@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.6
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.5.7
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/01/29
+## Modified 2023/02/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.6';
+    our $VERSION = 'v0.5.7';
 };
 
 use strict;
@@ -2285,7 +2285,7 @@ sub open
             $mode = $map->{ $mode } if( CORE::exists( $map->{ $mode } ) );
             try
             {
-                $io = Module::Generic::File::IO->new( $file, "$mode", @_ ) || return( $self->error( "Unable to open file \"$file\": ", Module::Generic::File::IO->error ) );
+                $io = Module::Generic::File::IO->new( "$file", "$mode", @_ ) || return( $self->error( "Unable to open file \"$file\": ", Module::Generic::File::IO->error ) );
             }
             catch( $err )
             {
@@ -3168,6 +3168,7 @@ sub unload_json
     {
         ordered => 'canonical',
         sorted => 'canonical',
+        sort => 'canonical',
     };
     
     try
@@ -4237,7 +4238,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.6
+    v0.5.7
 
 =head1 DESCRIPTION
 

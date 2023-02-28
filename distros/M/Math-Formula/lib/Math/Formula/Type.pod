@@ -1,0 +1,521 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Formula::Type - variable types for Math::Formular
+
+=head1 INHERITANCE
+
+ Math::Formula::Type
+   is a Math::Formula::Token
+
+=head1 SYNOPSIS
+
+  my $string = MF::STRING->new("example");
+  my $answer = MF::INTEGER->new(42);
+
+  # See more details per section
+
+=head1 DESCRIPTION
+
+This page describes are Types used by L<Math::Formula|Math::Formula>. All parts of an
+expression has a known type, and also the type of the result of an expression
+is known beforehand.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Math::Formula::Type-E<gt>B<new>($token|undef, [$value], %options)
+
+The object is a blessed ARRAY.  On the first spot is the $token.  On the
+second spot might be the decoded value of the token, in internal Perl
+representation.  When no $token is passed (value C<undef> is explicit), then
+you MUST provide a $value.  The token will be generated on request.
+
+ -Option    --Default
+  attributes  {}
+
+=over 2
+
+=item attributes => HASH
+
+(MF::FRAGMENT only) Initial attributes, addressed with infix operator C<.> (dot).
+
+=back
+
+=back
+
+=head2 MF::Formula::Type
+
+The following methods and features are supported for any Type defined on this page.
+
+All types can be converted into a string:
+
+  "a" ~ 2          -> STRING "a2"
+
+All types may provide B<attributes> (calls) for objects of that type.  Those
+get inherited (of course).  For instance:
+
+   02:03:04.hour   -> INTEGER 2
+
+=over 4
+
+=item $obj-E<gt>B<cast>($type)
+
+Type-convert a typed object into an object with a different type.  Sometimes, the 
+represented value changes a little bit, but usually not.
+
+Any Type can be cast into a MF::STRING. Read the documentation for other types to
+see what they offer.
+
+=item $obj-E<gt>B<collapsed>()
+
+Returns the normalized version of the L<token()|Math::Formula::Type/"MF::Formula::Type">: leading and trailing blanks
+removed, intermediate sequences of blanks shortened to one blank.
+
+=item $obj-E<gt>B<token>()
+
+Returns the token in string form.  This may be a piece of text as parsed
+from the expression string, or generated when the token is computed.
+
+=item $obj-E<gt>B<value>()
+
+Where L<token()|Math::Formula::Type/"MF::Formula::Type"> returns a string representation of the instance, the
+C<value()> produces its translation into internal Perl values or objects,
+ready to be involved in computations.
+
+=back
+
+=head2 MF::BOOLEAN, a thruth value
+
+Represents a truth value, either C<true> or C<false>.
+
+Booleans implement the prefix operator "C<+>", and infix operators 'C<and>',
+'C<or>', and 'C<xor>'.
+
+B<. Example: for booleans>
+
+  true    false     # the only two values
+  0                 # will be cast to false in boolean expressions
+  42                # any other value is true, in boolean expressions
+
+  not true        -> BOOLEAN false
+  true and false  -> BOOLEAN false
+  true  or false  -> BOOLEAN true
+  true xor false  -> BOOLEAN true
+
+=head2 MF::STRING, contains text
+
+Represents a sequence of UTF8 characters, which may be used single and
+double quoted.
+
+Strings may be cast into regular expressions (MF::REGEXP) when used on the right
+side of a regular expression match operator ('C<=~>' and 'C<!~>').
+
+Strings may be cast into a pattern (MF::PATTERN) when used on the right
+of a pattern match operator ('C<like>' and 'C<unlike>').
+
+Besides the four match operators, strings can be concatenated using 'C<~>'.
+
+Strings also implement textual comparison operators C<lt>, C<le>, C<eq>,
+C<ne>, C<ge>, C<gt>, and C<cmp>.  Read its section in L<Math::Formula|Math::Formula>.
+These comparisons use L<Unicode::Collate> in an attempt to get correct
+utf8 sorting.
+
+B<Warning!> When you create an expression which is only one string, then you
+will probably forget the double quotes:
+
+  Math::Formula->new(origin => 'Larry');      # wrong!!!
+  Math::Formula->new(origin => '"Larry"');    # right
+  Math::Formula->new(origin => "'Larry'");    # right
+  Math::Formula->new(origin => $string);      # probably wrong
+  Math::Formula->new(origin => "'$string'");  # probably wrong: can ' be in string?
+
+  Math::Formula->new(origin => \"Larry");     # right
+  Math::Formula->new(origin => \'Larry');     # right
+  Math::Formula->new(origin => \$string);     # right
+
+See also L<Math::Formula::Context::new(lead_expressions)|Math::Formula::Context/"Constructors">, for a different solution.
+
+B<. Example: of strings>
+
+  "double quoted string"
+  'single quoted string'   # alternative
+
+String operations:
+
+  "a" + 'b'           -> STRING  "ab"
+  "a" =~ "regexp"     -> BOOLEAN, see MF::REGEXP
+  "a" like "pattern"  -> BOOLEAN, see MF::PATTERN
+
+  "a" gt "b"          -> BOOLEAN
+  "a" cmp "b"         -> INTEGER -1, 0, 1
+
+Attributes:
+
+   "abc".length       -> INTEGER  3
+   "".is_empty        -> BOOLEAN true   # only white-space
+   "ABC".lower        -> STRING "abc", lower-case using utf8 folding
+
+=head2 MF::INTEGER, a long whole number
+
+Integers contain a sequence of ASCII digits, optionally followed by a multiplier.
+Numbers may use an underscore ('C<_>') on the thousands, to be more readible.
+For instance, 'C<42k>' is equal to 'C<42_000>'.
+
+Supported multipliers are
+
+=over 4
+
+=item * 1000-based C<k>, C<M>, C<G>, C<T>, C<E>, and C<Z>;
+
+=item * 1024-based C<kibi>, C<Mibi>, C<Gibi>, C<Tibi>, C<Eibi>, and C<Zibi>;
+
+=back
+
+The current guaranteed value boundaries are C<±2⁶³> which is about
+9 Zeta, just below C(10¹)>.
+
+Integers can be cast to booleans, where C<0> means C<false> and all other
+numbers are C<true>.
+
+Integers support prefix operators C<+> and C<->.
+
+Integers support infix operators C<+>, C<->, C<*>, C<%> (modulo) which result
+in integers.  Infix operator C</> returns a float.  All numeric comparison operators
+return a boolean.
+
+Integers implement the numeric sort operator C<< <=> >>, which may be mixed
+with floats.
+
+B<. Example: of integers>
+
+  42        # the answer to everything
+  8T        # how my disk was sold to me
+  7451Mibi  # what my system tells me the space is
+  -12       # negatives
+  1_234_567 # _ on the thousands, more readible
+
+  + 2          -> INTEGER   2      # prefix op
+  - 2          -> INTEGER   -2     # prefix op
+  - -2         -> INTEGER   2      # prefix op, negative int
+  
+  1 + 2        -> INTEGER   3      # infix op
+  5 - 9        -> INTEGER   -4     # infix op
+  3 * 4        -> INTEGER   12
+  12 % 5       -> INTEGER   2
+  12 / 5       -> FLOAT     2.4
+
+  1 < 2        -> BOOLEAN   true
+  1 <=> 2      -> INTEGER   -1     # -1, 0, 1
+
+  not 0        -> BOOLEAN   true
+  not 42       -> BOOLEAN   false
+
+Attributes
+
+  (-3).abs     -> INTEGER   3      # -3.abs == -(3.abs)
+
+=head2 MF::FLOAT, floating-point numbers
+
+Floating point numbers.  Only a limited set of floating point syntaxes is permitted, see
+examples.  Especially: a float SHALL contain a dot or 'e'.  When it contains a dot, there
+must be a digit on both sides.
+
+Floats support prefix operators C<+> and C<->.
+
+Floats support infix operators C<+>, C<->, C<*>, C<%> (modulo), and C</> which result
+in floats.  All numeric comparison operators are supported, also in combination with
+integers.
+
+B<. Example: of floats>
+
+  0.0        # leading zero obligatory
+  0e+0
+  0.1234
+  3e+10
+  -12.345
+
+  3.14 / 4
+  2.7 < π        -> BOOLEAN true
+  2.12 <=> 4.89  -> INTEGER -1    # -1, 0, 1
+
+=head2 MF::DATETIME, refers to a moment of time
+
+The datetime is a complex value.  The ISO8601 specification offers many, many options which
+make interpretation expensive.  To simplify access, one version is chosen.  This is an
+example of that version:
+
+  yyyy-mm-ddThh:mm:ss.sss+hhmm
+  2013-02-20T15:04:12.231+0200
+
+Mind the 'C<T>' between the date and the time components.  Second fractions are optional.
+
+The timezone is relative to UTC.  The first two digits reflect an hour difference, the
+latter two are minutes.
+
+Datetimes can be cast to a time or a date, with loss of information.
+
+It is possible to add (C<+>) and subtract (C<->) durations from a datetime, which result
+in a new datetime.  When you subtract one datetime from another datetime, the result is
+a duration.
+
+Compare a datetime with an other datetime numerically (implemented as text comparison).
+When the datetime is compared with a date, it is checked whether the point of time is
+within the specified date range (from 00:00:00 in the morning upto 23:59:61 at night).
+
+B<. Example: for datetime>
+
+  2023-02-18T01:28:12
+  2023-02-18T01:28:12.345
+  2023-02-18T01:28:12+0300
+  2023-02-18T01:28:12.345+0300
+
+  2023-02-21T11:28:34 + P2Y3DT2H -> DATETIME  2025-02-24T13:28:34
+  2023-02-21T11:28:34 - P2Y3DT2H -> DATETIME  2021-02-18T09:28:34
+  2023-02-21T11:28:34 - 2021-02-18T09:28:34 -> DURATION P2Y3DT2H
+
+Attributes: (the date and time attributes combined)
+
+  date = 2006-11-21T12:23:34.56+0110
+  dt.year    -> INTEGER 2006
+  dt.month   -> INTEGER 11
+  dt.day     -> INTEGER 21
+  dt.hour    -> INTEGER 12
+  dt.minute  -> INTEGER 23
+  dt.second  -> INTEGER 34
+  dt.fracsec -> FLOAT   34.56
+  dt.tz      -> STRING  +0110
+  dt.time    -> TIME    12:23:34.56
+  dt.date    -> DATE    2006-11-21+0110
+
+=head2 MF::DATE, refers to a day in some timezone
+
+A date has format 'YYYY-MM-DD+TZ', for instance C<2023-02-20+0100>.
+
+The date may be cast into a datetime, where the time is set to C<00:00:00>.
+This transformation is actually slightly problematic: a date means "anywhere
+during the day, where a datetime is a specific moment.
+
+You may add (C<+>) and subtract (C<->) durations from a date, which result in
+a new date.  Those durations cannot contain a time component.
+
+An subtract (C<->) from a date produces a duration.
+
+You may also add a time to a date, forming a datetime.  Those may be in diffent
+timezones.  You may also numerically compare dates, but only when they are not
+in the same timezone, this will return false.
+
+B<. Example: for date>
+
+  1966-12-21        # without timezone, default from context
+  1966-12-21+0200   # with explicit timezone info
+
+  2023-02-21+0200 - P3D            -> DATE     2023-02-18+0200
+  2012-03-08+0100 + 06:07:08+0200  -> DATETIME 2012-03-08T06:07:08+0300
+  2023-02-26 - 2023-01-20          -> DURATION P1M6D
+  2023-02-22 < 1966-04-05          -> BOOLEAN  false
+  2023-02-22 <=> 1966-04-05        -> INTEGER 1      # -1, 0 1
+
+  4 + 2000-10-20 -> INTEGER 1974  # parser accident repaired
+
+Attributes:
+
+  date = 2006-11-21+0700
+  date.year      -> INTEGER 2006
+  date.month     -> INTEGER 11
+  date.day       -> INTEGER 21
+  date.tz        -> STRING  "+0700"
+
+=head2 MF::TIME, a moment during any day
+
+Usefull to indicate a daily repeating event.  For instance, C<start-backup: 04:00:12>.
+Times do no have a timezone: it only gets a meaning when added to a (local) time.
+
+Time supports numeric comparison.  When you add (C<+>) a (short) duration to a time, it
+will result in a new time (modulo 24 hours).
+
+When you subtract (C<->) one time from another, you will get a duration modulo 24 hours.
+This does not take possible jumps to and from Daylight Savingstime into
+account.  When you care about that, than create a formular involving
+the actual date:
+
+  bedtime = 23:00:00
+  wakeup  = 06:30:00
+  now     = #system.now
+  sleep   = ((now+P1D).date + wakeup) - (now.date + bedtime)  #DURATION
+
+B<. Example: for time>
+
+  12:00:34      # lunch-time, in context default time-zone
+  23:59:61      # with max leap seconds
+  09:11:11.111  # precise time (upto nanoseconds)
+
+  12:00:34 + PT30M -> TIME 12:30:34   # end of lunch
+  12:00:34 - PT15M -> TIME 11:45:34   # round-up coworkers
+  23:40:00 + PT7H  -> TIME 06:40:00   # early rise
+  07:00:00 - 23
+
+  18:00:00+0200 ==  17:00:00+0100 -> BOOLEAN
+  18:00:00+0200 <=> 17:00:00+0100 -> INTEGER
+
+Attributes:
+
+  time = 12:23:34.56+0110
+  time.hour        -> INTEGER 12
+  time.minute      -> INTEGER 23
+  time.second      -> INTEGER 34
+  time.fracsec     -> FLOAT   34.56
+  time.tz          -> STRING  +0110
+
+=head2 MF::DURATION, a period of time
+
+Durations are usually added to datetimes, and may be negative.  They are formatted in
+ISO8601 standard format, which is a bit akward, to say the least.
+
+Durations can be added (C<+>) together, subtracted (C<->) together,
+or multiplied by an integer factor.  The prefix C<+> and C<-> are also supported.
+
+B<Be warned> that operations may not always lead to the expected results.
+A sum of 12 months will lead to 1 year, but 40 days will stay 40 days because the
+day length differs per month.  This will only be resolved when the duration is added
+to an actual datetime.
+
+Two durations can be compared numerically.  However: a bit of care must be taken.
+Sometimes, it is only clear what the ordering is when seend from a certain datetime.
+For instance, which is longer: P1M or P30D?  The current time ("now") is used as
+reference point.  Otherwise, add some other datetime to both durations before
+comparison.
+
+B<. Example: for duration>
+
+  P1Y2M5D          # duration one year, 2 months, 5 days
+  PT1M             # mind the "T" before smaller than day values!
+  P3MT5M           # confusing: 3 months + 5 minutes
+  PT3H4M8.2S       # duration 3 hours, 4 minutes, just over 8 seconds
+
+  - -P1Y           # prefix + and =
+  P3Y2M + P1YT3M5S  -> DURATION P4Y2MT3M5S
+  P1Y2MT3H5M - P3Y8MT5H13M14S -> DURATION -P2Y6MT2H8M14S
+  P1DT2H * 4        -> DURATION P4DT8H
+  4 * P1DT2H        -> DURATION P4DT8H
+
+  P1Y > P1M         -> BOOLEAN true
+  PT20M <=> PT19M   => INTEGER 1     # -1, 0, 1
+
+=head2 MF::NAME, refers to something in the context
+
+The L<Math::Formula::Context|Math::Formula::Context> object contains translations for names to
+contextual objects.  Names are the usual tokens: unicode alpha-numeric
+characters and underscore (C<_>), where the first character cannot be
+a digit.
+
+On the right-side of a fragment indicator C<#> or method indicator C<.>,
+the name will be lookup in the features of the object on the left of that
+operator.
+
+A name which is not right of a C<#> or C<.> can be cast into an object
+from the context.
+
+Names are symbol: are not a value by themselves, so have no values to
+be ordered.  However, they may exist however: test it with prefix operator
+C<exists>.
+
+The more complicated concept is the C<//> operator.  When there is no
+formula with the name on the left side, the right side is taken.  This
+is often stacked with a constant default value at the end.
+
+B<. Example: of names>
+
+  tic
+  route66
+  the_boss
+  _42       # and '_' works as a character
+  αβΩ       # unicode alpha nums allowed
+
+  7eleven   # not allowed: no start with number
+
+  See "Math::Formula::Context" for the following
+  #frag     # (prefix #) fragment of default object
+  .method   # (prefix .) method on default object
+  name#frag # fragment of object 'name'
+  file.size # method 'size' on object 'file'
+
+Attributes on names
+
+  exists live     -> BOOLEAN    # does formula 'live' exist?
+  not exists live -> BOOLEAN
+
+  live // dead // false         # pick first rule which exists
+
+=over 4
+
+=item Math::Formula::Type-E<gt>B<validated>($string, $where)
+
+Create a MF::NAME from a $string which needs to be validated for being a valid
+name.  The $where will be used in error messages when the $string is invalid.
+
+=back
+
+=head2 MF::PATTERN, pattern matching
+
+This type implements pattern matching for the C<like> and C<unlike> operators.
+The patterns are similar to file-system patterns.  However, there is no special meaning
+to leading dots and '/'.
+
+Pattern matching constructs are C<*> (zero or more characters), C<?> (any single
+character), and C<[abcA-Z]> (one of a, b, c, or capital), C<[!abc]> (not a, b, or c).
+Besides, it supports curly alternatives like C<*.{jpg,gif,png}>.
+
+B<. Example: of patterns>
+
+  "abc" like "b"     -> BOOLEAN false
+  "abc" like "*b*"   -> BOOLEAN false
+  "abc" like "*c"    -> BOOLEAN true
+
+  "abc" unlike "b"   -> BOOLEAN true
+  "abc" unlike "*b*" -> BOOLEAN true
+  "abc" unlike "*c"  -> BOOLEAN false
+
+=head2 MF::REGEXP, Regular expression
+
+This type implements regular expressions for the C<=~> and C<!~> operators.
+
+The base of a regular expression is a single or double quote string. When the
+operators are detected, those will automatically be cast into a regexp.
+
+B<. Example: of regular expressions>
+
+  "abc" =~ "b"       -> BOOLEAN true
+  "abc" =~ "c$"      -> BOOLEAN true
+  "abc" !~ "b"       -> BOOLEAN false
+  "abc" !~ "c$"      -> BOOLEAN false
+
+=over 4
+
+=item $obj-E<gt>B<regexp>()
+
+Returns the regular expression as compiled object (qr).
+
+=back
+
+=head2 MF::FRAGMENT, access to externally provided data
+
+The used of this type is explained in L<Math::Formula::Context|Math::Formula::Context>.
+
+=head1 SEE ALSO
+
+This module is part of Math-Formula distribution version 0.13,
+built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

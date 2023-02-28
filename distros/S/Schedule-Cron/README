@@ -1,30 +1,29 @@
 			    Schedule::Cron
 			    ==============
 
-This module provides  a simple but complete cron  like scheduler.  I.e
-this modules can be  used for periodically executing Perl subroutines.
-The  dates  and  parameters  for  the subroutines  to  be  called  are
+This module provides a simple but complete cron like scheduler. I.e
+this modules can be used for periodically executing Perl subroutines.
+The dates and parameters for the subroutines to be called are
 specified with a format known as crontab entry (see manpage crontab(5)
 or documentation of Schedule::Cron).
 
-The   philosophy  behind   Schedule::Cron  is   to   call  subroutines
-periodically from  within one single  Perl program instead  of letting
-cron  trigger several  (possibly different)  Perl  scripts. Everything
-under  one  roof.  Furthermore  Schedule::Cron  provides mechanism  to
+The philosophy behind Schedule::Cron is to call subroutines
+periodically from within one single Perl program instead of letting
+cron trigger several (possibly different) Perl scripts. Everything
+under one roof. Furthermore Schedule::Cron provides mechanism to
 create crontab entries dynamically, which isn't that easy with cron.
 
-Schedule::Cron  knows  about  all   extensions  (well,  at  least  all
+Schedule::Cron knows about all extensions (well, at least all
 extensions I'm aware of, i.e those  of the so called "Vixie" cron) for
-crontab entries like ranges  including 'steps', specification of month
+crontab entries like ranges including 'steps', specification of month
 and days of the week by name or coexistence of lists and ranges in the
-same field. And  even a bit more (like lists  and ranges with symbolic
+same field. And even a bit more (like lists and ranges with symbolic
 names).
 
-This module is rather effective concerning system load.  It calculates
-the execution  dates in advance and  will sleep until  those dates are
-reached (and  wont wake  up every minute  to check for  execution like
-cron).   However, it  relies on  the accuracy  of your  sleep() system
-call.
+This module is rather effective concerning system load. It calculates
+the execution dates in advance and will sleep until those dates are
+reached (and wont wake up every minute to check for execution like
+cron). However, it relies on the accuracy of your sleep() system call.
 
 EXAMPLES
 --------
@@ -72,79 +71,72 @@ EXAMPLES
 PREREQUISITES
 -------------
 
-In order  to install and use  this package you will  need Perl version
-5.005  or better.   Furthermore  you need  the module  Time::ParseDate
+In order to install and use this package you will need Perl version
+5.005 or better. Furthermore you need the module Time::ParseDate
 (contained in the Time-modules-xx.xxxxx) available on CPAN.
 
 You need a fork()-aware Perl for dispatching the cron jobs. This might
-change in the future. On systems  without a fork() system call you can
+change in the future. On systems without a fork() system call you can
 use the 'nofork' option to run your jobs within the current process.
 
 OS-DEPENDENCIES
 ---------------
 
 Schedule::Cron was tested on a Redhat Linux-Box, but it should work on
-any UNIX Box.  In depends on some original UNIX system calls for
+any UNIX Box. In depends on some original UNIX system calls for
 starting jobs and detaching itself to the background:
 
   * It uses fork() for starting jobs
   * For  detaching it  uses either  setsid (POSIX)  or the  ioctl call
     TIOCNOTTY
 
-If the  system calls mentioned  above are not available  (which should
-hapen nowadays only  under rare circumstances), you can  still use the
+If the system calls mentioned above are not available (which should
+hapen nowadays only under rare circumstances), you can still use the
 'nofork' option to run all jobs within a single process/thread. Please
 refer to the documentation for further reading.
 
 INSTALLATION
 ------------
 
-Installation can be done either in the old fashioned way
+Installation can be done the old fashioned way
 
    perl Makefile.PL
    make
    make test
    make install
 
-or alternatively with Module::Build
-
-   perl Build.PL
-   ./Build 
-   ./Build test
-   ./Build install
-
-See the  documentation for  Schedule::Cron for a  detailed description
+See the documentation for Schedule::Cron for a detailed description
 and further usage examples.
 
 REPORTING BUGS
 --------------
 
-If  you  meet  a  bug  (say   hello  to  it  ;-),  open  a  ticket  at
+If you meet a bug (say hello to it ;-), open a ticket at
 https://rt.cpan.org/Ticket/Create.html?Queue=Schedule-Cron.          
 
-In addition of  a problem description, please add  a short description
-of you  OS, your Perl version  and the version  of Time::ParseDate you
-are using.  If some of the  provided tests fail, include the output of
+In addition of a problem description, please add a short description
+of you OS, your Perl version and the version of Time::ParseDate you
+are using. If some of the provided tests fail, include the output of
 'make test TEST_VERBOSE=1' as well.
 
-If you suspect,  that the date calculation of  the next execution time
-is buggy, please  use the following interactive command  to generate a
+If you suspect, that the date calculation of the next execution time
+is buggy, please use the following interactive command to generate a
 bug report.
 
    perl -MSchedule::Cron -e 'bug Schedule::Cron'
 
-You will be asked for a  reference time (default: the current time), a
-crontab  date  pattern  (with  five  columns) and  the  expected  next
-execution date  (relative to  the reference time).   The dates  can be
-specified in  a format understood by  'parsedate' from Time::ParseDate
-(like 'now  + 5  days').  Please include  the output of  this command.
+You will be asked for a reference time (default: the current time), a
+crontab  date pattern (with five columns) and the expected next
+execution date (relative to  the reference time). The dates can be
+specified in a format understood by 'parsedate' from Time::ParseDate
+(like 'now + 5 days'). Please include the output of this command.
 
 REPOSITORY
 ----------
 
-Schedule::Cron's         source          is         located         at
-https://github.com/rhuss/schedule-cron  Please feel  free  to send  me
-pull requests if they apply  to the license below.  Also, don't forget
+Schedule::Cron's source is located at
+https://github.com/rhuss/schedule-cron Please feel free to send me
+pull requests if they apply to the license below. Also, don't forget
 documentation and tests.
 
 Please note also, that the active development for this module has been
@@ -156,11 +148,10 @@ COPYRIGHT AND LICENSE
 
 Copyright (c) 1999-2013 Roland Huß.
 
-Copyright (c) 2022 Nicholas Hubbard.
+Copyright (c) 2022-2023 Nicholas Hubbard.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 Enjoy it...
                                             ...roland (roland@cpan.org)
-

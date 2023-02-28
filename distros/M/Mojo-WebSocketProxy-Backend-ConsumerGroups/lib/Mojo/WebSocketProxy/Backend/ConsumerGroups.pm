@@ -18,7 +18,7 @@ use parent qw(Mojo::WebSocketProxy::Backend);
 
 no indirect;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 __PACKAGE__->register_type('consumer_groups');
 
@@ -26,54 +26,12 @@ use constant RESPONSE_TIMEOUT             => $ENV{RPC_QUEUE_RESPONSE_TIMEOUT} //
 use constant DEFAULT_CATEGORY_NAME        => 'general';
 use constant REQUIRED_RESPONSE_PARAMETERS => qw(message_id response);
 
-=head1 NAME
-
-Mojo::WebSocketProxy::Backend::ConsumerGroup
-
-=head1 DESCRIPTION
-
-Class for communication with backend by sending messaging through redis streams.
-
-=over 4
-
-=item * C<Redis streams> is used as channel for sending request to backend servers.
-
-=item * C<Redis subscriptions> is used as channel for receiving responses from backend servers.
-
-=back
-
-=head1 METHODS
-
-=head2 new
-
-Creates object instance of the class
-
-=over 4
-
-=item * C<redis_uri> - URI for Redis connection. Ignored if the C<redis> argument is also given.
-
-=item * C<redis> - Redis client object (must be compatible with L<Mojo::Redis2>). This argument will override the C<redis_uri> argument.
-
-=item * C<timeout> - Request timeout, in seconds. If not set, uses the environment variable C<RPC_QUEUE_RESPONSE_TIMEOUT>, or defaults to 30
-
-=item * C<queue_separation_enabled> - Boolean to specify if messages should be assigned to different queus based on their C<msg_group> or only C<general> queue.
-
-=item * C<category_timeout_config> - A hash containing the timeout value for each request category.
-
-    { general => 5, other => 120 }
-
-=back
-
-=cut
 
 sub new {
     my ($class, %args) = @_;
     return bless \%args, $class;
 }
 
-=head2 loop
-
-=cut
 
 sub loop {
     my $self = shift;
@@ -83,28 +41,11 @@ sub loop {
     };
 }
 
-=head2 pending_requests
-
-Returns C<hashref> which is used as a storage for keeping requests which were sent.
-Stucture of the hash should be like:
-
-=over 4
-
-=item * C<key> - request id, which we'll get from redis after successful adding request to the stream
-
-=item * C<value> - future object, which will be done in case of getting response, of cancelled in case of timeout
-
-=back
-
-=cut
 
 sub pending_requests {
     return shift->{pending_requests} //= {};
 }
 
-=head2 redis
-
-=cut
 
 sub redis {
     my $self = shift;
@@ -114,42 +55,21 @@ sub redis {
     );
 }
 
-=head2 timeout
-
-=cut
 
 sub timeout {
     return shift->{timeout} //= RESPONSE_TIMEOUT;
 }
 
-=head2 category_timeout_config
-
-Hash containing the timeout value for each rpc call category.
-
-    { general => 5, other => 120 }
-
-=cut
 
 sub category_timeout_config {
     return shift->{category_timeout_config} //= {};
 }
 
-=head2 queue_separation_enabled
-
-Boolean specifying if category separation should be enabled.
-
-=cut
 
 sub queue_separation_enabled {
     return shift->{queue_separation_enabled} //= 0;
 }
 
-=head2 whoami
-
-Return unique ID of Redis which will be used by backend server to send response.
-Id is persistent for the object.
-
-=cut
 
 sub whoami {
     my $self = shift;
@@ -160,49 +80,6 @@ sub whoami {
     return $self->{whoami};
 }
 
-=head2 call_rpc
-
-Makes a remote call to a process  returning the result to the client in JSON format.
-Before, After and error actions can be specified using call backs.
-It takes the following arguments
-
-=over 4
-
-=item * C<$c>  : L<Mojolicious::Controller>
-
-=item * C<$req_storage> A hashref of attributes stored with the request.  This routine uses some of the following named arguments:
-
-=over 4
-
-=item * C<method> The name of the method at the remote end.
-
-=item * C<msg_type> a name for this method; if not supplied C<method> is used.
-
-=item * C<call_params> a hashref of arguments on top of C<req_storage> to send to remote method. This will be suplemented with C<< $req_storage->{args} >>
-added as an C<args> key and be merged with C<< $req_storage->{stash_params} >> with stash_params overwriting any matching
-keys in C<call_params>.
-
-=item * C<rpc_response_callback>  If supplied this will be run with args: C<< Mojolicious::Controller >> instance, the rpc_response and C<< $req_storage >>.
-B<Note:> if C<< rpc_response_callback >> is supplied the success and error callbacks are not used.
-
-=item * C<before_get_rpc_response>  arrayref of subroutines to be run before the remote response is received, with args: C<< $c >> and C<< req_storage >>
-
-=item * C<after_get_rpc_response> arrayref of subroutines to be run after the remote response is received; called with args: C<< $c >> and C<< req_storage >>
-called only when there is an response from the remote call.
-
-=item * C<before_call> arrayref of subroutines called before the request to the remote service is made.
-
-=item * C<rpc_failure_cb> a subroutine reference to call if the remote call fails. Called with C<< Mojolicious::Controller >>, the rpc_response and C<< $req_storage >>
-
-=item * C<msg_group> - if supplied, the message will be assigned to the Redis channel with the corresponding name. The I<< general >> channel will be used by default if either C<< $msg_type >> is not provided or C<queue_separation_enabled> is 0.
-
-=back
-
-=back
-
-Returns undef.
-
-=cut
 
 sub call_rpc {
     my ($self, $c, $req_storage) = @_;
@@ -213,15 +90,15 @@ sub call_rpc {
     my $before_call_hooks             = delete($req_storage->{before_call})             || [];
     my $rpc_failure_cb                = delete($req_storage->{rpc_failure_cb});
     # stream category which message should be assigned to
-    $req_storage->{msg_group} = $self->queue_separation_enabled && $req_storage->{msg_group} ? $req_storage->{msg_group} : DEFAULT_CATEGORY_NAME;
+    $req_storage->{category} = $self->queue_separation_enabled && $req_storage->{category} ? $req_storage->{category} : DEFAULT_CATEGORY_NAME;
 
     foreach my $hook ($before_call_hooks->@*) { $hook->($c, $req_storage) }
 
-    my $category_timeout = $self->_rpc_category_timeout($req_storage->{msg_group});
+    my $category_timeout = $self->_rpc_category_timeout($req_storage->{category});
 
     my $block_response = delete($req_storage->{block_response});
     my ($msg_type, $request_data) = $self->_prepare_request_data($c, $req_storage, $category_timeout);
-    $self->request($request_data, $req_storage->{msg_group}, $category_timeout)->then(
+    $self->request($request_data, $req_storage->{category}, $category_timeout)->then(
         sub {
             my ($message) = @_;
 
@@ -283,25 +160,6 @@ sub call_rpc {
     return;
 }
 
-=head2 request
-
-Sends request to backend service. The method accepts following arguments:
-
-=over 4
-
-=item * C<request_data> - an C<arrayref> containing data for the item which is going to be put into redis stream.
-
-=item * C<$category_name> - this will be passed to C<_send_request> to specify which redis category this message belongs to.
-
-=item * C<category_timeout> - timeout value for this specific call (differs based on category)
-
-=back
-
-Returns future.
-Which will be marked as done in case getting response from backend server.
-And it'll be marked as failed in case of request timeout or in case of error putting request to redis stream.
-
-=cut
 
 sub request {
     my ($self, $request_data, $category_name, $category_timeout) = @_;
@@ -356,13 +214,6 @@ sub _send_request {
     return $f;
 }
 
-=head2 wait_for_messages
-
-By using redis subscription, we subscribe on channel for receiving responses from backend server.
-We'll use uniq id generated by L<whoami> as subscription channel.
-Subscription will be done only once within first request to backend server.
-
-=cut
 
 sub wait_for_messages {
     my ($self) = @_;
@@ -378,7 +229,9 @@ sub _on_message {
 
     try {
         $message = decode_json_utf8($raw_message);
-    } catch ($err) {
+    } catch {
+        my $err = $@;
+
         $log->errorf('An error occurred while decoding published response from worker: %s', $err);
         return;
     }
@@ -428,6 +281,158 @@ sub _prepare_request_data {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mojo::WebSocketProxy::Backend::ConsumerGroups - Class for communication with backend by sending messaging through redis streams.
+
+=head1 VERSION
+
+version 0.03
+
+=head1 DESCRIPTION
+
+Class for communication with backend by sending messaging through redis streams.
+
+=over 4
+
+=item * C<Redis streams> is used as channel for sending request to backend servers.
+
+=item * C<Redis subscriptions> is used as channel for receiving responses from backend servers.
+
+=back
+
+=head1 NAME
+
+Mojo::WebSocketProxy::Backend::ConsumerGroup
+
+=head1 METHODS
+
+=head2 new
+
+Creates object instance of the class
+
+=over 4
+
+=item * C<redis_uri> - URI for Redis connection. Ignored if the C<redis> argument is also given.
+
+=item * C<redis> - Redis client object (must be compatible with L<Mojo::Redis2>). This argument will override the C<redis_uri> argument.
+
+=item * C<timeout> - Request timeout, in seconds. If not set, uses the environment variable C<RPC_QUEUE_RESPONSE_TIMEOUT>, or defaults to 30
+
+=item * C<queue_separation_enabled> - Boolean to specify if messages should be assigned to different queus based on their C<category> or only C<general> queue.
+
+=item * C<category_timeout_config> - A hash containing the timeout value for each request category.
+
+    { general => 5, other => 120 }
+
+=back
+
+=head2 loop
+
+=head2 pending_requests
+
+Returns C<hashref> which is used as a storage for keeping requests which were sent.
+Stucture of the hash should be like:
+
+=over 4
+
+=item * C<key> - request id, which we'll get from redis after successful adding request to the stream
+
+=item * C<value> - future object, which will be done in case of getting response, of cancelled in case of timeout
+
+=back
+
+=head2 redis
+
+=head2 timeout
+
+=head2 category_timeout_config
+
+Hash containing the timeout value for each rpc call category.
+
+    { general => 5, other => 120 }
+
+=head2 queue_separation_enabled
+
+Boolean specifying if category separation should be enabled.
+
+=head2 whoami
+
+Return unique ID of Redis which will be used by backend server to send response.
+Id is persistent for the object.
+
+=head2 call_rpc
+
+Makes a remote call to a process  returning the result to the client in JSON format.
+Before, After and error actions can be specified using call backs.
+It takes the following arguments
+
+=over 4
+
+=item * C<$c>  : L<Mojolicious::Controller>
+
+=item * C<$req_storage> A hashref of attributes stored with the request.  This routine uses some of the following named arguments:
+
+=over 4
+
+=item * C<method> The name of the method at the remote end.
+
+=item * C<msg_type> a name for this method; if not supplied C<method> is used.
+
+=item * C<call_params> a hashref of arguments on top of C<req_storage> to send to remote method. This will be suplemented with C<< $req_storage->{args} >>
+added as an C<args> key and be merged with C<< $req_storage->{stash_params} >> with stash_params overwriting any matching
+keys in C<call_params>.
+
+=item * C<rpc_response_callback>  If supplied this will be run with args: C<< Mojolicious::Controller >> instance, the rpc_response and C<< $req_storage >>.
+B<Note:> if C<< rpc_response_callback >> is supplied the success and error callbacks are not used.
+
+=item * C<before_get_rpc_response>  arrayref of subroutines to be run before the remote response is received, with args: C<< $c >> and C<< req_storage >>
+
+=item * C<after_get_rpc_response> arrayref of subroutines to be run after the remote response is received; called with args: C<< $c >> and C<< req_storage >>
+called only when there is an response from the remote call.
+
+=item * C<before_call> arrayref of subroutines called before the request to the remote service is made.
+
+=item * C<rpc_failure_cb> a subroutine reference to call if the remote call fails. Called with C<< Mojolicious::Controller >>, the rpc_response and C<< $req_storage >>
+
+=item * C<category> - if supplied, the message will be assigned to the Redis channel with the corresponding name. The I<< general >> channel will be used by default if either C<< $msg_type >> is not provided or C<queue_separation_enabled> is 0.
+
+=back
+
+=back
+
+Returns undef.
+
+=head2 request
+
+Sends request to backend service. The method accepts following arguments:
+
+=over 4
+
+=item * C<request_data> - an C<arrayref> containing data for the item which is going to be put into redis stream.
+
+=item * C<$category_name> - this will be passed to C<_send_request> to specify which redis category this message belongs to.
+
+=item * C<category_timeout> - timeout value for this specific call (differs based on category)
+
+=back
+
+Returns future.
+Which will be marked as done in case getting response from backend server.
+And it'll be marked as failed in case of request timeout or in case of error putting request to redis stream.
+
+=head2 wait_for_messages
+
+By using redis subscription, we subscribe on channel for receiving responses from backend server.
+We'll use uniq id generated by L<whoami> as subscription channel.
+Subscription will be done only once within first request to backend server.
+
 =head1 SEE ALSO
 
 L<Mojolicious::Plugin::WebSocketProxy>,
@@ -440,5 +445,16 @@ L<Mojo::WebSocketProxy::Parser>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2022 deriv.com
+
+=head1 AUTHOR
+
+DERIV <DERIV@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Deriv Services Ltd.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

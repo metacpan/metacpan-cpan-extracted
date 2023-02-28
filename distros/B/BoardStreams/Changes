@@ -1,5 +1,13 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.36 2023-02-28T10:02:17Z
+
+    - fixed important bug
+
+v0.0.35 2023-02-27T19:22:45Z
+
+    - lock_stream_p now optionally accepts more than one stream
+
 v0.0.34 2023-02-16T19:00:26Z
 
     - fixed important bug

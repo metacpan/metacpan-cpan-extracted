@@ -14,9 +14,9 @@ use Perinci::Sub::GetArgs::Array qw(get_args_from_array);
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2023-02-24'; # DATE
 our $DIST = 'Perinci-Sub-GetArgs-Argv'; # DIST
-our $VERSION = '0.849'; # VERSION
+our $VERSION = '0.850'; # VERSION
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -337,10 +337,7 @@ sub _args2opts {
                 }
             };
 
-            if ($is_simple) {
-                $val_set = 1; $val = $_[1];
-                $rargs->{$arg} = $val;
-            } elsif ($is_array_of_simple) {
+            if ($is_array_of_simple) {
                 $rargs->{$arg} //= [];
                 $val_set = 1; $val = $_[1];
                 push @{ $rargs->{$arg} }, $val;
@@ -349,22 +346,8 @@ sub _args2opts {
                 $val_set = 1; $val = $_[2];
                 $rargs->{$arg}{$_[1]} = $val;
             } else {
-                {
-                    my ($success, $e, $decoded);
-                    ($success, $e, $decoded) = _parse_json($_[1]);
-                    if ($success) {
-                        $val_set = 1; $val = $decoded;
-                        $rargs->{$arg} = $val;
-                        last;
-                    }
-                    ($success, $e, $decoded) = _parse_yaml($_[1]);
-                    if ($success) {
-                        $val_set = 1; $val = $decoded;
-                        $rargs->{$arg} = $val;
-                        last;
-                    }
-                    die "Invalid YAML/JSON in arg '$fqarg'";
-                }
+                $val_set = 1; $val = $_[1];
+                $rargs->{$arg} = $val;
             }
             if ($val_set && $arg_spec->{cmdline_on_getopt}) {
                 $arg_spec->{cmdline_on_getopt}->(
@@ -1151,7 +1134,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.849 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2022-03-27.
+This document describes version 0.850 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2023-02-24.
 
 =head1 SYNOPSIS
 
@@ -1270,6 +1253,8 @@ Rinci function metadata.
 
 =item * B<meta_is_normalized> => I<bool>
 
+(No description)
+
 =item * B<per_arg_json> => I<bool> (default: 0)
 
 Whether to add --NAME-json for non-simple arguments.
@@ -1380,6 +1365,8 @@ C<cmdline_aliases> property) usually gets converted to string C<CODE>. In some
 cases, like for tab completion, this is harmless so you can turn this option on.
 
 =item * B<meta>* => I<hash>
+
+(No description)
 
 =item * B<meta_is_normalized> => I<bool> (default: 0)
 
@@ -1516,13 +1503,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

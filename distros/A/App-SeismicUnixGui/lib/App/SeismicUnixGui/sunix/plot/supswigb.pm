@@ -20,7 +20,7 @@ Version:
 
  SUPSWIGB - PostScript Bit-mapped WIGgle plot of a segy data set	
 
- supswigb <stdin [optional parameters] | ...				
+ supswigb <stdin [optional parameters] > 				
 
  Optional parameters:						 	
  key=(keyword)		if set, the values of x2 are set from header field
@@ -185,9 +185,12 @@ PSWIGB - PostScript WIGgle-trace plot of f(x1,x2) via Bitmap
 
 =head2 CHANGES and their DATES
 
+V0.0.2 supswigb <stdin [optional parameters] > (JML for SeismicUnixGui 2.8.23)	
+
 =cut
+
  use Moose;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
 	my $get					= L_SU_global_constants->new();
@@ -2003,6 +2006,28 @@ sub titlefont {
     }
 }
 
+=head2 sub titlesize 
+
+
+=cut
+
+sub titlesize {
+
+    my ( $self, $titlesize ) = @_;
+    if ( $titlesize ne $empty_string ) {
+
+        $supswigb->{_titlesize} = $titlesize;
+        $supswigb->{_note} =
+          $supswigb->{_note} . ' titlesize=' . $supswigb->{_titlesize};
+        $supswigb->{_Step} =
+          $supswigb->{_Step} . ' titlesize=' . $supswigb->{_titlesize};
+
+    }
+    else {
+        print("supswigb,missing titlesize,\n");
+    }
+}
+
 =head2 sub tmpdir 
 
 
@@ -2128,6 +2153,7 @@ sub tstart_s {
 }
 
 =head2 sub va 
+
   plot data using a variable area scheme
   also sub shading
   Rachel Gnieski 091718
@@ -2647,1005 +2673,121 @@ sub y_tick_increment {
 	 }
  }
 
-#
-#=head2 sub bias 
-#
-#
-#=cut
-#
-# sub bias {
-#
-#	my ( $self,$bias )		= @_;
-#	if ( $bias ne $empty_string ) {
-#
-#		$supswigb->{_bias}		= $bias;
-#		$supswigb->{_note}		= $supswigb->{_note}.' bias='.$supswigb->{_bias};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' bias='.$supswigb->{_bias};
-#
-#	} else { 
-#		print("pswigb, bias, missing bias,\n");
-#	 }
-# }
-#
-#
-#=head2 sub clip 
-#
-#
-#=cut
-#
-# sub clip {
-#
-#	my ( $self,$clip )		= @_;
-#	if ( $clip ne $empty_string ) {
-#
-#		$supswigb->{_clip}		= $clip;
-#		$supswigb->{_note}		= $supswigb->{_note}.' clip='.$supswigb->{_clip};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' clip='.$supswigb->{_clip};
-#
-#	} else { 
-#		print("pswigb, clip, missing clip,\n");
-#	 }
-# }
-#
-#
-#=head2 sub curve 
-#
-#
-#=cut
-#
-# sub curve {
-#
-#	my ( $self,$curve )		= @_;
-#	if ( $curve ne $empty_string ) {
-#
-#		$supswigb->{_curve}		= $curve;
-#		$supswigb->{_note}		= $supswigb->{_note}.' curve='.$supswigb->{_curve};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' curve='.$supswigb->{_curve};
-#
-#	} else { 
-#		print("pswigb, curve, missing curve,\n");
-#	 }
-# }
-#
-#
-#=head2 sub curvecolor 
-#
-#
-#=cut
-#
-# sub curvecolor {
-#
-#	my ( $self,$curvecolor )		= @_;
-#	if ( $curvecolor ne $empty_string ) {
-#
-#		$supswigb->{_curvecolor}		= $curvecolor;
-#		$supswigb->{_note}		= $supswigb->{_note}.' curvecolor='.$supswigb->{_curvecolor};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' curvecolor='.$supswigb->{_curvecolor};
-#
-#	} else { 
-#		print("pswigb, curvecolor, missing curvecolor,\n");
-#	 }
-# }
-#
-#
-#=head2 sub curvedash 
-#
-#
-#=cut
-#
-# sub curvedash {
-#
-#	my ( $self,$curvedash )		= @_;
-#	if ( $curvedash ne $empty_string ) {
-#
-#		$supswigb->{_curvedash}		= $curvedash;
-#		$supswigb->{_note}		= $supswigb->{_note}.' curvedash='.$supswigb->{_curvedash};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' curvedash='.$supswigb->{_curvedash};
-#
-#	} else { 
-#		print("pswigb, curvedash, missing curvedash,\n");
-#	 }
-# }
-#
-#
-#=head2 sub curvefile 
-#
-#
-#=cut
-#
-# sub curvefile {
-#
-#	my ( $self,$curvefile )		= @_;
-#	if ( $curvefile ne $empty_string ) {
-#
-#		$supswigb->{_curvefile}		= $curvefile;
-#		$supswigb->{_note}		= $supswigb->{_note}.' curvefile='.$supswigb->{_curvefile};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' curvefile='.$supswigb->{_curvefile};
-#
-#	} else { 
-#		print("pswigb, curvefile, missing curvefile,\n");
-#	 }
-# }
-#
-#
-#=head2 sub curvewidth 
-#
-#
-#=cut
-#
-# sub curvewidth {
-#
-#	my ( $self,$curvewidth )		= @_;
-#	if ( $curvewidth ne $empty_string ) {
-#
-#		$supswigb->{_curvewidth}		= $curvewidth;
-#		$supswigb->{_note}		= $supswigb->{_note}.' curvewidth='.$supswigb->{_curvewidth};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' curvewidth='.$supswigb->{_curvewidth};
-#
-#	} else { 
-#		print("pswigb, curvewidth, missing curvewidth,\n");
-#	 }
-# }
-#
-#
-#=head2 sub d1 
-#
-#
-#=cut
-#
-# sub d1 {
-#
-#	my ( $self,$d1 )		= @_;
-#	if ( $d1 ne $empty_string ) {
-#
-#		$supswigb->{_d1}		= $d1;
-#		$supswigb->{_note}		= $supswigb->{_note}.' d1='.$supswigb->{_d1};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' d1='.$supswigb->{_d1};
-#
-#	} else { 
-#		print("pswigb, d1, missing d1,\n");
-#	 }
-# }
-#
-#
-#=head2 sub d1num 
-#
-#
-#=cut
-#
-# sub d1num {
-#
-#	my ( $self,$d1num )		= @_;
-#	if ( $d1num ne $empty_string ) {
-#
-#		$supswigb->{_d1num}		= $d1num;
-#		$supswigb->{_note}		= $supswigb->{_note}.' d1num='.$supswigb->{_d1num};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' d1num='.$supswigb->{_d1num};
-#
-#	} else { 
-#		print("pswigb, d1num, missing d1num,\n");
-#	 }
-# }
-#
-#
-#=head2 sub d2 
-#
-#
-#=cut
-#
-# sub d2 {
-#
-#	my ( $self,$d2 )		= @_;
-#	if ( $d2 ne $empty_string ) {
-#
-#		$supswigb->{_d2}		= $d2;
-#		$supswigb->{_note}		= $supswigb->{_note}.' d2='.$supswigb->{_d2};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' d2='.$supswigb->{_d2};
-#
-#	} else { 
-#		print("pswigb, d2, missing d2,\n");
-#	 }
-# }
-#
-#
-#=head2 sub d2num 
-#
-#
-#=cut
-#
-# sub d2num {
-#
-#	my ( $self,$d2num )		= @_;
-#	if ( $d2num ne $empty_string ) {
-#
-#		$supswigb->{_d2num}		= $d2num;
-#		$supswigb->{_note}		= $supswigb->{_note}.' d2num='.$supswigb->{_d2num};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' d2num='.$supswigb->{_d2num};
-#
-#	} else { 
-#		print("pswigb, d2num, missing d2num,\n");
-#	 }
-# }
-#
-#
-#=head2 sub f1 
-#
-#
-#=cut
-#
-# sub f1 {
-#
-#	my ( $self,$f1 )		= @_;
-#	if ( $f1 ne $empty_string ) {
-#
-#		$supswigb->{_f1}		= $f1;
-#		$supswigb->{_note}		= $supswigb->{_note}.' f1='.$supswigb->{_f1};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' f1='.$supswigb->{_f1};
-#
-#	} else { 
-#		print("pswigb, f1, missing f1,\n");
-#	 }
-# }
-#
-#
-#=head2 sub f1num 
-#
-#
-#=cut
-#
-# sub f1num {
-#
-#	my ( $self,$f1num )		= @_;
-#	if ( $f1num ne $empty_string ) {
-#
-#		$supswigb->{_f1num}		= $f1num;
-#		$supswigb->{_note}		= $supswigb->{_note}.' f1num='.$supswigb->{_f1num};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' f1num='.$supswigb->{_f1num};
-#
-#	} else { 
-#		print("pswigb, f1num, missing f1num,\n");
-#	 }
-# }
-#
-#
-#=head2 sub f2 
-#
-#
-#=cut
-#
-# sub f2 {
-#
-#	my ( $self,$f2 )		= @_;
-#	if ( $f2 ne $empty_string ) {
-#
-#		$supswigb->{_f2}		= $f2;
-#		$supswigb->{_note}		= $supswigb->{_note}.' f2='.$supswigb->{_f2};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' f2='.$supswigb->{_f2};
-#
-#	} else { 
-#		print("pswigb, f2, missing f2,\n");
-#	 }
-# }
-#
-#
-#=head2 sub f2num 
-#
-#
-#=cut
-#
-# sub f2num {
-#
-#	my ( $self,$f2num )		= @_;
-#	if ( $f2num ne $empty_string ) {
-#
-#		$supswigb->{_f2num}		= $f2num;
-#		$supswigb->{_note}		= $supswigb->{_note}.' f2num='.$supswigb->{_f2num};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' f2num='.$supswigb->{_f2num};
-#
-#	} else { 
-#		print("pswigb, f2num, missing f2num,\n");
-#	 }
-# }
-#
-#
-#=head2 sub grid1 
-#
-#
-#=cut
-#
-# sub grid1 {
-#
-#	my ( $self,$grid1 )		= @_;
-#	if ( $grid1 ne $empty_string ) {
-#
-#		$supswigb->{_grid1}		= $grid1;
-#		$supswigb->{_note}		= $supswigb->{_note}.' grid1='.$supswigb->{_grid1};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' grid1='.$supswigb->{_grid1};
-#
-#	} else { 
-#		print("pswigb, grid1, missing grid1,\n");
-#	 }
-# }
-#
-#
-#=head2 sub grid2 
-#
-#
-#=cut
-#
-# sub grid2 {
-#
-#	my ( $self,$grid2 )		= @_;
-#	if ( $grid2 ne $empty_string ) {
-#
-#		$supswigb->{_grid2}		= $grid2;
-#		$supswigb->{_note}		= $supswigb->{_note}.' grid2='.$supswigb->{_grid2};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' grid2='.$supswigb->{_grid2};
-#
-#	} else { 
-#		print("pswigb, grid2, missing grid2,\n");
-#	 }
-# }
-#
-#
-#=head2 sub gridcolor 
-#
-#
-#=cut
-#
-# sub gridcolor {
-#
-#	my ( $self,$gridcolor )		= @_;
-#	if ( $gridcolor ne $empty_string ) {
-#
-#		$supswigb->{_gridcolor}		= $gridcolor;
-#		$supswigb->{_note}		= $supswigb->{_note}.' gridcolor='.$supswigb->{_gridcolor};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' gridcolor='.$supswigb->{_gridcolor};
-#
-#	} else { 
-#		print("pswigb, gridcolor, missing gridcolor,\n");
-#	 }
-# }
-#
-#
-#=head2 sub gridwidth 
-#
-#
-#=cut
-#
-# sub gridwidth {
-#
-#	my ( $self,$gridwidth )		= @_;
-#	if ( $gridwidth ne $empty_string ) {
-#
-#		$supswigb->{_gridwidth}		= $gridwidth;
-#		$supswigb->{_note}		= $supswigb->{_note}.' gridwidth='.$supswigb->{_gridwidth};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' gridwidth='.$supswigb->{_gridwidth};
-#
-#	} else { 
-#		print("pswigb, gridwidth, missing gridwidth,\n");
-#	 }
-# }
-#
-#
-#=head2 sub hbox 
-#
-#
-#=cut
-#
-# sub hbox {
-#
-#	my ( $self,$hbox )		= @_;
-#	if ( $hbox ne $empty_string ) {
-#
-#		$supswigb->{_hbox}		= $hbox;
-#		$supswigb->{_note}		= $supswigb->{_note}.' hbox='.$supswigb->{_hbox};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' hbox='.$supswigb->{_hbox};
-#
-#	} else { 
-#		print("pswigb, hbox, missing hbox,\n");
-#	 }
-# }
-#
-#
-#=head2 sub interp 
-#
-#
-#=cut
-#
-# sub interp {
-#
-#	my ( $self,$interp )		= @_;
-#	if ( $interp ne $empty_string ) {
-#
-#		$supswigb->{_interp}		= $interp;
-#		$supswigb->{_note}		= $supswigb->{_note}.' interp='.$supswigb->{_interp};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' interp='.$supswigb->{_interp};
-#
-#	} else { 
-#		print("pswigb, interp, missing interp,\n");
-#	 }
-# }
-#
-#
-#=head2 sub label1 
-#
-#
-#=cut
-#
-# sub label1 {
-#
-#	my ( $self,$label1 )		= @_;
-#	if ( $label1 ne $empty_string ) {
-#
-#		$supswigb->{_label1}		= $label1;
-#		$supswigb->{_note}		= $supswigb->{_note}.' label1='.$supswigb->{_label1};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' label1='.$supswigb->{_label1};
-#
-#	} else { 
-#		print("pswigb, label1, missing label1,\n");
-#	 }
-# }
-#
-#
-#=head2 sub label2 
-#
-#
-#=cut
-#
-# sub label2 {
-#
-#	my ( $self,$label2 )		= @_;
-#	if ( $label2 ne $empty_string ) {
-#
-#		$supswigb->{_label2}		= $label2;
-#		$supswigb->{_note}		= $supswigb->{_note}.' label2='.$supswigb->{_label2};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' label2='.$supswigb->{_label2};
-#
-#	} else { 
-#		print("pswigb, label2, missing label2,\n");
-#	 }
-# }
-#
-#
-#=head2 sub labelfont 
-#
-#
-#=cut
-#
-# sub labelfont {
-#
-#	my ( $self,$labelfont )		= @_;
-#	if ( $labelfont ne $empty_string ) {
-#
-#		$supswigb->{_labelfont}		= $labelfont;
-#		$supswigb->{_note}		= $supswigb->{_note}.' labelfont='.$supswigb->{_labelfont};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' labelfont='.$supswigb->{_labelfont};
-#
-#	} else { 
-#		print("pswigb, labelfont, missing labelfont,\n");
-#	 }
-# }
-#
-#
-#=head2 sub labelsize 
-#
-#
-#=cut
-#
-# sub labelsize {
-#
-#	my ( $self,$labelsize )		= @_;
-#	if ( $labelsize ne $empty_string ) {
-#
-#		$supswigb->{_labelsize}		= $labelsize;
-#		$supswigb->{_note}		= $supswigb->{_note}.' labelsize='.$supswigb->{_labelsize};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' labelsize='.$supswigb->{_labelsize};
-#
-#	} else { 
-#		print("pswigb, labelsize, missing labelsize,\n");
-#	 }
-# }
-#
-#
-#=head2 sub n1 
-#
-#
-#=cut
-#
-# sub n1 {
-#
-#	my ( $self,$n1 )		= @_;
-#	if ( $n1 ne $empty_string ) {
-#
-#		$supswigb->{_n1}		= $n1;
-#		$supswigb->{_note}		= $supswigb->{_note}.' n1='.$supswigb->{_n1};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' n1='.$supswigb->{_n1};
-#
-#	} else { 
-#		print("pswigb, n1, missing n1,\n");
-#	 }
-# }
-#
-#
-#=head2 sub n1tic 
-#
-#
-#=cut
-#
-# sub n1tic {
-#
-#	my ( $self,$n1tic )		= @_;
-#	if ( $n1tic ne $empty_string ) {
-#
-#		$supswigb->{_n1tic}		= $n1tic;
-#		$supswigb->{_note}		= $supswigb->{_note}.' n1tic='.$supswigb->{_n1tic};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' n1tic='.$supswigb->{_n1tic};
-#
-#	} else { 
-#		print("pswigb, n1tic, missing n1tic,\n");
-#	 }
-# }
-#
-#
-#=head2 sub n2 
-#
-#
-#=cut
-#
-# sub n2 {
-#
-#	my ( $self,$n2 )		= @_;
-#	if ( $n2 ne $empty_string ) {
-#
-#		$supswigb->{_n2}		= $n2;
-#		$supswigb->{_note}		= $supswigb->{_note}.' n2='.$supswigb->{_n2};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' n2='.$supswigb->{_n2};
-#
-#	} else { 
-#		print("pswigb, n2, missing n2,\n");
-#	 }
-# }
-#
-#
-#=head2 sub n2tic 
-#
-#
-#=cut
-#
-# sub n2tic {
-#
-#	my ( $self,$n2tic )		= @_;
-#	if ( $n2tic ne $empty_string ) {
-#
-#		$supswigb->{_n2tic}		= $n2tic;
-#		$supswigb->{_note}		= $supswigb->{_note}.' n2tic='.$supswigb->{_n2tic};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' n2tic='.$supswigb->{_n2tic};
-#
-#	} else { 
-#		print("pswigb, n2tic, missing n2tic,\n");
-#	 }
-# }
-#
-#
-#=head2 sub nbpi 
-#
-#
-#=cut
-#
-# sub nbpi {
-#
-#	my ( $self,$nbpi )		= @_;
-#	if ( $nbpi ne $empty_string ) {
-#
-#		$supswigb->{_nbpi}		= $nbpi;
-#		$supswigb->{_note}		= $supswigb->{_note}.' nbpi='.$supswigb->{_nbpi};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' nbpi='.$supswigb->{_nbpi};
-#
-#	} else { 
-#		print("pswigb, nbpi, missing nbpi,\n");
-#	 }
-# }
-#
-#
-#=head2 sub npair 
-#
-#
-#=cut
-#
-# sub npair {
-#
-#	my ( $self,$npair )		= @_;
-#	if ( $npair ne $empty_string ) {
-#
-#		$supswigb->{_npair}		= $npair;
-#		$supswigb->{_note}		= $supswigb->{_note}.' npair='.$supswigb->{_npair};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' npair='.$supswigb->{_npair};
-#
-#	} else { 
-#		print("pswigb, npair, missing npair,\n");
-#	 }
-# }
-#
-#
-#=head2 sub perc 
-#
-#
-#=cut
-#
-# sub perc {
-#
-#	my ( $self,$perc )		= @_;
-#	if ( $perc ne $empty_string ) {
-#
-#		$supswigb->{_perc}		= $perc;
-#		$supswigb->{_note}		= $supswigb->{_note}.' perc='.$supswigb->{_perc};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' perc='.$supswigb->{_perc};
-#
-#	} else { 
-#		print("pswigb, perc, missing perc,\n");
-#	 }
-# }
-#
-#
-#=head2 sub style 
-#
-#
-#=cut
-#
-# sub style {
-#
-#	my ( $self,$style )		= @_;
-#	if ( $style ne $empty_string ) {
-#
-#		$supswigb->{_style}		= $style;
-#		$supswigb->{_note}		= $supswigb->{_note}.' style='.$supswigb->{_style};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' style='.$supswigb->{_style};
-#
-#	} else { 
-#		print("pswigb, style, missing style,\n");
-#	 }
-# }
-#
-#
-#=head2 sub ticwidth 
-#
-#
-#=cut
-#
-# sub ticwidth {
-#
-#	my ( $self,$ticwidth )		= @_;
-#	if ( $ticwidth ne $empty_string ) {
-#
-#		$supswigb->{_ticwidth}		= $ticwidth;
-#		$supswigb->{_note}		= $supswigb->{_note}.' ticwidth='.$supswigb->{_ticwidth};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' ticwidth='.$supswigb->{_ticwidth};
-#
-#	} else { 
-#		print("pswigb, ticwidth, missing ticwidth,\n");
-#	 }
-# }
-#
-#
-#=head2 sub title 
-#
-#
-#=cut
-#
-# sub title {
-#
-#	my ( $self,$title )		= @_;
-#	if ( $title ne $empty_string ) {
-#
-#		$supswigb->{_title}		= $title;
-#		$supswigb->{_note}		= $supswigb->{_note}.' title='.$supswigb->{_title};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' title='.$supswigb->{_title};
-#
-#	} else { 
-#		print("pswigb, title, missing title,\n");
-#	 }
-# }
-#
-#
-#=head2 sub titlecolor 
-#
-#
-#=cut
-#
-# sub titlecolor {
-#
-#	my ( $self,$titlecolor )		= @_;
-#	if ( $titlecolor ne $empty_string ) {
-#
-#		$supswigb->{_titlecolor}		= $titlecolor;
-#		$supswigb->{_note}		= $supswigb->{_note}.' titlecolor='.$supswigb->{_titlecolor};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' titlecolor='.$supswigb->{_titlecolor};
-#
-#	} else { 
-#		print("pswigb, titlecolor, missing titlecolor,\n");
-#	 }
-# }
-#
-#
-#=head2 sub titlefont 
-#
-#
-#=cut
-#
-# sub titlefont {
-#
-#	my ( $self,$titlefont )		= @_;
-#	if ( $titlefont ne $empty_string ) {
-#
-#		$supswigb->{_titlefont}		= $titlefont;
-#		$supswigb->{_note}		= $supswigb->{_note}.' titlefont='.$supswigb->{_titlefont};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' titlefont='.$supswigb->{_titlefont};
-#
-#	} else { 
-#		print("pswigb, titlefont, missing titlefont,\n");
-#	 }
-# }
-#
-#
-#=head2 sub titlesize 
-#
-#
-#=cut
-#
-# sub titlesize {
-#
-#	my ( $self,$titlesize )		= @_;
-#	if ( $titlesize ne $empty_string ) {
-#
-#		$supswigb->{_titlesize}		= $titlesize;
-#		$supswigb->{_note}		= $supswigb->{_note}.' titlesize='.$supswigb->{_titlesize};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' titlesize='.$supswigb->{_titlesize};
-#
-#	} else { 
-#		print("pswigb, titlesize, missing titlesize,\n");
-#	 }
-# }
-#
-#
-#=head2 sub va 
-#
-#
-#=cut
-#
-# sub va {
-#
-#	my ( $self,$va )		= @_;
-#	if ( $va ne $empty_string ) {
-#
-#		$supswigb->{_va}		= $va;
-#		$supswigb->{_note}		= $supswigb->{_note}.' va='.$supswigb->{_va};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' va='.$supswigb->{_va};
-#
-#	} else { 
-#		print("pswigb, va, missing va,\n");
-#	 }
-# }
-#
-#
-#=head2 sub verbose 
-#
-#
-#=cut
-#
-# sub verbose {
-#
-#	my ( $self,$verbose )		= @_;
-#	if ( $verbose ne $empty_string ) {
-#
-#		$supswigb->{_verbose}		= $verbose;
-#		$supswigb->{_note}		= $supswigb->{_note}.' verbose='.$supswigb->{_verbose};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' verbose='.$supswigb->{_verbose};
-#
-#	} else { 
-#		print("pswigb, verbose, missing verbose,\n");
-#	 }
-# }
-#
-#
-#=head2 sub wbox 
-#
-#
-#=cut
-#
-# sub wbox {
-#
-#	my ( $self,$wbox )		= @_;
-#	if ( $wbox ne $empty_string ) {
-#
-#		$supswigb->{_wbox}		= $wbox;
-#		$supswigb->{_note}		= $supswigb->{_note}.' wbox='.$supswigb->{_wbox};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' wbox='.$supswigb->{_wbox};
-#
-#	} else { 
-#		print("pswigb, wbox, missing wbox,\n");
-#	 }
-# }
-#
-#
-#=head2 sub wt 
-#
-#
-#=cut
-#
-# sub wt {
-#
-#	my ( $self,$wt )		= @_;
-#	if ( $wt ne $empty_string ) {
-#
-#		$supswigb->{_wt}		= $wt;
-#		$supswigb->{_note}		= $supswigb->{_note}.' wt='.$supswigb->{_wt};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' wt='.$supswigb->{_wt};
-#
-#	} else { 
-#		print("pswigb, wt, missing wt,\n");
-#	 }
-# }
-#
-#
-#=head2 sub x1beg 
-#
-#
-#=cut
-#
-# sub x1beg {
-#
-#	my ( $self,$x1beg )		= @_;
-#	if ( $x1beg ne $empty_string ) {
-#
-#		$supswigb->{_x1beg}		= $x1beg;
-#		$supswigb->{_note}		= $supswigb->{_note}.' x1beg='.$supswigb->{_x1beg};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' x1beg='.$supswigb->{_x1beg};
-#
-#	} else { 
-#		print("pswigb, x1beg, missing x1beg,\n");
-#	 }
-# }
-#
-#
-#=head2 sub x1end 
-#
-#
-#=cut
-#
-# sub x1end {
-#
-#	my ( $self,$x1end )		= @_;
-#	if ( $x1end ne $empty_string ) {
-#
-#		$supswigb->{_x1end}		= $x1end;
-#		$supswigb->{_note}		= $supswigb->{_note}.' x1end='.$supswigb->{_x1end};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' x1end='.$supswigb->{_x1end};
-#
-#	} else { 
-#		print("pswigb, x1end, missing x1end,\n");
-#	 }
-# }
-#
-#
-#=head2 sub x2 
-#
-#
-#=cut
-#
-# sub x2 {
-#
-#	my ( $self,$x2 )		= @_;
-#	if ( $x2 ne $empty_string ) {
-#
-#		$supswigb->{_x2}		= $x2;
-#		$supswigb->{_note}		= $supswigb->{_note}.' x2='.$supswigb->{_x2};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' x2='.$supswigb->{_x2};
-#
-#	} else { 
-#		print("pswigb, x2, missing x2,\n");
-#	 }
-# }
-#
-#
-#=head2 sub x2beg 
-#
-#
-#=cut
-#
-# sub x2beg {
-#
-#	my ( $self,$x2beg )		= @_;
-#	if ( $x2beg ne $empty_string ) {
-#
-#		$supswigb->{_x2beg}		= $x2beg;
-#		$supswigb->{_note}		= $supswigb->{_note}.' x2beg='.$supswigb->{_x2beg};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' x2beg='.$supswigb->{_x2beg};
-#
-#	} else { 
-#		print("pswigb, x2beg, missing x2beg,\n");
-#	 }
-# }
-#
-#
-#=head2 sub x2end 
-#
-#
-#=cut
-#
-# sub x2end {
-#
-#	my ( $self,$x2end )		= @_;
-#	if ( $x2end ne $empty_string ) {
-#
-#		$supswigb->{_x2end}		= $x2end;
-#		$supswigb->{_note}		= $supswigb->{_note}.' x2end='.$supswigb->{_x2end};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' x2end='.$supswigb->{_x2end};
-#
-#	} else { 
-#		print("pswigb, x2end, missing x2end,\n");
-#	 }
-# }
-#
-#
-#=head2 sub xbox 
-#
-#
-#=cut
-#
-# sub xbox {
-#
-#	my ( $self,$xbox )		= @_;
-#	if ( $xbox ne $empty_string ) {
-#
-#		$supswigb->{_xbox}		= $xbox;
-#		$supswigb->{_note}		= $supswigb->{_note}.' xbox='.$supswigb->{_xbox};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' xbox='.$supswigb->{_xbox};
-#
-#	} else { 
-#		print("pswigb, xbox, missing xbox,\n");
-#	 }
-# }
-#
-#
-#=head2 sub xcur 
-#
-#
-#=cut
-#
-# sub xcur {
-#
-#	my ( $self,$xcur )		= @_;
-#	if ( $xcur ne $empty_string ) {
-#
-#		$supswigb->{_xcur}		= $xcur;
-#		$supswigb->{_note}		= $supswigb->{_note}.' xcur='.$supswigb->{_xcur};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' xcur='.$supswigb->{_xcur};
-#
-#	} else { 
-#		print("pswigb, xcur, missing xcur,\n");
-#	 }
-# }
-#
-#
-#=head2 sub ybox 
-#
-#
-#=cut
-#
-# sub ybox {
-#
-#	my ( $self,$ybox )		= @_;
-#	if ( $ybox ne $empty_string ) {
-#
-#		$supswigb->{_ybox}		= $ybox;
-#		$supswigb->{_note}		= $supswigb->{_note}.' ybox='.$supswigb->{_ybox};
-#		$supswigb->{_Step}		= $supswigb->{_Step}.' ybox='.$supswigb->{_ybox};
-#
-#	} else { 
-#		print("pswigb, ybox, missing ybox,\n");
-#	 }
-# }
+
+
+
+
+=head2 sub curvedash 
+
+
+=cut
+
+ sub curvedash {
+
+	my ( $self,$curvedash )		= @_;
+	if ( $curvedash ne $empty_string ) {
+
+		$supswigb->{_curvedash}		= $curvedash;
+		$supswigb->{_note}		= $supswigb->{_note}.' curvedash='.$supswigb->{_curvedash};
+		$supswigb->{_Step}		= $supswigb->{_Step}.' curvedash='.$supswigb->{_curvedash};
+
+	} else { 
+		print("pswigb, curvedash, missing curvedash,\n");
+	 }
+ }
+
+
+
+
+
+=head2 sub curvewidth 
+
+
+=cut
+
+ sub curvewidth {
+
+	my ( $self,$curvewidth )		= @_;
+	if ( $curvewidth ne $empty_string ) {
+
+		$supswigb->{_curvewidth}		= $curvewidth;
+		$supswigb->{_note}		= $supswigb->{_note}.' curvewidth='.$supswigb->{_curvewidth};
+		$supswigb->{_Step}		= $supswigb->{_Step}.' curvewidth='.$supswigb->{_curvewidth};
+
+	} else { 
+		print("pswigb, curvewidth, missing curvewidth,\n");
+	 }
+ }
+
+
+#
+
+
+=head2 sub gridwidth 
+
+
+=cut
+
+ sub gridwidth {
+
+	my ( $self,$gridwidth )		= @_;
+	if ( $gridwidth ne $empty_string ) {
+
+		$supswigb->{_gridwidth}		= $gridwidth;
+		$supswigb->{_note}		= $supswigb->{_note}.' gridwidth='.$supswigb->{_gridwidth};
+		$supswigb->{_Step}		= $supswigb->{_Step}.' gridwidth='.$supswigb->{_gridwidth};
+
+	} else { 
+		print("pswigb, gridwidth, missing gridwidth,\n");
+	 }
+ }
+
+
+
+
+
+=head2 sub labelsize 
+
+
+=cut
+
+ sub labelsize {
+
+	my ( $self,$labelsize )		= @_;
+	if ( $labelsize ne $empty_string ) {
+
+		$supswigb->{_labelsize}		= $labelsize;
+		$supswigb->{_note}		= $supswigb->{_note}.' labelsize='.$supswigb->{_labelsize};
+		$supswigb->{_Step}		= $supswigb->{_Step}.' labelsize='.$supswigb->{_labelsize};
+
+	} else { 
+		print("pswigb, labelsize, missing labelsize,\n");
+	 }
+ }
+
+
+
+
+
+=head2 sub ticwidth 
+
+
+=cut
+
+ sub ticwidth {
+
+	my ( $self,$ticwidth )		= @_;
+	if ( $ticwidth ne $empty_string ) {
+
+		$supswigb->{_ticwidth}		= $ticwidth;
+		$supswigb->{_note}		= $supswigb->{_note}.' ticwidth='.$supswigb->{_ticwidth};
+		$supswigb->{_Step}		= $supswigb->{_Step}.' ticwidth='.$supswigb->{_ticwidth};
+
+	} else { 
+		print("pswigb, ticwidth, missing ticwidth,\n");
+	 }
+ }
+
 
 
 =head2 sub get_max_index

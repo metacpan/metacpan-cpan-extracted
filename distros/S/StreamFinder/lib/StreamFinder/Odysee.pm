@@ -4,7 +4,7 @@ StreamFinder::Odysee - Fetch actual raw streamable URLs from Odysee.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -113,8 +113,8 @@ such as yt-dlp.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-youtube> => yes|no|first|last|only ] 
-[, I<-secure> [ => 0|1 ]] 
+=item B<new>(I<ID>|I<url> [, I<-youtube> => yes|no|first|last|only|ifneeded ] 
+[, I<-secure> [ => 0|1 ]] [, I<-nohls> [ => 0|1 ]]
 [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a full odysee.com video URL and creates and returns a new video object, 
@@ -132,7 +132,14 @@ results only if there's a youtube link found at the bottom of the description
 (if any) first.  Default is B<"no"> (ignore any youtube link in 
 the description).  NOTE:  Unlike most other modules, youtube will NOT be 
 checked if I<-youtube> is set to I<no> regardless of whether any Odysee streams 
-were found.
+were found.  If I<-youtube> is set to I<ifneeded>, then youtube-dl will only 
+be called a second time, if no other streams found.
+
+The optional (<-nohls> argument can be set to either 0 or 1 
+(I<false> or I<true>).  If 1 (I<true>), then only non-HLS (.m3u8?) streams 
+will be accepted from Odysee.
+
+DEFAULT I<-nohls> is 0 (false) - return all streams youtube-dl finds in Odysee.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -329,7 +336,7 @@ L<http://search.cpan.org/dist/StreamFinder-Odysee/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -390,10 +397,14 @@ sub new
 	my $self = $class->SUPER::new('Odysee', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 	$self->{'youtube'} = 'no'  unless (defined $self->{'youtube'});
+	$self->{'nohls'} = 0  unless (defined $self->{'nohls'});
 	while (@_) {
 		if ($_[0] =~ /^\-?youtube$/o) {
 			shift;
 			$self->{'youtube'} = (defined $_[0]) ? shift : 'yes';
+		} elsif ($_[0] =~ /^\-?nohls$/o) {
+			shift;
+			$self->{'nohls'} = (defined $_[0]) ? shift : 1;
 		} else {
 			shift;
 		}
@@ -451,13 +462,25 @@ sub new
 				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
 				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 			}
+			my @nonYtStreams = ();
+			my $nonYtCnt = 0;
 			my $yt = new StreamFinder::Youtube($url2fetch, %globalArgs);
 			if ($yt) {
+				if ($yt->count() > 0) {
+					my @ytStreams = $yt->get();
+					foreach my $s (@ytStreams) {
+						push (@nonYtStreams, $s)  unless ($self->{'nohls'} && $s =~ /\.m3u8?/o);
+					}
+					$nonYtCnt = scalar (@nonYtStreams);
+				}
 				print STDERR "--PREFER-YT=".$self->{'youtube'}."= iconURL=".$yt->{'iconurl'}."=\n"  if ($DEBUG);
-				if ($self->{'youtube'} =~ /(?:yes|top|first|last|only)/i && $yt->{'iconurl'} =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/) {
+				if ($self->{'youtube'} =~ /(?:yes|top|first|last|only|ifneeded)/i && $yt->{'iconurl'} =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/) {
 					#ODYSEE VIDEOS USUALLY HAVE A YOUTUBE URL AS LAST LINE IN DESCRIPTION, WHICH ENDS
 					#UP IN THE iconurl ARGUMENT AND USER WOULD PREFER YOUTUBE, SO WE'LL TRY THAT!:
 					print STDERR "---user prefers Youtube (".$yt->{'iconurl'}.")!...\n"  if ($DEBUG);
+					#IF youtube-dl FOUND A NON-YOUTUBE STREAM & USER SAYS "ifneeded", THEN SKIP 2ND youtube-dl SEARCH!:
+					goto NOTNEEDED  if ($nonYtCnt > 0 && $self->{'youtube'} =~ /ifneeded/);
+
 					my %globalArgs = (
 							'-noiframes' => 1, '-debug' => $DEBUG
 					);
@@ -478,21 +501,21 @@ sub new
 							}
 						}
 						$self->{'cnt'} = scalar @{$self->{'streams'}};
-						print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
+						print STDERR "i:Found (".$self->{'cnt'}.") Youtube stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
 					}					
 				}
-				if ($yt->count() > 0) {
-					my @ytStreams = $yt->get();
+NOTNEEDED:
+				if ($nonYtCnt > 0) {
 					if ($self->{'youtube'} =~ /(?:top|first)/i) {  #PUT youtube-dl STREAMS ON TOP:
-						push @{$self->{'streams'}}, @ytStreams;
+						push @{$self->{'streams'}}, @nonYtStreams;
 					} else {
-						unshift @{$self->{'streams'}}, @ytStreams;
+						unshift @{$self->{'streams'}}, @nonYtStreams;
 					}
 					foreach my $field (qw(title description)) {
 						$self->{$field} ||= $yt->{$field}  if (defined($yt->{$field}) && $yt->{$field});
 					}
 					$self->{'cnt'} = scalar @{$self->{'streams'}};
-					print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
+					print STDERR "i:Found ($nonYtCnt) non-Youtube stream(s) (".join('|',@nonYtStreams).") via youtube-dl.\n"  if ($DEBUG);
 				}
 			}
 			$self->{'imageurl'} ||= $self->{'iconurl'};

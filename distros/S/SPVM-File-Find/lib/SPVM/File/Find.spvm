@@ -1,0 +1,137 @@
+class File::Find {
+  use StringList;
+  use File::Spec;
+  use Sys;
+  use Regex;
+  use File::Basename;
+  use Fn;
+  use File::Find::Handler;
+  
+  static method find : void ($cb : File::Find::Handler, $top_dir : string, $options = undef : object[]) {
+    
+    unless ($cb) {
+      die "The \$cb must be defined";
+    }
+    
+    unless ($top_dir) {
+      die "The \$top_dir must be defined";
+    }
+    
+    if ($top_dir eq "") {
+      die "The \$top_dir must be non-empty string";
+    }
+    
+    # Options
+    my $options_h = Hash->new($options);
+    my $follow = $options_h->delete_or_default_int("follow", 0);
+    for my $name (@{$options_h->keys}) {
+      die "The \"$name\" option is invalid";
+    }
+    
+    # The path separator is converted to "/"
+    my $top_dir_slash = (string)undef;
+    if (Sys->defined("_WIN32")) {
+      $top_dir_slash = copy $top_dir;
+      Fn->replace_chars((mutable string)$top_dir_slash, '\\', '/');
+    }
+    else {
+      $top_dir_slash = $top_dir;
+    }
+    
+    # The trailing "/" is removed
+    unless (File::Spec->file_name_is_root($top_dir_slash)) {
+      $top_dir_slash = Regex->new("/\z")->replace($top_dir_slash, "");
+    }
+    
+    my $found_files_h = Hash->new;
+    
+    &_find_dir($cb, $top_dir_slash, $follow, $found_files_h);
+  }
+  
+  private static method _find_dir : void ($cb : File::Find::Handler, $dir_name : string, $follow : int, $found_files_h : Hash) {
+
+    $cb->($dir_name, undef);
+
+    $dir_name = &_resolve_dir($dir_name, $follow, $found_files_h);
+    
+    unless ($dir_name) {
+      return;
+    }
+    
+    my $dir_stream = Sys::IO->opendir($dir_name);
+    my $file_base_names_list = StringList->new;
+    
+    while (my $dir_ent = Sys::IO->readdir($dir_stream)) {
+      my $file_base_name = $dir_ent->d_name;
+      $file_base_names_list->push($file_base_name);
+    }
+    my $file_base_names = $file_base_names_list->to_array;
+    
+    Sys::IO->closedir($dir_stream);
+    
+    for (my $i = 0; $i < @$file_base_names; $i++) {
+      my $file_base_name = $file_base_names->[$i];
+      
+      if (Regex->new("^\.{1,2}\z")->match($file_base_name)) {
+        next;
+      }
+      
+      my $next_dir_name = "$dir_name/$file_base_name";
+      if (Sys::FileTest->d($next_dir_name)) {
+        &_find_dir($cb, $next_dir_name, $follow, $found_files_h);
+      }
+      else {
+        $cb->($dir_name, $file_base_name);
+      }
+    }
+  }
+  
+  private static method _resolve_dir : string ($path : string, $follow : int, $found_files_h : Hash) {
+    
+    if ($follow) {
+      while (1) {
+        my $is_symlink = Sys::FileTest->l($path);
+        
+        unless ($is_symlink) {
+          last;
+        }
+        
+        my $lstat = Sys::IO::Stat->new;
+        Sys::IO::Stat->lstat($path, $lstat);
+        
+        my $dev = $lstat->st_dev;
+        my $inode = $lstat->st_ino;
+        
+        my $found = $found_files_h->get_int("$dev-$inode");
+        
+        if ($found) {
+          die "The $path is encountered a second time";
+        }
+        
+        my $link = Sys::IO->readlinkp($path);
+        
+        if (Sys->defined("_WIN32")) {
+          Fn->replace_chars((mutable string)$link, '\\', '/');
+        }
+        
+        my $lstat_link = Sys::IO::Stat->new;
+        my $lstat_link_status = Sys::IO::Stat->lstat($link, $lstat_link);
+        
+        if ($lstat_link_status == 0) {
+          $path = $link;
+        }
+        else {
+          $path = undef;
+          last;
+        }
+      }
+    }
+    else {
+      unless (Sys::FileTest->d($path)) {
+        $path = undef;
+      }
+    }
+    
+    return $path;
+  }
+}

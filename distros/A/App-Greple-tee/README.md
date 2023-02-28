@@ -14,16 +14,15 @@ command, and replace them by the command result.  The idea is derived
 from the command called **teip**.  It is like bypassing partial data to
 the external filter command.
 
-Filter command is specified as following arguments after the module
-option ending with `--`.  For example, next command call command
-`tr` command with `a-z A-Z` arguments for the matched word in the
-data.
+Filter command follows module declaration (`-Mtee`) and terminates by
+two dashes (`--`).  For example, next command call command `tr`
+command with `a-z A-Z` arguments for the matched word in the data.
 
     greple -Mtee tr a-z A-Z -- '\w+' ...
 
 Above command convert all matched words from lower-case to upper-case.
-Actually this example is not useful because **greple** can do the same
-thing more effectively with **--cm** option.
+Actually this example itself is not so useful because **greple** can do
+the same thing more effectively with **--cm** option.
 
 By default, the command is executed as a single process, and all
 matched data is sent to it mixed together.  If the matched text does
@@ -32,7 +31,7 @@ mapped line by line, so the number of lines of input and output data
 must be identical.
 
 Using **--discrete** option, individual command is called for each
-matched part.  You can notice the difference by following commands.
+matched part.  You can tell the difference by following commands.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
@@ -44,7 +43,7 @@ with **--discrete** option.
 
 - **--discrete**
 
-    Invoke new command for every matched part.
+    Invoke new command individually for every matched part.
 
 # WHY DO NOT USE TEIP
 
@@ -66,8 +65,8 @@ included in Perl module file.
 
     greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^(\w.+\n)+' tee.pm
 
-You can translate them by DeepL service by executing above command
-with **-Mtee** module calling **deepl** command like this:
+You can translate them by DeepL service by executing the above command
+convined with **-Mtee** module which calls **deepl** command like this:
 
     greple -Mtee deepl text --to JA - -- --discrete ...
 
@@ -117,6 +116,8 @@ command:
     $ cpanm App::Greple::tee
 
 # SEE ALSO
+
+[App::Greple::tee](https://metacpan.org/pod/App%3A%3AGreple%3A%3Atee), [https://github.com/kaz-utashiro/App-Greple-tee](https://github.com/kaz-utashiro/App-Greple-tee)
 
 [https://github.com/greymd/teip](https://github.com/greymd/teip)
 

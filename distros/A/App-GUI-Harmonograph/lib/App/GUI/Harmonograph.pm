@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.57';
+our $VERSION = '0.59';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -33,7 +33,7 @@ __END__
 
 App::GUI::Harmonograph - sculpting beautiful circular drawings
 
-=head1 SYNOPSIS 
+=head1 SYNOPSIS
 
 =over 4
 
@@ -47,12 +47,12 @@ start the program (C<harmonograph>)
 
 =item 3.
 
-move knobs and observe how preview sketch reacts til you got 
-an interesting configuration 
+move knobs and observe how preview sketch reacts til you got
+an interesting configuration
 
 =item 4.
 
-push I<Draw> (right below drawing board or C<Ctrl+D>) to produce full image
+push I<Draw> (right below drawing board or C<Ctrl+D> or C<Alt+D> ) to produce full image
 
 =item 5.
 
@@ -68,9 +68,10 @@ INI file for tweaking them later
 Please note that quick preview gets only triggered by the pendulum
 controls (section X, Y, Z and R).
 
-After first use of the program, a config file I<.harmonograph> will be
-created in you home directory. You may move it into your I<Documents>
-or your local directory, from where the app is started.
+After first use of the program, a config file will be created under
+I<~/.config/harmonograph> in your home directory. It contains mainly
+stored colors and dirs where to load and store setting files.
+You may change it manually or deleted it to reset defaults.
 
 
 =head1 DESCRIPTION
@@ -89,7 +90,7 @@ creating together spiraling pictures :
 </p>
 
 
-This is a cybernetic recreation of an Prof. Blackburns invention with 
+This is a cybernetic recreation of an Prof. Blackburns invention with
 several enhancements:
 
 =over 4
@@ -100,7 +101,7 @@ third pendulum can rotate
 
 =item *
 
-pendula can oscillate at none integer frequencies 
+pendula can oscillate at none integer frequencies
 
 =item *
 
@@ -126,18 +127,18 @@ In the same fashion the second (Y) only moves up and down.
 When both are connected to a pen, we get a combination of both movements.
 As long as X and Y swing at the same speed, the result is a diagonal line.
 Because when X goes right Y goes up and vice versa.
-But if we start one pendulum at the center and the other 
+But if we start one pendulum at the center and the other
 at the upmost position we get a circle.
 In other words: we added an offset of 90 degrees to Y (or X).
-Our third pendulum Z moves the paper and does exactly 
+Our third pendulum Z moves the paper and does exactly
 the already described circular movement without rotating around its center.
-If both circular movements (of X, Y and Z) are concurrent - 
-the pen just stays at one point over the paper, If both are countercurrent - 
+If both circular movements (of X, Y and Z) are concurrent -
+the pen just stays at one point over the paper, If both are countercurrent -
 we get a circle. Interesting things start to happen, if we alter
 the speed of of X, Y and Z. Than famous harmonic pattern appear.
 And for even more complex drawings I added R, which is not really
 a pendulum, but an additional rotary movement of Z around its center.
-The pendula out of metal do of course fizzle out over time, 
+The pendula out of metal do of course fizzle out over time,
 which you can see in the drawing, in a spiraling movement toward the center.
 We emulate this with two damping factors: one for amplitude and one for
 the frequency (speed).
@@ -167,14 +168,14 @@ These are divided into four tabs - roughly devided in form (3) and decoration (l
 
 The lower left side contains buttons which trigger a few commands,
 mostly for mass productions of image files. All the other commands are
-only reachable in the main menu or by keyboard 
+only reachable in the main menu or by keyboard
 (key combinations are displayed in the menu).
 
 =back
 
 Please mind the tool tips - short help texts which appear if the mouse
 stands still over a button or slider. Also helpful are messages in the
-status bar at the bottom - on bottom left regarding images and bottom 
+status bar at the bottom - on bottom left regarding images and bottom
 right about settings.
 When brwosing the main menu, help texts about the highlighted item
 also appears in the status bar. The Menu can be completely navigated with
@@ -206,18 +207,18 @@ fundamental to the shape. For instance 2 means that the pendulum swings
 back and fourth twice as fast. To the right you can choose an additional
 factor the frequency gets multiplied with. This can be a constant like
 Pi or Phi or the frequency of another pendulum or just simply one.
-This is especially handy when browsing the classic shapes 
+This is especially handy when browsing the classic shapes
 with three pendula. For these the frequency of X and Y has to be the same -
-which will be ensured when you set the frequency factor of Y to X 
+which will be ensured when you set the frequency factor of Y to X
 (or vice versa) and keep the frequency of Y to one.
-The next combo control below adds decimals  to the frequency value 
+The next combo control below adds decimals  to the frequency value
 for more complex rotating drawings. Behind that are two check boxes to
 invert the final frequency value to 1/x or to flip the direction of
 the pendulum. Below that follows a frequency damping, which works
 the same as the second row only with slightly different optical results.
 
 The last row starts with a slider to fine tune the starting point of the
-pendulum. It can be chosen between zero and a quater rotation. This can 
+pendulum. It can be chosen between zero and a quater rotation. This can
 have great effects on the shape. Because of the special desirability
 offsets of an half (180 degree) or quarter (90 degree) rotation can be
 activated by checkbox (to the right of the slider). The final offset is
@@ -273,7 +274,7 @@ with the I<start color> and the lower with the I<end color>.
 
 =head2 Commands
 
-In the lower left corner are two rows of command buttons. All other 
+In the lower left corner are two rows of command buttons. All other
 commands are in the menu.
 
 The upper row has only one button for making a full drawing. This
@@ -290,7 +291,7 @@ First push I<Dir> to select the directory and then type directly into the
 second text field the file base name. The index in the next one
 is found automatically. Every time you now press I<Save> a file with the
 current image is saved under the path: dir + base name + index + ending
-(set in Menu: Image &gt; Format and saved in configs). 
+(set in Menu: Image &gt; Format and saved in configs).
 The index automatically autoincrements when producing a file.
 Push button I<INI> next to it to also save the settings of the current
 state under same file name, but with the ending C<.ini>.
@@ -303,7 +304,7 @@ Please not that each menu shows which key combination triggers the same
 command and while hovering over an menu item you see a short help text
 the left status bar field.
 
-The first menu is for loading and storing setting files with arbitrary 
+The first menu is for loading and storing setting files with arbitrary
 names. I recommend giving them the file ending C<.ini> for transparency
 reasons. A submenu allows a quick load of the recently used files.
 The first entry lets you reset the whole program to the starting state
@@ -321,9 +322,13 @@ The third menu has some dialogs with documentation and additional information.
 
 =head1 SEE ALSO
 
+L<App::GUI::Chaosgraph>
+
 L<App::GUI::Cellgraph>
 
 L<App::GUI::Dynagraph>
+
+L<App::GUI::Sierpingaph>
 
 =head1 AUTHOR
 
@@ -331,9 +336,9 @@ Herbert Breunung (lichtkind@cpan.org)
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2022 by Herbert Breunung
+Copyright(c) 2022-23 by Herbert Breunung
 
-All rights reserved. 
+All rights reserved.
 This program is free software and can be used, changed and distributed
 under the GPL 3 licence.
 

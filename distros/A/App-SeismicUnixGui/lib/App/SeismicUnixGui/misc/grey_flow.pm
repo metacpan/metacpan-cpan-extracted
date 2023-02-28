@@ -3080,7 +3080,7 @@ sub flow_select {
 
 				if ( $max_saved_widget_index eq $most_recent_flow_index ) {
 
-				 # CASE 1A
+				 #  CASE 1A
 				 #  last selected index was last in program
 				 #  list and last color flow is the same as this color flow
 				 #  e.g., just loaded a new flow and user clicks on last program
@@ -3505,7 +3505,7 @@ sub save_button {
 		my $last_flow_index = $most_recent_flow_index_touched;
 
 		$last_flow_color = $color_flow_href->{_last_flow_color};
-		my $max_saved_widget_index = scalar @save_last_param_widget_values;
+		my $max_saved_widget_index = (scalar @save_last_param_widget_values) - 1;
 
 		# restore terminal ticks in strings after reading from the GUI
 		# remove  possible terminal strings
@@ -3542,33 +3542,43 @@ for first time but no listboxes have been occupied previously
 
 		_save_most_recent_param_flow();
 
-		#		print("color_flow, save_button writing gui_history.txt\n");
-		#		$gui_history->view();
-
+		# print("color_flow, save_button writing gui_history.txt\n");
+		# $gui_history->view();		
+		
+#		print("3. color_flow, save_button, param_flow view data\n"
+#				);
+#				$param_flow_color_pkg->view_data();		
+        
 		if ( not $memory_leak4save_button_fixed ) {
 
-			# dtrange memory leak when a file is just openened
-			# last element of last program disappears
+			# Strange memory leak when a file is just opened.
+			# Last element of last program disappears
 			# if user clicks on an element different from
-			# the last.
+			# the last, or the Save button
 			# Conditions are for just having opened a file
-			# but made not made any changes to the flow
+			# nO changes have yet been made to the flow
 			# and $total_click_value < $very_low_click_value
+			# if file has just been opened and is immediately saved
+			# the set flow index is assumed = 0
 
 			my $click_count =
 			  ( ( $gui_history->get_defaults() )->{_count} );
+			  
+#			  				print(
+#"5. color_flow, save_button, memory fix, click count=$click_count\n"
+#				);
+#							  				print(
+#"5. color_flow, save_button, most_recent_flow_index_touched=$last_flow_index\n"
+#				);
 
 			if (   ( $this_color eq $last_flow_color )
-				&& ( $last_flow_index eq $max_saved_widget_index )
+				&& ( $last_flow_index == $max_saved_widget_index 
+				or   $last_flow_index == 0)  # generally means file is just openend
 				&& ( $click_count < $min_clicks4save_button ) )
 			{
 
-				print(
-"5. color_flow, save_button, memory fix, count=$click_count\n"
-				);
-
 				# CASE 1
-				# of last color=grey also
+				# of last color=this_color also
 				# and we are still at the last index
 				# e.g., a recently opened file that the user
 				# decides to Save without any changes
@@ -3576,15 +3586,13 @@ for first time but no listboxes have been occupied previously
 				# fixing param_widget memory leak that deletes the
 				# last element in the last flow
 
+#				print("6 color_flow,save_last_param_widget_values=@save_last_param_widget_values\n");
+#				print("6 color_flow,max_saved_widget_index=$max_saved_widget_index\n");
 				$param_flow_color_pkg->set_flow_index($max_saved_widget_index);
 				$param_widgets->set_values( \@save_last_param_widget_values );
 				$param_flow_color_pkg->set_values_aref(
 					\@save_last_param_widget_values );
 
-#				print(
-#"4. color_flow, save_button , after update to recent and prior flow param values\n"
-#				);
-#				$param_flow_color_pkg->view_data();
 				$param_widgets->redisplay_values();
 
 			}
@@ -3594,7 +3602,10 @@ for first time but no listboxes have been occupied previously
 #"5. color_flow, save_button, this_color,last_flow_color are:$this_color,$last_flow_color\n"
 #				);
 #				print(
-#"5. color_flow, save_button, current index is $most_recent_flow_index_touched\n"
+#"5. color_flow, save_button, most recent flow index is $most_recent_flow_index_touched\n"
+#				);
+#				print(
+#"5. color_flow, save_button, last flow index: $last_flow_index\n"
 #				);
 #				print(
 #"5. color_flow, save_button, max_saved_widget_index was $max_saved_widget_index\n"
@@ -3603,7 +3614,9 @@ for first time but no listboxes have been occupied previously
 #"5. color_flow, save_button, click_count:$click_count min_clicks4save_button:$min_clicks4save_button\n"
 #				);
 			}
-			$memory_leak4save_button_fixed = $true;
+			# needs to be fixed each time Save is used on unchanged perl flow
+			$memory_leak4save_button_fixed = $false; 
+			
 		}    # end of memory leak solution
 
 		$param_flow_color_pkg->set_flow_index($last_flow_index);

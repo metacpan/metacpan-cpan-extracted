@@ -28,7 +28,7 @@ SYNOPSIS
      }
 
 DESCRIPTION
-    `Hook::Output::File' redirects `STDOUT/STDERR' to a file.
+    "Hook::Output::File" redirects "STDOUT/STDERR" to a file.
 
 METHODS
   redirect
@@ -39,12 +39,12 @@ METHODS
      );
 
     Installs a file-redirection hook for regular output streams (i.e.,
-    `STDOUT/STDERR') with lexical scope.
+    "STDOUT/STDERR") with lexical scope.
 
-    A word of caution: do not intermix the file paths for `STDOUT/STDERR'
+    A word of caution: do not intermix the file paths for "STDOUT/STDERR"
     output or you will eventually receive unexpected results. The paths may
     be relative or absolute; if no valid path is provided, an usage help
-    will be printed (because otherwise, the `open()' call might silently
+    will be printed (because otherwise, the "open()" call might silently
     fail to satisfy expectations).
 
     The hook may be uninstalled either explicitly or implicitly; doing it
@@ -74,5 +74,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

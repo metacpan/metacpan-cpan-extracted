@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::Needs 'LWP::UserAgent';
+use Test::Needs { 'LWP::UserAgent' => '6.37' };
 
 use Test::More tests => 45;
 use lib 't/lib';

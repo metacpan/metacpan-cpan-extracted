@@ -11,7 +11,7 @@ use Geo::ShapeFile::Shape::Index;
 
 use parent qw /Geo::ShapeFile/;
 
-our $VERSION = '3.01';
+our $VERSION = '3.03';
 
 my $little_endian_sys = unpack 'b', (pack 'S', 1 );
 
@@ -263,7 +263,7 @@ sub _parse_shp_MultiPointM {
     my $self = shift;
 
     $self->_parse_shp_MultiPoint();
-    $self->_extract_m_datextract_m_data();
+    $self->_extract_m_data();
 }
 #  MultiPointM
 # MultiPoint
@@ -1012,7 +1012,7 @@ Shawn Laffan, E<lt>shawnlaffan@gmail.comE<gt>
 
 Copyright 2002-2013 by Jason Kohles
 
-Copyright 2014 by Shawn Laffan
+Copyright 2014-2023 by Shawn Laffan
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

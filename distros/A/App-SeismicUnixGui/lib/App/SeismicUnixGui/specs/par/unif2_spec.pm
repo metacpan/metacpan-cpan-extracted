@@ -3,13 +3,11 @@ use Moose;
 our $VERSION = '0.0.1';
 
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
-use App::SeismicUnixGui::misc::SeismicUnix qw($su $bin $suffix_su $suffix_bin);
+use App::SeismicUnixGui::misc::SeismicUnix qw($su $txt $bin $suffix_su $suffix_txt $suffix_bin);
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
-use aliased 'App::SeismicUnixGui::misc::unif2';
 
 my $get     = L_SU_global_constants->new();
 my $Project = Project_config->new();
-my $unif2   = unif2->new();
 
 my $var              = $get->var();
 my $empty_string     = $var->{_empty_string};
@@ -19,25 +17,26 @@ my $file_dialog_type = $get->file_dialog_type_href();
 my $flow_type        = $get->flow_type_href();
 
 my $DATA_SEISMIC_SU  = $Project->DATA_SEISMIC_SU();     # output data directory
+my $DATA_SEISMIC_TXT  = $Project->DATA_SEISMIC_TXT(); 
 my $PL_SEISMIC        = $Project->PL_SEISMIC();
 my $DATA_SEISMIC_BIN = $Project->DATA_SEISMIC_BIN();    # output data directory
-my $max_index        = $unif2->get_max_index();
+my $max_index        = 14;
 
 my $unif2_spec = {
-	_CONFIG	 				=> $PL_SEISMIC,
-	_DATA_DIR_IN           => $DATA_SEISMIC_BIN,
+	_CONFIG	 			   => $PL_SEISMIC,
+	_DATA_DIR_IN           => $DATA_SEISMIC_TXT,
 	_DATA_DIR_OUT          => $DATA_SEISMIC_BIN,
 	_binding_index_aref    => '',
-	_suffix_type_in        => $bin,
-	_data_suffix_in        => $suffix_bin,
+	_suffix_type_in        => $txt,
+	_data_suffix_in        => $suffix_txt,
 	_suffix_type_out       => $bin,
 	_data_suffix_out       => $suffix_bin,
 	_file_dialog_type_aref => '',
 	_flow_type_aref        => '',
 	_has_infile            => $true,
-    _has_outpar          => $false,
+    _has_outpar            => $false,
 	_has_pipe_in           => $true,
-	_has_pipe_out          => $true,
+	_has_pipe_out          => $false,
 	_has_redirect_in       => $true,
 	_has_redirect_out      => $true,
 	_has_subin_in          => $false,
@@ -45,8 +44,8 @@ my $unif2_spec = {
 	_is_data               => $false,
 	_is_first_of_2         => $true,
 	_is_first_of_3or_more  => $true,
-	_is_first_of_4or_more  => $true,
-	_is_last_of_2          => $true,
+	_is_first_of_4or_more  => $false,
+	_is_last_of_2          => $false,
 	_is_last_of_3or_more   => $false,
 	_is_last_of_4or_more   => $false,
 	_is_suprog             => $true,
@@ -83,8 +82,11 @@ sub file_dialog_type_aref {
 	my ($self) = @_;
 
 	my @type;
+	
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
 
-	$type[0] = $file_dialog_type->{_Data};
+	$type[$index[0]] = $file_dialog_type->{_Data};
 
 	$unif2_spec->{_file_dialog_type_aref} = \@type;
 	return ();
@@ -314,10 +316,10 @@ sub prefix_aref {
 		$prefix[$i] = $empty_string;
 	}
 
-	my $index_aref = get_binding_index_aref();
-	my @index      = @$index_aref;
+	my $index_aref       = get_binding_index_aref();
+	my @index            = @$index_aref;
+
 	$prefix[ $index[0] ] = '$DATA_SEISMIC_BIN' . ".'/'.";
-	$unif2_spec->{_prefix_aref} = \@prefix;
 
 	$unif2_spec->{_prefix_aref} = \@prefix;
 	return ();
@@ -346,7 +348,11 @@ sub suffix_aref {
 	my $index_aref = get_binding_index_aref();
 	# print("unif2_spec,suffix_aref,index_aref: $index_aref\n");
 	my @index      				   = @$index_aref;
-	$suffix[ $index[0] ]           = "." . '$suffix_bin';
+	
+	
+	$suffix[ $index[0] ]           = "" . '$suffix_bin';
+	
+	
 	$unif2_spec->{_suffix_aref} = \@suffix;
 	return ();
 

@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Role::Tiny::With" => 0,
     "TableDataRole::Source::CSVInDATA" => 0,
+    "TableDataRole::Spec::TableDef" => 0,
     "strict" => 0,
     "utf8" => 0
   },
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Role::Tiny::With" => 0,
   "TableDataRole::Source::CSVInDATA" => 0,
+  "TableDataRole::Spec::TableDef" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "utf8" => 0

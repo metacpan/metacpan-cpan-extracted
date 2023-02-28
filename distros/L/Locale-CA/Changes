@@ -1,5 +1,9 @@
 Revision history for Locale-CA
 
+0.05	Sat Feb 25 10:35:03 EST 2023
+	Include normalized strings
+	Use _get_language from Lingua::Conjunction
+
 0.04	Thu Jul 16 09:19:57 EDT 2020
 	lang can be passed in as a parameter
 

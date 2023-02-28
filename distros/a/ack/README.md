@@ -69,11 +69,21 @@ installed, you can build ack.
 
 See the [Community](https://beyondgrep.com/community/) page.
 
+Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) in all your interactions with our project.
+
 # License
 
-Copyright 2005-2022 Andy Lester.
+Copyright 2005-2023 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the
 [Artistic License v2.0](https://www.perlfoundation.org/artistic_license_2_0).
 See also the LICENSE.md file that comes with the ack distribution.
+
+# Support
+
+[ack](https://github.com/beyondgrep/ack3) and [beyondgrep.com](https://beyondgrep.com) are supported by [DigitalOcean](https://m.do.co/c/6a437192f552).
+
+<a href="https://m.do.co/c/6a437192f552">
+  <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" width="201px">
+</a>

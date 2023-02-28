@@ -77,6 +77,13 @@ This is a short-cut to specify the pattern matches entire text
     option because module `xlate::deepl` declares it as
     `--xlate-engine=deepl`.
 
+- **--xlate-labor**
+
+    Insted of calling translation engine, you are expected to work for.
+    After preparing text to be translated, they are copied to the
+    clipboard.  You are expected to paste them to the form, copy the
+    result to the clipboard, and hit return.
+
 - **--xlate-to** (Default: `JA`)
 
     Specify the target language.  You can get available languages by
@@ -136,8 +143,14 @@ This is a short-cut to specify the pattern matches entire text
 **xlate** module can store cached text of translation for each file and
 read it before execution to eliminate the overhead of asking to
 server.  With the default cache strategy `auto`, it maintains cache
-data only when the cache file exists for target file.  If the
-corresponding cache file does not exist, it does not create it.
+data only when the cache file exists for target file.
+
+- --refresh
+
+    The <--refresh> option can be used to initiate cache management or to
+    refresh all existing cache data. Once executed with this option, a new
+    cache file will be created if one does not exist and then
+    automatically maintained afterward.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -151,6 +164,10 @@ corresponding cache file does not exist, it does not create it.
     - `always`, `yes`, `1`
 
         Maintain cache anyway as far as the target is normal file.
+
+    - `refresh`
+
+        Maintain cache but don't read existing one.
 
     - `never`, `no`, `0`
 
@@ -195,7 +212,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright ©︎ 2023 Kazumasa Utashiro.
+Copyright © 2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

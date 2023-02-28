@@ -47,6 +47,7 @@
          "requires" : {
             "App::Greple" : "9.02",
             "App::sdif" : "v4.24.0",
+            "Clipboard" : "0",
             "Hash::Util" : "0",
             "JSON" : "0",
             "List::Util" : "0",
@@ -63,11 +64,11 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -82,7 +83,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

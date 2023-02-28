@@ -62,7 +62,7 @@ do { my $x = {
                                    'perl' => '5.006'
                                  },
                    'suggests' => {
-                                   'LWP::UserAgent' => '6.07'
+                                   'LWP::UserAgent' => '6.37'
                                  }
                  },
        'x_Dist_Zilla' => {

@@ -4,11 +4,12 @@ author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
 build_requires:
   Test::Exception: '0'
+  Test::More: '0.96'
   rlib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/Geo-ShapeFile/issues/
   repository: https://github.com/shawnlaffan/Geo-ShapeFile.git
-version: '3.01'
+version: '3.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

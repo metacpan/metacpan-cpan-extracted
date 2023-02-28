@@ -59,6 +59,7 @@
       },
       "test" : {
          "recommends" : {
+            "TableData::Chemistry::Element" : "0.005",
             "TableData::Sample::DeNiro" : "0"
          },
          "requires" : {
@@ -75,7 +76,7 @@
    "provides" : {
       "Perinci::Sub::Gen::AccessTable" : {
          "file" : "lib/Perinci/Sub/Gen/AccessTable.pm",
-         "version" : "0.591"
+         "version" : "0.592"
       }
    },
    "release_status" : "stable",
@@ -90,7 +91,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable"
       }
    },
-   "version" : "0.591",
+   "version" : "0.592",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

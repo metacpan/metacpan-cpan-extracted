@@ -9,8 +9,8 @@ SYNOPSIS
     3.  move knobs and observe how preview sketch reacts til you got an
         interesting configuration
 
-    4.  push *Draw* (right below drawing board or "Ctrl+D") to produce full
-        image
+    4.  push *Draw* (right below drawing board or "Ctrl+D" or "Alt+D" ) to
+        produce full image
 
     5.  choose *Save* in *Image* menu (or "Ctrl+S") to store image in a PNG
         / JPEG / SVG file
@@ -21,9 +21,10 @@ SYNOPSIS
     Please note that quick preview gets only triggered by the pendulum
     controls (section X, Y, Z and R).
 
-    After first use of the program, a config file *.harmonograph* will be
-    created in you home directory. You may move it into your *Documents* or
-    your local directory, from where the app is started.
+    After first use of the program, a config file will be created under
+    *~/.config/harmonograph* in your home directory. It contains mainly
+    stored colors and dirs where to load and store setting files. You may
+    change it manually or deleted it to reset defaults.
 
 DESCRIPTION
     An Harmonograph is an apparatus with several connected pendula, creating
@@ -220,15 +221,19 @@ GUI
     information.
 
 SEE ALSO
+    App::GUI::Chaosgraph
+
     App::GUI::Cellgraph
 
     App::GUI::Dynagraph
+
+    App::GUI::Sierpingaph
 
 AUTHOR
     Herbert Breunung (lichtkind@cpan.org)
 
 COPYRIGHT & LICENSE
-    Copyright(c) 2022 by Herbert Breunung
+    Copyright(c) 2022-23 by Herbert Breunung
 
     All rights reserved. This program is free software and can be used,
     changed and distributed under the GPL 3 licence.

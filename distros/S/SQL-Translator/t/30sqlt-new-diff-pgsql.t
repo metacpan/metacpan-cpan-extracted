@@ -40,7 +40,7 @@ my $out = SQL::Translator::Diff::schema_diff(
     $target_schema,
    'PostgreSQL',
    {
-     producer_args => {
+     sqlt_args => {
          quote_identifiers => 1,
      }
    }
@@ -78,6 +78,8 @@ ALTER TABLE "person" ALTER COLUMN "name" SET NOT NULL;
 
 ALTER TABLE "person" ALTER COLUMN "age" SET DEFAULT 18;
 
+ALTER TABLE "person" ALTER COLUMN "weight" DROP NOT NULL;
+
 ALTER TABLE "person" ALTER COLUMN "iq" TYPE bigint;
 
 ALTER TABLE "person" ALTER COLUMN "nickname" SET NOT NULL;
@@ -103,7 +105,7 @@ $out = SQL::Translator::Diff::schema_diff(
     $source_schema, 'PostgreSQL', $target_schema, 'PostgreSQL',
     { ignore_index_names => 1,
       ignore_constraint_names => 1,
-      producer_args => {
+      sqlt_args => {
          quote_identifiers => 0,
       }
     });
@@ -132,6 +134,8 @@ ALTER TABLE person ALTER COLUMN person_id TYPE serial;
 ALTER TABLE person ALTER COLUMN name SET NOT NULL;
 
 ALTER TABLE person ALTER COLUMN age SET DEFAULT 18;
+
+ALTER TABLE person ALTER COLUMN weight DROP NOT NULL;
 
 ALTER TABLE person ALTER COLUMN iq TYPE bigint;
 

@@ -33,14 +33,14 @@ no_index:
 provides:
   Mojo::WebSocketProxy::Backend::ConsumerGroups:
     file: lib/Mojo/WebSocketProxy/Backend/ConsumerGroups.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Data::UUID: '0'
   IO::Async::Loop::Mojo: '0'
   JSON::MaybeUTF8: '0'
   Log::Any: '0'
   Mojo::Redis2: '0'
-  Mojo::WebSocketProxy: '0.14'
+  Mojo::WebSocketProxy: '0.13'
   Mojo::WebSocketProxy::Backend: '0'
   MojoX::JSON::RPC::Client: '0'
   Syntax::Keyword::Try: '0'
@@ -51,13 +51,13 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues
-  homepage: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups
-  repository: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git
-version: '0.01'
+  bugtracker: https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues
+  homepage: https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups
+  repository: https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git
+version: '0.03'
 x_authority: cpan:DERIV
 x_contributors:
-  - 'chylli-binary <chylli@binary.com>'
+  - 'user <user@binary.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
 x_generated_by_perl: v5.26.2

@@ -1,5 +1,18 @@
 Revision history for Env-Assert
 
+0.006     2023-02-27 22:15:15+01:00 Europe/Stockholm
+          * Clean up documentation.
+          * Clean up dist.ini a little.
+          * Use option auto_help in executable.
+          * Use option auto_version in executable.
+          * Move fatpacked executable to root.
+          * Update dist.ini with ExecDir to `script`.
+          * Update envassert.self-contained url.
+
+0.005     2023-02-25 19:28:40+01:00 Europe/Stockholm
+          * Fix typos (Ivan Bessarabov <ivan@bessarabov.ru>)
+          * Update README.md
+
 0.004     2023-02-19 15:47:10+01:00 Europe/Stockholm
           * Move fatpacked executable to root.
           * Update dist.ini with ExecDir to `script`.

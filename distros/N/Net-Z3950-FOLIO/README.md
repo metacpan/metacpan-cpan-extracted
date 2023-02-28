@@ -5,6 +5,20 @@ Copyright (C) 2018-2021 The Open Library Foundation
 This software is distributed under the terms of the Apache License,
 Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 
+<!-- md2toc -l 2 README.md -->
+* [Introduction](#introduction)
+* [Dependencies](#dependencies)
+* [Installation](#installation)
+* [Running](#running)
+* [Building and running from Docker](#building-and-running-from-docker)
+* [Authentication](#authentication)
+* [Access via SRU](#access-via-sru)
+* [Troubleshooting](#troubleshooting)
+* [Additional information](#additional-information)
+    * [Other documentation](#other-documentation)
+    * [Issue tracker](#issue-tracker)
+
+
 ## Introduction
 
 [`z2folio`](bin/z2folio) is a Z39.50 server for FOLIO bibliographic and holdings data, supporting record retrieval in USMARC, OPAC, XML and JSON formats. The functionality is all provided by [the `Net::Z3950::FOLIO` library](lib/Net/Z3950/FOLIO.pm), which is also part of this distribution. It is written in Perl, and follows standard Perl-module conventions.
@@ -85,6 +99,7 @@ The problem is that the back-end FOLIO service you are searching in does not hav
 * [The `z2folio` program.](doc/from-pod/z2folio.md)
 * [The underlying library.](doc/from-pod/Net-Z3950-FOLIO.md)
 * [The configuration file format.](doc/from-pod/Net-Z3950-FOLIO-Config.md)
+* The FOLIO-inventory fields that are [used to make holdings information](doc/inventory-fields-used.md)
 * Developer documentation about [the source code](doc/source-code-overview.md)
 * Developer documentation about [the release procedure](doc/release-procedure.md)
 * Developer documentation about [FOLIO's SRS system](doc/srs/using-srs.md), which the Z-server uses to obtain MARC records.

@@ -1,13 +1,23 @@
-#!perl -T
-use 5.014;
-use strict;
+#!perl
+use 5.14.0;
 use warnings;
-use Test::More;
+use Test2::V0;
 
-plan tests => 1;
+my @modules = <<'EOM' =~ m/([A-Z][A-Za-z0-9:]+)/g;
+Algorithm::Toy::HashSC
+EOM
 
-BEGIN {
-    use_ok( 'Algorithm::Toy::HashSC' ) || print "Bail out!\n";
+my $loaded = 0;
+for my $m (@modules) {
+    local $@;
+    eval "require $m";
+    if ($@) { bail_out("require failed '$m': $@") }
+    $loaded++;
 }
 
-diag( "Testing Algorithm::Toy::HashSC $Algorithm::Toy::HashSC::VERSION, Perl $], $^X" );
+diag(
+    "Testing Algorithm::Toy::HashSC $Algorithm::Toy::HashSC::VERSION, Perl $], $^X"
+);
+is( $loaded, scalar @modules );
+
+done_testing 1

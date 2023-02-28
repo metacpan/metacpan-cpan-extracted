@@ -11,10 +11,13 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Assert
+Bessarabov
 Env
+Ivan
 Koivunalho
 Mikko
 envassert
+ivan
 lib
 mikkoi
 script

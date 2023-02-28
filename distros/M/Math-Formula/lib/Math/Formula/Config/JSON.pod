@@ -1,0 +1,90 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Formula::Config::JSON - load/save formulas to file
+
+=head1 INHERITANCE
+
+ Math::Formula::Config::JSON
+   is a Math::Formula::Config
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Extends L<"DESCRIPTION" in Math::Formula::Config|Math::Formula::Config/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Math::Formula::Config|Math::Formula::Config/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Math::Formula::Config|Math::Formula::Config/"Constructors">.
+ 
+=over 4
+
+=item Math::Formula::Config::JSON-E<gt>B<new>(%options)
+
+Inherited, see L<Math::Formula::Config/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Math::Formula::Config|Math::Formula::Config/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<directory>()
+
+Inherited, see L<Math::Formula::Config/"Attributes">
+
+=item $obj-E<gt>B<path_for>($file)
+
+Inherited, see L<Math::Formula::Config/"Attributes">
+
+=back
+
+=head2 Actions
+
+Extends L<"Actions" in Math::Formula::Config|Math::Formula::Config/"Actions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<load>($name, %options)
+
+Inherited, see L<Math::Formula::Config/"Actions">
+
+=item $obj-E<gt>B<save>($context, %args)
+
+Serialize the $context to JSON files, as storage or to be editted by hand.
+This is a usefull method when default configuration templates need to be generated.
+
+ -Option  --Default
+  filename  C<< $context->name .json>
+
+=over 2
+
+=item filename => STRING
+
+Save under a different filename than derived from the name of the context.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Math-Formula distribution version 0.13,
+built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

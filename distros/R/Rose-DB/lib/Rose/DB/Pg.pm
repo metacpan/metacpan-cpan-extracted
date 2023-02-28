@@ -15,6 +15,43 @@ our $DBD_PG_AFTER_380; # set in refine_dbi_foreign_key_info()
 
 our $Debug = 0;
 
+
+#
+# Class data
+#
+
+use Rose::Class::MakeMethods::Generic
+(
+  inheritable_scalar =>
+  [
+    '_timestamps_are_inlined',
+  ],
+);
+
+__PACKAGE__->timestamps_are_inlined(0);
+
+
+#
+# Class methods
+#
+
+sub timestamps_are_inlined
+{
+  my($class) = shift;
+
+  if(@_)
+  {
+    my $arg = shift;
+
+    $class->_timestamps_are_inlined($arg);
+
+    return $arg ? 1 : 0;
+  }
+
+  return $class->_timestamps_are_inlined;
+}
+
+
 #
 # Object data
 #
@@ -26,6 +63,7 @@ use Rose::Object::MakeMethods::Generic
     qw(sslmode service options)
   ],
 );
+
 
 #
 # Object methods
@@ -237,6 +275,13 @@ sub validate_timestamp_keyword
 }
 
 *validate_datetime_keyword = \&validate_timestamp_keyword;
+
+sub should_inline_timestamp_keyword
+{
+  my($self) = shift;
+  my $class = ref($self) || $self;
+  return ($class->timestamps_are_inlined);
+}
 
 sub server_time_zone
 {
@@ -790,6 +835,16 @@ L<Rose::DB> blesses objects into a class derived from L<Rose::DB::Pg> when the L
 This class cannot be used directly.  You must use L<Rose::DB> and let its L<new()|Rose::DB/new> method return an object blessed into the appropriate class for you, according to its L<driver_class()|Rose::DB/driver_class> mappings.
 
 Only the methods that are new or have different behaviors than those in L<Rose::DB> are documented here.  See the L<Rose::DB> documentation for the full list of methods.
+
+=head1 CLASS METHODS
+
+=over 4
+
+=item B<timestamps_are_inlined [BOOL]>
+
+Get or set a boolean value that indicates whether or not timestamp keywords should be inline. If C<timestamps_are_inlined> is true, then keywords such as CURRENT_DATESTAMP and CURRENT_TIMESTAMP are inlined in the generated SQL queries. The default is false.
+
+=back
 
 =head1 OBJECT METHODS
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "PDL-aware drawing functions for Prima widgets",
+   "abstract" : "unknown",
    "author" : [
-      "David Mertens, E<lt>dcmertens.perl@gmail.comE<gt>."
+      "unknown"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,23 +15,24 @@
    "name" : "PDL-Drawing-Prima",
    "no_index" : {
       "directory" : [
+         "t",
+         "inc",
          "examples",
          "t"
       ],
       "file" : [
-         "README.pod"
+         "README.md"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "ExtUtils::ParseXS" : "3.0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "0",
             "PDL" : "2.037",
             "Prima" : "1.57"
          }
@@ -40,32 +41,26 @@
          "requires" : {
             "PDL" : "2.037",
             "Prima" : "1.57",
-            "perl" : "v5.12.0"
+            "perl" : "5.012"
          }
-      }
-   },
-   "provides" : {
-      "PDL::Drawing::Prima" : {
-         "file" : "lib/PDL/Drawing/Prima.pm.PL",
-         "version" : "0.16"
       },
-      "PDL::Drawing::Prima::Utils" : {
-         "file" : "lib/PDL/Drawing/Prima/Utils.pm.PL",
-         "version" : "0.16"
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/dk/PDL-Drawing-Prima/issues"
+         "web" : "https://github.com/PDLPorters/PDL-Drawing-Prima/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "http://github.com/dk/PDL-Drawing-Prima"
-      }
+         "type" : "git",
+         "web" : "https://github.com/dk/PDL-Drawing-Prima"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

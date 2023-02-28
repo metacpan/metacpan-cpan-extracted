@@ -15,7 +15,7 @@ our @EXPORT = qw/
     exists_p row_exists
 /;
 
-our $VERSION = "v0.0.34";
+our $VERSION = "v0.0.36";
 
 async sub exists_p ($db, $table_name, $where = undef, $options = undef) {
     my ($sql, @bind) = $db->pg->abstract->select($table_name, undef, $where, $options);

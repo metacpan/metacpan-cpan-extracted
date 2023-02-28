@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station, vide
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2022 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -132,7 +132,7 @@ bitchute.com videos (L<StreamFinder::Bitchute>),
 blogger.com videos (L<StreamFinder::Blogger>), 
 brandnewtube.com and ugetube.com videos (L<StreamFinder::BrandNewTube>), 
 brighteon.com videos (L<StreamFinder::Brighteon>), 
-castbox.fm podcases (L<StreamFinder::Castbox>), 
+castbox.fm podcasts (L<StreamFinder::Castbox>), 
 podcasts.google.com podcasts (L<StreamFinder::Google>), 
 iheartradio.com radio stations and podcasts (L<StreamFinder::IHeartRadio>), 
 www.internetradio.com radio stations (L<StreamFinder::InternetRadio>), 
@@ -141,6 +141,7 @@ odysee.com videos (L<StreamFinder::Odysee>),
 podbean.com podcasts (L<StreamFinder::Podbean>), 
 podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>), 
 radio.net radio stations (L<StreamFinder::RadioNet>), 
+rcast.net radio stations (L<StreamFinder::Rcast>), 
 rumble.com videos (L<StreamFinder::Rumble>),
 sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>), 
 soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>), 
@@ -254,7 +255,7 @@ I<-hls_bandwidth> => "I<number>"
 
 Limit HLS (m3u8) streams that contain a list of other HLS streams of varying 
 BANDWIDTH values (in BITS per second) by selecting the highest bitrate stream 
-at or below the specified limit when I<$stream->getURL()> is called.
+at or below the specified limit when I<$stream>->I<getURL()> is called.
 
 DEFAULT I<-none-> (no limiting by bitrate).
 
@@ -415,7 +416,7 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 youtube-dl, or other compatable program such as yt-dlp, etc. 
 (for Youtube, Bitchute, Blogger, Brighteon, Odysee, Vimeo)
-NOTE:  Required for Youtube, Odysee, and SoundCloud.
+NOTE:  Required for Youtube, Odysee, and SoundCloud to work.
 
 wget
 
@@ -456,7 +457,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -504,7 +505,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 our $DEBUG = 0;
 
 require Exporter;
@@ -512,8 +513,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Google
-		IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict RadioNet Rumble SermonAudio
-		SoundCloud	Spreaker	Subsplash Tunein Vimeo Youtube));
+		IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict RadioNet Rcast Rumble
+		SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube));
 
 my %useit;
 
@@ -607,6 +608,9 @@ sub new
 	} elsif ($url =~ m#\bsoundcloud\.# && $useit{'SoundCloud'}) {
 		eval { require 'StreamFinder/SoundCloud.pm'; $haveit = 1; };
 		return new StreamFinder::SoundCloud($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\brcast\.# && $useit{'Rcast'}) {
+		eval { require 'StreamFinder/Rcast.pm'; $haveit = 1; };
+		return new StreamFinder::Rcast($url, @args)  if ($haveit);
 	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {

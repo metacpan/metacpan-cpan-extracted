@@ -132,11 +132,13 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
 	my $firstStream = ${$self->{'streams'}}[$idx];
 
-	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
-			|| ($self->{'hls_bandwidth'} && ${$self->{'streams'}}[$idx] =~ /\.(m3u8)$/i)
-			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
+	return ''  unless (defined $firstStream);
+
+	if (($arglist =~ /\b\-?nopls\b/ && $firstStream =~ /\.(pls)$/i)
+			|| (defined($self->{'hls_bandwidth'}) && $firstStream =~ /\.(m3u8)$/i)
+			|| ($arglist =~ /\b\-?noplaylists\b/ && $firstStream =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;
-		print STDERR "-getURL($idx): NOPLAYLISTS|BANDWIDTH and (".${$self->{'streams'}}[$idx].") TP=$plType=\n"  if ($DEBUG);
+		print STDERR "-getURL($idx): NOPLAYLISTS|BANDWIDTH and (".$firstStream.") TP=$plType=\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 		$ua->timeout($self->{'timeout'});
 		$ua->cookie_jar({});
@@ -174,11 +176,11 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 			} else {
 				$plidx = 0;
 			}
-			$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
-					: ${$self->{'streams'}}[$idx];
+			$firstStream = $plentries[$plidx]
+					if (defined($plentries[$plidx]) && $plentries[$plidx]);
 		} elsif ($plType =~ /m3u8/i) {  #HLS?:
 			my $line = 1;
-			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			(my $urlpath = $firstStream) =~ s#[^\/]+$##;
 			my $highestBW = 0;
 			my $bestStream = '';
 			while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
@@ -205,7 +207,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 			$firstStream = $bestStream  if ($bestStream);
 			print STDERR "-getURL(m3u8/HLS) best=$bestStream=\n"  if ($DEBUG);
 		} else {  #m3u:
-			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			(my $urlpath = $firstStream) =~ s#[^\/]+$##;
 			foreach my $line (@lines) {
 				if ($line =~ m#^\s*([^\#].+)$#o) {
 					my $urlpart = $1;
@@ -226,7 +228,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 		}
 	}
 
-	print STDERR "-getURL returning stream=$firstStream=\n";
+	print STDERR "-getURL returning stream=$firstStream=\n"  if ($DEBUG);
 	return $firstStream;
 }
 

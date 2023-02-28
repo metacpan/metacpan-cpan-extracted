@@ -8,7 +8,7 @@ use Carp qw(carp croak);
 
 our ($VERSION, @EXPORT_OK);
 
-$VERSION = '0.22';
+$VERSION = '0.23';
 @EXPORT_OK = qw(median);
 
 require XSLoader;

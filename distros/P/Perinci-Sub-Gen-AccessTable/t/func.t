@@ -13,12 +13,12 @@ use Test::Needs;
 
 require "testlib.pl";
 
-my ($table_data, $table_spec) = gen_test_data();
+my ($table_data, $table_def) = gen_test_data();
 
 test_gen(
     name => 'ordering, detail',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -66,7 +66,7 @@ test_gen(
 test_gen(
     name => 'random ordering',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -82,7 +82,7 @@ test_gen(
 test_gen(
     name => 'fields, exclude_fields, with_field_names',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -166,12 +166,12 @@ test_gen(
     },
 );
 
-($table_data, $table_spec) = gen_test_data(1);
+($table_data, $table_def) = gen_test_data(1);
 
 test_gen(
     name => 'filtering, aoa data',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -230,9 +230,11 @@ test_gen(
 
 subtest 'data from TableData object' => sub {
     test_needs 'TableData::Sample::DeNiro';
+    test_needs 'TableData::Chemistry::Element';
+
     require TableData::Sample::DeNiro;
     test_gen(
-        name => 'data from TableData object (spec automatically from TableData Object)',
+        name => 'data from TableData object (table definition automatically from TableData Object)',
         table_data => TableData::Sample::DeNiro->new,
         status => 200,
         post_test => sub {
@@ -249,12 +251,32 @@ subtest 'data from TableData object' => sub {
             );
         },
     );
+
+    require TableData::Chemistry::Element;
+    test_gen(
+        name => 'data from TableData object (table definition from get_table_def() from TableData object)',
+        table_data => TableData::Chemistry::Element->new,
+        status => 200,
+        post_test => sub {
+            my ($res) = @_;
+            my $func = $res->[2]{code};
+
+            test_query(
+                $func, {"atomic_number.max"=>2, detail=>1},
+                sub {
+                    my ($rr) = @_;
+                    is(scalar(@$rr), 2, "num of results = 2");
+                    is($rr->[1]{symbol}, "He");
+                },
+            );
+        },
+    );
 };
 
 test_gen(
     name => 'paging',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -284,7 +306,7 @@ test_gen(
 test_gen(
     name => 'function table_data',
     table_data => sub { {data=>$table_data} },
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -297,7 +319,7 @@ test_gen(
 test_gen(
     name => 'function table_data (filtered=>1)',
     table_data => sub { {data=>$table_data, filtered=>1} },
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -314,7 +336,7 @@ test_gen(
 test_gen(
     name => 'search',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     status => 200,
     post_test => sub {
         my ($res) = @_;
@@ -332,7 +354,7 @@ test_gen(
         {id=>2, a=>[qw/pineapple/]},
         {id=>3, a=>[qw//]},
     ],
-    table_spec => {
+    table_def => {
         fields => {
             id => {schema=>'int*', index=>0},
             a  => {schema=>'array*', index => 1},
@@ -356,7 +378,7 @@ test_gen(
         {id=>2, s=>'b', s2=>'e'},
         {id=>3, s=>'c', s2=>'f'},
     ],
-    table_spec => {
+    table_def => {
         fields => {
             id => {schema=>'int*', index => 0},
             s  => {schema=>'str*', index => 1, searchable => 0},
@@ -380,7 +402,7 @@ test_gen(
         {s=>'A1'},
         {s=>'a2'},
     ];
-    my $table_spec = {
+    my $table_def = {
         fields => {
             s  => {schema=>'str*'   , pos=>0, filterable_regex=>1, },
             # TODO
@@ -392,7 +414,7 @@ test_gen(
     test_gen(
         name => 'case sensitive comparison 1',
         table_data => $table_data,
-        table_spec => $table_spec,
+        table_def  => $table_def,
         other_args => {case_insensitive_comparison=>1},
         status => 200,
         post_test => sub {
@@ -406,7 +428,7 @@ test_gen(
 test_gen(
     name => 'case sensitive search',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {case_insensitive_search=>0},
     status => 200,
     post_test => sub {
@@ -421,7 +443,7 @@ test_gen(
 test_gen(
     name => 'word search',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {word_search=>1},
     status => 200,
     post_test => sub {
@@ -436,7 +458,7 @@ test_gen(
 test_gen(
     name => 'custom search',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {custom_search=>sub {
                        my ($r, $q, $opts) = shift;
                        $r->{i} % 2;
@@ -453,7 +475,7 @@ test_gen(
 test_gen(
     name => 'default_arg_values',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_arg_values => {"f.min"=>1}},
     status => 200,
     post_test => sub {
@@ -468,7 +490,7 @@ test_gen(
 test_gen(
     name => 'custom_filters',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {
         custom_filters => {
             cf1=>{meta=>{schema=>'float'},
@@ -510,7 +532,7 @@ test_gen(
     test_gen(
         name => 'hooks',
         table_data => $table_data,
-        table_spec => $table_spec,
+        table_def  => $table_def,
         other_args => {
             hooks => {
                 before_parse_query => $hook_code,
@@ -541,7 +563,7 @@ test_gen(
     test_gen(
         name => 'hook can abort func',
         table_data => $table_data,
-        table_spec => $table_spec,
+        table_def  => $table_def,
         other_args => {
             hooks => {
                 before_parse_query => $hook_code,

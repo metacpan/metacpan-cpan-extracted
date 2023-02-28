@@ -1,11 +1,10 @@
-.github/workflows/all.yml
 Changes
 ignore.txt
 lib/Locale/CA.pm
 LICENSE
 Makefile.PL
 MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
@@ -14,10 +13,14 @@ t/20-basics.t
 t/30-all.t
 t/boiler.t
 t/changes.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
+t/errors.t
 t/gv.t
 t/kwalitee.t
 t/manifest.t
@@ -26,13 +29,14 @@ t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/snippets.t
-t/spelling.t
 t/strict.t
 t/unused.t
 t/used.t
 t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

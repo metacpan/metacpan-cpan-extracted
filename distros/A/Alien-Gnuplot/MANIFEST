@@ -1,5 +1,6 @@
 Changes
 lib/Alien/Gnuplot.pm
+alienfile
 Makefile.PL
 MANIFEST			This list of files
 README.pod

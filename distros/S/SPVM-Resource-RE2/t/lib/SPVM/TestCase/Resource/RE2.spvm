@@ -1,0 +1,3 @@
+class TestCase::Resource::RE2 {
+  native static method test : int ();
+}

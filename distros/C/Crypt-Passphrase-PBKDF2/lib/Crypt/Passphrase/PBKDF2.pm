@@ -1,5 +1,5 @@
 package Crypt::Passphrase::PBKDF2;
-$Crypt::Passphrase::PBKDF2::VERSION = '0.001';
+$Crypt::Passphrase::PBKDF2::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -20,17 +20,17 @@ my %param_for_type =(
 sub new {
 	my ($class, %args) = @_;
 	my $type = $args{type} || 'sha256';
-	croak '' unless exists $param_for_type{$type};
+	croak "Hash type $type not supported" unless exists $param_for_type{$type};
 	return bless {
 		salt_size  => $args{salt_size} || 16,
-		iterations => $args{iterations} || 10000,
+		iterations => $args{iterations} || 100_000,
 		type       => $type,
 	}, $class;
 }
 
 sub ab64_encode {
 	my $input = shift;
-	my $output = encode_base64($input);
+	my $output = encode_base64($input, '');
 	$output =~ tr/+/./;
 	$output =~ s/=+$//;
 	return $output;
@@ -46,7 +46,7 @@ sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
 	my $hash = derive($param_for_type{ $self->{type} }, $password, $salt, $self->{iterations});
-	return join '$', "\$pbkdf2-$self->{type}", $self->{iterations}, ab64_encode($salt, ''), ab64_encode($hash, '');
+	return join '$', "\$pbkdf2-$self->{type}", $self->{iterations}, ab64_encode($salt), ab64_encode($hash);
 }
 
 my $decode_regex = qr/ \A \$ pbkdf2- (\w+) \$ (\d+) \$ ([^\$]+) \$ ([^\$]*) \z /x;
@@ -54,8 +54,8 @@ my $decode_regex = qr/ \A \$ pbkdf2- (\w+) \$ (\d+) \$ ([^\$]+) \$ ([^\$]*) \z /
 sub needs_rehash {
 	my ($self, $hash) = @_;
 	my ($type, $iterations, $salt64, $hash64) = $hash =~ $decode_regex or return 1;
-	return 1 if $type ne $self->{type} or $iterations < $self->{iterations};
-	return 1 if length ab64_decode($salt64) < $self->{salt_size};
+	return 1 if $type ne $self->{type} or $iterations != $self->{iterations};
+	return 1 if length ab64_decode($salt64) != $self->{salt_size};
 	return;
 }
 
@@ -87,7 +87,11 @@ Crypt::Passphrase::PBKDF2 - A PBKDF2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 DESCRIPTION
+
+This class implements a PBKDF2 encoder for Crypt::Passphrase. It allows for any SHA-1 or SHA-2 hash, and any number of iterations.
 
 =head1 METHODS
 
@@ -103,7 +107,7 @@ This can be any of C<sha1>, C<sha224>, C<sha256> (default), C<sha384> or C<sha51
 
 =item * iterations
 
-This will be the iteration count, defaulting to C<10000>.
+This will be the iteration count, defaulting to C<100000>.
 
 =item * salt_size
 

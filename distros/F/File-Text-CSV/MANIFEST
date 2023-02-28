@@ -1,0 +1,24 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/Text/CSV.pm
+t/00-load.t
+t/00-load.t
+t/01-bare.t
+t/02-bare.t
+t/03-bare.t
+t/04-bare.t
+t/10-head.t
+t/11-head.t
+t/20-error.t
+t/21-error.t
+t/22-error.t
+t/23-error.t
+t/bare.csv
+t/err01.csv
+t/err02.csv
+t/err03.csv
+t/head.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

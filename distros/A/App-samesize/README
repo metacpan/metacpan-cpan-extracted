@@ -1,0 +1,5 @@
+This module provides a UNIX-like command `samesize'.
+
+ Copyright (c) 2019-2023 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

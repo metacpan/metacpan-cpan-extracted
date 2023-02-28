@@ -30,7 +30,7 @@ on 'test' => sub {
 };
 
 on 'test' => sub {
-  suggests "LWP::UserAgent" => "6.07";
+  suggests "LWP::UserAgent" => "6.37";
 };
 
 on 'configure' => sub {

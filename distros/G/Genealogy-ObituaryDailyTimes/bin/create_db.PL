@@ -4,7 +4,7 @@
 #	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit
 #
 # -f:	force a build, otherwise it won't build on CPAN smokers or if the
-# 	database is less than a day old
+#	database is less than a day old
 
 # If mlarchives starts to fail to download, try looking at bin/ml_from_cache
 
@@ -25,7 +25,7 @@ use autodie qw(:all);
 
 sub freelists($$);
 sub mlarchives($$);
-sub queue($$$$$$$$);
+sub queue($$$$$$$$$);
 sub flush($);
 sub normalise_name($);
 
@@ -50,13 +50,13 @@ my $filename = File::Spec->catdir($dir, 'obituaries.sql');
 my %normalised;
 
 if(!-d $dir) {
-	mkdir $dir;
+	mkdir $dir, 0755;
 }
 
 if(-r $filename) {
-	if(((-s $filename) > 0) && !$force_flag) {
-		# Don't bother downloading if the file is less than a day old
-		exit if(-M $filename < 1);
+	# Don't bother downloading if the file is less than a day old
+	if(((-s $filename) > 0) && (-M $filename < 1) && !$force_flag) {
+		exit;
 	}
 	unlink $filename;
 }
@@ -91,7 +91,7 @@ die "$filename: $!" if(!defined($dbh));
 
 $dbh->do('PRAGMA cache_size = -65536');	# 64MB
 $dbh->do('PRAGMA journal_mode = OFF');
-$dbh->do('CREATE TABLE obituaries(first VARCHAR, middle VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
+$dbh->do('CREATE TABLE obituaries(first VARCHAR NOT NULL, middle VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, source CHAR NOT NULL, page VARCHAR NOT NULL)');
 
 my @queue;
 my $page = 1;
@@ -126,12 +126,20 @@ while(freelists($ua, 'v27no' . sprintf('%03d', $issue))) {
 	$issue++;
 }
 
+flush($dbh);
+
+$issue = 1;
+while(freelists($ua, 'v28no' . sprintf('%03d', $issue))) {
+	$issue++;
+}
+
 print "\n";
 
 flush($dbh);
 
 $dbh->commit();
 $dbh->prepare('CREATE INDEX name_index ON obituaries(first, last)')->execute();
+$dbh->do('pragma optimize');
 $dbh->disconnect();
 
 sub mlarchives($$) {
@@ -236,6 +244,9 @@ sub mlarchives($$) {
 		# print __LINE__, ": $page: '$line' ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
 		next unless(defined($name));
 		my ($last, $first) = split(',\s', $name);
+		next unless(defined($last));
+		next unless(defined($first));
+
 		my $maiden;
 		if($first) {
 			if($first =~ /(.+)\s\((.+)\)$/) {
@@ -248,7 +259,7 @@ sub mlarchives($$) {
 		# $age //= '';
 
 		# print "$line->>>>>>>>>>\n";
-		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, $url) if($last =~ /^[A-Z]/);
+		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'M', $page) if($last =~ /^[A-Z]/);
 		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
 		$rc = 1;
 	}
@@ -258,8 +269,8 @@ sub mlarchives($$) {
 
 sub freelists($$) {
 	my $ua = shift;
-	my $issue = shift;
-	my $url = "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$issue";
+	my $page = shift;
+	my $url = "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$page";
 
 	$| = 1;
 	printf "%-70s\r", $url;
@@ -280,7 +291,11 @@ sub freelists($$) {
 	# print $data;
 	# exit;
 
-	my @lines = split(/<br>|<br \/>$/ms, $data);
+	# my @lines = split(/<br>|<br \/>/ms, $data);
+	$data =~ s/<br>/\n/g;
+	$data =~ s/<br \/>/\n/g;
+	$data =~ s/\n\n+/\n/g;
+	my @lines = split(/\n/ms, $data);
 
 	my $rc;
 
@@ -303,8 +318,11 @@ sub freelists($$) {
 		$line =~ s/'/''/g;
 		my ($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
 		if((!defined($tag)) || ($tag eq '')) {
+			# Handle when the information is split across more
+			# than one line ("cont" means "continuation")
 			my $cont = shift(@lines);
 
+			# print __LINE__, ": continuation '$cont'\n";
 			$cont =~ s/^\n//;
 			last if($cont =~ /^\-\-\-\-\-\-\-\-/);
 			$cont =~ s/&nbsp;/ /g;
@@ -316,7 +334,7 @@ sub freelists($$) {
 		}
 		# print __LINE__, ": $line: ($stage): $name, $age, $place, $newspaper, $date, $tag\n";
 		# use Data::Dumper;
-		# print __LINE__, ": $issue: ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
+		# print __LINE__, ": $page ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
 		next unless(defined($name));
 		my ($last, $first) = split(',\s', $name);
 		next unless(defined($last));
@@ -339,17 +357,19 @@ sub freelists($$) {
 
 		# print "$line:\n",
 			# "\t\"$last\",\"$first\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
-			# # "\t\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
-		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, $url) if($last =~ /^[A-Z]/);
+			# "\t\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
+		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'F', $page) if($last =~ /^[A-Z]/);
 		$rc = 1;
 	}
 	die "Couldn't parse $url" if(!defined($rc));
 	return 1;
 }
 
-sub queue($$$$$$$$)
+sub queue($$$$$$$$$)
 {
-	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $url) = @_;
+	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $source, $page) = @_;
+
+	die $source if(($source ne 'F') && ($source ne 'M'));
 
 	# If we don't know the date of publication, it's not easy to find
 	return unless(defined($date));
@@ -362,12 +382,16 @@ sub queue($$$$$$$$)
 		date => $date,
 		newspaper => $newspaper,
 		place => $place,
-		url => $url
+		source => $source,
+		page => $page,
 	);
 
 	if(defined($age) && ($age ne '')) {
+		return if($age =~ /\D/);
+		$age =~ s/\s+//g;
 		$columns{'age'} = $age;
 	}
+
 	if($maiden) {
 		$columns{'maiden'} = $maiden;
 	}
@@ -378,11 +402,48 @@ sub flush($)
 {
 	my $dbh = shift;
 
+	# Remove duplicates
+	my %seen;
+	my @deduped;
+
+	foreach my $item(@queue) {
+		# my $first = $item->{'first'};
+		# if(!defined($first)) {
+			# $item->{'first'} = '';
+		# }
+		my $maiden = $item->{'maiden'};
+		if(!defined($maiden)) {
+			$item->{'maiden'} = '';
+		}
+		my $age = $item->{'age'};
+		if(!defined($age)) {
+			$item->{'age'} = '';
+		}
+# use Data::Dumper;
+# print Data::Dumper->new([$item])->Dump();
+		my $k = join('|', @$item{qw /first last maiden age place date newspaper source page/ });
+		# if(!defined($first)) {
+			# delete $item->{'first'};
+		# }
+		if(!defined($maiden)) {
+			delete $item->{'maiden'};
+		}
+		if($item->{'age'} eq '') {
+			delete $item->{'age'};
+		}
+		unless($seen{$k}) {
+			push @deduped, $item;
+			$seen{$k} = 1;
+		} else {
+			# print "$k\n";
+		}
+	}
+
 	my $query;
 
-	while(my $row = pop @queue) {
+	while(my $row = pop @deduped) {
 		if(!defined($query)) {
-			$query = 'INSERT INTO obituaries(first, middle, last, maiden, age, place, date, newspaper, url) VALUES (';
+			$query = 'INSERT INTO obituaries(first, middle, last, maiden, age, place, date, newspaper, source, page) VALUES (';
 		} else {
 			$query .= ',(';
 		}
@@ -391,20 +452,21 @@ sub flush($)
 		if($columns{'first'}) {
 			if($columns{'first'} =~ /(.+)\s(.+)/) {
 				# Has a middle name
-				$query .= "'$1','$2','" . $columns{'last'} . "',";
+				$query .= "'$1','$2',";
 			} else {
-				$query .= "'" . $columns{'first'} . "',NULL,'" . $columns{'last'} . "',";
+				$query .= "'" . $columns{'first'} . "',NULL,";
 			}
 		} else {
-			$query .= "NULL,NULL,'" . $columns{'last'} . "',";
+			$query .= 'NULL,NULL,';
 		}
+		$query .= "'" . $columns{'last'} . "',";
 		if($columns{'maiden'} && ($columns{'maiden'} ne ' ')) {
 			$query .= "'" . $columns{'maiden'} . "',";
 		} else {
 			$query .= 'NULL,';
 		}
 		if($columns{'age'}) {
-			$query .= "'" . $columns{'age'} . "',";
+			$query .= $columns{'age'} . ',';
 		} else {
 			$query .= 'NULL,';
 		}
@@ -418,7 +480,9 @@ sub flush($)
 		} else {
 			$query .= 'NULL,';
 		}
-		$query .= "'" . $columns{'newspaper'} . "','" . $columns{'url'} . "')";
+		my $source = $columns{'source'};
+		die $source if(($source ne 'F') && ($source ne 'M'));
+		$query .= "'" . $columns{'newspaper'} . "','" . $columns{'source'} . "','" . $columns{'page'} . "')";
 	}
 
 	# $| = 1;
@@ -439,6 +503,8 @@ sub flush($)
 sub normalise_name($)
 {
 	my $name = shift;
+	$name =~ s/\"//g;
+
 	my $key = lc($name);
 
 	if($normalised{$key}) {

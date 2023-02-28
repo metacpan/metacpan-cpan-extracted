@@ -7,10 +7,9 @@ my $script = path(qw(script proxyforurl))->to_abs;
 plan skip_all => 'script/proxyforurl not found' unless -r $script;
 my $t = Test::Mojo->new($script);
 
-$t->get_ok('/')->status_is(200)
-  ->element_exists('a[href="//metacpan.org/pod/App::proxyforurl#DESCRIPTION"]')
-  ->element_exists('textarea#rules')->element_exists('input#url')->element_exists('input#host')
-  ->element_exists('input#rule');
+$t->get_ok('/')->status_is(200)->element_exists('textarea[name=rules]')
+  ->element_exists('input[name=url]')->element_exists('input[name=host]')
+  ->element_exists('table#pac_log');
 
 $t->get_ok('/pac.js')->status_is(200);
 for my $method (qw(
@@ -29,11 +28,7 @@ for my $method (qw(
   weekdayRange
 ))
 {
-  $t->content_like(qr{proto\.$method\s+=})->content_like(qr{'$method'});
+  $t->content_like(qr/async\s$method\(/);
 }
-
-$t->get_ok('/gethostbyname')->status_is(400);
-
-$t->get_ok('/within')->status_is(400);
 
 done_testing;

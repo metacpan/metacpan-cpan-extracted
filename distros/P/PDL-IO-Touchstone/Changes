@@ -1,5 +1,11 @@
 Revision history for PDL-IO-Touchstone
 
+1.014	2023-02-26T15:49:37-08:00
+	- Fix typos in Touchstone.pm and MDIF.pm
+	- Fixed args cloning in rmdif
+	- Removed unnecessary dummy dimension in m_to_pos_vecs
+	- Use splice instead of an iterative shift in rmdif()
+
 1.013	2022-11-14T21:58:23-08:00
 	- Removed hash-based frequency interpolation It was buggy and hard to
 	  work with.  The new format is far more flexible and easier to handle.

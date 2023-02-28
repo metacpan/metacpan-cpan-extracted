@@ -43,6 +43,7 @@ my %args = (
         'Test::LeakTrace' => '0',
         'Test::More' => '0.98',
         'Test::SharedFork' => '0',
+        'Test::Valgrind' => '0',
     },
 
     name            => 'Redis-Cluster-Fast',

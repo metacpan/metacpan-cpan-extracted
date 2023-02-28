@@ -167,15 +167,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$ftnstrip->{_opt}		= $opt;
-		$ftnstrip->{_note}		= $ftnstrip->{_note}.' opt='.$ftnstrip->{_opt};
-		$ftnstrip->{_Step}		= $ftnstrip->{_Step}.' opt='.$ftnstrip->{_opt};
-
-	} else { 
-		print("ftnstrip, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$ftnstrip->{_opt}		= $opt;
+#		$ftnstrip->{_note}		= $ftnstrip->{_note}.' opt='.$ftnstrip->{_opt};
+#		$ftnstrip->{_Step}		= $ftnstrip->{_Step}.' opt='.$ftnstrip->{_opt};
+#
+#	} else { 
+#		print("ftnstrip, opt, missing opt,\n");
+#	 }
  }
 
 

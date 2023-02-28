@@ -15,7 +15,7 @@ BEGIN
   }
   else
   {
-    Test::More->import(tests => 292);
+    Test::More->import(tests => 295);
   }
 }
 
@@ -196,6 +196,16 @@ foreach my $name (qw(date datetime time timestamp))
     ok($db->$method($new_value), "$method ($new_value)");
   }
 }
+
+# Timestamp inlining (default is false)
+
+is($db->should_inline_timestamp_keyword, 0, 'should_inline_timestamp_keyword (0)');
+
+Rose::DB::Pg->timestamps_are_inlined(1);
+is($db->should_inline_timestamp_keyword, 1, 'should_inline_timestamp_keyword (1)');
+
+Rose::DB::Pg->timestamps_are_inlined(0);
+is($db->should_inline_timestamp_keyword, 0, 'should_inline_timestamp_keyword (0)');
 
 # Interval values
 

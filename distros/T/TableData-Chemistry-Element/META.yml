@@ -19,17 +19,18 @@ name: TableData-Chemistry-Element
 provides:
   TableData::Chemistry::Element:
     file: lib/TableData/Chemistry/Element.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Role::Tiny::With: '0'
   TableDataRole::Source::CSVInDATA: '0'
+  TableDataRole::Spec::TableDef: '0'
   strict: '0'
   utf8: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Chemistry-Element
   homepage: https://metacpan.org/release/TableData-Chemistry-Element
   repository: git://github.com/perlancar/perl-TableData-Chemistry-Element.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

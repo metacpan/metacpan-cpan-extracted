@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::User;
-$RT::Client::REST::User::VERSION = '0.71';
+$RT::Client::REST::User::VERSION = '0.72';
 use parent 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
@@ -179,7 +179,7 @@ RT::Client::REST::User - user object representation.
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 
@@ -345,7 +345,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

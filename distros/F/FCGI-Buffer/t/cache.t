@@ -1,5 +1,7 @@
 #!perl -wT
 
+# TODO:  Consider Test::File::Contents
+
 use strict;
 use warnings;
 use Test::Most tests => 160;

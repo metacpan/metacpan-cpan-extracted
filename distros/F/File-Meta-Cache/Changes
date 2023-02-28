@@ -1,0 +1,6 @@
+Revision history for Perl extension File::Meta::Cache.
+
+v0.1.0 2023-02-23 
+	- original version; created by h2xs 1.23 with options
+		--name File::Meta::Cache -X -P -b v5.24.0
+

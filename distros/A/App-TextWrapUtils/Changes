@@ -1,3 +1,21 @@
+0.005   2022-12-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add aliases commands: nowrap -> textunwrap, nowrap-clipboard
+          -> textunwrap-clipboard.
+
+
+0.004   2022-12-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: textwrap-clipboard, textunwrap-clipboard.
+
+
+0.003   2022-12-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: textunwrap.
+
+        - Tweak Abstract for textwrap.
+
+
 0.002   2022-12-13  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] [cli textwrap] Change default backend from

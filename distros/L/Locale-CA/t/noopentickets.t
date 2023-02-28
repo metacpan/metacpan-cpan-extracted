@@ -11,7 +11,7 @@ NOBUGS: {
 			if($@) {
 				diag('WWW::RT::CPAN required to check for open tickets');
 				skip('WWW::RT::CPAN required to check for open tickets', 3);
-			} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'CGI-Info')}) {
+			} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'Locale-CA')}) {
 				ok($rc[0] == 200);
 				ok($rc[1] eq 'OK');
 				my @tickets = $rc[2] ? @{$rc[2]} : ();

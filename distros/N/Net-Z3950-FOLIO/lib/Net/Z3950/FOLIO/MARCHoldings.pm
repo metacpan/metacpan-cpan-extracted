@@ -60,7 +60,7 @@ sub _addSubfields {
 	my $name = $elementsCfg->{$subfield};
 	my $val = $data->{$name};
 	# warn "considering key '$subfield' mapped to '$name' with value '$val'";
-	if ($val) {
+	if ($val || (defined $val && "$val" eq '0')) {
 	    $marcField = _addSubfield($marcField, $marcCfg, $subfield, $val);
 	}
     }

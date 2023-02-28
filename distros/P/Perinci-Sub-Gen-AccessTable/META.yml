@@ -23,7 +23,7 @@ name: Perinci-Sub-Gen-AccessTable
 provides:
   Perinci::Sub::Gen::AccessTable:
     file: lib/Perinci/Sub/Gen/AccessTable.pm
-    version: '0.591'
+    version: '0.592'
 requires:
   Data::Sah::Normalize: '0.051'
   Data::Sah::Resolve: '0.010'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-AccessTable
   homepage: https://metacpan.org/release/Perinci-Sub-Gen-AccessTable
   repository: git://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable.git
-version: '0.591'
+version: '0.592'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

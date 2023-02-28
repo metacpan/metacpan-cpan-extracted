@@ -367,9 +367,9 @@ sub suffix_aref {
 
 	my $index_aref = get_binding_index_aref();
 	my @index      = @$index_aref;
-	$suffix[ $index[0] ] = "." . '$suffix_bin';
-	$suffix[ $index[1] ] = "." . '$suffix_su';
-	$suffix[ $index[2] ] = "." . '$suffix_bin';
+	$suffix[ $index[0] ] = ''.'' . '$suffix_bin';
+	$suffix[ $index[1] ] = ''.''. '$suffix_su';
+	$suffix[ $index[2] ] = ''.''. '$suffix_bin';
 
 	$sufdmod1_spec->{_suffix_aref} = \@suffix;
 	return ();

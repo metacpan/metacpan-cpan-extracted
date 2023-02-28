@@ -4,7 +4,7 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -39,16 +39,16 @@ returns a [Class::Measure::Length](https://metacpan.org/pod/Class%3A%3AMeasure%3
 
 Are two points the same?
 
-    my $loc1 = location->new(lat => 2, long => 2);
-    my $loc2 = location->new(lat => 2, long => 2);
+    my $loc1 = Geo::Location::Point->new(lat => 2, long => 2);
+    my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
     print ($loc1 == $loc2), "\n";       # Prints 1
 
 ## not\_equal
 
-Are two points different same?
+Are two points different?
 
-    my $loc1 = location->new(lat => 2, long => 2);
-    my $loc2 = location->new(lat => 2, long => 2);
+    my $loc1 = Geo::Location::Point->new(lat => 2, long => 2);
+    my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
     print ($loc1 != $loc2), "\n";       # Prints 0
 
 ## as\_string
@@ -80,7 +80,7 @@ it under the same terms as Perl itself.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019-2020 Nigel Horne.
+Copyright 2019-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

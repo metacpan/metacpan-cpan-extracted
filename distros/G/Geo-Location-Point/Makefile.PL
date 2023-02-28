@@ -24,16 +24,17 @@ WriteMakefile(
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo-Location-Point-*' },
-    META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	resources => {
-    		repository => {
+    META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+	'meta-spec' => { version => 2 },
+	resources => {
+		repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Location-Point.git',
 			web => 'https://github.com/nigelhorne/Geo-Location-Point',
-    		},
-		bugtracker => {
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Location-Point',
+			repository => 'https://github.com/nigelhorne/Geo-Location-Point',
+		}, bugtracker => {
+			web => 'https://github.com/nigelhorne/Geo-Location-Point/issues',
+			url => 'https://github.com/nigelhorne/Geo-Location-Point/issues',
 			mailto => 'bug-Geo-Location-Point@rt.cpan.org'
 		}
 	},

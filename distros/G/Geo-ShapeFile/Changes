@@ -1,5 +1,13 @@
 Revision history for Geo::ShapeFile.
 
+3.03 2022-02-24
+    - Tests: Generate unicode file names on the fly (GH#30).
+
+3.02 2022-02-23
+    - Fix copy-paste error in MultiPointM handling (GH#28).
+    - CI changes (GH#27, GH#29)
+    - Thanks to @voegelas for all three PRs.
+
 3.01 2021-04-15
     - The type_is method now handles both string and numeric codes.
       Thanks to @poslfit for reporting (GH#26). 

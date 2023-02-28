@@ -1,3 +1,9 @@
+0.03 2023-02-28T09:27:56+01:00
+ - Add license exceptions.
+ - Fix licenses() return list.
+ - Improve example in doc.
+ - Regen README file.
+
 0.02 2023-01-30T09:36:04+01:00
  - Add check for SPDX license id.
  - Fix license SPDX string in test.

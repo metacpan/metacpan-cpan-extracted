@@ -144,16 +144,16 @@ sub clear {
 sub opt {
 
 	my ( $self, $opt ) = @_;
-	if ( $opt ne $empty_string ) {
-
-		$psepsi->{_opt}  = $opt;
-		$psepsi->{_note} = $psepsi->{_note} . ' opt=' . $psepsi->{_opt};
-		$psepsi->{_Step} = $psepsi->{_Step} . ' opt=' . $psepsi->{_opt};
-
-	}
-	else {
-		print("psepsi, opt, missing opt,\n");
-	}
+#	if ( $opt ne $empty_string ) {
+#
+#		$psepsi->{_opt}  = $opt;
+#		$psepsi->{_note} = $psepsi->{_note} . ' opt=' . $psepsi->{_opt};
+#		$psepsi->{_Step} = $psepsi->{_Step} . ' opt=' . $psepsi->{_opt};
+#
+#	}
+#	else {
+#		print("psepsi, opt, missing opt,\n");
+#	}
 }
 
 =head2 sub get_max_index

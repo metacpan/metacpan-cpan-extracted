@@ -39,8 +39,9 @@
             "JSON::Validator" : "5.03",
             "Locale::PO" : "0.27",
             "Mojolicious" : "9.12",
-            "Mojolicious::Plugin::Qooxdoo" : "v1.0.13",
+            "Mojolicious::Plugin::Qooxdoo" : "v1.0.14",
             "Syntax::Keyword::Try" : "0.25",
+            "Test::Fatal" : "0",
             "Text::CSV" : "0",
             "XS::Parse::Keyword" : "0.21",
             "YAML::XS" : "0.83",
@@ -60,6 +61,6 @@
          "url" : "https://github.com/oetiker/callbackery"
       }
    },
-   "version" : "v0.43.1",
+   "version" : "v0.43.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

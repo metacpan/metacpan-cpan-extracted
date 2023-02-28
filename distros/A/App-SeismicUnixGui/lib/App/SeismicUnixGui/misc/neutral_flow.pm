@@ -89,7 +89,6 @@ my $manage_files_by2      = manage_files_by2->new();
 my $gui_history           = gui_history->new();
 my $param_flow            = param_flow_neutral->new();
 
-# print("user_built flow, make param_flow instance in user_built flow\n");
 my $param_widgets   = param_widgets_neutral->new();
 my $flow_type       = $L_SU_global_constants->flow_type_href();
 my $color_flow_href = $gui_history->get_defaults();
@@ -122,7 +121,7 @@ to share variable values easily
 
 my $color_flow = {
 
-	_Flow_file_exists => $true,
+	_is_file_selected => $true,
 
 };
 
@@ -154,6 +153,8 @@ sub FileDialog_button {
 sub _FileDialog_button_Delete {
 
 	my ( $self, $dialog_type_sref ) = @_;
+	
+	$color_flow->{_is_file_selected} = $true;
 
 	# higher-level and a more permanent
 	# setting than file_dialog->set_flow_type()
@@ -162,11 +163,11 @@ sub _FileDialog_button_Delete {
 	#	print("neutral_flow, _FileDialog_button_Delete, gui_history.txt\n");
 	#	$gui_history->view();
 
-	#	print(
-	#"neutral_flow,_FileDialog_button_Delete,dialog_type=$$dialog_type_sref\n"
-	#	);
+		# print(
+	# "neutral_flow,_FileDialog_button_Delete,dialog_type=$$dialog_type_sref\n"
+	# 	);
 
-	while ( $color_flow->{_Flow_file_exists} ) {
+	while ($color_flow->{_is_file_selected} ) {
 		
 		my $file_dialog_type = $L_SU_global_constants->file_dialog_type_href();
 		my $PL_SEISMIC       = $Project->PL_SEISMIC();
@@ -174,9 +175,9 @@ sub _FileDialog_button_Delete {
 		$color_flow_href->{_dialog_type} = $$dialog_type_sref;
 		my $topic = $color_flow_href->{_dialog_type};
 
-		#	print(
-		#"neutral_flow,_FileDialog_button_Delete,flow_color = $color_flow_href->{_flow_color}\n"
-		#	);
+		# print(
+		# "neutral_flow,_FileDialog_button_Delete,flow_color = $color_flow_href->{_flow_color}\n"
+		# 	);
 
 		$file_dialog->set_flow_color( $color_flow_href->{_flow_color} );
 		$file_dialog->set_hash_ref($color_flow_href);
@@ -184,15 +185,18 @@ sub _FileDialog_button_Delete {
 		$color_flow_href->{$_flow_name_in_color} =
 		  $file_dialog->get_perl_flow_name_in();
 
-#	print(
-#"color_flow,color_flow_href->{_has_used_Delete_button}=$color_flow_href->{_has_used_Delete_button}\n"
-#	);
-
 		# Is $flow_name_in empty?
 		my $file2query =
 		  $PL_SEISMIC . '/' . $color_flow_href->{$_flow_name_in_color};
 		$color_flow->{_Flow_file_exists} =
 		  $manage_files_by2->does_file_exist_sref( \$file2query );
+		 $color_flow->{_is_file_selected} = $file_dialog->get_is_file_selected();
+		 
+		 
+		#	print(
+		#"color_flow,_FileDialog_button_Delete, _is_file_selected= $color_flow->{_is_file_selected}\n"
+		#	);
+		 
 
 		if ( $color_flow->{_Flow_file_exists} ) {
 
@@ -201,11 +205,11 @@ sub _FileDialog_button_Delete {
 
 		}
 		else {
-#			print(
-#"3 neutral_flow,FileDialog_button, Warning: missing file. \"Cancel\" clicked by user? NADA\n"
-#			);
+		#			print(
+		#"3 neutral_flow,FileDialog_button, Warning: missing file. \"Cancel\" clicked by user? NADA\n"
+		#			);
 		}
-	}
+	} # end of click_button being=OK
 
 	return ();
 
@@ -414,7 +418,6 @@ sub sunix_select {
 	my $message = $neutral_flow_messages->null_button(0);
 	$message_w->delete( "1.0", 'end' );
 	$message_w->insert( 'end', $message );
-
 
 # print("neutral_flow,1. sunix_select,flow_color: $color_flow_href->{_flow_color}\n");
 # print("neutral_flow,1. sunix_select,_is_flow_listbox_neutral_w:	$color_flow_href->{_is_flow_listbox_neutral_w} \n");

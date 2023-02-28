@@ -10,7 +10,7 @@ use IO::File ();
 
 our ($VERSION, @EXPORT_OK, $ENTRIES, $FSTAB);
 
-$VERSION = '0.18';
+$VERSION = '0.19';
 @EXPORT_OK = qw(getfsent);
 $ENTRIES = __PACKAGE__ . '::_fsents';
 $FSTAB = '/etc/fstab';

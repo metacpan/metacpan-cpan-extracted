@@ -19,7 +19,7 @@ name: App-TextWrapUtils
 provides:
   App::TextWrapUtils:
     file: lib/App/TextWrapUtils.pm
-    version: '0.002'
+    version: '0.005'
 recommends:
   Text::ANSI::Fold: '0'
   Text::ANSI::WideUtil: '0'
@@ -27,6 +27,7 @@ recommends:
   Text::LineFold: '0'
   Text::WideChar::Util: '0'
 requires:
+  Clipboard::Any: '0.009'
   Data::Sah::Compiler::perl::TH::int: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
@@ -48,14 +49,34 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextWrapUtils
   homepage: https://metacpan.org/release/App-TextWrapUtils
   repository: git://github.com/perlancar/perl-App-TextWrapUtils.git
-version: '0.002'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript nowrap'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript textunwrap-clipboard'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript textunwrap'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript nowrap-clipboard'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript textwrap'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript textwrap-clipboard'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

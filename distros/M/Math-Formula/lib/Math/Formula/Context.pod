@@ -1,0 +1,344 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Formula::Context - calculation context
+
+=head1 SYNOPSIS
+
+  my $context = Math::Formula::Context->new();
+
+=head1 DESCRIPTION
+
+Like in web template systems, evaluation of expressions can be effected by the
+computation context which contains values.  The Context object manages these
+values: it runs the right expressions.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Math::Formula::Context-E<gt>B<new>(%options)
+
+Many of the %options make sense when this context is reloaded for file.
+
+ -Option          --Default
+  formula           []
+  lead_expressions  ''
+
+=over 2
+
+=item formula => $form|ARRAY
+
+One or more formula, passed to L<add()|Math::Formula::Context/"Formula and Fragment management">.
+
+=item lead_expressions => ''|STRING
+
+Read section L</"Keep strings apart from expressions"> below.  When a blank string,
+you will need to put (single or double) quotes around your strings within your strings,
+or pass a SCALAR reference.  But that may be changed.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<lead_expressions>()
+
+=item $obj-E<gt>B<name>()
+
+Contexts are required to have a name.  Usually, this is the name of the fragment as
+well.
+
+=back
+
+=head2 Fragment (this context) attributes
+
+Basic data types usually have attributes (string C<length>), which operator on the type
+to produce some fact.  The fragment type (which manages Context objects), however,
+cannot distinguish between attributes and formula names: both use the dot (C<.>)
+operator.  Therefore, all context attributes will start with C<ctx_>.
+
+The following attributes are currently defined:
+
+  ctx_name        MF::STRING    same as $context->name
+  ctx_version     MF::STRING    optional version of the context data
+  ctx_created     MF::DATETIME  initial creation of this context data
+  ctx_updated     MF::DATETIME  last save of this context data
+  ctx_mf_version  MF::STRING    Math::Formula version, useful for read/save
+
+=over 4
+
+=item $obj-E<gt>B<attribute>($name)
+
+=back
+
+=head2 Formula and Fragment management
+
+=over 4
+
+=item $obj-E<gt>B<add>(LIST)
+
+Add one or more items to the context.
+
+When a LIST is used and the first argument is a name, then the data is
+used to create a $formula or fragment (when the name starts with a '#').  
+
+Otherwise, the LIST is a sequence of prepared formulas and fragments,
+or a HASH with 
+
+example: :
+
+  $context->add(wakeup => '07:00:00', returns => 'MF::TIME');
+  $context->add(fruit  => \'apple', returns => 'MF::TIME');
+  
+  my $form = Math::Formula->new(wakeup => '07:00:00', returns => 'MF::TIME');
+  $context->add($form, @more_forms, @fragments, @hashes);
+  
+  my %library = (
+    breakfast => 'wakeup + P2H',
+	to_work   => 'PT10M',    # mind the 'T': minutes not months
+    work      => [ 'breakfast + to_work', returns => 'MF::TIME' ],
+	#filesys  => $fragment,
+  );
+  $context->add($form, \%library, $frag);
+
+=item $obj-E<gt>B<addFormula>(LIST)
+
+Add a single formula to this context.  The formula is returned.
+
+example: 
+
+Only the 3rd and 4th line of the examples below are affected by C<new(lead_expresssions)>:
+only in those cases it is unclear whether we speak about a STRING or an expression.  But,
+inconveniently, those are popular choices.
+
+  $context->addFormula($form);            # already created somewhere else
+  $context->addFormula(wakeup => $form);  # register under a (different) name
+  $context->addFormula(wakeup => '07:00:00');      # influenced by lead_expressions
+  $context->addFormula(wakeup => [ '07:00:00' ]);  # influenced by lead_expressions
+  $context->addFormula(wakeup => '07:00:00', returns => 'MF::TIME');
+  $context->addFormula(wakeup => [ '07:00:00', returns => 'MF::TIME' ]);
+  $context->addFormula(wakeup => sub { '07:00:00' }, returns => 'MF::TIME' ]);
+  $context->addFormula(wakeup => MF::TIME->new('07:00:00'));
+  $context->addFormula(wakeup => \'early');
+
+=item $obj-E<gt>B<addFragment>( [$name], $fragment )
+
+A $fragment is simply a different Context.  Fragments are addressed via the '#'
+operator.
+
+=item $obj-E<gt>B<evaluate>($name, %options)
+
+Evaluate the expresion with the $name.  Returns a types object, or C<undef>
+when not found.  The %options are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
+
+=item $obj-E<gt>B<formula>($name)
+
+Returns the formula with this specified name.
+
+=item $obj-E<gt>B<fragment>($name)
+
+Returns the fragment (context) with $name.  This is not sufficient to switch
+between contexts, which is done during execution.
+
+=item $obj-E<gt>B<run>($expression, %options)
+
+Singleshot an expression: the expression will be run in this context but
+not get a name.  A temporary L<Math::Formula|Math::Formula> object is created and
+later destroyed.  The %options are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
+
+ -Option--Default
+  name    <caller's filename and linenumber>
+
+=over 2
+
+=item name => $name
+
+The name may appear in error messages.
+
+=back
+
+=item $obj-E<gt>B<value>($expression, %options)
+
+First run the $expression, then return the value of the returned type object.
+All options are passed to L<run()|Math::Formula::Context/"Formula and Fragment management">.
+
+=back
+
+=head1 DETAILS
+
+=head2 Keep strings apart from expressions
+
+One serious complication in combining various kinds of data in strings, is
+expressing the distinction between strings and the other things.  Strings
+can contain any kind of text, and hence may look totally equivalent
+to the other things.  Therefore, you will need some kind of encoding,
+which can be selected with L<new(lead_expressions)|Math::Formula::Context/"Constructors">.
+
+When C<lead_expressions> is the empty string (default), then expressions have no
+leading flag, so the following can be used:
+
+   text_field => \"string"
+   text_field => \'string'
+   text_field => \$string
+   text_field => '"string"'
+   text_field => "'string'"
+   expr_field => '1 + 2 * 3'
+
+But C<lead_expressions> can be anything.  For instance, easy to remember is C<=>. In
+that case, the added data can look like
+
+   text_field => \"string"
+   text_field => \'string'
+   text_field => \$string
+   text_field => "string"
+   text_field => 'string'
+   text_field => $string       <-- unsafe?
+   expr_field => '= 1 + 2 * 3'
+
+Of course, this introduces the security risk in the C<$string> case, which might
+carry a C<=> by accident.  So: although useable, refrain from using that form
+unless you are really, really sure this can never be confused.
+
+Other suggestions for C<lead_expressions> are C<+> or C<expr: >.  Any constant string
+will do.
+
+=head2 Creating an interface to an object (fragment)
+
+For safity reasons, the formulars can not directly call methods on data
+objects, but need to use a well defined interface which hides the internals
+of your program.  Some (Perl) people call this "inside-out objects".
+
+With introspection, it would be quite simple to offer access to, for instance,
+a DateTime object which implements the DATETIME logic.  This would, however,
+open a pit full of security and compatibility worms.  So: the DATETIME object
+will only offer a small set of B<attributes>, which produce results also
+provided by other time computing libraries.
+
+The way to create an interface looks: (first the long version)
+
+  use Math::Formula::Type;
+  my $object    = ...something in the program ...;
+  sub handle_size($$%)
+  {   my ($context, $expr, %args) = @_;
+      MF::INTEGER->new($object->compute_the_size);
+  }
+
+  my $name      = $object->name;  # f.i. "file"
+  my $interface = Math::Formala::Context->new(name => $name);
+  $interface->addAttribute(size => \&handle_size);
+  $context->addFragment($interface);
+
+  my $expr   = Math::Formula->new(allocate => '#file.size * 10k');
+  my $result = $expr->evaluate($context, expect => 'MF::INTEGER');
+  print $result->value;
+
+Of course, there are various simplifications possible, when the calculations
+are not too complex:
+
+  my ($dir, $filename) = (..., ...);
+  my $fragment = Math::Formula::Context->new(
+    name     => 'file',
+    formulas => {
+      name     => \$filename,
+      size     => sub { MF::INTEGER->new(-s $filename) },
+      path     => sub { \File::Spec->catfile($dir, $filename) },
+      is_image => 'name =~ "*.{jpg,png,gif}"',
+	  π        => MF::FLOAT->new(undef, 3.14),    # constant
+    });
+  $context->addFragment($fragment);
+  $context->addFormula(allocate => '#file.size * 10k');
+  print $context->value('#file.allocate');
+
+In above example, the return type of the CODE for C<size> is explicit: this is
+the fastest and safest way to return data.  However, it can also be guessed:
+
+  size     => sub { -s $filename },
+
+For clarity: the three syntaxes:
+
+  .ctx_name       an attribute to the context
+  allocate        a formula in the context
+  allocate.abs    an attribute of the expression result
+  #file           interface to an object, registered in the context
+  #file.size      an attribute to an object
+  #filesys.file(name).size   file(name) produces an object
+
+=head2 Aliasing
+
+It is possible to produce an alias formula to hide or simplify the fragment.
+This also works for formulas and attributes!
+
+  fs   => '#filesys'         # alias fragment
+  dt   => '#system#datetime' # alias nested fragments
+  size => '"abc".size'       # alias attribute
+  now  => 'dt.now'           # alias formula
+
+=head2 CODE as expression
+
+It should be the common practice to use strings as expressions.  Those strings get
+tokenized and evaluated.  However, when you need calculations which are not offered
+by this module, or need connections to objects (see fragments in L<Math::Formula::Context|Math::Formula::Context>),
+then you will need CODE references as expression.
+
+The CODE reference returns either an B<explicit type> or a guessed type.
+When the type is explicit, you MUST decide whether the data is a "token"
+(in normalized string representation) or a "value" (internal data format).
+
+Math::Formula's internal types are bless ARRAYs with (usually) two fields.
+The first is the I<token>, the second the I<value>.  When the token is
+known, but the value is needed, the token will get parsed.  And vice
+versa: the token can be generated from the value when required.
+
+Some examples of explicit return object generation:
+
+  my $int = MF::INTEGER->new("3k", undef);  # token 3k given
+  my $int = MF::INTEGER->new("3k");         # same
+  say $int->token;  -> 3k
+  say $int->value;  -> 3000                 # now, conversion was run
+
+  my $dt  = DateTime->now;
+  my $now = MF::DATETIME->new(undef, $dt);  # value is given
+  my $dt2 = $now->value;                    # returns $dt
+  say $now->token;  -> 2032-02-24T10:00:15+0100
+
+See L<Math::Formula::Type|Math::Formula::Type> for detailed explanation for the types which
+can be returned.  These are the types with examples for tokens and values:
+
+  MF::BOOLEAN   'true'            1        # anything !=0 is true
+  MF::STRING    '"tic"'           'tic'    # the token has quotes!
+  MF::STRING    \'tic' \$string   'tic'    # no quotes with SCALAR ref
+  MF::INTEGER   '42'              42
+  MF::FLOAT     '3.14'            3.14
+  MF::DATETIME  '2023-...T09:...' DateTime-object
+  MF::DATE      '2023-02-24+0100' DateTime-object
+  MF::TIME      '09:12:24'        some HASH
+  MF::DURATION  'P3Y2MT12M'       DateTime::Duration-object
+  MF::NAME      'tac'             'tac'
+  MF::PATTERN   '"*c"'            qr/^.*c$/ # like understands MF::REGEXP
+  MF::REGEXP    '"a.b"'  qr//     qr/^a.b$/
+  MF::FRAGMENT  'toe'             ::Context-object
+
+When you decide to be lazy, Math::Formula will attempt to auto-detect the
+type.  This is helped by the fact that operator will cast types which they
+need, for instance MF::FLOAT to MF::INTEGER or the reverse.
+
+=head1 SEE ALSO
+
+This module is part of Math-Formula distribution version 0.13,
+built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

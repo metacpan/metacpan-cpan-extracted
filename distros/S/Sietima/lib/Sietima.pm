@@ -1,8 +1,8 @@
 package Sietima;
 use Moo;
 use Sietima::Policy;
-use Types::Standard qw(ArrayRef Object FileHandle Maybe);
-use Type::Params qw(compile);
+use Types::Standard qw(ArrayRef Object);
+use Type::Params -sigs;
 use Sietima::Types qw(Address AddressFromStr
                       EmailMIME Message
                       Subscriber SubscriberFromAddress SubscriberFromStr SubscriberFromHashRef
@@ -10,12 +10,11 @@ use Sietima::Types qw(Address AddressFromStr
 use Sietima::Message;
 use Sietima::Subscriber;
 use Email::Sender::Simple qw();
-use Email::Sender;
 use Email::Address;
 use namespace::clean;
 
 with 'MooX::Traits';
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: minimal mailing list manager
 
 
@@ -58,9 +57,11 @@ sub handle_mail_from_stdin($self,@) {
 }
 
 
+signature_for handle_mail => (
+    method => Object,
+    positional => [ EmailMIME ],
+);
 sub handle_mail($self,$incoming_mail) {
-    state $check = compile(Object,EmailMIME); $check->(@_);
-
     my (@outgoing_messages) = $self->munge_mail($incoming_mail);
     for my $outgoing_message (@outgoing_messages) {
         $self->send_message($outgoing_message);
@@ -69,16 +70,20 @@ sub handle_mail($self,$incoming_mail) {
 }
 
 
+signature_for subscribers_to_send_to => (
+    method => Object,
+    positional => [ EmailMIME ],
+);
 sub subscribers_to_send_to($self,$incoming_mail) {
-    state $check = compile(Object,EmailMIME); $check->(@_);
-
     return $self->subscribers;
 }
 
 
+signature_for munge_mail => (
+    method => Object,
+    positional => [ EmailMIME ],
+);
 sub munge_mail($self,$incoming_mail) {
-    state $check = compile(Object,EmailMIME); $check->(@_);
-
     return Sietima::Message->new({
         mail => $incoming_mail,
         from => $self->return_path,
@@ -87,9 +92,11 @@ sub munge_mail($self,$incoming_mail) {
 }
 
 
+signature_for send_message => (
+    method => Object,
+    positional => [ Message ],
+);
 sub send_message($self,$outgoing_message) {
-    state $check = compile(Object,Message); $check->(@_);
-
     my $envelope = $outgoing_message->envelope;
     if ($envelope->{to} && $envelope->{to}->@*) {
         $self->transport->send(
@@ -138,7 +145,7 @@ Sietima - minimal mailing list manager
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -188,6 +195,10 @@ specifies that to (un)subscribe, people should write to the list owner
 
 avoids sending messages to subscribers who don't want them
 
+=item L<< C<NoSpoof>|Sietima::Role::NoSpoof >>
+
+replaces the C<From> address with the list's own address
+
 =item L<< C<ReplyTo>|Sietima::Role::ReplyTo >>
 
 optionally sets the C<Reply-To> header to the mailing list address
@@ -231,7 +242,7 @@ empty array.
 Each item can be coerced from a string or a L<< C<Email::Address> >>
 instance, or a hashref of the form
 
-  { address => $string, %other_attributes }
+  { primary => $string, %other_attributes }
 
 The base Sietima class only uses the address of subscribers, but some
 roles use the other attributes (L<< C<NoMail>|Sietima::Role::NoMail
@@ -343,7 +354,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

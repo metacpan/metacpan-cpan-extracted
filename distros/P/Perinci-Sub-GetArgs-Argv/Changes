@@ -1,3 +1,16 @@
+0.850   2023-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - No changes from 0.849_001.
+
+
+0.849_001 2022-12-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+          - [experimental] Implicit JSON/YAML decoding on regular option (not
+            foo-json and foo-yaml options) are now turned off to avoid wrong
+            decoding; now users just need to specify --foo-json or --foo-yaml if
+            she wants explicit decoding (see: RT#145274).
+
+
 0.849   2022-03-27  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Show the details of clashing options.

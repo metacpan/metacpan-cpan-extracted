@@ -1,0 +1,275 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Formula - expressions on steroids
+
+=head1 SYNOPSIS
+
+  my $formula = Math::Formula->new('size', '42k + 324', %options);
+  my $formula = Math::Formula->new(π => 3.14);
+  my $size    = $formula->evaluate;
+
+  my $context = Math::Formula::Context->new(name => 'example');
+  $context->add( { size => '42k', header => '324', total => 'size + header' });
+  my $total   = $context->value(total);
+
+  my $formula = Math::Formula->new(size => \&own_sub, %options);
+
+=head1 DESCRIPTION
+
+B<WARNING:> This is not a programming language: it lacks control structures
+like loops and blocks.  This can be used to get (very) flexible configuration
+files for your program.
+
+B<What makes Math::Formula special?> Zillions of expression evaluators
+have been written in the past.  The application where this module was
+written for has special needs which were not served by them.
+This expression evaluator can do things which are usually hidden behind
+library calls.
+
+For instance, where are many types which you can use in your configuration
+lines to calculate directly (examples far down on this page)
+
+  true and false               # real booleans
+  "abc"  'abc'                 # the usual strings, WARNING: read below
+  7  89k  5Mibi                # integers with multiplier support
+  =~ "c$"                      # regular expressions
+  like "*c"                    # pattern matching
+  2023-02-18T01:28:12+0300     # date-times
+  2023-02-18                   # dates
+  01:18:12                     # times
+  P2Y3DT2H                     # duration
+  name                         # outcome of other expressions
+  #unit.owner                  # fragments (context, namespaces)
+  file.size                    # attributes
+  (1 + 2) * 3                  # parenthesis
+
+In your code, all these above are place between quotes.  This makes it
+inconvenient to use strings.  When you use a L<Math::Formula::Context|Math::Formula::Context>,
+you can select your own solution via L<Math::Formula::Context::new(lead_expressions)|Math::Formula::Context/"Constructors">.
+With plain formulas, there are only two options:
+
+  "\"string\""   '"string"'   "'$string'"   # $string with escaped quotes!
+  \"string"       \'string'   \$string      # use a SCALAR reference
+
+With this, your expressions can look like this:
+
+  my_age   = (#system.now.date - 1966-05-04).years
+  is_adult = my_age >= 18
+
+Expressions can refer to values computed by other expressions.  The results are
+cached within the context.  Also, external objects can maintain libraries of
+formulas or produce compatible data.
+
+B<Why do I need it?> My application has many kinds of configurable
+rules, often with dates and durations in it, to arrange processing.
+Instead of fixed, processed values in my configuration, each line can
+now be a smart expression.  Declarative programming.
+
+=head2 Plans
+
+=over 4
+
+=item * parameterized formulas would be nice
+
+=item * loading and saving contexts in INI, YAML, and JSON format
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Math::Formula-E<gt>B<new>($name, $expression, %options)
+
+ -Option    --Default
+  expression  <required>
+  name        <required>
+  returns     undef
+
+=over 2
+
+=item expression => $expression
+
+The expression is usually a (utf8) string, which will get parsed and
+evaluated on demand.  The $expresion may also be a prepared node (any
+<Math::Formula::Type> object.
+
+As special hook, you may also provide a CODE as $expression.  This will
+be called as
+
+  $expression->($context, $this_formula, %options_to_evaluate);
+
+Optimally, the expression returns any L<Math::Formula::Type|Math::Formula::Type> object.  Otherwise,
+autodetection kicks in.  More details below in L<Math::Formula::Context/"CODE as expression">.
+
+=item name => $name
+
+The expression need a name, to be able to produce desent error messages.
+But also to be able to cache the results in the "Context".  Expressions
+can refer to each other via this name.
+
+=item returns => $type
+
+Enforce that the type produced by the calculation of this $type.  Otherwise, it may
+be different when other people are permitted to configure the formulas... people can
+make mistakes.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<expression>()
+
+Returns the expression string, which was used at creation.
+
+=item $obj-E<gt>B<name>()
+
+Returns the name of this expression.
+
+=item $obj-E<gt>B<returns>()
+
+Set when the expression promisses to produce a certain type.
+
+=item $obj-E<gt>B<tree>($expression)
+
+Returns the Abstract Syntax Tree of the $expression. Some of the types
+are only determined at the first run, for optimal laziness.
+
+=back
+
+=head2 Running
+
+=over 4
+
+=item $obj-E<gt>B<evaluate>( [ $context, %options ] )
+
+Calculate the value for this expression given the $context.  The Context groups the expressions
+together so they can refer to eachother.  When the expression does not contain Names, than you
+may go without context.
+
+ -Option--Default
+  expect  <any ::Type>
+
+=over 2
+
+=item expect => $type
+
+When specified, the result will be of the expected $type or C<undef>.  This overrules
+L<new(returns)|Math::Formula/"Constructors">.  Without either, the result type depends on the evaluation of the
+expression.
+
+=back
+
+=item $obj-E<gt>B<toType>($data)
+
+Convert internal Perl data into a Math::Formula internal types.  For most
+times, this guess cannot go wrong. In other cases a mistake is not problematic.
+
+In a small number of cases, auto-detection may break: is C<'true'> a
+boolean or a string?  Gladly, this types will be cast into a string when
+used as a string; a wrong guess without consequences.  It is preferred
+that your CODE expressions return explicit types: for optimal safety and
+performance.
+
+See L<Math::Formula::Context/"CODE as expression"> for details.
+
+=back
+
+=head1 DETAILS
+
+=head2 Formulas
+
+=head3 explaining types
+
+Let's start with a large group of related formulas, and the types they produce:
+
+  birthday: 1966-04-05      # DATE
+  os_lib: #system           # external OBJECT
+  now: os_lib.now           # DATETIME 'now' is an attribute of system
+  today: now.date           # DATE 'date' is an attribute of DATETIME
+  alive: today - birthday   # DURATION
+  age: alive.years          # INTEGER 'years' is an attr of DURATION
+
+  # this can also be written in one line:
+
+  age: (#system.now.date - 1966-04-05).years
+
+Or some backup configuration lines:
+
+  backup_needed: #system.now.day_of_week <= 5    # Monday = 1
+  backup_start: 23:00:00
+  backup_max_duration: PT2H30M
+  backup_dir: "/var/tmp/backups"
+  backup_name: backup_dir ~ '/' ~ "backup-" ~ weekday ~ ".tgz"
+
+The application which uses this configuration, will run the expressions with
+the names has listed.  It may also provide some own formulas, fragments, and
+helper methods.
+
+=head2 Operators
+
+As B<prefix> operator, you can use C<not>, C<->, C<+>, and C<exists>
+on applicable data types.  The C<#> (fragment) and C<.> (attributes)
+prefixes are weird cases: see L<Math::Formula::Context|Math::Formula::Context>.
+
+Operators work on explicit data types.
+Of course, you can use parenthesis for grouping.
+
+The B<infix> operators have the following priorities: (from low to higher,
+each like with equivalent priority)
+
+  LTR       ?:                             # if ? then : else
+  LTR       or   xor  //
+  LTR       and
+  NOCHAIN	<    >    <=   ==   !=   <=>   # numeric comparison
+  NOCHAIN	lt   gt   le   eq   ne   cmp   # string comparison
+  LTR       +    -    ~
+  LTR       *    /    %
+  LTR       =~   !~   like  unlike         # regexps and patterns
+  LTR       #    .                         # fragments and attributes
+
+The first value is a constant representing associativety.  Either the constant
+LTR (compute left to right), RTL (right to left), or NOCHAIN (non-stackable
+operator).
+
+=head2 Comparison operators
+
+Some data types support numeric comparison (implement C<< <=> >>, the
+spaceship operator), other support textual comparison (implement C< cmp >),
+where also some types have no intrinsic order.
+
+The C<< <=> >> and C< cmp > return an integer: -1, 0, or 1, representing
+smaller, equal, larger.
+
+  =num  =text
+    <     lt      less than/before
+    <=    le      less-equal
+    ==    eq      equal/the same
+    !-    ne      unequal/different
+    >=    ge      greater-equal
+    >     gt      greater/larger
+
+String comparison uses L<Unicode::Collate>, which might be a bit expensive,
+but at least a better attempt to order utf8 correctly.
+
+=head1 SEE ALSO
+
+This module is part of Math-Formula distribution version 0.13,
+built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

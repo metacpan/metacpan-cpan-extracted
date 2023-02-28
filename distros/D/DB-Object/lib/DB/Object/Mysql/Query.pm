@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version 0.3.6
-## Copyright(c) 2019- DEGUEST Pte. Ltd.
+## Version v0.3.7
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/11/27
+## Modified 2023/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG $VERBOSE );
     use Devel::Confess;
-    $VERSION = 'v0.3.6';
+    $VERSION = 'v0.3.7';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -70,19 +70,38 @@ sub format_to_epoch
     }
 }
 
-## _having is in DB::Object::Query
+# _having is in DB::Object::Query
 sub having { return( shift->_where_having( 'having', 'having', @_ ) ); }
 
-## http://www.postgresql.org/docs/9.3/interactive/queries-limit.html
+# <https://dev.mysql.com/doc/refman/8.0/en/select.html>
 sub limit
 {
     my $self  = shift( @_ );
     my $limit = $self->_process_limit( @_ );
     if( CORE::length( $limit->metadata->limit ) )
     {
-        $limit->generic( CORE::length( $limit->metadata->offset ) ? 'OFFSET ? LIMIT ?' : 'LIMIT ?' );
-        $limit->value( CORE::length( $limit->metadata->offset ) ? CORE::sprintf( 'OFFSET %d LIMIT %d', $limit->metadata->offset, $limit->metadata->limit ) : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit ) );
-                                                                                                                                                                                                                                                                                                                                                                            }
+        $limit->generic( CORE::length( $limit->metadata->offset ) ? 'LIMIT ?, ?' : 'LIMIT ?' );
+        # User is managing the binding of value
+        if( (
+                $limit->metadata->offset eq '?' &&
+                $limit->metadata->limit eq '?'
+            ) || $limit->metadata->limit eq '?' )
+        {
+            $limit->value(
+                CORE::length( $limit->metadata->offset )
+                ?  'LIMIT ?, ?'
+                : 'LIMIT ?'
+            );
+        }
+        else
+        { 
+            $limit->value(
+                CORE::length( $limit->metadata->offset )
+                ? CORE::sprintf( 'LIMIT %d, %d', $limit->metadata->offset, $limit->metadata->limit )
+                : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit )
+            );
+        }
+    }
     return( $limit );
 }
 
@@ -207,7 +226,7 @@ sub _query_components
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -223,7 +242,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.3.6
+    v0.3.7
 
 =head1 DESCRIPTION
 
@@ -299,4 +318,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

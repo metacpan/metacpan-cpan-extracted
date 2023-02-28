@@ -1,5 +1,11 @@
 package Genealogy::ObituaryDailyTimes::DB::obituaries;
 
+=head1 NAME
+
+Genealogy::ObituaryDailyTimes::DB::obituaries
+
+=cut
+
 use strict;
 use warnings;
 

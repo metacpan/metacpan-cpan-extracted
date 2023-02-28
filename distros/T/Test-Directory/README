@@ -10,7 +10,7 @@ well as to verify that there are no missing or unknown files.
 
 The idea is to use this API to create a temporary directory and
 populate an initial set of files.  Then, whenever something in the directory
-is changes, use the test methods to verify that the change happened as
+changes, use the test methods to verify that the change happened as
 expected.  At any time, it is simple to verify that the contents of the
 directory are exactly as expected.
 

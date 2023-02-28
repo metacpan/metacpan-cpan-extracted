@@ -1,0 +1,126 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Formula::Config::INI - load/save formulas to file as INI
+
+=head1 INHERITANCE
+
+ Math::Formula::Config::INI
+   is a Math::Formula::Config
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Save and load a L<Math::Formula::Context|Math::Formula::Context> to INI files.  The INI file
+is not too complex.
+
+Extends L<"DESCRIPTION" in Math::Formula::Config|Math::Formula::Config/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Math::Formula::Config|Math::Formula::Config/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Math::Formula::Config|Math::Formula::Config/"Constructors">.
+ 
+=over 4
+
+=item Math::Formula::Config::INI-E<gt>B<new>(%options)
+
+Inherited, see L<Math::Formula::Config/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Math::Formula::Config|Math::Formula::Config/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<directory>()
+
+Inherited, see L<Math::Formula::Config/"Attributes">
+
+=item $obj-E<gt>B<path_for>($file)
+
+Inherited, see L<Math::Formula::Config/"Attributes">
+
+=back
+
+=head2 Actions
+
+Extends L<"Actions" in Math::Formula::Config|Math::Formula::Config/"Actions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<load>($name, %options)
+
+Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
+
+ -Option  --Default
+  filename  <directory/$name.ini>
+
+=over 2
+
+=item filename => FILENAME
+
+=back
+
+=item $obj-E<gt>B<save>($context, %args)
+
+Serialize the $context to INI files, as storage or to be editted by hand.
+This is a usefull method when default configuration templates need to be generated.
+
+ -Option  --Default
+  filename  C<< $context->name .ini>
+
+=over 2
+
+=item filename => STRING
+
+Save under a different filename than derived from the name of the context.
+
+=back
+
+=back
+
+=head1 DETAILS
+
+According to F<https://en.wikipedia.org/wiki/INI_file>, INI files only support strings
+and numbers.  To stay as close as possible to that description, everything else is
+put between double quotes (also the booleans).
+
+Only the quoted data may contain attributes.
+
+B<. Example>
+
+  name    = test
+  version = 1
+  created = "2023-02-26T20:07:54+0000"
+  updated = "2023-02-26T20:07:54+0000"
+  mf_version = 0
+
+  [formulas]
+  expr2 = "\"abc\".size + 3k"; returns='MF::INTEGER'
+  fakes = "false"
+  dinertime = "18:05:07"
+  expr1 = "1 + 2 * 3"
+  string = abc
+  some_truth = "true"
+
+=head1 SEE ALSO
+
+This module is part of Math-Formula distribution version 0.13,
+built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

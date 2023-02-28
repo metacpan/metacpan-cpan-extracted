@@ -1,10 +1,90 @@
 ==================================================
-Changes from 2021-05-26 00:00:00 +0000 to present.
+Changes from 2022-02-27 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 1.0.10 at 2022-05-26 20:39:28 +0000
+version 1.0.11 at 2023-02-27 23:29:17 +0000
 -------------------------------------------
+
+  Change: 53e6f7b3917a50e818f57bf475bba65eba183ee7
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-28 00:25:01 +0000
+
+    Bump version 
+
+  Change: 12402d77410d549ff20530b4e177f29a1570b4aa
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-28 00:25:01 +0000
+
+    Update references 
+
+  Change: 867ff0e870e634757d9699404924dbe094baef6b
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-28 00:25:01 +0000
+
+    Do not modify $_ in map()
+
+    See page 114 of PBP. 
+
+  Change: e3e0316b666552b953e88010579493d7c8db0256
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-28 00:14:19 +0000
+
+    Ensure consistant/reproductible device names 
+
+  Change: fc904b7d9a97b8836c0f401dd74aef6b1373231c
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-27 23:55:53 +0000
+
+    Do not fail is an old version of JSON::PP is available
+
+    allow_bignum and boolean_values can be absent 
+
+  Change: 308425c7fe9d4a42d8db18ea8ea443b5beffb4af
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-27 23:09:55 +0000
+
+    Better handle disks with no partitions
+
+    Avoid removed disks (cd, ...) Keep all others 
+
+  Change: 3a36fe838dc3aa394fb252e45ce47a3cc06aa25e
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-27 23:09:55 +0000
+
+    correctly decode 0/1 values with JSON::PP
+
+    By default, JSON::PP convert them to boolean representations 
+
+  Change: eb3527c6c2348cf0b40bd1d017f2e013f4293396
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-27 23:09:55 +0000
+
+    Ignore new (unused) infos from udev 
+
+  Change: 6c17afe25a1b1a3710ed284ad7cf8ee691c1d8f6
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-02-27 23:09:55 +0000
+
+    Better handle enclosure device ID with hardware RAID 
+
+  Change: 9b08632cccfdf05a8b3d95cc6a5719a0590a09c0
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-10-23 21:38:09 +0000
+
+    Better swap support
+
+    - do not fail with several swap storages - also handle swap file (in
+    addition to swap partition) 
+
+  Change: 3a16a32aa447bb669745c9ac2061e3c14c133bb3
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-10-23 21:38:09 +0000
+
+    Look for FS as root
+
+    This is required if the mount point is not reachable by the current
+    user 
 
   Change: 155b3f8684a515b7607f92f403ee6a122c9d9950
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

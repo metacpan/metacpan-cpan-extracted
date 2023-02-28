@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v0.3.6
+## Version v0.3.7
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/11
+## Modified 2023/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     die( $@ ) if( $@ );
     use Nice::Try;
     # DBI->trace( 5 );
-    $VERSION = 'v0.3.6';
+    $VERSION = 'v0.3.7';
     use Devel::Confess;
 };
 
@@ -426,7 +426,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections unknown_field )];
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -595,7 +595,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v0.3.6
+    v0.3.7
 
 =head1 DESCRIPTION
 

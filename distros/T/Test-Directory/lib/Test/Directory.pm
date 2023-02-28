@@ -9,7 +9,7 @@ use File::Spec;
 use File::Temp;
 use Test::Builder::Module;
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 our @ISA = 'Test::Builder::Module';
 
 ##############################
@@ -125,7 +125,7 @@ sub clean {
       rmdir $self->path($dir);
     };
     my $rv = rmdir $self->{dir};
-    carp "$self->{dir}: $1" unless $rv;
+    carp "$self->{dir}: $!" unless $rv;
     return $rv;
 }
 

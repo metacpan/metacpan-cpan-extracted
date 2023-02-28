@@ -109,13 +109,13 @@ riskier -- it involves waiting for the unknown executable to complete.
 
 =head1 REPOSITORIES
 
-Gnuplot's main home page is at L<http://www.gnuplot.info>.
+Gnuplot's main home page is at L<https://gnuplot.sourceforge.net/>.
 
-Alien::Gnuplot development is at L<http://github.com/drzowie/Alien-Gnuplot>.
+Alien::Gnuplot development is at L<https://github.com/drzowie/Alien-Gnuplot>.
 
 A major client module for Alien::Gnuplot is PDL::Graphics::Gnuplot, which
-can be found at L<http://github.com/drzowie/PDL-Graphics-Gnuplot>.
-PDL is at L<http://pdl.perl.org>.
+can be found at L<https://github.com/PDLPorters/PDL-Graphics-Gnuplot>.
+PDL is at L<https://pdl.perl.org/>.
 
 =head1 AUTHOR
 

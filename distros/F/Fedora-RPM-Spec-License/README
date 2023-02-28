@@ -5,6 +5,7 @@ SYNOPSIS
      use Fedora::RPM::Spec::License;
 
      my $obj = Fedora::RPM::Spec::License->new(%params);
+     my @exceptions = $obj->exceptions;
      my $fedora_license_format = $obj->format;
      my @licenses = $obj->licenses;
      $obj->parse($fedora_license_string);
@@ -22,6 +23,13 @@ METHODS
     Constructor.
 
     Returns instance of object.
+
+  "exceptions"
+     my @exceptions = $obj->exceptions;
+
+    Get exceptions used in the Fedora license string sorted alphabetically.
+
+    Returns array of strings.
 
   "format"
      my $fedora_license_format = $obj->format;
@@ -67,6 +75,10 @@ ERRORS
      licenses():
              No Fedora license string processed.
 
+     parse():
+             License '%s' isn't SPDX license.
+             License '%s' isn't SPDX license exception.
+
 EXAMPLE
      use strict;
      use warnings;
@@ -90,6 +102,12 @@ EXAMPLE
      print 'Format: '.$obj->format."\n";
      print "Contain licenses:\n";
      print join "\n", map { '- '. $_ } $obj->licenses;
+     print "\n";
+     if ($obj->exceptions) {
+             print "Contain exceptions:\n";
+             print join "\n", map { '- '. $_ } $obj->exceptions;
+             print "\n";
+     }
 
      # Output with 'MIT' input:
      # Fedora license string: MIT
@@ -114,6 +132,14 @@ EXAMPLE
      # - GPLv2
      # - MIT
 
+     # Output with 'LGPL-3.0-only WITH LGPL-3.0-linking-exception' input:
+     # Fedora license string: LGPL-3.0-only WITH LGPL-3.0-linking-exception
+     # Format: 2
+     # Contain licenses:
+     # - LGPL-3.0-only
+     # Contain exceptions:
+     # - LGPL-3.0-linking-exception
+
 DEPENDENCIES
     Class::Utils, English, Error::Pure, License::SPDX, List::Util,
     Parse::RecDescent, Readonly.
@@ -136,5 +162,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

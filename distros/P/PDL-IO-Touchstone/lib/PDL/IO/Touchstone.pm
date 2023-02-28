@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-our $VERSION = '1.013';
+our $VERSION = '1.014';
 
 use 5.010;
 use strict;
@@ -390,7 +390,7 @@ sub wsnp_fh
 	print $fd join("\n", map { "! $_" } @$comments) . "\n" if ($comments && @$comments);
 	print $fd "# $to_hz $param_type $fmt R $z0\n";
 
-	# $out is in touchstone-formated order for each frequency with frequency as the first element:
+	# $out is in touchstone-formatted order for each frequency with frequency as the first element:
 	# ie: [freq s11 21 s12 s11] < transposed for only for 2-port models.
 	
 	$f = $f->reshape($n_freqs);
@@ -432,7 +432,7 @@ sub wsnp_fh
 				$count = 8 if $count > 8 || $n_ports == 2;
 
 				my @line;
-				push @line, shift @data while ($count--);
+				push @line, splice(@data, 0, $count);
 
 				print $fd "\t" . join("\t", @line) . "\n";
 			}
@@ -615,7 +615,7 @@ sub s_to_abcd
 
 	croak "A-matrix transforms only work with 2-port matrices" if $n_ports != 2;
 
-	# We don't really need it diagonal, but it makes the call compatable with other
+	# We don't really need it diagonal, but it makes the call compatible with other
 	# conversions if the caller has different impedances per port:
 	my $Z_ref = _to_diagonal($z0, $n_ports);
 	my $z01 = $Z_ref->slice(0,0)->reshape(1);
@@ -676,7 +676,7 @@ sub abcd_to_s
 
 	croak "A-matrix transforms only work with 2-port matrices" if $n_ports != 2;
 
-	# We don't really need it diagonal, but it makes the call compatable with other
+	# We don't really need it diagonal, but it makes the call compatible with other
 	# conversions if the caller has different impedances per port:
 	my $Z_ref = _to_diagonal($z0, $n_ports);
 	my $z01 = $Z_ref->slice(0,0)->reshape(1);
@@ -714,7 +714,7 @@ sub abcd_to_s
 #                                                      S-Parameter Calculations
 
 # Return the complex port impedance vector for all frequencies given:
-#   - $S: S paramter matrix
+#   - $S: S parameter matrix
 #   - $z0: vector impedances at each port
 #   - $port: the port we want.
 #
@@ -1174,7 +1174,7 @@ sub m_interpolate
 	return ($f_new, pos_vecs_to_m(@cx_cols_new));
 }
 
-# Return the maximum difference between an ideal uniformally-spaced frequency set
+# Return the maximum difference between an ideal uniformly-spaced frequency set
 # and the frequency set provided.  For example:
 #   $f = [ 1, 2, 3  , 4 ] would return 0.0
 #   $f = [ 1, 2, 2.5, 4 ] would return 0.5
@@ -1242,7 +1242,7 @@ sub m_to_pos_vecs
 {
 	my $m = shift;
 
-	return $m->dummy(0,1)->clump(0..2)->transpose->dog;
+	return $m->clump(0..1)->transpose->dog;
 }
 
 # inverse of m_to_pos_vecs:
@@ -1284,13 +1284,13 @@ sub pos_vec
 
 # Create a diagonal matrix of size n from a scalar or vector $v.
 #
-# For example, $v can represent charectaristic impedance at each port either as:
+# For example, $v can represent characteristic impedance at each port either as:
 #   * a perl scalar value
 #   * a 0-dim pdl like pdl( 5+2*i() )
 #   * a 1-dim single-element pdl like pdl( [5+2*i()] )
-#   * a 1-dim pdl representing the charectaristic impedance at each port
+#   * a 1-dim pdl representing the characteristic impedance at each port
 #
-# In any case, the return value is an (N,N) pdl whith charectaristic impedances
+# In any case, the return value is an (N,N) pdl with characteristic impedances
 # for each port along the diagonal:
 #   [50  0]
 #   [ 0 50]
@@ -1370,7 +1370,6 @@ C<rsnp()> and will, most likely, simplify your RF component implementation.
 	# Read input matrix:
 	($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_f_unit) =
 		rsnp('input-file.s2p', { units => 'MHz' });
-
 
 	# Write output file:
 	wsnp('output-file.s2p',
@@ -1557,85 +1556,85 @@ is represented as either:
 
 =item - A 1-dim single-element pdl like pdl( [5+2*i()] ): all ports have same impedance
 
-=item - A 1-dim pdl representing the charectaristic impedance at each port: ports may have different impedances
+=item - A 1-dim pdl representing the characteristic impedance at each port: ports may have different impedances
 
 =back
 
 =back
 
-=head2 C<$Y = s_to_y($S, $z0)>: Convert S-paramters to Y-parameters.
+=head2 C<$Y = s_to_y($S, $z0)>: Convert S-parameters to Y-parameters.
 
 =over 4
 
-=item * C<$S>: The S-paramter matrix
+=item * C<$S>: The S-parameter matrix
 
-=item * C<$z0>: Charectaristic impedance (see above).
+=item * C<$z0>: Characteristic impedance (see above).
 
-=item * C<$Y>: The resultant Y-paramter matrix
+=item * C<$Y>: The resultant Y-parameter matrix
 
 =back
 
-=head2 C<$S = y_to_s($Y, $z0)>: Convert Y-paramters to S-parameters.
+=head2 C<$S = y_to_s($Y, $z0)>: Convert Y-parameters to S-parameters.
 
 =over 4
 
-=item * C<$Y>: The Y-paramter matrix
+=item * C<$Y>: The Y-parameter matrix
 
-=item * C<$z0>: Charectaristic impedance (see above).
+=item * C<$z0>: Characteristic impedance (see above).
 
-=item * C<$S>: The resultant S-paramter matrix
+=item * C<$S>: The resultant S-parameter matrix
 
 =back
 
-=head2 C<$Z = s_to_z($S, $z0)>: Convert S-paramters to Z-parameters.
+=head2 C<$Z = s_to_z($S, $z0)>: Convert S-parameters to Z-parameters.
 
 =over 4
 
-=item * C<$S>: The S-paramter matrix
+=item * C<$S>: The S-parameter matrix
 
-=item * C<$z0>: Charectaristic impedance (see above).
+=item * C<$z0>: Characteristic impedance (see above).
 
-=item * C<$Z>: The resultant Z-paramter matrix
+=item * C<$Z>: The resultant Z-parameter matrix
 
 =back
 
-=head2 C<$S = z_to_s($Z, $z0)>: Convert Z-paramters to S-parameters.
+=head2 C<$S = z_to_s($Z, $z0)>: Convert Z-parameters to S-parameters.
 
 =over 4
 
-=item * C<$Z>: The Z-paramter matrix
+=item * C<$Z>: The Z-parameter matrix
 
-=item * C<$z0>: Charectaristic impedance (see above).
+=item * C<$z0>: Characteristic impedance (see above).
 
-=item * C<$S>: The resultant S-paramter matrix
+=item * C<$S>: The resultant S-parameter matrix
 
 =back
 
-=head2 C<$ABCD = s_to_abcd($S, $z0)>: Convert S-paramters to ABCD-parameters.
+=head2 C<$ABCD = s_to_abcd($S, $z0)>: Convert S-parameters to ABCD-parameters.
 
 =over 4
 
-=item * C<$S>: The S-paramter matrix
+=item * C<$S>: The S-parameter matrix
 
-=item * C<$z0>: Charectaristic impedance (see above).
+=item * C<$z0>: Characteristic impedance (see above).
 
-=item * C<$ABCD>: The resultant ABCD-paramter matrix
+=item * C<$ABCD>: The resultant ABCD-parameter matrix
 
 =back
 
-=head2 C<$S = abcd_to_s($ABCD, $z0)>: Convert ABCD-paramters to S-parameters.
+=head2 C<$S = abcd_to_s($ABCD, $z0)>: Convert ABCD-parameters to S-parameters.
 
 =over 4
 
-=item * C<$ABCD>: The ABCD-paramter matrix
+=item * C<$ABCD>: The ABCD-parameter matrix
 
-=item * C<$z0>: Charectaristic impedance (see above).
+=item * C<$z0>: Characteristic impedance (see above).
 
-=item * C<$S>: The resultant S-paramter matrix
+=item * C<$S>: The resultant S-parameter matrix
 
 =back
 
-=head1 S-Paramter Calculaction Functions
+=head1 S-Parameter Calculation Functions
 
 All functions prefixed with "s_" require an S-parameter matrix.
 
@@ -1643,9 +1642,9 @@ All functions prefixed with "s_" require an S-parameter matrix.
 
 =over 4
 
-=item - C<$S>: S paramter matrix
+=item - C<$S>: S parameter matrix
 
-=item - C<$z0>: vector of _reference_ impedances at each port (from C<rsnp>)
+=item - C<$z0>: vector of I<reference> impedances at each port (from C<rsnp>)
 
 =item - C<$n>: the port we want.
 
@@ -1660,7 +1659,7 @@ Note that C<$z_in> and C<$z_out> are the PDL vectors for the input or output
 impedance at each frequency in C<$f>.  (NB, C<$f> is not actually needed for
 the calculation.)
 
-=head1 Y-Paramter Calculaction Functions
+=head1 Y-Parameter Calculation Functions
 
 All functions prefixed with "y_" require a Y-parameter matrix.
 
@@ -1777,7 +1776,7 @@ The value of C<$args> may be one of:
 =item * A scalar float or string.
 
 =item * An ARRAY reference.  If using an ARRAY reference then the array will be
-concatinated into a comma-separated string and used as follows:
+concatenated into a comma-separated string and used as follows:
 
 =back
 
@@ -1830,7 +1829,7 @@ additional options such as C<quiet> and may be extended further in the future.
 
 =head2 C<$max_diff = f_uniformity($f)> - Return maximum frequency deviation.
 
-Return the maximum difference between an ideal uniformally-spaced frequency set
+Return the maximum difference between an ideal uniformly-spaced frequency set
 and the frequency set provided.  This is used internally by C<f_is_uniform()>.
 For example:
 
@@ -1976,5 +1975,3 @@ for more details.
 
 You should have received a copy of the GNU General Public License along
 with this module. If not, see <http://www.gnu.org/licenses/>.
-
-

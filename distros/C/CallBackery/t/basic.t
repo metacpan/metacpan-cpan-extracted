@@ -35,7 +35,7 @@ for (1..2){
 }
 $ENV{CALLBACKERY_RPC_LOG}=0;
 
-my $c = p1->new;
+my $c = p1->new(app => $t->app);
 
 my $data = {
     k => { lalala => '123' }

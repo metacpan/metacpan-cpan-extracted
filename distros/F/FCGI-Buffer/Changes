@@ -1,4 +1,9 @@
 Revision history for FCGI-Buffer
+ 
+0.18	Sun Feb 26 17:06:17 EST 2023
+	Make debugging more readable
+	Log correctly when data isn't retrieved from the cache
+	Call logger instead of warn where possible
 
 0.17	Thu Jan 20 11:00:19 EST 2022
 	save_to: support '/' in an argument

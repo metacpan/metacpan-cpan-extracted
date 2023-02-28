@@ -2,42 +2,7 @@ digraph "machine"{
 	rankdir=LR;
 	{ "@Part: sda" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sda<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-0<BR/>Label: gpt<BR/>Size: 50.0 GiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1007 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sda1<BR/>efi<BR/>Size: 94.0 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="2" BGCOLOR="yellow">
-						/dev/sda2<BR/>pv-hera-disk1<BR/>Size: 49.9 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1008 kiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000019:pink;0.001836:pink;0.998125:green;0.000019";
-	]; }
-	{ "@Part: sdb" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sdb<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-2<BR/>Label: gpt<BR/>Size: 5.00 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sda<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-2<BR/>Label: gpt<BR/>Size: 5.00 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -46,12 +11,12 @@ digraph "machine"{
 					</TR>
 					<TR>
 						<TD PORT="2" BGCOLOR="yellow">
-						/dev/sdb2<BR/>disk2pv<BR/>Size: 4.00 TiB
+						/dev/sda2<BR/>disk2pv<BR/>Size: 4.00 TiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sdb1<BR/>disk2pv2<BR/>Size: 1.00 TiB
+						/dev/sda1<BR/>disk2pv2<BR/>Size: 1.00 TiB
 						</TD>
 					</TR>
 					<TR>
@@ -70,6 +35,41 @@ digraph "machine"{
 		style=striped;
 		fillcolor="green;0.000195:pink;0.799804:pink;0.200000:green;0.000000";
 	]; }
+	{ "@Part: sdb" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sdb<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-0<BR/>Label: gpt<BR/>Size: 150 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sdb1<BR/>efi<BR/>Size: 94.0 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sdb2<BR/>pv-hera-disk1<BR/>Size: 149 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1024 MiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000006:pink;0.000612:pink;0.992715:green;0.006667";
+	]; }
 	subgraph "cluster_vgchu" {
 		style=filled;
 		color=lightgrey;
@@ -78,17 +78,17 @@ digraph "machine"{
 		subgraph "cluster_vgchu@PV" {
 			color=white;
 			fillcolor=white;
-			{ "LVM@vgchu@PV@sda2" [
-				label="PV: /dev/sda2\nSize: 49.9 GiB\nFree: 4.90 GiB\nUsed: 45.0 GiB";
-				style=striped;fillcolor="pink;0.901761.2:green"
+			{ "LVM@vgchu@PV@sda1" [
+				label="PV: /dev/sda1\nSize: 1024 GiB\nFree: 0 B\nUsed: 1024 GiB";
+				style=striped;fillcolor="pink;1.000000.2:green"
 			]; }
-			{ "LVM@vgchu@PV@sdb1" [
-				label="PV: /dev/sdb1\nSize: 1024 GiB\nFree: 0 B\nUsed: 1024 GiB";
+			{ "LVM@vgchu@PV@sda2" [
+				label="PV: /dev/sda2\nSize: 4.00 TiB\nFree: 0 B\nUsed: 4.00 TiB";
 				style=striped;fillcolor="pink;1.000000.2:green"
 			]; }
 			{ "LVM@vgchu@PV@sdb2" [
-				label="PV: /dev/sdb2\nSize: 4.00 TiB\nFree: 0 B\nUsed: 4.00 TiB";
-				style=striped;fillcolor="pink;1.000000.2:green"
+				label="PV: /dev/sdb2\nSize: 149 GiB\nFree: 78.9 GiB\nUsed: 70.0 GiB";
+				style=striped;fillcolor="pink;0.470094.2:green"
 			]; }
 			label="vgchu's PVs";
 		}
@@ -96,11 +96,11 @@ digraph "machine"{
 			color=white;
 			fillcolor=white;
 			{ "dm-2" [
-				label="LV: home\nSize: 15.0 GiB";
+				label="LV: home\nSize: 30.0 GiB";
 				fillcolor="yellow"
 			]; }
 			{ "dm-0" [
-				label="LV: root\nSize: 20.0 GiB";
+				label="LV: root\nSize: 30.0 GiB";
 				fillcolor="yellow"
 			]; }
 			{ "dm-3" [
@@ -113,33 +113,33 @@ digraph "machine"{
 			]; }
 			label="vgchu's LVs";
 		}
-		label="LVM: vgchu\nSize: 5.05 TiB\nFree: 4.90 GiB";
-		style=striped;fillcolor="pink;0.999052.2:green"
+		label="LVM: vgchu\nSize: 5.14 TiB\nFree: 78.9 GiB";
+		style=striped;fillcolor="pink;0.985021.2:green"
 	}
 	subgraph "cluster_@FS" {
 		style=filled;
 		color=lightgrey;
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		{ "@FS@SWAP" [
-			label="SWAP\nDevice: /dev/vgchu/swap\nswap\nSize: 10.00 GiB\nFree: 9.06 GiB\nUsed: 966 MiB";
-			style=striped;fillcolor="pink;0.094370.2:green"
-		]; }
 		{ "@FS@/home" [
-			label="/home\nDevice: /dev/vgchu/home\next4\nSize: 14.7 GiB\nFree: 4.09 GiB\nUsed: 9.88 GiB";
-			style=striped;fillcolor="pink;0.722092.2:green"
+			label="/home\nDevice: /dev/vgchu/home\next4\nSize: 29.4 GiB\nFree: 7.88 GiB\nUsed: 20.2 GiB";
+			style=striped;fillcolor="pink;0.732178.2:green"
 		]; }
 		{ "@FS@/" [
-			label="/\nDevice: /dev/vgchu/root\next4\nSize: 19.6 GiB\nFree: 4.68 GiB\nUsed: 13.9 GiB";
-			style=striped;fillcolor="pink;0.760903.2:green"
+			label="/\nDevice: /dev/vgchu/root\next4\nSize: 29.4 GiB\nFree: 7.77 GiB\nUsed: 20.2 GiB";
+			style=striped;fillcolor="pink;0.735435.2:green"
 		]; }
 		{ "@FS@/srv/scratch" [
-			label="/srv/scratch\nDevice: /dev/vgchu/scratch\next4\nSize: 4.92 TiB\nFree: 2.13 TiB\nUsed: 2.58 TiB";
-			style=striped;fillcolor="pink;0.566269.2:green"
+			label="/srv/scratch\nDevice: /dev/vgchu/scratch\next4\nSize: 4.92 TiB\nFree: 1.27 TiB\nUsed: 3.44 TiB";
+			style=striped;fillcolor="pink;0.742055.2:green"
 		]; }
 		{ "@FS@/boot/efi" [
-			label="/boot/efi\nDevice: /dev/sda1\nvfat\nSize: 92.5 MiB\nFree: 87.4 MiB\nUsed: 5.10 MiB";
-			style=striped;fillcolor="pink;0.055077.2:green"
+			label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 92.5 MiB\nFree: 89.2 MiB\nUsed: 3.38 MiB";
+			style=striped;fillcolor="pink;0.036487.2:green"
+		]; }
+		{ "@FS@SWAP@dm-1" [
+			label="SWAP\nDevice: /dev/vgchu/swap\nSize: 10.00 GiB\nFree: 10.00 GiB\nUsed: 0 B";
+			style=striped;fillcolor="green"
 		]; }
 		label="Mounted FS and swap";
 	}
@@ -151,19 +151,19 @@ digraph "machine"{
 		label="Libvirt Virtual Machines";
 	}
 	// Links from LVM VG: vgchu
-	"LVM@vgchu@PV@sda2" -> "dm-2"
-	"LVM@vgchu@PV@sda2" -> "dm-0"
-	"LVM@vgchu@PV@sdb2" -> "dm-3"
-	"LVM@vgchu@PV@sdb1" -> "dm-3"
-	"LVM@vgchu@PV@sda2" -> "dm-1"
+	"LVM@vgchu@PV@sdb2" -> "dm-2"
+	"LVM@vgchu@PV@sdb2" -> "dm-2"
+	"LVM@vgchu@PV@sdb2" -> "dm-0"
+	"LVM@vgchu@PV@sdb2" -> "dm-0"
+	"LVM@vgchu@PV@sda2" -> "dm-3"
+	"LVM@vgchu@PV@sda1" -> "dm-3"
+	"LVM@vgchu@PV@sdb2" -> "dm-1"
+	// Links for LVM@vgchu@PV@sda1
+	"@Part: sda":"1" -> "LVM@vgchu@PV@sda1"
 	// Links for LVM@vgchu@PV@sda2
 	"@Part: sda":"2" -> "LVM@vgchu@PV@sda2"
-	// Links for LVM@vgchu@PV@sdb1
-	"@Part: sdb":"1" -> "LVM@vgchu@PV@sdb1"
 	// Links for LVM@vgchu@PV@sdb2
 	"@Part: sdb":"2" -> "LVM@vgchu@PV@sdb2"
-	// Links for @FS@SWAP
-	"dm-1" -> "@FS@SWAP"
 	// Links for @FS@/home
 	"dm-2" -> "@FS@/home"
 	// Links for @FS@/
@@ -171,5 +171,7 @@ digraph "machine"{
 	// Links for @FS@/srv/scratch
 	"dm-3" -> "@FS@/srv/scratch"
 	// Links for @FS@/boot/efi
-	"@Part: sda":"1" -> "@FS@/boot/efi"
+	"@Part: sdb":"1" -> "@FS@/boot/efi"
+	// Links for @FS@SWAP@dm-1
+	"dm-1" -> "@FS@SWAP@dm-1"
 }

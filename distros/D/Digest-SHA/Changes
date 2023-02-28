@@ -1,5 +1,11 @@
 Revision history for Perl extension Digest::SHA.
 
+6.04  Sat Feb 25 12:00:50 PM MST 2023
+	- modified SHA_INIT/sharewind to silence warnings from gcc 12
+		-- resolves rt.cpan.org #146585
+		-- thanks to Yves (yves@cpan.org) for patch,
+			amended slightly to preserve style
+
 6.03  Mon 08 Aug 2022 11:30:32 AM MST
 	- corrected addfile to report error when stdin is a directory
 		-- ref. rt.cpan.org #143899

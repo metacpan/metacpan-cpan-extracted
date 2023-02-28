@@ -1,3 +1,12 @@
+1.1.1     2023-02-28 13:02:33+00:00 Europe/London
+ - documentation fixes
+ - simplified SubscriberOnly::Moderate
+
+1.1.0     2023-02-28 11:56:27+00:00 Europe/London
+ - require perl 5.36
+ - new role NoSpoof for better DMARC compliance
+ - bumped all dependencies to latest
+
 1.0.5     2019-04-29 15:44:26+01:00 Europe/London
  - *really* make it work with App::Spec 0.005
 

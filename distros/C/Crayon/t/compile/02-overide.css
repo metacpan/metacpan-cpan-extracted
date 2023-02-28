@@ -1,0 +1,7 @@
+$color:black;
+$background:red;
+body {
+	padding: 1em;
+	color: $color;
+	background: $background;
+}

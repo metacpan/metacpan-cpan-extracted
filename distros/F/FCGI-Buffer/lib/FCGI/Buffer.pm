@@ -21,11 +21,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ debugging before publishing a code change, set the NO_CACHE environment variable
 to any non-zero value.
 This will also stop ETag being added to the header.
 If you get errors about Wide characters in print it means that you've
-forgotten to emit pure HTML on non-ascii characters.
+forgotten to emit pure HTML on non-ASCII characters.
 See L<HTML::Entities>.
 As a hack work around you could also remove accents and the like by using
 L<Text::Unidecode>,
@@ -166,8 +166,8 @@ sub DESTROY {
 		if($ENV{'HTTP_IF_MODIFIED_SINCE'}) {
 			$self->{logger}->debug("HTTP_IF_MODIFIED_SINCE: $ENV{HTTP_IF_MODIFIED_SINCE}");
 		}
-		$self->{logger}->debug("Generate_etag = $self->{generate_etag}",
-			"Generate_304 = $self->{generate_304}",
+		$self->{logger}->debug("Generate_etag = $self->{generate_etag}, ",
+			"Generate_304 = $self->{generate_304}, ",
 			"Generate_last_modified = $self->{generate_last_modified}");
 	}
 	unless($headers || $self->is_cached()) {
@@ -307,7 +307,11 @@ sub DESTROY {
 					$self->{body} = '';
 					foreach my $error ($lint->errors) {
 						my $errtext = $error->where() . ': ' . $error->errtext() . "\n";
-						warn($errtext);
+						if($self->{logger}) {
+							$self->{logger}->warn($errtext);
+						} else {
+							warn($errtext);
+						}
 						$self->{body} .= $errtext;
 					}
 				}
@@ -405,8 +409,10 @@ sub DESTROY {
 						push @{$self->{o}}, 'X-Cache: HIT';
 						push @{$self->{o}}, 'X-Cache-Lookup: HIT';
 					}
+				} elsif($self->{logger}) {
+					$self->{logger}->warn("Error retrieving data for key $key");
 				} else {
-					carp( __PACKAGE__, ": error retrieving data for key $key");
+					carp(__PACKAGE__, ": error retrieving data for key $key");
 				}
 			}
 
@@ -422,7 +428,7 @@ sub DESTROY {
 					});
 				}
 			}
-			if($self->{send_body} && ($self->{status} == 200)) {
+			if($self->{send_body} && ($self->{status} == 200) && defined($cache_hash)) {
 				$self->{body} = $cache_hash->{'body'};
 				if($dbh) {
 					my $changes = $self->_save_to($self->{body}, $dbh);
@@ -461,10 +467,11 @@ sub DESTROY {
 
 					if($self->{logger}) {
 						$self->{logger}->error("Can't retrieve body for key $key");
+						$self->{logger}->warn($self->{body});
 					} else {
-						carp "Can't retrieve body for key $key";
+						carp("Can't retrieve body for key $key");
+						warn($self->{body});
 					}
-					warn($self->{body});
 					$self->{send_body} = 0;
 					$self->{status} = 500;
 				}
@@ -834,6 +841,7 @@ sub _generate_etag {
 	my $self = shift;
 
 	return if defined($self->{'etag'});
+	return unless defined($self->{'body'});
 
 	if(!defined($self->{_encode_loaded})) {
 		# encode to avoid "Wide character in subroutine entry"
@@ -1672,7 +1680,7 @@ FCGI::Buffer has not been tested against FastCGI.
 
 I advise adding FCGI::Buffer as the last use statement so that it is
 cleared up first.  In particular it should be loaded after
-L<Log::Log4Perl>, if you're using that, so that any messages it
+L<Log::Log4perl>, if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 FCGI::Buffer;
 
@@ -1731,7 +1739,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2022 Nigel Horne,
+The rest of the program is Copyright 2015-2023 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

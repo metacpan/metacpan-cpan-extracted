@@ -3,6 +3,7 @@ requires 'perl', '5.014';
 requires 'JSON';
 requires 'List::Util';
 requires 'Hash::Util';
+requires 'Clipboard';
 requires 'App::Greple', '9.02';
 requires 'App::sdif', '4.24.0';
 requires 'Text::ANSI::Fold', '2.20';

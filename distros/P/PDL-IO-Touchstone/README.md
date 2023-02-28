@@ -27,7 +27,6 @@ module for an object-oriented approach which encapsulates the data returned by
         ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_f_unit) =
                 rsnp('input-file.s2p', { units => 'MHz' });
 
-
         # Write output file:
         wsnp('output-file.s2p',
                 $f, $m, $param_type, $z0, $comments, $fmt, $from_hz, $to_hz);
@@ -164,52 +163,52 @@ is represented as either:
     - - A perl scalar value: all ports have same impedance
     - - A 0-dim pdl like pdl( 5+2\*i() ): all ports have same impedance
     - - A 1-dim single-element pdl like pdl( \[5+2\*i()\] ): all ports have same impedance
-    - - A 1-dim pdl representing the charectaristic impedance at each port: ports may have different impedances
+    - - A 1-dim pdl representing the characteristic impedance at each port: ports may have different impedances
 
-## `$Y = s_to_y($S, $z0)`: Convert S-paramters to Y-parameters.
+## `$Y = s_to_y($S, $z0)`: Convert S-parameters to Y-parameters.
 
-- `$S`: The S-paramter matrix
-- `$z0`: Charectaristic impedance (see above).
-- `$Y`: The resultant Y-paramter matrix
+- `$S`: The S-parameter matrix
+- `$z0`: Characteristic impedance (see above).
+- `$Y`: The resultant Y-parameter matrix
 
-## `$S = y_to_s($Y, $z0)`: Convert Y-paramters to S-parameters.
+## `$S = y_to_s($Y, $z0)`: Convert Y-parameters to S-parameters.
 
-- `$Y`: The Y-paramter matrix
-- `$z0`: Charectaristic impedance (see above).
-- `$S`: The resultant S-paramter matrix
+- `$Y`: The Y-parameter matrix
+- `$z0`: Characteristic impedance (see above).
+- `$S`: The resultant S-parameter matrix
 
-## `$Z = s_to_z($S, $z0)`: Convert S-paramters to Z-parameters.
+## `$Z = s_to_z($S, $z0)`: Convert S-parameters to Z-parameters.
 
-- `$S`: The S-paramter matrix
-- `$z0`: Charectaristic impedance (see above).
-- `$Z`: The resultant Z-paramter matrix
+- `$S`: The S-parameter matrix
+- `$z0`: Characteristic impedance (see above).
+- `$Z`: The resultant Z-parameter matrix
 
-## `$S = z_to_s($Z, $z0)`: Convert Z-paramters to S-parameters.
+## `$S = z_to_s($Z, $z0)`: Convert Z-parameters to S-parameters.
 
-- `$Z`: The Z-paramter matrix
-- `$z0`: Charectaristic impedance (see above).
-- `$S`: The resultant S-paramter matrix
+- `$Z`: The Z-parameter matrix
+- `$z0`: Characteristic impedance (see above).
+- `$S`: The resultant S-parameter matrix
 
-## `$ABCD = s_to_abcd($S, $z0)`: Convert S-paramters to ABCD-parameters.
+## `$ABCD = s_to_abcd($S, $z0)`: Convert S-parameters to ABCD-parameters.
 
-- `$S`: The S-paramter matrix
-- `$z0`: Charectaristic impedance (see above).
-- `$ABCD`: The resultant ABCD-paramter matrix
+- `$S`: The S-parameter matrix
+- `$z0`: Characteristic impedance (see above).
+- `$ABCD`: The resultant ABCD-parameter matrix
 
-## `$S = abcd_to_s($ABCD, $z0)`: Convert ABCD-paramters to S-parameters.
+## `$S = abcd_to_s($ABCD, $z0)`: Convert ABCD-parameters to S-parameters.
 
-- `$ABCD`: The ABCD-paramter matrix
-- `$z0`: Charectaristic impedance (see above).
-- `$S`: The resultant S-paramter matrix
+- `$ABCD`: The ABCD-parameter matrix
+- `$z0`: Characteristic impedance (see above).
+- `$S`: The resultant S-parameter matrix
 
-# S-Paramter Calculaction Functions
+# S-Parameter Calculation Functions
 
 All functions prefixed with "s\_" require an S-parameter matrix.
 
 ## `$z0n = s_port_z($S, $z0, $n)` - Return the complex port impedance vector for each frequency
 
-- - `$S`: S paramter matrix
-- - `$z0`: vector of \_reference\_ impedances at each port (from `rsnp`)
+- - `$S`: S parameter matrix
+- - `$z0`: vector of _reference_ impedances at each port (from `rsnp`)
 - - `$n`: the port we want.
 
 In a 2-port, this will provide the input or output impedance as follows:
@@ -221,7 +220,7 @@ Note that `$z_in` and `$z_out` are the PDL vectors for the input or output
 impedance at each frequency in `$f`.  (NB, `$f` is not actually needed for
 the calculation.)
 
-# Y-Paramter Calculaction Functions
+# Y-Parameter Calculation Functions
 
 All functions prefixed with "y\_" require a Y-parameter matrix.
 
@@ -324,7 +323,7 @@ The value of `$args` may be one of:
 
 - A scalar float or string.
 - An ARRAY reference.  If using an ARRAY reference then the array will be
-concatinated into a comma-separated string and used as follows:
+concatenated into a comma-separated string and used as follows:
 
 Each range is split on a comma as follows (whitespace is ignored):
 
@@ -363,7 +362,7 @@ additional options such as `quiet` and may be extended further in the future.
 
 ## `$max_diff = f_uniformity($f)` - Return maximum frequency deviation.
 
-Return the maximum difference between an ideal uniformally-spaced frequency set
+Return the maximum difference between an ideal uniformly-spaced frequency set
 and the frequency set provided.  This is used internally by `f_is_uniform()`.
 For example:
 

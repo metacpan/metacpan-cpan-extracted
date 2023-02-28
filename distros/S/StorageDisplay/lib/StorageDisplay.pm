@@ -1,7 +1,7 @@
 #
 # This file is part of StorageDisplay
 #
-# This software is copyright (c) 2014-2022 by Vincent Danjean.
+# This software is copyright (c) 2014-2023 by Vincent Danjean.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.0.10'; # VERSION
+our $VERSION = '1.0.11'; # VERSION
 
 1;
 
@@ -1571,7 +1571,7 @@ sub dname {
     #print STDERR "name for ", $self->name, "\n";
     #use Data::Dumper;
     #print STDERR Dumper($self->names), "\n";
-     foreach my $n ($self->names_str) {
+    foreach my $n ($self->names_str) {
         my $s=0;
         if ($n =~ m,^disk/,) {
             $s = 20;
@@ -1585,9 +1585,14 @@ sub dname {
             $s = 50;
         }
         if ($s > $score) {
-            #print STDERR "  prefer ", $n, "\n";
+            #print STDERR "  prefer($s) ", $n, "\n";
             $score = $s;
             $best_name = $n;
+        } elsif ($s == $score && $n gt $best_name) {
+            #print STDERR "  prefer($s/alpha) ", $n, "\n";
+            $best_name = $n;
+        #} else {
+        #    print STDERR "  reject($s) ", $n, "\n";
         }
     }
 
@@ -3162,6 +3167,19 @@ with (
     'StorageDisplay::Role::Style::Grey',
     );
 
+has '_swaps' => (
+    traits   => [ 'Array' ],
+    is    => 'ro',
+    isa   => 'ArrayRef[StorageDisplay::FS::SWAP::Elem]',
+    required => 1,
+    default  => sub { return []; },
+    handles  => {
+        '_add_swap' => 'push',
+            'all_swap' => 'elements',
+            'nb_swap' => 'count',
+    }
+    );
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -3187,8 +3205,31 @@ sub BUILD {
 
     foreach my $dev (sort keys %{$allfs}) {
         my $fs = $allfs->{$dev};
+        if (($fs->{'mountpoint'}//'') eq 'SWAP') {
+            if ($fs->{'fstype'} eq 'partition') {
+                $self->_add_swap(
+                    StorageDisplay::FS::SWAP::Partition->new($dev, $st, $fs),
+                    );
+            } elsif ($fs->{'fstype'} eq 'file') {
+                $self->_add_swap(
+                    StorageDisplay::FS::SWAP::File->new($dev, $st, $fs),
+                    );
+            } else {
+                $self->error("Unknown swap type ".$fs->{'fstype'}." for ".$dev);
+            }
+        } else {
+            $self->addChild(
+                StorageDisplay::FS::FS->new($dev, $st, $fs),
+                );
+        }
+    }
+    if ($self->nb_swap == 1) {
+        my $s = ($self->all_swap)[0];
+        $s->onlyoneswap;
+        $self->addChild($s);
+    } else {
         $self->addChild(
-            StorageDisplay::FS::FS->new($dev, $st, $fs),
+            StorageDisplay::FS::AllSWAP->new($st, $self->all_swap()),
             );
     }
 }
@@ -3259,6 +3300,216 @@ sub dotLabel {
         $self->fstype,
         );
 }
+
+1;
+
+##################################################################
+package StorageDisplay::FS::AllSWAP;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::Elem';
+
+with (
+    'StorageDisplay::Role::Style::IsSubGraph',
+    'StorageDisplay::Role::Style::WithUsed',
+    );
+
+has '_swaps' => (
+    traits   => [ 'Array' ],
+    is    => 'ro',
+    isa   => 'ArrayRef[StorageDisplay::FS::SWAP::Elem]',
+    required => 1,
+    handles  => {
+        '_add_swap' => 'push',
+            'all_swap' => 'elements',
+            'nb_swap' => 'count',
+    }
+    );
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $st = shift;
+    my @swaps = @_;
+
+    $st->log({level=>1}, "SWAP");
+
+    my $name = '@FS@SWAP';
+
+    my ($size, $free, $used) = (0, 0, 0);
+    for my $s (@swaps) {
+        $size += $s->size;
+        $free += $s->free;
+        $used += $s->used;
+    }
+
+    return $class->$orig(
+        'name' => $name,
+        'st' => $st,
+        'free' => $free,
+        'size' => $size,
+        'used' => $used,
+        '_swaps' => \@swaps,
+        );
+};
+
+sub BUILD {
+    my $self=shift;
+    my $args=shift;
+
+    for my $s ($self->all_swap) {
+        $self->addChild($s);
+    }
+}
+
+sub dotLabel {
+    my $self = shift;
+    my $nb_swap = $self->nb_swap;
+    return (
+        "SWAP",
+        );
+}
+
+sub dotStyle2 {
+    my $orig  = shift;
+    my $self = shift;
+
+    return (
+        "style=filled;",
+        "color=lightgrey;",
+        "fillcolor=lightgrey;",
+        "node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];",
+        );
+};
+
+around 'dotStyle' => sub {
+    my $orig  = shift;
+    my $self = shift;
+
+    my @config = (map {
+        my $val = $_;
+        $val =~ s/^color=.*;/color=white/;
+        $val =~ s/,color=[^,]*,/,color=white,/;
+        $val;
+    } ($self->$orig(@_)));
+    return @config;
+};
+
+1;
+
+##################################################################
+package StorageDisplay::FS::SWAP::Elem;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::Elem';
+
+with (
+    'StorageDisplay::Role::HasBlock',
+    'StorageDisplay::Role::Style::WithUsed',
+    );
+
+has 'fstype' => (
+    is => 'ro',
+    isa => 'Str',
+    );
+
+has 'standalone' => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0,
+    required => 1,
+    writer => '_standalone'
+    );
+
+sub onlyoneswap {
+    my $self = shift;
+    return $self->_standalone(1);
+}
+
+sub BUILD {
+    my $self=shift;
+    my $args=shift;
+    $self->provideBlock($args->{'provide'});
+}
+
+sub dotLabel {
+    my $self = shift;
+    if ($self->standalone) {
+        return (
+            'SWAP',
+            'Device: '.$self->block->dname,
+            );
+    }
+    return (
+        $self->block->dname,
+        );
+}
+
+1;
+
+##################################################################
+package StorageDisplay::FS::SWAP::Partition;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::FS::SWAP::Elem';
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $dev = shift;
+    my $st = shift;
+    my $fs = shift;
+
+    my $block = $st->block($dev);
+    $st->log({level=>1}, "SWAP@".$dev);
+
+    my $name = '@FS@SWAP@'.$block->name;
+
+    return $class->$orig(
+        'name' => $name,
+        'consume' => [$block],
+        'provide' => $st->block($name),
+        'st' => $st,
+        'block' => $block,
+        %{$fs},
+        @_
+        );
+};
+
+1;
+
+##################################################################
+package StorageDisplay::FS::SWAP::File;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::FS::SWAP::Elem';
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $file = shift;
+    my $st = shift;
+    my $fs = shift;
+
+    my $block = $st->block($file);
+    $st->log({level=>1}, "SWAP@".$file);
+
+    my $name = '@FS@SWAP@'.$file;
+
+    return $class->$orig(
+        'name' => $name,
+        'consume' => [$st->block('@FS@'.($fs->{'file-mountpoint'} // '@none@'))],
+        'provide' => $st->block($name),
+        'st' => $st,
+        'block' => $block,
+        %{$fs},
+        @_
+        );
+};
 
 1;
 
@@ -5077,7 +5328,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.0.10
+version 1.0.11
 
 Replay commands
 
@@ -5087,7 +5338,7 @@ Vincent Danjean <Vincent.Danjean@ens-lyon.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2022 by Vincent Danjean.
+This software is copyright (c) 2014-2023 by Vincent Danjean.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

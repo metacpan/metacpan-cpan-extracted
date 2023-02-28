@@ -6,14 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TextWrapUtils.pm'
 );
 
 my @scripts = (
-    'script/textwrap'
+    'script/nowrap',
+    'script/nowrap-clipboard',
+    'script/textunwrap',
+    'script/textunwrap-clipboard',
+    'script/textwrap',
+    'script/textwrap-clipboard'
 );
 
 # no fake home requested

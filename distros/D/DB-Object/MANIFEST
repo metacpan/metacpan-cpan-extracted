@@ -5,6 +5,7 @@ lib/DB/Object/AND.pod
 lib/DB/Object/Cache/Tables.pm
 lib/DB/Object/Fields.pm
 lib/DB/Object/Fields/Field.pm
+lib/DB/Object/Fields/Unknown.pm
 lib/DB/Object/Mysql.pm
 lib/DB/Object/Mysql/Query.pm
 lib/DB/Object/Mysql/Statement.pm

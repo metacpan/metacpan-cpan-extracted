@@ -11,7 +11,7 @@ use Carp 'croak';
 
 no autovivification;
 
-our $VERSION = "v0.0.34";
+our $VERSION = "v0.0.36";
 
 has _streams_to_conns => sub { +{} };                # ends in connection object
 has _conns_to_streams => sub { +{} };                # ends in number of joins of that connection

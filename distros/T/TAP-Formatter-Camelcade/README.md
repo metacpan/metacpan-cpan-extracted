@@ -1,6 +1,6 @@
 # TAP::Formatter::Camelcade
 
-[![Build Status](https://travis-ci.org/Camelcade/TAP-Formatter-Camelcade.svg?branch=master)](https://travis-ci.org/Camelcade/TAP-Formatter-Camelcade)
+![Testing](https://github.com/Camelcade/TAP-Formatter-Camelcade/workflows/Testing/badge.svg?branch=master)
 
 Converts test events from TAP::Harness to the TeamCity format
 

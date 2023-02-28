@@ -17,9 +17,9 @@ use Perinci::Sub::Util qw(err);
 #use String::Trim::More qw(trim_blank_lines);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-02-24'; # DATE
 our $DIST = 'Perinci-Sub-Gen-AccessTable'; # DIST
-our $VERSION = '0.591'; # VERSION
+our $VERSION = '0.592'; # VERSION
 
 our @EXPORT_OK = qw(gen_read_table_func);
 
@@ -123,21 +123,21 @@ sub _add_arg {
 sub _gen_meta {
     require Data::Sah::Resolve;
 
-    my ($table_spec, $opts) = @_;
+    my ($table_def, $opts) = @_;
     my $langs = $opts->{langs};
 
-    my $fields = $table_spec->{fields};
+    my $fields = $table_def->{fields};
 
     # add general arguments
 
     my $func_meta = {
         v => 1.1,
-        summary => $opts->{summary} // $table_spec->{summary} // "REPLACE ME",
+        summary => $opts->{summary} // $table_def->{summary} // "REPLACE ME",
         description => $opts->{description} // "REPLACE ME",
         args => {},
         result => {
             table => {
-                spec => $table_spec,
+                def => $table_def,
             },
         },
         'x.dynamic_generator_modules' => [__PACKAGE__],
@@ -185,7 +185,7 @@ _
         func_meta   => $func_meta,
         langs       => $langs,
         name        => 'fields',
-        type        => ['array*' => {of=>['str*', {in=>[keys %{$table_spec->{fields}}]}]}],
+        type        => ['array*' => {of=>['str*', {in=>[keys %{$table_def->{fields}}]}]}],
         default     => $opts->{default_fields},
         aliases     => $opts->{fields_aliases},
         cat_name    => 'field-selection',
@@ -199,7 +199,7 @@ _
         func_meta   => $func_meta,
         langs       => $langs,
         name        => 'exclude_fields',
-        type        => ['array*' => {of=>['str*', {in=>[keys %{$table_spec->{fields}}]}]}],
+        type        => ['array*' => {of=>['str*', {in=>[keys %{$table_def->{fields}}]}]}],
         default     => $opts->{default_exclude_fields},
         aliases     => $opts->{exclude_fields_aliases},
         cat_name    => 'field-selection',
@@ -309,8 +309,8 @@ _
 
     # add filter arguments for each table field
 
-    for my $fname (keys %{$table_spec->{fields}}) {
-        my $fspec   = $table_spec->{fields}{$fname};
+    for my $fname (keys %{$table_def->{fields}}) {
+        my $fspec   = $table_def->{fields}{$fname};
         my $fschema = $fspec->{schema};
         my $frschema = Data::Sah::Resolve::resolve_schema($fschema);
         my $ftype   = $frschema->{type};
@@ -526,10 +526,10 @@ _
 sub __parse_query {
     require Data::Sah::Resolve;
 
-    my ($table_spec, $opts, $func_meta, $args) = @_;
+    my ($table_def, $opts, $func_meta, $args) = @_;
     my $query = {args=>$args};
 
-    my $fspecs = $table_spec->{fields};
+    my $fspecs = $table_def->{fields};
     # reminder: index property is for older spec, will be removed someday
     my @fields = sort {($fspecs->{$a}{pos}//$fspecs->{$a}{index}) <=>
                            ($fspecs->{$b}{pos}//$fspecs->{$b}{index})}
@@ -556,7 +556,7 @@ sub __parse_query {
             @requested_fields = @{ $args->{fields} };
             $args->{with_field_names} //= 0;
         } else {
-            @requested_fields = ($table_spec->{pk});
+            @requested_fields = ($table_def->{pk});
             $args->{with_field_names} //= 0;
         }
     } # SELECT_FIELDS
@@ -762,9 +762,9 @@ sub __parse_query {
 }
 
 sub _gen_func {
-    my ($table_spec, $opts, $table_data, $func_meta) = @_;
+    my ($table_def, $opts, $table_data, $func_meta) = @_;
 
-    my $fspecs = $table_spec->{fields};
+    my $fspecs = $table_def->{fields};
     my $func_args = $func_meta->{args};
     my $func = sub {
         my %args = @_;
@@ -793,7 +793,7 @@ sub _gen_func {
         }
         my $query;
         {
-            my $res = __parse_query($table_spec, $opts, $func_meta, \%args);
+            my $res = __parse_query($table_def, $opts, $func_meta, \%args);
             for ('after_parse_query') {
                 $hookargs{_parse_res} = $res;
                 last unless $hooks->{$_};
@@ -1091,7 +1091,7 @@ sub _gen_func {
 
         # select fields
         log_trace("(read_table_func) Selecting fields ...");
-        my $pk = $table_spec->{pk};
+        my $pk = $table_def->{pk};
         goto SKIP_SELECT_FIELDS if $metadata->{fields_selected};
       REC2:
         for my $r (@r) {
@@ -1257,13 +1257,13 @@ mentioned in filter arguments).
 
 _
         },
-        table_spec => {
+        table_def => {
             schema => 'hash*',
-            summary => 'Table specification',
+            summary => 'Table definition',
             description => <<'_',
 
 Required, unless `table_data` argument is a <pm:TableData> object, in which case
-table spec will be retrieved from the object if not supplied.
+table definition will be retrieved from the object if not supplied.
 
 See <pm:TableDef> for more details.
 
@@ -1552,39 +1552,42 @@ sub gen_read_table_func {
         ref($table_data) =~ /\ATableData::/ or
         ref($table_data) eq 'CODE'
             or return [400, "Invalid table_data: must be AoA/AoH/TableData obj/function"];
-    my $table_spec = $args{table_spec};
-    if (!$table_spec && ref($table_data) =~ /\ATableData::/) {
-        if ($table_data->can("get_table_spec")) {
-            $table_spec = $table_data->get_table_spec;
+    my $table_def = $args{table_def} //
+        $args{"table_"."spec"}; # old name, deprecated
+    if (!$table_def && ref($table_data) =~ /\ATableData::/) {
+        if ($table_data->can("get_table_def")) {
+            $table_def = $table_data->get_table_def;
         } else {
-            $table_spec = {fields => {}};
+            $table_def = {fields => {}};
             my @fields = $table_data->get_column_names;
             for my $i (0 .. $#fields) {
-                $table_spec->{fields}{ $fields[$i] } = {
+                $table_def->{fields}{ $fields[$i] } = {
                     pos => $i,
                     schema => "str*",
                     sortable => 1,
                 },
             };
             # assume the first field as pk
-            $table_spec->{pk} = $fields[0];
+            $table_def->{pk} = $fields[0];
         }
     }
-    $table_spec or return [400, "Please specify table_spec"];
-    ref($table_spec) eq 'HASH'
-        or return [400, "Invalid table_spec: must be a hash"];
-    $table_spec->{fields} or
-        return [400, "Invalid table_spec: fields not specified"];
-    ref($table_spec->{fields}) eq 'HASH' or
-        return [400, "Invalid table_spec: fields must be hash"];
-    $table_spec->{pk} or
-        return [400, "Invalid table_spec: pk not specified"];
-    exists($table_spec->{fields}{ $table_spec->{pk} }) or
-        return [400, "Invalid table_spec: pk not in fields"];
+    $table_def or return [400, "Please specify table_def"];
+    ref($table_def) eq 'HASH'
+        or return [400, "Invalid table_def: must be a hash"];
+    $table_def->{fields} or
+        return [400, "Invalid table_def: fields not specified"];
+    ref($table_def->{fields}) eq 'HASH' or
+        return [400, "Invalid table_def: fields must be hash"];
+    $table_def->{pk} or
+        return [400, "Invalid table_def: pk not specified"];
+    !ref($table_def->{pk}) or
+        return [400, "Sorry, I currently do not support multi-field pk"];
+    exists($table_def->{fields}{ $table_def->{pk} }) or
+        return [400, "Invalid table_def: pk not in fields"];
 
     # duplicate and make each field's schema normalized
-    $table_spec = clone($table_spec);
-    for my $fspec (values %{$table_spec->{fields}}) {
+    $table_def = clone($table_def);
+    for my $fspec (values %{$table_def->{fields}}) {
         $fspec->{schema} //= 'any';
         $fspec->{schema} = __parse_schema($fspec->{schema});
     }
@@ -1647,11 +1650,11 @@ sub gen_read_table_func {
     };
 
     my $res;
-    $res = _gen_meta($table_spec, $opts);
+    $res = _gen_meta($table_def, $opts);
     return err(500, "Can't generate meta", $res) unless $res->[0] == 200;
     my $func_meta = $res->[2];
 
-    $res = _gen_func($table_spec, $opts, $table_data, $func_meta);
+    $res = _gen_func($table_def, $opts, $table_data, $func_meta);
     return err(500, "Can't generate func", $res) unless $res->[0] == 200;
     my $func = $res->[2];
 
@@ -1681,7 +1684,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.591 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2023-02-12.
+This document describes version 0.592 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2023-02-24.
 
 =head1 SYNOPSIS
 
@@ -1707,7 +1710,7 @@ In list_countries.pl:
      summary     => 'func summary',     # opt
      description => 'func description', # opt
      table_data  => $countries,
-     table_spec  => {
+     table_def   => {
          summary => 'List of countries',
          fields => {
              id => {
@@ -2133,12 +2136,12 @@ that are mentioned in either filtering arguments or fields or ordering,
 'sort_fields' (fields mentioned in sort arguments), 'filter_fields' (fields
 mentioned in filter arguments).
 
-=item * B<table_spec> => I<hash>
+=item * B<table_def> => I<hash>
 
-Table specification.
+Table definition.
 
 Required, unless C<table_data> argument is a L<TableData> object, in which case
-table spec will be retrieved from the object if not supplied.
+table definition will be retrieved from the object if not supplied.
 
 See L<TableDef> for more details.
 

@@ -1531,7 +1531,7 @@ sub set_labels {
 		# print("param_widgets_color,set_labels, length=$length\n");
 		# print("param_widgets_color,set_labels, llabels: @{$param_widgets_color_href->{_labels_aref}}\n");
 	} else {
-		print("param_widgets_color,set_labels, missing labels\n");
+		print("param_widgets_green,set_labels, missing labels\n");
 	}
 	return ();
 }

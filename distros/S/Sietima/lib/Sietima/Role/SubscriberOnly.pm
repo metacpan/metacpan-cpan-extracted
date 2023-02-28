@@ -4,10 +4,10 @@ use Sietima::Policy;
 use Email::Address;
 use List::AllUtils qw(any);
 use Types::Standard qw(Object CodeRef);
-use Type::Params qw(compile);
+use Type::Params -sigs;
 use namespace::clean;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: base role for "closed" lists
 
 
@@ -28,9 +28,11 @@ around munge_mail => sub ($orig,$self,$mail) {
 };
 
 
+signature_for ignoring_subscriberonly => (
+    method => Object,
+    positional => [ CodeRef ],
+);
 sub ignoring_subscriberonly($self,$code) {
-    state $check = compile(Object,CodeRef); $check->(@_);
-
     local $let_it_pass = 1;
     return $code->($self);
 }
@@ -49,7 +51,7 @@ Sietima::Role::SubscriberOnly - base role for "closed" lists
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -79,9 +81,10 @@ C<Sietima::Role::SubscriberOnly::Moderate> >> for useable roles.
 This method will be invoked from L<< C<munge_mail>|Sietima/munge_mail
 >> whenever an email is processed that does not come from one of the
 list's subscribers. This method should return a (possibly empty) list
-of L<< C<Sietima::Message> >> objects, just like C<munge_mail>. It can
-also have side-effects, like forwarding the email to the owner of the
-list.
+of L<< C<Sietima::Message> >> objects, just like C<munge_mail>, for
+example to forward the email to the owner of the list. It can also
+have side-effects, like storing a copy of the message to approve
+later.
 
 =head1 METHODS
 
@@ -111,7 +114,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,9 +6,18 @@ ROADMAP:
 TODO's:
 -------
 
-more compact gui
-
-better optics on mac
 mod matrix
+  - other functions
+  - rotation matrix factors and values
+
 test optics on windows
+better optics on mac
+
+
+??
+
 undo setting changes
+
+???
+
+more compact gui

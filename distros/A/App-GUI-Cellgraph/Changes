@@ -1,3 +1,26 @@
+0.25 2023-02-23  lichtkind
+-------
+    * = colors
+    * ~ moved config to ~/.config/cellgraph
+    * ! switch current state on color panel now moves also HSL values
+    * ! grid computation bug
+    * ! fixed progressbar
+
+0.2  2023-01-30  lichtkind
+-------
+    * = colors
+    * * new Color panel with many functions (see Color sections in POD)
+    * + setting changes trigger only a sketch for faster interactions
+    * + draw button for full images
+    * ! rewritten eval compiler (didnt worked at all for many edge cases)
+
+0.1  2022-12-25  lichtkind
+-------
+    * = multi level fix
+    * + bring back cell mobility with previous fixed feature set
+    * ? update docs
+    * ! crashes on most buttons to get related rules
+
 0.03  2022-12-19  lichtkind
 -------
     * = feature expand
@@ -14,3 +37,8 @@
     * + changeable action propagation rules fixed with output size = 3
     * + changeable grid type and size
     * + changeable starting row with repeat function
+
+
+TODO:
+
+  meta settings for action rules

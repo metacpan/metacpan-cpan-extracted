@@ -47,7 +47,7 @@ sub rmdif
 	open(my $in, $filename) or croak "$filename: $!";
 
 	# Clone the input args and add to it:
-	$args = \%{ $args // {} };
+	$args = { %{$args // {}} };
 	$args->{filename} = $filename;
 	$args->{EOF_REGEX} = qr/^END$/;
 
@@ -198,7 +198,7 @@ The function C<rmdf> is an alias for C<rmdif>.
 	# Read input matrix into an arrayref:
 	$mdif_data = rmdif('input-file.mdf');
 
-It returns the an arrayref of hashrefs, as follows:
+It returns an arrayref of hashrefs, as follows:
 
 	[ 
 		# Component 1

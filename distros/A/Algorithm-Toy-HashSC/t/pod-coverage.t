@@ -1,8 +1,9 @@
 #!perl
-use 5.010000;
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
+
+unless ( $ENV{RELEASE_TESTING} ) {
+    plan( skip_all => "Author tests not required for installation" );
+}
 
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
@@ -18,6 +19,4 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
   if $@;
 
-# probably should figure up how to Pod::Coverage-compatible-POD up the not-
-# BUILD attribute thingies here...
 all_pod_coverage_ok();

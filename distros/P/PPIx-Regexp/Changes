@@ -1,3 +1,11 @@
+0.088		2023-02-28	T. R. Wyant
+    Remove support for (**{ ... code ... }).  This was introduced in
+    Perl 5.37.8 along with a single-splat version.  The double-splat
+    version was removed without deprecation in Perl 5.37.9, so it is
+    being removed without deprecation here as well, per my stated policy
+    about development functionality.  The single-splat version still
+    exists (and is documented) in Perl 5.37.9, and in this package.
+
 0.087		2023-01-28	T. R. Wyant
     Add support for code in optimized regex, a.k.a. (*{...}).  This
     involved making the recognition of backtracking control more

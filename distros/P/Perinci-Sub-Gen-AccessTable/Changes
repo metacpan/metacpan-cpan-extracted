@@ -1,3 +1,10 @@
+0.592   2023-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [deprecation] Rename table_spec argument to table_def (old name
+          is still supported but deprecated and will be removed in the
+          future).
+
+
 0.591   2023-02-12  Released-By: PERLANCAR; Urgency: medium
 
         - Support TableData object as data source.

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.71';
+$RT::Client::REST::Forms::VERSION = '0.72';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -262,7 +262,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head2 METHODS
 
@@ -300,7 +300,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

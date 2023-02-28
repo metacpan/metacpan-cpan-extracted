@@ -1,14 +1,14 @@
+Build.PL
 Changes
+lib/Algorithm/Toy/HashSC.pm
 LICENSE
 MANIFEST
-Makefile.PL
+META.json
+META.yml
 README
 SIGNATURE
-lib/Algorithm/Toy/HashSC.pm
 t/00-load.t
 t/hashsc.t
-t/manifest.t
 t/pod-coverage.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE    Added here by Module::Build

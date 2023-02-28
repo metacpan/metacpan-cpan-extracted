@@ -10,7 +10,7 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -89,6 +89,6 @@ Based on [Locale::US](https://metacpan.org/pod/Locale%3A%3AUS) - Copyright (c) 2
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2012-2020 Nigel Horne.
+Copyright 2012-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

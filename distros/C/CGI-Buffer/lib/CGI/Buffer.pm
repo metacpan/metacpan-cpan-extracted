@@ -1,5 +1,6 @@
 package CGI::Buffer;
 
+use 5.14.0;	# For IO::Compress::Brotli
 use strict;
 use warnings;
 
@@ -16,18 +17,18 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =cut
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 =head1 SYNOPSIS
 
 CGI::Buffer verifies the HTML that you produce by passing it through
 C<HTML::Lint>.
 
-CGI::Buffer optimises FCGI programs by reducing, filtering and compressing
+CGI::Buffer optimises CGI programs by reducing, filtering and compressing
 output to speed up the transmission and by nearly seamlessly making use of
 client and server caches.
 
@@ -61,7 +62,7 @@ To temporarily prevent the use of server-side caches, for example whilst
 debugging before publishing a code change, set the NO_CACHE environment variable
 to any non-zero value.
 If you get errors about Wide characters in print it means that you've
-forgotten to emit pure HTML on non-ascii characters.
+forgotten to emit pure HTML on non-ASCII characters.
 See L<HTML::Entities>.
 As a hack work around you could also remove accents and the like by using
 L<Text::Unidecode>,
@@ -99,7 +100,7 @@ BEGIN {
 
 	if((!defined($ENV{'SERVER_PROTOCOL'})) ||
 	  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.0')) {
-	  	$generate_etag = 0;
+		$generate_etag = 0;
 	}
 }
 
@@ -115,13 +116,14 @@ END {
 		if($ENV{'HTTP_IF_MODIFIED_SINCE'}) {
 			$logger->debug("HTTP_IF_MODIFIED_SINCE: $ENV{HTTP_IF_MODIFIED_SINCE}");
 		}
-		$logger->debug("Generate_etag = $generate_etag", "Generate_304 = $generate_304",
+		$logger->debug("Generate_etag = $generate_etag, ",
+			"Generate_304 = $generate_304, ",
 			"Generate_last_modified = $generate_last_modified");
 
 		# This will cause everything to get flushed and prevent
 		# outputs to the logger.  We need to do that now since
 		# if we leave it to Perl to delete later we may get
-		# a mesage that Log4Perl::init() hasn't been called
+		# a message that Log4perl::init() hasn't been called
 		$logger = undef;
 	}
 	select($CGI::Buffer::old_buf);
@@ -256,7 +258,11 @@ END {
 				$body = '';
 				foreach my $error ($lint->errors) {
 					my $errtext = $error->where() . ': ' . $error->errtext() . "\n";
-					warn($errtext);
+					if($logger) {
+						$logger->warn($errtext);
+					} else {
+						warn($errtext);
+					}
 					$body .= $errtext;
 				}
 			}
@@ -279,7 +285,7 @@ END {
 	# includes the mtime field which changes thus causing a different
 	# Etag to be generated
 	if($ENV{'SERVER_PROTOCOL'} &&
-	  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') &&
+	  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 	  $generate_etag && defined($body)) {
 		# encode to avoid "Wide character in subroutine entry"
 		require Encode;
@@ -348,15 +354,17 @@ END {
 						push @o, 'X-Cache: HIT';
 						push @o, 'X-Cache-Lookup: HIT';
 					}
+				} elsif($logger) {
+					$logger->warn("Error retrieving data for key $key");
 				} else {
-					carp "Error retrieving data for key $key";
+					carp(__PACKAGE__, ": error retrieving data for key $key");
 				}
 			}
 
 			# Nothing has been output yet, so we can check if it's
 			# OK to send 304 if possible
 			if($send_body && $ENV{'SERVER_PROTOCOL'} &&
-			  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') &&
+			  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 			  $generate_304 && ($status == 200)) {
 				if($ENV{'HTTP_IF_MODIFIED_SINCE'}) {
 					_check_modified_since({
@@ -365,7 +373,7 @@ END {
 					});
 				}
 			}
-			if($send_body && ($status == 200)) {
+			if($send_body && ($status == 200) && defined($cache_hash)) {
 				$body = $cache_hash->{'body'};
 				if(!defined($body)) {
 					# Panic
@@ -378,16 +386,17 @@ END {
 					$cache->remove($key);
 					if($logger) {
 						$logger->error("Can't retrieve body for key $key");
+						$logger->warn($body);
 					} else {
 						carp "Can't retrieve body for key $key";
+						warn($body);
 					}
-					warn($body);
 					$send_body = 0;
 					$status = 500;
 				}
 			}
 			if($send_body && $ENV{'SERVER_PROTOCOL'} &&
-			  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') &&
+			  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 			  ($status == 200)) {
 				if($ENV{'HTTP_IF_NONE_MATCH'}) {
 					if(!defined($etag)) {
@@ -532,6 +541,17 @@ END {
 	} elsif($info) {
 		my $host_name = $info->host_name();
 		push @o, ("X-Cache: MISS from $host_name", "X-Cache-Lookup: MISS from $host_name");
+		if($generate_last_modified) {
+			if(my $age = _my_age()) {
+				push @o, 'Last-Modified: ' . HTTP::Date::time2str($age);
+			}
+		}
+		if($ENV{'HTTP_IF_MODIFIED_SINCE'} && ($status != 304) && $generate_304) {
+			_check_modified_since({
+				since => $ENV{'HTTP_IF_MODIFIED_SINCE'},
+				modified => _my_age()
+			});
+		}
 	} else {
 		push @o, ('X-Cache: MISS', 'X-Cache-Lookup: MISS');
 	}
@@ -606,7 +626,7 @@ END {
 				open(my $fout, '>>', '/tmp/NJH');
 				print $fout "$widemess:\n";
 				print $fout $mess;
-				print $fout 'x' x 40 . "\n";
+				print $fout 'x' x 40, "\n";
 				close $fout;
 			}
 		}
@@ -716,6 +736,7 @@ sub _optimise_content {
 	$body =~ s/\s+<\/li>/<\/li>/gis;
 	$body =~ s/\<\/option\>\s+\<option/\<\/option\>\<option/gis;
 	$body =~ s/<title>\s*(.+?)\s*<\/title>/<title>$1<\/title>/is;
+	$body =~ s/<\/center>\s+<center>/ /gis;
 }
 
 # Create a key for the cache
@@ -1186,7 +1207,7 @@ CGI::Buffer is not compatible with FastCGI.
 
 I advise adding CGI::Buffer as the last use statement so that it is
 cleared up first.  In particular it should be loaded after
-L<Log::Log4Perl>, if you're using that, so that any messages it
+L<Log::Log4perl>, if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 CGI::Buffer;
 
@@ -1199,7 +1220,7 @@ your bug as I make changes.
 
 =head1 SEE ALSO
 
-HTML::Packer, HTML::Lint
+L<HTML::Packer>, L<HTML::Lint>
 
 =head1 SUPPORT
 
@@ -1211,24 +1232,31 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/CGI-Buffer>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Buffer>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Buffer>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * CPANTS
 
-L<http://annocpan.org/dist/CGI-Buffer>
+L<http://cpants.cpanauthors.org/dist/CGI-Buffer>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=CGI-Buffer>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Buffer>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/CGI-Buffer/>
+L<http://deps.cpantesters.org/?module=CGI::Buffer>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1246,7 +1274,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2018 Nigel Horne,
+The rest of the program is Copyright 2011-2023 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

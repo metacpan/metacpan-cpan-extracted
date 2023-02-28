@@ -1,3 +1,10 @@
+1.05        2023-02-22
+- Fixed POD error from using UTF8 char without setting =encoding (ticket 144709)
+- Fixed minor undefined warning bug (ticket 145506)
+- Fixed spelling and grammar issues in the documentation
+- Removed handwritten META.yml in favor of EU::MM generated META.yml
+- Removed support for Module::Build in favor of ExtUtils::MakeMaker
+
 1.04        2022-10-08
 
 - Merged "CHANGES" and "ChangeLog" into "Changes".

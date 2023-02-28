@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-13'; # DATE
+our $DATE = '2022-12-14'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/TextWrapUtils/textwrap",
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Wrap (fold) text using one of several Perl modules
+# ABSTRACT: Wrap (fold) paragraphs in text using one of several Perl modules
 # PODNAME: textwrap
 
 __END__
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-textwrap - Wrap (fold) text using one of several Perl modules
+textwrap - Wrap (fold) paragraphs in text using one of several Perl modules
 
 =head1 VERSION
 
-This document describes version 0.002 of textwrap (from Perl distribution App-TextWrapUtils), released on 2022-12-13.
+This document describes version 0.005 of textwrap (from Perl distribution App-TextWrapUtils), released on 2022-12-14.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ C<*> marks required options.
 
 Default value:
 
- "Text::Wrap"
+ "Text::ANSI::Util"
 
 Valid values:
 

@@ -24,14 +24,10 @@ package App::SeismicUnixGui::sunix::model::sufdmod2;
 
  Required Parameters:							
  <vfile		  file containing velocity[nx][nz]
- L_SU:
- 	data_in 
- 		suffix_type= bin
+SeismicUnixGui: data_in  suffix_type= bin
  
  >wfile	file containing waves[nx][nz] for time steps
- L_SU:
- 	data_out
- 		suffix_type= bin
+SeismicUnixGui: data_out suffix_type= bin
  
  nx=			number of x samples (2nd dimension)		
  nz=			number of z samples (1st dimension)		
@@ -64,16 +60,13 @@ package App::SeismicUnixGui::sunix::model::sufdmod2;
  vsx=			x coordinate of vertical line of seismograms	
  hsz=			z coordinate of horizontal line of seismograms	
  vsfile=		output file for vertical line of seismograms[nz][nt]
-  L_SU:
- 	vsfile goes to $DATA_SEIMICS_BIN
+ SeismicUnixGui: vsfile goes to $DATA_SEIMICS_BIN
  	
  hsfile=		output file for horizontal line of seismograms[nx][nt]
- L_SU:
- 	hsfile goes to $DATA_SEIMICS_BIN
+  SeismicUnixGui: hsfile goes to $DATA_SEIMICS_BIN
  	
  ssfile=		output file for source point seismograms[nt]
- L_SU:
- 	ssfile goes to $DATA_SEIMICS_BIN
+ SeismicUnixGui:  ssfile goes to $DATA_SEIMICS_BIN
  	
  verbose=0		=1 for diagnostic messages, =2 for more		
  abs=1,1,1,1		absorbing boundary conditions on top,left,bottom,right
@@ -701,7 +694,6 @@ sub tmax {
 	my ( $self, $tmax ) = @_;
 	if ( $tmax ne $empty_string ) {
 		
-		print("sufdmod2, tmax: $tmax \n");
 		$sufdmod2->{_tmax} = $tmax;
 		$sufdmod2->{_note} = $sufdmod2->{_note} . ' tmax=' . $sufdmod2->{_tmax};
 		$sufdmod2->{_Step} = $sufdmod2->{_Step} . ' tmax=' . $sufdmod2->{_tmax};

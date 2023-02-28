@@ -4,7 +4,7 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -47,6 +47,7 @@
             "Test::Harness" : "2.50",
             "Test::More" : "0.98",
             "Text::ParseWords" : "3.1",
+            "filetest" : "0",
             "if" : "0",
             "parent" : "0",
             "perl" : "5.010001",
@@ -69,6 +70,6 @@
       },
       "x_MailingList" : "https://groups.google.com/group/ack-users"
    },
-   "version" : "v3.6.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v3.7.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

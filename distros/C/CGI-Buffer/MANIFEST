@@ -4,8 +4,7 @@ lib/CGI/Buffer.pm
 LICENSE
 Makefile.PL
 MANIFEST
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST.SKIP
 README
 README.md
 src/testit
@@ -13,10 +12,13 @@ t/00-load.t
 t/apoc.t
 t/boiler.t
 t/changes.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/gv.t
 t/is_cached.t
 t/js.t
@@ -32,12 +34,14 @@ t/noplan.t
 t/output.t
 t/pod-cm.t
 t/pod.t
+t/pod_spelling.t
 t/port.t
 t/prereq.t
 t/snippets.t
-t/spelling.t
 t/strict.t
 t/too_late.t
 t/unused.t
 t/used.t
 t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

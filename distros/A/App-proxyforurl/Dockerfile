@@ -5,15 +5,17 @@
 FROM alpine:3.5
 MAINTAINER jhthorsen@cpan.org
 
-RUN apk add -U perl perl-io-socket-ssl \
-  && apk add -t builddeps build-base curl perl-dev wget \
-  && curl -L https://github.com/jhthorsen/app-proxyforurl/archive/master.tar.gz | tar xvz \
-  && curl -L https://cpanmin.us | perl - App::cpanminus \
-  && cpanm -M https://cpan.metacpan.org --installdeps ./app-proxyforurl-master \
-  && apk del builddeps curl \
-  && rm -rf /root/.cpanm /var/cache/apk/*
+RUN apk add --no-cache curl openssl perl perl-io-socket-ssl perl-net-ssleay wget \
+ && apk add --no-cache --virtual builddeps build-base perl-dev \
+ && curl -L https://github.com/jhthorsen/app-proxyforurl/archive/main.tar.gz | tar xvz \
+ && curl -L https://cpanmin.us | perl - App::cpanminus \
+ && cpanm -M https://cpan.metacpan.org --installdeps ./app-proxyforurl-main \
+ && apk del builddeps \
+ && rm -rf /root/.cpanm /var/cache/apk/*
 
 ENV MOJO_MODE production
+ENV PROXYFORURL_TEMPLATES=/templates
+
 EXPOSE 8080
 
-ENTRYPOINT ["/app-proxyforurl-master/script/proxyforurl", "prefork", "-l", "http://*:8080"]
+ENTRYPOINT ["/app-proxyforurl-main/script/proxyforurl", "prefork", "-l", "http://*:8080"]

@@ -1,0 +1,44 @@
+Test::NoTty
+===========
+
+Test your code that handles failure to open /dev/tty
+
+On a *nix system the special file /dev/tty always exists, and opening it gives
+you a(nother) file handle attached to your controlling terminal. This is useful
+if you want direct user input, such as entering passwords or passphrases, even
+if STDIN or STDOUT are redirected.
+
+But what happens if your code is running non-interactively? Such as servers,
+cron jobs, or just CPAN testers? /dev/tty still exists, but opening it will
+fail. Your tests need to cover this case. But how do you test your tests as you
+write them, when you're running them in a terminal session?
+
+That's the purpose of this module. With it you can interactively run code
+without a controlling terminal, to test those code paths.
+
+INSTALLATION
+
+The easiest way to install this module is to run
+
+     cpan .
+
+in the unpacked the source directory.
+
+This automates the following steps:
+
+     perl Makefile.PL
+     ... install the dependencies listed ...
+     make
+     make test
+     make install
+
+COPYRIGHT
+
+This distribution was written for Humanstate Sàrl by Nicholas Clark
+
+It is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. If you would like to contribute
+documentation, features, bug fixes, or anything else then please raise
+an issue / pull request:
+
+    https://github.com/Humanstate/test-notty

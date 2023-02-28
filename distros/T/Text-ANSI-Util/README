@@ -2,8 +2,8 @@ NAME
     Text::ANSI::Util - Routines for text containing ANSI color codes
 
 VERSION
-    This document describes version 0.233 of Text::ANSI::Util (from Perl
-    distribution Text-ANSI-Util), released on 2021-08-08.
+    This document describes version 0.234 of Text::ANSI::Util (from Perl
+    distribution Text-ANSI-Util), released on 2023-02-27.
 
 SYNOPSIS
      use Text::ANSI::Util qw(
@@ -93,9 +93,6 @@ DESCRIPTION
         "\e[1;0m" or "\e[31;47;0m" is not recognized, only "\e[0m" is. I
         believe this should not be a problem with most real-world text out
         there.
-
-CONTRIBUTOR
-    Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
 FUNCTIONS
   ta_add_color_resets(@text) => LIST
@@ -309,13 +306,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Text-ANSI-Util>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     String::Pad provides padding function for strings that do not contain
     ASCII escape codes nor wide characters.
@@ -332,10 +322,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2021, 2016, 2015, 2014, 2013 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

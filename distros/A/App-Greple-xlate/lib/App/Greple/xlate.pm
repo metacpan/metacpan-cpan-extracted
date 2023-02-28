@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 =encoding utf-8
 
@@ -83,6 +83,13 @@ Specify the translation engine to be used.  You don't have to use this
 option because module C<xlate::deepl> declares it as
 C<--xlate-engine=deepl>.
 
+=item B<--xlate-labor>
+
+Insted of calling translation engine, you are expected to work for.
+After preparing text to be translated, they are copied to the
+clipboard.  You are expected to paste them to the form, copy the
+result to the clipboard, and hit return.
+
 =item B<--xlate-to> (Default: C<JA>)
 
 Specify the target language.  You can get available languages by
@@ -148,10 +155,16 @@ Set the whole text of the file as a target area.
 B<xlate> module can store cached text of translation for each file and
 read it before execution to eliminate the overhead of asking to
 server.  With the default cache strategy C<auto>, it maintains cache
-data only when the cache file exists for target file.  If the
-corresponding cache file does not exist, it does not create it.
+data only when the cache file exists for target file.
 
 =over 7
+
+=item --refresh
+
+The <--refresh> option can be used to initiate cache management or to
+refresh all existing cache data. Once executed with this option, a new
+cache file will be created if one does not exist and then
+automatically maintained afterward.
 
 =item --xlate-cache=I<strategy>
 
@@ -168,6 +181,10 @@ Create empty cache file and exit.
 =item C<always>, C<yes>, C<1>
 
 Maintain cache anyway as far as the target is normal file.
+
+=item C<refresh>
+
+Maintain cache but don't read existing one.
 
 =item C<never>, C<no>, C<0>
 
@@ -224,7 +241,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2023 Kazumasa Utashiro.
+Copyright © 2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -324,8 +341,6 @@ sub normalize {
 	    =~ s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//gr
 	    =~ s/\s+/ /gr
     }pmger;
-
-
 }
 
 sub postgrep {
@@ -437,7 +452,9 @@ sub begin {
 	    }
 	    die "skip $current_file";
 	}
-	read_cache $cache;
+	if ($cache_method ne 'refresh') {
+	    read_cache $cache;
+	}
     }
 }
 
@@ -471,7 +488,8 @@ builtin xlate-cache:s      $cache_method
 builtin xlate-engine=s     $xlate_engine
 builtin xlate-dryrun       $dryrun
 
-builtin deepl-auth-key=s   $__PACKAGE__::deepl::auth_key
+builtin deepl-auth-key=s   $App::Greple::xlate::deepl::auth_key
+builtin deepl-method=s     $App::Greple::xlate::deepl::method
 
 option default --face +E --ci=A
 
@@ -484,6 +502,9 @@ option --xlate-color \
 	--end      &__PACKAGE__::end
 option --xlate --xlate-color --color=never
 option --xlate-fold --xlate --xlate-fold-line
+option --xlate-labor --xlate --deepl-method=clipboard
+
+option --refresh --xlate-cache=refresh
 
 option --match-entire    --re '\A(?s).+\z'
 option --match-paragraph --re '^(.+\n)+'

@@ -1,5 +1,26 @@
 Revision history for OpenAI-API
 
+0.14    2024-02-28
+        Update dependencies.
+
+0.13    2023-02-27
+        OpenAI::API::Request::* modules
+
+0.12    2023-02-27
+        Require defined OPENAI_API_KEY.
+
+0.11    2023-02-24
+        Test exceptions.
+
+0.10    2023-02-22
+        Improve documentation.
+
+0.09    2023-02-22
+        Minor changes, improve documentation.
+
+0.08    2023-02-22
+        New methods, update documentation and tests.
+
 0.07    2023-01-03
         Fix minimum perl version (thanks RAZ).
 

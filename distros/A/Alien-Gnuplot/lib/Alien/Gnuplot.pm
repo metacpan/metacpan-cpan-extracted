@@ -102,13 +102,13 @@ riskier -- it involves waiting for the unknown executable to complete.
 
 =head1 REPOSITORIES
 
-Gnuplot's main home page is at L<http://www.gnuplot.info>.
+Gnuplot's main home page is at L<https://gnuplot.sourceforge.net/>.
 
-Alien::Gnuplot development is at L<http://github.com/drzowie/Alien-Gnuplot>.
+Alien::Gnuplot development is at L<https://github.com/drzowie/Alien-Gnuplot>.
 
 A major client module for Alien::Gnuplot is PDL::Graphics::Gnuplot, which
-can be found at L<http://github.com/drzowie/PDL-Graphics-Gnuplot>.
-PDL is at L<http://pdl.perl.org>.
+can be found at L<https://github.com/PDLPorters/PDL-Graphics-Gnuplot>.
+PDL is at L<https://pdl.perl.org/>.
 
 =head1 AUTHOR
 
@@ -131,17 +131,21 @@ package Alien::Gnuplot;
 use strict;
 our $DEBUG = 0; # set to 1 for some debugging output
 
+use parent qw( Alien::Base );
+
 use File::Spec;
 use File::Temp qw/tempfile/;
+use File::Which;
 use Time::HiRes qw/usleep/;
 use POSIX ":sys_wait_h";
 use Fcntl qw/SEEK_SET/;
+use Env qw( @PATH );
 
 # VERSION here is for CPAN to parse -- it is the version of the module itself.  But we
 # overload the system VERSION to compare a required version against gnuplot itself, rather
 # than against the module version.
 
-our $VERSION = '1.034';
+our $VERSION = '1.040';
 
 # On install, try to make sure at least this version is present.
 our $GNUPLOT_RECOMMENDED_VERSION = '4.6';  
@@ -157,44 +161,61 @@ our %colors;
 sub VERSION {
     my $module =shift;
     my $req_v = shift;
+    # Need this line when using
+    #
+    #   use Alien::Gnuplot 4.4;
+    #
+    # to check Gnuplot version.
+    $module->load_gnuplot unless $version; # already have version
     unless($req_v <= $version) {
 	die qq{
 
 Alien::Gnuplot: Found gnuplot version $version, but you requested $req_v. 
 You should upgrade gnuplot, either by reinstalling Alien::Gnuplot or 
-getting it yourself from L<http://www.gnuplot.info>.
+getting it yourself from L<https://gnuplot.sourceforge.net/>.
 
 };
     }
 }
 
-
-sub load_gnuplot {
+sub exe {
 ##############################
 # Search the path for the executable
 #
+    my ($class) = @_;
+    $class ||= __PACKAGE__;
+
     my $exec_path;
+    # GNUPLOT_BINARY overrides at runtime
     if($ENV{'GNUPLOT_BINARY'}) {
 	$exec_path = $ENV{'GNUPLOT_BINARY'};
     } else {
-	my $exec_str = "gnuplot";
-	my @path = File::Spec->path();
-	for my $dir(@path) {
-	    $exec_path = File::Spec->catfile( $dir, $exec_str );
-	    last if( -x $exec_path );
-	    $exec_path .= ".exe";
-	    last if( -x $exec_path );
-	}
+	local $ENV{PATH} = $ENV{PATH};
+	unshift @PATH, $class->bin_dir;
+	$exec_path = which("gnuplot");
     }
-    
+
+    return $exec_path;
+}
+
+sub load_gnuplot {
+  my ($class) = @_;
+  $class ||= __PACKAGE__;
+
+  my $exec_path = $class->exe;
+  $class->check_gnuplot($exec_path);
+}
+
+sub check_gnuplot {
+    my $exec_path = pop @_;
+
     unless(-x $exec_path) { 
 	die q{
 Alien::Gnuplot: no executable gnuplot found!  If you have gnuplot,
 you can put its exact location in your GNUPLOT_BINARY environment 
 variable or make sure your PATH contains it.  If you do not have
 gnuplot, you can reinstall Alien::Gnuplot (and its installation 
-script will try to install gnuplot via one of several standard 
-package managers) or get it yourself from L<http://www.gnuplot.info>.
+script will try to install gnuplot) or get it yourself from L<https://gnuplot.sourceforge.net/>.
 };
     }
     
@@ -335,8 +356,11 @@ I could not parse a version number from its output.  Sorry, I give up.
     @colors = sort keys %colors;
 }
 
-
-load_gnuplot();
+sub import {
+    my $pkg = shift;
+    $pkg->SUPER::import(@_);
+    $pkg->load_gnuplot();
+};
 
 
 1;

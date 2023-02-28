@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::HTTPClient;
-$RT::Client::REST::HTTPClient::VERSION = '0.71';
+$RT::Client::REST::HTTPClient::VERSION = '0.72';
 use parent 'LWP::UserAgent';
 
 
@@ -47,7 +47,7 @@ RT::Client::REST::HTTPClient - Subclass LWP::UserAgent in order to support basic
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 METHODS
 
@@ -69,7 +69,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

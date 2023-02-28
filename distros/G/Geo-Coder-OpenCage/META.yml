@@ -6,6 +6,7 @@ build_requires:
   LWP::Protocol::https: '6.10'
   LWP::UserAgent: '6.55'
   Net::Ping: '2.73'
+  Scalar::Util: '0'
   Test::Exception: '0.32'
   Test::More: '0.92'
   Test::Pod: '1.51'
@@ -13,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +23,7 @@ name: Geo-Coder-OpenCage
 provides:
   Geo::Coder::OpenCage:
     file: lib/Geo/Coder/OpenCage.pm
-    version: '0.34'
+    version: '0.35'
 requires:
   Carp: '0'
   Cpanel::JSON::XS: '4.21'
@@ -34,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/OpenCageData/perl-Geo-Coder-OpenCage
   repository: https://github.com/OpenCageData/perl-Geo-Coder-OpenCage.git
-version: '0.34'
-x_generated_by_perl: v5.30.3
+version: '0.35'
+x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

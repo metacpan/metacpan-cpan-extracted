@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/TextWrapUtils.pm','script/textwrap'];
+my $filenames = ['lib/App/TextWrapUtils.pm','script/nowrap','script/nowrap-clipboard','script/textunwrap','script/textunwrap-clipboard','script/textwrap','script/textwrap-clipboard'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

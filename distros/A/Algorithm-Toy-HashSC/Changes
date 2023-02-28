@@ -1,5 +1,7 @@
 Revision history for Algorithm-Toy-HashSC
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.02    2023-02-23
+		Modernize to Module::Build, Test2, etc
 
+0.01    2015-09-19
+        First version, released on an unsuspecting world.

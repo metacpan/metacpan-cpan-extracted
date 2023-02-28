@@ -1,5 +1,10 @@
 Revision history for UUID-FFI
 
+0.11      2023-02-23 19:26:50 -0700
+  - Alien::libuuid is now a prerequsite listed in META.json.  If it is not
+    needed it will be removed in the configure stage instead of added if
+    it is needed (gh#10)
+
 0.10      2021-05-10 06:53:27 -0600
   - Check for required symbols, and require
     Alien::libuuid 0.05 if an appropriate system

@@ -16,7 +16,7 @@ has url => sub { die 'missing url' };
 has ua => sub { Mojo::UserAgent->new };
 has 'connected_o';
 
-our $VERSION = "v0.0.34";
+our $VERSION = "v0.0.36";
 
 sub new ($class, $url) {
     my $self = $class->SUPER::new(url => $url);

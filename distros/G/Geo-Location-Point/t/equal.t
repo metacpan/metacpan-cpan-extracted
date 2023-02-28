@@ -33,7 +33,7 @@ DISTANCE: {
 	ok($loc1 == $loc2);
 	ok($loc1 == $loc1);
 	ok($loc1 != $loc3);
-	ok($loc1->equals($loc2));
+	ok($loc1->equal($loc2));
 	ok($loc3 != $loc2);
 	ok($loc3->not_equal($loc2));
 }

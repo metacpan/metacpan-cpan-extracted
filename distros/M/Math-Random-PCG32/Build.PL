@@ -6,7 +6,7 @@ use Config;
 use Module::Build;
 
 # for irand64 and probably also to feed 64-bit seed values into ->new
-if (!$Config{use64bitint}) {
+if ( !$Config{use64bitint} ) {
     print "need perl compiled with use64bitint=define\n";
     exit(0);
 }
@@ -25,10 +25,7 @@ my $builder = Module::Build->new(
     },
     requires      => { 'perl' => '5.014000', },
     test_requires => {
-        # http://www.cpantesters.org/cpan/report/67976f18-c32b-11e8-a869-046817727b86
-        'Algorithm::Diff' => 0,
-        'Test::Most'      => 0,
-        'Test::More'      => '0.88',     # done_testing
+        'Test2::V0'             => '0.000060',
     },
     sign           => 1,
     create_readme  => 0,
@@ -45,7 +42,7 @@ my $builder = Module::Build->new(
         },
     },
     meta_merge => {
-        resources => { repository => 'https://github.com/thrig/Math-Random-PCG32' }
+        resources => { repository => 'https://thrig.me/src/Math-Random-PCG32.git' }
     },
 );
 

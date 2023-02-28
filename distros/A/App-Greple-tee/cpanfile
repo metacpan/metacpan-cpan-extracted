@@ -7,3 +7,8 @@ on 'test' => sub {
     requires 'Test::More', '0.98';
 };
 
+on 'develop' => sub {
+    recommends 'App::Greple::xlate';
+    recommends 'App::Greple::subst::desumasu';
+};
+

@@ -22,6 +22,7 @@ BEGIN
     use Module::Generic::Array;
     use overload (
         '""'    => 'as_string',
+        'bool'  => sub{1},
         '+'     => sub{ &_op_overload( @_, '+' ) },
         '-'     => sub{ &_op_overload( @_, '-' ) },
         '*'     => sub{ &_op_overload( @_, '*' ) },
@@ -294,7 +295,7 @@ sub _op_overload
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8

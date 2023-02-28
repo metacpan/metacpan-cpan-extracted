@@ -1,6 +1,6 @@
 package App::SeismicUnixGui;
 
-$VERSION = '0.81.4';
+$VERSION = '0.82.0';
 use strict;
 use warnings;
 
@@ -18,4 +18,18 @@ and signal processing.
 Perl/Tk is a mature, well-documented and free, 
 object-oriented graphical user interface for Perl. 
 
-1;
+=head2 EXTRA PACKAGES
+
+If you want to additional fortran and c packages
+run the following instruction post-installation:
+
+sudo bash post_install_scripts.sh
+
+If you can not find this file, then look for it with any of the
+these instructions:
+
+A.
+  find / -path */App/SeismicUnixGui/script/post_install_scripts.sh 2>/dev/null
+
+B.
+  locate post_install_scripts.sh

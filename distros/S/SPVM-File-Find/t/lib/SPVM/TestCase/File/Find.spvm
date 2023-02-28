@@ -1,0 +1,197 @@
+class TestCase::File::Find {
+  use File::Find;
+  use StringList;
+  use Sort;
+  use Array;
+  use Sys::IO;
+  
+  static method test : int () {
+    
+    {
+      my $dir = "lib";
+      
+      my $files_list = StringList->new;
+      
+      File::Find->find([$files_list : StringList] method : void ($dir : string, $file_base_name : string) {
+        my $file = $dir;
+        if ($file_base_name) {
+          $file .= "/$file_base_name";
+        }
+        
+        $files_list->push($file);
+        
+      }, $dir);
+      
+      my $files = $files_list->to_array;
+      
+      Sort->sort_string_asc($files);
+      
+      my $files_expected = [
+        "lib",
+        "lib/SPVM",
+        "lib/SPVM/File",
+        "lib/SPVM/File/Find",
+        "lib/SPVM/File/Find.pm",
+        "lib/SPVM/File/Find.spvm",
+        "lib/SPVM/File/Find/Handler.pm",
+        "lib/SPVM/File/Find/Handler.spvm"
+      ];
+      
+      unless (Array->equals_string($files, $files_expected)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dir = "lib/";
+      
+      my $files_list = StringList->new;
+      
+      File::Find->find([$files_list : StringList] method : void ($dir : string, $file_base_name : string) {
+        my $file = $dir;
+        if ($file_base_name) {
+          $file .= "/$file_base_name";
+        }
+        
+        $files_list->push($file);
+        
+      }, $dir);
+      
+      my $files = $files_list->to_array;
+      
+      Sort->sort_string_asc($files);
+      
+      my $files_expected = [
+        "lib",
+        "lib/SPVM",
+        "lib/SPVM/File",
+        "lib/SPVM/File/Find",
+        "lib/SPVM/File/Find.pm",
+        "lib/SPVM/File/Find.spvm",
+        "lib/SPVM/File/Find/Handler.pm",
+        "lib/SPVM/File/Find/Handler.spvm"
+      ];
+      
+      unless (Array->equals_string($files, $files_expected)) {
+        return 0;
+      }
+    }
+
+    {
+      my $cwd = Cwd->getcwd;
+      
+      my $dir = "$cwd/lib";
+      
+      my $files_list = StringList->new;
+      
+      File::Find->find([$files_list : StringList] method : void ($dir : string, $file_base_name : string) {
+        my $file = $dir;
+        if ($file_base_name) {
+          $file .= "/$file_base_name";
+        }
+        
+        $files_list->push($file);
+        
+      }, $dir);
+      
+      my $files = $files_list->to_array;
+      
+      Sort->sort_string_asc($files);
+      
+      my $files_expected = [
+        "$dir",
+        "$dir/SPVM",
+        "$dir/SPVM/File",
+        "$dir/SPVM/File/Find",
+        "$dir/SPVM/File/Find.pm",
+        "$dir/SPVM/File/Find.spvm",
+        "$dir/SPVM/File/Find/Handler.pm",
+        "$dir/SPVM/File/Find/Handler.spvm"
+      ];
+      
+      unless (Array->equals_string($files, $files_expected)) {
+        return 0;
+      }
+    }
+
+    {
+      my $cwd = Cwd->getcwd;
+      
+      my $dir = "$cwd/lib/";
+      
+      my $files_list = StringList->new;
+      
+      File::Find->find([$files_list : StringList] method : void ($dir : string, $file_base_name : string) {
+        my $file = $dir;
+        if ($file_base_name) {
+          $file .= "/$file_base_name";
+        }
+        
+        $files_list->push($file);
+        
+      }, $dir);
+      
+      my $files = $files_list->to_array;
+      
+      Sort->sort_string_asc($files);
+      
+      my $dir_no_slash = copy $dir;
+      Fn->shorten((mutable string)$dir_no_slash, length $dir - 1);
+      
+      my $files_expected = [
+        "$dir_no_slash",
+        "$dir_no_slash/SPVM",
+        "$dir_no_slash/SPVM/File",
+        "$dir_no_slash/SPVM/File/Find",
+        "$dir_no_slash/SPVM/File/Find.pm",
+        "$dir_no_slash/SPVM/File/Find.spvm",
+        "$dir_no_slash/SPVM/File/Find/Handler.pm",
+        "$dir_no_slash/SPVM/File/Find/Handler.spvm"
+      ];
+      
+      unless (Array->equals_string($files, $files_expected)) {
+        return 0;
+      }
+    }
+
+    {
+      Sys::IO->chdir("lib");
+      my $dir = ".";
+      
+      my $files_list = StringList->new;
+      
+      File::Find->find([$files_list : StringList] method : void ($dir : string, $file_base_name : string) {
+        my $file = $dir;
+        if ($file_base_name) {
+          $file .= "/$file_base_name";
+        }
+        
+        $files_list->push($file);
+        
+      }, $dir);
+      
+      my $files = $files_list->to_array;
+      
+      Sort->sort_string_asc($files);
+      
+      my $files_expected = [
+        ".",
+        "./SPVM",
+        "./SPVM/File",
+        "./SPVM/File/Find",
+        "./SPVM/File/Find.pm",
+        "./SPVM/File/Find.spvm",
+        "./SPVM/File/Find/Handler.pm",
+        "./SPVM/File/Find/Handler.spvm"
+      ];
+      
+      unless (Array->equals_string($files, $files_expected)) {
+        return 0;
+      }
+      Sys::IO->chdir("..");
+    }
+    
+    
+    return 1;
+  }
+}

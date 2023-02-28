@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.591 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.592 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2023-02-12.
+    2023-02-24.
 
 SYNOPSIS
     In list_countries.pl:
@@ -30,7 +30,7 @@ SYNOPSIS
          summary     => 'func summary',     # opt
          description => 'func description', # opt
          table_data  => $countries,
-         table_spec  => {
+         table_def   => {
              summary => 'List of countries',
              fields => {
                  id => {
@@ -470,12 +470,12 @@ FUNCTIONS
         (fields mentioned in sort arguments), 'filter_fields' (fields
         mentioned in filter arguments).
 
-    *   table_spec => *hash*
+    *   table_def => *hash*
 
-        Table specification.
+        Table definition.
 
         Required, unless "table_data" argument is a TableData object, in
-        which case table spec will be retrieved from the object if not
+        which case table definition will be retrieved from the object if not
         supplied.
 
         See TableDef for more details.

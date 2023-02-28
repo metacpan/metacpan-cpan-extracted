@@ -163,11 +163,11 @@ teamcity[testingStarted timestamp='2019-03-10T12:56:49.973']
 Files=17, Tests=35, TEST_MODE_STATS;
 Result: FAIL
 Test Summary Report
-testData/tests/bootstrap_failed.t         (Wstat: 256 Tests: 1 Failed: 1)
-testData/tests/die_inside_test.t          (Wstat: 65280 Tests: 1 Failed: 0)
-testData/tests/is_failed_named.t          (Wstat: 256 Tests: 1 Failed: 1)
-testData/tests/is_failed_unnamed.t        (Wstat: 256 Tests: 1 Failed: 1)
-testData/tests/subtest_is_failed_named.t  (Wstat: 256 Tests: 1 Failed: 1)
-testData/tests/subtest_is_failed_unnamed.t (Wstat: 256 Tests: 1 Failed: 1)
+testData/tests/bootstrap_failed.t         (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
+testData/tests/die_inside_test.t          (Wstat: 65280 (exited 255) Tests: 1 Failed: 0)
+testData/tests/is_failed_named.t          (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
+testData/tests/is_failed_unnamed.t        (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
+testData/tests/subtest_is_failed_named.t  (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
+testData/tests/subtest_is_failed_unnamed.t (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
 testData/tests/todo_tests.t               (Wstat: 0 Tests: 4 Failed: 0)
 testData/tests/todo_tests_unnamed.t.t     (Wstat: 0 Tests: 4 Failed: 0)

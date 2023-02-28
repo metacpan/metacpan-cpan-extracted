@@ -1,5 +1,20 @@
 Revision history for perl distribution App-proxyforurl
 
+1.01 2023-02-23T15:03:00
+ - Fix fetching correct URLs with PROXYFORURL_X_REQUEST_BASE
+
+1.00 2023-02-23T14:25:43
+ - Fix demo link in documentation
+ - Fix dnsDomainIs('microsoft.com', 'ft.com')
+ - Add support for PROXYFORURL_BRAND_NAME
+ - Add support for PROXYFORURL_BRAND_URL
+ - Add support for PROXYFORURL_TEMPLATES
+ - Add support for PROXYFORURL_X_REQUEST_BASE
+ - Changed GET /gethostbyname to POST /v1/gethostbyname
+ - Changed GET /within to POST /v1/is-in-net
+ - Changed default style to https://picocss.com
+ - Rewrote JavaScript
+
 0.12 2021-12-14T19:16:57+0900
  - Fix correct quotes for pure-min.css
 

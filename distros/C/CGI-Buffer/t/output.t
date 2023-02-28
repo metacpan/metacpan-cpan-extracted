@@ -6,12 +6,12 @@
 # TODO: check optimise_content and gzips do the *right* thing
 # TODO: check ETags are correct
 # TODO: Write a test to check that 304 is sent when a cached object
-#	is newer than the IF_MODIFIED_SINCE date
+# TODO:	Consider Test::File::Contents
 
 use strict;
 use warnings;
 
-use Test::Most tests => 103;
+use Test::Most tests => 101;
 use Compress::Zlib;
 use Test::TempDir::Tiny;
 use IO::Uncompress::Brotli;
@@ -541,10 +541,10 @@ OUTPUT: {
 			print $tmp "use lib '$_';\n";
 		}
 	}
-	print $tmp "use CGI::Buffer { optimise_content => 1, generate_etag => 0 };\n";
-	print $tmp "print \"Content-type: text/html; charset=ISO-8859-1\";\n";
-	print $tmp "print \"\\n\\n\";\n";
-	print $tmp "print \"<HTML><BODY><TABLE><TR><TD>foo</TD>  <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
+	print $tmp "use CGI::Buffer { optimise_content => 1, generate_etag => 0 };\n",
+		"print \"Content-type: text/html; charset=ISO-8859-1\";\n",
+		"print \"\\n\\n\";\n",
+		"print \"<HTML><BODY><TABLE><TR><TD>foo</TD>  <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
 
 	open($fin, '-|', "$^X -Iblib/lib " . $filename);
 
@@ -556,16 +556,13 @@ OUTPUT: {
 	close $tmp;
 
 	ok($output !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
-	ok($output !~ /^Status: 304 Not Modified/mi);
+	ok($output =~ /^Status: 304 Not Modified/mi);
 
 	($headers, $body) = split /\r?\n\r?\n/, $output, 2;
 
-	ok($headers =~ /^Content-Length:\s+(\d+)/m);
-	$length = $1;
+	ok($headers !~ /^Content-Length:/m);
 
-	ok(length($body) != 0);
-	ok(defined($length));
-	ok(length($body) == $length);
+	ok(length($body) == 0);
 
 	#......................................
 	$ENV{'HTTP_IF_MODIFIED_SINCE'} = 'This is an invalid date';

@@ -1,3 +1,7 @@
+2023.1
+    Updated dependencies versions on Test::Harness and Test::Simple. They changed output, providing exit codes. This was
+    failing tests during installation.
+
 2021.1
     Fixed problem with false-positive result on non-zero exiting without failed tests. NB: error messages sticks to the
      previous test or warning because there is no explicit test finished event.

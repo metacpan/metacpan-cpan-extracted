@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use CPAN::Meta;
 use Config;
@@ -126,17 +126,27 @@ sub get_changes {
 	return @content;
 }
 
-sub check_changes {
-	my $self = shift;
-	die "Changes appears to be empty\n" if not $self->get_changes;
-}
+sub preflight_check {
+	my ($self, %opts) = @_;
 
-sub check_meta {
-	my $self = shift;
-	my $module_name = $self->{meta}->name =~ s/-/::/gr;
+	die "Changes appears to be empty\n" if not $self->get_changes;
+
 	my $meta_version = $self->{meta}->version;
+	die "Version is still zero\n" if $meta_version eq '0.000';
+
+	die "Abstract is not set\n" if $self->{meta}->abstract eq 'INSERT YOUR ABSTRACT HERE';
+
+	if ($opts{tag}) {
+		require Git::Wrapper;
+		my $git = Git::Wrapper->new('.');
+
+		die "Dirty state in repository\n" if $git->status->is_dirty;
+		die "Tag v$meta_version already exists\n" if eval { $git->rev_parse({ quiet => 1, verify => 1}, "v$meta_version") };
+	}
+
+	my $module_name = $self->{meta}->name =~ s/-/::/gr;
 	my $detected_version = $self->{data}->version($module_name);
-	die sprintf "Version mismatch between module and meta, did you forgot to run regenerate? (%s versus %s)", $detected_version, $meta_version if $detected_version != $meta_version;
+	die sprintf "Version mismatch between module and meta, did you forgot to run regenerate? (%s versus %s)\n", $detected_version, $meta_version if $detected_version != $meta_version;
 }
 
 sub scan_files {
@@ -152,16 +162,15 @@ sub scan_files {
 	return $combined
 }
 
-sub scan_prereqs {
-	my ($self, %opts) = @_;
+sub _scan_prereqs {
+	my ($omit, %opts) = @_;
 	my (@runtime_files, @test_files);
-	File::Find::find(sub { push @runtime_files, $File::Find::name if -f && /\.pm$/ }, 'lib');
-	File::Find::find(sub { push @runtime_files, $File::Find::name if -f }, 'script');
-	File::Find::find(sub { push @test_files, $File::Find::name if -f && /\.(t|pm)$/ }, 't');
+	File::Find::find(sub { push @runtime_files, $File::Find::name if -f && /\.pm$/ }, 'lib') if -d 'lib';
+	File::Find::find(sub { push @runtime_files, $File::Find::name if -f }, 'script') if -d 'script';
+	File::Find::find(sub { push @test_files, $File::Find::name if -f && /\.(t|pm)$/ }, 't') if -d 't';
 
-	my @omit = (@{ $opts{omit} // [] }, keys %{ $self->{meta}->provides });
-	my $runtime = scan_files(\@runtime_files, \@omit);
-	my $test = scan_files(\@test_files, \@omit);
+	my $runtime = scan_files(\@runtime_files, $omit);
+	my $test = scan_files(\@test_files, $omit);
 
 	my $prereqs = CPAN::Meta::Prereqs->new({
 		runtime   => { requires => $runtime->as_string_hash },
@@ -172,7 +181,15 @@ sub scan_prereqs {
 	return CPAN::Meta::Prereqs::Filter::filter_prereqs($prereqs, %opts);
 }
 
+
+sub scan_prereqs {
+	my ($self, %opts) = @_;
+	my @omit = (@{ $opts{omit} // [] }, keys %{ $self->{meta}->provides });
+	return _scan_prereqs(\@omit, %opts);
+}
+
 sub load_prereqs {
+	my ($provides, %opts) = @_;
 	my @prereqs;
 	if (-f 'prereqs.json') {
 		push @prereqs, load_jsonyaml('prereqs.json');
@@ -183,6 +200,9 @@ sub load_prereqs {
 	if (-f 'cpanfile') {
 		require Module::CPANfile;
 		push @prereqs, Module::CPANfile->load('cpanfile')->prereq_specs;
+	}
+	if ($opts{scan}) {
+		push @prereqs, _scan_prereqs([ keys %{$provides} ])->as_string_hash;
 	}
 
 	if (@prereqs == 1) {
@@ -216,7 +236,8 @@ sub new {
 		my ($abstract) = ($pod_data->pod('NAME') // '')  =~ / \A \s+ \S+ \s? - \s? (.+?) \s* \z /x or warn "Could not parse abstract from `=head1 NAME` in $filename";
 		my $version = $data->version($data->name) // die "Cannot parse \$VERSION from $filename";
 
-		my $prereqs = load_prereqs();
+		my $provides = Module::Metadata->provides(version => 2, dir => 'lib');
+		my $prereqs = load_prereqs($provides, %opts);
 		$prereqs->{configure}{requires}{'Module::Build::Tiny'} //= mbt_version();
 		$prereqs->{develop}{requires}{'App::ModuleBuildTiny'} //= $VERSION;
 
@@ -259,7 +280,7 @@ sub new {
 		}
 		$metahash->{prereqs} = $filtered->as_string_hash;
 
-		$metahash->{provides} //= Module::Metadata->provides(version => 2, dir => 'lib') if not $metahash->{no_index};
+		$metahash->{provides} //= $provides if not $metahash->{no_index};
 		CPAN::Meta->create($metahash, { lazy_validation => 0 });
 	};
 
@@ -371,4 +392,9 @@ for my $method (qw/name version release_status/) {
 	*$method = sub { my $self = shift; return $self->{meta}->$method; }
 }
 
+sub fullname {
+	my $self = shift;
+	my $trial = $self->release_status eq 'testing' && $self->version !~ /_/;
+	return $self->meta->name . '-' . $self->meta->version . ($trial ? '-TRIAL' : '' );
+}
 1;

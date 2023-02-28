@@ -23,10 +23,10 @@ t/links.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
+t/obituaries.t
 t/pod-cm.t
 t/pod-spelling.t
 t/pod.t
-t/search.t
 t/snippets.t
 t/strict.t
 t/unused.t

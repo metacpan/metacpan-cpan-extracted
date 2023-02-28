@@ -8,9 +8,11 @@ on 'test' => sub {
     requires 'Test::LeakTrace';
     requires 'Test::More', '0.98';
     requires 'Test::SharedFork';
+    requires 'Test::Valgrind';
 };
 
 on 'configure' => sub {
+    requires 'Devel::CheckBin';
     requires 'File::Spec';
     requires 'File::Which';
     requires 'File::chdir';

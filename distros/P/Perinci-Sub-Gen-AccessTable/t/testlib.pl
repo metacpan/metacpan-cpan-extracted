@@ -15,7 +15,7 @@ sub test_gen {
             name       => 'foo',
             install    => $args{install} // 0,
             table_data => $args{table_data},
-            table_spec => $args{table_spec},
+            table_def  => $args{table_def},
         );
         if ($args{other_args}) {
             while (my ($k, $v) = each %{$args{other_args}}) {
@@ -107,7 +107,7 @@ sub gen_test_data {
         }
     }
 
-    my $table_spec = {
+    my $table_def = {
         fields => {
             # reminder: we still test the old 'index' property, support for it
             # will be removed someday
@@ -123,7 +123,7 @@ sub gen_test_data {
         pk => 's',
     };
 
-    return ($table_data, $table_spec);
+    return ($table_data, $table_def);
 }
 
 sub test_random_order {

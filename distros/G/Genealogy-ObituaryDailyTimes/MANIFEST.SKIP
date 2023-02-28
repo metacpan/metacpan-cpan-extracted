@@ -69,3 +69,4 @@ Genealogy-.*
 \.sqlite-journal$
 \.sql$
 \.sql-journal$
+typescript

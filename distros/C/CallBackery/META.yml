@@ -25,8 +25,9 @@ requires:
   JSON::Validator: '5.03'
   Locale::PO: '0.27'
   Mojolicious: '9.12'
-  Mojolicious::Plugin::Qooxdoo: v1.0.13
+  Mojolicious::Plugin::Qooxdoo: v1.0.14
   Syntax::Keyword::Try: '0.25'
+  Test::Fatal: '0'
   Text::CSV: '0'
   XS::Parse::Keyword: '0.21'
   YAML::XS: '0.83'
@@ -35,5 +36,5 @@ resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.43.1
+version: v0.43.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

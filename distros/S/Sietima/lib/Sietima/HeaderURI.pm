@@ -3,12 +3,12 @@ use Moo;
 use Sietima::Policy;
 use Sietima::Types qw(Address AddressFromStr is_Address);
 use Types::Standard qw(Str is_Str ClassName HashRef Optional);
-use Type::Params qw(compile);
+use Type::Params -sigs;
 use Types::URI qw(Uri is_Uri);
 use Email::Address;
 use namespace::clean;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: annotated URI for list headers
 
 
@@ -26,10 +26,7 @@ has comment => (
 );
 
 
-sub _args_from_address {
-    my ($address, $query) = @_;
-    $query ||= {};
-
+sub _args_from_address($address, $query={}) {
     my $uri = URI->new($address->address,'mailto');
     $uri->query_form($query->%*);
 
@@ -44,8 +41,7 @@ sub _args_from_address {
     };
 }
 
-around BUILDARGS => sub {
-    my ($orig, $class, @args) = @_;
+around BUILDARGS => sub($orig, $class, @args) {
     if (@args != 1 or ref($args[0]) eq 'HASH' and $args[0]->{uri}) {
         return $class->$orig(@args);
     }
@@ -66,21 +62,19 @@ around BUILDARGS => sub {
 };
 
 
-sub new_from_address {
-    state $check = compile(
-        ClassName,
+signature_for new_from_address => (
+    method => Str,
+    positional => [
         Address->plus_coercions(AddressFromStr),
         Optional[HashRef],
-    );
-    my ($class, $address, $query) = $check->(@_);
-
+    ],
+);
+sub new_from_address($class, $address, $query={}) {
     return $class->new(_args_from_address($address,$query));
 }
 
 
-sub as_header_raw {
-    my ($self) = @_;
-
+sub as_header_raw($self) {
     my $str = sprintf '<%s>',$self->uri;
     if (my $c = $self->comment) {
         $str .= sprintf ' (%s)',$c;
@@ -103,7 +97,7 @@ Sietima::HeaderURI - annotated URI for list headers
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -226,7 +220,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

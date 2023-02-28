@@ -22,9 +22,10 @@ SIGNATURE
 t/Fedora-RPM-Spec-License/01-use.t
 t/Fedora-RPM-Spec-License/02-version.t
 t/Fedora-RPM-Spec-License/03-new.t
-t/Fedora-RPM-Spec-License/04-format.t
-t/Fedora-RPM-Spec-License/05-licenses.t
-t/Fedora-RPM-Spec-License/06-parse.t
-t/Fedora-RPM-Spec-License/07-reset.t
+t/Fedora-RPM-Spec-License/04-exceptions.t
+t/Fedora-RPM-Spec-License/05-format.t
+t/Fedora-RPM-Spec-License/06-licenses.t
+t/Fedora-RPM-Spec-License/07-parse.t
+t/Fedora-RPM-Spec-License/08-reset.t
 xt/Fedora-RPM-Spec-License/01-pod_coverage.t
 xt/Fedora-RPM-Spec-License/02-pod.t

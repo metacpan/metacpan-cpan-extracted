@@ -1,3 +1,8 @@
+0.785 (02.28.2023) - John Siracusa <siracusa@gmail.com>
+
+    * Added timestamps_are_inlined method to DBD::Pg. (Patch
+      by Ferry Hendrikx.)
+
 0.784 (02.03.2023) - John Siracusa <siracusa@gmail.com>
 
     * Added support for PDBs (Pluggable Databases) to DBD::Oracle. (Patch

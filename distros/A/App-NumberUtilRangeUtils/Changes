@@ -1,3 +1,8 @@
-0.001   2019-01-25 (PERLANCAR)
+0.002   2023-01-04  Released-By: PERLANCAR
+
+        - Update to Number::Util::Range 0.003.
+
+
+0.001   2019-01-25  Released-By: PERLANCAR
 
         - First release.

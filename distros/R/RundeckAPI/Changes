@@ -1,3 +1,7 @@
+20230227
+	Version 1.3.5.0
+	Manage special case where endpoint is api/XXX/job, which returns YAML
+
 20201227
 	Version 1.3.3
 	/!\ Breaking change /!\ returne data is always in $returnedHash->{'content'}

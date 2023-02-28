@@ -189,15 +189,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$surecip->{_opt}		= $opt;
-		$surecip->{_note}		= $surecip->{_note}.' opt='.$surecip->{_opt};
-		$surecip->{_Step}		= $surecip->{_Step}.' opt='.$surecip->{_opt};
-
-	} else { 
-		print("surecip, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$surecip->{_opt}		= $opt;
+#		$surecip->{_note}		= $surecip->{_note}.' opt='.$surecip->{_opt};
+#		$surecip->{_Step}		= $surecip->{_Step}.' opt='.$surecip->{_opt};
+#
+#	} else { 
+#		print("surecip, opt, missing opt,\n");
+#	 }
  }
 
 

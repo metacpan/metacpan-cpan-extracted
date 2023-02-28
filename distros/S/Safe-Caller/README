@@ -22,11 +22,11 @@ CONSTRUCTOR
   new
      $caller = Safe::Caller->new(1);
 
-    Providing how many frames to go back while running perlfunc is optional.
-    By default (if no suitable value is provided) 1 will be assumed. The
-    default will be shared among all accessors and verification routines;
-    the accessors may optionally accept a frame as argument, whereas
-    verification routines (`called_from_*()') don't.
+    Providing how many frames to go back while running "caller" in perlfunc
+    is optional. By default (if no suitable value is provided) 1 will be
+    assumed. The default will be shared among all accessors and verification
+    routines; the accessors may optionally accept a frame as argument,
+    whereas verification routines ("called_from_*()") don't.
 
 METHODS
   called_from_package
@@ -69,10 +69,10 @@ ACCESSORS
      $caller->{hints}->();
      $caller->{bitmask}->();
 
-    See perlfunc for the values they are supposed to return.
+    See "caller" in perlfunc for the values they are supposed to return.
 
 SEE ALSO
-    perlfunc, Perl6::Caller, Devel::Caller, Sub::Caller
+    "caller" in perlfunc, Perl6::Caller, Devel::Caller, Sub::Caller
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>
@@ -81,5 +81,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

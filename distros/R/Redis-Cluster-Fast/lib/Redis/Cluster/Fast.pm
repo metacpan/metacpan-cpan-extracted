@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak confess/;
 
-our $VERSION = "0.05";
+our $VERSION = "0.082";
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -119,6 +119,8 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
 Redis::Cluster::Fast is like L<Redis::Fast|https://github.com/shogo82148/Redis-Fast> but support Redis Cluster by L<hiredis-cluster|https://github.com/Nordix/hiredis-cluster>.
 
 Require Redis 6 or higher to support L<RESP3|https://github.com/antirez/RESP3/blob/master/spec.md>.
+
+To build this module you need at least autoconf, automake, libtool, patch, pkg-config are installed on your system.
 
 =head1 METHODS
 

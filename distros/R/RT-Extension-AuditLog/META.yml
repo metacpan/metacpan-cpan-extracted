@@ -22,8 +22,7 @@ requires:
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-  repository: https://github.com/certat/rt-extension-auditlog
-version: '0.02'
+version: '0.04'
 x_module_install_rtx_version: '0.38'
 x_requires_rt: 4.4.0
 x_rt_too_new: 5.2.0

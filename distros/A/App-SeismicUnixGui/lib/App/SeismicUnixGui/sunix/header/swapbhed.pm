@@ -159,15 +159,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$swapbhed->{_opt}		= $opt;
-		$swapbhed->{_note}		= $swapbhed->{_note}.' opt='.$swapbhed->{_opt};
-		$swapbhed->{_Step}		= $swapbhed->{_Step}.' opt='.$swapbhed->{_opt};
-
-	} else { 
-		print("swapbhed, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$swapbhed->{_opt}		= $opt;
+#		$swapbhed->{_note}		= $swapbhed->{_note}.' opt='.$swapbhed->{_opt};
+#		$swapbhed->{_Step}		= $swapbhed->{_Step}.' opt='.$swapbhed->{_opt};
+#
+#	} else { 
+#		print("swapbhed, opt, missing opt,\n");
+#	 }
  }
 
 

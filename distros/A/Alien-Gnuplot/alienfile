@@ -1,0 +1,169 @@
+use alienfile;
+
+use File::Which;
+use version 0.77;
+
+for my $gnuplot (
+    ( $ENV{'GNUPLOT_BINARY'} ? $ENV{'GNUPLOT_BINARY'} : () ),
+    'gnuplot'
+  ) {
+  plugin 'Probe::CommandLine' => (
+    command => $gnuplot,
+    args    => [ '--version' ],
+    match   => qr/^gnuplot ([0-9\.]+ patchlevel [0-9]+)/,
+    version => qr/^gnuplot ([0-9\.]+ patchlevel [0-9]+)/,
+  );
+}
+
+meta->around_hook( probe => sub {
+  my $orig  = shift;
+  my $build = shift;
+
+  eval {
+    unshift @INC, '../../lib', 'lib';
+    require Alien::Gnuplot;
+  };
+
+  my $install_type = $orig->($build, @_);
+
+  $build->log("Checking @{[ $build->runtime_prop->{command} ]}");
+  eval {
+    Alien::Gnuplot->check_gnuplot(
+      map { -f $_ ? $_ : which($_) } $build->runtime_prop->{command}
+    );
+    1;
+  } or do {
+    $build->log($@);
+    return 'share';
+  };
+
+  # Fix up the version from output to include the patchlevel as a dotted
+  # version component.
+  if( exists $build->runtime_prop->{version} ) {
+    $build->runtime_prop->{version} =~ s/^([0-9\.]+) patchlevel ([0-9]+)$/$1.$2/;
+  }
+
+  # Check against minimum version.
+  my $got_version = version->parse($build->runtime_prop->{version});
+  if( version->parse($Alien::Gnuplot::GNUPLOT_RECOMMENDED_VERSION) > $got_version ) {
+    $build->log(<<EOF);
+Gnuplot seems to exist on your system, but it is version @{[ $build->runtime_prop->{version} ]}.
+The minimum recommended version is $Alien::Gnuplot::GNUPLOT_RECOMMENDED_VERSION.
+EOF
+    return 'share';
+  } else {
+    $build->log(<<EOF);
+Gnuplot version $got_version meets minimum version
+requirement of Gnuplot version $Alien::Gnuplot::GNUPLOT_RECOMMENDED_VERSION.
+EOF
+  }
+
+  {
+    # Check for Windows piped input bug.
+
+    # Range (exclusive) where bug is present.
+    my @exclusive_range = map version->parse($_), ( '5.2.8', '5.4.6' );
+
+    if( $^O eq 'MSWin32'
+      && $exclusive_range[0] < $got_version
+      && $got_version        < $exclusive_range[1] ) {
+      $build->log(<<EOF);
+Gnuplot version $got_version on Windows has a known problem.
+
+Gnuplot between versions (@{[ join ", ", @exclusive_range ]}) exclusive fails
+to work properly when given piped input. See <https://github.com/PDLPorters/PDL-Graphics-Gnuplot/issues/79>
+for more information.
+EOF
+      return 'share';
+    }
+  }
+
+  return $install_type;
+});
+
+
+# Separate hook after the above to give hints about installation to the system.
+meta->around_hook( probe => sub {
+  my $orig  = shift;
+  my $build = shift;
+
+  my $install_type = $orig->($build, @_);
+
+  # Map[ $^O, Tuple[ Name, Command, InstallCommand, Maybe[URL] ] ]
+  #
+  # NOTE: If the URL is defined, this is a self-installed package manager
+  # (i.e., for systems that do not come with a standard package manager), so
+  # print out its information regardless of whether it is installed.
+  my %os_installers = (
+    darwin => [
+      ['MacPorts','port', 'port install gnuplot', 'https://www.macports.org/'],
+      ['Fink'    ,'fink', 'fink install gnuplot', 'https://www.finkproject.org/'],
+      ['Homebrew','brew', 'brew install gnuplot', 'https://brew.sh/'],
+    ],
+    linux => [
+      [ 'YUM', 'yum'    , 'yum install gnuplot'    , undef ],
+      [ 'APT', 'apt-get', 'apt-get install gnuplot', undef ],
+    ],
+    MSWin32 => [
+      ['Chocolatey', 'choco', 'choco install gnuplot', 'https://chocolatey.org/' ],
+    ],
+  );
+
+  if( $install_type eq 'share' and exists $os_installers{$^O} ) {
+    $build->log(<<EOF);
+
+Gnuplot seems to not exist on your system. You can use the following package
+manager(s) to install Gnuplot to your system.
+
+EOF
+    for my $manager (@{ $os_installers{$^O} }) {
+      next if ! defined $manager->[3] && ! which( $manager->[1] );
+      $build->log(<<EOF);
+  - $manager->[0]@{[ defined $manager->[3] ? " (available at <$manager->[3]>)" : ""  ]}:
+      \$ $manager->[2]
+
+EOF
+    }
+  }
+
+  return $install_type;
+});
+
+
+sub do_binary_release_mswin32 {
+  requires 'Alien::7zip' => '0.03';
+  requires 'Alien::Build::CommandSequence';
+
+  start_url 'https://sourceforge.net/projects/gnuplot/files/gnuplot/5.4.6/gp546-win64-mingw.7z/download';
+  plugin 'Download';
+  extract [ '%{sevenzip} x %{.install.download}' ];
+  plugin 'Build::Copy';
+  gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{'style'} = 'binary';
+  };
+}
+
+sub do_source_release {
+  start_url 'https://sourceforge.net/projects/gnuplot/files/gnuplot/5.4.6/gnuplot-5.4.6.tar.gz/download';
+  plugin 'Download';
+  plugin 'Extract' => 'tar.gz';
+  plugin 'Build::Autoconf';
+  build [
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+  ];
+  gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{'style'} = 'source';
+  };
+}
+
+share {
+  if( $^O eq 'MSWin32' ) {
+    do_binary_release_mswin32;
+  } else {
+    do_source_release;
+  }
+}

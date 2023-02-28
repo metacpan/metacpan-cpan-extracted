@@ -1,11 +1,10 @@
 package Sietima::Policy;
-use 5.024;
+use v5.36;
 use strict;
 use warnings;
-use feature ':5.24';
-use experimental 'signatures';
+use feature ':5.36';
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: pragma for Sietima modules
 
 
@@ -14,8 +13,7 @@ sub import {
     # so no need for import::into
     strict->import;
     warnings->import;
-    experimental->import('signatures');
-    feature->import(':5.24');
+    feature->import(':5.36');
     return;
 }
 
@@ -33,15 +31,14 @@ Sietima::Policy - pragma for Sietima modules
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 SYNOPSIS
 
-  use 5.024;
+  use v5.36;
   use strict;
   use warnings;
-  use feature ':5.24';
-  use experimental 'signatures';
+  use feature ':5.36';
 
 or just:
 
@@ -58,7 +55,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

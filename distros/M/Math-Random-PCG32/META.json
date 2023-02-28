@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "apache_2_0"
    ],
@@ -32,16 +32,14 @@
       },
       "test" : {
          "requires" : {
-            "Algorithm::Diff" : "0",
-            "Test::More" : "0.88",
-            "Test::Most" : "0"
+            "Test2::V0" : "0.000060"
          }
       }
    },
    "provides" : {
       "Math::Random::PCG32" : {
          "file" : "lib/Math/Random/PCG32.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -50,9 +48,9 @@
          "http://www.apache.org/licenses/LICENSE-2.0.txt"
       ],
       "repository" : {
-         "url" : "https://github.com/thrig/Math-Random-PCG32"
+         "url" : "https://thrig.me/src/Math-Random-PCG32.git"
       }
    },
-   "version" : "0.23",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

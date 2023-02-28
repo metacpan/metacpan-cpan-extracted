@@ -16,8 +16,8 @@ A container for functions for the ack program.
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = 'v3.6.0'; # Check https://beyondgrep.com/ for updates
-    $COPYRIGHT = 'Copyright 2005-2022 Andy Lester.';
+    $VERSION = 'v3.7.0'; # Check https://beyondgrep.com/ for updates
+    $COPYRIGHT = 'Copyright 2005-2023 Andy Lester.';
 }
 our $STANDALONE = 0;
 our $ORIGINAL_PROGRAM_NAME;
@@ -246,6 +246,8 @@ Searching:
   --range-start PATTERN         Specify PATTERN as the start of a match range.
   --range-end PATTERN           Specify PATTERN as the end of a match range.
   --match PATTERN               Specify PATTERN explicitly. Typically omitted.
+  --not PATTERN                 Specifies PATTERN that must not be found on
+                                the line for a match to occur. Repeatable.
 
 Search output:
   --output=expr                 Output the evaluation of expr for each line

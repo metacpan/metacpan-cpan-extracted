@@ -1,7 +1,7 @@
 #
 # This file is part of StorageDisplay
 #
-# This software is copyright (c) 2014-2022 by Vincent Danjean.
+# This software is copyright (c) 2014-2023 by Vincent Danjean.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data. No dependencies (but perl itself)
 
-our $VERSION = '1.0.10'; # VERSION
+our $VERSION = '1.0.11'; # VERSION
 
 
 use Storable;
@@ -531,13 +531,21 @@ use is_collector
         progs => [ 'lsblk', 'udevadm' ],
 };
 
-use JSON::PP qw(decode_json);
+use JSON::PP;
 
 sub lsblkjson2perl {
     my $self = shift;
     my $json = shift;
+    my $jsonparser = JSON::PP->new;
+    eval {
+        $jsonparser->allow_bignum;
+    };
+    eval {
+        $jsonparser->boolean_values([0, 1]);
+    };
     my $info = {
-        map { $_->{kname} => $_ } (@{decode_json($json)->{"blockdevices"}})
+        map { $_->{kname} => $_ }
+            (@{$jsonparser->decode($json)->{"blockdevices"}})
     };
     return $info;
 }
@@ -600,8 +608,8 @@ sub collect {
                 $data->{'_udev_infos'}->{$1}=join(' ', sort(split(' ',$2)));
             } elsif ($line =~ /^E: ([^=]*)=(.*)$/) {
                 $data->{'_udev_infos'}->{$1}=$2;
-            } elsif ($line =~ /^L: 0$/) {
-                # ???
+            } elsif ($line =~ /^[MRUTDILQV]: .*$/) {
+                # Unused info. See udevadm(8) / Table 1 for more info
             } else {
                 print STDERR "Ignoring '$line'".(defined($dname)?(' for '.$dname):'')."\n";
             }
@@ -694,14 +702,27 @@ sub select {
 
     foreach my $kn (sort keys %{$infos->{'lsblk'}}) {
         my $udev_info = $infos->{'udev'}->{$kn};
+        my $lsblk_info = $infos->{'lsblk'}->{$kn};
         next if not defined($udev_info);
         if (($udev_info->{'_udev_infos'}->{DEVTYPE} // '') ne 'disk') {
             next;
         }
         if (($udev_info->{'_udev_infos'}->{ID_PART_TABLE_TYPE} // '') eq '') {
-            if (($udev_info->{'_udev_infos'}->{ID_TYPE} // '') eq 'disk') {
-                push @devs, $kn;
+            if (($lsblk_info->{'rm'} // 0) == 1) {
+                # removed disk (cd, ...), skipping
+                next;
             }
+            if (($lsblk_info->{'type'} // '') eq 'loop'
+		&& ($lsblk_info->{'size'} // 0) == 0) {
+                # loop device not attached
+                next;
+            }
+            if (($lsblk_info->{'type'} // '') eq 'lvm') {
+                # handled by lvm subsystem
+                next;
+            }
+            # disk with no partition, just get it
+            push @devs, $kn;
             next;
         }
         if (
@@ -837,7 +858,14 @@ sub lvmjson2perl {
     my $keys = shift;
     my $info = shift // {};
     my $json = shift;
-    my $alldata = decode_json($json)->{'report'}->[0]->{$kind};
+    my $jsonparser = JSON::PP->new;
+    eval {
+        $jsonparser->allow_bignum;
+    };
+    eval {
+        $jsonparser->boolean_values([0, 1]);
+    };
+    my $alldata = $jsonparser->decode($json)->{'report'}->[0]->{$kind};
     foreach my $data (@$alldata) {
         my $vg=$data->{vg_name} // die "no vg_name in data!";
         my $base = $info->{$vg}->{$kstore};
@@ -921,6 +949,7 @@ use is_collector
     no_names => 1,
     depends => {
         progs => [ '/sbin/swapon', 'df' ],
+	root => 1,
 };
 
 sub collect {
@@ -933,14 +962,23 @@ sub collect {
     my $fs={};
     while(defined(my $line=<$dh>)) {
         chomp($line);
-        if ($line =~ m,([^ ]+) partition ([0-9]+) ([0-9]+)$,) {
-            $fs->{$1} = {
-                size => $2,
-                used => $3,
-                free => ''.($2-$3),
-                fstype => 'swap',
+        if ($line =~ m,([^ ]+) (partition|file) ([0-9]+) ([0-9]+)$,) {
+            my $info={
+                size => $3,
+                used => $4,
+                free => ''.($3-$4),
+                fstype => $2,
                 mountpoint => 'SWAP',
             };
+            my $dev = $1;
+            if ($2 eq 'file') {
+                my $dh2=$self->open_cmd_pipe_root(qw(findmnt -n -o TARGET --target), $1);
+                my $mountpoint = <$dh2>;
+                chomp($mountpoint) if defined($mountpoint);
+                close $dh2;
+                $info->{'file-mountpoint'}=$mountpoint;
+            }
+            $fs->{$dev} = $info;
         } elsif ($line =~ m,([^ ]+) ([^ ]+) ([0-9]+) ([0-9]+)$,) {
             # skipping other kind of swap
         } else {
@@ -949,7 +987,7 @@ sub collect {
     }
     close $dh;
 
-    $dh=$self->open_cmd_pipe(qw(df -B1 --local),
+    $dh=$self->open_cmd_pipe_root(qw(df -B1 --local),
                              '--output=source,fstype,size,used,avail,target');
     while(defined(my $line=<$dh>)) {
         chomp($line);
@@ -1491,11 +1529,15 @@ sub collect {
                 print STDERR "W: megacli: strange adapter for #$dev: $line\n";
                 next;
             }
-            if ($line =~ /^Enclosure Device ID: *([0-9]+) *$/) {
+            if ($line =~ /^Enclosure Device ID: *([0-9]+|N\/A) *$/) {
                 $cur_enc=$1;
+		$cur_enc='' if $cur_enc eq 'N/A';
                 $cur_slot=undef;
                 next;
             }
+            if ($line =~ /^Enclosure Device ID: *(.*) *$/) {
+                print STDERR "W: megacli: strange enclosure device ID '$1'\n";
+	    }
             if ($line =~ /^Slot Number: *([0-9]+) *$/) {
                 if (defined($cur_slot) || not defined($cur_enc)) {
                     print STDERR "W: megacli: strange state when finding slot number $1\n";
@@ -1645,7 +1687,7 @@ StorageDisplay::Collect - modules required to collect data. No dependencies (but
 
 =head1 VERSION
 
-version 1.0.10
+version 1.0.11
 
 Main class, allows one to register collectors and run them (through the collect method)
 
@@ -1675,7 +1717,7 @@ Vincent Danjean <Vincent.Danjean@ens-lyon.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2022 by Vincent Danjean.
+This software is copyright (c) 2014-2023 by Vincent Danjean.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

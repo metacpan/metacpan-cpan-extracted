@@ -245,7 +245,7 @@ subtest 'RPC Category separation enable/disable' => sub {
 
     my $req_storage = {
         method       => 'ping',
-        msg_group    => 'mt5',
+        category     => 'mt5',
         stash_params => [],
         args         => {},
     };
@@ -319,7 +319,7 @@ subtest 'RPC Category separtion timeouts' => sub {
     foreach my $group (qw(mt5 payment)) {
         my $req_storage = {
             method       => 'ping',
-            msg_group    => $group,
+            category     => $group,
             stash_params => [],
             args         => {},
         };

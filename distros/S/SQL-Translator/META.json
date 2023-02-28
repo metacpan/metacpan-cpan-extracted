@@ -36,6 +36,8 @@
       },
       "develop" : {
          "requires" : {
+            "CGI" : "0",
+            "DBD::SQLite" : "0",
             "GD" : "0",
             "Graph::Directed" : "0",
             "GraphViz" : "0",
@@ -100,7 +102,7 @@
       "x_IRC" : "irc://irc.perl.org/#sql-translator",
       "x_Ratings" : "http://cpanratings.perl.org/d/SQL-Translator"
    },
-   "version" : "1.62",
+   "version" : "1.63",
    "x_authority" : "cpan:JROBINSON",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

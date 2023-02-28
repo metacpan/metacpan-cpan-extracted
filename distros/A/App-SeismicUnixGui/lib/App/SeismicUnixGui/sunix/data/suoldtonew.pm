@@ -165,15 +165,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$suoldtonew->{_opt}		= $opt;
-		$suoldtonew->{_note}		= $suoldtonew->{_note}.' opt='.$suoldtonew->{_opt};
-		$suoldtonew->{_Step}		= $suoldtonew->{_Step}.' opt='.$suoldtonew->{_opt};
-
-	} else { 
-		print("suoldtonew, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$suoldtonew->{_opt}		= $opt;
+#		$suoldtonew->{_note}		= $suoldtonew->{_note}.' opt='.$suoldtonew->{_opt};
+#		$suoldtonew->{_Step}		= $suoldtonew->{_Step}.' ';
+#
+#	} else { 
+#		print("suoldtonew, opt, missing opt,\n");
+#	 }
  }
 
 

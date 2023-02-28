@@ -12,12 +12,10 @@ my $build = Alien::Build::MB->new(
         'Module::Build' => 0,
         'Alien::Build' => 0,
         'Alien::Build::MB' => 0,
-        'Software::License' => 0,
     },
     build_requires => {
         'Alien::Build::MB' => 0,
         'Module::Build' => 0,
-        'Software::License' => 0,
         'Path::Tiny' => 0,
         'HTTP::Tiny' => 0,
     },
@@ -31,9 +29,19 @@ my $build = Alien::Build::MB->new(
         'perl' => '5.10.0',
     },
     meta_merge => {
+        'meta-spec' => {
+            version => 2
+        },
         resources => {
             repository => "https://github.com/vikasnkumar/Alien-TALib",
             bugtracker => "https://github.com/vikasnkumar/Alien-TALib/issues",
+        },
+        prereqs => {
+            develop => {
+                requires => {
+                    'Software::License' => 0,
+                },
+            },
         },
     },
 );

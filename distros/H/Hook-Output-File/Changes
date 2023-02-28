@@ -1,5 +1,11 @@
 Revision history for Perl extension Hook::Output::File.
 
+0.09  2023-02-27  <schubiger@cpan.org>
+
+ - Move testing modules to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.08  2016-04-29  <schubiger@cpan.org>
 
  - Merged development version to stable.

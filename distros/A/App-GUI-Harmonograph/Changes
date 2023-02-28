@@ -1,9 +1,22 @@
+0.59  2023-03-26  lichtkind
+-------
+    * = fixes
+    * ! reverse direction in X and Y works again
+    * ! setting line > connect gets now restored
+
+0.58  2023-02-23  lichtkind
+-------
+    * = maintenance
+    * " optimized GUI of panel section Pen LIne
+    * ~ moved config to ~/.config/harmonograph
+    * ! config parser had silent bug
+
 0.57  2022-10-25  lichtkind
 -------
     * = maintenance and starting mod matrix
     * + change main function of X and Y pendulum
     * + sped up sketch drawing
-    * ? cleanep up POD from incorrect leftover bits
+    * ? cleaned up POD from incorrect leftover bits
     * ? added some POD
     * " cleaned left lower corner of GUI
     * " made all comboboxes readonly (were never meant to be editable, but select only)
@@ -24,7 +37,7 @@
     * + independent frequency damping
     * + added Gamma(1/2) to frequency factor constants
     * ~ change dot density to quadratic behaviour
-    * / ranemed all damping related setting keys
+    * ~ ranemed all damping related setting keys
     * " separate linear and circular pendula in two tabs
     * " cleaner GUI
     * ? rewrote pendulum section in documentation
@@ -44,13 +57,13 @@
     * ? added and rewrote some docs
     * ! save frequency decimals in INI
     * ! fixed tests srezic++
-    
+
 0.45  2022-10-08  lichtkind
 -------
     * = maintenance
     * + display color flow in progress bar
     * - clean some dead code
-    * ? push color code into module Graphics::Toolkit::Color  
+    * ? push color code into module Graphics::Toolkit::Color
 
 0.44  2022-10-02  lichtkind
 -------
@@ -84,7 +97,7 @@
     * = initial CPAN release
     * + 4 pendula: X, Y, Z (wobble), Rotating with haveing each setting of
     *   - pendulum length (amplitude)
-    *   - frequency (integer + decimal), invertable 
+    *   - frequency (integer + decimal), invertable
     *   - offset, checks for 90 and 180 degree
     * + line length, dot denisty and dot size
     * + color flow: no, linear, alternating, circular

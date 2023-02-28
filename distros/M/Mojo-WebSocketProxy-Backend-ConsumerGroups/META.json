@@ -34,6 +34,7 @@
             "Devel::Cover::Report::Codecov" : "0.14",
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
             "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
             "Software::License::Perl_5" : "0",
@@ -57,7 +58,7 @@
             "JSON::MaybeUTF8" : "0",
             "Log::Any" : "0",
             "Mojo::Redis2" : "0",
-            "Mojo::WebSocketProxy" : "0.14",
+            "Mojo::WebSocketProxy" : "0.13",
             "Mojo::WebSocketProxy::Backend" : "0",
             "MojoX::JSON::RPC::Client" : "0",
             "Syntax::Keyword::Try" : "0",
@@ -91,25 +92,25 @@
    "provides" : {
       "Mojo::WebSocketProxy::Backend::ConsumerGroups" : {
          "file" : "lib/Mojo/WebSocketProxy/Backend/ConsumerGroups.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues"
+         "web" : "https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues"
       },
-      "homepage" : "https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups",
+      "homepage" : "https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git",
-         "web" : "https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups"
+         "url" : "https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git",
+         "web" : "https://github.com/mariovw-deriv/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
-      "chylli-binary <chylli@binary.com>",
+      "user <user@binary.com>",
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "Raunak Kathuria <raunakkathuria@gmail.com>"
    ],

@@ -165,15 +165,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$wpc1uncomp2->{_opt}		= $opt;
-		$wpc1uncomp2->{_note}		= $wpc1uncomp2->{_note}.' opt='.$wpc1uncomp2->{_opt};
-		$wpc1uncomp2->{_Step}		= $wpc1uncomp2->{_Step}.' opt='.$wpc1uncomp2->{_opt};
-
-	} else { 
-		print("wpc1uncomp2, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$wpc1uncomp2->{_opt}		= $opt;
+#		$wpc1uncomp2->{_note}		= $wpc1uncomp2->{_note}.' opt='.$wpc1uncomp2->{_opt};
+#		$wpc1uncomp2->{_Step}		= $wpc1uncomp2->{_Step}.' opt='.$wpc1uncomp2->{_opt};
+#
+#	} else { 
+#		print("wpc1uncomp2, opt, missing opt,\n");
+#	 }
  }
 
 

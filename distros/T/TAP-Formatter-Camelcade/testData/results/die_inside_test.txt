@@ -11,7 +11,7 @@ teamcity[testSuiteFinished locationHint='testData/tests/die_inside_test.t' name=
 
 Test Summary Report
 -------------------
-testData/tests/die_inside_test.t (Wstat: 65280 Tests: 1 Failed: 0)
+testData/tests/die_inside_test.t (Wstat: 65280 (exited 255) Tests: 1 Failed: 0)
   Non-zero exit status: 255
   Parse errors: No plan found in TAP output
 Files=1, Tests=1, TEST_MODE_STATS;

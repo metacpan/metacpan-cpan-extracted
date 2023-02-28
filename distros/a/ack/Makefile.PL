@@ -35,6 +35,7 @@ my %parms = (
         'File::Next'        => '1.18',
         'File::Spec'        => '3.00',
         'File::Temp'        => '0.19', # For newdir()
+        'filetest'          => 0,
         'Getopt::Long'      => '2.38',
         'if'                => 0,
         'List::Util'        => 0,
@@ -133,6 +134,8 @@ test_standalone: all ack-standalone
 
 test_xt: all
 	$(FULLPERLRUN) t/runtests.pl 0 $(TEST_VERBOSE) "$(INST_LIB)" "$(INST_ARCHLIB)" $(TEST_XT_FILES)
+
+test_all: test_classic test_standalone test_xt
 
 PROF_ARGS = -Mblib blib/script/ack foo ~/parrot
 

@@ -4,10 +4,10 @@ use warnings FATAL => 'all';
 use 5.008005;
 use base 'Module::Build::XSUtil';
 use Config;
+use Devel::CheckBin qw(check_bin);
 use File::Spec;
 use File::Which qw(which);
 use File::chdir;
-use Data::Dumper;
 
 sub is_debug {
     -d '.git';
@@ -19,6 +19,13 @@ sub _build_dependencies {
     my $abs = File::Spec->rel2abs('./deps');
     # Skip if already built
     return if -e "$abs/build";
+
+    check_bin('patch');
+    # libevent
+    check_bin('autoconf');
+    check_bin('automake');
+    check_bin('libtoolize');
+    check_bin('pkg-config');
 
     my $make;
     if ($^O =~ m/(bsd|dragonfly)$/ && $^O !~ m/gnukfreebsd$/) {
@@ -41,10 +48,12 @@ sub _build_dependencies {
         local $CWD = "deps/libevent";
         $self->do_system('./autogen.sh');
         $self->do_system('./configure',
+            '--disable-openssl',
+            '--disable-samples',
             '--disable-shared',
             '--with-pic',
             '--prefix',
-            "$abs/build/usr/local"
+            "$abs/build/usr/local",
         );
         $self->do_system($make);
         $self->do_system($make, 'install');
@@ -60,7 +69,7 @@ sub _build_dependencies {
         "USE_SSL=0",
         "DESTDIR=$abs/build",
         'clean',
-        'install'
+        'install',
     );
 }
 
@@ -80,16 +89,6 @@ sub new {
             "deps/build/usr/local/lib/libhiredis$Config{lib_ext}",
             "deps/build/usr/local/lib/libhiredis_cluster$Config{lib_ext}",
         ],
-
-        test_requires => {
-            'IO::CaptureOutput' => '0',
-            'Mouse' => '0',
-            'Sub::Retry' => '0',
-            'Test::Docker::Image' => '0.05',
-            'Test::LeakTrace' => '0',
-            'Test::More' => '0.98',
-            'Test::SharedFork' => '0',
-        },
     );
 
     $self->_build_dependencies;

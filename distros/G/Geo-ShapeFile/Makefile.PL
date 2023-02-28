@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
 
 my @win32_longpath
@@ -26,6 +29,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         'rlib'       => 0,
         'Test::Exception' => 0,
+        'Test::More' => 0.96,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

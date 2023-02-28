@@ -47,7 +47,7 @@ sub new {
     $self;
 }
 
-sub init { $_[0]->SetValue( $_[0]->{'init'} ) }    
+sub init { $_[0]->SetValue( $_[0]->{'init'} ) }
 
 sub GetValue { $_[0]->{'value'} }
 sub SetValue {
@@ -60,15 +60,16 @@ sub SetValue {
 sub GetMaxValue { $#{$_[0]->{'colors'} } }
 
 sub SetColors {
-    my ( $self, $colors ) = @_;
-    return unless ref $colors eq 'ARRAY' and @$colors > 1;
-    for (@$colors){ return unless ref $_ eq 'ARRAY' and @$_ == 3 }
-    $self->{'colors'} = $colors;
-    $self->{'init'} = $#$colors if $self->{'init'} > $#$colors;
-    $self->SetValue( $#$colors ) if $self->{'value'} > $#$colors;
+    my ( $self, @colors ) = @_;
+    return unless @colors > 1;
+    for (@colors){ return unless ref $_ eq 'ARRAY' and @$_ == 3 }
+    $self->{'colors'} = \@colors;
+    $self->{'init'} = $#colors if $self->{'init'} > $#colors;
+    $self->SetValue( $#colors ) if $self->{'value'} > $#colors;
+    $self->Refresh;
 }
 
-sub SetCallBack {    
+sub SetCallBack {
     my ( $self, $code) = @_;
     return unless ref $code eq 'CODE';
     $self->{'callback'} = $code;

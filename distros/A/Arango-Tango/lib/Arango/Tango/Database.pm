@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.016';
+$Arango::Tango::Database::VERSION = '0.019';
 use Arango::Tango::Cursor;
 use Arango::Tango::API;
 
@@ -55,7 +55,7 @@ BEGIN {
                 isVolatile        => { type => 'boolean' },
                 shardKeys         => { type => 'array', items => {type => 'string'} },
                 numberOfShards    => { type => 'integer' },
-                isSystem          => { type => 'booean' },
+                isSystem          => { type => 'boolean' },
                 type              => { type => 'string', default => '2', enum => ['2', '3'] },
                 indexBuckets      => { type => 'integer' },
                 distributeShardsLike => { type => 'string' },
@@ -95,7 +95,7 @@ sub collection {
    my ($self, $name) = @_;
    my @match = grep { $_->{name} eq $name } @{$self->list_collections};
    if (scalar(@match)) {
-      return Arango::Tango::Collection->_new(arango => $self->{arango}, database => $self->{name}, 'name' => $name);
+      return Arango::Tango::Collection->_new(arango => $self->{arango}, database => $self->{name}, 'name' => $name,);
    }
    else {
       die "Arango::Tango | Collection not found in database $self->{name}."
@@ -137,7 +137,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 USAGE
 
@@ -184,7 +184,7 @@ true, otherwise false.
    my $cursor = $database->cursor( $aql_query, %opt );
 
 Performs AQL queries, returning a cursor. An optional hash of
-options can be supplied. Supported hashes corresponde to the different attributes
+options can be supplied. Supported hashes corresponds to the different attributes
 available in the ArangoDB REST API (L<https://docs.arangodb.com/3.4/HTTP/AqlQueryCursor/AccessingCursors.html>).
 
 =head2 C<delete>
@@ -232,7 +232,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Alberto Simões.
+This software is copyright (c) 2019-2023 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

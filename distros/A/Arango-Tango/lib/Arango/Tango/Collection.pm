@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::Tango::Collection;
-$Arango::Tango::Collection::VERSION = '0.016';
+$Arango::Tango::Collection::VERSION = '0.019';
 use warnings;
 use strict;
 
@@ -10,6 +10,14 @@ BEGIN {
     Arango::Tango::API::_install_methods "Arango::Tango::Collection" => {
 
         ## Document Management -- Keeping here for now.
+        delete_document => {
+            rest => [ delete => '{{database}}_api/document/{name}/{key}'],
+            inject_properties => ['database', 'name'],
+            signature => ['key'],
+            ## FIXME - Header parameters still not supported
+            ## FIXME: missing schema options
+        },
+
         document => {
             rest => [ get => '{{database}}_api/document/{name}/{key}' ],
             inject_properties => [ 'database', 'name' ],
@@ -96,29 +104,37 @@ sub _new {
 }
 
 sub bulk_import {
-    my ($self, $documents) = @_;
+    my ($self, $documents, %options) = @_;
+    $options{type} ||= "list";
     return $self->{arango}->_api( bulk_import_list => {
         database => $self->{database},
         collection => $self->{name},
-        body => $documents
+        _body => $documents,
+        _url_parameters => \%options
     })
 }
 
-sub document_paths {
+sub document_paths {              ## FIXME: try to get larger cursors whenever possible
     my ($self) = @_;
-    return $self->{arango}->_api( all_keys => { database => $self->{database}, collection => $self->{name}, type => "path"})->{result}
+    my $paths = [];
+    my $query = qq!FOR doc IN $self->{name} RETURN CONCAT("/_db/", CURRENT_DATABASE(), "/_api/document/", doc._id)!;
+    my $cursor = $self->cursor($query);
+    while(my $row = $cursor->next) {
+        push @$paths, @$row;
+    }
+    return $paths;
 }
 
 sub create_document {
     my ($self, $body) = @_;
     die "Arango::Tango | Refusing to store undefined body" unless defined($body);
-    return $self->{arango}->_api( create_document => { database => $self->{database}, collection => $self->{name}, body => $body})
+    return $self->{arango}->_api( create_document => { database => $self->{database}, collection => $self->{name}, _body => $body})
 }
 
 sub replace_document {
     my ($self, $key, $body) = @_;
     die "Arango::Tango | Refusing to store undefined body" unless defined($body);
-    return $self->{arango}->_api( replace_document => { database => $self->{database}, collection => $self->{name}, key => $key, body => $body})
+    return $self->{arango}->_api( replace_document => { database => $self->{database}, collection => $self->{name}, key => $key, _body => $body})
 }
 
 sub get_access_level {
@@ -136,6 +152,10 @@ sub set_access_level {
     return $self->{arango}->set_access_level($username, $grant, $self->{database}, $self->{name});
 }
 
+sub cursor {
+    my ($self, $aql, %opts) = @_;
+    return Arango::Tango::Cursor->_new(arango => $self->{arango}, database => $self->{database}, query => $aql, %opts);
+}
 
 1;
 
@@ -151,7 +171,7 @@ Arango::Tango::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 USAGE
 
@@ -237,6 +257,12 @@ Stores a document in specified collection
 
 Replaces a document in specified collection
 
+=head2 C<delete_document>
+
+   $collection->delete_document($key);
+
+Deletes a document in specified collection
+
 =head2 C<truncate>
 
    $collection->truncate;
@@ -299,13 +325,21 @@ Clears the collection access level for a specific user.
 
 Imports a group of documents in a single call.
 
+=head2 C<cursor>
+
+   my $cursor = $collection->cursor( $aql_query, %opt );
+
+Performs AQL queries, returning a cursor. An optional hash of
+options can be supplied. Supported hashes corresponds to the different attributes
+available in the ArangoDB REST API (L<https://docs.arangodb.com/3.4/HTTP/AqlQueryCursor/AccessingCursors.html>).
+
 =head1 AUTHOR
 
 Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Alberto Simões.
+This software is copyright (c) 2019-2023 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

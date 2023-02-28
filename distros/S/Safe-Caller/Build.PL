@@ -14,13 +14,12 @@ my $build = Module::Build->new
                  'boolean' => 0,
                  'Carp' => 0,
                },
-   build_requires => {
-                       'File::Spec' => 0,
-                       'Test::More' => 0,
-                     },
+   test_requires => {
+                      'File::Spec' => 0,
+                      'Test::More' => 0,
+                    },
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
        resources => {
            repository => 'https://github.com/stsc/Safe-Caller',

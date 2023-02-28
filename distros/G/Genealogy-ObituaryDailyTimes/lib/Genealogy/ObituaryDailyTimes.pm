@@ -10,15 +10,15 @@ use Genealogy::ObituaryDailyTimes::DB::obituaries;
 
 =head1 NAME
 
-Genealogy::ObituaryDailyTimes - Compare a Gedcom against the Obituary Daily Times
+Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -79,9 +79,39 @@ sub search {
 
 	if(wantarray) {
 		my @obituaries = @{$self->{'obituaries'}->selectall_hashref(\%params)};
+		foreach my $obit(@obituaries) {
+			$obit->{'url'} = _create_url($obit);
+		}
 		return @obituaries;
 	}
-	return $self->{'obituaries'}->fetchrow_hashref(\%params);
+	if(defined(my $obit = $self->{'obituaries'}->fetchrow_hashref(\%params))) {
+		$obit->{'url'} = _create_url($obit);
+		return $obit;
+	}
+	return;	# undef
+}
+
+sub _create_url {
+	my $obit = shift;
+	my $source = $obit->{'source'};
+	my $page = $obit->{'page'};
+
+	if(!defined($page)) {
+		use Data::Dumper;
+		::diag(Data::Dumper->new([$obit])->Dump());
+		Carp::croak(__PACKAGE__, ': undefined $page');
+	}
+	if(!defined($source)) {
+		Carp::croak(__PACKAGE__, ": $page: undefined source");
+	}
+
+	if($source eq 'M') {
+		return "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
+	}
+	if($source eq 'F') {
+		return "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$page";
+	}
+	Carp::croak(__PACKAGE__, ": Invalid source, '$source'");
 }
 
 =head1 AUTHOR
@@ -132,7 +162,7 @@ L<http://deps.cpantesters.org/?module=Genealogy::ObituaryDailyTimes>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -3,7 +3,7 @@ use Moo::Role;
 use Sietima::Policy;
 use namespace::clean;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: interface for mail stores
 
 
@@ -25,7 +25,7 @@ Sietima::MailStore - interface for mail stores
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 DESCRIPTION
 
@@ -89,7 +89,7 @@ return an arrayref of hashrefs. For example:
  my $id2 = $ms->store($msg2,'t2');
  my $id3 = $ms->store($msg3,'t1','t2');
 
- $ms->retrieve_ids_by_tags('t1') ==> [
+ $ms->retrieve_by_tags('t1') ==> [
    { id => $id3, mail => $msg3 },
    { id => $id1, mail => $msg1 },
   ]
@@ -115,7 +115,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

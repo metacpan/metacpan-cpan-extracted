@@ -1,5 +1,5 @@
 package Task::BeLike::SHLOMIF;
-$Task::BeLike::SHLOMIF::VERSION = '0.0.9';
+$Task::BeLike::SHLOMIF::VERSION = '0.0.10';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::SHLOMIF - Be like SHLOMIF / Shlomi Fish.
 
 =head1 VERSION
 
-version 0.0.9
+version 0.0.10
 
 =head1 TASK CONTENTS
 
@@ -98,6 +98,8 @@ version 0.0.9
 =head3 L<App::Notifier::Client>
 
 =head3 L<App::Notifier::Service>
+
+=head3 L<App::SVG::Graph>
 
 =head3 L<App::Sky>
 

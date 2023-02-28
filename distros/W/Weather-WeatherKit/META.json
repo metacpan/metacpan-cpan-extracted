@@ -38,6 +38,7 @@
       },
       "test" : {
          "requires" : {
+            "HTTP::Response" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
             "Test2::Tools::Exception" : "0",
@@ -53,6 +54,6 @@
          "web" : "https://github.com/dkechag/Weather-WeatherKit"
       }
    },
-   "version" : "0.1",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,6 +1,11 @@
 NAME
 
-    Mojo::WebSocketProxy::Backend::ConsumerGroup
+    Mojo::WebSocketProxy::Backend::ConsumerGroups - Class for communication
+    with backend by sending messaging through redis streams.
+
+VERSION
+
+    version 0.03
 
 DESCRIPTION
 
@@ -12,6 +17,10 @@ DESCRIPTION
 
       * Redis subscriptions is used as channel for receiving responses from
       backend servers.
+
+NAME
+
+    Mojo::WebSocketProxy::Backend::ConsumerGroup
 
 METHODS
 
@@ -29,7 +38,7 @@ METHODS
       environment variable RPC_QUEUE_RESPONSE_TIMEOUT, or defaults to 30
 
       * queue_separation_enabled - Boolean to specify if messages should be
-      assigned to different queus based on their msg_group or only general
+      assigned to different queus based on their category or only general
       queue.
 
       * category_timeout_config - A hash containing the timeout value for
@@ -110,9 +119,9 @@ METHODS
 	fails. Called with Mojolicious::Controller, the rpc_response and
 	$req_storage
 
-	* msg_group - if supplied, the message will be assigned to the
-	Redis channel with the corresponding name. The general channel will
-	be used by default if either $msg_type is not provided or
+	* category - if supplied, the message will be assigned to the Redis
+	channel with the corresponding name. The general channel will be
+	used by default if either $msg_type is not provided or
 	queue_separation_enabled is 0.
 
     Returns undef.
@@ -151,4 +160,15 @@ SEE ALSO
 COPYRIGHT AND LICENSE
 
     Copyright (C) 2022 deriv.com
+
+AUTHOR
+
+    DERIV <DERIV@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Deriv Services Ltd.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

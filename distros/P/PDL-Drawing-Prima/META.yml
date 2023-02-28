@@ -1,16 +1,16 @@
 ---
-abstract: 'PDL-aware drawing functions for Prima widgets'
+abstract: unknown
 author:
-  - 'David Mertens, E<lt>dcmertens.perl@gmail.comE<gt>.'
+  - unknown
 build_requires:
-  ExtUtils::CBuilder: '0'
-  ExtUtils::ParseXS: '3.0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '0'
   PDL: '2.037'
   Prima: '1.57'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,24 +18,19 @@ meta-spec:
 name: PDL-Drawing-Prima
 no_index:
   directory:
+    - t
+    - inc
     - examples
     - t
   file:
-    - README.pod
-provides:
-  PDL::Drawing::Prima:
-    file: lib/PDL/Drawing/Prima.pm.PL
-    version: '0.16'
-  PDL::Drawing::Prima::Utils:
-    file: lib/PDL/Drawing/Prima/Utils.pm.PL
-    version: '0.16'
+    - README.md
 requires:
   PDL: '2.037'
   Prima: '1.57'
-  perl: v5.12.0
+  perl: '5.012'
 resources:
-  bugtracker: http://github.com/dk/PDL-Drawing-Prima/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/dk/PDL-Drawing-Prima
-version: '0.16'
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/PDL-Drawing-Prima/issues
+  repository: https://github.com/dk/PDL-Drawing-Prima
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

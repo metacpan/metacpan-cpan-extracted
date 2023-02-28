@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object;
-$RT::Client::REST::Object::VERSION = '0.71';
+$RT::Client::REST::Object::VERSION = '0.72';
 
 use Try::Tiny;
 use Params::Validate;
@@ -105,7 +105,8 @@ sub _generate_methods {
             if ($settings->{list}) {
                 my $retval = $self->{'_' . $method} || [];
                 return @$retval;
-            } else {
+            }
+            else {
                 return $self->{'_' . $method};
             }
         };
@@ -277,17 +278,18 @@ sub from_form {
 
     # Now set attributes:
     while (my ($key, $value) = each(%$hash)) {
+
         # Handle custom fields, ideally /(?(1)})/ would be appened to RE
         if ( $key =~ m%^(?:cf|customfield)(?:-|\.\{)([#\s\w_:()?/-]+)% ){
              $key = $1;
 
             # XXX very sketchy. Will fail on long form data e.g; wiki CF
-            if ($value =~ /,/) {
+            if (defined $value and $value =~ /,/) {
                 $value = [ split(/\s*,\s*/, $value) ];
             }
 
             $self->cf($key, $value);
-            next;
+            next
         }
 
         unless (exists($rest2attr{$key})) {
@@ -295,17 +297,19 @@ sub from_form {
             next;
         }
 
-        my ( $method, $settings)  = @{$rest2attr{$key}};
+        my ($method, $settings)  = @{$rest2attr{$key}};
 
         if ($settings->{is_datetime} and $value eq 'Not set') {
-            $value = undef;
+            $value = undef
         }
 
         if (exists($attributes->{$method}{form2value})) {
             $value = $attributes->{$method}{form2value}($value);
-        } elsif ($attributes->{$method}{list}) {
-            $value = [split(/\s*,\s*/, $value)],
         }
+        elsif ($attributes->{$method}{list}) {
+            $value = defined $value ? [split(/\s*,\s*/, $value)] : []
+        }
+
         $self->$method($value);
     }
 
@@ -627,7 +631,7 @@ RT::Client::REST::Object - base class for RT objects
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 
@@ -971,7 +975,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

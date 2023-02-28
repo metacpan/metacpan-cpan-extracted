@@ -1,5 +1,16 @@
 Revision history for App-ModuleBuildTiny
 
+0.036     2023-02-27 14:57:23+0100
+          - Rename configure to setup
+          - Add per-dist configuration
+          - Enable git integration by default
+          - Add flag and setting to automatically scan for dependencies
+          - Immediately regenerate on mint
+          - Add git initialization to mint
+          - Add setting to automatically bump on regenerate
+          - Add more preflight checks
+          - Only scan existent directories
+
 0.035     2023-02-15 21:38:16+0100
           - Add an auto_git configuration option
 

@@ -1,3 +1,11 @@
+0.234   2023-02-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix function name (GH#5).
+
+        - Add ta_set_state() and ta_state_to_code() to fix ta_highlight()
+          (ref: GH#3).
+
+
 0.233   2021-08-08  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix][function ta_wrap] Fix handling of flindent & slindent

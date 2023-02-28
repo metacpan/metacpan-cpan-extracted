@@ -1,6 +1,6 @@
 package Geo::Location::Point;
 
-use 5.10.0;
+use 5.10.0;	# For the //= operator
 use strict;
 use warnings;
 
@@ -21,11 +21,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -113,8 +113,8 @@ sub distance {
 
 Are two points the same?
 
-    my $loc1 = location->new(lat => 2, long => 2);
-    my $loc2 = location->new(lat => 2, long => 2);
+    my $loc1 = Geo::Location::Point->new(lat => 2, long => 2);
+    my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
     print ($loc1 == $loc2), "\n";	# Prints 1
 
 =cut
@@ -129,19 +129,18 @@ sub equal {
 
 =head2	not_equal
 
-Are two points different same?
+Are two points different?
 
-    my $loc1 = location->new(lat => 2, long => 2);
-    my $loc2 = location->new(lat => 2, long => 2);
+    my $loc1 = Geo::Location::Point->new(lat => 2, long => 2);
+    my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
     print ($loc1 != $loc2), "\n";	# Prints 0
 
 =cut
 
 sub not_equal {
 	my $self = shift;
-	my $other = shift;
 
-	return(!$self->equal($other));
+	return(!$self->equal(shift));
 }
 
 =head2	as_string
@@ -181,7 +180,7 @@ sub as_string {
 			my $leave_case = 0;
 			if(my $country = $self->{'country'} // $self->{'Country'}) {
 				if(uc($country) eq 'US') {
-					if(($field eq 'state') || ($field eq 'Region') || (lc($field) eq 'country')) {
+					if(($field eq 'state') || ($field eq 'region') || ($field eq 'country')) {
 						$leave_case = 1;
 						if(lc($field) eq 'country') {
 							$value = 'US';
@@ -192,7 +191,7 @@ sub as_string {
 						$leave_case = 1;
 					}
 				} elsif(uc($country) eq 'GB') {
-					if(lc($field) eq 'country') {
+					if($field eq 'country') {
 						$leave_case = 1;
 						$value = 'GB';
 					}
@@ -215,8 +214,9 @@ sub as_string {
 }
 
 sub _sortoutcase {
-	my $self = shift;
-	my $field = lc(shift);
+	# my $self = shift;
+	# my $field = lc(shift);
+	my $field = $_[1];
 	my $rc;
 
 	foreach (split(/ /, $field)) {
@@ -252,6 +252,7 @@ sub AUTOLOAD {
 
 	if(my $value = shift) {
 		$self->{$key} = $value;
+		delete $self->{'location'};	# Invalidate the cache
 	}
 
 	return $self->{$key};
@@ -273,7 +274,7 @@ L<Geo::Point>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2020 Nigel Horne.
+Copyright 2019-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

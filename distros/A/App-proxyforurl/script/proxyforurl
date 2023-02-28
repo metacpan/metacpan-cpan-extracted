@@ -1,213 +1,432 @@
 #!/usr/bin/env perl
-use Mojolicious::Lite;
-use NetAddr::IP ();
-use Socket 'inet_ntoa';
+use Mojolicious::Lite -signatures;
 
-get '/' => 'index';
+use Mojo::Util  qw(network_contains);
+use NetAddr::IP ();
+use Socket      qw(AF_INET AF_INET6 inet_ntop getaddrinfo unpack_sockaddr_in unpack_sockaddr_in6);
+
+get
+  '/' => {layout => 'pac'},
+  'index';
+
 get '/pac', [format => [qw(js)]], => 'pac';
 
-get '/gethostbyname' => sub {
-  my $c = shift;
-  return $c->render(text => "Host missing.", status => 400) unless my $host = $c->param('host');
-  return $c->render(text => $host) unless $host =~ /[a-z]/;
+post '/v1/gethostbyname' => sub ($c) {
+  return $c->render(text => 'Host missing.', status => 400) unless my $host = $c->param('host');
+  return $c->render(text => "Invalid host: $host", status => 400) unless $host =~ /[A-Za-z:\.]/;
 
-  local $! = 0;
-  local $? = 0;
-  my @addr = gethostbyname($c->param('host'));
-  $! ||= $?;
-  return $c->render(text => "No IP found: $!", status => 400) if $!;
-
-  @addr = map { inet_ntoa($_) } @addr[4 .. $#addr];
-  return $c->render(text => $addr[0]) if @addr;
-  return $c->render(text => "No IP found for $host.", status => 400);
-  },
-  'gethostbyname';
-
-get '/within' => sub {
-  my $c    = shift;
-  my $ip   = $c->param('ip');
-  my $net  = $c->param('net');
-  my $mask = $c->param('mask');
-
-  unless (2 == grep { $_ and $_ =~ /[:\.]/ } $ip, $net) {
-    return $c->render(text => "IP or Net is missing.", status => 400);
-  }
-  unless ($mask and $mask =~ /\d/) {
-    return $c->render(text => "Mask is invalid or missing.", status => 400);
-  }
-
-  $ip  = NetAddr::IP->new($c->param('ip'));
-  $net = NetAddr::IP->new(join '/', $net, $mask);
-  $c->render(text => $net->contains($ip) ? 1 : 0);
-  },
-  'within';
-
-hook before_dispatch => sub {
-  my $c = shift;
-  return unless my $base = $c->req->headers->header('X-Request-Base');
-  $c->req->url->base(Mojo::URL->new($base));
+  $c->res->headers->cache_control('max-age=600');
+  return $c->render_later->host_to_ip_p($host)->then(sub ($addr) {
+    return $c->render(text => "No IP found for $host", status => 400) unless $addr;
+    return $c->render(text => $addr);
+  })->catch(
+    sub ($err, @) {
+      return $c->render(text => exception_to_text($err), status => 500);
+    }
+  );
 };
 
-app->start;
+post '/v1/is-in-net' => sub ($c) {
+  my ($ip, $net, $mask) = map { $c->param($_) } qw(ip net mask);
+  return $c->render(text => 'IP or Net is missing.', status => 400)
+    unless 2 == grep { $_ && $_ =~ /[:\.]/ } $ip, $net;
+  return $c->render(text => 'Mask is invalid or missing.', status => 400)
+    unless $mask and $mask =~ /^\d{1,3}$/;
 
-__DATA__
-@@ index.html.ep
-<!DOCTYPE html>
-<html>
-<head>
-  <title>PAC file tester</title>
-  %= stylesheet '//unpkg.com/purecss@1.0.0/build/pure-min.css'
-  %= stylesheet begin
-    form { max-width: 50em; margin: 3em auto; }
-    textarea { height: 18em; }
-    .footer { margin-top: 3em; font-size: 0.9em; }
-    .footer, .footer a { color: #888; }
-  % end
-</head>
-<body>
-%= form_for '', method => 'post', class => 'pure-form pure-form-stacked', begin
-  <h1>Online proxy PAC file tester</h1>
-  <p>
-    <label for="rules">PAC file</label>
-    <textarea id="rules" class="pure-input-1"><%= include 'example_pac' %></textarea>
-  </p>
-  <p>
-    <label for="url">URL</label>
-    %= text_field 'url', 'http://example.com', class => 'pure-input-1', id => 'url', placeholder => 'http://example.com'
-  </p>
-  <p>
-    <label for="host">Host</label>
-    %= text_field 'host', 'example.com', class => 'pure-input-1', id => 'host'
-  </p>
-  <p>
-    <button class="pure-button pure-button-primary">Find rule</button>
-  </p>
-  <label for="rule">Rule</label>
-  <input type="text" id="rule" readonly="readonly" class="pure-input-1">
-  <p class="footer">
-    Powered by <a href="//metacpan.org/pod/App::proxyforurl#DESCRIPTION">proxyforurl</a>.
-  </p>
-% end
-%= javascript '/pac.js'
-%= javascript begin
-var $=function(id){return document.getElementById(id)};
-var template;
-$('url').addEventListener('change',function(e){var p=document.createElement('a');p.href=e.target.value;$('host').value=p.hostname});
-$('rules').addEventListener('click',function(e) {
-if(!template)template=this.value;
-if(this.value==template)this.value='';
-this.placeholder=template;
-});
-$('rules').addEventListener('blur',function(e){if(!this.value)this.value=template;});
-document.getElementsByTagName('form')[0].addEventListener('submit',function(e) {
-e.preventDefault();
-try{$('rule').value=new Pac().test($('rules').value, $('url').value, $('host').value)}
-catch(e){$('rule').value=e};
-});
-% end
-</body>
-</html>
+  $c->res->headers->cache_control('max-age=600');
+  return $c->render_later->host_to_ip_p($ip)->then(sub ($resolved) {
+    $c->render(text => $resolved && network_contains("$net/$mask", $resolved) ? 1 : 0);
+  })->catch(
+    sub ($err, @) {
+      $c->render(text => exception_to_text($err), status => 500);
+    }
+  );
+};
 
-@@ pac.js.ep
-(function(window) {
-  var pac = function() {};
-  var proto = pac.prototype;
-  var pacFunctions = [
-    'alert',
-    'dateRange',
-    'dnsDomainIs',
-    'dnsDomainLevels',
-    'dnsResolve',
-    'isInNet',
-    'isPlainHostName',
-    'isResolvable',
-    'localHostOrDomainIs',
-    'myIpAddress',
-    'shExpMatch',
-    'timeRange',
-    'weekdayRange'
-  ];
+get '/v1/template' => {template => 'template'};
 
-  var TODO = function() { return true; }
+helper host_to_ip_p => sub ($c, $host) {
+  return Mojo::IOLoop->subprocess->run_p(sub (@) {
+    local $SIG{ALRM} = sub { die 'Timeout!' };
+    alarm 2;
+    my ($err, @info) = getaddrinfo $host;
+    return undef if $err;
 
-  proto.test = function(_code, url, host) {
-    var i, re, code = _code.replace(/\bFindProxyForURL\b/, '');
-
-    for (i = 0; i < pacFunctions.length; i++) {
-      re = new RegExp('\\b' + pacFunctions[i] + '\\s*\\(', 'g');
-      code = code.replace(re, 'this.' + pacFunctions[i] + '(');
+    @info = grep { $_->{family} & (AF_INET6 | AF_INET) } @info;
+    for my $item (@info) {
+      $item->{pri} = $item->{family} == AF_INET6 ? 0 : 1;
+      @$item{qw(port ip)}
+        = $item->{family} == AF_INET6
+        ? unpack_sockaddr_in6($item->{addr})
+        : unpack_sockaddr_in($item->{addr});
+      $item->{ip} = inet_ntop @$item{qw(family ip)};
     }
 
-    code = code.replace(/\b(new\s|document\.|window\.|cookie\b)/, 'ILLEGAL');
-    code = eval('(' + code + ');');
-    return code.call(this, url, host);
+    # IPv4 before IPv6
+    @info = sort { $b->{pri} <=> $a->{pri} } @info;
+
+    return @info && $info[0]{ip} || undef;
+  })->catch(
+    sub ($err, @) {
+      return $err =~ m!Timeout! ? undef : Mojo::Promise->reject($err);
+    }
+  );
+};
+
+if (my $env_base = $ENV{PROXYFORURL_X_REQUEST_BASE}) {
+  $env_base = '' unless $env_base =~ m!^http!;
+  hook before_dispatch => sub ($c) {
+    return unless my $base = $env_base || $c->req->headers->header('X-Request-Base');
+    $c->req->url->base(Mojo::URL->new($base));
   };
+}
 
-  proto.alert = function(str) {
-    alert(str);
-  };
+app->renderer->paths([$ENV{PROXYFORURL_TEMPLATES} || 'templates']);
+app->static->paths([$ENV{PROXYFORURL_PUBLIC}      || 'public']);
+app->config(brand_name => $ENV{PROXYFORURL_BRAND_NAME} || 'ProxyForURL');
+app->config(brand_url  => $ENV{PROXYFORURL_BRAND_URL}  || '/');
+app->start;
 
-  proto.dateRange = TODO;
+sub exception_to_text ($err) {
+  $err =~ s!\sat\s\S+.*?line.*!!s;
+  return $err;
+}
 
-  proto.dnsDomainIs = function(host, domain) {
-    return host.length >= domain.length && host.substring(host.length - domain.length) == domain;
-  };
+__DATA__
+@@ layouts/pac.html.ep
+<!DOCTYPE html>
+<html>
+  <head>
+    %= include 'partial/pac/head'
+  </head>
+  <body>
+    <nav>
+      %= include 'partial/pac/nav'
+    </nav>
+    <div class="container">
+      <article>
+        <header>
+          <h1>Online proxy PAC file tester</h1>
+          <p>Enter the content of your PAC file and test it against a URL.</p>
+        </header>
+        %= content
+        <footer>
+          <a href="https://github.com/jhthorsen/app-proxyforurl">This program</a> is free software,
+          you can redistribute it and/or modify it under the terms of the
+          <a href="https://spdx.org/licenses/Artistic-2.0.html">Artistic License version 2.0</a>.
+        </footer>
+      </article>
+    </div>
+    %= javascript begin
+      const switcher = document.getElementById('theme_switcher');
+      const setTheme = (e) => {
+        const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const other = prefers === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', e.target.checked ? other : prefers);
+      };
+      switcher.addEventListener('click', setTheme);
+      setTheme({target: switcher});
+    % end
+  </body>
+</html>
+@@ partial/pac/head.html.ep
+<title>Online proxy PAC file tester</title>
+%= stylesheet 'https://unpkg.com/@picocss/pico@1.*/css/pico.min.css'
+%= stylesheet begin
+  body {
+    margin-top: 5rem;
+  }
+  nav {
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: saturate(150%) blur(18px);
+    border-bottom: 1px solid var(--muted-border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+  }
+  footer {
+    font-size: 14px;
+  }
+  textarea {
+    height: 18em;
+  }
+  label[data-tooltip] {
+    border: 0;
+  }
+  #pac_log tbody tr:first-child td {
+    color: var(--code-value-color);
+    font-weight: bold;
+    border-bottom: 4px double var(--code-value-color);
+    vertical-align: top;
+  }
+  #pac_log tbody tr:first-child:last-child td {
+    height: 8rem;
+  }
+% end
+@@ partial/pac/nav.html.ep
+<ul>
+  <li>&nbsp;</li>
+  <li><a href="<%= config 'brand_url' %>"><%= config 'brand_name'  %></a></li>
+</ul>
+<ul>
+  <li>
+    <label data-tooltip="Switch dark/light mode" data-placement="left">
+      <input type="checkbox" id="theme_switcher" role="switch" aria-label="Switch dark/light mode">
+    </label>
+  </li>
+  <li>&nbsp;</li>
+</ul>
+@@ index.html.ep
+%= form_for '/', method => 'post', id => 'proxy_for_url', begin
+  <label for="pac_rules">
+    <span>PAC file</span>
+    <textarea id="pac_rules" name="rules"></textarea>
+  </label>
+  <div class="grid">
+    <label for="pac_url">
+      <span>URL</span>
+      %= text_field 'url', 'http://example.com', id => 'pac_url', placeholder => 'http://example.com'
+    </label>
+    <label for="pac_host">
+      <span>Host</span>
+      %= text_field 'host', '', id => 'pac_host', placeholder => 'From URL'
+    </label>
+    <label for="pac_my_ip_address">
+      <span>Your IP address</span>
+      %= text_field 'my_ip_address', 'http://example.com', id => 'pac_my_ip_address', placeholder => 'http://example.com'
+    </label>
+  </div>
+  <div class="grid">
+    <button>Find rule</button>
+    <div>&nbsp;</div>
+    <div></div>
+  </div>
+  <table id="pac_log" role="grid">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Rule</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>0</td>
+        <td colspan="2">Hit "Find rule" to see log</td>
+      </tr>
+    </tbody>
+  </table>
+% end
+%= javascript begin
+%= include 'pac', format => 'js'
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.ProxyForURL) return;
+  window.proxyForURL = new ProxyForURL();
+  window.proxyForURL.attach(document);
+});
+% end
+@@ pac.js.ep
+const PAC_FUNCTIONS = {
+  alert: true,
+  dateRange: false,
+  dnsDomainIs: true,
+  dnsDomainLevels: true,
+  dnsResolve: true,
+  isInNet: true,
+  isPlainHostName: true,
+  isResolvable: true,
+  localHostOrDomainIs: true,
+  myIpAddress: true,
+  shExpMatch: true,
+  timeRange: false,
+  weekdayRange: false,
+};
 
-  proto.dnsDomainLevels = function(host) {
-    var m = host.match(/\./g);
-    return m ? m.length - 1 : 0;
-  };
+class ProxyForURL {
+  attach(d) {
+    this.form = d.querySelector('#proxy_for_url');
+    if (!this.form) return console.warn('Could not find form#proxy_for_url');
 
-  proto.dnsResolve = function(host) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '<%= url_for 'gethostbyname' %>?host=' + host, false);
-    xhr.send(null);
-    return xhr.status == 200 ? xhr.responseText : false;
-  };
+    this.basePath = (this.form.action || '/').replace(/\/+$/, '')
+    this.logEl = d.querySelector('table#pac_log, form table');
+    this.myIpAddressInput = this.form.querySelector('[name=my_ip_address]');
+    this.rulesInput = this.form.querySelector('[name=rules]');
+    if (!this.myIpAddressInput || !this.rulesInput) return console.error('Could not find all form fields');
 
-  proto.isInNet = function(ip, net, mask) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '<%= url_for 'within' %>?ip=' + ip + '&net=' + net + '&mask=' + mask, false);
-    xhr.send(null);
-    return xhr.status == 200 && parseInt(xhr.responseText) ? true : false;
-  };
-
-  proto.isResolvable = function(host) {
-    return dnsResolve(host) ? true : false;
+    this.form.addEventListener('submit', (e) => [e.preventDefault(), this.findRule()]);
+    this._init();
+    console.info('ProxyForURL attached to form#proxy_for_url');
   }
 
-  proto.isPlainHostName = function(str) {
+  findRule() {
+    const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
+    this._animate(true);
+
+    try {
+      const url = new URL(document.querySelector('#pac_url').value);
+      this.log(null);
+      this.log('FindProxyForURL', [url, url.hostname], null);
+
+      this.findProxyForURL = this.rulesInput.value
+          .replace(/function\s+FindProxyForURL[^{]+{/, '')
+          .replace(/\}\s*$/, '');
+
+      for (let func of Object.keys(PAC_FUNCTIONS)) {
+        const re = new RegExp('\\b' + func + '\\s*\\(', 'g');
+        this.findProxyForURL = this.findProxyForURL.replace(re, 'await this._wrap("' + func + '", ');
+      }
+
+      this.findProxyForURL = this.findProxyForURL.replace(/\b(new\s|document\.|window\.|cookie\b)/, 'ILLEGAL');
+
+      const fn = new AsyncFunction('url', 'host', this.findProxyForURL).bind(this);
+      fn(url.toString(), url.hostname).then(
+        (rule) => (this.logEl.querySelector('tbody tr td:last-child').textContent = rule),
+        (err) => this.log(String(err), '', 'Error!'),
+      ).finally(() => this._animate(false));
+    } catch (err) {
+      this._animate(false);
+      let message = String(err);
+      if (err.lineNumber) message += ' at line ' + err.lineNumber;
+      if (err.columnNumber) message += ':' + err.columnNumber;
+      this.log(message, '', 'Error!');
+      throw err;
+    }
+  }
+
+  log(msg, args, res) {
+    const tbody = this.logEl.querySelector('tbody');
+    if (msg === null) return tbody.innerHTML = '';
+    const cells = [tbody.querySelectorAll('tr').length, msg, JSON.stringify(res)];
+
+    if (args) {
+      const prefix = PAC_FUNCTIONS[msg] === false ? '// ' : '';
+      args = JSON.stringify(args).replace(/^\[/, '(').replace(/]$/, ')');
+      cells[1] = prefix + msg + args;
+    }
+
+    const tr = document.createElement('tr');
+    for (const content of cells) {
+      const td = document.createElement('td');
+      td.textContent = content;
+      tr.appendChild(td);
+    }
+
+    tbody.appendChild(tr);
+  }
+
+  async alert() {
+    return true;
+  }
+
+  async dateRange() {
+    return true;
+  }
+
+  async dnsDomainIs(host, domain) {
+    return host.endsWith(domain);
+  }
+
+  async dnsDomainLevels(host) {
+    const m = host.match(/\./g);
+    return m ? m.length : 0;
+  }
+
+  async dnsResolve(host) {
+    const body = new FormData();
+    body.append('host', host);
+    const res = await fetch(this.basePath + '/v1/gethostbyname', {method: 'POST', body});
+    const text = await res.text();
+    if (res.status >= 500) throw 'dnsResolve() FAIL ' + (text || res.status);
+    return text;
+  }
+
+  async isInNet(ip, net, mask) {
+    // Ex: Turn 255.255.255.0 into 24
+    if (mask.match(/\./)) mask = Math.round(mask.split('.').reduce((c, o) => c - Math.log2(256 - o), 32));
+
+    const body = new FormData();
+    body.append('ip', ip);
+    body.append('net', net);
+    body.append('mask', mask);
+    const res = await fetch(this.basePath + '/v1/is-in-net', {method: 'POST', body});
+    const text = await res.text();
+    if (res.status >= 500) throw 'isInNet() FAIL ' + (text || res.status);
+    return parseInt(text, 10) ? true : false;
+  }
+
+  async isResolvable(host) {
+    return await this.dnsResolve(host) ? true : false;
+  }
+
+  async isPlainHostName(str) {
     return str.match(/\./) ? false : true;
-  };
+  }
 
-  proto.localHostOrDomainIs = function(host, str) {
-    return str.match(/^\./) ? dnsDomainIs(host, str) : host == str ? true : host == host.split('.')[0];
-  };
+  async localHostOrDomainIs(host, str) {
+    return str.match(/^\./) ? dnsDomainIs(host, str) : host === str ? true : host === host.split('.')[0];
+  }
 
-  proto.myIpAddress = function() {
-    return '<%= $c->tx->remote_address %>';
-  };
+  async myIpAddress() {
+    return this.myIpAddressInput.value || this.remoteAddress || '127.0.0.1';
+  }
 
-  proto.shExpMatch = function(str, re) {
-    return str.match(new RegExp(re.replace(/\*/, '.*?'), 'i'));
-  };
+  async shExpMatch(host, re) {
+    return host.match(new RegExp(re.replace(/\*/, '.*?'), 'i')) ? true : false;
+  }
 
-  proto.timeRange = TODO;
-  proto.weekdayRange = TODO;
+  async timeRange() {
+    return true;
+  }
 
-  window.Pac = pac;
-})(window);
+  async weekdayRange() {
+    return true;
+  }
 
-@@ example_pac.html.ep
+  _animate(start) {
+    const method = start ? 'setAttribute' : 'removeAttribute';
+    setTimeout(() => {
+      this.form.querySelector('button')[method]('aria-busy', true);
+    }, (start ? 1 : 350));
+  }
+
+  async _init() {
+    const res = await fetch(this.basePath + '/v1/template');
+    const text = await res.text();
+
+    if (!this.rulesInput.value) this.rulesInput.value = text;
+    const yourIp = text.match(/Your IP: (\S+)/) || [];
+    this.remoteAddress = yourIp[1] || '127.0.0.1';
+    this.myIpAddressInput.placeholder = this.remoteAddress;
+    this.myIpAddressInput.value = this.remoteAddress;
+  }
+
+  async _wrap(func) {
+    const args = [].slice.call(arguments, 1);
+    const res = await this[func].apply(this, args);
+    this.log(func, args, res);
+    return res;
+  }
+}
+@@ template.html.ep
+// Your IP: <%= $c->tx->remote_address %>
 function FindProxyForURL(url, host) {
   // our local URLs from the domains below example.com don't need a proxy:
   if (shExpMatch(host, "*.example.com")) return "DIRECT";
+  if (isPlainHostName(host)) return "DIRECT";
+  if (localHostOrDomainIs(host, "www.example.com")) return "PROXY local.proxy:8080";
+  if (!isResolvable(host)) return "SOCKS4 example.com:1080";
+  if (dnsDomainLevels(host) === 4) return "SOCKS4 example.com:1081";
+
+  alert("Checking other rules...");
+  alert(myIpAddress());
 
   // URLs within this network are accessed through
   // port 8080 on fastproxy.example.com:
   if (isInNet(host, "10.0.0.0", "255.255.248.0")) return "PROXY fastproxy.example.com:8080";
 
-  if (dnsDomainIs(host, "example.com")) return "PROXY proxy2.example.com:8888";
+  if (dnsDomainIs(host, "le.com")) return "PROXY proxy2.example.com:8888";
 
   // All other requests go through port 8080 of proxy.example.com.
   // should that fail to respond, go directly to the WWW:

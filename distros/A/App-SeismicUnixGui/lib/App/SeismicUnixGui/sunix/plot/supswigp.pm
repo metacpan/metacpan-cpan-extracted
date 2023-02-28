@@ -1,6 +1,5 @@
  package App::SeismicUnixGui::sunix::plot::supswigp;
 
-
 =head1 DOCUMENTATION
 
 =head2 SYNOPSIS
@@ -21,7 +20,7 @@ Version:
 
  supswigp - PostScript Bit-mapped WIGgle plot of a segy data set	
 
- supswigp <stdin [optional parameters] | ...				
+ supswigp <stdin [optional parameters] >				
 
  Optional parameters:						 	
  key=(keyword)		if set, the values of x2 are set from header field
@@ -102,7 +101,7 @@ PSWIGP - PostScript WIGgle-trace plot of f(x1,x2) via Polygons
  Optional Parameters:							
  d1=1.0                 sampling interval in 1st dimension		
  f1=0.0                 first sample in 1st dimension			
- n2=all                 number of samples in 2nd (slow) dimension	
+ n2=all                 number of samples in 2| ...nd (slow) dimension	
  d2=1.0                 sampling interval in 2nd dimension		
  f2=0.0                 first sample in 2nd dimension			
  x2=f2,f2+d2,...        array of sampled values in 2nd dimension	
@@ -145,7 +144,7 @@ PSWIGP - PostScript WIGgle-trace plot of f(x1,x2) via Polygons
  titlesize=24           font size for title				
  titlecolor=black       color of title					
  axescolor=black        color of axes					
- gridcolor=black        color of grid					
+ gridcolor=black        color of grid			| ...		
  axeswidth=1            width (in points) of axes			
  ticwidth=axeswidth     width (in points) of tic marks		
  gridwidth=axeswidth    width (in points) of grid lines		
@@ -166,7 +165,7 @@ PSWIGP - PostScript WIGgle-trace plot of f(x1,x2) via Polygons
  The curve file is an ascii file with the points specified as x1 x2 pairs,
  one pair to a line.  A "vector" of curve files and curve colors may 
  be specified as curvefile=file1,file2,etc. and similarly		
- curvecolor=color1,color2,etc, and the number of pairs of values	
+ curvecolor=color1,color2,etc, and the number | ...of pairs of values	
  in each file as npair=npair1,npair2,... .                             
 
  All color specifications may also be made in X Window style Hex format
@@ -187,9 +186,13 @@ PSWIGP - PostScript WIGgle-trace plot of f(x1,x2) via Polygons
 
 =head2 CHANGES and their DATES
 
+VERSION = '0.0.2'; 02.09.23 Only redirection allowed.
+
 =cut
- use Moose;
-our $VERSION = '0.0.1';
+
+
+use Moose;
+our $VERSION = '0.0.2';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
 	my $get					= L_SU_global_constants->new();

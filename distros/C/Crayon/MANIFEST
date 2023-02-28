@@ -14,6 +14,9 @@ t/04-global.t
 t/05-comments.t
 t/06-syntax.t
 t/07-fix.t
+t/08-directory.t
+t/compile/01-base.css
+t/compile/02-overide.css
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

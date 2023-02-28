@@ -602,6 +602,14 @@ sub stat
     return( $self->error( "stat() is not implemented by $class." ) );
 }
 
+# sub structure must be superseded by sub classes
+sub structure
+{
+    my $self = shift( @_ );
+    my $class = ref( $self );
+    return( $self->error( "structure() is not implemented by $class." ) );
+}
+
 sub table { return( shift->{table} ); }
 
 sub tie
@@ -629,14 +637,6 @@ sub types_const
     my $types = $self->{types_const};
     return( wantarray() ? () : undef() ) if( !%$types );
     return( wantarray() ? %$types : $types );
-}
-
-# sub structure must be superseded by sub classes
-sub structure
-{
-    my $self = shift( @_ );
-    my $class = ref( $self );
-    return( $self->error( "structure() is not implemented by $class." ) );
 }
 
 sub unlock

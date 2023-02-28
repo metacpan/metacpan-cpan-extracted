@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.016';
+$Arango::Tango::API::VERSION = '0.019';
 #use Arango::Tango::Database;
 #use Arango::Tango::Collection;
 
@@ -65,26 +65,36 @@ sub _install_methods($$) {
 }
 
 my %API = (
-    bulk_import_list   => {
-        rest => [ post => '{{database}}_api/import?collection={collection}&type=list']
+    'bulk_import_list'   => {
+        rest => [ post => '{{database}}_api/import?collection={collection}'],
+        url_schema => {
+            type        => { type => 'string', pattern => 'documents|list|auto'  },
+            fromPrefix  => { type => 'string'  },
+            toPrefix    => { type => 'string'  },
+            overwrite   => { type => 'boolean' },
+            waitForSync => { type => 'boolean' },
+            onDuplicate => { type => 'string', pattern => 'error|update|replace|ignore'  },
+            complete    => { type => 'boolean' },
+            details     => { type => 'boolean' } 
+        }
     },
-    create_document    => {
+    'create_document'    => {
         rest => [ post  => '{{database}}_api/document/{collection}']
     },
-    replace_document   => {
+    'replace_document'   => {
         rest => [ put => '{{database}}_api/document/{collection}/{key}' ],
     },
-    list_collections   => {
+    'list_collections'   => {
         rest => [ get   => '{{database}}_api/collection'],
         schema => { excludeSystem => { type => 'boolean' } }
     },
-    cursor_next        => {
+    'cursor_next'        => {
         rest => [ put => '{{database}}_api/cursor/{id}']
     },
-    cursor_delete      => {
+    'cursor_delete'      => {
         rest => [ delete => '{{database}}_api/cursor/{id}']
     },
-    accessible_databases => {
+    'accessible_databases' => {
         rest => [ get => '_api/database/user']
     },
     'all_keys' => {
@@ -158,10 +168,31 @@ sub __api {
 
     my $url = sprintf("%s://%s:%d/%s", $self->{scheme}, $self->{host}, $self->{port}, $uri);
 
-    my $body = (ref($params) eq "HASH" || ref($params) eq "ARRAY") && exists $params->{body} ? $params->{body} : undef;
-    my $opts = ref($params) eq "HASH" ? $params : {};
-
+    my $body = undef;
+    my $opts = {};
+    my $url_opts = {};
+    if (ref($params) eq "HASH") {
+        $body = $params->{_body} if exists $params->{_body};
+        $url_opts = $params->{_url_parameters} if exists $params->{_url_parameters} and ref($params->{_url_parameters}) eq "HASH";
+        $opts = $params;
+        for (qw._body _parameters.) {
+            delete $opts->{$_} if exists $opts->{$_};
+        }
+    }
     $opts = exists($conf->{schema}) ? _check_options($opts, $conf->{schema}) : {};
+    $url_opts = exists($conf->{url_schema}) ? _check_options($url_opts, $conf->{url_schema}) : {};
+
+    if (keys %$url_opts) {
+        my $url_parameters = join("&", map { 
+            my $val = $url_opts->{$_};
+            if (ref($val) eq "JSON::PP::Boolean") {
+                $val = $val ? "yes" : "no"
+            }
+            "$_=$val" } keys %$url_opts);
+        $url .= ($url =~ /\?/ ? "&" : "?") . $url_parameters;
+    }
+
+
     if (exists($conf->{require_document}) && !$body) {
         die "Arango::Tango | Document missing\n    [ $method => $url ]\n";
     }
@@ -214,7 +245,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 AUTHOR
 
@@ -222,7 +253,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Alberto Simões.
+This software is copyright (c) 2019-2023 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

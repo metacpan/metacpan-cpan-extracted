@@ -1,7 +1,6 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
   (
-   NO_META => 1,
    NAME => "Schedule::Cron",
    VERSION_FROM => "lib/Schedule/Cron.pm",
    ($] >= 5.005

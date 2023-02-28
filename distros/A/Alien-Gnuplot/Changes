@@ -1,3 +1,17 @@
+1.040 2023-02-23
+  - Switch to using Alien::Build / alienfile to check and install Gnuplot.
+  - Alien::Gnuplot is now a subclass of Alien::Base.
+  - Remove interactive installation option for using system package manager.
+    The build now gives hints on what command to run instead.
+  - Add check for broken Gnuplot pipe IPC on Windows for versions in the
+    exclusive range ( 5.2.8, 5.4.6 ). See <https://github.com/PDLPorters/PDL-Graphics-Gnuplot/issues/79>
+    for more information.
+  - Can now download then build Gnuplot from source on non-MSWin32 platforms
+    and download then install the pre-built Gnuplot binaries on MSWin32. GH#2.
+  - API change: load_gnuplot() is no longer called when loading the module
+    with `require` or `do`. It is instead called by `import()`. This means
+    that the usual `use Alien::Gnuplot;` should continue to work.
+
 1.034 2021-07-23
 - reset stdin position before exec - thanks @vividsnow
 

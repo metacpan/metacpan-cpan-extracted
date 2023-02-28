@@ -21,7 +21,7 @@ recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
-requires 'License::SPDX' => 0;
+requires 'License::SPDX' => 0.04;
 requires 'List::Util' => 0;
 requires 'Parse::RecDescent' => 0;
 requires 'Readonly' => 0;
@@ -33,7 +33,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

@@ -4,7 +4,7 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -16,8 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
@@ -31,12 +30,17 @@
             "Exporter" : "0",
             "XSLoader" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Algorithm::MedianSelect::XS" : {
          "file" : "lib/Algorithm/MedianSelect/XS.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -48,6 +52,6 @@
          "url" : "https://github.com/stsc/Algorithm-MedianSelect-XS"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

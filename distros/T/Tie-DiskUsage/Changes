@@ -1,5 +1,11 @@
 Revision history for Perl extension Tie::DiskUsage.
 
+0.23  2023-02-26  <schubiger@cpan.org>
+
+ - Move testing modules to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.22  2016-11-30  <schubiger@cpan.org>
 
  - Merged development version to stable.

@@ -1,5 +1,5 @@
 package Test::PerlTidy;
-$Test::PerlTidy::VERSION = '20220902';
+$Test::PerlTidy::VERSION = '20230226';
 use 5.014;
 use strict;
 use warnings;
@@ -105,7 +105,7 @@ sub is_file_tidy {
 }
 
 sub list_files {
-    my (@args) = @_;
+    my (@params) = @_;
 
     my %args;
     my $path;
@@ -116,13 +116,13 @@ sub list_files {
     # backward compatibility with Test::PerlTidy::list_files, on the
     # off chance that someone was calling it directly...
     #
-    if ( @args > 1 ) {
-        %args = @args;
+    if ( @params > 1 ) {
+        %args = @params;
         $path = $args{path};
     }
     else {
         %args = ();
-        $path = $args[0];
+        $path = $params[0];
     }
 
     $path ||= q{.};
@@ -136,38 +136,44 @@ sub list_files {
     $test->BAIL_OUT('exclude should be an array')
       unless ref $excludes eq 'ARRAY';
 
-    my @files;
-    path($path)
-      ->visit( sub { push @files, $_ if $_->is_file && /[.](?:pl|pm|PL|t)\z/; },
-        { recurse => 1 } );
-
-    my %keep     = map { File::Spec->canonpath($_) => 1 } @files;
-    my @excluded = ();
-
-    foreach my $file ( keys %keep ) {
-
-        foreach my $exclude ( @{$excludes} ) {
-
-            my $exclude_me =
-              ref $exclude ? ( $file =~ $exclude ) : ( $file =~ /^$exclude/ );
-
-            if ($exclude_me) {
-                delete $keep{$file};
-                push @excluded, $file if $args{debug};
-                last;    # no need to check more exclusions...
-            }
+    foreach my $exclude (@$excludes) {
+        if ( not ref($exclude) ) {
+            $exclude = qr/\A$exclude/;
         }
     }
+    my $DEBUG    = ( $args{debug} // '' );
+    my @excluded = ();
+    my @filenames;
+    path($path)->visit(
+        sub {
+            my $fn = $_;
+            my $exclude_me;
+          EXCLUDES:
+            foreach my $exclude ( @{$excludes} ) {
+                $exclude_me = ( $fn =~ $exclude );
+                push @excluded, $fn if $DEBUG;
+                last EXCLUDES
+                  if $exclude_me;    # no need to check more exclusions...
+            }
+            return if $exclude_me;
+            if ( $fn->is_file && ( $fn =~ /\.(?:pl|pm|PL|t)\z/ ) ) {
+                push @filenames, $fn;
+            }
+        },
+        { recurse => 1 }
+    );
+
+    my %keep = map { File::Spec->canonpath($_) => 1 } @filenames;
 
     # Sort the output so that it is repeatable
-    @files = sort keys %keep;
+    @filenames = sort keys %keep;
 
-    if ( $args{debug} ) {
+    if ($DEBUG) {
         $test->diag( 'Files excluded: ', join( "\n\t", sort @excluded ), "\n" );
-        $test->diag( 'Files remaining ', join( "\n\t", @files ),         "\n" );
+        $test->diag( 'Files remaining ', join( "\n\t", @filenames ),     "\n" );
     }
 
-    return @files;
+    return @filenames;
 }
 
 sub load_file {
@@ -195,7 +201,7 @@ Test::PerlTidy - check that all your files are tidy.
 
 =head1 VERSION
 
-version 20220902
+version 20230226
 
 =head1 SYNOPSIS
 
@@ -473,7 +479,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Edmund von der Burg.
+This software is copyright (c) 2023 by Edmund von der Burg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

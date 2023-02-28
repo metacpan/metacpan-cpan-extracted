@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.8
+## Version v0.400.9
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2023/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -31,7 +31,7 @@ BEGIN
     use DateTime::Format::Strptime;
     use Module::Generic::File qw( sys_tmpdir );
     use Nice::Try;
-    $VERSION     = 'v0.400.8';
+    $VERSION     = 'v0.400.9';
     use Devel::Confess;
 };
 
@@ -695,7 +695,7 @@ sub _connection_parameters
     my $param = shift( @_ );
     # Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
     # Or maybe should I issue an error when they are provided?
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections unknown_field )];
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     # See DBD::SQLite for the list of valid parameters
     # E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
@@ -1317,7 +1317,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v0.400.8
+    v0.400.9
 
 =head1 DESCRIPTION
 

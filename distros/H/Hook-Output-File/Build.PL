@@ -19,14 +19,13 @@ my $build = Module::Build->new
                  'Params::Validate' => 0,
                  'Scalar::Util' => 0,
                },
-   build_requires => {
-                       'File::Temp' => 0,
-                       'IO::Capture' => 0,
-                       'Test::More' => 0,
-                     },
+   test_requires => {
+                      'File::Temp' => 0,
+                      'IO::Capture' => 0,
+                      'Test::More' => 0,
+                    },
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
        resources => {
            repository => 'https://github.com/stsc/Hook-Output-File',

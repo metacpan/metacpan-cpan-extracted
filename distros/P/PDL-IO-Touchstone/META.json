@@ -59,6 +59,6 @@
          "web" : "https://github.com/KJ7LNW/perl-PDL-IO-Touchstone.git"
       }
    },
-   "version" : "1.013",
+   "version" : "1.014",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

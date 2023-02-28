@@ -4,7 +4,7 @@ StreamFinder::BrandNewTube - Fetch actual raw streamable URLs from BrandNewTube.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2022 by
+This module is Copyright (C) 2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -308,7 +308,7 @@ L<http://search.cpan.org/dist/StreamFinder-BrandNewTube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Jim Turner.
+Copyright 2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -424,8 +424,10 @@ sub new
 			}
 		}
 		if ($html) {
-			$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
+			$self->{'title'} = ($html =~ m#\<title\>\s*([^\<]+)\<\/title\>#s) ? $1 : '';
 			$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+(?:name|property)\=\"?(?:og|twitter)\:title\"?\s+content\=\"(.+?)\"\s*\/?\>#s);
+			$self->{'title'} =~ s#\s+$##;
+			$self->{'title'} =~ s#\s*\-\s+Brand New Tube$##;
 
 			if ($html =~ m#<div class="publisher-name(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
@@ -435,19 +437,27 @@ sub new
 				}
 				if ($publisherHtml =~ m#\<span\s+title="Published on\s+([^\"]+)#s) {
 					$self->{'created'} = $1;
-					$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)$/);
 				}
 				$self->{'year'} ||= $1  if ($publisherHtml =~ m#(\d+)\<\/span#s);
+			} elsif ($html =~ m#Published\s+on\s+([^\<]+)#) {
+				$self->{'created'} = $1;
 			}
-			if ($html =~ m#<div class="publisher-avatar(.+?)\<\/div\>#s) {
+			$self->{'year'} ||= $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+				
+			if ($html =~ m#<div class="publisher-avatar(.+?)\<\/div\>#s) {  #UGETube?:
 				my $publisherHtml = $1;
 				$self->{'articonurl'} = $1  if ($publisherHtml =~ m#\<img\s+src\=\"([^\"]+)#s);
 				$self->{'albumartist'} ||= $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
+			} elsif ($html =~ m#\<span\s+class\=\"mr\-3\"\>(.+?)\<\/span\>#s) {  #brandnewtube?:
+				my $publisherHtml = $1;
+				$self->{'albumartist'} ||= $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
+				$self->{'articonurl'} = $1  if ($publisherHtml =~ m#\<img\s+.*?src\=\"([^\?\"]+)#s);
+				$self->{'artist'} = $1  if ($publisherHtml =~ m# title\=\"([^\"]+)#s);
 			}
 			if ($html =~ m#<div class="video-published(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
 				$self->{'genre'} = HTML::Entities::decode_entities($1)  if ($publisherHtml =~ m#\>([^\<]+)\<\/a#s);
-				#ugetube-specific year & genre:
+				#UGETube-specific year & genre:
 				if ($publisherHtml =~ m#Published on\s+(.+)#s) {
 					$self->{'created'} ||= $1;
 					$self->{'created'} =~ s/\s+$//;
@@ -460,6 +470,7 @@ sub new
 				}
 			}
 
+			#Below seems to be UGETube-only now?:
 			$self->{'description'} = $1  if ($html =~ m# itemprop\=\"description\"\>(.+?)\<\/p\>#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=\"(?:og\:|twitter\:)?description\"\s+content\=\"([^\"]+)#s);
 
@@ -475,7 +486,7 @@ sub new
 			}
 
 			#TRY TO FETCH STREAMS:
-			while ($html =~ s#\<source\s+src\=\"([^\"]+)\"##so) {
+			while ($html =~ s#\<source\s+.*?src\=\"([^\"]+)\"##so) {
 				my $one = $1;
 				push @{$self->{'streams'}}, $one  unless ($self->{'secure'} && $one !~ /^https/o);
 				$self->{'cnt'}++;

@@ -14,7 +14,7 @@ INSTALLATION
             make install
 
 AUTHOR
-    This module is Copyright (C) 2017-2022 by
+    This module is Copyright (C) 2017-2023 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
 
@@ -129,7 +129,7 @@ DESCRIPTION
     (StreamFinder::Apple), bitchute.com videos (StreamFinder::Bitchute),
     blogger.com videos (StreamFinder::Blogger), brandnewtube.com and
     ugetube.com videos (StreamFinder::BrandNewTube), brighteon.com videos
-    (StreamFinder::Brighteon), castbox.fm podcases (StreamFinder::Castbox),
+    (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
     podcasts.google.com podcasts (StreamFinder::Google), iheartradio.com
     radio stations and podcasts (StreamFinder::IHeartRadio),
     www.internetradio.com radio stations (StreamFinder::InternetRadio),
@@ -137,7 +137,8 @@ DESCRIPTION
     odysee.com videos (StreamFinder::Odysee), podbean.com podcasts
     (StreamFinder::Podbean), podcastaddict.com podcasts
     (StreamFinder::PodcastAddict), radio.net radio stations
-    (StreamFinder::RadioNet), rumble.com videos (StreamFinder::Rumble),
+    (StreamFinder::RadioNet), rcast.net radio stations
+    (StreamFinder::Rcast), rumble.com videos (StreamFinder::Rumble),
     sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
     soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
     spreaker.com podcasts (StreamFinder::Spreaker), tunein.com
@@ -253,7 +254,7 @@ SUBROUTINES/METHODS
         Limit HLS (m3u8) streams that contain a list of other HLS streams of
         varying BANDWIDTH values (in BITS per second) by selecting the
         highest bitrate stream at or below the specified limit when
-        *$stream-*getURL()> is called.
+        *$stream*->*getURL()* is called.
 
         DEFAULT *-none-* (no limiting by bitrate).
 
@@ -398,7 +399,7 @@ DEPENDENCIES
 RECCOMENDS
     youtube-dl, or other compatable program such as yt-dlp, etc. (for
     Youtube, Bitchute, Blogger, Brighteon, Odysee, Vimeo) NOTE: Required for
-    Youtube, Odysee, and SoundCloud.
+    Youtube, Odysee, and SoundCloud to work.
 
     wget
 
@@ -433,7 +434,7 @@ SEE ALSO
         <http://search.cpan.org/dist/StreamFinder/>
 
 LICENSE AND COPYRIGHT
-    Copyright 2017-2022 Jim Turner.
+    Copyright 2017-2023 Jim Turner.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy

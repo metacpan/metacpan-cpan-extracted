@@ -1,0 +1,72 @@
+{
+   "abstract" : "Select subtests by name or by number",
+   "author" : [
+      "Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Builder-SubtestSelection",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "develop" : {
+         "suggests" : {
+            "App::Software::License" : "0",
+            "Pod::Markdown::Github" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.24",
+            "Test::More" : "0.99",
+            "parent" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Builder::Tester" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Builder::SubtestSelection" : {
+         "file" : "lib/Test/Builder/SubtestSelection.pm",
+         "version" : "0.001002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/XSven/Test-Builder-SubtestSelection/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/XSven/Test-Builder-SubtestSelection.git",
+         "web" : "https://github.com/XSven/Test-Builder-SubtestSelection"
+      }
+   },
+   "version" : "0.001002"
+}

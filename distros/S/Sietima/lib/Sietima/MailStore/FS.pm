@@ -2,13 +2,13 @@ package Sietima::MailStore::FS;
 use Moo;
 use Sietima::Policy;
 use Types::Path::Tiny qw(Dir);
-use Types::Standard qw(Object ArrayRef Str slurpy);
-use Type::Params qw(compile);
+use Types::Standard qw(Object ArrayRef Str Slurpy);
+use Type::Params -sigs;
 use Sietima::Types qw(EmailMIME TagName);
 use Digest::SHA qw(sha1_hex);
 use namespace::clean;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: filesystem-backed email store
 
 
@@ -32,23 +32,31 @@ sub BUILD($self,@) {
 }
 
 
-sub store($self,$mail,@tags) {
-    state $check = compile(Object,EmailMIME,slurpy ArrayRef[TagName]);$check->(@_);
+signature_for store => (
+    method => Object,
+    positional => [
+        EmailMIME,
+        Slurpy[ArrayRef[TagName]],
+    ],
+);
+sub store($self,$mail,$tags) {
 
     my $str = $mail->as_string;
     my $id = sha1_hex($str);
 
     $self->_msgdir->child($id)->spew_raw($str);
 
-    $self->_tagdir->child($_)->append("$id\n") for @tags;
+    $self->_tagdir->child($_)->append("$id\n") for $tags->@*;
 
     return $id;
 }
 
 
+signature_for retrieve_by_id => (
+    method => Object,
+    positional => [ Str ],
+);
 sub retrieve_by_id($self,$id) {
-    state $check = compile(Object,Str);$check->(@_);
-
     my $msg_path = $self->_msgdir->child($id);
     return unless -e $msg_path;
     return Email::MIME->new($msg_path->slurp_raw);
@@ -61,13 +69,17 @@ sub _tagged_by($self,$tag) {
     return $tag_file->lines({chomp=>1});
 }
 
-sub retrieve_ids_by_tags($self,@tags) {
-    state $check = compile(Object,slurpy ArrayRef[TagName]);$check->(@_);
-
+signature_for retrieve_ids_by_tags => (
+    method => Object,
+    positional => [
+        Slurpy[ArrayRef[TagName]],
+    ],
+);
+sub retrieve_ids_by_tags($self,$tags) {
     # this maps: id -> how many of the given @tags it has
     my %msgs;
-    if (@tags) {
-        for my $tag (@tags) {
+    if ($tags->@*) {
+        for my $tag ($tags->@*) {
             $_++ for @msgs{$self->_tagged_by($tag)};
         }
     }
@@ -79,18 +91,22 @@ sub retrieve_ids_by_tags($self,@tags) {
     for my $id (keys %msgs) {
         # if this message id does not have all the required tags, we
         # won't return it
-        next unless $msgs{$id} == @tags;
+        next unless $msgs{$id} == $tags->@*;
         push @ret, $id;
     }
     return \@ret;
 }
 
 
-sub retrieve_by_tags($self,@tags) {
-    state $check = compile(Object,slurpy ArrayRef[TagName]);$check->(@_);
-
+signature_for retrieve_by_tags => (
+    method => Object,
+    positional => [
+        Slurpy[ArrayRef[TagName]],
+    ],
+);
+sub retrieve_by_tags($self,$tags) {
     my @ret;
-    for my $id ($self->retrieve_ids_by_tags(@tags)->@*) {
+    for my $id ($self->retrieve_ids_by_tags($tags->@*)->@*) {
         push @ret, {
             id => $id,
             mail => $self->retrieve_by_id($id),
@@ -101,9 +117,11 @@ sub retrieve_by_tags($self,@tags) {
 }
 
 
+signature_for remove => (
+    method => Object,
+    positional => [ Str ],
+);
 sub remove($self,$id) {
-    state $check = compile(Object,Str);$check->(@_);
-
     for my $tag_file ($self->_tagdir->children) {
         $tag_file->edit_lines( sub { $_='' if /\A\Q$id\E\n?\z/ } );
     }
@@ -132,7 +150,7 @@ Sietima::MailStore::FS - filesystem-backed email store
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -167,7 +185,7 @@ group-writable and group-sticky, and owned by that group:
   my $id = $store->store($email_mime_object,@tags);
 
 Stores the given email message inside the L<store root|/root>, and
-associates with the given tags.
+associates it with the given tags.
 
 Returns a unique identifier for the stored message. If you store twice
 the same message (or two messages that stringify identically), you'll
@@ -203,7 +221,7 @@ returns an empty arrayref.
 This method is similar to L<< /C<retrieve_ids_by_tags> >>, but it
 returns an arrayref of hashrefs like:
 
- $store->retrieve_ids_by_tags('t1') ==> [
+ $store->retrieve_by_tags('t1') ==> [
    { id => $id1, mail => $msg1 },
    { id => $id2, mail => $msg2 },
   ]
@@ -230,7 +248,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

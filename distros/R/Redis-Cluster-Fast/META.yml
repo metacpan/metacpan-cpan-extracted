@@ -10,7 +10,9 @@ build_requires:
   Test::LeakTrace: '0'
   Test::More: '0.98'
   Test::SharedFork: '0'
+  Test::Valgrind: '0'
 configure_requires:
+  Devel::CheckBin: '0'
   File::Spec: '0'
   File::Which: '0'
   File::chdir: '0'
@@ -37,13 +39,13 @@ no_index:
 provides:
   Redis::Cluster::Fast:
     file: lib/Redis/Cluster/Fast.pm
-    version: '0.05'
+    version: '0.082'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plainbanana/Redis-Cluster-Fast/issues
   homepage: https://github.com/plainbanana/Redis-Cluster-Fast
   repository: https://github.com/plainbanana/Redis-Cluster-Fast.git
-version: '0.05'
+version: '0.082'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

@@ -27,7 +27,6 @@
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
-            "Software::License" : "0",
             "URI" : "0"
          }
       },
@@ -37,7 +36,11 @@
             "Alien::Build::MB" : "0.01",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
             "ExtUtils::CBuilder" : "0",
-            "Module::Build" : "0.36",
+            "Module::Build" : "0.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
             "Software::License" : "0"
          }
       },
@@ -58,22 +61,16 @@
    "provides" : {
       "Alien::TALib" : {
          "file" : "lib/Alien/TALib.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/vikasnkumar/Alien-TALib/issues"
-      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "url" : "https://github.com/vikasnkumar/Alien-TALib"
-      }
+      ]
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MB version 0.09",
       "requires" : {

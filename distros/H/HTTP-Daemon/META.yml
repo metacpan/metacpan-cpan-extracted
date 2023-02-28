@@ -30,7 +30,7 @@ no_index:
 provides:
   HTTP::Daemon:
     file: lib/HTTP/Daemon.pm
-    version: '6.15'
+    version: '6.16'
 requires:
   Carp: '0'
   HTTP::Date: '6'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Daemon/issues
   homepage: https://github.com/libwww-perl/HTTP-Daemon
   repository: https://github.com/libwww-perl/HTTP-Daemon.git
-version: '6.15'
+version: '6.16'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -709,7 +709,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.15
+          tag: v6.16
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

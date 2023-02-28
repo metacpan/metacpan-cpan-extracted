@@ -1,5 +1,13 @@
 Revision history for Perl module DB::Object
 
+v0.11.0 2022-12-22T21:35:05+0900
+    - Minor correction to method format_update() in DB::Object::Query
+    - Implemented handling of use of unknown fields (via the $tbl->fo->some_field mechanism)
+    - Created new Module DB::Object::Fields::Unknown
+    - Updated methods _group_order(), _where_having() in DB::Object::Query
+    - Updated _process_limit in DB::Object::Query to take under account user-specified placeholders
+    - Also updated DB::Object::Mysql::Query, DB::Object::Postgres::Query and DB::Object::SQLite::Query
+
 v0.10.5 2022-11-11T19:07:06+0900
     - Minor correction in DB::Object::Mysql
 

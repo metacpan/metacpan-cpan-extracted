@@ -1,7 +1,7 @@
 #! /usr/bin/env perl
 # PODNAME: kamstrup-kem-split.pl
 # ABSTRACT: Split encrypted KEM file input from the Kamstrup backend into separate XML files with device information
-our $VERSION = '0.004'; # VERSION	
+our $VERSION = '0.005'; # VERSION	
 
 use Modern::Perl '2022';
 use App::KamstrupKemSplit;
@@ -75,9 +75,15 @@ foreach my $order ( sort keys %{$orders} ) {
 		LOGDIE "Expecting " . $orders->{$order}->{'nr_of_devices'} . " devices in batch $order but found " . scalar( keys %{$meterinfo} ) . " in XML file";
 	}
 
-	INFO "Dumping info from order # $order for " . scalar( keys %{$meterinfo} ) . " devices";
 	my $skeleton;
-	$skeleton->{'orderid'} = $meters->{'orderid'} . "_" . "$order";
+
+	$skeleton->{'orderid'} = $meters->{'orderid'};
+	$skeleton->{'orderid'} .= "_" . "$order" if $orders->{$order}->{'nr_of_devices'} != -1; # Add the _orderinfo in case we are not doing a full dump
+	my $order_name = $meters->{'orderid'};
+	$order_name = $order if $orders->{$order}->{'nr_of_devices'} != -1; # Use the suborder name in case we are not doing a full dump
+	
+	INFO "Dumping info from order # $order_name for " . scalar( keys %{$meterinfo} ) . " devices";
+	
 	$skeleton->{'Meter'}   = $meterinfo;
 	write_xml_output($skeleton);
 }

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::AuditLog;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -20,12 +20,12 @@ in all cases.
 
 =head1 RT VERSION
 
-Tested with RT 4.4.
+Tested with RT 4.4 and 5.0.3.
 
 As it, it does not work on our RT3.8 installation, but that might be more
 question of the Mason version, than the RT version itself. 
 
-As the missing C<$q->request()> is the prblem, a possible workaround is to
+As the missing C<$q->request()> is the problem, a possible workaround is to
 replace most for the code in F<Default> by
 
 $RT::AuditLogger->info(join(" ",
@@ -47,7 +47,7 @@ May need root permissions.
 
 I recommend you check if the two files were really installed into the right directory.
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -55,7 +55,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -81,14 +81,11 @@ https://forum.bestpractical.com/t/audit-log-for-user-read-activity/35137 )
 href="mailto:lendl@cpan.org">lendl@cpan.org</a>.
 
 =for text
-    All bugs should be reported via email to
-        bug-RT-Extension-AuditLog@rt.cpan.org
-    or via the web at
-        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AuditLog
+    All bugs should be reported via email to the author.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by nic.at GmbH
+This software is Copyright (c) 2023 by CERT.at GmbH
 
 This is free software, licensed under:
 

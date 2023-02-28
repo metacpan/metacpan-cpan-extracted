@@ -1,5 +1,11 @@
 CHANGES
 
+20230226        2023-02-26
+
+            * Cleanups and speedups
+                * https://github.com/shlomif/Test-PerlTidy/pull/8
+                    * Thanks to @thoke !
+
 20220902        2022-09-02
 
             * Fix the tests with latest Perl::Tidy

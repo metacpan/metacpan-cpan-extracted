@@ -31,11 +31,9 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "The World-Wide Web library for Perl",
   "AUTHOR" => "Gisle Aas <gisle\@activestate.com>",
   "CONFIGURE_REQUIRES" => {
-    "CPAN::Meta::Requirements" => "2.120620",
     "ExtUtils::MakeMaker" => 0,
     "File::Copy" => 0,
-    "Getopt::Long" => 0,
-    "Module::Metadata" => 0
+    "Getopt::Long" => 0
   },
   "DISTNAME" => "libwww-perl",
   "EXE_FILES" => [
@@ -56,14 +54,14 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Getopt::Long" => 0,
     "HTML::Entities" => 0,
-    "HTML::HeadParser" => 0,
+    "HTML::HeadParser" => "3.71",
     "HTTP::Cookies" => 6,
     "HTTP::Date" => 6,
     "HTTP::Negotiate" => 6,
-    "HTTP::Request" => 6,
-    "HTTP::Request::Common" => 6,
-    "HTTP::Response" => 6,
-    "HTTP::Status" => "6.07",
+    "HTTP::Request" => "6.18",
+    "HTTP::Request::Common" => "6.18",
+    "HTTP::Response" => "6.18",
+    "HTTP::Status" => "6.18",
     "IO::Select" => 0,
     "IO::Socket" => 0,
     "LWP::MediaTypes" => 6,
@@ -89,7 +87,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.67",
+  "VERSION" => "6.68",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -113,15 +111,15 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "Getopt::Long" => 0,
   "HTML::Entities" => 0,
-  "HTML::HeadParser" => 0,
+  "HTML::HeadParser" => "3.71",
   "HTTP::Cookies" => 6,
   "HTTP::Daemon" => "6.12",
   "HTTP::Date" => 6,
   "HTTP::Negotiate" => 6,
-  "HTTP::Request" => 6,
-  "HTTP::Request::Common" => 6,
-  "HTTP::Response" => 6,
-  "HTTP::Status" => "6.07",
+  "HTTP::Request" => "6.18",
+  "HTTP::Request::Common" => "6.18",
+  "HTTP::Response" => "6.18",
+  "HTTP::Status" => "6.18",
   "IO::Select" => 0,
   "IO::Socket" => 0,
   "LWP::MediaTypes" => 6,
@@ -142,9 +140,6 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
-requires('HTTP::Status', '6.18') if has_module('HTTP::Status', '6.17');
-
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
   delete $WriteMakefileArgs{BUILD_REQUIRES};
@@ -155,39 +150,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
-sub _add_prereq {
-  my ($mm_key, $module, $version_or_range) = @_;
-  $version_or_range ||= 0;
-  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
-    if exists $WriteMakefileArgs{$mm_key}{$module}
-      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
-      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$module}) -- need to do a sane metamerge!"
-    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
-        and $FallbackPrereqs{$module} ne $version_or_range;
-  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
-  return;
-}
-
-sub has_module {
-  my ($module, $version_or_range) = @_;
-  require Module::Metadata;
-  my $mmd = Module::Metadata->new_from_module($module);
-  return undef if not $mmd;
-  return $mmd->version($module) if not defined $version_or_range;
-
-  require CPAN::Meta::Requirements;
-  my $req = CPAN::Meta::Requirements->new;
-  $req->add_string_requirement($module => $version_or_range);
-  return 1 if $req->accepts_module($module => $mmd->version($module));
-  return 0;
-}
-
-sub requires { goto &runtime_requires }
-
-sub runtime_requires {
-  my ($module, $version_or_range) = @_;
-  _add_prereq(PREREQ_PM => $module, $version_or_range);
-}

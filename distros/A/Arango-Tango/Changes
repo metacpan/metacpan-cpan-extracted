@@ -1,3 +1,20 @@
+0.019 2023-02-24
+
+     - Collection.pm
+       - added: 'cursor' do obtain a generic database cursor
+       - modified document_paths to use AQL
+
+
+0.018 2023-02-24
+
+     - Collection.pm
+       - added: 'delete_document' do delete a document
+
+0.017 2023-02-24
+
+     - Collection.pm
+       - add options to 'bulk_import'
+
 0.016 2022-10-07
 
      - Collection.pm

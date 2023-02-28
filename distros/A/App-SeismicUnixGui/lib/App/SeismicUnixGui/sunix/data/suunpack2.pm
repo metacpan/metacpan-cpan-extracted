@@ -179,15 +179,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$suunpack2->{_opt}		= $opt;
-		$suunpack2->{_note}		= $suunpack2->{_note}.' opt='.$suunpack2->{_opt};
-		$suunpack2->{_Step}		= $suunpack2->{_Step}.' opt='.$suunpack2->{_opt};
-
-	} else { 
-		print("suunpack2, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$suunpack2->{_opt}		= $opt;
+#		$suunpack2->{_note}		= $suunpack2->{_note}.' opt='.$suunpack2->{_opt};
+#		$suunpack2->{_Step}		= $suunpack2->{_Step}.' opt='.$suunpack2->{_opt};
+#
+#	} else { 
+#		print("suunpack2, opt, missing opt,\n");
+#	 }
  }
 
 

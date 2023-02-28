@@ -88,7 +88,7 @@ digraph "machine"{
 	]; }
 	{ "@Part: nvme0n1" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">NVMe Device</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Model: Micron_9300_MTFDHAL6T4TDR<BR/>Serial: 20262AAA7392<BR/>Label: gpt<BR/>Size: 5.82 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">NVMe Device</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Model: Micron_9300_MTFDHAL6T4TDR               <BR/>Serial: 20262AAA7392<BR/>Label: gpt<BR/>Size: 5.82 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -170,32 +170,32 @@ digraph "machine"{
 			style=striped;fillcolor="pink;0.279154.2:green"
 		]; }
 		{ "@FS@/var/log/audit" [
-			label="/var/log/audit\nDevice: /dev/md/Volume0_0p10\nxfs\nSize: 4.87 GiB\nFree: 4.80 GiB\nUsed: 70.5 MiB";
-			style=striped;fillcolor="pink;0.014138.2:green"
+			label="/var/log/audit\nDevice: /dev/md/Volume0_0p10\nxfs\nSize: 4.87 GiB\nFree: 4.80 GiB\nUsed: 73.6 MiB";
+			style=striped;fillcolor="pink;0.014751.2:green"
 		]; }
 		{ "@FS@/home" [
-			label="/home\nDevice: /dev/md/Volume0_0p2\nxfs\nSize: 48.8 GiB\nFree: 44.2 GiB\nUsed: 4.61 GiB";
-			style=striped;fillcolor="pink;0.094515.2:green"
+			label="/home\nDevice: /dev/md/Volume0_0p2\nxfs\nSize: 48.8 GiB\nFree: 43.7 GiB\nUsed: 5.06 GiB";
+			style=striped;fillcolor="pink;0.103745.2:green"
 		]; }
 		{ "@FS@/var" [
-			label="/var\nDevice: /dev/md/Volume0_0p6\nxfs\nSize: 29.3 GiB\nFree: 22.2 GiB\nUsed: 7.13 GiB";
-			style=striped;fillcolor="pink;0.243452.2:green"
+			label="/var\nDevice: /dev/md/Volume0_0p6\nxfs\nSize: 29.3 GiB\nFree: 22.5 GiB\nUsed: 6.78 GiB";
+			style=striped;fillcolor="pink;0.231542.2:green"
 		]; }
 		{ "@FS@/" [
 			label="/\nDevice: /dev/md/Volume0_0p7\nxfs\nSize: 14.6 GiB\nFree: 10.5 GiB\nUsed: 4.15 GiB";
-			style=striped;fillcolor="pink;0.283564.2:green"
+			style=striped;fillcolor="pink;0.283651.2:green"
 		]; }
 		{ "@FS@/var/log" [
-			label="/var/log\nDevice: /dev/md/Volume0_0p8\nxfs\nSize: 9.76 GiB\nFree: 9.59 GiB\nUsed: 167 MiB";
-			style=striped;fillcolor="pink;0.016740.2:green"
-		]; }
-		{ "@FS@SWAP" [
-			label="SWAP\nDevice: /dev/md/Volume0_0p9\nswap\nSize: 7.81 GiB\nFree: 7.81 GiB\nUsed: 0 B";
-			style=striped;fillcolor="green"
+			label="/var/log\nDevice: /dev/md/Volume0_0p8\nxfs\nSize: 9.76 GiB\nFree: 9.43 GiB\nUsed: 333 MiB";
+			style=striped;fillcolor="pink;0.033353.2:green"
 		]; }
 		{ "@FS@/staging" [
-			label="/staging\nDevice: /dev/nvme0n1p1\nxfs\nSize: 5.82 TiB\nFree: 5.77 TiB\nUsed: 51.9 GiB";
-			style=striped;fillcolor="pink;0.008710.2:green"
+			label="/staging\nDevice: /dev/nvme0n1p1\nxfs\nSize: 5.82 TiB\nFree: 4.73 TiB\nUsed: 1.09 TiB";
+			style=striped;fillcolor="pink;0.187132.2:green"
+		]; }
+		{ "@FS@SWAP@md126p9" [
+			label="SWAP\nDevice: /dev/md/Volume0_0p9\nSize: 7.81 GiB\nFree: 6.47 GiB\nUsed: 1.34 GiB";
+			style=striped;fillcolor="pink;0.171594.2:green"
 		]; }
 		label="Mounted FS and swap";
 	}
@@ -207,13 +207,13 @@ digraph "machine"{
 		label="Libvirt Virtual Machines";
 	}
 	{ "sda" [
-		label="/dev/sda\nModel: TS256GSSD420K\nSerial: G210650036\nSize: 238 GiB";
+		label="/dev/sda\nModel: TS256GSSD420K   \nSerial: G210650036\nSize: 238 GiB";
 		fillcolor="yellow"
 		style=filled
 		shape=rectangle
 	]; }
 	{ "sdb" [
-		label="/dev/sdb\nModel: TS256GSSD420K\nSerial: G210650037\nSize: 238 GiB";
+		label="/dev/sdb\nModel: TS256GSSD420K   \nSerial: G210650037\nSize: 238 GiB";
 		fillcolor="yellow"
 		style=filled
 		shape=rectangle
@@ -246,8 +246,8 @@ digraph "machine"{
 	"@Part: md126":"7" -> "@FS@/"
 	// Links for @FS@/var/log
 	"@Part: md126":"8" -> "@FS@/var/log"
-	// Links for @FS@SWAP
-	"@Part: md126":"9" -> "@FS@SWAP"
 	// Links for @FS@/staging
 	"@Part: nvme0n1":"1" -> "@FS@/staging"
+	// Links for @FS@SWAP@md126p9
+	"@Part: md126":"9" -> "@FS@SWAP@md126p9"
 }

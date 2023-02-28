@@ -1,0 +1,10 @@
+App-samesize-0.006.tar.gz
+Changes
+INSTALL
+Makefile.PL
+MANIFEST			This list of files
+README
+samesize
+samesize.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Short Description",
+   "author" : [
+      "USER_NAME<USER_MAIL>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SPVM-File-Find",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "SPVM" : "0.9692"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SPVM" : "0.9692",
+            "SPVM::File::Basename" : "0.02",
+            "SPVM::File::Spec" : "0.05",
+            "SPVM::Regex" : "0.19",
+            "SPVM::Sys" : "0.42"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-File-Find.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-File-Find"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

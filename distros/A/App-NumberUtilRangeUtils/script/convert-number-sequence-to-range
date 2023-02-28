@@ -1,17 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Number/Util/Range/convert_number_sequence_to_range
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
-
-our $DATE = '2019-01-25'; # DATE
-our $DIST = 'App-NumberUtilRangeUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-04'; # DATE
+our $DIST = 'App-NumberUtilRangeUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Number/Util/Range/convert_number_sequence_to_range",
@@ -37,21 +38,19 @@ convert-number-sequence-to-range - Find sequences in number arrays & convert to 
 
 =head1 VERSION
 
-This document describes version 0.001 of convert-number-sequence-to-range (from Perl distribution App-NumberUtilRangeUtils), released on 2019-01-25.
+This document describes version 0.002 of convert-number-sequence-to-range (from Perl distribution App-NumberUtilRangeUtils), released on 2023-01-04.
 
 =head1 SYNOPSIS
 
-Usage:
+B<convert-number-sequence-to-range> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % convert-number-sequence-to-range [options] [array] ...
+B<convert-number-sequence-to-range> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-Examples:
+B<convert-number-sequence-to-range> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-duplicates|/"--ignore-duplicates">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--separator|/"--separator=s">>=I<str>] [B<L<--threshold|/"--threshold=s">>=I<L<posint|Sah::Schema::posint>>] -- [I<L<array|/"--array=s@">>] ...
 
- % convert-number-sequence-to-range 100 2 3 4 5 101 foo
- 100
- 2..5
- 101
- foo
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -65,9 +64,21 @@ C<*> marks required options.
 
 See C<--array>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--array>=I<s@>
 
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
+
+=item B<--ignore-duplicates>
+
+(No description)
+
 
 =item B<--separator>=I<s>
 
@@ -95,6 +106,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -109,15 +126,32 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
 
 
 =back
@@ -170,6 +204,49 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+=head2 basic, non-numbers ignored
+
+ % convert-number-sequence-to-range 100 2 3 4 5 101 foo
+ 100
+ 2..5
+ 101
+ foo
+
+=head2 option: separator
+
+ % convert-number-sequence-to-range 100 2 3 4 5 101 --separator -
+ 100
+ 2-5
+ 101
+
+=head2 multiple ranges, negative number
+
+ % convert-number-sequence-to-range 100 2 3 4 5 6 101 102 -5 -4 -3 -2 103
+ 100
+ 2..6
+ 101
+ 102
+ -5..-2
+ 103
+
+=head2 option: threshold
+
+ % convert-number-sequence-to-range 100 2 3 4 5 101 --threshold 5
+ 100
+ 2
+ 3
+ 4
+ 5
+ 101
+
+=head2 option: ignore_duplicates
+
+ % convert-number-sequence-to-range 1 2 3 4 2 9 9 9 --ignore-duplicates 1
+ 1..4
+ 9
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-NumberUtilRangeUtils>.
@@ -178,6 +255,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Number
 
 Source repository is at L<https://github.com/perlancar/perl-App-NumberUtilRangeUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-NumberUtilRangeUtils>
@@ -185,16 +291,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

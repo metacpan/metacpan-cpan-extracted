@@ -4,7 +4,7 @@
       "Gianni Ceccarelli <dakkar@thenautilus.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,13 +21,13 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.36"
+            "ExtUtils::MakeMaker" : "7.66"
          }
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0.100005",
-            "Test::More" : "1.302164",
+            "Pod::Coverage::TrustPod" : "0.100006",
+            "Test::More" : "1.302192",
             "Test::NoTabs" : "2.02",
             "Test::Perl::Critic" : "1.04",
             "Test::Pod" : "1.52",
@@ -36,43 +36,40 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Spec" : "0.005",
-            "App::Spec::Run" : "0.005",
-            "Digest::SHA" : "6.02",
-            "Email::Address" : "1.912",
-            "Email::MIME" : "1.946",
-            "Email::Sender" : "1.300031",
-            "Email::Sender::Simple" : "1.300031",
-            "Email::Stuffer" : "0.017",
-            "List::AllUtils" : "0.15",
-            "Moo" : "2.003004",
-            "Moo::Role" : "2.003004",
+            "App::Spec" : "0.013",
+            "App::Spec::Run" : "0.013",
+            "Digest::SHA" : "6.04",
+            "Email::Address" : "1.913",
+            "Email::MIME" : "1.953",
+            "Email::Sender::Simple" : "2.600",
+            "Email::Stuffer" : "0.020",
+            "List::AllUtils" : "0.19",
+            "Moo" : "2.005005",
+            "Moo::Role" : "2.005005",
             "MooX::Traits" : "0.005",
-            "Try::Tiny" : "0.30",
-            "Type::Library" : "1.004004",
-            "Type::Params" : "1.004004",
-            "Type::Utils" : "1.004004",
+            "Type::Library" : "2.002001",
+            "Type::Params" : "2.002001",
+            "Type::Utils" : "2.002001",
             "Types::Path::Tiny" : "0.006",
-            "Types::Standard" : "1.004004",
-            "Types::URI" : "0.006",
-            "experimental" : "0.020",
-            "feature" : "1.42",
+            "Types::Standard" : "2.002001",
+            "Types::URI" : "0.007",
+            "feature" : "1.72",
             "namespace::clean" : "0.27",
-            "perl" : "5.024",
-            "strict" : "1.11",
-            "warnings" : "1.36"
+            "perl" : "v5.36.0",
+            "strict" : "1.12",
+            "warnings" : "1.58"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Printer" : "0.40",
-            "Email::Sender::Transport::Test" : "1.300031",
+            "Data::Printer" : "1.001000",
+            "Email::Sender::Transport::Test" : "2.600",
             "Import::Into" : "1.002005",
-            "Path::Tiny" : "0.108",
-            "Test2::API" : "1.302164",
-            "Test2::V0" : "0.000120",
-            "URI" : "1.76",
-            "lib" : "0.63"
+            "Path::Tiny" : "0.144",
+            "Test2::API" : "1.302192",
+            "Test2::V0" : "0.000145",
+            "URI" : "5.17",
+            "lib" : "0.65"
          }
       }
    },
@@ -85,8 +82,9 @@
          "web" : "https://www.thenautilus.net/cgit/Sietima"
       }
    },
-   "version" : "1.0.5",
-   "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "version" : "1.1.1",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -2,7 +2,7 @@ digraph "machine"{
 	rankdir=LR;
 	{ "@Part: sda" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sda<BR/>Model: PERC_H710P<BR/>Serial: 6d4ae5208fc820002369966275967490<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sda<BR/>Model: PERC_H710P<BR/>Serial: 003e403f21a31628280020c88f20e54a<BR/>Label: gpt<BR/>Size: 5.46 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -11,12 +11,42 @@ digraph "machine"{
 					</TR>
 					<TR>
 						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sda1<BR/>EFI<BR/>Size: 477 GiB
+						/dev/sda1<BR/>pv-chu-C<BR/>Size: 5.46 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1008 kiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000000:pink;1.000000:green;0.000000";
+	]; }
+	{ "@Part: sdb" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdb<BR/>Model: PERC_H710P<BR/>Serial: 0090749675629669230020c88f20e54a<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sdb1<BR/>EFI<BR/>Size: 477 GiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="2" BGCOLOR="yellow">
-						/dev/sda2<BR/>pv-chu-A<BR/>Size: 931 GiB
+						/dev/sdb2<BR/>pv-chu-A<BR/>Size: 931 GiB
 						</TD>
 					</TR>
 					<TR>
@@ -35,39 +65,9 @@ digraph "machine"{
 		style=striped;
 		fillcolor="green;0.000000:pink;0.170664:pink;0.333329:green;0.496006";
 	]; }
-	{ "@Part: sdb" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdb<BR/>Model: PERC_H710P<BR/>Serial: 6d4ae5208fc820002369a7340fd8b826<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1007 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sdb1<BR/>oldsys<BR/>Size: 500 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 2.24 TiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000000:pink;0.178954:green;0.821045";
-	]; }
 	{ "@Part: sdc" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdc<BR/>Model: PERC_H710P<BR/>Serial: 6d4ae5208fc8200025e7e4eea0fcd8a6<BR/>Label: gpt<BR/>Size: 5.46 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdc<BR/>Model: PERC_H710P<BR/>Serial: 00a6d8fca0eee4e7250020c88f20e54a<BR/>Label: gpt<BR/>Size: 5.46 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -95,48 +95,6 @@ digraph "machine"{
 		style=striped;
 		fillcolor="green;0.000179:pink;0.999821:green;0.000000";
 	]; }
-	subgraph "cluster_os" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
-		subgraph "cluster_os@PV" {
-			color=white;
-			fillcolor=white;
-			{ "LVM@os@PV@sdb1" [
-				label="PV: /dev/sdb1\nSize: 500 GiB\nFree: 202 GiB\nUsed: 298 GiB";
-				style=striped;fillcolor="pink;0.596028.2:green"
-			]; }
-			label="os's PVs";
-		}
-		subgraph "cluster_os@LV" {
-			color=white;
-			fillcolor=white;
-			{ "dm-1" [
-				label="LV: home\nSize: 18.6 GiB";
-				fillcolor="lightgrey"
-			]; }
-			{ "dm-2" [
-				label="LV: root\nSize: 46.6 GiB";
-				fillcolor="lightgrey"
-			]; }
-			{ "dm-3" [
-				label="LV: swap\nSize: 121 GiB";
-				fillcolor="lightgrey"
-			]; }
-			{ "dm-4" [
-				label="LV: tmp\nSize: 93.1 GiB";
-				fillcolor="lightgrey"
-			]; }
-			{ "dm-5" [
-				label="LV: var\nSize: 18.6 GiB";
-				fillcolor="lightgrey"
-			]; }
-			label="os's LVs";
-		}
-		label="LVM: os\nSize: 500 GiB\nFree: 202 GiB";
-		style=striped;fillcolor="pink;0.596028.2:green"
-	}
 	subgraph "cluster_vgchu" {
 		style=filled;
 		color=lightgrey;
@@ -145,9 +103,13 @@ digraph "machine"{
 		subgraph "cluster_vgchu@PV" {
 			color=white;
 			fillcolor=white;
-			{ "LVM@vgchu@PV@sda2" [
-				label="PV: /dev/sda2\nSize: 931 GiB\nFree: 871 GiB\nUsed: 60.0 GiB";
-				style=striped;fillcolor="pink;0.064425.2:green"
+			{ "LVM@vgchu@PV@sda1" [
+				label="PV: /dev/sda1\nSize: 5.46 TiB\nFree: 2.46 TiB\nUsed: 3.00 TiB";
+				style=striped;fillcolor="pink;0.549750.2:green"
+			]; }
+			{ "LVM@vgchu@PV@sdb2" [
+				label="PV: /dev/sdb2\nSize: 931 GiB\nFree: 771 GiB\nUsed: 160 GiB";
+				style=striped;fillcolor="pink;0.171799.2:green"
 			]; }
 			{ "LVM@vgchu@PV@sdc1" [
 				label="PV: /dev/sdc1\nSize: 5.46 TiB\nFree: 467 GiB\nUsed: 5.00 TiB";
@@ -158,11 +120,15 @@ digraph "machine"{
 		subgraph "cluster_vgchu@LV" {
 			color=white;
 			fillcolor=white;
-			{ "dm-6" [
-				label="LV: kvm-hera-disk1\nSize: 50.0 GiB";
+			{ "dm-3" [
+				label="LV: gfs-ge-b1\nSize: 3.00 TiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-7" [
+			{ "dm-1" [
+				label="LV: kvm-hera-disk1\nSize: 150 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-2" [
 				label="LV: kvm-hera-disk2\nSize: 5.00 TiB";
 				fillcolor="yellow"
 			]; }
@@ -172,8 +138,8 @@ digraph "machine"{
 			]; }
 			label="vgchu's LVs";
 		}
-		label="LVM: vgchu\nSize: 6.37 TiB\nFree: 1.31 TiB";
-		style=striped;fillcolor="pink;0.794684.2:green"
+		label="LVM: vgchu\nSize: 11.8 TiB\nFree: 3.67 TiB";
+		style=striped;fillcolor="pink;0.689888.2:green"
 	}
 	subgraph "cluster_@LSIMegacli@0" {
 		style=filled;
@@ -193,13 +159,13 @@ digraph "machine"{
 			label="SEAGATE ST33000650SS RS0FZ293B1QG\nc0u0p1: slot [32:1]\nOnline, Spun Up\nSize: 2.73 TiB";
 			fillcolor=yellow
 		]; }
-		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:2]" [
-			label="SEAGATE ST33000650SS RS0FZ293E2CT\nc0uXpY: slot [32:2]\nUnconfigured(good), Spun Up\nSize: 2.73 TiB";
-			fillcolor=white
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u1p0" [
+			label="SEAGATE ST33000650SS RS0FZ293E2CT\nc0u1p0: slot [32:2]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
 		]; }
-		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:3]" [
-			label="SEAGATE ST33000650SS RS0FZ293BLDF\nc0uXpY: slot [32:3]\nUnconfigured(good), Spun Up\nSize: 2.73 TiB";
-			fillcolor=white
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u1p1" [
+			label="SEAGATE ST33000650SS RS0FZ293BLDF\nc0u1p1: slot [32:3]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
 		]; }
 		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u2p2" [
 			label="SEAGATE ST33000650SS RS0FZ2933SXS\nc0u2p2: slot [32:4]\nOnline, Spun Up\nSize: 2.73 TiB";
@@ -217,26 +183,26 @@ digraph "machine"{
 			label="SEAGATE ST33000650SS RS0FZ293E20Z\nc0u0pY: slot [32:9]\nHotspare, Spun Up\nSize: 2.73 TiB";
 			fillcolor=green
 		]; }
-		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u1p0" [
-			label="SEAGATE ST33000650SS RS0FZ293EDEA\nc0u1p0: slot [32:10]\nOnline, Spun Up\nSize: 2.73 TiB";
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u1p2" [
+			label="SEAGATE ST33000650SS RS0FZ293EDEA\nc0u1p2: slot [32:10]\nOnline, Spun Up\nSize: 2.73 TiB";
 			fillcolor=yellow
 		]; }
 		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:11]" [
 			label="SEAGATE ST33000650SS RS0FZ293GBHC\nc0uXpY: slot [32:11]\nHotspare, Spun Up\nSize: 2.73 TiB";
 			fillcolor=green
 		]; }
-		subgraph "cluster_sda@@state" {
-			{ "sda" [
-				label="/dev/sda (c0u0)\nRAID-1\nSize: 2.73 TiB";
+		subgraph "cluster_sdb@@state" {
+			{ "sdb" [
+				label="/dev/sdb (c0u0)\nRAID-1\nSize: 2.73 TiB";
 				fillcolor="yellow"
 			]; }
 			label="state: Optimal";
 			shape=oval
 			fillcolor=green
 		}
-		subgraph "cluster_sdb@@state" {
-			{ "sdb" [
-				label="/dev/sdb (c0u1)\nRAID-0\nSize: 2.73 TiB";
+		subgraph "cluster_sda@@state" {
+			{ "sda" [
+				label="/dev/sda (c0u1)\nRAID-5\nSize: 5.46 TiB";
 				fillcolor="yellow"
 			]; }
 			label="state: Optimal";
@@ -259,14 +225,26 @@ digraph "machine"{
 		color=lightgrey;
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@FS@/srv/glusterfs/ge" [
+			label="/srv/glusterfs/ge\nDevice: /dev/vgchu/gfs-ge-b1\nxfs\nSize: 3.00 TiB\nFree: 2.98 TiB\nUsed: 21.3 GiB";
+			style=striped;fillcolor="pink;0.006951.2:green"
+		]; }
 		{ "@FS@/" [
-			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.72 GiB\nFree: 2.28 GiB\nUsed: 6.92 GiB";
-			style=striped;fillcolor="pink;0.765154.2:green"
+			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.68 GiB\nFree: 1000 MiB\nUsed: 8.19 GiB";
+			style=striped;fillcolor="pink;0.899108.2:green"
 		]; }
 		{ "@FS@/boot/efi" [
-			label="/boot/efi\nDevice: /dev/sda1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 5.41 MiB";
-			style=striped;fillcolor="pink;0.000011.2:green"
+			label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 6.03 MiB";
+			style=striped;fillcolor="pink;0.000012.2:green"
 		]; }
+		subgraph "cluster_@FS@SWAP" {
+			style=filled;
+			color=white
+			fillcolor=lightgrey;
+			node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+			label="SWAP\nSize: 0 B\nFree: 0 B\nUsed: 0 B";
+			style=striped;fillcolor="green"
+		}
 		label="Mounted FS and swap";
 	}
 	subgraph "cluster_@libvirt" {
@@ -277,10 +255,10 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@1-hera" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@1-hera@dm-6" [
+			{ "@libvirt@1-hera@dm-1" [
 				label="/dev/vgchu/kvm-hera-disk1\n(sda)";
 			]; }
-			{ "@libvirt@1-hera@dm-7" [
+			{ "@libvirt@1-hera@dm-2" [
 				label="/dev/vgchu/kvm-hera-disk2\n(sdc)";
 			]; }
 			label="1-hera";
@@ -296,26 +274,21 @@ digraph "machine"{
 		}
 		label="Libvirt Virtual Machines";
 	}
-	// Links from LVM VG: os
-	"LVM@os@PV@sdb1" -> "dm-1"
-	"LVM@os@PV@sdb1" -> "dm-2"
-	"LVM@os@PV@sdb1" -> "dm-3"
-	"LVM@os@PV@sdb1" -> "dm-4"
-	"LVM@os@PV@sdb1" -> "dm-5"
 	// Links from LVM VG: vgchu
-	"LVM@vgchu@PV@sda2" -> "dm-6"
-	"LVM@vgchu@PV@sdc1" -> "dm-7"
-	"LVM@vgchu@PV@sda2" -> "dm-0"
+	"LVM@vgchu@PV@sda1" -> "dm-3"
+	"LVM@vgchu@PV@sdb2" -> "dm-1"
+	"LVM@vgchu@PV@sdc1" -> "dm-2"
+	"LVM@vgchu@PV@sdb2" -> "dm-0"
 	// Links from MegaCli: Controller c0
-	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p0" -> "sda"
-	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p1" -> "sda"
-	
-	
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p0" -> "sdb"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p1" -> "sdb"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u1p0" -> "sda"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u1p1" -> "sda"
 	"@LSIMegacli@0@dev@LSIMegaCli@c0u2p2" -> "sdc"
 	"@LSIMegacli@0@dev@LSIMegaCli@c0u2p0" -> "sdc"
 	"@LSIMegacli@0@dev@LSIMegaCli@c0u2p1" -> "sdc"
-	"@LSIMegacli@0@dev@LSIMegaCli@c0u0pY" -> "sda"
-	"@LSIMegacli@0@dev@LSIMegaCli@c0u1p0" -> "sdb"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u0pY" -> "sdb"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u1p2" -> "sda"
 	
 	// Links for @Part: sda
 	"sda" -> "@Part: sda"
@@ -323,20 +296,22 @@ digraph "machine"{
 	"sdb" -> "@Part: sdb"
 	// Links for @Part: sdc
 	"sdc" -> "@Part: sdc"
-	// Links for LVM@os@PV@sdb1
-	"@Part: sdb":"1" -> "LVM@os@PV@sdb1"
-	// Links for LVM@vgchu@PV@sda2
-	"@Part: sda":"2" -> "LVM@vgchu@PV@sda2"
+	// Links for LVM@vgchu@PV@sda1
+	"@Part: sda":"1" -> "LVM@vgchu@PV@sda1"
+	// Links for LVM@vgchu@PV@sdb2
+	"@Part: sdb":"2" -> "LVM@vgchu@PV@sdb2"
 	// Links for LVM@vgchu@PV@sdc1
 	"@Part: sdc":"1" -> "LVM@vgchu@PV@sdc1"
+	// Links for @FS@/srv/glusterfs/ge
+	"dm-3" -> "@FS@/srv/glusterfs/ge"
 	// Links for @FS@/
 	"dm-0" -> "@FS@/"
 	// Links for @FS@/boot/efi
-	"@Part: sda":"1" -> "@FS@/boot/efi"
-	// Links for @libvirt@1-hera@dm-6
-	"dm-6" -> "@libvirt@1-hera@dm-6"
-	// Links for @libvirt@1-hera@dm-7
-	"dm-7" -> "@libvirt@1-hera@dm-7"
+	"@Part: sdb":"1" -> "@FS@/boot/efi"
+	// Links for @libvirt@1-hera@dm-1
+	"dm-1" -> "@libvirt@1-hera@dm-1"
+	// Links for @libvirt@1-hera@dm-2
+	"dm-2" -> "@libvirt@1-hera@dm-2"
 	// Links for @libvirt@memtest86+@/srv/kvm/memtest86+-5.01.iso
 	"@FS@/" -> "@libvirt@memtest86+@/srv/kvm/memtest86+-5.01.iso"
 }

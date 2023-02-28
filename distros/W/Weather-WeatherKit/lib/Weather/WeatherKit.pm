@@ -13,11 +13,11 @@ Weather::WeatherKit - Apple WeatherKit REST API client
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ It was made to serve the apps L<Xasteria|https://astro.ecuadors.net/xasteria/> a
 L<Polar Scope Align|https://astro.ecuadors.net/polar-scope-align/>, but if your service
 requires some extra functionality, feel free to contact the author about it.
 
-=head1 CONSTRUCTOR METHOD
+=head1 CONSTRUCTOR
 
 =head2 C<new>
 

@@ -104,7 +104,7 @@ package App::SeismicUnixGui::sunix::filter::supef;
  value will be used.							
 
  Caveat:								
- The showweiner=1 option writes out the wiener filter to outpar, and   
+ The showwiener=1 option writes out the wiener filter to outpar, and   
  the prediction error filter to stdout, which is			", 
      1,0,0,...,-wiener[0],...,-wiener[imaxlag-1] 			
  where the sample value of -wiener[0], is  iminlag in the pe-filter.	
@@ -151,9 +151,8 @@ my $supef = {
     _Step       => '',
     _outpar     => '',
     _method     => '',
-    _perc       => '',
     _ntout      => '',
-    _showweiner => '',
+    _showwiener => '',
 };
 
 =head2 sub Step
@@ -201,10 +200,9 @@ sub clear {
     $supef->{_Step}       = '';
     $supef->{_outpar}     = '';
     $supef->{_method}     = '';
-    $supef->{_perc}       = '';
     $supef->{_ntout}      = '';
     $supef->{_MAXLAG_PEF} = '';
-    $supef->{_showweiner} = '';
+    $supef->{_showwiener} = '';
 }
 
 =head2 sub cdp 
@@ -349,20 +347,6 @@ sub method {
     }
 }
 
-=head2 sub perc 
-
-
-=cut
-
-sub perc {
-    my ( $self, $perc ) = @_;
-    if ($perc) {
-        $supef->{_perc} = $perc;
-        $supef->{_note} = $supef->{_note} . ' perc=' . $supef->{_perc};
-        $supef->{_Step} = $supef->{_Step} . ' perc=' . $supef->{_perc};
-    }
-}
-
 =head2 sub ntout 
 
 
@@ -377,21 +361,6 @@ sub ntout {
     }
 }
 
-=head2 sub showweiner 
-
-
-=cut
-
-sub showweiner {
-    my ( $self, $showweiner ) = @_;
-    if ($showweiner) {
-        $supef->{_showweiner} = $showweiner;
-        $supef->{_note} =
-          $supef->{_note} . ' showweiner=' . $supef->{_showweiner};
-        $supef->{_Step} =
-          $supef->{_Step} . ' showweiner=' . $supef->{_showweiner};
-    }
-}
 
 =head2 sub get_max_index
  
@@ -401,7 +370,7 @@ max index = number of input variables -1
 
 sub get_max_index {
     my ($self) = @_;
-    my $max_index = 12;
+    my $max_index = 11;
 
     return ($max_index);
 }

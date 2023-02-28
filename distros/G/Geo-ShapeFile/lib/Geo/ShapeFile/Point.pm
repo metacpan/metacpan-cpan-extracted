@@ -5,7 +5,7 @@ use warnings;
 use Math::Trig 1.04;
 use Carp;
 
-our $VERSION = '3.01';
+our $VERSION = '3.03';
 
 use overload
     '==' => 'eq',
@@ -386,7 +386,7 @@ Shawn Laffan, E<lt>shawnlaffan@gmail.comE<gt>
 
 Copyright 2002-2013 by Jason Kohles
 
-Copyright 2014 by Shawn Laffan
+Copyright 2014-2023 by Shawn Laffan
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

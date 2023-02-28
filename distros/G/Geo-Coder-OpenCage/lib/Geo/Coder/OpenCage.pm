@@ -1,15 +1,16 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.34';
+$Geo::Coder::OpenCage::VERSION = '0.35';
 use strict;
 use warnings;
 
 use Carp;
 use HTTP::Tiny;
 use JSON::MaybeXS;
+use Scalar::Util 'blessed';
 use URI;
-# FIXME - must be a way to get this from dist.ini?
-my $version = 0.34;
+
+my $version = our $VERSION || 'dev';
 my $ua_string;
 
 sub new {
@@ -104,24 +105,16 @@ sub geocode {
     # print STDERR 'url: ' . $URL->as_string . "\n";
     my $response = $self->{ua}->get($URL);
 
-    if (!$response) {
-        my $reason = (ref($response) eq 'HTTP::Response')
-                    ? $response->status_line() # <code> <message>
-                    : $response->{reason};
-        warn "failed to fetch '$URL': ", $reason;
-        return undef;
-    }
-
     # Support HTTP::Tiny and LWP:: CPAN packages
-    my $content = (ref($response) eq 'HTTP::Response')
-                    ? $response->decoded_content()
-                    : $response->{content};
+    my $content = ( blessed $response and $response->isa('HTTP::Response') )
+        ? $response->decoded_content()
+        : $response->{content};
+
     my $is_success = (ref($response) eq 'HTTP::Response')
-                       ? $response->is_success()
-                       : $response->{success};
+        ? $response->is_success()
+        : $response->{success};
 
     my $rh_content = $self->{json}->decode($content);
-
 
     if (!$is_success) {
         warn "response when requesting '$URL': " . $rh_content->{status}{code} . ', ' . $rh_content->{status}{message};
@@ -159,7 +152,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -274,8 +267,6 @@ For more information see L<perlunicode>.
 =head1 SEE ALSO
 
 This module was L<featured in the 2016 Perl Advent Calendar|http://perladvent.org/2016/2016-12-08.html>.
-
-Ed Freyfogle from the OpenCage team gave L<an interview with Built in Perl about how Perl is used at OpenCage|http://blog.builtinperl.com/post/opencage-data-geocoding-in-perl>.
 
 =head1 AUTHOR
 

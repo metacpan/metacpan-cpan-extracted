@@ -1,3 +1,9 @@
+0.004   2023-02-24  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Follow TableDataRole::Spec::TableDef
+          specification (rename get_table_spec() to get_table_def()).
+
+
 0.003   2023-02-12  Released-By: PERLANCAR; Urgency: medium
 
         - Add gen_table_spec().

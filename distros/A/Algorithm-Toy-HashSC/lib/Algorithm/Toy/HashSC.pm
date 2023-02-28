@@ -6,7 +6,7 @@
 # where malicious input may cause "Algorithmic Complexity Attacks" (see
 # perlsec(1)).
 #
-# Run perldoc(1) on this file for additional documentation.
+# run perldoc(1) on this file for additional documentation
 
 package Algorithm::Toy::HashSC;
 
@@ -19,7 +19,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ##############################################################################
 #
@@ -31,34 +31,34 @@ our $VERSION = '0.01';
 #
 # Internally, it's an array of array of arrays, or something like that.
 has _chain => (
-  is      => 'rw',
-  default => sub { [] },
+    is      => 'rw',
+    default => sub { [] },
 );
 
 has modulus => (
-  is      => 'rw',
-  default => sub { 7 },
-  coerce  => sub {
-    die 'modulus must be a positive integer > 1'
-      if !defined $_[0]
-      or !looks_like_number $_[0]
-      or $_[0] < 2;
-    return int $_[0];
-  },
-  trigger => sub {
-    my ($self) = @_;
-    # clobber extant hash (Moo does not provide old value, so cannot do
-    # this only when the modulus changes, oh well)
-    $self->_chain( [] ) unless $self->unsafe;
-  },
+    is      => 'rw',
+    default => sub { 7 },
+    coerce  => sub {
+        die 'modulus must be a positive integer > 1'
+          if !defined $_[0]
+          or !looks_like_number $_[0]
+          or $_[0] < 2;
+        return int $_[0];
+    },
+    trigger => sub {
+        my ($self) = @_;
+        # clobber extant hash (Moo does not provide old value, so cannot do
+        # this only when the modulus changes, oh well)
+        $self->_chain( [] ) unless $self->unsafe;
+    },
 );
 
 # Boolean, disables various sanity checks if set to a true value (in
 # particular whether the hash is cleared when the modulus is changed).
 has unsafe => (
-  is      => 'rw',
-  default => sub { 0 },
-  coerce  => sub { $_[0] ? 1 : 0 },
+    is      => 'rw',
+    default => sub { 0 },
+    coerce  => sub { $_[0] ? 1 : 0 },
 );
 
 ##############################################################################
@@ -66,21 +66,21 @@ has unsafe => (
 # METHODS
 
 sub clear_hash {
-  my ($self) = @_;
-  $self->_chain( [] );
-  return $self;
+    my ($self) = @_;
+    $self->_chain( [] );
+    return $self;
 }
 
 sub get {
-  my ( $self, $key ) = @_;
-  croak "must provide key" if !defined $key;
-  my $chain = $self->_chain->[ $self->hash($key) ];
-  if ( defined $chain ) {
-    for my $kvpair (@$chain) {
-      return $kvpair->[1] if $key eq $kvpair->[0];
+    my ( $self, $key ) = @_;
+    croak "must provide key" if !defined $key;
+    my $chain = $self->_chain->[ $self->hash($key) ];
+    if ( defined $chain ) {
+        for my $kvpair (@$chain) {
+            return $kvpair->[1] if $key eq $kvpair->[0];
+        }
     }
-  }
-  return;
+    return;
 }
 
 # Derives the index of the chain a particular key will be added to. The
@@ -89,90 +89,86 @@ sub get {
 #
 # Alternative: subclass this module and write yer own hash function.
 sub hash {
-  my ( $self, $key ) = @_;
-  croak "must provide key" if !defined $key;
-  my $code;
-  if ( $key->can('hashcode') ) {
-    $code = $key->hashcode();
-  } else {
-    # TODO is this adequate?
-    for my $n ( map ord, split //, $key ) {
-      $code += $n;
+    my ( $self, $key ) = @_;
+    croak "must provide key" if !defined $key;
+    my $code = 0;
+    if ( $key->can('hashcode') ) {
+        $code = $key->hashcode();
+    } else {
+        # this is pretty terrible...
+        for my $n ( map ord, split //, $key ) {
+            $code += $n;
+        }
     }
-  }
-  return abs( $code % $self->modulus );
+    return abs( $code % $self->modulus );
 }
 
 sub keys {
-  my ($self) = @_;
-  my @keys;
-  for my $chain ( @{ $self->_chain } ) {
-    push @keys, map { $_->[0] } @$chain;
-  }
-  return @keys;
+    my ($self) = @_;
+    my @keys;
+    for my $chain ( @{ $self->_chain } ) {
+        push @keys, map { $_->[0] } @$chain;
+    }
+    return @keys;
 }
 
 sub keys_in {
-  my ( $self, $index ) = @_;
-  croak "must provide index" if !defined $index;
-  $index %= $self->modulus;    # this will int() any floating-point nums
-  return map { $_->[0] } @{ $self->_chain->[$index] };
+    my ( $self, $index ) = @_;
+    croak "must provide index" if !defined $index;
+    $index %= $self->modulus;    # this will int() any floating-point nums
+    return map { $_->[0] } @{ $self->_chain->[$index] };
 }
 
 # Keys in the same chain (or bucket) as a given key
 sub keys_with {
-  my ( $self, $key ) = @_;
-  croak "must provide key" if !defined $key;
-  for my $chain ( @{ $self->_chain } ) {
-    for my $kvpair (@$chain) {
-      return map $_->[0], @$chain if $key eq $kvpair->[0];
+    my ( $self, $key ) = @_;
+    croak "must provide key" if !defined $key;
+    for my $chain ( @{ $self->_chain } ) {
+        for my $kvpair (@$chain) {
+            return map $_->[0], @$chain if $key eq $kvpair->[0];
+        }
     }
-  }
-  return;
+    return;
 }
 
 sub put {
-  my ( $self, $key, $value ) = @_;
-  croak "must provide key" if !defined $key;
-  my $chain = $self->_chain->[ $self->hash($key) ];
-  if ( defined $chain ) {
-    for my $kvpair (@$chain) {
-      if ( $key eq $kvpair->[0] ) {
-        $kvpair->[1] = $value;
-        return $self;
-      }
+    my ( $self, $key, $value ) = @_;
+    croak "must provide key" if !defined $key;
+    my $chain = $self->_chain->[ $self->hash($key) ];
+    if ( defined $chain ) {
+        for my $kvpair (@$chain) {
+            if ( $key eq $kvpair->[0] ) {
+                $kvpair->[1] = $value;
+                return $self;
+            }
+        }
     }
-  }
-  push @{ $self->_chain->[ $self->hash($key) ] }, [ $key, $value ];
-  return $self;
+    push @{ $self->_chain->[ $self->hash($key) ] }, [ $key, $value ];
+    return $self;
 }
 
 # a.k.a. delete but more indicative of the obtaining-a-value aspect
 sub take {
-  my ( $self, $key ) = @_;
-  croak "must provide key" if !defined $key;
-  my $chain = $self->_chain->[ $self->hash($key) ];
-  if ( defined $chain ) {
-    for my $i ( 0 .. $#$chain ) {
-      if ( $key eq $chain->[$i][0] ) {
-        my $kvpair = splice @$chain, $i, 1;
-        return $kvpair->[1];
-      }
+    my ( $self, $key ) = @_;
+    croak "must provide key" if !defined $key;
+    my $chain = $self->_chain->[ $self->hash($key) ];
+    if ( defined $chain ) {
+        for my $i ( 0 .. $#$chain ) {
+            if ( $key eq $chain->[$i][0] ) {
+                my $kvpair = splice @$chain, $i, 1;
+                return $kvpair->[1];
+            }
+        }
     }
-  }
-  return;
+    return;
 }
 
 1;
 __END__
 
-##############################################################################
-#
-# DOCS
-
 =head1 NAME
 
-Algorithm::Toy::HashSC - toy separate chain hash implementation for Perl
+Algorithm::Toy::HashSC - a toy separate chain hash implementation
 
 =head1 SYNOPSIS
 
@@ -206,18 +202,20 @@ Algorithm::Toy::HashSC - toy separate chain hash implementation for Perl
 
 =head1 DESCRIPTION
 
-A toy separate chain hash implementation; productive uses are left as an
-exercise to the reader. (Hint: music or artwork where the particulars of
-the hash code and modulus groups the data in a deterministic manner;
-this ordering or grouping can help determine e.g. pitch sets, rhythmic
-material, etc. Hence, the B<keys_in> and B<keys_with> methods to obtain
-the keys in a chain, or with a particular key. Variety could be added by
-varying the modulus, or changing the B<hash> or B<hashcode> methods.)
+This is a toy separate chain hash implementation; productive uses are
+left as an exercise to the reader, probably music or artwork where the
+particulars of the hash code and modulus groups the data in a desired
+manner; this ordering or grouping can help determine e.g. pitch sets,
+rhythmic material, etc. Hence, the B<keys_in> and B<keys_with> methods
+to obtain the keys in a chain, or with a particular key. Variety could
+be added by varying the modulus, or changing the B<hash> or
+B<hashcode> methods.
 
 This module is not for use where performance is a concern, or where
 untrusted user input may be supplied for the key material.
 L<perlsec/"Algorithmic Complexity Attacks"> discusses why Perl's hash
-are no longer deterministic.
+are no longer deterministic and thus not suitable for deterministic
+music composition.
 
 =head1 CONSTRUCTOR
 
@@ -343,15 +341,11 @@ L<Hash::Util> - insight into Perl's hashes.
 The "smhasher" project may help verify whether B<hashcode> functions are
 as perfect as possible.
 
-=head1 AUTHOR
-
-thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Jeremy Mates
+Copyright 2015 Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<https://opensource.org/licenses/BSD-3-Clause>
 
 =cut

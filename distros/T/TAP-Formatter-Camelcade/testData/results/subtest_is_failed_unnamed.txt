@@ -14,7 +14,7 @@ teamcity[testSuiteFinished locationHint='testData/tests/subtest_is_failed_unname
 
 Test Summary Report
 -------------------
-testData/tests/subtest_is_failed_unnamed.t (Wstat: 256 Tests: 1 Failed: 1)
+testData/tests/subtest_is_failed_unnamed.t (Wstat: 256 (exited 1) Tests: 1 Failed: 1)
   Failed test:  1
   Non-zero exit status: 1
 Files=1, Tests=1, TEST_MODE_STATS;

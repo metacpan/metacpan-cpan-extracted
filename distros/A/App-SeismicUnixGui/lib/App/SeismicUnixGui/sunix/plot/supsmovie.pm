@@ -25,7 +25,7 @@ Version:
 
 
 
- supsmovie <stdin [optional parameters] | ...				
+ supsmovie <stdin [optional parameters] >				
 
 
 
@@ -142,7 +142,9 @@ Version:
 
 
 =head2 User's notes (Juan Lorenzo)
+
 untested
+VERSION = '0.0.2'; Only redirection is allowed. 2.9.23
 
 =cut
 
@@ -152,7 +154,7 @@ untested
 =cut
 
 use Moose;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 
 =head2 Import packages

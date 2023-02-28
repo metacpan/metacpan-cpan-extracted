@@ -30,7 +30,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=BenchmarkAnything-Evaluations
   homepage: http://metacpan.org/release/BenchmarkAnything-Evaluations
   repository: git://github.com/benchmarkanything/BenchmarkAnything-Evaluations.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -325,7 +325,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

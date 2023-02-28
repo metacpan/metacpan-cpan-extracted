@@ -3,13 +3,25 @@ abstract: 'Find and verify functionality of the gnuplot executable.'
 author:
   - 'Craig DeForest <craig@deforest.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Env: '0'
+  ExtUtils::MakeMaker: '6.52'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  HTTP::Tiny: '0'
+  POSIX: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Time::HiRes: '0'
+  version: '0.77'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,14 +32,30 @@ no_index:
     - t
     - inc
 requires:
+  Alien::Build: '0.25'
+  Env: '0'
   File::Spec: '0'
   File::Temp: '0'
+  File::Which: '0'
   HTTP::Tiny: '0'
   POSIX: '0'
   Time::HiRes: '0'
   perl: '5.006000'
 resources:
-  homepage: http://github.com/drzowie/Alien-Gnuplot
+  homepage: https://github.com/drzowie/Alien-Gnuplot
   repository: git://github.com/drzowie/Alien-Gnuplot.git
-version: '1.034'
+version: '1.040'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.77'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

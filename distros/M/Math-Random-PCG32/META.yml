@@ -3,15 +3,13 @@ abstract: 'minimal random permuted congruential generator'
 author:
   - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
-  Algorithm::Diff: '0'
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
-  Test::Most: '0'
+  Test2::V0: '0.000060'
 configure_requires:
   CPAN::Meta: '2.142060'
   Module::Build: '0.4004'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,11 +18,11 @@ name: Math-Random-PCG32
 provides:
   Math::Random::PCG32:
     file: lib/Math/Random/PCG32.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   perl: '5.014000'
 resources:
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
-  repository: https://github.com/thrig/Math-Random-PCG32
-version: '0.23'
+  repository: https://thrig.me/src/Math-Random-PCG32.git
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

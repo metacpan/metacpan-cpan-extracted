@@ -21,7 +21,7 @@ package App::SeismicUnixGui::sunix::model::suea2df;
  SUEA2DF - SU version of (an)elastic anisotropic 2D finite difference 	
 		forward modeling, 4th order in space			
 
- suea2df > outfile c11file= c55file  [optional parameters]		
+ suea2df > outfile c11file= c55file=  [optional parameters]		
 
  Required Parameters:							
  c11file=c11_file	c11 voigt elasticity parameter filename		
@@ -214,6 +214,7 @@ my $empty_string = $var->{_empty_string};
 
 my $suea2df = {
     _aniso    => '',
+    _asw      => '',
     _bc       => '',
     _bc_a     => '',
     _bc_r     => '',
@@ -300,6 +301,7 @@ sub note {
 sub clear {
 
     $suea2df->{_aniso}    = '';
+    $suea2df->{_asw}       = '';
     $suea2df->{_bc}       = '';
     $suea2df->{_bc_a}     = '';
     $suea2df->{_bc_r}     = '';
@@ -362,6 +364,28 @@ sub aniso {
     }
     else {
         print("suea2df, aniso, missing aniso,\n");
+    }
+}
+
+=head2 sub asw 
+
+
+=cut
+
+sub asw {
+
+    my ( $self, $asw ) = @_;
+    if ( $asw ne $empty_string ) {
+
+        $suea2df->{_asw} = $asw;
+        $suea2df->{_note} =
+          $suea2df->{_note} . ' asw=' . $suea2df->{_asw};
+        $suea2df->{_Step} =
+          $suea2df->{_Step} . ' asw=' . $suea2df->{_asw};
+
+    }
+    else {
+        print("suea2df, asw, missing asw,\n");
     }
 }
 
@@ -1185,7 +1209,7 @@ max index = number of input variables -1
 
 sub get_max_index {
     my ($self) = @_;
-    my $max_index = 39;
+    my $max_index = 40;
 
     return ($max_index);
 }

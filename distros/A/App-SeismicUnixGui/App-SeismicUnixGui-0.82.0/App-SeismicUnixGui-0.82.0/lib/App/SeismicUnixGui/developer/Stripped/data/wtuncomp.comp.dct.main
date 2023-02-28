@@ -1,0 +1,15 @@
+ WTUNCOMP - UNCOMPression of WT compressed data			
+
+   wtuncomp < stdin > sdtout						
+
+ Required Parameters:							
+    none								
+ Optional Parameters:							
+    none								
+
+opt=null
+
+
+ Author:  CWP: Tong Chen, 1995
+
+

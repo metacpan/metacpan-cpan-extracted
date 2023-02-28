@@ -431,6 +431,7 @@ sub new
 	(my $url2fetch = $url);
 	#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 	if ($url2fetch =~ m#^https?\:#) {
+		$url2fetch =~ s#\/embed\/#\/#;   #CONVERT "embed" URLS TO STANDARD ONES.
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 		$self->{'id'} =~ s/[\?\&].*$//;
 	} else {

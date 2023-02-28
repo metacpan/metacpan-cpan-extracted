@@ -1,11 +1,12 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'CPAN::Meta::Requirements' => '2.120620',
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::Copy' => '0',
-                                        'Getopt::Long' => '0',
-                                        'Module::Metadata' => '0'
+                                        'Getopt::Long' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -18,6 +19,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Spell' => '1.25',
                                       'Test::EOL' => '2.00',
                                       'Test::LeakTrace' => '0.16',
                                       'Test::MinimumVersion' => '0',
@@ -40,14 +42,14 @@ do { my $x = {
                                       'File::Temp' => '0',
                                       'Getopt::Long' => '0',
                                       'HTML::Entities' => '0',
-                                      'HTML::HeadParser' => '0',
+                                      'HTML::HeadParser' => '3.71',
                                       'HTTP::Cookies' => '6',
                                       'HTTP::Date' => '6',
                                       'HTTP::Negotiate' => '6',
-                                      'HTTP::Request' => '6',
-                                      'HTTP::Request::Common' => '6',
-                                      'HTTP::Response' => '6',
-                                      'HTTP::Status' => '6.07',
+                                      'HTTP::Request' => '6.18',
+                                      'HTTP::Request::Common' => '6.18',
+                                      'HTTP::Response' => '6.18',
+                                      'HTTP::Status' => '6.18',
                                       'IO::Select' => '0',
                                       'IO::Socket' => '0',
                                       'LWP::MediaTypes' => '6',

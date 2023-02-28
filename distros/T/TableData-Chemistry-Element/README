@@ -2,9 +2,9 @@ NAME
     TableData::Chemistry::Element - Chemical elements
 
 VERSION
-    This document describes version 0.003 of TableData::Chemistry::Element
+    This document describes version 0.004 of TableData::Chemistry::Element
     (from Perl distribution TableData-Chemistry-Element), released on
-    2023-02-12.
+    2023-02-24.
 
 SYNOPSIS
     To use from Perl code:

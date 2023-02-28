@@ -26,23 +26,50 @@ share {
     start_url "https://sourceforge.net/code-snapshots/svn/t/ta/ta-lib/code/ta-lib-code-r${REV}-trunk.zip";
     plugin 'Download';
     meta->before_hook( download => sub {
-        # Need to request snapshot first.
-        my $response = HTTP::Tiny->new->post(
-            "https://sourceforge.net/p/ta-lib/code/$REV/tarball",
-            {
-                headers => {
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                    'Referer'      => "https://sourceforge.net/p/ta-lib/code/$REV/tree/trunk/",
+        my $build = shift;
+        my $tries = 0;
+        my $max_tries = 3;
+        my $http = HTTP::Tiny->new;
+        my $response;
+
+        while( $tries++ < $max_tries ) {
+            $build->log("Requesting snapshot r${REV}: attempt $tries/$max_tries");
+            # Need to request snapshot first.
+            $response = $http->post(
+                "https://sourceforge.net/p/ta-lib/code/$REV/tarball",
+                {
+                    headers => {
+                        'Content-Type' => 'application/x-www-form-urlencoded',
+                        'Referer'      => "https://sourceforge.net/p/ta-lib/code/$REV/tree/trunk/",
+                    },
+                    content => 'path=%2Ftrunk',
                 },
-                content => 'path=%2Ftrunk',
-            },
-        );
+            );
+            unless($response->{success}) {
+                $build->log("Request attempt not successful");
+                sleep $tries * 4; # wait a bit before requesting again
+                next;
+            } else {
+                $build->log("Request attempt successful");
+            }
+
+            sleep $tries * 4; # wait a bit before trying the .zip file
+
+            $build->log("Checking that .zip is available after request");
+            $response = $http->head( meta->{prop}{start_url} );
+            if( $response->{success} ) {
+                $build->log("The .zip is available now");
+                last;
+            } else {
+                $build->log("The .zip is not yet available");
+            }
+        }
+
         unless ($response->{success}) {
             print "HTTP Response: " . $response->{status} .
                   " Reason: " . $response->{reason} . "\n";
             die "Could not request snapshot from $response->{url}";
         }
-        sleep 4; # wait a bit
     });
     plugin 'Extract' => 'zip';
     plugin 'Build::CMake';

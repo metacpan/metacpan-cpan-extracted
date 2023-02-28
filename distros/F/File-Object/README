@@ -196,8 +196,14 @@ DEPENDENCIES
     Class::Utils, Error::Pure, FindBin, File::Spec::Functions.
 
 SEE ALSO
+    File::Fu
+        file and directory objects
+
     File::Spec
         portably perform operations on file names
+
+    IO::All
+        IO::All to Larry Wall!
 
     Path::Class
         Cross-platform path specification manipulation
@@ -214,10 +220,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2009-2022 Michal Josef Špaček
+    © 2009-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.17
+    0.18
 

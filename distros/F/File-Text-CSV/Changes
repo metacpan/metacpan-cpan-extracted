@@ -1,0 +1,9 @@
+Revision history for File-Text-CSV
+
+0.02    2016-01-17
+        Renamed to File::Text::CSV.
+	Use Text::CSV_XS (Text::CSV is still safe as well).
+
+0.01    2016-01-15
+        First version, released on an unsuspecting world.
+

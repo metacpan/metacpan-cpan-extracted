@@ -588,20 +588,20 @@ sub get_Data_path {
 			}
 
 		}
-		elsif ($entry_label eq 'file1'
-			or $entry_label eq 'file2' )
-		{
-
-		# FOR ANOTHER VERY SPECIFIC CASE
-		# TODO remove?? becuaseit is updated by prefix values inthe *_spec file?
-		# CASE 1B.1 : suop2
-		# first label/name   = 'file1'
-		# second label/name  = 'file2'
-			$iFile->{_path} = $DATA_SEISMIC_SU;
-
-			# print("CASE 1B.1 : iFile,get_path,path=$iFile->{_path}\n");
-
-		}
+#		elsif ($entry_label eq 'file1'
+#			or $entry_label eq 'file2' )
+#		{
+#
+#		# FOR ANOTHER VERY SPECIFIC CASE
+#		# TODO remove?? becuase it is updated by prefix values inthe *_spec file?
+#		# CASE 1B.1 : suop2
+#		# first label/name   = 'file1'
+#		# second label/name  = 'file2'
+#			$iFile->{_path} = $DATA_SEISMIC_SU;
+#
+#			# print("CASE 1B.1 : iFile,get_path,path=$iFile->{_path}\n");
+#
+#		}
 		elsif ( $entry_label ne $empty_string
 			and $iFile->{_dialog_type} eq
 			$file_dialog_type_h->{_Data_PL_SEISMIC} )

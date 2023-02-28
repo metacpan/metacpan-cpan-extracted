@@ -27,9 +27,9 @@ sub myWriteMakefile
     ]
   );
 
-  unless($lib)
+  if($lib)
   {
-    $args{PREREQ_PM}->{'Alien::libuuid'} = 0.05;
+    delete $args{PREREQ_PM}->{'Alien::libuuid'};
   }
 
   WriteMakefile(%args);

@@ -1,7 +1,17 @@
 Revision history for CGI-Buffer
 
+0.83	Fri Feb 24 15:45:21 EST 2023
+	Bump minimum version because of IO::Compress::Brotli failures
+	Fix problem where Last-Modified header not set when no cache
+	Generate 304 on non-cached files
+	Added HTTP/2.0 recognition
+	Make debugging more readable
+	Log correctly when data isn't retrieved from the cache
+	Call logger instead of warn where possible
+
 0.82	Tue Aug  7 09:45:13 EDT 2018
 	Fix RT#123101
+	Optmise <center>
 
 0.81	Thu Jul 19 08:50:53 EDT 2018
 	Get the return status from the CGI::Info object

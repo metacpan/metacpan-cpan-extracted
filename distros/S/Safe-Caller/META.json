@@ -4,22 +4,16 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Safe-Caller",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "File::Spec" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -30,12 +24,18 @@
             "Carp" : "0",
             "boolean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Safe::Caller" : {
          "file" : "lib/Safe/Caller.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/stsc/Safe-Caller"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

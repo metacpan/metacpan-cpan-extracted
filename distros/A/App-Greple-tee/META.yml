@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::tee:
     file: lib/App/Greple/tee.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   App::Greple: '9.02'
   App::sdif: v4.24.0
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-Greple-tee/issues
   homepage: https://github.com/kaz-utashiro/App-Greple-tee
   repository: https://github.com/kaz-utashiro/App-Greple-tee.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

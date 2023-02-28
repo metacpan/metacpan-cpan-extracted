@@ -64,7 +64,7 @@
          "web" : "http://github.com/benchmarkanything/BenchmarkAnything-Evaluations"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -445,7 +445,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.004",
+                  "tag" : "v0.005",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

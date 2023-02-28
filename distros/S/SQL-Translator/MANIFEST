@@ -151,8 +151,10 @@ t/51-xml-to-oracle_quoted.t
 t/52-oracle-options.t
 t/53-oracle-delay-constraints.t
 t/53-oracle-delay-constraints_quoted.t
+t/54-oracle-alter-constraint.t
 t/54-oracle-alter-field.t
-t/55-oracle-add-field.t
+t/54-oracle-sql-diff.t
+t/55-oracle-add-drop-field.t
 t/55-oracle-producer.t
 t/56-sqlite-producer.t
 t/57-class-dbi.t
@@ -183,9 +185,13 @@ t/data/mysql/entire_syntax.sql
 t/data/mysql/sqlfxml-producer-basic.sql
 t/data/oracle/create.sql
 t/data/oracle/create2.sql
+t/data/oracle/schema-1.5.sql
+t/data/oracle/schema-1.6.sql
 t/data/oracle/schema_diff_a.yaml
 t/data/oracle/schema_diff_b.yaml
 t/data/oracle/schema_diff_c.yaml
+t/data/oracle/schema_diff_d.yaml
+t/data/oracle/schema_diff_e.yaml
 t/data/oracle/schema_with_options.yaml
 t/data/pgsql/Chado-CV-PostGreSQL.sql
 t/data/pgsql/entire_syntax.sql

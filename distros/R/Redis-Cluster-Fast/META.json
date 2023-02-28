@@ -29,6 +29,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Devel::CheckBin" : "0",
             "File::Spec" : "0",
             "File::Which" : "0",
             "File::chdir" : "0",
@@ -58,14 +59,15 @@
             "Test::Docker::Image" : "0.05",
             "Test::LeakTrace" : "0",
             "Test::More" : "0.98",
-            "Test::SharedFork" : "0"
+            "Test::SharedFork" : "0",
+            "Test::Valgrind" : "0"
          }
       }
    },
    "provides" : {
       "Redis::Cluster::Fast" : {
          "file" : "lib/Redis/Cluster/Fast.pm",
-         "version" : "0.05"
+         "version" : "0.082"
       }
    },
    "release_status" : "stable",
@@ -80,7 +82,7 @@
          "web" : "https://github.com/plainbanana/Redis-Cluster-Fast"
       }
    },
-   "version" : "0.05",
+   "version" : "0.082",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 0
 }

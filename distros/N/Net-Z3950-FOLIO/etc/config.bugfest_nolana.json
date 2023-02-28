@@ -1,0 +1,23 @@
+{
+  "okapi": {
+    "url": "https://okapi-bugfest-nolana.int.aws.folio.org",
+    "tenant": "fs09000000"
+  },
+  "login": {
+    "username": "${OKAPI_USER-folio}",
+    "password": "${OKAPI_BUGFEST_NOLANA_PASSWORD}"
+  },
+  "marcHoldings": {
+    "fieldPerItem": true,
+    "field": "852",
+    "indicators": [" "," "],
+    "holdingsElements": {
+    },
+    "itemElements": {
+      "d": "_permanentLocation",
+      "b": "itemId",
+      "k": "_callNumberPrefix",
+      "r": "availableNow"
+    }
+  }
+}

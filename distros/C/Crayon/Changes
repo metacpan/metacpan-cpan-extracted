@@ -1,5 +1,7 @@
 Revision history for Crayon
 
+1.01    2023-02-24
+        - Adds parse_directory function which parses a directory of css files.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
-

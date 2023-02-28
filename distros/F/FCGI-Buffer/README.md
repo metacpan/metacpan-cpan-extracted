@@ -9,7 +9,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.17
+Version 0.18
 
 # SYNOPSIS
 
@@ -67,7 +67,7 @@ debugging before publishing a code change, set the NO\_CACHE environment variabl
 to any non-zero value.
 This will also stop ETag being added to the header.
 If you get errors about Wide characters in print it means that you've
-forgotten to emit pure HTML on non-ascii characters.
+forgotten to emit pure HTML on non-ASCII characters.
 See [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities).
 As a hack work around you could also remove accents and the like by using
 [Text::Unidecode](https://metacpan.org/pod/Text%3A%3AUnidecode),
@@ -240,7 +240,7 @@ FCGI::Buffer has not been tested against FastCGI.
 
 I advise adding FCGI::Buffer as the last use statement so that it is
 cleared up first.  In particular it should be loaded after
-[Log::Log4Perl](https://metacpan.org/pod/Log%3A%3ALog4Perl), if you're using that, so that any messages it
+[Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl), if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 FCGI::Buffer;
 
@@ -295,5 +295,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2022 Nigel Horne,
+The rest of the program is Copyright 2015-2023 Nigel Horne,
 and is released under the following licence: GPL2

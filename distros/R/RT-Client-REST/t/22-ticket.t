@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 114;
+use Test::More tests => 117;
 use Test::Exception;
 
 use constant METHODS => (
@@ -185,12 +185,25 @@ for my $method (qw(take untake steal)) {
 }
 
 # Test list attributes:
+throws_ok {
+    $ticket->requestors(undef);
+}
+'RT::Client::REST::Object::InvalidValueException',
+  'List attributes (requestors) only accept array reference';
+
 my @emails = qw(dmitri@localhost dude@localhost);
 throws_ok {
     $ticket->requestors(@emails);
 }
 'RT::Client::REST::Object::InvalidValueException',
   'List attributes (requestors) only accept array reference';
+
+lives_ok {
+    $ticket->requestors( [] );
+}
+'Set requestors to empty values';
+
+ok( 0 == $ticket->requestors, 'There are 0 requestors' );
 
 lives_ok {
     $ticket->requestors( \@emails );

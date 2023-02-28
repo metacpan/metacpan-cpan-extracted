@@ -2,7 +2,8 @@
 schema:
   procedures:
     foo_proc:
-      comments: Go Sox!
+      comments:
+        - Go Sox!
       extra:
         bar: baz
         foo: bar
@@ -336,4 +337,4 @@ translator:
   producer_type: SQL::Translator::Producer::YAML
   show_warnings: 0
   trace: 0
-  version: 1.62
+  version: 1.63

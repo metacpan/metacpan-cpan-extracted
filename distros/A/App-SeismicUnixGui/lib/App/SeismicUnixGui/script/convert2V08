@@ -10,5 +10,5 @@
  	echo " export SeismicUnixGui_script=/Location/of/script/folder "
  	
  else
-	perl $SeismicUnixGui_script/../developer/code/sunix/convert2V07.pl
+	perl $SeismicUnixGui_script/../developer/code/sunix/convert2V08.pl
  fi

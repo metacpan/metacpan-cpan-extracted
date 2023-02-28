@@ -189,7 +189,7 @@ sub _options_block {
 
 # Visual Studio user and workspace settings
 # https://code.visualstudio.com/docs/getstarted/settings
---ignore-dir=.vscode
+--ignore-dir=is:.vscode
 
 ### Filetypes defined
 
@@ -404,6 +404,11 @@ sub _options_block {
 # https://plone.org/
 --type-add=plone:ext:pt,cpt,metadata,cpy,py
 
+# PowerShell
+# https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_scripts
+# https://learn.microsoft.com/en-us/powershell/scripting/developer/module/understanding-a-windows-powershell-module
+--type-add=powershell:ext:ps1,psm1
+
 # PureScript
 # https://www.purescript.org
 --type-add=purescript:ext:purs
@@ -415,7 +420,8 @@ sub _options_block {
 
 # R
 # https://www.r-project.org/
---type-add=rr:ext:R
+# https://r4ds.had.co.nz/r-markdown.html
+--type-add=rr:ext:R,Rmd
 
 # reStructured Text
 # https://docutils.sourceforge.io/rst.html

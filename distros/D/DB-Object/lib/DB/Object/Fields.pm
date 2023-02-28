@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v1.0.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2021/03/21
+## Modified 2022/12/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use DB::Object::Fields::Field;
     use Devel::Confess;
-    our( $VERSION ) = 'v1.0.0';
+    our( $VERSION ) = 'v1.1.0';
 };
 
 use strict;
@@ -32,7 +32,7 @@ sub init
     $self->{prefixed} = 0;
     $self->{query_object} = '';
     $self->{table_object} = '';
-    ## $self->{fatal} = 1;
+    # $self->{fatal} = 1;
     $self->{_init_strict_use_sub} = 1;
     $self->{_init_params_order} = [qw( table_object query_object prefixed )];
     $self->SUPER::init( @_ );
@@ -134,16 +134,43 @@ AUTOLOAD
     {
         return( $code->( $self, @_ ) );
     }
-    ## elsif( CORE::exists( $self->{ $method } ) )
     elsif( exists( $fields->{ $method } ) )
     {
         return( $self->_initiate_field_object( $method ) );
     }
     else
     {
-        warn( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
-        return( $self->error( "Table ", $self->table_object->name, " has no such field \"$method\"." ) );
-        #die( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
+        # This is an unrecoverable error. We have no choice, but to die.
+        my $error = "Table " . $self->table_object->name . " has no such field \"$method\"";
+        $self->_load_class( 'Module::Generic::Exception' ) || die( $self->error );
+        my $exception = Module::Generic::Exception->new( $error );
+        my $on_unknown_field = $self->table_object->database_object->unknown_field;
+        if( ref( $on_unknown_field ) eq 'CODE' )
+        {
+            return( $on_unknown_field->({
+                table => $self->table_object,
+                field => $method,
+                error => $exception,
+            }) );
+        }
+        elsif( defined( $on_unknown_field ) && ( $on_unknown_field eq 'die' || $on_unknown_field eq 'fatal' ) )
+        {
+            die( $exception );
+        }
+        else
+        {
+            $self->_load_class( 'DB::Object::Fields::Unknown' ) ||
+                die( "${error}, and I could not load the module DB::Object::Fields::Unknown: ", $self->error );
+            my $unknown = DB::Object::Fields::Unknown->new(
+                table => $self->table_object->name,
+                error => $exception,
+                field => $method,
+            ) || die( "${error}, and I could not instantiate a new instance of the module DB::Object::Fields::Unknown: ", DB::Object::Fields::Unknown->error );
+            warn( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
+            # return( $self->error( "Table ", $self->table_object->name, " has no such field \"$method\"." ) );
+            #die( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
+            return( $unknown );
+        }
     }
 };
 
@@ -166,6 +193,7 @@ DB::Object::Fields - Tables Fields Object Accessor
         host => 'localhost',
         login => 'super_admin',
         schema => 'auth',
+        unknown_field => 'fatal',
         # debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
     
@@ -202,9 +230,12 @@ DB::Object::Fields - Tables Fields Object Accessor
     $table->select( $c + 10 ); # SELECT currency + 10 FROM dummy;
     $c == 'NULL' # currency IS NULL
 
+    # if DB::Object unknown_field option is set to fatal, this will die. By default, it will simply be ignored
+    my $unknown_field = $tbl->unknown;
+
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -217,6 +248,64 @@ Field objects can than be dynamically instantiated by accessing them, such as (a
 A note on the design: there had to be a separate this separate package L<DB::Object::Fields>, because access to table fields is done through the C<AUTOLOAD> and the methods within the package L<DB::Object::Tables> and its inheriting packages would clash with the tables fields. This package has very few methods, so the risk of a sql table field clashing with a method name is very limited. In any case, if you have in your table a field with the same name as one of those methods here (see below for the list), then you can instantiate a field object with:
 
     $tbl_object->_initiate_field_object( 'last_name' );
+
+If you call an unknown field, its behaviour will change depending on the option value C<unknown_field> of L<DB::Object> upon instantiation:
+
+=over 4
+
+=item * C<ignore> (default)
+
+The unknown field will be ignored and a warning will be emitted that this field does not exist in the given database table.
+
+=item * C<fatal> or C<die>
+
+This will trigger a L</die> using a L<Module::Generic::Exception> object. So you could catch it like this:
+
+    use Nice::Try;
+    
+    try
+    {
+        # $opts contains the property 'unknown_field' set to 'die'
+        my $dbh = DB::Object::Postgres->connect( $opts ) || die( "Unable to connect" );
+        my $tbl = $dbh->some_table || die( "Unable to get the database table \"some_table\": ", $dbh->error );
+        $tbl->where( $dbh->AND(
+            $tbl->fo->faulty_field == '?',
+            $tbl->fo->status == 'live',
+        ) );
+        my $ref = $tbl->select->fetchrow_hashref;
+    }
+    catch( $e isa( 'Module::Generic::Exception' ) )
+    {
+        die( "Caught error preparing SQL: $e" );
+    }
+    else
+    {
+        die( "Caught some other error." );
+    }
+
+=item * C<code reference>
+
+When the option C<unknown_field> is set to a code reference, this will be executed and passed an hash reference that will contain 3 properties:
+
+=over 8
+
+=item 1. C<table>
+
+The L<table object|DB::Object::Tables>
+
+=item 2. C<field>
+
+A regular string containing the unknown field name
+
+=item 3. C<error>
+
+The L<error object|Module::Generic::Exception>, which includes the error string and a stack trace
+
+=back
+
+=back
+
+By default, the unknown field will be ignored.
 
 =head1 CONSTRUCTOR
 

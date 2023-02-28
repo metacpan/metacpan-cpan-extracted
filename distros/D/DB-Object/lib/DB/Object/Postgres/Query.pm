@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.1.7
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.8
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2023/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $VERBOSE $DEBUG );
     use Devel::Confess;
-    $VERSION = 'v0.1.7';
+    $VERSION = 'v0.1.8';
 };
 
 use strict;
@@ -47,12 +47,10 @@ sub binded_types_as_param
     {
         if( CORE::length( $t ) )
         {
-            # CORE::push( @$params, { pg_type => $t } );
             $params->push( { pg_type => $t } );
         }
         else
         {
-            # CORE::push( @$params, '' );
             $params->push( '' );
         }
     }
@@ -187,6 +185,16 @@ sub format_statement
                     push( @$binded, $value );
                     # push( @format_values, "FROM_UNIXTIME( ? )" );
                     push( @format_values, $self->format_from_epoch({ value => $value, bind => 1 }) );
+                    if( CORE::exists( $types_const->{ $field } ) )
+                    {
+                        # CORE::push( @types, $types_const->{ $field }->{constant} );
+                        # PG_INT4
+                        CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
+                    }
+                    else
+                    {
+                        CORE::push( @types, '' );
+                    }
                 }
                 else
                 {
@@ -364,8 +372,27 @@ sub limit
     if( CORE::length( $limit->metadata->limit ) )
     {
         $limit->generic( CORE::length( $limit->metadata->offset ) ? 'OFFSET ? LIMIT ?' : 'LIMIT ?' );
-        $limit->value( CORE::length( $limit->metadata->offset ) ? CORE::sprintf( 'OFFSET %d LIMIT %d', $limit->metadata->offset, $limit->metadata->limit ) : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit ) );
-                                                                                                                                                                                                                                                                                                                                                                            }
+        # User is managing the binding of value
+        if( (
+                $limit->metadata->offset eq '?' &&
+                $limit->metadata->limit eq '?'
+            ) || $limit->metadata->limit eq '?' )
+        {
+            $limit->value(
+                CORE::length( $limit->metadata->offset )
+                ?  'OFFSET ? LIMIT ?'
+                : 'LIMIT ?'
+            );
+        }
+        else
+        { 
+            $limit->value(
+                CORE::length( $limit->metadata->offset )
+                ? CORE::sprintf( 'OFFSET %d LIMIT %d', $limit->metadata->offset, $limit->metadata->limit )
+                : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit )
+            );
+        }
+    }
     return( $limit );
 }
 
@@ -649,7 +676,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.1.7
+    v0.1.8
 
 =head1 DESCRIPTION
 

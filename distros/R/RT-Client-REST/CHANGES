@@ -1,5 +1,8 @@
 ﻿Revision history for Perl module RT::Client::REST
 
+0.72 Mon Feb 27 2023 "Deean Hamstead" <dean@fragfest.com.au>
+  - More fixes for GH#27 to eliminate warnings and handle empty list fields
+
 0.71 Mon Dec 5 2022 "Dean Hamstead" <dean@fragfest.com.au>
   - Fixed GH#27 Missing fields
 

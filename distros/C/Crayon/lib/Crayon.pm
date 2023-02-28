@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use 5.006;
 use strict;
 use warnings;
@@ -37,10 +37,24 @@ sub parse {
 
 sub parse_file {
 	my ($self, $file, $css) = @_;
+	die "Can't find the relative file: ${file}" unless -f $file;
 	open my $fh, '<', $file or die "cannot open file:$file $!";
 	my $string = do { local $/; <$fh> };
 	close $fh;
 	$self->parse($string, $css);
+}
+
+sub parse_directory {
+	my ($self, $dir, $css) = @_;
+	die "Can't find a relative directory: ${dir}" unless -d $dir;
+	opendir my $d, $dir or die "Cannot read the directory: ${dir} $!";
+	for (sort readdir $d) {
+		next if $_ =~ m/^\./;
+		next unless $_ =~ m/css$/;
+		$self->parse_file("$dir/$_");
+	}
+	closedir $d;
+	return $self;
 }
 
 sub compile {
@@ -327,7 +341,7 @@ Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 1.00 
+Version 1.01 
 
 =cut
 

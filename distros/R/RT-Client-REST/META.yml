@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/RT-Client-REST/RT-Client-REST/issues
   homepage: https://github.com/RT-Client-REST/RT-Client-REST
   repository: https://github.com/RT-Client-REST/RT-Client-REST.git
-version: '0.71'
+version: '0.72'
 x_contributors:
   - 'Abhijit Menon-Sen <ams@wiw.org>'
   - 'belg4mit <belg4mit>'

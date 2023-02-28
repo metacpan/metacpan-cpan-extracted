@@ -1,0 +1,15 @@
+Changes
+cpanfile
+lib/Test/Builder/SubtestSelection.pm
+lib/Test/Builder/SubtestSelection.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+t/nested-subtests.t
+t/no-subtest-selection.t
+t/single-subtest-selected-by-autoquoted-name.t
+t/single-subtest-selected-by-name.t
+t/single-subtest-selected-by-number.t
+t/two-subtests-selected.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

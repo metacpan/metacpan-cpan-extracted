@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -210,6 +210,7 @@ my %olson_to_win32_timezones = (
     'America/Chicago'                => ['Central Standard Time'],
     'America/Chihuahua'              =>
       [ 'Mexico Standard Time 2', 'Mountain Standard Time (Mexico)' ],
+    'America/Ciudad_Juarez'       => ['Mountain Standard Time'],
     'America/Coral_Harbour'       => ['SA Pacific Standard Time'],
     'America/Cordoba'             => ['Argentina Standard Time'],
     'America/Costa_Rica'          => ['Central America Standard Time'],
@@ -799,10 +800,12 @@ sub _unix_timezones {
         }
     }
     delete $self->{_unix_zonetab_path};
-    if ( -e File::Spec->catfile( $self->directory(), 'UTC' ) ) {
+    if ( my $tz = $self->_guess_tz() ) {
+        return ($tz);
+    }
+    else {
         return ();
     }
-    Carp::croak("Failed to open $last_path for reading:$EXTENDED_OS_ERROR");
 }
 
 sub _read_unix_timezones {
@@ -959,6 +962,43 @@ sub _matched_timezone_full_name_regex_tz {
     return $tz;
 }
 
+sub _set_non_win32_timezone {
+    my ( $self, $new ) = @_;
+    my @directories;
+    foreach my $key (qw(area location)) {
+        if ( defined $self->{$key} ) {
+            push @directories, $self->{$key};
+        }
+    }
+    my $path = File::Spec->catfile( $self->directory(), @directories );
+    if ( ( !-f $path ) && ( $new =~ /^Etc\/(GMT[-]0)$/smx ) )
+    {    # coping with test suite working with busybox on alpine linux
+        my $alternative_path = File::Spec->catfile( $self->directory(), 'UTC' );
+        if ( -f $alternative_path ) {
+            $path = $alternative_path;
+        }
+    }
+    if ( !-f $path ) {
+        if ( $new =~ m/^(?:UTC|Etc\/GMT([+-]\d+))$/smx ) {
+            my ($offset) = ( $1 || 0 );
+            $self->{_tzdata}->{$new} = {
+                tz_definition => {
+                    std_offset_in_seconds => $offset * _SECONDS_IN_ONE_MINUTE()
+                      * _MINUTES_IN_ONE_HOUR(),
+                    std_name => $new
+                },
+                transition_times => [],
+                no_tz_file       => 1,
+            };
+        }
+        else {
+            Carp::croak(
+                "'$new' is not a time zone in the existing Olson database");
+        }
+    }
+    return;
+}
+
 sub timezone {
     my ( $self, $new ) = @_;
     my $old = $self->{tz};
@@ -975,27 +1015,7 @@ sub timezone {
                 }
             }
             else {
-                my @directories;
-                foreach my $key (qw(area location)) {
-                    if ( defined $self->{$key} ) {
-                        push @directories, $self->{$key};
-                    }
-                }
-                my $path =
-                  File::Spec->catfile( $self->directory(), @directories );
-                if ( ( !-f $path ) && ( $new =~ /^Etc\/(GMT[-]0)$/smx ) )
-                {  # coping with test suite working with busybox on alpine linux
-                    my $alternative_path =
-                      File::Spec->catfile( $self->directory(), 'UTC' );
-                    if ( -f $alternative_path ) {
-                        $path = $alternative_path;
-                    }
-                }
-                if ( !-f $path ) {
-                    Carp::croak(
-"'$new' is not a time zone in the existing Olson database"
-                    );
-                }
+                $self->_set_non_win32_timezone($new);
             }
         }
         elsif ( my $tz_definition = $self->_parse_tz_variable( $new, 'TZ' ) ) {
@@ -3290,7 +3310,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.45
+Version 0.46
 
 =cut
 

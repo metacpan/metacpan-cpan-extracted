@@ -137,15 +137,15 @@ by adding the program name
  sub opt {
 
 	my ( $self,$opt )		= @_;
-	if ( $opt ne $empty_string ) {
-
-		$scmap->{_opt}		= $opt;
-		$scmap->{_note}		= $scmap->{_note}.' opt='.$scmap->{_opt};
-		$scmap->{_Step}		= $scmap->{_Step}.' opt='.$scmap->{_opt};
-
-	} else { 
-		print("scmap, opt, missing opt,\n");
-	 }
+#	if ( $opt ne $empty_string ) {
+#
+#		$scmap->{_opt}		= $opt;
+#		$scmap->{_note}		= $scmap->{_note}.' opt='.$scmap->{_opt};
+#		$scmap->{_Step}		= $scmap->{_Step}.' opt='.$scmap->{_opt};
+#
+#	} else { 
+#		print("scmap, opt, missing opt,\n");
+#	 }
  }
 
 

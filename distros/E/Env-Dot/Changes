@@ -1,6 +1,15 @@
 Revision history for Env-Dot
 
-0.002     2023-02-19 15:44:20+01:00 Europe/Stockholm * Move fatpacked executable to root.
+0.004     2023-02-26 21:07:39+01:00 Europe/Stockholm
+          * Add CLI argument --version to envdot.
+
+0.003     2023-02-26 19:58:10+01:00 Europe/Stockholm
+          * Fix Synopsis and other documentation.
+          * Add EXAMPLES to envdot executable pod.
+          * Add automatic generation for envdot.self-contained.
+
+0.002     2023-02-19 15:44:20+01:00 Europe/Stockholm
+          * Move fatpacked executable to root.
           * Update dist.ini with ExecDir to `script`.
 
 0.001     2023-02-19 12:45:27+01:00 Europe/Stockholm

@@ -15,6 +15,7 @@ doc/from-pod/Net-Z3950-FOLIO.md
 doc/from-pod/README.md
 doc/from-pod/z2folio.md
 doc/graphql/invoke-graphql.sh
+doc/inventory-fields-used.md
 doc/opac/Makefile
 doc/opac/README.md
 doc/opac/generated-opac-record.xml
@@ -26,6 +27,7 @@ doc/release-procedure.md
 doc/source-code-overview.md
 doc/srs/using-srs.md
 etc/config.able.json
+etc/config.bugfest_nolana.json
 etc/config.chicago.json
 etc/config.dummy.json
 etc/config.fieldPerItem.json

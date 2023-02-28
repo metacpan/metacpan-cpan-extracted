@@ -8,7 +8,7 @@
 
 # NAME
 
-Genealogy::ObituaryDailyTimes - Compare a Gedcom against the Obituary Daily Times
+Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 # VERSION
 
@@ -81,6 +81,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

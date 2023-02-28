@@ -4,24 +4,16 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tie-DiskUsage",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "File::Spec" : "0",
-            "File::Temp" : "0",
-            "FindBin" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -34,12 +26,20 @@
             "File::Which" : "0",
             "Symbol" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Tie::DiskUsage" : {
          "file" : "lib/Tie/DiskUsage.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "https://github.com/stsc/Tie-DiskUsage"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

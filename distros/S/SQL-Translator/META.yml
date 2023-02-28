@@ -54,6 +54,6 @@ resources:
   bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Translator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-translator/
-version: '1.62'
+version: '1.63'
 x_authority: cpan:JROBINSON
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

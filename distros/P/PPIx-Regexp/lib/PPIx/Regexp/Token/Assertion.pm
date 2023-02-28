@@ -58,7 +58,7 @@ use PPIx::Regexp::Constant qw{
 
 use constant KEEP_EXPLANATION	=> 'In s///, keep everything before the \\K';
 
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };

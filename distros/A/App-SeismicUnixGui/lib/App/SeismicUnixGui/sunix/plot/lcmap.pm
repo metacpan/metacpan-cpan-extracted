@@ -132,16 +132,16 @@ sub clear {
 sub opt {
 
 	my ( $self, $opt ) = @_;
-	if ( $opt ne $empty_string ) {
-
-		$lcmap->{_opt}  = $opt;
-		$lcmap->{_note} = $lcmap->{_note} . ' opt=' . $lcmap->{_opt};
-		$lcmap->{_Step} = $lcmap->{_Step} . ' opt=' . $lcmap->{_opt};
-
-	}
-	else {
-		print("lcmap, opt, missing opt,\n");
-	}
+#	if ( $opt ne $empty_string ) {
+#
+#		$lcmap->{_opt}  = $opt;
+#		$lcmap->{_note} = $lcmap->{_note} . ' opt=' . $lcmap->{_opt};
+#		$lcmap->{_Step} = $lcmap->{_Step} . ' opt=' . $lcmap->{_opt};
+#
+#	}
+#	else {
+#		print("lcmap, opt, missing opt,\n");
+#	}
 }
 
 =head2 sub get_max_index

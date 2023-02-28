@@ -2,6 +2,7 @@ package Locale::CA;
 
 use warnings;
 use strict;
+use Carp;
 use Data::Section::Simple;
 
 =head1 NAME
@@ -10,11 +11,11 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -42,7 +43,14 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	if(!defined($class)) {
+		# Use Lingua::CA->new(), not Lingua::CA::new()
+		# Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	}
 
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
@@ -53,30 +61,53 @@ sub new {
 		$params{'lang'} = shift;
 	}
 
-	my $self = {};
 	my $data;
-	my $lang = $params{'lang'};
-	if(defined($lang)) {
+	if(defined(my $lang = ($params{'lang'} || _get_language()))) {
 		if(($lang eq 'fr') || ($lang eq 'en')) {
 			$data = Data::Section::Simple::get_data_section("provinces_$lang");
 		} else {
-			die "lang can only be one of 'en' or 'fr', given $lang";
+			Carp::croak("lang can only be one of 'en' or 'fr', given $lang");
 		}
-	} elsif(defined($ENV{'LANG'}) && ($ENV{'LANG'} =~ /^fr/)) {
-		$data = Data::Section::Simple::get_data_section('provinces_fr');
 	} else {
 		$data = Data::Section::Simple::get_data_section('provinces_en');
 	}
 
-	my @line = split /\n/, $data;
+	my @lines = split /\n/, $data;
 
-	for (@line) {
+	my $self = {};
+	for (@lines) {
 		my($code, $province) = split /:/;
 		$self->{code2province}{$code} = $province;
 		$self->{province2code}{$province} = $code;
 	}
 
 	return bless $self, $class;
+}
+
+# https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+# https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
+sub _get_language
+{
+	if(my $language = $ENV{'LANGUAGE'}) {
+		foreach my $l(split/:/, $language) {
+			if(($l eq 'en') || ($l eq 'fr')) {
+				return $l;
+			}
+		}
+	}
+	foreach my $variable('LC_ALL', 'LC_MESSAGES', 'LANG') {
+		my $val = $ENV{$variable};
+		next unless(defined($val));
+
+		$val = substr($val, 0, 2);
+		if(($val eq 'en') || ($val eq 'fr')) {
+			return $val;
+		}
+	}
+	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
+		return 'en';
+	}
+	return;	# undef
 }
 
 =head2 all_province_codes
@@ -161,7 +192,7 @@ Based on L<Locale::US> - Copyright (c) 2002 - C<< $present >> Terrence Brannon.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2020 Nigel Horne.
+Copyright 2012-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -40,7 +40,7 @@ use constant {
     MAX_WEBSOCKET_SIZE         => 262_144,
 };
 
-our $VERSION = "v0.0.34";
+our $VERSION = "v0.0.36";
 
 has _listener_observables => sub { +{} };
 
@@ -576,120 +576,135 @@ sub register ($self, $app, $config) {
     });
 
     $app->helper('bs.lock_stream_p' => async sub ($c, $stream_name, $sub) {
+        my $is_array = ref $stream_name eq 'ARRAY';
+        my $stream_names = $is_array ? $stream_name : [$stream_name];
         await $c->bs->do_txn_p(async sub ($db) {
-            my $stream_row = (await $db->select_p(
+            my $stream_rows = (await $db->select_p(
                 'bs_streams',
-                [qw/ id state keep_events /],
-                { name => $stream_name },
+                [qw/ id name state keep_events /],
+                { name => {-in, $stream_names} },
                 { for => 'update' },
-            ))->expand->hashes->[0] or die "Couldn't find stream '$stream_name' in database to lock\n";
-            my ($stream_id, $old_state, $keep_events) = $stream_row->@{qw/ id state keep_events /};
+            ))->expand->hashes;
+            my $streams = hashify($stream_rows, ['name']);
+            my ($missing_stream) = grep { not exists $streams->{$_} } @$stream_names;
+            ! defined $missing_stream or die "Couldn't find stream $missing_stream in database to lock\n";
+            # my ($stream_id, $old_state, $keep_events) = $stream_row->@{qw/ id state keep_events /};
 
-            my ($new_event, $new_state, $extra_guards) = $sub->((dclone [$old_state])->[0]);
-            ($new_event, $new_state, $extra_guards) = await $new_event if $new_event->$_can('then');
+            my @old_states = map $_->{state}, $streams->@{@$stream_names};
+            @old_states = map { (dclone [$_])->[0] } @old_states;
 
-            my $new_event_id;
-            $new_event_id = (await $db->insert_p(
-                'bs_events',
-                {
-                    stream_id => $stream_id,
-                    data      => { -json => $new_event },
-                },
-                { returning => 'id' },
-            ))->hashes->[0]{id} if $keep_events and defined $new_event;
+            my @ret = $sub->(map $_->{state}, $streams->@{@$stream_names});
+            @ret = await $ret[0] if $ret[0]->$_can('then');
+            $is_array or @ret = ([@ret]);
 
-            if (defined $new_event or defined $new_state) {
-                $new_event_id //= (await $db->query_p("SELECT nextval('bs_events_id_seq')"))->arrays->[0][0];
+            foreach my $sname (@$stream_names) {
+                my $old_state = shift @old_states;
+                my $stream_id = $streams->{$sname}{id};
+                my ($new_event, $new_state, $extra_guards) = (shift @ret)->@*;
 
-                await $db->update_p(
-                    'bs_streams',
+                my $new_event_id;
+                $new_event_id = (await $db->insert_p(
+                    'bs_events',
                     {
-                        defined $new_state ? (state => { -json => $new_state }) : (),
-                        event_id => $new_event_id,
-                        last_dt  => \'CURRENT_TIMESTAMP',
+                        stream_id => $stream_id,
+                        data      => { -json => $new_event },
                     },
-                    { id => $stream_id },
-                ) if (defined $new_event and $keep_events) or defined $new_state;
-            }
+                    { returning => 'id' },
+                ))->hashes->[0]{id} if $streams->{$sname}{keep_events} and defined $new_event;
 
-            my $diff;
-            if (defined $new_state) {
-                delete $old_state->{_secret} if ref $old_state eq 'HASH';
-                delete $new_state->{_secret} if ref $new_state eq 'HASH';
-                $diff = diff($old_state, $new_state, noO => 1, noU => 1);
-                $diff = undef if ! %$diff;
-            }
+                if (defined $new_event or defined $new_state) {
+                    $new_event_id //= (await $db->query_p("SELECT nextval('bs_events_id_seq')"))->arrays->[0][0];
 
-            if (defined $extra_guards) {
-                if ($extra_guards > 0) {
-                    await $db->insert_p(
-                        'bs_guards',
+                    await $db->update_p(
+                        'bs_streams',
                         {
-                            worker_id => $worker_id,
-                            stream_id => $stream_id,
-                            count     => $extra_guards,
+                            defined $new_state ? (state => { -json => $new_state }) : (),
+                            event_id => $new_event_id,
+                            last_dt  => \'CURRENT_TIMESTAMP',
                         },
-                        {
-                            on_conflict => [
-                                [ 'worker_id', 'stream_id' ] => { count => \'bs_guards.count + EXCLUDED.count' },
-                            ],
-                        }
-                    );
-                } elsif ($extra_guards < 0) {
-                    my $guard_row = (await $db->update_p(
-                        'bs_guards',
-                        { count => \['"count" - ?', abs($extra_guards)] },
-                        {
-                            worker_id => $worker_id,
-                            stream_id => $stream_id,
-                        },
-                        { returning => 'count' },
-                    ))->hashes->[0] or croak "missing guard row";
+                        { id => $stream_id },
+                    ) if (defined $new_event and $streams->{$sname}{keep_events}) or defined $new_state;
+                }
 
-                    if (! $guard_row->{count}) {
-                        await $db->delete_p(
+                my $diff;
+                if (defined $new_state) {
+                    delete $old_state->{_secret} if ref $old_state eq 'HASH';
+                    delete $new_state->{_secret} if ref $new_state eq 'HASH';
+                    $diff = diff($old_state, $new_state, noO => 1, noU => 1);
+                    $diff = undef if ! %$diff;
+                }
+
+                if (defined $extra_guards) {
+                    if ($extra_guards > 0) {
+                        await $db->insert_p(
                             'bs_guards',
                             {
                                 worker_id => $worker_id,
                                 stream_id => $stream_id,
-                                count     => 0, # because user may have forgotten to start a txn
+                                count     => $extra_guards,
                             },
+                            {
+                                on_conflict => [
+                                    [ 'worker_id', 'stream_id' ] => { count => \'bs_guards.count + EXCLUDED.count' },
+                                ],
+                            }
                         );
+                    } elsif ($extra_guards < 0) {
+                        my $guard_row = (await $db->update_p(
+                            'bs_guards',
+                            { count => \['"count" - ?', abs($extra_guards)] },
+                            {
+                                worker_id => $worker_id,
+                                stream_id => $stream_id,
+                            },
+                            { returning => 'count' },
+                        ))->hashes->[0] or croak "missing guard row";
+
+                        if (! $guard_row->{count}) {
+                            await $db->delete_p(
+                                'bs_guards',
+                                {
+                                    worker_id => $worker_id,
+                                    stream_id => $stream_id,
+                                    count     => 0, # because user may have forgotten to start a txn
+                                },
+                            );
+                        }
                     }
                 }
-            }
 
-            if (defined $diff or defined $new_event) {
-                my $pg_channel = get_pg_channel_name($stream_name);
-                my $notification = encode_json({
-                    id    => int $new_event_id,
-                    event => $new_event,
-                    patch => $diff,
-                });
-                my $whole_length = length $notification;
-                if ($whole_length <= $NOTIFY_SIZE_LIMIT) {
-                    $db->notify($pg_channel, $notification);
-                } else {
-                    # send notification in chunks
-                    for (my ($i, $cursor, $sent_ending) = (0, 0, 0); ! $sent_ending; $i++) {
-                        my $bytes_prefix;
-                        my $ending_bytes_prefix = ":$new_event_id $i\$: ";
-                        # this assumes that length $ending_bytes_prefix < $NOTIFY_SIZE_LIMIT
-                        if (length($ending_bytes_prefix) + $whole_length - $cursor <= $NOTIFY_SIZE_LIMIT) {
-                            $bytes_prefix = $ending_bytes_prefix;
-                            $sent_ending = 1;
-                        } else {
-                            $bytes_prefix = ":$new_event_id $i: ";
+                if (defined $diff or defined $new_event) {
+                    my $pg_channel = get_pg_channel_name($sname);
+                    my $notification = encode_json({
+                        id    => int $new_event_id,
+                        event => $new_event,
+                        patch => $diff,
+                    });
+                    my $whole_length = length $notification;
+                    if ($whole_length <= $NOTIFY_SIZE_LIMIT) {
+                        $db->notify($pg_channel, $notification);
+                    } else {
+                        # send notification in chunks
+                        for (my ($i, $cursor, $sent_ending) = (0, 0, 0); ! $sent_ending; $i++) {
+                            my $bytes_prefix;
+                            my $ending_bytes_prefix = ":$new_event_id $i\$: ";
+                            # this assumes that length $ending_bytes_prefix < $NOTIFY_SIZE_LIMIT
+                            if (length($ending_bytes_prefix) + $whole_length - $cursor <= $NOTIFY_SIZE_LIMIT) {
+                                $bytes_prefix = $ending_bytes_prefix;
+                                $sent_ending = 1;
+                            } else {
+                                $bytes_prefix = ":$new_event_id $i: ";
+                            }
+
+                            my $max_sublength = $NOTIFY_SIZE_LIMIT - length $bytes_prefix;
+                            my $substring = $cursor <= $whole_length ? substr($notification, $cursor, $max_sublength) : '';
+                            $cursor += $max_sublength;
+
+                            $db->notify($pg_channel, $bytes_prefix . $substring);
+
+                            # don't cause other threads to hang if notification is very large
+                            await next_tick_p unless $stream_names->[-1] eq $sname and $sent_ending;
                         }
-
-                        my $max_sublength = $NOTIFY_SIZE_LIMIT - length $bytes_prefix;
-                        my $substring = $cursor <= $whole_length ? substr($notification, $cursor, $max_sublength) : '';
-                        $cursor += $max_sublength;
-
-                        $db->notify($pg_channel, $bytes_prefix . $substring);
-
-                        # don't cause other threads to hang if notification is very large
-                        await next_tick_p unless $sent_ending;
                     }
                 }
             }

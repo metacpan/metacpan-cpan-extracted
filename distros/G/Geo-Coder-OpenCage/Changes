@@ -1,5 +1,12 @@
 Revision history for Geo-Coder-OpenCage
 
+0.35    2023-02-25
+        big thanks to TOBYINK for various suggestions/improvements
+        - get version number via $VERSION
+        - allow user-agents that are a subclass of HTTP::Response
+        - code cleanup
+        - new dependency on Scalar::Util
+
 0.34    2022-01-12
         - support address_only optional param
         - optionally specify http => 1 in object creation to make requests via http rather than https

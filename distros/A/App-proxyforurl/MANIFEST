@@ -1,18 +1,12 @@
-.perltidyrc
-.pls_cache/index
-.ship.conf
-.travis.yml
 Changes
-cpanfile
 Dockerfile
 lib/App/proxyforurl.pm
 Makefile.PL
 MANIFEST			This list of files
-README.md
 script/proxyforurl
-t/00-basic.t
+t/00-project.t
+t/api.t
 t/app.t
-t/gethostbyname.t
-t/within.t
+t/env.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

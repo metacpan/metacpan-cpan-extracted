@@ -14,13 +14,13 @@ ALL: {
 
 	my @p = $u->all_province_codes();
 
-	ok(scalar(@p) == 12);	# There are 12 provinces
+	cmp_ok(scalar(@p), '==', 12, 'There are 12 provinces');
 
 	foreach my $p(@p) {
-		ok(length($p) == 2);
+		cmp_ok(length($p), '==', 2, "$p should be two letters");
 	}
 
 	@p = $u->all_province_names();
 
-	ok(scalar(@p) == 12);
+	cmp_ok(scalar(@p), '==', 12, 'There are 12 provinces');
 }

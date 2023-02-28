@@ -11,12 +11,12 @@ use lib $Bin, "$Bin/t";
 use Test::More 0.96;
 require "testlib.pl";
 
-my ($table_data, $table_spec) = gen_test_data();
+my ($table_data, $table_def) = gen_test_data();
 
 test_gen(
     name => 'pk must be in fields',
     table_data => [],
-    table_spec => {
+    table_def  => {
         fields => {
             a => {schema=>'int*', index=>0, },
         },
@@ -26,9 +26,9 @@ test_gen(
 );
 
 test_gen(
-    name => 'pk must exist in table_spec',
+    name => 'pk must exist in table_def',
     table_data => [],
-    table_spec => {
+    table_def  => {
         fields => {
             a => {schema=>'int*', index=>0, },
         },
@@ -37,9 +37,9 @@ test_gen(
 );
 
 test_gen(
-    name => 'fields must exist in table_spec',
+    name => 'fields must exist in table_def',
     table_data => [],
-    table_spec => {
+    table_def  => {
     },
     status => 400,
 );
@@ -47,7 +47,7 @@ test_gen(
 test_gen(
     name => 'fields in sort must exist in fields',
     table_data => [],
-    table_spec => {
+    table_def  => {
         fields => {
             a => {schema=>'int*', index=>0, },
         },
@@ -58,7 +58,7 @@ test_gen(
 test_gen(
     name => 'spec generation',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     post_test => sub {
         my ($res) = @_;
         my $func = $res->[2]{code};
@@ -102,7 +102,7 @@ test_gen(
 test_gen(
     name => 'disable filtering',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {enable_filtering=>0},
     post_test => sub {
         my ($res) = @_;
@@ -116,7 +116,7 @@ test_gen(
 test_gen(
     name => 'disable search',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {enable_search=>0},
     # test_gen will test that the 'q' argument is not produced
 );
@@ -124,7 +124,7 @@ test_gen(
 test_gen(
     name => 'disable field selection',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {enable_field_selection=>0},
     # test_gen will test that the 'fields' argument is not produced
 );
@@ -132,7 +132,7 @@ test_gen(
 test_gen(
     name => 'disable ordering',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {enable_ordering=>0},
     # test_gen will test that the 'sort' & 'random' arguments are not produced
 );
@@ -140,7 +140,7 @@ test_gen(
 test_gen(
     name => 'disable random ordering',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {enable_ordering=>1, enable_random_ordering=>0},
     # test_gen will test that the 'random' argument is not produced
 );
@@ -148,7 +148,7 @@ test_gen(
 test_gen(
     name => 'disable paging',
     table_data => [],
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {enable_paging=>0},
     # test_gen will test that the 'result_*' arguments are not produced
 );
@@ -156,7 +156,7 @@ test_gen(
 test_gen(
     name => 'default_sort',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_sort=>["s"]},
     post_test => sub {
         my ($res) = @_;
@@ -179,7 +179,7 @@ test_gen(
 test_gen(
     name => 'default_random',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_random=>1},
     post_test => sub {
         my ($res) = @_;
@@ -195,7 +195,7 @@ test_gen(
 test_gen(
     name => 'default_fields',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_fields=>'s,b'},
     post_test => sub {
         my ($res) = @_;
@@ -222,7 +222,7 @@ test_gen(
 test_gen(
     name => 'default_detail',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_detail=>1},
     post_test => sub {
         my ($res) = @_;
@@ -244,7 +244,7 @@ test_gen(
 test_gen(
     name => 'default_with_field_names',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_with_field_names=>0},
     post_test => sub {
         my ($res) = @_;
@@ -271,7 +271,7 @@ test_gen(
 test_gen(
     name => 'default_result_limit',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {default_result_limit=>2},
     post_test => sub {
         my ($res) = @_;
@@ -285,7 +285,7 @@ test_gen(
 test_gen(
     name => 'option: extra_args',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {extra_args => {foo=>{}, bar=>{schema=>'int*'}}},
     post_test => sub {
         my ($res) = @_;
@@ -296,7 +296,7 @@ test_gen(
 );
 
 {
-    my $table_spec = {
+    my $table_def = {
         fields => {
             f1 => {schema=>'str*', pos=>0 },
             f2 => {schema=>'str*', pos=>1 },
@@ -309,7 +309,7 @@ test_gen(
     test_gen(
         name => 'field spec property: include_by_default=0',
         table_data => $table_data,
-        table_spec => $table_spec,
+        table_def  => $table_def,
         post_test => sub {
             my ($res) = @_;
             my $func = $res->[2]{code};
@@ -328,7 +328,7 @@ test_gen(
 test_gen(
     name => 'option: extra_props',
     table_data => $table_data,
-    table_spec => $table_spec,
+    table_def  => $table_def,
     other_args => {extra_props => {'x.foo'=>1, 'x.bar'=>[]}},
     post_test => sub {
         my ($res) = @_;

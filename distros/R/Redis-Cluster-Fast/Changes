@@ -1,5 +1,29 @@
 Revision history for Perl extension Redis-Cluster-Fast
 
+0.082 2023-02-26T17:57:12Z
+
+    - Fix error formatting #12
+
+0.081 2023-02-26T16:39:11Z
+
+    - Explicitly do disconnect before free async context.
+
+0.08 2023-02-26T13:47:23Z
+
+    - Refactoring.
+
+0.07 2023-02-25T18:42:41Z
+
+    - Bump hiredis-cluster to 0.10.0
+
+0.06 2023-02-25T18:12:59Z
+
+    - Fix memory leaks.
+    - Add a test using Test::Valgrind.
+    - Fix for building dependencies.
+    - Fix behavior when forked to reduce calls to Redis command to retrieve cluster topology.
+    - Refactoring.
+
 0.05 2023-02-05T09:56:36Z
 
     - skip tests when test Redis Cluster fails to start

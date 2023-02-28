@@ -542,7 +542,7 @@ sub new
 				$class = 1  if ($lowclass == 30 && $class =~ /\D/io);
 				push @{$streamsets{$class}}, $stream;
 			}
-			print STDERR "--Max resolution=".$self->{'quality'}."=\n";
+			print STDERR "--Max resolution=".$self->{'quality'}."=\n"  if ($DEBUG);
 			my %streamHash;  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
 			foreach my $streamtype (@okStreams) {
 				print STDERR "\n--keep type=$streamtype:\n"  if ($DEBUG);

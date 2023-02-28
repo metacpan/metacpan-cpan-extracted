@@ -2,23 +2,113 @@ NAME
     App::TextWrapUtils - Utilities related to text wrapping
 
 VERSION
-    This document describes version 0.002 of App::TextWrapUtils (from Perl
-    distribution App-TextWrapUtils), released on 2022-12-13.
+    This document describes version 0.005 of App::TextWrapUtils (from Perl
+    distribution App-TextWrapUtils), released on 2022-12-14.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
+    *   nowrap
+
+    *   nowrap-clipboard
+
+    *   textunwrap
+
+    *   textunwrap-clipboard
+
     *   textwrap
+
+    *   textwrap-clipboard
 
     Keywords: fold.
 
 FUNCTIONS
+  textunwrap
+    Usage:
+
+     textunwrap(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Unwrap (unfold) multiline paragraphs to single-line ones.
+
+    This is a shortcut for:
+
+     % textwrap -w 999999
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *perl::modname* (default: "Text::ANSI::Util")
+
+        (No description)
+
+    *   filename => *filename* (default: "-")
+
+        Use dash ("-") to read from stdin.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  textunwrap_clipboard
+    Usage:
+
+     textunwrap_clipboard(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Unwrap (unfold) multiline paragraphs in clipboard to single-line ones.
+
+    This is shortcut for something like:
+
+     % clipget | textunwrap ... | clipadd
+
+    where clipget and clipadd are utilities to get text from clipboard and
+    set text of clipboard, respectively.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *perl::modname* (default: "Text::ANSI::Util")
+
+        (No description)
+
+    *   clipboard_manager => *str*
+
+        Explicitly set clipboard manager to use.
+
+        The default, when left undef, is to detect what clipboard manager is
+        running.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   textwrap
     Usage:
 
      textwrap(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Wrap (fold) text using one of several Perl modules.
+    Wrap (fold) paragraphs in text using one of several Perl modules.
 
     Paragraphs are separated with two or more blank lines.
 
@@ -52,6 +142,54 @@ FUNCTIONS
 
     Return value: (any)
 
+  textwrap_clipboard
+    Usage:
+
+     textwrap_clipboard(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Wrap (fold) paragraphs in text in clipboard using one of several Perl
+    modules.
+
+    This is shortcut for something like:
+
+     % clipget | textwrap ... | clipadd
+
+    where clipget and clipadd are utilities to get text from clipboard and
+    set text of clipboard, respectively.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *perl::modname* (default: "Text::ANSI::Util")
+
+        (No description)
+
+    *   clipboard_manager => *str*
+
+        Explicitly set clipboard manager to use.
+
+        The default, when left undef, is to detect what clipboard manager is
+        running.
+
+    *   width => *posint* (default: 80)
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-TextWrapUtils>.
@@ -61,7 +199,7 @@ SOURCE
     <https://github.com/perlancar/perl-App-TextWrapUtils>.
 
 SEE ALSO
-    Text::Wrap and other backends.
+    Text::Wrap, Text::ANSI::Util and other backends.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

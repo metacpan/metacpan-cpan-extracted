@@ -21,13 +21,13 @@ my %WriteMakefileArgs = (
   "NAME" => "App::GUI::Cellgraph",
   "PREREQ_PM" => {
     "File::Spec" => 3,
-    "Graphics::Toolkit::Color" => 1,
+    "Graphics::Toolkit::Color" => "1.08",
     "Wx" => "0.9"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.3"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.25",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 3,
-  "Graphics::Toolkit::Color" => 1,
+  "Graphics::Toolkit::Color" => "1.08",
   "Test::More" => "1.3",
   "Wx" => "0.9"
 );

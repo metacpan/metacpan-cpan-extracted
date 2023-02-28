@@ -1,3 +1,21 @@
+Wed Feb 22 22:53:33 2023 -0500
+009bb3f7e5b5bff29e02f66875cf9a7d6244ff55
+Retry requesting .zip then check that it is available (#7)
+* Retry requesting .zip then check that it is available
+
+* Make Software::License a develop requires prereq
+
+instead of a configure and build prereq.
+
+This also helps with getting the dist to install on Perl v5.10 as the
+upstream `Data::Section` is now min Perl v5.12
+<https://metacpan.org/release/RJBS/Data-Section-0.200008>.
+
+* GHA: Need Homebrew libffi for FFI::Platypus
+Mon Jan 30 22:31:01 2023 -0500
+520a6fafbcc1705560fda53263713a9a85ad7287
+Do not probe old ta-lib libraries on FreeBSD/OpenBSD/NetBSD
+Signed-off-by: Vikas N Kumar <12120+vikasnkumar@users.noreply.github.com>
 Wed Dec 28 22:14:19 2022 -0500
 257bd8553b2790eb96a17a562e53ab9ef2c8a7dc
 Updating alienfile to print details on the HTTP error. Bump version to 0.12 for release

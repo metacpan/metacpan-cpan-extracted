@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.10.5
+## Version v0.11.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/11
+## Modified 2022/12/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -32,7 +32,7 @@ BEGIN
     use Module::Generic::File qw( sys_tmpdir );
     use POSIX ();
     use Want;
-    $VERSION     = 'v0.10.5';
+    $VERSION     = 'v0.11.0';
     use Devel::Confess;
 };
 
@@ -86,32 +86,18 @@ sub init
     $self->{auto_convert_datetime_to_object} = 0;
     $self->{allow_bulk_delete} = 0;
     $self->{allow_bulk_update} = 0;
+    $self->{unknown_field}     = 'ignore';
     $self->{_init_strict_use_sub} = 1;
     $self->Module::Generic::init( @_ );
     # $self->{constant_queries_cache} = $DB::Object::CONSTANT_QUERIES_CACHE;
     return( $self );
 }
 
-## End of generic routines
-
 sub allow_bulk_delete { return( shift->_set_get_scalar( 'allow_bulk_delete', @_ ) ); }
 
 sub allow_bulk_update { return( shift->_set_get_scalar( 'allow_bulk_update', @_ ) ); }
 
 sub AND { shift( @_ ); return( DB::Object::AND->new( @_ ) ); }
-
-# This should be in the DB::Object::Statement package. Not much reason to have it here really
-# sub as_string
-# {
-#     my $self = shift( @_ );
-#     ## my $q = $self->_query_object_current;
-#     ## used by select, insert, update, delete to flag that we need to reformat the query
-#     $self->{ 'as_string' }++;
-#     ## return( $self->{ 'sth' }->{ 'Statement' } );
-#     ## Same:
-#     ## return( $q->as_string );
-#     return( $self->{ 'query' } );
-# }
 
 sub auto_convert_datetime_to_object { return( shift->_set_get_scalar( 'auto_convert_datetime_to_object', @_ ) ); }
 
@@ -357,6 +343,7 @@ sub connect
     # $self->debug( 3 );
     $self->{debug} = CORE::exists( $param->{debug} ) ? CORE::delete( $param->{debug} ) : CORE::exists( $param->{Debug} ) ? CORE::delete( $param->{Debug} ) : $DEBUG;
     $self->{cache_dir} =  CORE::exists( $param->{cache_dir} ) ? CORE::delete( $param->{cache_dir} ) : CORE::exists( $that->{cache_dir} ) ?  $that->{cache_dir} : $CACHE_DIR;
+    $self->{unknown_field} = CORE::delete( $param->{unknown_field} ) if( CORE::exists( $param->{unknown_field} ) );
     
     $param = $self->_check_connect_param( $param ) || return( $self->pass_error );
     my $opt = {};
@@ -1237,6 +1224,8 @@ sub transaction { return( shift->_set_get_boolean( 'transaction', @_ ) ); }
 
 sub TRUE { return( 'TRUE' ); }
 
+sub unknown_field { return( shift->_set_get_scalar( 'unknown_field', @_ ) ); }
+
 sub unlock
 {
     my $self = shift( @_ );
@@ -1465,7 +1454,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    return( [qw( db login passwd host port driver database server opt uri debug cache_connections )] );
+    return( [qw( db login passwd host port driver database server opt uri debug cache_connections unknown_field )] );
 }
 
 sub _connection_params2hash
@@ -2400,7 +2389,7 @@ Sometimes, having placeholders in expression makes it difficult to work, so you 
 
 =head1 VERSION
 
-    v0.10.5
+    v0.11.0
 
 =head1 DESCRIPTION
 

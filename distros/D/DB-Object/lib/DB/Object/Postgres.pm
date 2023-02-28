@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.14
+## Version v0.4.15
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2023/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,7 +33,7 @@ BEGIN
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
     use Nice::Try;
-    $VERSION     = 'v0.4.14';
+    $VERSION     = 'v0.4.15';
     use Devel::Confess;
 };
 
@@ -1017,7 +1017,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database schema server opt uri debug cache_connections )];
+    my $core = [qw( db login passwd host port driver database schema server opt uri debug cache_connections unknown_field )];
     my @pg_params = grep( /^pg_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -1345,7 +1345,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v0.4.14
+    v0.4.15
 
 =head1 DESCRIPTION
 

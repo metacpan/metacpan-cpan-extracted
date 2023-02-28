@@ -1315,28 +1315,32 @@ sub set_values_aref {
 	if ( $param_flow_pink->{_selection_index} >= 0 ) {
 
 		my $index = $param_flow_pink->{_selection_index};
+		# print("param_flow_pink,set_values_aref, flow index: $index\n");
+		# print("param_flow_pink,set_values_aref, values_aref=@$values_aref\n");
+		
 		if ( $index >= 0 ) {
 			my ( $i, $j, $length );
-			my ( @values_aref, @values );
+			my ( @values_aref, @values, @values_array);
 
 			@{ $param_flow_pink->{_values_aref2} }[$index] = $values_aref;
-			$length = scalar @values_aref;
-
-			# print("param_flow_pink,set_values :values_aref is @$values_aref\n");
+			@values_array = @$values_aref;
+			$length       = scalar @values_array;
 
 			for ( $i = 1, $j = 0; $i < $length; $i = $i + 2, $j++ ) {
-				$values[$j] = $values_aref[$i];
+				
+				$values[$j] = $values_array[$i];
 
-				print("param_flow_pink, set_values :index $j values: $values[$j]\n");
+				# print("1. param_flow_pink, set_values_aref :index $j values: $values[$j]\n");
 			}
+			
+			# print("2. param_flow_pink,set_values_aref: @values\n");
 		}
 	}
 	else {
 		# print("param_flow_pink, set_values_aref: selection index < 0 NADA\n");
 	}
 
-	# print("param_flow_pink,set_values_aref :values_aref are @$values_aref[0]\n");
-	# print("param_flow_pink,set_values_aref, index: $index\n");
+	# print("param_flow_pink,set_values_aref :values_aref[0] are @$values_aref[0]\n");
 	return ();
 }
 

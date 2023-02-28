@@ -16,7 +16,6 @@ my $password = 'password';
 my $salt = "\0" x 16;
 
 my $hash1 = $passphrase->hash_password($password);
-diag $hash1;
 ok($passphrase->verify_password($password, $hash1), 'Self-generated password validates');
 ok(!$passphrase->needs_rehash($hash1), 'Self-generated password doesn\'t need to be regenerated');
 

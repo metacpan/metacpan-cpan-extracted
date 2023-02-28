@@ -95,7 +95,7 @@ if ($timezone->location()) {
 } elsif (defined $timezone->area()) {
 	diag("Local timezone does not have an area");
 }
-if ($timezone->areas()) {
+if (($timezone->areas()) && ((scalar $timezone->areas()) > 1)) {
 	ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->areas()");
 	ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
 	if ($^O eq 'MSWin32') {

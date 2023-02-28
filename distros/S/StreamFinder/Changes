@@ -486,3 +486,22 @@ Revision history for StreamFinder
         limit on HLS streams returned by getURL() when possible - useful for 
         users with limited bandwidth.
         - StreamFinder::Brighteon - Add ability to obtain the video's "year".
+2.03    2023/02/24
+        - Fix debug messages that were displaying without debugging turned on.
+        - StreamFinder::Brighteon - Convert "embed" URLs to standard ones, so 
+        that if passed an embed url, the proper stream data will be returned.
+2.04    2023/02/28
+        - Added StreamFinder::Rcast to fetch rcast.net radio stations.
+        - StreamFinder::BrandNewTube - Fix several issues with this rapidly-
+        depreciating video site (more recent videos seem to be wrapped in 
+        javascript and becoming unscrapable.  These fixes restore some fields 
+        for which the site has changed the code.  Note:  This module also 
+        handles ugetube.com videos, which seem to still work properly, and may 
+        be renamed to StreamFinder::UGETube in the future if brandnewtube.com 
+        support is eventually dropped.
+        - StreamFinder::Odysee - Add new "-youtube=ifneeded" option to only 
+        fetch Youtube streams if youtube-dl fails to find a valid Odysee stream.
+        Also add a new option "-nohls" to ignore HLS (.m3u/.m3u8).
+        StreamFinder class - Fix undefined variable warning when attempting to 
+        fetch a stream URL when there are no streams matching restricted 
+        criteria, even if a valid StreamFinder object was returned.

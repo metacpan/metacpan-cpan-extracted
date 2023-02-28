@@ -47,9 +47,8 @@ components:
       content:
         application/json:
           schema:
+            additionalProperties: false
             properties:
-              stash:
-                type: object
               result:
                 properties:
                   valid:
@@ -100,9 +99,6 @@ YAML
   $t->post_ok('/foo/hi/there')
     ->status_is(400, 'path_template cannot be found')
     ->json_is({
-      stash => my $expected_stash = {
-        method => 'post',
-      },
       result => my $expected_result = {
         valid => false,
         errors => [
@@ -115,6 +111,15 @@ YAML
         ],
       },
     });
+
+  cmp_deeply(
+    $BasicApp::LAST_VALIDATE_REQUEST_STASH,
+    my $expected_stash = {
+      method => 'post',
+      request => isa('Mojo::Message::Request'),
+    },
+    'stash is set in validate_request',
+  );
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,
@@ -132,11 +137,6 @@ YAML
   $t->get_ok('/foo/hi')
     ->status_is(400, 'wrong HTTP method')
     ->json_is({
-      stash => $expected_stash = {
-        path_template => '/foo/{foo_id}',
-        path_captures => { foo_id => 'hi' },
-        method => 'get',
-      },
       result => $expected_result = {
         valid => false,
         errors => [
@@ -149,6 +149,17 @@ YAML
         ],
       },
     });
+
+  cmp_deeply(
+    $BasicApp::LAST_VALIDATE_REQUEST_STASH,
+    $expected_stash = {
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => 'hi' },
+      method => 'get',
+      request => isa('Mojo::Message::Request'),
+    },
+    'stash is set in validate_request',
+  );
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,
@@ -166,13 +177,6 @@ YAML
   $t->post_ok('/foo/123')
     ->status_is(400, 'path parameter will fail validation')
     ->json_is({
-      stash => $expected_stash = {
-        method => 'post',
-        operation_id => 'operation_foo',
-        operation_path => '/paths/~1foo~1{foo_id}/post',
-        path_template => '/foo/{foo_id}',
-        path_captures => { foo_id => '123' },
-      },
       result => {
         valid => false,
         errors => [
@@ -185,6 +189,19 @@ YAML
         ],
       },
     });
+
+  cmp_deeply(
+    $BasicApp::LAST_VALIDATE_REQUEST_STASH,
+    $expected_stash = {
+      method => 'post',
+      operation_id => 'operation_foo',
+      operation_path => '/paths/~1foo~1{foo_id}/post',
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => '123' },
+      request => isa('Mojo::Message::Request'),
+    },
+    'stash is set in validate_request',
+  );
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,
@@ -202,13 +219,6 @@ YAML
   $t->post_ok('/foo/hi', { 'Content-Type' => 'text/plain' }, '123')
     ->status_is(400, 'valid path; body does not match')
     ->json_is({
-      stash => {
-        method => 'post',
-        operation_id => 'operation_foo',
-        operation_path => '/paths/~1foo~1{foo_id}/post',
-        path_template => '/foo/{foo_id}',
-        path_captures => { foo_id => 'hi' },
-      },
       result => {
         valid => false,
         errors => [
@@ -222,19 +232,37 @@ YAML
       },
     });
 
+  cmp_deeply(
+    $BasicApp::LAST_VALIDATE_REQUEST_STASH,
+    {
+      method => 'post',
+      operation_id => 'operation_foo',
+      operation_path => '/paths/~1foo~1{foo_id}/post',
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => 'hi' },
+      request => isa('Mojo::Message::Request'),
+    },
+    'stash is set in validate_request',
+  );
 
   $t->post_ok('/foo/hi?status=500', { 'Content-Type' => 'text/plain' }, 'hi')
     ->status_is(500, 'custom status code')
     ->json_is({
-      stash => $expected_stash = {
-        method => 'post',
-        operation_id => 'operation_foo',
-        operation_path => '/paths/~1foo~1{foo_id}/post',
-        path_template => '/foo/{foo_id}',
-        path_captures => { foo_id => 'hi' },
-      },
       result => { valid => true },
     });
+
+  cmp_deeply(
+    $BasicApp::LAST_VALIDATE_REQUEST_STASH,
+    $expected_stash = {
+      method => 'post',
+      operation_id => 'operation_foo',
+      operation_path => '/paths/~1foo~1{foo_id}/post',
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => 'hi' },
+      request => isa('Mojo::Message::Request'),
+    },
+    'stash is set in validate_request',
+  );
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,
@@ -262,6 +290,12 @@ YAML
   $t->get_ok('/skip_validate_request')
     ->status_is(200)
     ->content_is('ok');
+
+  cmp_deeply(
+    $BasicApp::LAST_VALIDATE_REQUEST_STASH,
+    undef,
+    'stash was not set in validate_request',
+  );
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,

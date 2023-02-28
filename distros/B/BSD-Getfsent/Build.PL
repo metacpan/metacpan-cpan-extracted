@@ -16,10 +16,9 @@ my $build = Module::Build->new
                  'Exporter' => 0,
                  'IO::File' => 0,
                },
-   build_requires => { 'Test::More' => 0 },
+   test_requires => { 'Test::More' => 0 },
    license => 'perl',
    create_readme => 1,
-   create_makefile_pl => 'traditional',
    meta_merge => {
        resources => {
            repository => 'https://github.com/stsc/BSD-Getfsent',

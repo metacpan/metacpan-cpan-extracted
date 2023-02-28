@@ -29,13 +29,23 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 sub new
 {
 	my $self = {};
 	$self->{LOGINSTATE} = 0;
-	$self->{URL}="https://www.yesss.at/kontomanager.at/";
+	#$self->{URL}="https://www.yesss.at/kontomanager.at/";
+	$self->{URL}="https://www.kontomanager.at/";
+	# www.yesss.at
+	# CookieSettings: %7B%22categories%22%3A%5B%22necessary%22%5D%7D / {"categories":["necessary"]}
+
+	# create useragent and cookie jar
+	$self->{UA} = LWP::UserAgent->new;
+	$self->{COOKIEJAR} = HTTP::Cookies->new();
+	$self->{COOKIEJAR}->set_cookie(0, 'CookieSettings', '{"categories":["necessary"]}', 
+		'/', 'www.yesss.at', 443, 0, 0, 86400, 0);
+	$self->{UA}->cookie_jar($self->{COOKIEJAR});
 
 	bless ($self);
 	return $self;
@@ -57,12 +67,8 @@ sub login
 		return 1;
 	}
 
-	# Cookies are needed
-	$self->{UA} = LWP::UserAgent->new;
-	$self->{UA}->cookie_jar(HTTP::Cookies->new);
-
 	# go to start page
-	$self->{CONTENT}=$self->{UA}->get($self->{URL});
+	$self->{CONTENT}=$self->{UA}->get($self->{URL}."index.php?brand=yesss&callfromapp=1&appversion=2_3");
 
 	# if there was an error on the start page, stop
 	if (!($self->{CONTENT}->is_success))
@@ -755,6 +761,10 @@ Removed accidental remaining debug output
 Implemented token introduced on website on November 11th, 2020
 
 Added status_line in case of errors when sending message
+
+=item 2.21
+
+Nailed to old interface because websms was removed from the new UI
 
 =back
 

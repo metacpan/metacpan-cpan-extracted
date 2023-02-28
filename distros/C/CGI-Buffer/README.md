@@ -1,22 +1,25 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/CGI-Buffer.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Buffer)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/2uhepmj5sd1nspjg?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-buffer)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Buffer/badge)](https://dependencyci.com/github/nigelhorne/CGI-Buffer)
+[![Actions Status](https://github.com/nigelhorne/CGI-Buffer/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/CGI-Buffer/actions)
+[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Buffer.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Buffer)
+[![Appveyor status](https://ci.appveyor.com/api/projects/status/2uhepmj5sd1nspjg?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-buffer)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Buffer/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Buffer?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/CGI-Buffer.svg)](http://search.cpan.org/~nhorne/CGI-Buffer/)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Buffer.png)](http://cpants.cpanauthors.org/dist/CGI-Buffer)
 
-# CGI::Buffer
+# NAME
 
-Verify, Cache and Optimise CGI Output
+CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.82
+Version 0.83
 
 # SYNOPSIS
 
 CGI::Buffer verifies the HTML that you produce by passing it through
 `HTML::Lint`.
 
-CGI::Buffer optimises FCGI programs by reducing, filtering and compressing
+CGI::Buffer optimises CGI programs by reducing, filtering and compressing
 output to speed up the transmission and by nearly seamlessly making use of
 client and server caches.
 
@@ -50,10 +53,10 @@ To temporarily prevent the use of server-side caches, for example whilst
 debugging before publishing a code change, set the NO\_CACHE environment variable
 to any non-zero value.
 If you get errors about Wide characters in print it means that you've
-forgotten to emit pure HTML on non-ascii characters.
-See [HTML::Entities](https://metacpan.org/pod/HTML::Entities).
+forgotten to emit pure HTML on non-ASCII characters.
+See [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities).
 As a hack work around you could also remove accents and the like by using
-[Text::Unidecode](https://metacpan.org/pod/Text::Unidecode),
+[Text::Unidecode](https://metacpan.org/pod/Text%3A%3AUnidecode),
 which works well but isn't really what you want.
 
 # SUBROUTINES/METHODS
@@ -93,7 +96,7 @@ Items stay in the server-side cache by default for 10 minutes.
 This can be overridden by the cache\_control HTTP header in the request, and
 the default can be changed by the cache\_age argument to init().
 
-Logger will be an object that understands debug() such as an [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl)
+Logger will be an object that understands debug() such as an [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)
 object.
 
 To generate a last\_modified header, you must give a cache object.
@@ -174,7 +177,7 @@ For example:
     print $output;
 
 Can produce buggy JavaScript if you use the &lt;!-- HIDING technique.
-This is a bug in [JavaScript::Packer](https://metacpan.org/pod/JavaScript::Packer), not CGI::Buffer.
+This is a bug in [JavaScript::Packer](https://metacpan.org/pod/JavaScript%3A%3APacker), not CGI::Buffer.
 See https://github.com/nevesenin/javascript-packer-perl/issues/1#issuecomment-4356790
 
 Mod\_deflate can confuse this when compressing output.
@@ -192,11 +195,11 @@ CGI::Buffer is not compatible with FastCGI.
 
 I advise adding CGI::Buffer as the last use statement so that it is
 cleared up first.  In particular it should be loaded after
-[Log::Log4Perl](https://metacpan.org/pod/Log::Log4Perl), if you're using that, so that any messages it
+[Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl), if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 CGI::Buffer;
 
-CGI::Buffer is not compatible with FCGI, use [FCGI::Buffer](https://metacpan.org/pod/FCGI::Buffer) instead.
+CGI::Buffer is not compatible with FCGI, use [FCGI::Buffer](https://metacpan.org/pod/FCGI%3A%3ABuffer) instead.
 
 Please report any bugs or feature requests to `bug-cgi-buffer at rt.cpan.org`,
 or through the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Buffer](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Buffer).
@@ -205,7 +208,7 @@ your bug as I make changes.
 
 # SEE ALSO
 
-HTML::Packer, HTML::Lint
+[HTML::Packer](https://metacpan.org/pod/HTML%3A%3APacker), [HTML::Lint](https://metacpan.org/pod/HTML%3A%3ALint)
 
 # SUPPORT
 
@@ -215,21 +218,29 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/CGI-Buffer](https://metacpan.org/release/CGI-Buffer)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Buffer](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Buffer)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Buffer](https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Buffer)
 
-- AnnoCPAN: Annotated CPAN documentation
+- CPANTS
 
-    [http://annocpan.org/dist/CGI-Buffer](http://annocpan.org/dist/CGI-Buffer)
+    [http://cpants.cpanauthors.org/dist/CGI-Buffer](http://cpants.cpanauthors.org/dist/CGI-Buffer)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=CGI-Buffer](http://matrix.cpantesters.org/?dist=CGI-Buffer)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-Buffer](http://cpanratings.perl.org/d/CGI-Buffer)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/CGI-Buffer/](http://search.cpan.org/dist/CGI-Buffer/)
+    [http://deps.cpantesters.org/?module=CGI::Buffer](http://deps.cpantesters.org/?module=CGI::Buffer)
 
 # ACKNOWLEDGEMENTS
 

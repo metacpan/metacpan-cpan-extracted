@@ -1,0 +1,8 @@
+Revision history for Music-CreatingRhythms
+
+0.0101 2023-02-26 09:06:32
+    - Improve documentation.
+
+0.0100 2023-02-26 08:54:43
+    - Mint with Dist::Zilla.
+    - Import and tweak functionality from my Creating-Rhythm github repo programs.

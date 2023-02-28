@@ -129,7 +129,7 @@ sub set_hash_ref {
 =head2 _changes
  If you are at this subroutine it means that
  an Entry widget has lost or gained focus
-param_widgets_blue, changes,
+param_widgets_pink, changes,
  If we reach this subroutine we 
  will assume changes occurred to 
  all parameter (Entry) widgets belonging to 
@@ -1531,7 +1531,7 @@ sub set_labels {
 		# print("param_widgets_color,set_labels, length=$length\n");
 		# print("param_widgets_color,set_labels, llabels: @{$param_widgets_color_href->{_labels_aref}}\n");
 	} else {
-		print("param_widgets_color,set_labels, missing labels\n");
+		print("param_widgets_blue,set_labels, missing labels\n");
 	}
 	return ();
 }

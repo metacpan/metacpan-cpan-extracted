@@ -1,5 +1,19 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [3.3.2](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.2) (Tue Feb 28 11:28:31 GMT 2023)
+
+* Add `1.0` to the list of options for required version of `search` interface, since it's apparently had a major release for some reason. Fixes ZF-85.
+
+## [3.3.1](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.1) (Fri Feb 24 19:26:47 GMT 2023)
+
+* Bump required version of graphql interface to v1.3. Fixes ZF-83.
+
+## [3.3.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.0) (Fri Feb 24 18:53:17 GMT 2023)
+
+* MARC-holdings subfield values of "0" are now included in the record, unlike other falsy values. Allows `availableNow=0` and fixes ZF-80.
+* Completely new GraphQL query for `mod-search`, including all and only those fields actually needed to make holdings information for OPAC XML records and MARC holdings. Fixes ZF-48.
+* Analyze the impact of missing fields in Morning Glory: we do not use `instanceTypeId` or `source`, and by v3.3.0, `holdingsRecords2.temporaryLocation` and `bareHoldingsItems.materialType` are both once more available. Fixes ZF-66.
+
 ## [3.2.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.2.0) (Fri Jan 13 19:13:17 GMT 2023)
 
 * Loosen requirements for `search` interface to allow v0.7. Fixes ZF-71.
@@ -9,6 +23,7 @@
 * Switch base image from perl:5 to perl:5-slim. Use signed-by indexdata.asc for apt. Fixes ZF-73.
 * Update definitions of access-points 7, 8 and 1211 (ISBN, ISSN and OCLC Number) for mod-search. Fixes ZF-77.
 * Remove literal '\n' sequence from between consecutive `<holding>` entries in OPAC XML records. Fixes ZF-78.
+* Complete rewrite of `mod-search.graphql-query` so it now requests all and only the fields used to generate information for OPAC XML records and MARC holdings. Fixes ZF-48.
 
 ## [3.1.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.1.0) (Sun Nov 27 08:36:08 GMT 2022)
 

@@ -1,5 +1,8 @@
 Revision history for Time-Zone-Olson
 
+0.46  Wed Feb 25 12:52:00 2023
+       More Alpine Linux fixes
+
 0.45  Wed Jan 04 21:08:00 2023
        Test suite fixes for CPAN Testers
 

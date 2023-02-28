@@ -1,0 +1,159 @@
+#!/usr/bin/perl 
+use 5.014 ; use strict ; use warnings  ;
+use Cwd qw [ getcwd abs_path ] ;
+use Digest::MD5 qw[ md5 md5_hex md5_base64 ] ; # use Digest::SHA1 qw[ sha1 sha1_hex sha1_base64 ]; 
+use feature qw [ say ] ;
+use File::Spec::Functions qw[ catfile splitdir rel2abs updir ] ; 
+use Getopt::Std ; 
+use List::Util qw [ max min sum sum0 reduce ] ;
+use POSIX qw[ strftime ] ;
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Time::HiRes qw[ stat gettimeofday tv_interval ] ;  # stat をマイクロ秒単位にする。
+
+sub dtwhen ( $ ) ;  # 各日時情報を、表示用の文字列に変換する。
+
+my $time_start = [ gettimeofday ] ; 
+my $t0 = $time_start -> [0] ;
+my $d0 = getcwd ; 
+my $cntF = 0 ; # 表示する出力ファイル数
+my $cntD = 0 ; # 削除したファイルの個数
+
+getopts '~:2b:d:Df:l:mnv:' , \my%o ; 
+$o{d} //= '' ; # 日時情報の制御。0を含むなら出さない。sを含むなら秒単位。
+$o{'~'} //= '' ; # いろんな順序の制御を逆にする。パラメータに応じて。
+
+my @F0 = @ARGV ? @ARGV : glob '*' ; # glob '*' はディレクトリのファイルは抽出しない。
+
+if ( $o{D} ) { # -Dは破壊的ゆえ、色々ここで仕込む。↓
+  $o{m} = 1 ; # -m 指定で、m5ハッシュ値を計算させる。
+} 
+
+$SIG { INT } = sub { exit } ; # Ctrl + C の押下でENDブロックを実行して終了。
+& main ; 
+exit 0 ;
+
+sub main () {
+
+  my %s2f ; # %{ $s2f { $size } } でバイトサイズから、ファイル名の一覧を取り出せる。
+  while ( defined ( $_  = shift @F0 ) ) {
+    # ↓ ディレクリファイルは、その直下のファイルを見るようにする。ただし、ディレクトリの深追いはしない。
+    do{ my $t = $_ ; chdir $t ; push @F0 , grep{ !-d && ($_=catfile $t,$_) } glob '*' ; chdir $d0 ; next } if -d ; 
+    next if -l $_ && 0 eq ($o{l}//'') ;  # -l0 を指定すると、シンボリックリンクファイルは、対象外。
+    my $size = ( stat ) [7] ; # <-- - lstat でなくて stat なので、シンボリックリンクのファイルはその先の中身を見る。
+    next if $size <  ( $o{b} // 0 ) ; # 最小のバイトサイズを見たな避ければ、対象外。
+    push @{ $s2f{$size} } , $_ ;
+  }
+
+  my $least = $o{f} // 2 ; # 同じバイトサイズが何個以上の場合を対象にするか? 
+  my @sizes  = sort { $a<=>$b } grep { @{ $s2f { $_ } } >= $least } keys %s2f ; 
+  @sizes = reverse @sizes if $o{'~'} =~ /s/ ;
+  my $fmt = do { my $t = max @sizes , 0 ; my $d = length "$t" ; "%${d}s" } ; # サイズの数値のフォーマットを"%7d"のように決める。
+  for my $size ( @sizes ) { 
+    my @files = sort @{ $s2f{$size} } ; # ファイルの一覧
+    @files = sort {(stat $a)[9] <=> (stat $b)[9]} @files if $o{t} || $o{'~'} =~ /t/oi ;
+    @files = reverse @files if $o{'~'} =~ /t/oi ;
+    my %seen ; # 既に見たハッシュダイジェスト値
+    for ( @files ) { 
+      my @t3 = ( stat $_ ) [ 8, 9, 10 ] ; # <-- atime, mtime, ctime の 日時3情報
+      my $ctx = Digest::MD5 -> new ;
+      if ( $o{m} ) {
+        open my $FH, '<', $_ or die  "Can't open '$_': $!";
+        binmode $FH ; 
+        $ctx -> addfile ( $FH );
+        close $FH ;
+      }
+
+      utime @t3[0,1] , $_ if $o{m} ; # ハッシュ値計算でアクセスしたことでアクセス日時が変わったことを、無かったことにする。
+      my $digest = $o{m} ? $ctx -> hexdigest : '---' ;
+      next if ! $seen{ $digest } ++ && $o{2} ;
+      if ( $o{D} && $seen { $digest } >= 2 ) {
+        my $c = unlink $_ if ! $o{n} ; # ドライラン -n が指定していなければ、ファイルを削除。
+        $_ .=  YELLOW "\t<-- " . ( $o{n} ? 'would be deleted..' : $c ? 'deleted.' : 'deleting failed !') ;
+        $cntD += $c // 0 ; 
+      }
+      my @out = ( sprintf ($fmt , $size) , $digest , $o{d} =~ /0/o ? () : map ( dtwhen $_, @t3 ) , $_ ) ;
+      say join "\t" , @out ;
+      $cntF ++ 
+    }
+  }
+}
+
+sub dtwhen ( $ ) { 
+  my $fmt = abs ( $_[0] - $t0 ) >= 86400 * 180 ? '%Y-%m-%d' : $o{d} =~ /s/oi ? '%m-%d %H:%M:%S' : '%m-%d %H:%M';
+  strftime $fmt , localtime $_[0] ;
+}
+
+END{ print STDERR RESET '' } ; # ENDの順序は重要。最初に書いたものが最後に実行される。このENDで文字の着色を消すことが出来る。
+
+END {
+  exit if 0 eq ( $o{v} // '' ) ;
+  say STDERR BOLD FAINT " --  " , 
+  sprintf( "%.6f", tv_interval $time_start , [ gettimeofday ] ) , " second(s) in process. " , 
+  $cntF ," file(s) shown. " , ( $cntD ? "$cntD file(s) removed. " : '' ) ,   
+  'Format : byte-size, md5-value, ', ($o{d} =~ /0/ ? '' : '{a,m,c}time, ') , 'filename.' ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    $o{v} = 0 ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+  警告: このコマンドは謝ってファイルを消去する恐れがある。ただしどのファイルを消すか確かめる機能は実装してある。
+
+　$0 files 
+
+  全く同じバイトサイズのファイルを検出する。
+  -mの指定によりMD5ハッシュ値が等しいかも見る。
+  引数には(通常2個以上の)ファイルを指定するが、ディレクトリが含まれていた場合には、
+   そのディレクトリの直下のファイルも見る。
+  ハッシュ値を計算する場合は、実際にはファイルにアクセスするのでアクセス時刻が変わってしまうが
+   その計算後に、計算前のアクセス時刻に戻すようにしている(OSに依存するかも知れない)。
+
+ オプション:  (下記で N は数値を表す。他は固定文字列。オプションとパラメータの間の空白は省略可能。-aと-bは-abのようにできる。)
+   --help : このヘルプ画面を出力する。
+   -2   : 同じファイルのバイトサイズで，(-mが指定されたらハッシュ値も考慮して)2番目以降を取り出す。
+   -b N : 処理対象とする最小のバイトサイズ N を指定。0バイトファイルを避けるなら1を指定。
+   -D   : 同じファイルサイズで，同じハッシュ値のものについて、2番目以降をファイル除去する。<-- 破壊的につき要注意。
+   -d 0 : 日時情報を出さない。(#1)
+   -d s : 分だけで無くて秒単位で出力する。(#2)
+   -f N : 同じファイルサイズで少なくとも何回(N)出現したものだけを取り出すか、の指定。初期値は2。
+   -l 0 : シンボリックリンクのファイルは、対象外にする。
+   -m   : MD5ハッシュ値(32桁)を算出する。(なお、ファイルのアクセス時刻は変更しない工夫がしてある。)
+   -n   : ドライラン。-D に対して、実際に削除は実行はしない。
+   -t   : 同じファイルサイズなら、書換日時の古い順(time)　(#3) 下記の(#5)の逆である。
+   -v 0 : 標準エラー出力に出力される2次情報を出力しない。
+   -~ s : 大きいファイル順に処理する。(#4)
+   -~ t : 同じファイルサイズなら、書換日時の新しい順。(#5) なお、-~ st と書くことで、(#4)と(#5)を同時指定できる。
+
+  利用例 : 
+    $0 -f1    # 現行ディレクトリにおける全てのファイルについての情報を出力する。
+    $0 -f3 .  # 現行ディレクトリで、全く同じバイトサイズが3個以上あるファイルを見つける。
+    $0 -t     # 同じサイズのファイルを新しい順序に並べる。(-D で削除する時に関係する。 )
+    $0 -~t    # 同じサイズのファイルを古い順序に並べる。  (     〃    )
+    $0 -D -n  # 全く同じ内容のファイルについて、1個だけ残して削除。ただし-nによりドライランになる。
+
+   注意 : 
+     * 同一内容のファイルを1個だけ残すにしても、シンボリックリンクファイルだけ残して、参照先の元のファイルを消すこともあり得るので、要注意。
+     * 全く同一内容のファイルを消すにしても、シンボリックリンクファイルについては、参照先のファイルより時間関係が想定と異なる場合があるので、要注意。
+
+   開発上のメモ :
+     * -f N で 「N回以上現れた同じサイズかハッシュ値」に制限しているが、-y N..N のような柔軟な書き方を採用したい。
+     * ファイルサイズの小さい順に並ぶようになっている。これを逆順にするオプションは一回は検討したが、煩雑になるので棚上げ。
+     * SHA1も使えるように検討したが、MD5より時間がかかるので、使わないことにした。
+     * find コマンドのオプションのように数の前に±の符号をつけることで、以上や以下を指定できるように、このコマンドの-bを改造したい。
+
+=cut

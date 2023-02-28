@@ -1,3 +1,9 @@
+2023-02-23   Armin Fuerst <armin@fuerst.priv.at>
+
+  Release 2.21
+  Nail to old layout because WebSMS was removed
+  from the new layout
+
 2020-11-11   Armin Fuerst <armin@fuerst.priv.at>
 
   Release 2.20

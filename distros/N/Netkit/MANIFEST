@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Netkit.pm
+lib/Netkit/Attachment.pm
+lib/Netkit/Interface.pm
+lib/Netkit/Lab.pm
+lib/Netkit/Lan.pm
+lib/Netkit/Machine.pm
+lib/Netkit/Route.pm
+lib/Netkit/Rule.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

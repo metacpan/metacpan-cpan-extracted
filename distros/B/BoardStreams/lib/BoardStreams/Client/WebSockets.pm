@@ -10,7 +10,7 @@ use RxPerl::Mojo ':all';
 use Exporter 'import';
 our @EXPORT_OK = qw/ make_websockets_observable /;
 
-our $VERSION = "v0.0.34";
+our $VERSION = "v0.0.36";
 
 sub make_websocket_observable ($url, $ua) {
     return rx_observable->new(sub ($subscriber) {

@@ -1,8 +1,8 @@
 digraph "machine"{
 	rankdir=LR;
-	{ "@Part: vda" [
+	{ "@Part: sda" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">Virtio Block Device</TD> </TR><TR><TD >/dev/vda<BR/>Label: gpt<BR/>Size: 50.0 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">ATA Samsung SSD 860</TD> </TR><TR><TD >/dev/sda<BR/>Model: Samsung_SSD_860_PRO_512GB<BR/>Serial: S42YNX0N512697B<BR/>Label: gpt<BR/>Size: 477 GiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -10,18 +10,28 @@ digraph "machine"{
 						</TD>
 					</TR>
 					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/vda1<BR/>EFI<BR/>Size: 285 MiB
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sda2<BR/>EFI<BR/>Size: 300 MiB
 						</TD>
 					</TR>
 					<TR>
-						<TD PORT="2" BGCOLOR="yellow">
-						/dev/vda2<BR/>pv-1<BR/>Size: 49.7 GiB
+						<TD PORT="3" BGCOLOR="yellow">
+						/dev/sda3<BR/>BOOTFS<BR/>Size: 500 MiB
 						</TD>
 					</TR>
 					<TR>
 						<TD bgcolor="green">
-						Free<BR/>Size: 1008 kiB
+						Free<BR/>Size: 223 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sda1<BR/>raid1A1<BR/>Size: 475 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 962 MiB
 						</TD>
 					</TR>
 				</TABLE>
@@ -33,33 +43,200 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		shape="rectangle";
 		style=striped;
-		fillcolor="green;0.000019:pink;0.005566:pink;0.994395:green;0.000019";
+		fillcolor="green;0.000002:pink;0.000614:pink;0.001024:green;0.000457:pink;0.995933:green;0.001970";
 	]; }
-	subgraph "cluster_ge91097" {
+	{ "@Part: sdb" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">SEAGATE ST33000650SS</TD> </TR><TR><TD >/dev/sdb<BR/>Model: ST33000650SS<BR/>Serial: Z293EBGJ<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.73 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;1.000000";
+	]; }
+	{ "@Part: sdc" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">SEAGATE ST33000650SS</TD> </TR><TR><TD >/dev/sdc<BR/>Model: ST33000650SS<BR/>Serial: Z2933SXF<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.73 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;1.000000";
+	]; }
+	{ "@Part: sdd" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">LSI Logical Volume</TD> </TR><TR><TD >/dev/sdd<BR/>Model: Logical_Volume<BR/>Serial: 2260419868161724514<BR/>Label: gpt<BR/>Size: 3.64 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1024 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sdd1<BR/>raid1A2<BR/>Size: 476 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sdd2<BR/>PV1<BR/>Size: 3.17 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 297 MiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000268:pink;0.127775:pink;0.871878:green;0.000078";
+	]; }
+	subgraph "cluster_vgchu" {
 		style=filled;
 		color=lightgrey;
 		fillcolor=lightgrey;
 		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
-		subgraph "cluster_ge91097@PV" {
+		subgraph "cluster_vgchu@PV" {
 			color=white;
 			fillcolor=white;
-			{ "LVM@ge91097@PV@vda2" [
-				label="PV: /dev/vda2\nSize: 49.7 GiB\nFree: 19.7 GiB\nUsed: 30.0 GiB";
-				style=striped;fillcolor="pink;0.603394.2:green"
+			{ "LVM@vgchu@PV@md127" [
+				label="PV: /dev/md/ssd-raid1-A\nSize: 475 GiB\nFree: 313 GiB\nUsed: 162 GiB";
+				style=striped;fillcolor="pink;0.341145.2:green"
 			]; }
-			label="ge91097's PVs";
+			{ "LVM@vgchu@PV@sdd2" [
+				label="PV: /dev/sdd2\nSize: 3.17 TiB\nFree: 1.88 TiB\nUsed: 1.29 TiB";
+				style=striped;fillcolor="pink;0.406404.2:green"
+			]; }
+			label="vgchu's PVs";
 		}
-		subgraph "cluster_ge91097@LV" {
+		subgraph "cluster_vgchu@LV" {
 			color=white;
 			fillcolor=white;
-			{ "dm-0" [
-				label="LV: root\nSize: 30.0 GiB";
+			{ "dm-3" [
+				label="LV: home\nSize: 500 GiB";
 				fillcolor="yellow"
 			]; }
-			label="ge91097's LVs";
+			{ "dm-8" [
+				label="LV: kvm-ge91097-vm0-disk1\nSize: 50.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-7" [
+				label="LV: kvm-ge91097-vm1-disk1\nSize: 50.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-6" [
+				label="LV: kvm-ngs-bdd-disk1\nSize: 50.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-1" [
+				label="LV: root+debian\nSize: 30.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-0" [
+				label="LV: root+ubuntu\nSize: 20.0 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-4" [
+				label="LV: scratch\nSize: 500 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-5" [
+				label="LV: swap\nSize: 32.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-2" [
+				label="LV: usr+local\nSize: 250 GiB";
+				fillcolor="yellow"
+			]; }
+			label="vgchu's LVs";
 		}
-		label="LVM: ge91097\nSize: 49.7 GiB\nFree: 19.7 GiB";
-		style=striped;fillcolor="pink;0.603394.2:green"
+		label="LVM: vgchu\nSize: 3.64 TiB\nFree: 2.19 TiB";
+		style=striped;fillcolor="pink;0.398080.2:green"
+	}
+	subgraph "cluster_@MD@md127" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_md127@@state" {
+			{ "md127" [
+				label="/dev/md/ssd-raid1-A\nraid1\nSize: 475 GiB";
+				fillcolor="yellow"
+			]; }
+			label="state: clean ";
+			shape=oval
+			fillcolor=green
+		}
+		{ "@MD@md127@dev@sda1" [
+			label="0: /dev/sda1\nactive sync";
+			fillcolor=yellow
+		]; }
+		{ "@MD@md127@dev@sdd1" [
+			label="1: /dev/sdd1\nactive sync writemostly";
+			fillcolor=yellow
+		]; }
+		label="ge91097-dom0:ssd-raid1-A\n475 GiB used per device";
+	}
+	subgraph "cluster_@LSISASIrcu@0" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:0" [
+			label="SEAGATE  ST33000650SS     Z293EBGJ\nenc/slot: 1:0\nReady (RDY)\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:1" [
+			label="ATA      WDC WD4003FRYZ-0 VBGGDRBF\n0: enc/slot: 1:1\nOptimal (OPT)\nSize: 3.64 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:2" [
+			label="ATA      WDC WD4003FRYZ-0 VBGGSM2F\n1: enc/slot: 1:2\nOptimal (OPT)\nSize: 3.64 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:3" [
+			label="SEAGATE  ST33000650SS     Z2933SXF\nenc/slot: 1:3\nReady (RDY)\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		subgraph "cluster_1@@state" {
+			{ "1" [
+				label="/dev/sdd\nRAID1\nSize: 3.64 TiB";
+				fillcolor="yellow"
+			]; }
+			label="state: Okay (OKY)";
+			shape=oval
+			fillcolor=green
+		}
+		label="SAS2308_1";
 	}
 	subgraph "cluster_@FS" {
 		style=filled;
@@ -67,13 +244,25 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		{ "@FS@/" [
-			label="/\nDevice: /dev/ge91097/root\next4\nSize: 29.4 GiB\nFree: 6.71 GiB\nUsed: 21.2 GiB";
-			style=striped;fillcolor="pink;0.771782.2:green"
+			label="/\nDevice: /dev/vgchu/root+debian\next4\nSize: 29.4 GiB\nFree: 5.61 GiB\nUsed: 22.3 GiB";
+			style=striped;fillcolor="pink;0.808833.2:green"
 		]; }
 		{ "@FS@/boot/efi" [
-			label="/boot/efi\nDevice: /dev/vda1\nvfat\nSize: 285 MiB\nFree: 280 MiB\nUsed: 5.13 MiB";
-			style=striped;fillcolor="pink;0.017993.2:green"
+			label="/boot/efi\nDevice: /dev/sda2\nvfat\nSize: 300 MiB\nFree: 294 MiB\nUsed: 5.79 MiB";
+			style=striped;fillcolor="pink;0.019308.2:green"
 		]; }
+		{ "@FS@/boot" [
+			label="/boot\nDevice: /dev/sda3\next4\nSize: 474 MiB\nFree: 241 MiB\nUsed: 204 MiB";
+			style=striped;fillcolor="pink;0.492481.2:green"
+		]; }
+		subgraph "cluster_@FS@SWAP" {
+			style=filled;
+			color=white
+			fillcolor=lightgrey;
+			node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+			label="SWAP\nSize: 0 B\nFree: 0 B\nUsed: 0 B";
+			style=striped;fillcolor="green"
+		}
 		label="Mounted FS and swap";
 	}
 	subgraph "cluster_@libvirt" {
@@ -81,14 +270,114 @@ digraph "machine"{
 		color=lightgrey;
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_@libvirt@ge91097-vm0" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@ge91097-vm0@dm-8" [
+				label="/dev/vgchu/kvm-ge91097-vm0-disk1\n(vda)";
+			]; }
+			label="ge91097-vm0";
+			fillcolor=yellow
+		}
+		subgraph "cluster_@libvirt@ge91097-vm1" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@ge91097-vm1@dm-3" [
+				label="/dev/vgchu/home\n(sdc)";
+			]; }
+			{ "@libvirt@ge91097-vm1@dm-7" [
+				label="/dev/vgchu/kvm-ge91097-vm1-disk1\n(sdb)";
+			]; }
+			{ "@libvirt@ge91097-vm1@dm-4" [
+				label="/dev/vgchu/scratch\n(sde)";
+			]; }
+			{ "@libvirt@ge91097-vm1@dm-5" [
+				label="/dev/vgchu/swap\n(sdf)";
+			]; }
+			{ "@libvirt@ge91097-vm1@dm-2" [
+				label="/dev/vgchu/usr+local\n(sdd)";
+			]; }
+			label="ge91097-vm1";
+			fillcolor=yellow
+		}
+		subgraph "cluster_@libvirt@ngs-bdd" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@ngs-bdd@dm-6" [
+				label="/dev/vgchu/kvm-ngs-bdd-disk1\n(sda)";
+			]; }
+			label="ngs-bdd";
+		}
+		subgraph "cluster_@libvirt@recovery-nas-cyto" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@recovery-nas-cyto@/srv/kvm/recovery-nas-cyto.img" [
+				label="/srv/kvm/recovery-nas-cyto.img\n(sda)";
+			]; }
+			{ "@libvirt@recovery-nas-cyto@/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sda.raw" [
+				label="/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sda.raw\n(sdh)";
+				fillcolor=mediumorchid1
+			]; }
+			{ "@libvirt@recovery-nas-cyto@/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sdb.img" [
+				label="/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sdb.img\n(sdi)";
+				fillcolor=mediumorchid1
+			]; }
+			label="recovery-nas-cyto";
+		}
 		label="Libvirt Virtual Machines";
 	}
-	// Links from LVM VG: ge91097
-	"LVM@ge91097@PV@vda2" -> "dm-0"
-	// Links for LVM@ge91097@PV@vda2
-	"@Part: vda":"2" -> "LVM@ge91097@PV@vda2"
+	// Links from LVM VG: vgchu
+	"LVM@vgchu@PV@sdd2" -> "dm-3"
+	"LVM@vgchu@PV@md127" -> "dm-8"
+	"LVM@vgchu@PV@md127" -> "dm-7"
+	"LVM@vgchu@PV@sdd2" -> "dm-6"
+	"LVM@vgchu@PV@md127" -> "dm-1"
+	"LVM@vgchu@PV@sdd2" -> "dm-0"
+	"LVM@vgchu@PV@sdd2" -> "dm-4"
+	"LVM@vgchu@PV@md127" -> "dm-5"
+	"LVM@vgchu@PV@sdd2" -> "dm-2"
+	// Links from MD: /dev/md/ssd-raid1-A
+	"@MD@md127@dev@sda1" -> "md127"
+	"@MD@md127@dev@sdd1" -> "md127"
+	// Links from MegaCli: Controller 0
+	
+	"@LSISASIrcu@0@dev@LSISASIrcu@1:1" -> "1"
+	"@LSISASIrcu@0@dev@LSISASIrcu@1:2" -> "1"
+	
+	// Links for @Part: sdb
+	"@LSISASIrcu@0@dev@LSISASIrcu@1:0" -> "@Part: sdb"
+	// Links for @Part: sdc
+	"@LSISASIrcu@0@dev@LSISASIrcu@1:3" -> "@Part: sdc"
+	// Links for @Part: sdd
+	"1" -> "@Part: sdd"
+	// Links for LVM@vgchu@PV@md127
+	"md127" -> "LVM@vgchu@PV@md127"
+	// Links for LVM@vgchu@PV@sdd2
+	"@Part: sdd":"2" -> "LVM@vgchu@PV@sdd2"
+	// Links for @MD@md127@dev@sda1
+	"@Part: sda":"1" -> "@MD@md127@dev@sda1"
+	// Links for @MD@md127@dev@sdd1
+	"@Part: sdd":"1" -> "@MD@md127@dev@sdd1"
 	// Links for @FS@/
-	"dm-0" -> "@FS@/"
+	"dm-1" -> "@FS@/"
 	// Links for @FS@/boot/efi
-	"@Part: vda":"1" -> "@FS@/boot/efi"
+	"@Part: sda":"2" -> "@FS@/boot/efi"
+	// Links for @FS@/boot
+	"@Part: sda":"3" -> "@FS@/boot"
+	// Links for @libvirt@ge91097-vm0@dm-8
+	"dm-8" -> "@libvirt@ge91097-vm0@dm-8"
+	// Links for @libvirt@ge91097-vm1@dm-3
+	"dm-3" -> "@libvirt@ge91097-vm1@dm-3"
+	// Links for @libvirt@ge91097-vm1@dm-7
+	"dm-7" -> "@libvirt@ge91097-vm1@dm-7"
+	// Links for @libvirt@ge91097-vm1@dm-4
+	"dm-4" -> "@libvirt@ge91097-vm1@dm-4"
+	// Links for @libvirt@ge91097-vm1@dm-5
+	"dm-5" -> "@libvirt@ge91097-vm1@dm-5"
+	// Links for @libvirt@ge91097-vm1@dm-2
+	"dm-2" -> "@libvirt@ge91097-vm1@dm-2"
+	// Links for @libvirt@ngs-bdd@dm-6
+	"dm-6" -> "@libvirt@ngs-bdd@dm-6"
+	// Links for @libvirt@recovery-nas-cyto@/srv/kvm/recovery-nas-cyto.img
+	"@FS@/" -> "@libvirt@recovery-nas-cyto@/srv/kvm/recovery-nas-cyto.img"
 }

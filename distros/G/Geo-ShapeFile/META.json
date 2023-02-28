@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,7 @@
       "test" : {
          "requires" : {
             "Test::Exception" : "0",
+            "Test::More" : "0.96",
             "rlib" : "0"
          }
       }
@@ -62,6 +63,6 @@
          "web" : "https://github.com/shawnlaffan/Geo-ShapeFile"
       }
    },
-   "version" : "3.01",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

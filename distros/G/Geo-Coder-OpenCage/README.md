@@ -7,7 +7,7 @@ This module provides a Perl interface to the [OpenCage geocoding API](https://op
 [![Build Status](https://api.travis-ci.com/OpenCageData/perl-Geo-Coder-OpenCage.svg?branch=master)](https://travis-ci.com/OpenCageData/perl-Geo-Coder-OpenCage)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-OpenCage.svg?style=flat-square)](https://metacpan.org/pod/Geo::Coder::OpenCage)
 [![Coverage Status](https://coveralls.io/repos/github/OpenCageData/perl-Geo-Coder-OpenCage/badge.svg?branch=master)](https://coveralls.io/github/OpenCageData/perl-Geo-Coder-OpenCage?branch=master)
-[![Twitter Follow](https://img.shields.io/twitter/follow/OpenCage?label=Follow%20OpenCage&style=social)](https://twitter.com/opencage)
+![Mastodon Follow](https://img.shields.io/mastodon/follow/109287663468501769?domain=https%3A%2F%2Fen.osm.town%2F&style=social)
 
 ## Usage
 

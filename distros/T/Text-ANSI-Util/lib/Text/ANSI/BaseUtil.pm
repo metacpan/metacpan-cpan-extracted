@@ -1,22 +1,173 @@
 package Text::ANSI::BaseUtil;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-08'; # DATE
-our $DIST = 'Text-ANSI-Util'; # DIST
-our $VERSION = '0.233'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use List::Util qw(min max);
 
-our $re       = qr/\e\[[0-9;]+m/s;
-our $re_mult  = qr/(?:\e\[[0-9;]+m)+/s;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-27'; # DATE
+our $DIST = 'Text-ANSI-Util'; # DIST
+our $VERSION = '0.234'; # VERSION
+
+our $re         = qr/\e\[[0-9;]+m/s;
+our $re_capture = qr/\e\[([0-9;]+)m/s;
+our $re_mult    = qr/(?:\e\[[0-9;]+m)+/s;
 
 sub ta_detect {
     my $text = shift;
     $text =~ $re ? 1:0;
+}
+
+sub ta_set_state {
+    my $state = shift;
+    for my $code (@_) {
+        my $code = shift;
+        $code =~ /\A$re_capture\z/ or die "ta_set_state: Please supply ANSI SGR (ESC [ ... m) code in the argument instead of '$code'";
+        $state //= {};
+        my @nums = split /;+/, $1;
+        while (@nums) {
+            # for ignoring when we run out of elements unexpectedly
+            no warnings 'uninitialized';
+
+            my $num = shift @nums;
+            # we mostly list only codes that Konsole supports
+            if ($num == 0) {
+                $state->{reset}     = 1;
+                delete $state->{fgcolor};
+                delete $state->{bgcolor};
+                delete $state->{bold};
+                delete $state->{dim};
+                delete $state->{italic};
+                delete $state->{underline};
+                delete $state->{reverse};
+                delete $state->{conceal};
+                delete $state->{strike};
+            } elsif ($num == 1) {
+                delete $state->{reset};
+                $state->{bold}      = 1;
+            } elsif ($num == 2) {
+                delete $state->{reset};
+                $state->{dim}       = 1;
+            } elsif ($num == 3) {
+                delete $state->{reset};
+                $state->{italic}    = 1;
+            } elsif ($num == 4) {
+                delete $state->{reset};
+                $state->{underline} = 1;
+            } elsif ($num == 5) {
+                delete $state->{reset};
+                $state->{blink}     = 1;
+            } elsif ($num == 7) {
+                delete $state->{reset};
+                $state->{reverse}   = 1;
+            } elsif ($num == 8) {
+                delete $state->{reset};
+                $state->{conceal}   = 1;
+            } elsif ($num == 9) {
+                delete $state->{reset};
+                $state->{strike}    = 1;
+            } elsif ($num == 21) {
+                delete $state->{reset};
+                $state->{bold}      = 0;
+            } elsif ($num == 22) {
+                delete $state->{reset};
+                $state->{bold}      = 0;
+                $state->{dim}       = 0;
+            } elsif ($num == 23) {
+                delete $state->{reset};
+                $state->{italic}    = 0;
+            } elsif ($num == 24) {
+                delete $state->{reset};
+                $state->{underline} = 24;
+            } elsif ($num == 25) {
+                delete $state->{reset};
+                $state->{blink}     = 0;
+            } elsif ($num == 27) {
+                delete $state->{reset};
+                $state->{reverse}   = 0;
+            } elsif ($num == 28) {
+                delete $state->{reset};
+                $state->{conceal}   = 0;
+            } elsif ($num == 29) {
+                delete $state->{reset};
+                $state->{strike}    = 0;
+            } elsif ($num >= 30 && $num <= 37) {
+                delete $state->{reset};
+                $state->{fgcolor}   = $num;
+            } elsif ($num == 38) {
+                my $num2 = shift @nums;
+                if ($num2 == 5) {
+                    delete $state->{reset};
+                    $state->{fgcolor}   = "5;" . shift @nums;
+                } elsif ($num2 == 2) {
+                    delete $state->{reset};
+                    $state->{fgcolor}   = join(";", 2, splice(@nums, 0, 3));
+                }
+            } elsif ($num == 39) {
+                delete $state->{reset};
+                $state->{fgcolor}   = $num;
+            } elsif ($num >= 40 && $num <= 47) {
+                delete $state->{reset};
+                $state->{bgcolor}   = $num;
+            } elsif ($num == 48) {
+                my $num2 = shift @nums;
+                if ($num2 == 5) {
+                    delete $state->{reset};
+                    $state->{bgcolor}   = "5;" . shift @nums;
+                } elsif ($num2 == 2) {
+                    delete $state->{reset};
+                    $state->{bgcolor}   = join(";", 2, splice(@nums, 0, 3));
+                }
+            } elsif ($num == 49) {
+                delete $state->{reset};
+                $state->{bgcolor}   = $num;
+            }
+        }
+    } # for code
+    $state;
+}
+
+sub ta_state_to_code {
+    my $state = shift;
+    my @nums;
+    if ($state->{reset}) {
+        push @nums, 0;
+        goto RETURN_CODE;
+    }
+    if (defined $state->{fgcolor}) {
+        push @nums, $state->{fgcolor};
+    }
+    if (defined $state->{bgcolor}) {
+        push @nums, $state->{bgcolor};
+    }
+    if (defined $state->{bold}) {
+        push @nums, $state->{bold} ? 1 : 21;
+    }
+    if (defined $state->{dim}) {
+        push @nums, $state->{dim} ? 1 : 22;
+    }
+    if (defined $state->{italic}) {
+        push @nums, $state->{italic} ? 3 : 23;
+    }
+    if (defined $state->{underline}) {
+        push @nums, $state->{underline} ? 4 : 24;
+    }
+    if (defined $state->{blink}) {
+        push @nums, $state->{blink} ? 5 : 25;
+    }
+    if (defined $state->{reverse}) {
+        push @nums, $state->{reverse} ? 7 : 27;
+    }
+    if (defined $state->{conceal}) {
+        push @nums, $state->{conceal} ? 8 : 28;
+    }
+    if (defined $state->{strike}) {
+        push @nums, $state->{strike} ? 9 : 29;
+    }
+  RETURN_CODE:
+    @nums ? "\e[".join(";",@nums)."m" : "";
 }
 
 sub ta_length {
@@ -285,9 +436,9 @@ sub _ta_wrap {
         my $tw = $opts->{tab_width} // 8;
         die "Please specify a positive tab width" unless $tw > 0;
         my $optfli  = $opts->{flindent};
-        my $optfliw; $optfliw = $is_mb ? Text::WideChar::Util::_mbs_indent_width($optfli, $tw) : _indent_width($optfli, $tw) if defined $optfli;
+        my $optfliw; $optfliw = $is_mb ? Text::WideChar::Util::_get_indent_width(1, $optfli, $tw) : _indent_width($optfli, $tw) if defined $optfli;
         my $optsli  = $opts->{slindent};
-        my $optsliw; $optsliw = $is_mb ? Text::WideChar::Util::_mbs_indent_width($optsli, $tw) : _indent_width($optsli, $tw) if defined $optsli;
+        my $optsliw; $optsliw = $is_mb ? Text::WideChar::Util::_get_indent_width(1, $optsli, $tw) : _indent_width($optsli, $tw) if defined $optsli;
         my $optkts  = $opts->{keep_trailing_space} // 0;
         my $pad = $opts->{pad};
         my $x = 0;
@@ -331,7 +482,7 @@ sub _ta_wrap {
                     $fliw = $optfliw;
                     if ($termt eq 's') {
                         $fli  //= $pterm;
-                        $fliw //= $is_mb ? Text::WideChar::Util::_mbs_indent_width($fli, $tw) : _indent_width($fli, $tw);
+                        $fliw //= $is_mb ? Text::WideChar::Util::_get_indent_width(1, $fli, $tw) : _indent_width($fli, $tw);
                     } else {
                         $fli  //= "";
                         $fliw //= 0;
@@ -345,7 +496,7 @@ sub _ta_wrap {
                             if ($termst[$j] eq 's') {
                                 if ($pterms[$j] =~ /\n([ \t]+)/) {
                                     $sli  = $1;
-                                    $sliw = $is_mb ? Text::WideChar::Util::_mbs_indent_width($sli, $tw) : _indent_width($sli, $tw);
+                                    $sliw = $is_mb ? Text::WideChar::Util::_get_indent_width(1, $sli, $tw) : _indent_width($sli, $tw);
                                     last;
                                 }
                             }
@@ -523,6 +674,7 @@ sub _ta_pad {
     $padchar //= " ";
 
     my $w = $is_mb ? _ta_mbswidth0($text) : ta_length($text);
+    no warnings 'numeric'; # turns off 'negative repeat count' warning
     if ($is_trunc && $w > $width) {
         my $res = $is_mb ?
             ta_mbtrunc($text, $width, 1) : ta_trunc($text, $width, 1);
@@ -854,7 +1006,7 @@ Text::ANSI::BaseUtil - Base for Text::ANSI::{Util,WideUtil}
 
 =head1 VERSION
 
-This document describes version 0.233 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2021-08-08.
+This document describes version 0.234 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2023-02-27.
 
 =for Pod::Coverage .*
 
@@ -866,6 +1018,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-ANSI-
 
 Source repository is at L<https://github.com/perlancar/perl-Text-ANSI-Util>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2021, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
@@ -873,16 +1054,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

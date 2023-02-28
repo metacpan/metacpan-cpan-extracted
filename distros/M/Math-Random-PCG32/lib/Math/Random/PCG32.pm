@@ -6,7 +6,7 @@
 
 package Math::Random::PCG32;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(coinflip decay irand irand64 irand_in irand_way
   rand rand_elm rand_from rand_idx roll sample);
 require XSLoader;
-XSLoader::load('Math::Random::PCG32', $VERSION);
+XSLoader::load( 'Math::Random::PCG32', $VERSION );
 
 1;
 __END__
@@ -211,12 +211,6 @@ did not show any notable speed gain for me (though perhaps my benchmark
 was flawed, or compiler too old? YMMV).
 
 =head1 BUGS
-
-=head2 Reporting Bugs
-
-Patches might best be applied towards:
-
-L<https://github.com/thrig/Math-Random-PCG32>
 
 =head2 Known Issues
 

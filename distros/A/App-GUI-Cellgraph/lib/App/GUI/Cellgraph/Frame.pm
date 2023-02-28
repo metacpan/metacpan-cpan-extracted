@@ -8,15 +8,18 @@ use Wx::AUI;
 
 package App::GUI::Cellgraph::Frame;
 use base qw/Wx::Frame/;
+use App::GUI::Cellgraph::Widget::ProgressBar;
 use App::GUI::Cellgraph::Frame::Panel::Global;
 use App::GUI::Cellgraph::Frame::Panel::Start;
 use App::GUI::Cellgraph::Frame::Panel::Rules;
 use App::GUI::Cellgraph::Frame::Panel::Mobile;
+use App::GUI::Cellgraph::Frame::Panel::Color;
 use App::GUI::Cellgraph::Frame::Part::Board;
 use App::GUI::Cellgraph::Dialog::Function;
 use App::GUI::Cellgraph::Dialog::Interface;
 use App::GUI::Cellgraph::Dialog::About;
 use App::GUI::Cellgraph::Settings;
+use App::GUI::Cellgraph::Config;
 
 sub new {
     my ( $class, $parent, $title ) = @_;
@@ -25,6 +28,9 @@ sub new {
     $self->CreateStatusBar( 1 );
     #$self->SetStatusWidths(2, 800, 100);
     Wx::InitAllImageHandlers();
+    $self->{'config'} = App::GUI::Cellgraph::Config->new();
+    $self->{'img_size'} = 700;
+    $self->{'img_format'} = 'png';
 
     # create GUI parts
     $self->{'tabs'}            = Wx::AuiNotebook->new( $self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
@@ -32,39 +38,36 @@ sub new {
     $self->{'panel'}{'start'}  = App::GUI::Cellgraph::Frame::Panel::Start->new(  $self->{'tabs'} );
     $self->{'panel'}{'rules'}  = App::GUI::Cellgraph::Frame::Panel::Rules->new(  $self->{'tabs'} );
     $self->{'panel'}{'mobile'} = App::GUI::Cellgraph::Frame::Panel::Mobile->new( $self->{'tabs'} );
-    $self->{'panel_names'} = [qw/global start rules mobile/];
+    $self->{'panel'}{'color'}  = App::GUI::Cellgraph::Frame::Panel::Color->new( $self->{'tabs'}, $self->{'config'} );
+    $self->{'panel_names'} = [qw/global start rules mobile color/];
     $self->{'tabs'}->AddPage( $self->{'panel'}{'global'}, 'Global');
     $self->{'tabs'}->AddPage( $self->{'panel'}{'start'},  'Start');
     $self->{'tabs'}->AddPage( $self->{'panel'}{'rules'},  'Rules');
     $self->{'tabs'}->AddPage( $self->{'panel'}{'mobile'}, 'Action');
+    $self->{'tabs'}->AddPage( $self->{'panel'}{'color'},  'Color');
     $self->{'tabs'}{'type'} = 0;
-    $self->{'img_size'} = 700;
-    $self->{'img_format'} = 'png';
+    $self->{'progress'} = App::GUI::Cellgraph::Widget::ProgressBar->new( $self, 400, 10, $self->{'panel'}{'color'}->get_active_colors);
 
-    #$self->{'color'}{'start'}   = App::GUI::Cellgraph::Frame::Part::ColorBrowser->new( $self->{'tab'}{'pen'}, 'start', { red => 20, green => 20, blue => 110 } );
-    #$self->{'color'}{'startio'} = App::GUI::Cellgraph::Frame::Part::ColorPicker->new( $self->{'tab'}{'pen'}, $self, 'Color IO', $self->{'config'}->get_value('color') , 162, 1);
-                               
     $self->{'board'}               = App::GUI::Cellgraph::Frame::Part::Board->new( $self , 800, 800 );
     $self->{'dialog'}{'about'}     = App::GUI::Cellgraph::Dialog::About->new();
     # $self->{'dialog'}{'interface'} = App::GUI::Cellgraph::Dialog::Interface->new();
     # $self->{'dialog'}{'function'}  = App::GUI::Cellgraph::Dialog::Function->new();
-    $self->{'panel'}{$_}->SetCallBack( sub { $self->draw( ) } ) for @{$self->{'panel_names'}};
+    $self->{'btn'}{'draw'} = $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[50, 40] );
 
     Wx::Event::EVT_AUINOTEBOOK_PAGE_CHANGED( $self, $self->{'tabs'}, sub {
         $self->{'tabs'}{'type'} = $self->{'tabs'}->GetSelection unless $self->{'tabs'}->GetSelection == $self->{'tabs'}->GetPageCount - 1;
     });
     Wx::Event::EVT_CLOSE( $self, sub {
-       # my $all_color = $self->{'config'}->get_value('color');
-       # my $startc = $self->{'color'}{'startio'}->get_data;
-       # for my $name (keys %$startc){
-       #     $all_color->{$name} = $startc->{$name} unless exists $all_color->{$name};
-       # }
+        $self->{'panel'}{'color'}->update_config;
+        $self->{'config'}->save();
         $self->{'dialog'}{$_}->Destroy() for qw/about/; # interface function
-        $_[1]->Skip(1) 
+        $_[1]->Skip(1)
     });
+    Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'draw'}, sub { $self->draw });
+    $self->{'panel'}{$_}->SetCallBack( sub { $self->sketch( $_[0] ) } ) for @{$self->{'panel_names'}};
 
     # GUI layout assembly
-    
+
     my $settings_menu = $self->{'setting_menu'} = Wx::Menu->new();
     $settings_menu->Append( 11100, "&Init\tCtrl+I", "put all settings to default" );
     $settings_menu->Append( 11200, "&Open\tCtrl+O", "load settings from an INI file" );
@@ -76,21 +79,21 @@ sub new {
     for (1 .. 20) {
         my $size = $_ * 100;
         $image_size_menu->AppendRadioItem(12100 + $_, $size, "set image size to $size x $size");
-        Wx::Event::EVT_MENU( $self, 12100 + $_, sub { 
-            $self->{'img_size'} = 100 * ($_[1]->GetId - 12100); 
+        Wx::Event::EVT_MENU( $self, 12100 + $_, sub {
+            $self->{'img_size'} = 100 * ($_[1]->GetId - 12100);
             $self->{'board'}->set_size( $self->{'img_size'} );
         });
-        
+
     }
     $image_size_menu->Check( 12100 +($self->{'img_size'} / 100), 1);
 
-    
+
     my $image_menu = Wx::Menu->new();
     # $image_menu->Append( 12300, "&Draw\tCtrl+D", "complete a sketch drawing" );
     $image_menu->Append( 12100, "S&ize",  $image_size_menu,   "set image size" );
     $image_menu->Append( 12400, "&Save\tCtrl+S", "save currently displayed image" );
 
-    
+
     my $help_menu = Wx::Menu->new();
     #$help_menu->Append( 13100, "&Function\tAlt+F", "Dialog with information how an Cellgraph works" );
     #$help_menu->Append( 13200, "&Knobs\tAlt+K", "Dialog explaining the layout and function of knobs" );
@@ -118,27 +121,25 @@ sub new {
     my $horiz_attr = $std_attr | &Wx::wxLEFT;
     my $all_attr    = $std_attr | &Wx::wxALL;
     my $line_attr    = $std_attr | &Wx::wxLEFT | &Wx::wxRIGHT ;
- 
-    #my $pen_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    #$pen_sizer->AddSpacer(5);
-    #$pen_sizer->Add( $self->{'line'},             0, $vert_attr, 10);
-    #$pen_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pen'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
-    #$pen_sizer->AddSpacer(10);
-    #$pen_sizer->Add( Wx::StaticText->new( $self->{'tab'}{'pen'}, -1, 'Start Color', [-1,-1], [-1,-1], &Wx::wxALIGN_CENTRE_HORIZONTAL), 0, &Wx::wxALIGN_CENTER_HORIZONTAL|&Wx::wxGROW|&Wx::wxALL, 5);
-    #$pen_sizer->Add( $self->{'color'}{'start'},   0, $vert_attr, 0);
-    #$pen_sizer->AddSpacer( 5);
-    #$pen_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pen'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
-    #$pen_sizer->AddSpacer( 5);
-    #$pen_sizer->Add( $self->{'color'}{'startio'}, 0, $vert_attr,  5);
-    #$pen_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
-    #$self->{'tab'}{'pen'}->SetSizer( $pen_sizer );
-    
+
     my $board_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $board_sizer->Add( $self->{'board'}, 0, $all_attr,  5);
     $board_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
+
+    my $cmd_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    my $paint_lbl = Wx::StaticText->new( $self, -1, 'Grid Status:' );
+    $cmd_sizer->Add( $paint_lbl,     0, $all_attr, 15 );
+    $cmd_sizer->Add( $self->{'progress'},         1, $all_attr, 10 );
+    $cmd_sizer->AddSpacer(5);
+    $cmd_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
+    $cmd_sizer->AddSpacer(10);
+
     my $setting_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $setting_sizer->Add( $self->{'tabs'}, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    $setting_sizer->AddSpacer(5);
+    $setting_sizer->Add( $cmd_sizer,      0,  0, 0);
+    $setting_sizer->AddSpacer(5);
     #$setting_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $main_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
@@ -152,41 +153,56 @@ sub new {
     $self->SetSize($size);
     $self->SetMinSize($size);
     $self->SetMaxSize($size);
-  
+
     $self->init();
     $self->SetStatusText( "settings in init state", 0 );
-    $self->{'last_file_settings'} = $self->get_data;
+    $self->{'last_file_settings'} = $self->get_settings;
     $self;
 }
 
 sub init {
     my ($self) = @_;
-    #$self->{'color'}{$_}->init() for qw/start/;
     $self->{'panel'}{ $_ }->init() for @{$self->{'panel_names'}};
     $self->draw( );
     $self->SetStatusText( "all settings are set to default", 0);
 }
 
-sub get_data {
+sub get_settings {
     my $self = shift;
-    my %data = map { $_ => $self->{'panel'}{$_}->get_data } @{$self->{'panel_names'}};
-    \%data;
+    my %settings = map { $_ => $self->{'panel'}{$_}->get_settings } @{$self->{'panel_names'}};
+    \%settings;
 }
 
-sub set_data {
-    my ($self, $data) = @_;
-    # $self->{'color'}{$_}->set_data( $data->{ $_.'_color' } ) for qw/start/;
-    $self->{'panel'}{ $_ }->set_data( $data->{ $_ } ) for @{$self->{'panel_names'}};
+sub set_settings {
+    my ($self, $settings) = @_;
+    $self->{'panel'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'panel_names'}};
+    $self->spread_setting_changes;
+    $self->{'panel'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'panel_names'}};
+}
+
+sub spread_setting_changes {
+    my ($self) = @_;
+    my $global = $self->{'panel'}{'global'}->get_settings;
+    $self->{'panel'}{'color'}->set_state_count( $global->{'state_count'} );
+    my @needed_colors = $self->{'panel'}{'color'}->get_active_colors;
+    $self->{'progress'}->set_colors( @needed_colors );
+    $self->{'panel'}{'start'}->update_cell_colors( @needed_colors );
+    $self->{'panel'}{'rules'}->regenerate_rules( $global->{'input_size'}, $global->{'state_count'}, @needed_colors );
+    $self->{'panel'}{'mobile'}->regenerate_rules( $global->{'input_size'}, $global->{'state_count'}, @needed_colors );
+}
+
+sub sketch {
+    my ($self) = @_;
+    $self->spread_setting_changes();
+    $self->{'board'}->sketch( $self->get_settings );
+    $self->{'progress'}->reset;
 }
 
 sub draw {
     my ($self) = @_;
-    my $config = $self->get_data;
-    $self->{'panel'}{'rules'}->regenerate_rules( $config );
-    $self->{'panel'}{'mobile'}->regenerate_rules( $config );
-    $self->{'panel'}{'start'}->regenerate_cells( $config );
-    $config = $self->get_data;
-    $self->{'board'}->draw( $config );
+    $self->spread_setting_changes();
+    $self->{'board'}->draw( $self->get_settings );
+    $self->{'progress'}->full;
 }
 
 sub open_settings_dialog {
@@ -197,7 +213,7 @@ sub open_settings_dialog {
     my $path = $dialog->GetPath;
     my $ret = $self->open_setting_file ( $path );
     if (not ref $ret) { $self->SetStatusText( $ret, 0) }
-    else { 
+    else {
         my $dir = App::GUI::Cellgraph::Settings::extract_dir( $path );
         $self->SetStatusText( "loaded settings from ".$dialog->GetPath, 0);
     }
@@ -225,7 +241,7 @@ sub save_image_dialog {
     my @wildcard = ( 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg');
     my $wildcard = '|All files (*.*)|*.*';
     $wildcard = ( join '|', @wildcard[1,0,2]) . $wildcard;
-    
+
     my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", '.', '', $wildcard, &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
@@ -239,16 +255,16 @@ sub save_image_dialog {
 
 sub open_setting_file {
     my ($self, $file ) = @_;
-    my $data = App::GUI::Cellgraph::Settings::load( $file );
-    if (ref $data) {
-        $self->set_data( $data );
+    my $settings = App::GUI::Cellgraph::Settings::load( $file );
+    if (ref $settings) {
+        $self->set_settings( $settings );
         $self->draw;
         my $dir = App::GUI::Cellgraph::Settings::extract_dir( $file );
         $self->SetStatusText( "loaded settings from ".$file, 0) ;
         $self->update_recent_settings_menu();
-        $data;
+        $settings;
     } else {
-         $self->SetStatusText( $data, 0);
+         $self->SetStatusText( $settings, 0);
     }
 }
 
@@ -266,14 +282,18 @@ sub update_recent_settings_menu {
   #      Wx::Event::EVT_MENU( $self, $Recent_ID++, sub { $self->open_setting_file( $path ) });
    # }
     #$self->{'setting_menu'}->Insert( 2, $set_menu_ID, '&Recent', $self->{'recent_menu'}, 'recently saved settings' );
-
 }
 
 sub write_settings_file {
     my ($self, $file)  = @_;
-    my $ret = App::GUI::Cellgraph::Settings::write( $file, $self->get_data );
+    my $settings = $self->get_settings;
+    delete $settings->{'rules'}{'f'};
+    delete $settings->{'mobile'}{'f'};
+    delete $settings->{'start'}{'list'};
+    delete $settings->{'color'}{'objects'};
+    my $ret = App::GUI::Cellgraph::Settings::write( $file, $settings );
     if ($ret){ $self->SetStatusText( $ret, 0 ) }
-    else     { 
+    else     {
         $self->update_recent_settings_menu();
         $self->SetStatusText( "saved settings into file $file", 0 );
     }

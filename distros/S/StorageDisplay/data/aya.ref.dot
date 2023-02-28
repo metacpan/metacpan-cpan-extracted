@@ -1,57 +1,52 @@
 digraph "machine"{
 	rankdir=LR;
-	{ "@Part: sda" [
+	{ "@Part: nvme0n1" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sda<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 1SHW0ZNZ<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">PC300 NVMe SK hynix 1TB</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Model: PC300 NVMe SK hynix 1TB<BR/>Serial: ES77N512811407H22<BR/>Label: gpt<BR/>Size: 954 GiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
-						<TD PORT="2" BGCOLOR="lightgrey">
-						/dev/sda2<BR/>none<BR/>Size: 1007 kiB
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
 						</TD>
 					</TR>
 					<TR>
-						<TD PORT="1" BGCOLOR="mediumorchid1">
-						/dev/sda1<BR/>efi<BR/>Size: 285 MiB
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/nvme0n1p1<BR/>EFI system partition<BR/>Size: 600 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="lightgrey">
+						/dev/nvme0n1p2<BR/>Microsoft reserved partition<BR/>Size: 16.0 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="lightgrey">
+						/dev/nvme0n1p3<BR/>Basic data partition<BR/>Size: 96.9 GiB
 						</TD>
 					</TR>
 					<TR>
 						<TD bgcolor="green">
-						Free<BR/>Size: 738 MiB
+						Free<BR/>Size: 60.5 kiB
 						</TD>
 					</TR>
 					<TR>
-						<TD PORT="3" BGCOLOR="yellow">
-						/dev/sda3<BR/>aya-raid5-A2<BR/>Size: 1.00 TiB
+						<TD PORT="4" BGCOLOR="lightgrey">
+						/dev/nvme0n1p4<BR/>Size: 716 MiB
 						</TD>
 					</TR>
 					<TR>
-						<TD PORT="4" BGCOLOR="yellow">
-						/dev/sda4<BR/>aya-raid6-A2<BR/>Size: 1.00 TiB
+						<TD bgcolor="green">
+						Free<BR/>Size: 344 GiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="5" BGCOLOR="yellow">
-						/dev/sda5<BR/>aya-raid6-B2<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="6" BGCOLOR="yellow">
-						/dev/sda6<BR/>aya-raid5-B2<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="7" BGCOLOR="yellow">
-						/dev/sda7<BR/>aya-raid1S-A2<BR/>Size: 512 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="8" BGCOLOR="yellow">
-						/dev/sda8<BR/>aya-raid1-B2<BR/>Size: 512 GiB
+						/dev/nvme0n1p5<BR/>aya-raid1-D1<BR/>Size: 512 GiB
 						</TD>
 					</TR>
 					<TR>
 						<TD bgcolor="green">
-						Free<BR/>Size: 4.09 TiB
+						Free<BR/>Size: 328 kiB
 						</TD>
 					</TR>
 				</TABLE>
@@ -63,11 +58,286 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		shape="rectangle";
 		style=striped;
-		fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.109942:pink;0.109942:pink;0.109942:pink;0.109942:pink;0.054971:pink;0.054971:green;0.450183";
+		fillcolor="green;0.000001:pink;0.000614:pink;0.000016:pink;0.101629:green;0.000000:pink;0.000733:green;0.360245:pink;0.536761:green;0.000000";
+	]; }
+	{ "@Part: nvme1n1" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">KXG50ZNV1T02 NVMe TOSHIBA 1024GB</TD> </TR><TR><TD >/dev/nvme1n1<BR/>Model: KXG50ZNV1T02 NVMe TOSHIBA 1024GB<BR/>Serial: X7ES10QHTYAT<BR/>Label: gpt<BR/>Size: 954 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="mediumorchid1">
+						/dev/nvme1n1p1<BR/>EFI system partition<BR/>Size: 600 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 441 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/nvme1n1p2<BR/>aya-raid1-D2<BR/>Size: 512 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 328 kiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000001:pink;0.000614:green;0.462623:pink;0.536761:green;0.000000";
+	]; }
+	{ "@Part: sda" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA ST4000NE0025-2EW</TD> </TR><TR><TD >/dev/sda<BR/>Model: ST4000NE0025-2EW107<BR/>Serial: ZC13DX74<BR/>Label: gpt<BR/>Size: 3.64 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 3.64 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;1.000000";
 	]; }
 	{ "@Part: sdb" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">ATA Crucial_CT960M50</TD> </TR><TR><TD >/dev/sdb<BR/>Model: Crucial_CT960M500SSD1<BR/>Serial: 14010960553B<BR/>Label: gpt<BR/>Size: 894 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">ATA WDC WD40EFRX-68W</TD> </TR><TR><TD >/dev/sdb<BR/>Model: WDC_WD40EFRX-68WT0N0<BR/>Serial: WD-WCC4EANEA2TA<BR/>Label: gpt<BR/>Size: 3.64 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD PORT="2" BGCOLOR="lightgrey">
+						/dev/sdb2<BR/>free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="mediumorchid1">
+						/dev/sdb1<BR/>efi<BR/>Size: 285 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 3.59 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="6" BGCOLOR="yellow">
+						/dev/sdb6<BR/>swap<BR/>Size: 49.0 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 23.8 MiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="pink;0.000000:pink;0.000075:green;0.986768:pink;0.013151:green;0.000006";
+	]; }
+	{ "@Part: sdc" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA WDC WD141KRYZ-01</TD> </TR><TR><TD >/dev/sdc<BR/>Model: WDC_WD141KRYZ-01C66B0<BR/>Serial: Z2KEZEXT<BR/>Label: gpt<BR/>Size: 12.7 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="mediumorchid1">
+						/dev/sdc1<BR/>grub-core-2<BR/>Size: 299 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 724 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="yellow">
+						/dev/sdc3<BR/>aya-raid5-C2<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="7" BGCOLOR="yellow">
+						/dev/sdc7<BR/>aya-raid1S-A1<BR/>Size: 512 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 512 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="9" BGCOLOR="yellow">
+						/dev/sdc9<BR/>aya-raid1-C1<BR/>Size: 1.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sdc2<BR/>aya-raid6-C2<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="10" BGCOLOR="yellow">
+						/dev/sdc10<BR/>aya-raid6-D2<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.73 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000000:pink;0.000022:green;0.000054:pink;0.157067:green;0.157067:pink;0.039267:green;0.039267:pink;0.078534:pink;0.157067:pink;0.157067:green;0.214587";
+	]; }
+	{ "@Part: sdd" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdd<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 7JKGRL5C<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD PORT="2" BGCOLOR="lightgrey">
+						/dev/sdd2<BR/>none<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="mediumorchid1">
+						/dev/sdd1<BR/>efi<BR/>Size: 285 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 738 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="yellow">
+						/dev/sdd3<BR/>aya-raid5-C1<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="7" BGCOLOR="yellow">
+						/dev/sdd7<BR/>aya-raid1-C2<BR/>Size: 1.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="8" BGCOLOR="yellow">
+						/dev/sdd8<BR/>aya-raid6-C1<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="9" BGCOLOR="yellow">
+						/dev/sdd9<BR/>aya-raid6-D1<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 97.0 GiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.219884:green;0.219884:pink;0.109942:pink;0.219884:pink;0.219884:green;0.010414";
+	]; }
+	{ "@Part: sde" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA WDC WUH722222AL</TD> </TR><TR><TD >/dev/sde<BR/>Model: WDC_WUH722222ALE6L4<BR/>Serial: 2GG6475D<BR/>Label: gpt<BR/>Size: 20.0 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="mediumorchid1">
+						/dev/sde1<BR/>EFI-place<BR/>Size: 999 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sde2<BR/>aya-raid6-C4<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="yellow">
+						/dev/sde3<BR/>aya-raid6-D4<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="4" BGCOLOR="yellow">
+						/dev/sde4<BR/>aya-raid5-C4<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 14.0 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000000:pink;0.000048:pink;0.099951:pink;0.099951:pink;0.099951:green;0.700099";
+	]; }
+	{ "@Part: sdf" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA Crucial_CT960M50</TD> </TR><TR><TD >/dev/sdf<BR/>Model: Crucial_CT960M500SSD1<BR/>Serial: 14010960553B<BR/>Label: gpt<BR/>Size: 894 GiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -76,12 +346,12 @@ digraph "machine"{
 					</TR>
 					<TR>
 						<TD PORT="2" BGCOLOR="mediumorchid1">
-						/dev/sdb2<BR/>efi<BR/>Size: 299 MiB
+						/dev/sdf2<BR/>efi<BR/>Size: 299 MiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="3" BGCOLOR="mediumorchid1">
-						/dev/sdb3<BR/>grub-core<BR/>Size: 1.00 MiB
+						/dev/sdf3<BR/>grub-core<BR/>Size: 1.00 MiB
 						</TD>
 					</TR>
 					<TR>
@@ -91,7 +361,7 @@ digraph "machine"{
 					</TR>
 					<TR>
 						<TD PORT="4" BGCOLOR="yellow">
-						/dev/sdb4<BR/>boot<BR/>Size: 1.00 GiB
+						/dev/sdf4<BR/>boot<BR/>Size: 1.00 GiB
 						</TD>
 					</TR>
 					<TR>
@@ -101,7 +371,7 @@ digraph "machine"{
 					</TR>
 					<TR>
 						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sdb1<BR/>pv-ssd-A<BR/>Size: 884 GiB
+						/dev/sdf1<BR/>pv-ssd-A<BR/>Size: 884 GiB
 						</TD>
 					</TR>
 					<TR>
@@ -120,18 +390,18 @@ digraph "machine"{
 		style=striped;
 		fillcolor="green;0.000001:pink;0.000327:pink;0.000001:green;0.000790:pink;0.001118:green;0.008946:pink;0.988817:green;0.000000";
 	]; }
-	{ "@Part: sdc" [
+	{ "@Part: sdg" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdc<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 7JKGRL5C<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdg<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 1SHW0ZNZ<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD PORT="2" BGCOLOR="lightgrey">
-						/dev/sdc2<BR/>none<BR/>Size: 1007 kiB
+						/dev/sdg2<BR/>none<BR/>Size: 1007 kiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="1" BGCOLOR="mediumorchid1">
-						/dev/sdc1<BR/>efi<BR/>Size: 285 MiB
+						/dev/sdg1<BR/>efi<BR/>Size: 285 MiB
 						</TD>
 					</TR>
 					<TR>
@@ -141,202 +411,37 @@ digraph "machine"{
 					</TR>
 					<TR>
 						<TD PORT="3" BGCOLOR="yellow">
-						/dev/sdc3<BR/>aya-raid5-A3<BR/>Size: 1.00 TiB
+						/dev/sdg3<BR/>aya-raid5-C3<BR/>Size: 2.00 TiB
 						</TD>
 					</TR>
 					<TR>
-						<TD PORT="4" BGCOLOR="yellow">
-						/dev/sdc4<BR/>aya-raid6-A3<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="5" BGCOLOR="yellow">
-						/dev/sdc5<BR/>aya-raid6-B3<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="6" BGCOLOR="yellow">
-						/dev/sdc6<BR/>aya-raid5-B3<BR/>Size: 1.00 TiB
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.00 TiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="7" BGCOLOR="yellow">
-						/dev/sdc7<BR/>aya-raid1-C2<BR/>Size: 1.00 TiB
+						/dev/sdg7<BR/>aya-raid1S-A2<BR/>Size: 512 GiB
 						</TD>
 					</TR>
 					<TR>
 						<TD bgcolor="green">
-						Free<BR/>Size: 4.09 TiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.109942:pink;0.109942:pink;0.109942:pink;0.109942:pink;0.109942:green;0.450183";
-	]; }
-	{ "@Part: sdd" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">ATA WDC WD40EFRX-68W</TD> </TR><TR><TD >/dev/sdd<BR/>Model: WDC_WD40EFRX-68WT0N0<BR/>Serial: WD-WCC4EANEA2TA<BR/>Label: gpt<BR/>Size: 3.64 TiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD PORT="2" BGCOLOR="lightgrey">
-						/dev/sdd2<BR/>free<BR/>Size: 1007 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="mediumorchid1">
-						/dev/sdd1<BR/>efi<BR/>Size: 285 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 738 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="3" BGCOLOR="yellow">
-						/dev/sdd3<BR/>aya-raid5-A4<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="4" BGCOLOR="yellow">
-						/dev/sdd4<BR/>aya-raid6-A4<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="5" BGCOLOR="yellow">
-						/dev/sdd5<BR/>aya-raid6-B4<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 604 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="6" BGCOLOR="yellow">
-						/dev/sdd6<BR/>swap<BR/>Size: 49.0 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 23.8 MiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="pink;0.000000:pink;0.000075:green;0.000193:pink;0.274824:pink;0.274824:pink;0.274824:green;0.162103:pink;0.013151:green;0.000006";
-	]; }
-	{ "@Part: sde" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">ATA ST4000NE0025-2EW</TD> </TR><TR><TD >/dev/sde<BR/>Model: ST4000NE0025-2EW107<BR/>Serial: ZC13DX74<BR/>Label: gpt<BR/>Size: 3.64 TiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1024 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="3" BGCOLOR="yellow">
-						/dev/sde3<BR/>aya-raid5-B4<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="4" BGCOLOR="yellow">
-						/dev/sde4<BR/>aya-raid6-A5<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="5" BGCOLOR="yellow">
-						/dev/sde5<BR/>aya-raid6-B5<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 653 GiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000268:pink;0.274824:pink;0.274824:pink;0.274824:green;0.175260";
-	]; }
-	{ "@Part: sdf" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">ATA WDC WD141KRYZ-01</TD> </TR><TR><TD >/dev/sdf<BR/>Model: WDC_WD141KRYZ-01C66B0<BR/>Serial: Z2KEZEXT<BR/>Label: gpt<BR/>Size: 12.7 TiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1007 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="mediumorchid1">
-						/dev/sdf1<BR/>grub-core-2<BR/>Size: 299 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 724 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="3" BGCOLOR="yellow">
-						/dev/sdf3<BR/>aya-raid5-A1<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="4" BGCOLOR="yellow">
-						/dev/sdf4<BR/>aya-raid6-A1<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="5" BGCOLOR="yellow">
-						/dev/sdf5<BR/>aya-raid6-B1<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="6" BGCOLOR="yellow">
-						/dev/sdf6<BR/>aya-raid5-B1<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="7" BGCOLOR="yellow">
-						/dev/sdf7<BR/>aya-raid1S-A1<BR/>Size: 512 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="8" BGCOLOR="yellow">
-						/dev/sdf8<BR/>aya-raid1-B1<BR/>Size: 512 GiB
+						Free<BR/>Size: 512 GiB
 						</TD>
 					</TR>
 					<TR>
 						<TD PORT="9" BGCOLOR="yellow">
-						/dev/sdf9<BR/>aya-raid1-C1<BR/>Size: 1.00 TiB
+						/dev/sdg9<BR/>aya-raid6-C3<BR/>Size: 2.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="10" BGCOLOR="yellow">
+						/dev/sdg10<BR/>aya-raid6-D3<BR/>Size: 2.00 TiB
 						</TD>
 					</TR>
 					<TR>
 						<TD bgcolor="green">
-						Free<BR/>Size: 6.73 TiB
+						Free<BR/>Size: 97.0 GiB
 						</TD>
 					</TR>
 				</TABLE>
@@ -348,7 +453,7 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		shape="rectangle";
 		style=striped;
-		fillcolor="green;0.000000:pink;0.000022:green;0.000054:pink;0.078534:pink;0.078534:pink;0.078534:pink;0.078534:pink;0.039267:pink;0.039267:pink;0.078534:green;0.528722";
+		fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.219884:green;0.219884:pink;0.054971:green;0.054971:pink;0.219884:pink;0.219884:green;0.010414";
 	]; }
 	subgraph "cluster_aya+raid1" {
 		style=filled;
@@ -358,25 +463,21 @@ digraph "machine"{
 		subgraph "cluster_aya+raid1@PV" {
 			color=white;
 			fillcolor=white;
-			{ "LVM@aya+raid1@PV@md121" [
-				label="PV: /dev/md/aya-raid1S-A\nSize: 512 GiB\nFree: 71.6 GiB\nUsed: 440 GiB";
-				style=striped;fillcolor="pink;0.860080.2:green"
-			]; }
 			{ "LVM@aya+raid1@PV@md122" [
-				label="PV: /dev/md/aya-raid1-B\nSize: 512 GiB\nFree: 512 GiB\nUsed: 0 B";
-				style=striped;fillcolor="green"
+				label="PV: /dev/md/aya-raid1-C\nSize: 1024 GiB\nFree: 505 GiB\nUsed: 519 GiB";
+				style=striped;fillcolor="pink;0.507041.2:green"
 			]; }
-			{ "LVM@aya+raid1@PV@md124" [
-				label="PV: /dev/md/aya-raid5-B\nSize: 3.00 TiB\nFree: 2.98 TiB\nUsed: 20.4 GiB";
-				style=striped;fillcolor="pink;0.006636.2:green"
+			{ "LVM@aya+raid1@PV@md123" [
+				label="PV: /dev/md/aya-raid1S-A\nSize: 512 GiB\nFree: 45.0 GiB\nUsed: 467 GiB";
+				style=striped;fillcolor="pink;0.912087.2:green"
 			]; }
-			{ "LVM@aya+raid1@PV@md126" [
-				label="PV: /dev/md/aya-raid5-A\nSize: 3.00 TiB\nFree: 0 B\nUsed: 3.00 TiB";
-				style=striped;fillcolor="pink;1.000000.2:green"
+			{ "LVM@aya+raid1@PV@md125" [
+				label="PV: /dev/md/aya-raid5-C\nSize: 6.00 TiB\nFree: 3.00 TiB\nUsed: 3.00 TiB";
+				style=striped;fillcolor="pink;0.500031.2:green"
 			]; }
 			{ "LVM@aya+raid1@PV@md127" [
-				label="PV: /dev/md/aya-raid1-C\nSize: 1024 GiB\nFree: 533 GiB\nUsed: 491 GiB";
-				style=striped;fillcolor="pink;0.479324.2:green"
+				label="PV: /dev/md/aya-raid1-D\nSize: 512 GiB\nFree: 347 GiB\nUsed: 165 GiB";
+				style=striped;fillcolor="pink;0.322347.2:green"
 			]; }
 			label="aya+raid1's PVs";
 		}
@@ -395,35 +496,35 @@ digraph "machine"{
 				label="LV: [tp_pool+raid1_tmeta]\nSize: 128 MiB";
 				fillcolor="lightgrey"
 			]; }
-			{ "dm-21" [
+			{ "dm-34" [
 				label="LV: backuppc\nSize: 3.00 TiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-7" [
+			{ "dm-5" [
 				label="LV: kvm\nSize: 100 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-20" [
+			{ "dm-30" [
 				label="LV: kvm-alastor-disk2\nSize: 100 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-19" [
+			{ "dm-29" [
 				label="LV: kvm-alastor-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-22" [
+			{ "dm-35" [
 				label="LV: kvm-belgarath-openhab\nSize: 20.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-26" [
+			{ "dm-15" [
 				label="LV: kvm-belgarath-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-13" [
+			{ "dm-19" [
 				label="LV: kvm-blackjack-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-18" [
+			{ "dm-28" [
 				label="LV: kvm-dedale-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
@@ -431,79 +532,83 @@ digraph "machine"{
 				label="LV: kvm-hermes-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-17" [
+			{ "dm-27" [
 				label="LV: kvm-kooot-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-23" [
+			{ "dm-8" [
 				label="LV: kvm-ogmios-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-24" [
+			{ "dm-9" [
 				label="LV: kvm-ran-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-27" [
+			{ "dm-16" [
 				label="LV: kvm-rosee-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-34" [
+			{ "dm-32" [
 				label="LV: kvm-talia-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-9" [
+			{ "dm-12" [
 				label="LV: kvm-talia-root-old\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
 			{ "dm-36" [
-				label="LV: kvm-thot-docker\nSize: 50.0 GiB";
+				label="LV: kvm-thot-docker\nSize: 200 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-33" [
+			{ "dm-31" [
 				label="LV: kvm-thot-root\nSize: 20.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-28" [
+			{ "dm-18" [
 				label="LV: kvm-urtho-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-15" [
+			{ "dm-21" [
 				label="LV: kvm-vaniel-root\nSize: 15.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-10" [
+			{ "dm-13" [
 				label="LV: kvm-win-data\nSize: 20.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-16" [
+			{ "dm-22" [
 				label="LV: kvm-win10-c\nSize: 50.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-11" [
-				label="LV: kvm-win764-c\nSize: 25.0 GiB";
-				fillcolor="yellow"
-			]; }
-			{ "dm-12" [
-				label="LV: kvm-win81-c\nSize: 50.0 GiB";
-				fillcolor="yellow"
-			]; }
-			{ "dm-8" [
-				label="LV: kvm-winwin-c\nSize: 9.77 GiB";
-				fillcolor="lightgrey"
-			]; }
-			{ "dm-25" [
-				label="LV: kvm-yoko-root\nSize: 15.0 GiB";
+			{ "dm-38" [
+				label="LV: kvm-win11-c\nSize: 50.0 GiB";
 				fillcolor="yellow"
 			]; }
 			{ "dm-14" [
+				label="LV: kvm-win764-c\nSize: 25.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-17" [
+				label="LV: kvm-win81-c\nSize: 50.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-7" [
+				label="LV: kvm-winwin-c\nSize: 9.77 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-11" [
+				label="LV: kvm-yoko-root\nSize: 15.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-20" [
 				label="LV: log\nSize: 6.00 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-0" [
+			{ "dm-10" [
 				label="LV: root\nSize: 40.0 GiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-35" [
+			{ "dm-33" [
 				label="LV: thinvolume\nSize: 1.00 GiB";
 				fillcolor="lightgrey"
 			]; }
@@ -513,8 +618,8 @@ digraph "machine"{
 			]; }
 			label="aya+raid1's LVs";
 		}
-		label="LVM: aya+raid1\nSize: 8.00 TiB\nFree: 4.07 TiB";
-		style=striped;fillcolor="pink;0.491160.2:green"
+		label="LVM: aya+raid1\nSize: 8.00 TiB\nFree: 3.88 TiB";
+		style=striped;fillcolor="pink;0.515553.2:green"
 	}
 	subgraph "cluster_aya+raid6" {
 		style=filled;
@@ -524,43 +629,43 @@ digraph "machine"{
 		subgraph "cluster_aya+raid6@PV" {
 			color=white;
 			fillcolor=white;
-			{ "LVM@aya+raid6@PV@md123" [
-				label="PV: /dev/md/aya-raid6-B\nSize: 3.00 TiB\nFree: 1024 GiB\nUsed: 2.00 TiB";
-				style=striped;fillcolor="pink;0.666750.2:green"
+			{ "LVM@aya+raid6@PV@md124" [
+				label="PV: /dev/md/aya-raid6-C\nSize: 4.00 TiB\nFree: 11.7 GiB\nUsed: 3.99 TiB";
+				style=striped;fillcolor="pink;0.997132.2:green"
 			]; }
-			{ "LVM@aya+raid6@PV@md125" [
-				label="PV: /dev/md/aya-raid6-A\nSize: 3.00 TiB\nFree: 948 GiB\nUsed: 2.07 TiB";
-				style=striped;fillcolor="pink;0.691492.2:green"
+			{ "LVM@aya+raid6@PV@md126" [
+				label="PV: /dev/md/aya-raid6-D\nSize: 4.00 TiB\nFree: 1.95 TiB\nUsed: 2.05 TiB";
+				style=striped;fillcolor="pink;0.512239.2:green"
 			]; }
 			label="aya+raid6's PVs";
 		}
 		subgraph "cluster_aya+raid6@LV" {
 			color=white;
 			fillcolor=white;
-			{ "dm-4" [
-				label="LV: archives\nSize: 500 GiB";
-				fillcolor="yellow"
-			]; }
-			{ "dm-3" [
-				label="LV: chenin\nSize: 100 GiB";
+			{ "dm-2" [
+				label="LV: archives\nSize: 1.50 TiB";
 				fillcolor="yellow"
 			]; }
 			{ "dm-6" [
+				label="LV: kvm-thot-calibre\nSize: 50.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-4" [
 				label="LV: multimedia\nSize: 2.00 TiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-2" [
-				label="LV: photos\nSize: 1.00 TiB";
+			{ "dm-1" [
+				label="LV: photos\nSize: 2.00 TiB";
 				fillcolor="yellow"
 			]; }
-			{ "dm-5" [
+			{ "dm-3" [
 				label="LV: rushes\nSize: 500 GiB";
 				fillcolor="yellow"
 			]; }
 			label="aya+raid6's LVs";
 		}
-		label="LVM: aya+raid6\nSize: 6.00 TiB\nFree: 1.93 TiB";
-		style=striped;fillcolor="pink;0.679121.2:green"
+		label="LVM: aya+raid6\nSize: 8.00 TiB\nFree: 1.96 TiB";
+		style=striped;fillcolor="pink;0.754685.2:green"
 	}
 	subgraph "cluster_aya+ssd" {
 		style=filled;
@@ -570,8 +675,8 @@ digraph "machine"{
 		subgraph "cluster_aya+ssd@PV" {
 			color=white;
 			fillcolor=white;
-			{ "LVM@aya+ssd@PV@sdb1" [
-				label="PV: /dev/sdb1\nSize: 884 GiB\nFree: 372 GiB\nUsed: 512 GiB";
+			{ "LVM@aya+ssd@PV@sdf1" [
+				label="PV: /dev/sdf1\nSize: 884 GiB\nFree: 372 GiB\nUsed: 512 GiB";
 				style=striped;fillcolor="pink;0.579022.2:green"
 			]; }
 			label="aya+ssd's PVs";
@@ -579,7 +684,7 @@ digraph "machine"{
 		subgraph "cluster_aya+ssd@LV" {
 			color=white;
 			fillcolor=white;
-			{ "dm-1" [
+			{ "dm-0" [
 				label="LV: aya-raid1S-A3\nSize: 512 GiB";
 				fillcolor="yellow"
 			]; }
@@ -588,34 +693,6 @@ digraph "machine"{
 		label="LVM: aya+ssd\nSize: 884 GiB\nFree: 372 GiB";
 		style=striped;fillcolor="pink;0.579022.2:green"
 	}
-	subgraph "cluster_@MD@md121" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		subgraph "cluster_md121@@state" {
-			{ "md121" [
-				label="/dev/md/aya-raid1S-A\nraid1\nSize: 512 GiB";
-				fillcolor="yellow"
-			]; }
-			label="state: active ";
-			shape=oval
-			fillcolor=green
-		}
-		{ "@MD@md121@dev@dm-1" [
-			label="2: /dev/aya+ssd/aya-raid1S-A3\nactive sync";
-			fillcolor=yellow
-		]; }
-		{ "@MD@md121@dev@sda7" [
-			label="1: /dev/sda7\nactive sync";
-			fillcolor=yellow
-		]; }
-		{ "@MD@md121@dev@sdf7" [
-			label="0: /dev/sdf7\nactive sync";
-			fillcolor=yellow
-		]; }
-		label="aya:aya-raid1S-A\n512 GiB used per device";
-	}
 	subgraph "cluster_@MD@md122" {
 		style=filled;
 		color=lightgrey;
@@ -623,22 +700,22 @@ digraph "machine"{
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		subgraph "cluster_md122@@state" {
 			{ "md122" [
-				label="/dev/md/aya-raid1-B\nraid1\nSize: 512 GiB";
+				label="/dev/md/aya-raid1-C\nraid1\nSize: 1024 GiB";
 				fillcolor="yellow"
 			]; }
 			label="state: clean ";
 			shape=oval
 			fillcolor=green
 		}
-		{ "@MD@md122@dev@sda8" [
-			label="1: /dev/sda8\nactive sync";
+		{ "@MD@md122@dev@sdc9" [
+			label="0: /dev/sdc9\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md122@dev@sdf8" [
-			label="0: /dev/sdf8\nactive sync";
+		{ "@MD@md122@dev@sdd7" [
+			label="1: /dev/sdd7\nactive sync";
 			fillcolor=yellow
 		]; }
-		label="aya:aya-raid1-B\n512 GiB used per device";
+		label="aya:aya-raid1-C\n1024 GiB used per device";
 	}
 	subgraph "cluster_@MD@md123" {
 		style=filled;
@@ -647,34 +724,26 @@ digraph "machine"{
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		subgraph "cluster_md123@@state" {
 			{ "md123" [
-				label="/dev/md/aya-raid6-B\nraid6\nSize: 3.00 TiB";
+				label="/dev/md/aya-raid1S-A\nraid1\nSize: 512 GiB";
 				fillcolor="yellow"
 			]; }
 			label="state: clean ";
 			shape=oval
 			fillcolor=green
 		}
-		{ "@MD@md123@dev@sda5" [
-			label="1: /dev/sda5\nactive sync";
+		{ "@MD@md123@dev@dm-0" [
+			label="2: /dev/aya+ssd/aya-raid1S-A3\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md123@dev@sdc5" [
-			label="2: /dev/sdc5\nactive sync";
+		{ "@MD@md123@dev@sdc7" [
+			label="0: /dev/sdc7\nactive sync writemostly";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md123@dev@sdd5" [
-			label="3: /dev/sdd5\nactive sync";
+		{ "@MD@md123@dev@sdg7" [
+			label="1: /dev/sdg7\nactive sync writemostly";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md123@dev@sde5" [
-			label="4: /dev/sde5\nactive sync";
-			fillcolor=yellow
-		]; }
-		{ "@MD@md123@dev@sdf5" [
-			label="0: /dev/sdf5\nactive sync";
-			fillcolor=yellow
-		]; }
-		label="aya:aya-raid6-B\n1024 GiB used per device";
+		label="aya:aya-raid1S-A\n512 GiB used per device";
 	}
 	subgraph "cluster_@MD@md124" {
 		style=filled;
@@ -683,30 +752,30 @@ digraph "machine"{
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		subgraph "cluster_md124@@state" {
 			{ "md124" [
-				label="/dev/md/aya-raid5-B\nraid5\nSize: 3.00 TiB";
+				label="/dev/md/aya-raid6-C\nraid6\nSize: 4.00 TiB";
 				fillcolor="yellow"
 			]; }
 			label="state: clean ";
 			shape=oval
 			fillcolor=green
 		}
-		{ "@MD@md124@dev@sda6" [
-			label="1: /dev/sda6\nactive sync";
+		{ "@MD@md124@dev@sdc2" [
+			label="1: /dev/sdc2\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md124@dev@sdc6" [
-			label="2: /dev/sdc6\nactive sync";
+		{ "@MD@md124@dev@sdd8" [
+			label="0: /dev/sdd8\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md124@dev@sde3" [
-			label="3: /dev/sde3\nactive sync";
+		{ "@MD@md124@dev@sde2" [
+			label="3: /dev/sde2\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md124@dev@sdf6" [
-			label="0: /dev/sdf6\nactive sync";
+		{ "@MD@md124@dev@sdg9" [
+			label="2: /dev/sdg9\nactive sync";
 			fillcolor=yellow
 		]; }
-		label="aya:aya-raid5-B\n1024 GiB used per device";
+		label="aya:aya-raid6-C\n2.00 TiB used per device";
 	}
 	subgraph "cluster_@MD@md125" {
 		style=filled;
@@ -715,34 +784,30 @@ digraph "machine"{
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		subgraph "cluster_md125@@state" {
 			{ "md125" [
-				label="/dev/md/aya-raid6-A\nraid6\nSize: 3.00 TiB";
+				label="/dev/md/aya-raid5-C\nraid5\nSize: 6.00 TiB";
 				fillcolor="yellow"
 			]; }
 			label="state: clean ";
 			shape=oval
 			fillcolor=green
 		}
-		{ "@MD@md125@dev@sda4" [
-			label="1: /dev/sda4\nactive sync";
+		{ "@MD@md125@dev@sdc3" [
+			label="1: /dev/sdc3\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md125@dev@sdc4" [
-			label="2: /dev/sdc4\nactive sync";
-			fillcolor=yellow
-		]; }
-		{ "@MD@md125@dev@sdd4" [
-			label="3: /dev/sdd4\nactive sync";
+		{ "@MD@md125@dev@sdd3" [
+			label="0: /dev/sdd3\nactive sync";
 			fillcolor=yellow
 		]; }
 		{ "@MD@md125@dev@sde4" [
-			label="4: /dev/sde4\nactive sync";
+			label="3: /dev/sde4\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md125@dev@sdf4" [
-			label="0: /dev/sdf4\nactive sync";
+		{ "@MD@md125@dev@sdg3" [
+			label="2: /dev/sdg3\nactive sync";
 			fillcolor=yellow
 		]; }
-		label="aya:aya-raid6-A\n1024 GiB used per device";
+		label="aya:aya-raid5-C\n2.00 TiB used per device";
 	}
 	subgraph "cluster_@MD@md126" {
 		style=filled;
@@ -751,30 +816,30 @@ digraph "machine"{
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		subgraph "cluster_md126@@state" {
 			{ "md126" [
-				label="/dev/md/aya-raid5-A\nraid5\nSize: 3.00 TiB";
+				label="/dev/md/aya-raid6-D\nraid6\nSize: 4.00 TiB";
 				fillcolor="yellow"
 			]; }
 			label="state: clean ";
 			shape=oval
 			fillcolor=green
 		}
-		{ "@MD@md126@dev@sda3" [
-			label="1: /dev/sda3\nactive sync";
+		{ "@MD@md126@dev@sdc10" [
+			label="1: /dev/sdc10\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md126@dev@sdc3" [
-			label="2: /dev/sdc3\nactive sync";
+		{ "@MD@md126@dev@sdd9" [
+			label="0: /dev/sdd9\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md126@dev@sdd3" [
-			label="3: /dev/sdd3\nactive sync";
+		{ "@MD@md126@dev@sde3" [
+			label="3: /dev/sde3\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md126@dev@sdf3" [
-			label="0: /dev/sdf3\nactive sync";
+		{ "@MD@md126@dev@sdg10" [
+			label="2: /dev/sdg10\nactive sync";
 			fillcolor=yellow
 		]; }
-		label="aya:aya-raid5-A\n1024 GiB used per device";
+		label="aya:aya-raid6-D\n2.00 TiB used per device";
 	}
 	subgraph "cluster_@MD@md127" {
 		style=filled;
@@ -783,22 +848,22 @@ digraph "machine"{
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		subgraph "cluster_md127@@state" {
 			{ "md127" [
-				label="/dev/md/aya-raid1-C\nraid1\nSize: 1024 GiB";
+				label="/dev/md/aya-raid1-D\nraid1\nSize: 512 GiB";
 				fillcolor="yellow"
 			]; }
 			label="state: active ";
 			shape=oval
 			fillcolor=green
 		}
-		{ "@MD@md127@dev@sdc7" [
-			label="1: /dev/sdc7\nactive sync";
+		{ "@MD@md127@dev@nvme0n1p5" [
+			label="0: /dev/nvme0n1p5\nactive sync";
 			fillcolor=yellow
 		]; }
-		{ "@MD@md127@dev@sdf9" [
-			label="0: /dev/sdf9\nactive sync";
+		{ "@MD@md127@dev@nvme1n1p2" [
+			label="1: /dev/nvme1n1p2\nactive sync";
 			fillcolor=yellow
 		]; }
-		label="aya:aya-raid1-C\n1024 GiB used per device";
+		label="aya:aya-raid1-D\n512 GiB used per device";
 	}
 	subgraph "cluster_@FS" {
 		style=filled;
@@ -806,48 +871,48 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		{ "@FS@/srv/backuppc" [
-			label="/srv/backuppc\nDevice: /dev/aya+raid1/backuppc\next4\nSize: 2.95 TiB\nFree: 874 GiB\nUsed: 2.06 TiB";
-			style=striped;fillcolor="pink;0.711093.2:green"
+			label="/srv/backuppc\nDevice: /dev/aya+raid1/backuppc\next4\nSize: 2.95 TiB\nFree: 1.07 TiB\nUsed: 1.85 TiB";
+			style=striped;fillcolor="pink;0.638452.2:green"
 		]; }
 		{ "@FS@/srv/kvm" [
-			label="/srv/kvm\nDevice: /dev/aya+raid1/kvm\next4\nSize: 98.3 GiB\nFree: 35.9 GiB\nUsed: 62.4 GiB";
-			style=striped;fillcolor="pink;0.634951.2:green"
+			label="/srv/kvm\nDevice: /dev/aya+raid1/kvm\next4\nSize: 98.3 GiB\nFree: 26.5 GiB\nUsed: 71.8 GiB";
+			style=striped;fillcolor="pink;0.730595.2:green"
 		]; }
 		{ "@FS@/var/log" [
-			label="/var/log\nDevice: /dev/aya+raid1/log\next4\nSize: 5.78 GiB\nFree: 4.04 GiB\nUsed: 1.42 GiB";
-			style=striped;fillcolor="pink;0.300278.2:green"
+			label="/var/log\nDevice: /dev/aya+raid1/log\next4\nSize: 5.77 GiB\nFree: 1.53 GiB\nUsed: 3.93 GiB";
+			style=striped;fillcolor="pink;0.735043.2:green"
 		]; }
 		{ "@FS@/" [
-			label="/\nDevice: /dev/aya+raid1/root\next4\nSize: 39.2 GiB\nFree: 5.82 GiB\nUsed: 33.4 GiB";
-			style=striped;fillcolor="pink;0.851816.2:green"
+			label="/\nDevice: /dev/aya+raid1/root\next4\nSize: 39.2 GiB\nFree: 1.21 GiB\nUsed: 38.0 GiB";
+			style=striped;fillcolor="pink;0.969122.2:green"
 		]; }
 		{ "@FS@/srv/archives" [
-			label="/srv/archives\nDevice: /dev/aya+raid6/archives\next4\nSize: 492 GiB\nFree: 320 GiB\nUsed: 172 GiB";
-			style=striped;fillcolor="pink;0.349274.2:green"
-		]; }
-		{ "@FS@/srv/chenin" [
-			label="/srv/chenin\nDevice: /dev/aya+raid6/chenin\next4\nSize: 72.0 GiB\nFree: 3.91 GiB\nUsed: 68.0 GiB";
-			style=striped;fillcolor="pink;0.945711.2:green"
+			label="/srv/archives\nDevice: /dev/aya+raid6/archives\next4\nSize: 1.48 TiB\nFree: 513 GiB\nUsed: 999 GiB";
+			style=striped;fillcolor="pink;0.660702.2:green"
 		]; }
 		{ "@FS@/srv/multimedia" [
-			label="/srv/multimedia\nDevice: /dev/aya+raid6/multimedia\next4\nSize: 1.97 TiB\nFree: 234 GiB\nUsed: 1.65 TiB";
-			style=striped;fillcolor="pink;0.883700.2:green"
+			label="/srv/multimedia\nDevice: /dev/aya+raid6/multimedia\next4\nSize: 1.97 TiB\nFree: 202 GiB\nUsed: 1.68 TiB";
+			style=striped;fillcolor="pink;0.899982.2:green"
 		]; }
 		{ "@FS@/srv/photos" [
-			label="/srv/photos\nDevice: /dev/aya+raid6/photos\next4\nSize: 1008 GiB\nFree: 260 GiB\nUsed: 748 GiB";
-			style=striped;fillcolor="pink;0.741835.2:green"
+			label="/srv/photos\nDevice: /dev/aya+raid6/photos\next4\nSize: 1.97 TiB\nFree: 910 GiB\nUsed: 1.08 TiB";
+			style=striped;fillcolor="pink;0.548352.2:green"
 		]; }
 		{ "@FS@/srv/rushes" [
-			label="/srv/rushes\nDevice: /dev/aya+raid6/rushes\next4\nSize: 491 GiB\nFree: 289 GiB\nUsed: 177 GiB";
-			style=striped;fillcolor="pink;0.411519.2:green"
+			label="/srv/rushes\nDevice: /dev/aya+raid6/rushes\next4\nSize: 491 GiB\nFree: 346 GiB\nUsed: 120 GiB";
+			style=striped;fillcolor="pink;0.294515.2:green"
+		]; }
+		{ "@FS@/boot/efi" [
+			label="/boot/efi\nDevice: /dev/nvme0n1p1\nvfat\nSize: 596 MiB\nFree: 507 MiB\nUsed: 89.0 MiB";
+			style=striped;fillcolor="pink;0.149342.2:green"
 		]; }
 		{ "@FS@/boot" [
-			label="/boot\nDevice: /dev/sdb4\next4\nSize: 976 MiB\nFree: 741 MiB\nUsed: 167 MiB";
-			style=striped;fillcolor="pink;0.240347.2:green"
+			label="/boot\nDevice: /dev/sdf4\next4\nSize: 975 MiB\nFree: 570 MiB\nUsed: 337 MiB";
+			style=striped;fillcolor="pink;0.414845.2:green"
 		]; }
-		{ "@FS@SWAP" [
-			label="SWAP\nDevice: /dev/sdd6\nswap\nSize: 49.0 GiB\nFree: 45.0 GiB\nUsed: 3.99 GiB";
-			style=striped;fillcolor="pink;0.081425.2:green"
+		{ "@FS@SWAP@sdb6" [
+			label="SWAP\nDevice: /dev/sdb6\nSize: 49.0 GiB\nFree: 48.6 GiB\nUsed: 459 MiB";
+			style=striped;fillcolor="pink;0.009146.2:green"
 		]; }
 		label="Mounted FS and swap";
 	}
@@ -859,10 +924,10 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@alastor" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@alastor@dm-20" [
+			{ "@libvirt@alastor@dm-30" [
 				label="/dev/aya+raid1/kvm-alastor-disk2\n(sdc)";
 			]; }
-			{ "@libvirt@alastor@dm-19" [
+			{ "@libvirt@alastor@dm-29" [
 				label="/dev/aya+raid1/kvm-alastor-root\n(sdb)";
 			]; }
 			label="alastor";
@@ -870,10 +935,10 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@belgarath" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@belgarath@dm-22" [
+			{ "@libvirt@belgarath@dm-35" [
 				label="/dev/aya+raid1/kvm-belgarath-openhab\n(vdb)";
 			]; }
-			{ "@libvirt@belgarath@dm-26" [
+			{ "@libvirt@belgarath@dm-15" [
 				label="/dev/aya+raid1/kvm-belgarath-root\n(vda)";
 			]; }
 			label="belgarath";
@@ -882,7 +947,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@blackjack" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@blackjack@dm-13" [
+			{ "@libvirt@blackjack@dm-19" [
 				label="/dev/aya+raid1/kvm-blackjack-root\n(vda)";
 			]; }
 			label="blackjack";
@@ -891,7 +956,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@dedale" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@dedale@dm-18" [
+			{ "@libvirt@dedale@dm-28" [
 				label="/dev/aya+raid1/kvm-dedale-root\n(sdb)";
 			]; }
 			label="dedale";
@@ -909,7 +974,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@kooot" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@kooot@dm-17" [
+			{ "@libvirt@kooot@dm-27" [
 				label="/dev/aya+raid1/kvm-kooot-root\n(sda)";
 			]; }
 			label="kooot";
@@ -918,7 +983,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@ogmios" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@ogmios@dm-23" [
+			{ "@libvirt@ogmios@dm-8" [
 				label="/dev/aya+raid1/kvm-ogmios-root\n(sda)";
 			]; }
 			label="ogmios";
@@ -927,7 +992,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@ran" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@ran@dm-24" [
+			{ "@libvirt@ran@dm-9" [
 				label="/dev/aya+raid1/kvm-ran-root\n(sda)";
 			]; }
 			label="ran";
@@ -936,7 +1001,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@rosee" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@rosee@dm-27" [
+			{ "@libvirt@rosee@dm-16" [
 				label="/dev/aya+raid1/kvm-rosee-root\n(vda)";
 			]; }
 			label="rosee";
@@ -945,10 +1010,10 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@talia" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@talia@dm-34" [
+			{ "@libvirt@talia@dm-32" [
 				label="/dev/aya+raid1/kvm-talia-root\n(sda)";
 			]; }
-			{ "@libvirt@talia@dm-9" [
+			{ "@libvirt@talia@dm-12" [
 				label="/dev/aya+raid1/kvm-talia-root-old\n(sdc)";
 			]; }
 			{ "@libvirt@talia@/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso" [
@@ -962,8 +1027,11 @@ digraph "machine"{
 			{ "@libvirt@thot@dm-36" [
 				label="/dev/aya+raid1/kvm-thot-docker\n(sdc)";
 			]; }
-			{ "@libvirt@thot@dm-33" [
+			{ "@libvirt@thot@dm-31" [
 				label="/dev/aya+raid1/kvm-thot-root\n(sdb)";
+			]; }
+			{ "@libvirt@thot@dm-6" [
+				label="/dev/aya+raid6/kvm-thot-calibre\n(sdd)";
 			]; }
 			label="thot";
 			fillcolor=yellow
@@ -971,7 +1039,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@urtho" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@urtho@dm-28" [
+			{ "@libvirt@urtho@dm-18" [
 				label="/dev/aya+raid1/kvm-urtho-root\n(vda)";
 			]; }
 			label="urtho";
@@ -980,7 +1048,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@vaniel" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@vaniel@dm-15" [
+			{ "@libvirt@vaniel@dm-21" [
 				label="/dev/aya+raid1/kvm-vaniel-root\n(sda)";
 			]; }
 			label="vaniel";
@@ -993,10 +1061,10 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@win10" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@win10@dm-10" [
+			{ "@libvirt@win10@dm-13" [
 				label="/dev/aya+raid1/kvm-win-data\n(sdb)";
 			]; }
-			{ "@libvirt@win10@dm-16" [
+			{ "@libvirt@win10@dm-22" [
 				label="/dev/aya+raid1/kvm-win10-c\n(sda)";
 			]; }
 			{ "@libvirt@win10@/srv/kvm/cds/virtio-win-0.1.185.iso" [
@@ -1004,13 +1072,21 @@ digraph "machine"{
 			]; }
 			label="win10";
 		}
+		subgraph "cluster_@libvirt@win11" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@win11@dm-38" [
+				label="/dev/aya+raid1/kvm-win11-c\n(sdb)";
+			]; }
+			label="win11";
+		}
 		subgraph "cluster_@libvirt@win764" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@win764@dm-10" [
+			{ "@libvirt@win764@dm-13" [
 				label="/dev/aya+raid1/kvm-win-data\n(vdb)";
 			]; }
-			{ "@libvirt@win764@dm-11" [
+			{ "@libvirt@win764@dm-14" [
 				label="/dev/aya+raid1/kvm-win764-c\n(vda)";
 			]; }
 			{ "@libvirt@win764@/srv/kvm/cds/sdcard" [
@@ -1021,10 +1097,10 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@win81" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@win81@dm-10" [
+			{ "@libvirt@win81@dm-13" [
 				label="/dev/aya+raid1/kvm-win-data\n(sdd)";
 			]; }
-			{ "@libvirt@win81@dm-12" [
+			{ "@libvirt@win81@dm-17" [
 				label="/dev/aya+raid1/kvm-win81-c\n(sda)";
 			]; }
 			{ "@libvirt@win81@/srv/kvm/cds/virtio-win-0.1.118.iso" [
@@ -1046,7 +1122,7 @@ digraph "machine"{
 		subgraph "cluster_@libvirt@yoko" {
 			color=white;
 			fillcolor=white;
-			{ "@libvirt@yoko@dm-25" [
+			{ "@libvirt@yoko@dm-11" [
 				label="/dev/aya+raid1/kvm-yoko-root\n(sda)";
 			]; }
 			label="yoko";
@@ -1055,231 +1131,214 @@ digraph "machine"{
 		label="Libvirt Virtual Machines";
 	}
 	// Links from LVM VG: aya+raid1
-	"LVM@aya+raid1@PV@md126" -> "dm-21"
-	"LVM@aya+raid1@PV@md126" -> "dm-21"
-	"LVM@aya+raid1@PV@md124" -> "dm-21"
-	"LVM@aya+raid1@PV@md127" -> "dm-7"
-	"LVM@aya+raid1@PV@md127" -> "dm-20"
-	"LVM@aya+raid1@PV@md127" -> "dm-19"
-	"LVM@aya+raid1@PV@md126" -> "dm-22"
-	"LVM@aya+raid1@PV@md121" -> "dm-26"
-	"LVM@aya+raid1@PV@md127" -> "dm-13"
-	"LVM@aya+raid1@PV@md127" -> "dm-18"
-	"LVM@aya+raid1@PV@md121" -> "dm-37"
-	"LVM@aya+raid1@PV@md127" -> "dm-17"
-	"LVM@aya+raid1@PV@md121" -> "dm-23"
-	"LVM@aya+raid1@PV@md121" -> "dm-24"
-	"LVM@aya+raid1@PV@md121" -> "dm-27"
-	"LVM@aya+raid1@PV@md121" -> "dm-34"
-	"LVM@aya+raid1@PV@md127" -> "dm-9"
-	"LVM@aya+raid1@PV@md121" -> "dm-36"
-	"LVM@aya+raid1@PV@md121" -> "dm-36"
-	"LVM@aya+raid1@PV@md121" -> "dm-33"
-	"LVM@aya+raid1@PV@md121" -> "dm-28"
+	"LVM@aya+raid1@PV@md125" -> "dm-34"
+	"LVM@aya+raid1@PV@md122" -> "dm-5"
+	"LVM@aya+raid1@PV@md122" -> "dm-30"
+	"LVM@aya+raid1@PV@md122" -> "dm-29"
+	"LVM@aya+raid1@PV@md122" -> "dm-35"
 	"LVM@aya+raid1@PV@md127" -> "dm-15"
-	"LVM@aya+raid1@PV@md127" -> "dm-10"
-	"LVM@aya+raid1@PV@md127" -> "dm-16"
-	"LVM@aya+raid1@PV@md127" -> "dm-11"
-	"LVM@aya+raid1@PV@md127" -> "dm-12"
+	"LVM@aya+raid1@PV@md122" -> "dm-19"
+	"LVM@aya+raid1@PV@md127" -> "dm-28"
+	"LVM@aya+raid1@PV@md123" -> "dm-37"
+	"LVM@aya+raid1@PV@md127" -> "dm-27"
 	"LVM@aya+raid1@PV@md127" -> "dm-8"
-	"LVM@aya+raid1@PV@md121" -> "dm-25"
-	"LVM@aya+raid1@PV@md127" -> "dm-14"
-	"LVM@aya+raid1@PV@md127" -> "dm-14"
-	"LVM@aya+raid1@PV@md121" -> "aya+raid1/[lvol0_pmspare]"
-	"LVM@aya+raid1@PV@md127" -> "dm-0"
-	"aya+raid1/tp_pool+raid1" -> "dm-35"
+	"LVM@aya+raid1@PV@md127" -> "dm-9"
+	"LVM@aya+raid1@PV@md123" -> "dm-16"
+	"LVM@aya+raid1@PV@md123" -> "dm-32"
+	"LVM@aya+raid1@PV@md122" -> "dm-12"
+	"LVM@aya+raid1@PV@md123" -> "dm-36"
+	"LVM@aya+raid1@PV@md123" -> "dm-36"
+	"LVM@aya+raid1@PV@md122" -> "dm-36"
+	"LVM@aya+raid1@PV@md123" -> "dm-31"
+	"LVM@aya+raid1@PV@md123" -> "dm-18"
+	"LVM@aya+raid1@PV@md122" -> "dm-21"
+	"LVM@aya+raid1@PV@md122" -> "dm-13"
+	"LVM@aya+raid1@PV@md122" -> "dm-22"
+	"LVM@aya+raid1@PV@md127" -> "dm-38"
+	"LVM@aya+raid1@PV@md122" -> "dm-14"
+	"LVM@aya+raid1@PV@md122" -> "dm-17"
+	"LVM@aya+raid1@PV@md122" -> "dm-7"
+	"LVM@aya+raid1@PV@md123" -> "dm-11"
+	"LVM@aya+raid1@PV@md122" -> "dm-20"
+	"LVM@aya+raid1@PV@md122" -> "dm-20"
+	"LVM@aya+raid1@PV@md123" -> "aya+raid1/[lvol0_pmspare]"
+	"LVM@aya+raid1@PV@md127" -> "dm-10"
+	"aya+raid1/tp_pool+raid1" -> "dm-33"
 	"aya+raid1/[tp_pool+raid1_tdata]" -> "aya+raid1/tp_pool+raid1"
 	"aya+raid1/[tp_pool+raid1_tdata]" -> "aya+raid1/tp_pool+raid1"
-	"LVM@aya+raid1@PV@md121" -> "aya+raid1/[tp_pool+raid1_tdata]"
+	"LVM@aya+raid1@PV@md123" -> "aya+raid1/[tp_pool+raid1_tdata]"
 	"aya+raid1/[tp_pool+raid1_tmeta]" -> "aya+raid1/tp_pool+raid1"
-	"LVM@aya+raid1@PV@md121" -> "aya+raid1/[tp_pool+raid1_tmeta]"
+	"LVM@aya+raid1@PV@md123" -> "aya+raid1/[tp_pool+raid1_tmeta]"
 	// Links from LVM VG: aya+raid6
-	"LVM@aya+raid6@PV@md125" -> "dm-4"
-	"LVM@aya+raid6@PV@md125" -> "dm-3"
-	"LVM@aya+raid6@PV@md123" -> "dm-6"
-	"LVM@aya+raid6@PV@md125" -> "dm-2"
-	"LVM@aya+raid6@PV@md125" -> "dm-2"
-	"LVM@aya+raid6@PV@md125" -> "dm-5"
+	"LVM@aya+raid6@PV@md124" -> "dm-2"
+	"LVM@aya+raid6@PV@md124" -> "dm-2"
+	"LVM@aya+raid6@PV@md126" -> "dm-6"
+	"LVM@aya+raid6@PV@md126" -> "dm-4"
+	"LVM@aya+raid6@PV@md124" -> "dm-1"
+	"LVM@aya+raid6@PV@md124" -> "dm-3"
 	// Links from LVM VG: aya+ssd
-	"LVM@aya+ssd@PV@sdb1" -> "dm-1"
-	// Links from MD: /dev/md/aya-raid1S-A
-	"@MD@md121@dev@dm-1" -> "md121"
-	"@MD@md121@dev@sda7" -> "md121"
-	"@MD@md121@dev@sdf7" -> "md121"
-	// Links from MD: /dev/md/aya-raid1-B
-	"@MD@md122@dev@sda8" -> "md122"
-	"@MD@md122@dev@sdf8" -> "md122"
-	// Links from MD: /dev/md/aya-raid6-B
-	"@MD@md123@dev@sda5" -> "md123"
-	"@MD@md123@dev@sdc5" -> "md123"
-	"@MD@md123@dev@sdd5" -> "md123"
-	"@MD@md123@dev@sde5" -> "md123"
-	"@MD@md123@dev@sdf5" -> "md123"
-	// Links from MD: /dev/md/aya-raid5-B
-	"@MD@md124@dev@sda6" -> "md124"
-	"@MD@md124@dev@sdc6" -> "md124"
-	"@MD@md124@dev@sde3" -> "md124"
-	"@MD@md124@dev@sdf6" -> "md124"
-	// Links from MD: /dev/md/aya-raid6-A
-	"@MD@md125@dev@sda4" -> "md125"
-	"@MD@md125@dev@sdc4" -> "md125"
-	"@MD@md125@dev@sdd4" -> "md125"
-	"@MD@md125@dev@sde4" -> "md125"
-	"@MD@md125@dev@sdf4" -> "md125"
-	// Links from MD: /dev/md/aya-raid5-A
-	"@MD@md126@dev@sda3" -> "md126"
-	"@MD@md126@dev@sdc3" -> "md126"
-	"@MD@md126@dev@sdd3" -> "md126"
-	"@MD@md126@dev@sdf3" -> "md126"
+	"LVM@aya+ssd@PV@sdf1" -> "dm-0"
 	// Links from MD: /dev/md/aya-raid1-C
-	"@MD@md127@dev@sdc7" -> "md127"
-	"@MD@md127@dev@sdf9" -> "md127"
-	// Links for LVM@aya+raid1@PV@md121
-	"md121" -> "LVM@aya+raid1@PV@md121"
+	"@MD@md122@dev@sdc9" -> "md122"
+	"@MD@md122@dev@sdd7" -> "md122"
+	// Links from MD: /dev/md/aya-raid1S-A
+	"@MD@md123@dev@dm-0" -> "md123"
+	"@MD@md123@dev@sdc7" -> "md123"
+	"@MD@md123@dev@sdg7" -> "md123"
+	// Links from MD: /dev/md/aya-raid6-C
+	"@MD@md124@dev@sdc2" -> "md124"
+	"@MD@md124@dev@sdd8" -> "md124"
+	"@MD@md124@dev@sde2" -> "md124"
+	"@MD@md124@dev@sdg9" -> "md124"
+	// Links from MD: /dev/md/aya-raid5-C
+	"@MD@md125@dev@sdc3" -> "md125"
+	"@MD@md125@dev@sdd3" -> "md125"
+	"@MD@md125@dev@sde4" -> "md125"
+	"@MD@md125@dev@sdg3" -> "md125"
+	// Links from MD: /dev/md/aya-raid6-D
+	"@MD@md126@dev@sdc10" -> "md126"
+	"@MD@md126@dev@sdd9" -> "md126"
+	"@MD@md126@dev@sde3" -> "md126"
+	"@MD@md126@dev@sdg10" -> "md126"
+	// Links from MD: /dev/md/aya-raid1-D
+	"@MD@md127@dev@nvme0n1p5" -> "md127"
+	"@MD@md127@dev@nvme1n1p2" -> "md127"
 	// Links for LVM@aya+raid1@PV@md122
 	"md122" -> "LVM@aya+raid1@PV@md122"
-	// Links for LVM@aya+raid1@PV@md124
-	"md124" -> "LVM@aya+raid1@PV@md124"
-	// Links for LVM@aya+raid1@PV@md126
-	"md126" -> "LVM@aya+raid1@PV@md126"
+	// Links for LVM@aya+raid1@PV@md123
+	"md123" -> "LVM@aya+raid1@PV@md123"
+	// Links for LVM@aya+raid1@PV@md125
+	"md125" -> "LVM@aya+raid1@PV@md125"
 	// Links for LVM@aya+raid1@PV@md127
 	"md127" -> "LVM@aya+raid1@PV@md127"
-	// Links for LVM@aya+raid6@PV@md123
-	"md123" -> "LVM@aya+raid6@PV@md123"
-	// Links for LVM@aya+raid6@PV@md125
-	"md125" -> "LVM@aya+raid6@PV@md125"
-	// Links for LVM@aya+ssd@PV@sdb1
-	"@Part: sdb":"1" -> "LVM@aya+ssd@PV@sdb1"
-	// Links for @MD@md121@dev@dm-1
-	"dm-1" -> "@MD@md121@dev@dm-1"
-	// Links for @MD@md121@dev@sda7
-	"@Part: sda":"7" -> "@MD@md121@dev@sda7"
-	// Links for @MD@md121@dev@sdf7
-	"@Part: sdf":"7" -> "@MD@md121@dev@sdf7"
-	// Links for @MD@md122@dev@sda8
-	"@Part: sda":"8" -> "@MD@md122@dev@sda8"
-	// Links for @MD@md122@dev@sdf8
-	"@Part: sdf":"8" -> "@MD@md122@dev@sdf8"
-	// Links for @MD@md123@dev@sda5
-	"@Part: sda":"5" -> "@MD@md123@dev@sda5"
-	// Links for @MD@md123@dev@sdc5
-	"@Part: sdc":"5" -> "@MD@md123@dev@sdc5"
-	// Links for @MD@md123@dev@sdd5
-	"@Part: sdd":"5" -> "@MD@md123@dev@sdd5"
-	// Links for @MD@md123@dev@sde5
-	"@Part: sde":"5" -> "@MD@md123@dev@sde5"
-	// Links for @MD@md123@dev@sdf5
-	"@Part: sdf":"5" -> "@MD@md123@dev@sdf5"
-	// Links for @MD@md124@dev@sda6
-	"@Part: sda":"6" -> "@MD@md124@dev@sda6"
-	// Links for @MD@md124@dev@sdc6
-	"@Part: sdc":"6" -> "@MD@md124@dev@sdc6"
-	// Links for @MD@md124@dev@sde3
-	"@Part: sde":"3" -> "@MD@md124@dev@sde3"
-	// Links for @MD@md124@dev@sdf6
-	"@Part: sdf":"6" -> "@MD@md124@dev@sdf6"
-	// Links for @MD@md125@dev@sda4
-	"@Part: sda":"4" -> "@MD@md125@dev@sda4"
-	// Links for @MD@md125@dev@sdc4
-	"@Part: sdc":"4" -> "@MD@md125@dev@sdc4"
-	// Links for @MD@md125@dev@sdd4
-	"@Part: sdd":"4" -> "@MD@md125@dev@sdd4"
+	// Links for LVM@aya+raid6@PV@md124
+	"md124" -> "LVM@aya+raid6@PV@md124"
+	// Links for LVM@aya+raid6@PV@md126
+	"md126" -> "LVM@aya+raid6@PV@md126"
+	// Links for LVM@aya+ssd@PV@sdf1
+	"@Part: sdf":"1" -> "LVM@aya+ssd@PV@sdf1"
+	// Links for @MD@md122@dev@sdc9
+	"@Part: sdc":"9" -> "@MD@md122@dev@sdc9"
+	// Links for @MD@md122@dev@sdd7
+	"@Part: sdd":"7" -> "@MD@md122@dev@sdd7"
+	// Links for @MD@md123@dev@dm-0
+	"dm-0" -> "@MD@md123@dev@dm-0"
+	// Links for @MD@md123@dev@sdc7
+	"@Part: sdc":"7" -> "@MD@md123@dev@sdc7"
+	// Links for @MD@md123@dev@sdg7
+	"@Part: sdg":"7" -> "@MD@md123@dev@sdg7"
+	// Links for @MD@md124@dev@sdc2
+	"@Part: sdc":"2" -> "@MD@md124@dev@sdc2"
+	// Links for @MD@md124@dev@sdd8
+	"@Part: sdd":"8" -> "@MD@md124@dev@sdd8"
+	// Links for @MD@md124@dev@sde2
+	"@Part: sde":"2" -> "@MD@md124@dev@sde2"
+	// Links for @MD@md124@dev@sdg9
+	"@Part: sdg":"9" -> "@MD@md124@dev@sdg9"
+	// Links for @MD@md125@dev@sdc3
+	"@Part: sdc":"3" -> "@MD@md125@dev@sdc3"
+	// Links for @MD@md125@dev@sdd3
+	"@Part: sdd":"3" -> "@MD@md125@dev@sdd3"
 	// Links for @MD@md125@dev@sde4
 	"@Part: sde":"4" -> "@MD@md125@dev@sde4"
-	// Links for @MD@md125@dev@sdf4
-	"@Part: sdf":"4" -> "@MD@md125@dev@sdf4"
-	// Links for @MD@md126@dev@sda3
-	"@Part: sda":"3" -> "@MD@md126@dev@sda3"
-	// Links for @MD@md126@dev@sdc3
-	"@Part: sdc":"3" -> "@MD@md126@dev@sdc3"
-	// Links for @MD@md126@dev@sdd3
-	"@Part: sdd":"3" -> "@MD@md126@dev@sdd3"
-	// Links for @MD@md126@dev@sdf3
-	"@Part: sdf":"3" -> "@MD@md126@dev@sdf3"
-	// Links for @MD@md127@dev@sdc7
-	"@Part: sdc":"7" -> "@MD@md127@dev@sdc7"
-	// Links for @MD@md127@dev@sdf9
-	"@Part: sdf":"9" -> "@MD@md127@dev@sdf9"
+	// Links for @MD@md125@dev@sdg3
+	"@Part: sdg":"3" -> "@MD@md125@dev@sdg3"
+	// Links for @MD@md126@dev@sdc10
+	"@Part: sdc":"10" -> "@MD@md126@dev@sdc10"
+	// Links for @MD@md126@dev@sdd9
+	"@Part: sdd":"9" -> "@MD@md126@dev@sdd9"
+	// Links for @MD@md126@dev@sde3
+	"@Part: sde":"3" -> "@MD@md126@dev@sde3"
+	// Links for @MD@md126@dev@sdg10
+	"@Part: sdg":"10" -> "@MD@md126@dev@sdg10"
+	// Links for @MD@md127@dev@nvme0n1p5
+	"@Part: nvme0n1":"5" -> "@MD@md127@dev@nvme0n1p5"
+	// Links for @MD@md127@dev@nvme1n1p2
+	"@Part: nvme1n1":"2" -> "@MD@md127@dev@nvme1n1p2"
 	// Links for @FS@/srv/backuppc
-	"dm-21" -> "@FS@/srv/backuppc"
+	"dm-34" -> "@FS@/srv/backuppc"
 	// Links for @FS@/srv/kvm
-	"dm-7" -> "@FS@/srv/kvm"
+	"dm-5" -> "@FS@/srv/kvm"
 	// Links for @FS@/var/log
-	"dm-14" -> "@FS@/var/log"
+	"dm-20" -> "@FS@/var/log"
 	// Links for @FS@/
-	"dm-0" -> "@FS@/"
+	"dm-10" -> "@FS@/"
 	// Links for @FS@/srv/archives
-	"dm-4" -> "@FS@/srv/archives"
-	// Links for @FS@/srv/chenin
-	"dm-3" -> "@FS@/srv/chenin"
+	"dm-2" -> "@FS@/srv/archives"
 	// Links for @FS@/srv/multimedia
-	"dm-6" -> "@FS@/srv/multimedia"
+	"dm-4" -> "@FS@/srv/multimedia"
 	// Links for @FS@/srv/photos
-	"dm-2" -> "@FS@/srv/photos"
+	"dm-1" -> "@FS@/srv/photos"
 	// Links for @FS@/srv/rushes
-	"dm-5" -> "@FS@/srv/rushes"
+	"dm-3" -> "@FS@/srv/rushes"
+	// Links for @FS@/boot/efi
+	"@Part: nvme0n1":"1" -> "@FS@/boot/efi"
 	// Links for @FS@/boot
-	"@Part: sdb":"4" -> "@FS@/boot"
-	// Links for @FS@SWAP
-	"@Part: sdd":"6" -> "@FS@SWAP"
-	// Links for @libvirt@alastor@dm-20
-	"dm-20" -> "@libvirt@alastor@dm-20"
-	// Links for @libvirt@alastor@dm-19
-	"dm-19" -> "@libvirt@alastor@dm-19"
-	// Links for @libvirt@belgarath@dm-22
-	"dm-22" -> "@libvirt@belgarath@dm-22"
-	// Links for @libvirt@belgarath@dm-26
-	"dm-26" -> "@libvirt@belgarath@dm-26"
-	// Links for @libvirt@blackjack@dm-13
-	"dm-13" -> "@libvirt@blackjack@dm-13"
-	// Links for @libvirt@dedale@dm-18
-	"dm-18" -> "@libvirt@dedale@dm-18"
+	"@Part: sdf":"4" -> "@FS@/boot"
+	// Links for @FS@SWAP@sdb6
+	"@Part: sdb":"6" -> "@FS@SWAP@sdb6"
+	// Links for @libvirt@alastor@dm-30
+	"dm-30" -> "@libvirt@alastor@dm-30"
+	// Links for @libvirt@alastor@dm-29
+	"dm-29" -> "@libvirt@alastor@dm-29"
+	// Links for @libvirt@belgarath@dm-35
+	"dm-35" -> "@libvirt@belgarath@dm-35"
+	// Links for @libvirt@belgarath@dm-15
+	"dm-15" -> "@libvirt@belgarath@dm-15"
+	// Links for @libvirt@blackjack@dm-19
+	"dm-19" -> "@libvirt@blackjack@dm-19"
+	// Links for @libvirt@dedale@dm-28
+	"dm-28" -> "@libvirt@dedale@dm-28"
 	// Links for @libvirt@hermes@dm-37
 	"dm-37" -> "@libvirt@hermes@dm-37"
-	// Links for @libvirt@kooot@dm-17
-	"dm-17" -> "@libvirt@kooot@dm-17"
-	// Links for @libvirt@ogmios@dm-23
-	"dm-23" -> "@libvirt@ogmios@dm-23"
-	// Links for @libvirt@ran@dm-24
-	"dm-24" -> "@libvirt@ran@dm-24"
-	// Links for @libvirt@rosee@dm-27
-	"dm-27" -> "@libvirt@rosee@dm-27"
-	// Links for @libvirt@talia@dm-34
-	"dm-34" -> "@libvirt@talia@dm-34"
-	// Links for @libvirt@talia@dm-9
-	"dm-9" -> "@libvirt@talia@dm-9"
+	// Links for @libvirt@kooot@dm-27
+	"dm-27" -> "@libvirt@kooot@dm-27"
+	// Links for @libvirt@ogmios@dm-8
+	"dm-8" -> "@libvirt@ogmios@dm-8"
+	// Links for @libvirt@ran@dm-9
+	"dm-9" -> "@libvirt@ran@dm-9"
+	// Links for @libvirt@rosee@dm-16
+	"dm-16" -> "@libvirt@rosee@dm-16"
+	// Links for @libvirt@talia@dm-32
+	"dm-32" -> "@libvirt@talia@dm-32"
+	// Links for @libvirt@talia@dm-12
+	"dm-12" -> "@libvirt@talia@dm-12"
 	// Links for @libvirt@talia@/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso
 	"@FS@/srv/kvm" -> "@libvirt@talia@/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso"
 	// Links for @libvirt@thot@dm-36
 	"dm-36" -> "@libvirt@thot@dm-36"
-	// Links for @libvirt@thot@dm-33
-	"dm-33" -> "@libvirt@thot@dm-33"
-	// Links for @libvirt@urtho@dm-28
-	"dm-28" -> "@libvirt@urtho@dm-28"
-	// Links for @libvirt@vaniel@dm-15
-	"dm-15" -> "@libvirt@vaniel@dm-15"
-	// Links for @libvirt@win10@dm-10
-	"dm-10" -> "@libvirt@win10@dm-10"
-	// Links for @libvirt@win10@dm-16
-	"dm-16" -> "@libvirt@win10@dm-16"
+	// Links for @libvirt@thot@dm-31
+	"dm-31" -> "@libvirt@thot@dm-31"
+	// Links for @libvirt@thot@dm-6
+	"dm-6" -> "@libvirt@thot@dm-6"
+	// Links for @libvirt@urtho@dm-18
+	"dm-18" -> "@libvirt@urtho@dm-18"
+	// Links for @libvirt@vaniel@dm-21
+	"dm-21" -> "@libvirt@vaniel@dm-21"
+	// Links for @libvirt@win10@dm-13
+	"dm-13" -> "@libvirt@win10@dm-13"
+	// Links for @libvirt@win10@dm-22
+	"dm-22" -> "@libvirt@win10@dm-22"
 	// Links for @libvirt@win10@/srv/kvm/cds/virtio-win-0.1.185.iso
 	"@FS@/srv/kvm" -> "@libvirt@win10@/srv/kvm/cds/virtio-win-0.1.185.iso"
-	// Links for @libvirt@win764@dm-10
-	"dm-10" -> "@libvirt@win764@dm-10"
-	// Links for @libvirt@win764@dm-11
-	"dm-11" -> "@libvirt@win764@dm-11"
+	// Links for @libvirt@win11@dm-38
+	"dm-38" -> "@libvirt@win11@dm-38"
+	// Links for @libvirt@win764@dm-13
+	"dm-13" -> "@libvirt@win764@dm-13"
+	// Links for @libvirt@win764@dm-14
+	"dm-14" -> "@libvirt@win764@dm-14"
 	// Links for @libvirt@win764@/srv/kvm/cds/sdcard
 	"@FS@/srv/kvm" -> "@libvirt@win764@/srv/kvm/cds/sdcard"
-	// Links for @libvirt@win81@dm-10
-	"dm-10" -> "@libvirt@win81@dm-10"
-	// Links for @libvirt@win81@dm-12
-	"dm-12" -> "@libvirt@win81@dm-12"
+	// Links for @libvirt@win81@dm-13
+	"dm-13" -> "@libvirt@win81@dm-13"
+	// Links for @libvirt@win81@dm-17
+	"dm-17" -> "@libvirt@win81@dm-17"
 	// Links for @libvirt@win81@/srv/kvm/cds/virtio-win-0.1.118.iso
 	"@FS@/srv/kvm" -> "@libvirt@win81@/srv/kvm/cds/virtio-win-0.1.118.iso"
 	// Links for @libvirt@winwin@/srv/kvm/cds/virtio-win-0.1-59.iso
 	"@FS@/srv/kvm" -> "@libvirt@winwin@/srv/kvm/cds/virtio-win-0.1-59.iso"
 	// Links for @libvirt@winwin@/srv/kvm/winwin/base_winXP+FF+WinSCP.img
 	"@FS@/srv/kvm" -> "@libvirt@winwin@/srv/kvm/winwin/base_winXP+FF+WinSCP.img"
-	// Links for @libvirt@yoko@dm-25
-	"dm-25" -> "@libvirt@yoko@dm-25"
+	// Links for @libvirt@yoko@dm-11
+	"dm-11" -> "@libvirt@yoko@dm-11"
 }

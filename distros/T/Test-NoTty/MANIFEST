@@ -1,0 +1,12 @@
+Changes
+CONTRIBUTING.md
+MANIFEST
+Makefile.PL
+README
+lib/Test/NoTty.pm
+t/force-a-tty.pl
+t/task-failed-successfully.t
+t/test1.t                       # Running tests in your block Test1 style
+t/test2.t                       # Test2::IPC removes 4 lines of fragile code
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

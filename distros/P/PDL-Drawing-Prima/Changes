@@ -1,0 +1,185 @@
+0.18 Feb 28, 2023
+
+   Fixes to build for distro
+
+0.17 Feb 27, 2023
+
+   Convert to EUMM
+
+0.16 Jan 16, 2023
+
+   Added pictures to the docs
+
+0.15 Dec 24, 2022
+
+  * Dmitry Karasik takes over the project.
+    - Compile with latest Prima
+    - Update links
+    - Switch from Travis CI to Github Actions
+    - Run tests without X11
+
+0.14_01 MTH XX, 2022
+
+0.14 Feb 13, 2022
+
+  [ENHANCEMENTS]
+  
+  * Now includes a real test! t/10 uses the Prima/Perl interface and the
+    pdl interface to draw what should be identical things---lines of
+    various colors. It then performs a pixel-by-pixel comparison to make
+    sure you get the exact same result. Much more needs to be written
+    but now at least I have the template.
+
+  [DEPENDENCIES]
+  
+  * Bumped required verson of PDL to v2.037. Should have done this with the
+    release of v0.13, but that was a bit hasty. Oops. This is the required
+    minimum version mostly because some versions of PDL earlier than
+    v2.037 made changes to PDL::PP that broke the compilation of this
+    distribution. The changes to PDL::PP were fixed with v2.037.
+  
+  [BUG FIXES]
+  
+  * Fixed a minor bug that caused PDL::Drawing::Prima::Utils to not compile
+    on some platforms. Should have used pp_line_numbers, but rolled my own
+    in a few spots for some reason.
+
+0.13 Feb 09, 2022
+
+  [BUG FIXES]
+  
+  * Prima changed fillWinding to fillMode, which required a change to
+    PDL::Drawing::Prima's interface. Thanks to dk for this fix!
+
+  [DEPENDENCIES]
+  
+  * Bumped required verson of Prima to 1.57
+
+0.12 Aug 01, 2016
+
+  [BUG FIXES]
+  
+  * PDL::PP now requires a call to pp_done, which was missing in Utils
+
+0.11 Nov 07, 2015
+
+  [BUG FIXES]
+  
+  * Fixed backwards-compatible support code, which wasn't actually fully
+    backwards compatible as written.
+  
+  * Update Build.PL to work with newest PDL.
+  
+  [DEVELOPMENT]
+  
+  * Added Travis support for github repository
+
+
+0.10 Oct 28, 2013
+
+  [ENHANCEMENTS]
+  
+  * Added backwards-compatible support for PDL v2.007.
+  
+  * Hacked an improved symbol drawing for crosses and triangles. It sometimes
+    happened that the bottom leg of a cross symbol wasn't straight down due to
+    rounding a floating-point number that is slightly less than the integer it
+    was supposed to be. This hack makes it work slightly better, though an even
+    better algorithm would be preferred.
+  
+  * Added a Changes file.
+  
+  * Revised PDL::Drawing::Prima::Utils::minmaxforpair() to use standard
+    functions in math.h for determining whether a value is finite or not.
+  
+  [BUG FIXES]
+  
+  * Fixed corner-case in PDL::Drawing::Prima::Utils::hsv_to_rgb.
+
+
+
+0.09 Jan 4, 2013
+
+  [BUG FIXES]
+  
+  * Fixed Build.PL's linking; now should work on Cygin and Strawberry.
+
+
+
+0.08 Sep 9, 2012
+
+  [BUG FIXES]
+  
+  * Fixed Windows runtime link error.
+  
+  [DEPENDENCIES]
+  
+  * Bumped required verson of Prima to 1.35
+
+
+
+0.07 Aug 6, 2012
+  
+  [API CHANGES]
+  
+  * Deprecated PDL::Drawing::Prima::pdl_of_handles_for()
+  
+  [DIFFERENT BEHAVIOR]
+    
+  * Drawing operations are now atomic!! Now, when you call pdl-based drawing
+   function on a Prima drawable, the drawable's state will be restored to its
+   original state before the function returns.
+  
+  [ENHANCEMENTS]
+  
+  * Documentation for the properties supported by a drawing operation are now
+    guaranteed to be correct because they are extracted directly from the
+    documentation.
+  
+  [DEPENDENCIES]
+  
+  * Added minimum version for Module::Build (0.28)
+  
+  * Bumped minimum version for PDL to 2.4.10
+  
+  * Added runtime Prima version check
+
+  [NEW FEATURES]
+  
+  * Added fillPattern property to applicable drawing functions.
+
+
+
+0.06 Jul 12, 2012
+
+  XXX WORKING HERE
+
+
+
+0.05 Jul 6, 2012
+
+  XXX WORKING HERE
+
+
+
+0.04 Jul 5, 2012
+
+  XXX WORKING HERE
+
+
+
+0.03 Jun 25, 2012
+
+  XXX WORKING HERE
+
+
+
+0.02 Mar 15, 2012
+
+  XXX WORKING HERE
+
+
+
+0.01 Feb 26, 2012
+
+  XXX WORKING HERE

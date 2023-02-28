@@ -107,7 +107,7 @@ sub clear {
 sub format {
 
     my ( $self, $format ) = @_;
-    if ($format) {
+    if (length $format) {
 
         $b2a->{_format} = $format;
         $b2a->{_note}   = $b2a->{_note} . ' format=' . $b2a->{_format};

@@ -1,5 +1,11 @@
 Revision history for Perl extension BSD::Getfsent.
 
+0.19  2023-02-24  <schubiger@cpan.org>
+
+ - Move testing module to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.18  2018-05-09  <schubiger@cpan.org>
 
  - Merged development version to stable.

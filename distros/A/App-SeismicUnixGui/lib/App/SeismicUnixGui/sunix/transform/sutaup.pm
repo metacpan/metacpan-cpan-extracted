@@ -65,12 +65,19 @@ package App::SeismicUnixGui::sunix::transform::sutaup;
  Trace header fields modified: dt,d2,f2
 
 Additional substitute subroutines: Juan Lorenzo March 1 2019
+
 inverse_via_fk=3
+
 inverse_via_tx=4
+
 forward_via_fk=1
+
 forward_via_tx=2
+
 compute_via_in=number
+
 outbound_pickfile=pick
+
 dp=1
 vmin=1
 vmax=2
@@ -94,10 +101,10 @@ my $sutaup = {
     _dt                => '',
     _dx                => '',
     _fmin              => '',
-    _forward_via_fk    => '3',
-    _forward_via_tx    => '4',
-    _inverse_via_fk    => '1',
-    _inverse_via_tx    => '2',
+    _forward_via_fk    => '1',
+    _forward_via_tx    => '2',
+    _inverse_via_fk    => '3',
+    _inverse_via_tx    => '4',
     _np                => '',
     _npoints           => '',
     _ntau              => '',
@@ -313,7 +320,6 @@ sub forward_via_fk {
     my ( $self, $forward_via_fk ) = @_;
     if ( $forward_via_fk ne $empty_string ) {
 
-        $sutaup->{_forward_via_fk} = $forward_via_fk;
         $sutaup->{_note} =
           $sutaup->{_note} . ' option=' . $sutaup->{_forward_via_fk};
         $sutaup->{_Step} =
@@ -336,7 +342,6 @@ sub forward_via_tx {
     my ( $self, $forward_via_tx ) = @_;
     if ( $forward_via_tx ne $empty_string ) {
 
-        $sutaup->{_forward_via_tx} = $forward_via_tx;
         $sutaup->{_note} =
           $sutaup->{_note} . ' option=' . $sutaup->{_forward_via_tx};
         $sutaup->{_Step} =
@@ -349,8 +354,8 @@ sub forward_via_tx {
 }
 
 =head2 sub inverse_via_fk 
+
         same as subroutine option=3
-	
 
 =cut
 
@@ -359,11 +364,10 @@ sub inverse_via_fk {
     my ( $self, $inverse_via_fk ) = @_;
     if ( $inverse_via_fk ne $empty_string ) {
 
-        $sutaup->{_inverse_via_fk} = $inverse_via_fk;
         $sutaup->{_note} =
-          $sutaup->{_note} . ' inverse_via_fk=' . $sutaup->{_inverse_via_fk};
+          $sutaup->{_note} . ' option=' . $sutaup->{_inverse_via_fk};
         $sutaup->{_Step} =
-          $sutaup->{_Step} . ' inverse_via_fk=' . $sutaup->{_inverse_via_fk};
+          $sutaup->{_Step} . ' option=' . $sutaup->{_inverse_via_fk};
 
     }
     else {
@@ -382,12 +386,13 @@ sub inverse_via_tx {
 
     my ( $self, $inverse_via_tx ) = @_;
     if ( $inverse_via_tx ne $empty_string ) {
+    	
+    	print("made it, sutaup\n");
 
-        $sutaup->{_inverse_via_tx} = $inverse_via_tx;
-        $sutaup->{_note} =
-          $sutaup->{_note} . ' inverse_via_tx=' . $sutaup->{_inverse_via_tx};
+        $sutaup->{_note}  = 
+          $sutaup->{_note} . ' option=' . $sutaup->{_inverse_via_tx};
         $sutaup->{_Step} =
-          $sutaup->{_Step} . ' inverse_via_tx=' . $sutaup->{_inverse_via_tx};
+          $sutaup->{_Step} . ' option=' . $sutaup->{_inverse_via_tx};
 
     }
     else {

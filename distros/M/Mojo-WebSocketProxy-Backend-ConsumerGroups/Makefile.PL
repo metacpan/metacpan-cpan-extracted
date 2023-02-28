@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "JSON::MaybeUTF8" => 0,
     "Log::Any" => 0,
     "Mojo::Redis2" => 0,
-    "Mojo::WebSocketProxy" => "0.14",
+    "Mojo::WebSocketProxy" => "0.13",
     "Mojo::WebSocketProxy::Backend" => 0,
     "MojoX::JSON::RPC::Client" => 0,
     "Syntax::Keyword::Try" => 0,
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeUTF8" => 0,
   "Log::Any" => 0,
   "Mojo::Redis2" => 0,
-  "Mojo::WebSocketProxy" => "0.14",
+  "Mojo::WebSocketProxy" => "0.13",
   "Mojo::WebSocketProxy::Backend" => 0,
   "MojoX::JSON::RPC::Client" => 0,
   "Syntax::Keyword::Try" => 0,

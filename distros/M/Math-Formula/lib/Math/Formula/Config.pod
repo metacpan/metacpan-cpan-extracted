@@ -1,0 +1,109 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Formula::Config - load/save formulas to file
+
+=head1 INHERITANCE
+
+ Math::Formula::Config is extended by
+   Math::Formula::Config::INI
+   Math::Formula::Config::JSON
+   Math::Formula::Config::YAML
+
+=head1 SYNOPSIS
+
+  my $saver = Math::Formula::Config::YAML->new(directory => $dir);
+  $saver->save($context);
+
+=head1 DESCRIPTION
+
+The extensions of this module can be used to export and import
+sets of expressions to and from a program.
+
+The following formats are supported:
+
+=over 4
+
+=item * JSON L<Math::Formula::Config::JSON|Math::Formula::Config::JSON>
+
+=item * YAML L<Math::Formula::Config::YAML|Math::Formula::Config::YAML>
+
+=item * INI  L<Math::Formula::Config::INI|Math::Formula::Config::INI>
+
+=back
+
+At the moment, B<loading is not yet supported>.  That implementation will
+certainly impact the output format.  The current version is ment for
+studying.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Math::Formula::Config-E<gt>B<new>(%options)
+
+ -Option   --Default
+  directory  <required>
+
+=over 2
+
+=item directory => DIRECTORY
+
+In this directory, the output files will be made.  For each context (fragment),
+a separate file is made.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<directory>()
+
+=item $obj-E<gt>B<path_for>($file)
+
+=back
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<load>($name, %options)
+
+Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
+
+ -Option  --Default
+  filename  <directory/$name.ini>
+
+=over 2
+
+=item filename => FILENAME
+
+=back
+
+=item $obj-E<gt>B<save>($context, %args)
+
+Serialize the $context to a files as storage or to be editted by hand.
+This is a usefull method when default configuration templates need to
+be generated.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Math-Formula distribution version 0.13,
+built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

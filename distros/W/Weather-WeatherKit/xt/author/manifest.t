@@ -1,15 +1,19 @@
 #!perl
-use 5.006;
 use strict;
 use warnings;
 use Test::More;
+use ExtUtils::Manifest;
 
 unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );
 }
 
-my $min_tcm = 0.9;
-eval "use Test::CheckManifest $min_tcm";
-plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
+is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';
 
-ok_manifest();
+my $manifest = ExtUtils::Manifest::maniread();
+my $skipchk  = ExtUtils::Manifest::maniskip();
+
+ok(!$skipchk->($_), "$_ shouldn't be in MANIFEST.SKIP") for keys %$manifest;
+
+done_testing;

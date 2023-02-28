@@ -14,12 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-TextWrapUtils",
   "EXE_FILES" => [
-    "script/textwrap"
+    "script/nowrap",
+    "script/nowrap-clipboard",
+    "script/textunwrap",
+    "script/textunwrap-clipboard",
+    "script/textwrap",
+    "script/textwrap-clipboard"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::TextWrapUtils",
   "PREREQ_PM" => {
+    "Clipboard::Any" => "0.009",
     "Data::Sah::Compiler::perl::TH::int" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -43,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +57,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clipboard::Any" => "0.009",
   "Data::Sah::Compiler::perl::TH::int" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,

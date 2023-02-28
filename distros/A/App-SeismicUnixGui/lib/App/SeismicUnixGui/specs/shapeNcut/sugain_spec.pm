@@ -24,7 +24,7 @@ my $PL_SEISMIC        = $Project->PL_SEISMIC();
 my $max_index       = $sugain->get_max_index();
 
 my $sugain_spec = {
-	_CONFIG						=> $PL_SEISMIC ,
+	_CONFIG				   => $PL_SEISMIC ,
 	_DATA_DIR_OUT          => $DATA_SEISMIC_SU,
 	_DATA_DIR_OUT          => $DATA_SEISMIC_SU,
 	_binding_index_aref    => '',
@@ -36,7 +36,7 @@ my $sugain_spec = {
     _flow_type_aref        => '',
     _has_infile            => $true,
     _has_pipe_in           => $true,
-    _has_outpar          => $false,
+    _has_outpar            => $false,
     _has_pipe_out          => $true,
     _has_redirect_in       => $true,
     _has_redirect_out      => $true,
@@ -52,6 +52,8 @@ my $sugain_spec = {
     _is_suprog             => $true,
     _is_superflow          => $false,
     _max_index             => $max_index,
+    _prefix_aref           => '',
+	_suffix_aref           => '',
 };
 
 =head2 sub binding_index_aref

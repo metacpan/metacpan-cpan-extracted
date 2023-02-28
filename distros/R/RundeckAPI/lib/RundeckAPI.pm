@@ -38,13 +38,13 @@ use JSON;
 use Storable qw(dclone);
 use Exporter qw(import);
 
-our @EXPORT_OK = qw(get post put delete postData putData postFile putFile);
+our @EXPORT_OK = qw(get post put delete postData putData);
 
 #####
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.3.4.1";
+our $VERSION = "1.3.5.0";
 #####
 ## VARIABLES
 #####
@@ -149,6 +149,12 @@ sub get (){		# endpoint
 	my $responsehash = ();
 	my $rc = 0;
 
+	# Handle secial case where endpoint is /api/XX/job, returns YAML
+	if ($endpoint =~ /api\/[0-9]+\/job/) {
+		$endpoint .= '?format=yaml';
+
+	}
+
 	$self->{'client'}->GET($endpoint);
 	$rc = $self->{'client'}->responseCode ();
 	$responsehash->{'httpstatus'} = $rc;
@@ -160,6 +166,7 @@ sub get (){		# endpoint
 		my $responseType = $self->{'client'}->responseHeader('content-type');
 		my $responseContent = $self->{'client'}->responseContent();
 		$responsehash = $self->_handleResponse($rc, $responseType, $responseContent);
+
 	}
 	return dclone ($responsehash);
 }
@@ -234,15 +241,6 @@ sub delete () {		# endpoint
 	return dclone ($responsehash);
 }
 
-sub postFile() {	# for compatibility only
-	my $self = shift;
-	my $endpoint = shift;
-	my $mimetype = shift;
-	my $data = shift;
-
-	reeturn $self->postData($endpoint, $mimetype, $data);
-
-}
 sub postData() {		# endpoint, mimetype, data
 	my $self = shift;
 	my $endpoint = shift;
@@ -268,15 +266,6 @@ sub postData() {		# endpoint, mimetype, data
 	return dclone ($responsehash);
 }
 
-sub putFile() {	# for compatibility only, must use a ... what ? File path or file handle ?
-	my $self = shift;
-	my $endpoint = shift;
-	my $mimetype = shift;
-	my $data = shift;
-
-	return $self->putData($endpoint, $mimetype, $data);
-
-}
 sub putData() {		# endpoint, mimetype, data
 	my $self = shift;
 	my $endpoint = shift;

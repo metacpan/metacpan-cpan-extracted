@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use File::Spec::Functions qw(catdir catfile splitdir);
 use FindBin qw($Bin $Script);
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 # Constructor.
 sub new {
@@ -485,9 +485,17 @@ L<File::Spec::Functions>.
 
 =over
 
+=item L<File::Fu>
+
+file and directory objects
+
 =item L<File::Spec>
 
 portably perform operations on file names
+
+=item L<IO::All>
+
+IO::All to Larry Wall!
 
 =item L<Path::Class>
 
@@ -511,12 +519,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2009-2022 Michal Josef Špaček
+© 2009-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

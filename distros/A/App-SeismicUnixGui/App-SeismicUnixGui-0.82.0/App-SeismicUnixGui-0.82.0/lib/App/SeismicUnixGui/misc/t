@@ -1,0 +1,60 @@
+=head2 sub FileDialog_button
+
+(1) For user-built flows.
+(2) Interactively choose a file name
+ that will then be entered into the
+ values of the parameter frame and 
+ stored away via param_flow	
+for colored flows: grey, pink, blue, green
+
+(3) Set conditions for the use of a FileDialog_button
+i.e., find out which prior widget invoked the FileDialog_button
+e.g., was it a user-built flow or a superflow?
+
+print("L_SU,FileDialog_button	parameter_values_frame: $L_SU_href->{_parameter_values_frame}\n");
+print("L_SU,FileDialog_button	parameter_values_frame: $parameter_values_frame\n");
+ 	
+ (4) dialog_type is one of 3 topics: 'Data ', (open a) 
+ Open (open a user-built perl flow) or'SaveAs 'a user-built perl flow)
+ or 'Delete' any file
+ 	
+ (5) The Save (main) option goes straight to the L_SU,save_button for both'
+  user_built'and 'pre_built_superflow'
+
+(6) flow_type can be 'user_built'or 'pre_built_superflow '
+(7) for safety, place set_hash_ref first
+	
+(8) Each colored flow will be directed to a different program
+
+	 	foreach my $key (sort keys %$L_SU_href) {
+      	print (" L_SU,FileDialog_button, key is $key, value is $L_SU_href->{$key}\n");
+ 	}
+ 	
+ (9) The number of values and names = what is read from the configuration file
+ After FileDialog is run, the number of values and names = max default value, 
+ because param_widgets are chosen inside file_dialog
+ This action is justified because I chose to determine independently # variables
+ from the param_widget which is defaulted to a large number 
+ (so that we know in advance how many value are occupied without reading SeismicUnixPltTk_global_cosntants.pm
+  The "large number" can be changed within L_SU_global_constants.
+
+=cut
+
+sub FileDialog_button {
+
+	my ( $self, $dialog_type_sref ) = @_;
+
+	my $dialog_type = $$dialog_type_sref;
+
+	my $private_module = 'FileDialog_button_' . $dialog_type;
+
+	&$private_module();
+
+	return ();
+}
+
+=head2 sub FileDialog_button_Open
+   
+=cut
+
+sub FileDialog_button_Open {

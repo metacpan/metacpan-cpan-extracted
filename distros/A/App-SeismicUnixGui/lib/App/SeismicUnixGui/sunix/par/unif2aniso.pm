@@ -325,6 +325,7 @@ hash of private variables
 =cut
 
 my $unif2aniso = {
+	_aniso     => '',
 	_c11_file  => '',
 	_c13_file  => '',
 	_c15_file  => '',
@@ -413,6 +414,7 @@ sub note {
 
 sub clear {
 
+	$unif2aniso->{_aniso}     = '';
 	$unif2aniso->{_c11_file}  = '';
 	$unif2aniso->{_c13_file}  = '';
 	$unif2aniso->{_c15_file}  = '';
@@ -1345,7 +1347,7 @@ max index = number of input variables -1
 
 sub get_max_index {
 	my ($self) = @_;
-	my $max_index = 35;
+	my $max_index = 42;
 
 	return ($max_index);
 }

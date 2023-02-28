@@ -5,10 +5,12 @@ use strict;
 use warnings;
 use Log::ger;
 
+use Clipboard::Any ();
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-13'; # DATE
+our $DATE = '2022-12-14'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -22,25 +24,45 @@ our @BACKENDS = qw(
                       Text::Wrap
               );
 
+our %argspecopt0_filename = (
+    filename => {
+        schema => 'filename*',
+        default => '-',
+        pos => 0,
+        description => <<'_',
+
+Use dash (`-`) to read from stdin.
+
+_
+    },
+);
+
+our %argspecopt_backend = (
+    backend => {
+        schema => ['perl::modname*', in=>\@BACKENDS],
+        default => 'Text::ANSI::Util',
+    },
+);
+
+our %argspecopt_width = (
+    width => {
+        schema => 'posint*',
+        default => 80,
+        cmdline_aliases => {w=>{}},
+    },
+);
+
 $SPEC{textwrap} = {
     v => 1.1,
-    summary => 'Wrap (fold) text using one of several Perl modules',
+    summary => 'Wrap (fold) paragraphs in text using one of several Perl modules',
     description => <<'_',
 
 Paragraphs are separated with two or more blank lines.
 
 _
     args => {
-        filename => {
-            schema => 'filename*',
-            default => '-',
-            pos => 0,
-            description => <<'_',
-
-Use dash (`-`) to read from stdin.
-
-_
-        },
+        %argspecopt0_filename,
+        %argspecopt_backend,
         width => {
             schema => 'posint*',
             default => 80,
@@ -50,20 +72,23 @@ _
         # XXX arg: subsequent indent string/number of spaces?
         # XXX arg: option to not wrap verbatim paragraphs
         # XXX arg: pass per-backend options
-        backend => {
-            schema => ['perl::modname*', in=>\@BACKENDS],
-            default => 'Text::ANSI::Util',
-        },
+
+        # internal: _text (pass text directly)
     },
 };
 sub textwrap {
     require File::Slurper::Dash;
 
     my %args = @_;
-    my $text = File::Slurper::Dash::read_text($args{filename});
-    $text =~ s/\R/ /;
+    my $text;
+    if (defined $args{_text}) {
+        $text = $args{_text};
+    } else {
+        $text = File::Slurper::Dash::read_text($args{filename});
+        $text =~ s/\R/ /;
+    }
 
-    my $backend = $args{backend} // 'Text::Wrap';
+    my $backend = $args{backend} // 'Text::ANSI::Util';
     my $width = $args{width} // 80;
 
     log_trace "Using text wrapping backend %s", $backend;
@@ -107,6 +132,105 @@ sub textwrap {
     [200, "OK", $res];
 }
 
+$SPEC{textwrap_clipboard} = {
+    v => 1.1,
+    summary => 'Wrap (fold) paragraphs in text in clipboard using one of several Perl modules',
+    description => <<'_',
+
+This is shortcut for something like:
+
+    % clipget | textwrap ... | clipadd
+
+where <prog:clipget> and <prog:clipadd> are utilities to get text from clipboard
+and set text of clipboard, respectively.
+
+_
+    args => {
+        %argspecopt_backend,
+        %argspecopt_width,
+        %Clipboard::Any::argspecopt_clipboard_manager,
+    },
+};
+sub textwrap_clipboard {
+    my %args = @_;
+    my $cm = delete $args{clipboard_manager};
+
+    my $res;
+    $res = Clipboard::Any::get_clipboard_content(clipboard_manager=>$cm);
+    return [500, "Can't get clipboard content: $res->[0] - $res->[1]"]
+        unless $res->[0] == 200;
+    my $text = $res->[2];
+
+    $res = textwrap(%args, _text => $text);
+    return $res unless $res->[0] == 200;
+    my $wrapped_text = $res->[2];
+
+    $res = Clipboard::Any::add_clipboard_content(clipboard_manager=>$cm, content=>$wrapped_text);
+    return [500, "Can't add clipboard content: $res->[0] - $res->[1]"]
+        unless $res->[0] == 200;
+
+    [200, "OK"];
+}
+
+$SPEC{textunwrap} = {
+    v => 1.1,
+    summary => 'Unwrap (unfold) multiline paragraphs to single-line ones',
+    description => <<'_',
+
+This is a shortcut for:
+
+    % textwrap -w 999999
+
+_
+    args => {
+        %argspecopt0_filename,
+        %argspecopt_backend,
+    },
+};
+sub textunwrap {
+    my %args = @_;
+    textwrap(%args, width=>999_999);
+}
+
+$SPEC{textunwrap_clipboard} = {
+    v => 1.1,
+    summary => 'Unwrap (unfold) multiline paragraphs in clipboard to single-line ones',
+    description => <<'_',
+
+This is shortcut for something like:
+
+    % clipget | textunwrap ... | clipadd
+
+where <prog:clipget> and <prog:clipadd> are utilities to get text from clipboard
+and set text of clipboard, respectively.
+
+_
+    args => {
+        %argspecopt_backend,
+        %Clipboard::Any::argspecopt_clipboard_manager,
+    },
+};
+sub textunwrap_clipboard {
+    my %args = @_;
+    my $cm = delete $args{clipboard_manager};
+
+    my $res;
+    $res = Clipboard::Any::get_clipboard_content(clipboard_manager=>$cm);
+    return [500, "Can't get clipboard content: $res->[0] - $res->[1]"]
+        unless $res->[0] == 200;
+    my $text = $res->[2];
+
+    $res = textunwrap(%args, _text => $text);
+    return $res unless $res->[0] == 200;
+    my $unwrapped_text = $res->[2];
+
+    $res = Clipboard::Any::add_clipboard_content(clipboard_manager=>$cm, content=>$unwrapped_text);
+    return [500, "Can't add clipboard content: $res->[0] - $res->[1]"]
+        unless $res->[0] == 200;
+
+    [200, "OK"];
+}
+
 1;
 # ABSTRACT: Utilities related to text wrapping
 
@@ -122,7 +246,7 @@ App::TextWrapUtils - Utilities related to text wrapping
 
 =head1 VERSION
 
-This document describes version 0.002 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2022-12-13.
+This document describes version 0.005 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2022-12-14.
 
 =head1 DESCRIPTION
 
@@ -130,7 +254,17 @@ This distributions provides the following command-line utilities:
 
 =over
 
+=item * L<nowrap>
+
+=item * L<nowrap-clipboard>
+
+=item * L<textunwrap>
+
+=item * L<textunwrap-clipboard>
+
 =item * L<textwrap>
+
+=item * L<textwrap-clipboard>
 
 =back
 
@@ -139,13 +273,102 @@ Keywords: fold.
 =head1 FUNCTIONS
 
 
+=head2 textunwrap
+
+Usage:
+
+ textunwrap(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Unwrap (unfold) multiline paragraphs to single-line ones.
+
+This is a shortcut for:
+
+ % textwrap -w 999999
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<backend> => I<perl::modname> (default: "Text::ANSI::Util")
+
+(No description)
+
+=item * B<filename> => I<filename> (default: "-")
+
+Use dash (C<->) to read from stdin.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 textunwrap_clipboard
+
+Usage:
+
+ textunwrap_clipboard(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Unwrap (unfold) multiline paragraphs in clipboard to single-line ones.
+
+This is shortcut for something like:
+
+ % clipget | textunwrap ... | clipadd
+
+where L<clipget> and L<clipadd> are utilities to get text from clipboard
+and set text of clipboard, respectively.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<backend> => I<perl::modname> (default: "Text::ANSI::Util")
+
+(No description)
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 textwrap
 
 Usage:
 
  textwrap(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Wrap (fold) text using one of several Perl modules.
+Wrap (fold) paragraphs in text using one of several Perl modules.
 
 Paragraphs are separated with two or more blank lines.
 
@@ -181,6 +404,57 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+
+
+=head2 textwrap_clipboard
+
+Usage:
+
+ textwrap_clipboard(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Wrap (fold) paragraphs in text in clipboard using one of several Perl modules.
+
+This is shortcut for something like:
+
+ % clipget | textwrap ... | clipadd
+
+where L<clipget> and L<clipadd> are utilities to get text from clipboard
+and set text of clipboard, respectively.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<backend> => I<perl::modname> (default: "Text::ANSI::Util")
+
+(No description)
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+=item * B<width> => I<posint> (default: 80)
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-TextWrapUtils>.
@@ -191,7 +465,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-TextWrapUtils>.
 
 =head1 SEE ALSO
 
-L<Text::Wrap> and other backends.
+L<Text::Wrap>, L<Text::ANSI::Util> and other backends.
 
 =head1 AUTHOR
 

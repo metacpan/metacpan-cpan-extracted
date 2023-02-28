@@ -1,0 +1,33 @@
+
+## INSTALL
+
+cpanm App::samesize
+
+
+## UNINSTALL 
+
+cpanm -U App::samesize
+
+
+■ コマンド samesize を使えるようにする方法 : 
+
+   インストール:  	cpanm    App::samesize
+アンインストール: 	cpanm –U App::samesize
+
+cpanmが使えない場合は、cpan でも良いが、インストールしたモジュールの
+アンインストールが難しくなるであろう。(アンインストールとは、インストール
+したモジュールを除去することで、インストール前の元の状態に戻すことである。)
+
+上記のcpanmを使った方法は、Perlのモジュールのインストールでよく用いられる方法である。
+
+
+■ cpanmやcpanによる一般的なインストールの方法は下記で網羅的に説明をしている。
+
+1. https://metacpan.org/release/TULAMILI/Table-Hack-0.12/source/Table-Hack.pdf
+2. https://www.ite.or.jp/wp/wp-content/uploads/opendata/tool201807.pdf
+
+上記2個のURLにある同じPDF形式ファイルは、2018年に下野寿之が書いたものであり、
+それぞれ26ページである。
+
+
+-- 2023-02-27(mon) Toshiyuki Shimono bin4tsv@gmail.com

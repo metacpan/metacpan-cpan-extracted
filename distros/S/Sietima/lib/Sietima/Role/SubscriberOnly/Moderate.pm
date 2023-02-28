@@ -2,10 +2,9 @@ package Sietima::Role::SubscriberOnly::Moderate;
 use Moo::Role;
 use Sietima::Policy;
 use Email::Stuffer;
-use Email::MIME;
 use namespace::clean;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 # ABSTRACT: moderate messages from non-subscribers
 
 
@@ -28,11 +27,12 @@ sub munge_mail_from_non_subscriber ($self,$mail) {
             # problems with encodings other than this
             encoding => '7bit',
         );
-    $self->transport->send($notice->email,{
+
+    return Sietima::Message->new({
+        mail => $notice->email,
         from => $self->return_path,
         to => [ $self->owner ],
     });
-    return;
 }
 
 
@@ -139,7 +139,7 @@ Sietima::Role::SubscriberOnly::Moderate - moderate messages from non-subscribers
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -177,8 +177,9 @@ owner|Sietima::Role::WithOwner/owner>.
 
   $sietima->resume($mail_id);
 
-Given an identifier returned when L<storing|Sietima::MailStore/store>
-an email, this method retrieves the email and re-processes it via L<<
+Given the identifier returned when
+L<storing|Sietima::MailStore/store>-ing an email, this method
+retrieves the email and re-processes it via L<<
 C<ignoring_subscriberonly>|Sietima::Role::SubscriberOnly/ignoring_subscriberonly
 >>. This will make sure that the email is not caught again by the
 subscriber-only filter.
@@ -187,8 +188,9 @@ subscriber-only filter.
 
   $sietima->drop($mail_id);
 
-Given an identifier returned when L<storing|Sietima::MailStore/store>
-an email, this method deletes the email from the store.
+Given the identifier returned when
+L<storing|Sietima::MailStore/store>-ing an email, this method deletes
+the email from the store.
 
 =head2 C<list_mails_in_moderation_queue>
 
@@ -280,7 +282,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

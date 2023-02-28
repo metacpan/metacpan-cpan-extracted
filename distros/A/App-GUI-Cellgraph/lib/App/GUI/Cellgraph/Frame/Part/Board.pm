@@ -4,10 +4,9 @@ use Wx;
 
 package App::GUI::Cellgraph::Frame::Part::Board;
 use base qw/Wx::Panel/;
-my $TAU = 6.283185307;
 
+use App::GUI::Cellgraph::Compute::Grid;
 use Graphics::Toolkit::Color qw/color/;
-use App::GUI::Cellgraph::Grid;
 
 sub new {
     my ( $class, $parent, $x, $y ) = @_;
@@ -27,32 +26,37 @@ sub new {
         $self->{'y_pos'} = $self->GetPosition->y;
 
         if (exists $self->{'data'}{'new'}) {
-            $self->{'dc'}->Blit (0, 0, $self->{'size'}{'x'} + $self->{'x_pos'}, 
-                                       $self->{'size'}{'y'} + $self->{'y_pos'} + $self->{'menu_size'}, 
+            $self->{'dc'}->Blit (0, 0, $self->{'size'}{'x'} + $self->{'x_pos'},
+                                       $self->{'size'}{'y'} + $self->{'y_pos'} + $self->{'menu_size'},
                                        $self->paint( Wx::PaintDC->new( $self ), $self->{'size'}{'x'}, $self->{'size'}{'y'} ), 0, 0);
         } else {
-            Wx::PaintDC->new( $self )->Blit (0, 0, $self->{'size'}{'x'}, 
-                                                   $self->{'size'}{'y'} + $self->{'menu_size'}, 
-                                                   $self->{'dc'}, 
+            Wx::PaintDC->new( $self )->Blit (0, 0, $self->{'size'}{'x'},
+                                                   $self->{'size'}{'y'} + $self->{'menu_size'},
+                                                   $self->{'dc'},
                                                    $self->{'x_pos'} , $self->{'y_pos'} + $self->{'menu_size'} );
         }
         1;
-    }); # Blit (xdest, ydest, width, height, DC *src, xsrc, ysrc, wxRasterOperationMode logicalFunc=wxCOPY, bool useMask=false)
-    
+    });
     return $self;
 }
 
 sub draw {
-    my( $self, $data ) = @_;
-    return unless ref $data eq 'HASH';
-    $self->set_data( $data );
+    my( $self, $settings ) = @_;
+    return unless $self->set_settings( $settings );
     $self->Refresh;
 }
 
-sub set_data {
-    my( $self, $data ) = @_;
-    return unless ref $data eq 'HASH';
-    $self->{'data'} = $data;
+sub sketch {
+    my( $self, $settings ) = @_;
+    return unless $self->set_settings( $settings );
+    $self->{'data'}{'sketch'} = 5;
+    $self->Refresh;
+}
+
+sub set_settings {
+    my( $self, $settings ) = @_;
+    return 0 unless ref $settings eq 'HASH';
+    $self->{'data'} = $settings;
     $self->{'data'}{'new'} = 1;
 }
 
@@ -66,10 +70,10 @@ sub paint {
     my( $self, $dc, $width, $height ) = @_;
 
     $self->{'size'}{'cell'} = $self->{'data'}{'global'}{'cell_size'} // 3;
-    $self->{'cells'}{'x'} = ($self->{'data'}{'global'}{'grid_type'} eq 'no') 
+    $self->{'cells'}{'x'} = ($self->{'data'}{'global'}{'grid_type'} eq 'no')
                           ? int (  $width      /  $self->{'size'}{'cell'}      )
                           : int ( ($width - 1) / ($self->{'size'}{'cell'} + 1) );
-    $self->{'cells'}{'y'} = ($self->{'data'}{'global'}{'grid_type'} eq 'no') 
+    $self->{'cells'}{'y'} = ($self->{'data'}{'global'}{'grid_type'} eq 'no')
                           ? int (  $height      /  $self->{'size'}{'cell'}      )
                           : int ( ($height - 1) / ($self->{'size'}{'cell'} + 1) );
     $self->{'seed_cell'}  = int   $self->{'cells'}{'x'} / 2;
@@ -77,11 +81,11 @@ sub paint {
     my $grid_d =  ($self->{'data'}{'global'}{'grid_type'} eq 'no')  ? $cell_size : $cell_size + 1;
     my $grid_max_x = $grid_d * $self->{'cells'}{'x'};
     my $grid_max_y = $grid_d * $self->{'cells'}{'y'};
-    
+
     my $background_color = Wx::Colour->new( 255, 255, 255 );
     $dc->SetBackground( Wx::Brush->new( $background_color, &Wx::wxBRUSHSTYLE_SOLID ) );     # $dc->SetBrush( $fgb );
     $dc->Clear();
-    my @color = map { Wx::Colour->new( $_->rgb ) } color('white')->gradient_to('black', $self->{'data'}{'global'}{'state_count'});
+    my @color = map { Wx::Colour->new( $_->rgb ) } @{$self->{'data'}{'color'}{'objects'}};
     my @pen = map {Wx::Pen->new( $_, 1, &Wx::wxPENSTYLE_SOLID )} @color;
     my @brush = map { Wx::Brush->new( $_, &Wx::wxBRUSHSTYLE_SOLID ) } @color;
     $dc->SetPen( Wx::Pen->new( Wx::Colour->new( 170, 170, 170 ), 1, &Wx::wxPENSTYLE_SOLID ) );
@@ -91,80 +95,76 @@ sub paint {
         $dc->DrawLine( $grid_d * $_,            0, $grid_d * $_, $grid_max_y ) for 1 .. $self->{'cells'}{'x'};
         $dc->DrawLine(            0, $grid_d * $_,  $grid_max_x, $grid_d * $_) for 1 .. $self->{'cells'}{'y'};
     }
- 
+
     my $color = Wx::Colour->new( 0, 0, 0 );
     $dc->SetPen( Wx::Pen->new( $color, 1, &Wx::wxPENSTYLE_SOLID ) );
     $dc->SetBrush( Wx::Brush->new( $color, &Wx::wxBRUSHSTYLE_SOLID ) );
-    my $grid = App::GUI::Cellgraph::Grid::get( [$self->{'cells'}{'x'}, $self->{'cells'}{'y'}], $self->{'data'} );
+    my $grid = App::GUI::Cellgraph::Compute::Grid::now( [$self->{'cells'}{'x'}, $self->{'cells'}{'y'}], $self->{'data'} );
 
+    my $sketch_length = exists $self->{'data'}{'sketch'} ? $self->{'data'}{'sketch'} : 0;
     if ($self->{'data'}{'global'}{'paint_direction'} eq 'inside_out') {
         my $mid = int($self->{'cells'}{'x'} / 2);
         if ($self->{'cells'}{'x'} % 2){
-            for my $y (1 .. $mid) {
+            for my $y (1 .. ($sketch_length ? $sketch_length : $mid)) {
                 for my $x ($mid - $y .. $mid -1 + $y){
-                    if ($grid->[$y][$x]){
-                        $dc->SetPen( $pen[$grid->[$y][$x]] );
-                        $dc->SetBrush( $brush[$grid->[$y][$x]] );
-                        my ($nx, $ny) = ($x, $mid + $y);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                        ($nx, $ny) = ($self->{'cells'}{'x'} - 1 - $x, $mid - $y);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                        ($nx, $ny) = ($mid - $y, $x);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                        ($nx, $ny) = ($mid + $y, $self->{'cells'}{'y'} - 1 - $x);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                    }
+                    $dc->SetPen( $pen[$grid->[$y][$x]] );
+                    $dc->SetBrush( $brush[$grid->[$y][$x]] );
+                    my ($nx, $ny) = ($x, $mid + $y);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
+                    ($nx, $ny) = ($self->{'cells'}{'x'} - 1 - $x, $mid - $y);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
+                    ($nx, $ny) = ($mid - $y, $x);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
+                    ($nx, $ny) = ($mid + $y, $self->{'cells'}{'y'} - 1 - $x);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
                 }
+                $dc->SetPen( $pen[ $grid->[0][$mid] ] );
+                $dc->SetBrush( $brush[ $grid->[0][$mid] ] );
+
                 $dc->DrawRectangle( 1 + ($mid * $grid_d), 1 + ($mid * $grid_d), $cell_size, $cell_size )
                     if $grid->[0][$mid];
             }
         } else {
-            for my $y (0 .. int($self->{'cells'}{'y'} / 2) + 1) {
+            for my $y (0 .. ($sketch_length ? $sketch_length : (int($self->{'cells'}{'y'} / 2) + 1))) {
                 last if $y >= $mid;
                 for my $x ($mid - $y .. $mid + $y){
-                    if ($grid->[$y][$x]){
-                        $dc->SetPen( $pen[$grid->[$y][$x]] );
-                        $dc->SetBrush( $brush[$grid->[$y][$x]] );
-                        my ($nx, $ny) = ($self->{'cells'}{'x'} - 1 - $x, $mid - 1 - $y);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                        ($nx, $ny) = ($x, $mid + $y);
-                        $dc->DrawRectangle( 1 + ($x * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                        ($nx, $ny) = ($mid - 1 - $y, $x);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($x * $grid_d), $cell_size, $cell_size );
-                        ($nx, $ny) = ($mid + $y, $self->{'cells'}{'x'} - 1 - $x);
-                        $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                    }
-                        
+                    $dc->SetPen( $pen[$grid->[$y][$x]] );
+                    $dc->SetBrush( $brush[$grid->[$y][$x]] );
+                    my ($nx, $ny) = ($self->{'cells'}{'x'} - 1 - $x, $mid - 1 - $y);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
+                    ($nx, $ny) = ($x, $mid + $y);
+                    $dc->DrawRectangle( 1 + ($x * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
+                    ($nx, $ny) = ($mid - 1 - $y, $x);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($x * $grid_d), $cell_size, $cell_size );
+                    ($nx, $ny) = ($mid + $y, $self->{'cells'}{'x'} - 1 - $x);
+                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
                 }
             }
         }
     } elsif ($self->{'data'}{'global'}{'paint_direction'} eq 'outside_in') {
-        for my $y (0 .. int($self->{'cells'}{'y'} / 2) + 1) {
+        for my $y (0 .. ($sketch_length ? $sketch_length : (int($self->{'cells'}{'y'} / 2) + 1)) ) {
             last if $y >= $self->{'cells'}{'x'} - 2 - $y;
             for my $x ($y .. $self->{'cells'}{'x'} - 2 - $y){
-                if ($grid->[$y][$x]){
-                    $dc->SetPen( $pen[$grid->[$y][$x]] );
-                    $dc->SetBrush( $brush[$grid->[$y][$x]] );
-                    my ($nx, $ny) = ($self->{'cells'}{'x'} - 1 - $x, $self->{'cells'}{'y'} - 1 - $y);
-                    $dc->DrawRectangle( 1 + ( $x * $grid_d), 1 + ( $y * $grid_d), $cell_size, $cell_size );
-                    $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
-                    $dc->DrawRectangle( 1 + ( $y * $grid_d), 1 + ($nx * $grid_d), $cell_size, $cell_size );
-                    $dc->DrawRectangle( 1 + ($ny * $grid_d), 1 + ( $x * $grid_d), $cell_size, $cell_size );
-                }
+                $dc->SetPen( $pen[$grid->[$y][$x]] );
+                $dc->SetBrush( $brush[$grid->[$y][$x]] );
+                my ($nx, $ny) = ($self->{'cells'}{'x'} - 1 - $x, $self->{'cells'}{'y'} - 1 - $y);
+                $dc->DrawRectangle( 1 + ( $x * $grid_d), 1 + ( $y * $grid_d), $cell_size, $cell_size );
+                $dc->DrawRectangle( 1 + ($nx * $grid_d), 1 + ($ny * $grid_d), $cell_size, $cell_size );
+                $dc->DrawRectangle( 1 + ( $y * $grid_d), 1 + ($nx * $grid_d), $cell_size, $cell_size );
+                $dc->DrawRectangle( 1 + ($ny * $grid_d), 1 + ( $x * $grid_d), $cell_size, $cell_size );
             }
         }
     } else {
-        for my $x (0 .. $self->{'cells'}{'x'} - 1){
-            for my $y (0 .. $self->{'cells'}{'y'} - 1) {
-                if ($grid->[$y][$x]){
-                    $dc->SetPen( $pen[$grid->[$y][$x]] );
-                    $dc->SetBrush( $brush[$grid->[$y][$x]] );
-                    $dc->DrawRectangle( 1 + ($x * $grid_d), 1 + ($y * $grid_d), $cell_size, $cell_size );
-                }
+        for my $y (0 .. ($sketch_length ? $sketch_length : $self->{'cells'}{'y'} - 1)) {
+            for my $x (0 .. $self->{'cells'}{'x'} - 1){
+                $dc->SetPen( $pen[$grid->[$y][$x]] );
+                $dc->SetBrush( $brush[$grid->[$y][$x]] );
+                $dc->DrawRectangle( 1 + ($x * $grid_d), 1 + ($y * $grid_d), $cell_size, $cell_size );
             }
         }
     }
     delete $self->{'data'}{'new'};
+    delete $self->{'data'}{'sketch'};
     $dc;
 }
 
@@ -172,7 +172,7 @@ sub save_file {
     my( $self, $file_name, $width, $height ) = @_;
     my $file_end = lc substr( $file_name, -3 );
     if ($file_end eq 'svg') { $self->save_svg_file( $file_name, $width, $height ) }
-    elsif ($file_end eq 'png' or $file_end eq 'jpg') { $self->save_bmp_file( $file_name, $file_end, $width, $height ) } 
+    elsif ($file_end eq 'png' or $file_end eq 'jpg') { $self->save_bmp_file( $file_name, $file_end, $width, $height ) }
     else { return "unknown file ending: '$file_end'" }
 }
 

@@ -54,15 +54,8 @@ test_getargs(meta=>$meta, argv=>[qw/--foo bar/], error=>1,
 test_getargs(meta=>$meta, argv=>['--arg1', '{"foo":0}',
                                '--arg2', '',
                                '--arg5', '{"foo":0}'],
-           args=>{arg1=>'{"foo":0}', arg2=>'', arg5=>{foo=>0}},
-           name=>"json parsing, done on nonscalars");
-test_getargs(meta=>$meta,
-             argv=>[
-                 '--arg1', 's', '--arg2', 's',
-                 '--arg5', '{"true":true,"false":false}',
-             ],
-             args=>{arg1=>"s", arg2=>"s", arg5=>{true=>1, false=>0}},
-             name=>"json true/false");
+           args=>{arg1=>'{"foo":0}', arg2=>'', arg5=>'{"foo":0}'},
+           name=>"json parsing now not done");
 
 subtest yaml => sub {
     plan skip_all => 'YAML modules not available'
@@ -71,13 +64,8 @@ subtest yaml => sub {
     test_getargs(meta=>$meta, argv=>['--arg1', '{foo: 0}',
                                      '--arg2', '',
                                      '--arg5', '{foo: 0}'],
-                 args=>{arg1=>'{foo: 0}', arg2=>'', arg5=>{foo=>0}},
-                 name=>"yaml parsing, done on nonscalars");
-    test_getargs(meta=>$meta, argv=>['--arg1', '{"foo": 0}',
-                                     '--arg2', '',
-                                     '--arg5', '{foo: 0'],
-                 error=>1,
-                 name=>"yaml+json syntax error");
+                 args=>{arg1=>'{foo: 0}', arg2=>'', arg5=>'{foo: 0}'},
+                 name=>"yaml parsing now not done");
 };
 
 subtest "nonscalar argv" => sub {

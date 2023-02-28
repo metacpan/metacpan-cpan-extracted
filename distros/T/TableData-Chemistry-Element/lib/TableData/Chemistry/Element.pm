@@ -5,8 +5,9 @@ use utf8;
 
 use Role::Tiny::With;
 with 'TableDataRole::Source::CSVInDATA';
+with 'TableDataRole::Spec::TableDef';
 
-sub get_table_spec {
+sub get_table_def {
     return +{
         fields => {
             atomic_number => {pos=>0, schema=>'posint*'},
@@ -32,9 +33,9 @@ sub get_table_spec {
 }
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-12'; # DATE
+our $DATE = '2023-02-24'; # DATE
 our $DIST = 'TableData-Chemistry-Element'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %STATS = ("num_columns",17,"num_rows",118); # STATS
 
@@ -51,7 +52,7 @@ TableData::Chemistry::Element - Chemical elements
 
 =head1 VERSION
 
-This document describes version 0.003 of TableData::Chemistry::Element (from Perl distribution TableData-Chemistry-Element), released on 2023-02-12.
+This document describes version 0.004 of TableData::Chemistry::Element (from Perl distribution TableData-Chemistry-Element), released on 2023-02-24.
 
 =head1 SYNOPSIS
 
@@ -94,7 +95,7 @@ See the L<tabledata> CLI's documentation for other available actions and options
 
 The statistics is available in the C<%STATS> package variable.
 
-=for Pod::Coverage ^(get_table_spec)$
+=for Pod::Coverage ^(get_table_def)$
 
 =head1 HOMEPAGE
 

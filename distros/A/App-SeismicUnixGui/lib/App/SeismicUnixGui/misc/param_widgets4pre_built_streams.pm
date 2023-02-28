@@ -434,7 +434,7 @@ sub local_update_check_button_setting {
 
 			$on_off[$idx] = $on;
 
-			# print("1.11.23 1 param_widgets,local_update_check_button_setting, index: $idx value: $values[$idx]\n");
+			print("1.11.23 1 param_widgets,local_update_check_button_setting, index: $idx value: $values[$idx]\n");
 
 		}
 		elsif ( $values[$idx] eq '0.0' ) {

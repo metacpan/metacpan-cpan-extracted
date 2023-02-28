@@ -36,39 +36,68 @@ use Moose;
 our $VERSION = '0.0.1';
 
 use Cwd;
-use Shell qw(echo);
+use Shell qw(echo find);
 
-my $C_PATH;
+my $C_pathNfile;
 my $SeismicUnixGui;
-my $ans 	= 'n';
-my $path;
+my $ans            = 'n'."\n";
+my $default_answer = 'y';
+my $choice         = 1;
+my $repeat         = 1;
 
-# important variables defined
-my $local_dir = getcwd;
+# search for c libraries
+my $starting_point = '/';
+my $file           = 'run_me_only.sh';
+my $pathNfile2find = "*c/synseis/$file";
 
-$C_PATH 	= $local_dir.'/blib/lib/App/SeismicUnixGui'.'/'.'c/synseis';
-print("\n\tINSTALLATION OF C PROGRAMS\n");
-print("\nC_PATH=$C_PATH\n");
-print("\nDo you want to compile C standalone program? (y/n)\n");
-$ans = <STDIN>;
-chomp $ans;
+print(" Looking for script on the system...\n");
 
-if ( ( $ans eq 'N' ) or ( $ans eq 'n' ) ) {
+my @list   = `(find $starting_point -path $pathNfile2find -print 2>/dev/null)`;
+my $length = scalar @list;
 
-	print("\nOK, your answer is no.  Bye!\n");
-	exit;
+print(" Found $length versions of the script: \(Hint: use one with the \"perl\" in path\)\n");
+
+for ( my $i = 0 ; $i < $length ; $i++ ) {
+
+	print("Case $i: $list[$i]\n");
 
 }
-elsif ( ( $ans eq 'Y' ) or ( $ans eq 'y' ) ) {
+
+while ($ans eq 'n'."\n") {
 	
-	print "\nOK, Proceeding to compile\n";
-	system("cd $C_PATH; bash run_me_only.sh ");
-	
-}
-else {
-	print("post_installation_c_compile.pl, unexpected answer\n");
+	print("\nEnter a script name (with Full Path),\n or use the default:$list[0]\n");
+	print("Enter a different name or only Hit Return\n");
+	my $answer = <STDIN>;
+	chomp $answer;
+
+	if ( length $answer ) {
+		
+		$C_pathNfile = $answer;
+		
+	}
+	elsif ( !( length $answer ) ) {
+		
+		$C_pathNfile = $list[0];
+		
+	}
+
+	print("You chose: $C_pathNfile\n");
+	print("Is that correct? Please answer y or n  [$default_answer]\n");
+	$ans = <STDIN>;
+	chomp $ans;
 }
 
-print("Hit Enter to continue\n");
+my $path = $C_pathNfile; 
+$path =~ s/$file//;
+chomp $path;
+print("path and file: $path$file\n");
+
+print("\n\tINSTALLATION OF EXTERNAL C PROGRAMS\n");
+print("\nC_PATH=$C_pathNfile\n");
+
+print "Proceeding to compile\n";
+chdir "$path";
+system("bash $file");
+
+print("Hit Enter to leave\n");
 <STDIN>
-

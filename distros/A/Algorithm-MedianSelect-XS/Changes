@@ -1,5 +1,11 @@
 Revision history for Perl extension Algorithm::MedianSelect::XS.
 
+0.23  2023-02-23  <schubiger@cpan.org>
+
+ - Move testing module to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.22  2021-04-06  <schubiger@cpan.org>
 
  - Merged development version to stable.

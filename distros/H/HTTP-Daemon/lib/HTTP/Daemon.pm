@@ -1,11 +1,11 @@
-package HTTP::Daemon; # git description: v6.14-30-gd7c9267
+package HTTP::Daemon; # git description: v6.15-4-gbab5825
 
 # ABSTRACT: A simple http server class
 
 use strict;
 use warnings;
 
-our $VERSION = '6.15';
+our $VERSION = '6.16';
 
 use Socket ();
 use IO::Socket::IP;
@@ -631,7 +631,7 @@ HTTP::Daemon - A simple http server class
 
 =head1 VERSION
 
-version 6.15
+version 6.16
 
 =head1 SYNOPSIS
 

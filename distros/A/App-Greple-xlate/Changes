@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.09 2023-02-27T09:47:19Z
+
+    - introduce --xlate-labor option
+    - introduce --refresh option
+    - make docs directory and multilingual READMEs
+
 0.08 2023-02-21T14:30:17Z
 
     - introduce docs/ directory

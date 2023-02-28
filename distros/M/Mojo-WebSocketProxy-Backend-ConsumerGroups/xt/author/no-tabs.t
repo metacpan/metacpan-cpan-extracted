@@ -8,14 +8,11 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Mojo/WebSocketProxy/Backend/ConsumerGroups.pm',
-    'lib/Mojo/WebSocketProxy/Backend/ConsumerGroups.pod',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/26-rpc-queue-unit.t',
-    't/rc/perlcriticrc',
-    't/rc/perltidyrc',
     'xt/author/critic.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',

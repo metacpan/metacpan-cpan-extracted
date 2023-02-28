@@ -1,0 +1,45 @@
+==== version history of Math::Formula
+
+All changes made by Mark Overmeer, unless explicitly stated otherwise.
+
+version 0.13: Mon 27 Feb 13:32:48 CET 2023
+
+	Fixes:
+	- require 5.16 for fc().
+	- require DateTime::Format::Duration::ISO8601 >= 0.006 [Slaven Rezic]
+
+	Improvements:
+	- implement config INI save and load
+	- booleans created from Perl condition undef or ''
+	- implement MF::STRING with reference
+	- implement ::Context(lead_expression)
+
+version 0.12: Sun 26 Feb 10:10:29 CET 2023
+
+	Fixes:
+	- typo in module description
+	- forgot to include some tests in MANIFEST
+
+	Improvements:
+	- attributes of Frasgment (Context) start with 'ctx_'
+	- prefix operator 'exists' on names.
+	- attribute 'is_empty' on strings.
+	- implement ? :
+	- implemented // for names
+	- implemented config save
+
+version 0.11: Sat Feb 25 12:41:37 CET 2023
+
+	Fixes:
+	- module name registrations for PAUSE.
+	- handle accidental MF::REGEXP on 'like'.
+	- ::Type::new() did not appear in the docs.
+	- nested fragments now work.
+	- aliasing of fragments, attributes, formulas.
+
+	Improvements:
+	- warn when trying to convert qr to pattern.
+	- textual corrections seen on metacpan.
+
+version 0.10: Fri 24 Feb 15:08:56 CET 2023
+	- initial release, for final documentation clean-ups, to test pause etc.

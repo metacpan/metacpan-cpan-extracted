@@ -20,14 +20,14 @@ on 'runtime' => sub {
     requires 'File::Temp';
     requires 'Getopt::Long';
     requires 'HTML::Entities';
-    requires 'HTML::HeadParser';
+    requires 'HTML::HeadParser' => '3.71';
     requires 'HTTP::Cookies' => '6';
     requires 'HTTP::Date' => '6';
     requires 'HTTP::Negotiate' => '6';
-    requires 'HTTP::Request' => '6';
-    requires 'HTTP::Request::Common' => '6';
-    requires 'HTTP::Response' => '6';
-    requires 'HTTP::Status' => '6.07';
+    requires 'HTTP::Request' => '6.18';
+    requires 'HTTP::Request::Common' => '6.18';
+    requires 'HTTP::Response' => '6.18';
+    requires 'HTTP::Status' => '6.18';
     requires 'IO::Select';
     requires 'IO::Socket';
     requires 'LWP::MediaTypes' => '6';
@@ -58,6 +58,7 @@ on 'test' => sub {
 on 'develop' => sub {
     requires 'Authen::NTLM' => '1.02';
     requires 'Pod::Coverage::TrustPod';
+    requires 'Pod::Spell' => '1.25';
     requires 'Test::EOL' => '2.00';
     requires 'Test::LeakTrace' => '0.16';
     requires 'Test::MinimumVersion';

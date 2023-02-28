@@ -6,11 +6,11 @@ package App::GUI::Cellgraph::Widget::ColorDisplay;
 use base qw/Wx::Panel/;
 
 sub new {
-    my ( $class, $parent, $x, $y, $init  ) = @_;
+    my ( $class, $parent, $x, $y, $nr, $init  ) = @_;
     return unless ref $init eq 'HASH' and exists $init->{'red'} and exists $init->{'green'}and exists $init->{'blue'};
-    
+
     my $self = $class->SUPER::new( $parent, -1, [-1,-1], [$x, $y]);
-  
+
     Wx::Event::EVT_PAINT( $self, sub {
         my( $cpanel, $event ) = @_;
         return unless exists $self->{'blue'} and exists $self->{'red'} and exists $self->{'green'};
@@ -20,6 +20,7 @@ sub new {
         $dc->Clear();
     } );
     $self->{'init'} = $init;
+    $self->{'nr'} = $nr;
     $self->set_color( $init );
     $self;
 }
@@ -27,8 +28,10 @@ sub new {
 sub init {
     my ($self) = @_;
     $self->set_color( $self->{'init'} );
-}    
-    
+}
+
+sub get_nr { $_[0]->{'nr'} }
+
 sub set_color {
     my ( $self, $color ) = @_;
     return unless ref $color eq 'HASH' and exists $color->{'red'} and exists $color->{'green'} and exists $color->{'blue'};
@@ -38,7 +41,7 @@ sub set_color {
 
 sub get_color {
     my ( $self ) = @_;
-    { 
+    {
         red   => $self->{'red'},
         green => $self->{'green'},
         blue  => $self->{'blue'},

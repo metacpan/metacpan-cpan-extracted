@@ -1,0 +1,12 @@
+Changes
+lib/File/Meta/Cache.pm
+lib/File/Meta/Cache.pod
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+t/File-Meta-Cache.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

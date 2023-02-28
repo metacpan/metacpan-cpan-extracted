@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -47,9 +47,9 @@ sub prompt_yn {
 	my ($description, $default) = @_;
 	my $result;
 	do {
-		$result = prompt("$description [y/n]", $default);
+		$result = prompt("$description [y/n]", $default ? 'y' : 'n');
 	} while (length $result and $result !~ /^(y|n|-)/i);
-	return lc substr $result, 0 , 1;
+	return lc(substr $result, 0 , 1) eq 'y';
 }
 
 sub create_license_for {
@@ -71,6 +71,7 @@ sub write_module {
 	my $content = fill_in($template, \%opts);
 	mkpath(dirname($filename));
 	write_text($filename, $content);
+	return $filename;
 }
 
 sub write_changes {
@@ -91,11 +92,6 @@ sub write_readme {
 	my %opts = @_;
 	my $template = get_data_section('README');
 	write_text('README', fill_in($template, \%opts));
-}
-
-sub get_config_file {
-	local $HOME = $USERPROFILE if $^O eq 'MSWin32';
-	return catfile(glob('~'), qw/.mbtiny conf/);
 }
 
 sub read_json {
@@ -121,17 +117,109 @@ sub bump_versions {
 	$app->rewrite_versions($new_version, is_trial => $trial);
 }
 
+sub regenerate {
+	my ($files, $config, %opts) = @_;
+	my %files = map { $_ => 1 } @{$files};
+	my @dirty = @{$files};
+
+	if ($opts{bump}) {
+		bump_versions(%opts);
+		$files{'Changes'}++;
+		push @dirty, 'Changes';
+	}
+
+	my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
+	my @generated = grep { $files{$_} } $dist->files;
+	for my $filename (@generated) {
+		say "Updating $filename" if $opts{verbose};
+		write_binary($filename, $dist->get_file($filename)) if !$opts{dry_run};
+	}
+
+	if ($opts{commit}) {
+		require Git::Wrapper;
+		my $git = Git::Wrapper->new('.');
+		if ($opts{bump}) {
+			push @dirty, 'lib';
+			push @dirty, 'script' if -d 'script';
+		}
+		my $allowed = join '|', map qr{^\Q$_\E$}, @dirty;
+		my @modified = grep /$allowed/, $git->ls_files({ modified => 1 });
+
+		if (@modified) {
+			my @changes = $dist->get_changes;
+			my $version = 'v' . $dist->version;
+			my $message = $opts{message} || ($opts{bump} ? join '', $version, "\n\n", @changes : 'Regenerate');
+			$git->commit({ m => $message }, @dirty);
+		} else {
+			say "No modifications to commit";
+		}
+	}
+}
+
 my %prompt_for = (
 	open => \&prompt,
 	yn => \&prompt_yn,
 );
 
 my @config_items = (
-	[ 'author'  , 'What is the author\'s name?', 'open' ],
-	[ 'email'   , 'What is the author\'s email?', 'open',  ],
-	[ 'license' , 'What license do you want to use?', 'open', 'Perl_5' ],
-	[ 'auto_git', 'Do you want mbtiny to automatically handle git for you?', 'yn' ],
+	[ 'author'   , 'What is the author\'s name?', 'open' ],
+	[ 'email'    , 'What is the author\'s email?', 'open',  ],
+	[ 'license'  , 'What license do you want to use?', 'open', 'Perl_5' ],
+	[ 'auto_git' , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
+	[ 'auto_bump', 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
+	[ 'auto_scan', 'Do you want mbtiny to automatically scan dependencies for you?', 'yn', !!1 ],
 );
+
+sub ask {
+	my ($config, $item, $local_default) = @_;
+	my ($key, $description, $type, $global_default) = @{$item};
+	my $value = $prompt_for{$type}->($description, $local_default // $global_default);
+
+	if ($value ne '-') {
+		$config->{$key} = $type eq 'open' ? $value : $value ? $JSON::PP::true : $JSON::PP::false;
+	}
+	else {
+		delete $config->{$key};
+	}
+}
+
+sub list_item {
+	my ($config, $key, $type) = @_;
+	my $value = defined $config->{$key} ? $type eq 'open' ? $config->{$key} : $config->{$key} ? 'true' : 'false' : '(undefined)';
+	say "\u$key: $value";
+}
+
+sub get_settings_file {
+	local $HOME = $USERPROFILE if $^O eq 'MSWin32';
+	return catfile(glob('~'), qw/.mbtiny conf/);
+}
+
+sub get_settings {
+	my $settings_file = get_settings_file;
+	my $settings = -f $settings_file ? read_json($settings_file) : {};
+	for my $item (@config_items) {
+		my ($key, $description, $type, $default) = @{$item};
+		next unless exists $settings->{$key};
+		next unless $type eq 'yn';
+		$settings->{$key} = !!$settings->{$key};
+	}
+	return $settings;
+}
+
+my $config_file = 'dist.json';
+
+sub get_config {
+	my $config = -f $config_file ? read_json($config_file) : {};
+	for my $item (@config_items) {
+		my ($key, $description, $type, $default) = @{$item};
+		next unless exists $config->{$key};
+		next unless $type eq 'yn';
+		$config->{$key} = !!$config->{$key};
+	}
+	return $config;
+}
+
+my @regenerate_files = qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
 
 my %actions = (
 	dist => sub {
@@ -139,19 +227,16 @@ my %actions = (
 		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
 		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
-		$dist->check_changes;
-		$dist->check_meta;
-		my $name = $dist->meta->name . '-' . $dist->meta->version;
-		printf "tar czf $name.tar.gz %s\n", join ' ', $dist->files if $opts{verbose};
-		$dist->write_tarball($name);
+		$dist->preflight_check(%opts);
+		printf "tar czf %s.tar.gz %s\n", $dist->fullname, join ' ', $dist->files if $opts{verbose};
+		$dist->write_tarball($dist->fullname);
 		return 0;
 	},
 	distdir => sub {
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
-		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
-		$dist->write_dir($dist->meta->name . '-' . $dist->meta->version, $opts{verbose});
+		$dist->write_dir($dist->fullname, $opts{verbose});
 		return 0;
 	},
 	test => sub {
@@ -172,23 +257,18 @@ my %actions = (
 	},
 	upload => sub {
 		my @arguments = @_;
-		my $config_file = get_config_file();
-		my $config = -f $config_file ? read_json($config_file) : {};
-		my $auto_git = ($config->{auto_git} // 'n') eq 'y';
-		my %opts = $auto_git ? (tag => 1, push => '') : ();
+		my $config = get_config;
+		my %opts = $config->{auto_git} ? (tag => 1, push => '') : ();
 		GetOptionsFromArray(\@arguments, \%opts, qw/trial config=s silent tag! push:s nopush|no-push/) or return 2;
 
 		my $dist = App::ModuleBuildTiny::Dist->new;
-		$dist->check_changes;
-		$dist->check_meta;
+		$dist->preflight_check(%opts);
 		local ($AUTHOR_TESTING, $RELEASE_TESTING) = (1, 1);
 		$dist->run(command => [ catfile(curdir, 'Build'), 'test' ], build => 1, verbose => !$opts{silent}) or return 1;
 
 		my $sure = prompt_yn('Do you want to continue the release process?', 'n');
-		if ($sure eq 'y') {
-			my $trial =  $dist->release_status eq 'testing' && $dist->version !~ /_/;
-			my $name = $dist->meta->name . '-' . $dist->meta->version . ($trial ? '-TRIAL' : '' );
-			my $file = $dist->write_tarball($name);
+		if ($sure) {
+			my $file = $dist->write_tarball($dist->fullname);
 			require CPAN::Upload::Tiny;
 			CPAN::Upload::Tiny->VERSION('0.009');
 			my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($opts{config});
@@ -257,44 +337,17 @@ my %actions = (
 	},
 	regenerate => sub {
 		my @arguments = @_;
-		my $config_file = get_config_file();
-		my $config = -f $config_file ? read_json($config_file) : {};
-		GetOptionsFromArray(\@arguments, \my %opts, qw/trial bump version=s verbose dry_run|dry-run commit!/) or return 2;
-		$opts{commit} //= $opts{bump} if ($config->{auto_git} // '') eq 'y';
-		my %files = map { $_ => 1 } @arguments ? @arguments : qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
+		my $config = get_config;
+		my %opts = (
+			bump   => $config->{auto_bump},
+			commit => $config->{auto_git},
+			scan   => $config->{auto_scan},
+		);
+		GetOptionsFromArray(\@arguments, \%opts, qw/trial bump! version=s verbose dry_run|dry-run commit! scan! message=s/) or return 2;
+		my @files = @arguments ? @arguments : @regenerate_files;
 
-		if ($opts{bump}) {
-			bump_versions(%opts);
-			$files{Changes}++;
-		}
+		regenerate(\@files, $config, %opts);
 
-		my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
-		my @generated = grep { $files{$_} } $dist->files;
-		for my $filename (@generated) {
-			say "Updating $filename" if $opts{verbose};
-			write_binary($filename, $dist->get_file($filename)) if !$opts{dry_run};
-		}
-
-		if ($opts{commit}) {
-			require Git::Wrapper;
-			my $git = Git::Wrapper->new('.');
-			my @files = keys %files;
-			if ($opts{bump}) {
-				push @files, 'lib';
-				push @files, 'script' if -d 'script';
-			}
-			my $allowed = join '|', map qr{^\Q$_\E$}, @files;
-			my @modified = grep /$allowed/, $git->ls_files({ modified => 1 });
-
-			if (@modified) {
-				my @changes = $dist->get_changes;
-				my $version = 'v' . $dist->version;
-				my $message = join '', $version, "\n\n", @changes;
-				$git->commit({ m => $message }, @files);
-			} else {
-				say "No modifications to commit";
-			}
-		}
 		return 0;
 	},
 	scan => sub {
@@ -306,44 +359,70 @@ my %actions = (
 		write_json('prereqs.json', $prereqs->as_string_hash);
 		return 0;
 	},
-	configure => sub {
+	setup => sub {
 		my @arguments = @_;
-		my $config_file = get_config_file();
+		my $config_file = get_settings_file();
+		my $config = -f $config_file ? read_json($config_file) : {};
 
 		my $mode = @arguments ? $arguments[0] : 'upgrade';
 
-		my $save = sub {
-			my ($config, $key, $value) = @_;
-			if (length $value and $value ne '-') {
-				$config->{$key} = $value;
-			}
-			else {
-				delete $config->{$key};
-			}
-		};
 		if ($mode eq 'upgrade') {
-			my $config = -f $config_file ? read_json($config_file) : {};
 			for my $item (@config_items) {
-				my ($key, $description, $type, $default) = @{$item};
-				next if defined $config->{$key};
-				$save->($config, $key, $prompt_for{$type}->($description, $default));
+				next if defined $config->{ $item->[0] };
+				ask($config, $item);
 			}
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'all') {
-			my $config = -f $config_file ? read_json($config_file) : {};
 			for my $item (@config_items) {
-				my ($key, $description, $type, $default) = @{$item};
-				my $new_value = $prompt_for{$type}->($description, $config->{$key} // $default);
-				$save->($config, $key, $new_value);
+				ask($config, $item, $config->{ $item->[0] });
 			}
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'list') {
-			my $config = -f $config_file ? read_json($config_file) : {};
 			for my $item (@config_items) {
 				my ($key, $description, $type, $default) = @{$item};
-				printf "%s: %s\n", ucfirst $key, $config->{$key} // '(undefined)';
+				list_item($config, $key, $type);
+			}
+		}
+		elsif ($mode eq 'reset') {
+			return not unlink $config_file;
+		}
+		return 0;
+	},
+	config => sub {
+		my @arguments = @_;
+		my $settings = get_settings;
+		my $config = get_config;
+
+		my $mode = @arguments ? $arguments[0] : 'upgrade';
+
+		my @items = grep { $_->[2] ne 'open' } @config_items;
+		if ($mode eq 'upgrade') {
+			for my $item (@items) {
+				next if defined $config->{ $item->[0] };
+				ask($config, $item, $settings->{ $item->[0] });
+			}
+			write_json($config_file, $config);
+		}
+		elsif ($mode eq 'all') {
+			for my $item (@items) {
+				my $default = $config->{ $item->[0] } // $settings->{ $item->[0] };
+				ask($config, $item, $default);
+			}
+			write_json($config_file, $config);
+		}
+		elsif ($mode eq 'copy') {
+			for my $item (@items) {
+				my ($key) = @{$item};
+				$config->{$key} = $settings->{$key} if exists $settings->{$key};
+			}
+			write_json($config_file, $config);
+		}
+		elsif ($mode eq 'list') {
+			for my $item (@items) {
+				my ($key, $description, $type, $default) = @{$item};
+				list_item($config, $key, $type);
 			}
 		}
 		elsif ($mode eq 'reset') {
@@ -354,24 +433,30 @@ my %actions = (
 	mint => sub {
 		my @arguments = @_;
 
-		my $config_file = get_config_file();
-		my $config = -f $config_file ? read_json($config_file) // {} : {};
+		my $settings = get_settings;
 
 		my $distname = decode_utf8(shift @arguments // die "No distribution name given\n");
 		die "Directory $distname already exists\n" if -e $distname;
 
 		my %args = (
-			%{ $config },
-			version => '0.001',
-			dirname => $distname,
+			author   => $settings->{author},
+			email    => $settings->{email},
+			license  => $settings->{license},
+			version  => '0.000',
+			dirname  => $distname,
 			abstract => 'INSERT YOUR ABSTRACT HERE',
+			init_git => $settings->{auto_git},
 		);
-		GetOptionsFromArray(\@arguments, \%args, qw/author=s email=s license=s version=s abstract=s dirname=s/) or return 2;
+		my %config;
+		GetOptionsFromArray(\@arguments, \%args, qw/author=s email=s license=s version=s abstract=s dirname=s init_git|init-git/) or return 2;
 		for my $item (@config_items) {
 			my ($key, $description, $type, $default) = @{$item};
-			next if $type ne 'open'; # may need a field of its own
-			next if defined $args{$key};
-			$args{$key} = prompt($description, $default);
+			if ($type eq 'open') {
+				$args{$key} //= prompt($description, $default);
+			}
+			else {
+				$config{$key} = $settings->{$key} // prompt($description, $default);
+			}
 		}
 
 		my $license = create_license_for(delete $args{license}, $args{author});
@@ -380,10 +465,20 @@ my %actions = (
 		chdir $args{dirname};
 		$args{module_name} = $distname =~ s/-/::/gr;
 
-		write_module(%args, notice => $license->notice);
-		write_text('LICENSE', $license->fulltext);
+		my $module_file = write_module(%args, notice => $license->notice);
 		write_changes(%args, distname => $distname);
 		write_maniskip($distname);
+		write_json('dist.json', \%config);
+
+		regenerate(\@regenerate_files, \%args, scan => 1);
+
+		if ($args{init_git}) {
+			require Git::Wrapper;
+			my $git = Git::Wrapper->new('.');
+			$git->init;
+			$git->add(@regenerate_files, 'Changes', 'MANIFEST.SKIP', 'dist.json', $module_file);
+			$git->commit({ message => 'Initial commit' });
+		}
 
 		return 0;
 	},
@@ -453,7 +548,6 @@ __DATA__
 @@ Changes
 Revision history for {{ $distname }}
 
-{{ $version }}
           - Initial release to an unsuspecting world
 
 @@ Module.pm

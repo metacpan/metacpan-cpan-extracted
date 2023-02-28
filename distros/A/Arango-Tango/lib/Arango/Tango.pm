@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.016';
+$Arango::Tango::VERSION = '0.019';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -191,7 +191,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSYS
 
@@ -209,7 +209,7 @@ version 0.016
 
 The module is B<VERY> incomplete. It is being written accordingly with my 
 personal needs. While I tried L<ArangoDB2> it didn't work out of the box as I expected,
-and decided to write a simple strightforward solution.
+and decided to write a simple straightforward solution.
 
 Patches and suggestions are B<VERY> welcome.
 
@@ -528,7 +528,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2022 by Alberto Simões.
+This software is copyright (c) 2019-2023 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
