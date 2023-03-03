@@ -132,9 +132,15 @@ The list of some CPAN modules. All CPAN modules are yet experimental status.
 
 =item * L<File::Basename|SPVM::File::Basename>
 
-=item * L<File::Spec|SPVM::File::Spec>
+=item * L<File::Copy|SPVM::File::Copy>
+
+=item * L<File::Glob|SPVM::File::Glob>
+
+=item * L<File::Path|SPVM::File::Path>
 
 =item * L<File::Spec|SPVM::File::Spec>
+
+=item * L<File::Temp|SPVM::File::Temp>
 
 =item * L<FindBin|SPVM::FindBin>
 
@@ -155,6 +161,8 @@ The list of some CPAN modules. All CPAN modules are yet experimental status.
 =item * L<MIME::QuotedPrint|SPVM::MIME::QuotedPrint>
 
 =item * L<Regex|SPVM::Regex>
+
+=item * L<Resource::RE2|SPVM::Resource::RE2>
 
 =item * L<Resource::Re2::V2022_06_01|SPVM::Resource::Re2::V2022_06_01>
 

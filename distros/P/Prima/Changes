@@ -1,6 +1,6 @@
 Revision history for Perl module Prima
 
-1.68 2023-XX-XX
+1.68 2023-02-25
  - Process signals inside event loop
  - Add sys::GUIException, onDie, and a standard dialog for user interactions on exceptions
  - Widget.onMouseClick.dblclick::bool is .nth::int now, can report triple, quadruple etc clicks
@@ -9,6 +9,9 @@ Revision history for Perl module Prima
  - Remove native Win32 support from cygwin builds
  - File.onRead supports native Win32 console stdin event
  - Support XIM input
+ - Win32: fix local non-latin months/days of week names in Calendar
+ - Win32: fix IME input
+ - Add Prima::sys::AnyEvent - same as AnyEvent::Impl::Prima bridge but now in the core
 
 1.67 2022-11-27
  - Links and tooltips extended functionality:

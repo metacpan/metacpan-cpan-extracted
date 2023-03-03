@@ -11,7 +11,19 @@ Math::Formula::Config::JSON - load/save formulas to file
 
 =head1 SYNOPSIS
 
+  my $context = Math::Formula::Content->new(name => 'test');
+  my $config = Math::Formula::Config::INI->JSON(directory => $dir);
+
+  $config->save($context);
+  my $context = $config->load('test');
+
 =head1 DESCRIPTION
+
+Save and load a L<Math::Formula::Context|Math::Formula::Context> to JSON files.
+
+You need to have installed B<Cpanel::JSON::XS>.  That module is not in the
+dependencies of this packages, because we do not want to add complications
+to the main code.
 
 Extends L<"DESCRIPTION" in Math::Formula::Config|Math::Formula::Config/"DESCRIPTION">.
  
@@ -55,7 +67,16 @@ Extends L<"Actions" in Math::Formula::Config|Math::Formula::Config/"Actions">.
 
 =item $obj-E<gt>B<load>($name, %options)
 
-Inherited, see L<Math::Formula::Config/"Actions">
+Load a L<Math::Formula::Context|Math::Formula::Context> for a yml file.
+
+ -Option  --Default
+  filename  <directory/$name.yml>
+
+=over 2
+
+=item filename => FILENAME
+
+=back
 
 =item $obj-E<gt>B<save>($context, %args)
 
@@ -75,10 +96,37 @@ Save under a different filename than derived from the name of the context.
 
 =back
 
+=head1 DETAILS
+
+JSON seems to be everyone's favorit serialization syntax, nowadays.  It natively
+supports integers, floats, booleans, and strings.  Formulas get a leading '='
+(not yet configurable).
+
+B<. Example>
+
+{
+   "created" : "2023-02-28T16:30:27+0000",
+   "formulas" : {
+      "expr1" : "=1 + 2 * 3",
+      "expr2" : "=\"abc\".size + 3k; returns='MF::INTEGER'",
+      "fakes" : false,
+      "float" : 3.14,
+      "int" : 42,
+      "longer" : "abc def yes no",
+      "no_quotes" : "abc",
+      "some_truth" : true,
+      "string" : "true"
+   },
+   "mf_version" : "",
+   "name" : "test",
+   "updated" : "2023-02-28T16:30:27+0000",
+   "version" : 1.0
+}
+
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.13,
-built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.14,
+built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

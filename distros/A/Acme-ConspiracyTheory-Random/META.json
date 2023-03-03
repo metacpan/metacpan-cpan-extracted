@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-ConspiracyTheory-Random",
    "no_index" : {
@@ -51,7 +51,7 @@
    "provides" : {
       "Acme::ConspiracyTheory::Random" : {
          "file" : "lib/Acme/ConspiracyTheory/Random.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -70,11 +70,11 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/project"
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_provides_scripts" : {
       "conspire" : {
          "file" : "bin/conspire"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

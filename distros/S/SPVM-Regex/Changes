@@ -1,3 +1,8 @@
+0.20 2023-03-01
+  [Prerequirement Changes]
+    * SPVM::Resource::RE2 0.01 is required.
+    * SPVM::Unicode is no more required.
+    * SPVM::Resource::Re2::V2022_06_01 is no more required.
 0.19 2023-02-08
   [Prerequirement Changes]
     * SPVM 0.9691+ is needed.

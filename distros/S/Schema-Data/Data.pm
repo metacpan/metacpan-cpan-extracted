@@ -8,7 +8,7 @@ use English;
 use Error::Pure qw(err);
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub new {
 	my ($class, @params) = @_;
@@ -262,12 +262,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

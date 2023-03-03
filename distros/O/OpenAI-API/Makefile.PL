@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More'             => '0',
+        'Test::Deep'             => '0',
         'Test::Exception'        => '0',
         'Test::RequiresInternet' => '0',
     },
@@ -26,6 +27,19 @@ my %WriteMakefileArgs = (
         'namespace::clean'     => '0.27',
         'strictures'           => '2.000006',
         'Types::Standard'      => '2.002001',
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/nferraz/perl-openai-api.git',
+                web  => 'https://github.com/nferraz/perl-openai-api',
+            },
+            bugtracker => {
+                web => 'https://github.com/nferraz/perl-openai-api/issues',
+            },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'OpenAI-API-*' },

@@ -11,8 +11,17 @@ t/20-new.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
+t/links.t
+t/no404s.t
 t/noplan.t
+t/pod-cm.t
+t/pod-coverage.t
+t/pod-snippets.t
 t/pod-spelling.t
+t/pod.t
+t/port.t
+t/strict.t
+t/unused.t
 t/weather.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

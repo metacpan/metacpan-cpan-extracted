@@ -4,7 +4,7 @@ StreamFinder::Vimeo - Fetch actual raw streamable URLs from Vimeo.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -249,9 +249,10 @@ Options specified here override any specified in I<~/.config/StreamFinder/config
 Among options valid for Vimeo videos are the I<-vimeo_quality> 
 option, which can be set to a "p" number optionally preceeded by 
 a relational operator ("<", ">", "=") - default: "<".  This limits 
-the video quality.. For example:  "720" would mean select a stream 
+the video quality.  For example:  "720" would mean select a stream 
 "<= 720p", ">720" would mean ">= 720p", and "=1080" would mean "only 
-"1080p".  This can be overridden with the I<-quality> argument to 
+"1080p".  NOTE:  The "<" and ">" are "inclusive", actually meaning "<=" and 
+">=" respectively!  This can be overridden with the I<-quality> argument to 
 the new() function.  Also, various youtube-dl (L<StreamFinder::Youtube>) 
 configuration options, namely I<format>, I<formatonly>, I<youtube-dl-args>, 
 and I<youtube-dl-add-args> can be overridden here by specifying 
@@ -326,7 +327,7 @@ L<http://search.cpan.org/dist/StreamFinder-Vimeo/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -397,7 +398,7 @@ sub new
 		}
 	}
 
-	print STDERR "-0(Vimeo): URL=$url=\n"  if ($DEBUG);
+	print STDERR "-0(Vimeo): URL=$url= quality=".$self->{'vimeo_quality'}."=\n"  if ($DEBUG);
 	if ($url =~ m#^https?\:#) {
 		$self->{'id'} = $1  if ($url =~ m#\/([^\/]+)\/?$#);
 		$self->{'id'} =~ s/[\?\&].*$//;
@@ -428,8 +429,23 @@ sub new
 		}
 	}
 	$html =~ s/\\\"/\&quot\;/gs;
-	$self->{'title'} = ($html =~ m#\<title\>([^\<]+)#) ? $1 : '';
-	$self->{'imageurl'} = ($html =~ m#background\:\s+url\s*\(([^\)]+)#) ? $1 : '';
+	$self->{'title'} = $1  if ($html =~ m#\"video\"\:\{\"id\"\:\"?$$self{'id'}\"?\,\"title\"\:\"([^\"]+)#s);
+	$self->{'title'} ||= ($html =~ m#\<title\>([^\<]+)#) ? $1 : '';
+	$self->{'imageurl'} = $1  if ($html =~ m#background\:\s+url\s*\(([^\)]+)#s) ? $1 : '';
+	if ($html =~ m#\"thumbs\"\:\{([^\}]+)#s) {
+		my $thumbnails = $1;
+		my %thumbhash = ();
+		while ($thumbnails =~ s#\"(\d+)\"\:\"(https?\:[^\"]+)\"##s) {
+			$thumbhash{$1} = $2;
+		}
+		#USUALLY MULTIPLE URLS OF VARYING SIZES FOR SAME IMAGE, SO WE USE THE
+		#SMALLEST ONE FOR iconurl AND LARGEST FOR imageurl:
+		foreach my $res (sort { $a <=> $b } keys %thumbhash) {
+			$self->{'iconurl'} ||= $thumbhash{$res};
+			$self->{'imageurl'} = $thumbhash{$res};
+		}
+	}
+	$self->{'description'} = $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
 	if ($html =~ m#\"progressive\"\:(\[\{[^\]]+\])#s) {
 		(my $s = $1) =~ s/\"\:/\" \=\> /gs;
 		my $v;

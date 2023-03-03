@@ -1,11 +1,7 @@
 use strict;
 use warnings;
 
-use Prima;
-use Prima::Classes;
-use Prima::Label;
-use Prima::ComboBox;
-use Prima::Sliders;
+use Prima qw(Classes Label ComboBox Sliders Utils);
 
 package Prima::Calendar;
 use vars qw(@ISA @non_locale_months @days_in_months $OB_format);
@@ -136,10 +132,16 @@ sub can_use_locale
 	return $posix_state = 0;
 }
 
+sub locale_str($$$)
+{
+	my ( $format, $day, $month ) = @_;
+	Prima::Utils::local2sv(POSIX::strftime ( $format, 0, 0, 0, $day, $month, 0 ));
+}
+
 sub month2str
 {
 	return $non_locale_months[$_[1]] unless $_[0]-> {useLocale};
-	return POSIX::strftime ( "%B", 0, 0, 0, 1, $_[1], 0 );
+	return locale_str "%B", 1, $_[1];
 }
 
 sub make_months
@@ -153,9 +155,7 @@ sub make_months
 			POSIX::strftime ( "%OB", 0, 0, 0, 1, 1, 0 )
 		) ? '%B' : '%OB';
 	}
-	return [ map {
-		POSIX::strftime ( $OB_format, 0, 0, 0, 1, $_, 0 )
-	} 0 .. 11 ];
+	return [ map { locale_str $OB_format, 1, $_ } 0 .. 11 ];
 }
 
 sub day_of_week
@@ -185,8 +185,8 @@ sub reset_days
 	my $self = $_[0];
 	my $dow = $self-> {firstDayOfWeek};
 	$self-> {days} = $self-> {useLocale} ?
-	[ map { strftime("%a", 0, 0, 0, $_, 0, 0) } 0 .. 6 ] :
-	[ qw( Sun Mon Tue Wed Thu Fri Sat ) ];
+		[ map { locale_str "%a", $_, 0 } 0 .. 6 ] :
+		[ qw( Sun Mon Tue Wed Thu Fri Sat ) ];
 	push @{$self-> {days}}, splice( @{$self-> {days}}, 0, $dow) if $dow;
 }
 

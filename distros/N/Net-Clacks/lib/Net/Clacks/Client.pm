@@ -1,19 +1,19 @@
 package Net::Clacks::Client;
 #---AUTOPRAGMASTART---
-use 5.020;
+use v5.36;
 use strict;
-use warnings;
 use diagnostics;
 use mro 'c3';
-use English;
-use Carp;
-our $VERSION = 24;
+use English qw(-no_match_vars);
+use Carp qw[carp croak confess cluck longmess shortmess];
+our $VERSION = 26;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
-use feature 'signatures';
-no warnings qw(experimental::signatures);
+use Data::Dumper;
+use builtin qw[true false is_bool];
+no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 #---AUTOPRAGMAEND---
 
 use IO::Socket::IP;
@@ -258,7 +258,7 @@ sub doNetwork($self, $readtimeout = 0) {
         my $brokenpipe = 0;
         my $writeok = 0;
         my $written;
-        eval {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
             local $SIG{PIPE} = sub { $brokenpipe = 1; };
             $written = syswrite($self->{socket}, $self->{outbuffer});
             $writeok = 1;
@@ -297,7 +297,7 @@ sub doNetwork($self, $readtimeout = 0) {
     while(1) {
         my $buf;
         my $readok = 0;
-        eval {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
             sysread($self->{socket}, $buf, 10_000); # Read in at most 10kB at once
             $readok = 1;
         };
@@ -1147,7 +1147,7 @@ sub disconnect($self) {
 
 sub DESTROY($self) {
     # Try to disconnect cleanly, but socket might already be DESTROYed, so catch any errors
-    eval {
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         $self->disconnect();
     };
 
@@ -1312,7 +1312,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 Rene Schickbauer
+Copyright (C) 2008-2023 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

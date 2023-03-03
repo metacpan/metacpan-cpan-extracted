@@ -1,3 +1,12 @@
+0.000135  2023-02-28 10:13:21-08:00 America/Los_Angeles
+
+    - Better order and fix typo on recent command
+
+0.000134  2023-02-28 09:21:05-08:00 America/Los_Angeles
+
+    - Enhance rerun capabilities
+    - Added `yath recent` command
+
 0.000133  2023-02-16 08:22:45-08:00 America/Los_Angeles
 
     - Add "resource" category to sweeper

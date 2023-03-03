@@ -10,7 +10,7 @@ use File::Share ':all';
 use List::Util qw(first);
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -272,7 +272,7 @@ Returns string.
  check_license():
          Check type '%s' doesn't supported.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=check_license_id.pl
 
@@ -292,16 +292,47 @@ Returns string.
 
  print 'License with id \''.$license_id.'\' is ';
  if ($obj->check_license($license_id)) {
-         print "suppored.\n";
+         print "supported.\n";
  } else {
-         print "not suppored.\n";
+         print "not supported.\n";
  }
 
  # Output for 'MIT':
- # License with id 'MIT' is suppored.
+ # License with id 'MIT' is supported.
 
  # Output for 'BAD':
- # License with id 'BAD' is not suppored.
+ # License with id 'BAD' is not supported.
+
+=head1 EXAMPLE2
+
+=for comment filename=check_license_exception_id.pl
+
+ use strict;
+ use warnings;
+
+ use License::SPDX;
+
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 license_exception_id\n";
+         exit 1;
+ }
+ my $license_exception_id = $ARGV[0];
+
+ # Object.
+ my $obj = License::SPDX->new;
+
+ print 'License exception with id \''.$license_exception_id.'\' is ';
+ if ($obj->check_exception($license_exception_id)) {
+         print "supported.\n";
+ } else {
+         print "not supported.\n";
+ }
+
+ # Output for 'LGPL-3.0-linking-exception':
+ # License exception with id 'LGPL-3.0-linking-exception' is supported.
+
+ # Output for 'BAD':
+ # License exception with id 'BAD' is not supported.
 
 =head1 DEPENDENCIES
 
@@ -340,6 +371,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

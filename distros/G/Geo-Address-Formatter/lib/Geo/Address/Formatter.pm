@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.993';
+$Geo::Address::Formatter::VERSION = '1.994';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -91,8 +91,12 @@ sub _read_configuration {
         }
 
         foreach my $rh_c (@c) {
-            if (defined($rh_c->{aliases}) && defined($rh_c->{name})){
-                $self->{component_aliases}{$rh_c->{name}} = $rh_c->{aliases};
+            if (defined($rh_c->{name})){
+                if (defined($rh_c->{aliases})){
+                    $self->{component_aliases}{$rh_c->{name}} = $rh_c->{aliases};
+                } else {
+                    $self->{component_aliases}{$rh_c->{name}} = [];
+                }
             }
         }
 
@@ -205,25 +209,50 @@ sub format_address {
         say STDERR "component_aliases";
         say STDERR Dumper $self->{component_aliases};
     }
-    
-    # set the aliases, unless this would overwrite something
+
+    # done with the options
+
+    # 3. set the aliases, unless this would overwrite something
     # need to do this in the right order (as defined in the components file)
     # For example:
     # both 'city_district' and 'suburb' are aliases of 'neighbourhood'
     # so which one should we use if both are present?
     # We should use the one defined first in the list
-    foreach my $placetype (keys %{$self->{component_aliases}}){
-        # do we already have this placetype?
-        # $placetype is 'neighbourhood'
 
-        next if (defined($rh_components->{$placetype}));
+    my $rhh_p2a;
+    foreach my $c (keys %$rh_components){
 
-        # if not let's go through the list in order and see if we have an alias
-        foreach my $alias (@{$self->{component_aliases}->{$placetype}}){
-            # $alias is 'suburb'
-            if (defined($rh_components->{$alias})){
-                $rh_components->{$placetype} = $rh_components->{$alias};
-                last;
+        # might not need an alias as it is a primary type
+        next if (defined($self->{component_aliases}{$c}));
+
+        # it is not a primary type
+        # is there an alias?
+        if (defined($self->{component2type}{$c})){
+            my $ptype = $self->{component2type}{$c};
+            # but is it already set?
+            if (! defined($rh_components->{$ptype}) ){
+                # no, we will set it later
+                $rhh_p2a->{$ptype}{$c} = 1;
+
+            }
+        }
+    }
+
+    # now we know which primary types have aliases
+    foreach my $ptype (keys %$rhh_p2a){
+        # is there more than one?
+        my @aliases = keys %{$rhh_p2a->{$ptype}};
+        if (scalar @aliases == 1){
+            $rh_components->{$ptype} = $rh_components->{$aliases[0]};
+            next;  # we are done with this ptype
+        }
+
+        # if there is more than one we need to go through the list
+        # so we do them in the right order
+        foreach my $c (@{$self->{component_aliases}->{$ptype}}){
+            if (defined($rh_components->{$c})){
+                $rh_components->{$ptype} = $rh_components->{$c};
+                last; # we are done with this ptype
             }
         }
     }
@@ -233,14 +262,14 @@ sub format_address {
         say STDERR Dumper $rh_components;
     }
 
-    # 3. deal wtih terrible inputs
+    # 4. deal wtih terrible inputs
     $self->_sanity_cleaning($rh_components);
     if ($debug){
         say STDERR "after sanity_cleaning applied";
         say STDERR Dumper $rh_components;
     }
 
-    # 4. determine the template
+    # 5. determine the template
     my $template_text;
     my $rh_config = $self->{templates}{uc($cc)} || $self->{templates}{default};
     
@@ -271,7 +300,7 @@ sub format_address {
 
     say STDERR 'template text: ' . $template_text if ($debug);
 
-    # 5. clean up the components, possibly add codes
+    # 6. clean up the components, possibly add codes
     $self->_fix_country($rh_components);
     if ($debug){
         say STDERR "after fix_country";
@@ -290,36 +319,42 @@ sub format_address {
         say STDERR Dumper $rh_components;
     }
 
-    # 6. add the attention, but only if needed
-    my $ra_unknown = $self->_find_unknown_components($rh_components);
+    # 7. add the attention, if needed
     if ($debug){
-        say STDERR "unknown_components:";
-        say STDERR Dumper $ra_unknown;
         say STDERR "object level only_address: $only_address";
         say STDERR "formatting level only_address: $oa";
     }
 
     if ($oa){
         if ($debug){
-            say STDERR "ignoring unknown_components because only_address was specified";
+            say STDERR "not looking for unknown_components";
+            say STDERR "only_address was specified";
         }
     }
-    elsif (scalar(@$ra_unknown)){
-        $rh_components->{attention} = join(', ', map { $rh_components->{$_} } @$ra_unknown);
+    else {
+        my $ra_unknown = $self->_find_unknown_components($rh_components);
         if ($debug){
-            say STDERR "adding unknown_components to 'attention'";
+            say STDERR "unknown_components:";
+            say STDERR Dumper $ra_unknown;
+        }
+        if (scalar(@$ra_unknown)){
+            $rh_components->{attention} =
+                join(', ', map { $rh_components->{$_} } @$ra_unknown);
+            if ($debug){
+                say STDERR "putting unknown_components in 'attention'";
+            }
         }
     }
 
-    # 7. abbreviate
+    # 8. abbreviate, if needed
     if ($abbrv) {
         $rh_components = $self->_abbreviate($rh_components);
     }
 
-    # 8. prepare the template
+    # 9. prepare the template
     $template_text = $self->_replace_template_lambdas($template_text);
 
-    # 9. compiled the template
+    # 10. compiled the template
     my $compiled_template =
         $THC->compile($template_text, {'numeric_string_as_string' => 1});
 
@@ -330,12 +365,15 @@ sub format_address {
         say STDERR Dumper $compiled_template;
     }
 
-    # 10. render the template
+    # 11. render the template
     my $text = $self->_render_template($compiled_template, $rh_components);
-    say STDERR "text after _render_template $text" if ($debug);
+    if ($debug){
+        say STDERR "text after _render_template $text";
+    }
 
     # 11. postformatting
     $text = $self->_postformat($text, $rh_config->{postformat_replace});
+
     # 12. clean again
     $text = $self->_clean($text);
 
@@ -350,10 +388,11 @@ sub format_address {
 sub _postformat {
     my $self = shift;
     my $text = shift;
-
-    say STDERR "entering _postformat: $text" if ($debug);
     my $raa_rules = shift;
-    my $text_orig = $text; # keep a copy
+
+    if ($debug){
+        say STDERR "entering _postformat: $text"
+    }
 
     # remove duplicates
     my @before_pieces = split(/, /, $text);
@@ -401,8 +440,8 @@ sub _sanity_cleaning {
     my $self          = shift;
     my $rh_components = shift || return;
 
+    # catch insane postcodes
     if (defined($rh_components->{'postcode'})) {
-
         if (length($rh_components->{'postcode'}) > 20) {
             delete $rh_components->{'postcode'};
         } elsif ($rh_components->{'postcode'} =~ m/\d+;\d+/) {
@@ -415,16 +454,16 @@ sub _sanity_cleaning {
 
     # remove things that might be empty
     foreach my $c (keys %$rh_components) {
+        # catch empty values
         if (!defined($rh_components->{$c})) {
             delete $rh_components->{$c};
-        } elsif ($rh_components->{$c} !~ m/\w/) {
+        }
+        # no chars
+        elsif ($rh_components->{$c} !~ m/\w/) {
             delete $rh_components->{$c};
         }
-    }
-
-    # catch values containing URLs
-    foreach my $c (keys %$rh_components) {
-        if ($rh_components->{$c} =~ m|https?://|) {
+        # catch values containing URLs
+        elsif ($rh_components->{$c} =~ m|https?://|) {
             delete $rh_components->{$c};
         }
     }
@@ -524,8 +563,8 @@ sub _fix_country {
     # is the country a number?
     # if so, and there is a state, use state as country
     if (defined($rh_components->{country})) {
-        if (defined($rh_components->{state})) {
-            if (looks_like_number($rh_components->{country})) {
+        if (looks_like_number($rh_components->{country})) {
+            if (defined($rh_components->{state})) {
                 $rh_components->{country} = $rh_components->{state};
                 delete $rh_components->{state};
             }
@@ -642,7 +681,7 @@ sub _apply_replacements {
         say STDERR Dumper $raa_rules;
     }
 
-    foreach my $component (sort keys %$rh_components) {
+    foreach my $component (keys %$rh_components) {
         foreach my $ra_fromto (@$raa_rules) {
             try {
                 # do key specific replacement
@@ -894,7 +933,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.993
+version 1.994
 
 =head1 SYNOPSIS
 
@@ -924,7 +963,7 @@ I<debug>: prints tons of debugging info for use in development.
 
 I<no_warnings>: turns off a few warnings if configuration is not optimal.
 
-I<only_address>: formatted will only contain known components (will not include POI names like)
+I<only_address>: formatted will only contain known components (will not include POI names like). Note, can be overridden with optional param to format_address method.
 
 =head2 final_components
 
@@ -953,7 +992,7 @@ Possible options are:
     e.g. 'GB' for Great Britain, 'DE' for Germany, etc.
     If ommited we try to find the country in the address components.
 
-    'only_address', same as I<only_address> global option but set at formatting level
+    'only_address', same as only_address global option but set at formatting level
 
 =head1 DESCRIPTION
 
@@ -992,7 +1031,7 @@ Ed Freyfogle
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Opencage GmbH.
+This software is copyright (c) 2023 by Opencage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

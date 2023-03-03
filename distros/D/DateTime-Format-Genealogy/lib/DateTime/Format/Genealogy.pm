@@ -1,7 +1,7 @@
 package DateTime::Format::Genealogy;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2018-2021, Nigel Horne
+# Copyright (C) 2018-2023, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -31,6 +31,8 @@ our %months = (
 	'July' => 'Jul',
 	'August' => 'Aug',
 	'September' => 'Sep',
+	'Sept' => 'Sep',
+	'Sept.' => 'Sep',
 	'October' => 'Oct',
 	'November' => 'Nov',
 	'December' => 'Dec'
@@ -42,13 +44,17 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
+
+    use DateTime::Format::Genealogy;
+    my $dtg = DateTime::Format::Genealogy->new();
+    # ...
 
 =head1 SUBROUTINES/METHODS
 
@@ -59,12 +65,17 @@ Creates a DateTime::Format::Genealogy object.
 =cut
 
 sub new {
-	my $proto = shift;
+	my($proto, %args) = @_;
 	my $class = ref($proto) || $proto;
 
-	if(defined($class)) {
-		return bless {}, $class;
+	if(!defined($class)) {
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
+	return bless {}, $class;
 }
 
 =head2 parse_datetime($string)
@@ -73,8 +84,13 @@ Given a date,
 runs it through L<Genealogy::Gedcom::Date> to create a L<DateTime> object.
 If a date range is given, return a two element array in array context, or undef in scalar context
 
-Returns undef if the date can't be parsed, is just a year or if it is an appoximate date starting with "c", "ca" or "abt".
+Returns undef if the date can't be parsed,
+is before AD100,
+is just a year or if it is an approximate date starting with "c", "ca" or "abt".
 Can be called as a class or object method.
+
+    my $dt = DateTime::Format::Genealogy('25 Dec 2022');
+    $dt = $dtg->(date => '25 Dec 2022');
 
 date: the date to be parsed
 quiet: set to fail silently if there is an error with the date
@@ -131,10 +147,14 @@ sub parse_datetime {
 		}
 
 		if($date !~ /^\d{3,4}$/) {
-			if($date =~ /^(\d{1,2})\s+([A-Z]{4,}+)\s+(\d{3,4})$/i) {
-				my $strict = $params{'strict'};
-
-				if((!$strict) && (my $abbrev = $months{$2})) {
+			my $strict = $params{'strict'};
+			if($strict) {
+				if($date !~ /^(\d{1,2})\s+([A-Z]{3})\s+(\d{3,4})$/i) {
+					Carp::carp("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
+					return;
+				}
+			} elsif($date =~ /^(\d{1,2})\s+([A-Z]{4,}+)\.?\s+(\d{3,4})$/i) {
+				if(my $abbrev = $months{ucfirst(lc($2))}) {
 					$date = "$1 $abbrev $3";
 				} else {
 					Carp::carp("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
@@ -142,6 +162,8 @@ sub parse_datetime {
 				}
 			}
 			if(($date =~ /^\d/) && (my $d = $self->_date_parser_cached($date))) {
+				# D:T:Natural doesn't seem to work before AD100
+				return if($date =~ /\s\d{1,2}$/);
 				return $dfn->parse_datetime($d->{'canonical'});
 			}
 			if(($date !~ /^(Abt|ca?)/i) && ($date =~ /^[\w\s,]+$/)) {
@@ -157,6 +179,8 @@ sub parse_datetime {
 				}
 				return;
 			}
+		} else {
+			return;	# undef
 		}
 	} else {
 		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
@@ -205,6 +229,9 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
+I can't get L<DateTime::Format::Natural> to work on dates before AD100,
+so this module rejects dates that old.
+
 =head1 SEE ALSO
 
 L<Genealogy::Gedcom::Date> and
@@ -232,7 +259,7 @@ L<http://cpanratings.perl.org/d/DateTime-Format-Gedcom>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2021 Nigel Horne.
+Copyright 2018-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

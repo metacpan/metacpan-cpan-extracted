@@ -294,6 +294,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'stop_previous_sound' => {
+    	datatype => 'boolean',
+    	base_name => 'StopPreviousSound',
+    	description => 'This attribute specifies if the animation effect stops the previous sound.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -313,7 +320,8 @@ __PACKAGE__->swagger_types( {
     'speed' => 'double',
     'trigger_delay_time' => 'double',
     'repeat_until_end_slide' => 'boolean',
-    'repeat_until_next_click' => 'boolean'
+    'repeat_until_next_click' => 'boolean',
+    'stop_previous_sound' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -333,7 +341,8 @@ __PACKAGE__->attribute_map( {
     'speed' => 'Speed',
     'trigger_delay_time' => 'TriggerDelayTime',
     'repeat_until_end_slide' => 'RepeatUntilEndSlide',
-    'repeat_until_next_click' => 'RepeatUntilNextClick'
+    'repeat_until_next_click' => 'RepeatUntilNextClick',
+    'stop_previous_sound' => 'StopPreviousSound'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

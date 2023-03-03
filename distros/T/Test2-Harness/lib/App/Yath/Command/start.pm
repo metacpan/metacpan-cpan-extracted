@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000148';
+our $VERSION = '1.000150';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -1015,6 +1015,15 @@ The Yath-UI project for your test results
 =item --no-yathui-render
 
 Add the YathUI renderer in addition to other renderers
+
+
+=item --yathui-resources
+
+=item --yathui-resources=5
+
+=item --no-yathui-resources
+
+Send resource info (for supported resources) to yathui at the specified interval in seconds (5 if not specified)
 
 
 =item --yathui-retry

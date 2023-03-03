@@ -1,0 +1,72 @@
+NAME
+    RT-Extension-DynamicWebPath - Dynamic WebPath
+
+DESCRIPTION
+    This extension adds dynamic WebPath support to RT, each WebPath can have
+    its own configurations.
+
+    This can be used to support different auth methods, e.g. "" for SSO and
+    "/rt" for RT internal login.
+
+RT VERSION
+    Works with RT 5
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::DynamicWebPath');
+
+    Clear your mason cache
+            rm -rf /opt/rt5/var/mason_data/obj
+
+    Restart your webserver
+
+Configuration
+    Assuming "" is to use SSO, "/rt" is to use RT internal login:
+
+        Set( %DynamicWebPath,
+            '' => {
+                WebRemoteUserAuth    => 1,
+                WebFallbackToRTLogin => 0,
+            },
+            '/rt' => {
+                WebRemoteUserAuth    => 0,
+                WebFallbackToRTLogin => 1,
+            },
+        );
+
+    The corresponding configs are set automatically when RT detects WebPath
+    changes by checking HTTP request URL.
+
+    In apache config, add the following directive before normal setup:
+
+        ScriptAlias /rt /opt/rt5/sbin/rt-server.fcgi/
+
+    Also remember to turn off SSO for /rt, e.g.
+
+        <LocationMatch "^/(rt|REST)(/|$)">
+            MellonEnable off
+            Require all granted
+        </LocationMatch>
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+    All bugs should be reported via email to
+        bug-RT-Extension-DynamicWebPath@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-DynamicWebPath
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2022-2023 by Best Practical Solutions,
+    LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

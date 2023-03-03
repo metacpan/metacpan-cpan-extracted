@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-29'; # DATE
+our $DATE = '2023-02-05'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionFacts/bpom_show_nutrition_facts",
@@ -39,7 +39,7 @@ bpom-show-nutrition-facts - Render BPOM-compliant nutrition fact table (ING - in
 
 =head1 VERSION
 
-This document describes version 0.023 of bpom-show-nutrition-facts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-29.
+This document describes version 0.024 of bpom-show-nutrition-facts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-02-05.
 
 =head1 SYNOPSIS
 

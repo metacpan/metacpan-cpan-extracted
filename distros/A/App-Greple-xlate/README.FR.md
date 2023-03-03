@@ -63,7 +63,7 @@ Si vous voulez traduire un texte entier, utilisez l'option **--match-entire**. I
 
     Spécifiez la langue cible. Vous pouvez obtenir les langues disponibles par la commande `deepl languages` lorsque vous utilisez le moteur **DeepL**.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Spécifiez le format de sortie pour le texte original et le texte traduit.
 
@@ -116,14 +116,14 @@ Si vous voulez traduire un texte entier, utilisez l'option **--match-entire**. I
 
 Le module **xlate** peut stocker le texte de la traduction en cache pour chaque fichier et le lire avant l'exécution pour éliminer les frais généraux de demande au serveur. Avec la stratégie de cache par défaut `auto`, il maintient les données de cache uniquement lorsque le fichier de cache existe pour le fichier cible.
 
-- --refresh
+- --cache-clear
 
-    L'option <--refresh> peut être utilisée pour lancer la gestion du cache ou pour rafraîchir toutes les données du cache existantes. Une fois exécutée avec cette option, un nouveau fichier de cache sera créé s'il n'en existe pas, puis automatiquement maintenu par la suite.
+    L'option **--cache-clear** peut être utilisée pour initier la gestion du cache ou pour rafraîchir toutes les données du cache existant. Une fois exécutée avec cette option, un nouveau fichier de cache sera créé s'il n'en existe pas, puis automatiquement maintenu par la suite.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Maintient le fichier de cache s'il existe.
+        Maintenir le fichier de cache s'il existe.
 
     - `create`
 
@@ -133,9 +133,9 @@ Le module **xlate** peut stocker le texte de la traduction en cache pour chaque 
 
         Maintenir le cache de toute façon tant que la cible est un fichier normal.
 
-    - `refresh`
+    - `clear`
 
-        Maintenir le cache mais ne pas lire celui existant.
+        Effacer d'abord les données du cache.
 
     - `never`, `no`, `0`
 
@@ -151,7 +151,15 @@ Le module **xlate** peut stocker le texte de la traduction en cache pour chaque 
 
     Définissez votre clé d'authentification pour le service DeepL.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

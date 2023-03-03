@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::Portion;
 use AsposeSlidesCloud::Object::PortionFormat;
 use AsposeSlidesCloud::Object::ResourceBase;
@@ -263,41 +264,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'bullet_char' => {
-    	datatype => 'string',
-    	base_name => 'BulletChar',
-    	description => 'Bullet char.',
-    	format => '',
-    	read_only => '',
-    		},
-    'bullet_height' => {
-    	datatype => 'double',
-    	base_name => 'BulletHeight',
-    	description => 'Bullet height.',
-    	format => '',
-    	read_only => '',
-    		},
-    'bullet_type' => {
-    	datatype => 'string',
-    	base_name => 'BulletType',
-    	description => 'Bullet type.',
-    	format => '',
-    	read_only => '',
-    		},
-    'numbered_bullet_start_with' => {
-    	datatype => 'int',
-    	base_name => 'NumberedBulletStartWith',
-    	description => 'Starting number for a numbered bullet.',
-    	format => '',
-    	read_only => '',
-    		},
-    'numbered_bullet_style' => {
-    	datatype => 'string',
-    	base_name => 'NumberedBulletStyle',
-    	description => 'Numbered bullet style.',
-    	format => '',
-    	read_only => '',
-    		},
     'hanging_punctuation' => {
     	datatype => 'string',
     	base_name => 'HangingPunctuation',
@@ -340,6 +306,48 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'bullet_char' => {
+    	datatype => 'string',
+    	base_name => 'BulletChar',
+    	description => 'Bullet char.',
+    	format => '',
+    	read_only => '',
+    		},
+    'bullet_height' => {
+    	datatype => 'double',
+    	base_name => 'BulletHeight',
+    	description => 'Bullet height.',
+    	format => '',
+    	read_only => '',
+    		},
+    'bullet_type' => {
+    	datatype => 'string',
+    	base_name => 'BulletType',
+    	description => 'Bullet type.',
+    	format => '',
+    	read_only => '',
+    		},
+    'numbered_bullet_start_with' => {
+    	datatype => 'int',
+    	base_name => 'NumberedBulletStartWith',
+    	description => 'Starting number for a numbered bullet.',
+    	format => '',
+    	read_only => '',
+    		},
+    'numbered_bullet_style' => {
+    	datatype => 'string',
+    	base_name => 'NumberedBulletStyle',
+    	description => 'Numbered bullet style.',
+    	format => '',
+    	read_only => '',
+    		},
+    'bullet_fill_format' => {
+    	datatype => 'FillFormat',
+    	base_name => 'BulletFillFormat',
+    	description => 'Bullet fill format.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -355,17 +363,18 @@ __PACKAGE__->swagger_types( {
     'font_alignment' => 'string',
     'default_tab_size' => 'double',
     'depth' => 'int',
-    'bullet_char' => 'string',
-    'bullet_height' => 'double',
-    'bullet_type' => 'string',
-    'numbered_bullet_start_with' => 'int',
-    'numbered_bullet_style' => 'string',
     'hanging_punctuation' => 'string',
     'east_asian_line_break' => 'string',
     'latin_line_break' => 'string',
     'right_to_left' => 'string',
     'portion_list' => 'ARRAY[Portion]',
-    'default_portion_format' => 'PortionFormat'
+    'default_portion_format' => 'PortionFormat',
+    'bullet_char' => 'string',
+    'bullet_height' => 'double',
+    'bullet_type' => 'string',
+    'numbered_bullet_start_with' => 'int',
+    'numbered_bullet_style' => 'string',
+    'bullet_fill_format' => 'FillFormat'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -381,17 +390,18 @@ __PACKAGE__->attribute_map( {
     'font_alignment' => 'FontAlignment',
     'default_tab_size' => 'DefaultTabSize',
     'depth' => 'Depth',
-    'bullet_char' => 'BulletChar',
-    'bullet_height' => 'BulletHeight',
-    'bullet_type' => 'BulletType',
-    'numbered_bullet_start_with' => 'NumberedBulletStartWith',
-    'numbered_bullet_style' => 'NumberedBulletStyle',
     'hanging_punctuation' => 'HangingPunctuation',
     'east_asian_line_break' => 'EastAsianLineBreak',
     'latin_line_break' => 'LatinLineBreak',
     'right_to_left' => 'RightToLeft',
     'portion_list' => 'PortionList',
-    'default_portion_format' => 'DefaultPortionFormat'
+    'default_portion_format' => 'DefaultPortionFormat',
+    'bullet_char' => 'BulletChar',
+    'bullet_height' => 'BulletHeight',
+    'bullet_type' => 'BulletType',
+    'numbered_bullet_start_with' => 'NumberedBulletStartWith',
+    'numbered_bullet_style' => 'NumberedBulletStyle',
+    'bullet_fill_format' => 'BulletFillFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

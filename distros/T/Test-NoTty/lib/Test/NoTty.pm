@@ -9,7 +9,7 @@ use parent qw(Exporter);
 use POSIX qw(setsid _exit WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
 
 our @EXPORT = 'without_tty';
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub without_tty(&@) {
     my ($code, @args) = @_;
@@ -32,6 +32,8 @@ sub without_tty(&@) {
     # can. A child process is really supposed to call `exec` or `_exit`. But
     # there's a chance here that we want to have real output
 
+    # Perl before v5.14 didn't automatically load this:
+    require IO::File;
     STDOUT->flush;
     STDERR->flush;
     my $pid = fork;
@@ -54,7 +56,7 @@ sub without_tty(&@) {
             my $exitcode = $code->(@args);
             STDOUT->flush;
             STDERR->flush;
-            _exit($exitcode // 0);
+            _exit(defined $exitcode ? $exitcode : 0);
         };
 
         # If you get here it's an error:

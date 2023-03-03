@@ -245,6 +245,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'sound_base64' => {
+    	datatype => 'string',
+    	base_name => 'SoundBase64',
+    	description => 'Audio data encoded in base64. Represents the playing sound of the hyperlink. ',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -257,7 +264,8 @@ __PACKAGE__->swagger_types( {
     'history' => 'boolean',
     'highlight_click' => 'boolean',
     'stop_sound_on_click' => 'boolean',
-    'color_source' => 'string'
+    'color_source' => 'string',
+    'sound_base64' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -270,7 +278,8 @@ __PACKAGE__->attribute_map( {
     'history' => 'History',
     'highlight_click' => 'HighlightClick',
     'stop_sound_on_click' => 'StopSoundOnClick',
-    'color_source' => 'ColorSource'
+    'color_source' => 'ColorSource',
+    'sound_base64' => 'SoundBase64'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

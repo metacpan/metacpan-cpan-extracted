@@ -23,6 +23,7 @@ my $build = Module::Build->new(
         'Test::More' => 0,
     },
     requires => {
+        perl => '5.10.0',
         'Carp' => 0,
         'POSIX' => 0,
         'Cwd' => 0,
@@ -40,7 +41,7 @@ my $build = Module::Build->new(
         'DateTime::Format::Strptime' => '1.79',
         'Finance::QuoteHist' => '1.32',
         'PDL::Finance::TA' => '0.010',
-        'Prima' => '1.67',
+        'Prima' => '1.67001',
         'PDL::Graphics::Gnuplot' => '2.021',
         'Scalar::Util' => '1.63',
         'Getopt::Long' => '2.54',

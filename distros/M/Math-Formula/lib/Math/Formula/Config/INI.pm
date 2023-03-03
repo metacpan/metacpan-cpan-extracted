@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.03.
 package Math::Formula::Config::INI;
 use vars '$VERSION';
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 use base 'Math::Formula::Config';
 
@@ -107,7 +107,7 @@ sub _unpack($$)
 	if($encoded =~ m/^"(.*?)"(?:;\s*(.*))?$/)
 	{	my ($expr, $attrs) = ($1, $2 // '');
 		my %attrs = $attrs =~ m/(\w+)\='([^']+)'/g;
-		Math::Formula->new($name, $expr =~ s/\\"/"/gr, %attrs);
+		return Math::Formula->new($name, $expr =~ s/\\"/"/gr, %attrs);
 	}
 
 	  $encoded =~ qr/^[0-9]+$/           ? MF::INTEGER->new($encoded)

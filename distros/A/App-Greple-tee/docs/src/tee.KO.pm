@@ -96,6 +96,8 @@ B<deepl>은 한 줄 입력에 더 잘 동작하므로 명령어 부분을 다음
 
 =head1 SEE ALSO
 
+L<App::Greple::tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
 L<https://github.com/greymd/teip>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>

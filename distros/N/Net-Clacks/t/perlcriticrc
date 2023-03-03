@@ -110,3 +110,12 @@ max_elsif = 20
 
 # No. just no. This doesn't make sense in many cases
 [-Variables::RequireLocalizedPunctuationVars]
+
+# Subroutine prototypes are now an officially supported feature, so ignore perlcritic warnings about their use
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# Use version strings for perl version
+[-ValuesAndExpressions::ProhibitVersionStrings]
+
+# The "English" module doesn't degrade performance anymore when not using -no_match_vars
+[-Modules::RequireNoMatchVarsWithUseEnglish]

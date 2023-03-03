@@ -120,6 +120,8 @@ command:
 
 =head1 SEE ALSO
 
+L<App::Greple::tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
 L<https://github.com/greymd/teip>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>

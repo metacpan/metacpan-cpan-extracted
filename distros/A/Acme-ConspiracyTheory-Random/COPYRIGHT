@@ -6,11 +6,15 @@ Source: https://metacpan.org/release/Acme-ConspiracyTheory-Random
 Files: Changes
  META.json
  META.yml
- bin/conspire
- dist.ini
  doap.ttl
-Copyright: Copyright 2021 Toby Inkster.
+Copyright: Copyright 2023 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
 
 Files: INSTALL
  LICENSE
@@ -24,25 +28,24 @@ Files: README
 Copyright: This software is copyright (c) 2021 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
+Files: bin/conspire
+ dist.ini
+Copyright: Copyright 2021 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2021 by the copyright holder(s).
+ This software is Copyright (c) 2023 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2021 by the copyright holder(s).
+ This software is Copyright (c) 2023 by the copyright holder(s).
  
  This is free software, licensed under:
  

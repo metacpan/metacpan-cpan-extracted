@@ -1178,6 +1178,36 @@ translate_console_input( INPUT_RECORD *ir)
 	return duplicate_string(buf);
 }
 
+static char*
+locale_strings_set(int start, int num)
+{
+	int i, nsz;
+	wchar_t wbuf[256];
+	char buf[256*12] = "";
+	nsz = 0;
+	for ( i = 0; i < num; i++) {
+		int len;
+		char * utf;
+
+		wbuf[0] = 0;
+		len = GetLocaleInfoW( LOCALE_USER_DEFAULT, start + i, wbuf, 256);
+		if ( len == 0 ) return 0;
+
+		wbuf[255] = 0;
+		if ( !( utf = alloc_wchar_to_utf8( wbuf, &len ))) return 0;
+		if ( nsz + len + 1 >= sizeof(buf)) {
+			free(utf);
+			return 0;
+		}
+
+		strcat(buf + nsz, utf);
+		free(utf);
+		if ( i != num - 1 ) strcat(buf + nsz, ":");
+		nsz += len;
+	}
+	return duplicate_string(buf);
+}
+
 char *
 apc_system_action( const char * params)
 {
@@ -1279,11 +1309,18 @@ apc_system_action( const char * params)
 			}
 			h = (fd == 0) ? GetStdHandle(STD_INPUT_HANDLE) : (WINHANDLE) _get_osfhandle(fd);
 			if (
-				ReadConsoleInputExW( h, &ir, 1, &n, flags) == 0 ||
+				read_console_input( h, &ir, 1, &n, flags) == 0 ||
 				n == 0
 			)
 				return NULL;
 			return translate_console_input(&ir);
+		} else if ( strncmp( params, "win32.locale.", 13) == 0) {
+			if ( strcmp( params + 13, "days") == 0)
+				return locale_strings_set(LOCALE_SDAYNAME1, 7);
+			else if (strcmp( params + 13, "months") == 0)
+				return locale_strings_set(LOCALE_SMONTHNAME1, 12);
+			else
+				goto DEFAULT;
 		} else
 			goto DEFAULT;
 		break;

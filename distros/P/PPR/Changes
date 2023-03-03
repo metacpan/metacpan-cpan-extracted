@@ -347,3 +347,9 @@ Revision history for PPR
       to 5.28, as the bug was only fixed in 5.30.
       (Thanks, Zaki!)
 
+
+
+0.001007  Fri Mar  3 09:44:34 2023
+
+    * Improved error handling via PPR::ERROR mechanism
+      (Thanks, Yves!)

@@ -63,7 +63,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
     대상 언어를 지정합니다. **DeepL** 엔진을 사용할 때 `deepl languages` 명령으로 사용 가능한 언어를 가져올 수 있습니다.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     원본 및 번역 텍스트의 출력 형식을 지정합니다.
 
@@ -116,14 +116,14 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 **엑스레이트** 모듈은 각 파일에 대한 번역 텍스트를 캐시하여 저장하고 실행 전에 읽어들여 서버에 요청하는 오버헤드를 없앨 수 있습니다. 기본 캐시 전략 `auto`를 사용하면 대상 파일에 대한 캐시 파일이 존재할 때만 캐시 데이터를 유지합니다.
 
-- --refresh
+- --cache-clear
 
-    <-- 새로 고침> 옵션은 캐시 관리를 시작하거나 기존의 모든 캐시 데이터를 새로 고치는 데 사용할 수 있습니다. 이 옵션을 실행하면 캐시 파일이 없는 경우 새 캐시 파일이 생성되고 이후에는 자동으로 유지 관리됩니다.
+    **--cache-clear** 옵션은 캐시 관리를 시작하거나 기존의 모든 캐시 데이터를 새로 고치는 데 사용할 수 있습니다. 이 옵션을 실행하면 캐시 파일이 없는 경우 새 캐시 파일이 생성되고 이후에는 자동으로 유지 관리됩니다.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        캐시 파일이 존재하면 캐시 파일을 유지합니다.
+        캐시 파일이 있는 경우 캐시 파일을 유지 관리합니다.
 
     - `create`
 
@@ -133,9 +133,9 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
         타겟이 정상 파일인 한 캐시를 유지합니다.
 
-    - `refresh`
+    - `clear`
 
-        캐시는 유지하되 기존 캐시는 읽지 않습니다.
+        캐시 데이터를 먼저 지웁니다.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
     - `accumulate`
 
-        기본 동작으로 사용하지 않은 데이터는 캐시 파일에서 제거됩니다. 제거하지 않고 파일에 보관하고 싶지 않다면 `accumulate`를 사용하세요.
+        기본 동작에 따라 사용하지 않는 데이터는 캐시 파일에서 제거됩니다. 제거하지 않고 파일에 유지하려면 `accumulate`를 사용하세요.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
     DeepL 서비스에 대한 인증 키를 설정합니다.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

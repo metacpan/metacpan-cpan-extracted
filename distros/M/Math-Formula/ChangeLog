@@ -2,6 +2,13 @@
 
 All changes made by Mark Overmeer, unless explicitly stated otherwise.
 
+version 0.14: Tue 28 Feb 17:34:40 CET 2023
+
+	Improvements:
+	- cleaned-up more docs
+	- implement config YAML save and load
+	- implement config JSON save and load
+
 version 0.13: Mon 27 Feb 13:32:48 CET 2023
 
 	Fixes:

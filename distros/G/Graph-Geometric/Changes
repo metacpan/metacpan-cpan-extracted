@@ -1,3 +1,12 @@
+0.2.0 2023-03-01
+
+    - Implement generators for bifrustum, gyrobicupola.
+    - Implement property checkers is_isogonal(), is_isohedral(), is_isotoxal(), is_regular() and is_quasiregular().
+    - Implement has_face().
+    - Implement elongation of certain polyhedra.
+    - Specify minimum Perl version.
+    - Support 'triangular' and 'square' generators.
+
 0.1.0 2023-02-08
 
     - Initial release.

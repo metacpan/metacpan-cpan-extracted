@@ -31,6 +31,7 @@ lib/Venus/Box.pm
 lib/Venus/Class.pm
 lib/Venus/Cli.pm
 lib/Venus/Code.pm
+lib/Venus/Config.pm
 lib/Venus/Core.pm
 lib/Venus/Core/Class.pm
 lib/Venus/Core/Mixin.pm
@@ -114,6 +115,7 @@ t/Venus_Box.t
 t/Venus_Class.t
 t/Venus_Cli.t
 t/Venus_Code.t
+t/Venus_Config.t
 t/Venus_Core.t
 t/Venus_Core_Class.t
 t/Venus_Core_Mixin.t
@@ -188,6 +190,9 @@ t/Venus_Type.t
 t/Venus_Undef.t
 t/Venus_Vars.t
 t/Venus_Yaml.t
+t/conf/test.json
+t/conf/test.perl
+t/conf/test.yaml
 t/data/moon
 t/data/planets/ceres
 t/data/planets/earth

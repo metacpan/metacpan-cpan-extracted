@@ -25,7 +25,7 @@ my $meta = {
                             test      => { requires => { "Test::More" => 0.96 } },
                           },
   "provides"           => {
-                            "Acme::ConspiracyTheory::Random" => { file => "lib/Acme/ConspiracyTheory/Random.pm", version => 0.014 },
+                            "Acme::ConspiracyTheory::Random" => { file => "lib/Acme/ConspiracyTheory/Random.pm", version => 0.015 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -41,7 +41,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/project",
                           },
-  "version"            => 0.014,
+  "version"            => 0.015,
   "x_provides_scripts" => { conspire => { file => "bin/conspire" } },
 };
 

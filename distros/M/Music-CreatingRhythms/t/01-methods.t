@@ -16,6 +16,56 @@ subtest defaults => sub {
     is $mcr->verbose, 1, 'verbose';
 };
 
+subtest cfcv => sub {
+    my $mcr = new_ok $module;
+
+    # sqrt(2)
+    my $expect = [3,2];
+    my $got = $mcr->cfcv(1, 2);
+    is_deeply $got, $expect, 'cfcv';
+
+    $expect = [7,5];
+    $got = $mcr->cfcv(1, 2, 2);
+    is_deeply $got, $expect, 'cfcv';
+
+    $expect = [17,12];
+    $got = $mcr->cfcv(1, 2, 2, 2);
+    is_deeply $got, $expect, 'cfcv';
+
+    # sqrt(3)
+    $expect = [5,3];
+    $got = $mcr->cfcv(1, 1, 2);
+    is_deeply $got, $expect, 'cfcv';
+
+    $expect = [19,11];
+    $got = $mcr->cfcv(1, 1, 2, 1, 2);
+    is_deeply $got, $expect, 'cfcv';
+};
+
+subtest cfsqrt => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = [1,2];
+    my $got = $mcr->cfsqrt(2);
+    is_deeply $got, $expect, 'cfsqrt';
+
+    $expect = [1,2,2];
+    $got = $mcr->cfsqrt(2, 3);
+    is_deeply $got, $expect, 'cfsqrt';
+
+    $expect = [1,1,2];
+    $got = $mcr->cfsqrt(3);
+    is_deeply $got, $expect, 'cfsqrt';
+
+    $expect = [1,1,2,1];
+    $got = $mcr->cfsqrt(3, 4);
+    is_deeply $got, $expect, 'cfsqrt';
+
+    $expect = [1,1,2,1,2];
+    $got = $mcr->cfsqrt(3, 5);
+    is_deeply $got, $expect, 'cfsqrt';
+};
+
 subtest chsequl => sub {
     my $mcr = new_ok $module;
 
@@ -507,14 +557,42 @@ subtest partm => sub {
     is_deeply $got, $expect, 'partm';
 };
 
-subtest permute => sub {
+subtest permi => sub {
     my $mcr = new_ok $module;
 
     my $parts = [qw(1 0 1)];
 
     my $expect = [[1,0,1],[1,1,0],[0,1,1],[0,1,1],[1,1,0],[1,0,1]];
-    my $got = $mcr->permute($parts);
-    is_deeply $got, $expect, 'permute';
+    my $got = $mcr->permi($parts);
+    is_deeply $got, $expect, 'permi';
+};
+
+subtest pfold => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = [1];
+    my $got = $mcr->pfold(1, 1, 1);
+    is_deeply $got, $expect, 'pfold';
+
+    $expect = [1,1];
+    $got = $mcr->pfold(2, 1, 1);
+    is_deeply $got, $expect, 'pfold';
+
+    $expect = [1,1,0];
+    $got = $mcr->pfold(3, 1, 1);
+    is_deeply $got, $expect, 'pfold';
+
+    $expect = [1,1,0,1];
+    $got = $mcr->pfold(4, 1, 1);
+    is_deeply $got, $expect, 'pfold';
+
+    $expect = [0,0,1,0,0,1,1,0,0,0,1,1,0,1,1];
+    $got = $mcr->pfold(15, 4, 0);
+    is_deeply $got, $expect, 'pfold';
+
+    $expect = [1,0,0,0,1,1,0,0,1,0,0,1,1,1,0];
+    $got = $mcr->pfold(15, 4, 1);
+    is_deeply $got, $expect, 'pfold';
 };
 
 subtest reverse_at => sub {

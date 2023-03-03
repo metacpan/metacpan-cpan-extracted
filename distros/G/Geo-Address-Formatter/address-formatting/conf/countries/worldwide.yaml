@@ -521,10 +521,16 @@ CG:
     address_template: *generic18
 
 # Switzerland
-CH: 
-    address_template: *generic1
+CH:
+    address_template: |
+        {{{attention}}}
+        {{{house}}}
+        {{{road}}} {{{house_number}}}
+        {{{postcode}}} {{#first}} {{{postal_city}}} || {{{town}}} || {{{city}}} || {{{municipality}}} || {{{village}}} || {{{hamlet}}} || {{{county}}} || {{{state}}} {{/first}}
+        {{{country}}}
     replace:
         - ["Verwaltungskreis",""]
+        - ["Verwaltungsregion",""]        
         - [" administrative district",""]
         - [" administrative region",""]
 
@@ -989,6 +995,7 @@ IE:
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
         {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{municipality}}} {{/first}}
         {{{county}}}
+        {{{postcode}}}
         {{{country}}}
     replace:
         - [" City$",""]
@@ -1001,8 +1008,12 @@ IE:
         - ["Galway\nCounty Galway","Galway"]
         - ["Kilkenny\nCounty Kilkenny","Kilkenny"]        
         - ["Limerick\nCounty Limerick","Limerick"]
-        - ["Tipperary\nCounty Tipperary","Tipperary"]        
+        - ["Tipperary\nCounty Tipperary","Tipperary"]
+        # fix eircode formatting
+        #- ["\n(\\d{4})(\\w{2}) ","\n$1 $2 "]
+        - ["\n(([AC-FHKNPRTV-Y][0-9]{2}|D6W))[ -]?([0-9AC-FHKNPRTV-Y]{4})", "\n$1 $3"] 
         
+
 # Israel
 IL: 
     address_template: *generic1
@@ -1423,7 +1434,13 @@ MR:
 
 # Mauritius
 MU:
-    address_template: *generic18
+    address_template: |
+        {{{attention}}}
+        {{{house}}}
+        {{{house_number}}}, {{{road}}}
+        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{state}}} {{/first}} {{{postcode}}}
+        {{{country}}}
 
 # Maldives
 MV:

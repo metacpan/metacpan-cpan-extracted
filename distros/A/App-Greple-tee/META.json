@@ -17,12 +17,7 @@
       "directory" : [
          "t",
          "xt",
-         "inc",
-         "share",
-         "eg",
-         "examples",
-         "author",
-         "builder"
+         "docs"
       ]
    },
    "prereqs" : {
@@ -60,7 +55,7 @@
    "provides" : {
       "App::Greple::tee" : {
          "file" : "lib/App/Greple/tee.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -75,7 +70,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-tee"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -1,3 +1,10 @@
+Sat Jan 14 15:48:10 2023 -0500
+815c1f2c1fb6184c87fc832556c7ec9b5a24b2e5
+Adding Signal handling using the latest Prima::sys::GUIException() code.
+
+Sun Jan 8 08:18:54 2023 -0500
+813e9ab1038985a4689d9550947be12053e60aff
+ignore dist files from git
 Sat Jan 7 23:25:23 2023 -0500
 a9ff92a5fa6a9d48ca38016bb13bad89503f73aa
 Getting POE::Loop::Prima to be imported correctly

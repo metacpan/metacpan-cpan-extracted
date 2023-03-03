@@ -8473,7 +8473,9 @@ sub getpasswd
        =&Net::FullAuto::FA_Core::lookup_hostinfo_from_label(
        $hostlabel);
    my $host='';my $stdout='';my $stderr='';
-   if (exists $Hosts{$hostlabel}{'cyberark'}) {
+   if ((exists $Hosts{$hostlabel}{'cyberark'})
+         || (exists $Hosts{$hostlabel}{'CyberArk'})
+         || (exists $Hosts{$hostlabel}{'CYBERARK'})) {
       my $capath=$Net::FullAuto::FA_Core::gbp->('clipasswordsdk');
       $capath||='/opt/CARKaim/sdk/';
       my $app_id=$Hosts{$hostlabel}{'ca_appid'}||'';
@@ -18530,7 +18532,9 @@ sub ftm_login
                $Net::FullAuto::FA_Core::Hosts{
                $hostlabel}{'IdentityFile'})) {
             if ($hostlabel!~/__Master_${$}__/ && !$identityfile
-                  && !(exists $Hosts{$hostlabel}{'cyberark'})) {
+                  && !(exists $Hosts{$hostlabel}{'cyberark'})
+                  && !(exists $Hosts{$hostlabel}{'CyberArk'})
+                  && !(exists $Hosts{$hostlabel}{'CYBERARK'})) {
                $determine_password->('',0,$hostlabel,$password);
             }
             unless ($password) {
@@ -26840,7 +26844,9 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE BACK FROM LOOKUP<==\n"
          ($Hosts{$hostlabel}->{'label'} eq 'Localhost Shell')
          || $_connect eq 'connect_shell') {
    } elsif ($hostlabel!~/__Master_${$}__/ && !$identityfile
-         && !(exists $Hosts{$hostlabel}{'cyberark'})) {
+         && !(exists $Hosts{$hostlabel}{'cyberark'})
+         && !(exists $Hosts{$hostlabel}{'CyberArk'})
+         && !(exists $Hosts{$hostlabel}{'CYBERARK'})) {
       $determine_password->('',0,$hostlabel,$password);
       $login_passwd=&Net::FullAuto::FA_Core::getpasswd(
          $hostlabel,$login_id,'','');

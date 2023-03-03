@@ -86,6 +86,7 @@ typedef enum _MONITOR_DPI_TYPE {
 static HRESULT (__stdcall *SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS)  = NULL;
 static HRESULT (__stdcall *GetDpiForMonitor)(HMONITOR,MONITOR_DPI_TYPE,UINT*,UINT*) = NULL;
 static HRESULT (__stdcall *DwmIsCompositionEnabled)(BOOL *pfEnabled) = NULL;
+static BOOL    (__stdcall *ReadConsoleInputExW)( WINHANDLE hConsoleInput, PINPUT_RECORD lpBuffer, DWORD nLength, LPDWORD lpNumberOfEventsRead, USHORT wFlags) = NULL;
 
 #if WINVER < 0x0600
 static BOOL    (__stdcall *GetUserPreferredUILanguages)(DWORD dwFlags, PULONG pulNumLanguages, PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer) = NULL;
@@ -102,7 +103,6 @@ my_GetUserPreferredUILanguages(
 #endif
 	return GetUserPreferredUILanguages(dwFlags, pulNumLanguages, pwszLanguagesBuffer, pcchLanguagesBuffer);
 }
-
 
 void
 dpi_change(void)
@@ -139,6 +139,12 @@ is_dwm_enabled( void )
 		} else
 			return 0;
 	}
+}
+
+Bool
+read_console_input( WINHANDLE hConsoleInput, PINPUT_RECORD lpBuffer, DWORD nLength, LPDWORD lpNumberOfEventsRead, USHORT wFlags)
+{
+	return ReadConsoleInputExW( hConsoleInput, lpBuffer, nLength, lpNumberOfEventsRead, wFlags);
 }
 
 static void
@@ -260,6 +266,7 @@ window_subsystem_init( char * error_buf)
 		mod = LoadLibrary("KERNEL32.DLL");
 		if ( mod ) {
 			LOAD_FUNC(mod, GetUserPreferredUILanguages);
+			LOAD_FUNC(mod, ReadConsoleInputExW);
 		}
 #endif
 	}
@@ -781,6 +788,7 @@ LRESULT CALLBACK generic_view_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM m
 			ev. key. mod  = kmUnicode;
 			ev. key. key  = kbNoKey;
 			ev. key. code = mp1;
+			ev. key. repeat = 1;
 		}
 		break;
 	case WM_SYSKEYDOWN:
@@ -801,6 +809,7 @@ LRESULT CALLBACK generic_view_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM m
 			ev. key. key    = ctx_remap_def( mp1, ctx_kb2VK, false, kbNoKey);
 			ev. key. code   = mp1;
 			ev. key. repeat = mp2 & 0x000000FF;
+			if (ev. key. repeat == 0) ev. key. repeat = 1;
 
 			// VK validations
 			if ( extended) {

@@ -2,15 +2,13 @@ package RxPerl::Utils;
 use strict;
 use warnings;
 
-use Scalar::Util 'weaken';
-
 use Exporter 'import';
 our @EXPORT_OK = qw/
     immortalize decapitate
     get_timer_subs get_interval_subs
 /;
 
-our $VERSION = "v6.26.2";
+our $VERSION = "v6.27.0";
 
 my %KEEP_ALIVE;
 

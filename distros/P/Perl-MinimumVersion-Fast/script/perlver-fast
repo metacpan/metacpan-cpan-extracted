@@ -4,12 +4,32 @@ use warnings;
 use Perl::MinimumVersion::Fast;
 
 if (@ARGV) {
-    for (@ARGV) {
-        my $v = Perl::MinimumVersion::Fast->new($_);
-        printf "%s: %s\n", $_, $v->minimum_version;
+    for my $file (@ARGV) {
+        my $v = Perl::MinimumVersion::Fast->new($file);
+        printf "%s: %s\n", $file, $v->minimum_version;
     }
 } else {
     my $src = join("", <>);
-    my $v = Perl::MinimumVersion::Fast->new($src);
-    printf "%s: %s\n", $_, $v->minimum_version;
+    my $v = Perl::MinimumVersion::Fast->new(\$src);
+    printf "STDIN: %s\n", $v->minimum_version;
 }
+
+__END__
+
+=head1 NAME
+
+perlver-fast - Minimum perl version detector
+
+=head1 SYNOPSIS
+
+Analyze from file list
+
+    $ perlver-fast lib/Acme/Kensiro.pm t/00.load.t
+    lib/Acme/Kensiro.pm: 5.008001
+    t/00.load.t: 5.006
+
+Analyze from STDIN
+
+    $ perlver-fast < lib/Acme/Kensiro.pm
+    STDIN: 5.008001
+

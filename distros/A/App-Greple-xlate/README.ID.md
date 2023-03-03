@@ -63,7 +63,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
 
     Tentukan bahasa target. Anda bisa mendapatkan bahasa yang tersedia dengan perintah `deepl languages` ketika menggunakan mesin **DeepL**.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Tentukan format output untuk teks asli dan terjemahan.
 
@@ -116,14 +116,14 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
 
 Modul **xlate** dapat menyimpan teks terjemahan dalam cache untuk setiap file dan membacanya sebelum eksekusi untuk menghilangkan overhead dari permintaan ke server. Dengan strategi cache default `auto`, modul ini mempertahankan data cache hanya ketika file cache ada untuk file target.
 
-- --refresh
+- --cache-clear
 
-    Opsi <--refresh> dapat digunakan untuk memulai manajemen cache atau menyegarkan semua data cache yang ada. Setelah dieksekusi dengan opsi ini, file cache baru akan dibuat jika belum ada dan kemudian secara otomatis dipelihara setelahnya.
+    Opsi **--cache-clear** dapat digunakan untuk memulai manajemen cache atau untuk menyegarkan semua data cache yang ada. Setelah dieksekusi dengan opsi ini, file cache baru akan dibuat jika belum ada dan kemudian secara otomatis dipelihara setelahnya.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Mempertahankan file cache jika ada.
+        Mempertahankan file cache jika sudah ada.
 
     - `create`
 
@@ -133,9 +133,9 @@ Modul **xlate** dapat menyimpan teks terjemahan dalam cache untuk setiap file da
 
         Pertahankan cache sejauh targetnya adalah file normal.
 
-    - `refresh`
+    - `clear`
 
-        Mempertahankan cache tetapi tidak membaca cache yang sudah ada.
+        Hapus data cache terlebih dahulu.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ Modul **xlate** dapat menyimpan teks terjemahan dalam cache untuk setiap file da
 
     - `accumulate`
 
-        Secara default, data yang tidak terpakai akan dihapus dari file cache. Jika anda tidak ingin menghapusnya dan tetap menyimpannya di dalam file, gunakan `accumulate`.
+        Secara default, data yang tidak digunakan akan dihapus dari file cache. Jika Anda tidak ingin menghapusnya dan menyimpannya di dalam file, gunakan `accumulate`.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ Modul **xlate** dapat menyimpan teks terjemahan dalam cache untuk setiap file da
 
     Tetapkan kunci autentikasi Anda untuk layanan DeepL.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+L <App::Greple::xlate>
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

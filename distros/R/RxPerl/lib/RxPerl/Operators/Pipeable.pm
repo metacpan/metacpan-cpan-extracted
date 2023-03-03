@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.26.2";
+our $VERSION = "v6.27.0";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -66,7 +66,8 @@ sub op_audit {
 
                     $last_val = $v;
                     if (!defined $mini_subscription) {
-                        $mini_subscription = $duration_selector->($v)->pipe(
+                        my $o = do { local $_ = $v; $duration_selector->($v) };
+                        $mini_subscription = $o->pipe(
                             op_take(1),
                         )->subscribe($mini_subscriber);
                     }
@@ -356,7 +357,8 @@ sub op_debounce {
                     $last_val = $v;
                     $has_last_val = 1;
 
-                    $mini_subscription = $duration_selector->($v)->pipe(
+                    my $o = do { local $_ = $v; $duration_selector->($v) };
+                    $mini_subscription = $o->pipe(
                         op_take(1),
                     )->subscribe($mini_subscriber);
                 },
@@ -2069,12 +2071,13 @@ sub op_take_while {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
+            my $i = 0;
             my $own_subscriber = {
                 %$subscriber,
                 next => sub {
                     my ($value) = @_;
 
-                    if (! $cond->($value)) {
+                    if (! do { local $_ = $value; $cond->($value, $i++) }) {
                         $subscriber->{next}->($value) if $include and defined $subscriber->{next};
                         $subscriber->{complete}->() if defined $subscriber->{complete};
                         return;
@@ -2153,7 +2156,7 @@ sub op_throttle {
 
                     if (! $mini_subscription) {
                         $subscriber->{next}->(@_) if defined $subscriber->{next};
-                        $mini_subscription = $duration_selector->($v)->pipe(
+                        $mini_subscription = do { local $_ = $v; $duration_selector->($v) }->pipe(
                             op_take(1),
                         )->subscribe($mini_subscriber);
                     }

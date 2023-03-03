@@ -7,7 +7,7 @@ use warnings;
 package Acme::ConspiracyTheory::Random;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 use Exporter::Shiny qw( theory bad_punctuation );
 use List::Util 1.54 ();
@@ -39,7 +39,7 @@ sub celebrity {
 		{ female => 0, name => 'Bernie Sanders' },
 		{ female => 0, name => 'Joe Biden' },
 		{ female => 0, name => 'Bill Clinton' },
-		{ female => 1, name => 'Queen Elizabeth II' },
+		{ female => 1, name => 'King Charles III' },
 		{ female => 0, name => 'Johnny Depp' },
 		{ female => 0, name => 'Q' },
 		{ female => 1, name => 'Madonna' },
@@ -50,6 +50,12 @@ sub celebrity {
 		{ female => 1, name => 'Beyonce' },
 		{ female => 1, name => 'Whitney Houston' },
 		{ female => 0, name => 'Joe Rogan' },
+		{ female => 1, name => 'Marjorie Taylor Greene' },
+		{ female => 0, name => 'Rishi Sunak' },
+		{ female => 0, name => 'Vladimir Putin' },
+		{ female => 0, name => 'Ron DeSantis' },
+		{ female => 1, name => 'Lauren Opal Boebert' },
+		{ female => 0, name => 'Elon Musk' },
 	);
 	_MERGE_( $redstring, celebrity => $celeb );
 	return $celeb->{name};
@@ -159,6 +165,7 @@ sub real_animal {
 		'zebra',
 		'frog',
 		'fish',
+		'sea turtle',
 	);
 	
 	_MERGE_( $redstring, real_animal => $animal );
@@ -207,6 +214,8 @@ sub invention {
 		['cryptocurrencies', 1],
 		['smartphones', 1],
 		['bitcoin', 0],
+		['blockchain technology', 0],
+		['ChatGPT', 0],
 	);
 	
 	_MERGE_( $redstring, invention => $invention->[0],
@@ -228,6 +237,7 @@ sub shady_project {
 		'the Kalergi Plan',
 		'Eurabia',
 		'the moon-landing hoax',
+		'the LGBT+ agenda',
 	);
 	
 	_MERGE_( $redstring, shady_project => $x );
@@ -243,6 +253,7 @@ sub authority {
 		'the FBI',
 		'the CIA',
 		'NATO',
+		'the European Union',
 	);
 	
 	_MERGE_( $redstring, authority => $x );
@@ -261,6 +272,9 @@ sub dark_lord {
 		'the devil',
 		'the evil one',
 		'the almighty',
+		'the demon king',
+		'the dark prince',
+		'Voldemort',
 	);
 	
 	_MERGE_( $redstring, dark_lord => $x );
@@ -274,11 +288,15 @@ sub disease {
 		'cancer',
 		'COVID-19',
 		'HIV',
+		'AIDS',
 		'the common cold',
 		'diabetes',
 		'obesity',
 		'autism',
 		'Ebola',
+		'COVID-20',
+		'monkeypox',
+		'gender dyspohoria',
 	);
 	
 	_MERGE_( $redstring, disease => $disease );
@@ -301,6 +319,7 @@ sub disease_cause {
 		'socialism',
 		'electromagnetic radiation (WiFi!)',
 		'radon gas',
+		'all the drugs (so many drugs!)',
 	);
 	
 	_MERGE_( $redstring, disease_cause => $cause );
@@ -322,6 +341,8 @@ sub chemicals {
 		'antimatter',
 		'dark matter',
 		'fluoride',
+		'dihydrogen monoxide',
+		'carbon nanotubes',
 	);
 	
 	_MERGE_( $redstring, chemicals => $chemicals );
@@ -377,6 +398,11 @@ sub artifact {
 		"the Philosopher's Stone",
 		"a fragment of the true cross",
 		"the seal of Solomon",
+		'the crystal skull',
+		sub { "a golden " . fake_animal( $redstring ) },
+		'the original copy of the bible',
+		'the original copy of the quran',
+		'the original copy of the Declaration of Independence',
 	);
 	
 	_MERGE_( $redstring, artifact => $artifact );
@@ -459,6 +485,15 @@ sub myth_place {
 	
 	_MERGE_( $redstring, myth_place => $place );
 	return $place;
+}
+
+sub any_place {
+	my $redstring = shift // {};
+	return _RANDOM_(
+		sub { bad_place $redstring },
+		sub { random_place $redstring },
+		sub { myth_place $redstring },
+	);
 }
 
 sub cryptids {
@@ -554,6 +589,7 @@ sub mind_control_device {
 		['mass media', 1],
 		['space lasers', 1],
 		['hypnotism', 0],
+		['Jewish space lasers', 1],
 	);
 	
 	my $mc = _RANDOM_(@mc);
@@ -570,7 +606,7 @@ sub future_time {
 		'in 2030',
 		'by the end of the century',
 		'in 2666',
-		'when Queen Elizabeth II dies',
+		'when King Charles III dies',
 		'when the ice caps melt',
 		'next Christmas',
 	);
@@ -704,6 +740,9 @@ sub victim {
 		'Malcolm X',
 		'John Lennon',
 		'Michael Jackson',
+		'Queen Elizabeth II',
+		'Prince Phillip',
+		'Walt Disney',
 	);
 	
 	_MERGE_( $redstring, victim => $victim );
@@ -735,6 +774,7 @@ sub biologist {  # and medics
 		'Robert Koch',
 		'Carl Linneaus',
 		'Alexander Fleming',
+		'Dr Fauci',
 	);
 	
 	_MERGE_( $redstring, biologist => $x );
@@ -754,6 +794,10 @@ sub website {
 		'Instagram',
 		'Geocities',
 		'Parler',
+		'Angelfire',
+		'the Fediverse',
+		'Nostr',
+		'Reddit',
 	);
 
 	_MERGE_( $redstring, website => $x );
@@ -773,6 +817,8 @@ sub fatuous {
 		"They leave clues to mock us.",
 		"It's not funny!",
 		"There are too many coincidences to ignore.",
+		"You'd have to be blind not to see it!",
+		"It's so obvious!",
 	);
 
 	_MERGE_( $redstring, clone => $x );
@@ -783,12 +829,14 @@ sub clone {
 	my $redstring = shift // {};
 
 	my $x = _RANDOM_(
+		'an actor',
 		'an alien',
 		'an avatar',
 		'a CGI replica',
 		'a clone',
 		'a cyborg',
 		'a hologram',
+		'an impersonator',
 		'a look-alike',
 		'a robot',
 		'a shapeshifter',
@@ -806,6 +854,8 @@ sub lies {
 		'a big coverup',
 		'a fairy tale',
 		'disinformation',
+		'the Big Lie',
+		'fake news',
 	);
 	
 	_MERGE_( $redstring, lies => $x );
@@ -1066,6 +1116,7 @@ sub evidence {
 			# This has singular/plural problems - how to solve?
 			"$bad has ties to $p",
 			"$p probably isn't a real place anyway",
+			"$p isn't shown on any maps",
 		);
 	}
 
@@ -1725,6 +1776,60 @@ sub theory {
 					"$fiction was analysed with a computer by $group and it revealed $truth.",
 				},
 			);
+		},
+		sub {
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $knows  = $redstring->{protagonists}->{plural} ? 'knows' : 'know';
+			my $theyve = $redstring->{protagonists}->{plural} ? "They've" : "It's";
+			my $is     = $redstring->{protagonists}->{plural} ? 'are' : 'is';
+			my $group_shortname = $redstring->{protagonists}{shortname} // $group;
+			
+			my $artifact = artifact( $redstring );
+			my $project = shady_project( $redstring );
+			my $place = any_place( $redstring );
+			
+			my @parts = _UCFIRST_ _RANDOM_(
+				"$group $knows that the truth about $project is engraved on $artifact. $theyve been searching $place to find it.",
+				"$group found out that $artifact has the truth about $project engraved on it. $theyve been looking for it in $place.",
+				"$group $knows that $artifact holds the truth about $project. They are hiding it in $place.",
+				"$group $is searching $place for $artifact because it holds the truth about $project.",
+			);
+			
+			my ( $group2, $group3 );
+			
+			if ( _RANDOM_( 1, 2 ) == 1 ) {
+				$group2 = shady_group( $redstring );
+				$redstring->{antagonists} = $redstring->{shady_group};
+				my $tool = precious_resource_with_quantity( $redstring );
+				push @parts, _UCFIRST_ _RANDOM_(
+					"$tool is being used by $group2 to stop $group_shortname.",
+					"$group2 donated $tool to help $group_shortname.",
+					"$group2 used $tool to try to stop $group_shortname but it didn't work.",
+				);
+			}
+			
+			if ( _RANDOM_( 1, 2 ) == 1 ) {
+				$group3 = shady_group( $redstring );
+				$redstring->{antagonists} //= $redstring->{shady_group};
+				my $web = website( $redstring );
+				push @parts, _UCFIRST_ _RANDOM_(
+					"$group3 hacked the $group_shortname $web account to track them through $place.",
+					"$group3 noticed $group_shortname used an IP address from $place to post on $web.",
+					"$group_shortname contacted $group3 on $web about $artifact.",
+				);
+			}
+			
+			if ( $group2 and $group3 ) {
+				push @parts, _UCFIRST_ _RANDOM_(
+					"$group2 and $group3 are in contact with each other.",
+					"$group2 and $group3 hired the same planner for their Christmas party.",
+					"$group2 and $group3 are connected.",
+					"$group2 and $group3 are probably working together.",
+				);
+			}
+			
+			return join q[ ], @parts;
 		},
 		sub {
 			my $group = shady_group( $redstring );

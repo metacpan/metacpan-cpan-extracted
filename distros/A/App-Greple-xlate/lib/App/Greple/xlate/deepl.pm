@@ -1,9 +1,10 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use v5.14;
 use warnings;
+use Encode;
 use Data::Dumper;
 
 use List::Util qw(sum);
@@ -12,7 +13,6 @@ use App::cdif::Command;
 our $lang_from //= 'ORIGINAL';
 our $lang_to   //= 'JA';
 our $auth_key;
-our $max_length = 128 * 1024;
 our $method = 'deepl';
 
 my %param = (
@@ -64,7 +64,7 @@ sub xlate {
 	my $len = 0;
 	while (@from) {
 	    my $next = length $from[0];
-	    last if $len + $next > $max_length;
+	    last if $len + $next > $max;
 	    $len += $next;
 	    push @tmp, shift @from;
 	}

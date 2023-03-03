@@ -16,13 +16,13 @@ my $obj = License::SPDX->new;
 
 print 'License with id \''.$license_id.'\' is ';
 if ($obj->check_license($license_id)) {
-        print "suppored.\n";
+        print "supported.\n";
 } else {
-        print "not suppored.\n";
+        print "not supported.\n";
 }
 
 # Output for 'MIT':
-# License with id 'MIT' is suppored.
+# License with id 'MIT' is supported.
 
 # Output for 'BAD':
-# License with id 'BAD' is not suppored.
+# License with id 'BAD' is not supported.

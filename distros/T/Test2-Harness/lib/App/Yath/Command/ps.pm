@@ -2,7 +2,7 @@ package App::Yath::Command::ps;
 use strict;
 use warnings;
 
-our $VERSION = '1.000148';
+our $VERSION = '1.000150';
 
 use Term::Table();
 use File::Spec();
@@ -696,6 +696,17 @@ Only run tests that have their duration flag set to 'LONG'
 Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
 
 
+=item --rerun-all
+
+=item --rerun-all=path/to/log.jsonl
+
+=item --rerun-all=plugin_specific_string
+
+=item --no-rerun-all
+
+Re-Run all tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
 =item --rerun-failed
 
 =item --rerun-failed=path/to/log.jsonl
@@ -707,6 +718,59 @@ Re-Run tests from a previous run from a log file (or last log file). Plugins can
 Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
 
 
+=item --rerun-missed
+
+=item --rerun-missed=path/to/log.jsonl
+
+=item --rerun-missed=plugin_specific_string
+
+=item --no-rerun-missed
+
+Run missed tests from a previously aborted/stopped run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-modes failed,missed,...
+
+=item --rerun-modes all
+
+=item --rerun-modes failed
+
+=item --rerun-modes missed
+
+=item --rerun-modes passed
+
+=item --rerun-modes retried
+
+=item --rerun-mode failed,missed,...
+
+=item --rerun-mode all
+
+=item --rerun-mode failed
+
+=item --rerun-mode missed
+
+=item --rerun-mode passed
+
+=item --rerun-mode retried
+
+=item --no-rerun-modes
+
+Pick which test categories to run
+
+Can be specified multiple times
+
+
+=item --rerun-passed
+
+=item --rerun-passed=path/to/log.jsonl
+
+=item --rerun-passed=plugin_specific_string
+
+=item --no-rerun-passed
+
+Re-Run passed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
 =item --rerun-plugin Foo
 
 =item --rerun-plugin +App::Yath::Plugin::Foo
@@ -716,6 +780,17 @@ Re-Run failed tests from a previous run from a log file (or last log file). Plug
 What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)
 
 Can be specified multiple times
+
+
+=item --rerun-retried
+
+=item --rerun-retried=path/to/log.jsonl
+
+=item --rerun-retried=plugin_specific_string
+
+=item --no-rerun-retried
+
+Re-Run retried tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
 
 
 =item --search ARG
@@ -1379,6 +1454,15 @@ The Yath-UI project for your test results
 =item --no-yathui-render
 
 Add the YathUI renderer in addition to other renderers
+
+
+=item --yathui-resources
+
+=item --yathui-resources=5
+
+=item --no-yathui-resources
+
+Send resource info (for supported resources) to yathui at the specified interval in seconds (5 if not specified)
 
 
 =item --yathui-retry

@@ -25,6 +25,8 @@ CreatingRhythms
 Gene
 Hollos
 Music
+cfcv
+cfsqrt
 chsequl
 combinatorial
 compa
@@ -40,4 +42,6 @@ neckm
 parta
 partam
 partm
+permi
+pfold
 pn

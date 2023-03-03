@@ -1,5 +1,14 @@
 Revision history for OpenAI-API
 
+0.17    2024-03-02
+        Add github links to Makefile.PL
+
+0.16    2024-03-02
+        Update documentation.
+
+0.15    2024-03-01
+        Chat endpoint. Update documentation.
+
 0.14    2024-02-28
         Update dependencies.
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension Number::Continuation.
 
+0.06  2023-03-01  <schubiger@cpan.org>
+
+ - Move testing module to test_requires.
+
+ - Drop generating compat Makefile.PL.
+
 0.05  2016-03-15  <schubiger@cpan.org>
 
  - Merged development version to stable.

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-18'; # DATE
+our $DATE = '2023-03-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.017'; # VERSION
+our $VERSION = '1.021'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_replace_newline/csv_replace_newline",
@@ -41,7 +41,7 @@ csv-replace-newline - Replace newlines in CSV values
 
 =head1 VERSION
 
-This document describes version 1.017 of csv-replace-newline (from Perl distribution App-CSVUtils), released on 2023-02-18.
+This document describes version 1.021 of csv-replace-newline (from Perl distribution App-CSVUtils), released on 2023-03-02.
 
 =head1 SYNOPSIS
 

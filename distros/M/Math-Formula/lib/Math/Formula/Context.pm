@@ -5,7 +5,7 @@
 
 package Math::Formula::Context;
 use vars '$VERSION';
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 
 use warnings;
@@ -64,7 +64,7 @@ sub _index()
 
 #--------------
 
-sub name            { $_[0]->{MFC_name} }
+sub name             { $_[0]->{MFC_name} }
 sub lead_expressions { $_[0]->{MFC_lead} }
 
 #--------------

@@ -37,9 +37,8 @@ my %args = (
 
     test_requires => {
         'IO::CaptureOutput' => '0',
-        'Mouse' => '0',
+        'Scope::Guard' => '0',
         'Sub::Retry' => '0',
-        'Test::Docker::Image' => '0.05',
         'Test::LeakTrace' => '0',
         'Test::More' => '0.98',
         'Test::SharedFork' => '0',

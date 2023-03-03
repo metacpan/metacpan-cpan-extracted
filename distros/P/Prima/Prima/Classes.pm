@@ -1328,12 +1328,8 @@ sub profile_check_in
 				@default_font_box = ( $f-> { width}, $f-> { height});
 			}
 			my @a = @default_font_box;
-			$p-> {left}    *= $a[0] / $d[0] if exists $p-> {left};
-			$p-> {right}   *= $a[0] / $d[0] if exists $p-> {right};
-			$p-> {top}     *= $a[1] / $d[1] if exists $p-> {top};
-			$p-> {bottom}  *= $a[1] / $d[1] if exists $p-> {bottom};
-			$p-> {width}   *= $a[0] / $d[0] if exists $p-> {width};
-			$p-> {height}  *= $a[1] / $d[1] if exists $p-> {height};
+			$p->{$_} = int($p->{$_} * $a[0] / $d[0] + .5) for grep { exists $p->{$_} } qw(left right width);
+			$p->{$_} = int($p->{$_} * $a[1] / $d[1] + .5) for grep { exists $p->{$_} } qw(top bottom height);
 		}
 	} else {
 		$p-> {designScale} = [0,0];
@@ -1602,9 +1598,17 @@ sub rect_bevel
 	if ( $opt{concave}) {
 		push @c3d, 0x404040, $c3d[0];
 	} elsif ( $opt{panel}) {
-		@c3d = ( 0x404040, $self-> disabledBackColor, $c3d[0], $c3d[1]);
+		@c3d = (
+			0x404040, cl::blend( $self->map_color($self->backColor), $self->map_color($c3d[1]), 0.5),
+			$c3d[0], $c3d[1]
+		);
 	} else {
 		push @c3d, $c3d[1], 0x404040;
+	}
+
+	if ( $opt{focused}) {
+		my $hilite = $self->map_color(cl::Hilite);
+		$_ = cl::blend( $self->map_color($_), $hilite, 0.5) for @c3d;
 	}
 
 	$fill = $fill->clone( widgetClass => $self->widgetClass ) if $fill && ref($fill);

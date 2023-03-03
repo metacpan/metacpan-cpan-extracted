@@ -2,7 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use lib './t/lib';
-use Test::RedisCluster qw/get_startup_nodes/;
+use Test::Docker::RedisCluster qw/get_startup_nodes/;
 
 use Redis::Cluster::Fast;
 use Test::LeakTrace;
@@ -12,6 +12,12 @@ no_leaks_ok {
     my $redis = Redis::Cluster::Fast->new(
         startup_nodes => get_startup_nodes,
     );
+
+    eval {
+        # wide character
+        $redis->set('euro', "\x{20ac}");
+    };
+
     $redis->ping;
     $redis->CLUSTER_INFO();
     $redis->eval(

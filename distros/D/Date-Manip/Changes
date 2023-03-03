@@ -15,6 +15,12 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.91  2023-03-01
+  -  Fixed bug where timezone alias wasn't handled
+         On linux systems configured to be in a timezone that is an alias,
+         the system timezone wasn't recognized, and it defaulted to GMT.
+         This is now fixed. Patch supplied by Sandi Wallendahl (GitHub #43)
+
 6.90  2022-12-02
   -  Time zone fixes
          Aliases in the tzdata database were not being added to the timezone

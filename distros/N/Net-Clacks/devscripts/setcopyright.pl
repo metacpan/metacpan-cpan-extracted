@@ -1,19 +1,19 @@
 #!/usr/bin/env perl
 #---AUTOPRAGMASTART---
-use 5.020;
+use v5.36;
 use strict;
-use warnings;
 use diagnostics;
 use mro 'c3';
-use English;
-use Carp;
-our $VERSION = 24;
+use English qw(-no_match_vars);
+use Carp qw[carp croak confess cluck longmess shortmess];
+our $VERSION = 26;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
-use feature 'signatures';
-no warnings qw(experimental::signatures);
+use Data::Dumper;
+use builtin qw[true false is_bool];
+no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 #---AUTOPRAGMAEND---
 
 # PAGECAMEL  (C) 2008-2022 Rene Schickbauer
@@ -37,8 +37,8 @@ foreach my $file (@files) {
 
     open(my $ofh, ">", $file) or die($ERRNO);
     foreach my $line (@lines) {
-        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ Rene\ Schickbauer/\(C\) 2008-2022 Rene Schickbauer/ig;
-        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ by\ Rene\ Schickbauer/\(C\) 2008-2022 Rene Schickbauer/ig;
+        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ Rene\ Schickbauer/\(C\) 2008-2023 Rene Schickbauer/ig;
+        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ by\ Rene\ Schickbauer/\(C\) 2008-2023 Rene Schickbauer/ig;
         print $ofh $line;
     }
     close $ofh;

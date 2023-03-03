@@ -1,4 +1,4 @@
-Chemistry/File/CML    version 0.13
+Chemistry/File/CML    version 0.14
 ==================================
 
 This module reads CML (Chemical Markup Language) files. 
@@ -6,8 +6,8 @@ This module reads CML (Chemical Markup Language) files.
 The CML module automatically registers the 'cml' format with Chemistry::Mol,
 so that molfiles may be identified and read by Chemistry::Mol::read_mol().
 
-CHANGES SINCE VERSION 0.12
-        - Mark atoms without coordinates with an attribute.
+CHANGES SINCE VERSION 0.13
+        - Implement writer.
 
 INSTALLATION
 
@@ -23,10 +23,11 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     Chemistry::Mol      0.35
+    XML::LibXML
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 Andrius Merkys <merkys@cpan.org>
+Copyright (C) 2022-2023 Andrius Merkys <merkys@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

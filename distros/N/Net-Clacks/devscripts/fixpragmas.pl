@@ -1,22 +1,22 @@
 #!/usr/bin/env perl
 #---AUTOPRAGMASTART---
-use 5.020;
+use v5.36;
 use strict;
-use warnings;
 use diagnostics;
 use mro 'c3';
-use English;
-use Carp;
-our $VERSION = 24;
+use English qw(-no_match_vars);
+use Carp qw[carp croak confess cluck longmess shortmess];
+our $VERSION = 26;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
-use feature 'signatures';
-no warnings qw(experimental::signatures);
+use Data::Dumper;
+use builtin qw[true false is_bool];
+no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 #---AUTOPRAGMAEND---
 
-# PAGECAMEL  (C) 2008-2022 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2023 Rene Schickbauer
 # Developed under Artistic license
 
 
@@ -38,16 +38,19 @@ foreach my $file (@files) {
     foreach my $line (@lines) {
         if($line =~ /^use\ +(.+)\;/) {
             my $pragma = $1;
-            if($pragma =~ /(strict|warnings|English|mro|diagnostics|Carp|Fatal|Array\:\:Contains|autodie|utf8|Encode)/ && $pragma !~ /Digest/) {
+            if($pragma =~ /(strict|warnings|English|mro|diagnostics|Carp|Fatal|Array\:\:Contains|autodie|utf8|Encode|Data\:\:Dumper|builtin)/ && $pragma !~ /Digest/) {
                 # Remove this (old) lines
                 next;
             }
-            if($pragma =~ /(5.\d+)/ && $pragma !~ /Digest/) {
+            if($pragma =~ /(5\.\d+)/ && $pragma !~ /Digest/) {
                 # Always update the required perl version
                 next;
             }
         }
         if($line =~ /^no\ if.*experimental\:\:smartmatch/) {
+            next;
+        }
+        if($line =~ /^use\ English\ qw/) {
             next;
         }
         if($line =~ /^(our|my) \$VERSION/) {
@@ -56,6 +59,10 @@ foreach my $file (@files) {
 
         # Handle sub "signatures"
         if($line =~ /^use\ feature\ \'signatures\'/ || $line =~ /^no\ warnings\ .*experimental\:\:signatures/) {
+            next;
+        }
+        # Handle the new "builtin" stuff
+        if($line =~ /^no\ warnings\ .*experimental\:\:builtin/) {
             next;
         }
 
@@ -71,20 +78,20 @@ foreach my $file (@files) {
         }
         if($line =~ /^package\ / || $line =~ /^\#\!/) {
             print $ofh "#---AUTOPRAGMASTART---\n";
-            print $ofh "use 5.020;\n";
+            print $ofh "use v5.36;\n";
             print $ofh "use strict;\n";
-            print $ofh "use warnings;\n";
             print $ofh "use diagnostics;\n";
             print $ofh "use mro 'c3';\n";
-            print $ofh "use English;\n";
-            print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 24;\n";
+            print $ofh "use English qw(-no_match_vars);\n";
+            print $ofh "use Carp qw[carp croak confess cluck longmess shortmess];\n";
+            print $ofh "our \$VERSION = 26;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";
             print $ofh "use Encode qw(is_utf8 encode_utf8 decode_utf8);\n";
-            print $ofh "use feature 'signatures';\n";
-            print $ofh "no warnings qw(experimental::signatures);\n";
+            print $ofh "use Data::Dumper;\n";
+            print $ofh "use builtin qw[true false is_bool];\n";
+            print $ofh "no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)\n";
             print $ofh "#---AUTOPRAGMAEND---\n";
             $inserted = 1;
         }

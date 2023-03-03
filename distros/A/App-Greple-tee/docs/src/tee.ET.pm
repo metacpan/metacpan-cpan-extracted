@@ -96,6 +96,8 @@ Seda osa saab ümber vormindada, kasutades B<tee> moodulit koos B<ansifold> käs
 
 =head1 SEE ALSO
 
+L<App::Greple::tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
 L<https://github.com/greymd/teip>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>

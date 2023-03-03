@@ -1,0 +1,854 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/ENumberUtils/list_enumbers
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-03-01'; # DATE
+our $DIST = 'App-ENumberUtils'; # DIST
+our $VERSION = '20230301.0.2'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/ENumberUtils/list_enumbers",
+    program_name => "list-enumbers",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List E Numbers
+# PODNAME: list-enumbers
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-enumbers - List E Numbers
+
+=head1 VERSION
+
+This document describes version 20230301.0.2 of list-enumbers (from Perl distribution App-ENumberUtils), released on 2023-03-01.
+
+=head1 SYNOPSIS
+
+B<list-enumbers> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<list-enumbers> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-enumbers> [B<L<--code-contains|/"--code-contains=s">>=I<str>] [(B<L<--code-in|/"--code-in=s@">>=I<str>)+|B<L<--code-in-json|/"--code-in=s@">>=I<json>] [B<L<--code-is|/"--code-is=s">>=I<str>] [B<L<--code-isnt|/"--code-isnt=s">>=I<str>] [B<L<--code-matches|/"--code-matches=s">>=I<str>] [B<L<--code-max|/"--code-max=s">>=I<str>] [B<L<--code-min|/"--code-min=s">>=I<str>] [B<L<--code-not-contains|/"--code-not-contains=s">>=I<str>] [(B<L<--code-not-in|/"--code-not-in=s@">>=I<str>)+|B<L<--code-not-in-json|/"--code-not-in=s@">>=I<json>] [B<L<--code-not-matches|/"--code-not-matches=s">>=I<str>] [B<L<--code-xmax|/"--code-xmax=s">>=I<str>] [B<L<--code-xmin|/"--code-xmin=s">>=I<str>] [B<L<--code|/"--code=s">>=I<str>] [(B<L<--color-index-in|/"--color-index-in=s@">>=I<int>)+|B<L<--color-index-in-json|/"--color-index-in=s@">>=I<json>] [B<L<--color-index-is|/"--color-index-is=s">>=I<int>] [B<L<--color-index-isnt|/"--color-index-isnt=s">>=I<int>] [B<L<--color-index-max|/"--color-index-max=s">>=I<int>] [B<L<--color-index-min|/"--color-index-min=s">>=I<int>] [(B<L<--color-index-not-in|/"--color-index-not-in=s@">>=I<int>)+|B<L<--color-index-not-in-json|/"--color-index-not-in=s@">>=I<json>] [B<L<--color-index-xmax|/"--color-index-xmax=s">>=I<int>] [B<L<--color-index-xmin|/"--color-index-xmin=s">>=I<int>] [B<L<--color-index|/"--color-index=s">>=I<int>] [B<L<--colour-contains|/"--colour-contains=s">>=I<str>] [(B<L<--colour-in|/"--colour-in=s@">>=I<str>)+|B<L<--colour-in-json|/"--colour-in=s@">>=I<json>] [B<L<--colour-is|/"--colour-is=s">>=I<str>] [B<L<--colour-isnt|/"--colour-isnt=s">>=I<str>] [B<L<--colour-matches|/"--colour-matches=s">>=I<str>] [B<L<--colour-max|/"--colour-max=s">>=I<str>] [B<L<--colour-min|/"--colour-min=s">>=I<str>] [B<L<--colour-not-contains|/"--colour-not-contains=s">>=I<str>] [(B<L<--colour-not-in|/"--colour-not-in=s@">>=I<str>)+|B<L<--colour-not-in-json|/"--colour-not-in=s@">>=I<json>] [B<L<--colour-not-matches|/"--colour-not-matches=s">>=I<str>] [B<L<--colour-xmax|/"--colour-xmax=s">>=I<str>] [B<L<--colour-xmin|/"--colour-xmin=s">>=I<str>] [B<L<--colour|/"--colour=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--names-contains|/"--names-contains=s">>=I<str>] [(B<L<--names-in|/"--names-in=s@">>=I<str>)+|B<L<--names-in-json|/"--names-in=s@">>=I<json>] [B<L<--names-is|/"--names-is=s">>=I<str>] [B<L<--names-isnt|/"--names-isnt=s">>=I<str>] [B<L<--names-matches|/"--names-matches=s">>=I<str>] [B<L<--names-max|/"--names-max=s">>=I<str>] [B<L<--names-min|/"--names-min=s">>=I<str>] [B<L<--names-not-contains|/"--names-not-contains=s">>=I<str>] [(B<L<--names-not-in|/"--names-not-in=s@">>=I<str>)+|B<L<--names-not-in-json|/"--names-not-in=s@">>=I<json>] [B<L<--names-not-matches|/"--names-not-matches=s">>=I<str>] [B<L<--names-xmax|/"--names-xmax=s">>=I<str>] [B<L<--names-xmin|/"--names-xmin=s">>=I<str>] [B<L<--names|/"--names=s">>=I<str>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--purpose-contains|/"--purpose-contains=s">>=I<str>] [(B<L<--purpose-in|/"--purpose-in=s@">>=I<str>)+|B<L<--purpose-in-json|/"--purpose-in=s@">>=I<json>] [B<L<--purpose-is|/"--purpose-is=s">>=I<str>] [B<L<--purpose-isnt|/"--purpose-isnt=s">>=I<str>] [B<L<--purpose-matches|/"--purpose-matches=s">>=I<str>] [B<L<--purpose-max|/"--purpose-max=s">>=I<str>] [B<L<--purpose-min|/"--purpose-min=s">>=I<str>] [B<L<--purpose-not-contains|/"--purpose-not-contains=s">>=I<str>] [(B<L<--purpose-not-in|/"--purpose-not-in=s@">>=I<str>)+|B<L<--purpose-not-in-json|/"--purpose-not-in=s@">>=I<json>] [B<L<--purpose-not-matches|/"--purpose-not-matches=s">>=I<str>] [B<L<--purpose-xmax|/"--purpose-xmax=s">>=I<str>] [B<L<--purpose-xmin|/"--purpose-xmin=s">>=I<str>] [B<L<--purpose|/"--purpose=s">>=I<str>] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--status-contains|/"--status-contains=s">>=I<str>] [(B<L<--status-in|/"--status-in=s@">>=I<str>)+|B<L<--status-in-json|/"--status-in=s@">>=I<json>] [B<L<--status-is|/"--status-is=s">>=I<str>] [B<L<--status-isnt|/"--status-isnt=s">>=I<str>] [B<L<--status-matches|/"--status-matches=s">>=I<str>] [B<L<--status-max|/"--status-max=s">>=I<str>] [B<L<--status-min|/"--status-min=s">>=I<str>] [B<L<--status-not-contains|/"--status-not-contains=s">>=I<str>] [(B<L<--status-not-in|/"--status-not-in=s@">>=I<str>)+|B<L<--status-not-in-json|/"--status-not-in=s@">>=I<json>] [B<L<--status-not-matches|/"--status-not-matches=s">>=I<str>] [B<L<--status-xmax|/"--status-xmax=s">>=I<str>] [B<L<--status-xmin|/"--status-xmin=s">>=I<str>] [B<L<--status|/"--status=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for code options
+
+=over
+
+=item B<--code-contains>=I<s>
+
+Only return records where the 'code' field contains specified text.
+
+=item B<--code-in-json>=I<s>
+
+Only return records where the 'code' field is in the specified values (JSON-encoded).
+
+See C<--code-in>.
+
+=item B<--code-in>=I<s@>
+
+Only return records where the 'code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-is>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=item B<--code-isnt>=I<s>
+
+Only return records where the 'code' field does not equal specified value.
+
+=item B<--code-matches>=I<s>
+
+Only return records where the 'code' field matches specified regular expression pattern.
+
+=item B<--code-max>=I<s>
+
+Only return records where the 'code' field is less than or equal to specified value.
+
+=item B<--code-min>=I<s>
+
+Only return records where the 'code' field is greater than or equal to specified value.
+
+=item B<--code-not-contains>=I<s>
+
+Only return records where the 'code' field does not contain specified text.
+
+=item B<--code-not-in-json>=I<s>
+
+Only return records where the 'code' field is not in the specified values (JSON-encoded).
+
+See C<--code-not-in>.
+
+=item B<--code-not-in>=I<s@>
+
+Only return records where the 'code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-not-matches>=I<s>
+
+Only return records where the 'code' field does not match specified regular expression.
+
+=item B<--code-xmax>=I<s>
+
+Only return records where the 'code' field is less than specified value.
+
+=item B<--code-xmin>=I<s>
+
+Only return records where the 'code' field is greater than specified value.
+
+=item B<--code>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=back
+
+=head2 Filtering for color_index options
+
+=over
+
+=item B<--color-index-in-json>=I<s>
+
+Only return records where the 'color_index' field is in the specified values (JSON-encoded).
+
+See C<--color-index-in>.
+
+=item B<--color-index-in>=I<s@>
+
+Only return records where the 'color_index' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--color-index-is>=I<s>
+
+Only return records where the 'color_index' field equals specified value.
+
+=item B<--color-index-isnt>=I<s>
+
+Only return records where the 'color_index' field does not equal specified value.
+
+=item B<--color-index-max>=I<s>
+
+Only return records where the 'color_index' field is less than or equal to specified value.
+
+=item B<--color-index-min>=I<s>
+
+Only return records where the 'color_index' field is greater than or equal to specified value.
+
+=item B<--color-index-not-in-json>=I<s>
+
+Only return records where the 'color_index' field is not in the specified values (JSON-encoded).
+
+See C<--color-index-not-in>.
+
+=item B<--color-index-not-in>=I<s@>
+
+Only return records where the 'color_index' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--color-index-xmax>=I<s>
+
+Only return records where the 'color_index' field is less than specified value.
+
+=item B<--color-index-xmin>=I<s>
+
+Only return records where the 'color_index' field is greater than specified value.
+
+=item B<--color-index>=I<s>
+
+Only return records where the 'color_index' field equals specified value.
+
+=back
+
+=head2 Filtering for colour options
+
+=over
+
+=item B<--colour-contains>=I<s>
+
+Only return records where the 'colour' field contains specified text.
+
+=item B<--colour-in-json>=I<s>
+
+Only return records where the 'colour' field is in the specified values (JSON-encoded).
+
+See C<--colour-in>.
+
+=item B<--colour-in>=I<s@>
+
+Only return records where the 'colour' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--colour-is>=I<s>
+
+Only return records where the 'colour' field equals specified value.
+
+=item B<--colour-isnt>=I<s>
+
+Only return records where the 'colour' field does not equal specified value.
+
+=item B<--colour-matches>=I<s>
+
+Only return records where the 'colour' field matches specified regular expression pattern.
+
+=item B<--colour-max>=I<s>
+
+Only return records where the 'colour' field is less than or equal to specified value.
+
+=item B<--colour-min>=I<s>
+
+Only return records where the 'colour' field is greater than or equal to specified value.
+
+=item B<--colour-not-contains>=I<s>
+
+Only return records where the 'colour' field does not contain specified text.
+
+=item B<--colour-not-in-json>=I<s>
+
+Only return records where the 'colour' field is not in the specified values (JSON-encoded).
+
+See C<--colour-not-in>.
+
+=item B<--colour-not-in>=I<s@>
+
+Only return records where the 'colour' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--colour-not-matches>=I<s>
+
+Only return records where the 'colour' field does not match specified regular expression.
+
+=item B<--colour-xmax>=I<s>
+
+Only return records where the 'colour' field is less than specified value.
+
+=item B<--colour-xmin>=I<s>
+
+Only return records where the 'colour' field is greater than specified value.
+
+=item B<--colour>=I<s>
+
+Only return records where the 'colour' field equals specified value.
+
+=back
+
+=head2 Filtering for names options
+
+=over
+
+=item B<--names-contains>=I<s>
+
+Only return records where the 'names' field contains specified text.
+
+=item B<--names-in-json>=I<s>
+
+Only return records where the 'names' field is in the specified values (JSON-encoded).
+
+See C<--names-in>.
+
+=item B<--names-in>=I<s@>
+
+Only return records where the 'names' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--names-is>=I<s>
+
+Only return records where the 'names' field equals specified value.
+
+=item B<--names-isnt>=I<s>
+
+Only return records where the 'names' field does not equal specified value.
+
+=item B<--names-matches>=I<s>
+
+Only return records where the 'names' field matches specified regular expression pattern.
+
+=item B<--names-max>=I<s>
+
+Only return records where the 'names' field is less than or equal to specified value.
+
+=item B<--names-min>=I<s>
+
+Only return records where the 'names' field is greater than or equal to specified value.
+
+=item B<--names-not-contains>=I<s>
+
+Only return records where the 'names' field does not contain specified text.
+
+=item B<--names-not-in-json>=I<s>
+
+Only return records where the 'names' field is not in the specified values (JSON-encoded).
+
+See C<--names-not-in>.
+
+=item B<--names-not-in>=I<s@>
+
+Only return records where the 'names' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--names-not-matches>=I<s>
+
+Only return records where the 'names' field does not match specified regular expression.
+
+=item B<--names-xmax>=I<s>
+
+Only return records where the 'names' field is less than specified value.
+
+=item B<--names-xmin>=I<s>
+
+Only return records where the 'names' field is greater than specified value.
+
+=item B<--names>=I<s>
+
+Only return records where the 'names' field equals specified value.
+
+=back
+
+=head2 Filtering for purpose options
+
+=over
+
+=item B<--purpose-contains>=I<s>
+
+Only return records where the 'purpose' field contains specified text.
+
+=item B<--purpose-in-json>=I<s>
+
+Only return records where the 'purpose' field is in the specified values (JSON-encoded).
+
+See C<--purpose-in>.
+
+=item B<--purpose-in>=I<s@>
+
+Only return records where the 'purpose' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--purpose-is>=I<s>
+
+Only return records where the 'purpose' field equals specified value.
+
+=item B<--purpose-isnt>=I<s>
+
+Only return records where the 'purpose' field does not equal specified value.
+
+=item B<--purpose-matches>=I<s>
+
+Only return records where the 'purpose' field matches specified regular expression pattern.
+
+=item B<--purpose-max>=I<s>
+
+Only return records where the 'purpose' field is less than or equal to specified value.
+
+=item B<--purpose-min>=I<s>
+
+Only return records where the 'purpose' field is greater than or equal to specified value.
+
+=item B<--purpose-not-contains>=I<s>
+
+Only return records where the 'purpose' field does not contain specified text.
+
+=item B<--purpose-not-in-json>=I<s>
+
+Only return records where the 'purpose' field is not in the specified values (JSON-encoded).
+
+See C<--purpose-not-in>.
+
+=item B<--purpose-not-in>=I<s@>
+
+Only return records where the 'purpose' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--purpose-not-matches>=I<s>
+
+Only return records where the 'purpose' field does not match specified regular expression.
+
+=item B<--purpose-xmax>=I<s>
+
+Only return records where the 'purpose' field is less than specified value.
+
+=item B<--purpose-xmin>=I<s>
+
+Only return records where the 'purpose' field is greater than specified value.
+
+=item B<--purpose>=I<s>
+
+Only return records where the 'purpose' field equals specified value.
+
+=back
+
+=head2 Filtering for status options
+
+=over
+
+=item B<--status-contains>=I<s>
+
+Only return records where the 'status' field contains specified text.
+
+=item B<--status-in-json>=I<s>
+
+Only return records where the 'status' field is in the specified values (JSON-encoded).
+
+See C<--status-in>.
+
+=item B<--status-in>=I<s@>
+
+Only return records where the 'status' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-is>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=item B<--status-isnt>=I<s>
+
+Only return records where the 'status' field does not equal specified value.
+
+=item B<--status-matches>=I<s>
+
+Only return records where the 'status' field matches specified regular expression pattern.
+
+=item B<--status-max>=I<s>
+
+Only return records where the 'status' field is less than or equal to specified value.
+
+=item B<--status-min>=I<s>
+
+Only return records where the 'status' field is greater than or equal to specified value.
+
+=item B<--status-not-contains>=I<s>
+
+Only return records where the 'status' field does not contain specified text.
+
+=item B<--status-not-in-json>=I<s>
+
+Only return records where the 'status' field is not in the specified values (JSON-encoded).
+
+See C<--status-not-in>.
+
+=item B<--status-not-in>=I<s@>
+
+Only return records where the 'status' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-not-matches>=I<s>
+
+Only return records where the 'status' field does not match specified regular expression.
+
+=item B<--status-xmax>=I<s>
+
+Only return records where the 'status' field is less than specified value.
+
+=item B<--status-xmin>=I<s>
+
+Only return records where the 'status' field is greater than specified value.
+
+=item B<--status>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
+
+Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-enumbers list-enumbers
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-enumbers 'p/*/`list-enumbers`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Check E numbers for yellow colors
+
+ % list-enumbers -l --format text-pretty -- yellow
+ +-------+------------------------------------------------------------------+------------------+----------------------------+-------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+ | code  | names                                                            | purpose          | colour                     | color_index | status                                                                                                                                                          |
+ +-------+------------------------------------------------------------------+------------------+----------------------------+-------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+ | E100  | Curcumin (from turmeric)                                         | color            | Yellow-orange              |             | Approved in the EU.[8] Approved in the US.[9]                                                                                                                   |
+ | E101  | Riboflavin (Vitamin B2), formerly called lactoflavin             | color            | Yellow-orange              |             | Approved in the EU.[8] Approved in the US.[9]                                                                                                                   |
+ | E101a | Riboflavin-5'-Phosphate                                          | color            | Yellow-orange              |             | Approved in the EU.[8]                                                                                                                                          |
+ | E102  | Tartrazine (FD&C Yellow 5)                                       | color            | Yellow                     | 19140       | Approved in the EU.[8] Approved in the US.[9]                                                                                                                   |
+ | E104  | Quinoline Yellow WS                                              | color            | Dull or greenish yellow    | 47005       | Restricted use approved in the EU.[8][11]                                                                                                                       |
+ | E105  | Fast Yellow AB                                                   | color            | Yellow                     |             |                                                                                                                                                                 |
+ | E106  | Riboflavin-5-Sodium Phosphate                                    | color            | Yellow                     |             |                                                                                                                                                                 |
+ | E107  | Yellow 2G                                                        | color            | Yellow                     |             |                                                                                                                                                                 |
+ | E110  | Sunset Yellow FCF (Orange Yellow S, FD&C Yellow 6)               | color            | Yellow-orange              | 15985       | Restricted use approved in the EU.[8][11] Banned in Norway.[12] Products in the EU require warnings and its use is being phased out.[11] Approved in the US.[9] |
+ | E160a | Alpha-carotene, Beta-carotene, Gamma-carotene                    | color            | Yellow-orange to brown     |             | Approved in the EU.[8]                                                                                                                                          |
+ | E160e | Beta-apo-8'-carotenal (C 30)                                     | color            | Orange-red to yellow       |             | Approved in the EU.[8] Approved in the US.[9]                                                                                                                   |
+ | E160f | Ethyl ester of beta-apo-8'-carotenic acid (C 30)                 | color            | Orange-red to yellow       |             | Not approved in the EU.[11]                                                                                                                                     |
+ | E161a | Flavoxanthin                                                     | color            | Golden-yellow and brownish |             |                                                                                                                                                                 |
+ | E161b | Lutein                                                           | color            | Orange-red to yellow       |             | Approved in the EU.[8]                                                                                                                                          |
+ | E901  | Beeswax, white and yellow                                        | glazing agent    |                            |             | Approved in the EU.[20]                                                                                                                                         |
+ | E1400 | Dextrin (Dextrins, roasted starch white and yellow) (stabiliser) | thickening agent |                            |             |                                                                                                                                                                 |
+ +-------+------------------------------------------------------------------+------------------+----------------------------+-------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ENumberUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ENumberUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ENumberUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

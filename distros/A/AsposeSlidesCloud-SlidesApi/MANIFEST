@@ -140,6 +140,7 @@ lib/AsposeSlidesCloud/Object/OrderedMergeRequest.pm
 lib/AsposeSlidesCloud/Object/OuterShadowEffect.pm
 lib/AsposeSlidesCloud/Object/OutputFile.pm
 lib/AsposeSlidesCloud/Object/Paragraph.pm
+lib/AsposeSlidesCloud/Object/ParagraphFormat.pm
 lib/AsposeSlidesCloud/Object/Paragraphs.pm
 lib/AsposeSlidesCloud/Object/PathInputFile.pm
 lib/AsposeSlidesCloud/Object/PathOutputFile.pm

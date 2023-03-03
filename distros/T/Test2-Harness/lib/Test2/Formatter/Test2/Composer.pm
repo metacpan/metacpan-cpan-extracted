@@ -2,7 +2,7 @@ package Test2::Formatter::Test2::Composer;
 use strict;
 use warnings;
 
-our $VERSION = '1.000148';
+our $VERSION = '1.000150';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/first/;
@@ -273,7 +273,7 @@ sub render_info {
     my ($f) = @_;
 
     return map {
-        my $details = $_->{details} || '';
+        my $details = $_->{details} // '';
 
         my $msg;
         if (ref($details)) {

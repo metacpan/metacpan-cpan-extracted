@@ -2,7 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use lib './t/lib';
-use Test::RedisCluster qw/get_startup_nodes/;
+use Test::Docker::RedisCluster qw/get_startup_nodes/;
 
 use Redis::Cluster::Fast;
 use Test::SharedFork;

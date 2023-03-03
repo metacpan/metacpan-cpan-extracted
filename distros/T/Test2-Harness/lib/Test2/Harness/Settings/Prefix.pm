@@ -2,7 +2,7 @@ package Test2::Harness::Settings::Prefix;
 use strict;
 use warnings;
 
-our $VERSION = '1.000148';
+our $VERSION = '1.000150';
 
 use Carp();
 use Test2::Harness::Util();
@@ -37,6 +37,12 @@ sub field : lvalue {
     (${$self}->{$field}) = @args if @args;
 
     return ${$self}->{$field};
+}
+
+sub remove_field {
+    my $self = shift;
+    my ($field) = @_;
+    delete ${$self}->{$field};
 }
 
 our $AUTOLOAD;

@@ -44,12 +44,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yuki-kimoto/SPVM/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yuki-kimoto/SPVM.git",
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.9692",
+   "version" : "0.9694",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

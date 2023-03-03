@@ -63,7 +63,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
     対象言語を指定します。**DeepL**エンジンを使っている場合は、`deepl languages`コマンドで利用可能な言語を得ることができます。
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     原文と訳文の出力形式を指定します。
 
@@ -116,14 +116,14 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 **xlate**モジュールは、各ファイルの翻訳テキストをキャッシュしておき、実行前にそれを読むことで、サーバーへの問い合わせのオーバーヘッドをなくすことができます。デフォルトのキャッシュ戦略`auto`では、対象ファイルに対してキャッシュファイルが存在する場合のみ、キャッシュデータを保持します。
 
-- --refresh
+- --cache-clear
 
-    <--refresh>オプションは、キャッシュ管理を開始するか、既存のキャッシュデータをすべてリフレッシュするために使用されます。このオプションを一度実行すると、キャッシュファイルが存在しない場合は新規に作成され、その後は自動的に維持されます。
+    **--cache-clear**オプションは、キャッシュ管理を開始するため、あるいは既存のキャッシュデータをすべてリフレッシュするために使用することができます。このオプションを一度実行すると、キャッシュファイルが存在しない場合は新しいキャッシュファイルが作成され、その後は自動的にメンテナンスされます。
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        キャッシュファイルが存在すれば、それを維持します。
+        キャッシュファイルが存在する場合は、それを維持します。
 
     - `create`
 
@@ -133,9 +133,9 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
         ターゲットが通常のファイルである限り、とにかくキャッシュを維持します。
 
-    - `refresh`
+    - `clear`
 
-        キャッシュは維持するが、既存のキャッシュは読み込まないです。
+        キャッシュデータを先にクリアします。
 
     - `never`, `no`, `0`
 
@@ -151,7 +151,15 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
     DeepLサービス用の認証キーを設定します。
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)の場合。
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

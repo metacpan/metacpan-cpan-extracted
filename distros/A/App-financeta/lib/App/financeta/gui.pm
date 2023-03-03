@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
-
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter get_icon_path);
 use Carp ();
@@ -28,6 +27,7 @@ use Prima qw(
     Widget::ScrollWidget DetailedList Dialog::ColorDialog
     Dialog::FileDialog Dialog::FindDialog ScrollBar
     Dialog::PrintDialog Dialog::ImageDialog Dialog::FontDialog
+    sys::GUIException Utils
 );
 use Prima::Utils ();
 use Capture::Tiny ();
@@ -456,10 +456,28 @@ sub run {
     $self->main->show;
     $self->disable_menu_options; # to be safe
     my $stack_sub = sub {
-        Carp::confess();
+        my $sig = shift;
+        my $stackdump = Carp::longmess();
+        $log->error("Signal caught: SIG$sig\n$stackdump\n");
+        Prima::Utils::post(sub {
+            if ($::application) {
+                my $choice = Prima::MsgBox::signal_dialog('Error',
+                    "Signal caught: SIG$sig", $stackdump);
+                if ($choice == mb::Abort) {
+                    $log->error("Exiting the application");
+                    exit;
+                } else {
+                    $log->error("Not exiting the application");
+                }
+            }
+        });
     };
-    local $SIG{__DIE__} = $stack_sub;
+    # Prima::sys::GUIException takes care of __DIE__
     local $SIG{SEGV} = $stack_sub;
+    local $SIG{INT} = $stack_sub;
+    local $SIG{QUIT} = $stack_sub;
+    local $SIG{TERM} = $stack_sub;
+    local $SIG{HUP} = $stack_sub;
     run Prima;
 }
 

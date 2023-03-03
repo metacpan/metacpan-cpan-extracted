@@ -4,9 +4,13 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
+
+    use DateTime::Format::Genealogy;
+    my $dtg = DateTime::Format::Genealogy->new();
+    # ...
 
 # SUBROUTINES/METHODS
 
@@ -20,8 +24,13 @@ Given a date,
 runs it through [Genealogy::Gedcom::Date](https://metacpan.org/pod/Genealogy%3A%3AGedcom%3A%3ADate) to create a [DateTime](https://metacpan.org/pod/DateTime) object.
 If a date range is given, return a two element array in array context, or undef in scalar context
 
-Returns undef if the date can't be parsed, is just a year or if it is an appoximate date starting with "c", "ca" or "abt".
+Returns undef if the date can't be parsed,
+is before AD100,
+is just a year or if it is an approximate date starting with "c", "ca" or "abt".
 Can be called as a class or object method.
+
+    my $dt = DateTime::Format::Genealogy('25 Dec 2022');
+    $dt = $dtg->(date => '25 Dec 2022');
 
 date: the date to be parsed
 quiet: set to fail silently if there is an error with the date
@@ -32,6 +41,9 @@ strict: more strictly enforce the Gedcom standard, for example don't allow long 
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
+
+I can't get [DateTime::Format::Natural](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ANatural) to work on dates before AD100,
+so this module rejects dates that old.
 
 # SEE ALSO
 
@@ -56,6 +68,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2018-2021 Nigel Horne.
+Copyright 2018-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

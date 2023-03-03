@@ -20,7 +20,6 @@ extern "C" {
 #define NEED_newSVpvn_flags
 #include "ppport.h"
 
-#define MAX_ERROR_SIZE 256
 #define ONE_SECOND_TO_MICRO 1000000
 
 #define DEBUG_MSG(fmt, ...) \
@@ -35,27 +34,22 @@ extern "C" {
         event_base_dump_events(self->cluster_event_base, stderr);       \
     }
 
-#define DEBUG_MSG_FORCE(fmt, ...) \
-    fprintf(stderr, "[%d][%d][%s:%d:%s]: ", getpid(), getppid(), __FILE__, __LINE__, __func__);  \
-    fprintf(stderr, fmt, __VA_ARGS__);                              \
-    fprintf(stderr, "\n");
-
 typedef struct redis_cluster_fast_reply_s {
     SV *result;
     SV *error;
 } redis_cluster_fast_reply_t;
 
 typedef struct cmd_reply_context_s {
-    void* self;
+    void *self;
     SV *result;
     SV *error;
     int done;
 } cmd_reply_context_t;
 
 typedef struct redis_cluster_fast_s {
-    redisClusterAsyncContext* acc;
-    struct event_base* cluster_event_base;
-    char* hostnames;
+    redisClusterAsyncContext *acc;
+    struct event_base *cluster_event_base;
+    char *hostnames;
     int debug;
     int max_retry;
     struct timeval connect_timeout;
@@ -266,25 +260,24 @@ end:
 
 MODULE = Redis::Cluster::Fast    PACKAGE = Redis::Cluster::Fast
 
+BOOT:
+{
+    srand((unsigned int) time(NULL));
+}
+
 PROTOTYPES: DISABLE
 
-SV*
+void
 _new(char* cls);
 PREINIT:
 redis_cluster_fast_t* self;
-CODE:
+PPCODE:
 {
-    srand((unsigned int) time(NULL));
-
     Newxz(self, sizeof(redis_cluster_fast_t), redis_cluster_fast_t);
-    DEBUG_MSG("%s", "start new");
     ST(0) = sv_newmortal();
     sv_setref_pv(ST(0), cls, (void*)self);
-    DEBUG_MSG("return %p", ST(0));
     XSRETURN(1);
 }
-OUTPUT:
-    RETVAL
 
 int
 __set_debug(Redis::Cluster::Fast self, int val)
@@ -305,7 +298,7 @@ CODE:
         self->hostnames = NULL;
     }
 
-    if(hostnames) {
+    if (hostnames) {
         Newx(self->hostnames, sizeof(char) * (strlen(hostnames) + 1), char);
         strcpy(self->hostnames, hostnames);
         DEBUG_MSG("%s %s", "set hostnames", self->hostnames);
@@ -359,9 +352,9 @@ PREINIT:
     size_t* argvlen;
     STRLEN len;
     int argc, i;
-CODE:
+PPCODE:
 {
-    if(!self->acc) {
+    if (!self->acc) {
        croak("Not connected to any server");
     }
 
@@ -371,14 +364,9 @@ CODE:
     Newx(result_context, sizeof(cmd_reply_context_t), cmd_reply_context_t);
 
     for (i = 0; i < argc; i++) {
-        if(!sv_utf8_downgrade(ST(i + 1), 1)) {
-            croak("command sent is not an octet sequence in the native encoding (Latin-1). Consider using debug mode to see the command itself.");
-        }
         argv[i] = SvPV(ST(i + 1), len);
         argvlen[i] = len;
     }
-
-    DEBUG_MSG("raw_cmd : %s", *argv);
 
     Redis__Cluster__Fast_run_cmd(aTHX_ self, argc, (const char **) argv, argvlen, result_context);
 

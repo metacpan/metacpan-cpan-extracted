@@ -6,7 +6,7 @@ use Carp qw/confess/;
 
 use Test2::Harness::Util qw/looks_like_uuid/;
 
-our $VERSION = '0.000133';
+our $VERSION = '0.000135';
 
 use base 'DBIx::Class::Schema';
 
@@ -68,6 +68,9 @@ sub vague_run_search {
             die "No match for source ($source)";
         }
     }
+
+    return $self->resultset('Run')->search($query, $attrs)
+        if $params{list};
 
     $run = $self->resultset('Run')->find($query, $attrs);
     return $run;

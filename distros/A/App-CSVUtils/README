@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.017 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-02-18.
+    This document describes version 1.021 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-03-02.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -14,52 +14,56 @@ DESCRIPTION
     4. csv-check-field-names
     5. csv-check-field-values
     6. csv-check-rows
-    7. csv-concat
-    8. csv-convert-to-hash
-    9. csv-csv
-    10. csv-delete-fields
-    11. csv-dump
-    12. csv-each-row
-    13. csv-fill-template
-    14. csv-find-values
-    15. csv-freqtable
-    16. csv-gen
-    17. csv-get-cells
-    18. csv-grep
-    19. csv-info
-    20. csv-intrange
-    21. csv-list-field-names
-    22. csv-lookup-fields
-    23. csv-map
-    24. csv-munge-field
-    25. csv-munge-row
-    26. csv-pick
-    27. csv-pick-fields
-    28. csv-pick-rows
-    29. csv-replace-newline
-    30. csv-select-fields
-    31. csv-select-rows
-    32. csv-setop
-    33. csv-shuf
-    34. csv-shuf-fields
-    35. csv-shuf-rows
-    36. csv-sort
-    37. csv-sort-fields
-    38. csv-sort-rows
-    39. csv-sorted
-    40. csv-sorted-fields
-    41. csv-sorted-rows
-    42. csv-split
-    43. csv-sum
-    44. csv-transpose
-    45. csv-uniq
-    46. csv2ltsv
-    47. csv2paras
-    48. csv2td
-    49. csv2tsv
-    50. csv2vcf
-    51. paras2csv
-    52. tsv2csv
+    7. csv-cmp
+    8. csv-concat
+    9. csv-convert-to-hash
+    10. csv-csv
+    11. csv-delete-fields
+    12. csv-dump
+    13. csv-each-row
+    14. csv-fill-template
+    15. csv-find-values
+    16. csv-freqtable
+    17. csv-gen
+    18. csv-get-cells
+    19. csv-grep
+    20. csv-info
+    21. csv-intrange
+    22. csv-list-field-names
+    23. csv-lookup-fields
+    24. csv-ltrim
+    25. csv-map
+    26. csv-munge-field
+    27. csv-munge-row
+    28. csv-pick
+    29. csv-pick-fields
+    30. csv-pick-rows
+    31. csv-replace-newline
+    32. csv-rtrim
+    33. csv-select-fields
+    34. csv-select-rows
+    35. csv-setop
+    36. csv-shuf
+    37. csv-shuf-fields
+    38. csv-shuf-rows
+    39. csv-sort
+    40. csv-sort-fields
+    41. csv-sort-rows
+    42. csv-sorted
+    43. csv-sorted-fields
+    44. csv-sorted-rows
+    45. csv-split
+    46. csv-sum
+    47. csv-transpose
+    48. csv-trim
+    49. csv-uniq
+    50. csv2ltsv
+    51. csv2paras
+    52. csv2td
+    53. csv2tsv
+    54. csv2vcf
+    55. paras2csv
+    56. tsv2csv
 
 FUNCTIONS
   gen_csv_util

@@ -1,3 +1,12 @@
+1.000150  2023-03-01 13:40:42-08:00 America/Los_Angeles
+
+    - Add ability to override 'add' value in rerun grabbing
+
+1.000149  2023-02-28 09:13:50-08:00 America/Los_Angeles
+
+    - Add more 'rerun' capabilities
+    - Fix diagnostcis replacing '0' with an empty string
+
 1.000148  2023-02-22 17:17:49-08:00 America/Los_Angeles
 
     - Fix output corruption in interactive mode

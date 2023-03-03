@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
-
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter);
 use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
@@ -18,7 +17,7 @@ if ($^O !~ /win32/i) {
         require POE::Session;
     } or die "Unable to load POE::Loop::Prima";
 }
-use Prima qw(Application Edit MsgBox);
+use Prima qw(Application Edit MsgBox sys::GUIException);
 use Try::Tiny;
 use App::financeta::language;
 

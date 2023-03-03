@@ -7,7 +7,7 @@ use strict;
 
 package Math::Formula::Token;
 use vars '$VERSION';
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 
 #!!! The declarations of all other packages in this file are indented to avoid

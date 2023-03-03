@@ -21,21 +21,21 @@ Math::Formula::Config - load/save formulas to file
 The extensions of this module can be used to export and import
 sets of expressions to and from a program.
 
-The following formats are supported:
+The following serialization formats are supported:
 
 =over 4
 
-=item * JSON L<Math::Formula::Config::JSON|Math::Formula::Config::JSON>
+=item * JSON L<Math::Formula::Config::JSON|Math::Formula::Config::JSON> (save)
 
-=item * YAML L<Math::Formula::Config::YAML|Math::Formula::Config::YAML>
+=item * YAML L<Math::Formula::Config::YAML|Math::Formula::Config::YAML> (save)
 
-=item * INI  L<Math::Formula::Config::INI|Math::Formula::Config::INI>
+=item * INI  L<Math::Formula::Config::INI|Math::Formula::Config::INI>  (save and load)
 
 =back
 
-At the moment, B<loading is not yet supported>.  That implementation will
-certainly impact the output format.  The current version is ment for
-studying.
+At the moment, B<loading is not generally supported>: it produces only satisfactory
+results for INI, but improvements are under way.  That implementation will
+certainly impact the output format.  The current version is ment for studying.
 
 =head1 METHODS
 
@@ -65,7 +65,12 @@ a separate file is made.
 
 =item $obj-E<gt>B<directory>()
 
+When the configuration files will be written, and are read.
+
 =item $obj-E<gt>B<path_for>($file)
+
+Constructs a filename, based on the configured L<directory()|Math::Formula::Config/"Attributes">, the context's name,
+and the usual filename extensions.
 
 =back
 
@@ -88,7 +93,7 @@ Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
 
 =item $obj-E<gt>B<save>($context, %args)
 
-Serialize the $context to a files as storage or to be editted by hand.
+Serialize the $context into a file as storage or to be editted by hand.
 This is a usefull method when default configuration templates need to
 be generated.
 
@@ -96,8 +101,8 @@ be generated.
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.13,
-built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.14,
+built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

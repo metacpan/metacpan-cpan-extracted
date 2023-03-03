@@ -106,7 +106,7 @@ should apply to RxPerl too).
 
         my $o = rx_defer(sub {
             return $special_var ? rx_of(10, 20, 30) : rx_of(40, 50, 60)
-        })
+        });
 
         # 10, 20, 30, complete
         $special_var = 1;
@@ -387,7 +387,7 @@ apply to RxPerl too).
 
         # 1, 3, 5, 7, 9, ...
         rx_interval(0.7)->pipe(
-            op_audit(sub ($val) { rx_timer(1) }),
+            op_audit(sub ($val) { rx_timer(1) }), # can also use $_ here
         )->subscribe($observer);
 
 - op\_audit\_time
@@ -522,7 +522,7 @@ apply to RxPerl too).
 
         # 3, complete
         rx_of(1, 2, 3)->pipe(
-            op_debounce(sub ($val) { rx_timer(0.5) }),
+            op_debounce(sub ($val) { rx_timer(0.5) }), # can also use $_ here
         )->subscribe($observer);
 
 - op\_debounce\_time
@@ -543,6 +543,12 @@ apply to RxPerl too).
         # 42, complete
         rx_timer(0.7)->pipe(
             op_ignore_elements(),
+            op_default_if_empty(42),
+        )->subscribe($observer);
+
+        # 0, 1, complete
+        rx_interval(0.7)->pipe(
+            op_take(2),
             op_default_if_empty(42),
         )->subscribe($observer);
 
@@ -654,7 +660,7 @@ apply to RxPerl too).
 
         # 0, complete
         rx_of(5, 10, 15, 18, 20)->pipe(
-            op_every(sub ($value, $idx) { $value % 5 == 0 }),
+            op_every(sub ($value, $idx) { $value % 5 == 0 }), # can also use $_ here
         )->subscribe($observer);
 
 - op\_exhaust\_all
@@ -683,11 +689,9 @@ apply to RxPerl too).
 
     [https://rxjs.dev/api/operators/filter](https://rxjs.dev/api/operators/filter)
 
-    You can use `$_` instead of `$_[0]` inside this operator's callback.
-
         # 0, 2, 4, 6, ... (every 1.4 seconds)
         rx_interval(0.7)->pipe(
-            op_filter(sub {$_[0] % 2 == 0}),
+            op_filter(sub {$_[0] % 2 == 0}), # can also use $_ here
         )->subscribe($observer);
 
         # 0, 2, 4, 6, ... (every 1.4 seconds)
@@ -759,7 +763,7 @@ apply to RxPerl too).
 
         # (pause 7 seconds) 6, complete
         rx_interval(1)->pipe(
-            op_first(sub { $_[0] > 5 }),
+            op_first(sub ($val, $idx) { $val > 5 }), # can also use $_ here
         )->subscribe($observer);
 
         # 0, complete
@@ -971,7 +975,7 @@ apply to RxPerl too).
 
         # [0, 1], [1, 2], [2, 3], ...
         rx_interval(1)->pipe(
-            op_pairwise,
+            op_pairwise(),
         )->subscribe(sub {print Dumper($_[0])});
 
 - op\_pluck
@@ -1205,12 +1209,12 @@ apply to RxPerl too).
 
         # 0, 1, 2, 3, 4, 5, complete
         rx_interval(1)->pipe(
-            op_take_while(sub { $_[0] <= 5 }),
+            op_take_while(sub ($val, $idx) { $val <= 5 }), # can also use $_ here
         )->subscribe($observer);
 
         # 0, 1, 2, 3, 4, 5, 6, complete
         rx_interval(1)->pipe(
-            op_take_while(sub { $_[0] <= 5 }, 1),
+            op_take_while(sub { $_ <= 5 }, 1),
         )->subscribe($observer);
 
 - op\_tap
@@ -1228,7 +1232,7 @@ apply to RxPerl too).
 
         # 0, 2, 4, 6, 8, 10, ...
         rx_interval(0.7)->pipe(
-            op_throttle(sub ($val) { rx_timer(1) }),
+            op_throttle(sub ($val) { rx_timer(1) }), # can also use $_ here
         )->subscribe($observer);
 
 - op\_throttle\_time

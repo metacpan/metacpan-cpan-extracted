@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Graph-Geometric",
   "LICENSE" => "bsd",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Graph::Geometric",
   "PREREQ_PM" => {
     "Graph" => "0.9713",
@@ -22,7 +23,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.1.0",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -3,9 +3,9 @@ NAME
     facts
 
 VERSION
-    This document describes version 0.023 of App::BPOMUtils::NutritionFacts
+    This document describes version 0.024 of App::BPOMUtils::NutritionFacts
     (from Perl distribution App-BPOMUtils-NutritionFacts), released on
-    2023-01-29.
+    2023-02-05.
 
 SYNOPSIS
 DESCRIPTION
@@ -230,7 +230,7 @@ SOURCE
 SEE ALSO
     <https://pom.go.id>
 
-    App::BPOMUtils
+    Other "App::BPOMUtils::*" distributions.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

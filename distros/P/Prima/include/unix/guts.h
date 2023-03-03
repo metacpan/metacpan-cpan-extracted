@@ -1327,7 +1327,7 @@ prima_free_rotated_entry( PCachedFont f);
 #define frUnix_int 1000
 
 extern int
-unix_rm_get_int( Handle self, XrmQuark class_detail, XrmQuark name_detail, int default_value);
+prima_rm_get_int( Handle self, XrmQuark class_detail, XrmQuark name_detail, int default_value);
 
 extern void
 prima_rect_union( XRectangle *t, const XRectangle *s);
@@ -1585,6 +1585,9 @@ prima_xim_focus_out(void);
 extern void
 prima_xim_update_cursor( Handle self);
 
+extern U32
+prima_keysym_to_keycode( KeySym keysym, XKeyEvent *ev, U8 character );
+
 #ifdef WITH_GTK
 extern Display*
 prima_gtk_init( void);
@@ -1688,4 +1691,7 @@ prima_paint_text_background( Handle self, Point * p, int x, int y );
 
 extern void
 prima_paint_box( Handle self, int w, int h, Matrix matrix, unsigned long foreground );
+
+extern Bool
+prima_update_quarks_cache( Handle self);
 

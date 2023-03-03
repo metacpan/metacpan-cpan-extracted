@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.10.0';
+$HTML::Spelling::Site::Checker::VERSION = '0.10.1';
 use strict;
 use warnings;
 use autodie;
@@ -10,10 +10,10 @@ use 5.014;
 use MooX qw/late/;
 
 use HTML::Parser 3.00 ();
-use List::MoreUtils qw(any);
-use JSON::MaybeXS qw(decode_json);
-use Path::Tiny qw/ path /;
-use Digest ();
+use List::MoreUtils   qw(any);
+use JSON::MaybeXS     qw(decode_json);
+use Path::Tiny        qw/ path /;
+use Digest            ();
 
 has '_inside' =>
     ( is => 'rw', isa => 'HashRef', default => sub { return +{}; } );
@@ -59,6 +59,7 @@ sub _calc_mispellings
 
     my $write_cache = sub {
         my ( $ref, $ddata ) = @_;
+        $cache_fh->parent()->mkdir();
         $cache_fh->spew_raw(
             JSON::MaybeXS->new( canonical => 1 )->encode(
                 {
@@ -268,7 +269,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.10.0
+version 0.10.1
 
 =head1 SYNOPSIS
 

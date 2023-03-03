@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::ParagraphFormat;
 use AsposeSlidesCloud::Object::ThreeDFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -190,16 +191,142 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'margin_left' => {
+    	datatype => 'double',
+    	base_name => 'MarginLeft',
+    	description => 'Left margin. Left margin.',
+    	format => '',
+    	read_only => '',
+    		},
+    'margin_right' => {
+    	datatype => 'double',
+    	base_name => 'MarginRight',
+    	description => 'Right margin.',
+    	format => '',
+    	read_only => '',
+    		},
+    'margin_top' => {
+    	datatype => 'double',
+    	base_name => 'MarginTop',
+    	description => 'Top margin.',
+    	format => '',
+    	read_only => '',
+    		},
+    'margin_bottom' => {
+    	datatype => 'double',
+    	base_name => 'MarginBottom',
+    	description => 'Bottom margin.',
+    	format => '',
+    	read_only => '',
+    		},
+    'wrap_text' => {
+    	datatype => 'string',
+    	base_name => 'WrapText',
+    	description => 'True if text is wrapped at TextFrame&#39;s margins.',
+    	format => '',
+    	read_only => '',
+    		},
+    'anchoring_type' => {
+    	datatype => 'string',
+    	base_name => 'AnchoringType',
+    	description => 'Returns or sets vertical anchor text in a TextFrame.',
+    	format => '',
+    	read_only => '',
+    		},
+    'center_text' => {
+    	datatype => 'string',
+    	base_name => 'CenterText',
+    	description => 'If True then text should be centered in box horizontally.',
+    	format => '',
+    	read_only => '',
+    		},
+    'text_vertical_type' => {
+    	datatype => 'string',
+    	base_name => 'TextVerticalType',
+    	description => 'Determines text orientation. The resulted value of visual text rotation summarized from this property and custom angle in property RotationAngle.',
+    	format => '',
+    	read_only => '',
+    		},
+    'autofit_type' => {
+    	datatype => 'string',
+    	base_name => 'AutofitType',
+    	description => 'Returns or sets text&#39;s auto-fit mode.',
+    	format => '',
+    	read_only => '',
+    		},
+    'column_count' => {
+    	datatype => 'int',
+    	base_name => 'ColumnCount',
+    	description => 'Returns or sets number of columns in the text area. This value must be a positive number. Otherwise, the value will be set to zero.  Value 0 means undefined value.',
+    	format => '',
+    	read_only => '',
+    		},
+    'column_spacing' => {
+    	datatype => 'double',
+    	base_name => 'ColumnSpacing',
+    	description => 'Returns or sets the space between text columns in the text area (in points). This should only apply  when there is more than 1 column present. This value must be a positive number. Otherwise, the value will be set to zero. ',
+    	format => '',
+    	read_only => '',
+    		},
+    'keep_text_flat' => {
+    	datatype => 'boolean',
+    	base_name => 'KeepTextFlat',
+    	description => 'Returns or set keeping text out of 3D scene entirely.',
+    	format => '',
+    	read_only => '',
+    		},
+    'rotation_angle' => {
+    	datatype => 'double',
+    	base_name => 'RotationAngle',
+    	description => 'Specifies the custom rotation that is being applied to the text within the bounding box.',
+    	format => '',
+    	read_only => '',
+    		},
+    'default_paragraph_format' => {
+    	datatype => 'ParagraphFormat',
+    	base_name => 'DefaultParagraphFormat',
+    	description => 'Default portion format.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'three_d_format' => 'ThreeDFormat',
-    'transform' => 'string'
+    'transform' => 'string',
+    'margin_left' => 'double',
+    'margin_right' => 'double',
+    'margin_top' => 'double',
+    'margin_bottom' => 'double',
+    'wrap_text' => 'string',
+    'anchoring_type' => 'string',
+    'center_text' => 'string',
+    'text_vertical_type' => 'string',
+    'autofit_type' => 'string',
+    'column_count' => 'int',
+    'column_spacing' => 'double',
+    'keep_text_flat' => 'boolean',
+    'rotation_angle' => 'double',
+    'default_paragraph_format' => 'ParagraphFormat'
 } );
 
 __PACKAGE__->attribute_map( {
     'three_d_format' => 'ThreeDFormat',
-    'transform' => 'Transform'
+    'transform' => 'Transform',
+    'margin_left' => 'MarginLeft',
+    'margin_right' => 'MarginRight',
+    'margin_top' => 'MarginTop',
+    'margin_bottom' => 'MarginBottom',
+    'wrap_text' => 'WrapText',
+    'anchoring_type' => 'AnchoringType',
+    'center_text' => 'CenterText',
+    'text_vertical_type' => 'TextVerticalType',
+    'autofit_type' => 'AutofitType',
+    'column_count' => 'ColumnCount',
+    'column_spacing' => 'ColumnSpacing',
+    'keep_text_flat' => 'KeepTextFlat',
+    'rotation_angle' => 'RotationAngle',
+    'default_paragraph_format' => 'DefaultParagraphFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

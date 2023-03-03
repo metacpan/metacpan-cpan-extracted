@@ -301,6 +301,17 @@ This release also has a lot of code refactoring and other internal changes.
 
 This release is dedicated to the dog Sheila, faithful companion of my friend @NightStorm_KPC. Rest in peace, Sheila.
 
+=head2 VERSION 25
+
+This version is (in theory) fully backward compatible. The only change is the addition of the L<Net::Clacks::PostgreSQL2Clacks> module.
+
+This Version is dedicated to Tobias, my coworker whos software always wants to know (in real time!) if critical data has changed in the database. WITHOUT polling the database constantly.
+Displaying up-to-date data to the user? What a strange and novel concept.
+
+=head2 VERSION 26
+
+This fixes some documentation issues.
+
 
 =head1 AUTHOR
 
@@ -313,7 +324,7 @@ L<https://cavac.at/public/mercurial/Net-Clacks/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 Rene Schickbauer
+Copyright (C) 2008-2023 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

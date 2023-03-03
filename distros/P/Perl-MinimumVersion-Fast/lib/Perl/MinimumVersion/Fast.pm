@@ -8,7 +8,7 @@ use version ();
 use Compiler::Lexer 0.13;
 use List::Util qw(max);
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 my $MIN_VERSION   = version->new('5.006');
 my $VERSION_5_020 = version->new('5.020');

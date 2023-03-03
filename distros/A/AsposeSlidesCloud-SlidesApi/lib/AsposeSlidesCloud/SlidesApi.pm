@@ -14398,6 +14398,92 @@ sub download_shape {
 }
 
 #
+# download_shape_from_dto
+#
+# Creates the shape from the DTO and returns the result in the specified format.
+# 
+# @param string $format Export format (required)
+# @param ShapeBase $dto Shape DTO. (required)
+{
+    my $params = {
+    'format' => {
+        data_type => 'string',
+        description => 'Export format',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_shape_from_dto' } = { 
+    	summary => 'Creates the shape from the DTO and returns the result in the specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_shape_from_dto {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling download_shape_from_dto");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling download_shape_from_dto");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/shape/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # download_shape_online
 #
 # Render shape to specified picture format.

@@ -494,7 +494,7 @@ Revision history for StreamFinder
         - Added StreamFinder::Rcast to fetch rcast.net radio stations.
         - StreamFinder::BrandNewTube - Fix several issues with this rapidly-
         depreciating video site (more recent videos seem to be wrapped in 
-        javascript and becoming unscrapable.  These fixes restore some fields 
+        javascript and becoming unscrapable).  These fixes restore some fields 
         for which the site has changed the code.  Note:  This module also 
         handles ugetube.com videos, which seem to still work properly, and may 
         be renamed to StreamFinder::UGETube in the future if brandnewtube.com 
@@ -505,3 +505,15 @@ Revision history for StreamFinder
         StreamFinder class - Fix undefined variable warning when attempting to 
         fetch a stream URL when there are no streams matching restricted 
         criteria, even if a valid StreamFinder object was returned.
+2.10    2023/03/02
+        - Added StreamFinder::Goodpods to fetch goodpods.com podcasts.
+        - StreamFinder::SermonAudio - Add "-speakericon" to reverse the two 
+        artist/channel images - SermonAudio usually provides 2 separate artist/
+        channel images (one for the church/channel, and one a portrait of the 
+        preacher).  The -speakericon option (if set) reverses the ones returned 
+        by getIconURL('artist') and getImageURL('artist').  Also try harder to 
+        find these icon images in the sermon pages.
+        - StreamFinder::Vimeo - Fix missing "description" (getTitle('desc')) 
+        and icon (video-preview) image due to site changes.  Also do better job 
+        selecting this image, which usually comes in multiple sizes:  
+        make getIconURL() return the smallest and getImageURL() the largest.

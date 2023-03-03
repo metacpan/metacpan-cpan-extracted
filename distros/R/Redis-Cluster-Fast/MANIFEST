@@ -15,9 +15,7 @@ t/02_leak.t
 t/03_fork.t
 t/04_timeout.t
 t/05_valgrind.t
-t/lib/Test/RedisCluster.pm
-t/lib/Test/RedisClusterBoot.pm
-t/lib/Test/RedisClusterImage.pm
+t/lib/Test/Docker/RedisCluster.pm
 t/lib/memcheck-extra.supp
 typemap
 deps/hiredis/CHANGELOG.md

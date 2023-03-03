@@ -9,7 +9,7 @@
 
 package Math::Formula;
 use vars '$VERSION';
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 
 use warnings;
@@ -34,8 +34,7 @@ sub new(%)
 
 sub init($)
 {	my ($self, $args) = @_;
-	my $name = $self->{MSBE_name} = $args->{_name} or panic "every formular requires a name";
-
+	my $name    = $self->{MSBE_name} = $args->{_name} or panic "every formular requires a name";
 	my $expr    = $args->{_expr} or panic "every formular requires an expression";
 	my $returns = $self->{MSBE_returns} = $args->{returns};
 
@@ -133,9 +132,6 @@ sub _build_ast($$)
   PROGRESS:
 	while(my $first = shift @$t)
 	{
-#use Data::Dumper; $Data::Dumper::Indent = 0;
-#warn "LOOP FIRST ", Dumper $first;
-#warn "     MORE  ", Dumper $t;
 		if($first->isa('MF::PARENS'))
 		{	my $level = $first->level;
 

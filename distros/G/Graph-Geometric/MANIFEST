@@ -12,7 +12,9 @@ t/carve.t
 t/carve_face.t
 t/cuboctahedron.t
 t/cupola-and-rotunda.t
+t/elongate.t
 t/pentagonal_trapezohedron.t
 t/polygons.t
+t/properties.t
 t/rhombic_dodecahedron.t
 t/truncated_icosahedron.t

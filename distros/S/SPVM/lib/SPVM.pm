@@ -8,7 +8,7 @@ use Carp 'cluck';
 use SPVM::Builder;
 use SPVM::Global;
 
-our $VERSION = '0.9692';
+our $VERSION = '0.9694';
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
@@ -444,6 +444,8 @@ motiE<lt>motohiko.ave@gmail.comE<gt>
 =item * L<Yoshiyuki Itoh|https://github.com/YoshiyukiItoh>
 
 =item * L<Tore Aursand|https://github.com/toreau>
+
+=item * L<greengorcer|https://github.com/greengorcer>
 
 =back
 

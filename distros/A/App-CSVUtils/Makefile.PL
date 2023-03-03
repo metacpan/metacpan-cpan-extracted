@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "script/csv-check-field-names",
     "script/csv-check-field-values",
     "script/csv-check-rows",
+    "script/csv-cmp",
     "script/csv-concat",
     "script/csv-convert-to-hash",
     "script/csv-csv",
@@ -36,6 +37,7 @@ my %WriteMakefileArgs = (
     "script/csv-intrange",
     "script/csv-list-field-names",
     "script/csv-lookup-fields",
+    "script/csv-ltrim",
     "script/csv-map",
     "script/csv-munge-field",
     "script/csv-munge-row",
@@ -43,6 +45,7 @@ my %WriteMakefileArgs = (
     "script/csv-pick-fields",
     "script/csv-pick-rows",
     "script/csv-replace-newline",
+    "script/csv-rtrim",
     "script/csv-select-fields",
     "script/csv-select-rows",
     "script/csv-setop",
@@ -58,6 +61,7 @@ my %WriteMakefileArgs = (
     "script/csv-split",
     "script/csv-sum",
     "script/csv-transpose",
+    "script/csv-trim",
     "script/csv-uniq",
     "script/csv2ltsv",
     "script/csv2paras",
@@ -124,7 +128,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.017",
+  "VERSION" => "1.021",
   "test" => {
     "TESTS" => "t/*.t"
   }

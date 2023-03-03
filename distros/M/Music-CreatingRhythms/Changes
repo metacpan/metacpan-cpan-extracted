@@ -1,5 +1,19 @@
 Revision history for Music-CreatingRhythms
 
+0.0301 2023-03-02 13:11:46
+    - Improve the eg/pfold-set.pl program.
+    - Improve documentation drastically!
+
+0.0300 2023-03-01 13:50:53
+    - Add the pfold() method.
+    - Add the eg/pfold-set.pl program.
+
+0.0200 2023-02-28 17:44:56
+    - Add the cfcv() and cfsqrt() routines from the book.
+    - Add the eg/chsequl-set.pl program.
+    - Add the eg/chseqcv-set.pl program.
+    - Fix function name to match book ("permi").
+
 0.0101 2023-02-26 09:06:32
     - Improve documentation.
 

@@ -5,8 +5,9 @@ use 5.10.0;
 use App::financeta::utils qw(dumper log_filter);
 use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
 use Log::Any::Adapter 'Stderr';
+use App::financeta::gui;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
 
 sub print_banner {
@@ -51,7 +52,6 @@ sub run {
     Log::Any::Adapter->set('Stderr', log_level => $log_level);
     $log->debug("Options sent to the Gui: " . dumper(\%opts));
     $log->debug("Setting log level to $log_level");
-    eval { require App::financeta::gui; } or die "Unable to load App::financeta::gui";
     my $gui = App::financeta::gui->new(
         log_level => $log_level,
         debug => $opts{debug},
@@ -131,7 +131,13 @@ Then you build L<Prima>, L<PDL>, L<PDL::Graphics::Gnuplot>, L<PDL::Graphics::Sim
 
 For Windows you need Strawberry Perl installed and install L<Prima>, L<PDL>, L<PDL::Graphics::Prima>, L<PDL::Graphics::Gnuplot>, L<PDL::Graphics::Simple>.
 
-You may want to install Gnuplot from their website.
+You will want to install Gnuplot 5.2.8 from their website. The version that is 5.4 and above is not supported at the moment due to issues with IPC.
+
+=item B<Mac OSX>
+
+It is quite a lot of work to get this working on Mac OSX. We have tested it on Monterey. You will need HomeBrew from <https://brew.sh> setup and install the following packages: B<gnuplot>, B<xorg-server>, B<cmake>, B<openssl>, B<perl>, B<xinit>, B<fribidi>, B<pkg-config>, B<xquartz>, B<dk/libthai/libthai>, B<libheif>, B<gtk+3>.
+
+It may or may not work here.
 
 =back
 

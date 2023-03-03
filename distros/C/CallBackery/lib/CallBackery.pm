@@ -38,7 +38,7 @@ use CallBackery::Database;
 use CallBackery::User;
 
 
-our $VERSION = '0.43.2';
+our $VERSION = '0.44.0';
 
 
 =head2 config
@@ -159,11 +159,11 @@ sub startup {
         $c->req->url->base(Mojo::URL->new($uri)) if $uri;
     });
 
-    my $securityHeaders = $app->securityHeaders;
     $app->hook( after_dispatch => sub {
         my $c = shift;
         # not telling anyone that we are mojo
         $c->res->headers->remove('Server');
+        my $securityHeaders = $c->can('securityHeaders') ? $c->securityHeaders : $app->securityHeaders;
         for my $header ( keys %$securityHeaders){
             $c->res->headers->header($header,$securityHeaders->{$header});
         }

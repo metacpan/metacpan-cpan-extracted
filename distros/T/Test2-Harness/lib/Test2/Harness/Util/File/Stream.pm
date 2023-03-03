@@ -2,7 +2,7 @@ package Test2::Harness::Util::File::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '1.000148';
+our $VERSION = '1.000150';
 
 use Carp qw/croak/;
 use Test2::Harness::Util qw/lock_file unlock_file/;
@@ -40,11 +40,11 @@ sub poll_with_index {
 
     my @out;
     while (!$max || @out < $max) {
-        my ($spos, $epos, $line) = $self->read_line(%params, from => $pos);
-        last unless defined($line) || defined($spos) || defined($epos);
+        my ($spos, $epos, $line, $err) = $self->read_line(%params, from => $pos);
+        last unless defined($line) || defined($spos) || defined($epos) || $err;
 
         $self->{+LINE_POS} = $epos unless $params{peek} || defined $params{from};
-        push @out => [$spos, $epos, $line];
+        push @out => [$spos, $epos, $line] unless $err;
         $pos = $epos;
     }
 

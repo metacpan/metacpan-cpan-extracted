@@ -1,19 +1,19 @@
 package Net::Clacks::ClacksCache;
 #---AUTOPRAGMASTART---
-use 5.020;
+use v5.36;
 use strict;
-use warnings;
 use diagnostics;
 use mro 'c3';
-use English;
-use Carp;
-our $VERSION = 24;
+use English qw(-no_match_vars);
+use Carp qw[carp croak confess cluck longmess shortmess];
+our $VERSION = 26;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
-use feature 'signatures';
-no warnings qw(experimental::signatures);
+use Data::Dumper;
+use builtin qw[true false is_bool];
+no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 #---AUTOPRAGMAEND---
 
 use Net::Clacks::Client;
@@ -97,7 +97,7 @@ sub extraDestroys($self) {
 }
 
 sub disconnect($self) {
-    eval {
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         $self->{clacks}->disconnect();
     };
 
@@ -105,7 +105,7 @@ sub disconnect($self) {
 }
 
 DESTROY($self) {
-    eval {
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         $self->{clacks}->disconnect();
     };
 
@@ -142,14 +142,14 @@ sub set($self, $key, $data) { ## no critic (NamingConventions::ProhibitAmbiguous
         $data = 'PAGECAMELCLACKSYAMLB64: ' . encode_base64($data, '');
     } elsif($data =~ /^PAGECAMELCLACKSB64/o) {
         # Already encoded? Clacks injection alert? Just don't store the thing...
-        return 0;
+        return false;
     } elsif($data =~ /\n/o || $data =~ /\r/o) {
         $data = 'PAGECAMELCLACKSB64:' . encode_base64($data, '');
     }
 
     $self->{clacks}->store($key, $data);
 
-    return 1;
+    return true;
 }
 
 sub delete($self, $key) { ## no critic(BuiltinHomonyms)
@@ -158,7 +158,7 @@ sub delete($self, $key) { ## no critic(BuiltinHomonyms)
     $key = $self->sanitize_key($key);
 
     $self->{clacks}->remove($key);
-    return 1;
+    return true;
 }
 
 sub incr($self, $key, $stepsize = '') {
@@ -171,7 +171,7 @@ sub incr($self, $key, $stepsize = '') {
     } else {
         $self->{clacks}->increment($key, $stepsize);
     }
-    return 1;
+    return true;
 }
 
 sub decr($self, $key, $stepsize = '') {
@@ -184,7 +184,7 @@ sub decr($self, $key, $stepsize = '') {
     } else {
         $self->{clacks}->decrement($key, $stepsize);
     }
-    return 1;
+    return true;
 }
 
 sub clacks_set($self, $key, $data) {
@@ -194,7 +194,7 @@ sub clacks_set($self, $key, $data) {
 
     $self->{clacks}->set($key, $data);
 
-    return 1;
+    return true;
 }
 
 sub clacks_notify($self, $key) {
@@ -202,9 +202,9 @@ sub clacks_notify($self, $key) {
 
     $key = $self->sanitize_key($key);
 
-    $self->{clacks}->set($key);
+    $self->{clacks}->notify($key);
 
-    return 1;
+    return true;
 }
 
 sub clacks_keylist($self) {
@@ -329,7 +329,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 Rene Schickbauer
+Copyright (C) 2008-2023 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

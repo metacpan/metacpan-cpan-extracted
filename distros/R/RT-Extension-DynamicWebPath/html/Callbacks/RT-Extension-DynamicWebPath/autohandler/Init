@@ -1,0 +1,24 @@
+<%INIT>
+my $dynamic_web_path = RT->Config->Get('DynamicWebPath') or return;
+my $web_path;
+
+if ( RT::Interface::Web::RequestENV('REQUEST_URI') =~ m{^/*(/[^/]+)} ) {
+    $web_path = $1 if $dynamic_web_path->{$1};
+}
+
+$web_path ||= '';
+
+return if RT->Config->Get('WebPath') eq $web_path;
+
+if ( my $config = $dynamic_web_path->{$web_path} ) {
+    RT->Config->Set( WebImagesURL => "$web_path/static/images/" );
+    RT->Config->Set( LogoURL      => "$web_path/static/images/request-tracker-logo.svg" );
+    RT->Config->Set( WebURL       => RT->Config->Get('WebBaseURL') . "$web_path/" );
+    RT->Config->Set( WebPath      => $web_path );
+
+    for my $name ( keys %$config ) {
+        RT->Config->Set( $name => $config->{$name} );
+    }
+    RT->Logger->debug("Switched WebPath to $web_path");
+}
+</%INIT>

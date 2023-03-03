@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak confess/;
 
-our $VERSION = "0.082";
+our $VERSION = "0.084";
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -47,7 +47,13 @@ sub AUTOLOAD {
 
     my $method = sub {
         my $self = shift;
-        my ($reply, $error) = $self->__std_cmd(@command, @_);
+        my @arguments = @_;
+        for my $index (0 .. $#arguments) {
+            utf8::downgrade($arguments[$index], 1)
+                or confess 'command sent is not an octet sequence in the native encoding (Latin-1).';
+        }
+
+        my ($reply, $error) = $self->__std_cmd(@command, @arguments);
         confess "[$command] $error" if defined $error;
         if (wantarray) {
             my $type = ref $reply;

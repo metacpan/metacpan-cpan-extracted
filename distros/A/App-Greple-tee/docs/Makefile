@@ -1,15 +1,18 @@
-LANGS  := DE EL ET FR ID JA KO NL RO RU TR UK ZH
-IGNORE := AUTHOR LICENSE
+LANGS    := DE EL ET FR ID JA KO NL RO RU TR UK ZH
+RM_LANGS := JA KO ZH
+IGNORE   := AUTHOR LICENSE
 
 LIB    := ../lib/App/Greple
 SRCDIR := src
 
 MODS   := $(wildcard $(LIB)/*.pm)
 PM     := $(notdir $(MODS))
+NAME   := $(patsubst %.pm,%,$(firstword $(PM)))
 SRC    := $(PM:%=$(if $(SRCDIR),$(SRCDIR)/,)%)
 PMS    := $(foreach lang,$(LANGS),$(SRC:.pm=.$(lang).pm))
 MDS    := $(foreach lang,$(LANGS),$(PM:.pm=.$(lang).md))
-ALL    := $(PMS) $(MDS) README.md
+RM_MDS := $(RM_LANGS:%=../README.%.md)
+ALL    := $(PMS) $(MDS) README.md $(RM_MDS)
 
 all: $(ALL)
 
@@ -49,6 +52,13 @@ $(foreach lang,$(LANGS),$(eval $(call LANG_PM,$(lang))))
 
 %.md: $(SRCPATH)%.pm
 	pod2markdown $< > $@
+
+define LANG_README
+  ../README.$1.md: $(NAME).$1.md
+	cp $$< $$@
+endef
+
+$(foreach lang,$(RM_LANGS),$(eval $(call LANG_README,$(lang))))
 
 README.md: Makefile
 	exec > $@ && \

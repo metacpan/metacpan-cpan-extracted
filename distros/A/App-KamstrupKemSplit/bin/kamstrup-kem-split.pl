@@ -1,7 +1,7 @@
 #! /usr/bin/env perl
 # PODNAME: kamstrup-kem-split.pl
 # ABSTRACT: Split encrypted KEM file input from the Kamstrup backend into separate XML files with device information
-our $VERSION = '0.005'; # VERSION	
+our $VERSION = '0.006'; # VERSION	
 
 use Modern::Perl '2022';
 use App::KamstrupKemSplit;
@@ -54,7 +54,7 @@ if ( !defined $orders ) {
 	$orders->{'fulldump'} = {
 		'kamstrup_ordernr' => -1,
 		'kamstrup_start'   => 0,
-		'kamstrup_stop'	   => 99999999,
+		'kamstrup_stop'	   => -1,
 		'nr_of_devices'	   => -1
 	};
 	

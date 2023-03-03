@@ -2,17 +2,23 @@
 
 =head1 NAME
 
-Math::Formula::Context - calculation context
+Math::Formula::Context - Calculation context, pile of expressions
 
 =head1 SYNOPSIS
 
   my $context = Math::Formula::Context->new();
+  $context->add({
+    event       => \'Wedding',
+    diner_start => '19:30:00',
+    door_open   => 'dinner_start - PT1H30',
+  });
+  print $context->value('door_open');  # 18:00:00
 
 =head1 DESCRIPTION
 
 Like in web template systems, evaluation of expressions can be effected by the
-computation context which contains values.  The Context object manages these
-values: it runs the right expressions.
+computation context which contains values.  Thise Context object manages these
+values; in this case, it runs the right expressions.
 
 =head1 METHODS
 
@@ -49,6 +55,11 @@ or pass a SCALAR reference.  But that may be changed.
 =over 4
 
 =item $obj-E<gt>B<lead_expressions>()
+
+Returns the string which needs to be prepended to each of the formulas
+which are added to the context.  When an empty string (the default),
+formulas have no identification which distinguishes them from string.  In that case,
+be sure to pass strings as references.
 
 =item $obj-E<gt>B<name>()
 
@@ -112,7 +123,7 @@ example: :
 
 Add a single formula to this context.  The formula is returned.
 
-example: 
+example: of addFormula
 
 Only the 3rd and 4th line of the examples below are affected by C<new(lead_expresssions)>:
 only in those cases it is unclear whether we speak about a STRING or an expression.  But,
@@ -250,7 +261,7 @@ are not too complex:
       size     => sub { MF::INTEGER->new(-s $filename) },
       path     => sub { \File::Spec->catfile($dir, $filename) },
       is_image => 'name =~ "*.{jpg,png,gif}"',
-	  π        => MF::FLOAT->new(undef, 3.14),    # constant
+      π        => MF::FLOAT->new(undef, 3.14),    # constant
     });
   $context->addFragment($fragment);
   $context->addFormula(allocate => '#file.size * 10k');
@@ -331,8 +342,8 @@ need, for instance MF::FLOAT to MF::INTEGER or the reverse.
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.13,
-built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.14,
+built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

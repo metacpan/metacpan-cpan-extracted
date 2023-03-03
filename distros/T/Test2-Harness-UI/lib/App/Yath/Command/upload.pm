@@ -2,7 +2,7 @@ package App::Yath::Command::upload;
 use strict;
 use warnings;
 
-our $VERSION = '0.000133';
+our $VERSION = '0.000135';
 
 use IO::Uncompress::Bunzip2 qw($Bunzip2Error);
 use IO::Uncompress::Gunzip  qw($GunzipError);
@@ -21,7 +21,7 @@ include_options(
     'App::Yath::Options::PreCommand',
 );
 
-sub summary { "Use the YathUIDB pluginto upload a log file" }
+sub summary { "Use the YathUIDB plugin to upload a log file" }
 
 sub group { 'log' }
 

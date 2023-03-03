@@ -1,5 +1,93 @@
-@  changeset:   178:604b2eac0d0f
+@  changeset:   189:64b62a5ee47d
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 02 12:46:14 2023 +0100
+|  files:       lib/Net/Clacks/PostgreSQL2Clacks.pm
+|  description:
+|  BF Config
+|
+|
+o  changeset:   188:6ea035a80ef8
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 02 12:14:19 2023 +0100
+|  files:       Changes
+|  description:
+|  Prepare for Version 25 release
+|
+|
+o  changeset:   187:4aaaed3585be
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 02 12:13:07 2023 +0100
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm t/perlcriticrc
+|  description:
+|  Fix some Perl::Critic issues
+|
+|
+o  changeset:   186:ff5fc8cc1d46
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 02 11:38:35 2023 +0100
+|  files:       lib/Net/Clacks.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/UpgradeGuide.pod t/01-use.t
+|  description:
+|  Bugfixes, update docs
+|
+|
+o  changeset:   185:660ad765d181
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 02 10:41:13 2023 +0100
+|  files:       lib/Net/Clacks.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Updated docs
+|
+|
+o  changeset:   184:6376b222e0e9
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Wed Mar 01 16:54:55 2023 +0100
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm
+|  description:
+|  Bump Version to 25
+|
+|
+o  changeset:   183:56703587996c
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Wed Mar 01 16:54:21 2023 +0100
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Update copyright
+|
+|
+o  changeset:   182:f03862bb215b
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Wed Mar 01 16:52:20 2023 +0100
+|  files:       MANIFEST lib/Net/Clacks/PostgreSQL2Clacks.pm
+|  description:
+|  Start working on PostgreSQL2Clacks
+|
+|
+o  changeset:   181:c990cc8226ba
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Nov 24 11:24:54 2022 +0100
+|  files:       lib/Net/Clacks/ClacksCache.pm
+|  description:
+|  Fix ClacksCache clacks_notify()
+|
+|
+o  changeset:   180:0638683e515e
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Nov 24 11:24:11 2022 +0100
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
+|  description:
+|  Switch to Perl 5.36 and use sub signatures
+|
+|
+o  changeset:   179:6fcdd8a78191
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Jun 13 14:06:25 2022 +0200
+|  files:       Changes
+|  description:
+|  Update Changes file
+|
+|
+o  changeset:   178:604b2eac0d0f
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jun 13 14:05:49 2022 +0200
 |  files:       lib/Net/Clacks/UpgradeGuide.pod

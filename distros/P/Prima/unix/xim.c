@@ -84,11 +84,11 @@ prima_xim_focus_out(void)
 }
 
 Bool
-prima_xim_handle_key_press( Handle self, XKeyEvent *ev, Event *e, KeySym *sym)
+prima_xim_handle_key_press( Handle self, XKeyEvent *xev, Event *e, KeySym *sym)
 {
 #ifdef X_HAVE_UTF8_STRING
 	Status status;
-	int c;
+	int c, n;
 	Bool ok = true;
 	semistatic_t local_buf_ptr;
 	char local_buf[256], *buf;
@@ -96,7 +96,7 @@ prima_xim_handle_key_press( Handle self, XKeyEvent *ev, Event *e, KeySym *sym)
 	while ( 1 ) {
 		char *b;
 
-		c = Xutf8LookupString(guts.xic, ev, guts.xic_buffer, guts.xic_bufsize - 1, sym, &status);
+		c = Xutf8LookupString(guts.xic, xev, guts.xic_buffer, guts.xic_bufsize - 1, sym, &status);
 		Mdebug("Xutf8LookupString: nc=%d status=%d\n", c, status);
 		switch ( status ) {
 		case XLookupNone:
@@ -128,6 +128,7 @@ prima_xim_handle_key_press( Handle self, XKeyEvent *ev, Event *e, KeySym *sym)
 
 	/* send events */
 	protect_object(self);
+	n = 0;
 	while ( *buf ) {
 		UV uv;
 		STRLEN charlen;
@@ -137,17 +138,19 @@ prima_xim_handle_key_press( Handle self, XKeyEvent *ev, Event *e, KeySym *sym)
 		buf  += charlen;
 		c    -= charlen;
 		if ( charlen == 0 ) break;
+		n++;
 		if ( uv > 0x10FFFF ) continue;
-		if ( uv < 32 ) {
-			ok = false;
-			break; /* kbBackspace is 8, f ex */
-		}
 
 		ev.cmd        = cmKeyDown;
-		ev.key.key    = kbNoKey;
 		ev.key.code   = uv;
 		ev.key.mod    = kmUnicode;
 		ev.key.repeat = 1;
+		ev.key.key    = kbNoKey;
+		if ( n == 1 && status == XLookupBoth ) {
+			U32 key = prima_keysym_to_keycode(*sym, xev, 0) & kbCodeMask;
+			if ( key != 0 ) ev.key.key = key;
+		}
+		Mdebug("Xutf8LookupString: char(%d)=%x key=%x\n", n, uv, ev.key.key);
 		CComponent(self)-> message(self,&ev);
 		if (PWidget(self)-> stage != csNormal)
 			break;

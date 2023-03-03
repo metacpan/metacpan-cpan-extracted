@@ -55,11 +55,11 @@ requires:
   Starman: 0
   String::ShellQuote: 0
   Try::Tiny: 0.12
-  Zonemaster::Engine: 4.006001
+  Zonemaster::Engine: 4.006002
   Zonemaster::LDNS: 3.001
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-backend
-version: 10.0.1
+version: 10.0.2

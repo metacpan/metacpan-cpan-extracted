@@ -1,0 +1,9 @@
+<%INIT>
+for my $item ( qw/WebPath WebURL/ ) {
+    $COLUMN_MAP->{$item}{value} = RT->Config->Get($item);
+}
+</%INIT>
+
+<%ARGS>
+$COLUMN_MAP
+</%ARGS>

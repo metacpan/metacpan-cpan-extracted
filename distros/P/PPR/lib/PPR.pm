@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 use utf8;
 use List::Util qw<min max>;
 
@@ -56,6 +56,8 @@ use List::Util qw<min max>;
                    $diagnostic =~ s{ \s*+ \bat \s++ \( eval \s++ \d++ \) \s++ line \s++ 0,
                                    | \s*+ \( eval \s++ \d++ \)
                                    | \s++ \Z
+                                   | \s++ \bExecution \s++ of \s++ .*? \s++ aborted
+                                     \s++ due \s++ to \s++ compilation \s++ errors\.
                                    }{}gx;
                    return $diagnostic;
                  }
@@ -2917,7 +2919,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.001006
+This document describes PPR version 0.001007
 
 
 =head1 SYNOPSIS

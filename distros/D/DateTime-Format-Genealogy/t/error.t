@@ -12,7 +12,7 @@ ERROR: {
 	if($@) {
 		plan(skip_all => 'Test::Carp needed to check error messages');
 	} else {
-		plan(tests => 18);
+		plan(tests => 19);
 
 		my $f = new_ok('DateTime::Format::Genealogy');
 		does_carp_that_matches(sub { $f->parse_datetime('29 SepX 1939') }, qr/^Unparseable date/);
@@ -23,6 +23,7 @@ ERROR: {
 		does_carp_that_matches(sub { $f->parse_datetime(date => 'bef 29 Sep 1939', strict => 1) }, qr/need an exact date/);
 		does_carp_that_matches(sub { $f->parse_datetime('Aft 1 Jan 2000') }, qr/invalid/);
 		is($f->parse_datetime(date => 'Aft 1 Jan 2000', quiet => 1), undef, 'quiet does not carp');
+		does_carp_that_matches(sub { $f->parse_datetime('Abt 1 Jan 2001') }, qr/invalid/);
 		does_croak_that_matches(sub { $f->parse_datetime() }, qr/^Usage:/);
 		does_croak_that_matches(sub { $f->parse_datetime(date => undef) }, qr/^Usage:/);
 		does_carp_that_matches(sub { $f->parse_datetime({ date => '28 Jul 1914 - 11 Nov 1918' }) }, qr/Changing date/);
@@ -31,6 +32,6 @@ ERROR: {
 		does_carp_that_matches(sub { my $rc = $f->parse_datetime('xyzzy'); }, qr/does not parse/);
 		does_carp_that_matches(sub { my $rc = $f->parse_datetime(date => 'xyzzy'); }, qr/does not parse/);
 		does_carp_that_matches(sub { my $rc = $f->parse_datetime({ date => 'xyzzy' }); }, qr/does not parse/);
-		does_carp_that_matches(sub { my $rc = $f->parse_datetime({ date => 'Zzz 55, 2020', strict => 1 }); }, qr/does not parse/);
+		does_carp_that_matches(sub { my $rc = $f->parse_datetime({ date => 'Zzz 55, 2020', strict => 1 }); }, qr/^Unparseable date/);
 	}
 }

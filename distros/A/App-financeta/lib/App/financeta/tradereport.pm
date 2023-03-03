@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
-
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter);
 use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
@@ -25,6 +24,7 @@ use Prima qw(
     Widget::ScrollWidget DetailedList Dialog::ColorDialog
     Dialog::FileDialog Dialog::FindDialog ScrollBar
     Dialog::PrintDialog Dialog::ImageDialog Dialog::FontDialog
+    sys::GUIException
 );
 use PDL::Lite;
 

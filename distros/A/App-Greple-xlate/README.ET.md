@@ -63,7 +63,7 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
     Määrake sihtkeel. **DeepL** mootori kasutamisel saate saadaval olevad keeled kätte käsuga `deepl languages`.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Määrake originaal- ja tõlgitud teksti väljundformaat.
 
@@ -116,14 +116,14 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
 **xlate** moodul võib salvestada iga faili tõlketeksti vahemällu ja lugeda seda enne täitmist, et kõrvaldada serveri küsimisega kaasnev koormus. Vaikimisi vahemälustrateegia `auto` puhul säilitab ta vahemälu andmeid ainult siis, kui vahemälufail on sihtfaili jaoks olemas.
 
-- --refresh
+- --cache-clear
 
-    Valikut <--refresh> saab kasutada vahemälu haldamise algatamiseks või kõigi olemasolevate vahemälu andmete värskendamiseks. Selle valikuga käivitamisel luuakse uus vahemälufail, kui seda ei ole olemas, ja seejärel hooldatakse seda automaatselt.
+    Valikut **--cache-clear** saab kasutada vahemälu haldamise alustamiseks või kõigi olemasolevate vahemälu andmete värskendamiseks. Selle valikuga käivitamisel luuakse uus vahemälufail, kui seda ei ole veel olemas, ja seejärel hooldatakse seda automaatselt.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Säilitab vahemälufaili, kui see on olemas.
+        Säilitada vahemälufaili, kui see on olemas.
 
     - `create`
 
@@ -133,9 +133,9 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
         Säilitab vahemälu andmed niikuinii, kui sihtfail on tavaline fail.
 
-    - `refresh`
+    - `clear`
 
-        Säilitada vahemälu, kuid mitte lugeda olemasolevat.
+        Tühjendage esmalt vahemälu andmed.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
     - `accumulate`
 
-        Vaikimisi käitumine, kasutamata andmed eemaldatakse vahemälufailist. Kui te ei soovi neid eemaldada ja failis hoida, kasutage `accumulate`.
+        Vaikimisi käitumise kohaselt eemaldatakse kasutamata andmed vahemälufailist. Kui te ei soovi neid eemaldada ja failis hoida, kasutage `accumulate`.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
     Määrake oma autentimisvõti DeepL teenuse jaoks.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

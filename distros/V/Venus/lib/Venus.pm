@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.90';
+our $VERSION = '2.01';
 
 # AUTHORITY
 
@@ -25,6 +25,7 @@ sub import {
   my %exports = (
     cast => 1,
     catch => 1,
+    caught => 1,
     error => 1,
     false => 1,
     fault => 1,
@@ -64,6 +65,30 @@ sub catch (&) {
   my @result = Venus::Try->new($data)->error(\$error)->result;
 
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
+}
+
+sub caught ($$;&) {
+  my ($data, $type, $code) = @_;
+
+  ($type, my($name)) = @$type if ref $type eq 'ARRAY';
+
+  my $is_true = $data
+    && UNIVERSAL::isa($data, $type)
+    && UNIVERSAL::isa($data, 'Venus::Error')
+    && (
+      $data->name
+        ? ($name ? $data->of($name) : true())
+        : (!$name ? true() : false())
+    );
+
+  if ($is_true) {
+    local $_ = $data;
+
+    return $code ? $code->($data) : $data;
+  }
+  else {
+    return undef;
+  }
 }
 
 sub error (;$) {
@@ -129,7 +154,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-1.90
+2.01
 
 =cut
 
@@ -307,6 +332,182 @@ I<Since C<0.01>>
   $result;
 
   # 1
+
+=back
+
+=cut
+
+=head2 caught
+
+  caught(Object $error, Str | Tuple[Str, Str] $identity, CodeRef $block) (Any)
+
+The caught function evaluates the exception object provided and validates its
+identity and name (if provided) then executes the code block provided returning
+the result of the callback. If no callback is provided this function returns
+the exception object on success and C<undef> on failure.
+
+I<Since C<1.95>>
+
+=over 4
+
+=item caught example 1
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, 'Venus::Error';
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 2
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error' };
+
+  my $result = caught $error, 'Venus::Error';
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 3
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error' };
+
+  my $result = caught $error, 'Example::Error';
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 4
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error', { name => 'on.test' } };
+
+  my $result = caught $error, ['Example::Error', 'on.test'];
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 5
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error', { name => 'on.recv' } };
+
+  my $result = caught $error, ['Example::Error', 'on.send'];
+
+  # undef
+
+=back
+
+=over 4
+
+=item caught example 6
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, ['Example::Error', 'on.send'];
+
+  # undef
+
+=back
+
+=over 4
+
+=item caught example 7
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, ['Example::Error'];
+
+  # undef
+
+=back
+
+=over 4
+
+=item caught example 8
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, 'Example::Error';
+
+  # undef
+
+=back
+
+=over 4
+
+=item caught example 9
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error { name => 'on.send' } };
+
+  my $result = caught $error, ['Venus::Error', 'on.send'];
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 10
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error { name => 'on.send.open' } };
+
+  my $result = caught $error, ['Venus::Error', 'on.send'], sub {
+    $error->stash('caught', true) if $error->is('on.send.open');
+    return $error;
+  };
+
+  # bless(..., 'Venus::Error')
 
 =back
 
@@ -1051,6 +1252,8 @@ B<example 1>
 =head1 AUTHORS
 
 Awncorp, C<awncorp@cpan.org>
+
+=cut
 
 =head1 LICENSE
 

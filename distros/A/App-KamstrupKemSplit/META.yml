@@ -28,7 +28,7 @@ no_index:
 provides:
   App::KamstrupKemSplit:
     file: lib/App/KamstrupKemSplit.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Archive::Zip: '0'
   Crypt::Rijndael: '0'
@@ -43,7 +43,7 @@ requires:
 resources:
   bugtracker: https://github.com/hollie/app-kamstrupkemsplit-perl/issues
   repository: git://github.com/hollie/app-kamstrupkemsplit-perl.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -133,7 +133,7 @@ x_Dist_Zilla:
           branch: releases
           changelog: Changes
           signed: 0
-          tag: v0.005
+          tag: v0.006
           tag_format: v%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

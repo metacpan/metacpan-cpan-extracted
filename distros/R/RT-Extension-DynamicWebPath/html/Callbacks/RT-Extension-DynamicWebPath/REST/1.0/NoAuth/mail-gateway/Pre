@@ -1,0 +1,3 @@
+<%INIT>
+$m->comp('/Callbacks/RT-Extension-DynamicWebPath/autohandler/Init');
+</%INIT>

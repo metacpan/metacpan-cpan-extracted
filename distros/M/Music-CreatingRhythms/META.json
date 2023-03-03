@@ -39,6 +39,7 @@
             "Data::Munge" : "0",
             "Integer::Partition" : "0",
             "List::Util" : "1.33",
+            "Math::NumSeq::SqrtContinued" : "0",
             "Math::Sequence::DeBruijn" : "0",
             "Moo" : "2",
             "Music::AtonalUtil" : "0",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/ology/Music-CreatingRhythms"
       }
    },
-   "version" : "0.0101",
+   "version" : "0.0301",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -301,6 +302,8 @@
                      "Bruijn",
                      "Christoffel",
                      "Hollos",
+                     "cfcv",
+                     "cfsqrt",
                      "chsequl",
                      "combinatorial",
                      "compa",
@@ -314,6 +317,8 @@
                      "parta",
                      "partam",
                      "partm",
+                     "permi",
+                     "pfold",
                      "pn"
                   ],
                   "wordlist" : "Pod::Wordlist"

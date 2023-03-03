@@ -63,7 +63,7 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
     Hedef dili belirtin. **DeepL** motorunu kullanırken `deepl languages` komutu ile mevcut dilleri alabilirsiniz.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Orijinal ve çevrilmiş metin için çıktı formatını belirtin.
 
@@ -116,14 +116,14 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
 **xlate** modülü her dosya için önbellekte çeviri metnini saklayabilir ve sunucuya sorma ek yükünü ortadan kaldırmak için yürütmeden önce okuyabilir. Varsayılan önbellek stratejisi `auto` ile, önbellek verilerini yalnızca hedef dosya için önbellek dosyası mevcut olduğunda tutar.
 
-- --refresh
+- --cache-clear
 
-    <--refresh> seçeneği önbellek yönetimini başlatmak veya mevcut tüm önbellek verilerini yenilemek için kullanılabilir. Bu seçenekle çalıştırıldığında, mevcut değilse yeni bir önbellek dosyası oluşturulacak ve daha sonra otomatik olarak korunacaktır.
+    **--cache-clear** seçeneği önbellek yönetimini başlatmak veya mevcut tüm önbellek verilerini yenilemek için kullanılabilir. Bu seçenekle çalıştırıldığında, mevcut değilse yeni bir önbellek dosyası oluşturulacak ve daha sonra otomatik olarak korunacaktır.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Eğer varsa önbellek dosyasını korur.
+        Eğer varsa önbellek dosyasını koruyun.
 
     - `create`
 
@@ -133,9 +133,9 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
         Hedef normal dosya olduğu sürece önbelleği yine de korur.
 
-    - `refresh`
+    - `clear`
 
-        Önbelleği koru ancak mevcut olanı okuma.
+        Önce önbellek verilerini temizleyin.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
     - `accumulate`
 
-        Varsayılan davranış olarak, kullanılmayan veriler önbellek dosyasından kaldırılır. Bunları kaldırmak ve dosyada tutmak istemiyorsanız, `accumulate` kullanın.
+        Varsayılan davranışa göre, kullanılmayan veriler önbellek dosyasından kaldırılır. Bunları kaldırmak ve dosyada tutmak istemiyorsanız, `accumulate` kullanın.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
     DeepL hizmeti için kimlik doğrulama anahtarınızı ayarlayın.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

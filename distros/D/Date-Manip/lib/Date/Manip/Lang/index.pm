@@ -1,5 +1,5 @@
 package Date::Manip::Lang::index;
-# Copyright (c) 2003-2022 Sullivan Beck. All rights reserved.
+# Copyright (c) 2003-2023 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ use strict;
 use warnings;
 
 our($VERSION);
-$VERSION='6.90';
+$VERSION='6.91';
 
 our(%Lang);
 

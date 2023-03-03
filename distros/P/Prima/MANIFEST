@@ -136,7 +136,8 @@ examples/scrollbar2.pl
 examples/scrollgroup.pl
 examples/sheet.pl
 examples/socket.pl
-examples/socket_anyevent.pl
+examples/socket_anyevent1.pl
+examples/socket_anyevent2.pl
 examples/spinner.pl
 examples/spline.pl
 examples/theme.pl
@@ -193,6 +194,7 @@ pod/Prima/conversions.gif
 pod/Prima/curvedtext.gif
 pod/Prima/detailedlist.gif
 pod/Prima/detailedoutline.gif
+pod/Prima/detailedoutline2.gif
 pod/Prima/Dialog/colordlg.png
 pod/Prima/Dialog/editdlg.gif
 pod/Prima/Dialog/filedlg.gif
@@ -238,6 +240,7 @@ pod/Prima/msgbox.gif
 pod/Prima/notebook.gif
 pod/Prima/Object.pod
 pod/Prima/outline.gif
+pod/Prima/outline2.gif
 pod/Prima/path.gif
 pod/Prima/podview.gif
 pod/Prima/progressbar.png
@@ -349,6 +352,7 @@ Prima/Sliders.pm
 Prima/Spinner.pm
 Prima/StdBitmap.pm
 Prima/Stress.pm
+Prima/sys/AnyEvent.pm
 Prima/sys/FS.pm
 Prima/sys/Gencls.pm
 Prima/sys/GUIException.pm
@@ -446,6 +450,7 @@ unix/app.c
 unix/clipboard.c
 unix/cocoa.c
 unix/color.c
+unix/cursor.c
 unix/dnd.c
 unix/event.c
 unix/file.c
@@ -458,6 +463,7 @@ unix/misc.c
 unix/pointer.c
 unix/region.c
 unix/render.c
+unix/resource.c
 unix/text.c
 unix/timer.c
 unix/widget.c

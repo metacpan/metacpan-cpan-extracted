@@ -96,6 +96,8 @@ Puteți reformata această parte utilizând modulul B<tee> cu comanda B<ansifold
 
 =head1 SEE ALSO
 
+L<App::Greple::tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
 L<https://github.com/greymd/teip>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>

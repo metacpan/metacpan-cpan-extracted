@@ -130,14 +130,14 @@ DESCRIPTION
     blogger.com videos (StreamFinder::Blogger), brandnewtube.com and
     ugetube.com videos (StreamFinder::BrandNewTube), brighteon.com videos
     (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
-    podcasts.google.com podcasts (StreamFinder::Google), iheartradio.com
-    radio stations and podcasts (StreamFinder::IHeartRadio),
-    www.internetradio.com radio stations (StreamFinder::InternetRadio),
-    onlineradiobox.com radio stations (StreamFinder::OnlineRadiobox),
-    odysee.com videos (StreamFinder::Odysee), podbean.com podcasts
-    (StreamFinder::Podbean), podcastaddict.com podcasts
-    (StreamFinder::PodcastAddict), radio.net radio stations
-    (StreamFinder::RadioNet), rcast.net radio stations
+    podcasts.google.com podcasts (StreamFinder::Google), goodpods.com
+    podcasts (StreamFinder::Goodpods), iheartradio.com radio stations and
+    podcasts (StreamFinder::IHeartRadio), www.internetradio.com radio
+    stations (StreamFinder::InternetRadio), onlineradiobox.com radio
+    stations (StreamFinder::OnlineRadiobox), odysee.com videos
+    (StreamFinder::Odysee), podbean.com podcasts (StreamFinder::Podbean),
+    podcastaddict.com podcasts (StreamFinder::PodcastAddict), radio.net
+    radio stations (StreamFinder::RadioNet), rcast.net radio stations
     (StreamFinder::Rcast), rumble.com videos (StreamFinder::Rumble),
     sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
     soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
@@ -317,22 +317,34 @@ SUBROUTINES/METHODS
         NOTE: Some sights do not support a separate long description field,
         so if none found, the standard title field will always be returned.
 
-    $station->getIconURL()
+    $station->getIconURL(['artist'])
         Returns the URL for the station's "cover art" icon image, if any.
 
-    $station->getIconData()
+        Some video and podcast sites will also provide a separate
+        artist/channel icon. If 'artist' is specified, this icon url is
+        returned instead, if any.
+
+    $station->getIconData(['artist'])
         Returns a two-element array consisting of the extension (ie. "png",
         "gif", "jpeg", etc.) and the actual icon image (binary data), if
         any. This makes it easy to download the image to local storage for
         use by your preferred media player.
 
-    $station->getImageURL()
+        Some video and podcast sites will also provide a separate
+        artist/channel icon. If 'artist' is specified, this icon's data is
+        returned instead, if any.
+
+    $station->getImageURL(['artist'])
         Returns the URL for the station's "cover art" banner image, if any.
 
         NOTE: If no "banner image" (usually a larger image) is found, the
         "icon image" URL will be returned.
 
-    $station->getImageData()
+        Some video and podcast sites will also provide a separate
+        artist/channel image (usually larger). If 'artist' is specified,
+        this icon url is returned instead, if any.
+
+    $station->getImageData(['artist'])
         Returns a two-element array consisting of the extension (ie. "png",
         "gif", "jpeg", etc.) and the actual station's banner image (binary
         data). This makes it easy to download the image to local storage for
@@ -341,10 +353,18 @@ SUBROUTINES/METHODS
         NOTE: If no "banner image" (usually a larger image) is found, the
         "icon image" data, if any, will be returned.
 
+        Some video and podcast sites will also provide a separate
+        artist/channel image (usually larger). If 'artist' is specified,
+        this icon's data is returned instead, if any.
+
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
         (one of: "Anystream", "Apple", "BitChute", "Blogger", "Youtube",
         etc. - depending on the sight that matched the URL).
+
+        Some video and podcast sites will also provide a separate
+        artist/channel image (usually larger). If 'artist' is specified,
+        this icon url is returned instead, if any.
 
 CONFIGURATION FILES
     The default root location directory for StreamFinder configuration files

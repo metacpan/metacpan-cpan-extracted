@@ -96,6 +96,8 @@ B<deepl>は一行入力に適しているので、コマンド部分をこのよ
 
 =head1 SEE ALSO
 
+L<App::Greple::tee>、L<https://github.com/kaz-utashiro/App-Greple-tee>。
+
 L<https://github.com/greymd/teip>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>

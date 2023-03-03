@@ -1,5 +1,5 @@
 ---
-abstract: 'CML reader'
+abstract: 'Chemical Markup Language reader/writer'
 author:
   - 'Andrius Merkys <merkys@cpan.org>'
 build_requires:
@@ -23,6 +23,6 @@ requires:
 resources:
   homepage: https://search.cpan.org/dist/Chemistry-File-CML
   repository: git://github.com/perlmol/chemistry-file-cml.git
-version: '0.13'
+version: '0.14'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

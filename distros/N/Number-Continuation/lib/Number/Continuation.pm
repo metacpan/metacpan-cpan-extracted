@@ -10,7 +10,7 @@ use Params::Validate ':all';
 
 our ($VERSION, @EXPORT_OK);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 @EXPORT_OK = qw(continuation);
 
 validation_options(

@@ -2,8 +2,8 @@ NAME
     App::BPOMUtils::Additives - Utilities related to food additives in BPOM
 
 VERSION
-    This document describes version 0.002 of App::BPOMUtils::Additives (from
-    Perl distribution App-BPOMUtils-Additives), released on 2023-02-01.
+    This document describes version 0.003 of App::BPOMUtils::Additives (from
+    Perl distribution App-BPOMUtils-Additives), released on 2023-02-05.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -33,7 +33,11 @@ FUNCTIONS
              { amount => 1, unit => "ppm" },
              { amount => 0.847408229824443, unit => "ppm-as-benzoic-acid" },
              { amount => 1, unit => "ppm-as-sodium-benzoate" },
+             { amount => 1, unit => "ppm-as-na-benzoate" },
              { amount => 1.04239816806606, unit => "ppm-as-potassium-benzoate" },
+             { amount => 1.04239816806606, unit => "ppm-as-k-benzoate" },
+             { amount => 2.31174254831314, unit => "ppm-as-calcium-benzoate" },
+             { amount => 2.31174254831314, unit => "ppm-as-ca-benzoate" },
            ],
            {},
          ]
@@ -83,7 +87,7 @@ SOURCE
     <https://github.com/perlancar/perl-App-BPOMUtils-Additives>.
 
 SEE ALSO
-    App::BPOMUtils
+    Other "App::BPOMUtils::*" distributions.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

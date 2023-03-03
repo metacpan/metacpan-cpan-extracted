@@ -16,6 +16,7 @@ author_requires 'Test::Pod::Coverage' => 0;
 license 'bsd';
 name 'Schema-Data';
 perl_version 5.006;
+readme_from 'Data.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'English' => 0;
@@ -34,7 +35,7 @@ test_requires 'IO::Barf' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

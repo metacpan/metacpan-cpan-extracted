@@ -1,15 +1,16 @@
 package App::FileRenameUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-02'; # DATE
-our $DIST = 'App-FileRenameUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-27'; # DATE
+our $DIST = 'App-FileRenameUtils'; # DIST
+our $VERSION = '0.007'; # VERSION
+
 our @EXPORT_OK = qw(add_filename_suffix find_unique_filename);
 
 sub add_filename_suffix {
@@ -47,7 +48,7 @@ App::FileRenameUtils - Utilities related to renaming/moving files
 
 =head1 VERSION
 
-This document describes version 0.007 of App::FileRenameUtils (from Perl distribution App-FileRenameUtils), released on 2021-08-02.
+This document describes version 0.007 of App::FileRenameUtils (from Perl distribution App-FileRenameUtils), released on 2023-02-27.
 
 =head1 DESCRIPTION
 
@@ -55,15 +56,17 @@ This distribution provides the following command-line utilities:
 
 =over
 
-=item * L<move-files-here>
+=item 1. L<move-files-here>
 
-=item * L<mv-reverse>
+=item 2. L<mv-reverse>
 
-=item * L<rename-add-prefix>
+=item 3. L<rename-add-prefix>
 
-=item * L<rename-swap>
+=item 4. L<rename-add-prefix-datestamp>
 
-=item * L<rename-to-from>
+=item 5. L<rename-swap>
+
+=item 6. L<rename-to-from>
 
 =back
 
@@ -98,14 +101,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-FileRe
 
 Source repository is at L<https://github.com/perlancar/perl-App-FileRenameUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<rename> from L<File::Rename>
@@ -114,18 +109,41 @@ L<perlmv> from L<App::perlmv>
 
 L<renwd> from L<App::renwd>
 
-Other similar distributions: L<App::FileModifyUtils>,
-L<App::FileRemoveUtilities>.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -19,6 +19,7 @@ lib/App/CSVUtils/csv_check_cell_values.pm
 lib/App/CSVUtils/csv_check_field_names.pm
 lib/App/CSVUtils/csv_check_field_values.pm
 lib/App/CSVUtils/csv_check_rows.pm
+lib/App/CSVUtils/csv_cmp.pm
 lib/App/CSVUtils/csv_concat.pm
 lib/App/CSVUtils/csv_convert_to_hash.pm
 lib/App/CSVUtils/csv_csv.pm
@@ -35,12 +36,14 @@ lib/App/CSVUtils/csv_info.pm
 lib/App/CSVUtils/csv_intrange.pm
 lib/App/CSVUtils/csv_list_field_names.pm
 lib/App/CSVUtils/csv_lookup_fields.pm
+lib/App/CSVUtils/csv_ltrim.pm
 lib/App/CSVUtils/csv_map.pm
 lib/App/CSVUtils/csv_munge_field.pm
 lib/App/CSVUtils/csv_munge_row.pm
 lib/App/CSVUtils/csv_pick_fields.pm
 lib/App/CSVUtils/csv_pick_rows.pm
 lib/App/CSVUtils/csv_replace_newline.pm
+lib/App/CSVUtils/csv_rtrim.pm
 lib/App/CSVUtils/csv_select_fields.pm
 lib/App/CSVUtils/csv_select_rows.pm
 lib/App/CSVUtils/csv_setop.pm
@@ -53,6 +56,7 @@ lib/App/CSVUtils/csv_sorted_rows.pm
 lib/App/CSVUtils/csv_split.pm
 lib/App/CSVUtils/csv_sum.pm
 lib/App/CSVUtils/csv_transpose.pm
+lib/App/CSVUtils/csv_trim.pm
 lib/App/CSVUtils/csv_uniq.pm
 lib/App/CSVUtils/paras2csv.pm
 script/csv-add-fields
@@ -61,6 +65,7 @@ script/csv-check-cell-values
 script/csv-check-field-names
 script/csv-check-field-values
 script/csv-check-rows
+script/csv-cmp
 script/csv-concat
 script/csv-convert-to-hash
 script/csv-csv
@@ -77,6 +82,7 @@ script/csv-info
 script/csv-intrange
 script/csv-list-field-names
 script/csv-lookup-fields
+script/csv-ltrim
 script/csv-map
 script/csv-munge-field
 script/csv-munge-row
@@ -84,6 +90,7 @@ script/csv-pick
 script/csv-pick-fields
 script/csv-pick-rows
 script/csv-replace-newline
+script/csv-rtrim
 script/csv-select-fields
 script/csv-select-rows
 script/csv-setop
@@ -99,6 +106,7 @@ script/csv-sorted-rows
 script/csv-split
 script/csv-sum
 script/csv-transpose
+script/csv-trim
 script/csv-uniq
 script/csv2ltsv
 script/csv2paras

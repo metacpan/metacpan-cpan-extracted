@@ -635,6 +635,30 @@ sub splice {
   return $class->new(join '/', @$parts);
 }
 
+sub swap {
+  my ($self, $name, $code) = @_;
+
+  my $orig = $self->package->can($name);
+
+  return $orig if !$code;
+
+  unless ($orig) {
+    my $throw;
+    my $class = $self->package;
+    my $error = qq(Attempt to swap undefined subroutine in package "$class");
+    $throw = $self->throw;
+    $throw->name('on.swap');
+    $throw->message($error);
+    $throw->stash(package => $class);
+    $throw->stash(routine => $name);
+    $throw->error;
+  }
+
+  $self->routine($name, sub { $code->($orig, @_) });
+
+  return $orig;
+}
+
 sub tfile {
   my ($self) = @_;
 
@@ -2790,6 +2814,69 @@ I<Since C<0.09>>
 
 =cut
 
+=head2 swap
+
+  swap(Str $name, CodeRef $code) (CodeRef)
+
+The swap method overwrites the named subroutine in the underlying package with
+the code reference provided and returns the original subroutine as a code
+reference. The code provided will be passed a reference to the original
+subroutine as its first argument.
+
+I<Since C<1.95>>
+
+=over 4
+
+=item swap example 1
+
+  package Foo::Swap;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/swap');
+
+  my $subroutine = $space->swap('new', sub {
+    my ($next, @args) = @_;
+    my $self = $next->(@args);
+    $self->{swapped} = 1;
+    return $self;
+  });
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item swap example 2
+
+  package Foo::Swap;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/swap');
+
+  my $subroutine = $space->swap('something', sub {
+    my ($next, @args) = @_;
+    my $self = $next->(@args);
+    $self->{swapped} = 1;
+    return $self;
+  });
+
+  # Exception! (isa Venus::Error) is "on.swap"
+
+=back
+
+=cut
+
 =head2 tfile
 
   tfile() (Str)
@@ -3120,5 +3207,20 @@ I<Since C<1.02>>
   # 1
 
 =back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

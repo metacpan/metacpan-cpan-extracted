@@ -89,7 +89,7 @@ This is a short-cut to specify the pattern matches entire text
     Specify the target language.  You can get available languages by
     `deepl languages` command when using **DeepL** engine.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Specify the output format for original and translated text.
 
@@ -145,17 +145,17 @@ read it before execution to eliminate the overhead of asking to
 server.  With the default cache strategy `auto`, it maintains cache
 data only when the cache file exists for target file.
 
-- --refresh
+- --cache-clear
 
-    The <--refresh> option can be used to initiate cache management or to
-    refresh all existing cache data. Once executed with this option, a new
-    cache file will be created if one does not exist and then
+    The **--cache-clear** option can be used to initiate cache management
+    or to refresh all existing cache data. Once executed with this option,
+    a new cache file will be created if one does not exist and then
     automatically maintained afterward.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Maintain cache file if it exists.
+        Maintain the cache file if it exists.
 
     - `create`
 
@@ -165,9 +165,9 @@ data only when the cache file exists for target file.
 
         Maintain cache anyway as far as the target is normal file.
 
-    - `refresh`
+    - `clear`
 
-        Maintain cache but don't read existing one.
+        Clear the cache data first.
 
     - `never`, `no`, `0`
 
@@ -175,8 +175,8 @@ data only when the cache file exists for target file.
 
     - `accumulate`
 
-        By default behavior, unused data is removed from cache file.  If you
-        don't want to remove them and keep in the file, use `accumulate`.
+        By default behavior, unused data is removed from the cache file.  If
+        you don't want to remove them and keep in the file, use `accumulate`.
 
 # ENVIRONMENT
 
@@ -184,7 +184,15 @@ data only when the cache file exists for target file.
 
     Set your authentication key for DeepL service.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

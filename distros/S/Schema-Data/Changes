@@ -1,3 +1,8 @@
+0.06 2023-03-01T00:51:30+01:00
+ - Add LICENSE file.
+ - Add README file.
+ - Update copyright years.
+
 0.05 2022-10-20T11:19:03+02:00
  - Add schema() method to Schema::Data::Data abstract class.
  - Add Schema::Data::Plugin abstract class.

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "Data::Munge" => 0,
     "Integer::Partition" => 0,
     "List::Util" => "1.33",
+    "Math::NumSeq::SqrtContinued" => 0,
     "Math::Sequence::DeBruijn" => 0,
     "Moo" => 2,
     "Music::AtonalUtil" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0101",
+  "VERSION" => "0.0301",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Integer::Partition" => 0,
   "List::Util" => "1.33",
+  "Math::NumSeq::SqrtContinued" => 0,
   "Math::Sequence::DeBruijn" => 0,
   "Moo" => 2,
   "Music::AtonalUtil" => 0,

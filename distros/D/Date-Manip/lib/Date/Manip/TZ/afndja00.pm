@@ -1,6 +1,6 @@
 package #
 Date::Manip::TZ::afndja00;
-# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2023 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.90';
+$VERSION='6.91';
 END { undef $VERSION; }
 
 %Dates         = (

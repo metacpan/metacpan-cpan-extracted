@@ -19,6 +19,7 @@ example/server.pl
 lib/Net/Clacks.pm
 lib/Net/Clacks/ClacksCache.pm
 lib/Net/Clacks/Client.pm
+lib/Net/Clacks/PostgreSQL2Clacks.pm
 lib/Net/Clacks/Server.pm
 lib/Net/Clacks/UpgradeGuide.pod
 Makefile.PL

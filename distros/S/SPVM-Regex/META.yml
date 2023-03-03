@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   SPVM: '0.9691'
-  SPVM::Resource::Re2::V2022_06_01: '0.06'
+  SPVM::Resource::RE2: '0.01'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -20,9 +20,8 @@ no_index:
     - inc
 requires:
   SPVM: '0.9691'
-  SPVM::Resource::Re2::V2022_06_01: '0.06'
-  SPVM::Unicode: '0.03'
+  SPVM::Resource::RE2: '0.01'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Regex.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

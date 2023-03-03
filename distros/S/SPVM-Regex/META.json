@@ -28,14 +28,13 @@
       "configure" : {
          "requires" : {
             "SPVM" : "0.9691",
-            "SPVM::Resource::Re2::V2022_06_01" : "0.06"
+            "SPVM::Resource::RE2" : "0.01"
          }
       },
       "runtime" : {
          "requires" : {
             "SPVM" : "0.9691",
-            "SPVM::Resource::Re2::V2022_06_01" : "0.06",
-            "SPVM::Unicode" : "0.03"
+            "SPVM::Resource::RE2" : "0.01"
          }
       },
       "test" : {
@@ -50,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Regex"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

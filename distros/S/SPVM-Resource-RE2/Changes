@@ -1,3 +1,27 @@
+0.02 2023-03-01
+  [Document Fix]
+    * Fixed "Required Libraries" in the doc.
+    
+      # Windows
+      if ($^O eq 'MSWin32') {
+        $config->add_static_libs('stdc++', 'winpthread', 'gcc');
+      }
+      # Linux/Unix, Mac, etc
+      else {
+        $config->add_libs('stdc++');
+      }
+  [Test Fix]
+    * Fixed the config file of the tests.
+    
+      # Windows
+      if ($^O eq 'MSWin32') {
+        $config->add_static_libs('stdc++', 'winpthread', 'gcc');
+      }
+      # Linux/Unix, Mac, etc
+      else {
+        $config->add_libs('stdc++');
+      }
+      
 0.01 2023-02-28
   
   * First release

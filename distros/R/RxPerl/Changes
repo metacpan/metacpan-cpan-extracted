@@ -1,5 +1,14 @@
 Revision history for Perl extension RxPerl
 
+v6.27.0 2023-03-01T15:00:57Z
+
+    - op_audit, op_debounce, op_every, op_first, op_take_while, op_throttle allow $_ in their callbacks
+    - BREAKING CHANGE: op_take_while's callback accepts also $index as second parameter
+
+v6.26.3 2023-03-01T13:08:40Z
+
+    - wrote CreatingPipeableOperators pod page
+
 v6.26.2 2023-02-19T12:10:11Z
 
     - fixed two examples in the documentation

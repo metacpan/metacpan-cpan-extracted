@@ -1,3 +1,8 @@
+0.006   2023-01-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust to Complete::Man 0.100.
+
+
 0.005   2019-07-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Show message when completing an empty word.

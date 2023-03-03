@@ -20,7 +20,7 @@ unless ($meta) {
 
 my %configure_and_runtime_requires = (
   'SPVM' => '0.9691',
-  'SPVM::Resource::Re2::V2022_06_01' => '0.06',
+  'SPVM::Resource::RE2' => '0.01',
 );
 WriteMakefile(
   NAME              => 'SPVM::Regex',
@@ -47,7 +47,6 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
-    'SPVM::Unicode' => '0.03',
   },
   TEST_REQUIRES => {
   },

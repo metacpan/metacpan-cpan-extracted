@@ -11,6 +11,7 @@ lib/RxPerl/CodeOfConduct.pod
 lib/RxPerl/ConnectableObservable.pm
 lib/RxPerl/Functions.pm
 lib/RxPerl/Guides/CreatingObservables.pod
+lib/RxPerl/Guides/CreatingPipeableOperators.pod
 lib/RxPerl/Observable.pm
 lib/RxPerl/Operators/Creation.pm
 lib/RxPerl/Operators/Pipeable.pm

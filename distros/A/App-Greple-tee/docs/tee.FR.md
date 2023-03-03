@@ -92,6 +92,8 @@ Vous pouvez reformater cette partie en utilisant le module **tee** avec la comma
 
 # SEE ALSO
 
+[App::Greple::tee](https://metacpan.org/pod/App%3A%3AGreple%3A%3Atee), [https://github.com/kaz-utashiro/App-Greple-tee](https://github.com/kaz-utashiro/App-Greple-tee)
+
 [https://github.com/greymd/teip](https://github.com/greymd/teip)
 
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)

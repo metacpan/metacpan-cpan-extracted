@@ -63,7 +63,7 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
 
     Geben Sie die Zielsprache an. Sie können die verfügbaren Sprachen mit dem Befehl `deepl languages` abrufen, wenn Sie die Engine **DeepL** verwenden.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Geben Sie das Ausgabeformat für den Originaltext und den übersetzten Text an.
 
@@ -116,14 +116,14 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
 
 Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speichern und vor der Ausführung lesen, um den Overhead durch Anfragen an den Server zu vermeiden. Bei der Standard-Cache-Strategie `auto` werden die Cache-Daten nur beibehalten, wenn die Cache-Datei für die Zieldatei existiert.
 
-- --refresh
+- --cache-clear
 
-    Die Option <--refresh> kann verwendet werden, um die Cache-Verwaltung zu starten oder um alle vorhandenen Cache-Daten zu aktualisieren. Nach der Ausführung dieser Option wird eine neue Cachedatei erstellt, falls noch keine vorhanden ist, und anschließend automatisch gepflegt.
+    Die Option **--cache-clear** kann verwendet werden, um die Cache-Verwaltung zu starten oder um alle vorhandenen Cache-Daten zu aktualisieren. Wenn diese Option ausgeführt wird, wird eine neue Cache-Datei erstellt, falls noch keine vorhanden ist, und anschließend automatisch beibehalten.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Cache-Datei beibehalten, wenn sie vorhanden ist.
+        Behalten Sie die Cache-Datei bei, wenn sie vorhanden ist.
 
     - `create`
 
@@ -133,9 +133,9 @@ Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speicher
 
         Cache trotzdem beibehalten, sofern das Ziel eine normale Datei ist.
 
-    - `refresh`
+    - `clear`
 
-        Cache beibehalten, aber vorhandene Datei nicht lesen.
+        Löschen Sie zuerst die Cache-Daten.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speicher
 
     - `accumulate`
 
-        Standardmäßig werden ungenutzte Daten aus der Cache-Datei entfernt. Wenn Sie sie nicht entfernen und in der Datei behalten wollen, verwenden Sie `accumulate`.
+        In der Standardeinstellung werden nicht verwendete Daten aus der Cache-Datei entfernt. Wenn Sie sie nicht entfernen und in der Datei behalten wollen, verwenden Sie `accumulate`.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speicher
 
     Legen Sie Ihren Authentifizierungsschlüssel für den Dienst DeepL fest.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

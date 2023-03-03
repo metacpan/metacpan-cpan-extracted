@@ -96,6 +96,8 @@ Greple的B<-Mtee>模块将匹配的文本部分发送到给定的过滤命令，
 
 =head1 SEE ALSO
 
+L<App::Greple::Tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
 L<https://github.com/greymd/teip>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>

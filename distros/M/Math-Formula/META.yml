@@ -23,6 +23,7 @@ requires:
   DateTime::Format::Duration::ISO8601: '0.006'
   DateTime::TimeZone: '0'
   DateTime::TimeZone::OffsetOnly: '0'
+  File::Slurper: '0'
   File::Spec: '0'
   Log::Report: '0'
   POSIX: '0'
@@ -32,5 +33,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Math-Formula.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

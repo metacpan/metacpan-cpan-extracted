@@ -64,53 +64,53 @@
             "Pegex" : "0.75",
             "Perl::Tidy" : "0",
             "Pod::Usage" : "2.03",
-            "Prima" : "1.67",
+            "Prima" : "1.67001",
             "Scalar::Util" : "1.63",
             "Try::Tiny" : "0.31",
-            "YAML::Any" : "1.30"
+            "YAML::Any" : "1.30",
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "App::financeta" : {
          "file" : "lib/App/financeta.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::editor" : {
          "file" : "lib/App/financeta/editor.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::gui" : {
          "file" : "lib/App/financeta/gui.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::indicators" : {
          "file" : "lib/App/financeta/indicators.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::language" : {
-         "file" : "lib/App/financeta/language.pm",
-         "version" : "0.11"
+         "file" : "lib/App/financeta/language.pm"
       },
       "App::financeta::language::grammar" : {
          "file" : "lib/App/financeta/language.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::language::receiver" : {
          "file" : "lib/App/financeta/language.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::mo" : {
          "file" : "lib/App/financeta/mo.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::tradereport" : {
          "file" : "lib/App/financeta/tradereport.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::financeta::utils" : {
          "file" : "lib/App/financeta/utils.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -125,6 +125,6 @@
          "url" : "https://github.com/vikasnkumar/financeta"
       }
    },
-   "version" : "0.11",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

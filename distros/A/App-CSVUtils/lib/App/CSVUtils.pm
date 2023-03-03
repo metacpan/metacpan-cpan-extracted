@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-18'; # DATE
+our $DATE = '2023-03-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.017'; # VERSION
+our $VERSION = '1.021'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -258,11 +258,14 @@ sub _array2hash {
 }
 
 sub _select_fields {
-    my ($fields, $field_idxs, $args) = @_;
+    my ($fields, $field_idxs, $args, $default_to_select_all) = @_;
 
     my @selected_fields;
 
+    my $select_field_options_used;
+
     if (defined $args->{include_field_pat}) {
+        $select_field_options_used++;
         for my $field (@$fields) {
             if ($field =~ $args->{include_field_pat}) {
                 push @selected_fields, $field;
@@ -270,10 +273,12 @@ sub _select_fields {
         }
     }
     if (defined $args->{exclude_field_pat}) {
+        $select_field_options_used++;
         @selected_fields = grep { $_ !~ $args->{exclude_field_pat} }
             @selected_fields;
     }
     if (defined $args->{include_fields}) {
+        $select_field_options_used++;
       FIELD:
         for my $field (@{ $args->{include_fields} }) {
             unless (defined $field_idxs->{$field}) {
@@ -285,6 +290,7 @@ sub _select_fields {
         }
     }
     if (defined $args->{exclude_fields}) {
+        $select_field_options_used++;
       FIELD:
         for my $field (@{ $args->{exclude_fields} }) {
             unless (defined $field_idxs->{$field}) {
@@ -293,6 +299,10 @@ sub _select_fields {
             }
             @selected_fields = grep { $field ne $_ } @selected_fields;
         }
+    }
+
+    if (!$select_field_options_used && $default_to_select_all) {
+        @selected_fields = @$fields;
     }
 
     if ($args->{show_selected_fields}) {
@@ -1891,7 +1901,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.017 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-02-18.
+This document describes version 1.021 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-03-02.
 
 =head1 DESCRIPTION
 
@@ -1911,97 +1921,105 @@ This distribution contains the following CLI utilities:
 
 =item 6. L<csv-check-rows>
 
-=item 7. L<csv-concat>
+=item 7. L<csv-cmp>
 
-=item 8. L<csv-convert-to-hash>
+=item 8. L<csv-concat>
 
-=item 9. L<csv-csv>
+=item 9. L<csv-convert-to-hash>
 
-=item 10. L<csv-delete-fields>
+=item 10. L<csv-csv>
 
-=item 11. L<csv-dump>
+=item 11. L<csv-delete-fields>
 
-=item 12. L<csv-each-row>
+=item 12. L<csv-dump>
 
-=item 13. L<csv-fill-template>
+=item 13. L<csv-each-row>
 
-=item 14. L<csv-find-values>
+=item 14. L<csv-fill-template>
 
-=item 15. L<csv-freqtable>
+=item 15. L<csv-find-values>
 
-=item 16. L<csv-gen>
+=item 16. L<csv-freqtable>
 
-=item 17. L<csv-get-cells>
+=item 17. L<csv-gen>
 
-=item 18. L<csv-grep>
+=item 18. L<csv-get-cells>
 
-=item 19. L<csv-info>
+=item 19. L<csv-grep>
 
-=item 20. L<csv-intrange>
+=item 20. L<csv-info>
 
-=item 21. L<csv-list-field-names>
+=item 21. L<csv-intrange>
 
-=item 22. L<csv-lookup-fields>
+=item 22. L<csv-list-field-names>
 
-=item 23. L<csv-map>
+=item 23. L<csv-lookup-fields>
 
-=item 24. L<csv-munge-field>
+=item 24. L<csv-ltrim>
 
-=item 25. L<csv-munge-row>
+=item 25. L<csv-map>
 
-=item 26. L<csv-pick>
+=item 26. L<csv-munge-field>
 
-=item 27. L<csv-pick-fields>
+=item 27. L<csv-munge-row>
 
-=item 28. L<csv-pick-rows>
+=item 28. L<csv-pick>
 
-=item 29. L<csv-replace-newline>
+=item 29. L<csv-pick-fields>
 
-=item 30. L<csv-select-fields>
+=item 30. L<csv-pick-rows>
 
-=item 31. L<csv-select-rows>
+=item 31. L<csv-replace-newline>
 
-=item 32. L<csv-setop>
+=item 32. L<csv-rtrim>
 
-=item 33. L<csv-shuf>
+=item 33. L<csv-select-fields>
 
-=item 34. L<csv-shuf-fields>
+=item 34. L<csv-select-rows>
 
-=item 35. L<csv-shuf-rows>
+=item 35. L<csv-setop>
 
-=item 36. L<csv-sort>
+=item 36. L<csv-shuf>
 
-=item 37. L<csv-sort-fields>
+=item 37. L<csv-shuf-fields>
 
-=item 38. L<csv-sort-rows>
+=item 38. L<csv-shuf-rows>
 
-=item 39. L<csv-sorted>
+=item 39. L<csv-sort>
 
-=item 40. L<csv-sorted-fields>
+=item 40. L<csv-sort-fields>
 
-=item 41. L<csv-sorted-rows>
+=item 41. L<csv-sort-rows>
 
-=item 42. L<csv-split>
+=item 42. L<csv-sorted>
 
-=item 43. L<csv-sum>
+=item 43. L<csv-sorted-fields>
 
-=item 44. L<csv-transpose>
+=item 44. L<csv-sorted-rows>
 
-=item 45. L<csv-uniq>
+=item 45. L<csv-split>
 
-=item 46. L<csv2ltsv>
+=item 46. L<csv-sum>
 
-=item 47. L<csv2paras>
+=item 47. L<csv-transpose>
 
-=item 48. L<csv2td>
+=item 48. L<csv-trim>
 
-=item 49. L<csv2tsv>
+=item 49. L<csv-uniq>
 
-=item 50. L<csv2vcf>
+=item 50. L<csv2ltsv>
 
-=item 51. L<paras2csv>
+=item 51. L<csv2paras>
 
-=item 52. L<tsv2csv>
+=item 52. L<csv2td>
+
+=item 53. L<csv2tsv>
+
+=item 54. L<csv2vcf>
+
+=item 55. L<paras2csv>
+
+=item 56. L<tsv2csv>
 
 =back
 

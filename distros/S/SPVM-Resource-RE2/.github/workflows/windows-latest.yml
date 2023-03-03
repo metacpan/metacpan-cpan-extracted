@@ -13,8 +13,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: MinGW DLL Path
-        run: echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $Env:GITHUB_PATH
       - name: Show PATH
         run: echo $env:PATH
       - name: Perl version

@@ -258,8 +258,8 @@ sub option_default {
 sub option_initial {
   my ($self, $name, @data) = @_;
 
-  if ((my $code = $self->can("initial_${name}")) && !@data) {
-    $self->{$name} = $code->($self, @data) if !exists $self->{$name};
+  if ((my $code = $self->can("initial_${name}"))) {
+    $self->{$name} = $code->($self, @data);
   }
   return;
 }
@@ -1932,3 +1932,18 @@ B<example 3>
   # Exception! (isa Person::Error)
 
 =back
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

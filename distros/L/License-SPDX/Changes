@@ -1,3 +1,7 @@
+0.05 2023-03-01T12:34:17+01:00
+ - Add example for check_exception() method.
+ - Fix typo in doc example.
+
 0.04 2023-02-27T18:51:38+01:00
  - Add information about license data to doc.
  - Add license exceptions handling.

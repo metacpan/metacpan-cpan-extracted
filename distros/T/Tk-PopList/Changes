@@ -1,0 +1,13 @@
+Revision history for Perl extension Tk::PopList.
+
+0.01  Tue Feb 21 22:18:01 2023
+	- original version; created by h2xs 1.23 with options
+		-X Tk::PopList
+
+0.01  Tue Feb 28 2023
+	- initial release
+
+0.02  Thu Mar 3 2023
+	-added the module Tk::Poplevel and made Tk::PopList inherit it.
+	-added the options -confine, -popdirection and -popalign.
+	-updated documentation

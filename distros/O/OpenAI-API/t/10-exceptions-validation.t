@@ -39,6 +39,11 @@ my @test_cases = (
         params    => {},
         exception => qr/Missing required arguments: input/,
     },
+    {
+        method    => 'chat',
+        params    => {},
+        exception => qr/Missing required arguments: messages/,
+    },
 );
 
 for my $test (@test_cases) {

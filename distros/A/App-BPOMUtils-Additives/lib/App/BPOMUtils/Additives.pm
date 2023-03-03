@@ -7,9 +7,9 @@ use warnings;
 use Capture::Tiny 'capture_stderr';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-01'; # DATE
+our $DATE = '2023-02-05'; # DATE
 our $DIST = 'App-BPOMUtils-Additives'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -48,9 +48,13 @@ sub convert_benzoate_unit {
 
     Physics::Unit::InitUnit(
         ['ppm'], '1 mg/kg',
-        ['ppm-as-sodium-benzoate'], '1 mg/kg',
-        ['ppm-as-potassium-benzoate'], '0.959326321395287 mg/kg', # potassium benzoate's molecular weight = 150.22
         ['ppm-as-benzoic-acid'], '1.18006878480183 mg/kg', # benzoic acid's molecular weight = 122.12, sodium benzoate's molecular weight = 144.11
+        ['ppm-as-sodium-benzoate'], '1 mg/kg',
+        ['ppm-as-na-benzoate'], '1 mg/kg',
+        ['ppm-as-potassium-benzoate'], '0.959326321395287 mg/kg', # potassium benzoate's molecular weight = 150.22
+        ['ppm-as-k-benzoate'], '0.959326321395287 mg/kg',
+        ['ppm-as-calcium-benzoate'], '0.432574120647515 mg/kg', # calcium benzoate's molecular weight = 282.31
+        ['ppm-as-ca-benzoate'], '0.432574120647515 mg/kg',
     );
 
     my %args = @_;
@@ -66,7 +70,11 @@ sub convert_benzoate_unit {
             'ppm',
             'ppm-as-benzoic-acid',
             'ppm-as-sodium-benzoate',
+            'ppm-as-na-benzoate',
             'ppm-as-potassium-benzoate',
+            'ppm-as-k-benzoate',
+            'ppm-as-calcium-benzoate',
+            'ppm-as-ca-benzoate',
         ) {
             push @rows, {
                 unit => $u,
@@ -92,7 +100,7 @@ App::BPOMUtils::Additives - Utilities related to food additives in BPOM
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BPOMUtils::Additives (from Perl distribution App-BPOMUtils-Additives), released on 2023-02-01.
+This document describes version 0.003 of App::BPOMUtils::Additives (from Perl distribution App-BPOMUtils-Additives), released on 2023-02-05.
 
 =head1 DESCRIPTION
 
@@ -132,7 +140,11 @@ Result:
      { amount => 1, unit => "ppm" },
      { amount => 0.847408229824443, unit => "ppm-as-benzoic-acid" },
      { amount => 1, unit => "ppm-as-sodium-benzoate" },
+     { amount => 1, unit => "ppm-as-na-benzoate" },
      { amount => 1.04239816806606, unit => "ppm-as-potassium-benzoate" },
+     { amount => 1.04239816806606, unit => "ppm-as-k-benzoate" },
+     { amount => 2.31174254831314, unit => "ppm-as-calcium-benzoate" },
+     { amount => 2.31174254831314, unit => "ppm-as-ca-benzoate" },
    ],
    {},
  ]
@@ -187,7 +199,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils-Additi
 
 =head1 SEE ALSO
 
-L<App::BPOMUtils>
+Other C<App::BPOMUtils::*> distributions.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ StreamFinder::SermonAudio - Fetch actual raw streamable URLs on sermonaudio.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021-2022 by
+This module is Copyright (C) 2021-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -103,7 +103,8 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, "-quality" => I<quality>] [, I<-secure> [ => 0|1 ]] 
+=item B<new>(I<ID>|I<url> [, I<-quality> => high|low|audio|any ] 
+[, I<-speakericon> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]] 
 [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a www.sermonaudio.com podcast (sermon) ID or URL and creates and returns a 
@@ -123,6 +124,12 @@ stream is accepted (subject to the above limitations), then the "best" stream
 returned will be video (video streams are favored over audio).
 
 DEFAULT I<-quality> is "I<any>":  (accept all streams without resolution limit).
+
+The optional I<-speakericon> argument can be set to reverse the artist 
+(channel) icon and artist image, usually resulting in the artist icon being a 
+photo of the preacher, instead of his church's thumbnail icon.
+
+DEFAULT zero (I<false>): Don't reverse the artist icon and image.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -173,24 +180,41 @@ Returns the podcast's title, or (long description).  Podcasts
 on SermonAudio can have separate descriptions, but for podcasts, 
 it is always the podcast's title.
 
-=item $podcast->B<getIconURL>()
+=item $podcast->B<getIconURL>(['artist'])
 
 Returns the URL for the podcast's "cover art" icon image, if any.
 
-=item $podcast->B<getIconData>()
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.
+
+=item $podcast->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
-=item $podcast->B<getImageURL>()
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
+
+=item $podcast->B<getImageURL>(['artist'])
 
 Returns the URL for the podcast's "cover art" (usually larger) 
 banner image.
 
-=item $podcast->B<getImageData>()
+If B<'artist'> is specified, the channel artist's image url is returned, 
+if any.
+
+Note:  SermonAudio sermons (unlike most other podcast sites) often have both 
+an artist icon (for the church) AND an artist image for that artist/channel 
+(preacher), and the artist's image is usually slightly larger and is a photo 
+of the specific preacher.  See also the B<-speakericon> option.
+
+=item $podcast->B<getImageData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual podcast's banner image (binary data).
+
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $podcast->B<getType>()
 
@@ -289,7 +313,7 @@ L<http://search.cpan.org/dist/StreamFinder-SermonAudio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2022 Jim Turner.
+Copyright 2021-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -360,11 +384,15 @@ sub new
 		} elsif ($_[0] =~ /^\-?quality$/o) {
 			shift;
 			$self->{'quality'} = (defined $_[0]) ? shift : 'any';
+		} elsif ($_[0] =~ /^\-?speakericon$/o) {
+			shift;
+			$self->{'speakericon'} = (defined $_[0]) ? shift : 1;
 		} else {
 			shift;
 		}
 	}
 	$self->{'quality'} = 'any'  unless (defined $self->{'quality'});
+	$self->{'speakericon'} = 0  unless (defined $self->{'speakericon'});
 
 	my $isEpisode = 1;
 	$url =~ s#\\##g;
@@ -490,15 +518,19 @@ TRYIT:
 		$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
 		$self->{'iconurl'} ||= $1  if ($html =~ m#\<font\s+class\=ar3\>\<img\s+src\=\"([^\"]+)#s);
 		$self->{'imageurl'} = $self->{'iconurl'};
-		$self->{'articonurl'} = ($html =~ m#\<img\s+.*?src\=\"([^\"]+)\"\s+width\=\"?60\"?\s+height\=\"?40\"?\s+border\=\"?0#s)
-				? $1 : '';
-		$self->{'artimageurl'} ||= $1  if ($html =~ m#\<img\s+src\=\"(.*?\/images\/speakers\/[^\"]+)#s);
+		$self->{'articonurl'} = $1  if ($html =~ m#\<img\s+.*?src\=\"([^\"]+)\"\s+width\=\"?60\"?\s+height\=\"?40\"?\s+border\=\"?0#s);
+		$self->{'artimageurl'} = $1  if ($html =~ m#\<img\s+src\=\"(\S*?\/images\/speakers\/[^\"]+)#s);
 		$self->{'artimageurl'} = 'https:' . $self->{'artimageurl'}  if ($self->{'artimageurl'} =~ m#^\/\/#);
 		$self->{'artimageurl'} = 'https://media.sermonaudio.com' . $self->{'artimageurl'}  if ($self->{'artimageurl'} =~ m#^\/#);
 		$self->{'articonurl'} ||= $self->{'artimageurl'};
 		$self->{'articonurl'} = 'https:' . $self->{'articonurl'}  if ($self->{'articonurl'} =~ m#^\/\/#);
 		$self->{'articonurl'} = 'https://media.sermonaudio.com' . $self->{'articonurl'}  if ($self->{'articonurl'} =~ m#^\/#);
-		print STDERR "--articon=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+		if ($self->{'speakericon'} && $self->{'artimageurl'}) {  #USE PREACHER'S THUMBNAIL (REVERSE articon AND artimage):
+			my $x = $self->{'artimageurl'};
+			$self->{'artimageurl'} = $self->{'articonurl'};
+			$self->{'articonurl'} = $x;
+		}
+		print STDERR "--EPI-- articon=".$self->{'articonurl'}."= artimg=".$self->{'artimageurl'}."=\n"  if ($DEBUG);
 		if ($html =~ s#Speaker\:\<\/font\>\<BR\>\<B\>\<a\s+class\=\S+\shref\=\"([^\"]+)\"\>([^\<]*)##s) {
 			$self->{'albumartist'} = $1;
 			$self->{'artist'} = $2;
@@ -528,6 +560,9 @@ TRYIT:
 			}
 			$self->{'articonurl'} ||= $1  if ($html =~ s#^.+?\<div\s+style\=\"margin\-bottom##s
 					&& $html =~ m#\<img[^\>]+?src\=\"?([^\"\s]+)#);
+			$self->{'articonurl'} = 'https:' . $self->{'articonurl'}
+					if ($self->{'articonurl'} =~ m#^\/\/#);
+			print STDERR "--CHN-- articon=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 			if ($html =~ s#^.+?\<a\s+class\=sermonlink##s) {
 				if ($html =~ m#\?SID\=(\d+).*?\>([^\<]+)#) {
 					$self->{'id'} = $1;

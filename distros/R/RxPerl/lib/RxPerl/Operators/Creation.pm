@@ -21,7 +21,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.26.2";
+our $VERSION = "v6.27.0";
 
 sub rx_observable;
 
@@ -590,7 +590,7 @@ sub rx_throw_error {
 
         return;
     });
-};
+}
 
 sub rx_timer {
     my ($after, $period) = @_;
@@ -619,7 +619,7 @@ sub rx_timer {
             $cancel_interval_sub->($timer_int);
         };
     });
-};
+}
 
 sub rx_zip {
     my @sources = @_;

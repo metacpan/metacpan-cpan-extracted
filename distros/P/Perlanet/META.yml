@@ -7,6 +7,7 @@ build_requires:
   File::Path: '0'
   MooseX::ConfigFromFile: '0'
   Test::More: '0'
+  Test::Warnings: '0'
   XML::OPML::SimpleGen: '0'
 configure_requires:
   Module::Build: '0.42'
@@ -28,7 +29,7 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: v2.2.1
+    version: v3.0.0
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
   Perlanet::Feed:
@@ -81,5 +82,5 @@ resources:
   homepage: http://perlanet.mag-sol.com/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/perlanet.git
-version: v2.2.1
+version: v3.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

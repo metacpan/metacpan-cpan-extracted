@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 98 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 106 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
@@ -19,6 +19,7 @@ my @module_files = (
     'App/CSVUtils/csv_check_field_names.pm',
     'App/CSVUtils/csv_check_field_values.pm',
     'App/CSVUtils/csv_check_rows.pm',
+    'App/CSVUtils/csv_cmp.pm',
     'App/CSVUtils/csv_concat.pm',
     'App/CSVUtils/csv_convert_to_hash.pm',
     'App/CSVUtils/csv_csv.pm',
@@ -35,12 +36,14 @@ my @module_files = (
     'App/CSVUtils/csv_intrange.pm',
     'App/CSVUtils/csv_list_field_names.pm',
     'App/CSVUtils/csv_lookup_fields.pm',
+    'App/CSVUtils/csv_ltrim.pm',
     'App/CSVUtils/csv_map.pm',
     'App/CSVUtils/csv_munge_field.pm',
     'App/CSVUtils/csv_munge_row.pm',
     'App/CSVUtils/csv_pick_fields.pm',
     'App/CSVUtils/csv_pick_rows.pm',
     'App/CSVUtils/csv_replace_newline.pm',
+    'App/CSVUtils/csv_rtrim.pm',
     'App/CSVUtils/csv_select_fields.pm',
     'App/CSVUtils/csv_select_rows.pm',
     'App/CSVUtils/csv_setop.pm',
@@ -53,6 +56,7 @@ my @module_files = (
     'App/CSVUtils/csv_split.pm',
     'App/CSVUtils/csv_sum.pm',
     'App/CSVUtils/csv_transpose.pm',
+    'App/CSVUtils/csv_trim.pm',
     'App/CSVUtils/csv_uniq.pm',
     'App/CSVUtils/paras2csv.pm'
 );
@@ -64,6 +68,7 @@ my @scripts = (
     'script/csv-check-field-names',
     'script/csv-check-field-values',
     'script/csv-check-rows',
+    'script/csv-cmp',
     'script/csv-concat',
     'script/csv-convert-to-hash',
     'script/csv-csv',
@@ -80,6 +85,7 @@ my @scripts = (
     'script/csv-intrange',
     'script/csv-list-field-names',
     'script/csv-lookup-fields',
+    'script/csv-ltrim',
     'script/csv-map',
     'script/csv-munge-field',
     'script/csv-munge-row',
@@ -87,6 +93,7 @@ my @scripts = (
     'script/csv-pick-fields',
     'script/csv-pick-rows',
     'script/csv-replace-newline',
+    'script/csv-rtrim',
     'script/csv-select-fields',
     'script/csv-select-rows',
     'script/csv-setop',
@@ -102,6 +109,7 @@ my @scripts = (
     'script/csv-split',
     'script/csv-sum',
     'script/csv-transpose',
+    'script/csv-trim',
     'script/csv-uniq',
     'script/csv2ltsv',
     'script/csv2paras',

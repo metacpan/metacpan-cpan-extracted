@@ -154,7 +154,7 @@ get_unchecked_bitmap(void)
 
 	std_unchecked_bitmap = (HBITMAP) -1;
 
-	cx = GetSystemMetrics( SM_CXMENUCHECK ) - 1;
+	cx = GetSystemMetrics( SM_CXMENUCHECK );
 	dc = GetDC(NULL);
 	if ( !( std_unchecked_bitmap = image_create_argb_dib_section( dc, cx, cx, &ptr))) {
 		ReleaseDC(NULL, dc);
@@ -166,7 +166,17 @@ get_unchecked_bitmap(void)
 	stock_bm = SelectObject( dc, std_unchecked_bitmap);
 
 	sz = cx * cx;
-	bzero(ptr, sz * 4);
+	if (
+		(LOBYTE(LOWORD(guts.version)) < 6) || (
+			(LOBYTE(LOWORD(guts.version)) == 6) &&
+			(HIBYTE(LOWORD(guts.version)) <  2)
+		)
+	) {
+		DWORD color = GetSysColor( COLOR_MENU ) | 0xff000000;
+		for ( i = 0; i < sz; i++, ptr++)
+			*ptr = color;
+	} else
+		bzero(ptr, sz * 4);
 	x1 = y1 = (cx > 10) ? cx / 4 : 0;
 	x2 = y2 = cx - x1;
 
@@ -480,6 +490,7 @@ update_check_icons( Handle self, PMenuItemReg m)
 		mii. hbmpUnchecked = get_unchecked_bitmap();
 	}
 
+	SetMenuItemInfo(( HMENU ) var handle, m-> id + MENU_ID_AUTOSTART, false, &mii);
 
 	return ret;
 }

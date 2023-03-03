@@ -1,0 +1,27 @@
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt5/local/lib /opt/rt5/lib);
+
+package RT::Extension::DynamicWebPath::Test;
+use base 'RT::Test';
+
+sub import {
+    my $class = shift;
+    my %args  = @_;
+
+    $args{'requires'} ||= [];
+    if ( $args{'testing'} ) {
+        unshift @{ $args{'requires'} }, 'RT::Extension::DynamicWebPath';
+    } else {
+        $args{'testing'} = 'RT::Extension::DynamicWebPath';
+    }
+
+    $class->SUPER::import( %args );
+    $class->export_to_level(1);
+
+    require RT::Extension::DynamicWebPath;
+}
+
+1;

@@ -1,6 +1,6 @@
 package SPVM::Resource::RE2;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
@@ -109,11 +109,14 @@ The config definition of C<Resource::RE2>.
   $config->add_source_files(@source_files);
 
 =head1 Required Libraries
-
-=head2 Windows
-
+  
+  # Windows
   if ($^O eq 'MSWin32') {
     $config->add_static_libs('stdc++', 'winpthread', 'gcc');
+  }
+  # Linux/Unix, Mac, etc
+  else {
+    $config->add_libs('stdc++');
   }
 
 =head1 How to Create This Resource

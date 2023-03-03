@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-18'; # DATE
+our $DATE = '2023-03-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.017'; # VERSION
+our $VERSION = '1.021'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 use String::Pad qw(pad);
@@ -84,12 +84,12 @@ Long lines are also by default folded at 78 columns (but you can customize with
 the `--width` option); if a line is folded a literal backslash is added to the
 end of each physical line and the next line will be indented by two spaces:
 
-    notes: This is a long note. This is a long note. This is a long note. This is\
+    notes: This is a long note. This is a long note. This is a long note. This is
       a long note. This is a long note.
 
 A long word is also folded and the next line will be indented by one space:
 
-    notes: Thisisalongwordthisisalongwordthisisalongwordthisisalongwordthisisalongw\
+    notes: Thisisalongwordthisisalongwordthisisalongwordthisisalongwordthisisalongw
      ord
 
 Newline and backslash are also escaped in header; additionally a literal ":"
@@ -168,7 +168,6 @@ _
                 require Text::Wrap::NoStrip;
                 local $Text::Wrap::NoStrip::columns = $r->{util_args}{width};
                 my $wrapped_line = Text::Wrap::NoStrip::wrap("", " ", $line);
-                $wrapped_line =~ s!$(?=.)!\\!gm;
                 print $wrapped_line, "\n";
             }
         }
@@ -192,7 +191,7 @@ App::CSVUtils::csv2paras - Convert CSV to paragraphs
 
 =head1 VERSION
 
-This document describes version 1.017 of App::CSVUtils::csv2paras (from Perl distribution App-CSVUtils), released on 2023-02-18.
+This document describes version 1.021 of App::CSVUtils::csv2paras (from Perl distribution App-CSVUtils), released on 2023-03-02.
 
 =head1 FUNCTIONS
 
@@ -260,12 +259,12 @@ Long lines are also by default folded at 78 columns (but you can customize with
 the C<--width> option); if a line is folded a literal backslash is added to the
 end of each physical line and the next line will be indented by two spaces:
 
- notes: This is a long note. This is a long note. This is a long note. This is\
+ notes: This is a long note. This is a long note. This is a long note. This is
    a long note. This is a long note.
 
 A long word is also folded and the next line will be indented by one space:
 
- notes: Thisisalongwordthisisalongwordthisisalongwordthisisalongwordthisisalongw\
+ notes: Thisisalongwordthisisalongwordthisisalongwordthisisalongwordthisisalongw
   ord
 
 Newline and backslash are also escaped in header; additionally a literal ":"

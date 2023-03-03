@@ -1,5 +1,8 @@
 Revision history for HTML-Spelling-Site
 
+0.10.1      2023-03-02
+    - add mkdir on cache write.
+
 0.10.0      2022-03-04
     - add MAXSIZE.
 

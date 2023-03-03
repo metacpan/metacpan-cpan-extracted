@@ -1,6 +1,6 @@
 package Chemistry::File::CML;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 # $Id$
 
 use base 'Chemistry::File';
@@ -13,7 +13,7 @@ our $DEBUG = 0;
 
 =head1 NAME
 
-Chemistry::File::CML - CML reader
+Chemistry::File::CML - Chemical Markup Language reader/writer
 
 =head1 SYNOPSIS
 
@@ -22,19 +22,21 @@ Chemistry::File::CML - CML reader
     # read a molecule
     my $mol = Chemistry::Mol->read('myfile.cml');
 
+    # write a molecule
+    $mol->write('myfile.cml');
+
 =cut
 
 Chemistry::Mol->register_format(cml => __PACKAGE__);
 
 =head1 DESCRIPTION
 
-Chemical Markup Language reader.
+Chemical Markup Language reader/writer.
 
 This module automatically registers the 'cml' format with L<Chemistry::Mol>.
 
-This version only reads some of the information available in CML files.
+This version reads and writer only some of the information available in CML files.
 It does not read stereochemistry yet, but this is envisaged in future.
-Writing CML files is not implemented yet too.
 
 This module is part of the PerlMol project, L<https://github.com/perlmol>.
 
@@ -168,12 +170,58 @@ sub parse_string {
                      "less than the number of explicit hydrogen atoms\n";
                 next;
             }
-            next if $explicit_hydrogens == $hydrogens_by_id{$id};
             $atom->implicit_hydrogens( $hydrogens_by_id{$id} - $explicit_hydrogens );
         }
     }
 
     return @molecules;
+}
+
+sub write_string {
+    my ($self, $mol, %opts) = @_;
+    my $cml = sprintf '  <molecule id="%s">' . "\n", $mol->name;
+
+    # Write the atomArray
+    $cml .= "    <atomArray>\n";
+    for my $atom ($mol->atoms) {
+        my %attributes = ( id => $atom->name,
+                           elementType => $atom->symbol );
+
+        if( $atom->attr( 'cml/has_coords' ) ) {
+            ( $attributes{x3}, $attributes{y3}, $attributes{z3} ) = $atom->coords->array;
+        }
+
+        $attributes{formalCharge} = $atom->formal_charge if $atom->formal_charge;
+        $attributes{isotopeNumber} = $atom->mass_number if $atom->mass_number;
+
+        if( defined $atom->implicit_hydrogens ) {
+            $attributes{hydrogenCount} =
+                $atom->implicit_hydrogens +
+                scalar grep { $_->symbol eq 'H' } $atom->neighbors;
+        }
+
+        $cml .= '      <atom ' .
+                join( ' ', map { $_ . '="' . $attributes{$_} . '"' }
+                           sort { ($b eq 'id') <=> ($a eq 'id') || $a cmp $b }
+                                keys %attributes ) .
+                "/>\n";
+    }
+    $cml .= "    </atomArray>\n";
+
+    # Write the bondArray (if any)
+    if ($mol->bonds) {
+        $cml .= "    <bondArray>\n";
+        for my $bond ($mol->bonds) {
+            $cml .= '      <bond atomRefs2="' .
+                    join( ' ', map { $_->name } $bond->atoms ) .
+                    sprintf '" order="%s"/>' . "\n",
+                            $bond->type;
+        }
+        $cml .= "    </bondArray>\n";
+    }
+
+    $cml .= "  </molecule>\n";
+    return $cml;
 }
 
 sub name_is {
@@ -184,6 +232,18 @@ sub name_is {
 sub file_is {
     my ($self, $fname) = @_;
     $fname =~ /\.cml$/i;
+}
+
+sub write_header {
+    my ($self) = @_;
+    my $fh = $self->fh;
+    print $fh "<?xml version=\"1.0\"?>\n<cml xmlns=\"http://www.xml-cml.org/schema\">\n";
+}
+
+sub write_footer {
+    my ($self) = @_;
+    my $fh = $self->fh;
+    print $fh "</cml>\n";
 }
 
 1;
@@ -202,7 +262,7 @@ Andrius Merkys <merkys@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2022 Andrius Merkys. All rights reserved. This program is
+Copyright (c) 2022-2023 Andrius Merkys. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same terms as
 Perl itself.
 

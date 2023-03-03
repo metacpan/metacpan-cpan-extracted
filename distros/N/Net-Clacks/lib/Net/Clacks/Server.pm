@@ -1,19 +1,19 @@
 package Net::Clacks::Server;
 #---AUTOPRAGMASTART---
-use 5.020;
+use v5.36;
 use strict;
-use warnings;
 use diagnostics;
 use mro 'c3';
-use English;
-use Carp;
-our $VERSION = 24;
+use English qw(-no_match_vars);
+use Carp qw[carp croak confess cluck longmess shortmess];
+our $VERSION = 26;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
-use feature 'signatures';
-no warnings qw(experimental::signatures);
+use Data::Dumper;
+use builtin qw[true false is_bool];
+no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 #---AUTOPRAGMAEND---
 
 use XML::Simple;
@@ -26,7 +26,6 @@ use IO::Socket::SSL;
 use YAML::Syck;
 use MIME::Base64;
 use File::Copy;
-use Data::Dumper;
 use Scalar::Util qw(looks_like_number);
 
 # For turning off SSL session cache
@@ -98,12 +97,12 @@ sub new($class, $isDebugging, $configfile) {
 
 sub init($self) {
     # Dummy function for backward compatibility
-    warn("Deprecated call to init(), you can remove that function from your code");
+    carp("Deprecated call to init(), you can remove that function from your code");
     return;
 }
 
 
-sub run($self) { ## no critic (Subroutines::ProhibitExcessComplexity)
+sub run($self) {
     if(!defined($self->{initHasRun}) || !$self->{initHasRun}) {
         $self->_init();
     }
@@ -229,7 +228,7 @@ sub run($self) { ## no critic (Subroutines::ProhibitExcessComplexity)
 
 
 
-                if($inmsg =~ /^OVERHEAD\ /) { ## no critic (ControlStructures::ProhibitCascadingIfElse)
+                if($inmsg =~ /^OVERHEAD\ /) {
                     # Already handled
                     next;
                 } elsif($self->_handleMessageDirect($cid, $inmsg)) {
@@ -323,19 +322,19 @@ sub _savePersistanceFile($self) {
     return;
 }
 
-sub _deref($self, $val) {
-    return if(!defined($val));
-
-    while(ref($val) eq "SCALAR" || ref($val) eq "REF") {
-        $val = ${$val};
-        last if(!defined($val));
-    }
-
-    return $val;
-}
+#sub _deref($self, $val) {
+#    return if(!defined($val));
+#
+#    while(ref($val) eq "SCALAR" || ref($val) eq "REF") {
+#        $val = ${$val};
+#        last if(!defined($val));
+#    }
+#
+#    return $val;
+#}
 
 sub _evalsyswrite($self, $socket, $buffer) {
-    return 0 unless(length($buffer));
+    return false unless(length($buffer));
 
     my $written = 0;
     my $ok = 0;
@@ -380,7 +379,7 @@ sub _writeBinFile($self, $fname, $data) {
     print $fh $data;
     close($fh);
 
-    return 1;
+    return true;
 }
 
 sub _restorePersistanceFile($self) {
@@ -637,14 +636,14 @@ retry:
     if(!-f $fname) {
         # Does not exist
         carp("$fname not found");
-        return 0;
+        return false;
     }
 
     my $data = $self->_slurpBinFile($fname);
     if(length($data) < 11) {
         carp("$fname too small");
         # Invalid file
-        return 0;
+        return false;
     }
     if(substr($data, 0, 9) ne chr(0) . 'CLACKSV3') {
         if($alreadyupgraded) {
@@ -656,14 +655,14 @@ retry:
         if(!$self->_inplaceUpgrade($fname)) {
             carp("Inplace upgrade failed");
             # Could not upgrade
-            return 0;
+            return false;
         }
         goto retry;
     }
 
     if(length($data) < 18) {
         carp("Incomplete V3 persistance file " . $fname . " (too small)!");
-        return 0;
+        return false;
     }
 
     substr($data, 0, 9, ''); # Remove header
@@ -671,24 +670,24 @@ retry:
     if(substr($data, -9, 9) ne chr(0) . 'CLACKSV3') {
         # Missing end bytes
         carp("Incomplete V3 persistance file " . $fname . " (missing end bytes)!");
-        return 0; # Fail
+        return false; # Fail
     }
     substr($data, -9, 9, ''); # Remove end bytes
 
     $self->{cache} = {};
     if(length($data)) {
         my $loadok = 0;
-        eval {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
             $self->{cache} = Load($data);
             $loadok = 1;
         };
         if(!$loadok) {
             carp("Invalid V3 persistance file " . $fname . "!");
-            return 0; # Fail
+            return false; # Fail
         }
     }
 
-    return 1;
+    return true;
 }
 
 sub _inplaceUpgrade($self, $fname) {
@@ -723,20 +722,20 @@ sub _inplaceUpgrade($self, $fname) {
 
         if(!defined($line) || !defined($timestampline) || $endline ne 'ENDBYTES') {
             carp("Invalid persistance file " . $fname . "! File is incomplete!");
-            return 0; # Fail
+            return false; # Fail
         }
 
         my $loadok = 0;
 
         if($line ne '') {
-            eval {
+            eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
                 $line = decode_base64($line);
                 $line = Load($line);
                 $loadok = 1;
             };
             if(!$loadok) {
                 carp("Invalid persistance file " . $fname . "! Failed to decode data line!");
-                return 0; # Fail
+                return false; # Fail
             }
         }
         %clackscache = %{$line};
@@ -748,14 +747,14 @@ sub _inplaceUpgrade($self, $fname) {
 
         if($timestampline ne '') {
             $loadok = 0;
-            eval {
+            eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
                 $timestampline = decode_base64($timestampline);
                 $timestampline = Load($timestampline);
                 $loadok = 1;
             };
             if(!$loadok) {
                 carp("Invalid persistance file " . $fname . "! Failed to decode timestamp line, using current time!");
-                return 0; # Fail
+                return false; # Fail
             } else {
                 my %clackstemp = %{$timestampline};
                 foreach my $key (keys %clackstemp) {
@@ -771,21 +770,21 @@ sub _inplaceUpgrade($self, $fname) {
             }
         } elsif($accesstimeline ne '') {
             $loadok = 0;
-            eval {
+            eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
                 $accesstimeline = decode_base64($accesstimeline);
                 $accesstimeline = Load($accesstimeline);
                 $loadok = 1;
             };
             if(!$loadok) {
                 carp("Invalid persistance file " . $fname . "! Failed to decode timestamp line, using current time!");
-                return 0; # Fail
+                return false; # Fail
             } else {
                 %clackscacheaccesstime = %{$accesstimeline};
             }
         }
     } else {
         # Fail
-        return 0;
+        return false;
     }
 
     # Turn into new format
@@ -833,7 +832,7 @@ sub _inplaceUpgrade($self, $fname) {
 
     print "...upgrade complete.\n";
 
-    return 1;
+    return true;
 }
 
 sub _addInterclacksLink($self) {
@@ -1122,7 +1121,7 @@ sub _clientInput($self) {
         while(1) {
             my $rawbuffer;
             my $readok = 0;
-            eval {
+            eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
                 sysread($self->{clients}->{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
                 $readok = 1;
             };
@@ -1330,27 +1329,27 @@ sub _handleMessageOverhead($self, $cid, $inmsg) {
                 $self->{clients}->{$cid}->{authok} = 1;
                 #$self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD O Welcome!\r\n";
                 push @{$self->{clients}->{$cid}->{outmessages}}, {releasetime => $now + $self->{clients}->{$cid}->{outmessagedelay}, message => 'OVERHEAD O Welcome!'};
-                return 1; # NO LOGGING OF CREDENTIALS
+                return true; # NO LOGGING OF CREDENTIALS
             } else {
                 $self->{clients}->{$cid}->{authok} = 0;
                 #$self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
                 push @{$self->{clients}->{$cid}->{outmessages}}, {releasetime => $now + $self->{clients}->{$cid}->{outmessagedelay}, message => 'OVERHEAD F Login failed!'};
                 push @{$self->{clients}->{$cid}->{outmessages}}, {releasetime => $now + $self->{clients}->{$cid}->{outmessagedelay}, message => 'EXIT'};
                 push @{$self->{toremove}}, $cid; # Disconnect the client
-                return 1; # NO LOGGING OF CREDENTIALS
+                return true; # NO LOGGING OF CREDENTIALS
             }
         }
 
         # Ignore other command when not authenticated
         if(!$self->{clients}->{$cid}->{authok}) {
-            return 1;
+            return true;
         }
 
         if($parsedflags{timestamp}) {
             $now = $self->_getTime(); # Make sure we are at the "latest" $now. This is one of the very few critical sections
             $self->{clients}->{$cid}->{client_timeoffset} = $now - $value;
             print "**** CLIENT TIME OFFSET: ", $self->{clients}->{$cid}->{client_timeoffset}, "\n";
-            return 1;
+            return true;
         }
 
         if($parsedflags{lock_for_sync} && $self->{clients}->{$cid}->{interclacksclient}) {
@@ -1492,10 +1491,10 @@ sub _handleMessageOverhead($self, $cid, $inmsg) {
             }
         }
 
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 sub _handleMessageCaching($self, $cid, $inmsg) {
@@ -1626,10 +1625,10 @@ sub _handleMessageCaching($self, $cid, $inmsg) {
         $self->{savecache} = 1;
     } else {
         # "not handled in this sub"
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
 sub _handleMessageControl($self, $cid, $inmsg) {
@@ -1693,10 +1692,10 @@ sub _handleMessageControl($self, $cid, $inmsg) {
         $self->{sendinterclacks} = 0;
     } else {
         # "not handled in this sub"
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
 
@@ -1718,10 +1717,10 @@ sub _handleMessageDirect($self, $cid, $inmsg) {
         push @{$self->{outbox}}, \%tmp;
     } else {
         # "not handled in this sub"
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
 1;
@@ -1766,7 +1765,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 Rene Schickbauer
+Copyright (C) 2008-2023 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -14,6 +14,7 @@ cpanfile
 dist.ini
 jquery-ui.LICENSE.txt
 json-formatter.LICENSE
+lib/App/Yath/Command/recent.pm
 lib/App/Yath/Command/ui.pm
 lib/App/Yath/Command/upload.pm
 lib/App/Yath/Plugin/YathUIDB.pm
@@ -38,6 +39,8 @@ lib/Test2/Harness/UI/Controller/JobField.pm
 lib/Test2/Harness/UI/Controller/Lookup.pm
 lib/Test2/Harness/UI/Controller/Project.pm
 lib/Test2/Harness/UI/Controller/Query.pm
+lib/Test2/Harness/UI/Controller/ReRun.pm
+lib/Test2/Harness/UI/Controller/Recent.pm
 lib/Test2/Harness/UI/Controller/Resources.pm
 lib/Test2/Harness/UI/Controller/Run.pm
 lib/Test2/Harness/UI/Controller/RunField.pm

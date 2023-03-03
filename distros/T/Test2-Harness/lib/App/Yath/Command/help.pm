@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '1.000148';
+our $VERSION = '1.000150';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw/<_command_info_hash/;
@@ -550,6 +550,15 @@ The Yath-UI project for your test results
 =item --no-yathui-render
 
 Add the YathUI renderer in addition to other renderers
+
+
+=item --yathui-resources
+
+=item --yathui-resources=5
+
+=item --no-yathui-resources
+
+Send resource info (for supported resources) to yathui at the specified interval in seconds (5 if not specified)
 
 
 =item --yathui-retry

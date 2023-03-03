@@ -26,6 +26,7 @@ requires:
   Data::Munge: '0'
   Integer::Partition: '0'
   List::Util: '1.33'
+  Math::NumSeq::SqrtContinued: '0'
   Math::Sequence::DeBruijn: '0'
   Moo: '2'
   Music::AtonalUtil: '0'
@@ -35,7 +36,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-CreatingRhythms
   repository: https://github.com/ology/Music-CreatingRhythms.git
-version: '0.0101'
+version: '0.0301'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -219,6 +220,8 @@ x_Dist_Zilla:
             - Bruijn
             - Christoffel
             - Hollos
+            - cfcv
+            - cfsqrt
             - chsequl
             - combinatorial
             - compa
@@ -232,6 +235,8 @@ x_Dist_Zilla:
             - parta
             - partam
             - partm
+            - permi
+            - pfold
             - pn
           wordlist: Pod::Wordlist
       name: Test::PodSpelling

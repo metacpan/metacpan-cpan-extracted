@@ -423,29 +423,10 @@ feed_unicode_character(Handle self, PEvent ev)
 	ev-> key.code = r;
 }
 
-static void
-handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool release)
+U32
+prima_keysym_to_keycode( KeySym keysym, XKeyEvent *ev, U8 character )
 {
-	/* if e-> cmd is unset on exit, the event will not be passed to the system-independent part */
-	char str_buf[ 256];
-	KeySym keysym, keysym2;
 	U32 keycode;
-	int str_len;
-
-	if ( !release && guts.use_xim && P_APPLICATION-> wantUnicodeInput) {
-		if ( prima_xim_handle_key_press(self, ev, e, sym))
-			return;
-	}
-
-	str_len = XLookupString( ev, str_buf, 256, &keysym, NULL);
-	*sym = keysym;
-	Edebug( "event: keysym: %08lx/%08lx 0: %08lx, 1: %08lx, 2: %08lx, 3: %08lx\n", keysym,
-		KeySymToUcs4( keysym),
-		XLookupKeysym(ev,0),
-		XLookupKeysym(ev,1),
-		XLookupKeysym(ev,2),
-		XLookupKeysym(ev,3)
-	);
 
 	switch (keysym) {
 	/* virtual keys-modifiers */
@@ -566,9 +547,12 @@ handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool relea
 	case XK_space:        keycode = kbSpace;      break;
 	default:              keycode = kbNoKey;
 	}
+
 	if (( keycode == kbTab || keycode == kbKPTab) && ( ev-> state & ShiftMask))
 		keycode = kbBackTab;
+
 	if ( keycode == kbNoKey) {
+		KeySym keysym2;
 		if ( keysym <= 0x0000007f && !isalpha(keysym & 0x000000ff))
 			keycode = keysym & 0x000000ff;
 		else if (
@@ -577,15 +561,48 @@ handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool relea
 			&& isalpha(keysym2 & 0x0000007f)
 		)
 			keycode = toupper(keysym2 & 0x0000007f) - '@';
-		else if ( str_len == 1)
-			keycode = (uint8_t)*str_buf;
+		else if ( character != 0)
+			keycode = character;
 		else if ( keysym < 0xFD00)
 			keycode = keysym & 0x000000ff;
-		else
-			return; /* don't generate an event */
 	}
+
 	if (( keycode & kbCodeCharMask) == kbCodeCharMask)
 		keycode |= (keycode >> 8) & 0xFF;
+
+	return keycode;
+}
+
+static void
+handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool release)
+{
+	/* if e-> cmd is unset on exit, the event will not be passed to the system-independent part */
+	char str_buf[ 256];
+	KeySym keysym;
+	U32 keycode;
+	int str_len;
+
+	if (
+		!release &&
+		guts.use_xim &&
+		P_APPLICATION-> wantUnicodeInput &&
+		(ev->state & (ShiftMask|ControlMask|Mod1Mask)) == 0
+	) {
+		if ( prima_xim_handle_key_press(self, ev, e, sym))
+			return;
+	}
+
+	str_len = XLookupString( ev, str_buf, 256, &keysym, NULL);
+	*sym = keysym;
+	Edebug( "event: keysym: %08lx/%08lx 0: %08lx, 1: %08lx, 2: %08lx, 3: %08lx\n", keysym,
+		KeySymToUcs4( keysym),
+		XLookupKeysym(ev,0),
+		XLookupKeysym(ev,1),
+		XLookupKeysym(ev,2),
+		XLookupKeysym(ev,3)
+	);
+	keycode = prima_keysym_to_keycode( keysym, ev, ( str_len == 1 ) ? str_buf[0] : 0 );
+
 	e-> cmd = release ? cmKeyUp : cmKeyDown;
 	e-> key. key = keycode & kbCodeMask;
 	if ( !e-> key. key) e-> key. key = kbNoKey;
@@ -603,6 +620,10 @@ handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool relea
 	} else {
 		e-> key. code = keycode & kbCharMask;
 	}
+
+	/* do not generate event */
+	if ( !e->key.code && keycode == kbNoKey )
+		return;
 
 	/* unicode hex treatment */
 	switch(e->key.key) {

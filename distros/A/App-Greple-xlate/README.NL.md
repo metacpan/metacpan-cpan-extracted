@@ -63,7 +63,7 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
 
     Geef de doeltaal op. U kunt de beschikbare talen krijgen met het commando `deepl languages` wanneer u de engine **DeepL** gebruikt.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Specificeer het uitvoerformaat voor originele en vertaalde tekst.
 
@@ -116,14 +116,14 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
 
 De module **xlate** kan de tekst van de vertaling voor elk bestand in de cache opslaan en lezen vóór de uitvoering om de overhead van het vragen aan de server te elimineren. Met de standaard cache strategie `auto`, onderhoudt het alleen cache gegevens wanneer het cache bestand bestaat voor het doelbestand.
 
-- --refresh
+- --cache-clear
 
-    De optie <-verversen> kan worden gebruikt om cachebeheer te starten of om alle bestaande cache-gegevens te verversen. Eenmaal uitgevoerd met deze optie, wordt een nieuw cache-bestand aangemaakt als er geen bestaat en daarna automatisch onderhouden.
+    De optie **--cache-clear** kan worden gebruikt om het beheer van de cache te starten of om alle bestaande cache-gegevens te vernieuwen. Eenmaal uitgevoerd met deze optie, wordt een nieuw cachebestand aangemaakt als er geen bestaat en daarna automatisch onderhouden.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Onderhoudt het cache bestand als het bestaat.
+        Onderhoud het cachebestand als het bestaat.
 
     - `create`
 
@@ -133,9 +133,9 @@ De module **xlate** kan de tekst van de vertaling voor elk bestand in de cache o
 
         Cache-bestand toch behouden voor zover het doelbestand een normaal bestand is.
 
-    - `refresh`
+    - `clear`
 
-        Cache onderhouden maar bestaande niet lezen.
+        Wis eerst de cachegegevens.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ De module **xlate** kan de tekst van de vertaling voor elk bestand in de cache o
 
     - `accumulate`
 
-        Standaard gedrag, ongebruikte gegevens worden verwijderd uit cache bestand. Als u ze niet wilt verwijderen en in het bestand wilt houden, gebruik dan `accumuleren`.
+        Standaard worden ongebruikte gegevens uit het cachebestand verwijderd. Als u ze niet wilt verwijderen en in het bestand wilt houden, gebruik dan `accumuleren`.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ De module **xlate** kan de tekst van de vertaling voor elk bestand in de cache o
 
     Stel uw authenticatiesleutel in voor DeepL service.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

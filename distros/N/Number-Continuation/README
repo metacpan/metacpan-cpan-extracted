@@ -36,18 +36,18 @@ DESCRIPTION
     Continuation ranges may be negative.
 
     It takes optionally a hash reference as last argument containing the
-    parameters `delimiter', `range' and `separator'. `delimiter' may contain
+    parameters "delimiter", "range" and "separator". "delimiter" may contain
     two characters, where first one is prepended to the beginning of a
-    continuation and the second one appended to the end; `range' may consist
+    continuation and the second one appended to the end; "range" may consist
     of one or two characters which are being inserted between the beginning
-    and end of a continuation; `separator' may be set to a single character
+    and end of a continuation; "separator" may be set to a single character
     which ends a continuation.
 
-    `delimiter', `range' and `separator' aren't mandatory parameters. If
+    "delimiter", "range" and "separator" aren't mandatory parameters. If
     options aren't defined, a reasonable default will be assumed.
 
 EXPORT
-    `continuation()' is exportable.
+    "continuation()" is exportable.
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>
@@ -56,5 +56,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

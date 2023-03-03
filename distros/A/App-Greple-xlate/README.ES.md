@@ -63,7 +63,7 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
 
     Especifique el idioma de destino. Puede obtener los idiomas disponibles mediante el comando `deepl languages` si utiliza el motor **DeepL**.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Especifique el formato de salida del texto original y traducido.
 
@@ -116,9 +116,9 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
 
 El módulo **xlate** puede almacenar en caché el texto traducido de cada fichero y leerlo antes de la ejecución para eliminar la sobrecarga de preguntar al servidor. Con la estrategia de caché por defecto `auto`, mantiene los datos de caché sólo cuando el archivo de caché existe para el archivo de destino.
 
-- --refresh
+- --cache-clear
 
-    La opción <--refresh> puede utilizarse para iniciar la gestión de la caché o para refrescar todos los datos de caché existentes. Una vez ejecutada esta opción, se creará un nuevo archivo de caché si no existe y se mantendrá automáticamente después.
+    La opción **--cache-clear** puede utilizarse para iniciar la gestión de la caché o para refrescar todos los datos de caché existentes. Una vez ejecutada esta opción, se creará un nuevo archivo de caché si no existe y se mantendrá automáticamente después.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -133,9 +133,9 @@ El módulo **xlate** puede almacenar en caché el texto traducido de cada ficher
 
         Mantener caché de todos modos hasta que el destino sea un archivo normal.
 
-    - `refresh`
+    - `clear`
 
-        Mantener la caché pero no leer la existente.
+        Borrar primero los datos de la caché.
 
     - `never`, `no`, `0`
 
@@ -151,7 +151,15 @@ El módulo **xlate** puede almacenar en caché el texto traducido de cada ficher
 
     Establezca su clave de autenticación para el servicio DeepL.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

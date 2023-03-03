@@ -10,9 +10,8 @@ use File::ShareDir 'dist_file';
 use File::Spec::Functions qw(rel2abs catfile);
 use Cwd qw(getcwd);
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
-
 our @EXPORT_OK = (
     qw(dumper log_filter get_icon_path)
 );

@@ -121,19 +121,19 @@ sub search {
 
     my $text;
     if ($text = $data->{data}) {
-      $text = ref($text) eq 'Regexp' ? $text : qr/^$text$/;
+      $text = ref($text) eq 'Regexp' ? $text : qr/^@{[quotemeta($text)]}$/;
       $found->{data} = 1 if "@{$item->{data}}" =~ $text;
     }
 
     my $index;
     if ($index = $data->{index}) {
-      $index = ref($index) eq 'Regexp' ? $index : qr/^$index$/;
+      $index = ref($index) eq 'Regexp' ? $index : qr/^@{[quotemeta($index)]}$/;
       $found->{index} = 1 if $item->{index} =~ $index;
     }
 
     my $list;
     if ($list = $data->{list}) {
-      $list = (ref($list) eq 'Regexp' ? $list : qr/^$list$/);
+      $list = (ref($list) eq 'Regexp' ? $list : qr/^@{[quotemeta($list)]}$/);
       $found->{list} = 1 if defined $item->{list} && $item->{list} =~ $list;
     }
     else {
@@ -143,7 +143,7 @@ sub search {
 
     my $name;
     if ($name = $data->{name}) {
-      $name = ref($name) eq 'Regexp' ? $name : qr/^$name$/;
+      $name = ref($name) eq 'Regexp' ? $name : qr/^@{[quotemeta($name)]}$/;
       $found->{name} = 1 if $item->{name} =~ $name;
     }
 
@@ -622,5 +622,20 @@ I<Since C<0.01>>
   # bless({ etag  => '@@ end', from  => 'data', stag  => '@@ ', ... }, "Venus::Data")
 
 =back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

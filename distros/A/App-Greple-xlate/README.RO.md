@@ -63,7 +63,7 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
 
     Specificați limba țintă. Puteți obține limbile disponibile prin comanda `deepl languages` atunci când se utilizează motorul **DeepL**.
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     Specificați formatul de ieșire pentru textul original și cel tradus.
 
@@ -116,14 +116,14 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
 
 Modulul **xlate** poate stoca în memoria cache textul traducerii pentru fiecare fișier și îl poate citi înainte de execuție, pentru a elimina costurile suplimentare de solicitare a serverului. Cu strategia implicită de cache `auto`, acesta păstrează datele din cache numai atunci când fișierul cache există pentru fișierul țintă.
 
-- --refresh
+- --cache-clear
 
-    Opțiunea <--refresh> poate fi utilizată pentru a iniția gestionarea cache-ului sau pentru a reîmprospăta toate datele existente în cache. Odată executat cu această opțiune, se va crea un nou fișier cache dacă nu există unul și apoi va fi menținut automat după aceea.
+    Opțiunea **--cache-clear** poate fi utilizată pentru a iniția gestionarea memoriei cache sau pentru a reîmprospăta toate datele existente în memoria cache. Odată executat cu această opțiune, un nou fișier cache va fi creat dacă nu există unul și apoi va fi menținut automat.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Menține fișierul cache dacă există.
+        Menține fișierul cache dacă acesta există.
 
     - `create`
 
@@ -133,9 +133,9 @@ Modulul **xlate** poate stoca în memoria cache textul traducerii pentru fiecare
 
         Menține oricum memoria cache în măsura în care fișierul țintă este un fișier normal.
 
-    - `refresh`
+    - `clear`
 
-        Menține memoria cache, dar nu o citește pe cea existentă.
+        Ștergeți mai întâi datele din memoria cache.
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ Modulul **xlate** poate stoca în memoria cache textul traducerii pentru fiecare
 
     - `accumulate`
 
-        Prin comportament implicit, datele neutilizate sunt eliminate din fișierul cache. Dacă nu doriți să le eliminați și să le păstrați în fișier, utilizați `acumulez`.
+        Prin comportament implicit, datele neutilizate sunt eliminate din fișierul cache. Dacă nu doriți să le eliminați și să le păstrați în fișier, utilizați `acumulare`.
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ Modulul **xlate** poate stoca în memoria cache textul traducerii pentru fiecare
 
     Setați cheia de autentificare pentru serviciul DeepL.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

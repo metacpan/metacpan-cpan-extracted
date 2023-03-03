@@ -20,6 +20,7 @@ WriteMakefile
                    'MooseX::Traits' => 0,
                    'Template' => 0,
                    'Test::More' => 0,
+                   'Test::Warnings' => 0,
                    'Try::Tiny' => 0,
                    'URI::Fetch' => 0,
                    'XML::Feed' => '0.22',

@@ -1,12 +1,12 @@
 package App::digitdemog ; 
-our $VERSION = '0.062' ; 
-our $DATE = '2021-07-03T22:09+09:00' ; 
+our $VERSION = '0.071' ; 
+our $DATE = '2023-03-02T23:55+09:00' ; 
 
 =encoding utf8
 
 =head1 NAME
 
-App::digitdemog
+App::digitdemog -- 各行の文字列について、左からの桁ごとにどんな文字が現れたかをクロス表で表示。
 
 =head1 SYNOPSIS
 
@@ -16,8 +16,9 @@ This module provides a Unix-like command `digitdemog'.
 
 想定している使い方 (digitdemog) : 
 
-  1. 何桁目にどんな文字が現れたのかを解読する
-  2. -L2 により、各行の桁数ごとに、どんな値が現れたか、例を取り出す。(-L4も可能。)
+  - 何桁目にどんな文字が現れたのかを解読する
+  - 最も長いもしくは短い行の例を知る。
+  - L2 か -L4 のオプションで、行の文字列長ごとの例を知る。
  
 =head1 SEE ALSO
 

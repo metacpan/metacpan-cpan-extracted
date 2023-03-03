@@ -12,15 +12,16 @@ Math::Formula - expressions on steroids
 
   my $context = Math::Formula::Context->new(name => 'example');
   $context->add( { size => '42k', header => '324', total => 'size + header' });
-  my $total   = $context->value(total);
+  my $total   = $context->value('total');
 
   my $formula = Math::Formula->new(size => \&own_sub, %options);
 
 =head1 DESCRIPTION
 
-B<WARNING:> This is not a programming language: it lacks control structures
-like loops and blocks.  This can be used to get (very) flexible configuration
-files for your program.
+B<WARNING:> This is not a programming language: it lacks control
+structures, like loops and blocks.  This module can be used
+to get (very) flexible configuration (files) for your program.
+See L<Math::Formula::Context|Math::Formula::Context> and L<Math::Formula::Config|Math::Formula::Config>.
 
 B<What makes Math::Formula special?> Zillions of expression evaluators
 have been written in the past.  The application where this module was
@@ -28,44 +29,46 @@ written for has special needs which were not served by them.
 This expression evaluator can do things which are usually hidden behind
 library calls.
 
-For instance, where are many types which you can use in your configuration
+For instance, there are many types which can used in your configuration
 lines to calculate directly (examples far down on this page)
 
   true and false               # real booleans
   "abc"  'abc'                 # the usual strings, WARNING: read below
   7  89k  5Mibi                # integers with multiplier support
-  =~ "c$"                      # regular expressions
+  =~ "c$"                      # regular expression matching
   like "*c"                    # pattern matching
   2023-02-18T01:28:12+0300     # date-times
-  2023-02-18                   # dates
+  2023-02-18+0100              # dates
   01:18:12                     # times
   P2Y3DT2H                     # duration
   name                         # outcome of other expressions
-  #unit.owner                  # fragments (context, namespaces)
-  file.size                    # attributes
+  #unit.owner                  # fragments (nested context, namespaces)
+  "abc".length                 # attributes
   (1 + 2) * 3                  # parenthesis
 
-In your code, all these above are place between quotes.  This makes it
-inconvenient to use strings.  When you use a L<Math::Formula::Context|Math::Formula::Context>,
-you can select your own solution via L<Math::Formula::Context::new(lead_expressions)|Math::Formula::Context/"Constructors">.
-With plain formulas, there are only two options:
+WARNING: in your code, all these above are place between quotes.
+This makes it inconvenient to use strings, which are also between
+quotes.  So: strings should stand-out from expressions.  By default, use this:
 
   "\"string\""   '"string"'   "'$string'"   # $string with escaped quotes!
-  \"string"       \'string'   \$string      # use a SCALAR reference
+  \"string"       \'string'   \$string      # or, use a SCALAR reference
 
-With this, your expressions can look like this:
+When you use a L<Math::Formula::Context|Math::Formula::Context> (preferred), you can select your
+own solution via L<Math::Formula::Context::new(lead_expressions)|Math::Formula::Context/"Constructors">.
 
-  my_age   = (#system.now.date - 1966-05-04).years
-  is_adult = my_age >= 18
+Your expressions can look like this:
 
-Expressions can refer to values computed by other expressions.  The results are
-cached within the context.  Also, external objects can maintain libraries of
-formulas or produce compatible data.
+  my_age   => '(#system.now.date - 1966-05-04).years',
+  is_adult => 'my_age >= 18',
 
-B<Why do I need it?> My application has many kinds of configurable
-rules, often with dates and durations in it, to arrange processing.
-Instead of fixed, processed values in my configuration, each line can
-now be a smart expression.  Declarative programming.
+Expressions can refer to values computed by other expressions.  Also,
+external objects can maintain libraries of formulas or produce compatible
+data.
+
+B<Why do I need it?> <i>My</i> application has many kinds of configurable
+rules.  Those rules often use times and durations in it, to organize
+processing activities.  Each line in my configuration can now be a
+smart expression.  Declarative programming.
 
 =head2 Plans
 
@@ -85,32 +88,25 @@ now be a smart expression.  Declarative programming.
 
 =item Math::Formula-E<gt>B<new>($name, $expression, %options)
 
- -Option    --Default
-  expression  <required>
-  name        <required>
-  returns     undef
+The expression needs a $name.  Expressions can refer to each other via this name.
 
-=over 2
-
-=item expression => $expression
-
-The expression is usually a (utf8) string, which will get parsed and
+The $expression is usually a (utf8) string, which will get parsed and
 evaluated on demand.  The $expresion may also be a prepared node (any
-<Math::Formula::Type> object.
+<Math::Formula::Type> object).
 
 As special hook, you may also provide a CODE as $expression.  This will
 be called as
 
-  $expression->($context, $this_formula, %options_to_evaluate);
+  $expression->($context, $this_formula, %options);
 
 Optimally, the expression returns any L<Math::Formula::Type|Math::Formula::Type> object.  Otherwise,
-autodetection kicks in.  More details below in L<Math::Formula::Context/"CODE as expression">.
+auto-detection of the computed rsult kicks in.  The %options are passed to
+L<evaluate()|Math::Formula/"Running">  More details below in L<Math::Formula::Context/"CODE as expression">.
 
-=item name => $name
+ -Option --Default
+  returns  undef
 
-The expression need a name, to be able to produce desent error messages.
-But also to be able to cache the results in the "Context".  Expressions
-can refer to each other via this name.
+=over 2
 
 =item returns => $type
 
@@ -128,7 +124,8 @@ make mistakes.
 
 =item $obj-E<gt>B<expression>()
 
-Returns the expression string, which was used at creation.
+Returns the expression, which was given at creation. Hence, it can be a string
+to be evaluated, a type-object, or a CODE reference.
 
 =item $obj-E<gt>B<name>()
 
@@ -141,7 +138,8 @@ Set when the expression promisses to produce a certain type.
 =item $obj-E<gt>B<tree>($expression)
 
 Returns the Abstract Syntax Tree of the $expression. Some of the types
-are only determined at the first run, for optimal laziness.
+are only determined at the first run, for optimal laziness.  Used for
+debugging purposes only.
 
 =back
 
@@ -194,7 +192,7 @@ Let's start with a large group of related formulas, and the types they produce:
   birthday: 1966-04-05      # DATE
   os_lib: #system           # external OBJECT
   now: os_lib.now           # DATETIME 'now' is an attribute of system
-  today: now.date           # DATE 'date' is an attribute of DATETIME
+  today: now.date           # DATE 'today' is an attribute of DATETIME
   alive: today - birthday   # DURATION
   age: alive.years          # INTEGER 'years' is an attr of DURATION
 
@@ -223,8 +221,9 @@ prefixes are weird cases: see L<Math::Formula::Context|Math::Formula::Context>.
 Operators work on explicit data types.
 Of course, you can use parenthesis for grouping.
 
-The B<infix> operators have the following priorities: (from low to higher,
-each like with equivalent priority)
+B<Prefix> operators always have the highest priority, and work right
+to left (RTL) The B<infix> and B<ternary> operators have the following
+priorities: (from low to higher, each like with equivalent priority)
 
   LTR       ?:                             # if ? then : else
   LTR       or   xor  //
@@ -262,8 +261,8 @@ but at least a better attempt to order utf8 correctly.
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.13,
-built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.14,
+built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

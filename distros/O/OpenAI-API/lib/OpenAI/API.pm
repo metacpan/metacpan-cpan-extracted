@@ -8,12 +8,13 @@ use Carp qw/croak/;
 use JSON::MaybeXS;
 use LWP::UserAgent;
 
+use OpenAI::API::Request::Chat;
 use OpenAI::API::Request::Completion;
 use OpenAI::API::Request::Edit;
 use OpenAI::API::Request::Embedding;
 use OpenAI::API::Request::Moderation;
 
-our $VERSION = 0.14;
+our $VERSION = 0.17;
 
 sub new {
     my ( $class, %params ) = @_;
@@ -24,6 +25,12 @@ sub new {
 
     croak 'Missing OPENAI_API_KEY' if !defined $self->{api_key};
     return bless $self, $class;
+}
+
+sub chat {
+    my ( $self, %params ) = @_;
+    my $request = OpenAI::API::Request::Chat->new( \%params );
+    return $self->_post( 'chat/completions', { %{$request} } );
 }
 
 sub completions {
@@ -79,13 +86,18 @@ __END__
 
 =head1 NAME
 
-OpenAI::API - access GPT models via OpenAI API
+OpenAI::API - Perl interface to OpenAI API
 
 =head1 SYNOPSIS
 
     use OpenAI::API;
 
     my $openai = OpenAI::API->new(); # uses OPENAI_API_KEY environment variable
+
+    my $chat = $openai->chat(
+        model       => 'gpt-3.5-turbo',
+        messages    => [ { "role" => "user", "content" => "Hello!" }, ],
+    );
 
     my $completions = $openai->completions(
         model  => 'text-davinci-003',
@@ -135,146 +147,87 @@ The endpoint URL for the OpenAI API. Default: 'https://api.openai.com/v1/'.
 
 =back
 
-=head2 completions()
+=head2 chat()
 
-Given a prompt, the model will return one or more predicted completions.
+Given a chat conversation, the model will return a chat completion response.
+
+Mandatory parameters:
 
 =over 4
 
 =item * model
 
-ID of the model to use.
-
-See L<Models overview|https://platform.openai.com/docs/models/overview>
-for a reference of them.
-
-=item * prompt
-
-The prompt for the text generation.
-
-=item * suffix [optional]
-
-The suffix that comes after a completion of inserted text.
-
-=item * max_tokens [optional]
-
-The maximum number of tokens to generate.
-
-Most models have a context length of 2048 tokens (except for the newest
-models, which support 4096.
-
-=item * temperature [optional]
-
-What sampling temperature to use, between 0 and 2. Higher values like
-0.8 will make the output more random, while lower values like 0.2 will
-make it more focused and deterministic.
-
-=item * top_p [optional]
-
-An alternative to sampling with temperature, called nucleus sampling.
-
-We generally recommend altering this or C<temperature> but not both.
-
-=item * n [optional]
-
-How many completions to generate for each prompt.
-
-Use carefully and ensure that you have reasonable settings for
-C<max_tokens> and C<stop>.
-
-=item * stop [optional]
-
-Up to 4 sequences where the API will stop generating further tokens. The
-returned text will not contain the stop sequence.
-
-=item * frequency_penalty [optional]
-
-Number between -2.0 and 2.0. Positive values penalize new tokens based
-on their existing frequency in the text so far.
-
-=item * presence_penalty [optional]
-
-Number between -2.0 and 2.0. Positive values penalize new tokens based
-on whether they appear in the text so far.
-
-=item * best_of [optional]
-
-Generates best_of completions server-side and returns the "best" (the
-one with the highest log probability per token).
-
-Use carefully and ensure that you have reasonable settings for
-C<max_tokens> and C<stop>.
+=item * messages
 
 =back
 
-Documentation: L<Completions|https://platform.openai.com/docs/api-reference/completions>
+More info: L<OpenAI::API::Request::Chat>
+
+=head2 completions()
+
+Given a prompt, the model will return one or more predicted completions.
+
+Mandatory parameters:
+
+=over 4
+
+=item * model
+
+=item * prompt
+
+=back
+
+More info: L<OpenAI::API::Request::Completion>
 
 =head2 edits()
 
 Creates a new edit for the provided input, instruction, and parameters.
 
+Mandatory parameters:
+
 =over 4
 
 =item * model
 
-ID of the model to use. You can use the text-davinci-edit-001 or
-code-davinci-edit-001 model with this endpoint.
-
-=item * input [optional]
-
-The input text to use as a starting point for the edit.
-
 =item * instruction
 
-The instruction that tells the model how to edit the prompt.
-
-=item * n [optional]
-
-How many edits to generate for the input and instruction.
-
-=item * temperature [optional]
-
-What sampling temperature to use, between 0 and 2.
-
-=item * top_p [optional]
-
-An alternative to sampling with temperature.
+=item * input [optional, but often required]
 
 =back
 
-Documentation: L<Edits|https://platform.openai.com/docs/api-reference/edits>
+More info: L<OpenAI::API::Request::Edit>
 
 =head2 embeddings()
 
 Get a vector representation of a given input that can be easily consumed
 by machine learning models and algorithms.
 
+Mandatory parameters:
+
 =over 4
 
 =item * model
 
 =item * input
 
-=item * user [optional]
-
 =back
 
-Documentation: L<Embeddings|https://platform.openai.com/docs/api-reference/embeddings>
+More info: L<OpenAI::API::Request::Embedding>
 
 =head2 moderations()
 
 Given a input text, outputs if the model classifies it as violating
 OpenAI's content policy.
 
+Mandatory parameters:
+
 =over 4
 
 =item * input
 
-=item * model [optional]
-
 =back
 
-Documentation: L<Moderations|https://platform.openai.com/docs/api-reference/moderations>
+More info: L<OpenAI::API::Request::Moderation>
 
 =head1 SEE ALSO
 

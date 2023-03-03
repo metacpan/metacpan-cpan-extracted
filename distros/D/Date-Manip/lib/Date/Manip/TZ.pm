@@ -1,5 +1,5 @@
 package Date::Manip::TZ;
-# Copyright (c) 2008-2022 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2023 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -26,7 +26,7 @@ use Data::Dumper;
 use Carp;
 
 our $VERSION;
-$VERSION='6.90';
+$VERSION='6.91';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.
@@ -762,7 +762,8 @@ sub _zoneinfo_file_name_to_zone {
    my($file,$zoneinfo) = @_;
    require File::Spec;
    my $zone = File::Spec->abs2rel($file,$zoneinfo);
-   return $zone  if (exists $Date::Manip::Zones::ZoneNames{lc($zone)});
+   return $zone  if (exists $Date::Manip::Zones::ZoneNames{lc($zone)} ||
+                     exists $Date::Manip::Zones::Alias{lc($zone)});
    return;
 }
 

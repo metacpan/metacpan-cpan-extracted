@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.10.0';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.10.1';
 use strict;
 use warnings;
 use autodie;
@@ -278,7 +278,7 @@ HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 VERSION
 
-version 0.10.0
+version 0.10.1
 
 =head1 SYNOPSIS
 

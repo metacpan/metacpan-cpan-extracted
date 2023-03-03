@@ -59,7 +59,19 @@ DEPENDENCIES FOR DEVELOPERS
       PDL, PDL::Graphics::Prima, PDL::Graphics::Gnuplot,
       PDL::Graphics::Simple.
 
-      You may want to install Gnuplot from their website.
+      You will want to install Gnuplot 5.2.8 from their website. The
+      version that is 5.4 and above is not supported at the moment due to
+      issues with IPC.
+
+    Mac OSX
+
+      It is quite a lot of work to get this working on Mac OSX. We have
+      tested it on Monterey. You will need HomeBrew from <https://brew.sh>
+      setup and install the following packages: gnuplot, xorg-server,
+      cmake, openssl, perl, xinit, fribidi, pkg-config, xquartz,
+      dk/libthai/libthai, libheif, gtk+3.
+
+      It may or may not work here.
 
 COPYRIGHT
 

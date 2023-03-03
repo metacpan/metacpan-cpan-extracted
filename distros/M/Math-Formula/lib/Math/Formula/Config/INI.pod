@@ -11,10 +11,20 @@ Math::Formula::Config::INI - load/save formulas to file as INI
 
 =head1 SYNOPSIS
 
+  my $context = Math::Formula::Content->new(name => 'test');
+  my $config = Math::Formula::Config::INI->new(directory => $dir);
+
+  $config->save($context);
+  my $context = $config->load('test');
+
 =head1 DESCRIPTION
 
 Save and load a L<Math::Formula::Context|Math::Formula::Context> to INI files.  The INI file
 is not too complex.
+
+You need to have installed B<Config::INI>.  That module is not in the
+dependencies of this packages, because we do not want to add complications
+to the main code.
 
 Extends L<"DESCRIPTION" in Math::Formula::Config|Math::Formula::Config/"DESCRIPTION">.
  
@@ -75,7 +85,7 @@ Serialize the $context to INI files, as storage or to be editted by hand.
 This is a usefull method when default configuration templates need to be generated.
 
  -Option  --Default
-  filename  C<< $context->name .ini>
+  filename  $context->name .ini
 
 =over 2
 
@@ -113,8 +123,8 @@ B<. Example>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.13,
-built on February 27, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.14,
+built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

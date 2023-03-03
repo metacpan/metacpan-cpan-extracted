@@ -1,5 +1,7 @@
 Revision history for Test-NoTty
 
+0.02  2023-03-01 NWCLARK
+        - Tweak the code to work on v5.12.x back to v5.8.x
+
 0.01  2023-02-26 NWCLARK
         - First EXPERIMENTAL release escapes to an unsuspecting CPAN
-

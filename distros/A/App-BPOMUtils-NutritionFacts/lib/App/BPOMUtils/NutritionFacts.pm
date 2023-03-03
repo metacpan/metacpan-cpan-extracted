@@ -9,9 +9,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-29'; # DATE
+our $DATE = '2023-02-05'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_show_nutrition_facts
@@ -693,7 +693,7 @@ App::BPOMUtils::NutritionFacts - Utilities related to BPOM nutrition facts
 
 =head1 VERSION
 
-This document describes version 0.023 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-01-29.
+This document describes version 0.024 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-02-05.
 
 =head1 SYNOPSIS
 
@@ -929,7 +929,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils-Nutrit
 
 L<https://pom.go.id>
 
-L<App::BPOMUtils>
+Other C<App::BPOMUtils::*> distributions.
 
 =head1 AUTHOR
 

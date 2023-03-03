@@ -134,6 +134,7 @@ brandnewtube.com and ugetube.com videos (L<StreamFinder::BrandNewTube>),
 brighteon.com videos (L<StreamFinder::Brighteon>), 
 castbox.fm podcasts (L<StreamFinder::Castbox>), 
 podcasts.google.com podcasts (L<StreamFinder::Google>), 
+goodpods.com podcasts (L<StreamFinder::Goodpods>), 
 iheartradio.com radio stations and podcasts (L<StreamFinder::IHeartRadio>), 
 www.internetradio.com radio stations (L<StreamFinder::InternetRadio>), 
 onlineradiobox.com radio stations (L<StreamFinder::OnlineRadiobox>), 
@@ -320,25 +321,37 @@ Returns the station's title, (or long description, if "desc" specified).
 NOTE:  Some sights do not support a separate long description field, 
 so if none found, the standard title field will always be returned.
 
-=item $station->B<getIconURL>()
+=item $station->B<getIconURL>(['artist'])
 
 Returns the URL for the station's "cover art" icon image, if any.
 
-=item $station->B<getIconData>()
+Some video and podcast sites will also provide a separate artist/channel 
+icon.  If B<'artist'> is specified, this icon url is returned instead, 
+if any.
+
+=item $station->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.  
 This makes it easy to download the image to local storage for use by 
 your preferred media player.
 
-=item $station->B<getImageURL>()
+Some video and podcast sites will also provide a separate artist/channel 
+icon.  If B<'artist'> is specified, this icon's data is returned instead, 
+if any.
+
+=item $station->B<getImageURL>(['artist'])
 
 Returns the URL for the station's "cover art" banner image, if any.
 
 NOTE:  If no "banner image" (usually a larger image) is found, 
 the "icon image" URL will be returned.
 
-=item $station->B<getImageData>()
+Some video and podcast sites will also provide a separate artist/channel 
+image (usually larger).  If B<'artist'> is specified, this icon url is 
+returned instead, if any.
+
+=item $station->B<getImageData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual station's banner image 
@@ -348,11 +361,19 @@ local storage for use by your preferred media player.
 NOTE:  If no "banner image" (usually a larger image) is found, 
 the "icon image" data, if any, will be returned.
 
+Some video and podcast sites will also provide a separate artist/channel 
+image (usually larger).  If B<'artist'> is specified, this icon's data is 
+returned instead, if any.
+
 =item $station->B<getType>()
 
 Returns the station / podcast / video's type (I<submodule-name>).  
 (one of:  "Anystream", "Apple", "BitChute", "Blogger", "Youtube", etc. - 
 depending on the sight that matched the URL).
+
+Some video and podcast sites will also provide a separate artist/channel 
+image (usually larger).  If B<'artist'> is specified, this icon url is 
+returned instead, if any.
 
 =back
 
@@ -505,16 +526,16 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.04';
+our $VERSION = '2.10';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Google
-		IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict RadioNet Rcast Rumble
-		SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube));
+my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Goodpods 
+		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict RadioNet 
+		Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube));
 
 my %useit;
 
@@ -608,6 +629,9 @@ sub new
 	} elsif ($url =~ m#\bsoundcloud\.# && $useit{'SoundCloud'}) {
 		eval { require 'StreamFinder/SoundCloud.pm'; $haveit = 1; };
 		return new StreamFinder::SoundCloud($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bgoodpods\.# && $useit{'Goodpods'}) {
+		eval { require 'StreamFinder/Goodpods.pm'; $haveit = 1; };
+		return new StreamFinder::Goodpods($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\brcast\.# && $useit{'Rcast'}) {
 		eval { require 'StreamFinder/Rcast.pm'; $haveit = 1; };
 		return new StreamFinder::Rcast($url, @args)  if ($haveit);

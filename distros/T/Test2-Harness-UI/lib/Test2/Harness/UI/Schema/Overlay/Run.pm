@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw/confess/;
 
-our $VERSION = '0.000133';
+our $VERSION = '0.000135';
 
 use Test2::Harness::UI::Util::DateTimeFormat qw/DTF/;
 
@@ -182,6 +182,32 @@ sub coverage_data {
     }
 
     return @out;
+}
+
+sub rerun_data {
+    my $self = shift;
+
+    my $files = $self->jobs->search(
+        {},
+        {join => 'test_file', order_by => 'test_file.filename'},
+    );
+
+    my $data = {};
+
+    while (my $file = $files->next) {
+        my $name = $file->file || next;
+
+        my $row = $data->{$name} //= {};
+
+        $row->{retry}++ if $file->job_try > 0;
+
+        if($file->ended) {
+            $row->{end}++;
+            $row->{$file->fail ? 'fail' : 'pass'}++;
+        }
+    }
+
+    return $data;
 }
 
 1;

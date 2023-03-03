@@ -1,5 +1,8 @@
 Revision history for Perl extension Chemistry::File::CML.
 
+0.14  Thu Mar 02 2023
+        - Implement writer.
+
 0.13  Fri Feb 10 2023
         - Mark atoms without coordinates with an attribute.
 

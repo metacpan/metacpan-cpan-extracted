@@ -1,6 +1,6 @@
 package App::KamstrupKemSplit;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Helper functions for the Kamstrup KEM file splitter application
 
 use Modern::Perl;
@@ -105,8 +105,10 @@ sub split_order {
 	
 	my $response;
 	foreach my $meter ( @{ $meters->{'Meter'} } ) {
-		if ( $meter->{'MeterNo'} >= $nr_min && $meter->{'MeterNo'} <= $nr_max )
-		{
+		# If we want to dump all devices, $nr_max will be -1, so if this is not the case do the check and otherwise just dump all
+		if ($nr_max == -1) {
+			$response->{$meter} = $meter;
+		} elsif ( $meter->{'MeterNo'} >= $nr_min && $meter->{'MeterNo'} <= $nr_max ) {
 			$response->{$meter} = $meter;
 		}
 	}

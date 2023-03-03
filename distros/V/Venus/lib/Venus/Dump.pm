@@ -74,7 +74,11 @@ sub build_self {
 
   $self->decoder(sub {
     my ($text) = @_;
-    eval $text;
+    require Symbol;
+    my $name = join '::', __PACKAGE__, join '_', 'Eval', rand =~ s/\D//gr;
+    my $data = eval "package $name; no warnings; return $text";
+    Symbol::delete_package($name);
+    return $data;
   });
 
   return $self;
@@ -292,5 +296,20 @@ I<Since C<0.01>>
   # '{name => ["Ready","Robot"], stable => !!1, version => "0.12"}'
 
 =back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

@@ -1,9 +1,10 @@
 ---
-abstract: 'access GPT models via OpenAI API'
+abstract: 'Perl interface to OpenAI API'
 author:
   - 'Nelson Ferraz <nferraz@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::RequiresInternet: '0'
@@ -29,5 +30,8 @@ requires:
   namespace::clean: '0.27'
   perl: '5.010'
   strictures: '2.000006'
-version: 0.14
+resources:
+  bugtracker: https://github.com/nferraz/perl-openai-api/issues
+  repository: https://github.com/nferraz/perl-openai-api.git
+version: 0.17
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

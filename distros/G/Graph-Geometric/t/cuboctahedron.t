@@ -7,6 +7,7 @@ use Graph::Geometric;
 use Test::More;
 
 my @cases = ( rectified tetragonal prism,
+              rectified square prism,
               rectified octahedron );
 
 plan tests => 3 * scalar @cases;

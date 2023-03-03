@@ -63,7 +63,7 @@ App::Greple::xlate - greple的翻译支持模块
 
     指定目标语言。当使用**DeepL**引擎时，你可以通过`deepl languages`命令获得可用语言。
 
-- **--xlate-format**=_format_ (Default: conflict)
+- **--xlate-format**=_format_ (Default: `conflict`)
 
     指定原始和翻译文本的输出格式。
 
@@ -116,14 +116,14 @@ App::Greple::xlate - greple的翻译支持模块
 
 **xlate**模块可以存储每个文件的翻译缓存文本，并在执行前读取它，以消除向服务器请求的开销。在默认的缓存策略`auto`下，它只在目标文件的缓存文件存在时才维护缓存数据。
 
-- --refresh
+- --cache-clear
 
-    <--刷新>选项可用于启动缓存管理或刷新所有现有缓存数据。一旦用这个选项执行，如果不存在一个新的缓存文件，就会创建一个新的缓存文件，之后自动维护。
+    **--cache-clear**选项可以用来启动缓冲区管理或刷新所有现有的缓冲区数据。一旦用这个选项执行，如果不存在一个新的缓存文件，就会创建一个新的缓存文件，然后自动维护。
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        如果缓存文件存在，则维护缓存文件。
+        如果缓存文件存在，则维护该文件。
 
     - `create`
 
@@ -133,9 +133,9 @@ App::Greple::xlate - greple的翻译支持模块
 
         只要目标文件是正常文件，就维持缓存。
 
-    - `refresh`
+    - `clear`
 
-        维护缓存但不读取现有的缓存。
+        先清除缓存数据。
 
     - `never`, `no`, `0`
 
@@ -143,7 +143,7 @@ App::Greple::xlate - greple的翻译支持模块
 
     - `accumulate`
 
-        默认情况下，未使用的数据会从缓存文件中删除。如果你不想删除它们并保留在文件中，使用`accumulate`。
+        根据默认行为，未使用的数据会从缓存文件中删除。如果你不想删除它们并保留在文件中，使用`accumulate`。
 
 # ENVIRONMENT
 
@@ -151,7 +151,15 @@ App::Greple::xlate - greple的翻译支持模块
 
     为DeepL 服务设置你的认证密钥。
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
 # SEE ALSO
+
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

@@ -55,7 +55,7 @@
    "provides" : {
       "Perl::MinimumVersion::Fast" : {
          "file" : "lib/Perl/MinimumVersion/Fast.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/tokuhirom/Perl-MinimumVersion-Fast"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>",
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>",

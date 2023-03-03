@@ -19,7 +19,7 @@ name: App-BPOMUtils-Additives
 provides:
   App::BPOMUtils::Additives:
     file: lib/App/BPOMUtils/Additives.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Capture::Tiny: '0'
   Data::Sah::Compiler::perl::TH::str: '0.914'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Additives
   homepage: https://metacpan.org/release/App-BPOMUtils-Additives
   repository: git://github.com/perlancar/perl-App-BPOMUtils-Additives.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -1,0 +1,113 @@
+#!perl
+
+use strict;
+use warnings;
+use Log::ger;
+use Log::ger::Screen;
+
+#use File::Which;
+
+unless (@ARGV >= 1) {
+    die "Usage: rename-add-prefix-datestamp <FILE>...\n";
+}
+#die "rename-add-prefix-datestamp: Can't find perlmv in PATH\n" unless which("perlmv");
+
+my $prefix = shift @ARGV;
+system "perlmv", "add-prefix-datestamp", "-a", "avoid_duplicate_prefix=1", @ARGV;
+
+# ABSTRACT: Add datestamp prefix (YYYYMMDD-) to filenames
+# PODNAME: rename-add-prefix-datestamp
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rename-add-prefix-datestamp - Add datestamp prefix (YYYYMMDD-) to filenames
+
+=head1 VERSION
+
+This document describes version 0.007 of rename-add-prefix-datestamp (from Perl distribution App-FileRenameUtils), released on 2023-02-27.
+
+=head1 SYNOPSIS
+
+ % rename-add-prefix-datestamp [options] <file>...
+
+Given these files:
+
+ foo
+ bar.txt
+ new-baz.mp4
+
+this command:
+
+ % rename-add-prefix-datestamp *
+
+will rename them as follow (the datestamp will use the file's modification
+date):
+
+ foo -> 20230110-foo
+ bar.txt -> 20221223-bar.txt
+
+You can use L<perlmv>'s options, e.g. C<-d> (dry-run), etc.
+
+=head1 DESCRIPTION
+
+This is a shortcut for:
+
+ % perlmv add-prefix-datestamp -a avoid_duplicate_prefix=1 <file>...
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FileRenameUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FileRenameUtils>.
+
+=head1 SEE ALSO
+
+L<App::perlmv> and its L<App::perlmv::scriptlet::add_prefix_datestamp>
+scriptlet.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

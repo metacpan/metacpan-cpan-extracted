@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.994  2023-03-02
+       - various performance tweaks
+       - newest address-formatting
+
 1.993  2022-12-14
        - ability to set "only_address" as optional param to format_address
 

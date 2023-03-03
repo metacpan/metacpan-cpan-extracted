@@ -12,11 +12,14 @@ inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+README
 SIGNATURE
 t/data/ex1/Schema/Data/Foo.pm
 t/data/ex1/Schema/Data/Foo/0_1_0.pm
