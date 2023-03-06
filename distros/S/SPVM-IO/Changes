@@ -1,3 +1,20 @@
+0.18 2023-03-06
+  [Prerequirement Changes]
+    * SPVM 0.9695+ is needed.
+  [Changes]
+    * Removed the unused IO::Util class.
+  [Incompatible Changes]
+    * Removed IO::Handle::Interface.
+    * Removed IO::Socket::Interface.
+    * Removed the has_interfaces method in the IO::Handle.
+0.17 2023-03-06
+  [Changes]
+    * The definition of the init method in the IO::File is changed.
+      [Before]
+      protected method init : void ();
+      [After]
+      protected method init : void ($options = undef : object[]);
+      
 0.16 2023-02-14
   [Bug Fix]
     * Fixed the bug that the close method in the IO::File doesn't set the stream undef.

@@ -32,6 +32,8 @@ combinatorial
 compa
 compam
 compm
+compmrnd
+comprnd
 de
 euclid
 gene

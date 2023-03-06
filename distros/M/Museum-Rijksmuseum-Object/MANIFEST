@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+lib/Museum/Rijksmuseum/Object.pm
+lib/Museum/Rijksmuseum/Object/Harvester.pm
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

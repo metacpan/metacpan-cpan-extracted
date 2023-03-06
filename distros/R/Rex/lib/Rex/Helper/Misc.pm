@@ -4,11 +4,10 @@
 
 package Rex::Helper::Misc;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 sub get_random {
   my $count = shift;

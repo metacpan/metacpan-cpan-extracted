@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.37';
+our $VERSION = '3.38';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -79,6 +79,8 @@ our @BROWSER_TESTS = qw(
     edge           pubsub           adm
     brave          imagesearcherpro polaris
     edgelegacy     samsung
+    instagram
+    yandex_browser
 );
 
 our @IE_TESTS = qw(
@@ -204,6 +206,7 @@ our @ROBOT_TESTS = (
 our @MISC_TESTS = qw(
     dotnet      x11
     webview
+    meta_app
 );
 
 our @ALL_TESTS = (
@@ -366,6 +369,7 @@ my %BROWSER_NAMES = (
     iceweasel        => 'IceWeasel',
     ie               => 'MSIE',
     imagesearcherpro => 'ImageSearcherPro',
+    instagram        => 'Instagram',
     konqueror        => 'Konqueror',
     links            => 'Links',
     lotusnotes       => 'Lotus Notes',
@@ -389,6 +393,7 @@ my %BROWSER_NAMES = (
     staroffice       => 'StarOffice',
     ucbrowser        => 'UCBrowser',
     webtv            => 'WebTV',
+    yandex_browser   => 'Yandex Browser',
 );
 
 # Device names
@@ -715,6 +720,23 @@ sub _init_core {
         $browser_tests->{$1} = 1;
         $browser_tests->{firefox} = 1;
     }
+    elsif ( $self->{user_agent} =~ m{ \[ FB (?: AN | _IAB ) }x ) {
+        $browser_string = $self->_match(
+            [ 'Facebook', '[FB_IAB/FB4A', '[FBAN/FBIOS' ],
+            [ 'Facebook Lite', '[FBAN/EMA' ],
+            [
+                'Facebook Messenger', '[FB_IAB/Orca-Android',
+                '[FB_IAB/MESSENGER',  '[FBAN/MessengerForiOS'
+            ],
+            [
+                'Facebook Messenger Lite', '[FBAN/mLite',
+                '[FBAN/MessengerLiteForiOS'
+            ],
+        ) || 'Meta App';
+        $browser = lc $browser_string;
+        $browser =~ tr/ /_/;
+        $tests->{meta_app} = 1;
+    }
     elsif ( $ua =~ m{opera|opr\/} ) {
 
         # Browser is Opera
@@ -754,6 +776,10 @@ sub _init_core {
         #    $browser_string = 'Maxthon';
         #}
     }
+    elsif ( 0 < index $self->{user_agent}, ' Instagram ' ) {
+        $browser = 'instagram';
+        $browser_tests->{$browser} = 1;
+    }
     elsif ( index( $ua, 'brave' ) != -1 ) {
 
         # Has to go above Chrome, it includes 'like Chrome/'
@@ -779,6 +805,10 @@ sub _init_core {
         # Has to go above Safari, Mozilla and Chrome
 
         $browser = 'ucbrowser';
+        $browser_tests->{$browser} = 1;
+    }
+    elsif ( 0 < index $self->{user_agent}, ' YaBrowser/' ) {
+        $browser = 'yandex_browser';
         $browser_tests->{$browser} = 1;
     }
     elsif (index( $ua, 'chrome/' ) != -1
@@ -997,6 +1027,19 @@ sub _init_core {
         $tests->{webview} = 1;
     }
 
+}
+
+# match strings or regexps against user_agent
+# pass specs as list of [ 'thing to return', …tests… ]
+sub _match {
+    my ( $self, @specs ) = @_;
+    for my $spec (@specs) {
+        my ( $ret, @tests ) = @{$spec};
+        for my $m (@tests) {
+            return $ret if !ref $m && 0 < index $self->{user_agent}, $m;
+            return $ret if 'Regexp' eq ref $m && $self->{user_agent} =~ $m;
+        }
+    }
 }
 
 # Any of these fragments within a user-agent generally indicates it's
@@ -1884,6 +1927,31 @@ sub _init_version {
     elsif ( $browser_tests->{fxios} ) {
         ( $major, $minor ) = $ua =~ m{ \b fxios/ (\d+) [.] (\d+) }x;
     }
+    elsif ( $tests->{meta_app} ) {
+
+        # init. in order to avoid guessing downstream
+        ( $major, $minor, $beta ) = (q{}) x 3;
+
+        # get version only from FBAV/ part
+        if ( $ua =~ m{ \b fbav/ ([^;]*) }x ) {
+            ( $major, $minor, $beta ) = split /[.]/, $1, 3;
+            if ($beta) {
+
+                # "minor" forcibly gets a "." prepended at the end of _init_version
+                # while "beta" does not - yet it is documented to include the "."
+                $beta = q{.} . $beta;
+            }
+        }
+    }
+    elsif ( $browser_tests->{instagram} ) {
+        ( $major, $minor, $beta ) = (q{}) x 3;    # don't guess downstream
+        if ( $self->{user_agent} =~ m{ \b Instagram [ ]+ ([0-9.]+) [ ] }x ) {
+            ( $major, $minor, $beta ) = split /[.]/, $1, 3;
+            if ($beta) {
+                $beta = q{.} . $beta;
+            }
+        }
+    }
     elsif ( $browser_tests->{ie} ) {
 
         # MSIE
@@ -1969,6 +2037,15 @@ sub _init_version {
     {
         $major = $1;
         $minor = $2;
+    }
+    elsif ( $browser_tests->{yandex_browser} ) {
+        ( $major, $minor, $beta ) = (q{}) x 3;    # don't guess downstream
+        if ( $self->{user_agent} =~ m{ \b YaBrowser / ([0-9.]+) [ ] }x ) {
+            ( $major, $minor, $beta ) = split /[.]/, $1, 3;
+            if ($beta) {
+                $beta = q{.} . $beta;
+            }
+        }
     }
 
     # If we didn't match a browser-specific test, we look for
@@ -2857,6 +2934,18 @@ sub _language_country {
         return { language => $1, country => $2 };
     }
 
+    if (   $self->meta_app
+        && $self->{user_agent}
+        =~ m{ ;FBLC/ ([a-z]{2}) (?: [_-] ([A-Z]{2}) )? }x ) {
+        return { language => uc $1, $2 ? ( country => $2 ) : () };
+    }
+
+    if (   $self->instagram
+        && $self->{user_agent}
+        =~ m{ (?: [(] | ;[ ] ) ([a-z]{2}) [_-] ([A-Z]{2}) [;)] }x ) {
+        return { language => uc $1, $2 ? ( country => $2 ) : () };
+    }
+
     if ( $self->{user_agent} =~ m/\b([a-z]{2})-([A-Za-z]{2})\b/xms ) {
         return { language => uc $1, country => uc $2 };
     }
@@ -2986,7 +3075,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.37
+version 3.38
 
 =head1 SYNOPSIS
 

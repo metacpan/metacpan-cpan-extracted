@@ -7,7 +7,7 @@ use strict;
 
 package Math::Formula::Token;
 use vars '$VERSION';
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 
 #!!! The declarations of all other packages in this file are indented to avoid
@@ -56,8 +56,8 @@ use constant {
 # "accidentally" is the same value as the M<token()> method produces.
 sub operator() { $_[0][0] }
 
-sub _compute
-{	my ($self, $context, $expr) = @_;
+sub compute
+{	my ($self, $context) = @_;
 	panic +(ref $self) . ' does not compute';
 }
 
@@ -68,6 +68,7 @@ my %table;
 	my @order = (
 #		[ LTR,     ',' ],
  		[ LTR,     '?', ':' ],        # ternary ?:
+		[ NOCHAIN, '->' ],
 		[ LTR,     qw/or xor/, '//' ],
 		[ LTR,     'and' ],
 		[ NOCHAIN, qw/ <=> < <= == != >= > / ],
@@ -109,9 +110,9 @@ use base 'MF::OPERATOR';
 # method child(): Returns the AST where this operator works on.
 sub child() { $_[0][1] }
 
-sub _compute($$)
-{	my ($self, $context, $expr) = @_;
-    my $value = $self->child->_compute($context, $expr)
+sub compute($$)
+{	my ($self, $context) = @_;
+    my $value = $self->child->compute($context)
 		or return undef;
 
 	$value->prefix($self->operator, $context);
@@ -150,13 +151,13 @@ my %comparison = (
 
 sub _compare_ops { keys %comparison }
 
-sub _compute($$)
-{	my ($self, $context, $expr) = @_;
+sub compute($$)
+{	my ($self, $context) = @_;
 
-    my $left  = $self->left->_compute($context, $expr)
+    my $left  = $self->left->compute($context)
 		or return undef;
 
-	my $right = $self->right->_compute($context, $expr)
+	my $right = $self->right->compute($context)
 		or return undef;
 
 	# Comparison operators are all implemented via a space-ship, when available.
@@ -165,12 +166,12 @@ sub _compute($$)
 	my $op = $self->operator;
 	if(my $rewrite = $comparison{$op})
 	{	my ($spaceship, $compare) = @$rewrite;
-		if(my $result = $left->infix($spaceship, $right, $context, $expr))
+		if(my $result = $left->infix($spaceship, $right, $context))
 		{	return MF::BOOLEAN->new(undef, $compare->($result->value));
 		}
 	}
 
-	$left->infix($op, $right, $context, $expr);
+	$left->infix($op, $right, $context);
 }
 
 
@@ -188,13 +189,28 @@ sub condition() { $_[0][1] }
 sub then()      { $_[0][2] }
 sub else()      { $_[0][3] }
 
-sub _compute($$)
-{	my ($self, $context, $expr) = @_;
+sub compute($$)
+{	my ($self, $context) = @_;
 
-    my $cond  = $self->condition->_compute($context, $expr)
+    my $cond  = $self->condition->compute($context)
 		or return undef;
 
-	($cond->value ? $self->then : $self->else)->_compute($context, $expr)
+	($cond->value ? $self->then : $self->else)->compute($context)
+}
+
+#-------------------
+# When used, this returns a MF::STRING taken from the captures in the context.
+
+package
+	MF::CAPTURE;
+use base 'Math::Formula::Token';
+
+sub seqnr() { $_[0][0] }
+
+sub compute($$)
+{	my ($self, $context) = @_;
+	my $v = $context->capture($self->seqnr -1);
+	defined $v ? MF::STRING->new(undef, $v) : undef;
 }
 
 1;

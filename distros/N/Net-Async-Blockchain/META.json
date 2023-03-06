@@ -4,7 +4,7 @@
       "DERIV <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -107,43 +107,43 @@
    "provides" : {
       "Net::Async::Blockchain" : {
          "file" : "lib/Net/Async/Blockchain.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::BTC" : {
          "file" : "lib/Net/Async/Blockchain/BTC.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Client::RPC" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Client::RPC::BTC" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC/BTC.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Client::RPC::ETH" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC/ETH.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Client::RPC::Omni" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC/Omni.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Client::Websocket" : {
          "file" : "lib/Net/Async/Blockchain/Client/Websocket.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Client::ZMQ" : {
          "file" : "lib/Net/Async/Blockchain/Client/ZMQ.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::ETH" : {
          "file" : "lib/Net/Async/Blockchain/ETH.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Net::Async::Blockchain::Transaction" : {
          "file" : "lib/Net/Async/Blockchain/Transaction.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -158,12 +158,12 @@
          "web" : "https://github.com/binary-com/perl-Net-Async-Blockchain"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Reginaldo Costa <53163145+reginaldo-binary@users.noreply.github.com>",
-      "chylli-binary <chylli@binary.com>",
       "Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>",
+      "Arshad <arshad@binary.com>",
       "Tanya Sahni <54654631+binary-tanya@users.noreply.github.com>",
       "Reginaldo Costa <regcostajr@gmail.com>",
       "Zak B. Elep <zakame@zakame.net>",
@@ -173,7 +173,7 @@
       "Tom Molesworth <tom@binary.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

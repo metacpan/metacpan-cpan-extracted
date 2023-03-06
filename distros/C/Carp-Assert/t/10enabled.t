@@ -3,7 +3,7 @@
 # Test with assert on.
 
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 7;
 
 # Make sure we're shielded against the user possibly having
 # NDEBUG or PERL_NDEBUG set.  Localize the changes because changes
@@ -14,11 +14,6 @@ BEGIN {
     require Carp::Assert;
     Carp::Assert->import;
 }
-
-# shouldn't makes its decision at run-time
-local %ENV = %ENV;
-delete @ENV{qw(PERL_NDEBUG NDEBUG)};
-
 
 eval { assert(1==0) if DEBUG; };
 like $@, '/^Assertion failed/i';
@@ -45,8 +40,4 @@ is $@, '';
 
 
 eval { shouldnt('up', 'up') };
-like $@, '/^Assertion \(.*\) failed/i';
-
-
-eval { shouldn't('up', 'up') };
 like $@, '/^Assertion \(.*\) failed/i';

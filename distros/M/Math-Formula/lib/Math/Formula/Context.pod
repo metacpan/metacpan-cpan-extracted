@@ -144,11 +144,6 @@ inconveniently, those are popular choices.
 A $fragment is simply a different Context.  Fragments are addressed via the '#'
 operator.
 
-=item $obj-E<gt>B<evaluate>($name, %options)
-
-Evaluate the expresion with the $name.  Returns a types object, or C<undef>
-when not found.  The %options are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
-
 =item $obj-E<gt>B<formula>($name)
 
 Returns the formula with this specified name.
@@ -157,6 +152,22 @@ Returns the formula with this specified name.
 
 Returns the fragment (context) with $name.  This is not sufficient to switch
 between contexts, which is done during execution.
+
+=back
+
+=head2 Runtime
+
+=over 4
+
+=item $obj-E<gt>B<capture>($index)
+
+Returns the value of a capture as STRING, when it exists.  The C<$index> starts at
+zero, where the capture indicators start at one.
+
+=item $obj-E<gt>B<evaluate>($name, %options)
+
+Evaluate the expresion with the $name.  Returns a types object, or C<undef>
+when not found.  The %options are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
 
 =item $obj-E<gt>B<run>($expression, %options)
 
@@ -175,10 +186,17 @@ The name may appear in error messages.
 
 =back
 
+=item $obj-E<gt>B<setCaptures>(\@strings)
+
+See the boolean operator C<< -> >>, used in combination with regular expression
+match which captures fragments of a string.  On the right side of this arrow,
+you may use C<$1>, C<$2>, etc as strings representing parts of the matched
+expression.  This method sets those strings when the arrow operator is applied.
+
 =item $obj-E<gt>B<value>($expression, %options)
 
 First run the $expression, then return the value of the returned type object.
-All options are passed to L<run()|Math::Formula::Context/"Formula and Fragment management">.
+All options are passed to L<run()|Math::Formula::Context/"Runtime">.
 
 =back
 
@@ -330,6 +348,7 @@ can be returned.  These are the types with examples for tokens and values:
   MF::DATETIME  '2023-...T09:...' DateTime-object
   MF::DATE      '2023-02-24+0100' DateTime-object
   MF::TIME      '09:12:24'        some HASH
+  MF::TIMEZONE  '+0200'           in seconds
   MF::DURATION  'P3Y2MT12M'       DateTime::Duration-object
   MF::NAME      'tac'             'tac'
   MF::PATTERN   '"*c"'            qr/^.*c$/ # like understands MF::REGEXP
@@ -342,8 +361,8 @@ need, for instance MF::FLOAT to MF::INTEGER or the reverse.
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.14,
-built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.15,
+built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -14,14 +14,24 @@ use OpenAI::API::Request::Edit;
 use OpenAI::API::Request::Embedding;
 use OpenAI::API::Request::Moderation;
 
-our $VERSION = 0.17;
+our $VERSION = 0.22;
+
+my $DEFAULT_API_BASE = 'https://api.openai.com/v1';
+my $DEFAULT_TIMEOUT  = 60;
+my $DEFAULT_RETRIES  = 3;
+my $DEFAULT_SLEEP    = 1;
 
 sub new {
     my ( $class, %params ) = @_;
     my $self = {
-        api_key  => $params{api_key} // $ENV{OPENAI_API_KEY},
-        endpoint => $params{endpoint} || 'https://api.openai.com/v1',
+        api_key  => $params{api_key}  // $ENV{OPENAI_API_KEY},
+        api_base => $params{api_base} // $ENV{OPENAI_API_BASE} // $DEFAULT_API_BASE,
+        timeout  => $params{timeout}  // $DEFAULT_TIMEOUT,
+        retry    => $params{retry}    // $DEFAULT_RETRIES,
+        sleep    => $params{sleep}    // $DEFAULT_SLEEP,
     };
+
+    $self->{ua} = LWP::UserAgent->new( timeout => $params{timeout} );
 
     croak 'Missing OPENAI_API_KEY' if !defined $self->{api_key};
     return bless $self, $class;
@@ -30,53 +40,58 @@ sub new {
 sub chat {
     my ( $self, %params ) = @_;
     my $request = OpenAI::API::Request::Chat->new( \%params );
-    return $self->_post( 'chat/completions', { %{$request} } );
+    return $self->_post( $request );
 }
 
 sub completions {
     my ( $self, %params ) = @_;
     my $request = OpenAI::API::Request::Completion->new( \%params );
-    return $self->_post( 'completions', { %{$request} } );
+    return $self->_post( $request );
 }
 
 sub edits {
     my ( $self, %params ) = @_;
     my $request = OpenAI::API::Request::Edit->new( \%params );
-    return $self->_post( 'edits', { %{$request} } );
+    return $self->_post( $request );
 }
 
 sub embeddings {
     my ( $self, %params ) = @_;
     my $request = OpenAI::API::Request::Embedding->new( \%params );
-    return $self->_post( 'edits', { %{$request} } );
+    return $self->_post( $request );
 }
 
 sub moderations {
     my ( $self, %params ) = @_;
     my $request = OpenAI::API::Request::Moderation->new( \%params );
-    return $self->_post( 'moderations', { %{$request} } );
+    return $self->_post( $request );
 }
 
 sub _post {
-    my ( $self, $method, $params ) = @_;
+    my ( $self, $request ) = @_;
 
-    my $ua = LWP::UserAgent->new();
+    my $method = $request->endpoint();
+    my %params = %{$request};
 
     my $req = HTTP::Request->new(
-        POST => "$self->{endpoint}/$method",
+        POST => "$self->{api_base}/$method",
         [
             'Content-Type'  => 'application/json',
             'Authorization' => "Bearer $self->{api_key}",
         ],
-        encode_json($params),
+        encode_json(\%params),
     );
 
-    my $res = $ua->request($req);
+    for my $attempt ( 1 .. $self->{retry} ) {
+        my $res = $self->{ua}->request($req);
 
-    if ( $res->is_success ) {
-        return decode_json( $res->decoded_content );
-    } else {
-        die "Error retrieving '$method': " . $res->status_line;
+        if ( $res->is_success ) {
+            return decode_json( $res->decoded_content );
+        } elsif ( $res->code =~ /^(?:500|503|504|599)$/ && $attempt < $self->{retry} ) {
+            sleep( $self->{sleep} );
+        } else {
+            die "Error retrieving '$method': " . $res->status_line;
+        }
     }
 }
 
@@ -87,6 +102,8 @@ __END__
 =head1 NAME
 
 OpenAI::API - Perl interface to OpenAI API
+
+=for readme plugin version
 
 =head1 SYNOPSIS
 
@@ -124,6 +141,41 @@ and perform other tasks using the language models developed by OpenAI.
 To use the OpenAI::API module, you will need an API key, which you can obtain by
 signing up for an account on the L<OpenAI website|https://platform.openai.com>.
 
+=begin :readme
+
+=head1 INSTALLATION
+
+If you have cpanm, you only need one line:
+
+    % cpanm OpenAI::API
+
+Alternatively, if your CPAN shell is set up, you should just be able
+to do:
+
+    % cpan OpenAI::API
+
+As a last resort, you can manually install it:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If your perl is system-managed, you can create a L<local::lib> in your
+home directory to install modules to. For details, see the
+L<local::lib documentation|https://metacpan.org/pod/local::lib>.
+
+=head1 DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc OpenAI::API
+
+=end :readme
+
+=for readme stop
+
 =head1 METHODS
 
 =head2 new()
@@ -141,9 +193,13 @@ environment variable instead.
 
 See: L<Best Practices for API Key Safety|https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety>.
 
-=item * endpoint [optional]
+=item * api_base [optional]
 
-The endpoint URL for the OpenAI API. Default: 'https://api.openai.com/v1/'.
+The api_base URL for the OpenAI API. Default: 'https://api.openai.com/v1/'.
+
+=item * timeout [optional]
+
+The timeout value, in seconds. Default: 60 seconds.
 
 =back
 
@@ -233,9 +289,19 @@ More info: L<OpenAI::API::Request::Moderation>
 
 L<OpenAI Reference Overview|https://platform.openai.com/docs/api-reference/overview>
 
+=for readme start
+
 =head1 AUTHOR
 
 Nelson Ferraz E<lt>nferraz@gmail.comE<gt>
+
+=head1 SUPPORT
+
+This module is developed on
+L<GitHub|https://github.com/nferraz/perl-openai-api>.
+
+Send ideas, feedback, tasks, or bugs to
+L<GitHub Issues|https://github.com/nferraz/perl-openai-api/issues>.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -244,5 +310,7 @@ Copyright (C) 2022, 2023 by Nelson Ferraz
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.30.2 or,
 at your option, any later version of Perl 5 you may have available.
+
+=for readme stop
 
 =cut

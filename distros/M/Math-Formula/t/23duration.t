@@ -73,4 +73,23 @@ foreach (@infix)
 	isa_ok $eval, $type;
 }
 
+### ATTRIBUTES
+
+my $duration = 'P3DT5H2M12S';
+my $secs = 3 * 86400 + 5 * 3600 + 2 * 60 + 12;
+
+my @attrs = (
+	[ $secs, 'MF::INTEGER', "$duration.in_seconds" ],
+	[ 3,     'MF::INTEGER', "$duration.in_days" ],
+);
+
+foreach (@infix, @attrs)
+{	my ($result, $type, $rule) = @$_;
+
+	$expr->_test($rule);
+	my $eval = $expr->evaluate;
+	is $eval->token, $result, "$rule -> $result";
+	isa_ok $eval, $type;
+}
+
 done_testing;

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.49;
+package Devel::MAT::Tool::Show 0.50;
 
 use v5.14;
 use warnings;
@@ -65,9 +65,10 @@ sub run
    my %opts = %{ +shift };
    my ( $sv ) = @_;
 
-   Devel::MAT::Cmd->printf( "%s with refcount %d\n",
+   Devel::MAT::Cmd->printf( "%s with refcount %d%s\n",
       Devel::MAT::Cmd->format_sv( $sv ),
       $sv->refcnt,
+      $sv->is_mortal ? ( " " . Devel::MAT::Cmd->format_note( "(mortalized)", 1 ) ) : "",
    );
 
    my $size = $sv->size;

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -60,51 +60,51 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"37162", "Valmiera",
-"371656", "Krāslava",
-"371637", "Dobele",
-"371634", "Liepaja",
-"371684", "Liepāja",
-"371649", "Aizkraukle",
-"371658", "Daugavpils",
-"371635", "Ventspils",
-"371651", "Aizkraukle",
-"37167", "Riga",
-"371654", "Daugavpils",
-"371640", "Limbaži",
-"371686", "Jelgava",
-"371657", "Ludza",
-"371636", "Ventspils",
+$areanames{en} = {"371659", "Cēsis",
 "371655", "Ogre",
-"371631", "Tukums",
-"371642", "Valmiera",
+"371654", "Daugavpils",
 "371643", "Alūksne",
-"371638", "Saldus",
-"371630", "Jelgava",
-"371646", "Rēzekne",
-"37166", "Riga",
-"371641", "Cēsis",
-"371659", "Cēsis",
-"371683", "Jēkabpils",
-"371632", "Talsi",
-"371682", "Valmiera",
-"371648", "Madona",
-"371633", "Kuldiga",
-"371647", "Valka",
-"371644", "Gulbene",
 "37169", "Riga",
-"371650", "Ogre",
+"371646", "Rēzekne",
+"371657", "Ludza",
+"371684", "Liepāja",
+"371636", "Ventspils",
+"371633", "Kuldiga",
+"371658", "Daugavpils",
 "371652", "Jēkabpils",
-"371639", "Bauska",
+"371651", "Aizkraukle",
+"371650", "Ogre",
+"371682", "Valmiera",
+"371656", "Krāslava",
+"371647", "Valka",
+"37167", "Riga",
 "371653", "Preiļi",
+"37162", "Valmiera",
 "37161", "Jūrmala",
-"371645", "Balvi",};
+"371683", "Jēkabpils",
+"371686", "Jelgava",
+"371638", "Saldus",
+"371644", "Gulbene",
+"371645", "Balvi",
+"37166", "Riga",
+"371632", "Talsi",
+"371649", "Aizkraukle",
+"371631", "Tukums",
+"371630", "Jelgava",
+"371640", "Limbaži",
+"371639", "Bauska",
+"371641", "Cēsis",
+"371635", "Ventspils",
+"371642", "Valmiera",
+"371648", "Madona",
+"371634", "Liepaja",
+"371637", "Dobele",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+371|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '371', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

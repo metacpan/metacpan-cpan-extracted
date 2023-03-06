@@ -61,7 +61,6 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   }
 
   method catdir : string ($dir_parts : string[]) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     unless ($dir_parts) {
       die "The \$dir_parts must be defined";
@@ -73,13 +72,12 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     
     my $path = Fn->join("/", $dir_parts);
     
-    my $canonpath = $interface->canonpath($path);
+    my $canonpath = $self->canonpath($path);
     
     return $canonpath;
   }
   
   method catfile : string ($dir_parts : string[], $file_base_name : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     unless ($dir_parts) {
       die "The \$dir_parts must be defined";
@@ -89,13 +87,13 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
       die "The \$file_base_name must be defined";
     }
     
-    $file_base_name = $interface->canonpath($file_base_name);
+    $file_base_name = $self->canonpath($file_base_name);
     
     unless (@$dir_parts) {
       return $file_base_name;
     }
     
-    my $dir = $interface->catdir($dir_parts);
+    my $dir = $self->catdir($dir_parts);
     my $dir_length = length $dir;
     
     unless ($dir_length >= 1 && $dir->[$dir_length - 1] == '/') {
@@ -141,9 +139,9 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   }
   
   method join : string ($dir_parts : string[], $file_base_name : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
-    return $interface->catfile($dir_parts, $file_base_name);
+    
+    return $self->catfile($dir_parts, $file_base_name);
   }
   
   method catpath : string ($volume : string, $directory : string, $file : string) {
@@ -191,25 +189,24 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   }
 
   method rel2abs : string ($path : string, $base = undef : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     # Clean up $path
-    if (!$interface->file_name_is_absolute($path)) {
+    if (!$self->file_name_is_absolute($path)) {
       # Figure out the effective $base and clean it up.
       if (!$base || $base eq "") {
         $base = Cwd->getcwd;
       }
-      elsif (!$interface->file_name_is_absolute($base)) {
-        $base = $interface->rel2abs($base) ;
+      elsif (!$self->file_name_is_absolute($base)) {
+        $base = $self->rel2abs($base) ;
       }
       else {
-        $base = $interface->canonpath($base);
+        $base = $self->canonpath($base);
       }
       # Glom them together
-      $path = $interface->catdir([$base, $path]);
+      $path = $self->catdir([$base, $path]);
     }
     
-    my $rel2abs = $interface->canonpath($path);
+    my $rel2abs = $self->canonpath($path);
     
     return $rel2abs;
   }
@@ -269,62 +266,61 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   }
 
   method abs2rel : string ($path : string, $base = undef : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     unless ($base && length $base) {
       $base = Cwd->getcwd();
     }
     
-    $path = $interface->canonpath($path);
-    $base = $interface->canonpath($base);
+    $path = $self->canonpath($path);
+    $base = $self->canonpath($base);
 
     my $path_directories = (string)undef;
     my $base_directories = (string)undef;
     
-    my $pash_is_abs = $interface->file_name_is_absolute($path);
-    my $base_is_abs =  $interface->file_name_is_absolute($base);
+    my $pash_is_abs = $self->file_name_is_absolute($path);
+    my $base_is_abs =  $self->file_name_is_absolute($base);
     
     if ($pash_is_abs || $base_is_abs) {
-      $path = $interface->rel2abs($path);
-      $base = $interface->rel2abs($base);
+      $path = $self->rel2abs($path);
+      $base = $self->rel2abs($base);
       
-      my $path_volume = $interface->splitpath($path, 1)->[0];
-      my $base_volume = $interface->splitpath($base, 1)->[0];
+      my $path_volume = $self->splitpath($path, 1)->[0];
+      my $base_volume = $self->splitpath($base, 1)->[0];
 
       # Can't relativize across volumes
       unless ($path_volume eq $base_volume) {
         return $path ;
       }
       
-      $path_directories = $interface->splitpath($path, 1)->[1];
-      $base_directories = $interface->splitpath($base, 1)->[1];
+      $path_directories = $self->splitpath($path, 1)->[1];
+      $base_directories = $self->splitpath($base, 1)->[1];
 
       # For UNC paths, the user might give a volume like //foo/bar that
       # strictly speaking has no directory portion.  Treat it as if it
       # had the root directory for that volume.
-      if (!length($base_directories) && $interface->file_name_is_absolute($base)) {
-        $base_directories = $interface->rootdir;
+      if (!length($base_directories) && $self->file_name_is_absolute($base)) {
+        $base_directories = $self->rootdir;
       }
     }
     else {
-      my $wd= $interface->splitpath(Cwd->getcwd(), 1)->[1];
-      $path_directories = $interface->catdir([$wd, $path]);
-      $base_directories = $interface->catdir([$wd, $base]);
+      my $wd= $self->splitpath(Cwd->getcwd(), 1)->[1];
+      $path_directories = $self->catdir([$wd, $path]);
+      $base_directories = $self->catdir([$wd, $base]);
     }
 
     # Now, remove all leading components that are the same
-    my $pathchunks = $interface->splitdir( $path_directories );
-    my $basechunks = $interface->splitdir( $base_directories );
+    my $pathchunks = $self->splitdir( $path_directories );
+    my $basechunks = $self->splitdir( $base_directories );
 
-    if ($base_directories eq $interface->rootdir) {
-      if ($path_directories eq $interface->rootdir) {
-        return $interface->curdir;
+    if ($base_directories eq $self->rootdir) {
+      if ($path_directories eq $self->rootdir) {
+        return $self->curdir;
       }
       
       my $pathchunks_list = StringList->new($pathchunks);
       $pathchunks_list->shift;
       $pathchunks = $pathchunks_list->to_array;
-      return $interface->canonpath( $interface->catpath("", $interface->catdir($pathchunks ), "") );
+      return $self->canonpath( $self->catpath("", $self->catdir($pathchunks ), "") );
     }
 
     my $common_list = StringList->new;
@@ -336,7 +332,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     }
     
     unless ($pathchunks_list->length > 0 || $basechunks_list->length > 0) {
-      return $interface->curdir;
+      return $self->curdir;
     }
     
     # @basechunks now contains the directories the resulting relative path 
@@ -346,12 +342,12 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     my $reverse_base_list = StringList->new;
     while ($basechunks_list->length > 0) {
       my $dir = $basechunks_list->shift;
-      if( $dir ne $interface->updir ) {
-        $reverse_base_list->unshift($interface->updir);
+      if( $dir ne $self->updir ) {
+        $reverse_base_list->unshift($self->updir);
         $common_list->push($dir);
       }
       elsif($common_list->length > 0) {
-        if( $reverse_base_list->length > 0 && $reverse_base_list->get(0) eq $interface->updir ) {
+        if( $reverse_base_list->length > 0 && $reverse_base_list->get(0) eq $self->updir ) {
           $reverse_base_list->shift;
           $common_list->pop;
         }
@@ -366,9 +362,9 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
       $pathchunks_list->unshift($reserve_base_part);
     }
     $pathchunks = $pathchunks_list->to_array;
-    my $result_dirs = $interface->catdir($pathchunks);
+    my $result_dirs = $self->catdir($pathchunks);
     
-    return $interface->canonpath( $interface->catpath("", $result_dirs, "") );
+    return $self->canonpath( $self->catpath("", $result_dirs, "") );
     
     return undef;
   }
@@ -470,16 +466,14 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   }
 
   method tmpdir : string () {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     my $env_tmpdir = Sys->getenv("TMPDIR");
     my $dirlist = [$env_tmpdir, "/tmp"];
-    my $tmpdir = $interface->_tmpdir($dirlist);
+    my $tmpdir = $self->_tmpdir($dirlist);
     return $tmpdir;
   }
 
   method _tmpdir : string ($dirlist : string[]) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     my $tmpdir = (string)undef;
     for my $dir (@$dirlist) {
@@ -490,14 +484,14 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     }
     
     unless ($tmpdir) {
-      $tmpdir = $interface->curdir;
+      $tmpdir = $self->curdir;
     }
     
-    $tmpdir = $interface->canonpath($tmpdir);
+    $tmpdir = $self->canonpath($tmpdir);
     
-    if (!$interface->file_name_is_absolute($tmpdir)) {
-      $tmpdir =  $interface->rel2abs($tmpdir);
-      if (!$interface->file_name_is_absolute($tmpdir)) {
+    if (!$self->file_name_is_absolute($tmpdir)) {
+      $tmpdir =  $self->rel2abs($tmpdir);
+      if (!$self->file_name_is_absolute($tmpdir)) {
         die "A temporary directory must be converted to an absolute path";
       }
     }

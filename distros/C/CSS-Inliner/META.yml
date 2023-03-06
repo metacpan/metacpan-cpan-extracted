@@ -25,5 +25,5 @@ requires:
   URI: '0'
 resources:
   repository: http://github.com/kamelkev/CSS-Inliner
-version: '4014'
+version: '4018'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

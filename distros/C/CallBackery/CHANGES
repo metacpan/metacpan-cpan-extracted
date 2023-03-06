@@ -1,3 +1,15 @@
+0.44.3 2023-03-03 16:29:29 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add timing for validators as well
+
+0.44.2 2023-03-03 16:18:45 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - syntax regression fixed
+
+0.44.1 2023-03-03 16:11:50 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - log time spent running getters
+
 0.44.0 2023-03-02 13:41:21 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - use the controller supplied securityHeaders method if one exists,

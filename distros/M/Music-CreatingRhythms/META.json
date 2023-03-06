@@ -1,5 +1,5 @@
 {
-   "abstract" : "Ported Perl from the book's C code",
+   "abstract" : "Combinatorial algorithms to generate rhythms",
    "author" : [
       "Gene Boggs <gene@cpan.org>"
    ],
@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Music-CreatingRhythms"
       }
    },
-   "version" : "0.0301",
+   "version" : "0.0504",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -309,6 +309,8 @@
                      "compa",
                      "compam",
                      "compm",
+                     "compmrnd",
+                     "comprnd",
                      "de",
                      "euclid",
                      "necka",
@@ -354,7 +356,9 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "\\.png"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",

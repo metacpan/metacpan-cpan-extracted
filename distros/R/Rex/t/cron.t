@@ -1,3 +1,8 @@
+#!/usr/bin/env perl
+
+use v5.12.5;
+use warnings;
+
 use Test::More;
 
 $^O =~ m/^MSWin/ ? plan tests => 83 : plan tests => 286;
@@ -528,4 +533,3 @@ unless ( $^O =~ m/^MSWin/ ) {
   is( $cron[0]->{value}, "/bin/bash",       "3rd env name" );
   is( $cron[0]->{line},  'SHELL=/bin/bash', "3rd env name" );
 }
-

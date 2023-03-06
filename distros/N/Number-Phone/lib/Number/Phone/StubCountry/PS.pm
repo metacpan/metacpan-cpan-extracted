@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -69,30 +69,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"970820", "Khan\ Yunis",
-"970929", "Qalqilya\/Salfit",
-"970229", "Ramallah\/Al\-Bireh",
+$areanames{en} = {"970229", "Ramallah\/Al\-Bireh",
 "970824", "North\ Gaza",
-"970424", "Jenin",
-"970825", "Deir\ al\-Balah",
-"970926", "Tulkarm",
 "970223", "Jerusalem",
-"970222", "Jericho\/Hebron",
-"970826", "Gaza",
 "970925", "Tubas",
-"970923", "Nablus",
-"970821", "Rafah",
+"970825", "Deir\ al\-Balah",
+"970929", "Qalqilya\/Salfit",
 "970227", "Bethlehem",
-"970828", "Gaza",};
+"970826", "Gaza",
+"970923", "Nablus",
+"970926", "Tulkarm",
+"970820", "Khan\ Yunis",
+"970821", "Rafah",
+"970828", "Gaza",
+"970424", "Jenin",
+"970222", "Jericho\/Hebron",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+970|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '970', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '970', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

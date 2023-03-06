@@ -32,7 +32,7 @@ resources:
   homepage: https://github.com/jhthorsen/app-proxyforurl
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/app-proxyforurl.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

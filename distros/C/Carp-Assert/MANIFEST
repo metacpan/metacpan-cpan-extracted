@@ -1,11 +1,11 @@
 Changes
 INSTALL
-MANIFEST
-Makefile.PL
-README
 lib/Carp/Assert.pm
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
 t/10enabled.t
 t/20disabled.t
 t/embedded-Carp-Assert.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

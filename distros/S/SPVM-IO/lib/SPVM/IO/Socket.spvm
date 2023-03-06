@@ -11,9 +11,6 @@ class IO::Socket extends IO::Handle {
   use Errno;
   use Scope::Guard;
   
-  # Interfaces
-  interface IO::Socket::Interface;
-  
   # Fields
   has timeout : protected ro int;
   has sockdomain : protected ro int;
@@ -34,8 +31,6 @@ class IO::Socket extends IO::Handle {
   }
   
   # Instance Methods
-  method has_interfaces : int () { return 1; }
-
   method new_instance : IO::Socket ($options = undef : object[]) {
     {
       my $self = IO::Socket->new($options);
@@ -304,42 +299,38 @@ class IO::Socket extends IO::Handle {
     return $pair;
   }
 
-  method accept : IO::Socket::Interface ($peer_ref = undef : Sys::Socket::Sockaddr[]) {
-    {
-      my $self = (IO::Socket::Interface)$self;
+  method accept : IO::Socket ($peer_ref = undef : Sys::Socket::Sockaddr[]) {
+    my $fd = $self->fd;
+    my $timeout = $self->timeout;
+    
+    if ($timeout > 0) {
+      my $select = IO::Select->new;
+      $select->add($fd);
       
-      my $fd = $self->fd;
-      my $timeout = $self->timeout;
-      
-      if ($timeout > 0) {
-        my $select = IO::Select->new;
-        $select->add($fd);
-        
-        unless ($select->can_read($timeout)) {
-          die "accept: timeout";
-        }
+      unless ($select->can_read($timeout)) {
+        die "accept: timeout";
       }
-
-      my $client_socket_address = $self->sockname->clone;
-      my $client_socket_address_size = $client_socket_address->sizeof;
-      
-      my $client_fd = Sys::Socket->accept($fd, $client_socket_address, \$client_socket_address_size);
-      
-      my $options = {
-        Timeout => $timeout,
-        fd => $client_fd,
-        Domain => $self->sockdomain,
-        Type => $self->socktype,
-        Proto => $self->protocol,
-      };
-      
-      my $client = $self->new_instance($options);
-      
-      if ($peer_ref) {
-        $peer_ref->[0] = $client_socket_address;
-      }
-      
-      return $client;
     }
+
+    my $client_socket_address = $self->sockname->clone;
+    my $client_socket_address_size = $client_socket_address->sizeof;
+    
+    my $client_fd = Sys::Socket->accept($fd, $client_socket_address, \$client_socket_address_size);
+    
+    my $options = {
+      Timeout => $timeout,
+      fd => $client_fd,
+      Domain => $self->sockdomain,
+      Type => $self->socktype,
+      Proto => $self->protocol,
+    };
+    
+    my $client = $self->new_instance($options);
+    
+    if ($peer_ref) {
+      $peer_ref->[0] = $client_socket_address;
+    }
+    
+    return $client;
   }
 }

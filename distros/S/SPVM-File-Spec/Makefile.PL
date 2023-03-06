@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %spvm_requires = ('SPVM' => '0.9689');
+my %spvm_requires = ('SPVM' => '0.9695');
 WriteMakefile(
   NAME              => 'SPVM::File::Spec',
   VERSION_FROM      => 'lib/SPVM/File/Spec.pm',

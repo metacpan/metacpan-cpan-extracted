@@ -42,15 +42,13 @@ there are also formatters for ANSI (Syntax::Kamelon::ANSI) and HTML4
 
 # Development plans
 
-Improve speed by Rewriting some core functions of Kamelon in C
-
 Add output formatters for HTML5, PDF, RTF, ODT, etcetera
 
 Help and support is appreciated.
 
 # user license
 
-This software is licensed under the GPLV3.
+This software is licensed under the same lincense as Perl.
 
 
 

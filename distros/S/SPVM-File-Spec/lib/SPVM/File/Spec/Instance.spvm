@@ -1,7 +1,5 @@
 class File::Spec::Instance {
   
-  interface File::Spec::Instance::Interface;
-  
   use Sys;
   use File::Spec::Instance::Unix;
   use File::Spec::Instance::Win32;
@@ -24,75 +22,39 @@ class File::Spec::Instance {
   # Instance Methods
   method has_interfaces : int () { return 1; }
   
-  method canonpath : string ($path : string) {
-    return $self->(File::Spec::Instance::Interface)->canonpath($path);
-  }
+  method canonpath : string ($path : string) { die "Not implemented"; }
   
-  method catdir : string ($directories : string[]) {
-    return $self->(File::Spec::Instance::Interface)->catdir($directories);
-  }
+  method catdir : string ($directories : string[]) { die "Not implemented"; }
   
-  method catfile : string ($directories : string[], $filename : string) {
-    return $self->(File::Spec::Instance::Interface)->catfile($directories, $filename);
-  }
+  method catfile : string ($directories : string[], $filename : string) { die "Not implemented"; }
   
-  method curdir : string () {
-    return $self->(File::Spec::Instance::Interface)->curdir;
-  }
+  method curdir : string () { die "Not implemented"; }
   
-  method devnull : string () {
-    return $self->(File::Spec::Instance::Interface)->devnull;
-  }
+  method devnull : string () { die "Not implemented"; }
   
-  method rootdir : string () {
-    return $self->(File::Spec::Instance::Interface)->rootdir;
-  }
+  method rootdir : string () { die "Not implemented"; }
   
-  method tmpdir : string () {
-    return $self->(File::Spec::Instance::Interface)->tmpdir;
-  }
+  method tmpdir : string () { die "Not implemented"; }
   
-  method updir : string () {
-    return $self->(File::Spec::Instance::Interface)->updir;
-  }
+  method updir : string () { die "Not implemented"; }
   
-  method no_upwards : string[] ($directories : string[]) {
-    return $self->(File::Spec::Instance::Interface)->no_upwards($directories);
-  }
+  method no_upwards : string[] ($directories : string[]) { die "Not implemented"; }
   
-  method file_name_is_absolute : int ($path : string) {
-    return $self->(File::Spec::Instance::Interface)->file_name_is_absolute($path);
-  }
+  method file_name_is_absolute : int ($path : string) { die "Not implemented"; }
   
-  method file_name_is_root : int ($path : string) {
-    return $self->(File::Spec::Instance::Interface)->file_name_is_root($path);
-  }
+  method file_name_is_root : int ($path : string) { die "Not implemented"; }
   
-  method path : string[] () {
-    return $self->(File::Spec::Instance::Interface)->path;
-  }
+  method path : string[] () { die "Not implemented"; }
   
-  method join : string ($directories : string[], $filename : string) {
-    return $self->(File::Spec::Instance::Interface)->join($directories, $filename);
-  }
+  method join : string ($directories : string[], $filename : string) { die "Not implemented"; }
   
-  method splitpath : string[] ($path : string, $no_file = 0 : int) {
-    return $self->(File::Spec::Instance::Interface)->splitpath($path, $no_file);
-  }
+  method splitpath : string[] ($path : string, $no_file = 0 : int) { die "Not implemented"; }
   
-  method splitdir : string[] ($path : string) {
-    return $self->(File::Spec::Instance::Interface)->splitdir($path);
-  }
+  method splitdir : string[] ($path : string) { die "Not implemented"; }
    
-  method catpath : string ($volume : string, $directory : string, $file : string) {
-    return $self->(File::Spec::Instance::Interface)->catpath($volume, $directory, $file);
-  }
+  method catpath : string ($volume : string, $directory : string, $file : string) { die "Not implemented"; }
   
-  method abs2rel : string ($path : string, $base = undef : string) {
-    return $self->(File::Spec::Instance::Interface)->abs2rel($path, $base);
-  }
+  method abs2rel : string ($path : string, $base = undef : string) { die "Not implemented"; }
   
-  method rel2abs : string ($path : string, $base = undef : string) {
-    return $self->(File::Spec::Instance::Interface)->rel2abs($path, $base);
-  }
+  method rel2abs : string ($path : string, $base = undef : string) { die "Not implemented"; }
 }

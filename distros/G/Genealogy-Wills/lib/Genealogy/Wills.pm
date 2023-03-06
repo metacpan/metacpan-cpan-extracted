@@ -14,11 +14,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -38,16 +38,25 @@ Takes an optional argument, directory, that is the directory containing wills.sq
 =cut
 
 sub new {
-	my($proto, %param) = @_;
+	my($proto, %args) = @_;
 	my $class = ref($proto) || $proto;
 
-	# Use Genealogy::Wills->new, not Genealogy::Wills::new
-	return unless($class);
+	if(!defined($class)) {
+		# Using Genealogy::Wills->new(), not Genealogy::Wills::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
 
-	my $directory = $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
+
+	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
-	Genealogy::Wills::DB::init(directory => File::Spec->catfile($directory, 'database'), %param);
+	Genealogy::Wills::DB::init(directory => File::Spec->catfile($directory, 'database'), %args);
 	return bless { }, $class;
 }
 

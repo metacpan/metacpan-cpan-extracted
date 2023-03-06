@@ -125,19 +125,36 @@ my @tests = (
         },
     },
     {
-        year              => 2023,
-        isa               => 'Finance::Tax::Aruba::Income::2023',
-        income            => 6250,
-        label             => "Pension 1% by employee",
+        year                  => 2023,
+        isa                   => 'Finance::Tax::Aruba::Income::2023',
+        income                => 6250,
+        label                 => "Pension 1% by employee",
         pension_employee_perc => 1,
 
         results => {
-            wervingskosten    => 1500,
+            wervingskosten        => 1500,
             pension_employer_perc => 5,
 
             tax_fixed => 3493,
             tax_rate  => 21,
 
+        },
+    },
+    {
+        year   => 2023,
+        isa    => 'Finance::Tax::Aruba::Income::2023',
+        income => 5000,
+        label  => "Company cost test",
+
+        pension_employee_perc => 0,
+        premiums_employer     => 1,
+
+        results => {
+            tax_fixed        => 0,
+            tax_rate         => 12,
+            company_costs    => 78810,
+            government_costs => 18630,
+            social_costs     => 22230,
         },
     },
 );

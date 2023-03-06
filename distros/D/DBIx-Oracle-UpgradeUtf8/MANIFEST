@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/DBIx/Oracle/UpgradeUtf8.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/upgrade_utf8.t
+

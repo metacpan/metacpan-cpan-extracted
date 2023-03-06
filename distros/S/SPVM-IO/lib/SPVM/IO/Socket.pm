@@ -28,10 +28,6 @@ L<SPVM::IO::Socket> provides socket communications.
 
 L<IO::Handle|SPVM::IO::Handle>.
 
-=head1 Interfaces
-
-L<IO::Socket::Interface|SPVM::IO::Socket::Interface>.
-
 =head1 Fields
 
 =head2 timeout
@@ -178,7 +174,7 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 accept
 
-  method accept : IO::Socket::Interface ($io_socket_builder = undef : IO::Socket::Builder, $peer_ref = undef : Sys::Socket::Sockaddr[]);
+  method accept : IO::Socket ($io_socket_builder = undef : IO::Socket::Builder, $peer_ref = undef : Sys::Socket::Sockaddr[]);
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 

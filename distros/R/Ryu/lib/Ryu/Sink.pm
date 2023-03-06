@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '3.002'; # VERSION
+our $VERSION = '3.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -74,8 +74,7 @@ sub source {
     };
 }
 
-sub completed { shift->source->completed }
-sub _completed { shift->source->completed }
+sub _completed { shift->source->_completed }
 
 sub notify_child_completion { }
 
@@ -89,5 +88,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

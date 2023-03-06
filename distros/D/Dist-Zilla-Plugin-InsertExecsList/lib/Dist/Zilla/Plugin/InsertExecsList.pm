@@ -1,8 +1,5 @@
 package Dist::Zilla::Plugin::InsertExecsList;
 
-our $DATE = '2015-08-31'; # DATE
-our $VERSION = '0.02'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -15,7 +12,14 @@ with (
     },
 );
 
+has ordered => (is => 'rw', default => sub{1});
+
 use namespace::autoclean;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-16'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-InsertExecsList'; # DIST
+our $VERSION = '0.030'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -51,7 +55,7 @@ sub _insert_execs_list {
     join(
         "",
         "=over\n\n",
-        (map {"=item * L<$_>\n\n"} @list),
+        (map {"=item ".($self->ordered ? ($_+1).".":"*")." $list[$_]\n\n"} 0..$#list),
         "=back\n\n",
     );
 }
@@ -72,7 +76,7 @@ Dist::Zilla::Plugin::InsertExecsList - Insert a POD containing a list of scripts
 
 =head1 VERSION
 
-This document describes version 0.02 of Dist::Zilla::Plugin::InsertExecsList (from Perl distribution Dist-Zilla-Plugin-InsertExecsList), released on 2015-08-31.
+This document describes version 0.030 of Dist::Zilla::Plugin::InsertExecsList (from Perl distribution Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-16.
 
 =head1 SYNOPSIS
 
@@ -102,11 +106,11 @@ After build, lib/Foo.pm will contain:
 
  =over
 
- =item * L<script1>
+ =item 1. L<script1>
 
- =item * L<script2>
+ =item 2. L<script2>
 
- =item * L<script3>
+ =item 3. L<script3>
 
  =back
 
@@ -120,9 +124,12 @@ distribution.
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
+=head1 CONFIGURATION
 
-L<Dist::Zilla::Plugin::InsertModulesList>
+=head2 ordered
+
+Bool. Default true. Can be set to false to generate an unordered list instead of
+ordered one.
 
 =head1 HOMEPAGE
 
@@ -132,6 +139,39 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertExecsList>.
 
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::InsertModulesList>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertExecsList>
@@ -139,16 +179,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

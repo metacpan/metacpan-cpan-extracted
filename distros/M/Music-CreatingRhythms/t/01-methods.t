@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use List::Util qw(sum0);
 
 my $module = 'Music::CreatingRhythms';
 
@@ -14,6 +15,18 @@ subtest defaults => sub {
     ];
 
     is $mcr->verbose, 1, 'verbose';
+};
+
+subtest b2int => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = [[1,2,3]];
+    my $got = $mcr->b2int([[1,1,0,1,0,0]]);
+    is_deeply $got, $expect, 'b2int';
+
+    $expect = [[1],[2],[3]];
+    $got = $mcr->b2int([[1],[1,0],[1,0,0]]);
+    is_deeply $got, $expect, 'b2int';
 };
 
 subtest cfcv => sub {
@@ -242,24 +255,56 @@ subtest compm => sub {
     is_deeply $got, $expect, 'compm';
 };
 
-subtest debruijn_n => sub {
+subtest compmrnd => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = 0;
+    my $got = $mcr->compmrnd(0, 0);
+    is sum0(@$got), $expect, 'compmrnd';
+
+    $expect = 1;
+    $got = $mcr->compmrnd(1, 1);
+    is sum0(@$got), $expect, 'compmrnd';
+
+    $expect = 16;
+    $got = $mcr->compmrnd(16, 4);
+    is sum0(@$got), $expect, 'compmrnd';
+};
+
+subtest comprnd => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = 0;
+    my $got = $mcr->comprnd(0);
+    is sum0(@$got), $expect, 'comprnd';
+
+    $expect = 1;
+    $got = $mcr->comprnd(1);
+    is sum0(@$got), $expect, 'comprnd';
+
+    $expect = 16;
+    $got = $mcr->comprnd(16);
+    is sum0(@$got), $expect, 'comprnd';
+};
+
+subtest de_bruijn => sub {
     my $mcr = new_ok $module;
 
     my $expect = [0];
-    my $got = $mcr->debruijn_n(0);
-    is_deeply $got, $expect, 'debruijn_n';
+    my $got = $mcr->de_bruijn(0);
+    is_deeply $got, $expect, 'de_bruijn';
 
     $expect = [qw(1 0)];
-    $got = $mcr->debruijn_n(1);
-    is_deeply $got, $expect, 'debruijn_n';
+    $got = $mcr->de_bruijn(1);
+    is_deeply $got, $expect, 'de_bruijn';
 
     $expect = [qw(1 1 0 0)];
-    $got = $mcr->debruijn_n(2);
-    is_deeply $got, $expect, 'debruijn_n';
+    $got = $mcr->de_bruijn(2);
+    is_deeply $got, $expect, 'de_bruijn';
 
     $expect = [qw(1 1 1 0 1 0 0 0)];
-    $got = $mcr->debruijn_n(3);
-    is_deeply $got, $expect, 'debruijn_n';
+    $got = $mcr->de_bruijn(3);
+    is_deeply $got, $expect, 'de_bruijn';
 };
 
 subtest euclid => sub {
@@ -292,6 +337,18 @@ subtest euclid => sub {
     $expect = [1,1,1,1];
     $got = $mcr->euclid(4, 4);
     is_deeply $got, $expect, 'euclid';
+};
+
+subtest int2b => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = [[1,1,0,1,0,0]];
+    my $got = $mcr->int2b([[1,2,3]]);
+    is_deeply $got, $expect, 'int2b';
+
+    $expect = [[1],[1,0],[1,0,0]];
+    $got = $mcr->int2b([[1],[2],[3]]);
+    is_deeply $got, $expect, 'int2b';
 };
 
 subtest invert_at => sub {

@@ -367,9 +367,19 @@ Returns a L<Future::Queue> instance which will
 L<Future::Queue/push> items whenever the source
 emits them.
 
-Unfortunately there is currently no way to tell
-when the queue will end, so you'd need to track
-that separately.
+The queue will be marked as finished when this source is completed.
+
+Parameters passed to this method will be given to the L<Future::Queue>
+constructor:
+
+ use Future::AsyncAwait qw(:experimental(suspend));
+ my $queue = $src->as_queue(
+  max_items => 100
+ );
+ SUSPEND { print "Waiting for more items\n" }
+ while(my @batch = await $queue->shift_atmost(10)) {
+  print "Had batch of @{[ 0 + @batch ]} items\n";
+ }
 
 =head2 as_buffer
 
@@ -755,5 +765,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

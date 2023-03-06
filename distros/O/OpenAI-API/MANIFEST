@@ -17,6 +17,7 @@ t/03-moderations.t
 t/04-chat.t
 t/10-exceptions-validation.t
 t/11-exceptions-internet.t
+t/12-exceptions-timeout.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

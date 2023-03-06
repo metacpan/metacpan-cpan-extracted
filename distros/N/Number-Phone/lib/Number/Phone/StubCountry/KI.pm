@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [];
 
@@ -108,63 +108,63 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"6867540", "Phoenix\ Islands",
-"68627", "Tarawa",
-"68638", "Maiana",
-"6867548", "Line\ Islands",
-"68683", "Fanning",
-"68682", "Kiritimati",
-"68635", "Butaritari",
-"686653", "Gilbert\ Islands",
-"68622", "Bairiki",
-"686750", "Bairiki",
-"68623", "Bairiki",
+$areanames{en} = {"686654", "Gilbert\ Islands",
 "68649", "Arorae",
-"686650", "Bairiki",
-"68636", "Makin",
-"686651", "Betio",
-"68629", "Bikenibeu",
-"68643", "Tabiteuea\ North",
-"68640", "Aranuka",
-"686751", "Betio",
-"68642", "Nonouti",
-"686655", "Phoenix\ Islands",
-"68672700", "Gilbert\ Islands",
-"68634", "Marakei",
-"686755", "Phoenix\ Islands",
-"68631", "North\ Tarawa",
-"68647", "Nikunau",
+"68638", "Maiana",
+"68623", "Bairiki",
+"6867540", "Phoenix\ Islands",
 "68632", "North\ Tarawa",
-"68625", "Betio",
-"68633", "Abaiang",
+"6867548", "Line\ Islands",
+"68644", "Tabiteuea\ South",
+"68684", "Washington",
+"686651", "Betio",
+"68645", "Onotoa",
 "68646", "Beru",
-"68637", "Banaba",
-"686652", "Bikenibeu",
+"68672700", "Gilbert\ Islands",
+"68647", "Nikunau",
 "68641", "Abemama",
 "68628", "Bikenibeu",
-"686752", "Bikenibeu",
-"68644", "Tabiteuea\ South",
-"68685", "Kanton",
-"6867538", "Line\ Islands",
-"68624", "Bairiki",
-"68648", "Tamana",
-"6867530", "Gilbert\ Islands",
-"68621", "Bairiki",
 "68681", "Kiritimati",
-"68626", "Betio",
+"68633", "Abaiang",
+"68622", "Bairiki",
+"68685", "Kanton",
+"686751", "Betio",
+"68636", "Makin",
+"68635", "Butaritari",
+"68637", "Banaba",
+"68631", "North\ Tarawa",
+"686655", "Phoenix\ Islands",
+"68683", "Fanning",
+"68640", "Aranuka",
+"68643", "Tabiteuea\ North",
+"686652", "Bikenibeu",
+"68629", "Bikenibeu",
+"686650", "Bairiki",
+"68624", "Bairiki",
+"686755", "Phoenix\ Islands",
+"6867538", "Line\ Islands",
 "68639", "Kuria",
-"686654", "Gilbert\ Islands",
-"68684", "Washington",
-"68645", "Onotoa",};
+"68648", "Tamana",
+"68634", "Marakei",
+"686653", "Gilbert\ Islands",
+"6867530", "Gilbert\ Islands",
+"68642", "Nonouti",
+"68682", "Kiritimati",
+"68626", "Betio",
+"68625", "Betio",
+"686750", "Bairiki",
+"68621", "Bairiki",
+"68627", "Tarawa",
+"686752", "Bikenibeu",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+686|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '686', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '686', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

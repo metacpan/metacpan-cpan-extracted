@@ -1,6 +1,6 @@
 #  -*-cperl-*-
 #
-#  Copyright (c) 2002-2022 Greg Sabino Mullane and others: see the Changes file
+#  Copyright (c) 2002-2023 Greg Sabino Mullane and others: see the Changes file
 #  Portions Copyright (c) 2002 Jeffrey W. Baker
 #  Portions Copyright (c) 1997-2001 Edmund Mergl
 #  Portions Copyright (c) 1994-1997 Tim Bunce
@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.16.0');
+    use version; our $VERSION = qv('3.16.1');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -137,7 +137,7 @@ use 5.008001;
         $class .= '::dr';
 
         ## Work around for issue found in https://rt.cpan.org/Ticket/Display.html?id=83057
-        my $realversion = qv('3.16.0');
+        my $realversion = qv('3.16.1');
 
         $drh = DBI::_new_drh($class, {
             'Name'        => 'Pg',
@@ -1587,6 +1587,7 @@ use 5.008001;
         return {
                 pg_async_status                => undef,
                 pg_bool_tf                     => undef,
+                pg_int8_as_string              => undef,
                 pg_db                          => undef,
                 pg_default_port                => undef,
                 pg_enable_utf8                 => undef,
@@ -1698,7 +1699,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.16.0 of the DBD::Pg module
+This documents version 3.16.1 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -1760,8 +1761,15 @@ If the username and password values passed via C<connect()> are undefined (as op
 to merely being empty strings), DBI will use the environment variables I<DBI_USER> 
 and I<DBI_PASS> if they exist.
 
-You can also connect by using a service connection file, which is named 
-F<pg_service.conf>. The location of this file can be controlled by 
+You can also connect by using a service connection file.
+Service names can be defined in either a per-user service file or a system-wide
+file. If the same service name exists in both the user and the system file,
+the user file takes precedence. By default, the per-user service file is
+named ~/.pg_service.conf. On Microsoft Windows, it is named %APPDATA%
+\postgresql\.pg_service.conf (where %APPDATA% refers to the Application Data
+subdirectory in the user's profile). A different file name can be specified
+by setting the environment variable PGSERVICEFILE. The system-wide file is
+named F<pg_service.conf>. The location of this file can be controlled by 
 setting the I<PGSYSCONFDIR> environment variable. To use one of the named 
 services within the file, set the name by using either the I<service> parameter 
 or the environment variable I<PGSERVICE>. Note that when connecting this way, 
@@ -2788,7 +2796,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.16.0'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.16.1'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -3294,6 +3302,15 @@ Note that the value of client_encoding is only checked on connection time. If
 you change the client_encoding to/from 'UTF8' after connecting, you can set 
 pg_enable_utf8 to -1 to force DBD::Pg to read in the new client_encoding and 
 act accordingly.
+
+=head3 B<pg_int8_as_string> (integer)
+
+DBD::Pg specific attribute. Since version 3.0.0 the processing of SQL_INT8 has
+changed, before that 64 bit values were returned as strings, starting from
+version 3.0.0 64 bit values are returned as numbers. This flag makes it
+possible to return the old behavior. The old behavior is useful when encoding
+the results of a call in JSON format and passing it to JavaScript for
+processing, where integer values have a precision of no more than 53 bits.
 
 =head3 B<pg_errorlevel> (integer)
 
@@ -4479,7 +4496,7 @@ Visit the archives at http://grokbase.com/g/perl/dbd-pg
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1994-2022, Greg Sabino Mullane
+Copyright (C) 1994-2023, Greg Sabino Mullane
 
 This module (DBD::Pg) is free software; you can redistribute it and/or modify it 
 under the same terms as Perl 5.10.0. For more details, see the full text of the 

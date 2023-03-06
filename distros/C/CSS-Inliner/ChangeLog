@@ -246,3 +246,6 @@
 4014	2019-12-31	Kevin Kamel <kamelkev@underprint.com>
 	* Apply patch from Graham Ollis related to listing in module indexes
 	* Apply patch from Christian Walde related to tests passing
+
+4018	2023-03-04	Kevin Kamel <kamelkev@underprint.com>
+	* Apply path from Sunnavy related to retaining the order of CSS rules; addresses various unreported bugs

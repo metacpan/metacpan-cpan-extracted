@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -94,30 +94,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"227202", "Niamey",
+$areanames{en} = {"2272071", "Tillabéry",
+"227202", "Niamey",
+"2272064", "Konni",
+"2272045", "Arlit",
+"2272075", "Niamey",
+"2272041", "Maradi",
+"2272054", "Diffa",
+"2272072", "Niamey",
+"2272044", "Agadez",
 "2272073", "Niamey",
+"2272051", "Zinder",
+"2272065", "Dosso",
+"2272074", "Niamey",
+"2272061", "Tahoua",
+"2272078", "Say",
 "2272068", "Gaya",
 "227203", "Niamey",
-"2272064", "Konni",
-"2272061", "Tahoua",
-"2272072", "Niamey",
-"2272065", "Dosso",
-"2272044", "Agadez",
-"2272051", "Zinder",
-"2272077", "Filingué",
-"2272074", "Niamey",
-"2272078", "Say",
-"2272054", "Diffa",
-"2272041", "Maradi",
-"2272075", "Niamey",
-"2272071", "Tillabéry",
-"2272045", "Arlit",};
+"2272077", "Filingué",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+227|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '227', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

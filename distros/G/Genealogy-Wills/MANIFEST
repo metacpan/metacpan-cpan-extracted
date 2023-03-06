@@ -1,4 +1,5 @@
 bin/create_db.PL
+Changes
 lib/Genealogy/Wills.pm
 lib/Genealogy/Wills/DB.pm
 lib/Genealogy/Wills/DB/wills.pm
@@ -9,7 +10,24 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/10-new.t
+t/carp.t
+t/comment-spelling.t
+t/coverage.t
+t/critic.t
+t/eof.t
+t/eol.t
+t/fixme.t
 t/lib/MyLogger.pm
+t/links.t
+t/no404s.t
+t/noopentickets.t
+t/noplan.t
+t/pod-cm.t
+t/pod-spelling.t
+t/pod.t
+t/snippets.t
+t/strict.t
+t/unused.t
 t/wills.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

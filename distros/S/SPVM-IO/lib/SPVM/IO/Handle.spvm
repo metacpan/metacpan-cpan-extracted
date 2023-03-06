@@ -10,9 +10,6 @@ class IO::Handle {
   use Scope::Guard;
   use Hash;
   
-  # Interfaces
-  interface IO::Handle::Interface;
-  
   # Fields
   has autoflush : rw byte;
   has input_line_number : ro int;
@@ -29,8 +26,6 @@ class IO::Handle {
   }
   
   # Instance Methods
-  method has_interfaces : int () { return 1; }
-  
   method init : void ($options = undef : object[]) {
     my $options_h = Hash->new($options);
     
@@ -43,25 +38,15 @@ class IO::Handle {
     }
   }
   
-  method close : int () {
-    return $self->(IO::Handle::Interface)->close;
-  }
+  method close : int () { die "Not implemented"; }
 
-  method eof : int () {
-    return $self->(IO::Handle::Interface)->eof;
-  }
+  method eof : int () { die "Not implemented"; }
 
-  method fileno : int () {
-    return $self->(IO::Handle::Interface)->fileno;
-  }
+  method fileno : int () { die "Not implemented"; }
 
-  method getc : int () {
-    return $self->(IO::Handle::Interface)->getc;
-  }
+  method getc : int () { die "Not implemented"; }
 
-  method print : int ($string : string) {
-    return $self->(IO::Handle::Interface)->print($string);
-  }
+  method print : int ($string : string) { die "Not implemented"; }
 
   method say : int ($string : string) {
     my $status1 = $self->print($string);
@@ -76,21 +61,13 @@ class IO::Handle {
     return $self->print($formated_string);
   }
 
-  method clearerr : void () {
-    $self->(IO::Handle::Interface)->clearerr;
-  }
+  method clearerr : void () { die "Not implemented"; }
   
-  method error : int () {
-    $self->(IO::Handle::Interface)->error;
-  }
+  method error : int () { die "Not implemented"; }
 
-  method flush : int () {
-    $self->(IO::Handle::Interface)->flush;
-  }
+  method flush : int () { die "Not implemented"; }
 
-  method ungetc : int ($c : int) {
-    return $self->(IO::Handle::Interface)->ungetc($c);
-  }
+  method ungetc : int ($c : int) { die "Not implemented"; }
 
   method printflush : int ($string : string) {
     my $old_autoflush = $self->autoflush;
@@ -129,13 +106,9 @@ class IO::Handle {
     return Sys::IO::Stat->fstat($fileno, $stat);
   }
 
-  method getline : string () {
-    return $self->(IO::Handle::Interface)->getline;
-  }
+  method getline : string () { die "Not implemented"; }
 
-  method getlines : string () {
-    return $self->(IO::Handle::Interface)->getlines;
-  }
+  method getlines : string () { die "Not implemented"; }
 
   method fcntl : int ($command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object) {
     my $fileno = $self->fileno;
@@ -176,11 +149,7 @@ class IO::Handle {
     return $self->sysread($buffer, $length, $offset);
   }
   
-  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int) {
-    return $self->(IO::Handle::Interface)->syswrite($buffer, $length, $offset);
-  }
+  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int) { die "Not implemented"; }
   
-  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int) {
-    return $self->(IO::Handle::Interface)->sysread($buffer, $length, $offset);
-  }
+  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int) { die "Not implemented"; }
 }

@@ -3,7 +3,8 @@ README
 CONTRIBUTING.md
 SIGNATURE
 Pg.pm
-META.yml
+META.yaml
+META.json
 TODO
 Makefile.PL
 .dir-locals.el

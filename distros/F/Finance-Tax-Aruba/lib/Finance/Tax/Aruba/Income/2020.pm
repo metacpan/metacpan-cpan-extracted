@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2020;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use Moose;
 use namespace::autoclean;
 
@@ -101,7 +101,7 @@ Finance::Tax::Aruba::Income::2020 - Income tax calculator for the year 2020
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

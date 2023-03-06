@@ -5,7 +5,6 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '1.001002'
-  Test::Pod: '1.48'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,7 +20,6 @@ no_index:
     - inc
 requires:
   Carp: '1.01'
-  Config: '0'
   File::Which: '1.09'
   Getopt::Long: '2.34'
   IO::Dir: '1.04'
@@ -33,14 +31,9 @@ requires:
   Time::HiRes: '1.51'
   XML::Twig: '3.52'
   XML::XPath: '1.13'
-  lib: '0'
-  perl: '5.006'
-  strict: '0'
-  vars: '0'
-  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=GraphViz
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/GraphViz.git
-version: '2.25'
+version: '2.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

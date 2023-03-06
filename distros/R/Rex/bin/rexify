@@ -1,13 +1,13 @@
-#!perl
+#!/usr/bin/env perl
 
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
 #
 
-use strict;
+use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 BEGIN {
   # this is for new package format

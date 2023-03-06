@@ -47,28 +47,21 @@ my(%params) =
 	PREREQ_PM =>
 	{
 		'Carp'				=> 1.01,
-		'Config'			=> 0,
 		'File::Which'		=> 1.09,
 		'Getopt::Long'		=> 2.34,
 		'IO::Dir'			=> 1.04,
 		'IO::File'			=> 1.10,
 		'IPC::Run'			=> 0.6,
-		'lib'				=> 0,
 		'LWP::Simple'		=> 6.00,
 		'Parse::RecDescent'	=> 1.965001,
-		'perl'				=> 5.006,
 		'Pod::Usage'		=> 1.16,
-		'strict'			=> 0,
 		'Time::HiRes'		=> 1.51,
-		'vars'				=> 0,
-		'warnings'			=> 0,
 		'XML::Twig'			=> 3.52,
 		'XML::XPath'		=> 1.13,
 	},
 	TEST_REQUIRES =>
 	{
 		'Test::More'	=> 1.001002,
-		'Test::Pod'		=> 1.48,
 	},
 	VERSION_FROM => 'lib/GraphViz.pm',
 );

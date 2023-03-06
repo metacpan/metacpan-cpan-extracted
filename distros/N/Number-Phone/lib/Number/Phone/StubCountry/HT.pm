@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[2-489]',
+                  'leading_digits' => '[2-589]',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{4})'
                 }
               ];
@@ -49,7 +49,12 @@ my $validators = {
             9[149]
           )\\d{5}
         ',
-                'mobile' => '[34]\\d{7}',
+                'mobile' => '
+          (?:
+            [34]\\d|
+            55
+          )\\d{6}
+        ',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
@@ -67,7 +72,7 @@ my $validators = {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+509|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '509', number => $number, formatters => $formatters, validators => $validators, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211024;
+our $VERSION = 1.20230305170050;
 
 my $formatters = [
                 {
@@ -172,82 +172,82 @@ my $validators = {
                 'voip' => '44\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"5667", "Coyhaique\,\ Aisén",
-"56538", "Ovalle\,\ Coquimbo",
-"565325", "Ovalle\,\ Coquimbo",
-"5642", "Chillán\,\ Biobío",
-"5664", "Osorno\,\ Los\ Lagos",
-"565326", "Ovalle\,\ Coquimbo",
-"56535", "Ovalle\,\ Coquimbo",
-"56532458", "Ovalle\,\ Coquimbo",
-"565321", "Ovalle\,\ Coquimbo",
-"56532456", "Ovalle\,\ Coquimbo",
-"5645", "Temuco\,\ Araucanía",
-"5653246", "Ovalle\,\ Coquimbo",
-"5665", "Puerto\ Montt\,\ Los\ Lagos",
-"565320", "Ovalle\,\ Coquimbo",
-"5672", "Rancagua\,\ O\'Higgins",
-"56536", "Ovalle\,\ Coquimbo",
-"5623", "Santiago\,\ Metropolitan\ Region",
-"5653242", "Ovalle\,\ Coquimbo",
-"565323", "Ovalle\,\ Coquimbo",
-"5653249", "Ovalle\,\ Coquimbo",
-"56532457", "Ovalle\,\ Coquimbo",
-"5633", "Quillota\,\ Valparaíso",
-"56211", "Santiago\,\ Metropolitan\ Region",
-"56532459", "Ovalle\,\ Coquimbo",
-"5653240", "Ovalle\,\ Coquimbo",
-"5651", "La\ Serena\,\ Coquimbo",
-"56532455", "Ovalle\,\ Coquimbo",
-"56534", "Ovalle\,\ Coquimbo",
-"5675", "Curicó\,\ Maule",
-"5653248", "Ovalle\,\ Coquimbo",
-"565329", "Ovalle\,\ Coquimbo",
+$areanames{en} = {"56537", "Ovalle\,\ Coquimbo",
 "56531", "Ovalle\,\ Coquimbo",
-"56530", "Ovalle\,\ Coquimbo",
+"5633", "Quillota\,\ Valparaíso",
+"5635", "San\ Antonio\,\ Valparaíso",
+"5623", "Santiago\,\ Metropolitan\ Region",
 "56532453", "Ovalle\,\ Coquimbo",
+"56536", "Ovalle\,\ Coquimbo",
 "5658", "Arica\,\ Arica\ and\ Parinacota",
-"565327", "Ovalle\,\ Coquimbo",
-"5634", "San\ Felipe\,\ Valparaíso",
-"56533", "Ovalle\,\ Coquimbo",
-"5671", "Talca\,\ Maule",
-"5655", "Antofagasta",
-"5626", "Santiago\,\ Metropolitan\ Region",
-"5653241", "Ovalle\,\ Coquimbo",
-"56537", "Ovalle\,\ Coquimbo",
-"565328", "Ovalle\,\ Coquimbo",
+"5672", "Rancagua\,\ O\'Higgins",
+"56535", "Ovalle\,\ Coquimbo",
+"5667", "Coyhaique\,\ Aisén",
+"565323", "Ovalle\,\ Coquimbo",
+"56532456", "Ovalle\,\ Coquimbo",
+"56532457", "Ovalle\,\ Coquimbo",
+"5653246", "Ovalle\,\ Coquimbo",
+"5653242", "Ovalle\,\ Coquimbo",
+"56211", "Santiago\,\ Metropolitan\ Region",
+"5651", "La\ Serena\,\ Coquimbo",
+"56534", "Ovalle\,\ Coquimbo",
+"5664", "Osorno\,\ Los\ Lagos",
+"565325", "Ovalle\,\ Coquimbo",
+"56539", "Ovalle\,\ Coquimbo",
 "5661", "Punta\ Arenas\,\ Magallanes\ and\ Antártica\ Chilena",
-"5643", "Los\ Angeles\,\ Biobío",
-"5652", "Copiapó\,\ Atacama",
 "56532452", "Ovalle\,\ Coquimbo",
-"5663", "Valdivia\,\ Los\ Ríos",
+"5653241", "Ovalle\,\ Coquimbo",
+"5632", "Valparaíso",
+"565320", "Ovalle\,\ Coquimbo",
 "5641", "Concepción\,\ Biobío",
 "565322", "Ovalle\,\ Coquimbo",
-"5635", "San\ Antonio\,\ Valparaíso",
-"5657", "Iquique\,\ Tarapacá",
-"5653243", "Ovalle\,\ Coquimbo",
-"56539", "Ovalle\,\ Coquimbo",
-"5673", "Linares\,\ Maule",
 "5622", "Santiago\,\ Metropolitan\ Region",
-"5632", "Valparaíso",
-"562198", "Santiago\,\ Metropolitan\ Region",
+"5673", "Linares\,\ Maule",
+"565328", "Ovalle\,\ Coquimbo",
+"5653249", "Ovalle\,\ Coquimbo",
 "5653244", "Ovalle\,\ Coquimbo",
+"5675", "Curicó\,\ Maule",
+"5657", "Iquique\,\ Tarapacá",
+"5663", "Valdivia\,\ Los\ Ríos",
+"5652", "Copiapó\,\ Atacama",
+"5653248", "Ovalle\,\ Coquimbo",
+"5665", "Puerto\ Montt\,\ Los\ Lagos",
+"56538", "Ovalle\,\ Coquimbo",
+"5653240", "Ovalle\,\ Coquimbo",
+"562198", "Santiago\,\ Metropolitan\ Region",
 "56532454", "Ovalle\,\ Coquimbo",
-"5653247", "Ovalle\,\ Coquimbo",};
-$areanames{es} = {"5622", "Santiago\,\ Región\ Metropolitana",
+"565326", "Ovalle\,\ Coquimbo",
+"5653247", "Ovalle\,\ Coquimbo",
+"5671", "Talca\,\ Maule",
+"56532455", "Ovalle\,\ Coquimbo",
+"5643", "Los\ Angeles\,\ Biobío",
+"5645", "Temuco\,\ Araucanía",
+"565327", "Ovalle\,\ Coquimbo",
+"56530", "Ovalle\,\ Coquimbo",
+"5626", "Santiago\,\ Metropolitan\ Region",
+"5634", "San\ Felipe\,\ Valparaíso",
+"5642", "Chillán\,\ Biobío",
+"565329", "Ovalle\,\ Coquimbo",
+"56532458", "Ovalle\,\ Coquimbo",
+"56532459", "Ovalle\,\ Coquimbo",
+"565321", "Ovalle\,\ Coquimbo",
+"5655", "Antofagasta",
+"5653243", "Ovalle\,\ Coquimbo",
+"56533", "Ovalle\,\ Coquimbo",};
+$areanames{es} = {"5626", "Santiago\,\ Región\ Metropolitana",
 "562198", "Santiago\,\ Región\ Metropolitana",
+"5622", "Santiago\,\ Región\ Metropolitana",
 "5661", "Punta\ Arenas\,\ Magallanes",
-"5658", "Arica\,\ Arica\ y\ Parinacota",
-"5626", "Santiago\,\ Región\ Metropolitana",
-"5623", "Santiago\,\ Región\ Metropolitana",
 "56211", "Santiago\,\ Región\ Metropolitana",
-"5667", "Coihaique\,\ Aysén",};
+"5658", "Arica\,\ Arica\ y\ Parinacota",
+"5667", "Coihaique\,\ Aysén",
+"5623", "Santiago\,\ Región\ Metropolitana",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+56|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '56', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

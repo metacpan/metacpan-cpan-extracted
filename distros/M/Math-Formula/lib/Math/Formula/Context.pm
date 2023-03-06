@@ -5,7 +5,7 @@
 
 package Math::Formula::Context;
 use vars '$VERSION';
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 
 use warnings;
@@ -50,6 +50,7 @@ sub init($)
 	}
 
 	$self->{MFC_claims} = { };
+	$self->{MFC_capts}  = [ ];
 	$self;
 }
 
@@ -153,6 +154,7 @@ sub addFragment($;$)
 
 sub fragment($) { $_[0]->{MFC_frags}{$_[1]} }
 
+#-------------------
 
 sub evaluate($$%)
 {	my ($self, $name) = (shift, shift);
@@ -196,6 +198,13 @@ sub value($@)
 	my $result = $self->run(@_);
 	$result ? $result->value : undef;
 }
+
+
+sub setCaptures($) { $_[0]{MFC_capts} = $_[1] }
+sub _captures() { $_[0]{MFC_capts} }
+
+
+sub capture($) { $_[0]->_captures->[$_[1]] }
 
 #--------------
 

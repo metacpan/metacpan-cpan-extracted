@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211022;
+our $VERSION = 1.20230305170049;
 
 my $formatters = [
                 {
@@ -69,45 +69,45 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9713", "Al\ Ain",
-"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97146", "Dubai",
-"97197", "Fujairah",
-"97195", "Fujairah",
+$areanames{en} = {"97178", "Ras\ Alkhaimah",
+"97144", "Dubai",
+"97193", "Fujairah",
 "97176", "Ras\ Alkhaimah",
 "97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
 "9712", "Abu\ dhabi",
-"97144", "Dubai",
-"97174", "Ras\ Alkhaimah",
-"97192", "Fujairah",
-"97198", "Fujairah",
-"97193", "Fujairah",
-"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97142", "Dubai",
-"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97143", "Dubai",
-"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97148", "Dubai",
-"97173", "Ras\ Alkhaimah",
-"97178", "Ras\ Alkhaimah",
+"97175", "Ras\ Alkhaimah",
 "97172", "Ras\ Alkhaimah",
-"97194", "Fujairah",
-"97147", "Dubai",
-"97145", "Dubai",
-"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
 "97177", "Ras\ Alkhaimah",
+"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97194", "Fujairah",
+"97143", "Dubai",
+"97142", "Dubai",
+"97147", "Dubai",
+"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97174", "Ras\ Alkhaimah",
+"97148", "Dubai",
+"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97146", "Dubai",
+"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97145", "Dubai",
+"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97195", "Fujairah",
+"9713", "Al\ Ain",
+"97198", "Fujairah",
 "97196", "Fujairah",
-"97175", "Ras\ Alkhaimah",};
+"97173", "Ras\ Alkhaimah",
+"97192", "Fujairah",
+"97197", "Fujairah",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+971|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '971', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '971', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

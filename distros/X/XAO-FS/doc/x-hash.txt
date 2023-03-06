@@ -251,12 +251,15 @@ DESCRIPTION
         Convenience method that checks object structure and adds specified
         placeholders if they do not currently exist.
 
-        Upon return object will have at least the given fields. It can have
-        some extra fields that were on the object before, but given fields
-        guaranteed to exist and have the same descriptions as provided.
+        If any existing field has a different description than supplied
+        build_structure() method will adjust the database structure when
+        possible, or throw an error if an automatic adjustment is not
+        supported.
 
-        If any existing field has different description than supplied
-        build_structure() method will throw an error.
+        Upon return, the object will have at least the given fields. It can
+        have some extra fields that were on the object before, but given
+        fields guaranteed to exist and have the same descriptions as
+        provided. The list of extra fields is returned.
 
         Example:
 
@@ -280,6 +283,13 @@ DESCRIPTION
                  type => 'text',
                  maxlength => 100
              });
+
+    sync_structure (%)
+        Build the given structure (similarly to build_structure()) and drop
+        all fields that are not mentioned in the given structure definition.
+
+        DANGER: This routine can irreversibly delete table fields and whole
+        tables.
 
     collection_key ()
         Returns the same ID of the object that would be used be a collection

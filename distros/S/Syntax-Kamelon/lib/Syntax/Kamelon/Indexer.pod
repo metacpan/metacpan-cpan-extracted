@@ -93,13 +93,19 @@ These methods return general information about the syntax definitions.
 
 =item B<Info>(I<$syntax>, I<$tag>);
 
-$tag can have the value: 'ext', 'mime', 'menu', 'file' or 'version'.
+$tag can have the value: 'ext', 'slcomment', 'mlcommentend', 'mlcommentstart', 'mime', 'menu', 'file' or 'version'.
 
 =item B<InfoExtensions>(I<$syntax>);
+
+=item B<InfoMLCommentEnd(I<$syntax>);
+
+=item B<InfoMLCommentStart(I<$syntax>);
 
 =item B<InfoMimeType>(I<$syntax>);
 
 =item B<InfoSection>(I<$syntax>);
+
+=item B<InfoSLComment>(I<$syntax>);
 
 =item B<InfoVersion>(I<$syntax>);
 
@@ -128,16 +134,18 @@ Sets and returns the xml folder name. Corresponds with the B<xmlfolder> option.
 
 This module is written and maintained by:
 
-Hans Jeuken < hansjeuken at xs4all dot nl>
+Hans Jeuken < hanje at cpan dot org >
 
-Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+Copyright (c) 2017 - 2023 by Hans Jeuken, all rights reserved.
 
-Published under the GPLV3 license
+Published under the same license as Perl.
 
 =head1 SEE ALSO
 
-B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
-B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format:HTML4>
+L<Syntax::Kamelon>, L<Syntax::Kamelon::Builder>,  L<Syntax::Kamelon::Debugger>,
+L<Syntax::Kamelon::Diagnostics>, L<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>,
+L<Syntax::Kamelon::Format::ANSI>, L<Syntax::Kamelon::Format:HTML4>
+
 
 =cut
 

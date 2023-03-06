@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,57 +22,62 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
                   'leading_digits' => '
-            2[126]|
+            2[16]|
             8
           ',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[2-7]',
+                  'leading_digits' => '[3-7]',
                   'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
                 'fixed_line' => '
-          414[1-4]\\d{4}|
-          (?:
-            23|
-            4[04]
-          )\\d{6}
+          4(?:
+            1111|
+            2022
+          )\\d{3}|
+          4(?:
+            [04]\\d\\d|
+            14[0-6]|
+            999
+          )\\d{4}
         ',
                 'geographic' => '
-          414[1-4]\\d{4}|
-          (?:
-            23|
-            4[04]
-          )\\d{6}
+          4(?:
+            1111|
+            2022
+          )\\d{3}|
+          4(?:
+            [04]\\d\\d|
+            14[0-6]|
+            999
+          )\\d{4}
         ',
-                'mobile' => '
-          (?:
-            2[89]|
-            [35-7]\\d
-          )\\d{6}
-        ',
+                'mobile' => '[35-7]\\d{7}',
                 'pager' => '
           2(?:
-            [12]\\d|
+            1\\d|
             61
           )\\d{4}
         ',
                 'personal_number' => '',
                 'specialrate' => '',
                 'toll_free' => '
-          800\\d{4}(?:
-            \\d{2}
-          )?
+          800\\d{4}|
+          (?:
+            0080[01]|
+            800
+          )\\d{6}
         ',
                 'voip' => ''
               };
@@ -81,7 +86,7 @@ my $validators = {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+974|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '974', number => $number, formatters => $formatters, validators => $validators, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

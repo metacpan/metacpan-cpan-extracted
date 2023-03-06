@@ -6,6 +6,13 @@ TODO:
     * Support dual household income tax calculations
     * Convert to Object::Pad
 
+0.008     2023-03-05 14:30:45Z
+
+    * Update POD
+    * Fix bug where pension-employe[er] disappeared from loon.pl
+    * Fix total company cost calculations
+    * Add government costs and social costs numbers to the calculator
+
 0.007     2023-02-07 16:36:22Z
 
     * Support employer pays all constructions

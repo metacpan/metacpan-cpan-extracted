@@ -6,6 +6,23 @@ Home page:    <https://metacpan.org/release/Hydrogen>
 Bug tracker:  <https://github.com/tobyink/p5-hydrogen/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.020000	2023-03-04
+
+ [ Documentation ]
+ - Copyright 2023.
+ - Include String::Util in SEE ALSO.
+ - Mention that Lexical::Sub enables lexical imports on older Perls.
+
+ [ Test Suite ]
+ - Rename a bunch of test files.
+
+ [ Packaging ]
+ - Switch to X.YYYZZZ version numbers.
+
+0.018	2023-03-04
+
+ - Updated: Rebuild with Sub::HandlesVia 0.046.
+
 0.017	2022-10-21
 
  - Updated: Rebuild with Sub::HandlesVia 0.038.

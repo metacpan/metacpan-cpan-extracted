@@ -2,7 +2,7 @@ package App::proxyforurl;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 1;
 
@@ -11,10 +11,6 @@ our $VERSION = '1.01';
 =head1 NAME
 
 App::proxyforurl - An online proxy PAC file parser
-
-=head1 VERSION
-
-0.12
 
 =head1 DESCRIPTION
 

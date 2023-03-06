@@ -28,22 +28,17 @@ This module is the logging module. You can define custom logformats.
 
 package Rex::Logger;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
-#use Rex;
+use English qw(-no_match_vars);
+use Term::ANSIColor;
+
+use if $OSNAME eq 'MSWin32', 'Win32::Console::ANSI';
 
 our $no_color = 0;
-eval "use Term::ANSIColor";
-if ($@) { $no_color = 1; }
-
-if ( $^O =~ m/MSWin/ ) {
-  eval "use Win32::Console::ANSI";
-  if ($@) { $no_color = 1; }
-}
 
 my $has_syslog = 0;
 my $log_fh;
@@ -95,7 +90,7 @@ sub init {
   eval {
     die
       if ( Rex::Config->get_log_filename || !Rex::Config->get_log_facility );
-    die if ( $^O =~ m/^MSWin/ );
+    die if ( $OSNAME =~ m/^MSWin/ );
 
     Sys::Syslog->use;
     openlog( "rex", "ndelay,pid", Rex::Config->get_log_facility );
@@ -137,7 +132,7 @@ sub info {
   }
 
   if ( Rex::Config->get_log_filename() ) {
-    open( $log_fh, ">>", Rex::Config->get_log_filename() ) or die($!);
+    open( $log_fh, ">>", Rex::Config->get_log_filename() ) or die($OS_ERROR);
     flock( $log_fh, 2 );
     print {$log_fh} "$msg\n" if ($log_fh);
     close($log_fh);
@@ -190,7 +185,7 @@ sub debug {
   }
 
   if ( Rex::Config->get_log_filename() ) {
-    open( $log_fh, ">>", Rex::Config->get_log_filename() ) or die($!);
+    open( $log_fh, ">>", Rex::Config->get_log_filename() ) or die($OS_ERROR);
     flock( $log_fh, 2 );
     print {$log_fh} "$msg\n" if ($log_fh);
     close($log_fh);
@@ -240,9 +235,6 @@ sub shutdown {
 
 }
 
-# %D - Date
-# %h - Host
-# %s - Logstring
 sub format_string {
   my ( $s, $level ) = @_;
 
@@ -252,7 +244,6 @@ sub format_string {
     && Rex::get_current_connection()->{conn}->server
     ? Rex::get_current_connection()->{conn}->server
     : "<local>";
-  my $pid = $$;
 
   my $line = $format;
 
@@ -260,7 +251,7 @@ sub format_string {
   $line =~ s/\%h/$host/gms;
   $line =~ s/\%s/$s/gms;
   $line =~ s/\%l/$level/gms;
-  $line =~ s/\%p/$pid/gms;
+  $line =~ s/\%p/$PID/gms;
 
   return $line;
 }

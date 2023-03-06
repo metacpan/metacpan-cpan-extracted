@@ -8,7 +8,7 @@ use JSON::MaybeXS;
 use Mojo::UserAgent;
 use Ethereum::RPC::Contract;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has host => (
     is      => 'ro',
@@ -34,9 +34,10 @@ sub AUTOLOAD {
 
     $self->{id} = 1;
     my $obj = {
-        id     => $self->{id}++,
-        method => $method,
-        params => (ref $_[0] ? $_[0] : [@_]),
+        id      => $self->{id}++,
+        method  => $method,
+        jsonrpc => '2.0',
+        params  => (ref $_[0] ? $_[0] : [@_]),
     };
 
     my $res = $self->http_client->post($url => json => $obj)->result;

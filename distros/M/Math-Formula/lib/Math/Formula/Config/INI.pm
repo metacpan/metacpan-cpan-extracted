@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.03.
 package Math::Formula::Config::INI;
 use vars '$VERSION';
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 use base 'Math::Formula::Config';
 

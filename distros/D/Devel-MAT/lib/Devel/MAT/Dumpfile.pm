@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.49;
+package Devel::MAT::Dumpfile 0.50;
 
 use v5.14;
 use warnings;
@@ -265,6 +265,14 @@ sub load
    $self->{contexts} = \my @contexts;
    while( my $ctx = $self->_read_ctx ) {
       push @contexts, $ctx;
+   }
+
+   # From here onwards newer files have mortals, older ones don't
+   if( my $mortalcount = $self->_read_uint ) {
+      $self->{mortals_at} = \my @mortals_at;
+      push @mortals_at, $self->_read_ptr for 1 .. $mortalcount;
+      $self->sv_at( $_ )->_set_is_mortal for @mortals_at;
+      $self->{mortal_floor} = $self->_read_uint;
    }
 
    $self->_fixup( %args ) unless $args{no_fixup};

@@ -1,4 +1,6 @@
-use strict;
+#!/usr/bin/env perl
+
+use v5.12.5;
 use warnings;
 
 use Test::More tests => 21;
@@ -141,4 +143,3 @@ for my $key ( keys %{$v} ) {
     "$var_name is equal to " . $v->{$key}->{name}
   );
 }
-

@@ -16,12 +16,6 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
   my $handle = IO::Handle->new;
   $handle->set_autoflush(1);
 
-=head1 Interfaces
-
-=head2 IO::Handle::Interface
-
-L<IO::Handle::Interface|SPVM::IO::Handle::Interface>
-
 =head1 Instance Methods
 
 =head1 Fields
@@ -49,8 +43,6 @@ L<IO::Handle::Interface|SPVM::IO::Handle::Interface>
   static method new : IO::Handle ($options : object[]);
 
 =head1 Instance Methods
-
-  method has_interfaces : int ();
 
 =head2 init
 

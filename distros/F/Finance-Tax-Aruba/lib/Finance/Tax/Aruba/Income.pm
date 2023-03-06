@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use warnings;
 use strict;
 
@@ -45,12 +45,14 @@ Finance::Tax::Aruba::Income - Income tax calculations for Aruba
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
     use Finance::Tax::Aruba::Income;
 
+    # For all the options, please see
+    # Finance::Tax::Aruba::Role::Income::TaxYear
     my %opts = (
         income => 7000
     );
@@ -63,13 +65,17 @@ Factory for tax calculations
 
 =head1 SUPPORTED YEARS
 
-Currently only the year 2020 is supported.
+All the years from 2020 up to 2023 are supported.
 
 =head1 METHODS
 
 =head2 tax_year
 
 Factory method to create the correct calculator for a given tax year
+
+=head1 SEE ALSO
+
+L<Finance::Tax::Aruba::Role::Income::TaxYear>
 
 =head1 AUTHOR
 

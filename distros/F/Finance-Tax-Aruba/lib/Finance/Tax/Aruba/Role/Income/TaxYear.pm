@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -472,11 +472,20 @@ sub net_income {
 sub company_costs {
     my $self = shift;
     return
-          $self->net_income
-        + $self->aov_premium
-        + $self->azv_premium
-        + $self->income_tax
-        + $self->pension_employer;
+        $self->yearly_income_gross
+         + $self->aov_employer
+         + $self->azv_employer
+         + $self->pension_employer;
+}
+
+sub government_costs {
+    my $self = shift;
+    return $self->aov_premium + $self->azv_premium + $self->income_tax
+}
+
+sub social_costs {
+    my $self = shift;
+    return $self->government_costs + $self->pension_total;
 }
 
 around BUILDARGS => sub {
@@ -506,17 +515,15 @@ around BUILDARGS => sub {
         $args{pension_employer_perc} = 0;
         $args{pension_employee_perc} = 0;
     }
-    else {
-        if ($args{pension_employee_perc}) {
+    elsif (exists $args{pension_employee_perc}) {
             $self->_offset_values('pension_employee_perc',
                 $args{pension_employee_perc},
                 'pension_employer_perc', \%args);
-        }
-        if ($args{pension_employer_perc}) {
-            $self->_offset_values('pension_employer_perc',
-                $args{pension_employer_perc},
-                'pension_employee_perc', \%args);
-        }
+    }
+    elsif (exists $args{pension_employer_perc}) {
+        $self->_offset_values('pension_employer_perc',
+            $args{pension_employer_perc},
+            'pension_employee_perc', \%args);
     }
 
     if ($args{premiums_employer}) {
@@ -574,7 +581,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

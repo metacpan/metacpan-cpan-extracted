@@ -1,6 +1,6 @@
 package App::digitdemog ; 
-our $VERSION = '0.071' ; 
-our $DATE = '2023-03-02T23:55+09:00' ; 
+our $VERSION = '0.085' ; 
+our $DATE = '2023-03-06T01:23+09:00' ; 
 
 =encoding utf8
 
@@ -16,15 +16,15 @@ This module provides a Unix-like command `digitdemog'.
 
 想定している使い方 (digitdemog) : 
 
-  - 何桁目にどんな文字が現れたのかを解読する
-  - 最も長いもしくは短い行の例を知る。
-  - L2 か -L4 のオプションで、行の文字列長ごとの例を知る。
+  1. 何桁目にどんな文字が現れたのか把握することで、調べたい文字列データの性質を解読する
+  2. 最も長いもしくは短い行の例を知る。
+  3. L2 か -L4 のオプションで、行の文字列長ごとの例を知る。
  
 =head1 SEE ALSO
 
 digitdemog --help 
 
- Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ Copyright (c) 2023 Toshiyuki SHIMONO. All rights reserved.
  This program is free software; you can redistribute it and/or
  modify it under the same terms as Perl itself.
 

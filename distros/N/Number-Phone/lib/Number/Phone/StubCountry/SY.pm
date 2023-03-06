@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -80,34 +80,34 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96315", "Dara",
+$areanames{en} = {"96313", "Al\-Zabadani",
+"96322", "Al\-Rakkah",
 "96321", "Aleppo",
-"96314", "Al\-Quneitra",
-"96343", "Tartous",
-"96353", "Al\-Kameshli",
-"96333", "Hamah",
-"96352", "Alhasakah",
-"96311", "Damascus\ and\ rural\ areas",
 "96325", "Menbej",
-"96331", "Homs",
-"96351", "Deir\ Ezzour",
-"96312", "Al\-Nebek",
-"96313", "Al\-Zabadani",
-"96316", "Al\-Swedaa",
+"96333", "Hamah",
+"96353", "Al\-Kameshli",
+"96343", "Tartous",
 "96344", "Hamah",
-"96334", "Palmyra",
-"96323", "Edleb",
+"96316", "Al\-Swedaa",
 "96341", "Lattakia",
-"96322", "Al\-Rakkah",};
+"96351", "Deir\ Ezzour",
+"96352", "Alhasakah",
+"96334", "Palmyra",
+"96331", "Homs",
+"96315", "Dara",
+"96323", "Edleb",
+"96312", "Al\-Nebek",
+"96311", "Damascus\ and\ rural\ areas",
+"96314", "Al\-Quneitra",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+963|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '963', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '963', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

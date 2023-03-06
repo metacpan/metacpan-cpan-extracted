@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -91,43 +91,43 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2048", "Monufia",
-"2088", "Assiout",
-"2092", "Wadi\ El\-Gedid",
-"2045", "Damanhur",
-"2013", "Banha",
-"2015", "10th\ of\ Ramadan",
-"2082", "Beni\ Suef",
-"2095", "Luxor",
-"2093", "Sohag",
-"2066", "Port\ Said",
-"2055", "Zagazig",
-"2064", "Ismailia",
-"2050", "Mansoura",
-"2062", "Suez",
-"2046", "Marsa\ Matruh",
-"20554", "10th\ of\ Ramadan",
-"2069", "El\-Tor",
-"2084", "Fayoum",
-"2047", "Kafr\ El\-Sheikh",
-"2086", "Minia",
-"2096", "Qena",
-"2065", "Red\ Sea",
-"2040", "Tanta",
+$areanames{en} = {"2065", "Red\ Sea",
 "202", "Cairo\/Giza\/Qalyubia",
 "203", "Alexandria",
 "2097", "Aswan",
+"2086", "Minia",
+"2093", "Sohag",
+"2040", "Tanta",
+"2095", "Luxor",
+"2084", "Fayoum",
+"2047", "Kafr\ El\-Sheikh",
+"2088", "Assiout",
+"2082", "Beni\ Suef",
+"2045", "Damanhur",
+"20554", "10th\ of\ Ramadan",
+"2050", "Mansoura",
+"2064", "Ismailia",
+"2048", "Monufia",
+"2066", "Port\ Said",
+"2015", "10th\ of\ Ramadan",
+"2096", "Qena",
+"2013", "Banha",
+"2055", "Zagazig",
+"2062", "Suez",
+"2092", "Wadi\ El\-Gedid",
+"2057", "Damietta",
+"2046", "Marsa\ Matruh",
 "2068", "El\-Arish",
-"2057", "Damietta",};
+"2069", "El\-Tor",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+20|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '20', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '20', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

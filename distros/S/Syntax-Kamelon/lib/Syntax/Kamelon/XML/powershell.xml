@@ -1,13 +1,13 @@
-<!DOCTYPE language SYSTEM "language.dtd">
+<!DOCTYPE language>
 <language
   name="PowerShell"
-  version="2"
+  version="13"
   kateversion="5.0"
-  extensions="*.ps1;*.ps1m;*.ps1d"
+  extensions="*.ps1;*.psm1;*.psd1"
   section="Scripts"
   author="Motoki Kashihara (motoki8791@gmail.com); Michael Lombardi (Michael.T.Lombardi@outlook.com)"
   casesensitive="0"
-  license="LGPLv2+">
+  license="MIT">
   <highlighting>
     <list name="keywords">
       <item>Begin</item>
@@ -47,7 +47,8 @@
       <item>Param</item>
       <item>Workflow</item>
     </list>
-    <list name="attributes">
+<!-- TODO: Seems unused?!
+      <list name="attributes">
       <item>CmdletBinding</item>
       <item>ConfirmImpact</item>
       <item>DefaultParameterSetName</item>
@@ -55,7 +56,7 @@
       <item>SupportsPaging</item>
       <item>SupportsShouldProcess</item>
       <item>PositionalBinding</item>
-    </list>
+    </list>-->
     <list name="types">
       <item>bool</item>
       <item>byte</item>
@@ -74,7 +75,8 @@
       <item>ulong</item>
       <item>ushort</item>
     </list>
-    <list name="operators">
+<!-- TODO: Seems unused?!
+      <list name="operators">
       <item>-split</item>
       <item>-isplit</item>
       <item>-csplit</item>
@@ -135,7 +137,7 @@
       <item>*=</item>
       <item>/=</item>
       <item>%=</item>
-    </list>
+    </list>-->
     <list name="cmdlets">
       <item>Add-Content</item>
       <item>Add-ADComputerServiceAccount</item>
@@ -877,22 +879,36 @@
         <keyword attribute="Data Type" context="#stay" String="types" />
         <IncludeRules context="Cmdlet" />
         <DetectChar attribute="String" context="String" char="&quot;"/>
+        <DetectChar attribute="String" context="StringQ" char="'"/>
         <Detect2Chars attribute="HereString" context="HereStringer" char="@" char1="&quot;" beginRegion="StringRegion"/>
-        <IncludeRules context="##Doxygen" />
         <DetectChar attribute="Comment" context="Commentar 1" char="#"/>
         <Detect2Chars attribute="Comment" context="Commentar 2" char="&lt;" char1="#" beginRegion="CommentRegion"/>
         <DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="block1"/>
         <DetectChar attribute="Symbol" context="#stay" char="}" endRegion="block1"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\b\$global(?=\s+(:))"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\b\$script(?=\s+(:))"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\b\$(global|script)(?=\s+(:))"/>
         <RegExpr attribute="Variable" context="#stay" String="\$+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*" />
         <keyword attribute="Special Variable" context="#stay" String="special-variables"/>
-        <RegExpr attribute="Symbol" context="Member" String="[.]{1,1}" />
-        <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/.*&lt;=&gt;?[]|~^&#59;"/>
+        <DetectChar attribute="Symbol" context="Member" char="." />
+        <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/*&lt;=&gt;?[]|~^&#59;"/>
+      </context>
+      <context attribute="String Char" lineEndContext="#stay" name="StringEscape">
+        <RegExpr attribute="String Char" String="`[`&quot;0abefnrtv\$]|`u\{[0-9A-Fa-f]+\}" context="#stay"/>
       </context>
       <context attribute="String" lineEndContext="#pop" name="String">
+        <IncludeRules context="StringEscape"/>
+        <Detect2Chars attribute="Variable Substitution" context="#stay" char="$" char1="_" />
+        <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
         <LineContinue attribute="String" context="#pop"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+      <context attribute="String" lineEndContext="#pop" name="StringQ">
+        <IncludeRules context="StringEscape"/>
+        <LineContinue attribute="String" context="#pop"/>
+        <DetectChar attribute="String" context="#pop" char="'"/>
+      </context>
+      <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
+        <DetectIdentifier />
+        <DetectChar attribute="Variable Substitution" context="#pop" char="}" />
       </context>
       <context attribute="HereString" lineEndContext="#stay" name="HereStringer">
         <Detect2Chars attribute="HereString" context="#pop" char="&quot;" char1="@" endRegion="StringRegion"/>
@@ -900,27 +916,32 @@
       <context attribute="Normal Text" lineEndContext="#pop" name="Member" fallthrough="true" fallthroughContext="#pop">
         <RegExpr attribute="Function" context="#pop" String="\b[_\w][_\w\d]*(?=[\s]*)" />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="Commentar 1"/>
-      <context attribute="Comment" lineEndContext="#stay" name="Commentar 2">
-        <Detect2Chars attribute="Comment" context="#pop" char="#" char1="&gt;" endRegion="CommentRegion"/>
+      <context attribute="Comment" lineEndContext="#pop" name="Commentar 1">
+        <DetectSpaces />
+        <IncludeRules context="##Comments"/>
       </context>
-      <context attribute="Cmdlets" lineEndContext="#stay" name="Cmdlet">
+      <context attribute="Comment" lineEndContext="#stay" name="Commentar 2">
+        <DetectSpaces />
+        <Detect2Chars attribute="Comment" context="#pop" char="#" char1="&gt;" endRegion="CommentRegion"/>
+        <IncludeRules context="##Comments"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="Cmdlet">
         <keyword attribute="Function" context="#stay" String="cmdlets"/>
       </context>
     </contexts>
     <itemDatas>
-		 <!--		 Adapted to work with Syntax::Kamelon-->
-		 <itemData name="Normal Text"  defStyleNum="dsNormal" spellChecking="false"/>
-      <itemData name="Keyword"      defStyleNum="dsKeyword" spellChecking="false"/>
-      <itemData name="Function"     defStyleNum="dsFunction" spellChecking="false"/>
-      <itemData name="Data Type"    defStyleNum="dsDataType" spellChecking="false"/>
-      <itemData name="String"       defStyleNum="dsString"/>
-      <itemData name="HereString"       defStyleNum="dsVerbatimString"/>
-      <itemData name="Comment"      defStyleNum="dsComment"/>
-      <itemData name="Cmdlets"      defStyleNum="dsBuiltIn" spellChecking="false"/>
-      <itemData name="Symbol"       defStyleNum="dsNormal" spellChecking="false"/>
-      <itemData name="Variable" defStyleNum="dsVariable" spellChecking="false"/>
-		<itemData name="Special Variable" defStyleNum="dsVerbatimString" bold="1" spellChecking="false"/>
+      <itemData name="Normal Text"           defStyleNum="dsNormal"   spellChecking="false"/>
+      <itemData name="Keyword"               defStyleNum="dsKeyword"  spellChecking="false"/>
+      <itemData name="Function"              defStyleNum="dsFunction" spellChecking="false"/>
+      <itemData name="Data Type"             defStyleNum="dsDataType" spellChecking="false"/>
+      <itemData name="String"                defStyleNum="dsString"/>
+      <itemData name="String Char"           defStyleNum="dsChar"     spellChecking="false"/>
+      <itemData name="HereString"            defStyleNum="dsVerbatimString"/>
+      <itemData name="Comment"               defStyleNum="dsComment"/>
+      <itemData name="Symbol"                defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Variable"              defStyleNum="dsVariable" spellChecking="false"/>
+      <itemData name="Special Variable"      defStyleNum="dsVariable" spellChecking="false" bold="1"/>
+      <itemData name="Variable Substitution" defStyleNum="dsString"   spellChecking="false" />
     </itemDatas>
   </highlighting>
   <general>
@@ -931,3 +952,4 @@
     <keywords casesensitive="0" weakDeliminator=":-"/>
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

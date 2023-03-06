@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -93,44 +93,44 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9435", "Kegalle",
-"9433", "Gampaha",
-"9457", "Bandarawela\,\ Badulla",
-"9454", "Nawalapitiya\,\ Kandy",
-"9441", "Matara",
-"9463", "Ampara",
-"9465", "Batticaloa",
-"9425", "Anuradhapura",
-"9423", "Mannar",
-"9438", "Panadura\,\ Kalutara",
-"9432", "Chilaw\,\ Puttalam",
+$areanames{en} = {"9465", "Batticaloa",
+"9435", "Kegalle",
 "9411", "Colombo",
+"9423", "Mannar",
+"9433", "Gampaha",
+"9425", "Anuradhapura",
+"9463", "Ampara",
+"9452", "Nuwara\ Eliya",
+"9437", "Kurunegala",
+"9467", "Kalmunai\,\ Ampara",
+"9427", "Polonnaruwa",
+"9454", "Nawalapitiya\,\ Kandy",
 "9447", "Hambantota",
+"9482", "Kandy",
+"9445", "Ratnapura",
 "9451", "Hatton\,\ Nuwara\ Eliya",
+"9434", "Kalutara",
+"9426", "Trincomalee",
+"9436", "Avissawella\,\ Colombo",
 "9491", "Galle",
 "9466", "Matale",
 "9424", "Vavuniya",
-"9437", "Kurunegala",
-"9426", "Trincomalee",
-"9455", "Badulla",
-"9436", "Avissawella\,\ Colombo",
-"9467", "Kalmunai\,\ Ampara",
-"9427", "Polonnaruwa",
-"9482", "Kandy",
-"9434", "Kalutara",
+"9431", "Negombo\,\ Gampaha",
 "9421", "Jaffna",
-"9452", "Nuwara\ Eliya",
-"9445", "Ratnapura",
-"9431", "Negombo\,\ Gampaha",};
+"9441", "Matara",
+"9455", "Badulla",
+"9432", "Chilaw\,\ Puttalam",
+"9457", "Bandarawela\,\ Badulla",
+"9438", "Panadura\,\ Kalutara",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+94|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '94', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '94', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

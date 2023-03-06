@@ -220,6 +220,10 @@ static void S_setup_constants(pTHX)
   DO_CONSTANT(KEYWORD_PLUGIN_EXPR);
   DO_CONSTANT(KEYWORD_PLUGIN_STMT);
 
+  DO_CONSTANT(G_SCALAR);
+  DO_CONSTANT(G_LIST);
+  DO_CONSTANT(G_VOID);
+
   DO_CONSTANT(OPf_WANT);
   DO_CONSTANT(OPf_WANT_VOID);
   DO_CONSTANT(OPf_WANT_SCALAR);
@@ -361,6 +365,24 @@ found:
     RETVAL
 
 SV *
+op_contextualize(SV *o, I32 context)
+  CODE:
+    ENTER_and_setup_pad("op_contextualize");
+    RETVAL = newSVop(op_contextualize(SvOPo(o), context));
+    LEAVE;
+  OUTPUT:
+    RETVAL
+
+SV *
+op_scope(SV *o)
+  CODE:
+    ENTER_and_setup_pad("op_scope");
+    RETVAL = newSVop(op_scope(SvOPo(o)));
+    LEAVE;
+  OUTPUT:
+    RETVAL
+
+SV *
 newOP(I32 type, I32 flags)
   CODE:
     ENTER_and_setup_pad("newOP");
@@ -370,10 +392,28 @@ newOP(I32 type, I32 flags)
     RETVAL
 
 SV *
+newASSIGNOP(I32 flags, SV *left, I32 optype, SV *right)
+  CODE:
+    ENTER_and_setup_pad("newASSIGNOP");
+    RETVAL = newSVop(newASSIGNOP(flags, SvOPo(left), optype, SvOPo(right)));
+    LEAVE;
+  OUTPUT:
+    RETVAL
+
+SV *
 newBINOP(I32 type, I32 flags, SV *first, SV *last)
   CODE:
     ENTER_and_setup_pad("newBINOP");
     RETVAL = newSVop(newBINOP(type, flags, SvOPo(first), SvOPo(last)));
+    LEAVE;
+  OUTPUT:
+    RETVAL
+
+SV *
+newCONDOP(I32 flags, SV *first, SV *trueop, SV *falseop)
+  CODE:
+    ENTER_and_setup_pad("newCONDOP");
+    RETVAL = newSVop(newCONDOP(flags, SvOPo(first), SvOPo(trueop), SvOPo(falseop)));
     LEAVE;
   OUTPUT:
     RETVAL

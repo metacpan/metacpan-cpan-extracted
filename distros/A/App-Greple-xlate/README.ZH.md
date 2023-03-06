@@ -67,7 +67,7 @@ App::Greple::xlate - greple的翻译支持模块
 
     指定原始和翻译文本的输出格式。
 
-    - **conflict**
+    - **conflict**, **cm**
 
         以[git(1)](http://man.he.net/man1/git)冲突标记格式打印原始和翻译文本。
 
@@ -100,9 +100,9 @@ App::Greple::xlate - greple的翻译支持模块
 
         打印原始文本和翻译文本，用单个空行分开。
 
-    - **none**
+    - **xtxt**
 
-        如果格式是`none`或不知道，则只打印翻译的文本。
+        如果格式是`xtxt`（翻译文本）或不知道，则只打印翻译文本。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

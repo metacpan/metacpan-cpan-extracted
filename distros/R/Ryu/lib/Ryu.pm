@@ -6,7 +6,7 @@ use warnings;
 # Older versions cannot complete the test suite successfully
 use 5.018;
 
-our $VERSION = '3.002';
+our $VERSION = '3.004';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -287,5 +287,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >> with contributions from:
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

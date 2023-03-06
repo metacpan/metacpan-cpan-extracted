@@ -1,5 +1,5 @@
 ---
-abstract: 'Google/RE2 Resources'
+abstract: 'Google/RE2 Resource'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -21,5 +21,5 @@ requires:
   SPVM: '0.9692'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Resource-RE2.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

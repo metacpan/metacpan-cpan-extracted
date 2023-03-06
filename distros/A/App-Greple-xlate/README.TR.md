@@ -67,7 +67,7 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
     Orijinal ve çevrilmiş metin için çıktı formatını belirtin.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Orijinal ve çevrilmiş metni [git(1)](http://man.he.net/man1/git) çakışma işaretleyici biçiminde yazdırın.
 
@@ -100,9 +100,9 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
         Orijinal ve çevrilmiş metni tek bir boş satırla ayırarak yazdırın.
 
-    - **none**
+    - **xtxt**
 
-        Eğer format `none` veya unkown ise, sadece çevrilmiş metin yazdırılır.
+        Biçim `xtxt` (çevrilmiş metin) veya bilinmiyorsa, yalnızca çevrilmiş metin yazdırılır.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

@@ -153,10 +153,7 @@ package Sidef::Types::String::String {
         $self->new($$self x $num);
     }
 
-    sub repeat {
-        my ($self, $num) = @_;
-        $self->times($num // (Sidef::Types::Number::Number::ONE));
-    }
+    *repeat = \&mul;
 
     sub eq {
         my ($self, $arg) = @_;
@@ -198,16 +195,18 @@ package Sidef::Types::String::String {
         $self->new(CORE::lc $$self);
     }
 
-    *downcase = \&lc;
-    *lower    = \&lc;
+    *downcase  = \&lc;
+    *lower     = \&lc;
+    *lowercase = \&lc;
 
     sub uc {
         my ($self) = @_;
         $self->new(CORE::uc $$self);
     }
 
-    *upcase = \&uc;
-    *upper  = \&uc;
+    *upcase    = \&uc;
+    *upper     = \&uc;
+    *uppercase = \&uc;
 
     sub fc {
         my ($self) = @_;
@@ -377,6 +376,7 @@ package Sidef::Types::String::String {
 
     sub parse_quotewords {
         my ($self, $delim, $keep) = @_;
+        $delim //= ' ';
         state $x = require Text::ParseWords;
         my @words = map { bless \$_ } Text::ParseWords::parse_line("$delim", ($keep ? 1 : 0), $$self);
         Sidef::Types::Array::Array->new(\@words);
@@ -548,6 +548,41 @@ package Sidef::Types::String::String {
     }
 
     *is_alnum = \&is_alphanum;
+
+    sub is_blank {
+        my ($self) = @_;
+        ($$self =~ /^[[:blank:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_graph {
+        my ($self) = @_;
+        ($$self =~ /^[[:graph:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_control {
+        my ($self) = @_;
+        ($$self =~ /^[[:cntrl:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_printable {
+        my ($self) = @_;
+        ($$self =~ /^[[:print:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_xdigit {
+        my ($self) = @_;
+        ($$self =~ /^[[:xdigit:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
 
     sub index {
         my ($self, $substr, $pos) = @_;
@@ -1312,28 +1347,62 @@ package Sidef::Types::String::String {
 
     sub encode {
         my ($self, $enc) = @_;
-
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::encode("$enc", $$self));
     }
 
     sub decode {
         my ($self, $enc) = @_;
-
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::decode("$enc", $$self));
     }
 
     sub encode_utf8 {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::encode_utf8($$self));
     }
 
     sub decode_utf8 {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::decode_utf8($$self));
+    }
+
+    sub deflate {
+        my ($self) = @_;
+        state $x = require IO::Compress::RawDeflate;
+        my $input = $$self;
+        IO::Compress::RawDeflate::rawdeflate(\$input => \my $output)
+          or die "String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError";
+        bless \$output;
+    }
+
+    sub inflate {
+        my ($self) = @_;
+        state $x = require IO::Uncompress::RawInflate;
+        my $input = $$self;
+        IO::Uncompress::RawInflate::rawinflate(\$input => \my $output)
+          or die "String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+        bless \$output;
+    }
+
+    sub gzip {
+        my ($self) = @_;
+        state $x = require IO::Compress::Gzip;
+        my $input = $$self;
+        IO::Compress::Gzip::gzip(\$input => \my $output)
+          or die "String.gzip failed: $IO::Compress::Gzip::GzipError";
+        bless \$output;
+    }
+
+    sub gunzip {
+        my ($self) = @_;
+        state $x = require IO::Uncompress::Gunzip;
+        my $input = $$self;
+        IO::Uncompress::Gunzip::gunzip(\$input => \my $output)
+          or die "String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError";
+        bless \$output;
     }
 
     sub _require {
@@ -1357,6 +1426,12 @@ package Sidef::Types::String::String {
     sub frequire {
         my ($self) = @_;
         Sidef::Module::Func->__NEW__($self->_require);
+    }
+
+    sub use {
+        my ($self) = @_;
+        eval("use $$self");
+        $@ ? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub run {

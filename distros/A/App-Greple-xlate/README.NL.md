@@ -67,7 +67,7 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
 
     Specificeer het uitvoerformaat voor originele en vertaalde tekst.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Print originele en vertaalde tekst in [git(1)](http://man.he.net/man1/git) conflictmarker formaat.
 
@@ -100,9 +100,9 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
 
         Originele en vertaalde tekst afdrukken, gescheiden door een enkele lege regel.
 
-    - **none**
+    - **xtxt**
 
-        Als het formaat `none` of onbekend is, wordt alleen de vertaalde tekst afgedrukt.
+        Als het formaat `xtxt` (vertaalde tekst) of onbekend is, wordt alleen vertaalde tekst afgedrukt.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

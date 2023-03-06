@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -64,37 +64,37 @@ my $validators = {
                 'voip' => '3[89]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"29931", "Nuuk",
-"29984", "Kangerlussuaq",
-"29989", "Aasiaat",
-"29934", "Nuuk",
-"29996", "Upernavik",
-"29981", "Maniitsoq",
-"29968", "Paamiut",
-"29986", "Sisimiut",
-"29991", "Qasigannguit",
-"29936", "Nuuk",
-"29999", "Ittoqqortoormiit",
-"29994", "Ilulissat",
-"29964", "Qaqortoq",
-"29987", "Kangaatsiaq",
-"29985", "Sisimiut",
-"29992", "Qeqertasuaq",
-"29961", "Nanortalik",
-"29935", "Nuuk",
-"29998", "Tasiilaq",
-"29966", "Narsaq",
-"29933", "Nuuk",
-"29997", "Qaanaaq",
-"29995", "Uummannaq",
+$areanames{en} = {"29964", "Qaqortoq",
+"29931", "Nuuk",
 "29932", "Nuuk",
-"299691", "Ivittuut",};
+"29936", "Nuuk",
+"29935", "Nuuk",
+"29999", "Ittoqqortoormiit",
+"29989", "Aasiaat",
+"29994", "Ilulissat",
+"29984", "Kangerlussuaq",
+"29934", "Nuuk",
+"29961", "Nanortalik",
+"29968", "Paamiut",
+"29966", "Narsaq",
+"29986", "Sisimiut",
+"29998", "Tasiilaq",
+"29996", "Upernavik",
+"29985", "Sisimiut",
+"29995", "Uummannaq",
+"29992", "Qeqertasuaq",
+"29991", "Qasigannguit",
+"29987", "Kangaatsiaq",
+"29997", "Qaanaaq",
+"299691", "Ivittuut",
+"29981", "Maniitsoq",
+"29933", "Nuuk",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+299|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '299', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -13,6 +13,8 @@ has input => ( is => 'rw', isa => Str, required => 1, );
 
 has user => ( is => 'rw', isa => Str, );
 
+sub endpoint { 'embeddings' }
+
 1;
 
 __END__

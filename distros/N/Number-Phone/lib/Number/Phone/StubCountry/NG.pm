@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -130,20 +130,17 @@ my $validators = {
                 'mobile' => '
           (?:
             702[0-24-9]|
-            8(?:
-              01|
-              19
-            )[01]
+            819[01]
           )\\d{6}|
           (?:
             70[13-689]|
             8(?:
-              0[2-9]|
+              0[1-9]|
               1[0-8]
             )|
             9(?:
               0[1-9]|
-              1[2356]
+              1[1-356]
             )
           )\\d{7}
         ',
@@ -154,88 +151,88 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"23483", "Owerri",
-"23482", "Aba",
-"234908", "Abuja",
-"23450", "Ikare",
+$areanames{en} = {"23464", "Kano",
+"23475", "Yola",
+"2342", "Ibadan",
+"23444", "Makurdi",
+"23476", "Maiduguri",
+"23493", "Abuja",
 "23452", "Benin",
 "23438", "Oyo",
-"23497", "Abuja",
+"23469", "Zaria",
+"23471", "Azare",
+"23458", "Lokoja",
+"23477", "Bauchi",
+"234906", "Abuja",
+"23489", "Yenegoa",
+"23484", "Port\ Harcourt",
+"23430", "Ado\ Ekiti",
+"23479", "Jalingo",
+"23461", "Kafanchau",
+"23467", "Kontagora",
+"23441", "Wukari",
+"23450", "Ikare",
+"23447", "Lafia",
+"23445", "Ogoja",
+"23466", "Minna",
+"23474", "Damaturu",
+"23465", "Katsina",
+"23446", "Onitsha",
+"23486", "Ahoada",
+"23498", "Abuja",
+"234909", "Abuja",
+"2347020", "Pank\ Shin",
+"23485", "Uyo",
+"23492", "Abuja",
 "23453", "Warri",
 "23487", "Calabar",
-"23469", "Zaria",
-"23493", "Abuja",
-"23457", "Auchi",
 "234907", "Abuja",
-"23435", "Oshogbo",
 "234904", "Abuja",
-"23479", "Jalingo",
-"23492", "Abuja",
-"23460", "Sokobo",
-"23443", "Abakaliki",
-"23462", "Kaduna",
-"23442", "Enugu",
-"23463", "Gusau",
-"23472", "Gombe",
-"23499", "Abuja",
-"23436", "Ile\ Ife",
-"23473", "Jos",
-"23489", "Yenegoa",
-"23467", "Kontagora",
-"23447", "Lafia",
-"23431", "Ilorin",
-"23477", "Bauchi",
-"2341", "Lagos",
-"23434", "Akura",
-"23459", "Okitipupa",
-"23446", "Onitsha",
-"23488", "Umuahia",
-"23466", "Minna",
-"23430", "Ado\ Ekiti",
-"23458", "Lokoja",
 "23433", "New\ Bussa",
-"234906", "Abuja",
-"23495", "Abuja",
-"23476", "Maiduguri",
-"23444", "Makurdi",
-"23471", "Azare",
-"23485", "Uyo",
-"234905", "Abuja",
-"2342", "Ibadan",
-"23464", "Kano",
-"23498", "Abuja",
-"23441", "Wukari",
-"23455", "Agbor",
+"23460", "Sokobo",
+"23431", "Ilorin",
 "23437", "Ijebu\ Ode",
-"23474", "Damaturu",
-"23461", "Kafanchau",
-"234909", "Abuja",
-"23486", "Ahoada",
-"23448", "Awka",
-"23491", "Abuja",
-"23468", "Birnin\-Kebbi",
-"23494", "Abuja",
-"23456", "Asaba",
 "23478", "Hadejia",
-"23484", "Port\ Harcourt",
-"2347020", "Pank\ Shin",
-"23465", "Katsina",
-"23445", "Ogoja",
+"23483", "Owerri",
+"23457", "Auchi",
 "23451", "Owo",
+"23455", "Agbor",
+"23436", "Ile\ Ife",
+"23456", "Asaba",
+"23472", "Gombe",
+"23435", "Oshogbo",
+"23499", "Abuja",
 "234903", "Abuja",
-"23496", "Abuja",
-"23475", "Yola",
+"23494", "Abuja",
+"23443", "Abakaliki",
+"2341", "Lagos",
+"23463", "Gusau",
+"23434", "Akura",
+"23462", "Kaduna",
+"234908", "Abuja",
+"23442", "Enugu",
+"23454", "Sapele",
+"23468", "Birnin\-Kebbi",
+"23459", "Okitipupa",
 "23439", "Abeokuta",
-"23454", "Sapele",};
+"23448", "Awka",
+"23473", "Jos",
+"23488", "Umuahia",
+"23496", "Abuja",
+"234905", "Abuja",
+"23495", "Abuja",
+"23491", "Abuja",
+"23497", "Abuja",
+"23482", "Aba",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+234|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '234', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '234', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

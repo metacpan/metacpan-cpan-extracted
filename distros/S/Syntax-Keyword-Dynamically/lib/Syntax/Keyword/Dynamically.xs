@@ -485,6 +485,7 @@ static int build_dynamically(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *ho
     /* op_free will destroy the entire optree so replace the child ops first */
     cBINOPx(aop)->op_first = NULL;
     cBINOPx(aop)->op_last = NULL;
+    aop->op_flags &= ~OPf_KIDS;
     op_free(aop);
   }
 

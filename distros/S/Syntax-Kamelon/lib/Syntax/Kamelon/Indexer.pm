@@ -54,8 +54,21 @@ sub CreateIndex {
 			if ($file =~ /.*\.xml$/) {
 				my $xml = $self->LoadXML("$folder/$file");
 				if (defined $xml) {
+					my %options = ();
+					my $cl = $xml->Comment;
+					for (keys %$cl) {
+						my $name = $_;
+						my $data = $cl->{$name};
+						if ($name =~ /^single/i) {
+							$options{'slcomment'} = $data->[0];
+						} else {
+							$options{'mlcommentstart'} = $data->[0];
+							$options{'mlcommentend'} = $data->[1];
+						}
+					}
 					my $l = $xml->Language;
-					$index{$l->{name}} = { 
+					$index{$l->{name}} = {
+						%options,
 						file => $file,
 						ext =>  $l->{extensions},
 						menu => $l->{section},
@@ -156,6 +169,7 @@ sub Info {
 			return $t
 		}
 	}
+	return undef
 }
 
 sub InfoExtensions {
@@ -170,9 +184,24 @@ sub InfoMimeType {
 	return $self->Info($syntax, 'mime')
 }
 
+sub InfoMLCommentEnd {
+	my ($self, $syntax) = @_;
+	return $self->Info($syntax, 'mlcommentend')
+}
+
+sub InfoMLCommentStart {
+	my ($self, $syntax) = @_;
+	return $self->Info($syntax, 'mlcommentstart')
+}
+
 sub InfoSection {
 	my ($self, $syntax) = @_;
 	return $self->Info($syntax, 'menu')
+}
+
+sub InfoSLComment {
+	my ($self, $syntax) = @_;
+	return $self->Info($syntax, 'slcomment')
 }
 
 sub InfoVersion {

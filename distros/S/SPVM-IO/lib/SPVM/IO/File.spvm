@@ -113,7 +113,7 @@ class IO::File extends IO::Handle {
     $self->{stream} = $stream;
   }
 
-  protected method init : void () {
+  protected method init : void ($options = undef : object[]) {
     $self->SUPER::init;
   }
   

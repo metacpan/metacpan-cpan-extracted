@@ -8,7 +8,7 @@ use v5.16;  # fc
 
 package Math::Formula::Type;
 use vars '$VERSION';
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 use base 'Math::Formula::Token';
 
@@ -38,7 +38,7 @@ sub cast($)
 
 # Returns a value as result of a calculation.
 # nothing to compute for most types: simply itself
-sub _compute { $_[0] }
+sub compute { $_[0] }
 
 
 sub value  { my $self = shift; $self->[1] //= $self->_value($self->[0], @_) }
@@ -106,12 +106,19 @@ sub infix($$$)
 	my ($op, $right, $context) = @_;
 
 	if(my $r = $right->isa('MF::BOOLEAN') ? $right : $right->cast('MF::BOOLEAN', $context))
-	{	my $v = $op eq 'and' ? ($self->value and $r->value)
+	{	# boolean values are 0 or 1, never undef
+		my $v = $op eq 'and' ? ($self->value and $r->value)
 	  		  : $op eq  'or' ? ($self->value  or $r->value)
 	  		  : $op eq 'xor' ? ($self->value xor $r->value)
 	  		  : undef;
 
 		return MF::BOOLEAN->new(undef, $v) if defined $v;
+	}
+	elsif($op eq '->')
+	{   $self->value or return undef;   # case false
+		my $result = $right->compute($context);
+		$context->setCaptures([]);      # do not leak captures
+		return $result;
 	}
 
 	$self->SUPER::infix(@_);
@@ -162,11 +169,18 @@ sub infix($$$)
 	{	my $r = $right->isa('MF::STRING') ? $right : $right->cast('MF::STRING', $context);
 		return MF::STRING->new(undef, $self->value . $r->value) if $r;
 	}
-	elsif($op eq '=~' || $op eq '!~')
+	elsif($op eq '=~')
+	{	if(my $r = $right->isa('MF::REGEXP') ? $right : $right->cast('MF::REGEXP', $context))
+		{	if(my @captures = $self->value =~ $r->regexp)
+			{	$context->setCaptures(\@captures);
+				return MF::BOOLEAN->new(undef, 1);
+			}
+			return MF::BOOLEAN->new(undef, 0);
+		}
+	}
+	elsif($op eq '!~')
 	{	my $r = $right->isa('MF::REGEXP') ? $right : $right->cast('MF::REGEXP', $context);
-		my $v = ! $r ? undef
-			  : $op eq '=~' ? $self->value =~ $r->regexp : $self->value !~ $r->regexp;
-		return MF::BOOLEAN->new(undef, $v) if $r;
+		return MF::BOOLEAN->new(undef, $self->value !~ $r->regexp) if $r;
 	}
 	elsif($op eq 'like' || $op eq 'unlike')
 	{	# When expr is CODE, it may produce a qr// instead of a pattern.
@@ -219,6 +233,9 @@ sub infix($$$)
 
 	return $self->cast('MF::BOOLEAN', $context)->infix(@_)
 		if $op eq 'and' || $op eq 'or' || $op eq 'xor';
+
+	$right->cast('MF::INTEGER')
+		if $right->isa('MF::TIMEZONE');  # mis-parse
 
 	if($right->isa('MF::INTEGER') || $right->isa('MF::FLOAT'))
 	{   my $v = $op eq '+' ? $self->value + $right->value
@@ -295,6 +312,9 @@ sub infix($$$)
 
 	return $self->cast('MF::BOOLEAN', $context)->infix(@_)
 		if $op eq 'and' || $op eq 'or' || $op eq 'xor';
+
+	$right->cast('MF::INTEGER')
+		if $right->isa('MF::TIMEZONE');  # mis-parse
 
 	if($right->isa('MF::FLOAT') || $right->isa('MF::INTEGER'))
 	{	# Perl will upgrade the integers
@@ -504,7 +524,7 @@ our %date_attrs = (
    year     => sub { MF::INTEGER->new(undef, $_[0]->value->year)  },
    month    => sub { MF::INTEGER->new(undef, $_[0]->value->month) },
    day      => sub { MF::INTEGER->new(undef, $_[0]->value->day) },
-   tz       => sub { MF::STRING ->new(undef, $_[0]->value->time_zone->name) },
+   timezone => sub { MF::TIMEZONE->new($_[0]->value->time_zone->name) },
 );
 sub attribute($) { $date_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
@@ -588,10 +608,78 @@ sub infix($$@)
 #-----------------
 
 package
+	MF::TIMEZONE;
+use base 'Math::Formula::Type';
+use POSIX  'floor';
+
+sub _match { '[+-] (?: 0[0-9]|1[012] ) [0-5][0-9]' }
+
+sub _token($)
+{	my $count = $_[1];
+	my $sign = '+';
+	($sign, $count) = ('-', -$count) if $count < 0;
+	my $hours = floor($count / 60 + 0.0001);
+	my $mins  = $count % 60;
+	sprintf "%s%02d%02d", $sign, $hours, $mins;
+}
+
+# The value is stored in minutes
+
+sub _value($)
+{	my ($self, $token) = @_;
+	$token =~ m/^ ([+-]) (0[0-9]|1[012]) ([0-5][0-9]) $/x
+		or return;
+
+	($1 eq '-' ? -1 : 1) * ( $2 * 60 + $3 );
+}
+
+sub cast($)
+{	my ($self, $to) = @_;
+	if($to->isa('MF::INTEGER') || $to->isa('MF::FLOAT'))
+	{	# Oops, we mis-parsed and integer when 1[0-2][0-5][0-9]
+		$self->[1] = $self->[0] + 0;
+		$self->[0] = undef;
+		return bless $self, $to;
+	}
+	$self->SUPER::cast($to);
+}
+
+our %tz_attrs = (
+	in_seconds => sub { MF::INTEGER->new(undef, $_[0]->value * 60)  },
+	in_minutes => sub { MF::INTEGER->new(undef, $_[0]->value) },
+);
+
+sub attribute($) { $tz_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
+
+sub prefix($$)
+{   my ($self, $op, $context) = @_;
+		$op eq '+' ? $self
+	  : $op eq '-' ? MF::TIMEZONE->new(undef, - $self->value)
+	  : $self->SUPER::prefix($op, $context);
+}
+
+sub infix($$@)
+{	my $self = shift;
+	my ($op, $right, $context) = @_;
+
+	if($op eq '+' || $op eq '-')
+	{	if(my $d = $right->isa('MF::DURATION') ? $right : $right->cast('MF::DURATION'))
+		{	return MF::TIMEZONE->new(undef, $self->value +
+				($op eq '-' ? -1 : 1) * floor($d->inSeconds / 60 + 0.000001));
+		}
+	}
+
+	$self->SUPER::infix(@_);
+}
+
+#-----------------
+
+package
 	MF::DURATION;
 use base 'Math::Formula::Type';
 
 use DateTime::Duration ();
+use POSIX  qw/floor/;
 
 sub _match { '[+-]? P (?:[0-9]+Y)? (?:[0-9]+M)? (?:[0-9]+D)? '
 	. ' (?:T (?:[0-9]+H)? (?:[0-9]+M)? (?:[0-9]+(?:\.[0-9]+)?S)? )? \b';
@@ -639,7 +727,17 @@ sub infix($$@)
 	$self->SUPER::infix(@_);
 }
 
-my %dur_attrs;   # Sorry, the attributes of DateTime::Duration make no sense
+
+sub inSeconds()
+{	my $d = $_[0]->value;
+	($d->years + $d->months/12) * 365.256 + $d->days * 86400 + $d->hours * 3600 + $d->minutes * 60 + $d->seconds;
+}
+
+my %dur_attrs = (
+	in_days    => sub { MF::INTEGER->new(undef, floor($_[0]->inSeconds / 86400 +0.00001)) },
+	in_seconds => sub { MF::INTEGER->new(undef, $_[0]->inSeconds) },
+);
+
 sub attribute($) { $dur_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
 #-----------------
@@ -702,9 +800,7 @@ sub infix(@)
 	}
 
 	if($op eq '//')
-	{	return defined $context->formula($name)
-		  ? $context->evaluate($name)
-		  : $right->_compute($context);
+	{	return defined $context->formula($name) ? $context->evaluate($name) : $right->compute($context);
 	}
 
 	my $left = $context->evaluate($name);

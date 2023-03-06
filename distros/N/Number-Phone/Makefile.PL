@@ -23,8 +23,8 @@ install_share 'share';
 
 WriteMakefile(
   NAME         => 'Number::Phone',
+  LICENSE      => 'open_source',
     META_MERGE => {
-        license => 'open_source',
         resources => {
             repository => 'https://github.com/DrHyde/perl-modules-Number-Phone',
             bugtracker => 'https://github.com/DrHyde/perl-modules-Number-Phone/issues'
@@ -50,7 +50,7 @@ WriteMakefile(
     'DBM::Deep'                          => 2.0008,
     'Data::Dumper::Concise'              => 0,
     'Devel::CheckOS'                     => '1.83',
-    'Devel::Deprecations::Environmental' => 0,
+    'Devel::Deprecations::Environmental' => '1.101',
     'Digest::MD5'                        => 0,
     'File::Basename'                     => 0,
     'File::Find::Rule'                   => 0,
@@ -69,7 +69,7 @@ WriteMakefile(
     'if'                     => 0,
   },
   dist => {
-    PREOP    => "./build-data.sh --previouslibphonenumbertag",
+    PREOP    => "./build-data.sh --previouslibphonenumbertag --quietly",
     TARFLAGS => "--format ustar -c -v -f",
   },
   realclean => {

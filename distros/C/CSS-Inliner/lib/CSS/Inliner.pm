@@ -2,7 +2,7 @@ package CSS::Inliner;
 use strict;
 use warnings;
 
-our $VERSION = '4014';
+our $VERSION = '4018';
 
 use Carp;
 use Encode;
@@ -482,25 +482,25 @@ sub inlinify {
       # we sort with the lightest items first so that heavier items can override later
       my @sorted_matches = sort { $a->{specificity} <=> $b->{specificity} || $a->{position} <=> $b->{position} } @$matches;
 
-      my %new_style;
-      my %new_important_style;
+      my @new_style;
+      my @new_important_style;
 
       foreach my $match (@sorted_matches) {
-        %new_style = (%new_style, %{$match->{css}});
-        %new_important_style = (%new_important_style, _grep_important_declarations($match->{css}));
+        push @new_style, @{$match->{css}};
+        push @new_important_style, _grep_important_declarations($match->{css});
       }
 
       # styles already inlined have greater precedence
       if (defined($element->attr('style'))) {
         my $cur_style = $self->_split({ style => $element->attr('style') });
-        %new_style = (%new_style, %{$cur_style});
-        %new_important_style = (%new_important_style, _grep_important_declarations($cur_style));
+        push @new_style, @$cur_style;
+        push @new_important_style, _grep_important_declarations($cur_style);
       }
 
       # override styles with !important styles
-      %new_style = (%new_style, %new_important_style);
+      push @new_style, @new_important_style;
 
-      $element->attr('style', $self->_expand({ declarations => \%new_style }));
+      $element->attr('style', $self->_expand({ declarations => \@new_style }));
     }
 
     #at this point we have a document that contains the expanded inlined stylesheet
@@ -937,8 +937,14 @@ sub _collapse_inline_styles {
       my $styles = $self->_split({ style => $existing_styles });
 
       my $collapsed_style = '';
-      foreach my $key (sort keys %{$styles}) { #sort for predictable output
-        $collapsed_style .= $key . ': ' . $$styles{$key} . '; ';
+
+      # loop in reverse order as the latter rule wins
+      my %exist;
+      for (my $i = $#$styles; $i > 0; $i -= 2) {
+        my $property = $styles->[$i-1];
+        my $value = $styles->[$i];
+        next if $exist{$property}++; # the former rule with the same name is overridden
+        $collapsed_style = "$property: $value; " . $collapsed_style;
       }
 
       $collapsed_style =~ s/\s*$//;
@@ -1015,8 +1021,10 @@ sub _expand {
 
   my $declarations = $$params{declarations};
   my $inline = '';
-  foreach my $property (keys %{$declarations}) {
-    $inline .= $property . ':' . $$declarations{$property} . ';';
+  for ( my $i = 0; $i < @$declarations; $i += 2 ) {
+    my $property = $declarations->[$i];
+    my $value = $declarations->[$i+1];
+    $inline .= "$property:$value;";
   }
 
   return $inline;
@@ -1028,31 +1036,32 @@ sub _split {
   $self->_check_object();
 
   my $style = $params->{style};
-  my %split;
+  my @split;
 
   # Split into properties/values
   foreach ( grep { /\S/ } split /\;/, $style ) {
     unless ( /^\s*([\w._-]+)\s*:\s*(.*?)\s*$/ ) {
       $self->_report_warning({ info => "Invalid or unexpected property '$_' in style '$style'" });
     }
-    $split{lc $1} = $2;
+    push @split, lc $1, $2;
   }
 
-  return \%split;
+  return \@split;
 }
 
 sub _grep_important_declarations {
   my ($declarations) = @_;
 
-  my %important;
-
-  while (my ($property, $value) = each %$declarations) {
+  my @important;
+  for ( my $i = 0; $i < @$declarations; $i += 2 ) {
+    my $property = $declarations->[$i];
+    my $value = $declarations->[$i+1];
     if ($value =~ /!\s*important\s*$/i) {
-      $important{$property} = $value;
+      push @important, $property, $value;
     }
   }
 
-  return %important;
+  return @important;
 }
 
 1;

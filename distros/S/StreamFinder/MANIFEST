@@ -16,6 +16,7 @@ lib/StreamFinder/Odysee.pm
 lib/StreamFinder/OnlineRadiobox.pm
 lib/StreamFinder/Podbean.pm
 lib/StreamFinder/PodcastAddict.pm
+lib/StreamFinder/Podchaser.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Rcast.pm
 lib/StreamFinder/Rumble.pm

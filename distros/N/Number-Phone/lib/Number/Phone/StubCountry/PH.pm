@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -182,62 +182,62 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"6336", "Antique\/Aklan\/Capiz",
-"634761", "Zambales",
-"634251", "Quezon",
-"6355", "Western\ Samar",
-"635221", "Albay",
-"638834", "Misamis\ Occidental",
-"6383", "South\ Cotabato",
-"634422", "Bulacan",
-"638622", "Surigao\ del\ Sur",
-"638851", "Bukidnon",
-"634765", "Zambales",
-"634597", "Pampanga",
-"6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
-"634594", "Pampanga",
-"6356", "Sorsogon\/Masbate",
-"6338", "Bohol",
-"6335", "Negros\ Oriental",
-"636422", "North\ Cotabato",
-"638853", "Bukidnon",
-"634463", "Bulacan",
-"634396", "Batangas",
-"6332", "Cebu",
-"638822", "Misamis\ Oriental",
-"6382", "Davao\ del\ Sur\/Davao",
-"635446", "Camarines\ Sur",
-"638842", "Misamis\ Oriental",
-"6353", "Leyte",
-"634593", "Pampanga",
-"634235", "Quezon",
-"6348", "Palawan",
-"6377", "Ilocos\ Sur\/Ilocos\ Norte",
-"6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",
-"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
-"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
-"634264", "Quezon",
-"6372", "La\ Union",
-"636423", "North\ Cotabato",
-"6333", "Iloilo",
-"634279", "Quezon",
-"6362", "Zamboanga\ del\ Sur",
-"633461", "Negros\ Occidental",
-"6387", "Davao\ Oriental",
-"6375", "Pangasinan",
+$areanames{en} = {"6356", "Sorsogon\/Masbate",
 "634244", "Quezon",
-"6346", "Cavite",
+"6333", "Iloilo",
+"634765", "Zambales",
+"6335", "Negros\ Oriental",
+"634396", "Batangas",
+"634463", "Bulacan",
+"6372", "La\ Union",
 "6384", "Davao\ del\ Norte",
-"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",};
+"634235", "Quezon",
+"638842", "Misamis\ Oriental",
+"634279", "Quezon",
+"6332", "Cebu",
+"634264", "Quezon",
+"6346", "Cavite",
+"6375", "Pangasinan",
+"638834", "Misamis\ Occidental",
+"634597", "Pampanga",
+"6387", "Davao\ Oriental",
+"6348", "Palawan",
+"634251", "Quezon",
+"638853", "Bukidnon",
+"634594", "Pampanga",
+"633461", "Negros\ Occidental",
+"638822", "Misamis\ Oriental",
+"636423", "North\ Cotabato",
+"634761", "Zambales",
+"638851", "Bukidnon",
+"6382", "Davao\ del\ Sur\/Davao",
+"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
+"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",
+"6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
+"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
+"635221", "Albay",
+"635446", "Camarines\ Sur",
+"638622", "Surigao\ del\ Sur",
+"634593", "Pampanga",
+"6353", "Leyte",
+"6362", "Zamboanga\ del\ Sur",
+"6355", "Western\ Samar",
+"6377", "Ilocos\ Sur\/Ilocos\ Norte",
+"634422", "Bulacan",
+"6338", "Bohol",
+"6336", "Antique\/Aklan\/Capiz",
+"636422", "North\ Cotabato",
+"6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",
+"6383", "South\ Cotabato",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+63|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '63', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '63', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

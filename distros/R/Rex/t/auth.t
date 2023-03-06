@@ -1,4 +1,6 @@
-use strict;
+#!/usr/bin/env perl
+
+use v5.12.5;
 use warnings;
 
 use Test::More tests => 48;
@@ -173,4 +175,3 @@ is( $auth->{user},        "root5" );
 is( $auth->{password},    "pass5" );
 is( $auth->{private_key}, "testa5.priv" );
 is( $auth->{public_key},  "testa5.pub" );
-

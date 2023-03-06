@@ -18,14 +18,15 @@ use Perl::Critic::PolicyFactory (
 
 use Test::More;
 
-our $VERSION = '1.148';
+our $VERSION = '1.150';
 
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );
 
 #-----------------------------------------------------------------------------
 
-use Test::Perl::Critic;
+eval 'use Test::Perl::Critic; 1;'
+    or plan skip_all => 'Test::Perl::Critic required to test Perl::Critic itself';
 
 #-----------------------------------------------------------------------------
 # Set up PPI caching for speed (used primarily during development)

@@ -32,7 +32,6 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
   }
 
   method tmpdir : string () {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     my $env_tmpdir = Sys->getenv("TMPDIR");
     my $env_temp = Sys->getenv("TEMP");
@@ -48,7 +47,7 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
       "/",
     ];
 
-    my $tmpdir = $interface->_tmpdir($dirlist);
+    my $tmpdir = $self->_tmpdir($dirlist);
     return $tmpdir;
   }
   
@@ -265,7 +264,6 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
   }
   
   method canonpath : string ($path : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     unless ($path) {
       die "The \$path must be defined";
@@ -281,7 +279,6 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
   }
 
   method catdir : string ($dir_parts : string[]) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     unless ($dir_parts) {
       die "The \$dir_parts must be defined";
@@ -305,7 +302,6 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
   }
 
   method catfile : string ($dir_parts : string[], $file_base_name : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
     unless ($dir_parts) {
       die "The \$dir_parts must be defined";
@@ -335,26 +331,25 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
   }
 
   method rel2abs : string ($path : string, $base = undef : string) {
-    my $interface = (File::Spec::Instance::Interface)$self;
     
-    my $is_abs = $interface->file_name_is_absolute($path);
+    my $is_abs = $self->file_name_is_absolute($path);
     
     my $abs_path = (string)undef;
     
     # Check for volume (should probably document the '2' thing...)
     if ($is_abs == 2) {
-      $abs_path = $interface->canonpath($path) ;
+      $abs_path = $self->canonpath($path) ;
     }
     elsif ($is_abs) {
       # It's missing a volume, add one
-      my $vol_parts = $interface->splitpath(Cwd->getcwd);
+      my $vol_parts = $self->splitpath(Cwd->getcwd);
       my $vol = $vol_parts->[0];
       
-      $abs_path = $interface->canonpath($vol . $path);
+      $abs_path = $self->canonpath($vol . $path);
     }
     else {
       if (!$base || $base eq "") {
-        my $drive = $interface->splitpath($path)->[0];
+        my $drive = $self->splitpath($path)->[0];
         if (length $drive) {
           eval { $base = Cwd->getdcwd($drive); };
           if ($@) {
@@ -367,28 +362,28 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
           $base = Cwd->getcwd;
         }
       }
-      elsif (!$interface->file_name_is_absolute($base)) {
-        $base = $interface->rel2abs($base) ;
+      elsif (!$self->file_name_is_absolute($base)) {
+        $base = $self->rel2abs($base) ;
       }
       else {
-        $base = $interface->canonpath($base) ;
+        $base = $self->canonpath($base) ;
       }
       
-      my $path_parts = $interface->splitpath($path, 1);
+      my $path_parts = $self->splitpath($path, 1);
       my $path_dir = $path_parts->[1];
       my $path_base_file = $path_parts->[2];
       
-      my $base_parts = $interface->splitpath($base, 1);
+      my $base_parts = $self->splitpath($base, 1);
       my $base_volume = $base_parts->[0];
       my $base_dir = $base_parts->[1];
       
-      $path = $interface->catpath( 
+      $path = $self->catpath( 
        $base_volume, 
-       $interface->catdir([$base_dir, $path_dir]), 
+       $self->catdir([$base_dir, $path_dir]), 
        $path_base_file
       );
       
-      $abs_path = $interface->canonpath($path);
+      $abs_path = $self->canonpath($path);
     }
     
     return $abs_path;
@@ -419,8 +414,6 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
     }
     
     $path .= $directory;
-    
-    
     
     # If the volume is not just A:, make sure the glue separator is 
     # there, reusing whatever separator is first in the $volume if possible.

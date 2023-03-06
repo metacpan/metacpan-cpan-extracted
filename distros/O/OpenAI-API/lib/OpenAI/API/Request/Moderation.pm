@@ -12,6 +12,8 @@ has input => ( is => 'rw', isa => Str, required => 1, );
 
 has model => ( is => 'rw', isa => Str, );
 
+sub endpoint { 'moderations' }
+
 1;
 
 __END__

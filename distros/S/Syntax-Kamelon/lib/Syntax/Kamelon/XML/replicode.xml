@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd">
+<!DOCTYPE language>
 <!--
 This file is part of KDE's kate project.
 
@@ -11,7 +11,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 -->
-<language version="3" kateversion="2.4" name="Replicode" section="Scientific" extensions="*.replicode" author="Martin Sandsmark" license="GPLv2+">
+<language version="6" kateversion="5.0" name="Replicode" section="Scientific" extensions="*.replicode" author="Martin Sandsmark" license="GPLv2+">
     <highlighting>
         <list name="operators">
             <item>_now</item>
@@ -142,8 +142,8 @@ the Free Software Foundation; either version 2 of the License, or
                 <DetectChar attribute="Class Definition" context="open_parens" char="(" beginRegion="true" />
             </context>
             <context attribute="Comment" lineEndContext="#pop" name="comment">
-                <IncludeRules context="##Alerts" />
-                <IncludeRules context="##Modelines" />
+                <DetectSpaces />
+                <IncludeRules context="##Comments" />
             </context>
             <context attribute="Class Definition" lineEndContext="#stay" name="class_definition">
                 <DetectChar attribute="Class Definition" context="#pop#pop" char=")" endRegion="true" />
@@ -165,25 +165,21 @@ the Free Software Foundation; either version 2 of the License, or
         <itemDatas>
             <itemData name="Normal Text" defStyleNum="dsNormal"/>
             <itemData name="String" defStyleNum="dsString"/>
-            <itemData name="Path" defStyleNum="dsSpecialString" bold="1" />
+            <itemData name="Path" defStyleNum="dsString" bold="1" />
             <itemData name="Class Definition" defStyleNum="dsOthers" />
-            <itemData name="Preprocessor" defStyleNum="dsPreprocessor" bold="1" />
+            <itemData name="Preprocessor" defStyleNum="dsNormal" bold="1" />
             <itemData name="Class Name" defStyleNum="dsFunction" />
-            <itemData name="Builtin Class" defStyleNum="dsBuiltIn" bold="1" />
+            <itemData name="Builtin Class" defStyleNum="dsFunction" bold="1" />
             <itemData name="Member" defStyleNum="dsKeyword" bold="0" />
-            <itemData name="Constant" defStyleNum="dsConstant" bold="1" />
-            <itemData name="Group" defStyleNum="dsAttribute" italic="1" bold="0" />
-            <itemData name="Entity" defStyleNum="dsDataType" italic="1" bold="1" />
-            <itemData name="Operator" defStyleNum="dsOperator" italic="1" bold="0" />
+            <itemData name="Constant" defStyleNum="dsKeyword" bold="1" />
+            <itemData name="Group" defStyleNum="dsKeyword" italic="1" bold="0" />
+            <itemData name="Entity" defStyleNum="dsKeyword" italic="1" bold="1" />
+            <itemData name="Operator" defStyleNum="dsFunction" italic="1" bold="0" />
             <itemData name="Function" defStyleNum="dsFunction" italic="0" bold="1" />
-            <itemData name="Bracket" defStyleNum="dsOthers" />
-            <itemData name="ListBracket" defStyleNum="dsControlFlow" color="#0095ff" selColor="#0095ff" bold="0" italic="0" />
-            <itemData name="EmptyList" defStyleNum="dsImport" color="#0095ff" selColor="#0095ff" bold="1" italic="0" />
+            <itemData name="ListBracket" defStyleNum="dsOthers" color="#0095ff" selColor="#0095ff" bold="0" italic="0" />
+            <itemData name="EmptyList" defStyleNum="dsOthers" color="#0095ff" selColor="#0095ff" bold="1" italic="0" />
             <itemData name="Identifier" defStyleNum="dsFunction" />
-            <itemData name="List" defStyleNum="dsRegionMarker" />
-            <itemData name="MultiList" defStyleNum="dsError" />
             <itemData name="Number" defStyleNum="dsDecVal" />
-            <itemData name="Float" defStyleNum="dsFloat" />
             <itemData name="Error" defStyleNum="dsError" />
             <itemData name="Comment" defStyleNum="dsComment" />
             <itemData name="Hex" defStyleNum="dsBaseN" />
@@ -191,7 +187,7 @@ the Free Software Foundation; either version 2 of the License, or
     </highlighting>
     <general>
         <comments>
-            <comment name="singleLine" start=";" />
+            <comment name="singleLine" start=";" position="afterwhitespace" />
         </comments>
         <folding indentationsensitive="1" />
         <keywords casesensitive="1" weakDeliminator="|." />

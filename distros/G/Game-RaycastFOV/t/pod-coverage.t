@@ -1,11 +1,8 @@
 #!perl
-use 5.006;
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 
-unless ($ENV{RELEASE_TESTING}) {
-    plan(skip_all => "Author tests not required for installation");
+unless ( $ENV{RELEASE_TESTING} ) {
+    plan( skip_all => "Author tests not required for installation" );
 }
 
 # Ensure a recent version of Test::Pod::Coverage
@@ -19,8 +16,7 @@ plan skip_all =>
 # but older versions don't recognize some common documentation styles
 my $min_pc = 0.18;
 eval "use Pod::Coverage $min_pc";
-plan skip_all =>
-  "Pod::Coverage $min_pc required for testing POD coverage"
+plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
   if $@;
 
 all_pod_coverage_ok();

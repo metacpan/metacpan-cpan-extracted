@@ -20,7 +20,7 @@ unless ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.9691',
+  'SPVM' => '0.9695',
 );
 WriteMakefile(
   NAME              => 'SPVM::IO',
@@ -63,7 +63,6 @@ sub MY::postamble {
   
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('IO::Util');
   }
   
   return $make_rule;

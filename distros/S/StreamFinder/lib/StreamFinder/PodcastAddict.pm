@@ -4,7 +4,7 @@ StreamFinder::PodcastAddict - Fetch actual raw streamable URLs on podcastaddict.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2022 by
+This module is Copyright (C) 2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -298,7 +298,7 @@ L<http://search.cpan.org/dist/StreamFinder-PodcastAddict/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Jim Turner.
+Copyright 2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -404,7 +404,7 @@ TRYIT:
 	$self->{'genre'} = 'Podcast';
 	print STDERR "---ID=".$self->{'id'}."= tried=$tried=\n"  if ($DEBUG);
 	unless ($isEpisode) {   #PODCAST PAGE ID (FETCH XML PAGE):
-		print STDERR "-----WE'RE A PODCAST PAGE!\n"  if ($DEBUG);
+		print STDERR "-----WE'RE A PODCAST PAGE: ID=".$self->{'id'}."!\n"  if ($DEBUG);
 
 		#FETCH PODCAST-WIDE METADATA HERE!:
 		$self->{'albumartist'} = $url2fetch;
@@ -441,14 +441,17 @@ TRYIT:
 			$url2fetch = $ep1id;
 			print STDERR "-!!!!- RETRY w/1ST EPISODE URL=$url2fetch=\n"  if ($DEBUG);
 			goto TRYIT;
+		} else {
+			print STDERR "e:Podcast ($url2fetch) has no episodes!\n";
 		}
 	} else {   #EPISODE PAGE ID (NOW GET THE DETAILED EPISODE METADATA & WE'RE DONE):
-		print STDERR "-----WE'RE AN EPISODE PAGE!\n"  if ($DEBUG);
+		print STDERR "-----WE'RE AN EPISODE PAGE: ID=".$self->{'id'}."!\n"  if ($DEBUG);
 		if ($html =~ m#\<h1\>(.+?)\<\/h1\>#s) {
 			my $h1data = $1;
-			$self->{'id'} ||= $1  if ($h1data =~ m#\<a\s+href\=\"\/podcast\/(\d+)#s);  #USE PODCAST'S ID FOR DEFAULT.
-			$self->{'articonurl'} ||= 'https://podcastaddict.com/cache/artwork/thumb/'.$self->{'id'};
-			$self->{'albumartist'} = 'https://podcastaddict.com/podcast/'.$self->{'id'};
+			my $channelID = $1  if ($h1data =~ m#\<a\s+href\=\"\/podcast\/(\d+)#s);  #USE PODCAST'S ID FOR DEFAULT.
+			$self->{'id'} ||= $channelID;
+			$self->{'articonurl'} ||= 'https://podcastaddict.com/cache/artwork/thumb/'.$channelID;
+			$self->{'albumartist'} = 'https://podcastaddict.com/podcast/'.$channelID;
 			#NOTE:  podcastaddict DOES NOT INCLUDE THE PODCAST ARTIST'S NAME IN EPISODE PAGES, SO WE 
 			#PUT THE PODCAST NAME IN THE ARTIST FIELD (WHICH WOULD NORMALLY GO IN THE ALBUM FIELD)!
 			#IF WE ALREADY HAVE (THE CORRECT) ARTIST & ALBUM FIELDS, IT MEANS WE FETCHED A PODCAST 
@@ -502,6 +505,7 @@ TRYIT:
 	}
 
 	$self->{'total'} = $self->{'cnt'};
+	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 
 	print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."= iconurl="
 			.$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}

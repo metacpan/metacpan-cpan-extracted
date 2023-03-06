@@ -7,9 +7,10 @@ use Test2::V0;
 
 use XS::Parse::Keyword::FromPerl qw(
    opcode
-   KEYWORD_PLUGIN_STMT KEYWORD_PLUGIN_EXPR
+   KEYWORD_PLUGIN_STMT KEYWORD_PLUGIN_EXPR G_VOID
    newOP newLISTOP newFOROP newSVOP newLOGOP
    XPK_BLOCK XPK_TERMEXPR
+   op_contextualize
    register_xs_parse_keyword
 );
 
@@ -39,6 +40,8 @@ BEGIN {
             $block,
             undef
          );
+
+         $$outref = op_contextualize($$outref, G_VOID);
 
          return KEYWORD_PLUGIN_STMT;
       },

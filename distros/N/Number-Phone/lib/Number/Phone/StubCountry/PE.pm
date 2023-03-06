@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -123,39 +123,39 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5142", "San\ Martín",
+$areanames{en} = {"5166", "Ayacucho",
 "5164", "Junín",
-"5153", "Moquegua",
-"5166", "Ayacucho",
-"5182", "Madre\ de\ Dios",
-"5156", "Ica",
-"5172", "Tumbes",
-"5167", "Huancavelica",
-"5154", "Arequipa",
-"5163", "Pasco",
-"5141", "Amazonas",
-"5165", "Loreto",
 "511", "Lima\/Callao",
-"5176", "Cajamarca",
-"5143", "Ancash",
-"5152", "Tacna",
+"5142", "San\ Martín",
 "5161", "Ucayali",
-"5184", "Cusco",
-"5174", "Lambayeque",
 "5183", "Apurímac",
+"5153", "Moquegua",
+"5162", "Huánuco",
+"5141", "Amazonas",
 "5173", "Piura",
 "5144", "La\ Libertad",
-"5162", "Huánuco",
-"5151", "Puno",};
+"5152", "Tacna",
+"5163", "Pasco",
+"5165", "Loreto",
+"5172", "Tumbes",
+"5184", "Cusco",
+"5167", "Huancavelica",
+"5156", "Ica",
+"5154", "Arequipa",
+"5143", "Ancash",
+"5176", "Cajamarca",
+"5182", "Madre\ de\ Dios",
+"5151", "Puno",
+"5174", "Lambayeque",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+51|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '51', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '51', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

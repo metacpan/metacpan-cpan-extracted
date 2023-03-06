@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -129,17 +129,17 @@ my $validators = {
                 'voip' => '49[0-24-79]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"35455", "Reykjavík\/Vesturbær\/Miðbærinn",
-"35446", "Akureyri",
+$areanames{en} = {"35442", "Keflavík",
 "35456", "Reykjavík\/Vesturbær\/Miðbærinn",
-"35442", "Keflavík",
-"3545", "Reykjavík",};
+"3545", "Reykjavík",
+"35446", "Akureyri",
+"35455", "Reykjavík\/Vesturbær\/Miðbærinn",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+354|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '354', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

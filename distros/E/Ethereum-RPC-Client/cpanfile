@@ -1,5 +1,6 @@
 requires 'perl', '5.014';
 requires 'Moo';
+requires 'Mojolicious', '== 7.29';
 requires 'Mojo::UserAgent';
 requires 'Math::BigInt', '>= 1.999814';
 requires 'Math::BigFloat', '>= 1.999814';

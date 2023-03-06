@@ -19,14 +19,6 @@ This module is designed to support operations commonly performed on file specifi
   my $spec = File::Spec::Instance->new;
   my $file = $spec->catfile(["foo", "bar"], "a.txt"]);
 
-=head1 Interfaces
-
-=over 2
-
-=item * L<File::Spec::Instance::Interface|SPVM::File::Spec::Instance::Interface>
-
-=back
-
 =head1 Class Methods
 
   static method new : File::Spec::Instance ();

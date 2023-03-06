@@ -75,10 +75,10 @@ my @infix = (
 
 my $date  = "2006-11-21+0700";
 my @attrs = (
-	[ 2006,      'MF::INTEGER', "$date.year"  ],
-	[ 11,        'MF::INTEGER', "$date.month" ],
-	[ 21,        'MF::INTEGER', "$date.day"   ],
-	[ '"+0700"', 'MF::STRING',  "$date.tz"    ],
+	[ 2006,    'MF::INTEGER', "$date.year"     ],
+	[ 11,      'MF::INTEGER', "$date.month"    ],
+	[ 21,      'MF::INTEGER', "$date.day"      ],
+	[ '+0700', 'MF::TIMEZONE',"$date.timezone" ],
 );
 
 foreach (@infix, @attrs)

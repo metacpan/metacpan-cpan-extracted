@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.563';
+our $VERSION = '0.564';
 
 use 5.020;
 use Moo;
@@ -129,7 +129,7 @@ sub _traverse_keyword_not { shift->traverse_subschema(@_) }
 sub _eval_keyword_not ($self, $data, $schema, $state) {
   return 1 if not $self->eval($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not',
-      short_circuit => $state->{short_circuit} || !$state->{collect_annotations},
+      short_circuit_suggested => !$state->{collect_annotations}, collect_annotations => 0,
       errors => [] });
 
   return E($state, 'subschema is valid');
@@ -144,7 +144,7 @@ sub _eval_keyword_if ($self, $data, $schema, $state) {
     and not $state->{collect_annotations};
   my $keyword = $self->eval($data, $schema->{if},
      +{ %$state, schema_path => $state->{schema_path}.'/if',
-        short_circuit => $state->{short_circuit} || !$state->{collect_annotations},
+        short_circuit_suggested => !$state->{collect_annotations},
         errors => [],
       })
     ? 'then' : 'else';
@@ -514,7 +514,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.563
+version 0.564
 
 =head1 DESCRIPTION
 

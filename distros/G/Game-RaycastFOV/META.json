@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "bsd"
    ],
@@ -35,8 +35,7 @@
       "test" : {
          "requires" : {
             "Math::Trig" : "0",
-            "Test::More" : "0.88",
-            "Test::Most" : "0",
+            "Test2::V0" : "0.000060",
             "strict" : "0"
          }
       }
@@ -44,7 +43,7 @@
    "provides" : {
       "Game::RaycastFOV" : {
          "file" : "lib/Game/RaycastFOV.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       }
    },
    "release_status" : "stable",
@@ -53,9 +52,9 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
-         "url" : "https://github.com/thrig/Game-RaycastFOV"
+         "url" : "https://thrig.me/src/Game-RaycastFOV.git"
       }
    },
-   "version" : "2.02",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "2.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

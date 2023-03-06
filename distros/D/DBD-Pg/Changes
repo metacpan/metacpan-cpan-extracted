@@ -2,6 +2,23 @@ Changes for the DBD::Pg module
 
 RT refers to rt.cpan.org
 
+
+Version 3.16.1 (released March 5, 2023)
+
+ - Add new attribute "pg_int8_as_string", for backwards compatibility.
+   [Alexander Gorlov]
+   (Github pull request #100)
+
+ - Add a META.json file; rename META.yml to META.yaml
+
+ - Fix 03smethod.t $sth->last_insert_id skip count for DBI < 1.642
+   [Dagfinn Ilmari Mannsåker]
+   (Github issue #99)
+
+ - Documentation improvements for service files
+   [Erik Rijkers]
+
+
 Version 3.16.0 (August 8, 2022)
 
  - Automatically use 64-bit versions of large object functions when available

@@ -1,14 +1,20 @@
 #!perl
 use 5.006;
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 
-plan tests => 1;
+plan 1;
 
-BEGIN {
-    use_ok('Game::RaycastFOV') || print "Bail out!\n";
+my @modules = <<'EOM' =~ m/([A-Z][A-Za-z0-9:]+)/g;
+Game::RaycastFOV
+EOM
+
+my $loaded = 0;
+for my $m (@modules) {
+    local $@;
+    eval "require $m";
+    if ($@) { bail_out("require failed '$m': $@") }
+    $loaded++;
 }
 
-diag(
-    "Testing Game::RaycastFOV $Game::RaycastFOV::VERSION, Perl $], $^X");
+diag("Testing Game::RaycastFOV $Game::RaycastFOV::VERSION, Perl $], $^X");
+is( $loaded, scalar @modules );

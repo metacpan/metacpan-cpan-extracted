@@ -63,12 +63,12 @@ class TestCase::File::Spec::Instance {
     }
     
     {
-      my $spec = (File::Spec::Instance::Interface)File::Spec::Instance::Win32->new;
+      my $spec = File::Spec::Instance::Win32->new;
       $spec->curdir;
     }
     
     {
-      my $spec = (File::Spec::Instance::Interface)File::Spec::Instance::Win32->new;
+      my $spec = File::Spec::Instance::Win32->new;
       $spec->curdir;
     }
     

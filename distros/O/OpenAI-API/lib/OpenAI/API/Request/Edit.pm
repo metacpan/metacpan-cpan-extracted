@@ -16,6 +16,8 @@ has temperature => ( is => 'rw', isa => Num, );
 has top_p       => ( is => 'rw', isa => Num, );
 has n           => ( is => 'rw', isa => Int, );
 
+sub endpoint { 'edits' }
+
 1;
 
 __END__

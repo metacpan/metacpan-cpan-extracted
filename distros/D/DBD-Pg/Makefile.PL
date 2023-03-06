@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.16.0';
+my $VERSION = '3.16.1';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -221,7 +221,7 @@ my %opts =
      AUTHOR         => 'Greg Sabino Mullane',
      ABSTRACT       => 'PostgreSQL database driver for the DBI module',
      PREREQ_PM      => {
-                        'ExtUtils::MakeMaker' => '6.11',
+                        'ExtUtils::MakeMaker' => '6.58',
                         'DBI'                 => '1.614',
                         'File::Temp'          => '0',
                         'Test::More'          => '0.88',
@@ -232,12 +232,13 @@ my %opts =
      PERL_MALLOC_OK => 1,
      NEEDS_LINKING  => 1,
      NO_META        => 1,
+     NO_MYMETA      => 1,
      NORECURS       => 1,
      PM             => {
                         'Pg.pm' => '$(INST_LIBDIR)/Pg.pm',
                         'lib/Bundle/DBD/Pg.pm' => '$(INST_LIB)/Bundle/DBD/Pg.pm',
                        },
-     clean          => { FILES => 'trace Pg.xsi README.testdatabase cover_db' },
+     clean          => { FILES => 'trace Pg.xsi README.testdatabase cover_db *.tst' },
      realclean      => { FILES => 'dbdpg_test_database/' },
 );
 

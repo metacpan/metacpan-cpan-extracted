@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword::FromPerl 0.03;
+package XS::Parse::Keyword::FromPerl 0.04;
 
 use v5.26; # XS code needs op_class() and the OPclass_* constants
 use warnings;
@@ -38,8 +38,12 @@ require B; # for the B::OP classes
 use Exporter 'import';
 push our @EXPORT_OK, qw(
    opcode
+   op_contextualize
+   op_scope
    newOP
+   newASSIGNOP
    newBINOP
+   newCONDOP
    newFOROP
    newGVOP
    newLISTOP
@@ -67,6 +71,21 @@ search across the entire C<PL_op_name> array you may wish to perform this just
 once and store the result, perhaps using C<use constant> for convenience.
 
    use constant OP_CONST => opcode("const");
+
+=head2 op_contextualize
+
+   $op = op_contextualize( $op, $context );
+
+Applies a syntactic context to an optree representing an expression.
+C<$context> must be one of the exported constants C<G_VOID>, C<G_SCALAR>, or
+C<G_LIST>.
+
+=head2 op_scope
+
+   $op = op_scope( $op );
+
+Wraps an optree with some additional ops so that a runtime dynamic scope will
+created.
 
 =head2 new*OP
 
@@ -97,11 +116,25 @@ currently-compiling function.
 
 Returns a new base OP for the given type and flags.
 
+=head3 newASSIGNOP
+
+   $op = newASSIGNOP( $flags, $left, $optype, $right );
+
+Returns a new op representing an assignment operation from the right to the
+left OP child of the given type. Note the odd order of arguments.
+
 =head3 newBINOP
 
    $op = newBINOP( $type, $flags, $first, $last );
 
 Returns a new BINOP for the given type, flags, and first and last OP child.
+
+=head3 newCONDOP
+
+   $op = newCONDOP( $flags, $first, $trueop, $falseop );
+
+Returns a new conditional expression op for the given condition expression and
+true and false alternatives, all as OP instances.
 
 =head3 newFOROP
 
@@ -518,14 +551,11 @@ Returns a pad offset index as an integer.
 
 Returns the line number of the source text on which the piece was started.
 
+=cut
+
 =head1 TODO
 
 =over 4
-
-=item *
-
-Non-trivial C<pieces> for parsing. Pieces that are structural and consume
-other pieces (OPTIONAL, SEQ, etc..)
 
 =item *
 

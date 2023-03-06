@@ -174,9 +174,9 @@ Returns true if the last character that was parsed was a deliminator.
 
 Returns the last character that was parsed.
 
-=item B<LineNumber>
+=item B<LineNumber>(I<$number>);
 
-Returns the line number of the next line that is to be parsed.
+Sets and returns the line number of the next line that is to be parsed.
 
 =item B<LineStart>
 
@@ -230,267 +230,6 @@ Switches to the lexer in $syntax and performs a reset.
 
 =back
 
-=head1 PRIVATE METHODS
-
-=over 4
-
-=item B<Captured>(I<\@captured>)
-
-Stores a list of items captured by the RegExpr rule in the stack
-with the current context. Used with dynamic rules.
-
-=item B<CapturedGet>(I<$number>)
-
-Returns the captured item indexed by number that is stored in the
-stack with the parent context. Used with dynamic rules.
-
-=item B<CapturedParseC>(I<$string>)
-
-B<$string> should only be one character long and numeric. B<capturedParseC> will return the 
-Nth captured element of the parent context.
-
-Used with dynamic rules.
-
-=item B<CapturedParseR>(I<$string>)
-
-All occurences of \[1-9] will be replaced by the 
-corresponding captured elements of the parent context.
-
-Used with dynamic rules.
-
-=item B<CommandExecute>(I<$cmdname>, I<$matchedtext>);
-
-Calls the sub connected to $cmdname with $matchedtext as parameter.
-Returns whatever the sub returns.
-
-=item B<IncludeRules>(I<$text>, I<$callbacklist>, I<$debuginfo>, I<$inclattr>);
-
-Called when an IncludeRules instruction is encountered in a lexer context.
-
-=item B<IncludeSyntax>(I<$text>, I<$syntax>, I<$context>);
-
-Same as IncludeRules, only the Rules refer to another syntax.
-
-=item B<IncludeSyntaxIA>(I<$text>, I<$syntax>, I<$context>, I<$attr>);
-
-Same as IncludeSyntax but now with the includeAttribute flag set.
-
-=item B<InitFormatter>(I<$reftolist>);
-
-Tries to load a formatter module that lives in I<Syntax::Kamelon::Format::PluginName>.
-The PluginName is the first item in the list. The other items are its options
-
-These formatters do not yet work.
-
-Initializes the formatter module. These modules are not yet ready for deployment.
-
-=item B<LineEndContext>(I<$shifter>);
-
-Makes sure the context shift is done properly when a LineEndContext is specified.
-
-=item B<ParseContext>(I<$text>, I<$callbacklist>, I<$debuginfo>);
-
-The internal combustion engine of Kamelon. It parses $$text through all callbacks
-in $callbacklist. If a match is found it parses the result and stops. Returns true if 
-a match was made.
-
-=item B<ParseLine>(I<$text>);
-
-Called by B<Parse>. It is given one line (including the newline) as a parameter.
-
-=item B<ParseResultXXXX>
-
-These methods are called by the resultparsers. These are anonymous subs within the rules
-of the lexer. Sometimes multiple resultparsers are embedded in a rule.
-
-=item B<ParseResult>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>);
-
-=item B<ParseResultCommand>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<@resultparsers>, I<$command>);
-
-=item B<ParseResultLookAhead>(I<$text>, I<$match>, I<$contextswitcher>);
-
-=item B<ParseResultOverStrike>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<@resultparsers>, I<$command>);
-
-=item B<ParseResultRegion>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<$beginregion>, I<$endregion>);
-
-Not yet functional. Should be called when a match indicates a region (code folding) event.
-
-=item B<ParseResultReplace>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<@resultparsers>, I<$string>);
-
-=item B<SnippetForce>
-
-Forces the current text snippet into the output cue together with its attribute. Clears the snippet.
-
-=item B<SnippetParse>(I<$match>, I<$attribute>);
-
-Tries to collect a snippet of text, as long as possible under the same attribute. If I<$attribute> differs
-form the current attribute, the snippet and current attribute are parsed to the output. The snippet is emptied
-and the current attribute changed.
-
-=item B<StackPush>($lexer, $context);
-
-Pushes $lexer and $context to the stack. Also adds the collected dynamic captures. This $lexer now
-becomes the acting lexer.
-
-Stack items are stored in the stack as [$lexer, $context, \@captures].
-
-=item B<StackPull>
-
-Pulls the last lexer and context that was pushed from the stack and returns it.
-
-=item B<StackTop>
-
-Returns a reference to the top item on the stack.
-
-=item B<testXXXXXX>
-
-These are the methods called by the rules in the lexers. They return true if a match
-was found and take care that the result gets parsed. I<$text> stands for a reference to
-the line that is currently parsed.
-
-=item B<testAnyChar>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testAnyCharI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testCommonColumn>(I<$text>, I<$column>, I<$nexttestmethod>, I<@options>);
-
-=item B<testCommonFirstNonSpace>(I<$text>, I<$nexttestmethod>, I<@options>);
-
-=item B<testCommonLastCharBB>(I<$text>, I<$nexttestmethod>, I<@options>);
-
-=item B<testCommonLastCharBb>(I<$text>, I<$nexttestmethod>, I<@options>);
-
-=item B<testCommonLineStart>(I<$text>, I<$nexttestmethod>, I<@options>);
-
-=item B<testDetectChar>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testDetectCharD>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic.
-
-=item B<testDetectCharDI>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic and case insensitive.
-
-=item B<testDetectCharI>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testDetect2Chars>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testDetect2CharsD>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic.
-
-=item B<testDetect2CharsDI>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic and case insensitive.
-
-=item B<testDetect2CharsI>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testDetectIdentifier>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testDetectSpaces>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testFloat>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testHlCChar>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testHlCHex>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testHlCOct>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testHlCStringChar>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testInt>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testKeyword>(I<$text>, I<$list>, I<$deliminators>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testKeywordI>(I<$text>, I<$list>, I<$deliminators>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testLineContinue>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-=item B<testRangeDetect>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testRangeDetectI>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testRegExpr>(I<$text>, I<$reg>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testRegExprD>(I<$text>, I<$regstring>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic.
-
-=item B<testRegExprDI>(I<$text>, I<$regstring>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic and case insensitive.
-
-=item B<testRegExprI>(I<$text>, I<$reg>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testStringDetect>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testStringDetectD>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic.
-
-=item B<testStringDetectDI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic and case insensitive.
-
-=item B<testStringDetectI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<testWordDetect>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case sensitive.
-
-=item B<testWordDetectD>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic.
-
-=item B<testWordDetectDI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Dynamic and case insensitive.
-
-=item B<testWordDetectI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
-
-Case insensitive.
-
-=item B<UseAttribStackPush>
-
-=item B<UseAttribStackPull>
-
-=item B<UseAttribStackTop>
-
-Used with IncludeRules instructions. The UseAttribStack facilitates the use of the attribute of the calling
-rule/context to make usse of it's attribute instead of the native attribute of the included context.
-
-=back
-
 =head1 ACKNOWLEDGEMENTS
 
 All the people who wrote Kate and the syntax highlight xml files.
@@ -499,11 +238,11 @@ All the people who wrote Kate and the syntax highlight xml files.
 
 This module is written and maintained by:
 
-Hans Jeuken < hansjeuken at xs4all dot nl>
+Hans Jeuken < hanje at cpan dot org>
 
-Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+Copyright (c) 2017 - 2023 by Hans Jeuken, all rights reserved.
 
-Published under the GPLV3 license
+Published under the same lincense as Perl.
 
 =head1 BUGS, ERRORS and DISCLAIMER
 
@@ -524,9 +263,9 @@ Then edit the xml to your liking.
 
 =head1 SEE ALSO
 
-B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
-B<Syntax::Kamelon::Indexer>, B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, 
-B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format::HTML4>, B<Syntax::Kamelon::Syntaxes>.
+L<Syntax::Kamelon::Builder>, L<Syntax::Kamelon::Debugger>, L<Syntax::Kamelon::Diagnostics>,
+L<Syntax::Kamelon::Indexer>, L<Syntax::Kamelon::XMLData>, L<Syntax::Kamelon::Format::Base>, 
+L<Syntax::Kamelon::Format::ANSI>, L<Syntax::Kamelon::Format::HTML4>, L<Syntax::Kamelon::Syntaxes>.
 
 =cut
 

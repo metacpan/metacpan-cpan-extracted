@@ -4,11 +4,7 @@ examples/demo.pl
 examples/netcat.pl
 lib/Tickit/Console.pm
 lib/Tickit/Console/Tab.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01basic.t
 t/02tabs.t
@@ -17,3 +13,7 @@ t/04make_widget.t
 t/05bind_key.t
 t/06timestamp.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

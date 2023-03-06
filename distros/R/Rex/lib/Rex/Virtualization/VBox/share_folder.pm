@@ -4,11 +4,10 @@
 
 package Rex::Virtualization::VBox::share_folder;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -73,4 +72,3 @@ sub execute {
 }
 
 1;
-

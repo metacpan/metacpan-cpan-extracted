@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211023;
+our $VERSION = 1.20230305170049;
 
 my $formatters = [
                 {
@@ -125,101 +125,101 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {"3251", "Roulers",
-"3216", "Louvain",
+$areanames{en} = {"3285", "Huy",
+"3213", "Diest",
+"3242", "Liège",
+"3261", "Libramont\-Chevigny",
+"3283", "Ciney",
+"3215", "Mechelen",
+"3287", "Verviers",
+"3264", "La\ Louvière",
+"3250", "Bruges",
+"3268", "Ath",
+"3280", "Stavelot",
+"3269", "Tournai",
+"3257", "Ypres",
+"3210", "Wavre",
+"3253", "Aalst",
+"3255", "Ronse",
+"3259", "Ostend",
+"3216", "Leuven",
+"3284", "Marche\-en\-Famenne",
+"3258", "Veurne",
+"3214", "Herentals",
+"3267", "Nivelles",
+"329", "Ghent",
+"3286", "Durbuy",
+"323", "Antwerp",
+"3281", "Namur",
+"3263", "Arlon",
+"3252", "Dendermonde",
+"3265", "Mons",
+"322", "Brussels",
+"3211", "Hasselt",
+"3243", "Liège",
+"3212", "Tongeren",
+"3282", "Dinant",
+"3251", "Roeselare",
+"3219", "Waremme",
+"3256", "Kortrijk",
+"3254", "Ninove",
+"3271", "Charleroi",
+"3260", "Chimay",
+"3289", "Genk",};
+$areanames{fr} = {"3252", "Termonde",
 "323", "Anvers",
 "322", "Bruxelles",
-"3256", "Courtrai",
-"3259", "Ostende",
-"3252", "Termonde",
-"3212", "Tongres",
-"329", "Gand",
-"3253", "Alost",
-"3255", "Renaix",
 "3258", "Furnes",
-"3215", "Malines",};
-$areanames{nl} = {"3267", "Nijvel",
-"3242", "Luik",
+"3216", "Louvain",
+"3259", "Ostende",
+"329", "Gand",
+"3256", "Courtrai",
+"3212", "Tongres",
+"3251", "Roulers",
+"3215", "Malines",
+"3253", "Alost",
+"3255", "Renaix",};
+$areanames{nl} = {"3259", "Oostende",
+"3267", "Nijvel",
 "329", "Gent",
-"3285", "Hoei",
-"3219", "Borgworm",
-"3243", "Luik",
-"3259", "Oostende",
-"322", "Brussel",
-"3265", "Bergen",
 "3263", "Aarlen",
-"3257", "Ieper",
-"3268", "Aat",
 "3281", "Namen",
 "323", "Antwerpen",
-"3269", "Doornik",
-"3250", "Brugge",
-"3210", "Waver",};
-$areanames{en} = {"323", "Antwerp",
-"3216", "Leuven",
-"3280", "Stavelot",
-"3281", "Namur",
-"3268", "Ath",
-"3257", "Ypres",
-"3214", "Herentals",
-"3265", "Mons",
-"3254", "Ninove",
-"3263", "Arlon",
-"3256", "Kortrijk",
-"322", "Brussels",
-"3284", "Marche\-en\-Famenne",
-"3211", "Hasselt",
-"3210", "Wavre",
-"3286", "Durbuy",
-"3250", "Bruges",
-"3251", "Roeselare",
-"3287", "Verviers",
-"3269", "Tournai",
-"3271", "Charleroi",
-"329", "Ghent",
-"3255", "Ronse",
-"3264", "La\ Louvière",
-"3253", "Aalst",
-"3242", "Liège",
-"3267", "Nivelles",
-"3213", "Diest",
-"3215", "Mechelen",
-"3289", "Genk",
-"3258", "Veurne",
-"3282", "Dinant",
-"3259", "Ostend",
-"3260", "Chimay",
-"3243", "Liège",
-"3261", "Libramont\-Chevigny",
-"3252", "Dendermonde",
-"3212", "Tongeren",
-"3219", "Waremme",
-"3285", "Huy",
-"3283", "Ciney",};
-$areanames{de} = {"3243", "Lüttich",
-"3259", "Ostende",
-"3212", "Tongern",
-"3242", "Lüttich",
-"329", "Gent",
-"3215", "Mecheln",
-"3250", "Brügge",
-"3257", "Ypern",
-"323", "Antwerpen",
-"3216", "Löwen",
-"3280", "Stablo",
-"3281", "Namür",
-"322", "Brüssel",
+"322", "Brussel",
 "3265", "Bergen",
-"3263", "Arel",};
+"3243", "Luik",
+"3219", "Borgworm",
+"3242", "Luik",
+"3285", "Hoei",
+"3250", "Brugge",
+"3269", "Doornik",
+"3268", "Aat",
+"3210", "Waver",
+"3257", "Ieper",};
+$areanames{de} = {"3243", "Lüttich",
+"3212", "Tongern",
+"329", "Gent",
+"3259", "Ostende",
+"3216", "Löwen",
+"3265", "Bergen",
+"322", "Brüssel",
+"323", "Antwerpen",
+"3281", "Namür",
+"3263", "Arel",
+"3257", "Ypern",
+"3280", "Stablo",
+"3215", "Mecheln",
+"3242", "Lüttich",
+"3250", "Brügge",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+32|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '32', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '32', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

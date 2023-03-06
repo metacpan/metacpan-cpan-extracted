@@ -1,45 +1,95 @@
-OpenAI-API
+NAME
 
-OpenAI::API is a Perl module that provides an interface to the OpenAI API,
-which allows you to generate text, translate languages, summarize text,
-and perform other tasks using the language models developed by OpenAI.
+    OpenAI::API - Perl interface to OpenAI API
 
-To use the OpenAI::API module, you will need an API key, which you can obtain by
-signing up for an account on the OpenAI website (https://beta.openai.com/).
+VERSION
+
+    0.22
+
+SYNOPSIS
+
+        use OpenAI::API;
+    
+        my $openai = OpenAI::API->new(); # uses OPENAI_API_KEY environment variable
+    
+        my $chat = $openai->chat(
+            model       => 'gpt-3.5-turbo',
+            messages    => [ { "role" => "user", "content" => "Hello!" }, ],
+        );
+    
+        my $completions = $openai->completions(
+            model  => 'text-davinci-003',
+            prompt => 'What is the capital of France?',
+        );
+    
+        my $edits = $openai->edits(
+            model       => 'text-davinci-edit-001',
+            input       => 'What day of the wek is it?',
+            instruction => 'Fix the spelling mistakes',
+        );
+    
+        my $moderations = $openai->moderations(
+            model => 'text-moderation-latest',
+            input => 'I want to kill them.',
+        );
+
+DESCRIPTION
+
+    OpenAI::API is a Perl module that provides an interface to the OpenAI
+    API, which allows you to generate text, translate languages, summarize
+    text, and perform other tasks using the language models developed by
+    OpenAI.
+
+    To use the OpenAI::API module, you will need an API key, which you can
+    obtain by signing up for an account on the OpenAI website
+    <https://platform.openai.com>.
 
 INSTALLATION
 
-To install this module, run the following commands:
+    If you have cpanm, you only need one line:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        % cpanm OpenAI::API
 
-SUPPORT AND DOCUMENTATION
+    Alternatively, if your CPAN shell is set up, you should just be able to
+    do:
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        % cpan OpenAI::API
 
-    perldoc OpenAI::API
+    As a last resort, you can manually install it:
 
-You can also look for information at:
+        perl Makefile.PL
+        make
+        make test
+        make install
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=OpenAI-API
+    If your perl is system-managed, you can create a local::lib in your
+    home directory to install modules to. For details, see the local::lib
+    documentation <https://metacpan.org/pod/local::lib>.
 
-    CPAN Ratings
-        https://cpanratings.perl.org/d/OpenAI-API
+DOCUMENTATION
 
-    Search CPAN
-        https://metacpan.org/release/OpenAI-API
+    After installing, you can find documentation for this module with the
+    perldoc command.
 
+        perldoc OpenAI::API
 
-LICENSE AND COPYRIGHT
+AUTHOR
 
-This software is Copyright (c) 2022 by Nelson Ferraz.
+    Nelson Ferraz <nferraz@gmail.com>
 
-This is free software, licensed under:
+SUPPORT
 
-  The Artistic License 2.0 (GPL Compatible)
+    This module is developed on GitHub
+    <https://github.com/nferraz/perl-openai-api>.
+
+    Send ideas, feedback, tasks, or bugs to GitHub Issues
+    <https://github.com/nferraz/perl-openai-api/issues>.
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2022, 2023 by Nelson Ferraz
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.30.2 or, at
+    your option, any later version of Perl 5 you may have available.
 

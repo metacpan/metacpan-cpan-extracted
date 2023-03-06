@@ -1,3 +1,8 @@
+#!/usr/bin/env perl
+
+use v5.12.5;
+use warnings;
+
 use Test::More tests => 3;
 
 use Rex::Commands::Run;
@@ -20,4 +25,3 @@ SKIP: {
   $s = run("ls -l /jllkjlkj");
   like( $s, qr/No such file/, "again with tty" );
 }
-

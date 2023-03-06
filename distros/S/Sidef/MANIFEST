@@ -191,8 +191,13 @@ scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
 'scripts/Extended tests/binomialmod.sf'
+'scripts/Extended tests/carmichael_with_n_factors.sf'
 'scripts/Extended tests/chebyshev_factorization_method.sf'
 'scripts/Extended tests/digits2num.pl'
+'scripts/Extended tests/fermat_pseudoprimes.sf'
+'scripts/Extended tests/fermat_pseudoprimes_to_base_n.sf'
+'scripts/Extended tests/fermat_with_n_factors.sf'
+'scripts/Extended tests/fermat_with_n_factors_to_base_n.sf'
 'scripts/Extended tests/inverse_of_multiplicative_functions.sf'
 'scripts/Extended tests/inverse_sigma.sf'
 'scripts/Extended tests/is_almost_prime.sf'
@@ -202,6 +207,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/is_super_psp.sf'
 'scripts/Extended tests/lucas_carmichael_negative.sf'
 'scripts/Extended tests/lucas_carmichael_positive.sf'
+'scripts/Extended tests/lucas_carmichael_with_n_factors.sf'
 'scripts/Extended tests/lucas_sequences.sf'
 'scripts/Extended tests/mertens_function.sf'
 'scripts/Extended tests/nth_prime.sf'
@@ -213,6 +219,10 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/pseudoprimes.sf'
 'scripts/Extended tests/range_sum.sf'
 'scripts/Extended tests/sqrtmod.pl'
+'scripts/Extended tests/squarefree_pseudoprimes.sf'
+'scripts/Extended tests/strong_fermat_pseudoprimes_to_base_n.sf'
+'scripts/Extended tests/strong_fermat_with_n_factors.sf'
+'scripts/Extended tests/strong_fermat_with_n_factors_to_base_n.sf'
 'scripts/Extended tests/sumdigits.pl'
 scripts/fast_fourier_transform.sf
 scripts/faulhaber_s_formula.sf

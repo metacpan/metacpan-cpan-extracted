@@ -9,7 +9,7 @@
 
 package Math::Formula;
 use vars '$VERSION';
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 
 use warnings;
@@ -78,11 +78,12 @@ my $match_float = MF::FLOAT->_match;
 my $match_name  = MF::NAME->_match;
 my $match_date  = MF::DATE->_match;
 my $match_time  = MF::TIME->_match;
+my $match_tz    = MF::TIMEZONE->_match;
 my $match_dt    = MF::DATETIME->_match;
 my $match_dur   = MF::DURATION->_match;
 
 my $match_op    = join '|',
-	qw{ // }, '[?*\/+\-#~.%]',
+	qw{ // -> }, '[?*\/+\-#~.%]',
 	qw{ =~ !~ <=> <= >= == != < > },  # order is important
 	qw{ :(?![0-9][0-9]) (?<![0-9][0-9]): },
 	( map "$_\\b", qw/ and or not xor exists like unlike cmp lt le eq ne ge gt/
@@ -104,6 +105,7 @@ sub _tokenize($)
 		| ( \' (?: \\\' | [^'] )* \' )
 							(?{ push @t, MF::STRING->new($+) })
 		| ( $match_dur )	(?{ push @t, MF::DURATION->new($+) })
+		| ( $match_tz )		(?{ push @t, MF::TIMEZONE->new($+) })
 		| ( $match_op )		(?{ push @t, MF::OPERATOR->new($+) })
 		| ( $match_name )	(?{ push @t, MF::NAME->new($+) })
 		| ( $match_dt )		(?{ push @t, MF::DATETIME->new($+) })
@@ -113,6 +115,7 @@ sub _tokenize($)
 		| ( $match_int )	(?{ push @t, MF::INTEGER->new($+) })
 		| \(				(?{ push @t, MF::PARENS->new('(', ++$parens_open) })
 		| \)				(?{ push @t, MF::PARENS->new(')', $parens_open--) })
+		| \$ ([1-9][0-9]*)	(?{ push @t, MF::CAPTURE->new($+) })
 		| $
 		| (.+)				(?{ error __x"expression '{name}', failed at '{where}'",
 								name => $self->name, where => $+ })
@@ -166,9 +169,17 @@ sub _build_ast($$)
 		my $next = $t->[0]
 			or return $first;   # end of expression
 
-		ref $next eq 'MF::OPERATOR'
-			or error __x"expression '{name}', expected infix operator but found '{type}'",
-				name => $self->name, type => ref $next;
+		if(ref $next ne 'MF::OPERATOR')
+		{	if($next->isa('MF::TIMEZONE'))
+			{	# Oops, mis-parse
+				unshift @$t, $next->cast('MF::INTEGER');
+				$next = MF::OPERATOR->new('+');
+			}
+			else
+			{	error __x"expression '{name}', expected infix operator but found '{type}'",
+					name => $self->name, type => ref $next;
+			}
+		}
 
 		my $op = $next->token;
 		@$t or error __x"expression '{name}', infix operator '{op}' requires right-hand argument",
@@ -210,7 +221,7 @@ sub evaluate($)
 
 	my $result
 	  = ref $expr eq 'CODE' ? $self->toType($expr->($context, $self, %args))
-	  : ! blessed $expr     ? $self->tree($expr)->_compute($context, $self)
+	  : ! blessed $expr     ? $self->tree($expr)->compute($context)
 	  : $expr->isa('Math::Formula::Type') ? $expr
 	  : panic;
 

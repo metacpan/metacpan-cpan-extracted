@@ -5,7 +5,7 @@
 
 package Game::RaycastFOV;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use strict;
 use warnings;
@@ -387,7 +387,7 @@ Prior to version 2.02 used distinct code.
 
 See also the C<eg/> directory of this module's distribution.
 
-L<https://github.com/thrig/ministry-of-silly-vaults/> has a FOV
+L<https://thrig.me/src/ministry-of-silly-vaults.git> has a FOV
 subdirectory with example scripts.
 
   use Game::RaycastFOV qw(circle raycast swing_circle);
@@ -436,9 +436,8 @@ those close to the origin that are clear of FOV-blocking obstacles.
 
 =head1 BUGS
 
-or patches might best be applied towards
-
-L<https://github.com/thrig/Game-RaycastFOV>
+None known. Raycast is problematic, but that's probably baked into to
+algorithm, which is why other methods of FOV were invented.
 
 =head1 SEE ALSO
 
@@ -446,14 +445,10 @@ L<Game::Xomb> uses modified code from this module.
 
 L<NetHack::FOV>
 
-L<https://github.com/thrig/ministry-of-silly-vaults/>
+L<https://thrig.me/src/ministry-of-silly-vaults.git>
 
 There are other FOV algorithms and implementations to be found on
 the Internet.
-
-=head1 AUTHOR
-
-thrig - Jeremy Mates (cpan:JMATES) C<< <jeremy.mates at gmail.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 

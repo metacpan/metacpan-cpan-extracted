@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -28,7 +27,7 @@ is_display( [ BLANKLINES(23),
 is_cursorpos( 24, 0, 'Cursor position after ->add_tab' );
 
 is( $console->active_tab_index, 0, '$console->active_tab_index' );
-identical( $console->active_tab, $tabs[0], '$console->active_tab' );
+ref_is( $console->active_tab, $tabs[0], '$console->active_tab' );
 
 is( $tabs[0]->index, 0,     '$tab[0]->index' );
 is( $tabs[0]->name, "Tab0", '$tab[0]->name' );
@@ -47,7 +46,7 @@ is_display( [ BLANKLINES(23),
 $console->activate_tab( 1 );
 
 is( $console->active_tab_index, 1, '$console->active_tab_index after ->activate_tab' );
-identical( $console->active_tab, $tabs[1], '$console->active_tab after ->activate_tab' );
+ref_is( $console->active_tab, $tabs[1], '$console->active_tab after ->activate_tab' );
 
 flush_tickit;
 

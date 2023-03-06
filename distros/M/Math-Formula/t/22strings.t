@@ -5,9 +5,11 @@ use strict;
 use utf8;
 
 use Math::Formula ();
+use Math::Formula::Context ();
 use Test::More;
 
-my $expr = Math::Formula->new(test => 1);
+my $expr    = Math::Formula->new(test => 1);
+my $context = Math::Formula::Context->new(name => 'test');
 
 is_deeply $expr->_tokenize('" bc d "'), [MF::STRING->new('" bc d "')];
 is_deeply $expr->_tokenize('"a\"b"')->[0]->value, 'a"b';
@@ -81,7 +83,7 @@ foreach (@infix, @attrs)
 {	my ($result, $type, $rule) = @$_;
 
 	$expr->_test($rule);
-	my $eval = $expr->evaluate;
+	my $eval = $expr->evaluate($context);
 	is $eval->token, $result, "$rule -> $result";
 	isa_ok $eval, $type;
 }

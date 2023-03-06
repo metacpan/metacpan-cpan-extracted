@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC::Omni;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -32,6 +32,8 @@ Omnicore based RPC calls
 no indirect;
 
 use parent qw(Net::Async::Blockchain::Client::RPC::BTC);
+
+sub jsonrpc { return undef }
 
 =head2 get_transaction
 

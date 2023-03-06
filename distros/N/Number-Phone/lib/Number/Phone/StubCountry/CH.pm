@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211023;
+our $VERSION = 1.20230305170050;
 
 my $formatters = [
                 {
@@ -80,60 +80,60 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {"4161", "Bâle",
-"4152", "Winterthour",
-"4122", "Genève",
-"4181", "Coire",
-"4133", "Thoune",
-"4171", "St\.\ Gall",};
-$areanames{en} = {"4144", "Zurich",
-"4162", "Olten",
-"4191", "Bellinzona",
-"4131", "Berne",
-"4122", "Geneva",
+$areanames{en} = {"4127", "Sion",
 "4121", "Lausanne",
-"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",
+"4131", "Berne",
 "4161", "Basel",
-"4143", "Zurich",
 "4152", "Winterthur",
-"4141", "Lucerne",
-"4156", "Baden",
-"4134", "Burgdorf\/Langnau\ i\.E\.",
-"4127", "Sion",
-"4171", "St\.\ Gallen",
-"4133", "Thun",
 "4124", "Yverdon\/Aigle",
+"4133", "Thun",
+"4191", "Bellinzona",
 "4181", "Chur",
+"4126", "Fribourg",
+"4134", "Burgdorf\/Langnau\ i\.E\.",
+"4143", "Zurich",
+"4144", "Zurich",
+"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",
+"4162", "Olten",
+"4156", "Baden",
 "4155", "Rapperswil",
-"4126", "Fribourg",};
-$areanames{de} = {"4131", "Bern",
-"4122", "Genf",
+"4141", "Lucerne",
+"4122", "Geneva",
+"4171", "St\.\ Gallen",};
+$areanames{fr} = {"4152", "Winterthour",
+"4133", "Thoune",
+"4181", "Coire",
+"4161", "Bâle",
+"4122", "Genève",
+"4171", "St\.\ Gall",};
+$areanames{it} = {"4144", "Zurigo",
+"4143", "Zurigo",
+"4141", "Lucerna",
+"4122", "Ginevra",
+"4171", "San\ Gallo",
+"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
+"4131", "Berna",
+"4161", "Basilea",
+"4121", "Losanna",
+"4126", "Friburgo",
+"4181", "Coira",};
+$areanames{de} = {"4122", "Genf",
+"4141", "Luzern",
+"4132", "Biel\/Neuenburg\/Solothurn\/Jura",
 "4144", "Zürich",
 "4143", "Zürich",
-"4132", "Biel\/Neuenburg\/Solothurn\/Jura",
-"4127", "Sitten",
-"4141", "Luzern",
-"4126", "Freiburg",};
-$areanames{it} = {"4141", "Lucerna",
-"4171", "San\ Gallo",
-"4181", "Coira",
-"4126", "Friburgo",
-"4144", "Zurigo",
-"4122", "Ginevra",
-"4131", "Berna",
-"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
-"4121", "Losanna",
-"4161", "Basilea",
-"4143", "Zurigo",};
+"4126", "Freiburg",
+"4131", "Bern",
+"4127", "Sitten",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+41|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '41', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '41', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

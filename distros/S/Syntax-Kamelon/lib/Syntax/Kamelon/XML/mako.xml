@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd"
+<!DOCTYPE language
 [
 	<!ENTITY name    "[A-Za-z_:][\w.:_-]*">
 	<!ENTITY entref  "&amp;(#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="Mako" version="3" kateversion="3.4" section="Markup" extensions="*.mako;*.mak" author="Massimiliano Torromeo (massimiliano.torromeo@gmail.com)" license="LGPL">
+<language name="Mako" version="8" kateversion="5.53" section="Markup" extensions="*.mako;*.mak" author="Massimiliano Torromeo (massimiliano.torromeo@gmail.com)" license="LGPL">
 
 <highlighting>
 <list name="flow">
-	<item> endfor </item>
-	<item> endif </item>
+	<item>endfor</item>
+	<item>endif</item>
 </list>
 <contexts>
 	<context name="Start" attribute="Normal Text" lineEndContext="#stay">
@@ -21,7 +21,7 @@
 		<RegExpr attribute="MakoKeyword" context="NoMakoHTML" String="&lt;%text(?:\s+[^&gt;]*)?&gt;" beginRegion="nomako" />
 		<Detect2Chars attribute="MakoKeyword" context="Mako" char="&lt;" char1="%" />
 		<RegExpr attribute="MakoKeyword" context="Mako" String="&lt;/?%" />
-		<RegExpr attribute="MakoKeyword" context="MakoOneLiner" String="^\s*% " />
+		<RegExpr attribute="MakoKeyword" context="MakoOneLiner" String="^\s*% " column="0" />
 		<Detect2Chars attribute="MakoKeyword" context="MakoPrint" char="$" char1="{" />
 	</context>
 
@@ -101,7 +101,7 @@
 
 	<context name="Comment" attribute="Comment" lineEndContext="#stay">
 		<DetectSpaces/>
-		<IncludeRules context="##Alerts" />
+		<IncludeRules context="##Comments" />
 		<DetectIdentifier/>
 		<StringDetect attribute="Comment" context="#pop" String="--&gt;" endRegion="comment" />
 		<RegExpr attribute="Error" context="#stay" String="-(-(?!-&gt;))+" />
@@ -197,7 +197,8 @@
 
 	<context name="JS comment close" attribute="Comment" lineEndContext="#pop">
 		<RegExpr attribute="Element" context="El Close 3" String="&lt;/script\b" insensitive="true" endRegion="script" />
-		<IncludeRules context="##Alerts" />
+		<DetectSpaces />
+		<IncludeRules context="##Comments" />
 	</context>
 
 	<context name="Value" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="Value NQ">
@@ -208,8 +209,7 @@
 
 	<context name="Value NQ" attribute="Normal Text" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="#pop#pop">
 		<IncludeRules context="FindEntityRefs" />
-		<RegExpr attribute="Value" context="#stay" String="/(?!&gt;)" />
-		<RegExpr attribute="Value" context="#stay" String="[^/&gt;&lt;&quot;&apos;\s]" />
+		<RegExpr attribute="Value" context="#stay" String="/(?!&gt;)|[^/&gt;&lt;&quot;&apos;\s]" />
 	</context>
 
 	<context name="Value DQ" attribute="Value" lineEndContext="#stay">
@@ -230,7 +230,7 @@
   <itemData name="Comment" defStyleNum="dsComment" />
   <itemData name="CDATA" defStyleNum="dsBaseN" bold="1" />
   <itemData name="Processing Instruction" defStyleNum="dsKeyword" />
-  <itemData name="Doctype" defStyleNum="dsAttribute" bold="1" />
+  <itemData name="Doctype" defStyleNum="dsDataType" bold="1" />
   <itemData name="Element" defStyleNum="dsKeyword" />
   <itemData name="Flow Control Keyword" defStyleNum="dsKeyword" spellChecking="false"/>
   <itemData name="Attribute" defStyleNum="dsOthers" />
@@ -239,17 +239,15 @@
   <itemData name="PEntityRef" defStyleNum="dsDecVal" />
   <itemData name="Error" defStyleNum="dsError" />
   <itemData name="Mako" defStyleNum="dsDataType" />
-  <itemData name="MakoVar" defStyleNum="dsOthers" bold="1" />
-  <itemData name="MakoString" defStyleNum="dsString" />
-  <itemData name="MakoKeyword" defStyleNum="dsFloat" bold="1" />
+  <itemData name="MakoKeyword" defStyleNum="dsDataType" bold="1" />
 </itemDatas>
 
 </highlighting>
 <general>
   <comments>
-    <comment name="multiLine" start="&lt;!--" end="--&gt;" />
-    <comment name="multiLine" start="&lt;%doc&gt;" end="&lt;/%doc&gt;" />
-    <comment name="singleLine" start="##" position="afterwhitespace"/>
+    <comment name="singleLine" start="#" position="afterwhitespace"/>
+	<comment name="multiLine" start="&lt;!--" end="--&gt;" region="comment"/>
   </comments>
 </general>
 </language>
+<!-- kate: replace-tabs off; -->

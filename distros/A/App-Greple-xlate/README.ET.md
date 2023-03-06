@@ -67,7 +67,7 @@ Kui soovite t천lkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
     M채채rake originaal- ja t천lgitud teksti v채ljundformaat.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Tr체kib originaal- ja t천lgitud teksti [git(1)](http://man.he.net/man1/git) konfliktim채rgistuse formaadis.
 
@@ -100,9 +100,9 @@ Kui soovite t천lkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
         Prindi originaal- ja t천lgitud tekst 체he t체hja reaga eraldatud.
 
-    - **none**
+    - **xtxt**
 
-        Kui formaat on `none` v천i tundmatu, tr체kitakse ainult t천lgitud tekst.
+        Kui formaat on `xtxt` (t천lgitud tekst) v천i tundmatu, tr체kitakse ainult t천lgitud tekst.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

@@ -26,6 +26,8 @@ has best_of           => ( is => 'rw', isa => Int, );
 has logit_bias        => ( is => 'rw', isa => Map [ Int, Int ], );
 has user              => ( is => 'rw', isa => Str, );
 
+sub endpoint { 'completions' }
+
 1;
 
 __END__

@@ -1,5 +1,24 @@
 Revision history for Ryu
 
+3.004     2023-03-05 14:36:17+08:00 Asia/Singapore
+    [New features]
+    - Ryu::Source->as_queue allows `max_items` and will pause the stream while waiting for the queue to drain
+    - flag a warning when someone tries to use `->completed->done/fail` directly, since that's not likely to work as expected
+
+    [Bugs fixed]
+    - extra single-use Futures were being created, which caused complaints from Future::XS since they were
+    abandoned (the ->without_cancel calls in Ryu::Node)
+    - chained nodes were still being called after completion, which would lead to some odd-looking debug messages
+    from nodes such as `->take(5)`
+
+3.003     2023-03-03 20:51:58+08:00 Asia/Singapore
+    [New features]
+    - Ryu::Observable now has a ->finish method
+
+3.003     2023-03-03 20:51:58+08:00 Asia/Singapore
+    [New features]
+    - Ryu::Observable now has a ->finish method
+
 3.002     2021-07-07 17:48:25+08:00 Asia/Kuala_Lumpur
     [Bugs fixed]
     - in ->flat_map, any failure in the original or added Ryu::Source instances

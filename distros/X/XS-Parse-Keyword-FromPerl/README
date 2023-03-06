@@ -39,6 +39,21 @@ UTILITY FUNCTIONS
 
        use constant OP_CONST => opcode("const");
 
+ op_contextualize
+
+       $op = op_contextualize( $op, $context );
+
+    Applies a syntactic context to an optree representing an expression.
+    $context must be one of the exported constants G_VOID, G_SCALAR, or
+    G_LIST.
+
+ op_scope
+
+       $op = op_scope( $op );
+
+    Wraps an optree with some additional ops so that a runtime dynamic
+    scope will created.
+
  new*OP
 
     This family of functions return a new OP of the given class, for the
@@ -68,12 +83,26 @@ UTILITY FUNCTIONS
 
     Returns a new base OP for the given type and flags.
 
+  newASSIGNOP
+
+       $op = newASSIGNOP( $flags, $left, $optype, $right );
+
+    Returns a new op representing an assignment operation from the right to
+    the left OP child of the given type. Note the odd order of arguments.
+
   newBINOP
 
        $op = newBINOP( $type, $flags, $first, $last );
 
     Returns a new BINOP for the given type, flags, and first and last OP
     child.
+
+  newCONDOP
+
+       $op = newCONDOP( $flags, $first, $trueop, $falseop );
+
+    Returns a new conditional expression op for the given condition
+    expression and true and false alternatives, all as OP instances.
 
   newFOROP
 
@@ -456,9 +485,6 @@ XPK FUNCTIONS
     started.
 
 TODO
-
-      * Non-trivial pieces for parsing. Pieces that are structural and
-      consume other pieces (OPTIONAL, SEQ, etc..)
 
       * More new*OP() wrapper functions.
 

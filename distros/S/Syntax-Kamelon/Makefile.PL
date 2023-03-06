@@ -1,21 +1,12 @@
+
 use strict;
-
-print <<__EOF;
-
-*********************************************************
-This package contains a number of scripts that use Wx.
-If you want to use these scripts, please install it.
-*********************************************************
-
-__EOF
-
-my $pmfile = 'Kamelon/lib/Syntax/Kamelon.pm';
-
+use warnings;
 use ExtUtils::MakeMaker;
+
 WriteMakefile(
    NAME              => 'Syntax::Kamelon',
-   VERSION_FROM      => $pmfile, # finds $VERSION, requires EU::MM from perl >= 5.5
-   LICENSE           => 'gpl_3',
+   VERSION_FROM      => 'lib/Syntax/Kamelon.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+   LICENSE           => 'Perl',
    PREREQ_PM         => {
       'Data::Dumper' => 0,
       'Module::Load::Conditional' => 0,
@@ -31,7 +22,7 @@ WriteMakefile(
           resources => {
               repository => {
                  type => 'git',
-		 url  => 'git://github.com/haje61/Kamelon.git',
+                 url  => 'git://github.com/haje61/Kamelon.git',
                  web  => 'https://github.com/haje61/Kamelon',
               },
           }})

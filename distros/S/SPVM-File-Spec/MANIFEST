@@ -12,8 +12,6 @@ lib/SPVM/File/Spec.pm
 lib/SPVM/File/Spec.spvm
 lib/SPVM/File/Spec/Instance.pm
 lib/SPVM/File/Spec/Instance.spvm
-lib/SPVM/File/Spec/Instance/Interface.pm
-lib/SPVM/File/Spec/Instance/Interface.spvm
 lib/SPVM/File/Spec/Instance/Unix.pm
 lib/SPVM/File/Spec/Instance/Unix.spvm
 lib/SPVM/File/Spec/Instance/Win32.pm

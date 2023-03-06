@@ -4,13 +4,12 @@
 
 package Rex::Shared::Var::Array;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 
 use Rex::Shared::Var::Common qw/__lock __store __retrieve/;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 sub TIEARRAY {
   my $self = { varname => $_[1], };

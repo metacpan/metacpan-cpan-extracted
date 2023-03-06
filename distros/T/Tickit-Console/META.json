@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.43",
+            "Object::Pad" : "0.74",
             "String::Tagged" : "0.10",
             "Tickit" : "0",
             "Tickit::Widget::Entry" : "0",
@@ -33,19 +33,19 @@
       },
       "test" : {
          "requires" : {
-            "Test::Identity" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Refcount" : "0"
          }
       }
    },
    "provides" : {
       "Tickit::Console" : {
          "file" : "lib/Tickit/Console.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Tickit::Console::Tab" : {
          "file" : "lib/Tickit/Console/Tab.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

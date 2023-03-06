@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211023;
+our $VERSION = 1.20230305170050;
 
 my $formatters = [
                 {
@@ -35,7 +35,7 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '2[12]\\d{6}',
                 'geographic' => '2[12]\\d{6}',
-                'mobile' => '7[02457]\\d{6}',
+                'mobile' => '7[024-7]\\d{6}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(8776\\d{4})',
@@ -49,7 +49,7 @@ $areanames{en} = {"2362", "Bangui",};
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+236|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '236', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Ported Perl from the book's C code",
+  "ABSTRACT" => "Combinatorial algorithms to generate rhythms",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0301",
+  "VERSION" => "0.0504",
   "test" => {
     "TESTS" => "t/*.t"
   }

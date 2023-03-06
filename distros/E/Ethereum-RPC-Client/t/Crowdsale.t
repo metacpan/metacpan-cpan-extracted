@@ -9,7 +9,7 @@ use JSON;
 
 BEGIN {
     plan skip_all => 'Needs Travis setup'
-        unless $ENV{TRAVIS};
+        unless $ENV{CIRCLECI};
 }
 
 my $rpc_client = Ethereum::RPC::Client->new;

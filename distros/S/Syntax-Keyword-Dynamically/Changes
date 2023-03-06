@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.12    2023-03-04
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+
+        [BUGFIXES]
+         * Remember to clear the OPf_KIDS flag when nulling out an op before
+           op_free()
+
 0.11    2022-11-22
         [CHANGES]
          * Use the new Future::AsyncAwait::ExtensionBuilder

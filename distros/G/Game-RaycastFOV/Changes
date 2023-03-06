@@ -1,5 +1,8 @@
 Revision history for Game-RaycastFOV
 
+2.03    2023-03-04
+        Update tests to Test2, remove github references.
+
 2.02    2021-03-13
         Add sub_circle(), update swing_circle() to call that.
         circle() now only passes unique points to the callback.

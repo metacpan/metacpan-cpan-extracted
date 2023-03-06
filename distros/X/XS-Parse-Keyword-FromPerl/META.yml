@@ -18,12 +18,12 @@ name: XS-Parse-Keyword-FromPerl
 provides:
   XS::Parse::Keyword::FromPerl:
     file: lib/XS/Parse/Keyword/FromPerl.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   XS::Parse::Keyword: '0.33'
   perl: '5.026'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

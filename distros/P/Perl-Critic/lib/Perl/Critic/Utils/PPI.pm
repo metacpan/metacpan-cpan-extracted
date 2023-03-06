@@ -10,7 +10,7 @@ use Scalar::Util qw< blessed >;
 
 use Exporter 'import';
 
-our $VERSION = '1.148';
+our $VERSION = '1.150';
 
 #-----------------------------------------------------------------------------
 
@@ -157,7 +157,7 @@ sub get_constant_name_element_from_declaring_statement {
 
     warnings::warnif(
         'deprecated',
-        'Perl::Critic::Utils::PPI::get_constant_name_element_from_declaring_statement() is deprecated. Use PPIx::Utilities::Statement::get_constant_name_elements_from_declaring_statement() instead.',
+        'Perl::Critic::Utils::PPI::get_constant_name_element_from_declaring_statement() is deprecated. Use PPIx::Utils::Traversal::get_constant_name_elements_from_declaring_statement() instead.',
     );
 
     return if not $element;
@@ -326,7 +326,7 @@ Is the parameter a subroutine or inside one?
 =item C<get_constant_name_element_from_declaring_statement($statement)>
 
 B<This subroutine is deprecated.> You should use
-L<PPIx::Utilities::Statement/get_constant_name_elements_from_declaring_statement()>
+L<PPIx::Utils::Traversal/get_constant_name_elements_from_declaring_statement()>
 instead.
 
 Given a L<PPI::Statement|PPI::Statement>, if the statement is a C<use
@@ -344,7 +344,7 @@ this will return "FOO".  Similarly, given
 this will return "%FOO".
 
 B<Caveat:> in the case where multiple constants are declared using the same
-C<use constant> statement (e.g. C<< use constant { FOO => 1, BAR => 2 }; >>,
+C<use constant> statement (e.g. C<< use constant { FOO => 1, BAR => 2 }; >>),
 this subroutine will return the declaring
 L<PPI::Structure::Constructor|PPI::Structure::Constructor>. In the case of
 C<< use constant 1.16 { FOO => 1, BAR => 2 }; >> it may return a

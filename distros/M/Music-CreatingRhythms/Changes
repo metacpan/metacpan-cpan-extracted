@@ -1,5 +1,37 @@
 Revision history for Music-CreatingRhythms
 
+0.0504 2023-03-05 17:06:34
+    - Improve the eg/play-*.pl program logic.
+
+0.0503 2023-03-05 16:54:37
+    - Add the eg/play-euclid-set.pl program.
+
+0.0502 2023-03-05 16:29:39
+    - Improve the eg/play-set.pl program.
+
+0.0501 2023-03-04 11:45:32
+    - Alphabetize subroutine order.
+
+0.0500 2023-03-04 11:20:14
+    - Add the comprnd() and compmrnd() methods.
+
+0.0404 2023-03-04 10:37:23
+    - Add the eg/play-set.pl program a bit more.
+    - Rename b2int() and int2b() to match the book.
+
+0.0403 2023-03-03 21:57:18
+    - Improve documentation.
+
+0.0402 2023-03-03 21:24:33
+    - Fix ABSTRACT.
+    - Add the eg/play-set.pl program.
+
+0.0401 2023-03-03 20:02:05
+    - Rename de_bruijn().
+
+0.0400 2023-03-03 09:16:08
+    - Add the interval2seq() and seq2interval() methods.
+
 0.0301 2023-03-02 13:11:46
     - Improve the eg/pfold-set.pl program.
     - Improve documentation drastically!

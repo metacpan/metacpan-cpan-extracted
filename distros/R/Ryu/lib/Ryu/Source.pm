@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '3.002'; # VERSION
+our $VERSION = '3.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -428,7 +428,7 @@ sub hexdump {
             $in = $_;
             $offset = 0;
         }
-        while(length(my $bytes = substr $in, 0, 16, '')) {
+        while(length(my $bytes = substr $in, 0, List::Util::min(length($in), 16), '')) {
             my $encoded = join '', unpack 'H*' => $bytes;
             $encoded =~ s/[[:xdigit:]]{2}\K(?=[[:xdigit:]])/ /g;
             my $ascii = $bytes =~ s{[^[:print:]]}{.}gr;
@@ -609,7 +609,6 @@ sub flat_map {
     }, $src);
     $src
 }
-
 
 =head2 split
 
@@ -912,18 +911,47 @@ Returns a L<Future::Queue> instance which will
 L<Future::Queue/push> items whenever the source
 emits them.
 
-Unfortunately there is currently no way to tell
-when the queue will end, so you'd need to track
-that separately.
+The queue will be marked as finished when this source is completed.
+
+Parameters passed to this method will be given to the L<Future::Queue>
+constructor:
+
+ use Future::AsyncAwait qw(:experimental(suspend));
+ my $queue = $src->as_queue(
+  max_items => 100
+ );
+ SUSPEND { print "Waiting for more items\n" }
+ while(my @batch = await $queue->shift_atmost(10)) {
+  print "Had batch of @{[ 0 + @batch ]} items\n";
+ }
 
 =cut
 
 sub as_queue {
-    my ($self) = @_;
-    my $queue = Future::Queue->new;
-    $self->each(sub {
-        $queue->push($_)
-    });
+    my ($self, %args) = @_;
+    my $queue = Future::Queue->new(
+        prototype => $self->curry::weak::new_future,
+        %args
+    );
+
+    if($args{max_items}) {
+        $self->each($self->curry::weak(sub {
+            my ($self) = @_;
+            my $f = $queue->push($_);
+            return if $f->is_ready;
+            $self->pause;
+            $f->on_ready(sub { $self->resume });
+            return;
+        }));
+    } else {
+        # Avoid the extra overhead when we know there isn't going to be any
+        # upper limit on accepted items.
+        $self->each(sub {
+            $queue->push($_);
+            return;
+        });
+    }
+    $self->completed->on_ready(sub { $queue->finish });
     return $queue;
 }
 
@@ -1265,7 +1293,7 @@ sub ordered_futures {
         $pending{$k} = $f;
         $log->tracef('Ordered futures has %d pending', 0 + keys %pending);
         $src->pause if $high and keys(%pending) >= $high and not $src->is_paused;
-        $_->on_done(sub {
+        $f->on_done(sub {
             my @pending = @_;
             while(@pending and not $src_completed->is_ready) {
                 $src->emit(shift @pending);
@@ -2045,7 +2073,7 @@ sub notify_child_completion {
         return $self;
     }
 
-    $log->warnf("Child %s (addr 0x%x) not found in list for %s", $child->describe, $self->describe);
+    $log->warnf("Child %s (addr 0x%x) not found in list for %s", $child->describe, $addr, $self->describe);
     $log->tracef("* %s (addr 0x%x)", $_->describe, Scalar::Util::refaddr($_)) for @{$self->{children}};
     $self
 }
@@ -2208,13 +2236,15 @@ parent completes.
 sub each_while_source {
     my ($self, $code, $src, %args) = @_;
     $self->each($code);
+    $src->_completed->on_ready(sub {
+        my $addr = Scalar::Util::refaddr($code);
+        my $count = List::UtilsBy::extract_by { $addr == Scalar::Util::refaddr($_) } @{$self->{on_item}};
+        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
+    });
     $self->_completed->on_ready(sub {
         my ($f) = @_;
         $args{cleanup}->($f, $src) if exists $args{cleanup};
-        my $addr = Scalar::Util::refaddr($code);
-        my $count = List::UtilsBy::extract_by { $addr == Scalar::Util::refaddr($_) } @{$self->{on_item}};
         $f->on_ready($src->_completed) unless $src->is_ready;
-        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
     });
     $src
 }
@@ -2280,5 +2310,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

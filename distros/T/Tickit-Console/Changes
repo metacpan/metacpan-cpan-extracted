@@ -1,5 +1,13 @@
 Revision history for Tickit-Console
 
+0.11    2023-03-04
+        [CHANGES]
+         * Updates for Object::Pad 0.74:
+            + Use :weak params
+            + Use :isa instead of extends
+            + Use ADJUST :params blocks
+            + Use field NAME = EXPR
+
 0.10    2021-07-06
         [CHANGES]
          * Updates for Object::Pad 0.43:

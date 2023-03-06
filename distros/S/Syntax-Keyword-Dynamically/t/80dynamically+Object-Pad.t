@@ -3,31 +3,35 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Syntax::Keyword::Dynamically is not available"
       unless eval { require Syntax::Keyword::Dynamically };
-   plan skip_all => "Object::Pad is not available"
-      unless eval { require Object::Pad };
+   plan skip_all => "Object::Pad >= 0.73 is not available"
+      unless eval { require Object::Pad;
+                    Object::Pad->VERSION( '0.73' ) };
 
    Syntax::Keyword::Dynamically->import;
-   Object::Pad->import;
+   Object::Pad->import( ':experimental(init_expr)' );
+
+   diag( "Syntax::Keyword::Dynamically $Syntax::Keyword::Dynamically::VERSION, " .
+         "Object::Pad $Object::Pad::VERSION" );
 }
 
 class Datum {
-   has $value = 1;
+   field $value = 1;
    method value { $value }
 
    method test {
-      Test::More::is( $self->value, 1, 'value is 1 initially' );
+      ::is( $self->value, 1, 'value is 1 initially' );
 
       {
          dynamically $value = 2;
-         Test::More::is( $self->value, 2, 'value is 2 inside dynamically-assigned block' );
+         ::is( $self->value, 2, 'value is 2 inside dynamically-assigned block' );
       }
 
-      Test::More::is( $self->value, 1, 'value is 1 finally' );
+      ::is( $self->value, 1, 'value is 1 finally' );
    }
 }
 

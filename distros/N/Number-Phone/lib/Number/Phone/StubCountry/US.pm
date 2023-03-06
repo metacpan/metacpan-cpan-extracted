@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -52,11 +52,17 @@ my $formatters = [
 
 my $validators = {
                 'geographic' => '(
-          505(?:
-            [2-57-9]\\d\\d|
-            6(?:
-              [0-35-9]\\d|
-              44
+          (?:
+            47220[01]|
+            5(?:
+              05(?:
+                [2-57-9]\\d\\d|
+                6(?:
+                  [0-35-9]\\d|
+                  4[46]
+                )
+              )|
+              57200
             )
           )\\d{4}|
           (?:
@@ -77,7 +83,7 @@ my $validators = {
               2[01356]|
               3[0-24679]|
               4[167]|
-              5[12]|
+              5[0-2]|
               6[014]|
               8[056]
             )|
@@ -128,7 +134,7 @@ my $validators = {
               0[1-68]|
               1[02-8]|
               2[068]|
-              3[0-289]|
+              3[0-2589]|
               4[03578]|
               5[046-9]|
               6[02-5]|
@@ -146,11 +152,17 @@ my $validators = {
             )
           )[2-9]\\d{6}
         |
-          505(?:
-            [2-57-9]\\d\\d|
-            6(?:
-              [0-35-9]\\d|
-              44
+          (?:
+            47220[01]|
+            5(?:
+              05(?:
+                [2-57-9]\\d\\d|
+                6(?:
+                  [0-35-9]\\d|
+                  4[46]
+                )
+              )|
+              57200
             )
           )\\d{4}|
           (?:
@@ -171,7 +183,7 @@ my $validators = {
               2[01356]|
               3[0-24679]|
               4[167]|
-              5[12]|
+              5[0-2]|
               6[014]|
               8[056]
             )|
@@ -222,7 +234,7 @@ my $validators = {
               0[1-68]|
               1[02-8]|
               2[068]|
-              3[0-289]|
+              3[0-2589]|
               4[03578]|
               5[046-9]|
               6[02-5]|
@@ -271,7 +283,7 @@ my $validators = {
           52[34][2-9]1[02-9]\\d{4}|
           5(?:
             00|
-            2[125-7]|
+            2[125-9]|
             33|
             44|
             66|
@@ -301,7 +313,7 @@ Number::Phone::NANP::Data::_areaname('1'.shift()->{number}); }
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+1|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '1', number => $number, formatters => $formatters, validators => $validators, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

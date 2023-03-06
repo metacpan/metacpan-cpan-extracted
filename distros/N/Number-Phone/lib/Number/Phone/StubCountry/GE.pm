@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -88,26 +88,20 @@ my $validators = {
                 'mobile' => '
           5(?:
             (?:
-              0555|
-              1(?:
-                [17]77|
-                555
+              (?:
+                0555|
+                1(?:
+                  [17]77|
+                  555
+                )
+              )[5-9]|
+              757(?:
+                7[7-9]|
+                8[01]
               )
-            )[5-9]|
-            757(?:
-              7[7-9]|
-              8[01]
-            )
-          )\\d{3}|
-          5(?:
-            0070|
-            11(?:
-              33|
-              51
-            )|
-            [25]222|
-            3333
-          )[0-4]\\d{3}|
+            )\\d|
+            22252[0-4]
+          )\\d\\d|
           5(?:
             00(?:
               0\\d|
@@ -118,7 +112,10 @@ my $validators = {
               [124]\\d|
               3[01]
             )|
-            5200|
+            (?:
+              520|
+              909
+            )0|
             75(?:
               00|
               [57]5
@@ -144,7 +141,34 @@ my $validators = {
               9[1-35-9]
             )|
             790
-          )\\d{6}
+          )\\d{6}|
+          5(?:
+            0(?:
+              070|
+              505
+            )|
+            1(?:
+              0[01]0|
+              1(?:
+                07|
+                33|
+                51
+              )
+            )|
+            2(?:
+              0[02]0|
+              2[25]2
+            )|
+            3(?:
+              0[03]0|
+              3[35]3
+            )|
+            (?:
+              40[04]|
+              900
+            )0|
+            5222
+          )[0-4]\\d{3}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -153,90 +177,90 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995367", "Bordjomi",
-"995364", "Aspindza",
-"995434", "Bagdati",
-"995427", "Xelvachauri",
-"995424", "Shuaxevi",
-"995419", "Choxatauri",
-"995348", "Tianeti",
-"995437", "Lentekhi",
-"995347", "Djava",
-"995492", "Zestafoni",
-"995443", "Gagra",
-"995370", "Gori",
-"995344", "Tskhinvali",
-"995410", "Mestia",
-"995373", "Mtskheta",
-"995352", "Kvareli",
-"995413", "Senaki",
-"995368", "Khashuri",
-"995432", "Vani",
-"995416", "Tsalendjikha",
-"995422", "Batumi",
-"995358", "Bolnisi",
-"995446", "Tkvarcheli",
-"995371", "Kaspi",
-"995362", "Akhalkalaki",
-"995411", "Samtredia",
-"995445", "Ochamchire",
-"995354", "Lagodekhi",
-"995357", "Marneuli",
-"995472", "Tsageri",
-"995415", "Zugdidi",
-"995494", "lanchxuti",
-"995497", "Tkibuli",
-"995342", "Akhalgori",
-"995435", "Sachkhere",
-"995425", "Qeda",
-"995346", "Dusheti",
-"995341", "Rustavi",
+$areanames{en} = {"995444", "Gudauta",
 "995365", "Akhaltsikhe",
-"995359", "TetriTskaro",
-"995442", "Sukhumi",
-"995493", "Poti",
-"995350", "Telavi",
-"995431", "Kutaisi",
-"995366", "Adigeni",
-"995353", "Gurdjaani",
-"995412", "Abasha",
-"995372", "Gardabani",
-"995436", "Tskaltubo",
-"995361", "Ninotsminda",
-"995426", "Kobuleti",
-"995345", "Stefanstminda\/Kazbegi",
-"995356", "DedoplisTskaro",
-"995479", "Chiatura",
-"99532", "Tbilisi",
-"995448", "Gulripshi",
-"995433", "Kharagauli",
-"995360", "Dmanisi",
-"995423", "Xulo",
-"995491", "Terdjola",
-"995418", "Martvili",
-"995349", "Akhmeta",
-"995496", "Ozurgeti",
-"995351", "Sagaredjo",
-"995363", "Tsalka",
-"995495", "Khoni",
-"995414", "Xobi",
-"995374", "Tigvi",
-"995439", "Ambrolauri",
-"995473", "Oni",
-"995417", "Chkhorotskhu",
-"995444", "Gudauta",
-"995369", "Kareli",
+"995447", "Gali",
 "995355", "Signagi",
-"995447", "Gali",};
+"995423", "Xulo",
+"995497", "Tkibuli",
+"995416", "Tsalendjikha",
+"995432", "Vani",
+"995494", "lanchxuti",
+"995370", "Gori",
+"995368", "Khashuri",
+"995435", "Sachkhere",
+"995372", "Gardabani",
+"995358", "Bolnisi",
+"995360", "Dmanisi",
+"995352", "Kvareli",
+"995362", "Akhalkalaki",
+"995491", "Terdjola",
+"995350", "Telavi",
+"99532", "Tbilisi",
+"995414", "Xobi",
+"995353", "Gurdjaani",
+"995417", "Chkhorotskhu",
+"995363", "Tsalka",
+"995496", "Ozurgeti",
+"995345", "Stefanstminda\/Kazbegi",
+"995446", "Tkvarcheli",
+"995425", "Qeda",
+"995479", "Chiatura",
+"995373", "Mtskheta",
+"995419", "Choxatauri",
+"995411", "Samtredia",
+"995422", "Batumi",
+"995342", "Akhalgori",
+"995433", "Kharagauli",
+"995348", "Tianeti",
+"995495", "Khoni",
+"995369", "Kareli",
+"995374", "Tigvi",
+"995359", "TetriTskaro",
+"995413", "Senaki",
+"995354", "Lagodekhi",
+"995367", "Bordjomi",
+"995473", "Oni",
+"995426", "Kobuleti",
+"995364", "Aspindza",
+"995445", "Ochamchire",
+"995357", "Marneuli",
+"995431", "Kutaisi",
+"995346", "Dusheti",
+"995439", "Ambrolauri",
+"995442", "Sukhumi",
+"995371", "Kaspi",
+"995437", "Lentekhi",
+"995351", "Sagaredjo",
+"995434", "Bagdati",
+"995448", "Gulripshi",
+"995361", "Ninotsminda",
+"995492", "Zestafoni",
+"995347", "Djava",
+"995356", "DedoplisTskaro",
+"995424", "Shuaxevi",
+"995493", "Poti",
+"995366", "Adigeni",
+"995427", "Xelvachauri",
+"995344", "Tskhinvali",
+"995443", "Gagra",
+"995349", "Akhmeta",
+"995415", "Zugdidi",
+"995472", "Tsageri",
+"995412", "Abasha",
+"995341", "Rustavi",
+"995436", "Tskaltubo",
+"995410", "Mestia",
+"995418", "Martvili",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+995|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '995', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '995', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

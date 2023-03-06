@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -59,23 +59,23 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"249153", "Khartoum",
-"249155", "Khartoum\ North",
-"249185", "Khartoum\ North",
-"249183", "Khartoum",
-"249156", "Khartoum\ Rural",
+$areanames{en} = {"249157", "Omdurman",
 "249187", "Omdurman",
-"249157", "Omdurman",
-"249186", "Khartoum\ Rural",};
+"249186", "Khartoum\ Rural",
+"249155", "Khartoum\ North",
+"249183", "Khartoum",
+"249153", "Khartoum",
+"249185", "Khartoum\ North",
+"249156", "Khartoum\ Rural",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+249|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '249', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '249', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

@@ -67,7 +67,7 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
 
     Geben Sie das Ausgabeformat für den Originaltext und den übersetzten Text an.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Drucken Sie den Originaltext und den übersetzten Text im Format [git(1)](http://man.he.net/man1/git) conflict marker.
 
@@ -100,9 +100,9 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
 
         Original und übersetzten Text durch eine einzelne Leerzeile getrennt ausgeben.
 
-    - **none**
+    - **xtxt**
 
-        Wenn das Format `none` oder unbekannt ist, wird nur der übersetzte Text gedruckt.
+        Wenn das Format `xtxt` (übersetzter Text) oder unbekannt ist, wird nur der übersetzte Text gedruckt.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

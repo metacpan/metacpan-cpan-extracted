@@ -1,3 +1,11 @@
+0.002     2023-03-03 07:47:47+00:00 UTC
+
+0.003     2023-03-03 12:28:18+00:00 UTC
+  this release make is mandatory to send jsonrpc version as 2.0 as required by latest geth upgrade
+
+0.002     2023-03-03 12:28:18+00:00 UTC
+ test release
+ 
 0.001     2022-11-24 12:28:18+00:00 UTC
   Initial release
 

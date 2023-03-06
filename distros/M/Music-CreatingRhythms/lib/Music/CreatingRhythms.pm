@@ -1,9 +1,9 @@
 package Music::CreatingRhythms;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Ported Perl from the book's C code
+# ABSTRACT: Combinatorial algorithms to generate rhythms
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0504';
 
 use Moo;
 use strictures 2;
@@ -24,6 +24,17 @@ has verbose => (
     default => sub { 0 },
 );
 
+
+
+sub b2int {
+    my ($self, $sequences) = @_;
+    my @intervals;
+    for my $i (@$sequences) {
+        my $string = join '', @$i;
+        push @intervals, [ map { length $_ } grep { $_ } split /(10*)/, $string ];
+    }
+    return \@intervals;
+}
 
 
 sub cfcv {
@@ -211,7 +222,47 @@ sub _composem {
 }
 
 
-sub debruijn_n {
+sub compmrnd {
+    my ($self, $n, $m) = @_;
+    return [0] unless $n;
+    my @compositions;
+    my ($p, $j, $np);
+    for(my $mp = $m - 1, $np = $n - 1, $j = 1; $mp > 0; --$np) {
+        $p = $mp / $np;
+        if ($p % 2 == 0) {
+            push @compositions, $j;
+            $mp--;
+            $j = 1;
+        }
+        else {
+            $j++;
+        }
+    }
+    push @compositions, $j + $np;
+    return \@compositions;
+}
+
+
+sub comprnd {
+    my ($self, $n) = @_;
+    return [0] unless $n;
+    my @compositions;
+    my $p = 1;
+    for my $i (1 .. $n - 1) {
+        if ((int rand 2) % 2 == 0) {
+            $p++;
+        }
+        else {
+            push @compositions, $p;
+            $p = 1;
+        }
+    }
+    push @compositions, $p;
+    return \@compositions;
+}
+
+
+sub de_bruijn {
     my ($self, $n) = @_;
     my $sequence = $n ? debruijn([1,0], $n) : 0;
     return [ split //, $sequence ];
@@ -227,6 +278,21 @@ sub euclid {
         $pattern[ sprintf '%.0f', ( $y - $intercept ) / $slope ] = '1';
     }
     return \@pattern;
+}
+
+
+sub int2b {
+    my ($self, $intervals) = @_;
+    my @sequences;
+    for my $i (@$intervals) {
+        my @bitstring;
+        for my $j (@$i) {
+            my $bits = '1' . '0' x ($j - 1);
+            push @bitstring, split //, $bits;
+        }
+        push @sequences, \@bitstring;
+    }
+    return \@sequences;
 }
 
 
@@ -499,11 +565,11 @@ __END__
 
 =head1 NAME
 
-Music::CreatingRhythms - Ported Perl from the book's C code
+Music::CreatingRhythms - Combinatorial algorithms to generate rhythms
 
 =head1 VERSION
 
-version 0.0301
+version 0.0504
 
 =head1 SYNOPSIS
 
@@ -516,7 +582,7 @@ version 0.0301
 C<Music::CreatingRhythms> provides the combinatorial algorithms
 described in the book, "Creating Rhythms", by Hollos. These algorithms
 are ported directly from the C, and are pretty fast. Please see the
-link below for more information.
+links below for more information.
 
 NB: Arguments are sometimes switched between book and software.
 
@@ -538,6 +604,18 @@ Show progress. * This is not showing anything yet, however.
   $mcr = Music::CreatingRhythms->new;
 
 Create a new C<Music::CreatingRhythms> object.
+
+=head2 b2int
+
+  $intervals = $mcr->b2int($sequences);
+
+Convert binary B<sequences> of the form C<[[1,0],[1,0,0]]> into a set
+of intervals of the form C<[[2],[3]]>.
+
+Examples:
+
+  $got = $mcr->b2int([[1,1,0,1,0,0]]);     # [[1,2,3]]
+  $got = $mcr->b2int([[1],[1,0],[1,0,0]]); # [[1],[2],[3]]
 
 =head2 cfcv
 
@@ -632,15 +710,35 @@ Example:
 
   $got = $mcr->compm(4, 2); # [[1,3],[2,2],[3,1]]
 
-=head2 debruijn_n
+=head2 compmrnd
 
-  $sequence = $mcr->debruijn_n($n);
+  $composition = $mcr->compmrnd($n);
+
+Generate a random composition of B<n>.
+
+Example:
+
+  $got = $mcr->compmrnd(16, 4); # [6,1,3,6], etc.
+
+=head2 comprnd
+
+  $composition = $mcr->comprnd($n);
+
+Generate a random composition of B<n>.
+
+Example:
+
+  $got = $mcr->comprnd(16); # [1,3,2,1,1,2,1,3,2], etc.
+
+=head2 de_bruijn
+
+  $sequence = $mcr->de_bruijn($n);
 
 Generate the largest de Bruijn sequence of order B<n>.
 
 Example:
 
-  $got = $mcr->debruijn_n(3); # 1 1 1 0 1 0 0 0
+  $got = $mcr->de_bruijn(3); # [1,1,1,0,1,0,0,0]
 
 =head2 euclid
 
@@ -655,6 +753,18 @@ Examples:
   $got = $mcr->euclid(2, 4); # [1,0,1,0]
   $got = $mcr->euclid(3, 4); # [1,1,0,1]
   $got = $mcr->euclid(4, 4); # [1,1,1,1]
+
+=head2 int2b
+
+  $sequences = $mcr->int2b($intervals);
+
+Convert B<intervals> of the form C<[2,3]> into a set of binary
+sequences.
+
+Examples:
+
+  $got = $mcr->int2b([[1,2,3]]);     # [[1,1,0,1,0,0]]
+  $got = $mcr->int2b([[1],[2],[3]]); # [[1],[1,0],[1,0,0]]
 
 =head2 invert_at
 
@@ -833,7 +943,9 @@ Examples:
 
 =head1 SEE ALSO
 
-L<https://abrazol.com/books/rhythm1/> "Creating Rhythms"
+L<https://abrazol.com/books/rhythm1/> - "Creating Rhythms", the book.
+
+L<https://ology.github.io/2023/03/02/creating-rhythms-with-perl/> - my write-up.
 
 The F<t/01-methods.t> and F<eg/*> programs included with this distribution.
 

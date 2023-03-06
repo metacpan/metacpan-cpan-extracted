@@ -1,5 +1,8 @@
 Revision history for Ethereum-RPC-Client
 
+0.05      2023-03-03 08:16:10+00:00 UTC
+   this release make is mandatory to send jsonrpc version as 2.0 as required by latest geth upgrade
+
 0.04      2022-11-25 07:19:04+00:00 UTC
         - Added lots of feature & bugfix
 

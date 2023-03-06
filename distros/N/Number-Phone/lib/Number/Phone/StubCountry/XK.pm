@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -68,33 +68,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"38329", "Prizren",
-"38338", "Prishtina",
-"38339", "Peja",
-"38328", "Mitrovica",
-"383280", "Gjilan",
-"383390", "Gjakova",
-"383290", "Ferizaj",};
-$areanames{sq} = {"38339", "Pejë",
-"38328", "Mitrovicë",
-"38338", "Prishtinë",
-"383390", "Gjakovë",};
 $areanames{sr} = {"38329", "Призрен",
-"38338", "Приштина",
+"383290", "Урошевац",
 "38339", "Пећ",
+"383390", "Ђаковица",
 "38328", "Косовска\ Митровица",
 "383280", "Гњилане",
-"383390", "Ђаковица",
-"383290", "Урошевац",};
+"38338", "Приштина",};
+$areanames{en} = {"383390", "Gjakova",
+"38339", "Peja",
+"383290", "Ferizaj",
+"38329", "Prizren",
+"38338", "Prishtina",
+"383280", "Gjilan",
+"38328", "Mitrovica",};
+$areanames{sq} = {"38338", "Prishtinë",
+"38328", "Mitrovicë",
+"383390", "Gjakovë",
+"38339", "Pejë",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+383|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '383', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '383', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

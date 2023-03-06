@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -132,41 +132,41 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"42156", "Michalovce",
-"42136", "Levice",
-"42142", "Povazska\ Bystrica",
-"42143", "Martin",
-"42148", "Banska\ Bystrica",
-"42154", "Bardejov",
-"421601", "Roznava",
-"42134", "Senica",
-"42147", "Lucenec",
-"42145", "Zvolen",
-"42131", "Dunajska\ Streda",
-"42151", "Presov",
+$areanames{en} = {"42143", "Martin",
+"42156", "Michalovce",
+"42135", "Nove\ Zamky",
 "42158", "Roznava",
 "42138", "Topolcany",
-"42153", "Spisska\ Nova\ Ves",
-"42133", "Trnava",
-"42152", "Poprad",
-"42132", "Trencin",
-"42146", "Prievidza",
-"42141", "Zilina",
-"42135", "Nove\ Zamky",
-"42137", "Nitra",
 "42155", "Kosice",
+"42136", "Levice",
 "42157", "Humenne",
+"42144", "Liptovsky\ Mikulas",
+"42151", "Presov",
+"42152", "Poprad",
+"42131", "Dunajska\ Streda",
+"42132", "Trencin",
+"42137", "Nitra",
 "4212", "Bratislava",
-"42144", "Liptovsky\ Mikulas",};
+"42133", "Trnava",
+"42153", "Spisska\ Nova\ Ves",
+"421601", "Roznava",
+"42148", "Banska\ Bystrica",
+"42146", "Prievidza",
+"42145", "Zvolen",
+"42141", "Zilina",
+"42142", "Povazska\ Bystrica",
+"42147", "Lucenec",
+"42154", "Bardejov",
+"42134", "Senica",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+421|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '421', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '421', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

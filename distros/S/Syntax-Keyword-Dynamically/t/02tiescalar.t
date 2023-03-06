@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Syntax::Keyword::Dynamically;
 
@@ -26,7 +26,7 @@ subtest "tied scalar" => sub {
       is( $scalar, "inside", 'new value within scope' );
    }
    is( $scalar, "restored", 'value restored after block leave' );
-   is_deeply( \@stored_values, [ "new", "saved" ], 'STORE magic invoked' );
+   is( \@stored_values, [ "new", "saved" ], 'STORE magic invoked' );
 };
 
 done_testing;

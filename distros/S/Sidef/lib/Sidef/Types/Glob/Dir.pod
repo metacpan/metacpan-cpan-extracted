@@ -74,6 +74,16 @@ Returns the
 
 =cut
 
+=head2 find
+
+    self.find(arg)
+
+Returns the
+
+Aliases: I<browse>
+
+=cut
+
 =head2 home
 
     self.home
@@ -107,6 +117,16 @@ Aliases: I<mkdir>, I<create>
 Returns the
 
 Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
+
+=cut
+
+=head2 mktemp
+
+    self.mktemp(:opts)
+
+Returns the
+
+Aliases: I<make_tmp>, I<make_temp>
 
 =cut
 

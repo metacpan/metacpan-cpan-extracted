@@ -164,30 +164,30 @@ font.Warning {
 <div id="2" class="line"><font class="Comment">#&nbsp;AWK&nbsp;hl&nbsp;test</font></br></div>
 <div id="3" class="line"></br></div>
 <div id="4" class="line"><font class="Comment">#&nbsp;</font><font class="RegionMarker">BEGIN</font><font class="Comment">&nbsp;and&nbsp;</font><font class="RegionMarker">END</font><font class="Comment">&nbsp;are&nbsp;also&nbsp;matched&nbsp;as&nbsp;patterns</font></br></div>
-<div id="5" class="line"><font class="ControlFlow">BEGIN</font><font class="Normal">&nbsp;</font><font class="Keyword">{</font></br></div>
+<div id="5" class="line"><font class="ControlFlow">BEGIN</font><font class="Normal">&nbsp;</font><font class="Operator">{</font></br></div>
 <div id="6" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;p&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Float">0</font><font class="Operator">;</font></br></div>
-<div id="7" class="line"><font class="Keyword">}</font></br></div>
+<div id="7" class="line"><font class="Operator">}</font></br></div>
 <div id="8" class="line"></br></div>
-<div id="9" class="line"><font class="Others">/</font><font class="SpecialString">some&nbsp;pattern</font><font class="Others">/</font><font class="Normal">&nbsp;</font><font class="Keyword">{</font></br></div>
+<div id="9" class="line"><font class="Others">/</font><font class="SpecialString">some&nbsp;pattern</font><font class="Others">/</font><font class="Normal">&nbsp;</font><font class="Operator">{</font></br></div>
 <div id="10" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;p</font><font class="Operator">++;</font></br></div>
-<div id="11" class="line"><font class="Keyword">}</font></br></div>
+<div id="11" class="line"><font class="Operator">}</font></br></div>
 <div id="12" class="line"></br></div>
 <div id="13" class="line"><font class="Comment">#&nbsp;/&nbsp;inside&nbsp;brackets&nbsp;is&nbsp;not&nbsp;considered&nbsp;end&nbsp;of&nbsp;expression</font></br></div>
 <div id="14" class="line"><font class="Comment">#&nbsp;a&nbsp;loose&nbsp;division&nbsp;operator&nbsp;(/)&nbsp;is&nbsp;not&nbsp;mismatched&nbsp;as&nbsp;a&nbsp;pattern.</font></br></div>
-<div id="15" class="line"><font class="DataType">$1</font><font class="Normal">&nbsp;</font><font class="Operator">=~</font><font class="Normal">&nbsp;</font><font class="Others">/[^</font><font class="SpecialString">abc/</font><font class="Others">]</font><font class="SpecialString">def</font><font class="Others">/</font><font class="Normal">&nbsp;||&nbsp;b&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="Float">3</font><font class="Normal">&nbsp;</font><font class="Operator">/</font><font class="Normal">&nbsp;</font><font class="Float">5</font><font class="Normal">&nbsp;</font><font class="Keyword">{</font></br></div>
+<div id="15" class="line"><font class="DataType">$1</font><font class="Normal">&nbsp;</font><font class="Operator">=~</font><font class="Normal">&nbsp;</font><font class="Others">/[^</font><font class="SpecialString">abc/</font><font class="Others">]</font><font class="SpecialString">def</font><font class="Others">/</font><font class="Normal">&nbsp;||&nbsp;b&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="Float">3</font><font class="Normal">&nbsp;</font><font class="Operator">/</font><font class="Normal">&nbsp;</font><font class="Float">5</font><font class="Normal">&nbsp;</font><font class="Operator">{</font></br></div>
 <div id="16" class="line"></br></div>
-<div id="17" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">gsub</font><font class="Normal">&nbsp;(&nbsp;</font><font class="BuiltIn">FILENAME</font><font class="Normal">&nbsp;)</font><font class="Operator">;</font></br></div>
+<div id="17" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">gsub</font><font class="Normal">&nbsp;</font><font class="Operator">(</font><font class="Normal">&nbsp;</font><font class="BuiltIn">FILENAME</font><font class="Normal">&nbsp;</font><font class="Operator">);</font></br></div>
 <div id="18" class="line"></br></div>
-<div id="19" class="line"><font class="Keyword">}</font></br></div>
+<div id="19" class="line"><font class="Operator">}</font></br></div>
 <div id="20" class="line"></br></div>
 <div id="21" class="line"><font class="Comment">#&nbsp;</font><font class="Alert">TODO</font><font class="Comment">&nbsp;and&nbsp;</font><font class="Alert">FIXME</font><font class="Comment">&nbsp;also&nbsp;work&nbsp;in&nbsp;comments&nbsp;in&nbsp;Awk.</font></br></div>
 <div id="22" class="line"></br></div>
 <div id="23" class="line"><font class="Comment">#&nbsp;Also&nbsp;backslash&nbsp;in&nbsp;patterns&nbsp;works.</font></br></div>
-<div id="24" class="line"><font class="Others">/\</font><font class="SpecialString">/usr</font><font class="Others">\</font><font class="SpecialString">/bin</font><font class="Others">\</font><font class="SpecialString">/awk</font><font class="Others">/</font><font class="Normal">&nbsp;</font><font class="Keyword">{</font><font class="Normal">&nbsp;</font><font class="Keyword">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;This&nbsp;is&nbsp;me&quot;</font><font class="Operator">;</font><font class="Normal">&nbsp;</font><font class="Keyword">}</font></br></div>
+<div id="24" class="line"><font class="Others">/\</font><font class="SpecialChar">/</font><font class="SpecialString">usr</font><font class="Others">\</font><font class="SpecialChar">/</font><font class="SpecialString">bin</font><font class="Others">\</font><font class="SpecialChar">/</font><font class="SpecialString">awk</font><font class="Others">/</font><font class="Normal">&nbsp;</font><font class="Operator">{</font><font class="Normal">&nbsp;</font><font class="Keyword">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;This&nbsp;is&nbsp;me&quot;</font><font class="Operator">;</font><font class="Normal">&nbsp;</font><font class="Operator">}</font></br></div>
 <div id="25" class="line"></br></div>
-<div id="26" class="line"><font class="ControlFlow">END</font><font class="Normal">&nbsp;</font><font class="Keyword">{</font></br></div>
+<div id="26" class="line"><font class="ControlFlow">END</font><font class="Normal">&nbsp;</font><font class="Operator">{</font></br></div>
 <div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">print</font><font class="Normal">&nbsp;p</font><font class="Operator">;</font></br></div>
-<div id="28" class="line"><font class="Keyword">}</font></br></div>
+<div id="28" class="line"><font class="Operator">}</font></br></div>
 </div>
 </body>
 </html>

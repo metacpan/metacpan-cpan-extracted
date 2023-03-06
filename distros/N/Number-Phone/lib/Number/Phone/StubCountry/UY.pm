@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -51,6 +51,10 @@ my $formatters = [
                   'leading_digits' => '4',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
+                },
+                {
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
@@ -85,7 +89,10 @@ my $validators = {
                 'specialrate' => '(90[0-8]\\d{4})',
                 'toll_free' => '
           (?:
-            4\\d{5}|
+            (?:
+              0004|
+              4
+            )\\d{5}|
             80[05]
           )\\d{4}|
           405\\d{4}
@@ -93,42 +100,42 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"598464", "Melo\/Cerro\ Largo",
-"5984360", "Durazno",
-"5984365", "Durazno",
-"5984364", "Trinidad\/Flores",
-"598433", "Canelones",
-"5984368", "Durazno",
-"5984367", "Durazno",
-"598444", "Minas\/Lavalleja",
-"598447", "Rocha",
-"5984362", "Durazno",
-"5982", "Montevideo",
-"598445", "Treinta\ y\ Tres",
-"5984369", "Durazno",
-"5984363", "Durazno",
-"598453", "Mercedes\/Soriano",
-"598473", "Salto",
-"598472", "Paysandu",
+$areanames{en} = {"598462", "Rivera",
 "598452", "Colonia\ del\ Scaramento",
+"598472", "Paysandu",
+"598433", "Canelones",
+"5984369", "Durazno",
+"598464", "Melo\/Cerro\ Largo",
+"5984363", "Durazno",
+"5984364", "Trinidad\/Flores",
+"5982", "Montevideo",
 "5984361", "Durazno",
+"598477", "Artigas",
 "598434", "San\ Jose\ de\ Mayo",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"59842", "San\ Carlos",
-"598462", "Rivera",
-"598463", "Tacuarembo",
+"5984367", "Durazno",
+"5984360", "Durazno",
 "598435", "Florida",
+"5984368", "Durazno",
+"598473", "Salto",
+"598445", "Treinta\ y\ Tres",
+"598463", "Tacuarembo",
+"598444", "Minas\/Lavalleja",
+"598456", "Fray\ Bentos\/Rio\ Negro",
 "5984366", "Durazno",
-"598477", "Artigas",};
+"5984362", "Durazno",
+"598447", "Rocha",
+"598453", "Mercedes\/Soriano",
+"5984365", "Durazno",
+"59842", "San\ Carlos",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+598|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '598', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '598', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

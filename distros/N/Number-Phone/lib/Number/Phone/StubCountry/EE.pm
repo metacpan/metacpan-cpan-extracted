@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -104,7 +104,7 @@ my $validators = {
                     1\\d
                   )|
                   (?:
-                    23|
+                    2[0-59]|
                     [3-79]\\d
                   )\\d
                 )\\d
@@ -170,30 +170,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"37279", "Põlva",
-"37274", "Tartu",
-"37235", "Narva\/Sillamäe",
-"37277", "Jõgeva",
-"37275", "Tartu",
-"37245", "Kuressaare",
-"37247", "Haapsalu",
-"37244", "Pärnu",
-"37278", "Võru",
-"37276", "Valga",
-"37233", "Kohtla\-Järve",
-"37273", "Tartu",
-"37238", "Paide",
-"3726", "Tallinn\/Harju\ County",
+$areanames{en} = {"37275", "Tartu",
 "37232", "Rakvere",
+"37279", "Põlva",
+"37247", "Haapsalu",
+"37276", "Valga",
+"37278", "Võru",
+"37244", "Pärnu",
+"37245", "Kuressaare",
+"37238", "Paide",
+"37277", "Jõgeva",
 "37246", "Kärdla",
+"37235", "Narva\/Sillamäe",
 "37248", "Rapla",
-"37243", "Viljandi",};
+"37274", "Tartu",
+"37273", "Tartu",
+"3726", "Tallinn\/Harju\ County",
+"37243", "Viljandi",
+"37233", "Kohtla\-Järve",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+372|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '372', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

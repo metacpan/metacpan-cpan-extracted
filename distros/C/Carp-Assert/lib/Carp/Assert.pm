@@ -8,7 +8,7 @@ use Exporter;
 use vars qw(@ISA $VERSION %EXPORT_TAGS);
 
 BEGIN {
-    $VERSION = '0.21';
+    $VERSION = '0.22';
 
     @ISA = qw(Exporter);
 
@@ -392,18 +392,6 @@ sub shouldnt ($$) {
     return undef;
 }
 
-# Sorry, I couldn't resist.
-sub shouldn't ($$) {     # emacs cperl-mode madness #' sub {
-    my $env_ndebug = exists $ENV{PERL_NDEBUG} ? $ENV{PERL_NDEBUG}
-                                              : $ENV{'NDEBUG'};
-    if( $env_ndebug ) {
-        return undef;
-    }
-    else {
-        shouldnt($_[0], $_[1]);
-    }
-}
-
 =back
 
 =head1 Debugging vs Production
@@ -518,11 +506,6 @@ Since C<POSIX> exports way too much, you should be using it like that anyway.
 
 affirm() mucks with the expression's caller and it is run in an eval
 so anything that checks $^S will be wrong.
-
-=head2 C<shouldn't>
-
-Yes, there is a C<shouldn't> routine.  It mostly works, but you B<must>
-put the C<if DEBUG> after it.
 
 =head2 missing C<if DEBUG>
 

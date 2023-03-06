@@ -517,3 +517,14 @@ Revision history for StreamFinder
         and icon (video-preview) image due to site changes.  Also do better job 
         selecting this image, which usually comes in multiple sizes:  
         make getIconURL() return the smallest and getImageURL() the largest.
+2.11    2023/03/03
+        - Added StreamFinder::Podchaser to fetch podchaser.com podcasts.
+        - Fix failure to fetch channel art on 
+        first episode if given a podcast page; misc. cleanups.
+2.12    2023/03/06
+        - StreamFinder::PodcastAddict - When given a podcast page, refactor to 
+        1) avoid a 2nd fetch of the latest episode page if we are able to get 
+        all the needed metadata from the podcast page code; and 2) Fix failure 
+        to fetch with just a podcast-ID or podcast-ID/episode-ID (without a 
+        full URL).  Also misc. tweaks to try to get all metadata, properly 
+        handle sorting the playlist (getURL('playlist')), and doc. tweaks.

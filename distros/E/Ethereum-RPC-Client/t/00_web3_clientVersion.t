@@ -4,8 +4,8 @@ use Test::More;
 use Ethereum::RPC::Client;
 
 BEGIN {
-    plan skip_all => 'Needs Travis setup'
-        unless $ENV{TRAVIS};
+    plan skip_all => 'Needs Circle setup'
+        unless $ENV{CIRCLECI};
 }
 
 my $eth                = Ethereum::RPC::Client->new();

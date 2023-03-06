@@ -25,12 +25,12 @@ register_worker({ phase => 'early',
   my ($job, $workerconf) = @_;
   my $device = $job->device;
 
-  # would be possible just to use now() on updated records, but by using this
+  # would be possible just to use LOCALTIMESTAMP on updated records, but by using this
   # same value for them all, we can if we want add a job at the end to
   # select and do something with the updated set (see set archive, below)
   vars->{'timestamp'} = ($job->is_offline and $job->entered)
     ? (schema('netdisco')->storage->dbh->quote($job->entered) .'::timestamp')
-    : 'to_timestamp('. (join '.', gettimeofday) .')';
+    : 'to_timestamp('. (join '.', gettimeofday) .')::timestamp';
 
   # initialise the cache
   vars->{'fwtable'} ||= {};
@@ -225,13 +225,13 @@ All four fields in the tuple are required. If you don't know the VLAN ID,
 Netdisco supports using ID "0".
 
 Optionally, a fifth argument can be the literal string passed to the time_last
-field of the database record. If not provided, it defaults to C<now()>.
+field of the database record. If not provided, it defaults to C<LOCALTIMESTAMP>.
 
 =cut
 
 sub store_node {
   my ($ip, $vlan, $port, $mac, $now) = @_;
-  $now ||= 'now()';
+  $now ||= 'LOCALTIMESTAMP';
   $vlan ||= 0;
 
   schema('netdisco')->txn_do(sub {
@@ -249,7 +249,7 @@ sub store_node {
         })->update( { active => \'false' } );
 
     # new data
-    $nodes->update_or_create(
+    my $row = $nodes->update_or_new(
       {
         switch => $ip,
         port => $port,
@@ -265,6 +265,11 @@ sub store_node {
         for => 'update',
       }
     );
+
+    if (! $row->in_storage) {
+        $row->set_column(time_first => \$now);
+        $row->insert;
+    }
   });
 }
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT 0.49;
+package Devel::MAT 0.50;
 
 use v5.14;
 use warnings;
@@ -339,6 +339,11 @@ sub inref_graph
          my ( $depth ) = grep { $cv->pad( $_ ) == $pad } ( 1 .. ( $cv->depth || 1 ) );
          return Devel::MAT::SV::Reference( $_->name . " at depth $depth", $_->strength, $cv );
       }->() } @inrefs;
+   }
+
+   if( $sv->is_mortal ) {
+      $graph->add_root( $sv,
+         Devel::MAT::SV::Reference( "a mortal", strong => undef ) );
    }
 
    foreach my $ref ( sort_by { $_->name } @inrefs ) {

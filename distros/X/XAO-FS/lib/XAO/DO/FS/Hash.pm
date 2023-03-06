@@ -326,12 +326,14 @@ sub add_placeholder ($%) {
 Convenience method that checks object structure and adds specified
 placeholders if they do not currently exist.
 
-Upon return object will have at least the given fields. It can have some
-extra fields that were on the object before, but given fields guaranteed
-to exist and have the same descriptions as provided.
+If any existing field has a different description than supplied
+build_structure() method will adjust the database structure when
+possible, or throw an error if an automatic adjustment is not supported.
 
-If any existing field has different description than supplied
-build_structure() method will throw an error.
+Upon return, the object will have at least the given fields. It can
+have some extra fields that were on the object before, but given fields
+guaranteed to exist and have the same descriptions as provided. The list
+of extra fields is returned.
 
 Example:
 
@@ -362,13 +364,22 @@ sub build_structure ($%) {
     my $self=shift;
     my $args=get_args(\@_);
 
+    $self->_consistency_checked ||
+        throw $self "- can't build_structure without 'check_consistency' on loading";
+
+    $self->_glue->transact_active &&
+        throw $self "- structure manipulations don't support transactions";
+
     my %changed_charset;
     my %changed_scale;
     my %changed_default;
     my %changed_maxlength;
 
-    $self->_consistency_checked ||
-        throw $self "- can't build_structure without 'check_consistency' on loading";
+    my %result=(
+        changed => 0,
+        added   => 0,
+        orphans => [],
+    );
 
     foreach my $name (keys %$args) {
         my %ph;
@@ -397,6 +408,7 @@ sub build_structure ($%) {
 
                     if($v ne ($dbv || '')) {
                         $changed_charset{$name}=$v;
+                        ++$result{'changed'};
                         dprint "..changed charset for '$name': '$dbv' => '$v'";
                     }
                 }
@@ -408,6 +420,7 @@ sub build_structure ($%) {
                     }
                     elsif($v>$dbv) {
                         $changed_scale{$name}=$v;
+                        ++$result{'changed'};
                         dprint "..changed scale for '$name': '$dbv' => '$v'";
                     }
                 }
@@ -415,6 +428,7 @@ sub build_structure ($%) {
                     my $match=$type eq 'text' || $type eq 'blob' ? ($v eq $dbv) : ($v == $dbv && $dbv ne '' && $dbv !~ /[a-z]/i);
                     if(!$match) {
                         $changed_default{$name}=$v;
+                        ++$result{'changed'};
                         dprint "..changed default for '$name': '$dbv' => '$v'";
                     }
                 }
@@ -424,6 +438,7 @@ sub build_structure ($%) {
                         $type eq 'text' || $type eq 'blob' ||
                             throw $self "- 'maxlength' only makes sense for 'text' and 'blob' fields";
                         $changed_maxlength{$name}=$v;
+                        ++$result{'changed'};
                         dprint "..changed maxlength for '$name': '$dbv' => '$v'";
                     }
                 }
@@ -434,6 +449,7 @@ sub build_structure ($%) {
         }
         else {
             $self->add_placeholder(\%ph);
+            ++$result{'added'};
         }
 
         # Building recursive structures
@@ -441,7 +457,12 @@ sub build_structure ($%) {
         if($ph{'type'} eq 'list' && $ph{'structure'}) {
             my $ro=XAO::Objects->new(objname => $ph{'class'},
                                      glue => $self->_glue);
-            $ro->build_structure($ph{'structure'});
+
+            my $res=$ro->build_structure($ph{'structure'});
+
+            $result{'changed'}+=$res->{'changed'};
+            $result{'added'}+=$res->{'added'};
+            push(@{$result{'orphans'}}, @{$res->{'orphans'}});
         }
     }
 
@@ -468,6 +489,30 @@ sub build_structure ($%) {
         structure   => $args,
         param       => 'default',
     );
+
+    # Checking for fields that are defined in the database structure,
+    # but not in the given description.
+    #
+    foreach my $k ($self->keys) {
+        next if $args->{$k};
+
+        my $d=$self->describe($k);
+
+        next if $d->{'type'} eq 'key';
+
+        # /project is hard-coded and is not usually a part of any given
+        # structure, keeping it.
+        #
+        my $objname=$self->objname;
+        next if $objname eq 'FS::Global' && $k eq 'project';
+
+        push(@{$result{'orphans'}},{
+            class   => $objname,
+            field   => $k,
+        });
+    }
+
+    return \%result;
 }
 
 ###############################################################################
@@ -514,6 +559,58 @@ sub _build_structure_change($@) {
 
     if(!$forced) {
         XAO::Utils::set_debug($debug_status);
+    }
+}
+
+###############################################################################
+
+=item sync_structure (%)
+
+Build the given structure (similarly to L<build_structure()>) and drop all
+fields that are not mentioned in the given structure definition.
+
+B<DANGER:> This routine can irreversibly delete table fields and whole
+tables.
+
+=cut
+
+sub sync_structure ($%) {
+    my $self=shift;
+    my $args=get_args(\@_);
+
+    my $res=$self->build_structure($args);
+
+    my $orphans=$res->{'orphans'};
+
+    if(@$orphans) {
+        my $forced=grep { $args->{$_}->{'_force'} } keys %$args;
+
+        my $debug_status=XAO::Utils::get_debug();
+        if(!$forced) {
+            XAO::Utils::set_debug(1);
+
+            dprint "Some placeholders are present in the database, but not in the given structure.";
+            foreach my $orphan (@$orphans) {
+                dprint "..$orphan->{'class'} / $orphan->{'field'}";
+            }
+            dprint "They will be irrecoverably dropped. Interrupt within 10 seconds to abort.";
+            sleep 10;
+        }
+
+        dprint "Dropping placeholders";
+
+        foreach my $orphan (@$orphans) {
+            my ($class,$field)=@{$orphan}{'class','field'};
+
+            dprint "..$class / $field";
+
+            my $obj=XAO::Objects->new(
+                objname => $class,
+                glue    => $self->_glue,
+            );
+
+            $obj->drop_placeholder($field);
+        }
     }
 }
 
@@ -686,8 +783,7 @@ sub describe ($$) {
     my $desc=$self->_field_description($name);
     return undef unless $desc;
 
-    ##
-    # We copy description so that whoever needs it will not modify our
+    # We copy description so that whoever needs it, would not modify our
     # internal structure.
     #
     my %d;

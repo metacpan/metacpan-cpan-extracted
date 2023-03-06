@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20221202210916';
+    $VERSION = '2.20230305165945';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -168,6 +168,8 @@
 691 => 'FM',
 692 => 'MH',
 7 => ['KZ', 'RU'],
+800 => '001',
+808 => '001',
 81 => 'JP',
 82 => 'KR',
 84 => 'VN',
@@ -177,8 +179,14 @@
 855 => 'KH',
 856 => 'LA',
 86 => 'CN',
+870 => '001',
+878 => '001',
 880 => 'BD',
+881 => '001',
+882 => '001',
+883 => '001',
 886 => 'TW',
+888 => '001',
 90 => 'TR',
 91 => 'IN',
 92 => 'PK',
@@ -202,6 +210,7 @@
 975 => 'BT',
 976 => 'MN',
 977 => 'NP',
+979 => '001',
 98 => 'IR',
 992 => 'TJ',
 993 => 'TM',
@@ -212,6 +221,7 @@
 
     );
     %Number::Phone::Country::prefix_codes = (
+'001' => ['979', undef, undef, undef],
 'AC' => ['247', '00', undef, qr/\A 00 /xms],
 'AD' => ['376', '00', undef, qr/\A 00 /xms],
 'AE' => ['971', '00', '0', qr/\A 00 /xms],
@@ -482,25 +492,25 @@ $Number::Phone::Country::idd_codes{447839} = 'GG';
 $Number::Phone::Country::idd_codes{4479111} = 'GG';
 $Number::Phone::Country::idd_codes{4479117} = 'GG';
 $Number::Phone::Country::idd_codes{441624} = 'IM';
+$Number::Phone::Country::idd_codes{44762450} = 'IM';
+$Number::Phone::Country::idd_codes{44762456} = 'IM';
 $Number::Phone::Country::idd_codes{4474576} = 'IM';
 $Number::Phone::Country::idd_codes{447524} = 'IM';
+$Number::Phone::Country::idd_codes{447924} = 'IM';
 $Number::Phone::Country::idd_codes{4476240} = 'IM';
 $Number::Phone::Country::idd_codes{4476241} = 'IM';
 $Number::Phone::Country::idd_codes{4476242} = 'IM';
 $Number::Phone::Country::idd_codes{4476243} = 'IM';
 $Number::Phone::Country::idd_codes{4476244} = 'IM';
-$Number::Phone::Country::idd_codes{44762450} = 'IM';
-$Number::Phone::Country::idd_codes{44762456} = 'IM';
 $Number::Phone::Country::idd_codes{4476246} = 'IM';
 $Number::Phone::Country::idd_codes{4476248} = 'IM';
 $Number::Phone::Country::idd_codes{4476249} = 'IM';
-$Number::Phone::Country::idd_codes{447924} = 'IM';
 $Number::Phone::Country::idd_codes{44808162} = 'IM';
 $Number::Phone::Country::idd_codes{448440406} = 'IM';
 $Number::Phone::Country::idd_codes{448440906} = 'IM';
+$Number::Phone::Country::idd_codes{44872299} = 'IM';
 $Number::Phone::Country::idd_codes{44845624} = 'IM';
 $Number::Phone::Country::idd_codes{44870624} = 'IM';
-$Number::Phone::Country::idd_codes{44872299} = 'IM';
 $Number::Phone::Country::idd_codes{44900624} = 'IM';
 $Number::Phone::Country::idd_codes{44901624} = 'IM';
 $Number::Phone::Country::idd_codes{44906624} = 'IM';
@@ -530,30 +540,70 @@ $Number::Phone::Country::idd_codes{38128} = 'XK';
 $Number::Phone::Country::idd_codes{38129} = 'XK';
 $Number::Phone::Country::idd_codes{38138} = 'XK';
 $Number::Phone::Country::idd_codes{38139} = 'XK';
-$Number::Phone::Country::idd_codes{800} = 'InternationalFreephone';
-$Number::Phone::Country::idd_codes{808} = 'SharedCostServices';
-$Number::Phone::Country::idd_codes{870} = 'Inmarsat';
-$Number::Phone::Country::idd_codes{878} = 'UniversalPersonalTelecoms';
-$Number::Phone::Country::idd_codes{881} = 'GMSS';
-$Number::Phone::Country::idd_codes{8810} = 'ICO';
-$Number::Phone::Country::idd_codes{8811} = 'ICO';
-$Number::Phone::Country::idd_codes{8816} = 'Iridium';
-$Number::Phone::Country::idd_codes{8817} = 'Iridium';
-$Number::Phone::Country::idd_codes{8818} = 'Globalstar';
-$Number::Phone::Country::idd_codes{8819} = 'Globalstar';
-$Number::Phone::Country::idd_codes{882} = 'InternationalNetworks';
-$Number::Phone::Country::idd_codes{88213} = 'Telespazio';
-$Number::Phone::Country::idd_codes{88216} = 'Thuraya';
-$Number::Phone::Country::idd_codes{88220} = 'GarudaMobile';
 $Number::Phone::Country::idd_codes{88234} = 'AQ';
-$Number::Phone::Country::idd_codes{883} = 'InternationalNetworks';
-$Number::Phone::Country::idd_codes{883120} = 'Telenor';
-$Number::Phone::Country::idd_codes{883130} = 'Mobistar';
-$Number::Phone::Country::idd_codes{883140} = 'MTTGlobalNetworks';
-$Number::Phone::Country::idd_codes{888} = 'TelecomsForDisasterRelief';
-$Number::Phone::Country::idd_codes{979} = 'InternationalPremiumRate';
+$Number::Phone::Country::idd_codes{88213} = 'InternationalNetworks882::Telespazio';
+$Number::Phone::Country::idd_codes{883140} = 'InternationalNetworks883::MTTGlobalNetworks';
+$Number::Phone::Country::idd_codes{8811} = 'GMSS::ICO';
 $Number::Phone::Country::idd_codes{991} = 'ITPCS';
+$Number::Phone::Country::idd_codes{979} = 'InternationalPremiumRate';
+$Number::Phone::Country::idd_codes{88216} = 'InternationalNetworks882::Thuraya';
+$Number::Phone::Country::idd_codes{8818} = 'GMSS::Globalstar';
+$Number::Phone::Country::idd_codes{883} = 'InternationalNetworks883';
+$Number::Phone::Country::idd_codes{8819} = 'GMSS::Globalstar';
+$Number::Phone::Country::idd_codes{878} = 'UniversalPersonalTelecoms';
+$Number::Phone::Country::idd_codes{800} = 'InternationalFreephone';
+$Number::Phone::Country::idd_codes{883130} = 'InternationalNetworks883::Mobistar';
+$Number::Phone::Country::idd_codes{808} = 'SharedCostServices';
+$Number::Phone::Country::idd_codes{8810} = 'GMSS::ICO';
+$Number::Phone::Country::idd_codes{8817} = 'GMSS::Iridium';
+$Number::Phone::Country::idd_codes{881} = 'GMSS';
+$Number::Phone::Country::idd_codes{882} = 'InternationalNetworks882';
+$Number::Phone::Country::idd_codes{8816} = 'GMSS::Iridium';
+$Number::Phone::Country::idd_codes{888} = 'TelecomsForDisasterRelief';
+$Number::Phone::Country::idd_codes{870} = 'Inmarsat';
 
+        $Number::Phone::Country::prefix_codes{'AQ'} = ['88234'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalNetworks882::Telespazio'} = ['88213'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalNetworks883::MTTGlobalNetworks'} = ['883140'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS::ICO'} = ['8811'];
+    
+        $Number::Phone::Country::prefix_codes{'ITPCS'} = ['991'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalPremiumRate'} = ['979'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalNetworks882::Thuraya'} = ['88216'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS::Globalstar'} = ['8818'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalNetworks883'} = ['883'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS::Globalstar'} = ['8819'];
+    
+        $Number::Phone::Country::prefix_codes{'UniversalPersonalTelecoms'} = ['878'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalFreephone'} = ['800'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalNetworks883::Mobistar'} = ['883130'];
+    
+        $Number::Phone::Country::prefix_codes{'SharedCostServices'} = ['808'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS::ICO'} = ['8810'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS::Iridium'} = ['8817'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS'} = ['881'];
+    
+        $Number::Phone::Country::prefix_codes{'InternationalNetworks882'} = ['882'];
+    
+        $Number::Phone::Country::prefix_codes{'GMSS::Iridium'} = ['8816'];
+    
+        $Number::Phone::Country::prefix_codes{'TelecomsForDisasterRelief'} = ['888'];
+    
+        $Number::Phone::Country::prefix_codes{'Inmarsat'} = ['870'];
+    
     $Number::Phone::Country::prefix_codes{VA} = ['379', '00',   undef, qr/\A 00 /xms];
     $Number::Phone::Country::prefix_codes{BV} = ['47',  '00',   undef, qr/\A 00 /xms];
     $Number::Phone::Country::prefix_codes{GS} = ['500', '00',   undef, qr/\A 00 /xms];

@@ -1,5 +1,8 @@
 Revision history for perl distribution App-proxyforurl
 
+1.02 2023-03-06T13:34:06
+ - Skipping api.t tests if not developing
+
 1.01 2023-02-23T15:03:00
  - Fix fetching correct URLs with PROXYFORURL_X_REQUEST_BASE
 

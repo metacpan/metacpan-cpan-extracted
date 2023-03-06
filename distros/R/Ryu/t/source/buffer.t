@@ -86,7 +86,7 @@ subtest 'completion after drain' => sub {
     }
     ok($buffered->is_paused, 'have enough items to trigger a pause');
     ok(!$buffered->completed->is_ready, 'not yet finished');
-    $src->completed->done;
+    $src->finish;
     ok(!$buffered->completed->is_ready, 'still not finished');
     ok(!$target->completed->is_ready, 'and target is still not finished either');
     cmp_deeply([ splice @received, 0 ],   [], 'items still have not passed through');

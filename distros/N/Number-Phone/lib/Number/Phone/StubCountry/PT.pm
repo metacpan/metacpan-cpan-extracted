@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -114,65 +114,65 @@ my $validators = {
                 'voip' => '30\\d{7}'
               };
 my %areanames = ();
-$areanames{pt} = {"35121", "Lisboa",};
-$areanames{en} = {"351238", "Seia",
-"351243", "Santarém",
-"351292", "Horta",
-"351269", "Santiago\ do\ Cacém",
-"351281", "Tavira",
-"351255", "Penafiel",
-"351277", "Idanha\-a\-Nova",
-"351286", "Castro\ Verde",
-"351274", "Proença\-a\-Nova",
-"351285", "Moura",
-"351251", "Valença",
-"351263", "Vila\ Franca\ de\ Xira",
-"351278", "Mirandela",
-"351249", "Torres\ Novas",
+$areanames{en} = {"351292", "Horta",
 "351234", "Aveiro",
-"351256", "S\.\ João\ da\ Madeira",
-"35122", "Porto",
-"351245", "Portalegre",
-"351289", "Faro",
-"351253", "Braga",
-"351261", "Torres\ Vedras",
-"351272", "Castelo\ Branco",
-"351266", "Évora",
-"351265", "Setúbal",
-"351232", "Viseu",
-"351283", "Odemira",
-"351259", "Vila\ Real",
-"351241", "Abrantes",
 "351242", "Ponte\ de\ Sôr",
-"351231", "Mealhada",
-"351275", "Covilhã",
-"351236", "Pombal",
-"351257", "Braga",
-"351254", "Peso\ da\ Régua",
-"351262", "Caldas\ da\ Rainha",
-"351271", "Guarda",
-"351235", "Arganil",
-"351258", "Viana\ do\ Castelo",
-"351284", "Beja",
-"351276", "Chaves",
-"351295", "Angra\ do\ Heroísmo",
-"351268", "Estremoz",
-"35121", "Lisbon",
-"351273", "Bragança",
 "351239", "Coimbra",
+"351231", "Mealhada",
+"351245", "Portalegre",
+"351273", "Bragança",
+"351253", "Braga",
+"35122", "Porto",
+"351286", "Castro\ Verde",
+"351263", "Vila\ Franca\ de\ Xira",
+"351295", "Angra\ do\ Heroísmo",
+"351278", "Mirandela",
 "351252", "V\.\ N\.\ de\ Famalicão",
+"351281", "Tavira",
+"351262", "Caldas\ da\ Rainha",
+"351268", "Estremoz",
+"351236", "Pombal",
+"351258", "Viana\ do\ Castelo",
+"351272", "Castelo\ Branco",
+"351275", "Covilhã",
+"351284", "Beja",
+"351243", "Santarém",
+"351265", "Setúbal",
+"351289", "Faro",
+"351255", "Penafiel",
+"351291", "Funchal",
+"351235", "Arganil",
+"351241", "Abrantes",
+"351249", "Torres\ Novas",
+"351232", "Viseu",
+"351276", "Chaves",
+"35121", "Lisbon",
+"351256", "S\.\ João\ da\ Madeira",
+"351238", "Seia",
 "351244", "Leiria",
+"351266", "Évora",
+"351283", "Odemira",
+"351251", "Valença",
+"351261", "Torres\ Vedras",
 "351282", "Portimão",
 "351233", "Figueira\ da\ Foz",
+"351271", "Guarda",
 "351279", "Moncorvo",
-"351291", "Funchal",
-"351296", "Ponta\ Delgada",};
+"351254", "Peso\ da\ Régua",
+"351257", "Braga",
+"351296", "Ponta\ Delgada",
+"351277", "Idanha\-a\-Nova",
+"351269", "Santiago\ do\ Cacém",
+"351285", "Moura",
+"351259", "Vila\ Real",
+"351274", "Proença\-a\-Nova",};
+$areanames{pt} = {"35121", "Lisboa",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+351|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '351', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

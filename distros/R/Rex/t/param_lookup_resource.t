@@ -1,3 +1,8 @@
+#!/usr/bin/env perl
+
+use v5.12.5;
+use warnings;
+
 package MyTest;
 
 use Rex -base;
@@ -44,4 +49,3 @@ task(
 );
 
 test1();
-

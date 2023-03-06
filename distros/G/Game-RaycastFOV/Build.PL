@@ -23,8 +23,7 @@ my $builder = Module::Build->new(
     test_requires => {
         'strict'     => 0,
         'Math::Trig' => 0,
-        'Test::More' => '0.88',          # done_testing
-        'Test::Most' => 0,
+        'Test2::V0'  => '0.000060',
     },
     sign           => 1,
     add_to_cleanup => ['Game-RaycastFOV-*'],
@@ -37,10 +36,8 @@ my $builder = Module::Build->new(
             },
         },
     },
-    meta_merge => {
-        resources =>
-          { repository => 'https://github.com/thrig/Game-RaycastFOV' }
-    },
+    meta_merge =>
+      { resources => { repository => 'https://thrig.me/src/Game-RaycastFOV.git' } },
 );
 
 $builder->create_build_script();

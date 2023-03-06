@@ -5,6 +5,7 @@ use CallBackery::Exception qw(mkerror);
 use Mojo::Promise;
 use Mojo::JSON qw(encode_json);
 use Mojo::Util qw(dumper);
+use Time::HiRes;
 
 =head1 NAME
 
@@ -90,8 +91,14 @@ sub validateData {
     if (not ref $entry){
         die mkerror(4095,trm("sorry, don't know the field you are talking about"));
     }
-    return undef if not $entry->{set}{required} and (not defined $formData->{$fieldName} or length($formData->{$fieldName}) == 0);
-    return ($entry->{validator} ? $entry->{validator}->($formData->{$fieldName},$fieldName,$formData) : undef);
+    return if not $entry->{set}{required} and (not defined $formData->{$fieldName} or length($formData->{$fieldName}) == 0);
+    if ($entry->{validator}){
+        my $start = time;
+        my $data = $entry->{validator}->($formData->{$fieldName},$fieldName,$formData);
+        $self->log->debug(sprintf("validator %s: %0.2fs",$fieldName,time-$start));
+        return $data;
+    }
+    return;
 }
 
 =head2 processData($args)
@@ -162,7 +169,10 @@ sub getFieldValue {
     return undef unless ref $entry eq 'HASH';
     if ($entry->{getter}){
         if (ref $entry->{getter} eq 'CODE'){
-            return $entry->{getter}->($self);
+            my $start = time;
+            my $data = $entry->{getter}->($self);
+            $self->log->debug(sprintf("getter %s: %0.2fs",$field,time-$start));
+            return $data;
         }
         else {
             $self->log->warn('Plugin instance'.$self->name." field $field has a broken getter\n");

@@ -1,11 +1,15 @@
-Revision history for Dist-Zilla-Plugin-InsertExecsList
+0.030   2023-02-16  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-0.02    2015-08-31 (PERLANCAR)
+        - [incompatible change] By default generate an ordered list, add
+          configuration to use unordered list (ordered -> false).
+
+
+0.02    2015-08-31  Released-By: PERLANCAR
 
 	- By default skip completer scripts (currently hardcoded to /^_/
 	  and no configuration to skip this yet).
 
 
-0.01    2015-03-21 (PERLANCAR)
+0.01    2015-03-21  Released-By: PERLANCAR
 
          - First release.

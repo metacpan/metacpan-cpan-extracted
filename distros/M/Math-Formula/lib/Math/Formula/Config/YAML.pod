@@ -134,8 +134,8 @@ B<. Example>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.14,
-built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.15,
+built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

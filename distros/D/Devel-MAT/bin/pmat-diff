@@ -7,6 +7,7 @@ use utf8;
 
 use Devel::MAT;
 use Devel::MAT::Cmd::Terminal;
+use List::Util qw( any );
 use List::UtilsBy qw( nsort_by );
 
 # We're drawing pretty graphs with line drawing
@@ -30,8 +31,6 @@ my @svsB = nsort_by { $_->addr } $pmatB->dumpfile->heap;
 
 $progress->() if $progress;
 
-my $countA = 0;
-my $countB = 0;
 my $countC = 0;
 
 my @onlyA;
@@ -45,12 +44,10 @@ while( @svsA && @svsB ) {
    my $addrB = $svB->addr;
 
    if( $addrA < $addrB ) {
-      $countA++;
       push @onlyA, $svA;
       shift @svsA;
    }
    elsif( $addrB < $addrA ) {
-      $countB++;
       push @onlyB, $svB;
       shift @svsB;
    }
@@ -99,7 +96,6 @@ sub svtrees_from_set
 
    my %svs_by_addr = map { $_->addr => $_ } @svs;
 
-   # First, see what references between the SVs we can find
    my %sv_outrefs; # {$addr} => [other svs here that it refers to]
    foreach my $sv ( @svs ) {
       $sv_outrefs{ $sv->addr } = [];
@@ -110,64 +106,36 @@ sub svtrees_from_set
       }
    }
 
-   # Next, form a reachability matrix. This will be complete but may contain
-   # cycles which we'll delete in the next step.
-   # We can detect possible roots of cycles in this way
-   my %sv_refs_sv; # {$from}{$to} = 1
-   my @cyclic_svs;
+   my %sv_trees; # {$addr} => [$sv, other SV trees it refers to]
+   my %seen;     # {$addr} => bool
+   my %toplevel; # {$addr} => bool
+
    foreach my $origsv ( @svs ) {
-      my $origaddr = $origsv->addr;
-      my @queue = $sv_outrefs{ $origaddr }->@*;
+      my @queue = $origsv;
       while( @queue ) {
          my $sv = shift @queue;
          my $addr = $sv->addr;
 
-         push @cyclic_svs, $sv and next if $addr == $origaddr; # already a cycle
-
-         next if $sv_refs_sv{ $origaddr }{ $addr };
-
-         $sv_refs_sv{ $origaddr }{ $addr } = 1;
-         push @queue, $sv_outrefs{ $addr }->@*;
-      }
-   }
-
-   # Now need to remove links from the reachability matrix until we have no cycles
-   foreach my $origsv ( @cyclic_svs ) {
-      my $origaddr = $origsv->addr;
-      my @queue = sort keys $sv_refs_sv{ $origaddr }->%*;
-      while( @queue ) {
-         my $addr = shift @queue;
-
-         if( $sv_refs_sv{ $addr }{ $origaddr } ) {
-            delete $sv_refs_sv{ $addr }{ $origaddr };
-            next;
+         if( !$sv_trees{ $addr } ) {
+            $toplevel{ $addr }++;
          }
 
-         push @queue, sort keys $sv_refs_sv{ $addr }->%*;
+         $seen{ $addr }++;
+
+         my $node = $sv_trees{ $addr } //= [ $sv ];
+
+         my @new_outrefs = grep { !$seen{ $_->addr }++ } $sv_outrefs{ $addr }->@*;
+
+         foreach my $outref ( nsort_by { $_->addr } @new_outrefs ) {
+            push @queue, $outref;
+            push $node->@*, $sv_trees{ $outref->addr } //= [ $outref ];
+
+            delete $toplevel{ $outref->addr };
+         }
       }
    }
 
-   # Now build them up into trees
-   my %sv_tree = map { $_->addr => [ $_ ] } @svs;
-
-   # At this point, %sv_refs_sv is now acyclic but may still have multipaths
-   # in it. We use this second hash to track that
-   my %seen_by_addr;
-
-   foreach my $sv ( @svs ) {
-      my @outref_addrs = sort keys $sv_refs_sv{ $sv->addr }->%*;
-
-      my $tree = $sv_tree{ $sv->addr };
-
-      foreach my $addr ( @outref_addrs ) {
-         next if $seen_by_addr{$addr}++;
-
-         push @$tree, $sv_tree{$addr};
-      }
-   }
-
-   # Any SVs we didn't already see on that walk must now be toplevel ones
-   return @sv_tree{ map { $seen_by_addr{ $_->addr } ? () : $_->addr } @svs };
+   return @sv_trees{ sort { $a <=> $b } keys %toplevel };
 }
 
 our $Indent = "";
@@ -199,12 +167,12 @@ sub print_svtree
 }
 
 print "\n";
-printf "%d unique to %s:\n", $countA, $fileA;
+printf "%d unique to %s:\n", scalar @onlyA, $fileA;
 my @treesA = svtrees_from_set @onlyA;
 print_svtree $_, "- ", "  ", \%notesA for @treesA;
 
 print "\n";
-printf "%d unique to %s:\n", $countB, $fileB;
+printf "%d unique to %s:\n", scalar @onlyB, $fileB;
 my @treesB = svtrees_from_set @onlyB;
 print_svtree $_, "+ ", "  ", \%notesB for @treesB;
 

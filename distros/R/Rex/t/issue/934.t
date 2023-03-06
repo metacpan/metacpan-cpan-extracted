@@ -1,4 +1,6 @@
-use strict;
+#!/usr/bin/env perl
+
+use v5.12.5;
 use warnings;
 
 use Test::More tests => 1;
@@ -33,4 +35,3 @@ before_task_start task1 => sub {
 my $run_list = Rex::RunList->instance;
 $run_list->parse_opts(@ARGV);
 $run_list->run_tasks;
-

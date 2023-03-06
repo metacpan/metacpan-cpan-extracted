@@ -32,6 +32,8 @@ t/27names.t
 t/28pattern.t
 t/29float.t
 t/30fragment.t
+t/31timezone.t
+t/32regexp.t
 t/40tokenize.t
 t/50tree.t
 t/51parens.t

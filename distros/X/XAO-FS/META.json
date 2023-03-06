@@ -4,13 +4,13 @@
       "Andrew Maltsev, https://ejelta.com/xao/"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XAO-FS",
    "no_index" : {
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Pod::Usage" : "1.12",
-            "XAO::Base" : "1.20"
+            "Pod::Usage" : "1.12"
          }
       },
       "configure" : {
@@ -38,8 +37,14 @@
             "XAO::Base" : "1.20",
             "perl" : "5.010001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "XAO::Base" : "1.20"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.24"
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

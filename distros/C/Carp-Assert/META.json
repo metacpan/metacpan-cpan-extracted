@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Carp-Assert",
    "no_index" : {
@@ -50,9 +50,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/schwern/Carp-Assert.git",
-         "web" : "https://github.com/schwern/Carp-Assert"
+         "url" : "git://github.com/demerphq/Carp-Assert.git",
+         "web" : "https://github.com/demerphq/Carp-Assert"
       }
    },
-   "version" : "0.21"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

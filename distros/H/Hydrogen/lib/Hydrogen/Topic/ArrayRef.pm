@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Topic::ArrayRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.017';
+our $VERSION   = '0.020000';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Topic::ArrayRef - functions from Hydrogen::ArrayRef applied to C<$_>
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Topic::ArrayRef 0.017,
-which is based on Sub::HandlesVia::HandlerLibrary::Array 0.038.
+This documentation is for Hydrogen::Topic::ArrayRef 0.020000,
+which is based on Sub::HandlesVia::HandlerLibrary::Array 0.046.
 
 =cut
 
@@ -1877,7 +1877,7 @@ To rename functions:
 
     use Hydrogen::Topic::ArrayRef 'all_true' => { -as => 'myfunc' };
 
-On Perl 5.37.2+, you can import lexically:
+On Perl 5.37.2+ (or if L<Lexical::Sub> is installed) you can import lexically:
 
     use Hydrogen::Topic::ArrayRef -lexical, 'all_true';
 
@@ -1904,7 +1904,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022 by Toby Inkster.
+This software is copyright (c) 2022-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

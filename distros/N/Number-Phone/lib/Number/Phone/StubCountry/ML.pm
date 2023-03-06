@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -104,31 +104,31 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"223202", "Bamako",
-"2232073", "Bamako",
-"223216", "Sikasso",
-"223443", "Bamako",
-"2232072", "Bamako",
-"223219", "Tombouctou",
-"223442", "Bamako",
+$areanames{en} = {"223443", "Bamako",
 "223218", "Gao\/Kidal",
-"2232076", "Bamako",
-"2232077", "Bamako",
 "2232074", "Bamako",
-"2232078", "Bamako",
-"223214", "Mopti",
+"2232073", "Bamako",
+"223449", "Bamako",
 "2232075", "Bamako",
+"2232072", "Bamako",
+"2232076", "Bamako",
+"223212", "Koulikoro",
+"223202", "Bamako",
 "2232071", "Bamako",
 "2232070", "Bamako",
+"223219", "Tombouctou",
+"2232077", "Bamako",
 "223215", "Kayes",
-"223212", "Koulikoro",
-"223449", "Bamako",};
+"223216", "Sikasso",
+"2232078", "Bamako",
+"223442", "Bamako",
+"223214", "Mopti",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+223|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '223', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

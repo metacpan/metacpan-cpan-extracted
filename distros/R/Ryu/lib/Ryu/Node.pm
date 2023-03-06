@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '3.002'; # VERSION
+our $VERSION = '3.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -54,7 +54,15 @@ Returns a L<Future> indicating completion (or failure) of this stream.
 
 sub completed {
     my ($self) = @_;
-    return $self->_completed->without_cancel;
+    return $self->{without_cancel} //= do {
+        my $completion = $self->_completed;
+        $completion->without_cancel->on_ready(sub {
+            my $f = shift;
+            if($f->state ne $completion->state) {
+                warn "Completed state does not match internal state - if you are calling ->completed->@{[$f->state]}, this will not work: use ->finish or ->fail instead";
+            }
+        });
+    };
 }
 
 # Internal use only, since it's cancellable
@@ -84,7 +92,7 @@ sub pause {
 
     my $was_paused = $self->{is_paused} && keys %{$self->{is_paused}};
     unless($was_paused) {
-        delete $self->{unblocked} if $self->{unblocked} and $self->{unblocked}->is_ready;
+        delete @{$self}{qw(unblocked unblocked_without_cancel)} if $self->{unblocked} and $self->{unblocked}->is_ready;
     }
     ++$self->{is_paused}{$k};
     if(my $parent = $self->parent) {
@@ -131,7 +139,8 @@ otherwise L<ready|Future/is_ready>.
 sub unblocked {
     # Since we don't want stray callers to affect our internal state, we always return
     # a non-cancellable version of our internal Future.
-    shift->_unblocked->without_cancel
+    my $self = shift;
+    return $self->{unblocked_without_cancel} //= $self->_unblocked->without_cancel
 }
 
 sub _unblocked {
@@ -195,5 +204,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

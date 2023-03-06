@@ -24,6 +24,8 @@ has frequency_penalty => ( is => 'rw', isa => Num, );
 has logit_bias        => ( is => 'rw', isa => Map [ Int, Int ], );
 has user              => ( is => 'rw', isa => Str, );
 
+sub endpoint { 'chat/completions' }
+
 1;
 
 __END__

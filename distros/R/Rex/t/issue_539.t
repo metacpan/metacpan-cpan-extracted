@@ -1,3 +1,8 @@
+#!/usr/bin/env perl
+
+use v5.12.5;
+use warnings;
+
 use Test::More tests => 16;
 use Rex::Hardware::Network::Linux;
 use Rex::Helper::Hash;
@@ -30,4 +35,3 @@ is( $f->{eth0_1_netmask}, "255.255.255.0",
   "eth0 secondary / flatten / netmask" );
 is( $f->{eth0_1_broadcast},
   "192.168.99.255", "eth0 secondary / flatten / broadcast" );
-

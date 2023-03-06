@@ -1,5 +1,9 @@
 Revision history for Class-Method-Modifiers
 
+2.15      2023-03-05 23:42:48Z
+        - localize $SIG{__DIE__} before calling eval (closes RT#146848; Yves
+          Orton)
+
 2.14      2023-01-16 21:26:04Z
         - remove Test::Fatal and Test::Needs from test prereqs (PRs #7, #8,
           Graham Knop)

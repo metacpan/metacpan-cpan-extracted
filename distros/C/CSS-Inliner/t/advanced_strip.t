@@ -38,8 +38,8 @@ my $inliner = CSS::Inliner->new({ strip_attrs => 1 });
 $inliner->read({ html => $html });
 my $inlined = $inliner->inlinify();
 
-ok($inlined =~ m/<h1 style="color: red; font-size: 20px;">Lorem ipsum/, 'h1.alert rule inlined');
-ok($inlined =~ m/<h1 style="color: blue; font-size: 20px;">Consectetur/, 'h1.cool rule inlined');
+ok($inlined =~ m/<h1 style="font-size: 20px; color: red;">Lorem ipsum/, 'h1.alert rule inlined');
+ok($inlined =~ m/<h1 style="font-size: 20px; color: blue;">Consectetur/, 'h1.cool rule inlined');
 ok($inlined =~ m/<p style="color: #555555; font-size: 10px;">Aliquam/, '.intro rule inlined');
 ok($inlined =~ m/<p style="color: #123123; font-size: 8px;">Phasellus/, 'div p rule inlined');
 ok($inlined =~ m/<p style="color: #123123; font-size: 8px;">Nunc augue/, 'div p rule inlined again');

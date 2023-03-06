@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -71,22 +71,22 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"21670", "Ben\ Arous",
-"21672", "Bizerte\/Nabeul\/Zaghouan",
-"21677", "Haffouz\/Kairouan\/Kasserine",
-"21675", "Gabes\/Kebili\/Medenine\/Tataouine",
-"21676", "Gafsa\/Sidi\ Bouzid\/Tozeur",
+$areanames{en} = {"21676", "Gafsa\/Sidi\ Bouzid\/Tozeur",
 "21678", "Beja\/Jendouba\/Kef\/La\ Kef\/Siliana\/Tabarka",
-"21674", "Agareb\/Sfax",
-"21679", "Ariana\/Ben\ Arous\/Manouba\/Tunis",
 "21673", "Chebba\/Hamman\-Sousse\/Khenis\/Mahdia\/Monastir\/Sousse",
-"21671", "Ariana\/Ben\ Arous\/Carthage\/Tunis",};
+"21675", "Gabes\/Kebili\/Medenine\/Tataouine",
+"21679", "Ariana\/Ben\ Arous\/Manouba\/Tunis",
+"21677", "Haffouz\/Kairouan\/Kasserine",
+"21671", "Ariana\/Ben\ Arous\/Carthage\/Tunis",
+"21672", "Bizerte\/Nabeul\/Zaghouan",
+"21674", "Agareb\/Sfax",
+"21670", "Ben\ Arous",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+216|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '216', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

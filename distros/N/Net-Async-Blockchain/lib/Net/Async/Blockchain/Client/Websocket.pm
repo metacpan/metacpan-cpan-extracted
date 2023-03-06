@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::Websocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -186,9 +186,10 @@ async sub _request {
 
     # this is the client request
     my $request_call = {
-        id     => 1,
-        method => $method,
-        params => [@params],
+        id      => 1,
+        method  => $method,
+        jsonrpc => '2.0',
+        params  => [@params],
     };
 
     await $self->websocket_client->connect(

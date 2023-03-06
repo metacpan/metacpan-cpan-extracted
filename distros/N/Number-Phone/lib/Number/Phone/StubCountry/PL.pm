@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -162,76 +162,76 @@ my $validators = {
                 'voip' => '39\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"4883", "Biala\ Podlaska",
-"4859", "Slupsk",
-"4852", "Bydgoszcz",
-"4861", "Poznań",
-"4843", "Sieradz",
-"4813", "Krosno",
-"4858", "Gdańsk",
-"4834", "Częstochowa",
-"4895", "Gorzów\ Wielkopolski",
-"4824", "Plock",
-"4871", "Wroclaw",
-"4855", "Elbląg",
-"4829", "Ostrolęka",
-"4822", "Warsaw",
-"4832", "Katowice",
-"4863", "Konin",
-"4841", "Kielce",
-"4854", "Wloclawek",
-"4825", "Siedlce",
-"4856", "Toruń",
-"4894", "Koszalin",
-"4881", "Lublin",
-"4848", "Radom",
-"4812", "Kraków",
-"4877", "Opole",
-"4885", "Bialystok",
-"4874", "Walbrzych",
-"4876", "Legnica",
-"4815", "Tarnobrzeg",
-"4867", "Pila",
+$areanames{en} = {"4871", "Wroclaw",
 "4889", "Olsztyn",
+"4843", "Sieradz",
+"4812", "Kraków",
+"4876", "Legnica",
 "4882", "Chelm",
-"4842", "Lódź",
-"4818", "Nowy\ Sącz",
-"4844", "Piotrków\ Trybunalski",
-"4862", "Kalisz",
-"4891", "Szczecin",
-"4887", "Suwalki",
-"4875", "Jelenia\ Góra",
-"4846", "Skierniewice",
-"4884", "Zamość",
-"4886", "Lomża",
-"4817", "Rzeszów",
+"4874", "Walbrzych",
+"4863", "Konin",
+"4852", "Bydgoszcz",
 "4865", "Leszno",
+"4859", "Slupsk",
+"4895", "Gorzów\ Wielkopolski",
+"4862", "Kalisz",
+"4877", "Opole",
+"4855", "Elbląg",
+"4824", "Plock",
+"4834", "Częstochowa",
+"4813", "Krosno",
+"4885", "Bialystok",
+"4842", "Lódź",
+"4815", "Tarnobrzeg",
+"4883", "Biala\ Podlaska",
+"4856", "Toruń",
+"4818", "Nowy\ Sącz",
+"4854", "Wloclawek",
+"4881", "Lublin",
+"4825", "Siedlce",
+"4833", "Bielsko\-Biala",
 "4823", "Ciechanów",
 "4816", "Przemyśl",
-"4833", "Bielsko\-Biala",
+"4858", "Gdańsk",
+"4884", "Zamość",
+"4814", "Tarnów",
+"4867", "Pila",
+"4886", "Lomża",
+"4832", "Katowice",
+"4822", "Warsaw",
+"4841", "Kielce",
+"4846", "Skierniewice",
 "4868", "Zielona\ Góra",
-"4814", "Tarnów",};
-$areanames{pl} = {"4874", "Wałbrzych",
-"4885", "Białystok",
-"4842", "Łódź",
+"4844", "Piotrków\ Trybunalski",
+"4875", "Jelenia\ Góra",
+"4829", "Ostrolęka",
+"4891", "Szczecin",
+"4848", "Radom",
+"4887", "Suwalki",
+"4817", "Rzeszów",
+"4894", "Koszalin",
+"4861", "Poznań",};
+$areanames{pl} = {"4854", "Włocławek",
 "4867", "Piła",
-"4882", "Chełm",
 "4886", "Łomża",
-"4887", "Suwałki",
 "4833", "Bielsko\-Biała",
-"4859", "Słupsk",
-"4883", "Biała\ Podlaska",
-"4871", "Wrocław",
-"4824", "Płock",
 "4829", "Ostrołęka",
 "4822", "Warszawa",
-"4854", "Włocławek",};
+"4887", "Suwałki",
+"4874", "Wałbrzych",
+"4882", "Chełm",
+"4871", "Wrocław",
+"4859", "Słupsk",
+"4883", "Biała\ Podlaska",
+"4842", "Łódź",
+"4885", "Białystok",
+"4824", "Płock",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+48|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '48', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

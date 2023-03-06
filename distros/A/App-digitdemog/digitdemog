@@ -1,49 +1,78 @@
 #!/usr/bin/perl
 
-# このプログラムの作成者 : 下野寿之 bin4tsv@gmail.com
+# このプログラムの作成者 : 下野寿之 bin4tsv@gmail.com Toshiyuki Shimono
 
 use 5.030 ; 
 use warnings ; 
 use Getopt::Std ;
-use Getopt::Long qw [ GetOptions ] ; # GetOptionsFromArray ] ;
-Getopt::Long::Configure qw [ bundling ] ; #  1文字のオプションに対して有効。ずらずらつなげられる。
-Getopt::Long::Configure qw [ no_ignore_case ] ; # 大文字と小文字を区別する。
-Getopt::Long::Configure qw [ pass_through ] ; # 拾わなかった @ARGV の引数を残してくれるっぽい。posix_defaultの後で書くこと(!)。
-use Scalar::Util qw/looks_like_number/ ; # 5.7.3から
+use Getopt::Long qw [ GetOptions :config bundling no_ignore_case pass_through ] ; # GetOptionsFromArray ] ;
+#Getopt::Long::Configure qw [ bundling ] ; #  1文字のオプションに対して有効。ずらずらつなげられる。
+#Getopt::Long::Configure qw [ no_ignore_case ] ; # 大文字と小文字を区別する。
+#Getopt::Long::Configure qw [ pass_through ] ; # 拾わなかった @ARGV の引数を残してくれるっぽい。posix_defaultの後で書くこと(!)。
 use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
-use Time::HiRes qw/sleep usleep gettimeofday tv_interval/ ; # 5.7.3から
-use List::Util qw[ max first sum0 uniq ] ; 
+use Time::HiRes qw/gettimeofday tv_interval/ ; # 5.7.3から
+use List::Util qw[ max min first sum0 uniq ] ; 
 use Encode qw [ decode_utf8 ] ;
 
-GetOptions 'e=s' => \my@e ; # -e で指定されたパターンを何個でも拾う。
-getopts '.1$:=g:q:u:L:R:S', \my%o ;  
-my @e2 = map { qr/$_/ }  @e ;  # あらかじめ正規表現として先にコンパイルすることで高速化。
+GetOptions 'e=s' => \my@e , 'width=i' => \my$width ; # -e で指定されたパターンを何個でも拾う。
+getopts '.:$:0:12:=b:g:n:o:q:u:w:y:L:R:S', \my%o ;  
 
-#$SIG{INT} = sub { & info ; exit 130 } ;
-$o{g} //= 1 ;
-my $strime0 = [ gettimeofday ] ;
+$o{o} //= 0 ; # 桁の番号を0から始める ことがデフォルトだが、やはり1から始められるようにした。
+my $dt_start = [ gettimeofday ] ;
 my $optu0 = ($o{u}//'') eq 0 ; 
 my $optq0 = ($o{q}//'') eq 0 ;
 my $optw0 = ($o{w}//'') eq 0 ; 
 my $oL2 = ($o{L}//'') eq 2 ; # $optL2 は長すぎるので、ちょっと特例的に短くしてみた
-my $oL4 = ($o{L}//'') eq 4 ; 
-@e = map { decode_utf8 $_ } @e unless $optu0 ; 
+my $oL4 = ($o{L}//'') eq 4 ;
 
+$o{'.'} //= 1 ;
 $o{'$'} //= '$' ;  # 文字の終端を表す記号
-#$o{p} //= '' ;  # 文字を切り分けるパターン。正規表現
 binmode STDOUT, 'utf8' unless $optu0 ;
 
+## 具体例を指示する -g についての処理
+$o{g} //= 1 ; # 例として取り出すために、各頻度に対して何個異なる例を保持するか。
+my $sep = do { my $c = $o{g} =~s/\d//gr ; $c = decode_utf8 $c if ! $optu0 ; $c ne '' ? $c : '|' } ; # 出力表での具体例の区切り文字。
+$o{g} =~ s/\D//g ; 
+$o{g} = 1 if $o{g} eq '' ;
+my $header  ; # -1 が指定されたら読み飛ばしの対象となるが、一応保管。(2次情報として標準エラー出力に出す。)
+
+## -y による頻度のフィルタリングをするための準備 : 
+my @y_ranges = () ; # 出力される値の範囲が指定された場合の挙動を指定する。
+# 次の2個の関数は、出力すべき値の範囲をフィルターの様に指定する。
+& y_init () ;
+sub y_init ( ) { 
+  my @ranges = split /,/o , $o{y} // '' , -1 ; 
+  grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # = split /,/ , $o{y} // '' , -1 ; 
+  do { m/^(\d*)\.\.(\d*)/ ; push @y_ranges , [ $1||1 , $2||'Inf' ] } for @ranges ; 
+}
+sub y_filter ( $ ) { 
+  do { return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] } for @y_ranges ; 
+  return @y_ranges ? not 1 : not 0 ; # 指定が無かった場合はとにかく真を返す。
+}
+  
+## ここからメイン
 sub main () ; 
-* main = $oL2 || $oL4 ? * bylen : * normal ; # <-- mainの定義はここである。
+* main = $oL2 || $oL4 ? * bylen : * main_normal ; # <-- mainの定義はここである。
 & main ; 
 exit 0 ;
+
+###
+END {
+  exit if ($o{2}//'') eq 0 ;
+  my $rl = d3 ($. // 0) ; # read lines
+  my $procsec = tv_interval ${ dt_start } ;
+  my $out = "$rl line(s) read; "; 
+  $out .= do { chomp $header ; "\"$header\" is the 1st line; " } if defined $header ; 
+  $out .= sprintf '%0.6f seconds (digitdemog)', $procsec ; # たまにマイクロ秒単位の$procsecが15桁くらいで表示されるのでsprintf。
+  say STDERR BOLD DARK ITALIC CYAN $out ;
+}
 
 ##
 ## 長さ毎に数えるモード :  (入力の具体的な値を見るため)
 ## 
 
 sub bylen ( ) { 
-  my $header = <> if $o{'='} ; 
+  $header = <> if $o{'='} ; 
   my %freq ; # 同じ行が来たかどうかの判定に使う。数が集計される。
   my %M ; # 文字列長さごとの文字列最小値と文字列最大値を格納する。
   my %Lfrq ; # 文字列長ごとの頻度
@@ -59,17 +88,13 @@ sub bylen ( ) {
     next unless $oL4 ; 
     $M{$len}[2] = $_ if ! defined $M{$len}[2] ; 
     $M{$len}[3] = $_ ;
-
   }
-  #for(keys %freq){ say "$_, $freq{$_}"} ; exit 0 ;
   print join ( "\t", map {UNDERLINE $_} qw[length freq minstr maxstr] , $oL4 ? qw[first_str last_str ]:() ) , "\n" ;
   for ( sort { $a <=> $b } keys %M ) {  # 数値 (文字列の長さを表す)でソート 
     my @str = @{ $M{$_} } ;
     my @prt = $optq0 ? @str : map { defined $_ ? qq['$_'] : undef } @str ;
     $prt[1] = DARK '<-- same' if $str[1] eq $str[0] ; 
-    #$str[2] = '' ; #if defined $str[2] and $str[2] eq $str[0] || $str[2] eq $str[1]; 
     $prt[3] = DARK '<-- same' if $oL4 and defined $str[3] and $str[3] eq $str[2] ; #|| $str[3] eq $str[1]; 
-
     for my $p ($oL4? 0..3 : 0..1 )  { 
       $prt[$p] = $prt[$p] . DARK "(" . $freq{ $str[$p] } . ")" if $freq{ $str[$p] } != $Lfrq{$_} ;
     }
@@ -77,89 +102,122 @@ sub bylen ( ) {
   }
 }
 
-##
-## 普通のモードと(-.の場合に)さらにに詳しく分析する機能
-##
+sub d3 ($) { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ; # 数を3桁区切りに変換する。
 
-#sub uniq (@) {my %h;map { $h{$_}++ == 0 ? $_ : () } @_ } # List::MoreUtils から
-sub majority2 ( @ ) { # いろんな値がやってくる。最も頻繁な頻度を持つ値の中から、(ランダムに) 1個返す。
+sub majority2 ( @ ) { 
+  # いろんな値を配列で受け取り、頻度2以上のものについて、多い順番に返す。# 同一の入力でも、同じ頻度ならどっちが優先されるかは不明。
   my %h ; # ヒストグラム
-  for ( @_ ) { 
-    $h { $_ } += 1 ;  # <<-- --
-  }
+  ++ $h { $_ } for ( @_ ) ;
   my $m = max values %h ; 
-  $m ++ if $m == 1;  # <-- - 必要なのか、そうで無いのか、よく分からない。
-  return first { $h {$_} == $m } keys %h
+  $h{$_} == 1 and delete $h{$_} for keys %h ;  #++ $m if $m == 1;  # 頻度の最大値が1なら、次の処理で空列を返すようにする。
+  my %h2 ; 
+  my @out ; 
+  for ( keys %h ) { push @{ $h2{ $h{$_} } } , $_ } 
+  for ( sort { $b <=> $a } keys %h2 ) { push @out , @{ $h2{$_} } } 
+  return @out  ;#first { $h {$_} == $m } keys %h
 } # リストから最も成分の多いものをさらにひとつだけ選ぶ.
 
-sub normal ( ) { 
+sub backslash ($$) { # 制御文字を一部エスケープシーケンスに変化させる。 arg2 は シングルクォーテーションを何に変化させるか。
+  do{ my $c = eval qq["$_"] ; $_[0] =~ s/$c/$_/g and $_[0] =~ s/'/$_[1]/g } for qw[\a \n \r \f \t \e] ; 
+  return $_[0] ; # 
+}
+
+sub stock ($$$$) { # arg2が参照する配列で arg1 個蓄えるが、arg3の値を後ろに追加。さらに、arg4の0/1に応じて、pop/shift(後ろ出し/前出し)する。
+  my @ary = uniq @{ ${$_[1]} }, $_[2] ; 
+  @{ ${$_[1]} } = splice @ary, ( $_[3] ? max 0,scalar @ary - $_[0] : 0 ) , $_[0] ;
+} ;  # 各行の例をストックするための関数
+
+##
+## 普通のモードのmain関数
+##
+
+sub main_normal ( ) { 
 
   my %freq ; # 同じ行が来たかどうかの判定に使う。数が集計される。
-  my %S1 ; # $S1{$cp}{$pos} のように使う。 出現回数の集計表
-  my %S2 ; # $S2{ "$cp-$pos" } = "行番号+行番号+...行番号+" 
-  my %S3 ; # @ { $S3{ FREQ } } によって、頻度FREQ回現れるような あらゆる $cp のそれぞれについて、どの行番号集合 だったかを 、貯める。
-  my %P2 ; # $P2{$c-$p}が真ならピリオドを付ける
-  my %G1  ; # @{ $G { $cp } { $pos } } で 行の具体例を格納。 
-  my %G2  ; # @{ $G { $cp } { $pos } } で 行の具体例を格納。 最後の行の方の例を示す。
+  my %S1 ; # $S1{$v}{$pos} のように使う。 出現回数の集計表 ; # ここの $v は 文字と言うよりパターンを示す。'a'とか [1-3]とか。ここでは「文字」と呼ぶ。
+  my %S2 ; # $S2{$v}{$pos} = "行番号+行番号+...行番号+" (Lとする); $vが出現した桁$posに対応する行番号を蓄える。
+  my %S3 ; # @ { $S3{ F } } によって、分割表で頻度 F 回現れた 行番号集合の値 L (%S2の持つ値)を参照できるようにする。
+  my %mark ; # $mark{ L } がピリオドをピリオド付ける。 ( -. で使う。)
+  my %Gs  ; # @{ $G { $v } { $pos } [ 0 or 1 ] } で 行の具体例を格納。 ( -g で使う。)
   my $maxlen = 0 ; # 文字列の最大長
-  my $header = <> if $o{'='} ; 
-  my $patSplit = @e ? '(' . (join '|' , @e, '.') . ')' :  '' ; # split で割るためのパターンの設定。
+  my $eol = "EOL" . int rand 8 ; # 各行の終わりを示す。## saikoro -g10,3 でいろいろ試した。
 
+  @e = map { decode_utf8 $_ } @e unless $optu0  ;
+  unshift @e , "$eol\$" ;  # 正規表現パターン群に $eol を 最初に 追加。 # 「行末」は頻度が多いので最初に持ってきた。
+  #push @e , "$eol\$" ;  # 正規表現パターン群に $eol を 最後に 追加。# ここは、unshift でも push でも良い。
+  my @eqr ; # 「e をqrされた 」により名付けた。
+  my @exu ; # 「eにおいて、エスケープ(escape)してユニコード(unicode)で表した部分がある」により名付けた
+  for ( 0 .. $#e ) { 
+    my $eout = $e[$_] =~ s/#.*$//r ; # 正規表現で、コメント#の部分は除去する。
+    my @F  = split /([[:^ascii:]])/o , $eout , 0 ; # パターンで切った最後は空文字列なら切り落とすための0
+    grep { $_ =  (sprintf '\x{%02X}', ord $_ ) if m/[[:^ascii:]]/ } @F ;
+    my $p = join '' , @F ;
+    $eqr [ $_ ] = qr/$p/ ; # あらかじめ正規表現として先にコンパイルすることで高速化。
+    push @exu , $p ;
+  }
+  
+  # split で割るためのパターンの設定。
+  my $piecePattern = @e ? do{ my$t=join'|',@exu,'.','\n';qr/$t/o} : qr//o ; # @exuに1文字(.)と改行文字を追加した。
+
+  $header = <> if $o{'='} ; 
   while ( <> ) { 
-    #chomp ; # \n にマッチさせる可能性があるため。しかし、^ にマッチさせて集計したいときどうしたら良いだろうか?
+    chomp if 0 eq ($o{n}//'') ; #-n0 で改行文字を除去。
     next if $freq{$_} ++ && $o{1} ; # && の前後の順序に注意
     s/\r$// unless $optw0 ;    
     $_ = decode_utf8 $_ unless $optu0 ;
-    my @chars = grep { $_ ne '' } split /$patSplit/o , $_ , -1 ; # <-- - 区切る
-    for my $pos ( 0 .. $#chars ) {
-      my $char = $chars [ $pos ] ; # 実際の文字(列)。  (パターンにはまだ分類していない。)
-      my $cp  ; # どのパターンまたは文字として認識するか。(分類されたパターンなのである。)
-      #$char =~ /$_/ and $cp = $_ and last for @e ; # ++位置重要。 <-- - 時間が掛かるかも。
-      $char =~ $e2[$_] and $cp = $e[$_] and last for 0..$#e ; # ++位置重要。 <-- - 時間が掛かるかも。
-      $cp //= "'$chars[$pos]'" ; # 前行の処理で当てはまらない場合。クォーテーションを付加するようにした。    # chars を縮めてcp
-      $S1 { $cp } { $pos } ++ ; 
-      $S2 { "$cp-$pos" } .= "$.+" if $o{'.'} ; # <-- $S2{..}で、その「文字」がその桁で現れた、「行番号集合」L が結果的に生成される。
-      do { my $t = \$G1{$cp}{$pos} ; push @{$$t},$_ ; pop   @{$$t} if @{$$t} > $o{g} }  if $o{g}  ; # 改行文字はここでは除去せず
-      do { my $t = \$G2{$cp}{$pos} ; push @{$$t},$_ ; shift @{$$t} if @{$$t} > $o{g} }  if $o{g}  ; # 改行文字はここでは除去せず
+     # ▽ パターンに文字列を分解。
+    my @vvec = m/$piecePattern/go ; 
+    push @vvec , $eol ; # 各行をバラバラにした後に、$eolを最後に追加。
+    splice @vvec , $width, if defined $width ; 
+    $maxlen = @vvec if $maxlen < @vvec ; # 最大長の保管
+    for my $pos ( 0 .. $#vvec ) {
+      my $char = $vvec [ $pos ] ; # 実際の文字(列)。  (パターンにはまだ分類していない。)
+      my $v  ; # どのパターンまたは文字として認識するか。(分類されたパターンなのである。)
+       # ▽ どのパターンにマッチしたかを$vに格納する。次の2行のコードで。
+      $char =~ $eqr[$_] and do { $v = $e[$_] ; last } for 0 .. $#e ; # 指定したパターンの数が多いと遅くなるであろう。頻度の高いパターンを先に置くと早くなる。
+      $v //= "'$vvec[$pos]'" ; # 前行の処理で当てはまらない場合。クォーテーションを付加するようにした。
+      $S1 { $v } { $pos } ++ ; 
+      $S2 { $v } { $pos } .= "$.+" if $o{'.'} ; # <-- $S2{..}で、その「文字」がその桁で現れた、「行番号集合」L が結果的に生成される。
+      do { for my $way (0,1) { & stock ( $o{g} , \$Gs{$v}{$pos}[$way] , $_ , $way ) } } if $o{g}  ; # 改行文字はここでは除去せず
     }
-    $S1{ $o{'$'} } { scalar @chars } ++ ; # 文字列終端記号の足し合わせ
-    $maxlen = @chars if $maxlen < @chars ; # 最大長の保管
-    $S2{ $o{'$'} . '-' . scalar @chars } .= "$.+" if $o{'.'} ; # 文字列終端記号の足し合わせ
-    do { my $t = \$G1{$o{'$'}}{@chars} ; push @{$$t},$_ ; pop   @{$$t} if @{$$t} > $o{g} }  if $o{g}  ; # 改行文字はここでは除去せず
-    do { my $t = \$G2{$o{'$'}}{@chars} ; push @{$$t},$_ ; shift @{$$t} if @{$$t} > $o{g} }  if $o{g}  ; # 改行文字はここでは除去せず
   } # ← 入力読み取り処理の終わり
   if ( $o{'.'} ) {  ## 複雑な処理である↓ # $S1{ .. }　で その「文字」が「各桁」で、何回 (b回) 現れたのか。... # この  ; 「b回」現れた L を S3に保管。
-    for my $cp ( keys %S1 ){ # ここの $cp は 文字と言うよりパターンを示す。'a'とか [1-3]とか。ここでは「文字」と呼ぶ。
-      push @{  $S3 { $S1{$cp}{$_} }  }, $S2{"$cp-$_"} for keys %{ $S1{$cp} } ; 
+    for my $v ( keys %S1 ){ 
+      push @{  $S3 { $S1{$v}{$_} }  }, $S2{$v}{$_} for keys %{ $S1{$v} } ; 
     } 
     for( keys %S3 ){ # 各「文字」が各桁で何回現れたか(頻度) の 数 それぞれに対して
-      my $mostFreq = majority2 @{ $S3{$_} }  ; # 行番号集合L を考えて、そういうLで最も頻度の高いものを取り出す。
-      $P2{ $mostFreq } = 1 if defined $mostFreq ;
+      my @pcand  = majority2 @{ $S3{$_} }  ; # 行番号集合L を考えて、そういうLで最も頻度の高いものを取り出す。
+      grep { $mark { $pcand [$_] } = '.' . ( '0' x $_ ) } 0 .. min $#pcand , $o{'.'} - 1 if @pcand ; 
     }  
   }
   # 出力
-  say join "\t" , map { UNDERLINE YELLOW $_ } 0 .. $maxlen , 'char' , 'code' , 'freq' , $o{g} ? 'example' :() ; # 行頭の出力
-  my %om ; $om{$o{'$'}}=1 ; $om{$_}=2 for @e ; # omit する
-  my @cps ; 
-  push @cps , @e ; 
-  push @cps , sort {length $a <=> length $b or $a cmp $b } grep { ! $om { $_ } } keys %S1 ; 
-  push @cps , $o{'$'} ; 
-  for my $cp ( @cps ){ # <-- ソート順には注意したい
-    my @out = map { $S1{$cp}{$_} // 0 } 0 .. $maxlen ; 
-    my $fst = first { $out[$_] } $o{g}=~/\.$/o ? reverse 0..$#out : 0..$#out ; 
-    my $subtotal = sum0 @out ;  # その文字の出現回数
-    do { @out = map{ $P2{$S2{"$cp-$_"}//''} && $out[$_] ? "$out[$_]." : $out[$_] } 0 .. $#out  } ; # 数字の後ろにピリオド付加
-    do { my $c = substr $cp,1,1 ; push @out, $cp eq $o{'$'} ? 'end' : $om{$cp} ? '---' : sprintf 'U+%X', ord $c } ; # コード
-    my @example = map { $_ =~ s/\n$//r } uniq @{$G1{$cp}{$fst}} , @{$G2{$cp}{$fst}}  ; 
-    $cp = '"\n"' if $cp eq "'\n'" ;  # 改行記号
-    $cp = '"\r"' if $cp eq "'\r'" ;  # 改行記号    
-    $cp =~ s/(^\')|(\'$)//g if $optq0 ; # シングルクォーテーションによる囲みを外す
-    splice @out , @out -1, 0, YELLOW BOLD $cp ; # 最後から2番目に挿入。
-    push @out , $subtotal ; 
-    #push @out , do{ my $t = \$G{$cp}{$fst} ;($$t->[0]//'1' )=~ s/\n//r }//'' ;
-    #push @out , eval{ my $t = \$G{$cp}{$fst} ; my @ary = @{$$t} ; $ary[@ary -1] =~ s/\n//r }  ;
-    #push @out , eval{ my $t = \$G{$cp}{$fst} ; join "|" , map { $_ =~ s/\n$//r } @{$$t} }  ;
-    push @out, join '|', @example ;
+
+  my $ex = "example${sep}..${sep}example" ; # 具体例を表す列の表頭をどうするか?
+  say join "\t" , map { UNDERLINE YELLOW $_ } (0+$o{o}) .. ($maxlen+$o{o}-1) , 'char' , 'code' , 'freq' , $o{g} ? $ex :() ; # 行頭の出力
+  my %vcate ; $vcate{$_} = 2 for @e ; # omit する
+  my @vset ; # 表示する値の配列。順番は、 (1). 引数に渡された正規表現いくつか (2). 非cntrl文字 (3). cntrl文字(4). 各行の終わり
+  push @vset , @e[ 1 .. $#e ] ; # (1).
+  push @vset , sort {length $a <=> length $b or $a cmp $b } grep { ! $vcate { $_ } and ! /[[:cntrl:]]/ } keys %S1 ; # (2)
+  push @vset , sort {length $a <=> length $b or $a cmp $b } grep { ! $vcate { $_ } and /[[:cntrl:]]/ } keys %S1 ; #(3)
+  push @vset , $e[ 0 ] ;
+  my $take = sub ($$) { splice @{$_[1]} , 0, $_[0] } ; # 配列参照arg2からその配列の先頭arg1個取ってくる。
+  my $take2 = sub ($$$) { uniq $take->($_[0],$_[1]) , $take->($_[0],$_[2]) } ;# 配列参照2個(arg2,arg3)から、それぞれarg1個取って、uniq する。
+  my $ucd = sub ($){ ( sprintf 'U+%06X', ord $_[0] ) =~ s/(00)+((..)+$)/$2/r } ; # Unicode の符号位置を返す。2桁以上の偶数桁になるように。
+  for my $v ( @vset ){ # <-- ソート順には注意したい
+    my @out = map { $S1{$v}{$_} // 0 } 0 .. ( $maxlen - 1 ) ; 
+    my @pvec = grep { $out[$_] } $o{g}=~/\.$/o ? reverse 0..$#out : 0..$#out ;  # 何桁目を見るか、そして、優先的にどこから見るか。
+    my @pv = map { [ grep { $out[$_] } @{$_} ] } [0..$#out] , [reverse 0..$#out] ;  # 何桁目を見るか、そして、優先的にどこから見るか。
+    my @example = $take2 -> ( $o{g} , map { my $way = $_ ; [ map{ @{$Gs{$v}{$_}[ $way ]} } @{$pv[$way]} ] } 0,1 ) if $o{g} ;
+    @example = map{ backslash $_ , q['] } @example unless 0 eq ($o{b}//'') ; # -b0の指定が無ければ、改行などの文字をエスケープする。
+    my $subtotal = sum0 @out ;  # その文字の出現回数 -- @out をさらに加工する前にここで取得。
+    next until y_filter ( $subtotal )  ; 
+    do { $out[$_] .= $mark{ $S2{$v}{$_} // '' } // '' if $out[$_] } for 0 .. $#out ; # 数字の後ろにピリオド付加
+    @out = map { $_ eq 0 ? $o{0} : $_ } @out if defined $o{0} ;  # 頻度値がゼロの場合の置換
+    my $code = do { my $c = substr $v,1,1 ; $v eq "$eol\$" ? 'end' : $vcate{$v} ? '---' : $ucd -> ($c) } ; # 文字コード取得。$vの加工前にここで処理。
+    $v = $o{'$'} if $v eq "$eol\$" ; 
+    $v = backslash $v , q["] ; 
+    push @out , (YELLOW BOLD $v) , $code , (YELLOW $subtotal) ; 
+    push @out, join $sep , @example ;
     say join "\t" , @out ;
   }
 }
@@ -197,9 +255,10 @@ digitdist
 オプション : 
    --help  : このオンラインヘルプを表示する。
 
-  入力の扱い方 : 
+  入力の扱い方 : 以下で N は数値を示す。str は文字列を示す。
    -=     : 先頭行(1行目)を読み飛ばす
    -1     : データで全く同じ行が2回以上来たら、読み飛ばす。(-L2と-L4と-.の指定時は適用されない。)
+   -n 0   : 改行文字を除去する(各行を読み取って、通常なら行末の改行文字の様子も出力する)。
    -u 0   : バイナリで処理する(通常は UTF-8で処理をする)
    -w 0   ; 通常は、Windows形式の改行文字が来たらUNIX形式の改行文字に変換しているが、その動作を解除する。
 
@@ -208,21 +267,33 @@ digitdist
    -L4    ; 文字列長毎に、文字列の最小値と最大値の他に、最初に現れたもの、最後に現れたものも表示する。
 
   実質的な処理に与えるオプション : 
-   -.     : 出力表の値で "同じ数." と表示された値は、同じ入力の(改行文字で区切られた)文字列に由来することを表す。
-   -e STR : このオプションは何回も指定できる。STRは正規表現であり、最初のパターンにマッチするものを計数対象にする。
+   -. 0    : 通常出力表の値で "同じ数." と表示された値は、全く共通する行に由来することを示すが、その出力の仕方を抑制。
+   -. N    : 出力表の異なる頻度の値ごとに、どれが全く共通する行に由来するのかN個まで表示。未指定なら1。頻度の後にピリオドが付き、さらに0が最大N-1個付く。
+   -e str : このオプションは何回も指定できる。strは正規表現であり、最初のパターンにマッチするものを計数対象にする。
+   --width N : 出力表の頻度の値の部分が最大N列に制限される。この指定は、「例」には影響しない。
 
   出力へ影響するオプション : 
-   -q 0   : 出力で文字をシングルクォーテーションで囲まない。# 廃止 --> (-L2と-L4指定時に適用。)   
+   -0 str : 出力のゼロを別の文字列strに置換する。
+   -2 0   : 標準エラー出力に出力する二次情報を抑制する。
    -$ str : 文字列の終端をドルマーク($)として示すが、それを str に変更する。
-   -g N   : N=0 で例を出さないことで処理が軽くなる。N個のそれぞれ最初と最後の出現例を出す(重複は省かれる)。未指定だとN=1。各文字の最も左での出現での例(行全体)を出す。
-   -g N.  : 数値にピリオドをつけると、該当する文字の、最も右での出現の例で示す。
+   -b 0   : 通常は「例」(examle)の文字列で必要に応じてバックスラッシュを追加して、読み易くするが、それを止める。
+   -g N   : 出力各行で、頻度表の頻度値の最も左[と右]に対応する入力行の最初[と最後]からN行の例を取り出して異なるものを出力。
+   -g str : 出力各行の最も右に現れる例について、各例を区切る文字列を指定する。str中数を表す文字は、-g NのNで使われる。
+   -g 0   : 例を表示しない。計算が軽くなることが期待できる。
+   -q 0   : 出力で文字をシングルクォーテーションで囲まない。# 廃止 --> (-L2と-L4指定時に適用。)   
+   -o 1   : 桁数の初めを0始まりでなくて、1始まりにする。(origin) (1の代わりに任意の数が指定可能。)
+   -y 数値範囲 : 各文字のパターンの頻度が指定回数のものだけを出力。例 -y 1..3 なら3以下。 3.. なら3以上。2,4,6..8 なら2と4と6,7,8。
+
 
 開発上のメモ : 
-    * 出力する各行のソート順は指定できるようにした方が便利そう。
     * -Lの場合に、-g N の指定により、最小値N個、最大値N個を取り出せるようにしても良いかも。
     * -Lの場合に出力する出現文字列について、出現頻度も出力出来る様にしたい。
+    * 出力する各行のソート順は指定できるようにした方が便利そう。
     * メモリを無駄に消費してないか、考えたい。%S1とか%S2とか%S3とか%Gとか。
-    * 行の終端記号が、二重に被るリスクあり。
+    * -e で指定したパターンに該当する文字列についても、そのうち代表例(最初の出現の1文字目など)に対して、文字コードを出力するようにしたい。
+    * [[:ascii:]]以外の文字の-e指定に対応する (アスキー文字以外に対応する)
+    * エスケープシーケンスは6種類だけの処理で良かろうか?
+    * -gの指定で、区切り文字も指定可能にしたい。
 
 =end JapaneseManual
 

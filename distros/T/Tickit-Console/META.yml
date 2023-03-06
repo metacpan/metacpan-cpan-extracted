@@ -3,8 +3,8 @@ abstract: 'build full-screen console-style applications'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Identity: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
+  Test::Refcount: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,12 +17,12 @@ name: Tickit-Console
 provides:
   Tickit::Console:
     file: lib/Tickit/Console.pm
-    version: '0.10'
+    version: '0.11'
   Tickit::Console::Tab:
     file: lib/Tickit/Console/Tab.pm
-    version: '0.10'
+    version: '0.11'
 requires:
-  Object::Pad: '0.43'
+  Object::Pad: '0.74'
   String::Tagged: '0.10'
   Tickit: '0'
   Tickit::Widget::Entry: '0'
@@ -32,5 +32,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -70,10 +70,14 @@ my @tests = (
         fringe                => 40,
         tax_free              => 600 * 12,
         pension_employee_perc => 0,
-        pension_employer_perc => 6,
         results               => {
+
+            pension_employee_perc => 0,
+            pension_employer_perc => 6,
+
             pension_employee => 0,
             pension_employer => 5625,
+
             tax_fixed        => 4191.60,
             tax_rate         => 23,
             net_income       => 85783,

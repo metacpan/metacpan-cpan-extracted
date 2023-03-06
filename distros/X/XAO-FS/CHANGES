@@ -1,6 +1,26 @@
 https://github.com/amaltsev/XAO-FS
 ----------------------------------
 
+commit 6b5f73e34261ce0ce28ed44bcd719e3df2c26904
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Mar 4 15:29:52 2023 -0800
+
+    v1.25 sync_structure() method
+    
+    Made build_structure() return a summary of the changes, additions, and
+    placeholders (fields & tables) that are present in the database, but not
+    in the given structure.
+    
+    Added sync_structure() actually drop these orphan fields & tables.
+    
+    Updated test cases for both.
+
+commit 1d02d85dead74b75be884f402757eee0458cbae4
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Nov 19 18:53:46 2019 -0800
+
+    Added a test case for bytes in 'blob' field results
+
 commit 7f09060e8207d002b9e019ef2aa6fd029fec7382
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Jan 16 12:02:09 2019 -0800
@@ -60,18 +80,4 @@ Date:   Fri Jul 6 19:20:12 2018 -0700
     
     The previous solution for this did not work after switching to
     Test::Unit::Lite
-
-commit 2f6f3b8eed04b2f00c6aca9bc935a8b2ec05f401
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 09:02:48 2018 -0700
-
-    1.19 CPAN release updates
-    
-    No functional changes
-
-commit 8fe384952da938960049d483f43d6b28a57eb032
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Jun 12 20:31:09 2018 -0700
-
-    1.18 Ready for cpanm, skipping tests if no DB
 

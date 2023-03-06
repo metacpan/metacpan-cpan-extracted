@@ -1,9 +1,9 @@
 package Finance::Tax::Aruba::Income::2023;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use Moose;
 use namespace::autoclean;
 
-# ABSTRACT: Income tax calculator for the year 2021
+# ABSTRACT: Income tax calculator for the year 2023
 
 with qw(
     Finance::Tax::Aruba::Role::Income::TaxYear
@@ -98,17 +98,17 @@ __END__
 
 =head1 NAME
 
-Finance::Tax::Aruba::Income::2023 - Income tax calculator for the year 2021
+Finance::Tax::Aruba::Income::2023 - Income tax calculator for the year 2023
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Calculate your taxes and other social premiums for the year 2021 and 2022.
+Calculate your taxes and other social premiums for the year 2023
 
 =head1 METHODS
 
@@ -116,8 +116,8 @@ Calculate your taxes and other social premiums for the year 2021 and 2022.
 
 Year selector method
 
-    if ($module->is_year(2020)) {
-        return "year is 2020";
+    if ($module->is_year(2023)) {
+        return "year is 2023";
     }
 
 =head1 SEE ALSO

@@ -1,7 +1,6 @@
 package Syntax::Kamelon::Builder;
 
-use 5.006;
-our $VERSION = '0.15';
+our $VERSION = '0.21';
 
 use strict;
 use Carp qw(cluck);
@@ -477,7 +476,7 @@ sub SetupContextShifter {
 	if ($tcontext =~ s/##(.*)//) {
 		my $syntax = $1;
 		unless ($self->SyntaxExists($syntax)) {
-			$self->LogWarning("Syntax $syntax does not exist, reverting to #stay");
+			$self->LogWarning("Syntax '$syntax' does not exist, reverting to #stay");
 			return sub {}
 		}
 		my $p = $eng->{POSTCREATE};
@@ -490,19 +489,41 @@ sub SetupContextShifter {
 	} elsif ($tcontext =~ /^#pop/i) {
 		my $count = 0;
 		while ($tcontext =~ s/^#pop//i) { $count++ }
-		return sub { for (1 .. $count) { $eng->StackPull }}
+		my $default = sub { for (1 .. $count) { $eng->StackPull }};
+		return $default if $tcontext eq '';
+
+		if ($tcontext =~ s/^\!//) {
+			if ($tcontext =~ s/##(.*)//) {
+				my $lx = $1;
+				unless ($self->SyntaxExists($lx)) {
+					$self->LogWarning("Syntax '$lx' does not exist, only doing the #pop part");
+					return $default
+				}
+				return sub {
+					for (1 .. $count) { $eng->StackPull }
+					my $hl = $eng->GetLexer($lx);
+					if ($tcontext eq '') { $tcontext = $hl->{basecontext} }
+					$eng->StackPush($hl, $tcontext);
+				}
+			} else {
+				unless ($self->ContextExists($tcontext)) {
+					$self->LogWarning("Context '$tcontext' does not exist, only doing the #pop part");
+					return $default
+				}
+				return sub { 
+					for (1 .. $count) { $eng->StackPull }
+					$eng->StackPush($parser, $tcontext) 
+				}
+			}
+		}
+		return $default;
 	} elsif ($tcontext =~ /^#stay/i) {
 		return sub {} 
 	} else {
 		if ($self->ContextExists($tcontext)) {
-			my $c = $self->{CONTEXTDATA}->{$tcontext};
-			if ((exists $c->{dynamic}) and ($c->{dynamic} eq 'true')){
-				return sub { $eng->StackPush($parser, $tcontext) }
-			} else {
-				return sub { $eng->StackPush($parser, $tcontext) }
-			}
+			return sub { $eng->StackPush($parser, $tcontext) }
 		} else {
-			$self->LogWarning("Context $tcontext does not exist, reverting to #stay");
+			$self->LogWarning("Context '$tcontext' does not exist, reverting to #stay");
 			return sub {}
 		}
 	}
@@ -627,21 +648,21 @@ sub SetupRuleRangeDetect {
 	my ($self, $rule) = @_;
 	my ($char, $char1, $i, $d) = $self->RuleGetArgs($rule, qw/char char1 insensitive/ );
 	my $method = $tests{$rule->{'type'}};
-	unless ((defined $char) and ($char ne '')) { #the regex did not compile, the rule is useless
+	unless ((defined $char) and ($char ne '')) {
 		$self->LogWarning("Option char is not defined or is empty");
 		return (undef);
 	}
-	unless ((defined $char1) and ($char1 ne '')) { #the regex did not compile, the rule is useless
+	unless ((defined $char1) and ($char1 ne '')) {
 		$self->LogWarning("Option char1 is not defined or is empty");
 		return (undef);
 	}
 	$char = $self->RuleGetChar($char);
-	unless (length($char) eq 1) { #the regex did not compile, the rule is useless
+	unless (length($char) eq 1) {
 		$self->LogWarning("Option char is longer than one character");
 		return (undef);
 	}
 	$char1 = $self->RuleGetChar($char1);
-	unless (length($char1) eq 1) { #the regex did not compile, the rule is useless
+	unless (length($char1) eq 1) {
 		$self->LogWarning("Option char1 is longer than one character");
 		return (undef);
 	}
@@ -652,36 +673,6 @@ sub SetupRuleRangeDetect {
 	}
 	return $method, $char, $char1
 }
-
-# sub SetupRuleRegMinimal {
-# 	my ($self, $rule) = @_;
-# 	my ($string, $minimal) = $self->RuleGetArgs($rule, qw/ String minimal /);
-# # 	my $string = $rule->{'String'};
-# # 	my $minimal = $rule->{'minimal'};
-# # 	unless (defined($minimal)) { $minimal = 0 }
-# # 	$minimal = $self->Booleanize($minimal);
-# 	my $reg = '';
-# 	if ($minimal) {
-# 		my $lastchar = '';
-# 		while ($string ne '') {
-# 			if ($string =~ s/^(\*|\+)//) {
-# 				$reg = "$reg$1";
-# 				if ($lastchar ne "\\") {
-# 					$reg = "$reg?";
-# 				}
-# 				$lastchar = $1;
-# 			} else {
-# 				if ($string =~ s/^(.)//) {
-# 					$reg = "$reg$1";
-# 					$lastchar = $1;
-# 				} 
-# 			}
-# 		}
-# 	} else {
-# 		$reg = $string;
-# 	}
-# 	return $reg
-# }
 
 sub SetupRuleRegExpr {
 	my ($self, $rule) = @_;
@@ -724,6 +715,7 @@ sub SetupRuleRegExpr {
 	}
 	unless ($d and $self->CurContextIsDynamic) { 
 		$reg = "^($reg)";
+		no warnings;
 		if ($i) {
 			$reg = eval { qr/$reg/i };
 		} else {

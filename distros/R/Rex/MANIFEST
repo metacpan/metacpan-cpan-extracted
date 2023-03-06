@@ -69,7 +69,6 @@ lib/Rex/Commands/Tail.pm
 lib/Rex/Commands/Upload.pm
 lib/Rex/Commands/User.pm
 lib/Rex/Commands/Virtualization.pm
-lib/Rex/Commands/templates/append_if_no_such_line.tpl.pl
 lib/Rex/Config.pm
 lib/Rex/Constants.pm
 lib/Rex/Cron.pm

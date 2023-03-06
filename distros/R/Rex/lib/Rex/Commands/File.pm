@@ -57,12 +57,11 @@ With this module you can manipulate files.
 
 package Rex::Commands::File;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -102,6 +101,40 @@ Parse a template and return the content.
 By default, it uses L<Rex::Template>. If any of the L<template_ng|Rex#template_ng> or L<1.3|Rex#1.3> (or newer) feature flag is enabled, then L<Rex::Template::NG> is used instead of this module (recommended).
 
 For more advanced functionality, you may use your favorite template engine via the L<set_template_function|Rex::Config#set_template_function> configuration option.
+
+Template variables may be passed either as hash or a hash reference. The following calls are equivalent:
+
+ template( $template, variable => value );
+ 
+ template( $template, { variable => value } );
+
+=head3 List of exposed template variables
+
+The following template variables are passed to the underlying templating engine, in order of precedence from low to high (variables of the same name are overridden by the next level aka "last one wins"):
+
+=over 4
+
+=item task parameters
+
+All task parameters coming from the command line via C<S<rex taskname --param=value>>, or from calling a task as a function, like C<S<taskname( { param =E<gt> value } )>>.
+
+=item resource parameters
+
+All resource parameters as returned by C<Rex::Resource-E<gt>get_current_resource()-E<gt>get_all_parameters>, when called inside a resource.
+
+=item explicit template variables
+
+All manually specified, explicit template variables passed to C<template()>.
+
+=item system information
+
+The results from all available L<Rex::Hardware> modules as returned by C<Rex::Hardware-E<gt>get('All')>.
+
+Pass C<__no_sys_info__ =E<gt> TRUE> as a template variable to disable including system information:
+
+ my $content = template( $template, __no_sys_info__ => TRUE );
+
+=back
 
 =head3 Embedded templates
 

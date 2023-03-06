@@ -76,6 +76,7 @@ my %WriteMakefileArgs = (
     "Sort::Naturally" => 0,
     "Storable" => 0,
     "Symbol" => 0,
+    "Term::ANSIColor" => 0,
     "Term::ReadKey" => 0,
     "Test::Builder::Module" => 0,
     "Text::Glob" => 0,
@@ -89,6 +90,7 @@ my %WriteMakefileArgs = (
     "attributes" => 0,
     "base" => 0,
     "constant" => 0,
+    "if" => 0,
     "lib" => 0,
     "overload" => 0,
     "strict" => 0,
@@ -99,7 +101,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Find" => 0,
     "File::Temp" => 0,
-    "Parallel::ForkManager" => 0,
+    "Module::Load::Conditional" => 0,
     "String::Escape" => 0,
     "Sub::Override" => 0,
     "Test::Deep" => 0,
@@ -107,10 +109,11 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Output" => 0,
     "Test::UseAllModules" => 0,
+    "Test::Warnings" => 0,
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.14.0",
+  "VERSION" => "1.14.1",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }
@@ -147,15 +150,16 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "List::Util" => "1.45",
   "MIME::Base64" => 0,
+  "Module::Load::Conditional" => 0,
   "Net::OpenSSH::ShellQuoter" => 0,
   "POSIX" => 0,
-  "Parallel::ForkManager" => 0,
   "Scalar::Util" => 0,
   "Sort::Naturally" => 0,
   "Storable" => 0,
   "String::Escape" => 0,
   "Sub::Override" => 0,
   "Symbol" => 0,
+  "Term::ANSIColor" => 0,
   "Term::ReadKey" => 0,
   "Test::Builder::Module" => 0,
   "Test::Deep" => 0,
@@ -163,6 +167,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Output" => 0,
   "Test::UseAllModules" => 0,
+  "Test::Warnings" => 0,
   "Text::Glob" => 0,
   "Text::Wrap" => 0,
   "Time::HiRes" => 0,
@@ -175,6 +180,7 @@ my %FallbackPrereqs = (
   "autodie" => 0,
   "base" => 0,
   "constant" => 0,
+  "if" => 0,
   "lib" => 0,
   "overload" => 0,
   "strict" => 0,
@@ -215,6 +221,7 @@ if ( $^O !~ /MSWin/i ) {
 
 if ( $^O =~ /MSWin/i ) {
 	$WriteMakefileArgs{PREREQ_PM}{'Net::SSH2'} = $FallbackPrereqs{'Net::SSH2'} = '0';
+	$WriteMakefileArgs{PREREQ_PM}{'Win32::Console::ANSI'} = $FallbackPrereqs{'Win32::Console::ANSI'} = '0';
 }
 
 WriteMakefile(%WriteMakefileArgs);

@@ -67,7 +67,7 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
 
     Especifique el formato de salida del texto original y traducido.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Imprima el texto original y traducido en formato de marcador de conflicto [git(1)](http://man.he.net/man1/git).
 
@@ -100,9 +100,9 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
 
         Imprime el texto original y el traducido separados por una sola línea en blanco.
 
-    - **none**
+    - **xtxt**
 
-        Si el formato es `ninguno` o desconocido, sólo se imprime el texto traducido.
+        Si el formato es `xtxt` (texto traducido) o desconocido, sólo se imprime el texto traducido.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

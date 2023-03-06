@@ -1,12 +1,10 @@
 package Syntax::Kamelon::XMLData;
 
-use 5.006;
 use strict;
 use warnings;
 use XML::TokeParser;
-use Data::Dumper;
 
-our $VERSION = '0.18';
+our $VERSION = '0.21';
 
 my $regchars = "\\^.\$|()[]{}*+?~!%^&/";
 
@@ -18,6 +16,7 @@ sub new {
 	my $file = delete $args{'xmlfile'};
 	my $self = {
 		ATTRIBUTES => {},
+		COMMENT => {},
 		BASECONTEXT => '',
 		CONTEXTDATA => {},
 		ADDDELIMINATORS => '',
@@ -66,6 +65,12 @@ sub Clear {
 	$self->{KEYWORDSCASE} = 1;
 	$self->{LANGUAGE} = {};
 	$self->{LISTS} = {};
+}
+
+sub Comment {
+	my $self = shift;
+	if (@_) { $self->{COMMENT} = shift; };
+	return $self->{COMMENT};
 }
 
 sub ContextData {
@@ -206,12 +211,32 @@ sub XMLGetList {
 	}
 }
 
+sub XMLGetComment {
+	my ($self, $token, $parser) = @_;
+	my $incomments = 1;
+	while ($incomments) {
+		my $ltok = $parser->get_token;
+		if ($ltok->[0] eq 'S') {
+			my $data = $ltok->[2];
+			my $name = $data->{'name'};
+			my $start = $data->{'start'};
+			my $end = $data->{'end'};
+			$self->Comment->{$name} = [$start, $end]
+		} elsif ($ltok->[0] eq 'E') {
+			if ($ltok->[1] eq 'comments') {
+				$incomments = 0;
+			}
+		}
+	}
+}
+
 my %xmlmethods = (
 	context => 'XMLGetContext',
 	itemData => 'XMLGetAttribute',
 	keywords => 'XMLGetKeywordSettings',
 	language => 'XMLGetLanguage',
 	list => 'XMLGetList',
+	comments => 'XMLGetComment'
 );
 
 sub XMLLoad {

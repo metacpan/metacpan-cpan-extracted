@@ -1,0 +1,54 @@
+{
+   "abstract" : "automatically upgrade Perl strings to utf8 before sending them to DBD::Oracle",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4232",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Oracle-UpgradeUtf8",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "perl" : "5.010001",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::Oracle" : "0",
+            "DBI" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Oracle::UpgradeUtf8" : {
+         "file" : "lib/DBIx/Oracle/UpgradeUtf8.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/DBIx-Oracle-UpgradeUtf8"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

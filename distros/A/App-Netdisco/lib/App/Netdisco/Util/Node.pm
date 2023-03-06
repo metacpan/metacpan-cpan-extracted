@@ -160,13 +160,13 @@ The C<dns> entry is optional. The update will mark old entries for this IP as
 no longer C<active>.
 
 Optionally a literal string can be passed in the second argument for the
-C<time_last> timestamp, otherwise the current timestamp (C<now()>) is used.
+C<time_last> timestamp, otherwise the current timestamp (C<LOCALTIMESTAMP>) is used.
 
 =cut
 
 sub store_arp {
   my ($hash_ref, $now) = @_;
-  $now ||= 'now()';
+  $now ||= 'LOCALTIMESTAMP';
   my $ip   = $hash_ref->{'ip'};
   my $mac  = NetAddr::MAC->new(mac => ($hash_ref->{'node'} || $hash_ref->{'mac'} || ''));
   my $name = $hash_ref->{'dns'};
@@ -176,13 +176,13 @@ sub store_arp {
   debug sprintf 'store_arp - mac %s ip %s', $mac->as_ieee, $ip;
 
   schema(vars->{'tenant'})->txn_do(sub {
-    my $current = schema(vars->{'tenant'})->resultset('NodeIp')
+    schema(vars->{'tenant'})->resultset('NodeIp')
       ->search(
         { ip => $ip, -bool => 'active'},
         { columns => [qw/mac ip/] })->update({active => \'false'});
 
-    schema(vars->{'tenant'})->resultset('NodeIp')
-      ->update_or_create(
+    my $row = schema(vars->{'tenant'})->resultset('NodeIp')
+      ->update_or_new(
       {
         mac => $mac->as_ieee,
         ip => $ip,
@@ -194,6 +194,11 @@ sub store_arp {
         key => 'primary',
         for => 'update',
       });
+
+    if (! $row->in_storage) {
+        $row->set_column(time_first => \$now);
+        $row->insert;
+    }
   });
 }
 

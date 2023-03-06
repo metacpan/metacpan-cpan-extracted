@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.01",
-            "Config" : "0",
             "File::Which" : "1.09",
             "Getopt::Long" : "2.34",
             "IO::Dir" : "1.04",
@@ -44,18 +43,12 @@
             "Pod::Usage" : "1.16",
             "Time::HiRes" : "1.51",
             "XML::Twig" : "3.52",
-            "XML::XPath" : "1.13",
-            "lib" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "vars" : "0",
-            "warnings" : "0"
+            "XML::XPath" : "1.13"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.001002",
-            "Test::Pod" : "1.48"
+            "Test::More" : "1.001002"
          }
       }
    },
@@ -73,6 +66,6 @@
          "web" : "https://github.com/ronsavage/GraphViz"
       }
    },
-   "version" : "2.25",
+   "version" : "2.26",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

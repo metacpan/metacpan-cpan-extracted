@@ -1,3 +1,12 @@
+0.03 2023-03-03
+  [Document Improvement]
+    * Document is improved.
+    * Added -pthread linker option to document .
+  [Changes]
+    * Added -pthread compiler option.
+    * Use new_cpp11 instead of new_gnu11.
+  [Test Improvement]
+    * Added -pthread linker option to test.
 0.02 2023-03-01
   [Document Fix]
     * Fixed "Required Libraries" in the doc.

@@ -40,6 +40,7 @@ lines to calculate directly (examples far down on this page)
   2023-02-18T01:28:12+0300     # date-times
   2023-02-18+0100              # dates
   01:18:12                     # times
+  -0600                        # time-zone
   P2Y3DT2H                     # duration
   name                         # outcome of other expressions
   #unit.owner                  # fragments (nested context, namespaces)
@@ -65,7 +66,7 @@ Expressions can refer to values computed by other expressions.  Also,
 external objects can maintain libraries of formulas or produce compatible
 data.
 
-B<Why do I need it?> <i>My</i> application has many kinds of configurable
+B<Why do I need it?> I<My> application has many kinds of configurable
 rules.  Those rules often use times and durations in it, to organize
 processing activities.  Each line in my configuration can now be a
 smart expression.  Declarative programming.
@@ -75,8 +76,6 @@ smart expression.  Declarative programming.
 =over 4
 
 =item * parameterized formulas would be nice
-
-=item * loading and saving contexts in INI, YAML, and JSON format
 
 =back
 
@@ -226,20 +225,21 @@ to left (RTL) The B<infix> and B<ternary> operators have the following
 priorities: (from low to higher, each like with equivalent priority)
 
   LTR       ?:                             # if ? then : else
+  NOCHAIN	->                             # if-then, substitute
   LTR       or   xor  //
   LTR       and
   NOCHAIN	<    >    <=   ==   !=   <=>   # numeric comparison
   NOCHAIN	lt   gt   le   eq   ne   cmp   # string comparison
   LTR       +    -    ~
   LTR       *    /    %
-  LTR       =~   !~   like  unlike         # regexps and patterns
+  NOCHAIN   =~   !~   like  unlike         # regexps and patterns
   LTR       #    .                         # fragments and attributes
 
 The first value is a constant representing associativety.  Either the constant
 LTR (compute left to right), RTL (right to left), or NOCHAIN (non-stackable
 operator).
 
-=head2 Comparison operators
+=head3 Comparison operators
 
 Some data types support numeric comparison (implement C<< <=> >>, the
 spaceship operator), other support textual comparison (implement C< cmp >),
@@ -248,7 +248,7 @@ where also some types have no intrinsic order.
 The C<< <=> >> and C< cmp > return an integer: -1, 0, or 1, representing
 smaller, equal, larger.
 
-  =num  =text
+  :num: :text:
     <     lt      less than/before
     <=    le      less-equal
     ==    eq      equal/the same
@@ -257,12 +257,12 @@ smaller, equal, larger.
     >     gt      greater/larger
 
 String comparison uses L<Unicode::Collate>, which might be a bit expensive,
-but at least a better attempt to order utf8 correctly.
+but at least a better attempt to order UTF-8 correctly.
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.14,
-built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.15,
+built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

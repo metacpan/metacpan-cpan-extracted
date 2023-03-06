@@ -5,14 +5,13 @@ author:
 build_requires:
   ExtUtils::CBuilder: '0'
   Math::Trig: '0'
-  Test::More: '0.88'
-  Test::Most: '0'
+  Test2::V0: '0.000060'
   strict: '0'
 configure_requires:
   CPAN::Meta: '2.142060'
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +20,13 @@ name: Game-RaycastFOV
 provides:
   Game::RaycastFOV:
     file: lib/Game/RaycastFOV.pm
-    version: '2.02'
+    version: '2.03'
 requires:
   Math::Trig: '0'
   perl: v5.10.0
   strict: '0'
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-  repository: https://github.com/thrig/Game-RaycastFOV
-version: '2.02'
+  repository: https://thrig.me/src/Game-RaycastFOV.git
+version: '2.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

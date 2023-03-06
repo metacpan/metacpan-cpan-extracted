@@ -1,22 +1,44 @@
 package SPVM::Resource::RE2;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
 =head1 Name
 
-SPVM::Resource::RE2 - Google/RE2 Resources
+SPVM::Resource::RE2 - Google/RE2 Resource
+
+=head1 Description
+
+C<SPVM::Resource::RE2> is the C<Resource::RE2> class in L<SPVM>. This is a L<SPVM resource|SPVM::Document::Resource> of L<Google/RE2|https://github.com/google/re2>.
+
+L<Google/RE2|https://github.com/google/re2> is a regular expression library written by C<C++>.
 
 =head1 Usage
 
-C<MyRE2.spvm>
+MyRE2.config:
+  
+  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
+  my $resource = $config->use_resource('Resource::RE2');
+  
+  if ($^O eq 'MSWin32') {
+    $config->add_static_libs('stdc++', 'winpthread', 'gcc');
+  }
+  else {
+    $config->add_libs('stdc++');
+  }
+  
+  $config->add_ldflags('-pthread');
+  
+  $config;
+
+MyRE2.spvm:
 
   class MyRE2 {
     native static method match : int ();
   }
 
-C<MyRE2.cpp>
+MyRE2.cpp:
 
   #include "spvm_native.h"
   
@@ -38,19 +60,7 @@ C<MyRE2.cpp>
   
   }
 
-C<MyRE2.config>
-  
-  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
-  
-  my $resource = $config->use_resource('Resource::RE2');
-  
-  if ($^O eq 'MSWin32') {
-    $config->add_static_libs('stdc++', 'winpthread', 'gcc');
-  }
-  
-  $config;
-  
-C<myre2.pl>
+myre2.pl:
 
   use FindBin;
   use lib "$FindBin::Bin";
@@ -58,32 +68,37 @@ C<myre2.pl>
   
   my $match = SPVM::MyRE2->match;
 
-=head1 Description
+=head1 Library Version
 
-C<Resource::RE2> is a L<SPVM> module to provide the resource of L<RE2|https://github.com/google/re2> L<2022-06-01|https://github.com/google/re2/releases/tag/2022-06-01>.
-
-L<RE2|https://github.com/google/re2> is a regular expression library written by C<C++>. Google created it.
-
-See L<SPVM::Document::NativeModule> and L<SPVM::Document::Resource> to write native modules and use resources.
-
-=head1 Resource Version
-
-Google/RE2 C<2023-02-01>.
+L<Google/RE2 2023-02-01|https://github.com/google/re2/releases/tag/2023-02-01>.
 
 If a new release exists, it will be upgraded.
 
-=head1 Config Definition
+=head1 User Config
 
-The config definition of C<Resource::RE2>.
+Recommended user config:
 
   my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
+  my $resource = $config->use_resource('Resource::RE2');
+  
+  if ($^O eq 'MSWin32') {
+    $config->add_static_libs('stdc++', 'winpthread', 'gcc');
+  }
+  else {
+    $config->add_libs('stdc++');
+  }
+  
+  $config->add_ldflags('-pthread');
+
+=head1 Resource Config
+
+  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
+  
+  $config->add_ccflags('-pthread', '-Wno-unused-parameter', '-Wno-missing-field-initializers');
   
   $config->ext('cc');
   
   my @source_files = qw(
-    util/strutil.cc
-    util/rune.cc
-    util/pcre.cc
     re2/dfa.cc
     re2/prefilter_tree.cc
     re2/stringpiece.cc
@@ -92,6 +107,7 @@ The config definition of C<Resource::RE2>.
     re2/simplify.cc
     re2/filtered_re2.cc
     re2/onepass.cc
+    re2/bitmap256.cc
     re2/re2.cc
     re2/parse.cc
     re2/set.cc
@@ -104,20 +120,12 @@ The config definition of C<Resource::RE2>.
     re2/perl_groups.cc
     re2/unicode_groups.cc
     re2/compile.cc
+    util/strutil.cc
+    util/rune.cc
+    util/pcre.cc
   );
   
   $config->add_source_files(@source_files);
-
-=head1 Required Libraries
-  
-  # Windows
-  if ($^O eq 'MSWin32') {
-    $config->add_static_libs('stdc++', 'winpthread', 'gcc');
-  }
-  # Linux/Unix, Mac, etc
-  else {
-    $config->add_libs('stdc++');
-  }
 
 =head1 How to Create This Resource
 
@@ -148,7 +156,7 @@ The source files that is used in the config are extracted by the following comma
 
 =head1 Repository
 
-L<https://github.com/yuki-kimoto/SPVM-Resource-RE2>
+L<SPVM::Resource::RE2 - Github|https://github.com/yuki-kimoto/SPVM-Resource-RE2>
 
 =head1 Author
 

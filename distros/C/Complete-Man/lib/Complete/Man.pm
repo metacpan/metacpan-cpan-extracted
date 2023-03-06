@@ -1,12 +1,14 @@
 package Complete::Man;
 
-our $DATE = '2017-07-29'; # DATE
-our $VERSION = '0.09'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 #use Log::Any '$log';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-17'; # DATE
+our $DIST = 'Complete-Man'; # DIST
+our $VERSION = '0.100'; # VERSION
 
 our %SPEC;
 require Exporter;
@@ -149,7 +151,24 @@ _
     result_naked => 1,
 };
 sub complete_manpage_section {
-    _complete_manpage_or_section('section', @_);
+    my $res = _complete_manpage_or_section('section', @_);
+    # fill in summary for standard sections
+    {
+        my %sections = (
+            '1' => 'User Commands',
+            '2' => 'System Calls',
+            '3' => 'C Library Functions',
+            '4' => 'Devices and Special Files',
+            '5' => 'File Formats and Conventions',
+            '6' => 'Games et. al.',
+            '7' => 'Miscellanea',
+            '8' => 'System Administration tools and Daemons',
+        );
+        for (@$res) {
+            $_ = {word=>$_, summary=>$sections{$_}} if defined $sections{$_};
+        }
+    }
+    $res;
 }
 
 1;
@@ -167,7 +186,7 @@ Complete::Man - Complete from list of available manpages
 
 =head1 VERSION
 
-This document describes version 0.09 of Complete::Man (from Perl distribution Complete-Man), released on 2017-07-29.
+This document describes version 0.100 of Complete::Man (from Perl distribution Complete-Man), released on 2023-01-17.
 
 =head1 SYNOPSIS
 
@@ -212,11 +231,17 @@ Can also be a comma-separated list to allow multiple sections.
 
 =item * B<use_mandb> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<word>* => I<str>
+
+(No description)
+
 
 =back
 
 Return value:  (any)
+
 
 
 =head2 complete_manpage_section
@@ -240,6 +265,9 @@ Arguments ('*' denotes required arguments):
 
 =item * B<word>* => I<str>
 
+(No description)
+
+
 =back
 
 Return value:  (any)
@@ -252,6 +280,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-M
 
 Source repository is at L<https://github.com/perlancar/perl-Complete-Man>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Man>
@@ -259,16 +316,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

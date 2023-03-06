@@ -28,6 +28,5 @@ END
 my $inliner = CSS::Inliner->new();
 $inliner->read({ html => $html });
 my $inlined = $inliner->inlinify();
-
-ok($inlined =~ m/<h1 class="green" style="color: red !important; font-size: 20px;">Howdy!<\/h1>/, '!important applied correctly');
+ok($inlined =~ m/<h1 class="green" style="font-size: 20px; color: red !important;">Howdy!<\/h1>/, '!important applied correctly');
 

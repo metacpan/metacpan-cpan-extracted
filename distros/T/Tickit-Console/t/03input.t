@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -58,8 +57,8 @@ is_display( [ BLANKLINES(23),
 
 is_cursorpos( 24, 0, 'Cursor after Enter' );
 
-identical( $on_line_invocant, $tab, 'on_line invocant is $tab' );
-is_deeply( \@lines, [ "Hello" ], '@lines after Enter' );
+ref_is( $on_line_invocant, $tab, 'on_line invocant is $tab' );
+is( \@lines, [ "Hello" ], '@lines after Enter' );
 
 my @special_lines;
 my $special_tab = $console->add_tab(
@@ -81,7 +80,7 @@ is_display( [ BLANKLINES(23),
 presskey( text => $_ ) for split //, "Another";
 presskey( key => "Enter" );
 
-is_deeply( \@lines, [], '@lines empty after entry on special tab' );
-is_deeply( \@special_lines, [ "Another" ], '@special_lines after entry on special tab' );
+is( \@lines, [], '@lines empty after entry on special tab' );
+is( \@special_lines, [ "Another" ], '@special_lines after entry on special tab' );
 
 done_testing;

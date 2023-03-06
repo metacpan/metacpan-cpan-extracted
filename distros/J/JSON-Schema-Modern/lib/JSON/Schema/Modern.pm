@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.562-2-gf59945db
+package JSON::Schema::Modern; # git description: v0.563-6-g07edffa5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.563';
+our $VERSION = '0.564';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -563,6 +563,11 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   # bit if we see a local unevaluated* keyword, and clear it again as we move on to a new data path.
   $state->{collect_annotations} |= 0+(exists $schema->{unevaluatedItems} || exists $schema->{unevaluatedProperties});
 
+  # in order to collect annotations for unevaluated* keywords, we sometimes need to ignore the
+  # suggestion to short_circuit evaluation at this scope (but lower scopes are still fine)
+  $state->{short_circuit} = ($state->{short_circuit} || delete($state->{short_circuit_suggested}))
+    && !exists($schema->{unevaluatedItems}) && !exists($schema->{unevaluatedProperties});
+
   ALL_KEYWORDS:
   foreach my $vocabulary ($state->{vocabularies}->@*) {
     # [ [ $keyword => $subref|undef ], [ ... ] ]
@@ -961,7 +966,12 @@ has _encoding => (
       base64 => sub ($content_ref) {
         die "invalid characters\n"
           if $content_ref->$* =~ m{[^A-Za-z0-9+/=]} or $content_ref->$* =~ m{=(?=[^=])};
-        require MIME::Base64; \ MIME::Base64::decode($content_ref->$*);
+        require MIME::Base64; \ MIME::Base64::decode_base64($content_ref->$*);
+      },
+      base64url => sub ($content_ref) {
+        die "invalid characters\n"
+          if $content_ref->$* =~ m{[^A-Za-z0-9=_-]} or $content_ref->$* =~ m{=(?=[^=])};
+        require MIME::Base64; \ MIME::Base64::decode_base64url($content_ref->$*);
       },
     };
   },
@@ -1002,7 +1012,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.563
+version 0.564
 
 =head1 SYNOPSIS
 
@@ -1375,23 +1385,23 @@ These media types are already known:
 
 =item *
 
-C<application/json>
+C<application/json> - see L<RFC 4627|https://www.rfc-editor.org/rfc/rfc4627>
 
 =item *
 
-C<application/schema+json>
+C<application/schema+json> - see L<proposed definition|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schemajson>
 
 =item *
 
-C<application/schema-instance+json>
+C<application/schema-instance+json> - see L<proposed definition|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schema-instance>
 
 =item *
 
-C<application/octet-stream>
+C<application/octet-stream> - passes strings through unchanged
 
 =item *
 
-C<text/*>
+C<text/*> - passes strings through unchanged
 
 =back
 
@@ -1409,8 +1419,8 @@ You can use it thusly:
 
 =head2 add_encoding
 
-  $js->add_media_type('application/furble' => sub ($content_ref) {
-    return \ ...;  # data representing the deserialized content for Content-Type: application/furble
+  $js->add_encoding('bloop' => sub ($content_ref) {
+    return \ ...;  # data representing the deserialized content for Content-Transfer-Encoding: bloop
   });
 
 Takes an encoding name and a subref which takes a single scalar reference, which is expected to be
@@ -1425,11 +1435,15 @@ Encodings handled natively are:
 
 =item *
 
-C<identity>
+C<identity> - passes strings through unchanged
 
 =item *
 
-C<base64>
+C<base64> - see L<RFC 4648 §4|https://www.rfc-editor.org/rfc/rfc4648#section-4>
+
+=item *
+
+C<base64url> - see L<RFC 4648 §5|https://www.rfc-editor.org/rfc/rfc4648#section-5>
 
 =back
 

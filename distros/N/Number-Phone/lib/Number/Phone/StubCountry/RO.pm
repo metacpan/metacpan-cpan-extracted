@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -82,7 +82,7 @@ my $validators = {
             1[0-3]|
             [2-7]\\d|
             8[03-8]|
-            9[019]
+            9[0-29]
           )\\d{6}
         ',
                 'pager' => '',
@@ -97,99 +97,99 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"40254", "Hunedoara",
-"40239", "Brăila",
-"40365", "Mureș",
-"40345", "Dâmbovița",
-"40351", "Dolj",
-"40251", "Dolj",
-"40245", "Dâmbovița",
-"40265", "Mureș",
-"40354", "Hunedoara",
-"40339", "Brăila",
-"40256", "Timiș",
-"40348", "Argeș",
-"40368", "Brașov",
-"40268", "Brașov",
-"40356", "Timiș",
-"40248", "Argeș",
-"40344", "Prahova",
-"40261", "Satu\ Mare",
-"40237", "Vrancea",
-"40255", "Caraș\-Severin",
-"40241", "Constanța",
-"40364", "Cluj",
-"40341", "Constanța",
-"40264", "Cluj",
-"40337", "Vrancea",
-"40355", "Caraș\-Severin",
-"40361", "Satu\ Mare",
-"40244", "Prahova",
-"40233", "Neamț",
-"40258", "Alba",
-"40346", "Giurgiu",
-"40366", "Harghita",
-"40232", "Iași",
-"40230", "Suceava",
-"40330", "Suceava",
-"40266", "Harghita",
-"40332", "Iași",
-"40358", "Alba",
-"40246", "Giurgiu",
-"40333", "Neamț",
-"40259", "Bihor",
-"40234", "Bacău",
-"40367", "Covasna",
-"40347", "Teleorman",
-"4021", "Bucharest\ and\ Ilfov\ County",
-"40331", "Botoșani",
-"40231", "Botoșani",
-"4031", "Bucharest\ and\ Ilfov\ County",
-"40247", "Teleorman",
-"40267", "Covasna",
-"40359", "Bihor",
-"40334", "Bacău",
-"40360", "Sălaj",
-"40343", "Ialomița",
-"40362", "Maramureș",
-"40236", "Galați",
-"40342", "Călărași",
-"40340", "Tulcea",
-"40363", "Bistrița\-Năsăud",
-"40263", "Bistrița\-Năsăud",
-"40240", "Tulcea",
-"40242", "Călărași",
-"40262", "Maramureș",
-"40336", "Galați",
-"40260", "Sălaj",
-"40243", "Ialomița",
-"40349", "Olt",
-"40235", "Vaslui",
-"40257", "Arad",
-"40369", "Sibiu",
-"40269", "Sibiu",
-"40335", "Vaslui",
-"40357", "Arad",
-"40249", "Olt",
-"40253", "Gorj",
-"40238", "Buzău",
-"40252", "Mehedinți",
-"40250", "Vâlcea",
-"40350", "Vâlcea",
-"40352", "Mehedinți",
-"40338", "Buzău",
-"40353", "Gorj",};
 $areanames{ro} = {"4031", "București\ și\ județul\ Ilfov",
 "4021", "București\ și\ județul\ Ilfov",};
+$areanames{en} = {"40268", "Brașov",
+"40339", "Brăila",
+"40348", "Argeș",
+"40259", "Bihor",
+"40359", "Bihor",
+"40248", "Argeș",
+"40239", "Brăila",
+"40368", "Brașov",
+"40234", "Bacău",
+"40354", "Hunedoara",
+"40262", "Maramureș",
+"40342", "Călărași",
+"40242", "Călărași",
+"40254", "Hunedoara",
+"40334", "Bacău",
+"40362", "Maramureș",
+"40255", "Caraș\-Severin",
+"40335", "Vaslui",
+"40356", "Timiș",
+"40236", "Galați",
+"40256", "Timiș",
+"40336", "Galați",
+"40355", "Caraș\-Severin",
+"40235", "Vaslui",
+"40260", "Sălaj",
+"40231", "Botoșani",
+"40351", "Dolj",
+"40340", "Tulcea",
+"40357", "Arad",
+"40237", "Vrancea",
+"40240", "Tulcea",
+"40337", "Vrancea",
+"40257", "Arad",
+"40360", "Sălaj",
+"40251", "Dolj",
+"40331", "Botoșani",
+"40363", "Bistrița\-Năsăud",
+"4031", "Bucharest\ and\ Ilfov\ County",
+"40243", "Ialomița",
+"40343", "Ialomița",
+"4021", "Bucharest\ and\ Ilfov\ County",
+"40263", "Bistrița\-Năsăud",
+"40365", "Mureș",
+"40346", "Giurgiu",
+"40245", "Dâmbovița",
+"40266", "Harghita",
+"40366", "Harghita",
+"40345", "Dâmbovița",
+"40246", "Giurgiu",
+"40265", "Mureș",
+"40350", "Vâlcea",
+"40230", "Suceava",
+"40261", "Satu\ Mare",
+"40347", "Teleorman",
+"40341", "Constanța",
+"40267", "Covasna",
+"40241", "Constanța",
+"40367", "Covasna",
+"40250", "Vâlcea",
+"40330", "Suceava",
+"40361", "Satu\ Mare",
+"40247", "Teleorman",
+"40253", "Gorj",
+"40333", "Neamț",
+"40353", "Gorj",
+"40233", "Neamț",
+"40358", "Alba",
+"40249", "Olt",
+"40238", "Buzău",
+"40369", "Sibiu",
+"40269", "Sibiu",
+"40349", "Olt",
+"40258", "Alba",
+"40338", "Buzău",
+"40264", "Cluj",
+"40352", "Mehedinți",
+"40232", "Iași",
+"40344", "Prahova",
+"40244", "Prahova",
+"40364", "Cluj",
+"40252", "Mehedinți",
+"40332", "Iași",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+40|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '40', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '40', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

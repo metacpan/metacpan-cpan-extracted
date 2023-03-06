@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Tickit::Console' );
+require Tickit::Console;
 
+pass "Modules loaded";
 done_testing;

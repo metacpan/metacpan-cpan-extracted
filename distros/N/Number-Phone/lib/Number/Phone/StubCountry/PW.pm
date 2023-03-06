@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -114,27 +114,27 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"68074", "Ngardmau\ State",
-"68054", "Aimeliik\ State",
-"68065", "Melekeok\ State",
-"68067", "Ngiwal\ State",
-"68087", "Kayangel\ State",
+$areanames{en} = {"680622", "Ngchesar\ State",
 "68085", "Ngarchelong\ State",
-"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
-"68027", "Angaur\ State",
-"680622", "Ngchesar\ State",
 "68073", "Ngaremlengui\ State",
-"68058", "Airai\ State",
-"68053", "Ngatpang\ State",
-"68048", "Koror\ State",
+"6803", "Peleliu\ State",
+"68027", "Angaur\ State",
+"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
 "68082", "Ngaraard\ State",
-"6803", "Peleliu\ State",};
+"68087", "Kayangel\ State",
+"68053", "Ngatpang\ State",
+"68054", "Aimeliik\ State",
+"68067", "Ngiwal\ State",
+"68065", "Melekeok\ State",
+"68058", "Airai\ State",
+"68048", "Koror\ State",
+"68074", "Ngardmau\ State",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+680|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '680', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

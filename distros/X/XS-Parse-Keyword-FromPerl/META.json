@@ -40,7 +40,7 @@
    "provides" : {
       "XS::Parse::Keyword::FromPerl" : {
          "file" : "lib/XS/Parse/Keyword/FromPerl.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

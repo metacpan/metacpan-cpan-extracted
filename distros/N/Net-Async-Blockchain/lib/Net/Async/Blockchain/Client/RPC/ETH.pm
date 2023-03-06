@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC::ETH;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -32,6 +32,8 @@ ETH RPC calls
 no indirect;
 
 use parent qw(Net::Async::Blockchain::Client::RPC);
+
+sub jsonrpc { return '2.0' }
 
 =head2 call
 

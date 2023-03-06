@@ -11,14 +11,14 @@
 <font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">warnings</font><font class="Normal">;</font></br>
 <font class="Function">use</font><font class="Normal">&nbsp;Carp;</font></br>
 </br>
-<font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">vars</font><font class="Normal">&nbsp;</font><font class="Operator">qw(</font><font class="Normal">$VERSION</font><font class="Operator">)</font><font class="Normal">;</font></br>
-<font class="DataType">$VERSION</font><font class="Normal">=</font><font class="Operator">&quot;</font><font class="SpecialString">0.01</font><font class="Operator">&quot;</font><font class="Normal">;</font></br>
+<font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">vars</font><font class="Normal">&nbsp;</font><font class="Others">qw(</font><font class="Normal">$VERSION</font><font class="Others">)</font><font class="Normal">;</font></br>
+<font class="DataType">$VERSION</font><font class="Normal">=</font><font class="Others">&quot;</font><font class="String">0.01</font><font class="Others">&quot;</font><font class="Normal">;</font></br>
 </br>
-<font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;:textctrl&nbsp;:font&nbsp;:colour&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br>
+<font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Others">qw(</font><font class="Normal">&nbsp;:textctrl&nbsp;:font&nbsp;:colour&nbsp;</font><font class="Others">)</font><font class="Normal">;</font></br>
 <font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::DND</font><font class="Normal">;</font></br>
-<font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;wxTheClipboard&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br>
-<font class="Function">use</font><font class="Normal">&nbsp;base&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;Wx::TextCtrl&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br>
-<font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::Event</font><font class="Normal">&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;EVT_CHAR&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br>
+<font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Others">qw(</font><font class="Normal">&nbsp;wxTheClipboard&nbsp;</font><font class="Others">)</font><font class="Normal">;</font></br>
+<font class="Function">use</font><font class="Normal">&nbsp;base&nbsp;</font><font class="Others">qw(</font><font class="Normal">&nbsp;Wx::TextCtrl&nbsp;</font><font class="Others">)</font><font class="Normal">;</font></br>
+<font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::Event</font><font class="Normal">&nbsp;</font><font class="Others">qw(</font><font class="Normal">&nbsp;EVT_CHAR&nbsp;</font><font class="Others">)</font><font class="Normal">;</font></br>
 </br>
 <font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">KeyEchoes</font><font class="Normal">;</font></br>
 <font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">UndoRedo</font><font class="Normal">;</font></br>
@@ -38,9 +38,9 @@
 </br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{CALLBACK}&nbsp;=&nbsp;</font><font class="Keyword">sub&nbsp;</font><font class="Normal">{};</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}&nbsp;=&nbsp;{</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doremove</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoRemove,</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doreplace</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoReplace,</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">dowrite</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoWrite,</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">'</font><font class="SpecialString">doremove</font><font class="Others">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoRemove,</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">'</font><font class="SpecialString">doreplace</font><font class="Others">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoReplace,</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">'</font><font class="SpecialString">dowrite</font><font class="Others">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoWrite,</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;};</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING}&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font></br>
@@ -55,7 +55,7 @@
 </br>
 <font class="Keyword">sub&nbsp;</font><font class="Function">AppendText</font><font class="Normal">&nbsp;{</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">append</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Others">'</font><font class="SpecialString">append</font><font class="Others">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Append</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br>
 <font class="Normal">}</font></br>
@@ -65,7 +65,7 @@
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plugs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$flag</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">foreach</font><font class="Normal">&nbsp;(</font><font class="DataType">@$plugs</font><font class="Normal">)&nbsp;{</font></br>
-<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Preprocessor">$_</font><font class="Normal">-&gt;</font><font class="DataType">Receive</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br>
+<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Warning">$_</font><font class="Normal">-&gt;</font><font class="DataType">Receive</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$flag</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">1</font><font class="Normal">;</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br>
 <font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br>

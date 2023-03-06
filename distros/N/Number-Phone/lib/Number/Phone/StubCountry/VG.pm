@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -52,7 +52,6 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
-          284496[0-5]\\d{3}|
           284(?:
             229|
             4(?:
@@ -67,7 +66,6 @@ my $validators = {
           )\\d{4}
         ',
                 'geographic' => '
-          284496[0-5]\\d{3}|
           284(?:
             229|
             4(?:
@@ -82,7 +80,6 @@ my $validators = {
           )\\d{4}
         ',
                 'mobile' => '
-          284496[6-9]\\d{3}|
           284(?:
             245|
             3(?:
@@ -94,7 +91,7 @@ my $validators = {
             4(?:
               4[0-6]|
               68|
-              99
+              9[69]
             )|
             5(?:
               4[0-7]|
@@ -134,7 +131,7 @@ my $validators = {
           52[34][2-9]1[02-9]\\d{4}|
           5(?:
             00|
-            2[125-7]|
+            2[125-9]|
             33|
             44|
             66|
@@ -166,7 +163,7 @@ Number::Phone::NANP::Data::_areaname('1'.shift()->{number}); }
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+1|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '1', number => $number, formatters => $formatters, validators => $validators, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

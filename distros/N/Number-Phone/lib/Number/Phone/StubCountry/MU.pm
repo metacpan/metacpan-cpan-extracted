@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -35,7 +35,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '5',
+                  'leading_digits' => '[57]',
                   'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
@@ -96,12 +96,18 @@ my $validators = {
             )|
             87[15-8]
           )\\d{4}|
-          5(?:
-            2[5-9]|
-            4[3-689]|
-            [57]\\d|
-            8[0-689]|
-            9[0-8]
+          (?:
+            5(?:
+              2[5-9]|
+              4[3-689]|
+              [57]\\d|
+              8[0-689]|
+              9[0-8]
+            )|
+            7(?:
+              01|
+              30
+            )
           )\\d{5}
         ',
                 'pager' => '',
@@ -119,23 +125,23 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{fr} = {"2302", "Région\ Nord",
-"2306", "Région\ Sud",
+$areanames{fr} = {"2306", "Région\ Sud",
+"2302", "Région\ Nord",
 "2304", "Région\ Centrale",};
-$areanames{es} = {"2306", "Región\ Sur",
-"2302", "Región\ Norte",
+$areanames{es} = {"2302", "Región\ Norte",
+"2306", "Región\ Sur",
 "2304", "Región\ Central",};
-$areanames{en} = {"2306", "South\ Region",
-"2302", "North\ Region",
-"23083", "Rodrigues",
+$areanames{en} = {"2302", "North\ Region",
 "23081", "Agalega",
-"2304", "Central\ Region",};
+"2306", "South\ Region",
+"2304", "Central\ Region",
+"23083", "Rodrigues",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+230|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '230', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

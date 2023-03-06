@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -185,49 +185,49 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{en} = {"822", "Seoul",
-"8263", "Jeonbuk",
-"8241", "Chungnam",
-"8254", "Gyeongbuk",
-"8253", "Daegu",
-"8264", "Jeju",
-"8242", "Daejeon",
-"8255", "Gyeongnam",
+$areanames{en} = {"8264", "Jeju",
+"822", "Seoul",
 "8233", "Gangwon",
+"8263", "Jeonbuk",
+"8252", "Ulsan",
+"8261", "Jeonnam",
 "8231", "Gyeonggi",
+"8242", "Daejeon",
+"8254", "Gyeongbuk",
+"8241", "Chungnam",
+"8255", "Gyeongnam",
 "8262", "Gwangju",
+"8253", "Daegu",
+"8232", "Incheon",
 "8244", "Sejong\ City",
 "8251", "Busan",
-"8261", "Jeonnam",
-"8243", "Chungbuk",
-"8252", "Ulsan",
-"8232", "Incheon",};
-$areanames{ko} = {"8243", "충북",
-"8261", "전남",
-"8252", "울산",
-"8232", "인천",
+"8243", "Chungbuk",};
+$areanames{ko} = {"8261", "전남",
 "8231", "경기",
-"8262", "광주",
+"8242", "대전",
+"822", "서울",
+"8264", "제주",
+"8233", "강원",
+"8252", "울산",
+"8263", "전북",
 "8244", "세종",
 "8251", "부산",
+"8243", "충북",
+"8254", "경북",
 "8255", "경남",
-"8253", "대구",
-"8264", "제주",
-"8242", "대전",
-"8233", "강원",
-"822", "서울",
-"8263", "전북",
 "8241", "충남",
-"8254", "경북",};
+"8253", "대구",
+"8262", "광주",
+"8232", "인천",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+82|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '82', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0(8(?:[1-46-8]|5\d\d))?)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '82', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

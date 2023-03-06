@@ -20,8 +20,8 @@ configure_requires:
   ExtUtils::Manifest: '0'
   File::ShareDir::Install: '0.11'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -35,7 +35,7 @@ requires:
   DBM::Deep: '2.0008'
   Data::Dumper::Concise: '0'
   Devel::CheckOS: '1.83'
-  Devel::Deprecations::Environmental: '0'
+  Devel::Deprecations::Environmental: '1.101'
   Digest::MD5: '0'
   File::Basename: '0'
   File::Find::Rule: '0'
@@ -47,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Number-Phone/issues
   repository: https://github.com/DrHyde/perl-modules-Number-Phone
-version: '3.8007'
+version: '3.9000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

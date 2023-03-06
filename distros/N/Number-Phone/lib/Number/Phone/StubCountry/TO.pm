@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -92,39 +92,39 @@ my $validators = {
                 'voip' => '55[0-37-9]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"67640", "Kolovai",
-"67642", "Masilamea",
-"67643", "Matangiake",
-"67660", "Ha\’apai",
-"67629", "Pea",
-"67636", "Nakolo",
-"67670", "Vava\’u",
-"67672", "Vava\’u",
-"67631", "Muʻa",
-"67634", "Kolonga",
-"67675", "Vava\’u",
+$areanames{en} = {"67643", "Matangiake",
 "67680", "Niuas",
-"67633", "Kolonga",
-"67676", "Vava\’u",
+"67629", "Pea",
 "67638", "Vaini",
-"67632", "Muʻa",
-"67650", "\‘Eua",
-"67630", "Pea",
+"67636", "Nakolo",
 "67669", "Ha\’apai",
-"6762", "Nuku\'alofa",
 "67671", "Vava\’u",
+"67672", "Vava\’u",
+"67635", "Nakolo",
+"67660", "Ha\’apai",
+"67631", "Muʻa",
+"67632", "Muʻa",
+"67675", "Vava\’u",
+"6762", "Nuku\'alofa",
+"67637", "Vaini",
+"67640", "Kolovai",
+"67676", "Vava\’u",
+"67633", "Kolonga",
 "67685", "Niuas",
 "67674", "Vava\’u",
+"67670", "Vava\’u",
 "67679", "Vava\’u",
-"67635", "Nakolo",
-"67637", "Vaini",
-"67641", "Masilamea",};
+"67634", "Kolonga",
+"67630", "Pea",
+"67641", "Masilamea",
+"67642", "Masilamea",
+"67650", "\‘Eua",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+676|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '676', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

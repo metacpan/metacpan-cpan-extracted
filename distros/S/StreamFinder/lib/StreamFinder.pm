@@ -133,14 +133,15 @@ blogger.com videos (L<StreamFinder::Blogger>),
 brandnewtube.com and ugetube.com videos (L<StreamFinder::BrandNewTube>), 
 brighteon.com videos (L<StreamFinder::Brighteon>), 
 castbox.fm podcasts (L<StreamFinder::Castbox>), 
-podcasts.google.com podcasts (L<StreamFinder::Google>), 
 goodpods.com podcasts (L<StreamFinder::Goodpods>), 
+podcasts.google.com podcasts (L<StreamFinder::Google>), 
 iheartradio.com radio stations and podcasts (L<StreamFinder::IHeartRadio>), 
 www.internetradio.com radio stations (L<StreamFinder::InternetRadio>), 
 onlineradiobox.com radio stations (L<StreamFinder::OnlineRadiobox>), 
 odysee.com videos (L<StreamFinder::Odysee>), 
 podbean.com podcasts (L<StreamFinder::Podbean>), 
 podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>), 
+podchaser.com podcasts (L<StreamFinder::Podchaser>), 
 radio.net radio stations (L<StreamFinder::RadioNet>), 
 rcast.net radio stations (L<StreamFinder::Rcast>), 
 rumble.com videos (L<StreamFinder::Rumble>),
@@ -526,7 +527,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.10';
+our $VERSION = '2.12';
 our $DEBUG = 0;
 
 require Exporter;
@@ -534,8 +535,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Goodpods 
-		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict RadioNet 
-		Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube));
+		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict Podchaser 
+		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube));
 
 my %useit;
 
@@ -635,6 +636,9 @@ sub new
 	} elsif ($url =~ m#\brcast\.# && $useit{'Rcast'}) {
 		eval { require 'StreamFinder/Rcast.pm'; $haveit = 1; };
 		return new StreamFinder::Rcast($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bpodchaser\.# && $useit{'Podchaser'}) {
+		eval { require 'StreamFinder/Podchaser.pm'; $haveit = 1; };
+		return new StreamFinder::Podchaser($url, @args)  if ($haveit);
 	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {

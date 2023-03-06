@@ -43,9 +43,9 @@ while ( each %{$css} ) {$shuffle2++;}
 my $inlined = $inliner->inlinify();
 
 ok($shuffle1 == $shuffle2);
-ok($inlined =~ m/<h1 class="foo bar biz" style="color: green; font-size: 10px; font-weight: bold;">Howdy!<\/h1>/, 'order #1');
-ok($inlined =~ m/<h1 class="foo biz bar" style="color: green; font-size: 10px; font-weight: bold;">Ahoy!<\/h1>/, 'order #2');
-ok($inlined =~ m/<h1 class="bar biz foo" style="color: green; font-size: 10px; font-weight: bold;">Hello!<\/h1>/, 'order #3');
-ok($inlined =~ m/<h1 class="bar foo biz" style="color: green; font-size: 10px; font-weight: bold;">Hola!<\/h1>/, 'order #4');
-ok($inlined =~ m/<h1 class="biz foo bar" style="color: green; font-size: 10px; font-weight: bold;">Gudentag!<\/h1>/, 'order #5');
-ok($inlined =~ m/<h1 class="biz bar foo" style="color: green; font-size: 10px; font-weight: bold;">Dziendobre!<\/h1>/, 'order #6');
+ok($inlined =~ m/<h1 class="foo bar biz" style="font-weight: bold; color: green; font-size: 10px;">Howdy!<\/h1>/, 'order #1');
+ok($inlined =~ m/<h1 class="foo biz bar" style="font-weight: bold; color: green; font-size: 10px;">Ahoy!<\/h1>/, 'order #2');
+ok($inlined =~ m/<h1 class="bar biz foo" style="font-weight: bold; color: green; font-size: 10px;">Hello!<\/h1>/, 'order #3');
+ok($inlined =~ m/<h1 class="bar foo biz" style="font-weight: bold; color: green; font-size: 10px;">Hola!<\/h1>/, 'order #4');
+ok($inlined =~ m/<h1 class="biz foo bar" style="font-weight: bold; color: green; font-size: 10px;">Gudentag!<\/h1>/, 'order #5');
+ok($inlined =~ m/<h1 class="biz bar foo" style="font-weight: bold; color: green; font-size: 10px;">Dziendobre!<\/h1>/, 'order #6');

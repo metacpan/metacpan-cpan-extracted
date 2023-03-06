@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [];
 
@@ -37,32 +37,32 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2908", "Tristan\ da\ Cunha",
-"290267", "St\.\ Helena",
-"29022", "Jamestown",
-"29027", "St\.\ Helena",
+$areanames{en} = {"29023", "St\.\ Helena",
+"2908", "Tristan\ da\ Cunha",
+"290268", "St\.\ Helena",
 "290264", "St\.\ Helena",
-"29023", "St\.\ Helena",
-"29024", "St\.\ Helena",
+"290267", "St\.\ Helena",
 "290266", "St\.\ Helena",
-"290269", "St\.\ Helena",
 "290265", "St\.\ Helena",
-"290268", "St\.\ Helena",};
-$areanames{fr} = {"290269", "Sainte\-Hélène",
-"290268", "Sainte\-Hélène",
-"290265", "Sainte\-Hélène",
+"29024", "St\.\ Helena",
+"29022", "Jamestown",
+"290269", "St\.\ Helena",
+"29027", "St\.\ Helena",};
+$areanames{fr} = {"290266", "Sainte\-Hélène",
 "29027", "Sainte\-Hélène",
-"290267", "Sainte\-Hélène",
-"290266", "Sainte\-Hélène",
-"29023", "Sainte\-Hélène",
+"290269", "Sainte\-Hélène",
 "29024", "Sainte\-Hélène",
-"290264", "Sainte\-Hélène",};
+"290265", "Sainte\-Hélène",
+"290264", "Sainte\-Hélène",
+"290267", "Sainte\-Hélène",
+"290268", "Sainte\-Hélène",
+"29023", "Sainte\-Hélène",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+290|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '290', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -2,6 +2,17 @@
 
 All changes made by Mark Overmeer, unless explicitly stated otherwise.
 
+version 0.15: Mon  6 Mar 11:16:16 CET 2023
+
+	Changes:
+	- datetime and date attribute tz (return STRING object) became
+	  timezone (new TIMEZONE object).
+
+	Improvements:
+	- implement MF::TIMEZONE
+	- implement duration attributes in_seconds and in_days
+	- implement -> and captures
+
 version 0.14: Tue 28 Feb 17:34:40 CET 2023
 
 	Improvements:

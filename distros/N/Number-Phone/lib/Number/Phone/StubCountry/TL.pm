@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -63,28 +63,28 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"67042", "Manatuto",
-"67021", "Manufahi",
-"67043", "Viqueque",
-"67033", "Dili",
-"67036", "Liquica",
-"67024", "Ainaro",
-"67038", "Ermera",
-"67032", "Dili",
-"67025", "Dekuse",
-"67031", "Dili",
-"67044", "Lautem",
-"67039", "Oekusi",
-"67023", "Bobonaro",
-"67037", "Aileu",
+$areanames{en} = {"67024", "Ainaro",
 "67022", "Cova\ Lima",
-"67041", "Baucau",};
+"67021", "Manufahi",
+"67033", "Dili",
+"67025", "Dekuse",
+"67043", "Viqueque",
+"67044", "Lautem",
+"67042", "Manatuto",
+"67041", "Baucau",
+"67037", "Aileu",
+"67032", "Dili",
+"67031", "Dili",
+"67023", "Bobonaro",
+"67039", "Oekusi",
+"67036", "Liquica",
+"67038", "Ermera",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+670|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '670', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

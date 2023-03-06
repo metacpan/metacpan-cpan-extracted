@@ -87,6 +87,14 @@ my $calc = Finance::Tax::Aruba::Income->tax_year(
     months => $opts{months},
 
     exists $opts{'as-np'} ? ( as_np => 1) : (
+        exists $opts{'pension-employee'} ?
+        (
+            pension_employee_perc => $opts{'pension-employee'},
+        ) : (),
+        exists $opts{'pension-employer'} ?
+        (
+            pension_employer_perc => $opts{'pension-employer'},
+        ) : (),
         exists $opts{'fringe'}
             ? (fringe => $opts{'fringe'})
             : (),
@@ -148,11 +156,12 @@ my @order = qw(
     -
     azv_total
     aov_total
-    pensioen
-    cost_employer
+    gov_costs
     -
-    gov_gets
-    effective_rate
+    pensioen
+    social_costs
+    -
+    cost_employer
 );
 
 my $jaarloon_bruto = $calc->yearly_income_gross;
@@ -160,13 +169,6 @@ my $jaarloon       = $calc->yearly_income;
 
 my $pensioen = $calc->pension_total;
 my $tax_free = $calc->taxfree_amount;
-
-my $azv_total = $calc->azv_premium;
-my $aov_total = $calc->aov_premium;
-
-my $gov_gets = $calc->income_tax + $azv_total + $aov_total;
-
-my $effective_rate = $gov_gets / $jaarloon * 100;
 
 my %year = (
     income         => $calc->income,
@@ -192,8 +194,8 @@ my %year = (
     pensioen_employer => $calc->pension_employer,
     pensioen       => $calc->pension_total,
     cost_employer  => $calc->company_costs,
-    effective_rate => $effective_rate,
-    gov_gets       => $gov_gets,
+    gov_costs      => $calc->government_costs,
+    social_costs   => $calc->social_costs,
     azv_total      => $calc->azv_premium,
     aov_total      => $calc->aov_premium,
     tax_free       => $calc->tax_free,
@@ -235,7 +237,9 @@ my %mapping = (
     aov_total => sprintf('OAV/AWW Totaal (%s%%)',
         $calc->aov_percentage_employee + $calc->aov_percentage_employer),
 
-    gov_gets       => "Social premiums and taxes",
+    gov_costs      => "Government costs",
+    social_costs   => "Social costs",
+
     bonus          => "Bonus",
     fringe         => "Fringe benefits"
 );
@@ -294,7 +298,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,9 @@
+#!/usr/bin/env perl
+
 # tasks in Rexfile live under the Rex::CLI namespace
 package Rex::CLI;
 
-use strict;
+use v5.12.5;
 use warnings;
 
 BEGIN {

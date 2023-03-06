@@ -6,6 +6,7 @@ BEGIN { use_ok('Syntax::Kamelon') };
 
 
 my $kam = Syntax::Kamelon->new(
+#.	verbose => 1,
 );
 
 ok(defined $kam, 'Creation');

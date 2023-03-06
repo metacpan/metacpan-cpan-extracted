@@ -1,3 +1,9 @@
+0.06 2023-03-06
+  [Incompatible Changes]
+    * Removed the File::Spec::Instance::Interface class.
+    * Removed the has_interfaces method in the File::Spec::Instance class.
+  [Prerequirement Changes]
+    * SPVM 0.9695+ is needed.
 0.05 2023-02-22
   [New Features]
     * Added the file_name_is_root method in the SVPM::File::Spec, SVPM::File::Spec::(Instance|Instance::Unix|Instance::Win32|Instance::Interface).

@@ -10,7 +10,7 @@ use Perl::Critic::Exception::Fatal::Internal qw{ throw_internal };
 use Perl::Critic::Utils qw{ :characters :severities :data_conversion };
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.148';
+our $VERSION = '1.150';
 
 #-----------------------------------------------------------------------------
 
@@ -121,8 +121,9 @@ sub _is_compound_return {
 
     my $begin = $final->schild(0);
     return if !$begin; #fail
-    if (!($begin->isa('PPI::Token::Word') &&
-          ($begin->content() eq 'if' || $begin->content() eq 'unless'))) {
+
+    state $is_if_or_unless = { hashify( qw( if unless ) ) };
+    if (!($begin->isa('PPI::Token::Word') && $is_if_or_unless->{$begin->content()})) {
         return; #fail
     }
 
@@ -134,11 +135,7 @@ sub _is_compound_return {
             'Expected only conditions, blocks and tokens in the if statement';
     }
 
-    for my $block (@blocks) {
-        if (! $self->_block_has_return($block)) {
-            return; #fail
-        }
-    }
+    return if any { ! $self->_block_has_return($_) } @blocks;
 
     return 1;
 }
@@ -231,11 +228,8 @@ sub _is_terminal_stmnt {
 sub _is_conditional_stmnt {
     my ( $self, $stmnt ) = @_;
     return if not $stmnt->isa('PPI::Statement');
-    for my $elem ( $stmnt->schildren() ) {
-        return 1 if $elem->isa('PPI::Token::Word')
-            && exists $CONDITIONALS{$elem};
-    }
-    return;
+
+    return any { exists $CONDITIONALS{$_} && $_->isa('PPI::Token::Word') } $stmnt->schildren();
 }
 
 #-----------------------------------------------------------------------------
@@ -253,11 +247,7 @@ sub _is_when_stmnt_with_return {
         and throw_internal 'When statement should have no more than one block';
     @inner or return;   #fail
 
-    foreach my $block ( @inner ) {
-        if ( ! $self->_block_has_return( $block ) ) {
-            return; #fail
-        }
-    }
+    return if any { ! $self->_block_has_return( $_ ) } @inner;
 
     return 1;   #succeed
 }

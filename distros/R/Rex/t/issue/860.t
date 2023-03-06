@@ -1,4 +1,6 @@
-use strict;
+#!/usr/bin/env perl
+
+use v5.12.5;
 use warnings;
 
 use Test::More tests => 6;
@@ -105,4 +107,3 @@ is_deeply(
   \%opt_t3,
   "got task3 parameter with 1.4 compatibility"
 );
-

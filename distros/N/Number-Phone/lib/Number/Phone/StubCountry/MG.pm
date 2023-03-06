@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -58,7 +58,7 @@ my $validators = {
             9[245]
           )\\d{5}
         ',
-                'mobile' => '3[2-489]\\d{7}',
+                'mobile' => '3[2-47-9]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
@@ -66,34 +66,34 @@ my $validators = {
                 'voip' => '22\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"2612022", "Antananarivo",
-"2612067", "Antsohihy",
-"2612095", "Morondava",
-"2612073", "Farafangana",
-"2612053", "Toamasina",
-"2612094", "Toliary",
-"2612086", "Nosy\ Be",
-"2612088", "Sambava",
-"2612047", "Ambositra",
-"26120729", "Mananjary",
-"2612082", "Antsiranana",
-"2612044", "Antsirabe",
+$areanames{en} = {"2612054", "Ambatondrazaka",
 "2612069", "Maintirano",
-"2612092", "Taolañaro",
-"2612057", "Maroantsetra\/Sainte\ Marie",
+"2612094", "Toliary",
+"2612075", "Fianarantsoa",
+"2612053", "Toamasina",
 "2612056", "Moramanga",
-"26120722", "Manakara",
+"2612095", "Morondava",
+"2612088", "Sambava",
+"2612092", "Taolañaro",
+"2612073", "Farafangana",
 "2612062", "Mahajanga",
-"2612054", "Ambatondrazaka",
-"2612075", "Fianarantsoa",};
+"2612044", "Antsirabe",
+"2612057", "Maroantsetra\/Sainte\ Marie",
+"2612022", "Antananarivo",
+"2612067", "Antsohihy",
+"2612086", "Nosy\ Be",
+"2612082", "Antsiranana",
+"26120729", "Mananjary",
+"26120722", "Manakara",
+"2612047", "Ambositra",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+261|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '261', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
-      my $prefix = qr/^(?:0|([24-9]\d{6})$)/;
+      my $prefix = qr/^(?:([24-9]\d{6})$|0)/;
       my @matches = $number =~ /$prefix/;
       if (defined $matches[-1]) {
         no warnings 'uninitialized';
@@ -102,7 +102,7 @@ $areanames{en} = {"2612022", "Antananarivo",
       else {
         $number =~ s/$prefix//;
       }
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '261', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

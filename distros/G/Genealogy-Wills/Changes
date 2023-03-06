@@ -1,0 +1,10 @@
+Revision history for Genealogy::Wills
+
+0.02	Fri Mar  3 21:21:02 EST 2023
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+	Handle "Ash next Sandwich" by adding both Ash and Sandwich as well
+	Avoid adding duplicates into the database
+	Fixed URL that's added
+
+0.01	Tue Jan 24 21:00:44 EST 2023
+	First draft

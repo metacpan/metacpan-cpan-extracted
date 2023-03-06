@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.27;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Console 0.10;
+package Tickit::Console 0.11;
 class Tickit::Console
-   extends Tickit::Widget::VBox;
+   :isa(Tickit::Widget::VBox);
 
 use Tickit::Widget::Entry;
 use Tickit::Widget::Scroller 0.04;
@@ -74,21 +74,23 @@ tab constructor in the C<add_tab> method.
 
 =cut
 
-has %_default_tab_opts;
-has $_tabbed;
-has $_entry;
+field %_default_tab_opts;
+field $_tabbed;
+field $_entry;
 
-BUILD ( %args )
-{
-   my $on_line = $args{on_line};
-
-   $_default_tab_opts{$_} = $args{$_} for
-      qw( timestamp_format datestamp_format );
+ADJUST :params (
+   :$on_line          = undef,
+   :$timestamp_format = undef,
+   :$datestamp_format = undef,
+   :$tab_class        = "Tickit::Console::Tab",
+) {
+   $_default_tab_opts{timestamp_format} = $timestamp_format;
+   $_default_tab_opts{datestamp_format} = $datestamp_format;
 
    $self->add(
       $_tabbed = Tickit::Widget::Tabbed->new(
          tab_position => "bottom",
-         tab_class    => $args{tab_class} // "Tickit::Console::Tab",
+         tab_class    => $tab_class,
       ),
       expand => 1,
    );
@@ -224,7 +226,7 @@ If C<$code> is missing or C<undef>, any existing callback is removed.
 
 =cut
 
-has %_keybindings;
+field %_keybindings;
 
 method bind_key ( $key, $code )
 {

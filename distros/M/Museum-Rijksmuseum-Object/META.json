@@ -1,0 +1,53 @@
+{
+   "abstract" : "Access the Rijksmuseum object metadata API",
+   "author" : [
+      "Robin Sheat <rsheat@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Museum-Rijksmuseum-Object",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::OAI" : "4.11",
+            "JSON::MaybeXS" : "1.004003",
+            "LWP" : "6.61",
+            "Moo" : "2.005004",
+            "URI" : "5.10",
+            "URI::Encode" : "v1.1.1",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

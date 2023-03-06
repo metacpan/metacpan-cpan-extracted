@@ -48,12 +48,12 @@ The following methods and features are supported for any Type defined on this pa
 
 All types can be converted into a string:
 
-  "a" ~ 2          -> STRING "a2"
+  "a" ~ 2          => STRING "a2"
 
 All types may provide B<attributes> (calls) for objects of that type.  Those
 get inherited (of course).  For instance:
 
-   02:03:04.hour   -> INTEGER 2
+   02:03:04.hour   => INTEGER 2
 
 =over 4
 
@@ -91,16 +91,30 @@ Represents a truth value, either C<true> or C<false>.
 Booleans implement the prefix operator "C<+>", and infix operators 'C<and>',
 'C<or>', and 'C<xor>'.
 
+The weird infix operator C<< -> >> implements an 'if-then', which can also be
+used as substitute.  When the left-side of the arrow is true, then the right
+side is returned.
+
+When left of the C<< -> >> is a possive regular expression match C<< =~ >>,
+then the right side may can be a complex expression which may contains C<$1>,
+C<2> etc.  The represent the captured values in the regexp.
+
 B<. Example: for booleans>
 
   true    false     # the only two values
   0                 # will be cast to false in boolean expressions
   42                # any other value is true, in boolean expressions
 
-  not true        -> BOOLEAN false
-  true and false  -> BOOLEAN false
-  true  or false  -> BOOLEAN true
-  true xor false  -> BOOLEAN true
+  not true               => BOOLEAN false
+  true and false         => BOOLEAN false
+  true  or false         => BOOLEAN true
+  true xor false         => BOOLEAN true
+
+  true  -> something        => something
+  false -> something        => undef     # rule fails
+  "abcd" =~ "^(.*)c" -> $1  => STRING "ab"
+
+  filename =~ "\.([^.]+)$" -> "extension is " ~ $1
 
 =head2 MF::STRING, contains text
 
@@ -142,18 +156,18 @@ B<. Example: of strings>
 
 String operations:
 
-  "a" + 'b'           -> STRING  "ab"
-  "a" =~ "regexp"     -> BOOLEAN, see MF::REGEXP
-  "a" like "pattern"  -> BOOLEAN, see MF::PATTERN
+  "a" + 'b'           => STRING  "ab"
+  "a" =~ "regexp"     => BOOLEAN, see MF::REGEXP
+  "a" like "pattern"  => BOOLEAN, see MF::PATTERN
 
-  "a" gt "b"          -> BOOLEAN
-  "a" cmp "b"         -> INTEGER -1, 0, 1
+  "a" gt "b"          => BOOLEAN
+  "a" cmp "b"         => INTEGER -1, 0, 1
 
 Attributes:
 
-   "abc".length       -> INTEGER  3
-   "".is_empty        -> BOOLEAN true   # only white-space
-   "ABC".lower        -> STRING "abc", lower-case using utf8 folding
+   "abc".length       => INTEGER  3
+   "".is_empty        => BOOLEAN true   # only white-space
+   "ABC".lower        => STRING "abc", lower-case using utf8 folding
 
 =head2 MF::INTEGER, a long whole number
 
@@ -194,21 +208,21 @@ B<. Example: of integers>
   -12           # negatives
   1_234_567     # _ on the thousands, more readible
 
-  + 2          -> INTEGER   2      # prefix op
+  + 2          => INTEGER   2      # prefix op
   - 2          -> INTEGER   -2     # prefix op
   - -2         -> INTEGER   2      # prefix op, negative int
   
-  1 + 2        -> INTEGER   3      # infix op
+  1 + 2        => INTEGER   3      # infix op
   5 - 9        -> INTEGER   -4     # infix op
-  3 * 4        -> INTEGER   12
-  12 % 5       -> INTEGER   2
-  12 / 5       -> FLOAT     2.4
+  3 * 4        => INTEGER   12
+  12 % 5       => INTEGER   2
+  12 / 5       => FLOAT     2.4
 
-  1 < 2        -> BOOLEAN   true
-  1 <=> 2      -> INTEGER   -1     # -1, 0, 1
+  1 < 2        => BOOLEAN   true
+  1 <=> 2      => INTEGER   -1     # -1, 0, 1
 
-  not 0        -> BOOLEAN   true
-  not 42       -> BOOLEAN   false
+  not 0        => BOOLEAN   true
+  not 42       => BOOLEAN   false
 
 Attributes
 
@@ -235,8 +249,8 @@ B<. Example: of floats>
   -12.345
 
   3.14 / 4
-  2.7 < π        -> BOOLEAN true
-  2.12 <=> 4.89  -> INTEGER -1    # -1, 0, 1
+  2.7 < π        => BOOLEAN true
+  2.12 <=> 4.89  => INTEGER -1    # -1, 0, 1
 
 =head2 MF::DATETIME, refers to a moment of time
 
@@ -276,16 +290,16 @@ B<. Example: for datetime>
 Attributes: (the date and time attributes combined)
 
   date = 2006-11-21T12:23:34.56+0110
-  dt.year    -> INTEGER 2006
-  dt.month   -> INTEGER 11
-  dt.day     -> INTEGER 21
-  dt.hour    -> INTEGER 12
-  dt.minute  -> INTEGER 23
-  dt.second  -> INTEGER 34
-  dt.fracsec -> FLOAT   34.56
-  dt.tz      -> STRING  +0110
-  dt.time    -> TIME    12:23:34.56
-  dt.date    -> DATE    2006-11-21+0110
+  dt.year     => INTEGER  2006
+  dt.month    => INTEGER  11
+  dt.day      => INTEGER  21
+  dt.hour     => INTEGER  12
+  dt.minute   => INTEGER  23
+  dt.second   => INTEGER  34
+  dt.fracsec  => FLOAT    34.56
+  dt.timezone => TIMEZONE +0110
+  dt.time     => TIME     12:23:34.56
+  dt.date     => DATE     2006-11-21+0110
 
 =head2 MF::DATE, refers to a day in some timezone
 
@@ -320,10 +334,10 @@ B<. Example: for date>
 Attributes:
 
   date = 2006-11-21+0700
-  date.year      -> INTEGER 2006
-  date.month     -> INTEGER 11
-  date.day       -> INTEGER 21
-  date.tz        -> STRING  "+0700"
+  date.year      => INTEGER   2006
+  date.month     => INTEGER   11
+  date.day       => INTEGER   21
+  date.timezone  => TIMEZONE  +0700
 
 =head2 MF::TIME, a moment during any day
 
@@ -349,22 +363,45 @@ B<. Example: for time>
   23:59:61      # with max leap seconds
   09:11:11.111  # precise time (upto nanoseconds)
 
-  12:00:34 + PT30M -> TIME 12:30:34   # end of lunch
+  12:00:34 + PT30M => TIME 12:30:34   # end of lunch
   12:00:34 - PT15M -> TIME 11:45:34   # round-up coworkers
-  23:40:00 + PT7H  -> TIME 06:40:00   # early rise
+  23:40:00 + PT7H  => TIME 06:40:00   # early rise
   07:00:00 - 23
 
-  18:00:00+0200 ==  17:00:00+0100 -> BOOLEAN
-  18:00:00+0200 <=> 17:00:00+0100 -> INTEGER
+  18:00:00 ==  17:00:00 => BOOLEAN
+  18:00:00 <=> 17:00:00 => INTEGER
 
 Attributes:
 
-  time = 12:23:34.56+0110
-  time.hour        -> INTEGER 12
-  time.minute      -> INTEGER 23
-  time.second      -> INTEGER 34
-  time.fracsec     -> FLOAT   34.56
-  time.tz          -> STRING  +0110
+  time = 12:23:34.56
+  time.hour        => INTEGER 12
+  time.minute      => INTEGER 23
+  time.second      => INTEGER 34
+  time.fracsec     => FLOAT   34.56
+
+=head2 MF::TIMEZONE, time-zone.
+
+Clock difference to UTC (Zulu).  The format requires a plus (C<+>) or minus (C<->) followed by
+two digits representing hours and two digits for minutes.
+
+Timezone supports numeric comparison.  When you add (C<+>) and subtract (C<->) a (short)
+duration to a timezone.
+
+When you subtract (C<->) one timezone from another, you will get a duration.
+
+B<. Example: for timezone>
+
+  +0000
+  -0612
+
+  -0600 + PT1H     -> -0500
+  +0230 - PT3H30M  -> -0100
+
+Attributes:
+
+  tz = -1236
+  tz.in_minutes    => INTEGER -756
+  tz.in_seconds    => INTEGER -45360
 
 =head2 MF::DURATION, a period of time
 
@@ -393,13 +430,29 @@ B<. Example: for duration>
   PT3H4M8.2S       # duration 3 hours, 4 minutes, just over 8 seconds
 
   - -P1Y           # prefix + and =
-  P3Y2M + P1YT3M5S  -> DURATION P4Y2MT3M5S
+  P3Y2M + P1YT3M5S  => DURATION P4Y2MT3M5S
   P1Y2MT3H5M - P3Y8MT5H13M14S -> DURATION -P2Y6MT2H8M14S
-  P1DT2H * 4        -> DURATION P4DT8H
-  4 * P1DT2H        -> DURATION P4DT8H
+  P1DT2H * 4        => DURATION P4DT8H
+  4 * P1DT2H        => DURATION P4DT8H
 
-  P1Y > P1M         -> BOOLEAN true
+  P1Y > P1M         => BOOLEAN true
   PT20M <=> PT19M   => INTEGER 1     # -1, 0, 1
+
+Attributes
+
+  P1Y.in_days       => INTEGER  365  (4yrs will have extra day)
+  P1H.in_seconds    => INTEGER  3600
+
+=over 4
+
+=item $obj-E<gt>B<inSeconds>()
+
+Returns the duration in seconds, nanoseconds ignored.  This is exact when the duration
+only contains minutes and seconds.  When hours are involved, do you care about switching
+from and to Daylight Savingstime?  Months are taken as 1/12 of a year.  A year is taken
+as 365.256 year.  For exact calculations, add the duration to a DATETIME first.
+
+=back
 
 =head2 MF::NAME, refers to something in the context
 
@@ -441,8 +494,8 @@ B<. Example: of names>
 
 Attributes on names
 
-  exists live     -> BOOLEAN    # does formula 'live' exist?
-  not exists live -> BOOLEAN
+  exists live     => BOOLEAN    # does formula 'live' exist?
+  not exists live => BOOLEAN
 
   live // dead // false         # pick first rule which exists
 
@@ -467,13 +520,13 @@ Besides, it supports curly alternatives like C<*.{jpg,gif,png}>.
 
 B<. Example: of patterns>
 
-  "abc" like "b"     -> BOOLEAN false
-  "abc" like "*b*"   -> BOOLEAN false
-  "abc" like "*c"    -> BOOLEAN true
+  "abc" like "b"     => BOOLEAN false
+  "abc" like "*b*"   => BOOLEAN false
+  "abc" like "*c"    => BOOLEAN true
 
-  "abc" unlike "b"   -> BOOLEAN true
-  "abc" unlike "*b*" -> BOOLEAN true
-  "abc" unlike "*c"  -> BOOLEAN false
+  "abc" unlike "b"   => BOOLEAN true
+  "abc" unlike "*b*" => BOOLEAN true
+  "abc" unlike "*c"  => BOOLEAN false
 
 =head2 MF::REGEXP, Regular expression
 
@@ -484,10 +537,10 @@ operators are detected, those will automatically be cast into a regexp.
 
 B<. Example: of regular expressions>
 
-  "abc" =~ "b"       -> BOOLEAN true
-  "abc" =~ "c$"      -> BOOLEAN true
-  "abc" !~ "b"       -> BOOLEAN false
-  "abc" !~ "c$"      -> BOOLEAN false
+  "abc" =~ "b"       => BOOLEAN true
+  "abc" =~ "c$"      => BOOLEAN true
+  "abc" !~ "b"       => BOOLEAN false
+  "abc" !~ "c$"      => BOOLEAN false
 
 =over 4
 
@@ -503,8 +556,8 @@ The used of this type is explained in L<Math::Formula::Context|Math::Formula::Co
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.14,
-built on February 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.15,
+built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

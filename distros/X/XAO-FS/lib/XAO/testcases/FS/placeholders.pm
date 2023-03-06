@@ -489,7 +489,20 @@ sub test_build_structure {
         },
     );
 
-    $cust->build_structure(\%structure);
+    my $res=$cust->build_structure(\%structure);
+
+    $self->assert($res && ref $res eq 'HASH',
+        "Expected a hash from build_structure (A)");
+
+    $self->assert($res->{'added'} == 8,
+        "Expected build_structure to report 8 additions (A)");
+
+    $self->assert($res->{'changed'} == 0,
+        "Expected build_structure to report no changes (A)");
+
+    $self->assert(!@{$res->{'orphans'}},
+        "Expected build_structure to report no orphans (A)");
+
     foreach my $name (qw(name text integer Orders)) {
         $self->assert($cust->exists($name),
                       "Field ($name) doesn't exist after build_structure()");
@@ -522,7 +535,10 @@ sub test_build_structure {
     $structure{'name'}->{'charset'}='utf8';
     $structure{'text'}->{'charset'}='utf8';
 
-    $cust->build_structure(\%structure);
+    $res=$cust->build_structure(\%structure);
+
+    $self->assert($res->{'changed'} == 4,
+        "Expected build_structure to report 4 changes (B)");
 
     $odb=$self->reconnect();
     $cust=$odb->fetch('/Customers/c1');
@@ -548,7 +564,10 @@ sub test_build_structure {
         index => 1,
     };
 
-    $cust->build_structure(\%structure);
+    $res=$cust->build_structure(\%structure);
+
+    $self->assert($res->{'added'} == 1,
+        "Expected build_structure to report 1 added (C)");
 
     foreach my $name (qw(newf name text integer uns Orders)) {
         $self->assert($cust->exists($name),
@@ -566,6 +585,52 @@ sub test_build_structure {
         $self->assert($cust->describe($name)->{index},
                       "No indication of index in the created field ($name)");
     }
+
+    # Removing some fields from the structure prototype and checking
+    # that build structure returns the difference between on-disk and
+    # given.
+    #
+    delete $structure{'blob'};
+    delete $structure{'uq'};
+    delete $structure{'Orders'}->{'structure'}->{'foo'};
+
+    $odb=$self->reconnect();
+
+    $res=$cust->build_structure(\%structure);
+
+    $self->assert($res && ref $res eq 'HASH',
+        "Expected a hash from build_structure (D)");
+
+    $self->assert($res->{'added'} == 0,
+        "Expected build_structure to report no additions (D)");
+
+    $self->assert($res->{'changed'} == 0,
+        "Expected build_structure to report no changes (D)");
+
+    $self->assert(@{$res->{'orphans'}} == 3,
+        "Expected build_structure to report 3 orphans (D)");
+
+    # Actually dropping orphans and checking results
+    #
+    $cust->sync_structure(\%structure);
+
+    $self->assert(! $cust->describe('blob'),
+        "Expected 'blob' to be gone");
+
+    $self->assert(! $cust->describe('uq'),
+        "Expected 'uq' to be gone");
+
+    $self->assert(! $cust->get('Orders')->get_new()->describe('foo'),
+        "Expected 'Orders/foo' to be gone");
+
+    # Whole table
+    #
+    delete $structure{'Orders'};
+
+    $cust->sync_structure(\%structure);
+
+    $self->assert(! $cust->describe('Orders'),
+        "Expected 'Orders' to be gone");
 }
 
 ###############################################################################

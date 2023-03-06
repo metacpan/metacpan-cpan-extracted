@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211023;
+our $VERSION = 1.20230305170049;
 
 my $formatters = [
                 {
@@ -123,77 +123,77 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{hr} = {"38731", "Županija\ Posavska",
-"38730", "Županija\ Središnja\ Bosna",
-"38737", "Unsko\-sanska\ županija",
-"38735", "Tuzlanska\ županija",
-"38732", "Zeničko\-dobojska\ županija",
-"38736", "Hercegovačko\-neretvanska\ županija",
-"38738", "Bosansko\-podrinjska\ županija\ Goražde",
-"38739", "Županija\ Zapadnohercegovačka",
-"38734", "Hercegbosanska\ županija",
-"38733", "Sarajevska\ županija",};
-$areanames{bs} = {"38731", "Posavski\ kanton",
-"38739", "Zapadnohercegovački\ kanton",
+$areanames{bs} = {"38732", "Zeničko\-dobojski\ kanton",
+"38731", "Posavski\ kanton",
 "38734", "kanton\ 10",
-"38735", "Tuzlanski\ kanton",
+"38730", "Srednjobosanski\ kanton",
 "38737", "Unsko\-sanski\ kanton",
 "38757", "Istočno\ Sarajevo",
 "38738", "Bosansko\-podrinjski\ kanton\ Goražde",
 "38736", "Hercegovačko\-neretvanski\ kanton",
-"38733", "Kanton\ Sarajevo",
-"38730", "Srednjobosanski\ kanton",
+"38739", "Zapadnohercegovački\ kanton",
+"38735", "Tuzlanski\ kanton",
 "3874", "Brčko\ Distrikt",
-"38732", "Zeničko\-dobojski\ kanton",};
-$areanames{sr} = {"38738", "Босанско\-подрињски\ кантон\ Горажде",
-"38756", "Зворник",
-"38758", "Фоча",
-"38733", "Сарајевски\ кантон",
-"38753", "Добој",
-"38750", "Мркоњић\ Град",
-"38730", "Средњoбосански\ кантон",
-"38732", "Зеничко\-добојски\ кантон",
-"38752", "Приједор",
-"3874", "Брчко\ Дистрикт",
-"38734", "Кантон\ 10",
-"38754", "Шамац",
-"38759", "Требиње",
-"38757", "Источно\ Сарајево",
-"38755", "Бијељина",
-"38737", "Унско\-сански\ кантон",
-"38735", "Тузлански\ кантон",
-"38751", "Бања\ Лука",
-"38731", "Посавски\ кантон",};
-$areanames{en} = {"38751", "Banja\ Luka",
-"38731", "Posavina\ Canton",
-"38739", "West\ Herzegovina\ Canton",
-"38734", "Canton\ 10",
-"38759", "Trebinje",
-"38754", "Šamac",
-"38757", "East\ Sarajevo",
-"38755", "Bijeljina",
-"38737", "Una\-Sana\ Canton",
+"38733", "Kanton\ Sarajevo",};
+$areanames{en} = {"38739", "West\ Herzegovina\ Canton",
+"38756", "Zvornik",
 "38735", "Tuzla\ Canton",
-"38733", "Sarajevo\ Canton",
-"38753", "Doboj",
+"38758", "Foča",
+"38755", "Bijeljina",
 "38738", "Bosnian\-Podrinje\ Canton\ Goražde",
 "38736", "Herzegovina\-Neretva\ Canton",
-"38756", "Zvornik",
-"38758", "Foča",
-"38732", "Zenica\-Doboj\ Canton",
-"3874", "Brčko\ District",
+"38759", "Trebinje",
+"38757", "East\ Sarajevo",
 "38752", "Prijedor",
+"38751", "Banja\ Luka",
 "38750", "Mrkonjić\ Grad",
-"38730", "Central\ Bosnia\ Canton",};
+"38754", "Šamac",
+"38731", "Posavina\ Canton",
+"38732", "Zenica\-Doboj\ Canton",
+"38734", "Canton\ 10",
+"38730", "Central\ Bosnia\ Canton",
+"38737", "Una\-Sana\ Canton",
+"38733", "Sarajevo\ Canton",
+"38753", "Doboj",
+"3874", "Brčko\ District",};
+$areanames{sr} = {"38754", "Шамац",
+"38750", "Мркоњић\ Град",
+"38752", "Приједор",
+"38751", "Бања\ Лука",
+"38757", "Источно\ Сарајево",
+"38737", "Унско\-сански\ кантон",
+"38734", "Кантон\ 10",
+"38730", "Средњoбосански\ кантон",
+"38731", "Посавски\ кантон",
+"38732", "Зеничко\-добојски\ кантон",
+"38758", "Фоча",
+"38735", "Тузлански\ кантон",
+"38756", "Зворник",
+"38759", "Требиње",
+"38755", "Бијељина",
+"38738", "Босанско\-подрињски\ кантон\ Горажде",
+"3874", "Брчко\ Дистрикт",
+"38733", "Сарајевски\ кантон",
+"38753", "Добој",};
+$areanames{hr} = {"38735", "Tuzlanska\ županija",
+"38733", "Sarajevska\ županija",
+"38739", "Županija\ Zapadnohercegovačka",
+"38736", "Hercegovačko\-neretvanska\ županija",
+"38738", "Bosansko\-podrinjska\ županija\ Goražde",
+"38737", "Unsko\-sanska\ županija",
+"38732", "Zeničko\-dobojska\ županija",
+"38731", "Županija\ Posavska",
+"38730", "Županija\ Središnja\ Bosna",
+"38734", "Hercegbosanska\ županija",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+387|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '387', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '387', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

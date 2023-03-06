@@ -6,7 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Tickit::Console',
    requires => {
-      'Object::Pad' => '0.43',
+      'Object::Pad' => '0.74', # 0.73 + bugfix
       'String::Tagged' => '0.10',
       'Tickit' => 0,
       'Tickit::Window' => '0.45', # rendering order
@@ -19,8 +19,8 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    test_requires => {
-      'Test::Identity' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test::Refcount' => 0,
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd">
-<language name="CUE Sheet" version="1" kateversion="5.0" section="Other" extensions="*.cue" mimetype="application/x-cue">
+<!DOCTYPE language>
+<language name="CUE Sheet" version="3" kateversion="5.0" section="Other" extensions="*.cue" mimetype="application/x-cue">
   <highlighting>
     <list name="keywords">
-      <item> CATALOG </item>
-      <item> CDTEXTFILE </item>
-      <item> FILE </item>
-      <item> FLAGS </item>
-      <item> INDEX </item>
-      <item> ISRC </item>
-      <item> PERFORMER </item>
-      <item> PREGAP </item>
-      <item> POSTGAP </item>
-      <item> REM </item>
-      <item> SONGWRITER </item>
-      <item> TITLE </item>
-      <item> TRACK </item>
+      <item>CATALOG</item>
+      <item>CDTEXTFILE</item>
+      <item>FILE</item>
+      <item>FLAGS</item>
+      <item>INDEX</item>
+      <item>ISRC</item>
+      <item>PERFORMER</item>
+      <item>PREGAP</item>
+      <item>POSTGAP</item>
+      <item>REM</item>
+      <item>SONGWRITER</item>
+      <item>TITLE</item>
+      <item>TRACK</item>
     </list>
     <list name="format">
-      <item> AIFF </item>
-      <item> WAVE </item>
-      <item> MP3 </item>
-      <item> BINARY </item>
-      <item> MOTOTOLA </item>
+      <item>AIFF</item>
+      <item>WAVE</item>
+      <item>MP3</item>
+      <item>BINARY</item>
+      <item>MOTOTOLA</item>
     </list>
     <list name="mode">
-      <item> AUDIO </item>
-      <item> CDG </item>
-      <item> CDI </item>
-      <item> MODE1 </item>
-      <item> MODE2 </item>
-      <item> RAW </item>
+      <item>AUDIO</item>
+      <item>CDG</item>
+      <item>CDI</item>
+      <item>MODE1</item>
+      <item>MODE2</item>
+      <item>RAW</item>
     </list>
     <list name="flags">
-      <item> 4CH </item>
-      <item> DCP </item>
-      <item> PRE </item>
-      <item> SCMS </item>
+      <item>4CH</item>
+      <item>DCP</item>
+      <item>PRE</item>
+      <item>SCMS</item>
     </list>
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
@@ -52,7 +52,9 @@
         <LineContinue attribute="String" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="Comment" />
+      <context attribute="Comment" lineEndContext="#pop" name="Comment">
+        <IncludeRules context="##Comments" />
+      </context>
     </contexts>
     <itemDatas>
       <itemData name="Normal Text"  defStyleNum="dsNormal"/>
@@ -72,3 +74,4 @@
     <keywords casesensitive="0" />
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

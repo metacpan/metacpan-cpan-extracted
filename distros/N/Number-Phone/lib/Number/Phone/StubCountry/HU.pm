@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -96,96 +96,96 @@ my $validators = {
                 'voip' => '21\\d{7}'
               };
 my %areanames = ();
-$areanames{hu} = {"3627", "Vác",
-"3634", "Tatabánya",
-"3637", "Gyöngyös",
-"3695", "Sárvár",
-"3673", "Szigetvár",
-"3632", "Salgótarján",
-"3654", "Berettyóújfalu",
-"3696", "Győr",
-"3625", "Dunaújváros",
-"3628", "Gödöllő",
-"3657", "Jászberény",
-"3648", "Ózd",
-"3688", "Veszprém",
+$areanames{hu} = {"3689", "Pápa",
 "3674", "Szekszárd",
-"3676", "Kecskemét",
 "3645", "Kisvárda",
-"3689", "Pápa",
 "3682", "Kaposvár",
-"3649", "Mezőkövesd",
-"3666", "Békéscsaba",
-"3653", "Cegléd",
-"3642", "Nyíregyháza",
-"3669", "Mohács",
-"3684", "Siófok",
+"3676", "Kecskemét",
 "3678", "Kiskőrös",
+"3637", "Gyöngyös",
+"3627", "Vác",
+"3695", "Sárvár",
+"3653", "Cegléd",
+"3628", "Gödöllő",
+"3669", "Mohács",
+"3634", "Tatabánya",
+"3649", "Mezőkövesd",
+"3642", "Nyíregyháza",
+"3654", "Berettyóújfalu",
+"3688", "Veszprém",
+"3625", "Dunaújváros",
+"3684", "Siófok",
 "3672", "Pécs",
-"3668", "Orosháza",};
-$areanames{en} = {"3648", "Ozd",
-"3685", "Marcali",
-"3677", "Kiskunhalas",
-"3674", "Szekszard",
-"3688", "Veszprem",
-"3645", "Kisvarda",
-"3676", "Kecskemet",
-"361", "Budapest",
-"3689", "Papa",
-"3682", "Kaposvar",
-"3666", "Bekescsaba",
-"3649", "Mezokovesd",
-"3693", "Nagykanizsa",
-"3642", "Nyiregyhaza",
-"3653", "Cegled",
-"3662", "Szeged",
-"3644", "Mátészalka",
-"3646", "Miskolc",
-"3669", "Mohacs",
-"3675", "Paks",
-"3687", "Tapolca",
-"3678", "Kiskoros",
-"3684", "Siofok",
-"3647", "Szerencs",
-"3679", "Baja",
-"3672", "Pecs",
-"3623", "Biatorbágy",
-"3633", "Esztergom",
-"3668", "Oroshaza",
-"3683", "Keszthely",
-"3692", "Zalaegerszeg",
-"3659", "Karcag",
-"3652", "Debrecen",
-"3699", "Sopron",
-"3636", "Eger",
-"3627", "Vac",
-"3634", "Tatabanya",
-"3624", "Szigetszentmiklós",
-"3695", "Sarvar",
-"3637", "Gyongyos",
-"3626", "Szentendre",
-"3629", "Monor",
-"3622", "Székesfehérvár",
-"3673", "Szigetvar",
-"3632", "Salgotarjan",
+"3632", "Salgótarján",
+"3657", "Jászberény",
+"3673", "Szigetvár",
+"3668", "Orosháza",
+"3666", "Békéscsaba",
+"3648", "Ózd",
+"3696", "Győr",};
+$areanames{en} = {"3688", "Veszprem",
 "3654", "Berettyoujfalu",
-"3663", "Szentes",
+"3647", "Szerencs",
+"3656", "Szolnok",
+"3672", "Pecs",
+"3684", "Siofok",
+"3635", "Balassagyarmat",
+"3623", "Biatorbágy",
+"3625", "Dunaujvaros",
+"3633", "Esztergom",
+"3679", "Baja",
+"3675", "Paks",
+"3657", "Jaszbereny",
+"3644", "Mátészalka",
+"3629", "Monor",
+"3668", "Oroshaza",
+"3646", "Miskolc",
+"3673", "Szigetvar",
+"3622", "Székesfehérvár",
+"3632", "Salgotarjan",
 "3696", "Gyor",
 "3694", "Szombathely",
-"3656", "Szolnok",
-"3625", "Dunaujvaros",
+"3687", "Tapolca",
+"3666", "Bekescsaba",
+"3648", "Ozd",
+"3682", "Kaposvar",
+"3674", "Szekszard",
+"3645", "Kisvarda",
+"3676", "Kecskemet",
+"3689", "Papa",
+"3637", "Gyongyos",
+"3693", "Nagykanizsa",
+"3695", "Sarvar",
+"3659", "Karcag",
+"3627", "Vac",
+"3678", "Kiskoros",
+"3652", "Debrecen",
+"3663", "Szentes",
 "3628", "Godollo",
-"3635", "Balassagyarmat",
-"3657", "Jaszbereny",};
+"3692", "Zalaegerszeg",
+"3669", "Mohacs",
+"3677", "Kiskunhalas",
+"3699", "Sopron",
+"3662", "Szeged",
+"3653", "Cegled",
+"3683", "Keszthely",
+"3685", "Marcali",
+"361", "Budapest",
+"3642", "Nyiregyhaza",
+"3634", "Tatabanya",
+"3626", "Szentendre",
+"3649", "Mezokovesd",
+"3636", "Eger",
+"3624", "Szigetszentmiklós",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+36|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '36', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:06)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '36', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

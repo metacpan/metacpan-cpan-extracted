@@ -1,4 +1,6 @@
-use strict;
+#!/usr/bin/env perl
+
+use v5.12.5;
 use warnings;
 
 use Rex::CLI;
@@ -22,4 +24,3 @@ eval {
 };
 
 is( $ok, 1, "Rexfile with true return value was loaded successfull." );
-

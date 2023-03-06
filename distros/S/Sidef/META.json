@@ -5,7 +5,7 @@
       "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "artistic_2"
    ],
@@ -70,7 +70,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "22.12"
+         "version" : "23.03"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -248,6 +248,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "22.12",
-   "x_serialization_backend" : "JSON::PP version 4.12"
+   "version" : "23.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,7 +1,7 @@
 This archive contains the distribution Music-CreatingRhythms,
-version 0.0301:
+version 0.0504:
 
-  Ported Perl from the book's C code
+  Combinatorial algorithms to generate rhythms
 
 This software is Copyright (c) 2023 by Gene Boggs.
 

@@ -67,7 +67,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
 
     Tentukan format output untuk teks asli dan terjemahan.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Mencetak teks asli dan teks terjemahan dalam format penanda konflik [git(1)](http://man.he.net/man1/git).
 
@@ -100,9 +100,9 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
 
         Mencetak teks asli dan teks terjemahan yang dipisahkan oleh satu baris kosong.
 
-    - **none**
+    - **xtxt**
 
-        Jika formatnya adalah `none` atau tidak diketahui, hanya teks terjemahan yang dicetak.
+        Jika formatnya adalah `xtxt` (teks terjemahan) atau tidak diketahui, hanya teks terjemahan yang dicetak.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

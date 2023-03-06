@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170053;
 
 my $formatters = [
                 {
@@ -85,69 +85,69 @@ my $validators = {
                 'voip' => '[89]01\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"370469", "Neringa",
-"370428", "Raseiniai",
-"370347", "Kėdainiai",
-"370443", "Mažeikiai",
-"370440", "Skuodas",
-"370318", "Lazdijai",
-"370449", "Šilalė",
-"370451", "Pasvalys",
-"370460", "Palanga",
-"370382", "Širvintos",
-"370522", "Vilnius",
-"370427", "Kelmė",
-"370445", "Kretinga",
-"370342", "Vilkaviškis",
-"370528", "Trakai",
-"370450", "Biržai",
-"370527", "Vilnius",
-"370422", "Radviliškis",
-"370441", "Šilutė",
-"370459", "Kupiškis",
-"370387", "Švenčionys",
-"370524", "Vilnius",
-"370446", "Tauragė",
-"370315", "Alytus",
-"370421", "Pakruojis",
-"37045", "Panevėžys",
-"370345", "Šakiai",
-"370426", "Joniškis",
-"370389", "Utena",
-"370520", "Vilnius",
-"370346", "Kaišiadorys",
-"370425", "Akmenė",
-"370458", "Rokiškis",
-"370380", "Šalčininkai",
-"370383", "Molėtai",
-"370523", "Vilnius",
-"370313", "Druskininkai",
-"370386", "Ignalina\/Visaginas",
-"370526", "Vilnius",
-"37041", "Šiauliai",
-"370340", "Ukmergė",
-"37037", "Kaunas",
+$areanames{en} = {"370310", "Varėna",
 "370521", "Vilnius",
-"370343", "Marijampolė",
-"370447", "Jurbarkas",
-"370310", "Varėna",
-"370444", "Telšiai",
+"370441", "Šilutė",
 "370381", "Anykščiai",
-"370319", "Birštonas\/Prienai",
+"370318", "Lazdijai",
+"370527", "Vilnius",
+"37041", "Šiauliai",
+"370447", "Jurbarkas",
+"370389", "Utena",
+"370444", "Telšiai",
+"370524", "Vilnius",
+"370449", "Šilalė",
+"37046", "Klaipėda",
+"370343", "Marijampolė",
+"37045", "Panevėžys",
+"370315", "Alytus",
+"370387", "Švenčionys",
+"370342", "Vilkaviškis",
+"370422", "Radviliškis",
+"370340", "Ukmergė",
+"370451", "Pasvalys",
+"370428", "Raseiniai",
+"370386", "Ignalina\/Visaginas",
+"370469", "Neringa",
+"370459", "Kupiškis",
+"370425", "Akmenė",
+"370313", "Druskininkai",
+"370446", "Tauragė",
+"370345", "Šakiai",
+"370526", "Vilnius",
+"370440", "Skuodas",
+"370520", "Vilnius",
+"370522", "Vilnius",
+"370528", "Trakai",
+"370382", "Širvintos",
 "370448", "Plungė",
+"370380", "Šalčininkai",
 "370385", "Zarasai",
+"370346", "Kaišiadorys",
 "370525", "Vilnius",
+"370445", "Kretinga",
+"370319", "Birštonas\/Prienai",
+"370426", "Joniškis",
+"370458", "Rokiškis",
+"370421", "Pakruojis",
+"370460", "Palanga",
+"370450", "Biržai",
+"370383", "Molėtai",
+"370427", "Kelmė",
+"370347", "Kėdainiai",
+"37037", "Kaunas",
 "370349", "Jonava",
-"37046", "Klaipėda",};
+"370523", "Vilnius",
+"370443", "Mažeikiai",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+370|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '370', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:[08])//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '370', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

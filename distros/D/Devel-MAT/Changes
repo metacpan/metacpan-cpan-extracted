@@ -1,5 +1,18 @@
 Revision history for Devel-MAT
 
+0.50    2023-03-03
+        [CHANGES]
+         * Improved tree-forming algorithm in `pmat-diff` that produces better
+           output shapes
+         * Annotate SVs as being mortalized if the dumpfile contains that
+           information
+
+        [BUGFIXES]
+         * Ensure pmat-diff doesn't get stuck in a loop trying to break cycles
+           when forming tree shapes
+         * Ensure Reachability tool understands that CLASS is a kind of stash
+           (RT146630)
+
 0.49    2022-10-03
         [CHANGES]
          * Much improved output from pmat-diff:

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -65,12 +65,12 @@ my $validators = {
               52[35]|
               6(?:
                 0[1-3579]|
-                1[02357-9]|
+                1[0235-9]|
                 [23]\\d|
                 40|
                 5[06]|
                 6[2-589]|
-                7[025-7]|
+                7[025-9]|
                 8[04]|
                 9[4-9]
               )|
@@ -150,7 +150,7 @@ my $validators = {
           52[34][2-9]1[02-9]\\d{4}|
           5(?:
             00|
-            2[125-7]|
+            2[125-9]|
             33|
             44|
             66|
@@ -180,7 +180,7 @@ Number::Phone::NANP::Data::_areaname('1'.shift()->{number}); }
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+1|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '1', number => $number, formatters => $formatters, validators => $validators, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -106,11 +106,10 @@ This module is the core commands module.
 
 package Rex::Commands;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 require Rex::Exporter;
 use Rex::TaskList;
@@ -350,12 +349,20 @@ sub task {
 
 =head2 desc($description)
 
-Set the description of a task.
+Set the description of the task, batch, or environment following it.
 
- desc "This is a task description of the following task";
- task "mytask", sub {
-   say "Do something";
- }
+ desc 'This is the description of the following task';
+ task 'mytask', sub {
+   say 'Do something';
+ };
+
+ desc 'This is the description of the following batch';
+ batch mybatch => 'task1', 'task2', 'task3';
+ 
+ desc 'This is the description of the following environment';
+ environment production => sub {
+   ...
+ };
 
 =cut
 
@@ -1233,6 +1240,8 @@ Set the execution path for all commands.
 
  path "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/usr/pkg/bin", "/usr/pkg/sbin";
 
+It's a convenience wrapper for the L<set_path|Rex::Config#set_path> configuration option.
+
 =cut
 
 sub path {
@@ -1654,14 +1663,14 @@ sub tmp_dir {
 
 This function dumps the contents of a variable to STDOUT.
 
-task "mytask", "myserver", sub {
-  my $myvar = {
-    name => "foo",
-    sys  => "bar",
-  };
-
-  inspect $myvar;
-};
+ task "mytask", "myserver", sub {
+   my $myvar = {
+     name => "foo",
+     sys  => "bar",
+   };
+ 
+   inspect $myvar;
+ };
 
 =cut
 

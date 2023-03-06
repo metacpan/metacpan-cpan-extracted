@@ -732,7 +732,7 @@ use Test::More;
       compile_ok($source);
     }
     {
-      my $source = 'class MyClass { use Stringable; use Point::Interface; static method main : void () { my $source : Stringable[]; my $dist : Point::Interface[] = $source; } }';
+      my $source = 'class MyClass { use Stringable; use Cloneable; static method main : void () { my $source : Stringable[]; my $dist : Cloneable[] = $source; } }';
       compile_not_ok($source, , qr|implicite type conversion|);
     }
     {
@@ -751,7 +751,7 @@ use Test::More;
       compile_ok($source);
     }
     {
-      my $source = 'class MyClass { use Point::Interface; static method main : void () { my $source : Int[]; my $dist : Point::Interface[] = $source; } }';
+      my $source = 'class MyClass { use Cloneable; static method main : void () { my $source : Int[]; my $dist : Cloneable[] = $source; } }';
       compile_not_ok($source, , qr|implicite type conversion|);
     }
   }
@@ -871,7 +871,7 @@ use Test::More;
       'class MySockaddr : public;',
       'class MyIn_addr : public;',
     ];
-    compile_not_ok($source, q|The implicite type conversion from "MySockaddrIn" to "MyIn_addr" in the 1th argument of the "main" class method in the "MyClass" class is not allowed|);
+    compile_not_ok($source, q|The implicite type conversion from "MySockaddrIn" to "MyIn_addr" in the 1th argument of the "main" method in the "MyClass" class is not allowed|);
   }
 }
 

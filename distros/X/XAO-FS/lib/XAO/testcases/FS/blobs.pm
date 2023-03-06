@@ -48,6 +48,38 @@ sub test_charsets {
 
         $obj->drop_placeholder('blob');
     }
+
+    # Checking if storing a unicode string works and that we get
+    # back bytes even after storing unicode.
+    #
+    if(1) {
+        my $obj=$list->get_new;
+
+        $obj->add_placeholder(
+            name        => 'blob',
+            type        => 'blob',
+            maxlength   => 100,
+        );
+
+        my $ta=Encode::decode('utf8',"L\x{e1}minas");
+        $obj->put(blob => $ta);
+
+        my $id=$list->put($obj);
+        $obj=$list->get($id);
+
+        my $tb=$obj->get('blob');
+
+        ### dprint "ta=$ta u8.a=".Encode::is_utf8($ta)." tb=$tb u8.b=".Encode::is_utf8($tb);
+
+        $self->assert(Encode::is_utf8($ta),
+            "Expected the initial string '$ta' to be Unicode");
+        $self->assert(!Encode::is_utf8($tb),
+            "Expected retrieved string '$tb' to be bytes");
+        $self->assert(Encode::encode('utf8',$ta) eq $tb,
+            "Expected strings to match in byte representation");
+
+        $obj->drop_placeholder('blob');
+    }
 }
 
 ###############################################################################

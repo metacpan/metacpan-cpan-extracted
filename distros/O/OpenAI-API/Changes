@@ -1,5 +1,20 @@
 Revision history for OpenAI-API
 
+0.22    2024-03-04
+        Refactor endpoint / api_base parameters.
+
+0.21    2024-03-04
+        Implement retry with sleep.
+
+0.20    2024-03-04
+        Fix timeout.
+
+0.19    2024-03-03
+        Update documentation.
+
+0.18    2024-03-03
+        Add timeout parameter.
+
 0.17    2024-03-02
         Add github links to Makefile.PL
 

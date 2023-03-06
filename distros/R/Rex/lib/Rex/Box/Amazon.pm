@@ -75,8 +75,7 @@ See also the Methods of Rex::Box::Base. This module inherits all methods of it.
 
 package Rex::Box::Amazon;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 use Data::Dumper;
 use Rex::Box::Base;
@@ -84,7 +83,7 @@ use Rex::Commands -no => [qw/auth/];
 use Rex::Commands::Fs;
 use Rex::Commands::Cloud;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 BEGIN {
   LWP::UserAgent->use;

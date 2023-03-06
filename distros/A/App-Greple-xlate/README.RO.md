@@ -67,7 +67,7 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
 
     Specificați formatul de ieșire pentru textul original și cel tradus.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Tipăriți textul original și tradus în formatul de marcare a conflictului [git(1)](http://man.he.net/man1/git).
 
@@ -100,9 +100,9 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
 
         Tipăriți textul original și tradus separate de o singură linie albă.
 
-    - **none**
+    - **xtxt**
 
-        Dacă formatul este `none` sau necunoscut, se tipărește numai textul tradus.
+        Dacă formatul este `xtxt` (text tradus) sau necunoscut, se tipărește numai textul tradus.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

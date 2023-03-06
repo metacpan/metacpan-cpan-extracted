@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.73 ':experimental(init_expr)';
 
 use Tickit::Widget::Tabbed 0.024;
 
-package Tickit::Console::Tab 0.10;
+package Tickit::Console::Tab 0.11;
 class Tickit::Console::Tab
-   extends Tickit::Widget::Tabbed::Tab
+   :isa(Tickit::Widget::Tabbed::Tab)
    :strict(params);
 
 use Tickit::Widget::Scroller::Item::Text;
@@ -65,18 +65,13 @@ to generate timestamps in UTC instead of using the local timezone.
 
 =cut
 
-has $_scroller :param;
-has $_console  :param;
-has $_on_line  :param = undef;
+field $_scroller :param;
+field $_console  :param :weak;
+field $_on_line  :param = undef;
 
-has $_timestamp_format :param;
-has $_datestamp_format :param;
-has $_localtime        :param = sub ( $time ) { localtime $time };
-
-ADJUST
-{
-   weaken( $_console );
-}
+field $_timestamp_format :param;
+field $_datestamp_format :param;
+field $_localtime        :param = sub ( $time ) { localtime $time };
 
 =head1 METHODS
 
@@ -170,8 +165,8 @@ sub _make_item ( $string, %opts )
    }
 }
 
-has $_dusk_datestamp;
-has $_dawn_datestamp;
+field $_dusk_datestamp;
+field $_dawn_datestamp;
 
 method _make_item_with_timestamp ( $string, %opts )
 {
@@ -251,7 +246,7 @@ invoked instead.
 
 =cut
 
-has %_keybindings;
+field %_keybindings;
 
 method bind_key ( $key, $code )
 {

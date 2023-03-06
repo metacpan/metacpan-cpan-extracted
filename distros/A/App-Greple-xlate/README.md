@@ -93,7 +93,7 @@ This is a short-cut to specify the pattern matches entire text
 
     Specify the output format for original and translated text.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         Print original and translated text in [git(1)](http://man.he.net/man1/git) conflict marker format.
 
@@ -126,9 +126,10 @@ This is a short-cut to specify the pattern matches entire text
 
         Print original and translated text separated by single blank line.
 
-    - **none**
+    - **xtxt**
 
-        If the format is `none` or unkown, only translated text is printed.
+        If the format is `xtxt` (translated text) or unkown, only translated
+        text is printed.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

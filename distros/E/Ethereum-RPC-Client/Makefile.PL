@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "Math::BigFloat" => "1.999814",
     "Math::BigInt" => "1.999814",
     "Mojo::UserAgent" => 0,
+    "Mojolicious" => "== 7.29",
     "Moo" => 0,
     "Path::Tiny" => 0,
     "Scalar::Util" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "Math::BigFloat" => "1.999814",
   "Math::BigInt" => "1.999814",
   "Mojo::UserAgent" => 0,
+  "Mojolicious" => "== 7.29",
   "Moo" => 0,
   "Path::Tiny" => 0,
   "Scalar::Util" => 0,

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211027;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -96,42 +96,42 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
-"25451", "Nakuru\/Njoro\/Molo",
-"25467", "Kiambu\/Kikuyu",
-"25465", "Nyahururu\/Maralal",
-"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
-"25459", "Homabay\/Migori",
-"25468", "Embu",
-"25442", "Malindi\/Lamu\/Garsen",
-"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
-"25460", "Muranga\/Kerugoya",
-"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
-"25462", "Nanyuki",
+$areanames{en} = {"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
 "25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
-"2542", "Nairobi",
 "25469", "Marsabit\/Moyale",
-"25464", "Meru\/Maua\/Chuka",
-"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
-"25461", "Nyeri\/Karatina",
-"25441", "Mombasa\/Mariakani\/Kilifi",
 "25455", "Bungoma\/Busia",
+"25451", "Nakuru\/Njoro\/Molo",
+"25452", "Kericho\/Bomet",
 "25457", "Kisumu\/Siaya\/Maseno",
-"25466", "Thika\/Ruiru",
+"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
+"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
+"2542", "Nairobi",
+"25460", "Muranga\/Kerugoya",
+"25464", "Meru\/Maua\/Chuka",
+"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
 "25446", "Garissa\/Hola\/Wajir\/Mandera",
-"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
-"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
+"25465", "Nyahururu\/Maralal",
+"25466", "Thika\/Ruiru",
+"25459", "Homabay\/Migori",
+"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
+"25468", "Embu",
+"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
 "25450", "Naivasha\/Narok\/Gilgil",
-"25452", "Kericho\/Bomet",};
+"25442", "Malindi\/Lamu\/Garsen",
+"25441", "Mombasa\/Mariakani\/Kilifi",
+"25467", "Kiambu\/Kikuyu",
+"25462", "Nanyuki",
+"25461", "Nyeri\/Karatina",
+"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+254|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '254', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '254', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

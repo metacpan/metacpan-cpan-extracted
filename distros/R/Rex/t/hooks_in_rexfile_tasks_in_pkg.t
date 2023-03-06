@@ -1,6 +1,8 @@
+#!/usr/bin/env perl
+
 package Rex::CLI;
 
-use 5.006;
+use v5.12.5;
 use warnings;
 
 BEGIN {

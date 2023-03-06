@@ -1,8 +1,21 @@
 
 This module provides a Unix-like command `digitdemog'. 
-(And also "strgroup" that is still on developing, which may be integrated into `digitdemog'.)
 
 =head1 DESCRIPTION
+
+
+提供する機能: 
+
+ どんな文字が各行の先頭から何桁目に何回出現したかを、集計して
+ 表示する。このことで、テキスト形式のデータファイルの文字列の
+ 様子が分かりやすく把握できる。
+
+ このことにより、電話番号や図書番号などの規則性を把握したり、
+ 文字列や書類のタイトルや日付が適切にルールが作られて記録
+ されているか把握したり、どんな文字が使われているか、どんな
+ 例外が発生しているかを知ることも出来る。
+
+
 
 想定している使い方 (digitdemog) : 
 
@@ -10,13 +23,13 @@ This module provides a Unix-like command `digitdemog'.
   - 何桁目にどんな文字が現れたのかを解読する
   - 最も長いもしくは短い行の例を知る。
   - L2 か -L4 のオプションで、行の文字列長ごとの例を知る。
+  - etc. 
  
   
 =head1 SEE ALSO
 
 digitdemog --help 
-strgourp --help
 
- Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ Copyright (c) 2023 Toshiyuki SHIMONO. All rights reserved.
  This program is free software; you can redistribute it and/or
  modify it under the same terms as Perl itself.

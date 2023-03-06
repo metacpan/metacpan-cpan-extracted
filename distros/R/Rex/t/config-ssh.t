@@ -1,4 +1,6 @@
-use strict;
+#!/usr/bin/env perl
+
+use v5.12.5;
 use warnings;
 
 use File::Temp;
@@ -90,4 +92,3 @@ ok(
 );
 
 1;
-

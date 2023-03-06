@@ -1,3 +1,7 @@
+#!/usr/bin/env perl
+
+use v5.12.5;
+use warnings;
 
 package main;
 
@@ -45,4 +49,3 @@ task(
 test1();
 test2( { name => "rex" } );
 test3( { name => "xer" } );
-

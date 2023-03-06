@@ -1,3 +1,8 @@
+#!/usr/bin/env perl
+
+use v5.12.5;
+use warnings;
+
 use Test::More tests => 7;
 use Rex::Commands;
 

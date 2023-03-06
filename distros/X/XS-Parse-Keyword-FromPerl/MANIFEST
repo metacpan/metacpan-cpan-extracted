@@ -16,4 +16,6 @@ t/10pieces-simple.t
 t/11pieces-op.t
 t/12pieces-pad.t
 t/13pieces-structural.t
+t/20newASSIGNOP.t
+t/20newCONDOP.t
 t/99pod.t

@@ -4,8 +4,6 @@
 #
 # -f:	force a build, otherwise it won't build on CPAN smokers or if the
 #	database is less than a day old
-#
-# TODO: handle surnames of A/B e.g. COK/COOKE
 
 use strict;
 use warnings;
@@ -79,7 +77,7 @@ HTTP::Cache::Transparent::init({
 	MaxAge => 30 * 24
 }) || die "$0: $cachedir: $!";
 
-print "This will take some time. It'd be best to go and make yourself a cup of tea.\n";
+# print "This will take some time. It'd be best to go and make yourself a cup of tea.\n";
 
 my $ua = LWP::UserAgent::WithCache->new(timeout => 10, keep_alive => 1);
 $ua->env_proxy(1);
@@ -104,14 +102,14 @@ foreach my $page ('ab', 'c', 'dg', 'hj', 'km', 'nr', 'sv', 'wy') {
 
 print ' ' x 78, "\r";
 
-print "\n";
-
 flush($dbh);
 
 $dbh->commit();
 $dbh->prepare('CREATE INDEX name_index ON wills(first, last)')->execute();
 $dbh->do('pragma optimize');
 $dbh->disconnect();
+
+print "\n";
 
 sub mrawson($$) {
 	my $ua = shift;
@@ -147,8 +145,8 @@ sub mrawson($$) {
 		# print __LINE__, ": $page: '$line' ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
 		# print __LINE__, ": $page: '$line'\n";
 
-		$url =~ s/^https:\/\///;
-		queue("$url/$page", $first, $last, "$town, Kent, England", $year);
+		queue("freepages.rootsweb.com/~mrawson/genealogy/$page", $first, $last, "$town, Kent, England", $year);
+		# print "https://freepages.rootsweb.com/~mrawson/genealogy/$page\n";
 		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
 	}
 }
@@ -157,38 +155,69 @@ sub queue($$$$$)
 {
 	my ($url, $first, $last, $town, $year) = @_;
 
-	my %columns = (
+	my $columns = {
 		url => $url,
 		first => $first,
 		town => $town,
 		year => $year
-	);
+	};
 
 	# print __LINE__, ": $first, $last\n";
 
 	# TODO: combine these into one regex
 	if($last =~ /(.+)\sAlias\s(.+)/) {
-		$last = $1;
-		$columns{'last'} = $2;
+		push @queue, { %{$columns}, last => $1 };
 
-		push @queue, \%columns;
+		$last = $2;
 	} elsif($last =~ /(.+)\/(.+)/) {
-		$last = $1;
-		$columns{'last'} = $2;
+		push @queue, { %{$columns}, last => $1 };
 
-		push @queue, \%columns;
+		$last = $2;
 	}
 
-	$columns{'last'} = $last;
-	push @queue, \%columns;
+	$columns->{'last'} = $last;
+
+	# Handle "Ash next Sandwich" by adding both Ash and Sandwich as well
+	if($town =~ /^(.*) next (.*?),\s+(.*)/i) {
+		push @queue, $columns;
+
+		push @queue, { %{$columns}, town => "$1, $3" };
+		push @queue, { %{$columns}, town => "$1, $2, $3" };
+
+		$columns = { %{$columns} };	 # Clone as we push refs
+		$columns->{'town'} = "$2, $3";
+	}
+
+	push @queue, $columns;
 }
 
 sub flush($)
 {
 	my $dbh = shift;
-	my $query;
 
-	while(my $row = pop @queue) {
+	# Remove duplicates
+	my %seen;
+	my @deduped;
+
+	foreach my $item(@queue) {
+		my $middle = $item->{'middle'};
+		if(!defined($middle)) {
+			$item->{'middle'} = '';
+		}
+		my $k = join('|', @$item{qw /first middle last town year url/ });
+		if(!defined($middle)) {
+			delete $item->{'middle'};
+		}
+		unless($seen{$k}) {
+			push @deduped, $item;
+			$seen{$k} = 1;
+		} else {
+			# print "$k\n";
+		}
+	}
+
+	my $query;
+	while(my $row = pop @deduped) {
 		if(!defined($query)) {
 			$query = 'INSERT INTO wills(first, middle, last, town, year, url) VALUES (';
 		} else {

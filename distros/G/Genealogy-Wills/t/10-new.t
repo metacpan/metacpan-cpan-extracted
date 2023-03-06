@@ -7,4 +7,5 @@ use Test::Most tests => 2;
 use Genealogy::Wills;
 
 isa_ok(Genealogy::Wills->new(), 'Genealogy::Wills', 'Creating Genealogy::Wills object');
-ok(!defined(Genealogy::Wills::new()));
+isa_ok(Genealogy::Wills::new(), 'Genealogy::Wills', 'Creating Genealogy::Wills object');
+# ok(!defined(Genealogy::Wills::new()));

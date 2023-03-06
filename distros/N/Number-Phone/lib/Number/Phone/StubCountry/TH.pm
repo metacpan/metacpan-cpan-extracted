@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211028;
+our $VERSION = 1.20230305170054;
 
 my $formatters = [
                 {
@@ -85,69 +85,69 @@ my $validators = {
                 'voip' => '6[08]\\d{7}'
               };
 my %areanames = ();
-$areanames{th} = {"6644", "บุรีรัมย์\/ชัยภูมิ\/นครราชสีมา\/สุรินทร์",
-"6675", "กระบี่\/นครศรีธรรมราช\/ตรัง",
-"6673", "นราธิวาส\/ปัตตานี\/ยะลา",
-"6632", "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี",
-"6610", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6639", "จันทบุรี\/ตราด",
-"6654", "ลำปาง\/น่าน\/พะเยา\/แพร่",
-"6638", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
-"6656", "ชัยนาท\/นครสวรรค์\/เพชรบูรณ์\/พิจิตร\/อุทัยธานี",
-"662", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6616", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6635", "อ่างทอง\/พระนครศรีอยุธยา\/สุพรรณบุรี",
-"6633", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
-"6677", "ชุมพร\/ระนอง\/สุราษฎร์ธานี",
-"6619", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6674", "พัทลุง\/สตูล\/สงขลา",
-"6676", "พังงา\/ภูเก็ต",
-"6652", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
+$areanames{th} = {"6676", "พังงา\/ภูเก็ต",
 "6643", "กาฬสินธุ์\/ขอนแก่น\/มหาสารคาม\/ร้อยเอ็ด",
 "6645", "อำนาจเจริญ\/ศรีสะเกษ\/อุบลราชธานี\/ยโสธร",
-"6636", "ลพบุรี\/สระบุรี\/สิงห์บุรี",
-"6634", "กาญจนบุรี\/นครปฐม\/สมุทรสาคร\/สมุทรสงคราม",
+"6674", "พัทลุง\/สตูล\/สงขลา",
+"6618", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6656", "ชัยนาท\/นครสวรรค์\/เพชรบูรณ์\/พิจิตร\/อุทัยธานี",
+"6619", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6654", "ลำปาง\/น่าน\/พะเยา\/แพร่",
+"6616", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
 "6637", "นครนายก\/ปราจีนบุรี\/สระแก้ว",
+"6652", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
+"6633", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
+"662", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6635", "อ่างทอง\/พระนครศรีอยุธยา\/สุพรรณบุรี",
+"6673", "นราธิวาส\/ปัตตานี\/ยะลา",
+"6638", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
+"6639", "จันทบุรี\/ตราด",
+"6610", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6644", "บุรีรัมย์\/ชัยภูมิ\/นครราชสีมา\/สุรินทร์",
+"6675", "กระบี่\/นครศรีธรรมราช\/ตรัง",
+"6632", "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี",
 "6653", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
-"6642", "เลย\/มุกดาหาร\/นครพนม\/หนองคาย\/สกลนคร\/อุดรธานี",
+"6677", "ชุมพร\/ระนอง\/สุราษฎร์ธานี",
 "6655", "กำแพงเพชร\/พิษณุโลก\/สุโขทัย\/ตาก\/อุตรดิตถ์",
-"6618", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",};
-$areanames{en} = {"6677", "Chumphon\/Ranong\/Surat\ Thani",
-"6619", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6674", "Phatthalung\/Satun\/Songkhla",
-"6652", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
-"6676", "Phang\ Nga\/Phuket",
-"6643", "Kalasin\/Khon\ Kaen\/Maha\ Sarakham\/Roi\ Et",
-"6645", "Amnat\ Charoen\/Si\ Sa\ Ket\/Ubon\ Ratchathani\/Yasothon",
-"6636", "Lop\ Buri\/Saraburi\/Sing\ Buri",
-"6634", "Kanchanaburi\/Nakhon\ Pathom\/Samut\ Sakhon\/Samut\ Songkhram",
-"6637", "Nakhon\ Nayok\/Prachin\ Buri\/Sa\ Kaeo",
-"6618", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6642", "เลย\/มุกดาหาร\/นครพนม\/หนองคาย\/สกลนคร\/อุดรธานี",
+"6636", "ลพบุรี\/สระบุรี\/สิงห์บุรี",
+"6634", "กาญจนบุรี\/นครปฐม\/สมุทรสาคร\/สมุทรสงคราม",};
+$areanames{en} = {"6655", "Kamphaeng\ Phet\/Phitsanulok\/Sukhothai\/Tak\/Uttaradit",
+"6677", "Chumphon\/Ranong\/Surat\ Thani",
 "6653", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
-"6642", "Loei\/Mukdahan\/Nakhon\ Phanom\/Nong\ Khai\/Sakon\ Nakhon\/Udon\ Thani",
-"6655", "Kamphaeng\ Phet\/Phitsanulok\/Sukhothai\/Tak\/Uttaradit",
-"6644", "Buri\ Ram\/Chaiyaphum\/Nakhon\ Ratchasima\/Surin",
-"6675", "Krabi\/Nakhon\ Si\ Thammarat\/Trang",
-"6673", "Narathiwat\/Pattani\/Yala",
 "6632", "Phetchaburi\/Prachuap\ Khiri\ Khan\/Ratchaburi",
-"6639", "Chanthaburi\/Trat",
+"6675", "Krabi\/Nakhon\ Si\ Thammarat\/Trang",
+"6644", "Buri\ Ram\/Chaiyaphum\/Nakhon\ Ratchasima\/Surin",
 "6610", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6654", "Lampang\/Nan\/Phayao\/Phrae",
-"662", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6656", "Chai\ Nat\/Nakhon\ Sawan\/Phetchabun\/Phichit\/Uthai\ Thani",
+"6639", "Chanthaburi\/Trat",
+"6673", "Narathiwat\/Pattani\/Yala",
 "6638", "Chachoengsao\/Chon\ Buri\/Rayong",
+"6634", "Kanchanaburi\/Nakhon\ Pathom\/Samut\ Sakhon\/Samut\ Songkhram",
+"6636", "Lop\ Buri\/Saraburi\/Sing\ Buri",
+"6642", "Loei\/Mukdahan\/Nakhon\ Phanom\/Nong\ Khai\/Sakon\ Nakhon\/Udon\ Thani",
+"6654", "Lampang\/Nan\/Phayao\/Phrae",
+"6656", "Chai\ Nat\/Nakhon\ Sawan\/Phetchabun\/Phichit\/Uthai\ Thani",
+"6619", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6618", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6674", "Phatthalung\/Satun\/Songkhla",
+"6645", "Amnat\ Charoen\/Si\ Sa\ Ket\/Ubon\ Ratchathani\/Yasothon",
+"6643", "Kalasin\/Khon\ Kaen\/Maha\ Sarakham\/Roi\ Et",
+"6676", "Phang\ Nga\/Phuket",
 "6635", "Ang\ Thong\/Phra\ Nakhon\ Si\ Ayutthaya\/Suphan\ Buri",
+"662", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
 "6633", "Chachoengsao\/Chon\ Buri\/Rayong",
+"6652", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
+"6637", "Nakhon\ Nayok\/Prachin\ Buri\/Sa\ Kaeo",
 "6616", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+66|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '66', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '66', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

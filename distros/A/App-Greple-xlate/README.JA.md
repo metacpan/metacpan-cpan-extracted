@@ -41,7 +41,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 - **--xlate-fold**
 - **--xlate-fold-width**=_n_ (Default: 70)
 
-    マッチした部分ごとに翻訳処理を起動します。
+    マッチした領域ごとに翻訳処理を起動します。
 
     このオプションがない場合、**greple**は通常の検索コマンドとして動作します。したがって、ファイルのどの部分が翻訳の対象となるかを、実際の作業を始める前に確認することができます。
 
@@ -67,7 +67,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
     原文と訳文の出力形式を指定します。
 
-    - **conflict**
+    - **conflict**, **cm**
 
         原文と訳文を[git(1)](http://man.he.net/man1/git)コンフリクトマーカ形式で出力します。
 
@@ -100,9 +100,9 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
         原文と訳文を1行の空白で区切って表示します。
 
-    - **none**
+    - **xtxt**
 
-        `none`またはunknownの場合、翻訳されたテキストのみが表示されます。
+        フォーマットが`xtxt`（翻訳文）またはunknownの場合、翻訳文のみが印刷されます。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -118,7 +118,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 - --cache-clear
 
-    **--cache-clear**オプションは、キャッシュ管理を開始するため、あるいは既存のキャッシュデータをすべてリフレッシュするために使用することができます。このオプションを一度実行すると、キャッシュファイルが存在しない場合は新しいキャッシュファイルが作成され、その後は自動的にメンテナンスされます。
+    **--cache-clear**オプションは、キャッシュ管理を開始するか、既存のキャッシュデータをすべてリフレッシュするために使用されます。このオプションを一度実行すると、キャッシュファイルが存在しない場合は新規に作成され、その後は自動的にメンテナンスされます。
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
@@ -131,7 +131,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
     - `always`, `yes`, `1`
 
-        ターゲットが通常のファイルである限り、とにかくキャッシュを維持します。
+        対象が通常ファイルである限り、とにかくキャッシュを維持します。
 
     - `clear`
 
@@ -139,11 +139,11 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
     - `never`, `no`, `0`
 
-        キャッシュファイルが存在しても使用しないです。
+        キャッシュファイルが存在しても決して使用しないです。
 
     - `accumulate`
 
-        デフォルトの動作では、未使用のデータはキャッシュファイルから削除されます。削除せず、ファイルに残しておきたい場合は、`蓄積`を使用してください。
+        デフォルトの動作では、未使用のデータはキャッシュファイルから削除されます。削除せずに残しておきたい場合は、`蓄積`を使用してください。
 
 # ENVIRONMENT
 
@@ -159,15 +159,15 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 # SEE ALSO
 
-[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)の場合。
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)を使用します。
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
-    DeepL PythonライブラリとCLIコマンドを使用します。
+    DeepL の Python ライブラリと CLI コマンド。
 
 - [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
-    対象テキストパターンの詳細については、**greple**のマニュアルを参照してください。**--inside**, **--outside**, **--include**, **--exclude**オプションでマッチング範囲を限定してください。
+    対象テキストパターンの詳細については、**greple**のマニュアルを参照してください。**--inside**, **--outside**, **--include**, **--exclude**オプションでマッチング範囲を限定することができます。
 
 - [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
 

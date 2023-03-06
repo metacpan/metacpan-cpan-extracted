@@ -4,11 +4,10 @@
 
 package Rex::Inventory::SMBios::Section;
 
-use 5.010001;
-use strict;
+use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.0'; # VERSION
+our $VERSION = '1.14.1'; # VERSION
 
 require Exporter;
 use base qw(Exporter);
@@ -149,4 +148,3 @@ sub get_index {
 }
 
 1;
-

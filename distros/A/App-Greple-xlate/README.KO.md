@@ -67,7 +67,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
     원본 및 번역 텍스트의 출력 형식을 지정합니다.
 
-    - **conflict**
+    - **conflict**, **cm**
 
         원본 텍스트와 번역 텍스트를 [git(1)](http://man.he.net/man1/git) 충돌 마커 형식으로 인쇄합니다.
 
@@ -100,9 +100,9 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
         원본 텍스트와 번역 텍스트를 빈 줄로 구분하여 인쇄합니다.
 
-    - **none**
+    - **xtxt**
 
-        형식이 `없음` 또는 알 수 없는 경우 번역된 텍스트만 인쇄됩니다.
+        형식이 `xtxt`(번역된 텍스트) 또는 알 수 없는 경우 번역된 텍스트만 인쇄됩니다.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

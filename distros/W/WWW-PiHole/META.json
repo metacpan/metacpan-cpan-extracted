@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl interface to Pi-hole",
+   "author" : [
+      "Elvin Aslanov <rwp.primary@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-PiHole",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "URI" : "0",
+            "experimental" : "0",
+            "perl" : "v5.37.9"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::PiHole" : {
+         "file" : "lib/WWW/PiHole.pm",
+         "version" : "0.230630"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rwp0/WWW-PiHole/issues"
+      },
+      "homepage" : "https://github.com/rwp0/WWW-PiHole",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rwp0/WWW-PiHole.git",
+         "web" : "https://github.com/rwp0/WWW-PiHole"
+      }
+   },
+   "version" : "0.230630",
+   "x_generated_by_perl" : "v5.37.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

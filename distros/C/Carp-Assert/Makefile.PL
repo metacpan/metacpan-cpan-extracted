@@ -49,8 +49,8 @@ WriteMakefile(
         resources => {
             repository  => {
                 type => 'git',
-                web  => 'https://github.com/schwern/Carp-Assert',
-                url  => 'git://github.com/schwern/Carp-Assert.git',
+                web  => 'https://github.com/demerphq/Carp-Assert',
+                url  => 'git://github.com/demerphq/Carp-Assert.git',
             },
         },
     })),
@@ -107,15 +107,24 @@ END_OF_MAKE
         my($self, $orig_perl, $tests) = @_;
 
         my @perls = ($orig_perl);
-        push @perls, qw(bleadperl
-                        perl5.6.1
-                        perl5.005_03
-                        perl5.004_05
-                        perl5.004_04
-                        perl5.004
-                       )
-          if $ENV{PERL_TEST_ALL};
-
+        if ($ENV{PERL_TEST_ALL} and $ENV{HOME}) {
+            chomp(my @list = `perlbrew list 2>&1`);
+            my %candidate;
+            foreach my $name (@list) {
+                $name=~s/^\s+//;
+                $name=~s/\s+\z//;
+                next unless $name =~ /^(perl-\d+\.\d+)\.(\d+)\z/
+                         or $name =~ /^(latest_blead)\z/;
+                my $major = $1;
+                my $minor = $2 // 0;
+                my $path = "$ENV{HOME}/perl5/perlbrew/perls/$name/bin/perl";
+                if (-e $path) {
+                    $candidate{$major} = [$minor, $path]
+                        if !$candidate{$major} or $candidate{$major}[0] < $minor;
+                }
+            }
+            push @perls, sort map { $_->[-1] } values %candidate;
+        }
         my $out;
         foreach my $perl (@perls) {
             $out .= $self->SUPER::test_via_harness($perl, $tests);

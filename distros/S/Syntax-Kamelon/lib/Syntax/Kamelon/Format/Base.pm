@@ -7,6 +7,7 @@ use Carp;
 
 use vars qw($VERSION);
 $VERSION="0.15";
+
 use base qw(Template);
 
 my $default_template = <<__EOF;

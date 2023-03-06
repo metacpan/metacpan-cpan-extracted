@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2011 David Cantrell, derived from data from libphonenumber
+# Copyright 2023 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20221202211026;
+our $VERSION = 1.20230305170052;
 
 my $formatters = [
                 {
@@ -186,77 +186,77 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fa} = {"9866", "لرستان",
-"9871", "فارس",
-"9824", "استان\ زنجان",
-"9826", "البرز",
-"9813", "گیلان",
-"9858", "خراسان\ شمالی",
-"9834", "استان\ کرمان",
+$areanames{en} = {"9844", "West\ Azarbaijan",
+"9828", "Qazvin\ province",
+"9838", "Chahar\-mahal\ and\ Bakhtiari",
+"9841", "East\ Azarbaijan",
+"9877", "Bushehr\ province",
+"9831", "Isfahan\ province",
+"9883", "Kermanshah\ province",
+"9861", "Khuzestan",
+"9821", "Tehran\ province",
+"9813", "Gilan",
+"9826", "Alborz",
+"9817", "Golestan",
+"9834", "Kerman\ province",
+"9866", "Lorestan",
+"9887", "Kurdistan",
+"9824", "Zanjan\ province",
+"9845", "Ardabil\ province",
+"9851", "Razavi\ Khorasan",
+"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
+"9876", "Hormozgan",
+"9871", "Fars",
+"9854", "Sistan\ and\ Baluchestan",
+"9856", "South\ Khorasan",
+"9886", "Markazi",
+"9858", "North\ Khorasan",
+"9884", "Ilam\ province",
+"9811", "Mazandaran",
+"9823", "Semnan\ province",
+"9835", "Yazd\ province",
+"9881", "Hamadan\ province",
+"9825", "Qom\ province",};
+$areanames{fa} = {"9876", "هرمزگان",
 "9874", "کهگیلویه\ و\ بویراحمد",
-"9821", "استان\ تهران",
-"9876", "هرمزگان",
-"9861", "خوزستان",
 "9845", "استان\ اردبیل",
+"9851", "خراسان\ رضوی",
+"9856", "خراسان\ جنوبی",
+"9854", "سیستان\ و\ بلوچستان",
+"9871", "فارس",
+"9884", "استان\ ایلام",
+"9858", "خراسان\ شمالی",
+"9886", "مرکزی",
+"9825", "استان\ قم",
+"9881", "استان\ همدان",
+"9823", "استان\ سمنان",
+"9835", "استان\ یزد",
+"9811", "مازندران",
+"9838", "چهارمحال\ و\ بختیاری",
+"9828", "استان\ قزوین",
+"9844", "آذربایجان\ غربی",
+"9841", "آذربایجان\ شرقی",
 "9877", "استان\ بوشهر",
+"9821", "استان\ تهران",
+"9813", "گیلان",
+"9861", "خوزستان",
 "9883", "استان\ کرمانشاه",
 "9831", "استان\ اصفهان",
-"9881", "استان\ همدان",
-"9835", "استان\ یزد",
-"9828", "استان\ قزوین",
+"9866", "لرستان",
+"9887", "کردستان",
+"9824", "استان\ زنجان",
+"9834", "استان\ کرمان",
 "9817", "گلستان",
-"9854", "سیستان\ و\ بلوچستان",
-"9841", "آذربایجان\ شرقی",
-"9825", "استان\ قم",
-"9838", "چهارمحال\ و\ بختیاری",
-"9823", "استان\ سمنان",
-"9856", "خراسان\ جنوبی",
-"9884", "استان\ ایلام",
-"9811", "مازندران",
-"9886", "مرکزی",
-"9851", "خراسان\ رضوی",
-"9844", "آذربایجان\ غربی",
-"9887", "کردستان",};
-$areanames{en} = {"9844", "West\ Azarbaijan",
-"9851", "Razavi\ Khorasan",
-"9887", "Kurdistan",
-"9884", "Ilam\ province",
-"9886", "Markazi",
-"9811", "Mazandaran",
-"9854", "Sistan\ and\ Baluchestan",
-"9841", "East\ Azarbaijan",
-"9817", "Golestan",
-"9825", "Qom\ province",
-"9823", "Semnan\ province",
-"9838", "Chahar\-mahal\ and\ Bakhtiari",
-"9856", "South\ Khorasan",
-"9881", "Hamadan\ province",
-"9835", "Yazd\ province",
-"9828", "Qazvin\ province",
-"9883", "Kermanshah\ province",
-"9831", "Isfahan\ province",
-"9877", "Bushehr\ province",
-"9821", "Tehran\ province",
-"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
-"9861", "Khuzestan",
-"9876", "Hormozgan",
-"9845", "Ardabil\ province",
-"9858", "North\ Khorasan",
-"9813", "Gilan",
-"9834", "Kerman\ province",
-"9824", "Zanjan\ province",
-"9871", "Fars",
-"9866", "Lorestan",
-"9826", "Alborz",};
+"9826", "البرز",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+98|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '98', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      $self = bless({ country_code => '98', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

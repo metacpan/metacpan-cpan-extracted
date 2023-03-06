@@ -81,6 +81,7 @@ t/00use.t
 t/01self.t
 t/02contexts.t
 t/03local.t
+t/04objects.t
 t/10tool-identify.t
 t/10tool-inrefs.t
 t/10tool-reachability.t

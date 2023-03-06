@@ -76,7 +76,7 @@ my @attrs = (
 	[ 3,         'MF::INTEGER', "$dt.minute"  ],
 	[ 4,         'MF::INTEGER', "$dt.second"  ],
 	[ 4.5678,    'MF::FLOAT',   "$dt.fracsec" ],
-	[ '"+0910"', 'MF::STRING',  "$dt.tz"      ],
+	[ '+0910',   'MF::TIMEZONE',"$dt.timezone"],
 	[ '02:03:04.5678',   'MF::TIME', "$dt.time" ],
 	[ '2006-11-21+0910', 'MF::DATE', "$dt.date" ],
 );

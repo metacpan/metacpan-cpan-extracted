@@ -3,7 +3,7 @@ package Ryu::Buffer;
 use strict;
 use warnings;
 
-our $VERSION = '3.002'; # VERSION
+our $VERSION = '3.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(Ryu::Node);
@@ -364,5 +364,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

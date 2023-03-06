@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Reachability 0.49;
+package Devel::MAT::Tool::Reachability 0.50;
 
 use v5.14;
 use warnings;
@@ -133,7 +133,8 @@ sub mark_reachable
       my $count = 0;
       while( @symtab ) {
          my $stash = shift @symtab;
-         $stash->type eq "STASH" or die "ARGH! Encountered non-stash ".$stash->desc_addr;
+         $stash->type =~ m/^(?:STASH|CLASS)$/ or
+            die "ARGH! Encountered non-stash ".$stash->desc_addr;
 
          my @more_symtab;
          my @more_user;
@@ -169,13 +170,13 @@ sub mark_reachable
             $_->{tool_reachable} = REACH_USER, push @user, $_ for @more_user;
 
          !$_->{tool_reachable} and
-            $_->{tool_reachable} = REACH_INTERNAL, push @internal, $_ for
+            $_->{tool_reachable} = REACH_INTERNAL, push @internal, $_ for grep { defined }
                $stash->backrefs,
-                $stash->mro_linearall,
-                $stash->mro_linearcurrent,
-                $stash->mro_nextmethod,
-                $stash->mro_isa,
-                grep { defined } $stash->magic_svs;
+               $stash->mro_linearall,
+               $stash->mro_linearcurrent,
+               $stash->mro_nextmethod,
+               $stash->mro_isa,
+               $stash->magic_svs;
 
          $count++;
          $progress->( sprintf "Walking symbol table %d...", $count ) if $progress and $count % 1000 == 0;
