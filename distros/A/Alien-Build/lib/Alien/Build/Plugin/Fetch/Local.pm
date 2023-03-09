@@ -8,7 +8,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Plugin for fetching a local file
-our $VERSION = '2.77'; # VERSION
+our $VERSION = '2.78'; # VERSION
 
 
 has '+url' => '';
@@ -107,7 +107,7 @@ Alien::Build::Plugin::Fetch::Local - Plugin for fetching a local file
 
 =head1 VERSION
 
-version 2.77
+version 2.78
 
 =head1 SYNOPSIS
 

@@ -6,9 +6,9 @@ with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2023-02-16'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.072'; # VERSION
+our $VERSION = '0.073'; # VERSION
 
 sub weave_section {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -272,6 +272,18 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+=head2 Using on the CLI with validate-with-sah
+
+To validate some data on the CLI, you can use L<validate-with-sah> utility.
+Specify the schema as the first argument (encoded in Perl syntax) and the data
+to validate as the second argument (encoded in Perl syntax):
+
+ % validate-with-sah '"$sch_name*"' '"data..."'
+
+C<validate-with-sah> has several options for, e.g. validating multiple data,
+showing the generated validator code (Perl/JavaScript/etc), or loading
+schema/data from file. See its manpage for more details.
+
 _
                     (my $type_name = $sch_name) =~ s/(\A\w)|(::|_)(\w)/defined($3) ? uc($3) : uc($1)/eg;
 
@@ -286,7 +298,7 @@ To create a type constraint and type library from a schema:
      use Type::FromSah qw( sah2type );
 
      __PACKAGE__->add_type(
-         sah2type('\$sch_name*', name=>'$type_name')
+         sah2type('$sch_name*', name=>'$type_name')
      );
  }
 
@@ -354,7 +366,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.072 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2022-10-19.
+This document describes version 0.073 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2023-02-16.
 
 =head1 SYNOPSIS
 
@@ -431,7 +443,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

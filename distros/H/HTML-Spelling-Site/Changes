@@ -1,5 +1,16 @@
 Revision history for HTML-Spelling-Site
 
+0.10.2      2023-03-07
+    - minimal version of Path::Tiny with ->mkdir()
+        - https://github.com/shlomif/HTML-Spelling-Site/issues/3
+        - Thanks to SREZIC
+        - "Programming today is a race between software engineers striving to
+          build bigger and better idiot-proof programs, and the Universe trying
+          to produce bigger and better idiots. So far, the Universe is winning."
+            -- Rick Cook
+            -- The Wizardry Compiled
+            -- https://en.wikiquote.org/wiki/Rick_Cook
+
 0.10.1      2023-03-02
     - add mkdir on cache write.
 

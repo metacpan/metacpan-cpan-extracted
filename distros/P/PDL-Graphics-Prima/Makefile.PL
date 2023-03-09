@@ -13,7 +13,7 @@ WriteMakefile(
   PREREQ_PM => {
     'PDL::Drawing::Prima' => '0.15',
     'PDL' => '2.4.0',
-    Prima => '1.67',
+    Prima => '1.68',
   },
   TEST_REQUIRES => {
     'Test::More' => '0.88',
@@ -22,7 +22,7 @@ WriteMakefile(
     "meta-spec" => { version => 2 },
     dynamic_config => 0,
     resources => {
-      x_IRC => 'irc://irc.perl.org/#graphql-perl',
+      x_IRC => 'irc://irc.perl.org/#pdl',
       repository => {
         type => 'git',
         url => 'git@github.com:PDLPorters/PDL-Graphics-Prima.git',

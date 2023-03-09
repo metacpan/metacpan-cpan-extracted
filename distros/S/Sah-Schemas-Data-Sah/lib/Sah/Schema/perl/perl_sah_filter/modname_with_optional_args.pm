@@ -1,22 +1,18 @@
 package Sah::Schema::perl::perl_sah_filter::modname_with_optional_args;
 
 use strict;
-
-use Sah::PSchema 'get_schema';
-use Sah::PSchema::perl::modname_with_optional_args; # not yet detected automatically by a dzil plugin
+use warnings;
+use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-05'; # DATE
+our $DATE = '2023-01-17'; # DATE
 our $DIST = 'Sah-Schemas-Data-Sah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
-our $schema = get_schema(
-    'perl::modname_with_optional_args',
-    {ns_prefix=>'Data::Sah::Filter::perl', complete_recurse=>1},
-    {
-        summary => 'Perl module in the Data::Sah::Filter::perl::* namespace, without the namespace prefix, with optional args e.g. "PhysicalQuantity::convert_unit=to,kg"',
-    }
-);
+our $schema = ['perl::modname_with_optional_args', {
+    summary => 'Perl module in the Data::Sah::Filter::perl::* namespace, without the namespace prefix, with optional args e.g. "PhysicalQuantity::convert_unit=to,kg"',
+    'x.completion' => ['perl_sah_filter_modname_with_optional_args'],
+}];
 
 1;
 # ABSTRACT: Perl module in the Data::Sah::Filter::perl::* namespace, without the namespace prefix, with optional args e.g. "PhysicalQuantity::convert_unit=to,kg"
@@ -33,7 +29,7 @@ Sah::Schema::perl::perl_sah_filter::modname_with_optional_args - Perl module in 
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::perl::perl_sah_filter::modname_with_optional_args (from Perl distribution Sah-Schemas-Data-Sah), released on 2022-10-05.
+This document describes version 0.002 of Sah::Schema::perl::perl_sah_filter::modname_with_optional_args (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-17.
 
 =head1 SYNOPSIS
 
@@ -169,7 +165,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

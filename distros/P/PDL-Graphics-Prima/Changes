@@ -1,3 +1,6 @@
+0.20 2023-03-07
+- improve handling of Win32 terminal in perldl (#50) - thanks @dk
+
 0.19 2023-02-06
 - add missing files to MANIFEST, convert to EUMM for working disttest
 

@@ -13,20 +13,18 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "WWW-PiHole",
-  "EXE_FILES" => [
-    "bin/pihole"
-  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.037009",
   "NAME" => "WWW::PiHole",
   "PREREQ_PM" => {
-    "Data::Printer" => 0,
     "HTTP::Tiny" => 0,
     "JSON::PP" => 0,
+    "Syntax::Operator::In" => 0,
+    "Term::ANSIColor" => 0,
     "URI" => 0,
     "experimental" => 0
   },
-  "VERSION" => "0.230630",
+  "VERSION" => "0.230680",
   "test" => {
     "TESTS" => ""
   }
@@ -34,9 +32,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Printer" => 0,
   "HTTP::Tiny" => 0,
   "JSON::PP" => 0,
+  "Syntax::Operator::In" => 0,
+  "Term::ANSIColor" => 0,
   "URI" => 0,
   "experimental" => 0
 );

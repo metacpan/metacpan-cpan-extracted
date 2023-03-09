@@ -13,14 +13,18 @@ my $gapi = WebService::GoogleAPI::Client->new(
 ok dies {
   $gapi->_process_params({
     api_endpoint_id => 'jobs.non.existant',
-    options         => { fields => 'your(fez)' }
+    options         => {
+      fields => 'your(fez)'
+    }
   })
 }, 'blows up if an endpoint does not exist';
 
 ok dies {
   $gapi->_process_params({
     api_endpoint_id => 'i.am.non.existant',
-    options         => { fields => 'your(fez)' }
+    options         => {
+      fields => 'your(fez)'
+    }
   })
 }, 'blows up if an API does not exist';
 

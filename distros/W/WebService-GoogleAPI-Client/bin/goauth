@@ -4,7 +4,7 @@ use strictures;
 
 package goauth;
 
-our $VERSION = '0.26';    # VERSION
+our $VERSION = '0.27';    # VERSION
 
 use Carp;
 use Mojolicious::Lite;
@@ -12,7 +12,7 @@ use Mojo::File qw/path/;
 use Config::JSON;
 use feature 'say';
 use Net::EmptyPort qw(empty_port);
-use Crypt::JWT qw(decode_jwt);
+use Crypt::JWT     qw(decode_jwt);
 
 # ABSTRACT: CLI tool with mini http server for negotiating Google OAuth2 Authorisation access tokens that allow offline access to Google API Services on behalf of the user.
 
@@ -24,7 +24,7 @@ my $file     = path($filename);
 if ($file->stat)    ## file exists
 {
   say qq'File "${\$file->to_abs}" exists';
-  input_if_not_exists(['gapi/client_id', 'gapi/client_secret', 'gapi/scopes']);
+  input_if_not_exists([ 'gapi/client_id', 'gapi/client_secret', 'gapi/scopes' ]);
   ## this potentially allows mreging with a json file with data external
   ## to the app or to augment missing scope from file generated from
   ##  earlier versions of goauth from other libs
@@ -36,34 +36,30 @@ if ($file->stat)    ## file exists
 
 sub setup {
   say
-qq'Project Credentials config file "${\$file->to_abs}" with OAUTH App Secrets and user tokens not found. Creating new file...';
+      qq'Project Credentials config file "${\$file->to_abs}" with OAUTH App Secrets and user tokens not found. Creating new file...';
 
   ## TODO: consider allowing the gapi.json to be either seeded or to extend the credentials.json provided by Google
   my $oauth = {};
-  say
-"Obtain project app client_id and client_secret from http://console.developers.google.com/";
+  say "Obtain project app client_id and client_secret from http://console.developers.google.com/";
   print "client_id: ";
 
-  $oauth->{client_id} = _stdin()
-    || croak('client_id is required and has no default');
+  $oauth->{client_id} = _stdin() || croak('client_id is required and has no default');
   print "client_secret: ";
 
-  $oauth->{client_secret} = _stdin()
-    || croak('client secret is required and has no default');
+  $oauth->{client_secret} = _stdin() || croak('client secret is required and has no default');
 
   print
-'scopes ( space sep list - see https://developers.google.com/identity/protocols/googlescopes ): default is - email profile https://www.googleapis.com/auth/plus.profile.emails.read '
-    . "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/contacts.readonly https://mail.google.com\n";
+      'scopes ( space sep list - see https://developers.google.com/identity/protocols/googlescopes ): default is - email profile https://www.googleapis.com/auth/plus.profile.emails.read '
+      . "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/contacts.readonly https://mail.google.com\n";
 
-  $oauth->{scopes} =
-    _stdin(); ## no croak because empty string is allowed an will evoke defaults
+  $oauth->{scopes} = _stdin();    ## no croak because empty string is allowed an will evoke defaults
 
   ## set default scope if empty string provided
   if ($oauth->{scopes} eq '') {
-    $oauth->{scopes} =
-      'email profile https://www.googleapis.com/auth/plus.profile.emails.read '
-      . 'https://www.googleapis.com/auth/calendar '
-      . 'https://www.googleapis.com/auth/contacts.readonly https://mail.google.com';
+    $oauth->{scopes}
+        = 'email profile https://www.googleapis.com/auth/plus.profile.emails.read '
+        . 'https://www.googleapis.com/auth/calendar '
+        . 'https://www.googleapis.com/auth/contacts.readonly https://mail.google.com';
   }
 
   my $tokensfile = Config::JSON->create($file->to_abs);
@@ -93,7 +89,7 @@ sub input_if_not_exists {
 sub runserver {
   my $port = empty_port(3000);
   say
-"Starting web server. Before authorization don't forget to allow redirect_uri to http://127.0.0.1 in your Google Console Project";
+      "Starting web server. Before authorization don't forget to allow redirect_uri to http://127.0.0.1 in your Google Console Project";
   $ENV{'GOAUTH_TOKENSFILE'} = $file->to_abs;
 
   my $config = Config::JSON->new($ENV{'GOAUTH_TOKENSFILE'});
@@ -103,13 +99,11 @@ sub runserver {
   # https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues/52
   plugin "OAuth2" => {
     google => {
-      key    => $config->get('gapi/client_id'),    # $config->{gapi}{client_id},
-      secret => $config->get('gapi/client_secret')
-      ,    #$config->{gapi}{client_secret},
-      authorize_url =>
-        'https://accounts.google.com/o/oauth2/v2/auth?response_type=code',
-      token_url =>
-        'https://www.googleapis.com/oauth2/v4/token' ## NB Google credentials.json specifies "https://www.googleapis.com/oauth2/v3/token"
+      key           => $config->get('gapi/client_id'),        # $config->{gapi}{client_id},
+      secret        => $config->get('gapi/client_secret'),    #$config->{gapi}{client_secret},
+      authorize_url => 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code',
+      token_url     =>
+          'https://www.googleapis.com/oauth2/v4/token' ## NB Google credentials.json specifies "https://www.googleapis.com/oauth2/v3/token"
     }
   };
 
@@ -128,8 +122,7 @@ sub runserver {
     $hash->{client_id}     = $config->get('gapi/client_id');
     $hash->{client_secret} = $config->get('gapi/client_secret');
     $hash->{grant_type}    = 'authorization_code';
-    my $tokens = $c->ua->post(
-      'https://www.googleapis.com/oauth2/v4/token' => form => $hash)->res->json;
+    my $tokens = $c->ua->post('https://www.googleapis.com/oauth2/v4/token' => form => $hash)->res->json;
     return $tokens;
   };
 
@@ -138,8 +131,7 @@ sub runserver {
     $c->{config} = $config;
     my $user_data;
     my $tokens;
-    app->log->info(
-      "Will store tokens in " . $config->getFilename($config->pathToFile));
+    app->log->info("Will store tokens in " . $config->getFilename($config->pathToFile));
 
     if ($c->param('code'))    ## postback from google
     {
@@ -151,19 +143,15 @@ sub runserver {
         if ($tokens->{id_token}) {
           $user_data = decode_jwt(
             token    => $tokens->{id_token},
-            kid_keys =>
-              $c->ua->get('https://www.googleapis.com/oauth2/v3/certs')
-              ->res->json,
+            kid_keys => $c->ua->get('https://www.googleapis.com/oauth2/v3/certs')->res->json,
           );
         }
 
-        $config->addToHash('gapi/tokens/' . $user_data->{email},
-          'access_token', $tokens->{access_token});
+        $config->addToHash('gapi/tokens/' . $user_data->{email}, 'access_token', $tokens->{access_token});
 
         if ($tokens->{refresh_token}) {
-          $config->addToHash('gapi/tokens/' . $user_data->{email},
-            'refresh_token', $tokens->{refresh_token});
-        } else ## with access_type=offline set we should receive a refresh token unless user already has an active one.
+          $config->addToHash('gapi/tokens/' . $user_data->{email}, 'refresh_token', $tokens->{refresh_token});
+        } else  ## with access_type=offline set we should receive a refresh token unless user already has an active one.
         {
           ## carp('Google JWT Did not incude a refresh token - when the access token expires services will become inaccessible');
         }
@@ -173,12 +161,11 @@ sub runserver {
       $c->{access_token} = $tokens->{access_token};
       $c->{user_email}   = $user_data->{email};
       $c->render(template => 'oauth_granted');
-    } else ## PRESENT USER DEFAULT PAGE TO REQUEST GOOGLE AUTH'D ACCESS TO SERVICES
+    } else    ## PRESENT USER DEFAULT PAGE TO REQUEST GOOGLE AUTH'D ACCESS TO SERVICES
     {
       $c->render(template => 'oauth');
     }
   };
-
 #delete $static->extra->{'favicon.ico'};  ## look into https://mojolicious.org/perldoc/Mojolicious/Static with view to repalcing default favicon
   app->start('daemon', '-l', "http://*:$port");
   return 1;
@@ -211,7 +198,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head2 SUMMARY
 
@@ -273,7 +260,7 @@ application.
 Once you have succesfully created a gapi.json file and have authenticated a user
 that is represented in this file then you can start making Google API Requests.
 
-See L<WebServices::Google::Client> for more detail.
+See L<WebService::Google::Client> for more detail.
 
 =head2 gapi.json 
 
@@ -297,23 +284,13 @@ WebService::Google:API:Client Google API Client Library.
 
 * probably originally based on https://gist.github.com/throughnothing/3726907
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Veesh Goldman <veesh@cpan.org>
 
-=item *
-
-Peter Scott <localshop@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Peter Scott and others.
+This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
 This is free software, licensed under:
 

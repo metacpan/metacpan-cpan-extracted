@@ -1,0 +1,26 @@
+---
+abstract: '- new keywords for creating scopes.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  Test2::Harness: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlX-ScopeFunction
+provides:
+  PerlX::ScopeFunction:
+    file: lib/PerlX/ScopeFunction.pm
+    version: '0.01'
+requires:
+  Keyword::Simple: '0'
+  Text::Balanced: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: MIT

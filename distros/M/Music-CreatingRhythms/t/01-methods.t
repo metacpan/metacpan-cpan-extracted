@@ -287,6 +287,62 @@ subtest comprnd => sub {
     is sum0(@$got), $expect, 'comprnd';
 };
 
+subtest count_ones => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = 0;
+    my $got = $mcr->count_ones(0);
+    is $got, $expect, 'count_ones';
+
+    $expect = 0;
+    $got = $mcr->count_ones([0]);
+    is $got, $expect, 'count_ones';
+
+    $expect = 1;
+    $got = $mcr->count_ones(1);
+    is $got, $expect, 'count_ones';
+
+    $expect = 1;
+    $got = $mcr->count_ones([1]);
+    is $got, $expect, 'count_ones';
+
+    $expect = 1;
+    $got = $mcr->count_ones('010');
+    is $got, $expect, 'count_ones';
+
+    $expect = 1;
+    $got = $mcr->count_ones([0,1,0]);
+    is $got, $expect, 'count_ones';
+};
+
+subtest count_zeros => sub {
+    my $mcr = new_ok $module;
+
+    my $expect = 1;
+    my $got = $mcr->count_zeros(0);
+    is $got, $expect, 'count_zeros';
+
+    $expect = 1;
+    $got = $mcr->count_zeros([0]);
+    is $got, $expect, 'count_zeros';
+
+    $expect = 0;
+    $got = $mcr->count_zeros(1);
+    is $got, $expect, 'count_zeros';
+
+    $expect = 0;
+    $got = $mcr->count_zeros([1]);
+    is $got, $expect, 'count_zeros';
+
+    $expect = 2;
+    $got = $mcr->count_zeros('010');
+    is $got, $expect, 'count_zeros';
+
+    $expect = 2;
+    $got = $mcr->count_zeros([0,1,0]);
+    is $got, $expect, 'count_zeros';
+};
+
 subtest de_bruijn => sub {
     my $mcr = new_ok $module;
 

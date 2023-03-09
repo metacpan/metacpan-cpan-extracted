@@ -14,7 +14,7 @@ use CPAN::Audit::Version;
 use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 
-our $VERSION = '20230202.003';
+our $VERSION = '20230309.004';
 
 sub new {
     my( $class, %params ) = @_;
@@ -158,7 +158,7 @@ sub command {
 		installed    => 'command_installed',
 		module       => 'command_module',
 		release      => 'command_release',
-		dist         => 'command_dist',
+		dist         => 'command_release',
 		show         => 'command_show',
 	};
 

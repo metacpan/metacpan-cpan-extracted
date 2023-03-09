@@ -1,5 +1,5 @@
 package MIDI::Simple::Drummer::Euclidean;
-$MIDI::Simple::Drummer::Euclidean::VERSION = '0.0811';
+$MIDI::Simple::Drummer::Euclidean::VERSION = '0.0813';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -42,12 +42,12 @@ sub _default_patterns {
 
 sub euclid {
     my $self = shift;
-    my ($m, $n) = @_;
+    my ($p, $q) = @_;
 
     # Onsets per measure
-    $m ||= $self->{-onsets};
+    $p ||= $self->{-onsets};
     # Beats per measure
-    $n ||= $self->beats;
+    $q ||= $self->beats;
 
     # Line is from x=0, y=1 to x=$BPM, y=$mod+1
     # Then from that, for each $y from # 1..$mod
@@ -57,10 +57,11 @@ sub euclid {
 
     # y = mx + b; b is 1 as we're drawing the intercept through that point,
     # and then (y2-y1)/(x2-x1) reduces to just:
-    my $slope = $m / $n;
+    my $slope = $p / $q;
 
-    my @onsets = ('.') x $n;
-    for my $y ( 1 .. $m ) {
+    my @onsets = ('.') x $q;
+
+    for my $y ( 1 .. $p ) {
         # solve x = (y-b)/m rounding nearest and put the beat there
         $onsets[ sprintf "%.0f", ( $y - $intercept ) / $slope ] = 'x';
     }
@@ -96,7 +97,7 @@ MIDI::Simple::Drummer::Euclidean
 
 =head1 VERSION
 
-version 0.0811
+version 0.0813
 
 =head1 DESCRIPTION
 
@@ -128,7 +129,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2009-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

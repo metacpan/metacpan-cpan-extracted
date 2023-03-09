@@ -7,7 +7,7 @@ use Text::ParseWords qw( shellwords );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Alien::Build command sequence
-our $VERSION = '2.77'; # VERSION
+our $VERSION = '2.78'; # VERSION
 
 
 sub new
@@ -200,7 +200,7 @@ Alien::Build::CommandSequence - Alien::Build command sequence
 
 =head1 VERSION
 
-version 2.77
+version 2.78
 
 =head1 CONSTRUCTOR
 

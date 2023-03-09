@@ -56,6 +56,7 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
     Specificeer de te gebruiken vertaalmachine. U hoeft deze optie niet te gebruiken omdat module `xlate::deepl` deze verklaart als `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     In plaats van de vertaalmachine op te roepen, wordt van u verwacht dat u voor werkt. Na het voorbereiden van te vertalen tekst, worden ze gekopieerd naar het klembord. Van u wordt verwacht dat u ze in het formulier plakt, het resultaat naar het klembord kopieert en op return drukt.
 
@@ -103,6 +104,10 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
     - **xtxt**
 
         Als het formaat `xtxt` (vertaalde tekst) of onbekend is, wordt alleen vertaalde tekst afgedrukt.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Specificeer de maximale lengte van de tekst die in één keer naar de API moet worden gestuurd. De standaardwaarde is ingesteld zoals voor de gratis accountdienst: 128K voor de API (**--xlate**) en 5000 voor de klembordinterface (**--xlate-labor**). U kunt deze waarde wijzigen als u de Pro-service gebruikt.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

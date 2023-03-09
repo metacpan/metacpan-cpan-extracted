@@ -56,6 +56,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
     사용할 번역 엔진을 지정합니다. 모듈 `xlate::deep`은 `--xlate-engine=deepl`로 선언하므로 이 옵션을 사용할 필요가 없습니다.
 
 - **--xlate-labor**
+- **--xlabor**
 
     번역 엔진을 호출하는 대신 작업할 것으로 예상됩니다. 번역할 텍스트를 준비한 후 클립보드에 복사합니다. 양식에 붙여넣고 결과를 클립보드에 복사한 후 Return 키를 눌러야 합니다.
 
@@ -103,6 +104,10 @@ App::Greple::xlate - Greple용 번역 지원 모듈
     - **xtxt**
 
         형식이 `xtxt`(번역된 텍스트) 또는 알 수 없는 경우 번역된 텍스트만 인쇄됩니다.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    한 번에 API로 전송할 텍스트의 최대 길이를 지정합니다. 기본값은 무료 계정 서비스의 경우 API(**--xlate**)의 경우 128K, 클립보드 인터페이스(**--xlate-labor**)의 경우 5000으로 설정되어 있습니다. Pro 서비스를 사용하는 경우 이 값을 변경할 수 있습니다.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

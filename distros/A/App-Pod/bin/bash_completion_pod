@@ -1,0 +1,86 @@
+#!/bin/bash
+
+export MY_CACHE_DIR="$HOME/.cache"
+export MY_POD_CACHE="$MY_CACHE_DIR/my_pod_clases.cache"
+
+_tab__pod_make_class_cache(){
+   _tab__pod_get_modules_list  > "$MY_POD_CACHE"
+   pod --tool_options         >> "$MY_POD_CACHE"
+}
+
+_my_clear_cache(){
+   rm -frv $MY_CACHE_DIR/my_*.cache
+}
+
+_tab__pod_get_modules_list(){
+   perl -le 'print for @INC' | while
+      read dir; do
+         find $dir \( -type f -or -type l \) \( -name "*.pm" \) -printf "%P\n" |
+         perl -lpe '
+            s&^[^/]+/&& while /-/;
+            s&/&::&g;
+            s/\.pm$//
+         ' | sort -u
+      done
+}
+
+_tab__pod_get_command(){
+   perl -le '
+        my $cnt   = 0;
+        my $class = "";
+
+        $_ ||= " " for @ARGV;       # Empty input.
+        shift;                      # Skip script name.
+
+        while ($_ = shift) {
+            if ( / ^ - /x) {        # Skip options.
+                # Skip query value.
+                shift if / ^ -+ q(uery)? $ /x;
+                next;
+            }
+            $class = $_ if not $cnt++;
+        }
+
+        if($cnt == 1) {
+          print q(cat $MY_POD_CACHE);
+          print join " ", " echo",
+                map { -d ? "$_/" : $_  }
+                glob qq("$class*");
+        }
+        elsif($cnt == 2){
+            print qq(pod $class --class_options --tool_options --no_error);
+        }
+        else{
+            print q(pod --tool_options);
+        }
+   ' -- "$@"
+}
+
+_tab__pod(){
+   local cur prev words cword _possible
+   _init_completion -n : || return
+
+   if [ ! -e "$MY_POD_CACHE" ]; then
+      _tab__pod_make_class_cache
+   fi
+
+   if [[ $cur =~ ^- ]]; then                    # Option
+       _possible=$(pod --tool_options)
+   elif [[ "$prev" =~ ^-+q(uery)?$ ]]; then     # --query
+       return                                   # Since it can be anything.
+   else
+       # Filter out script name, options, and query value.
+       # Then count how many arguments remain.
+       local command=$(_tab__pod_get_command "${words[@]}")
+       _possible=$(eval "$command")
+       compopt -o nospace                       # No space afterwards.
+   fi
+
+   COMPREPLY=($(compgen -W "$_possible" -- $cur))
+
+   # Remove colon contain prefix from COMPREPLY
+   __ltrim_colon_completions "$cur"
+}
+
+complete -F _tab__pod pod
+

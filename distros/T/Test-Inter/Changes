@@ -2,6 +2,13 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+1.10  2023-03-07
+  - A number of modules were included as test dependencies that are only used
+    by the author when preparing releases.  These have been removed as
+    dependencies.  Petr Pisar on GitHub #3
+  - Added github tags for all releases.  Tomasz Kloczko on GitHub #4
+  - Fixed a bug where feature wasn't working correctly.
+
 1.09  2019-04-13
   - Added test directory to directories added in the use_lib method automatically.
   - Added functionality to the testdir method

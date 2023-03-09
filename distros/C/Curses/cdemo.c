@@ -47,25 +47,31 @@ main(int           const argc,
     move(1, 1);
     addstr("fooalpha");
 
+    move(2, 5);
 #ifdef C_ATTRON
 #  ifdef A_BOLD
     attron(A_BOLD);
 #  endif
 #endif
-    move(2, 5);
-    addstr("bold  ");
+    addstr("bold ");
 #ifdef C_ATTRON
 #  ifdef A_REVERSE
     attron(A_REVERSE);
 #  endif
 #endif
-    addstr("bold+reverse");
+    addstr("bold+reverse ");
+#ifdef C_ATTRON
+#  ifdef A_ITALIC
+    attron(A_ITALIC);
+#  endif
+#endif
+    addstr("bold+reverse+italic ");
 #ifdef C_ATTRSET
 #  ifdef A_NORMAL
     attrset(A_NORMAL);
 #  endif
 #endif
-    addstr("  normal  (if your curses can do these modes)");
+    addstr(" (if your curses can do these modes)");
 
     move(6, 1);
     addstr("do12345678901234567890n't worry be happy");
@@ -73,10 +79,10 @@ main(int           const argc,
     box(b, '|', '-');
 #endif
     wstandout(b);
-    move(2, 2);
+    wmove(b, 2, 2);
     waddstr(b, "ping");
     wstandend(b);
-    move(4, 4);
+    wmove(b, 4, 4);
     waddstr(b, "pong");
 
     wmove(b, 3, 3);
@@ -84,9 +90,9 @@ main(int           const argc,
     wdeleteln(b);
     insertln();
 
-    move(4, 5);
+    wmove(b, 6, 5);
     wdelch(b);
-    move(7, 8);
+    move(8, 8);
     insch('a');
 
 #ifdef C_KEYPAD

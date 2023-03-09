@@ -3,9 +3,9 @@ NAME
     division
 
 VERSION
-    This document describes version 0.018 of App::BPOMUtils::Table::FoodType
+    This document describes version 0.019 of App::BPOMUtils::Table::FoodType
     (from Perl distribution App-BPOMUtils-Table-FoodType), released on
-    2023-02-14.
+    2023-03-09.
 
 DESCRIPTION
     This distribution contains the following CLIs:

@@ -4,6 +4,10 @@ information, see the file 'HISTORY'.
 Note that the filename "ChangeLog" is recognized by the CPAN machinery as the
 name of a change log.
 
+New in 1.44 (Released March 07, 2023)
+
+  Implement A_ITALIC
+
 New in 1.43 (Released December 08, 2022)
 
   Fix missing file introduced in 1.42 that prevents all builds from working.

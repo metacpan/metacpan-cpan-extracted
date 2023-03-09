@@ -3,31 +3,20 @@
    "author" : [
       "Jeremy Mates <jmates@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Cmp",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -35,20 +24,30 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Scalar::Util" : "0",
-            "Test::More" : "0",
-            "perl" : "5.01"
+            "perl" : "v5.8.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060"
+         }
+      }
+   },
+   "provides" : {
+      "File::Cmp" : {
+         "file" : "lib/File/Cmp.pm",
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/thrig/File-Cmp",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
-         "url" : "http://github.com/thrig/File-Cmp"
+         "url" : "https://thrig.me/src/File-Cmp.git"
       }
    },
-   "version" : "1.07"
+   "version" : "1.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

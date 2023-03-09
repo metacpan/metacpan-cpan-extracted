@@ -1,16 +1,18 @@
+Build.PL
 Changes
 LICENSE
 MANIFEST
-Makefile.PL
 README
 SIGNATURE
-atonal-util
-canonical
+bin/atonal-util
+bin/canonical
+bin/harmonic-fit
+bin/ly-fu
+bin/scalemogrifier
+bin/varionator
+bin/vov
 capture-stderr
-harmonic-fit
 lib/App/MusicTools.pm
-ly-fu
-scalemogrifier
 t/atonal-util.t
 t/canonical.t
 t/harmonic-fit.t
@@ -21,12 +23,11 @@ t/rules
 t/scalemogrifier.t
 t/varionator.t
 t/vov.t
-varionator
-vov
 zsh-compdef/_atonal-util
 zsh-compdef/_canonical
 zsh-compdef/_ly-fu
 zsh-compdef/_scalemogrifier
 zsh-compdef/_vov
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

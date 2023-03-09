@@ -1,4 +1,4 @@
-bin/bashrc_pod
+bin/bash_completion_pod
 bin/pod
 Build.PL
 Changes

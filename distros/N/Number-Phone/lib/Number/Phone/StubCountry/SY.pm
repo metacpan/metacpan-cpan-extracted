@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230305170054;
+our $VERSION = 1.20230307181422;
 
 my $formatters = [
                 {
@@ -80,25 +80,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96313", "Al\-Zabadani",
-"96322", "Al\-Rakkah",
-"96321", "Aleppo",
-"96325", "Menbej",
-"96333", "Hamah",
-"96353", "Al\-Kameshli",
-"96343", "Tartous",
-"96344", "Hamah",
-"96316", "Al\-Swedaa",
-"96341", "Lattakia",
-"96351", "Deir\ Ezzour",
+$areanames{en} = {"96351", "Deir\ Ezzour",
 "96352", "Alhasakah",
+"96316", "Al\-Swedaa",
+"96313", "Al\-Zabadani",
 "96334", "Palmyra",
 "96331", "Homs",
-"96315", "Dara",
+"96341", "Lattakia",
 "96323", "Edleb",
-"96312", "Al\-Nebek",
+"96344", "Hamah",
+"96353", "Al\-Kameshli",
 "96311", "Damascus\ and\ rural\ areas",
-"96314", "Al\-Quneitra",};
+"96312", "Al\-Nebek",
+"96314", "Al\-Quneitra",
+"96315", "Dara",
+"96333", "Hamah",
+"96343", "Tartous",
+"96325", "Menbej",
+"96321", "Aleppo",
+"96322", "Al\-Rakkah",};
 
     sub new {
       my $class = shift;

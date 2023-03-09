@@ -2,5 +2,16 @@ Revision history for Perl distribution WWW-PiHole
 
 This is a changelog file in addition to git commit messages.
 
+0.230680  2023-03-09 19:20:19+04:00 Asia/Baku
+  - Document the newly added methods
+  - Correct POD format
+
+0.230660  2023-03-07 14:02:19+04:00 Asia/Baku
+  - Document all methods
+  - Modify private methods
+  - Improve general documentation
+  - Add get_dns public method
+  - Add get_cname public method
+
 0.230630  2023-03-05 00:42:44+04:00 Asia/Baku
   - Release to CPAN

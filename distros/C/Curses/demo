@@ -20,11 +20,13 @@ addstr(0, 0, "ref b = " . ref $b);
 addstr(1, 1, "fooalpha");
 
 eval { attron(A_BOLD) };
-addstr(2, 5, "bold  ");
+addstr(2, 5, "bold ");
 eval { attron(A_REVERSE) };
-addstr("bold+reverse");
+addstr("bold+reverse ");
+eval { attrset(A_ITALIC) };
+addstr("bold+reverse+italic ");
 eval { attrset(A_NORMAL) };
-addstr("  normal  (if your curses has these modes)");
+addstr(" (if your curses has these modes)");
 
 addstr(6, 1, "do12345678901234567890n't worry be happy");
 eval { box($b, '|', '-') };
@@ -39,8 +41,8 @@ move(6, 3);
 deleteln($b);
 insertln();
 
-delch($b, 4, 5);
-insch(7, 8, ord(a));
+delch($b, 6, 5);
+insch(8, 8, ord(a));
 
 eval { keypad(1) };
 addstr(14, 0, "hit a key: ");
@@ -67,7 +69,7 @@ addstr(21, 0, "testing KEY_*.  Hit the up arrow on your keyboard: ");
 refresh();
 $ch = getch();
 eval
-{ 
+{
     if ($ch == KEY_UP) { addstr(22, 0, "KEY_UP was pressed!") }
     else               { addstr(22, 0, "Something else was pressed.") }
     1;

@@ -9,10 +9,6 @@ use Time::HiRes qw( sleep );
 use URI;
 use URI::QueryParam;
 
-use Museum::Rijksmuseum::Object;
-
-use namespace::clean;
-
 =head1 NAME
 
 Museum::Rijksmuseum::Object::Harvester - Bulk-fetching of Rijksmuseum data via the OAI-PMH interface
@@ -23,7 +19,8 @@ See L<Museum::Rijksmuseum::Object>
 
 =cut
 
-our $VERSION = $Museum::Rijksmuseum::Object::VERSION;
+use Museum::Rijksmuseum::Object; our $VERSION = $Museum::Rijksmuseum::Object::VERSION;
+use namespace::clean;
 
 =head1 SYNOPSIS
 
@@ -92,6 +89,9 @@ batch. This helps avoid missing records.
 
 The return value is a hashref that contains C<error> if something went wrong,
 and possibly a C<resumptionToken> to let you know how to pick up again.
+
+There is some basic retry logic with exponential backoff that'll hopefully help
+seamlessly recover from transient network or service issues.
 
 =cut
 
@@ -183,6 +183,12 @@ Robin Sheat, C<< <rsheat at cpan.org> >>
 =item Handle the ListRecords verb
 
 This'll require writing a parser for EDM-DC or similar.
+
+=item Implement logging
+
+A proper logging system would allow recording of transient failures to see if
+they are becoming a problem. It would also allow the option for more
+fine-grained progress information to be displayed.
 
 =back
 

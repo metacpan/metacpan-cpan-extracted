@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2016-2022 Sullivan Beck. All rights reserved.
+# Copyright (c) 2016-2023 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -33,6 +33,7 @@ sub init_tests {
    # Module is based on DATATYPE
 
    my $tmp      = $0;
+   $tmp         =~ s/\\/\//g;
    $tmp         =~ s,^.*/,,;
    $tmp         =~ s,\.t$,,;
    my($dt,$flag,$n) = split(/_/,$tmp);

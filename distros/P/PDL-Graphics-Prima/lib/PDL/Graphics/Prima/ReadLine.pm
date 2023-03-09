@@ -32,43 +32,58 @@ sub setup {
 	# application object during the import if it hasn't already been set up (by
 	# a previous call to Prima::Application::import).
 	require Prima::Application;
+	require Prima::sys::win32 if $^O =~ /win32/i;
 	Prima::Application->import;
 
-	# Except on Windows, this io watcher will (eventually) watch whatever the
+	my @has_more_keys;
+	if ($^O =~ /win32/i) {
+		# Term::ReadKey::Win32PeekChar translates some keys to multi-char sequences, storing emulated
+		# input in its internal buffer. However there's no API to check whether that internal
+		# buffer is in play or not, and we need this not make event loop to wait on a physical
+		# input that may never come, because input is virtual
+		require Term::ReadKey;
+		*old_Win32PeekChar = \&Term::ReadKey::Win32PeekChar;
+		no warnings 'redefine';
+		*Term::ReadKey::Win32PeekChar = sub {
+			my ( $fh, $delay ) = @_;
+			return shift @has_more_keys if @has_more_keys;
+			my $ret = old_Win32PeekChar($fh, $delay);
+			while ( 1 ) {
+				my $h = old_Win32PeekChar($fh, -1);
+				last unless $h;
+				push @has_more_keys, $h;
+			}
+			return $ret;
+		};
+	}
+
+	# this io watcher will (eventually) watch whatever the
 	# readline is monitoring. That will be established later in the call to
-	# event_loop. Die'ing is a simple way to exit the "go" method invoked
-	# during the event loop
+	# event_loop.
 	my $prima_io_watcher = Prima::File->new(
-		onRead => sub { die 'user pressed a key' },
+		onRead => sub {
+			if ( $^O =~ /win32/i ) {
+				my $fd = shift->fd;
+				# silently consume non-text input, otherwise the event loop
+				# quits responding on any console event (focus, menu, resize, etc)
+				my %event = Prima::sys::win32::ReadConsoleInput( peek => 1, nonblocking => 1, fd => $fd);
+				return Prima::sys::win32::ReadConsoleInput(fd => $fd) unless
+					($event{type} // '') eq 'key' and $event{down};
+			}
+			$::application->stop;
+		},
 	);
-	# On Windows, use this timer instead
-	my $fh;
-	Prima::Timer->new(
-		timeout => 30,
-		onTick => sub {
-			die 'user pressed a key' if Term::ReadKey::ReadKey(-1);#PeekKey();
-		}
-	)->start if $^O =~ /Win/;
 
-#	setup_readkey();
-
-	$readline_obj->event_loop( sub {
-			local $@;
-			# Run the event loop. If a key is pressed, the io watcher's
-			# callback will get called, throwing an exception.
-#if (PeekKey()) {
-#print "PeekKey is already true\n" if PeekKey();
-#print "OldReadKey returns ", OldReadKey(-1), "\n";
-#}
-			eval { $::application->go };
-			# Rethrow the exception if it's not one that we threw
-			die unless $@ =~ /user pressed a key/;
+	$readline_obj->event_loop(
+		sub {
+			return if @has_more_keys;
+			$::application->go;
 		},
 		sub {
 			# Register the event loop, which means associating the io
 			# watcher with the specific io handle the readline wants
-			$fh = shift;
-			$prima_io_watcher->file($fh) unless $^O =~ /Win32/;
+			my $fh = shift;
+			$prima_io_watcher->file($fh);
 		},
 	);
 	$is_setup = 1;
@@ -76,41 +91,6 @@ sub setup {
 
 # Status method
 sub is_setup { $is_setup }
-
-1;
-__END__
-# My own version of ReadKey that lets me peek using PeakKey. This is ONLY
-# used on Windows, though I suppose it could work on other OSes too. I feel
-# rather dirty monkey-patching Term::ReadKey like this, but I really need to be
-# able to peek without obliterating the keystroke from the ReadKey buffer. :-(
-sub OldReadKey;
-sub ReadKey;
-sub PeekKey;
-sub setup_readkey {
-	print "PDL::Graphics::Prima::ReadLine patching Term::ReadKey\n";
-	require Term::ReadKey;
-	*OldReadKey = \&Term::ReadKey::ReadKey;
-	no warnings 'redefine';
-	*Term::ReadKey::ReadKey = \&ReadKey;
-}
-my $last_key;
-my $counter = 1;
-sub PeekKey {
-print "$counter time peeking at key\n" if $counter % 100 == 0;
-$counter++;
-	return $last_key if defined $last_key;
-	return $last_key = OldReadKey(-1);
-}
-sub ReadKey {
-print "Called new ReadKey\n";
-	if (defined $last_key) {
-		my $to_return = $last_key;
-		$last_key = undef;
-		return $to_return;
-	}
-	return OldReadKey(@_);
-}
-
 
 1;
 
@@ -170,10 +150,7 @@ module should make that procedure as straight-forward as one can hope.
 
 C<PDL::Graphics::Prima::ReadLine> can only hook into the event loop for
 newer versions of L<Term::ReadLine|Term::ReadLine/> (specifically, versions
-that support L<event_loop|Term::ReadLine/event_loop>). Also, due to current
-limitations in my knowledge of Prima's monitoring of STDIN, this module
-cannot hook into the event loop on Windows operating systems, both Cygwin
-and Strawberry Perl.
+that support L<event_loop|Term::ReadLine/event_loop>).
 
 =head2 is_happy_with
 

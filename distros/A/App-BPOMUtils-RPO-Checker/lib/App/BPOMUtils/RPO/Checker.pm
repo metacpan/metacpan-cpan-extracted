@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-16'; # DATE
+our $DATE = '2023-03-09'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_rpo_check_label_files_design
@@ -34,6 +34,8 @@ Here's what it checks:
 - filename should not contain unsafe symbols
 - file must not be larger than 5MB
 - file must be readable
+- type of file must be PDF or image (JPG), other types will generate warnings
+- file's mime type and extension must match
 
 _
     args => {
@@ -45,36 +47,85 @@ _
     },
 };
 sub bpom_rpo_check_files {
+    require Cwd;
+    require File::MimeInfo::Magic;
+
     my %args = @_;
 
     my $i = 0;
     my @errors;
     my @warnings;
+    my %symlinks; # key=abspath of symlink target, val=(first) link filename
+
+  FILE:
     for my $file (@{ $args{files} }) {
         $i++;
-        log_info "[%d/%d] Processing file %s ...", $i, scalar(@{ $args{files} }), $file;
+        log_info "[%d/%d] Processing file %s ...", $i, scalar(@{ $args{files} }), $file
+            unless $args{_no_log};
         unless (-f $file) {
             push @errors, {file=>$file, message=>"File not found or not a regular file"};
             next;
         }
 
-        if ($file =~ /\.[^.]+\./) {
-            push @errors, {file=>$file, message=>"Filename contains multiple dots, currently uploadable but not viewable in ereg-rba"};
-        }
-        if ($file =~ /[^A-Za-z0-9_.-]/) {
-            push @warnings, {file=>$file, message=>"Filename contains symbols, should be avoided to ensure viewable in ereg-rba"};
-        }
-
-        if (!-r($file)) {
-            push @errors, {file=>$file, message=>"File cannot be read"};
-            next;
+      CHECK_FILENAME: {
+            if ($file =~ /\.[^.]+\./) {
+                push @errors, {file=>$file, message=>"Filename contains multiple dots, currently uploadable but not viewable in ereg-rba"};
+            }
+            if ($file =~ /[^A-Za-z0-9 _.-]/) {
+                push @warnings, {file=>$file, message=>"Filename contains symbols, should be avoided to ensure viewable in ereg-rba"};
+            }
         }
 
-        my $filesize = -s $file;
-        if ($filesize > 5*1024*1024) {
-            push @errors, {file=>$file, message=>"File size too large (>5M)"};
+      CHECK_READABILITY: {
+            if (!-r($file)) {
+                push @errors, {file=>$file, message=>"File cannot be read"};
+                next FILE;
+            }
         }
+
+      CHECK_SYMLINK_TARGET: {
+            if (-l $file) {
+                my $abs_target = Cwd::abs_path(readlink $file);
+                log_trace "Symlink target: %s", $abs_target;
+                unless ($abs_target) {
+                    push @errors, {file=>$file, message=>"Symlink target cannot be made absolute"}; # should not happen if we already check -f $file
+                    next FILE;
+                }
+                if (defined $symlinks{$abs_target}) {
+                    push @warnings, {file=>$file, message=>"WARNING: Targets to the same file ($abs_target) as link $symlinks{$abs_target}, probably not what we want"}; # should not happen if we already check -f $file
+                    next FILE;
+                } else {
+                    $symlinks{$abs_target} = $file;
+                }
+            }
+        } # CHECK_SYMLINK_TARGET
+
+      CHECK_SIZE: {
+            my $filesize = -s $file;
+            if ($filesize > 5*1024*1024) {
+                push @errors, {file=>$file, message=>"File size too large (>5M)"};
+            }
+        } # CHECK_SIZE
+
+      CHECK_TYPE_AND_EXTENSION: {
+            # because File::MimeInfo::Magic will report mime='inode/symlink' for symlink
+            my $realfile = -l $file ? readlink($file) : $file;
+            my $mime_type = File::MimeInfo::Magic::mimetype($realfile);
+            if ($mime_type eq 'image/jpeg') {
+                push @errors, {file=>$file, message=>"File type is JPEG but extension is not jpg/jpeg"}
+                    unless $file =~ /\.(jpe?g)$/i;
+            } elsif ($mime_type eq 'application/pdf') {
+                push @errors, {file=>$file, message=>"File type is PDF but extension is not pdf"}
+                    unless $file =~ /\.(pdf)$/i;
+            } else {
+                push @errors, {file=>$file, message=>"File type is not JPEG or PDF"};
+            }
+
+        } # CHECK_TYPE_AND_EXTENSION
+
     }
+
+    #use DD; dd \%symlinks;
 
     [200, "OK", [@errors, @warnings], {'cmdline.exit_code'=>@errors ? 1:0}];
 }
@@ -87,12 +138,10 @@ $SPEC{bpom_rpo_check_files_label_design} = {
 By default will check all files in the current directory, recursively.
 
 Here's what it checks:
+- all the checks by bpom_rpo_check_files()
 - file must be in JPEG format and has name ending in /\.jpe?g$/i
-- filename should not contain unsafe symbols
-- file must not be larger than 5MB
-- file must be readable
 - image size must be smaller than 2300 x 2300 px
-- (WARNING) image should not be smaller than 600 x 600 px
+- (WARNING) image should not be smaller than 600 x 600px
 
 _
     args => {
@@ -112,6 +161,14 @@ sub bpom_rpo_check_files_label_design {
     my $i = 0;
     my @errors;
     my @warnings;
+
+    my $checkf_res = bpom_rpo_check_files(files => $args{files}, _no_log=>1);
+    return [500, "Can't check files with bpom_rpo_check_files(): $checkf_res->[0] - $checkf_res->[1]"]
+        unless $checkf_res->[0] == 200;
+    #use DD; dd $checkf_res;
+    push @errors  , $_ for grep { !/^WARNING:/ } @{ $checkf_res->[2] };
+    push @warnings, $_ for grep {  /^WARNING:/ } @{ $checkf_res->[2] };
+
     for my $file (@{ $args{files} }) {
         $i++;
         log_info "[%d/%d] Processing file %s ...", $i, scalar(@{ $args{files} }), $file;
@@ -126,14 +183,10 @@ sub bpom_rpo_check_files_label_design {
         if ($file =~ /\.[^.]+\./) {
             push @errors, {file=>$file, message=>"Filename contains multiple dots, currently uploadable but not viewable in ereg-rba"};
         }
-        if ($file =~ /[^A-Za-z0-9_.-]/) {
+        if ($file =~ /[^A-Za-z0-9 _.-]/) {
             push @warnings, {file=>$file, message=>"Filename contains symbols, should be avoided to ensure viewable in ereg-rba"};
         }
-
-        if (!-r($file)) {
-            push @errors, {file=>$file, message=>"File cannot be read"};
-            next;
-        }
+        next unless -r $file;
 
         my $filesize = -s $file;
         if ($filesize < 100*1024) {
@@ -174,7 +227,7 @@ App::BPOMUtils::RPO::Checker - Various checker utilities to help with Processed 
 
 =head1 VERSION
 
-This document describes version 0.006 of App::BPOMUtils::RPO::Checker (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-02-16.
+This document describes version 0.008 of App::BPOMUtils::RPO::Checker (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-09.
 
 =head1 SYNOPSIS
 
@@ -208,6 +261,8 @@ Here's what it checks:
 - filename should not contain unsafe symbols
 - file must not be larger than 5MB
 - file must be readable
+- type of file must be PDF or image (JPG), other types will generate warnings
+- file's mime type and extension must match
 
 This function is not exported.
 
@@ -246,12 +301,10 @@ Check label design files.
 By default will check all files in the current directory, recursively.
 
 Here's what it checks:
+- all the checks by bpom_rpo_check_files()
 - file must be in JPEG format and has name ending in /.jpe?g$/i
-- filename should not contain unsafe symbols
-- file must not be larger than 5MB
-- file must be readable
 - image size must be smaller than 2300 x 2300 px
-- (WARNING) image should not be smaller than 600 x 600 px
+- (WARNING) image should not be smaller than 600 x 600px
 
 This function is not exported.
 

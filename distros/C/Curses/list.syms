@@ -4,6 +4,9 @@
 ##   E = function existence check,
 ##   I = function "returns int?" check
 ##   T = typedef existence check
+##
+## Note that we don't need to list constants such as A_BOLD, because those are
+## defined as macros in Curses, so C code can already tell if they exist.
 
 E  waddch(stdscr,0)
 E  wechochar(stdscr,0)

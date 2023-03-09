@@ -1,7 +1,7 @@
 package WebService::GoogleAPI::Client::AccessToken;
 use strictures;
 
-our $VERSION = '0.26';    # VERSION
+our $VERSION = '0.27';    # VERSION
 
 # ABSTRACT: A small class for bundling user and scopes with a token
 use Moo;
@@ -9,7 +9,7 @@ use Moo;
 use overload '""' => sub { shift->token };
 
 has [qw/token user scopes/] => is => 'ro',
-  required                  => 1;
+    required                => 1;
 
 
 9008
@@ -26,7 +26,7 @@ WebService::GoogleAPI::Client::AccessToken - A small class for bundling user and
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -51,23 +51,13 @@ the response from your request and check the C<_token> hash key on that object.
 Note that this is subject to change in future versions (there's probably a saner
 way to do this).
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Veesh Goldman <veesh@cpan.org>
 
-=item *
-
-Peter Scott <localshop@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Peter Scott and others.
+This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
 This is free software, licensed under:
 

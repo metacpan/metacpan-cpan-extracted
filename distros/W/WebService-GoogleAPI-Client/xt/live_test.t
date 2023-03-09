@@ -25,12 +25,13 @@ NEEDS_USER
 
 my ($path, $email) = split /:/, $user_creds;
 my $u = WebService::GoogleAPI::Client->new(
-  gapi_json => $path, user => $email
+  gapi_json => $path,
+  user      => $email
 );
 
 my $s = WebService::GoogleAPI::Client->new(
   service_account => $service_creds,
-  scopes => [ 'https://www.googleapis.com/auth/drive' ]
+  scopes          => ['https://www.googleapis.com/auth/drive']
 );
 
 my $filename = 'a-rather-unlikely-named-file-for-xt-testing';
@@ -42,17 +43,17 @@ describe 'file creation and deletion' => sub {
 
   tests 'doing it' => sub {
     my $res = $ua->api_query({
-        api_endpoint_id => 'drive.files.create',
-        options => { name => $filename }
-      });
+      api_endpoint_id => 'drive.files.create',
+      options         => { name => $filename }
+    });
 
     is $res->json('/name'), $filename, 'request worked';
     my $id = $res->json('/id');
 
     $res = $ua->api_query({
-        api_endpoint_id => 'drive.files.delete',
-        options => { fileId => $id }
-      });
+      api_endpoint_id => 'drive.files.delete',
+      options         => { fileId => $id }
+    });
 
     is $res->code, 204, 'delete went as planned';
   };

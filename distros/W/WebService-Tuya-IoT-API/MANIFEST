@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+CONTRIBUTING.md
+LICENSE
+README.md
+t/001_load.t
+lib/WebService/Tuya/IoT/API.pm
+perl-WebService-Tuya-IoT-API.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

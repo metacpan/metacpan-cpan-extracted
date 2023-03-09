@@ -1,5 +1,9 @@
 Revision history for Museum-Rijksmuseum-Object
 
-0.01    Date/time
+0.03    2023-02-08
+        Fix unicode handling in JSON decoding
+0.02    2023-03-08
+        Add a missing dependency
+0.01    2023-03-04
         First version, released on an unsuspecting world.
 

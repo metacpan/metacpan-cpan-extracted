@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.10.1';
+$HTML::Spelling::Site::Checker::VERSION = '0.10.2';
 use strict;
 use warnings;
 use autodie;
@@ -12,7 +12,7 @@ use MooX qw/late/;
 use HTML::Parser 3.00 ();
 use List::MoreUtils   qw(any);
 use JSON::MaybeXS     qw(decode_json);
-use Path::Tiny        qw/ path /;
+use Path::Tiny 0.144  qw/ path /;
 use Digest            ();
 
 has '_inside' =>
@@ -269,7 +269,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.10.1
+version 0.10.2
 
 =head1 SYNOPSIS
 

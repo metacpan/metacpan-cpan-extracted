@@ -2,8 +2,7 @@ use strictures;
 
 package WebService::GoogleAPI::Client::AuthStorage::GapiJSON;
 
-our $VERSION = '0.26';    # VERSION
-
+our $VERSION = '0.27';    # VERSION
 # ABSTRACT: Auth Storage Backend based on gapi.json
 
 use Moo;
@@ -16,7 +15,7 @@ with 'WebService::GoogleAPI::Client::AuthStorage';
 has 'path' => (is => 'rw', default => './gapi.json');    # default is gapi.json
 
 
-has 'tokensfile' => (is => 'rw');    # Config::JSON object pointer
+has 'tokensfile' => (is => 'rw');                        # Config::JSON object pointer
 
 # NOTE- this type of class has getters and setters b/c the implementation of
 # getting and setting depends on what's storing
@@ -24,8 +23,7 @@ has 'tokensfile' => (is => 'rw');    # Config::JSON object pointer
 sub BUILD {
   my ($self) = @_;
   $self->tokensfile(Config::JSON->new($self->path));
-  my $missing = grep !$_, map $self->get_from_storage($_),
-    qw/client_id client_secret/;
+  my $missing = grep !$_, map $self->get_from_storage($_), qw/client_id client_secret/;
   croak <<NOCLIENT if $missing;
 Malformed gapi.json detected. We need the client_id and client_secret in order
 to refresh expired tokens
@@ -44,8 +42,7 @@ sub get_access_token {
 
 sub refresh_access_token {
   my ($self) = @_;
-  my %p = map { ($_ => $self->get_from_storage($_)) }
-    qw/client_id client_secret refresh_token/;
+  my %p = map { ($_ => $self->get_from_storage($_)) } qw/client_id client_secret refresh_token/;
 
   croak <<MISSINGCREDS unless $p{refresh_token};
 If your credentials are missing the refresh_token - consider removing the auth at
@@ -64,7 +61,7 @@ MISSINGCREDS
 sub get_token_emails_from_storage {
   my ($self) = @_;
   my $tokens = $self->get_from_storage('tokens');
-  return [keys %$tokens];
+  return [ keys %$tokens ];
 }
 
 
@@ -78,8 +75,7 @@ sub get_from_storage {
 }
 
 sub get_scopes_from_storage_as_array {
-  carp
-'get_scopes_from_storage_as_array is being deprecated, please use the more succint scopes accessor';
+  carp 'get_scopes_from_storage_as_array is being deprecated, please use the more succint scopes accessor';
   return $_[0]->scopes;
 }
 
@@ -90,7 +86,7 @@ sub get_scopes_from_storage_as_array {
 
 sub scopes {
   my ($self) = @_;
-  return [split / /, $self->tokensfile->get('gapi/scopes')];
+  return [ split / /, $self->tokensfile->get('gapi/scopes') ];
 }
 
 9011;
@@ -107,7 +103,7 @@ WebService::GoogleAPI::Client::AuthStorage::GapiJSON - Auth Storage Backend base
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -159,23 +155,13 @@ the current user, and other fields from the global config.
 
 Read-only accessor returning the list of scopes configured in the gapi.json file.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Veesh Goldman <veesh@cpan.org>
 
-=item *
-
-Peter Scott <localshop@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Peter Scott and others.
+This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
 This is free software, licensed under:
 

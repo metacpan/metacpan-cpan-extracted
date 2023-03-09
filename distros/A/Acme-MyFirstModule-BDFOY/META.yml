@@ -1,0 +1,42 @@
+---
+abstract: 'The great new Acme::MyFirstModule::BDFOY!'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Builder: '1.001006'
+  Test::Builder::Tester: '1.04'
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - testing
+  - file
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MyFirstModule-BDFOY
+no_index:
+  directory:
+    - t
+    - inc
+    - t/inc
+    - inc
+  file:
+    - t/lib/test.pm
+  namespace:
+    - Local
+  package:
+    - version
+    - Local
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY/issues
+  homepage: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY
+  repository: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -50,7 +50,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::InsertExecsList" : {
          "file" : "lib/Dist/Zilla/Plugin/InsertExecsList.pm",
-         "version" : "0.030"
+         "version" : "0.031"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertExecsList"
       }
    },
-   "version" : "0.030",
+   "version" : "0.031",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2010-2022 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2023 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.72';
+$VERSION='3.73';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -112,7 +112,7 @@ require "data.language.pl";
 ########################################
 # CURRENCY
 
-our $currency_iso_url    = "http://www.currency-iso.org/dam/downloads/lists/list_one.xls";
+our $currency_iso_url    = "https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xls";
 
 require "data.currency.pl";
 
@@ -267,117 +267,51 @@ sub do_country {
 #
 # GENC
 #
-# The GENC web page contains a set of country codes which is very
-# similar to the ISO codes, but contains some differences.  As a result,
-# this is a separate list.
+# The GENC web page now has you copy/paste into a text file.  The file will
+# contain lines like:
 #
-# File format is:
+#  AF AFG 004 AFGHANISTAN     Independent     Exception       Unchanged
+#  QZ XQZ 900 AKROTIRI        Other   Extension       Unchanged
 #
-# <tr ...>
-#   <td ...>
-#     <table width="100%">
-#       <tr>
-#         <td ...><a ...><font ...>2-char<br/>Code</a></td>
-#         <td ...><a ...><img ...></a></td>
-#       </tr>
-#     </table>
-#   </td>
+# Ignore lines that start with [None Assigned]
 #
-#   <td ...>
-#     <table width="100%">
-#       <tr>
-#         <td ...><a ...><font ...>3-char<br/>Code</a></td>
-#         <td ...><a ...><img ...></a></td>
-#       </tr>
-#     </table>
-#   </td>
+# Country names sometimes have space in them, but the next field is one of:
+#   Independent
+#   Other
+#   U.S. Dependency
 #
-#   <td ...>
-#     <table width="100%">
-#       <tr>
-#         <td ...><a ...><font ...>Numeric<br/>Code</a></td>
-#         <td ...><a ...><img ...></a></td>
-#       </tr>
-#     </table>
-#   </td>
-#
-#   <td ...>
-#     <table width="100%">
-#       <tr>
-#         <td ...><a ...><font ...>Name</a></td>
-#         <td ...><a ...><img ...></a></td>
-#       </tr>
-#     </table>
-#   </td>
-#
-#   <td ...>
-#     <table width="100%">
-#       <tr>
-#         <td ...><a ...><font ...>U.S.&nbsp;Recognition</a></td>
-#         <td ...><a ...><img ...></a></td>
-#       </tr>
-#     </table>
-#   </td>
-#
-#   <td ...>
-#     <table width="100%">
-#       <tr>
-#         <td ...><a ...><font ...>GENC<br/>Status</a></td>
-#         <td ...><a ...><img ...></a></td>
-#       </tr>
-#     </table>
-#   </td>
-# </tr>
-#
-# <tr ...>
-#
-#    <td ...>
-#      <a ...><font ...>AF</a>
-#    </td>
-#
-#    <td ...>
-#      <a ...><font ...>AFG</a>
-#    </td>
-#
-#    <td ...>
-#      <a ...><font ...>004</a>
-#    </td>
-#
-#    <td ...>
-#      <a ...><font ...>AFGHANISTAN</a>
-#    </td>
-#
-#   <td ...><span ...>Independent</span></td>
-
-#   <td ...><span ...>Exception</span></td>
-# </tr>
 
 {
    my $in;
 
    sub _init_country_genc {
-      $in = _read_file('url'        => $country_genc_url,
-                       'type'       => 'html',
-                       'as_list'    => 0,
-                       'html_strip' => [ qw(a font img br span) ],
-                       'html_repl'  => [ qw(&nbsp;) ],
+      my $inst = qq
+(Please download the data manually for GNEC country codes.
+
+Go to the following URL:
+   $country_genc_url
+Click on:
+   'Show 100 entries'
+Select the entire chart (not including the header).  If not all of the
+countries fit on a single page, do it in multiple steps.
+);
+
+      $in = _read_file('type'      => 'manual',
+                       'inst'      => $inst,
+                       'as_list'   => 1,
                       );
-
-      # Look for a table who's first row has the header:
-      #    Country or area name
-
-      my $found = jump_to_row(\$in,"U.S. Recognition",1);
-      if (! $found) {
-         die "ERROR [genc]: country code file format changed!\n";
-      }
    }
 
    sub _read_country_genc {
-      while (1) {
-         my @row = get_row("genc",\$in);
-         return ()  if (! @row);
+      while (@$in) {
+         my $line = shift (@$in);
+         next  if ($line =~ /None Assigned/);
 
-         my($alpha2,$alpha3,$num,$country) = @row;
+         if ($line !~ /^(\S\S)\s+(\S\S\S)\s+(\S\S\S)\s+(.*?)\s+(Independent|Other|U.S. Dependency)/) {
+            print "WARNING [genc]: invalid line: $line\n";
+            next;
+         }
+         my($alpha2,$alpha3,$num,$country) = ($1,$2,$3,$4);
 
          my($id,$i);
 
@@ -409,6 +343,17 @@ sub do_country {
             }
          }
 
+         # Country is all uppercase, so we'll convert it to a set of ucfirst
+         # words (unless it is explicitly set in %Data)
+
+         if (exists $Data{'country'}{'genc'}{'orig'}{'name'}{$country}) {
+            $country = $Data{'country'}{'genc'}{'orig'}{'name'}{$country};
+         } else {
+            my @tmp  = split(/\s+/,$country);
+            my @tmp2 = map { ucfirst(lc($_)) } @tmp;
+            $country = join(' ',@tmp2);
+         }
+
          my @country;
          if (exists $Alias{lc($country)}) {
             my($id2,$i2) = @{ $Alias{lc($country)} };
@@ -433,6 +378,7 @@ sub do_country {
 
          return ($alpha2,$alpha3,$num,@country);
       }
+      return ();
    }
 }
 
@@ -1724,7 +1670,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.72';
+\$VERSION='3.73';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

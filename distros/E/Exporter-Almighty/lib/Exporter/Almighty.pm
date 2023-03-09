@@ -5,7 +5,7 @@ use warnings;
 package Exporter::Almighty;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001003';
+our $VERSION   = '0.001004';
 
 use parent qw( Exporter::Tiny );
 
@@ -93,6 +93,7 @@ sub steps {
 	push @steps, 'setup_ducks_for'                if $setup->{duck};
 	push @steps, 'setup_types_for'                if $setup->{type};
 	push @steps, 'setup_constants_for'            if $setup->{const};
+	push @steps, 'setup_readonly_vars_for';
 	push @steps, 'finalize_export_variables_for';
 	return @steps;
 }
@@ -267,8 +268,9 @@ sub setup_constants_for {
 	for my $tag_name ( keys %tags ) {
 		my %exports = %{ assert_HashRef $tags{$tag_name} };
 		$tag_name =~ s/^[-:]//;
-		push @{ $into_EXPORT_TAGS->{$tag_name}   //= [] }, sort keys %exports;
-		push @{ $into_EXPORT_TAGS->{'constants'} //= [] }, sort keys %exports;
+		my @constant_names = sort keys %exports;
+		push @{ $into_EXPORT_TAGS->{$tag_name}   //= [] }, @constant_names;
+		push @{ $into_EXPORT_TAGS->{'constants'} //= [] }, @constant_names;
 		$me->make_constant_subs( $into, \%exports );
 	}
 	
@@ -300,6 +302,24 @@ sub make_constant_subs {
 		no strict 'refs';
 		*$full_name = set_subname $full_name => $coderef;
 	}
+}
+
+sub setup_readonly_vars_for {
+	my ( $me, $into, $setup ) = @_;
+	
+	my ( $into_ISA, $into_EXPORT, $into_EXPORT_OK, $into_EXPORT_TAGS ) =
+		$me->standard_package_variables( $into );
+	
+	my @constants = @{ $into_EXPORT_TAGS->{'constants'} // [] };
+	for my $name ( @constants ) {
+		no strict 'refs';
+		my $full_name = "$into\::$name";
+		${ $full_name } = &{ $full_name }();
+		Internals::SvREADONLY( ${ $full_name }, 1 );
+		push @{ $into_EXPORT_TAGS->{'ro_vars'} //= [] }, '$' . $name;
+	}
+	
+	return;
 }
 
 sub finalize_export_variables_for {
@@ -436,6 +456,13 @@ A user of the package defined in the L</SYNOPSIS> could import:
 
 By convention, the tag names should be snake_case, but constant names
 should be SHOUTING_SNAKE_CASE.
+
+For every constant like C<< RED >>, a readonly variable C<< $RED >> is
+also created, making it easier to interpolate the constant into a string.
+These are not exported by default.
+
+  use Your::Package qw( $RED $GREEN $BLUE );  # import ro vars by name
+  use Your::Package qw( :ro_vars );           # import ALL ro vars
 
 =head3 C<< type >>
 

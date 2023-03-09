@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Exporter-Almighty>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-almighty/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001004	2023-03-08
+
+ - Added: All constants exported by Exporter::Almighty-based modules now
+   also have a corresponding exportable readonly variable.
+
 0.001003	2023-01-28
 
  [ Documentation ]

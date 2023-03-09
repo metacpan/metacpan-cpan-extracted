@@ -3,9 +3,9 @@ NAME
     scripts/executables in the distribution
 
 VERSION
-    This document describes version 0.030 of
+    This document describes version 0.031 of
     Dist::Zilla::Plugin::InsertExecsList (from Perl distribution
-    Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-16.
+    Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-18.
 
 SYNOPSIS
     In dist.ini:

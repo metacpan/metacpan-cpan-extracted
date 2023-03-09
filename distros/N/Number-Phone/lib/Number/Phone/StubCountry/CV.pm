@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230305170051;
+our $VERSION = 1.20230307181419;
 
 my $formatters = [
                 {
@@ -74,45 +74,45 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{pt} = {};
-$areanames{en} = {"238222", "Porto\ Novo\,\ Santo\ Antão",
-"238271", "Orgão\/São\ Jorge\ \(Santiago\ Island\)",
-"238221", "Ribeira\ Grande\,\ Santo\ Antão",
-"238272", "Picos\,\ Santiago",
-"238268", "São\ Domingos\,\ Santiago",
-"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",
-"238261", "Praia\,\ Santiago",
-"238282", "Cova\ Figueira\,\ Fogo",
-"238262", "Praia\,\ Santiago",
-"238281", "São\ Filipe\,\ Fogo",
-"238251", "Sal\ Rei\,\ Boa\ Vista",
-"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",
-"238260", "Praia\,\ Santiago",
-"238255", "Vila\ do\ Maio\,\ Maio",
-"238224", "Cocoli\,\ Santo\ Antão",
-"238265", "Santa\ Catarina\,\ Santiago",
-"238227", "Lajedos\/Alto\ Mira\ \(Santo\ Antão\ Island\)",
-"238285", "Nova\ Sintra\,\ Brava",
-"238269", "Pedra\ Badejo\,\ Santiago",
-"238284", "São\ Jorge\,\ Fogo",
-"238264", "Praia\,\ Santiago",
-"238267", "Cidade\ Velha\,\ Santiago",
-"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
+$areanames{en} = {"238224", "Cocoli\,\ Santo\ Antão",
 "238235", "Ribeira\ Brava\,\ São\ Nicolau",
-"238242", "Santa\ Maria\,\ Sal",
+"238265", "Santa\ Catarina\,\ Santiago",
 "238241", "Espargos\,\ Sal",
+"238226", "Manta\ Velha\/Chã\ de\ Igreja\ \ \(Santo\ Antão\ Island\)",
+"238256", "Calheta\,\ Maio",
+"238284", "São\ Jorge\,\ Fogo",
+"238268", "São\ Domingos\,\ Santiago",
+"238262", "Praia\,\ Santiago",
+"238267", "Cidade\ Velha\,\ Santiago",
 "238237", "Fajã\,\ São\ Nicolau",
+"238232", "Mindelo\,\ São\ Vicente",
 "238263", "Praia\,\ Santiago",
 "238238", "Praia\ Branca\,\ São\ Nicolau",
-"238283", "Mosteiros\,\ Fogo",
-"238266", "Tarrafal\,\ Santiago",
-"238256", "Calheta\,\ Maio",
-"238226", "Manta\ Velha\/Chã\ de\ Igreja\ \ \(Santo\ Antão\ Island\)",
-"238273", "Calheta\ de\ São\ Miguel\,\ Santiago",
-"238223", "Paúl\,\ Santo\ Antão",
-"238230", "Mindelo\,\ São\ Vicente",
+"238261", "Praia\,\ Santiago",
+"238269", "Pedra\ Badejo\,\ Santiago",
 "238231", "Mindelo\,\ São\ Vicente",
-"238232", "Mindelo\,\ São\ Vicente",};
+"238242", "Santa\ Maria\,\ Sal",
+"238251", "Sal\ Rei\,\ Boa\ Vista",
+"238221", "Ribeira\ Grande\,\ Santo\ Antão",
+"238273", "Calheta\ de\ São\ Miguel\,\ Santiago",
+"238281", "São\ Filipe\,\ Fogo",
+"238272", "Picos\,\ Santiago",
+"238283", "Mosteiros\,\ Fogo",
+"238230", "Mindelo\,\ São\ Vicente",
+"238255", "Vila\ do\ Maio\,\ Maio",
+"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
+"238266", "Tarrafal\,\ Santiago",
+"238282", "Cova\ Figueira\,\ Fogo",
+"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",
+"238271", "Orgão\/São\ Jorge\ \(Santiago\ Island\)",
+"238264", "Praia\,\ Santiago",
+"238260", "Praia\,\ Santiago",
+"238223", "Paúl\,\ Santo\ Antão",
+"238285", "Nova\ Sintra\,\ Brava",
+"238222", "Porto\ Novo\,\ Santo\ Antão",
+"238227", "Lajedos\/Alto\ Mira\ \(Santo\ Antão\ Island\)",
+"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",};
+$areanames{pt} = {};
 
     sub new {
       my $class = shift;

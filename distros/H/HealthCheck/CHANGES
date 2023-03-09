@@ -1,6 +1,12 @@
 Changelog for HealthCheck
 
-v1.8.0 2022-01-07T17:40:21
+v1.8.1 2023-03-08T23:27:08
+ - Update README and License (Andrew Hewus Fresh)
+ - Update Makefile from upstream (Andrew Hewus Fresh)
+ - Pull request #10: MINOR SM-4102 (Mitch McCracken)
+ - Split run() out w/ _run_checks() and _run_check() (Mitch McCracken)
+
+v1.8.0 2022-01-07T17:39:51
  - Update README (Andrew Hewus Fresh)
  - PCR-802 Add runbook attribute to the base class (Hu Yin)
  - Pull request #9: SM-3261 Unclobber $SIG{__DIE__} (Tom Christiansen)

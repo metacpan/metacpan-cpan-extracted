@@ -6,6 +6,7 @@ requires "Carp" => "0";
 requires "Config::JSON" => "0";
 requires "Data::Dump" => "0";
 requires "Data::Dumper" => "0";
+requires "Data::Printer" => "1.00";
 requires "Exporter::Shiny" => "0";
 requires "IO::Socket::SSL" => "2.06";
 requires "List::SomeUtils" => "0";

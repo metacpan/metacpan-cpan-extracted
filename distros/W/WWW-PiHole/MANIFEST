@@ -7,9 +7,9 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
-bin/pihole
+README.txt
 cpanfile
 dist.ini
+eg/pihole
 lib/WWW/PiHole.pm
 weaver.ini

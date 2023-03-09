@@ -58,7 +58,6 @@ subtest pattern => sub {
     $d->pattern( instrument => $d->open_hh, patterns => [qw(11111)] );
 
     my $expect = [
-        [ 'patch_change', 0, 9, 46 ],
         [ 'note',   0, 96, 9, 46, 100 ],
         [ 'note',  96, 96, 9, 46, 100 ],
         [ 'note', 192, 96, 9, 46, 100 ],
@@ -68,7 +67,7 @@ subtest pattern => sub {
 
     @score = $d->score->Score;
 
-    is_deeply [ @score[4 .. 9] ], $expect, 'pattern';
+    is_deeply [ @score[4 .. 8] ], $expect, 'pattern';
 };
 
 subtest fill => sub {
@@ -141,6 +140,30 @@ subtest fill => sub {
         $d->kick    => [ '1010' ],
     );
     is_deeply $got, $expect, 'add_fill';
+};
+
+subtest euclidean => sub {
+    my $d = new_ok 'MIDI::Drummer::Tiny';
+
+    my $expect = '';
+    my $got = $d->euclidean(0, 0);
+    is $got, $expect, 'euclidean';
+
+    $expect = '0';
+    $got = $d->euclidean(0, 1);
+    is $got, $expect, 'euclidean';
+
+    $expect = '00';
+    $got = $d->euclidean(0, 2);
+    is $got, $expect, 'euclidean';
+
+    $expect = '10';
+    $got = $d->euclidean(1, 2);
+    is $got, $expect, 'euclidean';
+
+    $expect = '10010100';
+    $got = $d->euclidean(3, 8);
+    is $got, $expect, 'euclidean';
 };
 
 done_testing();

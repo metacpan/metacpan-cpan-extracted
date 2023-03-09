@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.10.1';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.10.2';
 use strict;
 use warnings;
 use autodie;
@@ -8,7 +8,7 @@ use 5.014;
 
 use MooX (qw( late ));
 
-use Path::Tiny qw/ path /;
+use Path::Tiny 0.144 qw/ path /;
 
 has '_general_whitelist' => ( is => 'ro', default => sub { return []; } );
 has '_records'           => ( is => 'ro', default => sub { return []; } );
@@ -278,7 +278,7 @@ HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 VERSION
 
-version 0.10.1
+version 0.10.2
 
 =head1 SYNOPSIS
 

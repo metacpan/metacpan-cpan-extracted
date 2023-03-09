@@ -22,10 +22,7 @@ my %script_prereq = (
 );
 
 my %test_prereq = (
-   'File::Find::Rule'         => '0',
    'Test::More'               => '0',
-   'Test::Pod'                => '1.00',
-   'Test::Pod::Coverage'      => '1.00',
 );
 
 my %config_prereq = (
@@ -41,7 +38,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Test::Inter",
-   VERSION          => "1.09",
+   VERSION          => "1.10",
    ABSTRACT         => "framework for more readable interactive test scripts",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -62,7 +59,7 @@ WriteMakefile(
           provides     => {
              'Test::Inter' => {
                 file    => 'lib/Test/Inter.pm',
-                version => '1.09',
+                version => '1.10',
              },
 
           },
@@ -76,6 +73,10 @@ WriteMakefile(
              version   => 2,
           },
           resources    => {
+             bugtracker => {
+                web  => 'https://github.com/SBECK-github/Test-Inter/issues',
+             },
+             homepage => 'https://github.com/SBECK-github/Test-Inter',
              repository => {
                 type => 'git',
                 web  => 'https://github.com/SBECK-github/Test-Inter',

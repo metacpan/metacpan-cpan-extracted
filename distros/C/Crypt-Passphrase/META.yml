@@ -11,6 +11,7 @@ build_requires:
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,32 +22,31 @@ name: Crypt-Passphrase
 provides:
   Crypt::Passphrase:
     file: lib/Crypt/Passphrase.pm
-    version: '0.007'
+    version: '0.009'
   Crypt::Passphrase::Encoder:
     file: lib/Crypt/Passphrase/Encoder.pm
-    version: '0.007'
+    version: '0.009'
   Crypt::Passphrase::Fallback:
     file: lib/Crypt/Passphrase/Fallback.pm
-    version: '0.007'
+    version: '0.009'
   Crypt::Passphrase::MD5::Hex:
     file: lib/Crypt/Passphrase/MD5/Hex.pm
-    version: '0.007'
+    version: '0.009'
   Crypt::Passphrase::PassphraseHash:
     file: lib/Crypt/Passphrase/PassphraseHash.pm
-    version: '0.007'
+    version: '0.009'
   Crypt::Passphrase::SHA1::Hex:
     file: lib/Crypt/Passphrase/SHA1/Hex.pm
-    version: '0.007'
+    version: '0.009'
   Crypt::Passphrase::Validator:
     file: lib/Crypt/Passphrase/Validator.pm
-    version: '0.007'
+    version: '0.009'
 requires:
   Carp: '0'
   Crypt::URandom: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
   Encode: '0'
-  Hash::Util::FieldHash: '0'
   Scalar::Util: '0'
   Unicode::Normalize: '0'
   parent: '0'
@@ -56,7 +56,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase/issues
   repository: git://github.com/Leont/crypt-passphrase.git
-version: '0.007'
+version: '0.009'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

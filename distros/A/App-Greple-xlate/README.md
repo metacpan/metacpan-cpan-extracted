@@ -78,6 +78,7 @@ This is a short-cut to specify the pattern matches entire text
     `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     Insted of calling translation engine, you are expected to work for.
     After preparing text to be translated, they are copied to the
@@ -130,6 +131,13 @@ This is a short-cut to specify the pattern matches entire text
 
         If the format is `xtxt` (translated text) or unkown, only translated
         text is printed.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Specify the maximum length of text to be sent to the API at once.
+    Default value is set as for free account service: 128K for the API
+    (**--xlate**) and 5000 for the clipboard interface (**--xlate-labor**).
+    You may be able to change these value if you are using Pro service.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

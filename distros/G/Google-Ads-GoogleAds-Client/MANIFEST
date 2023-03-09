@@ -69,6 +69,7 @@ examples/campaign_management/get_all_disapproved_ads.pl
 examples/campaign_management/get_campaigns_by_label.pl
 examples/campaign_management/set_ad_parameters.pl
 examples/campaign_management/update_campaign_criterion_bid_modifier.pl
+examples/campaign_management/update_campaign_criterion_ip_block.pl
 examples/campaign_management/validate_ad.pl
 examples/error_handling/handle_keyword_policy_violations.pl
 examples/error_handling/handle_partial_failure.pl

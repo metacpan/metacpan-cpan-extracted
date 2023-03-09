@@ -3,11 +3,10 @@ use strict;
 use warnings;
 
 use Exporter::Shiny qw/ gapi_json DEBUG user has_credentials set_credentials/;
-use Mojo::File qw/curfile path/;
+use Mojo::File      qw/curfile path/;
 use WebService::GoogleAPI::Client::AuthStorage::GapiJSON;
 
 my $gapi;
-
 #try and find a good gapi.json to use here. Check as follows:
 # for sanity, we only use the fake gapi.json in the t/ directory unless the user
 # explicitly gives a GOOGLE_TOKENSFILE

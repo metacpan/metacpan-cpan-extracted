@@ -1,0 +1,5 @@
+00-load.t
+boilerplate.t
+manifest.t
+pod-coverage.t
+pod.t

@@ -1,0 +1,30 @@
+---
+abstract: 'Perl library to access the Tuya IoT API'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Tuya-IoT-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::UUID: '0'
+  Digest::SHA: '0'
+  HTTP::Tiny: '0'
+  JSON::XS: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-WebService-Tuya-IoT-API/issues
+  homepage: https://github.com/mrdvt92/perl-WebService-Tuya-IoT-API
+  repository: https://github.com/mrdvt92/perl-WebService-Tuya-IoT-API.git
+version: '0.01'

@@ -113,8 +113,8 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20221112';
-}
+    $VERSION = '20230309';
+} ## end BEGIN
 
 sub DESTROY {
 
@@ -456,6 +456,7 @@ BEGIN {
         _fileroot_                 => $i++,
         _is_encoded_data_          => $i++,
         _length_function_          => $i++,
+        _line_separator_default_   => $i++,
         _line_separator_           => $i++,
         _logger_object_            => $i++,
         _output_file_              => $i++,
@@ -466,8 +467,10 @@ BEGIN {
         _tabsize_                  => $i++,
         _teefile_stream_           => $i++,
         _user_formatter_           => $i++,
+        _input_copied_verbatim_    => $i++,
+        _input_output_difference_  => $i++,
     };
-}
+} ## end BEGIN
 
 sub perltidy {
 
@@ -632,14 +635,14 @@ EOM
         if   ($flag) { goto ERROR_EXIT }
         else         { goto NORMAL_EXIT }
         croak "unexpectd return to Exit";
-    }
+    } ## end sub Exit
 
     sub Die {
         my $msg = shift;
         Warn($msg);
         Exit(1);
         croak "unexpected return to Die";
-    }
+    } ## end sub Die
 
     sub Fault {
         my ($msg) = @_;
@@ -651,6 +654,7 @@ EOM
         my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
         my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
         my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+        my $pkg = __PACKAGE__;
 
         my $input_stream_name = $rstatus->{'input_name'};
         $input_stream_name = '(unknown)' unless ($input_stream_name);
@@ -662,13 +666,13 @@ in file '$filename1'
 which was called from line $line1 of sub '$subroutine2'
 Message: '$msg'
 This is probably an error introduced by a recent programming change.
-Perl::Tidy.pm reports VERSION='$VERSION'.
+$pkg reports VERSION='$VERSION'.
 ==============================================================================
 EOM
 
         # This return is to keep Perl-Critic from complaining.
         return;
-    }
+    } ## end sub Fault
 
     # extract various dump parameters
     my $dump_options_type     = $input_hash{'dump_options_type'};
@@ -842,12 +846,21 @@ EOM
         Exit(0);
     }
 
+    # --dump-block-summary requires one filename in the arg list.
+    # This is a safety precaution in case a user accidentally adds -dbs to the
+    # command line parameters and is expecting formatted output to stdout.
+    # Another precaution, added elsewhere, is to  ignore -dbs in a .perltidyrc
+    my $numf = @Arg_files;
+    if ( $rOpts->{'dump-block-summary'} && $numf != 1 ) {
+        Die(<<EOM);
+--dump-block-summary expects 1 filename in the arg list but saw $numf filenames
+EOM
+    }
+
     #----------------------------------------
     # check parameters and their interactions
     #----------------------------------------
-    my $tabsize =
-      check_options( $rOpts, $is_Windows, $Windows_type, $rpending_complaint );
-    $self->[_tabsize_] = $tabsize;
+    $self->check_options( $is_Windows, $Windows_type, $rpending_complaint );
 
     if ($user_formatter) {
         $rOpts->{'format'} = 'user';
@@ -1115,7 +1128,7 @@ sub check_in_place_modify {
     }
 
     return ( $in_place_modify, $backup_extension, $delete_backup );
-}
+} ## end sub check_in_place_modify
 
 sub backup_method_copy {
 
@@ -1158,6 +1171,13 @@ sub backup_method_copy {
     my $in_place_modify = 1;
     $self->set_output_file_permissions( $backup_file, \@input_file_stat,
         $in_place_modify );
+
+    # set the modification time of the copy to the original value (rt#145999)
+    my ( $read_time, $write_time ) = @input_file_stat[ 8, 9 ];
+    if ( defined($write_time) ) {
+        utime( $read_time, $write_time, $backup_file )
+          || Warn("error setting times for backup file '$backup_file'\n");
+    }
 
     # Open the original input file for writing ... opening with ">" will
     # truncate the existing data.
@@ -1208,6 +1228,12 @@ EOM
     # have been reset.
     $self->set_output_file_permissions( $input_file, \@input_file_stat,
         $in_place_modify );
+
+    # Keep original modification time if no change (rt#145999)
+    if ( !$self->[_input_output_difference_] && defined($write_time) ) {
+        utime( $read_time, $write_time, $input_file )
+          || Warn("error setting times for '$input_file'\n");
+    }
 
     #---------------------------------------------------------
     # remove the original file for in-place modify as follows:
@@ -1353,6 +1379,13 @@ EOM
     my $in_place_modify = 1;
     $self->set_output_file_permissions( $input_file, \@input_file_stat,
         $in_place_modify );
+
+    # Keep original modification time if no change (rt#145999)
+    my ( $read_time, $write_time ) = @input_file_stat[ 8, 9 ];
+    if ( !$self->[_input_output_difference_] && defined($write_time) ) {
+        utime( $read_time, $write_time, $input_file )
+          || Warn("error setting times for '$input_file'\n");
+    }
 
     #---------------------------------------------------------
     # remove the original file for in-place modify as follows:
@@ -1529,8 +1562,7 @@ sub get_decoded_string_buffer {
 
         # In testing I have found that including additional guess 'suspect'
         # encodings sometimes works but can sometimes lead to disaster by
-        # using an incorrect decoding.  The user can always specify a
-        # specific input encoding.
+        # using an incorrect decoding.
         my $buf_in = $buf;
 
         my $decoder = guess_encoding( $buf_in, 'utf8' );
@@ -1695,9 +1727,10 @@ sub process_all_files {
     #   process_iteration_layer - handle any iterations on formatting
     #   process_single_case     - solves one formatting problem
 
-    my $rOpts              = $self->[_rOpts_];
-    my $dot                = $self->[_file_extension_separator_];
-    my $diagnostics_object = $self->[_diagnostics_object_];
+    my $rOpts                  = $self->[_rOpts_];
+    my $dot                    = $self->[_file_extension_separator_];
+    my $diagnostics_object     = $self->[_diagnostics_object_];
+    my $line_separator_default = $self->[_line_separator_default_];
 
     my $destination_stream = $rinput_hash->{'destination'};
     my $errorfile_stream   = $rinput_hash->{'errorfile'};
@@ -1983,6 +2016,8 @@ EOM
         my $log_file = $fileroot . $dot . "LOG";
         if ($logfile_stream) { $log_file = $logfile_stream }
 
+        # The logger object handles warning messages, logfile messages,
+        # and can supply basic run information to lower level routines.
         my $logger_object = Perl::Tidy::Logger->new(
             rOpts           => $rOpts,
             log_file        => $log_file,
@@ -2003,11 +2038,12 @@ EOM
             $logger_object->complain( ${$rpending_complaint} );
         }
 
-        my $line_separator = $rOpts->{'output-line-ending'};
+        # Use input line endings if requested
+        my $line_separator = $line_separator_default;
         if ( $rOpts->{'preserve-line-endings'} ) {
-            $line_separator = find_input_line_ending($input_file);
+            my $ls_input = find_input_line_ending($input_file);
+            if ( defined($ls_input) ) { $line_separator = $ls_input }
         }
-        $line_separator = "\n" unless defined($line_separator);
 
         # additional parameters needed by lower level routines
         $self->[_actual_output_extension_] = $actual_output_extension;
@@ -2022,6 +2058,8 @@ EOM
         $self->[_logger_object_]           = $logger_object;
         $self->[_output_file_]             = $output_file;
         $self->[_teefile_stream_]          = $teefile_stream;
+        $self->[_input_copied_verbatim_]   = 0;
+        $self->[_input_output_difference_] = 1;    ## updated later if -b used
 
         #----------------------------------------------------------
         # Do all formatting of this buffer.
@@ -2034,24 +2072,29 @@ EOM
         #--------------------------------------------------
         if ($in_place_modify) {
 
-            my $backup_method = $rOpts->{'backup-method'};
+            # For -b option, leave the file unchanged if a severe error caused
+            # formatting to be skipped. Otherwise we will overwrite any backup.
+            if ( !$self->[_input_copied_verbatim_] ) {
 
-            # Option 1, -bm='copy': uses newer version in which original is
-            # copied to the backup and rewritten; see git #103.
-            if ( defined($backup_method) && $backup_method eq 'copy' ) {
-                $self->backup_method_copy(
-                    $input_file,       $output_file,
-                    $backup_extension, $delete_backup
-                );
-            }
+                my $backup_method = $rOpts->{'backup-method'};
 
-            # Option 2, -bm='move': uses older version, where original is moved
-            # to the backup and formatted output goes to a new file.
-            else {
-                $self->backup_method_move(
-                    $input_file,       $output_file,
-                    $backup_extension, $delete_backup
-                );
+                # Option 1, -bm='copy': uses newer version in which original is
+                # copied to the backup and rewritten; see git #103.
+                if ( defined($backup_method) && $backup_method eq 'copy' ) {
+                    $self->backup_method_copy(
+                        $input_file,       $output_file,
+                        $backup_extension, $delete_backup
+                    );
+                }
+
+                # Option 2, -bm='move': uses older version, where original is
+                # moved to the backup and formatted output goes to a new file.
+                else {
+                    $self->backup_method_move(
+                        $input_file,       $output_file,
+                        $backup_extension, $delete_backup
+                    );
+                }
             }
             $output_file = $input_file;
         }
@@ -2137,7 +2180,7 @@ sub process_filter_layer {
     my $sink_object;
 
     # vars for checking assertions, if needed
-    my $digest_input = 0;
+    my $digest_input;
     my $saved_input_buf;
 
     my $ref_destination_stream = ref($destination_stream);
@@ -2146,8 +2189,11 @@ sub process_filter_layer {
     # if needed.  These are only used for 'tidy' formatting.
     if ( $rOpts->{'format'} eq 'tidy' ) {
 
-        # evaluate MD5 sum of input file for assert tests before any prefilter
-        if ( $rOpts->{'assert-tidy'} || $rOpts->{'assert-untidy'} ) {
+        # evaluate MD5 sum of input file, if needed, before any prefilter
+        if (   $rOpts->{'assert-tidy'}
+            || $rOpts->{'assert-untidy'}
+            || $rOpts->{'backup-and-modify-in-place'} )
+        {
             $digest_input    = $md5_hex->($buf);
             $saved_input_buf = $buf;
         }
@@ -2165,7 +2211,8 @@ sub process_filter_layer {
              $postfilter
           || $remove_terminal_newline
           || $rOpts->{'assert-tidy'}
-          || $rOpts->{'assert-untidy'};
+          || $rOpts->{'assert-untidy'}
+          || $rOpts->{'backup-and-modify-in-place'};
 
         #-------------------------
         # Setup destination_buffer
@@ -2253,10 +2300,15 @@ EOM
           ? $postfilter->($postfilter_buffer)
           : $postfilter_buffer;
 
+        if ( defined($digest_input) ) {
+            my $digest_output = $md5_hex->($buf_post);
+            $self->[_input_output_difference_] =
+              $digest_output ne $digest_input;
+        }
+
         # Check if file changed if requested, but only after any postfilter
         if ( $rOpts->{'assert-tidy'} ) {
-            my $digest_output = $md5_hex->($buf_post);
-            if ( $digest_output ne $digest_input ) {
+            if ( $self->[_input_output_difference_] ) {
                 my $diff_msg =
                   compare_string_buffers( $saved_input_buf, $buf_post,
                     $is_encoded_data );
@@ -2270,8 +2322,7 @@ EOM
         }
 
         if ( $rOpts->{'assert-untidy'} ) {
-            my $digest_output = $md5_hex->($buf_post);
-            if ( $digest_output eq $digest_input ) {
+            if ( !$self->[_input_output_difference_] ) {
                 $logger_object->warning(
 "assertion failure: '--assert-untidy' is set but output equals input\n"
                 );
@@ -2537,7 +2588,7 @@ sub process_iteration_layer {
         #---------------------------------
         # do processing for this iteration
         #---------------------------------
-        process_single_case( $tokenizer, $formatter );
+        $self->process_single_case( $tokenizer, $formatter );
 
         #-----------------------------------------
         # close the input source and report errors
@@ -2566,7 +2617,7 @@ sub process_iteration_layer {
             );
 
             # stop iterations if errors or converged
-            my $stop_now = $tokenizer->report_tokenization_errors();
+            my $stop_now = $self->[_input_copied_verbatim_];
             $stop_now ||= $tokenizer->get_unexpected_error_count();
             my $stopping_on_error = $stop_now;
             if ($stop_now) {
@@ -2671,7 +2722,7 @@ EOM
 sub process_single_case {
 
     # run the formatter on a single defined case
-    my ( $tokenizer, $formatter ) = @_;
+    my ( $self, $tokenizer, $formatter ) = @_;
 
     # Total formatting is done with these layers of subroutines:
     #   perltidy                - main routine; checks run parameters
@@ -2683,12 +2734,14 @@ sub process_single_case {
     while ( my $line = $tokenizer->get_line() ) {
         $formatter->write_line($line);
     }
-    my $severe_error = $tokenizer->report_tokenization_errors();
 
     # user-defined formatters are possible, and may not have a
     # sub 'finish_formatting', so we have to check
-    $formatter->finish_formatting($severe_error)
-      if $formatter->can('finish_formatting');
+    if ( $formatter->can('finish_formatting') ) {
+        my $severe_error = $tokenizer->report_tokenization_errors();
+        my $verbatim     = $formatter->finish_formatting($severe_error);
+        $self->[_input_copied_verbatim_] = $verbatim;
+    }
 
     return;
 } ## end sub process_single_case
@@ -2869,7 +2922,6 @@ sub compare_string_buffers {
         $last_nonblank_line = $truncate->( $last_nonblank_line, 72 );
 
         if ($last_nonblank_line) {
-            my $countm = $counti - 1;
             $msg .= <<EOM;
  $last_nonblank_count:$last_nonblank_line
 EOM
@@ -2910,7 +2962,7 @@ sub fileglob_to_re {
     $x =~ s#\*#.*#g;               # '*' -> '.*'
     $x =~ s#\?#.#g;                # '?' -> '.'
     return "^$x\\z";               # match whole word
-}
+} ## end sub fileglob_to_re
 
 sub make_logfile_header {
     my ( $rOpts, $config_file, $rraw_options, $Windows_type, $readable_options )
@@ -2943,19 +2995,6 @@ sub make_logfile_header {
     $msg .= "To find error messages search for 'WARNING' with your editor\n";
     return $msg;
 } ## end sub make_logfile_header
-
-sub write_logfile_header {
-    my (
-        $rOpts,        $logger_object, $config_file,
-        $rraw_options, $Windows_type,  $readable_options
-    ) = @_;
-
-    my $msg = make_logfile_header( $rOpts, $config_file,
-        $rraw_options, $Windows_type, $readable_options );
-
-    $logger_object->write_logfile_entry($msg);
-    return;
-} ## end sub write_logfile_header
 
 sub generate_options {
 
@@ -3130,6 +3169,7 @@ sub generate_options {
     $add_option->( 'sub-alias-list',               'sal',  '=s' );
     $add_option->( 'grep-alias-list',              'gal',  '=s' );
     $add_option->( 'grep-alias-exclusion-list',    'gaxl', '=s' );
+    $add_option->( 'use-feature',                  'uf',   '=s' );
 
     ########################################
     $category = 2;    # Code indentation control
@@ -3233,12 +3273,14 @@ sub generate_options {
     $add_option->( 'add-newlines',                            'anl',   '!' );
     $add_option->( 'block-brace-vertical-tightness',          'bbvt',  '=i' );
     $add_option->( 'block-brace-vertical-tightness-list',     'bbvtl', '=s' );
+    $add_option->( 'brace-follower-vertical-tightness',       'bfvt',  '=i' );
     $add_option->( 'brace-vertical-tightness',                'bvt',   '=i' );
     $add_option->( 'brace-vertical-tightness-closing',        'bvtc',  '=i' );
     $add_option->( 'cuddled-else',                            'ce',    '!' );
     $add_option->( 'cuddled-block-list',                      'cbl',   '=s' );
     $add_option->( 'cuddled-block-list-exclusive',            'cblx',  '!' );
     $add_option->( 'cuddled-break-option',                    'cbo',   '=i' );
+    $add_option->( 'cuddled-paren-brace',                     'cpb',   '!' );
     $add_option->( 'delete-old-newlines',                     'dnl',   '!' );
     $add_option->( 'opening-brace-always-on-right',           'bar',   '!' );
     $add_option->( 'opening-brace-on-new-line',               'bl',    '!' );
@@ -3269,6 +3311,7 @@ sub generate_options {
     $add_option->( 'keep-interior-semicolons',                'kis',   '!' );
     $add_option->( 'one-line-block-semicolons',               'olbs',  '=i' );
     $add_option->( 'one-line-block-nesting',                  'olbn',  '=i' );
+    $add_option->( 'one-line-block-exclusion-list',           'olbxl', '=s' );
     $add_option->( 'break-before-hash-brace',                 'bbhb',  '=i' );
     $add_option->( 'break-before-hash-brace-and-indent',      'bbhbi', '=i' );
     $add_option->( 'break-before-square-bracket',             'bbsb',  '=i' );
@@ -3347,19 +3390,22 @@ sub generate_options {
     ########################################
     $category = 13;    # Debugging
     ########################################
-    $add_option->( 'DIAGNOSTICS',             'I',    '!' ) if (DEVEL_MODE);
-    $add_option->( 'DEBUG',                   'D',    '!' );
-    $add_option->( 'dump-cuddled-block-list', 'dcbl', '!' );
-    $add_option->( 'dump-defaults',           'ddf',  '!' );
-    $add_option->( 'dump-long-names',         'dln',  '!' );
-    $add_option->( 'dump-options',            'dop',  '!' );
-    $add_option->( 'dump-profile',            'dpro', '!' );
-    $add_option->( 'dump-short-names',        'dsn',  '!' );
-    $add_option->( 'dump-token-types',        'dtt',  '!' );
-    $add_option->( 'dump-want-left-space',    'dwls', '!' );
-    $add_option->( 'dump-want-right-space',   'dwrs', '!' );
-    $add_option->( 'fuzzy-line-length',       'fll',  '!' );
-    $add_option->( 'help',                    'h',    EMPTY_STRING );
+    $add_option->( 'DIAGNOSTICS',              'I',    '!' ) if (DEVEL_MODE);
+    $add_option->( 'DEBUG',                    'D',    '!' );
+    $add_option->( 'dump-block-summary',       'dbs',  '!' );
+    $add_option->( 'dump-block-minimum-lines', 'dbl',  '=i' );
+    $add_option->( 'dump-block-types',         'dbt',  '=s' );
+    $add_option->( 'dump-cuddled-block-list',  'dcbl', '!' );
+    $add_option->( 'dump-defaults',            'ddf',  '!' );
+    $add_option->( 'dump-long-names',          'dln',  '!' );
+    $add_option->( 'dump-options',             'dop',  '!' );
+    $add_option->( 'dump-profile',             'dpro', '!' );
+    $add_option->( 'dump-short-names',         'dsn',  '!' );
+    $add_option->( 'dump-token-types',         'dtt',  '!' );
+    $add_option->( 'dump-want-left-space',     'dwls', '!' );
+    $add_option->( 'dump-want-right-space',    'dwrs', '!' );
+    $add_option->( 'fuzzy-line-length',        'fll',  '!' );
+    $add_option->( 'help',                     'h',    EMPTY_STRING );
     $add_option->( 'short-concatenation-item-length', 'scl',   '=i' );
     $add_option->( 'show-options',                    'opt',   '!' );
     $add_option->( 'timestamp',                       'ts',    '!' );
@@ -3419,6 +3465,7 @@ sub generate_options {
         'square-bracket-tightness'      => [ 0,      2 ],
 
         'block-brace-vertical-tightness'            => [ 0, 2 ],
+        'brace-follower-vertical-tightness'         => [ 0, 2 ],
         'brace-vertical-tightness'                  => [ 0, 2 ],
         'brace-vertical-tightness-closing'          => [ 0, 2 ],
         'paren-vertical-tightness'                  => [ 0, 2 ],
@@ -3470,6 +3517,7 @@ sub generate_options {
 
       block-brace-tightness=0
       block-brace-vertical-tightness=0
+      brace-follower-vertical-tightness=1
       brace-tightness=1
       brace-vertical-tightness-closing=0
       brace-vertical-tightness=0
@@ -3499,6 +3547,8 @@ sub generate_options {
       cuddled-break-option=1
       delete-old-newlines
       delete-semicolons
+      dump-block-minimum-lines=20
+      dump-block-types=sub
       extended-syntax
       encode-output-strings
       function-paren-vertical-alignment
@@ -3544,6 +3594,7 @@ sub generate_options {
       noweld-nested-containers
       recombine
       nouse-unicode-gcstring
+      use-feature=class
       valign-code
       valign-block-comments
       valign-side-comments
@@ -3568,8 +3619,6 @@ sub generate_options {
       html-table-of-contents
       html-entities
     );
-
-    push @defaults, "perl-syntax-check-flags=-c -T";
 
     #-----------------------------------------------------------------------
     # Define abbreviations which will be expanded into the above primitives.
@@ -3880,7 +3929,6 @@ sub _process_command_line {
         }
     }
 
-    my $word;
     my @raw_options        = ();
     my $config_file        = EMPTY_STRING;
     my $saw_ignore_profile = 0;
@@ -4067,6 +4115,7 @@ EOM
                     dump-token-types
                     dump-want-left-space
                     dump-want-right-space
+                    dump-block-summary
                     help
                     stylesheet
                     version
@@ -4165,9 +4214,59 @@ sub make_grep_alias_string {
     return;
 } ## end sub make_grep_alias_string
 
+sub cleanup_word_list {
+    my ( $rOpts, $option_name, $rforced_words ) = @_;
+
+    # Clean up the list of words in a user option to simplify use by
+    # later routines (delete repeats, replace commas with single space,
+    # remove non-words)
+
+    # Given:
+    #   $rOpts - the global option hash
+    #   $option_name - hash key of this option
+    #   $rforced_words - ref to list of any words to be added
+
+    # Returns:
+    #   \%seen - hash of the final list of words
+
+    my %seen;
+    my @input_list;
+
+    my $input_string = $rOpts->{$option_name};
+    if ( defined($input_string) && length($input_string) ) {
+        $input_string =~ s/,/ /g;    # allow commas
+        $input_string =~ s/^\s+//;
+        $input_string =~ s/\s+$//;
+        @input_list = split /\s+/, $input_string;
+    }
+
+    if ($rforced_words) {
+        push @input_list, @{$rforced_words};
+    }
+
+    my @filtered_word_list;
+    foreach my $word (@input_list) {
+        if ($word) {
+
+            # look for obviously bad words
+            if ( $word =~ /^\d/ || $word !~ /^\w[\w\d]*$/ ) {
+                Warn("unexpected '$option_name' word '$word' - ignoring\n");
+            }
+            if ( !$seen{$word} ) {
+                $seen{$word}++;
+                push @filtered_word_list, $word;
+            }
+        }
+    }
+    $rOpts->{$option_name} = join SPACE, @filtered_word_list;
+    return \%seen;
+} ## end sub cleanup_word_list
+
 sub check_options {
 
-    my ( $rOpts, $is_Windows, $Windows_type, $rpending_complaint ) = @_;
+    my ( $self, $is_Windows, $Windows_type, $rpending_complaint ) = @_;
+
+    my $rOpts = $self->[_rOpts_];
 
     #------------------------------------------------------------
     # check and handle any interactions among the basic options..
@@ -4314,30 +4413,30 @@ EOM
         $rOpts->{'default-tabsize'} = 8;
     }
 
-    # Check and clean up any sub-alias-list
-    if ( $rOpts->{'sub-alias-list'} ) {
-        my $sub_alias_string = $rOpts->{'sub-alias-list'};
-        $sub_alias_string =~ s/,/ /g;    # allow commas
-        $sub_alias_string =~ s/^\s+//;
-        $sub_alias_string =~ s/\s+$//;
-        my @sub_alias_list     = split /\s+/, $sub_alias_string;
-        my @filtered_word_list = ('sub');
-        my %seen;
+    # Check and clean up any use-feature list
+    my $saw_use_feature_class;
+    if ( $rOpts->{'use-feature'} ) {
+        my $rseen = cleanup_word_list( $rOpts, 'use-feature' );
+        $saw_use_feature_class = $rseen->{'class'};
+    }
 
-        # include 'sub' for later convenience
-        $seen{sub}++;
-        foreach my $word (@sub_alias_list) {
-            if ($word) {
-                if ( $word !~ /^\w[\w\d]*$/ ) {
-                    Warn("unexpected sub alias '$word' - ignoring\n");
-                }
-                if ( !$seen{$word} ) {
-                    $seen{$word}++;
-                    push @filtered_word_list, $word;
-                }
-            }
-        }
-        $rOpts->{'sub-alias-list'} = join SPACE, @filtered_word_list;
+    # Check and clean up any sub-alias-list
+    if (
+        defined( $rOpts->{'sub-alias-list'} )
+        && length( $rOpts->{'sub-alias-list'} )
+
+        || $saw_use_feature_class
+      )
+    {
+        my @forced_words;
+
+        # include 'sub' for convenience if this option is used
+        push @forced_words, 'sub';
+
+        # use-feature=class requires method as a sub alias
+        push @forced_words, 'method' if ($saw_use_feature_class);
+
+        cleanup_word_list( $rOpts, 'sub-alias-list', \@forced_words );
     }
 
     make_grep_alias_string($rOpts);
@@ -4350,6 +4449,11 @@ EOM
         {
             $rOpts->{'fuzzy-line-length'} = 1;
         }
+    }
+
+    # Large values of -scl can cause convergence problems, issue c167
+    if ( $rOpts->{'short-concatenation-item-length'} > 12 ) {
+        $rOpts->{'short-concatenation-item-length'} = 12;
     }
 
     # The freeze-whitespace option is currently a derived option which has its
@@ -4365,15 +4469,57 @@ EOM
 
     # Define $tabsize, the number of spaces per tab for use in
     # guessing the indentation of source lines with leading tabs.
-    # Assume same as for this run if tabs are used , otherwise assume
+    # Assume same as for this run if tabs are used, otherwise assume
     # a default value, typically 8
-    my $tabsize =
+    $self->[_tabsize_] =
         $rOpts->{'entab-leading-whitespace'}
       ? $rOpts->{'entab-leading-whitespace'}
       : $rOpts->{'tabs'} ? $rOpts->{'indent-columns'}
       :                    $rOpts->{'default-tabsize'};
-    return $tabsize;
+
+    # Define the default line ending, before any -ple option is applied
+    $self->[_line_separator_default_] = get_line_separator_default($rOpts);
+
+    return;
 } ## end sub check_options
+
+sub get_line_separator_default {
+
+    my ( $rOpts, $input_file ) = @_;
+
+    # Get the line separator that will apply unless overriden by a
+    # --preserve-line-endings flag for a specific file
+
+    my $line_separator_default = "\n";
+
+    my $ole = $rOpts->{'output-line-ending'};
+    if ($ole) {
+        my %endings = (
+            dos  => "\015\012",
+            win  => "\015\012",
+            mac  => "\015",
+            unix => "\012",
+        );
+
+        $line_separator_default = $endings{ lc $ole };
+
+        if ( !$line_separator_default ) {
+            my $str = join SPACE, keys %endings;
+            Die(<<EOM);
+Unrecognized line ending '$ole'; expecting one of: $str
+EOM
+        }
+
+        # Check for conflict with -ple
+        if ( $rOpts->{'preserve-line-endings'} ) {
+            Warn("Ignoring -ple; conflicts with -ole\n");
+            $rOpts->{'preserve-line-endings'} = undef;
+        }
+    }
+
+    return $line_separator_default;
+
+} ## end sub get_line_separator_default
 
 sub find_file_upwards {
     my ( $search_dir, $search_file ) = @_;
@@ -4628,14 +4774,6 @@ EOS
     return ( $os eq "2000" && $major != 5 ) ? "NT4" : $os;
 } ## end sub Win_OS_Type
 
-sub is_unix {
-    return
-         ( $OSNAME !~ /win32|dos/i )
-      && ( $OSNAME ne 'VMS' )
-      && ( $OSNAME ne 'OS2' )
-      && ( $OSNAME ne 'MacOS' );
-}
-
 sub look_for_Windows {
 
     # determine Windows sub-type and location of
@@ -4874,7 +5012,6 @@ sub read_config_file {
         # See rules in perltidy's perldoc page
         # Section: Other Controls - Creating a new abbreviation
         if ( $line =~ /^((\w+)\s*\{)(.*)?$/ ) {
-            my $oldname = $name;
             ( $name, $body ) = ( $2, $3 );
 
             # Cannot start new abbreviation unless old abbreviation is complete
@@ -5120,7 +5257,7 @@ sub dump_defaults {
     print STDOUT "Default command line options:\n";
     foreach my $line ( sort @defaults ) { print STDOUT "$line\n" }
     return;
-}
+} ## end sub dump_defaults
 
 sub readable_options {
 
@@ -5340,7 +5477,7 @@ Outdenting
  -okwl=s specify alternative keywords for -okw command
 
 Other controls
- -mft=n  maximum fields per table; default n=40
+ -mft=n  maximum fields per table; default n=0 (no limit)
  -x      do not format lines before hash-bang line (i.e., for VMS)
  -asc    allows perltidy to add a ';' when missing (default)
  -dsm    allows perltidy to delete an unnecessary ';'  (default)

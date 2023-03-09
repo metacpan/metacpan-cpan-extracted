@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4012';
+our $VERSION = '0.4103';
 
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
@@ -11,6 +11,7 @@ use List::Util qw(sum0);
 use Math::Bezier ();
 use MIDI::Util qw(dura_size reverse_dump set_chan_patch set_time_signature);
 use Moo;
+use Music::CreatingRhythms ();
 use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
 use namespace::clean;
@@ -437,16 +438,14 @@ sub pattern {
         1 => sub { $self->note( $args{duration}, $args{instrument} ) },
     };
 
-    set_chan_patch( $self->score, $self->channel, $args{instrument} );
-
     for my $pattern (@{ $args{patterns} }) {
-        next if $pattern =~ /^0+$/;
-
         $pattern =~ tr/01/10/ if $args{negate};
+
+        next if $pattern =~ /^0+$/;
 
         for ( 1 .. $args{repeat} ) {
             for my $bit ( split //, $pattern ) {
-                $args{vary}{$bit}->($self);
+                $args{vary}{$bit}->($self, %args);
             }
         }
     }
@@ -552,6 +551,15 @@ sub add_fill {
 }
 
 
+sub euclidean {
+    my ($self, $p, $n) = @_;
+    return '' unless $n;
+    my $mcr = Music::CreatingRhythms->new;
+    my $sequence = $mcr->euclid($p, $n);
+    return join '', @$sequence;
+}
+
+
 sub set_time_sig {
     my ($self, $signature, $set) = @_;
     $self->signature($signature) if $signature;
@@ -612,7 +620,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4012
+version 0.4103
 
 =head1 SYNOPSIS
 
@@ -625,7 +633,7 @@ version 0.4012
     signature => '5/4',
     bars      => 8,
     reverb    => 0,
-    kit       => 25, # TR-808 if using GM Level 2
+    #kit   => 25, # TR-808 if using GM Level 2
     #kick  => 36, # Override default patch
     #snare => 40, # "
  );
@@ -645,18 +653,23 @@ version 0.4012
  $d->note($d->sixteenth, $d->crash1);
  $d->accent_note(127, $d->sixteenth, $d->crash2);
 
+ my $patterns = [ $d->euclidean(5, 16), $d->euclidean(7, 16) ];
+ $d->pattern( instrument => $d->kick, patterns => $patterns );
+
  # Alternate kick and snare
  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
     for 1 .. $d->beats * $d->bars;
 
- print 'Count: ', $d->counter, "\n";
-
  # Same but with beat-strings:
  $d->sync_patterns(
-    $d->open_hh => [ ('1111') x $d->bars ],
-    $d->snare   => [ ('0101') x $d->bars ],
-    $d->kick    => [ ('1010') x $d->bars ],
- );
+    $d->open_hh => [ '1111' ],
+    $d->snare   => [ '0101' ],
+    $d->kick    => [ '1010' ],
+ ) for 1 .. $d->bars;
+
+ $d->add_fill('...');
+
+ print 'Count: ', $d->counter, "\n";
 
  $d->write;
 
@@ -1011,11 +1024,11 @@ Defaults:
 
   $d->sync_patterns( $instrument1 => $patterns1, $inst2 => $pats2, ... );
   $d->sync_patterns(
-      $d->open_hh => [ ('11111111') x $d->bars ],
-      $d->snare   => [ ('0101') x $d->bars ],
-      $d->kick    => [ ('1010') x $d->bars ],
+      $d->open_hh => [ '11111111') ],
+      $d->snare   => [ '0101' ],
+      $d->kick    => [ '1010' ],
       duration    => $d->eighth, # render all notes at this level of granularity
-  );
+  ) for 1 .. $d->bars;
 
 Execute the C<pattern> method for multiple voices.
 
@@ -1035,9 +1048,9 @@ If a C<duration> is provided, this will be used for each pattern
             $self->kick    => '00000000',
           };
       },
-      $d->open_hh => [ ('11111111') x $d->bars ],  # example phrase
-      $d->snare   => [ ('0101') x $d->bars ],      # "
-      $d->kick    => [ ('1010') x $d->bars ],      # "
+      $d->open_hh => [ '11111111' ],  # example phrase
+      $d->snare   => [ '0101' ],      # "
+      $d->kick    => [ '1010' ],      # "
   );
 
 Add a fill to the beat pattern.  That is, replace the end of the given
@@ -1045,7 +1058,11 @@ beat-string phrase with a fill.  The fill is given as the first
 argument and should be a coderef that returns a hashref.  The default
 is a three-note, eighth-note snare fill.
 
-* This method is not right at all and is still in development.
+=head2 euclidean
+
+  $pattern = $d->euclidean($p, $n);
+
+Return the Euclidean bitstring pattern for B<p> onsets over B<n> beats.
 
 =head2 set_time_sig
 
@@ -1081,14 +1098,21 @@ the file name.
 =head1 SEE ALSO
 
 The F<t/*> test file and the F<eg/*> programs in this distribution.
+
 Also F<eg/drum-fills-advanced> in the L<Music::Duration::Partition>
 distribution.
+
+L<Data::Dumper::Compact>
+
+L<List::Util>
 
 L<Math::Bezier>
 
 L<MIDI::Util>
 
 L<Moo>
+
+L<Music::CreatingRhythms>
 
 L<Music::Duration>
 
@@ -1104,7 +1128,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2014-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

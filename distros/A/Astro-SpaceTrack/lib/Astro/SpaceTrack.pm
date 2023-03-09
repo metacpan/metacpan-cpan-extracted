@@ -89,34 +89,6 @@ Of course, since there are no longer any Iridium Classic satellites in
 service, all the Iridium status machinery is a candidate for deprecation
 and removal. Stay tuned.
 
-=head2 RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE
-
-On February 25 2021 NASA shut down their Human Space Flight web site at
-L<https://spaceflight.nasa.gov/>. This means that the
-C<spaceflight()> method is non-functional. As of February
-28 2021 access redirects to
-L<https://www.nasa.gov/feature/spaceflightnasagov-has-been-retired/>.
-This lists a number of replacement resources, including
-L<https://spotthestation.nasa.gov/> and L<https://www.nasa.gov/station>.
-
-Unfortunately, so far I have found no replacement source for ISS TLEs.
-The redirection page notes the availability of state vectors in both
-text and XML, at
-C<https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.txt>
-and
-C<https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml>
-respectively. I may provide download access to these, but it will be a
-while until a state-vector analog to
-L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> is written, if it ever
-is.
-
-The functional result of this is that the C<spaceflight()> method
-gives a C<403> error as of February 28 2021. If some reasonable
-replacement becomes known to me, I will use it; otherwise this method
-will be removed. My usual removal schedule calls for the method to warn
-on the first use September 2021, warn on every use March 2022, die
-September 2022, and be removed completely March 2023.
-
 =head1 DESCRIPTION
 
 This package retrieves orbital data from the Space Track web site
@@ -156,7 +128,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 our @EXPORT_OK = qw{
     shell
 
@@ -464,12 +436,6 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    member	=> undef,	# vsnames
 	    spacetrack_type	=> 'molczan',
 	    url		=> 'http://www.prismnet.com/~mmccants/tles/vsnames.zip',
-	},
-    },
-    spaceflight => {
-	iss => {
-	    name	=> 'International Space Station',
-	    url		=> 'http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/orbit/ISS/SVPOST.html',
 	},
     },
     spacetrack => [	# Numbered by space_track_version
@@ -4260,217 +4226,6 @@ sub source {
 }
 
 
-=for html <a name="spaceflight"></a>
-
-=item $resp = $st->spaceflight ()
-
-B<Notice:> NASA shut down the source of this information on February 25
-2021. See
-L<RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE|/ RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE>
-above for more information, including deprecation plans for this method.
-
-B<As of version 0.157 this method throws a fatal exception.>
-
-This method downloads current orbital elements from NASA's human
-spaceflight site, L<https://spaceflight.nasa.gov/>. As of July 21 2011
-you only get the International Space Station.
-
-You can specify the argument 'ISS' (case-insensitive) to explicitly
-retrieve the data for the International Space Station, but as of July 21
-2011 this is equivalent to specifying no argument and getting
-everything.
-
-In addition you can specify options, either as command-style options
-(e.g. C<-all>) or by passing them in a hash as the first argument (e.g.
-C<{all => 1}>). The options specific to this method are:
-
- all
-  causes all TLEs for a body to be downloaded;
- effective
-  causes the effective date to be added to the data.
-
-In addition, any of the C<retrieve()> options is valid for this method as
-well.
-
-The -all option is recommended, but is not the default for historical
-reasons. If you specify -start_epoch, -end_epoch, or -last5, -all will
-be ignored.
-
-The -effective option hacks the effective date of the data onto the end
-of the common name (i.e. the first line of the 'NASA TLE') in the form
-C<--effective=date> where the effective date is encoded the same way the
-epoch is. Specifying this forces the generation of a 'NASA TLE'.
-
-No Space Track account is needed to access this data, even if the
-'direct' attribute is false. But if the 'direct' attribute is true,
-the setting of the 'with_name' attribute is ignored.
-
-If this method succeeds, the response will contain headers
-
- Pragma: spacetrack-type = orbit
- Pragma: spacetrack-source = spaceflight
-
-These can be accessed by C<< $st->content_type( $resp ) >> and
-C<< $st->content_source( $resp ) >> respectively.
-
-This method is a web page scraper. any change in the location of the
-web pages, or any substantial change in their format, will break this
-method.
-
-=cut
-
-{
-    my %dig_deeper = (
-	'http://notice.usa.gov'	=> sub {
-	    my ( $resp ) = @_;
-	    my $content = $resp->content();
-	    $content =~ m/ \b funding \b /smx
-		and $content =~ m/ \b not \s+ available \b /smx
-		or return;
-	    $resp->code( HTTP_PAYMENT_REQUIRED );
-	    $resp->message( LAPSED_FUNDING );
-	    return;
-	},
-    );
-
-    sub __tweak_response {
-	my ( $resp ) = @_;
-	$resp->is_success()
-	    or return;
-	my $url = $resp->request()->url();
-	ref $url
-	    and $url = $url->as_string();
-	$url =~ s{ / \z }{}smx;
-	my $code = $dig_deeper{$url}
-	    or return;
-	$code->( $resp );
-	return;
-    }
-}
-
-# Called dynamically
-sub _spaceflight_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
-    return [
-	'all!' => 'retrieve all data',
-	'effective!' => 'include effective date',
-	# The below are the version 1 retrieval options, which are
-	# emulated for this method. See the definition of
-	# CLASSIC_RETRIEVE_OPTIONS for more information.
-	@{ CLASSIC_RETRIEVE_OPTIONS() },
-    ];
-}
-
-sub spaceflight {
-    my ($self, @args) = @_;
-    delete $self->{_pragmata};
-
-    @args = _parse_args( @args );
-    my $opt = _parse_retrieve_dates( shift @args );
-
-    $opt->{all} = 0 if $opt->{last5} || $opt->{start_epoch};
-    $opt->{sort} ||= _validate_sort( $opt->{sort} );
-
-    $self->_deprecation_notice( 'spaceflight' );
-
-    my @list;
-    if (@args) {
-	foreach (@args) {
-	    my $info = $catalogs{spaceflight}{lc $_} or
-		return $self->_no_such_catalog (spaceflight => $_);
-	    exists $info->{url}
-		and push @list, $info->{url};
-	}
-    } else {
-	my $hash = $catalogs{spaceflight};
-	@list = map { $hash->{$_}{url} }
-	    grep { exists $hash->{$_}{url} }
-	    sort keys %$hash;
-    }
-
-    my $content = '';
-    my $html = '';
-    my $now = time ();
-    my %tle;
-    foreach my $url (@list) {
-	my $resp = $self->_get_agent()->get ($url);
-	__tweak_response( $resp );
-	return $resp unless $resp->is_success;
-	$html .= $resp->content();
-	my (@data, $acquire, $effective);
-	foreach (split qr{ \n }smx, $resp->content) {
-	    chomp;
-	    m{ Vector \s+ Time \s+ [(] GMT [)] : \s+
-		( \d+ / \d+ / \d+ : \d+ : \d+ [.] \d+ )}smx and do {
-		$effective = join ' ', '--effective', $1;
-		next;
-	    };
-	    m/TWO LINE MEAN ELEMENT SET/ and do {
-		$acquire = 1;
-		@data = ();
-		next;
-	    };
-	    next unless $acquire;
-	    s/ \A \s+ //smx;
-	    $_ and do {push @data, $_; next};
-	    @data and do {
-		$acquire = undef;
-		@data == 2 or @data == 3 or next;
-		@data == 3
-		    and not $self->{direct}
-		    and not $self->{with_name}
-		    and shift @data;
-		if ($effective && $opt->{effective}) {
-		    if (@data == 2) {
-			unshift @data, $effective;
-		    } else {
-			$data[0] .= " $effective";
-		    }
-		}
-		$effective = undef;
-		my $id = 0 + substr $data[-2], 2, 5;
-		my $yr = substr $data[-2], 18, 2;
-		my $da = substr $data[-2], 20, 12;
-		$yr += 100 if $yr < 57;
-		my $ep = Time::Local::timegm (0, 0, 0, 1, 0, $yr) + ($da - 1) * 86400;
-		if ( $opt->{all} ||
-		    $opt->{start_epoch} && $ep >= $opt->{start_epoch} &&
-			$ep < $opt->{end_epoch} ||
-		    $ep <= $now ) {
-##		unless (!$opt->{all} && ($opt->{start_epoch} ?
-##			($ep > $opt->{end_epoch} || $ep <= $opt->{start_epoch}) :
-##			$ep > $now)) {
-		    $tle{$id} ||= [];
-		    my @keys = $opt->{descending} ? (-$id, -$ep) : ($id, $ep);
-		    @keys = reverse @keys if $opt->{sort} eq 'epoch';
-		    push @{$tle{$id}}, [@keys, join '', map {"$_\n"} @data];
-		}
-		@data = ();
-	    };
-	}
-    }
-
-    unless ($opt->{all} || $opt->{start_epoch}) {
-	my $keep = $opt->{last5} ? 5 : 1;
-	foreach (values %tle) {splice @{ $_ }, $keep}
-    }
-    $content .= join '',
-	map {$_->[2]}
-	sort {$a->[0] <=> $b->[0] || $a->[1] <=> $b->[1]}
-	map {@$_} values %tle;
-
-    $content
-	or return HTTP::Response->new( HTTP_PRECONDITION_FAILED,
-	    NO_RECORDS, undef, $html );
-
-    my $resp = HTTP::Response->new (HTTP_OK, undef, undef, $content);
-    $self->_add_pragmata($resp,
-	'spacetrack-type' => 'orbit',
-	'spacetrack-source' => 'spaceflight',
-    );
-    $self->__dump_response( $resp );
-    return $resp;
-}
-
 =for html <a name="spacetrack"></a>
 
 =item $resp = $st->spacetrack ($name);
@@ -5329,7 +5084,6 @@ sub _check_cookie_generic {
 	    '--sort'		=> 0,
 	    '--start_epoch'	=> 0,
 	},
-	spaceflight => 3,
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,
 	},
@@ -6108,7 +5862,6 @@ sub _mutate_verify_hostname {
 
     my %no_such_name = (
 	celestrak => 'CelesTrak',
-	spaceflight => 'Manned Spaceflight',
 	spacetrack => 'Space Track',
     );
 
@@ -6700,8 +6453,7 @@ sub _readline_complete_catalog {
 {
     my @builtins;
     my %disallow = map { $_ => 1 } qw{
-	can getv import isa
-	new spaceflight
+	can getv import isa new
     };
     sub _readline_complete_command {
 	my ( $app, $text ) = @_;
@@ -7349,7 +7101,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2022 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2023 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 LICENSE
 

@@ -8,12 +8,6 @@ celestrak
     you specify a non-existent list you will get an error stating
     what lists are available.
 
-spaceflight
-    This script retireves data from NASA's manned spaceflight
-    web site. By default, it retrieves the current data. If you
-    give command option -all, it retrieves all data, past and
-    future. The option -help gets you brief help.
-
 spacetrack-identity
     This script prints the username and password in a format appropriate
     to create environment variable SPACETRACK_USER via a shell eval.

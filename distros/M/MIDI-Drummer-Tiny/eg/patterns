@@ -5,6 +5,9 @@ use warnings;
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny);
 use MIDI::Drummer::Tiny;
 
+my $snare_onset = shift || 5;
+my $kick_onset  = shift || 7;
+
 my $d = MIDI::Drummer::Tiny->new(
     file    => "$0.mid",
     bpm     => 90,
@@ -13,30 +16,30 @@ my $d = MIDI::Drummer::Tiny->new(
 
 $d->count_in(1);
 
-$d->sync_patterns(
-    $d->closed_hh => [ ('11111111') x $d->bars ],
-    $d->snare     => [ ('0101') x $d->bars ],
-    $d->kick      => [ ('1010') x $d->bars ],
-);
+#$d->sync_patterns(
+#    $d->closed_hh => [ '11111111' ],
+#    $d->snare     => [ '0101' ],
+#    $d->kick      => [ '1010' ],
+#) for 1 .. $d->bars - 1;
 
 # For finer-grain control:
 $d->sync(
-   sub { $d->pattern( instrument => $d->closed_hh, patterns => [ ('11111111') x $d->bars ] ) },
-   sub { $d->pattern( instrument => $d->snare,     patterns => [ ('0101') x $d->bars ] ) },
-   sub { $d->pattern( instrument => $d->kick,      patterns => [ ('1010') x $d->bars ] ) },
-);
+   sub { $d->pattern( instrument => $d->closed_hh, patterns => [ '11111111' ] ) },
+   sub { $d->pattern( instrument => $d->snare,     patterns => [ $d->euclidean($snare_onset, 16) ] ) },
+   sub { $d->pattern( instrument => $d->kick,      patterns => [ $d->euclidean($kick_onset, 16) ] ) },
+) for 1 .. $d->bars - 1;
 
 $d->add_fill(
     sub {
         my $self = shift;
         return {
-          duration         => 16,   # sixteenth note fill
+          duration         => 16,     # sixteenth note fill
           $self->closed_hh => '00000000',
           $self->snare     => '11111111',
-          $self->kick      => '00000000',
+          $self->kick      => '10001000',
         };
     },
-    $d->closed_hh => [ '1111' ],  # example phrase
+    $d->closed_hh => [ '11111111' ],  # example phrase
     $d->snare     => [ '0101' ],      # "
     $d->kick      => [ '1010' ],      # "
 );

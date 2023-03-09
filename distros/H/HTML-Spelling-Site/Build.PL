@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "HTML-Spelling-Site",
-  "dist_version" => "0.10.1",
+  "dist_version" => "0.10.2",
   "license" => "mit",
   "module_name" => "HTML::Spelling::Site",
   "recursive_test_files" => 1,
@@ -31,7 +31,7 @@ my %module_build_args = (
     "MooX" => 0,
     "MooX::late" => "0.010",
     "POSIX" => 0,
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.144",
     "Test::Differences" => 0,
     "Test::More" => "0.88",
     "autodie" => 0,

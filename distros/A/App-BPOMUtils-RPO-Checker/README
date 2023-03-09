@@ -3,9 +3,9 @@ NAME
     Processed Food Registration (RPO - Registrasi Pangan Olahan) at BPOM
 
 VERSION
-    This document describes version 0.006 of App::BPOMUtils::RPO::Checker
+    This document describes version 0.008 of App::BPOMUtils::RPO::Checker
     (from Perl distribution App-BPOMUtils-RPO-Checker), released on
-    2023-02-16.
+    2023-03-09.
 
 SYNOPSIS
 DESCRIPTION
@@ -27,7 +27,9 @@ FUNCTIONS
     By default will check all files in the current directory, recursively.
 
     Here's what it checks: - filename should not contain unsafe symbols -
-    file must not be larger than 5MB - file must be readable
+    file must not be larger than 5MB - file must be readable - type of file
+    must be PDF or image (JPG), other types will generate warnings - file's
+    mime type and extension must match
 
     This function is not exported.
 
@@ -60,11 +62,10 @@ FUNCTIONS
 
     By default will check all files in the current directory, recursively.
 
-    Here's what it checks: - file must be in JPEG format and has name ending
-    in /.jpe?g$/i - filename should not contain unsafe symbols - file must
-    not be larger than 5MB - file must be readable - image size must be
-    smaller than 2300 x 2300 px - (WARNING) image should not be smaller than
-    600 x 600 px
+    Here's what it checks: - all the checks by bpom_rpo_check_files() - file
+    must be in JPEG format and has name ending in /.jpe?g$/i - image size
+    must be smaller than 2300 x 2300 px - (WARNING) image should not be
+    smaller than 600 x 600px
 
     This function is not exported.
 

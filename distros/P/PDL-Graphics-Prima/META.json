@@ -34,7 +34,7 @@
          "requires" : {
             "PDL" : "v2.4.0",
             "PDL::Drawing::Prima" : "0.15",
-            "Prima" : "1.67",
+            "Prima" : "1.68",
             "perl" : "5.012"
          }
       },
@@ -53,8 +53,8 @@
          "type" : "git",
          "web" : "https://github.com/PDLPorters/PDL-Graphics-Prima"
       },
-      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+      "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

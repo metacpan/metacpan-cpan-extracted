@@ -4,7 +4,7 @@
 
 package App::MusicTools;
 use 5.014000;
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 1;
 
 __END__
@@ -108,7 +108,7 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016,2019 by Jeremy Mates
+Copyright (C) 2012 by Jeremy Mates
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

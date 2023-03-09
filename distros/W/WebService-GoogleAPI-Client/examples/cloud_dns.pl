@@ -10,13 +10,14 @@ use Text::Table;
 use MIME::Types;
 use Image::PNG::Libpng;
 
-require './EXAMPLE_HELPERS.pm'; ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
+require './EXAMPLE_HELPERS.pm'
+    ;    ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
 
 my $config = {
-  api => 'dns',
-  debug => 01,
-  project => $ENV{GOOGLE_PROJECT_ID},
-  managedZone => $ENV{GOOGLE_DNS_MANAGED_ZONE}, 
+  api         => 'dns',
+  debug       => 01,
+  project     => $ENV{GOOGLE_PROJECT_ID},
+  managedZone => $ENV{GOOGLE_DNS_MANAGED_ZONE},
 };
 
 
@@ -95,39 +96,33 @@ say 'x' x 180;
 croak('must have environment variable GOOGLE_PROJECT_ID set to run') unless defined $ENV{GOOGLE_PROJECT_ID};
 
 
-
-
-
-
 ####
 ####
-####            SET UP THE CLIENT AS THE DEFAULT USER 
+####            SET UP THE CLIENT AS THE DEFAULT USER
 ####
 ####
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
 ## manunally sets the client user email to be the first in the gapi.json file
-my $gapi_client = WebService::GoogleAPI::Client->new( debug => $config->{debug}, gapi_json => 'gapi.json' );
+my $gapi_client       = WebService::GoogleAPI::Client->new(debug => $config->{debug}, gapi_json => 'gapi.json');
 my $aref_token_emails = $gapi_client->auth_storage->get_token_emails_from_storage;
-my $user              = $aref_token_emails->[0];                                                             ## default to the first user
-$gapi_client->user( $user );
-
-
+my $user              = $aref_token_emails->[0];    ## default to the first user
+$gapi_client->user($user);
 
 
 ####
 ####
-####            DISPLAY AN OVERVIEW OF THE API VERSIONS 
+####            DISPLAY AN OVERVIEW OF THE API VERSIONS
 ####            AND SELECT THE PREFERRED VERSION IF NOT SPECIFIED
 ####
 
 #display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api}, 'v1beta2' );
-my $versioned_api = display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api} );
+my $versioned_api = display_api_summary_and_return_versioned_api_string($gapi_client, $config->{api});
 
 say "Versioned version of API = $versioned_api ";
 #exit;
 ## interestingly an auth'd request is denied without the correct scope .. so can't use that to find the missing scope :)
-my $methods = $gapi_client->methods_available_for_google_api_id( $versioned_api );
- say join("\n\t", "DNS API END POINTS:\n", sort keys %$methods );
+my $methods = $gapi_client->methods_available_for_google_api_id($versioned_api);
+say join("\n\t", "DNS API END POINTS:\n", sort keys %$methods);
 #exit;
 
 
@@ -138,30 +133,29 @@ my $methods = $gapi_client->methods_available_for_google_api_id( $versioned_api 
 ####            DISPLAY A SUMMARY OF THE API-ENDPOINT  -- dns.managedZones.list
 ####
 ####
-check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.projects.get" );
+check_api_endpoint_and_user_scopes($gapi_client, "$versioned_api.projects.get");
 #exit;
 
 ####
 ####
-####            EXECUTE API - LIST DNS PROJECTS  
+####            EXECUTE API - LIST DNS PROJECTS
 ####
 ####
-my $r = $gapi_client->api_query(  api_endpoint_id => "$versioned_api.projects.get",  
-                                 options => { 
-                                     project => $config->{project}
-                                  } 
-                                  );
+my $r = $gapi_client->api_query(
+  api_endpoint_id => "$versioned_api.projects.get",
+  options         => {
+    project => $config->{project}
+  }
+);
 #print Dumper  $r; # ->json;
-if ( $config->{debug} )
-{
-    my $d = $r->json;
-    say pp $d;
-    #exit;
+if ($config->{debug}) {
+  my $d = $r->json;
+  say pp $d;
+  #exit;
 }
 
 
 #############################################################################
-
 
 
 ####
@@ -169,25 +163,25 @@ if ( $config->{debug} )
 ####            DISPLAY A SUMMARY OF THE API-ENDPOINT  -- dns.managedZones.list
 ####
 ####
-check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.managedZones.list" );
+check_api_endpoint_and_user_scopes($gapi_client, "$versioned_api.managedZones.list");
 #exit;
 
 ####
 ####
-####            EXECUTE API - GET LIST OF MANAGED ZONES  
+####            EXECUTE API - GET LIST OF MANAGED ZONES
 ####
 ####
-my $r = $gapi_client->api_query(  api_endpoint_id => "$versioned_api.managedZones.list",  
-                                 options => { 
-                                     project => $config->{project}
-                                  } 
-                                  );
+my $r = $gapi_client->api_query(
+  api_endpoint_id => "$versioned_api.managedZones.list",
+  options         => {
+    project => $config->{project}
+  }
+);
 #print Dumper  $r; # ->json;
-if ( $config->{debug} )
-{
-    my $d = $r->json;
-    say pp $d;
-    #exit;
+if ($config->{debug}) {
+  my $d = $r->json;
+  say pp $d;
+  #exit;
 }
 
 #############################################################################
@@ -197,33 +191,30 @@ if ( $config->{debug} )
 ####            DISPLAY A SUMMARY OF THE API-ENDPOINT  -- resourceRecordSets.list
 ####
 ####
-check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.resourceRecordSets.list" );
+check_api_endpoint_and_user_scopes($gapi_client, "$versioned_api.resourceRecordSets.list");
 #exit;
 
 ####
 ####
-####            EXECUTE API - LIST DNS ZONE RECORD  
+####            EXECUTE API - LIST DNS ZONE RECORD
 ####
 ####
-my $r = $gapi_client->api_query(  api_endpoint_id => "$versioned_api.resourceRecordSets.list",  
-                                 options => { 
-                                     project => $config->{project},
-                                     managedZone => $config->{managedZone}
-                                  } 
-                                  );
+my $r = $gapi_client->api_query(
+  api_endpoint_id => "$versioned_api.resourceRecordSets.list",
+  options         => {
+    project     => $config->{project},
+    managedZone => $config->{managedZone}
+  }
+);
 #print Dumper  $r; # ->json;
-if ( $config->{debug} )
-{
-    my $d = $r->json;
-    say pp $d;
-    exit;
+if ($config->{debug}) {
+  my $d = $r->json;
+  say pp $d;
+  exit;
 }
 
 
-
-
 say "Done ";
-
 
 
 =pod

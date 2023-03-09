@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use v5.14;
 use warnings;
@@ -16,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,10 @@ Next command simply produces the same result.
 =head2 FILE FORMATS
 
 =over 7
+
+=item git
+
+L<git(1)> file object. Like C<HEAD^:README.md>.
 
 =item msdoc
 
@@ -162,7 +166,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2019-2022 Kazumasa Utashiro.
+Copyright 2019-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -175,6 +179,7 @@ use List::Util 1.45 qw(first);
 our @CONVERTER;
 use App::optex::textconv::default;
 use App::optex::textconv::msdoc;
+use App::optex::textconv::git;
 
 use Exporter 'import';
 
@@ -191,20 +196,10 @@ sub finalize {
     @$argv = textconv(@$argv);
 }
 
-sub hit {
-    local $_ = shift;
-    my $check = shift;
-    if (ref $check eq 'CODE') {
-	$check->();
-    } else {
-	/$check/;
-    }
-}
-
 sub converter {
     my $filename = shift;
-    if (my $ent = first { hit $filename, $_->[0] } @CONVERTER) {
-	return $ent->[1];
+    if (my $ent = first { $_->treat($filename) } @CONVERTER) {
+	return $ent;
     }
     undef;
 }
@@ -237,19 +232,15 @@ my @persist;
 sub textconv {
   ARGV:
     for (@_) {
-	# check file existence
-	do {{
-	    m[^https?://] and last; # skip URL
-	    -f or next ARGV;
-	}};
 	my($suffix) = map { lc } /\.(\w+)$/x;
 	my $func = do {
-	    if (my $converter = converter $_) {
-		if (ref $converter eq 'CODE') {
-		    $converter;
+	    if (my $c = converter $_) {
+		my $textize = $c->textize;
+		if (ref $textize eq 'CODE') {
+		    $textize;
 		}
 		else {
-		    sub { exec_command $converter, $_ };
+		    sub { exec_command $textize, $_ };
 		}
 	    }
 	    elsif ($suffix) {

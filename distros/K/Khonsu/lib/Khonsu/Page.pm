@@ -26,6 +26,7 @@ sub add {
 	my $page = $args{open} ? $file->pdf->openpage($args{num}) : $file->pdf->page($args{num} || 0);
 	$page->mediabox($self->page_size);
 	$self->set_points($page->get_mediabox);
+
 	$self->current($page);
 	$self->rotate if $args{rotate};
 	if ($self->background) {

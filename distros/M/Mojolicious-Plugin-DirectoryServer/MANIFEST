@@ -1,0 +1,26 @@
+Changes
+cpanfile
+examples/documents/css/github.css
+examples/documents/index.md
+examples/documents/subdir/foo.md
+examples/markdown_viewer
+lib/Mojolicious/Plugin/DirectoryServer.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+README.pod
+t/00_compile.t
+t/auto_index.t
+t/default.t
+t/dir.t
+t/dir/delete.me
+t/dir/index.html
+t/dir_index.t
+t/dir_page.t
+t/dummy.txt
+t/file.t
+t/handle.t
+t/path_walking.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -56,6 +56,7 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
     Especifique el motor de traducción que se utilizará. No es necesario utilizar esta opción porque el módulo `xlate::deepl` lo declara como `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     En lugar de llamar al motor de traducción, se espera que trabaje para. Después de preparar el texto a traducir, se copian en el portapapeles. Se espera que los pegue en el formulario, copie el resultado en el portapapeles y pulse Retorno.
 
@@ -103,6 +104,10 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
     - **xtxt**
 
         Si el formato es `xtxt` (texto traducido) o desconocido, sólo se imprime el texto traducido.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Especifique la longitud máxima del texto que se enviará a la API de una sola vez. El valor predeterminado es el mismo que para el servicio de cuenta gratuita: 128K para la API (**--xlate**) y 5000 para la interfaz del portapapeles (**--xlate-labor**). Puede cambiar estos valores si utiliza el servicio Pro.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

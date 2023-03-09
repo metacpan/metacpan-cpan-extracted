@@ -51,7 +51,7 @@ sub DESTROY { }
 
 package Curses;
 
-$VERSION = '1.43'; # Makefile.PL picks this up
+$VERSION = '1.44'; # Makefile.PL picks this up
 
 use Carp;
 require Exporter;
@@ -158,7 +158,7 @@ tie $COLOR_PAIRS, Curses::Vars, 6;
     ACS_DEGREE ACS_DIAMOND ACS_HLINE ACS_LANTERN ACS_LARROW ACS_LLCORNER
     ACS_LRCORNER ACS_LTEE ACS_PLMINUS ACS_PLUS ACS_RARROW ACS_RTEE ACS_S1
     ACS_S9 ACS_TTEE ACS_UARROW ACS_ULCORNER ACS_URCORNER ACS_VLINE
-    A_ALTCHARSET A_ATTRIBUTES A_BLINK A_BOLD A_CHARTEXT A_COLOR A_DIM
+    A_ALTCHARSET A_ATTRIBUTES A_BLINK A_BOLD A_ITALIC A_CHARTEXT A_COLOR A_DIM
     A_INVIS A_NORMAL A_PROTECT A_REVERSE A_STANDOUT A_UNDERLINE COLOR_BLACK
     COLOR_BLUE COLOR_CYAN COLOR_GREEN COLOR_MAGENTA COLOR_RED COLOR_WHITE
     COLOR_YELLOW KEY_A1 KEY_A3 KEY_B2 KEY_BACKSPACE KEY_BEG KEY_BREAK
@@ -407,7 +407,7 @@ If C<wget_wch()> is not available (i.e. The Curses library does not understand
 wide characters), this calls C<wgetch()>, but returns the values described
 above nonetheless.  This can be a problem because with a multibyte character
 encoding like UTF-8, you will receive two one-character strings for a
-two-byte-character (e.g. "õ€‚‚" and "â–½" for "âˆ½").  If you append
+two-byte-character (e.g. "ï¿½ï¿½ï¿½ï¿½" and "â–½" for "âˆ½").  If you append
 these characters to a Perl string, that string may internally contain a valid
 UTF-8 encoding of a character, but Perl will not interpret it that way. Perl
 may even try to convert what it believes to be two characters to UTF-8, giving
@@ -468,7 +468,7 @@ library provides no way to push back function keys, only characters.
 
 =over 4
 
-	ungetchar("X") || die "ungetchar failed";
+	ungetchar("X") or die "ungetchar failed";
 
 =back
 
@@ -969,7 +969,8 @@ example of this.
     A_BOLD                  A_CHARTEXT              A_COLOR
     A_DIM                   A_INVIS                 A_NORMAL
     A_PROTECT               A_REVERSE               A_STANDOUT
-    A_UNDERLINE             COLOR_BLACK             COLOR_BLUE
+    A_UNDERLINE             A_ITALIC
+    COLOR_BLACK             COLOR_BLUE
     COLOR_CYAN              COLOR_GREEN             COLOR_MAGENTA
     COLOR_RED               COLOR_WHITE             COLOR_YELLOW
     KEY_A1                  KEY_A3                  KEY_B2

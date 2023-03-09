@@ -5,7 +5,7 @@ use Test::Most;    # plan is down at bottom
 
 my $deeply = \&eq_or_diff;
 
-my $test_prog = './atonal-util';
+my $test_prog = './bin/atonal-util';
 my $tc        = Test::Cmd->new(
     interpreter => $^X,
     prog        => $test_prog,

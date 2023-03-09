@@ -17,7 +17,7 @@ my @test_cases = (
     {
         method    => 'new',
         params    => {},
-        exception => qr/Missing OPENAI_API_KEY/,
+        exception => qr/Undef did not pass type constraint "Str"/,
     },
     {
         method    => 'completions',

@@ -56,6 +56,7 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
     Määrake kasutatav tõlkemootor. Seda valikut ei pea kasutama, sest moodul `xlate::deepl` deklareerib seda kui `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     Insted kutsudes tõlkemootor, siis oodatakse tööd. Pärast tõlgitava teksti ettevalmistamist kopeeritakse need lõikelauale. Eeldatakse, et kleebite need vormi, kopeerite tulemuse lõikelauale ja vajutate return.
 
@@ -103,6 +104,10 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
     - **xtxt**
 
         Kui formaat on `xtxt` (tõlgitud tekst) või tundmatu, trükitakse ainult tõlgitud tekst.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Määrake API-le korraga saadetava teksti maksimaalne pikkus. Vaikeväärtus on määratud nagu tasuta kontoteenuse puhul: 128K API jaoks (**--xlate**) ja 5000 lõikelaua liidesele (**--xlate-labor**). Kui kasutate Pro teenust, võite neid väärtusi muuta.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

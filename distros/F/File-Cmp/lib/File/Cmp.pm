@@ -1,6 +1,6 @@
 # -*- Perl -*-
 #
-# Compare two files character by character like cmp(1).
+# File::Cmp - compare two files character by character like cmp(1)
 
 package File::Cmp;
 
@@ -8,93 +8,94 @@ use 5.008000;
 use strict;
 use warnings;
 
-use Carp qw/croak/;
+use Carp         qw/croak/;
 use Scalar::Util qw/reftype/;
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw/&fcmp/;
 
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 
 # XXX 'skip' and 'limit' might be good parameters to add, to skip X
 # initial bytes, limit work to Y bytes of data to check
 sub fcmp {
-  croak 'fcmp needs two files' if @_ < 2;
-  my @files = splice @_, 0, 2;
-  my $param = ( @_ == 1 and ref $_[0] eq 'HASH' ) ? $_[0] : {@_};
+    croak 'fcmp needs two files' if @_ < 2;
+    my @files = splice @_, 0, 2;
+    my $param = ( @_ == 1 and ref $_[0] eq 'HASH' ) ? $_[0] : {@_};
 
-  $param->{sizecheck} = 1 unless exists $param->{sizecheck};
-  $param->{sizecheck} = 0 if exists $param->{tells};
+    $param->{sizecheck} = 1 unless exists $param->{sizecheck};
+    $param->{sizecheck} = 0 if exists $param->{tells};
 
-  if ( $param->{fscheck} ) {
-    my @statbuf;
+    if ( $param->{fscheck} ) {
+        my @statbuf;
+        for my $f (@files) {
+            # stat has the handy property of chasing symlinks for us
+            my @devino = ( stat $f )[ 0, 1 ] or croak "could not stat: $!";
+            push @statbuf, \@devino;
+        }
+        if (    $statbuf[0][0] == $statbuf[1][0]
+            and $statbuf[0][1] == $statbuf[1][1] ) {
+            ${ $param->{reason} } = 'fscheck' if exists $param->{reason};
+            return 1;    # assume files identical as both dev and inode match
+        }
+    }
+
+    # The files are probably not identical if they differ in size;
+    # however, offer means to turn this check off if -s for some reason is
+    # incorrect (or if 'tells' is on so we need to find roughly where the
+    # difference is in the files).
+    if ( $param->{sizecheck}
+        and ( ( -s $files[0] ) // -1 ) != ( ( -s $files[1] ) // -2 ) ) {
+        ${ $param->{reason} } = 'size' if exists $param->{reason};
+        return 0;
+    }
+
+    my @fhs;
     for my $f (@files) {
-      # stat has the handy property of chasing symlinks for us
-      my @devino = ( stat $f )[ 0, 1 ] or croak "could not stat: $!";
-      push @statbuf, \@devino;
-    }
-    if (  $statbuf[0][0] == $statbuf[1][0]
-      and $statbuf[0][1] == $statbuf[1][1] ) {
-      ${ $param->{reason} } = 'fscheck' if exists $param->{reason};
-      return 1;    # assume files identical as both dev and inode match
-    }
-  }
-
-  # The files are probably not identical if they differ in size;
-  # however, offer means to turn this check off if -s for some reason is
-  # incorrect (or if 'tells' is on so we need to find roughly where the
-  # difference is in the files).
-  if ( $param->{sizecheck} and -s $files[0] != -s $files[1] ) {
-    ${ $param->{reason} } = 'size' if exists $param->{reason};
-    return 0;
-  }
-
-  my @fhs;
-  for my $f (@files) {
-    if ( !defined reftype $f) {
-      open my $fh, '<', $f or croak "could not open $f: $!";
-      push @fhs, $fh;
-    } else {
-      # Assume is a GLOB or something can readline on, XXX might want to
-      # better check this
-      push @fhs, $f;
-    }
-    if ( exists $param->{binmode} ) {
-      binmode $fhs[-1], $param->{binmode} or croak "binmode failed: $!";
-    }
-  }
-
-  local $/ = $param->{RS} if exists $param->{RS};
-
-  while (1) {
-    my $eof1 = eof $fhs[0];
-    my $eof2 = eof $fhs[1];
-    # Done if both files are at EOF; otherwise assume they differ if one
-    # completes before the other (this second case would normally be
-    # optimized away by the -s test, above).
-    last if $eof1 and $eof2;
-    if ( $eof1 xor $eof2 ) {
-      ${ $param->{reason} } = 'eof' if exists $param->{reason};
-      @{ $param->{tells} } = ( tell $fhs[0], tell $fhs[1] )
-        if exists $param->{tells};
-      return 0;
+        if ( !defined reftype $f) {
+            open my $fh, '<', $f or croak "could not open $f: $!";
+            push @fhs, $fh;
+        } else {
+            # Assume is a GLOB or something can readline on, XXX might want to
+            # better check this
+            push @fhs, $f;
+        }
+        if ( exists $param->{binmode} ) {
+            binmode $fhs[-1], $param->{binmode} or croak "binmode failed: $!";
+        }
     }
 
-    my $this = readline $fhs[0];
-    croak "error reading from first file: $!" if !defined $this;
-    my $that = readline $fhs[1];
-    croak "error reading from second file: $!" if !defined $that;
+    local $/ = $param->{RS} if exists $param->{RS};
 
-    if ( $this ne $that ) {
-      @{ $param->{tells} } = ( tell $fhs[0], tell $fhs[1] )
-        if exists $param->{tells};
-      ${ $param->{reason} } = 'diff' if exists $param->{reason};
-      return 0;
+    while (1) {
+        my $eof1 = eof $fhs[0];
+        my $eof2 = eof $fhs[1];
+        # Done if both files are at EOF; otherwise assume they differ if one
+        # completes before the other (this second case would normally be
+        # optimized away by the -s test, above).
+        last if $eof1 and $eof2;
+        if ( $eof1 xor $eof2 ) {
+            ${ $param->{reason} } = 'eof' if exists $param->{reason};
+            @{ $param->{tells} }  = ( tell $fhs[0], tell $fhs[1] )
+              if exists $param->{tells};
+            return 0;
+        }
+
+        my $this = readline $fhs[0];
+        croak "error reading from first file: $!" if !defined $this;
+        my $that = readline $fhs[1];
+        croak "error reading from second file: $!" if !defined $that;
+
+        if ( $this ne $that ) {
+            @{ $param->{tells} } = ( tell $fhs[0], tell $fhs[1] )
+              if exists $param->{tells};
+            ${ $param->{reason} } = 'diff' if exists $param->{reason};
+            return 0;
+        }
     }
-  }
 
-  return 1;    # assume files identical if get this far
+    return 1;    # assume files identical if get this far
 }
 
 1;
@@ -126,9 +127,9 @@ of two files are identical, in the spirit of the Unix L<cmp(1)> utility.
 A single subroutine, B<fcmp>, is offered for optional export. It expects
 at minimum two files or file handles, along with various optional
 parameters following those filenames. Any errors encountered will cause
-an exception to be thrown; consider C<eval> or L<Try::Tiny> to catch
-these. Otherwise, the return value will be true if the files are
-identical, false if not.
+an exception to be thrown; consider C<eval> or L<Syntax::Keyword::Try>
+to catch these. Otherwise, the return value will be true if the files
+are identical, false if not.
 
 Note that if passed a file handle, the code will read to the end of the
 handle, and will not rewind. This will require C<tell> and C<seek>
@@ -142,6 +143,8 @@ C<readline> calls are used on the filehandle. This means the usual "do
 not mix sys* and non-sys* calls on the same filehandle" advice applies
 for any passed filehandles. (See the C<sysread> function perldocs for
 details in L<perlfunc>.)
+
+=head2 fcmp
 
 Available parameters include:
 
@@ -215,7 +218,7 @@ Unix file system semantics for the C<fscheck> parameter.
 Newer versions of this module may be available from CPAN. If the bug is
 in the latest version, check:
 
-L<http://github.com/thrig/File-Cmp>
+L<https://thrig.me/src/File-Cmp.git>
 
 =head1 HISTORY
 
@@ -235,9 +238,9 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2015 by Jeremy Mates
+Copyright 2013 Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<https://opensource.org/licenses/BSD-3-Clause>
 
 =cut

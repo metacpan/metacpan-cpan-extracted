@@ -12,11 +12,11 @@ use Test::Most tests => 2;
 
 my $lilypond_path;
 for my $d ( split ':', $ENV{PATH} ) {
-  my $loc = File::Spec->catfile( $d, 'lilypond' );
-  if ( -x $loc ) {
-    $lilypond_path = $loc;
-    last;
-  }
+    my $loc = File::Spec->catfile( $d, 'lilypond' );
+    if ( -x $loc ) {
+        $lilypond_path = $loc;
+        last;
+    }
 }
 
 # XXX really need to parse `lilypond --version` to ensure using > 2.14
@@ -29,23 +29,23 @@ for my $d ( split ':', $ENV{PATH} ) {
 # versions of lilypond to PATH for various reasons)
 
 SKIP: {
-  skip "lilypond not installed", 2 unless defined $lilypond_path;
+    skip "lilypond not installed", 2 unless defined $lilypond_path;
 
-  diag
-    "NOTE ly-fu will fail if lilypond is ancient (but only if lilypond installed)";
+    diag
+      "NOTE ly-fu will fail if lilypond is ancient (but only if lilypond installed)";
 
-  my $test_prog = './ly-fu';
-  my $tc        = Test::Cmd->new(
-    interpreter => $^X,
-    prog        => $test_prog,
-    verbose     => 0,            # TODO is there a standard ENV to toggling?
-    workdir     => '',
-  );
-  $tc->run( args => '--layout --silent c' );
-  my $outfile = $tc->stdout;
-  chomp $outfile;
-  ok( -f $outfile, 'check that temp file generated' );
-  is( $tc->stderr, "", "ly-fu call emits no stderr" );
+    my $test_prog = './bin/ly-fu';
+    my $tc        = Test::Cmd->new(
+        interpreter => $^X,
+        prog        => $test_prog,
+        verbose     => 0,            # TODO is there a standard ENV to toggling?
+        workdir     => '',
+    );
+    $tc->run( args => '--layout --silent c' );
+    my $outfile = $tc->stdout;
+    chomp $outfile;
+    ok( -f $outfile, 'check that temp file generated' );
+    is( $tc->stderr, "", "ly-fu call emits no stderr" );
 }
 
 # XXX listen, verify something with ear and eye

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-16'; # DATE
+our $DATE = '2023-03-09'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/RPO/Checker/bpom_rpo_check_files",
@@ -41,7 +41,7 @@ bpom-rpo-check-files - Check document files
 
 =head1 VERSION
 
-This document describes version 0.006 of bpom-rpo-check-files (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-02-16.
+This document describes version 0.008 of bpom-rpo-check-files (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-09.
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,8 @@ Here's what it checks:
 - filename should not contain unsafe symbols
 - file must not be larger than 5MB
 - file must be readable
+- type of file must be PDF or image (JPG), other types will generate warnings
+- file's mime type and extension must match
 
 =head1 OPTIONS
 

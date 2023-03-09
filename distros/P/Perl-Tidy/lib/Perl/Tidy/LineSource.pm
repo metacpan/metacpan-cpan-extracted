@@ -9,7 +9,7 @@ package Perl::Tidy::LineSource;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20221112';
+our $VERSION = '20230309';
 
 use constant DEVEL_MODE => 0;
 
@@ -53,20 +53,14 @@ sub new {
     my $input_file = $args{input_file};
     my $rOpts      = $args{rOpts};
 
-    my $input_line_ending;
-    if ( $rOpts->{'preserve-line-endings'} ) {
-        $input_line_ending = Perl::Tidy::find_input_line_ending($input_file);
-    }
-
     ( my $fh, $input_file ) = Perl::Tidy::streamhandle( $input_file, 'r' );
     return unless $fh;
 
     return bless {
-        _fh                => $fh,
-        _filename          => $input_file,
-        _input_line_ending => $input_line_ending,
-        _rinput_buffer     => [],
-        _started           => 0,
+        _fh            => $fh,
+        _filename      => $input_file,
+        _rinput_buffer => [],
+        _started       => 0,
     }, $class;
 }
 

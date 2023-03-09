@@ -4,7 +4,7 @@ package WebService::GoogleAPI::Client::AuthStorage;
 
 # ABSTRACT: Role for classes which store your auth credentials
 
-our $VERSION = '0.26';    # VERSION
+our $VERSION = '0.27';    # VERSION
 
 use Moo::Role;
 use Carp;
@@ -22,10 +22,10 @@ has ua => is => 'rw', weak_ref => 1;
 
 
 requires qw/
-  scopes
-  refresh_access_token
-  get_access_token
-  /;
+    scopes
+    refresh_access_token
+    get_access_token
+    /;
 
 around get_access_token => sub {
   my ($orig, $self) = @_;
@@ -45,15 +45,12 @@ around get_access_token => sub {
 
 sub refresh_user_token {
   my ($self, $params) = @_;
-  my $tx =
-    $self->ua->post('https://www.googleapis.com/oauth2/v4/token' => form =>
-      { %$params, grant_type => 'refresh_token' });
+  my $tx = $self->ua->post(
+    'https://www.googleapis.com/oauth2/v4/token' => form => { %$params, grant_type => 'refresh_token' });
   my $new_token = $tx->res->json('/access_token');
   unless ($new_token) {
-    croak "Failed to refresh access token: ", join ' - ',
-      map $tx->res->json("/$_"), qw/error error_description/
-      if $tx->res->json;
-
+    croak "Failed to refresh access token: ", join ' - ', map $tx->res->json("/$_"), qw/error error_description/
+        if $tx->res->json;
     # if the error doesn't come from google
     croak "Unknown error refreshing access token";
   }
@@ -65,14 +62,11 @@ sub refresh_user_token {
 
 sub refresh_service_account_token {
   my ($self, $jwt) = @_;
-  my $tx = $self->ua->post(
-    'https://www.googleapis.com/oauth2/v4/token' => form => $jwt->as_form_data);
+  my $tx        = $self->ua->post('https://www.googleapis.com/oauth2/v4/token' => form => $jwt->as_form_data);
   my $new_token = $tx->res->json('/access_token');
   unless ($new_token) {
-    croak "Failed to get access token: ", join ' - ',
-      map $tx->res->json("/$_"), qw/error error_description/
-      if $tx->res->json;
-
+    croak "Failed to get access token: ", join ' - ', map $tx->res->json("/$_"), qw/error error_description/
+        if $tx->res->json;
     # if the error doesn't come from google
     croak "Unknown error getting access token";
   }
@@ -93,7 +87,7 @@ WebService::GoogleAPI::Client::AuthStorage - Role for classes which store your a
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -190,23 +184,13 @@ WebService::GoogleAPI::Client::AccessToken instance. If you choose to return suc
 
 =back
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Veesh Goldman <veesh@cpan.org>
 
-=item *
-
-Peter Scott <localshop@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Peter Scott and others.
+This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
 This is free software, licensed under:
 

@@ -91,11 +91,6 @@ complete( 'set password ', [] );
 
 complete( 'show p', [ qw{ password pretty prompt } ] );
 
-complete( 'spaceflight -', [ classic_retrieve_options( [
-		'all!' => 'retrieve all data',
-		'effective!' => 'include effective date',
-	    ] ) ] );
-
 complete( 'spacetrack -', [ qw{ --format --json --no-json } ] );
 
 complete( 'spacetrack i', [ qw{ inmarsat intelsat iridium } ] );
@@ -145,7 +140,6 @@ sub complete {
 		    import	=> 1,
 		    isa	=> 1,
 		    new	=> 1,
-		    spaceflight	=> 1,
 		}->{$_}
 		    and next;
 		push @core, $_;

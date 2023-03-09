@@ -6,25 +6,27 @@ use Mojo::UserAgent;
 use Mojo::JWT::Google;
 
 my $config = {
-    path => $ARGV[0] // '/Users/peter/Downloads/computerproscomau-b9f59b8ee34a.json',
-    scopes => $ARGV[1] //  'https://www.googleapis.com/auth/plus.business.manage https://www.googleapis.com/auth/compute'
+  path   => $ARGV[0] // '/Users/peter/Downloads/computerproscomau-b9f59b8ee34a.json',
+  scopes => $ARGV[1]
+      // 'https://www.googleapis.com/auth/plus.business.manage https://www.googleapis.com/auth/compute'
 };
 
-my $jwt = Mojo::JWT::Google->new( from_json => $config->{path}, scopes => [ split / /, $config->{scopes} ] );
+my $jwt = Mojo::JWT::Google->new(from_json => $config->{path}, scopes => [ split / /, $config->{scopes} ]);
 
-my $ua = Mojo::UserAgent->new(); 
+my $ua = Mojo::UserAgent->new();
 
-my $response = $ua->post('https://www.googleapis.com/oauth2/v4/token', form => { 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer', 
-     'assertion' =>  $jwt->encode }
-     ); 
+my $response = $ua->post(
+  'https://www.googleapis.com/oauth2/v4/token',
+  form => {
+    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+    'assertion'  => $jwt->encode
+  }
+);
 
-if ($response->res) 
-{
-    p $response->res->json;
-}
-else 
-{
-    warn $response->res->status, "\n";
+if ($response->res) {
+  p $response->res->json;
+} else {
+  warn $response->res->status, "\n";
 }
 
 exit;

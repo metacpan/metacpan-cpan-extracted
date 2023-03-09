@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/nferraz/perl-openai-api/issues
   repository: https://github.com/nferraz/perl-openai-api.git
-version: 0.22
+version: 0.24
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ sub add {
 	my ($self, $file, %attributes) = @_;
 	$attributes{font}->{size} ||= 30;
 	$attributes{font}->{line_height} ||= 23;
-	$attributes{h} ||= %attributes{font}->{line_height};
+	$attributes{h} ||= $attributes{font}->{line_height};
 	return $self->SUPER::add($file, %attributes);
 }
 

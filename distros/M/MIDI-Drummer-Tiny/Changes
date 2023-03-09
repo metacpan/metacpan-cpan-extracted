@@ -1,5 +1,21 @@
 Revision history for MIDI-Drummer
 
+0.4103 2023-03-09 06:23:20
+    - Negate a pattern before deciding to skip it.
+    - Do NOT set the chan_patch() in the pattern() method!
+
+0.4102 2023-03-08 16:34:23
+    - Improve the eg/patterns program.
+    - Improve examples in documentation.
+
+0.4101 2023-03-08 13:33:18
+    - Improve examples in documentation.
+
+0.4100 2023-03-08 12:26:32
+    - Add the euclidean() method.
+    - Improve documentation.
+    - Improve the eg/patterns program.
+
 0.4012 2022-11-25 14:00:33
     - Allow the patch to be set for the count_in() method.
     - Improve documentation.

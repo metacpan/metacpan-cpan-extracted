@@ -1,3 +1,17 @@
+0.008   2023-03-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add check: file must be pdf or jpg.
+
+        - Add check: file type and extension must match.
+
+
+0.007   2023-03-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Add check: warn links to same target.
+
+        - Allow spaces in filename.
+
+
 0.006   2023-02-16  Released-By: PERLANCAR; Urgency: medium
 
         - images must be *smaller* than 2300x2300, not smaller or equal to.

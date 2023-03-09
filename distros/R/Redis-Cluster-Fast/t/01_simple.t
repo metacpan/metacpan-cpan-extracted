@@ -42,4 +42,13 @@ $redis->del($to_latin1);
 $redis->set($to_utf8, 'unicode');
 is $redis->get($to_latin1), 'unicode', 'got value will be equal';
 
+eval {
+    Redis::Cluster::Fast->new(
+        startup_nodes => [
+            'localhost:1111corrupted'
+        ],
+    );
+};
+like $@, qr/^failed to add nodes: server port is incorrect/;
+
 done_testing;

@@ -1,27 +1,7 @@
 File::Cmp - compare two files character by character
 
-To install this module, use CPAN, for example:
+this module can be installed using cpanm:
 
-  cpan File::Cmp
+  cpanm File::Cmp
 
-The source tree is available at:
-
-http://github.com/thrig/File-Cmp
-
-This can be built and installed by running:
-
-  perl Makefile.PL
-  make
-  make test
-  make install
-
-Then the documentation may be read via:
-
-  perldoc File::Cmp
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2013-2015 by Jeremy Mates
-
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+run perldoc(1) on File::Cmp for documentation

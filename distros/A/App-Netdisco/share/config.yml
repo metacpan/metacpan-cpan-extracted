@@ -174,11 +174,11 @@ system_reports:
     label: 'Error Disabled Ports'
     category: Port
     columns:
-    - { ip: Device } 
-    - { dns: DNS } 
-    - { port: Port } 
-    - { name: Description } 
-    - { reason: Reason } 
+      - { ip: Device }
+      - { dns: DNS }
+      - { port: Port }
+      - { name: Description }
+      - { reason: Reason }
     query: |
       SELECT dp.ip, d.dns, dp.port, dp.name, properties.error_disable_cause AS reason
         FROM device_port dp
@@ -186,6 +186,55 @@ system_reports:
         LEFT JOIN device d USING (ip)
       WHERE properties.error_disable_cause IS NOT NULL
       ORDER BY dp.ip, dp.port
+  - tag: devicemultipleaddresses
+    label: 'Devices with Multiple Addresses'
+    category: Device
+    columns:
+      - { 'ip': 'Device IP', _searchable: true }
+      - { 'devname': 'Name' }
+      - { 'count': 'Addresses Count' }
+      - { 'contact': 'Contact' }
+      - { 'location': 'Location' }
+    query: |
+      SELECT ip, COALESCE(NULLIF(device.dns,''), NULLIF(name,''), '(none)') AS devname, count(alias), contact, location
+        FROM device_ip LEFT JOIN device USING (ip)
+        GROUP BY ip, devname, contact, location
+        HAVING count(alias) > 1
+        ORDER BY count(alias) DESC, devname ASC
+  - tag: devicesharedaddresses
+    label: 'IPs on Multiple Devices'
+    category: Device
+    columns:
+      - { 'alias': 'Interface IP', _searchable: true }
+      - { 'count': 'Instance Count' }
+    query: |
+      SELECT alias, count(ip)
+        FROM device_ip
+        WHERE alias != '127.0.0.1'
+        GROUP BY alias
+        HAVING count(ip) > 1
+        ORDER BY count(ip) DESC, alias ASC
+  - tag: recentlyaddeddevices
+    category: Device
+    label: 'Recently Added Devices'
+    columns:
+      - { ip: 'Device IP', _searchable: true }
+      - { devname: 'Name' }
+      - { model: 'Model' }
+      - { vendor: 'Vendor' }
+      - { creation: 'Date Added' }
+      - { os: 'Operating System' }
+      - { os_ver: 'OS Version' }
+      - { location: 'Location' }
+      - { contact: 'Contact' }
+      - { serial: 'Serial' }
+    bind_params: ['since']
+    query: |
+      SELECT ip, COALESCE(NULLIF(dns,''), NULLIF(name,''), '') AS devname,
+          model, vendor, creation, os, os_ver, location, contact, serial
+        FROM device
+        WHERE creation > (LOCALTIMESTAMP - COALESCE(NULLIF(?,''), '2 months')::interval)
+        ORDER BY creation DESC
 table_pagesize: 10
 table_showrecordsmenu:
   - [10, 25, 50, 100, '-1']
@@ -288,6 +337,7 @@ nonincreasing: false
 snmpver: 3
 snmptimeout: 3000000
 snmpretries: 2
+net_snmp_options: {}
 snmp_remoteport: {}
 snmp_field_protection:
   device:

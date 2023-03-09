@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-# Play Christoffel word sets.
+# Play Euclidean word sets.
 
 use Data::Dumper::Compact qw(ddc);
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny Music-CreatingRhythms); # local author libs
@@ -17,7 +17,7 @@ my $loops = shift || 8; # times to loop
 my $mcr = Music::CreatingRhythms->new;
 
 my $d = MIDI::Drummer::Tiny->new(
-   file   => 'play-euclid-set.mid',
+   file   => 'play-set.mid',
    bpm    => 90,
    volume => 100,
    bars   => $loops,

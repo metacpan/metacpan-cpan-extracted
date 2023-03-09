@@ -1,3 +1,6 @@
+0.160		2023-03-09	T. R. Wyant
+    Remove spaceflight() and all supporting code.
+
 0.159		2022-12-21	T. R. Wyant
     Add Celestrak supplemental catalog ast (AST Space Mobile). This is
     currently only Bluewalker 3, but I assume the Bluebirds will go here

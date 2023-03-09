@@ -1,5 +1,5 @@
 package Crypt::Passphrase::SHA1::Hex;
-$Crypt::Passphrase::SHA1::Hex::VERSION = '0.007';
+$Crypt::Passphrase::SHA1::Hex::VERSION = '0.009';
 use parent 'Crypt::Passphrase::Validator';
 
 use Digest::SHA 'sha1_hex';
@@ -35,17 +35,17 @@ Crypt::Passphrase::SHA1::Hex - Validate against hexed SHA1 hashes with Crypt::Pa
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 DESCRIPTION
 
-This module implements a validator
+This module implements a validator for hex-encoded SHA-1 hashes.
 
 =head1 METHODS
 
 =head2 new()
 
-This creates a new SHA1 validator. It takes no arguments.
+This creates a new SHA-1 validator. It takes no arguments.
 
 =head2 accepts_hash($hash)
 

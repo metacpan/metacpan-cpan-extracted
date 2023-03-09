@@ -17,9 +17,9 @@ has ordered => (is => 'rw', default => sub{1});
 use namespace::autoclean;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-16'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertExecsList'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -55,7 +55,7 @@ sub _insert_execs_list {
     join(
         "",
         "=over\n\n",
-        (map {"=item ".($self->ordered ? ($_+1).".":"*")." $list[$_]\n\n"} 0..$#list),
+        (map {"=item ".($self->ordered ? ($_+1).".":"*")." L<$list[$_]>\n\n"} 0..$#list),
         "=back\n\n",
     );
 }
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::InsertExecsList - Insert a POD containing a list of scripts
 
 =head1 VERSION
 
-This document describes version 0.030 of Dist::Zilla::Plugin::InsertExecsList (from Perl distribution Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-16.
+This document describes version 0.031 of Dist::Zilla::Plugin::InsertExecsList (from Perl distribution Dist-Zilla-Plugin-InsertExecsList), released on 2023-02-18.
 
 =head1 SYNOPSIS
 

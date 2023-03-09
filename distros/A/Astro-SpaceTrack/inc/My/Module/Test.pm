@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -200,10 +200,6 @@ sub not_defined {
 	    'rod.sladen'	=> {
 		url	=> 'http://www.rod.sladen.org.uk/iridium.htm',
 	    },
-	    'spaceflight.nasa.gov'	=> {
-		# url	=> 'http://spaceflight.nasa.gov',
-		url	=> 'https://spaceflight.nasa.gov/realdata/elements/index.html'
-	    },
 	    'www.amsat.org'	=> {
 		url	=> 'https://www.amsat.org/',
 	    },
@@ -211,10 +207,6 @@ sub not_defined {
 		url	=> 'https://www.space-track.org/',
 		check	=> \&__spacetrack_skip,
 	    }
-	);
-
-	%skip_site = (
-	    'spaceflight.nasa.gov'	=> 'Site retired',
 	);
 
 	if ( defined $ENV{ASTRO_SPACETRACK_SKIP_SITE} ) {
@@ -270,7 +262,6 @@ sub not_defined {
 	    ssl_opts	=> { verify_hostname => VERIFY_HOSTNAME },
 	);
 	my $rslt = $ua->get( $url );
-	Astro::SpaceTrack::__tweak_response( $rslt );
 	$rslt->is_success()
 	    or return ( $skip_site{$site} =
 		"$site not available: " . $rslt->status_line() );
@@ -552,8 +543,8 @@ defined. The second argument is the test name.
 
 =head2 set_skip
 
- set_skip 'spaceflight.nasa.gov';
- set_skip 'spaceflight.nasa.gov', 'Manually skipping';
+ set_skip 'celestrak.org';
+ set_skip 'celestrak.org', 'Manually skipping';
 
 This subroutine sets or clears the skip indicator for the given site.
 The first argument is the site name, which must appear on the list
@@ -562,7 +553,7 @@ and represents the skip message, if any.
 
 =head2 site_check
 
- site_check 'spaceflight.nasa.gov', 'celestrak.org';
+ site_check 'www.amsat.org', 'celestrak.org';
 
 This subroutine tests a preselected URL on the given sites, and sets the
 skip indicator appropriately. Allowed site names are:
@@ -570,7 +561,6 @@ skip indicator appropriately. Allowed site names are:
  celestrak.org
  mike.mccants
  rod.sladen
- spaceflight.nasa.gov
  www.amsat.org
  www.space-track.org
 
@@ -612,7 +602,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2022 by Thomas R. Wyant, III
+Copyright (C) 2014-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

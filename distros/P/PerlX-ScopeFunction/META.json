@@ -1,0 +1,50 @@
+{
+   "abstract" : "- new keywords for creating scopes.",
+   "author" : [
+      "Kang-min Liu  C<< <gugod@gugod.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlX-ScopeFunction",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.029"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Keyword::Simple" : "0",
+            "Text::Balanced" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Harness" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PerlX::ScopeFunction" : {
+         "file" : "lib/PerlX/ScopeFunction.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_spdx_expression" : "MIT"
+}

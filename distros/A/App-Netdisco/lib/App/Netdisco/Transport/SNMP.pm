@@ -94,13 +94,17 @@ Returns C<undef> if the connection fails.
 sub test_connection {
   my ($class, $ip) = @_;
   my $addr = NetAddr::IP::Lite->new($ip) or return undef;
+
   # avoid renumbering to localhost loopbacks
   return undef if $addr->addr eq '0.0.0.0'
                   or check_acl_no($addr->addr, 'group:__LOOPBACK_ADDRESSES__');
+
   my $device = schema(vars->{'tenant'})->resultset('Device')
     ->new_result({ ip => $addr->addr }) or return undef;
+
   my $readers = $class->instance->readers or return undef;
   return $readers->{$device->ip} if exists $readers->{$device->ip};
+
   debug sprintf 'snmp reader cache warm: [%s]', $device->ip;
   return ($readers->{$device->ip} = _snmp_connect_generic('read', $device));
 }
@@ -167,11 +171,25 @@ sub _snmp_connect_generic {
   }
 
   # support for offline cache
-  if ($device->is_pseudo) {
-    my $pseudo_cache = catfile( catdir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'logs', 'snapshots'), $device->ip );
+  my $pseudo_cache = catfile( catdir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'logs', 'snapshots'), $device->ip );
+  if (-f $pseudo_cache and ($device->is_pseudo or ! $device->in_storage)) {
     $snmp_args{Cache} = thaw( decode_base64( read_text($pseudo_cache) ) );
     $snmp_args{Offline} = 1;
+    # support pseudo/offline device renumber and also pseudo device autovivification
+    $device->set_column(is_pseudo => \'true') if ! $device->is_pseudo;
     debug sprintf 'snmp transport running in offline mode for: [%s]', $device->ip;
+  }
+
+  # any net-snmp options to add or override
+  foreach my $k (keys %{ setting('net_snmp_options') }) {
+    $snmp_args{ $k } = setting('net_snmp_options')->{ $k };
+  }
+
+  if (scalar keys %{ setting('net_snmp_options') }) {
+    foreach my $k (sort keys %snmp_args) {
+        next if $k eq 'MibDirs';
+        debug sprintf 'snmp transport conf: %s => %s', $k, $snmp_args{ $k };
+    }
   }
 
   # get the community string(s)

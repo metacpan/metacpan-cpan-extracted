@@ -2,9 +2,11 @@
 ##
 ##  testsyms -- test for function/variable symbols
 ##
+##  The symbols for which we test are listed in the file 'list.syms'
+##
 ##  Set the environment variable CURSES_VERBOSE to see the details of the
 ##  testing.
-
+##
 ##  Copyright (c) 1994-2000  William Setzer
 ##
 ##  You may distribute under the terms of either the Artistic License
@@ -27,13 +29,31 @@ my $verbose;
 
 sub makeCompileCommand($) {
     my ($compileR) = @_;
+#-----------------------------------------------------------------------------
+#  A template for a compile command that can test for existence of some
+#  symbol in this system's Curses library.
+#
+#  The template is a shell command containing some variables
+#  to be substituted to make a real executable command.
+#
+#  Those variables are:
+#
+#     _C_SYM   Value for -DSYM option, e.g. "addstr" to get
+#              -DSYM=addstr in the command.
+#
+#     _C_FILE  base of name of file to compile and executable output file
+#              e.g. "foo" to compile "foo.c" into "foo"
+#
+#  Some of the compile command is determined by environment variables:
+#
+#     CC, INC, CCFLAGS, LDLOADLIBS, LDDLFLAGS
+#
+#-----------------------------------------------------------------------------
+    my $compile;
 
-    #  Get a compile command so we can test for curses symbols.
-    # (There has got to be an easier way.  Blech.)
-    #
-
-    my $compile = '#CC# #DEFS# #INCS# #CFLAGS# #FILE# #LFLAGS# #LIBS#' .
+    $compile = '#CC# #DEFS# #INCS# #CFLAGS# #FILE# #LFLAGS# #LIBS#' .
         ($verbose ? '' : '#NULL#');
+        # Initial value
 
     my $cc         = $ENV{'CC'};
     my $inc        = $ENV{'INC'};
@@ -105,7 +125,7 @@ sub completeCompileCmd($$$$) {
 #-----------------------------------------------------------------------------
 #  The complete ready-to-execute compile command.
 #
-#  $compile is a template for the compile command, with some variables in it
+#  $template is a template for the compile command, with some variables in it
 #  that need to be replaced based on the values of $sym, $args, and $file.
 # -----------------------------------------------------------------------------
     my $retval;
@@ -159,15 +179,32 @@ my %tstfile = qw( E  testsym
 
 
 sub testCompile($$$$$$) {
-    my ($action, $sym, $args, $compile, $logFh, $compFailedR) = @_;
-
+    my ($action, $sym, $args, $compileCmdTemplate, $logFh, $compFailedR) = @_;
+#-----------------------------------------------------------------------------
+#  Do a test compile to determine if symbol $sym exists in this system's
+#  Curses library.
+#
+#  Use the compile command template $compileCmdTemplate to do this,
+#  filling in variables _C_SYM and _C_FILE in this template appropriately.
+#
+#  The source file we compile is that given my %tstfile for the action
+#  $action.
+#
+#  The symbol for which we test is $sym, with $args appended if $args
+#  is defined.
+#
+#  Return $$compFailedR true iff the compile failed.  Note that we don't
+#  supply any information as to how it failed; caller must simply assume
+#  that it failed because the symbol is not defined in this system's
+#  Curses library.
+#-----------------------------------------------------------------------------
     my $file  = $tstfile{$action};
 
     unless (defined $sym and defined $file) {
         warn "WARNING: internal error on symbol $_\n";
     }
 
-    my $cmd = completeCompileCmd($compile, $sym, $args, $file);
+    my $cmd = completeCompileCmd($compileCmdTemplate, $sym, $args, $file);
 
     print $logFh $cmd, "\n"      if $verbose;
 
@@ -290,12 +327,13 @@ while (<$listSymsFh>) {
         warn "WARNING: internal error on symbol $_\n";
     }
 
+    my $pad1 = length($c_sym)   < 24 ? " " x (24 - length($c_sym))   : "";
+    my $pad2 = length($comment) < 42 ? " " x (42 - length($comment)) : "";
+
     print $cursesDefFh
         $compFailed ? "#undef  " : "#define ",
-        $c_sym,   " " x (24 - length $c_sym),
-        "/* ",
-        $comment, " " x (42 - length $comment),
-        "*/\n";
+        $c_sym, $pad1, "/* ", $comment, $pad2, "*/",
+        "\n";
 }
 
 unlink "testsym";

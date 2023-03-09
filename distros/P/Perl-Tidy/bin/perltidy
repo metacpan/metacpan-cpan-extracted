@@ -35,8 +35,12 @@ perltidy - a perl script indenter and reformatter
 
 =head1 DESCRIPTION
 
-Perltidy reads a perl script and writes an indented, reformatted script.
-This document describes the parameters available for controlling this formatting.
+Perltidy reads a perl script and writes an indented, reformatted script.  The
+formatting process involves converting the script into a string of tokens,
+removing any non-essential whitespace, and then rewriting the string of tokens
+with whitespace using whatever rules are specified, or defaults.  This happens
+in a series of operations which can be controlled with the parameters described
+in this document.
 
 Perltidy is a commandline frontend to the module Perl::Tidy.  For documentation
 describing how to call the Perl::Tidy module from other applications see the
@@ -399,45 +403,6 @@ other words that the input code is 'untidy' according to the formatting
 parameters.  If this is not the case, an error message noting this is produced.
 This flag has no other effect on the functioning of perltidy.
 
-=item B<-sal=s>,   B<--sub-alias-list=s>
-
-This flag causes one or more words to be treated the same as if they were the keyword 'sub'.  The string B<s> contains one or more alias words, separated by spaces or commas.
-
-For example,
-
-        perltidy -sal='method fun _sub M4'
-
-will cause the perltidy to treat the words 'method', 'fun', '_sub' and 'M4' the same as if they were 'sub'.  Note that if the alias words are separated by spaces then the string of words should be placed in quotes.
-
-Note that several other parameters accept a list of keywords, including 'sub' (see L<"Specifying Block Types">).
-You do not need to include any sub aliases in these lists. Just include keyword 'sub' if you wish, and all aliases are automatically included.
-
-=item B<-gal=s>,   B<--grep-alias-list=s>
-
-This flag allows a code block following an external 'list operator' function to be formatted as if it followed one of the built-in keywords B<grep>,  B<map> or B<sort>.  The string B<s> contains the names of one or more such list operators, separated by spaces or commas.
-
-By 'list operator' is meant a function which is invoked in the form
-
-      word {BLOCK} @list
-
-Perltidy tries to keep code blocks for these functions intact, since they are usually short, and does not automatically break after the closing brace since a list may follow. It also does some special handling of continuation indentation.
-
-For example, the code block arguments to functions 'My_grep' and 'My_map' can be given formatting like 'grep' with
-
-        perltidy -gal='My_grep My_map'
-
-By default, the following list operators in List::Util are automatically included:
-
-      all any first none notall reduce reductions
-
-Any operators specified with B<--grep-alias-list> are added to this list.
-The next parameter can be used to remove words from this default list.
-
-=item B<-gaxl=s>,   B<--grep-alias-exclusion-list=s>
-
-The B<-gaxl=s> flag provides a method for removing any of the default list operators given above
-by listing them in the string B<s>.  To remove all of the default operators use B<-gaxl='*'>.
-
 =back
 
 =head1 FORMATTING OPTIONS
@@ -570,29 +535,6 @@ indentation spaces as for the output stream (any other assumption would lead to
 unstable editing).
 
 =back
-
-=item B<-xs>,   B<--extended-syntax>
-
-A problem with formatting Perl code is that some modules can introduce new
-syntax.  This flag allows perltidy to handle certain common extensions
-to the standard syntax without complaint.
-
-For example, without this flag a structure such as the following would generate
-a syntax error and the braces would not be balanced:
-
-    method deposit( Num $amount) {
-        $self->balance( $self->balance + $amount );
-    }
-
-For one of the extensions, module Switch::Plain, colons are marked as labels.
-If you use this module, you may want to also use the B<--nooutdent-labels> flag
-to prevent lines such as 'default:' from being outdented.
-
-This flag is enabled by default but it can be deactivated with B<-nxs>.
-Probably the only reason to deactivate this flag is to generate more diagnostic
-messages when debugging a script.
-
-For another method of handling extended syntax see the section L<"Skipping Selected Sections of Code">.
 
 =item B<-io>,   B<--indent-only>
 
@@ -1532,7 +1474,7 @@ B<-sfp>  or B<--space-function-paren>
 
 You will probably also want to use the flag B<-skp> (previous item) too.
 
-The reason this is not recommended is that spacing a function paren can make a
+The parameter is not recommended because spacing a function paren can make a
 program vulnerable to parsing problems by Perl.  For example, the following
 two-line program will run as written but will have a syntax error if
 reformatted with -sfp:
@@ -2407,7 +2349,7 @@ following set of parameters could be used:
   perltidy -ce -cbl='else elsif continue' -cblx
 
 
-=item B<-cbo=n>,   B<--cuddled-break-option=n>
+=item B<-cbo=n>, B<--cuddled-break-option=n>
 
 Cuddled formatting is only possible between a pair of code blocks if the
 closing brace of the first block starts a new line. If a block is encountered
@@ -2778,7 +2720,7 @@ must either (1) be adjacent as in the above example, or (2) have an anonymous
 sub declaration following an outer opening container symbol which is not a
 code block brace, or (3) have an outer opening paren separated from the inner
 opening symbol by any single non-container symbol or something that looks like
-a function evaluation, as illustrated in the next examples. An additonal
+a function evaluation, as illustrated in the next examples. An additional
 option (4) which can be turned on with the flag B<--weld-fat-comma> is when the opening container symbols are separated by a hash key and fat comma (=>).
 
 Any container symbol may serve as both the inner container of one pair and as
@@ -2893,7 +2835,7 @@ last represents a quoted list.  For example the string
 
   -wnxl='[ { q'
 
-means do B<NOT> include square-bracets, braces, or quotes in any welds.  The only unspecified
+means do B<NOT> include square-brackets, braces, or quotes in any welds.  The only unspecified
 container is '(', so this string means that only welds involving parens will be made.
 
 To illustrate, following welded snippet consists of a chain of three welded
@@ -3432,14 +3374,12 @@ tables in the file must already be nicely formatted.
 
 =item B<-mft=n>,  B<--maximum-fields-per-table=n>
 
-If the computed number of fields for any table exceeds B<n>, then it
-will be reduced to B<n>.  The default value for B<n> is a large number,
-40.  While this value should probably be left unchanged as a general
-rule, it might be used on a small section of code to force a list to
-have a particular number of fields per line, and then either the B<-boc>
-flag could be used to retain this formatting, or a single comment could
-be introduced somewhere to freeze the formatting in future applications
-of perltidy.
+If B<n> is a positive number, and the computed number of fields for any table
+exceeds B<n>, then it will be reduced to B<n>.  This parameter might be used on
+a small section of code to force a list to have a particular number of fields
+per line, and then either the B<-boc> flag could be used to retain this
+formatting, or a single comment could be introduced somewhere to freeze the
+formatting in future applications of perltidy. For example
 
     # perltidy -mft=2
     @month_of_year = (
@@ -3450,6 +3390,9 @@ of perltidy.
         'Sep', 'Oct',
         'Nov', 'Dec'
     );
+
+The default value is B<n=0>, which does not place a limit on the
+number of fields in a table.
 
 =item B<-cab=n>,  B<--comma-arrow-breakpoints=n>
 
@@ -3673,7 +3616,7 @@ can be useful on a temporary basis for reformatting a script.
 If the closing tokens of two nested containers are separated by a comma, then
 welding requested with B<--weld-nested-containers> cannot occur.  Any commas in
 this situation are optional trailing commas and can be removed with B<-dwic>.
-For example, a comma in this scipt prevents welding:
+For example, a comma in this script prevents welding:
 
     # perltidy -wn
     skip_symbols(
@@ -4387,9 +4330,9 @@ B<-nst> and/or B<-nse> after the -pbp parameter.
 
 Also note that the value of continuation indentation, -ci=4, is equal to the
 value of the full indentation, -i=4.  It is recommended that the either (1) the
-parameter B<-ci=2> be used instead, or the flag B<-xci> be set.  This will help
-show structure, particularly when there are ternary statements. The following
-snippet illustrates these options.
+parameter B<-ci=2> be used instead, or (2) the flag B<-xci> be set.  This will
+help show structure, particularly when there are ternary statements. The
+following snippet illustrates these options.
 
     # perltidy -pbp
     $self->{_text} = (
@@ -4429,39 +4372,92 @@ snippet illustrates these options.
 The B<-xci> flag was developed after the B<-pbp> parameters were published so you need
 to include it separately.
 
-=item B<One-line blocks>
+=back
 
-There are a few points to note regarding one-line blocks.  A one-line
-block is something like this,
+=head2 One-Line Blocks
+
+A one-line block is a block of code where the contents within the curly braces
+is short enough to fit on a single line. For example,
 
     if ( -e $file ) { print "'$file' exists\n" }
 
-where the contents within the curly braces is short enough to fit
-on a single line.
+The alternative, a block which spans multiple lines, is said to be a broken
+block.  With few exceptions, perltidy retains existing one-line blocks, if it
+is possible within the line-length constraint, but it does not attempt to form
+new ones.  In other words, perltidy will try to follow the input file regarding
+broken and unbroken blocks.
 
-With few exceptions, perltidy retains existing one-line blocks, if it
-is possible within the line-length constraint, but it does not attempt
-to form new ones.  In other words, perltidy will try to follow the
-one-line block style of the input file.
+The main exception to this rule is that perltidy will attempt to form new
+one-line blocks following the keywords C<map>, C<eval>, and C<sort>, C<eval>,
+because these code blocks are often small and most clearly displayed in a
+single line. This behavior can be controlled with the flag
+B<--one-line-block-exclusion-list> described below.
 
-If an existing one-line block is longer than the maximum line length,
-however, it will be broken into multiple lines.  When this happens, perltidy
-checks for and adds any optional terminating semicolon (unless the B<-nasc>
-option is used) if the block is a code block.
+When the B<cuddled-else> style is used, the default treatment of one-line blocks
+may interfere with the cuddled style.  In this case, the default behavior may 
+be changed with the flag B<--cuddled-break-option=n> described elsehwere.
 
-The main exception is that perltidy will attempt to form new one-line
-blocks following the keywords C<map>, C<eval>, and C<sort>, because
-these code blocks are often small and most clearly displayed in a single
-line.
+When an existing one-line block is longer than the maximum line length, and
+must therefore be broken into multiple lines, perltidy checks for and adds any
+optional terminating semicolon (unless the B<-nasc> option is used) if the
+block is a code block.
 
-One-line block rules can conflict with the cuddled-else option.  When
-the cuddled-else option is used, perltidy retains existing one-line
-blocks, even if they do not obey cuddled-else formatting.
+=over 4
 
-Occasionally, when one-line blocks get broken because they exceed the
-available line length, the formatting will violate the requested brace style.
-If this happens, reformatting the script a second time should correct
-the problem.
+=item B<-olbxl=s>, B<--one-line-block-exclusion-list=s>
+
+As noted above, perltidy will, by default, attempt to create new one-line
+blocks for certain block types.  This flag allows the user to prevent this behavior for the block types listed in the string B<s>.  The list B<s> may
+include any of the words C<sort>, C<map>, C<grep>, C<eval>,  or it may be C<*>
+to indicate all of these.
+
+So for example to prevent multi-line B<eval> blocks from becoming one-line
+blocks, the command would be B<-olbxl='eval'>.  In this case, existing one-line B<eval> blocks will remain on one-line if possible, and existing multi-line
+B<eval> blocks will remain multi-line blocks.
+
+=item B<-olbn=n>, B<--one-line-block-nesting=n>
+
+Nested one-line blocks are lines with code blocks which themselves contain code
+blocks.  For example, the following line is a nested one-line block.
+
+         foreach (@list) { if ($_ eq $asked_for) { last } ++$found }
+
+The default behavior is to break such lines into multiple lines, but this
+behavior can be controlled with this flag.  The values of n are:
+
+  n=0 break nested one-line blocks into multiple lines [DEFAULT]
+  n=1 stable: keep existing nested-one line blocks intact
+
+For the above example, the default formatting (B<-olbn=0>) is
+
+    foreach (@list) {
+        if ( $_ eq $asked_for ) { last }
+        ++$found;
+    }
+
+If the parameter B<-olbn=1> is given, then the line will be left intact if it
+is a single line in the source, or it will be broken into multiple lines if it
+is broken in multiple lines in the source.
+
+=item B<-olbs=n>, B<--one-line-block-semicolons=n>
+
+This flag controls the placement of semicolons at the end of one-line blocks.
+Semicolons are optional before a closing block brace, and frequently they are
+omitted at the end of a one-line block containing just a single statement.
+By default, perltidy follows the input file regarding these semicolons,
+but this behavior can be controlled by this flag.  The values of n are:
+
+  n=0 remove terminal semicolons in one-line blocks having a single statement
+  n=1 stable; keep input file placement of terminal semicolons [DEFAULT ]
+  n=2 add terminal semicolons in all one-line blocks
+
+Note that the B<n=2> option has no effect if adding semicolons is prohibited
+with the B<-nasc> flag.  Also not that while B<n=2> adds missing semicolons to
+all one-line blocks, regardless of complexity, the B<n=0> option only removes
+ending semicolons which terminate one-line blocks containing just one
+semicolon.  So these two options are not exact inverses.
+
+=item B<Forming new one-line blocks>
 
 Sometimes it might be desirable to convert a script to have one-line blocks
 whenever possible.  Although there is currently no flag for this, a simple
@@ -4490,51 +4486,20 @@ the result is
 
 This shows that blocks with a single statement become one-line blocks.
 
-=item B<-olbs=n>, B<--one-line-block-semicolons=n>
+=item B<Breaking existing one-line blocks>
 
-This flag controls the placement of semicolons at the end of one-line blocks.
-Semicolons are optional before a closing block brace, and frequently they are
-omitted at the end of a one-line block containing just a single statement.
-By default, perltidy follows the input file regarding these semicolons,
-but this behavior can be controlled by this flag.  The values of n are:
+There is no automatic way to break existing long one-line blocks into multiple
+lines, but this can be accomplished by processing a script, or section of a
+script, with a short value of the parameter B<maximum-line-length=n>.  Then,
+when the script is reformatted again with the normal parameters, the blocks
+which were broken will remain broken (with the exceptions noted above).
 
-  n=0 remove terminal semicolons in one-line blocks having a single statement
-  n=1 stable; keep input file placement of terminal semicolons [DEFAULT ]
-  n=2 add terminal semicolons in all one-line blocks
-
-Note that the B<n=2> option has no effect if adding semicolons is prohibited
-with the B<-nasc> flag.  Also not that while B<n=2> adds missing semicolons to
-all one-line blocks, regardless of complexity, the B<n=0> option only removes
-ending semicolons which terminate one-line blocks containing just one
-semicolon.  So these two options are not exact inverses.
-
-=item B<-olbn=n>, B<--one-line-block-nesting=n>
-
-Nested one-line blocks are lines with code blocks which themselves contain code
-blocks.  For example, the following line is a nested one-line block.
-
-         foreach (@list) { if ($_ eq $asked_for) { last } ++$found }
-
-The default behavior is to break such lines into multiple lines, but this
-behavior can be controlled with this flag.  The values of n are:
-
-  n=0 break nested one-line blocks into multiple lines [DEFAULT]
-  n=1 stable: keep existing nested-one line blocks intact
-
-For the above example, the default formatting (B<-olbn=0>) is
-
-    foreach (@list) {
-        if ( $_ eq $asked_for ) { last }
-        ++$found;
-    }
-
-If the parameter B<-olbn=1> is given, then the line will be left intact if it
-is a single line in the source, or it will be broken into multiple lines if it
-is broken in multiple lines in the source.
-
+Another trick for doing this for certain block types is to format one time with
+the B<-cuddled-else> flag and B<--cuddled-break-option=2>. Then format again
+with the normal parameters.  This will break any one-line blocks which are
+involved in a cuddled-else style.
 
 =back
-
 
 =head2 Controlling Vertical Alignment
 
@@ -4680,6 +4645,82 @@ alignment cannot be made for some reason.
 
 But also notice that side comments remain aligned because their alignment is
 controlled separately with the parameter B<--valign-side_comments> described above.
+
+=back
+
+=head2 Extended Syntax
+
+This section describes some parameters for dealing with extended syntax.
+
+For another method of handling extended syntax see the section L<"Skipping Selected Sections of Code">.
+
+Also note that the module F<Perl::Tidy> supplies a pre-filter and post-filter capability. This requires calling the module from a separate program rather than through the binary F<perltidy>. 
+
+=over 4
+
+=item B<-xs>,   B<--extended-syntax>
+
+This flag allows perltidy to handle certain common extensions
+to the standard syntax without complaint.
+
+For example, without this flag a structure such as the following would generate
+a syntax error:
+
+    Method deposit( Num $amount) {
+        $self->balance( $self->balance + $amount );
+    }
+
+This flag is enabled by default but it can be deactivated with B<-nxs>.
+Probably the only reason to deactivate this flag is to generate more diagnostic
+messages when debugging a script.
+
+=item B<-sal=s>,   B<--sub-alias-list=s>
+
+This flag causes one or more words to be treated the same as if they were the keyword B<sub>.  The string B<s> contains one or more alias words, separated by spaces or commas.
+
+For example,
+
+        perltidy -sal='method fun _sub M4'
+
+will cause the perltidy to treat the words 'method', 'fun', '_sub' and 'M4' the same as if they were 'sub'.  Note that if the alias words are separated by spaces then the string of words should be placed in quotes.
+
+Note that several other parameters accept a list of keywords, including 'sub' (see L<"Specifying Block Types">).
+You do not need to include any sub aliases in these lists. Just include keyword 'sub' if you wish, and all aliases are automatically included.
+
+=item B<-gal=s>,   B<--grep-alias-list=s>
+
+This flag allows a code block following an external 'list operator' function to be formatted as if it followed one of the built-in keywords B<grep>,  B<map> or B<sort>.  The string B<s> contains the names of one or more such list operators, separated by spaces or commas.
+
+By 'list operator' is meant a function which is invoked in the form
+
+      word {BLOCK} @list
+
+Perltidy tries to keep code blocks for these functions intact, since they are usually short, and does not automatically break after the closing brace since a list may follow. It also does some special handling of continuation indentation.
+
+For example, the code block arguments to functions 'My_grep' and 'My_map' can be given formatting like 'grep' with
+
+        perltidy -gal='My_grep My_map'
+
+By default, the following list operators in List::Util are automatically included:
+
+      all any first none notall reduce reductions
+
+Any operators specified with B<--grep-alias-list> are added to this list.
+The next parameter can be used to remove words from this default list.
+
+=item B<-gaxl=s>,   B<--grep-alias-exclusion-list=s>
+
+The B<-gaxl=s> flag provides a method for removing any of the default list operators given above
+by listing them in the string B<s>.  To remove all of the default operators use B<-gaxl='*'>.
+
+=item B<-uf=s>,   B<--use-feature=s>
+
+This flag tells perltidy to allow the syntax associated a pragma in string
+B<s>. Currently only the recognized values for the string are B<s='class'> or
+string B<s=' '>.  The default is B<--use-feature='class'>.  This enables
+perltidy to recognized the special words B<class>, B<method>, B<field>, and
+B<ADJUST>.  If this causes a conflict with other uses of these words, the
+default can be turned off with B<--use-feature=' '>.
 
 =back
 
@@ -4992,6 +5033,97 @@ to avoid causing problems with scripts which have extended syntaxes.
 
 B<-DEBUG>  will write a file with extension F<.DEBUG> for each input file
 showing the tokenization of all lines of code.
+
+=item B<Making a table of information on code blocks>
+
+A table listing information about the blocks of code in a file can be made with
+B<--dump-block-summary>, or B<-dbs>.  This causes perltidy to read and parse
+the file, write a table of comma-separated values for selected code blocks to
+the standard output, and then exit.  This parameter must be on the command
+line, not in a F<.perlticyrc> file, and it requires a single file name on the
+command line.  For example
+
+   perltidy -dbs somefile.pl >blocks.csv
+
+produces an output file F<blocks.csv> whose lines hold these
+parameters:
+
+    filename     - the name of the file
+    line         - the line number of the opening brace of this block
+    line_count   - the number of lines between opening and closing braces
+    code_lines   - the number of lines excluding blanks, comments, and pod
+    type         - the block type (sub, for, foreach, ...)
+    name         - the block name if applicable (sub name, label, asub name)
+    depth        - the nesting depth of the opening block brace
+    max_change   - the change in depth to the most deeply nested code block
+    block_count  - the total number of code blocks nested in this block
+    mccabe_count - the McCabe complexity measure of this code block
+
+This feature was developed to help identify complex sections of code as an aid
+in refactoring.  The McCabe complexity measure follows the definition used by
+Perl::Critic.  By default the table contains these values for subroutines, but
+the user may request them for any or all blocks of code or packages.  For
+blocks which are loops nested within loops, a postfix '+' to the C<type> is
+added to indicate possible code complexity.  Although the table does not
+otherwise indicate which blocks are nested in other blocks, this can be
+determined by computing and comparing the block ending line numbers.
+
+By default the table lists subroutines with more than 20 C<code_lines>, but
+this can be changed with the following two parameters:
+
+B<--dump-block-minimum-lines=n>, or B<-dbl=n>, where B<n> is the minimum
+number of C<code_lines> to be included. The default is B<-n=20>.  Note that
+C<code_lines> is the number of lines excluding and comments, blanks and pod.
+
+B<--dump-block-types=s>, or B<-dbt=s>, where string B<s> is a list of block
+types to be included.  The type of a block is either the name of the perl
+builtin keyword for that block (such as B<sub if elsif else for foreach ..>) or
+the word immediately before the opening brace.  In addition, there are
+a few symbols for special block types, as follows:
+
+   if elsif else for foreach ... any keyword introducing a block
+   sub  - any sub or anynomous sub
+   asub - any anonymous sub
+   *    - any block except nameless blocks
+   +    - any nested inner block loop
+   package - any package or class
+   closure - any nameless block
+
+In addition, specific block loop types which are nested in other loops can be
+selected by adding a B<+> after the block name. (Nested loops are sometimes
+good candidates for restructuring).
+
+The default is B<-dbt='sub'>.
+
+In the following examples a table C<block.csv> is created for a file
+C<somefile.pl>:
+
+=over 4
+
+=item *
+This selects both C<subs> and C<packages> which have 20 or more lines of code.
+This can be useful in code which contains multiple packages.
+
+    perltidy -dbs -dbt='sub package' somefile.pl >blocks.csv
+
+=item *
+This selects block types C<sub for foreach while> with 10 or more code lines.
+
+    perltidy -dbs -dbl=10 -dbt='sub for foreach while' somefile.pl >blocks.csv
+
+=item *
+This selects blocks with 2 or more code lines which are type C<sub> or which
+are inner loops.
+
+    perltidy -dbs -dbl=2 -dbt='sub +' somefile.pl >blocks.csv
+
+=item *
+This selects every block and package.
+
+    perltidy -dbs -dbl=1 -dbt='* closure' somefile.pl >blocks.csv
+
+=back
+
 
 =item B<Working with MakeMaker, AutoLoader and SelfLoader>
 
@@ -5312,22 +5444,22 @@ The following list shows all short parameter names which allow a prefix
 
  D      anl    asbl   asc    ast    asu    atc    atnl   aws    b
  baa    baao   bar    bbao   bbb    bbc    bbs    bl     bli    boa
- boc    bok    bol    bom    bos    bot    cblx   ce     conv   cs
- csc    cscb   cscw   dac    dbc    dcbl   dcsc   ddf    dln    dnl
- dop    dp     dpro   drc    dsc    dsm    dsn    dtc    dtt    dwic
- dwls   dwrs   dws    eos    f      fll    fpva   frm    fs     fso
- gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj    hbk    hbm
- hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv    hbw    hent
- hic    hicm   hico   hih    hihh   hii    hij    hik    him    hin
- hip    hipd   hipu   hiq    his    hisc   hiv    hiw    hsc    html
- ibc    icb    icp    iob    isbc   iscl   kgb    kgbd   kgbi   kis
- lal    log    lop    lp     lsl    mem    nib    ohbr   okw    ola
- olc    oll    olq    opr    opt    osbc   osbr   otr    ple    pod
- pvl    q      sac    sbc    sbl    scbb   schb   scp    scsb   sct
- se     sfp    sfs    skp    sob    sobb   sohb   sop    sosb   sot
- ssc    st     sts    t      tac    tbc    toc    tp     tqw    trp
- ts     tsc    tso    vbc    vc     vmll   vsc    w      wfc    wn
- x      xci    xlp    xs
+ boc    bok    bol    bom    bos    bot    cblx   ce     conv   cpb
+ cs     csc    cscb   cscw   dac    dbc    dbs    dcbl   dcsc   ddf
+ dln    dnl    dop    dp     dpro   drc    dsc    dsm    dsn    dtc
+ dtt    dwic   dwls   dwrs   dws    eos    f      fll    fpva   frm
+ fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj
+ hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv
+ hbw    hent   hic    hicm   hico   hih    hihh   hii    hij    hik
+ him    hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw
+ hsc    html   ibc    icb    icp    iob    isbc   iscl   kgb    kgbd
+ kgbi   kis    lal    log    lop    lp     lsl    mem    nib    ohbr
+ okw    ola    olc    oll    olq    opr    opt    osbc   osbr   otr
+ ple    pod    pvl    q      sac    sbc    sbl    scbb   schb   scp
+ scsb   sct    se     sfp    sfs    skp    sob    sobb   sohb   sop
+ sosb   sot    ssc    st     sts    t      tac    tbc    toc    tp
+ tqw    trp    ts     tsc    tso    vbc    vc     vmll   vsc    w
+ wfc    wn     x      xci    xlp    xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -5426,7 +5558,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20221112
+This man page documents perltidy version 20230309
 
 =head1 BUG REPORTS
 

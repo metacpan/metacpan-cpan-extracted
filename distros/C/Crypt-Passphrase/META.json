@@ -16,7 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -37,7 +38,6 @@
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
-            "Hash::Util::FieldHash" : "0",
             "Scalar::Util" : "0",
             "Unicode::Normalize" : "0",
             "parent" : "0",
@@ -60,31 +60,31 @@
    "provides" : {
       "Crypt::Passphrase" : {
          "file" : "lib/Crypt/Passphrase.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::Encoder" : {
          "file" : "lib/Crypt/Passphrase/Encoder.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::Fallback" : {
          "file" : "lib/Crypt/Passphrase/Fallback.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::MD5::Hex" : {
          "file" : "lib/Crypt/Passphrase/MD5/Hex.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::PassphraseHash" : {
          "file" : "lib/Crypt/Passphrase/PassphraseHash.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::SHA1::Hex" : {
          "file" : "lib/Crypt/Passphrase/SHA1/Hex.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Crypt::Passphrase::Validator" : {
          "file" : "lib/Crypt/Passphrase/Validator.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

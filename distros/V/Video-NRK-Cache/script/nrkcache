@@ -1,0 +1,149 @@
+#!perl
+
+use v5.36;
+
+# PODNAME: nrkcache
+# ABSTRACT: Cache NRK Video on Demand broadcasts for offline viewing
+
+use Video::NRK::Cache;
+use Video::NRK::Cache::Store;
+
+use Getopt::Long 2.33 qw( :config posix_default gnu_getopt auto_version auto_help );
+use Pod::Usage qw( pod2usage );
+
+
+$main::VERSION = $Video::NRK::Cache::VERSION;
+
+my %options = (
+	nice => $Video::NRK::Cache::Store::NICE,
+	quality => -1,
+);
+GetOptions(
+	'comment|c=s' => \$options{comment},  # ignored!
+	'coreaudio' => \$options{coreaudio},
+	'man' => \$options{man},
+	'nice|n+' => \$options{nice},
+	'no-nice' => \$options{not_nice},
+	'not-nice' => \$options{not_nice},  # legacy syntax
+	'quality|q=i' => \$options{quality},
+) or pod2usage(2);
+pod2usage(-exitstatus => 0, -verbose => 2) if $options{man};
+pod2usage(2) unless @ARGV;
+utf8::decode $_ for @ARGV;
+
+
+$options{acodec} = 'aac_at -b:a 160k' if $options{coreaudio};
+$options{quality} = undef if $options{quality} < 0;
+$options{nice} = 0 if $options{not_nice};
+
+my $cache = Video::NRK::Cache->new(
+	url => $ARGV[0],
+	options => \%options,
+)->store->create;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+nrkcache - Cache NRK Video on Demand broadcasts for offline viewing
+
+=head1 VERSION
+
+version 3.00
+
+=head1 SYNOPSIS
+
+ nrkcache https://tv.nrk.no/program/DVFJ64001010
+ nrkcache -n -q2 DVFJ64001010
+ nrkcache --help|--version|--man
+
+=head1 DESCRIPTION
+
+The Video-on-Demand programs of the Norwegian Broadcasting
+Corporation (NRK) can be difficult to watch over a slow or unstable
+network connection. This script creates a local cache of such video
+programs in an MPEG-4 container, enabling users to watch without
+interruptions.
+
+For network transport, this script requires YT-dlp.
+Norwegian subtitles and metadata are retrieved from NRK as well.
+The data is muxed into a single MP4 file, which requires FFmpeg.
+
+=head1 OPTIONS
+
+=over
+
+=item --coreaudio
+
+Recode the audio track using Apple Core Audio (C<aac_at>). Useful
+to avoid audible artifacts during playback on certain Apple devices,
+such as ancient iPads. Only supported on the Mac. Experimental.
+
+=item --help, -?
+
+Display a help message and exit.
+
+=item --man
+
+Print the manual page and exit.
+
+=item --nice, -n
+
+Try to reduce the bandwidth used by the program. Giving this option
+multiple times may reduce the bandwidth more and more.
+
+Reducing the bandwidth may be useful when the caching is done on a
+good network connection for later viewing, where it prevents the
+overuse of network and server resources. It may also be useful on
+a bad network connection to keep the remaining bandwidth available
+for other purposes.
+
+=item --no-nice
+
+Prevent bandwidth reduction.
+
+=item --quality, -q
+
+The format of the AV content to store in the cache.
+Usually the AV quality for NRK content ranges from 0 to 5.
+
+If this option is not given, by default quality 3 is preferred when
+available, otherwise the highest numerical value available is chosen.
+AV content at quality 3 means "540p" or "qHD" resolution, which is
+similar to Standard Definition TV (though typically encoded at higher
+quality than standard TV). It may sound old-fashioned, but it saves
+valuable bandwidth, and for a lot of TV programs, this quality is
+actually plenty fine.
+
+=item --version
+
+Display version information and exit.
+
+=back
+
+=head1 SEE ALSO
+
+For known limitations and prerequisites, see L<Video::NRK::Cache>.
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+Arne Johannessen has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
+
+=cut

@@ -223,7 +223,8 @@ fallback3: &fallback3 |
         {{{house}}}
         {{{road}}} {{{house_number}}}
         {{#first}} {{{suburb}}} || {{{island}}} {{/first}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{municipality}}} {{/first}}
+        {{#first}} {{{village}}} || {{{hamlet}}} || {{{municipality}}} {{/first}}
+        {{#first}} {{{city}}} || {{{town}}}{{/first}}
         {{{county}}}
         {{#first}} {{{state}}} || {{{state_code}}} {{/first}}
         {{{country}}}
@@ -556,36 +557,12 @@ CM:
 # China
 CN:
     address_template: |
-        {{{attention}}}
-        {{{house}}}
-        {{{house_number}}} {{{road}}} 
-        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
+        {{{postcode}}} {{{country}}}
+        {{#first}} {{{state_code}}} || {{{state}}} || {{{state_district}}} || {{{region}}}{{/first}}
         {{{county}}}
-        {{{postcode}}} {{#first}} {{{state_code}}} || {{{state}}} || {{{city}}} || {{{town}}} || {{{municipality}}} || {{{state_district}}} || {{{region}}} || {{{village}}}|| {{{hamlet}}} {{/first}}
-        {{{country}}}
-
-# China - English
-CN_en:
-    address_template: |
-        {{{attention}}}
-        {{{house}}}
-        {{{house_number}}} {{{road}}} 
-        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
-        {{{county}}}
-        {{{postcode}}} {{#first}} {{{state_code}}} || {{{state}}} || {{{city}}} || {{{town}}} || {{{municipality}}} || {{{state_district}}} || {{{region}}} || {{{village}}} || {{{hamlet}}} {{/first}}
-        {{{country}}}
-
-# China - Chinese
-CN_zh:
-    address_template: |
-        {{{country}}}
-        {{{postcode}}} 
-        {{#first}} {{{state_code}}} || {{{state}}} || {{{region}}} {{/first}}
-        {{#first}} {{{state_district}}} || {{{county}}} {{/first}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{municipality}}} {{/first}}
-        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
-        {{{road}}}
-        {{{house_number}}} 
+        {{#first}}{{{city}}} || {{{town}}} || {{{municipality}}}|| {{{village}}}|| {{{hamlet}}}{{/first}}
+        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}        
+        {{{road}}} {{{house_number}}}
         {{{house}}}
         {{{attention}}}
 
@@ -810,6 +787,7 @@ GB:
     address_template: *generic23
     fallback_template: *fallback3
     replace:
+        - ["village= CP$",""]
         - ["^Borough of ",""]
         - ["^County( of)? ",""]
         - ["^Parish of ",""]
@@ -876,6 +854,9 @@ GQ:
 # Greece
 GR:
     address_template: *generic1
+    replace:
+        - ["Municipal Unit of ",""]
+        - ["Regional Unit of ",""]
     postformat_replace:
         # fix the postcode to make it \d\d\d \d\d
         - ["\n(\\d{3})(\\d{2}) ","\n$1 $2 "]
@@ -1005,6 +986,7 @@ IE:
         - ["Electoral Division",""]        
     postformat_replace:
         - ["Dublin\nCounty Dublin","Dublin"]
+        - ["Dublin\nLeinster","Dublin"]
         - ["Galway\nCounty Galway","Galway"]
         - ["Kilkenny\nCounty Kilkenny","Kilkenny"]        
         - ["Limerick\nCounty Limerick","Limerick"]

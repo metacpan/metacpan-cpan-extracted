@@ -1,0 +1,9 @@
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+lib/PerlX/ScopeFunction.pm
+t/with.t

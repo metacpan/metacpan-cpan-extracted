@@ -98,6 +98,7 @@ use Getopt::EX::Hashed; {
 				     , any => [ qw(char word letter mecab 0), '' ];
     has show_old       => '    !   ' , default => 1 , alias => 'old' ;
     has show_new       => '    !   ' , default => 1 , alias => 'new' ;
+    has show_mrg       => '    !   ' , default => 1 , alias => 'mrg' ;
     has command        => '    !   ' , default => 1 ;
     has unknown        => '    !   ' , default => 1 ;
     has mark           => '    !   ' , default => 1 ;
@@ -497,20 +498,25 @@ while (<DIFF>) {
 		last;
 	    };
 
-	    my $i = first { $old[$_] eq "|||||||\n" } 0 .. $#old;
-	    my @org = defined $i ? splice @old, $i : ();
+	    my $i = first { $old[$_] =~ /^\Q|||||||\E/ } 0 .. $#old;
+	    my @mrg = defined $i ? splice @old, $i : ();
 
 	    my $old = join '', @old;
 	    my $new = join '', @new;
 	    compare(\$old, \$new) if $app->unit;
 
-	    print
-		$c1,
-		color("OTEXT", $old),
-		@org,
-		$c2,
-		color("NTEXT", $new),
-		$c3;
+
+	    print $c1 if $app->mark;
+	    print color("OTEXT", $old) if $app->show_old;
+	    if (@mrg) {
+		my $c4 = shift @mrg;
+		print $c4 if $app->mark;
+		my $mrg = join '', @mrg;
+		print color("MTEXT", $mrg) if $app->show_mrg;
+	    }
+	    print $c2 if $app->mark;
+	    print color("NTEXT", $new) if $app->show_new;
+	    print $c3 if $app->mark;
 	}
     }
     else {
@@ -888,7 +894,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.25.1
+Version 4.26
 
 =head1 SYNOPSIS
 
@@ -918,6 +924,7 @@ Options:
 	--[no]unknowncolor  color for unknown text  (default true)
 	--[no]old	    print old text          (default true)
 	--[no]new	    print new text          (default true)
+	--[no]mrg	    print merged text       (default true)
 	--[no]command	    print diff command line (default true)
 	--[no]unknown	    print unknown line      (default true)
 	--[no]mark	    print mark or not       (default true)
@@ -1012,9 +1019,9 @@ when B<-r>I<rev> is supplied.
 
 =end deprecated
 
-=item B<-->B<unit>=[C<word>,C<letter>,C<char>,C<mecab>]
+=item B<-->B<unit>=[C<word>,C<letter>,C<char>,C<mecab>,C<>]
 
-=item B<-->B<by>=[C<word>,C<letter>,C<char>,C<mecab>]
+=item B<-->B<by>=[C<word>,C<letter>,C<char>,C<mecab>,C<>]
 
 Specify the comparing unit.  Default is I<word> and compare each line
 word-by-word.  Specify C<char> if you want to compare them
@@ -1191,9 +1198,9 @@ Disable options appropriate to use for B<sdif>'s input:
 B<--commandcolor>, B<--markcolor>, B<--textcolor> and
 B<--unknowncolor>.
 
-=item B<-->[B<no->]B<old>, B<-->[B<no->]B<new>
+=item B<-->[B<no->]B<old>, B<-->[B<no->]B<new>, B<-->[B<no->]B<mrg>
 
-Print or not old/new text in diff output.
+Print or not old/new/mrg text in diff output.
 
 =item B<-->[B<no->]B<command>
 

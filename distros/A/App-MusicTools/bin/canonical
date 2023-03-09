@@ -1,0 +1,640 @@
+#!perl
+#
+# canonical - computes canon voices via the Music::Canon module, though
+# this script comes from the App::MusicTools distribution.
+#
+# Run perldoc(1) on this file for additional documentation.
+#
+# A ZSH completion script is available in the zsh-compdef/ directory of
+# the App::MusicTools distribution.
+
+use strict;
+use warnings;
+use feature qw(say);
+
+use File::Basename qw/basename/;
+use Getopt::Long   qw/GetOptionsFromArray/;
+
+use Music::Canon        ();
+use Music::LilyPondUtil ();
+
+my $PROG_NAME = basename($0);
+
+# XXX too much repeated code between these, alas!
+my %Modes = (
+    exact => \&do_exact,
+    modal => \&do_modal,
+);
+
+my $Flag_Duration         = 4;    # default for rhythm qualification
+my $Flag_Non_Octave_Scale = 0;
+my @Std_Opts              = (
+    'contrary|c!'    => \my $Flag_Contrary,
+    'duration=s'     => \$Flag_Duration,
+    'flats!'         => \my $Flag_Flats,
+    'map!'           => \my $Flag_Map,
+    'raw!'           => \my $Flag_Raw,
+    'relative|rel=s' => \my $Flag_Relative,
+    'retrograde|r!'  => \my $Flag_Retrograde,
+    'transpose|t=s'  => \my $Flag_Transpose,
+);
+my $modal_chrome = 0;
+
+# NOTE may false positive if there is a standalone argument option with
+# the same contents as a mode name; however, with ZSH tab completion I'm
+# using --foo=bar instead of the risk prone --foo bar so meh.
+my @leading_args;
+while ( @ARGV and !exists $Modes{ $ARGV[0] } ) {
+    push @leading_args, shift @ARGV;
+}
+
+GetOptionsFromArray( \@leading_args, @Std_Opts, 'help|h' => \&emit_help, )
+  or emit_help();
+
+my $mode = shift;
+emit_help() if !defined $mode or !exists $Modes{$mode};
+
+my $ret;
+eval { $ret = $Modes{$mode}->(@ARGV) };
+if ($@) {
+    warn "$PROG_NAME: $@";
+    $ret = 65;    # assume input data error
+}
+exit $ret;
+
+########################################################################
+#
+# SUBROUTINES
+
+# Create these late from each mode as options to them might arrive
+# globally or as mode options.
+sub _init_obj {
+    my $c = Music::Canon->new(
+        modal_chrome      => $modal_chrome,
+        contrary          => $Flag_Contrary,
+        non_octave_scales => $Flag_Non_Octave_Scale,
+        retrograde        => $Flag_Retrograde,
+        transpose         => defined $Flag_Transpose ? $Flag_Transpose : 0,
+    );
+    my $l = Music::LilyPondUtil->new(
+        max_pitch  => 999,
+        min_pitch  => -999,
+        mode       => 'relative',
+        keep_state => 1,
+    );
+    $l->chrome( defined $Flag_Flats  ? 'flats'    : 'sharps' );
+    $l->mode( defined $Flag_Relative ? 'relative' : 'absolute' );
+    $l->prev_note($Flag_Relative) if defined $Flag_Relative;
+
+    return $c, $l;
+}
+
+sub _parse_modal_opt {
+    my ($mode_str) = @_;
+    return 'major' unless defined $mode_str;
+
+    my ( $asc, $dsc ) = split ':', $mode_str, 2;
+    my @asc = split ',', $asc;
+
+    my @dsc;
+    if ( defined $dsc ) {
+        @dsc = split ',', $dsc;
+    }
+
+    my @ret = grep defined, @asc > 1 ? \@asc : $asc[0], @dsc > 1 ? \@dsc : $dsc[0];
+    return @ret;
+}
+
+# In the "you cannot simply moonwalk into Mordor" department, input such
+# as "n4. n8 n n n4" requires care, as there's implicit 8th notes that
+# must not become quarter notes in reverse, etc.
+sub _reverse_rhythm {
+    my ($rhythm) = @_;
+
+    my $is_rhythmic = 0;
+    for my $r (@$rhythm) {
+        next if $r eq '';
+        $is_rhythmic = 1;
+        last;
+    }
+    if ($is_rhythmic) {
+        $rhythm->[0] = $Flag_Duration if $rhythm->[0] eq '';
+        for my $i ( 1 .. $#$rhythm ) {
+            $rhythm->[$i] = $rhythm->[ $i - 1 ] if $rhythm->[$i] eq '';
+        }
+    }
+
+    @$rhythm = reverse @$rhythm;
+    if ($is_rhythmic) {
+        # clean up output (omit implicit durations)
+        for my $i ( reverse 1 .. $#$rhythm ) {
+            $rhythm->[$i] = '' if $rhythm->[$i] eq $rhythm->[ $i - 1 ];
+        }
+    }
+}
+
+sub do_exact {
+    my @args = @_;
+    GetOptionsFromArray( \@args, @Std_Opts, 'help|h' => \&emit_help_exact, )
+      or emit_help_exact();
+    my ( $canon, $lyu ) = _init_obj();
+    my $is_multicolumn = 0;
+    my @restofline;
+
+    # XXX could do line-by-line but that would require adding state
+    # support back into Music::Canon (a source of bugs under modal_map) so
+    # can then call modal_map on a single pitch (with state saved from the
+    # previous note). This here is so can have the pitch as the first
+    # column, and any other information (velocity, etc.) in subsequent
+    # columns, without dealing with shell temporary files and judicious
+    # use of paste(1).
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        @args           = ();
+        $is_multicolumn = 1;
+        my $i = 0;
+        while ( my $line = readline *STDIN ) {
+            chomp $line;
+            next if $line =~ m/^\s*$/;
+            ( $args[$i], $restofline[$i] ) = split ' ', $line, 2;
+            $i++;
+        }
+    } else {
+        # due to shell quoting fun, often provide "a b' c" which thus must
+        # be split into individual notes
+        @args = map { split } @args;
+    }
+
+    die "no notes found in input\n" if !@args;
+
+    # XXX have lyu return object with dur/pitch bits or something so do
+    # not need double parse
+    my @pitches = $lyu->notes2pitches( \@args );
+    my @rhythm  = map { /[^\d-](\d+[.]*)/ ? $1 : '' } @args;
+    if ( $canon->get_retrograde ) {
+        @restofline = reverse @restofline;
+        _reverse_rhythm( \@rhythm );
+    }
+
+    my @new_phrase = $canon->exact_map( \@pitches );
+    @new_phrase = $lyu->p2ly(@new_phrase) if !$Flag_Raw;
+
+    for my $i ( 0 .. $#new_phrase ) {
+        $new_phrase[$i] .= $rhythm[$i] unless $new_phrase[$i] =~ m/\d/;
+    }
+
+    emit_phrase( $is_multicolumn, \@args, \@new_phrase, \@restofline );
+
+    return 0;    # used as exit code
+}
+
+sub do_modal {
+    my @args = @_;
+    GetOptionsFromArray(
+        \@args, @Std_Opts,
+        'chrome=i'        => \$modal_chrome,
+        'endpitch|ep=s'   => \my $end_pitch,
+        'help|h'          => \&emit_help_modal,
+        'input=s'         => \my $input_mode,
+        'nos!'            => \$Flag_Non_Octave_Scale,
+        'output=s'        => \my $output_mode,
+        'startpitch|sp=s' => \my $start_pitch,
+        'undef=s'         => \my $whoops_undef,
+    ) or emit_help_modal();
+    my ( $canon, $lyu ) = _init_obj();
+    my $is_multicolumn = 0;
+    my @restofline;
+
+    $canon->set_modal_scale_in( _parse_modal_opt($input_mode) )
+      if defined $input_mode;
+    $canon->set_modal_scale_out( _parse_modal_opt($output_mode) )
+      if defined $output_mode;
+
+    $canon->set_modal_pitches( $start_pitch, $end_pitch )
+      if defined $start_pitch
+      or defined $end_pitch;
+
+    $whoops_undef //= 'x';
+
+    if ( !@args or ( @args == 1 and $args[0] eq '-' ) ) {
+        @args           = ();
+        $is_multicolumn = 1;
+        my $i = 0;
+        while ( my $line = readline *STDIN ) {
+            chomp $line;
+            next if $line =~ m/^\s*$/;
+            ( $args[$i], $restofline[$i] ) = split ' ', $line, 2;
+            $i++;
+        }
+    } else {
+        # due to shell quoting fun, often provide "a b' c" which thus must
+        # be split into individual notes
+        @args = map { split } @args;
+    }
+
+    die "no notes found in input\n" if !@args;
+
+    my @pitches = $lyu->notes2pitches( \@args );
+    my @rhythm  = map { /[^\d-](\d+[.]*)/ ? $1 : '' } @args;
+
+    my @new_phrase = $canon->modal_map( \@pitches );
+    @new_phrase = $lyu->p2ly( map { defined($_) ? $_ : $whoops_undef } @new_phrase )
+      if !$Flag_Raw;
+
+    if ( $canon->get_retrograde ) {
+        @restofline = reverse @restofline;
+        _reverse_rhythm( \@rhythm );
+    }
+
+    for my $i ( 0 .. $#new_phrase ) {
+        $new_phrase[$i] .= $rhythm[$i] unless $new_phrase[$i] =~ m/\d/;
+    }
+
+    emit_phrase( $is_multicolumn, \@args, \@new_phrase, \@restofline );
+
+    return 0;    # used as exit code
+}
+
+sub emit_help {
+    warn <<"EOH";
+Usage: $PROG_NAME [global opts] mode [mode opts] args
+
+Compute canon voices via the Music::Canon module. The modes are:
+
+  exact - exact interval canon for given input notes
+  modal - modal interval canon          "
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted. Examples:
+
+  \$ $PROG_NAME --contrary --retrograde exact c cis d
+  \$ $PROG_NAME --transpose=12 exact c ees g
+  \$ $PROG_NAME --raw --contrary exact 1 2 3
+
+  \$ $PROG_NAME modal --input=lydian --output=locrian c e g
+
+Global options (which may also be given to the mode) include:
+
+  --contrary     Compute canon in contrary motion.
+  --duration=N   Set default duration value.
+  --flats        Print notes with flats instead of sharps.
+  --map          Prints original and output notes or numbers one per line.
+  --raw          Emit raw pitch numbers in output instead of note names.
+  --relative=N   Input is relative to lilypond note N (absolute notation is
+                 assumed by default otherwise).
+  --retrograde   Reverse the output voice.
+  --transpose=N  Transpose output voice by semitones or to a lilypond note.
+
+Run perldoc(1) on $PROG_NAME for additional documentation.
+
+EOH
+    exit 64;
+}
+
+sub emit_help_exact {
+    warn <<"EOH";
+Usage: $PROG_NAME [opts] exact [exactopts] note1 note2 .. noteN
+
+Exact interval mapping. Options include:
+
+  --contrary     Compute canon in contrary motion.
+  --duration=N   Set default duration value.
+  --flats        Print notes with flats instead of sharps.
+  --map          Prints original and output notes or numbers one per line.
+  --raw          Emit raw pitch numbers in output instead of note names.
+  --relative=N   Input is relative to lilypond note N (absolute notation is
+                 assumed by default otherwise).
+  --retrograde   Reverse the output voice.
+  --transpose=N  Transpose output voice by semitones or to a lilypond note.
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted.
+
+Run perldoc(1) on $PROG_NAME for additional documentation.
+
+EOH
+    exit 64;
+}
+
+sub emit_help_modal {
+    warn <<"EOH";
+Usage: $PROG_NAME [opts] modal --input=mode --output=mode notes...
+
+Modal interval mapping. In particular:
+
+  --chrome=N     Chrome weighting. Default is 0. See Music::Canon.
+  --duration=N   Set default duration value.
+
+  --ep=N         Set the start and end pitch via set_modal_pitches().
+  --sp=N         Necessary if phrase begins on non-tonic scale degree.
+
+  --input=mode   Set the input and output modes. These may be Music::Scales
+  --output=mode  names, or Forte Numbers. Major to Major used by default.
+
+  --nos          Allow for non-octave scales. Necessary if doing crazy
+                 things with intervals in the --input or --output options.
+
+  --undef=N      Use N for notes that cannot be converted.
+
+General options include:
+
+  --contrary     Compute canon in contrary motion.
+  --flats        Print notes with flats instead of sharps.
+  --map          Prints original and output notes or numbers one per line.
+  --raw          Emit raw pitch numbers in output instead of note names.
+  --relative=N   Input is relative to lilypond note N (absolute notation is
+                 assumed by default otherwise).
+  --retrograde   Reverse the output voice.
+  --transpose=N  Transpose output voice by semitones or to a lilypond note.
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted.
+
+Run perldoc(1) on $PROG_NAME for additional documentation.
+
+EOH
+    exit 64;
+}
+
+sub emit_phrase {
+    my ( $is_multicolumn, $orig, $new, $rest ) = @_;
+
+    $is_multicolumn = 1 if $Flag_Map;
+
+    # As a not-compatible change, this *always* used to emit space-
+    # delimited values though for multicolumness (and to avoid a
+    # subsequent `tr ' ' '\n'`) switched output to be delimited by
+    # newlines.
+    if ($is_multicolumn) {
+        while (@$new) {
+            say join( ' ',
+                $Flag_Map ? shift @$orig : (),
+                grep { defined } shift @$new,
+                shift @$rest );
+        }
+    } else {
+        print join( ' ', @$new ), "\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+canonical - compute canon voices via the Music::Canon module
+
+=head1 SYNOPSIS
+
+  $ canonical --contrary --retrograde exact c cis d
+  $ canonical --transpose=12 exact c ees g
+  $ canonical --raw --contrary exact 1 2 3
+
+  $ canonical modal --input=lydian --output=locrian c e g
+
+Raw pitch numbers or lilypond note names (though only in the default
+"nederlands" language) are accepted. Consult the C<lilypond> "Notation
+Reference" section "Note names in other languages" for the syntax.
+
+=head1 DESCRIPTION
+
+Command line interface to the mapping methods present in the
+L<Music::Canon> module. Certain questions might be better answered by
+coding directly against L<Music::Canon>; see the C<eg/> directory under
+the distribution of that Perl module for examples.
+
+Note that input via the command line is handled differently from notes
+supplied via standard input; in the first case, all of the input is
+considered to be notes. In the second case, only the first column
+(delimited by a space) is considered to be note material, and the other
+columns should be passed through unchanged.
+
+  $ echo 42 cat | canonical exact --transpose=a
+  a cat
+
+=head1 GLOBAL OPTIONS
+
+This program currently supports the following global command line
+switches. These can also be specified to the underlying modes.
+
+=over 4
+
+=item B<--contrary> | B<-c> | B<--nocontrary>
+
+Whether to compute the output line in contrary motion or not (default
+is not to).
+
+=item B<--duration>=I<value>
+
+Set the default duration for rhythm handling (C<4> by default). Rhythm
+handling should be transparent, though does not extend to tied notes,
+triplet groups, or grace notes.
+
+=item B<--flats> B<--noflats>
+
+Print notes with flats instead of sharps.
+
+=item B<--help>
+
+Emits help and exits the program.
+
+=item B<--map> B<--nomap>
+
+Whether to show the original input pitch numbers or note names one per
+line alongside the corresponding output pitch number or note name.
+Disabled by default.
+
+=item B<--raw> B<--noraw>
+
+Whether to emit output in raw pitch numbers (default is to emit lilypond
+note names).
+
+=item B<--relative>=I<lilypond_note>
+
+Use relative mode in L<Music::LilyPondUtil> and make the input notes
+relative to the specified note. Without this option, the assumption is
+that the lilypond input is specified in absolute form:
+
+  g d\'             # MIDI pitches 55 62 (absolute)
+  --rel=g\' g d\'   # MIDI pitches 67 74 (relative to g' or 67)
+
+=item B<--retrograde> | B<-r> | B<--noretrograde>
+
+Whether to reverse the output phrase or not. (Default is not to.)
+
+=item B<--transpose>=I<pitch_or_lilypond_note> | B<-t>=...
+
+Transpose to the first note of the output phrase by the specified amount
+in semitones (integer) or to the specified lilypond note name. (Default
+is no transposition.)
+
+=back
+
+=head1 MODES
+
+=head2 EXACT
+
+Exact interval canon computation. No new options beyond the global ones
+listed above.
+
+  $ canonical exact --transpose=e c e g
+
+=head2 MODAL
+
+Modal interval canon computation. In addition to the global options
+listed above, accepts:
+
+=over 4
+
+=item B<--chrome>=I<troolean>
+
+Chrome weighting. Default is 0, for proportional weighting. Negative or
+positive values use the literal chromatic offset from the input mode at
+the bottom or top of the appropriate interval in the output mode. See
+L<Music::Canon> for details. The weighting only applies when the output
+scale has steps of three or more semitones (e.g. Hugarian minor,
+pentatonic scales, and so forth).
+
+=item B<--endpitch>=I<pitch_or_note> | B<--ep>=I<pitch_or_note>
+
+Sets the output mode starting pitch. Probably should also be called with
+B<--startpitch>.
+
+=item B<--input>=I<scale_or_forte_number>
+
+Scale name (see L<Music::Scales>) or Forte Number or interval list to
+use for the input. A colon delimits the ascending versus descending
+versions of the scale; commas delimit specific scale degrees. Examples:
+
+  --input=mm
+  --input=major:minor
+  --input=2,2,2,2,1:5-25
+
+See L<Music::Canon> for the algorithm that maps input to output mode.
+
+=item B<--nos>
+
+Allow non-octave scales. Necessary if the scale intervals sum up to more
+than 12, or if scales repeat not at the usual 12-pitch octave point.
+
+=item B<--output>=I<scale_or_forte_number>
+
+Like B<--input>, except for the output line.
+
+=item B<--startpitch>=I<pitch_or_note> | B<--sp>=I<pitch_or_note>
+
+Sets the input mode starting pitch via B<set_modal_pitches>. Probably
+should also be called with B<--endpitch>. Necessary if the phrase begins
+on a non-tonic scale degree, as otherwise the input mode will shift to
+be based on that now-the-tonic note.
+
+=item B<--undef>=I<string>
+
+String to use for notes or pitches that cannot be converted. If unset,
+defaults to C<x>. For example, under contrary motion, using Major to
+Major scales, C to D via C sharp is impossible, as there is no space
+between C and B downwards in the output line for the chromatic C sharp:
+
+  $ canonical --relative=c modal --contrary --undef=OOPS c cis d
+  c OOPS b
+
+Set this to C<r> or C<s> to have C<lilypond> or C<ly-fu> ignore the
+impossible note.
+
+=back
+
+=head1 EXAMPLES
+
+Fugue answers can readily be calculated with this program, for example
+to transpose to the key of the dominant (WTC II, Fugue 9 in E major).
+
+  $ canonical --rel=e modal --t=7 e1 fis2 a gis fis e4
+  b1 cis2 e dis cis b4
+
+This handles the need to raise the leading tone of the key of the
+Dominant automatically where A needs to raise to A# (WTC I, Fugue 9
+in E major).
+
+  $ canonical --rel=e\' modal --t=7 \
+    r8 e8 fis4 r16 b,16 cis dis e dis e fis g
+  r8 b8 cis4 r16 fis,16 gis ais b ais b cis d
+
+Or the need to raise both II and VII in the minor key (WTC I, Fugue 4 in
+C# minor).
+
+  $ canonical --rel=e\' modal --t=7 cis1 bis2 e dis1 cis4                    
+  gis1 g2 b ais1 gis4
+
+Or even complicated things with chromatic alterations (WTC I, Fugue 14
+in F# minor).
+
+  $ canonical --rel b modal --t=7 r4 fis gis a1 \
+    gis8 ais b4 b ais8 gis ais bis cis4. b8 a8 cis b a gis2 fis
+  r4 cis dis e1 dis8 f fis4 fis f8 dis f g gis4. fis8 e8 gis fis e dis2 cis
+
+If the phrase is not in, say, C-Major, be sure to use the B<--sp> flag to
+indicate that. This following line transposes the result up by a major third:
+
+  $ canonical --flats modal --undef=r --rel=des --sp=des --transpose=4 \
+    "des8 r des r des c16 bes aes8 ges aes8 ges16 f ees8 des8"
+
+Complicated input may benefit from the use of standard input, as in this
+case C<canonical> will only read pitch values from the first column of
+input, and will leave the rest unchanged. This would allow rhythmic,
+dynamics, or other metadata to pass through C<canonical> unchanged,
+provided this information is not in the first column.
+
+  $ (echo 0 4. f; echo 2 8 p; echo 4 4 ff) | canonical -t c exact
+
+Mapping may be used to construct hash lookup tables for given inputs,
+with suitable doctoring of the mapped data. This allows the use of pre-
+computed canonic mappings in other programming languages, for example.
+
+  $ canonical exact --relative=c --map 1 2 3 4
+  1 cis
+  2 d
+  3 dis
+  4 e
+  $ echo '(setf *h* (make-hash-table))' > x
+  $ canonical exact --relative=c --map 1 2 3 4 \
+    | awk '{printf "(setf (gethash '\''%s *h*) '\''%s)\n", $1, $2}' >> x
+  $ clisp -repl x
+  [1]> (gethash 3 *h*)
+  dis ;
+  t
+  [2]> 
+
+=head1 FILES
+
+A ZSH completion script is available in the C<zsh-compdef/> directory of 
+the L<App::MusicTools> distribution. Install this to a C<$fpath> 
+directory.
+
+=head1 BUGS
+
+=head2 Reporting Bugs
+
+If the bug is in the latest version, send a report to the author.
+Patches that fix problems or add new features are welcome.
+
+L<https://thrig.me/src/App-MusicTools.git>
+
+=head1 SEE ALSO
+
+L<http://www.lilypond.org/> and in particular the Learning and Notation
+manuals should be consulted to understand C<lilypond> note syntax. Or, use
+raw pitch numbers.
+
+L<http://en.wikipedia.org/wiki/Forte_number>
+
+"The Technique of Canon" and "Foundation Studies in Fugue" by
+Hugo Norden.
+
+L<Music::Canon>, L<Music::LilyPondUtil>, L<Music::Scales>
+
+=head1 COPYRIGHT
+
+Copyright 2012 Jeremy Mates
+
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
+
+=cut

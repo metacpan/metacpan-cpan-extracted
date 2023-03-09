@@ -2,7 +2,7 @@ use strictures;
 
 package WebService::GoogleAPI::Client::Discovery;
 
-our $VERSION = '0.26';    # VERSION
+our $VERSION = '0.27';    # VERSION
 
 # ABSTRACT: Google API discovery service
 
@@ -10,9 +10,9 @@ our $VERSION = '0.26';    # VERSION
 use Moo;
 use Carp;
 use WebService::GoogleAPI::Client::UserAgent;
-use List::Util qw/uniq reduce/;
+use List::Util      qw/uniq reduce/;
 use List::SomeUtils qw/pairwise/;
-use Data::Dump qw/pp/;
+use Data::Dump      qw/pp/;
 use CHI;
 
 has ua => (
@@ -26,7 +26,7 @@ has 'chi' => (
   lazy    => 1
 );    ## i believe that this gives priority to param if provided ?
 has 'stats' => is => 'rw',
-  default   => sub { { network => { get => 0 }, cache => { get => 0 } } };
+    default => sub { { network => { get => 0 }, cache => { get => 0 } } };
 
 
 sub get_with_cache {
@@ -37,7 +37,7 @@ sub get_with_cache {
   my $will_expire = $expiration - time();
   if ($will_expire > 0 && not $force) {
     carp "discovery_data cached data expires in $will_expire seconds"
-      if $self->debug > 2;
+        if $self->debug > 2;
     my $ret = $self->chi->get($key);
     croak 'was expecting a HASHREF!' unless ref $ret eq 'HASH';
     $self->stats->{cache}{get}++;
@@ -66,7 +66,7 @@ sub get_with_cache {
 }
 
 
-sub discover_key { 'https://www.googleapis.com/discovery/v1/apis' }
+sub discover_key {'https://www.googleapis.com/discovery/v1/apis'}
 
 sub discover_all {
   my $self = shift;
@@ -108,8 +108,7 @@ sub available_APIs {
       push @{ $a->{ $b->{name} }->{$key} }, $b->{$key};
     }
     $a;
-  }
-  {}, @relevant;
+  } {}, @relevant;
 
   #store it away globally
   $available = $reduced;
@@ -221,10 +220,10 @@ sub get_api_document {
 
   my @versions = @{ $api->{version} };
   my @urls     = @{ $api->{discoveryRestUrl} };
-  my ($url) = pairwise { $a eq $params->{version} ? $b : () } @versions, @urls;
+  my ($url)    = pairwise { $a eq $params->{version} ? $b : () } @versions, @urls;
 
   croak "Couldn't find correct url for $params->{api} $params->{version}"
-    unless $url;
+      unless $url;
 
   $self->get_with_cache($url);
 }
@@ -238,14 +237,13 @@ sub _extract_resource_methods_from_api_spec {
   if (defined $api_spec->{methods} && ref($api_spec->{methods}) eq 'HASH') {
     foreach my $method (keys %{ $api_spec->{methods} }) {
       $ret->{"$tree.$method"} = $api_spec->{methods}{$method}
-        if ref($api_spec->{methods}{$method}) eq 'HASH';
+          if ref($api_spec->{methods}{$method}) eq 'HASH';
     }
   }
   if (defined $api_spec->{resources}) {
     foreach my $resource (keys %{ $api_spec->{resources} }) {
       ## NB - recursive traversal down tree of api_spec resources
-      $self->_extract_resource_methods_from_api_spec("$tree.$resource",
-        $api_spec->{resources}{$resource}, $ret);
+      $self->_extract_resource_methods_from_api_spec("$tree.$resource", $api_spec->{resources}{$resource}, $ret);
     }
   }
   return $ret;
@@ -269,9 +267,9 @@ sub get_method_details {
 
   my @nodes = split /\./smx, $tree;
   croak(
-"tree structure '$tree' must contain at least 2 nodes including api id, [list of hierarchical resources ] and method - not "
-      . scalar(@nodes))
-    unless @nodes > 1;
+    "tree structure '$tree' must contain at least 2 nodes including api id, [list of hierarchical resources ] and method - not "
+        . scalar(@nodes))
+      unless @nodes > 1;
 
   my $api_id = shift(@nodes);    ## api was head
   my $method = pop(@nodes);      ## method was tail
@@ -285,7 +283,7 @@ sub get_method_details {
   }
 
   ## handle incorrect api_id
-  if ($self->service_exists($api_id) == 0) {
+  if (!$self->service_exists($api_id)) {
     croak("unable to confirm that '$api_id' is a valid Google API service id");
   }
 
@@ -293,8 +291,7 @@ sub get_method_details {
 
 
   ## TODO: confirm that spec available for api version
-  my $api_spec =
-    $self->get_api_document({ api => $api_id, version => $api_version });
+  my $api_spec = $self->get_api_document({ api => $api_id, version => $api_version });
 
 
   ## we use the schemas to substitute into '$ref' keyed placeholders
@@ -308,35 +305,28 @@ sub get_method_details {
   ##  '$ref' values within the schema structures themselves
   ##  including within the schema spec structures (NB assumes no cyclic structures )
   ##   otherwise would could recursive chaos
-  my $api_spec_fix = $self->_fix_ref($api_spec, $schemas)
-    ;    ## first level ( '$ref' in the method params and return values etc )
+  my $api_spec_fix
+      = $self->_fix_ref($api_spec, $schemas);    ## first level ( '$ref' in the method params and return values etc )
   $api_spec = $self->_fix_ref($api_spec_fix, $schemas)
-    ;    ## second level ( '$ref' in the interpolated schemas from first level )
+      ;                                          ## second level ( '$ref' in the interpolated schemas from first level )
 
   ## now extract all the methods (recursive )
-  my $all_api_methods =
-    $self->_extract_resource_methods_from_api_spec("$api_id:$api_version",
-    $api_spec);
+  my $all_api_methods = $self->_extract_resource_methods_from_api_spec("$api_id:$api_version", $api_spec);
 
   unless (defined $all_api_methods->{$tree}) {
-    $all_api_methods =
-      $self->_extract_resource_methods_from_api_spec($api_id, $api_spec);
+    $all_api_methods = $self->_extract_resource_methods_from_api_spec($api_id, $api_spec);
   }
   if ($all_api_methods->{$tree}) {
 
     #add in the global parameters to the endpoint,
     #stored in the top level of the api_spec
     # TODO - why are we mutating the main hash?
-    $all_api_methods->{$tree}{parameters} = {
-      %{ $all_api_methods->{$tree}{parameters} },
-      %{ $api_spec->{parameters} }
-    };
+    $all_api_methods->{$tree}{parameters}
+        = { %{ $all_api_methods->{$tree}{parameters} }, %{ $api_spec->{parameters} } };
     return $all_api_methods->{$tree};
   }
 
-  croak(
-"Unable to find method detail for '$tree' within Google Discovery Spec for $api_id version $api_version"
-  );
+  croak("Unable to find method detail for '$tree' within Google Discovery Spec for $api_id version $api_version");
 }
 ########################################################
 
@@ -410,10 +400,8 @@ sub methods_available_for_google_api_id {
 
   $version = $self->latest_stable_version($api_id) unless $version;
   ## TODO: confirm that spec available for api version
-  my $api_spec = $self->get_api_discovery_for_api_id(
-    { api => $api_id, version => $version });
-  my $methods =
-    $self->_extract_resource_methods_from_api_spec($api_id, $api_spec);
+  my $api_spec = $self->get_api_discovery_for_api_id({ api => $api_id, version => $version });
+  my $methods  = $self->_extract_resource_methods_from_api_spec($api_id, $api_spec);
   return $methods;
 }
 ########################################################
@@ -450,7 +438,7 @@ WebService::GoogleAPI::Client::Discovery - Google API discovery service
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head2 MORE INFORMATION
 
@@ -634,23 +622,13 @@ that is either fetched or cached in CHI locally for 30 days.
 Formerly was list_of_available_google_api_ids, which will now give a deprecation warning
 to switch to list_api_ids.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Veesh Goldman <veesh@cpan.org>
 
-=item *
-
-Peter Scott <localshop@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Peter Scott and others.
+This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
 This is free software, licensed under:
 

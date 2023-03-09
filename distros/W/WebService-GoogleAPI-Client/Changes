@@ -1,3 +1,7 @@
+0.27      2023-03-09 19:06:14+02:00 Asia/Jerusalem
+
+- Fix typo in goauth docs
+
 0.26      2021-03-22 18:11:36+02:00 Asia/Jerusalem
 
 - Fix ANOTHER bug from dep burnination, goauth ACTUALLY works now

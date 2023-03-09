@@ -10,17 +10,18 @@ use Text::Table;
 use MIME::Types;
 use Image::PNG::Libpng;
 
-require './EXAMPLE_HELPERS.pm'; ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
+require './EXAMPLE_HELPERS.pm'
+    ;    ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
 
 my $config = {
   #api => 'storage:v1beta2',
-  api => 'storage',
-  debug => 01,
-  project => $ENV{GOOGLE_PROJECT_ID},
-  selected_bucket => undef, ## filled with first available bucket of user for project
-  upload  =>  $ARGV[0] || undef,
-  file_content => undef, ## will be filled with content of file at path 'upload'
-  
+  api             => 'storage',
+  debug           => 01,
+  project         => $ENV{GOOGLE_PROJECT_ID},
+  selected_bucket => undef,                     ## filled with first available bucket of user for project
+  upload          => $ARGV[0] || undef,
+  file_content    => undef,                     ## will be filled with content of file at path 'upload'
+
 };
 
 
@@ -87,44 +88,40 @@ assumes gapi.json configuration in working directory with scoped project and use
 say 'x' x 180;
 croak('must have environment variable GOOGLE_PROJECT_ID set to run') unless defined $ENV{GOOGLE_PROJECT_ID};
 
-if ( $config->{upload} )
-{
-    #my $mt    = MIME::Types->new();
-    croak("not going to try to upload file $config->{upload} as it doesn't seem to be available in the path") unless -e $config->{upload};
-    $config->{MIMETYPE} = MIME::Types->new()->mimeTypeOf( $config->{upload});
-    ## maybe consider use File::Slurp; qw/read_file/ .. so my $config->{file_content} = read_file( $config->{upload} , binmode => ':raw' , scalar_ref => 1 );
-    open F, $config->{upload};
-    $config->{file_content} = do { local $/; <F> };
-    close F;
+if ($config->{upload}) {
+  #my $mt    = MIME::Types->new();
+  croak("not going to try to upload file $config->{upload} as it doesn't seem to be available in the path")
+      unless -e $config->{upload};
+  $config->{MIMETYPE} = MIME::Types->new()->mimeTypeOf($config->{upload});
+  ## maybe consider use File::Slurp; qw/read_file/ .. so my $config->{file_content} = read_file( $config->{upload} , binmode => ':raw' , scalar_ref => 1 );
+  open F, $config->{upload};
+  $config->{file_content} = do { local $/; <F> };
+  close F;
 
 }
 
 
-
-
 ####
 ####
-####            SET UP THE CLIENT AS THE DEFAULT USER 
+####            SET UP THE CLIENT AS THE DEFAULT USER
 ####
 ####
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
 ## manunally sets the client user email to be the first in the gapi.json file
-my $gapi_client = WebService::GoogleAPI::Client->new( debug => $config->{debug}, gapi_json => 'gapi.json' );
+my $gapi_client       = WebService::GoogleAPI::Client->new(debug => $config->{debug}, gapi_json => 'gapi.json');
 my $aref_token_emails = $gapi_client->auth_storage->get_token_emails_from_storage;
-my $user              = $aref_token_emails->[0];                                                             ## default to the first user
-$gapi_client->user( $user );
-
-
+my $user              = $aref_token_emails->[0];    ## default to the first user
+$gapi_client->user($user);
 
 
 ####
 ####
-####            DISPLAY AN OVERVIEW OF THE API VERSIONS 
+####            DISPLAY AN OVERVIEW OF THE API VERSIONS
 ####            AND SELECT THE PREFERRED VERSION IF NOT SPECIFIED
 ####
 
 #display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api}, 'v1beta2' );
-my $versioned_api = display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api} );
+my $versioned_api = display_api_summary_and_return_versioned_api_string($gapi_client, $config->{api});
 
 #say "Versioned version of API = $versioned_api ";
 
@@ -138,19 +135,20 @@ my $versioned_api = display_api_summary_and_return_versioned_api_string( $gapi_c
 ####            DISPLAY A SUMMARY OF THE API-ENDPOINT  -- storage.buckets.list
 ####
 ####
-check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.buckets.list" );
+check_api_endpoint_and_user_scopes($gapi_client, "$versioned_api.buckets.list");
 
 
 ####
 ####
-####            EXECUTE API - GET LIST OF BUCKETS  
+####            EXECUTE API - GET LIST OF BUCKETS
 ####
 ####
-my $r = $gapi_client->api_query(  api_endpoint_id => 'storage.buckets.list',  #storage.objects.list
-                                 options => { 
-                                     project => $config->{project}
-                                  } 
-                                  );
+my $r = $gapi_client->api_query(
+  api_endpoint_id => 'storage.buckets.list',    #storage.objects.list
+  options         => {
+    project => $config->{project}
+  }
+);
 #print Dumper  $r; # ->json;
 my $d = $r->json;
 say pp $d;
@@ -163,13 +161,14 @@ $config->{selected_bucket} = $d->{items}[0]{id};
 ####
 ####
 
-check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.objects.insert" );
+check_api_endpoint_and_user_scopes($gapi_client, "$versioned_api.objects.insert");
 
 ####
 ####
 ####            EXECUTE API - INSERT A FILE INTO A BUCKET .. NB - not working using API Spec
 ####
 ####
+
 =pod
     "message": "Upload requests must include an uploadType URL parameter and a URL path beginning with /upload/",
     "extendedHelp": "https://cloud.google.com/storage/docs/json_api/v1/how-tos/upload"
@@ -206,20 +205,21 @@ to the file or bucket through the browser - will include example on API in futur
 as per L<https://cloud.google.com/storage/docs/access-control/making-data-public>
 
 =cut
+
 ## split out the filename - a bit rough
-if ( $config->{upload} =~ /([^\/]*)$/xsmg )
-{
-     $config->{upload} = $1;
+if ($config->{upload} =~ /([^\/]*)$/xsmg) {
+  $config->{upload} = $1;
 }
 
-say "File content length = " . length( $config->{file_content});
+say "File content length = " . length($config->{file_content});
 say "MIME TYPE of $config->{upload} is '$config->{MIMETYPE}'";
 #exit;
-$r = $gapi_client->api_query( { 
-                                path => "https://www.googleapis.com/upload/storage/v1/b/$config->{selected_bucket}/o?uploadType=media&name=$config->{upload}",  
-                                method => 'POST',
-                                 options => $config->{file_content}
-                                  });
+$r = $gapi_client->api_query({
+  path =>
+      "https://www.googleapis.com/upload/storage/v1/b/$config->{selected_bucket}/o?uploadType=media&name=$config->{upload}",
+  method  => 'POST',
+  options => $config->{file_content}
+});
 #print Dumper  $r; # ->json;
 
 pp $r->json;
@@ -227,11 +227,6 @@ exit;
 
 
 exit;
-
-
-
-
-
 
 
 =pod

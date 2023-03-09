@@ -37,6 +37,7 @@ t/05-spec-interpolation.t
 t/WebService/GoogleAPI/Client/Discovery.t
 t/gapi.json
 t/lib/TestTools.pm
+tidyall.ini
 weaver.ini
 xt/author/critic.t
 xt/live_test.t

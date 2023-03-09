@@ -1,0 +1,4 @@
+Revision history for Perl extension WebService::Tuya::IoT::API.
+
+0.01 2023-03-08
+  - Minimum viable product for access token, device status, and device commands.

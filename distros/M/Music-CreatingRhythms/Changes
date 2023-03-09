@@ -1,5 +1,12 @@
 Revision history for Music-CreatingRhythms
 
+0.0601 2023-03-09 07:56:06
+    - Fix examples.
+
+0.0600 2023-03-06 16:40:08
+    - Fix distro excludes. Oof!
+    - Add the count_ones() and count_zeros() methods.
+
 0.0504 2023-03-05 17:06:34
     - Improve the eg/play-*.pl program logic.
 

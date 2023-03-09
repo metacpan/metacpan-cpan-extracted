@@ -125,20 +125,15 @@ sub setup_gui {
 
 																	# Window
 	$gui->{window} = Prima::Window->create(
-		place => {
-			relx => 0.15, relwidth => 0.7, relheight => 0.7, rely => 0.15,
+		place     => {
+			relx   => 0.15, relwidth => 0.7, relheight => 0.7, rely => 0.15,
 			anchor => 'sw',
 		},
-		sizeMax => [600, 800],
-		sizeMin => [600, 800],
-		text => 'PDL::Graphics::Prima Demo',
-		onDestroy => sub {
-			require Prima::Utils;
-			# Throw an exception after destruction is complete so that we
-			# break out of the $::application->go loop.
-			Prima::Utils::post(sub { die 'time to exit the event loop' });
-		},
-		onKeyUp => \&keypress_handler,
+		sizeMax   => [600, 800],
+		sizeMin   => [600, 800],
+		text      => 'PDL::Graphics::Prima Demo',
+		onDestroy => sub { $::application->stop },
+		onKeyUp   => \&keypress_handler,
 	);
 	$gui->{window}->font->size(12);
 																		# Title

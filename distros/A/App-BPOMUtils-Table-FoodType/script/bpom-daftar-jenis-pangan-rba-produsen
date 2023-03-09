@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-14'; # DATE
+our $DATE = '2023-03-09'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodType'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/Table/FoodTypeRBAProducer/bpom_list_food_types_rba_producer",
@@ -40,7 +40,7 @@ bpom-daftar-jenis-pangan-rba-produsen - List food types in BPOM processed food d
 
 =head1 VERSION
 
-This document describes version 0.018 of bpom-daftar-jenis-pangan-rba-produsen (from Perl distribution App-BPOMUtils-Table-FoodType), released on 2023-02-14.
+This document describes version 0.019 of bpom-daftar-jenis-pangan-rba-produsen (from Perl distribution App-BPOMUtils-Table-FoodType), released on 2023-03-09.
 
 =head1 SYNOPSIS
 

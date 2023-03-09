@@ -1,0 +1,125 @@
+Revision history for nrkcache.pl
+
+3.00  2023-03-06
+
+ - Change the default download tool from youtube-dl to yt-dlp.
+ - Refactor class structure to allow for alternative download tools.
+ - Separate packages/classes from the CLI script to make them reusable
+   from other Perl code.
+ - Release as CPAN distribution.
+
+2.03  2023-03-04
+
+ - Fix bug in future-proofing of program ID detection (not relevant today)
+
+2.02  2022-12-10
+
+ - Add experimental Mac-only --coreaudio option to recode the audio track
+   using Apple Core Audio, which can avoid audible artifacts in some cases
+ - Change default rate limit to 1600 KiB/s
+ - Fix spurious undefined warning for non-NRK URLs
+
+2.01  2022-03-22
+
+ - Quick workaround for the mediaelement API, which is gone now
+
+2.00  2021-10-15
+
+ - Complete rewrite using Object::Pad and youtube-dl
+ - Subtitles and metadata are now automatically added to the MP4 file
+ - Multi-part programs are now automatically merged into single files
+ - The command-line interface has been redesigned; this is a breaking change
+ - Removal of all_segments.sh and associated tools
+
+1.20  2020-10-18
+
+ - Add more ways to retrieve the program ID
+
+1.19  2020-03-24
+
+ - Limit quality to -q3 unless -q4 is specifically requested
+
+1.18  2020-03-23
+
+ - Add --nice flag to limit bandwidth usage
+
+1.17  2020-03-23
+
+ - Fix the --verbose option, which didn't do anything
+
+1.16  2019-04-04
+
+ - Fix one of the less reliable ways to determine program ID
+
+1.15  2019-04-04
+
+ - Add option to send a custom HTTP header
+
+1.14  2018-08-08
+
+ - Append program ID to the description in the first lines of the report
+ - Show the title in a line of its own before the rest of the report
+ - Sort the report alphabetically
+
+1.13  2018-08-08
+
+ - Add new ways to retrieve the program ID
+
+1.12  2018-03-23
+
+ - Hard-code media element API template
+ - Hard-code API base URL (as fall-back)
+
+1.11  2017-12-07
+
+ - Add more ways to retrieve the program ID
+
+1.10  2017-10-31
+
+ - Fix parsing of " quotes in media description
+
+1.09  2017-10-25
+
+ - Reuse HTTP connections for the first caching attempt of each broadcast
+
+1.08  2017-09-12
+
+ - Add --part option to allow caching of a video's numbered part
+   (useful for very long programmes like "Sommertoget minutt for minutt")
+ - Mark subtitles as being in Norwegian language
+
+1.07  2017-05-04
+
+ - Add --mkdir option to create a new directory
+ - Add --comment option (which is always ignored)
+ - Minor improvements to verbosity
+
+1.06  2017-04-17
+
+ - Fix for the new way NRK encodes their program ID
+
+1.05  2016-11-27
+
+ - Update for new JSON metadata format used by NRK
+ - Try to retrieve the playlist of songs for radio broadcasts
+ - Create a .webloc file when caching, as quick route back to nrk.no
+ - Add --base option in an effort to make this script work with
+   non-NRK sources or partial caches, but this is somewhat 'hacky';
+   use at your own risk!
+
+1.02  2015-11-24
+
+ - Add Perl script as new frontend to all_segments.sh
+ - Accept the URL of the NRK VOD page as CLI input
+ - Add --quality option to specify the intended resolution
+ - Add --any option to retrieve non-video content (such as radio)
+ - If available, subtitles will automatically be provided as .srt
+ - A text file is created with a short report of the video's meta data
+
+0.02  2015-07-14
+
+ - Get full segment list from master file
+
+0.00  2015-03-31
+
+ - publish all_segments.sh

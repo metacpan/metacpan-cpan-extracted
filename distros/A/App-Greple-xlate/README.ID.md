@@ -56,6 +56,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
     Tentukan mesin penerjemahan yang akan digunakan. Anda tidak perlu menggunakan opsi ini karena modul `xlate::deepl` mendeklarasikannya sebagai `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     Setelah memanggil mesin penerjemahan, Anda diharapkan untuk bekerja. Setelah menyiapkan teks yang akan diterjemahkan, teks tersebut disalin ke clipboard. Anda diharapkan untuk menempelkannya ke formulir, menyalin hasilnya ke clipboard, dan menekan return.
 
@@ -103,6 +104,10 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
     - **xtxt**
 
         Jika formatnya adalah `xtxt` (teks terjemahan) atau tidak diketahui, hanya teks terjemahan yang dicetak.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Tentukan panjang maksimum teks yang akan dikirim ke API sekaligus. Nilai default ditetapkan untuk layanan akun gratis: 128K untuk API (**--xlate**) dan 5000 untuk antarmuka clipboard (**--xlate-labor**). Anda mungkin dapat mengubah nilai ini jika Anda menggunakan layanan Pro.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

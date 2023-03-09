@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.12 2023-03-08T07:33:57Z
+
+    - introduce --xlate-maxlen option
+    - update examples
+
 0.11 2023-03-06T05:14:31Z
 
     - make alias 'cm' for 'conflict'

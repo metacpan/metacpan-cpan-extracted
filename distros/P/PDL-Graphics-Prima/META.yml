@@ -21,11 +21,11 @@ no_index:
 requires:
   PDL: v2.4.0
   PDL::Drawing::Prima: '0.15'
-  Prima: '1.67'
+  Prima: '1.68'
   perl: '5.012'
 resources:
-  IRC: irc://irc.perl.org/#graphql-perl
+  IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-Prima/issues
   repository: https://github.com/PDLPorters/PDL-Graphics-Prima
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

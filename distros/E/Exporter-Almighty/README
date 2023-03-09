@@ -97,6 +97,13 @@ DESCRIPTION
     By convention, the tag names should be snake_case, but constant names
     should be SHOUTING_SNAKE_CASE.
 
+    For every constant like `RED`, a readonly variable $RED is also created,
+    making it easier to interpolate the constant into a string. These are not
+    exported by default.
+
+      use Your::Package qw( $RED $GREEN $BLUE );  # import ro vars by name
+      use Your::Package qw( :ro_vars );           # import ALL ro vars
+
    `type`
     This is an arrayref of type libraries. Each library listed will be
     *imported* into your exporter, and then the types in it will be

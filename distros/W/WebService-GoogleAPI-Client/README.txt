@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.26
+    version 0.27
 
 SYNOPSIS
 
@@ -401,15 +401,13 @@ FEATURES
       OAuth2 configuration, sccoping, authorization and obtaining access_
       and refresh_ tokens from users
 
-AUTHORS
+AUTHOR
 
-      * Veesh Goldman <veesh@cpan.org>
-
-      * Peter Scott <localshop@cpan.org>
+    Veesh Goldman <veesh@cpan.org>
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2017-2021 by Peter Scott and others.
+    This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
     This is free software, licensed under:
 

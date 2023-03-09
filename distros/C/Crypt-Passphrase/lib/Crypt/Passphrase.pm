@@ -1,12 +1,12 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.007';
+$Crypt::Passphrase::VERSION = '0.009';
 use strict;
 use warnings;
 
-use Carp 'croak';
-use Scalar::Util 'blessed';
-use Encode 'encode';
-use Unicode::Normalize 'normalize';
+use Carp ();
+use Scalar::Util ();
+use Encode ();
+use Unicode::Normalize ();
 
 sub _load_extension {
 	my $name = shift;
@@ -19,7 +19,7 @@ sub _load_extension {
 
 sub _load_encoder {
 	my $encoder = shift;
-	if (blessed $encoder) {
+	if (Scalar::Util::blessed($encoder)) {
 		return $encoder;
 	}
 	elsif (ref $encoder) {
@@ -32,13 +32,13 @@ sub _load_encoder {
 		return $encoder_module->new;
 	}
 	else {
-		croak 'No encoder given to Crypt::Passphrase->new';
+		Carp::croak('No encoder given to Crypt::Passphrase->new');
 	}
 }
 
 sub _load_validator {
 	my $validator = shift;
-	if (blessed $validator) {
+	if (Scalar::Util::blessed($validator)) {
 		return $validator;
 	}
 	elsif (ref($validator) eq 'HASH') {
@@ -51,7 +51,7 @@ sub _load_validator {
 		return Crypt::Passphrase::Fallback->new(callback => $validator);
 	}
 	else {
-		return _load_extension($validator);
+		return _load_extension($validator)->new;
 	}
 }
 
@@ -61,7 +61,7 @@ sub new {
 	my $encoder = _load_encoder($args{encoder});
 	my @validators = map { _load_validator($_) } @{ $args{validators} };
 	my $normalization = $args{normalization} || 'C';
-	croak "Invalid normalization form $normalization" if not $valid{$normalization};
+	Carp::croak("Invalid normalization form $normalization") if not $valid{$normalization};
 
 	my $self = bless {
 		encoder       => $encoder,
@@ -74,7 +74,8 @@ sub new {
 
 sub _normalize_password {
 	my ($self, $password) = @_;
-	return encode('utf-8-strict', normalize($self->{normalization}, $password));
+	my $normalized = Unicode::Normalize::normalize($self->{normalization}, $password);
+	return Encode::encode('utf-8-strict', $normalized);
 }
 
 sub hash_password {
@@ -85,7 +86,7 @@ sub hash_password {
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	return 1 if $hash !~ / \A \$ (\w+) \$ /x;
+	return 1 if $hash !~ / \A \$ ([^\$]+) \$ /x;
 	return $self->{encoder}->needs_rehash($hash);
 }
 
@@ -99,7 +100,7 @@ sub verify_password {
 		}
 	}
 
-	return;
+	return 0;
 }
 
 sub curry_with_hash {
@@ -130,7 +131,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -151,6 +152,8 @@ version 0.007
 =head1 DESCRIPTION
 
 This module manages the passwords in a cryptographically agile manner. Following Postel's principle, it allows you to define a single scheme that will be used for new passwords, but several schemes to check passwords with. It will be able to tell you if you should rehash your password, not only because the scheme is outdated, but also because the desired parameters have changed.
+
+Note that this module doesn't depend on any backend, your application will have to depend on one or more of the backends listed under L</SEE ALSO>
 
 =head1 METHODS
 
@@ -224,7 +227,7 @@ This method is like C<curry_with_hash>, but takes a password and hashes that fir
 
 While encoders generally allow for a default configuration, I would strongly encourage anyone to research what settings work for your application. It is generally a trade-off between usability/resources and security.
 
-The configuration for C<Crypt::Passphrase> should generally be part of your application configuration file, and not be hardcoded if that can be avoided.
+If your application is deployed by different people than it's developed by it may be helpful to have the configuration for C<Crypt::Passphrase> part of your application configuration file and not be hardcoded so that your users can choose the right settings for them.
 
 =head2 Unicode
 
@@ -240,6 +243,8 @@ In some situations, it may be appropriate to have different password settings fo
 
 =head1 SEE ALSO
 
+The following encoders are currently available on CPAN:
+
 =over 4
 
 =item * L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2>
@@ -248,15 +253,31 @@ This is a state-of-the-art memory-hard password hashing algorithm, recommended f
 
 =item * L<Crypt::Passphrase::Bcrypt|Crypt::Passphrase::Bcrypt>
 
-And older but still safe password hashing algorithm, recommended for lower-end parameters.
-
-=item * L<Crypt::Passphrase::Scrypt|Crypt::Passphrase::Scrypt>
-
-A first-generation memory-hard algorithm.
+And older but still safe password hashing algorithm, recommended for lower-end parameters or if you need to be compatible with BSD system passwords.
 
 =item * L<Crypt::Passphrase::PBKDF2|Crypt::Passphrase::PBKDF2>
 
 A FIPS-standardized hashing algorithm. Only recommended when FIPS-compliance is required.
+
+=item * L<Crypt::Passphrase::Linux|Crypt::Passphrase::Linux>
+
+An implementation of SHA-512, SHA256 and MD5 based C<crypt()>. Recommended if you need to be compatible with Linux system passwords.
+
+=item * L<Crypt::Passphrase::Scrypt|Crypt::Passphrase::Scrypt>
+
+A first-generation memory-hard algorithm, Argon2 is recommended instead if you want a memory-hard algorithm.
+
+=back
+
+A number of integrations of Crypt::Passphrase exist:
+
+=over 4
+
+=item * L<DBIx::Class::CryptColumn|DBIx::Class::CryptColumn>
+
+=item * L<Mojolicious::Plugin::Passphrase|Mojolicious::Plugin::Passphrase>
+
+=item * L<Dancer2::Plugin::CryptPassphrase|Dancer2::Plugin::CryptPassphrase>
 
 =back
 

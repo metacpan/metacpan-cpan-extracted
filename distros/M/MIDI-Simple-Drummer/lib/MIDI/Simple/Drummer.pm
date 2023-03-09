@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: An algorithmic MIDI drummer
 
-our $VERSION = '0.0811';
+our $VERSION = '0.0813';
 
 use strict;
 use warnings;
@@ -14,13 +14,13 @@ use Music::Duration ();
 BEGIN {
     # Define a division structure to use for durations.
     use constant DIVISION => {
-        w => { number =>  1, ordinal =>  '1st', name => 'whole' },
-        h => { number =>  2, ordinal =>  '2nd', name => 'half' },
-        q => { number =>  4, ordinal =>  '4th', name => 'quarter' },
-        e => { number =>  8, ordinal =>  '8th', name => 'eighth' },
-        s => { number => 16, ordinal => '16th', name => 'sixteenth' },
-        x => { number => 32, ordinal => '32nd', name => 'thirtysecond' },
-        y => { number => 64, ordinal => '64th', name => 'sixtyfourth' },
+        w => { number =>   1, ordinal =>   '1st', name => 'whole' },
+        h => { number =>   2, ordinal =>   '2nd', name => 'half' },
+        q => { number =>   4, ordinal =>   '4th', name => 'quarter' },
+        e => { number =>   8, ordinal =>   '8th', name => 'eighth' },
+        s => { number =>  16, ordinal =>  '16th', name => 'sixteenth' },
+        x => { number =>  32, ordinal =>  '32nd', name => 'thirtysecond' },
+        y => { number =>  64, ordinal =>  '64th', name => 'sixtyfourth' },
         z => { number => 128, ordinal => '128th', name => 'onetwentyeighth' },
     };
 
@@ -563,7 +563,7 @@ MIDI::Simple::Drummer - An algorithmic MIDI drummer
 
 =head1 VERSION
 
-version 0.0811
+version 0.0813
 
 =head1 SYNOPSIS
 
@@ -636,6 +636,9 @@ version 0.0811
   }
 
 =head1 DESCRIPTION
+
+* While still viable, this module has mostly been superseded by
+L<MIDI::Drummer::Tiny>.
 
 This is a "robotic" drummer that provides algorithmic methods to make beats,
 rhythms, noise, what have you.  It is also a glorified metronome.
@@ -1091,7 +1094,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2009-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

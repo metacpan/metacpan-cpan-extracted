@@ -18,11 +18,11 @@ Museum::Rijksmuseum::Object - Access the Rijksmuseum object metadata API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -82,7 +82,7 @@ sub search {
     my $result = $api->fetch('SK-C-5');
 
 Fetches an individual item from the collection. The parameter is the
-C<objectNumber> as returned by the L<search> call.
+C<objectNumber> as returned by the C<search> call.
 
 =cut
 
@@ -160,9 +160,8 @@ sub _fetch_url {
     my $req = HTTP::Request->new( GET => $url );
 
     my $res = $ua->request($req);
-
     if ( $res->is_success ) {
-        my $json = JSON::MaybeXS->new( utf8 => 1 );
+        my $json = JSON::MaybeXS->new();
         return $json->decode( $res->content );
     } else {
         return { error => $res->status_line };
@@ -193,6 +192,11 @@ has culture => (
     is       => 'rw',
     required => 1
 );
+
+=head1 SEE ALSO
+
+For bulk-ingestion of data using the Rijksmuseum OAI-PMH API, see
+L<Museum::Rijksmuseum::Object::Harvester>.
 
 =head1 AUTHOR
 

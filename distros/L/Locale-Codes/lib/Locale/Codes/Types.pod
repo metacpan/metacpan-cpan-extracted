@@ -1,4 +1,4 @@
-=pod
+pod
 
 =head1 NAME
 
@@ -226,7 +226,7 @@ ISO 639.
 =head1 currency
 
 The source of currency codes is the ISO 4217 data available here:
-L<http://www.iso.org/iso/support/currency_codes_list-1.htm>
+L<https://www.six-group.com/en/products-services/financial-information/data-standards.html>
 
 The code sets are:
 
@@ -406,7 +406,7 @@ Currently maintained by Sullivan Beck (sbeck@cpan.org).
 
    Copyright (c) 1997-2001 Canon Research Centre Europe (CRE).
    Copyright (c) 2001-2010 Neil Bowers
-   Copyright (c) 2010-2022 Sullivan Beck
+   Copyright (c) 2010-2023 Sullivan Beck
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

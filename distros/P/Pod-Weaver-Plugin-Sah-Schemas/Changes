@@ -1,3 +1,9 @@
+0.073   2023-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix generated example on using with Type::Tiny
+          (interpolation bug).
+
+
 0.072   2022-10-19  Released-By: PERLANCAR; Urgency: medium
 
         - Render Sah schema's links clause.

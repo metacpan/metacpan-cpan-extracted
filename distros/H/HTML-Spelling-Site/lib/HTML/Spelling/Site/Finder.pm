@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Finder;
-$HTML::Spelling::Site::Finder::VERSION = '0.10.1';
+$HTML::Spelling::Site::Finder::VERSION = '0.10.2';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ a directory tree.
 
 =head1 VERSION
 
-version 0.10.1
+version 0.10.2
 
 =head1 SYNOPSIS
 

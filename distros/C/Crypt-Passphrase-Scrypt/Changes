@@ -1,4 +1,7 @@
 Revision history for Crypt-Passphrase-Scrypt
 
+0.002     2023-03-07 23:51:53+01:00 Europe/Amsterdam
+          - Use the secure_compare helper method
+
 0.001     2021-03-08 18:56:13+01:00 Europe/Amsterdam
           Initial release to an unsuspecting world

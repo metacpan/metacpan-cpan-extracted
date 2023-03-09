@@ -9,7 +9,7 @@ use File::Temp ();
 use Path::Tiny ();
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Tar
-our $VERSION = '2.77'; # VERSION
+our $VERSION = '2.78'; # VERSION
 
 
 has '+format' => 'tar';
@@ -103,7 +103,7 @@ Alien::Build::Plugin::Extract::ArchiveTar - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 2.77
+version 2.78
 
 =head1 SYNOPSIS
 

@@ -42,7 +42,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Exporter::Almighty" => { file => "lib/Exporter/Almighty.pm", version => 0.001003 },
+                        "Exporter::Almighty" => { file => "lib/Exporter/Almighty.pm", version => 0.001004 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -56,7 +56,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/project",
                       },
-  "version"        => 0.001003,
+  "version"        => 0.001004,
 };
 
 my %dynamic_config;

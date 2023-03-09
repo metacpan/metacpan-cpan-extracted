@@ -1,5 +1,5 @@
 package Crypt::Passphrase::PassphraseHash;
-$Crypt::Passphrase::PassphraseHash::VERSION = '0.007';
+$Crypt::Passphrase::PassphraseHash::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -29,6 +29,8 @@ sub raw_hash {
 
 1;
 
+# ABSTRACT: An object representing a hash for password checking
+
 __END__
 
 =pod
@@ -37,11 +39,11 @@ __END__
 
 =head1 NAME
 
-Crypt::Passphrase::PassphraseHash
+Crypt::Passphrase::PassphraseHash - An object representing a hash for password checking
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.8.0'; # VERSION
+our $VERSION = 'v1.8.1'; # VERSION
 
 use 5.010;
 use strict;
@@ -435,28 +435,49 @@ sub run {
     # If we are going to summarize things, no need for our children to
     $params{summarize_result} = 0 unless exists $params{summarize_result};
 
-    my @results = map {
-        my %c = %{$_};
-        $self->_set_check_response_defaults(\%c);
-        my $defaults = delete $c{_respond};
-        my $i        = delete $c{invocant} || '';
-        my $m        = delete $c{check}    || '';
+    my @results = $self->_run_checks(
+        [
+            grep { $self->should_run( $_, %params ) }
+            @{ $registered_checks{$self} || [] }
+        ],
+        \%params,
+    );
 
-        my @r;
-        # Exceptions will probably not contain child health check's metadata,
-        # as HealthCheck::Diagnostic->summarize would normally populate these
-        # and was not called.
-        # This could theoretically be a pain for prodsupport. If we find this
-        # happening frequently, we should reassess our decision not to attempt
-        # to call summarize here
-        # (for fear of exception-catching magic and rabbitholes).
-        {
-            local $@;
-            @r = eval { $i ? $i->$m( %c, %params ) : $m->( %c, %params ) };
-            @r = { status => 'CRITICAL', info => $@ } if $@ and not @r;
-        }
+    return unless @results; # don't return undef, instead an empty list
+    return $results[0] if @{ $registered_checks{$self} || [] } == 1;
+    return { results => \@results };
+}
 
-        @r
+sub _run_checks {
+    my ( $self, $checks, $params ) = @_;
+
+    return map { $self->_run_check( $_, $params ) } @$checks;
+}
+
+sub _run_check {
+    my ( $self, $check, $params ) = @_;
+
+    my %c = %{ $check };
+    $self->_set_check_response_defaults(\%c);
+    my $defaults = delete $c{_respond};
+    my $i        = delete $c{invocant} || '';
+    my $m        = delete $c{check}    || '';
+
+    my @r;
+    # Exceptions will probably not contain child health check's metadata,
+    # as HealthCheck::Diagnostic->summarize would normally populate these
+    # and was not called.
+    # This could theoretically be a pain for prodsupport. If we find this
+    # happening frequently, we should reassess our decision not to attempt
+    # to call summarize here
+    # (for fear of exception-catching magic and rabbitholes).
+    {
+        local $@;
+        @r = eval { $i ? $i->$m( %c, %$params ) : $m->( %c, %$params ) };
+        @r = { status => 'CRITICAL', info => $@ } if $@ and not @r;
+    }
+
+    @r
         = @r == 1 && ref $r[0] eq 'HASH' ? $r[0]
         : @r % 2 == 0                    ? {@r}
         : do {
@@ -465,16 +486,9 @@ sub run {
             ();
         };
 
-        if (@r) { @r = +{ %$defaults, %{ $r[0] } } }
+    if (@r) { @r = +{ %$defaults, %{ $r[0] } } }
 
-        @r;
-    } grep {
-        $self->should_run( $_, %params );
-    } @{ $registered_checks{$self} || [] };
-
-    return unless @results; # don't return undef, instead an empty list
-    return $results[0] if @{ $registered_checks{$self} || [] } == 1;
-    return { results => \@results };
+    return @r;
 }
 
 sub _set_check_response_defaults {
@@ -597,7 +611,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 SYNOPSIS
 
@@ -977,7 +991,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 - 2022 by Grant Street Group.
+This software is Copyright (c) 2017 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

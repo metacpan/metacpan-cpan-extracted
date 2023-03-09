@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Scrypt;
-$Crypt::Passphrase::Scrypt::VERSION = '0.001';
+$Crypt::Passphrase::Scrypt::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ sub needs_rehash {
 	my ($cost, $block_size, $parallel, $salt64, $hash64) = $hash =~ $decode_regex or return 1;
 	return 1 if $cost < $self->{cost} or $block_size < $self->{block_size} or $parallel < $self->{parallel};
 	return 1 if length decode_base64($salt64) < $self->{salt_size} or length decode_base64($hash64) < $self->{output_size};
-	return;
+	return 0;
 }
 
 sub crypt_subtypes {
@@ -44,8 +44,9 @@ sub crypt_subtypes {
 sub verify_password {
 	my ($class, $password, $hash) = @_;
 	my ($cost, $block_size, $parallel, $salt64, $hash64) = $hash =~ $decode_regex or return 0;
-	my $new_hash = scrypt_raw($password, decode_base64($salt64), 1 << $cost, $block_size, $parallel, length decode_base64($hash64));
-	return $new_hash eq decode_base64($hash64);
+	my $old_hash = decode_base64($hash64);
+	my $new_hash = scrypt_raw($password, decode_base64($salt64), 1 << $cost, $block_size, $parallel, length $old_hash);
+	return $class->secure_compare($new_hash, $old_hash);
 }
 
 1;
@@ -64,7 +65,11 @@ Crypt::Passphrase::Scrypt - A scrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 DESCRIPTION
+
+This class implements an scrypt encoder for Crypt::Passphrase. If one wants a memory-hard password scheme Argon2 is recommended instead.
 
 =head1 METHODS
 

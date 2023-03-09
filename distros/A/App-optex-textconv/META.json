@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -46,7 +46,7 @@
             "XML::LibXSLT" : "0"
          },
          "requires" : {
-            "App::optex" : "v0.5.2",
+            "App::optex" : "v0.5.4",
             "App::optex::Tmpfile" : "0",
             "Archive::Zip" : "1.37",
             "Encode" : "0",
@@ -68,7 +68,7 @@
       },
       "App::optex::textconv" : {
          "file" : "lib/App/optex/textconv.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::Converter" : {
          "file" : "lib/App/optex/textconv/Converter.pm"
@@ -78,39 +78,43 @@
       },
       "App::optex::textconv::doc" : {
          "file" : "lib/App/optex/textconv/doc.pm",
-         "version" : "1.03"
+         "version" : "1.04"
+      },
+      "App::optex::textconv::git" : {
+         "file" : "lib/App/optex/textconv/git.pm",
+         "version" : "1.04"
       },
       "App::optex::textconv::msdoc" : {
          "file" : "lib/App/optex/textconv/msdoc.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::ooxml" : {
          "file" : "lib/App/optex/textconv/ooxml.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::ooxml::regex" : {
          "file" : "lib/App/optex/textconv/ooxml/regex.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::ooxml::xslt" : {
          "file" : "lib/App/optex/textconv/ooxml/xslt.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::pandoc" : {
          "file" : "lib/App/optex/textconv/pandoc.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::pdf" : {
          "file" : "lib/App/optex/textconv/pdf.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::tika" : {
          "file" : "lib/App/optex/textconv/tika.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::optex::textconv::xls" : {
          "file" : "lib/App/optex/textconv/xls.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -120,15 +124,16 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/optex-textconv",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/optex-textconv.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/optex-textconv.git",
          "web" : "https://github.com/kaz-utashiro/optex-textconv"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

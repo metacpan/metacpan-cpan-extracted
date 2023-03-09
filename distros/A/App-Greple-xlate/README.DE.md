@@ -56,6 +56,7 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
     Geben Sie die zu verwendende Übersetzungsmaschine an. Sie brauchen diese Option nicht zu verwenden, da das Modul `xlate::deepl` sie als `--xlate-engine=deepl` deklariert.
 
 - **--xlate-labor**
+- **--xlabor**
 
     Anstatt die Übersetzungsmaschine aufzurufen, wird von Ihnen erwartet, dass Sie für arbeiten. Nachdem der zu übersetzende Text vorbereitet wurde, wird er in die Zwischenablage kopiert. Es wird erwartet, dass Sie sie in das Formular einfügen, das Ergebnis in die Zwischenablage kopieren und die Eingabetaste drücken.
 
@@ -103,6 +104,10 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
     - **xtxt**
 
         Wenn das Format `xtxt` (übersetzter Text) oder unbekannt ist, wird nur der übersetzte Text gedruckt.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Geben Sie die maximale Länge des Textes an, der auf einmal an die API gesendet werden soll. Der Standardwert ist wie beim kostenlosen Dienst: 128K für die API (**--xlate**) und 5000 für die Zwischenablage-Schnittstelle (**--xlate-labor**). Sie können diese Werte ändern, wenn Sie den Pro-Dienst nutzen.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

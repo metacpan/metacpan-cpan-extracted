@@ -10,7 +10,7 @@ use IO::File;
 use Tk;
 use Tk::Pane;
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 
 my @pad = qw{ -padx 5 -pady 5 };	# Standard cell padding
 
@@ -981,80 +981,6 @@ sub search_options_args {
     return @rslt;
 }
 
-# Adjust the data panel to retrieve Human Space Flight data.
-sub spaceflight_panel {
-    my ( $widget, $data ) = @_;
-
-    if ( ! $widget->{spaceflight} ) {
-	$data->{spaceflight}{iss} = $data->{spaceflight}{shuttle} = 1;
-	$widget->{spaceflight} = {
-	    all_label => $widget->{data_frame}->Label(
-		-text => 'Retrieve all elements:' ),
-	    all_value => $widget->{data_frame}->Checkbutton(
-		-relief => 'flat',
-		-variable => \$data->{spaceflight}{all},
-	    ),
-	    eff_label => $widget->{data_frame}->Label(
-		-text => 'Retrieve effective date:' ),
-	    eff_value => $widget->{data_frame}->Checkbutton(
-		-relief => 'flat',
-		-variable => \$data->{spaceflight}{effective},
-	    ),
-	    iss_label => $widget->{data_frame}->Label(
-		-text => 'Retrieve International Space Station data:' ),
-	    iss_value => $widget->{data_frame}->Checkbutton(
-		-relief => 'flat',
-		-variable => \$data->{spaceflight}{iss},
-	    ),
-##	    sts_label => $widget->{data_frame}->Label(
-##		-text => 'Retrieve Space Shuttle data:' ),
-##	    sts_value => $widget->{data_frame}->Checkbutton(
-##		-relief => 'flat',
-##		-variable => \$data->{spaceflight}{shuttle},
-##	    ),
-	};
-    }
-
-    my $dg = grid_new( 1 );
-    $widget->{spaceflight}{iss_label}
-	->grid( grid_args( $dg, sticky => 'e' ) );
-    $widget->{spaceflight}{iss_value}
-	->grid( grid_args( $dg, sticky => 'w' ) )->raise();
-
-##  grid_next_row( $dg );
-##  $widget->{spaceflight}{sts_label}
-##	->grid( grid_args( $dg, sticky => 'e' ) );
-##  $widget->{spaceflight}{sts_value}
-##	->grid( grid_args( $dg, sticky => 'w' ) )->raise();
-
-    grid_next_row( $dg );
-    $widget->{spaceflight}{all_label}
-	->grid( grid_args( $dg, sticky => 'e' ) );
-    $widget->{spaceflight}{all_value}
-	->grid( grid_args( $dg, sticky => 'w' ) )->raise();
-
-    grid_next_row( $dg );
-    $widget->{spaceflight}{eff_label}
-	->grid( grid_args( $dg, sticky => 'e' ) );
-    $widget->{spaceflight}{eff_value}
-	->grid( grid_args( $dg, sticky => 'w' ) )->raise();
-
-    include_common_names( $widget, $data, $dg );
-
-    return;
-}
-
-# Build the argument list for the spaceflight() method.
-sub spaceflight_args {
-    my ( $data ) = @_;
-    my @args;
-    $data->{spaceflight}{all} and push @args, '-all';
-    $data->{spaceflight}{effective} and push @args, '-effective';
-    $data->{spaceflight}{iss} and push @args, 'iss';
-    $data->{spaceflight}{shuttle} and push @args, 'shuttle';
-    return @args;
-}
-
 # Adjust the data panel to retrieve Space Track catalogs.
 sub spacetrack_panel {
     my ( $widget, $data ) = @_;
@@ -1152,7 +1078,6 @@ sub load_data_frame {
 	    [
 		[ 'Celestrak catalog'		=> 'celestrak' ],
 		[ 'Celestrak supplemental'	=> 'celestrak_supplemental' ],
-		[ 'Human Space Flight data'	=> 'spaceflight' ],
 		[ 'Iridium Status'		=> 'iridium_status' ],
 		[ 'Local file catalog'		=> 'file' ],
 		[ 'Radio Amateur Satellite Corporation data' => 'amsat' ],
@@ -1169,7 +1094,6 @@ sub load_data_frame {
 	    [
 		[ 'Celestrak catalog'		=> 'celestrak' ],
 		[ 'Celestrak supplemental'	=> 'celestrak_supplemental' ],
-		[ 'Human Space Flight data'	=> 'spaceflight' ],
 		[ 'Iridium Status'		=> 'iridium_status' ],
 		[ 'Radio Amateur Satellite Corporation data' => 'amsat' ],
 	    ],
@@ -1329,7 +1253,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2022 by Thomas R. Wyant, III
+Copyright (C) 2010-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

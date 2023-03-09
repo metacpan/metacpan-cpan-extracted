@@ -56,6 +56,7 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
     Kullanılacak çeviri motorunu belirtin. Bu seçeneği kullanmak zorunda değilsiniz çünkü `xlate::deepl` modülü bunu `--xlate-engine=deepl` olarak bildirir.
 
 - **--xlate-labor**
+- **--xlabor**
 
     Çeviri motorunu çağırmak yerine, sizin çalışmanız beklenir. Çevrilecek metin hazırlandıktan sonra panoya kopyalanır. Bunları forma yapıştırmanız, sonucu panoya kopyalamanız ve return tuşuna basmanız beklenir.
 
@@ -103,6 +104,10 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
     - **xtxt**
 
         Biçim `xtxt` (çevrilmiş metin) veya bilinmiyorsa, yalnızca çevrilmiş metin yazdırılır.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    API'ye bir kerede gönderilecek maksimum metin uzunluğunu belirtin. Varsayılan değer ücretsiz hesap hizmeti için ayarlanmıştır: API için 128K (**--xlate**) ve pano arayüzü için 5000 (**--xlate-labor**). Pro hizmeti kullanıyorsanız bu değerleri değiştirebilirsiniz.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

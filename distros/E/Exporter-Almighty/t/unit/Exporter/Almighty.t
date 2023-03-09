@@ -167,6 +167,7 @@ describe "method `steps`" => sub {
 		$setup     = {};
 		$expected  = [
 			'setup_exporter_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -176,6 +177,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_reexports_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -185,6 +187,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_enums_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -194,6 +197,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_classes_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -203,6 +207,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_roles_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -212,6 +217,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_ducks_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -221,6 +227,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_types_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -230,6 +237,7 @@ describe "method `steps`" => sub {
 		$expected  = [
 			'setup_exporter_for',
 			'setup_constants_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -241,6 +249,7 @@ describe "method `steps`" => sub {
 			'setup_reexports_for',
 			'setup_enums_for',
 			'setup_constants_for',
+			'setup_readonly_vars_for',
 			'finalize_export_variables_for',
 		];
 	};
@@ -692,8 +701,33 @@ describe "method `make_constant_subs`" => sub {
 	};
 };
 
+describe "method `setup_readonly_vars_for`" => sub {
+	
+	tests 'it works' => sub {
+		
+		*Local::TestPkg24::FOO = sub () { 42 };
+		%Local::TestPkg24::EXPORT_TAGS = ( constants => [ 'FOO' ] );
+		$CLASS->setup_readonly_vars_for(
+			'Local::TestPkg24',
+			{ const => { FOO => 42 } },
+		);
+		
+		is( $Local::TestPkg24::FOO, 42, 'var has correct value' );
+		
+		my $e = dies {
+			$Local::TestPkg24::FOO = 666;
+		};
+		isnt( $e, undef, 'var is read only' );
+		
+		is(
+			$Local::TestPkg24::EXPORT_TAGS{'ro_vars'},
+			[ '$FOO' ],
+			'var is exportable',
+		);
+	};
+};
 
-describe "method `make_constant_subs`" => sub {
+describe "method `finalize_export_variables_for`" => sub {
 	
 	tests 'it works' => sub {
 		

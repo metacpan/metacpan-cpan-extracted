@@ -1,3 +1,9 @@
+0.019   2023-03-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix data, previously incomplete to bad newlines in CSV
+          source.
+
+
 0.018   2023-02-14  Released-By: PERLANCAR; Urgency: medium
 
         - Add utilities: bpom-list-food-types-rba-{producer,importer}.

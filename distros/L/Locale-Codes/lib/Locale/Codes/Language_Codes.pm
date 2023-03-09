@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Thu Sep  1 09:56:47 EDT 2022
+#    Generated on: Mon Mar  6 13:17:39 EST 2023
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.72';
+$VERSION='3.73';
 
 $Locale::Codes::Data{'language'}{'id'} = '8020';
 
@@ -15518,6 +15518,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
    q(5063) => [
       q(Jerriais),
       q(Guernesiais),
+      q(Sercquiais),
       ],
    q(5064) => [
       q(Narango),
@@ -50783,6 +50784,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(serbo-croatian) => [
       q(0538),
       q(0),
+      ],
+   q(sercquiais) => [
+      q(5063),
+      q(2),
       ],
    q(sere) => [
       q(6318),

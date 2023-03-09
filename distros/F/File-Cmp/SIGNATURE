@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,28 +12,32 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 5af545c218bf29dd2f3c9202e292c2116254d035 Changes
-SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
-SHA1 35f278d8387762cd1fed7b8b43d377ec0629ebe1 MANIFEST
-SHA1 eacb754cc30d957ca9d4e477a16665f216c9940e META.json
-SHA1 891054fc6e0241667beef0add55e0ca1f41e6049 META.yml
-SHA1 9c36b1158ef6b5b44edc307a7250cb7a5d9ef102 Makefile.PL
-SHA1 784880bcfd0378f7aa1707383103629ddc9d22e9 README
-SHA1 3f840f2b5b6cd71ed58e754d04711f5784a7f603 lib/File/Cmp.pm
-SHA1 9cd373e8541e1c79ac54aef25cbb1a650ac341d6 t/File-Cmp.t
-SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
-SHA1 282003a9cff7bbadb41fa05748c21775eb61dccd that
-SHA1 de90960ff14378a0082c85f97e99d6a8a941531c this
+SHA256 7493161aeec31ebeb3e8b57b4ea31868517912f3f2425d3e83c9bc2da8839199 Build.PL
+SHA256 5b643f8c7db5fc0eb9750c9ceec741285bfa891db5d82f3dd5e360e574dad2b9 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 bcd232bc77340b8868682972833d34653a8936463335deebb8b166bb7fca4b96 MANIFEST
+SHA256 245fe947e22a396d0e1267cb42b9d9b9b18bc1de14498d3532fe2212e514a41f META.json
+SHA256 37df28022a6de78617a80105a4afbe55002dce6bf84ea19c4da3ce160ed7abef META.yml
+SHA256 fa09b5e05aee0e4bc5e2965f8df8aee90f0e05ea67a30493ca933ecb633adcd9 README
+SHA256 f4efe6096f9253aa880331beaa978f01a8c5c43f67758cf272b959be1ccaf3c1 lib/File/Cmp.pm
+SHA256 79c6685ced65529d80b312b8727bdfdb1cc6744f3c83b305aa5b0229a65369ba t/File-Cmp.t
+SHA256 e6d9462c550e9e4fb82ab19823c8c5421ca0ce0fa077c01b9fac03a11e0a87f9 t/pod-coverage.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+SHA256 c18d547cafb43e30a993439599bd08321bea17bfedbe28b13bce8a7f298b63a2 that
+SHA256 8f0904a9625b0214c95f3687bad9c1d0acf3c286a1cbcfd40c38a03e3e83a1a1 this
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJU0NsAAAoJEDTEVWqwTuCUFB4IAKpAecbnq3j00X/MNwZCJU7y
-FzxKoxgIbV6CSfUXFNqvuscOirauPGO9GCCOEVTQdoIcYsD8e2o63QMD6a+N63E8
-5oEP0DffjjNOPBfXv0DaIz8bEWGOl3lU8fQv3P7ttvcEY9+vEkREmiLEQXdibjui
-FKaNMRh/fnIDak+Lm2ijRKzHWutPaYBev3sZox+CA536Ak9YaGkXg8+lgeXWVypx
-svMizW1mMXfBNYSrrENaLOwMx0o/HtSSwp8KaWEK5zWe/6T+yJyBwDanFfuw4TcC
-ZhTjme/CSHhkMovd20tKiOcLaQCZkrMB9DYtq3RnSyvSYDO3lf4z3O3LSyzXyPU=
-=/I22
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmQGjJAACgkQs1lvXE/r
+yKeszgv/UHKHA+YW2CRb7cJwltZR9YWmBvIxOFTGIziph/ZGGpPwB8K6cjifdBhX
+8+VUKWlFg7K+PEvK74poQ6Hh4bjMGr61VP2NTkVLzVDHLOfaMFPMPWoPj77Q6onP
+B0flfPanXxNAZbpMRmUMXcjIIiNL5sC4Vb4jkQbgtYIkpdbSv6sg7VdtphPczObc
+NCzRyMggCQ8uu8J6PoOv/r9T4SInl8B1v4ulqbVJo2/3OBaDJykc+cfUmjPAc3mg
+EPtH/vLQvJZm6K2iHsYmHSwwPWbMykjETllPVZ6cAyB6ndgd59QErOhSdnt4nQmI
+9yINtEe8HreNhfv7t6887eIDiPB5KTwTADVsrJmcP+r1p6UfiU7hwFqRtnqxiIsc
+4w1wO2R1y92HBZf0xP/LTRmiXLdaGdouMGyUO7p2EypaYj/D2sdx3LPYi0fwKGXI
+L4KcuWr8+ho5fYyfF+pku0bBHuMcbRLxrZj02/rEe6w0U/MA2lpkXtsQ7XOou99r
+wnNSrV8N
+=qGrh
 -----END PGP SIGNATURE-----

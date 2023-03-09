@@ -32,7 +32,6 @@ i_can( 'search_name' );
 i_can( 'set' );
 i_can( 'shell' );
 i_can( 'source' );
-i_can( 'spaceflight' );
 i_can( 'spacetrack' );
 i_can( 'spacetrack_query_v2' );
 

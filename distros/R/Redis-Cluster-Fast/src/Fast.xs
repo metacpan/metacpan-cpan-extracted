@@ -164,27 +164,36 @@ void wait_for_event(Redis__Cluster__Fast self) {
     DEBUG_EVENT_BASE();
 }
 
-int Redis__Cluster__Fast_connect(Redis__Cluster__Fast self){
+SV *Redis__Cluster__Fast_connect(pTHX_ Redis__Cluster__Fast self) {
     DEBUG_MSG("%s", "start connect");
 
     self->pid = getpid();
 
     self->acc = redisClusterAsyncContextInit();
-    redisClusterSetOptionAddNodes(self->acc->cc, self->hostnames);
-    redisClusterSetOptionConnectTimeout(self->acc->cc, self->connect_timeout);
-    redisClusterSetOptionTimeout(self->acc->cc, self->command_timeout);
-    redisClusterSetOptionMaxRetry(self->acc->cc, self->max_retry);
+    if (redisClusterSetOptionAddNodes(self->acc->cc, self->hostnames) != REDIS_OK) {
+        return newSVpvf("failed to add nodes: %s", self->acc->cc->errstr);
+    }
+    if (redisClusterSetOptionConnectTimeout(self->acc->cc, self->connect_timeout) != REDIS_OK) {
+        return newSVpvf("failed to set connect timeout: %s", self->acc->cc->errstr);
+    }
+    if (redisClusterSetOptionTimeout(self->acc->cc, self->command_timeout) != REDIS_OK) {
+        return newSVpvf("failed to set command timeout: %s", self->acc->cc->errstr);
+    }
+    if (redisClusterSetOptionMaxRetry(self->acc->cc, self->max_retry) != REDIS_OK) {
+        return newSVpvf("%s", "failed to set max retry");
+    }
 
     if (redisClusterConnect2(self->acc->cc) != REDIS_OK) {
-        DEBUG_MSG("connect error %s", self->acc->cc->errstr);
-        return 1;
+        return newSVpvf("failed to connect: %s", self->acc->cc->errstr);
     }
 
     self->cluster_event_base = event_base_new();
-    redisClusterLibeventAttach(self->acc, self->cluster_event_base);
+    if (redisClusterLibeventAttach(self->acc, self->cluster_event_base) != REDIS_OK) {
+        return newSVpvf("%s", "failed to attach event base");
+    }
 
     DEBUG_MSG("%s", "done connect");
-    return 0;
+    return &PL_sv_undef;
 }
 
 cluster_node *get_node_by_random(Redis__Cluster__Fast self) {
@@ -335,11 +344,11 @@ CODE:
     DEBUG_MSG("max_retry %d", max_retry);
 }
 
-int
-connect(Redis::Cluster::Fast self)
+SV*
+__connect(Redis::Cluster::Fast self)
 CODE:
 {
-    RETVAL = Redis__Cluster__Fast_connect(self);
+    RETVAL = Redis__Cluster__Fast_connect(aTHX_ self);
 }
 OUTPUT:
     RETVAL

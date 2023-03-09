@@ -2,7 +2,7 @@ use strictures;
 
 package WebService::GoogleAPI::Client::AuthStorage::ServiceAccount;
 
-our $VERSION = '0.26';    # VERSION
+our $VERSION = '0.27';    # VERSION
 
 # ABSTRACT: Manage access tokens from a service account file
 
@@ -13,24 +13,24 @@ use Mojo::JWT::Google;
 
 
 has scopes => is => 'rw',
-  coerce   => sub {
-  my $arg = shift;
-  return [split / /, $arg] unless ref $arg eq 'ARRAY';
-  return $arg;
-  },
-  default => sub { [] };
+    coerce => sub {
+      my $arg = shift;
+      return [ split / /, $arg ] unless ref $arg eq 'ARRAY';
+      return $arg;
+    },
+    default => sub { [] };
 
 
-has user  => is => 'rw',
-  coerce  => sub { $_[0] || '' },
-  default => '';
+has user    => is => 'rw',
+    coerce  => sub { $_[0] || '' },
+    default => '';
 
 with 'WebService::GoogleAPI::Client::AuthStorage';
 
 
-has path   => is => 'rw',
-  required => 1,
-  trigger  => 1;
+has path     => is => 'rw',
+    required => 1,
+    trigger  => 1;
 
 sub _trigger_path {
   my ($self) = @_;
@@ -42,8 +42,8 @@ sub _trigger_path {
 has jwt => is => 'rw';
 
 
-has tokens => is => 'ro',
-  default  => sub { {} };
+has tokens  => is => 'ro',
+    default => sub { {} };
 
 
 sub get_access_token {
@@ -92,7 +92,7 @@ WebService::GoogleAPI::Client::AuthStorage::ServiceAccount - Manage access token
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -155,23 +155,13 @@ using a JWT.
 
 Return the list of scopes as a space seperated string.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Veesh Goldman <veesh@cpan.org>
 
-=item *
-
-Peter Scott <localshop@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Peter Scott and others.
+This software is Copyright (c) 2017-2023 by Veesh Goldman and Others.
 
 This is free software, licensed under:
 

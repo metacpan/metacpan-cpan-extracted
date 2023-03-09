@@ -5,7 +5,7 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
@@ -36,6 +36,10 @@ Next command simply produces the same result.
     $ diff OLD.docx NEW.docx
 
 ## FILE FORMATS
+
+- git
+
+    [git(1)](http://man.he.net/man1/git) file object. Like `HEAD^:README.md`.
 
 - msdoc
 
@@ -147,7 +151,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2019-2022 Kazumasa Utashiro.
+Copyright 2019-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

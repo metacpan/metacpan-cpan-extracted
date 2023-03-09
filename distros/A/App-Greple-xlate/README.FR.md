@@ -56,6 +56,7 @@ Si vous voulez traduire un texte entier, utilisez l'option **--match-entire**. I
     Spécifiez le moteur de traduction à utiliser. Vous n'avez pas à utiliser cette option car le module `xlate::deepl` le déclare comme `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     Au lieu d'appeler le moteur de traduction, vous êtes censé travailler pour. Après avoir préparé les textes à traduire, ils sont copiés dans le presse-papiers. Vous êtes censé les coller dans le formulaire, copier le résultat dans le presse-papiers et appuyer sur la touche retour.
 
@@ -103,6 +104,10 @@ Si vous voulez traduire un texte entier, utilisez l'option **--match-entire**. I
     - **xtxt**
 
         Si le format est `xtxt` (texte traduit) ou inconnu, seul le texte traduit est imprimé.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Spécifie la longueur maximale du texte à envoyer à l'API en une seule fois. La valeur par défaut est la même que pour le service de compte gratuit : 128K pour l'API (**--xlate**) et 5000 pour l'interface du presse-papiers (**--xlate-labor**). Vous pouvez modifier ces valeurs si vous utilisez le service Pro.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

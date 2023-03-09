@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 
 use Astro::SpaceTrack qw{shell};
 use Getopt::Long 2.39;
@@ -92,7 +92,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006, 2010-2022 by Thomas R. Wyant, III
+Copyright (C) 2005-2006, 2010-2023 by Thomas R. Wyant, III
 (F<wyant at cpan dot org>).
 
 This program is free software; you can redistribute it and/or modify it

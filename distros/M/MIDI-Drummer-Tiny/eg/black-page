@@ -21,12 +21,12 @@ my $d = MIDI::Drummer::Tiny->new(
     reverb => 15,
 );
 
-Music::Duration::tuplet($d->half,    'A', 5);  # Ahn
-Music::Duration::tuplet($d->eighth,  'B', 5);  # Ben
+Music::Duration::tuplet($d->half,    'A', 5);    # Ahn
+Music::Duration::tuplet($d->eighth,  'B', 5);    # Ben
 Music::Duration::tuplet($d->quarter, 'C', 5.2);  # Cqn
-Music::Duration::tuplet($d->quarter, 'D', 7);  # Dqn
-Music::Duration::tuplet($d->quarter, 'E', 11); # Eqn
-Music::Duration::tuplet($d->quarter, 'F', 12); # Fqn
+Music::Duration::tuplet($d->quarter, 'D', 7);    # Dqn
+Music::Duration::tuplet($d->quarter, 'E', 11);   # Eqn
+Music::Duration::tuplet($d->quarter, 'F', 12);   # Fqn
 
 my $ten = dura_size($d->triplet_eighth);
 Music::Duration::add_duration(Gten => $ten * 2); # Gten

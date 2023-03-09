@@ -19,7 +19,7 @@ my $class = Module::Build->subclass(
             }
         }
         sub _check_for_source_command {
-            my $file = "bashrc_pod";
+            my $file = "bash_completion_pod";
             my $path = qx(which $file);
             chomp $path;
             if ( not $ENV{MY_POD_CACHE} and $path ) {

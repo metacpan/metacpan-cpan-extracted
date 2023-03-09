@@ -26,7 +26,7 @@
   use strict;
   use warnings;
   use vars qw(%areanames %fixed_line_regexes %mobile_regexes);
-our $VERSION = 1.20230305165945;
+our $VERSION = 1.20230307181309;
 
 
 

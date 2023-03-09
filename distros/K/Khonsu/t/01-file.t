@@ -1,3 +1,5 @@
+use Test::More;
+
 use Khonsu;
 
 my $khonsu = Khonsu->new(
@@ -167,4 +169,8 @@ $khonsu->add_page(
 );
 
 $khonsu->save();
+
+ok(1);
+
+done_testing();
 

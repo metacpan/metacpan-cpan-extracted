@@ -14,7 +14,7 @@ use IO::File;
 use Cwd 'abs_path';
 
 our($VERSION);
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 ###############################################################################
 # BASE METHODS
@@ -307,7 +307,8 @@ sub require_ok {
    $main::TI_NUM++  unless ($mode eq 'feature');
 
    my $pack = caller;
-   my @inc  = map { "unshift(\@INC,'$_');\n" } ($$self{'libdir'},$$self{'testdir'});
+   my @inc  = map { "unshift(\@INC,'$_');\n" }
+     ($$self{'libdir'},$$self{'testdir'});
 
    my($desc,$code);
 
@@ -321,7 +322,9 @@ REQUIRE
    } else {
       $module = qq['$module'] unless $self->_is_module_name($module);
       $desc   = "require $module";
-      my $p   = "package";   # So the following do not get picked up by cpantorpm-depreq
+      # So the following do not get picked up by cpantorpm-depreq or other
+      # tools that try to determine dependencies and prereqs
+      my $p   = "package";
       my $r   = "require";
       $code   = <<REQUIRE;
 $p $pack;
@@ -426,7 +429,9 @@ USE
 
       my @inc  = map { "unshift(\@INC,'$_');\n" } ($$self{'libdir'},$$self{'testdir'});
 
-      my $p   = "package";   # So the following do not get picked up by cpantorpm-depreq
+      # So the following do not get picked up by cpantorpm-depreq or other
+      # tools that try to determine dependencies and prereqs
+      my $p   = "package";
       $code = <<USE;
 $p $pack;
 @inc
@@ -967,13 +972,15 @@ sub tests {
    if (exists $opts{'feature'}) {
       foreach my $feature (@{ $opts{'feature'} }) {
          $skip = "Required feature unavailable: $feature", last
-           if (! exists $$self{'features'}{$feature});
+           if (! exists $$self{'features'}{$feature}  ||
+               ! $$self{'features'}{$feature});
       }
    }
    if (exists $opts{'disable'}  &&  ! $skip) {
       foreach my $feature (@{ $opts{'disable'} }) {
          $skip = "Disabled due to feature being available: $feature", last
-           if (exists $$self{'features'}{$feature});
+           if (exists $$self{'features'}{$feature}  &&
+               $$self{'features'}{$feature});
       }
    }
 

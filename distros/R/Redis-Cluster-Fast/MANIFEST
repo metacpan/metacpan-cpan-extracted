@@ -6,6 +6,7 @@ README.md
 builder/MyBuilder.pm
 cpanfile
 deps/async_context_always_use_resp3.patch
+examples/benchmark-simple.pl
 lib/Redis/Cluster/Fast.pm
 minil.toml
 src/Fast.xs

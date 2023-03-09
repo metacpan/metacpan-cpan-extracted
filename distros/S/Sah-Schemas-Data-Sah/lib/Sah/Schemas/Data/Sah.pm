@@ -3,9 +3,9 @@ package Sah::Schemas::Data::Sah;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-05'; # DATE
+our $DATE = '2023-01-17'; # DATE
 our $DIST = 'Sah-Schemas-Data-Sah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Data::Sah
@@ -22,7 +22,7 @@ Sah::Schemas::Data::Sah - Sah schemas related to Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Data::Sah (from Perl distribution Sah-Schemas-Data-Sah), released on 2022-10-05.
+This document describes version 0.002 of Sah::Schemas::Data::Sah (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-17.
 
 =head1 SAH SCHEMAS
 
@@ -80,7 +80,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

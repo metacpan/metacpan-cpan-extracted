@@ -1,0 +1,536 @@
+#!perl
+#
+# vov - musical V/V utility, for arbitrary "chord X relative to Y as
+# tonic in key Z" type calculations (V/V are called "applied dominants"
+# among various other names). Any scale degree can be used, e.g. the
+# phrase with a sub-phrase relative to IV "I IV/IV V/IV IV V I" says
+# tonic (C), subdominant of the subdominant (B of F), dominant of the
+# subdominant (C of F), and then subdominant (F), dominant (G) and back
+# to the tonic.
+#
+# Run perldoc(1) on this file for additional documentation.
+#
+# A ZSH completion script is available in the zsh-compdef/ directory of
+# the App::MusicTools distribution.
+#
+# XXX the code is something of a mess, and should be simplified and
+# rewritten. But that takes time and energy.
+
+use strict;
+use warnings;
+
+use Carp;
+use Getopt::Long qw/GetOptions/;
+use List::Util   qw/sum/;
+# So as it turns out atonal functions can be handy for various
+# tonal needs.
+use Music::AtonalUtil   ();
+use Music::LilyPondUtil ();
+use Music::Scales       qw/get_scale_nums is_scale/;
+use Text::Roman         qw/roman2int/;
+
+# Leading sharp/flats adjust the tonic up or down (might also support
+# doublesharp or doubleflat, but those get tricky depending on the
+# underlying note, and are not used in output (e.g. 'a' will be shown
+# instead of a 'beses' for a double-diminished 7th).
+my $FLAT_CHARS      = 'b\x{266D}';
+my $SHARP_CHARS     = '#\x{266F}';
+my $ROMAN_PREFIX_RE = qr/[$FLAT_CHARS$SHARP_CHARS]/;
+
+# Upper vs. lower case indicates major vs. minor quality of the 3rd
+my $ROMAN_NUMERAL_RE = qr/III|iii|VII|vii|II|ii|IV|iv|VI|vi|I|i|V|v/;
+
+# Whether to aug or dim or double dim the chord (+ * **), the chord
+# factor or inversion data, or inversion by letter form.
+my $ROMAN_SUFFIX_RE = qr/[+*]?[*]?\d*[a-g]?/;
+
+# Standard tonal limits on scale degrees and non-repetition of triad
+# pitches; adjust these if using some other scale system.
+my $MAX_SCALE_DEGREE = 7;
+# Western system of 7 scale degrees allows for at most a 13th chord
+# before repeats; the following generalizes to arbitrary degrees.
+my $MAX_CHORD_FACTOR =
+  ( $MAX_SCALE_DEGREE % 2 == 0 ? $MAX_SCALE_DEGREE : $MAX_SCALE_DEGREE * 2 ) -
+  1;
+my $DEFAULT_CHORD_FACTOR = 5;    # a 5th
+my $DEG_IN_SCALE         = 12;
+my @MODES =
+  qw/aeolian amdorian dorian hminor hunminor ionian locrian lydian major minor mixolydian mminor phrygian/;
+my $mode_name = 'major';
+
+my $atu = Music::AtonalUtil->new;
+# Chords generated from the root up, with no notion of register
+my $lyu = Music::LilyPondUtil->new( ignore_register => 1, keep_state => 0 );
+
+my $output_tmpl = '%{chord}' . "\n";
+
+GetOptions(
+    'factor=i'      => \my $Default_Factor,
+    'flats!'        => \my $use_flats,
+    'help'          => \&print_help,
+    'listmodes'     => \my $list_modes,
+    'minor'         => \my $use_minor,
+    'mode=s'        => \$mode_name,
+    'natural'       => \my $use_naturals,
+    'outputtmpl=s'  => \$output_tmpl,
+    'raw'           => \my $raw_output,
+    'transpose|t=s' => \my $Transpose,
+) or print_help();
+
+if ($list_modes) {
+    print "$_\n" for @MODES;
+    exit 0;
+}
+print_help() unless @ARGV;
+
+$lyu->chrome('flats') if $use_flats;
+
+$mode_name = 'minor' if $use_minor;
+die "error: no such mode '$mode_name'" unless is_scale $mode_name;
+
+$Default_Factor //= $DEFAULT_CHORD_FACTOR;
+$Transpose = $lyu->notes2pitches($Transpose) if $Transpose;
+
+$output_tmpl =~ s/(\\.)/qq!"$1"!/eeg;
+$output_tmpl .= "\n" unless $output_tmpl =~ m/\s$/;
+
+for my $vov_spec (@ARGV) {
+    my @vovs           = reverse split '/', $vov_spec;
+    my $base_intervals = get_mode_intervals($mode_name);
+    my $cur_intervals  = $base_intervals;
+    my $sd_transpose   = 0;
+
+    my ( $prev_root_pitch, $prev_root_sd, $pset, $invert_by );
+    for my $vov (@vovs) {
+        my ( $root_sd, $factor, $alterations, $inv ) = parse_roman_numeral($vov);
+        if ( defined $prev_root_sd ) {
+            $sd_transpose = $prev_root_pitch;
+            # This rotation trick constrains the pitches of the new relative
+            # pitch to those of the overlying mode, as otherwise III/ii
+            # assuming major will use pitches not present in the underlying
+            # major scale.
+            $cur_intervals = $atu->rotate( -1 * $prev_root_sd, $base_intervals );
+        }
+        my $sds = build_triad_degrees( $root_sd, $factor );
+        $pset = sd2ps( $sds, $alterations, $cur_intervals, $sd_transpose );
+
+        $prev_root_pitch = $pset->[0];
+        $prev_root_sd    = $root_sd;
+        $invert_by       = $inv;
+    }
+
+    $pset = $atu->rotate( -1 * $invert_by, $pset ) if $invert_by;
+
+    if ($Transpose) {
+        for my $p (@$pset) {
+            $p += $Transpose;
+            $p %= $DEG_IN_SCALE;
+        }
+    }
+
+    my %out_attr = ( vov => $vov_spec );
+    if ($raw_output) {
+        $out_attr{chord} = join " ", @$pset;
+    } else {
+        $out_attr{chord} = join " ", $lyu->p2ly(@$pset);
+    }
+    my $str = $output_tmpl;
+    $str =~
+      s/ \Q%{\E (\w+) \Q}\E / defined $out_attr{$1} ? $out_attr{$1} : q{} /egx;
+    print $str;
+}
+
+exit 0;
+
+########################################################################
+#
+# SUBROUTINES
+
+# Given root scale degree plus a chord factor, returns an array
+# reference of scale degrees of the chord elements up to the
+# chord factor.
+sub build_triad_degrees {
+    my ( $root_sd, $factor ) = @_;
+    if ( defined $factor ) {
+        $factor =~ tr/0-9//cd;    # so can say "5th" or "7th" or the like
+        if ( $factor < 1 or $factor > $MAX_CHORD_FACTOR or $factor % 2 == 0 ) {
+            croak "factor must be odd number between 1 and $MAX_CHORD_FACTOR inclusive";
+        }
+    } else {
+        $factor = $DEFAULT_CHORD_FACTOR;
+    }
+
+    if ( !defined $root_sd or $root_sd < 0 or $root_sd >= $MAX_SCALE_DEGREE ) {
+        croak "root scale degree must be 0 to "
+          . ( $MAX_SCALE_DEGREE - 1 )
+          . " inclusive";
+    }
+
+    my @sds;
+    # I blame too many slope equation videos & exercises on Khan Academy
+    # for this code.
+    for my $i ( 1 .. ( $factor * 0.5 + 0.5 ) ) {
+        push @sds, ( $root_sd + 2 * $i - 2 ) % $MAX_SCALE_DEGREE;
+    }
+
+    return \@sds;
+}
+
+# Convert pitches from Music::Scales into a list of intervals
+sub get_mode_intervals {
+    my ($name) = @_;
+    my @pitches = get_scale_nums($name);
+    my @intervals;
+
+    for my $i ( 1 .. $#pitches ) {
+        push @intervals, $pitches[$i] - $pitches[ $i - 1 ];
+    }
+
+    # pad out scale with VII to I interval
+    my $sum = sum @intervals;
+    if ( $sum < $DEG_IN_SCALE ) {
+        push @intervals, $DEG_IN_SCALE - $sum;
+    } elsif ( $sum > $DEG_IN_SCALE ) {
+        die "error: do not know what to do with scale larger than $DEG_IN_SCALE\n";
+    }
+    return \@intervals;
+}
+
+# XXX 7ths could use more work? no way to specify MM7 vs. Mm7 (that
+# these are notated the same using Roman Numerals does not help).
+sub parse_roman_numeral {
+    my ($numeral) = @_;
+    my ( $pre, $roman, $suf ) =
+      $numeral =~ m/^($ROMAN_PREFIX_RE)?($ROMAN_NUMERAL_RE)($ROMAN_SUFFIX_RE)?/;
+    $pre //= '';
+    $suf //= '';
+
+    my %alterations;
+    my $factor = $Default_Factor;
+    my $inversion;
+
+    # Inversions by trailing letter format: Ia no inversion, Ib first,
+    # etc. 'g' is to support the maximum inversion of a 13th chord.
+    if ( $suf =~ m/([a-g])/ ) {
+        $inversion = ord($1) - ord('a');
+    }
+
+    # Optional factor or perhaps inversion (7 for seventh, 64 for 5th in
+    # 2nd inversion, and so forth).
+    if ( $suf =~ m/(\d+)/ ) {
+        my $digits = $1;
+        if ( $digits <= $MAX_CHORD_FACTOR and $digits % 2 == 1 ) {
+            $factor = $1;
+        } else {
+            croak "cannot mix letter and numeric form of inversions"
+              if defined $inversion;
+            if ( $digits == 6 ) {
+                $inversion = 1;
+            } elsif ( $digits == 64 ) {
+                $inversion = 2;
+            } elsif ( $digits == 65 ) {
+                $inversion = 1;
+                $factor    = 7;
+            } elsif ( $digits == 43 ) {
+                $inversion = 2;
+                $factor    = 7;
+            } elsif ( $digits == 2 ) {
+                $inversion = 3;
+                $factor    = 7;
+            }
+        }
+    }
+
+    # KLUGE $alterations is something of a mess; might be better to build
+    # the chord up by 3rds--minors for diminished, majors for aug,
+    # major/minor 3rds for major, minor/major for minor. (though 7ths and
+    # up still tricky)
+
+    my $scale_degree = roman2int($roman) if $roman;
+    if ( !$scale_degree ) {
+        croak "could not parse '$numeral'";
+    } else {
+        $scale_degree--;    # base from 0..6 for ease of internal calcs
+
+        if ( lc $roman eq $roman ) {
+            $alterations{1} = -1;
+            $alterations{3} = -1;    # so that i7 converts to mm7
+        } else {
+            $alterations{1} = 1;
+        }
+    }
+
+    # Sharpen or flatten the root (e.g. for bII or #IV chromatic alterations).
+    if ( $pre =~ m/[$FLAT_CHARS]/ ) {
+        $alterations{0} = -1;
+        $alterations{2} = -1;
+    } elsif ( $pre =~ m/[$SHARP_CHARS]/ ) {
+        $alterations{0} = 1;
+    }
+
+    # Augment or diminish the 5th (or 7th with **).
+    if ( $suf =~ m/[+]/ ) {
+        $alterations{2} = 1;
+    } elsif ( $suf =~ m/\*\*/ ) {
+        # dd7
+        $alterations{1} = -1;
+        $alterations{2} = -1;
+        $alterations{3} = -2;
+    } elsif ( $suf =~ m/\*/ ) {
+        # dm7
+        $alterations{1} = -1;
+        $alterations{2} = -1;
+    }
+
+    if ($use_naturals) {
+        my $zero = $alterations{0};
+        %alterations = ();
+        $alterations{0} = $zero if defined $zero;
+    }
+
+    $inversion //= 0;
+    return $scale_degree, $factor, \%alterations, $inversion;
+}
+
+sub print_help {
+    warn <<"END_HELP";
+Usage: $0 [options] x/x [x/x ...]
+
+Where x are roman numerals (I..VII and i..vii), possibly prefixed with #
+or b to sharpen or flatten the root pitch, possibly suffixed with + to
+augment or * to diminish or ** to double diminish, possibly suffixed
+with an integer specifying the chord factor or inversion:
+
+  V5 V6 V64       # Dominant fifth and inversions (also Va, Vb, Vc)
+  V7 V65 V42 V2   # Dominant seventh and inversions (V7a, V7b, V7c, V7d)
+  bII6            # Neapolitan 6th
+
+Options that do nothing else:
+
+  --help            Displays help and exits program.
+  --listmodes       Shows list of available modes and exits program.
+
+Options that adjust the results:
+
+  --minor           Use minor mode (default is Major).
+  --mode=s          Or specify the named mode.
+
+  --factor=i        Specify default chord factor (1 for single notes, and
+                    up to 13 for thirteenth chords). 5th is the default.
+  --flats           Use flats in output, instead of default sharps.
+  --natural         Ignore VII vs. vii vs. 'vii*' in input and use the
+                    intervals implied by the mode. (But a bII would still
+                    lower the root.)
+  --outputtmpl=s    Specify a custom output template (see example below).
+  --raw             Emit pitch numbers instead of note names.
+  --transpose=s     Number of semitones to transpose the output by, or the
+                    note letter to transpose to, e.g. 'a' or -3 or 9 to move
+                    the root to A from the default C.
+
+Examples:
+
+  \$ vov V7/V
+  d fis a c
+  \$ vov --outputtmpl='<%{chord}> % %{vov}' I
+  <c e g> % I
+
+END_HELP
+    exit 64;
+}
+
+# convert scale degrees into a set of pitches
+sub sd2ps {
+    my ( $sdset, $alterations, $scale_intervals, $transpose ) = @_;
+    $alterations //= {};
+    $transpose ||= 0;
+
+    my @pset;
+    for my $sd (@$sdset) {
+        push @pset, $sd != 0 ? sum( @{$scale_intervals}[ 0 .. $sd - 1 ] ) : 0;
+    }
+
+    for my $i ( sort { $a <=> $b } keys %$alterations ) {
+        next if $i < 0 or $i > $#pset;
+        if ( $i > 0 ) {
+            # KLUGE skip alteration if already applied by the scale in
+            # question (e.g. don't flatten 3rd of "i" in c-minor as will
+            # already be a minor 3rd). Better implementation might just deal
+            # with major vs. minor 3rds, and stack those up?
+            next
+              if $alterations->{$i} == -1
+              and ( $pset[$i] - $pset[ $i - 1 ] ) % $DEG_IN_SCALE == 3;
+            next
+              if $alterations->{$i} == 1
+              and ( $pset[$i] - $pset[ $i - 1 ] ) % $DEG_IN_SCALE == 4;
+        }
+        $pset[$i] += $alterations->{$i};
+    }
+    for my $p (@pset) {
+        $p += $transpose;
+        $p %= $DEG_IN_SCALE;
+    }
+    return \@pset;
+}
+
+END {
+    # Report problems when writing to stdout (perldoc perlopentut)
+    unless ( close(STDOUT) ) {
+        warn "error: problem closing STDOUT: $!\n";
+        exit 74;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+vov - chord generation from roman numerals with sub-phrase support
+
+=head1 SYNOPSIS
+
+  $ vov --outputtmpl='<%{chord}> \t% %{vov}' I IV/IV V7/IV IV V7 I
+  <c e g>       % I
+  <b dis f>     % IV/IV
+  <c e g b>     % V7/IV
+  <f a c>       % IV
+  <g b d f>     % V7
+  <c e g>       % I
+
+=head1 DESCRIPTION
+
+Musical V/V utility, for arbitrary "chord X relative to Y as tonic in
+key Z" type calculations (V/V are called "applied dominants" among
+various other names). Any scale degree can be used, e.g. the phrase with
+a sub-phrase relative to IV "I IV/IV V/IV IV V I" says tonic (C),
+subdominant of the subdominant (B of F), dominant of the subdominant (C
+of F), and then subdominant (F), dominant (G) and back to the tonic.
+
+The input format is based somewhat upon "Roman Numeral Analysis" and
+other musical sources, with some tweaks for Unix command line input
+needs. The output is somewhat suitable for input to lilypond, e.g. via
+C<vov ... | ly-fu -> though can be adjusted by various options.
+
+=head1 INPUT FORMAT
+
+Supported input must be a roman numeral (I..VII and i..vii), possibly
+prefixed with C<#> or C<b> to sharpen or flatten the root pitch,
+possibly suffixed with C<+> to augment or C<*> to diminish or C<**> to
+double diminish, possibly suffixed with an integer specifying the chord
+factor or inversion:
+
+  V5 V6 V64       # Dominant fifth and inversions (or also Va, Vb, Vc)
+  V7 V65 V42 V2   # Dominant seventh and inversions (V7a, V7b, V7c, V7d)
+  bII6            # Neapolitan 6th
+
+Use C</> to delimit chord-X-of-Y, to arbitrary depth (depending on
+available memory, but going beyond 12 is silly):
+
+  $ vov V/V/V/V/V/V/V/V/V/V/V/V/V
+  g b d
+
+=head1 OPTIONS
+
+This program currently supports the following command line switches:
+
+=over 4
+
+=item B<--factor>=I<positive odd integer>
+
+Specify default chord factor (odd integer between 1 for just the
+fundamental and 13 for thirteenth chords, inclusive). Default is to
+generate 5th chords; C<7> would get seventh chords.
+
+  $ vov --factor=7 II V I
+  d fis a c
+  g b d f
+  c e g b
+
+=item B<--flats> | B<--noflats>
+
+Use flats instead of sharps in the output note names. Prefix with no to
+disable flats, in the event an alias has set them on by default.
+
+=item B<--help>
+
+Displays help and exits program.
+
+=item B<--listmodes>
+
+List available named scale modes and then exit. Used by ZSH compdef
+script. The scales listed are a subset of what L<Music::Scales> offers.
+
+=item B<--minor>
+
+Use C<minor> mode (default is C<major>).
+
+=item B<--mode>=I<mode>
+
+Specify named scale mode instead of using B<--intervals>. Some modes
+can be listed with the B<--listmodes> option; see L<Music::Scales> for
+the complete list. Only ascending versions of scales are available at
+this time.
+
+=item B<--natural>
+
+Ignore C<VII> vs. C<vii> vs. C<vii*> distinctions in input and use
+the intervals implied by the mode. However, a C<bII> would still
+lower the root.
+
+=item B<--outputtmpl>=I<template>
+
+Specify a custom output template. Supported macros include C<chord> and
+C<vov> to specify the notes of the chord, and the chord name as
+specified on the command line. For example:
+
+  --outputtmpl='<%{chord}> \t% %{vov}'
+
+=item B<--raw>
+
+Emit raw pitch numbers instead of note names.
+
+=item B<--transpose>=I<pitch or note>
+
+Value by which to transpose the output by (integer) or to (note name).
+
+=back
+
+=head1 FILES
+
+A ZSH completion script is available in the C<zsh-compdef/> directory of 
+the L<App::MusicTools> distribution. Install this to a C<$fpath> 
+directory.
+
+=head1 BUGS
+
+Lots, probably. In particular, diminished chords stay diminished (they
+follow the underlying mode, not the desired quality of the chord), even
+if one specifies C<VII> for major or C<II> for minor. Fixing this would
+be annoying, as the best way would involve a rewrite of the code.
+
+If the bug is in the latest version, send a report to the author.
+Patches that fix problems or add new features are welcome.
+
+L<https://thrig.me/src/App-MusicTools.git>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<http://www.lilypond.org/>
+
+=item *
+
+L<https://en.wikipedia.org/wiki/Roman_numeral_analysis>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2012 Jeremy Mates
+
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
+
+=cut

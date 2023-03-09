@@ -3,7 +3,7 @@ Locale::Codes::LangExt_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Thu Sep  1 10:00:57 EDT 2022
+#    Generated on: Mon Mar  6 13:25:07 EST 2023
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.72';
+$VERSION='3.73';
 
 $Locale::Codes::Data{'langext'}{'id'} = '0249';
 

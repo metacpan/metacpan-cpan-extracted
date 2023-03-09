@@ -7,6 +7,7 @@ Files: README
  lib/Exporter/Almighty.pm
  t/00start.t
  t/01basic.t
+ t/integration/readonlys.t
  t/integration/synopsis.t
  t/unit/Exporter/Almighty.t
 Copyright: This software is copyright (c) 2023 by Toby Inkster.
@@ -21,17 +22,17 @@ Files: Changes
 Copyright: Copyright 2023 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- Makefile.PL
-Copyright: Unknown
-License: Unknown
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+Copyright: Unknown
+License: Unknown
 
 License: Artistic-1.0
  This software is Copyright (c) 2023 by the copyright holder(s).

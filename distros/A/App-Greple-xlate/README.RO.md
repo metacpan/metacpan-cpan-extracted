@@ -56,6 +56,7 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
     Specificați motorul de traducere care urmează să fie utilizat. Nu este necesar să utilizați această opțiune deoarece modulul `xlate::deepl` o declară ca fiind `--xlate-engine=deepl`.
 
 - **--xlate-labor**
+- **--xlabor**
 
     În loc să apelați motorul de traducere, se așteaptă să lucrați pentru. După pregătirea textului care urmează să fie tradus, acestea sunt copiate în clipboard. Se așteaptă să le lipiți în formular, să copiați rezultatul în clipboard și să apăsați return.
 
@@ -103,6 +104,10 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
     - **xtxt**
 
         Dacă formatul este `xtxt` (text tradus) sau necunoscut, se tipărește numai textul tradus.
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    Specificați lungimea maximă a textului care urmează să fie trimis la API deodată. Valoarea implicită este setată ca pentru serviciul de cont gratuit: 128K pentru API (**--xlate**) și 5000 pentru interfața clipboard (**--xlate-labor**). Este posibil să puteți modifica aceste valori dacă utilizați serviciul Pro.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

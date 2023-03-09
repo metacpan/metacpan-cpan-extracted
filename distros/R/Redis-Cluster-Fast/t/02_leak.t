@@ -25,6 +25,14 @@ no_leaks_ok {
         2, '{key}1', '{key}2', 'first', 'second');
     $redis->mset('{my}hoge', 'test', '{my}fuga', 'test2');
     $redis->mget('{my}hoge', '{my}fuga');
+
+    eval {
+        Redis::Cluster::Fast->new(
+            startup_nodes => [
+                'localhost:1111corrupted'
+            ],
+        );
+    };
 } "No Memory leak";
 
 no_leaks_ok {

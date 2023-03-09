@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Google API Discovery and SDK",
-  "AUTHOR" => "Veesh Goldman <veesh\@cpan.org>, Peter Scott <localshop\@cpan.org>",
+  "AUTHOR" => "Veesh Goldman <veesh\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Config::JSON" => 0,
     "Data::Dump" => 0,
     "Data::Dumper" => 0,
+    "Data::Printer" => "1.00",
     "Exporter::Shiny" => 0,
     "IO::Socket::SSL" => "2.06",
     "List::SomeUtils" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::HTTP" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.26",
+  "VERSION" => "0.27",
   "test" => {
     "TESTS" => "t/*.t t/WebService/GoogleAPI/Client/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Config::JSON" => 0,
   "Data::Dump" => 0,
   "Data::Dumper" => 0,
+  "Data::Printer" => "1.00",
   "Exporter::Shiny" => 0,
   "IO::Socket::SSL" => "2.06",
   "List::SomeUtils" => 0,

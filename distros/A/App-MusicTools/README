@@ -1,21 +1,8 @@
 Music Tools - command line utilities for music composition and analysis
 
-To install this module, use CPAN, for example:
+to install this module, use CPAN, for example:
 
   cpanm App::MusicTools
 
-For the current source tree, see:
-
-http://github.com/thrig/App-MusicTools
-
-which can be built and installed via:
-
-  perl Makefile.PL
-  make
-  make test
-  make install
-
-DEPENDENCIES
-
-Some knowledge of lilypond and music theory may well benefit the user.
-See the Makefile.PL for module dependencies.
+this will install various scripts from bin/ to a directory that is
+hopefully in PATH

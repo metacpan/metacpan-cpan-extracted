@@ -3,7 +3,7 @@ package Terse::Helper;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Cwd qw/cwd/;
 use Module::Generate;
 use base 'Terse';
@@ -17,13 +17,15 @@ sub new {
 
 sub run {
 	my ($self, %args) = @_;
-	if ( $args{'--help'} ) {
+	if ( not keys %args || $args{'--help'} ) {
 		print q|Help:
 terse --name Test::App # Generates an application skeleton
-terse --name Test::App --controller Moon # Generate an application controller
 terse --name Test::App --model Sun # Generate an application model
-terse --name Test::App --plugin Stars # Generate an application plugin
+terse --name Test::App --view Moon # Generate an application view
+terse --name Test::App --controller Stars # Generate an application controller
+terse --name Test::App --plugin Satellites # Generate an application plugin
 |;
+		return;
 	}
 	$args{base} ||= cwd;
 	if (! $args{'--name'}) {
@@ -37,6 +39,8 @@ terse --name Test::App --plugin Stars # Generate an application plugin
 		return $self->create_plugin(%args);
 	} elsif ($args{'--model'}) {
 		return $self->create_model(%args);
+	} elsif ($args{'--view'}) {
+		return $self->create_view(%args);
 	} else {
 		$self->create_base_application(%args);
 	}
@@ -93,6 +97,22 @@ sub create_model {
 			->synopsis("\$t->model('$sub')->\$method(...)")
 			->abstract("$args{'--model'} application model")
 			->base($args{'--base'} || 'Terse::Plugin')
+			->generate();
+}
+
+sub create_view {
+	my ($self, %args) = @_;
+	chdir 'lib';
+	my $view = "$args{'--name'}::View::$args{'--view'}"; 
+	my @parts = split "\:\:", $args{'--view'}; 
+	my $sub = lc($parts[-1]);
+	my $endpoint = lc(join "/", @parts);
+	my $applicaiton = Module::Generate->start
+		->class($view)
+			->no_warnings('reserved')
+			->synopsis("\$t->view('$sub')->\$method(...)")
+			->abstract("$args{'--view'} application view")
+			->base($args{'--base'} || 'Terse::View')
 			->generate();
 }
 
@@ -375,7 +395,7 @@ Terse::Helper - Utility for generating Terse skeleton code.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

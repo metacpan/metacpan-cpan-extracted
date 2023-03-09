@@ -14,4 +14,6 @@ on 'test' => sub {
 
 on 'develop' => sub {
     recommends 'Pod::Markdown';
+    recommends 'App::Greple::msdoc', '1.05';
+    recommends 'App::Greple::xp', '0.04';
 };

@@ -12,6 +12,14 @@
 #9 wtc.wtc7
 #10 rt144979.def
 #11 rt144979.rt144979
+#12 bfvt.bfvt0
+#13 bfvt.bfvt2
+#14 bfvt.def
+#15 cpb.cpb
+#16 cpb.def
+#17 rt145706.def
+#18 olbxl.def
+#19 olbxl.olbxl1
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -29,8 +37,12 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
+        'bfvt0'    => "-bfvt=0",
+        'bfvt2'    => "-bfvt=2",
+        'cpb'      => "-cpb",
         'def'      => "",
         'dwic'     => "-wn -dwic",
+        'olbxl1'   => "-olbxl=eval",
         'rt144979' => "-xci -ce -lp",
         'wtc1'     => "-wtc=0 -dtc",
         'wtc2'     => "-wtc=1 -atc",
@@ -46,6 +58,55 @@ BEGIN {
     ############################
     $rsources = {
 
+        'bfvt' => <<'----------',
+# combines with -bfvt>0
+eval {
+    require XSLoader;
+    XSLoader::load( 'Sys::Syslog', $VERSION );
+    1;
+}
+  or do {
+    require DynaLoader;
+    push @ISA, 'DynaLoader';
+    bootstrap Sys::Syslog $VERSION;
+  };
+
+# combines with -bfvt=2
+eval {
+    ( $line, $cond ) = $self->_normalize_if_elif($line);
+    1;
+}
+  or die sprintf "Error at line %d\nLine %d: %s\n%s",
+  ( $line_info->start_line_num() ) x 2, $line, $@;
+
+# stable for bfvt<2; combines for bfvt=2; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+}
+  || "";
+
+# stays combined for all bfvt; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+} || "";
+----------
+
+        'cpb' => <<'----------',
+foreach my $dir (
+    '05_lexer', '07_token', '08_regression', '11_util',
+    '13_data',  '15_transform'
+  )
+{
+    my @perl = find_files( catdir( 't', 'data', $dir ) );
+    push @files, @perl;
+}
+
+----------
+
         'dwic' => <<'----------',
     skip_symbols(
         [ qw(
@@ -55,6 +116,26 @@ BEGIN {
             PL_sys_intern
         ) ],
     );
+----------
+
+        'olbxl' => <<'----------',
+            eval {
+               require Ace };
+
+            @list = map {
+                $frm{ ( /@(.*?)>/ ? $1 : $_ ) }++ ? () : ($_);
+            } @list;
+
+            $color = join(
+                '/',
+                sort {
+                    $color_value{$::a} <=> $color_value{$::b};
+                } keys %colors
+            );
+
+            @sorted = sort {
+                $SortDir * $PageTotal{$a} <=> $SortDir * $PageTotal{$b}
+                };
 ----------
 
         'rt144979' => <<'----------',
@@ -69,7 +150,7 @@ GetOptions(
           }
           return;
       },
-); 
+);
 
 # part 2
 {{{
@@ -96,6 +177,48 @@ GetOptions(
             }
 }}}
 
+----------
+
+        'rt145706' => <<'----------',
+# some tests for default setting --use-feature=class, rt145706
+class Example::Subclass1 : isa(Example::Base) { ... }
+class Example::Subclass2 : isa(Example::Base 2.345) { ... }
+class Example::Subclass3 : isa(Example::Base) 1.345 { ... }
+field $y : param(the_y_value);
+class Pointer 2.0 {
+    field $x : param;
+    field $y : param;
+
+    method to_string() {
+        return "($x, $y)";
+    }
+}
+
+ADJUST {
+    $x = 0;
+}
+
+# these should not produce errors
+method paint => sub {
+    ...;
+};
+method painter
+
+  => sub {
+    ...;
+  };
+is( ( method Pack "a", "b", "c" ), "method,a,b,c" );
+class ExtendsBasicAttributes is BasicAttributes{
+ ...
+}
+class BrokenExtendsBasicAttributes
+is BasicAttributes{
+ ...
+}
+class +Night with +Bad {
+    public nine { return 'crazy' }
+};
+my $x = field(50);
 ----------
 
         'wtc' => <<'----------',
@@ -644,6 +767,239 @@ GetOptions(
 }
 
 #11...........
+        },
+
+        'bfvt.bfvt0' => {
+            source => "bfvt",
+            params => "bfvt0",
+            expect => <<'#12...........',
+# combines with -bfvt>0
+eval {
+    require XSLoader;
+    XSLoader::load( 'Sys::Syslog', $VERSION );
+    1;
+}
+  or do {
+    require DynaLoader;
+    push @ISA, 'DynaLoader';
+    bootstrap Sys::Syslog $VERSION;
+  };
+
+# combines with -bfvt=2
+eval {
+    ( $line, $cond ) = $self->_normalize_if_elif($line);
+    1;
+}
+  or die sprintf "Error at line %d\nLine %d: %s\n%s",
+  ( $line_info->start_line_num() ) x 2, $line, $@;
+
+# stable for bfvt<2; combines for bfvt=2; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+  }
+  || "";
+
+# stays combined for all bfvt; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+  } || "";
+#12...........
+        },
+
+        'bfvt.bfvt2' => {
+            source => "bfvt",
+            params => "bfvt2",
+            expect => <<'#13...........',
+# combines with -bfvt>0
+eval {
+    require XSLoader;
+    XSLoader::load( 'Sys::Syslog', $VERSION );
+    1;
+} or do {
+    require DynaLoader;
+    push @ISA, 'DynaLoader';
+    bootstrap Sys::Syslog $VERSION;
+};
+
+# combines with -bfvt=2
+eval {
+    ( $line, $cond ) = $self->_normalize_if_elif($line);
+    1;
+} or die sprintf "Error at line %d\nLine %d: %s\n%s",
+  ( $line_info->start_line_num() ) x 2, $line, $@;
+
+# stable for bfvt<2; combines for bfvt=2; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+  } || "";
+
+# stays combined for all bfvt; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+  } || "";
+#13...........
+        },
+
+        'bfvt.def' => {
+            source => "bfvt",
+            params => "def",
+            expect => <<'#14...........',
+# combines with -bfvt>0
+eval {
+    require XSLoader;
+    XSLoader::load( 'Sys::Syslog', $VERSION );
+    1;
+} or do {
+    require DynaLoader;
+    push @ISA, 'DynaLoader';
+    bootstrap Sys::Syslog $VERSION;
+};
+
+# combines with -bfvt=2
+eval {
+    ( $line, $cond ) = $self->_normalize_if_elif($line);
+    1;
+}
+  or die sprintf "Error at line %d\nLine %d: %s\n%s",
+  ( $line_info->start_line_num() ) x 2, $line, $@;
+
+# stable for bfvt<2; combines for bfvt=2; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+  }
+  || "";
+
+# stays combined for all bfvt; has ci
+my $domain = shift
+  || eval {
+    require Net::Domain;
+    Net::Domain::hostfqdn();
+  } || "";
+#14...........
+        },
+
+        'cpb.cpb' => {
+            source => "cpb",
+            params => "cpb",
+            expect => <<'#15...........',
+foreach my $dir (
+    '05_lexer', '07_token', '08_regression', '11_util',
+    '13_data',  '15_transform'
+) {
+    my @perl = find_files( catdir( 't', 'data', $dir ) );
+    push @files, @perl;
+}
+
+#15...........
+        },
+
+        'cpb.def' => {
+            source => "cpb",
+            params => "def",
+            expect => <<'#16...........',
+foreach my $dir (
+    '05_lexer', '07_token', '08_regression', '11_util',
+    '13_data',  '15_transform'
+  )
+{
+    my @perl = find_files( catdir( 't', 'data', $dir ) );
+    push @files, @perl;
+}
+
+#16...........
+        },
+
+        'rt145706.def' => {
+            source => "rt145706",
+            params => "def",
+            expect => <<'#17...........',
+# some tests for default setting --use-feature=class, rt145706
+class Example::Subclass1 : isa(Example::Base) { ... }
+class Example::Subclass2 : isa(Example::Base 2.345) { ... }
+class Example::Subclass3 : isa(Example::Base) 1.345 { ... }
+field $y : param(the_y_value);
+class Pointer 2.0 {
+    field $x : param;
+    field $y : param;
+
+    method to_string() {
+        return "($x, $y)";
+    }
+}
+
+ADJUST {
+    $x = 0;
+}
+
+# these should not produce errors
+method paint => sub {
+    ...;
+};
+method painter
+
+  => sub {
+    ...;
+  };
+is( ( method Pack "a", "b", "c" ), "method,a,b,c" );
+class ExtendsBasicAttributes is BasicAttributes {
+    ...
+}
+class BrokenExtendsBasicAttributes is BasicAttributes {
+    ...
+}
+class +Night with +Bad {
+    public nine { return 'crazy' }
+};
+my $x = field(50);
+#17...........
+        },
+
+        'olbxl.def' => {
+            source => "olbxl",
+            params => "def",
+            expect => <<'#18...........',
+            eval { require Ace };
+
+            @list =
+              map { $frm{ ( /@(.*?)>/ ? $1 : $_ ) }++ ? () : ($_); } @list;
+
+            $color = join( '/',
+                sort { $color_value{$::a} <=> $color_value{$::b}; }
+                  keys %colors );
+
+            @sorted =
+              sort { $SortDir * $PageTotal{$a} <=> $SortDir * $PageTotal{$b} };
+#18...........
+        },
+
+        'olbxl.olbxl1' => {
+            source => "olbxl",
+            params => "olbxl1",
+            expect => <<'#19...........',
+            eval {
+                require Ace;
+            };
+
+            @list =
+              map { $frm{ ( /@(.*?)>/ ? $1 : $_ ) }++ ? () : ($_); } @list;
+
+            $color = join( '/',
+                sort { $color_value{$::a} <=> $color_value{$::b}; }
+                  keys %colors );
+
+            @sorted =
+              sort { $SortDir * $PageTotal{$a} <=> $SortDir * $PageTotal{$b} };
+#19...........
         },
     };
 

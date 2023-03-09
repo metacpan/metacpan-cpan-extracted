@@ -1,5 +1,5 @@
 package MIDI::Simple::Drummer::Rock;
-$MIDI::Simple::Drummer::Rock::VERSION = '0.0811';
+$MIDI::Simple::Drummer::Rock::VERSION = '0.0813';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -289,7 +289,7 @@ MIDI::Simple::Drummer::Rock
 
 =head1 VERSION
 
-version 0.0811
+version 0.0813
 
 =head1 DESCRIPTION
 
@@ -313,7 +313,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2009-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

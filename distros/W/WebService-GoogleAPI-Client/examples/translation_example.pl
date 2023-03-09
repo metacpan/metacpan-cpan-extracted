@@ -9,7 +9,8 @@ use File::Which;
 use feature 'say';
 use MIME::Base64;
 
-require './EXAMPLE_HELPERS.pm'; ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
+require './EXAMPLE_HELPERS.pm'
+    ;    ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
 
 
 #use utf8;
@@ -97,10 +98,10 @@ print "Translating '$params->{text}'\n";
 
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
 ## manunally sets the client user email to be the first in the gapi.json file
-my $gapi_client = WebService::GoogleAPI::Client->new( debug => 0, gapi_json => 'gapi.json', debug=>0 );
+my $gapi_client       = WebService::GoogleAPI::Client->new(debug => 0, gapi_json => 'gapi.json', debug => 0);
 my $aref_token_emails = $gapi_client->auth_storage->get_token_emails_from_storage;
-my $user              = $aref_token_emails->[0];                                                             ## default to the first user
-$gapi_client->user( $user );
+my $user              = $aref_token_emails->[0];    ## default to the first user
+$gapi_client->user($user);
 
 #my $list = $gapi_client->discover_all();
 #say Dumper $list;
@@ -110,25 +111,26 @@ $gapi_client->user( $user );
 #say join(',', keys %$methods );
 
 ## todo include a check and handle if only pass in the api endpoint without the hash key
-##    - should not need to pass in options ! 
+##    - should not need to pass in options !
 
-#my $r = $gapi_client->api_query(  api_endpoint_id => 'translate.languages.list'); 
+#my $r = $gapi_client->api_query(  api_endpoint_id => 'translate.languages.list');
 #say Dumper $r->json;
 
 
-## 
+##
 
-check_api_endpoint_and_user_scopes( $gapi_client, 'translate.translations.translate' );
+check_api_endpoint_and_user_scopes($gapi_client, 'translate.translations.translate');
 
 
-my $r = $gapi_client->api_query(  api_endpoint_id => 'translate.translations.translate', 
-                                  options => { 
-                                      q=> $params->{text},
-                                      target => 'fr',
-                                      format => 'text',
-                                  } );
+my $r = $gapi_client->api_query(
+  api_endpoint_id => 'translate.translations.translate',
+  options         => {
+    q      => $params->{text},
+    target => 'fr',
+    format => 'text',
+  }
+);
 #say Dumper $r->json;
 say $r->json->{data}{translations}[0]{translatedText};
-
 
 

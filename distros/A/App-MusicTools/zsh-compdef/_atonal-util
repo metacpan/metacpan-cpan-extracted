@@ -29,6 +29,7 @@ _atonal-util() {
 _atonalutil_mode() {
   _atonalutil_modes=(
     'adjacent_interval_content:AIC' \
+    'bark:pitch to Bark scale numbers' \
     'basic:prime_form and interval_class_content info' \
     'beats2set:rhythmic beats to set class' \
     'circular_permute:all permutations of pitch set' \
@@ -96,6 +97,14 @@ _atonalutil_adjacent_interval_content() {
   _arguments -s \
     '1:noteorfnum:_values "forte number or pitches" $forte_numbers $pitches' \
     {--sd,--scaledegrees}'=[degrees in the scale]:scaledegrees:(12 16)' \
+    '*:note:_values "pitches" $pitches'
+}
+_atonalutil_bark() {
+  _arguments -s \
+    {--concertfreq=,--cf=}'[concert frequency]:frequency:(409 415 422.5 440)' \
+    {--concertpitch=,--cp=}'[concert pitch]:pitch:(69)' \
+    '--relative=[relative starting pitch]:pitch:_values "pitches" $pitches' \
+    '--scala=[scala .scl file]:filename:_files' \
     '*:note:_values "pitches" $pitches'
 }
 _atonalutil_basic() {

@@ -1,6 +1,6 @@
 package App::optex::textconv::pdf;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf-8
 
@@ -10,7 +10,7 @@ textconv::pdf - optex::textconv submodule to handle PDF files
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -70,6 +70,10 @@ Default is C<->.
 Define format for B<number> parameter.
 Default is C<[ Page %d ]>.
 
+=item B<raw>
+
+Use C<-raw> option with L<pdftotext(1)> command.
+
 =back
 
 =head1 SEE ALSO
@@ -106,6 +110,7 @@ our %param = (
     width     => 78,
     mark      => '-',
     format    => '[ Page %d ]',
+    raw       => 0,
     );
 
 my %pagebreak = (
@@ -127,7 +132,9 @@ sub to_text {
     my $file = shift;
     my $type = ($file =~ /\.(pdf)$/i)[0] or return;
     my $break = $pagebreak{$param{pagebreak}}->();
-    local $_ = qx{ pdftotext -q \"$file\" - };
+    my $pdftotext = 'pdftotext';
+    $pdftotext .= ' -raw' if $param{raw};
+    local $_ = qx{ $pdftotext -q \"$file\" - };
     s/\f/$break->()/ger;
 }
 

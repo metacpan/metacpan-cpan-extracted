@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Perinci/Sub/XCompletion/perl_sah_filter_modname_with_optional_args.pm',
     'Sah/Schema/perl/perl_sah_filter/modname.pm',
     'Sah/Schema/perl/perl_sah_filter/modname_with_optional_args.pm',
     'Sah/SchemaR/perl/perl_sah_filter/modname.pm',

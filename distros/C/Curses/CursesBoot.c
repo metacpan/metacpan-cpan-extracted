@@ -1,4 +1,4 @@
-/* 
+/*
 **
 **  CursesBoot.c -- the bootstrap function
 **
@@ -475,6 +475,9 @@ XS(boot_Curses)
 #endif
 #ifdef A_BOLD
     C_NEWCS("A_BOLD",                         A_BOLD);
+#endif
+#ifdef A_ITALIC
+    C_NEWCS("A_ITALIC",                         A_ITALIC);
 #endif
 #ifdef A_CHARTEXT
     C_NEWCS("A_CHARTEXT",                     A_CHARTEXT);

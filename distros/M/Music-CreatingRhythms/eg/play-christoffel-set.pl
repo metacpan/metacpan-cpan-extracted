@@ -19,7 +19,7 @@ my $loops = shift || 8; # times to loop
 my $mcr = Music::CreatingRhythms->new;
 
 my $d = MIDI::Drummer::Tiny->new(
-   file   => 'play-christoffel-set.mid',
+   file   => 'play-set.mid',
    bpm    => 90,
    volume => 100,
    bars   => $loops,

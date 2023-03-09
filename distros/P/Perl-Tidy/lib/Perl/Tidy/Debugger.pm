@@ -8,7 +8,7 @@ package Perl::Tidy::Debugger;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20221112';
+our $VERSION = '20230309';
 
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
@@ -23,7 +23,7 @@ sub new {
         _fh                => undef,
         _is_encoded_data   => $is_encoded_data,
     }, $class;
-}
+} ## end sub new
 
 sub really_open_debug_file {
 
@@ -40,12 +40,11 @@ sub really_open_debug_file {
     $fh->print(
         "Use -dump-token-types (-dtt) to get a list of token type codes\n");
     return;
-}
+} ## end sub really_open_debug_file
 
 sub close_debug_file {
 
     my $self = shift;
-    my $fh   = $self->{_fh};
     if ( $self->{_debug_file_opened} ) {
         if ( !eval { $self->{_fh}->close(); 1 } ) {
 
@@ -53,7 +52,7 @@ sub close_debug_file {
         }
     }
     return;
-}
+} ## end sub close_debug_file
 
 sub write_debug_entry {
 
@@ -117,5 +116,5 @@ sub write_debug_entry {
     $fh->print("$token_str\n");
 
     return;
-}
+} ## end sub write_debug_entry
 1;

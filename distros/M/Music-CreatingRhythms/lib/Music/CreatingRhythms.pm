@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Combinatorial algorithms to generate rhythms
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0601';
 
 use Moo;
 use strictures 2;
@@ -259,6 +259,36 @@ sub comprnd {
     }
     push @compositions, $p;
     return \@compositions;
+}
+
+
+sub count_ones {
+    my ($self, $n) = @_;
+    my $x = 0;
+    if (ref $n) {
+        for my $i (@$n) {
+            $x++ if $i == 1;
+        }
+    }
+    else {
+        $x = $n =~ tr/1//;
+    }
+    return $x;
+}
+
+
+sub count_zeros {
+    my ($self, $n) = @_;
+    my $x = 0;
+    if (ref $n) {
+        for my $i (@$n) {
+            $x++ if $i == 0;
+        }
+    }
+    else {
+        $x = $n =~ tr/0//;
+    }
+    return $x;
 }
 
 
@@ -569,7 +599,7 @@ Music::CreatingRhythms - Combinatorial algorithms to generate rhythms
 
 =head1 VERSION
 
-version 0.0504
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -580,9 +610,9 @@ version 0.0504
 =head1 DESCRIPTION
 
 C<Music::CreatingRhythms> provides the combinatorial algorithms
-described in the book, "Creating Rhythms", by Hollos. These algorithms
-are ported directly from the C, and are pretty fast. Please see the
-links below for more information.
+described in the book, "Creating Rhythms", by Hollos. Many of these
+algorithms are ported directly from the C, and are pretty fast. Please
+see the links below for more information.
 
 NB: Arguments are sometimes switched between book and software.
 
@@ -730,6 +760,28 @@ Example:
 
   $got = $mcr->comprnd(16); # [1,3,2,1,1,2,1,3,2], etc.
 
+=head2 count_ones
+
+  $count = $mcr->count_ones($n);
+
+Count the number of 1s in a string or vector.
+
+Examples:
+
+  $got = $mcr->count_ones('100110100');         # 4
+  $got = $mcr->count_ones([1,0,0,1,1,0,1,0,0]); # 4
+
+=head2 count_zeros
+
+  $count = $mcr->count_zeros($n);
+
+Count the number of 0s in a string or vector.
+
+Examples:
+
+  $got = $mcr->count_zeros('100110100');         # 5
+  $got = $mcr->count_zeros([1,0,0,1,1,0,1,0,0]); # 5
+
 =head2 de_bruijn
 
   $sequence = $mcr->de_bruijn($n);
@@ -775,9 +827,9 @@ Invert a section of a B<parts> binary sequence at B<n>.
 Examples:
 
     $parts = [qw(1 0 1 0 0)];
-    $got = $mcr->invert_at(0, $parts); # 0 1 0 1 1
-    $got = $mcr->invert_at(1, $parts); # 1 1 0 1 1
-    $got = $mcr->invert_at(2, $parts); # 1 0 0 1 1
+    $got = $mcr->invert_at(0, $parts); # [0,1,0,1,1]
+    $got = $mcr->invert_at(1, $parts); # [1,1,0,1,1]
+    $got = $mcr->invert_at(2, $parts); # [1,0,0,1,1]
 
 =head2 neck
 
@@ -920,10 +972,10 @@ Reverse a section of a B<parts> sequence at B<n>.
 Examples:
 
   $parts = [qw(1 0 1 0 0)];
-  $got = $mcr->reverse_at(0, $parts); # 0 0 1 0 1
-  $got = $mcr->reverse_at(1, $parts); # 1 0 0 1 0
-  $got = $mcr->reverse_at(2, $parts); # 1 0 0 0 1
-  $got = $mcr->reverse_at(3, $parts); # 1 0 1 0 0
+  $got = $mcr->reverse_at(0, $parts); # [0,0,1,0,1]
+  $got = $mcr->reverse_at(1, $parts); # [1,0,0,1,0]
+  $got = $mcr->reverse_at(2, $parts); # [1,0,0,0,1]
+  $got = $mcr->reverse_at(3, $parts); # [1,0,1,0,0]
 
 =head2 rotate_n
 
@@ -934,12 +986,12 @@ Rotate a necklace of the given B<parts>, B<n> times.
 Examples:
 
   $parts = [qw(1 0 1 0 0)];
-  $got = $mcr->rotate_n(0, $parts); # 1 0 1 0 0
-  $got = $mcr->rotate_n(1, $parts); # 0 1 0 1 0
-  $got = $mcr->rotate_n(2, $parts); # 0 0 1 0 1
-  $got = $mcr->rotate_n(3, $parts); # 1 0 0 1 0
-  $got = $mcr->rotate_n(4, $parts); # 0 1 0 0 1
-  $got = $mcr->rotate_n(5, $parts); # 1 0 1 0 0
+  $got = $mcr->rotate_n(0, $parts); # [1,0,1,0,0]
+  $got = $mcr->rotate_n(1, $parts); # [0,1,0,1,0]
+  $got = $mcr->rotate_n(2, $parts); # [0,0,1,0,1]
+  $got = $mcr->rotate_n(3, $parts); # [1,0,0,1,0]
+  $got = $mcr->rotate_n(4, $parts); # [0,1,0,0,1]
+  $got = $mcr->rotate_n(5, $parts); # [1,0,1,0,0]
 
 =head1 SEE ALSO
 

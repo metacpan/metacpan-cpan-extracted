@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20221112';
+our $VERSION = '20230309';
 
 use Perl::Tidy::LineBuffer;
 use Carp;
@@ -101,6 +101,7 @@ use vars qw{
   %is_tetragraph
   %is_valid_token_type
   %is_keyword
+  %is_my_our_state
   %is_code_block_token
   %is_sort_map_grep_eval_do
   %is_sort_map_grep
@@ -208,7 +209,7 @@ BEGIN {
         _rOpts_logfile_                      => $i++,
         _rOpts_                              => $i++,
     };
-}
+} ## end BEGIN
 
 {    ## closure for subs to count instances
 
@@ -262,6 +263,8 @@ sub Fault {
     my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
     my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
     my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my $pkg = __PACKAGE__;
+
     my $input_stream_name = get_input_stream_name();
 
     Die(<<EOM);
@@ -272,7 +275,7 @@ in file '$filename1'
 which was called from line $line1 of sub '$subroutine2'
 Message: '$msg'
 This is probably an error introduced by a recent programming change.
-Perl::Tidy::Tokenizer.pm reports VERSION='$VERSION'.
+$pkg reports VERSION='$VERSION'.
 ==============================================================================
 EOM
 
@@ -289,7 +292,7 @@ sub bad_pattern {
     my ($pattern) = @_;
     my $ok = eval "'##'=~/$pattern/";
     return !defined($ok) || $EVAL_ERROR;
-}
+} ## end sub bad_pattern
 
 sub make_code_skipping_pattern {
     my ( $rOpts, $opt_name, $default ) = @_;
@@ -336,6 +339,43 @@ sub check_options {
         }
     }
 
+    #------------------------------------------------
+    # Update hash values for any -use-feature options
+    #------------------------------------------------
+    my $use_feature_class = $rOpts->{'use-feature'} =~ /\bclass\b/;
+
+    # These are the main updates for this option. There are additional
+    # changes elsewhere, usually indicated with a comment 'rt145706'
+
+    # Update hash values for use_feature=class, added for rt145706
+    # see 'perlclass.pod'
+
+    # IMPORTANT: We are changing global hash values initially set in a BEGIN
+    # block.  Values must be defined (true or false) for each of these new
+    # words whether true or false. Otherwise, programs using the module which
+    # change options between runs (such as test code) will have
+    # incorrect settings and fail.
+
+    # There are 4 new keywords:
+
+    # 'class' - treated specially as generalization of 'package'
+    # Note: we must not set 'class' to be a keyword to avoid problems
+    # with older uses.
+    $is_package{'class'} = $use_feature_class;
+
+    # 'method' - treated like sub using the sub-alias-list option
+    # Note: we must not set 'method' to be a keyword to avoid problems
+    # with older uses.
+
+    # 'field'  - added as a keyword, and works like 'my'
+    $is_keyword{'field'}      = $use_feature_class;
+    $is_my_our_state{'field'} = $use_feature_class;
+
+    # 'ADJUST' - added as a keyword and works like 'BEGIN'
+    # TODO: if ADJUST gets a paren list, this will need to be updated
+    $is_keyword{'ADJUST'}          = $use_feature_class;
+    $is_code_block_token{'ADJUST'} = $use_feature_class;
+
     %is_grep_alias = ();
     if ( $rOpts->{'grep-alias-list'} ) {
 
@@ -350,6 +390,7 @@ sub check_options {
       make_code_skipping_pattern( $rOpts, 'code-skipping-begin', '#<<V' );
     $code_skipping_pattern_end =
       make_code_skipping_pattern( $rOpts, 'code-skipping-end', '#>>V' );
+
     return;
 } ## end sub check_options
 
@@ -494,7 +535,7 @@ sub warning {
         $logger_object->warning($msg);
     }
     return;
-}
+} ## end sub warning
 
 sub get_input_stream_name {
     my $input_stream_name = EMPTY_STRING;
@@ -503,7 +544,7 @@ sub get_input_stream_name {
         $input_stream_name = $logger_object->get_input_stream_name();
     }
     return $input_stream_name;
-}
+} ## end sub get_input_stream_name
 
 sub complain {
     my $msg           = shift;
@@ -523,7 +564,7 @@ sub write_logfile_entry {
         $logger_object->write_logfile_entry($msg);
     }
     return;
-}
+} ## end sub write_logfile_entry
 
 sub interrupt_logfile {
     my $logger_object = $tokenizer_self->[_logger_object_];
@@ -531,7 +572,7 @@ sub interrupt_logfile {
         $logger_object->interrupt_logfile();
     }
     return;
-}
+} ## end sub interrupt_logfile
 
 sub resume_logfile {
     my $logger_object = $tokenizer_self->[_logger_object_];
@@ -539,7 +580,7 @@ sub resume_logfile {
         $logger_object->resume_logfile();
     }
     return;
-}
+} ## end sub resume_logfile
 
 sub increment_brace_error {
     my $logger_object = $tokenizer_self->[_logger_object_];
@@ -547,7 +588,7 @@ sub increment_brace_error {
         $logger_object->increment_brace_error();
     }
     return;
-}
+} ## end sub increment_brace_error
 
 sub report_definite_bug {
     $tokenizer_self->[_hit_bug_] = 1;
@@ -556,7 +597,7 @@ sub report_definite_bug {
         $logger_object->report_definite_bug();
     }
     return;
-}
+} ## end sub report_definite_bug
 
 sub brace_warning {
     my $msg           = shift;
@@ -565,7 +606,7 @@ sub brace_warning {
         $logger_object->brace_warning($msg);
     }
     return;
-}
+} ## end sub brace_warning
 
 sub get_saw_brace_error {
     my $logger_object = $tokenizer_self->[_logger_object_];
@@ -575,7 +616,7 @@ sub get_saw_brace_error {
     else {
         return 0;
     }
-}
+} ## end sub get_saw_brace_error
 
 sub get_unexpected_error_count {
     my ($self) = @_;
@@ -589,7 +630,7 @@ sub write_diagnostics {
         $tokenizer_self->[_diagnostics_object_]->write_diagnostics($msg);
     }
     return;
-}
+} ## end sub write_diagnostics
 
 sub get_maximum_level {
     return $tokenizer_self->[_maximum_level_];
@@ -794,7 +835,7 @@ sub log_numbered_msg {
     my $input_line_number = $self->[_last_line_number_];
     write_logfile_entry("Line $input_line_number: $msg");
     return;
-}
+} ## end sub log_numbered_msg
 
 # returns the next tokenized line
 sub get_line {
@@ -1121,7 +1162,6 @@ sub get_line {
     #        _in_skipped_
     #        _in_pod_
     #        _in_quote_
-    my $ending_in_quote_last = $self->[_in_quote_];
     $self->tokenize_this_line($line_of_tokens);
 
     # Now finish defining the return structure and return it
@@ -1857,14 +1897,13 @@ EOM
     @q = qw(for foreach);
     @is_for_foreach{@q} = (1) x scalar(@q);
 
-    my %is_my_our_state;
-    @q = qw(my our state);
-    @is_my_our_state{@q} = (1) x scalar(@q);
-
     # These keywords may introduce blocks after parenthesized expressions,
     # in the form:
     # keyword ( .... ) { BLOCK }
     # patch for SWITCH/CASE: added 'switch' 'case' 'given' 'when'
+    # NOTE for --use-feature=class: if ADJUST blocks eventually take a
+    # parameter list, then ADJUST might need to be added to this list (see
+    # perlclass.pod)
     my %is_blocktype_with_paren;
     @q =
       qw(if elsif unless while until for foreach switch case given when catch);
@@ -1974,7 +2013,7 @@ EOM
           scan_bare_identifier_do( $input_line, $i, $tok, $type, $prototype,
             $rtoken_map, $max_token_index );
         return;
-    }
+    } ## end sub scan_bare_identifier
 
     sub scan_identifier {
         (
@@ -2023,7 +2062,7 @@ EOM
             '%' => LIST_CONTEXT,
             '&' => UNKNOWN_CONTEXT,
         );
-    }
+    } ## end BEGIN
 
     sub scan_simple_identifier {
 
@@ -2161,12 +2200,158 @@ EOM
         return;
     } ## end sub scan_simple_identifier
 
+    sub method_ok_here {
+
+        # Return:
+        #   false if this is definitely an invalid method declaration
+        #   true otherwise (even if not sure)
+
+        # We are trying to avoid problems with old uses of 'method'
+        # when --use-feature=class is set (rt145706).
+        # For example, this should cause a return of 'false':
+
+        #  method paint => sub {
+        #    return;
+        #  };
+
+        # from do_scan_sub:
+        my $i_beg   = $i + 1;
+        my $pos_beg = $rtoken_map->[$i_beg];
+        pos($input_line) = $pos_beg;
+
+        # TEST 1: look a valid sub NAME
+        if (
+            $input_line =~ m/\G\s*
+        ((?:\w*(?:'|::))*)  # package - something that ends in :: or '
+        (\w+)               # NAME    - required
+        /gcx
+          )
+        {
+            # For possible future use..
+            my $subname = $2;
+            my $package = $1 ? $1 : EMPTY_STRING;
+        }
+        else {
+            return;
+        }
+
+        # TEST 2: look for invalid characters after name, such as here:
+        #    method paint => sub {
+        #     ...
+        #    }
+        my $next_char = EMPTY_STRING;
+        if ( $input_line =~ m/\s*(\S)/gcx ) { $next_char = $1 }
+        if ( !$next_char || $next_char eq '#' ) {
+            ( $next_char, my $i_next ) =
+              find_next_nonblank_token( $max_token_index,
+                $rtokens, $max_token_index );
+        }
+
+        if ( !$next_char ) {
+
+            # out of characters - give up
+            return;
+        }
+
+        # Possibly valid next token types:
+        # '(' could start prototype or signature
+        # ':' could start ATTRIBUTE
+        # '{' cold start BLOCK
+        # ';' or '}' could end a statement
+        if ( $next_char !~ /^[\(\:\{\;\}]/ ) {
+
+            # This does not match use feature 'class' syntax
+            return;
+        }
+
+        # We will stop here and assume that this is valid syntax for
+        # use feature 'class'.
+        return 1;
+    } ## end sub method_ok_here
+
+    sub class_ok_here {
+
+        # Return:
+        #   false if this is definitely an invalid class declaration
+        #   true otherwise (even if not sure)
+
+        # We are trying to avoid problems with old uses of 'class'
+        # when --use-feature=class is set (rt145706).  We look ahead
+        # see if this use of 'class' is obviously inconsistent with
+        # the syntax of use feature 'class'.  This allows the default
+        # setting --use-feature=class to work for old syntax too.
+
+        # Valid class declarations look like
+        #   class NAME ?ATTRS ?VERSION ?BLOCK
+        # where ATTRS VERSION and BLOCK are optional
+
+        # For example, this should produce a return of 'false':
+        #
+        #   class ExtendsBasicAttributes is BasicAttributes{
+
+        # TEST 1: class stmt can only go where a new statment can start
+        if ( !new_statement_ok() ) { return }
+
+        my $i_beg   = $i + 1;
+        my $pos_beg = $rtoken_map->[$i_beg];
+        pos($input_line) = $pos_beg;
+
+        # TEST 2: look for a valid NAME
+        if (
+            $input_line =~ m/\G\s*
+        ((?:\w*(?:'|::))*)  # package - something that ends in :: or '
+        (\w+)               # NAME    - required
+        /gcx
+          )
+        {
+            # For possible future use..
+            my $subname = $2;
+            my $package = $1 ? $1 : EMPTY_STRING;
+        }
+        else {
+            return;
+        }
+
+        # TEST 3: look for valid characters after NAME
+        my $next_char = EMPTY_STRING;
+        if ( $input_line =~ m/\s*(\S)/gcx ) { $next_char = $1 }
+        if ( !$next_char || $next_char eq '#' ) {
+            ( $next_char, my $i_next ) =
+              find_next_nonblank_token( $max_token_index,
+                $rtokens, $max_token_index );
+        }
+        if ( !$next_char ) {
+
+            # out of characters - give up
+            return;
+        }
+
+        # Must see one of: ATTRIBUTE, VERSION, BLOCK, or end stmt
+
+        # Possibly valid next token types:
+        # ':' could start ATTRIBUTE
+        # '\d' could start VERSION
+        # '{' cold start BLOCK
+        # ';' could end a statement
+        # '}' could end statement but would be strange
+
+        if ( $next_char !~ /^[\:\d\{\;\}]/ ) {
+
+            # This does not match use feature 'class' syntax
+            return;
+        }
+
+        # We will stop here and assume that this is valid syntax for
+        # use feature 'class'.
+        return 1;
+    } ## end sub class_ok_here
+
     sub scan_id {
         ( $i, $tok, $type, $id_scan_state ) =
           scan_id_do( $input_line, $i, $tok, $rtokens, $rtoken_map,
             $id_scan_state, $max_token_index );
         return;
-    }
+    } ## end sub scan_id
 
     sub scan_number {
         my $number;
@@ -2174,7 +2359,7 @@ EOM
           scan_number_do( $input_line, $i, $rtoken_map, $type,
             $max_token_index );
         return $number;
-    }
+    } ## end sub scan_number
 
     use constant VERIFY_FASTNUM => 0;
 
@@ -2308,7 +2493,7 @@ EOM
         error_if_expecting_TERM()
           if ( $expecting == TERM );
         return;
-    }
+    } ## end sub do_GREATER_THAN_SIGN
 
     sub do_VERTICAL_LINE {
 
@@ -2316,7 +2501,7 @@ EOM
         error_if_expecting_TERM()
           if ( $expecting == TERM );
         return;
-    }
+    } ## end sub do_VERTICAL_LINE
 
     sub do_DOLLAR_SIGN {
 
@@ -2658,7 +2843,8 @@ EOM
 
         # ATTRS: for a '{' following an attribute list, reset
         # things to look like we just saw the sub name
-        if ( $statement_type =~ /^sub\b/ ) {
+        # Added 'package' (can be 'class') for --use-feature=class (rt145706)
+        if ( $statement_type =~ /^(sub|package)\b/ ) {
             $last_nonblank_token = $statement_type;
             $last_nonblank_type  = 'i';
             $statement_type      = EMPTY_STRING;
@@ -2769,8 +2955,15 @@ EOM
             }
         }
 
-        $brace_type[ ++$brace_depth ]        = $block_type;
-        $brace_package[$brace_depth]         = $current_package;
+        $brace_type[ ++$brace_depth ] = $block_type;
+
+        # Patch for CLASS BLOCK definitions: do not update the package for the
+        # current depth if this is a BLOCK type definition.
+        # TODO: should make 'class' separate from 'package' and only do
+        # this for 'class'
+        $brace_package[$brace_depth] = $current_package
+          if ( substr( $block_type, 0, 8 ) ne 'package ' );
+
         $brace_structural_type[$brace_depth] = $type;
         $brace_context[$brace_depth]         = $context;
         ( $type_sequence, $indent_flag ) =
@@ -2971,7 +3164,8 @@ EOM
 
         # ATTRS: check for a ':' which introduces an attribute list
         # either after a 'sub' keyword or within a paren list
-        elsif ( $statement_type =~ /^sub\b/ ) {
+        # Added 'package' (can be 'class') for --use-feature=class (rt145706)
+        elsif ( $statement_type =~ /^(sub|package)\b/ ) {
             $type              = 'A';
             $in_attribute_list = 1;
         }
@@ -3046,7 +3240,7 @@ EOM
           if ( $expecting == OPERATOR );
         scan_simple_identifier();
         return;
-    }
+    } ## end sub do_AT_SIGN
 
     sub do_PERCENT_SIGN {
 
@@ -3192,7 +3386,7 @@ EOM
         #  '::' = probably a sub call
         scan_bare_identifier();
         return;
-    }
+    } ## end sub do_DOUBLE_COLON
 
     sub do_LEFT_SHIFT {
 
@@ -3315,7 +3509,7 @@ EOM
 
         #  '->'
         return;
-    } ## end sub do_POINTER
+    }
 
     sub do_PLUS_PLUS {
 
@@ -3380,7 +3574,7 @@ EOM
         error_if_expecting_TERM()
           if ( $expecting == TERM && $last_nonblank_token ne ',' );    #c015
         return;
-    }
+    } ## end sub do_LOGICAL_AND
 
     sub do_LOGICAL_OR {
 
@@ -3388,7 +3582,7 @@ EOM
         error_if_expecting_TERM()
           if ( $expecting == TERM && $last_nonblank_token ne ',' );    #c015
         return;
-    }
+    } ## end sub do_LOGICAL_OR
 
     sub do_SLASH_SLASH {
 
@@ -3396,7 +3590,7 @@ EOM
         error_if_expecting_TERM()
           if ( $expecting == TERM );
         return;
-    }
+    } ## end sub do_SLASH_SLASH
 
     sub do_DIGITS {
 
@@ -4041,19 +4235,54 @@ EOM
             $i = $i_next;
         }
 
-        #      'sub' or alias
+        # 'sub' or other sub alias
         elsif ( $is_sub{$tok_kw} ) {
-            error_if_expecting_OPERATOR()
-              if ( $expecting == OPERATOR );
-            initialize_subname();
-            scan_id();
+
+            # Update for --use-feature=class (rt145706):
+            # We have to be extra careful to avoid misparsing other uses of
+            # 'method' in older scripts.
+            if ( $tok_kw eq 'method' ) {
+                if (   $expecting == OPERATOR
+                    || $next_nonblank_token !~ /^(\w|\:)/
+                    || !method_ok_here() )
+                {
+                    do_UNKNOWN_BAREWORD($next_nonblank_token);
+                }
+                else {
+                    initialize_subname();
+                    scan_id();
+                }
+            }
+            else {
+                error_if_expecting_OPERATOR()
+                  if ( $expecting == OPERATOR );
+                initialize_subname();
+                scan_id();
+            }
         }
 
-        #      'package'
+        # 'package'
         elsif ( $is_package{$tok_kw} ) {
-            error_if_expecting_OPERATOR()
-              if ( $expecting == OPERATOR );
-            scan_id();
+
+            # Update for --use-feature=class (rt145706):
+            # We have to be extra careful because 'class' may be used for other
+            # purposes on older code; i.e.
+            #   class($x)   - valid sub call
+            #   package($x) - error
+            if ( $tok_kw eq 'class' ) {
+                if (   $expecting == OPERATOR
+                    || $next_nonblank_token !~ /^(\w|\:)/
+                    || !class_ok_here() )
+                {
+                    do_UNKNOWN_BAREWORD($next_nonblank_token);
+                }
+                else { scan_id() }
+            }
+            else {
+                error_if_expecting_OPERATOR()
+                  if ( $expecting == OPERATOR );
+                scan_id();
+            }
         }
 
         # Fix for c035: split 'format' from 'is_format_END_DATA' to be
@@ -4726,7 +4955,7 @@ EOM
                 $tok  = $pre_tok;
             }
 
-            my $prev_tok  = $i > 0 ? $rtokens->[ $i - 1 ]     : SPACE;
+##          my $prev_tok  = $i > 0 ? $rtokens->[ $i - 1 ]     : SPACE;
             my $prev_type = $i > 0 ? $rtoken_type->[ $i - 1 ] : 'b';
 
             #-----------------------------------------------------------
@@ -5565,7 +5794,7 @@ BEGIN {
     @q = qw( n v );
     @{is_n_v}{@q} = (1) x scalar(@q);
 
-}
+} ## end BEGIN
 
 use constant DEBUG_OPERATOR_EXPECTED => 0;
 
@@ -5783,6 +6012,13 @@ sub operator_expected {
     elsif ( $last_nonblank_type eq 'q' ) {
         $op_expected = OPERATOR;
         if ( $last_nonblank_token eq 'prototype' ) {
+            $op_expected = TERM;
+        }
+
+        # update for --use-feature=class (rt145706):
+        # Look for class VERSION after possible attribute, as in
+        #    class Example::Subclass : isa(Example::Base) 1.345 { ... }
+        elsif ( $statement_type =~ /^package\b/ ) {
             $op_expected = TERM;
         }
     }
@@ -6139,7 +6375,7 @@ sub decide_if_code_block {
             foreach my $k ( $j + 1 .. @pre_types - 2 ) {
                 if ( $pre_types[$k] eq $quote_mark ) {
                     $j = $k + 1;
-                    my $next = $pre_types[$j];
+                    ##my $next = $pre_types[$j];
                     last;
                 }
             }
@@ -6240,7 +6476,7 @@ BEGIN {
 
     @q = qw(R ]);
     @{is_R_closing_sb}{@q} = (1) x scalar(@q);
-}
+} ## end BEGIN
 
 sub is_non_structural_brace {
 
@@ -6694,7 +6930,7 @@ BEGIN {
     # parenless calls of 'ok' are common
     @q = qw( ok );
     @{is_known_function}{@q} = (1) x scalar(@q);
-}
+} ## end BEGIN
 
 sub guess_if_pattern_or_division {
 
@@ -7341,7 +7577,8 @@ sub do_scan_package {
         # Examples of valid primitive tokens that might follow are:
         #  1235  . ; { } v3  v
         # FIX: added a '#' since a side comment may also follow
-        if ( $next_nonblank_token =~ /^([v\.\d;\{\}\#])|v\d|\d+$/ ) {
+        # Added ':' for class attributes (for --use-feature=class, rt145706)
+        if ( $next_nonblank_token =~ /^([v\.\d;\{\}\#\:])|v\d|\d+$/ ) {
             $statement_type = $tok;
         }
         else {
@@ -7369,7 +7606,7 @@ BEGIN {
     my @q =
       qw{ ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ };
     @{is_special_variable_char}{@q} = (1) x scalar(@q);
-}
+} ## end BEGIN
 
 {    ## begin closure for sub scan_complex_identifier
 
@@ -8231,7 +8468,7 @@ EOM
         # lexical subs with these names can cause parsing errors in this version
         my @q = qw( m q qq qr qw qx s tr y );
         @{warn_if_lexical}{@q} = (1) x scalar(@q);
-    }
+    } ## end BEGIN
 
     # saved package and subnames in case prototype is on separate line
     my ( $package_saved, $subname_saved );
@@ -8544,10 +8781,24 @@ EOM
                 }
             }
             elsif ($next_nonblank_token) {    # EOF technically ok
-                $subname = EMPTY_STRING unless defined($subname);
-                warning(
+
+                if ( $rinput_hash->{tok} eq 'method' && $call_type == SUB_CALL )
+                {
+                    # For a method call, silently ignore this error (rt145706)
+                    # to avoid needless warnings. Example which can produce it:
+                    #     test(method Pack (), "method");
+
+                    # TODO: scan for use feature 'class' and:
+                    # - if we saw 'use feature 'class' then issue the warning.
+                    # - if we did not see use feature 'class' then issue the
+                    #   warning and suggest turning off --use-feature=class
+                }
+                else {
+                    $subname = EMPTY_STRING unless defined($subname);
+                    warning(
 "expecting ':' or ';' or '{' after definition or declaration of sub '$subname' but saw '$next_nonblank_token'\n"
-                );
+                    );
+                }
             }
             check_prototype( $proto, $package, $subname );
         }
@@ -8695,7 +8946,7 @@ sub is_possible_numerator {
         my @q = qw( & && | || ? : + - * and or while if unless);
         push @q, ')', '}', ']', '>', ',', ';';
         @{pattern_test}{@q} = (1) x scalar(@q);
-    }
+    } ## end BEGIN
 
     sub pattern_expected {
 
@@ -9235,8 +9486,6 @@ sub do_quote {
 
     ) = @_;
 
-    my $in_quote_starting = $in_quote;
-
     my $quoted_string;
     if ( $in_quote == 2 ) {    # two quotes/quoted_string_1s to follow
         my $ibeg = $i;
@@ -9244,7 +9493,7 @@ sub do_quote {
             $i, $in_quote, $quote_character, $quote_pos, $quote_depth,
             $quoted_string
           )
-          = follow_quoted_string( $i, $in_quote, $rtokens, $quote_character,
+          = follow_quoted_string( $ibeg, $in_quote, $rtokens, $quote_character,
             $quote_pos, $quote_depth, $max_token_index );
         $quoted_string_2 .= $quoted_string;
         if ( $in_quote == 1 ) {
@@ -9476,7 +9725,7 @@ sub indicate_error {
     write_error_indicator_pair( $line_number, $input_line, $pos, $carrat );
     resume_logfile();
     return;
-}
+} ## end sub indicate_error
 
 sub write_error_indicator_pair {
     my ( $line_number, $input_line, $pos, $carrat ) = @_;
@@ -9661,7 +9910,7 @@ sub show_tokens {
             '[' => ']',
             '<' => '>',
         );
-    }
+    } ## end BEGIN
 
     sub matching_end_token {
 
@@ -9671,7 +9920,7 @@ sub show_tokens {
             return $matching_end_token{$beginning_token};
         }
         return ($beginning_token);
-    }
+    } ## end sub matching_end_token
 }
 
 sub dump_token_types {
@@ -9805,10 +10054,15 @@ BEGIN {
     @q = qw( print printf sort exec system say);
     @is_indirect_object_taker{@q} = (1) x scalar(@q);
 
+    # Note: 'field' will be added by sub check_options if --use-feature=class
+    @q = qw(my our state);
+    @is_my_our_state{@q} = (1) x scalar(@q);
+
     # These tokens may precede a code block
     # patched for SWITCH/CASE/CATCH.  Actually these could be removed
     # now and we could let the extended-syntax coding handle them.
     # Added 'default' for Switch::Plain.
+    # Note: 'ADJUST' will be added by sub check_options if --use-feature=class
     @q =
       qw( BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue if elsif else
       unless do while until eval for foreach map grep sort
@@ -10058,7 +10312,11 @@ BEGIN {
       isa
 
       catch
+
     );
+
+    # Note: 'ADJUST', 'field' are added by sub check_options
+    # if --use-feature=class
 
     # patched above for SWITCH/CASE given/when err say
     # 'err' is a fairly safe addition.
@@ -10159,6 +10417,7 @@ BEGIN {
     @q = qw(q qq qw qx qr s y tr m);
     @is_q_qq_qw_qx_qr_s_y_tr_m{@q} = (1) x scalar(@q);
 
+    # Note: 'class' will be added by sub check_options if -use-feature=class
     @q = qw(package);
     @is_package{@q} = (1) x scalar(@q);
 
@@ -10398,5 +10657,5 @@ BEGIN {
     #  __DATA__ __END__
 
     @is_keyword{@Keywords} = (1) x scalar(@Keywords);
-}
+} ## end BEGIN
 1;

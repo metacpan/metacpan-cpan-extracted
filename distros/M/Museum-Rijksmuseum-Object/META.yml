@@ -26,5 +26,6 @@ requires:
   URI: '5.10'
   URI::Encode: v1.1.1
   perl: '5.006'
-version: '0.01'
+  strictures: '2'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

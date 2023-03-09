@@ -2,7 +2,6 @@
 abstract: 'Google API Discovery and SDK'
 author:
   - 'Veesh Goldman <veesh@cpan.org>'
-  - 'Peter Scott <localshop@cpan.org>'
 build_requires:
   Test2::Tools::HTTP: '0'
   Test2::V0: '0'
@@ -21,6 +20,7 @@ requires:
   Config::JSON: '0'
   Data::Dump: '0'
   Data::Dumper: '0'
+  Data::Printer: '1.00'
   Exporter::Shiny: '0'
   IO::Socket::SSL: '2.06'
   List::SomeUtils: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/rabbiveesh/WebService-GoogleAPI-Client/issues
   homepage: https://pscott-au.github.io/WebService-GoogleAPI-Client/
   repository: git://github.com/rabbiveesh/WebService-GoogleAPI-Client.git
-version: '0.26'
+version: '0.27'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Apache-2.0

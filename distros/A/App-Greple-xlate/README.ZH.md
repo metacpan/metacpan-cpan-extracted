@@ -56,6 +56,7 @@ App::Greple::xlate - greple的翻译支持模块
     指定要使用的翻译引擎。你不必使用这个选项，因为模块`xlate::deepl`将它声明为`--xlate-engine=deepl`。
 
 - **--xlate-labor**
+- **--xlabor**
 
     与其说是调用翻译引擎，不如说是希望你能为之工作。在准备好要翻译的文本后，它们被复制到剪贴板上。你应该把它们粘贴到表格中，把结果复制到剪贴板上，然后点击返回。
 
@@ -103,6 +104,10 @@ App::Greple::xlate - greple的翻译支持模块
     - **xtxt**
 
         如果格式是`xtxt`（翻译文本）或不知道，则只打印翻译文本。
+
+- **--xlate-maxlen**=_chars_ (Default: 0)
+
+    指定一次性发送至API的最大文本长度。默认值设置为免费账户服务：API（**--xlate**）为128K，剪贴板界面（**--xlate-labor**）为5000。如果你使用专业服务，你可以改变这些值。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 

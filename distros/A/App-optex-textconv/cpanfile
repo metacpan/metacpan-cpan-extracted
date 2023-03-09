@@ -1,5 +1,5 @@
 requires 'perl', 'v5.14.0';
-requires 'App::optex', 'v0.5.2';
+requires 'App::optex', 'v0.5.4';
 requires 'App::optex::Tmpfile';
 requires 'Archive::Zip', '1.37';
 requires 'Encode';

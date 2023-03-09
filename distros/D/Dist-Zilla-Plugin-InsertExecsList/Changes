@@ -1,3 +1,8 @@
+0.031   2023-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [regression] Script was not linkified.
+
+
 0.030   2023-02-16  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] By default generate an ordered list, add

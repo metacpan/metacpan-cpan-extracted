@@ -38,7 +38,8 @@
             "Moo" : "2.005004",
             "URI" : "5.10",
             "URI::Encode" : "v1.1.1",
-            "perl" : "5.006"
+            "perl" : "5.006",
+            "strictures" : "2"
          }
       },
       "test" : {
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

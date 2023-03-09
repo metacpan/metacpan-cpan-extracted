@@ -19,13 +19,13 @@ name: App-BPOMUtils-Table-FoodType
 provides:
   App::BPOMUtils::Table::FoodType:
     file: lib/App/BPOMUtils/Table/FoodType.pm
-    version: '0.018'
+    version: '0.019'
   App::BPOMUtils::Table::FoodTypeRBAImporter:
     file: lib/App/BPOMUtils/Table/FoodTypeRBAImporter.pm
-    version: '0.018'
+    version: '0.019'
   App::BPOMUtils::Table::FoodTypeRBAProducer:
     file: lib/App/BPOMUtils/Table/FoodTypeRBAProducer.pm
-    version: '0.018'
+    version: '0.019'
 requires:
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -37,7 +37,7 @@ requires:
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
-  Perinci::Sub::Gen::AccessTable: '0.591'
+  Perinci::Sub::Gen::AccessTable: '0.592'
   Perinci::Sub::Property::result::table: '0'
   perl: '5.010001'
   strict: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-FoodType
   homepage: https://metacpan.org/release/App-BPOMUtils-Table-FoodType
   repository: git://github.com/perlancar/perl-App-BPOMUtils-Table-FoodType.git
-version: '0.018'
+version: '0.019'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -79,7 +79,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.02'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -249,7 +249,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -361,7 +361,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

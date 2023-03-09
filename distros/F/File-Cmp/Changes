@@ -1,1 +1,4 @@
-See the git repository.
+Otherwise see the git repository.
+
+1.09    2023-03-06 
+        Update to Module::Build and Test2::V0, better test coverage, etc

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::MD5::Hex;
-$Crypt::Passphrase::MD5::Hex::VERSION = '0.007';
+$Crypt::Passphrase::MD5::Hex::VERSION = '0.009';
 use parent 'Crypt::Passphrase::Validator';
 
 use Digest::MD5 'md5_hex';
@@ -35,7 +35,7 @@ Crypt::Passphrase::MD5::Hex - Validate against hexed MD5 hashes with Crypt::Pass
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 DESCRIPTION
 

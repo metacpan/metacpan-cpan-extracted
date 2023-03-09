@@ -135,6 +135,10 @@ try {
     $schema->storage->disconnect;
 };
 
+# roll everything back if we're testing
+my $txn_guard = $ENV{ND2_DB_ROLLBACK}
+  ? schema('netdisco')->storage->txn_scope_guard : undef;
+
 # upgrade from whatever dbix_class_schema_versions says, to $VERSION
 # except that get_db_version will be 0 at first deploy
 my $db_version = ($schema->get_db_version || 1);
@@ -156,4 +160,5 @@ for (my $i = $db_version; $i < $target_version; $i++) {
     };
 }
 
+undef $txn_guard if $ENV{ND2_DB_ROLLBACK};
 exit 0;

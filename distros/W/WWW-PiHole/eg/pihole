@@ -1,0 +1,31 @@
+#! /usr/bin/env perl
+
+# PODNAME: pihole
+# ABSTRACT: Sample CLI to the WWW::PiHole module
+
+use v5.37.9;
+use WWW::PiHole;
+use Data::Printer;
+
+my $pihole = WWW::PiHole -> new;
+
+# say $pihole -> status;
+
+# say $pihole -> enable;
+# say $pihole -> disable;
+
+# p $pihole -> add( 'www.remove.me' );
+# p $pihole -> remove( 'www.remove.me' );
+
+# p $pihole -> recent;
+
+# p $pihole -> add_dns( 'custom.local' , '192.168.1.1' );
+# p $pihole -> remove_dns( 'custom.local' , '192.168.1.1' );
+# p $pihole -> get_dns; # array of 2-element arrays
+# # No comments allowed in the hostfile
+
+# p $pihole -> add_cname( 'redirect.this' , 'www.example.com' );
+# p $pihole -> remove_cname( 'redirect.this' , 'www.example.com' );
+# p $pihole -> get_cname; # array of 2-element arrays
+
+say $pihole -> version( 'latest' ); # Modes: 'update', 'current', 'latest', 'branch'

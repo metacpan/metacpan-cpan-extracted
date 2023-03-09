@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/Schema/perl/perl_sah_filter/modname.pm','lib/Sah/Schema/perl/perl_sah_filter/modname_with_optional_args.pm','lib/Sah/SchemaR/perl/perl_sah_filter/modname.pm','lib/Sah/SchemaR/perl/perl_sah_filter/modname_with_optional_args.pm','lib/Sah/Schemas/Data/Sah.pm'];
+my $filenames = ['lib/Perinci/Sub/XCompletion/perl_sah_filter_modname_with_optional_args.pm','lib/Sah/Schema/perl/perl_sah_filter/modname.pm','lib/Sah/Schema/perl/perl_sah_filter/modname_with_optional_args.pm','lib/Sah/SchemaR/perl/perl_sah_filter/modname.pm','lib/Sah/SchemaR/perl/perl_sah_filter/modname_with_optional_args.pm','lib/Sah/Schemas/Data/Sah.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

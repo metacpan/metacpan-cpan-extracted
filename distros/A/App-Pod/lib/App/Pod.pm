@@ -35,7 +35,7 @@ App::Pod - Quickly show available class methods and documentation.
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 
 =head1 SYNOPSIS

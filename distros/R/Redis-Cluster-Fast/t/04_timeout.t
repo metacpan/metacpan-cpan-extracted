@@ -10,7 +10,7 @@ my $redis = Redis::Cluster::Fast->new(
     startup_nodes => get_startup_nodes,
     connect_timeout => 0.05,
     command_timeout => 0.05,
-    max_retry => 0,
+    max_retry_count => 3,
 );
 
 my $lua = <<EOF;

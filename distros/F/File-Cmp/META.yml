@@ -3,28 +3,27 @@ abstract: 'compare two files character by character'
 author:
   - 'Jeremy Mates <jmates@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0.000060'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690'
-license: artistic_2
+  Module::Build: '0.4004'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: File-Cmp
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  File::Cmp:
+    file: lib/File/Cmp.pm
+    version: '1.09'
 requires:
   Carp: '0'
   Exporter: '0'
   Scalar::Util: '0'
-  Test::More: '0'
-  perl: '5.01'
+  perl: v5.8.0
 resources:
-  homepage: http://github.com/thrig/File-Cmp
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/thrig/File-Cmp
-version: '1.07'
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://thrig.me/src/File-Cmp.git
+version: '1.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

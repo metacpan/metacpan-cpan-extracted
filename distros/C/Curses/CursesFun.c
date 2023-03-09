@@ -5,6 +5,11 @@
 **
 **  This is an inclusion for Curses.c
 **
+**  This contains an XS function for each Curses function that we know about,
+**  named e.g. 'XS_Curses_addch'.  If this system's Curses libary does not
+**  contain that function, the XS function just calls 'c_fun_not_there'
+**  (presumed to exist in the program that includes CursesFun.c).
+**
 **  Copyright (c) 1994-2000  William Setzer
 **
 **  You may distribute under the terms of either the Artistic License
@@ -23,7 +28,7 @@ XS(XS_Curses_addch)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ch  = c_sv2chtype(ST(c_arg));
     int ret = c_mret == ERR ? ERR : waddch(win, ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -44,7 +49,7 @@ XS(XS_Curses_echochar)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ch  = c_sv2chtype(ST(c_arg));
     int ret = c_mret == ERR ? ERR : wechochar(win, ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -68,7 +73,7 @@ XS(XS_Curses_addchstr)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype *str = (chtype *)SvPV_nolen(ST(c_arg));
     int ret = c_mret == ERR ? ERR : waddchstr(win, str);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -90,7 +95,7 @@ XS(XS_Curses_addchnstr)
     chtype *str = (chtype *)SvPV_nolen(ST(c_arg));
     int n   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : waddchnstr(win, str, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -114,7 +119,7 @@ XS(XS_Curses_addstr)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     char *  str = (char *)SvPV_nolen(ST(c_arg));
     int ret = c_mret == ERR ? ERR : waddstr(win, str);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -136,7 +141,7 @@ XS(XS_Curses_addnstr)
     char *  str = (char *)SvPV_nolen(ST(c_arg));
     int n   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : waddnstr(win, str, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -160,7 +165,7 @@ XS(XS_Curses_attroff)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int attrs   = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : wattroff(win, attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -181,7 +186,7 @@ XS(XS_Curses_attron)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int attrs   = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : wattron(win, attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -202,7 +207,7 @@ XS(XS_Curses_attrset)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int attrs   = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : wattrset(win, attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -222,7 +227,7 @@ XS(XS_Curses_standend)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : (int)wstandend(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -242,7 +247,7 @@ XS(XS_Curses_standout)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : (int)wstandout(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -265,7 +270,7 @@ XS(XS_Curses_attr_get)
     short   color   = 0;
     void *  opts    = 0;
     int ret = c_mret == ERR ? ERR : wattr_get(win, &attrs, &color, opts);
-    
+
     sv_setiv(ST(c_arg), (IV)attrs);;
     sv_setiv(ST(c_arg+1), (IV)color);;
     ST(0) = sv_newmortal();
@@ -289,7 +294,7 @@ XS(XS_Curses_attr_off)
     attr_t  attrs   = (attr_t)SvIV(ST(c_arg));
     void *  opts    = 0;
     int ret = c_mret == ERR ? ERR : wattr_off(win, attrs, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -311,7 +316,7 @@ XS(XS_Curses_attr_on)
     attr_t  attrs   = (attr_t)SvIV(ST(c_arg));
     void *  opts    = 0;
     int ret = c_mret == ERR ? ERR : wattr_on(win, attrs, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -334,7 +339,7 @@ XS(XS_Curses_attr_set)
     short   color   = (short)SvIV(ST(c_arg+1));
     void *  opts    = 0;
     int ret = c_mret == ERR ? ERR : wattr_set(win, attrs, color, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -367,7 +372,7 @@ XS(XS_Curses_chgat)
     short   color   = (short)SvIV(ST(c_arg+2));
     void *  opts    = 0;
     int ret = c_mret == ERR ? ERR : wchgat(win, n, attrs, color, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -386,7 +391,7 @@ XS(XS_Curses_COLOR_PAIR)
     {
     int n   = (int)SvIV(ST(0));
     int ret = COLOR_PAIR(n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -405,7 +410,7 @@ XS(XS_Curses_PAIR_NUMBER)
     {
     int attrs   = (int)SvIV(ST(0));
     int ret = PAIR_NUMBER(attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -426,7 +431,7 @@ XS(XS_Curses_beep)
     c_exactargs("beep", items, 0);
     {
     int ret = beep();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -444,7 +449,7 @@ XS(XS_Curses_flash)
     c_exactargs("flash", items, 0);
     {
     int ret = flash();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -468,7 +473,7 @@ XS(XS_Curses_bkgd)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ch  = c_sv2chtype(ST(c_arg));
     int ret = c_mret == ERR ? ERR : wbkgd(win, ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -488,7 +493,7 @@ XS(XS_Curses_bkgdset)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ch  = c_sv2chtype(ST(c_arg));
-    
+
     if (c_mret == OK) { wbkgdset(win, ch); }
     }
     XSRETURN(0);
@@ -507,7 +512,7 @@ XS(XS_Curses_getbkgd)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ret = c_mret == ERR ? ERR : getbkgd(win);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -538,7 +543,7 @@ XS(XS_Curses_border)
     chtype  bl  = c_sv2chtype(ST(c_arg+6));
     chtype  br  = c_sv2chtype(ST(c_arg+7));
     int ret = c_mret == ERR ? ERR : wborder(win, ls, rs_, ts, bs, tl, tr, bl, br);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -560,7 +565,7 @@ XS(XS_Curses_box)
     chtype  verch   = c_sv2chtype(ST(c_arg));
     chtype  horch   = c_sv2chtype(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : box(win, verch, horch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -582,7 +587,7 @@ XS(XS_Curses_hline)
     chtype  ch  = c_sv2chtype(ST(c_arg));
     int n   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : whline(win, ch, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -604,7 +609,7 @@ XS(XS_Curses_vline)
     chtype  ch  = c_sv2chtype(ST(c_arg));
     int n   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : wvline(win, ch, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -627,7 +632,7 @@ XS(XS_Curses_erase)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : werase(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -647,7 +652,7 @@ XS(XS_Curses_clear)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wclear(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -667,7 +672,7 @@ XS(XS_Curses_clrtobot)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wclrtobot(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -687,7 +692,7 @@ XS(XS_Curses_clrtoeol)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wclrtoeol(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -708,7 +713,7 @@ XS(XS_Curses_start_color)
     c_exactargs("start_color", items, 0);
     {
     int ret = start_color();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -729,7 +734,7 @@ XS(XS_Curses_init_pair)
     short   f   = (short)SvIV(ST(1));
     short   b   = (short)SvIV(ST(2));
     int ret = init_pair(pair, f, b);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -751,7 +756,7 @@ XS(XS_Curses_init_color)
     short   g   = (short)SvIV(ST(2));
     short   b   = (short)SvIV(ST(3));
     int ret = init_color(color, r, g, b);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -769,7 +774,7 @@ XS(XS_Curses_has_colors)
     c_exactargs("has_colors", items, 0);
     {
     bool    ret = has_colors();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -787,7 +792,7 @@ XS(XS_Curses_can_change_color)
     c_exactargs("can_change_color", items, 0);
     {
     bool    ret = can_change_color();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -809,7 +814,7 @@ XS(XS_Curses_color_content)
     short   g   = 0;
     short   b   = 0;
     int ret = color_content(color, &r, &g, &b);
-    
+
     sv_setiv(ST(1), (IV)r);;
     sv_setiv(ST(2), (IV)g);;
     sv_setiv(ST(3), (IV)b);;
@@ -833,7 +838,7 @@ XS(XS_Curses_pair_content)
     short   f   = 0;
     short   b   = 0;
     int ret = pair_content(pair, &f, &b);
-    
+
     sv_setiv(ST(1), (IV)f);;
     sv_setiv(ST(2), (IV)b);;
     ST(0) = sv_newmortal();
@@ -858,7 +863,7 @@ XS(XS_Curses_delch)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wdelch(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -881,7 +886,7 @@ XS(XS_Curses_deleteln)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wdeleteln(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -902,7 +907,7 @@ XS(XS_Curses_insdelln)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int n   = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : winsdelln(win, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -922,7 +927,7 @@ XS(XS_Curses_insertln)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : winsertln(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -945,7 +950,7 @@ XS(XS_Curses_getch)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ret = c_mret == ERR ? ERR : wgetch(win);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -964,7 +969,7 @@ XS(XS_Curses_ungetch)
     {
     chtype  ch  = c_sv2chtype(ST(0));
     int ret = ungetch(ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -983,7 +988,7 @@ XS(XS_Curses_has_key)
     {
     int ch  = (int)SvIV(ST(0));
     int ret = has_key(ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1002,7 +1007,7 @@ XS(XS_Curses_KEY_F)
     {
     int n   = (int)SvIV(ST(0));
     chtype  ret = KEY_F(n);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -1026,7 +1031,7 @@ XS(XS_Curses_getstr)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     char *  str = (char *)sv_grow(ST(c_arg), 250);
     int ret = c_mret == ERR ? ERR : wgetstr(win, str);
-    
+
     c_setchar(ST(c_arg), str);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -1049,7 +1054,7 @@ XS(XS_Curses_getnstr)
     int n   = (int)SvIV(ST(c_arg+1));
     char *  str = (char *)sv_grow(ST(c_arg), n+1);
     int ret = c_mret == ERR ? ERR : wgetnstr(win, str, n);
-    
+
     c_setchar(ST(c_arg), str);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -1074,7 +1079,7 @@ XS(XS_Curses_getyx)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int y   = 0;
     int x   = 0;
-    
+
     if (c_mret == OK) { getyx(win, y, x); }
     sv_setiv(ST(c_arg), (IV)y);;
     sv_setiv(ST(c_arg+1), (IV)x);;
@@ -1096,7 +1101,7 @@ XS(XS_Curses_getparyx)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int y   = 0;
     int x   = 0;
-    
+
     if (c_mret == OK) { getparyx(win, y, x); }
     sv_setiv(ST(c_arg), (IV)y);;
     sv_setiv(ST(c_arg+1), (IV)x);;
@@ -1118,7 +1123,7 @@ XS(XS_Curses_getbegyx)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int y   = 0;
     int x   = 0;
-    
+
     if (c_mret == OK) { getbegyx(win, y, x); }
     sv_setiv(ST(c_arg), (IV)y);;
     sv_setiv(ST(c_arg+1), (IV)x);;
@@ -1140,7 +1145,7 @@ XS(XS_Curses_getmaxyx)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int y   = 0;
     int x   = 0;
-    
+
     if (c_mret == OK) { getmaxyx(win, y, x); }
     sv_setiv(ST(c_arg), (IV)y);;
     sv_setiv(ST(c_arg+1), (IV)x);;
@@ -1164,7 +1169,7 @@ XS(XS_Curses_inch)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ret = c_mret == ERR ? ERR : winch(win);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -1188,7 +1193,7 @@ XS(XS_Curses_inchstr)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype *str = (chtype *)sv_grow(ST(c_arg), (250)*sizeof(chtype));
     int ret = c_mret == ERR ? ERR : winchstr(win, str);
-    
+
     c_setchtype(ST(c_arg), str);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -1211,7 +1216,7 @@ XS(XS_Curses_inchnstr)
     int n   = (int)SvIV(ST(c_arg+1));
     chtype *str = (chtype *)sv_grow(ST(c_arg), (n+1)*sizeof(chtype));
     int ret = c_mret == ERR ? ERR : winchnstr(win, str, n);
-    
+
     c_setchtype(ST(c_arg), str);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -1233,7 +1238,7 @@ XS(XS_Curses_initscr)
     c_exactargs("initscr", items, 0);
     {
     WINDOW *    ret = initscr();
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -1251,7 +1256,7 @@ XS(XS_Curses_endwin)
     c_exactargs("endwin", items, 0);
     {
     int ret = endwin();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1269,7 +1274,7 @@ XS(XS_Curses_isendwin)
     c_exactargs("isendwin", items, 0);
     {
     int ret = isendwin();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1295,7 +1300,7 @@ XS(XS_Curses_newterm)
     FILE *  outfd   = PerlIO_findFILE(IoIFP(sv_2io(ST(1))));
     FILE *  infd    = PerlIO_findFILE(IoIFP(sv_2io(ST(2))));
     SCREEN *    ret = newterm(type, outfd, infd);
-    
+
     ST(0) = sv_newmortal();
     c_screen2sv(ST(0), ret);
     }
@@ -1314,7 +1319,7 @@ XS(XS_Curses_set_term)
     {
     SCREEN *new = c_sv2screen(ST(0), 0);
     SCREEN *    ret = set_term(new);
-    
+
     ST(0) = sv_newmortal();
     c_screen2sv(ST(0), ret);
     }
@@ -1332,7 +1337,7 @@ XS(XS_Curses_delscreen)
     c_exactargs("delscreen", items, 1);
     {
     SCREEN *sp  = c_sv2screen(ST(0), 0);
-    
+
     delscreen(sp);
     }
     XSRETURN(0);
@@ -1353,7 +1358,7 @@ XS(XS_Curses_cbreak)
     c_exactargs("cbreak", items, 0);
     {
     int ret = cbreak();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1389,7 +1394,7 @@ XS(XS_Curses_nocbreak)
     c_exactargs("nocbreak", items, 0);
     {
     int ret = nocbreak();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1425,7 +1430,7 @@ XS(XS_Curses_echo)
     c_exactargs("echo", items, 0);
     {
     int ret = echo();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1461,7 +1466,7 @@ XS(XS_Curses_noecho)
     c_exactargs("noecho", items, 0);
     {
     int ret = noecho();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1497,7 +1502,7 @@ XS(XS_Curses_halfdelay)
     {
     int tenths  = (int)SvIV(ST(0));
     int ret = halfdelay(tenths);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1518,7 +1523,7 @@ XS(XS_Curses_intrflush)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : intrflush(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1539,7 +1544,7 @@ XS(XS_Curses_keypad)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : keypad(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1560,7 +1565,7 @@ XS(XS_Curses_meta)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : meta(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1581,7 +1586,7 @@ XS(XS_Curses_nodelay)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : nodelay(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1602,7 +1607,7 @@ XS(XS_Curses_notimeout)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : notimeout(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1621,7 +1626,7 @@ XS(XS_Curses_raw)
     c_exactargs("raw", items, 0);
     {
     int ret = raw();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1657,7 +1662,7 @@ XS(XS_Curses_noraw)
     c_exactargs("noraw", items, 0);
     {
     int ret = noraw();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1724,7 +1729,7 @@ XS(XS_Curses_timeout)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int delay   = (int)SvIV(ST(c_arg));
-    
+
     if (c_mret == OK) { wtimeout(win, delay); }
     }
     XSRETURN(0);
@@ -1742,7 +1747,7 @@ XS(XS_Curses_typeahead)
     {
     int fd  = (int)SvIV(ST(0));
     int ret = typeahead(fd);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1766,7 +1771,7 @@ XS(XS_Curses_insch)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     chtype  ch  = c_sv2chtype(ST(c_arg));
     int ret = c_mret == ERR ? ERR : winsch(win, ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1790,7 +1795,7 @@ XS(XS_Curses_insstr)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     char *  str = (char *)SvPV_nolen(ST(c_arg));
     int ret = c_mret == ERR ? ERR : winsstr(win, str);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1812,7 +1817,7 @@ XS(XS_Curses_insnstr)
     char *  str = (char *)SvPV_nolen(ST(c_arg));
     int n   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : winsnstr(win, str, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1836,7 +1841,7 @@ XS(XS_Curses_instr)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     char *  str = (char *)sv_grow(ST(c_arg), 250);
     int ret = c_mret == ERR ? ERR : winstr(win, str);
-    
+
     c_setchar(ST(c_arg), str);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -1859,7 +1864,7 @@ XS(XS_Curses_innstr)
     int n   = (int)SvIV(ST(c_arg+1));
     char *  str = (char *)sv_grow(ST(c_arg), n+1);
     int ret = c_mret == ERR ? ERR : winnstr(win, str, n);
-    
+
     c_setchar(ST(c_arg), str);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -1881,7 +1886,7 @@ XS(XS_Curses_def_prog_mode)
     c_exactargs("def_prog_mode", items, 0);
     {
     int ret = def_prog_mode();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1899,7 +1904,7 @@ XS(XS_Curses_def_shell_mode)
     c_exactargs("def_shell_mode", items, 0);
     {
     int ret = def_shell_mode();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1917,7 +1922,7 @@ XS(XS_Curses_reset_prog_mode)
     c_exactargs("reset_prog_mode", items, 0);
     {
     int ret = reset_prog_mode();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1935,7 +1940,7 @@ XS(XS_Curses_reset_shell_mode)
     c_exactargs("reset_shell_mode", items, 0);
     {
     int ret = reset_shell_mode();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1953,7 +1958,7 @@ XS(XS_Curses_resetty)
     c_exactargs("resetty", items, 0);
     {
     int ret = resetty();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1971,7 +1976,7 @@ XS(XS_Curses_savetty)
     c_exactargs("savetty", items, 0);
     {
     int ret = savetty();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -1992,7 +1997,7 @@ XS(XS_Curses_getsyx)
     int y   = 0;
     int x   = 0;
     int ret = getsyx(y, x);
-    
+
     sv_setiv(ST(0), (IV)y);;
     sv_setiv(ST(1), (IV)x);;
     ST(0) = sv_newmortal();
@@ -2014,7 +2019,7 @@ XS(XS_Curses_getsyx)
     {
     int y   = 0;
     int x   = 0;
-    
+
     getsyx(y, x);
     sv_setiv(ST(0), (IV)y);;
     sv_setiv(ST(1), (IV)x);;
@@ -2037,7 +2042,7 @@ XS(XS_Curses_setsyx)
     int y   = (int)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = setsyx(y, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2057,7 +2062,7 @@ XS(XS_Curses_setsyx)
     {
     int y   = (int)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
-    
+
     setsyx(y, x);
     }
     XSRETURN(0);
@@ -2076,7 +2081,7 @@ XS(XS_Curses_curs_set)
     {
     int visibility  = (int)SvIV(ST(0));
     int ret = curs_set(visibility);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2095,7 +2100,7 @@ XS(XS_Curses_napms)
     {
     int ms  = (int)SvIV(ST(0));
     int ret = napms(ms);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2120,7 +2125,7 @@ XS(XS_Curses_move)
     int y   = (int)SvIV(ST(c_arg));
     int x   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : wmove(win, y, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2144,7 +2149,7 @@ XS(XS_Curses_clearok)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : clearok(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2166,7 +2171,7 @@ XS(XS_Curses_idlok)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : idlok(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2187,7 +2192,7 @@ XS(XS_Curses_idlok)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
-    
+
     if (c_mret == OK) { idlok(win, bf); }
     }
     XSRETURN(0);
@@ -2207,7 +2212,7 @@ XS(XS_Curses_idcok)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
-    
+
     if (c_mret == OK) { idcok(win, bf); }
     }
     XSRETURN(0);
@@ -2226,7 +2231,7 @@ XS(XS_Curses_immedok)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
-    
+
     if (c_mret == OK) { immedok(win, bf); }
     }
     XSRETURN(0);
@@ -2246,7 +2251,7 @@ XS(XS_Curses_leaveok)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : leaveok(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2268,7 +2273,7 @@ XS(XS_Curses_setscrreg)
     int top = (int)SvIV(ST(c_arg));
     int bot = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : wsetscrreg(win, top, bot);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2289,7 +2294,7 @@ XS(XS_Curses_scrollok)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : scrollok(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2308,7 +2313,7 @@ XS(XS_Curses_nl)
     c_exactargs("nl", items, 0);
     {
     int ret = nl();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2344,7 +2349,7 @@ XS(XS_Curses_nonl)
     c_exactargs("nonl", items, 0);
     {
     int ret = nonl();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2384,7 +2389,7 @@ XS(XS_Curses_overlay)
     WINDOW *srcwin  = c_sv2window(ST(0), 0);
     WINDOW *dstwin  = c_sv2window(ST(1), 1);
     int ret = overlay(srcwin, dstwin);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2404,7 +2409,7 @@ XS(XS_Curses_overwrite)
     WINDOW *srcwin  = c_sv2window(ST(0), 0);
     WINDOW *dstwin  = c_sv2window(ST(1), 1);
     int ret = overwrite(srcwin, dstwin);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2431,7 +2436,7 @@ XS(XS_Curses_copywin)
     int dmaxcol = (int)SvIV(ST(7));
     int overlay = (int)SvIV(ST(8));
     int ret = copywin(srcwin, dstwin, sminrow, smincol, dminrow, dmincol, dmaxrow, dmaxcol, overlay);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2454,7 +2459,7 @@ XS(XS_Curses_newpad)
     int lines_  = (int)SvIV(ST(0));
     int cols    = (int)SvIV(ST(1));
     WINDOW *    ret = newpad(lines_, cols);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -2477,7 +2482,7 @@ XS(XS_Curses_subpad)
     int beginy  = (int)SvIV(ST(3));
     int beginx  = (int)SvIV(ST(4));
     WINDOW *    ret = subpad(orig, lines_, cols, beginy, beginx);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -2502,7 +2507,7 @@ XS(XS_Curses_prefresh)
     int smaxrow = (int)SvIV(ST(5));
     int smaxcol = (int)SvIV(ST(6));
     int ret = prefresh(pad, pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2527,7 +2532,7 @@ XS(XS_Curses_pnoutrefresh)
     int smaxrow = (int)SvIV(ST(5));
     int smaxcol = (int)SvIV(ST(6));
     int ret = pnoutrefresh(pad, pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2547,7 +2552,7 @@ XS(XS_Curses_pechochar)
     WINDOW *pad = c_sv2window(ST(0), 0);
     chtype  ch  = c_sv2chtype(ST(1));
     int ret = pechochar(pad, ch);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2574,7 +2579,7 @@ XS(XS_Curses_refresh)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wrefresh(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2594,7 +2599,7 @@ XS(XS_Curses_noutrefresh)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : wnoutrefresh(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2612,7 +2617,7 @@ XS(XS_Curses_doupdate)
     c_exactargs("doupdate", items, 0);
     {
     int ret = doupdate();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2632,7 +2637,7 @@ XS(XS_Curses_redrawwin)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : redrawwin(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2654,7 +2659,7 @@ XS(XS_Curses_redrawln)
     int beg_line    = (int)SvIV(ST(c_arg));
     int num_lines   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : wredrawln(win, beg_line, num_lines);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2680,7 +2685,7 @@ XS(XS_Curses_scr_dump)
     {
     char *  filename    = (char *)SvPV_nolen(ST(0));
     int ret = scr_dump(filename);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2699,7 +2704,7 @@ XS(XS_Curses_scr_restore)
     {
     char *  filename    = (char *)SvPV_nolen(ST(0));
     int ret = scr_restore(filename);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2718,7 +2723,7 @@ XS(XS_Curses_scr_init)
     {
     char *  filename    = (char *)SvPV_nolen(ST(0));
     int ret = scr_init(filename);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2737,7 +2742,7 @@ XS(XS_Curses_scr_set)
     {
     char *  filename    = (char *)SvPV_nolen(ST(0));
     int ret = scr_set(filename);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2760,7 +2765,7 @@ XS(XS_Curses_scroll)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : scroll(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2781,7 +2786,7 @@ XS(XS_Curses_scrl)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int n   = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : wscrl(win, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2803,7 +2808,7 @@ XS(XS_Curses_slk_init)
     {
     int fmt = (int)SvIV(ST(0));
     int ret = slk_init(fmt);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2824,7 +2829,7 @@ XS(XS_Curses_slk_set)
     char *  label   = (char *)SvPV_nolen(ST(1));
     int fmt = (int)SvIV(ST(2));
     int ret = slk_set(labnum, label, fmt);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2842,7 +2847,7 @@ XS(XS_Curses_slk_refresh)
     c_exactargs("slk_refresh", items, 0);
     {
     int ret = slk_refresh();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2860,7 +2865,7 @@ XS(XS_Curses_slk_noutrefresh)
     c_exactargs("slk_noutrefresh", items, 0);
     {
     int ret = slk_noutrefresh();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2879,7 +2884,7 @@ XS(XS_Curses_slk_label)
     {
     int labnum  = (int)SvIV(ST(0));
     char *  ret = slk_label(labnum);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -2897,7 +2902,7 @@ XS(XS_Curses_slk_clear)
     c_exactargs("slk_clear", items, 0);
     {
     int ret = slk_clear();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2915,7 +2920,7 @@ XS(XS_Curses_slk_restore)
     c_exactargs("slk_restore", items, 0);
     {
     int ret = slk_restore();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2933,7 +2938,7 @@ XS(XS_Curses_slk_touch)
     c_exactargs("slk_touch", items, 0);
     {
     int ret = slk_touch();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2952,7 +2957,7 @@ XS(XS_Curses_slk_attron)
     {
     chtype  attrs   = c_sv2chtype(ST(0));
     int ret = slk_attron(attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2971,7 +2976,7 @@ XS(XS_Curses_slk_attrset)
     {
     chtype  attrs   = c_sv2chtype(ST(0));
     int ret = slk_attrset(attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -2989,7 +2994,7 @@ XS(XS_Curses_slk_attr)
     c_exactargs("slk_attr", items, 0);
     {
     attr_t  ret = slk_attr();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3008,7 +3013,7 @@ XS(XS_Curses_slk_attroff)
     {
     chtype  attrs   = c_sv2chtype(ST(0));
     int ret = slk_attroff(attrs);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3027,7 +3032,7 @@ XS(XS_Curses_slk_color)
     {
     short   color_pair_number   = (short)SvIV(ST(0));
     int ret = slk_color(color_pair_number);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3048,7 +3053,7 @@ XS(XS_Curses_baudrate)
     c_exactargs("baudrate", items, 0);
     {
     int ret = baudrate();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3066,7 +3071,7 @@ XS(XS_Curses_erasechar)
     c_exactargs("erasechar", items, 0);
     {
     char    ret = erasechar();
-    
+
     ST(0) = sv_newmortal();
     sv_setpvn(ST(0), (char *)&ret, 1);
     }
@@ -3084,7 +3089,7 @@ XS(XS_Curses_has_ic)
     c_exactargs("has_ic", items, 0);
     {
     int ret = has_ic();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3102,7 +3107,7 @@ XS(XS_Curses_has_il)
     c_exactargs("has_il", items, 0);
     {
     int ret = has_il();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3120,7 +3125,7 @@ XS(XS_Curses_killchar)
     c_exactargs("killchar", items, 0);
     {
     char    ret = killchar();
-    
+
     ST(0) = sv_newmortal();
     sv_setpvn(ST(0), (char *)&ret, 1);
     }
@@ -3139,7 +3144,7 @@ XS(XS_Curses_longname)
     c_exactargs("longname", items, 0);
     {
     char *  ret = longname();
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -3160,7 +3165,7 @@ XS(XS_Curses_longname)
     char *  a   = (char *)SvPV_nolen(ST(0));
     char *  b   = (char *)SvPV_nolen(ST(1));
     char *  ret = longname(a, b);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -3180,7 +3185,7 @@ XS(XS_Curses_termattrs)
     c_exactargs("termattrs", items, 0);
     {
     chtype  ret = termattrs();
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -3198,7 +3203,7 @@ XS(XS_Curses_termname)
     c_exactargs("termname", items, 0);
     {
     char *  ret = termname();
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -3221,7 +3226,7 @@ XS(XS_Curses_touchwin)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : touchwin(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3244,7 +3249,7 @@ XS(XS_Curses_touchline)
     int start   = (int)SvIV(ST(c_arg));
     int count   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : touchline(win, start, count);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3268,7 +3273,7 @@ XS(XS_Curses_touchline)
     int sx  = (int)SvIV(ST(c_arg+1));
     int ex  = (int)SvIV(ST(c_arg+2));
     int ret = c_mret == ERR ? ERR : touchline(win, y, sx, ex);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3290,7 +3295,7 @@ XS(XS_Curses_untouchwin)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : untouchwin(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3313,7 +3318,7 @@ XS(XS_Curses_touchln)
     int n   = (int)SvIV(ST(c_arg+1));
     int changed = (int)SvIV(ST(c_arg+2));
     int ret = c_mret == ERR ? ERR : wtouchln(win, y, n, changed);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3334,7 +3339,7 @@ XS(XS_Curses_is_linetouched)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int line    = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : is_linetouched(win, line);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3354,7 +3359,7 @@ XS(XS_Curses_is_wintouched)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : is_wintouched(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3378,7 +3383,7 @@ XS(XS_Curses_unctrl) {
     {
         chtype const ch = c_sv2chtype(ST(0));
         const char * const ret = unctrl(ch);
-    
+
         ST(0) = sv_newmortal();
         sv_setpv((SV*)ST(0), ret);
     }
@@ -3399,7 +3404,7 @@ XS(XS_Curses_keyname)
     {
     int k   = (int)SvIV(ST(0));
     char *  ret = (char *)keyname(k);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -3418,7 +3423,7 @@ XS(XS_Curses_filter)
     c_exactargs("filter", items, 0);
     {
     int ret = filter();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3453,7 +3458,7 @@ XS(XS_Curses_use_env)
     c_exactargs("use_env", items, 1);
     {
     bool    bf  = (int)SvIV(ST(0));
-    
+
     use_env(bf);
     }
     XSRETURN(0);
@@ -3473,7 +3478,7 @@ XS(XS_Curses_putwin)
     /* See explanation of PerlIO_findFILE in newterm() */
     FILE *  filep   = PerlIO_findFILE(IoIFP(sv_2io(ST(1))));
     int ret = putwin(win, filep);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3493,7 +3498,7 @@ XS(XS_Curses_getwin)
     /* See explanation of PerlIO_findFILE in newterm() */
     FILE *  filep   = PerlIO_findFILE(IoIFP(sv_2io(ST(0))));
     WINDOW *    ret = getwin(filep);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -3512,7 +3517,7 @@ XS(XS_Curses_delay_output)
     {
     int ms  = (int)SvIV(ST(0));
     int ret = delay_output(ms);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3530,7 +3535,7 @@ XS(XS_Curses_flushinp)
     c_exactargs("flushinp", items, 0);
     {
     int ret = flushinp();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3555,7 +3560,7 @@ XS(XS_Curses_newwin)
     int beginy  = (int)SvIV(ST(2));
     int beginx  = (int)SvIV(ST(3));
     WINDOW *    ret = newwin(nlines, ncols, beginy, beginx);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -3575,7 +3580,7 @@ XS(XS_Curses_delwin)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : delwin(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3597,7 +3602,7 @@ XS(XS_Curses_mvwin)
     int y   = (int)SvIV(ST(c_arg));
     int x   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : mvwin(win, y, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3621,7 +3626,7 @@ XS(XS_Curses_subwin)
     int beginy  = (int)SvIV(ST(c_arg+2));
     int beginx  = (int)SvIV(ST(c_arg+3));
     WINDOW *    ret = c_mret == ERR ? NULL : subwin(win, nlines, ncols, beginy, beginx);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -3645,7 +3650,7 @@ XS(XS_Curses_derwin)
     int beginy  = (int)SvIV(ST(c_arg+2));
     int beginx  = (int)SvIV(ST(c_arg+3));
     WINDOW *    ret = c_mret == ERR ? NULL : derwin(win, nlines, ncols, beginy, beginx);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -3667,7 +3672,7 @@ XS(XS_Curses_mvderwin)
     int par_y   = (int)SvIV(ST(c_arg));
     int par_x   = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : mvderwin(win, par_y, par_x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3687,7 +3692,7 @@ XS(XS_Curses_dupwin)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     WINDOW *    ret = c_mret == ERR ? NULL : dupwin(win);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -3706,7 +3711,7 @@ XS(XS_Curses_syncup)
     {
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
-    
+
     if (c_mret == OK) { wsyncup(win); }
     }
     XSRETURN(0);
@@ -3726,7 +3731,7 @@ XS(XS_Curses_syncok)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
     int ret = c_mret == ERR ? ERR : syncok(win, bf);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3745,7 +3750,7 @@ XS(XS_Curses_cursyncup)
     {
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
-    
+
     if (c_mret == OK) { wcursyncup(win); }
     }
     XSRETURN(0);
@@ -3763,7 +3768,7 @@ XS(XS_Curses_syncdown)
     {
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
-    
+
     if (c_mret == OK) { wsyncdown(win); }
     }
     XSRETURN(0);
@@ -3784,7 +3789,7 @@ XS(XS_Curses_getmouse)
     {
     MEVENT *event   = (MEVENT *)sv_grow(ST(0), 2 * sizeof(MEVENT));
     int ret = getmouse(event);
-    
+
     c_setmevent(ST(0));
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -3804,7 +3809,7 @@ XS(XS_Curses_ungetmouse)
     {
     MEVENT *event   = (MEVENT *)SvPV_nolen(ST(0));
     int ret = ungetmouse(event);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3824,7 +3829,7 @@ XS(XS_Curses_mousemask)
     mmask_t newmask = (mmask_t)SvIV(ST(0));
     mmask_t oldmask = 0;
     mmask_t ret = mousemask(newmask, &oldmask);
-    
+
     sv_setiv(ST(1), (IV)oldmask);;
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -3850,7 +3855,7 @@ XS(XS_Curses_enclose)
        window, we just say the window does not enclose the location.
     */
     bool    ret = c_mret == ERR ? false : wenclose(win, y, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3873,7 +3878,7 @@ XS(XS_Curses_mouse_trafo)
     int pX  = 0;
     bool    to_screen   = (int)SvIV(ST(c_arg+2));
     bool    ret = c_mret == ERR ? false : wmouse_trafo(win, &pY, &pX, to_screen);
-    
+
     sv_setiv(ST(c_arg), (IV)pY);;
     sv_setiv(ST(c_arg+1), (IV)pX);;
     ST(0) = sv_newmortal();
@@ -3894,7 +3899,7 @@ XS(XS_Curses_mouseinterval)
     {
     int erval   = (int)SvIV(ST(0));
     int ret = mouseinterval(erval);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3914,7 +3919,7 @@ XS(XS_Curses_BUTTON_RELEASE)
     mmask_t e   = (mmask_t)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = BUTTON_RELEASE(e, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3934,7 +3939,7 @@ XS(XS_Curses_BUTTON_PRESS)
     mmask_t e   = (mmask_t)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = BUTTON_PRESS(e, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3954,7 +3959,7 @@ XS(XS_Curses_BUTTON_CLICK)
     mmask_t e   = (mmask_t)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = BUTTON_CLICK(e, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3974,7 +3979,7 @@ XS(XS_Curses_BUTTON_DOUBLE_CLICK)
     mmask_t e   = (mmask_t)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = BUTTON_DOUBLE_CLICK(e, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -3994,7 +3999,7 @@ XS(XS_Curses_BUTTON_TRIPLE_CLICK)
     mmask_t e   = (mmask_t)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = BUTTON_TRIPLE_CLICK(e, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4014,7 +4019,7 @@ XS(XS_Curses_BUTTON_RESERVED_EVENT)
     mmask_t e   = (mmask_t)SvIV(ST(0));
     int x   = (int)SvIV(ST(1));
     int ret = BUTTON_RESERVED_EVENT(e, x);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4033,7 +4038,7 @@ XS(XS_Curses_use_default_colors)
     c_exactargs("use_default_colors", items, 0);
     {
     int ret = use_default_colors();
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4053,7 +4058,7 @@ XS(XS_Curses_assume_default_colors)
     int fg  = (int)SvIV(ST(0));
     int bg  = (int)SvIV(ST(1));
     int ret = assume_default_colors(fg, bg);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4073,7 +4078,7 @@ XS(XS_Curses_define_key)
     char *  definition  = (char *)SvPV_nolen(ST(0));
     int keycode = (int)SvIV(ST(1));
     int ret = define_key(definition, keycode);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4093,7 +4098,7 @@ XS(XS_Curses_keybound)
     int keycode = (int)SvIV(ST(0));
     int count   = (int)SvIV(ST(1));
     char *  ret = keybound(keycode, count);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -4113,7 +4118,7 @@ XS(XS_Curses_keyok)
     int keycode = (int)SvIV(ST(0));
     bool    enable  = (int)SvIV(ST(1));
     int ret = keyok(keycode, enable);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4133,7 +4138,7 @@ XS(XS_Curses_resizeterm)
     int lines   = (int)SvIV(ST(0));
     int cols    = (int)SvIV(ST(1));
     int ret = resizeterm(lines, cols);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4155,7 +4160,7 @@ XS(XS_Curses_resize)
     int lines_  = (int)SvIV(ST(c_arg));
     int columns = (int)SvIV(ST(c_arg+1));
     int ret = c_mret == ERR ? ERR : wresize(win, lines_, columns);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4178,7 +4183,7 @@ XS(XS_Curses_getmaxy)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : getmaxy(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4198,7 +4203,7 @@ XS(XS_Curses_getmaxx)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int ret = c_mret == ERR ? ERR : getmaxx(win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4221,7 +4226,7 @@ XS(XS_Curses_flusok)
     WINDOW *win = c_win ? c_sv2window(ST(0), 0) : stdscr;
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     bool    bf  = (int)SvIV(ST(c_arg));
-    
+
     if (c_mret == OK) { flusok(win, bf); }
     }
     XSRETURN(0);
@@ -4239,7 +4244,7 @@ XS(XS_Curses_getcap)
     {
     char *  term    = (char *)SvPV_nolen(ST(0));
     char *  ret = (char *)getcap(term);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -4259,7 +4264,7 @@ XS(XS_Curses_touchoverlap)
     WINDOW *src = c_sv2window(ST(0), 0);
     WINDOW *dst = c_sv2window(ST(1), 1);
     int ret = touchoverlap(src, dst);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4281,7 +4286,7 @@ XS(XS_Curses_new_panel)
     {
     WINDOW *win = c_sv2window(ST(0), 0);
     PANEL * ret = new_panel(win);
-    
+
     ST(0) = sv_newmortal();
     c_panel2sv(ST(0), ret);
     }
@@ -4300,7 +4305,7 @@ XS(XS_Curses_bottom_panel)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     int ret = bottom_panel(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4319,7 +4324,7 @@ XS(XS_Curses_top_panel)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     int ret = top_panel(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4338,7 +4343,7 @@ XS(XS_Curses_show_panel)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     int ret = show_panel(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4372,7 +4377,7 @@ XS(XS_Curses_hide_panel)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     int ret = hide_panel(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4391,7 +4396,7 @@ XS(XS_Curses_panel_window)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     WINDOW *    ret = panel_window(pan);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -4411,7 +4416,7 @@ XS(XS_Curses_replace_panel)
     PANEL * pan = c_sv2panel(ST(0), 0);
     WINDOW *window  = c_sv2window(ST(1), 1);
     int ret = replace_panel(pan, window);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4432,7 +4437,7 @@ XS(XS_Curses_move_panel)
     int starty  = (int)SvIV(ST(1));
     int startx  = (int)SvIV(ST(2));
     int ret = move_panel(pan, starty, startx);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4451,7 +4456,7 @@ XS(XS_Curses_panel_hidden)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     int ret = panel_hidden(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4470,7 +4475,7 @@ XS(XS_Curses_panel_above)
     {
     PANEL * pan = ST(0) != &PL_sv_undef ? c_sv2panel(ST(0), 0) : NULL;
     PANEL * ret = panel_above(pan);
-    
+
     ST(0) = sv_newmortal();
     c_panel2sv(ST(0), ret);
     }
@@ -4489,7 +4494,7 @@ XS(XS_Curses_panel_below)
     {
     PANEL * pan = ST(0) != &PL_sv_undef ? c_sv2panel(ST(0), 0) : NULL;
     PANEL * ret = panel_below(pan);
-    
+
     ST(0) = sv_newmortal();
     c_panel2sv(ST(0), ret);
     }
@@ -4509,7 +4514,7 @@ XS(XS_Curses_set_panel_userptr)
     PANEL * pan = c_sv2panel(ST(0), 0);
     char *  ptr = (char *)SvPV_nolen(ST(1));
     int ret = set_panel_userptr(pan, ptr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4528,7 +4533,7 @@ XS(XS_Curses_panel_userptr)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     char *  ret = (char *)panel_userptr(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -4547,7 +4552,7 @@ XS(XS_Curses_del_panel)
     {
     PANEL * pan = c_sv2panel(ST(0), 0);
     int ret = del_panel(pan);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4572,7 +4577,7 @@ XS(XS_Curses_set_menu_fore)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     chtype  attr    = c_sv2chtype(ST(1));
     int ret = set_menu_fore(menu, attr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4591,7 +4596,7 @@ XS(XS_Curses_menu_fore)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     chtype  ret = menu_fore(menu);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -4611,7 +4616,7 @@ XS(XS_Curses_set_menu_back)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     chtype  attr    = c_sv2chtype(ST(1));
     int ret = set_menu_back(menu, attr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4630,7 +4635,7 @@ XS(XS_Curses_menu_back)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     chtype  ret = menu_back(menu);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -4650,7 +4655,7 @@ XS(XS_Curses_set_menu_grey)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     chtype  attr    = c_sv2chtype(ST(1));
     int ret = set_menu_grey(menu, attr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4669,7 +4674,7 @@ XS(XS_Curses_menu_grey)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     chtype  ret = menu_grey(menu);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -4689,7 +4694,7 @@ XS(XS_Curses_set_menu_pad)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int pad = (int)SvIV(ST(1));
     int ret = set_menu_pad(menu, pad);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4708,7 +4713,7 @@ XS(XS_Curses_menu_pad)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = menu_pad(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4730,7 +4735,7 @@ XS(XS_Curses_pos_menu_cursor)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = pos_menu_cursor(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4753,7 +4758,7 @@ XS(XS_Curses_menu_driver)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int c   = (int)SvIV(ST(1));
     int ret = menu_driver(menu, c);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4777,7 +4782,7 @@ XS(XS_Curses_set_menu_format)
     int rows    = (int)SvIV(ST(1));
     int cols    = (int)SvIV(ST(2));
     int ret = set_menu_format(menu, rows, cols);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4797,7 +4802,7 @@ XS(XS_Curses_menu_format)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int rows    = 0;
     int cols    = 0;
-    
+
     menu_format(menu, &rows, &cols);
     sv_setiv(ST(1), (IV)rows);;
     sv_setiv(ST(2), (IV)cols);;
@@ -4821,7 +4826,7 @@ XS(XS_Curses_set_menu_items)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     ITEM ** items   = (ITEM **)SvPV_nolen(ST(1));
     int ret = set_menu_items(menu, items);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4840,7 +4845,7 @@ XS(XS_Curses_menu_items)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     ITEM ** ret = menu_items(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), (char *)ret);
     }
@@ -4859,7 +4864,7 @@ XS(XS_Curses_item_count)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = item_count(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4882,7 +4887,7 @@ XS(XS_Curses_set_menu_mark)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     char *  mark    = (char *)SvPV_nolen(ST(1));
     int ret = set_menu_mark(menu, mark);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4901,7 +4906,7 @@ XS(XS_Curses_menu_mark)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     char *  ret = (char *)menu_mark(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -4922,7 +4927,7 @@ XS(XS_Curses_new_menu)
     {
         ITEM ** items   = (ITEM **)SvPV_nolen(ST(0));
         MENU *  ret = new_menu(items);
-    
+
         ST(0) = sv_newmortal();
         c_menu2sv(ST(0), ret);
     }
@@ -4943,7 +4948,7 @@ XS(XS_Curses_free_menu)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = free_menu(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4965,7 +4970,7 @@ XS(XS_Curses_menu_opts)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = menu_opts(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -4985,7 +4990,7 @@ XS(XS_Curses_set_menu_opts)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = set_menu_opts(menu, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5005,7 +5010,7 @@ XS(XS_Curses_menu_opts_on)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = menu_opts_on(menu, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5025,7 +5030,7 @@ XS(XS_Curses_menu_opts_off)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = menu_opts_off(menu, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5048,7 +5053,7 @@ XS(XS_Curses_set_menu_pattern)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     char *  pattern = (char *)SvPV_nolen(ST(1));
     int ret = set_menu_pattern(menu, pattern);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5067,7 +5072,7 @@ XS(XS_Curses_menu_pattern)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     char *  ret = menu_pattern(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -5089,7 +5094,7 @@ XS(XS_Curses_post_menu)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = post_menu(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5108,7 +5113,7 @@ XS(XS_Curses_unpost_menu)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = unpost_menu(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5131,7 +5136,7 @@ XS(XS_Curses_set_menu_userptr)
     MENU *  item    = c_sv2menu(ST(0), 0);
     char *  userptr = (char *)SvPV_nolen(ST(1));
     int ret = set_menu_userptr(item, userptr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5150,7 +5155,7 @@ XS(XS_Curses_menu_userptr)
     {
     MENU *  item    = c_sv2menu(ST(0), 0);
     char *  ret = menu_userptr(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -5173,7 +5178,7 @@ XS(XS_Curses_set_menu_win)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     WINDOW *win = c_sv2window(ST(1), 1);
     int ret = set_menu_win(menu, win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5192,7 +5197,7 @@ XS(XS_Curses_menu_win)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     WINDOW *    ret = menu_win(menu);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -5212,7 +5217,7 @@ XS(XS_Curses_set_menu_sub)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     WINDOW *win = c_sv2window(ST(1), 1);
     int ret = set_menu_sub(menu, win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5231,7 +5236,7 @@ XS(XS_Curses_menu_sub)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     WINDOW *    ret = menu_sub(menu);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -5252,7 +5257,7 @@ XS(XS_Curses_scale_menu)
     int rows    = 0;
     int cols    = 0;
     int ret = scale_menu(menu, &rows, &cols);
-    
+
     sv_setiv(ST(1), (IV)rows);;
     sv_setiv(ST(2), (IV)cols);;
     ST(0) = sv_newmortal();
@@ -5277,7 +5282,7 @@ XS(XS_Curses_set_current_item)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     ITEM *  item    = c_sv2item(ST(1), 1);
     int ret = set_current_item(menu, item);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5296,7 +5301,7 @@ XS(XS_Curses_current_item)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     ITEM *  ret = current_item(menu);
-    
+
     ST(0) = sv_newmortal();
     c_item2sv(ST(0), ret);
     }
@@ -5316,7 +5321,7 @@ XS(XS_Curses_set_top_row)
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int row = (int)SvIV(ST(1));
     int ret = set_top_row(menu, row);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5335,7 +5340,7 @@ XS(XS_Curses_top_row)
     {
     MENU *  menu    = c_sv2menu(ST(0), 0);
     int ret = top_row(menu);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5354,7 +5359,7 @@ XS(XS_Curses_item_index)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     int ret = item_index(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5376,7 +5381,7 @@ XS(XS_Curses_item_name)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     char *  ret = (char *)item_name(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -5395,7 +5400,7 @@ XS(XS_Curses_item_description)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     char *  ret = (char *)item_description(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -5419,7 +5424,7 @@ XS(XS_Curses_new_item)
         char *  descr   = (char *)SvPV_nolen(ST(1));
 
         ITEM *  ret = new_item(name, descr);
-    
+
         ST(0) = sv_newmortal();
         c_item2sv(ST(0), ret);
     }
@@ -5438,7 +5443,7 @@ XS(XS_Curses_free_item)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     int ret = free_item(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5461,7 +5466,7 @@ XS(XS_Curses_set_item_opts)
     ITEM *  item    = c_sv2item(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = set_item_opts(item, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5481,7 +5486,7 @@ XS(XS_Curses_item_opts_on)
     ITEM *  item    = c_sv2item(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = item_opts_on(item, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5501,7 +5506,7 @@ XS(XS_Curses_item_opts_off)
     ITEM *  item    = c_sv2item(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = item_opts_off(item, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5520,7 +5525,7 @@ XS(XS_Curses_item_opts)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     int ret = item_opts(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5542,7 +5547,7 @@ XS(XS_Curses_item_userptr)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     char *  ret = (char *)item_userptr(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -5562,7 +5567,7 @@ XS(XS_Curses_set_item_userptr)
     ITEM *  item    = c_sv2item(ST(0), 0);
     char *  ptr = (char *)SvPV_nolen(ST(1));
     int ret = set_item_userptr(item, ptr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5585,7 +5590,7 @@ XS(XS_Curses_set_item_value)
     ITEM *  item    = c_sv2item(ST(0), 0);
     bool    val = (int)SvIV(ST(1));
     int ret = set_item_value(item, val);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5604,7 +5609,7 @@ XS(XS_Curses_item_value)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     bool    ret = item_value(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5626,7 +5631,7 @@ XS(XS_Curses_item_visible)
     {
     ITEM *  item    = c_sv2item(ST(0), 0);
     bool    ret = item_visible(item);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5648,7 +5653,7 @@ XS(XS_Curses_menu_request_name)
     {
     int request = (int)SvIV(ST(0));
     char *  ret = (char *)menu_request_name(request);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -5667,7 +5672,7 @@ XS(XS_Curses_menu_request_by_name)
     {
     char *  name    = (char *)SvPV_nolen(ST(0));
     int ret = menu_request_by_name(name);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5689,7 +5694,7 @@ XS(XS_Curses_set_menu_spacing)
     int rows    = (int)SvIV(ST(2));
     int cols    = (int)SvIV(ST(3));
     int ret = set_menu_spacing(menu, descr, rows, cols);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5711,7 +5716,7 @@ XS(XS_Curses_menu_spacing)
     int rows    = 0;
     int cols    = 0;
     int ret = menu_spacing(menu, &descr, &rows, &cols);
-    
+
     sv_setiv(ST(1), (IV)descr);;
     sv_setiv(ST(2), (IV)rows);;
     sv_setiv(ST(3), (IV)cols);;
@@ -5738,7 +5743,7 @@ XS(XS_Curses_pos_form_cursor)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = pos_form_cursor(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5760,7 +5765,7 @@ XS(XS_Curses_data_ahead)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     bool    ret = data_ahead(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5779,7 +5784,7 @@ XS(XS_Curses_data_behind)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     bool    ret = data_behind(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5802,7 +5807,7 @@ XS(XS_Curses_form_driver)
     FORM *  form    = c_sv2form(ST(0), 0);
     int c   = (int)SvIV(ST(1));
     int ret = form_driver(form, c);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5825,7 +5830,7 @@ XS(XS_Curses_set_form_fields)
     FORM *  form    = c_sv2form(ST(0), 0);
     FIELD **fields  = (FIELD **)SvPV_nolen(ST(1));
     int ret = set_form_fields(form, fields);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5844,7 +5849,7 @@ XS(XS_Curses_form_fields)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     FIELD **    ret = form_fields(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), (char *)ret);
     }
@@ -5863,7 +5868,7 @@ XS(XS_Curses_field_count)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = field_count(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5884,7 +5889,7 @@ XS(XS_Curses_move_field)
     int frow    = (int)SvIV(ST(1));
     int fcol    = (int)SvIV(ST(2));
     int ret = move_field(field, frow, fcol);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5905,7 +5910,7 @@ XS(XS_Curses_new_form) {
     {
         FIELD ** fields  = (FIELD **)SvPV_nolen(ST(0));
         FORM *  ret = new_form(fields);
-        
+
         ST(0) = sv_newmortal();
         c_form2sv(ST(0), ret);
     }
@@ -5924,7 +5929,7 @@ XS(XS_Curses_free_form)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = free_form(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5947,7 +5952,7 @@ XS(XS_Curses_set_new_page)
     FIELD * field   = c_sv2field(ST(0), 0);
     bool    new_page_flag   = (int)SvIV(ST(1));
     int ret = set_new_page(field, new_page_flag);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5966,7 +5971,7 @@ XS(XS_Curses_new_page)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     bool    ret = new_page(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -5989,7 +5994,7 @@ XS(XS_Curses_set_form_opts)
     FORM *  form    = c_sv2form(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = set_form_opts(form, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6009,7 +6014,7 @@ XS(XS_Curses_form_opts_on)
     FORM *  form    = c_sv2form(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = form_opts_on(form, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6029,7 +6034,7 @@ XS(XS_Curses_form_opts_off)
     FORM *  form    = c_sv2form(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = form_opts_off(form, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6048,7 +6053,7 @@ XS(XS_Curses_form_opts)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = form_opts(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6071,7 +6076,7 @@ XS(XS_Curses_set_current_field)
     FORM *  form    = c_sv2form(ST(0), 0);
     FIELD * field   = c_sv2field(ST(1), 1);
     int ret = set_current_field(form, field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6090,7 +6095,7 @@ XS(XS_Curses_current_field)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     FIELD * ret = current_field(form);
-    
+
     ST(0) = sv_newmortal();
     c_field2sv(ST(0), ret);
     }
@@ -6110,7 +6115,7 @@ XS(XS_Curses_set_form_page)
     FORM *  form    = c_sv2form(ST(0), 0);
     int n   = (int)SvIV(ST(1));
     int ret = set_form_page(form, n);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6129,7 +6134,7 @@ XS(XS_Curses_form_page)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = form_page(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6148,7 +6153,7 @@ XS(XS_Curses_field_index)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     int ret = field_index(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6170,7 +6175,7 @@ XS(XS_Curses_post_form)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = post_form(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6189,7 +6194,7 @@ XS(XS_Curses_unpost_form)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     int ret = unpost_form(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6212,7 +6217,7 @@ XS(XS_Curses_set_form_userptr)
     FORM *  form    = c_sv2form(ST(0), 0);
     char *  userptr = (char *)SvPV_nolen(ST(1));
     int ret = set_form_userptr(form, userptr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6231,7 +6236,7 @@ XS(XS_Curses_form_userptr)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     char *  ret = form_userptr(form);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -6254,7 +6259,7 @@ XS(XS_Curses_set_form_win)
     FORM *  form    = c_sv2form(ST(0), 0);
     WINDOW *win = c_sv2window(ST(1), 1);
     int ret = set_form_win(form, win);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6273,7 +6278,7 @@ XS(XS_Curses_form_win)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     WINDOW *    ret = form_win(form);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -6293,7 +6298,7 @@ XS(XS_Curses_set_form_sub)
     FORM *  form    = c_sv2form(ST(0), 0);
     WINDOW *sub = c_sv2window(ST(1), 1);
     int ret = set_form_sub(form, sub);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6312,7 +6317,7 @@ XS(XS_Curses_form_sub)
     {
     FORM *  form    = c_sv2form(ST(0), 0);
     WINDOW *    ret = form_sub(form);
-    
+
     ST(0) = sv_newmortal();
     c_window2sv(ST(0), ret);
     }
@@ -6333,7 +6338,7 @@ XS(XS_Curses_scale_form)
     int rows    = 0;
     int cols    = 0;
     int ret = scale_form(form, &rows, &cols);
-    
+
     sv_setiv(ST(1), (IV)rows);;
     sv_setiv(ST(2), (IV)cols);;
     ST(0) = sv_newmortal();
@@ -6358,7 +6363,7 @@ XS(XS_Curses_set_field_fore)
     FIELD * field   = c_sv2field(ST(0), 0);
     chtype  attr    = c_sv2chtype(ST(1));
     int ret = set_field_fore(field, attr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6377,7 +6382,7 @@ XS(XS_Curses_field_fore)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     chtype  ret = field_fore(field);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -6397,7 +6402,7 @@ XS(XS_Curses_set_field_back)
     FIELD * field   = c_sv2field(ST(0), 0);
     chtype  attr    = c_sv2chtype(ST(1));
     int ret = set_field_back(field, attr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6416,7 +6421,7 @@ XS(XS_Curses_field_back)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     chtype  ret = field_back(field);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -6436,7 +6441,7 @@ XS(XS_Curses_set_field_pad)
     FIELD * field   = c_sv2field(ST(0), 0);
     int pad = (int)SvIV(ST(1));
     int ret = set_field_pad(field, pad);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6455,7 +6460,7 @@ XS(XS_Curses_field_pad)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     chtype  ret = field_pad(field);
-    
+
     ST(0) = sv_newmortal();
     c_chtype2sv(ST(0), ret);
     }
@@ -6479,7 +6484,7 @@ XS(XS_Curses_set_field_buffer)
     int buf = (int)SvIV(ST(1));
     char *  value   = (char *)SvPV_nolen(ST(2));
     int ret = set_field_buffer(field, buf, value);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6499,7 +6504,7 @@ XS(XS_Curses_field_buffer)
     FIELD * field   = c_sv2field(ST(0), 0);
     int buffer  = (int)SvIV(ST(1));
     char *  ret = field_buffer(field, buffer);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -6519,7 +6524,7 @@ XS(XS_Curses_set_field_status)
     FIELD * field   = c_sv2field(ST(0), 0);
     bool    status  = (int)SvIV(ST(1));
     int ret = set_field_status(field, status);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6538,7 +6543,7 @@ XS(XS_Curses_field_status)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     bool    ret = field_status(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6558,7 +6563,7 @@ XS(XS_Curses_set_max_field)
     FIELD * field   = c_sv2field(ST(0), 0);
     int max = (int)SvIV(ST(1));
     int ret = set_max_field(field, max);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6586,7 +6591,7 @@ XS(XS_Curses_field_info)
     int nrow    = 0;
     int nbuf    = 0;
     int ret = field_info(field, &rows, &cols, &frow, &fcol, &nrow, &nbuf);
-    
+
     sv_setiv(ST(1), (IV)rows);;
     sv_setiv(ST(2), (IV)cols);;
     sv_setiv(ST(3), (IV)frow);;
@@ -6614,7 +6619,7 @@ XS(XS_Curses_dynamic_field_info)
     int cols    = 0;
     int max = 0;
     int ret = dynamic_field_info(field, &rows, &cols, &max);
-    
+
     sv_setiv(ST(1), (IV)rows);;
     sv_setiv(ST(2), (IV)cols);;
     sv_setiv(ST(3), (IV)max);;
@@ -6640,7 +6645,7 @@ XS(XS_Curses_set_field_just)
     FIELD * field   = c_sv2field(ST(0), 0);
     int justif  = (int)SvIV(ST(1));
     int ret = set_field_just(field, justif);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6659,7 +6664,7 @@ XS(XS_Curses_field_just)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     int ret = field_just(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6706,7 +6711,7 @@ XS(XS_Curses_dup_field)
     int toprow  = (int)SvIV(ST(1));
     int leftcol = (int)SvIV(ST(2));
     FIELD * ret = dup_field(field, toprow, leftcol);
-    
+
     ST(0) = sv_newmortal();
     c_field2sv(ST(0), ret);
     }
@@ -6727,7 +6732,7 @@ XS(XS_Curses_link_field)
     int toprow  = (int)SvIV(ST(1));
     int leftcol = (int)SvIV(ST(2));
     FIELD * ret = link_field(field, toprow, leftcol);
-    
+
     ST(0) = sv_newmortal();
     c_field2sv(ST(0), ret);
     }
@@ -6746,7 +6751,7 @@ XS(XS_Curses_free_field)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     int ret = free_field(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6769,7 +6774,7 @@ XS(XS_Curses_set_field_opts)
     FIELD * field   = c_sv2field(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = set_field_opts(field, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6789,7 +6794,7 @@ XS(XS_Curses_field_opts_on)
     FIELD * field   = c_sv2field(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = field_opts_on(field, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6809,7 +6814,7 @@ XS(XS_Curses_field_opts_off)
     FIELD * field   = c_sv2field(ST(0), 0);
     int opts    = (int)SvIV(ST(1));
     int ret = field_opts_off(field, opts);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6828,7 +6833,7 @@ XS(XS_Curses_field_opts)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     int ret = field_opts(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6851,7 +6856,7 @@ XS(XS_Curses_set_field_userptr)
     FIELD * field   = c_sv2field(ST(0), 0);
     char *  userptr = (char *)SvPV_nolen(ST(1));
     int ret = set_field_userptr(field, userptr);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6870,7 +6875,7 @@ XS(XS_Curses_field_userptr)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     char *  ret = field_userptr(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -6892,7 +6897,7 @@ XS(XS_Curses_field_arg)
     {
     FIELD * field   = c_sv2field(ST(0), 0);
     char *  ret = field_arg(field);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -6914,7 +6919,7 @@ XS(XS_Curses_form_request_name)
     {
     int request = (int)SvIV(ST(0));
     char *  ret = (char *)form_request_name(request);
-    
+
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), ret);
     }
@@ -6933,7 +6938,7 @@ XS(XS_Curses_form_request_by_name)
     {
     char *  name    = (char *)SvPV_nolen(ST(0));
     int ret = form_request_by_name(name);
-    
+
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
     }
@@ -6943,4 +6948,3 @@ XS(XS_Curses_form_request_by_name)
     XSRETURN(0);
 #endif
 }
-

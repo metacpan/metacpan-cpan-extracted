@@ -5,7 +5,6 @@ eg/celestrak
 eg/README
 eg/sh_data
 eg/sh_script
-eg/spaceflight
 eg/spacetrack-identity
 eg/SpaceTrackTk
 inc/Astro/SpaceTrack/Dumper.pm

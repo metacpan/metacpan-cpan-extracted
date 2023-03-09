@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2022-12-18 08:55:33 */
+/* this file was auto-generated at 2023-03-09 13:51:47 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -791,7 +791,7 @@ const tld_t tld_list[] = {
     { "lv", 3, TLD_TYPE_COUNTRY_CODE },
     { "ly", 3, TLD_TYPE_COUNTRY_CODE },
     { "ma", 3, TLD_TYPE_COUNTRY_CODE },
-    { "macys", 6, TLD_TYPE_GENERIC },
+    { "macys", 6, TLD_TYPE_NOT_ASSIGNED },
     { "madrid", 7, TLD_TYPE_GENERIC },
     { "maif", 5, TLD_TYPE_GENERIC },
     { "maison", 7, TLD_TYPE_GENERIC },

@@ -1,3 +1,7 @@
+0.12
+	o revert commit 495fcbc, see #7: breaks backwards
+	  compatibility.
+
 0.11
 	o typos
 

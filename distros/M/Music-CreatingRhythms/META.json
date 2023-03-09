@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Music-CreatingRhythms"
       }
    },
-   "version" : "0.0504",
+   "version" : "0.0601",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -357,7 +357,7 @@
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
                   "exclude_match" : [
-                     "\\.png"
+                     "\\.mid"
                   ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,

@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Thu Sep  1 10:02:44 EDT 2022
+#    Generated on: Mon Mar  6 13:26:32 EST 2023
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.72';
+$VERSION='3.73';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -309,12 +309,15 @@ $Locale::Codes::Retired{'country'}{'dom'}{'code'} = {
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'code'} = {
+   q(A1) => q(Unknown),
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'code'} = {
+   q(AX1) => q(Unknown),
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'code'} = {
+   q(932) => q(Unknown),
 };
 
 $Locale::Codes::Retired{'country'}{'numeric'}{'code'} = {
@@ -532,6 +535,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
    q(macedonia) => [ q(MK), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(MK), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SZ), q(SWAZILAND) ],
+   q(unknown) => [ q(A1), q(Unknown) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
@@ -539,6 +543,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
    q(macedonia) => [ q(MKD), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SWZ), q(SWAZILAND) ],
+   q(unknown) => [ q(AX1), q(Unknown) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
@@ -546,6 +551,7 @@ $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
    q(macedonia) => [ q(807), q(MACEDONIA) ],
    q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(748), q(SWAZILAND) ],
+   q(unknown) => [ q(932), q(Unknown) ],
 };
 
 $Locale::Codes::Retired{'country'}{'numeric'}{'name'} = {

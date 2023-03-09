@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-16'; # DATE
+our $DATE = '2023-03-09'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/RPO/Checker/bpom_rpo_check_files_label_design",
@@ -41,7 +41,7 @@ bpom-rpo-check-files-label-design - Check label design files
 
 =head1 VERSION
 
-This document describes version 0.006 of bpom-rpo-check-files-label-design (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-02-16.
+This document describes version 0.008 of bpom-rpo-check-files-label-design (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-09.
 
 =head1 SYNOPSIS
 
@@ -56,12 +56,10 @@ B<bpom-rpo-check-files-label-design> [B<L<--debug|/"--debug">>|B<L<--log-level|/
 By default will check all files in the current directory, recursively.
 
 Here's what it checks:
+- all the checks by bpom_rpo_check_files()
 - file must be in JPEG format and has name ending in /.jpe?g$/i
-- filename should not contain unsafe symbols
-- file must not be larger than 5MB
-- file must be readable
-- image size must not be larger than 2300 x 2300 px
-- (WARNING) image should not be smaller than 600 x 600 px
+- image size must be smaller than 2300 x 2300 px
+- (WARNING) image should not be smaller than 600 x 600px
 
 =head1 OPTIONS
 
