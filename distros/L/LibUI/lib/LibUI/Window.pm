@@ -1,14 +1,15 @@
-package LibUI::Window 0.01 {
+package LibUI::Window 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use parent 'LibUI::Control';
     #
-    affix( LibUI::lib(), 'uiWindowTitle', [ InstanceOf ['LibUI::Window'] ] => Str, 'title' );
+    affix( LibUI::lib(), [ 'uiWindowTitle', 'title' ], [ InstanceOf ['LibUI::Window'] ] => Str );
     affix(
-        LibUI::lib(), 'uiWindowSetTitle', [ InstanceOf ['LibUI::Window'], Str ] => Void,
-        'setTitle'
+        LibUI::lib(),
+        [ 'uiWindowSetTitle',           'setTitle' ],
+        [ InstanceOf ['LibUI::Window'], Str ] => Void
     );
 
     sub contentSize($) {
@@ -20,82 +21,99 @@ package LibUI::Window 0.01 {
         return ( $width, $height );
     }
     affix(
-        LibUI::lib(), 'uiWindowSetContentSize', [ InstanceOf ['LibUI::Window'], Int, Int ] => Void,
-        'setContentSize'
-    );
-    affix(
-        LibUI::lib(), 'uiWindowFullscreen', [ InstanceOf ['LibUI::Window'] ] => Int,
-        'fullscreen'
-    );
-    affix(
-        LibUI::lib(), 'uiWindowSetFullscreen', [ InstanceOf ['LibUI::Window'], Int ] => Void,
-        'setFullscreen'
+        LibUI::lib(),
+        [ 'uiWindowSetContentSize',     'setContentSize' ],
+        [ InstanceOf ['LibUI::Window'], Int, Int ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiWindowOnContentSizeChanged',
+        [ 'uiWindowFullscreen', 'fullscreen' ],
+        [ InstanceOf ['LibUI::Window'] ] => Int
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiWindowSetFullscreen',      'setFullscreen' ],
+        [ InstanceOf ['LibUI::Window'], Int ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiWindowOnContentSizeChanged', 'onContentSizeChanged' ],
         [   InstanceOf ['LibUI::Window'],
             CodeRef [ [ InstanceOf ['LibUI::Window'], Any ] => Void ], Any
-        ] => Void,
-        'onContentSizeChanged'
+        ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiWindowOnClosing',
+        [ 'uiWindowOnClosing', 'onClosing' ],
         [   InstanceOf ['LibUI::Window'],
             CodeRef [ [ InstanceOf ['LibUI::Window'], Any ] => Int ], Any
-        ] => Void,
-        'onClosing'
+        ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiWindowOnFocusChanged',
+        [ 'uiWindowOnFocusChanged', 'onFocusChanged' ],
         [   InstanceOf ['LibUI::Window'],
             CodeRef [ [ InstanceOf ['LibUI::Window'], Any ] => Int ], Any
-        ] => Void,
-        'onFocusChanged'
+        ] => Void
     );
-    affix( LibUI::lib(), 'uiWindowFocused', [ InstanceOf ['LibUI::Window'] ] => Int, 'focused' );
+    affix( LibUI::lib(), [ 'uiWindowFocused', 'focused' ],
+        [ InstanceOf ['LibUI::Window'] ] => Int );
     affix(
-        LibUI::lib(), 'uiWindowBorderless', [ InstanceOf ['LibUI::Window'] ] => Int,
-        'borderless'
-    );
-    affix(
-        LibUI::lib(), 'uiWindowSetBorderless', [ InstanceOf ['LibUI::Window'], Int ] => Void,
-        'setBorderless'
+        LibUI::lib(),
+        [ 'uiWindowBorderless', 'borderless' ],
+        [ InstanceOf ['LibUI::Window'] ] => Int
     );
     affix(
-        LibUI::lib(), 'uiWindowSetChild',
-        [ InstanceOf ['LibUI::Window'], InstanceOf ['LibUI::Control'] ] => Void,
-        'setChild'
-    );
-    affix( LibUI::lib(), 'uiWindowMargined', [ InstanceOf ['LibUI::Window'] ] => Int, 'margined' );
-    affix(
-        LibUI::lib(), 'uiWindowSetMargined', [ InstanceOf ['LibUI::Window'], Int ] => Void,
-        'setMargined'
+        LibUI::lib(),
+        [ 'uiWindowSetBorderless',      'setBorderless' ],
+        [ InstanceOf ['LibUI::Window'], Int ] => Void
     );
     affix(
-        LibUI::lib(), 'uiWindowResizeable', [ InstanceOf ['LibUI::Window'] ] => Int,
-        'resizable'
+        LibUI::lib(),
+        [ 'uiWindowSetChild',           'setChild' ],
+        [ InstanceOf ['LibUI::Window'], InstanceOf ['LibUI::Control'] ] => Void
     );
     affix(
-        LibUI::lib(), 'uiWindowSetResizeable', [ InstanceOf ['LibUI::Window'], Int ] => Void,
-        'setResizable'
+        LibUI::lib(),
+        [ 'uiWindowMargined', 'margined' ],
+        [ InstanceOf ['LibUI::Window'] ] => Int
     );
     affix(
-        LibUI::lib(), 'uiNewWindow', [ Void, Str, Int, Int, Int ] => InstanceOf ['LibUI::Window'],
-        'new'
+        LibUI::lib(),
+        [ 'uiWindowSetMargined',        'setMargined' ],
+        [ InstanceOf ['LibUI::Window'], Int ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiWindowResizeable', 'resizable' ],
+        [ InstanceOf ['LibUI::Window'] ] => Int
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiWindowSetResizeable',      'setResizable' ],
+        [ InstanceOf ['LibUI::Window'], Int ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiNewWindow', 'new' ],
+        [ Void, Str, Int, Int, Int ] => InstanceOf ['LibUI::Window']
     );
 
     # Dialogs
-    affix( LibUI::lib(), 'uiMsgBox', [ InstanceOf ['LibUI::Window'], Str, Str ] => Void, 'msgBox' );
     affix(
-        LibUI::lib(), 'uiMsgBoxError', [ InstanceOf ['LibUI::Window'], Str, Str ] => Void,
-        'msgBoxError'
+        LibUI::lib(),
+        [ 'uiMsgBox', 'msgBox' ],
+        [ InstanceOf ['LibUI::Window'], Str, Str ] => Void
     );
-    affix( LibUI::lib(), 'uiOpenFile',   [ InstanceOf ['LibUI::Window'] ] => Str, 'openFile' );
-    affix( LibUI::lib(), 'uiOpenFolder', [ InstanceOf ['LibUI::Window'] ] => Str, 'openFolder' );
-    affix( LibUI::lib(), 'uiSaveFile',   [ InstanceOf ['LibUI::Window'] ] => Str, 'saveFile' );
+    affix(
+        LibUI::lib(),
+        [ 'uiMsgBoxError', 'msgBoxError' ],
+        [ InstanceOf ['LibUI::Window'], Str, Str ] => Void
+    );
+    affix( LibUI::lib(), [ 'uiOpenFile', 'openFile' ], [ InstanceOf ['LibUI::Window'] ] => Str );
+    affix( LibUI::lib(), [ 'uiOpenFolder', 'openFolder' ],
+        [ InstanceOf ['LibUI::Window'] ] => Str );
+    affix( LibUI::lib(), [ 'uiSaveFile', 'saveFile' ], [ InstanceOf ['LibUI::Window'] ] => Str );
 };
 1;
 #
@@ -113,7 +131,7 @@ LibUI::Window - Top-Level Window
 
     use LibUI ':all';
     use LibUI::Window;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
     $window->onClosing(
         sub {

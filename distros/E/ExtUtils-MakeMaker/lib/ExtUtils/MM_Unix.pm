@@ -13,10 +13,11 @@ our %Config_Override;
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue _sprintf562);
 
-# If we make $VERSION an our variable parse_version() breaks
-use vars qw($VERSION);
-$VERSION = '7.66';
+# If $VERSION is in scope, parse_version() breaks
+{
+our $VERSION = '7.68';
 $VERSION =~ tr/_//d;
+}
 
 require ExtUtils::MM_Any;
 our @ISA = qw(ExtUtils::MM_Any);
@@ -34,7 +35,7 @@ BEGIN {
     $Is{SunOS4}  = $^O eq 'sunos';
     $Is{Solaris} = $^O eq 'solaris';
     $Is{SunOS}   = $Is{SunOS4} || $Is{Solaris};
-    $Is{BSD}     = ($^O =~ /^(?:free|net|open)bsd$/ or
+    $Is{BSD}     = ($^O =~ /^(?:free|midnight|net|open)bsd$/ or
                    grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
     $Is{Android} = $^O =~ /android/;
@@ -224,7 +225,7 @@ sub cflags {
     # with the warning flags, but NOT the -std=c89 flags (the latter
     # would break using any system header files that are strict C99).
     my @ccextraflags = qw(ccwarnflags);
-    if ($ENV{PERL_CORE}) {
+    if ($self->{PERL_CORE}) {
       for my $x (@ccextraflags) {
         if (exists $Config{$x}) {
           $cflags{$x} = $Config{$x};
@@ -1747,13 +1748,47 @@ sub init_DIRFILESEP {
 }
 
 
+=item init_CORE
+
+Initializes PERL_CORE and PERL_SRC.
+
+=cut
+
+sub init_CORE {
+    my ($self) = @_;
+
+    # Are we building the core?
+    $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
+
+    if ((!defined $self->{PERL_CORE} || $self->{PERL_CORE}) && !$self->{PERL_SRC}){
+        foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
+            my $dir = $self->catdir(($Updir) x $dir_count);
+
+            if (-f $self->catfile($dir,"config_h.SH")   &&
+                -f $self->catfile($dir,"perl.h")        &&
+                -f $self->catfile($dir,"lib","strict.pm")
+            ) {
+                $self->{PERL_SRC} = $dir ;
+                $self->{PERL_CORE} = 1;
+                last;
+            }
+        }
+    }
+
+    warn "PERL_CORE is set but I can't find your PERL_SRC!\n"
+        if $self->{PERL_CORE} and !$self->{PERL_SRC};
+
+    return;
+}
+
+
 =item init_main
 
 Initializes AR, AR_STATIC_ARGS, BASEEXT, CONFIG, DISTNAME, DLBASE,
 EXE_EXT, FULLEXT, FULLPERL, FULLPERLRUN, FULLPERLRUNINST, INST_*,
 INSTALL*, INSTALLDIRS, LIB_EXT, LIBPERL_A, MAP_TARGET, NAME,
 OBJ_EXT, PARENT_NAME, PERL, PERL_ARCHLIB, PERL_INC, PERL_LIB,
-PERL_SRC, PERLRUN, PERLRUNINST, PREFIX, VERSION,
+PERLRUN, PERLRUNINST, PREFIX, VERSION,
 VERSION_SYM, XS_VERSION.
 
 =cut
@@ -1803,23 +1838,6 @@ sub init_main {
     # *Real* information: where did we get these two from? ...
     my $inc_config_dir = dirname($INC{'Config.pm'});
     my $inc_carp_dir   = dirname($INC{'Carp.pm'});
-
-    unless ($self->{PERL_SRC}){
-        foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
-            my $dir = $self->catdir(($Updir) x $dir_count);
-
-            if (-f $self->catfile($dir,"config_h.SH")   &&
-                -f $self->catfile($dir,"perl.h")        &&
-                -f $self->catfile($dir,"lib","strict.pm")
-            ) {
-                $self->{PERL_SRC}=$dir ;
-                last;
-            }
-        }
-    }
-
-    warn "PERL_CORE is set but I can't find your PERL_SRC!\n" if
-      $self->{PERL_CORE} and !$self->{PERL_SRC};
 
     if ($self->{PERL_SRC}){
 	$self->{PERL_LIB}     ||= $self->catdir("$self->{PERL_SRC}","lib");
@@ -2159,10 +2177,6 @@ sub init_PERL {
     # * including any initial directory separator preserves the `file_name_is_absolute` property
     $self->{PERL} =~ s/^"(\S(:\\|:)?)/$1"/ if $self->is_make_type('dmake');
 
-    # Are we building the core?
-    $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
-    $self->{PERL_CORE} = 0               unless defined $self->{PERL_CORE};
-
     # Make sure perl can find itself before it's installed.
     my $lib_paths = $self->{UNINSTALLED_PERL} || $self->{PERL_CORE}
         ? ( $self->{PERL_ARCHLIB} && $self->{PERL_LIB} && $self->{PERL_ARCHLIB} ne $self->{PERL_LIB} ) ?
@@ -2196,7 +2210,7 @@ Add MM_Unix_VERSION.
 sub init_platform {
     my($self) = shift;
 
-    $self->{MM_Unix_VERSION} = $VERSION;
+    $self->{MM_Unix_VERSION} = our $VERSION;
     $self->{PERL_MALLOC_DEF} = '-DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc '.
                                '-Dfree=Perl_mfree -Drealloc=Perl_realloc '.
                                '-Dcalloc=Perl_calloc';

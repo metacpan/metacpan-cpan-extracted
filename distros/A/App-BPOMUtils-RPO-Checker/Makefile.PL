@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "Data::Sah::Value::perl::Path::filenames" => 0,
     "Exporter" => "5.57",
+    "File::Basename" => 0,
     "File::MimeInfo::Magic" => 0,
     "Image::Size" => 0,
     "Log::ger" => "0.038",
@@ -43,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +59,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "Data::Sah::Value::perl::Path::filenames" => 0,
   "Exporter" => "5.57",
+  "File::Basename" => 0,
   "File::MimeInfo::Magic" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

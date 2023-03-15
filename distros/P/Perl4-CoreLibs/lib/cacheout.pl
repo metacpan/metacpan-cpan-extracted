@@ -9,13 +9,15 @@
 
 # Open in their package.
 
-sub cacheout'open {
+no warnings "ambiguous";
+
+sub cacheout::open {
     open($_[0], $_[1]);
 }
 
 # Close as well
 
-sub cacheout'close {
+sub cacheout::close {
     close($_[0]);
 }
 

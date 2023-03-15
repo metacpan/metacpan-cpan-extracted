@@ -18,6 +18,8 @@ Allows configurations of:
 
 Other elements of startup files can be added using the Machine extra field.
 
+Download from CPAN: https://metacpan.org/release/RHYSADAMS/Netkit-0.01/view/lib/Netkit.pm
+
 ## Example Lab
 
 Place machine data folders in the ./data directory, run `perl main.pl`, and a lab folder appears in the ./res directory.

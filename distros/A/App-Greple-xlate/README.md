@@ -7,6 +7,10 @@ App::Greple::xlate - translation support module for greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
+# VERSION
+
+Version 0.17
+
 # DESCRIPTION
 
 **Greple** **xlate** module find text blocks and replace them by the
@@ -85,7 +89,7 @@ This is a short-cut to specify the pattern matches entire text
     clipboard.  You are expected to paste them to the form, copy the
     result to the clipboard, and hit return.
 
-- **--xlate-to** (Default: `JA`)
+- **--xlate-to** (Default: `EN-US`)
 
     Specify the target language.  You can get available languages by
     `deepl languages` command when using **DeepL** engine.

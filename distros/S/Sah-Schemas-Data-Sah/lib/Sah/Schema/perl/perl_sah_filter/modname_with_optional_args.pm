@@ -5,13 +5,13 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-17'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Data-Sah'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = ['perl::modname_with_optional_args', {
     summary => 'Perl module in the Data::Sah::Filter::perl::* namespace, without the namespace prefix, with optional args e.g. "PhysicalQuantity::convert_unit=to,kg"',
-    'x.completion' => ['perl_sah_filter_modname_with_optional_args'],
+    'x.completion' => ['perl_perl_sah_filter_modname_with_optional_args'],
 }];
 
 1;
@@ -29,7 +29,7 @@ Sah::Schema::perl::perl_sah_filter::modname_with_optional_args - Perl module in 
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::perl_sah_filter::modname_with_optional_args (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-17.
+This document describes version 0.003 of Sah::Schema::perl::perl_sah_filter::modname_with_optional_args (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-19.
 
 =head1 SYNOPSIS
 

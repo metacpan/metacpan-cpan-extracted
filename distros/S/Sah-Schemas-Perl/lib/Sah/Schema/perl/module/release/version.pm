@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 our $schema = [str => {
     summary => 'Expression to select module release',
@@ -34,7 +34,7 @@ Sah::Schema::perl::module::release::version - Expression to select module releas
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schema::perl::module::release::version (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schema::perl::module::release::version (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -64,11 +64,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "< latest";
+ $data = 0.001;
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "< foo";
+ $data = "";
  my $errmsg = $validator->($data); # => "Invalid releases expression"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -79,12 +79,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "< latest";
- my $res = $validator->($data); # => ["","< latest"]
+ $data = 0.001;
+ my $res = $validator->($data); # => ["",0.001]
  
  # a sample invalid data
- $data = "< foo";
- my $res = $validator->($data); # => ["Invalid releases expression","< foo"]
+ $data = "";
+ my $res = $validator->($data); # => ["Invalid releases expression",""]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Webservice::Judobase;
-$Webservice::Judobase::VERSION = '0.08';
+$Webservice::Judobase::VERSION = '0.09';
 # ABSTRACT: This module wraps the www.judobase.org website API.
 # VERSION
 

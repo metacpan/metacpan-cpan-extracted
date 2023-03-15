@@ -137,6 +137,14 @@ subtest chsequl => sub {
     $expect = [1,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0];
     $got = $mcr->chsequl('u', 11, 5);
     is_deeply $got, $expect, 'chsequl';
+
+    $expect = [0,1,1,0];
+    $got = $mcr->chsequl('l', 11, 5, 4);
+    is_deeply $got, $expect, 'chsequl';
+
+    $expect = [1,1,1,0];
+    $got = $mcr->chsequl('u', 11, 5, 4);
+    is_deeply $got, $expect, 'chsequl';
 };
 
 subtest comp => sub {

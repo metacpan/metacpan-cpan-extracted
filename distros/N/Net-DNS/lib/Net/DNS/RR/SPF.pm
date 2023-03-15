@@ -2,7 +2,7 @@ package Net::DNS::RR::SPF;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SPF.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: SPF.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR::TXT);
 
@@ -17,7 +17,8 @@ use integer;
 
 
 sub spfdata {
-	my @spf = shift->char_str_list(@_);
+	my ( $self, @argument ) = @_;
+	my @spf = shift->char_str_list(@argument);
 	return wantarray ? @spf : join '', @spf;
 }
 
@@ -106,6 +107,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::TXT>, RFC7208
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<Net::DNS::RR::TXT>
+L<RFC7208|https://tools.ietf.org/html/rfc7208>
 
 =cut

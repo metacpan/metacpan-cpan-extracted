@@ -28,4 +28,4 @@ my $pihole = WWW::PiHole -> new;
 # p $pihole -> remove_cname( 'redirect.this' , 'www.example.com' );
 # p $pihole -> get_cname; # array of 2-element arrays
 
-say $pihole -> version( 'latest' ); # Modes: 'update', 'current', 'latest', 'branch'
+say $pihole -> version( 'latest1' ); # Modes: 'update', 'current', 'latest', 'branch'

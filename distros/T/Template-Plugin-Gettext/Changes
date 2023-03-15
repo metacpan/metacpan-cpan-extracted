@@ -1,3 +1,7 @@
+0.8  2023-03-15
+	- Fixed spelling errors.
+	- Documentation.
+
 0.7  2018-11-04
         - Always set utf8 flag on translations.
         - Require libintl-perl 1.30, because of

@@ -1,3 +1,10 @@
+0.006   2023-03-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Apply suggestion from UTASHIRO for Text::ANSI::Fold backend (GH#1).
+
+        - [ux] Add -b as short alias for --backend.
+
+
 0.005   2022-12-14  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add aliases commands: nowrap -> textunwrap, nowrap-clipboard

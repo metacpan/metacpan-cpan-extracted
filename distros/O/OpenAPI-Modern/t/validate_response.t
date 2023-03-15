@@ -390,7 +390,7 @@ paths:
   /foo:
     post:
       responses:
-        '200':
+        200:
           description: no content permitted
           headers:
             Content-Length:
@@ -409,7 +409,7 @@ paths:
               schema:
                 type: string
                 maxLength: 0
-        '204':
+        204:
           description: no content permitted, and no Content-Length either
           headers:
             Content-Length:
@@ -657,7 +657,7 @@ paths:
   /foo:
     post:
       responses:
-        '200':
+        200:
           description: success
           headers:
             a:
@@ -700,7 +700,7 @@ paths:
   /foo:
     post:
       responses:
-        '200':
+        200:
           description: blah
           headers:
             Foo:

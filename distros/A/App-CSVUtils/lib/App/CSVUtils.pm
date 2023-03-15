@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -257,8 +257,58 @@ sub _array2hash {
     $rowhash;
 }
 
+# check that the first N values of a field are all defined and numeric. if there
+# are now rows or less than N values, return true.
+sub _is_numeric_field {
+    require Scalar::Util::Numeric;
+
+    my ($rows, $field_idx, $num_samples) = @_;
+    $num_samples //= 5;
+
+    my $is_numeric = 1;
+    for my $row (@$rows) {
+        my $val = $row->[$field_idx];
+        return 0 unless defined $val;
+        return 0 unless Scalar::Util::Numeric::isnum($val);
+    }
+    $is_numeric;
+}
+
+# find a single field by name or index (1-based), return index (0-based). die
+# when requested field does not exist.
+sub _find_field {
+    my ($fields, $name_or_idx) = @_;
+
+    # search by name first
+    for my $i (0 .. $#{$fields}) {
+        my $field = $fields->[$i];
+        return $i if $field eq $name_or_idx;
+    }
+
+    if ($name_or_idx eq '0') {
+        die [400, "Field index 0 is requested, you probably meant 1 for the first field?"];
+    } elsif ($name_or_idx =~ /\A[1-9][0-9]*\z/) {
+        if ($name_or_idx > @$fields) {
+            die [400, "There are only ".scalar(@$fields)." field(s) but field index $name_or_idx is requested"];
+        } else {
+            return $name_or_idx-1;
+        }
+    } elsif ($name_or_idx =~ /\A-[1-9][0-9]*\z/) {
+        if (-$name_or_idx > @$fields) {
+            die [400, "There are only ".scalar(@$fields)." field(s) but field index $name_or_idx is requested"];
+        } else {
+            return @$fields + $name_or_idx;
+        }
+    }
+
+    # not found
+    die [404, "Unknown field name/index '$name_or_idx' (known fields include: ".
+         join(", ", map { "'$_'" } @$fields).")"];
+}
+
+# select one or more fields with options like --include-field, etc
 sub _select_fields {
-    my ($fields, $field_idxs, $args, $default_to_select_all) = @_;
+    my ($fields, $field_idxs, $args, $default_select_choice) = @_;
 
     my @selected_fields;
 
@@ -301,8 +351,16 @@ sub _select_fields {
         }
     }
 
-    if (!$select_field_options_used && $default_to_select_all) {
-        @selected_fields = @$fields;
+    if (!$select_field_options_used && $default_select_choice) {
+        if ($default_select_choice eq 'all') {
+            @selected_fields = @$fields;
+        } elsif ($default_select_choice eq 'first') {
+            @selected_fields = ($fields->[0]) if @$fields;
+        } elsif ($default_select_choice eq 'last') {
+            @selected_fields = ($fields->[-1]) if @$fields;
+        } elsif ($default_select_choice eq 'first-if-only-field') {
+            @selected_fields = ($fields->[0]) if @$fields == 1;
+        }
     }
 
     if ($args->{show_selected_fields}) {
@@ -1839,6 +1897,9 @@ sub gen_csv_util {
                     $meta->{args}{$_} = {%{$argspecsopt_inplace{$_}}} for keys %argspecsopt_inplace;
                     $meta->{args_rels}{'dep_all&'} //= [];
                     push @{ $meta->{args_rels}{'dep_all&'} }, ['inplace_backup_ext', ['inplace']];
+                    $meta->{args_rels}{'choose_one&'} //= [];
+                    push @{ $meta->{args_rels}{'choose_one&'} }, ['inplace', 'output_filename'];
+                    push @{ $meta->{args_rels}{'choose_one&'} }, ['inplace', 'output_filenames'];
                 }
 
                 if ($writes_multiple_csv) {
@@ -1858,6 +1919,8 @@ sub gen_csv_util {
                 }
 
                 $meta->{args}{overwrite} = {%{$argspecopt_overwrite{overwrite}}};
+                $meta->{args_rels}{'dep_any&'} //= [];
+                push @{ $meta->{args_rels}{'dep_any&'} }, ['overwrite', ['output_filename', 'output_filenames']];
             } # if outputs csv
 
         } # CREATE_ARGS_PROP
@@ -1901,7 +1964,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 DESCRIPTION
 
@@ -1969,57 +2032,61 @@ This distribution contains the following CLI utilities:
 
 =item 30. L<csv-pick-rows>
 
-=item 31. L<csv-replace-newline>
+=item 31. L<csv-quote>
 
-=item 32. L<csv-rtrim>
+=item 32. L<csv-replace-newline>
 
-=item 33. L<csv-select-fields>
+=item 33. L<csv-rtrim>
 
-=item 34. L<csv-select-rows>
+=item 34. L<csv-select-fields>
 
-=item 35. L<csv-setop>
+=item 35. L<csv-select-rows>
 
-=item 36. L<csv-shuf>
+=item 36. L<csv-setop>
 
-=item 37. L<csv-shuf-fields>
+=item 37. L<csv-shuf>
 
-=item 38. L<csv-shuf-rows>
+=item 38. L<csv-shuf-fields>
 
-=item 39. L<csv-sort>
+=item 39. L<csv-shuf-rows>
 
-=item 40. L<csv-sort-fields>
+=item 40. L<csv-sort>
 
-=item 41. L<csv-sort-rows>
+=item 41. L<csv-sort-fields>
 
-=item 42. L<csv-sorted>
+=item 42. L<csv-sort-rows>
 
-=item 43. L<csv-sorted-fields>
+=item 43. L<csv-sorted>
 
-=item 44. L<csv-sorted-rows>
+=item 44. L<csv-sorted-fields>
 
-=item 45. L<csv-split>
+=item 45. L<csv-sorted-rows>
 
-=item 46. L<csv-sum>
+=item 46. L<csv-split>
 
-=item 47. L<csv-transpose>
+=item 47. L<csv-sum>
 
-=item 48. L<csv-trim>
+=item 48. L<csv-transpose>
 
-=item 49. L<csv-uniq>
+=item 49. L<csv-trim>
 
-=item 50. L<csv2ltsv>
+=item 50. L<csv-uniq>
 
-=item 51. L<csv2paras>
+=item 51. L<csv-unquote>
 
-=item 52. L<csv2td>
+=item 52. L<csv2ltsv>
 
-=item 53. L<csv2tsv>
+=item 53. L<csv2paras>
 
-=item 54. L<csv2vcf>
+=item 54. L<csv2td>
 
-=item 55. L<paras2csv>
+=item 55. L<csv2tsv>
 
-=item 56. L<tsv2csv>
+=item 56. L<csv2vcf>
+
+=item 57. L<paras2csv>
+
+=item 58. L<tsv2csv>
 
 =back
 

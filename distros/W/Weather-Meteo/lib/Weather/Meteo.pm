@@ -4,11 +4,8 @@ use strict;
 use warnings;
 
 use Carp;
-use Encode;
 use JSON::MaybeXS;
-use HTTP::Request;
 use LWP::UserAgent;
-use LWP::Protocol::https;
 use URI;
 
 =head1 NAME
@@ -17,18 +14,18 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
-      use Weather::Meteo
+      use Weather::Meteo;
 
       my $meteo = Weather::Meteo->new();
-      my $weather = $meteo->weather({ latitude => '0.1', longitude => '0.2', date => '2022-12-25' });
+      my $weather = $meteo->weather({ latitude => 0.1, longitude => 0.2, date => '2022-12-25' });
 
 =head1 DESCRIPTION
 

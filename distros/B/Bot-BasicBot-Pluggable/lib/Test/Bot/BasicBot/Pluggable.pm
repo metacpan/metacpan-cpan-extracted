@@ -1,5 +1,5 @@
 package Test::Bot::BasicBot::Pluggable;
-$Test::Bot::BasicBot::Pluggable::VERSION = '1.20';
+$Test::Bot::BasicBot::Pluggable::VERSION = '1.30';
 use warnings;
 use strict;
 use base qw( Bot::BasicBot::Pluggable );
@@ -61,7 +61,7 @@ Test::Bot::BasicBot::Pluggable - utilities to aid in testing of Bot::BasicBot::P
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 

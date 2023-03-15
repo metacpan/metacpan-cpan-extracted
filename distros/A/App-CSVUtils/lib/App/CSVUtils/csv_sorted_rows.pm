@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -66,11 +66,6 @@ _
         },
     },
 
-    # KEEP SYNC WITH csv_sort_rows
-    add_args_rels => {
-        req_one => ['by_fields', 'by_code', 'by_sortsub'],
-    },
-
     on_input_header_row => \&App::CSVUtils::csv_sort_rows::on_input_header_row,
 
     on_input_data_row => \&App::CSVUtils::csv_sort_rows::on_input_data_row,
@@ -96,7 +91,7 @@ App::CSVUtils::csv_sorted_rows - Check that CSV rows are sorted
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils::csv_sorted_rows (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils::csv_sorted_rows (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 FUNCTIONS
 

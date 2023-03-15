@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -135,7 +135,13 @@ sub	perl2json {
 	} else {
 		if( $pretty_printing ){
 			$json_string = JSON->new->utf8(0)->pretty->encode($pv);
-		} else { $json_string = JSON->new->utf8(0)->encode($pv) }
+		} else {
+# cpan testers report:
+# https://www.cpantesters.org/cpan/report/1fba88ee-6bfa-1014-8b5d-8080f52666f1
+# cannot encode reference to scalar at C:\strawberry163\cpan\build\Data-Roundtrip-0.11-0\blib\lib/Data/Roundtrip.pm line 138.
+# following is line 138:
+			$json_string = JSON->new->utf8(0)->encode($pv);
+		}
 	}
 	if( ! $json_string ){ warn "perl2json() : error, no json produced from perl variable"; return undef }
 	return $json_string
@@ -191,8 +197,14 @@ sub	yaml2perl {
 sub	json2perl {
 	my $json_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
-	my $pv = JSON::decode_json(Encode::encode_utf8($json_string));
-	if( ! defined $pv ){ warn "json2perl() :  error, call to json2perl() has failed"; return undef }
+	my $pv;
+	if( _has_utf8($json_string) ){
+		$pv = eval { JSON::decode_json(Encode::encode_utf8($json_string)) };
+		if( $@ || ! $pv ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
+	} else {
+		$pv = eval { JSON::decode_json($json_string) };
+		if( $@ || ! $pv ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
+	}
 	return $pv;
 }
 sub	json2json {
@@ -575,7 +587,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.11
+Version 0.14
 
 =head1 SYNOPSIS
 

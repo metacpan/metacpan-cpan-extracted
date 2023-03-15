@@ -321,7 +321,7 @@ instead, so that you can interpolate the value of B<COUNT>!
 
 =item B<[% debug_locale %]>
 
-The plug-in implicitely calls B<web_set_locale()> (see
+The plug-in implicitly calls B<web_set_locale()> (see
 L<Locale::Util>) if a language was specified in the B<USE> 
 statement.  The function B<debug_locale()> gives you the return
 value of the call for debugging purposes.  Example:

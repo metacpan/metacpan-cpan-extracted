@@ -4,12 +4,13 @@ use strict;
 use warnings;
 
 use Statistics::Basic qw/median/;
+use Test2::Harness::UI::UUID qw/uuid_deflate/;
 
 use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 sub last_covered_run {
     my $self = shift;
@@ -60,7 +61,7 @@ sub durations {
            AND jobs.duration IS NOT NULL
            AND test_files.filename IS NOT NULL
     EOT
-    my @vals = ($self->project_id);
+    my @vals = (uuid_deflate($self->project_id));
 
     my ($user_append, @user_args) = $username ? ("users.username = ?", $username) : ();
 

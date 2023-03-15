@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::ProStep4;
-$Lab::Moose::Instrument::ProStep4::VERSION = '3.851';
+$Lab::Moose::Instrument::ProStep4::VERSION = '3.860';
 #ABSTRACT: ProStep4 step motor
+#TODO: Documentation!!!
 
 use v5.20;
 
@@ -162,7 +163,8 @@ sub InitEncoder {
 	);
 
 	my ( $steps, $res, $null )
-		= delete @args{qw/steps res null/};
+		= delete @args{ qw/steps res null/ };
+
     $self->write( command => "encoder: $steps $res $null\r\n" );
     my $result = $self->read( command => { read_length => 300 } );
 
@@ -181,7 +183,7 @@ sub InitRamp {
 	);
 
 	my ( $axis, $aa, $ae, $va, $ve, $vm, )
-		= delete @args{qw/axis aa ae va ve vm/};
+		= delete @args{ qw/axis aa ae va ve vm/ };
 
     $self->write( command => "tp: $axis $aa $ae $va $ve $vm\r\n" );
     my $result = $self->read( command => { read_length => 100 } );
@@ -198,13 +200,14 @@ sub move {
 	);
 
 	my ( $position, $speed, $mode )
-		= delete @args{qw/position speed mode/};
+		= delete @args{ qw/position speed mode/ };
 
     if ( not defined $mode ) {
         $mode = $device_settings{'pos_mode'};
     }
     if ( not $mode =~ /ABS|abs|REL|rel/ ) {
-    	croak "unexpected value for <MODE> in sub move. expected values are ABS and REL."
+    	croak "unexpected value for <MODE> in sub move.
+               expected values are ABS and REL."
     }
     if ( not defined $speed ) {
         $speed = $device_settings{speed_max};
@@ -222,21 +225,25 @@ sub move {
     # this sets the upper limit for the positioning speed:
     $speed = abs($speed);
     if ( $speed > $device_settings{speed_max} ) {
-    	warn "Warning in sub move: <SPEED> = $speed is too high. Reduce <SPEED> to its maximum value defined by internal limit settings of $device_settings{speed_max}";
+    	warn "Warning in sub move: <SPEED> = $speed is too high.
+              Reduce <SPEED> to its maximum value defined by internal
+              limit settings of $device_settings{speed_max}";
         $speed = $device_settings{speed_max};
     }
 
     $speed = $self->angle2steps($speed) / 60;
 
     # Moving in ABS or REL mode:
-    my $CP = $self->get_position();    # get current position
+    my $CP = $self->get_position();
+
     if (   $mode eq "ABS"
         or $mode eq "abs"
         or $mode eq "ABSOLUTE"
         or $mode eq "absolute" ) {
         if (   $position < $device_settings{lower_limit}
             or $position > $device_settings{upper_limit} ) {
-        		croak "unexpected value for NEW POSITION in sub move. Expected values are between "
+        		croak "unexpected value for NEW POSITION in sub move.
+                       Expected values are between "
                     . $device_settings{lower_limit} . " ... "
                     . $device_settings{upper_limit}
         }
@@ -244,7 +251,8 @@ sub move {
         $self->_save_motorlog( $CP, $position );
         $self->save_motorinitdata();
         $self->query(
-            command => "ma$device_props{'AXIS'} " . $self->angle2steps($position) . " $speed\r\n" );
+            command => "ma$device_props{'AXIS'} "
+                       . $self->angle2steps($position) . " $speed\r\n" );
     }
     elsif ($mode eq "REL"
         or $mode eq "rel"
@@ -252,7 +260,8 @@ sub move {
         or $mode eq "relative" ) {
         if (   $CP + $position < $device_settings{lower_limit}
             or $CP + $position > $device_settings{upper_limit} ) {
-                    croak "ERROR in sub move.Can't execute move; TARGET POSITION ("
+                    croak "ERROR in sub move.
+                           Can't execute move; TARGET POSITION ("
                     . ( $CP + $position )
                     . ") is out of valid limits ("
                     . $device_settings{lower_limit} . " ... "
@@ -263,7 +272,8 @@ sub move {
         $self->_save_motorlog( $CP, $CP + $position );
         $self->save_motorinitdata();
         $self->query(
-            command => "mr$device_props{'AXIS'} " . $self->angle2steps($position) . " $speed\r\n" );
+            command => "mr$device_props{'AXIS'} "
+                        . $self->angle2steps($position) . " $speed\r\n" );
 
     }
 
@@ -328,7 +338,9 @@ sub init_limits {
     if ( $self->read_motorinitdata() ) {
         while (1) {
             print
-                "Motor-Init data found. Do you want to keep the reference point and the limits? (y/n) ";
+                "Motor-Init data found.
+                 Do you want to keep the reference point
+                 and the limits? (y/n) ";
             my $input = <>;
             chomp $input;
             if ( $input =~ /YES|yes|Y|y/ ) {
@@ -712,13 +724,13 @@ Lab::Moose::Instrument::ProStep4 - ProStep4 step motor
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
-  Copyright 2022       Mia Schambeck
+  Copyright 2022-2023  Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,5 +1,14 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.04 2023-02-00
+
+  - MIDI::Event encoded/decoded messages now include channel (breaking change!)
+  - Added support for RtMidi v5
+  - Enabled limited SysEx support in MIDI::Event encoded/decoded messages
+  - Fixed some data handling issues in callback messages
+  - Using FFI::Platypus API v2
+  - Removed runtime dependency on Alien::RtMidi
+
 0.03 2020-09-02
 
   - Updated for FFI::Platypus API v1

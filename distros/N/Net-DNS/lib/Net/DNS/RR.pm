@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1891 2022-12-28 13:09:27Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1906 2023-03-10 07:09:31Z willem $)[2];
 
 
 =head1 NAME
@@ -50,12 +50,12 @@ you will get an error message and execution will be terminated.
 =cut
 
 sub new {
+	my ( $class, @list ) = @_;
 	return eval {
 		local $SIG{__DIE__};
-		scalar @_ > 2 ? &_new_hash : &_new_string;
+		scalar @list > 1 ? &_new_hash : &_new_string;
 	} || do {
-		my $class = shift || __PACKAGE__;
-		my @param = map { defined($_) ? split /\s+/ : 'undef' } @_;
+		my @param = map { defined($_) ? split /\s+/ : 'undef' } @list;
 		my $stmnt = substr "$class->new( @param )", 0, 80;
 		croak "${@}in $stmnt\n";
 	};
@@ -88,9 +88,8 @@ The trailing dot (.) is optional.
 my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]+/;		# NB: *not* \s (matches Unicode white space)
 
 sub _new_string {
-	my $base;
-	local $_;
-	( $base, $_ ) = @_;
+	my ( $base, $string ) = @_;
+	local $_ = $string;
 	croak 'argument absent or undefined' unless defined $_;
 	croak 'non-scalar argument' if ref $_;
 
@@ -122,8 +121,8 @@ sub _new_string {
 
 	my $self = $base->_subclass( $type, $populated );	# create RR object
 	$self->owner($owner);
-	$self->class($class) if defined $class;			# specify CLASS
-	$self->ttl($ttl)     if defined $ttl;			# specify TTL
+	&class( $self, $class );				# specify CLASS
+	&ttl( $self, $ttl );					# specify TTL
 
 	return $self unless $populated;				# empty RR
 
@@ -222,12 +221,11 @@ corrupt data.
 use constant RRFIXEDSZ => length pack 'n2 N n', (0) x 4;
 
 sub decode {
-	my $base = shift;
-	my ( $data, $offset, @opaque ) = @_;
+	my ( $base, @argument ) = @_;
 
-	my ( $owner, $fixed ) = Net::DNS::DomainName1035->decode(@_);
-
+	my ( $owner, $fixed ) = Net::DNS::DomainName1035->decode(@argument);
 	my $index = $fixed + RRFIXEDSZ;
+	my ( $data, $offset, @opaque ) = @argument;
 	die 'corrupt wire-format data' if length $$data < $index;
 	my $self = $base->_subclass( unpack "\@$fixed n", $$data );
 	$self->{owner} = $owner;
@@ -236,9 +234,8 @@ sub decode {
 	my $next = $index + $self->{rdlength};
 	die 'corrupt wire-format data' if length $$data < $next;
 
-	$self->{offset} = $offset || 0;
+	local $self->{offset} = $offset || 0;
 	$self->_decode_rdata( $data, $index, @opaque ) if $next > $index or $self->type eq 'OPT';
-	delete $self->{offset};
 
 	return wantarray ? ( $self, $next ) : $self;
 }
@@ -260,8 +257,8 @@ subordinate encoders.
 =cut
 
 sub encode {
-	my $self = shift;
-	my ( $offset, @opaque ) = scalar(@_) ? @_ : ( 0x4000, {} );
+	my ( $self, $offset, @opaque ) = @_;
+	( $offset, @opaque ) = ( 0x4000, {} ) unless defined $offset;
 
 	my $owner = $self->{owner}->encode( $offset, @opaque );
 	my ( $type, $class, $ttl ) = @{$self}{qw(type class ttl)};
@@ -415,8 +412,8 @@ Returns the owner name of the record.
 =cut
 
 sub owner {
-	my $self = shift;
-	$self->{owner} = Net::DNS::DomainName1035->new(shift) if scalar @_;
+	my ( $self, @name ) = @_;
+	for (@name) { $self->{owner} = Net::DNS::DomainName1035->new($_) }
 	return defined wantarray ? $self->{owner}->name : undef;
 }
 
@@ -432,8 +429,8 @@ Returns the record type.
 =cut
 
 sub type {
-	my $self = shift;
-	croak 'not possible to change RR->type' if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { croak 'not possible to change RR->type' }
 	return typebyval( $self->{type} );
 }
 
@@ -447,8 +444,8 @@ Resource record class.
 =cut
 
 sub class {
-	my $self = shift;
-	return $self->{class} = classbyname(shift) if scalar @_;
+	my ( $self, $class ) = @_;
+	return $self->{class} = classbyname($class) if defined $class;
 	return defined $self->{class} ? classbyval( $self->{class} ) : 'IN';
 }
 
@@ -519,11 +516,12 @@ sub _defaults { }			## set attribute default values
 
 
 sub dump {				## print internal data structure
-	require Data::Dumper;					# uncoverable pod
+	my @data = @_;						# uncoverable pod
+	require Data::Dumper;
 	local $Data::Dumper::Maxdepth = $Data::Dumper::Maxdepth || 6;
 	local $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys || 1;
 	local $Data::Dumper::Useqq    = $Data::Dumper::Useqq	|| 1;
-	return print Data::Dumper::Dumper(@_);
+	return print Data::Dumper::Dumper(@data);
 }
 
 sub rdatastr {				## historical RR subtype method
@@ -545,9 +543,7 @@ sub rdata {
 	return $self->_empty ? '' : eval { $self->_encode_rdata( 0x4000, {} ) } unless @_;
 
 	my $data = shift || '';
-	my $hash = {};
-	$self->_decode_rdata( \$data, 0, $hash ) if ( $self->{rdlength} = length $data );
-	croak 'compression pointer in rdata'	 if keys %$hash;
+	$self->_decode_rdata( \$data, 0 ) if ( $self->{rdlength} = length $data );
 	return;
 }
 
@@ -594,7 +590,7 @@ comparator function used for a particular RR based on its attributes.
 
 =head2 set_rrsort_func
 
-    my $function = sub {		## numerically ascending order
+    my $function = sub {	## numerically ascending order
 	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
     };
 
@@ -712,8 +708,8 @@ sub _subclass {
 
 
 sub _annotation {
-	my $self = shift;
-	$self->{annotation} = ["@_"] if scalar @_;
+	my ( $self, @note ) = @_;
+	$self->{annotation} = ["@note"] if scalar @note;
 	return wantarray ? @{$self->{annotation} || []} : ();
 }
 
@@ -721,9 +717,8 @@ sub _annotation {
 my %warned;
 
 sub _deprecate {
-	my $msg = pop(@_);
-	carp join ' ', 'deprecated method;', $msg unless $warned{$msg}++;
-	return;
+	my ( undef, @note ) = @_;
+	return carp "deprecated method; @note" unless $warned{"@note"}++;
 }
 
 
@@ -742,8 +737,6 @@ sub _wrap {
 
 	my ( @line, @fill );
 	foreach (@text) {
-		s/\\034/\\"/g;					# tart up escaped "
-		s/\\092/\\\\/g;					# tart up escaped escape
 		$coln += ( length || next ) + 1;
 		if ( $coln > $cols ) {				# start new line
 			push( @line, join ' ', @fill ) if @fill;
@@ -753,28 +746,32 @@ sub _wrap {
 		$coln = $cols	  if chomp;			# force line break
 		push( @fill, $_ ) if length;
 	}
-	push @line, join ' ', @fill;
-	return @line;
+	return ( @line, join ' ', @fill );
 }
 
 
 ################################################################################
 
-our $AUTOLOAD;
-
 sub DESTROY { }				## Avoid tickling AUTOLOAD (in cleanup)
 
+## no critic
 sub AUTOLOAD {				## Default method
-	my $self     = shift;
-	my ($method) = reverse split /::/, $AUTOLOAD;
-
-	for ($method) {			## tolerate mixed-case attribute name
-		return $self->$_(@_) if tr [A-Z-] [a-z_];
-	}
+	my ($self) = @_;
 
 	no strict 'refs';		## no critic ProhibitNoStrict
-	*{$AUTOLOAD} = sub {undef};	## suppress repetition and deep recursion
+	our $AUTOLOAD;
+	my ($method) = reverse split /::/, $AUTOLOAD;
+
+	for ( my $action = $method ) {	## tolerate mixed-case attribute name
+		tr [A-Z-] [a-z_];
+		if ( $self->can($action) ) {
+			*{$AUTOLOAD} = sub { shift->$action(@_) };
+			return &{$AUTOLOAD};
+		}
+	}
+
 	my $oref = ref($self);
+	*{$AUTOLOAD} = sub {undef};	## suppress deep recursion
 	croak qq[$self has no class method "$method"] unless $oref;
 
 	my $string = $self->string;
@@ -837,9 +834,10 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::Question>,
-L<Net::DNS::Packet>, L<Net::DNS::Update>,
-RFC1035 Section 4.1.3, RFC1123, RFC3597
+L<perl> L<Net::DNS>
+L<Net::DNS::Question> L<Net::DNS::Packet> L<Net::DNS::Update>
+L<RFC1035(4.1.3)|https://tools.ietf.org/html/rfc1035>
+L<RFC3597|https://tools.ietf.org/html/rfc3597>
 
 =cut
 

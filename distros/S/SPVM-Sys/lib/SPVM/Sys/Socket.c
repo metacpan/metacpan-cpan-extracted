@@ -94,7 +94,7 @@ int32_t SPVM__Sys__Socket__inet_aton(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct in_addr* st_in_addr = env->get_pointer(env, stack, obj_inp);
   
-#ifdef _WIN32
+#if defined(_WIN32)
   int32_t status = inet_pton(AF_INET, cp, st_in_addr);
 #else
   int32_t status = inet_aton(cp, st_in_addr);
@@ -514,8 +514,8 @@ int32_t SPVM__Sys__Socket__getsockname(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Socket__socketpair(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "socketpair is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "socketpair is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -693,7 +693,7 @@ int32_t SPVM__Sys__Socket__shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
 int32_t SPVM__Sys__Socket__close(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t s = stack[0].ival;
   
-#ifdef _WIN32
+#if defined(_WIN32)
   int32_t status = closesocket(s);
 #else
   int32_t status = close(s);
@@ -855,8 +855,8 @@ int32_t SPVM__Sys__Socket__getnameinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Socket__sockatmark(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-    env->die(env, stack, "[Not Supported]sockatmark is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+    env->die(env, stack, "[Not Supported]sockatmark is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   

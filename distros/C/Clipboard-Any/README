@@ -2,8 +2,8 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.009 of Clipboard::Any (from Perl
-    distribution Clipboard-Any), released on 2022-12-13.
+    This document describes version 0.010 of Clipboard::Any (from Perl
+    distribution Clipboard-Any), released on 2023-02-18.
 
 DESCRIPTION
     This module provides a common interface to interact with clipboard.
@@ -38,8 +38,8 @@ DESCRIPTION
     This module provides common functions related to clipboard manager.
 
     Supported clipboard manager: KDE Plasma's Klipper ("klipper"),
-    "parcellite". Support for more clipboard managers, e.g. on Windows or
-    other Linux desktop environment is welcome.
+    "parcellite", "clipit", "xclip". Support for more clipboard managers,
+    e.g. on Windows or other Linux desktop environment is welcome.
 
 NOTES
     2021-07-15 - Tested on my system (KDE Plasma 5.12.9 on Linux).
@@ -309,7 +309,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

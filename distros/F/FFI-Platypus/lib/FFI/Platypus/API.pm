@@ -9,7 +9,7 @@ use Exporter qw( import );
 our @EXPORT = grep /^arguments_/, keys %FFI::Platypus::API::;
 
 # ABSTRACT: Platypus arguments and return value API for custom types
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 
 1;
@@ -26,7 +26,7 @@ FFI::Platypus::API - Platypus arguments and return value API for custom types
 
 =head1 VERSION
 
-version 2.05
+version 2.07
 
 =head1 SYNOPSIS
 

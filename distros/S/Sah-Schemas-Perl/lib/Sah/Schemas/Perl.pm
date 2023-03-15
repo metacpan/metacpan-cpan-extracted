@@ -3,9 +3,9 @@
 package Sah::Schemas::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Perl
@@ -22,7 +22,7 @@ Sah::Schemas::Perl - Sah schemas related to Perl
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SAH SCHEMAS
 

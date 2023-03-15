@@ -4,21 +4,10 @@ class Sys::IO::Stat : pointer {
   use Hash;
   use Sys;
   use Fn;
+  use Sys::IO;
   
   # Class methods
-  static method new : Sys::IO::Stat ($path = undef : string) {
-    my $items = items;
-    
-    my $self = &_new;;
-    
-    if ($items > 0) {
-      &stat($path, $self);
-    }
-    
-    return $self;
-  }
-  
-  private native static method _new : Sys::IO::Stat ();
+  native static method new : Sys::IO::Stat ();
   
   native static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
   
@@ -87,7 +76,7 @@ class Sys::IO::Stat : pointer {
   method O : int () {
     
     my $ok = 0;
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       if ($self->st_uid == 0) {
         $ok = 1;
       }
@@ -103,7 +92,7 @@ class Sys::IO::Stat : pointer {
   
   method S : int () {
     my $ok = 0;
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       # Socket
       if (($self->st_mode & IO->S_IFMT) == IO->S_IFSOCK) {
         $ok = 1;
@@ -165,7 +154,7 @@ class Sys::IO::Stat : pointer {
   method g : int () {
     
     my $ok = 0;
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       if ($self->st_mode & IO->S_ISGID) {
         $ok = 1;
       }
@@ -177,7 +166,7 @@ class Sys::IO::Stat : pointer {
   method k : int () {
     
     my $ok = 0;
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       if ($self->st_mode & IO->S_ISVTX) {
         $ok = 1;
       }
@@ -198,7 +187,7 @@ class Sys::IO::Stat : pointer {
   }
   
   method o : int () {
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       return $self->O;
     }
     
@@ -231,7 +220,7 @@ class Sys::IO::Stat : pointer {
     
     # Character device
     my $ok = 0;
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       if ($self->st_mode & IO->S_ISUID) {
         $ok = 1;
       }
@@ -255,7 +244,7 @@ class Sys::IO::Stat : pointer {
     my $stmode = $self->st_mode;
     
     my $cando = 0;
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       $cando = !!($mode & $stmode);
     }
     else {

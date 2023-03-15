@@ -4,9 +4,9 @@ use strict;
 use utf8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 our $schema = [str => {
     summary => 'Qualified identifier in Perl, without "use utf8" in effect',
@@ -52,7 +52,7 @@ Sah::Schema::perl::identifier::qualified_ascii - Qualified identifier in Perl, w
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schema::perl::identifier::qualified_ascii (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schema::perl::identifier::qualified_ascii (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -98,11 +98,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "_foo::bar";
+ $data = "foo0::bar";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "foo::b\xE9b\xE9";
+ $data = "foo'bar";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)+\\z)"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -113,12 +113,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "_foo::bar";
- my $res = $validator->($data); # => ["","_foo::bar"]
+ $data = "foo0::bar";
+ my $res = $validator->($data); # => ["","foo0::bar"]
  
  # a sample invalid data
- $data = "foo::b\xE9b\xE9";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)+\\z)","foo::b\xE9b\xE9"]
+ $data = "foo'bar";
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)+\\z)","foo'bar"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

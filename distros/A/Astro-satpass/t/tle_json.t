@@ -75,6 +75,7 @@ foreach my $key ( qw{
 	MEAN_MOTION_DDOT
 	MEAN_MOTION_DOT
 	NORAD_CAT_ID
+	OBJECT_ID
 	OBJECT_NAME
 	OBJECT_NUMBER
 	OBJECT_TYPE
@@ -116,6 +117,7 @@ is_deeply $hash, {
     'MEAN_MOTION_DOT' => '2.3e-07',
     'MEAN_MOTION_DDOT' => '0',
     'NORAD_CAT_ID' => '00005',
+    OBJECT_ID	=> '1958-002B',
     'OBJECT_NAME' => 'VANGUARD 1',
     'OBJECT_NUMBER'	=> '00005',
     OBJECT_TYPE	=> uc BODY_TYPE_PAYLOAD,
@@ -182,6 +184,15 @@ my $json = JSON->new()->utf8()->convert_blessed()->canonical();
 	or diag _json_config();
 
     isa_ok $tle2->get( 'sun' ), 'My::Module::Sun';
+
+    {
+	my $hash_celestrak = _make_json_celestrak( $hash );
+	( my $vanguard_celestrak = $vanguard ) =~ s/ \s+ -- [^\n]* //smx;
+	my ( $tle_celestrak ) = Astro::Coord::ECI::TLE->parse(
+	    $json->encode( $hash_celestrak ) );
+	is $tle_celestrak->get( 'tle' ), $vanguard_celestrak,
+	'Vanguard 1 round-trip via Celestrak JSON';
+    }
 }
 
 SKIP: {
@@ -227,6 +238,7 @@ EOD
 	    MEAN_MOTION_DDOT
 	    MEAN_MOTION_DOT
 	    NORAD_CAT_ID
+	    OBJECT_ID
 	    OBJECT_NAME
 	    OBJECT_NUMBER
 	    OBJECT_TYPE
@@ -264,6 +276,7 @@ EOD
 	'MEAN_MOTION_DOT' => '2.3e-07',
 	'MEAN_MOTION_DDOT' => '0',
 	'NORAD_CAT_ID' => '00005',
+	OBJECT_ID	=> '1958-002B',
 	'OBJECT_NAME' => 'FAKE IRIDIUM',
 	'OBJECT_NUMBER'	=> '00005',
 	'RA_OF_ASC_NODE' => '348.7242',
@@ -315,6 +328,39 @@ sub _fudge_json {
     }
 
     return;
+}
+
+# Strip superfluous keys
+sub _make_json_celestrak {
+    my ( $hash ) = @_;
+    my %rslt;
+    my $epoch_usec = $hash->{EPOCH_MICROSECONDS};
+    foreach my $key ( qw{
+	OBJECT_NAME
+	OBJECT_ID
+	EPOCH
+	MEAN_MOTION
+	ECCENTRICITY
+	INCLINATION
+	RA_OF_ASC_NODE
+	ARG_OF_PERICENTER
+	MEAN_ANOMALY
+	EPHEMERIS_TYPE
+	CLASSIFICATION_TYPE
+	NORAD_CAT_ID
+	ELEMENT_SET_NO
+	REV_AT_EPOCH
+	BSTAR
+	MEAN_MOTION_DOT
+	MEAN_MOTION_DDOT
+	}
+    ) {
+	$rslt{$key} = $hash->{$key};
+    }
+    $rslt{EPOCH} =~ s/ /T/;
+    defined $epoch_usec
+	and $rslt{EPOCH} .= sprintf '.%06d', $epoch_usec;
+    return \%rslt;
 }
 
 sub _json_config {

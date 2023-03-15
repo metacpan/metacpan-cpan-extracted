@@ -50,6 +50,7 @@ t/open2.t
 t/open3.t
 t/pod_cvg.t
 t/pod_syn.t
+t/require.t
 t/shellwords.t
 t/timelocal.t
 SIGNATURE    Added here by Module::Build

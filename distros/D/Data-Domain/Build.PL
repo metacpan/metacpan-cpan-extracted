@@ -5,12 +5,13 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Data::Domain',
     license             => 'perl',
-    dist_author         => 'Laurent Dami <laurent.dami@justice.ge.ch>',
+    dist_author         => 'Laurent Dami <dami@cpan.org>',
     dist_version_from   => 'lib/Data/Domain.pm',
     requires => {
       'perl'            => "5.010001",
       'autouse'         => 0,
       'experimental'    => 0,
+      'match::simple'   => 0, 'match::simple::XS' => 0,
       'Date::Calc'      => 0,
       'List::MoreUtils' => 0,
       'Scalar::Does'    => 0.007,

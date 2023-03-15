@@ -1,4 +1,4 @@
-package LibUI::FontButton 0.01 {
+package LibUI::FontButton 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,7 +6,7 @@ package LibUI::FontButton 0.01 {
     use parent 'LibUI::Control';
     use LibUI::FontDescriptor;
     #
-    affix( LibUI::lib(), 'uiNewFontButton', [Void] => InstanceOf ['LibUI::FontButton'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewFontButton', 'new' ], [Void] => InstanceOf ['LibUI::FontButton'] );
 
     sub font($) {
         CORE::state $affix //= wrap( LibUI::lib(), 'uiFontButtonFont',
@@ -17,15 +17,15 @@ package LibUI::FontButton 0.01 {
     }
     affix(
         LibUI::lib(),
-        'uiFontButtonOnChanged',
+        [ 'uiFontButtonOnChanged', 'onChanged' ],
         [   InstanceOf ['LibUI::FontButton'],
             CodeRef [ [ InstanceOf ['LibUI::FontButton'], Any ] => Void ], Any
-        ] => Void,
-        'onChanged'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiFreeFontButtonFont', [ Pointer [LibUI::FontDescriptor] ] => Void,
-        'freeFont'
+        LibUI::lib(),
+        [ 'uiFreeFontButtonFont', 'freeFont' ],
+        [ Pointer [LibUI::FontDescriptor] ] => Void
     );
 };
 1;
@@ -47,8 +47,9 @@ LibUI::FontButton - Button-like Control that Opens a Font Chooser when Clicked
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::FontButton;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Font Picker', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $text   = LibUI::FontButton->new();
     $box->append( $text, 1 );

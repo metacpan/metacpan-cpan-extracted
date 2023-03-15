@@ -66,6 +66,13 @@ set_emit_spaces( stripper, emit )
   stripper->o_emit_spaces = emit;
 
 void
+set_emit_newlines( stripper, emit )
+  Stripper * stripper
+  int emit
+ CODE:
+  stripper->o_emit_newlines = emit;
+
+void
 set_decode_entities( stripper, decode )
   Stripper * stripper
   int decode

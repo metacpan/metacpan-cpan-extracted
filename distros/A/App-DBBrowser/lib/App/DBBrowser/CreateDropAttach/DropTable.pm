@@ -38,7 +38,7 @@ sub __choose_drop_item {
     my ( $sf, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tables = [ grep { $sf->{d}{tables_info}{$_}[3] eq uc $type } @{$sf->{d}{user_table_keys}} ]; ##
+    my $tables = [ grep { $sf->{d}{tables_info}{$_}[3] eq uc $type } @{$sf->{d}{user_table_keys}} ];
     if ( ! @$tables ) {
         my $info = $sf->{d}{db_string};
         my $prompt = sprintf 'No user %ss.', $type;
@@ -96,10 +96,13 @@ sub __drop {
         unshift @$all_arrayref, $col_names;
         my $prompt_pt = sprintf "DROP %s %s     (on last look at the %s)\n", uc $type, $sql->{table}, $type;
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
-        $tp->print_table(
-            $all_arrayref,
-            { prompt => $prompt_pt, footer => "     '" . $table . "'     " }
-        );
+        if ( ! $sf->{o}{G}{warnings_table_print} ) {
+            local $SIG{__WARN__} = sub {};
+            $tp->print_table( $all_arrayref, { prompt => $prompt_pt, footer => "     '" . $table . "'     " } );
+        }
+        else {
+            $tp->print_table( $all_arrayref, { prompt => $prompt_pt, footer => "     '" . $table . "'     " } );
+        }
         1; }
     ) {
         $ax->print_error_message( $@ );

@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 __PACKAGE__->inflate_column(
     data => {
@@ -20,7 +20,7 @@ __PACKAGE__->inflate_column(
 
 sub TO_JSON {
     my $self = shift;
-    my %cols = $self->get_columns;
+    my %cols = $self->get_all_fields;
     $cols{data} = decode_json($cols{data}) if $cols{data} && !ref($cols{data});
     return \%cols;
 }

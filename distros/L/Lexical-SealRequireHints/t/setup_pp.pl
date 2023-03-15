@@ -11,8 +11,13 @@ my $orig_load = \&XSLoader::load;
 # benefit of before_warnings.t.
 BEGIN { ${^WARNING_BITS} = ""; }
 *XSLoader::load = sub {
-	die "XS loading disabled for Lexical::SealRequireHints"
-		if ($_[0] || "") eq "Lexical::SealRequireHints";
+	if(($_[0] || "") eq "Lexical::SealRequireHints") {
+		# Load DynaLoader before dying in order to better
+		# replicate the module loading status of a failed XS load,
+		# in order to make the pure Perl tests more realistic.
+		eval { local $SIG{__DIE__}; require DynaLoader; };
+		die "XS loading disabled for Lexical::SealRequireHints";
+	}
 	goto &$orig_load;
 };
 

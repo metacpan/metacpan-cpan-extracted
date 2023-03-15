@@ -2,7 +2,7 @@ package Net::DNS::RR::AMTRELAY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: AMTRELAY.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: AMTRELAY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -23,8 +23,7 @@ use Net::DNS::RR::AAAA;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $size = $self->{rdlength} - 2;
 	@{$self}{qw(precedence relaytype relay)} = unpack "\@$offset C2 a$size", $$data;
@@ -60,10 +59,10 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
 	foreach (qw(precedence dbit relaytype relay)) {
-		$self->$_(shift);
+		$self->$_( shift @argument );
 	}
 	return;
 }
@@ -78,33 +77,32 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub precedence {
-	my $self = shift;
-
-	$self->{precedence} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{precedence} = 0 + $_ }
 	return $self->{precedence} || 0;
 }
 
 
 sub dbit {
-	my $self = shift;					# uncoverable pod
-	$self->{relaytype} = $self->relaytype | ( $_[0] ? 0x80 : 0 ) if scalar @_;
+	my ( $self, @value ) = @_;				# uncoverable pod
+	for (@value) { $self->{relaytype} = $self->relaytype | ( $_ ? 0x80 : 0 ) }
 	return ( $self->{relaytype} || 0 ) >> 7;
 }
 
-sub d {&dbit}							# uncoverable pod
+sub d { return &dbit }						# uncoverable pod
 
 
 sub relaytype {
-	my $self = shift;
-	$self->{relaytype} = $self->dbit ? ( 0x80 | shift ) : shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{relaytype} = $self->dbit ? ( 0x80 | $_ ) : $_ }
 	return 0x7f & ( $self->{relaytype} || 0 );
 }
 
 
 sub relay {
-	my $self = shift;
+	my ( $self, @value ) = @_;
 
-	for (@_) {
+	for (@value) {
 		/^\.*$/ && do {
 			$self->relaytype(0);
 			$self->{relay} = '';			# no relay
@@ -255,6 +253,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8777, RFC7450
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC8777|https://tools.ietf.org/html/rfc8777>
 
 =cut

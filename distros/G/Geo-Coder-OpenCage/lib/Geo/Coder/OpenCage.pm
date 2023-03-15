@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
-# ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.35';
+# ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoding API
+$Geo::Coder::OpenCage::VERSION = '0.36';
 use strict;
 use warnings;
 
@@ -148,23 +148,23 @@ __END__
 
 =head1 NAME
 
-Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geocoder
+Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geocoding API
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
     my $Geocoder = Geo::Coder::OpenCage->new(api_key => $my_api_key);
 
-    my $result = $Geocoder->geocode(location => "Donostia");
+    my $response = $Geocoder->geocode(location => "Donostia");
 
 =head1 DESCRIPTION
 
 This module provides an interface to the OpenCage geocoding service.
 
-For full details of the API visit L<https://opencagedata.com/api>.
+For full details of the API visit L<https://opencagedata.com/api>
 
 It is recommended you read the L<best practices for using the OpenCage geocoder|https://opencagedata.com/api#bestpractices> before you start.
 
@@ -175,6 +175,7 @@ It is recommended you read the L<best practices for using the OpenCage geocoder|
     my $Geocoder = Geo::Coder::OpenCage->new(api_key => $my_api_key);
 
 Get your API key from L<https://opencagedata.com>.
+
 Optionally "http => 1" can also be specified in which case API requests will NOT be made via https
 
 =head2 ua
@@ -191,12 +192,20 @@ be specified as "Geo::Coder::OpenCage $version"
 
 Takes a single named parameter 'location' and returns a result hashref.
 
-    my $result = $Geocoder->geocode(location => "Mudgee, Australia");
+    my $response = $Geocoder->geocode(location => "Mudgee, Australia");
 
 warns and returns undef if the query fails for some reason.
 
 If you will be doing forward geocoding, please see the 
 L<OpenCage query formatting guidelines|https://opencagedata.com/guides/how-to-format-your-geocoding-query>
+
+You should check the always response status 
+
+  $response->{status}{code} 
+
+to ensure you have had a successful response, are not hitting rate limits, etc.
+Please see the 
+L<OpenCage geocoding API response codes|https://opencagedata.com/api#codes>
 
 The OpenCage Geocoder has a few optional parameters:
 
@@ -243,7 +252,7 @@ option is never used.
 
 As a full example:
 
-    my $result = $Geocoder->geocode(
+    my $response = $Geocoder->geocode(
         location => "Псковская улица, Санкт-Петербург, Россия",
         language => "ru",
         countrycode => "ru",
@@ -253,7 +262,7 @@ As a full example:
 
 Takes two named parameters 'lat' and 'lng' and returns a result hashref.
 
-    my $result = $Geocoder->reverse_geocode(lat => -22.6792, lng => 14.5272);
+    my $response = $Geocoder->reverse_geocode(lat => -22.6792, lng => 14.5272);
 
 This method supports the optional parameters in the same way that geocode() does.
 
@@ -265,6 +274,10 @@ expected to be character strings, not byte strings.
 For more information see L<perlunicode>.
 
 =head1 SEE ALSO
+
+Please see L<the Perl tutorial|https://opencagedata.com/tutorials/geocode-in-perl> on the OpenCage site. Many other languages and frameworks are also available.
+
+For full details of the API visit L<https://opencagedata.com/api>
 
 This module was L<featured in the 2016 Perl Advent Calendar|http://perladvent.org/2016/2016-12-08.html>.
 

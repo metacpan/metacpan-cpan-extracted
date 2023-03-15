@@ -1,3 +1,7 @@
+1.041 2023-03-12
+  - Minimum Alien::Build for Build::Copy plugin is Alien::Build v2.19. Thanks
+    to Andreas K. Hüttel (akhuettel++) for the bug report. GH#11.
+
 1.040 2023-02-23
   - Switch to using Alien::Build / alienfile to check and install Gnuplot.
   - Alien::Gnuplot is now a subclass of Alien::Base.

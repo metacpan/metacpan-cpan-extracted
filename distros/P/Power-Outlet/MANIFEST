@@ -20,6 +20,7 @@ lib/Power/Outlet/iBootBarGroup.pm
 lib/Power/Outlet/Shelly.pm
 lib/Power/Outlet/SonoffDiy.pm
 lib/Power/Outlet/Tasmota.pm
+lib/Power/Outlet/TuyaAPI.pm
 lib/Power/Outlet/WeMo.pm
 lib/Power/Outlet/Virtual.pm
 lib/Power/Outlet/Config.pm
@@ -34,6 +35,7 @@ t/003_Shelly_live.t
 t/003_Shelly_live.psgi
 t/003_SonoffDiy_live.t
 t/003_Tasmota_live.t
+t/003_TuyaAPI_live.t
 t/003_WeMo_live.t
 t/003_Virtual_live.t
 t/003_Config_live.t

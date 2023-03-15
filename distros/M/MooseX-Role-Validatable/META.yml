@@ -9,24 +9,55 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.96'
-  perl: '5.014000'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooseX-Role-Validatable
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  MooseX::Role::Validatable:
+    file: lib/MooseX/Role/Validatable.pm
+    version: '0.12'
+  MooseX::Role::Validatable::Error:
+    file: lib/MooseX/Role/Validatable/Error.pm
+    version: '0.12'
 requires:
+  Carp: '0'
+  Class::Load: '0'
   Moose: '0'
+  Moose::Role: '0'
   Scalar::Util: '0'
-  perl: '5.014000'
+  perl: '5.008005'
 resources:
-  bugtracker: https://github.com/binary-com/perl-MooX-Role-Validatable/issues
-  repository: git://github.com/binary-com/perl-MooX-Role-Validatable.git
-version: '0.11'
-x_generated_by_perl: v5.34.1
+  bugtracker: https://github.com/chylli-deriv/perl-MooX-Role-Validatable/issues
+  homepage: https://github.com/chylli-deriv/perl-MooX-Role-Validatable
+  repository: https://github.com/chylli-deriv/perl-MooX-Role-Validatable.git
+version: '0.12'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Shantanu Patil <shantanu@regentmarkets.com>'
+  - 'amin roosta <amin.roosta@outlook.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'junbon-deriv <junbon@binary.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

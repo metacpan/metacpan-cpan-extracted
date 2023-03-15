@@ -1,0 +1,155 @@
+#!/usr/bin/perl
+
+use 5.030 ;  
+use feature qw[ say ] ; 
+use autodie qw[ open ] ;
+use warnings ; 
+#use Getopt::Std ; getopts '2p' , \my %o ; 
+use Getopt::Long qw [ GetOptions :config bundling no_ignore_case pass_through ] ; # GetOptionsFromArray ] ;
+use POSIX qw [ strftime ] ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use Time::HiRes qw[ gettimeofday tv_interval ] ; 
+use Time::Local qw[ timegm ] ; # タイムゾーンに依存する時差を計算するため
+use FindBin qw[ $Script ] ; 
+use File::Basename ; # fileparse 関数で、ファイル名とディレクトリ名に分解する目的で使う。
+
+my %o ;
+GetOptions 'catchf' => \$o{catchf} , 'push' => \$o{push}  ;
+
+my $time_start = [ gettimeofday ] ; 
+END{ ## 終了する段階で、二次情報を表示する
+  my $sec = sprintf "PT %0.3f S", tv_interval ( $time_start ) ; 
+  say STDERR BOLD FAINT "-- " , & dt1000 , "  calculation time: ", $sec,  "  ($Script $$)"; 
+}
+## $0 CMD FILE [MESSAGE_HEAD]  # ← コマンドの引数
+
+do { & HELP_MESSAGE ; exit } if $#ARGV <= 0 ; # 引数が足りない場合は、ヘルプを表示して終了。
+my $cmd = $ARGV[0] ; # 実行するコマンド文字列
+my ($file_name, $dirs) = fileparse $ARGV[1]  ; # 出力先のファイル
+my $msg_head = $ARGV[2] // $ARGV[0] ; # GITのコミットに残すメッセージの最初の部分になる。ファイルの中身を表すデータの名前を想定している。
+
+& change_dir ( $dirs ) ; 
+& get_cmdout ( $cmd , my $file_content ) ; 
+my $time_file_get = dt100 () ; # Retreived Date Time 取得日時
+& write_file ( $file_name , $file_content , $file_name , $msg_head , my $msg_lastmod , my $file_lines , my $file_bytes ) ; 
+& commit_git ( $file_name , $msg_head , $time_file_get , $msg_lastmod, $file_lines , $file_bytes ) ; 
+exit 0 ; 
+
+sub change_dir ( $ ) {
+  my $pwd =  qx[ mkdir -p $_[0] ; cd $_[0] && pwd | tr -d '\n' ] ; #  chdir だと、~USERNAME の書式が使えないので、シェルのcdコマンドを利用。
+  die BRIGHT_RED BOLD qq["cd $_[0]" failed] if $? ;
+  chdir $pwd or die qq [Failed: "chdir $pwd"] ; # ここでdieは考えにくいかも知れないが、このプログラムが短時間で多重起動された場合も考察したいので残す。
+}
+
+# ファイルをインターネットから取ってくる。
+sub get_cmdout ( $ $ ) {
+  my $ctt = eval{ qx[ $_[0] ] } ;
+  # my $ctt = $res -> is_success ? $res -> content : BRIGHT_RED BOLD $res -> status_line ; # (データ)ファイルに残す内容。Content.
+  die BRIGHT_RED BOLD &dt1000, "\tcommand `$_[0]' does not work." if $? and ! $o{catchf} ; 
+  $_[1] = $? ? "$_[0]: failed.." : $ctt ;
+}
+  
+# ファイル書込とGitのコマンド起動
+sub write_file ( $$$$ $$$ ) { 
+  #say STDERR YELLOW BOLD & dt1000 , "\t" , qx[ pwd ] =~ s/\n$//r , BOLD FAINT qq[ Trying to get $_[2] "$_[3]" $lmm0] ; ## 作業ディレクトリ名の(端末)出力
+  my $lmm0 = do { my $t = [ stat $_[0] ]->[9] ; defined $t ? & make_lmm ( $t ) : '' } ; # 取得するファイルが最後に変更された日時(last modified)
+  do { open my $FH , '>' , $_[0] ; print {$FH} $_[1] } ; # ファイルに取得した内容をここで保存する。
+  #return if do { qx [ git diff ] =~ m/^\s*$/ } ;  # $diff の内容が無いなら、ここで終了。ゼロバイトとも限らないと思い、(空白文字だけを意味する)正規表現を用いた。
+  @_[4..6] = ( $lmm0 , & d3 ( qx [ cat $_[0] | wc -l ] =~ s/\n$//r ) , & d3 ( qx [ cat $_[0] | wc -c ] =~ s/\n$//r ) ); # 行数、バイト数
+}
+
+# 最後にいつ変更されたかについてのメッセージの文を構成する。(write_fileからこの関数は呼び出される。)
+sub make_lmm ( $ ) { 
+  my $message1 = strftime 'The previous version lasted at least until %Y-%m-%d %H:%M', localtime $_[0] ;
+  my $delta = time - $_[0] ; 
+  my ( $days, $sec ) = ( int $delta / 86400 , $delta % 86400 ) ;
+  my $dhms = do { my $h = int $sec / 3600 ; my $m = int ($sec - $h*3600) / 60 ; sprintf '<- P%dT%02d:%02d:%02d before' , $days, $h , $m , $sec % 60 } ;  
+  return "($message1 $dhms )" ; 
+}
+
+sub commit_git ( $$$$$$ ) {
+  my ( $file, $message , $time , $lmm , $lines , $bytes ) = @_ ;
+  my $msg1 = qq [$message: $lines lines $bytes bytes $time retreived $lmm.] ; # GITのコメント文
+  my $msg2 = qx [ git diff --stat -- $file | tail -1 ] =~ s/\n$//r ; #  「2 files changed, 11 insertions(+), 6 deletions(-)」のような情報を取り出す。
+  my $cmd = qq[git reset --mix ; git add $file ; git status -s | grep -F $file && git commit -q -m '$msg1' -m '$msg2'] ;
+  $cmd .= ' && git push' if $o{push} ;
+  qx[ $cmd ] ;
+  say join ";; " , & dt1000 , $cmd , "\$?=$?" ; # Git 2.29だとcommitがなされた時のみsuccessになるようだが、ドキュメント記載では無い。
+}
+
+
+# 関数 dt100 : その時点の日時を0.01秒単位(10ミリ秒単位)で、日時記録を残すようにする。
+sub dt100 { 
+  my $t = [ gettimeofday ] ; 
+  my $z = do { my $d = timegm(localtime)-timegm(gmtime) ; sprintf '%+03d:%02d', $d/3600, $d/60%60 } ;
+  strftime( '%Y-%m-%d %H:%M:%S.' . sprintf("%02d", $t->[1] / 1e4 ) . $z , localtime( $t->[0] ) ) 
+}
+
+# 関数 dt1000 : その時点の日時を0.001秒単位(ミリ秒単位)で、日時記録を残すようにする。
+sub dt1000 { my $t = [ gettimeofday ] ; strftime( "%Y-%m-%d %H:%M:%S." . sprintf("%03d", $t->[1] / 1e3 ) , localtime( $t->[0] ) ) }
+
+# 数を3桁区切りに変換する。
+sub d3 ($) { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ; 
+
+## ヘルプ (オプション --help が与えられた時に、動作する)
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+$0 CMD FILE [MESSAGE_HEAD]
+ 
+ 機能: 
+
+   URLで示されるファイルをローカルの指定ディレクトリに保管する。
+  
+ 引数:  
+ 
+  このコマンドの実行には、2個または3個の引数を必要とする : 
+
+  1番目の引数CMDは実行するコマンドを表す文字列 'ls' や 'crontab -l '　や 'last' など。
+  2番目の引数DIRは、Gitのレポジトリであるローカルのディレクトリの下におくファイルのパス名
+  3番目の引数STRは、Gitのコミットのメッセージに残す文字列(ファイルの内容の短い説明など)。
+
+ 引数のオプション : 
+
+   --push : git pushも行う。
+   --catchf : コマンドの実行に失敗した場合でも、処理は進める。 ( catch failure で名前は考えた。)
+
+ 想定されている目的: 
+
+   + インターネット上に公開されている任意のファイルをGitレポジトリに保管する。
+   + URLで指定できる特定のファイルを、cronで定期的にダウンロードして、保管する。
+
+ 利用例 : 
+
+  cmdout2git date date date        # date というコマンドを実行して、date というファイルに結果を保管し、dateというコミットメッセージを先頭に、gitのレポジトリにコミット。
+  cmdout2git 'ls -l' ls-l 'ls -l'  # コマンド ls -l を実行して、ファイル ls-l に結果を保管し、コミット。メッセージは ls -l で始まって、いろいろ補助情報を追加。
+  cmdout2git last last last --push # 誰がログインしたのか、再起動(reboot)がいつ行われたのか、が分かる。さらに、リモートレポジトリに push する。
+
+
+  git remote -v                    # どこにpushされるか知りたいときに便利。
+
+ 必要な準備: 
+
+   1. Gitレポジトリを用意すること。そのレポジトリにするディレクトリで、"git init" を実行しておくこと。
+
+  開発メモ : 
+
+   * 関数qxで実行したシステムコマンドが、短い時間で終了しない場合が厄介。forkを使った凝ったプログラムにはまだしてない。
+
+=cut
+
+

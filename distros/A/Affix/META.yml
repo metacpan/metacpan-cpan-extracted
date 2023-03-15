@@ -25,7 +25,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   Path::Tiny: '0.144'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,10 +44,7 @@ no_index:
 provides:
   Affix:
     file: lib/Affix.pm
-    version: '0.09'
-  Affix::Feature:
-    file: lib/Affix.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Attribute::Handlers: '0'
   Config: '0'
@@ -60,7 +57,7 @@ resources:
   bugtracker: https://github.com/sanko/Affix.pm/issues
   homepage: https://github.com/sanko/Affix.pm
   repository: https://github.com/sanko/Affix.pm.git
-version: '0.09'
+version: '0.10'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

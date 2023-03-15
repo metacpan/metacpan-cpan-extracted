@@ -22,7 +22,7 @@
 # ABSTRACT: Extract Strings To PO Files
 
 package Locale::XGettext;
-$Locale::XGettext::VERSION = '0.7';
+$Locale::XGettext::VERSION = '0.8';
 use strict;
 
 use Locale::TextDomain 1.20 qw(Locale-XGettext);

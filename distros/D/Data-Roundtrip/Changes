@@ -41,3 +41,18 @@ Revision history for Data-Roundtrip
 0.11	2020-04-21
 	Checked failures for test script t/02-random-data-structure.t
 	and provided a fix and added a warning in CAVEATS section.
+
+0.12	2023-03-09
+	Wrapped within an eval{}, call to JSON::decode_json in sub json2perl.
+	This allows graceful death when input json is not valid.
+
+0.13	2023-03-11
+	In the previous version I had forgotten an erroneous INSTALL_BASE
+	in Makefile.PL which pointed to $ENV{HOME}/usr.
+	This resulted in installing this module in installing user's
+	home dir, under usr/
+	Now this is fixed. Those who installed the previous version (0.12),
+	please make sure to uninstall it from $ENV{HOME}/usr.
+
+0.14	2023-03-11
+	See 0.13.

@@ -4,6 +4,7 @@ use lib '../lib';
 use_ok $_ for qw[
     LibUI
     LibUI::Align
+    LibUI::Area
     LibUI::At
     LibUI::Button
     LibUI::Checkbox
@@ -19,7 +20,7 @@ use_ok $_ for qw[
     LibUI::Grid
     LibUI::Group
     LibUI::HBox
-    LibUI::HorizontalSeparator
+    LibUI::HSeparator
     LibUI::Label
     LibUI::Menu
     LibUI::MenuItem
@@ -28,6 +29,7 @@ use_ok $_ for qw[
     LibUI::PasswordEntry
     LibUI::ProgressBar
     LibUI::RadioButtons
+    LibUI::ScrollingArea
     LibUI::SearchEntry
     LibUI::Slider
     LibUI::Spinbox
@@ -38,7 +40,8 @@ use_ok $_ for qw[
     LibUI::Time
     LibUI::TimePicker
     LibUI::VBox
-    LibUI::VerticalSeparator
+    LibUI::VSeparator
     LibUI::Window
 ];
+diag prototype('LibUI::Timer');
 done_testing;

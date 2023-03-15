@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 use Lingua::EN::Inflect 'PL';
 use File::Spec ();
@@ -192,7 +192,7 @@ Pod::Wordlist - English words that come up in Perl documentation
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 DESCRIPTION
 
@@ -281,7 +281,7 @@ Caleb Cushing <xenoterracide@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Olivier Mengué.
+This software is Copyright (c) 2023 by Olivier Mengué.
 
 This is free software, licensed under:
 

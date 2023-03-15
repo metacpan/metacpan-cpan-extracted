@@ -16,15 +16,21 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Spreadsheet::ReadGnumeric",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.2",
+  "PREREQ_PM" => {
+    "PerlIO::gzip" => "0.20",
+    "XML::Parser::Lite" => "0.722"
+  },
+  "VERSION" => "0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "PerlIO::gzip" => "0.20",
+  "XML::Parser::Lite" => "0.722"
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

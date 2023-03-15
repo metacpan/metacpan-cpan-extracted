@@ -44,6 +44,16 @@ my @test_cases = (
         params    => {},
         exception => qr/Missing required arguments: messages/,
     },
+    {
+        method    => 'model_retrieve',
+        params    => {},
+        exception => qr/Missing required arguments: model/,
+    },
+    {
+        method    => 'image_create',
+        params    => {},
+        exception => qr/Missing required arguments: prompt/,
+    },
 );
 
 for my $test (@test_cases) {

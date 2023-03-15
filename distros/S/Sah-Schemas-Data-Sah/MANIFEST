@@ -7,7 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/Perinci/Sub/XCompletion/perl_sah_filter_modname_with_optional_args.pm
+lib/Perinci/Sub/XCompletion/perl_perl_sah_filter_modname_with_optional_args.pm
 lib/Sah/Schema/perl/perl_sah_filter/modname.pm
 lib/Sah/Schema/perl/perl_sah_filter/modname_with_optional_args.pm
 lib/Sah/SchemaR/perl/perl_sah_filter/modname.pm

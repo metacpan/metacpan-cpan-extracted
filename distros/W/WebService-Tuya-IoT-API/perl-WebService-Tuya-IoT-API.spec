@@ -1,7 +1,7 @@
 Name:           perl-WebService-Tuya-IoT-API
-Version:        0.01
-Release:        1%{?dist}
-Summary:        Perl library to access the Tuya API
+Version:        0.02
+Release:        3%{?dist}
+Summary:        Perl library to access the Tuya IoT API
 License:        MIT
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/WebService-Tuya-IoT-API/
@@ -14,16 +14,18 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(HTTP::Tiny)
 BuildRequires:  perl(JSON::XS)
 BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(List::Util)
 Requires:       perl(Data::UUID)
 Requires:       perl(Digest::SHA)
 Requires:       perl(HTTP::Tiny)
 Requires:       perl(JSON::XS)
 Requires:       perl(Time::HiRes)
+Requires:       perl(List::Util)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
-This Perl package controls and reads state of Tuya compatible Smart Devices
-(Plugs, Switches, Lights, Window Covers, etc.) using the TuyaCloud API.
+Perl library to access the Tuya IoT API to control and read the state of
+Tuya compatible smart devices.
 
 %prep
 %setup -q -n WebService-Tuya-IoT-API-%{version}

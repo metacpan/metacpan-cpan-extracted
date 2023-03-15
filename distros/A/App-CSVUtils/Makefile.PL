@@ -44,6 +44,7 @@ my %WriteMakefileArgs = (
     "script/csv-pick",
     "script/csv-pick-fields",
     "script/csv-pick-rows",
+    "script/csv-quote",
     "script/csv-replace-newline",
     "script/csv-rtrim",
     "script/csv-select-fields",
@@ -63,6 +64,7 @@ my %WriteMakefileArgs = (
     "script/csv-transpose",
     "script/csv-trim",
     "script/csv-uniq",
+    "script/csv-unquote",
     "script/csv2ltsv",
     "script/csv2paras",
     "script/csv2td",
@@ -108,6 +110,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::re_from_str" => 0,
     "Sah::Schema::true" => 0,
     "Sah::Schema::uint" => 0,
+    "Scalar::Util::Numeric" => 0,
     "Sort::ByExample" => 0,
     "String::Pad" => "0.021",
     "Text::CSV_XS" => 0,
@@ -128,7 +131,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.021",
+  "VERSION" => "1.022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -175,6 +178,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::re_from_str" => 0,
   "Sah::Schema::true" => 0,
   "Sah::Schema::uint" => 0,
+  "Scalar::Util::Numeric" => 0,
   "Sort::ByExample" => 0,
   "String::Pad" => "0.021",
   "Test::Exception" => 0,

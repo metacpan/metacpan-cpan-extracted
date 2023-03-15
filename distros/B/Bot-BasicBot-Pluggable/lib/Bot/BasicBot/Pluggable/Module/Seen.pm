@@ -48,6 +48,7 @@ sub chanjoin {
 sub update_seen {
     my ( $self, $who, $channel, $what ) = @_;
     my $nick = lc $who;
+    $channel = lc $channel;
     my $ignore_channels = $self->get('user_ignore_channels') || {};
     return if exists $ignore_channels->{$channel};
 
@@ -84,7 +85,7 @@ sub told {
     
         my $ignore_channels = $self->get('user_ignore_channels') || {};
         my $hidden_channel = 
-            $seen && exists $ignore_channels->{ $seen->{channel} };
+            $seen && exists $ignore_channels->{ lc $seen->{channel} };
 
         if (!$seen || $hidden_channel
             || ( $self->get("user_allow_hiding") and $self->get("hide_$who") )
@@ -95,7 +96,7 @@ sub told {
         # If the channel is private, and it's a different channel to the one we
         # are in, hide what they were saying
         my $private_channels = $self->get('user_private_channels') || {};
-        if (exists $private_channels->{ $seen->{channel} }
+        if (exists $private_channels->{ lc $seen->{channel} }
             && $mess->{channel} ne $seen->{channel})
         {
             $seen->{what} = "saying something";
@@ -182,7 +183,7 @@ Bot::BasicBot::Pluggable::Module::Seen - track when and where people were seen
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 IRC USAGE
 

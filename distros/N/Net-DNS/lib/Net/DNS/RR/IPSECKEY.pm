@@ -2,7 +2,7 @@ package Net::DNS::RR::IPSECKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: IPSECKEY.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: IPSECKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -24,8 +24,7 @@ use Net::DNS::RR::AAAA;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 
@@ -95,18 +94,17 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	foreach (qw(precedence gatetype algorithm gateway)) { $self->$_(shift) }
-	$self->key(@_);
+	foreach (qw(precedence gatetype algorithm gateway)) { $self->$_( shift @argument ) }
+	$self->key(@argument);
 	return;
 }
 
 
 sub precedence {
-	my $self = shift;
-
-	$self->{precedence} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{precedence} = 0 + $_ }
 	return $self->{precedence} || 0;
 }
 
@@ -117,17 +115,16 @@ sub gatetype {
 
 
 sub algorithm {
-	my $self = shift;
-
-	$self->{algorithm} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{algorithm} = 0 + $_ }
 	return $self->{algorithm} || 0;
 }
 
 
 sub gateway {
-	my $self = shift;
+	my ( $self, @value ) = @_;
 
-	for (@_) {
+	for (@value) {
 		/^\.*$/ && do {
 			$self->{gatetype} = 0;
 			$self->{gateway}  = undef;		# no gateway
@@ -167,16 +164,15 @@ sub gateway {
 
 
 sub key {
-	my $self = shift;
-	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
-	return $self->keybin( MIME::Base64::decode( join "", @_ ) );
+	my ( $self, @value ) = @_;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @value;
+	return $self->keybin( MIME::Base64::decode( join "", @value ) );
 }
 
 
 sub keybin {
-	my $self = shift;
-
-	$self->{keybin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{keybin} = $_ }
 	return $self->{keybin} || "";
 }
 
@@ -296,6 +292,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4025
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC4025|https://tools.ietf.org/html/rfc4025>
 
 =cut

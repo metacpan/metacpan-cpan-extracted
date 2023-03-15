@@ -1,5 +1,11 @@
 Revision history for Data-Domain
 
+1.08 10.03.2023
+  - remove internal uses of smartmatch and 'when'
+  - drop support for "~~" overloading if perl version >= 5.037
+  - the -matches feature is now implemented through match::simple::XS
+  - pod tests moved to xt
+
 1.07 29.04.2020
   - fix warning 'redundant' appeared in perl 5.22 
 

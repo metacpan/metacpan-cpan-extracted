@@ -1,5 +1,9 @@
 Revision history for Bitcoin::RPC::Client 
 
+0.12    2023-3-13/16
+        - 'die' when invalid JSON is returned from RPC service (GH#4)
+        - Updated documentation
+
 0.11    2020-7-8/16
         - SSL_verify_mode must be a numeric (GH#3)
         - Updated documentation

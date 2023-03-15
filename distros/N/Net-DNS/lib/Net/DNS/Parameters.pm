@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2022-12-06)
+##	(last updated 2023-03-01)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1886 2022-12-20 11:27:25Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1903 2023-03-06 08:51:09Z willem $)[2];
 
 use integer;
 use Carp;
@@ -71,8 +71,8 @@ my @typebyname = (
 	X25	   => 19,					# RFC1183
 	ISDN	   => 20,					# RFC1183
 	RT	   => 21,					# RFC1183
-	NSAP	   => 22,					# RFC1706
-	'NSAP-PTR' => 23,					# RFC1706
+	NSAP	   => 22,					# RFC1706 https://datatracker.ietf.org/doc/status-change-int-tlds-to-historic
+	'NSAP-PTR' => 23,					# RFC1706 https://datatracker.ietf.org/doc/status-change-int-tlds-to-historic
 	SIG	   => 24,					# RFC2536 RFC2931 RFC3110 RFC4034
 	KEY	   => 25,					# RFC2536 RFC2539 RFC3110 RFC4034
 	PX	   => 26,					# RFC2163
@@ -281,7 +281,7 @@ my @dnserrorbyval = (
 	25 => 'Signature Expired before Valid',			# https://github.com/NLnetLabs/unbound/pull/604#discussion_r802678343
 	26 => 'Too Early',					# RFC9250
 	27 => 'Unsupported NSEC3 Iterations Value',		# RFC9276
-	28 => 'Unable to conform to policy',			#
+	28 => 'Unable to conform to policy',			# draft-homburg-dnsop-codcp-00
 	);
 our %dnserrorbyval = @dnserrorbyval;
 
@@ -399,7 +399,7 @@ use constant EXTLANG => defined eval { require Net::DNS::Extlang };
 
 sub _typespec {
 	my $generate = defined wantarray;
-	return EXTLANG ? eval <<'END' : '';			# no critic
+	return EXTLANG ? eval <<'END' : '';	## no critic
 	my ($node) = @_;		## draft-levine-dnsextlang
 	my $instance = Net::DNS::Extlang->new();
 	my $basename = $instance->domain || return '';

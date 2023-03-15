@@ -13,12 +13,14 @@ meta-spec:
   version: '1.4'
 name: Spreadsheet-ReadGnumeric
 requires:
+  PerlIO::gzip: '0.20'
+  XML::Parser::Lite: '0.722'
   perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Spreadsheet-ReadGnumeric
   homepage: https://git.sr.ht/~rgrjr/Spreadsheet-ReadGnumeric
   repository: https://git.sr.ht/~rgrjr/Spreadsheet-ReadGnumeric
-version: '0.2'
+version: '0.3'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

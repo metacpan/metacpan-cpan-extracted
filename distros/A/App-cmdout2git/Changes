@@ -1,0 +1,7 @@
+Revision history for the module "App::digitdemog" : 
+
+0.011  2023-03-10 18:50+0900  Renovated from https://github.com/tulamili/download2gitrepo/blob/master/dl2git. "Download" is changed into "command output".
+0.012  2023-03-10 19:08+0900  README is revised since it was not changed from of "dl2git".
+0.013  2023-03-10 19:19+0900  usage examples are added to the help manual.
+0.014  2023-03-10 20:43+0900  Employed "--catchf" and "--push" instead of "-2" and "-p", respectively.
+0.015  2023-03-10 21:00+0900  Specifed to use ARGV[0] (command sentence) as ARGV[2] (the head part of the commit message) when ARGV[2] is ommited.

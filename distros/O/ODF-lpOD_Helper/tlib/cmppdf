@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+# Copyright (c) Jim Avera 2023
+# License: CC BY-SA 4.0 (Attribution-ShareAlike 4.0 International)
+# See https://creativecommons.org/licenses/by-sa/4.0/
+set -u -e
+
+##########################################################################
+USAGE=$(cat <<'EOF'
+ NAME
+    cmppdf -- Compare the visual appearance or text of PDF files
+
+ SYNOPSIS
+    cmppdf        [-o BASEPATH] [-q] [-d] FILE1 FILE2
+    cmppdf --text [-o BASEPATH] [-q] [-d] FILE1 FILE2
+
+ EXIT STATUS
+   0  if no differences found
+   1  if differences found
+   2+ if trouble
+
+ OPTIONS
+   -t, --text      Compare the text in the PDFs, ignoring grapical appearance.
+
+   --diff diff-option1,diff-option2, ...
+
+     Specify options to pass to the 'diff' command, separated by commas.
+     The default is '-u'.  --text is implied by --diff.
+
+   -o, --output BASEPATH
+
+     With this option a "difference file" named BASEPATH_page_NNN.png
+     or .txt is created for each page which has differences.
+     With visual comparison (the default), the files will be .png images with
+     changed parts highlighted in RED.   With text comparison (--text option),
+     the files will contain output from the 'diff' command, or if BASEPATH
+     is '-' then all diffs are written to stdout.
+
+   -q, --quiet     Suppress all progress messages
+
+   -d, --debug     Show detailed information about commands run
+
+ AUTHOR
+   The graphical compare code was originaly posted by 'linguisticturn' at
+     https://stackoverflow.com/questions/6469157/pdf-compare-on-linux-command-line
+     (License CC BY-SA 4.0)
+     Whoever you are, please send me more info so I can credit you properly!
+
+   Jim Avera (jim.avera at gmail)
+     Added command-line processing
+     Added --text support
+     Allow PDFs to have passwords (prompted interactively)
+     Reworked temp files to allow curr-dir to be read-only
+      and allow FILE1 and FILE2 to be the same.
+
+ The latest version of this script can be downloaded 
+ from https://abhweb.org/jima/cmppdf?v
+
+EOF
+)
+# $Id: cmppdf,v 1.23 2023/03/12 01:10:27 jima Exp jima $
+
+##########################################################################
+# The basic idea:
+# 1. Split each pdf into possibly-multiple single-page pdf files.
+# 2. Convert each pdf into a .png image, or with --text, extract
+#    the text for the page into a .txt file.
+# 3. Compute and compare checksums of the corresponding file pairs.
+
+# REQUIRES: pdftk pdftoppm pdftotxt b2sum compare(from imagemagick-6)
+
+progname=$(basename "$0")
+
+resolution=150
+debug=
+quiet=
+diff_basepath=
+textonly=
+diff_opts=
+tmpdir=
+declare -a diff_opts=()
+TEMP=$(getopt -o 'ho:r:tqd' \
+        --long 'help,resolution:,textonly,diff-opts:,debug,tmpdir:,output:,quiet' \
+        -n "$progname" -- ${1+"$@"})
+[ $? -eq 0 ] || { echo "$progname -h for help" >&2; exit 2; }
+eval set -- "$TEMP" ; unset TEMP
+while true ; do
+  case "$1" in
+    --)                                  shift; break ;;
+    -o|--output)     diff_basepath="$2"; shift; shift ;;
+    -r|--resolution) resolution="$2";    shift; shift ;;
+    -t|--textonly)   textonly=yes;              shift ;;
+    --diff-opts)     IFS=',' command eval 'diff_opts+=($2)'; textonly=yes; shift; shift ;;
+    -q|--quiet)      quiet=yes;                 shift ;;
+    -d|--debug)      debug=yes;                 shift ;;
+    --tmpdir)        tmpdir="$2";        shift; shift ;;
+    -h|--help)       [ -t 1 ] || PAGER=cat; echo "$USAGE" | ${PAGER:-more} ; exit 0 ;;
+     *) echo "Internal error!"; exit 99 ;;
+  esac
+done
+[ -z "$debug" ] || quiet=
+if [ -n "$debug" ] ; then setdashx="set -x;" ; else setdashx=""; fi
+if [ ${#diff_opts[*]} -eq 0 ] ; then
+  diff_opts=(-u)
+fi
+
+if [ $# -ne 2 ] ; then
+  echo "$progname: Expecting two pdf file arguments" >&2
+  echo "$progname -h for help" >&2
+  exit 2
+fi
+file_1="$1"
+file_2="$2"
+
+# Create a unique directory for temp files
+if [ -z "$tmpdir" ] ; then
+  tmpdir=$(mktemp --tmpdir --directory "$progname-XXXXXX")
+
+  # trap any kind of exit and clean up first
+  trap 'stat=$?; '"$setdashx"' rm -rf "$tmpdir"; exit $stat' 0 1 2 3 15
+fi
+
+# Get fully-qualified paths so we can change the current directory
+path_1=$(realpath "$file_1")
+path_2=$(realpath "$file_2")
+if [ "$diff_basepath" = "-" ] ; then
+  if [ -z "$textonly" ] ; then
+    echo "--outpath '-' may only be used with --text" >&2;
+    exit 2
+  fi
+elif [ -n "$diff_basepath" ] ; then
+  diff_basepath=$(realpath "$diff_basepath")
+fi
+
+# Change the current directory to $tmpdir and run commands from there.
+# This avoids trouble if the user's current directory is not writable.
+# Also pdftk always creates a "doc_data.txt" in the current dir and so
+# this is the only way to avoid trying to write into the user's directory.
+[ -z "$debug" ] || echo "cd $tmpdir" >&2
+cd "$tmpdir"
+
+# Burst the files into individual pages
+(eval $setdashx;
+ # First try without a password, and if that fails, ask user for a pw
+ pdftk A="$path_1" burst output f1-page_%03d.pdf 2>/dev/null \
+   || pdftk A="$path_1" input_pw A=PROMPT burst output f1-page_%03d.pdf
+ pdftk A="$path_2" burst output f2-page_%03d.pdf 2>/dev/null \
+   || pdftk A="$path_2" input_pw A=PROMPT burst output f2-page_%03d.pdf
+) || exit $?
+
+status=0
+
+# we loop over the individual pages of the first file
+for f1 in `echo f1-page_*.pdf`
+do
+  # 'page' holds the current page number, e.g. 'page_003'
+  page="${f1/f1-/}"
+  page="${page/.pdf/}"
+
+  # f2 is the name of the PDF of the corresponding page of the second file
+  f2="${f1/f1/f2}"
+
+  if [ ! -r "$f2" ] ; then
+    [ -z "$quiet" ] && echo "$page is NOT PRESENT in the second file ($file_2)" >& 2;
+    status=1
+    #exit $status 
+    continue
+  fi
+
+  if [ -n "$textonly" ] ; then
+    # Extract the text from individual page PDFs
+    (eval $setdashx;
+     pdftotext $f1 ${f1/.*}.txt  # e.g. page_001.txt
+     pdftotext $f2 ${f2/.*}.txt
+    )
+    # 'g1' and 'g2' are the names of the two files we just created
+    g1=${f1/.*}.txt
+    g2=${f2/.*}.txt
+  else
+    # Convert the individual page PDFs to PNGs
+    (eval $setdashx;
+     pdftoppm "$f1" f1 -png -r $resolution
+     pdftoppm "$f2" f2 -png -r $resolution
+    )
+    # 'g1' and 'g2' are the names of the two PNG files we just created.
+    # The "-1" is the page number appended by pdftoppm.
+    g1=f1-1.png
+    g2=f2-1.png
+  fi
+
+  # Create the checksums for the two files
+  B2S_1=$(eval $setdashx; b2sum "$g1" | awk '{print $1}')
+  B2S_2=$(eval $setdashx; b2sum "$g2" | awk '{print $1}')
+
+  # Now we compare the checksums
+  if [ "$B2S_1" = "$B2S_2" ]; then
+    [ -n "$quiet" ] || echo "$page: same";
+  else
+    status=1
+    # The checksums are different.
+    # Create a difference file (if requested)
+    if [ -n "$diff_basepath" ] ; then
+      if [ "$diff_basepath" = "-" ] ; then
+        # only with --text
+        (eval $setdashx; diff "${diff_opts[@]}" "$g1" "$g2") || true
+      else
+        if [ -n "$textonly" ] ; then
+          outfile="${diff_basepath}_${page}.txt"
+          (eval $setdashx; diff "${diff_opts[@]}" "$g1" "$g2" > "$outfile") || true
+        else
+          outfile="${diff_basepath}_${page}.png"
+          (eval $setdashx; compare "$g1" "$g2" "$outfile") || true
+        fi
+        if [ -r "$outfile" ] ; then
+          [ -n "$quiet" ] || echo "Created '$outfile'"
+        else
+          echo "Error creating '$outfile'" # e.g. non-writable directory
+          exit 2
+        fi
+      fi
+    else
+      [ -n "$quiet" ] || echo "$page: different";
+    fi
+  fi
+done
+
+# Check that $file_2 does not have extra pages
+for f2 in `echo f2-page_*.pdf`
+do
+  page="${f2/f2-/}"
+  page="${page/.pdf/}"
+
+  f1="${f2/f2/f1}"
+  if [ ! -r "$f1" ] ; then
+    [ -z "$quiet" ] && echo "$page is NOT PRESENT in the first file ($file_1)" >& 2;
+    status=1
+    #exit $status 
+    continue
+  fi
+done
+
+exit $status

@@ -1,26 +1,29 @@
-package LibUI::Group 0.01 {
+package LibUI::Group 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use parent 'LibUI::Control';
     #
-    affix( LibUI::lib(), 'uiGroupMargined', [ InstanceOf ['LibUI::Group'] ] => Int, 'margined' );
+    affix( LibUI::lib(), [ 'uiGroupMargined', 'margined' ],
+        [ InstanceOf ['LibUI::Group'] ] => Int );
     affix(
-        LibUI::lib(), 'uiGroupSetChild',
-        [ InstanceOf ['LibUI::Group'], InstanceOf ['LibUI::Control'] ] => Void,
-        'setChild'
+        LibUI::lib(),
+        [ 'uiGroupSetChild',           'setChild' ],
+        [ InstanceOf ['LibUI::Group'], InstanceOf ['LibUI::Control'] ] => Void
     );
     affix(
-        LibUI::lib(), 'uiGroupSetMargined', [ InstanceOf ['LibUI::Group'], Int ] => Void,
-        'setMargined'
+        LibUI::lib(),
+        [ 'uiGroupSetMargined',        'setMargined' ],
+        [ InstanceOf ['LibUI::Group'], Int ] => Void
     );
     affix(
-        LibUI::lib(), 'uiGroupSetTitle', [ InstanceOf ['LibUI::Group'], Str ] => Void,
-        'setTitle'
+        LibUI::lib(),
+        [ 'uiGroupSetTitle',           'setTitle' ],
+        [ InstanceOf ['LibUI::Group'], Str ] => Void
     );
-    affix( LibUI::lib(), 'uiGroupTitle', [ InstanceOf ['LibUI::Group'] ] => Str,       'title' );
-    affix( LibUI::lib(), 'uiNewGroup',   [ Void, Str ] => InstanceOf ['LibUI::Group'], 'new' );
+    affix( LibUI::lib(), [ 'uiGroupTitle', 'title' ], [ InstanceOf ['LibUI::Group'] ] => Str );
+    affix( LibUI::lib(), [ 'uiNewGroup', 'new' ], [ Void, Str ] => InstanceOf ['LibUI::Group'] );
 };
 1;
 #
@@ -43,8 +46,9 @@ Control
     use LibUI::Window;
     use LibUI::ColorButton;
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $group  = LibUI::Group->new('Color Pickers');
     my $box    = LibUI::HBox->new;
     my $cbtn_l = LibUI::ColorButton->new();

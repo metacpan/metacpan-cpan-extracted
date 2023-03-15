@@ -1,5 +1,5 @@
 package Lab::XPRESS::hub;
-$Lab::XPRESS::hub::VERSION = '3.851';
+$Lab::XPRESS::hub::VERSION = '3.860';
 #ABSTRACT: The XPRESS main hub
 
 use v5.20;
@@ -192,7 +192,7 @@ Lab::XPRESS::hub - The XPRESS main hub
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 COPYRIGHT AND LICENSE
 

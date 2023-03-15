@@ -1,0 +1,224 @@
+#!/bin/bash
+
+define() { IFS='\n' read -r -d '' ${1} || true ; }
+
+myname="$(basename $0)"
+
+define pod <<"=cut"
+
+=head1 NAME
+
+    xlate - Front-end CLI tool for App::Greple::xlate module
+
+=head1 SYNOPSIS
+
+    xlate [ options ] file [ greple options ]
+	-h   help
+	-d   debug
+	-a   use API
+	-c   just check translation area
+	-r   refresh cache
+	-s   silent mode
+	-p#  pattern to determine translation area
+	-w#  wrap line by # width
+	-o#  output format (xtxt, cm, ifdef)
+	-f#  from lang (ignored)
+	-t#  to lang
+	-m#  max length per API call
+        --   terminate option parsing
+
+    Docker and Make options
+	-M   run make
+	-G   mount git toplevel directory
+	-B   batch mode (non-interactive)
+	-D   run xlate on the container
+	-C   run any command on the container
+
+    Control Files:
+	*.LANG    translation languates
+	*.FORMAT  translation foramt (xtxt, cm, ifdef)
+
+=head1 VERSION
+
+    Version 0.17
+
+=cut
+
+git_topdir() {
+    [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == true ] || return
+    local dir="$(git rev-parse --show-superproject-working-tree)"
+    [ "$dir" ] || dir="$(git rev-parse --show-toplevel)"
+    [ "$dir" ] && echo $dir
+}
+
+env_pattern() {
+    set +x
+    local e
+    # IFS is not good on macOS
+    while (( $# > 0 )); do e+="${e:+\\|}$1"; shift; done
+    echo ${e:+"^\\($e\\)="}
+}
+
+interactive=yes
+version=
+workdir=/work
+
+while getopts :${EXOPT:=dBI:V:GCD} OPT
+do
+    case $OPT in
+	d) debug=yes ; set -x ;;
+	B) interactive= ;;
+	I) container="$OPTARG" ;;
+	V) volume="$OPTARG" ;;
+	G)
+	    if [ "${topdir:=$(git_topdir)}" ]
+	    then
+		if [ "$topdir" != "${PWD:=$(pwd)}" ]
+		then
+		    echo "Mount $topdir" >&2
+		    volume=$topdir
+		    cd_path=${PWD#$topdir}
+		fi
+	    fi
+	    ;;
+	C|D)
+	    [ "$XLATE_RUNNING_DOCKER" ] && break
+	    ip=$(ifconfig | awk '/inet /{print $2}' | tail -1)
+	    [[ "$pod" =~ Version\ ([0-9]+.[0-9_]+) ]] && version=:${BASH_REMATCH[1]}
+	    declare -a command
+	    case "$OPT" in
+		C) shift $((OPTIND - 1)) ;;
+		D) command=(xlate) ;;
+	    esac
+	    command+=(${1+"$@"})
+	    ENV=(LANG TZ TERM_PROGRAM TERM_BGCOLOR COLORTERM)
+	    ENV+=(DEEPL_AUTH_KEY)
+	    ENV_PATTERN=$(env_pattern ${ENV[@]})
+	    exec docker run --rm \
+		 ${interactive:+-it} \
+		 --hostname xlate \
+		 -v ${volume:-$(pwd)}:$workdir \
+		 -w $workdir$cd_path \
+		 -v /etc/localtime:/etc/localtime:ro \
+		 -e XLATE_RUNNING_DOCKER=1 \
+		 -e DISPLAY="$ip:0" \
+		 ${ENV_PATTERN:+--env-file <(env | grep -e "$ENV_PATTERN")} \
+		 ${container:-tecolicom/xlate$version} \
+		 "${command[@]}"
+	    exit;
+	    ;;
+    esac
+done
+OPTIND=1
+
+while getopts "${EXOPT}"'Macrsnp:w:o:f:t:m:h' OPT
+do
+    case $OPT in
+	[$EXOPT]) : ignore ;;
+	M)  run_make=yes ;;
+	a)   use_api=yes ;;
+	c)     check=yes ;;
+	r)   refresh=yes ;;
+	s)    silent=yes ;;
+	n)    dryrun=yes ;;
+	p)   pattern="$OPTARG" ;;
+	w)      wrap="$OPTARG" ;;
+	o)    format="$OPTARG" ;;
+	f) from_lang="$OPTARG" ;;
+	t)   to_lang="$OPTARG" ;;
+	m)       max="$OPTARG" ;;
+	h)
+	    help="$(sed -r -e 's/^=[a-z]+[0-9]* *//' <<< "$pod")"
+	    exec echo "$help"
+	    exit
+	    ;;
+    esac
+done	
+shift $((OPTIND - 1))
+
+: ${to_lang:=EN-US}
+: ${format:=xtxt}
+
+if [[ "$format" =~ ^(.+)-fold$ ]]
+then
+    format=${BASH_REMATCH[1]}
+    : ${wrap:=76}
+fi
+
+declare -a module option
+
+module+=(-Mxlate::deepl) 
+option+=(--xlate-to="$to_lang" --xlate-format="$format" --xlate-cache=yes)
+option+=(--all)
+
+[ "$use_api" == yes ] || use_clipboard=yes
+[ "$check"   == yes ] || option+=(--xlate${use_clipboard:+-labor})
+[ "$wrap"    != ""  ] && option+=(--xlate-fold-line --xlate-fold-width=$wrap)
+[ "$debug"   == yes ] && option+=(-dmo)
+[ "$refresh" == yes ] && option+=(--cache-clear)
+[ "$silent"  == yes ] && option+=(--no-xlate-progress)
+[ "$pattern" != ""  ] && option+=(--re="$pattern")
+[ "$max"     != ""  ] && option+=(--xlate-maxlen="$max")
+
+: run make
+if [ "$run_make" == yes ]
+then
+    mod="App-Greple-xlate"
+    share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
+    declare -a opt
+    for m in $*
+    do
+	if [ -f "$m" ]
+	then
+	    # GNU Make behaves differently in different versions with
+	    # respect to double-quoted strings and spaces within them.
+	    file="${file:+$file|||}$m"
+	else
+	    opt+=("$m")
+	fi
+    done
+    unset MAKELEVEL
+    exec make -f $share/XLATE.mk \
+	 ${dryrun:+-n} \
+	 XLATE_LANG=$to_lang \
+	 XLATE_DEBUG=$debug \
+	 XLATE_MAXLEN=$max \
+	 XLATE_USEAPI=$use_api \
+	 ${file:+XLATE_FILES=\"$file\"} \
+	 ${opt[@]}
+    exit 1
+fi
+
+declare -a area
+case $1 in
+    *.txt)
+	area=(--re '^(.+\n)+')
+	;;
+    *.md)
+	area=(--re '(?x) ^[-+#].*\n | ^(.+\n)+ ')
+	option+=(--exclude '^([ \t]+.*\n)+')
+	;;
+    *.pm|*.pod)
+	module+=(-Mperl)
+	option+=(--pod)
+	option+=(--exclude '^=head\d +(VERSION|AUTHOR|LICENSE).*\n(?s:.*?)(?=^=|\z)')
+	area=(--re '^(\w.+\n)+')
+	;;
+    *.docx|*.pptx)
+	module+=(-Mmsdoc)
+	option+=(--exclude '^\[.*\b(docx|pptx)\b.*\]\n')
+	area=(--re '^.+\n')
+	;;
+    *)
+	area=(--re '^.+\n')
+	;;
+esac
+
+if [ "$pattern" ]
+then
+    option+=(--re "$pattern")
+else
+    option+=("${area[@]}")
+fi
+
+greple "${module[@]}" "${option[@]}" ${1+"$@"}

@@ -40,7 +40,7 @@ require "bigint.pl";
 #   rsqrt(RAT, cycles) return RAT       square root
 
 # Convert a number to the canonical string form m|^[+-]\d+/\d+|.
-sub main'rnorm { #(string) return rat_num
+sub main::rnorm { #(string) return rat_num
     local($_) = @_;
     s/\s+//g;
     if (m#^([+-]?\d+)(/(\d*[1-9]0*))?$#) {
@@ -60,14 +60,14 @@ sub norm { #(bint, bint) return rat_num
     } elsif ($dom =~ /^[+-]?0+$/) {
 	'NaN';
     } else {
-	local($gcd) = &'bgcd($num,$dom);
+	local($gcd) = &::bgcd($num,$dom);
 	$gcd =~ s/^-/+/;
 	if ($gcd ne '+1') { 
-	    $num = &'bdiv($num,$gcd);
-	    $dom = &'bdiv($dom,$gcd);
+	    $num = &::bdiv($num,$gcd);
+	    $dom = &::bdiv($dom,$gcd);
 	} else {
-	    $num = &'bnorm($num);
-	    $dom = &'bnorm($dom);
+	    $num = &::bnorm($num);
+	    $dom = &::bnorm($dom);
 	}
 	substr($dom,0,1) = '';
 	"$num/$dom";
@@ -75,58 +75,58 @@ sub norm { #(bint, bint) return rat_num
 }
 
 # negation
-sub main'rneg { #(rat_num) return rat_num
-    local($_) = &'rnorm(@_);
+sub main::rneg { #(rat_num) return rat_num
+    local($_) = &::rnorm(@_);
     tr/-+/+-/ if ($_ ne '+0/1');
     $_;
 }
 
 # absolute value
-sub main'rabs { #(rat_num) return $rat_num
-    local($_) = &'rnorm(@_);
+sub main::rabs { #(rat_num) return $rat_num
+    local($_) = &::rnorm(@_);
     substr($_,0,1) = '+' unless $_ eq 'NaN';
     $_;
 }
 
 # multipication
-sub main'rmul { #(rat_num, rat_num) return rat_num
-    local($xn,$xd) = split('/',&'rnorm($_[0]));
-    local($yn,$yd) = split('/',&'rnorm($_[1]));
-    &norm(&'bmul($xn,$yn),&'bmul($xd,$yd));
+sub main::rmul { #(rat_num, rat_num) return rat_num
+    local($xn,$xd) = split('/',&::rnorm($_[0]));
+    local($yn,$yd) = split('/',&::rnorm($_[1]));
+    &norm(&::bmul($xn,$yn),&::bmul($xd,$yd));
 }
 
 # division
-sub main'rdiv { #(rat_num, rat_num) return rat_num
-    local($xn,$xd) = split('/',&'rnorm($_[0]));
-    local($yn,$yd) = split('/',&'rnorm($_[1]));
-    &norm(&'bmul($xn,$yd),&'bmul($xd,$yn));
+sub main::rdiv { #(rat_num, rat_num) return rat_num
+    local($xn,$xd) = split('/',&::rnorm($_[0]));
+    local($yn,$yd) = split('/',&::rnorm($_[1]));
+    &norm(&::bmul($xn,$yd),&::bmul($xd,$yn));
 }
 
 # addition
-sub main'radd { #(rat_num, rat_num) return rat_num
-    local($xn,$xd) = split('/',&'rnorm($_[0]));
-    local($yn,$yd) = split('/',&'rnorm($_[1]));
-    &norm(&'badd(&'bmul($xn,$yd),&'bmul($yn,$xd)),&'bmul($xd,$yd));
+sub main::radd { #(rat_num, rat_num) return rat_num
+    local($xn,$xd) = split('/',&::rnorm($_[0]));
+    local($yn,$yd) = split('/',&::rnorm($_[1]));
+    &norm(&::badd(&::bmul($xn,$yd),&::bmul($yn,$xd)),&::bmul($xd,$yd));
 }
 
 # subtraction
-sub main'rsub { #(rat_num, rat_num) return rat_num
-    local($xn,$xd) = split('/',&'rnorm($_[0]));
-    local($yn,$yd) = split('/',&'rnorm($_[1]));
-    &norm(&'bsub(&'bmul($xn,$yd),&'bmul($yn,$xd)),&'bmul($xd,$yd));
+sub main::rsub { #(rat_num, rat_num) return rat_num
+    local($xn,$xd) = split('/',&::rnorm($_[0]));
+    local($yn,$yd) = split('/',&::rnorm($_[1]));
+    &norm(&::bsub(&::bmul($xn,$yd),&::bmul($yn,$xd)),&::bmul($xd,$yd));
 }
 
 # comparison
-sub main'rcmp { #(rat_num, rat_num) return cond_code
-    local($xn,$xd) = split('/',&'rnorm($_[0]));
-    local($yn,$yd) = split('/',&'rnorm($_[1]));
-    &bigint'cmp(&'bmul($xn,$yd),&'bmul($yn,$xd));
+sub main::rcmp { #(rat_num, rat_num) return cond_code
+    local($xn,$xd) = split('/',&::rnorm($_[0]));
+    local($yn,$yd) = split('/',&::rnorm($_[1]));
+    &bigint::cmp(&::bmul($xn,$yd),&::bmul($yn,$xd));
 }
 
 # int and frac parts
-sub main'rmod { #(rat_num) return (rat_num,rat_num)
-    local($xn,$xd) = split('/',&'rnorm(@_));
-    local($i,$f) = &'bdiv($xn,$xd);
+sub main::rmod { #(rat_num) return (rat_num,rat_num)
+    local($xn,$xd) = split('/',&::rnorm(@_));
+    local($i,$f) = &::bdiv($xn,$xd);
     if (wantarray) {
 	("$i/1", "$f/$xd");
     } else {
@@ -136,8 +136,8 @@ sub main'rmod { #(rat_num) return (rat_num,rat_num)
 
 # square root by Newtons method.
 #   cycles specifies the number of iterations default: 5
-sub main'rsqrt { #(fnum_str[, cycles]) return fnum_str
-    local($x, $scale) = (&'rnorm($_[0]), $_[1]);
+sub main::rsqrt { #(fnum_str[, cycles]) return fnum_str
+    local($x, $scale) = (&::rnorm($_[0]), $_[1]);
     if ($x eq 'NaN') {
 	'NaN';
     } elsif ($x =~ /^-/) {
@@ -146,7 +146,7 @@ sub main'rsqrt { #(fnum_str[, cycles]) return fnum_str
 	local($gscale, $guess) = (0, '+1/1');
 	$scale = 5 if (!$scale);
 	while ($gscale++ < $scale) {
-	    $guess = &'rmul(&'radd($guess,&'rdiv($x,$guess)),"+1/2");
+	    $guess = &::rmul(&::radd($guess,&::rdiv($x,$guess)),"+1/2");
 	}
 	"$guess";          # quotes necessary due to perl bug
     }

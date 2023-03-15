@@ -16,7 +16,7 @@
 
 ;# Usage:
 ;#	require "validate.pl";
-;#	$warnings += do validate('
+;#	$warnings += validate('
 ;#	/vmunix			-e || die
 ;#	/boot			-e || die
 ;#	/bin			cd
@@ -46,7 +46,7 @@ sub validate {
 	    $this =~ s/(-\w\b)/$1 \$file/g;
 	    $this =~ s/-Z/-$one/;
 	    $this .= ' || warn' unless $this =~ /\|\|/;
-	    $this =~ s/^(.*\S)\s*\|\|\s*(die|warn)$/$1 || do valmess('$2','$1')/;
+	    $this =~ s/^(.*\S)\s*\|\|\s*(die|warn)$/$1 || valmess('$2','$1')/;
 	    $this =~ s/\bcd\b/chdir (\$cwd = \$file)/g;
 	    eval $this;
 	    last if $warnings > $oldwarnings;

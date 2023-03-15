@@ -7,8 +7,9 @@ require Digest::SHA;
 require Data::UUID;
 require JSON::XS;
 require HTTP::Tiny;
+use List::Util qw{first}; #import required
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -35,11 +36,11 @@ Other projects have documented device setup, so I will not go into details here.
 
 =over
 
-=item * You must configure your devices with the Smart Life (L<iOS|https://apps.apple.com/us/app/smart-life-smart-living/id1115101477>) app.
+=item * You must configure your devices with the Smart Life (L<iOS|https://apps.apple.com/us/app/smart-life-smart-living/id1115101477>,L<Android|https://play.google.com/store/apps/details?id=com.tuya.smartlife>) app.
 
 =item * You must create an account and project on the L<Tuya IoT Platform|https://iot.tuya.com/>.
 
-=item * You must link the Smart Life app to the project with the QR code. 
+=item * You must link the Smart Life app to the project with the QR code.
 
 =item * You must configure the correct project data center to see your devices in the project (Note: My devices call the Western America Data Center even though I'm located in Eastern America).
 
@@ -50,11 +51,11 @@ Other projects have documented device setup, so I will not go into details here.
 =head1 CONSTRUCTORS
 
 =head2 new
- 
+
   my $ws = WebService::Tuya::IoT::API->new;
- 
+
 =cut
- 
+
 sub new {
   my $this  = shift;
   my $class = ref($this) ? ref($this) : $this;
@@ -88,7 +89,7 @@ sub http_hostname {
 
 =head2 client_id
 
-Sets and returns the Client ID found on https://iot.tuya.com/ project overview page.
+Sets and returns the Client ID found on L<https://iot.tuya.com/> project overview page.
 
 =cut
 
@@ -101,7 +102,7 @@ sub client_id {
 
 =head2 client_secret
 
-Sets and returns the Client Secret found on https://iot.tuya.com/ project overview page.
+Sets and returns the Client Secret found on L<https://iot.tuya.com/> project overview page.
 
 =cut
 
@@ -110,23 +111,6 @@ sub client_secret {
   $self->{'client_secret'} = shift if @_;
   $self->{'client_secret'} = die("Error: property client_secret required") unless $self->{'client_secret'};
   return $self->{'client_secret'};
-}
-
-=head2 api_version
-
-Sets and returns the API version string used in the URL on API web service calls.
-
-  my $api_version = $ws->api_version;
-
-default: v1.0
-
-=cut
-
-sub api_version {
-  my $self               = shift;
-  $self->{'api_version'} = shift if @_;
-  $self->{'api_version'} = 'v1.0' unless $self->{'api_version'};
-  return $self->{'api_version'};
 }
 
 sub _debug {
@@ -142,19 +126,19 @@ sub _debug {
 
 Calls the Tuya IoT API and returns the parsed JSON data structure.  This method automatically handles access token and web request signatures.
 
-  my $response = $ws->api(GET  => 'token?grant_type=1');                                                             #get access token
-  my $response = $ws->api(GET  => "iot-03/devices/$deviceid/status");                                                #get status of $deviceid
-  my $response = $ws->api(POST => "iot-03/devices/$deviceid/commands", {commands=>[{code=>'switch_1', value=>\0}]}); #set switch_1 off on $deviceid
+  my $response = $ws->api(GET  => 'v1.0/token?grant_type=1');                                                             #get access token
+  my $response = $ws->api(GET  => "v1.0/iot-03/devices/$deviceid/status");                                                #get status of $deviceid
+  my $response = $ws->api(POST => "v1.0/iot-03/devices/$deviceid/commands", {commands=>[{code=>'switch_1', value=>\0}]}); #set switch_1 off on $deviceid
 
 References:
 
 =over
 
-=item * https://developer.tuya.com/en/docs/iot/new-singnature?id=Kbw0q34cs2e5g
+=item * L<https://developer.tuya.com/en/docs/iot/new-singnature?id=Kbw0q34cs2e5g>
 
-=item * https://github.com/jasonacox/tinytuya/blob/ffcec471a9c4bba38d5bf224608e20bc148f1b86/tinytuya/Cloud.py#L130
+=item * L<https://github.com/jasonacox/tinytuya/blob/ffcec471a9c4bba38d5bf224608e20bc148f1b86/tinytuya/Cloud.py#L130>
 
-=item * https://bestlab-platform.readthedocs.io/en/latest/bestlab_platform.tuya.html
+=item * L<https://bestlab-platform.readthedocs.io/en/latest/bestlab_platform.tuya.html>
 
 =back
 
@@ -163,15 +147,15 @@ References:
 # Thanks to Jason Cox at https://github.com/jasonacox/tinytuya
 # Copyright (c) 2022 Jason Cox - MIT License
 
-sub api {                                                                                                          #TODO: wrappers like api_get and api_post
+sub api {
   my $self             = shift;
   my $http_method      = shift;                                                                                    #TODO: die on bad http methods
   my $api_destination  = shift;                                                                                    #TODO: sort query parameters alphabetically
   my $input            = shift; #or undef
   my $content          = defined($input) ? JSON::XS::encode_json($input) : '';                                     #Note: empty string stringifies to "" in JSON
-  my $is_token         = $api_destination =~ m/\Atoken\b/ ? 1 : 0;
+  my $is_token         = $api_destination =~ m{v[0-9\.]+/token\b} ? 1 : 0;
   my $access_token     = $is_token ? undef : $self->access_token;                                                  #Note: recursive call
-  my $http_path        = sprintf('/%s/%s', $self->api_version, $api_destination);
+  my $http_path        = '/' . $api_destination;
   my $url              = sprintf('https://%s%s', $self->http_hostname, $http_path);                                #e.g. "https://openapi.tuyaus.com/v1.0/token?grant_type=1"
   my $nonce            = Data::UUID->new->create_str;                                                              #Field description - nonce: the universally unique identifier (UUID) generated for each API request.
   my $t                = int(Time::HiRes::time() * 1000);                                                          #Field description - t: the 13-digit standard timestamp.
@@ -206,14 +190,14 @@ sub api {                                                                       
   my $response         = $self->ua->request($http_method, $url, $options);
   print Data::Dumper::Dumper({response => $response}) if $self->_debug;
   my $status           = $response->{'status'};
-  die("Error: Web service request unsuccessful - status: $status\n") unless $status eq '200';                     #TODO: better error handeling
+  die("Error: Web service request unsuccessful - dest: $api_destination, status: $status\n") unless $status eq '200';                     #TODO: better error handeling
   my $response_content = $response->{'content'};
   local $@;
   my $response_decoded = eval{JSON::XS::decode_json($response_content)};
   my $error            = $@;
-  die("Error: API returned invalid JSON - content: $response_content\n") if $error;
+  die("Error: API returned invalid JSON - dest: $api_destination, content: $response_content\n") if $error;
   print Data::Dumper::Dumper({response_decoded => $response_decoded}) if $self->_debug > 2;
-  die("Error: API returned unsuccessful - content: $response_content\n") unless $response_decoded->{'success'};
+  die("Error: API returned unsuccessful - dest: $api_destination, content: $response_content\n") unless $response_decoded->{'success'};
   return $response_decoded
 }
 
@@ -232,6 +216,8 @@ sub api_delete {my $self = shift; return $self->api(DELETE => @_)};
 
 Wrapper around C<api> method which calls and caches the token web service for a temporary access token to be used for subsequent web service calls.
 
+  my $access_token = $ws->access_token; #requires client_id and client_secret
+
 =cut
 
 sub access_token {
@@ -242,7 +228,7 @@ sub access_token {
   }
   unless (defined $self->{'_access_token_data'}) {
     #get access_token and calculate expire_time epoch
-    my $api_destination           = 'token?grant_type=1';
+    my $api_destination           = 'v1.0/token?grant_type=1';
     my $output                    = $self->api_get($api_destination);
 
 #{
@@ -277,7 +263,119 @@ Wrapper around C<api> method to access the device status API destination.
 sub device_status {
   my $self            = shift;
   my $deviceid        = shift;
-  my $api_destination = "iot-03/devices/$deviceid/status";
+  my $api_destination = "v1.0/iot-03/devices/$deviceid/status";
+  return $self->api_get($api_destination);
+}
+
+=head2 device_status_code_value
+
+Wrapper around C<api> method to access the device status API destination and return the value for the given switch code.
+
+  my $value = $ws->device_status_code_value($deviceid, $code); #isa JSON Boolean
+
+default: code => switch_1
+
+=cut
+
+sub device_status_code_value {
+  my $self     = shift;
+  my $deviceid = shift;
+  my $code     = shift; $code = 'switch_1' unless defined $code; #5.8 syntax
+  my $response = $self->device_status($deviceid);
+  my $result   = $response->{'result'};
+  my $obj      = first {$_->{'code'} eq $code} @$result;
+  my $value    = $obj->{'value'};
+  return $value;
+}
+
+=head2 device_information
+
+Wrapper around C<api> method to access the device information API destination.
+
+  my $device_information = $ws->device_information($deviceid);
+
+=cut
+
+sub device_information {
+  my $self            = shift;
+  my $deviceid        = shift;
+  my $api_destination = "v1.1/iot-03/devices/$deviceid";
+  return $self->api_get($api_destination);
+}
+
+=head2 device_freeze_state
+
+Wrapper around C<api> method to access the device freeze-state API destination.
+
+  my $device_freeze_state = $ws->device_freeze_state($deviceid);
+
+=cut
+
+sub device_freeze_state {
+  my $self            = shift;
+  my $deviceid        = shift;
+  my $api_destination = "v1.0/iot-03/devices/$deviceid/freeze-state";
+  return $self->api_get($api_destination);
+}
+
+=head2 device_factory_infos
+
+Wrapper around C<api> method to access the device factory-infos API destination.
+
+  my $device_factory_infos = $ws->device_factory_infos($deviceid);
+
+=cut
+
+sub device_factory_infos {
+  my $self            = shift;
+  my $deviceid        = shift;
+  my $api_destination = "v1.0/iot-03/devices/factory-infos?device_ids=$deviceid";
+
+  return $self->api_get($api_destination);
+}
+
+=head2 device_specification
+
+Wrapper around C<api> method to access the device specification API destination.
+
+  my $device_specification = $ws->device_specification($deviceid);
+
+=cut
+
+sub device_specification {
+  my $self            = shift;
+  my $deviceid        = shift;
+  my $api_destination = "v1.2/iot-03/devices/$deviceid/specification";
+  return $self->api_get($api_destination);
+}
+
+=head2 device_protocol
+
+Wrapper around C<api> method to access the device protocol API destination.
+
+  my $device_protocol = $ws->device_protocol($deviceid);
+
+=cut
+
+sub device_protocol {
+  my $self            = shift;
+  my $deviceid        = shift;
+  my $api_destination = "v1.0/iot-03/devices/protocol?device_ids=$deviceid";
+  return $self->api_get($api_destination);
+}
+
+=head2 device_properties
+
+Wrapper around C<api> method to access the device properties API destination.
+
+  my $device_properties = $ws->device_properties($deviceid);
+
+=cut
+
+sub device_properties {
+  my $self            = shift;
+  my $deviceid        = shift;
+  my $api_destination = "v1.0/iot-03/devices/$deviceid/properties";
   return $self->api_get($api_destination);
 }
 
@@ -295,7 +393,7 @@ sub device_commands {
   my $self            = shift;
   my $deviceid        = shift;
   my @commands        = @_; #each command must be a hash reference
-  my $api_destination = "iot-03/devices/$deviceid/commands";
+  my $api_destination = "v1.0/iot-03/devices/$deviceid/commands";
   return $self->api_post($api_destination, {commands=>\@commands});
 }
 
@@ -337,7 +435,17 @@ sub ua {
 
 =head1 SEE ALSO
 
-https://iot.tuya.com/, https://github.com/jasonacox/tinytuya, https://apps.apple.com/us/app/smart-life-smart-living/id1115101477, 
+=over
+
+=item * L<Tuya IoT Platform|https://iot.tuya.com/>
+
+=item * L<TinyTuya - Python|https://github.com/jasonacox/tinytuya>
+
+=item * L<Smart Life - iOS|https://apps.apple.com/us/app/smart-life-smart-living/id1115101477>
+
+=item * L<Smart Life - Android|https://play.google.com/store/apps/details?id=com.tuya.smartlife>
+
+=back
 
 =head1 AUTHOR
 

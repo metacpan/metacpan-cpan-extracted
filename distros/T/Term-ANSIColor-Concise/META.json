@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -57,31 +57,31 @@
    "provides" : {
       "Term::ANSIColor::Concise" : {
          "file" : "lib/Term/ANSIColor/Concise.pm",
-         "version" : "2.01"
+         "version" : "2.0201"
       },
       "Term::ANSIColor::Concise::Table" : {
          "file" : "lib/Term/ANSIColor/Concise/Table.pm",
-         "version" : "2.01"
+         "version" : "2.0201"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/Term-ANSIColor-Concise/issues"
+         "web" : "https://github.com/tecolicom/Term-ANSIColor-Concise/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/Term-ANSIColor-Concise",
+      "homepage" : "https://github.com/tecolicom/Term-ANSIColor-Concise",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/Term-ANSIColor-Concise.git",
-         "web" : "https://github.com/kaz-utashiro/Term-ANSIColor-Concise"
+         "url" : "https://github.com/tecolicom/Term-ANSIColor-Concise.git",
+         "web" : "https://github.com/tecolicom/Term-ANSIColor-Concise"
       }
    },
-   "version" : "2.01",
+   "version" : "2.0201",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Kazumasa Utashiro <utashiro@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

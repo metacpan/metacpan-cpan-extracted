@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.10.2';
+$HTML::Spelling::Site::Checker::VERSION = '0.10.3';
 use strict;
 use warnings;
 use autodie;
@@ -269,7 +269,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.10.2
+version 0.10.3
 
 =head1 SYNOPSIS
 

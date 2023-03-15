@@ -22,7 +22,7 @@ my $hdr;
 eval {
   $hdr = keypar( $fptr, 'SIMPLE' );
 };
-ok( ! $@ && $hdr->type eq 'LOGICAL' && $hdr->value eq 1 
+ok( ! $@ && $hdr->type eq 'LOGICAL' && $hdr->value eq 1
          && $hdr->hdu_num() == 1, "keypar: hdu 1" );
 
 $fptr->get_hdu_num( $hdu_num );
@@ -36,4 +36,3 @@ ok( !$@ && $hdr && $hdr->value == 9
 
 $fptr->get_hdu_num( $hdu_num );
 ok ( $hdu_num == $init_hdu_num, "keypar: init hdu" );
-

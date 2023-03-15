@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+use v5.14.1;
+use App::picadata;
+
+App::picadata->new(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+picadata - parse and validate PICA+ data
+
+=head1 SYNOPSIS
+
+picadata [<command>] {path} {options} {files}
+
+=head1 DESCRIPTION
+
+Convert, analyze and validate PICA+ data from the command line.
+
+=head1 COMMANDS
+
+=head2 convert
+
+Convert between PICA+ serialization formats (the default command).
+
+=head2 get
+
+Print subfield values.
+
+=head2 levels
+
+Split records into multiple records for each level. Implies C<-o>.
+
+=head2 join
+
+Join multiple records into one and sort afterwards.
+
+=head2 count
+
+Count number of records, holdings, items, and fields.
+
+=head2 filter
+
+Filter records that include any of some given (sub)fields.
+
+=head2 fields/subfields/sf
+
+List distinct fields or subfields in the data. Provide an Avram schema 
+(C<-s/--schema>) to include documenation.
+
+=head2 explain
+
+Lookup (sub)fields in an Avram schema given by option or from stdin.
+Optional (C<o>/C<*>), mandatory (C<.>/C<+>), repeatable (C<+>/C<*>).
+
+=head2 validate
+
+Validate data against an Avram schema (C<-s/--schema>).
+
+=head2 diff
+
+Compare PICA records from two inputs. Output is always annotated PICA Plain.
+
+=head2 patch
+
+Apply modifications given in annotated PICA Plain.
+
+=head2 modify
+
+Change subfield values and return result or patch (option C<-a>).
+
+=head2 build
+
+Build an Avram schema from input data, optionally based on an existing schema
+(C<-s/--schema>).  Add option C<-B/--abbrev> to abbreviate.
+
+=head1 OPTIONS
+
+=head2 --from, -f
+
+PICA serialization type (plain, plus, binary, import, XML, ppxml, pixml) with
+Plain as default. Guessed from first input filename unless specified. See
+format documentation at L<http://format.gbv.de/pica>.
+
+=head2 --to, -t
+
+PICA serialization type to enable writing parsed PICA data.
+
+=head2 --number, -n
+
+Stop parsing after C<n> records. Can be abbreviated as C<-1>, C<-2>...
+
+=head2 --order, -o
+
+Sort record fields by field identifier and by occurrence at level 2.
+
+=head2 --level, -l
+
+Split record into selected level, includes higher level identifiers.
+
+=head2 --annotate, -a, -A
+
+Enforce annotated PICA as output format or prevent with C<-A>. Combined with
+C<--schema> this will set annotations C<!> and C<?> to mark validation errors.
+
+=head2 --path, -p
+
+Select fields or subfield values specified by PICA Path expressions. Multiple
+expressions can be separated by C<|> or by repeating the option. Positions such
+as C</3-7> are read as occurrence ranges. 
+
+=head2 --schema, -s
+
+L<Avram Schema|http://format.gbv.de/schema/avram/specification> given by
+file or URL. Default set via environment variable C<PICA_SCHEMA>.
+
+=head2 --unknown, -u
+
+Report unknown fields and subfields on validation (disabled by default).
+
+=head2 --abbrev, -B
+
+Abbreviate the Avram schema (with command <build>).
+
+=head2 --color, -C
+
+Colorize output. Only supported for PICA plain and PICA plus format.
+
+=head2 --mono, -M
+
+Monochrome (don't colorize output).
+
+=head2 --version, -V
+
+Print version number and exit.
+
+=head1 EXAMPLES
+
+  picadata pica.dat -t xml                    # convert binary to XML
+  picadata count -f plain < pica.plain        # parse and count records
+  picadata 003@ pica.xml                      # extract field 003@
+  picadata validate pica.xml -s schema.json   # validate against Avram schema
+  picadata modify 021A.a "New Title" pica.pp  # modify subfield value
+
+  # document fields used in a record
+  picadata fields pica.xml -s https://format.k10plus.de/avram.pl?profile=k10plus
+
+=head1 SEE ALSO
+
+See L<catmandu> for a more elaborated command line tool for data processing
+(transformation, API access...), including PICA+ with L<Catmandu::PICA>.
+
+=cut

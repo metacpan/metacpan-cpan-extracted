@@ -339,6 +339,18 @@ sub one {
   return $found == 1 ? true : false;
 }
 
+sub order {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  my %seen = ();
+
+  @{$data} = (map $data->[$_], grep !$seen{$_}++, (@args), 0..$#{$data});
+
+  return $self;
+}
+
 sub pairs {
   my ($self) = @_;
 
@@ -2863,6 +2875,53 @@ I<Since C<0.01>>
   });
 
   # 1
+
+=back
+
+=cut
+
+=head2 order
+
+  order(Int @indices) (Array)
+
+The order method reorders the array items based on the indices provided and
+returns the invocant.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item order example 1
+
+  # given: synopsis;
+
+  my $order = $array->order;
+
+  # bless({ value => [1..9] }, "Venus::Array")
+
+=back
+
+=over 4
+
+=item order example 2
+
+  # given: synopsis;
+
+  my $order = $array->order(8,7,6);
+
+  # bless({ value => [9,8,7,1,2,3,4,5,6] }, "Venus::Array")
+
+=back
+
+=over 4
+
+=item order example 3
+
+  # given: synopsis;
+
+  my $order = $array->order(0,2,1);
+
+  # bless({ value => [1,3,2,4,5,6,7,8,9] }, "Venus::Array")
 
 =back
 

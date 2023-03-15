@@ -8,11 +8,62 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 BEGIN { use_ok('Sub::Middler') };
 
-#########################
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+my $middler=Sub::Middler->new;
+ok $middler, "New object";
 
+
+
+# Fail non code ref for register
+$@=undef;
+eval {
+  $middler->register("asdf");
+};
+my $e=$@;
+ok $e =~ /Middleware must be a CODE reference/, "register fail";
+
+
+
+for my $v (1..3){
+  $middler->register(
+    sub {
+      my ($next, $index, @args)=@_;
+
+      sub {
+        $_[0].="Index $index,".join(",",@args)."\n";
+        &$next;
+      }
+    }
+  );
+}
+
+
+# Fail non code ref for link
+$@=undef;
+eval {
+  $middler->link("noncode", qw<extra args>);
+};
+
+$e=$@;
+ok $e =~ /A CODE reference is requred when linking middleware/, "link fail";
+
+
+# Test the linking lexical linking of extra arguments at link time.
+# Tests that arguments between link in chain are up to the links only.
+my $output;
+my $dispatcher=$middler->link(sub {$output=$_[0]},qw<extra args>);
+
+ok $dispatcher, "Dispatcher created";
+
+$dispatcher->(my $input="");
+
+ok $output eq
+"Index 0,extra,args
+Index 1,extra,args
+Index 2,extra,args
+", "Data pass through middleware";
+
+done_testing;

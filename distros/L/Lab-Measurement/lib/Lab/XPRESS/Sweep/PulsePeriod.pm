@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::PulsePeriod;
 #ABSTRACT: Pulse period sweep
-$Lab::XPRESS::Sweep::PulsePeriod::VERSION = '3.851';
+$Lab::XPRESS::Sweep::PulsePeriod::VERSION = '3.860';
 use v5.20;
 
 
@@ -95,7 +95,7 @@ Lab::XPRESS::Sweep::PulsePeriod - Pulse period sweep
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 CAVEATS/BUGS
 

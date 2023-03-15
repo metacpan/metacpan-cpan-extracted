@@ -7,6 +7,7 @@ class Sys::IO {
   use Sys::IO::Utimbuf;
   use Sys::IO::Flock;
   use Sys::IO::Constant as IO;
+  use Sys::IO::Windows;
   
   our $STDIN : Sys::IO::FileStream;
   our $STDOUT : Sys::IO::FileStream;
@@ -75,15 +76,15 @@ class Sys::IO {
   native static method unlink : int ($pathname : string);
   
   native static method rename : int ($oldpath : string, $newpath : string);
-
+  
   native static method getcwd : mutable string ($buf : mutable string, $size : int);
-
+  
   native static method _getdcwd : mutable string ($drive : int, $buffer : mutable string, $maxlen : int);
-
+  
   native static method realpath : mutable string ($path : string, $resolved_path : mutable string);
-
+  
   native static method _fullpath : mutable string ($absPath : mutable string, $relPath : string, $maxLength : int);
-
+  
   native static method chdir : int ($path : string);
   
   native static method chmod : int ($path : string, $mode :int);
@@ -96,21 +97,14 @@ class Sys::IO {
   
   native static method readlink : int ($path : string, $buf : mutable string, $bufsiz : int);
   
-  static method readlinkp : string ($file : string) {
+  static method get_readlink_buffer_size : int ($path : string) {
     my $stat = Sys::IO::Stat->new;
-    
-    my $status = Sys::IO::Stat->lstat($file, $stat);
-    
-    my $link_text = (string)undef;
-    if ($status == 0) {
-      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
-        my $link_text_length = (int)$stat->st_size;
-        my $link_text = (mutable string)new_string_len $link_text_length;
-        &readlink($file, $link_text, $link_text_length);
-      }
-    }
-    
-    return $link_text;
+
+    Sys::IO::Stat->lstat($path, $stat);
+
+    my $readlink_buffer_size = (int)$stat->st_size;
+
+    return $readlink_buffer_size;
   }
   
   native static method opendir : Sys::IO::DirStream ($dir : string);
@@ -186,5 +180,21 @@ class Sys::IO {
   static method setlinebuf : void ($stream : Sys::IO::FileStream) {
     my $mode = IO->_IOLBF;
     &setvbuf($stream, undef, $mode, IO->BUFSIZ);
+  }
+  
+  # Temporary
+  static method readlinkp : string ($file : string) {
+    if (Sys::OS->is_windows) {
+      my $buffer_size = Sys::IO::Windows->get_readlink_buffer_size($file);
+      my $buffer = (mutable string)new_string_len $buffer_size;
+      Sys::IO::Windows->readlink($file, $buffer, $buffer_size);
+      return $buffer;
+    }
+    else {
+      my $buffer_size = Sys::IO->get_readlink_buffer_size($file);
+      my $buffer = (mutable string)new_string_len $buffer_size;
+      Sys::IO->readlink($file, $buffer, $buffer_size);
+      return $buffer;
+    }
   }
 }

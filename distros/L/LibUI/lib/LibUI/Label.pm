@@ -1,16 +1,17 @@
-package LibUI::Label 0.01 {
+package LibUI::Label 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use parent 'LibUI::Control';
     #
-    affix( LibUI::lib(), 'uiLabelText', [ InstanceOf ['LibUI::Label'] ] => Str, 'text' );
+    affix( LibUI::lib(), [ 'uiLabelText', 'text' ], [ InstanceOf ['LibUI::Label'] ] => Str );
     affix(
-        LibUI::lib(), 'uiLabelSetText', [ InstanceOf ['LibUI::Label'], Str ] => Void,
-        'setText'
+        LibUI::lib(),
+        [ 'uiLabelSetText',            'setText' ],
+        [ InstanceOf ['LibUI::Label'], Str ] => Void
     );
-    affix( LibUI::lib(), 'uiNewLabel', [ Void, Str ] => InstanceOf ['LibUI::Label'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewLabel', 'new' ], [ Void, Str ] => InstanceOf ['LibUI::Label'] );
 };
 1;
 #
@@ -30,8 +31,9 @@ LibUI::Label - Non-interactive Text Display
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $lbl    = LibUI::Label->new('Hello, World');
     $box->append( $lbl, 1 );

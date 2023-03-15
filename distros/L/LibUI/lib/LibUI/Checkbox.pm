@@ -1,4 +1,4 @@
-package LibUI::Checkbox 0.01 {
+package LibUI::Checkbox 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,27 +6,33 @@ package LibUI::Checkbox 0.01 {
     use parent 'LibUI::Control';
     #
     affix(
-        LibUI::lib(), 'uiCheckboxChecked', [ InstanceOf ['LibUI::Checkbox'] ] => Int,
-        'checked'
+        LibUI::lib(),
+        [ 'uiCheckboxChecked', 'checked' ],
+        [ InstanceOf ['LibUI::Checkbox'] ] => Int
     );
     affix(
         LibUI::lib(),
-        'uiCheckboxOnToggled',
+        [ 'uiCheckboxOnToggled', 'onToggled' ],
         [   InstanceOf ['LibUI::Checkbox'],
             CodeRef [ [ InstanceOf ['LibUI::Checkbox'], Any ] => Void ], Any
-        ] => Void,
-        'onToggled'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiCheckboxSetChecked', [ InstanceOf ['LibUI::Checkbox'], Int ] => Void,
-        'setChecked'
+        LibUI::lib(),
+        [ 'uiCheckboxSetChecked',         'setChecked' ],
+        [ InstanceOf ['LibUI::Checkbox'], Int ] => Void
     );
     affix(
-        LibUI::lib(), 'uiCheckboxSetText', [ InstanceOf ['LibUI::Checkbox'], Str ] => Void,
-        'setText'
+        LibUI::lib(),
+        [ 'uiCheckboxSetText',            'setText' ],
+        [ InstanceOf ['LibUI::Checkbox'], Str ] => Void
     );
-    affix( LibUI::lib(), 'uiCheckboxText', [ InstanceOf ['LibUI::Checkbox'] ] => Str, 'text' );
-    affix( LibUI::lib(), 'uiNewCheckbox',  [ Void, Str ] => InstanceOf ['LibUI::Checkbox'], 'new' );
+    affix( LibUI::lib(), [ 'uiCheckboxText', 'text' ], [ InstanceOf ['LibUI::Checkbox'] ] => Str );
+    affix(
+        LibUI::lib(),
+        [ 'uiNewCheckbox', 'new' ],
+        [ Void,            Str ] => InstanceOf ['LibUI::Checkbox']
+    );
 };
 1;
 #
@@ -46,8 +52,9 @@ LibUI::Checkbox - User Checkable Box
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::Checkbox;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
 
     sub checked {

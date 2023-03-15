@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.563-6-g07edffa5
+package JSON::Schema::Modern; # git description: v0.564-6-ge53bfa3b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.564';
+our $VERSION = '0.565';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -386,7 +386,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     }
   }
 
-  die 'evaluate validity inconstent with error count' if $valid xor !$state->{errors}->@*;
+  die 'evaluate validity inconsistent with error count' if $valid xor !$state->{errors}->@*;
 
   return JSON::Schema::Modern::Result->new(
     output_format => $self->output_format,
@@ -490,13 +490,17 @@ sub _traverse_subschema ($self, $schema, $state) {
       $state->{keyword} = $keyword;
 
       if (not $sub->($vocabulary, $schema, $state)) {
-        die 'traverse returned false but we have no errors' if not $state->{errors}->@*;
+        die 'traverse result is false but there are no errors (keyword: '.$keyword.')' if not $state->{errors}->@*;
         $valid = 0;
         next;
       }
 
       if (my $callback = $state->{callbacks}{$keyword}) {
-        $callback->($schema, $state);
+        if (not $callback->($schema, $state)) {
+          die 'callback result is false but there are no errors (keyword: '.$keyword.')' if not $state->{errors}->@*;
+          $valid = 0;
+          next;
+        }
       }
     }
   }
@@ -590,7 +594,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
         my $error_count = $state->{errors}->@*;
 
         if (not $sub->($vocabulary, $data, $schema, $state)) {
-          warn 'result is false but there are no errors (keyword: '.$keyword.')'
+          warn 'evaluation result is false but there are no errors (keyword: '.$keyword.')'
             if $error_count == $state->{errors}->@*;
           $valid = 0;
 
@@ -600,7 +604,16 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       }
 
       if (my $callback = $state->{callbacks}{$keyword}) {
-        $callback->($data, $schema, $state);
+        my $error_count = $state->{errors}->@*;
+
+        if (not $callback->($data, $schema, $state)) {
+          warn 'callback result is false but there are no errors (keyword: '.$keyword.')'
+            if $error_count == $state->{errors}->@*;
+          $valid = 0;
+
+          last ALL_KEYWORDS if $state->{short_circuit};
+          next;
+        }
       }
 
       push @new_annotations, $state->{annotations}->@[$#new_annotations+1 .. $state->{annotations}->$#*];
@@ -616,7 +629,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   $state->{annotations} = $orig_annotations;
 
-  if ($valid) {
+  if ($valid and $state->{collect_annotations}) {
     push $state->{annotations}->@*, @new_annotations;
     if ($state->{collect_annotations} and $state->{spec_version} !~ qr/^draft(7|2019-09)$/) {
       annotate_self(+{ %$state, keyword => $_, _unknown => 1 }, $schema)
@@ -1012,7 +1025,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.564
+version 0.565
 
 =head1 SYNOPSIS
 

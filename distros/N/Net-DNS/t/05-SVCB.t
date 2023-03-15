@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1875 2022-09-23 13:41:03Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -110,13 +110,14 @@ END
 
 ####	Test Vectors
 
-my $zonefile = new Net::DNS::ZoneFile( \*DATA );
+my $zonefile = Net::DNS::ZoneFile->new( \*DATA );
 
 sub testcase {
 	my $ident  = shift;
 	my $vector = $zonefile->read;
 	my $expect = $zonefile->read;
 	is( $vector->string, $expect->string, $ident );
+	return;
 }
 
 sub failure {
@@ -124,6 +125,7 @@ sub failure {
 	eval { $zonefile->read };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "$ident\t[$exception]" );
+	return;
 }
 
 

@@ -2,8 +2,8 @@ NAME
     App::TextWrapUtils - Utilities related to text wrapping
 
 VERSION
-    This document describes version 0.005 of App::TextWrapUtils (from Perl
-    distribution App-TextWrapUtils), released on 2022-12-14.
+    This document describes version 0.006 of App::TextWrapUtils (from Perl
+    distribution App-TextWrapUtils), released on 2023-03-10.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -221,7 +221,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

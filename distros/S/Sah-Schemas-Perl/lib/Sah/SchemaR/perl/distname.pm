@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::distname;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2023-01-14'; # DATE
-our $VERSION = '0.047'; # VERSION
+our $DATE = '2023-01-19'; # DATE
+our $VERSION = '0.048'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis is a schema you can use when you want to accept a Perl distribution name,\ne.g. `WWW-Mechanize`. It offers basic checking of syntax as well as a couple of\nconveniences. First, it offers completion from list of locally installed Perl\ndistribution. Second, it contains coercion rule so you can also input\n`Foo::Bar`, `Foo/Bar`, `Foo/Bar.pm`, or even 'Foo.Bar' and it will be normalized\ninto `Foo-Bar`.\n\nTo see this schema in action on the CLI, you can try e.g. the `dist-has-deb`\nscript from <pm:App::DistUtils> and activate its tab completion (see its manpage\nfor more details). Then on the CLI try typing:\n\n    % dist-has-deb WWW-<tab>\n    % dist-has-deb dzp/<tab>\n\nNote that this schema does not check that the Perl disribution exists on CPAN or\nis installed locally. To check that, use the `perl::distname::installed` schema.\nAnd there's also a `perl::distname::not_installed` schema.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\\z",summary=>"Perl distribution name, e.g. Foo-Bar","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::distname - Perl distribution name, e.g. Foo-Bar
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::SchemaR::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::SchemaR::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 DESCRIPTION
 

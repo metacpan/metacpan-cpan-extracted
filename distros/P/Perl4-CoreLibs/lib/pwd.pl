@@ -21,7 +21,7 @@
 
 package pwd;
 
-sub main'initpwd {
+sub main::initpwd {
     if ($ENV{'PWD'}) {
 	local($dd,$di) = stat('.');
 	local($pd,$pi) = stat($ENV{'PWD'});
@@ -41,7 +41,7 @@ sub main'initpwd {
     }
 }
 
-sub main'chdir {
+sub main::chdir {
     local($newdir) = shift;
     $newdir =~ s|/{2,}|/|g;
     if (chdir $newdir) {

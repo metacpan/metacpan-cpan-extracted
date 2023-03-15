@@ -1,25 +1,49 @@
 NAME
 
-    PerlX::ScopeFunction -- new keywords for creating scopes.
+    PerlX::ScopeFunction - new keywords for creating scopes.
 
 SYNOPSIS
 
-    Use with keyword to constraint the use result of the given expression
-    to a smaller lexical scope.
-
-        with ( grep { $_ % 2 == 0 } @input ) {
-            my @even_nums = @_;
+        use List::MoreUtils qw( part );
+        use PerlX::ScopeFunction qw( let with );
     
-            say "There are " . scalar(@even_nums) . " even numbers";
+        with ( part { $_ % 2 } @input ) {
+            my ($evens, $odds) = @_;
+            say "There are " . scalar(@$evens) . " even numbers: " . join(" ", @$evens);
+            say "There are " . scalar(@$odds) .  " odd numbers: " . join(" ", @$odds);
+        }
+    
+        let ($max = max(@input)) {
+            ...
         }
 
 DESCRIPTION
 
-    Scope functions are helper functions that helps to constraint the use
-    of an given expression, to make the boundray look clearer, usually by
-    making a inner lexical scope.
+    Scope functions can be used to create small lexical scope, inside which
+    the results of an given expression are used, but not outside.
 
- with (EXPR) BLOCK
+    This module provide 2 extra keywords -- with and let -- for creating
+    creating scopes that look a little bit better than just a bare code
+    BLOCK.
+
+    By use-ing this module without a import list, all keywords are
+    imported. To import only wanted keywords, specify them in the import
+    list:
+
+        # Import all keywords
+        use PerlX::ScopeFunction;
+    
+        # Import just `let`
+        use PerlX::ScopeFunction qw(let);
+    
+        # Import just `with`, and name it differently
+        use PerlX::ScopeFunction 'with' => { -as 'withThese' }
+
+    Imported keywords can be removed by a no statement.
+
+        no PerlX::ScopeFunction;
+
+ with
 
     The with keyword can be used to bring the result of an given EXPR to a
     smaller scope (code block):
@@ -29,6 +53,67 @@ DESCRIPTION
     The EXPR are evaluated in list context, and the result (a list) is
     available inside BLOCK as @_. The conventional topic variable $_ is
     also assigned the last value of the list ($_[-1]).
+
+ let
+
+    The let keyword can be used to create locally readonly variables in a
+    smaller scope (code block). The keyword let should be followed by a
+    list of assignment expressions, then a block.
+
+        let ( ASSIGNMENTS ) BLOCK
+
+    The ASSIGNMENTS means a list of assignment statements seperated by
+    semicolons, and the operator must =. They are evalutade in the same
+    order as they are defined and becomes new, readyonly, variables are
+    inside the BLOCK. Variables created in the beginning of this list of
+    can be used in the latter positions.
+
+    If in the current scope, thee are variables with identical names as the
+    LHS in the ASSIGNMENTS, they are masked in the let-block.
+
+    For example, these would creating 3 new variables in the let-block that
+    mask the ones with identical names in the current scope.
+
+        my ($foo, $bar, $baz) = (10, 20, 30);
+        let ($foo = 1; $bar = 2; $baz = $foo + $bar) {
+            say "$foo $bar $baz"; #=> 1 2 3
+        }
+        say "$foo $bar $baz"; #=> 10 20 30
+
+    Array and Hashes can also be created this way:
+
+        let (@foo = (1,2,3); %bar = (bar => 1); $baz = 42) {
+            ...
+        }
+
+Importing as different names
+
+    Since the keywords provided in this module are commonly defined in
+    other CPAN modules, this module also provides a way to let users to
+    import those keywords as different name, with a conventional spec also
+    seen in Sub::Exporter.
+
+    For example, to import with as given_these, you say:
+
+        use PerlX::ScopeFunction "with" => { -as => "given_these" };
+
+    Basically whenever there is a HashRef in the import list, previous
+    entries is imported. But "-as" is the only meaningful key. All other
+    options seen in Sub::Exporter are ignored.
+
+CAVEATS
+
+    Due to the fact this module hooks into perl parser, the keywords cannot
+    be used without being imported into current namespace. Statements like
+    the following does not compile:
+
+         PerlX::ScopeFunction::let( ... ) {
+             ...
+         }
+    
+         PerlX::ScopeFunction::with( ... ) {
+             ...
+         }
 
 AUTHOR
 

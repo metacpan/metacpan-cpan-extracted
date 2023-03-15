@@ -6,7 +6,7 @@ Template::Perlish - Yet Another Templating system for Perl
 
 =head1 VERSION
 
-This document describes Template::Perlish version 1.58.
+This document describes Template::Perlish version 1.64.
 
 
 =head1 SYNOPSIS
@@ -921,7 +921,9 @@ the same path will provide the right value:
 
 =item B<< crumble >>
 
-   my $array_ref = crumble($path);
+   my $array_ref = crumble($path);        # OR
+   my $array_ref = crumble($path, 1);     # OR, BETTER
+   my ($aref, $pos) = crumble($path, 1);
 
 split the input C<$path> into I<crumbs> that should be followed into
 some data structure (you can use L</traverse> to do the actual
@@ -929,6 +931,17 @@ traversal). Returns a reference to an array with the crumbs, in order.
 Returns C<undef> if the provided C<$path> cannot be broken down. See
 L</Templates> for the rules of breaking a path into pieces, this is the
 actual function used to do that.
+
+As of version 1.60, this function also accepts a second optional boolean
+argument for supporting I<partial matches>. If false (default), the legacy
+behaviour is kept, and the provided input C<$path> must match in its
+entirety or the splitting will fail. If true, the extraction of crumbs will
+begin at the first character of C<$path> but be allowed to stop in the
+middle; this e.g. allows parsing strings like C<foo.bar:baz>, with crumbs
+resulting in C<< ['foo', 'bar'] >>. The first variant will only return the
+crumbs in an array reference; the second variant will also point out the
+position where the match stopped, so that residual stuff can be extracted
+(in the example, the C<:baz> part).
 
 =item B<< traverse >>
 
@@ -975,10 +988,11 @@ parts.
 
 In particular, you will want to pass a reference to a hash or array if
 you want to just I<read> from C<data>. In this case, the first missing
-crumb will make the function return immediately an empty string value;
-moreover, if all crumbs are successfully found, the value will be
-returned. This is what is actually used by the functions described in
-L</Variables Accessors>.
+crumb will make the function return immediately an empty string value
+(or, as of version 1.62, whatever is passed with option C<missing>, if
+anything); moreover, if all crumbs are successfully found, the value
+will be returned. This is what is actually used by the functions
+described in L</Variables Accessors>.
 
 If you pass a reference to a scalar or to another reference instead, you
 will get back a reference to a value. In this case, any missing parts
@@ -1003,7 +1017,8 @@ Of course variable values might come from the command line or some other
 source in the real world!
 
 When something goes wrong in the traversal, C<undef> is returned if
-auto-vivification is enabled, an empty string is returned otherwise.
+auto-vivification is enabled, an empty string (or, as of version 1.62,
+what is passed as option C<missing> if present) is returned otherwise.
 
 If C<$path> is a reference to an array, its components can be plain
 scalars or references themselves. When they are plain scalars, they are
@@ -1145,6 +1160,28 @@ cases:
         what -> 'hey'       # method wins over key
         foo  -> ''          # key is ignored
         urgh -> 'gaah!'     # method is called
+
+Since version 1.62, additional option C<missing> allows setting the
+return value when the target key is not found. This applies only when
+auto-vivification is not active. When this key is missing, the return
+value is by default set to the empty string, preserving
+backwards-compatibility.
+
+To tell an undefined value from a really missing key, it's possible to
+pass a marker reference and check the return value against it with
+C<Scalar::Util::refaddr>:
+
+   use Scalar::Util 'refaddr';
+   my $marker = [];
+   my $value = traverse($data, $path, { missing => $marker });
+   say 'the value is missing'
+      if ref($value) && refaddr($value) == refaddr($marker);
+
+By default, landing on an (existent) undefined value makes C<traverse>
+return an empty string; this is to simplify usage in templates and is in
+line with the default value for C<missing>. As of version 1.64 it's
+possible to pass option C<undef> to set a different value, defaulting to
+the empty string for backwards compatibility;
 
 =back
 

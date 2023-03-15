@@ -4,7 +4,7 @@
       "Lance Wicks <lancew@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,8 +43,8 @@
          "requires" : {
             "HTTP::Request" : "6.44",
             "JSON::Tiny" : "0.58",
-            "LWP::UserAgent" : "6.67",
-            "Moo" : "2.005004",
+            "LWP::UserAgent" : "6.68",
+            "Moo" : "2.005005",
             "namespace::clean" : "0.27",
             "perl" : "v5.10.0"
          }
@@ -54,7 +54,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test2::V0" : "0.000145",
+            "Test2::V0" : "0.000148",
             "Test::More" : "0"
          }
       }
@@ -62,23 +62,23 @@
    "provides" : {
       "Webservice::Judobase" : {
          "file" : "lib/Webservice/Judobase.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Webservice::Judobase::Competitor" : {
          "file" : "lib/Webservice/Judobase/Competitor.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Webservice::Judobase::Contests" : {
          "file" : "lib/Webservice/Judobase/Contests.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Webservice::Judobase::Country" : {
          "file" : "lib/Webservice/Judobase/Country.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Webservice::Judobase::General" : {
          "file" : "lib/Webservice/Judobase/General.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -92,7 +92,7 @@
          "web" : "https://github.com/lancew/Webservice-Judobase"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_generated_by_perl" : "v5.35.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

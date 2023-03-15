@@ -4,6 +4,7 @@
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-2019.yml
+.github/workflows/windows-latest-devel-mode.yml
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
@@ -12,6 +13,10 @@ lib/SPVM/Sys.c
 lib/SPVM/Sys.config
 lib/SPVM/Sys.pm
 lib/SPVM/Sys.spvm
+lib/SPVM/Sys/Env.c
+lib/SPVM/Sys/Env.config
+lib/SPVM/Sys/Env.pm
+lib/SPVM/Sys/Env.spvm
 lib/SPVM/Sys/FileTest.pm
 lib/SPVM/Sys/FileTest.spvm
 lib/SPVM/Sys/IO.c
@@ -46,6 +51,10 @@ lib/SPVM/Sys/IO/Utimbuf.c
 lib/SPVM/Sys/IO/Utimbuf.config
 lib/SPVM/Sys/IO/Utimbuf.pm
 lib/SPVM/Sys/IO/Utimbuf.spvm
+lib/SPVM/Sys/IO/Windows.c
+lib/SPVM/Sys/IO/Windows.config
+lib/SPVM/Sys/IO/Windows.pm
+lib/SPVM/Sys/IO/Windows.spvm
 lib/SPVM/Sys/Ioctl.c
 lib/SPVM/Sys/Ioctl.config
 lib/SPVM/Sys/Ioctl.pm
@@ -54,6 +63,10 @@ lib/SPVM/Sys/Ioctl/Constant.c
 lib/SPVM/Sys/Ioctl/Constant.config
 lib/SPVM/Sys/Ioctl/Constant.pm
 lib/SPVM/Sys/Ioctl/Constant.spvm
+lib/SPVM/Sys/OS.c
+lib/SPVM/Sys/OS.config
+lib/SPVM/Sys/OS.pm
+lib/SPVM/Sys/OS.spvm
 lib/SPVM/Sys/Poll.c
 lib/SPVM/Sys/Poll.config
 lib/SPVM/Sys/Poll.pm
@@ -225,7 +238,7 @@ t/ftest/myexe.exe
 t/ftest/readline_basic.txt
 t/ftest/readline_eof.txt
 t/ftest/readline_long_lines.txt
-t/lib/SPVM/TestCase/Sys/FileTest.spvm
+t/lib/SPVM/TestCase/Sys.spvm
 t/lib/SPVM/TestCase/Sys/IO.spvm
 t/lib/SPVM/TestCase/Sys/IO/Stat.spvm
 t/lib/SPVM/TestCase/Sys/Ioctl.spvm
@@ -242,10 +255,11 @@ t/lib/SPVM/TestUtil/SocketAutoClose.spvm
 t/lib/TestUtil/Socket.pm
 t/print_hello.pl
 t/Sys.t
-t/Sys_FileTest.t
 t/Sys_IO.t
 t/Sys_IO_Stat.t
+t/Sys_IO_Windows.t
 t/Sys_Ioctl.t
+t/Sys_OS.t
 t/Sys_Poll.t
 t/Sys_Process.t
 t/Sys_Select.t
@@ -253,6 +267,7 @@ t/Sys_Signal.t
 t/Sys_Signal_alarm.t
 t/Sys_Signal_ualarm.t
 t/Sys_Socket.t
+t/Sys_symlink.t
 t/Sys_Time.t
 t/Sys_User.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

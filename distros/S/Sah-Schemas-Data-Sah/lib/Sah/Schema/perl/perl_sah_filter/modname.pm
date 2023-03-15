@@ -6,9 +6,9 @@ use Sah::PSchema 'get_schema';
 use Sah::PSchema::perl::modname; # not yet detected automatically by a dzil plugin
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-17'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Data-Sah'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = get_schema(
     'perl::modname',
@@ -33,7 +33,7 @@ Sah::Schema::perl::perl_sah_filter::modname - Perl module in the Data::Sah::Filt
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::perl_sah_filter::modname (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-17.
+This document describes version 0.003 of Sah::Schema::perl::perl_sah_filter::modname (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-19.
 
 =head1 SYNOPSIS
 

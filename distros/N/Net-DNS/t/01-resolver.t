@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1847 2021-08-11 10:02:44Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -89,7 +89,7 @@ sub warning {
 	eval {&$method};
 	my ($warning) = split /\n/, "$@\n";
 	ok( $warning, "$test\t[$warning]" );
-	eval {&$method};
+	return eval {&$method};
 }
 
 warning( 'unresolved nameserver warning', sub { $resolver->nameserver('bogus.example.com.') } );

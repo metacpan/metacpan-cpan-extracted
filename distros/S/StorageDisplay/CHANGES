@@ -1,10 +1,70 @@
 ==================================================
-Changes from 2022-02-27 00:00:00 +0000 to present.
+Changes from 2022-03-09 00:00:00 +0000 to present.
 ==================================================
 
--------------------------------------------
-version 1.0.11 at 2023-02-27 23:29:17 +0000
--------------------------------------------
+------------------------------------------
+version 1.1.0 at 2023-03-09 23:33:55 +0000
+------------------------------------------
+
+  Change: a6b857079ff3527bc4ff3edc8c2fb76c47ff2896
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-10 00:32:13 +0000
+
+    v1.1.0: ready to merge dotfiles 
+
+  Change: 43e337a78074e8ecccecaf5969cc2538f66cd56a
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-10 00:32:13 +0000
+
+    cleanup typo/error found by dzil 
+
+  Change: c0370a5eadf12d4701ad1656137a1c3d2d0cc723
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-10 00:02:09 +0000
+
+    Update test data 
+
+  Change: d7b6c683ef25655e9a2f64858a312e553154c0d9
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-09 22:14:46 +0000
+
+    New layout for modules 
+
+  Change: ac92fcff59bcd60b7ab98e45a3bfcc6aea4f6a94
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-09 22:14:03 +0000
+
+    Stop to send modules when __END__ is reached 
+
+  Change: d6bcfea4d981f8989c90e139befe8fca9f1ea52e
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-09 10:07:54 +0000
+
+    Per-machine and more readable dot linknames 
+
+  Change: 4f865bee8509b2d97fcd164489c9d7eca5fe7113
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-09 09:57:30 +0000
+
+    Collect file size when required 
+
+  Change: a4b3298e92d13ade33886cc20c0b9c6bcbebe4f5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-09 09:56:55 +0000
+
+    Collect a bit more info on host (fqdn, date, uname) 
+
+  Change: a729aaf725bf5ea991c114a40c18814405d36b48
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-07 21:11:10 +0000
+
+    Collect infos from qemu-agent if for VM if available 
+
+  Change: ae330118397c1493361bdf9ef962f46cfe8c166a
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-07 21:10:30 +0000
+
+    Collect hostname 
 
   Change: 53e6f7b3917a50e818f57bf475bba65eba183ee7
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

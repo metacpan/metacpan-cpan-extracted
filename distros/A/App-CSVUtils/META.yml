@@ -24,154 +24,160 @@ name: App-CSVUtils
 provides:
   App::CSVUtils:
     file: lib/App/CSVUtils.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv2paras:
     file: lib/App/CSVUtils/csv2paras.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv2td:
     file: lib/App/CSVUtils/csv2td.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv2vcf:
     file: lib/App/CSVUtils/csv2vcf.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_add_fields:
     file: lib/App/CSVUtils/csv_add_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_avg:
     file: lib/App/CSVUtils/csv_avg.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_check_cell_values:
     file: lib/App/CSVUtils/csv_check_cell_values.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_check_field_names:
     file: lib/App/CSVUtils/csv_check_field_names.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_check_field_values:
     file: lib/App/CSVUtils/csv_check_field_values.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_check_rows:
     file: lib/App/CSVUtils/csv_check_rows.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_cmp:
     file: lib/App/CSVUtils/csv_cmp.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_concat:
     file: lib/App/CSVUtils/csv_concat.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_convert_to_hash:
     file: lib/App/CSVUtils/csv_convert_to_hash.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_csv:
     file: lib/App/CSVUtils/csv_csv.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_delete_fields:
     file: lib/App/CSVUtils/csv_delete_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_dump:
     file: lib/App/CSVUtils/csv_dump.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_each_row:
     file: lib/App/CSVUtils/csv_each_row.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_fill_template:
     file: lib/App/CSVUtils/csv_fill_template.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_find_values:
     file: lib/App/CSVUtils/csv_find_values.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_freqtable:
     file: lib/App/CSVUtils/csv_freqtable.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_gen:
     file: lib/App/CSVUtils/csv_gen.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_get_cells:
     file: lib/App/CSVUtils/csv_get_cells.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_grep:
     file: lib/App/CSVUtils/csv_grep.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_info:
     file: lib/App/CSVUtils/csv_info.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_intrange:
     file: lib/App/CSVUtils/csv_intrange.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_list_field_names:
     file: lib/App/CSVUtils/csv_list_field_names.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_lookup_fields:
     file: lib/App/CSVUtils/csv_lookup_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_ltrim:
     file: lib/App/CSVUtils/csv_ltrim.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_map:
     file: lib/App/CSVUtils/csv_map.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_munge_field:
     file: lib/App/CSVUtils/csv_munge_field.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_munge_row:
     file: lib/App/CSVUtils/csv_munge_row.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_pick_fields:
     file: lib/App/CSVUtils/csv_pick_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_pick_rows:
     file: lib/App/CSVUtils/csv_pick_rows.pm
-    version: '1.021'
+    version: '1.022'
+  App::CSVUtils::csv_quote:
+    file: lib/App/CSVUtils/csv_quote.pm
+    version: '1.022'
   App::CSVUtils::csv_replace_newline:
     file: lib/App/CSVUtils/csv_replace_newline.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_rtrim:
     file: lib/App/CSVUtils/csv_rtrim.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_select_fields:
     file: lib/App/CSVUtils/csv_select_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_select_rows:
     file: lib/App/CSVUtils/csv_select_rows.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_setop:
     file: lib/App/CSVUtils/csv_setop.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_shuf_fields:
     file: lib/App/CSVUtils/csv_shuf_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_shuf_rows:
     file: lib/App/CSVUtils/csv_shuf_rows.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_sort_fields:
     file: lib/App/CSVUtils/csv_sort_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_sort_rows:
     file: lib/App/CSVUtils/csv_sort_rows.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_sorted_fields:
     file: lib/App/CSVUtils/csv_sorted_fields.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_sorted_rows:
     file: lib/App/CSVUtils/csv_sorted_rows.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_split:
     file: lib/App/CSVUtils/csv_split.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_sum:
     file: lib/App/CSVUtils/csv_sum.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_transpose:
     file: lib/App/CSVUtils/csv_transpose.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_trim:
     file: lib/App/CSVUtils/csv_trim.pm
-    version: '1.021'
+    version: '1.022'
   App::CSVUtils::csv_uniq:
     file: lib/App/CSVUtils/csv_uniq.pm
-    version: '1.021'
+    version: '1.022'
+  App::CSVUtils::csv_unquote:
+    file: lib/App/CSVUtils/csv_unquote.pm
+    version: '1.022'
   App::CSVUtils::paras2csv:
     file: lib/App/CSVUtils/paras2csv.pm
-    version: '1.021'
+    version: '1.022'
 recommends:
   Sort::Sub: '0.120'
 requires:
@@ -208,6 +214,7 @@ requires:
   Sah::Schema::re_from_str: '0'
   Sah::Schema::true: '0'
   Sah::Schema::uint: '0'
+  Scalar::Util::Numeric: '0'
   Sort::ByExample: '0'
   String::Pad: '0.021'
   Text::CSV_XS: '0'
@@ -221,7 +228,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '1.021'
+version: '1.022'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -348,6 +355,10 @@ x_Dist_Zilla:
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-quote'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-replace-newline'
       version: '0.424'
     -
@@ -421,6 +432,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-uniq'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-unquote'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -611,7 +626,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'

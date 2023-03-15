@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::TextTable - Modules that generate text tables
 
 VERSION
-    This document describes version 0.013 of Acme::CPANModules::TextTable
+    This document describes version 0.014 of Acme::CPANModules::TextTable
     (from Perl distribution Acme-CPANModules-TextTable), released on
-    2021-07-31.
+    2023-02-16.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -19,6 +19,13 @@ SYNOPSIS
     list/include/exclude/add datasets, etc), see bencher or run "bencher
     --help".
 
+DESCRIPTION
+    Currently excluded from this list are:
+
+    *   Text::SimpleTable::AutoWidth (wrapper to Text::SimpleTable);
+
+    *   Text::ASCIITable::EasyTable (wrapper to Text::ASCIITable);
+
 ACME::CPANMODULES ENTRIES
     Text::Table::Any
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
@@ -27,6 +34,13 @@ ACME::CPANMODULES ENTRIES
         interface is dead simple, following Text::Table::Tiny. The main
         drawback is that it currently does not allow passing (some, any)
         options to each backend.
+
+    Text::SimpleTable
+        Author: MRAMBERG <https://metacpan.org/author/MRAMBERG>
+
+        As its name implies, a simple table-generating module with minimal
+        documentation and a few choices or border characters. You have to
+        set the width of all columns manually.
 
     Text::UnicodeBox::Table
         Author: EWATERS <https://metacpan.org/author/EWATERS>
@@ -131,26 +145,27 @@ ACME::CPANMODULES FEATURE COMPARISON MATRIX
      +-------------------------------+----------------+------------------+---------------+--------------+----------------+-----------------+-------------+-------------------+------------------+---------------------+--------------+------------+------------------+--------------------+-----------------+----------------+-------------------+----------+-----------------------+---------------------+-----------------+-----------+
      | module                        | align_cell *1) | align_column *2) | align_row *3) | box_char *4) | color_data *5) | color_theme *6) | colspan *7) | custom_border *8) | custom_color *9) | multiline_data *10) | rowspan *11) | speed *12) | valign_cell *13) | valign_column *14) | valign_row *15) | wide_char_data | column_width *16) | pad *17) | per_column_width *18) | per_row_height *19) | row_height *20) | vpad *21) |
      +-------------------------------+----------------+------------------+---------------+--------------+----------------+-----------------+-------------+-------------------+------------------+---------------------+--------------+------------+------------------+--------------------+-----------------+----------------+-------------------+----------+-----------------------+---------------------+-----------------+-----------+
-     | Text::Table::Any              | N/A *22)       | N/A *22)         | N/A *22)      | N/A *22)     | N/A *22)       | N/A *22)        | N/A *22)    | N/A *22)          | N/A *22)         | N/A *22)            | N/A *22)     | N/A *22)   | N/A *22)         | N/A *22)           | N/A *22)        | N/A *22)       | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::UnicodeBox::Table       | no             | yes              | N/A           | no           | yes            | no              | no          | yes               | no               | no                  | no           | slow       | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::Table::Manifold         | no             | yes              | N/A           | N/A          | yes            | no              | no          | no *23)           | no               | no                  | no           | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::ANSITable               | yes            | yes              | yes           | yes          | yes            | yes             | no          | yes               | yes              | yes                 | no           | slow       | yes              | yes                | yes             | yes            | yes               | yes      | yes                   | yes                 | yes             | yes       |
+     | Text::Table::Any              | N/A *22)       | N/A *23)         | N/A *24)      | N/A *25)     | N/A *26)       | N/A *27)        | N/A *28)    | N/A *29)          | N/A *30)         | N/A *31)            | N/A *32)     | N/A *33)   | N/A *34)         | N/A *35)           | N/A *36)        | N/A *37)       | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::SimpleTable             | no             | no               | no            | no           | no             | no              | no          | yes *38)          | no               | no                  | no           | yes *39)   | no               | no                 | no              | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::UnicodeBox::Table       | no             | yes              | N/A           | no           | yes            | no              | no          | yes               | no               | no                  | no           | yes        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::Table::Manifold         | no             | yes              | N/A           | N/A          | yes            | no              | no          | no *40)           | no               | no                  | no           | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::ANSITable               | yes            | yes              | yes           | yes          | yes            | yes             | no          | yes               | yes              | yes                 | no           | yes        | yes              | yes                | yes             | yes            | yes               | yes      | yes                   | yes                 | yes             | yes       |
      | Text::ASCIITable              | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::FormatTable             | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::MarkdownTable           | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | no *24)             | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::Table                   | N/A            | N/A              | N/A           | N/A *25)     | no             | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::MarkdownTable           | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | no *41)             | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::Table                   | N/A            | N/A              | N/A           | N/A *42)     | no             | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::Table::Tiny             | N/A            | N/A              | N/A           | yes          | yes            | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::Table::TinyBorderStyle  | N/A            | N/A              | N/A           | yes          | no             | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::Table::More             | yes            | yes              | yes           | yes          | yes            | no              | yes         | yes               | no               | yes                 | yes          | slow       | yes              | yes                | yes             | yes            | no                | no       | no                    | no                  | no              | no        |
-     | Text::Table::Sprintf          | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | fast       | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::Table::More             | yes            | yes              | yes           | yes          | yes            | no              | yes         | yes               | no               | yes                 | yes          | yes        | yes              | yes                | yes             | yes            | no                | no       | no                    | no                  | no              | no        |
+     | Text::Table::Sprintf          | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | yes *43)   | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::Table::TinyColor        | N/A            | N/A              | N/A           | no           | yes            | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::Table::TinyColorWide    | N/A            | N/A              | N/A           | no           | yes            | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::Table::TinyWide         | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | N/A                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      | Text::Table::Org              | N/A            | N/A              | N/A           | no           | no             | N/A             | N/A         | N/A               | N/A              | no                  | N/A          | N/A        | N/A              | N/A                | N/A             | no             | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::Table::CSV              | N/A            | N/A              | N/A           | N/A *26)     | no             | N/A             | N/A         | N/A               | N/A              | yes *27)            | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::Table::HTML             | N/A            | N/A              | N/A           | no           | no *28)        | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::Table::HTML::DataTables | N/A            | N/A              | N/A           | no           | no *28)        | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
-     | Text::TabularDisplay          | N/A            | N/A              | N/A           | N/A *26)     | no             | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::Table::CSV              | N/A            | N/A              | N/A           | N/A *44)     | no             | N/A             | N/A         | N/A               | N/A              | yes *45)            | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::Table::HTML             | N/A            | N/A              | N/A           | no           | no *46)        | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::Table::HTML::DataTables | N/A            | N/A              | N/A           | no           | no *47)        | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
+     | Text::TabularDisplay          | N/A            | N/A              | N/A           | N/A *48)     | no             | N/A             | N/A         | N/A               | N/A              | yes                 | N/A          | N/A        | N/A              | N/A                | N/A             | yes            | N/A               | N/A      | N/A                   | N/A                 | N/A             | N/A       |
      +-------------------------------+----------------+------------------+---------------+--------------+----------------+-----------------+-------------+-------------------+------------------+---------------------+--------------+------------+------------------+--------------------+-----------------+----------------+-------------------+----------+-----------------------+---------------------+-----------------+-----------+
 
     Notes:
@@ -188,25 +203,47 @@ ACME::CPANMODULES FEATURE COMPARISON MATRIX
     20. row_height: Whether module allows setting the height of rows
     21. vpad: Whether module allows customizing cell vertical padding
     22. Depends on backend
-    23. But this module can pass rendering to other module like
+    23. Depends on backend
+    24. Depends on backend
+    25. Depends on backend
+    26. Depends on backend
+    27. Depends on backend
+    28. Depends on backend
+    29. Depends on backend
+    30. Depends on backend
+    31. Depends on backend
+    32. Depends on backend
+    33. Depends on backend
+    34. Depends on backend
+    35. Depends on backend
+    36. Depends on backend
+    37. Depends on backend
+    38. Limited choice of 1 ASCII style and 1 UTF style
+    39. Slightly slower than Text::Table::Tiny
+    40. But this module can pass rendering to other module like
     Text::UnicodeBox::Table
-    24. Newlines stripped
-    25. Does not draw borders
-    26. Irrelevant
-    27. But make sure your CSV parser can handle multiline cell
-    28. Not converted to HTML color elements
+    41. Newlines stripped
+    42. Does not draw borders
+    43. The fastest among the others in this list
+    44. Irrelevant
+    45. But make sure your CSV parser can handle multiline cell
+    46. Not converted to HTML color elements
+    47. Not converted to HTML color elements
+    48. Irrelevant
 
 BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
     sample benchmark.
 
-    Text::Table::Any 0.104
+    Text::Table::Any 0.114
+
+    Text::SimpleTable 2.07
 
     Text::UnicodeBox::Table
 
     Text::Table::Manifold 1.03
 
-    Text::ANSITable 0.602
+    Text::ANSITable 0.608
 
     Text::ASCIITable 0.22
 
@@ -218,11 +255,11 @@ BENCHMARKED MODULES
 
     Text::Table::Tiny 1.02
 
-    Text::Table::TinyBorderStyle 0.004
+    Text::Table::TinyBorderStyle 0.005
 
-    Text::Table::More 0.014
+    Text::Table::More 0.025
 
-    Text::Table::Sprintf 0.003
+    Text::Table::Sprintf 0.006
 
     Text::Table::TinyColor 0.002
 
@@ -230,13 +267,13 @@ BENCHMARKED MODULES
 
     Text::Table::TinyWide 0.001
 
-    Text::Table::Org 0.02
+    Text::Table::Org 0.031
 
     Text::Table::CSV 0.023
 
-    Text::Table::HTML 0.004
+    Text::Table::HTML 0.009
 
-    Text::Table::HTML::DataTables 0.007
+    Text::Table::HTML::DataTables 0.012
 
     Text::TabularDisplay 1.38
 
@@ -244,6 +281,10 @@ BENCHMARK PARTICIPANTS
     *   Text::Table::Any (perl_code)
 
         Text::Table::Any
+
+    *   Text::SimpleTable (perl_code)
+
+        Text::SimpleTable
 
     *   Text::UnicodeBox::Table (perl_code)
 
@@ -338,74 +379,73 @@ BENCHMARK DATASETS
 
     *   color data (1x2) (not included by default)
 
-BENCHMARK SAMPLE RESULTS
-  Sample benchmark #1
-    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
-    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
-    version 5.3.0-68-generic*.
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
+    version 5.4.0-91-generic*.
 
-    Benchmark command (default options):
-
-     % bencher --cpanmodules-module TextTable
-
-    Result formatted as table (split, part 1 of 5):
+    Benchmark with default options ("bencher --cpanmodules-module
+    TextTable"):
 
      #table1#
      {dataset=>"large (30x300)"}
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
      | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | Text::UnicodeBox::Table       |      1.44 |    696    |                 0.00% |             38063.55% |   0.00046 |      20 |
-     | Text::ANSITable               |      3.28 |    305    |               128.30% |             16616.21% |   0.0002  |      20 |
-     | Text::Table::More             |      6.66 |    150    |               363.51% |              8133.67% |   0.00014 |      20 |
-     | Text::ASCIITable              |     15    |     66    |               947.67% |              3542.72% | 7.8e-05   |      20 |
-     | Text::Table::TinyColorWide    |     22.1  |     45.2  |              1439.32% |              2379.25% |   2e-05   |      20 |
-     | Text::FormatTable             |     22.8  |     43.9  |              1483.83% |              2309.58% | 3.2e-05   |      20 |
-     | Text::Table::TinyWide         |     31.2  |     32    |              2072.28% |              1656.84% | 1.1e-05   |      20 |
-     | Text::Table::Manifold         |     49    |     20    |              3318.43% |              1016.41% | 2.4e-05   |      20 |
-     | Text::Table::Tiny             |     53    |     19    |              3583.64% |               936.03% | 3.4e-05   |      20 |
-     | Text::TabularDisplay          |     58.7  |     17    |              3985.42% |               834.14% | 5.6e-06   |      20 |
-     | Text::Table::TinyColor        |     78.8  |     12.7  |              5379.60% |               596.47% | 1.2e-05   |      20 |
-     | Text::Table::HTML             |     79    |     13    |              5390.03% |               595.14% | 2.7e-05   |      20 |
-     | Text::MarkdownTable           |    114    |      8.76 |              7844.02% |               380.41% | 4.7e-06   |      20 |
-     | Text::Table                   |    140    |      7    |              9907.76% |               281.34% | 9.6e-06   |      20 |
-     | Text::Table::HTML::DataTables |    165    |      6.05 |             11398.27% |               231.91% | 3.4e-06   |      20 |
-     | Text::Table::CSV              |    283    |      3.54 |             19572.73% |                93.99% |   2e-06   |      20 |
-     | Text::Table::Org              |    299    |      3.34 |             20702.20% |                83.46% | 9.1e-07   |      20 |
-     | Text::Table::TinyBorderStyle  |    331    |      3.02 |             22934.08% |                65.68% | 1.5e-06   |      20 |
-     | Text::Table::Any              |    520    |      1.9  |             35751.62% |                 6.45% | 5.2e-06   |      20 |
-     | Text::Table::Sprintf          |    548    |      1.82 |             38063.55% |                 0.00% | 1.6e-06   |      23 |
+     | Text::UnicodeBox::Table       |       1   |     990   |                 0.00% |             39075.07% |   0.0093  |      20 |
+     | Text::ANSITable               |       2.3 |     440   |               122.45% |             17511.06% |   0.001   |      20 |
+     | Text::Table::More             |       2.9 |     350   |               183.78% |             13704.67% |   0.00074 |      20 |
+     | Text::ASCIITable              |      12   |      86   |              1044.26% |              3323.61% |   0.00015 |      20 |
+     | Text::FormatTable             |      17   |      59   |              1583.12% |              2227.53% |   0.00017 |      21 |
+     | Text::Table::TinyColorWide    |      17   |      58   |              1601.03% |              2203.02% |   0.0001  |      20 |
+     | Text::Table::TinyWide         |      24   |      41   |              2297.54% |              1533.97% | 7.2e-05   |      20 |
+     | Text::SimpleTable             |      32   |      32   |              3016.17% |              1157.16% |   0.00011 |      20 |
+     | Text::Table::HTML             |      35   |      29   |              3312.65% |              1047.94% | 6.5e-05   |      20 |
+     | Text::Table::Manifold         |      39   |      26   |              3719.11% |               925.76% | 8.6e-05   |      20 |
+     | Text::Table::Tiny             |      41   |      24   |              3964.21% |               863.90% | 8.3e-05   |      20 |
+     | Text::TabularDisplay          |      47   |      21   |              4546.04% |               743.19% |   0.0002  |      20 |
+     | Text::Table::TinyColor        |      62   |      16   |              5986.13% |               543.68% | 4.5e-05   |      20 |
+     | Text::MarkdownTable           |      86   |      12   |              8370.09% |               362.51% | 2.4e-05   |      20 |
+     | Text::Table                   |     110   |       9.4 |             10414.16% |               272.59% | 3.3e-05   |      20 |
+     | Text::Table::HTML::DataTables |     130   |       7.9 |             12381.60% |               213.86% | 2.7e-05   |      20 |
+     | Text::Table::TinyBorderStyle  |     220   |       4.5 |             21965.23% |                77.54% | 1.4e-05   |      20 |
+     | Text::Table::CSV              |     230   |       4.4 |             22292.34% |                74.95% | 1.7e-05   |      20 |
+     | Text::Table::Org              |     230   |       4.3 |             22710.59% |                71.74% | 2.1e-05   |      20 |
+     | Text::Table::Sprintf          |     360   |       2.8 |             35801.17% |                 9.12% |   1e-05   |      20 |
+     | Text::Table::Any              |     400   |       2.5 |             39075.07% |                 0.00% | 1.3e-05   |      20 |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
-    The above result formatted in Benchmark.pm style:
+    Formatted as Benchmark.pm result:
 
-                                       Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::Table::TinyColorWide  Text::FormatTable  Text::Table::TinyWide  Text::Table::Manifold  Text::Table::Tiny  Text::TabularDisplay  Text::Table::HTML  Text::Table::TinyColor  Text::MarkdownTable  Text::Table  Text::Table::HTML::DataTables  Text::Table::CSV  Text::Table::Org  Text::Table::TinyBorderStyle  Text::Table::Any  Text::Table::Sprintf 
-      Text::UnicodeBox::Table        1.44/s                       --             -56%               -78%              -90%                        -93%               -93%                   -95%                   -97%               -97%                  -97%               -98%                    -98%                 -98%         -98%                           -99%              -99%              -99%                          -99%              -99%                  -99% 
-      Text::ANSITable                3.28/s                     128%               --               -50%              -78%                        -85%               -85%                   -89%                   -93%               -93%                  -94%               -95%                    -95%                 -97%         -97%                           -98%              -98%              -98%                          -99%              -99%                  -99% 
-      Text::Table::More              6.66/s                     363%             103%                 --              -56%                        -69%               -70%                   -78%                   -86%               -87%                  -88%               -91%                    -91%                 -94%         -95%                           -95%              -97%              -97%                          -97%              -98%                  -98% 
-      Text::ASCIITable                 15/s                     954%             362%               127%                --                        -31%               -33%                   -51%                   -69%               -71%                  -74%               -80%                    -80%                 -86%         -89%                           -90%              -94%              -94%                          -95%              -97%                  -97% 
-      Text::Table::TinyColorWide     22.1/s                    1439%             574%               231%               46%                          --                -2%                   -29%                   -55%               -57%                  -62%               -71%                    -71%                 -80%         -84%                           -86%              -92%              -92%                          -93%              -95%                  -95% 
-      Text::FormatTable              22.8/s                    1485%             594%               241%               50%                          2%                 --                   -27%                   -54%               -56%                  -61%               -70%                    -71%                 -80%         -84%                           -86%              -91%              -92%                          -93%              -95%                  -95% 
-      Text::Table::TinyWide          31.2/s                    2075%             853%               368%              106%                         41%                37%                     --                   -37%               -40%                  -46%               -59%                    -60%                 -72%         -78%                           -81%              -88%              -89%                          -90%              -94%                  -94% 
-      Text::Table::Manifold            49/s                    3379%            1425%               650%              229%                        126%               119%                    60%                     --                -5%                  -15%               -35%                    -36%                 -56%         -65%                           -69%              -82%              -83%                          -84%              -90%                  -90% 
-      Text::Table::Tiny                53/s                    3563%            1505%               689%              247%                        137%               131%                    68%                     5%                 --                  -10%               -31%                    -33%                 -53%         -63%                           -68%              -81%              -82%                          -84%              -90%                  -90% 
-      Text::TabularDisplay           58.7/s                    3994%            1694%               782%              288%                        165%               158%                    88%                    17%                11%                    --               -23%                    -25%                 -48%         -58%                           -64%              -79%              -80%                          -82%              -88%                  -89% 
-      Text::Table::HTML                79/s                    5253%            2246%              1053%              407%                        247%               237%                   146%                    53%                46%                   30%                 --                     -2%                 -32%         -46%                           -53%              -72%              -74%                          -76%              -85%                  -86% 
-      Text::Table::TinyColor         78.8/s                    5380%            2301%              1081%              419%                        255%               245%                   151%                    57%                49%                   33%                 2%                      --                 -31%         -44%                           -52%              -72%              -73%                          -76%              -85%                  -85% 
-      Text::MarkdownTable             114/s                    7845%            3381%              1612%              653%                        415%               401%                   265%                   128%               116%                   94%                48%                     44%                   --         -20%                           -30%              -59%              -61%                          -65%              -78%                  -79% 
-      Text::Table                     140/s                    9842%            4257%              2042%              842%                        545%               527%                   357%                   185%               171%                  142%                85%                     81%                  25%           --                           -13%              -49%              -52%                          -56%              -72%                  -74% 
-      Text::Table::HTML::DataTables   165/s                   11404%            4941%              2379%              990%                        647%               625%                   428%                   230%               214%                  180%               114%                    109%                  44%          15%                             --              -41%              -44%                          -50%              -68%                  -69% 
-      Text::Table::CSV                283/s                   19561%            8515%              4137%             1764%                       1176%              1140%                   803%                   464%               436%                  380%               267%                    258%                 147%          97%                            70%                --               -5%                          -14%              -46%                  -48% 
-      Text::Table::Org                299/s                   20738%            9031%              4391%             1876%                       1253%              1214%                   858%                   498%               468%                  408%               289%                    280%                 162%         109%                            81%                5%                --                           -9%              -43%                  -45% 
-      Text::Table::TinyBorderStyle    331/s                   22946%            9999%              4866%             2085%                       1396%              1353%                   959%                   562%               529%                  462%               330%                    320%                 190%         131%                           100%               17%               10%                            --              -37%                  -39% 
-      Text::Table::Any                520/s                   36531%           15952%              7794%             3373%                       2278%              2210%                  1584%                   952%               900%                  794%               584%                    568%                 361%         268%                           218%               86%               75%                           58%                --                   -4% 
-      Text::Table::Sprintf            548/s                   38141%           16658%              8141%             3526%                       2383%              2312%                  1658%                   998%               943%                  834%               614%                    597%                 381%         284%                           232%               94%               83%                           65%                4%                    -- 
+                                      Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table::TinyWide  Text::SimpleTable  Text::Table::HTML  Text::Table::Manifold  Text::Table::Tiny  Text::TabularDisplay  Text::Table::TinyColor  Text::MarkdownTable  Text::Table  Text::Table::HTML::DataTables  Text::Table::TinyBorderStyle  Text::Table::CSV  Text::Table::Org  Text::Table::Sprintf  Text::Table::Any 
+      Text::UnicodeBox::Table          1/s                       --             -55%               -64%              -91%               -94%                        -94%                   -95%               -96%               -97%                   -97%               -97%                  -97%                    -98%                 -98%         -99%                           -99%                          -99%              -99%              -99%                  -99%              -99% 
+      Text::ANSITable                2.3/s                     125%               --               -20%              -80%               -86%                        -86%                   -90%               -92%               -93%                   -94%               -94%                  -95%                    -96%                 -97%         -97%                           -98%                          -98%              -99%              -99%                  -99%              -99% 
+      Text::Table::More              2.9/s                     182%              25%                 --              -75%               -83%                        -83%                   -88%               -90%               -91%                   -92%               -93%                  -94%                    -95%                 -96%         -97%                           -97%                          -98%              -98%              -98%                  -99%              -99% 
+      Text::ASCIITable                12/s                    1051%             411%               306%                --               -31%                        -32%                   -52%               -62%               -66%                   -69%               -72%                  -75%                    -81%                 -86%         -89%                           -90%                          -94%              -94%              -95%                  -96%              -97% 
+      Text::FormatTable               17/s                    1577%             645%               493%               45%                 --                         -1%                   -30%               -45%               -50%                   -55%               -59%                  -64%                    -72%                 -79%         -84%                           -86%                          -92%              -92%              -92%                  -95%              -95% 
+      Text::Table::TinyColorWide      17/s                    1606%             658%               503%               48%                 1%                          --                   -29%               -44%               -50%                   -55%               -58%                  -63%                    -72%                 -79%         -83%                           -86%                          -92%              -92%              -92%                  -95%              -95% 
+      Text::Table::TinyWide           24/s                    2314%             973%               753%              109%                43%                         41%                     --               -21%               -29%                   -36%               -41%                  -48%                    -60%                 -70%         -77%                           -80%                          -89%              -89%              -89%                  -93%              -93% 
+      Text::SimpleTable               32/s                    2993%            1275%               993%              168%                84%                         81%                    28%                 --                -9%                   -18%               -25%                  -34%                    -50%                 -62%         -70%                           -75%                          -85%              -86%              -86%                  -91%              -92% 
+      Text::Table::HTML               35/s                    3313%            1417%              1106%              196%               103%                        100%                    41%                10%                 --                   -10%               -17%                  -27%                    -44%                 -58%         -67%                           -72%                          -84%              -84%              -85%                  -90%              -91% 
+      Text::Table::Manifold           39/s                    3707%            1592%              1246%              230%               126%                        123%                    57%                23%                11%                     --                -7%                  -19%                    -38%                 -53%         -63%                           -69%                          -82%              -83%              -83%                  -89%              -90% 
+      Text::Table::Tiny               41/s                    4025%            1733%              1358%              258%               145%                        141%                    70%                33%                20%                     8%                 --                  -12%                    -33%                 -50%         -60%                           -67%                          -81%              -81%              -82%                  -88%              -89% 
+      Text::TabularDisplay            47/s                    4614%            1995%              1566%              309%               180%                        176%                    95%                52%                38%                    23%                14%                    --                    -23%                 -42%         -55%                           -62%                          -78%              -79%              -79%                  -86%              -88% 
+      Text::Table::TinyColor          62/s                    6087%            2650%              2087%              437%               268%                        262%                   156%               100%                81%                    62%                50%                   31%                      --                 -25%         -41%                           -50%                          -71%              -72%              -73%                  -82%              -84% 
+      Text::MarkdownTable             86/s                    8150%            3566%              2816%              616%               391%                        383%                   241%               166%               141%                   116%               100%                   75%                     33%                   --         -21%                           -34%                          -62%              -63%              -64%                  -76%              -79% 
+      Text::Table                    110/s                   10431%            4580%              3623%              814%               527%                        517%                   336%               240%               208%                   176%               155%                  123%                     70%                  27%           --                           -15%                          -52%              -53%              -54%                  -70%              -73% 
+      Text::Table::HTML::DataTables  130/s                   12431%            5469%              4330%              988%               646%                        634%                   418%               305%               267%                   229%               203%                  165%                    102%                  51%          18%                             --                          -43%              -44%              -45%                  -64%              -68% 
+      Text::Table::TinyBorderStyle   220/s                   21900%            9677%              7677%             1811%              1211%                       1188%                   811%               611%               544%                   477%               433%                  366%                    255%                 166%         108%                            75%                            --               -2%               -4%                  -37%              -44% 
+      Text::Table::CSV               230/s                   22399%            9899%              7854%             1854%              1240%                       1218%                   831%               627%               559%                   490%               445%                  377%                    263%                 172%         113%                            79%                            2%                --               -2%                  -36%              -43% 
+      Text::Table::Org               230/s                   22923%           10132%              8039%             1900%              1272%                       1248%                   853%               644%               574%                   504%               458%                  388%                    272%                 179%         118%                            83%                            4%                2%                --                  -34%              -41% 
+      Text::Table::Sprintf           360/s                   35257%           15614%             12400%             2971%              2007%                       1971%                  1364%              1042%               935%                   828%               757%                  650%                    471%                 328%         235%                           182%                           60%               57%               53%                    --              -10% 
+      Text::Table::Any               400/s                   39500%           17500%             13900%             3340%              2260%                       2220%                  1539%              1180%              1060%                   940%               860%                  740%                    540%                 380%         276%                           216%                           80%               76%               72%                   11%                -- 
  
      Legends:
        Text::ANSITable: participant=Text::ANSITable
        Text::ASCIITable: participant=Text::ASCIITable
        Text::FormatTable: participant=Text::FormatTable
        Text::MarkdownTable: participant=Text::MarkdownTable
+       Text::SimpleTable: participant=Text::SimpleTable
        Text::Table: participant=Text::Table
        Text::Table::Any: participant=Text::Table::Any
        Text::Table::CSV: participant=Text::Table::CSV
@@ -422,67 +462,66 @@ BENCHMARK SAMPLE RESULTS
        Text::Table::TinyWide: participant=Text::Table::TinyWide
        Text::TabularDisplay: participant=Text::TabularDisplay
        Text::UnicodeBox::Table: participant=Text::UnicodeBox::Table
-
-    The above result presented as chart:
-
-    Result formatted as table (split, part 2 of 5):
 
      #table2#
      {dataset=>"long (3x300)"}
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Text::UnicodeBox::Table       |      11.3 |    88.4   |                 0.00% |             34905.68% | 8.5e-05 |      21 |
-     | Text::ANSITable               |      30   |    33     |               164.51% |             13134.31% |   4e-05 |      20 |
-     | Text::Table::More             |      61.7 |    16.2   |               445.13% |              6321.58% | 1.6e-05 |      20 |
-     | Text::ASCIITable              |     162   |     6.17  |              1331.88% |              2344.74% | 3.4e-06 |      20 |
-     | Text::FormatTable             |     200   |     5     |              1671.23% |              1876.35% | 7.1e-06 |      20 |
-     | Text::Table::TinyColorWide    |     217   |     4.61  |              1817.34% |              1725.74% | 2.4e-06 |      21 |
-     | Text::Table::TinyWide         |     304   |     3.29  |              2587.30% |              1202.63% | 1.3e-06 |      20 |
-     | Text::TabularDisplay          |     431   |     2.32  |              3708.00% |               819.27% | 2.2e-06 |      20 |
-     | Text::Table::Manifold         |     439   |     2.28  |              3780.76% |               802.03% | 1.1e-06 |      20 |
-     | Text::Table::Tiny             |     477   |     2.1   |              4112.27% |               731.04% | 1.3e-06 |      22 |
-     | Text::MarkdownTable           |     540   |     1.85  |              4671.83% |               633.59% | 1.1e-06 |      20 |
-     | Text::Table                   |     646   |     1.55  |              5605.53% |               513.54% | 7.5e-07 |      20 |
-     | Text::Table::TinyColor        |     735   |     1.36  |              6390.04% |               439.38% | 4.8e-07 |      20 |
-     | Text::Table::HTML             |     743   |     1.35  |              6463.79% |               433.32% | 1.1e-06 |      21 |
-     | Text::Table::HTML::DataTables |    1300   |     0.79  |             11078.51% |               213.15% | 8.3e-07 |      21 |
-     | Text::Table::Org              |    2170   |     0.461 |             19065.87% |                82.65% | 2.1e-07 |      20 |
-     | Text::Table::CSV              |    2170   |     0.46  |             19094.61% |                82.37% | 2.1e-07 |      21 |
-     | Text::Table::TinyBorderStyle  |    2210   |     0.452 |             19451.10% |                79.05% | 2.1e-07 |      20 |
-     | Text::Table::Any              |    3810   |     0.262 |             33567.68% |                 3.97% | 1.9e-07 |      26 |
-     | Text::Table::Sprintf          |    3960   |     0.252 |             34905.68% |                 0.00% | 2.1e-07 |      20 |
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | Text::UnicodeBox::Table       |       7.8 |   130     |                 0.00% |             37283.05% |   0.0012  |      20 |
+     | Text::ANSITable               |      20   |    50     |               155.65% |             14522.58% |   0.00018 |      20 |
+     | Text::Table::More             |      25   |    40     |               218.34% |             11643.01% | 9.2e-05   |      20 |
+     | Text::ASCIITable              |     100   |     8     |              1451.05% |              2310.18% |   0.0001  |      21 |
+     | Text::FormatTable             |     160   |     6.3   |              1932.80% |              1738.99% | 1.1e-05   |      20 |
+     | Text::Table::TinyColorWide    |     170   |     5.8   |              2113.73% |              1588.69% | 1.7e-05   |      20 |
+     | Text::Table::TinyWide         |     250   |     4.1   |              3045.53% |              1088.45% | 1.3e-05   |      20 |
+     | Text::SimpleTable             |     310   |     3.3   |              3791.86% |               860.54% | 7.8e-06   |      20 |
+     | Text::TabularDisplay          |     340   |     2.9   |              4242.44% |               760.88% | 2.5e-05   |      20 |
+     | Text::Table::Manifold         |     350   |     2.8   |              4380.44% |               734.36% | 1.6e-05   |      21 |
+     | Text::Table::Tiny             |     380   |     2.6   |              4796.42% |               663.48% | 1.1e-05   |      20 |
+     | Text::Table::HTML             |     400   |     2     |              5268.89% |               596.29% | 2.6e-05   |      20 |
+     | Text::MarkdownTable           |     430   |     2.3   |              5342.75% |               586.84% | 5.8e-06   |      20 |
+     | Text::Table                   |     510   |     2     |              6390.17% |               476.00% | 7.4e-06   |      20 |
+     | Text::Table::TinyColor        |     590   |     1.7   |              7481.10% |               393.11% |   5e-06   |      21 |
+     | Text::Table::HTML::DataTables |     990   |     1     |             12555.73% |               195.38% | 5.4e-06   |      20 |
+     | Text::Table::TinyBorderStyle  |    1400   |     0.73  |             17384.03% |               113.81% | 1.1e-06   |      20 |
+     | Text::Table::Org              |    1600   |     0.61  |             20935.91% |                77.71% | 3.8e-06   |      20 |
+     | Text::Table::CSV              |    1800   |     0.556 |             22842.23% |                62.94% | 2.1e-07   |      20 |
+     | Text::Table::Any              |    2880   |     0.348 |             36587.08% |                 1.90% | 2.1e-07   |      20 |
+     | Text::Table::Sprintf          |    2930   |     0.341 |             37283.05% |                 0.00% | 2.7e-07   |      20 |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
-    The above result formatted in Benchmark.pm style:
+    Formatted as Benchmark.pm result:
 
-                                       Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table::TinyWide  Text::TabularDisplay  Text::Table::Manifold  Text::Table::Tiny  Text::MarkdownTable  Text::Table  Text::Table::TinyColor  Text::Table::HTML  Text::Table::HTML::DataTables  Text::Table::Org  Text::Table::CSV  Text::Table::TinyBorderStyle  Text::Table::Any  Text::Table::Sprintf 
-      Text::UnicodeBox::Table        11.3/s                       --             -62%               -81%              -93%               -94%                        -94%                   -96%                  -97%                   -97%               -97%                 -97%         -98%                    -98%               -98%                           -99%              -99%              -99%                          -99%              -99%                  -99% 
-      Text::ANSITable                  30/s                     167%               --               -50%              -81%               -84%                        -86%                   -90%                  -92%                   -93%               -93%                 -94%         -95%                    -95%               -95%                           -97%              -98%              -98%                          -98%              -99%                  -99% 
-      Text::Table::More              61.7/s                     445%             103%                 --              -61%               -69%                        -71%                   -79%                  -85%                   -85%               -87%                 -88%         -90%                    -91%               -91%                           -95%              -97%              -97%                          -97%              -98%                  -98% 
-      Text::ASCIITable                162/s                    1332%             434%               162%                --               -18%                        -25%                   -46%                  -62%                   -63%               -65%                 -70%         -74%                    -77%               -78%                           -87%              -92%              -92%                          -92%              -95%                  -95% 
-      Text::FormatTable               200/s                    1668%             560%               223%               23%                 --                         -7%                   -34%                  -53%                   -54%               -57%                 -63%         -69%                    -72%               -73%                           -84%              -90%              -90%                          -90%              -94%                  -94% 
-      Text::Table::TinyColorWide      217/s                    1817%             615%               251%               33%                 8%                          --                   -28%                  -49%                   -50%               -54%                 -59%         -66%                    -70%               -70%                           -82%              -90%              -90%                          -90%              -94%                  -94% 
-      Text::Table::TinyWide           304/s                    2586%             903%               392%               87%                51%                         40%                     --                  -29%                   -30%               -36%                 -43%         -52%                    -58%               -58%                           -75%              -85%              -86%                          -86%              -92%                  -92% 
-      Text::TabularDisplay            431/s                    3710%            1322%               598%              165%               115%                         98%                    41%                    --                    -1%                -9%                 -20%         -33%                    -41%               -41%                           -65%              -80%              -80%                          -80%              -88%                  -89% 
-      Text::Table::Manifold           439/s                    3777%            1347%               610%              170%               119%                        102%                    44%                    1%                     --                -7%                 -18%         -32%                    -40%               -40%                           -65%              -79%              -79%                          -80%              -88%                  -88% 
-      Text::Table::Tiny               477/s                    4109%            1471%               671%              193%               138%                        119%                    56%                   10%                     8%                 --                 -11%         -26%                    -35%               -35%                           -62%              -78%              -78%                          -78%              -87%                  -88% 
-      Text::MarkdownTable             540/s                    4678%            1683%               775%              233%               170%                        149%                    77%                   25%                    23%                13%                   --         -16%                    -26%               -27%                           -57%              -75%              -75%                          -75%              -85%                  -86% 
-      Text::Table                     646/s                    5603%            2029%               945%              298%               222%                        197%                   112%                   49%                    47%                35%                  19%           --                    -12%               -12%                           -49%              -70%              -70%                          -70%              -83%                  -83% 
-      Text::Table::TinyColor          735/s                    6400%            2326%              1091%              353%               267%                        238%                   141%                   70%                    67%                54%                  36%          13%                      --                 0%                           -41%              -66%              -66%                          -66%              -80%                  -81% 
-      Text::Table::HTML               743/s                    6448%            2344%              1099%              357%               270%                        241%                   143%                   71%                    68%                55%                  37%          14%                      0%                 --                           -41%              -65%              -65%                          -66%              -80%                  -81% 
-      Text::Table::HTML::DataTables  1300/s                   11089%            4077%              1950%              681%               532%                        483%                   316%                  193%                   188%               165%                 134%          96%                     72%                70%                             --              -41%              -41%                          -42%              -66%                  -68% 
-      Text::Table::Org               2170/s                   19075%            7058%              3414%             1238%               984%                        900%                   613%                  403%                   394%               355%                 301%         236%                    195%               192%                            71%                --                0%                           -1%              -43%                  -45% 
-      Text::Table::CSV               2170/s                   19117%            7073%              3421%             1241%               986%                        902%                   615%                  404%                   395%               356%                 302%         236%                    195%               193%                            71%                0%                --                           -1%              -43%                  -45% 
-      Text::Table::TinyBorderStyle   2210/s                   19457%            7200%              3484%             1265%              1006%                        919%                   627%                  413%                   404%               364%                 309%         242%                    200%               198%                            74%                1%                1%                            --              -42%                  -44% 
-      Text::Table::Any               3810/s                   33640%           12495%              6083%             2254%              1808%                       1659%                  1155%                  785%                   770%               701%                 606%         491%                    419%               415%                           201%               75%               75%                           72%                --                   -3% 
-      Text::Table::Sprintf           3960/s                   34979%           12995%              6328%             2348%              1884%                       1729%                  1205%                  820%                   804%               733%                 634%         515%                    439%               435%                           213%               82%               82%                           79%                3%                    -- 
+                                       Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table::TinyWide  Text::SimpleTable  Text::TabularDisplay  Text::Table::Manifold  Text::Table::Tiny  Text::MarkdownTable  Text::Table::HTML  Text::Table  Text::Table::TinyColor  Text::Table::HTML::DataTables  Text::Table::TinyBorderStyle  Text::Table::Org  Text::Table::CSV  Text::Table::Any  Text::Table::Sprintf 
+      Text::UnicodeBox::Table         7.8/s                       --             -61%               -69%              -93%               -95%                        -95%                   -96%               -97%                  -97%                   -97%               -98%                 -98%               -98%         -98%                    -98%                           -99%                          -99%              -99%              -99%              -99%                  -99% 
+      Text::ANSITable                  20/s                     160%               --               -19%              -84%               -87%                        -88%                   -91%               -93%                  -94%                   -94%               -94%                 -95%               -96%         -96%                    -96%                           -98%                          -98%              -98%              -98%              -99%                  -99% 
+      Text::Table::More                25/s                     225%              25%                 --              -80%               -84%                        -85%                   -89%               -91%                  -92%                   -93%               -93%                 -94%               -95%         -95%                    -95%                           -97%                          -98%              -98%              -98%              -99%                  -99% 
+      Text::ASCIITable                100/s                    1525%             525%               400%                --               -21%                        -27%                   -48%               -58%                  -63%                   -65%               -67%                 -71%               -75%         -75%                    -78%                           -87%                          -90%              -92%              -93%              -95%                  -95% 
+      Text::FormatTable               160/s                    1963%             693%               534%               26%                 --                         -7%                   -34%               -47%                  -53%                   -55%               -58%                 -63%               -68%         -68%                    -73%                           -84%                          -88%              -90%              -91%              -94%                  -94% 
+      Text::Table::TinyColorWide      170/s                    2141%             762%               589%               37%                 8%                          --                   -29%               -43%                  -50%                   -51%               -55%                 -60%               -65%         -65%                    -70%                           -82%                          -87%              -89%              -90%              -94%                  -94% 
+      Text::Table::TinyWide           250/s                    3070%            1119%               875%               95%                53%                         41%                     --               -19%                  -29%                   -31%               -36%                 -43%               -51%         -51%                    -58%                           -75%                          -82%              -85%              -86%              -91%                  -91% 
+      Text::SimpleTable               310/s                    3839%            1415%              1112%              142%                90%                         75%                    24%                 --                  -12%                   -15%               -21%                 -30%               -39%         -39%                    -48%                           -69%                          -77%              -81%              -83%              -89%                  -89% 
+      Text::TabularDisplay            340/s                    4382%            1624%              1279%              175%               117%                        100%                    41%                13%                    --                    -3%               -10%                 -20%               -31%         -31%                    -41%                           -65%                          -74%              -78%              -80%              -88%                  -88% 
+      Text::Table::Manifold           350/s                    4542%            1685%              1328%              185%               125%                        107%                    46%                17%                    3%                     --                -7%                 -17%               -28%         -28%                    -39%                           -64%                          -73%              -78%              -80%              -87%                  -87% 
+      Text::Table::Tiny               380/s                    4900%            1823%              1438%              207%               142%                        123%                    57%                26%                   11%                     7%                 --                 -11%               -23%         -23%                    -34%                           -61%                          -71%              -76%              -78%              -86%                  -86% 
+      Text::MarkdownTable             430/s                    5552%            2073%              1639%              247%               173%                        152%                    78%                43%                   26%                    21%                13%                   --               -13%         -13%                    -26%                           -56%                          -68%              -73%              -75%              -84%                  -85% 
+      Text::Table::HTML               400/s                    6400%            2400%              1900%              300%               215%                        190%                   104%                64%                   44%                    39%                30%                  14%                 --           0%                    -15%                           -50%                          -63%              -69%              -72%              -82%                  -82% 
+      Text::Table                     510/s                    6400%            2400%              1900%              300%               215%                        190%                   104%                64%                   44%                    39%                30%                  14%                 0%           --                    -15%                           -50%                          -63%              -69%              -72%              -82%                  -82% 
+      Text::Table::TinyColor          590/s                    7547%            2841%              2252%              370%               270%                        241%                   141%                94%                   70%                    64%                52%                  35%                17%          17%                      --                           -41%                          -57%              -64%              -67%              -79%                  -79% 
+      Text::Table::HTML::DataTables   990/s                   12900%            4900%              3900%              700%               530%                        480%                   309%               229%                  190%                   179%               160%                 129%               100%         100%                     70%                             --                          -27%              -39%              -44%              -65%                  -65% 
+      Text::Table::TinyBorderStyle   1400/s                   17708%            6749%              5379%              995%               763%                        694%                   461%               352%                  297%                   283%               256%                 215%               173%         173%                    132%                            36%                            --              -16%              -23%              -52%                  -53% 
+      Text::Table::Org               1600/s                   21211%            8096%              6457%             1211%               932%                        850%                   572%               440%                  375%                   359%               326%                 277%               227%         227%                    178%                            63%                           19%                --               -8%              -42%                  -44% 
+      Text::Table::CSV               1800/s                   23281%            8892%              7094%             1338%              1033%                        943%                   637%               493%                  421%                   403%               367%                 313%               259%         259%                    205%                            79%                           31%                9%                --              -37%                  -38% 
+      Text::Table::Any               2880/s                   37256%           14267%             11394%             2198%              1710%                       1566%                  1078%               848%                  733%                   704%               647%                 560%               474%         474%                    388%                           187%                          109%               75%               59%                --                   -2% 
+      Text::Table::Sprintf           2930/s                   38023%           14562%             11630%             2246%              1747%                       1600%                  1102%               867%                  750%                   721%               662%                 574%               486%         486%                    398%                           193%                          114%               78%               63%                2%                    -- 
  
      Legends:
        Text::ANSITable: participant=Text::ANSITable
        Text::ASCIITable: participant=Text::ASCIITable
        Text::FormatTable: participant=Text::FormatTable
        Text::MarkdownTable: participant=Text::MarkdownTable
+       Text::SimpleTable: participant=Text::SimpleTable
        Text::Table: participant=Text::Table
        Text::Table::Any: participant=Text::Table::Any
        Text::Table::CSV: participant=Text::Table::CSV
@@ -499,67 +538,66 @@ BENCHMARK SAMPLE RESULTS
        Text::Table::TinyWide: participant=Text::Table::TinyWide
        Text::TabularDisplay: participant=Text::TabularDisplay
        Text::UnicodeBox::Table: participant=Text::UnicodeBox::Table
-
-    The above result presented as chart:
-
-    Result formatted as table (split, part 3 of 5):
 
      #table3#
      {dataset=>"small (3x5)"}
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
      | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Text::UnicodeBox::Table       |     300   | 4         |                 0.00% |             46360.22% | 4.6e-05 |      20 |
-     | Text::ANSITable               |    1120   | 0.89      |               332.32% |             10646.84% | 2.7e-07 |      20 |
-     | Text::Table::More             |    2500   | 0.4       |               854.89% |              4765.52% | 4.3e-07 |      20 |
-     | Text::ASCIITable              |    6100   | 0.16      |              2256.09% |              1871.92% | 2.1e-07 |      20 |
-     | Text::FormatTable             |    8680   | 0.115     |              3238.29% |              1291.74% | 5.3e-08 |      20 |
-     | Text::Table::Manifold         |    9500   | 0.11      |              3561.69% |              1168.82% | 1.6e-07 |      20 |
-     | Text::Table                   |    9600   | 0.1       |              3588.47% |              1159.61% | 2.1e-07 |      20 |
-     | Text::Table::TinyColorWide    |    9930   | 0.101     |              3721.66% |              1115.71% | 9.9e-08 |      23 |
-     | Text::Table::TinyWide         |   14000   | 0.0715    |              5280.40% |               763.51% | 2.7e-08 |      20 |
-     | Text::Table::TinyBorderStyle  |   14600   | 0.0683    |              5531.98% |               724.94% | 2.7e-08 |      20 |
-     | Text::MarkdownTable           |   16000   | 0.064     |              5901.06% |               674.20% | 1.1e-07 |      20 |
-     | Text::Table::HTML::DataTables |   18000   | 0.055     |              6884.01% |               565.24% | 8.3e-08 |      33 |
-     | Text::Table::Tiny             |   18408.4 | 0.0543232 |              6983.55% |               555.89% |   0     |      20 |
-     | Text::TabularDisplay          |   18900   | 0.0529    |              7177.45% |               538.41% | 2.5e-08 |      22 |
-     | Text::Table::TinyColor        |   29300   | 0.0341    |             11168.24% |               312.31% | 1.3e-08 |      22 |
-     | Text::Table::HTML             |   38400   | 0.026     |             14681.96% |               214.30% | 1.3e-08 |      20 |
-     | Text::Table::Org              |   68200   | 0.0147    |             26145.72% |                77.02% | 6.1e-09 |      24 |
-     | Text::Table::CSV              |   95800   | 0.0104    |             36764.56% |                26.03% | 8.6e-09 |      27 |
-     | Text::Table::Any              |  108000   | 0.00928   |             41362.43% |                12.05% | 2.9e-09 |      26 |
-     | Text::Table::Sprintf          |  121000   | 0.00828   |             46360.22% |                 0.00% | 2.6e-09 |      32 |
+     | Text::UnicodeBox::Table       |       200 |    5      |                 0.00% |             49318.62% | 6.5e-05 |      20 |
+     | Text::ANSITable               |       710 |    1.4    |               273.25% |             13140.15% | 5.4e-06 |      20 |
+     | Text::Table::More             |      1000 |    0.99   |               432.26% |              9184.73% | 1.8e-06 |      20 |
+     | Text::Table::TinyBorderStyle  |      3900 |    0.26   |              1949.48% |              2311.27% | 6.9e-07 |      20 |
+     | Text::ASCIITable              |      4800 |    0.21   |              2417.39% |              1863.09% | 1.3e-06 |      21 |
+     | Text::FormatTable             |      6800 |    0.15   |              3516.95% |              1266.30% | 6.9e-07 |      20 |
+     | Text::Table                   |      7700 |    0.13   |              3978.23% |              1111.77% | 2.5e-07 |      22 |
+     | Text::Table::Manifold         |      7800 |    0.13   |              4013.06% |              1101.50% | 2.1e-07 |      20 |
+     | Text::Table::TinyColorWide    |      7900 |    0.13   |              4082.92% |              1081.44% | 2.1e-07 |      20 |
+     | Text::Table::TinyWide         |     11000 |    0.089  |              5805.69% |               736.80% | 1.1e-07 |      20 |
+     | Text::MarkdownTable           |     12000 |    0.081  |              6428.62% |               656.95% | 8.6e-08 |      31 |
+     | Text::SimpleTable             |     13000 |    0.077  |              6777.54% |               618.55% |   1e-07 |      33 |
+     | Text::TabularDisplay          |     15000 |    0.066  |              7937.39% |               514.86% | 4.3e-07 |      20 |
+     | Text::Table::HTML::DataTables |     15000 |    0.066  |              7962.70% |               512.93% | 9.5e-08 |      25 |
+     | Text::Table::Tiny             |     15300 |    0.0653 |              7993.91% |               510.57% | 2.6e-08 |      21 |
+     | Text::Table::TinyColor        |     24000 |    0.0417 |             12569.86% |               290.05% | 1.3e-08 |      20 |
+     | Text::Table::HTML             |     24800 |    0.0403 |             13012.25% |               276.89% | 1.3e-08 |      20 |
+     | Text::Table::Org              |     52600 |    0.019  |             27683.28% |                77.87% | 6.1e-09 |      24 |
+     | Text::Table::CSV              |     78900 |    0.0127 |             41573.53% |                18.59% |   5e-09 |      35 |
+     | Text::Table::Any              |     80600 |    0.0124 |             42507.83% |                15.98% | 3.3e-09 |      20 |
+     | Text::Table::Sprintf          |     93500 |    0.0107 |             49318.62% |                 0.00% |   3e-09 |      24 |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
-    The above result formatted in Benchmark.pm style:
+    Formatted as Benchmark.pm result:
 
-                                          Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::FormatTable  Text::Table::Manifold  Text::Table::TinyColorWide  Text::Table  Text::Table::TinyWide  Text::Table::TinyBorderStyle  Text::MarkdownTable  Text::Table::HTML::DataTables  Text::Table::Tiny  Text::TabularDisplay  Text::Table::TinyColor  Text::Table::HTML  Text::Table::Org  Text::Table::CSV  Text::Table::Any  Text::Table::Sprintf 
-      Text::UnicodeBox::Table            300/s                       --             -77%               -90%              -96%               -97%                   -97%                        -97%         -97%                   -98%                          -98%                 -98%                           -98%               -98%                  -98%                    -99%               -99%              -99%              -99%              -99%                  -99% 
-      Text::ANSITable                   1120/s                     349%               --               -55%              -82%               -87%                   -87%                        -88%         -88%                   -91%                          -92%                 -92%                           -93%               -93%                  -94%                    -96%               -97%              -98%              -98%              -98%                  -99% 
-      Text::Table::More                 2500/s                     900%             122%                 --              -60%               -71%                   -72%                        -74%         -75%                   -82%                          -82%                 -84%                           -86%               -86%                  -86%                    -91%               -93%              -96%              -97%              -97%                  -97% 
-      Text::ASCIITable                  6100/s                    2400%             456%               150%                --               -28%                   -31%                        -36%         -37%                   -55%                          -57%                 -60%                           -65%               -66%                  -66%                    -78%               -83%              -90%              -93%              -94%                  -94% 
-      Text::FormatTable                 8680/s                    3378%             673%               247%               39%                 --                    -4%                        -12%         -13%                   -37%                          -40%                 -44%                           -52%               -52%                  -54%                    -70%               -77%              -87%              -90%              -91%                  -92% 
-      Text::Table::Manifold             9500/s                    3536%             709%               263%               45%                 4%                     --                         -8%          -9%                   -35%                          -37%                 -41%                           -50%               -50%                  -51%                    -69%               -76%              -86%              -90%              -91%                  -92% 
-      Text::Table::TinyColorWide        9930/s                    3860%             781%               296%               58%                13%                     8%                          --           0%                   -29%                          -32%                 -36%                           -45%               -46%                  -47%                    -66%               -74%              -85%              -89%              -90%                  -91% 
-      Text::Table                       9600/s                    3900%             790%               300%               59%                14%                     9%                          1%           --                   -28%                          -31%                 -36%                           -45%               -45%                  -47%                    -65%               -74%              -85%              -89%              -90%                  -91% 
-      Text::Table::TinyWide            14000/s                    5494%            1144%               459%              123%                60%                    53%                         41%          39%                     --                           -4%                 -10%                           -23%               -24%                  -26%                    -52%               -63%              -79%              -85%              -87%                  -88% 
-      Text::Table::TinyBorderStyle     14600/s                    5756%            1203%               485%              134%                68%                    61%                         47%          46%                     4%                            --                  -6%                           -19%               -20%                  -22%                    -50%               -61%              -78%              -84%              -86%                  -87% 
-      Text::MarkdownTable              16000/s                    6150%            1290%               525%              150%                79%                    71%                         57%          56%                    11%                            6%                   --                           -14%               -15%                  -17%                    -46%               -59%              -77%              -83%              -85%                  -87% 
-      Text::Table::HTML::DataTables    18000/s                    7172%            1518%               627%              190%               109%                   100%                         83%          81%                    29%                           24%                  16%                             --                -1%                   -3%                    -38%               -52%              -73%              -81%              -83%                  -84% 
-      Text::Table::Tiny              18408.4/s                    7263%            1538%               636%              194%               111%                   102%                         85%          84%                    31%                           25%                  17%                             1%                 --                   -2%                    -37%               -52%              -72%              -80%              -82%                  -84% 
-      Text::TabularDisplay             18900/s                    7461%            1582%               656%              202%               117%                   107%                         90%          89%                    35%                           29%                  20%                             3%                 2%                    --                    -35%               -50%              -72%              -80%              -82%                  -84% 
-      Text::Table::TinyColor           29300/s                   11630%            2509%              1073%              369%               237%                   222%                        196%         193%                   109%                          100%                  87%                            61%                59%                   55%                      --               -23%              -56%              -69%              -72%                  -75% 
-      Text::Table::HTML                38400/s                   15284%            3323%              1438%              515%               342%                   323%                        288%         284%                   175%                          162%                 146%                           111%               108%                  103%                     31%                 --              -43%              -60%              -64%                  -68% 
-      Text::Table::Org                 68200/s                   27110%            5954%              2621%              988%               682%                   648%                        587%         580%                   386%                          364%                 335%                           274%               269%                  259%                    131%                76%                --              -29%              -36%                  -43% 
-      Text::Table::CSV                 95800/s                   38361%            8457%              3746%             1438%              1005%                   957%                        871%         861%                   587%                          556%                 515%                           428%               422%                  408%                    227%               150%               41%                --              -10%                  -20% 
-      Text::Table::Any                108000/s                   43003%            9490%              4210%             1624%              1139%                  1085%                        988%         977%                   670%                          635%                 589%                           492%               485%                  470%                    267%               180%               58%               12%                --                  -10% 
-      Text::Table::Sprintf            121000/s                   48209%           10648%              4730%             1832%              1288%                  1228%                       1119%        1107%                   763%                          724%                 672%                           564%               556%                  538%                    311%               214%               77%               25%               12%                    -- 
+                                        Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::Table::TinyBorderStyle  Text::ASCIITable  Text::FormatTable  Text::Table  Text::Table::Manifold  Text::Table::TinyColorWide  Text::Table::TinyWide  Text::MarkdownTable  Text::SimpleTable  Text::TabularDisplay  Text::Table::HTML::DataTables  Text::Table::Tiny  Text::Table::TinyColor  Text::Table::HTML  Text::Table::Org  Text::Table::CSV  Text::Table::Any  Text::Table::Sprintf 
+      Text::UnicodeBox::Table          200/s                       --             -72%               -80%                          -94%              -95%               -97%         -97%                   -97%                        -97%                   -98%                 -98%               -98%                  -98%                           -98%               -98%                    -99%               -99%              -99%              -99%              -99%                  -99% 
+      Text::ANSITable                  710/s                     257%               --               -29%                          -81%              -85%               -89%         -90%                   -90%                        -90%                   -93%                 -94%               -94%                  -95%                           -95%               -95%                    -97%               -97%              -98%              -99%              -99%                  -99% 
+      Text::Table::More               1000/s                     405%              41%                 --                          -73%              -78%               -84%         -86%                   -86%                        -86%                   -91%                 -91%               -92%                  -93%                           -93%               -93%                    -95%               -95%              -98%              -98%              -98%                  -98% 
+      Text::Table::TinyBorderStyle    3900/s                    1823%             438%               280%                            --              -19%               -42%         -50%                   -50%                        -50%                   -65%                 -68%               -70%                  -74%                           -74%               -74%                    -83%               -84%              -92%              -95%              -95%                  -95% 
+      Text::ASCIITable                4800/s                    2280%             566%               371%                           23%                --               -28%         -38%                   -38%                        -38%                   -57%                 -61%               -63%                  -68%                           -68%               -68%                    -80%               -80%              -90%              -93%              -94%                  -94% 
+      Text::FormatTable               6800/s                    3233%             833%               560%                           73%               39%                 --         -13%                   -13%                        -13%                   -40%                 -46%               -48%                  -55%                           -55%               -56%                    -72%               -73%              -87%              -91%              -91%                  -92% 
+      Text::Table                     7700/s                    3746%             976%               661%                          100%               61%                15%           --                     0%                          0%                   -31%                 -37%               -40%                  -49%                           -49%               -49%                    -67%               -69%              -85%              -90%              -90%                  -91% 
+      Text::Table::Manifold           7800/s                    3746%             976%               661%                          100%               61%                15%           0%                     --                          0%                   -31%                 -37%               -40%                  -49%                           -49%               -49%                    -67%               -69%              -85%              -90%              -90%                  -91% 
+      Text::Table::TinyColorWide      7900/s                    3746%             976%               661%                          100%               61%                15%           0%                     0%                          --                   -31%                 -37%               -40%                  -49%                           -49%               -49%                    -67%               -69%              -85%              -90%              -90%                  -91% 
+      Text::Table::TinyWide          11000/s                    5517%            1473%              1012%                          192%              135%                68%          46%                    46%                         46%                     --                  -8%               -13%                  -25%                           -25%               -26%                    -53%               -54%              -78%              -85%              -86%                  -87% 
+      Text::MarkdownTable            12000/s                    6072%            1628%              1122%                          220%              159%                85%          60%                    60%                         60%                     9%                   --                -4%                  -18%                           -18%               -19%                    -48%               -50%              -76%              -84%              -84%                  -86% 
+      Text::SimpleTable              13000/s                    6393%            1718%              1185%                          237%              172%                94%          68%                    68%                         68%                    15%                   5%                 --                  -14%                           -14%               -15%                    -45%               -47%              -75%              -83%              -83%                  -86% 
+      Text::TabularDisplay           15000/s                    7475%            2021%              1400%                          293%              218%               127%          96%                    96%                         96%                    34%                  22%                16%                    --                             0%                -1%                    -36%               -38%              -71%              -80%              -81%                  -83% 
+      Text::Table::HTML::DataTables  15000/s                    7475%            2021%              1400%                          293%              218%               127%          96%                    96%                         96%                    34%                  22%                16%                    0%                             --                -1%                    -36%               -38%              -71%              -80%              -81%                  -83% 
+      Text::Table::Tiny              15300/s                    7556%            2043%              1416%                          298%              221%               129%          99%                    99%                         99%                    36%                  24%                17%                    1%                             1%                 --                    -36%               -38%              -70%              -80%              -81%                  -83% 
+      Text::Table::TinyColor         24000/s                   11890%            3257%              2274%                          523%              403%               259%         211%                   211%                        211%                   113%                  94%                84%                   58%                            58%                56%                      --                -3%              -54%              -69%              -70%                  -74% 
+      Text::Table::HTML              24800/s                   12306%            3373%              2356%                          545%              421%               272%         222%                   222%                        222%                   120%                 100%                91%                   63%                            63%                62%                      3%                 --              -52%              -68%              -69%                  -73% 
+      Text::Table::Org               52600/s                   26215%            7268%              5110%                         1268%             1005%               689%         584%                   584%                        584%                   368%                 326%               305%                  247%                           247%               243%                    119%               112%                --              -33%              -34%                  -43% 
+      Text::Table::CSV               78900/s                   39270%           10923%              7695%                         1947%             1553%              1081%         923%                   923%                        923%                   600%                 537%               506%                  419%                           419%               414%                    228%               217%               49%                --               -2%                  -15% 
+      Text::Table::Any               80600/s                   40222%           11190%              7883%                         1996%             1593%              1109%         948%                   948%                        948%                   617%                 553%               520%                  432%                           432%               426%                    236%               225%               53%                2%                --                  -13% 
+      Text::Table::Sprintf           93500/s                   46628%           12984%              9152%                         2329%             1862%              1301%        1114%                  1114%                       1114%                   731%                 657%               619%                  516%                           516%               510%                    289%               276%               77%               18%               15%                    -- 
  
      Legends:
        Text::ANSITable: participant=Text::ANSITable
        Text::ASCIITable: participant=Text::ASCIITable
        Text::FormatTable: participant=Text::FormatTable
        Text::MarkdownTable: participant=Text::MarkdownTable
+       Text::SimpleTable: participant=Text::SimpleTable
        Text::Table: participant=Text::Table
        Text::Table::Any: participant=Text::Table::Any
        Text::Table::CSV: participant=Text::Table::CSV
@@ -576,67 +614,66 @@ BENCHMARK SAMPLE RESULTS
        Text::Table::TinyWide: participant=Text::Table::TinyWide
        Text::TabularDisplay: participant=Text::TabularDisplay
        Text::UnicodeBox::Table: participant=Text::UnicodeBox::Table
-
-    The above result presented as chart:
-
-    Result formatted as table (split, part 4 of 5):
 
      #table4#
      {dataset=>"tiny (1x1)"}
-     +-------------------------------+-----------+------------+-----------------------+-----------------------+---------+---------+
-     | participant                   | rate (/s) |  time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +-------------------------------+-----------+------------+-----------------------+-----------------------+---------+---------+
-     | Text::UnicodeBox::Table       |       600 | 2          |                 0.00% |             61075.10% | 6.5e-05 |      20 |
-     | Text::ANSITable               |      4020 | 0.249      |               586.14% |              8815.88% | 2.1e-07 |      21 |
-     | Text::Table::More             |      9500 | 0.11       |              1524.04% |              3666.85% | 2.7e-07 |      20 |
-     | Text::Table::Manifold         |     16000 | 0.062      |              2650.29% |              2124.32% | 1.2e-07 |      25 |
-     | Text::Table::TinyBorderStyle  |     19000 | 0.052      |              3155.00% |              1779.42% | 1.2e-07 |      25 |
-     | Text::ASCIITable              |     21000 | 0.047      |              3555.71% |              1573.41% | 5.3e-08 |      20 |
-     | Text::Table::HTML::DataTables |     25000 | 0.04       |              4152.36% |              1338.61% | 9.5e-08 |      25 |
-     | Text::Table                   |     26000 | 0.039      |              4295.16% |              1291.87% | 5.3e-08 |      20 |
-     | Text::MarkdownTable           |     31000 | 0.033      |              5151.57% |              1064.89% | 5.3e-08 |      20 |
-     | Text::FormatTable             |     43000 | 0.023      |              7228.34% |               734.77% | 2.7e-08 |      30 |
-     | Text::Table::TinyColorWide    |     59000 | 0.017      |              9966.01% |               507.74% | 2.7e-08 |      20 |
-     | Text::Table::Tiny             |     65800 | 0.0152     |             11142.60% |               444.14% | 5.8e-09 |      26 |
-     | Text::Table::TinyWide         |     75800 | 0.0132     |             12842.13% |               372.68% | 6.7e-09 |      20 |
-     | Text::TabularDisplay          |     76700 | 0.013      |             12990.18% |               367.34% | 6.5e-09 |      21 |
-     | Text::Table::TinyColor        |    115103 | 0.00868789 |             19555.45% |               211.24% |   0     |      23 |
-     | Text::Table::HTML             |    180000 | 0.0056     |             30532.11% |                99.71% | 6.7e-09 |      20 |
-     | Text::Table::Org              |    180000 | 0.0054     |             31396.78% |                94.23% | 6.7e-09 |      20 |
-     | Text::Table::Any              |    258245 | 0.00387228 |             43999.10% |                38.72% |   0     |      20 |
-     | Text::Table::Sprintf          |    352000 | 0.00284    |             60033.82% |                 1.73% | 7.8e-10 |      23 |
-     | Text::Table::CSV              |    358000 | 0.00279    |             61075.10% |                 0.00% | 8.3e-10 |      20 |
-     +-------------------------------+-----------+------------+-----------------------+-----------------------+---------+---------+
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | Text::UnicodeBox::Table       |     400   | 3         |                 0.00% |             75061.76% | 7.2e-05 |      20 |
+     | Text::ANSITable               |    2300   | 0.44      |               481.41% |             12827.45% | 1.3e-06 |      20 |
+     | Text::Table::More             |    3000   | 0.33      |               673.26% |              9620.14% | 2.2e-06 |      20 |
+     | Text::Table::TinyBorderStyle  |    4800   | 0.21      |              1127.95% |              6020.92% | 6.9e-07 |      20 |
+     | Text::Table::Manifold         |   14000   | 0.073     |              3390.75% |              2053.17% | 1.1e-07 |      20 |
+     | Text::ASCIITable              |   17000   | 0.06      |              4189.96% |              1652.04% | 3.5e-07 |      20 |
+     | Text::Table                   |   20000   | 0.05      |              4719.47% |              1459.55% | 6.7e-07 |      20 |
+     | Text::Table::HTML::DataTables |   21000   | 0.048     |              5262.00% |              1301.75% | 9.7e-08 |      24 |
+     | Text::MarkdownTable           |   25000   | 0.04      |              6258.17% |              1082.13% | 1.1e-07 |      20 |
+     | Text::FormatTable             |   34000   | 0.029     |              8611.91% |               762.75% | 1.1e-07 |      22 |
+     | Text::Table::TinyColorWide    |   46000   | 0.022     |             11750.19% |               534.27% |   3e-08 |      24 |
+     | Text::Table::Tiny             |   54000   | 0.018     |             13862.61% |               438.31% | 2.6e-08 |      21 |
+     | Text::Table::TinyWide         |   60000   | 0.017     |             15386.79% |               385.33% |   2e-08 |      20 |
+     | Text::TabularDisplay          |   62468.1 | 0.0160082 |             15911.46% |               369.42% |   0     |      20 |
+     | Text::SimpleTable             |   64700   | 0.0155    |             16471.25% |               353.57% | 6.7e-09 |      20 |
+     | Text::Table::TinyColor        |   91000   | 0.011     |             23131.41% |               223.54% | 1.3e-08 |      22 |
+     | Text::Table::HTML             |  120000   | 0.0082    |             31181.42% |               140.28% |   1e-08 |      20 |
+     | Text::Table::Org              |  142000   | 0.00703   |             36356.69% |               106.17% | 2.9e-09 |      26 |
+     | Text::Table::Any              |  180000   | 0.0054    |             47266.53% |                58.68% | 6.5e-09 |      21 |
+     | Text::Table::Sprintf          |  270000   | 0.0037    |             68997.45% |                 8.78% | 1.3e-08 |      20 |
+     | Text::Table::CSV              |  293000   | 0.00341   |             75061.76% |                 0.00% | 1.4e-09 |      29 |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
-    The above result formatted in Benchmark.pm style:
+    Formatted as Benchmark.pm result:
 
-                                         Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::Table::Manifold  Text::Table::TinyBorderStyle  Text::ASCIITable  Text::Table::HTML::DataTables  Text::Table  Text::MarkdownTable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table::Tiny  Text::Table::TinyWide  Text::TabularDisplay  Text::Table::TinyColor  Text::Table::HTML  Text::Table::Org  Text::Table::Any  Text::Table::Sprintf  Text::Table::CSV 
-      Text::UnicodeBox::Table           600/s                       --             -87%               -94%                   -96%                          -97%              -97%                           -98%         -98%                 -98%               -98%                        -99%               -99%                   -99%                  -99%                    -99%               -99%              -99%              -99%                  -99%              -99% 
-      Text::ANSITable                  4020/s                     703%               --               -55%                   -75%                          -79%              -81%                           -83%         -84%                 -86%               -90%                        -93%               -93%                   -94%                  -94%                    -96%               -97%              -97%              -98%                  -98%              -98% 
-      Text::Table::More                9500/s                    1718%             126%                 --                   -43%                          -52%              -57%                           -63%         -64%                 -70%               -79%                        -84%               -86%                   -88%                  -88%                    -92%               -94%              -95%              -96%                  -97%              -97% 
-      Text::Table::Manifold           16000/s                    3125%             301%                77%                     --                          -16%              -24%                           -35%         -37%                 -46%               -62%                        -72%               -75%                   -78%                  -79%                    -85%               -90%              -91%              -93%                  -95%              -95% 
-      Text::Table::TinyBorderStyle    19000/s                    3746%             378%               111%                    19%                            --               -9%                           -23%         -25%                 -36%               -55%                        -67%               -70%                   -74%                  -75%                    -83%               -89%              -89%              -92%                  -94%              -94% 
-      Text::ASCIITable                21000/s                    4155%             429%               134%                    31%                           10%                --                           -14%         -17%                 -29%               -51%                        -63%               -67%                   -71%                  -72%                    -81%               -88%              -88%              -91%                  -93%              -94% 
-      Text::Table::HTML::DataTables   25000/s                    4900%             522%               175%                    55%                           29%               17%                             --          -2%                 -17%               -42%                        -57%               -62%                   -67%                  -67%                    -78%               -86%              -86%              -90%                  -92%              -93% 
-      Text::Table                     26000/s                    5028%             538%               182%                    58%                           33%               20%                             2%           --                 -15%               -41%                        -56%               -61%                   -66%                  -66%                    -77%               -85%              -86%              -90%                  -92%              -92% 
-      Text::MarkdownTable             31000/s                    5960%             654%               233%                    87%                           57%               42%                            21%          18%                   --               -30%                        -48%               -53%                   -60%                  -60%                    -73%               -83%              -83%              -88%                  -91%              -91% 
-      Text::FormatTable               43000/s                    8595%             982%               378%                   169%                          126%              104%                            73%          69%                  43%                 --                        -26%               -33%                   -42%                  -43%                    -62%               -75%              -76%              -83%                  -87%              -87% 
-      Text::Table::TinyColorWide      59000/s                   11664%            1364%               547%                   264%                          205%              176%                           135%         129%                  94%                35%                          --               -10%                   -22%                  -23%                    -48%               -67%              -68%              -77%                  -83%              -83% 
-      Text::Table::Tiny               65800/s                   13057%            1538%               623%                   307%                          242%              209%                           163%         156%                 117%                51%                         11%                 --                   -13%                  -14%                    -42%               -63%              -64%              -74%                  -81%              -81% 
-      Text::Table::TinyWide           75800/s                   15051%            1786%               733%                   369%                          293%              256%                           203%         195%                 150%                74%                         28%                15%                     --                   -1%                    -34%               -57%              -59%              -70%                  -78%              -78% 
-      Text::TabularDisplay            76700/s                   15284%            1815%               746%                   376%                          300%              261%                           207%         200%                 153%                76%                         30%                16%                     1%                    --                    -33%               -56%              -58%              -70%                  -78%              -78% 
-      Text::Table::TinyColor         115103/s                   22920%            2766%              1166%                   613%                          498%              440%                           360%         348%                 279%               164%                         95%                74%                    51%                   49%                      --               -35%              -37%              -55%                  -67%              -67% 
-      Text::Table::HTML              180000/s                   35614%            4346%              1864%                  1007%                          828%              739%                           614%         596%                 489%               310%                        203%               171%                   135%                  132%                     55%                 --               -3%              -30%                  -49%              -50% 
-      Text::Table::Org               180000/s                   36937%            4511%              1937%                  1048%                          862%              770%                           640%         622%                 511%               325%                        214%               181%                   144%                  140%                     60%                 3%                --              -28%                  -47%              -48% 
-      Text::Table::Any               258245/s                   51549%            6330%              2740%                  1501%                         1242%             1113%                           932%         907%                 752%               493%                        339%               292%                   240%                  235%                    124%                44%               39%                --                  -26%              -27% 
-      Text::Table::Sprintf           352000/s                   70322%            8667%              3773%                  2083%                         1730%             1554%                          1308%        1273%                1061%               709%                        498%               435%                   364%                  357%                    205%                97%               90%               36%                    --               -1% 
-      Text::Table::CSV               358000/s                   71584%            8824%              3842%                  2122%                         1763%             1584%                          1333%        1297%                1082%               724%                        509%               444%                   373%                  365%                    211%               100%               93%               38%                    1%                -- 
+                                          Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::Table::TinyBorderStyle  Text::Table::Manifold  Text::ASCIITable  Text::Table  Text::Table::HTML::DataTables  Text::MarkdownTable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table::Tiny  Text::Table::TinyWide  Text::TabularDisplay  Text::SimpleTable  Text::Table::TinyColor  Text::Table::HTML  Text::Table::Org  Text::Table::Any  Text::Table::Sprintf  Text::Table::CSV 
+      Text::UnicodeBox::Table            400/s                       --             -85%               -89%                          -93%                   -97%              -98%         -98%                           -98%                 -98%               -99%                        -99%               -99%                   -99%                  -99%               -99%                    -99%               -99%              -99%              -99%                  -99%              -99% 
+      Text::ANSITable                   2300/s                     581%               --               -25%                          -52%                   -83%              -86%         -88%                           -89%                 -90%               -93%                        -95%               -95%                   -96%                  -96%               -96%                    -97%               -98%              -98%              -98%                  -99%              -99% 
+      Text::Table::More                 3000/s                     809%              33%                 --                          -36%                   -77%              -81%         -84%                           -85%                 -87%               -91%                        -93%               -94%                   -94%                  -95%               -95%                    -96%               -97%              -97%              -98%                  -98%              -98% 
+      Text::Table::TinyBorderStyle      4800/s                    1328%             109%                57%                            --                   -65%              -71%         -76%                           -77%                 -80%               -86%                        -89%               -91%                   -91%                  -92%               -92%                    -94%               -96%              -96%              -97%                  -98%              -98% 
+      Text::Table::Manifold            14000/s                    4009%             502%               352%                          187%                     --              -17%         -31%                           -34%                 -45%               -60%                        -69%               -75%                   -76%                  -78%               -78%                    -84%               -88%              -90%              -92%                  -94%              -95% 
+      Text::ASCIITable                 17000/s                    4900%             633%               450%                          250%                    21%                --         -16%                           -19%                 -33%               -51%                        -63%               -70%                   -71%                  -73%               -74%                    -81%               -86%              -88%              -91%                  -93%              -94% 
+      Text::Table                      20000/s                    5900%             779%               560%                          319%                    45%               19%           --                            -4%                 -20%               -42%                        -56%               -64%                   -65%                  -67%               -69%                    -78%               -83%              -85%              -89%                  -92%              -93% 
+      Text::Table::HTML::DataTables    21000/s                    6150%             816%               587%                          337%                    52%               25%           4%                             --                 -16%               -39%                        -54%               -62%                   -64%                  -66%               -67%                    -77%               -82%              -85%              -88%                  -92%              -92% 
+      Text::MarkdownTable              25000/s                    7400%            1000%               725%                          425%                    82%               50%          25%                            19%                   --               -27%                        -45%               -55%                   -57%                  -59%               -61%                    -72%               -79%              -82%              -86%                  -90%              -91% 
+      Text::FormatTable                34000/s                   10244%            1417%              1037%                          624%                   151%              106%          72%                            65%                  37%                 --                        -24%               -37%                   -41%                  -44%               -46%                    -62%               -71%              -75%              -81%                  -87%              -88% 
+      Text::Table::TinyColorWide       46000/s                   13536%            1900%              1400%                          854%                   231%              172%         127%                           118%                  81%                31%                          --               -18%                   -22%                  -27%               -29%                    -50%               -62%              -68%              -75%                  -83%              -84% 
+      Text::Table::Tiny                54000/s                   16566%            2344%              1733%                         1066%                   305%              233%         177%                           166%                 122%                61%                         22%                 --                    -5%                  -11%               -13%                    -38%               -54%              -60%              -70%                  -79%              -81% 
+      Text::Table::TinyWide            60000/s                   17547%            2488%              1841%                         1135%                   329%              252%         194%                           182%                 135%                70%                         29%                 5%                     --                   -5%                -8%                    -35%               -51%              -58%              -68%                  -78%              -79% 
+      Text::TabularDisplay           62468.1/s                   18640%            2648%              1961%                         1211%                   356%              274%         212%                           199%                 149%                81%                         37%                12%                     6%                    --                -3%                    -31%               -48%              -56%              -66%                  -76%              -78% 
+      Text::SimpleTable                64700/s                   19254%            2738%              2029%                         1254%                   370%              287%         222%                           209%                 158%                87%                         41%                16%                     9%                    3%                 --                    -29%               -47%              -54%              -65%                  -76%              -78% 
+      Text::Table::TinyColor           91000/s                   27172%            3900%              2900%                         1809%                   563%              445%         354%                           336%                 263%               163%                        100%                63%                    54%                   45%                40%                      --               -25%              -36%              -50%                  -66%              -69% 
+      Text::Table::HTML               120000/s                   36485%            5265%              3924%                         2460%                   790%              631%         509%                           485%                 387%               253%                        168%               119%                   107%                   95%                89%                     34%                 --              -14%              -34%                  -54%              -58% 
+      Text::Table::Org                142000/s                   42574%            6158%              4594%                         2887%                   938%              753%         611%                           582%                 468%               312%                        212%               156%                   141%                  127%               120%                     56%                16%                --              -23%                  -47%              -51% 
+      Text::Table::Any                180000/s                   55455%            8048%              6011%                         3788%                  1251%             1011%         825%                           788%                 640%               437%                        307%               233%                   214%                  196%               187%                    103%                51%               30%                --                  -31%              -36% 
+      Text::Table::Sprintf            270000/s                   80981%           11791%              8818%                         5575%                  1872%             1521%        1251%                          1197%                 981%               683%                        494%               386%                   359%                  332%               318%                    197%               121%               89%               45%                    --               -7% 
+      Text::Table::CSV                293000/s                   87876%           12803%              9577%                         6058%                  2040%             1659%        1366%                          1307%                1073%               750%                        545%               427%                   398%                  369%               354%                    222%               140%              106%               58%                    8%                -- 
  
      Legends:
        Text::ANSITable: participant=Text::ANSITable
        Text::ASCIITable: participant=Text::ASCIITable
        Text::FormatTable: participant=Text::FormatTable
        Text::MarkdownTable: participant=Text::MarkdownTable
+       Text::SimpleTable: participant=Text::SimpleTable
        Text::Table: participant=Text::Table
        Text::Table::Any: participant=Text::Table::Any
        Text::Table::CSV: participant=Text::Table::CSV
@@ -653,67 +690,66 @@ BENCHMARK SAMPLE RESULTS
        Text::Table::TinyWide: participant=Text::Table::TinyWide
        Text::TabularDisplay: participant=Text::TabularDisplay
        Text::UnicodeBox::Table: participant=Text::UnicodeBox::Table
-
-    The above result presented as chart:
-
-    Result formatted as table (split, part 5 of 5):
 
      #table5#
      {dataset=>"wide (30x5)"}
-     +-------------------------------+-----------+------------+-----------------------+-----------------------+---------+---------+
-     | participant                   | rate (/s) | time (ms)  | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +-------------------------------+-----------+------------+-----------------------+-----------------------+---------+---------+
-     | Text::UnicodeBox::Table       |      53   | 19         |                 0.00% |             35533.33% | 3.7e-05 |      20 |
-     | Text::ANSITable               |     143   |  7.01      |               168.54% |             13169.40% | 2.5e-06 |      20 |
-     | Text::Table::More             |     320   |  3.2       |               494.57% |              5893.12% | 3.5e-06 |      24 |
-     | Text::ASCIITable              |     641   |  1.56      |              1105.52% |              2855.85% | 6.4e-07 |      20 |
-     | Text::FormatTable             |     883   |  1.13      |              1561.88% |              2044.16% | 6.9e-07 |      20 |
-     | Text::Table::TinyColorWide    |    1100   |  0.909     |              1969.45% |              1621.87% | 2.1e-07 |      20 |
-     | Text::Table                   |    1480   |  0.675     |              2688.68% |              1177.78% | 4.3e-07 |      20 |
-     | Text::Table::TinyWide         |    1550   |  0.645     |              2816.27% |              1121.88% | 2.7e-07 |      20 |
-     | Text::Table::Manifold         |    2040   |  0.49      |              3741.03% |               827.70% | 4.3e-07 |      20 |
-     | Text::Table::Tiny             |    2470   |  0.405     |              4541.36% |               667.73% | 2.6e-07 |      21 |
-     | Text::TabularDisplay          |    2790   |  0.358     |              5152.33% |               578.43% | 2.1e-07 |      20 |
-     | Text::Table::TinyColor        |    3700   |  0.27      |              6856.23% |               412.25% | 4.9e-08 |      24 |
-     | Text::Table::TinyBorderStyle  |    4080   |  0.245     |              7571.15% |               364.51% | 2.1e-07 |      20 |
-     | Text::MarkdownTable           |    4340   |  0.23      |              8063.82% |               336.48% |   2e-07 |      22 |
-     | Text::Table::HTML             |    4780   |  0.209     |              8900.61% |               295.90% | 5.3e-08 |      20 |
-     | Text::Table::HTML::DataTables |    6200   |  0.16      |             11553.86% |               205.76% | 2.6e-07 |      21 |
-     | Text::Table::Org              |   11000   |  0.09      |             20879.74% |                69.85% | 1.1e-07 |      20 |
-     | Text::Table::CSV              |   14356.1 |  0.0696569 |             26910.63% |                31.92% |   0     |      28 |
-     | Text::Table::Any              |   16000   |  0.062     |             30132.43% |                17.86% |   1e-07 |      22 |
-     | Text::Table::Sprintf          |   18900   |  0.0528    |             35533.33% |                 0.00% | 2.1e-08 |      32 |
-     +-------------------------------+-----------+------------+-----------------------+-----------------------+---------+---------+
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | Text::UnicodeBox::Table       |        40 |   25      |                 0.00% |             38035.84% |   0.00013 |      21 |
+     | Text::ANSITable               |        94 |   11      |               137.04% |             15988.38% | 4.2e-05   |      20 |
+     | Text::Table::More             |       130 |    7.5    |               236.11% |             11246.27% | 3.4e-05   |      20 |
+     | Text::ASCIITable              |       520 |    1.9    |              1211.61% |              2807.55% | 3.5e-06   |      20 |
+     | Text::FormatTable             |       720 |    1.4    |              1700.78% |              2017.74% | 1.8e-06   |      21 |
+     | Text::Table::TinyColorWide    |       880 |    1.1    |              2117.40% |              1619.84% |   3e-06   |      20 |
+     | Text::Table                   |      1200 |    0.85   |              2868.25% |              1184.79% | 9.1e-07   |      20 |
+     | Text::Table::TinyWide         |      1200 |    0.82   |              2979.82% |              1138.25% | 2.1e-06   |      20 |
+     | Text::Table::TinyBorderStyle  |      1240 |    0.807  |              3010.24% |              1126.14% | 6.4e-07   |      20 |
+     | Text::SimpleTable             |      1600 |    0.61   |              4019.62% |               825.71% | 8.8e-07   |      21 |
+     | Text::Table::Manifold         |      1700 |    0.6    |              4093.25% |               809.46% | 8.5e-07   |      20 |
+     | Text::Table::Tiny             |      2020 |    0.495  |              4977.95% |               651.01% | 4.8e-07   |      20 |
+     | Text::TabularDisplay          |      2300 |    0.43   |              5776.56% |               548.95% | 1.4e-06   |      20 |
+     | Text::Table::HTML             |      3000 |    0.33   |              7451.94% |               404.98% | 6.4e-07   |      20 |
+     | Text::Table::TinyColor        |      3050 |    0.328  |              7559.95% |               397.86% | 1.9e-07   |      24 |
+     | Text::MarkdownTable           |      3500 |    0.29   |              8665.15% |               335.08% | 4.3e-07   |      20 |
+     | Text::Table::HTML::DataTables |      4800 |    0.21   |             11976.18% |               215.79% | 1.3e-06   |      20 |
+     | Text::Table::Org              |      8600 |    0.12   |             21438.87% |                77.06% | 2.7e-07   |      20 |
+     | Text::Table::CSV              |     12000 |    0.085  |             29353.92% |                29.48% | 2.1e-07   |      20 |
+     | Text::Table::Any              |     14500 |    0.0688 |             36414.52% |                 4.44% | 2.7e-08   |      20 |
+     | Text::Table::Sprintf          |     15200 |    0.0659 |             38035.84% |                 0.00% | 2.5e-08   |      22 |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
-    The above result formatted in Benchmark.pm style:
+    Formatted as Benchmark.pm result:
 
-                                          Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table  Text::Table::TinyWide  Text::Table::Manifold  Text::Table::Tiny  Text::TabularDisplay  Text::Table::TinyColor  Text::Table::TinyBorderStyle  Text::MarkdownTable  Text::Table::HTML  Text::Table::HTML::DataTables  Text::Table::Org  Text::Table::CSV  Text::Table::Any  Text::Table::Sprintf 
-      Text::UnicodeBox::Table             53/s                       --             -63%               -83%              -91%               -94%                        -95%         -96%                   -96%                   -97%               -97%                  -98%                    -98%                          -98%                 -98%               -98%                           -99%              -99%              -99%              -99%                  -99% 
-      Text::ANSITable                    143/s                     171%               --               -54%              -77%               -83%                        -87%         -90%                   -90%                   -93%               -94%                  -94%                    -96%                          -96%                 -96%               -97%                           -97%              -98%              -99%              -99%                  -99% 
-      Text::Table::More                  320/s                     493%             119%                 --              -51%               -64%                        -71%         -78%                   -79%                   -84%               -87%                  -88%                    -91%                          -92%                 -92%               -93%                           -95%              -97%              -97%              -98%                  -98% 
-      Text::ASCIITable                   641/s                    1117%             349%               105%                --               -27%                        -41%         -56%                   -58%                   -68%               -74%                  -77%                    -82%                          -84%                 -85%               -86%                           -89%              -94%              -95%              -96%                  -96% 
-      Text::FormatTable                  883/s                    1581%             520%               183%               38%                 --                        -19%         -40%                   -42%                   -56%               -64%                  -68%                    -76%                          -78%                 -79%               -81%                           -85%              -92%              -93%              -94%                  -95% 
-      Text::Table::TinyColorWide        1100/s                    1990%             671%               252%               71%                24%                          --         -25%                   -29%                   -46%               -55%                  -60%                    -70%                          -73%                 -74%               -77%                           -82%              -90%              -92%              -93%                  -94% 
-      Text::Table                       1480/s                    2714%             938%               374%              131%                67%                         34%           --                    -4%                   -27%               -40%                  -46%                    -60%                          -63%                 -65%               -69%                           -76%              -86%              -89%              -90%                  -92% 
-      Text::Table::TinyWide             1550/s                    2845%             986%               396%              141%                75%                         40%           4%                     --                   -24%               -37%                  -44%                    -58%                          -62%                 -64%               -67%                           -75%              -86%              -89%              -90%                  -91% 
-      Text::Table::Manifold             2040/s                    3777%            1330%               553%              218%               130%                         85%          37%                    31%                     --               -17%                  -26%                    -44%                          -50%                 -53%               -57%                           -67%              -81%              -85%              -87%                  -89% 
-      Text::Table::Tiny                 2470/s                    4591%            1630%               690%              285%               179%                        124%          66%                    59%                    20%                 --                  -11%                    -33%                          -39%                 -43%               -48%                           -60%              -77%              -82%              -84%                  -86% 
-      Text::TabularDisplay              2790/s                    5207%            1858%               793%              335%               215%                        153%          88%                    80%                    36%                13%                    --                    -24%                          -31%                 -35%               -41%                           -55%              -74%              -80%              -82%                  -85% 
-      Text::Table::TinyColor            3700/s                    6937%            2496%              1085%              477%               318%                        236%         150%                   138%                    81%                50%                   32%                      --                           -9%                 -14%               -22%                           -40%              -66%              -74%              -77%                  -80% 
-      Text::Table::TinyBorderStyle      4080/s                    7655%            2761%              1206%              536%               361%                        271%         175%                   163%                   100%                65%                   46%                     10%                            --                  -6%               -14%                           -34%              -63%              -71%              -74%                  -78% 
-      Text::MarkdownTable               4340/s                    8160%            2947%              1291%              578%               391%                        295%         193%                   180%                   113%                76%                   55%                     17%                            6%                   --                -9%                           -30%              -60%              -69%              -73%                  -77% 
-      Text::Table::HTML                 4780/s                    8990%            3254%              1431%              646%               440%                        334%         222%                   208%                   134%                93%                   71%                     29%                           17%                  10%                 --                           -23%              -56%              -66%              -70%                  -74% 
-      Text::Table::HTML::DataTables     6200/s                   11775%            4281%              1900%              875%               606%                        468%         321%                   303%                   206%               153%                  123%                     68%                           53%                  43%                30%                             --              -43%              -56%              -61%                  -67% 
-      Text::Table::Org                 11000/s                   21011%            7688%              3455%             1633%              1155%                        910%         650%                   616%                   444%               350%                  297%                    200%                          172%                 155%               132%                            77%                --              -22%              -31%                  -41% 
-      Text::Table::CSV               14356.1/s                   27176%            9963%              4493%             2139%              1522%                       1204%         869%                   825%                   603%               481%                  413%                    287%                          251%                 230%               200%                           129%               29%                --              -10%                  -24% 
-      Text::Table::Any                 16000/s                   30545%           11206%              5061%             2416%              1722%                       1366%         988%                   940%                   690%               553%                  477%                    335%                          295%                 270%               237%                           158%               45%               12%                --                  -14% 
-      Text::Table::Sprintf             18900/s                   35884%           13176%              5960%             2854%              2040%                       1621%        1178%                  1121%                   828%               667%                  578%                    411%                          364%                 335%               295%                           203%               70%               31%               17%                    -- 
+                                        Rate  Text::UnicodeBox::Table  Text::ANSITable  Text::Table::More  Text::ASCIITable  Text::FormatTable  Text::Table::TinyColorWide  Text::Table  Text::Table::TinyWide  Text::Table::TinyBorderStyle  Text::SimpleTable  Text::Table::Manifold  Text::Table::Tiny  Text::TabularDisplay  Text::Table::HTML  Text::Table::TinyColor  Text::MarkdownTable  Text::Table::HTML::DataTables  Text::Table::Org  Text::Table::CSV  Text::Table::Any  Text::Table::Sprintf 
+      Text::UnicodeBox::Table           40/s                       --             -56%               -70%              -92%               -94%                        -95%         -96%                   -96%                          -96%               -97%                   -97%               -98%                  -98%               -98%                    -98%                 -98%                           -99%              -99%              -99%              -99%                  -99% 
+      Text::ANSITable                   94/s                     127%               --               -31%              -82%               -87%                        -90%         -92%                   -92%                          -92%               -94%                   -94%               -95%                  -96%               -97%                    -97%                 -97%                           -98%              -98%              -99%              -99%                  -99% 
+      Text::Table::More                130/s                     233%              46%                 --              -74%               -81%                        -85%         -88%                   -89%                          -89%               -91%                   -92%               -93%                  -94%               -95%                    -95%                 -96%                           -97%              -98%              -98%              -99%                  -99% 
+      Text::ASCIITable                 520/s                    1215%             478%               294%                --               -26%                        -42%         -55%                   -56%                          -57%               -67%                   -68%               -73%                  -77%               -82%                    -82%                 -84%                           -88%              -93%              -95%              -96%                  -96% 
+      Text::FormatTable                720/s                    1685%             685%               435%               35%                 --                        -21%         -39%                   -41%                          -42%               -56%                   -57%               -64%                  -69%               -76%                    -76%                 -79%                           -85%              -91%              -93%              -95%                  -95% 
+      Text::Table::TinyColorWide       880/s                    2172%             900%               581%               72%                27%                          --         -22%                   -25%                          -26%               -44%                   -45%               -55%                  -60%               -70%                    -70%                 -73%                           -80%              -89%              -92%              -93%                  -94% 
+      Text::Table                     1200/s                    2841%            1194%               782%              123%                64%                         29%           --                    -3%                           -5%               -28%                   -29%               -41%                  -49%               -61%                    -61%                 -65%                           -75%              -85%              -90%              -91%                  -92% 
+      Text::Table::TinyWide           1200/s                    2948%            1241%               814%              131%                70%                         34%           3%                     --                           -1%               -25%                   -26%               -39%                  -47%               -59%                    -60%                 -64%                           -74%              -85%              -89%              -91%                  -91% 
+      Text::Table::TinyBorderStyle    1240/s                    2997%            1263%               829%              135%                73%                         36%           5%                     1%                            --               -24%                   -25%               -38%                  -46%               -59%                    -59%                 -64%                           -73%              -85%              -89%              -91%                  -91% 
+      Text::SimpleTable               1600/s                    3998%            1703%              1129%              211%               129%                         80%          39%                    34%                           32%                 --                    -1%               -18%                  -29%               -45%                    -46%                 -52%                           -65%              -80%              -86%              -88%                  -89% 
+      Text::Table::Manifold           1700/s                    4066%            1733%              1150%              216%               133%                         83%          41%                    36%                           34%                 1%                     --               -17%                  -28%               -44%                    -45%                 -51%                           -65%              -80%              -85%              -88%                  -89% 
+      Text::Table::Tiny               2020/s                    4950%            2122%              1415%              283%               182%                        122%          71%                    65%                           63%                23%                    21%                 --                  -13%               -33%                    -33%                 -41%                           -57%              -75%              -82%              -86%                  -86% 
+      Text::TabularDisplay            2300/s                    5713%            2458%              1644%              341%               225%                        155%          97%                    90%                           87%                41%                    39%                15%                    --               -23%                    -23%                 -32%                           -51%              -72%              -80%              -84%                  -84% 
+      Text::Table::HTML               3000/s                    7475%            3233%              2172%              475%               324%                        233%         157%                   148%                          144%                84%                    81%                50%                   30%                 --                      0%                 -12%                           -36%              -63%              -74%              -79%                  -80% 
+      Text::Table::TinyColor          3050/s                    7521%            3253%              2186%              479%               326%                        235%         159%                   149%                          146%                85%                    82%                50%                   31%                 0%                      --                 -11%                           -35%              -63%              -74%              -79%                  -79% 
+      Text::MarkdownTable             3500/s                    8520%            3693%              2486%              555%               382%                        279%         193%                   182%                          178%               110%                   106%                70%                   48%                13%                     13%                   --                           -27%              -58%              -70%              -76%                  -77% 
+      Text::Table::HTML::DataTables   4800/s                   11804%            5138%              3471%              804%               566%                        423%         304%                   290%                          284%               190%                   185%               135%                  104%                57%                     56%                  38%                             --              -42%              -59%              -67%                  -68% 
+      Text::Table::Org                8600/s                   20733%            9066%              6150%             1483%              1066%                        816%         608%                   583%                          572%               408%                   400%               312%                  258%               175%                    173%                 141%                            75%                --              -29%              -42%                  -45% 
+      Text::Table::CSV               12000/s                   29311%           12841%              8723%             2135%              1547%                       1194%         899%                   864%                          849%               617%                   605%               482%                  405%               288%                    285%                 241%                           147%               41%                --              -19%                  -22% 
+      Text::Table::Any               14500/s                   36237%           15888%             10801%             2661%              1934%                       1498%        1135%                  1091%                         1072%               786%                   772%               619%                  525%               379%                    376%                 321%                           205%               74%               23%                --                   -4% 
+      Text::Table::Sprintf           15200/s                   37836%           16591%             11280%             2783%              2024%                       1569%        1189%                  1144%                         1124%               825%                   810%               651%                  552%               400%                    397%                 340%                           218%               82%               28%                4%                    -- 
  
      Legends:
        Text::ANSITable: participant=Text::ANSITable
        Text::ASCIITable: participant=Text::ASCIITable
        Text::FormatTable: participant=Text::FormatTable
        Text::MarkdownTable: participant=Text::MarkdownTable
+       Text::SimpleTable: participant=Text::SimpleTable
        Text::Table: participant=Text::Table
        Text::Table::Any: participant=Text::Table::Any
        Text::Table::CSV: participant=Text::Table::CSV
@@ -731,91 +767,86 @@ BENCHMARK SAMPLE RESULTS
        Text::TabularDisplay: participant=Text::TabularDisplay
        Text::UnicodeBox::Table: participant=Text::UnicodeBox::Table
 
-    The above result presented as chart:
-
-  Sample benchmark #2
-    Benchmark command (benchmarking module startup overhead):
-
-     % bencher --cpanmodules-module TextTable --module-startup
-
-    Result formatted as table:
+    Benchmark module startup overhead ("bencher --cpanmodules-module
+    TextTable --module-startup"):
 
      #table6#
-     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
-     | participant                   | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
-     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
-     | Text::UnicodeBox::Table       |     130   |             124   |                 0.00% |              2253.61% |   0.00019 |      20 |
-     | Text::Table::Manifold         |      71   |              65   |                77.51% |              1225.91% |   0.00012 |      20 |
-     | Text::ANSITable               |      37   |              31   |               237.43% |               597.51% |   0.00014 |      20 |
-     | Text::MarkdownTable           |      36   |              30   |               254.32% |               564.26% |   9e-05   |      20 |
-     | Text::Table::TinyColorWide    |      28   |              22   |               346.25% |               427.42% |   0.0002  |      20 |
-     | Text::Table::TinyWide         |      26   |              20   |               389.24% |               381.07% |   0.00014 |      21 |
-     | Text::Table::More             |      21   |              15   |               513.44% |               283.67% |   0.0001  |      21 |
-     | Text::Table                   |      20   |              14   |               533.68% |               271.42% |   0.00016 |      20 |
-     | Text::ASCIITable              |      20   |              14   |               727.66% |               184.37% |   0.0002  |      21 |
-     | Text::Table::Tiny             |      20   |              14   |               742.57% |               179.34% |   0.00016 |      20 |
-     | Text::Table::TinyColor        |      10   |               4   |               959.53% |               122.14% |   0.00021 |      20 |
-     | Text::FormatTable             |      10   |               4   |               974.94% |               118.95% |   0.00015 |      20 |
-     | Text::Table::TinyBorderStyle  |      10   |               4   |              1217.24% |                78.68% |   0.00012 |      20 |
-     | Text::Table::HTML             |       8   |               2   |              1429.79% |                53.85% |   0.00013 |      20 |
-     | Text::TabularDisplay          |       8   |               2   |              1434.59% |                53.37% |   0.00015 |      20 |
-     | Text::Table::Any              |       7.6 |               1.6 |              1575.00% |                40.51% | 6.1e-05   |      20 |
-     | Text::Table::HTML::DataTables |       8   |               2   |              1575.72% |                40.45% |   0.00013 |      22 |
-     | Text::Table::CSV              |       6   |               0   |              1848.42% |                20.80% |   0.00012 |      20 |
-     | perl -e1 (baseline)           |       6   |               0   |              1891.09% |                18.21% | 9.4e-05   |      20 |
-     | Text::Table::Org              |       6   |               0   |              2009.07% |                11.59% |   0.00022 |      20 |
-     | Text::Table::Sprintf          |       5   |              -1   |              2253.61% |                 0.00% |   0.00019 |      21 |
-     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     +-------------------------------+-----------+---------------------+-----------------------+-----------------------+-----------+---------+
+     | participant                   | time (ms) | mod_overhead_time   | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +-------------------------------+-----------+---------------------+-----------------------+-----------------------+-----------+---------+
+     | Text::UnicodeBox::Table       |     170   | 161.4               |                 0.00% |              1830.18% |   0.00027 |      20 |
+     | Text::Table::Manifold         |      92   |  83.4               |                81.30% |               964.64% |   0.00016 |      20 |
+     | Text::ANSITable               |      47   |  38.4               |               257.06% |               440.57% | 5.5e-05   |      20 |
+     | Text::MarkdownTable           |      42   |  33.4               |               294.86% |               388.83% | 5.6e-05   |      20 |
+     | Text::Table::TinyColorWide    |      35   |  26.4               |               380.00% |               302.12% | 6.6e-05   |      20 |
+     | Text::Table::TinyWide         |      32.1 |  23.5               |               419.12% |               271.82% | 2.7e-05   |      20 |
+     | Text::Table::More             |      25   |  16.4               |               559.15% |               192.83% | 7.8e-05   |      20 |
+     | Text::Table                   |      24   |  15.4               |               601.85% |               175.01% |   0.00011 |      20 |
+     | Text::ASCIITable              |      19   |  10.4               |               777.55% |               119.95% | 9.1e-05   |      20 |
+     | Text::Table::Tiny             |      19   |  10.4               |               787.87% |               117.39% |   0.00011 |      20 |
+     | Text::FormatTable             |      16   |   7.4               |               960.14% |                82.07% | 3.8e-05   |      20 |
+     | Text::Table::TinyColor        |      15   |   6.4               |               998.71% |                75.68% | 6.9e-05   |      20 |
+     | Text::Table::TinyBorderStyle  |      13   |   4.4               |              1185.52% |                50.15% |   0.00011 |      20 |
+     | Text::Table::Any              |      12.5 |   3.9               |              1234.89% |                44.60% | 1.1e-05   |      20 |
+     | Text::SimpleTable             |      12   |   3.4               |              1314.31% |                36.48% | 5.5e-05   |      20 |
+     | Text::TabularDisplay          |      12   |   3.4               |              1320.89% |                35.84% | 5.7e-05   |      20 |
+     | Text::Table::HTML::DataTables |      11   |   2.4               |              1410.81% |                27.76% | 2.6e-05   |      20 |
+     | Text::Table::HTML             |      11   |   2.4               |              1417.70% |                27.18% | 4.1e-05   |      22 |
+     | Text::Table::Org              |      11   |   2.4               |              1433.01% |                25.91% | 2.3e-05   |      20 |
+     | Text::Table::CSV              |       8.9 |   0.300000000000001 |              1759.70% |                 3.79% | 1.6e-05   |      20 |
+     | Text::Table::Sprintf          |       8.8 |   0.200000000000001 |              1789.17% |                 2.17% | 1.8e-05   |      20 |
+     | perl -e1 (baseline)           |       8.6 |   0                 |              1830.18% |                 0.00% |   5e-05   |      20 |
+     +-------------------------------+-----------+---------------------+-----------------------+-----------------------+-----------+---------+
 
-    The above result formatted in Benchmark.pm style:
+    Formatted as Benchmark.pm result:
 
-                                        Rate  Text::UnicodeBox::Table  Text::Table::Manifold  Text::ANSITable  Text::MarkdownTable  Text::Table::TinyColorWide  Text::Table::TinyWide  Text::Table::More  Text::Table  Text::ASCIITable  Text::Table::Tiny  Text::Table::TinyColor  Text::FormatTable  Text::Table::TinyBorderStyle  Text::Table::HTML  Text::TabularDisplay  Text::Table::HTML::DataTables  Text::Table::Any  Text::Table::CSV  perl -e1 (baseline)  Text::Table::Org  Text::Table::Sprintf 
-      Text::UnicodeBox::Table          7.7/s                       --                   -45%             -71%                 -72%                        -78%                   -80%               -83%         -84%              -84%               -84%                    -92%               -92%                          -92%               -93%                  -93%                           -93%              -94%              -95%                 -95%              -95%                  -96% 
-      Text::Table::Manifold           14.1/s                      83%                     --             -47%                 -49%                        -60%                   -63%               -70%         -71%              -71%               -71%                    -85%               -85%                          -85%               -88%                  -88%                           -88%              -89%              -91%                 -91%              -91%                  -92% 
-      Text::ANSITable                 27.0/s                     251%                    91%               --                  -2%                        -24%                   -29%               -43%         -45%              -45%               -45%                    -72%               -72%                          -72%               -78%                  -78%                           -78%              -79%              -83%                 -83%              -83%                  -86% 
-      Text::MarkdownTable             27.8/s                     261%                    97%               2%                   --                        -22%                   -27%               -41%         -44%              -44%               -44%                    -72%               -72%                          -72%               -77%                  -77%                           -77%              -78%              -83%                 -83%              -83%                  -86% 
-      Text::Table::TinyColorWide      35.7/s                     364%                   153%              32%                  28%                          --                    -7%               -25%         -28%              -28%               -28%                    -64%               -64%                          -64%               -71%                  -71%                           -71%              -72%              -78%                 -78%              -78%                  -82% 
-      Text::Table::TinyWide           38.5/s                     400%                   173%              42%                  38%                          7%                     --               -19%         -23%              -23%               -23%                    -61%               -61%                          -61%               -69%                  -69%                           -69%              -70%              -76%                 -76%              -76%                  -80% 
-      Text::Table::More               47.6/s                     519%                   238%              76%                  71%                         33%                    23%                 --          -4%               -4%                -4%                    -52%               -52%                          -52%               -61%                  -61%                           -61%              -63%              -71%                 -71%              -71%                  -76% 
-      Text::Table                     50.0/s                     550%                   254%              85%                  80%                         39%                    30%                 5%           --                0%                 0%                    -50%               -50%                          -50%               -60%                  -60%                           -60%              -62%              -70%                 -70%              -70%                  -75% 
-      Text::ASCIITable                50.0/s                     550%                   254%              85%                  80%                         39%                    30%                 5%           0%                --                 0%                    -50%               -50%                          -50%               -60%                  -60%                           -60%              -62%              -70%                 -70%              -70%                  -75% 
-      Text::Table::Tiny               50.0/s                     550%                   254%              85%                  80%                         39%                    30%                 5%           0%                0%                 --                    -50%               -50%                          -50%               -60%                  -60%                           -60%              -62%              -70%                 -70%              -70%                  -75% 
-      Text::Table::TinyColor         100.0/s                    1200%                   610%             270%                 260%                        179%                   160%               110%         100%              100%               100%                      --                 0%                            0%               -19%                  -19%                           -19%              -24%              -40%                 -40%              -40%                  -50% 
-      Text::FormatTable              100.0/s                    1200%                   610%             270%                 260%                        179%                   160%               110%         100%              100%               100%                      0%                 --                            0%               -19%                  -19%                           -19%              -24%              -40%                 -40%              -40%                  -50% 
-      Text::Table::TinyBorderStyle   100.0/s                    1200%                   610%             270%                 260%                        179%                   160%               110%         100%              100%               100%                      0%                 0%                            --               -19%                  -19%                           -19%              -24%              -40%                 -40%              -40%                  -50% 
-      Text::Table::HTML              125.0/s                    1525%                   787%             362%                 350%                        250%                   225%               162%         150%              150%               150%                     25%                25%                           25%                 --                    0%                             0%               -5%              -25%                 -25%              -25%                  -37% 
-      Text::TabularDisplay           125.0/s                    1525%                   787%             362%                 350%                        250%                   225%               162%         150%              150%               150%                     25%                25%                           25%                 0%                    --                             0%               -5%              -25%                 -25%              -25%                  -37% 
-      Text::Table::HTML::DataTables  125.0/s                    1525%                   787%             362%                 350%                        250%                   225%               162%         150%              150%               150%                     25%                25%                           25%                 0%                    0%                             --               -5%              -25%                 -25%              -25%                  -37% 
-      Text::Table::Any               131.6/s                    1610%                   834%             386%                 373%                        268%                   242%               176%         163%              163%               163%                     31%                31%                           31%                 5%                    5%                             5%                --              -21%                 -21%              -21%                  -34% 
-      Text::Table::CSV               166.7/s                    2066%                  1083%             516%                 500%                        366%                   333%               250%         233%              233%               233%                     66%                66%                           66%                33%                   33%                            33%               26%                --                   0%                0%                  -16% 
-      perl -e1 (baseline)            166.7/s                    2066%                  1083%             516%                 500%                        366%                   333%               250%         233%              233%               233%                     66%                66%                           66%                33%                   33%                            33%               26%                0%                   --                0%                  -16% 
-      Text::Table::Org               166.7/s                    2066%                  1083%             516%                 500%                        366%                   333%               250%         233%              233%               233%                     66%                66%                           66%                33%                   33%                            33%               26%                0%                   0%                --                  -16% 
-      Text::Table::Sprintf           200.0/s                    2500%                  1320%             640%                 620%                        459%                   420%               320%         300%              300%               300%                    100%               100%                          100%                60%                   60%                            60%               52%               19%                  19%               19%                    -- 
+                                        Rate  Text::UnicodeBox::Table  Text::Table::Manifold  Text::ANSITable  Text::MarkdownTable  Text::Table::TinyColorWide  Text::Table::TinyWide  Text::Table::More  Text::Table  Text::ASCIITable  Text::Table::Tiny  Text::FormatTable  Text::Table::TinyColor  Text::Table::TinyBorderStyle  Text::Table::Any  Text::SimpleTable  Text::TabularDisplay  Text::Table::HTML::DataTables  Text::Table::HTML  Text::Table::Org  Text::Table::CSV  Text::Table::Sprintf  perl -e1 (baseline) 
+      Text::UnicodeBox::Table          5.9/s                       --                   -45%             -72%                 -75%                        -79%                   -81%               -85%         -85%              -88%               -88%               -90%                    -91%                          -92%              -92%               -92%                  -92%                           -93%               -93%              -93%              -94%                  -94%                 -94% 
+      Text::Table::Manifold           10.9/s                      84%                     --             -48%                 -54%                        -61%                   -65%               -72%         -73%              -79%               -79%               -82%                    -83%                          -85%              -86%               -86%                  -86%                           -88%               -88%              -88%              -90%                  -90%                 -90% 
+      Text::ANSITable                 21.3/s                     261%                    95%               --                 -10%                        -25%                   -31%               -46%         -48%              -59%               -59%               -65%                    -68%                          -72%              -73%               -74%                  -74%                           -76%               -76%              -76%              -81%                  -81%                 -81% 
+      Text::MarkdownTable             23.8/s                     304%                   119%              11%                   --                        -16%                   -23%               -40%         -42%              -54%               -54%               -61%                    -64%                          -69%              -70%               -71%                  -71%                           -73%               -73%              -73%              -78%                  -79%                 -79% 
+      Text::Table::TinyColorWide      28.6/s                     385%                   162%              34%                  19%                          --                    -8%               -28%         -31%              -45%               -45%               -54%                    -57%                          -62%              -64%               -65%                  -65%                           -68%               -68%              -68%              -74%                  -74%                 -75% 
+      Text::Table::TinyWide           31.2/s                     429%                   186%              46%                  30%                          9%                     --               -22%         -25%              -40%               -40%               -50%                    -53%                          -59%              -61%               -62%                  -62%                           -65%               -65%              -65%              -72%                  -72%                 -73% 
+      Text::Table::More               40.0/s                     580%                   268%              87%                  68%                         39%                    28%                 --          -4%              -24%               -24%               -36%                    -40%                          -48%              -50%               -52%                  -52%                           -56%               -56%              -56%              -64%                  -64%                 -65% 
+      Text::Table                     41.7/s                     608%                   283%              95%                  75%                         45%                    33%                 4%           --              -20%               -20%               -33%                    -37%                          -45%              -47%               -50%                  -50%                           -54%               -54%              -54%              -62%                  -63%                 -64% 
+      Text::ASCIITable                52.6/s                     794%                   384%             147%                 121%                         84%                    68%                31%          26%                --                 0%               -15%                    -21%                          -31%              -34%               -36%                  -36%                           -42%               -42%              -42%              -53%                  -53%                 -54% 
+      Text::Table::Tiny               52.6/s                     794%                   384%             147%                 121%                         84%                    68%                31%          26%                0%                 --               -15%                    -21%                          -31%              -34%               -36%                  -36%                           -42%               -42%              -42%              -53%                  -53%                 -54% 
+      Text::FormatTable               62.5/s                     962%                   475%             193%                 162%                        118%                   100%                56%          50%               18%                18%                 --                     -6%                          -18%              -21%               -25%                  -25%                           -31%               -31%              -31%              -44%                  -44%                 -46% 
+      Text::Table::TinyColor          66.7/s                    1033%                   513%             213%                 179%                        133%                   114%                66%          60%               26%                26%                 6%                      --                          -13%              -16%               -19%                  -19%                           -26%               -26%              -26%              -40%                  -41%                 -42% 
+      Text::Table::TinyBorderStyle    76.9/s                    1207%                   607%             261%                 223%                        169%                   146%                92%          84%               46%                46%                23%                     15%                            --               -3%                -7%                   -7%                           -15%               -15%              -15%              -31%                  -32%                 -33% 
+      Text::Table::Any                80.0/s                    1260%                   636%             276%                 236%                        179%                   156%               100%          92%               52%                52%                28%                     19%                            4%                --                -4%                   -4%                           -12%               -12%              -12%              -28%                  -29%                 -31% 
+      Text::SimpleTable               83.3/s                    1316%                   666%             291%                 250%                        191%                   167%               108%         100%               58%                58%                33%                     25%                            8%                4%                 --                    0%                            -8%                -8%               -8%              -25%                  -26%                 -28% 
+      Text::TabularDisplay            83.3/s                    1316%                   666%             291%                 250%                        191%                   167%               108%         100%               58%                58%                33%                     25%                            8%                4%                 0%                    --                            -8%                -8%               -8%              -25%                  -26%                 -28% 
+      Text::Table::HTML::DataTables   90.9/s                    1445%                   736%             327%                 281%                        218%                   191%               127%         118%               72%                72%                45%                     36%                           18%               13%                 9%                    9%                             --                 0%                0%              -19%                  -19%                 -21% 
+      Text::Table::HTML               90.9/s                    1445%                   736%             327%                 281%                        218%                   191%               127%         118%               72%                72%                45%                     36%                           18%               13%                 9%                    9%                             0%                 --                0%              -19%                  -19%                 -21% 
+      Text::Table::Org                90.9/s                    1445%                   736%             327%                 281%                        218%                   191%               127%         118%               72%                72%                45%                     36%                           18%               13%                 9%                    9%                             0%                 0%                --              -19%                  -19%                 -21% 
+      Text::Table::CSV               112.4/s                    1810%                   933%             428%                 371%                        293%                   260%               180%         169%              113%               113%                79%                     68%                           46%               40%                34%                   34%                            23%                23%               23%                --                   -1%                  -3% 
+      Text::Table::Sprintf           113.6/s                    1831%                   945%             434%                 377%                        297%                   264%               184%         172%              115%               115%                81%                     70%                           47%               42%                36%                   36%                            25%                25%               25%                1%                    --                  -2% 
+      perl -e1 (baseline)            116.3/s                    1876%                   969%             446%                 388%                        306%                   273%               190%         179%              120%               120%                86%                     74%                           51%               45%                39%                   39%                            27%                27%               27%                3%                    2%                   -- 
  
      Legends:
-       Text::ANSITable: mod_overhead_time=31 participant=Text::ANSITable
-       Text::ASCIITable: mod_overhead_time=14 participant=Text::ASCIITable
-       Text::FormatTable: mod_overhead_time=4 participant=Text::FormatTable
-       Text::MarkdownTable: mod_overhead_time=30 participant=Text::MarkdownTable
-       Text::Table: mod_overhead_time=14 participant=Text::Table
-       Text::Table::Any: mod_overhead_time=1.6 participant=Text::Table::Any
-       Text::Table::CSV: mod_overhead_time=0 participant=Text::Table::CSV
-       Text::Table::HTML: mod_overhead_time=2 participant=Text::Table::HTML
-       Text::Table::HTML::DataTables: mod_overhead_time=2 participant=Text::Table::HTML::DataTables
-       Text::Table::Manifold: mod_overhead_time=65 participant=Text::Table::Manifold
-       Text::Table::More: mod_overhead_time=15 participant=Text::Table::More
-       Text::Table::Org: mod_overhead_time=0 participant=Text::Table::Org
-       Text::Table::Sprintf: mod_overhead_time=-1 participant=Text::Table::Sprintf
-       Text::Table::Tiny: mod_overhead_time=14 participant=Text::Table::Tiny
-       Text::Table::TinyBorderStyle: mod_overhead_time=4 participant=Text::Table::TinyBorderStyle
-       Text::Table::TinyColor: mod_overhead_time=4 participant=Text::Table::TinyColor
-       Text::Table::TinyColorWide: mod_overhead_time=22 participant=Text::Table::TinyColorWide
-       Text::Table::TinyWide: mod_overhead_time=20 participant=Text::Table::TinyWide
-       Text::TabularDisplay: mod_overhead_time=2 participant=Text::TabularDisplay
-       Text::UnicodeBox::Table: mod_overhead_time=124 participant=Text::UnicodeBox::Table
+       Text::ANSITable: mod_overhead_time=38.4 participant=Text::ANSITable
+       Text::ASCIITable: mod_overhead_time=10.4 participant=Text::ASCIITable
+       Text::FormatTable: mod_overhead_time=7.4 participant=Text::FormatTable
+       Text::MarkdownTable: mod_overhead_time=33.4 participant=Text::MarkdownTable
+       Text::SimpleTable: mod_overhead_time=3.4 participant=Text::SimpleTable
+       Text::Table: mod_overhead_time=15.4 participant=Text::Table
+       Text::Table::Any: mod_overhead_time=3.9 participant=Text::Table::Any
+       Text::Table::CSV: mod_overhead_time=0.300000000000001 participant=Text::Table::CSV
+       Text::Table::HTML: mod_overhead_time=2.4 participant=Text::Table::HTML
+       Text::Table::HTML::DataTables: mod_overhead_time=2.4 participant=Text::Table::HTML::DataTables
+       Text::Table::Manifold: mod_overhead_time=83.4 participant=Text::Table::Manifold
+       Text::Table::More: mod_overhead_time=16.4 participant=Text::Table::More
+       Text::Table::Org: mod_overhead_time=2.4 participant=Text::Table::Org
+       Text::Table::Sprintf: mod_overhead_time=0.200000000000001 participant=Text::Table::Sprintf
+       Text::Table::Tiny: mod_overhead_time=10.4 participant=Text::Table::Tiny
+       Text::Table::TinyBorderStyle: mod_overhead_time=4.4 participant=Text::Table::TinyBorderStyle
+       Text::Table::TinyColor: mod_overhead_time=6.4 participant=Text::Table::TinyColor
+       Text::Table::TinyColorWide: mod_overhead_time=26.4 participant=Text::Table::TinyColorWide
+       Text::Table::TinyWide: mod_overhead_time=23.5 participant=Text::Table::TinyWide
+       Text::TabularDisplay: mod_overhead_time=3.4 participant=Text::TabularDisplay
+       Text::UnicodeBox::Table: mod_overhead_time=161.4 participant=Text::UnicodeBox::Table
        perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
-
-    The above result presented as chart:
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
@@ -834,6 +865,18 @@ SAMPLE OUTPUTS
          | row4.1 | row4.2 | row4.3 |
          | row5.1 | row5.2 | row5.3 |
          +--------+--------+--------+
+
+    *   "Text::SimpleTable"
+
+         .-----------+-----------+-----------.
+         | col1      | col2      | col3      |
+         +-----------+-----------+-----------+
+         | row1.1    | row1.2    | row1.3    |
+         | row2.1    | row2.2    | row2.3    |
+         | row3.1    | row3.2    | row3.3    |
+         | row4.1    | row4.2    | row4.3    |
+         | row5.1    | row5.2    | row5.3    |
+         '-----------+-----------+-----------'
 
     *   "Text::Table::Manifold"
 
@@ -1021,10 +1064,10 @@ SAMPLE OUTPUTS
 
          <html>
          <head>
-         <link rel="stylesheet" type="text/css" href="file:///home/s1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.22/datatables.css">
-         <script src="file:///home/s1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/auto/share/dist/Text-Table-HTML-DataTables/jquery-2.2.4/jquery-2.2.4.min.js"></script>
-         <script src="file:///home/s1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.22/datatables.js"></script>
-         <script>var dt_opts = {"dom":"lQfrtip","buttons":["colvis","print"]}; $(document).ready(function() { $("table").DataTable(dt_opts); });</script>
+         <link rel="stylesheet" type="text/css" href="file:///home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.22/datatables.css">
+         <script src="file:///home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/auto/share/dist/Text-Table-HTML-DataTables/jquery-2.2.4/jquery-2.2.4.min.js"></script>
+         <script src="file:///home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.22/datatables.js"></script>
+         <script>var dt_opts = {"dom":"lQfrtip","buttons":["colvis","print"]}; $(document).ready(function() { $("table").DataTable(dt_opts); $("select[name=DataTables_Table_0_length]").val(1000); $("select[name=DataTables_Table_0_length]").trigger("change"); });</script>
  
          </head>
  
@@ -1093,7 +1136,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -1102,14 +1147,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-TextTable>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Text
-    Table>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Acme::CPANModules::HTMLTable
@@ -1121,9 +1158,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021, 2020, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Text
+    Table>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

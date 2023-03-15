@@ -16,7 +16,7 @@
 ;#     This routine provides word completion.
 ;#     (TAB) attempts word completion.
 ;#     (^D)  prints completion list.
-;#      (These may be changed by setting $Complete'complete, etc.)
+;#      (These may be changed by setting $Complete::complete, etc.)
 ;#
 ;# Diagnostics:
 ;#     Bell when word completion fails.

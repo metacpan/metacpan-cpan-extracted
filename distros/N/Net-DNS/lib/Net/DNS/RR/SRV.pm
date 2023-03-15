@@ -2,7 +2,7 @@ package Net::DNS::RR::SRV;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SRV.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: SRV.pm 1898 2023-02-15 14:27:22Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,19 +19,17 @@ use Net::DNS::DomainName;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset, @opaque ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	@{$self}{qw(priority weight port)} = unpack( "\@$offset n3", $$data );
 
-	$self->{target} = Net::DNS::DomainName2535->decode( $data, $offset + 6, @opaque );
+	$self->{target} = Net::DNS::DomainName2535->decode( $data, $offset + 6 );
 	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
-	my $self = shift;
-	my ( $offset, @opaque ) = @_;
+	my ( $self, $offset, @opaque ) = @_;
 
 	my $target = $self->{target};
 	my @nums   = ( $self->priority, $self->weight, $self->port );
@@ -49,43 +47,39 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
 	foreach my $attr (qw(priority weight port target)) {
-		$self->$attr(shift);
+		$self->$attr( shift @argument );
 	}
 	return;
 }
 
 
 sub priority {
-	my $self = shift;
-
-	$self->{priority} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{priority} = 0 + $_ }
 	return $self->{priority} || 0;
 }
 
 
 sub weight {
-	my $self = shift;
-
-	$self->{weight} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{weight} = 0 + $_ }
 	return $self->{weight} || 0;
 }
 
 
 sub port {
-	my $self = shift;
-
-	$self->{port} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{port} = 0 + $_ }
 	return $self->{port} || 0;
 }
 
 
 sub target {
-	my $self = shift;
-
-	$self->{target} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{target} = Net::DNS::DomainName2535->new($_) }
 	return $self->{target} ? $self->{target}->name : undef;
 }
 
@@ -193,6 +187,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC2782
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC2782|https://tools.ietf.org/html/rfc2782>
 
 =cut

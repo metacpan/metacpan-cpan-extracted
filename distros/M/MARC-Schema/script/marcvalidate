@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.14';
 
 use Getopt::Long 'HelpMessage';
 use MARC::Parser::RAW;

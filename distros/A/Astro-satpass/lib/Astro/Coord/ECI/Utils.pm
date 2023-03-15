@@ -123,7 +123,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.128';
+our $VERSION = '0.129';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -278,7 +278,8 @@ my @all_external = ( qw{
 	atmospheric_extinction date2epoch date2jd
 	decode_space_track_json_time deg2rad distsq dynamical_delta
 	embodies epoch2datetime find_first_true
-	fold_case format_space_track_json_time intensity_to_magnitude
+	fold_case __format_epoch_time_usec
+	format_space_track_json_time intensity_to_magnitude
 	jcent2000 jd2date jd2datetime jday2000 julianday
 	keplers_equation load_module looks_like_number max min mod2pi
 	omega
@@ -728,6 +729,10 @@ This function takes as input a Perl time, and returns that time
 in a format consistent with the Space Track JSON data. This is
 ISO-8601-ish, in Universal time, but without the zone indicated.
 
+B<Note> that Space Track does not represent fractional seconds, even in
+the epoch. This subroutine deals with this by truncating the epoch to
+seconds, and leaving the fractional seconds to the caller to deal with.
+
 =cut
 
 sub format_space_track_json_time {
@@ -735,11 +740,47 @@ sub format_space_track_json_time {
     defined $time
 	and $time =~ m/ \S /smx
 	or return;
-    my @parts = gmtime floor( $time + .5 );
-    $parts[4] += 1;
-    $parts[5] += 1900;
-    return sprintf '%04d-%02d-%02d %02d:%02d:%02d', reverse
-	@parts[ 0 .. 5 ];
+    my ( undef, $sec ) = modf( $time );
+    my @parts = ( gmtime $sec )[ reverse 0 .. 5 ];
+    $parts[0] += 1900;
+    $parts[1] += 1;
+    return sprintf '%04d-%02d-%02d %02d:%02d:%02d', @parts;
+}
+
+=item $fmtd = __format_epoch_time_usec( time(), '%F %T' )
+
+This function takes as input a Perl time with a possible fractional
+part, and returns that time as GMT in the given C<strftime> format, but
+with seconds expressed to the nearest microsecond.
+
+=cut
+
+{
+    # The test of this (which uses format '%F %T') failed under Windows,
+    # at least undef Strawberry, returning the empty string. Expanding
+    # %F fixed this, so I decided to expand all the 'equivalent to'
+    # format strings I could find.
+    my %equiv = (
+	'D'	=> 'm/%d/%y',
+	'F'	=> 'Y-%m-%d',
+	'r'	=> 'I:%M:%S %p',
+	'R'	=> 'H:%M',
+	'T'	=> 'H:%M:%S',
+	'V'	=> 'e-%b-%Y',
+    );
+
+    sub __format_epoch_time_usec {
+	my ( $epoch, $date_format ) = @_;
+	my ( $microseconds, $seconds ) = modf( $epoch );
+	my @parts = gmtime $seconds;
+	my $string_us = sprintf '%.6f', $parts[0] + $microseconds;
+	$string_us =~ s/ [^.]* //smx;
+	$date_format =~ s{ ( %+ ) ( [DFrRTV] ) }
+	    { length( $1 ) % 2 ?  "$1$equiv{$2}" : "$1$2" }smxge;
+	$date_format =~ s{ ( %+ ) S }
+	    { length( $1 ) % 2 ?  "${1}S$string_us" : "$1$2" }smxge;
+	return strftime( $date_format, @parts );
+    }
 }
 
 =item $epoch = greg_time_gm( $sec, $min, $hr, $day, $mon, $yr );
@@ -1548,7 +1589,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2022 by Thomas R. Wyant, III
+Copyright (C) 2005-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

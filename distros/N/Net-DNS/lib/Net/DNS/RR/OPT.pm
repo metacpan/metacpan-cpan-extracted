@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1891 2022-12-28 13:09:27Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1903 2023-03-06 08:51:09Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,8 +20,6 @@ use Net::DNS::Parameters qw(:rcode :ednsoption);
 
 use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };
 
-use constant CLASS_TTL_RDLENGTH => length pack 'n N n', (0) x 3;
-
 use constant OPT => Net::DNS::Parameters::typebyname qw(OPT);
 
 require Net::DNS::DomainName;
@@ -31,24 +29,25 @@ require Net::DNS::Text;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
-	my $index = $offset - CLASS_TTL_RDLENGTH;		# OPT redefines class and TTL fields
-	@{$self}{qw(size rcode version flags)} = unpack "\@$index n C2 n", $$data;
-	@{$self}{rcode} = @{$self}{rcode} << 4;
-	delete @{$self}{qw(class ttl)};
+	my $class = delete $self->{class};			# OPT redefines CLASS and TTL fields
+	$self->{udpsize} = $class if defined $class;
+
+	my $ttl = delete $self->{ttl};
+	@{$self}{qw(rcode version flags)} = unpack 'C2n', pack( 'N', $ttl ) if defined $ttl;
 
 	my $limit = $offset + $self->{rdlength} - 4;
-
 	my @index;
-	while ( $offset <= $limit ) {
-		my ( $code, $length ) = unpack "\@$offset nn", $$data;
-		my $value = unpack "\@$offset x4 a$length", $$data;
-		push @index, $code;
-		$self->{option}{$code} = $value;
-		$offset += $length + 4;
-	}
+	eval {
+		while ( $offset <= $limit ) {
+			my ( $code, $length ) = unpack "\@$offset nn", $$data;
+			my $value = unpack "\@$offset x4 a$length", $$data;
+			$self->{option}{$code} = $value;
+			push @index, $code;
+			$offset += $length + 4;
+		}
+	};
 	@{$self->{index}} = @index;
 	return;
 }
@@ -62,107 +61,121 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 }
 
 
-sub encode {				## overide RR method
+sub encode {				## override RR method
 	my $self = shift;
-
 	my $data = $self->_encode_rdata;
-	my $size = $self->UDPsize;
 	my @xttl = ( $self->rcode >> 4, $self->version, $self->flags );
-	return pack 'C n n C2n n a*', 0, OPT, $size, @xttl, length($data), $data;
+	return pack 'C n n C2n na*', 0, OPT, $self->udpsize, @xttl, length($data), $data;
 }
 
 
-sub string {				## overide RR method
-	my $self = shift;
-
-	my $edns = $self->version;
-	unless ( $edns == 0 ) {
-		my $content = unpack 'H*', eval { $self->encode };
-		return <<"QQ";
-;; {	"EDNS-VERSION":	$edns,
-;;	"BASE16":	"$content"
-;;	}
-QQ
-	}
-
-	my $flags  = sprintf '%04x', $self->flags;
-	my $rcode  = $self->rcode;
-	my $size   = $self->UDPsize;
-	my @format = map { join( "\n;;\t\t\t\t", $self->_format_option($_) ) } $self->options;
-	my @indent = scalar(@format) ? "\n;;\t\t" : ();
-	my @option = join ",\n;;\t\t", @format;
-
-	return <<"QQ";
-;; {	"EDNS-VERSION":	$edns,
-;;	"FLAGS":	"$flags",
-;;	"RCODE":	$rcode,
-;;	"UDPSIZE":	$size,
-;;	"OPTIONS":	[@indent@option ]
-;;	}
-QQ
+sub string {				## override RR method
+	my @line = split /[\r\n]+/, shift->json;
+	return join '', map {";;$_\n"} @line;
 }
 
-
-sub class {				## overide RR method
-	my $self = shift;
+sub class {				## override RR method
+	my ( $self, @value ) = @_;
 	$self->_deprecate(qq[please use "UDPsize()"]);
-	return $self->UDPsize(@_);
+	return $self->udpsize(@value);
 }
 
-sub ttl {				## overide RR method
-	my $self = shift;
+sub ttl {				## override RR method
+	my ( $self, @value ) = @_;
 	$self->_deprecate(qq[please use "flags()" or "rcode()"]);
-	for (@_) {
+	for (@value) {
 		@{$self}{qw(rcode version flags)} = unpack 'C2n', pack 'N', $_;
 		@{$self}{rcode} = @{$self}{rcode} << 4;
 	}
 	return pack 'C2n', $self->rcode >> 4, $self->version, $self->flags;
 }
 
+sub generic {				## override RR method
+	my $self = shift;
+	local $self->{class} = $self->udpsize;
+	my @xttl = ( $self->rcode >> 4, $self->version, $self->flags );
+	local $self->{ttl} = unpack 'N', pack( 'C2n', @xttl );
+	return $self->SUPER::generic;
+}
+
+sub token {				## override RR method
+	return grep { !m/^[()]$/ } split /\s+/, &generic;
+}
+
+sub json {
+	my $self = shift;					# uncoverable pod
+
+	my $version = $self->version;
+	unless ( $version == 0 ) {
+		my $content = unpack 'H*', $self->encode;
+		return <<"QQ";
+ {	"EDNS-VERSION":	$version,
+	"BASE16":	"$content"
+	}
+QQ
+	}
+
+	my $flags  = sprintf '%04x', $self->flags;
+	my $rcode  = $self->rcode;
+	my $size   = $self->udpsize;
+	my @format = map { join( "\n\t\t\t", $self->_format_option($_) ) } $self->options;
+	my @indent = scalar(@format) ? "\n\t\t" : ();
+	my @option = join ",\n\t\t", @format;
+
+	return <<"QQ";
+ {	"EDNS-VERSION":	$version,
+	"FLAGS":	"$flags",
+	"RCODE":	$rcode,
+	"UDPSIZE":	$size,
+	"OPTIONS":	[@indent@option ]
+	}
+QQ
+}
+
 
 sub version {
-	my $self = shift;
-	$self->{version} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{version} = 0 + $_ }
 	return $self->{version} || 0;
 }
 
 
-sub UDPsize {
-	my $self = shift;
-	$self->{size} = shift if scalar @_;
-	return ( $self->{size} || 0 ) > 512 ? $self->{size} : 0;
+sub udpsize {
+	my ( $self, @value ) = @_;				# uncoverable pod
+	for (@value) { $self->{udpsize} = 0 + $_ }
+	return ( $self->{udpsize} || 0 ) > 512 ? $self->{udpsize} : 0;
 }
 
-sub size { return &UDPsize; }					# uncoverable pod
+sub size { return &udpsize; }					# uncoverable pod
 
 
 sub rcode {
-	my $self = shift;
-	return $self->{rcode} || 0 unless scalar @_;
-	my $val = shift || 0;
-	return $self->{rcode} = $val < 16 ? 0 : $val;		# discard non-EDNS rcodes 1 .. 15
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{rcode} = $_ < 16 ? 0 : $_ }	# discard non-EDNS rcodes 1 .. 15
+	return $self->{rcode} || 0;
 }
 
 
 sub flags {
-	my $self = shift;
-	$self->{flags} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{flags} = 0 + $_ }
 	return $self->{flags} || 0;
 }
 
 
 sub options {
-	my ($self) = @_;
+	my $self   = shift;
 	my $option = $self->{option} || {};
 	my @option = defined( $self->{index} ) ? @{$self->{index}} : sort { $a <=> $b } keys %$option;
 	return @option;
 }
 
 sub option {
-	my $self   = shift;
-	my $number = ednsoptionbyname(shift);
-	return $self->_get_option($number) unless scalar @_;
-	return $self->_set_option( $number, @_ );
+	my ( $self, $name, @value ) = @_;
+	my $number = ednsoptionbyname($name);
+	return $self->_get_option($number) unless scalar @value;
+	my $value = $self->_set_option( $number, @value );
+	return $@ ? croak( ( split /\sat/i, $@ )[0] ) : $value;
 }
 
 
@@ -176,24 +189,31 @@ sub _get_option {
 	return $payload unless wantarray;
 	my $package = join '::', __PACKAGE__, ednsoptionbyval($number);
 	$package =~ s/-/_/g;
-	my @structure = $package->can('_decompose') ? eval { $package->_decompose($payload) } : ();
-	return @structure if scalar(@structure);
+	if ( $package->can('_decompose') ) {
+		return {'OPTION-LENGTH' => 0} unless length $payload;
+		my @structure = eval { $package->_decompose($payload) };
+		return @structure if scalar @structure;
+	}
+	warn $@ if $@;
 	return length($payload) ? {BASE16 => unpack 'H*', $payload} : '';
 }
 
 
 sub _set_option {
 	my ( $self, $number, @value ) = @_;
-
-	my $options = $self->{option} ||= {};
-	delete $options->{$number};
-
 	my ($arg) = @value;
+
+	my $options = $self->{option} || {};
+	delete $options->{$number};
+	delete $self->{option} unless scalar( keys %$options );
+
 	return unless defined $arg;
+	$self->{option} = $options;
 
 	if ( ref($arg) eq 'HASH' ) {
-		my $octets = $$arg{'OPTION-DATA'};
+		for ( keys %$arg ) { $$arg{uc $_} = $$arg{$_} } # tolerate mixed case
 		my $length = $$arg{'OPTION-LENGTH'};
+		my $octets = $$arg{'OPTION-DATA'};
 		$octets = pack 'H*', $$arg{'BASE16'} if defined $$arg{'BASE16'};
 		$octets = '' if defined($length) && $length == 0;
 		return $options->{$number} = $octets if defined $octets;
@@ -202,10 +222,16 @@ sub _set_option {
 	my $option  = ednsoptionbyval($number);
 	my $package = join '::', __PACKAGE__, $option;
 	$package =~ s/-/_/g;
-	return eval { $options->{$number} = $package->_compose(@value) } if $package->can('_compose');
+	return eval { $options->{$number} = $package->_compose(@value) } if length($arg) && $package->can('_compose');
 
 	croak "unable to compose option $number" if ref($arg);
 	return $options->{$number} = $arg;
+}
+
+
+sub _specified {
+	my $self = shift;
+	return scalar grep { $self->{$_} } qw(udpsize flags rcode option);
 }
 
 
@@ -219,38 +245,39 @@ sub _format_option {
 
 sub _JSONify {
 	my $value = shift;
+	return 'null' unless defined $value;
+
 	if ( ref($value) eq 'HASH' ) {
-		my @tags = keys %$value;
+		my @tags = sort keys %$value;
 		my $tail = pop @tags;
-		my @body = map {
-			my ( $a, @z ) = _JSONify( $$value{$_} );
-			unshift @z, qq("$_": $a);
-			$z[-1] .= ',';
-			@z;
-		} @tags;
-		my ( $a, @tail ) = _JSONify( $$value{$tail} );
-		unshift @tail, qq("$tail": $a);
-		return ( '{', @body, @tail, '}' );
+		for ( $$value{BASE16} ) { $_ = pack( 'U0a*', $_ ) if defined }	  # mark as UTF-8
+		my @body = map { my @x = ( qq("$_":), _JSONify( $$value{$_} ) ); $x[-1] .= ','; @x } @tags;
+		push @body, ( qq("$tail":), _JSONify( $$value{$tail} ) );
+		$body[0] = '{' . $body[0];
+		$body[-1] .= '}';
+		return @body;
 	}
 
 	if ( ref($value) eq 'ARRAY' ) {
 		my @array = @$value;
-		return qq([ ]) unless scalar @array;
-		my @tail = _JSONify( pop @array );
-		my @body = map { my @x = _JSONify($_); $x[-1] .= ','; @x } @array;
+		my @tail  = map { _JSONify($_) } grep {defined} pop @array;
+		my @body  = map { my @x = _JSONify($_); $x[-1] .= ','; @x } @array;
 		return ( '[', @body, @tail, ']' );
 	}
 
-	my $string = qq("$value");	## stringify, then use isdual() as discriminant
-	return $value if UTIL  && Scalar::Util::isdual($value); # native integer
-	return $value if !UTIL && $string =~ /^"\d{1,10}"$/;	# best-effort workaround
-	return $string;
-}
-
-
-sub _specified {
-	my $self = shift;
-	return scalar grep { $self->{$_} } qw(size flags rcode option);
+	my $string = "$value";		## stringify, then use isdual() as discriminant
+	return $string if UTIL && Scalar::Util::isdual($value); # native numeric representation
+	for ($string) {
+		unless ( utf8::is_utf8($value) ) {
+			return $_ if /^-?\d+$/;			# integer (string representation)
+			return $_ if /^-?\d+\.\d+$/;		# non-integer
+			return $_ if /^-?\d+(\.\d+)?e[+-]\d\d?$/i;
+		}
+		s/\\/\\\\/g;					# escaped escape
+		s/^"(.*)"$/$1/;					# strip enclosing quotes
+		s/"/\\"/g;					# escape interior quotes
+	}
+	return qq("$string");
 }
 
 
@@ -258,18 +285,18 @@ sub _specified {
 package Net::DNS::RR::OPT::NSID;				# RFC5001
 
 sub _compose {
-	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? %$_ : $_ } @_;
 	return pack 'H*', pop @argument;
 }
 
-sub _decompose { return unpack 'H*', pop @_ }
+sub _decompose { return pack 'U0a*', unpack 'H*', pop @_ }	# mark as UTF-8
 
 
 package Net::DNS::RR::OPT::DAU;					# RFC6975
 
 sub _compose {
-	shift @_;
-	return pack 'C*', map { ref($_) ? @$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? @$_ : $_ } @_;
+	return pack 'C*', @argument;
 }
 
 sub _decompose { return [unpack 'C*', pop @_] }
@@ -299,8 +326,11 @@ sub _compose {
 sub _decompose {
 	my %object;
 	@object{@field8} = unpack 'nC2a*', pop @_;
-	my ($family) = grep defined($_), $family{$object{FAMILY}}, 2;
-	$object{ADDRESS} = bless( {address => $object{ADDRESS}}, $family )->address;
+	my $family = $family{$object{FAMILY}} || die 'unrecognised address family';
+	for ( $object{ADDRESS} ) {
+		$_ = bless( {address => $_}, $family )->address;
+		s/:[:0]+$/::/;
+	}
 	return \%object;
 }
 
@@ -308,45 +338,54 @@ sub _decompose {
 package Net::DNS::RR::OPT::EXPIRE;				# RFC7314
 
 sub _compose {
-	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? %$_ : $_ } @_;
 	return pack 'N', pop @argument;
 }
 
 sub _decompose {
 	my $argument = pop @_;
-	return length($argument) ? unpack( 'N', $argument ) : {'OPTION-LENGTH' => 0};
+	return {'EXPIRE-TIMER' => unpack 'N', $argument};
 }
 
 
 package Net::DNS::RR::OPT::COOKIE;				# RFC7873
 
+my @field10 = qw(CLIENT SERVER);
+
 sub _compose {
-	shift @_;
-	my @argument = map { ref($_) ? @$_ : $_ } @_;
-	return pack 'a8a*', map pack( 'H*', $_ ), grep defined($_), @argument;
+	my ( undef, @argument ) = @_;
+	for ( ref( $argument[0] ) ) {
+		/HASH/	&& ( @argument = @{$argument[0]}{@field10} );
+		/ARRAY/ && ( @argument = @{$argument[0]} );
+	}
+	return pack 'a8a*', map { pack 'H*', $_ || '' } @argument;
 }
 
-sub _decompose { return [unpack 'H16H*', pop @_] }
+sub _decompose {
+	my %object;
+	@object{@field10} = map { pack 'U0a*', $_ } unpack 'H16H*', pop @_;    # mark as UTF-8
+	return \%object;
+}
 
 
 package Net::DNS::RR::OPT::TCP_KEEPALIVE;			# RFC7828
 
 sub _compose {
-	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? %$_ : $_ } @_;
 	return pack 'n', pop @argument;
 }
 
 sub _decompose {
 	my $argument = pop @_;
-	return length($argument) ? unpack( 'n', $argument ) : {'OPTION-LENGTH' => 0};
+	return {'TIMEOUT' => unpack 'n', $argument};
 }
 
 
 package Net::DNS::RR::OPT::PADDING;				# RFC7830
 
 sub _compose {
-	my @argument = map { ref($_) ? %$_ : $_ } @_;
-	my $length   = pop @argument;
+	my ( undef, @argument ) = map { ref($_) ? %$_ : $_ } @_;
+	my $length = pop(@argument) || 0;
 	return pack "x$length";
 }
 
@@ -360,7 +399,7 @@ sub _decompose {
 package Net::DNS::RR::OPT::CHAIN;				# RFC7901
 
 sub _compose {
-	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? %$_ : $_ } @_;
 	return Net::DNS::DomainName->new( pop @argument )->encode;
 }
 
@@ -373,8 +412,8 @@ sub _decompose {
 package Net::DNS::RR::OPT::KEY_TAG;				# RFC8145
 
 sub _compose {
-	shift @_;
-	return pack 'n*', map { ref($_) ? @$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? @$_ : $_ } @_;
+	return pack 'n*', @argument;
 }
 
 sub _decompose { return [unpack 'n*', pop @_] }
@@ -382,29 +421,34 @@ sub _decompose { return [unpack 'n*', pop @_] }
 
 package Net::DNS::RR::OPT::EXTENDED_ERROR;			# RFC8914
 
-my @field15 = qw(INFO-CODE EXTRA-TEXT);
-
 sub _compose {
-	shift @_;
-	my %argument = map { ref($_) ? %$_ : $_ } @_;
-	my ( $code, $extra ) = map { defined($_) ? $_ : '' } @argument{@field15};
-	return pack 'na*', 0 + $code, Net::DNS::Text->new($extra)->raw;
+	my ( undef, @arg ) = @_;
+	my %arg	 = ref( $arg[0] ) ? %{$arg[0]} : @arg;
+	my $text = join '', Net::DNS::RR::OPT::_JSONify( $arg{'EXTRA-TEXT'} || '' );
+	return pack 'na*', $arg{'INFO-CODE'}, Net::DNS::Text->new($text)->raw;
 }
 
 sub _decompose {
-	my ( $code, $extra ) = unpack 'na*', pop @_;
-	my @error = grep { defined($_) } $Net::DNS::Parameters::dnserrorbyval{$code};
-	return {'INFO-CODE'  => $code,
-		'EXTRA-TEXT' => Net::DNS::Text->decode( \$extra, 0, length $extra )->value,
-		map( ( 'DNS-ERROR' => "$_" ), @error )};
+	my ( $code, $text ) = unpack 'na*', pop @_;
+	my $error = $Net::DNS::Parameters::dnserrorbyval{$code};
+	my @error = defined($error) ? ( 'ERROR' => $error ) : ();
+	my $extra = Net::DNS::Text->decode( \$text, 0, length $text );
+	my $REGEX = q/("[^"]*")|([\[\]{}:,])|\s+/;
+	for ( $extra->value ) {
+		last unless /^[\[\{]/;
+		s/([\@\$])/\\$1/g;
+		my $info = eval join( ' ', map { s/^:$/=>/; $_ } grep {defined} split /$REGEX/o );
+		return {'INFO-CODE' => $code, @error, 'EXTRA-TEXT' => $info || last};
+	}
+	return {'INFO-CODE' => $code, @error, 'EXTRA-TEXT' => $extra->string};
 }
 
 
 package Net::DNS::RR::OPT::REPORT_CHANNEL;			# draft-ietf-dnsop-dns-error-reporting
-$Net::DNS::Parameters::ednsoptionbyval{65023} = 'REPORT-CHANNEL';	# experimental/private use
+$Net::DNS::Parameters::ednsoptionbyval{65023} = 'REPORT-CHANNEL';	## experimental/private use
 
 sub _compose {
-	my @argument = map { ref($_) ? %$_ : $_ } @_;
+	my ( undef, @argument ) = map { ref($_) ? %$_ : $_ } @_;
 	return Net::DNS::DomainName->new( pop @argument )->encode;
 }
 
@@ -429,9 +473,9 @@ __END__
 
     $packet->edns->UDPsize(1232);	# UDP payload size
 
-    $packet->edns->option( 'NSID'	    => '7261776279746573' );
-    $packet->edns->option( 'TCP-KEEPALIVE'  => 200 );
+    $packet->edns->option( 'NSID'	    => {'OPTION-DATA' => 'rawbytes'} );
     $packet->edns->option( 'DAU'	    => [8, 10, 13, 14, 15, 16] );
+    $packet->edns->option( 'TCP-KEEPALIVE'  => 200 );
     $packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123} );
     $packet->edns->option( '65023'	    => {'BASE16' => '076578616d706c6500'} );
 
@@ -441,12 +485,12 @@ __END__
 	;;	"FLAGS":	"8000",
 	;;	"RCODE":	0,
 	;;	"UDPSIZE":	1232,
-	;;	"OPTIONS"	: [
-	;;		{ "NSID": "7261776279746573" },
-	;;		{ "TCP-KEEPALIVE": 200 },
-	;;		{ "DAU": [ 8, 10, 13, 14, 15, 16 ] },
-	;;		{ "EXTENDED-ERROR": { "INFO-CODE": 123, "EXTRA-TEXT": "" } },
-	;;		{ "65023": { "BASE16": "076578616d706c6500" } } ]
+	;;	"OPTIONS":	[
+	;;		{"NSID": "7261776279746573"},
+	;;		{"DAU": [ 8, 10, 13, 14, 15, 16 ]},
+	;;		{"TCP-KEEPALIVE": {"TIMEOUT": 200}},
+	;;		{"EXTENDED-ERROR": {"INFO-CODE": 123, "EXTRA-TEXT": ""}},
+	;;		{"65023": {"BASE16": "076578616d706c6500"}} ]
 	;;	}
 
 =head1 DESCRIPTION
@@ -547,7 +591,7 @@ option value:
 
 Copyright (c)2001,2002 RIPE NCC.  Author Olaf M. Kolkman.
 
-Portions Copyright (c)2012,2017-2022 Dick Franks.
+Portions Copyright (c)2012,2017-2023 Dick Franks.
 
 All rights reserved.
 
@@ -575,6 +619,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<RFC6891|https://tools.ietf.org/html/rfc6891>, L<RFC3225|https://tools.ietf.org/html/rfc3225>
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC6891|https://tools.ietf.org/html/rfc6891>
+L<RFC3225|https://tools.ietf.org/html/rfc3225>
 
 =cut

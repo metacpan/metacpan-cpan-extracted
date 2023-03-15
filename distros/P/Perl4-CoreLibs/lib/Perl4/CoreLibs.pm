@@ -82,7 +82,8 @@ Inhale shell variables set by a shell script.
 =item exceptions.pl
 
 String-based exception handling built on C<eval> and C<die>.
-Prefer L<Try::Tiny> or L<TryCatch>.
+Prefer L<Try::Tiny>, L<TryCatch>,
+or the core C<try>/C<catch> facility on Perl 5.33.7 or later.
 
 =item fastcwd.pl
 
@@ -200,7 +201,7 @@ package Perl4::CoreLibs;
 use warnings;
 use strict;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 =head1 AUTHOR
 
@@ -224,7 +225,8 @@ Andrew Main (Zefram) <zefram@fysh.org> built the Perl4::CoreLibs package.
 
 Copyright (C) 1987-2009 Larry Wall et al
 
-Copyright (C) 2010, 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2017, 2023
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

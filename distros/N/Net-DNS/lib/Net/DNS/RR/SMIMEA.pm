@@ -2,7 +2,7 @@ package Net::DNS::RR::SMIMEA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SMIMEA.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: SMIMEA.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -21,8 +21,7 @@ use constant BABBLE => defined eval { require Digest::BubbleBabble };
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $next = $offset + $self->{rdlength};
 
@@ -51,51 +50,46 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->usage(shift);
-	$self->selector(shift);
-	$self->matchingtype(shift);
-	$self->cert(@_);
+	for (qw(usage selector matchingtype)) { $self->$_( shift @argument ) }
+	$self->cert(@argument);
 	return;
 }
 
 
 sub usage {
-	my $self = shift;
-
-	$self->{usage} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{usage} = 0 + $_ }
 	return $self->{usage} || 0;
 }
 
 
 sub selector {
-	my $self = shift;
-
-	$self->{selector} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{selector} = 0 + $_ }
 	return $self->{selector} || 0;
 }
 
 
 sub matchingtype {
-	my $self = shift;
-
-	$self->{matchingtype} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{matchingtype} = 0 + $_ }
 	return $self->{matchingtype} || 0;
 }
 
 
 sub cert {
-	my $self = shift;
-	return unpack "H*", $self->certbin() unless scalar @_;
-	return $self->certbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	my ( $self, @value ) = @_;
+	return unpack "H*", $self->certbin() unless scalar @value;
+	my @hex = map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @value;
+	return $self->certbin( pack "H*", join "", @hex );
 }
 
 
 sub certbin {
-	my $self = shift;
-
-	$self->{certbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{certbin} = $_ }
 	return $self->{certbin} || "";
 }
 
@@ -222,7 +216,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8162,
-RFC6698
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC8162|https://tools.ietf.org/html/rfc8162>
+L<RFC6698|https://tools.ietf.org/html/rfc6698>
 
 =cut

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.154';
+our $VERSION = '0.156';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -50,13 +50,13 @@ sub new {
 
 sub _valid_options {
     return {
-        binary_filter     => '[ 0 1 ]',
         codepage_mapping  => '[ 0 1 ]',
         hide_cursor       => '[ 0 1 ]', # documentation
         mouse             => '[ 0 1 ]',
         squash_spaces     => '[ 0 1 ]',
         table_expand      => '[ 0 1 ]',
         trunc_fract_first => '[ 0 1 ]',
+        binary_filter     => '[ 0 1 2 ]',
         color             => '[ 0 1 2 ]',
         page              => '[ 0 1 2 ]', # undocumented
         search            => '[ 0 1 2 ]', #
@@ -65,7 +65,7 @@ sub _valid_options {
         min_col_width     => '[ 0-9 ]+', ##
         progress_bar      => '[ 0-9 ]+',
         tab_width         => '[ 0-9 ]+',
-        binary_string     => 'Str',
+        binary_string     => 'Str', ##
         decimal_separator => 'Str',
         footer            => 'Str',
         info              => 'Str',
@@ -87,7 +87,7 @@ sub _defaults {
         hide_cursor       => 1,
         info              => undef,
         keep              => undef,
-        max_rows          => 200000,
+        max_rows          => 0,
         min_col_width     => 30,
         mouse             => 0,
         page              => 2, ##
@@ -174,13 +174,9 @@ sub print_table {
     }
     my $data_row_count = @$tbl_orig - 1;
     my $info_row = '';
-    if ( $self->{max_rows} && $data_row_count >= $self->{max_rows} ) {
-        $info_row = sprintf( 'Reached the row LIMIT %s', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
-        # App::DBBrowser: $table_rows_count already cut to $self->{max_rows} so total rows are not known at this point.
-        # Therefore add 'total' only if $table_rows_count > $self->{max_rows}
-        if ( $data_row_count > $self->{max_rows} ) {
-            $info_row .= sprintf( '  (total %s)', insert_sep( $data_row_count, $self->{thsd_sep} ) );
-        }
+    if ( $self->{max_rows} && $data_row_count > $self->{max_rows} ) {
+        $info_row = sprintf( 'Limited to %s rows', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
+        $info_row .= sprintf( ' (total %s)', insert_sep( $data_row_count, $self->{thsd_sep} ) );
         $data_row_count = $self->{max_rows};
     }
     my $const = {
@@ -402,7 +398,12 @@ sub __copy_table {
                 $str =~ s/\e\[[\d;]*m/\x{feff}/g;
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-                $str = $self->{binary_string};
+                if ($self->{binary_filter} == 2 ) {
+                    $str = sprintf("%v02X", $str) =~ tr/./ /r;
+                }
+                else {
+                    $str = $self->{binary_string};
+                }
             }
             $str =~ s/\t/ /g;
             $str =~ s/\v+/\ \ /g;
@@ -743,11 +744,19 @@ sub __print_single_row {
         $key = cut_to_printwidth( $key, $len_key );
         my $copy_sep = $separator;
         my $value = $tbl_orig->[$row][$col];
-        if ( ! defined $value || ! length $value ) {
+        if ( ! length $value ) {
             $value = ' '; # to show also keys/columns with no values
         }
         if ( $self->{color} ) {
             $value =~ s/\e\[[\d;]*m//g;
+        }
+        if ( $self->{binary_filter} && substr( $value, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
+            if ( $self->{binary_filter} == 2 ) {
+                $value = sprintf("%v02X", $value) =~ tr/./ /r;
+            }
+            else {
+                $value = $self->{binary_string};
+            }
         }
         if ( ref $value ) {
             $value = _handle_reference( $value );
@@ -901,7 +910,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.154
+Version 0.156
 
 =cut
 
@@ -1017,7 +1026,7 @@ squashed to a single space.
 
 =item *
 
-If an element looks like a number it is left-justified, else it is right-justified.
+If an element looks like a number it is right-justified, else it is left-justified.
 
 =back
 
@@ -1075,11 +1084,18 @@ The subroutine C<print_table> takes the same arguments as the method L</print_ta
 
 =head3 binary_filter
 
-If I<binary_filter> is set to 1, "BNRY" is printed instead of arbitrary binary data.
+How to print arbitrary binary data:
 
-If the data matches the repexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, it is considered arbitrary binary data.
+0 - print the binary data as it is
 
-Printing arbitrary binary data could break the output.
+1 - "BNRY" is printed instead of the binary data
+
+2 - the binary data is printed in hexadecimal format
+
+If the substring of the first 100 characters of the data matches the repexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, the data
+is considered arbitrary binary data.
+
+Printing unfiltered arbitrary binary data could break the output.
 
 Default: 0
 
@@ -1137,10 +1153,10 @@ Set the maximum number of used table rows. The used table rows are kept in memor
 
 To disable the automatic limit set I<max_rows> to 0.
 
-If the number of table rows is equal to or higher than I<max_rows>, the last row of the output tells that the limit has
-been reached.
+If the number of table rows is higher than I<max_rows>, the last row of the output tells that the limit has been
+reached.
 
-Default: 200_000
+Default: 0
 
 =head3 min_col_width
 
@@ -1280,7 +1296,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2022 Matthäus Kiem.
+Copyright 2013-2023 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

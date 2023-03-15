@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #else
   #include <sys/un.h>
 #endif
@@ -11,7 +11,7 @@
 const char* FILE_NAME = "Sys/Socket/Sockaddr/Un.c";
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__new(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"new\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -30,7 +30,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"DESTROY\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -49,7 +49,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__DESTROY(SPVM_ENV* env, SPVM_VALUE* stac
 }
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__sun_family(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"sun_family\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -65,7 +65,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__sun_family(SPVM_ENV* env, SPVM_VALUE* s
 }
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_family(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"set_sun_family\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -81,7 +81,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_family(SPVM_ENV* env, SPVM_VALU
 }
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__copy_sun_path(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"sun_path\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -101,7 +101,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__copy_sun_path(SPVM_ENV* env, SPVM_VALUE
 }
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_path(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"set_sun_path\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -127,7 +127,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_path(SPVM_ENV* env, SPVM_VALUE*
 }
 
 int32_t SPVM__Sys__Socket__Sockaddr__Un__sizeof(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The \"sizeof\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else

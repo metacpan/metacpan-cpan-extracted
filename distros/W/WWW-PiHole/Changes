@@ -2,6 +2,9 @@ Revision history for Perl distribution WWW-PiHole
 
 This is a changelog file in addition to git commit messages.
 
+0.230690  2023-03-10 17:51:47+04:00 Asia/Baku
+  - Refactor private methods' code
+
 0.230680  2023-03-09 19:20:19+04:00 Asia/Baku
   - Document the newly added methods
   - Correct POD format

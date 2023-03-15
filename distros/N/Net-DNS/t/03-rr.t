@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-rr.t 1891 2022-12-28 13:09:27Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -295,7 +295,7 @@ use Net::DNS::RR;
 }
 
 
-eval {					## exercise printing functions
+eval {					## no critic		# exercise printing functions
 	require Data::Dumper;
 	require IO::File;
 	local $Data::Dumper::Maxdepth;

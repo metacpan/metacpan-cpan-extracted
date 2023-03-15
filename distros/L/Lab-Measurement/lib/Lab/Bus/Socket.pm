@@ -1,6 +1,6 @@
 package Lab::Bus::Socket;
 #ABSTRACT: IP network socket bus
-$Lab::Bus::Socket::VERSION = '3.851';
+$Lab::Bus::Socket::VERSION = '3.860';
 use v5.20;
 
 use strict;
@@ -239,7 +239,7 @@ Lab::Bus::Socket - IP network socket bus
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 COPYRIGHT AND LICENSE
 

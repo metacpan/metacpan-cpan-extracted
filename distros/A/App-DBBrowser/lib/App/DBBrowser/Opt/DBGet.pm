@@ -48,6 +48,7 @@ sub get_set_attributes {
         if ( $prepared_set_attrs->{$name} =~ /^(\d+)\s/ ) { # e.g.: '5 DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK'
             $prepared_set_attrs->{$name} = $1;
         }
+
     }
     return $prepared_set_attrs;
 }

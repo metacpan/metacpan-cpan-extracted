@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 sub meta {
     +{
@@ -29,7 +29,7 @@ sub filter {
         "do { my \$tmp = $dt; ",
         "if (ref \$tmp) { [\"Must be a string and not a reference\", \$tmp] } ",
         "else { ", (
-            "my \$argssuffix = ''; \$argssuffix = \$1 if \$tmp =~ s/(=.*)\\z//;",                                   # extract args suffix (=arg1,arg2) first
+            "my \$argssuffix = ''; \$argssuffix = \$1 if \$tmp =~ s/([=,].*)\\z//; \$argssuffix =~ s/\\A,/=/; ",    # extract args suffix (=arg1,...) first. we allow , in addition to =
             "my \$versuffix = ''; \$versuffix = \$1 if \$tmp =~ s/(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)\\z//; ", # extract version suffix part first
             "\$tmp = \$1 if \$tmp =~ m!\\A(\\w+(?:/\\w+)*)\.pm\\z!; ",
             "\$tmp =~ s!::?|/|\\.|-!::!g; ",
@@ -55,7 +55,7 @@ Data::Sah::Filter::perl::Perl::normalize_perl_modname
 
 =head1 VERSION
 
-This document describes version 0.047 of Data::Sah::Filter::perl::Perl::normalize_perl_modname (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Data::Sah::Filter::perl::Perl::normalize_perl_modname (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 DESCRIPTION
 
@@ -70,6 +70,22 @@ This prefilter rule can normalize strings in the form of:
 into:
 
  Foo::Bar
+
+This rule can also handle version after module name, e.g.:
+
+ Foo::Bar@1.23
+
+as well as optional import arguments like perl's C<-M>:
+
+ Foo::Bar=arg1,arg2
+ Foo::Bar@1.23=arg1,arg2
+
+For convenience with bash completion (because C<=> is by default a word-breaking
+character in bash, while C<,> is not) you can use C<,> instead of C<=> and it
+will be normalized to C<=>.
+
+ Foo::Bar,arg1,arg2           # will become Foo::Bar=arg1,arg2
+ Foo::Bar@1.23,arg1,arg2      # will become Foo::Bar@1.23=arg1,arg2
 
 =for Pod::Coverage ^(meta|filter)$
 

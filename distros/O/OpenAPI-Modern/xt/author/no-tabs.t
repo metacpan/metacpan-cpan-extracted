@@ -14,6 +14,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/dialects.t',
+    't/document-paths.t',
     't/document-schemas.t',
     't/document-toplevel.t',
     't/find_path.t',

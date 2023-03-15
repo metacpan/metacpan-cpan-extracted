@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Combinatorial algorithms to generate rhythms
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0602';
 
 use Moo;
 use strictures 2;
@@ -599,7 +599,7 @@ Music::CreatingRhythms - Combinatorial algorithms to generate rhythms
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -686,6 +686,15 @@ Arguments:
   p: required numerator of slope
   q: required denominator of slope
   n: optional number of terms to generate, default: p+q
+
+Examples:
+
+  $got = $mcr->chsequl('l', 11, 5);
+  # [0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,1]
+  $got = $mcr->chsequl('u', 11, 5);
+  # [1,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0]
+  $got = $mcr->chsequl('l', 11, 5, 4); # [0,1,1,0];
+  $got = $mcr->chsequl('u', 11, 5, 4); # [1,1,1,0];
 
 =head2 comp
 

@@ -6,6 +6,10 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
     greple -Mxlate::deepl --xlate pattern target-file
 
+# VERSION
+
+Version 0.17
+
 # DESCRIPTION
 
 **Greple** **xlate** Modul findet Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit wird nur der DeepL Service vom **xlate::deepl** Modul unterstützt.
@@ -60,7 +64,7 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
 
     Anstatt die Übersetzungsmaschine aufzurufen, wird von Ihnen erwartet, dass Sie für arbeiten. Nachdem der zu übersetzende Text vorbereitet wurde, wird er in die Zwischenablage kopiert. Es wird erwartet, dass Sie sie in das Formular einfügen, das Ergebnis in die Zwischenablage kopieren und die Eingabetaste drücken.
 
-- **--xlate-to** (Default: `JA`)
+- **--xlate-to** (Default: `EN-US`)
 
     Geben Sie die Zielsprache an. Sie können die verfügbaren Sprachen mit dem Befehl `deepl languages` abrufen, wenn Sie die Engine **DeepL** verwenden.
 

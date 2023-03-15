@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Module::Infobot;
-$Bot::BasicBot::Pluggable::Module::Infobot::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Module::Infobot::VERSION = '1.30';
 use strict;
 use warnings;
 use base qw(Bot::BasicBot::Pluggable::Module);
@@ -31,6 +31,8 @@ sub init {
               "here|how|it|something|that|this|what|when|where|which|who|why",
             user_unknown_responses =>
 "Dunno.|I give up.|I have no idea.|No clue. Sorry.|Search me, bub.|Sorry, I don't know.",
+            user_escape_pipes     => 0,
+            user_can_newline      => 0,
             db_version => "1",
         }
     );
@@ -148,7 +150,14 @@ sub fallback {
         # get the factoid and type of relationship
         my ( $is_are, $factoid, $literal ) = $self->get_factoid($body);
         if ( !$literal && $factoid && $factoid =~ /\|/ ) {
-            my @f = split /\|/, $factoid;
+            my @f;
+            # Allow escaped pipes
+            if ($self->get("user_escape_pipes")) {
+                @f = split /(?<!\\)(?>\\\\)*\|/, $factoid;
+                @f = map { s/\\\|/|/g; $_; } @f;
+            } else {
+                @f = split /\|/, $factoid;
+            }
             $factoid = $f[ int( rand( scalar @f ) ) ];
         }
 
@@ -237,6 +246,11 @@ sub fallback {
     }
 
     unless ( $self->protection_status($mess, $object) ) {
+	# Allow escaped newlines
+	if ($self->get("user_can_newline")) {
+	    $description =~ s/(?<!\\)(?>\\\\)*\\n/\n/g
+	}
+
 	# add this factoid. this comment is absolutely useless. excelsior.
 	$self->add_factoid( $object, $is_are, split( /\s+or\s+/, $description ) );
 
@@ -523,7 +537,7 @@ Bot::BasicBot::Pluggable::Module::Infobot - infobot clone redone in B::B::P.
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 
@@ -606,6 +620,9 @@ Finally, you can privmsg the bot to search for particular facts:
 
 =head1 VARS
 
+All of these are configurable via the Vars module, i.e. they have a C<user_>
+prefix in the store.
+
 =over 4
 
 =item min_length
@@ -664,6 +681,14 @@ blocking it. Defaults to 10.
 =item rss_items
 
 Maximal numbers of items returns when using RSS feeds. Defaults to 5.
+
+=item can_newline
+
+Allow newlines in factoids with \n (\\n is then needed for a literal backslash-n)
+
+=item escape_pipes
+
+Allow pipes in factoids with \| (otherwise they separate random items; see IRC USAGE above).
 
 =back
 

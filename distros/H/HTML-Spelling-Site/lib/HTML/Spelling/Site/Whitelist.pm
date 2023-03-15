@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.10.2';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.10.3';
 use strict;
 use warnings;
 use autodie;
@@ -278,7 +278,7 @@ HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 VERSION
 
-version 0.10.2
+version 0.10.3
 
 =head1 SYNOPSIS
 
@@ -355,7 +355,7 @@ wildcards or regular expression syntax.)
 
 Here's another example:
 
-L<https://bitbucket.org/shlomif/shlomi-fish-homepage/src/493302cc5f1d81584f6f21bbd64197048e185aa6/lib/hunspell/whitelist1.txt?at=default&fileviewer=file-view-default>
+L<https://github.com/shlomif/shlomi-fish-homepage/blob/master/lib/hunspell/whitelist1.txt>
 
 You should keep the whitelist file canonicalised and sorted by using
 write_sorted_file() and is_sorted() .

@@ -3,7 +3,7 @@ package Crypt::Passphrase::Reversed;
 use strict;
 use warnings;
 
-use parent 'Crypt::Passphrase::Encoder';
+use Crypt::Passphrase -encoder;
 
 use Encode 'decode_utf8';
 

@@ -30,15 +30,15 @@ sub attach_db {
     my $attached_db;
     if ( -s $sf->{i}{f_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
-        $attached_db = $h_ref->{$sf->{d}{db}} // [];
+        $attached_db = $h_ref->{$sf->{d}{db}} // {};
     }
     my $dbh = $sf->{d}{dbh};
     my $old_idx = 0;
 
     ATTACH: while ( 1 ) {
         my @tmp_info = ( $sf->{d}{db_string} );
-        for my $ref ( @$attached_db ) {
-            push @tmp_info, __attach_stmt( $dbh, $ref->[0], $ref->[1] );
+        for my $key ( sort keys %$attached_db ) {
+            push @tmp_info, __attach_stmt( $dbh, $attached_db->{$key}, $key );
         }
         push @tmp_info, '';
         my @pre = ( undef );
@@ -65,6 +65,7 @@ sub attach_db {
         my $db = $menu->[$idx];
         my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
         push @tmp_info, 'DB: ' . $db;
+        my $bu_attached_db = { %$attached_db };
 
         ALIAS: while ( 1 ) {
             my $info = join( "\n", @tmp_info );
@@ -79,9 +80,9 @@ sub attach_db {
                 next ATTACH;
             }
             else {
-                push @$attached_db, [ $db, $alias ];
+                $attached_db->{$alias} = $db;
                 my @tmp_info = ( $sf->{d}{db_string} );
-                push @tmp_info, map { __attach_stmt( $dbh, $_->[0], $_->[1] ) } @$attached_db;
+                push @tmp_info, map { __attach_stmt( $dbh, $attached_db->{$_}, $_ ) } sort keys %$attached_db;
                 push @tmp_info, '';
                 my $info = join( "\n", @tmp_info );
                 # Choose
@@ -91,26 +92,19 @@ sub attach_db {
                 );
                 $ax->print_sql_info( $info );
                 if ( ! defined $confirm ) {
-                    pop @$attached_db;
+                    $attached_db = $bu_attached_db;
                     next ALIAS;
                 }
-                if ( ! eval {
-                    $dbh->do( __attach_stmt( $dbh, $db, $alias ) );
-                    1 }
-                ) {
-                    pop @$attached_db;
-                    $ax->print_error_message( $@ );
-                    next ALIAS;
-                }
-                $sf->{d}{db_attached} = 1;
                 my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
-                $h_ref->{$sf->{d}{db}} = [ sort( @$attached_db ) ]; ## format
+                $h_ref->{$sf->{d}{db}} = $attached_db;
                 $ax->write_json( $sf->{i}{f_attached_db}, $h_ref );
                 return 1;
             }
         }
     }
 }
+
+
 
 sub __attach_stmt {
     my ( $dbh, $db, $alias ) = @_;
@@ -125,9 +119,9 @@ sub detach_db {
     my $attached_db;
     if ( -s $sf->{i}{f_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
-        $attached_db = $h_ref->{$sf->{d}{db}} // [];
+        $attached_db = $h_ref->{$sf->{d}{db}} // {};
     }
-    if ( ! @$attached_db ) {
+    if ( ! %$attached_db ) {
         my $info = $sf->{d}{db_string};
         my $prompt = 'No attached databases.';
         my $table = $tc->choose(
@@ -141,8 +135,9 @@ sub detach_db {
     DETACH: while ( 1 ) {
         my $info = $sf->{d}{db_string};
         my @choices;
-        for my $elem ( @$attached_db ) {
-            push @choices, sprintf "%s  (%s)", @$elem[1,0];
+        my @aliases = ( sort keys %$attached_db );
+        for my $key ( @aliases ) {
+            push @choices, sprintf "%s  (%s)", $key, $attached_db->{$key};
         }
         my $prompt = 'Detach database:';
         my @pre = ( undef );
@@ -162,10 +157,10 @@ sub detach_db {
             }
             $old_idx = $idx;
         }
-        my $detached = splice( @$attached_db, $idx - @pre, 1 );
+        my $detached_alias = $aliases[$idx - @pre];
+        my $detached_db = delete $attached_db->{$detached_alias};
         my $dbh = $sf->{d}{dbh};
-        my $stmt = sprintf "DETACH DATABASE %s", $dbh->quote( $detached->[1] );
-        $prompt = "\n" . $stmt . sprintf "   (%s)", $dbh->quote( $detached->[0] );
+        $prompt = sprintf "DETACH DATABASE %s  (%s)", $dbh->quote( $detached_alias ), $dbh->quote_identifier( $detached_db );
         # Choose
         my $confirm = $tc->choose(
             [ undef, 'YES' ],
@@ -173,17 +168,15 @@ sub detach_db {
         );
         $ax->print_sql_info( $info );
         if ( ! defined $confirm ) {
-            $attached_db = [ sort @$attached_db, $detached ];
+            $attached_db->{$detached_alias} = $detached_db;
             next DETACH;
         }
-        $dbh->do( $stmt );
         my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
-        if ( @$attached_db ) {
+        if ( %$attached_db ) {
             $h_ref->{$sf->{d}{db}} = $attached_db;
         }
         else {
             delete $h_ref->{$sf->{d}{db}};
-            $sf->{d}{db_attached} = 0; # no more databases attached
         }
         $ax->write_json( $sf->{i}{f_attached_db}, $h_ref );
         return 1;

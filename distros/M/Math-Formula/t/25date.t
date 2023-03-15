@@ -6,6 +6,7 @@ use utf8;
 
 use Math::Formula ();
 use Test::More;
+use Log::Report;   # dispatcher
 
 use DateTime;
 use DateTime::TimeZone::OffsetOnly ();
@@ -68,7 +69,7 @@ my @infix = (
 	[  1, 'MF::INTEGER', '2023-11-21 <=> 2022-03-05' ],
 
 	# Casts a warning
-	[  0, 'MF::INTEGER', '2022-03-05+0200 <=> 2022-03-05+0300' ],
+	[  0, 'MF::INTEGER', '2022-03-05+0200 <=> 2022-03-05+0300', 1 ],
 );
 
 ### ATTRIBUTES
@@ -82,9 +83,13 @@ my @attrs = (
 );
 
 foreach (@infix, @attrs)
-{	my ($result, $type, $rule) = @$_;
+{	my ($result, $type, $rule, $warning) = @$_;
 
 	$expr->_test($rule);
+
+	#!!! this has lasting effect on this script: no output from Log::Report
+	dispatcher close => 'default' if $warning;
+
 	my $eval = $expr->evaluate;
 	is $eval->token, $result, "$rule -> $result";
 	isa_ok $eval, $type;

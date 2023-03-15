@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 106 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 110 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
@@ -42,6 +42,7 @@ my @module_files = (
     'App/CSVUtils/csv_munge_row.pm',
     'App/CSVUtils/csv_pick_fields.pm',
     'App/CSVUtils/csv_pick_rows.pm',
+    'App/CSVUtils/csv_quote.pm',
     'App/CSVUtils/csv_replace_newline.pm',
     'App/CSVUtils/csv_rtrim.pm',
     'App/CSVUtils/csv_select_fields.pm',
@@ -58,6 +59,7 @@ my @module_files = (
     'App/CSVUtils/csv_transpose.pm',
     'App/CSVUtils/csv_trim.pm',
     'App/CSVUtils/csv_uniq.pm',
+    'App/CSVUtils/csv_unquote.pm',
     'App/CSVUtils/paras2csv.pm'
 );
 
@@ -92,6 +94,7 @@ my @scripts = (
     'script/csv-pick',
     'script/csv-pick-fields',
     'script/csv-pick-rows',
+    'script/csv-quote',
     'script/csv-replace-newline',
     'script/csv-rtrim',
     'script/csv-select-fields',
@@ -111,6 +114,7 @@ my @scripts = (
     'script/csv-transpose',
     'script/csv-trim',
     'script/csv-uniq',
+    'script/csv-unquote',
     'script/csv2ltsv',
     'script/csv2paras',
     'script/csv2td',

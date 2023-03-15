@@ -58,7 +58,7 @@
    "provides" : {
       "Complete::Util" : {
          "file" : "lib/Complete/Util.pm",
-         "version" : "0.614"
+         "version" : "0.617"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Util"
       }
    },
-   "version" : "0.614",
+   "version" : "0.617",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

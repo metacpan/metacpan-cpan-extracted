@@ -6,9 +6,9 @@ use warnings;
 no warnings 'experimental::regex_sets';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 our $schema = [str => {
     summary => 'Unqualified identifier in Perl, with "use utf8" in effect',
@@ -59,7 +59,7 @@ Sah::Schema::perl::identifier::qualified_unicode - Unqualified identifier in Per
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schema::perl::identifier::qualified_unicode (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schema::perl::identifier::qualified_unicode (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -105,11 +105,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "foo0::bar";
+ $data = "b\xE9b\xE9::0foo";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "\$foo::bar";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A\n                (?[ ( \\p{Word} & \\p{XID_Start} ) + [_] ])\n                (?[ ( \\p{Word} & \\p{XID_Continue} ) ])*\n                (?:\n                    ::(?[ ( \\p{Word} & \\p{XID_Continue} ) + [_] ])+\n                )+\n                \\z)x"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -120,12 +120,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "foo0::bar";
- my $res = $validator->($data); # => ["","foo0::bar"]
+ $data = "b\xE9b\xE9::0foo";
+ my $res = $validator->($data); # => ["","b\xE9b\xE9::0foo"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A\n                (?[ ( \\p{Word} & \\p{XID_Start} ) + [_] ])\n                (?[ ( \\p{Word} & \\p{XID_Continue} ) ])*\n                (?:\n                    ::(?[ ( \\p{Word} & \\p{XID_Continue} ) + [_] ])+\n                )+\n                \\z)x",""]
+ $data = "\$foo::bar";
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A\n                (?[ ( \\p{Word} & \\p{XID_Start} ) + [_] ])\n                (?[ ( \\p{Word} & \\p{XID_Continue} ) ])*\n                (?:\n                    ::(?[ ( \\p{Word} & \\p{XID_Continue} ) + [_] ])+\n                )+\n                \\z)x","\$foo::bar"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

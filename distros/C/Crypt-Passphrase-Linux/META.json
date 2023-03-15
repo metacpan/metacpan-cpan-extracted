@@ -30,11 +30,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::Passphrase::Encoder" : "0",
-            "Crypt::Passprase" : "0.008",
+            "Carp" : "0",
+            "Crypt::Passphrase" : "0.010",
             "Crypt::Passwd::XS" : "0",
             "MIME::Base64" : "0",
-            "parent" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -53,7 +52,7 @@
    "provides" : {
       "Crypt::Passphrase::Linux" : {
          "file" : "lib/Crypt/Passphrase/Linux.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -67,7 +66,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase-linux"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

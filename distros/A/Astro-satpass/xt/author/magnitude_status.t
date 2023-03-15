@@ -15,9 +15,13 @@ use Time::Local;
 note <<'EOD';
 
 This test checks to see if the canned magnitude data may need updating.
-All it really does is to check file dates on the relevant files.
+It checks the file dates of relevant files, and scrapes Heavens Above
+for current magnitudes.
 
 EOD
+
+$ENV{TLE_DO_MAGNITUDE_STATUS}
+    or plan skip_all => 'TLE_DO_MAGNITUDE_STATUS not set';
 
 is_last_modified(
     'http://celestrak.org/SpaceTrack/query/visual.txt',

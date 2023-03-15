@@ -2,7 +2,7 @@ package MooseX::Role::Validatable::Error;
 
 use Moose;
 
-our $VERSION = '0.11';    ## VERSION
+our $VERSION = '0.12';    ## VERSION
 
 has message => (
     is       => 'ro',
@@ -45,6 +45,14 @@ has alert => (
 
 has info_link => (is => 'ro');
 has info_text => (is => 'ro');
+
+has code => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub {
+        return 'General';
+    },
+);
 
 sub as_html {
     my $self = shift;
@@ -129,6 +137,10 @@ A URI for further explanation of the error.
 Description of the info_link
 
 =head2 as_html
+
+=head2 code
+
+Error code in string.
 
 =head1 AUTHOR
 

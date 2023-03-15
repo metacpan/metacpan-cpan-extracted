@@ -2,12 +2,12 @@
 
 // The maximum number of sockets that a Windows Sockets application can use is not affected by the manifest constant FD_SETSIZE
 // See https://learn.microsoft.com/en-us/windows/win32/winsock/maximum-number-of-sockets-supported-2
-#ifdef _WIN32
+#if defined(_WIN32)
   #undef FD_SETSIZE
   #define FD_SETSIZE 1024
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <winsock2.h>
   #include <winerror.h>
 #else
@@ -20,14 +20,14 @@ const char* FILE_NAME = "Sys/Select.c";
 
 // static functions are copied from Sys/Socket.c
 static int32_t socket_errno (void) {
-#ifdef _WIN32
+#if defined(_WIN32)
   return WSAGetLastError();
 #else
   return errno;
 #endif
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
 static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
   char* error_message = NULL;
   FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
@@ -45,7 +45,7 @@ static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32
 
 static void* socket_strerror_string (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
   void*
-#ifdef _WIN32
+#if defined(_WIN32)
   obj_strerror_value = socket_strerror_string_win(env, stack, error_number, length);
 #else
   obj_strerror_value = env->strerror_string(env, stack, error_number, length);

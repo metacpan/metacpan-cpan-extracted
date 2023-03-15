@@ -1,177 +1,215 @@
-digraph "machine"{
-	rankdir=LR;
-	{ "@Part: sda" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sda<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-2<BR/>Label: gpt<BR/>Size: 5.00 TiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1024 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="2" BGCOLOR="yellow">
-						/dev/sda2<BR/>disk2pv<BR/>Size: 4.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sda1<BR/>disk2pv2<BR/>Size: 1.00 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1008 kiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000195:pink;0.799804:pink;0.200000:green;0.000000";
-	]; }
-	{ "@Part: sdb" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sdb<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-0<BR/>Label: gpt<BR/>Size: 150 GiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1007 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/sdb1<BR/>efi<BR/>Size: 94.0 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="2" BGCOLOR="yellow">
-						/dev/sdb2<BR/>pv-hera-disk1<BR/>Size: 149 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1024 MiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000006:pink;0.000612:pink;0.992715:green;0.006667";
-	]; }
-	subgraph "cluster_vgchu" {
+digraph "ge95142-vm1"{ // HEADER: MACHINE
+	rankdir=LR; // HEADER: MACHINE
+	subgraph "cluster_machine@ge95142-vm1" {
 		style=filled;
 		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
-		subgraph "cluster_vgchu@PV" {
-			color=white;
-			fillcolor=white;
-			{ "LVM@vgchu@PV@sda1" [
-				label="PV: /dev/sda1\nSize: 1024 GiB\nFree: 0 B\nUsed: 1024 GiB";
-				style=striped;fillcolor="pink;1.000000.2:green"
+		fillcolor=white;
+		node [style=filled,color=white,fillcolor=white,shape=rectangle];
+			{ "machine@ge95142-vm1|Partition::GPT@sda" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sda<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-2<BR/>Label: gpt<BR/>Size: 5.00 TiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1024 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/sda2<BR/>disk2pv<BR/>Size: 4.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="yellow">
+								/dev/sda1<BR/>disk2pv2<BR/>Size: 1.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1008 kiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000195:pink;0.799804:pink;0.200000:green;0.000000";
 			]; }
-			{ "LVM@vgchu@PV@sda2" [
-				label="PV: /dev/sda2\nSize: 4.00 TiB\nFree: 0 B\nUsed: 4.00 TiB";
-				style=striped;fillcolor="pink;1.000000.2:green"
+			{ "machine@ge95142-vm1|Partition::GPT@sdb" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">QEMU QEMU HARDDISK</TD> </TR><TR><TD >/dev/sdb<BR/>Model: QEMU_HARDDISK<BR/>Serial: drive-scsi0-0-0-0<BR/>Label: gpt<BR/>Size: 150 GiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="yellow">
+								/dev/sdb1<BR/>efi<BR/>Size: 94.0 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/sdb2<BR/>pv-hera-disk1<BR/>Size: 149 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1024 MiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000006:pink;0.000612:pink;0.992715:green;0.006667";
 			]; }
-			{ "LVM@vgchu@PV@sdb2" [
-				label="PV: /dev/sdb2\nSize: 149 GiB\nFree: 78.9 GiB\nUsed: 70.0 GiB";
-				style=striped;fillcolor="pink;0.470094.2:green"
-			]; }
-			label="vgchu's PVs";
-		}
-		subgraph "cluster_vgchu@LV" {
-			color=white;
-			fillcolor=white;
-			{ "dm-2" [
-				label="LV: home\nSize: 30.0 GiB";
-				fillcolor="yellow"
-			]; }
-			{ "dm-0" [
-				label="LV: root\nSize: 30.0 GiB";
-				fillcolor="yellow"
-			]; }
-			{ "dm-3" [
-				label="LV: scratch\nSize: 5.00 TiB";
-				fillcolor="yellow"
-			]; }
-			{ "dm-1" [
-				label="LV: swap\nSize: 10.0 GiB";
-				fillcolor="yellow"
-			]; }
-			label="vgchu's LVs";
-		}
-		label="LVM: vgchu\nSize: 5.14 TiB\nFree: 78.9 GiB";
-		style=striped;fillcolor="pink;0.985021.2:green"
+			subgraph "cluster_machine@ge95142-vm1|LVM::VG@vgdata" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+				subgraph "cluster_machine@ge95142-vm1|LVM::VG@vgdata|::PVs" {
+					color=white;
+					fillcolor=white;
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda1" [
+						label="PV: /dev/sda1\nSize: 1024 GiB\nFree: 0 B\nUsed: 1024 GiB";
+						style=striped;fillcolor="pink;1.000000.2:green"
+					]; }
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda2" [
+						label="PV: /dev/sda2\nSize: 4.00 TiB\nFree: 0 B\nUsed: 4.00 TiB";
+						style=striped;fillcolor="pink;1.000000.2:green"
+					]; }
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" [
+						label="PV: /dev/sdb2\nSize: 149 GiB\nFree: 78.9 GiB\nUsed: 70.0 GiB";
+						style=striped;fillcolor="pink;0.470094.2:green"
+					]; }
+					label="LVM::VG@vgdata's PVs";
+				}
+				subgraph "cluster_machine@ge95142-vm1|LVM::VG@vgdata|::LVs" {
+					color=white;
+					fillcolor=white;
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@home" [
+						label="LV: home\nSize: 30.0 GiB";
+						fillcolor="yellow"
+					]; }
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@root" [
+						label="LV: root\nSize: 30.0 GiB";
+						fillcolor="yellow"
+					]; }
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch" [
+						label="LV: scratch\nSize: 5.00 TiB";
+						fillcolor="yellow"
+					]; }
+					{ "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@swap" [
+						label="LV: swap\nSize: 10.0 GiB";
+						fillcolor="yellow"
+					]; }
+					label="LVM::VG@vgdata's LVs";
+				}
+				label="LVM: LVM::VG@vgdata\nSize: 5.14 TiB\nFree: 78.9 GiB";
+				style=striped;fillcolor="pink;0.985021.2:green"
+			}
+			subgraph "cluster_machine@ge95142-vm1|FS" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				{ "machine@ge95142-vm1|FS|::FS@/home" [
+					label="/home\nDevice: /dev/vgdata/home\next4\nSize: 29.4 GiB\nFree: 3.26 GiB\nUsed: 24.8 GiB";
+					style=striped;fillcolor="pink;0.889092.2:green"
+				]; }
+				{ "machine@ge95142-vm1|FS|::FS@/" [
+					label="/\nDevice: /dev/vgdata/root\next4\nSize: 29.4 GiB\nFree: 7.78 GiB\nUsed: 20.1 GiB";
+					style=striped;fillcolor="pink;0.735088.2:green"
+				]; }
+				{ "machine@ge95142-vm1|FS|::FS@/srv/scratch" [
+					label="/srv/scratch\nDevice: /dev/vgdata/scratch\next4\nSize: 4.92 TiB\nFree: 1.26 TiB\nUsed: 3.45 TiB";
+					style=striped;fillcolor="pink;0.743643.2:green"
+				]; }
+				{ "machine@ge95142-vm1|FS|::FS@/boot/efi" [
+					label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 92.5 MiB\nFree: 89.2 MiB\nUsed: 3.38 MiB";
+					style=striped;fillcolor="pink;0.036487.2:green"
+				]; }
+				{ "machine@ge95142-vm1|FS|::SWAP::Partition@dm-1" [
+					label="SWAP\nDevice: /dev/vgdata/swap\nSize: 10.00 GiB\nFree: 9.78 GiB\nUsed: 222 MiB";
+					style=striped;fillcolor="pink;0.021719.2:green"
+				]; }
+				label="Mounted FS and swap";
+			}
+			subgraph "cluster_machine@ge95142-vm1|Libvirt" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				label="Libvirt Virtual Machines";
+			}
+			// Links from LVM VG: LVM::VG@vgdata
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@home"
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@home"
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@root"
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@root"
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch"
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda1" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch"
+			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@swap"
+			// Links for Partition::GPT@sda
+			// TARGET LINK: ge95142-vm1 5497558138880 sda "machine@ge95142-vm1|Partition::GPT@sda"
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@sda2
+			// Links for Partition::Table::Part::Data@sda1
+			// Links for Partition::Table::Part::Free@_2
+			// Links for Partition::GPT@sdb
+			// TARGET LINK: ge95142-vm1 161061273600 sdb "machine@ge95142-vm1|Partition::GPT@sdb"
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@sdb1
+			// Links for Partition::Table::Part::Data@sdb2
+			// Links for Partition::Table::Part::Free@_2
+			// Links for LVM VG: LVM::VG@vgdata
+			// Links for LVM::VG::PVs
+			// Links for LVM::VG::PVs::PV@sda1
+			"machine@ge95142-vm1|Partition::GPT@sda":"1" -> "machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda1"
+			// Links for LVM::VG::PVs::PV@sda1
+			// Links for LVM::VG::PVs::PV@sda2
+			"machine@ge95142-vm1|Partition::GPT@sda":"2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sda2"
+			// Links for LVM::VG::PVs::PV@sda2
+			// Links for LVM::VG::PVs::PV@sdb2
+			"machine@ge95142-vm1|Partition::GPT@sdb":"2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2"
+			// Links for LVM::VG::PVs::PV@sdb2
+			// Links for LVM::VG::LVs
+			// Links for LVM::VG::LVs::LV@home
+			// Links for LVM::VG::LVs::LV@root
+			// Links for LVM::VG::LVs::LV@scratch
+			// Links for LVM::VG::LVs::LV@swap
+			// Links for FS
+			// Links for FS::FS@/home
+			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@home" -> "machine@ge95142-vm1|FS|::FS@/home"
+			// Links for FS::FS@/home
+			// Links for FS::FS@/
+			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@root" -> "machine@ge95142-vm1|FS|::FS@/"
+			// Links for FS::FS@/
+			// Links for FS::FS@/srv/scratch
+			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@scratch" -> "machine@ge95142-vm1|FS|::FS@/srv/scratch"
+			// Links for FS::FS@/srv/scratch
+			// Links for FS::FS@/boot/efi
+			"machine@ge95142-vm1|Partition::GPT@sdb":"1" -> "machine@ge95142-vm1|FS|::FS@/boot/efi"
+			// Links for FS::FS@/boot/efi
+			// Links for FS::SWAP::Partition@dm-1
+			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@swap" -> "machine@ge95142-vm1|FS|::SWAP::Partition@dm-1"
+			// Links for FS::SWAP::Partition@dm-1
+			// Links for Libvirt Virtual Machines
+		label="ge95142-vm1";
 	}
-	subgraph "cluster_@FS" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		{ "@FS@/home" [
-			label="/home\nDevice: /dev/vgchu/home\next4\nSize: 29.4 GiB\nFree: 7.88 GiB\nUsed: 20.2 GiB";
-			style=striped;fillcolor="pink;0.732178.2:green"
-		]; }
-		{ "@FS@/" [
-			label="/\nDevice: /dev/vgchu/root\next4\nSize: 29.4 GiB\nFree: 7.77 GiB\nUsed: 20.2 GiB";
-			style=striped;fillcolor="pink;0.735435.2:green"
-		]; }
-		{ "@FS@/srv/scratch" [
-			label="/srv/scratch\nDevice: /dev/vgchu/scratch\next4\nSize: 4.92 TiB\nFree: 1.27 TiB\nUsed: 3.44 TiB";
-			style=striped;fillcolor="pink;0.742055.2:green"
-		]; }
-		{ "@FS@/boot/efi" [
-			label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 92.5 MiB\nFree: 89.2 MiB\nUsed: 3.38 MiB";
-			style=striped;fillcolor="pink;0.036487.2:green"
-		]; }
-		{ "@FS@SWAP@dm-1" [
-			label="SWAP\nDevice: /dev/vgchu/swap\nSize: 10.00 GiB\nFree: 10.00 GiB\nUsed: 0 B";
-			style=striped;fillcolor="green"
-		]; }
-		label="Mounted FS and swap";
-	}
-	subgraph "cluster_@libvirt" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		label="Libvirt Virtual Machines";
-	}
-	// Links from LVM VG: vgchu
-	"LVM@vgchu@PV@sdb2" -> "dm-2"
-	"LVM@vgchu@PV@sdb2" -> "dm-2"
-	"LVM@vgchu@PV@sdb2" -> "dm-0"
-	"LVM@vgchu@PV@sdb2" -> "dm-0"
-	"LVM@vgchu@PV@sda2" -> "dm-3"
-	"LVM@vgchu@PV@sda1" -> "dm-3"
-	"LVM@vgchu@PV@sdb2" -> "dm-1"
-	// Links for LVM@vgchu@PV@sda1
-	"@Part: sda":"1" -> "LVM@vgchu@PV@sda1"
-	// Links for LVM@vgchu@PV@sda2
-	"@Part: sda":"2" -> "LVM@vgchu@PV@sda2"
-	// Links for LVM@vgchu@PV@sdb2
-	"@Part: sdb":"2" -> "LVM@vgchu@PV@sdb2"
-	// Links for @FS@/home
-	"dm-2" -> "@FS@/home"
-	// Links for @FS@/
-	"dm-0" -> "@FS@/"
-	// Links for @FS@/srv/scratch
-	"dm-3" -> "@FS@/srv/scratch"
-	// Links for @FS@/boot/efi
-	"@Part: sdb":"1" -> "@FS@/boot/efi"
-	// Links for @FS@SWAP@dm-1
-	"dm-1" -> "@FS@SWAP@dm-1"
-}
+} // FOOTER: MACHINE

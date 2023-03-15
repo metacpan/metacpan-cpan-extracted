@@ -2,7 +2,7 @@ package Net::DNS::RR::CERT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CERT.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: CERT.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -33,8 +33,7 @@ my %certtype = (
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	@{$self}{qw(certtype keytag algorithm)} = unpack "\@$offset n2 C", $$data;
 	$self->{certbin} = substr $$data, $offset + 5, $self->{rdlength} - 5;
@@ -59,22 +58,22 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->certtype(shift);
-	$self->keytag(shift);
-	$self->algorithm(shift);
-	$self->cert(@_);
+	foreach (qw(certtype keytag algorithm)) {
+		$self->$_( shift @argument );
+	}
+	$self->cert(@argument);
 	return;
 }
 
 
 sub certtype {
-	my $self = shift;
+	my ( $self, @value ) = @_;
 
-	return $self->{certtype} unless scalar @_;
+	return $self->{certtype} unless scalar @value;
 
-	my $certtype = shift || 0;
+	my $certtype = shift @value;
 	return $self->{certtype} = $certtype unless $certtype =~ /\D/;
 
 	my $typenum = $certtype{$certtype};
@@ -84,9 +83,8 @@ sub certtype {
 
 
 sub keytag {
-	my $self = shift;
-
-	$self->{keytag} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{keytag} = 0 + $_ }
 	return $self->{keytag} || 0;
 }
 
@@ -104,17 +102,16 @@ sub certificate { return &certbin; }
 
 
 sub certbin {
-	my $self = shift;
-
-	$self->{certbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{certbin} = $_ }
 	return $self->{certbin} || "";
 }
 
 
 sub cert {
-	my $self = shift;
-	return MIME::Base64::encode( $self->certbin(), "" ) unless scalar @_;
-	return $self->certbin( MIME::Base64::decode( join "", @_ ) );
+	my ( $self, @value ) = @_;
+	return MIME::Base64::encode( $self->certbin(), "" ) unless scalar @value;
+	return $self->certbin( MIME::Base64::decode( join "", @value ) );
 }
 
 
@@ -264,7 +261,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4398
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC4398|https://tools.ietf.org/html/rfc4398>
 
 L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 

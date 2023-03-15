@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -22,7 +22,9 @@ sub new {
     my $parser = Pod::Spell::_Processor->new;
     $parser->stopwords($stopwords);
     $parser->_is_debug($debug);
-    $parser->output_fh(\*STDOUT);
+    open my $output_fh, '>&:encoding(UTF-8)', \*STDOUT
+      or die "can't dup STDOUT: $!";
+    $parser->output_fh($output_fh);
 
     my %self = (
         processor => $parser,
@@ -71,7 +73,7 @@ my %track_elements = (
     F         => 1,
 );
 
-sub _handle_element_start { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _handle_element_start {
     my ($self, $element_name, $attr) = @_;
     $self->{buffer} = ''
         if !defined $self->{buffer};
@@ -81,13 +83,12 @@ sub _handle_element_start { ## no critic (Subroutines::ProhibitUnusedPrivateSubr
     }
 }
 
-sub _handle_text { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _handle_text {
     my ($self, $text) = @_;
 
     my $in = $self->{in_element};
     if ($in && @$in) {
         my ($element_name, $attr) = @{$in->[-1]};
-        ## no critic (ControlStructures::ProhibitCascadingIfElse)
         if ($element_name eq 'for' && $attr->{target_matching} eq 'stopwords') {
             # this will match both for/begin and stopwords/:stopwords
 
@@ -117,7 +118,7 @@ sub _handle_text { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     $self->{buffer} .= $text;
 }
 
-sub _handle_element_end { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _handle_element_end {
     my ($self, $element_name) = @_;
 
     my $in = $self->{in_element};
@@ -144,7 +145,7 @@ sub _handle_element_end { ## no critic (Subroutines::ProhibitUnusedPrivateSubrou
     return
         if !length $out;
 
-    local $Text::Wrap::huge = 'overflow'; ## no critic ( Variables::ProhibitPackageVars )
+    local $Text::Wrap::huge = 'overflow';
     print { $fh } Text::Wrap::wrap( '', '', $out ) . "\n\n";
 }
 
@@ -164,7 +165,7 @@ Pod::Spell - a formatter for spellchecking Pod
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -436,7 +437,7 @@ Caleb Cushing <xenoterracide@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Olivier Mengué.
+This software is Copyright (c) 2023 by Olivier Mengué.
 
 This is free software, licensed under:
 

@@ -1,4 +1,4 @@
-package LibUI::Combobox 0.01 {
+package LibUI::Combobox 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,39 +6,48 @@ package LibUI::Combobox 0.01 {
     use parent 'LibUI::Control';
     #
     affix(
-        LibUI::lib(), 'uiComboboxAppend', [ InstanceOf ['LibUI::Combobox'], Str ] => Void,
-        'append'
-    );
-    affix( LibUI::lib(), 'uiComboboxClear', [ InstanceOf ['LibUI::Combobox'] ] => Void, 'clear' );
-    affix(
-        LibUI::lib(), 'uiComboboxDelete', [ InstanceOf ['LibUI::Combobox'], Int ] => Void,
-        'delete'
-    );
-    affix(
-        LibUI::lib(), 'uiComboboxInsertAt', [ InstanceOf ['LibUI::Combobox'], Int, Str ] => Void,
-        'insertAt'
-    );
-    affix(
-        LibUI::lib(), 'uiComboboxNumItems', [ InstanceOf ['LibUI::Combobox'], ] => Int,
-        'numItems'
+        LibUI::lib(),
+        [ 'uiComboboxAppend',             'append' ],
+        [ InstanceOf ['LibUI::Combobox'], Str ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiComboboxOnSelected',
+        [ 'uiComboboxClear', 'clear' ],
+        [ InstanceOf ['LibUI::Combobox'] ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiComboboxDelete',             'delete' ],
+        [ InstanceOf ['LibUI::Combobox'], Int ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiComboboxInsertAt', 'insertAt' ],
+        [ InstanceOf ['LibUI::Combobox'], Int, Str ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiComboboxNumItems', 'numItems' ],
+        [ InstanceOf ['LibUI::Combobox'], ] => Int
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiComboboxOnSelected', 'onSelected' ],
         [   InstanceOf ['LibUI::Combobox'],
             CodeRef [ [ InstanceOf ['LibUI::Combobox'], Any ] => Void ], Any
-        ] => Void,
-        'onSelected'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiComboboxSelected', [ InstanceOf ['LibUI::Combobox'] ] => Int,
-        'selected'
+        LibUI::lib(),
+        [ 'uiComboboxSelected', 'selected' ],
+        [ InstanceOf ['LibUI::Combobox'] ] => Int
     );
     affix(
-        LibUI::lib(), 'uiComboboxSetSelected', [ InstanceOf ['LibUI::Combobox'], Int ] => Void,
-        'setSelected'
+        LibUI::lib(),
+        [ 'uiComboboxSetSelected',        'setSelected' ],
+        [ InstanceOf ['LibUI::Combobox'], Int ] => Void
     );
-    affix( LibUI::lib(), 'uiNewCombobox', [Void] => InstanceOf ['LibUI::Combobox'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewCombobox', 'new' ], [Void] => InstanceOf ['LibUI::Combobox'] );
 };
 1;
 #
@@ -59,8 +68,9 @@ Options
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::Combobox;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $combo  = LibUI::Combobox->new();
     my @langs  = ( qw[English French Klingon German Japanese], 'Ubbi dubbi' );

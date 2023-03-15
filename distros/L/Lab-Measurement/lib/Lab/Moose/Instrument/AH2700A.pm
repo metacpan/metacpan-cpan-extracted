@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AH2700A;
-$Lab::Moose::Instrument::AH2700A::VERSION = '3.851';
+$Lab::Moose::Instrument::AH2700A::VERSION = '3.860';
 #ABSTRACT: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
 
 use v5.20;
@@ -160,7 +160,7 @@ sub get_single {
     # Rewrite with hash
 	#if ($result eq "") { croak "AH2700A: Low to Ground\n"; }
 	my $values;
-    while ( $result =~ /([A-Z])=\s(\d+\.\d+)/g ) {
+    while ( $result =~ /([A-Z])=\s?(-?\d+\.\d+)/g ) {
         $values->{$1} = $2;
     }
     $values->{E} = 00;
@@ -188,11 +188,11 @@ sub get_value {
     return $self->get_single(@_);
 }
 
-sub set_wait { my ( $self, $wait, %args ) = validated_setter( \@_, wait => { isa => 'Num' },
-    );
+sub set_wait {
+    my ( $self, $wait, %args )
+        = validated_setter( \@_, wait => { isa => 'Num' }, );
 
     $self->write( command => sprintf( "WAIT DELAY %d", $wait ), %args );
-
 }
 
 
@@ -242,7 +242,7 @@ Lab::Moose::Instrument::AH2700A - Andeen-Hagerling AH2700A ultra-precision capac
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 SYNOPSIS
 
@@ -340,7 +340,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
             2016       Andreas K. Huettel, Simon Reinhardt
             2017       Andreas K. Huettel
             2020       Andreas K. Huettel
-            2022       Mia Schambeck
+            2022-2023  Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

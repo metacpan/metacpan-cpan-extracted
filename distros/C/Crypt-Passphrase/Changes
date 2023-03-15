@@ -1,5 +1,10 @@
 Revision history for Crypt-Passphrase
 
+0.010     2023-03-14 23:04:53+01:00 Europe/Amsterdam
+          - Add @CARP_NOT handler to import
+          - More gracefully handle undefined passwords
+          - Depreciate curry_with_password
+
 0.009     2023-03-09 01:04:14+01:00 Europe/Amsterdam
           - Be more permissive in allowed crypt identifiers
 

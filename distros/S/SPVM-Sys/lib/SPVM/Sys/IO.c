@@ -11,7 +11,7 @@
 #include <dirent.h>
 #include <utime.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <direct.h>
 #endif
 
@@ -612,8 +612,8 @@ int32_t SPVM__Sys__IO__fflush(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__flock(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "The flock method in the class Sys::IO is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "The flock method in the class Sys::IO is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -648,7 +648,7 @@ int32_t SPVM__Sys__IO__mkdir(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   errno = 0;
   
-#ifdef _WIN32
+#if defined(_WIN32)
   int32_t status = mkdir(path);
 #else
   int32_t status = mkdir(path, mode);
@@ -710,7 +710,7 @@ int32_t SPVM__Sys__IO__unlink(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   int32_t status = unlink(pathname);
   if (status == -1) {
-    env->die(env, stack, "[System Error]unlink failed:%s. The \"%s\" directory can't be removed", env->strerror(env, stack, errno, 0), pathname, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]unlink failed:%s. The \"%s\" file can't be removed", env->strerror(env, stack, errno, 0), pathname, __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
 
@@ -842,8 +842,8 @@ int32_t SPVM__Sys__IO___getdcwd(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__realpath(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "realpath is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "realpath is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -970,8 +970,8 @@ int32_t SPVM__Sys__IO__chmod(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__IO__chown(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-#ifdef _WIN32
-  env->die(env, stack, "chown is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "chown is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_path = stack[0].oval;
@@ -1023,8 +1023,8 @@ int32_t SPVM__Sys__IO__truncate(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__symlink(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "symlink is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "symlink is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   int32_t e = 0;
@@ -1055,8 +1055,8 @@ int32_t SPVM__Sys__IO__symlink(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__readlink(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "readlink is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "readlink is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   int32_t e = 0;
@@ -1298,8 +1298,8 @@ int32_t SPVM__Sys__IO__access(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__faccessat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  return env->die(env, stack, "faccessat is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  return env->die(env, stack, "faccessat is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
 #else
   int32_t dirfd = stack[0].ival;
   
@@ -1339,8 +1339,8 @@ int32_t SPVM__Sys__IO__faccessat(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__fcntl(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  return env->die(env, stack, "fcntl is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  return env->die(env, stack, "fcntl is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
 #else
   
   int32_t e = 0;
@@ -1557,8 +1557,8 @@ int32_t SPVM__Sys__IO__ungetc(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__IO__fsync(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  return env->die(env, stack, "fsync is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  return env->die(env, stack, "fsync is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
 #else
   int32_t fd = stack[0].ival;
   

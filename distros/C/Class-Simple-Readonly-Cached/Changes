@@ -1,5 +1,9 @@
 Revision history for Class::Simple::Readonly::Cached
 
+0.09	Mon Mar 13 18:43:13 EDT 2023
+	Warn if we're caching an object that's already cached, then return
+		the previously cached object
+
 0.08	Sat Apr 30 15:03:33 EDT 2022
 	Warn if $object is a scalar in new()
 	Warn if you're trying to cache an object that's already being cached

@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Perl - Sah schemas related to Perl
 
 VERSION
-    This document describes version 0.047 of Sah::Schemas::Perl (from Perl
-    distribution Sah-Schemas-Perl), released on 2023-01-14.
+    This document describes version 0.048 of Sah::Schemas::Perl (from Perl
+    distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:

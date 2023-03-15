@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.614 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2023-01-17.
+    This document describes version 0.617 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2023-01-19.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -293,6 +293,69 @@ FUNCTIONS
 
         See also the "remaining" option for a more general mechanism of
         offering fewer elements.
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_comma_sep_pair
+    Usage:
+
+     complete_comma_sep_pair(%args) -> array
+
+    Complete a comma-separated list of key-value pairs.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   complete_value => *code*
+
+        Code to supply possible values for a key.
+
+        Code should accept hash arguments and will be given the arguments
+        "word" (word that is part of the value), and "key" (the key being
+        evaluated) and is expected to return a completion answer.
+
+    *   keys* => *array[str]*
+
+        (No description)
+
+    *   keys_summaries => *array[str]*
+
+        Summary for each key.
+
+    *   remaining_keys => *code*
+
+        What keys should remain for completion.
+
+        This is a more general mechanism if the "uniq" option does not
+        suffice. Suppose you are offering completion for arguments. Possible
+        arguments are "foo", "bar", "baz" but the "bar" and "baz" arguments
+        are mutually exclusive. We can set "remaining_keys" to this code:
+
+         my %possible_args = {foo=>1, bar=>1, baz=>1};
+         sub {
+             my ($seen_elems, $elems) = @_;
+ 
+             my %remaining = %possible_args;
+             for (@$seen_elems) {
+                 delete $remaining{$_};
+                 delete $remaining{baz} if $_ eq 'bar';
+                 delete $remaining{bar} if $_ eq 'baz';
+             }
+ 
+             [keys %remaining];
+         }
+
+        As you can see above, the code is given $seen_elems and $elems as
+        arguments and is expected to return remaining elements to offer.
+
+    *   uniq => *bool* (default: 1)
+
+        (No description)
 
     *   word* => *str* (default: "")
 

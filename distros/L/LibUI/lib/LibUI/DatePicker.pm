@@ -1,4 +1,4 @@
-package LibUI::DatePicker 0.01 {
+package LibUI::DatePicker 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,7 +6,7 @@ package LibUI::DatePicker 0.01 {
     use parent 'LibUI::DateTimePicker';
     use LibUI::Time;
     #
-    affix( LibUI::lib(), 'uiNewDatePicker', [Void] => InstanceOf ['LibUI::DatePicker'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewDatePicker', 'new' ], [Void] => InstanceOf ['LibUI::DatePicker'] );
 };
 1;
 #
@@ -27,8 +27,9 @@ LibUI::DatePicker - Control to Enter a Date
     use LibUI::Window;
     use LibUI::DatePicker;
     use Time::Piece;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Schedule an Event', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $date   = LibUI::DatePicker->new();
     $box->append( $date, 0 );

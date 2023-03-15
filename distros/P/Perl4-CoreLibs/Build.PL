@@ -49,6 +49,7 @@ my $build = Module::Build->new(
 		"IPC::Open2" => 0,
 		"IPC::Open3" => 0,
 		"Socket" => 0,
+		"Sys::Syslog" => "0.19",
 		"Text::ParseWords" => "3.25",
 		"Time::Local" => 0,
 		"perl" => "5.006",

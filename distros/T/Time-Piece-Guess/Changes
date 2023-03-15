@@ -1,0 +1,11 @@
+Revision history for Time-Piece-Guess
+
+0.0.3   2023-03-14/14:30
+        -minor doc tweaks
+
+0.0.2   2023-03-12/11:00
+        -fix guess_to_object
+
+0.0.1   2023-03-12/10:30
+        -Initial release
+

@@ -21,6 +21,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::FFI" : "0.20",
             "ExtUtils::CBuilder" : "0"
          }
       },
@@ -160,15 +161,16 @@
       "bugtracker" : {
          "web" : "https://github.com/PerlFFI/FFI-Platypus/issues"
       },
-      "homepage" : "https://metacpan.org/pod/FFI::Platypus",
+      "homepage" : "https://pl.atypus.org",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/PerlFFI/FFI-Platypus.git",
          "web" : "https://github.com/PerlFFI/FFI-Platypus"
       },
-      "x_IRC" : "irc://irc.perl.org/#native"
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "2.05",
+   "version" : "2.07",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",

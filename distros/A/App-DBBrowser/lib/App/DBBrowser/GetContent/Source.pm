@@ -39,6 +39,7 @@ sub __get_read_info {
     my $term_w = get_term_width();
     my @tmp = ( 'DATA:' );
     for my $row ( @$aoa ) {
+        no warnings 'uninitialized';
         push @tmp, line_fold( join( ', ', @$row ), $term_w, { subseq_tab => ' ' x 4, join => 0 } );
     }
     return join( "\n", @tmp ) . "\n";
@@ -53,11 +54,12 @@ sub from_col_by_col {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $back = 'Back';
     my $confirm = 'Confirm';
+    my $stmt_type = $sf->{d}{stmt_types}[0];
 
     COL_BY_COL: while( 1 ) {
         my $aoa = [];
         my $col_names;
-        if ( $sf->{d}{stmt_types}[0] eq 'Create_table' ) {
+        if ( $stmt_type eq 'Create_table' ) {
             my $col_count;
             my $info = 'CREATE TABLE';
 
@@ -103,16 +105,26 @@ sub from_col_by_col {
             );
             $ax->print_sql_info( $info );
             if ( ! defined $choice ) {
-                if ( @$aoa < 2 ) {
+                if ( $stmt_type eq 'Create_table' && @$aoa == 1 ) {
                     next COL_BY_COL;
                 }
-                $default = 0;
-                $#$aoa--;
-                next WHAT_NEXT;
+                elsif ( $stmt_type eq 'Insert' && @$aoa == 0 ) {
+                    return;
+                }
+                else {
+                    $default = 0;
+                    $#$aoa--;
+                    next WHAT_NEXT;
+                }
             }
             elsif ( $choice eq $sf->{i}{ok} ) {
                 if ( ! @$aoa ) {
-                    next COL_BY_COL;
+                    if ( $stmt_type eq 'Create_table' ) {
+                        next COL_BY_COL;
+                    }
+                    elsif ( $stmt_type eq 'Insert' ) {
+                        return;
+                    }
                 }
                 else {
                     $sql->{insert_into_args} = $aoa;
@@ -135,7 +147,12 @@ sub from_col_by_col {
                     $default = 0;
                 }
                 else {
-                    push @{$aoa}, [ map { $_->[1] } @$data ];
+                    if ( $sf->{o}{insert}{empty_to_null_plain} ) {
+                        push @{$aoa}, [ map { length( $_->[1] ) ? $_->[1] : undef } @$data ];
+                    }
+                    else {
+                        push @{$aoa}, [ map { $_->[1] } @$data ];
+                    }
                     $default = 2;
                 }
             }

@@ -1,29 +1,51 @@
 ---
 abstract: 'FITS utility routines'
 author:
-  - 'The Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Astro-FITS-CFITSIO-Utils
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
+    - xt
+provides:
+  Astro::FITS::CFITSIO::Utils:
+    file: lib/Astro/FITS/CFITSIO/Utils.pm
+    version: '0.14'
 requires:
-  Astro::FITS::CFITSIO: 0
-  Astro::FITS::CFITSIO::CheckStatus: 0
-  Astro::FITS::Header::CFITSIO: 0
-  Params::Validate: 0
-  perl: 5.6.0
+  Astro::FITS::CFITSIO: '0'
+  Astro::FITS::CFITSIO::CheckStatus: '0'
+  Astro::FITS::Header::CFITSIO: '0'
+  Astro::FITS::Header::Item: '0'
+  Carp: '0'
+  Exporter: '0'
+  Params::Validate: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://opensource.org/licenses/gpl-license.php
-version: 0.13
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-Utils
+  repository: https://gitlab.com/djerius/astro-fits-cfitsio-utils.git
+version: '0.14'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

@@ -204,6 +204,12 @@ EOM
     }, 'test case from pyaml_env (test_parse_config_default_separator_illegal_char_default_value)';
 }
 
+######################################################################
+# Error cases
+
+ok !eval { YAML::PP->new(schema => [qw(+ Env unhandledoption=foobar)]) }, 'unhandled option';
+like $@, qr{Invalid option for ENV Schema: 'unhandledoption=foobar'}, 'expected error message';
+
 __END__
 
 ;;; Local Variables:

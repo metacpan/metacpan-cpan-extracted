@@ -1,11 +1,11 @@
-package LibUI::VBox 0.01 {
+package LibUI::VBox 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use parent 'LibUI::HBox';
     #
-    affix( LibUI::lib(), 'uiNewVerticalBox', [Void] => InstanceOf ['LibUI::VBox'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewVerticalBox', 'new' ], [Void] => InstanceOf ['LibUI::VBox'] );
 };
 1;
 #
@@ -27,8 +27,9 @@ Controls
     use LibUI::Window;
     use LibUI::ColorButton;
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new;
     my $lbl    = LibUI::Label->new('Pick a color');
     my $cbtn   = LibUI::ColorButton->new();

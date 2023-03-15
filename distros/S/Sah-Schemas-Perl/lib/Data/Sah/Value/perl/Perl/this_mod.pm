@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 sub meta {
     +{
@@ -57,7 +57,7 @@ Data::Sah::Value::perl::Perl::this_mod
 
 =head1 VERSION
 
-This document describes version 0.047 of Data::Sah::Value::perl::Perl::this_mod (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Data::Sah::Value::perl::Perl::this_mod (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 DESCRIPTION
 

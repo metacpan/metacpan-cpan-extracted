@@ -58,10 +58,13 @@ sub browse_the_table {
         }
 
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
-        $tp->print_table(
-            $all_arrayref,
-            { footer => $sf->{d}{table_footer} }
-        );
+        if ( ! $sf->{o}{G}{warnings_table_print} ) {
+            local $SIG{__WARN__} = sub {};
+            $tp->print_table( $all_arrayref, { footer => $sf->{d}{table_footer} } );
+        }
+        else {
+            $tp->print_table( $all_arrayref, { footer => $sf->{d}{table_footer} } );
+        }
     }
 }
 
@@ -258,6 +261,14 @@ sub __selected_statement_result {
     my $col_names = $sth->{NAME}; # not quoted
     my $all_arrayref = $sth->fetchall_arrayref;
     unshift @$all_arrayref, $col_names;
+
+    if ( $sf->{i}{driver} eq 'DB2' && length $sf->{o}{G}{db2_encoding} ) {
+        print 'Decoding: ...' . "\r"  if $sf->{o}{table}{progress_bar};
+        require Encode;
+        for my $row ( @$all_arrayref ) {
+            $_ = Encode::decode( $sf->{o}{G}{db2_encoding}, $_ ) for @$row;
+        }
+    }
     return $all_arrayref;
 }
 

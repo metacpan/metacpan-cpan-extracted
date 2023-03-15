@@ -1,5 +1,9 @@
 Revision history for org-daemon.
 
+1.12	2023-03-15
+	- run ptksh with ctrl-p
+	- ci work
+
 1.11	2021-06-30
 	- use Linux::Inotify2 and AnyEvent instead of
 	  AnyEvent::Filesys::Notify on linux

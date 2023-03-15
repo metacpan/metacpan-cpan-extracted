@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -120,7 +120,7 @@ _
 
         if ($r->{input_filenum} == 1) {
             # set selected_fields_idx_array_sorted
-            my $res = App::CSVUtils::_select_fields($r->{input_fields}, $r->{input_fields_idx}, $r->{util_args}, 1);
+            my $res = App::CSVUtils::_select_fields($r->{input_fields}, $r->{input_fields_idx}, $r->{util_args}, 'all');
             die $res unless $res->[0] == 100;
             my $selected_fields = $res->[2][0];
             my $selected_fields_idx_array = $res->[2][1];
@@ -231,7 +231,7 @@ App::CSVUtils::csv_cmp - Compare two CSV files value by value
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils::csv_cmp (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils::csv_cmp (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 FUNCTIONS
 

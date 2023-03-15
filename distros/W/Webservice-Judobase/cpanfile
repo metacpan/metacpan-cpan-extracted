@@ -3,8 +3,8 @@
 
 requires "HTTP::Request" => "6.44";
 requires "JSON::Tiny" => "0.58";
-requires "LWP::UserAgent" => "6.67";
-requires "Moo" => "2.005004";
+requires "LWP::UserAgent" => "6.68";
+requires "Moo" => "2.005005";
 requires "namespace::clean" => "0.27";
 requires "perl" => "v5.10.0";
 
@@ -12,7 +12,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
-  requires "Test2::V0" => "0.000145";
+  requires "Test2::V0" => "0.000148";
   requires "Test::More" => "0";
 };
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::TXT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TXT.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: TXT.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -22,8 +22,7 @@ use Net::DNS::Text;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 	my $text;
@@ -55,17 +54,17 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->{txtdata} = [map { Net::DNS::Text->new($_) } @_];
+	$self->{txtdata} = [map { Net::DNS::Text->new($_) } @argument];
 	return;
 }
 
 
 sub txtdata {
-	my $self = shift;
+	my ( $self, @value ) = @_;
 
-	$self->{txtdata} = [map { Net::DNS::Text->new($_) } @_] if scalar @_;
+	$self->{txtdata} = [map { Net::DNS::Text->new($_) } @value] if scalar @value;
 
 	my $txtdata = $self->{txtdata} || [];
 
@@ -158,6 +157,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1035 Section 3.3.14, RFC3629
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC1035(3.3.14)|https://tools.ietf.org/html/rfc1035>
+L<RFC3629|https://tools.ietf.org/html/rfc3629>
 
 =cut

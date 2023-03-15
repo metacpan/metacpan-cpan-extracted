@@ -229,12 +229,13 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.128';
+our $VERSION = '0.129';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
 use Astro::Coord::ECI::Utils qw{ :params :ref :greg_time deg2rad distsq
     dynamical_delta embodies find_first_true fold_case
+    __format_epoch_time_usec
     format_space_track_json_time load_module looks_like_number max min
     mod2pi PI PIOVER2 rad2deg SECSPERDAY TWOPI thetag __default_station
     @CARP_NOT
@@ -243,7 +244,7 @@ use Astro::Coord::ECI::Utils qw{ :params :ref :greg_time deg2rad distsq
 use Carp qw{carp croak confess};
 use Data::Dumper;
 use IO::File;
-use POSIX qw{ ceil floor fmod strftime };
+use POSIX qw{ ceil floor fmod modf strftime };
 use Scalar::Util ();
 
 BEGIN {
@@ -7231,13 +7232,14 @@ moment is
 sub tle_verbose {
     my ($self, %args) = @_;
     my $dtfmt = $args{date_format} || '%d-%b-%Y %H:%M:%S';
+    my $epoch = __format_epoch_time_usec( $self->get( 'epoch' ), $dtfmt );
     my $semimajor = $self->get('semimajor');	# Of reference ellipsoid.
 
     my $result = <<EOD;
 NORAD ID: @{[$self->get ('id')]}
     Name: @{[$self->get ('name') || 'unspecified']}
     International launch designator: @{[$self->get ('international')]}
-    Epoch of data: @{[strftime $dtfmt, gmtime $self->get ('epoch')]} GMT
+    Epoch of data: $epoch GMT
 EOD
     if (defined (my $effective = $self->get('effective'))) {
 	$result .= <<EOD;
@@ -7313,7 +7315,7 @@ encoded with a four-digit year.
 	EPHEMERIS_TYPE	=> 'ephemeristype',
 	EPOCH		=> sub {
 	    my ( $self ) = @_;
-	    return format_space_track_json_time( floor(  $self->get( 'epoch' ) ) );
+	    return format_space_track_json_time( $self->get( 'epoch' ) );
 	},
 	EPOCH_MICROSECONDS	=> sub {
 	    my ( $self ) = @_;
@@ -7365,6 +7367,18 @@ encoded with a four-digit year.
 	    ) * SGP_XMNPDA * SGP_XMNPDA / TWOPI;
 	},
 	NORAD_CAT_ID	=> 'id',
+	OBJECT_ID	=> sub {
+	    my ( $self ) = @_;
+	    my $year = $self->get( 'launch_year' );
+	    my $num = $self->get( 'launch_num' );
+	    my $part = $self->get( 'launch_piece' );
+	    foreach ( $year, $num, $part ) {
+		defined $_
+		    and $_ =~ m/ \S /smx
+		    or return;
+	    }
+	    return sprintf '%04d-%03d%s', $year, $num, $part;
+	},
 	OBJECT_NAME	=> 'name',
 	OBJECT_NUMBER	=> 'id',
 	OBJECT_TYPE	=> sub {
@@ -7379,13 +7393,14 @@ encoded with a four-digit year.
 	},
 	RCSVALUE	=> 'rcs',
 	REV_AT_EPOCH	=> 'revolutionsatepoch',
-	TLE_LINE0	=> sub {
-	    my ( $self ) = @_;
-	    my $name = $self->get( 'name' );
-	    defined $name
-		and $name = "0 $name";
-	    return $name;
-	},
+#	TLE_LINE0	=> sub {
+#	    my ( $self ) = @_;
+#	    my $name = $self->get( 'name' );
+#	    defined $name
+#		and $name = "0 $name";
+#	    return $name;
+#	},
+	# TLE_LINE0 is handled programmatically
 	# TLE_LINE1 is handled programmatically
 	# TLE_LINE2 is handled programmatically
 	effective_date	=> sub {
@@ -7421,25 +7436,27 @@ encoded with a four-digit year.
 		and $val ne ''
 		and $rslt->{$key} = $val;
 	}
-	return $rslt;
-    }
-
-    sub TO_JSON {
-	my ( $self ) = @_;
-	my $rslt = $self->__to_json( \%json_map );
 
 	if ( defined ( my $tle = $self->get( 'tle' ) ) ) {
 	    chomp $tle;
 	    my @lines = split "\n", $tle;
 	    unshift @lines, '' while @lines < 3;
-	    foreach my $line ( 1, 2 ) {
+	    foreach my $line ( 1 .. 2 ) {
 		defined $lines[$line]
 		    and $lines[$line] =~ m/ \S /smx
 		    and $rslt->{"TLE_LINE$line"} = $lines[$line];
 	    }
+	    if ( defined( my $name = $self->get( 'name' ) ) ) {
+		$rslt->{TLE_LINE0} = "0 $name";
+	    }
 	}
 
 	return $rslt;
+    }
+
+    sub TO_JSON {
+	my ( $self ) = @_;
+	return $self->__to_json( \%json_map );
     }
 
 }
@@ -7464,9 +7481,10 @@ encoded with a four-digit year.
 	MEAN_MOTION_DDOT
     };
     my %json_map = (
-	INTLDES		=> 'international',
+#	INTLDES		=> 'international',
 	NORAD_CAT_ID	=> 'id',
 	OBJECT_NAME	=> 'name',
+#	OBJECT_ID	=> 'international',
 	RCSVALUE	=> 'rcs',
 #	LAUNCH_YEAR	=> 'launch_year',
 #	LAUNCH_NUM	=> 'launch_num',
@@ -7603,7 +7621,16 @@ encoded with a four-digit year.
 	    $tle{$attr} = $value;
 	}
 
-	return $class->new( %tle );
+	my $obj = $class->new( %tle );
+
+	foreach my $key ( qw{ OBJECT_ID INTLDES } ) {
+	    defined $hash->{$key}
+		or next;
+	    $obj->_set_intldes( international => $hash->{$key} );
+	    last;
+	}
+
+	return $obj;
     }
 }
 
@@ -7974,7 +8001,7 @@ sub _set_intldes {
 	    $self->{launch_num} = $num;
 	    $self->{launch_piece} = $piece;
 
-	    $self->{$name} = $val;
+	    $self->{$name} = sprintf '%02d%03d%s', $year % 100, $num, $piece;
 
 	    return 0;
 	}
@@ -8146,12 +8173,12 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak
 #
-# Last-Modified: Thu, 04 Aug 2022 07:58:53 GMT
+# Last-Modified: Mon, 27 Feb 2023 21:40:21 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Thu, 04 Aug 2022 07:58:53 GMT';
+use constant _CELESTRAK_VISUAL => 'Mon, 27 Feb 2023 21:40:21 GMT';
 use constant _MCCANTS_VSNAMES  => undef;
 use constant _MCCANTS_QUICKSAT => undef;
 
@@ -8194,7 +8221,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '14699' =>   4.2, # COSMOS 1536
   '14819' =>   4.7, # COSMOS 1544
   '14820' =>   4.7, # SL-14 R/B
-  '15354' =>   4.2, # ERBS
   '15483' =>   4.7, # SL-8 R/B
   '15494' =>   3.7, # COSMOS 1626
   '15772' =>   4.2, # SL-12 R/B(2)
@@ -8305,13 +8331,13 @@ use constant _MCCANTS_QUICKSAT => undef;
   '31792' =>   3.2, # COSMOS 2428
   '31793' =>   2.7, # SL-16 R/B
   '33504' =>   5.3, # KORONAS-FOTON
+# '37731' => undef, # CZ-2C R/B has no recorded magnitude
   '38341' =>   3.2, # H-2A R/B
 # '39271' => undef, # CUSAT 2/FALCON 9 has no recorded magnitude
 # '39358' => undef, # SJ-16 has no recorded magnitude
 # '39364' => undef, # CZ-2C R/B has no recorded magnitude
   '39679' =>   3.4, # SL-4 R/B
   '39766' =>   3.7, # ALOS 2
-# '40306' => undef, # CZ-2C R/B has no recorded magnitude
   '40354' =>   4.2, # SL-27 R/B
 # '41038' => undef, # YAOGAN 29 has no recorded magnitude
 # '41337' => undef, # ASTRO H has no recorded magnitude
@@ -8319,11 +8345,15 @@ use constant _MCCANTS_QUICKSAT => undef;
 # '43521' => undef, # CZ-2C R/B has no recorded magnitude
 # '43600' => undef, # AEOLUS has no recorded magnitude
 # '43641' => undef, # SAOCOM 1-A has no recorded magnitude
+# '43682' => undef, # H-2A R/B has no recorded magnitude
 # '46265' => undef, # SAOCOM 1-B has no recorded magnitude
   '48274' =>   0.0, # CSS (TIANHE-1)
 # '51842' => undef, # OBJECT U has no recorded magnitude
 # '52260' => undef, # SZ-13 MODULE has no recorded magnitude
 # '52794' => undef, # CZ-2C R/B has no recorded magnitude
+# '53131' => undef, # CZ-2C R/B has no recorded magnitude
+  '53807' =>   3.5, # BLUEWALKER 3
+# '54047' => undef, # DRAGON FREEDOM DEB has no recorded magnitude
 );
 
 1;
@@ -8785,7 +8815,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2022 by Thomas R. Wyant, III
+Copyright (C) 2005-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

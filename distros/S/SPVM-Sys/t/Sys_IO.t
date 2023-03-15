@@ -138,15 +138,6 @@ else {
   ok(SPVM::TestCase::Sys::IO->readlink("$tmp_dir"));
 }
 
-if ($^O eq 'MSWin32') {
-  eval { SPVM::Sys::IO->readlinkp(undef) };
-  ok($@);
-}
-else {
-  my $tmp_dir = File::Temp->newdir;
-  ok(!SPVM::TestCase::Sys::IO->readlinkp("$tmp_dir"));
-}
-
 ok(SPVM::TestCase::Sys::IO->readline("$test_dir"));
 
 ok(SPVM::TestCase::Sys::IO->ungetc("$test_dir"));

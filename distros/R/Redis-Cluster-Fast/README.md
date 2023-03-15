@@ -37,7 +37,7 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
     $redis->hset('mymap', 'field2', 'ByeBye');
 
     # get as hash-ref
-    my $hash_ref = $redis->hgetall('mymap');
+    my $hash_ref = { $redis->hgetall('mymap') };
     # get as hash
     my %hash = $redis->hgetall('mymap');
 
@@ -45,9 +45,12 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
 
 Redis::Cluster::Fast is like [Redis::Fast](https://github.com/shogo82148/Redis-Fast) but support Redis Cluster by [hiredis-cluster](https://github.com/Nordix/hiredis-cluster).
 
-Require Redis 6 or higher to support [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md).
+To build this module you need at least autoconf, automake, libtool, pkg-config are installed on your system.
 
-To build this module you need at least autoconf, automake, libtool, patch, pkg-config are installed on your system.
+Recommend Redis 6 or higher.
+
+Since Redis 6, it supports new version of Redis serialization protocol, [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md).
+This client start to connect using RESP2 and currently it has no option to upgrade all connections to RESP3.
 
 ## MICROBENCHMARK
 
@@ -111,6 +114,8 @@ To run a Redis command with arguments.
 The command can also be expressed by concatenating the subcommands with underscores.
 
     e.g. cluster_info
+
+It does not support (Sharded) Pub/Sub family of commands and should not be run.
 
 # LICENSE
 

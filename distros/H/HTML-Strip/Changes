@@ -1,5 +1,17 @@
 Revision history for Perl extension HTML::Strip.
 
+2.11  Tue 14 Mar 2023 13:18:29 EET
+    - fix public VSC info for MetaCPAN (RT#115740)
+    - add option to emit newlines for <br> and <p> tags
+    (patch by Ryan Schmidt, contributed by Jason McIntosh)
+    - installation / complilation bug on macOS (RT#134342)
+    (patch contributed by Lucas Kanashiro)
+    - spelling correction (RT#115740)
+    (patch contributed by Florian Weimer)
+    - improved C99 compatibility with utf8_char_width prototype (RT#146734)
+    (contributed by Gabor Szabo)
+    - htmlstrip command-line tool
+
 2.10  Fri Apr 22 12:16:17 BST 2016
     - fix to building on Windows / MSVC (RT#102389)
     - fix duplicate DESTROY in Strip(.pm,.xs) warning (RT#104379, Debian bug #785032)
@@ -48,7 +60,7 @@ Revision history for Perl extension HTML::Strip.
     - smoke test and utf8 test, tests ordered
 
 1.10  Tue Sep 30 14:34:47 UTC 2014
-    - Fix for RT#99207 (script mathematical symbol bug)
+    - fix for RT#99207 (script mathematical symbol bug)
 
 1.09  Tue Sep 30 10:39:47 UTC 2014
     - offbyone.t disabled under Windows (RT#99219)
@@ -73,27 +85,27 @@ Revision history for Perl extension HTML::Strip.
     - fixes POD errors
 
 1.06  Fri Feb 10 11:18:35 2006
-	- documented 'set_decode_entities' method
+    - documented 'set_decode_entities' method
 
 1.05  Thu Feb  9 12:11:50 2006
-	- added 'set_decode_entities' method
+    - added 'set_decode_entities' method
 
 1.04  Mon Jan 24 16:41:51 2005
-	- Replaced all instances of strcmp with strcasecmp to make the
-	  module case-insensitive towards HTML tag names
+   - replaced all instances of strcmp with strcasecmp to make the
+      module case-insensitive towards HTML tag names
 
 1.03  Wed Jul  7 13:42:26 2004
-	- Added 'emit_spaces' configuration option which can turn off
-	  attempted conversion of HTML tags into spaces
-	- Constructor options now passed in a hash
+    - added 'emit_spaces' configuration option which can turn off
+      attempted conversion of HTML tags into spaces
+    - constructor options now passed in a hash
 
 1.02  Tue Feb 24 16:24:18 2004
-    - Yet more checks to prevent extraneous whitespace
-    - Added many more tests
+    - yet more checks to prevent extraneous whitespace
+    - added many more tests
 
 1.01  Mon Jul  7 18:15:59 2003
-    - Removed provision for escaped quotes in attributes values
-    - More checks to prevent the outputting of extraneous whitespace
+    - removed provision for escaped quotes in attributes values
+    - more checks to prevent the outputting of extraneous whitespace
 
 1.00  Wed Jun 11 12:05:47 2003
     - rewritten in C, using a struct for each object to keep track
@@ -106,7 +118,7 @@ Revision history for Perl extension HTML::Strip.
       absence was causing problems for some people
 
 0.04  Sun Mar 23 12:45:13 2003
-    - Tweaked docs, added FAQ explaining why 0.03 failed cpan testing
+    - tweaked docs, added FAQ explaining why 0.03 failed cpan testing
 
 0.03  Sat Mar 22 11:20:34 2003
     - rewritten in C++ to make striptags an attribute of each

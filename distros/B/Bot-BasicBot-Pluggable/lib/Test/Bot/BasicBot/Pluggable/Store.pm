@@ -1,5 +1,5 @@
 package Test::Bot::BasicBot::Pluggable::Store;
-$Test::Bot::BasicBot::Pluggable::Store::VERSION = '1.20';
+$Test::Bot::BasicBot::Pluggable::Store::VERSION = '1.30';
 use base qw(Test::Builder::Module);
 use strict;
 use warnings;
@@ -45,7 +45,7 @@ Test::Bot::BasicBot::Pluggable::Store - basics tests for Bot::BasicBot::Pluggabl
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ basic store_ok.
 
 This functions justs tests some basic behaviour every storage module
 should provide, like store creation, get and set. You can't use it
-directly with Test::More as we harcode the number of tests to nine
+directly with Test::More as we hardcode the number of tests to nine
 in the moment. (Man, i'm so excited about nested tap streams in the
 newest development release of Test::Simple)
 

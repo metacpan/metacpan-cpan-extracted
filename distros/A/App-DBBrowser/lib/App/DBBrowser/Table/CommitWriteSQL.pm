@@ -58,10 +58,13 @@ sub commit_sql {
         my $info = $ax->get_sql_info( $sql );
         if ( @$all_arrayref > 1 ) {
             my $tp = Term::TablePrint->new( $sf->{o}{table} );
-            $tp->print_table(
-                $all_arrayref,
-                { info => $info, prompt => $prompt, footer => $sf->{d}{table_footer} }
-            );
+            if ( ! $sf->{o}{G}{warnings_table_print} ) {
+                local $SIG{__WARN__} = sub {};
+                $tp->print_table( $all_arrayref, { info => $info, prompt => $prompt, footer => $sf->{d}{table_footer} } );
+            }
+            else {
+                $tp->print_table( $all_arrayref, { info => $info, prompt => $prompt, footer => $sf->{d}{table_footer} } );
+            }
         }
         $ax->print_sql_info( $info, $waiting );
     }

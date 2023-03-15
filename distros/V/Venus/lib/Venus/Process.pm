@@ -225,6 +225,12 @@ sub kill {
   return _kill(uc($name), @pids);
 }
 
+sub ping {
+  my ($self, @pids) = @_;
+
+  return $self->kill(0, @pids);
+}
+
 sub setsid {
   my ($self) = @_;
 
@@ -897,6 +903,34 @@ I<Since C<0.06>>
   }
 
   my $kill = $parent->kill('term', int$process);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 ping
+
+  ping(Int @pids) (Int)
+
+The ping method returns truthy if the process of the PID provided is active. If
+multiple PIDs are provided, this method will return the count of active PIDs.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item ping example 1
+
+  # given: synopsis;
+
+  if ($process = $parent->fork) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $ping = $parent->ping(int$process);
 
   # 1
 

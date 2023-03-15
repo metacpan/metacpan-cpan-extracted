@@ -1,6 +1,10 @@
 lib/YAML/PP/Schema/Env.pm
+lib/YAML/PP/Schema/Env.pod
+Changes
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+README
 t/10-basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

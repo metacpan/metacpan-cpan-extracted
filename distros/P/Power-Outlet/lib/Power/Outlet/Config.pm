@@ -4,7 +4,7 @@ use warnings;
 use base qw{Package::New Package::Role::ini};
 use Power::Outlet;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME

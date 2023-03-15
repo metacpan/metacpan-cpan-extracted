@@ -101,7 +101,9 @@ sub union_tables {
             }
             my $default_alias = 'U_TBL_' . $unique_char++;
             my $alias = $ax->alias( $union, 'union', $union_table, $default_alias );
-            $qt_union_table = $union_table . " AS " . $ax->prepare_identifier( $alias );
+            if ( length $alias ) {
+                $qt_union_table = $union_table . " AS " . $ax->prepare_identifier( $alias );
+            }
             $sf->{d}{col_names}{$union_table} = $ax->column_names( $qt_union_table );
         }
         else {
@@ -118,10 +120,17 @@ sub union_tables {
         }
     }
     my $qt_table = $ax->get_stmt( $union, 'Union', 'prepare' );
-    my $dummy_identifier = 'UNION_ALL_' . join( '_', @{$union->{used_tables}} ); ##
-    # alias: required if mysql, Pg, ...
+    my $dummy_identifier;
+    if ( $sf->{o}{alias}{use_defaults} ) {
+        $dummy_identifier = 'UNION_ALL_' . join( '_', @{$union->{used_tables}} );
+    }
+    else {
+        $dummy_identifier = 'UNION_ALL';
+    }
     my $alias = $ax->alias( $union, 'union', $dummy_identifier, $dummy_identifier );
-    $qt_table .= " AS " . $ax->prepare_identifier( $alias );
+    if ( length $alias ) {
+        $qt_table .= " AS " . $ax->prepare_identifier( $alias );
+    }
     # column names in the result-set of a UNION are taken from the first query.
     my $qt_columns = $union->{subselect_data}[0][1];
     return $qt_table, $qt_columns;

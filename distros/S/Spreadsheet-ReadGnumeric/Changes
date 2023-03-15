@@ -1,5 +1,10 @@
 Revision history for Spreadsheet-ReadGnumeric
 
+0.3	- 09 Mar 2023
+    * Third public release.
+    * Add missing runtime dependencies (thanks to srezic).
+    * Handle a MaxRow of zero (i.e. one row).
+
 0.2	- 20 Feb 2023
     * Second public release.
     * Add attribute handling.

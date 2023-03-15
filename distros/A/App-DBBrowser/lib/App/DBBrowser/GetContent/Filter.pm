@@ -53,7 +53,7 @@ sub input_filter {
     my $s_and_replace = 'Search_&_Replace';
     my $field_count = @{$sql->{insert_into_args}} * @{$sql->{insert_into_args}[0]};
     my $bu_insert_into_args = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ]; # copy the entire data
-    $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $source->{source_type}}; ##
+    $sf->{empty_to_null} = $sf->{o}{insert}{empty_to_null_file};
     $sf->{working} = $field_count > 1_000_000 ? 'Working ... ' : undef;
     my $old_idx = 0;
 
@@ -93,7 +93,7 @@ sub input_filter {
         my $filter_str = sprintf( "Filter: %s", $filter );
         if ( $filter eq $reset ) {
             $sql->{insert_into_args} = [ map { [ @$_ ] } @{$bu_insert_into_args} ];
-            $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $source->{source_type}};
+            $sf->{empty_to_null} = $sf->{o}{insert}{empty_to_null_file};
             next FILTER
         }
         elsif ( $filter eq $confirm ) {

@@ -1,5 +1,5 @@
 ---
-abstract: '- new keywords for creating scopes.'
+abstract: 'new keywords for creating scopes.'
 author:
   - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
 build_requires:
@@ -17,10 +17,11 @@ name: PerlX-ScopeFunction
 provides:
   PerlX::ScopeFunction:
     file: lib/PerlX/ScopeFunction.pm
-    version: '0.01'
+    version: '0.02'
 requires:
+  Const::Fast: '0'
   Keyword::Simple: '0'
-  Text::Balanced: '0'
-version: '0.01'
+  PPR: '0'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT

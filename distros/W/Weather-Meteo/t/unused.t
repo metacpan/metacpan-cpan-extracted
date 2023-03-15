@@ -4,33 +4,17 @@ use strict;
 use warnings;
 use Test::Most;
 
-my $can_test = 1;
-
 if($ENV{AUTHOR_TESTING}) {
 	eval {
-		use Test::Requires {
-			'warnings::unused' => 0.04
-		};
+		eval 'use warnings::unused 0.04';
 	};
 	if($@) {
-		plan(skip_all => 'Test::Requires needed for test');
-		$can_test = 0;
-	}
-}
-
-if($can_test) {
-	BEGIN {
-		if($ENV{AUTHOR_TESTING}) {
-			use_ok('Weather::Meteo');
-			# eval 'use warnings::unused -global';
-			eval 'use warnings::unused';
-		}
-	}
-
-	if($ENV{AUTHOR_TESTING}) {
+		plan(skip_all => 'warnings::unused needed for test for unused variables');
+	} else {
+		use_ok('Weather::Meteo');
 		new_ok('Weather::Meteo');
 		plan(tests => 2);
-	} else {
-		plan(skip_all => 'Author tests not required for installation');
 	}
+} else {
+	plan(skip_all => 'Author tests not required for installation');
 }

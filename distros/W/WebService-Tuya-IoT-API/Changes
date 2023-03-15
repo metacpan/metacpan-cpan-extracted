@@ -1,4 +1,17 @@
 Revision history for Perl extension WebService::Tuya::IoT::API.
 
+0.02 2023-03-09
+  - Dropped support for method api_version  - it was not implemented as I had envisioned - NOT 100% BACKWARDS COMPATABLE
+  - Added wrapper methods
+    - device_information
+    - device_freeze_state
+    - device_factory_infos
+    - device_specification
+    - device_protocol
+    - device_properties
+    - device_status_code_value
+  - Added live device tests - must enable with environment
+  - Added example scripts to CPAN distribution
+
 0.01 2023-03-08
   - Minimum viable product for access token, device status, and device commands.

@@ -20,11 +20,11 @@ $VAR1 = {
                                         'used' => '145379328'
                                       },
                     '/dev/md126p10' => {
-                                         'free' => '5155209216',
+                                         'free' => '5162221568',
                                          'fstype' => 'xfs',
                                          'mountpoint' => '/var/log/audit',
                                          'size' => '5232394240',
-                                         'used' => '77185024'
+                                         'used' => '70172672'
                                        },
                     '/dev/md126p2' => {
                                         'free' => '46966640640',
@@ -34,41 +34,42 @@ $VAR1 = {
                                         'used' => '5436559360'
                                       },
                     '/dev/md126p6' => {
-                                        'free' => '24161779712',
+                                        'free' => '24164659200',
                                         'fstype' => 'xfs',
                                         'mountpoint' => '/var',
                                         'size' => '31441920000',
-                                        'used' => '7280140288'
+                                        'used' => '7277260800'
                                       },
                     '/dev/md126p7' => {
-                                        'free' => '11259691008',
+                                        'free' => '11259633664',
                                         'fstype' => 'xfs',
                                         'mountpoint' => '/',
                                         'size' => '15718154240',
-                                        'used' => '4458463232'
+                                        'used' => '4458520576'
                                       },
                     '/dev/md126p8' => {
-                                        'free' => '10125889536',
+                                        'free' => '10183651328',
                                         'fstype' => 'xfs',
                                         'mountpoint' => '/var/log',
                                         'size' => '10475274240',
-                                        'used' => '349384704'
+                                        'used' => '291622912'
                                       },
                     '/dev/md126p9' => {
-                                        'free' => '6949171200',
+                                        'free' => '6949433344',
                                         'fstype' => 'partition',
                                         'mountpoint' => 'SWAP',
                                         'size' => '8388603904',
-                                        'used' => '1439432704'
+                                        'used' => '1439170560'
                                       },
                     '/dev/nvme0n1p1' => {
-                                          'free' => '5201632669696',
+                                          'free' => '5084497448960',
                                           'fstype' => 'xfs',
                                           'mountpoint' => '/staging',
                                           'size' => '6399114346496',
-                                          'used' => '1197481676800'
+                                          'used' => '1314616897536'
                                         }
                   },
+          'hostname' => 'di138099su.example.com',
           'lsblk' => {
                        'md126' => {
                                     'alignment' => '0',
@@ -712,7 +713,7 @@ $VAR1 = {
                                       'uuid' => undef,
                                       'vendor' => undef,
                                       'wsame' => '0',
-                                      'wwn' => undef
+                                      'wwn' => 'eui.000000000000000100a075012aaa7392'
                                     },
                        'nvme0n1p1' => {
                                         'alignment' => '0',
@@ -758,7 +759,7 @@ $VAR1 = {
                                         'uuid' => '754cd82c-99fa-485c-8411-6feab7c1e78c',
                                         'vendor' => undef,
                                         'wsame' => '0',
-                                        'wwn' => undef
+                                        'wwn' => 'eui.000000000000000100a075012aaa7392'
                                       },
                        'sda' => {
                                   'alignment' => '0',
@@ -1026,7 +1027,7 @@ $VAR1 = {
           'partitions' => {
                             'md126' => {
                                          'extended' => '4',
-                                         'label' => 'Grappe RAID logiciel Linux',
+                                         'label' => 'Linux Software RAID Array',
                                          'parts' => [
                                                       {
                                                         'kind' => 'free',
@@ -1034,7 +1035,7 @@ $VAR1 = {
                                                         'start' => '32256'
                                                       },
                                                       {
-                                                        'flags' => 'démarrage',
+                                                        'flags' => 'boot',
                                                         'id' => '1',
                                                         'kind' => 'part',
                                                         'label' => '',
@@ -3516,14 +3517,17 @@ $VAR1 = {
                                  },
                       'nvme0n1' => {
                                      '_udev_infos' => {
-                                                        'DEVLINKS' => '/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
+                                                        'DEVLINKS' => '/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392 /dev/disk/by-id/nvme-eui.000000000000000100a075012aaa7392 /dev/disk/by-path/pci-0000:5e:00.0-nvme-1',
                                                         'DEVNAME' => '/dev/nvme0n1',
                                                         'DEVPATH' => '/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/nvme/nvme0/nvme0n1',
                                                         'DEVTYPE' => 'disk',
                                                         'ID_MODEL' => 'Micron_9300_MTFDHAL6T4TDR',
                                                         'ID_PART_TABLE_TYPE' => 'gpt',
+                                                        'ID_PATH' => 'pci-0000:5e:00.0-nvme-1',
+                                                        'ID_PATH_TAG' => 'pci-0000_5e_00_0-nvme-1',
                                                         'ID_SERIAL' => 'Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
                                                         'ID_SERIAL_SHORT' => '20262AAA7392',
+                                                        'ID_WWN' => 'eui.000000000000000100a075012aaa7392',
                                                         'MAJOR' => '259',
                                                         'MINOR' => '11',
                                                         'MPATH_SBIN_PATH' => '/sbin',
@@ -3534,13 +3538,15 @@ $VAR1 = {
                                      'name' => 'nvme0n1',
                                      'names' => [
                                                   'disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
+                                                  'disk/by-id/nvme-eui.000000000000000100a075012aaa7392',
+                                                  'disk/by-path/pci-0000:5e:00.0-nvme-1',
                                                   'nvme0n1'
                                                 ],
                                      'path' => '/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/nvme/nvme0/nvme0n1'
                                    },
                       'nvme0n1p1' => {
                                        '_udev_infos' => {
-                                                          'DEVLINKS' => '/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392-part1 /dev/disk/by-id/nvme-eui.000000000000000100a075012aaa7392-part1 /dev/disk/by-partuuid/1f99aca4-0be3-4257-b27b-5661c561c081 /dev/disk/by-uuid/754cd82c-99fa-485c-8411-6feab7c1e78c',
+                                                          'DEVLINKS' => '/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392-part1 /dev/disk/by-id/nvme-eui.000000000000000100a075012aaa7392-part1 /dev/disk/by-partuuid/1f99aca4-0be3-4257-b27b-5661c561c081 /dev/disk/by-path/pci-0000:5e:00.0-nvme-1-part1 /dev/disk/by-uuid/754cd82c-99fa-485c-8411-6feab7c1e78c',
                                                           'DEVNAME' => '/dev/nvme0n1p1',
                                                           'DEVPATH' => '/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/nvme/nvme0/nvme0n1/nvme0n1p1',
                                                           'DEVTYPE' => 'partition',
@@ -3557,8 +3563,11 @@ $VAR1 = {
                                                           'ID_PART_ENTRY_TYPE' => 'ebd0a0a2-b9e5-4433-87c0-68b6b72699c7',
                                                           'ID_PART_ENTRY_UUID' => '1f99aca4-0be3-4257-b27b-5661c561c081',
                                                           'ID_PART_TABLE_TYPE' => 'gpt',
+                                                          'ID_PATH' => 'pci-0000:5e:00.0-nvme-1',
+                                                          'ID_PATH_TAG' => 'pci-0000_5e_00_0-nvme-1',
                                                           'ID_SERIAL' => 'Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
                                                           'ID_SERIAL_SHORT' => '20262AAA7392',
+                                                          'ID_WWN' => 'eui.000000000000000100a075012aaa7392',
                                                           'MAJOR' => '259',
                                                           'MINOR' => '12',
                                                           'SUBSYSTEM' => 'block',
@@ -3570,6 +3579,7 @@ $VAR1 = {
                                                     'disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392-part1',
                                                     'disk/by-id/nvme-eui.000000000000000100a075012aaa7392-part1',
                                                     'disk/by-partuuid/1f99aca4-0be3-4257-b27b-5661c561c081',
+                                                    'disk/by-path/pci-0000:5e:00.0-nvme-1-part1',
                                                     'disk/by-uuid/754cd82c-99fa-485c-8411-6feab7c1e78c',
                                                     'nvme0n1p1'
                                                   ],

@@ -151,7 +151,7 @@ sub __print_template_info {
 }
 
 
-sub parse_with_template { ##
+sub parse_with_template {
     my ( $sf, $sql, $fh ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
@@ -194,7 +194,6 @@ sub parse_with_template { ##
         seek $fh, 0, 0;
         my @rows = grep { ! /^\s+\z/ } <$fh>;
         chomp @rows;
-        #my $fields_set = [ [ 'Number of columns', ], [ ' Separator width', ], ]; ##
         my $fields_set = [ [ 'Col count', ], [ 'Sep width', ], ];
 
         SETTINGS: while ( 1 ) {
@@ -225,7 +224,7 @@ sub parse_with_template { ##
                 my $info = $sf->__print_template_info( \@rows, 6 );
                 $tc->choose(
                     [ 'Press ENTER' ],
-                    { info => $info, prompt => $prompt, info => $info }
+                    { info => $info, prompt => $prompt }
                 );
                 $ax->print_sql_info( $info );
                 @$fields_set = @$form_set;

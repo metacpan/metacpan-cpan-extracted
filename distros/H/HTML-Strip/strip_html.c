@@ -8,6 +8,8 @@
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
 
+static int utf8_char_width(unsigned char * string);
+
 void
 _strip_html( Stripper * stripper, char * raw, char * output, int is_utf8_p ) {
   char * p_raw = raw;
@@ -21,6 +23,7 @@ _strip_html( Stripper * stripper, char * raw, char * output, int is_utf8_p ) {
 
   while( p_raw < raw_end ) {
     width = is_utf8_p ? utf8_char_width(p_raw) : 1;
+    // either a single char or a set of unicode code points
 
     if( stripper->o_debug ) {
       printf( "[DEBUG] char:%C w%i state:%c%c%c tag:%5s last:%c%c%c%c in:%c%c%c quote:%c ",
@@ -41,10 +44,9 @@ _strip_html( Stripper * stripper, char * raw, char * output, int is_utf8_p ) {
       );
     }
 
-    // either a single char or a set of unicode code points;
     if( stripper->f_in_tag ) {
       /* inside a tag */
-      /* check if we know either the tagname, or that we're in a declaration */
+      /* check we don't know either the tagname, or that we're in a declaration */
       if( !stripper->f_full_tagname && !stripper->f_in_decl ) {
         /* if this is the first character, check if it's a '!'; if so, we're in a declaration */
         if( stripper->p_tagname == stripper->tagname && *p_raw == '!' ) {
@@ -55,11 +57,12 @@ _strip_html( Stripper * stripper, char * raw, char * output, int is_utf8_p ) {
           stripper->f_closing = 1;
         }
         /* if the first character wasn't a '/', and we're in a stripped block,
-         * assume this is a mathematical operator and reset */
+         * assume any previous '<' was a mathematical operator and reset */
         else if( !stripper->f_closing && stripper->f_in_striptag && stripper->p_tagname == stripper->tagname && *p_raw != '/' ) {
           stripper->f_in_tag = 0;
           stripper->f_closing = 0;
-        /* we only care about closing tags within a stripped tags block (e.g. scripts) */
+        /* within a stripped tags block (e.g. scripts), we only care about closing tags
+         * within normal tags, we care about both opening and closing tags */
         } else if( !stripper->f_in_striptag || stripper->f_closing ) {
           /* if we don't have the full tag name yet, add p_raw character unless it's whitespace, a '/', or a '>';
              otherwise null pad the string and set the full tagname flag, and check the tagname against stripped ones.
@@ -75,20 +78,34 @@ _strip_html( Stripper * stripper, char * raw, char * output, int is_utf8_p ) {
               if( strcasecmp( stripper->tagname, stripper->striptag ) == 0 ) {
                 stripper->f_in_striptag = 0;
               }
-              /* if we're outside a stripped tag block, check tagname against stripped tag list */
+              /* if we're outside a stripped tag block, check if tagname represents a newline,
+               * then check tagname against stripped tag list */
             } else if( !stripper->f_in_striptag && !stripper->f_closing ) {
+              if( strcasecmp( stripper->tagname, "p" ) ||
+                  strcasecmp( stripper->tagname, "br" ) ) {
+                if( stripper->o_emit_newlines ) {
+                  if( stripper->o_debug ) {
+                    printf("NEWLINE ");
+                  }
+                  *p_output++ = '\n';
+                  stripper->f_outputted_space = 1;
+                }
+              }
               int i;
               for( i = 0; i < stripper->numstriptags; i++ ) {
                 if( strcasecmp( stripper->tagname, stripper->o_striptags[i] ) == 0 ) {
                   stripper->f_in_striptag = 1;
                   strcpy( stripper->striptag, stripper->tagname );
+                  break;
                 }
               }
             }
             check_end( stripper, *p_raw );
           }
         }
-      } else {
+      }
+      /* we know the tagname, or that we're in a decl */
+      else {
         if( stripper->f_in_quote ) {
           /* inside a quote */
           /* end of quote if p_raw character matches the opening quote character */
@@ -191,7 +208,7 @@ _strip_html( Stripper * stripper, char * raw, char * output, int is_utf8_p ) {
   }
 }
 
-int
+static int
 utf8_char_width(unsigned char * string) {
     if (~*string & 128) {                   // 0xxxxxxx
         return 1;

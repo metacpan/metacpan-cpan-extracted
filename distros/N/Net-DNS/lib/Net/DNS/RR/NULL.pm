@@ -2,7 +2,7 @@ package Net::DNS::RR::NULL;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NULL.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: NULL.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -81,6 +81,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1035 Section 3.3.10
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC1035(3.3.10)|https://tools.ietf.org/html/rfc1035>
 
 =cut

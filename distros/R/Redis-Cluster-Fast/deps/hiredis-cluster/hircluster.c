@@ -46,8 +46,6 @@
 #include "hiutil.h"
 #include "win32.h"
 
-#define REDIS_PROTOCOL_VERSION 3
-
 // Cluster errors are offset by 100 to be sufficiently out of range of
 // standard Redis errors
 #define REDIS_ERR_CLUSTER_TOO_MANY_RETRIES 100
@@ -3650,14 +3648,6 @@ redisAsyncContext *actx_get_by_node(redisClusterAsyncContext *acc,
             redisAsyncFree(ac);
             return NULL;
         }
-    }
-
-    // Always use RESP3
-    ret = redisAsyncCommand(ac, NULL, NULL, "HELLO %d", REDIS_PROTOCOL_VERSION);
-    if (ret != REDIS_OK) {
-        __redisClusterAsyncSetError(acc, ac->c.err, ac->c.errstr);
-        redisAsyncFree(ac);
-        return NULL;
     }
 
     if (acc->adapter) {

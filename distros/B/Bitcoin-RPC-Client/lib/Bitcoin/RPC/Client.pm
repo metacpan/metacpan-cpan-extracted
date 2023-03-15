@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use JSON::RPC::Legacy::Client;
 
-our $VERSION  = '0.11';
+our $VERSION  = '0.12';
 
 has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Legacy::Client"->new });
 has user     => (is => 'ro');
@@ -83,12 +83,20 @@ sub AUTOLOAD {
                              SSL_verify_mode => 0 );
    }
 
+   # Build the RPC
    my $obj = {
       method => $method,
       params => (ref $_[0] ? $_[0] : [@_]),
    };
-
-   my $res = $client->call( $url, $obj );
+   my $res;
+   eval {
+      # Attempt the RPC
+      $res = $client->call( $url, $obj );
+   } or do {
+      # Test the HTTP service and die with usable output if above RPC call fails
+      my $tr = $client->ua->post($url);
+      die $tr->status_line;
+   };
    if($res) {
       if ($res->is_error) {
           my $content = $res->content;
@@ -171,10 +179,8 @@ Bitcoin::RPC::Client - Bitcoin Core JSON RPC Client
 =head1 DESCRIPTION
 
 This module implements in Perl the functions that are currently part of the
-Bitcoin Core RPC client calls (bitcoin-cli).The function names and parameters
-are identical between the Bitcoin Core API and this module. This is done for
-consistency so that a developer only has to reference one manual:
-https://bitcoin.org/en/developer-reference#remote-procedure-calls-rpcs
+Bitcoin Core RPC client calls (bitcoin-cli). The function names and parameters
+are identical between the L<Bitcoin Core RPC API|https://developer.bitcoin.org/reference/rpc/index.html> and this module.
 
 =head1 CONSTRUCTOR
 
@@ -194,7 +200,6 @@ This method creates a new C<Bitcoin::RPC::Client> and returns it.
    ssl                 0
    verify_hostname     1
    debug               0
-   syntax              0
 
 cookie - Absolute path to your RPC cookie file (.cookie). When cookie is
 defined user and password will be ignored and the contents of cookie will
@@ -214,9 +219,6 @@ verify_hostname - Disable SSL certificate verification. Needed when
 bitcoind is fronted by a proxy or when using a self-signed certificate.
 
 debug - Turns on raw HTTP request/response output from LWP::UserAgent.
-
-syntax - Removed as of Bitcoin::RPC::Client v0.7, however having the value
-set will not break anything.
 
 =head1 AUTHOR
 

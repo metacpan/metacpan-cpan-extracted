@@ -896,6 +896,116 @@ The full text of the license can be found in the LICENSE file included with this
 
 [https://tasmota.github.io/docs/#/Commands](https://tasmota.github.io/docs/#/Commands)
 
+# File: lib/Power/Outlet/TuyaAPI.pm
+
+## NAME
+
+Power::Outlet::TuyaAPI - Control and query an outlet via the TuyaAPI.
+
+## SYNOPSIS
+
+    my $outlet = Power::Outlet::TuyaAPI->new(client_id=>"abc123", client_secret=>"cde234", deviceid=>"def345", switch=>"switch_1");
+    print $outlet->query, "\n";
+    print $outlet->on, "\n";
+    print $outlet->off, "\n";
+
+## DESCRIPTION
+
+Power::Outlet::TuyaAPI is a package for controlling and querying an outlet via the TuyaAPI.
+
+This package is a wrapper around [WebService::Tuya::IoT::API](https://metacpan.org/pod/WebService::Tuya::IoT::API) please see that documentation for device configuration.
+
+## USAGE
+
+    use Power::Outlet::TuyaAPI;
+    my $relay = Power::Outlet::TuyaAPI->new(client_id=>"abc123", client_secret=>"cde234", deviceid=>"def345", switch=>"switch_1");
+    print $relay->on, "\n";
+
+## CONSTRUCTOR
+
+### new
+
+    my $outlet = Power::Outlet->new(type=>"TuyaAPI", client_id=>"abc123", client_secret=>"cde234", deviceid=>"def345", switch=>"switch_1");
+    my $outlet = Power::Outlet::TuyaAPI->new(client_id=>"abc123", client_secret=>"cde234", deviceid=>"def345", switch=>"switch_1");
+
+## PROPERTIES
+
+### host 
+
+default: openapi.tuyaus.com
+
+### client\_id
+
+The Client ID found on https://iot.tuya.com/ project overview page.
+
+### client\_secret
+
+The Client Secret found on https://iot.tuya.com/ project overview page.
+
+### deviceid
+
+The Device ID found on https://iot.tuya.com/ project devices page.
+
+### relay
+
+The relay name or "code" for a particular relay on the device.  Devices with a single relay this value will most likely be switch\_1 but, for devices with multiple relays the first relay is normally switch\_1 and subsequent relays should be labeled switch\_2, etc.
+
+default: switch\_1
+
+## METHODS
+
+### name
+
+Returns the name from the device information API
+
+Note: The name is cached for the life of the object.
+
+### query
+
+Sends an HTTP message to the API to query the current state of the device relay
+
+### on
+
+Sends a message to the API to turn the device relay ON
+
+### off
+
+Sends a message to the API to turn the device relay OFF
+
+### switch
+
+Sends a message to the API to toggle the device relay state
+
+### cycle
+
+Sends messages to the device to cycle the device relay state
+
+## BUGS
+
+Please log on RT and send an email to the author.
+
+## SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
+
+## AUTHOR
+
+    Michael R. Davis
+    CPAN ID: MRDVT
+    DavisNetworks.com
+
+## COPYRIGHT
+
+Copyright (c) 2020 Michael R. Davis
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with this module.
+
+## SEE ALSO
+
+[https://tasmota.github.io/docs/#/Commands](https://tasmota.github.io/docs/#/Commands)
+
 # File: lib/Power/Outlet/WeMo.pm
 
 ## NAME

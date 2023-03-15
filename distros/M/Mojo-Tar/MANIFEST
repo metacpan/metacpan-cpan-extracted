@@ -1,0 +1,11 @@
+Changes
+lib/Mojo/Tar.pm
+lib/Mojo/Tar/File.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-project.t
+t/example.tar
+t/header.t
+t/tar.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

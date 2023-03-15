@@ -9,7 +9,7 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
@@ -85,8 +85,6 @@ sub Populate {
 	$self->{VALUES} = [];
 	
 	my $listbox = $self->Scrolled('Listbox',
-		-borderwidth => 1,
-		-relief => 'sunken',
 		-scrollbars => 'oe',
 		-listvariable => $self->{LIST},
 	)->pack(-fill => 'both');
@@ -97,8 +95,10 @@ sub Populate {
 	$self->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
 
 	$self->ConfigSpecs(
+		-borderwidth => ['SELF'],
 		-filter => ['PASSIVE', undef, undef, 0],
 		-selectcall => ['CALLBACK', undef, undef, sub {}],
+		-relief => ['SELF'],
 		'-values' => ['METHOD', undef, undef, []],
 		DEFAULT => [ $listbox ],
 	);
@@ -128,7 +128,7 @@ sub filter {
 	my @new = ();
 	my $len = length($filter);
 	for (@$values) {
-		push @new, $_ if $_ =~ /^$filter/i;
+		push @new, $_ if $_ =~ /$filter/i;
 	}
 	my $size = @new;
 	my $list = $self->{LIST};

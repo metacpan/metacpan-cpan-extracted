@@ -9,19 +9,20 @@ WriteMakefile(
                        'Test::Simple'                            => 0.44,
                       },
     PREREQ_PM    => {
-                     'Package::New'             => 0,
-                     'Time::HiRes'              => 0,
-                     'Parallel::ForkManager'    => 1.01, #for CGI app
-                     'Net::SNMP'                => 0,    #for iBootBar
-                     'Net::UPnP'                => 0,    #for WeMo
-                     'XML::LibXML::LazyBuilder' => 0,    #for WeMo
-                     'URI'                      => 0,    #for Hue
-                     'HTTP::Tiny'               => 0,    #for Hue
-                     'JSON'                     => 0,    #for Hue
-                     'Path::Class'              => 0,    #for Virtual
-                     'File::Spec'               => 0,    #for Virtual
-                     'List::MoreUtils'          => 0,    #for iBootBarGroup
-                     'Package::Role::ini'       => 0.07, #for Config
+                     'Package::New'               => 0,
+                     'Time::HiRes'                => 0,
+                     'Parallel::ForkManager'      => 1.01, #for CGI app
+                     'Net::SNMP'                  => 0,    #for iBootBar
+                     'Net::UPnP'                  => 0,    #for WeMo
+                     'XML::LibXML::LazyBuilder'   => 0,    #for WeMo
+                     'URI'                        => 0,    #for Hue
+                     'HTTP::Tiny'                 => 0,    #for Hue
+                     'JSON'                       => 0,    #for Hue
+                     'Path::Class'                => 0,    #for Virtual
+                     'File::Spec'                 => 0,    #for Virtual
+                     'List::MoreUtils'            => 0,    #for iBootBarGroup
+                     'Package::Role::ini'         => 0.07, #for Config
+                     'WebService::Tuya::IoT::API' => 0.02, #for TuyaAPI
                     },
     META_MERGE   => {
                       'resources' => {

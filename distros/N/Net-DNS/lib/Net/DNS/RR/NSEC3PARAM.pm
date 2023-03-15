@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC3PARAM;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC3PARAM.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: NSEC3PARAM.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,8 +19,7 @@ use Carp;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $size = unpack "\@$offset x4 C", $$data;
 	@{$self}{qw(algorithm flags iterations saltbin)} = unpack "\@$offset CCnx a$size", $$data;
@@ -44,52 +43,47 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->algorithm(shift);
-	$self->flags(shift);
-	$self->iterations(shift);
-	my $salt = shift;
+	for (qw(algorithm flags iterations)) { $self->$_( shift @argument ) }
+	my $salt = shift @argument;
 	$self->salt($salt) unless $salt eq '-';
 	return;
 }
 
 
 sub algorithm {
-	my $self = shift;
-
-	$self->{algorithm} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{algorithm} = 0 + $_ }
 	return $self->{algorithm} || 0;
 }
 
 
 sub flags {
-	my $self = shift;
-
-	$self->{flags} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{flags} = 0 + $_ }
 	return $self->{flags} || 0;
 }
 
 
 sub iterations {
-	my $self = shift;
-
-	$self->{iterations} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{iterations} = 0 + $_ }
 	return $self->{iterations} || 0;
 }
 
 
 sub salt {
-	my $self = shift;
-	return unpack "H*", $self->saltbin() unless scalar @_;
-	return $self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	my ( $self, @value ) = @_;
+	return unpack "H*", $self->saltbin() unless scalar @value;
+	my @hex = map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @value;
+	return $self->saltbin( pack "H*", join "", @hex );
 }
 
 
 sub saltbin {
-	my $self = shift;
-
-	$self->{saltbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{saltbin} = $_ }
 	return $self->{saltbin} || "";
 }
 
@@ -204,6 +198,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC5155
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC5155|https://tools.ietf.org/html/rfc5155>
 
 =cut

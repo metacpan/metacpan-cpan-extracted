@@ -2,9 +2,9 @@ package Redis::Cluster::Fast;
 use 5.008001;
 use strict;
 use warnings;
-use Carp qw/croak confess/;
+use Carp 'croak';
 
-our $VERSION = "0.086";
+our $VERSION = "0.087";
 
 use constant {
     DEFAULT_COMMAND_TIMEOUT => 1.0,
@@ -56,11 +56,11 @@ sub AUTOLOAD {
         my @arguments = @_;
         for my $index (0 .. $#arguments) {
             utf8::downgrade($arguments[$index], 1)
-                or confess 'command sent is not an octet sequence in the native encoding (Latin-1).';
+                or croak 'command sent is not an octet sequence in the native encoding (Latin-1).';
         }
 
         my ($reply, $error) = $self->__std_cmd(@command, @arguments);
-        confess "[$command] $error" if defined $error;
+        croak "[$command] $error" if defined $error;
         if (wantarray) {
             my $type = ref $reply;
             if ($type eq 'ARRAY') {
@@ -122,7 +122,7 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
     $redis->hset('mymap', 'field2', 'ByeBye');
 
     # get as hash-ref
-    my $hash_ref = $redis->hgetall('mymap');
+    my $hash_ref = { $redis->hgetall('mymap') };
     # get as hash
     my %hash = $redis->hgetall('mymap');
 
@@ -130,9 +130,12 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
 
 Redis::Cluster::Fast is like L<Redis::Fast|https://github.com/shogo82148/Redis-Fast> but support Redis Cluster by L<hiredis-cluster|https://github.com/Nordix/hiredis-cluster>.
 
-Require Redis 6 or higher to support L<RESP3|https://github.com/antirez/RESP3/blob/master/spec.md>.
+To build this module you need at least autoconf, automake, libtool, pkg-config are installed on your system.
 
-To build this module you need at least autoconf, automake, libtool, patch, pkg-config are installed on your system.
+Recommend Redis 6 or higher.
+
+Since Redis 6, it supports new version of Redis serialization protocol, L<RESP3|https://github.com/antirez/RESP3/blob/master/spec.md>.
+This client start to connect using RESP2 and currently it has no option to upgrade all connections to RESP3.
 
 =head2 MICROBENCHMARK
 
@@ -196,6 +199,8 @@ To run a Redis command with arguments.
 The command can also be expressed by concatenating the subcommands with underscores.
 
     e.g. cluster_info
+
+It does not support (Sharded) Pub/Sub family of commands and should not be run.
 
 =head1 LICENSE
 

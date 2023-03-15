@@ -1,6 +1,6 @@
 package SPVM::Sys;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 1;
 
@@ -12,251 +12,441 @@ SPVM::Sys - System Calls for File IO, User, Process, Signal, Socket
 
 C<SPVM::Sys> is the C<Sys> class in L<SPVM> language. It provides system calls such as file IO, user manipulation, process, socket, time,
 
-This distribution contains many modules for system calls such as L<Sys::IO|SPVM::Sys::IO>. See L</"Modules">.
+This class provides methods compatible with functions related to system calls provided by Perl.
+
+This distribution contains many modules for system calls such as L<Sys::IO|SPVM::Sys::IO>, L<Sys::Socket|SPVM::Sys::Socket>, L<Sys::Process|SPVM::Sys::Process>. See L</"Modules">.
+
+Methods compatible with file IO, sockets, file paths, current directory, select, and poll are implemented as other modules such as L<IO::File|SPVM::IO::File>, L<IO::Socket|SPVM::IO::Socket>, L<Cwd|SPVM::Cwd>. See L</"See Also">.
 
 =head1 Usage
 
   use Sys;
   
-  my $path = Sys->getenv("PATH");
+  Sys->mkdir("foo");
   
-  my $is_windows = Sys->defined("_WIN32");
+  Sys->rmdir("foo");
+  
+  my $path = Sys->env("PATH");
+  
+  my $process_id = Sys->getpid;
 
 =head1 Class Methods
 
-=head2 getenv
+=head2 env
 
-  static method getenv : string ($name : string);
+  static method env : string ($name : string);
 
-The getenv() function searches the environment list to find the environment variable name, and returns a pointer to the corresponding value string.
+Gets an environment variable. The same as getting of the Perl L<$ENV{$name}|https://perldoc.perl.org/perlvar#%25ENV>.
 
-See the detail of the L<getenv|https://linux.die.net/man/3/getenv> function in the case of Linux.
+=head2 osname
 
-=head2 setenv
+  static method osname : string ()
 
-  static method setenv : int ($name : string, $value : string, $overwrite : int);
+Gets OS name. The same as Perl L<$^O|https://perldoc.perl.org/perlvar#$%5EO>.
 
-The setenv() function adds the variable name to the environment with the value value, if name does not already exist. If name does exist in the environment, then its value is changed to value if overwrite is nonzero; if overwrite is zero, then the value of name is not changed. This function makes copies of the strings pointed to by name and value (by contrast with putenv(3)).
-
-See the detail of the L<setenv|https://linux.die.net/man/3/setenv> function in the case of Linux.
-
-=head2 unsetenv
-
-  static method unsetenv : int ($name : string);
-
-The unsetenv() function deletes the variable name from the environment. If name does not exist in the environment, then the function succeeds, and the environment is unchanged.
-
-See the detail of the L<unsetenv|https://linux.die.net/man/3/unsetenv> function in the case of Linux.
-
-=head2 defined
-
-  static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
-
-Checks if the macro in C<C langauge> is defined. If the macro is defined, returns C<1>. Otherwise returns C<0>.
-
-If C<$value> is specifed and C<$macro_name> is defined, the macro value converted to the given type is set to C<$value>.
-
-Supports the following macro names.
+Currently the following OS names are supported.
 
 =over 2
 
-=item * __GNUC__
+=item * C<linux>
 
-=item * __clang__
+=item * C<darwin>
 
-=item * __BORLANDC__
+=item * C<MSWin32>
 
-=item * __INTEL_COMPILER
+=item * C<freebsd>
 
-=item * __unix
+=item * C<openbsd>
 
-=item * __unix__
-
-=item * __linux
-
-=item * __linux__
-
-=item * __FreeBSD__
-
-=item * __NetBSD__
-
-=item * __OpenBSD__
-
-=item * _WIN32
-
-=item * WIN32
-
-=item * _WIN64
-
-=item * _WINDOWS
-
-=item * _CONSOLE
-
-=item * WINVER
-
-=item * _WIN32_WINDOWS
-
-=item * _WIN32_WINNT
-
-=item * WINCEOSVER
-
-=item * __CYGWIN__
-
-=item * __CYGWIN32__
-
-=item * __MINGW32__
-
-=item * __MINGW64__
-
-=item * __APPLE__
-
-=item * __MACH__
-
-=item * __sun
-
-=item * __solaris
+=item * C<solaris>
 
 =back
 
-=head2 get_osname
+=head2 A
 
-  static method get_osname : string ()
+  static method A : double ($file : string);
 
-Gets the OS name(Perl's L<$^O|https://perldoc.perl.org/perlvar#$%5EO> ). The list of the OS names are described at L<PLATFORMS - perlport|https://perldoc.perl.org/perlport#PLATFORMS>.
+Script start time minus file access time, in days. The same as Perl L<-A|https://perldoc.perl.org/functions/-X>.
 
-The C<get_osname> in the C<Sys> class supports the following os names.
+=head2 C
 
-=over 2
+  static method C : double ($file : string);
 
-=item * linux
+Script start time minus file inode change time, in days. The same as Perl L<-C|https://perldoc.perl.org/functions/-X>.
 
-=item * darwin
+=head2 M
 
-=item * MSWin32
+  static method M : double ($file : string);
 
-=item * freebsd
+Script start time minus file modification time, in days. The same as Perl L<-M|https://perldoc.perl.org/functions/-X>.
 
-=item * openbsd
+=head2 O
 
-=item * solaris
+  static method O : int ($file : string);
 
-=back
+File is owned by real uid. The same as Perl L<-O|https://perldoc.perl.org/functions/-X>.
+
+=head2 R
+
+  static method R : int ($file : string);
+
+File is readable by real uid/gid. The same as Perl L<-R|https://perldoc.perl.org/functions/-X>.
+
+=head2 S
+
+  static method S : int ($file : string);
+
+File is a socket. The same as Perl L<-S|https://perldoc.perl.org/functions/-X>.
+
+=head2 W
+
+  static method W : int ($file : string);
+
+File is writable by real uid/gid. The same as Perl L<-W|https://perldoc.perl.org/functions/-X>.
+
+=head2 X
+
+  static method X : int ($file : string);
+
+File is executable by real uid/gid. The same as Perl L<-X|https://perldoc.perl.org/functions/-X>.
+
+=head2 b
+
+  static method b : int ($file : string);
+
+File is a block special file. The same as Perl L<-b|https://perldoc.perl.org/functions/-X>.
+
+=head2 c
+
+  static method c : int ($file : string);
+
+File is a character special file. The same as Perl L<-c|https://perldoc.perl.org/functions/-X>.
+
+=head2 d
+
+  static method d : int ($file : string);
+
+File is a directory. The same as Perl L<-d|https://perldoc.perl.org/functions/-X>.
+
+=head2 e
+
+  static method e : int ($file : string);
+
+File exists. The same as Perl L<-e|https://perldoc.perl.org/functions/-X>.
+
+=head2 f
+
+  static method f : int ($file : string);
+
+File is a plain file. The same as Perl L<-f|https://perldoc.perl.org/functions/-X>.
+
+=head2 g
+
+  static method g : int ($file : string);
+
+File has setgid bit set. The same as Perl L<-g|https://perldoc.perl.org/functions/-X>.
+
+=head2 k
+
+  static method k : int ($file : string);
+
+File has sticky bit set. The same as Perl L<-k|https://perldoc.perl.org/functions/-X>.
+
+=head2 l
+
+  static method l : int ($file : string);
+
+File is a symbolic link (false if symlinks aren't supported by the file system). The same as Perl L<-l|https://perldoc.perl.org/functions/-X>.
+
+=head2 o
+
+  static method o : int ($file : string);
+
+File is owned by effective uid. The same as Perl L<-l|https://perldoc.perl.org/functions/-X>.
+
+=head2 p
+
+  static method p : int ($file : string);
+
+File is a named pipe (FIFO), or Filehandle is a pipe. The same as Perl L<-p|https://perldoc.perl.org/functions/-X>.
+
+=head2 r
+
+  static method r : int ($file : string);
+
+File is readable by effective uid/gid. The same as Perl L<-r|https://perldoc.perl.org/functions/-X>.
+
+=head2 s
+
+  static method s : long ($file : string);
+
+File has nonzero size (returns size in bytes). The same as Perl L<-s|https://perldoc.perl.org/functions/-X>.
+
+=head2 u
+
+  static method u : int ($file : string);
+
+File has setuid bit set. The same as Perl L<-u|https://perldoc.perl.org/functions/-X>.
+
+=head2 w
+
+  static method w : int ($file : string);
+
+File is writable by effective uid/gid. The same as Perl L<-u|https://perldoc.perl.org/functions/-X>.
+
+=head2 x
+
+  static method x : int ($file : string);
+
+File is executable by effective uid/gid. The same as Perl L<-x|https://perldoc.perl.org/functions/-X>.
+
+=head2 z
+
+  static method z : int ($file : string);
+
+File has zero size (is empty). The same as Perl L<-z|https://perldoc.perl.org/functions/-X>.
+
+=head2 time
+
+  static method time : long ();
+
+Returns the number of non-leap seconds since whatever time the system considers to be the epoch, suitable for feeding to gmtime and localtime. The same as the Perl L<time|https://perldoc.perl.org/functions/time>. This is the alias for L<time|SPVM::Time/"time"> method in the L<Time|SPVM::Time> class.
+
+=head2 localtime
+
+  static method localtime : Time::Info ($time : long);
+
+Converts a time as returned by the time function to a L<Time::Info|SPVM::Time::Info> object with the time analyzed for the local time zone. The same as the Perl L<localtime|https://perldoc.perl.org/functions/localtime>. This is the alias for L<localtime|SPVM::Time/"localtime"> method in the L<Time|SPVM::Time> class.
+
+=head2 gmtime
+
+  static method gmtime : Time::Info ($time : long);
+
+Works just like localtime, but the returned values are localized for the standard Greenwich time zone. The same as the Perl L<gmtime|https://perldoc.perl.org/functions/gmtime>. This is the alias for L<gmtime|SPVM::Time/"gmtime"> method in the L<Time|SPVM::Time> class.
+
+=head2 process_id
+
+  static method process_id : int ();
+
+Gets the process number of the running this program. The same as the Perl L<$$|https://perldoc.perl.org/perlvar#$PROCESS_ID>.
+
+=head2 stat
+
+  static method stat : Sys::IO::Stat ($path : string);
+
+Returns a L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object giving the status info for a file. The same as the Perl L<stat|https://perldoc.perl.org/functions/stat> function.
+
+=head2 chdir
+
+  static method chdir : int ($path : string);
+
+Changes the working directory to $path. The same as the Perl L<chdir|https://perldoc.perl.org/functions/chdir> function.
+
+=head2 chmod
+
+  static method chmod : int ($mode :int, $path : string);
+
+Changes the permissions of a file. The same as the Perl L<chmod|https://perldoc.perl.org/functions/chmod> function.
+
+=head2 mkdir
+
+  static method mkdir : int ($path : string, $mode : int);
+
+Creates the directory specified by $path and $mode. The same as the Perl L<mkdir|https://perldoc.perl.org/functions/mkdir> function.
+
+=head2 umask
+
+  static method umask : int ($mode : int);
+
+Sets the umask for the process to $mode and returns the previous value. The same as the Perl L<umask|https://perldoc.perl.org/functions/umask> function.
+
+=head2 rmdir
+
+  static method rmdir : int ($path : string);
+
+Deletes the directory specified by $path. The same as the Perl L<rmdir|https://perldoc.perl.org/functions/rmdir> function.
+
+=head2 unlink
+
+  static method unlink : int ($pathname : string);
+
+Deletes a file. The same as the Perl L<unlink|https://perldoc.perl.org/functions/unlink> function.
+
+=head2 rename
+
+  static method rename : int ($oldpath : string, $newpath : string);
+
+Changes the name of a file. The same as the Perl L<rename|https://perldoc.perl.org/functions/rename> function.
+
+=head2 readlink
+
+  static method readlink : int ($file : string);
+
+Returns the value of a symbolic link. The same as the Perl L<readlink|https://perldoc.perl.org/functions/readlink> function.
+
+=head2 symlink
+
+  static method symlink : int ($oldpath : string, $newpath : string);
+
+Creates a $newpath symbolically linked to the $oldpath. The same as the Perl L<symlink|https://perldoc.perl.org/functions/symlink> function.
+
+=head2 sleep
+
+  static method sleep : int ($seconds : int);
+
+Causes the program to sleep for $seconds seconds. The same as the Perl L<sleep|https://perldoc.perl.org/functions/sleep>.
 
 =head1 Modules
 
-All modules that is included in this distribution.
+All modules included in this distribution. These classes have methods that directly correspond to Linux/Unix/Mac or Windows system call functions written in C. In addition, several helper methods are implemented.
 
-=over 2
+=head2 Sys::Env
 
-=item * L<Sys|SPVM::Sys>
+=head4 L<Sys::Env|SPVM::Sys::Env>
 
-=item * L<Sys::FileTest|SPVM::Sys::FileTest>
+=head2 Sys::IO
 
-=item * L<Sys::IO|SPVM::Sys::IO>
+=head4 L<Sys::IO|SPVM::Sys::IO>
 
-=item * L<Sys::IO::Constant|SPVM::Sys::IO::Constant>
+=head4 L<Sys::IO::Constant|SPVM::Sys::IO::Constant>
 
-=item * L<Sys::Ioctl|SPVM::Sys::Ioctl>
+=head4 L<Sys::IO::Dirent|SPVM::Sys::IO::Dirent>
 
-=item * L<Sys::Ioctl::Constant|SPVM::Sys::Ioctl::Constant>
+=head4 L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream>
 
-=item * L<Sys::IO::Dirent|SPVM::Sys::IO::Dirent>
+=head4 L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream>
 
-=item * L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream>
+=head4 L<Sys::IO::Flock|SPVM::Sys::IO::Flock>
 
-=item * L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream>
+=head4 L<Sys::IO::Stat|SPVM::Sys::IO::Stat>
 
-=item * L<Sys::IO::Flock|SPVM::Sys::IO::Flock>
+=head4 L<Sys::IO::Utimbuf|SPVM::Sys::IO::Utimbuf>
 
-=item * L<Sys::IO::Stat|SPVM::Sys::IO::Stat>
+=head2 Sys::Ioctl
 
-=item * L<Sys::IO::Utimbuf|SPVM::Sys::IO::Utimbuf>
+=head4 L<Sys::Ioctl|SPVM::Sys::Ioctl>
 
-=item * L<Sys::Poll|SPVM::Sys::Poll>
+=head4 L<Sys::Ioctl::Constant|SPVM::Sys::Ioctl::Constant>
 
-=item * L<Sys::Poll::Constant|SPVM::Sys::Poll::Constant>
+=head2 Sys::OS
 
-=item * L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray>
+=head4 L<Sys::OS|SPVM::Sys::OS>
 
-=item * L<Sys::Process|SPVM::Sys::Process>
+=head2 Sys::Poll
 
-=item * L<Sys::Process::Constant|SPVM::Sys::Process::Constant>
+=head4 L<Sys::Poll|SPVM::Sys::Poll>
 
-=item * L<Sys::Select|SPVM::Sys::Select>
+=head4 L<Sys::Poll::Constant|SPVM::Sys::Poll::Constant>
 
-=item * L<Sys::Select::Constant|SPVM::Sys::Select::Constant>
+=head4 L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray>
 
-=item * L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>
+=head2 Sys::Process
 
-=item * L<Sys::Signal|SPVM::Sys::Signal>
+=head4 L<Sys::Process|SPVM::Sys::Process>
 
-=item * L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>
+=head4 L<Sys::Process::Constant|SPVM::Sys::Process::Constant>
 
-=item * L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler>
+=head2 Sys::Select
 
-=item * L<Sys::Signal::Handler::Default|SPVM::Sys::Signal::Handler::Default>
+=head4 L<Sys::Select|SPVM::Sys::Select>
 
-=item * L<Sys::Signal::Handler::Ignore|SPVM::Sys::Signal::Handler::Ignore>
+=head4 L<Sys::Select::Constant|SPVM::Sys::Select::Constant>
 
-=item * L<Sys::Signal::Handler::Monitor|SPVM::Sys::Signal::Handler::Monitor>
+=head4 L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>
 
-=item * L<Sys::Signal::Handler::Unknown|SPVM::Sys::Signal::Handler::Unknown>
+=head2 Sys::Signal
 
-=item * L<Sys::Socket|SPVM::Sys::Socket>
+=head4 L<Sys::Signal|SPVM::Sys::Signal>
 
-=item * L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo>
+=head4 L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>
 
-=item * L<Sys::Socket::AddrinfoLinkedList|SPVM::Sys::Socket::AddrinfoLinkedList>
+=head4 L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler>
 
-=item * L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant>
+=head4 L<Sys::Signal::Handler::Default|SPVM::Sys::Signal::Handler::Default>
 
-=item * L<Sys::Socket::Error|SPVM::Sys::Socket::Error>
+=head4 L<Sys::Signal::Handler::Ignore|SPVM::Sys::Signal::Handler::Ignore>
 
-=item * L<Sys::Socket::Error::InetInvalidNetworkAddress|SPVM::Sys::Socket::Error::InetInvalidNetworkAddress>
+=head4 L<Sys::Signal::Handler::Monitor|SPVM::Sys::Signal::Handler::Monitor>
 
-=item * L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr>
+=head4 L<Sys::Signal::Handler::Unknown|SPVM::Sys::Signal::Handler::Unknown>
 
-=item * L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>
+=head2 Sys::Socket
 
-=item * L<Sys::Socket::Ip_mreq|SPVM::Sys::Socket::Ip_mreq>
+=head4 L<Sys::Socket|SPVM::Sys::Socket>
 
-=item * L<Sys::Socket::Ip_mreq_source|SPVM::Sys::Socket::Ip_mreq_source>
+=head4 L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo>
 
-=item * L<Sys::Socket::Ipv6_mreq|SPVM::Sys::Socket::Ipv6_mreq>
+=head4 L<Sys::Socket::AddrinfoLinkedList|SPVM::Sys::Socket::AddrinfoLinkedList>
 
-=item * L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>
+=head4 L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant>
 
-=item * L<Sys::Socket::Sockaddr::In|SPVM::Sys::Socket::Sockaddr::In>
+=head4 L<Sys::Socket::Error|SPVM::Sys::Socket::Error>
 
-=item * L<Sys::Socket::Sockaddr::In6|SPVM::Sys::Socket::Sockaddr::In6>
+=head4 L<Sys::Socket::Error::InetInvalidNetworkAddress|SPVM::Sys::Socket::Error::InetInvalidNetworkAddress>
 
-=item * L<Sys::Socket::Sockaddr::Interface|SPVM::Sys::Socket::Sockaddr::Interface>
+=head4 L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr>
 
-=item * L<Sys::Socket::Sockaddr::Storage|SPVM::Sys::Socket::Sockaddr::Storage>
+=head4 L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>
 
-=item * L<Sys::Socket::Sockaddr::Un|SPVM::Sys::Socket::Sockaddr::Un>
+=head4 L<Sys::Socket::Ip_mreq|SPVM::Sys::Socket::Ip_mreq>
 
-=item * L<Sys::Time|SPVM::Sys::Time>
+=head4 L<Sys::Socket::Ip_mreq_source|SPVM::Sys::Socket::Ip_mreq_source>
 
-=item * L<Sys::Time::Constant|SPVM::Sys::Time::Constant>
+=head4 L<Sys::Socket::Ipv6_mreq|SPVM::Sys::Socket::Ipv6_mreq>
 
-=item * L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>
+=head4 L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>
 
-=item * L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>
+=head4 L<Sys::Socket::Sockaddr::In|SPVM::Sys::Socket::Sockaddr::In>
 
-=item * L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>
+=head4 L<Sys::Socket::Sockaddr::In6|SPVM::Sys::Socket::Sockaddr::In6>
 
-=item * L<Sys::Time::Timezone|SPVM::Sys::Time::Timezone>
+=head4 L<Sys::Socket::Sockaddr::Interface|SPVM::Sys::Socket::Sockaddr::Interface>
 
-=item * L<Sys::Time::Tms|SPVM::Sys::Time::Tms>
+=head4 L<Sys::Socket::Sockaddr::Storage|SPVM::Sys::Socket::Sockaddr::Storage>
 
-=item * L<Sys::User|SPVM::Sys::User>
+=head4 L<Sys::Socket::Sockaddr::Un|SPVM::Sys::Socket::Sockaddr::Un>
 
-=item * L<Sys::User::Group|SPVM::Sys::User::Group>
+=head2 Sys::Time
 
-=item * L<Sys::User::Passwd|SPVM::Sys::User::Passwd>
+=head4 L<Sys::Time|SPVM::Sys::Time>
 
-=back
+=head4 L<Sys::Time::Constant|SPVM::Sys::Time::Constant>
+
+=head4 L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>
+
+=head4 L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>
+
+=head4 L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>
+
+=head4 L<Sys::Time::Timezone|SPVM::Sys::Time::Timezone>
+
+=head4 L<Sys::Time::Tms|SPVM::Sys::Time::Tms>
+
+=head2 Sys::User
+
+=head4 L<Sys::User|SPVM::Sys::User>
+
+=head4 L<Sys::User::Group|SPVM::Sys::User::Group>
+
+=head4 L<Sys::User::Passwd|SPVM::Sys::User::Passwd>
+
+=head2 Sys::FileTest
+
+=head4 L<Sys::FileTest|SPVM::Sys::FileTest> (Deparecated)
+
+=head1 See Also
+
+=head4 L<IO::File|SPVM::IO::File>
+
+=head4 L<IO::Socket|SPVM::IO::Socket>
+
+=head4 L<IO::Select|SPVM::IO::Select>
+
+=head4 L<IO::Poll|SPVM::IO::Poll>
+
+=head4 L<File::Spec|SPVM::File::Spec>
+
+=head4 L<Cwd|SPVM::Cwd>
 
 =head1 Author
 
@@ -272,8 +462,7 @@ L<SPVM::Sys - Github|https://github.com/yuki-kimoto/SPVM-Sys>
 
 =head1 Copyright & License
 
-Copyright Yuki Kimoto 2022-2022, all rights reserved.
+Copyright Yuki Kimoto 2022-2023, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-

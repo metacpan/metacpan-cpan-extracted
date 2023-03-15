@@ -1,23 +1,18 @@
-package LibUI 0.01 {
-    use 5.008001;
+use 5.008001;
+
+package LibUI 0.02 {
     use strict;
     use warnings;
     use lib '../lib', '../blib/arch', '../blib/lib';
     use Affix;
-    use Dyn       qw[:dl];
-    use Dyn::Load qw[:all];
-    use Dyn::Call qw[:all];
     use Alien::libui;
     use Exporter 'import';    # gives you Exporter's import() method directly
     use Config;
     our %EXPORT_TAGS;
     $|++;
     #
-    my ($path) = Alien::libui->dynamic_libs;
-
     #my $path = '/home/sanko/Downloads/libui-ng-master/build/meson-out/libui.so.0';
-    my $lib = dlLoadLibrary($path);
-    sub lib () {$lib}
+    sub lib () { CORE::state $lib //= Alien::libui->dynamic_libs; $lib }
     #
     sub export {
         my ( $tag, @funcs ) = @_;
@@ -33,39 +28,33 @@ package LibUI 0.01 {
         $name =~ s[::New(.+)$][::$1::new];
 
         #warn sprintf '%30s => %-50s', $func, $name;
-        affix( $lib, $func, $params, $ret, $name );
+        affix( lib, [ $func, $name ], $params, $ret );
     }
     #
-    #my $init = dlSymsInit($path);
-    #
-    #CORE::say "Symbols in $path: " . dlSymsCount($init);
-    #for my $i ( 0 .. dlSymsCount($init) - 1 ) {
-    #    my $name = dlSymsName( $init, $i );
-    #    CORE::say sprintf '  %4d %s', $i, $name if $name =~ m[^ui];
-    #}
-    #
-    #push @{ $EXPORT_TAGS{types} }, 'InitOptions';
-    #typedef InitOptions => Struct [ Size => Size_t ];
-    #sub InitOptions {
-    #    InitOptions->new(@_);
-    #}
+    sub Init {
+        my $aggs = @_ ? shift : { Size => 1024 };
+        CORE::state $func
+            //= wrap( lib(), 'uiInit', [ Pointer [ Struct [ Size => Size_t ] ] ], Str );
+        $func->($aggs);
+    }
+
+    sub Timer($&;$) {
+        my ( $timeout, $coderef, $agg ) = @_;
+        CORE::state $func
+            //= wrap( lib(), 'uiTimer', [ Int, CodeRef [ [Any] => Int ], Any ] => Void );
+        $func->( $timeout, $coderef, $agg // undef );
+    }
     typedef uiForEach => Enum [qw[uiForEachContinue uiForEachStop]];
     {
-        typedef 'InitOptions' => Struct [ Size => Size_t ];
-
-        #@InitOptions::ISA = qw[Dyn::Call::Pointer];
-        #
         export default => qw[uiInit uiUninit uiFreeInitError
             uiMain uiMainSteps uiMainStep uiQuit
             uiQueueMain
             uiTimer
             uiFreeText
         ];
-        func( 'uiInit',   [ Pointer [ InitOptions() ] ]          => Str );
-        func( 'uiUninit', []                                     => Void );
-        func( 'uiMain',   []                                     => Void );
-        func( 'uiQuit',   []                                     => Void );
-        func( 'uiTimer',  [ Int, CodeRef [ [Any] => Int ], Any ] => Void );
+        func( 'uiUninit', [] => Void );
+        func( 'uiMain',   [] => Void );
+        func( 'uiQuit',   [] => Void );
 
         # Undocumented
         func( 'uiFreeInitError', [Str] => Void );
@@ -76,8 +65,9 @@ package LibUI 0.01 {
         func( 'uiQueueMain', [ CodeRef [ [ Pointer [Void] ] => Void ], Any ] => Void );
         #
         affix(
-            lib(), 'uiOnShouldQuit', [ CodeRef [ [Any] => Int ], Any ] => Void,
-            'LibUI::onShouldQuit'
+            lib(),
+            [ 'uiOnShouldQuit',         'LibUI::onShouldQuit' ],
+            [ CodeRef [ [Any] => Int ], Any ] => Void
         );
         func( 'uiFreeText', [Str] => Void );
     }
@@ -107,8 +97,9 @@ LibUI - Simple, Portable, Native GUI Library
     use LibUI ':all';
     use LibUI::Window;
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init( ) && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     $window->setChild( LibUI::Label->new('Hello, World!') );
     $window->onClosing(
         sub {
@@ -119,6 +110,19 @@ LibUI - Simple, Portable, Native GUI Library
     );
     $window->show;
     Main();
+
+=begin html
+
+<h2>Screenshots</h2> <div style="text-align: center"> <h3>Linux</h3><img
+alt="Linux"
+src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/linux.png" />
+<h3>MacOS</h3><img alt="MacOS"
+src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/macos.png" />
+<h3>Windows</h3><img alt="Windows"
+src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/windows.png" />
+</div>
+
+=end html
 
 =head1 DESCRIPTION
 
@@ -193,9 +197,9 @@ This distribution is under construction. It works but is incomplete.
 
 =item L<LibUI::ProgressBar> - a control that visualizes the progress of a task via the fill level of a horizontal bar
 
-=item L<LibUI::HorizontalSeparator> - a control to visually separate controls horizontally
+=item L<LibUI::HSeparator> - a control to visually separate controls horizontally
 
-=item L<LibUI::VerticalSeparator> - a control to visually separate controls vertically
+=item L<LibUI::VSeparator> - a control to visually separate controls vertically
 
 =back
 
@@ -237,24 +241,21 @@ Some basics you gotta use just to keep a modern GUI running.
 
 This is incomplete but... well, I'm working on it.
 
+=head2 C<Init( [...] )>
 
+    Init( );
 
-=head2 C<Init( ... )>
+Ask LibUI to do all the platform specific work to get up and running. If LibUI
+fails to initialize itself, this will return a true value. Weird upstream
+choice, I know...
 
-    Init( { Size => 1024 } );
+You B<must> call this before creating widgets.
 
-Ask LibUI to do all the platform specific work to get up and running.
+=head2 C<Main( ... )>
 
-Expected parameters include:
+    Main( );
 
-=over
-
-=item C<$options>
-
-LibUI::InitOptions structure.
-
-=back
-
+Let LibUI's event loop run until interrupted.
 
 =head2 C<Uninit( ... )>
 
@@ -268,15 +269,20 @@ Ask LibUI to break everything down before quitting.
 
 Quit.
 
-=head2 C<Main( ... )>
-
-    Main( );
-
-Let LibUI's event loop run until interrupted.
 
 =head2 C<Timer( ... )>
 
     Timer( 1000, sub { die 'do not do this here' }, undef);
+
+    Timer(
+        1000,
+        sub {
+            my $data = shift;
+            return 1 unless ++$data->{ticks} == 5;
+            0;
+        },
+        { ticks => 0 }
+    );
 
 Expected parameters include:
 
@@ -294,15 +300,19 @@ Return a true value from your C<$func> to make your timer repeating.
 
 =item C<$data>
 
-Any userdata you feel like passing.
+Any userdata you feel like passing. It'll be handed off to your function.
 
 =back
-
-
 
 =head1 Requirements
 
 See L<Alien::libui>
+
+=head1 See Also
+
+F<eg/demo.pl> - Very basic example
+
+F<eg/widgets.pl> - Demo of basic controls
 
 =head1 LICENSE
 

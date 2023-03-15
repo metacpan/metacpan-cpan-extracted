@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,123 +26,162 @@ no_index:
 provides:
   LibUI:
     file: lib/LibUI.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Align:
     file: lib/LibUI/Align.pm
-    version: '0.01'
+    version: '0.02'
+  LibUI::Area:
+    file: lib/LibUI/Area.pm
+    version: '0.02'
+  LibUI::Area::DrawParams:
+    file: lib/LibUI/Area/DrawParams.pm
+    version: '0.02'
+  LibUI::Area::Handler:
+    file: lib/LibUI/Area/Handler.pm
+    version: '0.02'
+  LibUI::Area::KeyEvent:
+    file: lib/LibUI/Area/KeyEvent.pm
+    version: '0.02'
+  LibUI::Area::Modifiers:
+    file: lib/LibUI/Area/Modifiers.pm
+    version: '0.02'
+  LibUI::Area::MouseEvent:
+    file: lib/LibUI/Area/MouseEvent.pm
+    version: '0.02'
   LibUI::At:
     file: lib/LibUI/At.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Button:
     file: lib/LibUI/Button.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Checkbox:
     file: lib/LibUI/Checkbox.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::ColorButton:
     file: lib/LibUI/ColorButton.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Combobox:
     file: lib/LibUI/Combobox.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Control:
     file: lib/LibUI/Control.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::DatePicker:
     file: lib/LibUI/DatePicker.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::DateTimePicker:
     file: lib/LibUI/DateTimePicker.pm
-    version: '0.01'
+    version: '0.02'
+  LibUI::Draw:
+    file: lib/LibUI/Draw.pm
+    version: '0.02'
+  LibUI::Draw::Brush:
+    file: lib/LibUI/Draw/Brush.pm
+    version: '0.02'
+  LibUI::Draw::Matrix:
+    file: lib/LibUI/Draw/Matrix.pm
+    version: '0.02'
+  LibUI::Draw::Path:
+    file: lib/LibUI/Draw/Path.pm
+    version: '0.02'
+  LibUI::Draw::StrokeParams:
+    file: lib/LibUI/Draw/StrokeParams.pm
+    version: '0.02'
   LibUI::EditableCombobox:
     file: lib/LibUI/EditableCombobox.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Entry:
     file: lib/LibUI/Entry.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::FontButton:
     file: lib/LibUI/FontButton.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::FontDescriptor:
     file: lib/LibUI/FontDescriptor.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Form:
     file: lib/LibUI/Form.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Grid:
     file: lib/LibUI/Grid.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Group:
     file: lib/LibUI/Group.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::HBox:
     file: lib/LibUI/HBox.pm
-    version: '0.01'
-  LibUI::HorizontalSeparator:
-    file: lib/LibUI/HorizontalSeparator.pm
-    version: '0.01'
+    version: '0.02'
+  LibUI::HSeparator:
+    file: lib/LibUI/HSeparator.pm
+    version: '0.02'
   LibUI::Label:
     file: lib/LibUI/Label.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Menu:
     file: lib/LibUI/Menu.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::MenuItem:
     file: lib/LibUI/MenuItem.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::MultilineEntry:
     file: lib/LibUI/MultilineEntry.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::NonWrappingMultilineEntry:
     file: lib/LibUI/NonWrappingMultilineEntry.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::PasswordEntry:
     file: lib/LibUI/PasswordEntry.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::ProgressBar:
     file: lib/LibUI/ProgressBar.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::RadioButtons:
     file: lib/LibUI/RadioButtons.pm
-    version: '0.01'
+    version: '0.02'
+  LibUI::ScrollingArea:
+    file: lib/LibUI/ScrollingArea.pm
+    version: '0.02'
   LibUI::SearchEntry:
     file: lib/LibUI/SearchEntry.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Slider:
     file: lib/LibUI/Slider.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Spinbox:
     file: lib/LibUI/Spinbox.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Tab:
     file: lib/LibUI/Tab.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::TextItalic:
     file: lib/LibUI/TextItalic.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::TextStretch:
     file: lib/LibUI/TextStretch.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::TextWeight:
     file: lib/LibUI/TextWeight.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::Time:
     file: lib/LibUI/Time.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::TimePicker:
     file: lib/LibUI/TimePicker.pm
-    version: '0.01'
+    version: '0.02'
   LibUI::VBox:
     file: lib/LibUI/VBox.pm
-    version: '0.01'
-  LibUI::VerticalSeparator:
-    file: lib/LibUI/VerticalSeparator.pm
-    version: '0.01'
+    version: '0.02'
+  LibUI::VSeparator:
+    file: lib/LibUI/VSeparator.pm
+    version: '0.02'
   LibUI::Window:
     file: lib/LibUI/Window.pm
-    version: '0.01'
+    version: '0.02'
+  LibUI::Window::ResizeEdge:
+    file: lib/LibUI/Window/ResizeEdge.pm
+    version: '0.02'
 requires:
-  Affix: '0'
+  Affix: '0.10'
   Alien::libui: '0'
   Time::Local: '1.30'
   Time::Piece: '0'
@@ -151,7 +190,7 @@ resources:
   bugtracker: https://github.com/sanko/LibUI.pm/issues
   homepage: https://github.com/sanko/LibUI.pm
   repository: https://github.com/sanko/LibUI.pm.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

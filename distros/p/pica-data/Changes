@@ -1,0 +1,277 @@
+Revision history for PICA::Data
+
+2.07 2023-03-15T12:15:00Z
+    - Fix inclusion of PICA Import reader
+
+2.06 2023-01-31T09:15:07Z
+    - Fix default --level value in command line interface
+    - Add PICA::Data::Field
+
+2.05 2022-11-15T07:41:31Z
+    - Add functions pica_sort_subfields and parse_subfield_schedule
+
+2.04 2022-09-20T09:31:32Z
+    - Add option level to pica_split
+    - Support writing annotated PICA / PICA Patch in normalized and binary form
+
+2.03 2022-04-20T10:23:58Z
+    - Add PICA Import format writer
+
+2.02 2022-03-24T08:13:38Z
+    - Fix support of generic writer
+
+2.01 2021-12-10T13:00:56Z
+    - picadata: keep unchanged fields with modify -a
+    - picadata: add command 'join'
+    - Add PIXML parser und writer
+
+2.00 2021-12-09T09:29:42Z
+    - Fix Unicode output of field labels
+    - PICA Path: allow dot alternative to $
+    - PICA Path: allow star as subfield wildcard
+    - PICA Path: field without occurrence will only match occurrence zero, use /* for any occurrence
+    - Remove option position_as_occurrence, use '/' for occurences by default
+    - picadata: colorize output of (sub)fields schedules
+    - Document methods to append, update and remove fields and extend update method
+    - picadata: add command 'modify'
+
+1.35 2021-11-05T10:13:05Z
+    - Add methods to append, update and remove fields in record (#118)
+
+1.34 2021-10-05T07:16:02Z
+    - support x-counter field identifiers in schemas
+    - remove occurrence zero (/00) in schemas
+
+1.33 2021-09-29T14:14:11Z
+    - fix treatment of occurrence ranges in schema builder
+
+1.32 2021-09-29T09:44:13Z
+    - picadata: change color blue to magenta
+    - schema builder: rename 'total' number to 'records'
+      to align with Avram specification 0.7.0
+
+1.31 2021-09-24T08:34:41Z
+    - picadata: add command 'filter'
+    - add PICA Path method alias 'match'
+    - add record count to schema builder
+
+1.30 2021-08-17T16:46:36Z
+    - picadata: Fix UTF-8 output of schema labels
+    - picadata: allow to explain full Avram schema
+    - picadata: add command 'get'
+    - picadata: rename command 'split' to 'levels'
+    - Add method pica_data and fix pica_guess
+
+1.29 2021-07-22T08:51:03Z
+    - picadata: Fix detection of terminal
+
+1.28 2021-07-06T09:52:24Z
+    - Add method to get subfields as multihash (#98)
+    - picadata: fix option --number (#111)
+    - picadata: support parsing multiple formats (#112)
+
+1.27 2021-06-23T07:23:14Z
+    - Add accessor: empty. Fixes counting.
+    - Remove parser option 'bless', always return blessed record (#107, BREAKING CHANGE)
+
+1.26 2021-06-19T16:51:01Z
+    - Support diff/patch in CLI
+    - Support option --unknown in build/fields/explain 
+
+1.25 2021-06-16T14:18:46Z
+    - Implement occurrence ranges (#96) 
+    - Add option position_as_occurrence (see #66)
+
+1.24 2021-06-07T08:51:52Z
+    - Add method to split record
+    - Make path optional in pica_fields
+    - picadata: allow to parse multiple files
+    - picadata: load schema from PICA_SCHEMA for more commands
+    - Extend schema checking to level 1 and level 2
+
+1.23 2021-06-03T10:19:24Z
+    - Move picadata implementation into module App::picadata
+    - Rewrite picadata to use commands (#101)
+    - Add picadata command 'explain' (#99)
+    - picadata: read schema from environment variable PICA_SCHEMA if needed
+    - Remove PICA::Writer::[Sub]fields
+
+1.22 2021-05-26T12:54:35Z
+    - Add PICA::Writer::Subfields
+    - Support parsing WinIBW download format (#34)
+
+1.21 2021-05-18T09:23:25Z
+    - Add function pica_annotation
+    - Add accessor ->id and function pica_id
+    - Rename option annotated to annotate
+    - Support using field annotations for schema checking (#89)
+    - picadata: add option -a/-A/-annotated (#94)
+    - picadata: ignore empty records
+    - picadata: Expect UTF-8 on STDIN (#92)
+    - picadata: exit code on validation errors (#95)
+
+1.20 2021-05-12T15:27:58Z
+    - Implement record sorting (#59)
+    - Refactor PPXML writer (#84)
+
+1.19 2021-05-10T13:22:39Z
+    - picadata: get schema via URL (#77)
+    - Treat occurrence zero equal to none (#88)
+
+1.18 2021-04-30T10:54:49Z
+    - Support parsing field annotations (#86)
+
+1.17 2021-04-23T08:16:14Z
+    - Support checking and writing field annotations (#86)
+
+1.16 2021-03-02T16:19:47Z
+    - Move clean_pica to PICA::Schema and add add option ignore_subfields
+    - Extend method/function field_identifier to occurrence ranges
+
+1.15 2021-03-01T10:56:48Z
+    - Add clean_pica to check PICA data structure (#82)
+    - Rename PICA::Schema::Error to PICA::Error
+
+1.14 2020-07-28T08:42:47Z
+    - picadata: allow to repeat --path
+    - picadata: don't emit records by default
+    - PICA Plain parser also supports ƒ as subfield indicator (#67)
+
+1.13 2020-07-14T13:06:18Z
+    - Add method to abbreviate schemas (-B in picadata)
+    - picadata: remove shorthand -f (#73)
+    - picadata: allow whitespaces in path expressions (#74)
+
+1.12 2020-07-13T12:13:55Z
+    - picadata: add option --number
+    - Rewrite PPXML Writer
+    - Internally use Unicode strings
+
+1.11 2020-07-01T10:57:27Z
+    - picadata: --count does not echo records by default
+    - picadata: detect ndjson file extension
+    - Fix PICA::Schema::Builder to properly encode true on JSON
+
+1.10 2020-06-25T21:00:31Z
+    - picadata: support selecting subfield values
+
+1.09 2020-06-24T08:42:49Z
+    - Support syntax highlighting
+    - picadata: guess serialization from filename
+    - picadata: support multiple path expressions
+    - picadata: make -p and -f optional
+
+1.08 2020-06-10T13:27:29Z
+    - Require Perl >= 5.14.1
+    - Fix installation of picadata script
+    - Make picadata detect missing files
+    - Use perltidy and tidyall for coding style
+
+1.07
+    - rename pica-validate to picadata
+    - support filtering by multiple path expressions (pica_fields)
+    - Add PICA JSON Writer and serializer
+    - Add PICA::Path accessors
+
+1.06  2020-04-20 11:20:40 CEST
+    - fix return of empty values
+
+1.05  2020-03-23 10:59:47 CET
+    - fix version numbers
+
+1.04  2020-03-23 10:47:47 CET
+    - remove faulty sorting from PICA::Writer modules
+
+1.03  2020-02-11 12:47:52 CET
+    - Fix zero items/holdings bug
+    - Add pica-validate command line script
+
+1.02  2020-02-06 12:16:32 CET
+    - Support parsing PICA XML with namespace prefix
+
+1.01  2019-12-18 09:20:11 CET
+    - add match function and documentation of matching rules
+
+1.00  2019-10-01 18:43:42 CEST
+    - fix .travis.yml
+    - gh#47 Drop usage of * for wildcard from PICA::PATH
+    - fix typo in pod
+
+0.37  2018-05-23 08:46:19 CEST
+    - Extend Schema validation with positions, patterns, occurrences etc.
+    - Include Schema information in XML Writer
+
+0.36  2018-02-25 13:31:30 CET
+    - Modify schema format to align with Avram
+    - Add PICA::Schema::Builder and extend PICA::Schema
+    - align PICA::Schema with Avram specification
+    - add PICA::Schema::Builder
+
+0.35  2018-01-29 16:29:52 CET
+    - add PICA::Schema
+    - add parsers and writers to documentation
+    - add Generic writer
+    - check if occurrence is defined 
+    - add PICA::Writer::PPXML to documentation
+    - fix version number in cpanfile
+
+0.34  2017-11-18 13:04:04 CET
+    - add dependencies to cpanfile
+    - use XML::Writer to generate XML files
+    - add support for 3-digit occurrences 
+
+0.33  2017-07-10 13:19:46 CEST
+    - new writer PPXML
+    - list denpencies in cpanfile
+
+0.32  2017-06-28 14:21:36 CEST
+    - sort record before printing
+    - updated travis.yml with use of --skip-installed
+    - skip faulty fields by default, add strict option in parsers
+    - fix IO layer for XML parser in test file
+
+0.31  2016-02-19 10:13:44 CET
+    - refactor parser
+    - add PICA::Path::record_field and ::record_subfields
+
+0.30  2016-02-18 20:19:47 CET
+    - add parser for PPXML (PICA+ XML format variant of DNB)
+
+0.29  2016-02-17 09:17:17 CET
+    - skip empty records when parsing
+
+0.28  2016-02-16 14:58:57 CET
+    - add new binary PICA format
+
+0.27  2015-05-07 16:08:19 CEST
+    - bless holdings and items (close #11)
+
+0.26  2015-02-05 12:17:28 CET
+    - fix parsing double-encoded $$ in plain format
+    - support writing to scalar
+    - new methods write and string
+
+0.25  2015-02-05 10:26:29 CET
+    - documentation
+
+0.24  2015-01-16 14:25:24 CET
+    - new function pica_xml_struct
+    - support blessing of records
+
+0.23  2014-09-19 12:12:23 CEST
+    - removed dependency on Moo (close #6)
+    - fixed PICA::Parser::Plus
+
+0.22  2014-09-18 14:42:01 CEST
+    - extend PICA path expressions
+    - fix dependency
+
+0.21  2014-09-18 11:06:29 CEST
+    - added pica_holdings and pica_items (close #1)
+
+0.2001  2014-09-17 15:17:28 CEST
+    - added missing version numbers
+
+0.20  2014-09-17 15:05:55 CEST
+    - split from Catmandu::PICA after heavy refactoring
+

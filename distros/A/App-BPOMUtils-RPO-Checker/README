@@ -3,9 +3,9 @@ NAME
     Processed Food Registration (RPO - Registrasi Pangan Olahan) at BPOM
 
 VERSION
-    This document describes version 0.008 of App::BPOMUtils::RPO::Checker
+    This document describes version 0.009 of App::BPOMUtils::RPO::Checker
     (from Perl distribution App-BPOMUtils-RPO-Checker), released on
-    2023-03-09.
+    2023-03-10.
 
 SYNOPSIS
 DESCRIPTION
@@ -35,7 +35,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   files => *array[filename]*
+    *   filenames => *array[filename]*
 
         (No description)
 
@@ -71,7 +71,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   files => *array[filename]*
+    *   filenames => *array[filename]*
 
         (No description)
 

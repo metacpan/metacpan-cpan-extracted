@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.851';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.860';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -15,7 +15,8 @@ use Lab::Moose;
 use Lab::Moose::Instrument qw/
     validated_getter validated_setter/;
 extends 'Lab::Moose::Instrument';
-
+class_type 'Lab::Moose::Sweep';
+class_type 'Lab::Moose::DataFile';
 use namespace::autoclean;
 
 
@@ -964,6 +965,10 @@ sub threeDSwp_TimingSend {
 
 
 sub threeDSwp_FilePathsGet {
+  # This sleep function deals with an internal issue of the tramea software
+  # If one askes for filenames too soon after sweep it tries to access
+  # files of previous sweep 
+  sleep(1);
   my $self = shift;
   my $command_name = "3dswp.filepathsget";
   my $head = 
@@ -1873,55 +1878,203 @@ sub set_Session_Path {
 
 
 sub load_data {
- my($self,%params) = validated_hash(
-  \@_,
-  file_origin => {isa=>"Str"},
-  return_head => {isa=>"Bool", default => 0},
-  return_colnames => {isa=>"Bool", default => 1},
-  return_raw => {isa =>"Bool",default =>0}
- );
- my %to_return;
- my ($pdl,$cols_ref,$head) = $self->File_datLoad($params{file_origin},0);
+  my($self,%params) = validated_hash(
+         \@_,
+         file_origin => {isa=>"Str"},
+         return_pdl => {isa=>"Bool", default => 1},
+         return_head => {isa=>"Bool", default => 0},
+         return_colnames => {isa=>"Bool", default => 1},
+         );
+  my %to_return;
+  my ($pdl,$cols_ref,$head) = $self->File_datLoad($params{file_origin},0);
 
- if($params{return_raw} == 1){
-  #this shall return a string version of the parsed data
- }
- else{
+  if($params{return_pdl}==1)
+  {
     $to_return{pdl}= $pdl;
-    if ($params{return_head} == 1){
-
-      $to_return{header}=$head;
-    }
-    if ($params{return_colnames} == 1){
-
-      $to_return{cols}=$cols_ref;
-
-    }
-    return \%to_return;  
- }
-
+  }
+  if ($params{return_head} == 1)
+  {
+    $to_return{header}=$head;
+  }
+  if ($params{return_colnames} == 1)
+  {
+    $to_return{cols}=$cols_ref;
+  }
+  return \%to_return;  
 }
 
 # Function prototype to add sweep functionalities 
 
-sub load_last_measurement_2D {
+sub load_pdl {
   my($self,%params) = validated_hash(
   \@_,
-  return_head => {isa=>"Bool", default => 0},
-  return_colnames => {isa=>"Bool", default => 1},
-  return_raw => {isa =>"Bool",default =>0}
+  file_origin => {isa=> "Str"},
  );
-  my %files = $self->threeDSwp_FilePathsGet();
- if(scalar(keys %files)>1)
- {
-   croak "Last Measurement was not a 2D swep, number of files recived: ".scalar(keys %files) ;
- }
- else
- {
-    return $self->load_data(file_origin=>$files{0}, return_head=>$params{return_head},return_colnames=>$params{return_colnames});
- }
+  my $data_hash = $self->load_data(
+                         file_origin=>$params{file_origin},
+                         return_colnames=>1,
+                         return_head=>1);
+
+  my $pdl = $data_hash->{pdl};
+  my @colnames = @{$data_hash->{cols}};
+  my %head = %{$data_hash->{header}};
+  # Attempt to detect if it is 2D Sweep by cheking for caratteristic
+  # string that tels the point number
+  if($colnames[-1]=~ m/\[(?<idx_int>[0-9]{5})\]/)
+  {
+    # print("Detected 2D SWP\n");
+    # Extractiong point number, +0 casts to number 
+    my $stp1_point_number = $+{idx_int} +0;
+    # print("Detected point number: $stp1_point_number\n");
+    # Now Detect total Acq_Channel number
+    my $acq_number = (scalar(@colnames)-1)/$stp1_point_number;
+    # print("Detected Number of acq_number: $acq_number \n");
+    # Now lets try and get the extremes of the stp1 channel from header
+    my $stp1_start;
+    my $stp1_stop;
+    my $using_stp2 =0;
+    my $stp2_level; 
+    foreach(keys %head)
+    {
+      if($_=~ m/(?:Step\schannel\s1:\sStart)/)
+      {
+          $stp1_start = $head{$_} +0;
+      }
+      elsif($_=~m/(?:Step\schannel\s2\s[\w():\s]*\sStart)/)
+      {
+          $stp1_start = $head{$_} +0;
+      }
+      if($_=~ m/(?:Step\schannel\s1:\sStop)/)
+      {
+  	      $stp1_stop = $head{$_} +0;
+      }
+      elsif($_=~m/(?:Step\schannel\s2\s[\w():\s]*\sStop)/)
+      {
+          $stp1_stop = $head{$_} +0;
+      }
+
+      if($_=~m/(?:Step\schannel\s2\s[\w():\s]*\sLevel)/)
+      {
+        $using_stp2 = 1;
+        $stp2_level = $head{$_}+0;
+      }
+    }
+    # lets format the pdl,2D
+    my @dims = $pdl->dims;
+    my $swp_point_number = $dims[0];
+    my $stp1_values = zeroes($stp1_point_number)->xlinvals($stp1_start,$stp1_stop);
+    my $formatted_pdl = zeroes($stp1_point_number,$dims[0],$acq_number+2);
+    my @newDims = $formatted_pdl->dims;
+    my $col_start;
+    my $col_end;
+    my $col_end2;
+    for( my $index = 0; $index < $stp1_point_number ;$index++)
+    {
+      $col_start= $acq_number*$index + 1;
+      $col_end= $acq_number*$index + $acq_number;
+      $col_end2 = $acq_number+1;
+      $stp1_values->at($index);
+      $formatted_pdl->slice("($index),:,(0)")+= $stp1_values->at($index);
+      $formatted_pdl->slice("($index),:,(1)")+= $pdl->slice(":,(0)");
+      $formatted_pdl->slice("($index),:,2:$col_end2") += $pdl->slice(":,$col_start:$col_end");
+    }
+    # Now lets check if the sweep was using stpch2
+    if($using_stp2)
+    {
+      my $inflated_pdl = zeroes($stp1_point_number,$dims[0],$acq_number+3);
+      for( my $index = 0; $index < $stp1_point_number ;$index++)
+      {
+        $inflated_pdl->slice("($index),:,(0)")+=$stp2_level;
+        $inflated_pdl->slice("($index),:,1:-1")+= $formatted_pdl->slice("($index),:,:");
+      }
+      return $inflated_pdl;
+    }
+    else
+    {
+      return $formatted_pdl;
+    }
+  }
+  else
+    {
+      return $pdl;
+    }
 }
 
+
+# Multidimensional load prototype
+
+sub load_last_measurement {
+  my($self) = validated_hash(\@_);
+  my %files = $self->threeDSwp_FilePathsGet();
+  my $stp2_point_number = scalar(keys %files);
+  if($stp2_point_number>1)
+  {
+    my $pdl3d = $self->load_pdl(file_origin=>$files{0});
+    my @dims = $pdl3d->dims;
+    my $inflated_pdl = zeroes($stp2_point_number,$dims[0],$dims[1],$dims[2]);
+    $inflated_pdl->slice("(0),:,:,:") += $pdl3d;
+    for(my $idx = 1; $idx<$stp2_point_number; $idx++)
+    {
+      $pdl3d = $self->load_pdl(file_origin=>$files{$idx});
+      $inflated_pdl->slice("($idx),:,:,:") += $pdl3d;
+    }
+    return $inflated_pdl;
+        
+  }
+  else
+  {
+    return $self->load_pdl(file_origin=>$files{0});
+  }
+}
+
+#Lab::Moose::DataFile
+# Probably to be deprecated 
+sub tramea_log_block {
+    my ($self,$datafile,$prefix, $pdl, $add_newline, $refresh_plots)= validated_list(\@_,
+    datafile      => {isa=>"Lab::Moose::Sweep | Lab::Moose::DataFile"},
+    prefix        => { isa => 'HashRef[Num]', optional => 1 },
+    pdl           => {isa =>"PDL"},
+    add_newline   => { isa => 'Bool',         default  => 0 },
+    refresh_plots => { isa => 'Bool',         default  => 0 },
+        );
+    
+    # Build args
+    my %args;
+    if($prefix)
+    {
+      $args{prefix}= $prefix;
+    }
+    $args{add_newline}=$add_newline;
+    $args{refresh_plots}=$refresh_plots;
+
+    my @dims = $pdl->dims;
+
+    if (scalar @dims == 4)
+    {
+      for(my $iter = 0; $iter <$dims[0]; $iter++)
+      {
+          for(my $iter1 = 0; $iter1 <$dims[1]; $iter1++)
+          {
+              $datafile->log_block(block=>$pdl->slice("($iter),($iter1),:,:"),%args);
+          }
+      }
+    }
+    elsif (scalar @dims == 3)
+    {
+      for(my $iter1 = 0; $iter1 <$dims[0]; $iter1++)
+      {
+          $datafile->log_block(block=>$pdl->slice("($iter1),:,:"),%args);
+      }
+    }
+    elsif (scalar @dims == 2)
+    {
+      $datafile->log_block(block=>$pdl,%args);
+    }
+    else
+    {
+      croak "Number of dimension is wrong:".scalar(@dims);
+    }
+}
 sub parse_last_measurement {
   my ($self,%params) = validated_hash(\@_,
       folder=>{isa=>'Lab::Moose::DataFolder'});
@@ -2329,7 +2482,7 @@ sub tramea_sweep {
   }
   if($params{load}==1)
   {
-    return $self->load_last_measurement_2D();
+    return $self->load_last_measurement();
   }
 }
 __PACKAGE__->meta()->make_immutable();
@@ -2348,7 +2501,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 SYNOPSIS
 

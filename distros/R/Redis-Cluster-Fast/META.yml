@@ -38,13 +38,13 @@ no_index:
 provides:
   Redis::Cluster::Fast:
     file: lib/Redis/Cluster/Fast.pm
-    version: '0.086'
+    version: '0.087'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plainbanana/Redis-Cluster-Fast/issues
   homepage: https://github.com/plainbanana/Redis-Cluster-Fast
   repository: https://github.com/plainbanana/Redis-Cluster-Fast.git
-version: '0.086'
+version: '0.087'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

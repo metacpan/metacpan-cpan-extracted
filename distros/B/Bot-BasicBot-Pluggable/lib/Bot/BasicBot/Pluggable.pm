@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable;
-$Bot::BasicBot::Pluggable::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::VERSION = '1.30';
 use warnings;
 use strict;
 
@@ -203,7 +203,7 @@ sub remove_handler {
     my ( $self, $name ) = @_;
     my $logger = Log::Log4perl->get_logger( ref $self );
     $logger->logdie("Need a name for removing a handler") unless $name;
-    $logger->logdie("Hander $name not defined")
+    $logger->logdie("Handler $name not defined")
       unless $self->{handlers}{ lc($name) };
     $self->{handlers}{ lc($name) }->stop();
     delete $self->{handlers}{ lc($name) };
@@ -378,7 +378,7 @@ Bot::BasicBot::Pluggable - extended simple IRC bot for pluggable modules
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 
@@ -389,20 +389,19 @@ version 1.20
 
   # with useful options. pass any option
   # that's valid for Bot::BasicBot.
-  my $bot = Bot::BasicBot::Pluggable->new(
-  
-                      channels => ["#bottest"],
-                      server   => "irc.example.com",
-                      port     => "6667",
+my $bot = Bot::BasicBot::Pluggable->new(
+    channels => ["#bottest"],
+    server   => "irc.example.com",
+    port     => "6667",
 
-                      nick     => "pluggabot",
-                      altnicks => ["pbot", "pluggable"],
-                      username => "bot",
-                      name     => "Yet Another Pluggable Bot",
+    nick      => "pluggabot",
+    alt_nicks => ["pbot", "pluggable"],
+    username  => "bot",
+    name      => "Yet Another Pluggable Bot",
 
-                      ignore_list => [qw(hitherto blech muttley)],
+    ignore_list => [qw(hitherto blech muttley)],
 
-                );
+);
 
 =head2 Running the bot (simple)
 
@@ -519,7 +518,7 @@ Removes a module from the bot. It won't get events any more.
 =item module($module)
 
 Returns the handler object for the loaded module C<$module>. Used, e.g.,
-to get the 'Auth' hander to check if a given user is authenticated.
+to get the 'Auth' handler to check if a given user is authenticated.
 
 =item modules
 

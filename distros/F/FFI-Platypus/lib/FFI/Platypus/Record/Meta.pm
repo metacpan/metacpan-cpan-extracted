@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 
 {
@@ -85,7 +85,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 2.05
+version 2.07
 
 =head1 DESCRIPTION
 

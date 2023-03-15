@@ -250,3 +250,12 @@ METHODS - TRADING TIMES RELATED.
     Returns either undef, a single Date::Utility, or an arrayref of
     Date::Utility instances.
 
+ next_open_at
+
+    ->next_open_at($exchange_object, Date::Utility->new('2023-02-16
+    15:30:00'));
+
+    Returns Date::Utility object of the next opening date and time.
+
+    Returns undef if exchange is open for the requested date.
+

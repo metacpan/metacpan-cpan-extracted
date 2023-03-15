@@ -1,0 +1,69 @@
+{
+   "abstract" : "Stream your (ustar) tar files",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-Tar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "9.00",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000145"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojo-tar/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojo-tar",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojo-tar.git",
+         "web" : "https://github.com/jhthorsen/mojo-tar"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

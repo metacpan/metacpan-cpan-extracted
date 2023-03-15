@@ -5,32 +5,15 @@ use warnings;
 
 use Carp qw/croak/;
 
-use Types::Standard qw(Int Num Str);
-
 use Moo;
 use strictures 2;
 use namespace::clean;
 
-with 'OpenAI::API::ResourceDispatcherRole';
+with 'OpenAI::API::ConfigurationRole';
+with 'OpenAI::API::UserAgentRole';
+with 'OpenAI::API::RequestDispatcherRole';
 
-our $VERSION = 0.24;
-
-my $DEFAULT_API_BASE = 'https://api.openai.com/v1';
-
-has api_key  => ( is => 'rw', isa => Str, default => sub { $ENV{OPENAI_API_KEY} }, required => 1 );
-has api_base => ( is => 'rw', isa => Str, default => sub { $ENV{OPENAI_API_BASE} // $DEFAULT_API_BASE }, );
-has timeout  => ( is => 'rw', isa => Num, default => sub { 60 } );
-has retry    => ( is => 'rw', isa => Int, default => sub { 3 } );
-has sleep    => ( is => 'rw', isa => Num, default => sub { 1 } );
-
-has user_agent => ( is => 'lazy' );
-
-sub _build_user_agent {
-    my ($self) = @_;
-    $self->{user_agent} = LWP::UserAgent->new( timeout => $self->timeout );
-}
-
-1;
+our $VERSION = 0.27;
 
 __END__
 
@@ -43,29 +26,21 @@ OpenAI::API - Perl interface to OpenAI API
 =head1 SYNOPSIS
 
     use OpenAI::API;
+    use OpenAI::API::Request::Chat;
 
-    my $openai = OpenAI::API->new(); # uses OPENAI_API_KEY environment variable
+    my $config = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
 
-    my $chat = $openai->chat(
-        model       => 'gpt-3.5-turbo',
-        messages    => [ { "role" => "user", "content" => "Hello!" }, ],
+    my $request = OpenAI::API::Request::Chat->new(
+        model    => "gpt-3.5-turbo",
+        messages => [
+            { "role" => "system",    "content" => "You are a helpful assistant." },
+            { "role" => "user",      "content" => "Who won the world series in 2020?" },
+            { "role" => "assistant", "content" => "The Los Angeles Dodgers won the World Series in 2020." },
+            { "role" => "user",      "content" => "Where was it played?" }
+        ],
     );
 
-    my $completions = $openai->completions(
-        model  => 'text-davinci-003',
-        prompt => 'What is the capital of France?',
-    );
-
-    my $edits = $openai->edits(
-        model       => 'text-davinci-edit-001',
-        input       => 'What day of the wek is it?',
-        instruction => 'Fix the spelling mistakes',
-    );
-
-    my $moderations = $openai->moderations(
-        model => 'text-moderation-latest',
-        input => 'I want to kill them.',
-    );
+    my $res = $request->send($config);
 
 =head1 DESCRIPTION
 
@@ -138,87 +113,31 @@ The timeout value, in seconds. Default: 60 seconds.
 
 =back
 
-=head2 chat()
+=head1 RESOURCES
 
-Given a chat conversation, the model will return a chat completion response.
+=over
 
-Mandatory parameters:
+=item * L<OpenAI::API::Request::Chat>
 
-=over 4
+=item * L<OpenAI::API::Request::Completion>
 
-=item * model
+=item * L<OpenAI::API::Request::Edit>
 
-=item * messages
+=item * L<OpenAI::API::Request::Embedding>
 
-=back
+=item * L<OpenAI::API::Request::File::List>
 
-More info: L<OpenAI::API::Resource::Chat>
+=item * L<OpenAI::API::Request::File::Retrieve>
 
-=head2 completions()
+=item * L<OpenAI::API::Request::Image::Generation>
 
-Given a prompt, the model will return one or more predicted completions.
+=item * L<OpenAI::API::Request::Model::List>
 
-Mandatory parameters:
+=item * L<OpenAI::API::Request::Model::Retrieve>
 
-=over 4
-
-=item * model
-
-=item * prompt
+=item * L<OpenAI::API::Request::Moderation>
 
 =back
-
-More info: L<OpenAI::API::Resource::Completion>
-
-=head2 edits()
-
-Creates a new edit for the provided input, instruction, and parameters.
-
-Mandatory parameters:
-
-=over 4
-
-=item * model
-
-=item * instruction
-
-=item * input [optional, but often required]
-
-=back
-
-More info: L<OpenAI::API::Resource::Edit>
-
-=head2 embeddings()
-
-Get a vector representation of a given input that can be easily consumed
-by machine learning models and algorithms.
-
-Mandatory parameters:
-
-=over 4
-
-=item * model
-
-=item * input
-
-=back
-
-More info: L<OpenAI::API::Resource::Embedding>
-
-=head2 moderations()
-
-Given a input text, outputs if the model classifies it as violating
-OpenAI's content policy.
-
-Mandatory parameters:
-
-=over 4
-
-=item * input
-
-=back
-
-More info: L<OpenAI::API::Resource::Moderation>
 
 =head1 SEE ALSO
 

@@ -9,9 +9,9 @@ use Exporter::Rinci qw(import);
 use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-13'; # DATE
+our $DATE = '2023-02-18'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -50,9 +50,9 @@ $SPEC{':package'} = {
 
 This module provides common functions related to clipboard manager.
 
-Supported clipboard manager: KDE Plasma's Klipper (`klipper`), `parcellite`.
-Support for more clipboard managers, e.g. on Windows or other Linux desktop
-environment is welcome.
+Supported clipboard manager: KDE Plasma's Klipper (`klipper`), `parcellite`,
+`clipit`, `xclip`. Support for more clipboard managers, e.g. on Windows or other
+Linux desktop environment is welcome.
 
 _
 };
@@ -512,7 +512,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.009 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-12-13.
+This document describes version 0.010 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2023-02-18.
 
 =head1 DESCRIPTION
 
@@ -555,9 +555,9 @@ first/recent is the primary selection and the second one is the secondary.
 
 This module provides common functions related to clipboard manager.
 
-Supported clipboard manager: KDE Plasma's Klipper (C<klipper>), C<parcellite>.
-Support for more clipboard managers, e.g. on Windows or other Linux desktop
-environment is welcome.
+Supported clipboard manager: KDE Plasma's Klipper (C<klipper>), C<parcellite>,
+C<clipit>, C<xclip>. Support for more clipboard managers, e.g. on Windows or other
+Linux desktop environment is welcome.
 
 =head1 NOTES
 
@@ -857,7 +857,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

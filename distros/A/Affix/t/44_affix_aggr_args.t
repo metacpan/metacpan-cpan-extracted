@@ -7,6 +7,7 @@ use File::Spec;
 use t::lib::nativecall;
 use experimental 'signatures';
 $|++;
+plan skip_all => 'no support for aggregates by value' unless Affix::Feature::AggrByVal();
 #
 compile_test_lib('44_affix_aggr_args');
 

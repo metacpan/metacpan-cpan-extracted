@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Webservice::Judobase::Contests;
-$Webservice::Judobase::Contests::VERSION = '0.08';
+$Webservice::Judobase::Contests::VERSION = '0.09';
 # VERSION
 
 use Moo;

@@ -119,7 +119,7 @@ coulomb-diamonds.pl - Measure a quantum dot stability diagram, i.e. current vers
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 COPYRIGHT AND LICENSE
 

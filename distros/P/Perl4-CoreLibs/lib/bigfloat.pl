@@ -47,7 +47,7 @@ $rnd_mode = 'even';
 # Convert a number to canonical string form.
 #   Takes something that looks like a number and converts it to
 #   the form /^[+-]\d+E[+-]\d+$/.
-sub main'fnorm { #(string) return fnum_str
+sub main::fnorm { #(string) return fnum_str
     local($_) = @_;
     s/\s+//g;                               # strip white space
     if (/^([+-]?)(\d*)(\.(\d*))?([Ee]([+-]?\d+))?$/
@@ -76,8 +76,8 @@ sub norm { #(mantissa, exponent) return fnum_str
 }
 
 # negation
-sub main'fneg { #(fnum_str) return fnum_str
-    local($_) = &'fnorm($_[0]);
+sub main::fneg { #(fnum_str) return fnum_str
+    local($_) = &::fnorm($_[0]);
     vec($_,0,8) ^= ord('+') ^ ord('-') unless $_ eq '+0E+0'; # flip sign
     if ( ord("\t") == 9 ) { # ascii
         s/^H/N/;
@@ -89,48 +89,48 @@ sub main'fneg { #(fnum_str) return fnum_str
 }
 
 # absolute value
-sub main'fabs { #(fnum_str) return fnum_str
-    local($_) = &'fnorm($_[0]);
+sub main::fabs { #(fnum_str) return fnum_str
+    local($_) = &::fnorm($_[0]);
     s/^-/+/;		                       # mash sign
     $_;
 }
 
 # multiplication
-sub main'fmul { #(fnum_str, fnum_str) return fnum_str
-    local($x,$y) = (&'fnorm($_[0]),&'fnorm($_[1]));
+sub main::fmul { #(fnum_str, fnum_str) return fnum_str
+    local($x,$y) = (&::fnorm($_[0]),&::fnorm($_[1]));
     if ($x eq 'NaN' || $y eq 'NaN') {
 	'NaN';
     } else {
 	local($xm,$xe) = split('E',$x);
 	local($ym,$ye) = split('E',$y);
-	&norm(&'bmul($xm,$ym),$xe+$ye);
+	&norm(&::bmul($xm,$ym),$xe+$ye);
     }
 }
 
 # addition
-sub main'fadd { #(fnum_str, fnum_str) return fnum_str
-    local($x,$y) = (&'fnorm($_[0]),&'fnorm($_[1]));
+sub main::fadd { #(fnum_str, fnum_str) return fnum_str
+    local($x,$y) = (&::fnorm($_[0]),&::fnorm($_[1]));
     if ($x eq 'NaN' || $y eq 'NaN') {
 	'NaN';
     } else {
 	local($xm,$xe) = split('E',$x);
 	local($ym,$ye) = split('E',$y);
 	($xm,$xe,$ym,$ye) = ($ym,$ye,$xm,$xe) if ($xe < $ye);
-	&norm(&'badd($ym,$xm.('0' x ($xe-$ye))),$ye);
+	&norm(&::badd($ym,$xm.('0' x ($xe-$ye))),$ye);
     }
 }
 
 # subtraction
-sub main'fsub { #(fnum_str, fnum_str) return fnum_str
-    &'fadd($_[0],&'fneg($_[1]));    
+sub main::fsub { #(fnum_str, fnum_str) return fnum_str
+    &::fadd($_[0],&::fneg($_[1]));    
 }
 
 # division
 #   args are dividend, divisor, scale (optional)
 #   result has at most max(scale, length(dividend), length(divisor)) digits
-sub main'fdiv #(fnum_str, fnum_str[,scale]) return fnum_str
+sub main::fdiv #(fnum_str, fnum_str[,scale]) return fnum_str
 {
-    local($x,$y,$scale) = (&'fnorm($_[0]),&'fnorm($_[1]),$_[2]);
+    local($x,$y,$scale) = (&::fnorm($_[0]),&::fnorm($_[1]),$_[2]);
     if ($x eq 'NaN' || $y eq 'NaN' || $y eq '+0E+0') {
 	'NaN';
     } else {
@@ -140,7 +140,7 @@ sub main'fdiv #(fnum_str, fnum_str[,scale]) return fnum_str
 	$scale = length($xm)-1 if (length($xm)-1 > $scale);
 	$scale = length($ym)-1 if (length($ym)-1 > $scale);
 	$scale = $scale + length($ym) - length($xm);
-	&norm(&round(&'bdiv($xm.('0' x $scale),$ym),&'babs($ym)),
+	&norm(&round(&::bdiv($xm.('0' x $scale),$ym),&::babs($ym)),
 	    $xe-$ye-$scale);
     }
 }
@@ -153,7 +153,7 @@ sub round { #(int_str, int_str, int_str) return int_str
     } elsif ($rnd_mode eq 'trunc') {
 	$q;                         # just truncate
     } else {
-	local($cmp) = &'bcmp(&'bmul($r,'+2'),$base);
+	local($cmp) = &::bcmp(&::bmul($r,'+2'),$base);
 	if ( $cmp < 0 ||
 		 ($cmp == 0 &&
 		  ( $rnd_mode eq 'zero'                             ||
@@ -163,15 +163,15 @@ sub round { #(int_str, int_str, int_str) return int_str
 		   ($rnd_mode eq 'odd'  && $q =~ /[13579]$/)        )) ) {
 	    $q;                     # round down
 	} else {
-	    &'badd($q, ((substr($q,0,1) eq '-') ? '-1' : '+1'));
+	    &::badd($q, ((substr($q,0,1) eq '-') ? '-1' : '+1'));
 				    # round up
 	}
     }
 }
 
 # round the mantissa of $x to $scale digits
-sub main'fround { #(fnum_str, scale) return fnum_str
-    local($x,$scale) = (&'fnorm($_[0]),$_[1]);
+sub main::fround { #(fnum_str, scale) return fnum_str
+    local($x,$scale) = (&::fnorm($_[0]),$_[1]);
     if ($x eq 'NaN' || $scale <= 0) {
 	$x;
     } else {
@@ -187,8 +187,8 @@ sub main'fround { #(fnum_str, scale) return fnum_str
 }
 
 # round $x at the 10 to the $scale digit place
-sub main'ffround { #(fnum_str, scale) return fnum_str
-    local($x,$scale) = (&'fnorm($_[0]),$_[1]);
+sub main::ffround { #(fnum_str, scale) return fnum_str
+    local($x,$scale) = (&::fnorm($_[0]),$_[1]);
     if ($x eq 'NaN') {
 	'NaN';
     } else {
@@ -216,9 +216,9 @@ sub main'ffround { #(fnum_str, scale) return fnum_str
     
 # compare 2 values returns one of undef, <0, =0, >0
 #   returns undef if either or both input value are not numbers
-sub main'fcmp #(fnum_str, fnum_str) return cond_code
+sub main::fcmp #(fnum_str, fnum_str) return cond_code
 {
-    local($x, $y) = (&'fnorm($_[0]),&'fnorm($_[1]));
+    local($x, $y) = (&::fnorm($_[0]),&::fnorm($_[1]));
     if ($x eq "NaN" || $y eq "NaN") {
 	undef;
     } else {
@@ -226,14 +226,14 @@ sub main'fcmp #(fnum_str, fnum_str) return cond_code
 	||
 	(  local($xm,$xe,$ym,$ye) = split('E', $x."E$y"),
 	     (($xe <=> $ye) * (substr($x,0,1).'1')
-             || &bigint'cmp($xm,$ym))
+             || &bigint::cmp($xm,$ym))
 	);
     }
 }
 
 # square root by Newtons method.
-sub main'fsqrt { #(fnum_str[, scale]) return fnum_str
-    local($x, $scale) = (&'fnorm($_[0]), $_[1]);
+sub main::fsqrt { #(fnum_str[, scale]) return fnum_str
+    local($x, $scale) = (&::fnorm($_[0]), $_[1]);
     if ($x eq 'NaN' || $x =~ /^-/) {
 	'NaN';
     } elsif ($x eq '+0E+0') {
@@ -244,10 +244,10 @@ sub main'fsqrt { #(fnum_str[, scale]) return fnum_str
 	$scale = length($xm)-1 if ($scale < length($xm)-1);
 	local($gs, $guess) = (1, sprintf("1E%+d", (length($xm)+$xe-1)/2));
 	while ($gs < 2*$scale) {
-	    $guess = &'fmul(&'fadd($guess,&'fdiv($x,$guess,$gs*2)),".5");
+	    $guess = &::fmul(&::fadd($guess,&::fdiv($x,$guess,$gs*2)),".5");
 	    $gs *= 2;
 	}
-	&'fround($guess, $scale);
+	&::fround($guess, $scale);
     }
 }
 

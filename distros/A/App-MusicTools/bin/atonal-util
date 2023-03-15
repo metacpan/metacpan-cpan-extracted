@@ -15,6 +15,7 @@
 #
 # (Or more likely scrap and rewrite from scratch, eesh.)
 
+use 5.14.0;
 use strict;
 use warnings;
 
@@ -212,6 +213,7 @@ sub _ms2abbr_time {
     $temp .= ($minutes) ? "${minutes}m " : q{};
     $temp .= ($seconds) ? "${seconds}s " : q{};
     $temp .= ($ms) ? "${ms}ms" : q{};
+	$temp =~ s/\s+$//;
     return $temp;
 }
 
@@ -232,7 +234,7 @@ sub _fit_scale {
 
             my $scale_fmt   = join '', ('%-6s') x @scale_nums;
             my $scale_notes = sprintf $scale_fmt, $Lyu->p2ly(@scale_nums);
-
+			$scale_notes =~ s/\s+$//;
             printf "%-3s%-18s%-8s%s\n", "\u$tonic", "\u$scale", $dsc_flag, $scale_notes;
         }
     }
@@ -643,8 +645,10 @@ sub _findps {
 
             @pitches = $Lyu->p2ly(@pitches) if $Flag_Lyout;
 
-            printf "%s\tTi(%d)\t%-${ps_width}s%s\n", $fnum, $i,
+            my $s = sprintf "%s\tTi(%d)\t%-${ps_width}s%s", $fnum, $i,
               join( ',', @pitches ), $tstr;
+			$s =~ s/\s+$//;
+			say $s;
         }
     }
 }
@@ -664,8 +668,10 @@ sub fnums {
             $tstr = sprintf "\t%.03f  %.03f  %.03f", $Tension->vertical($pset);
         }
 
-        printf "%s\t%-16s\t%-8s%s\n", $fn, join( ',', @$pset ),
+        my $s = sprintf "%s\t%-16s\t%-8s%s", $fn, join( ',', @$pset ),
           join( '', @$icc ), $tstr;
+		$s =~ s/\s+$//;
+		say $s;
     }
 }
 

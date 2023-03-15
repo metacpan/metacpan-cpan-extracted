@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Server.
 
+2.014  Mar 14 2023
+        - Apply patch to Fork for UDP
+        - Fix tests on perls without threads
+
 2.013  Dec 03 2022
         - Update MANIFEST for missing file
 

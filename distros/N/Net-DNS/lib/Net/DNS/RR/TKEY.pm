@@ -2,7 +2,7 @@ package Net::DNS::RR::TKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TKEY.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: TKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -21,16 +21,15 @@ use Net::DNS::Parameters qw(:class :type);
 use Net::DNS::DomainName;
 
 use constant ANY  => classbyname qw(ANY);
-use constant TKEY => typebyname qw(TKEY);
+use constant TKEY => typebyname	 qw(TKEY);
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 
-	( $self->{algorithm}, $offset ) = Net::DNS::DomainName->decode(@_);
+	( $self->{algorithm}, $offset ) = Net::DNS::DomainName->decode( $data, $offset );
 
 	@{$self}{qw(inception expiration mode error)} = unpack "\@$offset N2n2", $$data;
 	$offset += 12;
@@ -79,57 +78,50 @@ sub encode {				## overide RR method
 
 
 sub algorithm {
-	my $self = shift;
-
-	$self->{algorithm} = Net::DNS::DomainName->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{algorithm} = Net::DNS::DomainName->new($_) }
 	return $self->{algorithm} ? $self->{algorithm}->name : undef;
 }
 
 
 sub inception {
-	my $self = shift;
-
-	$self->{inception} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{inception} = 0 + $_ }
 	return $self->{inception} || 0;
 }
 
 
 sub expiration {
-	my $self = shift;
-
-	$self->{expiration} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{expiration} = 0 + $_ }
 	return $self->{expiration} || 0;
 }
 
 
 sub mode {
-	my $self = shift;
-
-	$self->{mode} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{mode} = 0 + $_ }
 	return $self->{mode} || 0;
 }
 
 
 sub error {
-	my $self = shift;
-
-	$self->{error} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{error} = 0 + $_ }
 	return $self->{error} || 0;
 }
 
 
 sub key {
-	my $self = shift;
-
-	$self->{key} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{key} = $_ }
 	return $self->{key} || "";
 }
 
 
 sub other {
-	my $self = shift;
-
-	$self->{other} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{other} = $_ }
 	return $self->{other} || "";
 }
 
@@ -247,6 +239,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC2930
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC2930|https://tools.ietf.org/html/rfc2930>
 
 =cut

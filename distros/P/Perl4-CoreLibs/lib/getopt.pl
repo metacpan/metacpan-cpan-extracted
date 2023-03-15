@@ -15,7 +15,7 @@
 ;# whether there is a space between the switch and the argument.
 
 ;# Usage:
-;#	do Getopt('oDI');  # -o, -D & -I take arg.  Sets opt_* as a side effect.
+;#	Getopt('oDI');  # -o, -D & -I take arg.  Sets opt_* as a side effect.
 
 sub Getopt {
     local($argumentative) = @_;

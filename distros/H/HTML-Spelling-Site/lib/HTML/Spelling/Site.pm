@@ -1,5 +1,5 @@
 package HTML::Spelling::Site;
-$HTML::Spelling::Site::VERSION = '0.10.2';
+$HTML::Spelling::Site::VERSION = '0.10.3';
 use strict;
 use warnings;
 
@@ -20,13 +20,14 @@ HTML site.
 
 =head1 VERSION
 
-version 0.10.2
+version 0.10.3
 
 =head1 SYNOPSIS
 
 See L<HTML::Spelling::Site::Checker> .
 
-And also see the example code on L<https://bitbucket.org/shlomif/shlomi-fish-homepage> .
+And also see the example code on L<https://github.com/shlomif/shlomi-fish-homepage>
+and L<https://github.com/shlomif/perl-begin> .
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,12 @@
+1.28    2023-03-14
+
+- Bug fix: DCANTRELL: undef values in hashes were treated incorrectly,
+  need to check for existence, not definedness before comparing. See
+  https://github.com/DrHyde/perl-modules-Data-Compare/issues/21
+
 1.27    2019-11-05  DCANTRELL  Fix bug when options are passed as a persistent
-				 hash from calling code and not an anonyhash
-				 (Sam Kington)
+                               hash from calling code and not an anonyhash
+                               (Sam Kington)
 
 1.26    2019-09-18  DCANTRELL  Minor code quality improvements from Alberto
                                  Simõe;

@@ -17,7 +17,9 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
 
     is $result, [
         {
-
+            'id_competition_teams' => undef,
+            'id_fight_team' => undef,
+            'mat' => 1,
             'weight'                 => '-60',
             'personal_picture_white' =>
                 'https://www.judobase.org/files/persons//2019/02//15116_1550581155.jpg',
@@ -26,7 +28,6 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
             'id_ijf_white'       => '71454548',
             'id_weight'          => '1',
             'is_finished'        => '1',
-
             'is_finished'         => '1',
             'rank_name'           => 'World Championships',
             'tagged'              => '3',
@@ -92,7 +93,8 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
                             'group_name' => 'Score',
                             'id_tag'     => '4',
                             'public'     => '1',
-                            'id_event'   => '129801'
+                            'id_event'   => '129801',
+
                         },
                         {   'name'       => 'Defensive-Posture',
                             'id_groups'  => '36,38',
@@ -129,7 +131,8 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
                     'id_event_group'    => '0',
                     'time_real_gs'      => '0.00',
                     'time_sc'           => '34.00',
-                    'contest_code_long' => 'wc_sen2019_m_0060_0010'
+                    'contest_code_long' => 'wc_sen2019_m_0060_0010',
+                    'jm_unique_id'      => undef
                 },
                 {   'tags_full'         => undef,
                     'rating'            => 0,
@@ -172,6 +175,7 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
                     'id_color'     => undef,
                     'video_offset' => '-5.00',
                     'time_real'    => '102.00',
+                    'jm_unique_id'      => undef,
                     'actors'       => [
                         {   'id_person'     => '15116',
                             'country_short' => 'GEO',
@@ -185,7 +189,7 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
                 },
                 {   'is_gs'    => '0',
                     'id_color' => undef,
-
+                    'jm_unique_id'      => undef,
                     'actors' => [
                         {   'id_actor'      => '136783',
                             'id_event'      => '129803',
@@ -236,6 +240,8 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
                     'tags_full'         => undef
                 },
                 {   'time_real_gs' => '0.00',
+                    'jm_unique_id' => undef,
+
 
                     'updated_at'        => '2019-08-25 02:30:58',
                     'id_event_group'    => '0',

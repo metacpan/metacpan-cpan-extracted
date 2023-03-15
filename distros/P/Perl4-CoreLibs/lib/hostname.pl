@@ -8,6 +8,8 @@
 #
 # Suggested alternative: Sys::Hostname
 #
+no warnings "ambiguous";
+
 sub hostname
 {
 	local(*P,@tmp,$hostname,$_);

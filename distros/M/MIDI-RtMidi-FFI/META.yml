@@ -6,12 +6,15 @@ build_requires:
   Proc::Find: '0'
   Test2::V0: '0'
   Test::Lib: '0'
+  Test::MemoryGrowth: '0'
   Time::HiRes: '0'
   ok: '0'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,18 +27,33 @@ no_index:
     - xt
   package:
     - RtMidiWrapper
+provides:
+  MIDI::RtMidi::FFI:
+    file: lib/MIDI/RtMidi/FFI.pm
+    version: '0.04'
+  MIDI::RtMidi::FFI::Device:
+    file: lib/MIDI/RtMidi/FFI/Device.pm
+    version: '0.04'
+  RtMidiIn:
+    file: lib/MIDI/RtMidi/FFI/Device.pm
+    version: '0.04'
+  RtMidiOut:
+    file: lib/MIDI/RtMidi/FFI/Device.pm
+    version: '0.04'
 requires:
-  Alien::RtMidi: '0'
-  FFI::Platypus: '1.00'
+  Alien::RtMidi: '0.04'
+  FFI::CheckLib: '0.25'
+  FFI::Platypus: '2.00'
   FFI::Platypus::Buffer: '0'
   FFI::Platypus::Memory: '0'
   FFI::Platypus::Record: '0'
   MIDI::Event: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/jbarrett/MIDI-RtMidi-FFI/issues
   homepage: https://github.com/jbarrett/MIDI-RtMidi-FFI
   repository: https://github.com/jbarrett/MIDI-RtMidi-FFI.git
-version: '0.03'
-x_generated_by_perl: v5.34.0
+version: '0.04'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

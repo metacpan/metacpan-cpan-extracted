@@ -25,6 +25,8 @@ if (defined $app) {
 		-height => 200,
 	)->pack;
 	$poplist = $frame->PopList(
+		-relief => 'raised',
+		-borderwidth => 2,
 # 		-popdirection => 'down',
 		-confine => 1,
 		-filter => 1,

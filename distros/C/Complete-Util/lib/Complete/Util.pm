@@ -9,9 +9,9 @@ use Complete::Common qw(:all);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-17'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Complete-Util'; # DIST
-our $VERSION = '0.614'; # VERSION
+our $VERSION = '0.617'; # VERSION
 
 our @EXPORT_OK = qw(
                        hashify_answer
@@ -24,6 +24,7 @@ our @EXPORT_OK = qw(
                        complete_array_elem
                        complete_hash_key
                        complete_comma_sep
+                       complete_comma_sep_pair
                );
 
 our %SPEC;
@@ -301,9 +302,13 @@ _
 sub complete_array_elem {
     my %args  = @_;
 
-    my $array0    = $args{array} or die "Please specify array";
-    my $summaries = $args{summaries};
-    my $word      = $args{word} // "";
+    my $array0    = delete $args{array} or die "Please specify array";
+    my $summaries = delete $args{summaries};
+    my $word      = delete($args{word}) // "";
+    my $exclude   = delete $args{exclude};
+    my $replace_map = delete $args{replace_map};
+    die "complete_array_elem(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
 
     my $ci          = $Complete::Common::OPT_CI;
     my $map_case    = $Complete::Common::OPT_MAP_CASE;
@@ -324,9 +329,9 @@ sub complete_array_elem {
     my $wordn = $ci ? uc($word) : $word; $wordn =~ s/_/-/g if $map_case;
 
     my $excluden;
-    if ($args{exclude}) {
+    if ($exclude) {
         $excluden = {};
-        for my $el (@{$args{exclude}}) {
+        for my $el (@{$exclude}) {
             my $eln = $ci ? uc($el) : $el; $eln =~ s/_/-/g if $map_case;
             $excluden->{$eln} //= 1;
         }
@@ -334,13 +339,13 @@ sub complete_array_elem {
 
     my $rmapn;
     my $rev_rmapn; # to replace back to the original words back in the result
-    if (my $rmap = $args{replace_map}) {
+    if ($replace_map) {
         $rmapn = {};
         $rev_rmapn = {};
-        for my $k (keys %$rmap) {
+        for my $k (keys %$replace_map) {
             my $kn = $ci ? uc($k) : $k; $kn =~ s/_/-/g if $map_case;
             my @vn;
-            for my $v (@{ $rmap->{$k} }) {
+            for my $v (@{ $replace_map->{$k} }) {
                 my $vn = $ci ? uc($v) : $v; $vn =~ s/_/-/g if $map_case;
                 push @vn, $vn;
                 $rev_rmapn->{$vn} //= $k;
@@ -571,10 +576,12 @@ $SPEC{complete_hash_key} = {
 };
 sub complete_hash_key {
     my %args  = @_;
-    my $hash      = $args{hash} or die "Please specify hash";
-    my $word      = $args{word} // "";
-    my $summaries = $args{summaries};
-    my $summaries_from_hash_values = $args{summaries_from_hash_values};
+    my $hash      = delete $args{hash} or die "Please specify hash";
+    my $word      = delete($args{word}) // "";
+    my $summaries = delete $args{summaries};
+    my $summaries_from_hash_values = delete $args{summaries_from_hash_values};
+    die "complete_hash_key(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
 
     my @keys = keys %$hash;
     my @summaries;
@@ -682,6 +689,10 @@ sub complete_comma_sep {
     my $summaries = delete $args{summaries};
     my $uniq      = delete $args{uniq};
     my $remaining = delete $args{remaining};
+    my $exclude     = delete $args{exclude};
+    my $replace_map = delete $args{replace_map};
+    die "complete_comma_sep(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
 
     my $ci = $Complete::Common::OPT_CI;
 
@@ -721,9 +732,10 @@ sub complete_comma_sep {
     }
 
     my $cae_res = complete_array_elem(
-        %args,
         word  => $cae_word,
         array => $remaining_elems,
+        exclude => $exclude,
+        replace_map => $replace_map,
         ($summaries ? (summaries=>[map {$summaries_for{ $ci ? lc($_):$_ }} @$remaining_elems]) : ()),
     );
 
@@ -739,6 +751,159 @@ sub complete_comma_sep {
         $cae_res = [{word=>"$cae_res->[0]{word}$sep", (defined $cae_res->[0]{summary} ? (summary=>$cae_res->[0]{summary}) : ()), is_partial=>1}];
     }
     $cae_res;
+}
+
+$SPEC{complete_comma_sep_pair} = {
+    v => 1.1,
+    summary => 'Complete a comma-separated list of key-value pairs',
+    args => {
+        %arg_word,
+        keys => {
+            schema => ['array*', of=>'str*'],
+            req => 1,
+        },
+        keys_summaries => {
+            summary => 'Summary for each key',
+            schema => ['array*', of=>'str*'],
+        },
+        complete_value => {
+            summary => 'Code to supply possible values for a key',
+            schema => 'code*',
+            description => <<'_',
+
+Code should accept hash arguments and will be given the arguments `word` (word
+that is part of the value), and `key` (the key being evaluated) and is expected
+to return a completion answer.
+
+_
+        },
+        uniq => {
+            schema => 'bool*',
+            default => 1,
+        },
+        remaining_keys => {
+            schema => ['code*'],
+            summary => 'What keys should remain for completion',
+            description => <<'_',
+
+This is a more general mechanism if the `uniq` option does not suffice. Suppose
+you are offering completion for arguments. Possible arguments are `foo`, `bar`,
+`baz` but the `bar` and `baz` arguments are mutually exclusive. We can set
+`remaining_keys` to this code:
+
+    my %possible_args = {foo=>1, bar=>1, baz=>1};
+    sub {
+        my ($seen_elems, $elems) = @_;
+
+        my %remaining = %possible_args;
+        for (@$seen_elems) {
+            delete $remaining{$_};
+            delete $remaining{baz} if $_ eq 'bar';
+            delete $remaining{bar} if $_ eq 'baz';
+        }
+
+        [keys %remaining];
+    }
+
+As you can see above, the code is given `$seen_elems` and `$elems` as arguments
+and is expected to return remaining elements to offer.
+
+
+_
+        },
+    },
+    result_naked => 1,
+    result => {
+        schema => 'array',
+    },
+};
+sub complete_comma_sep_pair {
+    my %args  = @_;
+    my $word           = delete $args{word} // "";
+    my $sep            = delete $args{sep} // ',';
+    my $keys           = delete $args{keys} or die "Please specify keys";
+    my $keys_summaries = delete $args{keys_summaries};
+    my $uniq           = delete $args{uniq} // 1;
+    my $remaining_keys = delete $args{remaining_keys};
+    my $complete_value = delete $args{complete_value};
+    die "complete_comma_sep_pair(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
+
+    my $ci = $Complete::Common::OPT_CI;
+
+    my %keys_summaries_for; # key=elem val=summary
+  GEN_KEYS_SUMMARIES_HASH:
+    {
+        last unless $keys_summaries;
+        for my $i (0 .. $#{$keys}) {
+            my $key0 = $keys->[$i];
+            my $summary = $keys_summaries->[$i];
+            my $key = $ci ? lc($key0) : $key0;
+            if (exists $keys_summaries_for{$key}) {
+                log_warn "Non-unique key '$key', using only the first summary for it";
+                next;
+            }
+            $keys_summaries_for{$key} = $summary;
+        }
+    } # GEN_KEYS_SUMMARIES_HASH
+
+    my @mentioned_elems = split /\Q$sep\E/, $word, -1;
+    my @mentioned_keys;
+    for my $i (0..$#mentioned_elems) { push @mentioned_keys, $mentioned_elems[$i] if $i % 2 == 0 }
+
+    if (@mentioned_elems == 0 || @mentioned_elems % 2 == 1) {
+
+        # we should be completing keys
+        my $cae_word = @mentioned_keys ? pop(@mentioned_keys) : ''; # cae=complete_array_elem
+
+        my $remaining_elems;
+        if ($remaining_keys) {
+            $remaining_elems = $remaining_keys->(\@mentioned_keys, $keys);
+        } elsif ($uniq) {
+            my %mem;
+            $remaining_elems = [];
+            for (@mentioned_keys) {
+                if ($ci) { $mem{lc $_}++ } else { $mem{$_}++ }
+            }
+            for (@$keys) {
+                push @$remaining_elems, $_ unless ($ci ? $mem{lc $_} : $mem{$_});
+            }
+        } else {
+            $remaining_elems = $keys;
+        }
+
+        my $cae_res = complete_array_elem(
+            %args,
+            word  => $cae_word,
+            array => $remaining_elems,
+            ($keys_summaries ? (summaries=>[map {$keys_summaries_for{ $ci ? lc($_):$_ }} @$remaining_elems]) : ()),
+        );
+
+        pop @mentioned_elems;
+        my $prefix = join($sep, @mentioned_elems);
+        $prefix .= $sep if @mentioned_elems;
+        $cae_res = [map { ref $_ eq 'HASH' ? { %$_, word=>"$prefix$_->{word}" } : "$prefix$_" } @$cae_res];
+
+        # add trailing comma for convenience, where appropriate
+        {
+            last unless @$cae_res == 1;
+            last if @$remaining_elems <= 1;
+            $cae_res = [{word=>$cae_res->[0]}] unless ref $cae_res->[0] eq 'HASH';
+            $cae_res = [{word=>"$cae_res->[0]{word}$sep", (defined $cae_res->[0]{summary} ? (summary=>$cae_res->[0]{summary}) : ()), is_partial=>1}];
+        }
+        return $cae_res;
+
+    } else {
+
+        # we should be completing values
+
+        return [] unless $complete_value;
+        my $word = pop @mentioned_elems;
+        my $res = $complete_value->(word=>$word, key=>$mentioned_keys[-1]);
+        my $prefix = join($sep, @mentioned_elems);
+        $prefix .= $sep if @mentioned_elems;
+        modify_answer(answer=>$res, prefix=>$prefix);
+    }
 }
 
 $SPEC{combine_answers} = {
@@ -864,10 +1029,14 @@ $SPEC{modify_answer} = {
 sub modify_answer {
     my %args = @_;
 
-    my $answer = $args{answer};
+    my $answer = delete $args{answer};
     my $words = ref($answer) eq 'HASH' ? $answer->{words} : $answer;
+    my $prefix = delete $args{prefix};
+    my $suffix = delete $args{suffix};
+    die "modify_answer(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
 
-    if (defined(my $prefix = $args{prefix})) {
+    if (defined $prefix) {
         for (@$words) {
             if (ref $_ eq 'HASH') {
                 $_->{word} = "$prefix$_->{word}";
@@ -876,7 +1045,7 @@ sub modify_answer {
             }
         }
     }
-    if (defined(my $suffix = $args{suffix})) {
+    if (defined $suffix) {
         for (@$words) {
             if (ref $_ eq 'HASH') {
                 $_->{word} = "$_->{word}$suffix";
@@ -913,8 +1082,10 @@ _
 sub ununiquify_answer {
     my %args = @_;
 
-    my $answer = $args{answer};
+    my $answer = delete $args{answer};
     my $words = ref($answer) eq 'HASH' ? $answer->{words} : $answer;
+    die "ununiquify_answer(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
 
     if (@$words == 1) {
         push @$words, "$words->[0] ";
@@ -937,7 +1108,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.614 of Complete::Util (from Perl distribution Complete-Util), released on 2023-01-17.
+This document describes version 0.617 of Complete::Util (from Perl distribution Complete-Util), released on 2023-01-19.
 
 =head1 DESCRIPTION
 
@@ -1264,6 +1435,77 @@ but with C<uniq> set to true, the completion answer becomes:
 
 See also the C<remaining> option for a more general mechanism of offering fewer
 elements.
+
+=item * B<word>* => I<str> (default: "")
+
+Word to complete.
+
+
+=back
+
+Return value:  (array)
+
+
+
+=head2 complete_comma_sep_pair
+
+Usage:
+
+ complete_comma_sep_pair(%args) -> array
+
+Complete a comma-separated list of key-value pairs.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<complete_value> => I<code>
+
+Code to supply possible values for a key.
+
+Code should accept hash arguments and will be given the arguments C<word> (word
+that is part of the value), and C<key> (the key being evaluated) and is expected
+to return a completion answer.
+
+=item * B<keys>* => I<array[str]>
+
+(No description)
+
+=item * B<keys_summaries> => I<array[str]>
+
+Summary for each key.
+
+=item * B<remaining_keys> => I<code>
+
+What keys should remain for completion.
+
+This is a more general mechanism if the C<uniq> option does not suffice. Suppose
+you are offering completion for arguments. Possible arguments are C<foo>, C<bar>,
+C<baz> but the C<bar> and C<baz> arguments are mutually exclusive. We can set
+C<remaining_keys> to this code:
+
+ my %possible_args = {foo=>1, bar=>1, baz=>1};
+ sub {
+     my ($seen_elems, $elems) = @_;
+ 
+     my %remaining = %possible_args;
+     for (@$seen_elems) {
+         delete $remaining{$_};
+         delete $remaining{baz} if $_ eq 'bar';
+         delete $remaining{bar} if $_ eq 'baz';
+     }
+ 
+     [keys %remaining];
+ }
+
+As you can see above, the code is given C<$seen_elems> and C<$elems> as arguments
+and is expected to return remaining elements to offer.
+
+=item * B<uniq> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<word>* => I<str> (default: "")
 

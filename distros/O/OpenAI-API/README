@@ -4,34 +4,26 @@ NAME
 
 VERSION
 
-    0.24
+    0.27
 
 SYNOPSIS
 
         use OpenAI::API;
+        use OpenAI::API::Request::Chat;
     
-        my $openai = OpenAI::API->new(); # uses OPENAI_API_KEY environment variable
+        my $config = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
     
-        my $chat = $openai->chat(
-            model       => 'gpt-3.5-turbo',
-            messages    => [ { "role" => "user", "content" => "Hello!" }, ],
+        my $request = OpenAI::API::Request::Chat->new(
+            model    => "gpt-3.5-turbo",
+            messages => [
+                { "role" => "system",    "content" => "You are a helpful assistant." },
+                { "role" => "user",      "content" => "Who won the world series in 2020?" },
+                { "role" => "assistant", "content" => "The Los Angeles Dodgers won the World Series in 2020." },
+                { "role" => "user",      "content" => "Where was it played?" }
+            ],
         );
     
-        my $completions = $openai->completions(
-            model  => 'text-davinci-003',
-            prompt => 'What is the capital of France?',
-        );
-    
-        my $edits = $openai->edits(
-            model       => 'text-davinci-edit-001',
-            input       => 'What day of the wek is it?',
-            instruction => 'Fix the spelling mistakes',
-        );
-    
-        my $moderations = $openai->moderations(
-            model => 'text-moderation-latest',
-            input => 'I want to kill them.',
-        );
+        my $res = $request->send($config);
 
 DESCRIPTION
 

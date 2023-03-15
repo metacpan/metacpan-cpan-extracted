@@ -226,6 +226,10 @@ subtest csv_sort_rows => sub {
         $stdout = capture_stdout { $res = App::CSVUtils::csv_sort_rows::csv_sort_rows(input_filename=>"$dir/sort-rows.csv", by_fields=>["f2"]) };
         is($stdout,qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n), "output");
     };
+    subtest "alphabetical (field referred by index)" => sub {
+        $stdout = capture_stdout { $res = App::CSVUtils::csv_sort_rows::csv_sort_rows(input_filename=>"$dir/sort-rows.csv", by_fields=>[2]) };
+        is($stdout,qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n), "output");
+    };
     subtest "reverse alphabetical" => sub {
         $stdout = capture_stdout { $res = App::CSVUtils::csv_sort_rows::csv_sort_rows(input_filename=>"$dir/sort-rows.csv", by_fields=>["~f2"]) };
         is($stdout,qq(f1,f2\n2,andy\n10,Chuck\n1,Andy\n), "output");

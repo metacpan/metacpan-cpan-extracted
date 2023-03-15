@@ -3,7 +3,7 @@
 
 #include "spvm_native.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <winsock2.h>
 #else
   #include <poll.h>

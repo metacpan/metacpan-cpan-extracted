@@ -11,5 +11,6 @@ LICENSE
 t/00-load.t
 t/01-setup.t
 t/02-workflow.t
+t/03-utils.t
 META.yml
 META.json

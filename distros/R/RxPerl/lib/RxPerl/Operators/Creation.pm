@@ -21,7 +21,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.27.0";
+our $VERSION = "v6.27.1";
 
 sub rx_observable;
 
@@ -288,7 +288,7 @@ sub rx_from_event {
         };
 
         $subscriber->subscription->add(sub {
-            $object->unsubscribe($cb) if defined $object;
+            $object->unsubscribe($event_type, $cb) if defined $object;
         });
 
         $object->on($event_type, $cb);
@@ -313,7 +313,7 @@ sub rx_from_event_array {
         };
 
         $subscriber->subscription->add(sub {
-            $object->unsubscribe($cb) if defined $object;
+            $object->unsubscribe($event_type, $cb) if defined $object;
         });
 
         $object->on($event_type, $cb);

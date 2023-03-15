@@ -25,6 +25,7 @@ typedef struct Stripper {
   char o_striptags[MAX_STRIPTAGS][MAX_TAGNAMELENGTH];
   int numstriptags;
   int o_emit_spaces;
+  int o_emit_newlines;
   int o_decode_entities;
 
   int o_auto_reset;
@@ -33,7 +34,9 @@ typedef struct Stripper {
 } Stripper;
 
 void _strip_html( Stripper * stripper, char * raw, char * clean, int is_utf8_p );
+static int utf8_char_width( unsigned char * string );
 void _reset( Stripper * stripper );
+
 void clear_striptags( Stripper * stripper );
 void add_striptag( Stripper * stripper, char * tag );
 

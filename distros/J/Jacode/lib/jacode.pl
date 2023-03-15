@@ -6,7 +6,7 @@ package jacode;
 #
 # https://metacpan.org/dist/Jacode
 #
-# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # Perl4 script and also Perl5 script
@@ -140,7 +140,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.29';
+$VERSION = '2.13.4.30';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -1372,37 +1372,40 @@ sub getcode {
 
         # 'euc' popular codepoints
         elsif (
-            $s =~ /^\xb1[\xb3\xbf\xc4\xc6\xc7\xca\xd1\xd2\xd8\xdb]$/                                                         ||
-            $s =~ /^\xb2[\xb5\xb6\xb9\xbb\xbc\xbd\xbe\xbf\xc1\xc3\xc4\xc6\xc7\xc8\xca\xcb\xcc\xce\xcf\xd0\xd6\xd9\xda\xdd]$/ ||
-            $s =~ /^\xb3[\xb2\xb9\xc6\xc8\xca\xce\xd0\xd1\xd8\xda\xdb]$/                                                     ||
-            $s =~ /^\xb4[\xb1\xb3\xb4\xb6\xc0\xc4\xc5\xc6\xc9\xca\xd6\xd8\xda\xdb\xdd]$/                                     ||
-            $s =~ /^\xb5[\xb4\xbb\xc1\xc4\xc8\xd2\xd5\xd7\xd9\xdb\xdc]$/                                                     ||
-            $s =~ /^\xb6[\xb2\xb5\xb6\xbb\xbd\xc1\xc8\xc9\xca\xcb\xcc\xd0\xd8\xda]$/                                         ||
-            $s =~ /^\xb7[\xb3\xb8\xbb\xbf\xc1\xc3\xc7\xc8\xca\xcf\xd0\xd1\xd2\xd7\xd9\xda\xdd]$/                             ||
-            $s =~ /^\xb8[\xb5\xb6\xb7\xba\xbb\xbd\xc0\xc2\xc4\xc5\xc6\xca\xcb\xcd\xce]$/                                     ||
-            $s =~ /^\xb9[\xb6\xb9\xbb\xbd\xbe\xc1\xc6\xcd\xd3\xd4\xd6\xd8]$/                                                 ||
-            $s =~ /^\xba[\xb4\xb8\xb9\xc2\xc6\xc7\xcd\xd0\xd1\xd2\xd7\xd9\xda\xdc]$/                                         ||
-            $s =~ /^\xbb[\xb2\xb3\xb6\xba\xbb\xc4\xc8\xc9\xca\xcb\xcd\xce\xcf\xd0\xd1\xd2\xd4\xd5\xd6\xd7\xd8\xd9\xdc]$/     ||
-            $s =~ /^\xbc[\xba\xbc\xc1\xc2\xcc\xce\xd2\xd4\xd5\xd6\xda]$/                                                     ||
-            $s =~ /^\xbd[\xb5\xb8\xbb\xbc\xbd\xc2\xc5\xc9\xcb\xd0\xd5]$/                                                     ||
-            $s =~ /^\xbe[\xbe\xc3\xc6\xc8\xc9\xca\xcf\xd0\xda\xdc\xdd]$/                                                     ||
-            $s =~ /^\xbf[\xb2\xb4\xb6\xb7\xb9\xbc\xbd\xbf\xc0\xc6\xc7\xc9\xca\xcc\xcd]$/                                     ||
-            $s =~ /^\xc0[\xb1\xb2\xb5\xb6\xb8\xb9\xba\xbc\xbd\xbe\xc1\xc4\xc5\xc7\xca\xce\xd0\xd1\xd5\xd6\xda\xdc]$/         ||
-            $s =~ /^\xc1[\xb1\xb4\xc7\xc8\xdb]$/                                                                             ||
-            $s =~ /^\xc2[\xb2\xb3\xb4\xbc\xbe\xbf\xc0\xc7\xce\xd0\xd3\xd4\xd8]$/                                             ||
-            $s =~ /^\xc3[\xb1\xb5\xbb\xbc\xc2\xc6\xc7\xc8\xca\xcb\xcc\xcd\xce\xcf\xd1\xd3\xd7\xd9]$/                         ||
-            $s =~ /^\xc4[\xb4\xb6\xb9\xba\xbb\xbe\xc5\xc9\xcb\xcc]$/                                                         ||
-            $s =~ /^\xc5[\xb4\xb5\xb7\xb8\xb9\xbe\xc0\xc1\xc4\xc5\xcf\xd0\xd4\xd9\xda\xdc\xdd]$/                             ||
-            $s =~ /^\xc6[\xb1\xb2\xbb\xc0\xc3\xc8\xc9\xcd\xcf]$/                                                             ||
-            $s =~ /^\xc7[\xb3\xba\xbc\xbd\xbe\xc0\xc8\xc9\xcb\xcf\xd4\xd5\xd8\xdb\xdc]$/                                     ||
-            $s =~ /^\xc8[\xb1\xb4\xbd\xbe\xbf\xc4\xc7\xc8\xcc\xce\xd3\xd5\xd6\xdd]$/                                         ||
-            $s =~ /^\xc9[\xb4\xb8\xbc\xbd\xbe\xc1\xc2\xca\xcd\xd4\xd5\xd7\xd8\xd9\xdb\xdc\xdd]$/                             ||
-            $s =~ /^\xca[\xb4\xb8\xb9\xbc\xbf\xc2\xc4\xc6\xcc\xd1\xd2\xd4\xd5\xd6\xd8\xd9\xdb\xdd]$/                         ||
-            $s =~ /^\xcb[\xba\xbd\xbe\xc9\xcc\xcd\xdc]$/                                                                     ||
-            $s =~ /^\xcc[\xb1\xb2\xb4\xb5\xbc\xbe\xbf\xc0\xc2\xc4\xcc\xd1\xd3\xda\xdc]$/                                     ||
-            $s =~ /^\xcd[\xb5\xb7\xbc\xbd\xbe\xc4\xc6\xc9\xcb\xcd\xce\xd1\xd5\xd7\xdb]$/                                     ||
-            $s =~ /^\xce[\xb1\xb9\xbe\xc1\xc5\xc9\xcc\xcf\xd3\xd9]$/                                                         ||
-            $s =~ /^\xcf[\xbf\xc0\xc2\xc3\xc8]$/
+            $s =~ /^\xb1[\xb3\xbf\xc0\xc4\xc6\xc7\xc9\xca\xd1\xd2\xd8\xd9\xdb]$/                                                         ||
+            $s =~ /^\xb2[\xb5\xb6\xb8\xb9\xbb\xbc\xbd\xbe\xbf\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xca\xcb\xcc\xce\xcf\xd0\xd6\xd9\xda\xdd]$/ ||
+            $s =~ /^\xb3[\xb2\xb9\xc6\xc8\xca\xce\xd0\xd1\xd8\xda\xdb]$/                                                                 ||
+            $s =~ /^\xb4[\xb1\xb2\xb3\xb4\xb6\xbb\xc0\xc4\xc5\xc6\xc9\xca\xd6\xd7\xd8\xda\xdb\xdd]$/                                     ||
+            $s =~ /^\xb5[\xb4\xb5\xbb\xc1\xc4\xc6\xc8\xd2\xd5\xd7\xd9\xdb\xdc\xdd]$/                                                     ||
+            $s =~ /^\xb6[\xb2\xb5\xb6\xbb\xbd\xc1\xc6\xc8\xc9\xca\xcb\xcc\xd0\xd6\xd7\xd8\xda]$/                                         ||
+            $s =~ /^\xb7[\xb3\xb8\xbb\xbd\xbf\xc1\xc3\xc5\xc7\xc8\xc9\xca\xcf\xd0\xd1\xd2\xd7\xd9\xda\xdd\xde]$/                         ||
+            $s =~ /^\xb8[\xb2\xb5\xb6\xb7\xb9\xba\xbb\xbd\xc0\xc2\xc4\xc5\xc6\xca\xcb\xcd\xce\xd7\xde]$/                                 ||
+            $s =~ /^\xb9[\xb6\xb9\xbb\xbd\xbe\xc0\xc1\xc6\xc9\xcd\xd3\xd4\xd6\xd7\xd8]$/                                                 ||
+            $s =~ /^\xba[\xb4\xb8\xb9\xbb\xc2\xc6\xc7\xca\xcd\xd0\xd1\xd2\xd7\xd8\xd9\xda\xdc]$/                                         ||
+            $s =~ /^\xbb[\xb2\xb3\xb6\xba\xbb\xc2\xc4\xc8\xc9\xca\xcb\xcd\xce\xcf\xd0\xd1\xd2\xd4\xd5\xd6\xd7\xd8\xd9\xdc]$/             ||
+            $s =~ /^\xbc[\xb6\xba\xbc\xc1\xc2\xcc\xce\xd2\xd4\xd5\xd6\xda]$/                                                             ||
+            $s =~ /^\xbd[\xb5\xb8\xbb\xbc\xbd\xc2\xc5\xc9\xcb\xd0\xd4\xd5]$/                                                             ||
+            $s =~ /^\xbe[\xb1\xbd\xbe\xc3\xc4\xc6\xc8\xc9\xca\xcf\xd0\xda\xdc\xdd]$/                                                     ||
+            $s =~ /^\xbf[\xb2\xb4\xb6\xb7\xb9\xbc\xbd\xbf\xc0\xc6\xc7\xc9\xca\xcc\xcd]$/                                                 ||
+            $s =~ /^\xc0[\xb1\xb2\xb5\xb6\xb8\xb9\xba\xbc\xbd\xbe\xc1\xc4\xc5\xc7\xca\xce\xd0\xd1\xd5\xd6\xda\xdc\xde]$/                 ||
+            $s =~ /^\xc1[\xb1\xb4\xc7\xc8\xcf\xd4\xdb]$/                                                                                 ||
+            $s =~ /^\xc2[\xb2\xb3\xb4\xbc\xbe\xbf\xc0\xc7\xce\xd0\xd3\xd4\xd8\xd9]$/                                                     ||
+            $s =~ /^\xc3[\xb1\xb5\xbb\xbc\xc2\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd1\xd3\xd7\xd9]$/                                 ||
+            $s =~ /^\xc4[\xb4\xb6\xb9\xba\xbb\xbe\xc5\xc9\xcb\xcc\xce\xd4\xd8]$/                                                         ||
+            $s =~ /^\xc5[\xb4\xb5\xb7\xb8\xb9\xba\xbe\xc0\xc1\xc4\xc5\xcf\xd0\xd4\xd9\xda\xdc\xdd]$/                                     ||
+            $s =~ /^\xc6[\xb1\xb2\xb7\xbb\xbe\xc0\xc3\xc8\xc9\xcd\xcf\xd7]$/                                                             ||
+            $s =~ /^\xc7[\xb3\xba\xbc\xbd\xbe\xc0\xc8\xc9\xcb\xcf\xd4\xd5\xd8\xdb\xdc]$/                                                 ||
+            $s =~ /^\xc8[\xb1\xb4\xb5\xb7\xbd\xbe\xbf\xc4\xc7\xc8\xcc\xce\xd3\xd5\xd6\xdd]$/                                             ||
+            $s =~ /^\xc9[\xb1\xb4\xb8\xbc\xbd\xbe\xc1\xc2\xc5\xca\xcd\xd4\xd5\xd7\xd8\xd9\xdb\xdc\xdd]$/                                 ||
+            $s =~ /^\xca[\xb4\xb7\xb8\xb9\xbc\xbf\xc2\xc4\xc6\xcc\xd1\xd2\xd4\xd5\xd6\xd8\xd9\xdb\xdd]$/                                 ||
+            $s =~ /^\xcb[\xba\xbd\xbe\xc9\xcc\xcd\xd2\xdc]$/                                                                             ||
+            $s =~ /^\xcc[\xb1\xb2\xb4\xb5\xbc\xbe\xbf\xc0\xc2\xc4\xcc\xd1\xd3\xd4\xda\xdc]$/                                             ||
+            $s =~ /^\xcd[\xb4\xb5\xb7\xbc\xbd\xbe\xc0\xc4\xc6\xc9\xcb\xcd\xce\xd1\xd5\xd7\xdb]$/                                         ||
+            $s =~ /^\xce[\xb1\xb5\xb9\xbe\xc1\xc3\xc5\xc9\xcc\xcf\xd0\xd3\xd9\xdd]$/                                                     ||
+            $s =~ /^\xcf[\xbf\xc0\xc2\xc3\xc8\xca]$/                                                                                     ||
+            $s =~ /^\xd6\xbb$/                                                                                                           ||
+            $s =~ /^\xdc\xc6$/
+
         ) {
             $matched  = 2;
             $encoding = 'euc';
@@ -11923,7 +11926,7 @@ This software is free software; you can redistribute it and/or modify it under t
 
 This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022 INABA Hitoshi L<ina@cpan.org> in a CPAN
+Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023 INABA Hitoshi L<ina@cpan.org> in a CPAN
 
 The latest version of "jacode.pl" is available here:
 

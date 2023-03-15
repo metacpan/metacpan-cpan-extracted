@@ -6,11 +6,14 @@ use warnings;
 use Test::More;
 
 use Crypt::Passwd::XS 'crypt';
-use Crypt::Passphrase::Linux;
+use Crypt::Passphrase;
 
-my $passphrase = Crypt::Passphrase::Linux->new(
-	rounds => 100_000,
-	type   => 'sha512',
+my $passphrase = Crypt::Passphrase->new(
+	encoder => {
+		module => 'Linux',
+		rounds => 100_000,
+		type   => 'sha512',
+	},
 );
 
 my $password = 'password';
@@ -31,6 +34,10 @@ ok($passphrase->needs_rehash($hash3));
 my $hash4 = '$5$rounds=80000$wnsT7Yr92oJoP28r$cKhJImk5mfuSKV9b3mumNzlbstFUplKtQXXMo4G6Ep5';
 ok($passphrase->verify_password($password, $hash4));
 ok($passphrase->needs_rehash($hash4));
+
+my $hash5 = 'tesvSclXGCVNk';
+ok($passphrase->verify_password('test1234', $hash5));
+ok($passphrase->needs_rehash($hash5));
 
 done_testing;
 

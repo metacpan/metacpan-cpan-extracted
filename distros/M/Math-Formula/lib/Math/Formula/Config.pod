@@ -25,17 +25,13 @@ The following serialization formats are supported:
 
 =over 4
 
-=item * JSON L<Math::Formula::Config::JSON|Math::Formula::Config::JSON> (save)
+=item * JSON L<Math::Formula::Config::JSON|Math::Formula::Config::JSON>
 
-=item * YAML L<Math::Formula::Config::YAML|Math::Formula::Config::YAML> (save)
+=item * YAML L<Math::Formula::Config::YAML|Math::Formula::Config::YAML>
 
-=item * INI  L<Math::Formula::Config::INI|Math::Formula::Config::INI>  (save and load)
+=item * INI  L<Math::Formula::Config::INI|Math::Formula::Config::INI>
 
 =back
-
-At the moment, B<loading is not generally supported>: it produces only satisfactory
-results for INI, but improvements are under way.  That implementation will
-certainly impact the output format.  The current version is ment for studying.
 
 =head1 METHODS
 
@@ -80,7 +76,7 @@ and the usual filename extensions.
 
 =item $obj-E<gt>B<load>($name, %options)
 
-Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
+Load a L<Math::Formula::Context|Math::Formula::Context> for an INI file.
 
  -Option  --Default
   filename  <directory/$name.ini>
@@ -93,16 +89,16 @@ Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
 
 =item $obj-E<gt>B<save>($context, %args)
 
-Serialize the $context into a file as storage or to be editted by hand.
-This is a usefull method when default configuration templates need to
+Serialize the $context into a file as storage or to be edited by hand.
+This is a useful method when default configuration templates need to
 be generated.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.15,
-built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.16,
+built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

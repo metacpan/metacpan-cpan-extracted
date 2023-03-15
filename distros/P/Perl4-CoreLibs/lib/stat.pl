@@ -19,7 +19,7 @@ $ST_BLOCKS =	12;
 
 ;# Usage:
 ;#	require 'stat.pl';
-;#	do Stat('foo');		# sets st_* as a side effect
+;#	Stat('foo');		# sets st_* as a side effect
 ;#
 sub Stat {
     ($st_dev,$st_ino,$st_mode,$st_nlink,$st_uid,$st_gid,$st_rdev,$st_size,

@@ -8,7 +8,7 @@ use strict;
 use Carp;
 use English qw( -no_match_vars );
 use constant ERROR_CONTEXT => 3;
-{ our $VERSION = '1.58'; }
+{ our $VERSION = '1.64'; }
 use Scalar::Util qw< blessed reftype >;
 
 # Function-oriented interface
@@ -209,13 +209,15 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
 
    # early detection of options, remove them from args list
    my $opts = (@_ && (ref($_[-1]) eq 'HASH')) ? pop(@_) : {};
+   my $missing = $ref_wanted ? undef
+      : exists($opts->{missing}) ? $opts->{missing} : '';
 
    # if there's not $path provided, just don't bother going on. Actually,
    # no $path means just return root, undefined path is always "not
    # present" though.
    return ($ref_wanted ? $ref_to_value : $$ref_to_value) unless @_;
    my $path_input = shift;
-   return ($ref_wanted ? undef : '') unless defined $path_input;
+   return $missing unless defined $path_input;
 
    my $crumbs;
    if (ref $path_input) {
@@ -226,7 +228,7 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
         if defined($path_input) && !length($path_input);
       $crumbs = crumble($path_input);
    }
-   return ($ref_wanted ? undef : '') unless defined $crumbs;
+   return $missing unless defined $crumbs; # undef on crumble parse error
 
    # go down the rabbit hole
    my $use_method = $opts->{traverse_methods} || 0;
@@ -249,7 +251,7 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
       # if $ref is not true, we hit a wall. How we proceed depends on
       # whether we were asked to auto-vivify or not.
       if (!$ref) {
-         return '' unless $ref_wanted;    # don't bother going on
+         return $missing unless $ref_wanted;    # don't bother going on
 
          # auto-vivification requested! $key will tell us how to
          # proceed further, hopefully
@@ -261,7 +263,7 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
 
          # if $key_ref is not the same as $ref there is a mismatch
          # between what's available ($ref) and what' expected ($key_ref)
-         return($ref_wanted ? undef : '') if $key_ref ne $ref;
+         return $missing if $key_ref ne $ref;
 
          # OK, data and expectations agree. Get the "real" key
          if ($key_ref eq 'ARRAY') {
@@ -282,7 +284,7 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
       my $is_blessed = blessed $$ref_to_value;
       my $method = $is_blessed && $$ref_to_value->can($key);
       if ($is_blessed && $strict_blessed) {
-         return($ref_wanted ? undef : '') unless $method;
+         return $missing unless $method;
          $ref_to_value = \($$ref_to_value->$method());
       }
       elsif ($method && $method_pre) {
@@ -297,6 +299,9 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
       elsif ($method && $use_method) {
          $ref_to_value = \($$ref_to_value->$method());
       }
+      elsif (! $ref_wanted) { # block unwanted autovivification
+         return $missing;
+      }
       # autovivification goes here eventually
       elsif ($ref eq 'HASH') {
          $ref_to_value = \($$ref_to_value->{$key});
@@ -305,7 +310,7 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
          $ref_to_value = \($$ref_to_value->[$key]);
       }
       else {    # don't know what to do with other references!
-         return $ref_wanted ? undef : '';
+         return $missing;
       }
    } ## end for my $crumb (@$crumbs)
 
@@ -313,6 +318,7 @@ sub traverse {  ## no critic (RequireArgUnpacking,ProhibitExcessComplexity)
    return
        $ref_wanted             ? $ref_to_value
      : defined($$ref_to_value) ? $$ref_to_value
+     : exists($opts->{undef})  ? $opts->{undef}
      :                           '';
 
    ## use critic
@@ -520,7 +526,7 @@ END_OF_CHUNK
 } ## end sub _simple_text
 
 sub crumble {
-   my ($input) = @_;
+   my ($input, $allow_partial) = @_;
    return unless defined $input;
 
    $input =~ s{\A\s+|\s+\z}{}gmxs;
@@ -545,7 +551,7 @@ sub crumble {
    pos($input) = $prepos;
 
    return unless defined $postpos;
-   return if $postpos != length($input);
+   return if ($postpos != length($input)) && ! ($allow_partial);
 
    # cleanup @path components
    for my $part (@path) {
@@ -569,6 +575,7 @@ sub crumble {
       $part = join '', @subparts;
    } ## end for my $part (@path)
 
+   return (\@path, $postpos) if $allow_partial && wantarray;
    return \@path;
 } ## end sub crumble
 

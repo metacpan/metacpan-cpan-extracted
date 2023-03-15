@@ -4,14 +4,14 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
-      use Weather::Meteo
+      use Weather::Meteo;
 
       my $meteo = Weather::Meteo->new();
-      my $weather = $meteo->weather({ latitude => '0.1', longitude => '0.2', date => '2022-12-25' });
+      my $weather = $meteo->weather({ latitude => 0.1, longitude => 0.2, date => '2022-12-25' });
 
 # DESCRIPTION
 

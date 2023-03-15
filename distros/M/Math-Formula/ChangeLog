@@ -2,6 +2,17 @@
 
 All changes made by Mark Overmeer, unless explicitly stated otherwise.
 
+version 0.16: Tue 14 Mar 09:32:45 CET 2023
+
+	Fixes:
+	- utf8 names are broken in 5.20, avoid the test [cpantesters]
+	- enforce minimal versions of optional prereqs [cpantesters]
+
+	Improvements:
+	- loads of doc-fixes
+	- silence (correct) warning in t/27names.t
+	- add pod and prereq tests
+
 version 0.15: Mon  6 Mar 11:16:16 CET 2023
 
 	Changes:

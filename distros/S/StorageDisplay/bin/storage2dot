@@ -14,7 +14,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.0.11'; # VERSION
+our $VERSION = '1.1.0'; # VERSION
 
 use StorageDisplay;
 use StorageDisplay::Collect;
@@ -43,6 +43,7 @@ sub collect_from_remote {
     #Sys::Syscall::sendfile($in, $fdperlmod);
     {
         while(defined(my $line=<$fdperlmod>)) {
+	    last if $line =~ m/^__END__\s*$/;
             print $in $line;
         }
         close $fdperlmod;
@@ -226,7 +227,10 @@ sub main() {
 
     my $oldout;
     if (defined($output)) {
-        open(my $oldout, ">&STDOUT")     or die "Can't dup STDOUT: $!";
+	# dzil do not want Two-argument "open"
+	# so, commented-out as we do not use it
+	# if this change, a way to write this would have to be found
+        # open(my $oldout, ">&STDOUT")     or die "Can't dup STDOUT: $!";
         open(STDOUT, '>', $output) or die "Can't redirect STDOUT to $output: $!";
     }
 
@@ -254,7 +258,7 @@ storage2dot - analyse and generate a graphical view of a machine storage
 
 =head1 VERSION
 
-version 1.0.11
+version 1.1.0
 
 =head1 AUTHOR
 

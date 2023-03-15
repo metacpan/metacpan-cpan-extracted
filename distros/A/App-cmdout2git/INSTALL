@@ -1,0 +1,34 @@
+  
+
+## INSTALL
+
+cpanm App::cmdout2git
+
+
+## UNINSTALL 
+
+cpanm -U App::cmdout2git
+
+
+■ コマンド cmdout2git を使えるようにする方法 : 
+
+　　インストール:   cpanm    App::cmdout2git
+アンインストール:   cpanm –U App::cmdout2git
+
+cpanmが使えない場合は、cpan でも良いが、インストールしたモジュールの
+アンインストールが難しくなるであろう。(アンインストールとは、インストール
+したモジュールを除去することで、インストール前の元の状態に戻すことである。)
+
+上記のcpanmを使った方法は、Perlのモジュールのインストールでよく用いられる方法である。
+
+
+■ cpanmやcpanによる一般的なインストールの方法は、下記で網羅的に説明をしている。
+
+1. https://metacpan.org/release/TULAMILI/Table-Hack-0.12/source/Table-Hack.pdf
+2. https://www.ite.or.jp/wp/wp-content/uploads/opendata/tool201807.pdf
+
+上記2個のURLにある同じPDF形式ファイルは、2018年に下野寿之が書いたものであり、
+それぞれ26ページである。
+
+
+-- 2023-03-10(fri) Toshiyuki Shimono bin4tsv@gmail.com

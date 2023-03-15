@@ -5,7 +5,14 @@ CONTRIBUTING.md
 LICENSE
 README.md
 t/001_load.t
+t/002_token.t
+t/003_device_get.t
+t/004_device_commands.t
 lib/WebService/Tuya/IoT/API.pm
 perl-WebService-Tuya-IoT-API.spec
+examples/get_access_token.pl
+examples/get_device_name.pl
+examples/get_device_status.pl
+examples/set_device_state.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

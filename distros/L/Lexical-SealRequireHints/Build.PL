@@ -67,6 +67,7 @@ Module::Build->subclass(code => q{
 		)),
 	},
 	build_requires => {
+		"Exporter" => 0,
 		"Module::Build" => 0,
 		"Test::More" => "0.41",
 		"perl" => "5.006",
@@ -98,6 +99,18 @@ Module::Build->subclass(code => q{
 	needs_compiler => 0,
 	dynamic_config => 1,
 	meta_add => { distribution_type => "module" },
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Lexical-SealRequireHints".
+					"\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=".
+					"Lexical-SealRequireHints",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

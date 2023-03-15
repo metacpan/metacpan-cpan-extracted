@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::File" => "0.440",
     "Complete::Module" => "0.262",
-    "Complete::Util" => "0.608",
+    "Complete::Util" => "0.616",
     "Data::Dmp" => "0.242",
     "Module::CoreList" => 0,
     "Perinci::Sub::XCompletion::perl_distname" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.047",
+  "VERSION" => "0.048",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Complete::File" => "0.440",
   "Complete::Module" => "0.262",
-  "Complete::Util" => "0.608",
+  "Complete::Util" => "0.616",
   "Data::Dmp" => "0.242",
   "Data::Sah" => "0.914",
   "File::Spec" => 0,

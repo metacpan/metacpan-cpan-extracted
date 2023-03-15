@@ -97,25 +97,20 @@
 # Initial revision
 #
 
+no warnings "ambiguous";
+
+use Socket ();
+
 require 'chat2.pl';	# into main
-eval "require 'socket.ph'" || eval "require 'sys/socket.ph'"
-	|| die "socket.ph missing: $!\n";
 
 
 package ftp;
 
-if( defined( &main'PF_INET ) ){
-	$pf_inet = &main'PF_INET;
-	$sock_stream = &main'SOCK_STREAM;
+{
+	$pf_inet = Socket::PF_INET;
+	$sock_stream = Socket::SOCK_STREAM;
 	local($name, $aliases, $proto) = getprotobyname( 'tcp' );
 	$tcp_proto = $proto;
-}
-else {
-	# XXX hardwired $PF_INET, $SOCK_STREAM, 'tcp'
-	# but who the heck would change these anyway? (:-)
-	$pf_inet = 2;
-	$sock_stream = 1;
-	$tcp_proto = 6;
 }
 
 # If the remote ftp daemon doesn't respond within this time presume its dead
@@ -130,25 +125,25 @@ $timeout_open = $timeout;
 
 # This is a "global" it contains the last response from the remote ftp server
 # for use in error messages
-$ftp'response = "";
-# Also ftp'NS is the socket containing the data coming in from the remote ls
+$ftp::response = "";
+# Also ftp::NS is the socket containing the data coming in from the remote ls
 # command.
 
 # The size of block to be read or written when talking to the remote
 # ftp server
-$ftp'ftpbufsize = 4096;
+$ftp::ftpbufsize = 4096;
 
 # How often to print a hash out, when debugging
-$ftp'hashevery = 1024;
+$ftp::hashevery = 1024;
 # Output a newline after this many hashes to prevent outputing very long lines
-$ftp'hashnl = 70;
+$ftp::hashnl = 70;
 
 # If a proxy connection then who am I really talking to?
 $real_site = "";
 
 # This is just a tracing aid.
 $ftp_show = 0;
-sub ftp'debug
+sub ftp::debug
 {
 	$ftp_show = $_[0];
 #	if( $ftp_show ){
@@ -156,7 +151,7 @@ sub ftp'debug
 #	}
 }
 
-sub ftp'set_timeout
+sub ftp::set_timeout
 {
 	$timeout = $_[0];
 	$timeout_open = $timeout;
@@ -167,12 +162,12 @@ sub ftp'set_timeout
 }
 
 
-sub ftp'open_alarm
+sub ftp::open_alarm
 {
 	die "timeout: open";
 }
 
-sub ftp'timed_open
+sub ftp::timed_open
 {
 	local( $site, $ftp_port, $retry_call, $attempts ) = @_;
 	local( $connect_site, $connect_port );
@@ -207,7 +202,7 @@ sub ftp'timed_open
 			$connect_site = $site;
 			$connect_port = $ftp_port;
 		}
-		if( ! &chat'open_port( $connect_site, $connect_port ) ){
+		if( ! &chat::open_port( $connect_site, $connect_port ) ){
 			if( $retry_call ){
 				print STDERR "Failed to connect\n" if $ftp_show;
 				next;
@@ -218,12 +213,12 @@ sub ftp'timed_open
 				return 0;
 			}
 		}
-		$res = &ftp'expect( $timeout,
+		$res = &ftp::expect( $timeout,
 				    120, "service unavailable to $site", 0, 
 	                            220, "ready for login to $site", 1,
 				    421, "service unavailable to $site, closing connection", 0);
 		if( ! $res ){
-			&chat'close();
+			&chat::close();
 			next;
 		}
 		return 1;
@@ -235,11 +230,11 @@ sub ftp'timed_open
 	return 0;
 }
 
-sub ftp'open
+sub ftp::open
 {
 	local( $site, $ftp_port, $retry_call, $attempts ) = @_;
 
-	$SIG{ 'ALRM' } = "ftp\'open_alarm";
+	$SIG{ 'ALRM' } = "ftp::open_alarm";
 
 	local( $ret ) = eval "&timed_open( '$site', $ftp_port, $retry_call, $attempts )";
 	alarm( 0 );
@@ -250,18 +245,18 @@ sub ftp'open
 	return $ret;
 }
 
-sub ftp'login
+sub ftp::login
 {
 	local( $remote_user, $remote_password ) = @_;
 
 	if( $proxy ){
-		&ftp'send( "USER $remote_user\@$site" );
+		&ftp::send( "USER $remote_user\@$site" );
 	}
 	else {
-		&ftp'send( "USER $remote_user" );
+		&ftp::send( "USER $remote_user" );
 	}
         local( $val ) =
-               &ftp'expect($timeout,
+               &ftp::expect($timeout,
 	           230, "$remote_user logged in", 1,
 		   331, "send password for $remote_user", 2,
 
@@ -276,9 +271,9 @@ sub ftp'login
 	}
 	if( $val == 2 ){
 		# A password is needed
-		&ftp'send( "PASS $remote_password" );
+		&ftp::send( "PASS $remote_password" );
 
-		$val = &ftp'expect( $timeout,
+		$val = &ftp::expect( $timeout,
 		   230, "$remote_user logged in", 1,
 
 		   202, "command not implemented", 0,
@@ -299,22 +294,22 @@ sub ftp'login
 	return 0;
 }
 
-sub ftp'close
+sub ftp::close
 {
-	&ftp'quit();
-	&chat'close();
+	&ftp::quit();
+	&chat::close();
 }
 
 # Change directory
 # return 1 if successful
 # 0 on a failure
-sub ftp'cwd
+sub ftp::cwd
 {
 	local( $dir ) = @_;
 
-	&ftp'send( "CWD $dir" );
+	&ftp::send( "CWD $dir" );
 
-	return &ftp'expect( $timeout,
+	return &ftp::expect( $timeout,
 		200, "working directory = $dir", 1,
 		250, "working directory = $dir", 1,
 
@@ -327,28 +322,28 @@ sub ftp'cwd
 }
 
 # Get a full directory listing:
-# &ftp'dir( remote LIST options )
+# &ftp::dir( remote LIST options )
 # Start a list goin with the given options.
 # Presuming that the remote deamon uses the ls command to generate the
 # data to send back then then you can send it some extra options (eg: -lRa)
 # return 1 if sucessful and 0 on a failure
-sub ftp'dir_open
+sub ftp::dir_open
 {
 	local( $options ) = @_;
 	local( $ret );
 	
-	if( ! &ftp'open_data_socket() ){
+	if( ! &ftp::open_data_socket() ){
 		return 0;
 	}
 	
 	if( $options ){
-		&ftp'send( "LIST $options" );
+		&ftp::send( "LIST $options" );
 	}
 	else {
-		&ftp'send( "LIST" );
+		&ftp::send( "LIST" );
 	}
 	
-	$ret = &ftp'expect( $timeout,
+	$ret = &ftp::expect( $timeout,
 		150, "reading directory", 1,
 	
 		125, "data connection already open?", 0,
@@ -361,7 +356,7 @@ sub ftp'dir_open
 	
 		   421, "service unavailable, closing connection", 0 );
 	if( ! $ret ){
-		&ftp'close_data_socket;
+		&ftp::close_data_socket;
 		return 0;
 	}
 	
@@ -378,13 +373,13 @@ sub ftp'dir_open
 
 # Close down reading the result of a remote ls command
 # return 1 if successful and 0 on failure
-sub ftp'dir_close
+sub ftp::dir_close
 {
 	local( $ret );
 
 	# read the close
 	#
-	$ret = &ftp'expect($timeout,
+	$ret = &ftp::expect($timeout,
         	226, "", 1,     # transfer complete, closing connection
         	250, "", 1,     # action completed
 
@@ -394,7 +389,7 @@ sub ftp'dir_close
 	        421, "service unavailable, closing connection", 0);
 
 	# shut down our end of the socket
-	&ftp'close_data_socket;
+	&ftp::close_data_socket;
 
 	if( ! $ret ){
 		return 0;
@@ -405,33 +400,33 @@ sub ftp'dir_close
 
 # Quit from the remote ftp server
 # return 1 if successful and 0 on failure
-sub ftp'quit
+sub ftp::quit
 {
 	$site_command_check = 0;
 	@site_command_list = ();
 
-	&ftp'send("QUIT");
+	&ftp::send("QUIT");
 
-	return &ftp'expect($timeout, 
+	return &ftp::expect($timeout, 
 		221, "Goodbye", 1,     # transfer complete, closing connection
 	
 		500, "error quitting??", 0);
 }
 
-sub ftp'read_alarm
+sub ftp::read_alarm
 {
 	die "timeout: read";
 }
 
-sub ftp'timed_read
+sub ftp::timed_read
 {
 	alarm( $timeout_read );
 	return sysread( NS, $buf, $ftpbufsize );
 }
 
-sub ftp'read
+sub ftp::read
 {
-	$SIG{ 'ALRM' } = "ftp\'read_alarm";
+	$SIG{ 'ALRM' } = "ftp::read_alarm";
 
 	local( $ret ) = eval '&timed_read()';
 	alarm( 0 );
@@ -445,7 +440,7 @@ sub ftp'read
 # Get a remote file back into a local file.
 # If no loc_fname passed then uses rem_fname.
 # returns 1 on success and 0 on failure
-sub ftp'get
+sub ftp::get
 {
 	local($rem_fname, $loc_fname, $restart ) = @_;
 	
@@ -453,15 +448,15 @@ sub ftp'get
 		$loc_fname = $rem_fname;
 	}
 	
-	if( ! &ftp'open_data_socket() ){
+	if( ! &ftp::open_data_socket() ){
 		print STDERR "Cannot open data socket\n";
 		return 0;
 	}
 
 	if( $loc_fname ne '-' ){
 		# Find the size of the target file
-		local( $restart_at ) = &ftp'filesize( $loc_fname );
-		if( $restart && $restart_at > 0 && &ftp'restart( $restart_at ) ){
+		local( $restart_at ) = &ftp::filesize( $loc_fname );
+		if( $restart && $restart_at > 0 && &ftp::restart( $restart_at ) ){
 			$restart = 1;
 			# Make sure the file can be updated
 			chmod( 0644, $loc_fname );
@@ -472,10 +467,10 @@ sub ftp'get
 		}
 	}
 
-	&ftp'send( "RETR $rem_fname" );
+	&ftp::send( "RETR $rem_fname" );
 	
 	local( $ret ) =
-		&ftp'expect($timeout, 
+		&ftp::expect($timeout, 
                    150, "receiving $rem_fname", 1,
 
                    125, "data connection already open?", 0,
@@ -492,7 +487,7 @@ sub ftp'get
 		print STDERR "Failure on RETR command\n";
 
 		# shut down our end of the socket
-		&ftp'close_data_socket;
+		&ftp::close_data_socket;
 
 		return 0;
 	}
@@ -511,7 +506,7 @@ sub ftp'get
 		print STDERR "Cannot create local file $loc_fname\n";
 
 		# shut down our end of the socket
-		&ftp'close_data_socket;
+		&ftp::close_data_socket;
 
 		return 0;
 	}
@@ -522,22 +517,22 @@ sub ftp'get
 
 	local( $start_time ) = time;
 	local( $bytes, $lasthash, $hashes ) = (0, 0, 0);
-	while( ($len = &ftp'read()) > 0 ){
+	while( ($len = &ftp::read()) > 0 ){
 		$bytes += $len;
 		if( $strip_cr ){
-			$ftp'buf =~ s/\r//g;
+			$ftp::buf =~ s/\r//g;
 		}
 		if( $ftp_show ){
-			while( $bytes > ($lasthash + $ftp'hashevery) ){
+			while( $bytes > ($lasthash + $ftp::hashevery) ){
 				print STDERR '#';
-				$lasthash += $ftp'hashevery;
+				$lasthash += $ftp::hashevery;
 				$hashes++;
-				if( ($hashes % $ftp'hashnl) == 0 ){
+				if( ($hashes % $ftp::hashnl) == 0 ){
 					print STDERR "\n";
 				}
 			}
 		}
-		if( ! print FH $ftp'buf ){
+		if( ! print FH $ftp::buf ){
 			print STDERR "\nfailed to write data";
 			return 0;
 		}
@@ -545,7 +540,7 @@ sub ftp'get
 	close( FH );
 
 	# shut down our end of the socket
-	&ftp'close_data_socket;
+	&ftp::close_data_socket;
 
 	if( $len < 0 ){
 		print STDERR "\ntimed out reading data!\n";
@@ -554,7 +549,7 @@ sub ftp'get
 	}
 		
 	if( $ftp_show ){
-		if( $hashes && ($hashes % $ftp'hashnl) != 0 ){
+		if( $hashes && ($hashes % $ftp::hashnl) != 0 ){
 			print STDERR "\n";
 		}
 		local( $secs ) = (time - $start_time);
@@ -570,7 +565,7 @@ sub ftp'get
 	# read the close
 	#
 
-	$ret = &ftp'expect($timeout, 
+	$ret = &ftp::expect($timeout, 
 		226, "Got file", 1,     # transfer complete, closing connection
 	        250, "Got file", 1,     # action completed
 	
@@ -583,19 +578,19 @@ sub ftp'get
 	return $ret;
 }
 
-sub ftp'delete
+sub ftp::delete
 {
 	local( $rem_fname, $val ) = @_;
 
-	&ftp'send("DELE $rem_fname" );
-	$val = &ftp'expect( $timeout, 
+	&ftp::send("DELE $rem_fname" );
+	$val = &ftp::expect( $timeout, 
 			   250,"Deleted $rem_fname", 1,
 			   550,"Permission denied",0
 			   );
 	return $val == 1;
 }
 
-sub ftp'deldir
+sub ftp::deldir
 {
     local( $fname ) = @_;
 
@@ -605,7 +600,7 @@ sub ftp'deldir
 
 # UPDATE ME!!!!!!
 # Add in the hash printing and newline conversion
-sub ftp'put
+sub ftp::put
 {
 	local( $loc_fname, $rem_fname ) = @_;
 	local( $strip_cr );
@@ -614,18 +609,18 @@ sub ftp'put
 		$loc_fname = $rem_fname;
 	}
 	
-	if( ! &ftp'open_data_socket() ){
+	if( ! &ftp::open_data_socket() ){
 		return 0;
 	}
 	
-	&ftp'send("STOR $rem_fname");
+	&ftp::send("STOR $rem_fname");
 	
 	# 
 	# the data should be coming at us now
 	#
 	
 	local( $ret ) =
-	&ftp'expect($timeout, 
+	&ftp::expect($timeout, 
 		150, "sending $loc_fname", 1,
 
 		125, "data connection already open?", 0,
@@ -643,7 +638,7 @@ sub ftp'put
 
 	if( $ret != 1 ){
 		# shut down our end of the socket
-		&ftp'close_data_socket;
+		&ftp::close_data_socket;
 
 		return 0;
 	}
@@ -663,7 +658,7 @@ sub ftp'put
 		print STDERR "Cannot open local file $loc_fname\n";
 
 		# shut down our end of the socket
-		&ftp'close_data_socket;
+		&ftp::close_data_socket;
 
 		return 0;
 	}
@@ -674,13 +669,13 @@ sub ftp'put
 	close(FH);
 	
 	# shut down our end of the socket to signal EOF
-	&ftp'close_data_socket;
+	&ftp::close_data_socket;
 	
 	#
 	# read the close
 	#
 	
-	$ret = &ftp'expect($timeout, 
+	$ret = &ftp::expect($timeout, 
 		226, "file put", 1,     # transfer complete, closing connection
 		250, "file put", 1,     # action completed
 	
@@ -698,16 +693,16 @@ sub ftp'put
 	return $ret;
 }
 
-sub ftp'restart
+sub ftp::restart
 {
 	local( $restart_point, $ret ) = @_;
 
-	&ftp'send("REST $restart_point");
+	&ftp::send("REST $restart_point");
 
 	# 
 	# see what they say
 
-	$ret = &ftp'expect($timeout, 
+	$ret = &ftp::expect($timeout, 
 			   350, "restarting at $restart_point", 1,
 			   
 			   500, "syntax error", 0,
@@ -721,16 +716,16 @@ sub ftp'restart
 }
 
 # Set the file transfer type
-sub ftp'type
+sub ftp::type
 {
 	local( $type ) = @_;
 
-	&ftp'send("TYPE $type");
+	&ftp::send("TYPE $type");
 
 	# 
 	# see what they say
 
-	$ret = &ftp'expect($timeout, 
+	$ret = &ftp::expect($timeout, 
 			   200, "file type set to $type", 1,
 			   
 			   500, "syntax error", 0,
@@ -745,7 +740,7 @@ $site_command_check = 0;
 @site_command_list = ();
 
 # routine to query the remote server for 'SITE' commands supported
-sub ftp'site_commands
+sub ftp::site_commands
 {
 	local( $ret );
 	
@@ -754,11 +749,11 @@ sub ftp'site_commands
 	
 		$site_command_check = 1;
 	
-		&ftp'send( "HELP SITE" );
+		&ftp::send( "HELP SITE" );
 	
 		# assume the line in the HELP SITE response with the 'HELP'
 		# command is the one for us
-		$ret = &ftp'expect( $timeout,
+		$ret = &ftp::expect( $timeout,
 			".*HELP.*", "", "\$1",
 			214, "", "0",
 			202, "", "0" );
@@ -774,16 +769,16 @@ sub ftp'site_commands
 }
 
 # return the pwd, or null if we can't get the pwd
-sub ftp'pwd
+sub ftp::pwd
 {
 	local( $ret, $cwd );
 
-	&ftp'send( "PWD" );
+	&ftp::send( "PWD" );
 
 	# 
 	# see what they say
 
-	$ret = &ftp'expect( $timeout, 
+	$ret = &ftp::expect( $timeout, 
 			   257, "working dir is", 1,
 			   500, "syntax error", 0,
 			   501, "syntax error", 0,
@@ -792,7 +787,7 @@ sub ftp'pwd
 
 			   421, "service unavailable, closing connection", 0 );
 	if( $ret ){
-		if( $ftp'response =~ /^257\s"(.*)"\s.*$/ ){
+		if( $ftp::response =~ /^257\s"(.*)"\s.*$/ ){
 			$cwd = $1;
 		}
 	}
@@ -800,17 +795,17 @@ sub ftp'pwd
 }
 
 # return 1 for success, 0 for failure
-sub ftp'mkdir
+sub ftp::mkdir
 {
 	local( $path ) = @_;
 	local( $ret );
 
-	&ftp'send( "MKD $path" );
+	&ftp::send( "MKD $path" );
 
 	# 
 	# see what they say
 
-	$ret = &ftp'expect( $timeout, 
+	$ret = &ftp::expect( $timeout, 
 			   257, "made directory $path", 1,
 			   
 			   500, "syntax error", 0,
@@ -824,17 +819,17 @@ sub ftp'mkdir
 }
 
 # return 1 for success, 0 for failure
-sub ftp'chmod
+sub ftp::chmod
 {
 	local( $path, $mode ) = @_;
 	local( $ret );
 
-	&ftp'send( sprintf( "SITE CHMOD %o $path", $mode ) );
+	&ftp::send( sprintf( "SITE CHMOD %o $path", $mode ) );
 
 	# 
 	# see what they say
 
-	$ret = &ftp'expect( $timeout, 
+	$ret = &ftp::expect( $timeout, 
 			   200, "chmod $mode $path succeeded", 1,
 			   
 			   500, "syntax error", 0,
@@ -848,17 +843,17 @@ sub ftp'chmod
 }
 
 # rename a file
-sub ftp'rename
+sub ftp::rename
 {
 	local( $old_name, $new_name ) = @_;
 	local( $ret );
 
-	&ftp'send( "RNFR $old_name" );
+	&ftp::send( "RNFR $old_name" );
 
 	# 
 	# see what they say
 
-	$ret = &ftp'expect( $timeout, 
+	$ret = &ftp::expect( $timeout, 
 			   350, "", 1,
 			   
 			   500, "syntax error", 0,
@@ -873,12 +868,12 @@ sub ftp'rename
 
 	# check if the "rename from" occurred ok
 	if( $ret ) {
-		&ftp'send( "RNTO $new_name" );
+		&ftp::send( "RNTO $new_name" );
 	
 		# 
 		# see what they say
 	
-		$ret = &ftp'expect( $timeout, 
+		$ret = &ftp::expect( $timeout, 
 			           250, "rename $old_name to $new_name", 1, 
 
 				   500, "syntax error", 0,
@@ -896,13 +891,13 @@ sub ftp'rename
 }
 
 
-sub ftp'quote
+sub ftp::quote
 {
       local( $cmd ) = @_;
 
-      &ftp'send( $cmd );
+      &ftp::send( $cmd );
 
-      return &ftp'expect( $timeout, 
+      return &ftp::expect( $timeout, 
               200, "Remote '$cmd' OK", 1,
               500, "error in remote '$cmd'", 0 );
 }
@@ -910,32 +905,32 @@ sub ftp'quote
 # ------------------------------------------------------------------------------
 # These are the lower level support routines
 
-sub ftp'expectgot
+sub ftp::expectgot
 {
-	($ftp'response, $ftp'fatalerror) = @_;
+	($ftp::response, $ftp::fatalerror) = @_;
 	if( $ftp_show ){
-		print STDERR "$ftp'response\n";
+		print STDERR "$ftp::response\n";
 	}
 }
 
 #
-#  create the list of parameters for chat'expect
+#  create the list of parameters for chat::expect
 #
-#  ftp'expect(time_out, {value, string_to_print, return value});
+#  ftp::expect(time_out, {value, string_to_print, return value});
 #     if the string_to_print is "" then nothing is printed
-#  the last response is stored in $ftp'response
+#  the last response is stored in $ftp::response
 #
 # NOTE: lmjm has changed this code such that the string_to_print is
 # ignored and the string sent back from the remote system is printed
 # instead.
 #
-sub ftp'expect {
+sub ftp::expect {
 	local( $ret );
 	local( $time_out );
 	local( $expect_args );
 	
-	$ftp'response = '';
-	$ftp'fatalerror = 0;
+	$ftp::response = '';
+	$ftp::fatalerror = 0;
 
 	@expect_args = ();
 	
@@ -950,33 +945,33 @@ sub ftp'expect {
 		push( @expect_args, "$pre(" . $code . " .*)\\015\\n" );
 		shift( @_ );
 		push( @expect_args, 
-			"&ftp'expectgot( \$1, 0 ); " . shift( @_ ) );
+			"&ftp::expectgot( \$1, 0 ); " . shift( @_ ) );
 	}
 	
 	# Treat all unrecognised lines as continuations
 	push( @expect_args, "^(.*)\\015\\n" );
-	push( @expect_args, "&ftp'expectgot( \$1, 0 ); 100" );
+	push( @expect_args, "&ftp::expectgot( \$1, 0 ); 100" );
 	
 	# add patterns TIMEOUT and EOF
 	
 	push( @expect_args, 'TIMEOUT' );
-	push( @expect_args, "&ftp'expectgot( \"timed out\", 1 ); 0" );
+	push( @expect_args, "&ftp::expectgot( \"timed out\", 1 ); 0" );
 	
 	push( @expect_args, 'EOF' );
-	push( @expect_args, "&ftp'expectgot( \"remote server gone away\", 1 ); 0" );
+	push( @expect_args, "&ftp::expectgot( \"remote server gone away\", 1 ); 0" );
 	
 	if( $ftp_show > 9 ){
 		&printargs( $time_out, @expect_args );
 	}
 	
-	$ret = &chat'expect( $time_out, @expect_args );
+	$ret = &chat::expect( $time_out, @expect_args );
 	if( $ret == 100 ){
 		# we saw a continuation line, wait for the end
 		push( @expect_args, "^.*\n" );
 		push( @expect_args, "100" );
 	
 		while( $ret == 100 ){
-			$ret = &chat'expect( $time_out, @expect_args );
+			$ret = &chat::expect( $time_out, @expect_args );
 		}
 	}
 	
@@ -986,7 +981,7 @@ sub ftp'expect {
 #
 #  opens NS for io
 #
-sub ftp'open_data_socket
+sub ftp::open_data_socket
 {
 	local( $ret );
 	local( $hostname );
@@ -1005,10 +1000,10 @@ sub ftp'open_data_socket
 	
 #	($name, $aliases, $type, $len, $thisaddr) =
 #	gethostbyname( $hostname );
-	($a,$b,$c,$d) = unpack( 'C4', $chat'thisaddr );
+	($a,$b,$c,$d) = unpack( 'C4', $chat::thisaddr );
 	
-#	$this = pack( $sockaddr, &main'AF_INET, 0, $thisaddr );
-	$this = $chat'thisproc;
+#	$this = pack( $sockaddr, Socket::AF_INET, 0, $thisaddr );
+	$this = $chat::thisproc;
 	
 	socket(S, $pf_inet, $sock_stream, $proto ) || die "socket: $!";
 	bind(S, $this) || die "bind: $!";
@@ -1026,9 +1021,9 @@ sub ftp'open_data_socket
 	#
 	listen( S, 5 ) || die "listen";
 	
-	&ftp'send( "PORT $a,$b,$c,$d,$hi,$lo" );
+	&ftp::send( "PORT $a,$b,$c,$d,$hi,$lo" );
 	
-	return &ftp'expect($timeout,
+	return &ftp::expect($timeout,
 		200, "PORT command successful", 1,
 		250, "PORT command successful", 1 ,
 
@@ -1039,12 +1034,12 @@ sub ftp'open_data_socket
 		421, "service unavailable, closing connection", 0);
 }
 	
-sub ftp'close_data_socket
+sub ftp::close_data_socket
 {
 	close(NS);
 }
 
-sub ftp'send
+sub ftp::send
 {
 	local($send_cmd) = @_;
 	if( $send_cmd =~ /\n/ ){
@@ -1060,17 +1055,17 @@ sub ftp'send
 		print STDERR "---> $sc\n";
 	}
 	
-	&chat'print( "$send_cmd\r\n" );
+	&chat::print( "$send_cmd\r\n" );
 }
 
-sub ftp'printargs
+sub ftp::printargs
 {
 	while( @_ ){
 		print STDERR shift( @_ ) . "\n";
 	}
 }
 
-sub ftp'filesize
+sub ftp::filesize
 {
 	local( $fname ) = @_;
 

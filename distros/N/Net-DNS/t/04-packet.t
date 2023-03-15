@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 04-packet.t 1891 2022-12-28 13:09:27Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -227,7 +227,7 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 }
 
 
-eval {					## exercise dump and debug diagnostics
+eval {					## no critic		# exercise dump and debug diagnostics
 	require IO::File;
 	require Data::Dumper;
 	local $Data::Dumper::Maxdepth;

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_sort_rows/csv_sort_rows",
@@ -41,7 +41,7 @@ csv-sort - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 1.021 of csv-sort (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of csv-sort (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,10 @@ descending length of name):
  Jerry,30
  Andy,20
  Ben,30
+
+If none of the C<--by-*> options are specified, the utility will bail unless
+there's a default that can be used, e.g. when CSV has a single field then that
+field will be used.
 
 =head1 OPTIONS
 

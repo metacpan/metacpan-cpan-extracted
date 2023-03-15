@@ -19,7 +19,7 @@ name: Complete-Util
 provides:
   Complete::Util:
     file: lib/Complete/Util.pm
-    version: '0.614'
+    version: '0.617'
 recommends:
   Text::Levenshtein::Flexible: '0'
 requires:
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Util
   homepage: https://metacpan.org/release/Complete-Util
   repository: git://github.com/perlancar/perl-Complete-Util.git
-version: '0.614'
+version: '0.617'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

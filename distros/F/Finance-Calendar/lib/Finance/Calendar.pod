@@ -255,6 +255,14 @@ The possible values for C<$which> include:
 
 Returns either C<undef>, a single L<Date::Utility>, or an arrayref of L<Date::Utility> instances.
 
+=head2 next_open_at
+
+->next_open_at($exchange_object, Date::Utility->new('2023-02-16 15:30:00'));
+
+Returns Date::Utility object of the next opening date and time.
+
+Returns undef if exchange is open for the requested date.
+
 =head1 INHERITED METHODS
 
 =over 4

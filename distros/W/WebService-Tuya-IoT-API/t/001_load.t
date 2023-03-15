@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 BEGIN { use_ok('WebService::Tuya::IoT::API') };
 
 {
@@ -9,7 +9,6 @@ BEGIN { use_ok('WebService::Tuya::IoT::API') };
   isa_ok($ws, 'WebService::Tuya::IoT::API');
   can_ok($ws, 'new');
   can_ok($ws, 'http_hostname');
-  can_ok($ws, 'api_version');
   can_ok($ws, 'api');
   can_ok($ws, 'client_id');
   can_ok($ws, 'client_secret');

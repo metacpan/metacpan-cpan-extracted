@@ -8,28 +8,25 @@ Affix - A Foreign Function Interface eXtension
 ```perl
 use Affix;
 
+# bind to exported function
 affix( 'libfoo', 'bar', [Str, Float] => Double );
 print bar( 'Baz', 3.14 );
 
-# or
-
-my $bar = wrap( 'libfoo', 'bar', [Str, Float] => Double );
-print $bar->( 'Baz', 3.14 );
-
-# or
-
+# bind to exported function but with sugar
 sub bar : Native('libfoo') : Signature([Str, Float] => Double);
 print bar( 'Baz', 10.9 );
 
-# bind to exported values
+# wrap an exported function in a code reference
+my $bar = wrap( 'libfoo', 'bar', [Str, Float] => Double );
+print $bar->( 'Baz', 3.14 );
+
+# bind an exported value to a Perl value
+pin( my $ver, 'libfoo', 'VERSION', Int );
 ```
 
 # DESCRIPTION
 
-Affix is a wrapper around [dyncall](https://dyncall.org/). If you're looking to
-design your own low level FFI, see [Dyn.pm](https://metacpan.org/pod/Dyn).
-
-But if you're just looking for a fast FFI system, keep reading.
+Affix is a wrapper around [dyncall](https://dyncall.org/).
 
 Note: This is experimental software and is subject to change as long as this
 disclaimer is here.
@@ -43,6 +40,9 @@ The basic API here is rather simple but not lacking in power.
 ```perl
 affix( 'C:\Windows\System32\user32.dll', 'pow', [Double, Double] => Double );
 warn pow( 3, 5 );
+
+affix( 'foo', ['foo', 'foobar'] => [ Str ] );
+foobar( 'Hello' );
 ```
 
 Attaches a given symbol in a named perl sub.
@@ -58,17 +58,18 @@ Parameters include:
 
     the name of the symbol to call
 
+    Optionally, you may provide an array reference with the symbol's name and the
+    name of the subroutine
+
 - `$parameters`
 
     signature defining argument types in an array
 
 - `$return`
 
-    return type
+    optional return type
 
-- `$name`
-
-    optional name of affixed sub; `$symbol_name` by default
+    default is `Void`
 
 Returns a code reference on success.
 
@@ -449,33 +450,34 @@ code and might not be public in the future.
 
 # Types
 
-While Raku offers a set of native types with a fixed, and known, representation
-in memory but this is Perl so we need to do the work ourselves and design and
-build a pseudo-type system. Affix supports the fundamental types (void, int,
-etc.) and aggregates (struct, array, union).
+Raku offers a set of native types with a fixed, and known, representation in
+memory but this is Perl so we need to do the work ourselves with a pseudo-type
+system. Affix supports the fundamental types (void, int, etc.), aggregates
+(struct, array, union), and .
 
 ## Fundamental Types with Native Representation
 
 ```
-Affix       C99/C++     Rust    C#          pack()  Raku
------------------------------------------------------------------------
-Void        void/NULL   ->()    void/NULL   -
-Bool        _Bool       bool    bool        -       bool
-Char        int8_t      i8      sbyte       c       int8
-UChar       uint8_t     u8      byte        C       byte, uint8
-Short       int16_t     i16     short       s       int16
-UShort      uint16_t    u16     ushort      S       uint16
-Int         int32_t     i32     int         i       int32
-UInt        uint32_t    u32     uint        I       uint32
-Long        int64_t     i64     long        l       int64, long
-ULong       uint64_t    u64     ulong       L       uint64, ulong
-LongLong    -           i128                q       longlong
-ULongLong   -           u128                Q       ulonglong
-Float       float       f32                 f       num32
-Double      double      f64                 d       num64
-SSize_t     SSize_t                                 SSize_t
-Size_t      size_t                                  size_t
+Affix       C99                   Rust    C#          pack()  Raku
+----------------------------------------------------------------------------
+Void        void                  ->()    void/NULL   -
+Bool        _Bool                 bool    bool        -       bool
+Char        int8_t                i8      sbyte       c       int8
+UChar       uint8_t               u8      byte        C       byte, uint8
+Short       int16_t               i16     short       s       int16
+UShort      uint16_t              u16     ushort      S       uint16
+Int         int32_t               i32     int         i       int32
+UInt        uint32_t              u32     uint        I       uint32
+Long        int64_t               i64     long        l       int64, long
+ULong       uint64_t              u64     ulong       L       uint64, ulong
+LongLong    -/long long           i128                q       longlong
+ULongLong   -/unsigned long long  u128                Q       ulonglong
+Float       float                 f32                 f       num32
+Double      double                f64                 d       num64
+SSize_t     SSize_t                                           SSize_t
+Size_t      size_t                                            size_t
 Str         char *
+WStr        wchar_t
 ```
 
 Given sizes are minimums measured in bits
@@ -579,6 +581,11 @@ trying using `Pointer[Char]` and doing it yourself.
 
 You'll learn a bit more about `Pointer[...]` and other parameterized types in
 the next section.
+
+## `WStr`
+
+A null-terminated wide string is a sequence of valid wide characters, ending
+with a null character.
 
 # Parameterized Types
 
@@ -860,7 +867,7 @@ are exposed under the `Affix::Feature` package:
 
 # See Also
 
-Check out [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus) for a more robust and mature FFI.
+Check out [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus) for a more robust and mature FFI
 
 Examples found in `eg/`.
 

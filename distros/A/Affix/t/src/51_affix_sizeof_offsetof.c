@@ -28,15 +28,27 @@ DLLEXPORT size_t s_ssize_t() {
     return sizeof(ssize_t);
 }
 DLLEXPORT size_t s_size_t() {
-    warn("# sizeof(size_t) == %zu", sizeof(size_t));
-    warn("# sizeof(unsigned long) == %zu", sizeof(unsigned long));
-    warn("# sizeof(unsigned long long) == %zu", sizeof(unsigned long long));
-    warn("# sizeof(unsigned int) == %zu", sizeof(unsigned int));
-
-    /*warn("# Size_t_size == %zu", Size_t_size);
-    warn("# INTSIZE == %zu", INTSIZE);
-    warn("# LONGSIZE == %zu", LONGSIZE);*/
+    //~ warn("# sizeof(size_t) == %zu", sizeof(size_t));
+    //~ warn("# sizeof(unsigned long) == %zu", sizeof(unsigned long));
+    //~ warn("# sizeof(unsigned long long) == %zu", sizeof(unsigned long long));
+    //~ warn("# sizeof(unsigned int) == %zu", sizeof(unsigned int));
+    /*
+        warn("# Size_t_size == %zu", Size_t_size);
+        warn("# INTSIZE == %zu", INTSIZE);
+        warn("# LONGSIZE == %zu", LONGSIZE);*/
     return sizeof(size_t);
+}
+
+DLLEXPORT size_t s_pointer() {
+    return sizeof(void *);
+}
+
+DLLEXPORT size_t s_pointer_array() {
+    return sizeof(void *[1]);
+}
+
+DLLEXPORT size_t s_string_array() {
+    return sizeof(char *[3]);
 }
 
 //
@@ -93,9 +105,9 @@ DLLEXPORT size_t s_struct5() {
     return sizeof(struct5);
 }
 DLLEXPORT size_t s_struct6() {
-    warn("offsetof(struct6, s) == %zu", offsetof(struct6, s));
-    warn("offsetof(struct6, c) == %zu", offsetof(struct6, c));
-    warn("sizeof(struct4) == %zu", sizeof(struct4));
+    //~ warn("offsetof(struct6, s) == %zu", offsetof(struct6, s));
+    //~ warn("offsetof(struct6, c) == %zu", offsetof(struct6, c));
+    //~ warn("sizeof(struct4) == %zu", sizeof(struct4));
     return sizeof(struct6);
 }
 

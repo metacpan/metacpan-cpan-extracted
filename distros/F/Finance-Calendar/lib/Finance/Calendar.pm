@@ -59,7 +59,7 @@ This class is responsible for providing trading times or holidays related inform
 
 use Moose;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use List::Util qw(min max first);
 use Date::Utility;
@@ -763,6 +763,43 @@ sub _days_between {
 }
 
 Memoize::memoize('_days_between', NORMALIZER => '_normalize_on_just_dates');
+
+=head2 next_open_at
+
+->next_open_at($exchange_object, Date::Utility->new('2023-02-16 15:30:00'));
+
+Returns Date::Utility object of the next opening date and time.
+
+Returns undef if exchange is open for the requested date.
+
+=cut
+
+sub next_open_at {
+    my ($self, $exchange, $date) = @_;
+
+    return undef if $self->is_open_at($exchange, $date);
+
+    my $market_opens = $self->_market_opens($exchange, $date);
+    # exchange is closed for the trading day
+    unless (defined $market_opens->{open}) {
+        my $next_trading = $self->trade_date_after($exchange, $date);
+        return $self->opening_on($exchange, $next_trading);
+    }
+
+    # exchange is closed for trading breaks, will open again
+    unless ($market_opens->{open}) {
+        my $trading_breaks = $self->trading_breaks($exchange, $date);
+        foreach my $break ($trading_breaks->@*) {
+            my ($close, $open) = $break->@*;
+            if ($date->is_after($close) and $date->is_before($open)) {
+                return $open;
+            }
+        }
+    }
+
+    # we shouldn't reach here but, return undef instead of a wrong time here.
+    return undef;
+}
 
 ## PRIVATE _market_opens
 #

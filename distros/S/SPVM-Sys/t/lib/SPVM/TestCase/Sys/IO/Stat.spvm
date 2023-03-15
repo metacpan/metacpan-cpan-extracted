@@ -3,6 +3,7 @@ class TestCase::Sys::IO::Stat {
   use Sys::IO::Stat;
   use Sys;
   use Sys::IO;
+  use Sys::OS;
 
   static method stat : int ($test_dir : string) {
     
@@ -55,7 +56,7 @@ class TestCase::Sys::IO::Stat {
     
     warn("[Test Output]stat:" . $stat->st_atime . " " . $stat->st_mtime . " " . $stat->st_ctime);
     
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       $stat_info->[11] = (long)$stat->st_blksize;
       $stat_info->[12] = (long)$stat->st_blocks;
     }
@@ -113,7 +114,7 @@ class TestCase::Sys::IO::Stat {
       0,
     ];
 
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       $stat_info->[11] = (long)$stat->st_blksize;
       $stat_info->[12] = (long)$stat->st_blocks;
     }
@@ -160,7 +161,13 @@ class TestCase::Sys::IO::Stat {
       0,
       0,
     ];
+    
+    warn "CCC";
+    
+    Sys->defined("_WIN32");
 
+    warn "DDD";
+    
     unless (Sys->defined("_WIN32")) {
       $stat_info->[11] = (long)$stat->st_blksize;
       $stat_info->[12] = (long)$stat->st_blocks;

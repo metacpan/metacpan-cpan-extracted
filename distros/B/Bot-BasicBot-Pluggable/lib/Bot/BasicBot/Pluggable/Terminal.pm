@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Terminal;
-$Bot::BasicBot::Pluggable::Terminal::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Terminal::VERSION = '1.30';
 use warnings;
 use strict;
 use base qw(Test::Bot::BasicBot::Pluggable);
@@ -32,7 +32,7 @@ bot-basicbot-pluggable.pl - A standard Bot::BasicBot::Pluggable script
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 DESCRIPTION
 

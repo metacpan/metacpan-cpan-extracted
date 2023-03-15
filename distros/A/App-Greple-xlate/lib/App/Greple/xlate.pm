@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.12";
+our $VERSION = "0.17";
 
 =encoding utf-8
 
@@ -11,6 +11,10 @@ App::Greple::xlate - translation support module for greple
 =head1 SYNOPSIS
 
     greple -Mxlate::deepl --xlate pattern target-file
+
+=head1 VERSION
+
+Version 0.17
 
 =head1 DESCRIPTION
 
@@ -92,7 +96,7 @@ After preparing text to be translated, they are copied to the
 clipboard.  You are expected to paste them to the form, copy the
 result to the clipboard, and hit return.
 
-=item B<--xlate-to> (Default: C<JA>)
+=item B<--xlate-to> (Default: C<EN-US>)
 
 Specify the target language.  You can get available languages by
 C<deepl languages> command when using B<DeepL> engine.
@@ -283,7 +287,7 @@ our %opt = (
     format   => \(our $output_format = 'conflict'),
     collapse => \(our $collapse_spaces = 1),
     from     => \(our $lang_from = 'ORIGINAL'),
-    to       => \(our $lang_to = 'JA'),
+    to       => \(our $lang_to = 'EN-US'),
     fold     => \(our $fold_line = 0),
     width    => \(our $fold_width = 70),
     auth_key => \(our $auth_key),
@@ -387,6 +391,8 @@ sub postgrep {
 }
 
 sub cache_update {
+    binmode STDERR, ':encoding(utf8)';
+
     my @from = @_;
     print STDERR "From:\n", map s/^/\t< /mgr, @from if $show_progress;
     return @from if $dryrun;

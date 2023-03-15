@@ -52,67 +52,67 @@
    "provides" : {
       "App::VTide" : {
          "file" : "lib/App/VTide.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command" : {
          "file" : "lib/App/VTide/Command.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Conf" : {
          "file" : "lib/App/VTide/Command/Conf.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Edit" : {
          "file" : "lib/App/VTide/Command/Edit.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Grep" : {
          "file" : "lib/App/VTide/Command/Grep.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Help" : {
          "file" : "lib/App/VTide/Command/Help.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Init" : {
          "file" : "lib/App/VTide/Command/Init.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Recent" : {
          "file" : "lib/App/VTide/Command/Recent.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Refresh" : {
          "file" : "lib/App/VTide/Command/Refresh.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Run" : {
          "file" : "lib/App/VTide/Command/Run.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Save" : {
          "file" : "lib/App/VTide/Command/Save.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Split" : {
          "file" : "lib/App/VTide/Command/Split.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Start" : {
          "file" : "lib/App/VTide/Command/Start.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Command::Who" : {
          "file" : "lib/App/VTide/Command/Who.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Config" : {
          "file" : "lib/App/VTide/Config.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       },
       "App::VTide::Hooks" : {
          "file" : "lib/App/VTide/Hooks.pm",
-         "version" : "v0.1.20"
+         "version" : "v0.1.21"
       }
    },
    "release_status" : "stable",
@@ -127,6 +127,6 @@
          "url" : "git://github.com/ivanwills/App-VTide.git"
       }
    },
-   "version" : "v0.1.20",
+   "version" : "v0.1.21",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

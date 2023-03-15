@@ -28,12 +28,12 @@ sub newdevice {
 sub connect_devices {
     my ( $in, $out ) = @_;
     my $port_name = "rtmidi-ffi-port-out-$time";
-    $out->open_virtual_port( $port_name );
-    $in->open_port_by_name( qr/$port_name/ );
+    $in->open_virtual_port( $port_name );
+    $out->open_port_by_name( qr/$port_name/ );
 }
 
 # TAP readability
-sub msg2hex { join '', map { sprintf "%02x", ord $_ } split '', $_[0]; }
+sub msg2hex { unpack( 'H*', $_[0] ) }
 sub msgs2hex { [ map { msg2hex( $_ ) } @_ ] }
 
 sub drain_msgs {
@@ -65,7 +65,6 @@ sub sanity_check {
         return 0 unless -w '/dev/snd/seq';
     }
     if ( $api == RTMIDI_API_UNIX_JACK ) {
-        no warnings qw/ uninitialized /;
         return 0 unless proc_exists( name => 'jackd' );
     }
     1;

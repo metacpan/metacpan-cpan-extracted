@@ -1,0 +1,127 @@
+--- a/lib/Bot/BasicBot/Pluggable.pm
++++ b/lib/Bot/BasicBot/Pluggable.pm
+@@ -460,7 +460,7 @@
+ 
+ Bot::BasicBot::Pluggable started as Yet Another Infobot replacement, but now
+ is a generalised framework for writing infobot-type bots that lets you keep
+-each specific function seperate. You can have seperate modules for factoid
++each specific function separate. You can have separate modules for factoid
+ tracking, 'seen' status, karma, googling, etc. Included default modules are
+ below. Use C<perldoc Bot::BasicBot::Pluggable::Module::<module name>> for help
+ on their individual terminology.
+@@ -503,7 +503,7 @@
+ 
+ Reload the module C<$module> - equivalent to unloading it (if it's already
+ loaded) and reloading it. Will stomp the old module's namespace - warnings
+-are expected here. Not toally clean - if you're experiencing odd bugs, restart
++are expected here. Not totally clean - if you're experiencing odd bugs, restart
+ the bot if possible. Works for minor bug fixes, etc.
+ 
+ =item unload($module)
+@@ -552,7 +552,7 @@
+ 
+ Returns the bot configuration file for logging. Please refer to
+ L<Log::Log4perl::Config> for the configurations files format. Setting
+-this to a differant file after calling init() has no effect.
++this to a different file after calling init() has no effect.
+ 
+ Returns or set 
+ 
+--- a/lib/Bot/BasicBot/Pluggable/Module.pm
++++ b/lib/Bot/BasicBot/Pluggable/Module.pm
+@@ -318,7 +318,7 @@
+     return;
+   }
+ 
+-The preferred way, however, is to override one of the seperate C<seen()>, C<admin()>,
++The preferred way, however, is to override one of the separate C<seen()>, C<admin()>,
+ C<told()> and C<fallback()> methods, corresponding to priorities 0, 1, 2 and 3
+ in order - this will lead to nicer code. This approach is new, though, which
+ is why it's not yet used in most of the shipped modules yet. It will eventually
+@@ -362,7 +362,7 @@
+ 
+ =item authed($who)
+ 
+-This is a convinient method that trys to check for the users
++This is a convenient method that tries to check for the users
+ authentication level via Auth.pm. It is exactly equivalent to
+ 
+     $self->bot->module('Auth')
+--- a/lib/Bot/BasicBot/Pluggable/Module/Auth.pm
++++ b/lib/Bot/BasicBot/Pluggable/Module/Auth.pm
+@@ -221,10 +221,10 @@
+ 
+ If this variable is true, the implicit authentication handling is
+ disabled. Every module will have to check for authentication via the
+-authed method, otherwise access is just granted. This is only usefull
++authed method, otherwise access is just granted. This is only useful
+ to allow modules to handle directives starting with an exclamation
+ mark without needing any authentication. And to make things even more
+-interesting, you won't be warned that you have't authenticated, so modules
++interesting, you won't be warned that you haven't authenticated, so modules
+ needing authentication will fail without any warning. It defaults to
+ false and should probably never be changed. You've been warned.
+ 
+--- a/lib/Test/Bot/BasicBot/Pluggable.pm
++++ b/lib/Test/Bot/BasicBot/Pluggable.pm
+@@ -126,7 +126,7 @@
+ 
+ =head2 DESTROY
+ 
+-The special subrouting is explicitly overriden with an empty
++The special subroutine is explicitly overridden with an empty
+ subroutine as otherwise AUTOLOAD in Bot::BasicBot will be called
+ for it.
+ 
+--- a/bin/bot-basicbot-pluggable
++++ b/bin/bot-basicbot-pluggable
+@@ -46,7 +46,7 @@
+ =item --logconfig FILE
+ 
+ The logging configuration will be read from the specified file.
+-Please refer to L<Log::Log4perl::Config> for its format. The paramter
++Please refer to L<Log::Log4perl::Config> for its format. The parameter
+ loglevel will be ignored if this options is supplied.
+ 
+ =item --loglevel LEVEL
+@@ -61,7 +61,7 @@
+ 
+ =item --channel CHANNELNAME
+ 
+-Channel to connect to. This paramter may be provided several times.
++Channel to connect to. This parameter may be provided several times.
+ You do not have to prefix the channel name with a hash symbol, which
+ would have to be escaped in shell. It's automatically added for
+ you.
+@@ -74,7 +74,7 @@
+ 
+ =item --module
+ 
+-Modules to load. This paramter may be profided several times. You
++Modules to load. This parameter may be provided several times. You
+ can call --list-modules to get a list of all available modules. If
+ you do not define any module via this option, I<Auth> and I<Loader>
+ are loaded by default.
+@@ -97,7 +97,7 @@
+ 
+ This options take a string in the form I<key>=I<value> and can be
+ specified multiple times. The value of the key I<type> define which
+-storage backend to load, all other paramters are passed the the
++storage backend to load, all other parameters are passed to the
+ object constructor as hash reference. 
+ 
+ For example:
+@@ -131,11 +131,11 @@
+ =head1 CONFIGFILE
+ 
+ The bot read a configfile either found by L<Config::Find> (usually
+-named ~/.bot-basicbot-pluggable.yaml) or specified on the comamnd
+-line via I<--configfile> on startup. The file should be a synatctical
++named ~/.bot-basicbot-pluggable.yaml) or specified on the command
++line via I<--configfile> on startup. The file should be a syntactical
+ correct yaml file with a hash as its first level element. It
+ understands every option listed above and the special settings
+-paramter, which is a hash, where the keys are module names and the
++parameter, which is a hash, where the keys are module names and the
+ value is a hash of configurable module settings. Easier to show
+ than to explain:

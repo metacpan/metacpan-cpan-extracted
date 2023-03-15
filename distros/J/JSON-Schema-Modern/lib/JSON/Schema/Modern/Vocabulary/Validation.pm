@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.564';
+our $VERSION = '0.565';
 
 use 5.020;
 use Moo;
@@ -182,7 +182,7 @@ sub _traverse_keyword_pattern ($self, $schema, $state) {
 sub _eval_keyword_pattern ($self, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
 
-  return 1 if $data =~ m/$schema->{pattern}/;
+  return 1 if $data =~ m/(?:$schema->{pattern})/;
   return E($state, 'pattern does not match');
 }
 
@@ -335,7 +335,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.564
+version 0.565
 
 =head1 DESCRIPTION
 

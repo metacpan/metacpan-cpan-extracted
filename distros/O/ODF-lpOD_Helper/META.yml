@@ -1,0 +1,40 @@
+---
+abstract: 'ease-of-use wrapper for ODF::lpOD'
+author:
+  - 'Jim Avera'
+build_requires:
+  Encode: '0'
+  FindBin: '0'
+  Import::Into: '0'
+  Test::More: '0.98'
+  autovivification: '0'
+  bytes: '0'
+  indirect: '0'
+  lib: '0'
+  multidimensional: '0'
+  open: '0'
+  perl: v5.16.0
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ODF-lpOD_Helper
+requires:
+  Carp: '0'
+  Data::Dumper::Interp: '0'
+  Exporter: '0'
+  ODF::lpOD: '0'
+  constant: '0'
+  feature: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+version: '2.000'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: CC0-1.0

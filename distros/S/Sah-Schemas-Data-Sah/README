@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Data::Sah - Sah schemas related to Data::Sah
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::Data::Sah (from
-    Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-17.
+    This document describes version 0.003 of Sah::Schemas::Data::Sah (from
+    Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-19.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:

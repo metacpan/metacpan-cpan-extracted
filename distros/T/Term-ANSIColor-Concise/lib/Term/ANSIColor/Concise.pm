@@ -1,6 +1,6 @@
 package Term::ANSIColor::Concise;
 
-our $VERSION = "2.01";
+our $VERSION = "2.0201";
 
 use v5.14;
 use warnings;
@@ -24,7 +24,7 @@ use List::Util qw(min max first);
 
 our $NO_NO_COLOR //= $ENV{ANSICOLOR_NO_NO_COLOR};
 our $NO_COLOR    //= !$NO_NO_COLOR && defined $ENV{NO_COLOR};
-our $RGB24       //= $ENV{COLORTERM}//'' eq 'truecolor' || $ENV{ANSICOLOR_RGB24};
+our $RGB24       //= $ENV{ANSICOLOR_RGB24} // ($ENV{COLORTERM}//'' eq 'truecolor');
 our $LINEAR_256  //= $ENV{ANSICOLOR_LINEAR_256};
 our $LINEAR_GRAY //= $ENV{ANSICOLOR_LINEAR_GRAY};
 our $NO_RESET_EL //= $ENV{ANSICOLOR_NO_RESET_EL};
@@ -362,9 +362,9 @@ sub apply_color {
 	my($s, $e, $el) = @{ $cache->{$color} //= [ ansi_pair($color) ] };
 	state $reset = qr{ \e\[[0;]*m (?: \e\[[0;]*[Km] )* }x;
 	if ($el) {
-	    $text =~ s/(^|$reset)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
+	    $text =~ s/(\A|(?<=[\r\n])|$reset)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
 	} else {
-	    $text =~ s/(^|$reset)([^\e\r\n]+)/${1}${s}${2}${e}/mg;
+	    $text =~ s/(\A|(?<=[\r\n])|$reset)([^\e\r\n]+)/${1}${s}${2}${e}/mg;
 	}
 	return $text;
     }
@@ -394,14 +394,14 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/Term-ANSIColor-Concise/main/images/synopsis.png">
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/synopsis.png">
 
 =end html
 
 
 =head1 VERSION
 
-Version 2.01
+Version 2.0201
 
 
 =head1 DESCRIPTION
@@ -422,8 +422,8 @@ and gray scales in 24 steps.
 Color described by 12bit/24bit RGB values are converted to 6x6x6 216
 colors, or 24 gray scales if all RGB values are same.
 
-For a terminal which can display 24bit colors, full-color sequence is
-produce.  See L</ENVIRONMENT> section.
+For a terminal which can display 24bit colors, full-color sequence can
+be produced.  See L</ENVIRONMENT> section.
 
 
 =head1 FUNCTION
@@ -624,11 +624,14 @@ C<{NAME}>.
 
 These names can be followed by optional numerical parameters, using
 comma (C<,>) or semicolon (C<;>) to separate multiple ones, with
-optional braces.  For example, color spec C<DK/544> can be described
-as C<{SGR1;30;48;5;224}> or more readable C<{SGR(1,30,48,5,224)}>.
+optional parentheses.  For example, color spec C<DK/544> can be
+described as C<{SGR1;30;48;5;224}> or more readable
+C<{SGR(1,30,48,5,224)}>.
 
 Some other escape sequences are supported in the form of C<{NAME}>.
 These sequences do not start with CSI, and do not take parameters.
+VT100 compatible terminal usually support these, and does not support
+C<SCP> and C<RCP> CSI code.
 
     RIS     Reset to Initial State
     DECSC   DEC Save Cursor
@@ -793,13 +796,13 @@ L<Term::ANSIColor::Concise::Table>.  Next command will show table of
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/Term-ANSIColor-Concise/main/images/colortable-s.png">
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/colortable-s.png">
 
 =end html
 
 =begin html
 
-<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/Term-ANSIColor-Concise/main/images/colortable-rev-s.png">
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/colortable-rev-s.png">
 
 =end html
 
@@ -869,7 +872,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2022 Kazumasa Utashiro
+Copyright 2015-2023 Kazumasa Utashiro
 
 
 =head1 LICENSE

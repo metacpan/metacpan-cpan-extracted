@@ -2,7 +2,7 @@ NAME
     WWW::PiHole - Perl interface to Pi-hole
 
 VERSION
-    version 0.230680
+    version 0.230690
 
 METHODS
   version([$mode])

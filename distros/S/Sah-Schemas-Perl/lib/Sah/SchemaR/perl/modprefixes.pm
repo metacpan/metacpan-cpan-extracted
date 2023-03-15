@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::modprefixes;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2023-01-14'; # DATE
-our $VERSION = '0.047'; # VERSION
+our $DATE = '2023-01-19'; # DATE
+our $VERSION = '0.048'; # VERSION
 
 our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nArray of Perl module prefixes, where each element is of `perl::modprefix`\nschema, e.g. `Foo::`, `Foo::Bar::`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::C*\n\nand it will be expanded to e.g.:\n\n    [\"Module::CPANTS::\", \"Module::CPANfile::\", \"Module::CheckVersion::\", \"Module::CoreList::\"]\n\nThe wildcard syntax supports jokers (`?`, '*`) and brackets (`[abc]`). See the\n`unix` type of wildcard in <pm:Regexp::Wildcards>, which this coercion rule\nuses.\n\n",of=>["perl::modprefix",{req=>1},{}],summary=>"Perl module prefixes, e.g. [\"\", \"Foo::\", \"Foo::Bar::\"]","x.element_completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modprefix_wildcard"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::modprefixes - Perl module prefixes, e.g. ["", "Foo::", "Foo:
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 DESCRIPTION
 

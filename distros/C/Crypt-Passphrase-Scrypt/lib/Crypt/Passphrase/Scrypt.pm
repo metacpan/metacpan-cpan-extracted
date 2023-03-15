@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Scrypt;
-$Crypt::Passphrase::Scrypt::VERSION = '0.002';
+$Crypt::Passphrase::Scrypt::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ Crypt::Passphrase::Scrypt - A scrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

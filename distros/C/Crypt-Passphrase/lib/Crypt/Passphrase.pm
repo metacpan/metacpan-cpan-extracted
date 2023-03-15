@@ -1,5 +1,5 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.009';
+$Crypt::Passphrase::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -7,6 +7,34 @@ use Carp ();
 use Scalar::Util ();
 use Encode ();
 use Unicode::Normalize ();
+
+our @CARP_NOT;
+sub import {
+	my ($class, @args) = @_;
+	for my $arg (@args) {
+		my $caller = caller;
+		if ($arg eq '-encoder') {
+			require Crypt::Passphrase::Encoder;
+			no strict 'refs';
+			no warnings 'once';
+			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Encoder';
+			push @{"$caller\::CARP_NOT"}, __PACKAGE__;
+		}
+		elsif ($arg eq '-validator') {
+			require Crypt::Passphrase::Validator;
+			no strict 'refs';
+			no warnings 'once';
+			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Validator';
+			push @{"$caller\::CARP_NOT"}, __PACKAGE__;
+		}
+		elsif ($arg eq '-integration') {
+			push @CARP_NOT, $caller;
+		}
+		else {
+			Carp::croak("Unknown import argument $arg");
+		}
+	}
+}
 
 sub _load_extension {
 	my $name = shift;
@@ -74,7 +102,7 @@ sub new {
 
 sub _normalize_password {
 	my ($self, $password) = @_;
-	my $normalized = Unicode::Normalize::normalize($self->{normalization}, $password);
+	my $normalized = Unicode::Normalize::normalize($self->{normalization}, $password // '');
 	return Encode::encode('utf-8-strict', $normalized);
 }
 
@@ -131,7 +159,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -217,10 +245,6 @@ Calling this only ever makes sense after a password has been verified.
 
 This creates a C<Crypt::Passphrase::PassphraseHash> object for the hash, effectively currying C<Crypt::Passphrase> with that hash. This can be useful for plugging C<Crypt::Passphrase> into some frameworks (e.g. ORMs) that require a singular object to contain everything you need to match passwords against.
 
-=head2 curry_with_password($password)
-
-This method is like C<curry_with_hash>, but takes a password and hashes that first.
-
 =head1 TIPS AND TRICKS
 
 =head2 Custom configurations
@@ -249,11 +273,15 @@ The following encoders are currently available on CPAN:
 
 =item * L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2>
 
-This is a state-of-the-art memory-hard password hashing algorithm, recommended for higher-end parameters.
+This is a state-of-the-art memory-hard password hashing algorithm, recommended for higher-end parameters. Winner of the Password Hash Competition of 2015.
 
 =item * L<Crypt::Passphrase::Bcrypt|Crypt::Passphrase::Bcrypt>
 
 And older but still safe password hashing algorithm, recommended for lower-end parameters or if you need to be compatible with BSD system passwords.
+
+=item * L<Crypt::Passphrase::Yescrypt|Crypt::Passphrase::Yescrypt>
+
+Another state-of-the-art memory-hard password hashing algorithm. Finalist of the Password Hash Competition of 2015 and used in some recent Linux distributions for user passwords.
 
 =item * L<Crypt::Passphrase::PBKDF2|Crypt::Passphrase::PBKDF2>
 
@@ -261,7 +289,7 @@ A FIPS-standardized hashing algorithm. Only recommended when FIPS-compliance is 
 
 =item * L<Crypt::Passphrase::Linux|Crypt::Passphrase::Linux>
 
-An implementation of SHA-512, SHA256 and MD5 based C<crypt()>. Recommended if you need to be compatible with Linux system passwords.
+An implementation of SHA-512, SHA256 and MD5 based C<crypt()>. Recommended if you need to be compatible with standard Linux system passwords.
 
 =item * L<Crypt::Passphrase::Scrypt|Crypt::Passphrase::Scrypt>
 
@@ -280,6 +308,8 @@ A number of integrations of Crypt::Passphrase exist:
 =item * L<Dancer2::Plugin::CryptPassphrase|Dancer2::Plugin::CryptPassphrase>
 
 =back
+
+=for Pod::Coverage curry_with_password
 
 =head1 AUTHOR
 

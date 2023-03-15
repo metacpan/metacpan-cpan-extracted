@@ -8,7 +8,7 @@ use constant default_encoding => ':raw';
 use Carp ();
 
 # ABSTRACT: Class to track object file in FFI::Build
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 
 sub default_suffix
@@ -40,7 +40,7 @@ FFI::Build::File::Object - Class to track object file in FFI::Build
 
 =head1 VERSION
 
-version 2.05
+version 2.07
 
 =head1 SYNOPSIS
 

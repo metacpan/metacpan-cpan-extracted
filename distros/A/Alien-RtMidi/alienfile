@@ -1,17 +1,20 @@
 use alienfile;
 
-my $RTMIDI_VERSION = '4.0.0';
+my $RTMIDI_MIN_VERSION = '4.0.0';
+my $RTMIDI_NAJOR_VERSION = 5;
 my $WIN = $^O eq 'MSWin32';
 
 plugin 'Gather::IsolateDynamic';
 plugin 'PkgConfig' => (
     pkg_name => 'rtmidi',
-    atleast_version => $RTMIDI_VERSION
+    atleast_version => $RTMIDI_MIN_VERSION
 );
 
 share {
+    start_url 'http://www.music.mcgill.ca/~gary/rtmidi/release/';
     plugin 'Download' => (
-        url => "http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-$RTMIDI_VERSION.tar.gz"
+        filter => qr/^rtmidi-${RTMIDI_NAJOR_VERSION}.*\.tar\.gz$/,
+        version => qr/([0-9\.]+)/,
     );
     plugin 'Extract' => 'tar.gz';
 

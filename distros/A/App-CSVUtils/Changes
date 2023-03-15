@@ -1,3 +1,15 @@
+1.022   2023-03-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: csv-quote, csv-unquote.
+
+        - [ux][cli csv-sort-rows][cli csv-find-value][cli
+          csv-get-cells][cli csv-uniq] Fields can be referred by name or by
+          index (1-based).
+
+        - [ux][cli csv-sort-rows][cli csv-sorted-rows] Give default for
+          --by-field if there is only a single field.
+
+
 1.021   2023-03-02  Released-By: PERLANCAR; Urgency: medium
 
         - [cli csv-cmp] Allow excluding/selecting fields to compare.

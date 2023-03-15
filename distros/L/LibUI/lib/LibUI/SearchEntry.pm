@@ -1,11 +1,15 @@
-package LibUI::SearchEntry 0.01 {
+package LibUI::SearchEntry 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use parent 'LibUI::Entry';
     #
-    affix( LibUI::lib(), 'uiNewSearchEntry', [Void] => InstanceOf ['LibUI::SearchEntry'], 'new' );
+    affix(
+        LibUI::lib(),
+        [ 'uiNewSearchEntry', 'new' ],
+        [Void] => InstanceOf ['LibUI::SearchEntry']
+    );
 };
 1;
 #
@@ -25,8 +29,9 @@ LibUI::Entry - Single Line Text Entry Field Suitable for Sensitive Input
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::SearchEntry;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $pass   = LibUI::SearchEntry->new;
     $box->append( $pass, 0 );

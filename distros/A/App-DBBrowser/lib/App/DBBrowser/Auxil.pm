@@ -277,13 +277,31 @@ sub stmt_placeholder_to_value {
 
 
 sub alias {
+    # Aliases:
+    #   JOIN: mandatory
+    #
+    #   UNION: mandatory: mysql, MariaDB, Pg
+    #           optional: SQLite, Firebird, DB2, Informix
+    #
+    #   Derived Table: mandatory: mysql, MariaDB, Pg
+    #                   optional: SQLite, Firebird, DB2, Informix
+    #
+    #   Subquery column: optional
+    #
+    #   Function column: optional
+
     my ( $sf, $sql, $type, $identifier, $default ) = @_;
-    if ( defined $default ) { # && ! $sf->{o}{G}{quote_identifiers} ) {
-        if ( $sf->{i}{driver} =~ /^(?:Pg|Informix)\z/ ) {
-            $default = lc $default;
+    if ( ! $sf->{o}{alias}{use_defaults} && $type !~ /^(?:join|union|derived_table)\z/ ) {
+        $default = undef;
+    }
+    if ( defined $default ) {
+        if ( $sf->{i}{driver} eq 'Pg' ) {
+            $default = lc $default; ##
         }
-        elsif ( $sf->{i}{driver} =~ /^(?:Firebird|DB2)\z/ ) {
-            $default = uc $default;
+        if ( ! $sf->{o}{G}{quote_identifiers} ) {
+            $default =~ s/\W/_/g;
+            $default =~ s/\ /_/g;
+            $default =~ s/_+\z//;
         }
     }
     my $prompt = 'AS ';
@@ -294,7 +312,7 @@ sub alias {
         # Readline
         $alias = $tr->readline(
             $prompt,
-            { info => $info }
+            { info => $info, default => $default }
         );
         $sf->print_sql_info( $info );
     }
@@ -340,7 +358,7 @@ sub quote_table {
     # 1 = schema
     # 2 = table_name
     # 3 = table_type
-    if ( $sf->{o}{G}{qualified_table_name} || $sf->{d}{db_attached} ) {
+    if ( $sf->{o}{G}{qualified_table_name} || ( $sf->{d}{db_attached} && ! defined $sf->{d}{schema} ) ) {
         # If a SQLite database has databases attached, the fully qualified table name is used in SQL code regardless of
         # the setting of the option 'qualified_table_name' because attached databases could have tables with the same
         # name.
@@ -494,6 +512,62 @@ sub read_json {
     ) {
         die "In '$file_fs':\n$@";
     }
+
+############################################################## 2.317  12.03.2023
+    if ( $file_fs eq ( $sf->{i}{f_attached_db} // '' ) ) {
+        my @keys = keys %$ref;
+        if ( ref( $ref->{$keys[0]} ) eq 'ARRAY' ) {
+            my $tmp;
+            for my $key ( @keys ) {
+                for my $ar ( @{$ref->{$key}} ) {
+                    $tmp->{$key}{$ar->[1]} = $ar->[0];
+                }
+            }
+            $sf->write_json( $sf->{i}{f_attached_db}, $tmp );
+            return $tmp;
+        }
+        #else {
+        #    return $ref;
+        #}
+    }
+##############################################################
+
+################################################################################################# 2.314  03.02.2023
+    if ( $file_fs eq ( $sf->{i}{f_subqueries} // '' ) ) {
+        my $tmp;
+        CONVERT: for my $driver ( keys %$ref ) {
+            for my $db ( keys %{$ref->{$driver}} ) {
+                last CONVERT if ref( $ref->{$driver}{$db} ) ne 'HASH';
+                for my $key ( keys %{$ref->{$driver}{$db}} ) {
+                    next if $key ne 'substmt';
+                    for my $ref ( @{$ref->{$driver}{$db}{$key}} ) {
+                        push @{$tmp->{$driver}{$db}}, { stmt => $ref->[0], name => $ref->[1] };
+                    }
+                }
+            }
+        }
+        if ( defined $tmp ) {
+            $sf->write_json( $sf->{i}{f_subqueries}, $tmp );
+            return $tmp;
+        }
+        #else {
+        #    return $ref;
+        #}
+    }
+##################################################################################################
+
+############################################################### 2.307  01.01.2023
+    if ( $file_fs eq ( $sf->{i}{f_settings} // '' ) ) {
+        if ( exists $ref->{'csv'} ) {
+            for my $opt ( keys %{$ref->{'csv'}} ) {
+                $ref->{'csv_in'}{$opt} = $ref->{'csv'}{$opt};
+            }
+            delete $ref->{'csv'};
+            $sf->write_json( $sf->{i}{f_settings}, $ref );
+        }
+    }
+###############################################################
+
     return $ref;
 }
 

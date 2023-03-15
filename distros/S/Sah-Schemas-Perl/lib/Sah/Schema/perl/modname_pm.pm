@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -54,7 +54,7 @@ Sah::Schema::perl::modname_pm - Perl module name in Foo/Bar.pm form
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schema::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schema::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo/Bar";
+ $data = "Foo/Bar.pm";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -105,7 +105,7 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo/Bar";
+ $data = "Foo/Bar.pm";
  my $res = $validator->($data); # => ["","Foo/Bar.pm"]
  
  # a sample invalid data

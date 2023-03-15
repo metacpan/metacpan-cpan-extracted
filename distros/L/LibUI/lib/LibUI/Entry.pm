@@ -1,4 +1,4 @@
-package LibUI::Entry 0.01 {
+package LibUI::Entry 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -7,23 +7,25 @@ package LibUI::Entry 0.01 {
     #
     affix(
         LibUI::lib(),
-        'uiEntryOnChanged',
+        [ 'uiEntryOnChanged', 'onChanged' ],
         [   InstanceOf ['LibUI::Entry'],
             CodeRef [ [ InstanceOf ['LibUI::Entry'], Any ] => Void ], Any
-        ] => Void,
-        'onChanged'
+        ] => Void
     );
-    affix( LibUI::lib(), 'uiEntryReadOnly', [ InstanceOf ['LibUI::Entry'] ] => Int, 'readonly' );
+    affix( LibUI::lib(), [ 'uiEntryReadOnly', 'readonly' ],
+        [ InstanceOf ['LibUI::Entry'] ] => Int );
     affix(
-        LibUI::lib(), 'uiEntrySetReadOnly', [ InstanceOf ['LibUI::Entry'], Int ] => Void,
-        'setReadonly'
+        LibUI::lib(),
+        [ 'uiEntrySetReadOnly',        'setReadonly' ],
+        [ InstanceOf ['LibUI::Entry'], Int ] => Void
     );
     affix(
-        LibUI::lib(), 'uiEntrySetText', [ InstanceOf ['LibUI::Entry'], Str ] => Void,
-        'setText'
+        LibUI::lib(),
+        [ 'uiEntrySetText',            'setText' ],
+        [ InstanceOf ['LibUI::Entry'], Str ] => Void
     );
-    affix( LibUI::lib(), 'uiEntryText', [ InstanceOf ['LibUI::Entry'] ] => Str, 'text' );
-    affix( LibUI::lib(), 'uiNewEntry',  [Void] => InstanceOf ['LibUI::Entry'],  'new' );
+    affix( LibUI::lib(), [ 'uiEntryText', 'text' ], [ InstanceOf ['LibUI::Entry'] ] => Str );
+    affix( LibUI::lib(), [ 'uiNewEntry',  'new' ],  [Void] => InstanceOf ['LibUI::Entry'] );
 };
 1;
 #
@@ -43,8 +45,9 @@ LibUI::Entry - Single Line Text Entry Field
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::Entry;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $entry  = LibUI::Entry->new;
     $box->append( $entry, 0 );

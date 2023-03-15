@@ -1,3 +1,44 @@
+version 0.005; 2023-03-13
+
+  * port chat2.pl and validate.pl to Perl 5.19.8, which abolished the
+    "do" syntax for subroutine calls, after it had started warning by
+    default in Perl 5.11.1
+
+  * port abbrev.pl, bigfloat.pl, bigint.pl, bigrat.pl, cacheout.pl,
+    chat2.pl, complete.pl, exceptions.pl, ftp.pl, getcwd.pl, pwd.pl,
+    and syslog.pl to Perl 5.37.9, which deprecated the old "'" package
+    separator
+
+  * muffle ambiguity warnings that arose under -w from ambiguous use of
+    keywords "open", "close", and "select"
+
+  * make the tests in t/timelocal.t robust against the way
+    Time::Local::time{local,gm}() interpret year inputs 0 to 99 based
+    on a sliding window
+
+  * make the tests in t/timelocal.t accommodate OS-dependent limits on
+    the range of years that can be represented in a time_t
+
+  * update chat2.pl, ftp.pl, and syslog.pl to get constants from
+    the Socket and Sys::Syslog modules, rather than from socket.ph,
+    sys/socket.ph, and syslog.ph, which may well not be available
+
+  * test that all the library files can be loaded without causing
+    unintended warnings
+
+  * update usage comments in getopt.pl, getopts.pl, stat.pl, syslog.pl,
+    and validate.pl for Perl 5.19.8, which abolished the "do" syntax
+    for subroutine calls
+
+  * document that the core try/catch mechanism (from Perl 5.33.7) is
+    another alternative to exceptions.pl
+
+  * in t/timelocal.t, apply most tests to both timelocal() and timegm()
+
+  * in t/timelocal.t, test error for 2100-02-29
+
+  * in t/timelocal.t, don't load the unused Config module
+
 version 0.004; 2017-07-30
 
   * in doc, note when core versions started warning and were removed

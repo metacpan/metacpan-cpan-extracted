@@ -94,7 +94,9 @@ AUTHOR
 
 CONTRIBUTORS
 
-    Patrick Hochstenbach <patrick.hochstenbach@ugent.be<gt>
+    Patrick Hochstenbach
+
+    Steve Rogerson
 
 COPYRIGHT
 
@@ -117,7 +119,7 @@ SEE ALSO
 
 ACKNOWLEDGEMENT
 
-    MARC::Schema uses the MARC21 schema developed by P�ter Kir�ly
+    MARC::Schema uses the MARC21 schema developed by Péter Király
     <https://github.com/pkiraly> as default. For more information see
     "Metadata assessment for MARC records"
     <https://github.com/pkiraly/metadata-qa-marc> and "MARC21 structure in

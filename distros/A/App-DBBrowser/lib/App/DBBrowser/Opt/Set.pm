@@ -95,7 +95,7 @@ sub _options {
             { name => '_squash_spaces',      text => "- Squash spaces",       section => 'table' },
             { name => '_base_indent',        text => "- Indentation",         section => 'G'     },
             { name => '_set_string',         text => "- Undef string",        section => 'table' },
-            { name => '_file_find_warnings', text => "- Warnings",            section => 'G'     },
+            { name => '_warningss',          text => "- Warnings",            section => 'G'     },
         ],
         group_import => [
             { name => '_parse_file',        text => "- Parse tool",         section => 'insert' },
@@ -118,10 +118,11 @@ sub _options {
             { name => '_file_encoding_out', text => "- File encoding out",  section => 'export'  },
         ],
         group_misc => [
-            { name => '_menu_memory',  text => "- Menu memory",  section => 'G'     },
-            { name => '_table_expand', text => "- Expand table", section => 'table' },
-            { name => '_search',       text => "- Search",       section => 'table' },
-            { name => '_mouse',        text => "- Mouse mode",   section => 'table' },
+            { name => '_menu_memory',   text => "- Menu memory",  section => 'G'     },
+            { name => '_table_expand',  text => "- Expand table", section => 'table' },
+            { name => '_search',        text => "- Search",       section => 'table' },
+            { name => '_mouse',         text => "- Mouse mode",   section => 'table' },
+            { name => '_db2_encoding',  text => "- DB2 encoding", section => 'G'     },
         ],
     };
     return $groups->{$group_name};
@@ -342,13 +343,14 @@ sub set_options {
                 $sf->__choose_a_subset_wrap( $section, $opt, $sf->{avail_operators}, $prompt );
             }
             elsif ( $opt eq '_alias' ) {
-                my $prompt = 'Enable Alias for:';
+                my $prompt = 'Alias for:';
                 my $sub_menu = [
                     [ 'select',        "- Functions/Subqueries in SELECT",  [ $no, $yes ] ],
                     [ 'aggregate',     "- AGGREGATE functions",             [ $no, $yes ] ],
                     [ 'derived_table', "- Derived table",                   [ $no, $yes ] ],
                     [ 'join',          "- JOIN",                            [ $no, $yes ] ],
                     [ 'union',         "- UNION",                           [ $no, $yes ] ],
+                    [ 'use_defaults',  "- Optional alias defaults",         [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -412,9 +414,9 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_binary_filter' ) {
-                my $prompt = 'Print "BNRY" instead of binary data';
+                my $prompt = 'How to print arbitrary binray data';
                 my $sub_menu = [
-                    [ 'binary_filter', "- Binary filter", [ $no, $yes ] ]
+                    [ 'binary_filter', "- Binary filter", [ $no, 'BNRY', 'Hexadecimal' ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -439,10 +441,11 @@ sub set_options {
                 my $prompt = 'Undef string';
                 $sf->__group_readline( $section, $items, $prompt );
             }
-            elsif ( $opt eq '_file_find_warnings' ) {
-                my $prompt = '"SQLite database search"';
+            elsif ( $opt eq '_warningss' ) {
+                my $prompt = '"Disable/Enable warnings"';
                 my $sub_menu = [
-                    [ 'file_find_warnings', "- Enable \"File::Find\"-warnings", [ $no, $yes ] ]
+                    [ 'file_find_warnings',   "- Warnings \"File::Find\" (SQLite)", [ $no, $yes ] ],
+                    [ 'warnings_table_print', "- Warnings table-print",             [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -507,10 +510,10 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_empty_to_null' ) {
-                my $prompt = 'Enable "Empty to NULL" by default:';
+                my $prompt = 'Enable "Empty to NULL":';
                 my $sub_menu = [
                     [ 'empty_to_null_plain',  "- Source type 'plain'",  [ $no, $yes ] ],
-                    [ 'empty_to_null_file',   "- Source tpye 'file'",   [ $no, $yes ] ],
+                    [ 'empty_to_null_file',   "- Source type 'file'",   [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -582,7 +585,7 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            ##### behavior #####
+            ##### misc #####
             elsif ( $opt eq '_menu_memory' ) {
                 my $prompt = 'Your choice: ';
                 my $sub_menu = [
@@ -610,6 +613,13 @@ sub set_options {
                     [ 'mouse', "- Mouse mode", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_db2_encoding' ) {
+                my $items = [
+                    { name => 'db2_encoding', prompt => "DB2 application code set" },
+                ];
+                my $prompt = 'Set the DB2 application code set';
+                $sf->__group_readline( $section, $items, $prompt );
             }
             else {
                 die "Unknown option: $opt";
@@ -688,7 +698,7 @@ sub __choose_a_directory_wrap {
     my ( $sf, $section, $opt, $prompt ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     #my $current = $sf->{o}{$section}{$opt};
-    my $choice = $tu->choose_a_directory( { show_hidden => 1, prompt => $prompt, clear_screen => 1, decoded => 1 } ); ##
+    my $choice = $tu->choose_a_directory( { show_hidden => 1, prompt => $prompt, clear_screen => 1, decoded => 1 } );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
     $sf->{write_config}++;

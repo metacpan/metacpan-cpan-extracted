@@ -59,7 +59,7 @@ foreach my $outlet (@outlets) {#main forking loop
   local $@;
   my $status = eval{
                     local $SIG{ALRM} = sub {die "timeout\n"};
-                    alarm 1.5; #some devices are slow to warmup
+                    alarm 2.05; #some devices are slow to warmup
                     my $return       = $Power_Outlet->query;
                     alarm 0;
                     $return;

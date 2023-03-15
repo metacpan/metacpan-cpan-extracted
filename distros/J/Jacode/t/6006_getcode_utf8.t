@@ -24,6 +24,20 @@ require 'lib/jacode.pl';
     'サイト内の翻訳データは、Japanized Perl Resources Project(JPRP)で翻訳されたもの、有志が翻訳しているgithubのリポジトリ、JPAの翻訳文書から取得しています。','utf8',
     '最近の更新 / RSS','utf8',
     'CVS及びgitのcommitログから最新の50件を取得しています。稀に翻訳者とcommitした人が違う場合があります。また、修正のcommit、登録しただけで未翻訳のものも含まれる場合があります。','utf8',
+    '彗','utf8',
+    '倣','utf8',
+    '醒','utf8',
+    '彙','utf8',
+    '渦','utf8',
+    '塵','utf8',
+    '隕','utf8',
+    '冥','utf8',
+    '八','utf8',
+    '鷹','utf8',
+    '閃','utf8',
+    '杉','utf8',
+    '六','utf8',
+    '九','utf8',
 );
 
 print "1..", scalar(@todo)/2, "\n";

@@ -1,0 +1,11 @@
+--- lib/Test/Bot/BasicBot/Pluggable.pm
++++ lib/Test/Bot/BasicBot/Pluggable.pm
+@@ -126,7 +126,7 @@
+ 
+ =head2 DESTROY
+ 
+-The special subrouting is explicitly overriden with an empty
++The special subroutine is explicitly overridden with an empty
+ subroutine as otherwise AUTOLOAD in Bot::BasicBot will be called
+ for it.
+ 

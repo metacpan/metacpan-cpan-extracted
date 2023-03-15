@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -86,7 +86,7 @@ App::CSVUtils::csv_dump - Dump CSV as data structure (array of array/hash)
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils::csv_dump (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils::csv_dump (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 FUNCTIONS
 

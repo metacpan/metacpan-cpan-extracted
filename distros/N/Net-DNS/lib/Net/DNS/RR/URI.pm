@@ -2,7 +2,7 @@ package Net::DNS::RR::URI;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: URI.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: URI.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,8 +19,7 @@ use Net::DNS::Text;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 	@{$self}{qw(priority weight)} = unpack( "\@$offset n2", $$data );
@@ -48,33 +47,30 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->$_(shift) foreach qw(priority weight target);
+	for (qw(priority weight target)) { $self->$_( shift @argument ) }
 	return;
 }
 
 
 sub priority {
-	my $self = shift;
-
-	$self->{priority} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{priority} = 0 + $_ }
 	return $self->{priority} || 0;
 }
 
 
 sub weight {
-	my $self = shift;
-
-	$self->{weight} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{weight} = 0 + $_ }
 	return $self->{weight} || 0;
 }
 
 
 sub target {
-	my $self = shift;
-
-	$self->{target} = Net::DNS::Text->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{target} = Net::DNS::Text->new($_) }
 	return $self->{target} ? $self->{target}->value : undef;
 }
 
@@ -174,7 +170,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, 
-RFC7553
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC7553|https://tools.ietf.org/html/rfc7553>
 
 =cut

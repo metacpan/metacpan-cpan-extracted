@@ -1,3 +1,18 @@
+1.64  2023-03-12 19:10:56 CET
+   - Complete implementation for option "missing" in traverse()
+   - Add option "undef" in traverse()
+   - Add tests for the two above
+
+1.62  2023-03-11 15:04:02 CET
+   - Add support for passing an additional option to traverse(), for
+     setting the return value when missing a key.
+
+1.60  2023-03-10 21:57:10 CET
+   - release after 66 PASSes on CPAN Testers (thanks!)
+
+1.59  2023-03-09 23:06:50 CET
+   - support partial matching in crumble
+
 1.58  2023-02-05 14:55:55 CET
    - release after 412 PASSes on CPAN Testers (thanks!)
 

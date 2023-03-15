@@ -12,7 +12,7 @@ Math::Formula::Config::JSON - load/save formulas to file
 =head1 SYNOPSIS
 
   my $context = Math::Formula::Content->new(name => 'test');
-  my $config = Math::Formula::Config::INI->JSON(directory => $dir);
+  my $config = Math::Formula::Config::JSON->new(directory => $dir);
 
   $config->save($context);
   my $context = $config->load('test');
@@ -67,10 +67,10 @@ Extends L<"Actions" in Math::Formula::Config|Math::Formula::Config/"Actions">.
 
 =item $obj-E<gt>B<load>($name, %options)
 
-Load a L<Math::Formula::Context|Math::Formula::Context> for a yml file.
+Load a L<Math::Formula::Context|Math::Formula::Context> for a file in JSON serialization.
 
  -Option  --Default
-  filename  <directory/$name.yml>
+  filename  <directory/$name.json>
 
 =over 2
 
@@ -80,8 +80,8 @@ Load a L<Math::Formula::Context|Math::Formula::Context> for a yml file.
 
 =item $obj-E<gt>B<save>($context, %args)
 
-Serialize the $context to JSON files, as storage or to be editted by hand.
-This is a usefull method when default configuration templates need to be generated.
+Serialize the $context to JSON files, as storage or to be edited by hand.
+This is a useful method when default configuration templates need to be generated.
 
  -Option  --Default
   filename  C<< $context->name .json>
@@ -98,7 +98,7 @@ Save under a different filename than derived from the name of the context.
 
 =head1 DETAILS
 
-JSON seems to be everyone's favorit serialization syntax, nowadays.  It natively
+JSON seems to be everyone's favorite serialization syntax, nowadays.  It natively
 supports integers, floats, booleans, and strings.  Formulas get a leading '='
 (not yet configurable).
 
@@ -125,8 +125,8 @@ B<. Example>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.15,
-built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.16,
+built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

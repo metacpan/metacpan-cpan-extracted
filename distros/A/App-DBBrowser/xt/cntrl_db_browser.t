@@ -53,7 +53,7 @@ for my $file (
         if ( $line =~ /^\s*use\s+lib\s/s ) {
             $use_lib++;
         }
-        if ( $line =~ /__WARN__/s ) {
+        if ( $line =~ /__WARN__.+die/s ) {
             $warn_to_fatal++;
         }
     }

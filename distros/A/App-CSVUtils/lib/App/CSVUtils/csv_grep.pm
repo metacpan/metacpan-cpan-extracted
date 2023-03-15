@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -39,7 +39,7 @@ _
         {
             summary => 'Only show rows where the amount field '.
                 'is divisible by 7',
-            argv => ['-He', '$_->{amount} % 7 ? 1:0', 'file.csv'],
+            argv => ['-He', '$_->{amount} % 7 == 0', 'file.csv'],
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -86,7 +86,7 @@ App::CSVUtils::csv_grep - Only output row(s) where Perl expression returns true
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils::csv_grep (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils::csv_grep (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 FUNCTIONS
 
@@ -107,7 +107,7 @@ Examples:
 
  csv_grep(
      input_filename => "file.csv",
-   eval => "\$_->{amount} % 7 ? 1:0",
+   eval => "\$_->{amount} % 7 == 0",
    hash => 1
  );
 

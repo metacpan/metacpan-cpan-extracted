@@ -5,7 +5,7 @@ use warnings;
 use feature "refaliasing";
 
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 sub new {
 	#simply an array...	
@@ -17,9 +17,13 @@ sub register {
   no warnings "experimental";
 	\my @middleware=$_[0];	#self
 	my $sub=$_[1];
+  die "Middleware must be a CODE reference" unless ref($sub) eq "CODE";
 	push @middleware, $sub;
 	return $_[0]; #allow chaining
 }
+
+*append=\&register;
+*add=\&register;
 
 
 # Link together sub and give each one an index 
@@ -30,9 +34,11 @@ sub link {
 
   die "A CODE reference is requred when linking middleware" unless(@_ >=2 and ref $_[1] eq "CODE");
   
-	\my @middleware=$_[0];	#self;
+	\my @middleware=shift;	#self;
 
-	my $dispatcher=$_[1];
+	my $dispatcher=shift;
+
+  my @args=@_;
 
 	my @mw;  # The generated subs
 
@@ -41,7 +47,7 @@ sub link {
 		my $next=($i==@middleware-1)?$dispatcher:$mw[$i+1];	
 		
 
-		$mw[$i]=$maker->($next, $i);
+		$mw[$i]=$maker->($next, $i, @args);
 	}
 
 	@middleware?$mw[0]:$dispatcher;
@@ -77,7 +83,7 @@ Sub::Middler - Middleware subroutine chaining
   sub mw1 {
     my %options=@_;
     sub {
-      my ($next,$index)=@_;
+      my ($next, $index, @optional)=@_;
       sub {
         my $work=$_[0]+$options{x};
         $next->($work);
@@ -89,7 +95,7 @@ Sub::Middler - Middleware subroutine chaining
   sub mw2 {
     my %options=@_;
     sub {
-      my ($next, $index)=@_;
+      my ($next, $index, @optional)=@_;
       sub {
         my $work= $_[0]*$options{y};
         $next->( $work);
@@ -108,11 +114,11 @@ appropriately to facilitate the lexical binding of linking variables.
 
 This differs from other 'sub chaining' modules as it does not use a loop
 internally to iterate over a list of subroutines at runtime. As such there is
-no implicit call to the next item in the chain. Each stage can run
-synchronously or asynchronously or even not at all. Each element in the chain
-is responsible for calling the next.
+no implicit call to the 'next' item in the chain. Each stage can run the
+following stage synchronously or asynchronously or not at all. Each element in
+the chain is responsible for how and when it calls the 'next'.
 
-Finally the arguments and signatures at each stage of middleware are completely
+Finally the arguments and signatures of each stage of middleware are completely
 user defined and are not interfered with by this module. This allows reuse of
 the C<@_> array in calling subsequent stages for ultimate performance if you
 know what you're doing.
@@ -135,18 +141,28 @@ blessed array reference which stores the middleware directly.
 
 Appends the middleware to the internal list for later linking.
 
+=head3 append, add
+
+Alias for register
+
 =head3 link
 
-    $object->link($last);
+    $object->link($last,[@args]);
 
-Links together the registered middleware. Each middleware is intrinsically
-linked to the next middleware in the list. The last middleware being linked to
-the C<$last> argument, which must be a code ref. 
+Links together the registered middleware in the sequence of addition. Each
+middleware is intrinsically linked to the next middleware in the list. The last
+middleware being linked to the C<$last> argument, which must be a code ref. 
 
-The C<$last> ref MUST be  a regular subroutine reference, not middleware as it
-is defined below.
+The C<$last> ref MUST be  a regular subroutine reference, acting as the
+'kernel' as described in following sections.
 
 Calls C<die> if C<$last> is not a code ref.
+
+Any optional additional arguments C<@args> are passed to this function are
+passed on to each 'maker' sub after the C<$next> and C<$index>, parameters.
+This gives an alternative approach to distributing configuration data to each
+item in the chain prior to runtime. It is up to each item's maker sub to store
+relevant passed values as they see fit.
 
 =head2 Creating Middleware
 
@@ -170,11 +186,12 @@ This sounds complicated by this is what is looks like in code:
     my %options=@_;                       Store any config
    
     sub {                             (2) maker sub is returned
-      my ($next, $index)=@_;          (3) Must store these vars
+      my ($next, $index, @optional)=@_;   (3) Must store at least $next
 
       sub {                           (4) Returns the kernel sub
         # Code here implements your middleware
         # %options are lexically accessable here
+        # as are the @optional parameters
         
 
         # Execute the next item in the chain
@@ -199,9 +216,12 @@ sub.
 
 This anonymous sub (2) closes over the variables stored in B<Top> and is the
 input to this module (via C<register>). When being linked (called) by this
-module it is provided two arguments; the reference to the next item in
+module it is provided at least two arguments: the reference to the next item in
 the chain and the current middleware index. These B<MUST> be stored to be
 useful, but can be called anything you like (3).
+      
+Any optional/additional arguments supplied during a call to C<link> are also
+used as arguments 'as is' to all maker subroutines in the chain.
 
 
 =item Kernel subroutine
@@ -218,8 +238,8 @@ Any extra work can be performed after the chain is completed after this call
 =head2 LINKING CHAINS
 
 Multiple chains of middleware can be linked together. This needs to be done in
-reverse order. The last segment becomes the C<$last> item when linking the
-preceding chain and so on.
+reverse order. The last chain after being linked, becomes the C<$last> item
+when linking the preceding chain and so on.
 
 
 =head2 EXAMPLES

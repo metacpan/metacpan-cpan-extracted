@@ -1,9 +1,6 @@
 #!perl
 use strict;
 use warnings;
-
-use lib "../lib";
-
 use Test::More tests => 20;
 use Test::NoWarnings;
 
@@ -442,9 +439,12 @@ subtest "Overloads" => sub {
   my $string = "$dom";
   like($string, qr/Whatever/, "stringify");
 
-  ok(1 ~~ $dom,       "Smart match OK");
-  ok(!($dom ~~ $dom), "Smart match KO");
-  like($Data::Domain::MESSAGE, qr/blessed/, "Smart match message");
+  SKIP: {
+    skip "no smartmatch operator", 3 if $] >= 5.037;
+    ok(1 ~~ $dom,       "Smart match OK");
+    ok(!($dom ~~ $dom), "Smart match KO");
+    like($Data::Domain::MESSAGE, qr/blessed/, "Smart match message");
+  }
 };
 
 
@@ -626,11 +626,9 @@ subtest "doc" => sub {
   $msg = $dom->inspect({foo => "foo", bar => [buz => 1, 2]});
   ok($msg, "constant subdomains ERR1");
   note(explain($msg));
-
   $msg = $dom->inspect({foo => 111, bar => [1, zorglub => 3]});
   ok($msg, "constant subdomains ERR2");
   note(explain($msg));
-
 };
 
 

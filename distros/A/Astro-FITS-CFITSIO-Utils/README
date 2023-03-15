@@ -1,40 +1,34 @@
-		     Astro::FITS::CFITSIO::Utils
-		     ===========================
+Astro::FITS::CFITSIO::Utils
 
-DESCRIPTION
+This is a bundle of useful FITS routines which use CFITSIO.
 
-    This is a bundle of useful FITS routines which use CFITSIO.
+  Errors
+
+Errors are generally returned by croak()ing. Error messages will begin
+with "Astro::FITS::CFITSIO::Utils".
 
 INSTALLATION
 
-    To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-       perl Makefile.PL
-       make
-       make test
-       make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    This module requires these other modules and libraries:
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
-      Test::More
-      Astro::FITS::CFITSIO
-      Astro::FITS::Header::CFITSIO
+COPYRIGHT AND LICENSE
 
-COPYRIGHT AND LICENCE
+This software is Copyright (c) 2023 by Smithsonian Astrophysical
+Observatory.
 
-Copyright (c) 2002-2008 The Smithsonian Astrophysical Observatory
+This is free software, licensed under:
 
-Astro-FITS-CFITSIO-Utils is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007

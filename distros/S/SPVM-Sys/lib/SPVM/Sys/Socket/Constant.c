@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <ws2tcpip.h>
   #include <winsock2.h>
   #include <io.h>

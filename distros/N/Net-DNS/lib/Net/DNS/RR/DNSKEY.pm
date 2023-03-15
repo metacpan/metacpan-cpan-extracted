@@ -2,7 +2,7 @@ package Net::DNS::RR::DNSKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DNSKEY.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: DNSKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -21,8 +21,7 @@ use constant BASE64 => defined eval { require MIME::Base64 };
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
 	$self->{keybin} = unpack '@4 a*', $rdata;
@@ -51,13 +50,13 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	my $flags = shift;		## avoid destruction by CDNSKEY algorithm(0)
-	$self->protocol(shift);
-	$self->algorithm(shift);
+	my $flags = shift @argument;	## avoid destruction by CDNSKEY algorithm(0)
+	$self->protocol( shift @argument );
+	$self->algorithm( shift @argument );
+	$self->key(@argument);
 	$self->flags($flags);
-	$self->key(@_);
 	return;
 }
 
@@ -74,19 +73,18 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub flags {
-	my $self = shift;
-
-	$self->{flags} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{flags} = 0 + $_ }
 	return $self->{flags} || 0;
 }
 
 
 sub zone {
-	my $self = shift;
-	if ( scalar @_ ) {
+	my ( $self, @value ) = @_;
+	if ( scalar @value ) {
 		for ( $self->{flags} ) {
 			$_ = 0x0100 | ( $_ || 0 );
-			$_ ^= 0x0100 unless shift;
+			$_ ^= 0x0100 unless shift @value;
 		}
 	}
 	return 0x0100 & ( $self->{flags} || 0 );
@@ -94,11 +92,11 @@ sub zone {
 
 
 sub revoke {
-	my $self = shift;
-	if ( scalar @_ ) {
+	my ( $self, @value ) = @_;
+	if ( scalar @value ) {
 		for ( $self->{flags} ) {
 			$_ = 0x0080 | ( $_ || 0 );
-			$_ ^= 0x0080 unless shift;
+			$_ ^= 0x0080 unless shift @value;
 		}
 	}
 	return 0x0080 & ( $self->{flags} || 0 );
@@ -106,11 +104,11 @@ sub revoke {
 
 
 sub sep {
-	my $self = shift;
-	if ( scalar @_ ) {
+	my ( $self, @value ) = @_;
+	if ( scalar @value ) {
 		for ( $self->{flags} ) {
 			$_ = 0x0001 | ( $_ || 0 );
-			$_ ^= 0x0001 unless shift;
+			$_ ^= 0x0001 unless shift @value;
 		}
 	}
 	return 0x0001 & ( $self->{flags} || 0 );
@@ -118,9 +116,8 @@ sub sep {
 
 
 sub protocol {
-	my $self = shift;
-
-	$self->{protocol} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{protocol} = 0 + $_ }
 	return $self->{protocol} || 0;
 }
 
@@ -140,21 +137,23 @@ sub algorithm {
 
 
 sub key {
-	my $self = shift;
-	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
-	return $self->keybin( MIME::Base64::decode( join "", @_ ) );
+	my ( $self, @value ) = @_;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @value;
+	return $self->keybin( MIME::Base64::decode( join "", @value ) );
 }
 
 
 sub keybin {
-	my $self = shift;
-
-	$self->{keybin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{keybin} = $_ }
 	return $self->{keybin} || "";
 }
 
 
-sub publickey { return shift->key(@_); }
+sub publickey {
+	my ( $self, @value ) = @_;
+	return $self->key(@value);
+}
 
 
 sub privatekeyname {
@@ -429,7 +428,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4034
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC4034|https://tools.ietf.org/html/rfc4034>
 
 L<DNSKEY Flags|http://www.iana.org/assignments/dnskey-flags>
 

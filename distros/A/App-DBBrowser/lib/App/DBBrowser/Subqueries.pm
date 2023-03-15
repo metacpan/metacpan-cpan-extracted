@@ -64,26 +64,6 @@ sub __get_history {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
-
-################################################################################################# 2.314  03.02.2023
-    my $new_h_ref;
-    CONVERT: for my $driver ( keys %$h_ref ) {
-        for my $db ( keys %{$h_ref->{$driver}} ) {
-            last CONVERT if ref( $h_ref->{$driver}{$db} ) ne 'HASH';
-            for my $key ( keys %{$h_ref->{$driver}{$db}} ) {
-                next if $key ne 'substmt';
-                for my $ref ( @{$h_ref->{$driver}{$db}{$key}} ) {
-                    push @{$new_h_ref->{$driver}{$db}}, { stmt => $ref->[0], name => $ref->[1] };
-                }
-            }
-        }
-    }
-    if ( defined $new_h_ref ) {
-        $ax->write_json( $sf->{i}{f_subqueries}, $new_h_ref );
-        $h_ref = $new_h_ref;
-    }
-##################################################################################################
-
     my $saved_subqueries = $h_ref->{ $sf->{i}{driver} }{ $sf->{d}{db} } // [];
     my $session_history = $sf->__session_history() // [];
     return $saved_subqueries, $session_history;
@@ -155,7 +135,7 @@ sub choose_subquery {
             next SUBQUERY;
         }
         unshift @{$sf->{d}{subquery_history}}, { stmt => $stmt, name => $stmt };
-        return "(" . $stmt . ")"; ##
+        return "(" . $stmt . ")";
     }
 }
 

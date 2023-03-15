@@ -1,5 +1,8 @@
 Changes for Locale-XGettext.
 
+0.8  2023-03-15
+  - spelling errors fixed
+
 0.7  2018-11-04
   - fixes for utf-8 ideosyncrasies that caused wrong encoding on output
     files

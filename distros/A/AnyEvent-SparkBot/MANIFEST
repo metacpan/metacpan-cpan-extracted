@@ -1,13 +1,13 @@
-MANIFEST
-Makefile.PL
-lib/AnyEvent/HTTP/Spark.pm
-lib/AnyEvent/SparkBot/SharedRole.pm
-lib/AnyEvent/SparkBot.pm
-t/AnyEvent-HTTP-Spark-nonBLock.t
 t/AnyEvent-HTTP-Spark.t
 t/AnyEvent-SparkBot-SharedRole.t
+t/AnyEvent-HTTP-Spark-nonBLock.t
 t/AnyEvent-SparkBot.t
+Makefile.PL
+MANIFEST
 README.md
 Changes
+lib/AnyEvent/SparkBot.pm
+lib/AnyEvent/SparkBot/SharedRole.pm
+lib/AnyEvent/HTTP/Spark.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

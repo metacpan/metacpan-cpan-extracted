@@ -19,7 +19,7 @@
 # USA.
 
 package Locale::XGettext::Util::Keyword;
-$Locale::XGettext::Util::Keyword::VERSION = '0.7';
+$Locale::XGettext::Util::Keyword::VERSION = '0.8';
 use strict;
 
 use Locale::TextDomain qw(Locale-XGettext);
@@ -112,7 +112,7 @@ sub newFromString {
             my $comment = $token;
             # This is what GNU xgettxt does.
             $comment =~ s/"//;
-            unshift @tokens, qq{"$token"};
+            unshift @tokens, qq{"$comment"};
             
             last if ':' eq $sep;
         } else {
@@ -151,7 +151,9 @@ sub dump {
     my $dump = $self->function . ':';
     $dump .= $self->context . 'c,' if $self->context;
     $dump .= $self->singular . ',';
-    $dump .= $self->plural . '.' if $self->plural;
+    $dump .= $self->plural . ',' if $self->plural;
+    $dump .+ '"' . $self->comment . '",';
+
     chop $dump;
 
     return $dump;

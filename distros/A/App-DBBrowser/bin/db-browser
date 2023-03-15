@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.316';
+our $VERSION = '2.320';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.316
+Version 2.320
 
 =head1 SYNOPSIS
 
@@ -850,14 +850,15 @@ With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
 
 =head3 Aliases
 
-If enabled, it is asked for an alias. If entered nothing, the default alias is used except for Subqueries in SELECT
-which don't have a default alias.
+First five items: enable/disable user-defined aliases.
+
+Last item: enable alias defaults where aliases are optional.
 
 =over
 
 =item
 
-Functions/Subqueries in SELECT
+Functions/Subqueries as columns
 
 =item
 
@@ -874,6 +875,10 @@ JOIN
 =item
 
 UNION
+
+=item
+
+Optional alias defaults
 
 =back
 
@@ -939,11 +944,20 @@ Set the number of spaces between columns.
 Enables the support for color and text formatting escape sequences (SGR) if set to C<Enable>. Before the output it is
 added a reset (C<\e[0m>) at the end of each row.
 
-=head3 Binary binary
+=head3 Binary filter
 
-Setting the I<binary_filter> to C<1> means: print "BNRY" instead of arbitrary binary data. If data matches the repexp
-C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, it is considered arbitrary binary data. Printing arbitrary binary data could break
-the output.
+Set I<Binary filter> to C<NO>, C<BNRY> or C<Hexadecimal>.
+
+C<NO> - print the binary data as it is
+
+C<BNRY> - "BNRY" is printed instead of the binary data
+
+C<Hexadecimal> - the binary data is printed in hexadecimal format
+
+If the first 100 characters of the data match the repexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, the data is considered
+arbitrary binary data.
+
+Printing unfiltered arbitrary binary data could break the output.
 
 =head3 Squash spaces
 
@@ -963,7 +977,19 @@ the entry was created with this options menu.
 
 =head3 Warnings
 
-Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
+Enable/disable
+
+=over
+
+=item
+
+C<File::Find> warnings when searching for C<SQLite> databases.
+
+=item
+
+warnings - e.g. utf8 warnings - when printing a table.
+
+=back
 
 =head2 Import
 
@@ -1257,6 +1283,12 @@ Set the search behavior (C<Ctrl-F>).
 =head3 Mouse mode
 
 Set the I<Mouse mode> (see L<Term::Choose/mouse>).
+
+=head3 DB2 encoding
+
+C<DB2> databases only: set the application code set.
+
+Data comming from a DB2 database is decoded with this encoding.
 
 =head1 CONFIGURATION FILES
 

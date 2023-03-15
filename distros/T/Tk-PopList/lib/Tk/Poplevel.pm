@@ -2,14 +2,14 @@ package Tk::Poplevel;
 
 =head1 NAME
 
-Tk::PopList - Popping a selection list relative to a widget
+Tk::Poplevel - Popping a toplevel without decoration relative to a widget
 
 =cut
 
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 use base qw(Tk::Derived Tk::Toplevel);
 

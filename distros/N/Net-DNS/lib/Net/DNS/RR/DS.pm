@@ -2,7 +2,7 @@ package Net::DNS::RR::DS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DS.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: DS.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -33,8 +33,7 @@ my %digest = (
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
 	@{$self}{qw(keytag algorithm digtype digestbin)} = unpack 'n C2 a*', $rdata;
@@ -60,21 +59,20 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	my $keytag = shift;		## avoid destruction by CDS algorithm(0)
-	$self->algorithm(shift);
+	my $keytag = shift @argument;	## avoid destruction by CDS algorithm(0)
+	$self->algorithm( shift @argument );
+	$self->digtype( shift @argument );
+	$self->digest(@argument);
 	$self->keytag($keytag);
-	$self->digtype(shift);
-	$self->digest(@_);
 	return;
 }
 
 
 sub keytag {
-	my $self = shift;
-
-	$self->{keytag} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{keytag} = 0 + $_ }
 	return $self->{keytag} || 0;
 }
 
@@ -108,16 +106,16 @@ sub digtype {
 
 
 sub digest {
-	my $self = shift;
-	return unpack "H*", $self->digestbin() unless scalar @_;
-	return $self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	my ( $self, @value ) = @_;
+	return unpack "H*", $self->digestbin() unless scalar @value;
+	my @hex = map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @value;
+	return $self->digestbin( pack "H*", join "", @hex );
 }
 
 
 sub digestbin {
-	my $self = shift;
-
-	$self->{digestbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{digestbin} = $_ }
 	return $self->{digestbin} || "";
 }
 
@@ -128,10 +126,7 @@ sub babble {
 
 
 sub create {
-	my $class = shift;
-	my $keyrr = shift;
-	my %args  = @_;
-
+	my ( $class, $keyrr, %args ) = @_;
 	my ($type) = reverse split '::', $class;
 
 	croak "Unable to create $type record for non-zone key" unless $keyrr->zone;
@@ -397,7 +392,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4034
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC4034|https://tools.ietf.org/html/rfc4034>
 
 L<Digest Types|http://www.iana.org/assignments/ds-rr-types>
 

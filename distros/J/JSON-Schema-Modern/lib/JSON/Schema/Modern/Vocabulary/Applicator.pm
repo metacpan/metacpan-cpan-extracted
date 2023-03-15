@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.564';
+our $VERSION = '0.565';
 
 use 5.020;
 use Moo;
@@ -129,7 +129,8 @@ sub _traverse_keyword_not { shift->traverse_subschema(@_) }
 sub _eval_keyword_not ($self, $data, $schema, $state) {
   return 1 if not $self->eval($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not',
-      short_circuit_suggested => !$state->{collect_annotations}, collect_annotations => 0,
+      short_circuit_suggested => 1, # errors do not propagate upward from this subschema
+      collect_annotations => 0,     # nor do annotations
       errors => [] });
 
   return E($state, 'subschema is valid');
@@ -416,7 +417,7 @@ sub _eval_keyword_patternProperties ($self, $data, $schema, $state) {
   my $valid = 1;
   my @properties;
   foreach my $property_pattern (sort keys $schema->{patternProperties}->%*) {
-    foreach my $property (sort grep m/$property_pattern/, keys %$data) {
+    foreach my $property (sort grep m/(?:$property_pattern)/, keys %$data) {
       push @properties, $property;
       if (is_type('boolean', $schema->{patternProperties}{$property_pattern})) {
         next if $schema->{patternProperties}{$property_pattern};
@@ -452,7 +453,7 @@ sub _eval_keyword_additionalProperties ($self, $data, $schema, $state) {
   foreach my $property (sort keys %$data) {
     next if exists $schema->{properties} and exists $schema->{properties}{$property};
     next if exists $schema->{patternProperties}
-      and any { $property =~ /$_/ } keys $schema->{patternProperties}->%*;
+      and any { $property =~ /(?:$_)/ } keys $schema->{patternProperties}->%*;
 
     push @properties, $property;
     if (is_type('boolean', $schema->{additionalProperties})) {
@@ -514,7 +515,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.564
+version 0.565
 
 =head1 DESCRIPTION
 

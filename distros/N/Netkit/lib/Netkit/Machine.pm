@@ -61,10 +61,12 @@ sub extra {
 sub dump_startup {
 	my $class = shift;
 	
+	# Dump the interface IPs and MACs.
 	for (@{$class->{interfaces}}){
 		$_->dump;
 	}
 	
+	# Dump the static routes
 	for (@{$class->{routes}}){
 		$_->dump;
 	}
@@ -73,34 +75,39 @@ sub dump_startup {
 		print "\niptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT \n\n";
 	}
 	
-	for (grep {defined($_->{vlan})} @{$class->{attachments}}) {
+	# Dump the VLANs
+	for (grep {defined($_->{vlan})} @{$class->{attachments}}) { # For every attachment with a VLAN
 		my $vlan = $_->{vlan};
 		
-		print 'bridge vlan add vid ' . $vlan->{vid} . ' ';
+		print "bridge vlan add vid $vlan->{vid} ";
 		
-		if(! $_->{tagged}){
+		if($_->{untagged}){
 			print 'pvid untagged ';
 		}
 		
 		print "dev eth$_->{eth}\n";
 	}
 	
+	# Dump the firewall rules
 	for (@{$class->{rules}}){
 		$_->dump;
 	}
 	
+	# Add the extra startup from the extra parameter.
 	print $class->{startup_buffer}, "\n";
 }
 
 sub dump_conf {
 	my $class = shift;
-			
-	for (grep {defined($_->{lan})} @{$class->{attachments}}) {
+	
+	for (grep {defined($_->{lan})} @{$class->{attachments}}) { # For every attachment of a LAN
 		my $lan = $_->{lan};
-		
+	
+		# Put 'machine[eth_num]=lan' into the lab.conf	
 		print $class->{name}, '[', $_->{eth} . "]=$lan->{name}\n";
 	}
 		
+	# Add the extra conf from the extra_conf parameter.
 	print $class->{conf_buffer}, "\n";
 }
 

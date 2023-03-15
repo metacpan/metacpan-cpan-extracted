@@ -9,7 +9,7 @@ use App::OpenVZ::BCWatch;
 use Config::File qw(read_config_file);
 use Daemon::Generic;
 
-our $VERSION = '0.05'; # used by Daemon::Generic
+our $VERSION = $App::OpenVZ::BCWatch::VERSION; # used by Daemon::Generic
 
 $| = true;
 

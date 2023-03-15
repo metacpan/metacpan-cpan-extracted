@@ -2,12 +2,12 @@
 
 // The maximum number of sockets that a Windows Sockets application can use is not affected by the manifest constant FD_SETSIZE
 // See https://learn.microsoft.com/en-us/windows/win32/winsock/maximum-number-of-sockets-supported-2
-#ifdef _WIN32
+#if defined(_WIN32)
   #undef FD_SETSIZE
   #define FD_SETSIZE 1024
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <winsock2.h>
 #else
   #include <sys/select.h>

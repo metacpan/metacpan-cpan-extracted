@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export LC_ALL=C.UTF-8
 .PHONY: all check tests
 all:
 
@@ -41,7 +42,11 @@ DOT=dot
 download: $(addprefix download-,$(MACHINES))
 
 download-%:
-	$(STORAGE2DOT) --remote $(HOST_$*) -c --record $*.rawcmd -o $*.ref.data
+	$(STORAGE2DOT) --remote $(HOST_$*) -c --record $*.rawcmd -o $*.ref.data.downloaded
+	./local-cleanup-data $*
+	$(MAKE) $*.ref.data
+	diff -ub $*.ref.data.downloaded $*.ref.data
+	$(RM) $*.ref.data.downloaded
 	$(STORAGE2DOT) --data $*.ref.data -o $*.ref.dot
 
 %.ref.data: %.rawcmd

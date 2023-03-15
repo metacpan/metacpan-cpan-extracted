@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "URI" => 0,
     "experimental" => 0
   },
-  "VERSION" => "0.230680",
+  "VERSION" => "0.230690",
   "test" => {
     "TESTS" => ""
   }

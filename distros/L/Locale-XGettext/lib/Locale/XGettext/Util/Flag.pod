@@ -42,7 +42,7 @@ An integer B<N> greater than 0 for the argument number.
 The name of the flag to be applied, for example "perl-brace-format"
 or "no-perl-brace-format".  A possible prefix of "no-" or "pass-"
 is stripped off and interpreted accordingly but only if "pass" or
-"no" were not explicitely specified.
+"no" were not explicitly specified.
 
 =item B<no>
 

@@ -18,20 +18,24 @@ no_index:
     - t
     - inc
 requires:
+  Config::INI: '0.025'
+  Cpanel::JSON::XS: '4.35'
   DateTime: '0'
   DateTime::Duration: '0'
   DateTime::Format::Duration::ISO8601: '0.006'
   DateTime::TimeZone: '0'
   DateTime::TimeZone::OffsetOnly: '0'
-  File::Slurper: '0'
+  File::Slurper: '0.012'
   File::Spec: '0'
   Log::Report: '0'
   POSIX: '0'
   Scalar::Util: '0'
   Test::More: '0'
+  YAML::XS: '0.81'
+  boolean: '0.46'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Math-Formula.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

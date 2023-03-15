@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Math::Formula::Type - variable types for Math::Formular
+Math::Formula::Type - variable types for Math::Formula
 
 =head1 INHERITANCE
 
@@ -95,7 +95,7 @@ The weird infix operator C<< -> >> implements an 'if-then', which can also be
 used as substitute.  When the left-side of the arrow is true, then the right
 side is returned.
 
-When left of the C<< -> >> is a possive regular expression match C<< =~ >>,
+When left of the C<< -> >> is a possitive regular expression match C<< =~ >>,
 then the right side may can be a complex expression which may contains C<$1>,
 C<2> etc.  The represent the captured values in the regexp.
 
@@ -172,7 +172,7 @@ Attributes:
 =head2 MF::INTEGER, a long whole number
 
 Integers contain a sequence of ASCII digits, optionally followed by a multiplier.
-Numbers may use an underscore ('C<_>') on the thousands, to be more readible.
+Numbers may use an underscore ('C<_>') on the thousands, to be more readable.
 For instance, 'C<42k>' is equal to 'C<42_000>'.
 
 Supported multipliers are
@@ -206,7 +206,7 @@ B<. Example: of integers>
   8T            # how my disk was sold to me
   7451Mibi      # what my system tells me the space is
   -12           # negatives
-  1_234_567     # _ on the thousands, more readible
+  1_234_567     # _ on the thousands, more readable
 
   + 2          => INTEGER   2      # prefix op
   - 2          -> INTEGER   -2     # prefix op
@@ -263,10 +263,10 @@ example of that version:
 
 Mind the 'C<T>' between the date and the time components.  Second fractions are optional.
 
-The timezone is relative to UTC.  The first two digits reflect an hour difference, the
+The time-zone is relative to UTC.  The first two digits reflect an hour difference, the
 latter two are minutes.
 
-Datetimes can be cast to a time or a date, with loss of information.
+DateTimes can be cast to a time or a date, with loss of information.
 
 It is possible to add (C<+>) and subtract (C<->) durations from a datetime, which result
 in a new datetime.  When you subtract one datetime from another datetime, the result is
@@ -314,8 +314,8 @@ a new date.  Those durations cannot contain a time component.
 
 An subtract (C<->) from a date produces a duration.
 
-You may also add a time to a date, forming a datetime.  Those may be in diffent
-timezones.  You may also numerically compare dates, but only when they are not
+You may also add a time to a date, forming a datetime.  Those may be in different
+time-zones.  You may also numerically compare dates, but only when they are not
 in the same timezone, this will return false.
 
 B<. Example: for date>
@@ -341,15 +341,15 @@ Attributes:
 
 =head2 MF::TIME, a moment during any day
 
-Usefull to indicate a daily repeating event.  For instance, C<start-backup: 04:00:12>.
+Useful to indicate a daily repeating event.  For instance, C<start-backup: 04:00:12>.
 Times do no have a timezone: it only gets a meaning when added to a (local) time.
 
 Time supports numeric comparison.  When you add (C<+>) a (short) duration to a time, it
 will result in a new time (modulo 24 hours).
 
 When you subtract (C<->) one time from another, you will get a duration modulo 24 hours.
-This does not take possible jumps to and from Daylight Savingstime into
-account.  When you care about that, than create a formular involving
+This does not take possible jumps to and from Daylight Savings time into
+account.  When you care about that, than create a formula involving
 the actual date:
 
   bedtime = 23:00:00
@@ -406,7 +406,7 @@ Attributes:
 =head2 MF::DURATION, a period of time
 
 Durations are usually added to datetimes, and may be negative.  They are formatted in
-ISO8601 standard format, which is a bit akward, to say the least.
+ISO8601 standard format, which is a bit awkward, to say the least.
 
 Durations can be added (C<+>) together, subtracted (C<->) together,
 or multiplied by an integer factor.  The prefix C<+> and C<-> are also supported.
@@ -417,7 +417,7 @@ day length differs per month.  This will only be resolved when the duration is a
 to an actual datetime.
 
 Two durations can be compared numerically.  However: a bit of care must be taken.
-Sometimes, it is only clear what the ordering is when seend from a certain datetime.
+Sometimes, it is only clear what the ordering is when relative to a specific datetime.
 For instance, which is longer: P1M or P30D?  The current time ("now") is used as
 reference point.  Otherwise, add some other datetime to both durations before
 comparison.
@@ -449,7 +449,7 @@ Attributes
 
 Returns the duration in seconds, nanoseconds ignored.  This is exact when the duration
 only contains minutes and seconds.  When hours are involved, do you care about switching
-from and to Daylight Savingstime?  Months are taken as 1/12 of a year.  A year is taken
+from and to Daylight Savings time?  Months are taken as 1/12 of a year.  A year is taken
 as 365.256 year.  For exact calculations, add the duration to a DATETIME first.
 
 =back
@@ -457,7 +457,7 @@ as 365.256 year.  For exact calculations, add the duration to a DATETIME first.
 =head2 MF::NAME, refers to something in the context
 
 The L<Math::Formula::Context|Math::Formula::Context> object contains translations for names to
-contextual objects.  Names are the usual tokens: unicode alpha-numeric
+contextual objects.  Names are the usual tokens: Unicode alpha-numeric
 characters and underscore (C<_>), where the first character cannot be
 a digit.
 
@@ -482,7 +482,7 @@ B<. Example: of names>
   route66
   the_boss
   _42       # and '_' works as a character
-  αβΩ       # unicode alpha nums allowed
+  αβΩ       # Unicode alpha nums allowed
 
   7eleven   # not allowed: no start with number
 
@@ -556,8 +556,8 @@ The used of this type is explained in L<Math::Formula::Context|Math::Formula::Co
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.15,
-built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.16,
+built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

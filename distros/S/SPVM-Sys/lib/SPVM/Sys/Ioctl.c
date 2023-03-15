@@ -1,6 +1,6 @@
 #include "spvm_native.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <winsock2.h>
 #else
   #include <sys/ioctl.h>
@@ -12,14 +12,14 @@ const char* FILE_NAME = "Sys/Ioctl.c";
 
 // static functions are copied from Sys/Socket.c
 static int32_t socket_errno (void) {
-#ifdef _WIN32
+#if defined(_WIN32)
   return WSAGetLastError();
 #else
   return errno;
 #endif
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
 static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
   char* error_message = NULL;
   FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
@@ -37,7 +37,7 @@ static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32
 
 static void* socket_strerror_string (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
   void*
-#ifdef _WIN32
+#if defined(_WIN32)
   obj_strerror_value = socket_strerror_string_win(env, stack, error_number, length);
 #else
   obj_strerror_value = env->strerror_string(env, stack, error_number, length);
@@ -71,7 +71,7 @@ int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   void* obj_request_arg = stack[2].oval;
   
-#ifdef _WIN32
+#if defined(_WIN32)
     
   if (items <= 2) {
     return env->die(env, stack, "The $request_arg must be defined", __func__, FILE_NAME, __LINE__);

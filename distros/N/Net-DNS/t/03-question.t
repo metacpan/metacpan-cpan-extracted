@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-question.t 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
+# $Id: 03-question.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -197,7 +197,7 @@ use Test::More tests => 105;
 }
 
 
-eval {					## exercise but do not test print
+eval {					## no critic		# exercise but do not test print
 	require IO::File;
 	my $object = Net::DNS::Question->new('example.com');
 	my $file   = '03-question.txt';

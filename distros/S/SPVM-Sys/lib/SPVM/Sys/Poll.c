@@ -3,7 +3,7 @@
 
 #include "spvm_native.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <winsock2.h>
   #include <winerror.h>
 #else
@@ -16,14 +16,14 @@ const char* FILE_NAME = "Sys/Poll.c";
 
 // static functions are copied from Sys/Socket.c
 static int32_t socket_errno (void) {
-#ifdef _WIN32
+#if defined(_WIN32)
   return WSAGetLastError();
 #else
   return errno;
 #endif
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
 static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
   char* error_message = NULL;
   FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
@@ -41,7 +41,7 @@ static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32
 
 static void* socket_strerror_string (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
   void*
-#ifdef _WIN32
+#if defined(_WIN32)
   obj_strerror_value = socket_strerror_string_win(env, stack, error_number, length);
 #else
   obj_strerror_value = env->strerror_string(env, stack, error_number, length);
@@ -70,7 +70,7 @@ int32_t SPVM__Sys__Poll__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t timeout = stack[2].ival;
   
-#ifdef _WIN32
+#if defined(_WIN32)
   int32_t ready_count = WSAPoll(fds, nfds, timeout);
 #else
   int32_t ready_count = poll(fds, nfds, timeout);

@@ -45,6 +45,7 @@
             "Path::Class" : "0",
             "Time::HiRes" : "0",
             "URI" : "0",
+            "WebService::Tuya::IoT::API" : "0.02",
             "XML::LibXML::LazyBuilder" : "0"
          }
       }
@@ -60,5 +61,5 @@
          "web" : "https://github.com/mrdvt92/perl-Power-Outlet.git"
       }
    },
-   "version" : "0.47"
+   "version" : "0.48"
 }

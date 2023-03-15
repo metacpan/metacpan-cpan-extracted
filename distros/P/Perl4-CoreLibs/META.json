@@ -22,7 +22,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -58,6 +58,7 @@
             "IPC::Open2" : "0",
             "IPC::Open3" : "0",
             "Socket" : "0",
+            "Sys::Syslog" : "0.19",
             "Text::ParseWords" : "3.25",
             "Time::Local" : "0",
             "perl" : "5.006",
@@ -70,7 +71,7 @@
    "provides" : {
       "Perl4::CoreLibs" : {
          "file" : "lib/Perl4/CoreLibs.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -83,6 +84,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

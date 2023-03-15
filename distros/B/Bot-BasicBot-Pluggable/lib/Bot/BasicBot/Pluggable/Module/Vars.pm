@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Module::Vars;
-$Bot::BasicBot::Pluggable::Module::Vars::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Module::Vars::VERSION = '1.30';
 use base qw(Bot::BasicBot::Pluggable::Module);
 use warnings;
 use strict;
@@ -59,7 +59,7 @@ Bot::BasicBot::Pluggable::Module::Vars - change internal module variables
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 

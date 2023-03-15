@@ -1,0 +1,358 @@
+#!perl
+
+=head1 NAME
+
+virani - PCAP fetch tool for use with FPCs that save to PCAP format.
+
+=head1 SYNOPSIS
+
+virani B<-s> <start> B<-e> <end> B<-f> <filter> [B<-t> <type>] [B<-t> <set>]
+[B<--config> <file>] [B<-w> <output] [B<--nc>]
+
+virani B<-r> <remote> B<-s> <start> B<-e> <end> B<-f> <filter> [B<-t> <type>] [B<-t> <set>]
+B<--config> <file>] [B<-w> <output] [B<--nc>] [B<-a> <apikey>] [B<-k>]
+
+=head1 DESCRIPTION
+
+=head1 LOCAL
+
+Will read in the config '/usr/local/etc/virani.toml' and search the specified PCAP dirs.
+
+For information on the config, please see L<Virani>.
+
+=head2 REMOTE
+
+When used with B<-r>, it connects up to a remote location running mojo-virani.
+
+If the item specified by that switch is a HTTP or HTTPS url it will use that
+for with L<Viarni::Client>. Otherwise it will use that as part of a config file name
+or path to a config file. Searching in the order below.
+
+    $remote
+    $remote.toml
+    /usr/local/etc/virani.d/$remote
+    /usr/local/etc/virani.d/$remote.toml
+    /etc/virani.d/$remote
+    /etc/virani.d/$remote.toml
+
+If a API key is needed, it is read in in the order below.
+
+    -a
+    $ENV{virani_api_key}
+    $config{apikey}
+
+If using HTTPS, cert verification is read in the order below.
+'-k' is true and the rest are boolean.
+
+    -k
+    $ENV{VIRANI_VERIFY_HOSTNAME}
+    $ENV{HTTPS_VERIFY_HOSTNAME}
+    $ENV{PERL_LWP_VERIFY_HOSTNAME}
+    $config{verify_hostname}
+
+=head1 FLAGS
+
+=head2 -r <remote>
+
+Remote URL or config file for remote info.
+
+=head2 -a <apikey>
+
+API key for remote URL if needed.
+
+=head2 -f <filter>
+
+Filter for use with tshark or tcpdump.
+
+=head2 -t <type>
+
+tcpdump or tshark
+
+Default :: tcpdump
+
+=head2 -t <set>
+
+Set to use. If undef, uses whatever the default is.
+
+Default :: undef
+
+=head2 --config <config>
+
+Config file to use.
+
+Default :: /usr/local/etc/virani.toml
+
+=head2 -s <timestamp>
+
+Start timestamp. Any format supported by
+
+Time::Piece::Guess is usable.
+
+=head2 -e <timestamp>
+
+End timestamp. Any format supported by
+
+Time::Piece::Guess is usable.
+
+=head2 -w <output>
+
+The file to write the PCAP to.
+
+Default :: out.pcap
+
+=head2 --nc
+
+If cached, do not use it.
+
+=head2 -k
+
+Do not check the SSL cert for HTTPS for remote.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Virani;
+use TOML;
+use File::Slurp;
+use Time::Piece::Guess;
+use Virani::Client;
+use JSON;
+
+sub version {
+	print "viarni v. 0.0.1\n";
+}
+
+sub help {
+	&version;
+
+	print '
+
+--help            Print this.
+-h                Print this.
+
+--version         Print version.
+-v                Print version..
+
+-r <remote>       Remote URL or config file for remote info.
+
+-a <apikey>       API key for remote URL if needed.
+
+-f <filter>       Filter for use with tshark or tcpdump.
+
+-t <type>         tcpdump or tshark
+                  Default :: tcpdump
+
+-t <set>          Set to use. If undef, uses whatever the default is.
+                  Default :: undef
+
+--config <config> Config file to use.
+                  Default :: /usr/local/etc/virani.toml
+
+-s <timestamp>    Start timestamp. Any format supported by
+                  Time::Piece::Guess is usable.
+
+-e <timestamp>    End timestamp. Any format supported by
+                  Time::Piece::Guess is usable.
+
+-w <output>       The file to write the PCAP to.
+                  Default :: out.pcap
+
+--nc              If cached, do not use it.
+
+-k                Do not check the SSL cert for HTTPS for remote.
+
+';
+}
+
+# get the cli optiosn
+my $help    = 0;
+my $version = 0;
+my $filter  = undef;
+my $start;
+my $end;
+my $write = 'out.pcap';
+my $format;
+my $remote;
+my $url;
+my $apikey;
+my $set           = 'default';
+my $config_virani = '/usr/local/etc/virani.toml';
+my $tmpdir;
+my $no_cache             = 0;
+my $quiet                = 0, my $verbose = 1;
+my $type                 = 'tcpdump';
+my $verify_hostname      = 1;
+my $verify_hostname_flag = 0;
+my $timeout;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version'   => \$version,
+	'v'         => \$version,
+	'help'      => \$help,
+	'h'         => \$help,
+	'f=s'       => \$filter,
+	's=s'       => \$start,
+	'e=s'       => \$end,
+	'w=s'       => \$write,
+	'r=s'       => \$remote,
+	'set=s'     => \$set,
+	'nc'        => \$no_cache,
+	'q'         => \$quiet,
+	'config=s'  => \$config_virani,
+	'a=s'       => \$apikey,
+	't=s'       => \$type,
+	'k'         => \$verify_hostname_flag,
+	'timeout=s' => \$timeout,
+);
+
+if ($help) {
+	&help;
+	exit;
+}
+
+if ($version) {
+	&version;
+	exit;
+}
+
+if ( !defined($start) ) {
+	die('No start time set via -s');
+}
+elsif ( !defined($end) ) {
+	die('No start time set via -s');
+}
+
+if ($quiet) {
+	$verbose = 0;
+}
+
+if ($verify_hostname_flag) {
+	$verify_hostname = 0;
+}
+
+my $start_obj;
+eval { $start_obj = Time::Piece::Guess->guess_to_object($start); };
+if ( $@ || !defined($start_obj) ) {
+	die( 'Failed to parse the start stamp,"' . $start . '",' );
+}
+my $end_obj;
+eval { $end_obj = Time::Piece::Guess->guess_to_object($end); };
+if ( $@ || !defined($end_obj) ) {
+	die( 'Failed to parse the end timestamp,"' . $end . '",' );
+}
+
+# handles it if it is not remote
+if ( !$remote ) {
+	my $virani = Virani->new_from_conf( conf => $config_virani );
+	$virani->set_verbose($verbose);
+	$virani->set_verbose_to_syslog(0);
+
+	my $returned = $virani->get_pcap_local(
+		start    => $start_obj,
+		end      => $end_obj,
+		filter   => $filter,
+		file     => $write,
+		no_cache => $no_cache,
+		verbose  => $verbose,
+		set      => $set,
+		type     => $type,
+	);
+	if ( $returned->{using_cache} ) {
+		my $json = JSON->new->allow_nonref->pretty->canonical(1);
+		print "Cache metadata...\n" . $json->encode($returned);
+	}
+
+	exit 0;
+}
+else {
+	# check to see if remote is a config file
+	my $config_file;
+	if ( -f $remote ) {
+		$config_file = $remote;
+	}
+	elsif ( -f $remote . '.toml' ) {
+		$config_file = $remote . '.toml';
+	}
+	elsif ( -f '/usr/local/etc/virani.d/' . $remote ) {
+		$config_file = '/usr/local/etc/virani.d/' . $remote;
+	}
+	elsif ( -f '/usr/local/etc/virani.d/' . $remote . '.toml' ) {
+		$config_file = '/usr/local/etc/virani.d/' . $remote . '.toml';
+	}
+	elsif ( -f '/etc/virani.d/' . $remote ) {
+		$config_file = '/etc/virani.d/' . $remote;
+	}
+	elsif ( -f '/etc/virani.d/' . $remote . '.toml' ) {
+		$config_file = '/etc/virani.d/' . $remote . '.toml';
+	}
+
+	my $toml;
+	if ( defined($config_file) ) {
+		print 'Config File: ' . $config_file;
+
+		my $raw_toml = read_file($config_file) || die( 'Failed to read "' . $config_file . '"' );
+		my ( $toml, $err ) = from_toml($raw_toml);
+		unless ($toml) {
+			die( "Error parsing '" . $config_file . "':" . $err );
+		}
+	}
+	elsif ( $remote =~ /^[Hh][Tt][Tt][Pp][Ss]*\:\/\// ) {
+		print 'URL: ' . $remote . "\n";
+		$url = $remote;
+	}
+	else {
+		die( "'" . $remote . "' does not appear to be a config file or a HTTP or HTTPS URL" );
+	}
+
+	if ( defined($apikey) ) {
+		print "API key: specified via -a\n";
+	}
+	elsif ( defined( $ENV{virani_api_key} ) ) {
+		print 'API key: specified via $ENV{virani_api_key}' . "\n";
+		$apikey = $ENV{virani_api_key};
+	}
+	elsif ( defined($toml) && defined( $toml->{apikey} ) ) {
+		print 'API key: specified via config file at ' . $config_file . "\n";
+		$apikey = $toml->{apikey};
+	}
+
+	if ( defined($timeout) ) {
+		print "Timeout: specified via --timeout\n";
+	}
+	elsif ( defined( $ENV{virani_timeout} ) ) {
+		print 'Timeout: specified via $ENV{virani_timeout}' . "\n";
+		$timeout = $ENV{virani_timeout};
+	}
+	elsif ( defined($toml) && defined( $toml->{timeout} ) ) {
+		print 'Timeout: specified via config file at ' . $config_file . "\n";
+		$timeout = $toml->{timeout};
+	}
+
+	if ( !defined($url) ) {
+		if ( defined( $toml->{url} ) ) {
+			$url = $toml->{url};
+		}
+		else {
+			die( "No url specified in '" . $config_file . "'" );
+		}
+	}
+
+	my $vc = Virani::Client->new( url => $url, apikey => $apikey, verify_hostname => $verify_hostname );
+	$vc->fetch(
+		start    => $start_obj,
+		end      => $end_obj,
+		filter   => $filter,
+		file     => $write,
+		no_cache => $no_cache,
+		verbose  => $verbose,
+		set      => $set,
+		type     => $type,
+		timeout  => $timeout,
+	);
+	print 'Written to ' . $write . "\n";
+
+	exit 0;
+}

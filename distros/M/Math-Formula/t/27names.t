@@ -12,7 +12,13 @@ my $expr = Math::Formula->new(test => 1);
 
 is_deeply $expr->_tokenize('mark'),       [ MF::NAME->new('mark') ];
 is_deeply $expr->_tokenize('_mark_42'),   [ MF::NAME->new('_mark_42') ];
-is_deeply $expr->_tokenize('Зеленський'), [ MF::NAME->new('Зеленський') ];
+
+if($] =~ m/^5\.2[01]/)
+{	diag "utf8 names are broken in 5.20";  # regexp issue: get double encoded in $+
+}
+else
+{	is_deeply $expr->_tokenize('Зеленський'), [ MF::NAME->new('Зеленський') ];
+}
 
 is_deeply $expr->_tokenize('tic tac toe'), [MF::NAME->new('tic'), MF::NAME->new('tac'), MF::NAME->new('toe')];
 

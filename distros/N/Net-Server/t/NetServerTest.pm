@@ -53,7 +53,12 @@ sub prepare_test {
 
     if ($args->{'threads'}) {
         warn "# Checking can_thread\n" if debug;
-        ok(can_thread(), "Can thread on this platform".($@ ? " ($@)" : '')) || do { SKIP: { skip("Threads don't work on this platform", $N - 1) }; exit; };
+        if (can_thread()) {
+            ok(1, "Can thread on this platform".($@ ? " ($@)" : ''));
+        } else {
+            SKIP: { skip("Threads don't work on this platform", $N) };
+            exit;
+        }
         warn "# Checked can_thread\n"  if debug;
     } else {
         warn "# Checking can_fork\n" if debug;

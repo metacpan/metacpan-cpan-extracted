@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -47,6 +47,16 @@ sub after_close_input_files {
         for my $row (@{ $r->{util_args}{hash} ? $r->{input_rows_as_hashref} : $r->{input_rows} }) {
             local $_ = $row;
             push @keys, $code_gen_key->($row);
+        }
+    }
+
+    # if user doesn't specify any by_* args, try to set a default if we can
+    if (!(grep {defined} ($r->{util_args}{by_code}, $r->{util_args}{by_sortsub}, $r->{util_args}{by_fields}))) {
+        # if there is only a single field, use it
+        if (@{ $r->{input_fields} } == 1) {
+            my $field = $r->{input_fields}[0];
+            $r->{util_args}{by_fields} = App::CSVUtils::_is_numeric_field(
+                $r->{input_rows}, 0) ? ["+$field"] : [$field];
         }
     }
 
@@ -98,10 +108,7 @@ sub after_close_input_files {
         my $code_str = "";
         for my $field_spec (@{ $r->{util_args}{by_fields} }) {
             my ($prefix, $field) = $field_spec =~ /\A([+~-]?)(.+)/;
-            my $field_idx = $r->{input_fields_idx}{$field};
-            die [400, "Unknown field '$field' (known fields include: ".
-                 join(", ", map { "'$_'" } sort {$r->{input_fields_idx}{$a} <=> $r->{input_fields_idx}{$b}}
-                      keys %{$r->{input_fields_idx}}).")"] unless defined $field_idx;
+            my $field_idx = App::CSVUtils::_find_field($r->{input_fields}, $field);
             $prefix //= "";
             if ($prefix eq '+') {
                 $code_str .= ($code_str ? " || " : "") .
@@ -236,14 +243,15 @@ descending length of name):
     Andy,20
     Ben,30
 
+If none of the `--by-*` options are specified, the utility will bail unless
+there's a default that can be used, e.g. when CSV has a single field then that
+field will be used.
+
 _
 
     add_args => {
         %App::CSVUtils::argspecopt_hash,
         %App::CSVUtils::argspecs_sort_rows,
-    },
-    add_args_rels => {
-        req_one => ['by_fields', 'by_code', 'by_sortsub'],
     },
 
     on_input_header_row => \&App::CSVUtils::csv_sort_rows::on_input_header_row,
@@ -269,7 +277,7 @@ App::CSVUtils::csv_sort_rows - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils::csv_sort_rows (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils::csv_sort_rows (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =for Pod::Coverage ^(on|after|before)_.+$
 
@@ -361,6 +369,10 @@ descending length of name):
  Jerry,30
  Andy,20
  Ben,30
+
+If none of the C<--by-*> options are specified, the utility will bail unless
+there's a default that can be used, e.g. when CSV has a single field then that
+field will be used.
 
 This function is not exported.
 

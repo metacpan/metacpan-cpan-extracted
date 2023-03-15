@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Exporter" : "0",
             "Module::Build" : "0",
             "Test::More" : "0.41",
             "perl" : "5.006",
@@ -46,15 +47,19 @@
    "provides" : {
       "Lexical::SealRequireHints" : {
          "file" : "lib/Lexical/SealRequireHints.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Lexical-SealRequireHints@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Lexical-SealRequireHints"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

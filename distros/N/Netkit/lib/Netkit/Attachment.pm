@@ -30,7 +30,7 @@ sub new {
 		eth => $params{eth},
 		lan => $params{lan},
 		vlan => $params{vlan},
-		tagged => $params{tagged}
+		untagged => $params{untagged}
 	}, $class;
 	
 	return $self;

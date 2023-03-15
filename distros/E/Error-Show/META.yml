@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/drclaw1394/perl-error-show/issues
   homepage: https://github.com/drclaw1394/perl-error-show
   repository: https://github.com/drclaw1394/perl-error-show.git
-version: v0.2.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

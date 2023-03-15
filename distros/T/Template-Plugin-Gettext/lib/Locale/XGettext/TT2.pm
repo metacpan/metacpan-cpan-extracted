@@ -19,12 +19,13 @@
 # USA.
 
 package Locale::XGettext::TT2;
-$Locale::XGettext::TT2::VERSION = '0.7';
+$Locale::XGettext::TT2::VERSION = '0.8';
 use strict;
 
 use Locale::TextDomain qw(Template-Plugin-Gettext);
 use Template;
 
+use Locale::XGettext 0.7;
 use base qw(Locale::XGettext);
 
 sub versionInformation {
@@ -124,7 +125,7 @@ sub readFile {
 }
 
 package Locale::XGettext::TT2::Parser;
-$Locale::XGettext::TT2::Parser::VERSION = '0.7';
+$Locale::XGettext::TT2::Parser::VERSION = '0.8';
 use strict;
 
 use Locale::TextDomain qw(Template-Plugin-Gettext);

@@ -18,7 +18,7 @@ C<Sys::Process> provides the methods to call the system call for the time manipu
 
 =head2 gettimeofday
 
-  static method gettimeofday ($tv : Sys::Time::Timeval, $tz : Sys::Time::Timezone)
+  static method gettimeofday : int ($tv : Sys::Time::Timeval, $tz : Sys::Time::Timezone);
 
 The functions gettimeofday() can get the time as well as a timezone. The tv argument is a struct timeval (as specified in <sys/time.h>):
 
@@ -34,7 +34,7 @@ See L<clock(3) - Linux man page|https://linux.die.net/man/3/clock> in Linux.
 
 =head2 clock_gettime
 
-  static method clock_gettime : int ($clk_id : int, $tp : Sys::Time::Timespec)
+  static method clock_gettime : int ($clk_id : int, $tp : Sys::Time::Timespec);
 
 The functions clock_gettime() retrieves the time of the specified clock clk_id.
 
@@ -44,7 +44,7 @@ The C<$tp> is a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
 
 =head2 clock_getres
 
-  static method clock_getres : int ($clk_id : int, $res : Sys::Time::Timespec)
+  static method clock_getres : int ($clk_id : int, $res : Sys::Time::Timespec);
 
 The functions clock_getres() retrieves the time of the specified clock clk_id.
 
@@ -66,7 +66,7 @@ The C<$old_value> is a L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval> object
 
 =head2 getitimer
 
-  static method getitimer : int ($which : int, $curr_value : Sys::Time::Itimerval)
+  static method getitimer : int ($which : int, $curr_value : Sys::Time::Itimerval);
 
 The function getitimer() fills the structure pointed to by curr_value with the current setting for the timer specified by which (one of ITIMER_REAL, ITIMER_VIRTUAL, or ITIMER_PROF).
 

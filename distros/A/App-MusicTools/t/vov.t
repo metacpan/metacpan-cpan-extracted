@@ -1,136 +1,133 @@
 #!perl
+use Test2::V0;
+use Test2::Tools::Command;
+local @Test2::Tools::Command::command = ( $^X, '--', './bin/vov' );
 
-use Test::Cmd;
-use Test::Most;
+command {
+    args   => [qw(I)],
+    stdout => "c e g\n",
+};
+command {
+    args   => [qw(I6)],
+    stdout => "e g c\n",
+};
+command {
+    args   => [qw(I64)],
+    stdout => "g c e\n",
+};
+command {
+    args   => [qw(--raw I)],
+    stdout => "0 4 7\n",
+};
+command {
+    args   => [qw(II)],
+    stdout => "d fis a\n",
+};
+command {
+    args   => [qw(--flats bII6)],
+    stdout => "f aes des\n",
+};
+command {
+    args   => [qw(--natural II)],
+    stdout => "d f a\n",
+};
+command {
+    args   => [qw(--minor --natural I)],
+    stdout => "c dis g\n",
+};
+command {
+    args   => [qw(--flats III)],
+    stdout => "e aes b\n",
+};
+command {
+    args   => [qw(V7)],
+    stdout => "g b d f\n",
+};
+command {
+    args   => [qw(V65)],
+    stdout => "b d f g\n",
+};
+command {
+    args   => [qw(V43)],
+    stdout => "d f g b\n",
+};
+command {
+    args   => [qw(V2)],
+    stdout => "f g b d\n",
+};
+command {
+    args   => [qw(--natural vii)],
+    stdout => "b d f\n",
+};
+# XXX VII is tricky; this is what I intuit should happen without the
+# --natural flag involved, though it does break out of the mode.
+# XXX also must test inversions of VII and whatnot
+command {
+    args   => [qw(vii*)],
+    stdout => "b d f\n",
+};
+#   args vii
+#   stdout b d fis
+#   args VII
+#   stdout b dis fis
+# XXX oh also bvii is bad, that diminishes itself, which I would only
+# expect to happen to bvii*
 
-my $deeply = \&eq_or_diff;
+# and now transpositions
+command {
+    args   => [qw(--transpose=g I)],
+    stdout => "g b d\n",
+};
+command {
+    args   => [qw(--transpose=7 I)],
+    stdout => "g b d\n",
+};
+command {
+    args   => [qw(--flats --transpose=g i)],
+    stdout => "g bes d\n",
+};
+command {
+    args   => [qw(--transpose=b --mode=locrian i)],
+    stdout => "b d f\n",
+};
+command {
+    args   => [qw(--transpose=b --mode=locrian II)],
+    stdout => "c e g\n",
+};
+command {
+    args   => [qw(--transpose=b --mode=locrian Vb)],
+    stdout => "a c f\n",
+};
+command {
+    args   => [qw(I V7/IV IV V)],
+    stdout => "c e g\nc e g b\nf a c\ng b d\n",
+};
+command {
+    args   => [qw(--factor=7 IV)],
+    stdout => "f a c e\n",
+};
+command {
+    args   => [qw(--outputtmpl=%{vov} I)],
+    stdout => "I\n",
+};
+command {
+    args   => [qw(--outputtmpl=x%{chord}x I13g)],
+    stdout => "xa c e g b d fx\n",
+};
+command {
+    args   => [qw(--flats i7**)],
+    stdout => "c ees g bes\n",
+};
+command {
+    args   => [qw(I+)],
+    stdout => "c e gis\n",
+};
+command {
+    args   => [qw(i*)],
+    stdout => "c dis fis\n",
+};
 
-my $test_prog = './bin/vov';
-my $tc        = Test::Cmd->new(
-    interpreter => $^X,
-    prog        => $test_prog,
-    verbose     => 0,            # TODO is there a standard ENV to toggling?
-    workdir     => '',
-);
+# XXX think about what I* would mean...major 3rd but dim 5th? or throw
+# exception for unknown chord?
 
-# NOTE XXX TODO FIXME the * in the command arguments may fail, and
-# certainly only work by accident. Need to figure out how to get shell
-# metachars through Test::Cmd; the * here (should, in theory) not match
-# anything and thus per POSIX shell behavior (unless zsh) pass the * on
-# through unadulterated, unless you create say an i* filename in the
-# root directory of this distribution. With this in mind...
-my @tests = (
-    {   args     => 'I',
-        expected => [q{c e g}],
-    },
-    {   args     => 'I6',
-        expected => [q{e g c}],
-    },
-    {   args     => 'I64',
-        expected => [q{g c e}],
-    },
-    {   args     => '--raw I',
-        expected => [q{0 4 7}],
-    },
-    {   args     => 'II',
-        expected => [q{d fis a}],
-    },
-    {   args     => '--flats bII6',
-        expected => [q{f aes des}],
-    },
-    {   args     => '--natural II',
-        expected => [q{d f a}],
-    },
-    {   args     => '--minor --natural I',
-        expected => [q{c dis g}],
-    },
-    {   args     => '--flats III',
-        expected => [q{e aes b}],
-    },
-    {   args     => 'V7',
-        expected => [q{g b d f}],
-    },
-    {   args     => 'V65',
-        expected => [q{b d f g}],
-    },
-    {   args     => 'V43',
-        expected => [q{d f g b}],
-    },
-    {   args     => 'V2',
-        expected => [q{f g b d}],
-    },
-    {   args     => '--natural vii',
-        expected => [q{b d f}],
-    },
-    # XXX VII is tricky; this is what I intuit should happen without the
-    # --natural flag involved, though it does break out of the mode.
-    # XXX also must test inversions of VII and whatnot
-    {   args     => 'vii*',
-        expected => [q{b d f}],
-    },
-    # { args => 'vii',
-    #   expected => [q{b d fis}],
-    # },
-    # { args => 'VII',
-    #   expected => [q{b dis fis}],
-    # },
-    # XXX oh also bvii is bad, that diminishes itself, which I would only
-    # expect to happen to bvii*
-
-    # and now transpositions
-    {   args     => '--transpose=g I',
-        expected => [q{g b d}],
-    },
-    {   args     => '--transpose=7 I',
-        expected => [q{g b d}],
-    },
-    {   args     => '--flats --transpose=g i',
-        expected => [q{g bes d}],
-    },
-    {   args     => '--transpose=b --mode=locrian i',
-        expected => [q{b d f}],
-    },
-    {   args     => '--transpose=b --mode=locrian II',
-        expected => [q{c e g}],
-    },
-    {   args     => '--transpose=b --mode=locrian Vb',
-        expected => [q{a c f}],
-    },
-    {   args     => 'I V7/IV IV V',
-        expected => [ q{c e g}, q{c e g b}, q{f a c}, q{g b d} ],
-    },
-    {   args     => '--factor=7 IV',
-        expected => [q{f a c e}],
-    },
-    {   args     => '--outputtmpl=%{vov} I',
-        expected => [q{I}],
-    },
-    {   args     => '--outputtmpl=x%{chord}x I13g',
-        expected => [q{xa c e g b d fx}],
-    },
-    {   args     => '--flats i7**',
-        expected => [q{c ees g bes}],
-    },
-    {   args     => 'I+',
-        expected => [q{c e gis}],
-    },
-    {   args     => 'i*',
-        expected => [q{c dis fis}],
-    },
-    # XXX think about what I* would mean...major 3rd but dim 5th? or throw
-    # exception for unknown chord?
-    #{ args => 'I*',
-    #  expected => [q{c ? fis}],
-    #},
-);
-
-plan tests => @tests * 2;
-
-for my $test (@tests) {
-    $tc->run( args => $test->{args} );
-    $deeply->(
-        [ map { s/\s+$//r } $tc->stdout ],
-        $test->{expected}, "$test_prog $test->{args}"
-    );
-    is( $tc->stderr, "", "$test_prog $test->{args} emits no stderr" );
-}
+done_testing 84

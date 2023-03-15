@@ -87,7 +87,7 @@ sub database_setting {
             return;
         }
         push @groups, [ 'reset_db_dummy_str', "  Reset DB settings" ] if ! defined $db;
-        my $prompt = defined $db ? 'DB: ' . $db . '' : '' . $plugin . '';
+        my $prompt = defined $db ? 'DB: ' . $db : $plugin;
         my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
         my $db_opt = $db_opt_get->read_db_config_files();
         my $changed = 0;
@@ -152,7 +152,7 @@ sub database_setting {
                             # db specific               # global
                     $db_opt->{$key}{$opt} //= $db_opt->{$plugin}{$opt} // 1; # by default enabled
                 }
-                my $prompt = 'Required fields (' . $plugin . '):';
+                my $prompt = sprintf "%s\n%s:", $plugin, $group;
                 $sf->__settings_menu_wrap_db( $db_opt, $key, $sub_menu, $prompt );
             }
             elsif ( $group eq 'login_data' ) {
@@ -162,7 +162,7 @@ sub database_setting {
                         $db_opt->{$key}{$opt} = $db_opt->{$plugin}{$opt};
                     }
                 }
-                my $prompt = 'Default login data (' . $plugin . ')';
+                my $prompt = sprintf "%s\n%s:", $plugin, $group;
                 $sf->__group_readline_db( $db_opt, $key, $login_data, $prompt );
             }
             elsif ( $group eq 'read_attributes' ) {
@@ -177,7 +177,7 @@ sub database_setting {
                         }
                     }
                 }
-                my $prompt = 'Options ' . $plugin . ':';
+                my $prompt = sprintf "%s\n%s:", $plugin, $group;
                 $sf->__group_readline_db( $db_opt, $key, $read_attributes, $prompt );
             }
             elsif ( $group eq 'env_variables' ) {
@@ -188,7 +188,7 @@ sub database_setting {
                     push @$sub_menu, [ $opt, $prompt, $item->{values} ];
                     $db_opt->{$key}{$opt} //= $db_opt->{$plugin}{$opt} // 0; # by default disabled
                 }
-                my $prompt = 'Use ENV variables (' . $plugin . '):';
+                my $prompt = sprintf "%s\n%s:", $plugin, $group;
                 $sf->__settings_menu_wrap_db( $db_opt, $key, $sub_menu, $prompt );
             }
             elsif ( $group eq 'set_attributes' ) {
@@ -199,7 +199,7 @@ sub database_setting {
                     push @$sub_menu, [ $opt, $prompt, $item->{values} ];
                     $db_opt->{$key}{$opt} //= $db_opt->{$plugin}{$opt} // $item->{values}[$item->{default}];
                 }
-                my $prompt = 'Options ' . $plugin . ':';
+                my $prompt = sprintf "%s\n%s:", $plugin, $group;
                 $sf->__settings_menu_wrap_db( $db_opt, $key, $sub_menu, $prompt );
             }
         }

@@ -2,7 +2,7 @@ package Net::DNS::RR::DNAME;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DNAME.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: DNAME.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,18 +19,18 @@ use Net::DNS::DomainName;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->{target} = Net::DNS::DomainName2535->decode(@_);
+	$self->{target} = Net::DNS::DomainName2535->decode(@argument);
 	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
 	my $target = $self->{target};
-	return $target->encode(@_);
+	return $target->encode(@argument);
 }
 
 
@@ -43,17 +43,16 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->target(shift);
+	$self->target(@argument);
 	return;
 }
 
 
 sub target {
-	my $self = shift;
-
-	$self->{target} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{target} = Net::DNS::DomainName2535->new($_) }
 	return $self->{target} ? $self->{target}->name : undef;
 }
 
@@ -123,6 +122,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC6672
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC6672|https://tools.ietf.org/html/rfc6672>
 
 =cut

@@ -8,7 +8,7 @@ use v5.16;  # fc
 
 package Math::Formula::Type;
 use vars '$VERSION';
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 use base 'Math::Formula::Token';
 

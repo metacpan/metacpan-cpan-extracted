@@ -1,5 +1,12 @@
 Revision history for Perl extension Bot::BasicBot::Pluggable.
 
+{{NEXT}}
+- Avoid spurious table exists warning in ::Store::DBI (RT #75849, PR #11),
+  with thanks to Michael Alexander (omni)
+- Fix typo in doco (alt_nicks not alt_nicks) - also with thanks to omni
+- New infobox options to allow newlines / pipes in factoids
+  (PR #14, with thanks to Jaggz H (@jaggzh)
+
 1.20 - 2017-04-06
  - Support irc_raw and irc_raw_out (new events added in Bot::BasicBot 0.91 in
    order to provide raw IRC traffic)

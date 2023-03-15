@@ -5,7 +5,7 @@
 
 package Math::Formula::Context;
 use vars '$VERSION';
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 
 use warnings;

@@ -2,12 +2,13 @@ package Test2::Harness::UI::Controller::Binary;
 use strict;
 use warnings;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 use Test2::Harness::UI::Response qw/resp error/;
 
 use parent 'Test2::Harness::UI::Controller';
 use Test2::Harness::UI::Util::HashBase;
+use Test2::Harness::UI::UUID qw/uuid_inflate/;
 
 sub title { 'Binary' }
 
@@ -19,7 +20,7 @@ sub handle {
     my $res = resp(200);
 
     die error(404 => 'Missing route') unless $route;
-    my $binary_id = $route->{binary_id};
+    my $binary_id = uuid_inflate($route->{binary_id}) or die error(404 => "Invalid Route");
 
     error(404 => 'No id') unless $binary_id;
 

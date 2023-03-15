@@ -4,18 +4,19 @@ package Data::Domain; # documentation at end of file
 use 5.010;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Carp;
 use Data::Dumper;
 use Scalar::Does 0.007;
 use Scalar::Util ();
 use Try::Tiny;
-use List::MoreUtils qw/part natatime/;
-use overload '~~' => \&_matches, '""' => \&_stringify;
+use List::MoreUtils qw/part natatime any/;
+use if $] < 5.037, experimental => 'smartmatch';
+use overload '""' => \&_stringify, $] < 5.037 ? ('~~' => \&_matches) : ();
+use match::simple ();
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
-our $MESSAGE;        # global var for last message from ~~ (see '_matches')
+our $MESSAGE;        # global var for last message from _matches()
 our $MAX_DEEP = 100; # limit for recursive calls to inspect()
 
 #----------------------------------------------------------------------
@@ -244,9 +245,9 @@ sub inspect {
           or return $self->msg(MATCH_CAN => $method);
       }
     }
-    if (my $matches = $self->{-matches}) {
-      try {$data ~~ $matches}
-        or return $self->msg(MATCH_SMART => $matches);
+    if (my $match_target = $self->{-matches}) {
+      match::simple::match($data, $match_target)
+        or return $self->msg(MATCH_SMART => $match_target);
     }
     if ($self->{-has}) {
       # EXPERIMENTAL: check methods results
@@ -411,12 +412,10 @@ sub _check_min_max {
   my ($self, $min_field, $max_field, $cmp_func) = @_;
 
   # choose the appropriate comparison function
-  for ($cmp_func) {
-    when ('<=')             {$cmp_func = sub {$_[0] <= $_[1]}}
-    when ('le')             {$cmp_func = sub {$_[0] le $_[1]}}
-    when (does($_, 'CODE')) {} # already a coderef, do nothing
-    default {croak "inappropriate cmp_func for _check_min_max"}
-  }
+  if    ($cmp_func eq '<=')       {$cmp_func = sub {$_[0] <= $_[1]}}
+  elsif ($cmp_func eq 'le')       {$cmp_func = sub {$_[0] le $_[1]}}
+  elsif (does($cmp_func, 'CODE')) {} # already a coderef, do nothing
+  else                            {croak "inappropriate cmp_func for _check_min_max"}
 
   # check that min is smaller than max
   my ($min, $max) = @{$self}{$min_field, $max_field};
@@ -436,33 +435,31 @@ sub _build_subdomain {
     or croak "inspect() deepness exceeded $MAX_DEEP; "
            . "modify \$Data::Domain::MAX_DEEP if you need more";
 
-  for ($domain) {
-    when (does($_, 'Data::Domain')) {
-      # already a domain, nothing to do
-    }
-    when (does($_, 'CODE')) {
-      # this is a lazy domain, need to call the coderef to get a real domain
-      $domain = try   {$domain->($context)} 
-                catch {# remove "at source_file, line ..." from error message
-                       (my $error_msg = $_) =~ s/\bat\b.*//s;
-                       # return an empty domain that reports the error message
-                       Data::Domain::Empty->new(-name => "domain parameters",
-                                                -messages => $error_msg);
-                     };
-      # did we really get a domain ?
-      does($domain, "Data::Domain")
-        or croak "lazy domain coderef returned an invalid domain";
-    }
-    when (!ref) {
-      # this is a scalar, build a constant domain with that single value
-      my $subclass = Scalar::Util::looks_like_number($_) ? 'Num' : 'String';
-      $domain = "Data::Domain::$subclass"->new(-min  => $_,
-                                               -max  => $_,
-                                               -name => "constant $subclass");
-    }
-    default {
-      croak "unknown subdomain : $_";
-    }
+  if (does($domain, 'Data::Domain')) {
+    # already a domain, nothing to do
+  }
+  elsif (does($domain, 'CODE')) {
+    # this is a lazy domain, need to call the coderef to get a real domain
+    $domain = try   {$domain->($context)} 
+      catch {   # remove "at source_file, line ..." from error message
+        (my $error_msg = $_) =~ s/\bat\b.*//s;
+        # return an empty domain that reports the error message
+        Data::Domain::Empty->new(-name => "domain parameters",
+                                 -messages => $error_msg);
+      };
+    # did we really get a domain ?
+    does($domain, "Data::Domain")
+      or croak "lazy domain coderef returned an invalid domain";
+  }
+  elsif (!ref $domain) {
+    # this is a scalar, build a constant domain with that single value
+    my $subclass = Scalar::Util::looks_like_number($domain) ? 'Num' : 'String';
+    $domain = "Data::Domain::$subclass"->new(-min  => $domain,
+                                             -max  => $domain,
+                                             -name => "constant $subclass");
+  }
+  else {
+    croak "unknown subdomain : $domain";
   }
 
   return $domain;
@@ -486,7 +483,7 @@ sub _parse_args {
 
   # parse named arguments
   while (@$args_ref and $args_ref->[0] =~ /^-/) {
-    $args_ref->[0] ~~ [@$options_ref, @common_options]
+    any {$args_ref->[0] eq $_} (@$options_ref, @common_options)
       or croak "invalid argument: $args_ref->[0]";
     my ($key, $val) = (shift @$args_ref, shift @$args_ref);
     $parsed{$key}  = $val;
@@ -1170,24 +1167,22 @@ sub new {
   bless $self, $class;
 
   my $fields = $self->{-fields} || [];
-  for ($fields) {
-    when (does($_, 'ARRAY')) {
-      # transform arrayref into hashref plus an ordered list of keys
-      $self->{-fields_list} = [];
-      $self->{-fields}      = {};
-      for (my $i = 0; $i < @$fields; $i += 2) {
-        my ($key, $val) = ($fields->[$i], $fields->[$i+1]);
-        push @{$self->{-fields_list}}, $key;
-        $self->{-fields}{$key} = $val;
-      }
+  if (does($fields, 'ARRAY')) {
+    # transform arrayref into hashref plus an ordered list of keys
+    $self->{-fields_list} = [];
+    $self->{-fields}      = {};
+    for (my $i = 0; $i < @$fields; $i += 2) {
+      my ($key, $val) = ($fields->[$i], $fields->[$i+1]);
+      push @{$self->{-fields_list}}, $key;
+      $self->{-fields}{$key} = $val;
     }
-    when (does($_, 'HASH')) {
-      # keep given hashref, add list of keys
-      $self->{-fields_list} = [keys %$fields];
-    }
-    default {
-      croak "invalid data for -fields option";
-    }
+  }
+  elsif (does($fields, 'HASH')) {
+    # keep given hashref, add list of keys
+    $self->{-fields_list} = [keys %$fields];
+  }
+  else {
+    croak "invalid data for -fields option";
   }
 
   # check that -exclude is an arrayref or a regex or a string
@@ -1224,8 +1219,8 @@ sub _inspect {
       next FIELD if $self->{-fields}{$field};
 
       return $self->msg(FORBIDDEN_FIELD => $field)
-        if ref $exclude   and $field ~~ $exclude # Regexp or array membership
-        or !ref $exclude  and $exclude ~~ ['*', 'all'];
+        if match::simple::match($field, $exclude)
+        or match::simple::match($exclude, ['*', 'all']);
     }
   }
 
@@ -1369,10 +1364,6 @@ Data::Domain - Data description and validation
   # using the domain to check data
   my $error_messages = $domain->inspect($some_data);
   reject_form($error_messages) if $error_messages;
-
-  # same, using the smart match API
-  $some_other_data ~~ $domain
-    or die "did not match because $Data::Domain::MESSAGE";
 
   # custom name and custom messages (2 different ways)
   $domain = Int(-name => 'age', -min => 3, -max => 18, 
@@ -1649,7 +1640,7 @@ through L<Scalar::Does>.
 
 =item C<-matches>
 
-Checks if the data smart matches the supplied right operand
+Deprecated. Was used to check if the data smart matches the supplied right operand
 (i.e. C<< $data ~~ $domain->{-matches} >>).
 
 =back
@@ -1762,21 +1753,6 @@ for example
 The client code can then exploit this structure to dispatch
 error messages to appropriate locations (like for example the form
 fields from which the data was gathered).
-
-
-=head2 smart match
-
-C<Data::Domain> overloads the smart match operator C<~~>,
-so one can write 
-
-  if ($data ~~ $domain) {...}
-
-instead of 
-
-  if (!my $msg = $domain->inspect($data)) {...}
-
-The error message from the last smart match operation can be
-retrieved from C<$Data::Domain::MESSAGE>.
 
 =head2 stringification
 

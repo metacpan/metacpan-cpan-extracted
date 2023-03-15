@@ -49,7 +49,7 @@ if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
 my $abmm = Alien::Build::MM->new;
 
 my %configure_and_build_prereqs = (
-    "Alien::Build" => "0.32",
+    "Alien::Build" => "2.19",
     "Alien::Build::MM" => "0.32",
     "ExtUtils::MakeMaker" => "6.52",
 );

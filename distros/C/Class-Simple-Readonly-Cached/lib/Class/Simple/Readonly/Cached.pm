@@ -7,17 +7,19 @@ use Class::Simple;
 
 my @ISA = ('Class::Simple');
 
+our %cached;
+
 =head1 NAME
 
 Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -30,8 +32,18 @@ for example by changing its state.
 You can use this class to create a caching layer to an object of any class
 that works on objects which doesn't change its state based on input:
 
-    $val = $obj->val();
-    $val = $obj->val(a => 'b');
+    use Class::Simple::Readonly::Cached;
+
+    my $obj = Class::Simple->new();
+    $obj->val('foo');
+    $obj = Class::Simple::Readonly::Cached->new(object => $obj, cache => {});
+    my $val = $obj->val();
+    print "$val\n";	# Prints "foo"
+  
+    #... set $obj to be some other class which will take an argument 'a',
+    #	with a value 'b'
+  
+    $val = $obj->val(a => 'b');	# You
 
 =head1 SUBROUTINES/METHODS
 
@@ -57,6 +69,11 @@ and that is used.
     my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
     my $father1 = $object->father();	# Will call gedcom->father() to get the person's father
     my $father2 = $object->father();	# Will retrieve the father from the cache without calling person->father()
+
+Takes one optional argument: quiet,
+if you attempt to cache an object that is already cached, rather than create
+another copy you receive a warning and the previous cached copy is returned.
+The 'quiet' option, when non-zero, silences the warning.
 
 =cut
 
@@ -88,7 +105,7 @@ sub new {
 	if(defined($args{'object'})) {
 		if(ref($args{'object'})) {
 			if(ref($args{'object'}) eq __PACKAGE__) {
-				Carp::carp(__PACKAGE__, ' warning: $object is already cached');
+				Carp::carp(__PACKAGE__, ' warning: $object is a cached object');
 				# Note that this isn't a technique for clearing the cache
 				return $args{'object'};
 			}
@@ -100,7 +117,24 @@ sub new {
 		$args{'object'} = Class::Simple->new(%args);
 	}
 
-	return bless \%args, $class;
+	# Warn if we're caching an object that's already cached, then
+	# return the previously cached object.  Note that it could be in
+	# a separate cache
+	my $rc;
+	if($rc = $cached{$args{'object'}}) {
+		unless($args{'quiet'}) {
+			Carp::carp(__PACKAGE__, ' $object is already cached at ', $rc->{'line'}, ' of ', $rc->{'file'});
+		}
+		$rc = $rc->{'object'};
+	} else {
+		$rc = bless \%args, $class;
+		$cached{$args{'object'}}->{'object'} = $rc;
+		my @call_details = caller(0);
+		$cached{$args{'object'}}->{'file'} = $call_details[1];
+		$cached{$args{'object'}}->{'line'} = $call_details[2];
+	}
+
+	return $rc;
 }
 
 =head2 object
@@ -298,7 +332,7 @@ L<http://search.cpan.org/dist/Class-Simple-Readonly-Cached/>
 =head1 LICENSE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019-2022 Nigel Horne
+Copyright (C) 2019-2023 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

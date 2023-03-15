@@ -1,5 +1,19 @@
 Revision history for Perl extension LibUI.pm
 
+0.02 2023-03-11T05:00:07Z
+
+    - New widgets:
+        - LibUI::Area (very rough)
+        - LibUI::ScrollingArea
+    - Renamed widgets to fit existing pattern:
+        - LibUI::HorizontalSeparator => LibUI::HSeparator
+        - LibUI::VerticalSeparator   => LibUI::VSeparator
+    - New example scripts:
+        - eg/demo.pl: very basic, "Hello, World!" type of example
+        - eg/widgets.pl: demo of (nearly all) basic controls
+        - eg/histogram.pl: demo of LibUI::Area and releated functions
+    - New enum and structs: LibUI::Area::Handler, ::KeyEvent, ::MouseEvent, ::Modifiers
+
 0.01 2022-12-07T00:34:14Z
 
     - original version

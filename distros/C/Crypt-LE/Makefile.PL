@@ -3,34 +3,34 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
+  'NAME' => 'Crypt::LE',
   'VERSION_FROM' => 'lib/Crypt/LE.pm',
-  'PREREQ_PM' => {
-                   'Net::SSLeay' => '1.55',
-                   'Getopt::Long' => '2.33',
-                   'HTTP::Tiny' => '0.042',
-                   'Module::Load' => '0.28',
-                   'Log::Log4perl' => '1.27',
-                   'MIME::Base64' => '3.11',
-                   'Encode' => 0,
-                   'Scalar::Util' => 0,
-                   'IO::File' => '1.13',
-                   'IO::Socket::SSL' => '1.42',
-                   'Time::Piece' => '1.27',
-                   'Convert::ASN1' => '0.2',
-                   'Crypt::OpenSSL::Bignum' => '0.06',
-                   'File::Temp' => 0,
-                   'Time::Seconds' => 0,
-                   'Test::More' => 0,
-                   'Crypt::OpenSSL::RSA' => '0.28',
-                   'Storable' => '2.51',
-                   'Digest::SHA' => 0,
-                   'JSON::MaybeXS' => '1.003005'
-                 },
   'EXE_FILES' => [
                    'script/le.pl'
                  ],
-  'INSTALLDIRS' => 'site',
-  'NAME' => 'Crypt::LE'
+  'PREREQ_PM' => {
+                   'Time::Piece' => '1.27',
+                   'HTTP::Tiny' => '0.042',
+                   'Log::Log4perl' => '1.27',
+                   'Scalar::Util' => 0,
+                   'MIME::Base64' => '3.11',
+                   'Time::Seconds' => 0,
+                   'JSON::MaybeXS' => '1.003005',
+                   'File::Temp' => 0,
+                   'Getopt::Long' => '2.33',
+                   'Net::SSLeay' => '1.55',
+                   'Crypt::OpenSSL::Bignum' => '0.06',
+                   'Storable' => '2.51',
+                   'Encode' => 0,
+                   'Digest::SHA' => 0,
+                   'Crypt::OpenSSL::RSA' => '0.28',
+                   'IO::File' => '1.13',
+                   'Module::Load' => '0.28',
+                   'IO::Socket::SSL' => '1.42',
+                   'Convert::ASN1' => '0.2',
+                   'Test::More' => 0
+                 },
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site'
 )
 ;

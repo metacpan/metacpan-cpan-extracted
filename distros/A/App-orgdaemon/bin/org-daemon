@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2013,2014,2015,2016,2017,2019,2020,2021 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2013,2014,2015,2016,2017,2019,2020,2021,2022 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -18,7 +18,7 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Getopt::Long;
 use List::Util qw(max);
@@ -789,6 +789,63 @@ sub stay_on_top {
     warn $@ if $@;
 }
 
+# Code taken from bbbike
+sub start_ptksh {
+    # Is there already a (withdrawn) ptksh?
+    foreach my $mw0 (Tk::MainWindow::Existing()) {
+	if ($mw0->title =~ /^ptksh/) {
+	    $mw0->deiconify;
+	    $mw0->raise;
+	    return;
+	}
+    }
+
+    require Config;
+    require File::Basename;
+    my @perldirs = grep { defined $_ && -x $_ } ($Config::Config{'sitebin'}, $Config::Config{'scriptdir'});
+    push @perldirs, File::Basename::dirname(File::Basename::dirname($^X)); # for the SiePerl installation
+    my $perldir;
+ TRY: {
+	no warnings 'once';
+	# "local" probably does not work here, we're in a MainLoop...
+	$Data::Dumper::Deparse = 1; # if I need a "ptksh" window, then I need more diagnostics!
+	$Data::Dumper::Sortkeys = 1;
+
+	local @ARGV; # ptksh would read 1st argument as perl script
+
+        # Find the ptksh script
+        for $perldir (@perldirs) {
+            if (-r "$perldir/ptksh") {
+		require "$perldir/ptksh";
+                last TRY;
+            }
+        }
+	$perldir = File::Basename::dirname($^X);
+	if (-r "$perldir/ptksh") {
+	    require "$perldir/ptksh";
+	} else {
+	    my $f = ((Tk::MainWindow::Existing())[0])->getOpenFile
+		((-d $perldir ? (-initialdir => $perldir) : ()),
+		 -title => "Path to ptksh",
+		);
+	    if (defined $f) {
+		require $f;
+	    } else {
+		return;
+	    }
+	}
+    } 
+
+    # The created mainwindow is unnecessary - destroy it
+    for my $mw0 (Tk::MainWindow::Existing()) {
+	if ($mw0->title eq '$mw') {
+	    $mw0->destroy;
+	} elsif ($mw0->title eq 'ptksh') {
+	    $mw0->protocol('WM_DELETE_WINDOW' => [$mw0, 'withdraw']);
+	}
+    }
+}
+
 return 1 if caller;
 
 GetOptions(
@@ -965,6 +1022,8 @@ $lb->Button(-padx => 0, -pady => 0, -borderwidth => 1,
 	    -command => \&tk_do_one_iteration,
 	   )->place(-relx => 1, -rely => 1, -anchor => 'se');
 
+$mw->bind('<Control-p>' => sub { start_ptksh() });
+
 tk_do_one_iteration();
 if ($recheck_interval == 60) {
     # synchronize with full minute, only implemented for recheck_interval=60
@@ -994,6 +1053,12 @@ $mw->protocol('WM_DELETE_WINDOW', sub {
 		  if ($AnyEvent::Impl::Tk::mw) {
 		      $AnyEvent::Impl::Tk::mw->destroy;
 		      # otherwise process would still run & hang
+		  }
+
+		  for my $mw0 (Tk::MainWindow::Existing()) {
+		      if ($mw0->title eq 'ptksh') {
+			  $mw0->destroy;
+		      }
 		  }
 	      });
 

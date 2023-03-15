@@ -1,4 +1,4 @@
-package LibUI::EditableCombobox 0.01 {
+package LibUI::EditableCombobox 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,30 +6,31 @@ package LibUI::EditableCombobox 0.01 {
     use parent 'LibUI::Control';
     #
     affix(
-        LibUI::lib(), 'uiEditableComboboxAppend',
-        [ InstanceOf ['LibUI::EditableCombobox'], Str ] => Void,
-        'append'
+        LibUI::lib(),
+        [ 'uiEditableComboboxAppend',             'append' ],
+        [ InstanceOf ['LibUI::EditableCombobox'], Str ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiEditableComboboxOnChanged',
+        [ 'uiEditableComboboxOnChanged', 'onChanged' ],
         [   InstanceOf ['LibUI::EditableCombobox'],
             CodeRef [ [ InstanceOf ['LibUI::EditableCombobox'], Any ] => Void ], Any
-        ] => Void,
-        'onChanged'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiEditableComboboxSetText',
-        [ InstanceOf ['LibUI::EditableCombobox'], Str ] => Void,
-        'setText'
+        LibUI::lib(),
+        [ 'uiEditableComboboxSetText',            'setText' ],
+        [ InstanceOf ['LibUI::EditableCombobox'], Str ] => Void
     );
     affix(
-        LibUI::lib(), 'uiEditableComboboxText', [ InstanceOf ['LibUI::EditableCombobox'] ] => Str,
-        'text'
+        LibUI::lib(),
+        [ 'uiEditableComboboxText', 'text' ],
+        [ InstanceOf ['LibUI::EditableCombobox'] ] => Str
     );
     affix(
-        LibUI::lib(), 'uiNewEditableCombobox', [Void] => InstanceOf ['LibUI::EditableCombobox'],
-        'new'
+        LibUI::lib(),
+        [ 'uiNewEditableCombobox', 'new' ],
+        [Void] => InstanceOf ['LibUI::EditableCombobox']
     );
 };
 1;
@@ -51,8 +52,9 @@ Predefined Options or Enter Your Own
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::EditableCombobox;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $combo  = LibUI::EditableCombobox->new();
     my @langs  = ( qw[English French Klingon German Japanese], 'Ubbi dubbi' );

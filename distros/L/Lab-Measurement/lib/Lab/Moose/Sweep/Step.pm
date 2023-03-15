@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step;
-$Lab::Moose::Sweep::Step::VERSION = '3.851';
+$Lab::Moose::Sweep::Step::VERSION = '3.860';
 #ABSTRACT: Base class for step/list sweeps
 
 use v5.20;
@@ -36,6 +36,8 @@ has list => (
 );
 has backsweep => ( is => 'ro', isa => 'Bool', default => 0 );
 
+has both_directions => ( is => 'ro', isa => 'Bool', default => 0 );
+
 has setter => ( is => 'ro', isa => 'CodeRef', required => 1 );
 
 #
@@ -45,7 +47,8 @@ has setter => ( is => 'ro', isa => 'CodeRef', required => 1 );
 has _points => (
     is => 'ro', isa => 'ArrayRef[Num]', lazy => 1, init_arg => undef,
     builder => '_build_points', traits => ['Array'],
-    handles => { get_point => 'get', num_points => 'count' },
+    handles => { get_point => 'get', num_points => 'count', points_array => 'elements' },
+    writer => 'write_points',
 );
 
 has index => (
@@ -125,6 +128,9 @@ sub _build_points {
         my @backsweep_points = reverse @points;
         push @points, @backsweep_points;
     }
+    if ( $self->backsweep && $self->both_directions ) {
+        croak "Can't use backsweep and both_directions together."
+    }
 
     return \@points;
 }
@@ -157,6 +163,11 @@ sub sweep_finished {
     my $self  = shift;
     my $index = $self->index();
     if ( $index >= $self->num_points ) {
+        if ( $self->both_directions ) {
+            my @points = $self->points_array;
+            @points = reverse @points;
+            $self->write_points( \@points );
+        }
         return 1;
     }
     return 0;
@@ -201,7 +212,7 @@ Lab::Moose::Sweep::Step - Base class for step/list sweeps
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 SYNOPSIS
 
@@ -349,6 +360,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
             2020       Andreas K. Huettel
+            2023       Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

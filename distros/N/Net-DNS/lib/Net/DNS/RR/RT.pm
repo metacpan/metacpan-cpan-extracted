@@ -2,7 +2,7 @@ package Net::DNS::RR::RT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RT.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: RT.pm 1898 2023-02-15 14:27:22Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,18 +19,16 @@ use Net::DNS::DomainName;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset, @opaque ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	$self->{preference}   = unpack( "\@$offset n", $$data );
-	$self->{intermediate} = Net::DNS::DomainName2535->decode( $data, $offset + 2, @opaque );
+	$self->{intermediate} = Net::DNS::DomainName2535->decode( $data, $offset + 2 );
 	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
-	my $self = shift;
-	my ( $offset, @opaque ) = @_;
+	my ( $self, $offset, @opaque ) = @_;
 
 	return pack 'n a*', $self->preference, $self->{intermediate}->encode( $offset + 2, @opaque );
 }
@@ -44,26 +42,23 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->preference(shift);
-	$self->intermediate(shift);
+	for (qw(preference intermediate)) { $self->$_( shift @argument ) }
 	return;
 }
 
 
 sub preference {
-	my $self = shift;
-
-	$self->{preference} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{preference} = 0 + $_ }
 	return $self->{preference} || 0;
 }
 
 
 sub intermediate {
-	my $self = shift;
-
-	$self->{intermediate} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{intermediate} = Net::DNS::DomainName2535->new($_) }
 	return $self->{intermediate} ? $self->{intermediate}->name : undef;
 }
 
@@ -149,6 +144,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1183 Section 3.3
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC1183(3.3)|https://tools.ietf.org/html/rfc1183>
 
 =cut

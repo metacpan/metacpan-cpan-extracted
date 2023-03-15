@@ -1,5 +1,5 @@
 ---
-abstract: 'create netkit labs with code.'
+abstract: 'Create Netkit labs with code.'
 author:
   - 'Rhys Adams <rhys@therhys.co.uk>'
 build_requires:
@@ -22,5 +22,5 @@ requires:
   List::Util: '1.33'
   strict: '0'
   warnings: '0'
-version: 0.01
+version: 0.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

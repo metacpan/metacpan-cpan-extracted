@@ -1,5 +1,5 @@
 {
-   "abstract" : "Let's Encrypt API interfacing module and client.",
+   "abstract" : "Let's Encrypt (and other ACME-based) API interfacing module and client.",
    "author" : [
       "Alexander Yezhov <leader@cpan.org>"
    ],
@@ -52,15 +52,15 @@
    "provides" : {
       "Crypt::LE" : {
          "file" : "lib/Crypt/LE.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       },
       "Crypt::LE::Challenge::Simple" : {
          "file" : "lib/Crypt/LE/Challenge/Simple.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       },
       "Crypt::LE::Complete::Simple" : {
          "file" : "lib/Crypt/LE/Complete/Simple.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "url" : "https://github.com/do-know"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

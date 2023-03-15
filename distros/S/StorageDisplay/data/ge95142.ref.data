@@ -4,43 +4,43 @@ $VAR1 = {
                     'dm-0' => {
                                 'DM_BLKDEVNAME' => 'dm-0',
                                 'DM_BLKDEVS_USED' => 'sdb2',
-                                'DM_NAME' => 'vgchu-root',
+                                'DM_NAME' => 'vgdata-root',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
                     'dm-1' => {
                                 'DM_BLKDEVNAME' => 'dm-1',
                                 'DM_BLKDEVS_USED' => 'sdb2',
-                                'DM_NAME' => 'vgchu-kvm--hera--disk1',
+                                'DM_NAME' => 'vgdata-kvm--hera--disk1',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
                     'dm-2' => {
                                 'DM_BLKDEVNAME' => 'dm-2',
                                 'DM_BLKDEVS_USED' => 'sdc1',
-                                'DM_NAME' => 'vgchu-kvm--hera--disk2',
+                                'DM_NAME' => 'vgdata-kvm--hera--disk2',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
                     'dm-3' => {
                                 'DM_BLKDEVNAME' => 'dm-3',
                                 'DM_BLKDEVS_USED' => 'sda1',
-                                'DM_NAME' => 'vgchu-gfs--ge--b1',
+                                'DM_NAME' => 'vgdata-gfs--ge--b1',
                                 'DM_SUBSYSTEM' => 'LVM'
                               }
                   },
           'fs' => {
-                    '/dev/mapper/vgchu-gfs--ge--b1' => {
-                                                         'free' => '3274006929408',
-                                                         'fstype' => 'xfs',
-                                                         'mountpoint' => '/srv/glusterfs/ge',
-                                                         'size' => '3296924270592',
-                                                         'used' => '22917341184'
-                                                       },
-                    '/dev/mapper/vgchu-root' => {
-                                                  'free' => '1048973312',
-                                                  'fstype' => 'ext4',
-                                                  'mountpoint' => '/',
-                                                  'size' => '10396950528',
-                                                  'used' => '8794329088'
-                                                },
+                    '/dev/mapper/vgdata-gfs--ge--b1' => {
+                                                          'free' => '3274006929408',
+                                                          'fstype' => 'xfs',
+                                                          'mountpoint' => '/srv/glusterfs/ge',
+                                                          'size' => '3296924270592',
+                                                          'used' => '22917341184'
+                                                        },
+                    '/dev/mapper/vgdata-root' => {
+                                                   'free' => '1195110400',
+                                                   'fstype' => 'ext4',
+                                                   'mountpoint' => '/',
+                                                   'size' => '10396950528',
+                                                   'used' => '8648192000'
+                                                 },
                     '/dev/sdb1' => {
                                      'free' => '511867355136',
                                      'fstype' => 'vfat',
@@ -49,21 +49,22 @@ $VAR1 = {
                                      'used' => '6324224'
                                    }
                   },
+          'hostname' => 'ge95142',
           'libvirt' => {
                          '1-hera' => {
                                        'blocks' => {
-                                                     '/dev/vgchu/kvm-hera-disk1' => {
-                                                                                      'device' => 'disk',
-                                                                                      'source' => '/dev/vgchu/kvm-hera-disk1',
-                                                                                      'target' => 'sda',
-                                                                                      'type' => 'block'
-                                                                                    },
-                                                     '/dev/vgchu/kvm-hera-disk2' => {
-                                                                                      'device' => 'disk',
-                                                                                      'source' => '/dev/vgchu/kvm-hera-disk2',
-                                                                                      'target' => 'sdc',
-                                                                                      'type' => 'block'
-                                                                                    }
+                                                     '/dev/vgdata/kvm-hera-disk1' => {
+                                                                                       'device' => 'disk',
+                                                                                       'source' => '/dev/vgdata/kvm-hera-disk1',
+                                                                                       'target' => 'sda',
+                                                                                       'type' => 'block'
+                                                                                     },
+                                                     '/dev/vgdata/kvm-hera-disk2' => {
+                                                                                       'device' => 'disk',
+                                                                                       'source' => '/dev/vgdata/kvm-hera-disk2',
+                                                                                       'target' => 'sdc',
+                                                                                       'type' => 'block'
+                                                                                     }
                                                    },
                                        'name' => '1-hera',
                                        'state' => 'running'
@@ -72,6 +73,7 @@ $VAR1 = {
                                            'blocks' => {
                                                          '/srv/kvm/memtest86+-5.01.iso' => {
                                                                                              'device' => 'cdrom',
+                                                                                             'file-size' => '1839104',
                                                                                              'mount-point' => '/',
                                                                                              'source' => '/srv/kvm/memtest86+-5.01.iso',
                                                                                              'target' => 'hda',
@@ -92,11 +94,11 @@ $VAR1 = {
                                    'disc-gran' => 0,
                                    'disc-max' => 0,
                                    'disc-zero' => [],
-                                   'fsavail' => '1048977408',
+                                   'fsavail' => '1195126784',
                                    'fssize' => '10396950528',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '85%',
-                                   'fsused' => '8794324992',
+                                   'fsuse%' => '83%',
+                                   'fsused' => '8648175616',
                                    'fsver' => '1.0',
                                    'group' => 'disk',
                                    'hctl' => undef,
@@ -109,7 +111,7 @@ $VAR1 = {
                                    'mode' => 'brw-rw----',
                                    'model' => undef,
                                    'mountpoint' => '/',
-                                   'name' => 'vgchu-root',
+                                   'name' => 'vgdata-root',
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
@@ -117,7 +119,7 @@ $VAR1 = {
                                    'parttype' => undef,
                                    'parttypename' => undef,
                                    'partuuid' => undef,
-                                   'path' => '/dev/mapper/vgchu-root',
+                                   'path' => '/dev/mapper/vgdata-root',
                                    'phy-sec' => 512,
                                    'pkname' => 'sdb2',
                                    'pttype' => undef,
@@ -166,7 +168,7 @@ $VAR1 = {
                                    'mode' => 'brw-rw----',
                                    'model' => undef,
                                    'mountpoint' => undef,
-                                   'name' => 'vgchu-kvm--hera--disk1',
+                                   'name' => 'vgdata-kvm--hera--disk1',
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
@@ -174,7 +176,7 @@ $VAR1 = {
                                    'parttype' => undef,
                                    'parttypename' => undef,
                                    'partuuid' => undef,
-                                   'path' => '/dev/mapper/vgchu-kvm--hera--disk1',
+                                   'path' => '/dev/mapper/vgdata-kvm--hera--disk1',
                                    'phy-sec' => 512,
                                    'pkname' => 'sdb2',
                                    'pttype' => 'gpt',
@@ -223,7 +225,7 @@ $VAR1 = {
                                    'mode' => 'brw-rw----',
                                    'model' => undef,
                                    'mountpoint' => undef,
-                                   'name' => 'vgchu-kvm--hera--disk2',
+                                   'name' => 'vgdata-kvm--hera--disk2',
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
@@ -231,7 +233,7 @@ $VAR1 = {
                                    'parttype' => undef,
                                    'parttypename' => undef,
                                    'partuuid' => undef,
-                                   'path' => '/dev/mapper/vgchu-kvm--hera--disk2',
+                                   'path' => '/dev/mapper/vgdata-kvm--hera--disk2',
                                    'phy-sec' => 512,
                                    'pkname' => 'sdc1',
                                    'pttype' => 'gpt',
@@ -280,7 +282,7 @@ $VAR1 = {
                                    'mode' => 'brw-rw----',
                                    'model' => undef,
                                    'mountpoint' => '/srv/glusterfs/ge',
-                                   'name' => 'vgchu-gfs--ge--b1',
+                                   'name' => 'vgdata-gfs--ge--b1',
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
@@ -288,7 +290,7 @@ $VAR1 = {
                                    'parttype' => undef,
                                    'parttypename' => undef,
                                    'partuuid' => undef,
-                                   'path' => '/dev/mapper/vgchu-gfs--ge--b1',
+                                   'path' => '/dev/mapper/vgdata-gfs--ge--b1',
                                    'phy-sec' => 512,
                                    'pkname' => 'sda1',
                                    'pttype' => undef,
@@ -398,7 +400,7 @@ $VAR1 = {
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
-                                   'partlabel' => 'pv-chu-C',
+                                   'partlabel' => 'pv-data-C',
                                    'parttype' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
                                    'parttypename' => 'Linux LVM',
                                    'partuuid' => 'cbfb3ac0-9649-4a12-aec7-f55f9d27c140',
@@ -569,7 +571,7 @@ $VAR1 = {
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
-                                   'partlabel' => 'pv-chu-A',
+                                   'partlabel' => 'pv-data-A',
                                    'parttype' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
                                    'parttypename' => 'Linux LVM',
                                    'partuuid' => '98954e64-6a45-46eb-97e7-2752aa3e87d3',
@@ -683,7 +685,7 @@ $VAR1 = {
                                    'opt-io' => 0,
                                    'owner' => 'root',
                                    'partflags' => undef,
-                                   'partlabel' => 'pv-chu-B',
+                                   'partlabel' => 'pv-data-B',
                                    'parttype' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
                                    'parttypename' => 'Linux LVM',
                                    'partuuid' => 'ce8da785-75e6-4144-8daa-24cececf0cd3',
@@ -777,7 +779,7 @@ $VAR1 = {
                                                               'children' => [
                                                                               {
                                                                                 'kname' => 'dm-3',
-                                                                                'name' => 'vgchu-gfs--ge--b1'
+                                                                                'name' => 'vgdata-gfs--ge--b1'
                                                                               }
                                                                             ],
                                                               'kname' => 'sda1',
@@ -797,11 +799,11 @@ $VAR1 = {
                                                               'children' => [
                                                                               {
                                                                                 'kname' => 'dm-0',
-                                                                                'name' => 'vgchu-root'
+                                                                                'name' => 'vgdata-root'
                                                                               },
                                                                               {
                                                                                 'kname' => 'dm-1',
-                                                                                'name' => 'vgchu-kvm--hera--disk1'
+                                                                                'name' => 'vgdata-kvm--hera--disk1'
                                                                               }
                                                                             ],
                                                               'kname' => 'sdb2',
@@ -817,7 +819,7 @@ $VAR1 = {
                                                               'children' => [
                                                                               {
                                                                                 'kname' => 'dm-2',
-                                                                                'name' => 'vgchu-kvm--hera--disk2'
+                                                                                'name' => 'vgdata-kvm--hera--disk2'
                                                                               }
                                                                             ],
                                                               'kname' => 'sdc1',
@@ -879,7 +881,7 @@ $VAR1 = {
                                                                   'H/W Model' => 'PERC H710P Adapter',
                                                                   'ID' => 'c0',
                                                                   'RAM' => '1024MB',
-                                                                  'Temp' => '83C'
+                                                                  'Temp' => '84C'
                                                                 }
                                                       },
                                       'Disk' => {
@@ -1019,224 +1021,224 @@ $VAR1 = {
                                     }
                            },
           'lvm' => {
-                     'vgchu' => {
-                                  'lvs' => [
-                                             {
-                                               'devices' => '/dev/sda1(0)',
-                                               'lv_name' => 'gfs-ge-b1',
-                                               'lv_parent' => '',
-                                               'pool_lv' => '',
-                                               'seg_le_ranges' => '/dev/sda1:0-786431',
-                                               'seg_pe_ranges' => '/dev/sda1:0-786431',
-                                               'seg_size' => '3298534883328B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'devices' => '/dev/sdb2(2560)',
-                                               'lv_name' => 'kvm-hera-disk1',
-                                               'lv_parent' => '',
-                                               'pool_lv' => '',
-                                               'seg_le_ranges' => '/dev/sdb2:2560-40959',
-                                               'seg_pe_ranges' => '/dev/sdb2:2560-40959',
-                                               'seg_size' => '161061273600B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'devices' => '/dev/sdc1(0)',
-                                               'lv_name' => 'kvm-hera-disk2',
-                                               'lv_parent' => '',
-                                               'pool_lv' => '',
-                                               'seg_le_ranges' => '/dev/sdc1:0-1310719',
-                                               'seg_pe_ranges' => '/dev/sdc1:0-1310719',
-                                               'seg_size' => '5497558138880B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'devices' => '/dev/sdb2(0)',
-                                               'lv_name' => 'root',
-                                               'lv_parent' => '',
-                                               'pool_lv' => '',
-                                               'seg_le_ranges' => '/dev/sdb2:0-2559',
-                                               'seg_pe_ranges' => '/dev/sdb2:0-2559',
-                                               'seg_size' => '10737418240B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             }
-                                           ],
-                                  'pvs' => [
-                                             {
-                                               'lv_name' => 'gfs-ge-b1',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '2701530234880B',
-                                               'pv_name' => '/dev/sda1',
-                                               'pv_size' => '6000065118208B',
-                                               'pv_used' => '3298534883328B',
-                                               'pvseg_size' => '786432',
-                                               'pvseg_start' => '0',
-                                               'seg_size' => '3298534883328B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'lv_name' => '',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '2701530234880B',
-                                               'pv_name' => '/dev/sda1',
-                                               'pv_size' => '6000065118208B',
-                                               'pv_used' => '3298534883328B',
-                                               'pvseg_size' => '644095',
-                                               'pvseg_start' => '786432',
-                                               'seg_size' => '2701530234880B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'free',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'lv_name' => 'root',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '828198879232B',
-                                               'pv_name' => '/dev/sdb2',
-                                               'pv_size' => '999997571072B',
-                                               'pv_used' => '171798691840B',
-                                               'pvseg_size' => '2560',
-                                               'pvseg_start' => '0',
-                                               'seg_size' => '10737418240B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'lv_name' => 'kvm-hera-disk1',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '828198879232B',
-                                               'pv_name' => '/dev/sdb2',
-                                               'pv_size' => '999997571072B',
-                                               'pv_used' => '171798691840B',
-                                               'pvseg_size' => '38400',
-                                               'pvseg_start' => '2560',
-                                               'seg_size' => '161061273600B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'lv_name' => '',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '828198879232B',
-                                               'pv_name' => '/dev/sdb2',
-                                               'pv_size' => '999997571072B',
-                                               'pv_used' => '171798691840B',
-                                               'pvseg_size' => '197458',
-                                               'pvseg_start' => '40960',
-                                               'seg_size' => '828198879232B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'free',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'lv_name' => 'kvm-hera-disk2',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '501433237504B',
-                                               'pv_name' => '/dev/sdc1',
-                                               'pv_size' => '5998991376384B',
-                                               'pv_used' => '5497558138880B',
-                                               'pvseg_size' => '1310720',
-                                               'pvseg_start' => '0',
-                                               'seg_size' => '5497558138880B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'linear',
-                                               'vg_name' => 'vgchu'
-                                             },
-                                             {
-                                               'lv_name' => '',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '501433237504B',
-                                               'pv_name' => '/dev/sdc1',
-                                               'pv_size' => '5998991376384B',
-                                               'pv_used' => '5497558138880B',
-                                               'pvseg_size' => '119551',
-                                               'pvseg_start' => '1310720',
-                                               'seg_size' => '501433237504B',
-                                               'seg_start' => '0B',
-                                               'segtype' => 'free',
-                                               'vg_name' => 'vgchu'
-                                             }
-                                           ],
-                                  'vgs-lv' => {
-                                                'gfs-ge-b1' => {
-                                                                 'data_percent' => '',
-                                                                 'lv_name' => 'gfs-ge-b1',
-                                                                 'lv_role' => 'public',
-                                                                 'lv_size' => '3298534883328B',
-                                                                 'origin' => '',
-                                                                 'pool_lv' => '',
-                                                                 'vg_name' => 'vgchu'
-                                                               },
-                                                'kvm-hera-disk1' => {
-                                                                      'data_percent' => '',
-                                                                      'lv_name' => 'kvm-hera-disk1',
-                                                                      'lv_role' => 'public',
-                                                                      'lv_size' => '161061273600B',
-                                                                      'origin' => '',
-                                                                      'pool_lv' => '',
-                                                                      'vg_name' => 'vgchu'
-                                                                    },
-                                                'kvm-hera-disk2' => {
-                                                                      'data_percent' => '',
-                                                                      'lv_name' => 'kvm-hera-disk2',
-                                                                      'lv_role' => 'public',
-                                                                      'lv_size' => '5497558138880B',
-                                                                      'origin' => '',
-                                                                      'pool_lv' => '',
-                                                                      'vg_name' => 'vgchu'
-                                                                    },
-                                                'root' => {
-                                                            'data_percent' => '',
-                                                            'lv_name' => 'root',
-                                                            'lv_role' => 'public',
-                                                            'lv_size' => '10737418240B',
-                                                            'origin' => '',
-                                                            'pool_lv' => '',
-                                                            'vg_name' => 'vgchu'
-                                                          }
+                     'vgdata' => {
+                                   'lvs' => [
+                                              {
+                                                'devices' => '/dev/sda1(0)',
+                                                'lv_name' => 'gfs-ge-b1',
+                                                'lv_parent' => '',
+                                                'pool_lv' => '',
+                                                'seg_le_ranges' => '/dev/sda1:0-786431',
+                                                'seg_pe_ranges' => '/dev/sda1:0-786431',
+                                                'seg_size' => '3298534883328B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
                                               },
-                                  'vgs-pv' => {
-                                                '/dev/sda1' => {
-                                                                 'pv_free' => '2701530234880B',
-                                                                 'pv_name' => '/dev/sda1',
-                                                                 'pv_size' => '6000065118208B',
-                                                                 'pv_used' => '3298534883328B',
-                                                                 'vg_name' => 'vgchu'
-                                                               },
-                                                '/dev/sdb2' => {
-                                                                 'pv_free' => '828198879232B',
-                                                                 'pv_name' => '/dev/sdb2',
-                                                                 'pv_size' => '999997571072B',
-                                                                 'pv_used' => '171798691840B',
-                                                                 'vg_name' => 'vgchu'
-                                                               },
-                                                '/dev/sdc1' => {
-                                                                 'pv_free' => '501433237504B',
-                                                                 'pv_name' => '/dev/sdc1',
-                                                                 'pv_size' => '5998991376384B',
-                                                                 'pv_used' => '5497558138880B',
-                                                                 'vg_name' => 'vgchu'
-                                                               }
+                                              {
+                                                'devices' => '/dev/sdb2(2560)',
+                                                'lv_name' => 'kvm-hera-disk1',
+                                                'lv_parent' => '',
+                                                'pool_lv' => '',
+                                                'seg_le_ranges' => '/dev/sdb2:2560-40959',
+                                                'seg_pe_ranges' => '/dev/sdb2:2560-40959',
+                                                'seg_size' => '161061273600B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
                                               },
-                                  'vgs-vg' => {
-                                                'vg_free' => '4031162351616B',
-                                                'vg_name' => 'vgchu',
-                                                'vg_size' => '12999054065664B'
+                                              {
+                                                'devices' => '/dev/sdc1(0)',
+                                                'lv_name' => 'kvm-hera-disk2',
+                                                'lv_parent' => '',
+                                                'pool_lv' => '',
+                                                'seg_le_ranges' => '/dev/sdc1:0-1310719',
+                                                'seg_pe_ranges' => '/dev/sdc1:0-1310719',
+                                                'seg_size' => '5497558138880B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'devices' => '/dev/sdb2(0)',
+                                                'lv_name' => 'root',
+                                                'lv_parent' => '',
+                                                'pool_lv' => '',
+                                                'seg_le_ranges' => '/dev/sdb2:0-2559',
+                                                'seg_pe_ranges' => '/dev/sdb2:0-2559',
+                                                'seg_size' => '10737418240B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
                                               }
-                                }
+                                            ],
+                                   'pvs' => [
+                                              {
+                                                'lv_name' => 'gfs-ge-b1',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '2701530234880B',
+                                                'pv_name' => '/dev/sda1',
+                                                'pv_size' => '6000065118208B',
+                                                'pv_used' => '3298534883328B',
+                                                'pvseg_size' => '786432',
+                                                'pvseg_start' => '0',
+                                                'seg_size' => '3298534883328B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'lv_name' => '',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '2701530234880B',
+                                                'pv_name' => '/dev/sda1',
+                                                'pv_size' => '6000065118208B',
+                                                'pv_used' => '3298534883328B',
+                                                'pvseg_size' => '644095',
+                                                'pvseg_start' => '786432',
+                                                'seg_size' => '2701530234880B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'free',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'lv_name' => 'root',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '828198879232B',
+                                                'pv_name' => '/dev/sdb2',
+                                                'pv_size' => '999997571072B',
+                                                'pv_used' => '171798691840B',
+                                                'pvseg_size' => '2560',
+                                                'pvseg_start' => '0',
+                                                'seg_size' => '10737418240B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'lv_name' => 'kvm-hera-disk1',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '828198879232B',
+                                                'pv_name' => '/dev/sdb2',
+                                                'pv_size' => '999997571072B',
+                                                'pv_used' => '171798691840B',
+                                                'pvseg_size' => '38400',
+                                                'pvseg_start' => '2560',
+                                                'seg_size' => '161061273600B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'lv_name' => '',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '828198879232B',
+                                                'pv_name' => '/dev/sdb2',
+                                                'pv_size' => '999997571072B',
+                                                'pv_used' => '171798691840B',
+                                                'pvseg_size' => '197458',
+                                                'pvseg_start' => '40960',
+                                                'seg_size' => '828198879232B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'free',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'lv_name' => 'kvm-hera-disk2',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '501433237504B',
+                                                'pv_name' => '/dev/sdc1',
+                                                'pv_size' => '5998991376384B',
+                                                'pv_used' => '5497558138880B',
+                                                'pvseg_size' => '1310720',
+                                                'pvseg_start' => '0',
+                                                'seg_size' => '5497558138880B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'linear',
+                                                'vg_name' => 'vgdata'
+                                              },
+                                              {
+                                                'lv_name' => '',
+                                                'lv_role' => 'public',
+                                                'pv_free' => '501433237504B',
+                                                'pv_name' => '/dev/sdc1',
+                                                'pv_size' => '5998991376384B',
+                                                'pv_used' => '5497558138880B',
+                                                'pvseg_size' => '119551',
+                                                'pvseg_start' => '1310720',
+                                                'seg_size' => '501433237504B',
+                                                'seg_start' => '0B',
+                                                'segtype' => 'free',
+                                                'vg_name' => 'vgdata'
+                                              }
+                                            ],
+                                   'vgs-lv' => {
+                                                 'gfs-ge-b1' => {
+                                                                  'data_percent' => '',
+                                                                  'lv_name' => 'gfs-ge-b1',
+                                                                  'lv_role' => 'public',
+                                                                  'lv_size' => '3298534883328B',
+                                                                  'origin' => '',
+                                                                  'pool_lv' => '',
+                                                                  'vg_name' => 'vgdata'
+                                                                },
+                                                 'kvm-hera-disk1' => {
+                                                                       'data_percent' => '',
+                                                                       'lv_name' => 'kvm-hera-disk1',
+                                                                       'lv_role' => 'public',
+                                                                       'lv_size' => '161061273600B',
+                                                                       'origin' => '',
+                                                                       'pool_lv' => '',
+                                                                       'vg_name' => 'vgdata'
+                                                                     },
+                                                 'kvm-hera-disk2' => {
+                                                                       'data_percent' => '',
+                                                                       'lv_name' => 'kvm-hera-disk2',
+                                                                       'lv_role' => 'public',
+                                                                       'lv_size' => '5497558138880B',
+                                                                       'origin' => '',
+                                                                       'pool_lv' => '',
+                                                                       'vg_name' => 'vgdata'
+                                                                     },
+                                                 'root' => {
+                                                             'data_percent' => '',
+                                                             'lv_name' => 'root',
+                                                             'lv_role' => 'public',
+                                                             'lv_size' => '10737418240B',
+                                                             'origin' => '',
+                                                             'pool_lv' => '',
+                                                             'vg_name' => 'vgdata'
+                                                           }
+                                               },
+                                   'vgs-pv' => {
+                                                 '/dev/sda1' => {
+                                                                  'pv_free' => '2701530234880B',
+                                                                  'pv_name' => '/dev/sda1',
+                                                                  'pv_size' => '6000065118208B',
+                                                                  'pv_used' => '3298534883328B',
+                                                                  'vg_name' => 'vgdata'
+                                                                },
+                                                 '/dev/sdb2' => {
+                                                                  'pv_free' => '828198879232B',
+                                                                  'pv_name' => '/dev/sdb2',
+                                                                  'pv_size' => '999997571072B',
+                                                                  'pv_used' => '171798691840B',
+                                                                  'vg_name' => 'vgdata'
+                                                                },
+                                                 '/dev/sdc1' => {
+                                                                  'pv_free' => '501433237504B',
+                                                                  'pv_name' => '/dev/sdc1',
+                                                                  'pv_size' => '5998991376384B',
+                                                                  'pv_used' => '5497558138880B',
+                                                                  'vg_name' => 'vgdata'
+                                                                }
+                                               },
+                                   'vgs-vg' => {
+                                                 'vg_free' => '4031162351616B',
+                                                 'vg_name' => 'vgdata',
+                                                 'vg_size' => '12999054065664B'
+                                               }
+                                 }
                    },
           'partitions' => {
                             'dm-1' => {
@@ -1317,7 +1319,7 @@ $VAR1 = {
                                                       'flags' => 'lvm',
                                                       'id' => '1',
                                                       'kind' => 'part',
-                                                      'label' => 'pv-chu-C',
+                                                      'label' => 'pv-data-C',
                                                       'size' => '6000067215360',
                                                       'start' => '1048576'
                                                     },
@@ -1350,7 +1352,7 @@ $VAR1 = {
                                                       'flags' => 'lvm',
                                                       'id' => '2',
                                                       'kind' => 'part',
-                                                      'label' => 'pv-chu-A',
+                                                      'label' => 'pv-data-A',
                                                       'size' => '999999668224',
                                                       'start' => '511999737856'
                                                     },
@@ -1375,7 +1377,7 @@ $VAR1 = {
                                                       'flags' => 'lvm',
                                                       'id' => '1',
                                                       'kind' => 'part',
-                                                      'label' => 'pv-chu-B',
+                                                      'label' => 'pv-data-B',
                                                       'size' => '5998994522112',
                                                       'start' => '1073741824'
                                                     },
@@ -2213,14 +2215,14 @@ $VAR1 = {
                       'dm-0' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgchu-root /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XBi3Y7Ijemtq11lPnV3dAfJm97xeA02Zc /dev/disk/by-label/zeus:ROOTFS /dev/disk/by-uuid/f31bc3f4-d093-4086-9d89-4b2a6ecc1d33 /dev/mapper/vgchu-root /dev/vgchu/root',
+                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgdata-root /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XBi3Y7Ijemtq11lPnV3dAfJm97xeA02Zc /dev/disk/by-label/zeus:ROOTFS /dev/disk/by-uuid/f31bc3f4-d093-4086-9d89-4b2a6ecc1d33 /dev/mapper/vgdata-root /dev/vgdata/root',
                                                      'DEVNAME' => '/dev/dm-0',
                                                      'DEVPATH' => '/devices/virtual/block/dm-0',
                                                      'DEVTYPE' => 'disk',
                                                      'DISKSEQ' => '6',
                                                      'DM_ACTIVATION' => '1',
                                                      'DM_LV_NAME' => 'root',
-                                                     'DM_NAME' => 'vgchu-root',
+                                                     'DM_NAME' => 'vgdata-root',
                                                      'DM_STATE' => 'ACTIVE',
                                                      'DM_SUSPENDED' => '0',
                                                      'DM_TABLE_STATE' => 'LIVE',
@@ -2229,7 +2231,7 @@ $VAR1 = {
                                                      'DM_UDEV_RULES' => '1',
                                                      'DM_UDEV_RULES_VSN' => '2',
                                                      'DM_UUID' => 'LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XBi3Y7Ijemtq11lPnV3dAfJm97xeA02Zc',
-                                                     'DM_VG_NAME' => 'vgchu',
+                                                     'DM_VG_NAME' => 'vgdata',
                                                      'ID_FS_LABEL' => 'zeus:ROOTFS',
                                                      'ID_FS_LABEL_ENC' => 'zeus:ROOTFS',
                                                      'ID_FS_TYPE' => 'ext4',
@@ -2245,27 +2247,26 @@ $VAR1 = {
                                                    },
                                   'name' => 'dm-0',
                                   'names' => [
-                                               'disk/by-id/dm-name-vgchu-root',
+                                               'disk/by-id/dm-name-vgdata-root',
                                                'disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XBi3Y7Ijemtq11lPnV3dAfJm97xeA02Zc',
                                                'disk/by-label/zeus:ROOTFS',
                                                'disk/by-uuid/f31bc3f4-d093-4086-9d89-4b2a6ecc1d33',
                                                'dm-0',
-                                               'mapper/vgchu-root',
-                                               'vgchu/root'
+                                               'mapper/vgdata-root',
+                                               'vgdata/root'
                                              ],
                                   'path' => '/devices/virtual/block/dm-0'
                                 },
                       'dm-1' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgchu-kvm--hera--disk1 /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XaqGKRLsTisySSS8m6FKsD4PL7eLrHncv /dev/mapper/vgchu-kvm--hera--disk1 /dev/vgchu/kvm-hera-disk1',
+                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgdata-kvm--hera--disk1 /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XaqGKRLsTisySSS8m6FKsD4PL7eLrHncv /dev/mapper/vgdata-kvm--hera--disk1 /dev/vgdata/kvm-hera-disk1',
                                                      'DEVNAME' => '/dev/dm-1',
                                                      'DEVPATH' => '/devices/virtual/block/dm-1',
                                                      'DEVTYPE' => 'disk',
                                                      'DISKSEQ' => '7',
-                                                     'DM_ACTIVATION' => '1',
                                                      'DM_LV_NAME' => 'kvm-hera-disk1',
-                                                     'DM_NAME' => 'vgchu-kvm--hera--disk1',
+                                                     'DM_NAME' => 'vgdata-kvm--hera--disk1',
                                                      'DM_STATE' => 'ACTIVE',
                                                      'DM_SUSPENDED' => '0',
                                                      'DM_TABLE_STATE' => 'LIVE',
@@ -2274,7 +2275,7 @@ $VAR1 = {
                                                      'DM_UDEV_RULES' => '1',
                                                      'DM_UDEV_RULES_VSN' => '2',
                                                      'DM_UUID' => 'LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XaqGKRLsTisySSS8m6FKsD4PL7eLrHncv',
-                                                     'DM_VG_NAME' => 'vgchu',
+                                                     'DM_VG_NAME' => 'vgdata',
                                                      'ID_PART_TABLE_TYPE' => 'gpt',
                                                      'ID_PART_TABLE_UUID' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
                                                      'MAJOR' => '254',
@@ -2285,25 +2286,24 @@ $VAR1 = {
                                                    },
                                   'name' => 'dm-1',
                                   'names' => [
-                                               'disk/by-id/dm-name-vgchu-kvm--hera--disk1',
+                                               'disk/by-id/dm-name-vgdata-kvm--hera--disk1',
                                                'disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XaqGKRLsTisySSS8m6FKsD4PL7eLrHncv',
                                                'dm-1',
-                                               'mapper/vgchu-kvm--hera--disk1',
-                                               'vgchu/kvm-hera-disk1'
+                                               'mapper/vgdata-kvm--hera--disk1',
+                                               'vgdata/kvm-hera-disk1'
                                              ],
                                   'path' => '/devices/virtual/block/dm-1'
                                 },
                       'dm-2' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgchu-kvm--hera--disk2 /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XfhKiiIX7WGFlbtyff8UDPyfAeK4yDrVm /dev/mapper/vgchu-kvm--hera--disk2 /dev/vgchu/kvm-hera-disk2',
+                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgdata-kvm--hera--disk2 /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XfhKiiIX7WGFlbtyff8UDPyfAeK4yDrVm /dev/mapper/vgdata-kvm--hera--disk2 /dev/vgdata/kvm-hera-disk2',
                                                      'DEVNAME' => '/dev/dm-2',
                                                      'DEVPATH' => '/devices/virtual/block/dm-2',
                                                      'DEVTYPE' => 'disk',
                                                      'DISKSEQ' => '8',
-                                                     'DM_ACTIVATION' => '1',
                                                      'DM_LV_NAME' => 'kvm-hera-disk2',
-                                                     'DM_NAME' => 'vgchu-kvm--hera--disk2',
+                                                     'DM_NAME' => 'vgdata-kvm--hera--disk2',
                                                      'DM_STATE' => 'ACTIVE',
                                                      'DM_SUSPENDED' => '0',
                                                      'DM_TABLE_STATE' => 'LIVE',
@@ -2312,7 +2312,7 @@ $VAR1 = {
                                                      'DM_UDEV_RULES' => '1',
                                                      'DM_UDEV_RULES_VSN' => '2',
                                                      'DM_UUID' => 'LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XfhKiiIX7WGFlbtyff8UDPyfAeK4yDrVm',
-                                                     'DM_VG_NAME' => 'vgchu',
+                                                     'DM_VG_NAME' => 'vgdata',
                                                      'ID_PART_TABLE_TYPE' => 'gpt',
                                                      'ID_PART_TABLE_UUID' => '51f6098d-e270-47af-8bbb-11f86342e435',
                                                      'MAJOR' => '254',
@@ -2323,25 +2323,25 @@ $VAR1 = {
                                                    },
                                   'name' => 'dm-2',
                                   'names' => [
-                                               'disk/by-id/dm-name-vgchu-kvm--hera--disk2',
+                                               'disk/by-id/dm-name-vgdata-kvm--hera--disk2',
                                                'disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03XfhKiiIX7WGFlbtyff8UDPyfAeK4yDrVm',
                                                'dm-2',
-                                               'mapper/vgchu-kvm--hera--disk2',
-                                               'vgchu/kvm-hera-disk2'
+                                               'mapper/vgdata-kvm--hera--disk2',
+                                               'vgdata/kvm-hera-disk2'
                                              ],
                                   'path' => '/devices/virtual/block/dm-2'
                                 },
                       'dm-3' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgchu-gfs--ge--b1 /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03X22rHa6vWnWhRl7f80ACfqvEJfaRVUH99 /dev/disk/by-uuid/c057bcf0-8ff6-4e89-9c38-3b917511f9a5 /dev/mapper/vgchu-gfs--ge--b1 /dev/vgchu/gfs-ge-b1',
+                                                     'DEVLINKS' => '/dev/disk/by-id/dm-name-vgdata-gfs--ge--b1 /dev/disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03X22rHa6vWnWhRl7f80ACfqvEJfaRVUH99 /dev/disk/by-uuid/c057bcf0-8ff6-4e89-9c38-3b917511f9a5 /dev/mapper/vgdata-gfs--ge--b1 /dev/vgdata/gfs-ge-b1',
                                                      'DEVNAME' => '/dev/dm-3',
                                                      'DEVPATH' => '/devices/virtual/block/dm-3',
                                                      'DEVTYPE' => 'disk',
                                                      'DISKSEQ' => '9',
                                                      'DM_ACTIVATION' => '1',
                                                      'DM_LV_NAME' => 'gfs-ge-b1',
-                                                     'DM_NAME' => 'vgchu-gfs--ge--b1',
+                                                     'DM_NAME' => 'vgdata-gfs--ge--b1',
                                                      'DM_STATE' => 'ACTIVE',
                                                      'DM_SUSPENDED' => '0',
                                                      'DM_TABLE_STATE' => 'LIVE',
@@ -2350,7 +2350,7 @@ $VAR1 = {
                                                      'DM_UDEV_RULES' => '1',
                                                      'DM_UDEV_RULES_VSN' => '2',
                                                      'DM_UUID' => 'LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03X22rHa6vWnWhRl7f80ACfqvEJfaRVUH99',
-                                                     'DM_VG_NAME' => 'vgchu',
+                                                     'DM_VG_NAME' => 'vgdata',
                                                      'ID_FS_TYPE' => 'xfs',
                                                      'ID_FS_USAGE' => 'filesystem',
                                                      'ID_FS_UUID' => 'c057bcf0-8ff6-4e89-9c38-3b917511f9a5',
@@ -2363,18 +2363,18 @@ $VAR1 = {
                                                    },
                                   'name' => 'dm-3',
                                   'names' => [
-                                               'disk/by-id/dm-name-vgchu-gfs--ge--b1',
+                                               'disk/by-id/dm-name-vgdata-gfs--ge--b1',
                                                'disk/by-id/dm-uuid-LVM-CbMl2mE9gdHzzDRlhkUD2dAi9oBrO03X22rHa6vWnWhRl7f80ACfqvEJfaRVUH99',
                                                'disk/by-uuid/c057bcf0-8ff6-4e89-9c38-3b917511f9a5',
                                                'dm-3',
-                                               'mapper/vgchu-gfs--ge--b1',
-                                               'vgchu/gfs-ge-b1'
+                                               'mapper/vgdata-gfs--ge--b1',
+                                               'vgdata/gfs-ge-b1'
                                              ],
                                   'path' => '/devices/virtual/block/dm-3'
                                 },
                       'dri/card0' => {
                                        '_udev_infos' => {
-                                                          'CURRENT_TAGS' => ':uaccess:master-of-seat:seat:',
+                                                          'CURRENT_TAGS' => ':uaccess:seat:master-of-seat:',
                                                           'DEVLINKS' => '/dev/dri/by-path/pci-0000:0a:00.0-card',
                                                           'DEVNAME' => '/dev/dri/card0',
                                                           'DEVPATH' => '/devices/pci0000:00/0000:00:1c.7/0000:07:00.0/0000:08:00.0/0000:09:00.0/0000:0a:00.0/drm/card0',
@@ -2385,7 +2385,7 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':uaccess:master-of-seat:seat:',
+                                                          'TAGS' => ':uaccess:seat:master-of-seat:',
                                                           'USEC_INITIALIZED' => '8847833'
                                                         },
                                        'name' => 'dri/card0',
@@ -2605,7 +2605,7 @@ $VAR1 = {
                                         },
                       'input/event2' => {
                                           '_udev_infos' => {
-                                                             'CURRENT_TAGS' => ':power-switch:uaccess:seat:',
+                                                             'CURRENT_TAGS' => ':uaccess:seat:power-switch:',
                                                              'DEVLINKS' => '/dev/input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-if01-event-joystick /dev/input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-event-joystick',
                                                              'DEVNAME' => '/dev/input/event2',
                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input2/event2',
@@ -2631,7 +2631,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '66',
                                                              'SUBSYSTEM' => 'input',
-                                                             'TAGS' => ':power-switch:uaccess:seat:',
+                                                             'TAGS' => ':uaccess:seat:power-switch:',
                                                              'USEC_INITIALIZED' => '8753273'
                                                            },
                                           'name' => 'input/event2',
@@ -3226,7 +3226,7 @@ $VAR1 = {
                       'sda1' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-kNR4Hr-9gUw-uVFV-QgW4-Ql2r-KmKO-v9koGi /dev/disk/by-id/scsi-36d4ae5208fc82000282816a3213f403e-part1 /dev/disk/by-id/wwn-0x6d4ae5208fc82000282816a3213f403e-part1 /dev/disk/by-partlabel/pv-chu-C /dev/disk/by-partuuid/cbfb3ac0-9649-4a12-aec7-f55f9d27c140 /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:1:0-part1',
+                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-kNR4Hr-9gUw-uVFV-QgW4-Ql2r-KmKO-v9koGi /dev/disk/by-id/scsi-36d4ae5208fc82000282816a3213f403e-part1 /dev/disk/by-id/wwn-0x6d4ae5208fc82000282816a3213f403e-part1 /dev/disk/by-partlabel/pv-data-C /dev/disk/by-partuuid/cbfb3ac0-9649-4a12-aec7-f55f9d27c140 /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:1:0-part1',
                                                      'DEVNAME' => '/dev/sda1',
                                                      'DEVPATH' => '/devices/pci0000:00/0000:00:03.0/0000:03:00.0/host0/target0:2:1/0:2:1:0/block/sda/sda1',
                                                      'DEVTYPE' => 'partition',
@@ -3240,7 +3240,7 @@ $VAR1 = {
                                                      'ID_MODEL' => 'PERC_H710P',
                                                      'ID_MODEL_ENC' => 'PERC\\x20H710P',
                                                      'ID_PART_ENTRY_DISK' => '8:0',
-                                                     'ID_PART_ENTRY_NAME' => 'pv-chu-C',
+                                                     'ID_PART_ENTRY_NAME' => 'pv-data-C',
                                                      'ID_PART_ENTRY_NUMBER' => '1',
                                                      'ID_PART_ENTRY_OFFSET' => '2048',
                                                      'ID_PART_ENTRY_SCHEME' => 'gpt',
@@ -3265,7 +3265,7 @@ $VAR1 = {
                                                      'MAJOR' => '8',
                                                      'MINOR' => '1',
                                                      'PARTN' => '1',
-                                                     'PARTNAME' => 'pv-chu-C',
+                                                     'PARTNAME' => 'pv-data-C',
                                                      'SUBSYSTEM' => 'block',
                                                      'SYSTEMD_ALIAS' => '/dev/block/8:1',
                                                      'SYSTEMD_READY' => '1',
@@ -3279,7 +3279,7 @@ $VAR1 = {
                                                'disk/by-id/lvm-pv-uuid-kNR4Hr-9gUw-uVFV-QgW4-Ql2r-KmKO-v9koGi',
                                                'disk/by-id/scsi-36d4ae5208fc82000282816a3213f403e-part1',
                                                'disk/by-id/wwn-0x6d4ae5208fc82000282816a3213f403e-part1',
-                                               'disk/by-partlabel/pv-chu-C',
+                                               'disk/by-partlabel/pv-data-C',
                                                'disk/by-partuuid/cbfb3ac0-9649-4a12-aec7-f55f9d27c140',
                                                'disk/by-path/pci-0000:03:00.0-scsi-0:2:1:0-part1',
                                                'sda1'
@@ -3390,7 +3390,7 @@ $VAR1 = {
                       'sdb2' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-3vktm5-2Yqn-fpvf-AHoD-fYL2-Ykah-LTw3su /dev/disk/by-id/scsi-36d4ae5208fc820002369966275967490-part2 /dev/disk/by-id/wwn-0x6d4ae5208fc820002369966275967490-part2 /dev/disk/by-partlabel/pv-chu-A /dev/disk/by-partuuid/98954e64-6a45-46eb-97e7-2752aa3e87d3 /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:0:0-part2',
+                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-3vktm5-2Yqn-fpvf-AHoD-fYL2-Ykah-LTw3su /dev/disk/by-id/scsi-36d4ae5208fc820002369966275967490-part2 /dev/disk/by-id/wwn-0x6d4ae5208fc820002369966275967490-part2 /dev/disk/by-partlabel/pv-data-A /dev/disk/by-partuuid/98954e64-6a45-46eb-97e7-2752aa3e87d3 /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:0:0-part2',
                                                      'DEVNAME' => '/dev/sdb2',
                                                      'DEVPATH' => '/devices/pci0000:00/0000:00:03.0/0000:03:00.0/host0/target0:2:0/0:2:0:0/block/sdb/sdb2',
                                                      'DEVTYPE' => 'partition',
@@ -3404,7 +3404,7 @@ $VAR1 = {
                                                      'ID_MODEL' => 'PERC_H710P',
                                                      'ID_MODEL_ENC' => 'PERC\\x20H710P',
                                                      'ID_PART_ENTRY_DISK' => '8:16',
-                                                     'ID_PART_ENTRY_NAME' => 'pv-chu-A',
+                                                     'ID_PART_ENTRY_NAME' => 'pv-data-A',
                                                      'ID_PART_ENTRY_NUMBER' => '2',
                                                      'ID_PART_ENTRY_OFFSET' => '999999488',
                                                      'ID_PART_ENTRY_SCHEME' => 'gpt',
@@ -3429,7 +3429,7 @@ $VAR1 = {
                                                      'MAJOR' => '8',
                                                      'MINOR' => '18',
                                                      'PARTN' => '2',
-                                                     'PARTNAME' => 'pv-chu-A',
+                                                     'PARTNAME' => 'pv-data-A',
                                                      'SUBSYSTEM' => 'block',
                                                      'SYSTEMD_ALIAS' => '/dev/block/8:18',
                                                      'SYSTEMD_READY' => '1',
@@ -3443,7 +3443,7 @@ $VAR1 = {
                                                'disk/by-id/lvm-pv-uuid-3vktm5-2Yqn-fpvf-AHoD-fYL2-Ykah-LTw3su',
                                                'disk/by-id/scsi-36d4ae5208fc820002369966275967490-part2',
                                                'disk/by-id/wwn-0x6d4ae5208fc820002369966275967490-part2',
-                                               'disk/by-partlabel/pv-chu-A',
+                                               'disk/by-partlabel/pv-data-A',
                                                'disk/by-partuuid/98954e64-6a45-46eb-97e7-2752aa3e87d3',
                                                'disk/by-path/pci-0000:03:00.0-scsi-0:2:0:0-part2',
                                                'sdb2'
@@ -3494,7 +3494,7 @@ $VAR1 = {
                       'sdc1' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
-                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-6AzzD6-aiGt-UJcd-P7B9-0SEi-FBkh-JW2rRt /dev/disk/by-id/scsi-36d4ae5208fc8200025e7e4eea0fcd8a6-part1 /dev/disk/by-id/wwn-0x6d4ae5208fc8200025e7e4eea0fcd8a6-part1 /dev/disk/by-partlabel/pv-chu-B /dev/disk/by-partuuid/ce8da785-75e6-4144-8daa-24cececf0cd3 /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:2:0-part1',
+                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-6AzzD6-aiGt-UJcd-P7B9-0SEi-FBkh-JW2rRt /dev/disk/by-id/scsi-36d4ae5208fc8200025e7e4eea0fcd8a6-part1 /dev/disk/by-id/wwn-0x6d4ae5208fc8200025e7e4eea0fcd8a6-part1 /dev/disk/by-partlabel/pv-data-B /dev/disk/by-partuuid/ce8da785-75e6-4144-8daa-24cececf0cd3 /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:2:0-part1',
                                                      'DEVNAME' => '/dev/sdc1',
                                                      'DEVPATH' => '/devices/pci0000:00/0000:00:03.0/0000:03:00.0/host0/target0:2:2/0:2:2:0/block/sdc/sdc1',
                                                      'DEVTYPE' => 'partition',
@@ -3508,7 +3508,7 @@ $VAR1 = {
                                                      'ID_MODEL' => 'PERC_H710P',
                                                      'ID_MODEL_ENC' => 'PERC\\x20H710P',
                                                      'ID_PART_ENTRY_DISK' => '8:32',
-                                                     'ID_PART_ENTRY_NAME' => 'pv-chu-B',
+                                                     'ID_PART_ENTRY_NAME' => 'pv-data-B',
                                                      'ID_PART_ENTRY_NUMBER' => '1',
                                                      'ID_PART_ENTRY_OFFSET' => '2097152',
                                                      'ID_PART_ENTRY_SCHEME' => 'gpt',
@@ -3533,7 +3533,7 @@ $VAR1 = {
                                                      'MAJOR' => '8',
                                                      'MINOR' => '33',
                                                      'PARTN' => '1',
-                                                     'PARTNAME' => 'pv-chu-B',
+                                                     'PARTNAME' => 'pv-data-B',
                                                      'SUBSYSTEM' => 'block',
                                                      'SYSTEMD_ALIAS' => '/dev/block/8:33',
                                                      'SYSTEMD_READY' => '1',
@@ -3547,7 +3547,7 @@ $VAR1 = {
                                                'disk/by-id/lvm-pv-uuid-6AzzD6-aiGt-UJcd-P7B9-0SEi-FBkh-JW2rRt',
                                                'disk/by-id/scsi-36d4ae5208fc8200025e7e4eea0fcd8a6-part1',
                                                'disk/by-id/wwn-0x6d4ae5208fc8200025e7e4eea0fcd8a6-part1',
-                                               'disk/by-partlabel/pv-chu-B',
+                                               'disk/by-partlabel/pv-data-B',
                                                'disk/by-partuuid/ce8da785-75e6-4144-8daa-24cececf0cd3',
                                                'disk/by-path/pci-0000:03:00.0-scsi-0:2:2:0-part1',
                                                'sdc1'
@@ -3650,7 +3650,7 @@ $VAR1 = {
                                      },
                       'sr0' => {
                                  '_udev_infos' => {
-                                                    'CURRENT_TAGS' => ':uaccess:systemd:seat:',
+                                                    'CURRENT_TAGS' => ':uaccess:seat:systemd:',
                                                     'DEVLINKS' => '/dev/cdrom /dev/disk/by-id/ata-HL-DT-ST_DVD-ROM_DH40N_K5DC4GG4038 /dev/disk/by-path/pci-0000:00:1f.2-ata-5 /dev/disk/by-path/pci-0000:00:1f.2-ata-5.0 /dev/dvd',
                                                     'DEVNAME' => '/dev/sr0',
                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:1f.2/ata5/host5/target5:0:0/5:0:0:0/block/sr0',
@@ -3679,7 +3679,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'SYSTEMD_MOUNT_DEVICE_BOUND' => '1',
-                                                    'TAGS' => ':uaccess:systemd:seat:',
+                                                    'TAGS' => ':uaccess:seat:systemd:',
                                                     'USEC_INITIALIZED' => '2414148'
                                                   },
                                  'name' => 'sr0',

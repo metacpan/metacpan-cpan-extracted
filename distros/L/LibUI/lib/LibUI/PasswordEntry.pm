@@ -1,4 +1,4 @@
-package LibUI::PasswordEntry 0.01 {
+package LibUI::PasswordEntry 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,8 +6,9 @@ package LibUI::PasswordEntry 0.01 {
     use parent 'LibUI::Entry';
     #
     affix(
-        LibUI::lib(), 'uiNewPasswordEntry', [Void] => InstanceOf ['LibUI::PasswordEntry'],
-        'new'
+        LibUI::lib(),
+        [ 'uiNewPasswordEntry', 'new' ],
+        [Void] => InstanceOf ['LibUI::PasswordEntry']
     );
 };
 1;
@@ -28,8 +29,9 @@ LibUI::Entry - Single Line Text Entry Field Suitable for Sensitive Input
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::PasswordEntry;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $pass   = LibUI::PasswordEntry->new;
     $box->append( $pass, 0 );

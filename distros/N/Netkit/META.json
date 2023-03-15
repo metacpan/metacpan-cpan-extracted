@@ -1,5 +1,5 @@
 {
-   "abstract" : "create netkit labs with code.",
+   "abstract" : "Create Netkit labs with code.",
    "author" : [
       "Rhys Adams <rhys@therhys.co.uk>"
    ],
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.01,
+   "version" : 0.02,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

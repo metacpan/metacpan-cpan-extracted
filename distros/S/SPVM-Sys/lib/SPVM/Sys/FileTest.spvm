@@ -1,393 +1,99 @@
 class Sys::FileTest {
-  use Sys::IO;
-  use Sys::IO::Stat;
-  use Sys::IO::Constant as IO;
-  use Sys::User;
   use Sys;
-  use Fn;
-  
+
   static method A : double ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new($file);
-    
-    my $result_time = $stat->A;
-    
-    return $result_time;
+    return Sys->A($file);
   }
   
   static method C : double ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new($file);
-    my $result_time = $stat->C;
-    
-    return $result_time;
+    return Sys->C($file);
   }
   
   static method M : double ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new($file);
-    
-    my $result_time = $stat->M;
-    
-    return $result_time;
+    return Sys->M($file);
   }
   
   static method O : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->O;
-    }
-    
-    return $ok;
+    return Sys->O($file);
   }
   
   static method R : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->R;
-    }
-    
-    return $ok;
+    return Sys->R($file);
   }
   
   static method S : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new($file);
-    
-    my $ok = $stat->S;
-    
-    return $ok;
+    return Sys->S($file);
   }
   
   static method W : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->W;
-    }
-    
-    return $ok;
+    return Sys->W($file);
   }
   
   static method X : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->X;
-    }
-    
-    return $ok;
+    return Sys->X($file);
   }
   
   static method b : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Block device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->b;
-    }
-    
-    return $ok;
+    return Sys->b($file);
   }
   
   static method c : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->c;
-    }
-    
-    return $ok;
+    return Sys->c($file);
   }
   
   static method d : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->d;
-    }
-    
-    return $ok;
+    return Sys->d($file);
   }
   
   static method e : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->e;
-    }
-    
-    return $ok;
+    return Sys->e($file);
   }
   
   static method f : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->f;
-    }
-    
-    return $ok;
+    return Sys->f($file);
   }
   
   static method g : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->g;
-    }
-    
-    return $ok;
+    return Sys->g($file);
   }
   
   static method k : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->k;
-    }
-    
-    return $ok;
+    return Sys->k($file);
   }
   
   static method l : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->lstat_raw($file, $stat);
-    
-    # Symbolic link
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->l;
-    }
-    
-    return $ok;
+    return Sys->l($file);
   }
   
   static method o : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->o;
-    }
-    return $ok;
+    return Sys->o($file);
   }
   
   static method p : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # FIFO/PIPE
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->p;
-    }
-    
-    return $ok;
+    return Sys->p($file);
   }
   
   static method r : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->r;
-    }
-    
-    return $ok;
+    return Sys->r($file);
   }
   
   static method s : long ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new($file);
-    
-    my $size = $stat->s;
-    
-    return $size;
+    return Sys->s($file);
   }
   
   static method u : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->u;
-    }
-    
-    return $ok;
+    return Sys->u($file);
   }
   
   static method w : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->w;
-    }
-    
-    return $ok;
+    return Sys->w($file);
   }
   
   static method x : int ($file : string) {
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new;
-    my $status = Sys::IO::Stat->stat_raw($file, $stat);
-    
-    # Character device
-    my $ok = 0;
-    unless ($status == -1) {
-      $ok = $stat->x;
-    }
-    
-    return $ok;
+    return Sys->x($file);
   }
   
   static method z : int ($file : string) {
-    
-    unless ($file) {
-      die "The file must be defined";
-    }
-    
-    my $stat = Sys::IO::Stat->new($file);
-    
-    my $ok = $stat->z;
-    
-    return $ok;
+    return Sys->z($file);
   }
 }

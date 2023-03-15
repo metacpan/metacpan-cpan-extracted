@@ -4,7 +4,7 @@
       "Slaven Rezic <srezic@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,10 +40,9 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/eserte/org-daemon.git"
+         "url" : "https://github.com/eserte/org-daemon.git"
       }
    },
-   "version" : "1.11",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

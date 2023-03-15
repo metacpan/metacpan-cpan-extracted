@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -598,7 +598,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.05
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -2895,7 +2895,7 @@ Like .NET based languages and Java.
 =back
 
 The documentation has a bias toward using FFI / Platypus with C.  This
-is my fault, as my background in mainly in C/C++ programmer (when I am
+is my fault, as my background mainly in C/C++ programmer (when I am
 not writing Perl).  In many places I use "C" as a short form for "any
 language that can generate machine code and is callable from C".  I
 welcome pull requests to the Platypus core to address this issue.  In an

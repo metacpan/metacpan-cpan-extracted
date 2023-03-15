@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 31;
+use Test::More tests => 42;
 
 our @warnings;
 BEGIN {
@@ -73,6 +73,26 @@ BEGIN {
 BEGIN {
 	eval { require t::seal_4; };
 	like $@, qr/\Aseal_4 death\n/;
+}
+
+test_runtime_hint_hash "Lexical::SealRequireHints/test", 1;
+BEGIN {
+	is $^H{"Lexical::SealRequireHints/test"}, 1;
+	do "t/seal_d0.pl" or die $@ || $!;
+	is $^H{"Lexical::SealRequireHints/test"}, 1;
+}
+test_runtime_hint_hash "Lexical::SealRequireHints/test", 1;
+
+BEGIN { is +(1 + (do "t/seal_d1.pl")), 21; }
+
+BEGIN {
+	is +(do "t/seal_d2.pl"), undef;
+	like $@, qr/\Aseal_d2 death\n/;
+}
+
+BEGIN {
+	is +(do "t/seal_d3.pl"), undef;
+	like $@, qr/\Aseal_d3 death\n/;
 }
 
 is_deeply \@warnings, [];

@@ -145,6 +145,13 @@ subtest "arg:remaining" => sub {
 
 subtest "arg:summaries" => sub {
     test_complete(
+        word      => 'aa,a,c,',
+        elems     => [qw(a aa b)],
+        summaries => [qw(Sa Saa Sb)],
+        uniq      => 1,
+        result    => [{word=>'aa,a,c,b', summary=>'Sb'}],
+    );
+    test_complete(
         word      => 'aa,c,',
         elems     => [qw(a aa b)],
         summaries => [qw(Sa Saa Sb)],

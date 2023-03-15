@@ -1,24 +1,24 @@
-package LibUI::Button 0.01 {
+package LibUI::Button 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use parent 'LibUI::Control';
     #
-    affix( LibUI::lib(), 'uiNewButton', [ Void, Str ] => InstanceOf ['LibUI::Button'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewButton', 'new' ], [ Void, Str ] => InstanceOf ['LibUI::Button'] );
     affix(
         LibUI::lib(),
-        'uiButtonOnClicked',
+        [ 'uiButtonOnClicked', 'onClicked' ],
         [   InstanceOf ['LibUI::Button'],
             CodeRef [ [ InstanceOf ['LibUI::Button'], Any ] => Void ], Any
-        ] => Void,
-        'onClicked'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiButtonSetText', [ InstanceOf ['LibUI::Button'], Str ] => Void,
-        'setText'
+        LibUI::lib(),
+        [ 'uiButtonSetText',            'setText' ],
+        [ InstanceOf ['LibUI::Button'], Str ] => Void
     );
-    affix( LibUI::lib(), 'uiButtonSetText', [ InstanceOf ['LibUI::Button'] ] => Str, 'text' );
+    affix( LibUI::lib(), [ 'uiButtonSetText', 'text' ], [ InstanceOf ['LibUI::Button'] ] => Str );
 };
 1;
 #
@@ -37,8 +37,9 @@ LibUI::Button - Button to be Clicked by the User to Trigger an Action
     use LibUI ':all';
     use LibUI::Window;
     use LibUI::Button;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $btn    = LibUI::Button->new('Click me!');
     $btn->onClicked(
         sub {

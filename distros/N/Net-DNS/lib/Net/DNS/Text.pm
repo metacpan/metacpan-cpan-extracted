@@ -3,7 +3,7 @@ package Net::DNS::Text;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Text.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Text.pm 1894 2023-01-12 10:59:08Z willem $)[2];
 
 
 =head1 NAME
@@ -70,15 +70,13 @@ my ( %escape, %escapeUTF8, %unescape );	## precalculated escape tables
 
 sub new {
 	my $self = bless [], shift;
-	croak 'argument undefined' unless defined $_[0];
-
 	local $_ = &_encode_utf8;
 
 	s/^\042(.*)\042$/$1/s;					# strip paired quotes
 
-	s/\134\134/\134\060\071\062/g;				# disguise escaped escape
-	s/\134([\060-\071]{3})/$unescape{$1}/eg;		# numeric escape
-	s/\134(.)/$1/g;						# character escape
+	s/\134([\060-\071]{3})/$unescape{$1}/eg;		# restore numeric escapes
+	s/\134([^\134])/$1/g;					# restore character escapes
+	s/\134\134/\134/g;					# restore escaped escapes
 
 	while ( length $_ > 255 ) {
 		my $chunk = substr( $_, 0, 255 );		# carve into chunks
@@ -230,6 +228,7 @@ sub _decode_utf8 {			## UTF-8 to perl internal encoding
 
 sub _encode_utf8 {			## perl internal encoding to UTF-8
 	local $_ = shift;
+	croak 'argument undefined' unless defined $_;
 
 	# partial transliteration for non-ASCII character encodings
 	tr
@@ -323,7 +322,9 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, RFC1035, RFC3629, Unicode TR#16
+L<perl> L<Net::DNS>
+L<RFC1035|https://tools.ietf.org/html/rfc1035>
+L<RFC3629|https://tools.ietf.org/html/rfc3629>
 
 =cut
 

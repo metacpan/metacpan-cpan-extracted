@@ -2,7 +2,7 @@ package Net::DNS::RR::ZONEMD;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: ZONEMD.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: ZONEMD.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,8 +19,7 @@ use Carp;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
 	@{$self}{qw(serial scheme algorithm digestbin)} = unpack 'NC2a*', $rdata;
@@ -45,12 +44,10 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->serial(shift);
-	$self->scheme(shift);
-	$self->algorithm(shift);
-	$self->digest(@_);
+	for (qw(serial scheme algorithm)) { $self->$_( shift @argument ) }
+	$self->digest(@argument);
 	return;
 }
 
@@ -64,40 +61,37 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub serial {
-	my $self = shift;
-
-	$self->{serial} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{serial} = 0 + $_ }
 	return $self->{serial} || 0;
 }
 
 
 sub scheme {
-	my $self = shift;
-
-	$self->{scheme} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{scheme} = 0 + $_ }
 	return $self->{scheme} || 0;
 }
 
 
 sub algorithm {
-	my $self = shift;
-
-	$self->{algorithm} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{algorithm} = 0 + $_ }
 	return $self->{algorithm} || 0;
 }
 
 
 sub digest {
-	my $self = shift;
-	return unpack "H*", $self->digestbin() unless scalar @_;
-	return $self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	my ( $self, @value ) = @_;
+	return unpack "H*", $self->digestbin() unless scalar @value;
+	my @hex = map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @value;
+	return $self->digestbin( pack "H*", join "", @hex );
 }
 
 
 sub digestbin {
-	my $self = shift;
-
-	$self->{digestbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{digestbin} = $_ }
 	return $self->{digestbin} || "";
 }
 
@@ -196,6 +190,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8976
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC8976|https://tools.ietf.org/html/rfc8976>
 
 =cut

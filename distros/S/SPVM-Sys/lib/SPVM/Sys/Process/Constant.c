@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
   // None
 #else
   #include <sys/types.h>

@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.03.
 package Math::Formula::Config::YAML;
 use vars '$VERSION';
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 use base 'Math::Formula::Config';
 
@@ -13,7 +13,7 @@ use strict;
 
 use Log::Report 'math-formula';
 
-use YAML::XS 0.81;
+use YAML::XS qw/Dump Load/;
 use boolean ();
 use File::Slurper 'read_binary';
 

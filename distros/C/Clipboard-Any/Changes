@@ -1,3 +1,10 @@
+0.010   2023-02-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update list of supported clipboard managers.
+
+
 0.009   2022-12-13  Released-By: PERLANCAR; Urgency: medium
 
         - Add function: get_clipboard_history_item.

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -61,6 +61,6 @@
          "x_repository" : "https://github.com/nigelhorne/Class-Simple-Readonly-Cached"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

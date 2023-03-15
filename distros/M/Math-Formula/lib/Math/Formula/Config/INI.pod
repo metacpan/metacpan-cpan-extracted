@@ -68,7 +68,7 @@ Extends L<"Actions" in Math::Formula::Config|Math::Formula::Config/"Actions">.
 
 =item $obj-E<gt>B<load>($name, %options)
 
-Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
+Load a L<Math::Formula::Context|Math::Formula::Context> for an INI file.
 
  -Option  --Default
   filename  <directory/$name.ini>
@@ -81,8 +81,8 @@ Load a L<Math::Formula::Context|Math::Formula::Context> for an ini file.
 
 =item $obj-E<gt>B<save>($context, %args)
 
-Serialize the $context to INI files, as storage or to be editted by hand.
-This is a usefull method when default configuration templates need to be generated.
+Serialize the $context to INI files, as storage or to be edited by hand.
+This is a useful method when default configuration templates need to be generated.
 
  -Option  --Default
   filename  $context->name .ini
@@ -123,8 +123,8 @@ B<. Example>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.15,
-built on March 06, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula distribution version 0.16,
+built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

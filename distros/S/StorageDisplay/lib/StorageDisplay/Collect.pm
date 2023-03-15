@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data. No dependencies (but perl itself)
 
-our $VERSION = '1.0.11'; # VERSION
+our $VERSION = '1.1.0'; # VERSION
 
 
 use Storable;
@@ -522,6 +522,48 @@ sub new {
 ###########################################################################
 ###########################################################################
 ###########################################################################
+package StorageDisplay::Collect::Host;
+
+use is_collector
+    provides => [ qw(hostname) ],
+    no_names => 1,
+    depends => {
+        progs => [ 'hostname', 'date' ],
+};
+
+sub collect {
+    my $self = shift;
+    my $infos = {};
+    my $dh;
+
+    $dh=$self->open_cmd_pipe(qw(hostname));
+    my $hostname = <$dh>;
+    close $dh;
+    chomp($hostname);
+    $dh=$self->open_cmd_pipe(qw(hostname --fqdn));
+    my $fqdn_hostname = <$dh>;
+    close $dh;
+    chomp($fqdn_hostname);
+    $dh=$self->open_cmd_pipe(qw(date --rfc-3339=s));
+    my $date = <$dh>;
+    close $dh;
+    chomp($date);
+    $dh=$self->open_cmd_pipe(qw(uname -a));
+    my $uname = <$dh>;
+    close $dh;
+    chomp($uname);
+
+    return {
+	hostname => $hostname,
+	fqdn_hostname => $fqdn_hostname,
+	date => $date,
+	uname => $uname,
+    };
+}
+
+1;
+
+###########################################################################
 package StorageDisplay::Collect::SystemBlocks;
 
 use is_collector
@@ -948,7 +990,7 @@ use is_collector
     provides => 'fs',
     no_names => 1,
     depends => {
-        progs => [ '/sbin/swapon', 'df' ],
+        progs => [ '/sbin/swapon', 'df', 'findmnt', 'stat' ],
 	root => 1,
 };
 
@@ -977,6 +1019,11 @@ sub collect {
                 chomp($mountpoint) if defined($mountpoint);
                 close $dh2;
                 $info->{'file-mountpoint'}=$mountpoint;
+		$dh2=$self->open_cmd_pipe_root(qw(stat -c %s), $1);
+                my $size = <$dh2>;
+                chomp($size);
+                close $dh2;
+                $info->{'file-size'}=$size;
             }
             $fs->{$dev} = $info;
         } elsif ($line =~ m,([^ ]+) ([^ ]+) ([0-9]+) ([0-9]+)$,) {
@@ -1641,9 +1688,54 @@ sub collect {
                 chomp($mountpoint) if defined($mountpoint);
                 close $dh2;
                 $v->{'blocks'}->{$info[3]}->{'mount-point'}=$mountpoint;
+		if (defined($mountpoint)) {
+		    $dh2=$self->open_cmd_pipe_root(qw(stat -c %s), $info[3]);
+		    my $size = <$dh2>;
+		    chomp($size);
+		    close $dh2;
+		    $v->{'blocks'}->{$info[3]}->{'file-size'}=$size;
+		}
             }
         }
         close $dh;
+	if ($v->{state}//'' eq 'running') {
+	    # trying to get infos from QEMU guest agent
+	    $dh=$self->open_cmd_pipe_root(qw(virsh guestinfo --hostname --disk), $vm);
+	    my $curdisk='';
+	    my $curdiskinfo={};
+	    while(defined(my $line=<$dh>)) {
+		chomp($line);
+		if ($curdisk ne '' && $line !~ /^disk\.$curdisk\./) {
+		    if (exists($curdiskinfo->{name}) && exists($curdiskinfo->{alias})) {
+			#print STDERR "W: libvirt guestagent on $vm: adding ".$curdiskinfo->{alias}."\n";
+			$v->{ga}->{disks}->{$curdiskinfo->{alias}}=$curdiskinfo;
+		    }
+		    $curdiskinfo={};
+		    $curdisk = '';
+		}
+		next if $line =~ /^[\s-]*$/;
+		if ($line !~ m/^([^:\s]+)\s*: (.*)$/) {
+		    print STDERR "W: libvirt guestagent on $vm: Unknown line '$line'\n";
+		}
+		my $key=$1;
+		my $value=$2;
+		if ($key eq 'hostname') {
+		    $v->{ga}->{hostname} = $value;
+		    next;
+		}
+		if ($key =~ /^disk\.([0-9]+)\./) {
+		    $curdisk = $1;
+		    if ($key =~ /\.(name|alias)$/) {
+			$curdiskinfo->{$1} = $value;
+		    }
+		}
+	    }
+	    close $dh;
+	    if ($curdisk ne '') {
+		# the last empty line should have set $curdisk to ''
+		print STDERR "W: libvirt guestagent on $vm: end-before-end '$curdisk'\n";
+	    }
+	}
         $libvirt->{$vm} = $v;
     }
 
@@ -1687,7 +1779,7 @@ StorageDisplay::Collect - modules required to collect data. No dependencies (but
 
 =head1 VERSION
 
-version 1.0.11
+version 1.1.0
 
 Main class, allows one to register collectors and run them (through the collect method)
 

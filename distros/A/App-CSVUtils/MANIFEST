@@ -42,6 +42,7 @@ lib/App/CSVUtils/csv_munge_field.pm
 lib/App/CSVUtils/csv_munge_row.pm
 lib/App/CSVUtils/csv_pick_fields.pm
 lib/App/CSVUtils/csv_pick_rows.pm
+lib/App/CSVUtils/csv_quote.pm
 lib/App/CSVUtils/csv_replace_newline.pm
 lib/App/CSVUtils/csv_rtrim.pm
 lib/App/CSVUtils/csv_select_fields.pm
@@ -58,6 +59,7 @@ lib/App/CSVUtils/csv_sum.pm
 lib/App/CSVUtils/csv_transpose.pm
 lib/App/CSVUtils/csv_trim.pm
 lib/App/CSVUtils/csv_uniq.pm
+lib/App/CSVUtils/csv_unquote.pm
 lib/App/CSVUtils/paras2csv.pm
 script/csv-add-fields
 script/csv-avg
@@ -89,6 +91,7 @@ script/csv-munge-row
 script/csv-pick
 script/csv-pick-fields
 script/csv-pick-rows
+script/csv-quote
 script/csv-replace-newline
 script/csv-rtrim
 script/csv-select-fields
@@ -108,6 +111,7 @@ script/csv-sum
 script/csv-transpose
 script/csv-trim
 script/csv-uniq
+script/csv-unquote
 script/csv2ltsv
 script/csv2paras
 script/csv2td

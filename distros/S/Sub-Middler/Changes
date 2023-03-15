@@ -1,6 +1,19 @@
 Revision history for Perl extension Sub::Middler.
 
-0.1.0 2023-02-19 
+v0.2.0 2023-03-10
+  [features]
+  - Additional arguments to link are passed through to the element/link makers.
+    This makes adds an alternative way of sharing configuration between links
+    in the chain.
+
+  - Attempting to register/add a  non code ref will die
+
+  - method 'register' is aliased to 'add' and 'append'
+
+  [tests]
+  - Added tests covering registering, linking and passing link arguments
+
+v0.1.0 2023-02-19 
 	- original version; created by h2xs 1.23 with options
 		--name Sub::Middler -X -P -b v5.24.0
 

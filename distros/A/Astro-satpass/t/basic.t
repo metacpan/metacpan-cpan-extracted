@@ -323,7 +323,12 @@ u_cmp_eql( find_first_true => [
     'find_first_true looking for sin( $x ) >= sin( .5 )' );
 
 u_cmp_eql( format_space_track_json_time => timegm( 0, 0, 0, 1, 3, 114 ),
-    '2014-04-01 00:00:00', '%s', 'Format Space Tracj JSON time' );
+    '2014-04-01 00:00:00', '%s', 'Format Space Track JSON time' );
+
+u_cmp_eql( __format_epoch_time_usec => [
+	timegm( 5, 4, 3, 1, 3, 114 ) + .25, '%F %T' ],
+    '2014-04-01 03:04:05.250000', '%s',
+    'Format epoch time with microseconds' );
 
 note <<EOD;
 The following test is from the example in the IDL Astronomy User's

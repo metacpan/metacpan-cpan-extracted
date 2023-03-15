@@ -1,5 +1,10 @@
 Revision history for perl module Alien::RtMidi
 
+0.05 2022-02-00
+
+  - Updated for RtMidi v5
+  - Install point releases if they exist
+
 0.04 2021-09-17
 
   - Switch back to Autoconf for non-Windows platforms

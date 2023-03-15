@@ -8,8 +8,9 @@ LibUI - Simple, Portable, Native GUI Library
     use LibUI ':all';
     use LibUI::Window;
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init( ) && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     $window->setChild( LibUI::Label->new('Hello, World!') );
     $window->onClosing(
         sub {
@@ -20,6 +21,17 @@ LibUI - Simple, Portable, Native GUI Library
     );
     $window->show;
     Main();
+
+<div>
+    <h2>Screenshots</h2> <div style="text-align: center"> <h3>Linux</h3><img
+    alt="Linux"
+    src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/linux.png" />
+    <h3>MacOS</h3><img alt="MacOS"
+    src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/macos.png" />
+    <h3>Windows</h3><img alt="Windows"
+    src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/windows.png" />
+    </div>
+</div>
 
 # DESCRIPTION
 
@@ -61,8 +73,8 @@ This distribution is under construction. It works but is incomplete.
 
 - [LibUI::Label](https://metacpan.org/pod/LibUI%3A%3ALabel) - a control to display non-interactive text
 - [LibUI::ProgressBar](https://metacpan.org/pod/LibUI%3A%3AProgressBar) - a control that visualizes the progress of a task via the fill level of a horizontal bar
-- [LibUI::HorizontalSeparator](https://metacpan.org/pod/LibUI%3A%3AHorizontalSeparator) - a control to visually separate controls horizontally
-- [LibUI::VerticalSeparator](https://metacpan.org/pod/LibUI%3A%3AVerticalSeparator) - a control to visually separate controls vertically
+- [LibUI::HSeparator](https://metacpan.org/pod/LibUI%3A%3AHSeparator) - a control to visually separate controls horizontally
+- [LibUI::VSeparator](https://metacpan.org/pod/LibUI%3A%3AVSeparator) - a control to visually separate controls vertically
 
 ## Dialog windows
 
@@ -89,17 +101,21 @@ Some basics you gotta use just to keep a modern GUI running.
 
 This is incomplete but... well, I'm working on it.
 
-## `Init( ... )`
+## `Init( [...] )`
 
-    Init( { Size => 1024 } );
+    Init( );
 
-Ask LibUI to do all the platform specific work to get up and running.
+Ask LibUI to do all the platform specific work to get up and running. If LibUI
+fails to initialize itself, this will return a true value. Weird upstream
+choice, I know...
 
-Expected parameters include:
+You **must** call this before creating widgets.
 
-- `$options`
+## `Main( ... )`
 
-    LibUI::InitOptions structure.
+    Main( );
+
+Let LibUI's event loop run until interrupted.
 
 ## `Uninit( ... )`
 
@@ -113,15 +129,19 @@ Ask LibUI to break everything down before quitting.
 
 Quit.
 
-## `Main( ... )`
-
-    Main( );
-
-Let LibUI's event loop run until interrupted.
-
 ## `Timer( ... )`
 
     Timer( 1000, sub { die 'do not do this here' }, undef);
+
+    Timer(
+        1000,
+        sub {
+            my $data = shift;
+            return 1 unless ++$data->{ticks} == 5;
+            0;
+        },
+        { ticks => 0 }
+    );
 
 Expected parameters include:
 
@@ -137,11 +157,17 @@ Expected parameters include:
 
 - `$data`
 
-    Any userdata you feel like passing.
+    Any userdata you feel like passing. It'll be handed off to your function.
 
 # Requirements
 
 See [Alien::libui](https://metacpan.org/pod/Alien%3A%3Alibui)
+
+# See Also
+
+`eg/demo.pl` - Very basic example
+
+`eg/widgets.pl` - Demo of basic controls
 
 # LICENSE
 

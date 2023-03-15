@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver-config.t 1813 2020-10-08 21:58:40Z willem $	-*-perl-*-
+# $Id: 01-resolver-config.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -113,7 +113,7 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 }
 
 
-eval {					## exercise printing functions
+eval {					## no critic		# exercise printing functions
 	my $object = Net::DNS::Resolver->new();
 	my $file   = "01-resolver.tmp";
 	my $handle = IO::File->new( $file, '>' ) || die "Could not open $file for writing";

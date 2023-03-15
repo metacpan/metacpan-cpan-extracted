@@ -1,32 +1,38 @@
-package LibUI::MenuItem 0.01 {
+package LibUI::MenuItem 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     #
     affix(
-        LibUI::lib(), 'uiMenuItemChecked', [ InstanceOf ['LibUI::MenuItem'] ] => Int,
-        'checked'
+        LibUI::lib(),
+        [ 'uiMenuItemChecked', 'checked' ],
+        [ InstanceOf ['LibUI::MenuItem'] ] => Int
     );
-    affix(
-        LibUI::lib(), 'uiMenuItemDisable', [ InstanceOf ['LibUI::MenuItem'] ] => Void,
-        'disable'
-    );
-    affix( LibUI::lib(), 'uiMenuItemEnable', [ InstanceOf ['LibUI::MenuItem'] ] => Void, 'enable' );
     affix(
         LibUI::lib(),
-        'uiMenuItemOnClicked',
+        [ 'uiMenuItemDisable', 'disable' ],
+        [ InstanceOf ['LibUI::MenuItem'] ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiMenuItemEnable', 'enable' ],
+        [ InstanceOf ['LibUI::MenuItem'] ] => Void
+    );
+    affix(
+        LibUI::lib(),
+        [ 'uiMenuItemOnClicked', 'onClicked' ],
         [   InstanceOf ['LibUI::MenuItem'],
             CodeRef [
                 [ InstanceOf ['LibUI::MenuItem'], InstanceOf ['LibUI::Window'], Any ] => Void
             ],
             Any
-        ] => Void,
-        'onClicked'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiMenuItemSetChecked', [ InstanceOf ['LibUI::MenuItem'], Int ] => Void,
-        'setChecked'
+        LibUI::lib(),
+        [ 'uiMenuItemSetChecked',         'setChecked' ],
+        [ InstanceOf ['LibUI::MenuItem'], Int ] => Void
     );
 };
 1;
@@ -46,7 +52,7 @@ LibUI::MenuItem - Menu Item Use in Conjunction with LibUI::Menu
     use LibUI ':all';
     use LibUI::Window;
     use LibUI::Menu;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $mnuTest  = LibUI::Menu->new('Test');
     my $mnuCheck = $mnuTest->appendCheckItem('Target');
     $mnuTest->appendSeparator;

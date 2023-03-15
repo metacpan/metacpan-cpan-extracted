@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-14'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/TextWrapUtils/textwrap_clipboard",
@@ -40,7 +40,7 @@ textwrap-clipboard - Wrap (fold) paragraphs in text in clipboard using one of se
 
 =head1 VERSION
 
-This document describes version 0.005 of textwrap-clipboard (from Perl distribution App-TextWrapUtils), released on 2022-12-14.
+This document describes version 0.006 of textwrap-clipboard (from Perl distribution App-TextWrapUtils), released on 2023-03-10.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<textwrap-clipboard> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?
 
 B<textwrap-clipboard> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<textwrap-clipboard> [B<L<--backend|/"--backend=s">>=I<L<perl::modname|Sah::Schema::perl::modname>>] [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--width|/"--width=s, -w">>=I<L<posint|Sah::Schema::posint>>|B<L<-w|/"--width=s, -w">>=I<L<posint|Sah::Schema::posint>>]
+B<textwrap-clipboard> [B<L<--backend|/"--backend=s, -b">>=I<L<perl::modname|Sah::Schema::perl::modname>>|B<L<-b|/"--backend=s, -b">>=I<L<perl::modname|Sah::Schema::perl::modname>>] [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--width|/"--width=s, -w">>=I<L<posint|Sah::Schema::posint>>|B<L<-w|/"--width=s, -w">>=I<L<posint|Sah::Schema::posint>>]
 
 =head1 DESCRIPTION
 
@@ -67,7 +67,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--backend>=I<s>
+=item B<--backend>=I<s>, B<-b>
 
 Default value:
 
@@ -275,7 +275,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

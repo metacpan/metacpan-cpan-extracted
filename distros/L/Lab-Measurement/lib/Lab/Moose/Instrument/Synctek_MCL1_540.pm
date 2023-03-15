@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Synctek_MCL1_540;
-$Lab::Moose::Instrument::Synctek_MCL1_540::VERSION = '3.851';
+$Lab::Moose::Instrument::Synctek_MCL1_540::VERSION = '3.860';
 #ABSTRACT: Synctek MCL1-540 Lock-in Amplifier
 
 use v5.20;
@@ -64,6 +64,8 @@ sub request {
 # Configuration dump and write todo
 
 # WTF is das System mit dem Array?
+# TODO: - use a single function to return all DC voltages
+#         => use hash to match A_V1->id=L1,DC[0] etc
 sub get_A_V1_DC {
     my $self = shift;
     return $self->request(
@@ -360,7 +362,7 @@ Lab::Moose::Instrument::Synctek_MCL1_540 - Synctek MCL1-540 Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 SYNOPSIS
 
@@ -385,6 +387,7 @@ This driver consumes the following roles:
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Jonas Schambeck, Mia Schambeck, Simon Reinhardt
+            2023       Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

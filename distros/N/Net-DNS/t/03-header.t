@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-header.t 1815 2020-10-14 21:55:18Z willem $
+# $Id: 03-header.t 1899 2023-02-20 15:34:02Z willem $
 #
 
 use strict;
@@ -9,7 +9,7 @@ use Test::More;
 use Net::DNS::Packet;
 use Net::DNS::Parameters;
 
-plan tests => 72;
+plan tests => 77;
 
 
 my $packet = Net::DNS::Packet->new(qw(. NS IN));
@@ -18,9 +18,7 @@ ok( $header->isa('Net::DNS::Header'), 'packet->header object' );
 
 
 sub waggle {
-	my $object    = shift;
-	my $attribute = shift;
-	my @sequence  = @_;
+	my ( $object, $attribute, @sequence ) = @_;
 	for my $value (@sequence) {
 		my $change = $object->$attribute($value);
 		my $stored = $object->$attribute();
@@ -30,10 +28,14 @@ sub waggle {
 }
 
 
-my $newid = Net::DNS::Packet->new()->header->id;
-waggle( $header, 'id', $header->id, $newid, $header->id );
+my $newid = Net::DNS::Packet->new()->header->id(0);
+ok( $newid, 'expected non-zero packet ID' );
 
-waggle( $header, 'opcode', qw(STATUS UPDATE QUERY) );
+waggle( $header, 'opcode', qw(QUERY UPDATE DSO) );
+waggle( $header, 'id',	   $header->id, 0, $header->id );	# Zero ID => DSO unidirectional
+waggle( $header, 'opcode', qw(QUERY) );
+waggle( $header, 'id',	   $header->id, $newid, $header->id );
+
 waggle( $header, 'rcode',  qw(REFUSED FORMERR NOERROR) );
 
 waggle( $header, 'qr', 1, 0, 1, 0 );
@@ -119,7 +121,7 @@ SKIP: {
 }
 
 
-eval {					## exercise printing functions
+eval {					## no critic		# exercise printing functions
 	require IO::File;
 	my $file   = "03-header.tmp";
 	my $handle = IO::File->new( $file, '>' ) || die "Could not open $file for writing";

@@ -1,4 +1,4 @@
-package LibUI::NonWrappingMultilineEntry 0.01 {
+package LibUI::NonWrappingMultilineEntry 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,9 +6,9 @@ package LibUI::NonWrappingMultilineEntry 0.01 {
     use parent 'LibUI::MultilineEntry';
     #
     affix(
-        LibUI::lib(), 'uiNewNonWrappingMultilineEntry',
-        [Void] => InstanceOf ['LibUI::NonWrappingMultilineEntry'],
-        'new'
+        LibUI::lib(),
+        [ 'uiNewNonWrappingMultilineEntry', 'new' ],
+        [Void] => InstanceOf ['LibUI::NonWrappingMultilineEntry']
     );
 };
 1;
@@ -30,8 +30,9 @@ Automatically Wrap
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::NonWrappingMultilineEntry;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Notepadish', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $text   = LibUI::NonWrappingMultilineEntry->new();
     $box->append( $text, 1 );

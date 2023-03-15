@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.316';
+our $VERSION = '2.320';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -132,14 +132,14 @@ sub run {
     $sf->__options();
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
-    my $auto_one = 0;
+    my $skipped_menus = 0;
     my $old_idx_plugin = 0;
 
     PLUGIN: while ( 1 ) {
 
         my $plugin;
         if ( @{$sf->{o}{G}{plugins}} == 1 ) {
-            $auto_one++;
+            $skipped_menus++;
             $plugin = $sf->{o}{G}{plugins}[0];
             print clear_screen();
         }
@@ -195,7 +195,7 @@ sub run {
             next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last PLUGIN;
         }
-        $prefix = $driver eq 'SQLite' ? '' : '- ';
+        $prefix = $driver =~ /^(?:SQLite|Firebird)\z/ ? '' : '- ';
         if ( $sf->{o}{G}{metadata} ) {
             if ( $prefix ) {
                 @databases = ( map( $prefix . $_, @$user_dbs ), map( '  ' . $_, @$sys_dbs ) );
@@ -227,22 +227,22 @@ sub run {
             if ( $sf->{redo_db} ) {
                 $db = delete $sf->{redo_db};
                 $is_system_db = delete $sf->{redo_is_system_db};
-                $db = $prefix . $db if $prefix;
             }
             elsif ( @databases == 1 ) {
                 $db = $databases[0];
+                $db =~ s/^[-\ ]\s// if $prefix;
                 if ( ! @$user_dbs ) {
                     $is_system_db = 1;
                 }
-                $auto_one++ if $auto_one == 1;
+                $skipped_menus++ if $skipped_menus == 1;
             }
             else {
                 my $back;
                 if ( $prefix ) {
-                    $back = $auto_one ? $sf->{i}{_quit} : $sf->{i}{_back};
+                    $back = $skipped_menus ? $sf->{i}{_quit} : $sf->{i}{_back};
                 }
                 else {
-                    $back = $auto_one ? $sf->{i}{quit} : $sf->{i}{back};
+                    $back = $skipped_menus ? $sf->{i}{quit} : $sf->{i}{back};
                 }
                 my $prompt = 'Choose Database:';
                 my $menu_db = [ undef, @databases ];
@@ -251,7 +251,6 @@ sub run {
                     $menu_db,
                     { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
                 );
-                $db = undef;
                 if ( defined $idx_db ) {
                     $db = $menu_db->[$idx_db];
                 }
@@ -266,22 +265,21 @@ sub run {
                     }
                     $old_idx_db = $idx_db;
                 }
+                $db =~ s/^[-\ ]\s// if $prefix;
                 if ( $idx_db - 1 > $#$user_dbs ) {
                     $is_system_db = 1;
                 }
             }
-            $db =~ s/^[-\ ]\s// if $prefix;
-
-
-            # DB-HANDLE
-
-            my $dbh;
             $sf->{d} = {
                 db => $db,
                 user_dbs => $user_dbs,
                 sys_dbs => $sys_dbs,
             };
+
+            # DB-HANDLE
+
             $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $dbh;
             if ( ! eval {
                 $dbh = $plui->get_db_handle( $db );
                 $sf->{d}{identifier_quote_char} = $dbh->get_info(29) // '"', # SQL_IDENTIFIER_QUOTE_CHAR
@@ -299,14 +297,23 @@ sub run {
             }
             $sf->{d}{dbh} = $dbh;
             if ( $driver eq 'SQLite' && -s $sf->{i}{f_attached_db} ) {
-                my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
-                my $attached_db = $h_ref->{$db} // [];
-                if ( @$attached_db ) {
-                    for my $ref ( @$attached_db ) {
-                        my $stmt = sprintf "ATTACH DATABASE %s AS %s", $dbh->quote_identifier( $ref->[0] ), $dbh->quote( $ref->[1] );
-                        $dbh->do( $stmt );
+                if ( ! eval {
+                    my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
+                    my $attached_db = $h_ref->{$db} // {};
+                    if ( %$attached_db ) {
+                        for my $key ( sort keys %$attached_db ) {
+                            my $stmt = sprintf "ATTACH DATABASE %s AS %s", $dbh->quote_identifier( $attached_db->{$key} ), $dbh->quote( $key );
+                            $dbh->do( $stmt );
+                        }
+                        $sf->{d}{db_attached} = 1;
                     }
-                    $sf->{d}{db_attached} = 1;
+                    1 }
+                ) {
+                    $ax->print_error_message( $@ );
+                    $dbh->disconnect() if defined $dbh && $dbh->{Active};
+                    next DATABASE if @databases              > 1;
+                    next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
+                    last PLUGIN;
                 }
             }
 
@@ -315,7 +322,7 @@ sub run {
             my @schemas;
             my ( $user_schemas, $sys_schemas ) = ( [], [] );
             if ( ! eval {
-                ( $user_schemas, $sys_schemas ) = $plui->get_schemas( $dbh, $db, $is_system_db );
+                ( $user_schemas, $sys_schemas ) = $plui->get_schemas( $dbh, $db, $is_system_db, $sf->{d}{db_attached} );
                 1 }
             ) {
                 $ax->print_error_message( $@ );
@@ -324,11 +331,13 @@ sub run {
                 next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
                 last PLUGIN;
             }
+            my $undef_str = '';
             if ( $sf->{o}{G}{metadata} ) {
-                @schemas = ( map( "- $_", @$user_schemas ), map( "  $_", @$sys_schemas ) ); ##
+                @schemas = ( map( '- ' . ( $_ // $undef_str ), @$user_schemas ),
+                             map( '  ' . ( $_ // $undef_str ), @$sys_schemas  ) );
             }
             else {
-                @schemas = ( map( "- $_", @$user_schemas ) );
+                @schemas = ( map( '- ' . ( $_ // $undef_str ), @$user_schemas ) );
             }
             my $old_idx_sch = 0;
 
@@ -345,16 +354,18 @@ sub run {
                     # `$schema` remains undefined
                 }
                 elsif ( @schemas == 1 ) {
-                    $schema = $schemas[0];
-                    $schema =~ s/^[-\ ]\s//;
-                    if ( ! @$user_schemas ) {
+                    if ( @$sys_schemas ) {
+                        $schema = $sys_schemas->[0];
                         $is_system_schema = 1;
                     }
-                    $auto_one++ if $auto_one == 2
+                    else {
+                        $schema = $user_schemas->[0];
+                    }
+                    $skipped_menus++ if $skipped_menus == 2
                 }
                 else {
-                    my $back   = $auto_one == 2 ? $sf->{i}{_quit} : $sf->{i}{_back};
-                    my $prompt = $db_string . ' - choose Schema:';
+                    my $back = $skipped_menus == 2 ? $sf->{i}{_quit} : $sf->{i}{_back};
+                    my $prompt = $db_string . ':';
                     my $menu_schema = [ undef, @schemas ];
                     # Choose
                     my $idx_sch = $tc->choose(
@@ -377,12 +388,12 @@ sub run {
                         }
                         $old_idx_sch = $idx_sch;
                     }
-                    $schema =~ s/^[-\ ]\s//;
+                    $schema = ( @$user_schemas, @$sys_schemas )[ $idx_sch - 1 ]; # to preserve unstringified `undef`
                     if ( $idx_sch - 1 > $#$user_schemas ) {
                         $is_system_schema = 1;
                     }
                 }
-                $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
+                $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . ( $schema // $undef_str ) : '' ) . ':';
                 $sf->{d}{schema} = $schema;
                 $sf->{d}{is_system_schema} = $is_system_schema;
                 $sf->{d}{user_schemas} = $user_schemas;
@@ -393,7 +404,7 @@ sub run {
 
                 my ( $tables_info, $user_table_keys, $sys_table_keys );
                 if ( ! eval {
-                    ( $tables_info, $user_table_keys, $sys_table_keys ) = $plui->tables_info( $dbh, $schema, $is_system_schema, $sf->{d}{db_attached} );
+                    ( $tables_info, $user_table_keys, $sys_table_keys ) = $plui->tables_info( $dbh, $schema, $is_system_schema );
                     1 }
                 ) {
                     $ax->print_error_message( $@ );
@@ -412,42 +423,47 @@ sub run {
 
                     my ( $join, $union, $from_subquery, $db_setting ) = ( '  Join', '  Union', '  Derived', '  DB settings' );
                     my $hidden = $db_string;
-                    my @pre = ( $hidden, undef );
-                    my $menu_table;
-                    if ( $sf->{o}{G}{metadata} ) {
-                        my $sys_prefix = $is_system_schema ? '- ' : '  ';
-                        $menu_table = [ @pre, map( "- $_", @$user_table_keys ), map( $sys_prefix . $_, @$sys_table_keys ) ];
+                    my $table;
+                    if ( $sf->{redo_table} ) {
+                        $table = delete $sf->{redo_table};
                     }
                     else {
-                        $menu_table = [ @pre, map( "- $_", @$user_table_keys ) ];
-                    }
-                    push @$menu_table, $from_subquery if $sf->{o}{enable}{m_derived};
-                    push @$menu_table, $join          if $sf->{o}{enable}{join};
-                    push @$menu_table, $union         if $sf->{o}{enable}{union};
-                    push @$menu_table, $db_setting    if $sf->{o}{enable}{db_settings};
-                    my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
-                    # Choose
-                    my $idx_tbl = $tc->choose(
-                        $menu_table,
-                        { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
-                    );
-                    my $table;
-                    if ( defined $idx_tbl ) {
-                        $table = $menu_table->[$idx_tbl];
-                    }
-                    if ( ! defined $table ) {
-                        next SCHEMA         if @schemas                > 1;
-                        $dbh->disconnect();
-                        next DATABASE       if @databases              > 1;
-                        next PLUGIN         if @{$sf->{o}{G}{plugins}} > 1;
-                        last PLUGIN;
-                    }
-                    if ( $sf->{o}{G}{menu_memory} ) {
-                        if ( $old_idx_tbl == $idx_tbl && ! $ENV{TC_RESET_AUTO_UP} ) {
-                            $old_idx_tbl = 1;
-                            next TABLE;
+                        my @pre = ( $hidden, undef );
+                        my $menu_table;
+                        if ( $sf->{o}{G}{metadata} ) {
+                            my $sys_prefix = $is_system_schema ? '- ' : '  ';
+                            $menu_table = [ @pre, map( "- $_", @$user_table_keys ), map( $sys_prefix . $_, @$sys_table_keys ) ];
                         }
-                        $old_idx_tbl = $idx_tbl;
+                        else {
+                            $menu_table = [ @pre, map( "- $_", @$user_table_keys ) ];
+                        }
+                        push @$menu_table, $from_subquery if $sf->{o}{enable}{m_derived};
+                        push @$menu_table, $join          if $sf->{o}{enable}{join};
+                        push @$menu_table, $union         if $sf->{o}{enable}{union};
+                        push @$menu_table, $db_setting    if $sf->{o}{enable}{db_settings};
+                        my $back = $skipped_menus == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
+                        # Choose
+                        my $idx_tbl = $tc->choose(
+                            $menu_table,
+                            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
+                        );
+                        if ( defined $idx_tbl ) {
+                            $table = $menu_table->[$idx_tbl];
+                        }
+                        if ( ! defined $table ) {
+                            next SCHEMA         if @schemas                > 1;
+                            $dbh->disconnect();
+                            next DATABASE       if @databases              > 1;
+                            next PLUGIN         if @{$sf->{o}{G}{plugins}} > 1;
+                            last PLUGIN;
+                        }
+                        if ( $sf->{o}{G}{menu_memory} ) {
+                            if ( $old_idx_tbl == $idx_tbl && ! $ENV{TC_RESET_AUTO_UP} ) {
+                                $old_idx_tbl = 1;
+                                next TABLE;
+                            }
+                            $old_idx_tbl = $idx_tbl;
+                        }
                     }
                     if ( $table eq $db_setting ) {
                         my $changed;
@@ -473,11 +489,25 @@ sub run {
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $cda->create_drop_or_attach();
-                        $tables_info = $sf->{d}{tables_info};
-                        $user_table_keys = $sf->{d}{user_table_keys};
-                        $sys_table_keys = $sf->{d}{sys_table_keys};
-                        next TABLE
+                        my $ret = $cda->create_drop_or_attach();
+                        if ( ! $ret ) {
+                            next TABLE;
+                        }
+                        elsif ( $ret == 1 ) {
+                            # update the list of available tables and reenter the $hidden submenu
+                            $sf->{redo_schema} = $schema;
+                            $sf->{redo_is_system_schema} = $is_system_schema;
+                            $sf->{redo_table}  = $table;
+                            next SCHEMA;
+                        }
+                        elsif ( $ret == 2 ) {
+                            # reattach databases and therefore recall `get_scheams`
+                            # and reenter the $hidden submenu
+                            $sf->{redo_db} = $db;
+                            $sf->{redo_is_system_db} = $is_system_db;
+                            $sf->{redo_table}  = $table;
+                            next DATABASE;
+                        }
                     }
                     my ( $qt_table, $qt_columns );
                     if ( $table eq $join ) {
@@ -560,7 +590,9 @@ sub __derived_table {
         return;
     }
     my $alias = $ax->alias( $tmp, 'derived_table', $qt_table, 'Derived_Table' );
-    $qt_table .= " AS " . $ax->prepare_identifier( $alias );
+    if ( length $alias ) {
+        $qt_table .= " AS " . $ax->prepare_identifier( $alias );
+    }
     $tmp->{table} = $qt_table;
     my $columns = $ax->column_names( $qt_table );
     my $qt_columns = $ax->quote_cols( $columns );
@@ -588,7 +620,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.316
+Version 2.320
 
 =head1 DESCRIPTION
 

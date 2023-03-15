@@ -1,10 +1,10 @@
 {
    "abstract" : "Data description and validation",
    "author" : [
-      "Laurent Dami <laurent.dami@justice.ge.ch>"
+      "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,8 @@
             "Try::Tiny" : "0",
             "autouse" : "0",
             "experimental" : "0",
+            "match::simple" : "0",
+            "match::simple::XS" : "0",
             "perl" : "5.010001"
          }
       }
@@ -41,7 +43,7 @@
    "provides" : {
       "Data::Domain" : {
          "file" : "lib/Data/Domain.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "Data::Domain::All_of" : {
          "file" : "lib/Data/Domain.pm"
@@ -95,6 +97,6 @@
          "url" : "https://github.com/damil/Data-Domain"
       }
    },
-   "version" : "1.07",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

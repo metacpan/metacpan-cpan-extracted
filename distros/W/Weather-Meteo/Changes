@@ -1,5 +1,10 @@
 Revision history for Weather::Meteo
 
+0.03	Fri Mar 10 09:35:01 EST 2023
+	Remove unused modules
+	Look into http://www.cpantesters.org/cpan/report/8b5bb156-bd91-11ed-aba6-9a79f339625c
+	Fix https://github.com/nigelhorne/Weather-Meteo/issues/1 (SREZIC)
+
 0.02	Tue Feb 28 11:57:35 EST 2023
 	Remove references left from the template code
 	Added all my basic testing

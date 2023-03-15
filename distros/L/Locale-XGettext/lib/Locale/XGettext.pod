@@ -530,7 +530,7 @@ consisting of four items:
 =item *
 
 The option specification for Getopt::Long(3pm), for example
-"f|filename=s" for an option expexting a mandatory
+"f|filename=s" for an option expecting a mandatory
 string argument.
 
 =item *
@@ -624,7 +624,7 @@ option "-D, --directory".
 
 =item B<defaultKeywords>
 
-Returns a reference to an emtpy array.
+Returns a reference to an empty array.
 
 Subclasses may return a reference to an array with default keyword
 definitions for the specific language.  The default keywords 
@@ -643,7 +643,7 @@ for more information about the meaning of these strings.
 
 =item B<defaultFlags>
 
-Returns a reference to an emtpy array.
+Returns a reference to an empty array.
 
 Subclasses may return a reference to an array with default flag
 specifications for the specific language.  An example may look

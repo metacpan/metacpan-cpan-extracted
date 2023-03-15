@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,6 +34,7 @@ resources:
   bugtracker: https://github.com/gflohr/Locale-XGettext/issues
   homepage: http://www.guido-flohr.net/en/projects#locale-xgettext
   repository: git://github.com/gflohr/Locale-XGettext.git
-version: '0.7'
-x_generated_by_perl: v5.26.2
+version: '0.8'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: LGPL-3.0

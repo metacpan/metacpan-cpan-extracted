@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Store::DBI;
-$Bot::BasicBot::Pluggable::Store::DBI::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Store::DBI::VERSION = '1.30';
 use warnings;
 use strict;
 use Carp qw( croak );
@@ -28,7 +28,7 @@ sub dbh {
 sub create_table {
     my $self  = shift;
     my $table = $self->{table} or die "Need DB table";
-    my $sth   = $self->dbh->table_info( '', '', $table, "TABLE" );
+    my $sth   = $self->dbh->table_info( '%', '%', $table, "TABLE" );
 
 	$table = $self->dbh->quote_identifier($table);
 
@@ -173,7 +173,7 @@ Bot::BasicBot::Pluggable::Store::DBI - use DBI to provide a storage backend
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 

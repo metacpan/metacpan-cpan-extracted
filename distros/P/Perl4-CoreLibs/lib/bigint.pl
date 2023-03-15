@@ -55,7 +55,7 @@ $zero = 0;
 #   white space and add a sign, if missing.
 # Strings that are not numbers result the value 'NaN'.
 
-sub main'bnorm { #(num_str) return num_str
+sub main::bnorm { #(num_str) return num_str
     local($_) = @_;
     s/\s+//g;                           # strip white space
     if (s/^([+-]?)0*(\d+)$/$1$2/) {     # test if number
@@ -81,20 +81,20 @@ sub internal { #(num_str) return int_num_array
 sub external { #(int_num_array) return num_str
     $es = shift;
     grep($_ > 9999 || ($_ = substr('0000'.$_,-5)), @_);   # zero pad
-    &'bnorm(join('', $es, reverse(@_)));    # reverse concat and normalize
+    &::bnorm(join('', $es, reverse(@_)));    # reverse concat and normalize
 }
 
 # Negate input value.
-sub main'bneg { #(num_str) return num_str
-    local($_) = &'bnorm(@_);
+sub main::bneg { #(num_str) return num_str
+    local($_) = &::bnorm(@_);
     vec($_,0,8) ^= ord('+') ^ ord('-') unless $_ eq '+0';
     s/^./N/ unless /^[-+]/; # works both in ASCII and EBCDIC
     $_;
 }
 
 # Returns the absolute value of the input.
-sub main'babs { #(num_str) return num_str
-    &abs(&'bnorm(@_));
+sub main::babs { #(num_str) return num_str
+    &abs(&::bnorm(@_));
 }
 
 sub abs { # post-normalized abs for internal use
@@ -104,8 +104,8 @@ sub abs { # post-normalized abs for internal use
 }
 
 # Compares 2 values.  Returns one of undef, <0, =0, >0. (suitable for sort)
-sub main'bcmp { #(num_str, num_str) return cond_code
-    local($x,$y) = (&'bnorm($_[0]),&'bnorm($_[1]));
+sub main::bcmp { #(num_str, num_str) return cond_code
+    local($x,$y) = (&::bnorm($_[0]),&::bnorm($_[1]));
     if ($x eq 'NaN') {
 	undef;
     } elsif ($y eq 'NaN') {
@@ -136,8 +136,8 @@ sub cmp { # post-normalized compare for internal use
 
 }
 
-sub main'badd { #(num_str, num_str) return num_str
-    local(*x, *y); ($x, $y) = (&'bnorm($_[0]),&'bnorm($_[1]));
+sub main::badd { #(num_str, num_str) return num_str
+    local(*x, *y); ($x, $y) = (&::bnorm($_[0]),&::bnorm($_[1]));
     if ($x eq 'NaN') {
 	'NaN';
     } elsif ($y eq 'NaN') {
@@ -159,17 +159,17 @@ sub main'badd { #(num_str, num_str) return num_str
     }
 }
 
-sub main'bsub { #(num_str, num_str) return num_str
-    &'badd($_[0],&'bneg($_[1]));    
+sub main::bsub { #(num_str, num_str) return num_str
+    &::badd($_[0],&::bneg($_[1]));    
 }
 
 # GCD -- Euclids algorithm Knuth Vol 2 pg 296
-sub main'bgcd { #(num_str, num_str) return num_str
-    local($x,$y) = (&'bnorm($_[0]),&'bnorm($_[1]));
+sub main::bgcd { #(num_str, num_str) return num_str
+    local($x,$y) = (&::bnorm($_[0]),&::bnorm($_[1]));
     if ($x eq 'NaN' || $y eq 'NaN') {
 	'NaN';
     } else {
-	($x, $y) = ($y,&'bmod($x,$y)) while $y ne '+0';
+	($x, $y) = ($y,&::bmod($x,$y)) while $y ne '+0';
 	$x;
     }
 }
@@ -203,8 +203,8 @@ sub sub { #(int_num_array, int_num_array) return int_num_array
 }
 
 # multiply two numbers -- stolen from Knuth Vol 2 pg 233
-sub main'bmul { #(num_str, num_str) return num_str
-    local(*x, *y); ($x, $y) = (&'bnorm($_[0]), &'bnorm($_[1]));
+sub main::bmul { #(num_str, num_str) return num_str
+    local(*x, *y); ($x, $y) = (&::bnorm($_[0]), &::bnorm($_[1]));
     if ($x eq 'NaN') {
 	'NaN';
     } elsif ($y eq 'NaN') {
@@ -235,12 +235,12 @@ sub main'bmul { #(num_str, num_str) return num_str
 }
 
 # modulus
-sub main'bmod { #(num_str, num_str) return num_str
-    (&'bdiv(@_))[1];
+sub main::bmod { #(num_str, num_str) return num_str
+    (&::bdiv(@_))[1];
 }
 
-sub main'bdiv { #(dividend: num_str, divisor: num_str) return num_str
-    local (*x, *y); ($x, $y) = (&'bnorm($_[0]), &'bnorm($_[1]));
+sub main::bdiv { #(dividend: num_str, divisor: num_str) return num_str
+    local (*x, *y); ($x, $y) = (&::bnorm($_[0]), &::bnorm($_[1]));
     return wantarray ? ('NaN','NaN') : 'NaN'
 	if ($x eq 'NaN' || $y eq 'NaN' || $y eq '+0');
     return wantarray ? ('+0',$x) : '+0' if (&cmp(&abs($x),&abs($y)) < 0);

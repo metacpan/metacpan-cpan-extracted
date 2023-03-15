@@ -1,40 +1,40 @@
-package LibUI::Menu 0.01 {
+package LibUI::Menu 0.02 {
     use 5.008001;
     use strict;
     use warnings;
     use Affix;
     use LibUI::MenuItem;
     #
-    affix( LibUI::lib(), 'uiNewMenu', [ Void, Str ] => InstanceOf ['LibUI::Menu'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewMenu', 'new' ], [ Void, Str ] => InstanceOf ['LibUI::Menu'] );
     affix(
-        LibUI::lib(), 'uiMenuAppendAboutItem',
-        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem'],
-        'appendAboutItem'
+        LibUI::lib(),
+        [ 'uiMenuAppendAboutItem', 'appendAboutItem' ],
+        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem']
     );
     affix(
-        LibUI::lib(), 'uiMenuAppendCheckItem',
-        [ InstanceOf ['LibUI::Menu'], Str ] => InstanceOf ['LibUI::MenuItem'],
-        , 'appendCheckItem'
+        LibUI::lib(),
+        [ 'uiMenuAppendCheckItem',    'appendCheckItem' ],
+        [ InstanceOf ['LibUI::Menu'], Str ] => InstanceOf ['LibUI::MenuItem']
     );
     affix(
-        LibUI::lib(), 'uiMenuAppendItem',
-        [ InstanceOf ['LibUI::Menu'], Str ] => InstanceOf ['LibUI::MenuItem'],
-        , 'appendItem'
+        LibUI::lib(),
+        [ 'uiMenuAppendItem',         'appendItem' ],
+        [ InstanceOf ['LibUI::Menu'], Str ] => InstanceOf ['LibUI::MenuItem']
     );
     affix(
-        LibUI::lib(), 'uiMenuAppendPreferencesItem',
-        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem'],
-        , 'appendPreferencesItem'
+        LibUI::lib(),
+        [ 'uiMenuAppendPreferencesItem', 'appendPreferencesItem' ],
+        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem']
     );
     affix(
-        LibUI::lib(), 'uiMenuAppendQuitItem',
-        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem'],
-        , 'appendQuitItem'
+        LibUI::lib(),
+        [ 'uiMenuAppendQuitItem', 'appendQuitItem' ],
+        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem']
     );
     affix(
-        LibUI::lib(), 'uiMenuAppendSeparator',
-        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem'],
-        , 'appendSeparator'
+        LibUI::lib(),
+        [ 'uiMenuAppendSeparator', 'appendSeparator' ],
+        [ InstanceOf ['LibUI::Menu'] ] => InstanceOf ['LibUI::MenuItem']
     );
 };
 1;
@@ -54,7 +54,7 @@ LibUI::Menu - Application-Level Menu Bar
     use LibUI ':all';
     use LibUI::Window;
     use LibUI::Menu;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $mnuFile = LibUI::Menu->new('File');
     $mnuFile->appendItem('New')->onClicked( sub { warn 'File>New' }, undef );
     $mnuFile->appendItem('Open');

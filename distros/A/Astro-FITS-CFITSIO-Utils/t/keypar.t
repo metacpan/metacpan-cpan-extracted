@@ -10,7 +10,7 @@ my @hdr;
 eval {
   $hdr = keypar( 'data/bintbl.fits', 'SIMPLE' );
 };
-ok( ! $@ && $hdr->type eq 'LOGICAL' && $hdr->value eq 1 
+ok( ! $@ && $hdr->type eq 'LOGICAL' && $hdr->value eq 1
          && $hdr->hdu_num() == 1, "keypar: hdu 1" );
 
 eval {
@@ -22,7 +22,7 @@ ok( !$@ && $hdr && $hdr->value == 9
 eval {
   $hdr = keypar( 'data/bintbl.fits[1]', 'TFIELDS' );
 };
-ok( !$@ && $hdr && $hdr->value == 9 
+ok( !$@ && $hdr && $hdr->value == 9
         && $hdr->hdu_num() == 2, "keypar: hdu 2, explicit" );
 
 ok( !defined keypar( 'data/bintbl.fits', 'NOTEXIST' ),
@@ -67,4 +67,3 @@ ok( 2 == @{$hdr[0]} && $hdr[0][0]->value == 0 && $hdr[0][1]->value == 2 &&
 
 $hdr = keypar( 'data/bintbl.fits', 'VALUE', { Value => 1 } );
 ok( 2 == $hdr, 'single value, scalar context, return value' );
-

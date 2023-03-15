@@ -1,12 +1,19 @@
 Changes
 lib/OpenAI/API.pm
-lib/OpenAI/API/Resource/Chat.pm
-lib/OpenAI/API/Resource/Completion.pm
-lib/OpenAI/API/Resource/Edit.pm
-lib/OpenAI/API/Resource/Embedding.pm
-lib/OpenAI/API/Resource/Model.pm
-lib/OpenAI/API/Resource/Moderation.pm
-lib/OpenAI/API/ResourceDispatcherRole.pm
+lib/OpenAI/API/ConfigurationRole.pm
+lib/OpenAI/API/Request.pm
+lib/OpenAI/API/Request/Chat.pm
+lib/OpenAI/API/Request/Completion.pm
+lib/OpenAI/API/Request/Edit.pm
+lib/OpenAI/API/Request/Embedding.pm
+lib/OpenAI/API/Request/File/List.pm
+lib/OpenAI/API/Request/File/Retrieve.pm
+lib/OpenAI/API/Request/Image/Generation.pm
+lib/OpenAI/API/Request/Model/List.pm
+lib/OpenAI/API/Request/Model/Retrieve.pm
+lib/OpenAI/API/Request/Moderation.pm
+lib/OpenAI/API/RequestDispatcherRole.pm
+lib/OpenAI/API/UserAgentRole.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
@@ -18,9 +25,12 @@ t/02-edits.t
 t/03-moderations.t
 t/04-chat.t
 t/05-models.t
+t/06-images.t
+t/07-files.t
 t/10-exceptions-validation.t
 t/11-exceptions-internet.t
 t/12-exceptions-timeout.t
+t/20-pod-synopsis.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

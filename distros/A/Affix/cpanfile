@@ -49,4 +49,5 @@ on 'develop' => sub {
     requires 'Version::Next';
     requires 'Pod::Markdown::Github';
     requires 'Software::License::Artistic_2_0';
+    requires 'Minilla';
 };

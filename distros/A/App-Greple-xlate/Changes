@@ -1,5 +1,31 @@
 Revision history for Perl extension App-Greple-deepl
 
+0.17 2023-03-14T10:06:34Z
+
+    - fix XLATE.mk to use -o option instead of -x
+
+0.16 2023-03-14T09:47:33Z
+
+    - update examples/data_shishin.docx to the latest version
+    - change workdir to /work
+    - introduce -C and -B option
+    - introduce -G option
+
+0.15 2023-03-13T09:25:51Z
+
+    - xlate includes container version
+    - container includes standard tools and configuration
+
+0.14 2023-03-13T01:58:23Z
+
+    - release "xlate" command as a front-end cli tool
+    - implement automatic make mechanism
+    - implement companion Docker container (tecolicom/xlate)
+
+0.13 2023-03-10T04:38:06Z
+
+    - set STDERR to utf8 to avoid error in docker
+
 0.12 2023-03-08T07:33:57Z
 
     - introduce --xlate-maxlen option

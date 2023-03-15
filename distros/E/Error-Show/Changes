@@ -1,4 +1,14 @@
 Revision history for Perl extension Error::Show.
+v0.2.1 2023-03-10
+  [fixes]
+  - Stack trace arrays are now copied to prevent unwanted action at a distance
+    and fix incorrect line numbers when multiple calls to context are performed
+    on the stacke frames
+  - Reverse option when using stack frames was not operating as documented. Now
+    fixed
+  [tests]
+  - Added additional reverse test
+
 
 v0.2.0 
   [new features]

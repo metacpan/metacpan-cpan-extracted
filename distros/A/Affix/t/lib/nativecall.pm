@@ -18,13 +18,13 @@ package t::lib::nativecall {
     #~ diag $Config{ccname};
     #~ diag $Config{ccsymbols};
     #
-    sub compile_test_lib ($name) {
+    sub compile_test_lib ( $name, $aggs = '' ) {
         my $c_file = path("t/src/$name.c")->canonpath;
         my $o_file = path( "t/src/$name" . $Config{_o} )->canonpath;
         my $l_file = path( "t/src/$name." . $Config{so} )->canonpath;
         diag sprintf 'Building %s into %s', $c_file, $l_file;
         my @cmds = (
-            $Config{cc} . " -Wall --shared -fPIC -DBUILD_LIB -o $l_file $c_file",
+            $Config{cc} . " -Wall --shared -fPIC -DBUILD_LIB $aggs -o $l_file $c_file",
 
             #~ (
             #~ $OS eq 'MSWin32' ? "cl /LD /EHsc /Fe$l_file $c_file" :

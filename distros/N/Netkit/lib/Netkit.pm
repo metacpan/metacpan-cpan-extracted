@@ -10,11 +10,11 @@ use Netkit::Attachment;
 use Netkit::Rule;
 
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 Name
 
-Netkit - create netkit labs with code.
+Netkit - Create Netkit labs with code.
 
 =head1 SYNOPSIS
 
@@ -29,10 +29,16 @@ Generates a standalone netkit lab from a selection of configurable objects.
 Allows configurations of:
 
 - LANs
+
 - Interface attachments
+
 - Static Routes
+
 - Firewall rules
+
 - NAT rules
+
+- VLANs
 
 Other elements of startup files can be added using the Machine extra field.
 

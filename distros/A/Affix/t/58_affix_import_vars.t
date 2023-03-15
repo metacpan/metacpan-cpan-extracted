@@ -8,8 +8,6 @@ use t::lib::nativecall;
 use experimental 'signatures';
 $|++;
 #
-#plan skip_all => q[You use *BSD. You don't like nice things.] if $^O =~ /bsd/i;
-#
 compile_test_lib('58_affix_import_vars');
 sub get_integer : Native('t/src/58_affix_import_vars') : Signature([]=>Int);
 sub get_string : Native('t/src/58_affix_import_vars') : Signature([]=>Str);

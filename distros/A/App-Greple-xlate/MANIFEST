@@ -22,6 +22,8 @@ cpanfile
 lib/App/Greple/xlate.pm
 lib/App/Greple/xlate/deepl.pm
 minil.toml
+script/xlate
+share/XLATE.mk
 share/xlate.el
 t/00_compile.t
 META.yml

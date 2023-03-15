@@ -1,0 +1,53 @@
+--- bin/bot-basicbot-pluggable
++++ bin/bot-basicbot-pluggable
+@@ -46,7 +46,7 @@
+ =item --logconfig FILE
+ 
+ The logging configuration will be read from the specified file.
+-Please refer to L<Log::Log4perl::Config> for its format. The paramter
++Please refer to L<Log::Log4perl::Config> for its format. The parameter
+ loglevel will be ignored if this options is supplied.
+ 
+ =item --loglevel LEVEL
+@@ -61,7 +61,7 @@
+ 
+ =item --channel CHANNELNAME
+ 
+-Channel to connect to. This paramter may be provided several times.
++Channel to connect to. This parameter may be provided several times.
+ You do not have to prefix the channel name with a hash symbol, which
+ would have to be escaped in shell. It's automatically added for
+ you.
+@@ -74,7 +74,7 @@
+ 
+ =item --module
+ 
+-Modules to load. This paramter may be profided several times. You
++Modules to load. This parameter may be provided several times. You
+ can call --list-modules to get a list of all available modules. If
+ you do not define any module via this option, I<Auth> and I<Loader>
+ are loaded by default.
+@@ -97,7 +97,7 @@
+ 
+ This options take a string in the form I<key>=I<value> and can be
+ specified multiple times. The value of the key I<type> define which
+-storage backend to load, all other paramters are passed the the
++storage backend to load, all other parameters are passed to the
+ object constructor as hash reference. 
+ 
+ For example:
+@@ -131,11 +131,11 @@
+ =head1 CONFIGFILE
+ 
+ The bot read a configfile either found by L<Config::Find> (usually
+-named ~/.bot-basicbot-pluggable.yaml) or specified on the comamnd
+-line via I<--configfile> on startup. The file should be a synatctical
++named ~/.bot-basicbot-pluggable.yaml) or specified on the command
++line via I<--configfile> on startup. The file should be a syntactical
+ correct yaml file with a hash as its first level element. It
+ understands every option listed above and the special settings
+-paramter, which is a hash, where the keys are module names and the
++parameter, which is a hash, where the keys are module names and the
+ value is a hash of configurable module settings. Easier to show
+ than to explain:
+ 

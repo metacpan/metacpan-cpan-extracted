@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP3458A;
-$Lab::Moose::Instrument::HP3458A::VERSION = '3.851';
+$Lab::Moose::Instrument::HP3458A::VERSION = '3.860';
 #ABSTRACT: HP 3458A digital multimeter
 
 use v5.20;
@@ -259,7 +259,7 @@ Lab::Moose::Instrument::HP3458A - HP 3458A digital multimeter
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 SYNOPSIS
 

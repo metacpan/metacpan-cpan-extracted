@@ -1,11 +1,10 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.009';
+$Crypt::Passphrase::Encoder::VERSION = '0.010';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Validator';
 
-use Carp 'croak';
 use Crypt::URandom;
 
 sub random_bytes {
@@ -19,7 +18,7 @@ sub crypt_subtypes {
 
 sub accepts_hash {
 	my ($self, $hash) = @_;
-	return if not defined $hash;
+	return 0 if not defined $hash;
 	$self->{accepts_hash} //= do {
 		my $string = join '|', $self->crypt_subtypes or return;
 		qr/ \A \$ (?: $string ) \$ /x;
@@ -43,7 +42,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 

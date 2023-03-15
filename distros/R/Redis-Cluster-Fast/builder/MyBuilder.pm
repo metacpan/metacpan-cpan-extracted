@@ -20,7 +20,6 @@ sub _build_dependencies {
     # Skip if already built
     return if -e "$abs/build";
 
-    check_bin('patch');
     # libevent
     check_bin('autoconf');
     check_bin('automake');
@@ -41,7 +40,6 @@ sub _build_dependencies {
     if (is_debug) {
         $self->do_system('git', 'submodule', 'update', '--init');
     }
-    $self->do_system('patch -N -p1 < deps/async_context_always_use_resp3.patch');
 
     # libevent
     {
@@ -93,7 +91,7 @@ sub new {
 
     $self->_build_dependencies;
 
-    $self->config(optimize => '-g3 O0 -fsanitize=undefined,leak -fno-sanitize-recover=all -Wall')
+    $self->config(optimize => '-g3 -O0 -fsanitize=undefined,leak -fno-sanitize-recover=all -Wall')
         if is_debug;
 
     return $self;

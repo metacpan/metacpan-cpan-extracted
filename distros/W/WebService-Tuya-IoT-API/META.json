@@ -36,6 +36,7 @@
             "Digest::SHA" : "0",
             "HTTP::Tiny" : "0",
             "JSON::XS" : "0",
+            "List::Util" : "0",
             "Time::HiRes" : "0"
          }
       }
@@ -51,5 +52,5 @@
          "web" : "https://github.com/mrdvt92/perl-WebService-Tuya-IoT-API.git"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02"
 }

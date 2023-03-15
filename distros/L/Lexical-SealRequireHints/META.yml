@@ -3,6 +3,7 @@ abstract: 'prevent leakage of lexical hints'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
+  Exporter: '0'
   Module::Build: '0'
   Test::More: '0.41'
   perl: '5.006'
@@ -16,7 +17,7 @@ configure_requires:
 conflicts:
   B::Hooks::OP::Check: '< 0.19'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,12 +26,13 @@ name: Lexical-SealRequireHints
 provides:
   Lexical::SealRequireHints:
     file: lib/Lexical/SealRequireHints.pm
-    version: '0.011'
+    version: '0.012'
 recommends:
   XSLoader: '0'
 requires:
   perl: '5.006'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Lexical-SealRequireHints
   license: http://dev.perl.org/licenses/
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

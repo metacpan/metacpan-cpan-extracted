@@ -180,7 +180,7 @@ t/05-TXT.t
 t/05-URI.t
 t/05-X25.t
 t/05-ZONEMD.t
-t/06-packet-unique-push.t
+t/06-update-unique-push.t
 t/06-update.t
 t/07-rrsort.t
 t/07-zonefile.t

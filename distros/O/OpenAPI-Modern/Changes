@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.041     2023-03-13 02:47:59Z
+          - now detecting and erroring on two /paths with the same template
+            semantics
+          - handle new callback behaviour in JSON::Schema::Modern 0.565
+
 0.040     2023-02-18 23:43:50Z
           - all request and response validation are now done with
             Mojo::Message::Request and ::Response objects, converting from

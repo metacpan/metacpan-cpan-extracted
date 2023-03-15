@@ -10,3 +10,4 @@ Revision history for the module "App::timeput"
 0.076  2021-11-17T17:52+09:00 Removed "-b" while adding "-b". And "-. 3" became the default.
 0.077  2021-11-17T22:16+09:00 Added "-z" to enable specifying the time zone. 
 0.078  2021-11-24T22:59+09:00 Deleted the Ctrl+C behavior. Instead new Ctrl+Z behavior added. Also some modifications on manual.
+0.081  2023-03-10T16:47+09:00 "--sleep N" is employed in stead of "-w". To enable -d N specification.

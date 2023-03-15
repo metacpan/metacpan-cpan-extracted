@@ -3,9 +3,9 @@ package Sah::Schemas::Data::Sah;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-17'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Data-Sah'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Data::Sah
@@ -22,7 +22,7 @@ Sah::Schemas::Data::Sah - Sah schemas related to Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::Data::Sah (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-17.
+This document describes version 0.003 of Sah::Schemas::Data::Sah (from Perl distribution Sah-Schemas-Data-Sah), released on 2023-01-19.
 
 =head1 SAH SCHEMAS
 

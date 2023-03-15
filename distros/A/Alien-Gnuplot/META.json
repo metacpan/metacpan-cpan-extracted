@@ -4,7 +4,7 @@
       "Craig DeForest <craig@deforest.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
+            "Alien::Build" : "2.19",
             "Alien::Build::MM" : "0.32",
             "Env" : "0",
             "ExtUtils::MakeMaker" : "6.52",
@@ -37,7 +37,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.19",
+            "Alien::Build" : "2.19",
             "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52"
          }
@@ -70,9 +70,9 @@
          "url" : "git://github.com/drzowie/Alien-Gnuplot.git"
       }
    },
-   "version" : "1.040",
+   "version" : "1.041",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.77",
+      "generated_by" : "Alien::Build::MM version 2.38",
       "requires" : {
          "share" : {
             "Archive::Tar" : "0",
@@ -80,12 +80,11 @@
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
-            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "URI" : "0"
          },
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

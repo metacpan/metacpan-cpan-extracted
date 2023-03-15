@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Store::Memory;
-$Bot::BasicBot::Pluggable::Store::Memory::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Store::Memory::VERSION = '1.30';
 use warnings;
 use strict;
 
@@ -15,7 +15,7 @@ Bot::BasicBot::Pluggable::Store::Memory - use memory (RAM) to provide a storage 
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 

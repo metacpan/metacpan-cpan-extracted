@@ -9,14 +9,26 @@ use Test::EOL;
 my @files = (
     'lib/MooseX/Role/Validatable.pm',
     'lib/MooseX/Role/Validatable/Error.pm',
+    'lib/MooseX/Role/Validatable/Error.pod',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/errors.t',
     't/moose.t',
-    't/rc/.perlcriticrc',
-    't/rc/.perltidyrc'
+    't/rc/perlcriticrc',
+    't/rc/perltidyrc',
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
+    'xt/author/eol.t',
+    'xt/author/minimum-version.t',
+    'xt/author/mojibake.t',
+    'xt/author/no-tabs.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
+    'xt/author/test-version.t',
+    'xt/release/common_spelling.t',
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

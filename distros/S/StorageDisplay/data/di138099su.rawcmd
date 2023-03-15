@@ -2,6 +2,65 @@ $VAR1 = [
           {
             'cmd' => [
                        'which',
+                       'hostname'
+                     ],
+            'root' => 0,
+            'stdout' => [
+                          '/usr/bin/hostname'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'which',
+                       'date'
+                     ],
+            'root' => 0,
+            'stdout' => [
+                          '/usr/bin/date'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'hostname'
+                     ],
+            'root' => 0,
+            'stdout' => [
+                          'di138099su.example.com'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'hostname',
+                       '--fqdn'
+                     ],
+            'root' => 0,
+            'stdout' => [
+                          'di138099su.example.com'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'date',
+                       '--rfc-3339=s'
+                     ],
+            'root' => 0,
+            'stdout' => [
+                          '2023-03-09 23:54:54+01:00'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'uname',
+                       '-a'
+                     ],
+            'root' => 0,
+            'stdout' => [
+                          'Linux di138099su.example.com 3.10.0-957.27.2.el7.x86_64 #1 SMP Mon Jul 29 17:46:05 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'which',
                        'lsblk'
                      ],
             'root' => 0,
@@ -121,8 +180,8 @@ $VAR1 = [
                           '      {"name":"md126p10", "kname":"md126p10", "maj:min":"259:9", "fstype":"xfs", "mountpoint":"/var/log/audit", "label":null, "uuid":"437acd78-99b7-4cee-8cf0-d9bb307f75ea", "parttype":"0x83", "partlabel":null, "partuuid":null, "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":null, "serial":null, "size":"5242880000", "state":null, "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":null, "rq-size":"128", "type":"md", "disc-aln":"0", "disc-gran":"512", "disc-max":"2147450880", "disc-zero":"0", "wsame":"0", "wwn":null, "rand":"0", "pkname":"md126", "hctl":null, "tran":null, "subsystems":"block", "rev":null, "vendor":null},',
                           '      {"name":"md126p11", "kname":"md126p11", "maj:min":"259:10", "fstype":"xfs", "mountpoint":null, "label":null, "uuid":"8dbcf050-7e79-434d-a6ff-f5308f0d3faa", "parttype":"0x83", "partlabel":null, "partuuid":null, "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":null, "serial":null, "size":"503316480", "state":null, "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":null, "rq-size":"128", "type":"md", "disc-aln":"0", "disc-gran":"512", "disc-max":"2147450880", "disc-zero":"0", "wsame":"0", "wwn":null, "rand":"0", "pkname":"md126", "hctl":null, "tran":null, "subsystems":"block", "rev":null, "vendor":null},',
                           '      {"name":"md126p11", "kname":"md126p11", "maj:min":"259:10", "fstype":"xfs", "mountpoint":null, "label":null, "uuid":"8dbcf050-7e79-434d-a6ff-f5308f0d3faa", "parttype":"0x83", "partlabel":null, "partuuid":null, "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":null, "serial":null, "size":"503316480", "state":null, "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":null, "rq-size":"128", "type":"md", "disc-aln":"0", "disc-gran":"512", "disc-max":"2147450880", "disc-zero":"0", "wsame":"0", "wwn":null, "rand":"0", "pkname":"md126", "hctl":null, "tran":null, "subsystems":"block", "rev":null, "vendor":null},',
-                          '      {"name":"nvme0n1", "kname":"nvme0n1", "maj:min":"259:11", "fstype":null, "mountpoint":null, "label":null, "uuid":null, "parttype":null, "partlabel":null, "partuuid":null, "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":"Micron_9300_MTFDHAL6T4TDR               ", "serial":"20262AAA7392", "size":"6401252745216", "state":"live", "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":"none", "rq-size":"1023", "type":"disk", "disc-aln":"512", "disc-gran":"512", "disc-max":"2199023255040", "disc-zero":"0", "wsame":"0", "wwn":null, "rand":"0", "pkname":null, "hctl":null, "tran":"nvme", "subsystems":"block:nvme:pci", "rev":null, "vendor":null},',
-                          '      {"name":"nvme0n1p1", "kname":"nvme0n1p1", "maj:min":"259:12", "fstype":"xfs", "mountpoint":"/staging", "label":null, "uuid":"754cd82c-99fa-485c-8411-6feab7c1e78c", "parttype":"ebd0a0a2-b9e5-4433-87c0-68b6b72699c7", "partlabel":null, "partuuid":"1f99aca4-0be3-4257-b27b-5661c561c081", "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":null, "serial":null, "size":"6401251344384", "state":null, "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":"none", "rq-size":"1023", "type":"part", "disc-aln":"0", "disc-gran":"512", "disc-max":"2199023255040", "disc-zero":"0", "wsame":"0", "wwn":null, "rand":"0", "pkname":"nvme0n1", "hctl":null, "tran":"nvme", "subsystems":"block:nvme:pci", "rev":null, "vendor":null}',
+                          '      {"name":"nvme0n1", "kname":"nvme0n1", "maj:min":"259:11", "fstype":null, "mountpoint":null, "label":null, "uuid":null, "parttype":null, "partlabel":null, "partuuid":null, "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":"Micron_9300_MTFDHAL6T4TDR               ", "serial":"20262AAA7392", "size":"6401252745216", "state":"live", "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":"none", "rq-size":"1023", "type":"disk", "disc-aln":"512", "disc-gran":"512", "disc-max":"2199023255040", "disc-zero":"0", "wsame":"0", "wwn":"eui.000000000000000100a075012aaa7392", "rand":"0", "pkname":null, "hctl":null, "tran":"nvme", "subsystems":"block:nvme:pci", "rev":null, "vendor":null},',
+                          '      {"name":"nvme0n1p1", "kname":"nvme0n1p1", "maj:min":"259:12", "fstype":"xfs", "mountpoint":"/staging", "label":null, "uuid":"754cd82c-99fa-485c-8411-6feab7c1e78c", "parttype":"ebd0a0a2-b9e5-4433-87c0-68b6b72699c7", "partlabel":null, "partuuid":"1f99aca4-0be3-4257-b27b-5661c561c081", "partflags":null, "ra":"128", "ro":"0", "rm":"0", "hotplug":"0", "model":null, "serial":null, "size":"6401251344384", "state":null, "owner":"root", "group":"disk", "mode":"brw-rw----", "alignment":"0", "min-io":"512", "opt-io":"0", "phy-sec":"512", "log-sec":"512", "rota":"0", "sched":"none", "rq-size":"1023", "type":"part", "disc-aln":"0", "disc-gran":"512", "disc-max":"2199023255040", "disc-zero":"0", "wsame":"0", "wwn":"eui.000000000000000100a075012aaa7392", "rand":"0", "pkname":"nvme0n1", "hctl":null, "tran":"nvme", "subsystems":"block:nvme:pci", "rev":null, "vendor":null}',
                           '   ]',
                           '}'
                         ]
@@ -6824,14 +6883,19 @@ $VAR1 = [
                           'P: /devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/nvme/nvme0/nvme0n1',
                           'N: nvme0n1',
                           'S: disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
-                          'E: DEVLINKS=/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
+                          'S: disk/by-id/nvme-eui.000000000000000100a075012aaa7392',
+                          'S: disk/by-path/pci-0000:5e:00.0-nvme-1',
+                          'E: DEVLINKS=/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392 /dev/disk/by-id/nvme-eui.000000000000000100a075012aaa7392 /dev/disk/by-path/pci-0000:5e:00.0-nvme-1',
                           'E: DEVNAME=/dev/nvme0n1',
                           'E: DEVPATH=/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/nvme/nvme0/nvme0n1',
                           'E: DEVTYPE=disk',
                           'E: ID_MODEL=Micron_9300_MTFDHAL6T4TDR',
                           'E: ID_PART_TABLE_TYPE=gpt',
+                          'E: ID_PATH=pci-0000:5e:00.0-nvme-1',
+                          'E: ID_PATH_TAG=pci-0000_5e_00_0-nvme-1',
                           'E: ID_SERIAL=Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
                           'E: ID_SERIAL_SHORT=20262AAA7392',
+                          'E: ID_WWN=eui.000000000000000100a075012aaa7392',
                           'E: MAJOR=259',
                           'E: MINOR=11',
                           'E: MPATH_SBIN_PATH=/sbin',
@@ -6844,8 +6908,9 @@ $VAR1 = [
                           'S: disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392-part1',
                           'S: disk/by-id/nvme-eui.000000000000000100a075012aaa7392-part1',
                           'S: disk/by-partuuid/1f99aca4-0be3-4257-b27b-5661c561c081',
+                          'S: disk/by-path/pci-0000:5e:00.0-nvme-1-part1',
                           'S: disk/by-uuid/754cd82c-99fa-485c-8411-6feab7c1e78c',
-                          'E: DEVLINKS=/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392-part1 /dev/disk/by-id/nvme-eui.000000000000000100a075012aaa7392-part1 /dev/disk/by-partuuid/1f99aca4-0be3-4257-b27b-5661c561c081 /dev/disk/by-uuid/754cd82c-99fa-485c-8411-6feab7c1e78c',
+                          'E: DEVLINKS=/dev/disk/by-id/nvme-Micron_9300_MTFDHAL6T4TDR_20262AAA7392-part1 /dev/disk/by-id/nvme-eui.000000000000000100a075012aaa7392-part1 /dev/disk/by-partuuid/1f99aca4-0be3-4257-b27b-5661c561c081 /dev/disk/by-path/pci-0000:5e:00.0-nvme-1-part1 /dev/disk/by-uuid/754cd82c-99fa-485c-8411-6feab7c1e78c',
                           'E: DEVNAME=/dev/nvme0n1p1',
                           'E: DEVPATH=/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/nvme/nvme0/nvme0n1/nvme0n1p1',
                           'E: DEVTYPE=partition',
@@ -6862,8 +6927,11 @@ $VAR1 = [
                           'E: ID_PART_ENTRY_TYPE=ebd0a0a2-b9e5-4433-87c0-68b6b72699c7',
                           'E: ID_PART_ENTRY_UUID=1f99aca4-0be3-4257-b27b-5661c561c081',
                           'E: ID_PART_TABLE_TYPE=gpt',
+                          'E: ID_PATH=pci-0000:5e:00.0-nvme-1',
+                          'E: ID_PATH_TAG=pci-0000_5e_00_0-nvme-1',
                           'E: ID_SERIAL=Micron_9300_MTFDHAL6T4TDR_20262AAA7392',
                           'E: ID_SERIAL_SHORT=20262AAA7392',
+                          'E: ID_WWN=eui.000000000000000100a075012aaa7392',
                           'E: MAJOR=259',
                           'E: MINOR=12',
                           'E: SUBSYSTEM=block',
@@ -23019,9 +23087,9 @@ $VAR1 = [
             'root' => 1,
             'stdout' => [
                           'BYT;',
-                          '/dev/md126:243252854784B:md:512:512:msdos:Grappe RAID logiciel Linux:;',
+                          '/dev/md126:243252854784B:md:512:512:msdos:Linux Software RAID Array:;',
                           '1:32256B:1048575B:1016320B:free;',
-                          '1:1048576B:525336575B:524288000B:xfs::démarrage;',
+                          '1:1048576B:525336575B:524288000B:xfs::boot;',
                           '2:525336576B:52954136575B:52428800000B:xfs::;',
                           '3:52954136576B:100140056575B:47185920000B:xfs::;',
                           '4:100140056576B:243252854783B:143112798208B:::;',
@@ -23044,21 +23112,21 @@ $VAR1 = [
                      ],
             'root' => 1,
             'stdout' => [
-                          'Modèle: Grappe RAID logiciel Linux (md)',
-                          'Disque /dev/md126 : 243GB',
-                          'Taille des secteurs (logiques/physiques): 512B/512B',
-                          'Table de partitions : msdos',
+                          'Model: Linux Software RAID Array (md)',
+                          'Disk /dev/md126: 243GB',
+                          'Sector size (logical/physical): 512B/512B',
+                          'Partition Table: msdos',
                           'Disk Flags: ',
                           '',
-                          'Numéro  Début   Fin     Taille  Type      Système de fichiers  Fanions',
-                          ' 1      1049kB  525MB   524MB   primary   xfs                  démarrage',
-                          ' 2      525MB   53,0GB  52,4GB  primary   xfs',
-                          ' 3      53,0GB  100GB   47,2GB  primary   xfs',
+                          'Number  Start   End     Size    Type      File system     Flags',
+                          ' 1      1049kB  525MB   524MB   primary   xfs             boot',
+                          ' 2      525MB   53.0GB  52.4GB  primary   xfs',
+                          ' 3      53.0GB  100GB   47.2GB  primary   xfs',
                           ' 4      100GB   243GB   143GB   extended',
-                          ' 5      100GB   147GB   47,2GB  logical   xfs',
-                          ' 6      147GB   179GB   31,5GB  logical   xfs',
-                          ' 7      179GB   195GB   15,7GB  logical   xfs',
-                          ' 8      195GB   205GB   10,5GB  logical   xfs',
+                          ' 5      100GB   147GB   47.2GB  logical   xfs',
+                          ' 6      147GB   179GB   31.5GB  logical   xfs',
+                          ' 7      179GB   195GB   15.7GB  logical   xfs',
+                          ' 8      195GB   205GB   10.5GB  logical   xfs',
                           ' 9      205GB   213GB   8389MB  logical   linux-swap(v1)',
                           '10      213GB   219GB   5243MB  logical   xfs',
                           '11      219GB   219GB   503MB   logical   xfs',
@@ -23081,17 +23149,7 @@ $VAR1 = [
                           'BYT;',
                           '/dev/nvme0n1:6401252745216B:nvme:512:512:gpt:NVMe Device:;',
                           '1:17408B:1048575B:1031168B:free;',
-                          '1:1048576B:6401252392959B:6401251344384B:xfs:Project-Id-Version: parted 3.0',
-                          'Report-Msgid-Bugs-To: bug-parted@gnu.org',
-                          'POT-Creation-Date: 2012-03-02 17:52+0100',
-                          'PO-Revision-Date: 2011-06-01 13:35+0100',
-                          'Last-Translator: Nicolas Provost <nprovost@quadriv.com>',
-                          'Language-Team: French <traduc@traduc.org>',
-                          'Language: fr',
-                          'MIME-Version: 1.0',
-                          'Content-Type: text/plain; charset=ISO-8859-1',
-                          'Content-Transfer-Encoding: 8bit',
-                          ':;',
+                          '1:1048576B:6401252392959B:6401251344384B:xfs::;',
                           '1:6401252392960B:6401252728319B:335360B:free;'
                         ]
           },
@@ -23249,6 +23307,26 @@ $VAR1 = [
           },
           {
             'cmd' => [
+                       'which',
+                       'findmnt'
+                     ],
+            'root' => 1,
+            'stdout' => [
+                          '/bin/findmnt'
+                        ]
+          },
+          {
+            'cmd' => [
+                       'which',
+                       'stat'
+                     ],
+            'root' => 1,
+            'stdout' => [
+                          '/bin/stat'
+                        ]
+          },
+          {
+            'cmd' => [
                        '/sbin/swapon',
                        '--noheadings',
                        '--raw',
@@ -23257,7 +23335,7 @@ $VAR1 = [
                      ],
             'root' => 0,
             'stdout' => [
-                          '/dev/md126p9 partition 8388603904 1439432704'
+                          '/dev/md126p9 partition 8388603904 1439170560'
                         ]
           },
           {
@@ -23269,21 +23347,21 @@ $VAR1 = [
                      ],
             'root' => 1,
             'stdout' => [
-                          'Sys. de fichiers Type       blocs de 1B       Utilisé         Dispo Monté sur',
-                          '/dev/md126p7     xfs        15718154240    4458463232   11259691008 /',
-                          'devtmpfs         devtmpfs  134927712256             0  134927712256 /dev',
-                          'tmpfs            tmpfs     134938988544        286720  134938701824 /dev/shm',
-                          'tmpfs            tmpfs     134938988544    1303457792  133635530752 /run',
-                          'tmpfs            tmpfs     134938988544             0  134938988544 /sys/fs/cgroup',
-                          '/dev/md126p2     xfs        52403200000    5436559360   46966640640 /home',
-                          '/dev/md126p6     xfs        31441920000    7280140288   24161779712 /var',
-                          '/dev/md126p1     xfs          520785920     145379328     375406592 /boot',
-                          '/dev/md126p8     xfs        10475274240     349384704   10125889536 /var/log',
-                          '/dev/md126p10    xfs         5232394240      77185024    5155209216 /var/log/audit',
-                          '/dev/nvme0n1p1   xfs      6399114346496 1197481676800 5201632669696 /staging',
-                          'tmpfs            tmpfs      26987798528             0   26987798528 /run/user/550026',
-                          'tmpfs            tmpfs      26987798528             0   26987798528 /run/user/0',
-                          'tmpfs            tmpfs      26987798528             0   26987798528 /run/user/257253'
+                          'Filesystem     Type         1B-blocks          Used         Avail Mounted on',
+                          '/dev/md126p7   xfs        15718154240    4458520576   11259633664 /',
+                          'devtmpfs       devtmpfs  134927712256             0  134927712256 /dev',
+                          'tmpfs          tmpfs     134938988544        286720  134938701824 /dev/shm',
+                          'tmpfs          tmpfs     134938988544    1311813632  133627174912 /run',
+                          'tmpfs          tmpfs     134938988544             0  134938988544 /sys/fs/cgroup',
+                          '/dev/md126p2   xfs        52403200000    5436559360   46966640640 /home',
+                          '/dev/md126p6   xfs        31441920000    7277260800   24164659200 /var',
+                          '/dev/md126p1   xfs          520785920     145379328     375406592 /boot',
+                          '/dev/md126p8   xfs        10475274240     291622912   10183651328 /var/log',
+                          '/dev/md126p10  xfs         5232394240      70172672    5162221568 /var/log/audit',
+                          '/dev/nvme0n1p1 xfs      6399114346496 1314616897536 5084497448960 /staging',
+                          'tmpfs          tmpfs      26987798528             0   26987798528 /run/user/550026',
+                          'tmpfs          tmpfs      26987798528             0   26987798528 /run/user/0',
+                          'tmpfs          tmpfs      26987798528             0   26987798528 /run/user/257253'
                         ]
           },
           {

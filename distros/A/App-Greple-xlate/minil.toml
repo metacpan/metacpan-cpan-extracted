@@ -1,5 +1,6 @@
 name = "App-Greple-xlate"
 badges = [ "github-actions/test.yml" ]
+script_files = [ "script/xlate" ]
 authority = "cpan:UTASHIRO"
 
 module_maker = "ModuleBuildTiny"

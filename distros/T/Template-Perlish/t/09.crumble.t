@@ -27,7 +27,7 @@ my @tests = (
    [q<'runaway.boh>, undef, 'wrong input'],
    [q<''>, [''], 'one empty element, only'],
    [q<''.boh>, ['', 'boh'], 'one empty element, at beginning'],
-   [q<''.boh.''>, ['', 'boh', ''], 'one empty element, at extremes'],
+   [q<''.boh.''>, ['', 'boh', ''], 'empty elements at extremes'],
    [q<boh.''.bah>, ['boh', '', 'bah'], 'one empty element, inside'],
    [q<boh.''>, ['boh', ''], 'one empty element, at end'],
    [q<'"ciao"'>,     [q<"ciao">], 'double quotes in single quotes'],
@@ -46,4 +46,23 @@ for my $spec (@tests) {
    }
 } ## end for my $spec (@tests)
 
-done_testing(scalar @tests);
+my @additional = (
+   [ 'foo.bar:baz', [qw< foo bar >], 7, 'partial match with pos' ],
+   [ q<'runaway.boh>, undef, undef, 'wrong input' ],
+   [q<''.boh.''=f.b.>, ['', 'boh', ''], 9, 'elements at extremes'],
+);
+for my $spec (@additional) {
+   my ($path, $exp_crumbs, $exp_pos, $message) = @$spec;
+   my ($got_crumbs, $got_pos) = crumble($path, 'partial is OK');
+   if (defined $exp_crumbs) {
+      is_deeply $got_crumbs, $exp_crumbs, $message;
+      is $got_pos, $exp_pos, $message . ' (position)';
+   }
+   else {
+      ok((! defined $got_crumbs), $message);
+      ok((! defined $got_pos), $message . ' (position)');
+   }
+}
+
+
+done_testing(scalar(@tests) + 2 * scalar(@additional));

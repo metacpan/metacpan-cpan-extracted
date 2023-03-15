@@ -95,7 +95,7 @@
          "web" : "https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git"
       }
    },
-   "version" : "0.230480",
+   "version" : "0.230680",
    "x_BuiltWith" : {
       "failures" : {
          "CPAN::Changes::Release" : "Module::MetaData could not parse a version from /home/irogers/.plenv/versions/5.36.0/lib/perl5/site_perl/5.36.0/CPAN/Changes/Release.pm"
@@ -166,6 +166,7 @@
       "Ioan Rogers <irogers@maxmind.com>",
       "Tim Retout <tim@retout.co.uk>",
       "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Andrew Hewus Fresh <andrew.fresh@grantstreet.com>",
       "Doug Bell <madcityzen@gmail.com>",
       "Jakob Voss <jakob@nichtich.de>",
       "Jakob Voss <voss@gbv.de>",

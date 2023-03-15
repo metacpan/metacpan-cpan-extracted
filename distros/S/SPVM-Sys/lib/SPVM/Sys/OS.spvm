@@ -1,0 +1,6 @@
+class Sys::OS {
+  native static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
+  
+  native static method is_windows : int ();
+}
+

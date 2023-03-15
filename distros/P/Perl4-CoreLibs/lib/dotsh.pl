@@ -31,6 +31,8 @@
 #      &dotsh ('/foo/bar');
 #      &dotsh ('/foo/bar arg1 ... argN');
 #
+no warnings "ambiguous";
+
 sub dotsh {
    local(@sh) = @_;
    local($tmp,$key,$shell,$command,$args,$vars) = '';

@@ -19,7 +19,7 @@ name: App-TextWrapUtils
 provides:
   App::TextWrapUtils:
     file: lib/App/TextWrapUtils.pm
-    version: '0.005'
+    version: '0.006'
 recommends:
   Text::ANSI::Fold: '0'
   Text::ANSI::WideUtil: '0'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextWrapUtils
   homepage: https://metacpan.org/release/App-TextWrapUtils
   repository: git://github.com/perlancar/perl-App-TextWrapUtils.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -81,7 +81,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
-      version: '0.02'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -251,7 +251,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -363,7 +363,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

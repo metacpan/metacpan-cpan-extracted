@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use version;
 use JSON 2;
@@ -34,6 +34,7 @@ sub new {
         json => JSON->new,
         awscli_path => $param{awscli_path} || 'aws',
         croak_on_error => !!$param{croak_on_error},
+        timeout => (defined $ENV{AWS_CLIWRAPPER_TIMEOUT}) ? $ENV{AWS_CLIWRAPPER_TIMEOUT} : 30,
     }, $class;
 
     return $self;
@@ -194,7 +195,7 @@ sub _execute {
         # better for perl debugger
         my($ok, $err, $buf, $stdout_buf, $stderr_buf) = IPC::Cmd::run(
             command => join(' ', @cmd),
-            timeout => $opt{timeout} || 30,
+            timeout => $opt{timeout} || $self->{timeout},
         );
         $ret->{stdout} = join "", @$stdout_buf;
         $ret->{err_msg} = (defined $err ? "$err\n" : "") . join "", @$stderr_buf;
@@ -208,7 +209,7 @@ sub _execute {
         print "";
     } else {
         $ret = IPC::Cmd::run_forked(join(' ', @cmd), {
-            timeout => $opt{timeout} || 30,
+            timeout => $opt{timeout} || $self->{timeout},
         });
     }
 
@@ -293,12 +294,14 @@ sub appmesh            { shift->_execute('appmesh', @_) }
 sub apprunner          { shift->_execute('apprunner', @_) }
 sub appstream          { shift->_execute('appstream', @_) }
 sub appsync            { shift->_execute('appsync', @_) }
+sub arc_zonal_shift    { shift->_execute('arc-zonal-shift', @_) }
 sub athena             { shift->_execute('athena', @_) }
 sub auditmanager       { shift->_execute('auditmanager', @_) }
 sub autoscaling        { shift->_execute('autoscaling', @_) }
 sub autoscaling_plans  { shift->_execute('autoscaling-plans', @_) }
 sub backup             { shift->_execute('backup', @_) }
 sub backup_gateway     { shift->_execute('backup-gateway', @_) }
+sub backupstorage      { shift->_execute('backupstorage', @_) }
 sub batch              { shift->_execute('batch', @_) }
 sub billingconductor   { shift->_execute('billingconductor', @_) }
 sub braket             { shift->_execute('braket', @_) }
@@ -306,8 +309,11 @@ sub budgets            { shift->_execute('budgets', @_) }
 sub ce                 { shift->_execute('ce', @_) }
 sub chime              { shift->_execute('chime', @_) }
 sub chime_sdk_identity { shift->_execute('chime-sdk-identity', @_) }
+sub chime_sdk_media_pipelines { shift->_execute('chime-sdk-media-pipelines', @_) }
 sub chime_sdk_meetings { shift->_execute('chime-sdk-meetings', @_) }
 sub chime_sdk_messaging { shift->_execute('chime-sdk-messaging', @_) }
+sub chime_sdk_voice    { shift->_execute('chime-sdk-voice', @_) }
+sub cleanrooms         { shift->_execute('cleanrooms', @_) }
 sub cloud9             { shift->_execute('cloud9', @_) }
 sub cloudcontrol       { shift->_execute('cloudcontrol', @_) }
 sub clouddirectory     { shift->_execute('clouddirectory', @_) }
@@ -318,9 +324,11 @@ sub cloudhsmv2         { shift->_execute('cloudhsmv2', @_) }
 sub cloudsearch        { shift->_execute('cloudsearch', @_) }
 sub cloudsearchdomain  { shift->_execute('cloudsearchdomain', @_) }
 sub cloudtrail         { shift->_execute('cloudtrail', @_) }
+sub cloudtrail_data    { shift->_execute('cloudtrail-data', @_) }
 sub cloudwatch         { shift->_execute('cloudwatch', @_) }
 sub codeartifact       { shift->_execute('codeartifact', @_) }
 sub codebuild          { shift->_execute('codebuild', @_) }
+sub codecatalyst       { shift->_execute('codecatalyst', @_) }
 sub codecommit         { shift->_execute('codecommit', @_) }
 sub codeguru_reviewer  { shift->_execute('codeguru-reviewer', @_) }
 sub codeguruprofiler   { shift->_execute('codeguruprofiler', @_) }
@@ -338,7 +346,10 @@ sub configservice      { shift->_execute('configservice', @_) }
 sub configure          { shift->_execute('configure', @_) }
 sub connect            { shift->_execute('connect', @_) }
 sub connect_contact_lens { shift->_execute('connect-contact-lens', @_) }
+sub connectcampaigns   { shift->_execute('connectcampaigns', @_) }
+sub connectcases       { shift->_execute('connectcases', @_) }
 sub connectparticipant { shift->_execute('connectparticipant', @_) }
+sub controltower       { shift->_execute('controltower', @_) }
 sub cur                { shift->_execute('cur', @_) }
 sub customer_profiles  { shift->_execute('customer-profiles', @_) }
 sub databrew           { shift->_execute('databrew', @_) }
@@ -355,6 +366,7 @@ sub discovery          { shift->_execute('discovery', @_) }
 sub dlm                { shift->_execute('dlm', @_) }
 sub dms                { shift->_execute('dms', @_) }
 sub docdb              { shift->_execute('docdb', @_) }
+sub docdb_elastic      { shift->_execute('docdb-elastic', @_) }
 sub drs                { shift->_execute('drs', @_) }
 sub ds                 { shift->_execute('ds', @_) }
 sub dynamodb           { shift->_execute('dynamodb', @_) }
@@ -375,6 +387,7 @@ sub elb                { shift->_execute('elb', @_) }
 sub elbv2              { shift->_execute('elbv2', @_) }
 sub emr                { shift->_execute('emr', @_) }
 sub emr_containers     { shift->_execute('emr-containers', @_) }
+sub emr_serverless     { shift->_execute('emr-serverless', @_) }
 sub es                 { shift->_execute('es', @_) }
 sub events             { shift->_execute('events', @_) }
 sub evidently          { shift->_execute('evidently', @_) }
@@ -388,6 +401,7 @@ sub forecastquery      { shift->_execute('forecastquery', @_) }
 sub frauddetector      { shift->_execute('frauddetector', @_) }
 sub fsx                { shift->_execute('fsx', @_) }
 sub gamelift           { shift->_execute('gamelift', @_) }
+sub gamesparks         { shift->_execute('gamesparks', @_) }
 sub glacier            { shift->_execute('glacier', @_) }
 sub globalaccelerator  { shift->_execute('globalaccelerator', @_) }
 sub glue               { shift->_execute('glue', @_) }
@@ -406,9 +420,11 @@ sub imagebuilder       { shift->_execute('imagebuilder', @_) }
 sub importexport       { shift->_execute('importexport', @_) }
 sub inspector          { shift->_execute('inspector', @_) }
 sub inspector2         { shift->_execute('inspector2', @_) }
+sub internetmonitor    { shift->_execute('internetmonitor', @_) }
 sub iot                { shift->_execute('iot', @_) }
 sub iot_data           { shift->_execute('iot-data', @_) }
 sub iot_jobs_data      { shift->_execute('iot-jobs-data', @_) }
+sub iot_roborunner     { shift->_execute('iot-roborunner', @_) }
 sub iot1click_devices  { shift->_execute('iot1click-devices', @_) }
 sub iot1click_projects { shift->_execute('iot1click-projects', @_) }
 sub iotanalytics       { shift->_execute('iotanalytics', @_) }
@@ -416,20 +432,24 @@ sub iotdeviceadvisor   { shift->_execute('iotdeviceadvisor', @_) }
 sub iotevents          { shift->_execute('iotevents', @_) }
 sub iotevents_data     { shift->_execute('iotevents-data', @_) }
 sub iotfleethub        { shift->_execute('iotfleethub', @_) }
+sub iotfleetwise       { shift->_execute('iotfleetwise', @_) }
 sub iotsecuretunneling { shift->_execute('iotsecuretunneling', @_) }
 sub iotsitewise        { shift->_execute('iotsitewise', @_) }
 sub iotthingsgraph     { shift->_execute('iotthingsgraph', @_) }
 sub iottwinmaker       { shift->_execute('iottwinmaker', @_) }
 sub iotwireless        { shift->_execute('iotwireless', @_) }
 sub ivs                { shift->_execute('ivs', @_) }
+sub ivschat            { shift->_execute('ivschat', @_) }
 sub kafka              { shift->_execute('kafka', @_) }
 sub kafkaconnect       { shift->_execute('kafkaconnect', @_) }
 sub kendra             { shift->_execute('kendra', @_) }
+sub kendra_ranking     { shift->_execute('kendra-ranking', @_) }
 sub keyspaces          { shift->_execute('keyspaces', @_) }
 sub kinesis            { shift->_execute('kinesis', @_) }
 sub kinesis_video_archived_media { shift->_execute('kinesis-video-archived-media', @_) }
 sub kinesis_video_media { shift->_execute('kinesis-video-media', @_) }
 sub kinesis_video_signaling { shift->_execute('kinesis-video-signaling', @_) }
+sub kinesis_video_webrtc_storage { shift->_execute('kinesis-video-webrtc-storage', @_) }
 sub kinesisanalytics   { shift->_execute('kinesisanalytics', @_) }
 sub kinesisanalyticsv2 { shift->_execute('kinesisanalyticsv2', @_) }
 sub kinesisvideo       { shift->_execute('kinesisvideo', @_) }
@@ -441,12 +461,15 @@ sub lex_runtime        { shift->_execute('lex-runtime', @_) }
 sub lexv2_models       { shift->_execute('lexv2-models', @_) }
 sub lexv2_runtime      { shift->_execute('lexv2-runtime', @_) }
 sub license_manager    { shift->_execute('license-manager', @_) }
+sub license_manager_linux_subscriptions { shift->_execute('license-manager-linux-subscriptions', @_) }
+sub license_manager_user_subscriptions { shift->_execute('license-manager-user-subscriptions', @_) }
 sub lightsail          { shift->_execute('lightsail', @_) }
 sub location           { shift->_execute('location', @_) }
 sub logs               { shift->_execute('logs', @_) }
 sub lookoutequipment   { shift->_execute('lookoutequipment', @_) }
 sub lookoutmetrics     { shift->_execute('lookoutmetrics', @_) }
 sub lookoutvision      { shift->_execute('lookoutvision', @_) }
+sub m2                 { shift->_execute('m2', @_) }
 sub machinelearning    { shift->_execute('machinelearning', @_) }
 sub macie              { shift->_execute('macie', @_) }
 sub macie2             { shift->_execute('macie2', @_) }
@@ -468,6 +491,7 @@ sub mgh                { shift->_execute('mgh', @_) }
 sub mgn                { shift->_execute('mgn', @_) }
 sub migration_hub_refactor_spaces { shift->_execute('migration-hub-refactor-spaces', @_) }
 sub migrationhub_config { shift->_execute('migrationhub-config', @_) }
+sub migrationhuborchestrator { shift->_execute('migrationhuborchestrator', @_) }
 sub migrationhubstrategy { shift->_execute('migrationhubstrategy', @_) }
 sub mobile             { shift->_execute('mobile', @_) }
 sub mq                 { shift->_execute('mq', @_) }
@@ -477,7 +501,10 @@ sub neptune            { shift->_execute('neptune', @_) }
 sub network_firewall   { shift->_execute('network-firewall', @_) }
 sub networkmanager     { shift->_execute('networkmanager', @_) }
 sub nimble             { shift->_execute('nimble', @_) }
+sub oam                { shift->_execute('oam', @_) }
+sub omics              { shift->_execute('omics', @_) }
 sub opensearch         { shift->_execute('opensearch', @_) }
+sub opensearchserverless { shift->_execute('opensearchserverless', @_) }
 sub opsworks           { shift->_execute('opsworks', @_) }
 sub opsworks_cm        { shift->_execute('opsworks-cm', @_) }
 sub organizations      { shift->_execute('organizations', @_) }
@@ -490,8 +517,11 @@ sub pi                 { shift->_execute('pi', @_) }
 sub pinpoint           { shift->_execute('pinpoint', @_) }
 sub pinpoint_email     { shift->_execute('pinpoint-email', @_) }
 sub pinpoint_sms_voice { shift->_execute('pinpoint-sms-voice', @_) }
+sub pinpoint_sms_voice_v2 { shift->_execute('pinpoint-sms-voice-v2', @_) }
+sub pipes              { shift->_execute('pipes', @_) }
 sub polly              { shift->_execute('polly', @_) }
 sub pricing            { shift->_execute('pricing', @_) }
+sub privatenetworks    { shift->_execute('privatenetworks', @_) }
 sub proton             { shift->_execute('proton', @_) }
 sub qldb               { shift->_execute('qldb', @_) }
 sub qldb_session       { shift->_execute('qldb-session', @_) }
@@ -502,11 +532,14 @@ sub rds                { shift->_execute('rds', @_) }
 sub rds_data           { shift->_execute('rds-data', @_) }
 sub redshift           { shift->_execute('redshift', @_) }
 sub redshift_data      { shift->_execute('redshift-data', @_) }
+sub redshift_serverless { shift->_execute('redshift-serverless', @_) }
 sub rekognition        { shift->_execute('rekognition', @_) }
 sub resiliencehub      { shift->_execute('resiliencehub', @_) }
+sub resource_explorer_2 { shift->_execute('resource-explorer-2', @_) }
 sub resource_groups    { shift->_execute('resource-groups', @_) }
 sub resourcegroupstaggingapi { shift->_execute('resourcegroupstaggingapi', @_) }
 sub robomaker          { shift->_execute('robomaker', @_) }
+sub rolesanywhere      { shift->_execute('rolesanywhere', @_) }
 sub route53            { shift->_execute('route53', @_) }
 sub route53_recovery_cluster { shift->_execute('route53-recovery-cluster', @_) }
 sub route53_recovery_control_config { shift->_execute('route53-recovery-control-config', @_) }
@@ -522,12 +555,16 @@ sub sagemaker          { shift->_execute('sagemaker', @_) }
 sub sagemaker_a2i_runtime { shift->_execute('sagemaker-a2i-runtime', @_) }
 sub sagemaker_edge     { shift->_execute('sagemaker-edge', @_) }
 sub sagemaker_featurestore_runtime { shift->_execute('sagemaker-featurestore-runtime', @_) }
+sub sagemaker_geospatial { shift->_execute('sagemaker-geospatial', @_) }
+sub sagemaker_metrics  { shift->_execute('sagemaker-metrics', @_) }
 sub sagemaker_runtime  { shift->_execute('sagemaker-runtime', @_) }
 sub savingsplans       { shift->_execute('savingsplans', @_) }
+sub scheduler          { shift->_execute('scheduler', @_) }
 sub schemas            { shift->_execute('schemas', @_) }
 sub sdb                { shift->_execute('sdb', @_) }
 sub secretsmanager     { shift->_execute('secretsmanager', @_) }
 sub securityhub        { shift->_execute('securityhub', @_) }
+sub securitylake       { shift->_execute('securitylake', @_) }
 sub serverlessrepo     { shift->_execute('serverlessrepo', @_) }
 sub service_quotas     { shift->_execute('service-quotas', @_) }
 sub servicecatalog     { shift->_execute('servicecatalog', @_) }
@@ -537,6 +574,7 @@ sub ses                { shift->_execute('ses', @_) }
 sub sesv2              { shift->_execute('sesv2', @_) }
 sub shield             { shift->_execute('shield', @_) }
 sub signer             { shift->_execute('signer', @_) }
+sub simspaceweaver     { shift->_execute('simspaceweaver', @_) }
 sub sms                { shift->_execute('sms', @_) }
 sub snow_device_management { shift->_execute('snow-device-management', @_) }
 sub snowball           { shift->_execute('snowball', @_) }
@@ -545,6 +583,7 @@ sub sqs                { shift->_execute('sqs', @_) }
 sub ssm                { shift->_execute('ssm', @_) }
 sub ssm_contacts       { shift->_execute('ssm-contacts', @_) }
 sub ssm_incidents      { shift->_execute('ssm-incidents', @_) }
+sub ssm_sap            { shift->_execute('ssm-sap', @_) }
 sub sso                { shift->_execute('sso', @_) }
 sub sso_admin          { shift->_execute('sso-admin', @_) }
 sub sso_oidc           { shift->_execute('sso-oidc', @_) }
@@ -552,11 +591,13 @@ sub stepfunctions      { shift->_execute('stepfunctions', @_) }
 sub storagegateway     { shift->_execute('storagegateway', @_) }
 sub sts                { shift->_execute('sts', @_) }
 sub support            { shift->_execute('support', @_) }
+sub support_app        { shift->_execute('support-app', @_) }
 sub swf                { shift->_execute('swf', @_) }
 sub synthetics         { shift->_execute('synthetics', @_) }
 sub textract           { shift->_execute('textract', @_) }
 sub timestream_query   { shift->_execute('timestream-query', @_) }
 sub timestream_write   { shift->_execute('timestream-write', @_) }
+sub tnb                { shift->_execute('tnb', @_) }
 sub transcribe         { shift->_execute('transcribe', @_) }
 sub transfer           { shift->_execute('transfer', @_) }
 sub translate          { shift->_execute('translate', @_) }
@@ -685,6 +726,8 @@ See below for more detailed explanation.
 
 =item B<appsync>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<arc_zonal_shift>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<athena>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<auditmanager>($operation:Str, $param:HashRef, %opt:Hash)
@@ -696,6 +739,8 @@ See below for more detailed explanation.
 =item B<backup>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<backup_gateway>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<backupstorage>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<batch>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -711,9 +756,15 @@ See below for more detailed explanation.
 
 =item B<chime_sdk_identity>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<chime_sdk_media_pipelines>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<chime_sdk_meetings>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<chime_sdk_messaging>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<chime_sdk_voice>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<cleanrooms>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<cloud9>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -735,11 +786,15 @@ See below for more detailed explanation.
 
 =item B<cloudtrail>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<cloudtrail_data>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<cloudwatch>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<codeartifact>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<codebuild>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<codecatalyst>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<codecommit>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -775,7 +830,13 @@ See below for more detailed explanation.
 
 =item B<connect_contact_lens>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<connectcampaigns>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<connectcases>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<connectparticipant>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<controltower>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<cur>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -808,6 +869,8 @@ See below for more detailed explanation.
 =item B<dms>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<docdb>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<docdb_elastic>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<drs>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -849,6 +912,8 @@ See below for more detailed explanation.
 
 =item B<emr_containers>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<emr_serverless>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<es>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<events>($operation:Str, $param:HashRef, %opt:Hash)
@@ -874,6 +939,8 @@ See below for more detailed explanation.
 =item B<fsx>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<gamelift>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<gamesparks>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<glacier>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -911,11 +978,15 @@ See below for more detailed explanation.
 
 =item B<inspector2>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<internetmonitor>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<iot>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<iot_data>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<iot_jobs_data>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<iot_roborunner>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<iot1click_devices>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -931,6 +1002,8 @@ See below for more detailed explanation.
 
 =item B<iotfleethub>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<iotfleetwise>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<iotsecuretunneling>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<iotsitewise>($operation:Str, $param:HashRef, %opt:Hash)
@@ -943,11 +1016,15 @@ See below for more detailed explanation.
 
 =item B<ivs>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<ivschat>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<kafka>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<kafkaconnect>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<kendra>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<kendra_ranking>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<keyspaces>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -958,6 +1035,8 @@ See below for more detailed explanation.
 =item B<kinesis_video_media>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<kinesis_video_signaling>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<kinesis_video_webrtc_storage>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<kinesisanalytics>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -981,6 +1060,10 @@ See below for more detailed explanation.
 
 =item B<license_manager>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<license_manager_linux_subscriptions>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<license_manager_user_subscriptions>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<lightsail>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<location>($operation:Str, $param:HashRef, %opt:Hash)
@@ -992,6 +1075,8 @@ See below for more detailed explanation.
 =item B<lookoutmetrics>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<lookoutvision>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<m2>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<machinelearning>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1035,6 +1120,8 @@ See below for more detailed explanation.
 
 =item B<migrationhub_config>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<migrationhuborchestrator>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<migrationhubstrategy>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<mobile>($operation:Str, $param:HashRef, %opt:Hash)
@@ -1053,7 +1140,13 @@ See below for more detailed explanation.
 
 =item B<nimble>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<oam>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<omics>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<opensearch>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<opensearchserverless>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<opsworks>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1079,9 +1172,15 @@ See below for more detailed explanation.
 
 =item B<pinpoint_sms_voice>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<pinpoint_sms_voice_v2>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<pipes>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<polly>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<pricing>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<privatenetworks>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<proton>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1103,15 +1202,21 @@ See below for more detailed explanation.
 
 =item B<redshift_data>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<redshift_serverless>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<rekognition>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<resiliencehub>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<resource_explorer_2>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<resource_groups>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<resourcegroupstaggingapi>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<robomaker>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<rolesanywhere>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<route53>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1143,9 +1248,15 @@ See below for more detailed explanation.
 
 =item B<sagemaker_featurestore_runtime>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<sagemaker_geospatial>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<sagemaker_metrics>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<sagemaker_runtime>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<savingsplans>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<scheduler>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<schemas>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1154,6 +1265,8 @@ See below for more detailed explanation.
 =item B<secretsmanager>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<securityhub>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<securitylake>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<serverlessrepo>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1173,6 +1286,8 @@ See below for more detailed explanation.
 
 =item B<signer>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<simspaceweaver>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<sms>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<snow_device_management>($operation:Str, $param:HashRef, %opt:Hash)
@@ -1189,6 +1304,8 @@ See below for more detailed explanation.
 
 =item B<ssm_incidents>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<ssm_sap>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<sso>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<sso_admin>($operation:Str, $param:HashRef, %opt:Hash)
@@ -1203,6 +1320,8 @@ See below for more detailed explanation.
 
 =item B<support>($operation:Str, $param:HashRef, %opt:Hash)
 
+=item B<support_app>($operation:Str, $param:HashRef, %opt:Hash)
+
 =item B<swf>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<synthetics>($operation:Str, $param:HashRef, %opt:Hash)
@@ -1212,6 +1331,8 @@ See below for more detailed explanation.
 =item B<timestream_query>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<timestream_write>($operation:Str, $param:HashRef, %opt:Hash)
+
+=item B<tnb>($operation:Str, $param:HashRef, %opt:Hash)
 
 =item B<transcribe>($operation:Str, $param:HashRef, %opt:Hash)
 
@@ -1287,7 +1408,7 @@ Third arg "opt" is optional. Available key/values are below:
 
   timeout => Int
     Maximum time the "aws" command is allowed to run before aborting.
-    default is 30 seconds.
+    default is 30 seconds, unless overridden with AWS_CLIWRAPPER_TIMEOUT environment variable.
 
   nofork => Int (>0)
     Call IPC::Cmd::run vs. IPC::Cmd::run_forked (mostly useful if/when in perl debugger).  Note: 'timeout', if used with 'nofork', will merely cause an alarm and return.  ie. 'run' will NOT kill the awscli command like 'run_forked' will.
@@ -1305,6 +1426,12 @@ Third arg "opt" is optional. Available key/values are below:
 
 Special note: cron on Linux will often have a different HOME "/" instead of "/root" - set $ENV{'HOME'}
 to use the default credentials or specify $ENV{'AWS_CONFIG_FILE'} directly.
+
+=item AWS_CLIWRAPPER_TIMEOUT
+
+If this variable is set, this value will be used instead of default timeout (30 seconds) for every
+invocation of `aws-cli` that does not have a timeout value provided in the options argument of the
+called function.
 
 =item AWS_CONFIG_FILE
 

@@ -18,6 +18,8 @@
 ;#	&Tputs(&Tgoto($TC{'cm'},$col,$row), 0, 'FILEHANDLE');
 ;#	&Tputs($TC{'dl'},$affcnt,'FILEHANDLE');
 ;#
+no warnings "ambiguous";
+
 sub Tgetent {
     local($TERM) = @_;
     local($TERMCAP,$_,$entry,$loop,$field);

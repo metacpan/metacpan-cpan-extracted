@@ -6,9 +6,9 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
   Test::Carp: '0'
+  Test::Compile: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
-  Test::Script: '1.12'
   WWW::RT::CPAN: '0'
   autodie: '0'
 configure_requires:
@@ -26,7 +26,6 @@ no_index:
     - inc
 requires:
   Encode: '0'
-  HTTP::Request: '0'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -35,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Weather-Meto/issues
   repository: git://github.com/nigelhorne/Weather-Meto.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

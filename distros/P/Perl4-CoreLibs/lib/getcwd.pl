@@ -26,7 +26,7 @@ sub getcwd
 	$dotdots .= '/' if $dotdots;
 	$dotdots .= '..';
 	@pst = @cst;
-	unless (opendir(getcwd'PARENT, $dotdots))			#'))
+	unless (opendir(getcwd::PARENT, $dotdots))
 	{
 	    warn "opendir($dotdots): $!";
 	    return '';
@@ -34,7 +34,7 @@ sub getcwd
 	unless (@cst = stat($dotdots))
 	{
 	    warn "stat($dotdots): $!";
-	    closedir(getcwd'PARENT);					#');
+	    closedir(getcwd::PARENT);
 	    return '';
 	}
 	if ($pst[0] == $cst[0] && $pst[1] == $cst[1])
@@ -45,16 +45,16 @@ sub getcwd
 	{
 	    do
 	    {
-		unless (defined ($dir = readdir(getcwd'PARENT)))        #'))
+		unless (defined ($dir = readdir(getcwd::PARENT)))
 		{
 		    warn "readdir($dotdots): $!";
-		    closedir(getcwd'PARENT);				#');
+		    closedir(getcwd::PARENT);
 		    return '';
 		}
 		unless (@tst = lstat("$dotdots/$dir"))
 		{
 		    # warn "lstat($dotdots/$dir): $!";
-		    # closedir(getcwd'PARENT);				#');
+		    # closedir(getcwd::PARENT);
 		    # return '';
 		}
 	    }
@@ -62,7 +62,7 @@ sub getcwd
 		   $tst[1] != $pst[1]);
 	}
 	$cwd = "$dir/$cwd";
-	closedir(getcwd'PARENT);					#');
+	closedir(getcwd::PARENT);
     } while ($dir ne '');
     chop($cwd);
     $cwd;

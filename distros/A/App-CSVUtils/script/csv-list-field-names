@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_list_field_names/csv_list_field_names",
@@ -41,7 +41,7 @@ csv-list-field-names - List field names of CSV file
 
 =head1 VERSION
 
-This document describes version 1.021 of csv-list-field-names (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of csv-list-field-names (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 SYNOPSIS
 

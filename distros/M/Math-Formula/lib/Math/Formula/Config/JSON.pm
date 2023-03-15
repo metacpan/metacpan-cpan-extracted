@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.03.
 package Math::Formula::Config::JSON;
 use vars '$VERSION';
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 use base 'Math::Formula::Config';
 

@@ -41,11 +41,11 @@ sub catch {
     local($__exception__);
 
     eval "package $__package__; $__code__";
-    if ($__exception__ = &'thrown) {
+    if ($__exception__ = &::thrown) {
 	for (@__exceptions__) {
 	    return $__exception__ if /$__exception__/;
 	} 
-	&'throw($__exception__);
+	&::throw($__exception__);
     } 
 } 
 

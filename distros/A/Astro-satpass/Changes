@@ -1,3 +1,15 @@
+0.129		2023-03-11	T. R. Wyant
+    Add 53807 Bluewalker 3 to canned magnitudes.
+
+    Conditionalize canned magnitude test on environment variable so it
+    does not run every time I want to do an authortest.
+
+    Correct handling of Celestrak-format JSON TLE data. This mostly
+    involved the OBJECT_ID (International designator), and the fact that
+    Celestrak does not provide EPOCH_MICROSECONDS, instead merging it
+    into the EPOCH item as an ISO date/time with a decimal fraction on
+    the end.
+
 0.128		2022-10-02	T. R. Wyant
     Localize $_ before while(<>).
 

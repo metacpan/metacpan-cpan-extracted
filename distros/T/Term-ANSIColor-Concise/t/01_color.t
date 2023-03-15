@@ -26,6 +26,10 @@ is(ansi_color(";", "text"), "text", "; - NOP");
 
 is(ansi_color("R", "text"), "\e[31m"."text".RESET, "ansi_color");
 
+is(ansi_color("R", "1\n2\n"), "\e[31m1".RESET."\n\e[31m2".RESET."\n", "multi-line");
+
+is(ansi_color("R", "1\r2\n"), "\e[31m1".RESET."\r\e[31m2".RESET."\n", "carriage return");
+
 is(ansi_color("ABCDEF", "text"), "\e[38;5;153m"."text".RESET, "ansi_color, 24bit");
 
 is(ansi_color_24("ABCDEF", "text"), "\e[38;2;171;205;239m"."text".RESET, "ansi_color_24");

@@ -4,7 +4,7 @@
       "Toshiyuki SHIMONO (bin4tsv at gmail.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,5 +32,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.078"
+   "version" : "0.081",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

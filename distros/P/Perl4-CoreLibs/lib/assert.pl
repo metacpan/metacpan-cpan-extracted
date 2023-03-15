@@ -11,6 +11,8 @@
 # be printed out by &panic, which is just the stack-backtrace
 # routine shamelessly borrowed from the perl debugger.
 
+no warnings "ambiguous";
+
 sub assert {
     &panic("ASSERTION BOTCHED: $_[0]",$@) unless eval $_[0];
 } 

@@ -9,6 +9,7 @@ WriteMakefile(
                         'Data::UUID'  => 0,
                         'JSON::XS'    => 0,
                         'HTTP::Tiny'  => 0,
+                        'List::Util'  => 0,
                       },
     ABSTRACT_FROM  => 'lib/WebService/Tuya/IoT/API.pm',
     AUTHOR         => 'Michael R. Davis',

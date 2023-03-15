@@ -6,6 +6,10 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
     greple -Mxlate::deepl --xlate pattern target-file
 
+# VERSION
+
+Version 0.17
+
 # DESCRIPTION
 
 **Greple** **xlate** moodul leiab tekstiplokid ja asendab need tõlgitud tekstiga. Praegu toetab **xlate::deepl** moodul ainult DeepL teenust.
@@ -60,7 +64,7 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
     Insted kutsudes tõlkemootor, siis oodatakse tööd. Pärast tõlgitava teksti ettevalmistamist kopeeritakse need lõikelauale. Eeldatakse, et kleebite need vormi, kopeerite tulemuse lõikelauale ja vajutate return.
 
-- **--xlate-to** (Default: `JA`)
+- **--xlate-to** (Default: `EN-US`)
 
     Määrake sihtkeel. **DeepL** mootori kasutamisel saate saadaval olevad keeled kätte käsuga `deepl languages`.
 

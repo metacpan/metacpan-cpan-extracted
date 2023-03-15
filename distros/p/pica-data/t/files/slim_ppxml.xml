@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ppxml:collection xmlns:ppxml="http://www.oclcpica.org/xmlns/ppxml-1.0">
+  <ppxml:record>
+    <ppxml:global opacflag="" status="">
+      <ppxml:tag id="001@" occ="">
+        <ppxml:subf id="0">11-12,66</ppxml:subf>
+        <ppxml:subf id="a">3</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="001A" occ="">
+        <ppxml:subf id="0">0517:24-10-12</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="001B" occ="">
+        <ppxml:subf id="0">0003:29-07-14</ppxml:subf>
+        <ppxml:subf id="t">13:56:56.000</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="001D" occ="">
+        <ppxml:subf id="0">9001:23-07-13</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="001U" occ="">
+        <ppxml:subf id="0">utf8</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="001X" occ="">
+        <ppxml:subf id="0">0</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="002@" occ="">
+        <ppxml:subf id="0">Advz</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="003@" occ="">
+        <ppxml:subf id="0">1027146724</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="006Z" occ="">
+        <ppxml:subf id="0">2687943-8</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="007G" occ="">
+        <ppxml:subf id="a">ZDB</ppxml:subf>
+        <ppxml:subf id="0">2687943-8</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="010@" occ="">
+        <ppxml:subf id="a">eng</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="011@" occ="">
+        <ppxml:subf id="a">2010</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="019@" occ="">
+        <ppxml:subf id="a">XA-GB</ppxml:subf>
+        <ppxml:subf id="a">XD-US</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="021A" occ="">
+        <ppxml:subf id="a">Directory of world cinema</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="031@" occ="">
+        <ppxml:subf id="a">1.2010 -</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="031N" occ="">
+        <ppxml:subf id="d">1</ppxml:subf>
+        <ppxml:subf id="j">2010</ppxml:subf>
+        <ppxml:subf id="6"/>
+      </ppxml:tag>
+      <ppxml:tag id="033A" occ="">
+        <ppxml:subf id="p">Bristol [u.a.]</ppxml:subf>
+        <ppxml:subf id="n">Intellect</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="045T" occ="">
+        <ppxml:subf id="a">6,23</ppxml:subf>
+      </ppxml:tag>
+      <ppxml:tag id="045U" occ="">
+        <ppxml:subf id="e">791</ppxml:subf>
+      </ppxml:tag>
+    </ppxml:global>
+    <ppxml:owner iln="11">
+      <ppxml:local>
+        <ppxml:tag id="101@" occ="">
+          <ppxml:subf id="a">11</ppxml:subf>
+        </ppxml:tag>
+      </ppxml:local>
+      <ppxml:copy occ="1" opacflag="" status="" epn="249701367">
+        <ppxml:tag id="201B" occ="1">
+          <ppxml:subf id="0">09-06-15</ppxml:subf>
+          <ppxml:subf id="t">17:19:27.000</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="201U" occ="1">
+          <ppxml:subf id="0">utf8</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="203@" occ="1">
+          <ppxml:subf id="0">249701367</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="206Y" occ="1">
+          <ppxml:subf id="0">h1165459442</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="208@" occ="1">
+          <ppxml:subf id="a">08-06-10</ppxml:subf>
+          <ppxml:subf id="b">x</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209B" occ="1">
+          <ppxml:subf id="g">1</ppxml:subf>
+          <ppxml:subf id="x">32</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209B" occ="1">
+          <ppxml:subf id="a">Bestand s. Stabikat (Link anklicken)</ppxml:subf>
+          <ppxml:subf id="x">34</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209S" occ="1">
+          <ppxml:subf id="u">http://stabikat.staatsbibliothek-berlin.de:8080/DB=1/LNG=DU/CLK?IKT=12&amp;TRM=728437554</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="247C" occ="1">
+          <ppxml:subf id="9">009000046</ppxml:subf>
+          <ppxml:subf id="0">101005-0</ppxml:subf>
+          <ppxml:subf id="S">1a</ppxml:subf>
+          <ppxml:subf id="L">BER</ppxml:subf>
+          <ppxml:subf id="T">DE-1a</ppxml:subf>
+          <ppxml:subf id="I">0011</ppxml:subf>
+          <ppxml:subf id="Z">CC0</ppxml:subf>
+          <ppxml:subf id="c">S</ppxml:subf>
+          <ppxml:subf id="g">GBV</ppxml:subf>
+          <ppxml:subf id="h">l</ppxml:subf>
+          <ppxml:subf id="a">Berlin SBB Haus Potsdamer Str</ppxml:subf>
+        </ppxml:tag>
+      </ppxml:copy>
+    </ppxml:owner>
+    <ppxml:owner iln="12">
+      <ppxml:local>
+        <ppxml:tag id="101@" occ="">
+          <ppxml:subf id="a">12</ppxml:subf>
+        </ppxml:tag>
+      </ppxml:local>
+      <ppxml:copy occ="1" opacflag="" status="" epn="313000352">
+        <ppxml:tag id="201B" occ="1">
+          <ppxml:subf id="0">20-01-15</ppxml:subf>
+          <ppxml:subf id="t">17:11:13.000</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="201U" occ="1">
+          <ppxml:subf id="0">utf8</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="203@" occ="1">
+          <ppxml:subf id="0">313000352</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="206Y" occ="1">
+          <ppxml:subf id="0">h1489434275</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="208@" occ="1">
+          <ppxml:subf id="a">18-07-14</ppxml:subf>
+          <ppxml:subf id="b">x</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209B" occ="1">
+          <ppxml:subf id="g">1</ppxml:subf>
+          <ppxml:subf id="x">32</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209B" occ="1">
+          <ppxml:subf id="a">Bestand s. OPAC (Link anklicken)</ppxml:subf>
+          <ppxml:subf id="x">34</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209S" occ="1">
+          <ppxml:subf id="u">http://opac.bibliothek.uni-halle.de/DB=1/LNG=DU/CLK?IKT=12&amp;TRM=728437554</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="247C" occ="1">
+          <ppxml:subf id="9">009027866</ppxml:subf>
+          <ppxml:subf id="0">931000-9</ppxml:subf>
+          <ppxml:subf id="S">3</ppxml:subf>
+          <ppxml:subf id="L">SAA</ppxml:subf>
+          <ppxml:subf id="T">DE-3</ppxml:subf>
+          <ppxml:subf id="I">0012</ppxml:subf>
+          <ppxml:subf id="Z">CC0</ppxml:subf>
+          <ppxml:subf id="c">S</ppxml:subf>
+          <ppxml:subf id="g">GBV</ppxml:subf>
+          <ppxml:subf id="h">k</ppxml:subf>
+          <ppxml:subf id="a">Halle/S UuLB</ppxml:subf>
+        </ppxml:tag>
+      </ppxml:copy>
+    </ppxml:owner>
+    <ppxml:owner iln="66">
+      <ppxml:local>
+        <ppxml:tag id="101@" occ="">
+          <ppxml:subf id="a">66</ppxml:subf>
+        </ppxml:tag>
+      </ppxml:local>
+      <ppxml:copy occ="1" opacflag="" status="" epn="267162731">
+        <ppxml:tag id="201B" occ="1">
+          <ppxml:subf id="0">23-07-13</ppxml:subf>
+          <ppxml:subf id="t">17:07:28.000</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="201U" occ="1">
+          <ppxml:subf id="0">utf8</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="203@" occ="1">
+          <ppxml:subf id="0">267162731</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="206Y" occ="1">
+          <ppxml:subf id="0">h1400219051</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="206Z" occ="1">
+          <ppxml:subf id="0">728437554</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="208@" occ="1">
+          <ppxml:subf id="a">12-06-13</ppxml:subf>
+          <ppxml:subf id="b">x</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209A" occ="1">
+          <ppxml:subf id="l">k</ppxml:subf>
+          <ppxml:subf id="x">00</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209B" occ="1">
+          <ppxml:subf id="g">1</ppxml:subf>
+          <ppxml:subf id="x">32</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209B" occ="1">
+          <ppxml:subf id="a">Bestand s. OPAC (Link anklicken)</ppxml:subf>
+          <ppxml:subf id="x">34</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="209S" occ="1">
+          <ppxml:subf id="u">http://www.iaicat.de/DB=1/LNG=DU/CLK?IKT=12&amp;TRM=728437554</ppxml:subf>
+        </ppxml:tag>
+        <ppxml:tag id="247C" occ="1">
+          <ppxml:subf id="9">009000089</ppxml:subf>
+          <ppxml:subf id="0">101204-6</ppxml:subf>
+          <ppxml:subf id="S">204</ppxml:subf>
+          <ppxml:subf id="L">BER</ppxml:subf>
+          <ppxml:subf id="T">DE-204</ppxml:subf>
+          <ppxml:subf id="I">0066</ppxml:subf>
+          <ppxml:subf id="Z">CC0</ppxml:subf>
+          <ppxml:subf id="c">S</ppxml:subf>
+          <ppxml:subf id="g">GBV</ppxml:subf>
+          <ppxml:subf id="h">l</ppxml:subf>
+          <ppxml:subf id="a">Berlin IAI</ppxml:subf>
+        </ppxml:tag>
+      </ppxml:copy>
+    </ppxml:owner>
+  </ppxml:record>
+</ppxml:collection>

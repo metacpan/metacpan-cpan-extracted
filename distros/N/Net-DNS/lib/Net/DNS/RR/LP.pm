@@ -2,7 +2,7 @@ package Net::DNS::RR::LP;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: LP.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: LP.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -17,8 +17,7 @@ use integer;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	$self->{preference} = unpack( "\@$offset n", $$data );
 	$self->{target}	    = Net::DNS::DomainName->decode( $data, $offset + 2 );
@@ -43,26 +42,23 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->preference(shift);
-	$self->target(shift);
+	for (qw(preference target)) { $self->$_( shift @argument ) }
 	return;
 }
 
 
 sub preference {
-	my $self = shift;
-
-	$self->{preference} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{preference} = 0 + $_ }
 	return $self->{preference} || 0;
 }
 
 
 sub target {
-	my $self = shift;
-
-	$self->{target} = Net::DNS::DomainName->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{target} = Net::DNS::DomainName->new($_) }
 	return $self->{target} ? $self->{target}->name : undef;
 }
 
@@ -166,6 +162,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC6742
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC6742|https://tools.ietf.org/html/rfc6742>
 
 =cut

@@ -3,7 +3,7 @@ package Net::DNS::Domain;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Domain.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Domain.pm 1898 2023-02-15 14:27:22Z willem $)[2];
 
 
 =head1 NAME
@@ -124,7 +124,8 @@ sub new {
 		}
 
 		s/\134([\060-\071]{3})/$unescape{$1}/eg;	# restore numeric escapes
-		s/\134(.)/$1/g;					# restore character escapes
+		s/\134([^\134])/$1/g;				# restore character escapes
+		s/\134(\134)/$1/g;				# restore escaped escapes
 		croak qq(label too long in "$s") if length > 63;
 	}
 
@@ -265,7 +266,7 @@ my $placebo = sub { my $constructor = shift; &$constructor; };
 
 sub origin {
 	my ( $class, $name ) = @_;
-	my $domain = defined $name ? Net::DNS::Domain->new($name) : return $placebo;
+	my $domain = defined $name ? __PACKAGE__->new($name) : return $placebo;
 
 	return sub {						# closure w.r.t. $domain
 		my $constructor = shift;
@@ -393,7 +394,10 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::LibIDN2>, RFC1034, RFC1035, RFC5891, Unicode TR#16
+L<perl> L<Net::DNS> L<Net::LibIDN2>
+L<RFC1034|https://tools.ietf.org/html/rfc1034>
+L<RFC1035|https://tools.ietf.org/html/rfc1035>
+L<RFC5891|https://tools.ietf.org/html/rfc5891>
 
 =cut
 

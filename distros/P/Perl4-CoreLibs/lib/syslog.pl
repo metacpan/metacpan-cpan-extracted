@@ -15,37 +15,35 @@
 #  then (put these all in a script to test function)
 #		
 #
-#	do openlog($program,'cons,pid','user');
-#	do syslog('info','this is another test');
-#	do syslog('mail|warning','this is a better test: %d', time);
-#	do closelog();
+#	openlog($program,'cons,pid','user');
+#	syslog('info','this is another test');
+#	syslog('mail|warning','this is a better test: %d', time);
+#	closelog();
 #	
-#	do syslog('debug','this is the last test');
-#	do openlog("$program $$",'ndelay','user');
-#	do syslog('notice','fooprogram: this is really done');
+#	syslog('debug','this is the last test');
+#	openlog("$program $$",'ndelay','user');
+#	syslog('notice','fooprogram: this is really done');
 #
 #	$! = 55;
-#	do syslog('info','problem was %m'); # %m == $! in syslog(3)
+#	syslog('info','problem was %m'); # %m == $! in syslog(3)
 
 package syslog;
 
+no warnings "ambiguous";
 use warnings::register;
 
-$host = 'localhost' unless $host;	# set $syslog'host to change
+use Socket ();
+use Sys::Syslog 0.19 qw(:macros);
+
+$host = 'localhost' unless $host;	# set $syslog::host to change
 
 if ($] >= 5 && warnings::enabled()) {
     warnings::warn("You should 'use Sys::Syslog' instead; continuing");
 } 
 
-require 'syslog.ph';
-
- eval 'use Socket; 1' 			||
-     eval { require "socket.ph" } 	||
-     require "sys/socket.ph";
-
 $maskpri = &LOG_UPTO(&LOG_DEBUG);
 
-sub main'openlog {
+sub main::openlog {
     ($ident, $logopt, $facility) = @_;  # package vars
     $lo_pid = $logopt =~ /\bpid\b/;
     $lo_ndelay = $logopt =~ /\bndelay\b/;
@@ -54,18 +52,18 @@ sub main'openlog {
     &connect if $lo_ndelay;
 } 
 
-sub main'closelog {
+sub main::closelog {
     $facility = $ident = '';
     &disconnect;
 } 
 
-sub main'setlogmask {
+sub main::setlogmask {
     local($oldmask) = $maskpri;
     $maskpri = shift;
     $oldmask;
 }
  
-sub main'syslog {
+sub main::syslog {
     local($priority) = shift;
     local($mask) = shift;
     local($message, $whoami);
@@ -144,18 +142,18 @@ sub xlate {
     local($name) = @_;
     $name = uc $name;
     $name = "LOG_$name" unless $name =~ /^LOG_/;
-    $name = "syslog'$name";
+    $name = "syslog::$name";
     defined &$name ? &$name : -1;
 }
 
 sub connect {
     $pat = 'S n C4 x8';
 
-    $af_unix = &AF_UNIX;
-    $af_inet = &AF_INET;
+    $af_unix = Socket::AF_UNIX;
+    $af_inet = Socket::AF_INET;
 
-    $stream = &SOCK_STREAM;
-    $datagram = &SOCK_DGRAM;
+    $stream = Socket::SOCK_STREAM;
+    $datagram = Socket::SOCK_DGRAM;
 
     ($name,$aliases,$proto) = getprotobyname('udp');
     $udp = $proto;

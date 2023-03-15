@@ -24,6 +24,20 @@ require 'lib/jacode.pl';
     'サイト内の翻訳データは、Japanized Perl Resources Project(JPRP)で翻訳されたもの、有志が翻訳しているgithubのリポジトリ、JPAの翻訳文書から取得しています。','euc',
     '最近の更新 / RSS','euc',
     'CVS及びgitのcommitログから最新の50件を取得しています。稀に翻訳者とcommitした人が違う場合があります。また、修正のcommit、登録しただけで未翻訳のものも含まれる場合があります。','euc',
+#   '彗','euc', # SKIP [D7] [C2  "ﾗﾂ" in sjis
+    '倣','euc',
+#   '醒','euc', # SKIP [C0][C3]  "ﾀﾃ" in sjis
+#   '彙','euc', # SKIP [D7][C3]  "ﾗﾃ" in sjis
+#   '渦','euc', # SKIP [B1][B2]  "ｱｲ" in sjis
+#   '塵','euc', # SKIP [BF][D0]  "ｿﾐ" in sjis
+    '隕','euc',
+#   '冥','euc', # SKIP [CC][BD]  "ﾌｽ" in sjis
+    '八','euc',
+    '鷹','euc',
+    '閃','euc',
+    '杉','euc',
+#   '六','euc', # SKIP [CF][BB]  "ﾏｻ" in sjis
+    '九','euc',
 );
 
 print "1..", scalar(@todo)/2, "\n";

@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Module::DNS;
-$Bot::BasicBot::Pluggable::Module::DNS::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Module::DNS::VERSION = '1.30';
 use base qw(Bot::BasicBot::Pluggable::Module);
 use warnings;
 use strict;
@@ -40,7 +40,7 @@ Bot::BasicBot::Pluggable::Module::DNS - DNS lookups for hostnames or IP addresse
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 IRC USAGE
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::CDS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: CDS.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: CDS.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR::DS);
 
@@ -32,9 +32,9 @@ sub digtype {
 
 
 sub digest {
-	my $self = shift;
-	return $self->SUPER::digest(@_) unless defined( $_[0] ) && length( $_[0] ) < 2;
-	return $self->SUPER::digestbin( $_[0] ? '' : chr(0) );
+	my ( $self, @arg ) = @_;
+	return $self->SUPER::digest(@arg) unless defined( $arg[0] ) && length( $arg[0] ) < 2;
+	return $self->SUPER::digestbin( $arg[0] ? '' : chr(0) );
 }
 
 
@@ -97,6 +97,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::DS>, RFC7344, RFC8078(erratum 5049)
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<Net::DNS::RR::DS>
+L<RFC7344|https://tools.ietf.org/html/rfc7344>
 
 =cut

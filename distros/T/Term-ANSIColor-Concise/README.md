@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/Term-ANSIColor-Concise/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Term-ANSIColor-Concise/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Term-ANSIColor-Concise.svg)](https://metacpan.org/release/Term-ANSIColor-Concise)
+[![Actions Status](https://github.com/tecolicom/Term-ANSIColor-Concise/workflows/test/badge.svg)](https://github.com/tecolicom/Term-ANSIColor-Concise/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Term-ANSIColor-Concise.svg)](https://metacpan.org/release/Term-ANSIColor-Concise)
 # NAME
 
 Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
@@ -16,12 +16,12 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
                    'Flashing Underlined Bold Italic Gold on Gray10 Bar');
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/Term-ANSIColor-Concise/main/images/synopsis.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/synopsis.png">
 </div>
 
 # VERSION
 
-Version 2.01
+Version 2.0201
 
 # DESCRIPTION
 
@@ -41,8 +41,8 @@ and gray scales in 24 steps.
 Color described by 12bit/24bit RGB values are converted to 6x6x6 216
 colors, or 24 gray scales if all RGB values are same.
 
-For a terminal which can display 24bit colors, full-color sequence is
-produce.  See ["ENVIRONMENT"](#environment) section.
+For a terminal which can display 24bit colors, full-color sequence can
+be produced.  See ["ENVIRONMENT"](#environment) section.
 
 # FUNCTION
 
@@ -231,11 +231,14 @@ Native CSI (Control Sequence Introducer) sequences in the form of
 
 These names can be followed by optional numerical parameters, using
 comma (`,`) or semicolon (`;`) to separate multiple ones, with
-optional braces.  For example, color spec `DK/544` can be described
-as `{SGR1;30;48;5;224}` or more readable `{SGR(1,30,48,5,224)}`.
+optional parentheses.  For example, color spec `DK/544` can be
+described as `{SGR1;30;48;5;224}` or more readable
+`{SGR(1,30,48,5,224)}`.
 
 Some other escape sequences are supported in the form of `{NAME}`.
 These sequences do not start with CSI, and do not take parameters.
+VT100 compatible terminal usually support these, and does not support
+`SCP` and `RCP` CSI code.
 
     RIS     Reset to Initial State
     DECSC   DEC Save Cursor
@@ -391,11 +394,11 @@ Color table can be shown by other module
     $ perl -MTerm::ANSIColor::Concise::Table=:all -e colortable
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/Term-ANSIColor-Concise/main/images/colortable-s.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/colortable-s.png">
 </div>
 
 <div>
-    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/Term-ANSIColor-Concise/main/images/colortable-rev-s.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/colortable-rev-s.png">
 </div>
 
 # SEE ALSO
@@ -462,7 +465,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2022 Kazumasa Utashiro
+Copyright 2015-2023 Kazumasa Utashiro
 
 # LICENSE
 

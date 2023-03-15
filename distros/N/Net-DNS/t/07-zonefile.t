@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 07-zonefile.t 1855 2021-11-26 11:33:48Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1894 2023-01-12 10:59:08Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -365,7 +365,7 @@ EOF
 	is( $zonefile->read->rdstring, 'string',		    'redundant brackets ignored' );
 	is( $zonefile->read->rdstring, '"(string)"',		    'quoted brackets protected' );
 	is( $zonefile->read->rdstring, '"no;comment"',		    'quoted semicolon protected' );
-	is( $zonefile->read->rdstring, 'quoted\"quote',		    'quoted quote protected' );
+	is( $zonefile->read->rdstring, 'quoted\034quote',	    'quoted quote protected' );
 	is( $zonefile->read->rdstring, 'multiline resource record', 'multiline RR parsed correctly' );
 	is( $zonefile->read->rdstring, 'contiguousstring',	    'contiguous string reassembled' );
 	like( $zonefile->read->rdstring, '/quoted.*string$/', 'multiline string reassembled' );

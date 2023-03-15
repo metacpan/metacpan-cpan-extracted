@@ -3,7 +3,7 @@ package Net::DNS::Resolver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Resolver.pm 1883 2022-11-03 14:38:19Z willem $)[2];
+our $VERSION = (qw$Id: Resolver.pm 1895 2023-01-16 13:38:08Z willem $)[2];
 
 
 =head1 NAME
@@ -749,9 +749,11 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::Packet>, L<Net::DNS::Update>,
-L<Net::DNS::Header>, L<Net::DNS::Question>, L<Net::DNS::RR>,
-L<resolver(5)>, RFC 1034, RFC 1035
+L<perl> L<Net::DNS> L<Net::DNS::Packet> L<Net::DNS::Update>
+L<Net::DNS::Header> L<Net::DNS::Question> L<Net::DNS::RR>
+L<resolver(5)>
+L<RFC1034|https://tools.ietf.org/html/rfc1034>
+L<RFC1035|https://tools.ietf.org/html/rfc1035>
 
 =cut
 

@@ -1,12 +1,13 @@
 package Crypt::Passphrase::Linux;
-$Crypt::Passphrase::Linux::VERSION = '0.001';
+$Crypt::Passphrase::Linux::VERSION = '0.003';
 use strict;
 use warnings;
 
-use parent 'Crypt::Passphrase::Encoder';
+use Crypt::Passphrase 0.010 -encoder;
 
+use Carp 'croak';
 use Crypt::Passwd::XS 'crypt';
-use MIME::Base64 qw/encode_base64 decode_base64/;
+use MIME::Base64 qw/encode_base64/;
 
 my %identifier_for = (
 	md5        => '1',
@@ -25,7 +26,7 @@ my %salt_size = (
 sub new {
 	my ($class, %args) = @_;
 	my $type_name = $args{type} // 'sha512';
-	my $type = $identifier_for{$type_name} // die "No such crypt type $type_name";
+	my $type = $identifier_for{$type_name} // croak "No such crypt type $type_name";
 	my $salt_size = $salt_size{$type_name};
 	my $rounds = $args{rounds} // 656_000;
 
@@ -39,8 +40,14 @@ sub new {
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
-	my $settings = sprintf '$%s$rounds=%d$%s', $self->{type}, $self->{rounds}, encode_base64($salt);
+	(my $encoded_salt = encode_base64($salt, "")) =~ tr{A-Za-z0-9+/=}{./A-Za-z0-9}d;
+	my $settings = sprintf '$%s$rounds=%d$%s', $self->{type}, $self->{rounds}, $encoded_salt;
 	return Crypt::Passwd::XS::crypt($password, $settings);
+}
+
+sub accepts_hash {
+	my ($self, $hash) = @_;
+	return $hash =~ / \A [.\/A-Za-z0-9]{13} \z /x || $self->SUPER::accepts_hash($hash);
 }
 
 sub crypt_subtypes {
@@ -51,15 +58,14 @@ my $regex = qr/ ^ \$ (1|5|6|apr1) \$ (?: rounds= ([0-9]+) \$ )? ([^\$]*) \$ [^\$
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	my ($type, $rounds, $salt) = $hash =~ $regex or return 0;
+	my ($type, $rounds, $salt) = $hash =~ $regex or return 1;
 	$rounds = 5000 if $rounds eq '';
 	return $type ne $self->{type} || $rounds != $self->{rounds} || length $salt != $self->{salt_size} * 4 / 3;
 }
 
 sub verify_password {
 	my ($class, $password, $hash) = @_;
-	my ($settings) = $hash =~ /^(.*)\$[^\$]*/;
-	my $new_hash = Crypt::Passwd::XS::crypt($password, $settings);
+	my $new_hash = Crypt::Passwd::XS::crypt($password, $hash);
 	return $class->secure_compare($hash, $new_hash);
 }
 
@@ -79,7 +85,15 @@ Crypt::Passphrase::Linux - An linux crypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.001
+version 0.003
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(encoder => {
+   module => 'Linux',
+   type   => 'sha512',
+   rounds => 656_000,
+ });
 
 =head1 DESCRIPTION
 

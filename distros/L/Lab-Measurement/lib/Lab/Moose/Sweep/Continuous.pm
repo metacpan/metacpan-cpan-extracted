@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous;
-$Lab::Moose::Sweep::Continuous::VERSION = '3.851';
+$Lab::Moose::Sweep::Continuous::VERSION = '3.860';
 #ABSTRACT: Base class for continuous sweeps (time, temperature, magnetic field)
 
 use v5.20;
@@ -58,6 +58,8 @@ has rates => (
 
 has backsweep => ( is => 'ro', isa => 'Bool', default => 0 );
 
+has both_directions => ( is => 'ro', isa => 'Bool', default => 0 );
+has direction_index => ( is => 'ro', isa => 'Int', default => 1 );
 #
 # Private attributes used internally
 #
@@ -208,6 +210,10 @@ sub BUILD {
         push @intervals, reverse @intervals;
     }
 
+    if ( $self->both_directions && $self->backsweep ) {
+        croak "Can't use backsweep and both_directions together."
+    }
+
     $self->_points( \@points );
     $self->_rates( \@rates );
     $self->_intervals( \@intervals );
@@ -266,6 +272,7 @@ EOF
     );
     $instrument->trg();
     $instrument->wait();
+    
 }
 
 sub start_sweep {
@@ -306,6 +313,19 @@ sub sweep_finished {
     }
     else {
         # finished all points!
+        if( $self->both_directions) {
+            my @points = $self->points_array;
+            my @rates = $self->rates_array;
+            my @intervals = $self->intervals_array;
+    
+            @points = reverse @points;
+            @rates = reverse @rates;
+            @intervals = reverse @intervals;
+    
+            $self->_points( \@points );
+            $self->_rates( \@rates );
+            $self->_intervals( \@intervals );
+        }
         return 1;
     }
 }
@@ -327,7 +347,7 @@ Lab::Moose::Sweep::Continuous - Base class for continuous sweeps (time, temperat
 
 =head1 VERSION
 
-version 3.851
+version 3.860
 
 =head1 SYNOPSIS
 
@@ -422,6 +442,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
+            2023       Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -21,13 +21,20 @@ has api_url=>(
   isa=>Str,
   is=>'ro',
   lazy=>1,
-  default=>'https://api.ciscospark.com/v1/',
+	#default=>'https://api.ciscospark.com/v1/',
+	default=>'https://webexapis.com/v1/',
 );
 
 has retryCount=>(
   isa=>Int,
   is=>'ro',
   default=>1,
+);
+
+has retryTimeout=>(
+  isa=>Int,
+	is=>'ro',
+	default=>1,
 );
 
 has retryAfter=>(
@@ -74,7 +81,8 @@ Optional OO Arguments
 
   logger: sets the logging object
   agent: AnyEvent::HTTP::MultiGet object
-  api_url: https://api.ciscospark.com/v1/
+
+  api_url: https://webexapis.com/v1/
     # sets the web service the requests point to
   retryCount: 1, how many retries to attempt when getting a 429 error
 
@@ -1199,7 +1207,6 @@ __PACKAGE__->_build_common("people",qw(list get create delete update));
 __PACKAGE__->_build_common("rooms",qw(list get create delete update));
 __PACKAGE__->_build_common("meetings",qw(list get create delete update));
 __PACKAGE__->_build_common("memberships",qw(list get create delete update));
-__PACKAGE__->_build_common("messages",qw(list get create delete));
 __PACKAGE__->_build_common("teams",qw(list get create delete update));
 __PACKAGE__->_build_common("team/memberships",qw(list get create delete update));
 __PACKAGE__->_build_common("webhooks",qw(list get create delete update));
@@ -1208,6 +1215,7 @@ __PACKAGE__->_build_common("licenses",qw(list get));
 __PACKAGE__->_build_common("roles",qw(list get));
 __PACKAGE__->_build_common("events",qw(list get));
 
+__PACKAGE__->_build_common("messages",qw(list get create delete));
 sub _build_common {
   my ($class,$path,@todo)=@_;
   foreach my $method (@todo) {
@@ -1241,7 +1249,7 @@ sub _build_common {
     } elsif($method eq 'get') {
       $code=sub {
         my ($self,$cb,$targetId,$data)=@_;
-	return $self->queue_result($cb,$self->new_false("${method}Id is a requried argument")) unless defined($targetId);
+       	return $self->queue_result($cb,$self->new_false("${method}Id is a requried argument")) unless defined($targetId);
         return $self->que_get($cb,"$path/$targetId",$data);
       };
     } elsif($method eq 'delete') {
@@ -1535,7 +1543,7 @@ sub queue_builder {
   } else {
     $wrap=sub {
       my ($self,$id,$result,undef,$response)=@_;
-      return $cb->(@_) if $result or !($response->code==429 and $count-- >0);
+      return $cb->(@_) if $result || !(($response->code==429 || $response->code==404) &&  $count-- >0);
       my $timeout=looks_like_number($response->header('Retry-After')) ? $response->header('Retry-After') : $self->retryTimeout;
       $self->log_warn("Request: $id recived a 429 response, will retry in $timeout seconds");
 

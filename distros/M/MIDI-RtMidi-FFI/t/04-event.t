@@ -13,11 +13,12 @@ my ( $in, $out ) = ( newdevice( 'in' ), newdevice() );
 isa_ok( $_, 'MIDI::RtMidi::FFI::Device' ) for ( $in, $out );
 
 my @events = (
-    [ note_on => 0x40, 0x7f ],
-    [ note_off => 0x40, 0 ],
-    [ pitch_wheel_change => 0x1f40 ],
-    [ control_change => 0x01, 0x5f ],
-    [ key_after_touch => 0x40, 0x5f ],
+    [ note_on => 0x00, 0x40, 0x7f ],
+    [ note_off => 0x01, 0x40, 0 ],
+    [ pitch_wheel_change => 0x02, 0x1f40 ],
+    [ control_change => 0x0f, 0x01, 0x5f ],
+    [ key_after_touch => 0x00, 0x40, 0x5f ],
+    [ sysex_f0 => "Hello, world!" ],
 );
 
 subtest event => sub {

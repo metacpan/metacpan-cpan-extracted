@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-09'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/RPO/Checker/bpom_rpo_check_files_label_design",
@@ -41,7 +41,7 @@ bpom-rpo-check-files-label-design - Check label design files
 
 =head1 VERSION
 
-This document describes version 0.008 of bpom-rpo-check-files-label-design (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-09.
+This document describes version 0.009 of bpom-rpo-check-files-label-design (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-10.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<bpom-rpo-check-files-label-design> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/
 
 B<bpom-rpo-check-files-label-design> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<bpom-rpo-check-files-label-design> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<files|/"--files=s@">>] ...
+B<bpom-rpo-check-files-label-design> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<filenames|/"--filenames=s@">>] ...
 
 =head1 DESCRIPTION
 
@@ -69,13 +69,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--files-json>=I<s>
+=item B<--filenames-json>=I<s>
 
-See C<--files>.
+See C<--filenames>.
 
 Can also be specified as the 1st command-line argument and onwards.
 
-=item B<--files>=I<s@>
+=item B<--filenames>=I<s@>
 
 (No description)
 

@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1891 2022-12-28 13:09:27Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1901 2023-03-02 14:46:11Z willem $)[2];
 
 
 =head1 NAME
@@ -58,8 +58,8 @@ If called with an empty argument list, new() creates an empty packet.
 =cut
 
 sub new {
-	return &decode if ref $_[1];
-	my $class = shift;
+	my ( $class, @arg ) = @_;
+	return &decode if ref $arg[0];
 
 	my $self = bless {
 		status	   => 0,
@@ -69,7 +69,7 @@ sub new {
 		additional => [],
 		}, $class;
 
-	$self->{question} = [Net::DNS::Question->new(@_)] if scalar @_;
+	$self->{question} = [Net::DNS::Question->new(@arg)] if scalar @arg;
 
 	return $self;
 }
@@ -404,17 +404,17 @@ sub string {
 	my $origin = $server ? ";; Response received from $server ($length octets)\n" : "";
 	my @record = ( "$origin;; HEADER SECTION", $header->string );
 
-	my $edns = $self->edns;
-	CORE::push( @record, $edns->string ) if $edns->_specified;
-
 	if ( $opcode eq 'DSO' ) {
 		CORE::push( @record, ";; DSO SECTION" );
 		foreach ( @{$self->{dso}} ) {
 			my ( $t, $v ) = @$_;
-			CORE::push( @record, pack 'a* A18 a*', ";;\t", dsotypebyval($t), unpack( 'H*', $v ) );
+			CORE::push( @record, sprintf( ";;\t%s\t%s", dsotypebyval($t), unpack( 'H*', $v ) ) );
 		}
 		return join "\n", @record, "\n";
 	}
+
+	my $edns = $self->edns;
+	CORE::push( @record, $edns->string ) if $edns->_specified;
 
 	my @section  = $opcode eq 'UPDATE' ? qw(ZONE PREREQUISITE UPDATE) : qw(QUESTION ANSWER AUTHORITY);
 	my @question = $self->question;
@@ -453,9 +453,8 @@ This method will return undef for user-created packets.
 =cut
 
 sub from {
-	my $self = shift;
-
-	$self->{replyfrom} = shift if scalar @_;
+	my ( $self, @argument ) = @_;
+	for (@argument) { $self->{replyfrom} = $_ }
 	return $self->{replyfrom};
 }
 
@@ -497,9 +496,9 @@ Section names may be abbreviated to the first three characters.
 =cut
 
 sub push {
-	my $self = shift;
-	my $list = $self->_section(shift);
-	return CORE::push( @$list, grep { ref($_) } @_ );
+	my ( $self, $section, @rr ) = @_;
+	my $list = $self->_section($section);
+	return CORE::push( @$list, @rr );
 }
 
 
@@ -522,12 +521,10 @@ Section names may be abbreviated to the first three characters.
 =cut
 
 sub unique_push {
-	my $self = shift;
-	my $list = $self->_section(shift);
-	my @rr	 = grep { ref($_) } @_;
+	my ( $self, $section, @rr ) = @_;
+	my $list = $self->_section($section);
 
 	my %unique = map { ( bless( {%$_, ttl => 0}, ref $_ )->canonical => $_ ) } @rr, @$list;
-
 	return scalar( @$list = values %unique );
 }
 
@@ -628,12 +625,11 @@ does not support the suppressed signature scheme described in RFC2845.
 =cut
 
 sub sign_tsig {
-	my $self = shift;
-
+	my ( $self, @argument ) = @_;
 	return eval {
 		local $SIG{__DIE__};
 		require Net::DNS::RR::TSIG;
-		my $tsig = Net::DNS::RR::TSIG->create(@_);
+		my $tsig = Net::DNS::RR::TSIG->create(@argument);
 		$self->push( 'additional' => $tsig );
 		return $tsig;
 	} || return croak "$@\nTSIG: unable to sign packet";
@@ -661,16 +657,13 @@ on the final packet in the absence of more specific information.
 =cut
 
 sub verify {
-	my $self = shift;
-
+	my ( $self, @argument ) = @_;
 	my $sig = $self->sigrr;
-	return $sig ? $sig->verify( $self, @_ ) : shift;
+	return $sig ? $sig->verify( $self, @argument ) : shift @argument;
 }
 
 sub verifyerr {
-	my $self = shift;
-
-	my $sig = $self->sigrr;
+	my $sig = shift->sigrr;
 	return $sig ? $sig->vrfyerrstr : 'not signed';
 }
 
@@ -837,11 +830,12 @@ sub truncate {
 ########################################
 
 sub dump {				## print internal data structure
-	require Data::Dumper;					# uncoverable pod
+	my @data = @_;						# uncoverable pod
+	require Data::Dumper;
 	local $Data::Dumper::Maxdepth = $Data::Dumper::Maxdepth || 3;
 	local $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys || 1;
 	local $Data::Dumper::Useqq    = $Data::Dumper::Useqq	|| 1;
-	print Data::Dumper::Dumper(@_);
+	print Data::Dumper::Dumper(@data);
 	return;
 }
 
@@ -884,9 +878,11 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::Update>, L<Net::DNS::Header>,
-L<Net::DNS::Question>, L<Net::DNS::RR>, L<Net::DNS::RR::TSIG>,
-RFC1035 Section 4.1, RFC2136 Section 2, RFC2845
+L<perl> L<Net::DNS> L<Net::DNS::Update> L<Net::DNS::Header>
+L<Net::DNS::Question> L<Net::DNS::RR> L<Net::DNS::RR::TSIG>
+L<RFC1035(4.1)|https://tools.ietf.org/html/rfc1035>
+L<RFC2136(2)|https://tools.ietf.org/html/rfc2136>
+L<RFC8945|https://tools.ietf.org/html/rfc8945>
 
 =cut
 

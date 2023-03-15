@@ -1,4 +1,4 @@
-package LibUI::Control 0.01 {
+package LibUI::Control 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -28,8 +28,9 @@ package LibUI::Control 0.01 {
         ];
         #
         affix(
-            LibUI::lib(), 'uiControlDestroy', [ InstanceOf ['LibUI::Control'] ] => Void,
-            'Destroy'
+            LibUI::lib(),
+            [ 'uiControlDestroy', 'Destroy' ],
+            [ InstanceOf ['LibUI::Control'] ] => Void
         );
         affix( LibUI::lib(), 'uiControlHandle',
             [ InstanceOf ['LibUI::Control'] ] => Pointer [UInt] );
@@ -39,7 +40,11 @@ package LibUI::Control 0.01 {
             [ InstanceOf ['LibUI::Control'], InstanceOf ['LibUI::Control'] ] => Void );
         affix( LibUI::lib(), 'uiControlToplevel', [ InstanceOf ['LibUI::Control'] ] => Int );
         affix( LibUI::lib(), 'uiControlVisible',  [ InstanceOf ['LibUI::Control'] ] => Int );
-        affix( LibUI::lib(), 'uiControlShow', [ InstanceOf ['LibUI::Control'] ] => Void, 'show' );
+        affix(
+            LibUI::lib(),
+            [ 'uiControlShow', 'show' ],
+            [ InstanceOf ['LibUI::Control'] ] => Void
+        );
         affix( LibUI::lib(), 'uiControlHide',    [ InstanceOf ['LibUI::Control'] ] => Void );
         affix( LibUI::lib(), 'uiControlEnabled', [ InstanceOf ['LibUI::Control'] ] => Int );
         affix( LibUI::lib(), 'uiControlEnable',  [ InstanceOf ['LibUI::Control'] ] => Void );

@@ -1,13 +1,13 @@
 ---
 abstract: 'Data description and validation'
 author:
-  - 'Laurent Dami <laurent.dami@justice.ge.ch>'
+  - 'Laurent Dami <dami@cpan.org>'
 build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Data-Domain
 provides:
   Data::Domain:
     file: lib/Data/Domain.pm
-    version: '1.07'
+    version: '1.08'
   Data::Domain::All_of:
     file: lib/Data/Domain.pm
   Data::Domain::Date:
@@ -54,9 +54,11 @@ requires:
   Try::Tiny: '0'
   autouse: '0'
   experimental: '0'
+  match::simple: '0'
+  match::simple::XS: '0'
   perl: '5.010001'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Data-Domain
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

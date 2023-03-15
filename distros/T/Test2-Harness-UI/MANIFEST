@@ -49,7 +49,9 @@ lib/Test2/Harness/UI/Controller/Sweeper.pm
 lib/Test2/Harness/UI/Controller/Upload.pm
 lib/Test2/Harness/UI/Controller/User.pm
 lib/Test2/Harness/UI/Controller/View.pm
+lib/Test2/Harness/UI/Dumper.pm
 lib/Test2/Harness/UI/Importer.pm
+lib/Test2/Harness/UI/Loader.pm
 lib/Test2/Harness/UI/Queries.pm
 lib/Test2/Harness/UI/Request.pm
 lib/Test2/Harness/UI/Response.pm
@@ -188,15 +190,19 @@ lib/Test2/Harness/UI/Schema/Result/SourceSub.pm
 lib/Test2/Harness/UI/Schema/Result/Sweep.pm
 lib/Test2/Harness/UI/Schema/Result/TestFile.pm
 lib/Test2/Harness/UI/Schema/Result/User.pm
+lib/Test2/Harness/UI/Schema/ResultBase.pm
 lib/Test2/Harness/UI/Schema/ResultSet.pm
 lib/Test2/Harness/UI/Sweeper.pm
+lib/Test2/Harness/UI/UUID.pm
 lib/Test2/Harness/UI/Util.pm
 lib/Test2/Harness/UI/Util/DateTimeFormat.pm
 lib/Test2/Harness/UI/Util/Errors.pm
 lib/Test2/Harness/UI/Util/HashBase.pm
 lib/Test2/Harness/UI/Util/ImportModes.pm
 scripts/yath-ui-backfill.pl
+scripts/yath-ui-dumper.pl
 scripts/yath-ui-importer.pl
+scripts/yath-ui-loader.pl
 scripts/yath-ui-sweeper.pl
 share/css/dashboard.css
 share/css/datatables.min.css
@@ -291,4 +297,5 @@ t/lib/Test2/Harness/DB/Postgresql.pm
 t/simple.json
 t/simple.t
 t/util.t
+t/uuid.t
 xt/author/pod-syntax.t

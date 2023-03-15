@@ -40,3 +40,9 @@
   -- Added uploadFile interface
 1.013
   -- Fixed the readme file
+1.014
+  -- Added retry for 404 ( these are super common )
+	-- fixed missing method retryTimeout, now has a default value of 1 second
+1.015
+  -- Changed the default api url from: https://api.ciscospark.com/v1/ To:  https://webexapis.com/v1/
+

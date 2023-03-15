@@ -13,6 +13,8 @@
 ;# Usage: &printflush(FILEHANDLE, "prompt: ")
 ;# prints arguments and flushes filehandle
 
+no warnings "ambiguous";
+
 sub flush {
     local($old) = select(shift);
     $| = 1;

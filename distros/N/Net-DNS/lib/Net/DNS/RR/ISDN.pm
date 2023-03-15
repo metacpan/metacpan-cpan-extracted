@@ -2,7 +2,7 @@ package Net::DNS::RR::ISDN;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: ISDN.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: ISDN.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,8 +19,7 @@ use Net::DNS::Text;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	( $self->{address}, $offset ) = Net::DNS::Text->decode( $data, $offset );
 	( $self->{sa},	    $offset ) = Net::DNS::Text->decode( $data, $offset );
@@ -45,10 +44,10 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->address(shift);
-	$self->sa(@_);
+	$self->address( shift @argument );
+	$self->sa(@argument);
 	return;
 }
 
@@ -62,17 +61,15 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub address {
-	my $self = shift;
-
-	$self->{address} = Net::DNS::Text->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{address} = Net::DNS::Text->new($_) }
 	return $self->{address} ? $self->{address}->value : undef;
 }
 
 
 sub sa {
-	my $self = shift;
-
-	$self->{sa} = Net::DNS::Text->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{sa} = Net::DNS::Text->new($_) }
 	return $self->{sa} ? $self->{sa}->value : undef;
 }
 
@@ -152,6 +149,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1183 Section 3.2
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC1183(3.2)|https://tools.ietf.org/html/rfc1183>
 
 =cut

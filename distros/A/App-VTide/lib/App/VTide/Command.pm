@@ -16,7 +16,7 @@ use Path::Tiny;
 use YAML::Syck;
 use List::MoreUtils qw/uniq/;
 
-our $VERSION = version->new('0.1.20');
+our $VERSION = version->new('0.1.21');
 
 has [qw/ defaults options /] => ( is => 'rw', );
 
@@ -152,7 +152,7 @@ App::VTide::Command - Base class for VTide sub commands
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command version 0.1.20
+This documentation refers to App::VTide::Command version 0.1.21
 
 =head1 SYNOPSIS
 

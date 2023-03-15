@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 our $schema = ['perl::modname_with_optional_args' => {
     summary => 'Shorter alias for perl::modname_with_optional_args',
@@ -27,7 +27,7 @@ Sah::Schema::perl::modargs - Shorter alias for perl::modname_with_optional_args
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SYNOPSIS
 

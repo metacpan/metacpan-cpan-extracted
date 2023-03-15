@@ -1,4 +1,4 @@
-package LibUI::Grid 0.01 {
+package LibUI::Grid 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -9,29 +9,28 @@ package LibUI::Grid 0.01 {
     #
     affix(
         LibUI::lib(),
-        'uiGridAppend',
+        [ 'uiGridAppend', 'append' ],
         [   InstanceOf ['LibUI::Grid'],
             InstanceOf ['LibUI::Control'],
             Int, Int, Int, Int, Int, LibUI::Align, Int, LibUI::Align
-        ] => Void,
-        'append'
+        ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiGridInsertAt',
+        [ 'uiGridInsertAt', 'insertAt' ],
         [   InstanceOf ['LibUI::Grid'],
             InstanceOf ['LibUI::Control'],
             InstanceOf ['LibUI::Control'],
             LibUI::At, Int, Int, Int, LibUI::Align, Int, LibUI::Align
-        ] => Void,
-        'insertAt'
+        ] => Void
     );
-    affix( LibUI::lib(), 'uiGridPadded', [ InstanceOf ['LibUI::Grid'] ] => Int, 'padded' );
+    affix( LibUI::lib(), [ 'uiGridPadded', 'padded' ], [ InstanceOf ['LibUI::Grid'] ] => Int );
     affix(
-        LibUI::lib(), 'uiGridSetPadded', [ InstanceOf ['LibUI::Grid'], Int ] => Void,
-        'setPadded'
+        LibUI::lib(),
+        [ 'uiGridSetPadded',          'setPadded' ],
+        [ InstanceOf ['LibUI::Grid'], Int ] => Void
     );
-    affix( LibUI::lib(), 'uiNewGrid', [Void] => InstanceOf ['LibUI::Grid'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewGrid', 'new' ], [Void] => InstanceOf ['LibUI::Grid'] );
 };
 1;
 #
@@ -53,8 +52,9 @@ LibUI::Grid - Control Container to Arrange Containing Controls in a Grid
     use LibUI::Align qw[Center Fill];
     use LibUI::At    qw[Bottom];
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $grid   = LibUI::Grid->new();
     my $lbl    = LibUI::Label->new('Top Left');
     $grid->append( $lbl,                           0, 0, 1, 1, 1, Fill, 1, Fill );

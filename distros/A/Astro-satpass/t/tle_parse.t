@@ -40,7 +40,7 @@ EOD
 
 isa_ok $got->get( 'sun' ), 'My::Module::Sun';
 
-is $got->get( 'international' ), ' 8  2B',
+is $got->get( 'international' ), '08002B',
     q{Got expected 'international' value};
 
 foreach my $attr ( qw{ id epoch firstderivative secondderivative
@@ -65,7 +65,7 @@ EOD
     'Parse TLE with leading spaces, Space Track format.'
     or diag $@;
 
-is $got->get( 'international' ), ' 8  2B',
+is $got->get( 'international' ), '08002B',
     q{Got expected 'international' value};
 
 foreach my $attr ( qw{ id epoch firstderivative secondderivative

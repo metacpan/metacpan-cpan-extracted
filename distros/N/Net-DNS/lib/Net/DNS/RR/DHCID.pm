@@ -2,7 +2,7 @@ package Net::DNS::RR::DHCID;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DHCID.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: DHCID.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,8 +19,7 @@ use MIME::Base64;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $size = $self->{rdlength} - 3;
 	@{$self}{qw(identifiertype digesttype digest)} = unpack "\@$offset nC a$size", $$data;
@@ -44,9 +43,9 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	my $data = MIME::Base64::decode( join "", @_ );
+	my $data = MIME::Base64::decode( join "", @argument );
 	my $size = length($data) - 3;
 	@{$self}{qw(identifiertype digesttype digest)} = unpack "n C a$size", $data;
 	return;
@@ -73,25 +72,22 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 
 sub identifiertype {
-	my $self = shift;
-
-	$self->{identifiertype} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{identifiertype} = 0 + $_ }
 	return $self->{identifiertype} || 0;
 }
 
 
 sub digesttype {
-	my $self = shift;
-
-	$self->{digesttype} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{digesttype} = 0 + $_ }
 	return $self->{digesttype} || 0;
 }
 
 
 sub digest {
-	my $self = shift;
-
-	$self->{digest} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{digest} = $_ }
 	return $self->{digest} || "";
 }
 
@@ -182,6 +178,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4701
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC4701|https://tools.ietf.org/html/rfc4701>
 
 =cut

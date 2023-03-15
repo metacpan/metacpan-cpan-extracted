@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'Sys::Time';
+use SPVM 'Sys::OS';
 use SPVM 'Sys';
 use SPVM 'Int';
 
@@ -52,10 +53,10 @@ else {
   
   my $obj_major_version = SPVM::Int->new(0);
 
-  if (SPVM::Sys->defined('__APPLE__')) {
+  if (SPVM::Sys::OS->defined('__APPLE__')) {
     $clock_nanosleep_supported = 0;
   }
-  elsif (SPVM::Sys->defined('__FreeBSD__', $obj_major_version)) {
+  elsif (SPVM::Sys::OS->defined('__FreeBSD__', $obj_major_version)) {
     my $major_version = $obj_major_version->value;
     if ($major_version >= 13) {
       $clock_nanosleep_supported = 1;

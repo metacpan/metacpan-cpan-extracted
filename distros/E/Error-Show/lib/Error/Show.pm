@@ -23,7 +23,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} });
 our @EXPORT = qw();
 
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 use constant DEBUG=>undef;
 use enum ("PACKAGE=0",qw<FILENAME LINE SUBROUTINE 
   HASARGS WANTARRAY EVALTEXT IS_REQUIRE HINTS BITMASK 
@@ -230,18 +230,19 @@ sub text_output {
   my %opts=@_;
   my $total="";
 
+  DEBUG and say STDERR "Reverse flag in text output set to: $opts{reverse}";
+
   # Sort by sequence number 
   # Errors are stored by filename internally. Sort by sequence number.
   #
 
-  
   my @sorted_info= 
-    sort { $a->[SEQUENCE] <=> $b->[SEQUENCE] } 
-    map { $_->@* } values %$info_ref;
+    sort {$a->[SEQUENCE] <=> $b->[SEQUENCE] } 
+    map {  $_->@* } values %$info_ref;
 
   # Reverse the order if we want the first error listed last
   #
-  @sorted_info=reverse (@sorted_info)if $opts{reverse};
+  @sorted_info=reverse (@sorted_info) if $opts{reverse};
 
   # Process each of the errors in sequence
   my $counter=0;
@@ -337,8 +338,8 @@ sub text_output {
     #Change min and max to one based index
     #$min++;
     #$max--;
-    DEBUG and say "min before print $min";
-    DEBUG and say "max before print $max";
+    DEBUG and say STDERR "min before print $min";
+    DEBUG and say STDERR "max before print $max";
     for my $l($min..$max){
       $mark="";
 
@@ -440,7 +441,6 @@ sub context{
     $opts{error}=delete $opts{frames};
   }
   
-
   # Convert from supported exceptions classes to internal format
 
   my $ref=ref $opts{error};
@@ -452,25 +452,29 @@ sub context{
   }
   elsif($ref eq "ARRAY" and ref($opts{error}[0]) eq ""){
     # Array of scalars  - a normal stack frame - wrap it
-    $opts{error}=[$opts{error}];
+    $opts{error}=[[$opts{error}->@*]];
   }
   elsif($ref eq ""){
     # Not a reference - A string error 
   }
   elsif($ref eq "ARRAY" and ref($opts{error}[0]) eq "ARRAY"){
     # Array of  arrays of scalars
+    $opts{error}=[map { [$_->@*] } $opts{error}->@* ];
     
   }
   elsif($ref eq "ARRAY" and blessed($opts{error}[0]) eq $dstf){
     #Array of DSTF object
   }
   else {
-    #warn "Expecting a string, caller() type array or a $dstf object, or arrays of these";
+    # Force stringification of error as a last ditch attempt
     $opts{error}="$opts{error}";
   }
   
+  DEBUG and say STDERR "Reverse flag set to: $opts{reverse}";
 
-
+  # Reverse the ordering of errors here if requested
+  #
+  $opts{error}->@*=reverse $opts{error}->@* if $opts{reverse};
   # Check for trace kv pair. If this is present. We ignore the error
   #
   if(ref($opts{error}) eq "ARRAY" and ref $opts{error}[0]){
@@ -479,6 +483,7 @@ sub context{
     my $current_indent="";
 
     my %_opts=%opts;
+    my $i=0;  #Sequence number
     for my $e ($opts{error}->@*) {
 
       if((blessed($e)//"") eq "Devel::StackTrace::Frame"){
@@ -497,17 +502,21 @@ sub context{
         $a[HINT_HASH]=$e->hints;
         $e=\@a;
       }
+
+
       if($e->[FILENAME] and $e->[LINE]){
         $e->[MESSAGE]//="";
 
         #Force a message if one is provided
         $e->[LINE]--; #Make the error 0 based
         $e->[MESSAGE]=$opts{message} if $opts{message};
+        $e->[SEQUENCE]=$i++;
+        
+        # Generate the context here
+        #
         $_opts{indent}=$current_indent;
-
         $_opts{error}=$e;
         $out.=_context %_opts;
-
         $current_indent.=$_indent;
       }
       else{

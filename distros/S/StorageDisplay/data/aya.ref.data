@@ -1,5 +1,8 @@
 $VAR1 = {
           'disks-no-part' => {
+                               'md121' => {
+                                            'no partitions' => 1
+                                          },
                                'md122' => {
                                             'no partitions' => 1
                                           },
@@ -221,12 +224,30 @@ $VAR1 = {
                                  'DM_NAME' => 'aya+raid1-kvm--win11--c',
                                  'DM_SUBSYSTEM' => 'LVM'
                                },
+                    'dm-39' => {
+                                 'DM_BLKDEVNAME' => 'dm-39',
+                                 'DM_BLKDEVS_USED' => 'md121',
+                                 'DM_NAME' => 'aya+raid0-sid--amd64',
+                                 'DM_SUBSYSTEM' => 'LVM'
+                               },
                     'dm-4' => {
                                 'DM_BLKDEVNAME' => 'dm-4',
                                 'DM_BLKDEVS_USED' => 'md126',
                                 'DM_NAME' => 'aya+raid6-multimedia',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
+                    'dm-40' => {
+                                 'DM_BLKDEVNAME' => 'dm-40',
+                                 'DM_BLKDEVS_USED' => 'md121',
+                                 'DM_NAME' => 'aya+raid0-sbuild',
+                                 'DM_SUBSYSTEM' => 'LVM'
+                               },
+                    'dm-41' => {
+                                 'DM_BLKDEVNAME' => 'dm-41',
+                                 'DM_BLKDEVS_USED' => 'md121',
+                                 'DM_NAME' => 'aya+raid0-swap',
+                                 'DM_SUBSYSTEM' => 'LVM'
+                               },
                     'dm-5' => {
                                 'DM_BLKDEVNAME' => 'dm-5',
                                 'DM_BLKDEVS_USED' => 'md122',
@@ -259,12 +280,26 @@ $VAR1 = {
                               }
                   },
           'fs' => {
+                    '/dev/dm-41' => {
+                                      'free' => '53687087104',
+                                      'fstype' => 'partition',
+                                      'mountpoint' => 'SWAP',
+                                      'size' => '53687087104',
+                                      'used' => '0'
+                                    },
+                    '/dev/mapper/aya+raid0-sbuild' => {
+                                                        'free' => '46014586880',
+                                                        'fstype' => 'ext4',
+                                                        'mountpoint' => '/var/lib/sbuild/build',
+                                                        'size' => '52521566208',
+                                                        'used' => '3805847552'
+                                                      },
                     '/dev/mapper/aya+raid1-backuppc' => {
-                                                          'free' => '1173791088640',
+                                                          'free' => '1233141743616',
                                                           'fstype' => 'ext4',
                                                           'mountpoint' => '/srv/backuppc',
                                                           'size' => '3246567366656',
-                                                          'used' => '2034388852736'
+                                                          'used' => '1975038197760'
                                                         },
                     '/dev/mapper/aya+raid1-kvm' => {
                                                      'free' => '28436135936',
@@ -274,25 +309,25 @@ $VAR1 = {
                                                      'used' => '77098782720'
                                                    },
                     '/dev/mapper/aya+raid1-log' => {
-                                                     'free' => '1641848832',
+                                                     'free' => '4548075520',
                                                      'fstype' => 'ext4',
                                                      'mountpoint' => '/var/log',
                                                      'size' => '6196658176',
-                                                     'used' => '4215910400'
+                                                     'used' => '1309683712'
                                                    },
                     '/dev/mapper/aya+raid1-root' => {
-                                                      'free' => '1301221376',
+                                                      'free' => '1147207680',
                                                       'fstype' => 'ext4',
                                                       'mountpoint' => '/',
                                                       'size' => '42141351936',
-                                                      'used' => '40823353344'
+                                                      'used' => '40977367040'
                                                     },
                     '/dev/mapper/aya+raid6-archives' => {
-                                                          'free' => '550769012736',
+                                                          'free' => '530284736512',
                                                           'fstype' => 'ext4',
                                                           'mountpoint' => '/srv/archives',
                                                           'size' => '1623259533312',
-                                                          'used' => '1072473743360'
+                                                          'used' => '1092958019584'
                                                         },
                     '/dev/mapper/aya+raid6-multimedia' => {
                                                             'free' => '216375898112',
@@ -302,11 +337,11 @@ $VAR1 = {
                                                             'used' => '1848013475840'
                                                           },
                     '/dev/mapper/aya+raid6-photos' => {
-                                                        'free' => '977540358144',
+                                                        'free' => '994006925312',
                                                         'fstype' => 'ext4',
                                                         'mountpoint' => '/srv/photos',
                                                         'size' => '2164384514048',
-                                                        'used' => '1186827378688'
+                                                        'used' => '1170360811520'
                                                       },
                     '/dev/mapper/aya+raid6-rushes' => {
                                                         'free' => '371998908416',
@@ -323,20 +358,21 @@ $VAR1 = {
                                           'used' => '93331456'
                                         },
                     '/dev/sdb6' => {
-                                     'free' => '52132122624',
+                                     'free' => '50011533312',
                                      'fstype' => 'partition',
                                      'mountpoint' => 'SWAP',
                                      'size' => '52613345280',
-                                     'used' => '481222656'
+                                     'used' => '2601811968'
                                    },
                     '/dev/sdf4' => {
-                                     'free' => '598036480',
+                                     'free' => '700837888',
                                      'fstype' => 'ext4',
                                      'mountpoint' => '/boot',
                                      'size' => '1022013440',
-                                     'used' => '353513472'
+                                     'used' => '250712064'
                                    }
                   },
+          'hostname' => 'aya',
           'libvirt' => {
                          'alastor' => {
                                         'blocks' => {
@@ -473,6 +509,7 @@ $VAR1 = {
                                                                                            },
                                                     '/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso' => {
                                                                                                         'device' => 'cdrom',
+                                                                                                        'file-size' => '352321536',
                                                                                                         'mount-point' => '/srv/kvm',
                                                                                                         'source' => '/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso',
                                                                                                         'target' => 'sdb',
@@ -547,6 +584,7 @@ $VAR1 = {
                                                                                     },
                                                     '/srv/kvm/cds/virtio-win-0.1.185.iso' => {
                                                                                                'device' => 'cdrom',
+                                                                                               'file-size' => '412479488',
                                                                                                'mount-point' => '/srv/kvm',
                                                                                                'source' => '/srv/kvm/cds/virtio-win-0.1.185.iso',
                                                                                                'target' => 'hdb',
@@ -582,6 +620,7 @@ $VAR1 = {
                                                                                       },
                                                      '/srv/kvm/cds/sdcard' => {
                                                                                 'device' => 'disk',
+                                                                                'file-size' => '2014838784',
                                                                                 'mount-point' => '/srv/kvm',
                                                                                 'source' => '/srv/kvm/cds/sdcard',
                                                                                 'target' => 'vdc',
@@ -606,6 +645,7 @@ $VAR1 = {
                                                                                     },
                                                     '/srv/kvm/cds/virtio-win-0.1.118.iso' => {
                                                                                                'device' => 'cdrom',
+                                                                                               'file-size' => '56967168',
                                                                                                'mount-point' => '/srv/kvm',
                                                                                                'source' => '/srv/kvm/cds/virtio-win-0.1.118.iso',
                                                                                                'target' => 'hdc',
@@ -618,6 +658,7 @@ $VAR1 = {
                                        'blocks' => {
                                                      '/srv/kvm/cds/virtio-win-0.1-59.iso' => {
                                                                                                'device' => 'cdrom',
+                                                                                               'file-size' => '62025728',
                                                                                                'mount-point' => '/srv/kvm',
                                                                                                'source' => '/srv/kvm/cds/virtio-win-0.1-59.iso',
                                                                                                'target' => 'hdc',
@@ -625,6 +666,7 @@ $VAR1 = {
                                                                                              },
                                                      '/srv/kvm/winwin/base_winXP+FF+WinSCP.img' => {
                                                                                                      'device' => 'disk',
+                                                                                                     'file-size' => '8798445568',
                                                                                                      'mount-point' => '/srv/kvm',
                                                                                                      'source' => '/srv/kvm/winwin/base_winXP+FF+WinSCP.img',
                                                                                                      'target' => 'vda',
@@ -714,11 +756,11 @@ $VAR1 = {
                                    'disc-gran' => 0,
                                    'disc-max' => 0,
                                    'disc-zero' => [],
-                                   'fsavail' => '977540358144',
+                                   'fsavail' => '994006925312',
                                    'fssize' => '2164384514048',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '55%',
-                                   'fsused' => '1186827378688',
+                                   'fsuse%' => '54%',
+                                   'fsused' => '1170360811520',
                                    'fsver' => '1.0',
                                    'group' => 'disk',
                                    'hctl' => undef,
@@ -771,11 +813,11 @@ $VAR1 = {
                                     'disc-gran' => 512,
                                     'disc-max' => '2199023255040',
                                     'disc-zero' => [],
-                                    'fsavail' => '1301213184',
+                                    'fsavail' => '1147219968',
                                     'fssize' => '42141351936',
                                     'fstype' => 'ext4',
                                     'fsuse%' => '97%',
-                                    'fsused' => '40823361536',
+                                    'fsused' => '40977354752',
                                     'fsver' => '1.0',
                                     'group' => 'disk',
                                     'hctl' => undef,
@@ -787,7 +829,7 @@ $VAR1 = {
                                     'min-io' => 512,
                                     'mode' => 'brw-rw----',
                                     'model' => undef,
-                                    'mountpoint' => '/mnt/mnt1',
+                                    'mountpoint' => '/',
                                     'name' => 'aya+raid1-root',
                                     'opt-io' => 0,
                                     'owner' => 'root',
@@ -1341,11 +1383,11 @@ $VAR1 = {
                                    'disc-gran' => 0,
                                    'disc-max' => 0,
                                    'disc-zero' => [],
-                                   'fsavail' => '550769012736',
+                                   'fsavail' => '530284736512',
                                    'fssize' => '1623259533312',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '66%',
-                                   'fsused' => '1072473743360',
+                                   'fsuse%' => '67%',
+                                   'fsused' => '1092958019584',
                                    'fsver' => '1.0',
                                    'group' => 'disk',
                                    'hctl' => undef,
@@ -1398,11 +1440,11 @@ $VAR1 = {
                                     'disc-gran' => 0,
                                     'disc-max' => 0,
                                     'disc-zero' => [],
-                                    'fsavail' => '1641861120',
+                                    'fsavail' => '4548087808',
                                     'fssize' => '6196658176',
                                     'fstype' => 'ext4',
-                                    'fsuse%' => '68%',
-                                    'fsused' => '4215898112',
+                                    'fsuse%' => '21%',
+                                    'fsused' => '1309671424',
                                     'fsver' => '1.0',
                                     'group' => 'disk',
                                     'hctl' => undef,
@@ -2253,11 +2295,11 @@ $VAR1 = {
                                     'disc-gran' => 0,
                                     'disc-max' => 0,
                                     'disc-zero' => [],
-                                    'fsavail' => '1173791088640',
+                                    'fsavail' => '1233141743616',
                                     'fssize' => '3246567366656',
                                     'fstype' => 'ext4',
-                                    'fsuse%' => '63%',
-                                    'fsused' => '2034388852736',
+                                    'fsuse%' => '61%',
+                                    'fsused' => '1975038197760',
                                     'fsver' => '1.0',
                                     'group' => 'disk',
                                     'hctl' => undef,
@@ -2531,6 +2573,63 @@ $VAR1 = {
                                     'wwn' => undef,
                                     'zoned' => 'none'
                                   },
+                       'dm-39' => {
+                                    'alignment' => 0,
+                                    'dax' => [],
+                                    'disc-aln' => 0,
+                                    'disc-gran' => 512,
+                                    'disc-max' => '2199023255040',
+                                    'disc-zero' => [],
+                                    'fsavail' => undef,
+                                    'fssize' => undef,
+                                    'fstype' => 'ext4',
+                                    'fsuse%' => undef,
+                                    'fsused' => undef,
+                                    'fsver' => '1.0',
+                                    'group' => 'disk',
+                                    'hctl' => undef,
+                                    'hotplug' => [],
+                                    'kname' => 'dm-39',
+                                    'label' => 'sb:sid-amd64',
+                                    'log-sec' => 512,
+                                    'maj:min' => '253:39',
+                                    'min-io' => 524288,
+                                    'mode' => 'brw-rw----',
+                                    'model' => undef,
+                                    'mountpoint' => undef,
+                                    'name' => 'aya+raid0-sid--amd64',
+                                    'opt-io' => 1048576,
+                                    'owner' => 'root',
+                                    'partflags' => undef,
+                                    'partlabel' => undef,
+                                    'parttype' => undef,
+                                    'parttypename' => undef,
+                                    'partuuid' => undef,
+                                    'path' => '/dev/mapper/aya+raid0-sid--amd64',
+                                    'phy-sec' => 512,
+                                    'pkname' => 'md121',
+                                    'pttype' => undef,
+                                    'ptuuid' => undef,
+                                    'ra' => 2048,
+                                    'rand' => [],
+                                    'rev' => undef,
+                                    'rm' => [],
+                                    'ro' => [],
+                                    'rota' => [],
+                                    'rq-size' => 128,
+                                    'sched' => undef,
+                                    'serial' => undef,
+                                    'size' => '10737418240',
+                                    'state' => 'running',
+                                    'subsystems' => 'block',
+                                    'tran' => undef,
+                                    'type' => 'lvm',
+                                    'uuid' => '27785d0f-8f17-42e9-9e57-b094e79dba5a',
+                                    'vendor' => undef,
+                                    'wsame' => 0,
+                                    'wwn' => undef,
+                                    'zoned' => 'none'
+                                  },
                        'dm-4' => {
                                    'alignment' => 0,
                                    'dax' => [],
@@ -2588,6 +2687,120 @@ $VAR1 = {
                                    'wwn' => undef,
                                    'zoned' => 'none'
                                  },
+                       'dm-40' => {
+                                    'alignment' => 0,
+                                    'dax' => [],
+                                    'disc-aln' => 0,
+                                    'disc-gran' => 512,
+                                    'disc-max' => '2199023255040',
+                                    'disc-zero' => [],
+                                    'fsavail' => '46014586880',
+                                    'fssize' => '52521566208',
+                                    'fstype' => 'ext4',
+                                    'fsuse%' => '7%',
+                                    'fsused' => '3805847552',
+                                    'fsver' => '1.0',
+                                    'group' => 'disk',
+                                    'hctl' => undef,
+                                    'hotplug' => [],
+                                    'kname' => 'dm-40',
+                                    'label' => 'aya:SBUILDFS',
+                                    'log-sec' => 512,
+                                    'maj:min' => '253:40',
+                                    'min-io' => 524288,
+                                    'mode' => 'brw-rw----',
+                                    'model' => undef,
+                                    'mountpoint' => '/var/lib/sbuild/build',
+                                    'name' => 'aya+raid0-sbuild',
+                                    'opt-io' => 1048576,
+                                    'owner' => 'root',
+                                    'partflags' => undef,
+                                    'partlabel' => undef,
+                                    'parttype' => undef,
+                                    'parttypename' => undef,
+                                    'partuuid' => undef,
+                                    'path' => '/dev/mapper/aya+raid0-sbuild',
+                                    'phy-sec' => 512,
+                                    'pkname' => 'md121',
+                                    'pttype' => undef,
+                                    'ptuuid' => undef,
+                                    'ra' => 2048,
+                                    'rand' => [],
+                                    'rev' => undef,
+                                    'rm' => [],
+                                    'ro' => [],
+                                    'rota' => [],
+                                    'rq-size' => 128,
+                                    'sched' => undef,
+                                    'serial' => undef,
+                                    'size' => '53687091200',
+                                    'state' => 'running',
+                                    'subsystems' => 'block',
+                                    'tran' => undef,
+                                    'type' => 'lvm',
+                                    'uuid' => 'd482ae6a-c65c-4ca1-b2b7-b94428c51f8f',
+                                    'vendor' => undef,
+                                    'wsame' => 0,
+                                    'wwn' => undef,
+                                    'zoned' => 'none'
+                                  },
+                       'dm-41' => {
+                                    'alignment' => 0,
+                                    'dax' => [],
+                                    'disc-aln' => 0,
+                                    'disc-gran' => 512,
+                                    'disc-max' => '2199023255040',
+                                    'disc-zero' => [],
+                                    'fsavail' => undef,
+                                    'fssize' => undef,
+                                    'fstype' => 'swap',
+                                    'fsuse%' => undef,
+                                    'fsused' => undef,
+                                    'fsver' => '1',
+                                    'group' => 'disk',
+                                    'hctl' => undef,
+                                    'hotplug' => [],
+                                    'kname' => 'dm-41',
+                                    'label' => 'aya:SWAPFS2',
+                                    'log-sec' => 512,
+                                    'maj:min' => '253:41',
+                                    'min-io' => 524288,
+                                    'mode' => 'brw-rw----',
+                                    'model' => undef,
+                                    'mountpoint' => '[SWAP]',
+                                    'name' => 'aya+raid0-swap',
+                                    'opt-io' => 1048576,
+                                    'owner' => 'root',
+                                    'partflags' => undef,
+                                    'partlabel' => undef,
+                                    'parttype' => undef,
+                                    'parttypename' => undef,
+                                    'partuuid' => undef,
+                                    'path' => '/dev/mapper/aya+raid0-swap',
+                                    'phy-sec' => 512,
+                                    'pkname' => 'md121',
+                                    'pttype' => undef,
+                                    'ptuuid' => undef,
+                                    'ra' => 2048,
+                                    'rand' => [],
+                                    'rev' => undef,
+                                    'rm' => [],
+                                    'ro' => [],
+                                    'rota' => [],
+                                    'rq-size' => 128,
+                                    'sched' => undef,
+                                    'serial' => undef,
+                                    'size' => '53687091200',
+                                    'state' => 'running',
+                                    'subsystems' => 'block',
+                                    'tran' => undef,
+                                    'type' => 'lvm',
+                                    'uuid' => '961f6ee6-b019-4258-ba41-4d76d7d9b624',
+                                    'vendor' => undef,
+                                    'wsame' => 0,
+                                    'wwn' => undef,
+                                    'zoned' => 'none'
+                                  },
                        'dm-5' => {
                                    'alignment' => 0,
                                    'dax' => [],
@@ -3329,6 +3542,63 @@ $VAR1 = {
                                     'wwn' => undef,
                                     'zoned' => 'none'
                                   },
+                       'md121' => {
+                                    'alignment' => 0,
+                                    'dax' => [],
+                                    'disc-aln' => 0,
+                                    'disc-gran' => 512,
+                                    'disc-max' => '2199023255040',
+                                    'disc-zero' => [],
+                                    'fsavail' => undef,
+                                    'fssize' => undef,
+                                    'fstype' => 'LVM2_member',
+                                    'fsuse%' => undef,
+                                    'fsused' => undef,
+                                    'fsver' => 'LVM2 001',
+                                    'group' => 'disk',
+                                    'hctl' => undef,
+                                    'hotplug' => [],
+                                    'kname' => 'md121',
+                                    'label' => undef,
+                                    'log-sec' => 512,
+                                    'maj:min' => '9:121',
+                                    'min-io' => 524288,
+                                    'mode' => 'brw-rw----',
+                                    'model' => undef,
+                                    'mountpoint' => undef,
+                                    'name' => 'md121',
+                                    'opt-io' => 1048576,
+                                    'owner' => 'root',
+                                    'partflags' => undef,
+                                    'partlabel' => undef,
+                                    'parttype' => undef,
+                                    'parttypename' => undef,
+                                    'partuuid' => undef,
+                                    'path' => '/dev/md121',
+                                    'phy-sec' => 512,
+                                    'pkname' => 'nvme0n1p6',
+                                    'pttype' => undef,
+                                    'ptuuid' => undef,
+                                    'ra' => 2048,
+                                    'rand' => [],
+                                    'rev' => undef,
+                                    'rm' => [],
+                                    'ro' => [],
+                                    'rota' => [],
+                                    'rq-size' => 128,
+                                    'sched' => undef,
+                                    'serial' => undef,
+                                    'size' => '536600379392',
+                                    'state' => undef,
+                                    'subsystems' => 'block',
+                                    'tran' => undef,
+                                    'type' => 'raid0',
+                                    'uuid' => 'P8t4Ud-n2Th-OWWg-i7G1-5nu3-U7BO-19n5T8',
+                                    'vendor' => undef,
+                                    'wsame' => 0,
+                                    'wwn' => undef,
+                                    'zoned' => 'none'
+                                  },
                        'md122' => {
                                     'alignment' => 0,
                                     'dax' => [],
@@ -4013,6 +4283,63 @@ $VAR1 = {
                                         'wwn' => 'eui.ace42e718000d8b3',
                                         'zoned' => 'none'
                                       },
+                       'nvme0n1p6' => {
+                                        'alignment' => 0,
+                                        'dax' => [],
+                                        'disc-aln' => 0,
+                                        'disc-gran' => 512,
+                                        'disc-max' => '2199023255040',
+                                        'disc-zero' => [],
+                                        'fsavail' => undef,
+                                        'fssize' => undef,
+                                        'fstype' => 'linux_raid_member',
+                                        'fsuse%' => undef,
+                                        'fsused' => undef,
+                                        'fsver' => '1.2',
+                                        'group' => 'disk',
+                                        'hctl' => undef,
+                                        'hotplug' => [],
+                                        'kname' => 'nvme0n1p6',
+                                        'label' => 'aya:aya-raid0-A',
+                                        'log-sec' => 512,
+                                        'maj:min' => '259:9',
+                                        'min-io' => 512,
+                                        'mode' => 'brw-rw----',
+                                        'model' => undef,
+                                        'mountpoint' => undef,
+                                        'name' => 'nvme0n1p6',
+                                        'opt-io' => 0,
+                                        'owner' => 'root',
+                                        'partflags' => undef,
+                                        'partlabel' => 'aya-raid0-A1',
+                                        'parttype' => 'a19d880f-05fc-4d3b-a006-743f0f84911e',
+                                        'parttypename' => 'Linux RAID',
+                                        'partuuid' => '5ec0cb65-e03b-4e4a-9beb-c7f255c37919',
+                                        'path' => '/dev/nvme0n1p6',
+                                        'phy-sec' => 512,
+                                        'pkname' => 'nvme0n1',
+                                        'pttype' => 'gpt',
+                                        'ptuuid' => 'b76822b8-a99d-524f-9087-f387a8490e0a',
+                                        'ra' => 128,
+                                        'rand' => [],
+                                        'rev' => undef,
+                                        'rm' => [],
+                                        'ro' => [],
+                                        'rota' => [],
+                                        'rq-size' => 1023,
+                                        'sched' => 'none',
+                                        'serial' => undef,
+                                        'size' => '268435456000',
+                                        'state' => undef,
+                                        'subsystems' => 'block:nvme:pci',
+                                        'tran' => 'nvme',
+                                        'type' => 'part',
+                                        'uuid' => 'a44f12d1-8d42-8ca9-82d5-6e4838606f68',
+                                        'vendor' => undef,
+                                        'wsame' => 0,
+                                        'wwn' => 'eui.ace42e718000d8b3',
+                                        'zoned' => 'none'
+                                      },
                        'nvme1n1' => {
                                       'alignment' => 0,
                                       'dax' => [],
@@ -4179,6 +4506,63 @@ $VAR1 = {
                                         'tran' => 'nvme',
                                         'type' => 'part',
                                         'uuid' => 'a3868449-8c66-3527-aa67-7fb8430f9851',
+                                        'vendor' => undef,
+                                        'wsame' => 0,
+                                        'wwn' => 'eui.000000000000001000080d020033f310',
+                                        'zoned' => 'none'
+                                      },
+                       'nvme1n1p3' => {
+                                        'alignment' => 0,
+                                        'dax' => [],
+                                        'disc-aln' => 0,
+                                        'disc-gran' => 512,
+                                        'disc-max' => '2199023255040',
+                                        'disc-zero' => [],
+                                        'fsavail' => undef,
+                                        'fssize' => undef,
+                                        'fstype' => 'linux_raid_member',
+                                        'fsuse%' => undef,
+                                        'fsused' => undef,
+                                        'fsver' => '1.2',
+                                        'group' => 'disk',
+                                        'hctl' => undef,
+                                        'hotplug' => [],
+                                        'kname' => 'nvme1n1p3',
+                                        'label' => 'aya:aya-raid0-A',
+                                        'log-sec' => 512,
+                                        'maj:min' => '259:10',
+                                        'min-io' => 512,
+                                        'mode' => 'brw-rw----',
+                                        'model' => undef,
+                                        'mountpoint' => undef,
+                                        'name' => 'nvme1n1p3',
+                                        'opt-io' => 0,
+                                        'owner' => 'root',
+                                        'partflags' => undef,
+                                        'partlabel' => 'aya-raid0-A2',
+                                        'parttype' => 'a19d880f-05fc-4d3b-a006-743f0f84911e',
+                                        'parttypename' => 'Linux RAID',
+                                        'partuuid' => '512b9aed-9ebe-4fa0-a3ea-0305c8f77086',
+                                        'path' => '/dev/nvme1n1p3',
+                                        'phy-sec' => 512,
+                                        'pkname' => 'nvme1n1',
+                                        'pttype' => 'gpt',
+                                        'ptuuid' => '41822ba0-664e-4de6-be7a-8dedc805e5cf',
+                                        'ra' => 128,
+                                        'rand' => [],
+                                        'rev' => undef,
+                                        'rm' => [],
+                                        'ro' => [],
+                                        'rota' => [],
+                                        'rq-size' => 1023,
+                                        'sched' => 'none',
+                                        'serial' => undef,
+                                        'size' => '268435456000',
+                                        'state' => undef,
+                                        'subsystems' => 'block:nvme:pci',
+                                        'tran' => 'nvme',
+                                        'type' => 'part',
+                                        'uuid' => 'a44f12d1-8d42-8ca9-82d5-6e4838606f68',
                                         'vendor' => undef,
                                         'wsame' => 0,
                                         'wwn' => 'eui.000000000000001000080d020033f310',
@@ -5787,11 +6171,11 @@ $VAR1 = {
                                    'disc-gran' => 4096,
                                    'disc-max' => 2147450880,
                                    'disc-zero' => [],
-                                   'fsavail' => '598036480',
+                                   'fsavail' => '700837888',
                                    'fssize' => '1022013440',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '35%',
-                                   'fsused' => '353513472',
+                                   'fsuse%' => '25%',
+                                   'fsused' => '250712064',
                                    'fsver' => '1.0',
                                    'group' => 'disk',
                                    'hctl' => undef,
@@ -6384,6 +6768,30 @@ $VAR1 = {
                                                                                 ],
                                                                   'kname' => 'nvme0n1p5',
                                                                   'name' => 'nvme0n1p5'
+                                                                },
+                                                                {
+                                                                  'children' => [
+                                                                                  {
+                                                                                    'children' => [
+                                                                                                    {
+                                                                                                      'kname' => 'dm-39',
+                                                                                                      'name' => 'aya+raid0-sid--amd64'
+                                                                                                    },
+                                                                                                    {
+                                                                                                      'kname' => 'dm-40',
+                                                                                                      'name' => 'aya+raid0-sbuild'
+                                                                                                    },
+                                                                                                    {
+                                                                                                      'kname' => 'dm-41',
+                                                                                                      'name' => 'aya+raid0-swap'
+                                                                                                    }
+                                                                                                  ],
+                                                                                    'kname' => 'md121',
+                                                                                    'name' => 'md121'
+                                                                                  }
+                                                                                ],
+                                                                  'kname' => 'nvme0n1p6',
+                                                                  'name' => 'nvme0n1p6'
                                                                 }
                                                               ],
                                                 'kname' => 'nvme0n1',
@@ -6434,6 +6842,30 @@ $VAR1 = {
                                                                                 ],
                                                                   'kname' => 'nvme1n1p2',
                                                                   'name' => 'nvme1n1p2'
+                                                                },
+                                                                {
+                                                                  'children' => [
+                                                                                  {
+                                                                                    'children' => [
+                                                                                                    {
+                                                                                                      'kname' => 'dm-39',
+                                                                                                      'name' => 'aya+raid0-sid--amd64'
+                                                                                                    },
+                                                                                                    {
+                                                                                                      'kname' => 'dm-40',
+                                                                                                      'name' => 'aya+raid0-sbuild'
+                                                                                                    },
+                                                                                                    {
+                                                                                                      'kname' => 'dm-41',
+                                                                                                      'name' => 'aya+raid0-swap'
+                                                                                                    }
+                                                                                                  ],
+                                                                                    'kname' => 'md121',
+                                                                                    'name' => 'md121'
+                                                                                  }
+                                                                                ],
+                                                                  'kname' => 'nvme1n1p3',
+                                                                  'name' => 'nvme1n1p3'
                                                                 }
                                                               ],
                                                 'kname' => 'nvme1n1',
@@ -7156,6 +7588,147 @@ $VAR1 = {
                                },
           'luks' => {},
           'lvm' => {
+                     'aya+raid0' => {
+                                      'lvs' => [
+                                                 {
+                                                   'devices' => '/dev/md121(2560)',
+                                                   'lv_name' => 'sbuild',
+                                                   'lv_parent' => '',
+                                                   'pool_lv' => '',
+                                                   'seg_le_ranges' => '/dev/md121:2560-15359',
+                                                   'seg_pe_ranges' => '/dev/md121:2560-15359',
+                                                   'seg_size' => '53687091200B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'linear',
+                                                   'vg_name' => 'aya+raid0'
+                                                 },
+                                                 {
+                                                   'devices' => '/dev/md121(0)',
+                                                   'lv_name' => 'sid-amd64',
+                                                   'lv_parent' => '',
+                                                   'pool_lv' => '',
+                                                   'seg_le_ranges' => '/dev/md121:0-2559',
+                                                   'seg_pe_ranges' => '/dev/md121:0-2559',
+                                                   'seg_size' => '10737418240B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'linear',
+                                                   'vg_name' => 'aya+raid0'
+                                                 },
+                                                 {
+                                                   'devices' => '/dev/md121(15360)',
+                                                   'lv_name' => 'swap',
+                                                   'lv_parent' => '',
+                                                   'pool_lv' => '',
+                                                   'seg_le_ranges' => '/dev/md121:15360-28159',
+                                                   'seg_pe_ranges' => '/dev/md121:15360-28159',
+                                                   'seg_size' => '53687091200B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'linear',
+                                                   'vg_name' => 'aya+raid0'
+                                                 }
+                                               ],
+                                      'pvs' => [
+                                                 {
+                                                   'lv_name' => 'sid-amd64',
+                                                   'lv_role' => 'public',
+                                                   'pv_free' => '418486681600B',
+                                                   'pv_name' => '/dev/md121',
+                                                   'pv_size' => '536598282240B',
+                                                   'pv_used' => '118111600640B',
+                                                   'pvseg_size' => '2560',
+                                                   'pvseg_start' => '0',
+                                                   'seg_size' => '10737418240B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'linear',
+                                                   'vg_name' => 'aya+raid0'
+                                                 },
+                                                 {
+                                                   'lv_name' => 'sbuild',
+                                                   'lv_role' => 'public',
+                                                   'pv_free' => '418486681600B',
+                                                   'pv_name' => '/dev/md121',
+                                                   'pv_size' => '536598282240B',
+                                                   'pv_used' => '118111600640B',
+                                                   'pvseg_size' => '12800',
+                                                   'pvseg_start' => '2560',
+                                                   'seg_size' => '53687091200B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'linear',
+                                                   'vg_name' => 'aya+raid0'
+                                                 },
+                                                 {
+                                                   'lv_name' => 'swap',
+                                                   'lv_role' => 'public',
+                                                   'pv_free' => '418486681600B',
+                                                   'pv_name' => '/dev/md121',
+                                                   'pv_size' => '536598282240B',
+                                                   'pv_used' => '118111600640B',
+                                                   'pvseg_size' => '12800',
+                                                   'pvseg_start' => '15360',
+                                                   'seg_size' => '53687091200B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'linear',
+                                                   'vg_name' => 'aya+raid0'
+                                                 },
+                                                 {
+                                                   'lv_name' => '',
+                                                   'lv_role' => 'public',
+                                                   'pv_free' => '418486681600B',
+                                                   'pv_name' => '/dev/md121',
+                                                   'pv_size' => '536598282240B',
+                                                   'pv_used' => '118111600640B',
+                                                   'pvseg_size' => '99775',
+                                                   'pvseg_start' => '28160',
+                                                   'seg_size' => '418486681600B',
+                                                   'seg_start' => '0B',
+                                                   'segtype' => 'free',
+                                                   'vg_name' => 'aya+raid0'
+                                                 }
+                                               ],
+                                      'vgs-lv' => {
+                                                    'sbuild' => {
+                                                                  'data_percent' => '',
+                                                                  'lv_name' => 'sbuild',
+                                                                  'lv_role' => 'public',
+                                                                  'lv_size' => '53687091200B',
+                                                                  'origin' => '',
+                                                                  'pool_lv' => '',
+                                                                  'vg_name' => 'aya+raid0'
+                                                                },
+                                                    'sid-amd64' => {
+                                                                     'data_percent' => '',
+                                                                     'lv_name' => 'sid-amd64',
+                                                                     'lv_role' => 'public',
+                                                                     'lv_size' => '10737418240B',
+                                                                     'origin' => '',
+                                                                     'pool_lv' => '',
+                                                                     'vg_name' => 'aya+raid0'
+                                                                   },
+                                                    'swap' => {
+                                                                'data_percent' => '',
+                                                                'lv_name' => 'swap',
+                                                                'lv_role' => 'public',
+                                                                'lv_size' => '53687091200B',
+                                                                'origin' => '',
+                                                                'pool_lv' => '',
+                                                                'vg_name' => 'aya+raid0'
+                                                              }
+                                                  },
+                                      'vgs-pv' => {
+                                                    '/dev/md121' => {
+                                                                      'pv_free' => '418486681600B',
+                                                                      'pv_name' => '/dev/md121',
+                                                                      'pv_size' => '536598282240B',
+                                                                      'pv_used' => '118111600640B',
+                                                                      'vg_name' => 'aya+raid0'
+                                                                    }
+                                                  },
+                                      'vgs-vg' => {
+                                                    'vg_free' => '418486681600B',
+                                                    'vg_name' => 'aya+raid0',
+                                                    'vg_size' => '536598282240B'
+                                                  }
+                                    },
                      'aya+raid1' => {
                                       'lvs' => [
                                                  {
@@ -8833,6 +9406,23 @@ $VAR1 = {
                                   }
                    },
           'md' => {
+                    'md121' => {
+                                 'array-size' => '536600379392',
+                                 'devices' => {
+                                                '/dev/nvme0n1p6' => {
+                                                                      'raiddevice' => '0',
+                                                                      'state' => 'active sync'
+                                                                    },
+                                                '/dev/nvme1n1p3' => {
+                                                                      'raiddevice' => '1',
+                                                                      'state' => 'active sync'
+                                                                    }
+                                              },
+                                 'raid-level' => 'raid0',
+                                 'raid-name' => 'aya:aya-raid0-A',
+                                 'raid-state' => 'clean ',
+                                 'raid-version' => '1.2'
+                               },
                     'md122' => {
                                  'array-size' => '1099376361472',
                                  'devices' => {
@@ -9830,11 +10420,19 @@ $VAR1 = {
                                                         },
                                                         {
                                                           'kind' => 'free',
-                                                          'size' => '368966631424',
+                                                          'size' => '100531175424',
                                                           'start' => '105486745600'
                                                         },
                                                         {
-                                                          'flags' => '',
+                                                          'flags' => 'raid',
+                                                          'id' => '6',
+                                                          'kind' => 'part',
+                                                          'label' => 'aya-raid0-A1',
+                                                          'size' => '268435456000',
+                                                          'start' => '206017921024'
+                                                        },
+                                                        {
+                                                          'flags' => 'raid',
                                                           'id' => '5',
                                                           'kind' => 'part',
                                                           'label' => 'aya-raid1-D1',
@@ -9868,11 +10466,19 @@ $VAR1 = {
                                                         },
                                                         {
                                                           'kind' => 'free',
-                                                          'size' => '473823182848',
+                                                          'size' => '205387726848',
                                                           'start' => '630194176'
                                                         },
                                                         {
-                                                          'flags' => '',
+                                                          'flags' => 'raid',
+                                                          'id' => '3',
+                                                          'kind' => 'part',
+                                                          'label' => 'aya-raid0-A2',
+                                                          'size' => '268435456000',
+                                                          'start' => '206017921024'
+                                                        },
+                                                        {
+                                                          'flags' => 'raid',
                                                           'id' => '2',
                                                           'kind' => 'part',
                                                           'label' => 'aya-raid1-D2',
@@ -10480,7 +11086,7 @@ $VAR1 = {
                       'bus/usb/001/002' => {
                                              '_udev_infos' => {
                                                                 'BUSNUM' => '001',
-                                                                'CURRENT_TAGS' => ':uaccess:seat:',
+                                                                'CURRENT_TAGS' => ':seat:uaccess:',
                                                                 'DEVNAME' => '/dev/bus/usb/001/002',
                                                                 'DEVNUM' => '002',
                                                                 'DEVPATH' => '/devices/pci0000:00/0000:00:14.0/usb1/1-1',
@@ -10505,7 +11111,7 @@ $VAR1 = {
                                                                 'MINOR' => '1',
                                                                 'PRODUCT' => '413c/1005/5900',
                                                                 'SUBSYSTEM' => 'usb',
-                                                                'TAGS' => ':uaccess:seat:',
+                                                                'TAGS' => ':seat:uaccess:',
                                                                 'TYPE' => '9/0/0',
                                                                 'USEC_INITIALIZED' => '1973734',
                                                                 'adb_user' => 'yes'
@@ -10557,7 +11163,7 @@ $VAR1 = {
                       'bus/usb/001/004' => {
                                              '_udev_infos' => {
                                                                 'BUSNUM' => '001',
-                                                                'CURRENT_TAGS' => ':uaccess:seat:',
+                                                                'CURRENT_TAGS' => ':seat:uaccess:',
                                                                 'DEVNAME' => '/dev/bus/usb/001/004',
                                                                 'DEVNUM' => '004',
                                                                 'DEVPATH' => '/devices/pci0000:00/0000:00:14.0/usb1/1-1/1-1.1',
@@ -10582,7 +11188,7 @@ $VAR1 = {
                                                                 'MINOR' => '3',
                                                                 'PRODUCT' => '413c/2011/5900',
                                                                 'SUBSYSTEM' => 'usb',
-                                                                'TAGS' => ':uaccess:seat:',
+                                                                'TAGS' => ':seat:uaccess:',
                                                                 'TYPE' => '0/0/0',
                                                                 'USEC_INITIALIZED' => '2451630',
                                                                 'adb_user' => 'yes'
@@ -10854,7 +11460,7 @@ $VAR1 = {
                       'bus/usb/001/012' => {
                                              '_udev_infos' => {
                                                                 'BUSNUM' => '001',
-                                                                'CURRENT_TAGS' => ':uaccess:seat:',
+                                                                'CURRENT_TAGS' => ':seat:uaccess:',
                                                                 'DEVNAME' => '/dev/bus/usb/001/012',
                                                                 'DEVNUM' => '012',
                                                                 'DEVPATH' => '/devices/pci0000:00/0000:00:14.0/usb1/1-12/1-12.1/1-12.1.2',
@@ -10879,7 +11485,7 @@ $VAR1 = {
                                                                 'MINOR' => '11',
                                                                 'PRODUCT' => '409/5a/100',
                                                                 'SUBSYSTEM' => 'usb',
-                                                                'TAGS' => ':uaccess:seat:',
+                                                                'TAGS' => ':seat:uaccess:',
                                                                 'TYPE' => '9/0/1',
                                                                 'USEC_INITIALIZED' => '6958524',
                                                                 'adb_user' => 'yes'
@@ -13238,6 +13844,51 @@ $VAR1 = {
                                               ],
                                    'path' => '/devices/virtual/block/dm-38'
                                  },
+                      'dm-39' => {
+                                   '_udev_infos' => {
+                                                      'CURRENT_TAGS' => ':systemd:',
+                                                      'DEVLINKS' => '/dev/aya+raid0/sid-amd64 /dev/disk/by-id/dm-name-aya+raid0-sid--amd64 /dev/disk/by-id/dm-uuid-LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhL5FRtw4dDUsJsykwwXjfl7DWpkTZui1bs /dev/disk/by-label/sb:sid-amd64 /dev/disk/by-uuid/27785d0f-8f17-42e9-9e57-b094e79dba5a /dev/mapper/aya+raid0-sid--amd64',
+                                                      'DEVNAME' => '/dev/dm-39',
+                                                      'DEVPATH' => '/devices/virtual/block/dm-39',
+                                                      'DEVTYPE' => 'disk',
+                                                      'DISKSEQ' => '73',
+                                                      'DM_ACTIVATION' => '1',
+                                                      'DM_LV_NAME' => 'sid-amd64',
+                                                      'DM_NAME' => 'aya+raid0-sid--amd64',
+                                                      'DM_STATE' => 'ACTIVE',
+                                                      'DM_SUSPENDED' => '0',
+                                                      'DM_TABLE_STATE' => 'LIVE',
+                                                      'DM_UDEV_DISABLE_LIBRARY_FALLBACK_FLAG' => '1',
+                                                      'DM_UDEV_PRIMARY_SOURCE_FLAG' => '1',
+                                                      'DM_UDEV_RULES' => '1',
+                                                      'DM_UDEV_RULES_VSN' => '2',
+                                                      'DM_UUID' => 'LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhL5FRtw4dDUsJsykwwXjfl7DWpkTZui1bs',
+                                                      'DM_VG_NAME' => 'aya+raid0',
+                                                      'ID_FS_LABEL' => 'sb:sid-amd64',
+                                                      'ID_FS_LABEL_ENC' => 'sb:sid-amd64',
+                                                      'ID_FS_TYPE' => 'ext4',
+                                                      'ID_FS_USAGE' => 'filesystem',
+                                                      'ID_FS_UUID' => '27785d0f-8f17-42e9-9e57-b094e79dba5a',
+                                                      'ID_FS_UUID_ENC' => '27785d0f-8f17-42e9-9e57-b094e79dba5a',
+                                                      'ID_FS_VERSION' => '1.0',
+                                                      'MAJOR' => '253',
+                                                      'MINOR' => '39',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '969806572128'
+                                                    },
+                                   'name' => 'dm-39',
+                                   'names' => [
+                                                'aya+raid0/sid-amd64',
+                                                'disk/by-id/dm-name-aya+raid0-sid--amd64',
+                                                'disk/by-id/dm-uuid-LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhL5FRtw4dDUsJsykwwXjfl7DWpkTZui1bs',
+                                                'disk/by-label/sb:sid-amd64',
+                                                'disk/by-uuid/27785d0f-8f17-42e9-9e57-b094e79dba5a',
+                                                'dm-39',
+                                                'mapper/aya+raid0-sid--amd64'
+                                              ],
+                                   'path' => '/devices/virtual/block/dm-39'
+                                 },
                       'dm-4' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
@@ -13282,6 +13933,94 @@ $VAR1 = {
                                              ],
                                   'path' => '/devices/virtual/block/dm-4'
                                 },
+                      'dm-40' => {
+                                   '_udev_infos' => {
+                                                      'CURRENT_TAGS' => ':systemd:',
+                                                      'DEVLINKS' => '/dev/aya+raid0/sbuild /dev/disk/by-id/dm-name-aya+raid0-sbuild /dev/disk/by-id/dm-uuid-LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhLBcDT4OFc7iWnizMy2brsOsf9IbeCF8o2 /dev/disk/by-label/aya:SBUILDFS /dev/disk/by-uuid/d482ae6a-c65c-4ca1-b2b7-b94428c51f8f /dev/mapper/aya+raid0-sbuild',
+                                                      'DEVNAME' => '/dev/dm-40',
+                                                      'DEVPATH' => '/devices/virtual/block/dm-40',
+                                                      'DEVTYPE' => 'disk',
+                                                      'DISKSEQ' => '74',
+                                                      'DM_LV_NAME' => 'sbuild',
+                                                      'DM_NAME' => 'aya+raid0-sbuild',
+                                                      'DM_STATE' => 'ACTIVE',
+                                                      'DM_SUSPENDED' => '0',
+                                                      'DM_TABLE_STATE' => 'LIVE',
+                                                      'DM_UDEV_DISABLE_LIBRARY_FALLBACK_FLAG' => '1',
+                                                      'DM_UDEV_PRIMARY_SOURCE_FLAG' => '1',
+                                                      'DM_UDEV_RULES' => '1',
+                                                      'DM_UDEV_RULES_VSN' => '2',
+                                                      'DM_UUID' => 'LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhLBcDT4OFc7iWnizMy2brsOsf9IbeCF8o2',
+                                                      'DM_VG_NAME' => 'aya+raid0',
+                                                      'ID_FS_LABEL' => 'aya:SBUILDFS',
+                                                      'ID_FS_LABEL_ENC' => 'aya:SBUILDFS',
+                                                      'ID_FS_TYPE' => 'ext4',
+                                                      'ID_FS_USAGE' => 'filesystem',
+                                                      'ID_FS_UUID' => 'd482ae6a-c65c-4ca1-b2b7-b94428c51f8f',
+                                                      'ID_FS_UUID_ENC' => 'd482ae6a-c65c-4ca1-b2b7-b94428c51f8f',
+                                                      'ID_FS_VERSION' => '1.0',
+                                                      'MAJOR' => '253',
+                                                      'MINOR' => '40',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '972493099438'
+                                                    },
+                                   'name' => 'dm-40',
+                                   'names' => [
+                                                'aya+raid0/sbuild',
+                                                'disk/by-id/dm-name-aya+raid0-sbuild',
+                                                'disk/by-id/dm-uuid-LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhLBcDT4OFc7iWnizMy2brsOsf9IbeCF8o2',
+                                                'disk/by-label/aya:SBUILDFS',
+                                                'disk/by-uuid/d482ae6a-c65c-4ca1-b2b7-b94428c51f8f',
+                                                'dm-40',
+                                                'mapper/aya+raid0-sbuild'
+                                              ],
+                                   'path' => '/devices/virtual/block/dm-40'
+                                 },
+                      'dm-41' => {
+                                   '_udev_infos' => {
+                                                      'CURRENT_TAGS' => ':systemd:',
+                                                      'DEVLINKS' => '/dev/aya+raid0/swap /dev/disk/by-id/dm-name-aya+raid0-swap /dev/disk/by-id/dm-uuid-LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhLoyDY309aiPdSqQeVxcN3X5aQaipQ7EP9 /dev/disk/by-label/aya:SWAPFS2 /dev/disk/by-uuid/961f6ee6-b019-4258-ba41-4d76d7d9b624 /dev/mapper/aya+raid0-swap',
+                                                      'DEVNAME' => '/dev/dm-41',
+                                                      'DEVPATH' => '/devices/virtual/block/dm-41',
+                                                      'DEVTYPE' => 'disk',
+                                                      'DISKSEQ' => '107',
+                                                      'DM_LV_NAME' => 'swap',
+                                                      'DM_NAME' => 'aya+raid0-swap',
+                                                      'DM_STATE' => 'ACTIVE',
+                                                      'DM_SUSPENDED' => '0',
+                                                      'DM_TABLE_STATE' => 'LIVE',
+                                                      'DM_UDEV_DISABLE_LIBRARY_FALLBACK_FLAG' => '1',
+                                                      'DM_UDEV_PRIMARY_SOURCE_FLAG' => '1',
+                                                      'DM_UDEV_RULES' => '1',
+                                                      'DM_UDEV_RULES_VSN' => '2',
+                                                      'DM_UUID' => 'LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhLoyDY309aiPdSqQeVxcN3X5aQaipQ7EP9',
+                                                      'DM_VG_NAME' => 'aya+raid0',
+                                                      'ID_FS_LABEL' => 'aya:SWAPFS2',
+                                                      'ID_FS_LABEL_ENC' => 'aya:SWAPFS2',
+                                                      'ID_FS_TYPE' => 'swap',
+                                                      'ID_FS_USAGE' => 'other',
+                                                      'ID_FS_UUID' => '961f6ee6-b019-4258-ba41-4d76d7d9b624',
+                                                      'ID_FS_UUID_ENC' => '961f6ee6-b019-4258-ba41-4d76d7d9b624',
+                                                      'ID_FS_VERSION' => '1',
+                                                      'MAJOR' => '253',
+                                                      'MINOR' => '41',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1156375828780'
+                                                    },
+                                   'name' => 'dm-41',
+                                   'names' => [
+                                                'aya+raid0/swap',
+                                                'disk/by-id/dm-name-aya+raid0-swap',
+                                                'disk/by-id/dm-uuid-LVM-TmV5MBVKH7g5UaVSzfMJ6d4ZKRIimOhLoyDY309aiPdSqQeVxcN3X5aQaipQ7EP9',
+                                                'disk/by-label/aya:SWAPFS2',
+                                                'disk/by-uuid/961f6ee6-b019-4258-ba41-4d76d7d9b624',
+                                                'dm-41',
+                                                'mapper/aya+raid0-swap'
+                                              ],
+                                   'path' => '/devices/virtual/block/dm-41'
+                                 },
                       'dm-5' => {
                                   '_udev_infos' => {
                                                      'CURRENT_TAGS' => ':systemd:',
@@ -13506,7 +14245,7 @@ $VAR1 = {
                                      },
                       'dri/renderD128' => {
                                             '_udev_infos' => {
-                                                               'CURRENT_TAGS' => ':uaccess:seat:',
+                                                               'CURRENT_TAGS' => ':seat:uaccess:',
                                                                'DEVLINKS' => '/dev/dri/by-path/pci-0000:00:02.0-render',
                                                                'DEVNAME' => '/dev/dri/renderD128',
                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/drm/renderD128',
@@ -13517,7 +14256,7 @@ $VAR1 = {
                                                                'MAJOR' => '226',
                                                                'MINOR' => '128',
                                                                'SUBSYSTEM' => 'drm',
-                                                               'TAGS' => ':uaccess:seat:',
+                                                               'TAGS' => ':seat:uaccess:',
                                                                'USEC_INITIALIZED' => '5034264'
                                                              },
                                             'name' => 'dri/renderD128',
@@ -14463,13 +15202,13 @@ $VAR1 = {
                                 },
                       'kvm' => {
                                  '_udev_infos' => {
-                                                    'CURRENT_TAGS' => ':uaccess:seat:',
+                                                    'CURRENT_TAGS' => ':seat:uaccess:',
                                                     'DEVNAME' => '/dev/kvm',
                                                     'DEVPATH' => '/devices/virtual/misc/kvm',
                                                     'MAJOR' => '10',
                                                     'MINOR' => '232',
                                                     'SUBSYSTEM' => 'misc',
-                                                    'TAGS' => ':uaccess:seat:',
+                                                    'TAGS' => ':seat:uaccess:',
                                                     'USEC_INITIALIZED' => '11119734'
                                                   },
                                  'name' => 'kvm',
@@ -14666,6 +15405,56 @@ $VAR1 = {
                                                        ],
                                             'path' => '/devices/virtual/misc/device-mapper'
                                           },
+                      'md121' => {
+                                   '_udev_infos' => {
+                                                      'CURRENT_TAGS' => ':systemd:',
+                                                      'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-P8t4Ud-n2Th-OWWg-i7G1-5nu3-U7BO-19n5T8 /dev/disk/by-id/md-name-aya:aya-raid0-A /dev/disk/by-id/md-uuid-a44f12d1:8d428ca9:82d56e48:38606f68 /dev/md/aya-raid0-A',
+                                                      'DEVNAME' => '/dev/md121',
+                                                      'DEVPATH' => '/devices/virtual/block/md121',
+                                                      'DEVTYPE' => 'disk',
+                                                      'DISKSEQ' => '72',
+                                                      'ID_FS_TYPE' => 'LVM2_member',
+                                                      'ID_FS_USAGE' => 'raid',
+                                                      'ID_FS_UUID' => 'P8t4Ud-n2Th-OWWg-i7G1-5nu3-U7BO-19n5T8',
+                                                      'ID_FS_UUID_ENC' => 'P8t4Ud-n2Th-OWWg-i7G1-5nu3-U7BO-19n5T8',
+                                                      'ID_FS_VERSION' => 'LVM2 001',
+                                                      'LVM_MD_PV_ACTIVATED' => '1',
+                                                      'MAJOR' => '9',
+                                                      'MD_DEVICES' => '2',
+                                                      'MD_DEVICE_ev_nvme0n1p6_DEV' => '/dev/nvme0n1p6',
+                                                      'MD_DEVICE_ev_nvme0n1p6_ROLE' => '0',
+                                                      'MD_DEVICE_ev_nvme1n1p3_DEV' => '/dev/nvme1n1p3',
+                                                      'MD_DEVICE_ev_nvme1n1p3_ROLE' => '1',
+                                                      'MD_DEVNAME' => 'aya-raid0-A',
+                                                      'MD_LEVEL' => 'raid0',
+                                                      'MD_METADATA' => '1.2',
+                                                      'MD_NAME' => 'aya:aya-raid0-A',
+                                                      'MD_UUID' => 'a44f12d1:8d428ca9:82d56e48:38606f68',
+                                                      'MINOR' => '121',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'TAGS' => ':systemd:',
+                                                      'UDISKS_MD_DEVICES' => '2',
+                                                      'UDISKS_MD_DEVICE_ev_nvme0n1p6_DEV' => '/dev/nvme0n1p6',
+                                                      'UDISKS_MD_DEVICE_ev_nvme0n1p6_ROLE' => '0',
+                                                      'UDISKS_MD_DEVICE_ev_nvme1n1p3_DEV' => '/dev/nvme1n1p3',
+                                                      'UDISKS_MD_DEVICE_ev_nvme1n1p3_ROLE' => '1',
+                                                      'UDISKS_MD_DEVNAME' => 'aya-raid0-A',
+                                                      'UDISKS_MD_LEVEL' => 'raid0',
+                                                      'UDISKS_MD_METADATA' => '1.2',
+                                                      'UDISKS_MD_NAME' => 'aya:aya-raid0-A',
+                                                      'UDISKS_MD_UUID' => 'a44f12d1:8d428ca9:82d56e48:38606f68',
+                                                      'USEC_INITIALIZED' => '969672319032'
+                                                    },
+                                   'name' => 'md121',
+                                   'names' => [
+                                                'disk/by-id/lvm-pv-uuid-P8t4Ud-n2Th-OWWg-i7G1-5nu3-U7BO-19n5T8',
+                                                'disk/by-id/md-name-aya:aya-raid0-A',
+                                                'disk/by-id/md-uuid-a44f12d1:8d428ca9:82d56e48:38606f68',
+                                                'md/aya-raid0-A',
+                                                'md121'
+                                              ],
+                                   'path' => '/devices/virtual/block/md121'
+                                 },
                       'md122' => {
                                    '_udev_infos' => {
                                                       'CURRENT_TAGS' => ':systemd:',
@@ -15442,6 +16231,66 @@ $VAR1 = {
                                                   ],
                                        'path' => '/devices/pci0000:00/0000:00:06.0/0000:01:00.0/nvme/nvme0/nvme0n1/nvme0n1p5'
                                      },
+                      'nvme0n1p6' => {
+                                       '_udev_infos' => {
+                                                          'CURRENT_TAGS' => ':systemd:',
+                                                          'DEVLINKS' => '/dev/disk/by-id/nvme-PC300_NVMe_SK_hynix_1TB_ES77N512811407H22-part6 /dev/disk/by-id/nvme-eui.ace42e718000d8b3-part6 /dev/disk/by-partlabel/aya-raid0-A1 /dev/disk/by-partuuid/5ec0cb65-e03b-4e4a-9beb-c7f255c37919 /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part6',
+                                                          'DEVNAME' => '/dev/nvme0n1p6',
+                                                          'DEVPATH' => '/devices/pci0000:00/0000:00:06.0/0000:01:00.0/nvme/nvme0/nvme0n1/nvme0n1p6',
+                                                          'DEVTYPE' => 'partition',
+                                                          'DISKSEQ' => '2',
+                                                          'ID_FS_LABEL' => 'aya:aya-raid0-A',
+                                                          'ID_FS_LABEL_ENC' => 'aya:aya-raid0-A',
+                                                          'ID_FS_TYPE' => 'linux_raid_member',
+                                                          'ID_FS_USAGE' => 'raid',
+                                                          'ID_FS_UUID' => 'a44f12d1-8d42-8ca9-82d5-6e4838606f68',
+                                                          'ID_FS_UUID_ENC' => 'a44f12d1-8d42-8ca9-82d5-6e4838606f68',
+                                                          'ID_FS_UUID_SUB' => '46f60750-621f-f30b-7a08-a760e6daa65b',
+                                                          'ID_FS_UUID_SUB_ENC' => '46f60750-621f-f30b-7a08-a760e6daa65b',
+                                                          'ID_FS_VERSION' => '1.2',
+                                                          'ID_MODEL' => 'PC300 NVMe SK hynix 1TB',
+                                                          'ID_PART_ENTRY_DISK' => '259:3',
+                                                          'ID_PART_ENTRY_NAME' => 'aya-raid0-A1',
+                                                          'ID_PART_ENTRY_NUMBER' => '6',
+                                                          'ID_PART_ENTRY_OFFSET' => '402378752',
+                                                          'ID_PART_ENTRY_SCHEME' => 'gpt',
+                                                          'ID_PART_ENTRY_SIZE' => '524288000',
+                                                          'ID_PART_ENTRY_TYPE' => 'a19d880f-05fc-4d3b-a006-743f0f84911e',
+                                                          'ID_PART_ENTRY_UUID' => '5ec0cb65-e03b-4e4a-9beb-c7f255c37919',
+                                                          'ID_PART_TABLE_TYPE' => 'gpt',
+                                                          'ID_PART_TABLE_UUID' => 'b76822b8-a99d-524f-9087-f387a8490e0a',
+                                                          'ID_PATH' => 'pci-0000:01:00.0-nvme-1',
+                                                          'ID_PATH_TAG' => 'pci-0000_01_00_0-nvme-1',
+                                                          'ID_REVISION' => '20005A00',
+                                                          'ID_SERIAL' => 'PC300 NVMe SK hynix 1TB_ES77N512811407H22',
+                                                          'ID_SERIAL_SHORT' => 'ES77N512811407H22',
+                                                          'ID_WWN' => 'eui.ace42e718000d8b3',
+                                                          'MAJOR' => '259',
+                                                          'MINOR' => '9',
+                                                          'PARTN' => '6',
+                                                          'SUBSYSTEM' => 'block',
+                                                          'TAGS' => ':systemd:',
+                                                          'UDISKS_IGNORE' => '1',
+                                                          'UDISKS_MD_MEMBER_DEVICES' => '2',
+                                                          'UDISKS_MD_MEMBER_DEV_UUID' => '46f60750:621ff30b:7a08a760:e6daa65b',
+                                                          'UDISKS_MD_MEMBER_EVENTS' => '0',
+                                                          'UDISKS_MD_MEMBER_LEVEL' => 'raid0',
+                                                          'UDISKS_MD_MEMBER_NAME' => 'aya:aya-raid0-A',
+                                                          'UDISKS_MD_MEMBER_UPDATE_TIME' => '1678042004',
+                                                          'UDISKS_MD_MEMBER_UUID' => 'a44f12d1:8d428ca9:82d56e48:38606f68',
+                                                          'USEC_INITIALIZED' => '969486406560'
+                                                        },
+                                       'name' => 'nvme0n1p6',
+                                       'names' => [
+                                                    'disk/by-id/nvme-PC300_NVMe_SK_hynix_1TB_ES77N512811407H22-part6',
+                                                    'disk/by-id/nvme-eui.ace42e718000d8b3-part6',
+                                                    'disk/by-partlabel/aya-raid0-A1',
+                                                    'disk/by-partuuid/5ec0cb65-e03b-4e4a-9beb-c7f255c37919',
+                                                    'disk/by-path/pci-0000:01:00.0-nvme-1-part6',
+                                                    'nvme0n1p6'
+                                                  ],
+                                       'path' => '/devices/pci0000:00/0000:00:06.0/0000:01:00.0/nvme/nvme0/nvme0n1/nvme0n1p6'
+                                     },
                       'nvme1' => {
                                    '_udev_infos' => {
                                                       'DEVNAME' => '/dev/nvme1',
@@ -15609,6 +16458,66 @@ $VAR1 = {
                                                   ],
                                        'path' => '/devices/pci0000:00/0000:00:1b.4/0000:04:00.0/nvme/nvme1/nvme1n1/nvme1n1p2'
                                      },
+                      'nvme1n1p3' => {
+                                       '_udev_infos' => {
+                                                          'CURRENT_TAGS' => ':systemd:',
+                                                          'DEVLINKS' => '/dev/disk/by-id/nvme-KXG50ZNV1T02_NVMe_TOSHIBA_1024GB_X7ES10QHTYAT-part3 /dev/disk/by-id/nvme-eui.000000000000001000080d020033f310-part3 /dev/disk/by-partlabel/aya-raid0-A2 /dev/disk/by-partuuid/512b9aed-9ebe-4fa0-a3ea-0305c8f77086 /dev/disk/by-path/pci-0000:04:00.0-nvme-1-part3',
+                                                          'DEVNAME' => '/dev/nvme1n1p3',
+                                                          'DEVPATH' => '/devices/pci0000:00/0000:00:1b.4/0000:04:00.0/nvme/nvme1/nvme1n1/nvme1n1p3',
+                                                          'DEVTYPE' => 'partition',
+                                                          'DISKSEQ' => '1',
+                                                          'ID_FS_LABEL' => 'aya:aya-raid0-A',
+                                                          'ID_FS_LABEL_ENC' => 'aya:aya-raid0-A',
+                                                          'ID_FS_TYPE' => 'linux_raid_member',
+                                                          'ID_FS_USAGE' => 'raid',
+                                                          'ID_FS_UUID' => 'a44f12d1-8d42-8ca9-82d5-6e4838606f68',
+                                                          'ID_FS_UUID_ENC' => 'a44f12d1-8d42-8ca9-82d5-6e4838606f68',
+                                                          'ID_FS_UUID_SUB' => '265e518c-1308-5754-10ec-9b2ac3ae5028',
+                                                          'ID_FS_UUID_SUB_ENC' => '265e518c-1308-5754-10ec-9b2ac3ae5028',
+                                                          'ID_FS_VERSION' => '1.2',
+                                                          'ID_MODEL' => 'KXG50ZNV1T02 NVMe TOSHIBA 1024GB',
+                                                          'ID_PART_ENTRY_DISK' => '259:0',
+                                                          'ID_PART_ENTRY_NAME' => 'aya-raid0-A2',
+                                                          'ID_PART_ENTRY_NUMBER' => '3',
+                                                          'ID_PART_ENTRY_OFFSET' => '402378752',
+                                                          'ID_PART_ENTRY_SCHEME' => 'gpt',
+                                                          'ID_PART_ENTRY_SIZE' => '524288000',
+                                                          'ID_PART_ENTRY_TYPE' => 'a19d880f-05fc-4d3b-a006-743f0f84911e',
+                                                          'ID_PART_ENTRY_UUID' => '512b9aed-9ebe-4fa0-a3ea-0305c8f77086',
+                                                          'ID_PART_TABLE_TYPE' => 'gpt',
+                                                          'ID_PART_TABLE_UUID' => '41822ba0-664e-4de6-be7a-8dedc805e5cf',
+                                                          'ID_PATH' => 'pci-0000:04:00.0-nvme-1',
+                                                          'ID_PATH_TAG' => 'pci-0000_04_00_0-nvme-1',
+                                                          'ID_REVISION' => 'AADA4102',
+                                                          'ID_SERIAL' => 'KXG50ZNV1T02 NVMe TOSHIBA 1024GB_X7ES10QHTYAT',
+                                                          'ID_SERIAL_SHORT' => 'X7ES10QHTYAT',
+                                                          'ID_WWN' => 'eui.000000000000001000080d020033f310',
+                                                          'MAJOR' => '259',
+                                                          'MINOR' => '10',
+                                                          'PARTN' => '3',
+                                                          'SUBSYSTEM' => 'block',
+                                                          'TAGS' => ':systemd:',
+                                                          'UDISKS_IGNORE' => '1',
+                                                          'UDISKS_MD_MEMBER_DEVICES' => '2',
+                                                          'UDISKS_MD_MEMBER_DEV_UUID' => '265e518c:13085754:10ec9b2a:c3ae5028',
+                                                          'UDISKS_MD_MEMBER_EVENTS' => '0',
+                                                          'UDISKS_MD_MEMBER_LEVEL' => 'raid0',
+                                                          'UDISKS_MD_MEMBER_NAME' => 'aya:aya-raid0-A',
+                                                          'UDISKS_MD_MEMBER_UPDATE_TIME' => '1678042004',
+                                                          'UDISKS_MD_MEMBER_UUID' => 'a44f12d1:8d428ca9:82d56e48:38606f68',
+                                                          'USEC_INITIALIZED' => '969535834292'
+                                                        },
+                                       'name' => 'nvme1n1p3',
+                                       'names' => [
+                                                    'disk/by-id/nvme-KXG50ZNV1T02_NVMe_TOSHIBA_1024GB_X7ES10QHTYAT-part3',
+                                                    'disk/by-id/nvme-eui.000000000000001000080d020033f310-part3',
+                                                    'disk/by-partlabel/aya-raid0-A2',
+                                                    'disk/by-partuuid/512b9aed-9ebe-4fa0-a3ea-0305c8f77086',
+                                                    'disk/by-path/pci-0000:04:00.0-nvme-1-part3',
+                                                    'nvme1n1p3'
+                                                  ],
+                                       'path' => '/devices/pci0000:00/0000:00:1b.4/0000:04:00.0/nvme/nvme1/nvme1n1/nvme1n1p3'
+                                     },
                       'port' => {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/port',
@@ -15699,14 +16608,14 @@ $VAR1 = {
                                   },
                       'rfkill' => {
                                     '_udev_infos' => {
-                                                       'CURRENT_TAGS' => ':systemd:uaccess:seat:',
+                                                       'CURRENT_TAGS' => ':seat:systemd:uaccess:',
                                                        'DEVNAME' => '/dev/rfkill',
                                                        'DEVPATH' => '/devices/virtual/misc/rfkill',
                                                        'MAJOR' => '10',
                                                        'MINOR' => '242',
                                                        'SUBSYSTEM' => 'misc',
                                                        'SYSTEMD_WANTS' => 'systemd-rfkill.socket',
-                                                       'TAGS' => ':systemd:uaccess:seat:',
+                                                       'TAGS' => ':seat:systemd:uaccess:',
                                                        'USEC_INITIALIZED' => '10972066'
                                                      },
                                     'name' => 'rfkill',
@@ -16364,10 +17273,10 @@ $VAR1 = {
                                                      'UDISKS_MD_MEMBER_ARRAY_SIZE' => '4397.78GB',
                                                      'UDISKS_MD_MEMBER_DEVICES' => '4',
                                                      'UDISKS_MD_MEMBER_DEV_UUID' => 'dc6b400c:14394caa:11cc3e4d:c17c2627',
-                                                     'UDISKS_MD_MEMBER_EVENTS' => '8107',
+                                                     'UDISKS_MD_MEMBER_EVENTS' => '8110',
                                                      'UDISKS_MD_MEMBER_LEVEL' => 'raid6',
                                                      'UDISKS_MD_MEMBER_NAME' => 'aya:aya-raid6-C',
-                                                     'UDISKS_MD_MEMBER_UPDATE_TIME' => '1677442594',
+                                                     'UDISKS_MD_MEMBER_UPDATE_TIME' => '1678264837',
                                                      'UDISKS_MD_MEMBER_UUID' => '9f1e2355:7b50c9c1:7a173895:ae3306c0',
                                                      'USEC_INITIALIZED' => '3116066'
                                                    },
@@ -17198,10 +18107,10 @@ $VAR1 = {
                                                      'UDISKS_MD_MEMBER_ARRAY_SIZE' => '4397.78GB',
                                                      'UDISKS_MD_MEMBER_DEVICES' => '4',
                                                      'UDISKS_MD_MEMBER_DEV_UUID' => '40e15651:01bc7815:27d11c06:611e4e55',
-                                                     'UDISKS_MD_MEMBER_EVENTS' => '11276',
+                                                     'UDISKS_MD_MEMBER_EVENTS' => '11279',
                                                      'UDISKS_MD_MEMBER_LEVEL' => 'raid6',
                                                      'UDISKS_MD_MEMBER_NAME' => 'aya:aya-raid6-D',
-                                                     'UDISKS_MD_MEMBER_UPDATE_TIME' => '1677450187',
+                                                     'UDISKS_MD_MEMBER_UPDATE_TIME' => '1678400604',
                                                      'UDISKS_MD_MEMBER_UUID' => 'de3c17e7:234a3474:638e70a2:b4d94188',
                                                      'USEC_INITIALIZED' => '3087239'
                                                    },
@@ -18438,10 +19347,10 @@ $VAR1 = {
                                                      'UDISKS_MD_MEMBER_ARRAY_SIZE' => '549.62GB',
                                                      'UDISKS_MD_MEMBER_DEVICES' => '3',
                                                      'UDISKS_MD_MEMBER_DEV_UUID' => 'b761160e:27baab13:55f9d615:0186a811',
-                                                     'UDISKS_MD_MEMBER_EVENTS' => '51925',
+                                                     'UDISKS_MD_MEMBER_EVENTS' => '52476',
                                                      'UDISKS_MD_MEMBER_LEVEL' => 'raid1',
                                                      'UDISKS_MD_MEMBER_NAME' => 'aya:aya-raid1S-A',
-                                                     'UDISKS_MD_MEMBER_UPDATE_TIME' => '1677535612',
+                                                     'UDISKS_MD_MEMBER_UPDATE_TIME' => '1678402388',
                                                      'UDISKS_MD_MEMBER_UUID' => '708397ba:73707951:ca4c8e3f:d0985339',
                                                      'USEC_INITIALIZED' => '2497833'
                                                    },
@@ -18577,7 +19486,7 @@ $VAR1 = {
                                },
                       'sg2' => {
                                  '_udev_infos' => {
-                                                    'CURRENT_TAGS' => ':uaccess:seat:',
+                                                    'CURRENT_TAGS' => ':seat:uaccess:',
                                                     'DEVNAME' => '/dev/sg2',
                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:17.0/ata3/host2/target2:0:0/2:0:0:0/scsi_generic/sg2',
                                                     'ID_FOR_SEAT' => 'scsi_generic-pci-0000_00_17_0-ata-3_0',
@@ -18587,7 +19496,7 @@ $VAR1 = {
                                                     'MAJOR' => '21',
                                                     'MINOR' => '2',
                                                     'SUBSYSTEM' => 'scsi_generic',
-                                                    'TAGS' => ':uaccess:seat:',
+                                                    'TAGS' => ':seat:uaccess:',
                                                     'USEC_INITIALIZED' => '10969442'
                                                   },
                                  'name' => 'sg2',
@@ -18682,7 +19591,7 @@ $VAR1 = {
                                     },
                       'snd/controlC0' => {
                                            '_udev_infos' => {
-                                                              'CURRENT_TAGS' => ':uaccess:systemd:',
+                                                              'CURRENT_TAGS' => ':systemd:uaccess:',
                                                               'DEVLINKS' => '/dev/snd/by-path/pci-0000:00:1f.3',
                                                               'DEVNAME' => '/dev/snd/controlC0',
                                                               'DEVPATH' => '/devices/pci0000:00/0000:00:1f.3/sound/card0/controlC0',
@@ -18693,7 +19602,7 @@ $VAR1 = {
                                                               'SUBSYSTEM' => 'sound',
                                                               'SYSTEMD_USER_WANTS' => 'sound.target',
                                                               'SYSTEMD_WANTS' => 'sound.target',
-                                                              'TAGS' => ':uaccess:systemd:',
+                                                              'TAGS' => ':systemd:uaccess:',
                                                               'USEC_INITIALIZED' => '11070292'
                                                             },
                                            'name' => 'snd/controlC0',
@@ -18705,7 +19614,7 @@ $VAR1 = {
                                          },
                       'snd/controlC1' => {
                                            '_udev_infos' => {
-                                                              'CURRENT_TAGS' => ':uaccess:systemd:',
+                                                              'CURRENT_TAGS' => ':systemd:uaccess:',
                                                               'DEVLINKS' => '/dev/snd/by-id/usb-BurrBrown_from_Texas_Instruments_USB_AUDIO_CODEC-00 /dev/snd/by-path/pci-0000:00:14.0-usb-0:12.1.3:1.0',
                                                               'DEVNAME' => '/dev/snd/controlC1',
                                                               'DEVPATH' => '/devices/pci0000:00/0000:00:14.0/usb1/1-12/1-12.1/1-12.1.3/1-12.1.3:1.0/sound/card1/controlC1',
@@ -18729,7 +19638,7 @@ $VAR1 = {
                                                               'SUBSYSTEM' => 'sound',
                                                               'SYSTEMD_USER_WANTS' => 'sound.target',
                                                               'SYSTEMD_WANTS' => 'sound.target',
-                                                              'TAGS' => ':uaccess:systemd:',
+                                                              'TAGS' => ':systemd:uaccess:',
                                                               'USEC_INITIALIZED' => '11078302'
                                                             },
                                            'name' => 'snd/controlC1',
@@ -18955,7 +19864,7 @@ $VAR1 = {
                                      },
                       'sr0' => {
                                  '_udev_infos' => {
-                                                    'CURRENT_TAGS' => ':systemd:uaccess:seat:',
+                                                    'CURRENT_TAGS' => ':seat:systemd:uaccess:',
                                                     'DEVLINKS' => '/dev/cdrom /dev/cdrw /dev/disk/by-id/ata-DRW-24D5MT_K29I1JG2631 /dev/disk/by-id/wwn-0x5001480000000000 /dev/disk/by-path/pci-0000:00:17.0-ata-3 /dev/disk/by-path/pci-0000:00:17.0-ata-3.0 /dev/dvd /dev/dvdrw',
                                                     'DEVNAME' => '/dev/sr0',
                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:17.0/ata3/host2/target2:0:0/2:0:0:0/block/sr0',
@@ -18994,7 +19903,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'SYSTEMD_MOUNT_DEVICE_BOUND' => '1',
-                                                    'TAGS' => ':systemd:uaccess:seat:',
+                                                    'TAGS' => ':seat:systemd:uaccess:',
                                                     'USEC_INITIALIZED' => '2525828'
                                                   },
                                  'name' => 'sr0',
@@ -21214,6 +22123,13 @@ $VAR1->{'lsblk'}{'dm-38'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-38'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-38'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-38'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-39'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-4'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-4'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-4'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
@@ -21221,6 +22137,20 @@ $VAR1->{'lsblk'}{'dm-4'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-4'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-4'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-4'}{'rota'} = $VAR1->{'lsblk'}{'dm-1'}{'rota'};
+$VAR1->{'lsblk'}{'dm-40'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-40'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-40'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-40'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-40'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-40'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-40'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'dm-41'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-5'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-5'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'dm-5'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
@@ -21312,6 +22242,13 @@ $VAR1->{'lsblk'}{'loop7'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'loop7'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'loop7'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'loop7'}{'rota'} = $VAR1->{'lsblk'}{'dm-1'}{'rota'};
+$VAR1->{'lsblk'}{'md121'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'md121'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'md121'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'md121'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'md121'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'md121'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'md121'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'md122'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'md122'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'md122'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
@@ -21396,6 +22333,13 @@ $VAR1->{'lsblk'}{'nvme0n1p5'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme0n1p5'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme0n1p5'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme0n1p5'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme0n1p6'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme1n1'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme1n1'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme1n1'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
@@ -21417,6 +22361,13 @@ $VAR1->{'lsblk'}{'nvme1n1p2'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme1n1p2'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme1n1p2'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'nvme1n1p2'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
+$VAR1->{'lsblk'}{'nvme1n1p3'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'sda'}{'dax'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'sda'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};
 $VAR1->{'lsblk'}{'sda'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'dax'};

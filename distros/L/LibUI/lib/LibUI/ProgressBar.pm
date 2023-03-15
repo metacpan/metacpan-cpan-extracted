@@ -1,4 +1,4 @@
-package LibUI::ProgressBar 0.01 {
+package LibUI::ProgressBar 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,14 +6,20 @@ package LibUI::ProgressBar 0.01 {
     use parent 'LibUI::Control';
     #
     affix(
-        LibUI::lib(), 'uiProgressBarValue', [ InstanceOf ['LibUI::ProgressBar'] ] => Int,
-        'value'
+        LibUI::lib(),
+        [ 'uiProgressBarValue', 'value' ],
+        [ InstanceOf ['LibUI::ProgressBar'] ] => Int
     );
     affix(
-        LibUI::lib(), 'uiProgressBarSetValue', [ InstanceOf ['LibUI::ProgressBar'], Int ] => Void,
-        'setValue'
+        LibUI::lib(),
+        [ 'uiProgressBarSetValue',           'setValue' ],
+        [ InstanceOf ['LibUI::ProgressBar'], Int ] => Void
     );
-    affix( LibUI::lib(), 'uiNewProgressBar', [Void] => InstanceOf ['LibUI::ProgressBar'], 'new' );
+    affix(
+        LibUI::lib(),
+        [ 'uiNewProgressBar', 'new' ],
+        [Void] => InstanceOf ['LibUI::ProgressBar']
+    );
 };
 1;
 #
@@ -33,8 +39,9 @@ LibUI::ProgressBar - Control that Visualizes the Progress of a Task
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::ProgressBar;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window   = LibUI::Window->new( 'Hang on a tick...', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box      = LibUI::VBox->new();
     my $progress = LibUI::ProgressBar->new();
     $progress->setValue(-1);

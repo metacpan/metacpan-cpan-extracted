@@ -10,7 +10,7 @@ static const char* FILE_NAME = "Sys/User/Group.c";
 
 int32_t SPVM__Sys__User__Group__gr_name(SPVM_ENV* env, SPVM_VALUE* stack) {
 
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The method \"gr_name\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -26,7 +26,7 @@ int32_t SPVM__Sys__User__Group__gr_name(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__User__Group__gr_passwd(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The method \"gr_passwd\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -41,7 +41,7 @@ int32_t SPVM__Sys__User__Group__gr_passwd(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 int32_t SPVM__Sys__User__Group__gr_gid(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The method \"gr_gid\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
@@ -57,7 +57,7 @@ int32_t SPVM__Sys__User__Group__gr_gid(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__User__Group__gr_mem(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-#ifdef _WIN32
+#if defined(_WIN32)
   env->die(env, stack, "The method \"gr_mem\" in the class \"Sys::User::Group\" is not supported on this system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else

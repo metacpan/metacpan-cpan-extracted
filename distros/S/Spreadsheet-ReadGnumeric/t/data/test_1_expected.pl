@@ -10,14 +10,14 @@ $test_1_simple_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.2',
+                             'version' => '0.3',
                              'type' => 'gnumeric'
                            }
                          ],
             'type' => 'gnumeric',
             'sheets' => 3,
             'error' => undef,
-            'version' => '0.2',
+            'version' => '0.3',
             'parser' => 'Spreadsheet::ReadGnumeric'
           },
           {
@@ -576,13 +576,17 @@ $test_1_simple_expected
             'label' => 'Sheet2',
             'maxcol' => '256',
             'mincol' => 1,
+            'maxrow' => 1,
+            'minrow' => 1,
             'indx' => 2
           },
           {
             'label' => 'Sheet3',
             'indx' => 3,
             'mincol' => 1,
-            'maxcol' => '256'
+            'maxcol' => '256',
+            'maxrow' => 1,
+            'minrow' => 1
           }
         ];
 
@@ -597,7 +601,7 @@ $test_1_simple_no_rc_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.2',
+                             'version' => '0.3',
                              'type' => 'gnumeric'
                            }
                          ],
@@ -605,7 +609,7 @@ $test_1_simple_no_rc_expected
             'type' => 'gnumeric',
             'error' => undef,
             'sheets' => 3,
-            'version' => '0.2'
+            'version' => '0.3'
           },
           {
             'label' => 'Sheet1',
@@ -779,13 +783,17 @@ $test_1_simple_no_rc_expected
             'label' => 'Sheet2',
             'maxcol' => '256',
             'indx' => 2,
-            'mincol' => 1
+            'mincol' => 1,
+            'maxrow' => 1,
+            'minrow' => 1,
           },
           {
             'label' => 'Sheet3',
             'mincol' => 1,
             'maxcol' => '256',
-            'indx' => 3
+            'indx' => 3,
+            'maxrow' => 1,
+            'minrow' => 1,
           }
         ];
 
@@ -800,13 +808,13 @@ $test_1_simple_no_cells_expected
             'parsers' => [
                            {
                              'parser' => 'Spreadsheet::ReadGnumeric',
-                             'version' => '0.2',
+                             'version' => '0.3',
                              'type' => 'gnumeric'
                            }
                          ],
             'type' => 'gnumeric',
             'sheets' => 3,
-            'version' => '0.2',
+            'version' => '0.3',
             'error' => undef,
             'parser' => 'Spreadsheet::ReadGnumeric'
           },
@@ -1206,13 +1214,17 @@ $test_1_simple_no_cells_expected
             'label' => 'Sheet2',
             'mincol' => 1,
             'indx' => 2,
-            'maxcol' => '256'
+            'maxcol' => '256',
+            'maxrow' => 1,
+            'minrow' => 1,
           },
           {
             'label' => 'Sheet3',
             'maxcol' => '256',
             'indx' => 3,
-            'mincol' => 1
+            'mincol' => 1,
+            'maxrow' => 1,
+            'minrow' => 1,
           }
         ];
 

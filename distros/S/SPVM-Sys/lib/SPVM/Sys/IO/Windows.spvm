@@ -1,0 +1,8 @@
+class Sys::IO::Windows {
+  native static method is_symlink : int ($path : string);
+  native static method unlink : int ($pathname : string);
+  native static method rename : int ($oldpath : string, $newpath : string);
+  native static method readlink : int ($path : string, $buf : mutable string, $bufsiz : int);
+  native static method get_readlink_buffer_size : int ($path : string);
+  native static method symlink : int ($oldpath : string, $newpath : string);
+}

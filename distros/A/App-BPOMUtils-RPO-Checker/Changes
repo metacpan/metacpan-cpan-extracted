@@ -1,3 +1,10 @@
+0.009   2023-03-10  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Didn't handle filename with dirs correctly.
+
+        - [bugfix] We didn't process all files recursively by default.
+
+
 0.008   2023-03-09  Released-By: PERLANCAR; Urgency: medium
 
         - Add check: file must be pdf or jpg.

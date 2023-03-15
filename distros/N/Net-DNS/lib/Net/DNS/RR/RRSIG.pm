@@ -2,7 +2,7 @@ package Net::DNS::RR::RRSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RRSIG.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: RRSIG.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -28,9 +28,7 @@ eval { require MIME::Base64 };
 
 # IMPORTANT: Downstream distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
 use constant USESEC => defined $INC{'Net/DNS/SEC.pm'};		# Discover how we got here, without exposing any crypto
-use constant							# Discourage static code analysers and casual greppers
-		DNSSEC => USESEC && defined eval join '',
-		qw(r e q u i r e), ' Net::DNS', qw(:: SEC :: Private);	  ## no critic
+use constant DNSSEC => USESEC && defined eval join '', qw(r e q u i r e), ' Net::DNS::SEC::Private';	## no critic
 
 my @index;
 if (DNSSEC) {
@@ -51,8 +49,7 @@ my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception ke
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 	@{$self}{@field} = unpack "\@$offset n C2 N3 n", $$data;
@@ -81,10 +78,10 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	foreach ( @field, qw(signame) ) { $self->$_(shift) }
-	$self->signature(@_);
+	foreach ( @field, qw(signame) ) { $self->$_( shift @argument ) }
+	$self->signature(@argument);
 	return;
 }
 
@@ -98,8 +95,8 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub typecovered {
-	my $self = shift;
-	$self->{typecovered} = typebyname(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{typecovered} = typebyname($_) }
 	my $typecode = $self->{typecovered};
 	return defined $typecode ? typebyval($typecode) : undef;
 }
@@ -120,32 +117,30 @@ sub algorithm {
 
 
 sub labels {
-	my $self = shift;
-
-	$self->{labels} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{labels} = 0 + $_ }
 	return $self->{labels} || 0;
 }
 
 
 sub orgttl {
-	my $self = shift;
-
-	$self->{orgttl} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{orgttl} = 0 + $_ }
 	return $self->{orgttl} || 0;
 }
 
 
 sub sigexpiration {
-	my $self = shift;
-	$self->{sigexpiration} = _string2time(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{sigexpiration} = _string2time($_) }
 	my $time = $self->{sigexpiration};
 	return unless defined wantarray && defined $time;
 	return UTIL ? Scalar::Util::dualvar( $time, _time2string($time) ) : _time2string($time);
 }
 
 sub siginception {
-	my $self = shift;
-	$self->{siginception} = _string2time(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{siginception} = _string2time($_) }
 	my $time = $self->{siginception};
 	return unless defined wantarray && defined $time;
 	return UTIL ? Scalar::Util::dualvar( $time, _time2string($time) ) : _time2string($time);
@@ -156,39 +151,36 @@ sub sigex { return &sigexpiration; }	## historical
 sub sigin { return &siginception; }	## historical
 
 sub sigval {
-	my $self = shift;
+	my ( $self, @value ) = @_;
 	no integer;
-	return ( $self->{sigval} ) = map { int( 86400 * $_ ) } @_;
+	return ( $self->{sigval} ) = map { int( 86400 * $_ ) } @value;
 }
 
 
 sub keytag {
-	my $self = shift;
-
-	$self->{keytag} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{keytag} = 0 + $_ }
 	return $self->{keytag} || 0;
 }
 
 
 sub signame {
-	my $self = shift;
-
-	$self->{signame} = Net::DNS::DomainName->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{signame} = Net::DNS::DomainName->new($_) }
 	return $self->{signame} ? $self->{signame}->name : undef;
 }
 
 
 sub sig {
-	my $self = shift;
-	return MIME::Base64::encode( $self->sigbin(), "" ) unless scalar @_;
-	return $self->sigbin( MIME::Base64::decode( join "", @_ ) );
+	my ( $self, @value ) = @_;
+	return MIME::Base64::encode( $self->sigbin(), "" ) unless scalar @value;
+	return $self->sigbin( MIME::Base64::decode( join "", @value ) );
 }
 
 
 sub sigbin {
-	my $self = shift;
-
-	$self->{sigbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{sigbin} = $_ }
 	return $self->{sigbin} || "";
 }
 
@@ -459,14 +451,14 @@ sub _CreateSigData {
 
 sub _CreateSig {
 	if (DNSSEC) {
-		my $self = shift;
+		my ( $self, @argument ) = @_;
 
 		my $algorithm = $self->algorithm;
 		my $class     = $DNSSEC_siggen{$algorithm};
 
 		return eval {
 			die "algorithm $algorithm not supported\n" unless $class;
-			$self->sigbin( $class->sign(@_) );
+			$self->sigbin( $class->sign(@argument) );
 		} || return croak "${@}signature generation failed";
 	}
 }
@@ -474,14 +466,14 @@ sub _CreateSig {
 
 sub _VerifySig {
 	if (DNSSEC) {
-		my $self = shift;
+		my ( $self, @argument ) = @_;
 
 		my $algorithm = $self->algorithm;
 		my $class     = $DNSSEC_verify{$algorithm};
 
 		my $retval = eval {
 			die "algorithm $algorithm not supported\n" unless $class;
-			$class->verify( @_, $self->sigbin );
+			$class->verify( @argument, $self->sigbin );
 		};
 
 		unless ($retval) {
@@ -499,13 +491,13 @@ sub _VerifySig {
 
 
 sub _ordered() {			## irreflexive 32-bit partial ordering
-	use integer;
 	my ( $n1, $n2 ) = @_;
 
 	return 0 unless defined $n2;				# ( any, undef )
 	return 1 unless defined $n1;				# ( undef, any )
 
 	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
+	use integer;
 	if ( $n2 < 0 ) {					# fold, leaving $n2 non-negative
 		$n1 = ( $n1 & 0xFFFFFFFF ) ^ 0x80000000;	# -2**31 <= $n1 < 2**32
 		$n2 = ( $n2 & 0x7FFFFFFF );			#  0	 <= $n2 < 2**31
@@ -579,8 +571,8 @@ __END__
 
     use Net::DNS::SEC;
     $sigrr = Net::DNS::RR::RRSIG->create( \@rrset, $keypath,
-					sigex => 20211231010101
-					sigin => 20211201010101
+					sigex => 20231231010101
+					sigin => 20231201010101
 					);
 
     $sigrr->verify( \@rrset, $keyrr ) || die $sigrr->vrfyerrstr;
@@ -704,8 +696,8 @@ Create a signature over a RR set.
     $sigrr = Net::DNS::RR::RRSIG->create( \@rrsetref, $keypath );
 
     $sigrr = Net::DNS::RR::RRSIG->create( \@rrsetref, $keypath,
-					sigex => 20211231010101
-					sigin => 20211201010101
+					sigex => 20231231010101
+					sigin => 20231201010101
 					);
     $sigrr->print;
 
@@ -731,8 +723,8 @@ containing the private key as generated by dnssec-keygen.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigex  => 20211231010101,	# signature expiration
-	sigin  => 20211201010101,	# signature inception
+	sigex  => 20231231010101,	# signature expiration
+	sigin  => 20231201010101,	# signature inception
 	sigval => 30,			# validity window (days)
 	ttl    => 3600			# TTL
 
@@ -846,8 +838,9 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::SEC>,
-RFC4034
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<Net::DNS::SEC>
+L<RFC4034|https://tools.ietf.org/html/rfc4034>
 
 L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 

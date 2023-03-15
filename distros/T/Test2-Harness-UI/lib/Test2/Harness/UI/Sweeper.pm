@@ -2,9 +2,9 @@ package Test2::Harness::UI::Sweeper;
 use strict;
 use warnings;
 use Time::HiRes qw/time/;
-use Test2::Harness::Util::UUID qw/gen_uuid/;
+use Test2::Harness::UI::UUID qw/gen_uuid/;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config

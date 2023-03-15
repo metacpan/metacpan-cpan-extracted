@@ -13,16 +13,17 @@ subtest 'fundamental types' => sub {
 
     #diag sizeof(Double);
     #die;
-    is sizeof(Bool),     wrap( $lib, 's_bool',     [], Size_t )->(),  'sizeof(Bool)';
-    is sizeof(Char),     wrap( $lib, 's_char',     [], Size_t )->(),  'sizeof(Char)';
-    is sizeof(Short),    wrap( $lib, 's_short',    [], Size_t )->(),  'sizeof(Short)';
-    is sizeof(Int),      wrap( $lib, 's_int',      [], Size_t )->(),  'sizeof(Int)';
-    is sizeof(Long),     wrap( $lib, 's_long',     [], Size_t )->(),  'sizeof(Long)';
-    is sizeof(LongLong), wrap( $lib, 's_longlong', [], Size_t )->(),  'sizeof(LongLong)';
-    is sizeof(Float),    wrap( $lib, 's_float',    [], Size_t )->(),  'sizeof(Float)';
-    is sizeof(Double),   wrap( $lib, 's_double',   [], Size_t )->(),  'sizeof(Double)';
-    is sizeof(SSize_t),  wrap( $lib, 's_ssize_t',  [], SSize_t )->(), 'sizeof(SSize_t)';
-    is sizeof(Size_t),   wrap( $lib, 's_size_t',   [], Size_t )->(),  'sizeof(Size_t)';
+    is sizeof(Bool),             wrap( $lib, 's_bool',     [], Size_t )->(),  'sizeof(Bool)';
+    is sizeof(Char),             wrap( $lib, 's_char',     [], Size_t )->(),  'sizeof(Char)';
+    is sizeof(Short),            wrap( $lib, 's_short',    [], Size_t )->(),  'sizeof(Short)';
+    is sizeof(Int),              wrap( $lib, 's_int',      [], Size_t )->(),  'sizeof(Int)';
+    is sizeof(Long),             wrap( $lib, 's_long',     [], Size_t )->(),  'sizeof(Long)';
+    is sizeof(LongLong),         wrap( $lib, 's_longlong', [], Size_t )->(),  'sizeof(LongLong)';
+    is sizeof(Float),            wrap( $lib, 's_float',    [], Size_t )->(),  'sizeof(Float)';
+    is sizeof(Double),           wrap( $lib, 's_double',   [], Size_t )->(),  'sizeof(Double)';
+    is sizeof(SSize_t),          wrap( $lib, 's_ssize_t',  [], SSize_t )->(), 'sizeof(SSize_t)';
+    is sizeof(Size_t),           wrap( $lib, 's_size_t',   [], Size_t )->(),  'sizeof(Size_t)';
+    is sizeof( Pointer [Void] ), wrap( $lib, 's_pointer', [], Size_t )->(), 'sizeof(Pointer[Void])';
 };
 
 #done_testing;
@@ -50,13 +51,14 @@ typedef massive => Struct [
 #use Data::Dumper;
 #diag Dumper massive();
 subtest 'array' => sub {
-    is sizeof( ArrayRef [ Char, 3 ] ), 3, 'ArrayRef [ Char, 3 ]';
-    is sizeof( ArrayRef [ Pointer [Void], 1 ] ), 8, 'ArrayRef [ Pointer[Void], 1 ]';
-
-    # This needs pointer size x 3
-    is sizeof( ArrayRef [ Str, 3 ] ), 24, 'ArrayRef [ Str, 5 ]';
+    is sizeof( ArrayRef [ Char, 3 ] ), 3, 'sizeof(ArrayRef [ Char, 3 ])';
+    is sizeof( ArrayRef [ Pointer [Void], 1 ] ), wrap( $lib, 's_pointer_array', [], Size_t )->(),
+        'sizeof(ArrayRef [ Pointer[Void], 1 ])';
+    is sizeof( ArrayRef [ Str, 3 ] ), wrap( $lib, 's_string_array', [], Size_t )->(),
+        'sizeof(ArrayRef [ Str, 3 ])';
 };
 subtest 'aggregates' => sub {
+    is sizeof( Struct [] ), 0, 'empty struct is 0 bytes';
     my $struct1 = Struct [ c => ArrayRef [ Char, 3 ] ];
     my $struct2 = Struct [ c => ArrayRef [ Int,  3 ] ];
     my $struct3 = Struct [ d => Double, c => ArrayRef [ Int, 3 ] ];

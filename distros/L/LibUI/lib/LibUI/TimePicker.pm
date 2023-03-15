@@ -1,4 +1,4 @@
-package LibUI::TimePicker 0.01 {
+package LibUI::TimePicker 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,7 +6,7 @@ package LibUI::TimePicker 0.01 {
     use parent 'LibUI::DateTimePicker';
     use LibUI::Time;
     #
-    affix( LibUI::lib(), 'uiNewTimePicker', [Void] => InstanceOf ['LibUI::TimePicker'], 'new' );
+    affix( LibUI::lib(), [ 'uiNewTimePicker', 'new' ], [Void] => InstanceOf ['LibUI::TimePicker'] );
 };
 1;
 #
@@ -27,8 +27,9 @@ LibUI::TimePicker - Control to Enter a Date and Time
     use LibUI::Window;
     use LibUI::TimePicker;
     use Time::Piece;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Schedule an Event', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $date   = LibUI::TimePicker->new();
     $box->append( $date, 0 );

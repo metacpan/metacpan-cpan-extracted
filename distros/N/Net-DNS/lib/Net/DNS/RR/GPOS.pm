@@ -2,7 +2,7 @@ package Net::DNS::RR::GPOS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: GPOS.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: GPOS.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,8 +20,7 @@ use Net::DNS::Text;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 	( $self->{latitude},  $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
@@ -49,12 +48,10 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->latitude(shift);
-	$self->longitude(shift);
-	$self->altitude(shift);
-	die 'too many arguments for GPOS' if scalar @_;
+	foreach (qw(latitude longitude altitude)) { $self->$_( shift @argument ) }
+	die 'too many arguments for GPOS' if scalar @argument;
 	return;
 }
 
@@ -68,22 +65,22 @@ sub _defaults {				## specify RR attribute default values
 
 
 sub latitude {
-	my $self = shift;
-	$self->{latitude} = _fp2text(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{latitude} = _fp2text($_) }
 	return defined(wantarray) ? _text2fp( $self->{latitude} ) : undef;
 }
 
 
 sub longitude {
-	my $self = shift;
-	$self->{longitude} = _fp2text(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{longitude} = _fp2text($_) }
 	return defined(wantarray) ? _text2fp( $self->{longitude} ) : undef;
 }
 
 
 sub altitude {
-	my $self = shift;
-	$self->{altitude} = _fp2text(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{altitude} = _fp2text($_) }
 	return defined(wantarray) ? _text2fp( $self->{altitude} ) : undef;
 }
 
@@ -177,6 +174,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1712
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC1712|https://tools.ietf.org/html/rfc1712>
 
 =cut

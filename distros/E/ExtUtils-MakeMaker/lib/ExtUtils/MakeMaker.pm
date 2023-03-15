@@ -25,7 +25,7 @@ my %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
 our %macro_dep; # whether a macro is a dependency
 
-our $VERSION = '7.66';
+our $VERSION = '7.68';
 $VERSION =~ tr/_//d;
 
 # Emulate something resembling CVS $Revision$
@@ -44,7 +44,6 @@ our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
 # purged.
 my $Is_VMS     = $^O eq 'VMS';
 my $Is_Win32   = $^O eq 'MSWin32';
-our $UNDER_CORE = $ENV{PERL_CORE}; # needs to be our
 
 full_setup();
 
@@ -450,6 +449,8 @@ sub new {
     # object.  It will be blessed into a temp package later.
     bless $self, "MM";
 
+    $self->init_CORE;
+
     # Cleanup all the module requirement bits
     my %key2cmr;
     for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
@@ -508,7 +509,7 @@ sub new {
    }
 
     print "MakeMaker (v$VERSION)\n" if $Verbose;
-    if (-f "MANIFEST" && ! -f "Makefile" && ! $UNDER_CORE){
+    if (-f "MANIFEST" && ! -f "Makefile" && ! $self->{PERL_CORE}){
         check_manifest();
     }
 
@@ -525,7 +526,10 @@ sub new {
                     # simulate "use warnings FATAL => 'all'" for vintage perls
                     die @_;
                 };
-                version->new( $perl_version )->numify;
+                my $v = version->new($perl_version);
+                # we care about parse issues, not numify warnings
+                no warnings;
+                $v->numify;
             };
             $perl_version =~ tr/_//d
                 if defined $perl_version;
@@ -614,7 +618,7 @@ END
             warn sprintf "Warning: prerequisite %s %s not found.\n",
               $prereq, $required_version
                    unless $self->{PREREQ_FATAL}
-                       or $UNDER_CORE;
+                       or $self->{PERL_CORE};
 
             $unsatisfied{$prereq} = 'not installed';
         }
@@ -626,7 +630,7 @@ END
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
                   unless $self->{PREREQ_FATAL}
-                       or $UNDER_CORE;
+                       or $self->{PERL_CORE};
 
             $unsatisfied{$prereq} = $required_version || 'unknown version' ;
         }
@@ -1197,7 +1201,7 @@ sub mv_all_methods {
 sub skipcheck {
     my($self) = shift;
     my($section) = @_;
-    return 'skipped' if $section eq 'metafile' && $UNDER_CORE;
+    return 'skipped' if $section eq 'metafile' && $self->{PERL_CORE};
     if ($section eq 'dynamic') {
         print "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
@@ -1331,26 +1335,6 @@ sub neatvalue {
         push @m,"$key=>".neatvalue($v->{$key});
     }
     return "{ ".join(', ',@m)." }";
-}
-
-sub _find_magic_vstring {
-    my $value = shift;
-    return $value if $UNDER_CORE;
-    my $tvalue = '';
-    require B;
-    my $sv = B::svref_2object(\$value);
-    my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
-    while ( $magic ) {
-        if ( $magic->TYPE eq 'V' ) {
-            $tvalue = $magic->PTR;
-            $tvalue =~ s/^v?(.+)$/v$1/;
-            last;
-        }
-        else {
-            $magic = $magic->MOREMAGIC;
-        }
-    }
-    return $tvalue;
 }
 
 sub selfdocument {

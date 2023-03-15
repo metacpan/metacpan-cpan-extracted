@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Validator;
-$Crypt::Passphrase::Validator::VERSION = '0.009';
+$Crypt::Passphrase::Validator::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Crypt::Passphrase::Validator - Base class for Crypt::Passphrase validators
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -42,6 +42,8 @@ This method returns true if this validator is able to process a hash. Typically 
 =head2 verify_password($password, $hash)
 
 This checks if a C<$password> satisfies C<$hash>.
+
+It provides the following helper method:
 
 =head2 secure_compare($left, $right)
 

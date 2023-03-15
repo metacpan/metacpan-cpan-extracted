@@ -27,13 +27,13 @@ SKIP: {
     skip 'Cannot find math lib: ' . $libfile, 8 if $^O ne 'MSWin32' && !-f $libfile;
     diag 'Loading ' . $libfile . ' ...';
     my %loaders = (
-        sin_default  => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_DEFAULT() ),
-        sin_vararg   => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_ELLIPSIS_VARARGS() ),
-        sin_ellipsis => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_ELLIPSIS() ),
-        sin_cdecl    => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_CDECL() ),
-        sin_stdcall  => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_STDCALL() ),
-        sin_fastcall => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_FASTCALL_GNU() ),
-        sin_thiscall => wrap( $libfile, 'sin', [Double], Double, DC_SIGCHAR_CC_THISCALL_GNU() )
+        sin_default  => wrap( $libfile, 'sin', [ CC_DEFAULT,          Double ], Double ),
+        sin_vararg   => wrap( $libfile, 'sin', [ CC_ELLIPSIS_VARARGS, Double ], Double ),
+        sin_ellipsis => wrap( $libfile, 'sin', [ CC_ELLIPSIS,         Double ], Double ),
+        sin_cdecl    => wrap( $libfile, 'sin', [ CC_CDECL,            Double ], Double ),
+        sin_stdcall  => wrap( $libfile, 'sin', [ CC_STDCALL,          Double ], Double ),
+        sin_fastcall => wrap( $libfile, 'sin', [ CC_FASTCALL_GNU,     Double ], Double ),
+        sin_thiscall => wrap( $libfile, 'sin', [ CC_THISCALL_GNU,     Double ], Double )
     );
     my $correct
         = $Config{usequadmath} ? -0.988031624092861826547107284568483 :

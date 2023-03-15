@@ -5,7 +5,7 @@
 
 #include <assert.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
   #include <winsock2.h>
 #else
   #include <poll.h>

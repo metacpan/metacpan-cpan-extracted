@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Module::Base;
-$Bot::BasicBot::Pluggable::Module::Base::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Module::Base::VERSION = '1.30';
 use warnings;
 use strict;
 use base qw( Bot::BasicBot::Pluggable::Module );

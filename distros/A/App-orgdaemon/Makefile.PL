@@ -28,7 +28,7 @@ WriteMakefile(
       (ABSTRACT	      => 'watch for appointments in org-mode files',
        AUTHOR         => 'Slaven Rezic <srezic@cpan.org>') : ()),
     ($eumm_recent_enough ?
-      (META_ADD => { resources => { repository => 'git://github.com/eserte/org-daemon.git' } }) : ()),
+      (META_ADD => { resources => { repository => 'https://github.com/eserte/org-daemon.git' } }) : ()),
 );
 
 sub MY::postamble {

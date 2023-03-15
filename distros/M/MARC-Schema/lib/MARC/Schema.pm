@@ -3,7 +3,7 @@ package MARC::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Cpanel::JSON::XS;
 use File::Share ':all';
@@ -261,7 +261,9 @@ Johann Rolschewski E<lt>jorol@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
 
-Patrick Hochstenbach E<lt>patrick.hochstenbach@ugent.be<gt>
+Patrick Hochstenbach
+
+Steve Rogerson
 
 =head1 COPYRIGHT
 
@@ -284,6 +286,6 @@ L<MARC::Lint>
 
 =head1 ACKNOWLEDGEMENT
 
-MARC::Schema uses the MARC21 schema developed by L<P�ter Kir�ly|https://github.com/pkiraly> as default. For more information see L<"Metadata assessment for MARC records"|https://github.com/pkiraly/metadata-qa-marc> and L<"MARC21 structure in JSON"|https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
+MARC::Schema uses the MARC21 schema developed by L<Péter Király|https://github.com/pkiraly> as default. For more information see L<"Metadata assessment for MARC records"|https://github.com/pkiraly/metadata-qa-marc> and L<"MARC21 structure in JSON"|https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
 
 =cut

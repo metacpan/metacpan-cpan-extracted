@@ -1,5 +1,14 @@
 Revision history for OpenAI-API
 
+0.27    2023-03-13
+        Bugfix.
+
+0.26    2023-03-12
+        Refactor requests.
+
+0.25    2023-03-09
+        Add images and files endpoints. Refactor.
+
 0.24    2023-03-09
         Refactor with ResourceDispatcherRole.
 

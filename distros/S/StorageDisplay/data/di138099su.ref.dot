@@ -1,253 +1,302 @@
-digraph "machine"{
-	rankdir=LR;
-	{ "@Part: md126" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">Grappe RAID logiciel Linux</TD> </TR><TR><TD >/dev/md/Volume0_0<BR/>Label: msdos<BR/>Size: 227 GiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 993 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/md/Volume0_0p1<BR/>Size: 500 MiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="2" BGCOLOR="yellow">
-						/dev/md/Volume0_0p2<BR/>Size: 48.8 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="3" BGCOLOR="lightgrey">
-						/dev/md/Volume0_0p3<BR/>Size: 43.9 GiB
-						</TD>
-					</TR>
-					<TR>
-						<TD>
-							<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
-							<TD PORT="4" BGCOLOR="mediumorchid1">
-							/dev/md/Volume0_0p4<BR/>Size: 133 GiB
-							</TD></TR><TR><TD>
-							<TABLE >
-								<TR>
-									<TD PORT="5" BGCOLOR="lightgrey">
-									/dev/md/Volume0_0p5<BR/>Size: 43.9 GiB
-									</TD>
-								</TR>
-								<TR>
-									<TD PORT="6" BGCOLOR="yellow">
-									/dev/md/Volume0_0p6<BR/>Size: 29.3 GiB
-									</TD>
-								</TR>
-								<TR>
-									<TD PORT="7" BGCOLOR="yellow">
-									/dev/md/Volume0_0p7<BR/>Size: 14.6 GiB
-									</TD>
-								</TR>
-								<TR>
-									<TD PORT="8" BGCOLOR="yellow">
-									/dev/md/Volume0_0p8<BR/>Size: 9.77 GiB
-									</TD>
-								</TR>
-								<TR>
-									<TD PORT="9" BGCOLOR="yellow">
-									/dev/md/Volume0_0p9<BR/>Size: 7.81 GiB
-									</TD>
-								</TR>
-								<TR>
-									<TD PORT="10" BGCOLOR="yellow">
-									/dev/md/Volume0_0p10<BR/>Size: 4.88 GiB
-									</TD>
-								</TR>
-								<TR>
-									<TD PORT="11" BGCOLOR="lightgrey">
-									/dev/md/Volume0_0p11<BR/>Size: 480 MiB
-									</TD>
-								</TR>
-							</TABLE>
-							</TD></TR></TABLE>
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 22.5 GiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000004:pink;0.002155:pink;0.215532:pink;0.193979:pink;0.193979:pink;0.129319:pink;0.064660:pink;0.043106:pink;0.034485:pink;0.021553:pink;0.002069:green;0.099123";
-	]; }
-	{ "@Part: nvme0n1" [
-		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">NVMe Device</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Model: Micron_9300_MTFDHAL6T4TDR               <BR/>Serial: 20262AAA7392<BR/>Label: gpt<BR/>Size: 5.82 TiB</TD>    <TD BGCOLOR="lightgrey">
-				<TABLE >
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 1007 kiB
-						</TD>
-					</TR>
-					<TR>
-						<TD PORT="1" BGCOLOR="yellow">
-						/dev/nvme0n1p1<BR/>Size: 5.82 TiB
-						</TD>
-					</TR>
-					<TR>
-						<TD bgcolor="green">
-						Free<BR/>Size: 328 kiB
-						</TD>
-					</TR>
-				</TABLE>
-				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-			</TABLE>
-		>;
-		// Style node
-		color=white;
-		fillcolor=lightgrey;
-		shape="rectangle";
-		style=striped;
-		fillcolor="green;0.000000:pink;1.000000:green;0.000000";
-	]; }
-	subgraph "cluster_@MD@md126" {
+digraph "di138099su.example.com"{ // HEADER: MACHINE
+	rankdir=LR; // HEADER: MACHINE
+	subgraph "cluster_machine@di138099su.example.com" {
 		style=filled;
 		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		subgraph "cluster_md126@@state" {
-			{ "md126" [
-				label="/dev/md/Volume0_0\nraid1\nSize: 227 GiB";
-				fillcolor="yellow"
+		fillcolor=white;
+		node [style=filled,color=white,fillcolor=white,shape=rectangle];
+			{ "machine@di138099su.example.com|Partition::MSDOS@md126" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">Linux Software RAID Array</TD> </TR><TR><TD >/dev/md/Volume0_0<BR/>Label: msdos<BR/>Size: 227 GiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 993 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="yellow">
+								/dev/md/Volume0_0p1<BR/>Size: 500 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/md/Volume0_0p2<BR/>Size: 48.8 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="3" BGCOLOR="lightgrey">
+								/dev/md/Volume0_0p3<BR/>Size: 43.9 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD>
+									<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+									<TD PORT="4" BGCOLOR="mediumorchid1">
+									/dev/md/Volume0_0p4<BR/>Size: 133 GiB
+									</TD></TR><TR><TD>
+									<TABLE >
+										<TR>
+											<TD PORT="5" BGCOLOR="lightgrey">
+											/dev/md/Volume0_0p5<BR/>Size: 43.9 GiB
+											</TD>
+										</TR>
+										<TR>
+											<TD PORT="6" BGCOLOR="yellow">
+											/dev/md/Volume0_0p6<BR/>Size: 29.3 GiB
+											</TD>
+										</TR>
+										<TR>
+											<TD PORT="7" BGCOLOR="yellow">
+											/dev/md/Volume0_0p7<BR/>Size: 14.6 GiB
+											</TD>
+										</TR>
+										<TR>
+											<TD PORT="8" BGCOLOR="yellow">
+											/dev/md/Volume0_0p8<BR/>Size: 9.77 GiB
+											</TD>
+										</TR>
+										<TR>
+											<TD PORT="9" BGCOLOR="yellow">
+											/dev/md/Volume0_0p9<BR/>Size: 7.81 GiB
+											</TD>
+										</TR>
+										<TR>
+											<TD PORT="10" BGCOLOR="yellow">
+											/dev/md/Volume0_0p10<BR/>Size: 4.88 GiB
+											</TD>
+										</TR>
+										<TR>
+											<TD PORT="11" BGCOLOR="lightgrey">
+											/dev/md/Volume0_0p11<BR/>Size: 480 MiB
+											</TD>
+										</TR>
+									</TABLE>
+									</TD></TR></TABLE>
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 22.5 GiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000004:pink;0.002155:pink;0.215532:pink;0.193979:pink;0.193979:pink;0.129319:pink;0.064660:pink;0.043106:pink;0.034485:pink;0.021553:pink;0.002069:green;0.099123";
 			]; }
-			label="state: active ";
-			shape=oval
-			fillcolor=green
-		}
-		{ "@MD@md126@dev@sda" [
-			label="0: /dev/sda\nactive sync";
-			fillcolor=yellow
-		]; }
-		{ "@MD@md126@dev@sdb" [
-			label="1: /dev/sdb\nactive sync";
-			fillcolor=yellow
-		]; }
-		label="\n227 GiB used per device";
+			{ "machine@di138099su.example.com|Partition::GPT@nvme0n1" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">NVMe Device</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Model: Micron_9300_MTFDHAL6T4TDR               <BR/>Serial: 20262AAA7392<BR/>Label: gpt<BR/>Size: 5.82 TiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="yellow">
+								/dev/nvme0n1p1<BR/>Size: 5.82 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 328 kiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000000:pink;1.000000:green;0.000000";
+			]; }
+			subgraph "cluster_machine@di138099su.example.com|RAID::MD@md126" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				subgraph "cluster_machine@di138099su.example.com|RAID::MD@md126|::State" {
+					{ "machine@di138099su.example.com|RAID::MD@md126|::State|::RaidDevice@md126" [
+						label="/dev/md/Volume0_0\nraid1\nSize: 227 GiB";
+						fillcolor="yellow"
+					]; }
+					label="state: active ";
+					shape=oval
+					fillcolor=green
+				}
+				{ "machine@di138099su.example.com|RAID::MD@md126|::Device@sda" [
+					label="0: /dev/sda\nactive sync";
+					fillcolor=yellow
+				]; }
+				{ "machine@di138099su.example.com|RAID::MD@md126|::Device@sdb" [
+					label="1: /dev/sdb\nactive sync";
+					fillcolor=yellow
+				]; }
+				label="\n227 GiB used per device";
+			}
+			subgraph "cluster_machine@di138099su.example.com|RAID::MD::Container@md127" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				{ "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::ContainerDevice@md127" [
+					label="/dev/md/imsm0";
+					shape=oval;
+					fillcolor=mediumorchid1;
+				]; }
+				{ "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sda" [
+					label="0: /dev/sda";
+					fillcolor=yellow
+				]; }
+				{ "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sdb" [
+					label="1: /dev/sdb";
+					fillcolor=yellow
+				]; }
+				label="Software RAID container\nType: imsm";
+			}
+			subgraph "cluster_machine@di138099su.example.com|FS" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				{ "machine@di138099su.example.com|FS|::FS@/boot" [
+					label="/boot\nDevice: /dev/md/Volume0_0p1\nxfs\nSize: 497 MiB\nFree: 358 MiB\nUsed: 139 MiB";
+					style=striped;fillcolor="pink;0.279154.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::FS@/var/log/audit" [
+					label="/var/log/audit\nDevice: /dev/md/Volume0_0p10\nxfs\nSize: 4.87 GiB\nFree: 4.81 GiB\nUsed: 66.9 MiB";
+					style=striped;fillcolor="pink;0.013411.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::FS@/home" [
+					label="/home\nDevice: /dev/md/Volume0_0p2\nxfs\nSize: 48.8 GiB\nFree: 43.7 GiB\nUsed: 5.06 GiB";
+					style=striped;fillcolor="pink;0.103745.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::FS@/var" [
+					label="/var\nDevice: /dev/md/Volume0_0p6\nxfs\nSize: 29.3 GiB\nFree: 22.5 GiB\nUsed: 6.78 GiB";
+					style=striped;fillcolor="pink;0.231451.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::FS@/" [
+					label="/\nDevice: /dev/md/Volume0_0p7\nxfs\nSize: 14.6 GiB\nFree: 10.5 GiB\nUsed: 4.15 GiB";
+					style=striped;fillcolor="pink;0.283654.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::FS@/var/log" [
+					label="/var/log\nDevice: /dev/md/Volume0_0p8\nxfs\nSize: 9.76 GiB\nFree: 9.48 GiB\nUsed: 278 MiB";
+					style=striped;fillcolor="pink;0.027839.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::FS@/staging" [
+					label="/staging\nDevice: /dev/nvme0n1p1\nxfs\nSize: 5.82 TiB\nFree: 4.62 TiB\nUsed: 1.20 TiB";
+					style=striped;fillcolor="pink;0.205437.2:green"
+				]; }
+				{ "machine@di138099su.example.com|FS|::SWAP::Partition@md126p9" [
+					label="SWAP\nDevice: /dev/md/Volume0_0p9\nSize: 7.81 GiB\nFree: 6.47 GiB\nUsed: 1.34 GiB";
+					style=striped;fillcolor="pink;0.171563.2:green"
+				]; }
+				label="Mounted FS and swap";
+			}
+			subgraph "cluster_machine@di138099su.example.com|Libvirt" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				label="Libvirt Virtual Machines";
+			}
+			{ "machine@di138099su.example.com|Partition::None@sda" [
+				label="/dev/sda\nModel: TS256GSSD420K   \nSerial: G210650036\nSize: 238 GiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
+			{ "machine@di138099su.example.com|Partition::None@sdb" [
+				label="/dev/sdb\nModel: TS256GSSD420K   \nSerial: G210650037\nSize: 238 GiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
+			// Links from MD: /dev/md/Volume0_0
+			"machine@di138099su.example.com|RAID::MD@md126|::Device@sda" -> "machine@di138099su.example.com|RAID::MD@md126|::State|::RaidDevice@md126"
+			"machine@di138099su.example.com|RAID::MD@md126|::Device@sdb" -> "machine@di138099su.example.com|RAID::MD@md126|::State|::RaidDevice@md126"
+			// Links from MD: /dev/md/imsm0
+			"machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sda" -> "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::ContainerDevice@md127"
+			"machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sdb" -> "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::ContainerDevice@md127"
+			// Links for Partition::MSDOS@md126
+			"machine@di138099su.example.com|RAID::MD@md126|::State|::RaidDevice@md126" -> "machine@di138099su.example.com|Partition::MSDOS@md126"
+			// Links for Partition::MSDOS@md126
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@md126p1
+			// Links for Partition::Table::Part::Data@md126p2
+			// Links for Partition::Table::Part::Data@md126p3
+			// Links for Partition::Table::Part::SubTable@md126p4
+			// Links for Partition::Table::Part::Data@md126p5
+			// Links for Partition::Table::Part::Data@md126p6
+			// Links for Partition::Table::Part::Data@md126p7
+			// Links for Partition::Table::Part::Data@md126p8
+			// Links for Partition::Table::Part::Data@md126p9
+			// Links for Partition::Table::Part::Data@md126p10
+			// Links for Partition::Table::Part::Data@md126p11
+			// Links for Partition::Table::Part::Free@_2
+			// Links for Partition::GPT@nvme0n1
+			// TARGET LINK: di138099su.example.com 6401252745216 nvme0n1 "machine@di138099su.example.com|Partition::GPT@nvme0n1"
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@nvme0n1p1
+			// Links for Partition::Table::Part::Free@_2
+			// Links for MD: /dev/md/Volume0_0
+			// Links for RAID::MD::State
+			// Links for RAID::MD::State::RaidDevice@md126
+			// Links for RAID::MD::Device@sda
+			"machine@di138099su.example.com|RAID::MD::Container@md127|RAID::ContainerDevice@md127" -> "machine@di138099su.example.com|RAID::MD@md126|::Device@sda"
+			// Links for RAID::MD::Device@sda
+			// Links for RAID::MD::Device@sdb
+			"machine@di138099su.example.com|RAID::MD::Container@md127|RAID::ContainerDevice@md127" -> "machine@di138099su.example.com|RAID::MD@md126|::Device@sdb"
+			// Links for RAID::MD::Device@sdb
+			// Links for MD: /dev/md/imsm0
+			// Links for RAID::ContainerDevice@md127
+			// Links for RAID::Device@sda
+			// TARGET LINK: di138099su.example.com 256060514304 sda "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sda"
+			// Links for RAID::Device@sdb
+			// TARGET LINK: di138099su.example.com 256060514304 sdb "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sdb"
+			// Links for FS
+			// Links for FS::FS@/boot
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"1" -> "machine@di138099su.example.com|FS|::FS@/boot"
+			// Links for FS::FS@/boot
+			// Links for FS::FS@/var/log/audit
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"10" -> "machine@di138099su.example.com|FS|::FS@/var/log/audit"
+			// Links for FS::FS@/var/log/audit
+			// Links for FS::FS@/home
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"2" -> "machine@di138099su.example.com|FS|::FS@/home"
+			// Links for FS::FS@/home
+			// Links for FS::FS@/var
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"6" -> "machine@di138099su.example.com|FS|::FS@/var"
+			// Links for FS::FS@/var
+			// Links for FS::FS@/
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"7" -> "machine@di138099su.example.com|FS|::FS@/"
+			// Links for FS::FS@/
+			// Links for FS::FS@/var/log
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"8" -> "machine@di138099su.example.com|FS|::FS@/var/log"
+			// Links for FS::FS@/var/log
+			// Links for FS::FS@/staging
+			"machine@di138099su.example.com|Partition::GPT@nvme0n1":"1" -> "machine@di138099su.example.com|FS|::FS@/staging"
+			// Links for FS::FS@/staging
+			// Links for FS::SWAP::Partition@md126p9
+			"machine@di138099su.example.com|Partition::MSDOS@md126":"9" -> "machine@di138099su.example.com|FS|::SWAP::Partition@md126p9"
+			// Links for FS::SWAP::Partition@md126p9
+			// Links for Libvirt Virtual Machines
+			// Links for Partition::None@sda
+			// TARGET LINK: di138099su.example.com 256060514304 sda "machine@di138099su.example.com|Partition::None@sda"
+			// Links for Partition::None@sdb
+			// TARGET LINK: di138099su.example.com 256060514304 sdb "machine@di138099su.example.com|Partition::None@sdb"
+		label="di138099su.example.com";
 	}
-	subgraph "cluster_@MD@md127" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		{ "md127" [
-			label="/dev/md/imsm0";
-			shape=oval;
-			fillcolor=mediumorchid1;
-		]; }
-		{ "@MD@md127@dev@sda" [
-			label="0: /dev/sda";
-			fillcolor=yellow
-		]; }
-		{ "@MD@md127@dev@sdb" [
-			label="1: /dev/sdb";
-			fillcolor=yellow
-		]; }
-		label="Software RAID container\nType: imsm";
-	}
-	subgraph "cluster_@FS" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		{ "@FS@/boot" [
-			label="/boot\nDevice: /dev/md/Volume0_0p1\nxfs\nSize: 497 MiB\nFree: 358 MiB\nUsed: 139 MiB";
-			style=striped;fillcolor="pink;0.279154.2:green"
-		]; }
-		{ "@FS@/var/log/audit" [
-			label="/var/log/audit\nDevice: /dev/md/Volume0_0p10\nxfs\nSize: 4.87 GiB\nFree: 4.80 GiB\nUsed: 73.6 MiB";
-			style=striped;fillcolor="pink;0.014751.2:green"
-		]; }
-		{ "@FS@/home" [
-			label="/home\nDevice: /dev/md/Volume0_0p2\nxfs\nSize: 48.8 GiB\nFree: 43.7 GiB\nUsed: 5.06 GiB";
-			style=striped;fillcolor="pink;0.103745.2:green"
-		]; }
-		{ "@FS@/var" [
-			label="/var\nDevice: /dev/md/Volume0_0p6\nxfs\nSize: 29.3 GiB\nFree: 22.5 GiB\nUsed: 6.78 GiB";
-			style=striped;fillcolor="pink;0.231542.2:green"
-		]; }
-		{ "@FS@/" [
-			label="/\nDevice: /dev/md/Volume0_0p7\nxfs\nSize: 14.6 GiB\nFree: 10.5 GiB\nUsed: 4.15 GiB";
-			style=striped;fillcolor="pink;0.283651.2:green"
-		]; }
-		{ "@FS@/var/log" [
-			label="/var/log\nDevice: /dev/md/Volume0_0p8\nxfs\nSize: 9.76 GiB\nFree: 9.43 GiB\nUsed: 333 MiB";
-			style=striped;fillcolor="pink;0.033353.2:green"
-		]; }
-		{ "@FS@/staging" [
-			label="/staging\nDevice: /dev/nvme0n1p1\nxfs\nSize: 5.82 TiB\nFree: 4.73 TiB\nUsed: 1.09 TiB";
-			style=striped;fillcolor="pink;0.187132.2:green"
-		]; }
-		{ "@FS@SWAP@md126p9" [
-			label="SWAP\nDevice: /dev/md/Volume0_0p9\nSize: 7.81 GiB\nFree: 6.47 GiB\nUsed: 1.34 GiB";
-			style=striped;fillcolor="pink;0.171594.2:green"
-		]; }
-		label="Mounted FS and swap";
-	}
-	subgraph "cluster_@libvirt" {
-		style=filled;
-		color=lightgrey;
-		fillcolor=lightgrey;
-		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-		label="Libvirt Virtual Machines";
-	}
-	{ "sda" [
-		label="/dev/sda\nModel: TS256GSSD420K   \nSerial: G210650036\nSize: 238 GiB";
-		fillcolor="yellow"
-		style=filled
-		shape=rectangle
-	]; }
-	{ "sdb" [
-		label="/dev/sdb\nModel: TS256GSSD420K   \nSerial: G210650037\nSize: 238 GiB";
-		fillcolor="yellow"
-		style=filled
-		shape=rectangle
-	]; }
-	// Links from MD: /dev/md/Volume0_0
-	"@MD@md126@dev@sda" -> "md126"
-	"@MD@md126@dev@sdb" -> "md126"
-	// Links from MD: /dev/md/imsm0
-	"@MD@md127@dev@sda" -> "md127"
-	"@MD@md127@dev@sdb" -> "md127"
-	// Links for @Part: md126
-	"md126" -> "@Part: md126"
-	// Links for @MD@md126@dev@sda
-	"md127" -> "@MD@md126@dev@sda"
-	// Links for @MD@md126@dev@sdb
-	"md127" -> "@MD@md126@dev@sdb"
-	// Links for @MD@md127@dev@sda
-	"sda" -> "@MD@md127@dev@sda"
-	// Links for @MD@md127@dev@sdb
-	"sdb" -> "@MD@md127@dev@sdb"
-	// Links for @FS@/boot
-	"@Part: md126":"1" -> "@FS@/boot"
-	// Links for @FS@/var/log/audit
-	"@Part: md126":"10" -> "@FS@/var/log/audit"
-	// Links for @FS@/home
-	"@Part: md126":"2" -> "@FS@/home"
-	// Links for @FS@/var
-	"@Part: md126":"6" -> "@FS@/var"
-	// Links for @FS@/
-	"@Part: md126":"7" -> "@FS@/"
-	// Links for @FS@/var/log
-	"@Part: md126":"8" -> "@FS@/var/log"
-	// Links for @FS@/staging
-	"@Part: nvme0n1":"1" -> "@FS@/staging"
-	// Links for @FS@SWAP@md126p9
-	"@Part: md126":"9" -> "@FS@SWAP@md126p9"
-}
+} // FOOTER: MACHINE

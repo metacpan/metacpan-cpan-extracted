@@ -1,0 +1,7 @@
+Revision history for YAML::PP::Schema::Env.
+
+0.02	2023-03-12
+	add Pod documentation, README and Changes files
+
+0.01	2023-01-28
+	initial release

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
   // None
 #else
   #include <sys/types.h>
@@ -17,8 +17,8 @@
 const char* FILE_NAME = "Sys/Process.c";
 
 int32_t SPVM__Sys__Process__fork(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "fork is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "fork is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -38,8 +38,8 @@ int32_t SPVM__Sys__Process__fork(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__getpriority(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "getpriority is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "getpriority is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -62,8 +62,8 @@ int32_t SPVM__Sys__Process__getpriority(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__setpriority(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "setpriority is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "setpriority is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -99,8 +99,8 @@ int32_t SPVM__Sys__Process__sleep(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__wait(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "wait is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "wait is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -124,8 +124,8 @@ int32_t SPVM__Sys__Process__wait(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__waitpid(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "waitpid is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "waitpid is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -180,8 +180,8 @@ int32_t SPVM__Sys__Process__exit(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "pipe is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "pipe is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -218,8 +218,8 @@ int32_t SPVM__Sys__Process__pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__getpgid(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "getpgid is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "getpgid is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -241,8 +241,8 @@ int32_t SPVM__Sys__Process__getpgid(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__setpgid(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "setpgid is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "setpgid is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -276,8 +276,8 @@ int32_t SPVM__Sys__Process__getpid(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Process__getppid(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "getppid is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "getppid is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;

@@ -2,7 +2,7 @@ package Net::DNS::RR::KEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: KEY.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: KEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR::DNSKEY);
 
@@ -83,8 +83,12 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::DNSKEY>,
-RFC4034, RFC3755, RFC3008, RFC2535
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<Net::DNS::RR::DNSKEY>
+L<RFC2536|https://tools.ietf.org/html/rfc2536>
+L<RFC2539|https://tools.ietf.org/html/rfc2539>
+L<RFC3110|https://tools.ietf.org/html/rfc3110>
+L<RFC4034|https://tools.ietf.org/html/rfc4034>
 
 L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 

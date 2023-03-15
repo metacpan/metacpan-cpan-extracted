@@ -1,254 +1,258 @@
 #!perl
+use Test2::V0;
+use Test2::Tools::Command;
+local @Test2::Tools::Command::command = ( $^X, '--', './bin/atonal-util' );
 
-use Test::Cmd;
-use Test::Most;    # plan is down at bottom
+# these may just confirm existing bad behavior, or duplicate tests from
+# Music::AtonalUtil, or probably are otherwise incomplete
+command {
+    args   => [qw(--sd=16 adjacent_interval_content 0 3 6 10 12)],
+    stdout => "01220000\n",
+};
+command {
+    args   => [qw(bark 69)],    # 440 Hz, a'
+    stdout => "4.39\n",
+};
+command {
+    args   => [qw(basic 0 4 7)],
+    stdout => "0,3,7\n001110\n3-11\tMajor and minor triad\n0,4,7\thalf_prime\n",
+};
+command {
+    args   => [qw(basic c e g)],
+    stdout => "0,3,7\n001110\n3-11\tMajor and minor triad\n0,4,7\thalf_prime\n",
+};
+command {
+    args   => [qw(basic --ly --tension=cope 0 1 2)],
+    stdout => "c,cis,d\n210000\n3-1\n1.800  0.800  1.000\n",
+};
+command {
+    args   => [qw(--rs=_ basic c e g)],
+    stdout => "0_3_7\n001110\n3-11\tMajor and minor triad\n0_4_7\thalf_prime\n",
+};
+command {
+    args   => [qw(beats2set --scaledegrees=16 x..x ..x. ..x. x...)],
+    stdout => "0,3,6,10,12\n",
+};
+command {
+    args   => [qw(circular_permute 0 1 2)],
+    stdout => "0 1 2\n1 2 0\n2 0 1\n",
+};
+command {
+    args   => [qw(combos 440 880)],
+    stdout =>
+      "440.00+880.00 = 1320.00\t(88 error -1.49)\n880.00-440.00 = 440.00\t(69 error 0.00)\n",
+};
+command {
+    args   => [qw(combos c g)],
+    stdout =>
+      "130.81+196.00 = 326.81\t(64 error 2.82)\n196.00-130.81 = 65.18\t(36 error 0.22)\n",
+};
+command {
+    args   => [ 'complement', '0,1,2,3,4,5,7,8,9,10,11' ],
+    stdout => "6\n",
+};
+command {
+    args   => [qw(equivs 0 1 2 3 4 5 6 7 8 9 10 11)],
+    stdout => "0 1 2 3 4 5 6 7 8 9 10 11\n",
+};
+command {
+    args   => [qw(findall --fn=5 --root=0 c e g b a)],
+    stdout => "5-27\tTi(0)\t0,11,9,7,4\n",
+};
+command {
+    args   => [qw(findin --pitchset=4-23 --root=2 0 2 7 9)],
+    stdout => "-\tTi(2)\t2,0,9,7\n",
+};
+command {
+    args   => [qw(forte2pcs 9-3)],
+    stdout => "0,1,2,3,4,5,6,8,9\n",
+};
+command {
+    args   => [qw(freq2pitch 440)],
+    stdout => "440.00\t69\t+0.00\t0.00%\n",
+};
+command {
+    args   => [qw(freq2pitch --cf=422.5 440)],
+    stdout => "440.00\t70\t-7.62\t1.70%\n",
+};
+command {
+    args   => [qw(half_prime_form c b g)],
+    stdout => "0,4,5\n",
+};
+command {
+    args   => [qw(interval_class_content c fis b)],
+    stdout => "100011\n",
+};
+command {
+    args   => [qw(intervals2pcs --pitch=2 3 4 7)],
+    stdout => "2,5,9,4\n",
+};
+command {
+    args   => [qw(invariance_matrix 0 2 4)],
+    stdout => "0,2,4\n2,4,6\n4,6,8\n",
+};
+command {
+    args   => [qw(invert 1 2 3)],
+    stdout => "11,10,9\n",
+};
+command {
+    args   => [qw(ly2pitch c')],
+    stdout => "60\n",
+};
+command {
+    args   => [qw(ly2struct --tempo=120 --relative=c c4 r8)],
+    stdout => "\t{ 131, 500 },\t/* c4 */\n\t{ 0, 250 },\t/* r8 */\n",
 
-my $deeply = \&eq_or_diff;
+};
+command {
+    args   => [qw(multiply --factor=2 1 2 3)],
+    stdout => "2 4 6\n",
+};
+command {
+    args   => [qw(normal_form e g c)],
+    stdout => "0,4,7\n",
+};
+command {
+    args   => [qw(notes2time 1)],
+    stdout => "4s\n",
+};
+command {
+    args   => [qw(notes2time --ms --tempo=120 1)],
+    stdout => "2000\n",
+};
+command {
+    args   => [qw(notes2time --ms --tempo=160 c4*2/3 c c)],
+    stdout => "250\n250\n250\n= 750\n",
+};
+command {
+    args   => [qw(notes2time --fraction=2/3 c4. d8 e4)],
+    stdout => "1s\n333ms\n666ms\n= 2s\n",
+};
+command {
+    args   => [qw(pcs2forte 4 6 3 7)],
+    stdout => "4-3\n",
+};
+command {
+    args   => [qw(pcs2intervals 3 4 7)],
+    stdout => "1,3\n",
+};
+command {
+    args   => [qw(pitch2freq 60)],
+    stdout => "60\t261.63\n",
+};
+# TODO need to check these numbers manually
+command {
+    args   => [qw(pitch2freq --cf=422.5 a)],
+    stdout => "57\t211.25\n",
+};
+command {
+    args   => [qw(pitch2intervalclass 4)],
+    stdout => "4\n",
+};
+command {
+    args   => [qw(pitch2intervalclass 8)],
+    stdout => "4\n",
+};
+command {
+    args   => [qw(pitch2ly 72)],
+    stdout => "c''\n",
+};
+command {
+    args   => [qw(prime_form 0 4 7)],
+    stdout => "0,3,7\n",
+};
+command {
+    args   => [qw(recipe --file=t/rules 0 11 3)],
+    stdout => "4,8,7\n",
+};
+command {
+    args   => [qw(retrograde 1 2 3)],
+    stdout => "3,2,1\n",
+};
+command {
+    args   => [qw(rotate --rotate=3 1 2 3 4)],
+    stdout => "2,3,4,1\n",
+};
+command {
+    args   => [qw(set2beats --scaledegrees=16 4-z15)],
+    stdout => "xx..x.x.........\n",
+};
+command {
+    args   => [qw(set_complex 0 2 7)],
+    stdout => "0,2,7\n10,0,5\n5,7,0\n",
+};
+command {
+    args => [qw(subsets 3-1)],
+    # NOTE might false alarm if permutation module changes ordering; if
+    # so, sort the output?
+    stdout => "0,1\n0,2\n1,2\n",
+};
+command {
+    args   => [qw(tcs 7-4)],
+    stdout => "7 5 4 4 3 3 4 3 3 4 4 5\n",
+};
+command {
+    args   => [qw(tcis 7-4)],
+    stdout => "2 4 4 4 5 4 5 6 5 4 4 2\n",
+};
+command {
+    args   => [qw(tension g b d f)],
+    stdout => "1.000  0.100  0.700\t0.2,0.1,0.7\n",
+};
+command {
+    args   => [qw(time2notes 1234)],
+    stdout => "c4*123/100\n",
+};
+command {
+    args   => [qw(transpose --transpose=7 0 6 11)],
+    stdout => "7,1,6\n",
+};
+command {
+    args   => [qw(transpose_invert --transpose=3 1 2 3)],
+    stdout => "2,1,0\n",
+};
+command {
+    args   => [qw(whatscalesfit c d e f g a b)],
+    stdout =>
+      "C  Major                     c     d     e     f     g     a     b\nD  Dorian                    d     e     f     g     a     b     c\nE  Phrygian                  e     f     g     a     b     c     d\nF  Lydian                    f     g     a     b     c     d     e\nG  Mixolydian                g     a     b     c     d     e     f\nA  Aeolian                   a     b     c     d     e     f     g\nB  Locrian                   b     c     d     e     f     g     a\nA  Melodic minor     DSC     g     f     e     d     c     b     a\n",
+};
 
-my $test_prog = './bin/atonal-util';
-my $tc        = Test::Cmd->new(
-    interpreter => $^X,
-    prog        => $test_prog,
-    verbose     => 0,            # TODO is there a standard ENV to toggling?
-    workdir     => '',
-);
+# custom tests that the old Test::Cmd code had trouble with
 
-# These may just confirm existing bad behavior, or duplicate tests from
-# Music::AtonalUtil, or probably are otherwise incomplete. With the
-# switch to Test::Cmd some tests were fiddled with to avoid ' in the
-# arguments. Trailing whitespace in atonal-util output is ignored by
-# most of these tests.
-my @tests = (
-    {   args     => '--sd=16 adjacent_interval_content 0 3 6 10 12',
-        expected => ['01220000'],
-    },
-    {   args     => 'bark 69',    # 440 Hz, a'
-        expected => ['4.39'],
-    },
-    {   args     => 'basic 0 4 7',
-        expected =>
-          [ '0,3,7', '001110', "3-11\tMajor and minor triad", "0,4,7\thalf_prime" ],
-    },
-    {   args     => 'basic c e g',
-        expected =>
-          [ '0,3,7', '001110', "3-11\tMajor and minor triad", "0,4,7\thalf_prime" ],
-    },
-    {   args     => 'basic --ly --tension=cope 0 1 2',
-        expected => [ 'c,cis,d', '210000', '3-1', '1.800  0.800  1.000' ],
-    },
-    {   args     => '--rs=_ basic c e g',
-        expected =>
-          [ '0_3_7', '001110', "3-11\tMajor and minor triad", "0_4_7\thalf_prime" ],
-    },
-    {   args     => 'beats2set --scaledegrees=16 x..x ..x. ..x. x...',
-        expected => ['0,3,6,10,12'],
-    },
-    {   args     => 'circular_permute 0 1 2',
-        expected => [ '0 1 2', '1 2 0', '2 0 1' ],
-    },
-    {   args     => 'combos 440 880',
-        expected => [
-            "440.00+880.00 = 1320.00\t(88 error -1.49)",
-            "880.00-440.00 = 440.00\t(69 error 0.00)"
-        ],
-    },
-    {   args     => 'combos c g',
-        expected => [
-            "130.81+196.00 = 326.81\t(64 error 2.82)",
-            "196.00-130.81 = 65.18\t(36 error 0.22)"
-        ],
-    },
-    {   args     => 'complement 0,1,2,3,4,5,7,8,9,10,11',
-        expected => ['6'],
-    },
-    {   args     => 'equivs 0 1 2 3 4 5 6 7 8 9 10 11',
-        expected => ['0 1 2 3 4 5 6 7 8 9 10 11'],
-    },
-    {   args     => 'findall --fn=5 --root=0 c e g b a',
-        expected => ["5-27\tTi(0)\t0,11,9,7,4"],
-    },
-    {   args     => 'findin --pitchset=4-23 --root=2 0 2 7 9',
-        expected => ["-\tTi(2)\t2,0,9,7"],
-    },
-    {   args     => 'forte2pcs 9-3',
-        expected => ['0,1,2,3,4,5,6,8,9'],
-    },
-    {   args     => 'freq2pitch 440',
-        expected => ["440.00\t69\t+0.00\t0.00%"],
-    },
-    {   args     => 'freq2pitch --cf=422.5 440',
-        expected => ["440.00\t70\t-7.62\t1.70%"],
-    },
-    {   args     => 'half_prime_form c b g',
-        expected => ['0,4,5'],
-    },
-    {   args     => 'interval_class_content c fis b',
-        expected => ['100011'],
-    },
-    {   args     => 'intervals2pcs --pitch=2 3 4 7',
-        expected => ['2,5,9,4'],
-    },
-    {   args     => 'invariance_matrix 0 2 4',
-        expected => [ '0,2,4', '2,4,6', '4,6,8' ],
-    },
-    {   args     => 'invert 1 2 3',
-        expected => ['11,10,9'],
-    },
-    # TODO how get ' through Test::Cmd?
-    # { args      => q{ly2pitch c'},
-    #   expected => ['60'],
-    # },
-    {   args     => 'ly2struct --tempo=120 --relative=c c4 r8',
-        expected => [ "\t{ 131, 500 },\t/* c4 */", "\t{ 0, 250 },\t/* r8 */" ],
+my ( $result, $status, $stdout, $stderr ) =
+  command { args => [qw(fnums)], stdout => qr/^3-1\s+0,1,2\s+210000/ };
+my $lines = 0;
+$lines++ while $$stdout =~ m/^[3-9]-[1-9Z]/gm;
+is( $lines, 208, 'forte numbers count' );
 
-    },
-    {   args     => 'multiply --factor=2 1 2 3',
-        expected => ['2 4 6'],
-    },
-    {   args     => 'normal_form e g c',
-        expected => ['0,4,7'],
-    },
-    {   args     => 'notes2time 1',
-        expected => ['4s'],
-    },
-    {   args     => 'notes2time --ms --tempo=120 1',
-        expected => ['2000'],
-    },
-    {   args     => 'notes2time --ms --tempo=160 c4*2/3 c c',
-        expected => [ '250', '250', '250', '= 750' ],
-    },
-    {   args     => 'notes2time --fraction=2/3 c4. d8 e4',
-        expected => [ '1s', '333ms', '666ms', '= 2s' ],
-    },
-    {   args     => 'pcs2forte 4 6 3 7',
-        expected => ['4-3'],
-    },
-    {   args     => 'pcs2intervals 3 4 7',
-        expected => ['1,3'],
-    },
-    {   args     => 'pitch2freq 60',
-        expected => ["60\t261.63"],
-    },
-    # TODO need to check these numbers manually
-    {   args     => q{pitch2freq --cf=422.5 a},
-        expected => ["57\t211.25"],
-    },
-    {   args     => 'pitch2intervalclass 4',
-        expected => ['4'],
-    },
-    {   args     => 'pitch2intervalclass 8',
-        expected => ['4'],
-    },
-    {   args     => 'pitch2ly 72',
-        expected => [q{c''}],
-    },
-    {   args     => 'prime_form 0 4 7',
-        expected => ['0,3,7'],
-    },
-    {   args     => 'recipe --file=t/rules 0 11 3',
-        expected => ['4,8,7'],
-    },
-    {   args     => 'retrograde 1 2 3',
-        expected => ['3,2,1'],
-    },
-    {   args     => 'rotate --rotate=3 1 2 3 4',
-        expected => ['2,3,4,1'],
-    },
-    {   args     => 'set2beats --scaledegrees=16 4-z15',
-        expected => ['xx..x.x.........'],
-    },
-    {   args     => 'set_complex 0 2 7',
-        expected => [ '0,2,7', '10,0,5', '5,7,0' ],
-    },
-    {   args => 'subsets 3-1',
-        # NOTE might false alarm if permutation module changes ordering; if
-        # so, sort the output?
-        expected => [ '0,1', '0,2', '1,2', ],
-    },
-    {   args     => 'tcs 7-4',
-        expected => ['7 5 4 4 3 3 4 3 3 4 4 5'],
-    },
-    {   args     => 'tcis 7-4',
-        expected => ['2 4 4 4 5 4 5 6 5 4 4 2'],
-    },
-    {   args     => 'tension g b d f',
-        expected => ["1.000  0.100  0.700\t0.2,0.1,0.7"],
-    },
-    {   args     => 'time2notes 1234',
-        expected => ['c4*123/100'],
-    },
-    {   args     => 'transpose --transpose=7 0 6 11',
-        expected => ['7,1,6'],
-    },
-    {   args     => 'transpose_invert --transpose=3 1 2 3',
-        expected => ['2,1,0'],
-    },
-    {   args     => 'whatscalesfit c d e f g a b',
-        expected => [
-            'C  Major                     c     d     e     f     g     a     b',
-            'D  Dorian                    d     e     f     g     a     b     c',
-            'E  Phrygian                  e     f     g     a     b     c     d',
-            'F  Lydian                    f     g     a     b     c     d     e',
-            'G  Mixolydian                g     a     b     c     d     e     f',
-            'A  Aeolian                   a     b     c     d     e     f     g',
-            'B  Locrian                   b     c     d     e     f     g     a',
-            'A  Melodic minor     DSC     g     f     e     d     c     b     a',
-        ],
-    },
-);
+command {
+    args   => [qw(--help)],
+    stderr => qr/Usage: atonal-util/,
+    status => 64,
+};
 
-# TODO
-for my $test (@tests) {
-    $tc->run( args => $test->{args} );
-    $deeply->(
-        [ map { s/\s+$//r } split "\n", $tc->stdout ],
-        $test->{expected}, "$test_prog $test->{args}"
-    );
-    is( $tc->stderr, "", "$test_prog $test->{args} emits no stderr" );
-}
+command {
+    args   => [qw(invariants 3-9)],
+    stdout => qr/^T\(0\)\s+\[ 0,2,7\s+\] ivars \[ 0,2,7\s+\] 3-9/,
+    stderr => qr/^\[0,2,7\] icc 010020/,
+};
 
-# Custom tests for things that do not fit the above model well
+command {
+    args   => [qw(variances)],
+    stdin  => "5-1\n0 1 2 3 5\n",
+    stdout => "0,1,2,3\n4,5\n0,1,2,3,4,5\n"
+};
 
-$tc->run( args => 'fnums' );
-my @fnums = $tc->stdout;
-$fnums[0] =~ s/\s+$//;
-is( $fnums[0],     "3-1\t0,1,2           \t210000", 'first forte number' );
-is( scalar @fnums, 208,                             'forte numbers count' );
+command {
+    args   => [qw(zrelation)],
+    stdin  => "8-z15\n0,1,2,3,5,6,7,9\n",
+    stdout => "1\n"
+};
 
-$tc->run( args => '--help' );
-ok( $tc->stderr =~ m/^Usage/, 'help emits to stderr' );
+command {
+    args   => [qw(zrelation)],
+    stdin  => "9-2\n0 1 2 3 4 5 6 8 9\n",
+    stdout => "0\n"
+};
 
-$tc->run( args => 'invariants 3-9' );
-$deeply->(
-    [ map { s/\s+$//r } split "\n", $tc->stdout ],
-    [   'T(0)   [ 0,2,7    ] ivars [ 0,2,7    ] 3-9',
-        'T(2)   [ 2,4,9    ] ivars [ 2        ]',
-        'T(5)   [ 5,7,0    ] ivars [ 7,0      ]',
-        'T(7)   [ 7,9,2    ] ivars [ 7,2      ]',
-        'T(10)  [ 10,0,5   ] ivars [ 0        ]',
-        'Ti(0)  [ 0,10,5   ] ivars [ 0        ]',
-        'Ti(2)  [ 2,0,7    ] ivars [ 2,0,7    ] 3-9',
-        'Ti(4)  [ 4,2,9    ] ivars [ 2        ]',
-        'Ti(7)  [ 7,5,0    ] ivars [ 7,0      ]',
-        'Ti(9)  [ 9,7,2    ] ivars [ 7,2      ]',
-    ],
-    'invariences'
-);
-$deeply->(
-    [ map { s/\s+$//r } split "\n", $tc->stderr ],
-    ['[0,2,7] icc 010020'], 'invarients stderr'
-);
-
-$tc->run( args => 'variances', stdin => "5-1\n0 1 2 3 5\n" );
-$deeply->(
-    [ map { s/\s+$//r } split "\n", $tc->stdout ],
-    [ '0,1,2,3', '4,5', '0,1,2,3,4,5' ], 'variances'
-);
-
-$tc->run( args => 'zrelation', stdin => "8-z15\n0,1,2,3,5,6,7,9\n" );
-is( $tc->stdout, "1\n", 'zrelation yes' );
-
-$tc->run( args => 'zrelation', stdin => "9-2\n0 1 2 3 4 5 6 8 9\n" );
-is( $tc->stdout, "0\n", 'zrelation no' );
-
-plan tests => 8 + @tests * 2;
+done_testing 173

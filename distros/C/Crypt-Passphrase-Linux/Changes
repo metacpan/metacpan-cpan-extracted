@@ -1,4 +1,12 @@
 Revision history for Crypt-Passphrase-Linux
 
+0.003     2023-03-15 01:43:50+01:00 Europe/Amsterdam
+          - Correct Crypt::Passphrase dependency
+
+0.002     2023-03-14 23:47:48+01:00 Europe/Amsterdam
+          - Correctly encode salt in hash_password
+          - Accept legacy crypt values
+          - Correctly mark non-matching hashes as needing rehash
+
 0.001     2023-03-07 23:53:11+01:00 Europe/Amsterdam
           Initial release to an unsuspecting world

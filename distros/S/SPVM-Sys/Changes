@@ -1,3 +1,121 @@
+0.43 2022-03-15
+  [Deprecation]
+    * SPVM::FileTest is deprecated. Use methods in the Sys class instead.
+  [Exception Message Improvement]
+    * Improve the following exception messages.
+      [Before]
+        [System Error]unlink failed:%s. The \"%s\" directory can't be removed"      
+      [After]
+        [System Error]unlink failed:%s. The \"%s\" file can't be removed"      
+  [Test Improvement]
+    * Improved tests of Sys::IO::Stat.
+  [Incompatible Changes]
+    * Removed the readlink method in the Sys class and the readlinkp method in the Sys::IO class because I don't know the Windows/Unix portable way to allocate memory yet.
+    * Removed the unlinkp method in the SPVM::Sys::IO class. This logic is moved to the unlink method in the Sys class and fixed the return value.
+    * Removed the renamep method in the SPVM::Sys::IO class. This logic is moved to the rename method in the Sys class.
+    * Removed the symlinkp method in the SPVM::Sys::IO class. This logic is moved to the symlink method in the Sys class.
+    * Removed the readlinkp method in the SPVM::Sys::IO class. This logic is moved to the readlink method in the Sys class.
+    * Removed the chmodp method in the SPVM::Sys::IO class. This logic is moved to the chmod method in the Sys class.
+    * Removed the chownp method in the SPVM::Sys::IO class. This logic is moved to the chown method in the Sys class.
+    * Removed the utimep method in the SPVM::Sys::IO class. This logic is moved to the utime method in the Sys class.
+    * Removed the timesp method in the SPVM::Sys::Time class. This logic is moved to the times method in the Sys class.
+    * Removed the statp method in the SPVM::Sys::IO::Stat class. This logic is moved to the stat method in the Sys class.
+    * Removed the lstatp method in the SPVM::Sys::IO::Stat class. This logic is moved to the lstat method in the Sys class.
+    * Remvoed the argument of the new method in the Sys::IO::Stat class.
+    * Removed the is_windows method in the Sys class. This is used from the Sys::OS class.
+    * Removed the get_osname method in the Sys::OS class.
+    * Renamed the get_osname method in the Sys class to osname.
+  [New Features]
+    * Added the Sys::IO::Windows class.
+    * Added the symlinkp method in the Sys::IO: class.
+      static method unlinkp : int ($oldpath : string, $newpath : string);
+      static method renamep : int ($oldpath : string, $newpath : string);
+      static method symlinkp : int ($oldpath : string, $newpath : string);
+    * The l method in the Sys::FileTest supports Windows.
+    * Added the following methods in the Sys class.
+      
+      static method A : double ($file : string);
+
+      static method C : double ($file : string);
+
+      static method M : double ($file : string);
+
+      static method O : int ($file : string);
+
+      static method R : int ($file : string);
+
+      static method S : int ($file : string);
+
+      static method W : int ($file : string);
+
+      static method X : int ($file : string);
+
+      static method b : int ($file : string);
+
+      static method c : int ($file : string);
+
+      static method d : int ($file : string);
+
+      static method e : int ($file : string);
+
+      static method f : int ($file : string);
+
+      static method g : int ($file : string);
+
+      static method k : int ($file : string);
+
+      static method l : int ($file : string);
+
+      static method o : int ($file : string);
+
+      static method p : int ($file : string);
+
+      static method r : int ($file : string);
+
+      static method s : long ($file : string);
+
+      static method u : int ($file : string);
+
+      static method w : int ($file : string);
+
+      static method x : int ($file : string);
+
+      static method z : int ($file : string);
+      
+      static method env : string ($name : string);
+
+      static method time : long ();
+
+      static method localtime : Time::Info ($time : long);
+
+      static method gmtime : Time::Info ($time : long);
+
+      static method process_id : int ();
+
+      static method stat : Sys::IO::Stat ($path : string);
+
+      static method chdir : int ($path : string);
+
+      static method chmod : int ($mode :int, $path : string);
+
+      static method mkdir : int ($path : string, $mode : int);
+
+      static method umask : int ($mode : int);
+
+      static method rmdir : int ($path : string);
+
+      static method unlink : int ($pathname : string);
+
+      static method rename : int ($oldpath : string, $newpath : string);
+
+      static method symlink : int ($oldpath : string, $newpath : string);
+
+      static method readlink : int ($file : string);
+
+      static method sleep : int ($seconds : int);
+      
+    * Added the Sys::OS class.
+    * Added the Sys::Env class.
 0.42 2022-02-21
   [Prerequirement Changes]
     * SPVM 0.9692+ is needed.

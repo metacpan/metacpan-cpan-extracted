@@ -1,8 +1,6 @@
 # Data::Compare - compare perl data structures
 # Author: Fabien Tassin <fta@sofaraway.org>
 # updated by David Cantrell <david@cantrell.org.uk>
-# Copyright 1999-2001 Fabien Tassin <fta@sofaraway.org>
-# portions Copyright 2003 - 2013 David Cantrell
 
 package Data::Compare;
 
@@ -18,7 +16,7 @@ use File::Find::Rule;
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(Compare);
-$VERSION = 1.27;
+$VERSION = 1.28;
 $DEBUG   = $ENV{PERL_DATA_COMPARE_DEBUG} || 0;
 
 my %handler;
@@ -121,7 +119,7 @@ sub _Compare {
   $opts->{recursion_detector}++;
 
   warn "Yaroo! deep recursion!\n" if($opts->{recursion_detector} == 99);
-  
+
   if(
     (ref($x) && exists($been_there{"$x-$xpos-$xparent"}) && $been_there{"$x-$xpos-$xparent"} > 1) ||
     (ref($y) && exists($been_there{"$y-$ypos-$yparent"}) && $been_there{"$y-$ypos-$yparent"} > 1)
@@ -179,8 +177,11 @@ sub _Compare {
       $rval = 0 unless scalar @kx == scalar @ky;
 
       for (@kx) {
-        next unless defined $x->{$_} || defined $y->{$_};
-        $rval = 0 unless defined $y->{$_} && _Compare($x->{$_}, $y->{$_}, { %{$opts}, xparent => $x, xpos => $_, yparent => $y, ypos => $_});
+        if(!exists($y->{$_})) {
+            $rval = 0;
+            last;
+        }
+        $rval = 0 unless _Compare($x->{$_}, $y->{$_}, { %{$opts}, xparent => $x, xpos => $_, yparent => $y, ypos => $_});
       }
     }
     elsif($refx eq 'Regexp') {
@@ -416,7 +417,7 @@ Copyright (c) 1999-2001 Fabien Tassin. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-Some parts copyright 2003 - 2014 David Cantrell.
+Some parts copyright 2003 - 2023 David Cantrell.
 
 Seeing that Fabien seems to have disappeared, David Cantrell has become
 a co-maintainer so he can apply needed patches.  The licence, of course,

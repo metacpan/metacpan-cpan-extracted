@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.36';
-$VERSION = eval { $VERSION };
-our $SVNVERSION = (qw$Id: DNS.pm 1893 2022-12-30 15:49:02Z willem $)[2];
+$VERSION = '1.37';
+$VERSION = eval {$VERSION};
+our $SVNVERSION = (qw$Id: DNS.pm 1907 2023-03-12 09:53:46Z willem $)[2];
 
 
 =head1 NAME
@@ -23,8 +23,8 @@ Net::DNS is a collection of Perl modules that act as a Domain Name System
 (DNS) resolver. It allows the programmer to perform DNS queries that are
 beyond the capabilities of "gethostbyname" and "gethostbyaddr".
 
-The programmer should be familiar with the structure of a DNS packet.
-See RFC 1035 or DNS and BIND (Albitz & Liu) for details.
+The programmer should be familiar with the structure of a DNS packet
+and the zone file presentation format described in RFC1035.
 
 =cut
 
@@ -56,10 +56,10 @@ sub version { return $VERSION; }
 #	@rr = rr($res, 'example.com' ... );
 #
 sub rr {
-	my ($arg1) = @_;
-	my $res = ref($arg1) ? shift : Net::DNS::Resolver->new();
+	my @arg = @_;
+	my $res = ( ref( $arg[0] ) ? shift @arg : Net::DNS::Resolver->new() );
 
-	my $reply = $res->query(@_);
+	my $reply = $res->query(@arg);
 	my @list  = $reply ? $reply->answer : ();
 	return @list;
 }
@@ -73,9 +73,9 @@ sub rr {
 #	@mx = mx($res, 'example.com');
 #
 sub mx {
-	my ($arg1) = @_;
-	my @res = ( ref($arg1) ? shift : () );
-	my ( $name, @class ) = @_;
+	my @arg = @_;
+	my @res = ( ref( $arg[0] ) ? shift @arg : () );
+	my ( $name, @class ) = @arg;
 
 	# This construct is best read backwards.
 	#
@@ -98,9 +98,10 @@ sub mx {
 #    @prioritysorted = rrsort( "SRV", "priority", @rr_array );
 #
 sub rrsort {
-	my $rrtype = uc shift;
-	my ( $attribute, @rr ) = @_;	## NB: attribute is optional
-	( @rr, $attribute ) = @_ if ref($attribute) =~ /^Net::DNS::RR/;
+	my @arg	   = @_;
+	my $rrtype = uc shift @arg;
+	my ( $attribute, @rr ) = @arg;	## NB: attribute is optional
+	( @rr, $attribute ) = @arg if ref($attribute) =~ /^Net::DNS::RR/;
 
 	my @extracted = grep { $_->type eq $rrtype } @rr;
 	return @extracted unless scalar @extracted;
@@ -133,14 +134,16 @@ sub YYYYMMDDxx {
 #
 
 sub yxrrset {
-	my $rr = Net::DNS::RR->new(@_);
+	my @arg = @_;
+	my $rr	= Net::DNS::RR->new(@arg);
 	$rr->ttl(0);
 	$rr->class('ANY') unless $rr->rdata;
 	return $rr;
 }
 
 sub nxrrset {
-	my $rr = Net::DNS::RR->new(@_);
+	my @arg = @_;
+	my $rr	= Net::DNS::RR->new(@arg);
 	return Net::DNS::RR->new(
 		name  => $rr->name,
 		type  => $rr->type,
@@ -149,8 +152,9 @@ sub nxrrset {
 }
 
 sub yxdomain {
-	my ( $domain, @etc ) = map {split} @_;
-	my $rr = Net::DNS::RR->new( scalar(@etc) ? @_ : ( name => $domain ) );
+	my @arg = @_;
+	my ( $domain, @etc ) = map {split} @arg;
+	my $rr = Net::DNS::RR->new( scalar(@etc) ? @arg : ( name => $domain ) );
 	return Net::DNS::RR->new(
 		name  => $rr->name,
 		type  => 'ANY',
@@ -159,8 +163,9 @@ sub yxdomain {
 }
 
 sub nxdomain {
-	my ( $domain, @etc ) = map {split} @_;
-	my $rr = Net::DNS::RR->new( scalar(@etc) ? @_ : ( name => $domain ) );
+	my @arg = @_;
+	my ( $domain, @etc ) = map {split} @arg;
+	my $rr = Net::DNS::RR->new( scalar(@etc) ? @arg : ( name => $domain ) );
 	return Net::DNS::RR->new(
 		name  => $rr->name,
 		type  => 'ANY',
@@ -169,14 +174,16 @@ sub nxdomain {
 }
 
 sub rr_add {
-	my $rr = Net::DNS::RR->new(@_);
+	my @arg = @_;
+	my $rr	= Net::DNS::RR->new(@arg);
 	$rr->{ttl} = 86400 unless defined $rr->{ttl};
 	return $rr;
 }
 
 sub rr_del {
-	my ( $domain, @etc ) = map {split} @_;
-	my $rr = Net::DNS::RR->new( scalar(@etc) ? @_ : ( name => $domain, type => 'ANY' ) );
+	my @arg = @_;
+	my ( $domain, @etc ) = map {split} @arg;
+	my $rr = Net::DNS::RR->new( scalar(@etc) ? @arg : ( name => $domain, type => 'ANY' ) );
 	$rr->class( $rr->rdata ? 'NONE' : 'ANY' );
 	$rr->ttl(0);
 	return $rr;
@@ -647,10 +654,9 @@ Net::DNS was created in 1997 by Michael Fuhr.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS::Resolver>, L<Net::DNS::Question>, L<Net::DNS::RR>,
-L<Net::DNS::Packet>, L<Net::DNS::Update>,
-L<RFC1035|https://tools.ietf.org/html/rfc1035>,
-I<DNS and BIND> by Paul Albitz & Cricket Liu
+L<perl> L<Net::DNS::Resolver> L<Net::DNS::Question> L<Net::DNS::RR>
+L<Net::DNS::Packet> L<Net::DNS::Update>
+L<RFC1035|https://tools.ietf.org/html/rfc1035>
 
 =cut
 

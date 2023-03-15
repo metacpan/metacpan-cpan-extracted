@@ -113,8 +113,8 @@ int32_t SPVM__Sys__Time__clock_getres(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "getitimer is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "getitimer is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -151,8 +151,8 @@ int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "getitimer is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "getitimer is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -184,8 +184,8 @@ int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Time__times(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "times is not supported on this system(_WIN32)", __func__, FILE_NAME, __LINE__);
+#if defined(_WIN32)
+  env->die(env, stack, "times is not supported on this system(defined(_WIN32))", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_tms = stack[0].oval;

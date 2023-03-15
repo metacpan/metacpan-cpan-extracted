@@ -16,7 +16,6 @@ subtest "__rewrite_with", sub {
     is $code, "(sub { local \$_ = \$_[-1]; CODE })->( EXPR );\n foo();";
 };
 
-
 subtest "basic", sub {
     with( range(5) ) {
         is $_, 5;

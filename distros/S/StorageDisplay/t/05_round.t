@@ -13,15 +13,15 @@ use warnings;
 
 use Test2::V0;
 
-use StorageDisplay;
+use StorageDisplay::Data::Elem;
 
-is( StorageDisplay::Elem->disp_size(5150212096), '4.80 GiB', "Perl round");
-is( StorageDisplay::Elem->disp_size(4387131392), '4.09 GiB', "Perl round");
-is( StorageDisplay::Elem->disp_size(4386631092), '4.09 GiB', "Perl round");
-is( StorageDisplay::Elem->disp_size(4386131092), '4.08 GiB', "Perl round");
-is( StorageDisplay::Elem->disp_size(43871313920), '40.9 GiB', "Perl round");
-is( StorageDisplay::Elem->disp_size(43866310920), '40.9 GiB', "Perl round");
-is( StorageDisplay::Elem->disp_size(43861310920), '40.8 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(5150212096), '4.80 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(4387131392), '4.09 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(4386631092), '4.09 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(4386131092), '4.08 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(43871313920), '40.9 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(43866310920), '40.9 GiB', "Perl round");
+is( StorageDisplay::Data::Elem->disp_size(43861310920), '40.8 GiB', "Perl round");
 
 done_testing;   # reached the end safely
 

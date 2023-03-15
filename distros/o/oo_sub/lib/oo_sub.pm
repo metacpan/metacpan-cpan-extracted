@@ -1,4 +1,4 @@
-package oo_sub v1.0.9;
+package oo_sub v1.1.0;
 
 use strict;   # https://perldoc.perl.org/strict
 use warnings; # https://perldoc.perl.org/warnings

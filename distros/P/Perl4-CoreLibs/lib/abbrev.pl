@@ -16,7 +16,7 @@
 
 package abbrev;
 
-sub main'abbrev {
+sub main::abbrev {
     local(*domain) = @_;
     shift(@_);
     @cmp = @_;

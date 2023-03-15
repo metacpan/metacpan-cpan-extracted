@@ -18,10 +18,9 @@ my $builder = Module::Build->new(
     dynamic_config     => 0,
     configure_requires => { 'Module::Build' => '0.4004', },
     test_requires      => {
-        'Test::Cmd'       => 0,
-        'Test::Exception' => 0,
-        'Test::Most'      => 0,
-        'perl'            => '5.14.0',
+        'Test2::Tools::Command' => '0.11',
+        'Test2::V0'             => '0.000060',
+        'perl'                  => '5.14.0',
     },
     requires => {
         'Carp'                    => 0,

@@ -108,8 +108,8 @@ sub exp_colkeys {
                      'hdr' => {
                                'ttype' => 'x0',
                                'tform' => '1D',
-			       'lonp'  => 33,
-			       'lonpa' => 55
+                               'lonp'  => 33,
+                               'lonpa' => 55
                               },
                      'idx' => 1
                     },

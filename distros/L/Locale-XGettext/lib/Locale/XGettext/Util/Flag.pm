@@ -19,7 +19,7 @@
 # USA.
 
 package Locale::XGettext::Util::Flag;
-$Locale::XGettext::Util::Flag::VERSION = '0.7';
+$Locale::XGettext::Util::Flag::VERSION = '0.8';
 use strict;
 
 use Locale::TextDomain qw(Locale-XGettext);

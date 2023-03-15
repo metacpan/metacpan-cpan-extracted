@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Complete::Module" : "0.262",
-            "Complete::Util" : "0.615",
+            "Complete::Util" : "0.616",
             "Log::ger" : "0.038",
             "Perinci::Sub::Complete" : "0.944",
             "Perinci::Sub::XCompletion::perl_modname" : "0",
@@ -42,6 +42,7 @@
             "Sah::PSchema::perl::modname" : "0.008",
             "Sah::Schema::perl::modname" : "0.035",
             "Sah::Schema::perl::modname_with_optional_args" : "0.035",
+            "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -56,29 +57,29 @@
       }
    },
    "provides" : {
-      "Perinci::Sub::XCompletion::perl_sah_filter_modname_with_optional_args" : {
-         "file" : "lib/Perinci/Sub/XCompletion/perl_sah_filter_modname_with_optional_args.pm",
-         "version" : "0.002"
+      "Perinci::Sub::XCompletion::perl_perl_sah_filter_modname_with_optional_args" : {
+         "file" : "lib/Perinci/Sub/XCompletion/perl_perl_sah_filter_modname_with_optional_args.pm",
+         "version" : "0.003"
       },
       "Sah::Schema::perl::perl_sah_filter::modname" : {
          "file" : "lib/Sah/Schema/perl/perl_sah_filter/modname.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Sah::Schema::perl::perl_sah_filter::modname_with_optional_args" : {
          "file" : "lib/Sah/Schema/perl/perl_sah_filter/modname_with_optional_args.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Sah::SchemaR::perl::perl_sah_filter::modname" : {
          "file" : "lib/Sah/SchemaR/perl/perl_sah_filter/modname.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Sah::SchemaR::perl::perl_sah_filter::modname_with_optional_args" : {
          "file" : "lib/Sah/SchemaR/perl/perl_sah_filter/modname_with_optional_args.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Sah::Schemas::Data::Sah" : {
          "file" : "lib/Sah/Schemas/Data/Sah.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -93,7 +94,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Data-Sah"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

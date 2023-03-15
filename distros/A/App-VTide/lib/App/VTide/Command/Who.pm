@@ -16,9 +16,9 @@ use Path::Tiny;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.20');
+our $VERSION = version->new('0.1.21');
 our $NAME    = 'who';
-our $OPTIONS = [ 'set|s=s', 'term|t=i', 'verbose|v+', ];
+our $OPTIONS = [ 'set|s=s', 'term|t=s', 'verbose|v+', ];
 our $LOCAL   = 1;
 sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
@@ -47,8 +47,7 @@ EXPORTS
         }
         if ( $conf->{terminals}{$term}{env} ) {
             for my $key ( sort keys %{ $conf->{terminals}{$term}{env} } ) {
-                print
-                    "export $key=\"$conf->{terminals}{$term}{env}{$key}\"\n";
+                print "export $key=\"$conf->{terminals}{$term}{env}{$key}\"\n";
             }
         }
 
@@ -85,13 +84,15 @@ App::VTide::Command::Who - Tells you about the terminal you are in
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Who version 0.1.20
+This documentation refers to App::VTide::Command::Who version 0.1.21
 
 =head1 SYNOPSIS
 
     vtide who [[-s|--set] path/to/.vtide.yml]
 
     OPTIONS
+     -t --term[=]term-name
+                    Terminal name to get/set envirnment variables for
      -s --set[=]file
                     Set the current terminal to use the supplied config file
      -v --verbose   Show more detailed output

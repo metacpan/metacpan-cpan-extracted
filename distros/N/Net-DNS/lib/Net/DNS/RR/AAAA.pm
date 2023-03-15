@@ -2,7 +2,7 @@ package Net::DNS::RR::AAAA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: AAAA.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: AAAA.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -17,8 +17,7 @@ use integer;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	$self->{address} = unpack "\@$offset a16", $$data;
 	return;
@@ -40,9 +39,9 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->address(shift);
+	$self->address(@argument);
 	return;
 }
 
@@ -64,11 +63,10 @@ sub address_short {
 
 
 sub address {
-	my $self = shift;
+	my ( $self, $addr ) = @_;
 
-	return address_long($self) unless scalar @_;
+	return address_long($self) unless defined $addr;
 
-	my $addr  = shift;
 	my @parse = split /:/, "0$addr";
 
 	if ( (@parse)[$#parse] =~ /\./ ) {			# embedded IPv4
@@ -168,6 +166,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC3596, RFC3513, RFC5952
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC3596|https://tools.ietf.org/html/rfc3596>
 
 =cut

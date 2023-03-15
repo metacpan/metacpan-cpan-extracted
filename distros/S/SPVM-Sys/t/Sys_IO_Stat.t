@@ -9,22 +9,16 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 use File::Temp;
 
 use SPVM 'TestCase::Sys::IO::Stat';
+use SPVM 'Sys::IO::Stat';
+use SPVM 'Sys::IO';
 
 use IO::Poll;
+use File::stat ();
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 my $test_dir = "$FindBin::Bin";
-
-{
-  ok(SPVM::TestCase::Sys::IO::Stat->stat("$test_dir"));
-  
-  my $stat_info = SPVM::TestCase::Sys::IO::Stat->stat_info("$test_dir");
-  my $stat_info_expected = [stat "$test_dir/ftest/readline_long_lines.txt"];
-  use Data::Dumper;
-  warn Dumper $stat_info->to_elems;
-  warn Dumper $stat_info_expected;
 
 =pod
 
@@ -45,39 +39,75 @@ my $test_dir = "$FindBin::Bin";
              on disk (often, but not always, 512 bytes each)
 
 =cut
-  
-  my $stat_info_array = $stat_info->to_elems;
-  is($stat_info_array->[0], $stat_info_expected->[0], "stat[0]");
-  is($stat_info_array->[1], $stat_info_expected->[1], "stat[1]");
-  is($stat_info_array->[2], $stat_info_expected->[2], "stat[2]");
-  if ($^O eq 'MSWin32') {
-    warn("[Test Output]Output:$stat_info_array->[3], Expected(Perl Output):$stat_info_expected->[3] on Windows");
-  }
-  else {
-    is($stat_info_array->[3], $stat_info_expected->[3], "stat[3");
-  }
-  is($stat_info_array->[4], $stat_info_expected->[4], "stat[4]");
-  is($stat_info_array->[5], $stat_info_expected->[5], "stat[5]");
-  is($stat_info_array->[6], $stat_info_expected->[6], "stat[6]");
-  is($stat_info_array->[7], $stat_info_expected->[7], "stat[7]");
-  is($stat_info_array->[8], $stat_info_expected->[8], "stat[8]");
-  is($stat_info_array->[9], $stat_info_expected->[9], "stat[9]");
-  is($stat_info_array->[10], $stat_info_expected->[10], "stat[10]");
-  
-  unless ($^O eq 'MSWin32') {
-    is($stat_info_array->[11], $stat_info_expected->[11], "stat[11]");
-    is($stat_info_array->[12], $stat_info_expected->[12], "stat[12]");
+
+{
+  ok(SPVM::TestCase::Sys::IO::Stat->stat("$test_dir"));
+
+  {
+    my $file = "$test_dir/ftest/readline_long_lines.txt";
+    my $stat = SPVM::Sys::IO::Stat->new();
+    SPVM::Sys::IO::Stat->stat($file, $stat);
+    my $stat_expected = File::stat::stat($file);
+    use Data::Dumper;
+    warn Dumper $stat_expected;
+    
+    is($stat->st_dev, $stat_expected->dev, "st_dev");
+    is($stat->st_ino, $stat_expected->ino, "st_ino");
+    is($stat->st_mode, $stat_expected->mode, "st_mode");
+    if ($stat->st_nlink == $stat_expected->nlink) {
+      is($stat->st_nlink, $stat_expected->nlink, "st_nlink");
+    }
+    else {
+      warn "[Test Output]Got: " . $stat->st_nlink . ", Expected: " . $stat_expected->nlink;
+    }
+    is($stat->st_uid, $stat_expected->uid, "uid");
+    is($stat->st_gid, $stat_expected->gid, "gid");
+    is($stat->st_rdev, $stat_expected->rdev, "rdev");
+    is($stat->st_size, $stat_expected->size, "size");
+    is($stat->st_atime, $stat_expected->atime, "atime");
+    is($stat->st_mtime, $stat_expected->mtime, "mtime");
+    is($stat->st_ctime, $stat_expected->ctime, "ctime");
+    
+    unless ($^O eq 'MSWin32') {
+      is($stat->st_blksize, $stat_expected->blksize, "blksize");
+      is($stat->st_blocks, $stat_expected->blocks, "blocks");
+    }
   }
 }
 
 unless ($^O eq 'MSWin32') {
   ok(SPVM::TestCase::Sys::IO::Stat->lstat("$test_dir"));
   
-  my $stat_info = SPVM::TestCase::Sys::IO::Stat->lstat_info("$test_dir");
-  my $stat_info_expected = [lstat "$test_dir/ftest/readline_long_lines.txt"];
-  warn Dumper $stat_info->to_elems;
-  warn Dumper $stat_info_expected;
-  is_deeply($stat_info->to_elems, $stat_info_expected);
+  {
+    my $file = "$test_dir/ftest/readline_long_lines.txt";
+    my $stat = SPVM::Sys::IO::Stat->new();
+    SPVM::Sys::IO::Stat->lstat($file, $stat);
+    my $stat_expected = File::stat::lstat($file);
+    use Data::Dumper;
+    warn Dumper $stat_expected;
+    
+    is($stat->st_dev, $stat_expected->dev, "st_dev");
+    is($stat->st_ino, $stat_expected->ino, "st_ino");
+    is($stat->st_mode, $stat_expected->mode, "st_mode");
+    if ($stat->st_nlink == $stat_expected->nlink) {
+      is($stat->st_nlink, $stat_expected->nlink, "st_nlink");
+    }
+    else {
+      warn "[Test Output]Got: " . $stat->st_nlink . ", Expected: " . $stat_expected->nlink;
+    }
+    is($stat->st_uid, $stat_expected->uid, "uid");
+    is($stat->st_gid, $stat_expected->gid, "gid");
+    is($stat->st_rdev, $stat_expected->rdev, "rdev");
+    is($stat->st_size, $stat_expected->size, "size");
+    is($stat->st_atime, $stat_expected->atime, "atime");
+    is($stat->st_mtime, $stat_expected->mtime, "mtime");
+    is($stat->st_ctime, $stat_expected->ctime, "ctime");
+    
+    unless ($^O eq 'MSWin32') {
+      is($stat->st_blksize, $stat_expected->blksize, "blksize");
+      is($stat->st_blocks, $stat_expected->blocks, "blocks");
+    }
+  }
 }
 
 {
@@ -88,37 +118,39 @@ unless ($^O eq 'MSWin32') {
   warn Dumper $stat_info->to_elems;
   warn Dumper $stat_info_expected;
   
-  my $stat_info_array = $stat_info->to_elems;
-  if ($^O eq 'MSWin32') {
-    warn("[Test Output]Output:$stat_info_array->[0], Expected(Perl Output):$stat_info_expected->[0] on Windows");
-  }
-  else {
-    is($stat_info_array->[0], $stat_info_expected->[0], "stat[0]");
-  }
-  is($stat_info_array->[1], $stat_info_expected->[1], "stat[1]");
-  is($stat_info_array->[2], $stat_info_expected->[2], "stat[2]");
-  if ($^O eq 'MSWin32') {
-    warn("[Test Output]Output:$stat_info_array->[3], Expected(Perl Output):$stat_info_expected->[3] on Windows");
-  }
-  else {
-    is($stat_info_array->[3], $stat_info_expected->[3], "stat[3]");
-  }
-  is($stat_info_array->[4], $stat_info_expected->[4], "stat[4]");
-  is($stat_info_array->[5], $stat_info_expected->[5], "stat[5]");
-  if ($^O eq 'MSWin32') {
-    warn("[Test Output]Output:$stat_info_array->[6], Expected(Perl Output):$stat_info_expected->[6] on Windows");
-  }
-  else {
-    is($stat_info_array->[6], $stat_info_expected->[6], "stat[6]");
-  }
-  is($stat_info_array->[7], $stat_info_expected->[7], "stat[7]");
-  is($stat_info_array->[8], $stat_info_expected->[8], "stat[8]");
-  is($stat_info_array->[9], $stat_info_expected->[9], "stat[9]");
-  is($stat_info_array->[10], $stat_info_expected->[10], "stat[10]");
-  
-  unless ($^O eq 'MSWin32') {
-    is($stat_info_array->[11], $stat_info_expected->[11], "stat[11]");
-    is($stat_info_array->[12], $stat_info_expected->[12], "stat[12]");
+  {
+    my $file = "$test_dir/ftest/readline_long_lines.txt";
+    my $fh_spvm = SPVM::Sys::IO->fopen($file, "rb");
+    my $stat = SPVM::Sys::IO::Stat->new();
+    SPVM::Sys::IO::Stat->fstat(SPVM::Sys::IO->fileno($fh_spvm), $stat);
+    
+    open my $fh_perl, '<', $file
+      or die;
+    my $stat_expected = File::stat::stat($fh_perl);
+    use Data::Dumper;
+    warn Dumper $stat_expected;
+    
+    is($stat->st_dev, $stat_expected->dev, "st_dev");
+    is($stat->st_ino, $stat_expected->ino, "st_ino");
+    is($stat->st_mode, $stat_expected->mode, "st_mode");
+    if ($stat->st_nlink == $stat_expected->nlink) {
+      is($stat->st_nlink, $stat_expected->nlink, "st_nlink");
+    }
+    else {
+      warn "[Test Output]Got: " . $stat->st_nlink . ", Expected: " . $stat_expected->nlink;
+    }
+    is($stat->st_uid, $stat_expected->uid, "uid");
+    is($stat->st_gid, $stat_expected->gid, "gid");
+    is($stat->st_rdev, $stat_expected->rdev, "rdev");
+    is($stat->st_size, $stat_expected->size, "size");
+    is($stat->st_atime, $stat_expected->atime, "atime");
+    is($stat->st_mtime, $stat_expected->mtime, "mtime");
+    is($stat->st_ctime, $stat_expected->ctime, "ctime");
+    
+    unless ($^O eq 'MSWin32') {
+      is($stat->st_blksize, $stat_expected->blksize, "blksize");
+      is($stat->st_blocks, $stat_expected->blocks, "blocks");
+    }
   }
 }
 

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-14'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name with version number suffix, e.g. Foo::Bar@0.001',
@@ -46,7 +46,7 @@ Sah::Schema::perl::modname_with_ver - Perl module name with version number suffi
 
 =head1 VERSION
 
-This document describes version 0.047 of Sah::Schema::perl::modname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2023-01-14.
+This document describes version 0.048 of Sah::Schema::perl::modname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo-Bar\@0.5_001";
+ $data = "Foo::Bar\@1.0.0";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -99,8 +99,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo-Bar\@0.5_001";
- my $res = $validator->($data); # => ["","Foo::Bar\@0.5_001"]
+ $data = "Foo::Bar\@1.0.0";
+ my $res = $validator->($data); # => ["","Foo::Bar\@1.0.0"]
  
  # a sample invalid data
  $data = "Foo::Bar\@a";

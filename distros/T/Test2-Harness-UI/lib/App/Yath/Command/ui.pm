@@ -2,7 +2,7 @@ package App::Yath::Command::ui;
 use strict;
 use warnings;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -12,7 +12,7 @@ use Test2::Harness::UI::Config;
 use Test2::Harness::UI::Importer;
 use Test2::Harness::UI;
 
-use Test2::Harness::Util::UUID qw/gen_uuid/;
+use Test2::Harness::UI::UUID qw/gen_uuid/;
 
 use DBIx::QuickDB;
 use Plack::Builder;

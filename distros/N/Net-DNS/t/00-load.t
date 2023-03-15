@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 00-load.t 1875 2022-09-23 13:41:03Z willem $	-*-perl-*-
+# $Id: 00-load.t 1896 2023-01-30 12:59:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -15,7 +15,7 @@ if ($handle) {
 	my $json = join '', (<$handle>);
 	for ($json) {
 		s/\s:\s/ => /g;					# Perl? en voilà!
-		my $hashref = eval $_;
+		my $hashref = eval $_;	## no critic
 		%metadata = %$hashref;
 	}
 	close $handle;

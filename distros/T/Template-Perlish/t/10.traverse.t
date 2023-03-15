@@ -2,7 +2,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31; # last test to print
+use Storable 'dclone';
+use Test::More;# tests => 31; # last test to print
 use Template::Perlish qw< traverse >;
 
 my $hash = {
@@ -92,6 +93,15 @@ my @tests = (
       42,
       'traverse_methods and strict_blessed, unblessed stuff'
    ],
+   [
+      [
+         $data,
+         ['inexistent2'],
+         {missing => undef},
+      ],
+      undef,
+      'options missing set to undef'
+   ],
 );
 
 for my $spec (@tests) {
@@ -161,6 +171,34 @@ $data->{objects}{array} = Some::Thing->new(['a' .. 'd']);
      traverse($data, [qw< objects array 2 >],
       {traverse_methods => 1, strict_refs => 1});
    is $got, 'c', 'no fallback from method to key with strict_blessed (aref)';
+}
+
+{
+   my $data = { foo => {}, bar => undef };
+   my $original = dclone($data);
+   my $opts = {};
+   my $got;
+
+   $got = traverse($data, [qw< foo inexistent >], $opts);
+   is $got, '', 'plain default return on inexistent final key';
+   is_deeply $data, $original, 'no auto-vivification';
+
+   $got = traverse($data, [qw< foo inexistent and then some >], $opts);
+   is $got, '', 'plain default return on inexistent deep key';
+   is_deeply $data, $original, 'no auto-vivification';
+
+   $opts = { missing => 42, undef => 84 };
+
+   $got = traverse($data, [qw< foo inexistent >], $opts);
+   is $got, 42, 'return on inexistent final key, missing is set';
+   is_deeply $data, $original, 'no auto-vivification';
+
+   $got = traverse($data, [qw< foo inexistent and then some >], $opts);
+   is $got, 42, 'return on inexistent deep key, missing is set';
+   is_deeply $data, $original, 'no auto-vivification';
+
+   $got = traverse($data, [qw< bar >], $opts);
+   is $got, 84, 'return on existing undef, undef is set';
 }
 
 done_testing();

@@ -18,6 +18,7 @@ t/pod-cm.t
 t/pod-coverage.t
 t/pod-snippets.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/strict.t

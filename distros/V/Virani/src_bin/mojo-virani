@@ -1,0 +1,202 @@
+#!perl
+
+=head1 NAME
+
+mojo-virani - A mojolicious server/CGI script for allowing remote fetching/searching of PCAPs.
+
+=head1 SYNOPSIS
+
+mojo-virani daemon -m production -l http://<ip>:<port>
+
+=head1 DESCRIPTION
+
+To use this as a CGI script, copy this to location of the CGI bin.
+
+May be used as a fast CGI script via running this locally as a daemon and forwarding
+that path to the where it is listening on.
+
+=cut
+
+use Mojolicious::Lite -signatures;
+use Time::Piece::Guess;
+use Virani;
+use JSON;
+
+# two are needed as /* and / don't overlap... so pass it to the_stuff to actually handle it
+get '/*' => sub ($c) {
+	the_stuff($c);
+};
+get '/' => sub ($c) {
+	the_stuff($c);
+};
+
+# handle it
+sub the_stuff {
+	my $c         = $_[0];
+	my $remote_ip = $c->{tx}{original_remote_address};
+
+	my $virani = Virani->new_from_conf;
+	$virani->set_verbose(1);
+	$virani->set_verbose_to_syslog(1);
+
+	# make sure we have a API key and it is valid
+	# only needed if not authing via IP only
+	if ( !$virani->{auth_by_IP_only} ) {
+		my $apikey = $c->param('apikey');
+		if ( !$virani->check_apikey($apikey) ) {
+			$c->render( text => "Invalid API key\n", status => 403, );
+			$virani->verbose( 'alert', 'Failed API key from: ' . $remote_ip . ', API key: ' . $apikey );
+			return;
+		}
+		$virani->verbose( 'info', 'API key: ' . $apikey );
+	}
+
+	# make sure the remote IP is allowed
+	$virani->verbose( 'info', 'Remote IP: ' . $remote_ip );
+	if ( !$virani->check_remote_ip($remote_ip) ) {
+		$c->render( text => "IP or subnet not allowed\n", status => 403, );
+		$virani->verbose( 'alert', 'IP or subnet not allowed: ' . $remote_ip );
+		return;
+	}
+
+	# if the set is not specified, use the default
+	my $set = $c->param('set');
+	if ( !defined($set) or $set eq '' ) {
+		$set = $virani->get_default_set;
+	}
+	$virani->verbose( 'info', 'Set: ' . $set );
+
+	# get the start value and make sure it is sane
+	my $start_obj;
+	my $start = $c->param('start');
+	if ( !defined($start) ) {
+		$c->render( text => "No start value specified\n", status => 400, );
+		$virani->verbose( 'err', 'Start time not specified' );
+		return;
+	}
+	eval { $start_obj = Time::Piece::Guess->guess_to_object($start); };
+	if ( $@ || !defined($start_obj) ) {
+		$c->render( text => "'" . $start . " cound not be parsed'\n", status => 400, );
+		$virani->verbose( 'err', 'Unparsable start time: ' . $start );
+		return;
+	}
+
+	# get the end value and make sure it is sane
+	my $end_obj;
+	my $end = $c->param('end');
+	if ( !defined($end) ) {
+		$c->render( text => "No end value specified\n", status => 400, );
+		$virani->verbose( 'err', 'End time not specified' );
+		return;
+	}
+	eval { $end_obj = Time::Piece::Guess->guess_to_object($end); };
+	if ( $@ || !defined($end_obj) ) {
+		$c->render( text => "'" . $end . " cound not be parsed'\n", status => 400, );
+		$virani->verbose( 'err', 'Unparsable end time: ' . $end );
+		return;
+	}
+
+	# make sure the end time comes after the start time
+	if ( $end_obj < $start_obj ) {
+		$c->render( text => "End time before start time\n", status => 400, );
+		$virani->verbose( 'err', 'Start Is After End... start: ' . $start . '    end: ' . $end );
+		return;
+	}
+
+	# get thet type and make sure it is something sane
+	my $type = $c->param('type');
+	if ( defined($type) ) {
+		if ( !$virani->check_type($type) ) {
+			$c->render( text => "Type '" . $type . "' is not a valid type\n", status => 400, );
+			$virani->verbose( 'err', 'Type "' . $type . '" not a valid type' );
+			return;
+		}
+	}
+
+	# get the bpf value and make sure it is vaguely sane
+	my $bpf = $c->param('bpf');
+	eval { $bpf = $virani->filter_clean($bpf); };
+	if ( !defined($bpf) || $bpf eq '' ) {
+		$c->render( text => "Filter not specified or empty\n", status => 400, );
+		$virani->verbose( 'err', 'BPF not specified or blank' );
+		return;
+	}
+
+	my $get_meta;
+	$get_meta = $c->param('get_meta');
+	if ($get_meta) {
+		$get_meta = 1;
+	}
+	else {
+		$get_meta = 0;
+	}
+	$virani->verbose( 'info', 'get_meta: ' . $get_meta );
+
+	my $return_file;
+	if ( !$get_meta ) {
+		my $returned;
+		eval {
+			$returned = $virani->get_pcap_local(
+				set    => $set,
+				start  => $start_obj,
+				end    => $end_obj,
+				filter => $bpf,
+				type   => $type,
+			);
+		};
+		if ($@) {
+			$c->render( text => "PCAP generation died... please see syslog\n", status => 400, );
+			$virani->verbose( 'err', 'get_pcap_local failed: ' . $@ );
+			return;
+		}
+
+		# if there are more than 0 found pcaps and the count is the same as the failed cound,
+		# then generation of them all failed
+		if ( $returned->{pcap_count} == $returned->{failed_count} && $returned->{pcap_count} > 0 ) {
+			my $json = JSON->new->allow_nonref->canonical(1)->pretty;
+			$c->render(
+				text => 'All PCAP generation failed. pcap_count: '
+					. $returned->{pcap_count}
+					. ', failed_count: '
+					. $returned->{failed_count} . "\n\n"
+					. $json->encode($returned),
+				status => 400,
+			);
+			$virani->verbose( 'err',
+					  'All PCAP generation failed. pcap_count: '
+					. $returned->{pcap_count}
+					. ', failed_count: '
+					. $returned->{failed_count} );
+			return;
+		}
+		$return_file = $returned->{path};
+	}else {
+		eval{
+			$return_file = $virani->get_cache_file(
+												   set    => $set,
+												   start  => $start_obj,
+												   end    => $end_obj,
+												   filter => $bpf,
+												   type   => $type,
+												   );
+			$return_file=$return_file.'.json';
+		};
+		if ($@) {
+			$c->render( text => "Getting metadata JSON failed... please see syslog\n", status => 400, );
+			return;
+		}
+		$virani->verbose( 'info', 'returning '.$return_file);
+	}
+
+	# if this fails, it is a old version of Mojolicious
+	eval { $c->reply->file($return_file); };
+	if ($@) {
+		use File::Slurp;
+		my $raw_pcap = read_file($return_file);
+		$c->render( data => $raw_pcap );
+	}
+
+	return;
+}
+
+app->start;

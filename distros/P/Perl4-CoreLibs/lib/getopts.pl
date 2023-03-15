@@ -9,8 +9,8 @@
 # Suggested alternatives: Getopt::Long  or  Getopt::Std
 #
 ;# Usage:
-;#      do Getopts('a:bc');  # -a takes arg. -b & -c not. Sets opt_* as a
-;#                           #  side effect.
+;#      Getopts('a:bc');  # -a takes arg. -b & -c not. Sets opt_* as a
+;#                        #  side effect.
 
 sub Getopts {
     local($argumentative) = @_;

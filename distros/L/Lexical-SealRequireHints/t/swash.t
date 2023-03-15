@@ -44,11 +44,11 @@ BEGIN {
 	# is the execution.  Hence for this test we must arrange for
 	# both to occur between the surrounding segments of test code.
 	# A BEGIN block achieves this nicely.
-	my $x = "foo\x{666}";
-	$x =~ /foo\p{Alnum}/;
+	my $x = "bar\x{666}";
+	$x =~ /bar\p{Alnum}/;
 }
 BEGIN {
-	ok exists($INC{"utf8.pm"});
+	ok "$]" >= 5.027011 || exists($INC{"utf8.pm"});
 	is_deeply [ sort keys(%^H) ], [qw(bar foo)];
 }
 

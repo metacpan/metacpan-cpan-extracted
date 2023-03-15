@@ -1,4 +1,4 @@
-package LibUI::Spinbox 0.01 {
+package LibUI::Spinbox 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,22 +6,23 @@ package LibUI::Spinbox 0.01 {
     use parent 'LibUI::Control';
     #
     affix(
-        LibUI::lib(), 'uiNewSpinbox', [ Void, Int, Int ] => InstanceOf ['LibUI::Spinbox'],
-        'new'
+        LibUI::lib(),
+        [ 'uiNewSpinbox', 'new' ],
+        [ Void, Int, Int ] => InstanceOf ['LibUI::Spinbox']
     );
     affix(
         LibUI::lib(),
-        'uiSpinboxOnChanged',
+        [ 'uiSpinboxOnChanged', 'onChanged' ],
         [   InstanceOf ['LibUI::Spinbox'],
             CodeRef [ [ InstanceOf ['LibUI::Spinbox'], Any ] => Void ], Any
-        ] => Void,
-        'onChanged'
+        ] => Void
     );
     affix(
-        LibUI::lib(), 'uiSpinboxSetValue', [ InstanceOf ['LibUI::Spinbox'], Int ] => Void,
-        'setValue'
+        LibUI::lib(),
+        [ 'uiSpinboxSetValue',           'setValue' ],
+        [ InstanceOf ['LibUI::Spinbox'], Int ] => Void
     );
-    affix( LibUI::lib(), 'uiSpinboxValue', [ InstanceOf ['LibUI::Spinbox'] ] => Int, 'value' );
+    affix( LibUI::lib(), [ 'uiSpinboxValue', 'value' ], [ InstanceOf ['LibUI::Spinbox'] ] => Int );
 };
 1;
 #
@@ -42,8 +43,9 @@ or +/- Buttons
     use LibUI::VBox;
     use LibUI::Window;
     use LibUI::Spinbox;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::VBox->new();
     my $count  = LibUI::Spinbox->new( 1, 100 );
     $box->append( $count, 0 );

@@ -15,20 +15,15 @@
 
 package chat;
 
-require 'sys/socket.ph';
+no warnings "ambiguous";
 
-if( defined( &main'PF_INET ) ){
-	$pf_inet = &main'PF_INET;
-	$sock_stream = &main'SOCK_STREAM;
+use Socket ();
+
+{
+	$pf_inet = Socket::PF_INET;
+	$sock_stream = Socket::SOCK_STREAM;
 	local($name, $aliases, $proto) = getprotobyname( 'tcp' );
 	$tcp_proto = $proto;
-}
-else {
-	# XXX hardwired $PF_INET, $SOCK_STREAM, 'tcp'
-	# but who the heck would change these anyway? (:-)
-	$pf_inet = 2;
-	$sock_stream = 1;
-	$tcp_proto = 6;
 }
 
 
@@ -40,7 +35,7 @@ $next = "chatsymbol000000"; # next one
 $nextpat = "^chatsymbol"; # patterns that match next++, ++, ++, ++
 
 
-## $handle = &chat'open_port("server.address",$port_number);
+## $handle = &chat::open_port("server.address",$port_number);
 ## opens a named or numbered TCP server
 
 sub open_port { ## public
@@ -84,7 +79,7 @@ sub open_port { ## public
 	$next; # return symbol for switcharound
 }
 
-## ($host, $port, $handle) = &chat'open_listen([$port_number]);
+## ($host, $port, $handle) = &chat::open_listen([$port_number]);
 ## opens a TCP port on the current machine, ready to be listened to
 ## if $port_number is absent or zero, pick a default port number
 ## process must be uid 0 to listen to a low port number
@@ -114,7 +109,7 @@ sub open_listen { ## public
 	(@myaddr, $port, $next); # returning this
 }
 
-## $handle = &chat'open_proc("command","arg1","arg2",...);
+## $handle = &chat::open_proc("command","arg1","arg2",...);
 ## opens a /bin/sh on a pseudo-tty
 
 sub open_proc { ## public
@@ -147,9 +142,9 @@ sub open_proc { ## public
 
 # $S is the read-ahead buffer
 
-## $return = &chat'expect([$handle,] $timeout_time,
+## $return = &chat::expect([$handle,] $timeout_time,
 ## 	$pat1, $body1, $pat2, $body2, ... )
-## $handle is from previous &chat'open_*().
+## $handle is from previous &chat::open_*().
 ## $timeout_time is the time (either relative to the current time, or
 ## absolute, ala time(2)) at which a timeout event occurs.
 ## $pat1, $pat2, and so on are regexs which are matched against the input
@@ -273,11 +268,11 @@ ESQ
 		eval $cases; die "$cases:\n$@" if $@;
 	}
 	$eof = $timeout = 0;
-	do $subname();
+	$subname->();
 }
 
-## &chat'print([$handle,] @data)
-## $handle is from previous &chat'open().
+## &chat::print([$handle,] @data)
+## $handle is from previous &chat::open().
 ## like print $handle @data
 
 sub print { ## public
@@ -287,14 +282,14 @@ sub print { ## public
 
 	local $out = join $, , @_;
 	syswrite(S, $out, length $out);
-	if( $chat'debug ){
+	if( $chat::debug ){
 		print STDERR "printed:";
 		print STDERR @_;
 	}
 }
 
-## &chat'close([$handle,])
-## $handle is from previous &chat'open().
+## &chat::close([$handle,])
+## $handle is from previous &chat::open().
 ## like close $handle
 
 sub close { ## public
@@ -309,7 +304,7 @@ sub close { ## public
 	}
 }
 
-## @ready_handles = &chat'select($timeout, @handles)
+## @ready_handles = &chat::select($timeout, @handles)
 ## select()'s the handles with a timeout value of $timeout seconds.
 ## Returns an array of handles that are ready for I/O.
 ## Both user handles and chat handles are supported (but beware of
@@ -331,7 +326,8 @@ sub select { ## public
 			}
 			$handlename{fileno($_)} = $_;
 		} else {
-			$handlename{fileno(/'/ ? $_ : "$caller\'$_")} = $_;
+			$handlename{fileno(/(?:::|')/ ? $_ : "$caller\::$_")} =
+				$_;
 		}
 	}
 	for (sort keys %handlename) {
@@ -344,7 +340,7 @@ sub select { ## public
 	sort keys %ready;
 }
 
-# ($pty,$tty) = $chat'_getpty(PTY,TTY):
+# ($pty,$tty) = $chat::_getpty(PTY,TTY):
 # internal procedure to get the next available pty.
 # opens pty on handle PTY, and matching tty on handle TTY.
 # returns undef if can't find a pty.
@@ -352,8 +348,8 @@ sub select { ## public
 
 sub _getpty { ## private
 	local($_PTY,$_TTY) = @_;
-	$_PTY =~ s/^([^']+)$/(caller)[$[]."'".$1/e;
-	$_TTY =~ s/^([^']+)$/(caller)[$[]."'".$1/e;
+	$_PTY =~ s/^([^':]+)$/(caller)[$[]."::".$1/e;
+	$_TTY =~ s/^([^':]+)$/(caller)[$[]."::".$1/e;
 	local($pty, $tty, $kind);
 	if( -e "/dev/pts000" ){		## mods by Joe Doupnik Dec 1992
 		$kind = "pts";		## SVR4 Streams

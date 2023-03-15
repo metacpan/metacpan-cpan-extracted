@@ -1,0 +1,9 @@
+Revision history of PerlX-ScopeFunction
+
+0.02    2023-03-13
+        - Add `let`
+        - keywords can now be imported as different names.
+
+0.01    2022-03-09
+        - First release.
+        - The introduction of keyword `with`.

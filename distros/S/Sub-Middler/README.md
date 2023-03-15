@@ -26,7 +26,7 @@ $head->(0); # Call the Chain
 sub mw1 {
   my %options=@_;
   sub {
-    my ($next,$index)=@_;
+    my ($next, $index, @optional)=@_;
     sub {
       my $work=$_[0]+$options{x};
       $next->($work);
@@ -38,7 +38,7 @@ sub mw1 {
 sub mw2 {
   my %options=@_;
   sub {
-    my ($next, $index)=@_;
+    my ($next, $index, @optional)=@_;
     sub {
       my $work= $_[0]*$options{y};
       $next->( $work);
@@ -50,21 +50,22 @@ sub mw2 {
 # DESCRIPTION
 
 A small module, facilitating linking together subroutines, acting as middleware
-or filters into chains for flexible usage and low overhead runtime performance.
+or filters into chains with low runtime overhead.
 
-To achieve these desirable attributes, the  'complexity' is offloaded in the
-definition of middleware/filters. They have to be wrapped in subroutines
-appropriately to facilitate the lexical binding. 
+To achieve this, the  'complexity' is offloaded to the definition of
+middleware/filters subroutines. They must be wrapped in subroutines
+appropriately to facilitate the lexical binding of linking variables.
 
 This differs from other 'sub chaining' modules as it does not use a loop
-internally to iterate of over a list of subroutines at runtime. As such there
-is no implicit call to the next item in the chain, each stage can run
-synchronously or asynchronously or even not at all. Each element in the chain
-is responsible for calling the next.
+internally to iterate over a list of subroutines at runtime. As such there is
+no implicit call to the 'next' item in the chain. Each stage can run the
+following stage synchronously or asynchronously or not at all. Each element in
+the chain is responsible for how and when it calls the 'next'.
 
-Finally the arguments and signatures used to each stage of middleware are
-completely user defined. This allows reuse of the `@_` array in calling
-subsequent segments for ultimate performance if you know what you're doing.
+Finally the arguments and signatures of each stage of middleware are completely
+user defined and are not interfered with by this module. This allows reuse of
+the `@_` array in calling subsequent stages for ultimate performance if you
+know what you're doing.
 
 # API
 
@@ -77,7 +78,7 @@ my $object=Sub::Middler->new;
 ```
 
 Creates a empty middler object ready to accept middleware. The object is a
-blessed array reference which stores the middlewares directly.
+blessed array reference which stores the middleware directly.
 
 ### register
 
@@ -87,31 +88,42 @@ $object->register(my_middlware());
 
 Appends the middleware to the internal list for later linking.
 
+### append, add
+
+Alias for register
+
 ### link
 
 ```
-$object->link($last);
+$object->link($last,[@args]);
 ```
 
-Links together the registered middleware stored internally. Each middleware is
-intrinsically linked to the next middlware in the list. The last middleware
-being linked to the `$last` argument, which must be a code ref. 
+Links together the registered middleware in the sequence of addition. Each
+middleware is intrinsically linked to the next middleware in the list. The last
+middleware being linked to the `$last` argument, which must be a code ref. 
 
-The `$last` code ref does not have to be strictly be middleware.
+The `$last` ref MUST be  a regular subroutine reference, acting as the
+'kernel' as described in following sections.
 
 Calls `die` if `$last` is not a code ref.
+
+Any optional additional arguments `@args` are passed to this function are
+passed on to each 'maker' sub after the `$next` and `$index`, parameters.
+This gives an alternative approach to distributing configuration data to each
+item in the chain prior to runtime. It is up to each item's maker sub to store
+relevant passed values as they see fit.
 
 ## Creating Middleware
 
 To achieve low over head in linking middleware, functional programming
-techniques (higher order functions). This also give the greatest flexibility to
-the middleware, as signatures are completely user defined.
+techniques (higher order functions) are utilised. This also give the greatest
+flexibility to the middleware, as signatures are completely user defined.
 
 The trade off is that the middleware must be defined in a certain code
 structure. While this isn't difficult, it takes a minute to wrap your head
 around.
 
-### Middlware definition
+### Middlware Definition
 
 Middleware must be a subroutine (top/name) which returns a anonymous subroutine
 (maker), which also returns a anonymous subroutine to perform work (kernel).
@@ -123,11 +135,12 @@ sub my_middleware {                 (1) Top/name subroutine
   my %options=@_;                       Store any config
  
   sub {                             (2) maker sub is returned
-    my ($next, $index)=@_;          (3) Must stor these vars
+    my ($next, $index, @optional)=@_;   (3) Must store at least $next
 
     sub {                           (4) Returns the kernel sub
       # Code here implements your middleware
       # %options are lexically accessable here
+      # as are the @optional parameters
       
 
       # Execute the next item in the chain
@@ -142,30 +155,35 @@ sub my_middleware {                 (1) Top/name subroutine
 
 - Top Subroutine
 
-    The top sub routine (1) can take any arguments you desire and can be called what
-    you like. The idea is it represents your middleware/filter and stores any setup
-    lexically for the **maker** sub to close over. It returns the **maker** sub.
+    The top sub routine (1) can take any arguments you desire and can be called
+    what you like. The idea is it represents your middleware/filter and stores any
+    setup lexically for the **maker** sub to close over. It returns the **maker**
+    sub.
 
 - Maker Subroutine
 
     This anonymous sub (2) closes over the variables stored in **Top** and is the
-    input in to this module (via `register`). When being linked (called) by this
-    modules it is provided two arguments, which is the reference to the next item
-    in the chain and the current middleware index. These **MUST** be stored to be
+    input to this module (via `register`). When being linked (called) by this
+    module it is provided at least two arguments: the reference to the next item in
+    the chain and the current middleware index. These **MUST** be stored to be
     useful, but can be called anything you like (3).
+
+    Any optional/additional arguments supplied during a call to `link` are also
+    used as arguments 'as is' to all maker subroutines in the chain.
 
 - Kernel subroutine
 
     This anonymous subroutine (4) actually performs the work of the
-    middleware/filter. After work is done, the next item in the chain is called
-    explictly (5).  Any extra work can be performed after the chain is completed
-    after this call (6).
+    middleware/filter. After work is done, the next item in the chain must be
+    called explicitly (5).  This supports synchronous or asynchronous middleware.
+    Any extra work can be performed after the chain is completed after this call
+    (6).
 
 ## LINKING CHAINS
 
 Multiple chains of middleware can be linked together. This needs to be done in
-reverse order. The last segment becomes the `$last` item when linking the
-preceding chain and so on.
+reverse order. The last chain after being linked, becomes the `$last` item
+when linking the preceding chain and so on.
 
 ## EXAMPLES
 
@@ -177,8 +195,8 @@ distribution.
 [Sub::Chain](https://metacpan.org/pod/Sub%3A%3AChain)  and [Sub::Pipeline](https://metacpan.org/pod/Sub%3A%3APipeline) links together subs. They provide other
 features that this module does not. 
 
-These iterate over a list of subroutines, at runtime to achieve named subs etc.
-This modules pre links subroutines together, reducing over head
+These iterate over a list of subroutines at runtime to achieve named subs etc.
+where as this module pre links subroutines together, reducing overhead.
 
 # AUTHOR
 

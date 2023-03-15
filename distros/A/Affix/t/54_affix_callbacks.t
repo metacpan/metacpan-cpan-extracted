@@ -8,6 +8,8 @@ $|++;
 #
 use t::lib::nativecall;
 #
+plan skip_all => 'no support for aggregates by value' unless Affix::Feature::AggrByVal();
+#
 my $lib = compile_test_lib('54_affix_callbacks');
 diag $lib;
 

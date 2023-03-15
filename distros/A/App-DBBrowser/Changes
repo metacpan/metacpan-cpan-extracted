@@ -1,6 +1,27 @@
 Revision history for App-DBBrowser
 
 
+2.320    2023-03-14
+        - Update default aliases.
+
+2.319    2023-03-13
+        - Create tables: update list of tables even if insert failed.
+
+2.318    2023-03-13
+        - Bugfix update/delete info print.
+
+2.317    2023-03-12
+        - Informix: add 'Epoch_to_DateTime'.
+        - Informix add connection attribute 'ix_EnableUTF8'.
+        - Pg: add schema 'public' only if db is user-db.
+        - New option: DB2 application code set.
+        - New option to disable table print warnings
+        - Option 'binary_filter': add hexadecimal format.
+        - Allow nested function.
+        - attached_DB.json: save attached databases as hash.
+        - Bugfix in 'from_col_by_col'.
+        - Bugfix in 'CreateDropAttach'.
+
 2.316    2023-02-19
         - Update parse-mode 'Template'.
         - Update plugins 'mysql', 'MariaDB' and 'Pg'.

@@ -8,9 +8,9 @@ use Log::ger;
 use Clipboard::Any ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-14'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-TextWrapUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -41,6 +41,7 @@ our %argspecopt_backend = (
     backend => {
         schema => ['perl::modname*', in=>\@BACKENDS],
         default => 'Text::ANSI::Util',
+        cmdline_aliases => {b=>{}},
     },
 );
 
@@ -101,8 +102,10 @@ sub textwrap {
 
         if ($backend eq 'Text::ANSI::Fold') {
             require Text::ANSI::Fold;
-            $para_text = join("", map {"$_\n"} Text::ANSI::Fold->new(width=>$width)->text($para_text)->chops);
-            $para_text =~ s/\R\z//;
+            state $fold = Text::ANSI::Fold->new(width => $width,
+                                                boundary => 'word',
+                                                linebreak => &Text::ANSI::Fold::LINEBREAK_ALL);
+            $para_text = join("\n", $fold->text($para_text)->chops);
         } elsif ($backend eq 'Text::ANSI::Util') {
             require Text::ANSI::Util;
             $para_text = Text::ANSI::Util::ta_wrap($para_text, $width);
@@ -246,7 +249,7 @@ App::TextWrapUtils - Utilities related to text wrapping
 
 =head1 VERSION
 
-This document describes version 0.005 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2022-12-14.
+This document describes version 0.006 of App::TextWrapUtils (from Perl distribution App-TextWrapUtils), released on 2023-03-10.
 
 =head1 DESCRIPTION
 
@@ -491,7 +494,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

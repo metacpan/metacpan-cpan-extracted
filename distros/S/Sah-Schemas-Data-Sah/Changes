@@ -1,3 +1,12 @@
+0.003   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] For completion convenience, allow ',' in addition to '=' as
+          args starter.
+
+        - Rename xcompletion name:
+          perl{,_perl}_sah_filter_modname_with_optional_args.
+
+
 0.002   2023-01-17  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Provide completion for

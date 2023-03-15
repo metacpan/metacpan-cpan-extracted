@@ -10,7 +10,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 __PACKAGE__->parent_column('parent_id');
 
@@ -38,7 +38,7 @@ sub in_mode {
 
 sub TO_JSON {
     my $self = shift;
-    my %cols = $self->get_columns;
+    my %cols = $self->get_all_fields;
 
     # Inflate
     $cols{facets} = $self->facets;
@@ -60,7 +60,7 @@ sub st_line_data {
 
 sub line_data {
     my $self = shift;
-    my %cols = $self->get_columns;
+    my %cols = $self->get_all_fields;
     my %out;
 
     my $has_facets = ($cols{has_facets} || $cols{facets}) ? 1 : 0;

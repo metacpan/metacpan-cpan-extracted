@@ -3,6 +3,7 @@ abstract: 'Write Perl bindings to non-Perl libraries with FFI. No XS required.'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
+  Alien::FFI: '0.20'
   Capture::Tiny: '0'
   ExtUtils::CBuilder: '0'
   Test2::API: '1.302015'
@@ -40,10 +41,11 @@ requires:
   perl: '5.008004'
 resources:
   IRC: irc://irc.perl.org/#native
+  Twitter: https://fosstodon.org/@PerlFFI
   bugtracker: https://github.com/PerlFFI/FFI-Platypus/issues
-  homepage: https://metacpan.org/pod/FFI::Platypus
+  homepage: https://pl.atypus.org
   repository: git://github.com/PerlFFI/FFI-Platypus.git
-version: '2.05'
+version: '2.07'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

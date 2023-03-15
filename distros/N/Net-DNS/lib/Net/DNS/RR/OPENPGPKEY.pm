@@ -2,7 +2,7 @@ package Net::DNS::RR::OPENPGPKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPENPGPKEY.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: OPENPGPKEY.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,8 +19,7 @@ use MIME::Base64;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $length = $self->{rdlength};
 	$self->keybin( substr $$data, $offset, $length );
@@ -44,24 +43,23 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->key(@_);
+	$self->key(@argument);
 	return;
 }
 
 
 sub key {
-	my $self = shift;
-	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
-	return $self->keybin( MIME::Base64::decode( join "", @_ ) );
+	my ( $self, @value ) = @_;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @value;
+	return $self->keybin( MIME::Base64::decode( join "", @value ) );
 }
 
 
 sub keybin {
-	my $self = shift;
-
-	$self->{keybin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{keybin} = $_ }
 	return $self->{keybin} || "";
 }
 
@@ -135,6 +133,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC7929
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC7929|https://tools.ietf.org/html/rfc7929>
 
 =cut

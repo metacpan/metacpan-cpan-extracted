@@ -2,7 +2,7 @@ package Net::DNS::RR::RP;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RP.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: RP.pm 1898 2023-02-15 14:27:22Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,18 +20,16 @@ use Net::DNS::Mailbox;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset, @opaque ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
-	( $self->{mbox}, $offset ) = Net::DNS::Mailbox2535->decode( $data, $offset, @opaque );
-	$self->{txtdname} = Net::DNS::DomainName2535->decode( $data, $offset, @opaque );
+	( $self->{mbox}, $offset ) = Net::DNS::Mailbox2535->decode( $data, $offset );
+	$self->{txtdname} = Net::DNS::DomainName2535->decode( $data, $offset );
 	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
-	my $self = shift;
-	my ( $offset, @opaque ) = @_;
+	my ( $self, $offset, @opaque ) = @_;
 
 	my $txtdname = $self->{txtdname};
 	my $rdata    = $self->{mbox}->encode( $offset, @opaque );
@@ -49,26 +47,23 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->mbox(shift);
-	$self->txtdname(shift);
+	for (qw(mbox txtdname)) { $self->$_( shift @argument ) }
 	return;
 }
 
 
 sub mbox {
-	my $self = shift;
-
-	$self->{mbox} = Net::DNS::Mailbox2535->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{mbox} = Net::DNS::Mailbox2535->new($_) }
 	return $self->{mbox} ? $self->{mbox}->address : undef;
 }
 
 
 sub txtdname {
-	my $self = shift;
-
-	$self->{txtdname} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{txtdname} = Net::DNS::DomainName2535->new($_) }
 	return $self->{txtdname} ? $self->{txtdname}->name : undef;
 }
 
@@ -149,6 +144,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1183 Section 2.2
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC1183(2.2)|https://tools.ietf.org/html/rfc1183>
 
 =cut

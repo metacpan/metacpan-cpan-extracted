@@ -18,7 +18,7 @@ use warnings;
 use XML::Parser::Lite;
 use Spreadsheet::Gnumeric::StyleRegion;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use parent qw(Spreadsheet::Gnumeric::Base);
 
@@ -287,7 +287,7 @@ sub _process_MaxRow_elt {
     my ($self, $maxrow) = @_;
 
     return
-	unless $maxrow;
+	unless defined($maxrow);
     $self->{_sheet}{minrow} = 1;
     $self->{_sheet}{maxrow} = 1 + $maxrow;
 }
@@ -532,7 +532,7 @@ Spreadsheet::ReadGnumeric - read a Gnumeric file, return Spreadsheet::Read
 
 =head1 VERSION
 
-Version 0.2
+Version 0.3
 
 =head1 SYNOPSIS
 

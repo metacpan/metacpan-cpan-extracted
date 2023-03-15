@@ -18,6 +18,7 @@ t/advanced_eval.t
 t/basic.t
 t/cli-check.t
 t/frames.t
+t/reverse.t
 t/syntax-error.pl
 t/syntax-ok.pl
 t/syntax-warning.pl

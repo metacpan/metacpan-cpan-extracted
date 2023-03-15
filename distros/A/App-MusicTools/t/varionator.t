@@ -1,35 +1,22 @@
 #!perl
+use Test2::V0;
+use Test2::Tools::Command;
+local @Test2::Tools::Command::command = ( $^X, '--', './bin/varionator' );
 
-use Test::Cmd;
-use Test::Most tests => 6;
+command {
+    args   => [qw(I V)],
+    stdout => "I V\n",
+};
 
-my $deeply = \&eq_or_diff;
+command {
+    args   => [ "I", "(II IV)" ],
+    stdout => "I II\nI IV\n",
+};
 
-my $test_prog = './bin/varionator';
-my $tc        = Test::Cmd->new(
-    interpreter => $^X,
-    prog        => $test_prog,
-    verbose     => 0,            # TODO is there a standard ENV to toggling?
-    workdir     => '',
-);
+command {
+    args   => [ "c", "(d f a)", "(g e b)", "c" ],
+    stdout =>
+      "c d g c\nc d e c\nc d b c\nc f g c\nc f e c\nc f b c\nc a g c\nc a e c\nc a b c\n",
+};
 
-$tc->run( args => 'I V' );
-$deeply->( [ map { s/\s+$//r } $tc->stdout ], ['I V'], "$test_prog I V" );
-is( $tc->stderr, "", "$test_prog I V emits no stderr" );
-
-$tc->run( args => 'I "(II IV)"' );
-$deeply->(
-    [ map { s/\s+$//r } $tc->stdout ],
-    [ 'I II', 'I IV' ],
-    "$test_prog I '(II IV)'"
-);
-is( $tc->stderr, "", "$test_prog I '(II IV)' emits no stderr" );
-
-$tc->run( args => 'c "(d f a)" "(g e b)" c' );
-$deeply->(
-    [ map { s/\s+$//r } $tc->stdout ],
-    [   'c d g c', 'c d e c', 'c d b c', 'c f g c', 'c f e c', 'c f b c',
-        'c a g c', 'c a e c', 'c a b c',
-    ]
-);
-is( $tc->stderr, "", "$test_prog I '(d f a)' '(g e b)' c emits no stderr" );
+done_testing 9

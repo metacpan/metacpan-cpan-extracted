@@ -2,7 +2,7 @@ package Net::DNS::RR::SSHFP;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SSHFP.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: SSHFP.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -21,8 +21,7 @@ use constant BABBLE => defined eval { require Digest::BubbleBabble };
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my $self = shift;
-	my ( $data, $offset ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
 	my $size = $self->{rdlength} - 2;
 	@{$self}{qw(algorithm fptype fpbin)} = unpack "\@$offset C2 a$size", $$data;
@@ -48,42 +47,39 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
-	my $self = shift;
+	my ( $self, @argument ) = @_;
 
-	$self->algorithm(shift);
-	$self->fptype(shift);
-	$self->fp(@_);
+	for (qw(algorithm fptype)) { $self->$_( shift @argument ) }
+	$self->fp(@argument);
 	return;
 }
 
 
 sub algorithm {
-	my $self = shift;
-
-	$self->{algorithm} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{algorithm} = 0 + $_ }
 	return $self->{algorithm} || 0;
 }
 
 
 sub fptype {
-	my $self = shift;
-
-	$self->{fptype} = 0 + shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{fptype} = 0 + $_ }
 	return $self->{fptype} || 0;
 }
 
 
 sub fp {
-	my $self = shift;
-	return unpack "H*", $self->fpbin() unless scalar @_;
-	return $self->fpbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	my ( $self, @value ) = @_;
+	return unpack "H*", $self->fpbin() unless scalar @value;
+	my @hex = map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @value;
+	return $self->fpbin( pack "H*", join "", @hex );
 }
 
 
 sub fpbin {
-	my $self = shift;
-
-	$self->{fpbin} = shift if scalar @_;
+	my ( $self, @value ) = @_;
+	for (@value) { $self->{fpbin} = $_ }
 	return $self->{fpbin} || "";
 }
 
@@ -202,6 +198,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4255
+L<perl> L<Net::DNS> L<Net::DNS::RR>
+L<RFC4255|https://tools.ietf.org/html/rfc4255>
 
 =cut

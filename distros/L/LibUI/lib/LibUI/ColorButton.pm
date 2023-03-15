@@ -1,4 +1,4 @@
-package LibUI::ColorButton 0.01 {
+package LibUI::ColorButton 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -22,19 +22,22 @@ package LibUI::ColorButton 0.01 {
         ( $r, $g, $b, $a );
     }
     affix(
-        LibUI::lib(), 'uiColorButtonSetColor',
-        [ InstanceOf ['LibUI::ColorButton'], Double, Double, Double, Double ] => Void,
-        'setColor'
+        LibUI::lib(),
+        [ 'uiColorButtonSetColor', 'setColor' ],
+        [ InstanceOf ['LibUI::ColorButton'], Double, Double, Double, Double ] => Void
     );
     affix(
         LibUI::lib(),
-        'uiColorButtonOnChanged',
+        [ 'uiColorButtonOnChanged', 'onChanged' ],
         [   InstanceOf ['LibUI::ColorButton'],
             CodeRef [ [ InstanceOf ['LibUI::ColorButton'], Any ] => Void ], Any
-        ] => Void,
-        'onChanged'
+        ] => Void
     );
-    affix( LibUI::lib(), 'uiNewColorButton', [Void] => InstanceOf ['LibUI::ColorButton'], 'new' );
+    affix(
+        LibUI::lib(),
+        [ 'uiNewColorButton', 'new' ],
+        [Void] => InstanceOf ['LibUI::ColorButton']
+    );
 };
 1;
 #
@@ -53,8 +56,9 @@ LibUI::ColorButton - Color Picker
     use LibUI ':all';
     use LibUI::Window;
     use LibUI::ColorButton;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $cbtn   = LibUI::ColorButton->new();
     $cbtn->onChanged(
         sub {

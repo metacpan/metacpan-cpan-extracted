@@ -1,3 +1,9 @@
+0.048   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] For completion convenience, allow ',' in addition to '=' for
+          starting optional args, but normalize it to '='.
+
+
 0.047   2023-01-14  Released-By: PERLANCAR; Urgency: medium
 
         - Add schemas: perl::module::release::version{,s}.

@@ -1,5 +1,13 @@
 Revision history for FFI-Platypus
 
+2.07      2023-03-14 06:59:09 -0600
+  - Production release identical to 2.06_01
+
+2.06_01   2023-02-27 10:13:25 -0700
+  - Refactor Alien::FFI fallback mode to delete it as a prereq when it is not
+    needed instead of adding it when it is.  This way the CPAN river rating
+    for Alien::FFI more closely reflects reality (gh#391)
+
 2.05      2022-11-15 16:59:05 -0700
   - Documentation improvements (gh#387, gh#388)
 

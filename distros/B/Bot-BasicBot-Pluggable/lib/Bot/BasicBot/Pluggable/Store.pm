@@ -1,5 +1,5 @@
 package Bot::BasicBot::Pluggable::Store;
-$Bot::BasicBot::Pluggable::Store::VERSION = '1.20';
+$Bot::BasicBot::Pluggable::Store::VERSION = '1.30';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -161,7 +161,7 @@ Bot::BasicBot::Pluggable::Store - base class for the back-end pluggable store
 
 =head1 VERSION
 
-version 1.20
+version 1.30
 
 =head1 SYNOPSIS
 

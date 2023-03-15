@@ -1,4 +1,5 @@
 #include "std.h"
+#include <inttypes.h>
 
 typedef struct intstruct {
     int i;
@@ -9,9 +10,9 @@ typedef struct intintstruct {
 
 DLLEXPORT int TakeIntStruct(IntStruct x) {
     warn("# x.i!, %d", x.i);
-    warn("# IntStruct.i == %lu", offsetof(IntStruct, i));
-    warn("# IntIntStruct.i == %lu", offsetof(IntIntStruct, i));
-    warn("# IntIntStruct.j == %lu", offsetof(IntIntStruct, j));
+    warn("# IntStruct.i == %" PRIu64, offsetof(IntStruct, i));
+    warn("# IntIntStruct.i == %" PRIu64, offsetof(IntIntStruct, i));
+    warn("# IntIntStruct.j == %" PRIu64, offsetof(IntIntStruct, j));
     if (x.i == 42) return 1;
     return 0;
 }

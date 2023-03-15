@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 1896 2023-01-30 12:59:25Z willem $)[2];
 
 
 =head1 NAME
@@ -54,10 +54,10 @@ my @hints;
 my $root = [];
 
 sub hints {
-	shift;
-	return @hints unless scalar @_;
+	my ( undef, @argument ) = @_;
+	return @hints unless scalar @argument;
 	$root  = [];
-	@hints = @_;
+	@hints = @argument;
 	return;
 }
 
@@ -78,9 +78,9 @@ and invoke send() indirectly.
 =cut
 
 sub send {
-	my $self = shift;
+	my ( $self, @q ) = @_;
 	my @conf = ( recurse => 0, udppacketsize => 1024 );	# RFC8109
-	return bless( {persistent => {'.' => $root}, %$self, @conf}, ref($self) )->_send(@_);
+	return bless( {persistent => {'.' => $root}, %$self, @conf}, ref($self) )->_send(@q);
 }
 
 
@@ -92,8 +92,8 @@ sub query_dorecursion {			## historical
 
 
 sub _send {
-	my $self  = shift;
-	my $query = $self->_make_query_packet(@_);
+	my ( $self, @q ) = @_;
+	my $query = $self->_make_query_packet(@q);
 
 	unless ( scalar(@$root) ) {
 		$self->_diag("resolver priming query");
@@ -169,15 +169,17 @@ for queries for missing glue records.
 =cut
 
 sub callback {
-	my $self = shift;
-
-	( $self->{callback} ) = grep { ref($_) eq 'CODE' } @_;
+	my ( $self, @argument ) = @_;
+	for ( grep { ref($_) eq 'CODE' } @argument ) {
+		$self->{callback} = $_;
+	}
 	return;
 }
 
 sub _callback {
-	my $callback = shift->{callback};
-	$callback->(@_) if $callback;
+	my ( $self, @argument ) = @_;
+	my $callback = $self->{callback};
+	$callback->(@argument) if $callback;
 	return;
 }
 

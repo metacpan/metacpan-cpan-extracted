@@ -1,4 +1,4 @@
-package LibUI::HBox 0.01 {
+package LibUI::HBox 0.02 {
     use 5.008001;
     use strict;
     use warnings;
@@ -6,18 +6,23 @@ package LibUI::HBox 0.01 {
     use parent 'LibUI::Control';
     #
     affix(
-        LibUI::lib(), 'uiBoxAppend',
-        [ InstanceOf ['LibUI::HBox'], InstanceOf ['LibUI::Control'], Int ] => Void,
-        'append'
+        LibUI::lib(),
+        [ 'uiBoxAppend', 'append' ],
+        [ InstanceOf ['LibUI::HBox'], InstanceOf ['LibUI::Control'], Int ] => Void
     );
-    affix( LibUI::lib(), 'uiBoxDelete', [ InstanceOf ['LibUI::HBox'], Int ] => Void, 'delete' );
-    affix( LibUI::lib(), 'uiBoxNumChildren', [ InstanceOf ['LibUI::HBox'] ] => Int, 'numChildren' );
-    affix( LibUI::lib(), 'uiBoxPadded',      [ InstanceOf ['LibUI::HBox'] ] => Int, 'padded' );
+    affix( LibUI::lib(), [ 'uiBoxDelete', 'delete' ], [ InstanceOf ['LibUI::HBox'], Int ] => Void );
     affix(
-        LibUI::lib(), 'uiBoxSetPadded', [ InstanceOf ['LibUI::HBox'], Int ] => Void,
-        'setPadded'
+        LibUI::lib(),
+        [ 'uiBoxNumChildren', 'numChildren' ],
+        [ InstanceOf ['LibUI::HBox'] ] => Int
     );
-    affix( LibUI::lib(), 'uiNewHorizontalBox', [Void] => InstanceOf ['LibUI::HBox'], 'new' );
+    affix( LibUI::lib(), [ 'uiBoxPadded', 'padded' ], [ InstanceOf ['LibUI::HBox'] ] => Int );
+    affix(
+        LibUI::lib(),
+        [ 'uiBoxSetPadded',           'setPadded' ],
+        [ InstanceOf ['LibUI::HBox'], Int ] => Void
+    );
+    affix( LibUI::lib(), [ 'uiNewHorizontalBox', 'new' ], [Void] => InstanceOf ['LibUI::HBox'] );
 };
 1;
 #
@@ -39,8 +44,9 @@ Controls
     use LibUI::Window;
     use LibUI::ColorButton;
     use LibUI::Label;
-    Init( { Size => 1024 } ) && die;
+    Init && die;
     my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
+    $window->setMargined( 1 );
     my $box    = LibUI::HBox->new;
     my $lbl    = LibUI::Label->new('Pick a color');
     my $cbtn   = LibUI::ColorButton->new();

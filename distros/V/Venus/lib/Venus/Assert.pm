@@ -87,6 +87,25 @@ sub arrayref {
   return $self->array(@code);
 }
 
+sub attributes {
+  my ($self, @pairs) = @_;
+
+  $self->object(sub{
+    my $check = 0;
+    my $value = $_->value;
+    return false if @pairs % 2;
+    for (my $i = 0; $i < @pairs;) {
+      my ($key, $data) = (map $pairs[$_], $i++, $i++);
+      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
+      $check++ if $value->can($key)
+        && $self->new->do($match, @args)->check($value->$key);
+    }
+    ((@pairs / 2) == $check) ? true : false
+  });
+
+  return $self;
+}
+
 sub assertion {
   my ($self) = @_;
 
@@ -209,11 +228,23 @@ sub defined {
   return $self;
 }
 
+sub either {
+  my ($self, @data) = @_;
+
+  for (my $i = 0; $i < @data; $i++) {
+    my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
+    $self->accept($match, @args);
+  }
+
+  return $self;
+}
+
 sub enum {
   my ($self, @data) = @_;
 
   for my $item (@data) {
-    $self->constraints->when(sub{$_->value eq $item})->then(sub{true});
+    $self->constraints->when(sub{CORE::defined($_->value) && $_->value eq $item})
+      ->then(sub{true});
   }
 
   return $self;
@@ -224,18 +255,11 @@ sub expression {
 
   return $self if !$data;
 
-  my @data = split /\s*\|\s*(?![^\[]*\])/, $data;
+  $self->expects([$data]);
 
-  push @{$self->expects}, @data;
+  my @parsed = $self->parse($data);
 
-  for my $item (@data) {
-    if (my @nested = $item =~ /^((?:array|hash)(?:ref)?)\[([^\]]+)\]$/) {
-      $self->within($nested[0])->expression($nested[1]);
-    }
-    else {
-      $self->accept($item);
-    }
-  }
+  $self->either(@parsed);
 
   return $self;
 }
@@ -304,6 +328,27 @@ sub hash {
   return $self;
 }
 
+sub hashkeys {
+  my ($self, @pairs) = @_;
+
+  $self->constraints->when(sub{
+    CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
+      && %{$_->value} > 0
+  })->then(sub{
+    my $check = 0;
+    my $value = $_->value;
+    return false if @pairs % 2;
+    for (my $i = 0; $i < @pairs;) {
+      my ($key, $data) = (map $pairs[$_], $i++, $i++);
+      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
+      $check++ if $self->new->do($match, @args)->check($value->{$key});
+    }
+    ((@pairs / 2) == $check) ? true : false
+  });
+
+  return $self;
+}
+
 sub hashref {
   my ($self, @code) = @_;
 
@@ -314,6 +359,24 @@ sub identity {
   my ($self, $name) = @_;
 
   $self->constraint('object', sub {$_->value->isa($name) ? true : false});
+
+  return $self;
+}
+
+sub inherits {
+  my ($self, $name) = @_;
+
+  $self->constraint('object', sub {$_->value->isa($name) ? true : false});
+
+  return $self;
+}
+
+sub integrates {
+  my ($self, $name) = @_;
+
+  $self->constraint('object', sub {
+    $_->value->can('does') ? ($_->value->does($name) ? true : false) : false
+  });
 
   return $self;
 }
@@ -355,6 +418,14 @@ sub package {
   });
 
   return $self;
+}
+
+sub parse {
+  my ($self, $expr) = @_;
+
+  $expr ||= '';
+
+  return _type_parse($expr);
 }
 
 sub received {
@@ -455,13 +526,16 @@ sub string {
 sub tuple {
   my ($self, @data) = @_;
 
-  $self->array->constraints->then(sub{
+  $self->constraints->when(sub{
+    CORE::defined($_->value) && CORE::ref($_->value) eq 'ARRAY'
+      && @data == @{$_->value}
+  })->then(sub{
     my $check = 0;
     my $value = $_->value;
     return false if @data != @$value;
     for (my $i = 0; $i < @data; $i++) {
       my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
-      $check++ if $self->new->$match(@args)->check($value->[$i]);
+      $check++ if $self->new->do($match, @args)->check($value->[$i]);
     }
     (@data == $check) ? true : false
   });
@@ -519,7 +593,7 @@ sub value {
 }
 
 sub within {
-  my ($self, $type) = @_;
+  my ($self, $type, @next) = @_;
 
   if (!$type) {
     return $self;
@@ -528,14 +602,20 @@ sub within {
   my $where = $self->new;
 
   if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
-    $self->defined(sub{
+    $self->constraints->when(sub{
+      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
+        && %{$_->value} > 0
+    })->then(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'HASH')
         && CORE::values(%$value) == grep $where->check($_), CORE::values(%$value)
     });
   }
   elsif (lc($type) eq 'array' || lc($type) eq 'arrayref') {
-    $self->defined(sub{
+    $self->constraints->when(sub{
+      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'ARRAY')
+        && @{$_->value} > 0
+    })->then(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'ARRAY')
         && @$value == grep $where->check($_), @$value
@@ -550,7 +630,240 @@ sub within {
     $throw->error;
   }
 
+  $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
+
   return $where;
+}
+
+sub yesno {
+  my ($self, @code) = @_;
+
+  $self->constraints->when(sub{
+    CORE::defined($_->value) && $_->value =~ /^(?:1|y(?:es)?|0|n(?:o)?)$/i
+  })->then(@code ? @code : sub{true});
+
+  return $self;
+}
+
+sub _type_parse {
+  my @items = _type_parse_pipes(@_);
+
+  my $either = @items > 1;
+
+  @items = map _type_parse_nested($_), @items;
+
+  return wantarray && !$either ? @items : [$either ? ("either") : (), @items];
+}
+
+sub _type_parse_lists {
+  my @items = @_;
+
+  my $r0 = '[\"\'\[\]]';
+  my $r1 = '[^\"\'\[\]]';
+  my $r2 = _type_subexpr_type_2();
+  my $r3 = _type_subexpr_delimiter();
+
+  return (
+    grep length,
+      map {split/,\s*(?=(?:$r1*$r0$r1*$r0)*$r1*$)(${r2}(?:${r3}[^,]*)?)?/}
+        @items
+  );
+}
+
+sub _type_parse_nested {
+  my ($expr) = @_;
+
+  return ($expr) if $expr !~ _type_regexp(_type_subexpr_type_2());
+
+  my @items = ($expr);
+
+  @items = ($expr =~ /^(\w+)\s*\[(.*)\]+$/g);
+
+  @items = map _type_parse_lists($_), @items;
+
+  @items = map {s/^["']+|["']+$//gr} @items;
+
+  @items = map _type_parse($_), @items;
+
+  return (@items > 1 ? [@items] : @items);
+}
+
+sub _type_parse_pipes {
+  my ($expr) = @_;
+
+  my @items;
+
+  # i.e. tuple[number, string] | tuple[string, number]
+  if
+  (
+    _type_regexp_eval(
+      $expr, _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_2())
+    )
+  )
+  {
+    @items = map _type_parse_tuples($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_2(), _type_subexpr_type_2()));
+  }
+  # i.e. string | tuple[number, string]
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_1(), _type_subexpr_type_2()))
+  )
+  {
+    @items = map _type_parse_tuples($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_1(), _type_subexpr_type_2()));
+  }
+  # i.e. tuple[number, string] | string
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_1()))
+  )
+  {
+    @items = map _type_parse_tuples($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_2(), _type_subexpr_type_1()));
+  }
+  # special condition: i.e. tuple[number, string]
+  elsif
+  (
+    _type_regexp_eval($expr, _type_regexp(_type_subexpr_type_2()))
+  )
+  {
+    @items = ($expr);
+  }
+  # i.e. "..." | tuple[number, string]
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_2()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_2()));
+    @items = (_type_parse_pipes($items[0]), _type_parse_tuples($items[1]));
+  }
+  # i.e. tuple[number, string] | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_3()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_2(), _type_subexpr_type_3()));
+    @items = (_type_parse_tuples($items[0]), _type_parse_pipes($items[1]));
+  }
+  # i.e. Package::Name | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_4(), _type_subexpr_type_3()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_4(), _type_subexpr_type_3()));
+    @items = ($items[0], _type_parse_pipes($items[1]));
+  }
+  # i.e. "..." | Package::Name
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_4()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_4()));
+    @items = (_type_parse_pipes($items[0]), $items[1]);
+  }
+  # i.e. string | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_1(), _type_subexpr_type_3()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_1(), _type_subexpr_type_3()));
+    @items = ($items[0], _type_parse_pipes($items[1]));
+  }
+  # i.e. "..." | string
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_1()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_1()));
+    @items = (_type_parse_pipes($items[0]), $items[1]);
+  }
+  # i.e. "..." | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_3()))
+  )
+  {
+    @items = map _type_parse_pipes($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_3()));
+  }
+  else {
+    @items = ($expr);
+  }
+
+  return (@items);
+}
+
+sub _type_parse_tuples {
+  map +(scalar(_type_regexp_eval($_,
+    _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_2())))
+      ? (_type_parse_pipes($_))
+      : ($_)), @_
+}
+
+sub _type_regexp {
+  qr/^@{[_type_regexp_joined(@_)]}$/
+}
+
+sub _type_regexp_eval {
+  map {s/^\s+|\s+$//gr} ($_[0] =~ $_[1])
+}
+
+sub _type_regexp_groups {
+  qr/^@{[_type_regexp_joined(_type_subexpr_groups(@_))]}$/
+}
+
+sub _type_regexp_joined {
+  join(_type_subexpr_delimiter(), @_)
+}
+
+sub _type_subexpr_delimiter {
+  '\s*\|\s*'
+}
+
+sub _type_subexpr_groups {
+  map "($_)", @_
+}
+
+sub _type_subexpr_type_1 {
+  '\w+'
+}
+
+sub _type_subexpr_type_2 {
+  '\w+\s*\[.*\]+'
+}
+
+sub _type_subexpr_type_3 {
+  '.*'
+}
+
+sub _type_subexpr_type_4 {
+  '[A-Za-z][:\^\w]+\w*'
 }
 
 1;
@@ -646,15 +959,17 @@ This package provides the following methods:
 
 =head2 accept
 
-  accept(Str $name, CodeRef $callback) (Object)
+  accept(Str $name, Any @args) (Object)
 
 The accept method registers a constraint based on the built-in type or package
-name provided. Optionally, you can provide a callback to further
-constrain/validate the provided value, returning truthy or falsy. The built-in
-types are I<"array">, I<"boolean">, I<"code">, I<"float">, I<"hash">,
-I<"number">, I<"object">, I<"regexp">, I<"scalar">, I<"string">, or I<"undef">.
-Any name given that is not a built-in type is assumed to be an I<"object"> of
-the name provided.
+name provided as the first argument. The built-in types are I<"array">,
+I<"boolean">, I<"code">, I<"float">, I<"hash">, I<"number">, I<"object">,
+I<"regexp">, I<"scalar">, I<"string">, or I<"undef">.  Any name given that is
+not a built-in type is assumed to be a method (i.e. a method call) or an
+I<"object"> of the name provided. Additional arguments are assumed to be
+arguments for the dispatched method call. Optionally, you can provide a
+callback to further constrain/validate the provided value, returning truthy or
+falsy, for methods that support it.
 
 I<Since C<1.40>>
 
@@ -872,6 +1187,84 @@ I<Since C<1.71>>
   # $assert->check([]);
 
   # true
+
+=back
+
+=cut
+
+=head2 attributes
+
+  attributes(Str | ArrayRef[Str] @pairs) (Assert)
+
+The attributes method configures the object to accept objects containing
+attributes whose values' match the attribute names and types specified, and
+returns the invocant.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item attributes example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->attributes;
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=back
+
+=over 4
+
+=item attributes example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->attributes(name => 'string');
+
+  # $assert->check(bless{});
+
+  # false
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=back
+
+=over 4
+
+=item attributes example 3
+
+  # given: synopsis
+
+  package Example3;
+
+  use Venus::Class;
+
+  attr 'name';
+
+  package main;
+
+  $assert = $assert->attributes(name => 'string', message => 'string');
+
+  # $assert->check(bless{});
+
+  # false
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+  # $assert->check(Example3->new);
+
+  # false
 
 =back
 
@@ -1317,6 +1710,86 @@ I<Since C<1.40>>
 
 =cut
 
+=head2 either
+
+  either(Str | ArrayRef[Str|ArrayRef] $dispatch) (Assert)
+
+The either method configures the object to accept "either" of the conditions
+provided, which may be a string or arrayref representing a method call, and
+returns the invocant.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item either example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->either('string');
+
+  # $assert->check('1');
+
+  # true
+
+  # $assert->check(1);
+
+  # false
+
+=back
+
+=over 4
+
+=item either example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->either('string', 'number');
+
+  # $assert->check(true);
+
+  # false
+
+  # $assert->check('1');
+
+  # true
+
+  # $assert->check(1);
+
+  # true
+
+=back
+
+=over 4
+
+=item either example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->either('number', 'boolean');
+
+  # $assert->check(true);
+
+  # true
+
+  # $assert->check('1');
+
+  # false
+
+  # $assert->check(1);
+
+  # true
+
+=back
+
+=cut
+
 =head2 enum
 
   enum(Any @data) (Assert)
@@ -1352,9 +1825,9 @@ I<Since C<1.40>>
 
   expression(Str $expr) (Assert)
 
-The expression method parses a string representation of a method/function
-signature, registers the subexpressions using the L</accept> method, and
-returns the invocant.
+The expression method parses a string representation of an type assertion
+signature, registers the subexpressions using the L</either> and L</accept>
+methods, and returns the invocant.
 
 I<Since C<1.71>>
 
@@ -1438,7 +1911,7 @@ I<Since C<1.71>>
 
   package main;
 
-  $assert = $assert->expression('Venus::Assert | arrayref[Venus::Assert]');
+  $assert = $assert->expression('Venus::Assert | within[arrayref, Venus::Assert]');
 
   # $assert->check('hello');
 
@@ -1660,6 +2133,102 @@ I<Since C<1.40>>
 
 =cut
 
+=head2 hashkeys
+
+  hashkeys(Str | ArrayRef[Str] @pairs) (Assert)
+
+The hashkeys method configures the object to accept hash based values
+containing the keys whose values' match the specified types, and returns the
+invocant.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item hashkeys example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashkeys;
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({random => rand});
+
+  # true
+
+=back
+
+=over 4
+
+=item hashkeys example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashkeys(random => 'float');
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({random => rand});
+
+  # true
+
+  # $assert->check({random => time});
+
+  # false
+
+=back
+
+=over 4
+
+=item hashkeys example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashkeys(random => ['either', 'float', 'number']);
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({random => rand});
+
+  # true
+
+  # $assert->check({random => time});
+
+  # true
+
+  # $assert->check({random => 'okay'});
+
+  # false
+
+  # $assert->check(bless{random => rand});
+
+  # true
+
+  # $assert->check(bless{random => time});
+
+  # true
+
+  # $assert->check(bless{random => 'okay'});
+
+  # false
+
+=back
+
+=cut
+
 =head2 hashref
 
   hashref(CodeRef $check) (Assert)
@@ -1705,6 +2274,62 @@ I<Since C<1.40>>
   package main;
 
   $assert = $assert->identity('Venus::Assert');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=back
+
+=cut
+
+=head2 inherits
+
+  inherits(Str $name) (Assert)
+
+The inherits method configures the object to accept objects of the type
+specified as the argument, and returns the invocant. This method is a proxy for
+the L</identity> method.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item inherits example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->inherits('Venus::Assert');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=back
+
+=cut
+
+=head2 integrates
+
+  integrates(Str $name) (Assert)
+
+The integrates method configures the object to accept objects that support the
+C<"does"> behavior and consumes the "role" specified as the argument, and
+returns the invocant.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item integrates example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->integrates('Venus::Role::Doable');
 
   # $assert->check(Venus::Assert->new);
 
@@ -1821,6 +2446,188 @@ I<Since C<1.40>>
   # $assert->check('Venus');
 
   # true
+
+=back
+
+=cut
+
+=head2 parse
+
+  parse(Str $expr) (Any)
+
+The parse method accepts a string representation of a type assertion signature
+and returns a data structure representing one or more method calls to be used
+for validating the assertion signature.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item parse example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('');
+
+  # ['']
+
+=back
+
+=over 4
+
+=item parse example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('any');
+
+  # ['any']
+
+=back
+
+=over 4
+
+=item parse example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('string | number');
+
+  # ['either', 'string', 'number']
+
+=back
+
+=over 4
+
+=item parse example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('enum[up,down,left,right]');
+
+  # [['enum', 'up', 'down', 'left', 'right']]
+
+=back
+
+=over 4
+
+=item parse example 5
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('number | float | boolean');
+
+  # ['either', 'number', 'float', 'boolean']
+
+=back
+
+=over 4
+
+=item parse example 6
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('Example');
+
+  # ['Example']
+
+=back
+
+=over 4
+
+=item parse example 7
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('coderef | Venus::Code');
+
+  # ['either', 'coderef', 'Venus::Code']
+
+=back
+
+=over 4
+
+=item parse example 8
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('tuple[number, arrayref, coderef]');
+
+  # [['tuple', 'number', 'arrayref', 'coderef']]
+
+=back
+
+=over 4
+
+=item parse example 9
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('tuple[number, within[arrayref, hashref], coderef]');
+
+  # [['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef']]
+
+=back
+
+=over 4
+
+=item parse example 10
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse(
+    'tuple[number, within[arrayref, hashref] | arrayref, coderef]'
+  );
+
+  # [
+  #   ['tuple', 'number',
+  #     ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef']
+  # ]
+
+
+
+
+=back
+
+=over 4
+
+=item parse example 11
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse(
+    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]'
+  );
+
+  # [[
+  #   'hashkeys',
+  #   'id',
+  #     ['either', 'number', 'float'],
+  #   'upvotes',
+  #     ['within', 'arrayref', 'boolean']
+  # ]]
 
 =back
 
@@ -1993,7 +2800,8 @@ I<Since C<1.40>>
   tuple(Str | ArrayRef[Str] @types) (Assert)
 
 The tuple method configures the object to accept array references which conform
-to a tuple specification, and returns the invocant.
+to a tuple specification, and returns the invocant. The value being evaluated
+must contain at-least one element to match.
 
 I<Since C<1.40>>
 
@@ -2177,8 +2985,10 @@ I<Since C<1.40>>
   within(Str $type) (Assert)
 
 The within method configures the object, registering a constraint action as a
-sub-match operation, to accept array or hash based values, and returns the
-invocant.
+sub-match operation, to accept array or hash based values, and returns a
+L<Venus::Assert> instance for the sub-match operation (not the invocant).  This
+operation can traverse blessed array or hash based values. The value being
+evaluated must contain at-least one element to match.
 
 I<Since C<1.40>>
 
@@ -2196,7 +3006,7 @@ I<Since C<1.40>>
 
   # $assert->check([]);
 
-  # true
+  # false
 
   # $assert->check([sub{}]);
 
@@ -2207,6 +3017,10 @@ I<Since C<1.40>>
   # false
 
   # $assert->check(bless[]);
+
+  # false
+
+  # $assert->check(bless[sub{}]);
 
   # true
 
@@ -2226,7 +3040,7 @@ I<Since C<1.40>>
 
   # $assert->check({});
 
-  # true
+  # false
 
   # $assert->check({test => sub{}});
 
@@ -2238,7 +3052,100 @@ I<Since C<1.40>>
 
   # $assert->check({test => bless{}});
 
+  # false
+
+  # $assert->check({test => bless sub{}});
+
+  # false
+
+=back
+
+=over 4
+
+=item within example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $within = $assert->within('hashref', 'code');
+
+  my $action = $assert;
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({test => sub{}});
+
   # true
+
+  # $assert->check({test => {}});
+
+  # false
+
+  # $assert->check({test => bless{}});
+
+  # false
+
+  # $assert->check({test => bless sub{}});
+
+  # false
+
+=back
+
+=cut
+
+=head2 yesno
+
+  yesno(CodeRef $check) (Assert)
+
+The yesno method configures the object to accept a string value that's either
+C<"yes"> or C<1>, C<"no"> or C<0>, and returns the invocant.
+
+I<Since C<2.01>>
+
+=over 4
+
+=item yesno example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->yesno;
+
+  # $assert->check(undef);
+
+  # false
+
+  # $assert->check(0);
+
+  # true
+
+  # $assert->check('No');
+
+  # true
+
+  # $assert->check('n');
+
+  # true
+
+  # $assert->check(1);
+
+  # true
+
+  # $assert->check('Yes');
+
+  # true
+
+  # $assert->check('y');
+
+  # true
+
+  # $assert->check('Okay');
+
+  # false
 
 =back
 

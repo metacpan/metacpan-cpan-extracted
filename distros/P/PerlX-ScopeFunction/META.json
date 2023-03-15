@@ -1,5 +1,5 @@
 {
-   "abstract" : "- new keywords for creating scopes.",
+   "abstract" : "new keywords for creating scopes.",
    "author" : [
       "Kang-min Liu  C<< <gugod@gugod.org> >>"
    ],
@@ -26,8 +26,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Const::Fast" : "0",
             "Keyword::Simple" : "0",
-            "Text::Balanced" : "0"
+            "PPR" : "0"
          }
       },
       "test" : {
@@ -40,11 +41,11 @@
    "provides" : {
       "PerlX::ScopeFunction" : {
          "file" : "lib/PerlX/ScopeFunction.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_spdx_expression" : "MIT"
 }

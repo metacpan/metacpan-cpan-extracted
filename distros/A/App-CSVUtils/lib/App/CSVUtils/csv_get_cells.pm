@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.021'; # VERSION
+our $VERSION = '1.022'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -73,9 +73,8 @@ _
                         or die [400, "Invalid coordinate '$coord': field number '$coord_field' out of bound, must be between 1-". ($#{$r->{input_fields}}+1)];
                 $r->{cells}[$j] = $row->[$coord_field-1];
             } else {
-                exists $r->{input_fields_idx}{$coord_field}
-                    or die [400, "Invalid coordinate '$coord': Unknown field name '$coord_field'"];
-                $r->{cells}[$j] = $row->[ $r->{input_fields_idx}{$coord_field} ];
+                my $field_idx = App::CSVUtils::_find_field($r->{input_fields}, $coord_field);
+                $r->{cells}[$j] = $row->[ $field_idx ];
             }
         }
     },
@@ -102,7 +101,7 @@ App::CSVUtils::csv_get_cells - Get one or more cells from CSV
 
 =head1 VERSION
 
-This document describes version 1.021 of App::CSVUtils::csv_get_cells (from Perl distribution App-CSVUtils), released on 2023-03-02.
+This document describes version 1.022 of App::CSVUtils::csv_get_cells (from Perl distribution App-CSVUtils), released on 2023-03-10.
 
 =head1 FUNCTIONS
 
