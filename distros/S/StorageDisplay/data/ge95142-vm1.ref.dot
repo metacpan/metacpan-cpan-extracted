@@ -95,7 +95,7 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 						label="PV: /dev/sdb2\nSize: 149 GiB\nFree: 78.9 GiB\nUsed: 70.0 GiB";
 						style=striped;fillcolor="pink;0.470094.2:green"
 					]; }
-					label="LVM::VG@vgdata's PVs";
+					label="vgdata's PVs";
 				}
 				subgraph "cluster_machine@ge95142-vm1|LVM::VG@vgdata|::LVs" {
 					color=white;
@@ -116,9 +116,9 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 						label="LV: swap\nSize: 10.0 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@vgdata's LVs";
+					label="vgdata's LVs";
 				}
-				label="LVM: LVM::VG@vgdata\nSize: 5.14 TiB\nFree: 78.9 GiB";
+				label="LVM: vgdata\nSize: 5.14 TiB\nFree: 78.9 GiB";
 				style=striped;fillcolor="pink;0.985021.2:green"
 			}
 			subgraph "cluster_machine@ge95142-vm1|FS" {
@@ -127,24 +127,24 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				{ "machine@ge95142-vm1|FS|::FS@/home" [
-					label="/home\nDevice: /dev/vgdata/home\next4\nSize: 29.4 GiB\nFree: 3.26 GiB\nUsed: 24.8 GiB";
-					style=striped;fillcolor="pink;0.889092.2:green"
+					label="/home\nDevice: /dev/vgdata/home\next4\nSize: 29.4 GiB\nFree: 1.52 GiB\nUsed: 26.6 GiB";
+					style=striped;fillcolor="pink;0.948433.2:green"
 				]; }
 				{ "machine@ge95142-vm1|FS|::FS@/" [
-					label="/\nDevice: /dev/vgdata/root\next4\nSize: 29.4 GiB\nFree: 7.78 GiB\nUsed: 20.1 GiB";
-					style=striped;fillcolor="pink;0.735088.2:green"
+					label="/\nDevice: /dev/vgdata/root\next4\nSize: 29.4 GiB\nFree: 7.73 GiB\nUsed: 20.2 GiB";
+					style=striped;fillcolor="pink;0.736858.2:green"
 				]; }
 				{ "machine@ge95142-vm1|FS|::FS@/srv/scratch" [
-					label="/srv/scratch\nDevice: /dev/vgdata/scratch\next4\nSize: 4.92 TiB\nFree: 1.26 TiB\nUsed: 3.45 TiB";
-					style=striped;fillcolor="pink;0.743643.2:green"
+					label="/srv/scratch\nDevice: /dev/vgdata/scratch\next4\nSize: 4.92 TiB\nFree: 241 GiB\nUsed: 4.48 TiB";
+					style=striped;fillcolor="pink;0.952135.2:green"
 				]; }
 				{ "machine@ge95142-vm1|FS|::FS@/boot/efi" [
 					label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 92.5 MiB\nFree: 89.2 MiB\nUsed: 3.38 MiB";
 					style=striped;fillcolor="pink;0.036487.2:green"
 				]; }
 				{ "machine@ge95142-vm1|FS|::SWAP::Partition@dm-1" [
-					label="SWAP\nDevice: /dev/vgdata/swap\nSize: 10.00 GiB\nFree: 9.78 GiB\nUsed: 222 MiB";
-					style=striped;fillcolor="pink;0.021719.2:green"
+					label="SWAP\nDevice: /dev/vgdata/swap\nSize: 10.00 GiB\nFree: 3.15 GiB\nUsed: 6.85 GiB";
+					style=striped;fillcolor="pink;0.685081.2:green"
 				]; }
 				label="Mounted FS and swap";
 			}
@@ -155,6 +155,12 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				label="Libvirt Virtual Machines";
 			}
+			{ "machine@ge95142-vm1|Partition::None@loop1" [
+				label="/dev/loop1\nSize: 29.7 MiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
 			// Links from LVM VG: LVM::VG@vgdata
 			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@home"
 			"machine@ge95142-vm1|LVM::VG@vgdata|::PVs|::PV@sdb2" -> "machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@home"
@@ -210,6 +216,8 @@ digraph "ge95142-vm1"{ // HEADER: MACHINE
 			"machine@ge95142-vm1|LVM::VG@vgdata|::LVs|::LV@swap" -> "machine@ge95142-vm1|FS|::SWAP::Partition@dm-1"
 			// Links for FS::SWAP::Partition@dm-1
 			// Links for Libvirt Virtual Machines
+			// Links for Partition::None@loop1
+			// TARGET LINK: ge95142-vm1 31109120 loop1 "machine@ge95142-vm1|Partition::None@loop1"
 		label="ge95142-vm1";
 	}
 } // FOOTER: MACHINE

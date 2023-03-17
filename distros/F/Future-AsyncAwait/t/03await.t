@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -24,7 +24,7 @@ async sub identity
    my $f1 = Future->new;
    my $fret = identity( $f1 );
 
-   isa_ok( $fret, "Future", 'identity() returns a Future' ) and do {
+   isa_ok( $fret, [ "Future" ], 'identity() returns a Future' ) and do {
       ok( !$fret->is_ready, '$fret is not immediate for pending scalar' );
    };
 
@@ -37,10 +37,10 @@ async sub identity
    my $f1 = Future->new;
    my $fret = identity( $f1 );
 
-   isa_ok( $fret, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, [ "Future" ], 'identity() returns a Future' );
 
    $f1->done( list => "goes", "here" );
-   is_deeply( [ $fret->get ], [qw( list goes here )], '$fret->get for list' );
+   is( [ $fret->get ], [qw( list goes here )], '$fret->get for list' );
 }
 
 async sub makelist
@@ -55,9 +55,8 @@ async sub makelist
 
    $f1->done( 4, 5 );
 
-   is_deeply( [ $fret->get ],
-              [ 1, 2, [ 3, 4, 5, 6 ], 7, 8 ],
-              'async/await respects stack discipline' );
+   is( [ $fret->get ], [ 1, 2, [ 3, 4, 5, 6 ], 7, 8 ],
+      'async/await respects stack discipline' );
 }
 
 # await twice from function
@@ -111,7 +110,7 @@ async sub makelist
    my $f1 = Future->new;
    my $fret = identity( $f1 );
 
-   isa_ok( $fret, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, [ "Future" ], 'identity() returns a Future' );
 
    $f1->fail( "It failed\n" );
 
@@ -121,15 +120,15 @@ async sub makelist
 # die
 {
    my $f1 = Future->new;
-   async sub dies {
+   async sub f_dies {
       await $f1;
       die "Oopsie\n";
    }
 
-   my $fret = dies();
+   my $fret = f_dies();
    $f1->done;
 
-   is( $fret->failure, "Oopsie\n", '$fret->failure for dies' );
+   is( $fret->failure, "Oopsie\n", '$fret->failure for f_dies' );
 }
 
 # ANON sub

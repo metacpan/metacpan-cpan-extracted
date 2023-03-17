@@ -2,16 +2,14 @@ class File::Basename::Instance {
   use File::Basename::Instance::Win32;
   use File::Basename::Instance::Unix;
   use Sys;
-  
-  # Interfaces
-  interface File::Basename::Instance::Interface;
+  use Sys::OS;
   
   # Class Methods
   static method new : File::Basename::Instance () {
     
     my $self : File::Basename::Instance;
     
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       $self = File::Basename::Instance::Win32->new;
     }
     else {
@@ -22,17 +20,9 @@ class File::Basename::Instance {
   }
   
   # Instance Methods
-  method has_interfaces : int () { return 1; }
+  method fileparse : string[] ($path : string) { die "Not implemented"; }
   
-  method fileparse : string[] ($path : string) {
-    return $self->(File::Basename::Instance::Interface)->fileparse($path);
-  }
+  method basename : string ($path : string) { die "Not implemented"; }
   
-  method basename : string ($path : string) {
-    return $self->(File::Basename::Instance::Interface)->basename($path);
-  }
-  
-  method dirname : string ($path : string) {
-    return $self->(File::Basename::Instance::Interface)->dirname($path);
-  }
+  method dirname : string ($path : string) { die "Not implemented"; }
 }

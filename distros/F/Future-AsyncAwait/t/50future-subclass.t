@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 package SubclassOfFuture {
    use base qw( Future );
@@ -27,7 +27,7 @@ package SubclassOfFuture {
 {
    my $f = func();
 
-   isa_ok( $f, "SubclassOfFuture", 'result of async sub func' );
+   isa_ok( $f, [ "SubclassOfFuture" ], 'result of async sub func' );
 
    is( $f->get, 123, '$f->get' );
 }

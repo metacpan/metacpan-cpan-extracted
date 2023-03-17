@@ -4,9 +4,10 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Future" );
-use_ok( "Future::Utils" );
+require Future;
+require Future::Utils;
 
+pass "Modules loaded";
 done_testing;

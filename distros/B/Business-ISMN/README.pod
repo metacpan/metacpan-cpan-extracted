@@ -27,7 +27,7 @@ for any Perl module.
 
 To read about L<Business::ISMN>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|https://perldoc.perl.orgperldoc.html>:
+with L<perldoc|https://perldoc.perl.org/perldoc.html>:
 
 	% perldoc lib/Business/ISMN.pm
 

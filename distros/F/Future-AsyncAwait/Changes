@@ -1,5 +1,16 @@
 Revision history for Future-AsyncAwait
 
+0.65    2023-03-17
+        [CHANGES]
+         * More specific unit-testing of the croak location when testing
+           `AWAIT_GET` (related to RT145249)
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Avoids test_requires on `Test::Refcount` or `Test::Fatal`
+
+        [BUGFIXES]
+         * A more robust handling of defav during suspend/resume to try not to
+           upset `perl -d` (RT146246)
+
 0.64    2023-02-14
         [CHANGES]
          * Define ABI version 2, which adds pre_suspend and post_resume phase

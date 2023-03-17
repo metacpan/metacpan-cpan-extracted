@@ -568,9 +568,6 @@ static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
   }
 
   if(state->defav) {
-    /* This effectively held two references; one for GvAV(PL_defgv) and one
-     * for PAD_SV(0) */
-    SvREFCNT_dec(state->defav);
     SvREFCNT_dec(state->defav);
     state->defav = NULL;
   }
@@ -1169,11 +1166,16 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 #endif
   /* on perl versions between those, just do it unconditionally */
   {
-    assert((AV *)PAD_SVl(0) == GvAV(PL_defgv));
     state->defav = GvAV(PL_defgv); /* steal */
 
     AV *av = GvAV(PL_defgv) = newAV();
-    PAD_SVl(0) = SvREFCNT_inc(av);
+    AvREAL_off(av);
+
+    if(PAD_SVl(0) == (SV *)state->defav) {
+      /* Steal that one too */
+      SvREFCNT_dec(PAD_SVl(0));
+      PAD_SVl(0) = SvREFCNT_inc(av);
+    }
   }
 
   dounwind(cxix);
@@ -1489,7 +1491,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     SvREFCNT_dec(PAD_SVl(0));
 
     GvAV(PL_defgv) = state->defav;
-    PAD_SVl(0) = (SV *)state->defav;
+    PAD_SVl(0) = SvREFCNT_inc((SV *)state->defav);
     state->defav = NULL;
   }
 }
@@ -2077,7 +2079,7 @@ static OP *pp_await(pTHX)
   state->curcop = PL_curcop;
 
   if(regs)
-    RUN_HOOKS_FWD(pre_suspend, curcv, state->modhookdata);
+    RUN_HOOKS_REV(pre_suspend, curcv, state->modhookdata);
 
   suspendedstate_suspend(state, origcv);
 

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -39,7 +39,7 @@ use Future::AsyncAwait;
    })->();
 
    $f1->done;
-   is_deeply( [ $fret->get ], [ "Hello", 0, 5 ],
+   is( [ $fret->get ], [ "Hello", 0, 5 ],
       'await restores regexp context' );
 }
 

@@ -20,8 +20,8 @@ no_index:
 requires:
   SPVM: '0.9695'
   SPVM::Math: '0.11'
-  SPVM::Sys: '0.28'
+  SPVM::Sys: '0.43'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-IO.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

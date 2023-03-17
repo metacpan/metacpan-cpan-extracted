@@ -4,14 +4,11 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.757';
+our $VERSION = '1.758';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
-
-use Term::Choose::Constants qw( WIDTH_CURSOR );
-use Term::Choose::Screen    qw( normal );
 
 
 BEGIN {
@@ -61,10 +58,6 @@ sub print_columns {
     my $c;
     for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
         $c = ord substr $_[0], $i, 1;
-        #if ( ! defined $cache->{$c} ) {
-        #    $cache->{$c} = _char_width( $c );
-        #}
-        #$width = $width + $cache->{$c};
         $width = $width + (
             defined $cache->{$c}
             ? $cache->{$c}
@@ -182,7 +175,7 @@ sub line_fold {
                 last;
             }
         }
-        $paragraphs[-1] .= normal();
+        $paragraphs[-1] .= "\e[m";
     }
     if ( $opt->{join} ) {
         return join( "\n", @paragraphs );

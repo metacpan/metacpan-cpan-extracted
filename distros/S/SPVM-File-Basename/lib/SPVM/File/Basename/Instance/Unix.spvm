@@ -36,9 +36,9 @@ class File::Basename::Instance::Unix extends File::Basename::Instance {
       die "The \$path must be defined";
     }
     
-    $path = $self->(File::Basename::Instance::Interface)->_strip_trailing_sep($path);
+    $path = $self->_strip_trailing_sep($path);
 
-    my $fileparse = $self->(File::Basename::Instance::Interface)->fileparse($path);
+    my $fileparse = $self->fileparse($path);
     
     my $basename = $fileparse->[0];
     my $dirname = $fileparse->[1];
@@ -55,17 +55,17 @@ class File::Basename::Instance::Unix extends File::Basename::Instance {
       die "The \$path must be defined";
     }
     
-    my $fileparse = $self->(File::Basename::Instance::Interface)->fileparse($path);
+    my $fileparse = $self->fileparse($path);
     
     my $basename = $fileparse->[0];
     my $dirname = $fileparse->[1];
 
-    $dirname = $self->(File::Basename::Instance::Interface)->_strip_trailing_sep($dirname);
+    $dirname = $self->_strip_trailing_sep($dirname);
     
     unless (length $basename) {
-      my $fileparse_again = $self->(File::Basename::Instance::Interface)->fileparse($dirname);
+      my $fileparse_again = $self->fileparse($dirname);
       $dirname = $fileparse_again->[1];
-      $dirname = $self->(File::Basename::Instance::Interface)->_strip_trailing_sep($dirname);
+      $dirname = $self->_strip_trailing_sep($dirname);
     }
 
     return $dirname;

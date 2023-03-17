@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Libvirt;
 # ABSTRACT: Handle Libvirt data for StorageDisplay
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -37,7 +37,7 @@ around BUILDARGS => sub {
         'ignore_name' => 1,
         'consume' => [],
         'st' => $st,
-        'vms' => [ sort keys %{$info} ],
+        'vms' => [ sort { $b cmp $a } keys %{$info} ],
         @_
         );
 };
@@ -174,6 +174,9 @@ extends 'StorageDisplay::Data::Elem';
 with (
     'StorageDisplay::Role::HasBlock',
     'StorageDisplay::Role::Style::Grey',
+    'StorageDisplay::Role::Style::WithSize' => {
+	-excludes => 'dotStyle',
+    },
     );
 
 has 'target' => (
@@ -222,7 +225,7 @@ around BUILDARGS => sub {
     my @optional_infos;
 
     my $consumename=$bname;
-    my $size;
+    my $size = 0;
     if ($binfo->{'type'} eq 'file') {
         my $mountpoint = $binfo->{'mount-point'};
         if (defined($mountpoint)) {
@@ -231,7 +234,12 @@ around BUILDARGS => sub {
         } else {
 	    $consumename=undef;
 	}
-	$size = $binfo->{'file-size'} // undef;
+	$size = $binfo->{'size'} // $size;
+    } elsif ($binfo->{'type'} eq 'block') {
+	eval {
+	    # unknown (deleted?) blocks are NoSystem block with no size method
+	    $size = $block->size;
+	}
     }
     if (defined($consumename)) {
 	my $consumeblock = $st->block($consumename);
@@ -249,6 +257,7 @@ around BUILDARGS => sub {
         'name' => $binfo->{'target'},
         'block' => $block,
         'vm' => $vm,
+	'size' => $size,
         @optional_infos,
         'st' => $st,
         'target' => $binfo->{'target'},
@@ -263,7 +272,10 @@ around 'dotStyleNode' => sub {
     my @text = $self->$orig(@_);
 
     for my $i (1) { # just to be able to call 'last'
-        if ($self->type ne 'block') {
+	if ($self->size == 0) {
+	    my $color = $self->statecolor('missing');
+	    push @text, "fillcolor=$color";
+	} elsif ($self->type ne 'block') {
             my $color = $self->statecolor('special');
             if ($self->type eq 'file') {
                 if ($self->has_mountpoint) {
@@ -295,18 +307,32 @@ sub dotLabel {
     return @label;
 }
 
+around 'sizeLabel' => sub {
+    my $orig = shift;
+    my $self = shift;
+    if ($self->size eq 0) {
+	return;
+    }
+    return $self->$orig(@_);
+};
+
 around dotLinks => sub {
     my $orig = shift;
     my $self = shift;
 
     my @links = $self->$orig(@_);
+    my ($devname, $hostname);
     if ($self->has_hostdevice) {
-	my $devname = $self->hostdevice;
+	$devname = $self->hostdevice;	
 	$devname =~ s,^/dev/,,;
-	push @links, "// SOURCE LINK: ".$self->vm->hostname." ".
-	    $self->block->size." ".
-	    $devname." ".$self->linkname;
+	$hostname = $self->vm->hostname;
+    } else {
+	$devname = '('.$self->target.')';
+	$hostname = $self->vm->vmname;
     }
+    push @links, "// SOURCE LINK: ".$hostname." ".
+	$self->block->size." ".
+	$devname." ".$self->linkname;
 
     return @links;
 };
@@ -325,7 +351,7 @@ StorageDisplay::Data::Libvirt - Handle Libvirt data for StorageDisplay
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 

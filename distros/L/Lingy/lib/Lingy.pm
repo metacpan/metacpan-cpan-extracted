@@ -1,2 +1,8 @@
+use strict;
+use warnings;
+
 package Lingy;
-our $VERSION = '0.0.3';
+
+our $VERSION = '0.1.0';
+
+1;

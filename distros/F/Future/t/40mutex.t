@@ -4,8 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0;
 
 use Future;
 use Future::Mutex;
@@ -22,7 +21,7 @@ use Future::Mutex;
    ok( defined $lf, '->enter returns Future' );
    ok( defined $f, '->enter on new Mutex runs code' );
 
-   isa_ok( $lf, "t::Future::Subclass", '$lf' );
+   isa_ok( $lf, [ "t::Future::Subclass" ], '$lf' );
 
    ok( !$mutex->available, 'Mutex is unavailable' );
 
@@ -46,8 +45,8 @@ use Future::Mutex;
    my $f2;
    my $lf2 = $mutex->enter( sub { $f2 = t::Future::Subclass->new } );
 
-   isa_ok( $lf1, "t::Future::Subclass", '$lf1' );
-   isa_ok( $lf2, "t::Future::Subclass", '$lf2' );
+   isa_ok( $lf1, [ "t::Future::Subclass" ], '$lf1' );
+   isa_ok( $lf2, [ "t::Future::Subclass" ], '$lf2' );
 
    is_oneref( $lf2, '$lf2 has one ref' );
 
@@ -142,7 +141,7 @@ use Future::Mutex;
       $mutex->enter( sub { $f3 = t::Future::Subclass->new } ),
    );
 
-   isa_ok( $f, "t::Future::Subclass", '$f' );
+   isa_ok( $f, [ "t::Future::Subclass" ], '$f' );
 
    ok( defined $f1, '$f1 defined' );
    $f1->done;

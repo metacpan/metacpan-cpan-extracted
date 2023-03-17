@@ -2,9 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -31,7 +29,7 @@ use Future;
    is( $ready, 1, '$future is now ready' );
 
    ok( $future->is_ready, '$future now ready after f2 ready' );
-   is_deeply( [ $future->result ], [ one => 1, two => 2 ], '$future->result after f2 ready' );
+   is( [ $future->result ], [ one => 1, two => 2 ], '$future->result after f2 ready' );
 
    is_refcount( $future, 1, '$future has refcount 1 at end of test' );
    undef $future;
@@ -62,29 +60,29 @@ use Future;
    is( $future->failure, "It fails", '$future->failure yields exception' );
    my $file = __FILE__;
    my $line = __LINE__ + 1;
-   like( exception { $future->result }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
+   like( dies { $future->result }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
 
    is( $c2, 1, 'Unfinished child future cancelled on failure' );
 
-   is_deeply( [ $future->pending_futures ],
-              [],
-              '$future->pending_futures after $f1 failure' );
+   is( [ $future->pending_futures ],
+       [],
+       '$future->pending_futures after $f1 failure' );
 
-   is_deeply( [ $future->ready_futures ],
-              [ $f1, $f2 ],
-              '$future->ready_futures after $f1 failure' );
+   is( [ $future->ready_futures ],
+       [ $f1, $f2 ],
+       '$future->ready_futures after $f1 failure' );
 
-   is_deeply( [ $future->done_futures ],
-              [],
-              '$future->done_futures after $f1 failure' );
+   is( [ $future->done_futures ],
+       [],
+       '$future->done_futures after $f1 failure' );
 
-   is_deeply( [ $future->failed_futures ],
-              [ $f1 ],
-              '$future->failed_futures after $f1 failure' );
+   is( [ $future->failed_futures ],
+       [ $f1 ],
+       '$future->failed_futures after $f1 failure' );
 
-   is_deeply( [ $future->cancelled_futures ],
-              [ $f2 ],
-              '$future->cancelled_futures after $f1 failure' );
+   is( [ $future->cancelled_futures ],
+       [ $f2 ],
+       '$future->cancelled_futures after $f1 failure' );
 }
 
 # immediately done
@@ -140,7 +138,7 @@ use Future;
    my $f = Future->needs_all( () );
 
    ok( $f->is_ready, 'needs_all on no futures already done' );
-   is_deeply( [ $f->result ], [], '->result on empty needs_all is empty' );
+   is( [ $f->result ], [], '->result on empty needs_all is empty' );
 }
 
 # weakself retention (RT120468)
@@ -155,7 +153,7 @@ use Future;
       }),
    );
 
-   is( exception { $f->fail("oopsie\n") }, undef,
+   ok( lives { $f->fail("oopsie\n") },
       'no problems cancelling a Future which clears the original ->needs_all ref' );
 
    ok( $cancelled->is_cancelled, 'cancellation occured as expected' );

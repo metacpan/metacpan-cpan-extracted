@@ -199,7 +199,7 @@ START_MY_CXT
 /* Process a single callback */
 void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* origin)
 {
-    assert(origin->state == XSPR_STATE_FINISHED);
+    ASSUME(origin->state == XSPR_STATE_FINISHED);
 
     if (callback->type == XSPR_CALLBACK_CHAIN) {
         xspr_promise_finish(aTHX_ callback->chain, origin->finished.result);
@@ -237,7 +237,7 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
 
             } else {
                 callback_fn = NULL; /* Be quiet, bad compiler! */
-                assert(0);
+                ASSUME(0);
             }
         }
 
@@ -350,7 +350,7 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
         }
 
     } else {
-        assert(0);
+        ASSUME(0);
     }
 }
 
@@ -376,7 +376,7 @@ void xspr_callback_free(pTHX_ xspr_callback_t *callback)
         xspr_result_decref(aTHX_ callback->finally_chain.original_result);
 
     } else {
-        assert(0);
+        ASSUME(0);
     }
 
     Safefree(callback);
@@ -432,13 +432,13 @@ void xspr_queue_add(pTHX_ xspr_callback_t* callback, xspr_promise_t* origin)
     entry->callback = callback;
 
     if (MY_CXT.queue_head == NULL) {
-        assert(MY_CXT.queue_tail == NULL);
+        ASSUME(MY_CXT.queue_tail == NULL);
         /* Empty queue, so now it's just us */
         MY_CXT.queue_head = entry;
         MY_CXT.queue_tail = entry;
 
     } else {
-        assert(MY_CXT.queue_tail != NULL);
+        ASSUME(MY_CXT.queue_tail != NULL);
         /* Existing queue, add to the tail */
         MY_CXT.queue_tail->next = entry;
         MY_CXT.queue_tail = entry;
@@ -516,7 +516,7 @@ void xspr_queue_maybe_schedule(pTHX)
             MY_CXT.pxs_flush_cr = newRV_inc( (SV*)GvCV(method_gv) );
         }
         else {
-            assert(0);
+            ASSUME(0);
         }
     }
 
@@ -612,15 +612,15 @@ void xspr_immediate_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* pro
 }
 
 #define _XSPR_FREE_ON_READY_IMMEDIATE(promise) \
-    SvREFCNT_dec(promise->on_ready_immediate); \
-    SvREFCNT_dec(SvRV(promise->on_ready_immediate));
+    SvREFCNT_dec(SvRV(promise->on_ready_immediate)); \
+    SvREFCNT_dec(promise->on_ready_immediate);
 
 /* Transitions a promise from pending to finished, using the given result */
 void xspr_promise_finish(pTHX_ xspr_promise_t* promise, xspr_result_t* result)
 {
     dMY_CXT;
 
-    assert(promise->state == XSPR_STATE_PENDING);
+    ASSUME(promise->state == XSPR_STATE_PENDING);
     xspr_callback_t** pending_callbacks = promise->pending.callbacks;
     int count = promise->pending.callbacks_count;
 
@@ -659,8 +659,18 @@ void xspr_promise_finish(pTHX_ xspr_promise_t* promise, xspr_result_t* result)
     }
 
     if (promise->self_sv_ref != NULL) {
+
+        // After we set self_sv_ref, Future::AsyncAwait manipulates
+        // things a bit such that WEAKREF is set on the reference and
+        // the referent’s refcount is decremented. Thus, we can forgo
+        // the reference-count decrement here. We still check for the
+        // WEAKREF flag, though, just in case something changed.
+        //
+        if (!SvWEAKREF(promise->self_sv_ref)) {
+            SvREFCNT_dec(SvRV(promise->self_sv_ref));
+        }
+
         SvREFCNT_dec(promise->self_sv_ref);
-        SvREFCNT_dec(SvRV(promise->self_sv_ref));
         promise->self_sv_ref = NULL;
     }
 
@@ -727,7 +737,7 @@ void xspr_promise_decref(pTHX_ xspr_promise_t *promise)
             xspr_result_decref(aTHX_ promise->finished.result);
 
         } else {
-            assert(0);
+            ASSUME(0);
         }
 
         if (promise->on_ready_immediate != NULL) {
@@ -743,10 +753,12 @@ xspr_promise_t* xspr_promise_new(pTHX)
 {
     xspr_promise_t* promise;
     Newxz(promise, 1, xspr_promise_t);
-    promise->refs = 1;
-    promise->state = XSPR_STATE_PENDING;
-    promise->on_ready_immediate = NULL;
-    promise->self_sv_ref = NULL;
+
+    *promise = (xspr_promise_t) {
+        .refs = 1,
+        .state = XSPR_STATE_PENDING,
+    };
+
     return promise;
 }
 
@@ -826,7 +838,7 @@ void xspr_promise_then(pTHX_ xspr_promise_t* promise, xspr_callback_t* callback)
             xspr_immediate_process(aTHX_ callback, promise);
         }
     } else {
-        assert(0);
+        ASSUME(0);
     }
 }
 
@@ -1544,7 +1556,7 @@ AWAIT_GET(SV *self_sv)
         _DO_DEBUG_AWAITABLE();
         DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
 
-        assert(self->promise->state == XSPR_STATE_FINISHED);
+        ASSUME(self->promise->state == XSPR_STATE_FINISHED);
 
         SV** results = self->promise->finished.result->results;
         int result_count = self->promise->finished.result->count;
@@ -1574,7 +1586,7 @@ AWAIT_GET(SV *self_sv)
                     XSRETURN_EMPTY;
 
                 default:
-                    assert(0);
+                    ASSUME(0);
             }
         }
         else {

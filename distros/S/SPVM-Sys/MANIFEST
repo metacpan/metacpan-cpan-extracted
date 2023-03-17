@@ -257,7 +257,6 @@ t/print_hello.pl
 t/Sys.t
 t/Sys_IO.t
 t/Sys_IO_Stat.t
-t/Sys_IO_Windows.t
 t/Sys_Ioctl.t
 t/Sys_OS.t
 t/Sys_Poll.t

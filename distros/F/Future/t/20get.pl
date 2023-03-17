@@ -2,8 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Future;
 
@@ -11,14 +10,14 @@ use Future;
 {
    my $f = Future->done( result => "here" );
 
-   is_deeply( [ $f->get ], [ result => "here" ], 'Result of ->get on done future' );
+   is( [ $f->get ], [ result => "here" ], 'Result of ->get on done future' );
 }
 
 # ->get on immediate fail
 {
    my $f = Future->fail( "Something broke" );
 
-   like( exception { $f->get }, qr/^Something broke at /, 'Exception from ->get on failed future' );
+   like( dies { $f->get }, qr/^Something broke at /, 'Exception from ->get on failed future' );
 }
 
 # ->get on cancelled
@@ -26,14 +25,14 @@ use Future;
    my $f = Future->new;
    $f->cancel;
 
-   like( exception { $f->get }, qr/cancelled/, 'Exception from ->get on cancelled future' );
+   like( dies { $f->get }, qr/cancelled/, 'Exception from ->get on cancelled future' );
 }
 
 # ->get while pending without await
 {
    my $f = Future->new;
 
-   like( exception { $f->get }, qr/ is not yet complete /, 'Exception from ->get on pending future' );
+   like( dies { $f->get }, qr/ is not yet complete /, 'Exception from ->get on pending future' );
 }
 
 # ->get invokes ->await
@@ -66,11 +65,11 @@ use Future;
 {
    my $e;
 
-   ok( !( $e = exception { Future->done( "Result" )->await } ),
+   ok( !( $e = dies { Future->done( "Result" )->await } ),
       '->await on done does not throw' ) or
       diag( "Exception was: $e" );
 
-   ok( !( $e = exception { Future->fail( "Oops\n" )->await } ),
+   ok( !( $e = dies { Future->fail( "Oops\n" )->await } ),
       '->await on done does not throw' ) or
       diag( "Exception was: $e" );
 }

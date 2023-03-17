@@ -2,9 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -32,27 +30,27 @@ use Future;
    is( $ready, 1, '$future is now ready' );
 
    ok( $future->is_ready, '$future now ready after f1 ready' );
-   is_deeply( [ $future->result ], [ one => 1 ], 'results from $future->result' );
+   is( [ $future->result ], [ one => 1 ], 'results from $future->result' );
 
-   is_deeply( [ $future->pending_futures ],
-              [],
-              '$future->pending_futures after $f1 done' );
+   is( [ $future->pending_futures ],
+       [],
+       '$future->pending_futures after $f1 done' );
 
-   is_deeply( [ $future->ready_futures ],
-              [ $f1, $f2 ],
-              '$future->ready_futures after $f1 done' );
+   is( [ $future->ready_futures ],
+       [ $f1, $f2 ],
+       '$future->ready_futures after $f1 done' );
 
-   is_deeply( [ $future->done_futures ],
-              [ $f1 ],
-              '$future->done_futures after $f1 done' );
+   is( [ $future->done_futures ],
+       [ $f1 ],
+       '$future->done_futures after $f1 done' );
 
-   is_deeply( [ $future->failed_futures ],
-              [],
-              '$future->failed_futures after $f1 done' );
+   is( [ $future->failed_futures ],
+       [],
+       '$future->failed_futures after $f1 done' );
 
-   is_deeply( [ $future->cancelled_futures ],
-              [ $f2 ],
-              '$future->cancelled_futures after $f1 done' );
+   is( [ $future->cancelled_futures ],
+       [ $f2 ],
+       '$future->cancelled_futures after $f1 done' );
 
    is_refcount( $future, 1, '$future has refcount 1 at end of test' );
    undef $future;
@@ -82,15 +80,15 @@ use Future;
    $f2->done( two => 2 );
 
    ok( $future->is_ready, '$future now ready after $f2 done' );
-   is_deeply( [ $future->result ], [ two => 2 ], '$future->result after $f2 done' );
+   is( [ $future->result ], [ two => 2 ], '$future->result after $f2 done' );
 
-   is_deeply( [ $future->done_futures ],
-              [ $f2 ],
-              '$future->done_futures after $f2 done' );
+   is( [ $future->done_futures ],
+       [ $f2 ],
+       '$future->done_futures after $f2 done' );
 
-   is_deeply( [ $future->failed_futures ],
-              [ $f1 ],
-              '$future->failed_futures after $f2 done' );
+   is( [ $future->failed_futures ],
+       [ $f1 ],
+       '$future->failed_futures after $f2 done' );
 }
 
 # All fail
@@ -115,11 +113,11 @@ use Future;
    is( $future->failure, "It fails", '$future->failure yields exception' );
    my $file = __FILE__;
    my $line = __LINE__ + 1;
-   like( exception { $future->result }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
+   like( dies { $future->result }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
 
-   is_deeply( [ $future->failed_futures ],
-              [ $f1, $f2 ],
-              '$future->failed_futures after all fail' );
+   is( [ $future->failed_futures ],
+       [ $f1, $f2 ],
+       '$future->failed_futures after all fail' );
 }
 
 # immediately done
@@ -170,12 +168,12 @@ use Future;
 
    $f2->done( "result" );
 
-   is_deeply( [ $future->done_futures ],
-              [ $f2 ],
-              '->done_futures with cancellation' );
-   is_deeply( [ $future->cancelled_futures ],
-              [ $f1 ],
-              '->cancelled_futures with cancellation' );
+   is( [ $future->done_futures ],
+       [ $f2 ],
+       '->done_futures with cancellation' );
+   is( [ $future->cancelled_futures ],
+       [ $f1 ],
+       '->cancelled_futures with cancellation' );
 
    my $f3 = Future->new;
    $future = Future->needs_any( $f3 );
@@ -208,7 +206,7 @@ use Future;
       }),
    );
 
-   is( exception { $f->done(1) }, undef,
+   ok( lives { $f->done(1) },
       'no problems cancelling a Future which clears the original ->needs_any ref' );
 
    ok( $cancelled->is_cancelled, 'cancellation occured as expected' );

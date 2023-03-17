@@ -1,3 +1,11 @@
+0.010   2023-03-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Don't check symbol & double dot twice (in
+          bpom_rpo_check_files() and bpom_rpo_check_files_label_design().
+
+        - [compliance] Allow GIF & BMP.
+
+
 0.009   2023-03-10  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Didn't handle filename with dirs correctly.

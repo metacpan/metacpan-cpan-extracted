@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount 0.09 import => [qw( is_refcount refcount )];
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 

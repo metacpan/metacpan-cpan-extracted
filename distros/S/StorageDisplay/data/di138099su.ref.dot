@@ -175,8 +175,8 @@ digraph "di138099su.example.com"{ // HEADER: MACHINE
 					style=striped;fillcolor="pink;0.279154.2:green"
 				]; }
 				{ "machine@di138099su.example.com|FS|::FS@/var/log/audit" [
-					label="/var/log/audit\nDevice: /dev/md/Volume0_0p10\nxfs\nSize: 4.87 GiB\nFree: 4.81 GiB\nUsed: 66.9 MiB";
-					style=striped;fillcolor="pink;0.013411.2:green"
+					label="/var/log/audit\nDevice: /dev/md/Volume0_0p10\nxfs\nSize: 4.87 GiB\nFree: 4.81 GiB\nUsed: 68.9 MiB";
+					style=striped;fillcolor="pink;0.013799.2:green"
 				]; }
 				{ "machine@di138099su.example.com|FS|::FS@/home" [
 					label="/home\nDevice: /dev/md/Volume0_0p2\nxfs\nSize: 48.8 GiB\nFree: 43.7 GiB\nUsed: 5.06 GiB";
@@ -184,23 +184,23 @@ digraph "di138099su.example.com"{ // HEADER: MACHINE
 				]; }
 				{ "machine@di138099su.example.com|FS|::FS@/var" [
 					label="/var\nDevice: /dev/md/Volume0_0p6\nxfs\nSize: 29.3 GiB\nFree: 22.5 GiB\nUsed: 6.78 GiB";
-					style=striped;fillcolor="pink;0.231451.2:green"
+					style=striped;fillcolor="pink;0.231463.2:green"
 				]; }
 				{ "machine@di138099su.example.com|FS|::FS@/" [
 					label="/\nDevice: /dev/md/Volume0_0p7\nxfs\nSize: 14.6 GiB\nFree: 10.5 GiB\nUsed: 4.15 GiB";
-					style=striped;fillcolor="pink;0.283654.2:green"
+					style=striped;fillcolor="pink;0.283629.2:green"
 				]; }
 				{ "machine@di138099su.example.com|FS|::FS@/var/log" [
-					label="/var/log\nDevice: /dev/md/Volume0_0p8\nxfs\nSize: 9.76 GiB\nFree: 9.48 GiB\nUsed: 278 MiB";
-					style=striped;fillcolor="pink;0.027839.2:green"
+					label="/var/log\nDevice: /dev/md/Volume0_0p8\nxfs\nSize: 9.76 GiB\nFree: 9.47 GiB\nUsed: 295 MiB";
+					style=striped;fillcolor="pink;0.029572.2:green"
 				]; }
 				{ "machine@di138099su.example.com|FS|::FS@/staging" [
-					label="/staging\nDevice: /dev/nvme0n1p1\nxfs\nSize: 5.82 TiB\nFree: 4.62 TiB\nUsed: 1.20 TiB";
-					style=striped;fillcolor="pink;0.205437.2:green"
+					label="/staging\nDevice: /dev/nvme0n1p1\nxfs\nSize: 5.82 TiB\nFree: 4.49 TiB\nUsed: 1.33 TiB";
+					style=striped;fillcolor="pink;0.228509.2:green"
 				]; }
 				{ "machine@di138099su.example.com|FS|::SWAP::Partition@md126p9" [
 					label="SWAP\nDevice: /dev/md/Volume0_0p9\nSize: 7.81 GiB\nFree: 6.47 GiB\nUsed: 1.34 GiB";
-					style=striped;fillcolor="pink;0.171563.2:green"
+					style=striped;fillcolor="pink;0.171781.2:green"
 				]; }
 				label="Mounted FS and swap";
 			}
@@ -213,13 +213,13 @@ digraph "di138099su.example.com"{ // HEADER: MACHINE
 			}
 			{ "machine@di138099su.example.com|Partition::None@sda" [
 				label="/dev/sda\nModel: TS256GSSD420K   \nSerial: G210650036\nSize: 238 GiB";
-				fillcolor="lightgrey"
+				fillcolor="yellow"
 				style=filled
 				shape=rectangle
 			]; }
 			{ "machine@di138099su.example.com|Partition::None@sdb" [
 				label="/dev/sdb\nModel: TS256GSSD420K   \nSerial: G210650037\nSize: 238 GiB";
-				fillcolor="lightgrey"
+				fillcolor="yellow"
 				style=filled
 				shape=rectangle
 			]; }
@@ -264,9 +264,11 @@ digraph "di138099su.example.com"{ // HEADER: MACHINE
 			// Links for MD: /dev/md/imsm0
 			// Links for RAID::ContainerDevice@md127
 			// Links for RAID::Device@sda
-			// TARGET LINK: di138099su.example.com 256060514304 sda "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sda"
+			"machine@di138099su.example.com|Partition::None@sda" -> "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sda"
+			// Links for RAID::Device@sda
 			// Links for RAID::Device@sdb
-			// TARGET LINK: di138099su.example.com 256060514304 sdb "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sdb"
+			"machine@di138099su.example.com|Partition::None@sdb" -> "machine@di138099su.example.com|RAID::MD::Container@md127|RAID::Device@sdb"
+			// Links for RAID::Device@sdb
 			// Links for FS
 			// Links for FS::FS@/boot
 			"machine@di138099su.example.com|Partition::MSDOS@md126":"1" -> "machine@di138099su.example.com|FS|::FS@/boot"

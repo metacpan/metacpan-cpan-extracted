@@ -33,9 +33,9 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
 
   method tmpdir : string () {
     
-    my $env_tmpdir = Sys->getenv("TMPDIR");
-    my $env_temp = Sys->getenv("TEMP");
-    my $env_tmp = Sys->getenv("TMP");
+    my $env_tmpdir = Sys->env("TMPDIR");
+    my $env_temp = Sys->env("TEMP");
+    my $env_tmp = Sys->env("TMP");
     my $dirlist = [
       $env_tmpdir,
       $env_temp,
@@ -109,7 +109,7 @@ class File::Spec::Instance::Win32 extends File::Spec::Instance::Unix {
 
   method path : string[] () {
     
-    my $env_path = Sys->getenv("PATH");
+    my $env_path = Sys->env("PATH");
     unless ($env_path) {
       return new string[0];
     }

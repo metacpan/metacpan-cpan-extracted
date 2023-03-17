@@ -449,7 +449,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
 
   method path : string[] () {
     
-    my $env_path = Sys->getenv("PATH");
+    my $env_path = Sys->env("PATH");
     unless ($env_path) {
       return new string[0];
     }
@@ -467,7 +467,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
 
   method tmpdir : string () {
     
-    my $env_tmpdir = Sys->getenv("TMPDIR");
+    my $env_tmpdir = Sys->env("TMPDIR");
     my $dirlist = [$env_tmpdir, "/tmp"];
     my $tmpdir = $self->_tmpdir($dirlist);
     return $tmpdir;

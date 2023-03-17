@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    eval { require Devel::MAT; } or
       plan skip_all => "No Devel::MAT";

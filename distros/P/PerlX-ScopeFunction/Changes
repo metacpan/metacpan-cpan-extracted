@@ -1,5 +1,8 @@
 Revision history of PerlX-ScopeFunction
 
+0.03    2023-03-16
+        - `let`: now supports list of variables on LHS.
+
 0.02    2023-03-13
         - Add `let`
         - keywords can now be imported as different names.

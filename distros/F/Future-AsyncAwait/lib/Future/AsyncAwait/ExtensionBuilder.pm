@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::ExtensionBuilder 0.64;
+package Future::AsyncAwait::ExtensionBuilder 0.65;
 
 use v5.14;
 use warnings;

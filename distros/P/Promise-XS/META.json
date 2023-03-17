@@ -51,6 +51,6 @@
          "web" : "https://github.com/FGasper/p5-Promise-XS"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

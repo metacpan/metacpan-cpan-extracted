@@ -141,7 +141,7 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 						label="PV: /dev/sdd2\nSize: 3.17 TiB\nFree: 1.88 TiB\nUsed: 1.29 TiB";
 						style=striped;fillcolor="pink;0.406404.2:green"
 					]; }
-					label="LVM::VG@vgdata's PVs";
+					label="vgdata's PVs";
 				}
 				subgraph "cluster_machine@ge91097-dom0|LVM::VG@vgdata|::LVs" {
 					color=white;
@@ -182,9 +182,9 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 						label="LV: usr+local\nSize: 250 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@vgdata's LVs";
+					label="vgdata's LVs";
 				}
-				label="LVM: LVM::VG@vgdata\nSize: 3.64 TiB\nFree: 2.19 TiB";
+				label="LVM: vgdata\nSize: 3.64 TiB\nFree: 2.19 TiB";
 				style=striped;fillcolor="pink;0.398080.2:green"
 			}
 			subgraph "cluster_machine@ge91097-dom0|RAID::MD@md127" {
@@ -249,8 +249,8 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				{ "machine@ge91097-dom0|FS|::FS@/" [
-					label="/\nDevice: /dev/vgdata/root+debian\next4\nSize: 29.4 GiB\nFree: 5.61 GiB\nUsed: 22.3 GiB";
-					style=striped;fillcolor="pink;0.808766.2:green"
+					label="/\nDevice: /dev/vgdata/root+debian\next4\nSize: 29.4 GiB\nFree: 5.57 GiB\nUsed: 22.4 GiB";
+					style=striped;fillcolor="pink;0.810348.2:green"
 				]; }
 				{ "machine@ge91097-dom0|FS|::FS@/boot/efi" [
 					label="/boot/efi\nDevice: /dev/sda2\nvfat\nSize: 300 MiB\nFree: 294 MiB\nUsed: 5.79 MiB";
@@ -275,59 +275,59 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0" {
+				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto" {
 					color=white;
 					fillcolor=white;
-					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0|::Block@vda" [
-						label="/dev/vgdata/kvm-ge91097-vm0-disk1\n(vda)";
+					{ "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sda" [
+						label="/srv/kvm/recovery-nas-cyto.img\n(sda)\nSize: 5.00 GiB";
 					]; }
-					label="ge91097-vm0";
-					fillcolor=yellow
-				}
-				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1" {
-					color=white;
-					fillcolor=white;
-					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdc" [
-						label="/dev/vgdata/home\n(sdc)";
+					{ "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sdh" [
+						label="/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sda.raw\n(sdh)";
+						fillcolor=red
 					]; }
-					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdb" [
-						label="/dev/vgdata/kvm-ge91097-vm1-disk1\n(sdb)";
+					{ "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sdi" [
+						label="/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sdb.img\n(sdi)";
+						fillcolor=red
 					]; }
-					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sde" [
-						label="/dev/vgdata/scratch\n(sde)";
-					]; }
-					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdf" [
-						label="/dev/vgdata/swap\n(sdf)";
-					]; }
-					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdd" [
-						label="/dev/vgdata/usr+local\n(sdd)";
-					]; }
-					label="ge91097-vm1";
-					fillcolor=yellow
+					label="recovery-nas-cyto";
 				}
 				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@ngs-bdd" {
 					color=white;
 					fillcolor=white;
 					{ "machine@ge91097-dom0|Libvirt|::VM@ngs-bdd|::Block@sda" [
-						label="/dev/vgdata/kvm-ngs-bdd-disk1\n(sda)";
+						label="/dev/vgdata/kvm-ngs-bdd-disk1\n(sda)\nSize: 50.0 GiB";
 					]; }
 					label="ngs-bdd";
 				}
-				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto" {
+				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1" {
 					color=white;
 					fillcolor=white;
-					{ "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sda" [
-						label="/srv/kvm/recovery-nas-cyto.img\n(sda)";
+					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdc" [
+						label="/dev/vgdata/home\n(sdc)\nSize: 500 GiB";
 					]; }
-					{ "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sdh" [
-						label="/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sda.raw\n(sdh)";
-						fillcolor=mediumorchid1
+					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdb" [
+						label="/dev/vgdata/kvm-ge91097-vm1-disk1\n(sdb)\nSize: 50.0 GiB";
 					]; }
-					{ "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sdi" [
-						label="/srv/nfs/isilon/Archives_NGS/Test_Archivage/nas-cyto/raw/sdb.img\n(sdi)";
-						fillcolor=mediumorchid1
+					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sde" [
+						label="/dev/vgdata/scratch\n(sde)\nSize: 500 GiB";
 					]; }
-					label="recovery-nas-cyto";
+					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdf" [
+						label="/dev/vgdata/swap\n(sdf)\nSize: 32.0 GiB";
+					]; }
+					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdd" [
+						label="/dev/vgdata/usr+local\n(sdd)\nSize: 250 GiB";
+					]; }
+					label="ge91097-vm1";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0" {
+					color=white;
+					fillcolor=white;
+					{ "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0|::Block@vda" [
+						label="/dev/vgdata/kvm-ge91097-vm0-disk1\n(vda)\nSize: 50.0 GiB";
+					]; }
+					label="ge91097-vm0";
+					fillcolor=yellow
 				}
 				label="Libvirt Virtual Machines";
 			}
@@ -349,6 +349,26 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 			"machine@ge91097-dom0|RAID::LSI::SASIrcu@0|::RawDevice@LSISASIrcu@1:1" -> "machine@ge91097-dom0|RAID::LSI::SASIrcu@0|::State@sdd|::RaidDevice@1"
 			"machine@ge91097-dom0|RAID::LSI::SASIrcu@0|::RawDevice@LSISASIrcu@1:2" -> "machine@ge91097-dom0|RAID::LSI::SASIrcu@0|::State@sdd|::RaidDevice@1"
 			
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: recovery-nas-cyto 5368709120 (sda) "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sda"
+			// Links from Libvirt::VM::Block@sdh
+			// SOURCE LINK: recovery-nas-cyto 0 (sdh) "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sdh"
+			// Links from Libvirt::VM::Block@sdi
+			// SOURCE LINK: recovery-nas-cyto 0 (sdi) "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sdi"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: ngs-bdd 53687091200 (sda) "machine@ge91097-dom0|Libvirt|::VM@ngs-bdd|::Block@sda"
+			// Links from Libvirt::VM::Block@sdc
+			// SOURCE LINK: ge91097-vm1 536870912000 (sdc) "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdc"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: ge91097-vm1 53687091200 (sdb) "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdb"
+			// Links from Libvirt::VM::Block@sde
+			// SOURCE LINK: ge91097-vm1 536870912000 (sde) "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sde"
+			// Links from Libvirt::VM::Block@sdf
+			// SOURCE LINK: ge91097-vm1 34359738368 (sdf) "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdf"
+			// Links from Libvirt::VM::Block@sdd
+			// SOURCE LINK: ge91097-vm1 268435456000 (sdd) "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdd"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: ge91097-vm0 53687091200 (vda) "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0|::Block@vda"
 			// Links for Partition::GPT@sda
 			// TARGET LINK: ge91097-dom0 512110190592 sda "machine@ge91097-dom0|Partition::GPT@sda"
 			// Links for Partition::Table
@@ -422,10 +442,16 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 			// Links for FS::FS@/boot
 			// Links for FS::AllSWAP@@FS@SWAP
 			// Links for Libvirt Virtual Machines
-			// Links for Libvirt::VM@ge91097-vm0
-			// Links for Libvirt::VM::Block@vda
-			"machine@ge91097-dom0|LVM::VG@vgdata|::LVs|::LV@kvm-ge91097-vm0-disk1" -> "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0|::Block@vda"
-			// Links for Libvirt::VM::Block@vda
+			// Links for Libvirt::VM@recovery-nas-cyto
+			// Links for Libvirt::VM::Block@sda
+			"machine@ge91097-dom0|FS|::FS@/" -> "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM::Block@sdh
+			// Links for Libvirt::VM::Block@sdi
+			// Links for Libvirt::VM@ngs-bdd
+			// Links for Libvirt::VM::Block@sda
+			"machine@ge91097-dom0|LVM::VG@vgdata|::LVs|::LV@kvm-ngs-bdd-disk1" -> "machine@ge91097-dom0|Libvirt|::VM@ngs-bdd|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
 			// Links for Libvirt::VM@ge91097-vm1
 			// Links for Libvirt::VM::Block@sdc
 			"machine@ge91097-dom0|LVM::VG@vgdata|::LVs|::LV@home" -> "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdc"
@@ -442,16 +468,10 @@ digraph "ge91097-dom0"{ // HEADER: MACHINE
 			// Links for Libvirt::VM::Block@sdd
 			"machine@ge91097-dom0|LVM::VG@vgdata|::LVs|::LV@usr+local" -> "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm1|::Block@sdd"
 			// Links for Libvirt::VM::Block@sdd
-			// Links for Libvirt::VM@ngs-bdd
-			// Links for Libvirt::VM::Block@sda
-			"machine@ge91097-dom0|LVM::VG@vgdata|::LVs|::LV@kvm-ngs-bdd-disk1" -> "machine@ge91097-dom0|Libvirt|::VM@ngs-bdd|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM@recovery-nas-cyto
-			// Links for Libvirt::VM::Block@sda
-			"machine@ge91097-dom0|FS|::FS@/" -> "machine@ge91097-dom0|Libvirt|::VM@recovery-nas-cyto|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM::Block@sdh
-			// Links for Libvirt::VM::Block@sdi
+			// Links for Libvirt::VM@ge91097-vm0
+			// Links for Libvirt::VM::Block@vda
+			"machine@ge91097-dom0|LVM::VG@vgdata|::LVs|::LV@kvm-ge91097-vm0-disk1" -> "machine@ge91097-dom0|Libvirt|::VM@ge91097-vm0|::Block@vda"
+			// Links for Libvirt::VM::Block@vda
 		label="ge91097-dom0";
 	}
 } // FOOTER: MACHINE

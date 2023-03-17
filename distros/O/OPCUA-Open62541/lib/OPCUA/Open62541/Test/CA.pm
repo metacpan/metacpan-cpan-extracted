@@ -44,11 +44,12 @@ sub setup {
     }
 }
 
-sub create_cert_root {
+sub create_cert_ca {
     my ($self, %args) = @_;
 
     $self->create_cert(
 	name => 'root',
+	ca => 1,
 	%args,
     );
 }
@@ -89,6 +90,7 @@ sub create_cert {
     my $name        = delete($args{name}) || die 'no name for cert';
     my $subject     = delete($args{subject}) // {commonName => $name};
     my $create_args = delete($args{create_args}) // {};
+    my $is_ca       = delete($args{ca});
     my $dir         = $self->{dir};
 
     if ($issuer and not ref $issuer) {
@@ -97,12 +99,16 @@ sub create_cert {
 	$issuer = [@$issuer{qw(cert key)}];
     }
 
-    my $is_ca = !$issuer;
     my ($cert, $key) = CERT_create(
 	not_after => time() + 365*24*60*60,
 	subject => $subject,
 	$issuer ? (issuer => $issuer) : (),
-	$is_ca ? (CA => 1, purpose => 'sslCA,cRLSign') : (),
+	$is_ca ? (
+	    CA => 1,
+	    purpose => 'sslCA,cRLSign'
+	) : (
+	    purpose => 'digitalSignature,keyEncipherment,dataEncipherment',
+	),
 	%$create_args,
     );
 
@@ -236,9 +242,9 @@ Create a new test CA instance.
 
 Write OpenSSL config files.
 
-=item $ca->create_cert_root(%args)
+=item $ca->create_cert_ca(%args)
 
-Create root CA.
+Create CA certificate.
 
 =item $ca->create_cert_client(%args)
 

@@ -1,5 +1,15 @@
 Revision history for Future
 
+0.50    2023-03-17
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Avoids test_requires on `Test::Refcount` or `Test::Fatal`
+
+        [BUGFIXES]
+         * Fix documentation minisynopsis on `->udata`
+         * Set `@CARP_NOT` so that `AWAIT_GET` rethrow appears to come from
+           the right location (RT145249)
+
 0.49    2022-10-17
         [CHANGES]
          * Big reshuffle to move most code into Future/PP.pm in order to

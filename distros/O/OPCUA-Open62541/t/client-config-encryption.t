@@ -35,7 +35,8 @@ use Test::NoWarnings;
 my $ca = OPCUA::Open62541::Test::CA->new();
 $ca->setup();
 
-my ($cert_pem, $key_pem, $crl_pem) = @{$ca->create_cert_client()}{qw(cert_pem key_pem crl_pem)};
+my ($cert_pem, $key_pem) = @{$ca->create_cert_client()}{qw(cert_pem key_pem)};
+my ($crl_pem) = @{$ca->create_cert_ca()}{qw(crl_pem)};
 
 # open62541 logs errors if security policies are set multiple times for a client
 # config. For this reason we create clients and configs in separate blocks for

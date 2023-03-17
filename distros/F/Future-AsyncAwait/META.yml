@@ -4,10 +4,8 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::Fatal: '0'
+  Test2::V0: '0.000148'
   Test::Future::Deferred: '0'
-  Test::More: '0.88'
-  Test::Refcount: '0.09'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Keyword::Builder: '0.13'
@@ -22,23 +20,23 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.64'
+    version: '0.65'
   Future::AsyncAwait::Awaitable:
     file: lib/Future/AsyncAwait/Awaitable.pm
-    version: '0.64'
+    version: '0.65'
   Future::AsyncAwait::ExtensionBuilder:
     file: lib/Future/AsyncAwait/ExtensionBuilder.pm
-    version: '0.64'
+    version: '0.65'
   Test::Future::AsyncAwait::Awaitable:
     file: lib/Test/Future/AsyncAwait/Awaitable.pm
-    version: '0.64'
+    version: '0.65'
 requires:
-  Future: '0.48'
+  Future: '0.50'
   XS::Parse::Keyword: '0.13'
   XS::Parse::Sublike: '0.14'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.64'
+version: '0.65'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

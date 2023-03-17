@@ -125,7 +125,7 @@ digraph "eyak"{ // HEADER: MACHINE
 						label="PV: /dev/mapper/pv5_decrypted\nSize: 150 GiB\nFree: 70.0 GiB\nUsed: 80.0 GiB";
 						style=striped;fillcolor="pink;0.533403.2:green"
 					]; }
-					label="LVM::VG@eyak's PVs";
+					label="eyak's PVs";
 				}
 				subgraph "cluster_machine@eyak|LVM::VG@eyak|::LVs" {
 					color=white;
@@ -178,9 +178,9 @@ digraph "eyak"{ // HEADER: MACHINE
 						label="LV: swap\nSize: 18.9 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@eyak's LVs";
+					label="eyak's LVs";
 				}
-				label="LVM: LVM::VG@eyak\nSize: 1.61 TiB\nFree: 72.0 GiB";
+				label="LVM: eyak\nSize: 1.61 TiB\nFree: 72.0 GiB";
 				style=striped;fillcolor="pink;0.956373.2:green"
 			}
 			subgraph "cluster_machine@eyak|LVM::VG@eyak-init" {
@@ -195,7 +195,7 @@ digraph "eyak"{ // HEADER: MACHINE
 						label="PV: /dev/nvme0n1p2\nSize: 10.00 GiB\nFree: 1020 MiB\nUsed: 9.00 GiB";
 						style=striped;fillcolor="pink;0.900352.2:green"
 					]; }
-					label="LVM::VG@eyak-init's PVs";
+					label="eyak-init's PVs";
 				}
 				subgraph "cluster_machine@eyak|LVM::VG@eyak-init|::LVs" {
 					color=white;
@@ -208,9 +208,9 @@ digraph "eyak"{ // HEADER: MACHINE
 						label="LV: boot\nSize: 1.00 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@eyak-init's LVs";
+					label="eyak-init's LVs";
 				}
-				label="LVM: LVM::VG@eyak-init\nSize: 10.00 GiB\nFree: 1020 MiB";
+				label="LVM: eyak-init\nSize: 10.00 GiB\nFree: 1020 MiB";
 				style=striped;fillcolor="pink;0.900352.2:green"
 			}
 			subgraph "cluster_machine@eyak|LUKS@dm-9" {
@@ -301,16 +301,16 @@ digraph "eyak"{ // HEADER: MACHINE
 					style=striped;fillcolor="pink;0.995151.2:green"
 				]; }
 				{ "machine@eyak|FS|::FS@/home" [
-					label="/home\nDevice: /dev/eyak/home\next4\nSize: 245 GiB\nFree: 9.13 GiB\nUsed: 224 GiB";
-					style=striped;fillcolor="pink;0.962757.2:green"
+					label="/home\nDevice: /dev/eyak/home\next4\nSize: 245 GiB\nFree: 7.71 GiB\nUsed: 225 GiB";
+					style=striped;fillcolor="pink;0.968521.2:green"
 				]; }
 				{ "machine@eyak|FS|::FS@/srv/photos" [
 					label="/srv/photos\nDevice: /dev/eyak/photos\next4\nSize: 272 GiB\nFree: 39.3 GiB\nUsed: 230 GiB";
 					style=striped;fillcolor="pink;0.855773.2:green"
 				]; }
 				{ "machine@eyak|FS|::FS@/" [
-					label="/\nDevice: /dev/eyak/root\next4\nSize: 68.6 GiB\nFree: 4.77 GiB\nUsed: 60.6 GiB";
-					style=striped;fillcolor="pink;0.930503.2:green"
+					label="/\nDevice: /dev/eyak/root\next4\nSize: 68.6 GiB\nFree: 4.81 GiB\nUsed: 60.5 GiB";
+					style=striped;fillcolor="pink;0.929891.2:green"
 				]; }
 				{ "machine@eyak|FS|::FS@/boot/efi" [
 					label="/boot/efi\nDevice: /dev/nvme0n1p1\nvfat\nSize: 599 MiB\nFree: 499 MiB\nUsed: 99.7 MiB";
@@ -322,15 +322,15 @@ digraph "eyak"{ // HEADER: MACHINE
 					fillcolor=lightgrey;
 					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 					{ "machine@eyak|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@dm-16" [
-						label="/dev/eyak/swap\nSize: 18.9 GiB\nFree: 18.9 GiB\nUsed: 0 B";
-						style=striped;fillcolor="green"
+						label="/dev/eyak/swap\nSize: 18.9 GiB\nFree: 11.3 GiB\nUsed: 7.66 GiB";
+						style=striped;fillcolor="pink;0.404289.2:green"
 					]; }
 					{ "machine@eyak|FS|::AllSWAP@@FS@SWAP|FS::SWAP::File@/tmp/swap" [
 						label="/tmp/swap\nSize: 3.90 MiB\nFree: 3.90 MiB\nUsed: 0 B";
 						style=striped;fillcolor="green"
 					]; }
-					label="SWAP\nSize: 18.9 GiB\nFree: 18.9 GiB\nUsed: 0 B";
-					style=striped;fillcolor="green"
+					label="SWAP\nSize: 18.9 GiB\nFree: 11.3 GiB\nUsed: 7.66 GiB";
+					style=striped;fillcolor="pink;0.404207.2:green"
 				}
 				label="Mounted FS and swap";
 			}
@@ -339,81 +339,81 @@ digraph "eyak"{ // HEADER: MACHINE
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				subgraph "cluster_machine@eyak|Libvirt|::VM@OrdiClaire" {
+				subgraph "cluster_machine@eyak|Libvirt|::VM@visio" {
 					color=white;
 					fillcolor=white;
-					{ "machine@eyak|Libvirt|::VM@OrdiClaire|::Block@vda" [
-						label="sdb\n(vda)";
+					{ "machine@eyak|Libvirt|::VM@visio|::Block@sdb" [
+						label="/dev/eyak/kvm-discord\n(sdb)\nSize: 20.0 GiB";
 					]; }
-					label="OrdiClaire";
-				}
-				subgraph "cluster_machine@eyak|Libvirt|::VM@arm-aramis" {
-					color=white;
-					fillcolor=white;
-					label="arm-aramis";
-				}
-				subgraph "cluster_machine@eyak|Libvirt|::VM@debiantesting" {
-					color=white;
-					fillcolor=white;
-					{ "machine@eyak|Libvirt|::VM@debiantesting|::Block@sda" [
-						label="/home/user/dl/iso/chroot.img\n(sda)";
-						fillcolor=mediumorchid1
+					{ "machine@eyak|Libvirt|::VM@visio|::Block@sdc" [
+						label="/home/user/dl/iso/virtio-win-0.1.190.iso\n(sdc)\nSize: 479 MiB";
 					]; }
-					{ "machine@eyak|Libvirt|::VM@debiantesting|::Block@hda" [
-						label="/home/user/dl/iso/debian-9.5.0-amd64-netinst.iso\n(hda)";
-						fillcolor=mediumorchid1
-					]; }
-					label="debiantesting";
-				}
-				subgraph "cluster_machine@eyak|Libvirt|::VM@part2_agent" {
-					color=white;
-					fillcolor=white;
-					{ "machine@eyak|Libvirt|::VM@part2_agent|::Block@vda" [
-						label="/var/lib/libvirt/images/part2_agent.img\n(vda)";
-						fillcolor=mediumorchid1
-					]; }
-					label="part2_agent";
-				}
-				subgraph "cluster_machine@eyak|Libvirt|::VM@part2_master" {
-					color=white;
-					fillcolor=white;
-					{ "machine@eyak|Libvirt|::VM@part2_master|::Block@vda" [
-						label="/var/lib/libvirt/images/part2_master.img\n(vda)";
-						fillcolor=mediumorchid1
-					]; }
-					label="part2_master";
-				}
-				subgraph "cluster_machine@eyak|Libvirt|::VM@test" {
-					color=white;
-					fillcolor=white;
-					{ "machine@eyak|Libvirt|::VM@test|::Block@sdb" [
-						label="/dev/eyak/kvm-test-root\n(sdb)";
-					]; }
-					{ "machine@eyak|Libvirt|::VM@test|::Block@sda" [
-						label="/home/user/dl/iso/firmware-11.5.0-amd64-netinst.iso\n(sda)";
-					]; }
-					label="test";
+					label="visio";
 				}
 				subgraph "cluster_machine@eyak|Libvirt|::VM@vagrant_default" {
 					color=white;
 					fillcolor=white;
 					{ "machine@eyak|Libvirt|::VM@vagrant_default|::Block@vda" [
 						label="/var/lib/libvirt/images/vagrant_default.img\n(vda)";
-						fillcolor=mediumorchid1
+						fillcolor=red
 					]; }
 					label="vagrant_default";
 				}
-				subgraph "cluster_machine@eyak|Libvirt|::VM@visio" {
+				subgraph "cluster_machine@eyak|Libvirt|::VM@test" {
 					color=white;
 					fillcolor=white;
-					{ "machine@eyak|Libvirt|::VM@visio|::Block@sdb" [
-						label="/dev/eyak/kvm-discord\n[/dev/sdb]";
+					{ "machine@eyak|Libvirt|::VM@test|::Block@sdb" [
+						label="/dev/eyak/kvm-test-root\n(sdb)\nSize: 30.0 GiB";
 					]; }
-					{ "machine@eyak|Libvirt|::VM@visio|::Block@sdc" [
-						label="/home/user/dl/iso/virtio-win-0.1.190.iso\n[/dev/sda]";
+					{ "machine@eyak|Libvirt|::VM@test|::Block@sda" [
+						label="/home/user/dl/iso/firmware-11.5.0-amd64-netinst.iso\n(sda)\nSize: 476 MiB";
 					]; }
-					label="visio\nhostname: visio-eyak";
-					fillcolor=yellow
+					label="test";
+				}
+				subgraph "cluster_machine@eyak|Libvirt|::VM@part2_master" {
+					color=white;
+					fillcolor=white;
+					{ "machine@eyak|Libvirt|::VM@part2_master|::Block@vda" [
+						label="/var/lib/libvirt/images/part2_master.img\n(vda)";
+						fillcolor=red
+					]; }
+					label="part2_master";
+				}
+				subgraph "cluster_machine@eyak|Libvirt|::VM@part2_agent" {
+					color=white;
+					fillcolor=white;
+					{ "machine@eyak|Libvirt|::VM@part2_agent|::Block@vda" [
+						label="/var/lib/libvirt/images/part2_agent.img\n(vda)";
+						fillcolor=red
+					]; }
+					label="part2_agent";
+				}
+				subgraph "cluster_machine@eyak|Libvirt|::VM@debiantesting" {
+					color=white;
+					fillcolor=white;
+					{ "machine@eyak|Libvirt|::VM@debiantesting|::Block@sda" [
+						label="/home/user/dl/iso/chroot.img\n(sda)";
+						fillcolor=red
+					]; }
+					{ "machine@eyak|Libvirt|::VM@debiantesting|::Block@hda" [
+						label="/home/user/dl/iso/debian-9.5.0-amd64-netinst.iso\n(hda)";
+						fillcolor=red
+					]; }
+					label="debiantesting";
+				}
+				subgraph "cluster_machine@eyak|Libvirt|::VM@arm-aramis" {
+					color=white;
+					fillcolor=white;
+					label="arm-aramis";
+				}
+				subgraph "cluster_machine@eyak|Libvirt|::VM@OrdiClaire" {
+					color=white;
+					fillcolor=white;
+					{ "machine@eyak|Libvirt|::VM@OrdiClaire|::Block@vda" [
+						label="sdb\n(vda)";
+						fillcolor=red
+					]; }
+					label="OrdiClaire";
 				}
 				label="Libvirt Virtual Machines";
 			}
@@ -448,9 +448,25 @@ digraph "eyak"{ // HEADER: MACHINE
 			// Links from LUKS: /dev/nvme0n1p6
 			"machine@eyak|LUKS@nvme0n1p6|::Encrypted@nvme0n1p6" -> "machine@eyak|LUKS@nvme0n1p6|::Decrypted::Present@dm-5"
 			// Links from Libvirt::VM::Block@sdb
-			// SOURCE LINK: visio-eyak 21474836480 sdb "machine@eyak|Libvirt|::VM@visio|::Block@sdb"
+			// SOURCE LINK: visio 21474836480 (sdb) "machine@eyak|Libvirt|::VM@visio|::Block@sdb"
 			// Links from Libvirt::VM::Block@sdc
-			// SOURCE LINK: visio-eyak 501745664 sda "machine@eyak|Libvirt|::VM@visio|::Block@sdc"
+			// SOURCE LINK: visio 501745664 (sdc) "machine@eyak|Libvirt|::VM@visio|::Block@sdc"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: vagrant_default 0 (vda) "machine@eyak|Libvirt|::VM@vagrant_default|::Block@vda"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: test 32212254720 (sdb) "machine@eyak|Libvirt|::VM@test|::Block@sdb"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: test 499122176 (sda) "machine@eyak|Libvirt|::VM@test|::Block@sda"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: part2_master 0 (vda) "machine@eyak|Libvirt|::VM@part2_master|::Block@vda"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: part2_agent 0 (vda) "machine@eyak|Libvirt|::VM@part2_agent|::Block@vda"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: debiantesting 0 (sda) "machine@eyak|Libvirt|::VM@debiantesting|::Block@sda"
+			// Links from Libvirt::VM::Block@hda
+			// SOURCE LINK: debiantesting 0 (hda) "machine@eyak|Libvirt|::VM@debiantesting|::Block@hda"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: OrdiClaire 0 (vda) "machine@eyak|Libvirt|::VM@OrdiClaire|::Block@vda"
 			// Links for Partition::MSDOS@dm-10
 			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-miathan" -> "machine@eyak|Partition::MSDOS@dm-10"
 			// Links for Partition::MSDOS@dm-10
@@ -557,15 +573,14 @@ digraph "eyak"{ // HEADER: MACHINE
 			"machine@eyak|FS|::FS@/" -> "machine@eyak|FS|::AllSWAP@@FS@SWAP|FS::SWAP::File@/tmp/swap"
 			// Links for FS::SWAP::File@/tmp/swap
 			// Links for Libvirt Virtual Machines
-			// Links for Libvirt::VM@OrdiClaire
-			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@arm-aramis
-			// Links for Libvirt::VM@debiantesting
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM::Block@hda
-			// Links for Libvirt::VM@part2_agent
-			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@part2_master
+			// Links for Libvirt::VM@visio
+			// Links for Libvirt::VM::Block@sdb
+			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-discord" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
+			// Links for Libvirt::VM::Block@sdc
+			"machine@eyak|FS|::FS@/home" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdc"
+			// Links for Libvirt::VM::Block@sdc
+			// Links for Libvirt::VM@vagrant_default
 			// Links for Libvirt::VM::Block@vda
 			// Links for Libvirt::VM@test
 			// Links for Libvirt::VM::Block@sdb
@@ -574,15 +589,16 @@ digraph "eyak"{ // HEADER: MACHINE
 			// Links for Libvirt::VM::Block@sda
 			"machine@eyak|FS|::FS@/home" -> "machine@eyak|Libvirt|::VM@test|::Block@sda"
 			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM@vagrant_default
+			// Links for Libvirt::VM@part2_master
 			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@visio
-			// Links for Libvirt::VM::Block@sdb
-			"machine@eyak|LVM::VG@eyak|::LVs|::LV@kvm-discord" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM::Block@sdc
-			"machine@eyak|FS|::FS@/home" -> "machine@eyak|Libvirt|::VM@visio|::Block@sdc"
-			// Links for Libvirt::VM::Block@sdc
+			// Links for Libvirt::VM@part2_agent
+			// Links for Libvirt::VM::Block@vda
+			// Links for Libvirt::VM@debiantesting
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM::Block@hda
+			// Links for Libvirt::VM@arm-aramis
+			// Links for Libvirt::VM@OrdiClaire
+			// Links for Libvirt::VM::Block@vda
 		label="eyak";
 	}
 } // FOOTER: MACHINE

@@ -27,14 +27,14 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9685"
+            "SPVM" : "0.9695"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9685",
+            "SPVM" : "0.9695",
             "SPVM::Regex" : "0.17",
-            "SPVM::Sys" : "0.34"
+            "SPVM::Sys" : "0.43"
          }
       },
       "test" : {
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Basename"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

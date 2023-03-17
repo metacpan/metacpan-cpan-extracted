@@ -1,5 +1,10 @@
 Revision history for Future-XS
 
+0.09    2023-03-17
+        [CHANGES]
+         * Improved rethrow of failures to set a more accurate thrower
+           location file+line number (related to RT145249)
+
 0.08    2022-12-11
         [CHANGES]
          * Now requires perl v5.24 or later

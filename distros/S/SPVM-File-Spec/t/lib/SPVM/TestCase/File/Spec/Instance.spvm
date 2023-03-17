@@ -3,6 +3,7 @@ class TestCase::File::Spec::Instance {
   use File::Spec::Instance::Unix;
   use File::Spec::Instance::Win32;
   use Sys;
+  use Sys::OS;
   
   static method test : int () {
     
@@ -12,7 +13,7 @@ class TestCase::File::Spec::Instance {
         return 0;
       }
       
-      if (Sys->defined("_WIN32")) {
+      if (Sys::OS->is_windows) {
         unless ($spec is_type File::Spec::Instance::Win32) {
           return 0;
         }

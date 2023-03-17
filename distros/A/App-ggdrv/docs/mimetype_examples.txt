@@ -1,0 +1,63 @@
+
+# MIMEタイプを指定する際にどの文字列を使うか参考にするために、実例から抽出したものを以下の各行に並べた。
+
+application/octet-stream
+application/pdf
+application/vnd.google-apps.document
+application/vnd.google-apps.folder
+application/vnd.openxmlformats-officedocument.presentationml.presentation
+image/jpeg
+image/png
+text/csv
+text/html
+text/x-tex
+# 以上は、見た例から100回以上出現したものを文字列ソートした。
+
+application/gzip
+application/json
+application/msword
+application/rtf
+application/vnd.google-apps.presentation
+application/vnd.google-apps.spreadsheet
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+application/vnd.openxmlformats-officedocument.wordprocessingml.document
+audio/mpeg
+image/svg+xml
+plain/text  # <-- グーグルドライブをブラウザでプレビューを見ようとすると中が見えなかった。text/plainを使うと、その問題は無かった。
+text/markdown
+text/plain
+text/texmacs
+text/x-bibtex
+video/mp4
+# 以上は、見た例から10〜99回出現したものを文字列ソートした。
+
+application/postscript
+application/vnd.google-apps.drawing
+application/vnd.google-apps.earth
+application/vnd.google-apps.map
+application/vnd.google-apps.shortcut
+application/vnd.google.colaboratory
+application/vnd.ms-powerpoint
+application/x-dvi
+application/x-gzip
+application/x-httpd-php
+application/x-iwork-keynote-sffkey
+application/x-perl
+application/x-zip
+application/x-zip-compressed
+application/zip
+audio/x-m4a
+image/gif
+image/webp
+image/x-icon
+text/css
+text/javascript
+text/rtf
+text/tab-separated-values
+text/x-dsrc
+text/x-python
+text/x-sh
+text/x-uuencode
+video/quicktime
+video/x-ms-wmv
+# 以上は、見た例から1〜9回出現したものを文字列ソートした。

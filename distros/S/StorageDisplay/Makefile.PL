@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "StorageDisplay",
   "EXE_FILES" => [
+    "bin/storage-merge-dots",
     "bin/storage2dot"
   ],
   "LICENSE" => "perl",
@@ -33,7 +34,6 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Getopt::Long" => 0,
     "IO::Select" => 0,
-    "JSON::MaybeXS" => 0,
     "JSON::PP" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
@@ -47,6 +47,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Term::ReadKey" => 0,
     "Types::Standard" => 0,
+    "base" => 0,
     "bignum" => "0.51",
     "bigrat" => "0.51",
     "lib" => 0,
@@ -63,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::Script" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.1.0",
+  "VERSION" => "1.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,7 +77,6 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Getopt::Long" => 0,
   "IO::Select" => 0,
-  "JSON::MaybeXS" => 0,
   "JSON::PP" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
@@ -95,6 +95,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.94",
   "Test::Script" => 0,
   "Types::Standard" => 0,
+  "base" => 0,
   "bignum" => "0.51",
   "bigrat" => "0.51",
   "lib" => 0,

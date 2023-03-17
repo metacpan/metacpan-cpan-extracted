@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Root;
 # ABSTRACT: Handle machine data for StorageDisplay
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -67,9 +67,12 @@ sub dotSubGraph {
 	{
 	    # No consumed block. Perhaps, we come from a VM provisionning
 	    my @blocks = grep {
-		!$_->provided
+		(!$_->provided)
 		    && $_->isa('StorageDisplay::Block::System')
 	    } $e->consumedBlocks;
+	    if ($e->isa('StorageDisplay::Data::Partition::None')) {
+		push @blocks, $e->allProvidedBlocks;
+	    }
 	    $self->pushDotText(
                 \@text, $t,
                 '// Links for '.$e->dname,
@@ -119,7 +122,7 @@ StorageDisplay::Data::Root - Handle machine data for StorageDisplay
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 

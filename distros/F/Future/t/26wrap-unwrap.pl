@@ -2,7 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -13,7 +13,7 @@ use Future;
    my $future = Future->wrap( $f );
 
    ok( defined $future, 'Future->wrap(Future) defined' );
-   isa_ok( $future, "Future", 'Future->wrap(Future)' );
+   isa_ok( $future, [ "Future" ], 'Future->wrap(Future)' );
 
    $f->done( "Wrapped Future" );
    is( scalar $future->result, "Wrapped Future", 'Future->wrap(Future)->result' );
@@ -21,17 +21,17 @@ use Future;
    $future = Future->wrap( "Plain string" );
 
    ok( defined $future, 'Future->wrap(string) defined' );
-   isa_ok( $future, "Future", 'Future->wrap(string)' );
+   isa_ok( $future, [ "Future" ], 'Future->wrap(string)' );
 
    is( scalar $future->result, "Plain string", 'Future->wrap(string)->result' );
 }
 
 # unwrap
 {
-   is_deeply( [ Future->unwrap( Future->done( 1, 2, 3 ) ) ],
+   is( [ Future->unwrap( Future->done( 1, 2, 3 ) ) ],
               [ 1, 2, 3 ],
               'Future->unwrap Future in list context' );
-   is_deeply( [ Future->unwrap( 1, 2, 3 ) ],
+   is( [ Future->unwrap( 1, 2, 3 ) ],
               [ 1, 2, 3 ],
               'Future->unwrap plain list in list context' );
 

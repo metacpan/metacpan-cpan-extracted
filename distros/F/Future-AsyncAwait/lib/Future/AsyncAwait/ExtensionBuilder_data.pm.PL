@@ -19,7 +19,7 @@ $outh->print( scalar do {
    <$in_h> } );
 
 __DATA__
-package Future::AsyncAwait::ExtensionBuilder_data 0.64;
+package Future::AsyncAwait::ExtensionBuilder_data 0.65;
 
 use v5.14;
 use warnings;

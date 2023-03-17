@@ -2,10 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -15,12 +12,12 @@ use Future;
    my $called = 0;
    my $fseq = $f1->followed_by( sub {
       $called++;
-      identical( $_[0], $f1, 'followed_by block passed $f1' );
+      ref_is( $_[0], $f1, 'followed_by block passed $f1' );
       return $_[0];
    } );
 
    ok( defined $fseq, '$fseq defined' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
    # Two refs; one in lexical $f1, one in $fseq's cancellation closure
@@ -33,7 +30,7 @@ use Future;
    is( $called, 1, '$called after $f1 done' );
 
    ok( $fseq->is_ready, '$fseq is done after $f1 done' );
-   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
+   is( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
    is_oneref( $f1, '$f1 has refcount 1 before EOF' );
@@ -45,12 +42,12 @@ use Future;
    my $called = 0;
    my $fseq = $f1->followed_by( sub {
       $called++;
-      identical( $_[0], $f1, 'followed_by block passed $f1' );
+      ref_is( $_[0], $f1, 'followed_by block passed $f1' );
       return $_[0];
    } );
 
    ok( defined $fseq, '$fseq defined' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
 
@@ -61,7 +58,7 @@ use Future;
    is( $called, 1, '$called after $f1 failed' );
 
    ok( $fseq->is_ready, '$fseq is ready after $f1 failed' );
-   is_deeply( [ $fseq->failure ], [ "failure\n" ], '$fseq->failure returns failure' );
+   is( [ $fseq->failure ], [ "failure\n" ], '$fseq->failure returns failure' );
 
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
 }
@@ -74,7 +71,7 @@ use Future;
       die "It fails\n";
    } );
 
-   ok( !defined exception { $f1->done }, 'exception not propagated from code call' );
+   ok( lives { $f1->done }, 'exception not propagated from code call' );
 
    ok( $fseq->is_ready, '$fseq is ready after code exception' );
    is( scalar $fseq->failure, "It fails\n", '$fseq->failure after code exception' );
@@ -142,7 +139,7 @@ use Future;
 
    my $fseq;
 
-   ok( !defined exception {
+   ok( lives {
       $fseq = $f1->followed_by( sub {
          die "It fails\n";
       } );
@@ -159,7 +156,7 @@ use Future;
    my $fseq = $f1->followed_by( sub { "result" } );
    my $fseq2 = $f1->followed_by( sub { Future->done } );
 
-   is( exception { $f1->done }, undef,
+   ok( lives { $f1->done },
        '->done with non-future return from ->followed_by does not die' );
 
    is( scalar $fseq->result, "result",
@@ -168,7 +165,7 @@ use Future;
    ok( $fseq2->is_ready, '$fseq2 is ready after failure of $fseq' );
 
    my $fseq3;
-   is( exception { $fseq3 = $f1->followed_by( sub { "result" } ) }, undef,
+   ok( lives { $fseq3 = $f1->followed_by( sub { "result" } ) },
       'non-future return from ->followed_by on immediate does not die' );
 
    is( scalar $fseq3->result, "result",

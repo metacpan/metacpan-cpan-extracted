@@ -1,4 +1,7 @@
 Revision history for perl-file-valet
+1.11 Thu Mar 16 20:24:31
+	- New function: find_first
+
 1.10 Tue Jul 07 13:28:18
 	- Fixed rd_f for 32-bit platforms.
 

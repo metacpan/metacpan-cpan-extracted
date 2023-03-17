@@ -11,8 +11,8 @@ use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION);
 BEGIN {
     require Exporter;
     @ISA = qw(Exporter);
-    $VERSION = '1.10';
-    @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_home find_temp find_bin lockafile unlockafile unlock_all_the_files);
+    $VERSION = '1.11';
+    @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_first find_home find_temp find_bin lockafile unlockafile unlock_all_the_files);
 }
 
 our $OK     = 'OK'; # one of "OK", "WARNING" or "ERROR", reflecting most recently performed operation
@@ -189,6 +189,16 @@ sub ap_f {
 
 sub detect_windows {
     return ($^O eq 'MSWin32' || $Config{'osname'} =~ /windows/i || $Config{'osname'} =~ /winserver/i || $Config{'osname'} =~ /microsoft/i) ? 1 : 0;
+}
+
+sub find_first {
+    foreach my $d (@_) {
+        next unless (-e $d);
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('OK', '', '', 0);
+        return $d;
+    }
+    ($OK, $ERROR, $ERRNO, $ERRNUM) = ('WARNING', 'no file found', '', 0);
+    return undef;
 }
 
 sub find_home {

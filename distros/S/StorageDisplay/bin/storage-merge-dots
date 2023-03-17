@@ -1,0 +1,377 @@
+#!/usr/bin/env perl
+#
+# This file is part of StorageDisplay
+#
+# This software is copyright (c) 2014-2023 by Vincent Danjean.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+# PODNAME: storage-merge-dots
+# ABSTRACT: merge dot files created by storage2dot, adding inter links if possible
+
+use strict;
+use warnings;
+
+our $VERSION = '1.2.1'; # VERSION
+
+
+use StorageDisplay;
+use StorageDisplay::Collect;
+
+sub collect_from_remote {
+    my $remote = shift;
+    my $content='';
+    use Net::OpenSSH;
+    use Term::ReadKey;
+    END {
+        ReadMode('normal');
+    }
+    my $ssh = Net::OpenSSH->new($remote);
+    $ssh->error and
+        die "Couldn't establish SSH connection: ". $ssh->error;
+
+    my ($in, $out, $pid) = $ssh->open2(
+        #'cat',
+        'perl', '--', '-',
+        );
+
+    my $fdperlmod;
+    open($fdperlmod, '<', $INC{'StorageDisplay/Collect.pm'})
+        or die "Cannot open ".INC{'StorageDisplay/Collect.pm'}.": $!\n";
+    #use Sys::Syscall;
+    #Sys::Syscall::sendfile($in, $fdperlmod);
+    {
+        while(defined(my $line=<$fdperlmod>)) {
+	    last if $line =~ m/^__END__\s*$/;
+            print $in $line;
+        }
+        close $fdperlmod;
+    }
+    #print $in "StorageDisplay::Collect::dump_collect;\n";
+    my @args = (@_, 'LocalBySSH');
+    my $cmd = "StorageDisplay::Collect::dump_collect('".join("','", @args)."');\n";
+    print STDERR 'Running through SSH: ',$cmd;
+    print $in $cmd;
+    print $in "__END__\n";
+    flush $in;
+
+    use IO::Select;
+    use POSIX ":sys_wait_h";
+    my $sel = IO::Select->new(\*STDIN, $out);
+    my $timeout = 1;
+    ReadMode('noecho');
+    my ($in_closed,$out_closed) = (0,0);
+    while(1) {
+        $!=0;
+        my @ready = $sel->can_read($timeout);
+        if ($!) {
+            die "Error with select: $!\n";
+        }
+        if (scalar(@ready)) {
+            foreach my $fd (@ready) {
+                if ($fd == $out) {
+                    my $line=<$out>;
+                    if (defined($line)) {
+                        $content .= $line;
+                    } else {
+                        $sel->remove($out);
+                        close $out;
+                        $out_closed=1;
+                    }
+                } else {
+                    my $line=<STDIN>;
+                    if (print $in $line) {
+                        flush $in;
+                    } else {
+                        $sel->remove(\*STDIN);
+                        close $in;
+                        $in_closed=1;
+                    }
+                }
+            }
+        } else {
+            my $res = waitpid($pid, WNOHANG);
+            if ($res==-1) {
+                die "Some error occurred ".($? >> 8).": $!\n";
+            }
+            if ($res) {
+                if (!$in_closed) {
+                    $sel->remove(\*STDIN);
+                    close $in;
+                }
+                ReadMode('normal');
+                last;
+            }
+            #print STDERR "timeout for $pid\n";
+        }
+    }
+    if (!$out_closed) {
+        while (defined(my $line=<$out>)) {
+            $content .= $out;
+        }
+        $sel->remove($out);
+        close $out;
+    }
+    return $content;
+}
+
+use Getopt::Long;
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Purity = 1;
+
+my $help;
+my $verbose;
+my $vmnames={};
+
+GetOptions ("v|verbose+"        => \$verbose,     # flag
+            "h|help"          => \$help,     # flag
+	    "vm=s"            => $vmnames,
+    ) or die("Error in command line arguments\n");
+
+my $dotfiles;
+
+my $print_level=0;
+
+sub print_info {
+    if ($verbose) {
+	foreach my $l (@_) {
+	    print STDERR "I: ".('  'x$print_level).$l."\n";
+	}
+    }
+}
+
+sub print_warn {
+    foreach my $l (@_) {
+	print STDERR "W: ".('  'x$print_level).$l."\n";
+    }
+}
+
+my $slinks={};
+my $tlinks={};
+
+sub add_link {
+    my $self = shift;
+    my $name = shift;
+    my $link = shift;
+    if ($link !~ m,([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s*$,) {
+
+	return;
+    }
+    my ($vm, $size, $disk, $sl) = ($1, $2, $3, $4);
+    my $realdisk = 1;
+    if ($disk =~ m,^[(](.*)[)]$,) {
+	$disk = $1;
+	$realdisk = 0;
+    }
+    if (exists($self->{$vm}->{$disk})) {
+	    print_warn "Ignoring duplicate $name link: $link";
+    } else {
+	$self->{$vm}->{$disk} = {
+	    'link' => $sl,
+		'size' => $size,
+		'realdisk' => $realdisk,
+		'name' => $disk,
+	};
+    }    
+}
+
+sub add_slink {
+    my $link = shift;
+    add_link($slinks, "source", $link);
+}
+
+sub add_tlink {
+    my $link = shift;
+    add_link($tlinks, "target", $link);
+}
+
+sub check_disks {
+    my $hostdisk = shift;
+    my $vmdisk = shift;
+
+    return 0 if not exists($vmdisk->{name});
+    return 0 if $hostdisk->{matched};
+    return 0 if $vmdisk->{matched};
+
+    if ($hostdisk->{size} != $vmdisk->{size}) {
+	print_info "Rejecting $hostdisk->{name} to $vmdisk->{name}: different size";
+	return 0;
+    }
+    return 1;
+}
+
+sub match_links {
+    my $host = shift;
+    my $vm = shift;
+
+    my @matching;
+    foreach my $hostdname (sort keys %$host) {
+	my $hostdisk = $host->{$hostdname};
+	next if $hostdisk->{matched};
+	my $vmdname = $hostdname;
+	my $vmdisk = $vm->{$vmdname} // {};
+	if ($hostdisk->{realdisk}
+	    && check_disks($hostdisk, $vmdisk)) {
+	    # fast path with real diskname (qemu agent was available)
+	    push @matching, [$hostdisk, $vmdisk];
+	    $hostdisk->{matched} = 1;
+	    $vmdisk->{matched} = 1;
+	    next;
+	}
+	# slow path: qemu-agent not available or device renamed after reboot
+	# trying to check with disksize
+	$vmdisk = undef;
+	foreach my $vmdisk_try (values %$vm) {
+	    if (check_disks($hostdisk, $vmdisk_try)) {
+		if (defined($vmdisk)) {
+		    print_warn "Multiple disks matching, ignoring it";
+		    $vmdisk = undef;
+		    last;
+		}
+		$vmdisk = $vmdisk_try;
+	    }
+	}
+	if (defined($vmdisk)) {
+	    push @matching, [$hostdisk, $vmdisk];
+	    $hostdisk->{matched} = 1;
+	    $vmdisk->{matched} = 1;
+	}
+    }
+    return @matching;
+}
+
+my $one_handled;
+sub handle_dotfile {
+    my $filename = shift;
+
+    my $state = 0;
+    open(my $h, '<', $filename) or die "Cannot read $filename\n";
+    my $print = $one_handled ? 0 : 1;
+    my $header_size = 0;
+    my $footer_size = 0;
+    
+    while(defined(my $line = <$h>)) {
+	chomp($line);
+	if ($state == 0) {
+	    $state = 1;
+	}
+	if ($line =~ m,//\s*HEADER: MACHINE\s*$,) {
+	    if ($state == 1) {
+		print $line, "\n" if not $one_handled;
+		$header_size++;
+	    } else {
+		print_warn "Ignoring header line after data: $line";
+	    }
+	} elsif ($line =~ m,//\s*FOOTER: MACHINE\s*$,) {
+	    if ($state < 2) {
+		print_warn "Ignoring footer line before data: $line";
+	    } elsif ($state == 2) {
+		$state = 3;
+	    }
+	    if ($state == 3) {
+		if ($line !~ m,^\s*}\s*//\s*FOOTER: MACHINE\s*$,) {
+		    print_warn "Strange footer line $line";
+		}
+		$footer_size++;
+	    }
+	} else {
+	    if ($state < 1) {
+		print_warn "Data before header";
+	    } elsif ($state == 1) {
+		$state = 2;
+		$one_handled++;
+	    }
+	    if ($state == 2) {
+		print $line, "\n";
+		if ($line =~ m,//\s*SOURCE\s+LINK\s*:\s*(.*)$,) {
+		    my $link = $1;
+		    add_slink($link);
+		}
+		if ($line =~ m,//\s*TARGET\s+LINK\s*:\s*(.*)$,) {
+		    my $link = $1;
+		    add_tlink($link);
+		}
+	    } elsif ($state == 3) {
+		print_warn "Ignoring data after footer line: $line";		
+	    }
+	}
+	   
+    }
+    if ($header_size != 2) {
+	print_warn "Strange header with $header_size lines";
+    }
+    if ($footer_size != 1) {
+	print_warn "Strange footer with $header_size lines";
+    }
+}
+
+sub main() {
+    if (defined($help)) {
+        print "TODO: write help\n";
+        exit(0);
+    }
+
+    foreach my $dotfilename (@ARGV) {
+	print_info "handling $dotfilename";
+	$print_level++;
+	handle_dotfile($dotfilename);
+	$print_level--;
+    }
+    #use Data::Dumper;
+    #print STDERR Dumper($slinks), "\n";
+    #print STDERR Dumper($tlinks), "\n";
+    print_info "handling interlinks";
+    $print_level++;
+    foreach my $vm (sort keys %{$slinks}) {
+	my $hostname = $vmnames->{$vm} // $vm;
+	print_info "Looking for $vm ($hostname) VM";
+	if (exists($tlinks->{$hostname})) {
+	    $print_level++;
+	    print_info "Found target";
+	    my @matches = match_links($slinks->{$vm}, $tlinks->{$hostname});
+	    foreach (@matches) {
+		my ($hd, $vmd) = @{$_};
+		print_info "Linking $hd->{name}\@$vm to $vmd->{name}\@$hostname";
+		print $hd->{link}, " -> ", $vmd->{link}, "\n";
+	    }	    
+	    $print_level--;
+	}
+    }
+    $print_level--;
+
+    if ($one_handled) {
+	print "} // FOOTER: MACHINE\n";
+    }
+}
+
+main
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+storage-merge-dots - merge dot files created by storage2dot, adding inter links if possible
+
+=head1 VERSION
+
+version 1.2.1
+
+=head1 AUTHOR
+
+Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014-2023 by Vincent Danjean.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

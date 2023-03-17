@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.757';
+our $VERSION = '1.758';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1275,7 +1275,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.757
+Version 1.758
 
 =cut
 
@@ -1532,13 +1532,13 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 
 =head3 color
 
-Enable the support for color and text formatting escape sequences.
+Enable the support for SGR ANSI escape sequences.
 
 0 - off (default)
 
-1 - Enables the support for color and text formatting escape sequences except for the current selected element.
+1 - Enables the support for SGR ANSI escape sequences but the current selected element is not colored.
 
-2 - Enables the support for color and text formatting escape sequences including for the current selected element (shown
+2 - Enables the support for SGR ANSI escape sequences including for the current selected element (shown
 in inverted colors).
 
 =head3 default
@@ -1715,7 +1715,7 @@ Allowed values: 1 or greater
 
 If defined, sets the maximal output width to I<max_width> if the terminal width is greater than I<max_width>.
 
-To prevent the "auto-format" to use a width less than I<max_width> set I<layout> to 0.
+To prevent the "auto-format" to use a width less than I<max_width> set I<layout> to C<0>.
 
 Width refers here to the number of print columns.
 
@@ -1932,6 +1932,12 @@ C<TC_ANSI_ESCAPES> is set to a true value, hardcoded ANSI escape sequences are u
 
 The escape sequences to enable the I<mouse> mode are always hardcoded.
 
+=head2 Other environment variables
+
+If the environment variable C<TC_RESET_AUTO_UP> existed when calling C<choose>: C<TC_RESET_AUTO_UP> is set to C<0> if
+the C<LINE_FEED>/C<CARRIAGE_RETURN> key was the only key pressed and C<TC_RESET_AUTO_UP> is set ot C<1> if other keys
+than C<LINE_FEED>/C<CARRIAGE_RETURN> were also pressed.
+
 =head2 MSWin32
 
 If the OS is MSWin32 L<Win32::Console> and L<Win32::Console::ANSI> with ANSI escape sequences are used. See also
@@ -1956,7 +1962,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2022 Matthäus Kiem.
+Copyright (C) 2012-2023 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

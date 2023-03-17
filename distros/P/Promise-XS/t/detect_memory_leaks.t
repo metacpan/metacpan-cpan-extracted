@@ -55,7 +55,7 @@ SKIP: {
     my ($dir) = File::Spec->splitdir( __FILE__ );
     my $script_path = File::Spec->join( $dir, 'assets', 'deferred_leak.pl' );
 
-    my $got = `$^X @inc_args -Mstrict -Mwarnings -MPromise::XS $script_path`;
+    my $got = `"$^X" @inc_args -Mstrict -Mwarnings -MPromise::XS $script_path`;
 
     warn "CHILD_ERROR: $?" if $?;
 

@@ -6,11 +6,15 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+bin/storage-merge-dots
 bin/storage2dot
 data/Makefile
 data/aya.rawcmd
 data/aya.ref.data
 data/aya.ref.dot
+data/dahu-node.rawcmd
+data/dahu-node.ref.data
+data/dahu-node.ref.dot
 data/di138099su.rawcmd
 data/di138099su.ref.data
 data/di138099su.ref.dot
@@ -38,6 +42,9 @@ data/olddata/eh91160u.ref.dot
 data/olddata/yeti-node.rawcmd
 data/olddata/yeti-node.ref.data
 data/olddata/yeti-node.ref.dot
+data/yeti-node.rawcmd
+data/yeti-node.ref.data
+data/yeti-node.ref.dot
 dist.ini
 lib/StorageDisplay.pm
 lib/StorageDisplay/Block.pm
@@ -56,6 +63,7 @@ run-on
 t/000-report-versions.t
 t/05_round.t
 t/06_int-data-dumper.t
+t/07_json.t
 t/10_reference.t
 t/author-critic.t
 t/author-distmeta.t

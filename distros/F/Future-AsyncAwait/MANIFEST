@@ -56,11 +56,11 @@ t/45sub-signatures.t
 t/50future-subclass.t
 t/51awaitable-role.t
 t/52awaitable-future.t
+t/70await+feature-try.t
 t/80async-method.t
 t/80async-multi-sub.t
 t/80await+defer.t
 t/80await+dynamically.t
-t/80await+feature-try.t
 t/80await+matchcase.t
 t/80await+SKT.t
 t/81async-method+dynamically.t

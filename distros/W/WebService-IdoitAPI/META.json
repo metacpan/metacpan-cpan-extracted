@@ -33,8 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "JSON::RPC::Legacy::Client" : "0",
+            "Text::CSV" : "0",
             "perl" : "5.006"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.3",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

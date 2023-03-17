@@ -23,7 +23,7 @@ my $debug = 0;
 our @EXPORT_OK = qw(is_valid_checksum ean_to_ismn ismn_to_ean
 	INVALID_PUBLISHER_CODE BAD_CHECKSUM GOOD_ISMN BAD_ISMN);
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 sub INVALID_PUBLISHER_CODE { -3 };
 sub BAD_CHECKSUM           { -1 };
@@ -44,9 +44,8 @@ my %Lengths = qw(
 	);
 
 sub new {
-	my $class       = shift;
-	my $common_data = _common_format shift;
-
+	my( $class, $raw_ismn ) = @_;
+	my $common_data = _common_format $raw_ismn;
 	return unless defined $common_data;
 
 	my $self  = {};
@@ -199,10 +198,10 @@ sub ean_to_ismn {
 	$ean =~ s/[^0-9]//g;
 
 	return unless length $ean == 13;
-	return unless substr($ean, 0, 3) eq 979;
+	return unless substr($ean, 0, 4) eq 9790;
 
 	#XXX: fix to change leading 0 back to M
-	my $ismn = Business::ISMN->new( substr($ean, 3, 9) . '1' );
+	my $ismn = Business::ISMN->new( 'M' . substr($ean, 4, 9) );
 
 	$ismn->fix_checksum;
 
@@ -309,8 +308,8 @@ Business::ISMN - work with International Standard Music Numbers
 
 	use Business::ISMN;
 
-	$ismn_object = new Business::ISMN('M021765430');
-	$ismn_object = new Business::ISMN('M-021-76543-0');
+	$ismn_object = Business::ISMN->new('M021765430');
+	$ismn_object = Business::ISMN->new('M-021-76543-0');
 
 	#print the ISMN with hyphens at positions specified
 	#by constructor
@@ -535,7 +534,11 @@ what to do.
 
 =head1 TO DO
 
-* i need more ISMN numbers for tests
+=over 4
+
+=item * I need more ISMN numbers for tests
+
+=back
 
 =head1 SOURCE AVAILABILITY
 
@@ -549,7 +552,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -44,7 +44,7 @@ static inline void S_debug_sv_summary(pTHX_ const SV *sv)
     case SVt_PVCV: type = "PVCV"; break;
     default: {
       char buf[16];
-      sprintf(buf, "(%d)", SvTYPE(sv));
+      snprintf(buf, sizeof(buf), "(%d)", SvTYPE(sv));
       type = buf;
       break;
     }
@@ -124,5 +124,17 @@ static inline void S_debug_showstack(pTHX_ const char *pattern, ...)
   }
 }
 #endif
+
+/*
+void static inline exs_debug_showmark_stack(pTHX) {
+    PerlIO_printf(Perl_debug_log, "MARK STACK (start=%p; cur=%p, offset=%d):\n", PL_markstack, PL_markstack_ptr, (int) (PL_markstack_ptr - PL_markstack));
+    I32 *mp = PL_markstack;
+    while (mp != PL_markstack_max) {
+        const char* pattern = (mp == PL_markstack_ptr ? "[%d]" : "%d");
+        PerlIO_printf(Perl_debug_log, pattern, *mp++);
+        PerlIO_printf(Perl_debug_log, (mp == PL_markstack_max) ? "\n" : ",");
+    }
+}
+*/
 
 #endif

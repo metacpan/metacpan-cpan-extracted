@@ -1,10 +1,5 @@
 package Complete::Sah;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
-our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.008'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,10 +7,14 @@ use Log::ger;
 
 use Complete::Common qw(:all);
 use Complete::Util qw(combine_answers complete_array_elem hashify_answer);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-19'; # DATE
+our $DIST = 'Complete-Sah'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
-require Exporter;
-our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(complete_from_schema);
 
 $SPEC{':package'} = {
@@ -36,6 +35,7 @@ complete from the `in` clause. Or for something like `[int => between => [1,
 _
     args => {
         schema => {
+            schema => ['any*', of=>['str*', 'array*']], # XXX sah::schema
             description => <<'_',
 
 Will be normalized, unless when `schema_is_normalized` is set to true, in which
@@ -53,6 +53,7 @@ _
             req => 1,
         },
     },
+    result_naked => 1,
 };
 sub complete_from_schema {
     my %args = @_;
@@ -72,7 +73,7 @@ sub complete_from_schema {
     # schema might be based on other schemas, if that is the case, let's try to
     # look at Sah::SchemaR::* module to quickly find the base type
     unless ($type =~ /\A(all|any|array|bool|buf|cistr|code|date|duration|float|hash|int|num|obj|re|str|undef)\z/) {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my $pkg = "Sah::SchemaR::$type";
         (my $pkg_pm = "$pkg.pm") =~ s!::!/!g;
         eval { require $pkg_pm; 1 };
@@ -363,7 +364,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.008 of Complete::Sah (from Perl distribution Complete-Sah), released on 2021-07-29.
+This document describes version 0.010 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -378,7 +379,7 @@ This document describes version 0.008 of Complete::Sah (from Perl distribution C
 
 Usage:
 
- complete_from_schema(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ complete_from_schema(%args) -> any
 
 Complete a value from schema.
 
@@ -393,26 +394,21 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<schema>* => I<any>
+=item * B<schema>* => I<str|array>
 
 Will be normalized, unless when C<schema_is_normalized> is set to true, in which
 case schema must already be normalized.
 
 =item * B<schema_is_normalized> => I<bool> (default: 0)
 
+(No description)
+
 =item * B<word>* => I<str> (default: "")
+
+(No description)
 
 
 =back
-
-Returns an enveloped result (an array).
-
-First element ($status_code) is an integer containing HTTP-like status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or something like "OK" if status is
-200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
-element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -424,6 +420,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-S
 
 Source repository is at L<https://github.com/perlancar/perl-Complete-Sah>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Sah>
@@ -431,16 +456,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

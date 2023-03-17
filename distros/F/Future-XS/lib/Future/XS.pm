@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Future::XS 0.08;
+package Future::XS 0.09;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,8 @@ use Time::HiRes qw( tv_interval );
 # Future::_base is provided in Future.pm itself
 require Future;
 our @ISA = qw( Future::_base );
+
+our @CARP_NOT = qw( Future Future::_base );
 
 require Future::Exception;
 

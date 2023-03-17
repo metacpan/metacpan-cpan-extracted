@@ -3,15 +3,15 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+
 BEGIN {
    plan skip_all => "signatures are not availble"
       unless $] >= 5.026;
-
-   require feature;
-   feature->import( 'signatures' );
-   warnings->unimport( 'experimental::signatures' );
 }
+
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 BEGIN {
    plan skip_all => "Future is not available"

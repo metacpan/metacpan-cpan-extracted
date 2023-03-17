@@ -949,6 +949,8 @@ SUBCLASSING METHODS
 
        $future = $future->set_udata( $name, $value )
 
+    Since version 0.49
+
     Stores a Perl value within the instance, under the given name.
     Subclasses can use this to store extra data that the implementation may
     require.
@@ -958,7 +960,9 @@ SUBCLASSING METHODS
 
  udata
 
-       $value = $future->get_udata( $name )
+       $value = $future->udata( $name )
+
+    Since version 0.49
 
     Returns a Perl value from the instance that was previously set with
     "set_udata".

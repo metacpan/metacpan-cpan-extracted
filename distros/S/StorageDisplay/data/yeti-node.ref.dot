@@ -1,0 +1,123 @@
+digraph "yeti-3.example.com"{ // HEADER: MACHINE
+	rankdir=LR; // HEADER: MACHINE
+	subgraph "cluster_machine@yeti-3.example.com" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=white;
+		node [style=filled,color=white,fillcolor=white,shape=rectangle];
+			{ "machine@yeti-3.example.com|Partition::GPT@sda" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">ATA SSDSC2KG480G8R</TD> </TR><TR><TD >/dev/sda<BR/>Model: SSDSC2KG480G8R<BR/>Serial: BTYG918106V4480BGN<BR/>Label: gpt<BR/>Size: 447 GiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="yellow">
+								/dev/sda1<BR/>KDPL_SWAP_disk0<BR/>Size: 3.72 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/sda2<BR/>KDPL_PROD_disk0<BR/>Size: 28.9 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="3" BGCOLOR="lightgrey">
+								/dev/sda3<BR/>KDPL_DEPLOY_disk0<BR/>Size: 31.7 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="4" BGCOLOR="mediumorchid1">
+								/dev/sda4<BR/>efi<BR/>Size: 953 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="5" BGCOLOR="yellow">
+								/dev/sda5<BR/>KDPL_TMP_disk0<BR/>Size: 382 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 840 kiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000002:pink;0.008330:pink;0.064570:pink;0.070818:pink;0.002081:pink;0.854197:green;0.000002";
+			]; }
+			subgraph "cluster_machine@yeti-3.example.com|FS" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				{ "machine@yeti-3.example.com|FS|::FS@/" [
+					label="/\nDevice: /dev/sda2\next4\nSize: 28.2 GiB\nFree: 10.7 GiB\nUsed: 16.0 GiB";
+					style=striped;fillcolor="pink;0.619758.2:green"
+				]; }
+				{ "machine@yeti-3.example.com|FS|::FS@/tmp" [
+					label="/tmp\nDevice: /dev/sda5\next4\nSize: 375 GiB\nFree: 356 GiB\nUsed: 76.0 kiB";
+					style=striped;fillcolor="pink;0.050984.2:green"
+				]; }
+				{ "machine@yeti-3.example.com|FS|::SWAP::Partition@sda1" [
+					label="SWAP\nDevice: /dev/sda1\nSize: 3.72 GiB\nFree: 3.72 GiB\nUsed: 0 B";
+					style=striped;fillcolor="green"
+				]; }
+				label="Mounted FS and swap";
+			}
+			subgraph "cluster_machine@yeti-3.example.com|Libvirt" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				label="Libvirt Virtual Machines";
+			}
+			{ "machine@yeti-3.example.com|Partition::None@nvme0n1" [
+				label="/dev/nvme0n1\nModel: Dell Express Flash NVMe PM1725 1.6TB AIC\nSerial:       S2MBNA0J600524\nSize: 1.46 TiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
+			{ "machine@yeti-3.example.com|Partition::None@nvme1n1" [
+				label="/dev/nvme1n1\nModel: Dell Express Flash NVMe PM1725 1.6TB AIC\nSerial:       S2MBNA0J501703\nSize: 1.46 TiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
+			// Links for Partition::GPT@sda
+			// TARGET LINK: yeti-3.example.com 480103981056 sda "machine@yeti-3.example.com|Partition::GPT@sda"
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@sda1
+			// Links for Partition::Table::Part::Data@sda2
+			// Links for Partition::Table::Part::Data@sda3
+			// Links for Partition::Table::Part::Data@sda4
+			// Links for Partition::Table::Part::Data@sda5
+			// Links for Partition::Table::Part::Free@_2
+			// Links for FS
+			// Links for FS::FS@/
+			"machine@yeti-3.example.com|Partition::GPT@sda":"2" -> "machine@yeti-3.example.com|FS|::FS@/"
+			// Links for FS::FS@/
+			// Links for FS::FS@/tmp
+			"machine@yeti-3.example.com|Partition::GPT@sda":"5" -> "machine@yeti-3.example.com|FS|::FS@/tmp"
+			// Links for FS::FS@/tmp
+			// Links for FS::SWAP::Partition@sda1
+			"machine@yeti-3.example.com|Partition::GPT@sda":"1" -> "machine@yeti-3.example.com|FS|::SWAP::Partition@sda1"
+			// Links for FS::SWAP::Partition@sda1
+			// Links for Libvirt Virtual Machines
+			// Links for Partition::None@nvme0n1
+			// TARGET LINK: yeti-3.example.com 1600321314816 nvme0n1 "machine@yeti-3.example.com|Partition::None@nvme0n1"
+			// Links for Partition::None@nvme1n1
+			// TARGET LINK: yeti-3.example.com 1600321314816 nvme1n1 "machine@yeti-3.example.com|Partition::None@nvme1n1"
+		label="yeti-3.example.com";
+	}
+} // FOOTER: MACHINE

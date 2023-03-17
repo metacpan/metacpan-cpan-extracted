@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 use Future::AsyncAwait;
@@ -42,11 +42,7 @@ async sub read_lux
 
    do { my $f = $ftick; undef $ftick; $f->done } while $ftick;
 
-   is_deeply( \@written,
-      [
-         [ "\x03", 1 ],
-         [ "\x04", 1 ],
-      ],
+   is( \@written, [ [ "\x03", 1 ], [ "\x04", 1 ], ],
       'arguments to ->write_then_read' );
 }
 

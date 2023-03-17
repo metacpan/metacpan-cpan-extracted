@@ -1,5 +1,9 @@
 Revision history for Term::Choose
 
+1.758   2023-03-17
+    - LineFold.pm: use ansi escape to reset colors.
+    - Uniocde 15.0.
+    - Update documentation.
 
 1.757   2022-07-17
     - Constants.pm: removed 'keys' tag.

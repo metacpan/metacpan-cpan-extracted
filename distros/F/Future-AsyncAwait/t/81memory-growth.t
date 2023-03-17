@@ -3,13 +3,12 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    eval { require Test::MemoryGrowth; } or
       plan skip_all => "No Test::MemoryGrowth";
 }
 use Test::MemoryGrowth;
-use Test::Refcount;
 
 use Future;
 

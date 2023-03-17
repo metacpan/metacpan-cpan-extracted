@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
 }
@@ -29,7 +28,7 @@ use Future::AsyncAwait;
    async sub identity ( $x, $y = return $x ) { }
 
    my $f = identity( 123 );
-   isa_ok( $f, "Future", '$f' );
+   isa_ok( $f, [ "Future" ], '$f' );
    is( $f->get, 123, '$f->get on return in arg default' );
 }
 
@@ -37,11 +36,11 @@ use Future::AsyncAwait;
 {
    async sub one_arg ( $x ) { return $x; }
 
-   like( exception { my $f = one_arg() },
+   like( dies { my $f = one_arg() },
       qr/^Too few arguments for subroutine 'main::one_arg'/,
       'argcheck failure happens synchronously' );
 
-   like( exception { my $f = one_arg( 1, 2 ) },
+   like( dies { my $f = one_arg( 1, 2 ) },
       qr/^Too many arguments for subroutine 'main::one_arg'/,
       'argcheck failure happens synchronously' );
 }

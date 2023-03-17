@@ -16,4 +16,4 @@ meta-spec:
 name: File-Valet
 requires:
   perl: '5.010000'
-version: '1.10'
+version: '1.11'

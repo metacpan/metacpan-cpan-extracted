@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN::Data
 
+20230316.001 2023-03-16T14:14:06Z
+	* Update data to March 2023
+
 20210112.006 2021-02-16T04:08:08Z
 	* Fix testing bug. This module needs Business::ISBN 3.005 to match 
 	the data structures. Prior to that, Business::ISBN had a bug with

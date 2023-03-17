@@ -120,7 +120,7 @@ digraph "ge95142"{ // HEADER: MACHINE
 						label="PV: /dev/sdc1\nSize: 5.46 TiB\nFree: 467 GiB\nUsed: 5.00 TiB";
 						style=striped;fillcolor="pink;0.916414.2:green"
 					]; }
-					label="LVM::VG@vgdata's PVs";
+					label="vgdata's PVs";
 				}
 				subgraph "cluster_machine@ge95142|LVM::VG@vgdata|::LVs" {
 					color=white;
@@ -141,9 +141,9 @@ digraph "ge95142"{ // HEADER: MACHINE
 						label="LV: root\nSize: 10.0 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@vgdata's LVs";
+					label="vgdata's LVs";
 				}
-				label="LVM: LVM::VG@vgdata\nSize: 11.8 TiB\nFree: 3.67 TiB";
+				label="LVM: vgdata\nSize: 11.8 TiB\nFree: 3.67 TiB";
 				style=striped;fillcolor="pink;0.689888.2:green"
 			}
 			subgraph "cluster_machine@ge95142|RAID::LSI::Megacli@0" {
@@ -235,8 +235,8 @@ digraph "ge95142"{ // HEADER: MACHINE
 					style=striped;fillcolor="pink;0.006951.2:green"
 				]; }
 				{ "machine@ge95142|FS|::FS@/" [
-					label="/\nDevice: /dev/vgdata/root\next4\nSize: 9.68 GiB\nFree: 1.11 GiB\nUsed: 8.05 GiB";
-					style=striped;fillcolor="pink;0.885052.2:green"
+					label="/\nDevice: /dev/vgdata/root\next4\nSize: 9.68 GiB\nFree: 1.08 GiB\nUsed: 8.09 GiB";
+					style=striped;fillcolor="pink;0.888388.2:green"
 				]; }
 				{ "machine@ge95142|FS|::FS@/boot/efi" [
 					label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 6.03 MiB";
@@ -257,25 +257,25 @@ digraph "ge95142"{ // HEADER: MACHINE
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				subgraph "cluster_machine@ge95142|Libvirt|::VM@1-hera" {
-					color=white;
-					fillcolor=white;
-					{ "machine@ge95142|Libvirt|::VM@1-hera|::Block@sda" [
-						label="/dev/vgdata/kvm-hera-disk1\n(sda)";
-					]; }
-					{ "machine@ge95142|Libvirt|::VM@1-hera|::Block@sdc" [
-						label="/dev/vgdata/kvm-hera-disk2\n(sdc)";
-					]; }
-					label="1-hera";
-					fillcolor=yellow
-				}
 				subgraph "cluster_machine@ge95142|Libvirt|::VM@memtest86+" {
 					color=white;
 					fillcolor=white;
 					{ "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda" [
-						label="/srv/kvm/memtest86+-5.01.iso\n(hda)";
+						label="/srv/kvm/memtest86+-5.01.iso\n(hda)\nSize: 1.75 MiB";
 					]; }
 					label="memtest86+";
+				}
+				subgraph "cluster_machine@ge95142|Libvirt|::VM@1-hera" {
+					color=white;
+					fillcolor=white;
+					{ "machine@ge95142|Libvirt|::VM@1-hera|::Block@sda" [
+						label="/dev/vgdata/kvm-hera-disk1\n(sda)\nSize: 150 GiB";
+					]; }
+					{ "machine@ge95142|Libvirt|::VM@1-hera|::Block@sdc" [
+						label="/dev/vgdata/kvm-hera-disk2\n(sdc)\nSize: 5.00 TiB";
+					]; }
+					label="1-hera";
+					fillcolor=yellow
 				}
 				label="Libvirt Virtual Machines";
 			}
@@ -295,6 +295,12 @@ digraph "ge95142"{ // HEADER: MACHINE
 			"machine@ge95142|RAID::LSI::Megacli@0|::RawDevice@LSI@c0u0pY" -> "machine@ge95142|RAID::LSI::Megacli@0|::State@sdb|::RaidDevice@sdb"
 			"machine@ge95142|RAID::LSI::Megacli@0|::RawDevice@LSI@c0u1p2" -> "machine@ge95142|RAID::LSI::Megacli@0|::State@sda|::RaidDevice@sda"
 			
+			// Links from Libvirt::VM::Block@hda
+			// SOURCE LINK: memtest86+ 1839104 (hda) "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: 1-hera 161061273600 (sda) "machine@ge95142|Libvirt|::VM@1-hera|::Block@sda"
+			// Links from Libvirt::VM::Block@sdc
+			// SOURCE LINK: 1-hera 5497558138880 (sdc) "machine@ge95142|Libvirt|::VM@1-hera|::Block@sdc"
 			// Links for Partition::GPT@sda
 			"machine@ge95142|RAID::LSI::Megacli@0|::State@sda|::RaidDevice@sda" -> "machine@ge95142|Partition::GPT@sda"
 			// Links for Partition::GPT@sda
@@ -363,6 +369,10 @@ digraph "ge95142"{ // HEADER: MACHINE
 			// Links for FS::FS@/boot/efi
 			// Links for FS::AllSWAP@@FS@SWAP
 			// Links for Libvirt Virtual Machines
+			// Links for Libvirt::VM@memtest86+
+			// Links for Libvirt::VM::Block@hda
+			"machine@ge95142|FS|::FS@/" -> "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda"
+			// Links for Libvirt::VM::Block@hda
 			// Links for Libvirt::VM@1-hera
 			// Links for Libvirt::VM::Block@sda
 			"machine@ge95142|LVM::VG@vgdata|::LVs|::LV@kvm-hera-disk1" -> "machine@ge95142|Libvirt|::VM@1-hera|::Block@sda"
@@ -370,10 +380,6 @@ digraph "ge95142"{ // HEADER: MACHINE
 			// Links for Libvirt::VM::Block@sdc
 			"machine@ge95142|LVM::VG@vgdata|::LVs|::LV@kvm-hera-disk2" -> "machine@ge95142|Libvirt|::VM@1-hera|::Block@sdc"
 			// Links for Libvirt::VM::Block@sdc
-			// Links for Libvirt::VM@memtest86+
-			// Links for Libvirt::VM::Block@hda
-			"machine@ge95142|FS|::FS@/" -> "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda"
-			// Links for Libvirt::VM::Block@hda
 		label="ge95142";
 	}
 } // FOOTER: MACHINE

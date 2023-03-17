@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -19,7 +19,7 @@ async sub identity
    my $f1 = Future->done( "result" );
    my $fret = identity( $f1 );
 
-   isa_ok( $fret, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, [ "Future" ], 'identity() returns a Future' );
 
    ok( $fret->is_ready, '$fret is immediate for done scalar' );
    is( scalar $fret->get, "result", '$fret->get for done scalar' );
@@ -30,10 +30,10 @@ async sub identity
    my $f1 = Future->done( list => "goes", "here" );
    my $fret = identity( $f1 );
 
-   isa_ok( $fret, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, [ "Future" ], 'identity() returns a Future' );
 
    ok( $fret->is_ready, '$fret is immediate for done list' );
-   is_deeply( [ $fret->get ], [qw( list goes here )], '$fret->get for done list' );
+   is( [ $fret->get ], [qw( list goes here )], '$fret->get for done list' );
 }
 
 # stack discipline test
@@ -43,9 +43,8 @@ async sub identity
       1, 2, [ 3, await $f1, 6 ], 7, 8
    })->();
 
-   is_deeply( [ $fret->get ],
-              [ 1, 2, [ 3, 4, 5, 6 ], 7, 8 ],
-              'async/await respects stack discipline' );
+   is( [ $fret->get ], [ 1, 2, [ 3, 4, 5, 6 ], 7, 8 ],
+      'async/await respects stack discipline' );
 }
 
 # failure
@@ -53,7 +52,7 @@ async sub identity
    my $f1 = Future->fail( "It failed\n" );
    my $fret = identity( $f1 );
 
-   isa_ok( $fret, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, [ "Future" ], 'identity() returns a Future' );
 
    ok( $fret->is_ready, '$fret is immediate for fail' );
    is( $fret->failure, "It failed\n", '$fret->failure for fail' );

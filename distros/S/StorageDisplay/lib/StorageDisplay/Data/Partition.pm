@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Partition;
 # ABSTRACT: Handle partition tables data for StorageDisplay
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -477,11 +477,19 @@ around BUILDARGS => sub {
     return $class->$orig(
         'name' => $block->name,
         'block' => $block,
-        'consume' => [$block],
+        'provide' => [$block],
         'size' => $st->get_info('lsblk', $block->name, 'size'),
         @_
         );
 };
+
+sub BUILD {
+    my $self = shift;
+
+    #print STDERR "BUILD in ".__PACKAGE__."\n";
+    #print STDERR "Looking for ", $self->id, " into ", $self->table->disk->name, "\n";
+    $self->provideBlock($self->block);
+}
 
 sub dotLabel {
     my $self = shift;
@@ -656,7 +664,7 @@ StorageDisplay::Data::Partition - Handle partition tables data for StorageDispla
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 

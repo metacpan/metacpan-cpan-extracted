@@ -10,14 +10,14 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 our @ISA = qw( Future::_base );
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
 use Time::HiRes qw( gettimeofday );
 
-our @CARP_NOT = qw( Future Future::Utils );
+our @CARP_NOT = qw( Future Future::_base Future::Utils );
 
 use constant DEBUG => !!$ENV{PERL_FUTURE_DEBUG};
 

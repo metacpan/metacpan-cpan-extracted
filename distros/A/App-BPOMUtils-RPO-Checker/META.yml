@@ -19,7 +19,7 @@ name: App-BPOMUtils-RPO-Checker
 provides:
   App::BPOMUtils::RPO::Checker:
     file: lib/App/BPOMUtils/RPO/Checker.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-RPO-Checker
   homepage: https://metacpan.org/release/App-BPOMUtils-RPO-Checker
   repository: git://github.com/perlancar/perl-App-BPOMUtils-RPO-Checker.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

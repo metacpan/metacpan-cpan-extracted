@@ -4,9 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -19,13 +17,13 @@ use Future;
    );
 
    ok( defined $fseq, '$fseq defined' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
 
    $f1->done( results => "here" );
 
-   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
+   is( [ $fseq->result ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
 
    undef $f1;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -44,7 +42,7 @@ use Future;
    );
 
    ok( defined $fseq, '$fseq defined' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
 
@@ -80,7 +78,7 @@ use Future;
          sub { Future->done( default => "handler" ) },
       );
 
-   is_deeply( [ $fseq->result ], [ default => "handler" ],
+   is( [ $fseq->result ], [ default => "handler" ],
       '->catch accepts a default handler' );
 }
 
@@ -99,14 +97,14 @@ use Future;
 
    my $fseq = $f1->catch_with_f(
       test => sub {
-         identical( $_[0], $f1, '$f1 passed to catch code' );
+         ref_is( $_[0], $f1, '$f1 passed to catch code' );
          is( $_[1], "f1 failure\n", '$f1 failure message passed to catch code' );
          Future->done;
       },
    );
 
    ok( defined $fseq, 'defined $fseq' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    $f1->fail( "f1 failure\n", test => );
 
@@ -120,7 +118,7 @@ use Future;
    my $fseq = $f1->then_with_f(
       sub { die "then &done should not be invoked" },
       test => sub {
-         identical( $_[0], $f1, '$f1 passed to catch code' );
+         ref_is( $_[0], $f1, '$f1 passed to catch code' );
          is( $_[1], "f1 failure\n", '$f1 failure message passed to catch code' );
          Future->done;
       }

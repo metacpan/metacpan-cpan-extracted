@@ -9,5 +9,7 @@ cpanfile
 lib/PerlX/ScopeFunction.pm
 t/I_have_these_things.t
 t/imports.t
+t/let-parse-assignments.t
+t/let-rewrite.t
 t/let.t
 t/with.t

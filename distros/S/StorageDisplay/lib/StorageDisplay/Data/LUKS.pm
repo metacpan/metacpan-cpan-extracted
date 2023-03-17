@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::LUKS;
 # ABSTRACT: Handle LUKS data for StorageDisplay
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -246,7 +246,7 @@ StorageDisplay::Data::LUKS - Handle LUKS data for StorageDisplay
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 

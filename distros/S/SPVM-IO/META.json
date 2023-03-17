@@ -34,7 +34,7 @@
          "requires" : {
             "SPVM" : "0.9695",
             "SPVM::Math" : "0.11",
-            "SPVM::Sys" : "0.28"
+            "SPVM::Sys" : "0.43"
          }
       },
       "test" : {
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-IO"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

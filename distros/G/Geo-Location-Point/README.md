@@ -4,7 +4,7 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -12,23 +12,31 @@ Geo::Location::Point stores a place.
 
     use Geo::Location::Point;
 
-    my $location = Geo::Location::Point->new();
+    my $location = Geo::Location::Point->new(latitude => 0.01, longitude => -71);
 
 # SUBROUTINES/METHODS
 
 ## new
 
-    $location = Geo::Location::Point->new();
+    $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
 
 ## lat
 
     print 'Latitude: ', $location->lat(), "\n";
     print 'Longitude: ', $location->long(), "\n";
 
+## latitude
+
+Synonym for lat().
+
 ## long
 
     print 'Latitude: ', $location->lat(), "\n";
     print 'Longitude: ', $location->long(), "\n";
+
+## longitude
+
+Synonym for long().
 
 ## distance
 

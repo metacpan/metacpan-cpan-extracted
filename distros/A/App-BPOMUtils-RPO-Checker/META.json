@@ -64,7 +64,7 @@
    "provides" : {
       "App::BPOMUtils::RPO::Checker" : {
          "file" : "lib/App/BPOMUtils/RPO/Checker.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-RPO-Checker"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

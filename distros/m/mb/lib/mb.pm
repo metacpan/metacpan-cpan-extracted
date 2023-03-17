@@ -7,13 +7,13 @@ package mb;
 #
 # https://metacpan.org/release/mb
 #
-# Copyright (c) 2020, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.52';
+$VERSION = '0.53';
 $VERSION = $VERSION;
 
 # internal use
@@ -112,6 +112,23 @@ sub import {
     # original $0($PROGRAM_NAME) before transpile
     ($mb::ORIG_PROGRAM_NAME = $0) =~ s/\.oo(\.[^.]+)\z/$1/;
     $mb::ORIG_PROGRAM_NAME = $mb::ORIG_PROGRAM_NAME; # to avoid: Name "mb::ORIG_PROGRAM_NAME" used only once: possible typo at ...
+
+    # Sjis software compatible subroutines
+    my $package = {
+        'sjis'      => 'Sjis',
+        'gbk'       => 'GBK',
+        'uhc'       => 'UHC',
+        'big5'      => 'Big5',
+        'big5hkscs' => 'Big5HKSCS',
+        'eucjp'     => 'EUCJP',
+        'gb18030'   => 'GB18030',
+        'rfc2279'   => 'RFC2279',
+        'utf8'      => 'UTF2',
+        'wtf8'      => 'WTF8',
+    }->{mb::get_script_encoding()};
+    for my $subroutine (qw( chop chr do dosglob eval getc index index_byte lc lcfirst length ord require reverse rindex rindex_byte split substr tr uc ucfirst )) {
+        *{$package."::$subroutine"} = \&{"mb::$subroutine"};
+    }
 }
 
 #---------------------------------------------------------------------
@@ -5382,6 +5399,7 @@ To install this software without make, type the following:
 
 =head1 DESCRIPTION
 
+mb.pm modulino is a solution that can run your Perl script written in MBCS encoding.
 This software is a source code filter, a transpiler-modulino.
 
 Perl is said to have been able to handle Unicode since version 5.8.
@@ -5405,6 +5423,19 @@ There are some MBCS encodings in the world.
 
 These encodings are still used today in most areas except the world wide web.
 Even if you are an avid Unicode proponent, you cannot change this fact.
+These encodings will be used for the following reasons:
+
+=over 2
+
+=item * To maintain round-trip compatibility in reading and appending data (included offline data).
+
+=item * To maintain sorting order of strings.
+
+=item * Can create screens (and forms) easy, since octet size of memory matches width of display (and printing).
+
+=item * Size of character set is best for human brain and easy to use.
+
+=back
 
 In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932) have any DAMEMOJI who have metacharacters at second octet.
 And in Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932 and UHC have many CHANTOSHITAMOJI who have alphabets at second octet.
@@ -6058,6 +6089,39 @@ Instead of this
 
   $^X
   $0
+
+=head1 Porting from script with Sjis software
+
+The source of this software is the Sjis software family.
+mb.pm modulino also supports scripts written using those software.
+
+  script encoding and subroutines
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  always
+  supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf2               wtf8
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  mb::chop         Big5::chop         Big5HKSCS::chop         EUCJP::chop         GB18030::chop         GBK::chop         RFC2279::chop         Sjis::chop         UHC::chop         UTF2::chop         WTF8::chop
+  mb::chr          Big5::chr          Big5HKSCS::chr          EUCJP::chr          GB18030::chr          GBK::chr          RFC2279::chr          Sjis::chr          UHC::chr          UTF2::chr          WTF8::chr
+  mb::do           Big5::do           Big5HKSCS::do           EUCJP::do           GB18030::do           GBK::do           RFC2279::do           Sjis::do           UHC::do           UTF2::do           WTF8::do
+  mb::dosglob      Big5::dosglob      Big5HKSCS::dosglob      EUCJP::dosglob      GB18030::dosglob      GBK::dosglob      RFC2279::dosglob      Sjis::dosglob      UHC::dosglob      UTF2::dosglob      WTF8::dosglob
+  mb::eval         Big5::eval         Big5HKSCS::eval         EUCJP::eval         GB18030::eval         GBK::eval         RFC2279::eval         Sjis::eval         UHC::eval         UTF2::eval         WTF8::eval
+  mb::getc         Big5::getc         Big5HKSCS::getc         EUCJP::getc         GB18030::getc         GBK::getc         RFC2279::getc         Sjis::getc         UHC::getc         UTF2::getc         WTF8::getc
+  mb::index        Big5::index        Big5HKSCS::index        EUCJP::index        GB18030::index        GBK::index        RFC2279::index        Sjis::index        UHC::index        UTF2::index        WTF8::index
+  mb::index_byte   Big5::index_byte   Big5HKSCS::index_byte   EUCJP::index_byte   GB18030::index_byte   GBK::index_byte   RFC2279::index_byte   Sjis::index_byte   UHC::index_byte   UTF2::index_byte   WTF8::index_byte
+  mb::lc           Big5::lc           Big5HKSCS::lc           EUCJP::lc           GB18030::lc           GBK::lc           RFC2279::lc           Sjis::lc           UHC::lc           UTF2::lc           WTF8::lc
+  mb::lcfirst      Big5::lcfirst      Big5HKSCS::lcfirst      EUCJP::lcfirst      GB18030::lcfirst      GBK::lcfirst      RFC2279::lcfirst      Sjis::lcfirst      UHC::lcfirst      UTF2::lcfirst      WTF8::lcfirst
+  mb::length       Big5::length       Big5HKSCS::length       EUCJP::length       GB18030::length       GBK::length       RFC2279::length       Sjis::length       UHC::length       UTF2::length       WTF8::length
+  mb::ord          Big5::ord          Big5HKSCS::ord          EUCJP::ord          GB18030::ord          GBK::ord          RFC2279::ord          Sjis::ord          UHC::ord          UTF2::ord          WTF8::ord
+  mb::require      Big5::require      Big5HKSCS::require      EUCJP::require      GB18030::require      GBK::require      RFC2279::require      Sjis::require      UHC::require      UTF2::require      WTF8::require
+  mb::reverse      Big5::reverse      Big5HKSCS::reverse      EUCJP::reverse      GB18030::reverse      GBK::reverse      RFC2279::reverse      Sjis::reverse      UHC::reverse      UTF2::reverse      WTF8::reverse
+  mb::rindex       Big5::rindex       Big5HKSCS::rindex       EUCJP::rindex       GB18030::rindex       GBK::rindex       RFC2279::rindex       Sjis::rindex       UHC::rindex       UTF2::rindex       WTF8::rindex
+  mb::rindex_byte  Big5::rindex_byte  Big5HKSCS::rindex_byte  EUCJP::rindex_byte  GB18030::rindex_byte  GBK::rindex_byte  RFC2279::rindex_byte  Sjis::rindex_byte  UHC::rindex_byte  UTF2::rindex_byte  WTF8::rindex_byte
+  mb::split        Big5::split        Big5HKSCS::split        EUCJP::split        GB18030::split        GBK::split        RFC2279::split        Sjis::split        UHC::split        UTF2::split        WTF8::split
+  mb::substr       Big5::substr       Big5HKSCS::substr       EUCJP::substr       GB18030::substr       GBK::substr       RFC2279::substr       Sjis::substr       UHC::substr       UTF2::substr       WTF8::substr
+  mb::tr           Big5::tr           Big5HKSCS::tr           EUCJP::tr           GB18030::tr           GBK::tr           RFC2279::tr           Sjis::tr           UHC::tr           UTF2::tr           WTF8::tr
+  mb::uc           Big5::uc           Big5HKSCS::uc           EUCJP::uc           GB18030::uc           GBK::uc           RFC2279::uc           Sjis::uc           UHC::uc           UTF2::uc           WTF8::uc
+  mb::ucfirst      Big5::ucfirst      Big5HKSCS::ucfirst      EUCJP::ucfirst      GB18030::ucfirst      GBK::ucfirst      RFC2279::ucfirst      Sjis::ucfirst      UHC::ucfirst      UTF2::ucfirst      WTF8::ucfirst
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 =head1 Syntax Sugar of mb.pm modulino
 
@@ -8049,6 +8113,53 @@ We can use each advantages using following hints.
 =item * have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
 
 =back
+
+=head1 GIVE US BUG REPORT
+
+I have tested and verified this software using the best of my ability.
+However, this software containing much regular expression is bound to contain some bugs.
+Thus, if you happen to find a bug that's in this software and not your own program, you can try to reduce it to a minimal test case and then report it to author's address.
+If you have an idea that could make this a more useful tool, please let share it.
+
+=head1 From 1998 To You
+
+JPerl is very useful software.
+The last version of JPerl is 5.005_04 still today.
+
+Once WATANABE Hirofumi-san who maintained JPerl said,
+
+  "Because WATANABE am tired I give over maintaing JPerl."
+
+at Slide #15: "The future of JPerl" of
+
+L<ftp://ftp.oreilly.co.jp/pcjp98/watanabe/jperlconf.ppt>
+
+in The Perl Confernce Japan 1998.
+
+When I heard it, I thought that someone (excluding me!) would maintain JPerl.
+And I slept every night hanging a sock.
+Night and day, I kept having hope.
+After 10 years, I noticed that white beard exists in the sock :-)
+
+On April 1st, 2008, I released a new version of JPerl, named Sjis software.
+Sjis is implemented in two files, Sjis.pm and Esjis.pm.
+
+A few years later, my boss saw it and said it would be better to have made in single file.
+So Char software was born.
+However, Char software makes Sjis.pm and Esjis.pm at runtime.
+This meant that there would be three files (Char.pm, Sjis.pm, and Esjis.pm) on disk.
+This was a very bad design.
+
+A few years later again, I made UTF8::R2 module for Perl beginners.
+I also made IOas::* modules.
+
+But within a few months, Perl beginner gone far.
+
+So I decided to make a new Sjis software, in a (really!) single file, by single author.
+
+This is a short story of the beginnings of mb.pm modulino.
+
+--- Time flies.
 
 =head1 AUTHOR
 

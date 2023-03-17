@@ -531,20 +531,4 @@ class Sys {
   static method sleep : int ($seconds : int) {
     return Sys::Process->sleep($seconds) == 0;
   }
-  
-  # Temporary restored
-  static method getenv : string ($name : string) {
-    return Sys::Env->getenv($name);
-  }
-  # Temporary restored
-  static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double) {
-    my $items = items;
-    
-    if ($items > 1) {
-      return Sys::OS->defined($macro_name, $value);
-    }
-    else {
-      return Sys::OS->defined($macro_name);
-    }
-  }
 }

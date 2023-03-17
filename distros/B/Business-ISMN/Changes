@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISMN
 
+1.203 2023-03-16T11:10:05Z
+	* Fix ean_to_ismn, which was not adding the M to the start.
+
 1.202 2021-02-16T12:43:17Z
 	* Freshen distro, add Github Actions
 

@@ -2,7 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -16,7 +16,7 @@ use Future;
 
    $f1->done( 1, 2, 3 );
 
-   is_deeply( [ $future->result ], [ result => 1, 2, 3 ], '->transform result' );
+   is( [ $future->result ], [ result => 1, 2, 3 ], '->transform result' );
 }
 
 # Failure transformation
@@ -29,7 +29,7 @@ use Future;
 
    $f1->fail( "something failed\n" );
 
-   is_deeply( [ $future->failure ], [ "failure\n" => "something failed\n" ], '->transform failure' );
+   is( [ $future->failure ], [ "failure\n" => "something failed\n" ], '->transform failure' );
 }
 
 # code dies
@@ -42,7 +42,7 @@ use Future;
 
    $f1->done;
 
-   is_deeply( [ $future->failure ], [ "It fails\n" ], '->transform catches exceptions' );
+   is( [ $future->failure ], [ "It fails\n" ], '->transform catches exceptions' );
 }
 
 # Cancellation

@@ -4,8 +4,9 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+# By default Test2::V0 will want to export a 'call' but that will clash with
+# the one we want out of Future::Utils
+use Test2::V0 qw( :DEFAULT !call );
 
 use Future;
 use Future::Utils qw( call );
@@ -17,7 +18,7 @@ use Future::Utils qw( call );
       return $ret_f = Future->new;
    };
 
-   identical( $f, $ret_f, 'call() returns future returned from its code' );
+   ref_is( $f, $ret_f, 'call() returns future returned from its code' );
    $f->cancel;
 }
 

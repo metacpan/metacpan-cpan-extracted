@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 use Future::Utils qw( repeat try_repeat try_repeat_until_success );
@@ -62,13 +62,13 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    my $future = repeat { die "Not invoked" } foreach => [];
 
    ok( $future->is_ready, 'repeat {} on empty foreach without otherwise already ready' );
-   is_deeply( [ $future->result ], [], 'Result of empty future' );
+   is( [ $future->result ], [], 'Result of empty future' );
 
    $future = repeat { die "Not invoked" } foreach => [],
       otherwise => sub { Future->done( 1, 2, 3 ) };
 
    ok( $future->is_ready, 'repeat {} on empty foreach with otherwise already ready' );
-   is_deeply( [ $future->result ], [ 1, 2, 3 ], 'Result of otherwise future' );
+   is( [ $future->result ], [ 1, 2, 3 ], 'Result of otherwise future' );
 }
 
 # foreach while

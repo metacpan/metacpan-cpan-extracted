@@ -10,12 +10,11 @@ use strict;
 use warnings;
 
 package StorageDisplay::Collect;
-# ABSTRACT: modules required to collect data. No dependencies (but perl itself)
+# ABSTRACT: modules required to collect data.
+# No dependencies (but perl itself and its basic modules)
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
-
-use Storable;
 
 sub collectors {
     my $self = shift;
@@ -190,6 +189,116 @@ sub collect {
     }
 
     return $self->cmdreader->data_finish($infos);
+}
+
+1;
+
+###########################################################################
+package StorageDisplay::Collect::JSON;
+
+BEGIN {
+    # Mark current package as loaded;
+    # else, we cannot use 'use StorageDisplay::Collect::JSON;' latter
+    my $p = __PACKAGE__;
+    $p =~ s,::,/,g;
+    chomp(my $cwd = `pwd`);
+    $INC{$p.'.pm'} = $cwd.'/'.__FILE__;#k"current file";
+}
+
+# This package contains
+# - two public subroutines
+#   - `use_pp_parser` to know if JSON:PP makes all the work alone
+#   - `decode_json` to decode a json text with the $json_parser object
+# - a public `new` class method that returns
+#   - a plain JSON::PP object (if boolean_values method exists)
+#   - a __PACKAGE__ object (if not) that inherit from JSON::PP
+# - an overrided `decode` method that
+#   - calls SUPER::decode
+#   - manually transforms JSON:::PP::Boolean into plain scalar
+# $json_parser is
+# - either a JSON::PP object (if boolean_values method exists)
+# - or a StorageDisplay::Collect::JSON that inherit of JSON::PP
+#   but override the decode method
+
+use base 'JSON::PP';
+
+my $has_boolean_values;
+
+sub new {
+    my $class = shift;
+    my $json_pp_parser;
+    if (!defined($has_boolean_values)) {
+	$json_pp_parser = JSON::PP->new;
+	$has_boolean_values = 0;
+	eval {
+	    # workaround if not supported
+	    $json_pp_parser->boolean_values(0, 1);
+	    $has_boolean_values = 1;
+	};
+    }
+    my $parser;
+    if ($has_boolean_values) {
+	$parser = JSON::PP->new(@_);
+	$parser->boolean_values(0, 1);
+    } else {
+	$parser = JSON::PP::new(__PACKAGE__, @_);
+    }
+    eval {
+	# ignore if not supported
+        $parser->allow_bignum;
+    };
+    return $parser;
+}
+
+sub decode {
+    my $self = shift;
+
+    my $data = $self->SUPER::decode(@_);
+
+    my %unrecognized;
+
+    local *_convert_bools = sub {
+        my $ref_type = ref($_[0]);
+        if (!$ref_type) {
+            # Nothing.
+        }
+        elsif ($ref_type eq 'HASH') {
+            _convert_bools($_) for values(%{ $_[0] });
+        }
+        elsif ($ref_type eq 'ARRAY') {
+            _convert_bools($_) for @{ $_[0] };
+        }
+        elsif (
+               $ref_type eq 'JSON::PP::Boolean'           # JSON::PP
+            || $ref_type eq 'Types::Serialiser::Boolean'  # JSON::XS
+        ) {
+            $_[0] = $_[0] ? 1 : 0;
+        }
+        else {
+            ++$unrecognized{$ref_type};
+        }
+    };
+
+    &_convert_bools($data);
+
+    warn("Encountered an object of unrecognized type $_")
+        for sort values(%unrecognized);
+
+    return $data;
+}
+
+my $json_parser;
+
+sub decode_json {
+    if (not defined($json_parser)) {
+	$json_parser = __PACKAGE__->new();
+    }
+
+    $json_parser->decode(@_);
+}
+
+sub use_pp_parser {
+    return $has_boolean_values;
 }
 
 1;
@@ -573,21 +682,15 @@ use is_collector
         progs => [ 'lsblk', 'udevadm' ],
 };
 
-use JSON::PP;
+use StorageDisplay::Collect::JSON;
 
 sub lsblkjson2perl {
     my $self = shift;
     my $json = shift;
-    my $jsonparser = JSON::PP->new;
-    eval {
-        $jsonparser->allow_bignum;
-    };
-    eval {
-        $jsonparser->boolean_values([0, 1]);
-    };
     my $info = {
         map { $_->{kname} => $_ }
-            (@{$jsonparser->decode($json)->{"blockdevices"}})
+	(@{StorageDisplay::Collect::JSON::decode_json($json)
+	       ->{"blockdevices"}})
     };
     return $info;
 }
@@ -890,7 +993,7 @@ use is_collector
         root => 1,
 };
 
-use JSON::PP;
+use StorageDisplay::Collect::JSON;
 
 sub lvmjson2perl {
     my $self = shift;
@@ -900,14 +1003,8 @@ sub lvmjson2perl {
     my $keys = shift;
     my $info = shift // {};
     my $json = shift;
-    my $jsonparser = JSON::PP->new;
-    eval {
-        $jsonparser->allow_bignum;
-    };
-    eval {
-        $jsonparser->boolean_values([0, 1]);
-    };
-    my $alldata = $jsonparser->decode($json)->{'report'}->[0]->{$kind};
+    my $alldata = StorageDisplay::Collect::JSON::decode_json($json)
+	->{'report'}->[0]->{$kind};
     foreach my $data (@$alldata) {
         my $vg=$data->{vg_name} // die "no vg_name in data!";
         my $base = $info->{$vg}->{$kstore};
@@ -1693,9 +1790,12 @@ sub collect {
 		    my $size = <$dh2>;
 		    chomp($size);
 		    close $dh2;
-		    $v->{'blocks'}->{$info[3]}->{'file-size'}=$size;
+		    $v->{'blocks'}->{$info[3]}->{'size'}=$size;
 		}
-            }
+            } elsif ($info[0] eq 'block') {
+	    } else {
+		print STDERR "W: unknown VM device type: $info[0]\n";
+	    }
         }
         close $dh;
 	if ($v->{state}//'' eq 'running') {
@@ -1775,15 +1875,18 @@ __END__
 
 =head1 NAME
 
-StorageDisplay::Collect - modules required to collect data. No dependencies (but perl itself)
+StorageDisplay::Collect - modules required to collect data.
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 Main class, allows one to register collectors and run them (through the collect method)
 
 Collectors will be registered when their class is loaded
+
+Wrapper around JSON:PP as old versions do not support the
+boolean_value method.
 
 Base (abstract) class to run command to collect infos
 

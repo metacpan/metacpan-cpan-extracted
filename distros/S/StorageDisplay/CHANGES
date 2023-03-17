@@ -1,10 +1,88 @@
 ==================================================
-Changes from 2022-03-09 00:00:00 +0000 to present.
+Changes from 2022-03-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.1.0 at 2023-03-09 23:33:55 +0000
+version 1.2.1 at 2023-03-16 23:02:58 +0000
 ------------------------------------------
+
+  Change: 49b7665194b95a922524a2988e7d86f2edd02da6
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-17 00:02:48 +0000
+
+    New release 
+
+  Change: a1e53ab8733e4ea7d5929f03f854cfbe022acb81
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-17 00:02:24 +0000
+
+    Update ref data 
+
+  Change: f56c1176ceea4f67fd15939d0308908d37100007
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-17 00:01:32 +0000
+
+    Fix LVM VG name 
+
+  Change: ba8a5877de728b292838e3e017e5fd765e854b28
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 23:56:35 +0000
+
+    v1.2.0: dotfiles merging available 
+
+  Change: bd32d3c943183d358ab75ef923c4c15623d3df44
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 23:54:16 +0000
+
+    Update test references 
+
+  Change: 96007d9a0811f66d41ee9accf526d9a190269999
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 23:51:28 +0000
+
+    Add support for merging dotfiles of Host and VMs 
+
+  Change: 0afee950b444ff24b7311940087768f1caaec621
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 20:01:24 +0000
+
+    Fix code and test about JSON::PP::Boolean 
+
+  Change: 7823e0ffa6ac7b6a59da8ccd4394410fa8001296
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 16:34:23 +0000
+
+    New release 
+
+  Change: 1c49e58966932905bd9bf886298ed8d3492876f5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 16:34:23 +0000
+
+    Update test data 
+
+  Change: 299a419673663dd948e6667c3c00069ae9bdf69b
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 15:36:23 +0000
+
+    Fix JSON handling and add a test
+
+    boolean_values is not available in old implementation. Providing a
+    workaround. 
+
+  Change: 45240dcbb97b931f931137685c3d24b60ca77786
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 12:24:10 +0000
+
+    Fix provided blocks for disks with no partitions
+
+    Even if they are provided (by themselves), they have to be taken into
+    account when creating LINKs for VM 
+
+  Change: ea533cd2fc73b57eafc4eeb61b85495f9dd13ed5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-16 12:20:50 +0000
+
+    Fix LVM VG names 
 
   Change: a6b857079ff3527bc4ff3edc8c2fb76c47ff2896
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

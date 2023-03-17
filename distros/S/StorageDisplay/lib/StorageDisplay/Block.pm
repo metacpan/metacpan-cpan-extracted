@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Block;
 # ABSTRACT: Base package for block devices DAG
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 1;
 
@@ -214,7 +214,6 @@ around BUILDARGS => sub {
 package StorageDisplay::Block::System;
 use Moose;
 use namespace::sweep;
-use JSON::MaybeXS qw(decode_json);
 
 extends 'StorageDisplay::Block';
 
@@ -306,7 +305,7 @@ StorageDisplay::Block - Base package for block devices DAG
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 

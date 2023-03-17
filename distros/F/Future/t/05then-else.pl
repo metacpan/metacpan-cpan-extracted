@@ -2,9 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Identity;
-use Test::Fatal;
+use Test2::V0;
 
 use Future;
 
@@ -30,7 +28,7 @@ use Future;
    $fdone->done( results => "here" );
 
    ok( $fseq->is_ready, '$fseq is done after $fdone done' );
-   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
+   is( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 }
 
 # then fail
@@ -55,7 +53,7 @@ use Future;
    $ffail->done( fallback => "result" );
 
    ok( $fseq->is_ready, '$fseq is done after $ffail fail' );
-   is_deeply( [ $fseq->result ], [ fallback => "result" ], '$fseq->result returns results' );
+   is( [ $fseq->result ], [ fallback => "result" ], '$fseq->result returns results' );
 }
 
 # then done fails doesn't trigger fail block
@@ -85,7 +83,7 @@ use Future;
 
    my $fseq = $f1->then_with_f(
       sub {
-         identical( $_[0], $f1, 'then_with_f done block passed $f1' );
+         ref_is( $_[0], $f1, 'then_with_f done block passed $f1' );
          is( $_[1], "f1 result", 'then_with_f done block passed result of $f1' );
          Future->done;
       },

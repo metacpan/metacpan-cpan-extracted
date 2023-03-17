@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN { plan skip_all => "This test requires perl 5.35.5" unless $] >= 5.035005 }
 
 use experimental 'for_list';
@@ -34,7 +34,7 @@ use Future::AsyncAwait;
    $idxF[5]->done;
 
    is( scalar $fret->get, "end foreach", '$fret now ready after foreach(ARRAY) loop' );
-   is_deeply( \@result, \@idxF, '@result after foreach(ARRAY) loop' );
+   is( \@result, \@idxF, '@result after foreach(ARRAY) loop' );
 }
 
 # foreach(LIST) await
@@ -59,7 +59,7 @@ use Future::AsyncAwait;
    $F[2]->done;
 
    is( scalar $fret->get, "end foreach", '$fret now ready after foreach(LIST) loop' );
-   is_deeply( \@result, [ 0 => $F[0], 1, => $F[1], 2 => $F[2] ], '@result after foreach(LIST) loop' );
+   is( \@result, [ 0 => $F[0], 1, => $F[1], 2 => $F[2] ], '@result after foreach(LIST) loop' );
 }
 
 done_testing;

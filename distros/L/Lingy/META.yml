@@ -1,12 +1,12 @@
 ---
-abstract: 'A Language of Languages'
+abstract: 'An Acmeist Lisp for Perl'
 author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,16 +14,21 @@ meta-spec:
 name: Lingy
 no_index:
   directory:
+    - example
     - inc
     - t
     - xt
-    - example
 requires:
-  Pegex: '0'
-  YAML::XS: '0'
-  perl: v5.8.1
+  Tie::IxHash: '0'
+  XXX: '0'
+  YAML::PP: '0'
+  YAMLTest: '0'
+  perl: v5.12.0
 resources:
-  bugtracker: https://github.com/ingydotnet/lingy-pm/issues
-  homepage: https://github.com/ingydotnet/lingy-pm
-  repository: https://github.com/ingydotnet/lingy-pm.git
-version: 0.0.3
+  bugtracker: https://github.com/ingydotnet/lingy/issues
+  homepage: https://github.com/ingydotnet/lingy
+  repository: https://github.com/ingydotnet/lingy.git
+version: 0.1.0
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

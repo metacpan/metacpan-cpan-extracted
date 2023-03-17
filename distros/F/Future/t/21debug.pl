@@ -2,7 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Time::HiRes qw( gettimeofday tv_interval );
 
@@ -19,7 +19,7 @@ $FILE = qr/\Q$FILE\E/;
 my $LINE;
 my $LOSTLINE;
 
-sub warnings(&)
+sub warnings_from(&)
 {
    my $code = shift;
    my $warnings = "";
@@ -28,17 +28,17 @@ sub warnings(&)
    $LOSTLINE = __LINE__; return $warnings;
 }
 
-is( warnings {
+is( warnings_from {
       my $f = Future->new;
       $f->done;
    }, "", 'Completed Future does not give warning' );
 
-is( warnings {
+is( warnings_from {
       my $f = Future->new;
       $f->cancel;
    }, "", 'Cancelled Future does not give warning' );
 
-like( warnings {
+like( warnings_from {
       $LINE = __LINE__; my $f = Future->new;
       undef $f;
    },
@@ -47,7 +47,7 @@ like( warnings {
 
 my $THENLINE;
 my $SEQLINE;
-like( warnings {
+like( warnings_from {
       $LINE = __LINE__; my $f1 = Future->new;
       $THENLINE = __LINE__; my $fseq = $f1->then( sub { } ); undef $fseq;
       $SEQLINE = __LINE__; $f1->done;
@@ -56,7 +56,7 @@ like( warnings {
 Future=\S+ \(constructed at $FILE line $LINE\) lost a sequence Future at $FILE line $SEQLINE\.?$/,
    'Lost sequence Future raises warning' );
 
-like( warnings {
+like( warnings_from {
       $LINE = __LINE__; my $f = Future->fail("Failed!");
       undef $f;
    },

@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-16'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_rpo_check_label_files_design
@@ -120,11 +120,15 @@ sub bpom_rpo_check_files {
             if ($mime_type eq 'image/jpeg') {
                 push @errors, {file=>$filename, message=>"File type is JPEG but extension is not jpg/jpeg"}
                     unless $filename =~ /\.(jpe?g)$/i;
+            } elsif ($mime_type eq 'image/gif') {
+                push @errors, {file=>$filename, message=>"File type is GIF but extension is not gif"}
+            } elsif ($mime_type eq 'image/x-ms-bmp') {
+                push @errors, {file=>$filename, message=>"File type is BMP but extension is not bmp"}
+                    unless $filename =~ /\.(bmp)$/i;
             } elsif ($mime_type eq 'application/pdf') {
                 push @errors, {file=>$filename, message=>"File type is PDF but extension is not pdf"}
-                    unless $filename =~ /\.(pdf)$/i;
             } else {
-                push @errors, {file=>$filename, message=>"File type is not JPEG or PDF"};
+                push @errors, {file=>$filename, message=>"File type is not JPEG/GIF/BMP/PDF"};
             }
 
         } # CHECK_TYPE_AND_EXTENSION
@@ -155,6 +159,7 @@ _
     },
 };
 sub bpom_rpo_check_files_label_design {
+    require File::Basename;
     require File::MimeInfo::Magic;
     require Image::Size;
 
@@ -174,19 +179,14 @@ sub bpom_rpo_check_files_label_design {
     for my $filename (@{ $args{filenames} }) {
         $i++;
         log_info "[%d/%d] Processing file %s ...", $i, scalar(@{ $args{filenames} }), $filename;
+        my ($basename, $dirname, undef) = File::Basename::fileparse($filename);
         unless (-f $filename) {
             push @errors, {file=>$filename, message=>"File not found or not a regular file"};
             next;
         }
 
-        unless ($filename =~ /\.jpe?g\z/i) {
+        unless ($basename =~ /\.jpe?g\z/i) {
             push @errors, {file=>$filename, message=>"Filename does not end in .JPG or .JPEG"};
-        }
-        if ($filename =~ /\.[^.]+\./) {
-            push @errors, {file=>$filename, message=>"Filename contains multiple dots, currently uploadable but not viewable in ereg-rba"};
-        }
-        if ($filename =~ /[^A-Za-z0-9 _.-]/) {
-            push @warnings, {file=>$filename, message=>"Filename contains symbols, should be avoided to ensure viewable in ereg-rba"};
         }
         next unless -r $filename;
 
@@ -229,7 +229,7 @@ App::BPOMUtils::RPO::Checker - Various checker utilities to help with Processed 
 
 =head1 VERSION
 
-This document describes version 0.009 of App::BPOMUtils::RPO::Checker (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-10.
+This document describes version 0.010 of App::BPOMUtils::RPO::Checker (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-16.
 
 =head1 SYNOPSIS
 

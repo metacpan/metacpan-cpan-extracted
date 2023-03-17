@@ -11,8 +11,6 @@ lib/SPVM/File/Basename.pm
 lib/SPVM/File/Basename.spvm
 lib/SPVM/File/Basename/Instance.pm
 lib/SPVM/File/Basename/Instance.spvm
-lib/SPVM/File/Basename/Instance/Interface.pm
-lib/SPVM/File/Basename/Instance/Interface.spvm
 lib/SPVM/File/Basename/Instance/Unix.pm
 lib/SPVM/File/Basename/Instance/Unix.spvm
 lib/SPVM/File/Basename/Instance/Win32.pm

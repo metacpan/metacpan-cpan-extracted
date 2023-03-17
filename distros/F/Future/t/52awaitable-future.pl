@@ -2,7 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 eval { require Test::Future::AsyncAwait::Awaitable } or
    plan skip_all => "No Test::Future::AsyncAwait::Awaitable";

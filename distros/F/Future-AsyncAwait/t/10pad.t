@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -91,7 +91,7 @@ use List::Util qw( sum );
    $f1->done;
    $f2->done;
 
-   is_deeply( [ $fret->get ], [ "outerXX", "outerXX" ],
+   is( [ $fret->get ], [ "outerXX", "outerXX" ],
       '$fret now ready after done for closure'
    );
 }

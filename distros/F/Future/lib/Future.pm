@@ -10,7 +10,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 # we are not overloaded, but we want to check if other objects are
 require overload;
@@ -1224,6 +1224,8 @@ instead provided for authors of classes that subclass from C<Future> itself.
 
    $future = $future->set_udata( $name, $value )
 
+I<Since version 0.49>
+
 Stores a Perl value within the instance, under the given name. Subclasses can
 use this to store extra data that the implementation may require.
 
@@ -1234,7 +1236,9 @@ a hash reference.
 
 =head2 udata
 
-   $value = $future->get_udata( $name )
+   $value = $future->udata( $name )
+
+I<Since version 0.49>
 
 Returns a Perl value from the instance that was previously set with
 L</set_udata>.

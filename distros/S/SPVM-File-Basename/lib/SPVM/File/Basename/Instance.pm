@@ -43,14 +43,6 @@ This class parses a file path into a directory and a base name.
     my $dir_name = $fb->dirname($path);
   }
 
-=head1 Interfaces
-
-=over 2
-
-=item * L<File::Basename::Instance::Interface|SPVM::File::Basename::Instance::Interface>
-
-=back
-
 =head1 Class Methods
 
 =head2 new
@@ -70,12 +62,6 @@ This class parses a file path into a directory and a base name.
 =head2 dirname
 
   method dirname : string ($path : string);
-
-=head2 has_interfaces
-
-  method has_interfaces : int ();
-
-Returns C<1>.
 
 =head1 Well Known Child Classes
 

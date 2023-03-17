@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 $^V ge v5.24.0 or
    plan skip_all => "This test requires perl 5.24.0";

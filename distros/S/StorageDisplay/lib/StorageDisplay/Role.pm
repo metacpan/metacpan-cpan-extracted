@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Role;
 # ABSTRACT: Load all roles used in StorageDisplay
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 1;
 
@@ -918,13 +918,18 @@ sub dotStyle {
         );
 };
 
+sub sizeLabel {
+    my $self = shift;
+    return ("Size: ".$self->disp_size($self->size));
+}
+
 around '_dotDefaultFullLabel' => sub {
     my $orig  = shift;
     my $self = shift;
 
     return (
         $self->$orig(@_),
-        "Size: ".$self->disp_size($self->size),
+	$self->sizeLabel(),
         );
 };
 
@@ -1116,7 +1121,7 @@ StorageDisplay::Role - Load all roles used in StorageDisplay
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 

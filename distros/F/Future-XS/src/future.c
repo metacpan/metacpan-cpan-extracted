@@ -981,10 +981,38 @@ AV *Future_get_result_av(pTHX_ SV *f, bool await)
       LEAVE;
     }
 
-    if(!SvROK(exception) && SvPV_nolen(exception)[SvCUR(exception)-1] == '\n')
+    if(SvROK(exception) || SvPV_nolen(exception)[SvCUR(exception)-1] == '\n')
       die_sv(exception);
-    else
-      croak_sv(exception);
+    else {
+      /* We'd like to call Carp::croak to do the @CARP_NOT logic, but it gets
+       * confused about a missing callframe first because this is XS. We'll
+       * reïmplement the logic here
+       */
+      I32 cxix;
+      for(cxix = cxstack_ix; cxix; cxix--) {
+        if(CxTYPE(&cxstack[cxix]) != CXt_SUB)
+          continue;
+
+        const CV *cv = cxstack[cxix].blk_sub.cv;
+        if(!cv)
+          continue;
+
+        const char *stashname = HvNAME(CvSTASH(cv));
+        if(!stashname)
+          continue;
+
+        // The essence of the @CARP_NOT logic
+        if(strEQ(stashname, "Future::_base"))
+          continue;
+
+        const COP *cop = cxix < cxstack_ix ? cxstack[cxix+1].blk_oldcop : PL_curcop;
+
+        sv_catpvf(exception, " at %s line %d.\n", CopFILE(cop), CopLINE(cop));
+        break;
+      }
+
+      die_sv(exception);
+    }
   }
 
   if(self->cancelled)

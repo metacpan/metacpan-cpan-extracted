@@ -1,5 +1,11 @@
 Revision history for WebService-IdoitAPI
 
+v0.2.0 Thu Mar 16 12:15:18 CET 2023
+	- add CLI options '--json' and '--pretty' to bin/idoit-reports
+	- WebService::IdoitAPI::read_config() tries to find a config file
+	  automatically if none is given
+	- add CLI option '--csv' to bin/idoit-reports
+
 v0.1.3 Sun Feb 19 10:47:42 CET 2023
 	- t/02-connection.t seems to work only with perl >= 5.14
 

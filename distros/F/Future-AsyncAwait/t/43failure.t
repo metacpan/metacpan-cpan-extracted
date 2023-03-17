@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 
@@ -22,7 +22,7 @@ async sub identity
 
    ok( $fret->is_failed, '$fret failed after die in async' );
    is( ref $fret->failure, "TestException", 'die in async preserves object' );
-   is_deeply( [ @{ $fret->failure } ], [qw( a b c )],
+   is( [ @{ $fret->failure } ], [qw( a b c )],
       'die in async preserves object contents' );
 }
 
@@ -36,7 +36,7 @@ async sub identity
    $f1->fail( bless [qw( d e f )], "TestException" );
 
    is( ref $fret->get, "TestException", 'await failure preserves object' );
-   is_deeply( [ @{ $fret->get } ], [qw( d e f )],
+   is( [ @{ $fret->get } ], [qw( d e f )],
       'await failure preserves object contents' );
 }
 
@@ -49,7 +49,7 @@ async sub identity
 
    ok( $fret->is_failed, '$fret failed after die in async/await' );
    is( ref $fret->failure, "TestException", 'die in async/await preserves object' );
-   is_deeply( [ @{ $fret->failure } ], [qw( g h i )],
+   is( [ @{ $fret->failure } ], [qw( g h i )],
       'die in async/await preserves object contents' );
 }
 
@@ -61,8 +61,7 @@ SKIP: {
 
    $f1->fail( "message\n", category => qw( details here ) );
    ok( $fret->is_failed, '$fret failed after ->fail' );
-   is_deeply( [ $fret->failure ],
-      [ "message\n", category => qw( details here ) ],
+   is( [ $fret->failure ], [ "message\n", category => qw( details here ) ],
       '$fret->failure after ->fail' );
 }
 

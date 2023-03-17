@@ -34,7 +34,7 @@
          "requires" : {
             "SPVM" : "0.9695",
             "SPVM::Regex" : "0.18",
-            "SPVM::Sys" : "0.36"
+            "SPVM::Sys" : "0.43"
          }
       },
       "test" : {
@@ -47,6 +47,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

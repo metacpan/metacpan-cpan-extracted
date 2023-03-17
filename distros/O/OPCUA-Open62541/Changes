@@ -1,425 +1,430 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+2.01 2023-03-17
+  - Update ppport.h to Version 3.68 which comes with Perl v5.36.0.
+  - OPCUA::Open62541::Test::CA creates certificates that are
+    better suited for OPC UA verfication.
+
 2.00 2023-02-10
-    - Use methods ServerConfig::setDefaultWithSecurityPolicies()
-      and ClientConfig::setDefaultEncryption() to activate encryption
-      and optionally verfication on both sides respectively.
-    - Module OPCUA::Open62541::Test::CA is used to create private
-      key, certificate, CA and CRL for testing OPC UA encryption.
-    - Implement methods to get and set client and server description
-      in open62541 config.
-    - Generate OPC UA constants in Perl from open62541 version 1.3.4
-      with full namespace 0.
-    - Remove support for open62541 1.0 and 1.1 API.  1.2 branch did
-      not work properly with OPCUA::Open62541 anyway.  Minimum
-      required version of the open62541 library is 1.3 now.  open62541
-      master branch has issues.  OPCUA::Open62541 tests currently
-      run and pass with open62541 version 1.3.4.
-    - A lot of backwards compatibility code in implementations and tests
-      has been removed.
-    - The 1.0 API compatibility of the client getState() method has
-      been removed.  It has to be called in list context now to
-      retrieve channel state, session state, and connect status.
-      Trying to retrieve the client state in scalar context will
-      result in a Perl die.  A client state does not exist anymore.
-    - Implement basic encryption for client and server.  Certificates
-      are not validated yet.
-    - Improve behavior of client config setUsernamePassword()
-      method.
+  - Use methods ServerConfig::setDefaultWithSecurityPolicies()
+    and ClientConfig::setDefaultEncryption() to activate encryption
+    and optionally verfication on both sides respectively.
+  - Module OPCUA::Open62541::Test::CA is used to create private
+    key, certificate, CA and CRL for testing OPC UA encryption.
+  - Implement methods to get and set client and server description
+    in open62541 config.
+  - Generate OPC UA constants in Perl from open62541 version 1.3.4
+    with full namespace 0.
+  - Remove support for open62541 1.0 and 1.1 API.  1.2 branch did
+    not work properly with OPCUA::Open62541 anyway.  Minimum
+    required version of the open62541 library is 1.3 now.  open62541
+    master branch has issues.  OPCUA::Open62541 tests currently
+    run and pass with open62541 version 1.3.4.
+  - A lot of backwards compatibility code in implementations and tests
+    has been removed.
+  - The 1.0 API compatibility of the client getState() method has
+    been removed.  It has to be called in list context now to
+    retrieve channel state, session state, and connect status.
+    Trying to retrieve the client state in scalar context will
+    result in a Perl die.  A client state does not exist anymore.
+  - Implement basic encryption for client and server.  Certificates
+    are not validated yet.
+  - Improve behavior of client config setUsernamePassword()
+    method.
 
 1.05 2022-10-27
-    - Create correct SIGNATURE file.
+  - Create correct SIGNATURE file.
 
 1.04 2022-10-27
-    - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.3.
-      Test with open62541 master does not terminate, disable for now.
-    - Include patch for the open62541 1.0.6 sources that allows to
-      generate the Open62541-packed XS file.
-    - Major rewrite of XS pack and unpack functions.  The nested
-      Perl hashes and UA objects are linked together before they
-      are filled with values.  If the latter croaks in the middle
-      of packing or unpacking, the partially created object has
-      references to the part that succeeded.  So destruction of the
-      object can free the sub structures.  This avoids memory leaks
-      in error cases.
-    - Set build info leaked the build info that was set before.
-    - Fix memory leak in variant get scalar and get array error
-      case.
+  - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.3.
+    Test with open62541 master does not terminate, disable for now.
+  - Include patch for the open62541 1.0.6 sources that allows to
+    generate the Open62541-packed XS file.
+  - Major rewrite of XS pack and unpack functions.  The nested
+    Perl hashes and UA objects are linked together before they
+    are filled with values.  If the latter croaks in the middle
+    of packing or unpacking, the partially created object has
+    references to the part that succeeded.  So destruction of the
+    object can free the sub structures.  This avoids memory leaks
+    in error cases.
+  - Set build info leaked the build info that was set before.
+  - Fix memory leak in variant get scalar and get array error
+    case.
 
 1.03 2022-07-19
-    - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.2,
-      and master.  1.2 tests fail and there is no goal to fix them.
-      Remove version 1.2.5 from CI.
-    - Allow to set username and passwort in the client config.
+  - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.2,
+    and master.  1.2 tests fail and there is no goal to fix them.
+    Remove version 1.2.5 from CI.
+  - Allow to set username and passwort in the client config.
 
 1.02 2022-07-09
-    - Fix reference counting with server node lifecycle callbacks.
-      The behaviour in open62541 has changed, use heuristic to free
-      Perl SV.  Use common code for all server add node functions.
-    - Adapt client subscription callback to open62541 API 1.1.
-    - Test for source timestamps and async read value accept also
-      behavior of newer open62541.
-    - Behavior of Perl node context in constructor and destructor
-      has changed so that it can work with both old and new open62541.
-    - Connect and disconnect behavior has changed in subtle ways,
-      especially in the async case.  Tests tolerate more variations.
-    - To call the client state callback with a valid Perl client
-      variable, update the client context more often to current SV.
-      Due to different callback behavior, this became an issue with
-      newer open62541.
+  - Fix reference counting with server node lifecycle callbacks.
+    The behaviour in open62541 has changed, use heuristic to free
+    Perl SV.  Use common code for all server add node functions.
+  - Adapt client subscription callback to open62541 API 1.1.
+  - Test for source timestamps and async read value accept also
+    behavior of newer open62541.
+  - Behavior of Perl node context in constructor and destructor
+    has changed so that it can work with both old and new open62541.
+  - Connect and disconnect behavior has changed in subtle ways,
+    especially in the async case.  Tests tolerate more variations.
+  - To call the client state callback with a valid Perl client
+    variable, update the client context more often to current SV.
+    Due to different callback behavior, this became an issue with
+    newer open62541.
 
 1.01 2022-06-17
-    - Adapt client iterate timeout to 32 bit for open62541 API 1.1.
-    - Use the SECURECHANNELSTATE constants from API 1.1 and 1.2.
-    - Use magic STATUSCODE in clientStateCallback().
-    - Avoid double free when destroying client config.
-    - Test server starts with API 1.3.
-    - Implement client async connect and disconnect with API 1.1.
-    - Test client works with API 1.1.
-    - Server config provides setCustomHostname() or setServerUrls().
-    - Allow float values Infinity and NaN.
+  - Adapt client iterate timeout to 32 bit for open62541 API 1.1.
+  - Use the SECURECHANNELSTATE constants from API 1.1 and 1.2.
+  - Use magic STATUSCODE in clientStateCallback().
+  - Avoid double free when destroying client config.
+  - Test server starts with API 1.3.
+  - Implement client async connect and disconnect with API 1.1.
+  - Test client works with API 1.1.
+  - Server config provides setCustomHostname() or setServerUrls().
+  - Allow float values Infinity and NaN.
 
 1.00 2022-05-30
-    - Bump major version.  OPCUA::Open62541 compiles with open62541
-      version 1.0.6, 1.1.6, 1.2.4, 1.3.  While this is enough to
-      be API compatible with all versions, the tests fail from API
-      1.2 on.  Do not expect a working open62541 wrapper for anything
-      else than the old 1.0 API.
-    - Switch to X.YY version number format.  Three minor digits are
-      not needed.
-    - Generate and merge constants for 1.0 and 1.3 API.
-    - Optionally support highlevel client async interface of 1.3 API.
-    - 1.3 API removed Server Config set Custom Hostname function.
-    - 1.3 API removed typeIndex from UA_DataType, use pointer
-      arithmetic as workaround.
-    - Use github CI runner to build and test with open62541 API
-      1.0, 1.1, 1.2, and 1.3.
-    - Regenerate ppport.h with Devel::PPPort version 3.64.
+  - Bump major version.  OPCUA::Open62541 compiles with open62541
+    version 1.0.6, 1.1.6, 1.2.4, 1.3.  While this is enough to
+    be API compatible with all versions, the tests fail from API
+    1.2 on.  Do not expect a working open62541 wrapper for anything
+    else than the old 1.0 API.
+  - Switch to X.YY version number format.  Three minor digits are
+    not needed.
+  - Generate and merge constants for 1.0 and 1.3 API.
+  - Optionally support highlevel client async interface of 1.3 API.
+  - 1.3 API removed Server Config set Custom Hostname function.
+  - 1.3 API removed typeIndex from UA_DataType, use pointer
+    arithmetic as workaround.
+  - Use github CI runner to build and test with open62541 API
+    1.0, 1.1, 1.2, and 1.3.
+  - Regenerate ppport.h with Devel::PPPort version 3.64.
 
 0.029 2021-08-13
-    - Cleanup monitored item delete callback, newer open62541 behaves
-      differently.  Cover both cases.
-    - Fix memory leak when creating monitored items.
-    - Introduce MonitoredItemArrays to handle callback memory
-      in UA_Client_MonitoredItems_createDataChanges() and
-      UA_Client_MonitoredItems_createDataChange().  This should
-      plug all memory leaks and use after free with these callbacks.
+  - Cleanup monitored item delete callback, newer open62541 behaves
+    differently.  Cover both cases.
+  - Fix memory leak when creating monitored items.
+  - Introduce MonitoredItemArrays to handle callback memory
+    in UA_Client_MonitoredItems_createDataChanges() and
+    UA_Client_MonitoredItems_createDataChange().  This should
+    plug all memory leaks and use after free with these callbacks.
 
 0.028 2021-08-09
-    - Use specific structs to store subscription context and monitored
-      item context.
-    - Pass subscription context to monitored item callback.
-    - Fix memory management of MonitoredItemCreateRequest_default().
+  - Use specific structs to store subscription context and monitored
+    item context.
+  - Pass subscription context to monitored item callback.
+  - Fix memory management of MonitoredItemCreateRequest_default().
 
 0.027 2021-07-29
-    - Implement wrapper for subscription functions of open62541.
-    - Call back change and delete notifications to Perl.
-    - Call back multiple monitored items change and delete to Perl.
+  - Implement wrapper for subscription functions of open62541.
+  - Call back change and delete notifications to Perl.
+  - Call back multiple monitored items change and delete to Perl.
 
 0.026 2020-09-30
-    - Fix memory leak in server add node methods.
+  - Fix memory leak in server add node methods.
 
 0.025 2020-09-17
-    - Add missing functions documentation.
-    - Implement server config methods:
-      getMaxNodesPerRead(),
-      setMaxNodesPerRead(),
-      getMaxNodesPerWrite(),
-      setMaxNodesPerWrite(),
-      getMaxNodesPerMethodCall(),
-      setMaxNodesPerMethodCall(),
-      getMaxNodesPerBrowse(),
-      setMaxNodesPerBrowse(),
-      getMaxNodesPerRegisterNodes(),
-      setMaxNodesPerRegisterNodes(),
-      getMaxNodesPerTranslateBrowsePathsToNodeIds(),
-      setMaxNodesPerTranslateBrowsePathsToNodeIds(),
-      getMaxNodesPerNodeManagement(),
-      setMaxNodesPerNodeManagement(),
-      getMaxMonitoredItemsPerCall(),
-      setMaxMonitoredItemsPerCall().
+  - Add missing functions documentation.
+  - Implement server config methods:
+    getMaxNodesPerRead(),
+    setMaxNodesPerRead(),
+    getMaxNodesPerWrite(),
+    setMaxNodesPerWrite(),
+    getMaxNodesPerMethodCall(),
+    setMaxNodesPerMethodCall(),
+    getMaxNodesPerBrowse(),
+    setMaxNodesPerBrowse(),
+    getMaxNodesPerRegisterNodes(),
+    setMaxNodesPerRegisterNodes(),
+    getMaxNodesPerTranslateBrowsePathsToNodeIds(),
+    setMaxNodesPerTranslateBrowsePathsToNodeIds(),
+    getMaxNodesPerNodeManagement(),
+    setMaxNodesPerNodeManagement(),
+    getMaxMonitoredItemsPerCall(),
+    setMaxMonitoredItemsPerCall().
 
 0.024 2020-08-28
-    - Implement server config setBuildInfo().
+  - Implement server config setBuildInfo().
 
 0.023 2020-08-24
-    - Implement server config methods:
-      setUserRightsMaskReadonly(),
-      setUserAccessLevelReadonly(),
-      disableUserExecutable(),
-      disableUserExecutableOnObject(),
-      disableAddNode(),
-      disableAddReference(),
-      disableDeleteNode(),
-      disableDeleteReference(),
-      disableHistoryUpdateUpdateData(),
-      disableHistoryUpdateDeleteRawModified().
-      This allows to setup a server that provides read-only data.
+  - Implement server config methods:
+    setUserRightsMaskReadonly(),
+    setUserAccessLevelReadonly(),
+    disableUserExecutable(),
+    disableUserExecutableOnObject(),
+    disableAddNode(),
+    disableAddReference(),
+    disableDeleteNode(),
+    disableDeleteReference(),
+    disableHistoryUpdateUpdateData(),
+    disableHistoryUpdateDeleteRawModified().
+    This allows to setup a server that provides read-only data.
 
 0.022 2020-08-17
-    - Implement setStateCallback() and call Perl from callback.
-    - Implement client config get and setClientContext().
-    - Implement server browseNext().
+  - Implement setStateCallback() and call Perl from callback.
+  - Implement client config get and setClientContext().
+  - Implement server browseNext().
 
 0.021 2020-07-28
-    - Implement generic server read().
-    - Implement server config get and setMaxSecureChannels().
+  - Implement generic server read().
+  - Implement server config get and setMaxSecureChannels().
 
 0.020 2020-07-13
-    - Make compilation of constant defines optional.
-    - Implement generic server write() method.
+  - Make compilation of constant defines optional.
+  - Implement generic server write() method.
 
 0.019 2020-06-30
-    - Fix XS unpack for extension object, write data to C structure.
+  - Fix XS unpack for extension object, write data to C structure.
 
 0.018 2020-06-25
-    - Implement array dimensions for variant.
-    - Set value rank in test server complex objects.
+  - Implement array dimensions for variant.
+  - Set value rank in test server complex objects.
 
 0.017 2020-06-23
-    - Implement createOptionalChild and generateChildNodeId global
-      node lifecycle callbacks.
-    - Make pack and unpack of ExtensionObject consistent.
-    - Fix lifecycle spelling.
-    - Code reference to client callback is stored as a copy.
-    - Implement global node lifecycle destructor.  Node context
-      can be changed in constructor and is accessible from destructor.
-    - Store config in server and client object from the beginning.
+  - Implement createOptionalChild and generateChildNodeId global
+    node lifecycle callbacks.
+  - Make pack and unpack of ExtensionObject consistent.
+  - Fix lifecycle spelling.
+  - Code reference to client callback is stored as a copy.
+  - Implement global node lifecycle destructor.  Node context
+    can be changed in constructor and is accessible from destructor.
+  - Store config in server and client object from the beginning.
 
 0.016 2020-06-18
-    - Implement configuration of server session limits.  Server
-      config has methods getMaxSessions(), setMaxSessions(),
-      getMaxSessionTimeout(), setMaxSessionTimeout().
-    - Remove server newWithConfig() constructor.  The 1.1 API
-      would require a different implementation, but it is not used
-      anyway.
-    - open62541 has released version 1.1 of their library.  The
-      new API is slighlty different.  Update github CI to ubuntu-20.04
-      and implement enough XS so that all tests are passed or
-      skipped.  This makes p5-opcua-open62541 work with both 1.0
-      and 1.1 open62541.  Use Devel::CheckLib to find features of
-      the library and add #ifdef to compile a working variant.
-      Async connect works with 1.0 API only.
-    - Start adding global node lifecycle callbacks.  Only the
-      constructor callback has been implemented yet.  Using the
-      node context does not work.
-    - Pack and unpack Guid to formated Perl string as in Part 6,
-      5.1.3. of the OPC UA specification.
-    - During unpack of integer and float values, croak if an overflow
-      is detected.  This is better than a warning that nobody reads.
-    - Provide pack and unpack functions for full namespace 0 if
-      the open62541 library has been built with this option.
-    - Set admin session context to provide a context for the global
-      node lifecycle callbacks.  Implement server setAdminSessionContext()
-      method.
-    - Fix memory leak when server object is destroyed.
+  - Implement configuration of server session limits.  Server
+    config has methods getMaxSessions(), setMaxSessions(),
+    getMaxSessionTimeout(), setMaxSessionTimeout().
+  - Remove server newWithConfig() constructor.  The 1.1 API
+    would require a different implementation, but it is not used
+    anyway.
+  - open62541 has released version 1.1 of their library.  The
+    new API is slighlty different.  Update github CI to ubuntu-20.04
+    and implement enough XS so that all tests are passed or
+    skipped.  This makes p5-opcua-open62541 work with both 1.0
+    and 1.1 open62541.  Use Devel::CheckLib to find features of
+    the library and add #ifdef to compile a working variant.
+    Async connect works with 1.0 API only.
+  - Start adding global node lifecycle callbacks.  Only the
+    constructor callback has been implemented yet.  Using the
+    node context does not work.
+  - Pack and unpack Guid to formated Perl string as in Part 6,
+    5.1.3. of the OPC UA specification.
+  - During unpack of integer and float values, croak if an overflow
+    is detected.  This is better than a warning that nobody reads.
+  - Provide pack and unpack functions for full namespace 0 if
+    the open62541 library has been built with this option.
+  - Set admin session context to provide a context for the global
+    node lifecycle callbacks.  Implement server setAdminSessionContext()
+    method.
+  - Fix memory leak when server object is destroyed.
 
 0.015 2020-05-29
-    - Implement client sendAsyncReadRequest() as it is missing
-      in open62541 API.
-    - Implement client/server read/write DataType.  They cannot
-      be generated as DataType needs special conversion to NodeId.
-    - UA_Server_readContainsNoLoop contains typo, provide
-      server readContainsNoLoops wrapper.
-    - Genearalize  script client-server-read-write.pl
-      to generate all client/server read/write functions.
-    - Generate wrapper for all server read and write functions.
-    - Generate client write wrapper functions.
-    - Generate client readDataTypeAttribute() function.
+  - Implement client sendAsyncReadRequest() as it is missing
+    in open62541 API.
+  - Implement client/server read/write DataType.  They cannot
+    be generated as DataType needs special conversion to NodeId.
+  - UA_Server_readContainsNoLoop contains typo, provide
+    server readContainsNoLoops wrapper.
+  - Genearalize  script client-server-read-write.pl
+    to generate all client/server read/write functions.
+  - Generate wrapper for all server read and write functions.
+  - Generate client write wrapper functions.
+  - Generate client readDataTypeAttribute() function.
 
 0.014 2020-05-13
-    - Server build info is copied to return value and uses regular
-      typemap clear.
-    - The NULL string and NULL byte string is unpacked from undef.
-      Perl undef has a meaning different from "" and is represented
-      in the open62541 objects.
-    - Use Test::Strict to check all Perl source files.  This is a
-      new test dependency.
-    - Generate all client read XS wrapper functions with a script.
-      This includes the regular and async methods and the callback
-      with the matching return value for each type.  The
-      readDataTypeAttribute functions are implemented manually as
-      they have to convert NodeId to DataType before providing the
-      output value.
-    - Memory management for all input and output parameter is done
-      in the typemap.  Except for DESTROY destructors the XS functions
-      do not call clear() or delete() anymore.
-    - Better error message for missing mandatory parameter.
-    - The typemap identifies the reqId parameter as optional
-      output parameter by its new name outoptReqId.
-    - Implement client sendAsyncBrowseNextRequest() as it is missing
-      in open62541 API.
-    - Code scanner cppcheck passes with C code generated from XS.
-    - Test server setup_complex_objects() method can handle name
-      space, access level, and got various other improvements.
-    - An empty UA_Variant is now represented as an empty Perl hash.
-    - The open62541 parameters of the XS functions are allocated
-      in the typemap and stored as mortal Perl objects.  Now Perl
-      is responsible to free them.  The open62541 objects are deleted
-      in the Perl destructor.  The XS wrapper functions do not have
-      to care about calling clear() or delete() anymore.
-    - Server add node functions fill output parameter outNewNodeId
-      as hash.
-    - Parameter passing to XS functions is stricter.  The typemap
-      does all the checks at a central place.
-    - Add more than 100 test cases for all possible typemap
-      conversions of the input paramteter.
-    - Test Unicode conversions in XS packed functions, Perl hashes,
-      and YAML output.  YAML::Tiny is a new test dependency.
-    - In the XS functions the open62541 output value has to be
-      cleared after converting it to an SV.  This fixes a memory
-      leak.
-    - In the XS functions the temporary open62541 parameter objects
-      have to be cleared before return.  This fixes a memory leak.
-    - Setting scalars or arrays in a variant passes the reponsibility
-      for memory lifetime to the open62541 library.
-    - Memory for strings and byte strings is allocated dynamically.
-      Reusing the Perl data does not allow sane lifetime management.
-    - The unpack conversions use UA_Array_new() instead of calloc(3)
-      to construct arrays.
-    - Remove LocalizedText new() constructor, it was never used.
+  - Server build info is copied to return value and uses regular
+    typemap clear.
+  - The NULL string and NULL byte string is unpacked from undef.
+    Perl undef has a meaning different from "" and is represented
+    in the open62541 objects.
+  - Use Test::Strict to check all Perl source files.  This is a
+    new test dependency.
+  - Generate all client read XS wrapper functions with a script.
+    This includes the regular and async methods and the callback
+    with the matching return value for each type.  The
+    readDataTypeAttribute functions are implemented manually as
+    they have to convert NodeId to DataType before providing the
+    output value.
+  - Memory management for all input and output parameter is done
+    in the typemap.  Except for DESTROY destructors the XS functions
+    do not call clear() or delete() anymore.
+  - Better error message for missing mandatory parameter.
+  - The typemap identifies the reqId parameter as optional
+    output parameter by its new name outoptReqId.
+  - Implement client sendAsyncBrowseNextRequest() as it is missing
+    in open62541 API.
+  - Code scanner cppcheck passes with C code generated from XS.
+  - Test server setup_complex_objects() method can handle name
+    space, access level, and got various other improvements.
+  - An empty UA_Variant is now represented as an empty Perl hash.
+  - The open62541 parameters of the XS functions are allocated
+    in the typemap and stored as mortal Perl objects.  Now Perl
+    is responsible to free them.  The open62541 objects are deleted
+    in the Perl destructor.  The XS wrapper functions do not have
+    to care about calling clear() or delete() anymore.
+  - Server add node functions fill output parameter outNewNodeId
+    as hash.
+  - Parameter passing to XS functions is stricter.  The typemap
+    does all the checks at a central place.
+  - Add more than 100 test cases for all possible typemap
+    conversions of the input paramteter.
+  - Test Unicode conversions in XS packed functions, Perl hashes,
+    and YAML output.  YAML::Tiny is a new test dependency.
+  - In the XS functions the open62541 output value has to be
+    cleared after converting it to an SV.  This fixes a memory
+    leak.
+  - In the XS functions the temporary open62541 parameter objects
+    have to be cleared before return.  This fixes a memory leak.
+  - Setting scalars or arrays in a variant passes the reponsibility
+    for memory lifetime to the open62541 library.
+  - Memory for strings and byte strings is allocated dynamically.
+    Reusing the Perl data does not allow sane lifetime management.
+  - The unpack conversions use UA_Array_new() instead of calloc(3)
+    to construct arrays.
+  - Remove LocalizedText new() constructor, it was never used.
 
 0.013 2020-05-01
-    - Remove Makefile from MANIFEST and skip it.
-      [rt.cpan.org #132463] No rule to make target
+  - Remove Makefile from MANIFEST and skip it.
+    [rt.cpan.org #132463] No rule to make target
 
 0.012 2020-04-30
-    - Fix signal race in test server.
-    - Use test server planning_nofork() to compute test numbers
-      of non-forking server tests.
-    - Implement server browse(), deleteNode(), addReference(),
-      deleteReference().
-    - Improve test client usability.
-    - Use the github continuous integration framework to build the
-      module and run tests on a Ubuntu VM.
-    - In client-connect-async test, skip the subtests that trigger
-      an freeaddrinfo bug of open62541.  The bug is fixed in the
-      OpenBSD port, the test is skipped elsewhere.
-    - Implement server getBuildInfo().
-    - Implement server addNamespace().
-    - Plug memleak in variant setScalar() and setArray().
-    - Make error messages in croak consistent.
-    - The type constants depend on the compile options of open62541.
-      Do not check in these numbers in Perl files, but generate C
-      functions that evaluate them during Open62541.xs compile time.
-      Table with type conversion must not assume that the type
-      numbers are continuous.  This makes the module work with
-      precompiled open62541 library on GNU/Linux.
-    - Avoid compiler warnings with GCC.
-    - Fix test races seen on GNU/Linux.
-    - Improve test logger diagnostic output.
+  - Fix signal race in test server.
+  - Use test server planning_nofork() to compute test numbers
+    of non-forking server tests.
+  - Implement server browse(), deleteNode(), addReference(),
+    deleteReference().
+  - Improve test client usability.
+  - Use the github continuous integration framework to build the
+    module and run tests on a Ubuntu VM.
+  - In client-connect-async test, skip the subtests that trigger
+    an freeaddrinfo bug of open62541.  The bug is fixed in the
+    OpenBSD port, the test is skipped elsewhere.
+  - Implement server getBuildInfo().
+  - Implement server addNamespace().
+  - Plug memleak in variant setScalar() and setArray().
+  - Make error messages in croak consistent.
+  - The type constants depend on the compile options of open62541.
+    Do not check in these numbers in Perl files, but generate C
+    functions that evaluate them during Open62541.xs compile time.
+    Table with type conversion must not assume that the type
+    numbers are continuous.  This makes the module work with
+    precompiled open62541 library on GNU/Linux.
+  - Avoid compiler warnings with GCC.
+  - Fix test races seen on GNU/Linux.
+  - Improve test logger diagnostic output.
 
 0.011 2020-04-24
-    - Test client and server can use a custom log file.
-    - Improve signal handling in test server.
-    - Implement test server runtime actions.
-    - Implement server functions to read and write values:
-      readValue(), writeValue()
-    - Implement more server functions to add nodes:
-      addVariableTypeNode(), addObjectNode(), addObjectTypeNode(),
-      addViewNode(), addReferenceTypeNode(), addDataTypeNode()
-    - Implement client function Service_browse().
-    - Add prefix to QualifiedName hash keys.
+  - Test client and server can use a custom log file.
+  - Improve signal handling in test server.
+  - Implement test server runtime actions.
+  - Implement server functions to read and write values:
+    readValue(), writeValue()
+  - Implement more server functions to add nodes:
+    addVariableTypeNode(), addObjectNode(), addObjectTypeNode(),
+    addViewNode(), addReferenceTypeNode(), addDataTypeNode()
+  - Implement client function Service_browse().
+  - Add prefix to QualifiedName hash keys.
 
 0.010 2020-04-20
-    - Make single stepping the test server actually work.
+  - Make single stepping the test server actually work.
 
 0.009 2020-04-17
-    - Embed config and logger struct into client or server.  This
-      avoids malloc() and free() races.  The config and logger may
-      extend the lifetime of client or server.
-    - No stand alone logger is possible anymore.  The Logger->new()
-      method has been removed from the API.
-    - After connect_async() the client needs 100 miliseconds before
-      client run_iterate() may be called.  Add some sleeps to test.
-    - Move C declarations to PREINIT section.
-    - The test server can single step iterations to trigger timing
-      races in client tests.
+  - Embed config and logger struct into client or server.  This
+    avoids malloc() and free() races.  The config and logger may
+    extend the lifetime of client or server.
+  - No stand alone logger is possible anymore.  The Logger->new()
+    method has been removed from the API.
+  - After connect_async() the client needs 100 miliseconds before
+    client run_iterate() may be called.  Add some sleeps to test.
+  - Move C declarations to PREINIT section.
+  - The test server can single step iterations to trigger timing
+    races in client tests.
 
 0.008 2020-04-14
-    - Fix double free in set variant.
-    - Test cleanup.
-    - Variant can get and set array type.
-    - Generate correct version number in OPCUA::Open62541::Constant.
-    - Add NODECLASS constant.
+  - Fix double free in set variant.
+  - Test cleanup.
+  - Variant can get and set array type.
+  - Generate correct version number in OPCUA::Open62541::Constant.
+  - Add NODECLASS constant.
 
 0.007 2020-04-06
-    - Fix memory leak in callback_async() and extend leak tests.
-      The API does not invoke the connect callback in case of error.
-      This requires special code to track the call data and to free
-      it during destroy.
-    - Implement UA_Client_readValueAttribute_async().
-    - Implement client disconnect_async().
-    - Add missing functions to pod documentation.
-    - Test request id of async browse request.
+  - Fix memory leak in callback_async() and extend leak tests.
+    The API does not invoke the connect callback in case of error.
+    This requires special code to track the call data and to free
+    it during destroy.
+  - Implement UA_Client_readValueAttribute_async().
+  - Implement client disconnect_async().
+  - Add missing functions to pod documentation.
+  - Test request id of async browse request.
 
 0.006 2020-03-27
-    - Remove server config clean() function from Perl API.
-    - To run a test server manually, the timeout can be disabled.
-    - Use Test::EOL to find trailing whitespace.
-    - Generate constants from defines and enum in C header file.
-    - Export constants from OPCUA::Open62541 into namespace.
-      This breaks the existing API how modules are used and imported.
-      Especially NS0ID uses underscore and new names are incompatible.
-    - Place all generated constants into a single Perl module
-      OPCUA::Open62541::Constant.
+  - Remove server config clean() function from Perl API.
+  - To run a test server manually, the timeout can be disabled.
+  - Use Test::EOL to find trailing whitespace.
+  - Generate constants from defines and enum in C header file.
+  - Export constants from OPCUA::Open62541 into namespace.
+    This breaks the existing API how modules are used and imported.
+    Especially NS0ID uses underscore and new names are incompatible.
+  - Place all generated constants into a single Perl module
+    OPCUA::Open62541::Constant.
 
 0.005 2020-03-12
-    - Plug memory leaks in connect_async() in sendAsyncBrowseRequest(),
-      which were found by the tests.
-    - Allow to iterate client from test framework.
-    - Croak if wrong output variable type, make API stricter.
-    - Print log level and category as string with magic variables.
-    - Write client log files to debug tests.
-    - Improve leak ckecks in tests.
-    - Refactor client and server tests.
-    - Avoid posix signal handler in test server.
-    - Grep for server startup in server log to avoid races in tests.
-    - Test server writes log file.
-    - Implement Logger class.
-    - Refactor client callback.
-    - In XS croak() print function name and errno strings.
+  - Plug memory leaks in connect_async() in sendAsyncBrowseRequest(),
+    which were found by the tests.
+  - Allow to iterate client from test framework.
+  - Croak if wrong output variable type, make API stricter.
+  - Print log level and category as string with magic variables.
+  - Write client log files to debug tests.
+  - Improve leak ckecks in tests.
+  - Refactor client and server tests.
+  - Avoid posix signal handler in test server.
+  - Grep for server startup in server log to avoid races in tests.
+  - Test server writes log file.
+  - Implement Logger class.
+  - Refactor client callback.
+  - In XS croak() print function name and errno strings.
 
 0.004 2020-02-27
-    - Use perlcritic and perltidy.
-    - Test that adding a node in the server and reading its value
-      from the client works.
-    - Use an efficient way to export constants in Perl namespace.
-    - Implement UA_Client_readValueAttribute().
-    - Use a function jump table for packing all variant types.
-    - Make this module run on multi threaded Perl by sprinkling dTHX
-      into the XS file.
-    - UA_DiscoveryConfiguration and UA_FilterOperand croak when
-      trying to pack them.
-    - Implement all missing packed functions for builtin types.
-    - To test client and server easily, implement
-      OPCUA::Open62541::Test::Server and OPCUA::Open62541::Test::Client
-      to handle the other end.
+  - Use perlcritic and perltidy.
+  - Test that adding a node in the server and reading its value
+    from the client works.
+  - Use an efficient way to export constants in Perl namespace.
+  - Implement UA_Client_readValueAttribute().
+  - Use a function jump table for packing all variant types.
+  - Make this module run on multi threaded Perl by sprinkling dTHX
+    into the XS file.
+  - UA_DiscoveryConfiguration and UA_FilterOperand croak when
+    trying to pack them.
+  - Implement all missing packed functions for builtin types.
+  - To test client and server easily, implement
+    OPCUA::Open62541::Test::Server and OPCUA::Open62541::Test::Client
+    to handle the other end.
 
 0.003 2020-02-21
-    - OPCUA::Open62541::sendAsyncBrowseRequest() uses optional output
-      variable for request id.
-    - Run static code analyse with cppcheck, remove false positives.
-      The C code generated by XS is clean.
-    - Use the generated VariableAttributes packed functions.
-    - Implement sendAsyncBrowseRequest for client.
-    - Implement OPCUA::Open62541::Variant->setScalar() and ->getScalar().
-    - Make status code magic like $! containing number and string.
-    - Test code with Perl::Critic.
-    - Auto generate data conversion functions.
-    - Support optional output parameter for addVariableNode().
-    - Implement conversion functions for builtin data types.
-    - Convert Perl hashes to NodeId, QualifiedName, and VariableAttributes.
-    - Implement asynchronous connections for clients.
+  - OPCUA::Open62541::sendAsyncBrowseRequest() uses optional output
+    variable for request id.
+  - Run static code analyse with cppcheck, remove false positives.
+    The C code generated by XS is clean.
+  - Use the generated VariableAttributes packed functions.
+  - Implement sendAsyncBrowseRequest for client.
+  - Implement OPCUA::Open62541::Variant->setScalar() and ->getScalar().
+  - Make status code magic like $! containing number and string.
+  - Test code with Perl::Critic.
+  - Auto generate data conversion functions.
+  - Support optional output parameter for addVariableNode().
+  - Implement conversion functions for builtin data types.
+  - Convert Perl hashes to NodeId, QualifiedName, and VariableAttributes.
+  - Implement asynchronous connections for clients.
 
 0.002 2020-02-14
-    - Use Devel::CheckLib to ensure open62541 library is available.
-    - Implement type conversions for setting scalars in variant type.
-    - Connect client to server.
-    - Implement client and its config.
+  - Use Devel::CheckLib to ensure open62541 library is available.
+  - Implement type conversions for setting scalars in variant type.
+  - Connect client to server.
+  - Implement client and its config.
 
 0.001 2020-02-12
-    - Implement basic functions needed to build a simple OPC UA server.
-      That is "4.2 Building a Simple Server" and "11.2 Server Lifecycle"
-      from the open62541 1.0.1 library documentation.
-    - original version; created by h2xs 1.23 with -A -n OPCUA::Open62541
+  - Implement basic functions needed to build a simple OPC UA server.
+    That is "4.2 Building a Simple Server" and "11.2 Server Lifecycle"
+    from the open62541 1.0.1 library documentation.
+  - original version; created by h2xs 1.23 with -A -n OPCUA::Open62541

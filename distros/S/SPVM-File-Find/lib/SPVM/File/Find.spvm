@@ -6,6 +6,7 @@ class File::Find {
   use File::Basename;
   use Fn;
   use File::Find::Handler;
+  use Sys::OS;
   
   static method find : void ($cb : File::Find::Handler, $top_dir : string, $options = undef : object[]) {
     
@@ -30,7 +31,7 @@ class File::Find {
     
     # The path separator is converted to "/"
     my $top_dir_slash = (string)undef;
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       $top_dir_slash = copy $top_dir;
       Fn->replace_chars((mutable string)$top_dir_slash, '\\', '/');
     }
@@ -110,7 +111,7 @@ class File::Find {
         
         my $link = Sys::IO->readlinkp($path);
         
-        if (Sys->defined("_WIN32")) {
+        if (Sys::OS->is_windows) {
           Fn->replace_chars((mutable string)$link, '\\', '/');
         }
         

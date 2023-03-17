@@ -3,20 +3,55 @@
 set -x
 set -e
 
-m="$1"
-f="$(echo "$m" | sed -e 's/[.].*//')"
+declare -a machines
+declare -a files
+declare -a dotfiles
+
 export PERL5LIB=lib:$PERL5LIB
-bin/storage2dot --remote "$m" -c --record /tmp/$f-2.rawdata -o /tmp/$f-2.data
-bin/storage2dot --data /tmp/$f-2.data -o /tmp/$f-2.dot
-dot -Tpdf > /tmp/$f-2.pdf /tmp/$f-2.dot
-echo "*** evince /tmp/$f-2.pdf"
-exit 0
 
+PROGNAME="$(basename "$0")"
 
+TEMP=`getopt --shell sh \
+        -o hvm --long with-vm,merge-only: \
+        -n "$PROGNAME" -- "$@"`
 
+eval set -- "$TEMP"
 
-scp storage2dot $m:/tmp
-ssh -t $m /tmp/storage2dot -o /tmp/$f.dot "$@"
-scp $m:/tmp/$f.dot /tmp/$f.dot
-dot -Tpdf > /tmp/$f.pdf /tmp/$f.dot
-echo "*** evince /tmp/$f.pdf"
+WITH_VM=0
+MERGE_ONLY=0
+while true ; do
+        case "$1" in
+        -h|--help) usage ; exit 0 ;;
+        -v|--with-vm) WITH_VM=1 ;;
+        -m|--merge-only) MERGE_ONLY=1 ;;
+        --) shift ; break ;;
+        *) echo "Unknown option/argument '$1'" ; exit 1 ;;
+        esac
+        shift;
+done
+
+for m in "$@"; do
+	machines+=( "$m" )
+	if [ $WITH_VM = 1 ]; then
+		domain="$(echo "$m" | sed -e 's/^[^.]*//')"
+		machines+=( $(ssh "$m" virsh -c qemu:///system list | grep running | awk '{print $2"'"$domain"'" }' | sort ) )
+	fi
+done
+
+for m in "${machines[@]}"; do
+	f="$(echo "$m" | sed -e 's/[.].*//')"
+	files+=("$f")
+	dotfiles+=("/tmp/$f.dot")
+	if [ $MERGE_ONLY != 1 ]; then
+		bin/storage2dot --remote "$m" -c --record /tmp/$f.rawdata -o /tmp/$f.data
+		bin/storage2dot --data /tmp/$f.data -o /tmp/$f.dot
+		dot -Tpdf > /tmp/$f.pdf /tmp/$f.dot
+	fi
+done
+
+if [ ${#machines[@]} -gt 1 ]; then
+	f="${files[0]}"-all
+	bin/storage-merge-dots "${dotfiles[@]}" > /tmp/"$f".dot
+	dot -Tpdf > /tmp/"$f".pdf /tmp/"$f".dot
+fi
+echo "*** evince /tmp/"$f".pdf"

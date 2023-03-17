@@ -3,13 +3,14 @@ class File::Spec::Instance {
   use Sys;
   use File::Spec::Instance::Unix;
   use File::Spec::Instance::Win32;
+  use Sys::OS;
   
   # Class Methods
   static method new : File::Spec::Instance () {
     
     my $self : File::Spec::Instance;
     
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       $self = File::Spec::Instance::Win32->new;
     }
     else {

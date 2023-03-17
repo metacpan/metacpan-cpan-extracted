@@ -29,7 +29,7 @@ BEGIN {
 
     plan tests =>
 	OPCUA::Open62541::Test::Server::planning() +
-	OPCUA::Open62541::Test::Client::planning() + 243;
+	OPCUA::Open62541::Test::Client::planning() + 242;
 }
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -37,8 +37,8 @@ use Test::NoWarnings;
 my $ca = OPCUA::Open62541::Test::CA->new();
 $ca->setup();
 
-$ca->create_cert_client(issuer => $ca->create_cert_root(name => "ca_client"));
-$ca->create_cert_server(issuer => $ca->create_cert_root(name => "ca_server"));
+$ca->create_cert_client(issuer => $ca->create_cert_ca(name => "ca_client"));
+$ca->create_cert_server(issuer => $ca->create_cert_ca(name => "ca_server"));
 
 $ca->create_cert_server(name => "server_selfsigned");
 

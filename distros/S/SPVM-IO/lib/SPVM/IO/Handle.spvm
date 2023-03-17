@@ -9,6 +9,7 @@ class IO::Handle {
   use Format;
   use Scope::Guard;
   use Hash;
+  use Sys::OS;
   
   # Fields
   has autoflush : rw byte;
@@ -123,7 +124,7 @@ class IO::Handle {
     
     my $fileno = $self->fileno;
     
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       my $flags = Int->new(!$blocking);
       $self->ioctl(IOCTL->FIONBIO, $flags);
     }

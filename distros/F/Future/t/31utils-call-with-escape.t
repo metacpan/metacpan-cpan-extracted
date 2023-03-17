@@ -4,8 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 use Future::Utils qw( call_with_escape );

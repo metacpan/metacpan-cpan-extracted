@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable 0.64;
+package Test::Future::AsyncAwait::Awaitable 0.65;
 
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -99,6 +99,34 @@ happen.
 
 =cut
 
+my $FILE = __FILE__;
+
+my %FIXED_MODULE_VERSIONS = (
+   'Future::PP' => '0.50',
+   'Future::XS' => '0.09',
+);
+
+sub _complain_package_version
+{
+   my ( $pkg ) = @_;
+
+   # Drill down to the most base class that isn't Future::_base
+   {
+      no strict 'refs';
+      $pkg = ${"${pkg}::ISA"}[0] while @{"${pkg}::ISA"} and ${"${pkg}::ISA"}[0] ne "Future::_base";
+   }
+
+   my $pkgver = do { no strict 'refs'; ${"${pkg}::VERSION"} };
+   my $wantver = $FIXED_MODULE_VERSIONS{$pkg};
+
+   if( defined $wantver && $pkgver < $wantver ) {
+      diag( "$pkg VERSION is only $pkgver; this might be fixed by updating to version $wantver" );
+   }
+   else {
+      diag( "$pkg VERSION is $pkgver; maybe a later version fixes it?" );
+   }
+}
+
 sub test_awaitable
 {
    my ( $title, %args ) = @_;
@@ -114,19 +142,21 @@ sub test_awaitable
       ok(  $f->AWAIT_IS_READY,     'AWAIT_IS_READY true' );
       ok( !$f->AWAIT_IS_CANCELLED, 'AWAIT_IS_CANCELLED false' );
 
-      is_deeply( [ $f->AWAIT_GET ], [ "result" ], 'AWAIT_GET in list context' );
-      is( scalar $f->AWAIT_GET,     "result",     'AWAIT_GET in scalar context' );
-      ok( defined eval { $f->AWAIT_GET; 1 },      'AWAIT_GET in void context' );
+      is( [ $f->AWAIT_GET ], [ "result" ],    'AWAIT_GET in list context' );
+      is( scalar $f->AWAIT_GET,     "result", 'AWAIT_GET in scalar context' );
+      ok( defined eval { $f->AWAIT_GET; 1 },  'AWAIT_GET in void context' );
    };
 
    subtest "$title immediate fail" => sub {
-      ok( my $f = $class->AWAIT_NEW_FAIL( "Oopsie\n" ), "AWAIT_NEW_FAIL yields object" );
+      ok( my $f = $class->AWAIT_NEW_FAIL( "Oopsie" ), "AWAIT_NEW_FAIL yields object" );
 
       ok(  $f->AWAIT_IS_READY,     'AWAIT_IS_READY true' );
       ok( !$f->AWAIT_IS_CANCELLED, 'AWAIT_IS_CANCELLED false' );
 
+      my $LINE = __LINE__+1;
       ok( !defined eval { $f->AWAIT_GET; 1 }, 'AWAIT_GET in void context' );
-      is( $@, "Oopsie\n", 'AWAIT_GET throws exception' );
+      is( $@, "Oopsie at $FILE line $LINE.\n", 'AWAIT_GET throws exception' ) or
+         _complain_package_version( ref $f );
    };
 
    my $fproto = $new->() or BAIL_OUT( "new did not yield an instance" );
@@ -148,12 +178,14 @@ sub test_awaitable
 
       ok( !$f->AWAIT_IS_READY, 'AWAIT_IS_READY false' );
 
-      $f->AWAIT_FAIL( "Late oopsie\n" );
+      $f->AWAIT_FAIL( "Late oopsie" );
 
       ok( $f->AWAIT_IS_READY, 'AWAIT_IS_READY true' );
 
+      my $LINE = __LINE__+1;
       ok( !defined eval { $f->AWAIT_GET; 1 }, 'AWAIT_GET in void context' );
-      is( $@, "Late oopsie\n", 'AWAIT_GET throws exception' );
+      is( $@, "Late oopsie at $FILE line $LINE.\n", 'AWAIT_GET throws exception' ) or
+         _complain_package_version( ref $f );
    };
 
    subtest "$title on-ready" => sub {

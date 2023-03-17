@@ -9,7 +9,7 @@ use warnings;
 use Carp;
 use JSON::RPC::Legacy::Client;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.2.0';
 
 my @CONFIG_VARS = qw(apikey password url username);
 
@@ -125,6 +125,60 @@ sub is_logged_in {
     return exists $_[0]->{session_id};
 } # is_logged_in()
 
+sub read_config {
+    my $fname = shift;
+
+    my $known_paths = [ # some known paths of other configuration files
+        "$ENV{HOME}/.idoitcli/config.json",
+    ];
+
+    unless ( $fname ) {
+        for ( @$known_paths ) {
+            if ( -r $_ ) {
+                $fname = $_;
+                last;
+            }
+        }
+    }
+    open(my $fh, '<', $fname)
+      or die "Can't open config file '$fname': $!";
+
+    my $config = _read_config_fh($fh);
+
+    close($fh);
+
+    $config->{config_file} = $fname;
+
+    return $config;
+} # read_config()
+
+sub _read_config_fh {
+    my $fh = shift;
+
+    my $config = {};
+    my %valid = map { $_ => 1 } qw(
+        apikey key password url username
+    );
+
+    while (<$fh>) {
+        if ( /^\s*(\S[^:=]+)[:=]\s*(\S.+)$/ ) {
+            my ($key, $val) = ($1, $2);
+            for ($key, $val) {
+                s/\s+$//;
+                s/[,;]$//;
+                s/^"(.*)"$/$1/;
+                s/^'(.*)'$/$1/;
+            }
+            next unless ( $valid{$key} );
+            $config->{$key} = $val;
+        }
+    }
+
+    $config->{apikey} = $config->{key} unless ( exists $config->{apikey} );
+
+    return $config;
+} # _read_config_fh()
+
 sub _test_minimum_config {
     my $self = shift;
     croak "configuration is missing the API key"
@@ -143,7 +197,7 @@ WebService::IdoitAPI - a library to access the i-doit JSON RPC API
 
 =head1 VERSION
 
-Version v0.1.3
+Version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -265,6 +319,27 @@ to close the session on the server.
 
 Tests if the WebService::IdoitAPI object has a session ID -
 that means it is logged in.
+
+=head2 read_config
+
+    my $config = WebService::IdoitAPI::read_config($path);
+    my $api = WebService::IdoitAPI->new( $config );
+
+This is a convenience function,
+that tries to extract the necessary keys (C<< apikey password url username >>)
+from the file whose name is given by C<< $path >>.
+
+If C<< $path >> is not given or C<< undef >>,
+the function tries some known paths of configuration files.
+Currently there is only known path:
+
+=over 4
+
+=item C<< $ENV{HOME}/.idoitcli/config.json >>
+
+the configuration file used by the PHP CLI client I<< idoitcli >>.
+
+=back
 
 =head1 AUTHOR
 

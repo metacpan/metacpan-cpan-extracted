@@ -21,11 +21,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -33,13 +33,13 @@ Geo::Location::Point stores a place.
 
     use Geo::Location::Point;
 
-    my $location = Geo::Location::Point->new();
+    my $location = Geo::Location::Point->new(latitude => 0.01, longitude => -71);
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-    $location = Geo::Location::Point->new();
+    $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
 
 =cut
 
@@ -79,6 +79,18 @@ sub lat {
 	return $self->{'lat'};
 }
 
+=head2 latitude
+
+Synonym for lat().
+
+=cut
+
+sub latitude {
+	my $self = shift;
+
+	return $self->{'lat'};
+}
+
 =head2 long
 
     print 'Latitude: ', $location->lat(), "\n";
@@ -87,6 +99,18 @@ sub lat {
 =cut
 
 sub long {
+	my $self = shift;
+
+	return $self->{'long'};
+}
+
+=head2 longitude
+
+Synonym for long().
+
+=cut
+
+sub longitude {
 	my $self = shift;
 
 	return $self->{'long'};

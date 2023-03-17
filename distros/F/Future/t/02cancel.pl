@@ -2,10 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -15,7 +12,7 @@ use Future;
 
    my $cancelled;
 
-   identical( $future->on_cancel( sub { $cancelled .= "1" } ), $future, '->on_cancel returns $future' );
+   ref_is( $future->on_cancel( sub { $cancelled .= "1" } ), $future, '->on_cancel returns $future' );
    $future->on_cancel( sub { $cancelled .= "2" } );
 
    my $ready;
@@ -42,9 +39,9 @@ use Future;
    ok( !$fail_f->is_ready, 'on_fail chained future not ready after cancel' );
    is( $future->state, "cancelled", '$future->state after ->cancel' );
 
-   like( exception { $future->result }, qr/cancelled/, '$future->result throws exception by cancel' );
+   like( dies { $future->result }, qr/cancelled/, '$future->result throws exception by cancel' );
 
-   is( exception { $future->cancel }, undef,
+   is( dies { $future->cancel }, undef,
       '$future->cancel a second time is OK' );
 
    $done_f->cancel;
@@ -126,7 +123,7 @@ use Future;
    $f1->done( "result" );
 
    ok( $f3->is_ready, '$f3 ready when $f1 is' );
-   is_deeply( [ $f3->result ], [ "result" ], 'result of $f3' );
+   is( [ $f3->result ], [ "result" ], 'result of $f3' );
    is_oneref( $f1, '$f1 has one reference after done' );
 
    $f1 = Future->new;

@@ -2,10 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -18,13 +15,13 @@ use Future;
    );
 
    ok( defined $fseq, '$fseq defined' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
 
    $f1->done( results => "here" );
 
-   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
+   is( [ $fseq->result ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
 
    undef $f1;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -43,7 +40,7 @@ use Future;
    );
 
    ok( defined $fseq, '$fseq defined' );
-   isa_ok( $fseq, "Future", '$fseq' );
+   isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
 
@@ -61,7 +58,7 @@ use Future;
    $f2->done( results => "here" );
 
    ok( $fseq->is_ready, '$fseq is done after $f2 done' );
-   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
+   is( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 
    undef $f2;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -90,7 +87,7 @@ use Future;
       die "It fails\n";
    } );
 
-   ok( !defined exception { $f1->fail( "bork" ) }, 'exception not propagated from fail call' );
+   ok( lives { $f1->fail( "bork" ) }, 'exception not propagated from fail call' );
 
    ok( $fseq->is_ready, '$fseq is ready after code exception' );
    is( scalar $fseq->failure, "It fails\n", '$fseq->failure after code exception' );
@@ -151,7 +148,7 @@ use Future;
    my $fseq = $f1->else( sub { "result" } );
    my $fseq2 = $f1->else( sub { Future->done } );
 
-   is( exception { $f1->fail( "failed\n" ) }, undef,
+   ok( lives { $f1->fail( "failed\n" ) },
        '->fail with non-future return from ->else does not die' );
 
    is( scalar $fseq->result, "result",
@@ -160,7 +157,7 @@ use Future;
    ok( $fseq2->is_ready, '$fseq2 is ready after failure of $fseq' );
 
    my $fseq3;
-   is( exception { $fseq3 = $f1->else( sub { "result" } ) }, undef,
+   ok( lives { $fseq3 = $f1->else( sub { "result" } ) },
       'non-future return from ->else on immediate does not die' );
 
    is( scalar $fseq3->result, "result",
@@ -174,7 +171,7 @@ use Future;
    my $f2;
    my $fseq = $f1->else_with_f(
       sub {
-         identical( $_[0], $f1, 'else_with_f block passed $f1' );
+         ref_is( $_[0], $f1, 'else_with_f block passed $f1' );
          is( $_[1], "f1 failure\n", 'else_with_f block pased failure of $f1' );
          return $f2 = Future->new;
       }
@@ -214,12 +211,12 @@ use Future;
    $f1->fail( first => );
 
    ok( $fseq->is_ready, '$fseq done after $f1 done' );
-   is_deeply( [ $fseq->result ], [ second => "result" ], '$fseq->result returns result for else_done' );
+   is( [ $fseq->result ], [ second => "result" ], '$fseq->result returns result for else_done' );
 
    my $fseq2 = $f1->else_done( third => "result" );
 
    ok( $fseq2->is_ready, '$fseq2 done after ->else_done on immediate' );
-   is_deeply( [ $fseq2->result ], [ third => "result" ], '$fseq2->result returns result for else_done on immediate' );
+   is( [ $fseq2->result ], [ third => "result" ], '$fseq2->result returns result for else_done on immediate' );
 
    my $f2 = Future->new;
    $fseq = $f2->else_done( "result2" );
@@ -237,12 +234,12 @@ use Future;
    $f1->fail( first => );
 
    ok( $fseq->is_ready, '$fseq done after $f1 done' );
-   is_deeply( [ $fseq->failure ], [ second => "result" ], '$fseq->failure returns result for else_fail' );
+   is( [ $fseq->failure ], [ second => "result" ], '$fseq->failure returns result for else_fail' );
 
    my $fseq2 = $f1->else_fail( third => "result" );
 
    ok( $fseq2->is_ready, '$fseq2 done after ->else_fail on immediate' );
-   is_deeply( [ $fseq2->failure ], [ third => "result" ], '$fseq2->failure returns result for else_fail on immediate' );
+   is( [ $fseq2->failure ], [ third => "result" ], '$fseq2->failure returns result for else_fail on immediate' );
 
    my $f2 = Future->new;
    $fseq = $f2->else_fail( "failure" );

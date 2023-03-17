@@ -4,8 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Future;
 use Future::Utils qw( repeat try_repeat try_repeat_until_success );
@@ -32,7 +31,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    ok( defined $arg, '$arg defined for while test' );
    is( scalar $arg->result, "one", '$arg->result for first' );
 
-   identical( $previous_trial, $first_f, 'code block is passed previous trial' );
+   ref_is( $previous_trial, $first_f, 'code block is passed previous trial' );
 
    $again = 0;
    $trial_f->done( "two" );
@@ -48,7 +47,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
       return $trial_f = Future->new
    } while => sub { 1 }, return => my $ret = Future->new;
 
-   identical( $future, $ret, 'repeat with return yields correct instance' );
+   ref_is( $future, $ret, 'repeat with return yields correct instance' );
 }
 
 # cancellation

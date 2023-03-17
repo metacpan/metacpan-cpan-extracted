@@ -2,10 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -21,13 +18,13 @@ use Future;
    is_refcount( $f1, 2, '$f1 has refcount 2 after adding to ->wait_any' );
    is_refcount( $f2, 2, '$f2 has refcount 2 after adding to ->wait_any' );
 
-   is_deeply( [ $future->pending_futures ],
-              [ $f1, $f2 ],
-              '$future->pending_futures before any ready' );
+   is( [ $future->pending_futures ],
+       [ $f1, $f2 ],
+       '$future->pending_futures before any ready' );
 
-   is_deeply( [ $future->ready_futures ],
-              [],
-              '$future->done_futures before any ready' );
+   is( [ $future->ready_futures ],
+       [],
+       '$future->done_futures before any ready' );
 
    my @on_ready_args;
    $future->on_ready( sub { @on_ready_args = @_ } );
@@ -37,28 +34,28 @@ use Future;
 
    $f1->done( one => 1 );
 
-   is_deeply( [ $future->pending_futures ],
-              [],
-              '$future->pending_futures after $f1 ready' );
+   is( [ $future->pending_futures ],
+       [],
+       '$future->pending_futures after $f1 ready' );
 
-   is_deeply( [ $future->ready_futures ],
-              [ $f1, $f2 ],
-              '$future->ready_futures after $f1 ready' );
+   is( [ $future->ready_futures ],
+       [ $f1, $f2 ],
+       '$future->ready_futures after $f1 ready' );
 
-   is_deeply( [ $future->done_futures ],
-              [ $f1 ],
-              '$future->done_futures after $f1 ready' );
+   is( [ $future->done_futures ],
+       [ $f1 ],
+       '$future->done_futures after $f1 ready' );
 
-   is_deeply( [ $future->cancelled_futures ],
-              [ $f2 ],
-              '$future->cancelled_futures after $f1 ready' );
+   is( [ $future->cancelled_futures ],
+       [ $f2 ],
+       '$future->cancelled_futures after $f1 ready' );
 
    is( scalar @on_ready_args, 1, 'on_ready passed 1 argument' );
-   identical( $on_ready_args[0], $future, 'Future passed to on_ready' );
+   ref_is( $on_ready_args[0], $future, 'Future passed to on_ready' );
    undef @on_ready_args;
 
    ok( $future->is_ready, '$future now ready after f1 ready' );
-   is_deeply( [ $future->result ], [ one => 1 ], 'results from $future->result' );
+   is( [ $future->result ], [ one => 1 ], 'results from $future->result' );
 
    is_refcount( $future, 1, '$future has refcount 1 at end of test' );
    undef $future;
@@ -80,7 +77,7 @@ use Future;
 
    is( $future->failure, "It fails\n", '$future->failure yields exception' );
 
-   is( exception { $future->result }, "It fails\n", '$future->result throws exception' );
+   is( dies { $future->result }, "It fails\n", '$future->result throws exception' );
 
    ok( $f2->is_cancelled, '$f2 cancelled after a failure' );
 }
@@ -122,12 +119,12 @@ use Future;
 
    ok( $future->is_ready, '$future is ready' );
 
-   is_deeply( [ $future->done_futures ],
-              [ $f2 ],
-              '->done_futures with cancellation' );
-   is_deeply( [ $future->cancelled_futures ],
-              [ $f1 ],
-              '->cancelled_futures with cancellation' );
+   is( [ $future->done_futures ],
+       [ $f2 ],
+       '->done_futures with cancellation' );
+   is( [ $future->cancelled_futures ],
+       [ $f1 ],
+       '->cancelled_futures with cancellation' );
 
    my $f3 = Future->new;
    $future = Future->wait_any( $f3 );
@@ -160,7 +157,7 @@ use Future;
       }),
    );
 
-   is( exception { $f->done(1) }, undef,
+   ok( lives { $f->done(1) },
       'no problems cancelling a Future which clears the original ->wait_any ref' );
 
    ok( $cancelled->is_cancelled, 'cancellation occurred as expected' );

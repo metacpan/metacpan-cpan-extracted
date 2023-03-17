@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-03-16'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/RPO/Checker/bpom_rpo_check_files_label_design",
@@ -41,7 +41,7 @@ bpom-rpo-check-files-label-design - Check label design files
 
 =head1 VERSION
 
-This document describes version 0.009 of bpom-rpo-check-files-label-design (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-10.
+This document describes version 0.010 of bpom-rpo-check-files-label-design (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-16.
 
 =head1 SYNOPSIS
 

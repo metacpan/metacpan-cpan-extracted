@@ -162,13 +162,7 @@ class TestCase::Sys::IO::Stat {
       0,
     ];
     
-    warn "CCC";
-    
-    Sys->defined("_WIN32");
-
-    warn "DDD";
-    
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       $stat_info->[11] = (long)$stat->st_blksize;
       $stat_info->[12] = (long)$stat->st_blocks;
     }

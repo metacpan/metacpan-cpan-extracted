@@ -3,11 +3,12 @@ class Cwd {
   use Sys::IO;
   use Sys;
   use File::Spec;
+  use Sys::OS;
 
   static method getcwd : string () {
     my $cwd = Sys::IO->getcwd(undef, 0);
     
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       Fn->replace_chars($cwd, '\\', '/');
     }
     
@@ -15,7 +16,7 @@ class Cwd {
   }
   
   static method realpath : string ($file : string) {
-    if (Sys->defined("_WIN32")) {
+    if (Sys::OS->is_windows) {
       my $realpath = Sys::IO->_fullpath(undef, $file, 0);
       
       $realpath = (mutable string)File::Spec->canonpath($realpath);
@@ -34,7 +35,7 @@ class Cwd {
   static method abs_path : string ($file :string) { return &realpath($file); }
   
   static method getdcwd : string ($drive = undef : string) {
-    unless (Sys->defined("_WIN32")) {
+    unless (Sys::OS->is_windows) {
       set_error_code class_id Error::NotSupported;
       die "The getdcwd is not supported on this system(_WIN32)";
     }

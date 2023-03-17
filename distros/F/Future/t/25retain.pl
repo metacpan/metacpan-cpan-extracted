@@ -2,8 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
@@ -20,6 +19,13 @@ use Future;
 
       ok( $f->$method( @args ), "can call ->$method" );
       is_oneref( $f, 'refcount drops when completed' );
+
+      # Also test on immediate completed for
+      #   https://rt.cpan.org/Public/Bug/Display.html?id=145168
+      my $f_imm = Future->new;
+      $f_imm->$method( @args );
+
+      is( $f_imm->retain, $f_imm, '->retain on immediate returns original Future' );
 
       push @args, 'x';
    }

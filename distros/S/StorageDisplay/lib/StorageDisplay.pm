@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 ## Main object
 
@@ -154,7 +154,6 @@ sub blockBySerial {
 sub _loadAllBlocks {
     my $self=shift;
 
-    use JSON::MaybeXS qw(decode_json);
     my $blocks=$self->get_info('lsblk-hierarchy');
 
     my $handle_bloc;
@@ -756,7 +755,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 Replay commands
 

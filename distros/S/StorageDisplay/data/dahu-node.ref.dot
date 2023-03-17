@@ -1,0 +1,123 @@
+digraph "dahu-7.example.com"{ // HEADER: MACHINE
+	rankdir=LR; // HEADER: MACHINE
+	subgraph "cluster_machine@dahu-7.example.com" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=white;
+		node [style=filled,color=white,fillcolor=white,shape=rectangle];
+			{ "machine@dahu-7.example.com|Partition::GPT@sda" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">ATA MZ7KM240HMHQ0D3</TD> </TR><TR><TD >/dev/sda<BR/>Model: MZ7KM240HMHQ0D3<BR/>Serial: S3BSNY0J507278<BR/>Label: gpt<BR/>Size: 224 GiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="yellow">
+								/dev/sda1<BR/>KDPL_SWAP_disk0<BR/>Size: 3.72 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/sda2<BR/>KDPL_PROD_disk0<BR/>Size: 28.9 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="3" BGCOLOR="lightgrey">
+								/dev/sda3<BR/>KDPL_DEPLOY_disk0<BR/>Size: 31.7 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="4" BGCOLOR="mediumorchid1">
+								/dev/sda4<BR/>efi<BR/>Size: 953 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="5" BGCOLOR="yellow">
+								/dev/sda5<BR/>KDPL_TMP_disk0<BR/>Size: 158 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 584 kiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000004:pink;0.016660:pink;0.129136:pink;0.141633:pink;0.004163:pink;0.708401:green;0.000002";
+			]; }
+			subgraph "cluster_machine@dahu-7.example.com|FS" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				{ "machine@dahu-7.example.com|FS|::FS@/" [
+					label="/\nDevice: /dev/sda2\next4\nSize: 28.2 GiB\nFree: 10.7 GiB\nUsed: 16.0 GiB";
+					style=striped;fillcolor="pink;0.619742.2:green"
+				]; }
+				{ "machine@dahu-7.example.com|FS|::FS@/tmp" [
+					label="/tmp\nDevice: /dev/sda5\next4\nSize: 155 GiB\nFree: 147 GiB\nUsed: 76.0 kiB";
+					style=striped;fillcolor="pink;0.051247.2:green"
+				]; }
+				{ "machine@dahu-7.example.com|FS|::SWAP::Partition@sda1" [
+					label="SWAP\nDevice: /dev/sda1\nSize: 3.72 GiB\nFree: 3.72 GiB\nUsed: 0 B";
+					style=striped;fillcolor="green"
+				]; }
+				label="Mounted FS and swap";
+			}
+			subgraph "cluster_machine@dahu-7.example.com|Libvirt" {
+				style=filled;
+				color=lightgrey;
+				fillcolor=lightgrey;
+				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+				label="Libvirt Virtual Machines";
+			}
+			{ "machine@dahu-7.example.com|Partition::None@sdb" [
+				label="/dev/sdb\nModel: MZ7KM480HMHQ0D3\nSerial: S3BUNY0J511002\nSize: 447 GiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
+			{ "machine@dahu-7.example.com|Partition::None@sdc" [
+				label="/dev/sdc\nModel: ST4000NM0265-2DC107\nSerial: ZC149LGK\nSize: 3.64 TiB";
+				fillcolor="lightgrey"
+				style=filled
+				shape=rectangle
+			]; }
+			// Links for Partition::GPT@sda
+			// TARGET LINK: dahu-7.example.com 240057409536 sda "machine@dahu-7.example.com|Partition::GPT@sda"
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@sda1
+			// Links for Partition::Table::Part::Data@sda2
+			// Links for Partition::Table::Part::Data@sda3
+			// Links for Partition::Table::Part::Data@sda4
+			// Links for Partition::Table::Part::Data@sda5
+			// Links for Partition::Table::Part::Free@_2
+			// Links for FS
+			// Links for FS::FS@/
+			"machine@dahu-7.example.com|Partition::GPT@sda":"2" -> "machine@dahu-7.example.com|FS|::FS@/"
+			// Links for FS::FS@/
+			// Links for FS::FS@/tmp
+			"machine@dahu-7.example.com|Partition::GPT@sda":"5" -> "machine@dahu-7.example.com|FS|::FS@/tmp"
+			// Links for FS::FS@/tmp
+			// Links for FS::SWAP::Partition@sda1
+			"machine@dahu-7.example.com|Partition::GPT@sda":"1" -> "machine@dahu-7.example.com|FS|::SWAP::Partition@sda1"
+			// Links for FS::SWAP::Partition@sda1
+			// Links for Libvirt Virtual Machines
+			// Links for Partition::None@sdb
+			// TARGET LINK: dahu-7.example.com 480103981056 sdb "machine@dahu-7.example.com|Partition::None@sdb"
+			// Links for Partition::None@sdc
+			// TARGET LINK: dahu-7.example.com 4000787030016 sdc "machine@dahu-7.example.com|Partition::None@sdc"
+		label="dahu-7.example.com";
+	}
+} // FOOTER: MACHINE

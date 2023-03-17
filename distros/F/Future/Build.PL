@@ -61,10 +61,7 @@ my $build = Module::Build->new(
       'perl' => '5.010', # //
    },
    test_requires => {
-      'Test::Identity' => 0,
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000148',
    },
    meta_merge => {
       # It's unlikely at the time of writing that any CPAN client actually

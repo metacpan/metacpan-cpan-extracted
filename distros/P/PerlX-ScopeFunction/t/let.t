@@ -62,4 +62,28 @@ subtest "whitespaces", sub {
     }
 };
 
+subtest "statements swith lvalue being a list", sub {
+    let(($foo,$bar) = (1,2)) {
+        is $foo, 1;
+        is $bar, 2;
+    }
+
+    let(($foo,$bar) = (1,2); @fb = ($foo,$bar)) {
+        is $foo, 1;
+        is $bar, 2;
+        is \@fb, [ $foo, $bar ];
+    }
+
+    let(($foo,$bar) = (1,2); @fb = ($foo,$bar); %fb = (foo => $foo, bar => $bar)) {
+        is $foo, 1;
+        is $bar, 2;
+        is \@fb, [ $foo, $bar ];
+        is \%fb, hash {
+            field foo => 1;
+            field bar => 2;
+            end;
+        };
+    }
+};
+
 done_testing;

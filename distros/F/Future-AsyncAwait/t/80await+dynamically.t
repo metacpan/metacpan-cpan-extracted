@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    plan skip_all => "Future is not available"
@@ -104,7 +104,7 @@ BEGIN {
 
       await $f;
 
-      is_deeply( \%hash, { key => "new", newkey => "added" },
+      is( \%hash, { key => "new", newkey => "added" },
          '%hash after await' );
 
       return "result";
@@ -113,11 +113,11 @@ BEGIN {
    my $f1 = Future->new;
    my $fret = with_dynamically_helem( $f1 );
 
-   is_deeply( \%hash, \%orig, '%hash while suspended ');
+   is( \%hash, \%orig, '%hash while suspended ');
 
    $f1->done;
    is( scalar $fret->get, "result", '$fret for dynamically helem in async sub' );
-   is_deeply( \%hash, \%orig, '%hash after finish' );
+   is( \%hash, \%orig, '%hash after finish' );
 }
 
 # dynamically set variables in outer scopes during await
@@ -218,16 +218,16 @@ BEGIN {
       await $f1;
    })->();
 
-   is_deeply( \%state, { orig => "LIVE", new => "LIVE" }, '%state initially' );
+   is( \%state, { orig => "LIVE", new => "LIVE" }, '%state initially' );
 
    $f1->done;
    $fret->get;
 
-   is_deeply( \%state, { orig => "LIVE", new => "DEAD" }, '%state after done' );
+   is( \%state, { orig => "LIVE", new => "DEAD" }, '%state after done' );
 
    undef $var;
 
-   is_deeply( \%state, { orig => "DEAD", new => "DEAD" }, '%state finally' );
+   is( \%state, { orig => "DEAD", new => "DEAD" }, '%state finally' );
 }
 
 done_testing;

@@ -177,182 +177,7 @@ digraph "aya"{ // HEADER: MACHINE
 			]; }
 			{ "machine@aya|Partition::GPT@sdc" [
 				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-						<TR> <TD COLSPAN="2">ATA WDC WD141KRYZ-01</TD> </TR><TR><TD >/dev/sdc<BR/>Model: WDC_WD141KRYZ-01C66B0<BR/>Serial: Z2KEZEXT<BR/>Label: gpt<BR/>Size: 12.7 TiB</TD>    <TD BGCOLOR="lightgrey">
-						<TABLE >
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 1007 kiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="1" BGCOLOR="mediumorchid1">
-								/dev/sdc1<BR/>grub-core-2<BR/>Size: 299 MiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 724 MiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="3" BGCOLOR="yellow">
-								/dev/sdc3<BR/>aya-raid5-C2<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="7" BGCOLOR="yellow">
-								/dev/sdc7<BR/>aya-raid1S-A1<BR/>Size: 512 GiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 512 GiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="9" BGCOLOR="yellow">
-								/dev/sdc9<BR/>aya-raid1-C1<BR/>Size: 1.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="2" BGCOLOR="yellow">
-								/dev/sdc2<BR/>aya-raid6-C2<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="10" BGCOLOR="yellow">
-								/dev/sdc10<BR/>aya-raid6-D2<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 2.73 TiB
-								</TD>
-							</TR>
-						</TABLE>
-						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-					</TABLE>
-				>;
-				// Style node
-				color=white;
-				fillcolor=lightgrey;
-				shape="rectangle";
-				style=striped;
-				fillcolor="green;0.000000:pink;0.000022:green;0.000054:pink;0.157067:green;0.157067:pink;0.039267:green;0.039267:pink;0.078534:pink;0.157067:pink;0.157067:green;0.214587";
-			]; }
-			{ "machine@aya|Partition::GPT@sdd" [
-				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-						<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdd<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 7JKGRL5C<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
-						<TABLE >
-							<TR>
-								<TD PORT="2" BGCOLOR="lightgrey">
-								/dev/sdd2<BR/>none<BR/>Size: 1007 kiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="1" BGCOLOR="mediumorchid1">
-								/dev/sdd1<BR/>efi<BR/>Size: 285 MiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 738 MiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="3" BGCOLOR="yellow">
-								/dev/sdd3<BR/>aya-raid5-C1<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="7" BGCOLOR="yellow">
-								/dev/sdd7<BR/>aya-raid1-C2<BR/>Size: 1.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="8" BGCOLOR="yellow">
-								/dev/sdd8<BR/>aya-raid6-C1<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="9" BGCOLOR="yellow">
-								/dev/sdd9<BR/>aya-raid6-D1<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 97.0 GiB
-								</TD>
-							</TR>
-						</TABLE>
-						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-					</TABLE>
-				>;
-				// Style node
-				color=white;
-				fillcolor=lightgrey;
-				shape="rectangle";
-				style=striped;
-				fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.219884:green;0.219884:pink;0.109942:pink;0.219884:pink;0.219884:green;0.010414";
-			]; }
-			{ "machine@aya|Partition::GPT@sde" [
-				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-						<TR> <TD COLSPAN="2">ATA WDC WUH722222AL</TD> </TR><TR><TD >/dev/sde<BR/>Model: WDC_WUH722222ALE6L4<BR/>Serial: 2GG6475D<BR/>Label: gpt<BR/>Size: 20.0 TiB</TD>    <TD BGCOLOR="lightgrey">
-						<TABLE >
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 1007 kiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="1" BGCOLOR="mediumorchid1">
-								/dev/sde1<BR/>EFI-place<BR/>Size: 999 MiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="2" BGCOLOR="yellow">
-								/dev/sde2<BR/>aya-raid6-C4<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="3" BGCOLOR="yellow">
-								/dev/sde3<BR/>aya-raid6-D4<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD PORT="4" BGCOLOR="yellow">
-								/dev/sde4<BR/>aya-raid5-C4<BR/>Size: 2.00 TiB
-								</TD>
-							</TR>
-							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 14.0 TiB
-								</TD>
-							</TR>
-						</TABLE>
-						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
-					</TABLE>
-				>;
-				// Style node
-				color=white;
-				fillcolor=lightgrey;
-				shape="rectangle";
-				style=striped;
-				fillcolor="green;0.000000:pink;0.000048:pink;0.099951:pink;0.099951:pink;0.099951:green;0.700099";
-			]; }
-			{ "machine@aya|Partition::GPT@sdf" [
-				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-						<TR> <TD COLSPAN="2">ATA Crucial_CT960M50</TD> </TR><TR><TD >/dev/sdf<BR/>Model: Crucial_CT960M500SSD1<BR/>Serial: 14010960553B<BR/>Label: gpt<BR/>Size: 894 GiB</TD>    <TD BGCOLOR="lightgrey">
+						<TR> <TD COLSPAN="2">ATA Crucial_CT960M50</TD> </TR><TR><TD >/dev/sdc<BR/>Model: Crucial_CT960M500SSD1<BR/>Serial: 14010960553B<BR/>Label: gpt<BR/>Size: 894 GiB</TD>    <TD BGCOLOR="lightgrey">
 						<TABLE >
 							<TR>
 								<TD bgcolor="green">
@@ -361,12 +186,12 @@ digraph "aya"{ // HEADER: MACHINE
 							</TR>
 							<TR>
 								<TD PORT="2" BGCOLOR="mediumorchid1">
-								/dev/sdf2<BR/>efi<BR/>Size: 299 MiB
+								/dev/sdc2<BR/>efi<BR/>Size: 299 MiB
 								</TD>
 							</TR>
 							<TR>
 								<TD PORT="3" BGCOLOR="mediumorchid1">
-								/dev/sdf3<BR/>grub-core<BR/>Size: 1.00 MiB
+								/dev/sdc3<BR/>grub-core<BR/>Size: 1.00 MiB
 								</TD>
 							</TR>
 							<TR>
@@ -376,7 +201,7 @@ digraph "aya"{ // HEADER: MACHINE
 							</TR>
 							<TR>
 								<TD PORT="4" BGCOLOR="yellow">
-								/dev/sdf4<BR/>boot<BR/>Size: 1.00 GiB
+								/dev/sdc4<BR/>boot<BR/>Size: 1.00 GiB
 								</TD>
 							</TR>
 							<TR>
@@ -386,7 +211,7 @@ digraph "aya"{ // HEADER: MACHINE
 							</TR>
 							<TR>
 								<TD PORT="1" BGCOLOR="yellow">
-								/dev/sdf1<BR/>pv-ssd-A<BR/>Size: 884 GiB
+								/dev/sdc1<BR/>pv-ssd-A<BR/>Size: 884 GiB
 								</TD>
 							</TR>
 							<TR>
@@ -405,28 +230,73 @@ digraph "aya"{ // HEADER: MACHINE
 				style=striped;
 				fillcolor="green;0.000001:pink;0.000327:pink;0.000001:green;0.000790:pink;0.001118:green;0.008946:pink;0.988817:green;0.000000";
 			]; }
-			{ "machine@aya|Partition::GPT@sdg" [
+			{ "machine@aya|Partition::GPT@sdd" [
 				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-						<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdg<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 1SHW0ZNZ<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
+						<TR> <TD COLSPAN="2">ATA WDC WUH722222AL</TD> </TR><TR><TD >/dev/sdd<BR/>Model: WDC_WUH722222ALE6L4<BR/>Serial: 2GG6475D<BR/>Label: gpt<BR/>Size: 20.0 TiB</TD>    <TD BGCOLOR="lightgrey">
 						<TABLE >
 							<TR>
-								<TD PORT="2" BGCOLOR="lightgrey">
-								/dev/sdg2<BR/>none<BR/>Size: 1007 kiB
+								<TD bgcolor="green">
+								Free<BR/>Size: 1007 kiB
 								</TD>
 							</TR>
 							<TR>
 								<TD PORT="1" BGCOLOR="mediumorchid1">
-								/dev/sdg1<BR/>efi<BR/>Size: 285 MiB
+								/dev/sdd1<BR/>EFI-place<BR/>Size: 999 MiB
 								</TD>
 							</TR>
 							<TR>
-								<TD bgcolor="green">
-								Free<BR/>Size: 738 MiB
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/sdd2<BR/>aya-raid6-C4<BR/>Size: 2.00 TiB
 								</TD>
 							</TR>
 							<TR>
 								<TD PORT="3" BGCOLOR="yellow">
-								/dev/sdg3<BR/>aya-raid5-C3<BR/>Size: 2.00 TiB
+								/dev/sdd3<BR/>aya-raid6-D4<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="4" BGCOLOR="yellow">
+								/dev/sdd4<BR/>aya-raid5-C4<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 14.0 TiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000000:pink;0.000048:pink;0.099951:pink;0.099951:pink;0.099951:green;0.700099";
+			]; }
+			{ "machine@aya|Partition::GPT@sde" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">ATA WDC WD141KRYZ-01</TD> </TR><TR><TD >/dev/sde<BR/>Model: WDC_WD141KRYZ-01C66B0<BR/>Serial: Z2KEZEXT<BR/>Label: gpt<BR/>Size: 12.7 TiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="mediumorchid1">
+								/dev/sde1<BR/>grub-core-2<BR/>Size: 299 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 724 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="3" BGCOLOR="yellow">
+								/dev/sde3<BR/>aya-raid5-C2<BR/>Size: 2.00 TiB
 								</TD>
 							</TR>
 							<TR>
@@ -436,7 +306,7 @@ digraph "aya"{ // HEADER: MACHINE
 							</TR>
 							<TR>
 								<TD PORT="7" BGCOLOR="yellow">
-								/dev/sdg7<BR/>aya-raid1S-A2<BR/>Size: 512 GiB
+								/dev/sde7<BR/>aya-raid1S-A1<BR/>Size: 512 GiB
 								</TD>
 							</TR>
 							<TR>
@@ -446,12 +316,82 @@ digraph "aya"{ // HEADER: MACHINE
 							</TR>
 							<TR>
 								<TD PORT="9" BGCOLOR="yellow">
-								/dev/sdg9<BR/>aya-raid6-C3<BR/>Size: 2.00 TiB
+								/dev/sde9<BR/>aya-raid1-C1<BR/>Size: 1.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="2" BGCOLOR="yellow">
+								/dev/sde2<BR/>aya-raid6-C2<BR/>Size: 2.00 TiB
 								</TD>
 							</TR>
 							<TR>
 								<TD PORT="10" BGCOLOR="yellow">
-								/dev/sdg10<BR/>aya-raid6-D3<BR/>Size: 2.00 TiB
+								/dev/sde10<BR/>aya-raid6-D2<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 2.73 TiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="green;0.000000:pink;0.000022:green;0.000054:pink;0.157067:green;0.157067:pink;0.039267:green;0.039267:pink;0.078534:pink;0.157067:pink;0.157067:green;0.214587";
+			]; }
+			{ "machine@aya|Partition::GPT@sdf" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdf<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 1SHW0ZNZ<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD PORT="2" BGCOLOR="lightgrey">
+								/dev/sdf2<BR/>none<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="mediumorchid1">
+								/dev/sdf1<BR/>efi<BR/>Size: 285 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 738 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="3" BGCOLOR="yellow">
+								/dev/sdf3<BR/>aya-raid5-C3<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="7" BGCOLOR="yellow">
+								/dev/sdf7<BR/>aya-raid1S-A2<BR/>Size: 512 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 512 GiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="9" BGCOLOR="yellow">
+								/dev/sdf9<BR/>aya-raid6-C3<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="10" BGCOLOR="yellow">
+								/dev/sdf10<BR/>aya-raid6-D3<BR/>Size: 2.00 TiB
 								</TD>
 							</TR>
 							<TR>
@@ -470,6 +410,66 @@ digraph "aya"{ // HEADER: MACHINE
 				style=striped;
 				fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.219884:green;0.219884:pink;0.054971:green;0.054971:pink;0.219884:pink;0.219884:green;0.010414";
 			]; }
+			{ "machine@aya|Partition::GPT@sdg" [
+				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+						<TR> <TD COLSPAN="2">ATA WDC WD101KRYZ-01</TD> </TR><TR><TD >/dev/sdg<BR/>Model: WDC_WD101KRYZ-01JPDB1<BR/>Serial: 7JKGRL5C<BR/>Label: gpt<BR/>Size: 9.10 TiB</TD>    <TD BGCOLOR="lightgrey">
+						<TABLE >
+							<TR>
+								<TD PORT="2" BGCOLOR="lightgrey">
+								/dev/sdg2<BR/>none<BR/>Size: 1007 kiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="1" BGCOLOR="mediumorchid1">
+								/dev/sdg1<BR/>efi<BR/>Size: 285 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 738 MiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="3" BGCOLOR="yellow">
+								/dev/sdg3<BR/>aya-raid5-C1<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="7" BGCOLOR="yellow">
+								/dev/sdg7<BR/>aya-raid1-C2<BR/>Size: 1.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="8" BGCOLOR="yellow">
+								/dev/sdg8<BR/>aya-raid6-C1<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD PORT="9" BGCOLOR="yellow">
+								/dev/sdg9<BR/>aya-raid6-D1<BR/>Size: 2.00 TiB
+								</TD>
+							</TR>
+							<TR>
+								<TD bgcolor="green">
+								Free<BR/>Size: 97.0 GiB
+								</TD>
+							</TR>
+						</TABLE>
+						</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+					</TABLE>
+				>;
+				// Style node
+				color=white;
+				fillcolor=lightgrey;
+				shape="rectangle";
+				style=striped;
+				fillcolor="pink;0.000000:pink;0.000030:green;0.000077:pink;0.219884:green;0.219884:pink;0.109942:pink;0.219884:pink;0.219884:green;0.010414";
+			]; }
 			subgraph "cluster_machine@aya|LVM::VG@aya+raid0" {
 				style=filled;
 				color=lightgrey;
@@ -478,11 +478,11 @@ digraph "aya"{ // HEADER: MACHINE
 				subgraph "cluster_machine@aya|LVM::VG@aya+raid0|::PVs" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md121" [
+					{ "machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md127" [
 						label="PV: /dev/md/aya-raid0-A\nSize: 500 GiB\nFree: 390 GiB\nUsed: 110 GiB";
 						style=striped;fillcolor="pink;0.220112.2:green"
 					]; }
-					label="LVM::VG@aya+raid0's PVs";
+					label="aya+raid0's PVs";
 				}
 				subgraph "cluster_machine@aya|LVM::VG@aya+raid0|::LVs" {
 					color=white;
@@ -493,15 +493,15 @@ digraph "aya"{ // HEADER: MACHINE
 					]; }
 					{ "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sid-amd64" [
 						label="LV: sid-amd64\nSize: 10.0 GiB";
-						fillcolor="lightgrey"
+						fillcolor="yellow"
 					]; }
 					{ "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@swap" [
 						label="LV: swap\nSize: 50.0 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@aya+raid0's LVs";
+					label="aya+raid0's LVs";
 				}
-				label="LVM: LVM::VG@aya+raid0\nSize: 500 GiB\nFree: 390 GiB";
+				label="LVM: aya+raid0\nSize: 500 GiB\nFree: 390 GiB";
 				style=striped;fillcolor="pink;0.220112.2:green"
 			}
 			subgraph "cluster_machine@aya|LVM::VG@aya+raid1" {
@@ -512,23 +512,23 @@ digraph "aya"{ // HEADER: MACHINE
 				subgraph "cluster_machine@aya|LVM::VG@aya+raid1|::PVs" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" [
+					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" [
 						label="PV: /dev/md/aya-raid1-C\nSize: 1024 GiB\nFree: 505 GiB\nUsed: 519 GiB";
 						style=striped;fillcolor="pink;0.507041.2:green"
 					]; }
-					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" [
-						label="PV: /dev/md/aya-raid1S-A\nSize: 512 GiB\nFree: 45.0 GiB\nUsed: 467 GiB";
-						style=striped;fillcolor="pink;0.912087.2:green"
-					]; }
-					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" [
+					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md124" [
 						label="PV: /dev/md/aya-raid5-C\nSize: 6.00 TiB\nFree: 3.00 TiB\nUsed: 3.00 TiB";
 						style=striped;fillcolor="pink;0.500031.2:green"
 					]; }
-					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" [
+					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" [
+						label="PV: /dev/md/aya-raid1S-A\nSize: 512 GiB\nFree: 45.0 GiB\nUsed: 467 GiB";
+						style=striped;fillcolor="pink;0.912087.2:green"
+					]; }
+					{ "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" [
 						label="PV: /dev/md/aya-raid1-D\nSize: 512 GiB\nFree: 347 GiB\nUsed: 165 GiB";
 						style=striped;fillcolor="pink;0.322347.2:green"
 					]; }
-					label="LVM::VG@aya+raid1's PVs";
+					label="aya+raid1's PVs";
 				}
 				subgraph "cluster_machine@aya|LVM::VG@aya+raid1|::LVs" {
 					color=white;
@@ -665,9 +665,9 @@ digraph "aya"{ // HEADER: MACHINE
 						label="LV: tp_pool+raid1\nSize: 250 GiB";
 						fillcolor="lightgrey"
 					]; }
-					label="LVM::VG@aya+raid1's LVs";
+					label="aya+raid1's LVs";
 				}
-				label="LVM: LVM::VG@aya+raid1\nSize: 8.00 TiB\nFree: 3.88 TiB";
+				label="LVM: aya+raid1\nSize: 8.00 TiB\nFree: 3.88 TiB";
 				style=striped;fillcolor="pink;0.515553.2:green"
 			}
 			subgraph "cluster_machine@aya|LVM::VG@aya+raid6" {
@@ -678,15 +678,15 @@ digraph "aya"{ // HEADER: MACHINE
 				subgraph "cluster_machine@aya|LVM::VG@aya+raid6|::PVs" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md124" [
+					{ "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md122" [
 						label="PV: /dev/md/aya-raid6-C\nSize: 4.00 TiB\nFree: 11.7 GiB\nUsed: 3.99 TiB";
 						style=striped;fillcolor="pink;0.997132.2:green"
 					]; }
-					{ "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md126" [
+					{ "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md123" [
 						label="PV: /dev/md/aya-raid6-D\nSize: 4.00 TiB\nFree: 1.95 TiB\nUsed: 2.05 TiB";
 						style=striped;fillcolor="pink;0.512239.2:green"
 					]; }
-					label="LVM::VG@aya+raid6's PVs";
+					label="aya+raid6's PVs";
 				}
 				subgraph "cluster_machine@aya|LVM::VG@aya+raid6|::LVs" {
 					color=white;
@@ -711,9 +711,9 @@ digraph "aya"{ // HEADER: MACHINE
 						label="LV: rushes\nSize: 500 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@aya+raid6's LVs";
+					label="aya+raid6's LVs";
 				}
-				label="LVM: LVM::VG@aya+raid6\nSize: 8.00 TiB\nFree: 1.96 TiB";
+				label="LVM: aya+raid6\nSize: 8.00 TiB\nFree: 1.96 TiB";
 				style=striped;fillcolor="pink;0.754685.2:green"
 			}
 			subgraph "cluster_machine@aya|LVM::VG@aya+ssd" {
@@ -724,11 +724,11 @@ digraph "aya"{ // HEADER: MACHINE
 				subgraph "cluster_machine@aya|LVM::VG@aya+ssd|::PVs" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|LVM::VG@aya+ssd|::PVs|::PV@sdf1" [
-						label="PV: /dev/sdf1\nSize: 884 GiB\nFree: 372 GiB\nUsed: 512 GiB";
+					{ "machine@aya|LVM::VG@aya+ssd|::PVs|::PV@sdc1" [
+						label="PV: /dev/sdc1\nSize: 884 GiB\nFree: 372 GiB\nUsed: 512 GiB";
 						style=striped;fillcolor="pink;0.579022.2:green"
 					]; }
-					label="LVM::VG@aya+ssd's PVs";
+					label="aya+ssd's PVs";
 				}
 				subgraph "cluster_machine@aya|LVM::VG@aya+ssd|::LVs" {
 					color=white;
@@ -737,9 +737,9 @@ digraph "aya"{ // HEADER: MACHINE
 						label="LV: aya-raid1S-A3\nSize: 512 GiB";
 						fillcolor="yellow"
 					]; }
-					label="LVM::VG@aya+ssd's LVs";
+					label="aya+ssd's LVs";
 				}
-				label="LVM: LVM::VG@aya+ssd\nSize: 884 GiB\nFree: 372 GiB";
+				label="LVM: aya+ssd\nSize: 884 GiB\nFree: 372 GiB";
 				style=striped;fillcolor="pink;0.579022.2:green"
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md121" {
@@ -749,22 +749,22 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md121|::State" {
 					{ "machine@aya|RAID::MD@md121|::State|::RaidDevice@md121" [
-						label="/dev/md/aya-raid0-A\nraid0\nSize: 500 GiB";
+						label="/dev/md/aya-raid1-C\nraid1\nSize: 1024 GiB";
 						fillcolor="yellow"
 					]; }
 					label="state: clean ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md121|::Device@nvme0n1p6" [
-					label="0: /dev/nvme0n1p6\nactive sync";
+				{ "machine@aya|RAID::MD@md121|::Device@sde9" [
+					label="0: /dev/sde9\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md121|::Device@nvme1n1p3" [
-					label="1: /dev/nvme1n1p3\nactive sync";
+				{ "machine@aya|RAID::MD@md121|::Device@sdg7" [
+					label="1: /dev/sdg7\nactive sync";
 					fillcolor=yellow
 				]; }
-				label="aya:aya-raid0-A";
+				label="aya:aya-raid1-C\n1024 GiB used per device";
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md122" {
 				style=filled;
@@ -773,22 +773,30 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md122|::State" {
 					{ "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122" [
-						label="/dev/md/aya-raid1-C\nraid1\nSize: 1024 GiB";
+						label="/dev/md/aya-raid6-C\nraid6\nSize: 4.00 TiB";
 						fillcolor="yellow"
 					]; }
 					label="state: clean ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md122|::Device@sdc9" [
-					label="0: /dev/sdc9\nactive sync";
+				{ "machine@aya|RAID::MD@md122|::Device@sdd2" [
+					label="3: /dev/sdd2\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md122|::Device@sdd7" [
-					label="1: /dev/sdd7\nactive sync";
+				{ "machine@aya|RAID::MD@md122|::Device@sde2" [
+					label="1: /dev/sde2\nactive sync";
 					fillcolor=yellow
 				]; }
-				label="aya:aya-raid1-C\n1024 GiB used per device";
+				{ "machine@aya|RAID::MD@md122|::Device@sdf9" [
+					label="2: /dev/sdf9\nactive sync";
+					fillcolor=yellow
+				]; }
+				{ "machine@aya|RAID::MD@md122|::Device@sdg8" [
+					label="0: /dev/sdg8\nactive sync";
+					fillcolor=yellow
+				]; }
+				label="aya:aya-raid6-C\n2.00 TiB used per device";
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md123" {
 				style=filled;
@@ -797,26 +805,30 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md123|::State" {
 					{ "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123" [
-						label="/dev/md/aya-raid1S-A\nraid1\nSize: 512 GiB";
+						label="/dev/md/aya-raid6-D\nraid6\nSize: 4.00 TiB";
 						fillcolor="yellow"
 					]; }
 					label="state: clean ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md123|::Device@dm-0" [
-					label="2: /dev/aya+ssd/aya-raid1S-A3\nactive sync";
+				{ "machine@aya|RAID::MD@md123|::Device@sdd3" [
+					label="3: /dev/sdd3\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md123|::Device@sdc7" [
-					label="0: /dev/sdc7\nactive sync writemostly";
+				{ "machine@aya|RAID::MD@md123|::Device@sde10" [
+					label="1: /dev/sde10\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md123|::Device@sdg7" [
-					label="1: /dev/sdg7\nactive sync writemostly";
+				{ "machine@aya|RAID::MD@md123|::Device@sdf10" [
+					label="2: /dev/sdf10\nactive sync";
 					fillcolor=yellow
 				]; }
-				label="aya:aya-raid1S-A\n512 GiB used per device";
+				{ "machine@aya|RAID::MD@md123|::Device@sdg9" [
+					label="0: /dev/sdg9\nactive sync";
+					fillcolor=yellow
+				]; }
+				label="aya:aya-raid6-D\n2.00 TiB used per device";
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md124" {
 				style=filled;
@@ -825,30 +837,30 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md124|::State" {
 					{ "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124" [
-						label="/dev/md/aya-raid6-C\nraid6\nSize: 4.00 TiB";
+						label="/dev/md/aya-raid5-C\nraid5\nSize: 6.00 TiB";
 						fillcolor="yellow"
 					]; }
 					label="state: clean ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md124|::Device@sdc2" [
-					label="1: /dev/sdc2\nactive sync";
+				{ "machine@aya|RAID::MD@md124|::Device@sdd4" [
+					label="3: /dev/sdd4\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md124|::Device@sdd8" [
-					label="0: /dev/sdd8\nactive sync";
+				{ "machine@aya|RAID::MD@md124|::Device@sde3" [
+					label="1: /dev/sde3\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md124|::Device@sde2" [
-					label="3: /dev/sde2\nactive sync";
+				{ "machine@aya|RAID::MD@md124|::Device@sdf3" [
+					label="2: /dev/sdf3\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md124|::Device@sdg9" [
-					label="2: /dev/sdg9\nactive sync";
+				{ "machine@aya|RAID::MD@md124|::Device@sdg3" [
+					label="0: /dev/sdg3\nactive sync";
 					fillcolor=yellow
 				]; }
-				label="aya:aya-raid6-C\n2.00 TiB used per device";
+				label="aya:aya-raid5-C\n2.00 TiB used per device";
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md125" {
 				style=filled;
@@ -857,30 +869,26 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md125|::State" {
 					{ "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125" [
-						label="/dev/md/aya-raid5-C\nraid5\nSize: 6.00 TiB";
+						label="/dev/md/aya-raid1S-A\nraid1\nSize: 512 GiB";
 						fillcolor="yellow"
 					]; }
-					label="state: clean ";
+					label="state: active ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md125|::Device@sdc3" [
-					label="1: /dev/sdc3\nactive sync";
+				{ "machine@aya|RAID::MD@md125|::Device@dm-3" [
+					label="2: /dev/aya+ssd/aya-raid1S-A3\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md125|::Device@sdd3" [
-					label="0: /dev/sdd3\nactive sync";
+				{ "machine@aya|RAID::MD@md125|::Device@sde7" [
+					label="0: /dev/sde7\nactive sync writemostly";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md125|::Device@sde4" [
-					label="3: /dev/sde4\nactive sync";
+				{ "machine@aya|RAID::MD@md125|::Device@sdf7" [
+					label="1: /dev/sdf7\nactive sync writemostly";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md125|::Device@sdg3" [
-					label="2: /dev/sdg3\nactive sync";
-					fillcolor=yellow
-				]; }
-				label="aya:aya-raid5-C\n2.00 TiB used per device";
+				label="aya:aya-raid1S-A\n512 GiB used per device";
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md126" {
 				style=filled;
@@ -889,30 +897,22 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md126|::State" {
 					{ "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126" [
-						label="/dev/md/aya-raid6-D\nraid6\nSize: 4.00 TiB";
+						label="/dev/md/aya-raid1-D\nraid1\nSize: 512 GiB";
 						fillcolor="yellow"
 					]; }
-					label="state: clean ";
+					label="state: active ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md126|::Device@sdc10" [
-					label="1: /dev/sdc10\nactive sync";
+				{ "machine@aya|RAID::MD@md126|::Device@nvme0n1p5" [
+					label="0: /dev/nvme0n1p5\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md126|::Device@sdd9" [
-					label="0: /dev/sdd9\nactive sync";
+				{ "machine@aya|RAID::MD@md126|::Device@nvme1n1p2" [
+					label="1: /dev/nvme1n1p2\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md126|::Device@sde3" [
-					label="3: /dev/sde3\nactive sync";
-					fillcolor=yellow
-				]; }
-				{ "machine@aya|RAID::MD@md126|::Device@sdg10" [
-					label="2: /dev/sdg10\nactive sync";
-					fillcolor=yellow
-				]; }
-				label="aya:aya-raid6-D\n2.00 TiB used per device";
+				label="aya:aya-raid1-D\n512 GiB used per device";
 			}
 			subgraph "cluster_machine@aya|RAID::MD@md127" {
 				style=filled;
@@ -921,22 +921,22 @@ digraph "aya"{ // HEADER: MACHINE
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				subgraph "cluster_machine@aya|RAID::MD@md127|::State" {
 					{ "machine@aya|RAID::MD@md127|::State|::RaidDevice@md127" [
-						label="/dev/md/aya-raid1-D\nraid1\nSize: 512 GiB";
+						label="/dev/md/aya-raid0-A\nraid0\nSize: 500 GiB";
 						fillcolor="yellow"
 					]; }
-					label="state: active ";
+					label="state: clean ";
 					shape=oval
 					fillcolor=green
 				}
-				{ "machine@aya|RAID::MD@md127|::Device@nvme0n1p5" [
-					label="0: /dev/nvme0n1p5\nactive sync";
+				{ "machine@aya|RAID::MD@md127|::Device@nvme0n1p6" [
+					label="0: /dev/nvme0n1p6\nactive sync";
 					fillcolor=yellow
 				]; }
-				{ "machine@aya|RAID::MD@md127|::Device@nvme1n1p2" [
-					label="1: /dev/nvme1n1p2\nactive sync";
+				{ "machine@aya|RAID::MD@md127|::Device@nvme1n1p3" [
+					label="1: /dev/nvme1n1p3\nactive sync";
 					fillcolor=yellow
 				]; }
-				label="aya:aya-raid1-D\n512 GiB used per device";
+				label="aya:aya-raid0-A";
 			}
 			subgraph "cluster_machine@aya|FS" {
 				style=filled;
@@ -947,29 +947,33 @@ digraph "aya"{ // HEADER: MACHINE
 					label="/var/lib/sbuild/build\nDevice: /dev/aya+raid0/sbuild\next4\nSize: 48.9 GiB\nFree: 42.9 GiB\nUsed: 3.54 GiB";
 					style=striped;fillcolor="pink;0.123892.2:green"
 				]; }
+				{ "machine@aya|FS|::FS@/srv/chroots/sid-amd64" [
+					label="/srv/chroots/sid-amd64\nDevice: /dev/aya+raid0/sid-amd64\next4\nSize: 9.75 GiB\nFree: 8.59 GiB\nUsed: 652 MiB";
+					style=striped;fillcolor="pink;0.118278.2:green"
+				]; }
 				{ "machine@aya|FS|::FS@/srv/backuppc" [
 					label="/srv/backuppc\nDevice: /dev/aya+raid1/backuppc\next4\nSize: 2.95 TiB\nFree: 1.12 TiB\nUsed: 1.80 TiB";
-					style=striped;fillcolor="pink;0.620171.2:green"
+					style=striped;fillcolor="pink;0.621642.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/srv/kvm" [
 					label="/srv/kvm\nDevice: /dev/aya+raid1/kvm\next4\nSize: 98.3 GiB\nFree: 26.5 GiB\nUsed: 71.8 GiB";
 					style=striped;fillcolor="pink;0.730595.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/var/log" [
-					label="/var/log\nDevice: /dev/aya+raid1/log\next4\nSize: 5.77 GiB\nFree: 4.24 GiB\nUsed: 1.22 GiB";
-					style=striped;fillcolor="pink;0.266044.2:green"
+					label="/var/log\nDevice: /dev/aya+raid1/log\next4\nSize: 5.77 GiB\nFree: 4.21 GiB\nUsed: 1.25 GiB";
+					style=striped;fillcolor="pink;0.270592.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/" [
-					label="/\nDevice: /dev/aya+raid1/root\next4\nSize: 39.2 GiB\nFree: 1.07 GiB\nUsed: 38.2 GiB";
-					style=striped;fillcolor="pink;0.972777.2:green"
+					label="/\nDevice: /dev/aya+raid1/root\next4\nSize: 39.2 GiB\nFree: 1.39 GiB\nUsed: 37.8 GiB";
+					style=striped;fillcolor="pink;0.964530.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/srv/archives" [
 					label="/srv/archives\nDevice: /dev/aya+raid6/archives\next4\nSize: 1.48 TiB\nFree: 494 GiB\nUsed: 1018 GiB";
-					style=striped;fillcolor="pink;0.673321.2:green"
+					style=striped;fillcolor="pink;0.673536.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/srv/multimedia" [
-					label="/srv/multimedia\nDevice: /dev/aya+raid6/multimedia\next4\nSize: 1.97 TiB\nFree: 202 GiB\nUsed: 1.68 TiB";
-					style=striped;fillcolor="pink;0.899982.2:green"
+					label="/srv/multimedia\nDevice: /dev/aya+raid6/multimedia\next4\nSize: 1.97 TiB\nFree: 201 GiB\nUsed: 1.68 TiB";
+					style=striped;fillcolor="pink;0.900141.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/srv/photos" [
 					label="/srv/photos\nDevice: /dev/aya+raid6/photos\next4\nSize: 1.97 TiB\nFree: 926 GiB\nUsed: 1.06 TiB";
@@ -984,24 +988,24 @@ digraph "aya"{ // HEADER: MACHINE
 					style=striped;fillcolor="pink;0.149342.2:green"
 				]; }
 				{ "machine@aya|FS|::FS@/boot" [
-					label="/boot\nDevice: /dev/sdf4\next4\nSize: 975 MiB\nFree: 668 MiB\nUsed: 239 MiB";
-					style=striped;fillcolor="pink;0.314258.2:green"
+					label="/boot\nDevice: /dev/sdc4\next4\nSize: 975 MiB\nFree: 550 MiB\nUsed: 357 MiB";
+					style=striped;fillcolor="pink;0.435288.2:green"
 				]; }
 				subgraph "cluster_machine@aya|FS|::AllSWAP@@FS@SWAP" {
 					style=filled;
 					color=white
 					fillcolor=lightgrey;
 					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-					{ "machine@aya|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@dm-41" [
+					{ "machine@aya|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@dm-2" [
 						label="/dev/aya+raid0/swap\nSize: 50.0 GiB\nFree: 50.0 GiB\nUsed: 0 B";
 						style=striped;fillcolor="green"
 					]; }
 					{ "machine@aya|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@sdb6" [
-						label="/dev/sdb6\nSize: 49.0 GiB\nFree: 46.6 GiB\nUsed: 2.42 GiB";
-						style=striped;fillcolor="pink;0.049452.2:green"
+						label="/dev/sdb6\nSize: 49.0 GiB\nFree: 47.6 GiB\nUsed: 1.40 GiB";
+						style=striped;fillcolor="pink;0.028541.2:green"
 					]; }
-					label="SWAP\nSize: 99.0 GiB\nFree: 96.6 GiB\nUsed: 2.42 GiB";
-					style=striped;fillcolor="pink;0.024476.2:green"
+					label="SWAP\nSize: 99.0 GiB\nFree: 97.6 GiB\nUsed: 1.40 GiB";
+					style=striped;fillcolor="pink;0.014126.2:green"
 				}
 				label="Mounted FS and swap";
 			}
@@ -1010,295 +1014,359 @@ digraph "aya"{ // HEADER: MACHINE
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				subgraph "cluster_machine@aya|Libvirt|::VM@alastor" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@yoko" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@alastor|::Block@sdc" [
-						label="/dev/aya+raid1/kvm-alastor-disk2\n(sdc)";
+					{ "machine@aya|Libvirt|::VM@yoko|::Block@sda" [
+						label="/dev/aya+raid1/kvm-yoko-root\n(sda)\nSize: 15.0 GiB";
 					]; }
-					{ "machine@aya|Libvirt|::VM@alastor|::Block@sdb" [
-						label="/dev/aya+raid1/kvm-alastor-root\n(sdb)";
-					]; }
-					label="alastor";
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@belgarath" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@belgarath|::Block@vdb" [
-						label="/dev/aya+raid1/kvm-belgarath-openhab\n(vdb)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@belgarath|::Block@vda" [
-						label="/dev/aya+raid1/kvm-belgarath-root\n(vda)";
-					]; }
-					label="belgarath";
+					label="yoko";
 					fillcolor=yellow
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@blackjack" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@winwin" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@blackjack|::Block@vda" [
-						label="/dev/aya+raid1/kvm-blackjack-root\n(vda)";
+					{ "machine@aya|Libvirt|::VM@winwin|::Block@hdc" [
+						label="/srv/kvm/cds/virtio-win-0.1-59.iso\n(hdc)\nSize: 59.2 MiB";
 					]; }
-					label="blackjack";
-					fillcolor=yellow
+					{ "machine@aya|Libvirt|::VM@winwin|::Block@vda" [
+						label="/srv/kvm/winwin/base_winXP+FF+WinSCP.img\n(vda)\nSize: 8.19 GiB";
+					]; }
+					label="winwin";
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@dedale" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@win81" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@dedale|::Block@sdb" [
-						label="/dev/aya+raid1/kvm-dedale-root\n(sdb)";
+					{ "machine@aya|Libvirt|::VM@win81|::Block@sdd" [
+						label="/dev/aya+raid1/kvm-win-data\n(sdd)\nSize: 20.0 GiB";
 					]; }
-					label="dedale";
-					fillcolor=yellow
+					{ "machine@aya|Libvirt|::VM@win81|::Block@sda" [
+						label="/dev/aya+raid1/kvm-win81-c\n(sda)\nSize: 50.0 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@win81|::Block@hdc" [
+						label="/srv/kvm/cds/virtio-win-0.1.118.iso\n(hdc)\nSize: 54.3 MiB";
+					]; }
+					label="win81";
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@hermes" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@win764" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@hermes|::Block@sdb" [
-						label="/dev/aya+raid1/kvm-hermes-root\n(sdb)";
+					{ "machine@aya|Libvirt|::VM@win764|::Block@vdb" [
+						label="/dev/aya+raid1/kvm-win-data\n(vdb)\nSize: 20.0 GiB";
 					]; }
-					label="hermes";
-					fillcolor=yellow
+					{ "machine@aya|Libvirt|::VM@win764|::Block@vda" [
+						label="/dev/aya+raid1/kvm-win764-c\n(vda)\nSize: 25.0 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@win764|::Block@vdc" [
+						label="/srv/kvm/cds/sdcard\n(vdc)\nSize: 1.88 GiB";
+					]; }
+					label="win764";
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@kooot" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@win11" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@kooot|::Block@sda" [
-						label="/dev/aya+raid1/kvm-kooot-root\n(sda)";
+					{ "machine@aya|Libvirt|::VM@win11|::Block@sdb" [
+						label="/dev/aya+raid1/kvm-win11-c\n(sdb)\nSize: 50.0 GiB";
 					]; }
-					label="kooot";
-					fillcolor=yellow
+					label="win11";
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@ogmios" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@win10" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@ogmios|::Block@sda" [
-						label="/dev/aya+raid1/kvm-ogmios-root\n(sda)";
+					{ "machine@aya|Libvirt|::VM@win10|::Block@sdb" [
+						label="/dev/aya+raid1/kvm-win-data\n(sdb)\nSize: 20.0 GiB";
 					]; }
-					label="ogmios";
-					fillcolor=yellow
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@ran" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@ran|::Block@sda" [
-						label="/dev/aya+raid1/kvm-ran-root\n(sda)";
+					{ "machine@aya|Libvirt|::VM@win10|::Block@sda" [
+						label="/dev/aya+raid1/kvm-win10-c\n(sda)\nSize: 50.0 GiB";
 					]; }
-					label="ran";
-					fillcolor=yellow
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@rosee" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@rosee|::Block@vda" [
-						label="/dev/aya+raid1/kvm-rosee-root\n(vda)";
+					{ "machine@aya|Libvirt|::VM@win10|::Block@hdb" [
+						label="/srv/kvm/cds/virtio-win-0.1.185.iso\n(hdb)\nSize: 393 MiB";
 					]; }
-					label="rosee";
-					fillcolor=yellow
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@talia" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@talia|::Block@sda" [
-						label="/dev/aya+raid1/kvm-talia-root\n(sda)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@talia|::Block@sdc" [
-						label="/dev/aya+raid1/kvm-talia-root-old\n(sdc)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@talia|::Block@sdb" [
-						label="/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso\n(sdb)";
-					]; }
-					label="talia";
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@thot" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@thot|::Block@sdc" [
-						label="/dev/aya+raid1/kvm-thot-docker\n(sdc)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@thot|::Block@sdb" [
-						label="/dev/aya+raid1/kvm-thot-root\n(sdb)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@thot|::Block@sdd" [
-						label="/dev/aya+raid6/kvm-thot-calibre\n(sdd)";
-					]; }
-					label="thot";
-					fillcolor=yellow
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@urtho" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@urtho|::Block@vda" [
-						label="/dev/aya+raid1/kvm-urtho-root\n(vda)";
-					]; }
-					label="urtho";
-					fillcolor=yellow
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@vaniel" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@vaniel|::Block@sda" [
-						label="/dev/aya+raid1/kvm-vaniel-root\n(sda)";
-					]; }
-					label="vaniel";
+					label="win10";
 				}
 				subgraph "cluster_machine@aya|Libvirt|::VM@vaniel-piix" {
 					color=white;
 					fillcolor=white;
 					label="vaniel-piix";
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@win10" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@vaniel" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@win10|::Block@sdb" [
-						label="/dev/aya+raid1/kvm-win-data\n(sdb)";
+					{ "machine@aya|Libvirt|::VM@vaniel|::Block@sda" [
+						label="/dev/aya+raid1/kvm-vaniel-root\n(sda)\nSize: 15.0 GiB";
 					]; }
-					{ "machine@aya|Libvirt|::VM@win10|::Block@sda" [
-						label="/dev/aya+raid1/kvm-win10-c\n(sda)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@win10|::Block@hdb" [
-						label="/srv/kvm/cds/virtio-win-0.1.185.iso\n(hdb)";
-					]; }
-					label="win10";
+					label="vaniel";
 				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@win11" {
+				subgraph "cluster_machine@aya|Libvirt|::VM@urtho" {
 					color=white;
 					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@win11|::Block@sdb" [
-						label="/dev/aya+raid1/kvm-win11-c\n(sdb)";
+					{ "machine@aya|Libvirt|::VM@urtho|::Block@vda" [
+						label="/dev/aya+raid1/kvm-urtho-root\n(vda)\nSize: 15.0 GiB";
 					]; }
-					label="win11";
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@win764" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@win764|::Block@vdb" [
-						label="/dev/aya+raid1/kvm-win-data\n(vdb)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@win764|::Block@vda" [
-						label="/dev/aya+raid1/kvm-win764-c\n(vda)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@win764|::Block@vdc" [
-						label="/srv/kvm/cds/sdcard\n(vdc)";
-					]; }
-					label="win764";
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@win81" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@win81|::Block@sdd" [
-						label="/dev/aya+raid1/kvm-win-data\n(sdd)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@win81|::Block@sda" [
-						label="/dev/aya+raid1/kvm-win81-c\n(sda)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@win81|::Block@hdc" [
-						label="/srv/kvm/cds/virtio-win-0.1.118.iso\n(hdc)";
-					]; }
-					label="win81";
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@winwin" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@winwin|::Block@hdc" [
-						label="/srv/kvm/cds/virtio-win-0.1-59.iso\n(hdc)";
-					]; }
-					{ "machine@aya|Libvirt|::VM@winwin|::Block@vda" [
-						label="/srv/kvm/winwin/base_winXP+FF+WinSCP.img\n(vda)";
-					]; }
-					label="winwin";
-				}
-				subgraph "cluster_machine@aya|Libvirt|::VM@yoko" {
-					color=white;
-					fillcolor=white;
-					{ "machine@aya|Libvirt|::VM@yoko|::Block@sda" [
-						label="/dev/aya+raid1/kvm-yoko-root\n(sda)";
-					]; }
-					label="yoko";
+					label="urtho";
 					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@thot" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@thot|::Block@sdc" [
+						label="/dev/aya+raid1/kvm-thot-docker\n(sdc)\nSize: 200 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@thot|::Block@sdb" [
+						label="/dev/aya+raid1/kvm-thot-root\n(sdb)\nSize: 20.0 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@thot|::Block@sdd" [
+						label="/dev/aya+raid6/kvm-thot-calibre\n(sdd)\nSize: 50.0 GiB";
+					]; }
+					label="thot";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@talia" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@talia|::Block@sda" [
+						label="/dev/aya+raid1/kvm-talia-root\n(sda)\nSize: 15.0 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@talia|::Block@sdc" [
+						label="/dev/aya+raid1/kvm-talia-root-old\n(sdc)\nSize: 15.0 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@talia|::Block@sdb" [
+						label="/srv/kvm/cds/debian-10.4.0-amd64-netinst.iso\n(sdb)\nSize: 336 MiB";
+					]; }
+					label="talia";
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@rosee" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@rosee|::Block@vda" [
+						label="/dev/aya+raid1/kvm-rosee-root\n(vda)\nSize: 15.0 GiB";
+					]; }
+					label="rosee";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@ran" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@ran|::Block@sda" [
+						label="/dev/aya+raid1/kvm-ran-root\n(sda)\nSize: 15.0 GiB";
+					]; }
+					label="ran";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@ogmios" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@ogmios|::Block@sda" [
+						label="/dev/aya+raid1/kvm-ogmios-root\n(sda)\nSize: 15.0 GiB";
+					]; }
+					label="ogmios";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@kooot" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@kooot|::Block@sda" [
+						label="/dev/aya+raid1/kvm-kooot-root\n(sda)\nSize: 15.0 GiB";
+					]; }
+					label="kooot";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@hermes" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@hermes|::Block@sdb" [
+						label="/dev/aya+raid1/kvm-hermes-root\n(sdb)\nSize: 15.0 GiB";
+					]; }
+					label="hermes";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@dedale" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@dedale|::Block@sdb" [
+						label="/dev/aya+raid1/kvm-dedale-root\n(sdb)\nSize: 15.0 GiB";
+					]; }
+					label="dedale";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@blackjack" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@blackjack|::Block@vda" [
+						label="/dev/aya+raid1/kvm-blackjack-root\n(vda)\nSize: 15.0 GiB";
+					]; }
+					label="blackjack";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@belgarath" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@belgarath|::Block@vdb" [
+						label="/dev/aya+raid1/kvm-belgarath-openhab\n(vdb)\nSize: 20.0 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@belgarath|::Block@vda" [
+						label="/dev/aya+raid1/kvm-belgarath-root\n(vda)\nSize: 15.0 GiB";
+					]; }
+					label="belgarath";
+					fillcolor=yellow
+				}
+				subgraph "cluster_machine@aya|Libvirt|::VM@alastor" {
+					color=white;
+					fillcolor=white;
+					{ "machine@aya|Libvirt|::VM@alastor|::Block@sdc" [
+						label="/dev/aya+raid1/kvm-alastor-disk2\n(sdc)\nSize: 100 GiB";
+					]; }
+					{ "machine@aya|Libvirt|::VM@alastor|::Block@sdb" [
+						label="/dev/aya+raid1/kvm-alastor-root\n(sdb)\nSize: 15.0 GiB";
+					]; }
+					label="alastor";
 				}
 				label="Libvirt Virtual Machines";
 			}
 			// Links from LVM VG: LVM::VG@aya+raid0
-			"machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sbuild"
-			"machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sid-amd64"
-			"machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@swap"
+			"machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sbuild"
+			"machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sid-amd64"
+			"machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid0|::LVs|::LV@swap"
 			// Links from LVM VG: LVM::VG@aya+raid1
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@backuppc"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-disk2"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-openhab"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-blackjack-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-dedale-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-hermes-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-kooot-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ogmios-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ran-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-rosee-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root-old"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-urtho-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-vaniel-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win10-c"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win11-c"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win764-c"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win81-c"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-winwin-c"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-yoko-root"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@log"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@log"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[lvol0_pmspare]"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md124" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@backuppc"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-disk2"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-openhab"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-blackjack-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-dedale-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-hermes-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-kooot-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ogmios-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ran-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-rosee-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root-old"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-urtho-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-vaniel-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win10-c"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win11-c"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win764-c"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win81-c"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-winwin-c"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-yoko-root"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@log"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@log"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[lvol0_pmspare]"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@root"
 			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@tp_pool+raid1" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@thinvolume"
 			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tdata]" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@tp_pool+raid1"
 			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tdata]" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@tp_pool+raid1"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tdata]"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tdata]"
 			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tmeta]" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@tp_pool+raid1"
-			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tmeta]"
+			"machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125" -> "machine@aya|LVM::VG@aya+raid1|::LVs|::LV@[tp_pool+raid1_tmeta]"
 			// Links from LVM VG: LVM::VG@aya+raid6
-			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md124" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@archives"
-			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md124" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@archives"
-			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@kvm-thot-calibre"
-			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md126" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@multimedia"
-			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md124" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@photos"
-			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md124" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@rushes"
+			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@archives"
+			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@archives"
+			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@kvm-thot-calibre"
+			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md123" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@multimedia"
+			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@photos"
+			"machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md122" -> "machine@aya|LVM::VG@aya+raid6|::LVs|::LV@rushes"
 			// Links from LVM VG: LVM::VG@aya+ssd
-			"machine@aya|LVM::VG@aya+ssd|::PVs|::PV@sdf1" -> "machine@aya|LVM::VG@aya+ssd|::LVs|::LV@aya-raid1S-A3"
-			// Links from MD: /dev/md/aya-raid0-A
-			"machine@aya|RAID::MD@md121|::Device@nvme0n1p6" -> "machine@aya|RAID::MD@md121|::State|::RaidDevice@md121"
-			"machine@aya|RAID::MD@md121|::Device@nvme1n1p3" -> "machine@aya|RAID::MD@md121|::State|::RaidDevice@md121"
+			"machine@aya|LVM::VG@aya+ssd|::PVs|::PV@sdc1" -> "machine@aya|LVM::VG@aya+ssd|::LVs|::LV@aya-raid1S-A3"
 			// Links from MD: /dev/md/aya-raid1-C
-			"machine@aya|RAID::MD@md122|::Device@sdc9" -> "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122"
-			"machine@aya|RAID::MD@md122|::Device@sdd7" -> "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122"
-			// Links from MD: /dev/md/aya-raid1S-A
-			"machine@aya|RAID::MD@md123|::Device@dm-0" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
-			"machine@aya|RAID::MD@md123|::Device@sdc7" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
-			"machine@aya|RAID::MD@md123|::Device@sdg7" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
+			"machine@aya|RAID::MD@md121|::Device@sde9" -> "machine@aya|RAID::MD@md121|::State|::RaidDevice@md121"
+			"machine@aya|RAID::MD@md121|::Device@sdg7" -> "machine@aya|RAID::MD@md121|::State|::RaidDevice@md121"
 			// Links from MD: /dev/md/aya-raid6-C
-			"machine@aya|RAID::MD@md124|::Device@sdc2" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
-			"machine@aya|RAID::MD@md124|::Device@sdd8" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
-			"machine@aya|RAID::MD@md124|::Device@sde2" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
-			"machine@aya|RAID::MD@md124|::Device@sdg9" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
-			// Links from MD: /dev/md/aya-raid5-C
-			"machine@aya|RAID::MD@md125|::Device@sdc3" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
-			"machine@aya|RAID::MD@md125|::Device@sdd3" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
-			"machine@aya|RAID::MD@md125|::Device@sde4" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
-			"machine@aya|RAID::MD@md125|::Device@sdg3" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
+			"machine@aya|RAID::MD@md122|::Device@sdd2" -> "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122"
+			"machine@aya|RAID::MD@md122|::Device@sde2" -> "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122"
+			"machine@aya|RAID::MD@md122|::Device@sdf9" -> "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122"
+			"machine@aya|RAID::MD@md122|::Device@sdg8" -> "machine@aya|RAID::MD@md122|::State|::RaidDevice@md122"
 			// Links from MD: /dev/md/aya-raid6-D
-			"machine@aya|RAID::MD@md126|::Device@sdc10" -> "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126"
-			"machine@aya|RAID::MD@md126|::Device@sdd9" -> "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126"
-			"machine@aya|RAID::MD@md126|::Device@sde3" -> "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126"
-			"machine@aya|RAID::MD@md126|::Device@sdg10" -> "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126"
+			"machine@aya|RAID::MD@md123|::Device@sdd3" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
+			"machine@aya|RAID::MD@md123|::Device@sde10" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
+			"machine@aya|RAID::MD@md123|::Device@sdf10" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
+			"machine@aya|RAID::MD@md123|::Device@sdg9" -> "machine@aya|RAID::MD@md123|::State|::RaidDevice@md123"
+			// Links from MD: /dev/md/aya-raid5-C
+			"machine@aya|RAID::MD@md124|::Device@sdd4" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
+			"machine@aya|RAID::MD@md124|::Device@sde3" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
+			"machine@aya|RAID::MD@md124|::Device@sdf3" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
+			"machine@aya|RAID::MD@md124|::Device@sdg3" -> "machine@aya|RAID::MD@md124|::State|::RaidDevice@md124"
+			// Links from MD: /dev/md/aya-raid1S-A
+			"machine@aya|RAID::MD@md125|::Device@dm-3" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
+			"machine@aya|RAID::MD@md125|::Device@sde7" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
+			"machine@aya|RAID::MD@md125|::Device@sdf7" -> "machine@aya|RAID::MD@md125|::State|::RaidDevice@md125"
 			// Links from MD: /dev/md/aya-raid1-D
-			"machine@aya|RAID::MD@md127|::Device@nvme0n1p5" -> "machine@aya|RAID::MD@md127|::State|::RaidDevice@md127"
-			"machine@aya|RAID::MD@md127|::Device@nvme1n1p2" -> "machine@aya|RAID::MD@md127|::State|::RaidDevice@md127"
+			"machine@aya|RAID::MD@md126|::Device@nvme0n1p5" -> "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126"
+			"machine@aya|RAID::MD@md126|::Device@nvme1n1p2" -> "machine@aya|RAID::MD@md126|::State|::RaidDevice@md126"
+			// Links from MD: /dev/md/aya-raid0-A
+			"machine@aya|RAID::MD@md127|::Device@nvme0n1p6" -> "machine@aya|RAID::MD@md127|::State|::RaidDevice@md127"
+			"machine@aya|RAID::MD@md127|::Device@nvme1n1p3" -> "machine@aya|RAID::MD@md127|::State|::RaidDevice@md127"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: yoko 16106127360 (sda) "machine@aya|Libvirt|::VM@yoko|::Block@sda"
+			// Links from Libvirt::VM::Block@hdc
+			// SOURCE LINK: winwin 62025728 (hdc) "machine@aya|Libvirt|::VM@winwin|::Block@hdc"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: winwin 8798445568 (vda) "machine@aya|Libvirt|::VM@winwin|::Block@vda"
+			// Links from Libvirt::VM::Block@sdd
+			// SOURCE LINK: win81 21474836480 (sdd) "machine@aya|Libvirt|::VM@win81|::Block@sdd"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: win81 53687091200 (sda) "machine@aya|Libvirt|::VM@win81|::Block@sda"
+			// Links from Libvirt::VM::Block@hdc
+			// SOURCE LINK: win81 56967168 (hdc) "machine@aya|Libvirt|::VM@win81|::Block@hdc"
+			// Links from Libvirt::VM::Block@vdb
+			// SOURCE LINK: win764 21474836480 (vdb) "machine@aya|Libvirt|::VM@win764|::Block@vdb"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: win764 26843545600 (vda) "machine@aya|Libvirt|::VM@win764|::Block@vda"
+			// Links from Libvirt::VM::Block@vdc
+			// SOURCE LINK: win764 2014838784 (vdc) "machine@aya|Libvirt|::VM@win764|::Block@vdc"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: win11 53687091200 (sdb) "machine@aya|Libvirt|::VM@win11|::Block@sdb"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: win10 21474836480 (sdb) "machine@aya|Libvirt|::VM@win10|::Block@sdb"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: win10 53687091200 (sda) "machine@aya|Libvirt|::VM@win10|::Block@sda"
+			// Links from Libvirt::VM::Block@hdb
+			// SOURCE LINK: win10 412479488 (hdb) "machine@aya|Libvirt|::VM@win10|::Block@hdb"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: vaniel 16106127360 (sda) "machine@aya|Libvirt|::VM@vaniel|::Block@sda"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: urtho 16106127360 (vda) "machine@aya|Libvirt|::VM@urtho|::Block@vda"
+			// Links from Libvirt::VM::Block@sdc
+			// SOURCE LINK: thot 214748364800 (sdc) "machine@aya|Libvirt|::VM@thot|::Block@sdc"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: thot 21474836480 (sdb) "machine@aya|Libvirt|::VM@thot|::Block@sdb"
+			// Links from Libvirt::VM::Block@sdd
+			// SOURCE LINK: thot 53687091200 (sdd) "machine@aya|Libvirt|::VM@thot|::Block@sdd"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: talia 16106127360 (sda) "machine@aya|Libvirt|::VM@talia|::Block@sda"
+			// Links from Libvirt::VM::Block@sdc
+			// SOURCE LINK: talia 16106127360 (sdc) "machine@aya|Libvirt|::VM@talia|::Block@sdc"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: talia 352321536 (sdb) "machine@aya|Libvirt|::VM@talia|::Block@sdb"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: rosee 16106127360 (vda) "machine@aya|Libvirt|::VM@rosee|::Block@vda"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: ran 16106127360 (sda) "machine@aya|Libvirt|::VM@ran|::Block@sda"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: ogmios 16106127360 (sda) "machine@aya|Libvirt|::VM@ogmios|::Block@sda"
+			// Links from Libvirt::VM::Block@sda
+			// SOURCE LINK: kooot 16106127360 (sda) "machine@aya|Libvirt|::VM@kooot|::Block@sda"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: hermes 16106127360 (sdb) "machine@aya|Libvirt|::VM@hermes|::Block@sdb"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: dedale 16106127360 (sdb) "machine@aya|Libvirt|::VM@dedale|::Block@sdb"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: blackjack 16106127360 (vda) "machine@aya|Libvirt|::VM@blackjack|::Block@vda"
+			// Links from Libvirt::VM::Block@vdb
+			// SOURCE LINK: belgarath 21474836480 (vdb) "machine@aya|Libvirt|::VM@belgarath|::Block@vdb"
+			// Links from Libvirt::VM::Block@vda
+			// SOURCE LINK: belgarath 16106127360 (vda) "machine@aya|Libvirt|::VM@belgarath|::Block@vda"
+			// Links from Libvirt::VM::Block@sdc
+			// SOURCE LINK: alastor 107374182400 (sdc) "machine@aya|Libvirt|::VM@alastor|::Block@sdc"
+			// Links from Libvirt::VM::Block@sdb
+			// SOURCE LINK: alastor 16106127360 (sdb) "machine@aya|Libvirt|::VM@alastor|::Block@sdb"
 			// Links for Partition::GPT@nvme0n1
 			// TARGET LINK: aya 1024209543168 nvme0n1 "machine@aya|Partition::GPT@nvme0n1"
 			// Links for Partition::Table
@@ -1334,50 +1402,51 @@ digraph "aya"{ // HEADER: MACHINE
 			// Links for Partition::Table::Part::Data@sdb6
 			// Links for Partition::Table::Part::Free@_2
 			// Links for Partition::GPT@sdc
-			// TARGET LINK: aya 14000519643136 sdc "machine@aya|Partition::GPT@sdc"
+			// TARGET LINK: aya 960197124096 sdc "machine@aya|Partition::GPT@sdc"
 			// Links for Partition::Table
 			// Links for Partition::Table::Part::Free@_1
-			// Links for Partition::Table::Part::Data@sdc1
-			// Links for Partition::Table::Part::Free@_2
-			// Links for Partition::Table::Part::Data@sdc3
-			// Links for Partition::Table::Part::Free@_3
-			// Links for Partition::Table::Part::Data@sdc7
-			// Links for Partition::Table::Part::Free@_4
-			// Links for Partition::Table::Part::Data@sdc9
 			// Links for Partition::Table::Part::Data@sdc2
-			// Links for Partition::Table::Part::Data@sdc10
-			// Links for Partition::Table::Part::Free@_5
-			// Links for Partition::GPT@sdd
-			// TARGET LINK: aya 10000831348736 sdd "machine@aya|Partition::GPT@sdd"
-			// Links for Partition::Table
-			// Links for Partition::Table::Part::Data@sdd2
-			// Links for Partition::Table::Part::Data@sdd1
-			// Links for Partition::Table::Part::Free@_1
-			// Links for Partition::Table::Part::Data@sdd3
+			// Links for Partition::Table::Part::Data@sdc3
 			// Links for Partition::Table::Part::Free@_2
-			// Links for Partition::Table::Part::Data@sdd7
-			// Links for Partition::Table::Part::Data@sdd8
-			// Links for Partition::Table::Part::Data@sdd9
+			// Links for Partition::Table::Part::Data@sdc4
 			// Links for Partition::Table::Part::Free@_3
+			// Links for Partition::Table::Part::Data@sdc1
+			// Links for Partition::Table::Part::Free@_4
+			// Links for Partition::GPT@sdd
+			// TARGET LINK: aya 22000969973760 sdd "machine@aya|Partition::GPT@sdd"
+			// Links for Partition::Table
+			// Links for Partition::Table::Part::Free@_1
+			// Links for Partition::Table::Part::Data@sdd1
+			// Links for Partition::Table::Part::Data@sdd2
+			// Links for Partition::Table::Part::Data@sdd3
+			// Links for Partition::Table::Part::Data@sdd4
+			// Links for Partition::Table::Part::Free@_2
 			// Links for Partition::GPT@sde
-			// TARGET LINK: aya 22000969973760 sde "machine@aya|Partition::GPT@sde"
+			// TARGET LINK: aya 14000519643136 sde "machine@aya|Partition::GPT@sde"
 			// Links for Partition::Table
 			// Links for Partition::Table::Part::Free@_1
 			// Links for Partition::Table::Part::Data@sde1
-			// Links for Partition::Table::Part::Data@sde2
-			// Links for Partition::Table::Part::Data@sde3
-			// Links for Partition::Table::Part::Data@sde4
 			// Links for Partition::Table::Part::Free@_2
+			// Links for Partition::Table::Part::Data@sde3
+			// Links for Partition::Table::Part::Free@_3
+			// Links for Partition::Table::Part::Data@sde7
+			// Links for Partition::Table::Part::Free@_4
+			// Links for Partition::Table::Part::Data@sde9
+			// Links for Partition::Table::Part::Data@sde2
+			// Links for Partition::Table::Part::Data@sde10
+			// Links for Partition::Table::Part::Free@_5
 			// Links for Partition::GPT@sdf
-			// TARGET LINK: aya 960197124096 sdf "machine@aya|Partition::GPT@sdf"
+			// TARGET LINK: aya 10000831348736 sdf "machine@aya|Partition::GPT@sdf"
 			// Links for Partition::Table
-			// Links for Partition::Table::Part::Free@_1
 			// Links for Partition::Table::Part::Data@sdf2
+			// Links for Partition::Table::Part::Data@sdf1
+			// Links for Partition::Table::Part::Free@_1
 			// Links for Partition::Table::Part::Data@sdf3
 			// Links for Partition::Table::Part::Free@_2
-			// Links for Partition::Table::Part::Data@sdf4
+			// Links for Partition::Table::Part::Data@sdf7
 			// Links for Partition::Table::Part::Free@_3
-			// Links for Partition::Table::Part::Data@sdf1
+			// Links for Partition::Table::Part::Data@sdf9
+			// Links for Partition::Table::Part::Data@sdf10
 			// Links for Partition::Table::Part::Free@_4
 			// Links for Partition::GPT@sdg
 			// TARGET LINK: aya 10000831348736 sdg "machine@aya|Partition::GPT@sdg"
@@ -1388,33 +1457,32 @@ digraph "aya"{ // HEADER: MACHINE
 			// Links for Partition::Table::Part::Data@sdg3
 			// Links for Partition::Table::Part::Free@_2
 			// Links for Partition::Table::Part::Data@sdg7
-			// Links for Partition::Table::Part::Free@_3
+			// Links for Partition::Table::Part::Data@sdg8
 			// Links for Partition::Table::Part::Data@sdg9
-			// Links for Partition::Table::Part::Data@sdg10
-			// Links for Partition::Table::Part::Free@_4
+			// Links for Partition::Table::Part::Free@_3
 			// Links for LVM VG: LVM::VG@aya+raid0
 			// Links for LVM::VG::PVs
-			// Links for LVM::VG::PVs::PV@md121
-			"machine@aya|RAID::MD@md121|::State|::RaidDevice@md121" -> "machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md121"
-			// Links for LVM::VG::PVs::PV@md121
+			// Links for LVM::VG::PVs::PV@md127
+			"machine@aya|RAID::MD@md127|::State|::RaidDevice@md127" -> "machine@aya|LVM::VG@aya+raid0|::PVs|::PV@md127"
+			// Links for LVM::VG::PVs::PV@md127
 			// Links for LVM::VG::LVs
 			// Links for LVM::VG::LVs::LV@sbuild
 			// Links for LVM::VG::LVs::LV@sid-amd64
 			// Links for LVM::VG::LVs::LV@swap
 			// Links for LVM VG: LVM::VG@aya+raid1
 			// Links for LVM::VG::PVs
-			// Links for LVM::VG::PVs::PV@md122
-			"machine@aya|RAID::MD@md122|::State|::RaidDevice@md122" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md122"
-			// Links for LVM::VG::PVs::PV@md122
-			// Links for LVM::VG::PVs::PV@md123
-			"machine@aya|RAID::MD@md123|::State|::RaidDevice@md123" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md123"
-			// Links for LVM::VG::PVs::PV@md123
+			// Links for LVM::VG::PVs::PV@md121
+			"machine@aya|RAID::MD@md121|::State|::RaidDevice@md121" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md121"
+			// Links for LVM::VG::PVs::PV@md121
+			// Links for LVM::VG::PVs::PV@md124
+			"machine@aya|RAID::MD@md124|::State|::RaidDevice@md124" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md124"
+			// Links for LVM::VG::PVs::PV@md124
 			// Links for LVM::VG::PVs::PV@md125
 			"machine@aya|RAID::MD@md125|::State|::RaidDevice@md125" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md125"
 			// Links for LVM::VG::PVs::PV@md125
-			// Links for LVM::VG::PVs::PV@md127
-			"machine@aya|RAID::MD@md127|::State|::RaidDevice@md127" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md127"
-			// Links for LVM::VG::PVs::PV@md127
+			// Links for LVM::VG::PVs::PV@md126
+			"machine@aya|RAID::MD@md126|::State|::RaidDevice@md126" -> "machine@aya|LVM::VG@aya+raid1|::PVs|::PV@md126"
+			// Links for LVM::VG::PVs::PV@md126
 			// Links for LVM::VG::LVs
 			// Links for LVM::VG::LVs::LV@[lvol0_pmspare]
 			// Links for LVM::VG::LVs::LV@[tp_pool+raid1_tdata]
@@ -1451,12 +1519,12 @@ digraph "aya"{ // HEADER: MACHINE
 			// Links for LVM::VG::LVs::LV@tp_pool+raid1
 			// Links for LVM VG: LVM::VG@aya+raid6
 			// Links for LVM::VG::PVs
-			// Links for LVM::VG::PVs::PV@md124
-			"machine@aya|RAID::MD@md124|::State|::RaidDevice@md124" -> "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md124"
-			// Links for LVM::VG::PVs::PV@md124
-			// Links for LVM::VG::PVs::PV@md126
-			"machine@aya|RAID::MD@md126|::State|::RaidDevice@md126" -> "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md126"
-			// Links for LVM::VG::PVs::PV@md126
+			// Links for LVM::VG::PVs::PV@md122
+			"machine@aya|RAID::MD@md122|::State|::RaidDevice@md122" -> "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md122"
+			// Links for LVM::VG::PVs::PV@md122
+			// Links for LVM::VG::PVs::PV@md123
+			"machine@aya|RAID::MD@md123|::State|::RaidDevice@md123" -> "machine@aya|LVM::VG@aya+raid6|::PVs|::PV@md123"
+			// Links for LVM::VG::PVs::PV@md123
 			// Links for LVM::VG::LVs
 			// Links for LVM::VG::LVs::LV@archives
 			// Links for LVM::VG::LVs::LV@kvm-thot-calibre
@@ -1465,99 +1533,102 @@ digraph "aya"{ // HEADER: MACHINE
 			// Links for LVM::VG::LVs::LV@rushes
 			// Links for LVM VG: LVM::VG@aya+ssd
 			// Links for LVM::VG::PVs
-			// Links for LVM::VG::PVs::PV@sdf1
-			"machine@aya|Partition::GPT@sdf":"1" -> "machine@aya|LVM::VG@aya+ssd|::PVs|::PV@sdf1"
-			// Links for LVM::VG::PVs::PV@sdf1
+			// Links for LVM::VG::PVs::PV@sdc1
+			"machine@aya|Partition::GPT@sdc":"1" -> "machine@aya|LVM::VG@aya+ssd|::PVs|::PV@sdc1"
+			// Links for LVM::VG::PVs::PV@sdc1
 			// Links for LVM::VG::LVs
 			// Links for LVM::VG::LVs::LV@aya-raid1S-A3
-			// Links for MD: /dev/md/aya-raid0-A
-			// Links for RAID::MD::State
-			// Links for RAID::MD::State::RaidDevice@md121
-			// Links for RAID::MD::Device@nvme0n1p6
-			"machine@aya|Partition::GPT@nvme0n1":"6" -> "machine@aya|RAID::MD@md121|::Device@nvme0n1p6"
-			// Links for RAID::MD::Device@nvme0n1p6
-			// Links for RAID::MD::Device@nvme1n1p3
-			"machine@aya|Partition::GPT@nvme1n1":"3" -> "machine@aya|RAID::MD@md121|::Device@nvme1n1p3"
-			// Links for RAID::MD::Device@nvme1n1p3
 			// Links for MD: /dev/md/aya-raid1-C
 			// Links for RAID::MD::State
-			// Links for RAID::MD::State::RaidDevice@md122
-			// Links for RAID::MD::Device@sdc9
-			"machine@aya|Partition::GPT@sdc":"9" -> "machine@aya|RAID::MD@md122|::Device@sdc9"
-			// Links for RAID::MD::Device@sdc9
-			// Links for RAID::MD::Device@sdd7
-			"machine@aya|Partition::GPT@sdd":"7" -> "machine@aya|RAID::MD@md122|::Device@sdd7"
-			// Links for RAID::MD::Device@sdd7
-			// Links for MD: /dev/md/aya-raid1S-A
-			// Links for RAID::MD::State
-			// Links for RAID::MD::State::RaidDevice@md123
-			// Links for RAID::MD::Device@dm-0
-			"machine@aya|LVM::VG@aya+ssd|::LVs|::LV@aya-raid1S-A3" -> "machine@aya|RAID::MD@md123|::Device@dm-0"
-			// Links for RAID::MD::Device@dm-0
-			// Links for RAID::MD::Device@sdc7
-			"machine@aya|Partition::GPT@sdc":"7" -> "machine@aya|RAID::MD@md123|::Device@sdc7"
-			// Links for RAID::MD::Device@sdc7
+			// Links for RAID::MD::State::RaidDevice@md121
+			// Links for RAID::MD::Device@sde9
+			"machine@aya|Partition::GPT@sde":"9" -> "machine@aya|RAID::MD@md121|::Device@sde9"
+			// Links for RAID::MD::Device@sde9
 			// Links for RAID::MD::Device@sdg7
-			"machine@aya|Partition::GPT@sdg":"7" -> "machine@aya|RAID::MD@md123|::Device@sdg7"
+			"machine@aya|Partition::GPT@sdg":"7" -> "machine@aya|RAID::MD@md121|::Device@sdg7"
 			// Links for RAID::MD::Device@sdg7
 			// Links for MD: /dev/md/aya-raid6-C
 			// Links for RAID::MD::State
-			// Links for RAID::MD::State::RaidDevice@md124
-			// Links for RAID::MD::Device@sdc2
-			"machine@aya|Partition::GPT@sdc":"2" -> "machine@aya|RAID::MD@md124|::Device@sdc2"
-			// Links for RAID::MD::Device@sdc2
-			// Links for RAID::MD::Device@sdd8
-			"machine@aya|Partition::GPT@sdd":"8" -> "machine@aya|RAID::MD@md124|::Device@sdd8"
-			// Links for RAID::MD::Device@sdd8
+			// Links for RAID::MD::State::RaidDevice@md122
+			// Links for RAID::MD::Device@sdd2
+			"machine@aya|Partition::GPT@sdd":"2" -> "machine@aya|RAID::MD@md122|::Device@sdd2"
+			// Links for RAID::MD::Device@sdd2
 			// Links for RAID::MD::Device@sde2
-			"machine@aya|Partition::GPT@sde":"2" -> "machine@aya|RAID::MD@md124|::Device@sde2"
+			"machine@aya|Partition::GPT@sde":"2" -> "machine@aya|RAID::MD@md122|::Device@sde2"
 			// Links for RAID::MD::Device@sde2
+			// Links for RAID::MD::Device@sdf9
+			"machine@aya|Partition::GPT@sdf":"9" -> "machine@aya|RAID::MD@md122|::Device@sdf9"
+			// Links for RAID::MD::Device@sdf9
+			// Links for RAID::MD::Device@sdg8
+			"machine@aya|Partition::GPT@sdg":"8" -> "machine@aya|RAID::MD@md122|::Device@sdg8"
+			// Links for RAID::MD::Device@sdg8
+			// Links for MD: /dev/md/aya-raid6-D
+			// Links for RAID::MD::State
+			// Links for RAID::MD::State::RaidDevice@md123
+			// Links for RAID::MD::Device@sdd3
+			"machine@aya|Partition::GPT@sdd":"3" -> "machine@aya|RAID::MD@md123|::Device@sdd3"
+			// Links for RAID::MD::Device@sdd3
+			// Links for RAID::MD::Device@sde10
+			"machine@aya|Partition::GPT@sde":"10" -> "machine@aya|RAID::MD@md123|::Device@sde10"
+			// Links for RAID::MD::Device@sde10
+			// Links for RAID::MD::Device@sdf10
+			"machine@aya|Partition::GPT@sdf":"10" -> "machine@aya|RAID::MD@md123|::Device@sdf10"
+			// Links for RAID::MD::Device@sdf10
 			// Links for RAID::MD::Device@sdg9
-			"machine@aya|Partition::GPT@sdg":"9" -> "machine@aya|RAID::MD@md124|::Device@sdg9"
+			"machine@aya|Partition::GPT@sdg":"9" -> "machine@aya|RAID::MD@md123|::Device@sdg9"
 			// Links for RAID::MD::Device@sdg9
 			// Links for MD: /dev/md/aya-raid5-C
 			// Links for RAID::MD::State
-			// Links for RAID::MD::State::RaidDevice@md125
-			// Links for RAID::MD::Device@sdc3
-			"machine@aya|Partition::GPT@sdc":"3" -> "machine@aya|RAID::MD@md125|::Device@sdc3"
-			// Links for RAID::MD::Device@sdc3
-			// Links for RAID::MD::Device@sdd3
-			"machine@aya|Partition::GPT@sdd":"3" -> "machine@aya|RAID::MD@md125|::Device@sdd3"
-			// Links for RAID::MD::Device@sdd3
-			// Links for RAID::MD::Device@sde4
-			"machine@aya|Partition::GPT@sde":"4" -> "machine@aya|RAID::MD@md125|::Device@sde4"
-			// Links for RAID::MD::Device@sde4
+			// Links for RAID::MD::State::RaidDevice@md124
+			// Links for RAID::MD::Device@sdd4
+			"machine@aya|Partition::GPT@sdd":"4" -> "machine@aya|RAID::MD@md124|::Device@sdd4"
+			// Links for RAID::MD::Device@sdd4
+			// Links for RAID::MD::Device@sde3
+			"machine@aya|Partition::GPT@sde":"3" -> "machine@aya|RAID::MD@md124|::Device@sde3"
+			// Links for RAID::MD::Device@sde3
+			// Links for RAID::MD::Device@sdf3
+			"machine@aya|Partition::GPT@sdf":"3" -> "machine@aya|RAID::MD@md124|::Device@sdf3"
+			// Links for RAID::MD::Device@sdf3
 			// Links for RAID::MD::Device@sdg3
-			"machine@aya|Partition::GPT@sdg":"3" -> "machine@aya|RAID::MD@md125|::Device@sdg3"
+			"machine@aya|Partition::GPT@sdg":"3" -> "machine@aya|RAID::MD@md124|::Device@sdg3"
 			// Links for RAID::MD::Device@sdg3
-			// Links for MD: /dev/md/aya-raid6-D
+			// Links for MD: /dev/md/aya-raid1S-A
 			// Links for RAID::MD::State
-			// Links for RAID::MD::State::RaidDevice@md126
-			// Links for RAID::MD::Device@sdc10
-			"machine@aya|Partition::GPT@sdc":"10" -> "machine@aya|RAID::MD@md126|::Device@sdc10"
-			// Links for RAID::MD::Device@sdc10
-			// Links for RAID::MD::Device@sdd9
-			"machine@aya|Partition::GPT@sdd":"9" -> "machine@aya|RAID::MD@md126|::Device@sdd9"
-			// Links for RAID::MD::Device@sdd9
-			// Links for RAID::MD::Device@sde3
-			"machine@aya|Partition::GPT@sde":"3" -> "machine@aya|RAID::MD@md126|::Device@sde3"
-			// Links for RAID::MD::Device@sde3
-			// Links for RAID::MD::Device@sdg10
-			"machine@aya|Partition::GPT@sdg":"10" -> "machine@aya|RAID::MD@md126|::Device@sdg10"
-			// Links for RAID::MD::Device@sdg10
+			// Links for RAID::MD::State::RaidDevice@md125
+			// Links for RAID::MD::Device@dm-3
+			"machine@aya|LVM::VG@aya+ssd|::LVs|::LV@aya-raid1S-A3" -> "machine@aya|RAID::MD@md125|::Device@dm-3"
+			// Links for RAID::MD::Device@dm-3
+			// Links for RAID::MD::Device@sde7
+			"machine@aya|Partition::GPT@sde":"7" -> "machine@aya|RAID::MD@md125|::Device@sde7"
+			// Links for RAID::MD::Device@sde7
+			// Links for RAID::MD::Device@sdf7
+			"machine@aya|Partition::GPT@sdf":"7" -> "machine@aya|RAID::MD@md125|::Device@sdf7"
+			// Links for RAID::MD::Device@sdf7
 			// Links for MD: /dev/md/aya-raid1-D
 			// Links for RAID::MD::State
+			// Links for RAID::MD::State::RaidDevice@md126
+			// Links for RAID::MD::Device@nvme0n1p5
+			"machine@aya|Partition::GPT@nvme0n1":"5" -> "machine@aya|RAID::MD@md126|::Device@nvme0n1p5"
+			// Links for RAID::MD::Device@nvme0n1p5
+			// Links for RAID::MD::Device@nvme1n1p2
+			"machine@aya|Partition::GPT@nvme1n1":"2" -> "machine@aya|RAID::MD@md126|::Device@nvme1n1p2"
+			// Links for RAID::MD::Device@nvme1n1p2
+			// Links for MD: /dev/md/aya-raid0-A
+			// Links for RAID::MD::State
 			// Links for RAID::MD::State::RaidDevice@md127
-			// Links for RAID::MD::Device@nvme0n1p5
-			"machine@aya|Partition::GPT@nvme0n1":"5" -> "machine@aya|RAID::MD@md127|::Device@nvme0n1p5"
-			// Links for RAID::MD::Device@nvme0n1p5
-			// Links for RAID::MD::Device@nvme1n1p2
-			"machine@aya|Partition::GPT@nvme1n1":"2" -> "machine@aya|RAID::MD@md127|::Device@nvme1n1p2"
-			// Links for RAID::MD::Device@nvme1n1p2
+			// Links for RAID::MD::Device@nvme0n1p6
+			"machine@aya|Partition::GPT@nvme0n1":"6" -> "machine@aya|RAID::MD@md127|::Device@nvme0n1p6"
+			// Links for RAID::MD::Device@nvme0n1p6
+			// Links for RAID::MD::Device@nvme1n1p3
+			"machine@aya|Partition::GPT@nvme1n1":"3" -> "machine@aya|RAID::MD@md127|::Device@nvme1n1p3"
+			// Links for RAID::MD::Device@nvme1n1p3
 			// Links for FS
 			// Links for FS::FS@/var/lib/sbuild/build
 			"machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sbuild" -> "machine@aya|FS|::FS@/var/lib/sbuild/build"
 			// Links for FS::FS@/var/lib/sbuild/build
+			// Links for FS::FS@/srv/chroots/sid-amd64
+			"machine@aya|LVM::VG@aya+raid0|::LVs|::LV@sid-amd64" -> "machine@aya|FS|::FS@/srv/chroots/sid-amd64"
+			// Links for FS::FS@/srv/chroots/sid-amd64
 			// Links for FS::FS@/srv/backuppc
 			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@backuppc" -> "machine@aya|FS|::FS@/srv/backuppc"
 			// Links for FS::FS@/srv/backuppc
@@ -1586,111 +1657,27 @@ digraph "aya"{ // HEADER: MACHINE
 			"machine@aya|Partition::GPT@nvme0n1":"1" -> "machine@aya|FS|::FS@/boot/efi"
 			// Links for FS::FS@/boot/efi
 			// Links for FS::FS@/boot
-			"machine@aya|Partition::GPT@sdf":"4" -> "machine@aya|FS|::FS@/boot"
+			"machine@aya|Partition::GPT@sdc":"4" -> "machine@aya|FS|::FS@/boot"
 			// Links for FS::FS@/boot
 			// Links for FS::AllSWAP@@FS@SWAP
-			// Links for FS::SWAP::Partition@dm-41
-			"machine@aya|LVM::VG@aya+raid0|::LVs|::LV@swap" -> "machine@aya|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@dm-41"
-			// Links for FS::SWAP::Partition@dm-41
+			// Links for FS::SWAP::Partition@dm-2
+			"machine@aya|LVM::VG@aya+raid0|::LVs|::LV@swap" -> "machine@aya|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@dm-2"
+			// Links for FS::SWAP::Partition@dm-2
 			// Links for FS::SWAP::Partition@sdb6
 			"machine@aya|Partition::GPT@sdb":"6" -> "machine@aya|FS|::AllSWAP@@FS@SWAP|FS::SWAP::Partition@sdb6"
 			// Links for FS::SWAP::Partition@sdb6
 			// Links for Libvirt Virtual Machines
-			// Links for Libvirt::VM@alastor
-			// Links for Libvirt::VM::Block@sdc
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-disk2" -> "machine@aya|Libvirt|::VM@alastor|::Block@sdc"
-			// Links for Libvirt::VM::Block@sdc
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-root" -> "machine@aya|Libvirt|::VM@alastor|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM@belgarath
-			// Links for Libvirt::VM::Block@vdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-openhab" -> "machine@aya|Libvirt|::VM@belgarath|::Block@vdb"
-			// Links for Libvirt::VM::Block@vdb
+			// Links for Libvirt::VM@yoko
+			// Links for Libvirt::VM::Block@sda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-yoko-root" -> "machine@aya|Libvirt|::VM@yoko|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM@winwin
+			// Links for Libvirt::VM::Block@hdc
+			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@winwin|::Block@hdc"
+			// Links for Libvirt::VM::Block@hdc
 			// Links for Libvirt::VM::Block@vda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-root" -> "machine@aya|Libvirt|::VM@belgarath|::Block@vda"
+			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@winwin|::Block@vda"
 			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@blackjack
-			// Links for Libvirt::VM::Block@vda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-blackjack-root" -> "machine@aya|Libvirt|::VM@blackjack|::Block@vda"
-			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@dedale
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-dedale-root" -> "machine@aya|Libvirt|::VM@dedale|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM@hermes
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-hermes-root" -> "machine@aya|Libvirt|::VM@hermes|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM@kooot
-			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-kooot-root" -> "machine@aya|Libvirt|::VM@kooot|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM@ogmios
-			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ogmios-root" -> "machine@aya|Libvirt|::VM@ogmios|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM@ran
-			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ran-root" -> "machine@aya|Libvirt|::VM@ran|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM@rosee
-			// Links for Libvirt::VM::Block@vda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-rosee-root" -> "machine@aya|Libvirt|::VM@rosee|::Block@vda"
-			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@talia
-			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root" -> "machine@aya|Libvirt|::VM@talia|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM::Block@sdc
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root-old" -> "machine@aya|Libvirt|::VM@talia|::Block@sdc"
-			// Links for Libvirt::VM::Block@sdc
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@talia|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM@thot
-			// Links for Libvirt::VM::Block@sdc
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker" -> "machine@aya|Libvirt|::VM@thot|::Block@sdc"
-			// Links for Libvirt::VM::Block@sdc
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-root" -> "machine@aya|Libvirt|::VM@thot|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM::Block@sdd
-			"machine@aya|LVM::VG@aya+raid6|::LVs|::LV@kvm-thot-calibre" -> "machine@aya|Libvirt|::VM@thot|::Block@sdd"
-			// Links for Libvirt::VM::Block@sdd
-			// Links for Libvirt::VM@urtho
-			// Links for Libvirt::VM::Block@vda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-urtho-root" -> "machine@aya|Libvirt|::VM@urtho|::Block@vda"
-			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@vaniel
-			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-vaniel-root" -> "machine@aya|Libvirt|::VM@vaniel|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM@vaniel-piix
-			// Links for Libvirt::VM@win10
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data" -> "machine@aya|Libvirt|::VM@win10|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win10-c" -> "machine@aya|Libvirt|::VM@win10|::Block@sda"
-			// Links for Libvirt::VM::Block@sda
-			// Links for Libvirt::VM::Block@hdb
-			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@win10|::Block@hdb"
-			// Links for Libvirt::VM::Block@hdb
-			// Links for Libvirt::VM@win11
-			// Links for Libvirt::VM::Block@sdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win11-c" -> "machine@aya|Libvirt|::VM@win11|::Block@sdb"
-			// Links for Libvirt::VM::Block@sdb
-			// Links for Libvirt::VM@win764
-			// Links for Libvirt::VM::Block@vdb
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data" -> "machine@aya|Libvirt|::VM@win764|::Block@vdb"
-			// Links for Libvirt::VM::Block@vdb
-			// Links for Libvirt::VM::Block@vda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win764-c" -> "machine@aya|Libvirt|::VM@win764|::Block@vda"
-			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM::Block@vdc
-			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@win764|::Block@vdc"
-			// Links for Libvirt::VM::Block@vdc
 			// Links for Libvirt::VM@win81
 			// Links for Libvirt::VM::Block@sdd
 			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data" -> "machine@aya|Libvirt|::VM@win81|::Block@sdd"
@@ -1701,17 +1688,101 @@ digraph "aya"{ // HEADER: MACHINE
 			// Links for Libvirt::VM::Block@hdc
 			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@win81|::Block@hdc"
 			// Links for Libvirt::VM::Block@hdc
-			// Links for Libvirt::VM@winwin
-			// Links for Libvirt::VM::Block@hdc
-			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@winwin|::Block@hdc"
-			// Links for Libvirt::VM::Block@hdc
+			// Links for Libvirt::VM@win764
+			// Links for Libvirt::VM::Block@vdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data" -> "machine@aya|Libvirt|::VM@win764|::Block@vdb"
+			// Links for Libvirt::VM::Block@vdb
 			// Links for Libvirt::VM::Block@vda
-			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@winwin|::Block@vda"
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win764-c" -> "machine@aya|Libvirt|::VM@win764|::Block@vda"
 			// Links for Libvirt::VM::Block@vda
-			// Links for Libvirt::VM@yoko
+			// Links for Libvirt::VM::Block@vdc
+			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@win764|::Block@vdc"
+			// Links for Libvirt::VM::Block@vdc
+			// Links for Libvirt::VM@win11
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win11-c" -> "machine@aya|Libvirt|::VM@win11|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
+			// Links for Libvirt::VM@win10
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win-data" -> "machine@aya|Libvirt|::VM@win10|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
 			// Links for Libvirt::VM::Block@sda
-			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-yoko-root" -> "machine@aya|Libvirt|::VM@yoko|::Block@sda"
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-win10-c" -> "machine@aya|Libvirt|::VM@win10|::Block@sda"
 			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM::Block@hdb
+			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@win10|::Block@hdb"
+			// Links for Libvirt::VM::Block@hdb
+			// Links for Libvirt::VM@vaniel-piix
+			// Links for Libvirt::VM@vaniel
+			// Links for Libvirt::VM::Block@sda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-vaniel-root" -> "machine@aya|Libvirt|::VM@vaniel|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM@urtho
+			// Links for Libvirt::VM::Block@vda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-urtho-root" -> "machine@aya|Libvirt|::VM@urtho|::Block@vda"
+			// Links for Libvirt::VM::Block@vda
+			// Links for Libvirt::VM@thot
+			// Links for Libvirt::VM::Block@sdc
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-docker" -> "machine@aya|Libvirt|::VM@thot|::Block@sdc"
+			// Links for Libvirt::VM::Block@sdc
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-thot-root" -> "machine@aya|Libvirt|::VM@thot|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
+			// Links for Libvirt::VM::Block@sdd
+			"machine@aya|LVM::VG@aya+raid6|::LVs|::LV@kvm-thot-calibre" -> "machine@aya|Libvirt|::VM@thot|::Block@sdd"
+			// Links for Libvirt::VM::Block@sdd
+			// Links for Libvirt::VM@talia
+			// Links for Libvirt::VM::Block@sda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root" -> "machine@aya|Libvirt|::VM@talia|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM::Block@sdc
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-talia-root-old" -> "machine@aya|Libvirt|::VM@talia|::Block@sdc"
+			// Links for Libvirt::VM::Block@sdc
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|FS|::FS@/srv/kvm" -> "machine@aya|Libvirt|::VM@talia|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
+			// Links for Libvirt::VM@rosee
+			// Links for Libvirt::VM::Block@vda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-rosee-root" -> "machine@aya|Libvirt|::VM@rosee|::Block@vda"
+			// Links for Libvirt::VM::Block@vda
+			// Links for Libvirt::VM@ran
+			// Links for Libvirt::VM::Block@sda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ran-root" -> "machine@aya|Libvirt|::VM@ran|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM@ogmios
+			// Links for Libvirt::VM::Block@sda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-ogmios-root" -> "machine@aya|Libvirt|::VM@ogmios|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM@kooot
+			// Links for Libvirt::VM::Block@sda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-kooot-root" -> "machine@aya|Libvirt|::VM@kooot|::Block@sda"
+			// Links for Libvirt::VM::Block@sda
+			// Links for Libvirt::VM@hermes
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-hermes-root" -> "machine@aya|Libvirt|::VM@hermes|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
+			// Links for Libvirt::VM@dedale
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-dedale-root" -> "machine@aya|Libvirt|::VM@dedale|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
+			// Links for Libvirt::VM@blackjack
+			// Links for Libvirt::VM::Block@vda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-blackjack-root" -> "machine@aya|Libvirt|::VM@blackjack|::Block@vda"
+			// Links for Libvirt::VM::Block@vda
+			// Links for Libvirt::VM@belgarath
+			// Links for Libvirt::VM::Block@vdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-openhab" -> "machine@aya|Libvirt|::VM@belgarath|::Block@vdb"
+			// Links for Libvirt::VM::Block@vdb
+			// Links for Libvirt::VM::Block@vda
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-belgarath-root" -> "machine@aya|Libvirt|::VM@belgarath|::Block@vda"
+			// Links for Libvirt::VM::Block@vda
+			// Links for Libvirt::VM@alastor
+			// Links for Libvirt::VM::Block@sdc
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-disk2" -> "machine@aya|Libvirt|::VM@alastor|::Block@sdc"
+			// Links for Libvirt::VM::Block@sdc
+			// Links for Libvirt::VM::Block@sdb
+			"machine@aya|LVM::VG@aya+raid1|::LVs|::LV@kvm-alastor-root" -> "machine@aya|Libvirt|::VM@alastor|::Block@sdb"
+			// Links for Libvirt::VM::Block@sdb
 		label="aya";
 	}
 } // FOOTER: MACHINE

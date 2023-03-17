@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::LVM;
 # ABSTRACT: Handle LVM data for StorageDisplay
 
-our $VERSION = '1.1.0'; # VERSION
+our $VERSION = '1.2.1'; # VERSION
 
 1;
 
@@ -57,7 +57,7 @@ sub dname {
 
 sub dotLabel {
     my $self = shift;
-    return 'LVM: '.$self->name;
+    return 'LVM: '.$self->vgname;
 }
 
 sub _xv {
@@ -356,7 +356,7 @@ sub BUILD {
 
 sub dotLabel {
     my $self = shift;
-    return ($self->vg->name.'\'s PVs');
+    return ($self->vg->vgname.'\'s PVs');
 }
 
 1;
@@ -436,7 +436,7 @@ sub BUILD {
 
 sub dotLabel {
     my $self = shift;
-    return ($self->vg->name.'\'s LVs');
+    return ($self->vg->vgname.'\'s LVs');
 }
 1;
 
@@ -580,7 +580,7 @@ StorageDisplay::Data::LVM - Handle LVM data for StorageDisplay
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =head1 AUTHOR
 
