@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 use Moose;
+use Carp qw(croak);
 
 # ABSTRACT: Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
@@ -11,12 +12,17 @@ use Moose;
 use Net::SAML2::XML::Sig;
 use MIME::Base64 qw/ decode_base64 /;
 use Crypt::OpenSSL::Verify;
+use MIME::Base64;
+use URI::Escape;
 
 with 'Net::SAML2::Role::VerifyXML';
 
 
 has 'cert_text' => (isa => 'Str', is => 'ro');
 has 'cacert' => (isa => 'Maybe[Str]', is => 'ro');
+
+has 'cert' => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_cert');
+has 'key'  => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_key');
 
 
 sub handle_response {
@@ -39,6 +45,47 @@ sub handle_response {
     return $xml;
 }
 
+
+sub sign_xml {
+    my ($self, $request) = @_;
+
+    croak("Need to have a cert specified") unless $self->has_cert;
+    croak("Need to have a key specified") unless $self->has_key;
+
+    my $signer = XML::Sig->new({
+                        key => $self->key,
+                        cert => $self->cert,
+                        no_xml_declaration => 1,
+                    }
+                );
+
+    my $signed_message = $signer->sign($request);
+
+    # saml-schema-protocol-2.0.xsd Schema hack
+    #
+    # The real fix here is to fix XML::Sig to accept a XPATH to
+    # place the signature in the correct location.  Or use XML::LibXML
+    # here to do so
+    #
+    # The protocol schema defines a sequence which requires the order
+    # of the child elements in a Protocol based message:
+    #
+    # The dsig:Signature (should it exist) MUST follow the saml:Issuer
+    #
+    # 1: saml:Issuer
+    # 2: dsig:Signature
+    #
+    # Seems like an oversight in the SAML schema specifiation but...
+
+    $signed_message =~ s!(<dsig:Signature.*?</dsig:Signature>)!!s;
+    my $signature = $1;
+    $signed_message =~ s/(<\/saml\d*:Issuer>)/$1$signature/;
+
+    my $encoded_request = encode_base64($signed_message, "\n");
+
+    return $encoded_request;
+
+}
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -53,7 +100,7 @@ Net::SAML2::Binding::POST - Net::SAML2::Binding::POST - HTTP POST binding for SA
 
 =head1 VERSION
 
-version 0.64
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -88,6 +135,10 @@ path to the CA certificate for verification
 
 Decodes and verifies the response provided, which should be the raw
 Base64-encoded response, from the SAMLResponse CGI parameter.
+
+=head2 sign_xml( $request )
+
+Sign and encode the SAMLRequest.
 
 =head1 AUTHORS
 

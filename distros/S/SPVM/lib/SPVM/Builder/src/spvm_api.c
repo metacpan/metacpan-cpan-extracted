@@ -79,6 +79,22 @@ SPVM_ENV* SPVM_API_new_env_raw() {
   // Allocator
   SPVM_ALLOCATOR* allocator = SPVM_ALLOCATOR_new();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // The impelements of Native APIs
   void* env_init[]  = {
     NULL, // class_vars_heap
@@ -382,12 +398,12 @@ SPVM_OBJECT* SPVM_API_dump(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object
   SPVM_OBJECT* str = SPVM_API_dump_raw(env, stack, object);
   
   SPVM_API_push_mortal(env, stack, str);
-
+  
   return str;
 }
 
 SPVM_OBJECT* SPVM_API_dump_raw(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
-
+  
   SPVM_RUNTIME* runtime = env->runtime;
   
   int32_t depth = 0;

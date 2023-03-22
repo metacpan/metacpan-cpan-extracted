@@ -13,7 +13,7 @@ use SPVM 'Sys::Signal';
 use SPVM 'TestCase::Sys::Signal';
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 if ($^O eq 'MSWin32') {
   eval { SPVM::Sys::Signal->ualarm(0, 0) };
@@ -23,10 +23,10 @@ else {
   ok(SPVM::TestCase::Sys::Signal->ualarm);
 }
 
-SPVM::set_exception(undef);
+SPVM::api->set_exception(undef);
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

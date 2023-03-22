@@ -63,6 +63,7 @@ PresharedKey = PEER_A-PEER_B-PRESHARED_KEY
 Custom_attr_from_very_custom_implementation = Some crazy value with spaces :D
 AllowedIPs = fdc9:281f:04d7:9ee9::1/128
 Endpoint = 198.51.100.101:60001
+#+comment = wefef
 #+name = Name_by_test1
 #+Alias = alias2
 ';

@@ -38,6 +38,8 @@ OpenAI::API::Request::Model::Retrieve - retrieve model details
 
     my $res = $request->send();
 
+    my $id = $res->{id};
+
 =head1 DESCRIPTION
 
 Retrieves a model instance, providing basic information about the model
@@ -53,6 +55,11 @@ such as the owner and permissioning.
 
 =back
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Models|https://platform.openai.com/docs/api-reference/models>
+OpenAI API Reference: L<Models|https://platform.openai.com/docs/api-reference/models>

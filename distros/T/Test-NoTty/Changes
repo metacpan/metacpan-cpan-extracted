@@ -1,5 +1,9 @@
 Revision history for Test-NoTty
 
+0.03  2023-03-20 NWCLARK
+        - Fix the usage for setsid (patch from Shoichi Kaji)
+        - Skip test2.t if Test2::IPC is older than 1.302138
+
 0.02  2023-03-01 NWCLARK
         - Tweak the code to work on v5.12.x back to v5.8.x
 

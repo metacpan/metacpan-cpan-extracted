@@ -1,5 +1,5 @@
 package MsOffice::Word::HTML::Writer;
-
+use utf8;
 use warnings;
 use strict;
 use MIME::Base64      qw/encode_base64/;
@@ -8,17 +8,18 @@ use Carp;
 use Params::Validate  qw/validate SCALAR HASHREF/;
 use Scalar::Util      qw/looks_like_number/;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 sub new {
   my $class = shift;
 
   # validate named parameters
   my $param_spec = {
-    title        => {type => SCALAR, optional => 1},
-    head         => {type => SCALAR, optional => 1},
-    hf_head      => {type => SCALAR, optional => 1},
+    title        => {type => SCALAR,  optional => 1},
+    head         => {type => SCALAR,  optional => 1},
+    hf_head      => {type => SCALAR,  optional => 1},
     WordDocument => {type => HASHREF, optional => 1},
+    charset      => {type => SCALAR,  optional => 1, default => 'utf-8'},
    };
   my %params = validate(@_, $param_spec);
 
@@ -31,6 +32,7 @@ sub new {
     head         => $params{head}      || "",
     hf_head      => $params{hf_head}   || "",
     WordDocument => $params{WordDocument},
+    charset      => $params{charset},
    };
 
   bless $self, $class;
@@ -136,7 +138,7 @@ sub field {
 
   # when args : long form of field encoding
   if ($args) {
-    my $space = qq{<span style='mso-spacerun:yes'>�</span>};
+    my $space = qq{<span style='mso-spacerun:yes'> </span>};
     $field = qq{<span style='mso-element:field-begin'></span>}
            . $space . $fieldname . $space . $args
            . qq{<span style='mso-element:field-separator'></span>}
@@ -184,13 +186,13 @@ sub content {
       # no need for Windows-style end-of-lines of shape CRLF
       $content  =~ s/\r\n/\n/g;
 
-      # multibyte chars are encoded as numerical HTML entities
-      $content  =~ s/([^\x{0}-\x{FF}])/'&#'.ord($1).';'/eg;
+      # if charset is not utf-8, wide chars are encoded as numerical HTML entities
+      $content  =~ s/([^\x{0}-\x{FF}])/'&#'.ord($1).';'/eg unless $self->{charset} eq 'utf-8';
 
-      # simple-minded MIME quoted-printable encoding, using latin-1 encoding
+      # simple-minded MIME quoted-printable encoding
       $encoding = 'quoted-printable';
       ($encoded = $content)  =~ s/=/=3D/g;
-      $mime_type .= "; charset=iso-8859-1";
+      $mime_type .= "; charset=$self->{charset}";
     }
     else {
       $encoding = 'base64';
@@ -415,6 +417,8 @@ sub _filelist {
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 MsOffice::Word::HTML::Writer - Writing documents for MsWord in HTML format
@@ -459,6 +463,13 @@ targeted for Microsoft Word (MsWord). It doesn't need
 MsWord to be installed, and doesn't even require a Win32 machine
 (which is why the module is not in the C<Win32> namespace).
 
+B<Note> : another, more recent approach for doing the same task
+is the module L<MsOffice::Word::Template>, which has the great advantage
+of generating documents in genuine C<.docx> format, instead of the MHTML
+format explained below. So for new projects, consider using L<MsOffice::Word::Template>
+instead of the present module.
+
+
 =head2 MsWord and HTML
 
 MsWord can read documents encoded in old native binary format, in Rich
@@ -474,9 +485,9 @@ generated interactively from MsWord by calling the "SaveAs" menu and
 choosing the F<.mht> extension.
 
 Documents saved with a F<.mht> extension will not directly reopen in
-MsWord : when clicking on such documents, Windows chooses Internet
-Explorer as the default display program.  However, these documents can
-be simply renamed with a F<.doc> extension, and will then open
+MsWord : when clicking on such documents, Windows chooses Microsoft Edge
+(in Internet Explorer mode) as the default display program.  However, these
+documents can be simply renamed with a F<.doc> extension, and will then open
 directly in MsWord.  By the way, the same can be done with XML or RTF
 documents.  That is to say, MsWord is able to recognize the internal
 format of a file, without any dependency on the filename.  There is
@@ -509,8 +520,8 @@ way for programmatic document generation, because
 
 =item *
 
-unlike Excel, MsWord native binary format (used in versions up to 2003)
-is unpublished and therefore cannot be generated without the MsWord executable.
+MsWord native binary format (used in versions up to 2003)
+was unpublished and therefore cannot be generated without the MsWord executable.
 
 =item *
 
@@ -537,14 +548,17 @@ access to the "ODF" XML format used by OpenOffice. MsWord is able to
 read and produce such ODF files, but this is not fully satisfactory
 because in that mode many MsWord features are disabled or restricted.
 
-The XML format used by MsWord is called "OOXML"; to
-my knowledge, there is no CPAN module providing an API to
-this format.
+The XML format used by MsWord is called "OOXML".
+Modules L<Document::OOXML> and L<MsOffice::Word::Surgeon>
+on CPAN implement some operations on OOXML files, but have no support
+for creating a fresh document. The younger module L<MsOffice::Word::Template>
+does provide an API for creating documents in OOXML format; the recommandation
+is to use that module instead of the present one.
 
 
 =back
 
-By contrast, C<MsOffice::Word::HTML::Writer> allows you to
+C<MsOffice::Word::HTML::Writer> allows you to
 produce documents even with little knowledge of MsWord.
 Besides, since the content is in HTML, it can be assembled
 with any HTML tool, and therefore also requires little knowledge
@@ -616,6 +630,19 @@ by C<w:>. The hashref may contain nested hashrefs, such as
 Names and values of options
 must be found from the Microsoft documentation, or from
 reverse engineering of HTML files generated by MsWord.
+
+=item charset
+
+an optional charset for MIME-encoding the document content.
+The default is C<utf-8>. Another encoding like C<iso-8859-1>
+may be specified, but in principle this will not change the final
+result, since Word will decode the specified charset.
+
+If the charset is different from C<utf-8>, wide characters (those
+with values higher than C<0xFF>) will be replaced by their corresponding
+HTML numerical entities; so for example '♥' (C<< \N{BLACK HEART SUIT} >>)
+will be replaced by C<< &#9829; >>.
+
 
 =back
 
@@ -1034,8 +1061,6 @@ from the generic letter and overrides the C<letter_body> block :
 
 =head1 TO DO
 
-Many features could be added; for example:
-
   - link same header/footers across several sections
   - multiple columns
   - watermarks (I tried hard to reverse engineer MsWord behaviour,
@@ -1055,25 +1080,16 @@ Please report any bugs or feature requests to
 L<https://github.com/damil/MsOffice-Word-HTML-Writer/issues>.
 
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc MsOffice::Word::HTML::Writer
-
-or at the CPAN web site L<https://metacpan.org/pod/MsOffice::Word::HTML::Writer>.
-
-
 
 =head1 SEE ALSO
 
 L<Win32::Word::Writer>, L<RTF::Writer>, L<Spreadsheet::WriteExcel>,
-L<OpenOffice::OODoc>.
-
+L<OpenOffice::OODoc>, L<Document::OOXML>, L<MsOffice::Word::Surgeon>,
+L<MsOffice::Word::Template>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2022 Laurent Dami, all rights reserved.
+Copyright 2009-2023 Laurent Dami, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

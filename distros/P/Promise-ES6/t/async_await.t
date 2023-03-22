@@ -29,6 +29,8 @@ use AsyncAwait;
 
 note "Testing: synchronous mode";
 
+diag "Test::Future::AsyncAwait::Awaitable $Test::Future::AsyncAwait::Awaitable::VERSION";
+
 Test::Future::AsyncAwait::Awaitable::test_awaitable(
     'Promise::ES6 conforms to Awaitable API',
     class => 'Promise::ES6',

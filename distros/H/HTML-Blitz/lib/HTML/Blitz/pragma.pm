@@ -5,14 +5,17 @@
 package HTML::Blitz::pragma;
 use strict;
 use warnings qw(all FATAL uninitialized);
-use constant PERL_VERSION => '5.20';
+use constant {
+    PERL_VERSION    => '5.20',
+    _HAVE_PERL_5_32 => $^V ge v5.32.0,
+};
 use feature ':' . PERL_VERSION;
+no if _HAVE_PERL_5_32, feature => 'indirect';
 use Function::Parameters 2;
-no indirect ':fatal';
 
 use Carp ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 method import($class: @items) {
     for my $item (@items) {
@@ -22,8 +25,8 @@ method import($class: @items) {
     strict->import;
     warnings->import(qw(all FATAL uninitialized));
     feature->import(':' . PERL_VERSION);
+    feature->unimport('indirect') if _HAVE_PERL_5_32;
     Function::Parameters->import;
-    indirect->unimport(':fatal');
 }
 
 1

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = "0.64";
+our $VERSION = "0.67";
 
 require 5.012;
 
@@ -38,7 +38,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.64
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -113,6 +113,9 @@ Support for the Web Browser SSO profile of SAML2.
 Net::SAML2 correctly perform the SSO process against numerous SAML
 Identity Providers (IdPs).  It has been tested against:
 
+Version 0.54 and newer support EncryptedAssertions.  No changes required to existing
+SP applications if EncryptedAssertions are not in use.
+
 =over
 
 =item Auth0 (requires Net::SAML2 >=0.39)
@@ -131,14 +134,13 @@ Identity Providers (IdPs).  It has been tested against:
 
 =item OneLogin
 
-=item PingIdentity
-
-Version 0.54 and newer support EncryptedAssertions.  No changes required to existing
-SP applications if EncryptedAssertions are not in use.
+=item PingIdentity  (requires Net::SAML2 >=0.54)
 
 =item SAMLTEST.ID (requires Net::SAML2 >=0.63)
 
 =item Shibboleth (requires Net::SAML2 >=0.63)
+
+=item SimpleSAMLphp
 
 =back
 

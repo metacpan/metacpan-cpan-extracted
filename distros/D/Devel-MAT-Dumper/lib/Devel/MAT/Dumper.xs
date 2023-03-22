@@ -190,13 +190,6 @@ static HV *helper_per_package;
 typedef int DMD_MagicHelper(pTHX_ DMDContext *ctx, SV const *sv, MAGIC *mg);
 static HV *helper_per_magic;
 
-/* Before API v0.44 */
-typedef int DMD_LegacyHelper(pTHX_ SV const *sv);
-static HV *legacy_helper_per_package;
-
-typedef int DMD_LegacyMagicHelper(pTHX_ SV const *sv, MAGIC *mg);
-static HV *legacy_helper_per_magic;
-
 static void write_u8(FILE *fh, uint8_t v)
 {
   fwrite(&v, 1, 1, fh);
@@ -830,15 +823,14 @@ static void write_annotations_from_stack(FILE *fh, int n)
   }
 }
 
-static void run_package_helpers(DMDContext *ctx, const SV *sv, HV *stash);
-static void run_package_helpers(DMDContext *ctx, const SV *sv, HV *stash)
+static void run_package_helpers(DMDContext *ctx, const SV *sv, SV *classname)
 {
   FILE *fh = ctx->fh;
-  SV **svp;
+  HE *he;
 
   DMD_Helper *helper = NULL;
-  if((svp = hv_fetch(helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0)))
-    helper = (DMD_Helper *)SvUV(*svp);
+  if((he = hv_fetch_ent(helper_per_package, classname, 0, 0)))
+    helper = (DMD_Helper *)SvUV(HeVAL(he));
 
   if(helper) {
     ENTER;
@@ -851,18 +843,6 @@ static void run_package_helpers(DMDContext *ctx, const SV *sv, HV *stash)
 
     FREETMPS;
     LEAVE;
-  }
-
-  AV *isa_av;
-  if((svp = hv_fetchs(stash, "ISA", 0)) &&
-      SvTYPE(*svp) == SVt_PVGV &&
-      (isa_av = GvAV((GV *)*svp)) &&
-      AvFILL(isa_av) > -1) {
-    SSize_t i;
-    for(i = 0; i <= AvFILL(isa_av); i++) {
-      HV *superstash = gv_stashsv(AvARRAY(isa_av)[i], 0);
-      run_package_helpers(ctx, sv, superstash);
-    }
   }
 }
 
@@ -991,7 +971,9 @@ static void write_sv(DMDContext *ctx, const SV *sv)
   }
 
   if(SvOBJECT(sv)) {
-    run_package_helpers(ctx, sv, SvSTASH(sv));
+    AV *linearized_mro = mro_get_linear_isa(SvSTASH(sv));
+    for(SSize_t i = 0; i <= AvFILL(linearized_mro); i++)
+      run_package_helpers(ctx, sv, AvARRAY(linearized_mro)[i]);
   }
 
 #ifdef DEBUG_LEAKING_SCALARS
@@ -1155,26 +1137,6 @@ static const PERL_CONTEXT *caller_cx(int count, void *ignore)
 static void dumpfh(FILE *fh)
 {
   max_string = SvIV(get_sv("Devel::MAT::Dumper::MAX_STRING", GV_ADD));
-
-  {
-    HE *he;
-
-    if(hv_iterinit(legacy_helper_per_package)) {
-      warn("Legacy per-package helpers in %HELPER_PER_PACKAGE are no longer followed\n");
-      while((he = hv_iternext(legacy_helper_per_package))) {
-        STRLEN len;
-        warn("  %s\n", HePV(he, len));  // package names won't contain embedded NULs
-      }
-    }
-
-    if(hv_iterinit(legacy_helper_per_magic)) {
-      warn("Legacy per-magic helpers in %HELPER_PER_MAGIC are no longer followed\n");
-      while((he = hv_iternext(legacy_helper_per_magic))) {
-        STRLEN len;
-        warn("  %s\n", HePV(he, len)); // magic addresses are decimal integers
-      }
-    }
-  }
 
   DMDContext ctx = {
     .fh = fh,
@@ -1611,6 +1573,16 @@ static void dumpfh(FILE *fh)
 
   write_u8(fh, 0);
 
+  // Mortals stack
+  {
+    // Mortal stack is a pre-inc stack
+    write_uint(fh, PL_tmps_ix + 1);
+    for(SSize_t i = 0; i <= PL_tmps_ix; i++) {
+      write_ptr(fh, PL_tmps_stack[i]);
+    }
+    write_uint(fh, PL_tmps_floor);
+  }
+
   if(ctx.structdefs)
     SvREFCNT_dec((SV *)ctx.structdefs);
 }
@@ -1648,8 +1620,5 @@ BOOT:
     hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_magic",
       sv = newRV_noinc((SV *)(newHV())));
   helper_per_magic = (HV *)SvRV(sv);
-
-  legacy_helper_per_package = get_hv("Devel::MAT::Dumper::HELPER_PER_PACKAGE", GV_ADD);
-  legacy_helper_per_magic   = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);
 
   sv_setiv(*hv_fetchs(PL_modglobal, "Devel::MAT::Dumper/writestruct()", 1), PTR2UV(&writestruct));

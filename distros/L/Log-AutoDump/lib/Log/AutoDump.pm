@@ -17,9 +17,11 @@ use constant TRACE => 5;
 
 my %LEVELS = ( 0 => 'FATAL', 1 => 'ERROR', 2 => 'WARN', 3 => 'INFO', 4 => 'DEBUG', 5 => 'TRACE' );
 
-use constant DEFAULT_LEVEL => 5;
-use constant DEFAULT_SORT_KEYS => 1;
+use constant DEFAULT_LEVEL      => 5;
+use constant DEFAULT_SORT_KEYS  => 1;
 use constant DEFAULT_QUOTE_KEYS => 0;
+use constant DEFAULT_DEEP_COPY  => 1;
+use constant DEFAULT_PURITY     => 1;
 
 use constant DEFAULT_BASE_DIR => '/tmp';
 use constant MAX_FRAME => 10;
@@ -36,7 +38,7 @@ Version 0.20
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 $VERSION = eval $VERSION;
 
@@ -103,6 +105,7 @@ Creates a new logger object.
      dump_depth         => 2,
      sort_keys          => 1,
      quote_keys         => 0,
+     deep_copy          => 1,
      filename_datestamp => 1,
  );
 
@@ -148,8 +151,10 @@ sub new
          history        => [],
          dumps          => exists $args{ dumps } ? $args{ dumps } : 1,
          dump_depth     => $args{ dump_depth } || 0,
-         sort_keys      => exists $args{ sort_keys }  ? $args{ sort_keys }  : DEFAULT_SORT_KEYS,
+         sort_keys      => exists $args{ sort_keys }  ? $args{ sort_keys  } : DEFAULT_SORT_KEYS,
          quote_keys     => exists $args{ quote_keys } ? $args{ quote_keys } : DEFAULT_QUOTE_KEYS,
+         deep_copy      => exists $args{ deep_copy  } ? $args{ deep_copy  } : DEFAULT_DEEP_COPY,
+         purity         => exists $args{ purity     } ? $args{ purity     } : DEFAULT_PURITY,
          filename       => $args{ filename },
          autoflush      => exists $args{ autoflush } ? $args{ autoflush } : 1,
         _fh             => undef,
@@ -283,6 +288,35 @@ sub quote_keys
     return $self->{ quote_keys };
 }
 
+=head3 deep_copy
+
+Sets C<$Data::Dumper::Deepcopy>.
+
+ $log->deep_copy( 0 );
+
+=cut
+
+sub deep_copy
+{
+    my ( $self, $arg ) = @_;
+    $self->{ deep_copy } = $arg if defined $arg;
+    return $self->{ deep_copy };
+}
+
+=head3 purity
+
+Sets C<$Data::Dumper::Purity>.
+
+ $log->purity( 0 );
+
+=cut
+
+sub purity
+{
+    my ( $self, $arg ) = @_;
+    $self->{ purity } = $arg if defined $arg;
+    return $self->{ purity };
+}
 
 =head3 filename
 
@@ -355,6 +389,10 @@ sub msg
 
     local $Data::Dumper::Quotekeys = $self->quote_keys;
     
+    local $Data::Dumper::Deepcopy = $self->deep_copy;
+
+    local $Data::Dumper::Purity = $self->purity;
+
     if ( $level !~ /^\d+$/ )
     {
         # bad log level, so push the 'level' to the 'things'
@@ -401,9 +439,9 @@ sub msg
     {
         if ( my $label = ref $thing )
         {
-            if ( $self->dumps || $level == 0 )
+            if ( $self->dumps || $level == FATAL )
             {
-                $Data::Dumper::Maxdepth = 9 if $level == 0;
+                $Data::Dumper::Maxdepth = 0 if $level == FATAL;
 
                 my $dumped = Data::Dumper->Dump( [ $thing ], [ $label ] );
 

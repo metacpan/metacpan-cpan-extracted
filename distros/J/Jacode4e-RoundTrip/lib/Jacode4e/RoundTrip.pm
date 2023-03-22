@@ -1,5 +1,5 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.13';
+$VERSION = '2.13.81.14';
 '有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
 # 如果您可以阅读此字符，则可以通过选择所有内容并将其保存为文件名“Jacode4e/RoundTrip.pm”来将其用作模块。
 # 如果您可以閱讀此字符，則可以通過選擇所有內容並將其保存為文件名“Jacode4e/RoundTrip.pm”來將其用作模塊。
@@ -10,7 +10,7 @@ $VERSION = '2.13.81.13';
 #
 # Jacode4e::RoundTrip - Converts JIS X 0213 Encodings with Round-Trip
 #
-# Copyright (c) 2018, 2019, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 $VERSION = $VERSION;
@@ -1089,7 +1089,9 @@ You can following mnemonics as keys of hash reference "{ %option }":
 
 =over 2
 
-=item * INPUT_LAYOUT
+=item *
+
+INPUT_LAYOUT
 
 input record layout by 'S' and 'D' sequence
 
@@ -1097,29 +1099,35 @@ input record layout by 'S' and 'D' sequence
 
 each letter may optionally be followed by a number indicating the repeat count, see samples
 
-=item * OUTPUT_SHIFTING
+=item *
+
+OUTPUT_SHIFTING
 
 true means use output shift code, false means not use
 
 default is false
 
-=item * SPACE
+=item *
+
+SPACE
 
 output space code in DBCS/MBCS
 
-=item * GETA
+=item *
+
+GETA
 
 output geta code in DBCS/MBCS
 
-=item * OVERRIDE_MAPPING
+=item *
+
+OVERRIDE_MAPPING
 
 hash reference of FROM => TO override mapping { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
 
 (CAUTION! override also SPACE option)
 
 =back
-
-If you need round-trip conversion, you had better use Jacode4e::RoundTrip module.
 
 =head1 SAMPLES
 
@@ -1352,29 +1360,53 @@ This software is useful for processing your JIS X 0213 data by other system, and
 
 =over 4
 
-=item * Mnemonic is "cp932x"
+=item *
 
-=item * CP932X is almost CP932
+Mnemonic is "cp932x"
 
-=item * Pronounce [si: pi: nain thri: tu: kai] in English
+=item *
 
-=item * Pronounce [shi: pi: kju: san' ni kai] in Japanese
+CP932X is almost CP932
 
-=item * We have reserved [si: pi: nain thri: tu: iks] for Microsoft Corporation-san
+=item *
 
-=item * CP932 upper compatible
+Pronounce [si: pi: nain thri: tu: kai] in English
 
-=item * Supports JIS X 0213 character set
+=item *
 
-=item * Used ghost character "\x9C\x5A" as single shift code
+Pronounce [shi: pi: kju: san' ni kai] in Japanese
 
-=item * Used "\x9C\x5A\x9C\x5A" for single "\x9C\x5A"
+=item *
 
-=item * You can use private use characters you made
+We have reserved [si: pi: nain thri: tu: iks] for Microsoft Corporation-san
 
-=item * You can use your operating system, network, and database
+=item *
 
-=item * In almost all cases, application programs can be used as it is
+CP932 upper compatible
+
+=item *
+
+Supports JIS X 0213 character set
+
+=item *
+
+Used ghost character "\x9C\x5A" as single shift code
+
+=item *
+
+Used "\x9C\x5A\x9C\x5A" for single "\x9C\x5A"
+
+=item *
+
+You can use private use characters you made
+
+=item *
+
+You can use your operating system, network, and database
+
+=item *
+
+In almost all cases, application programs can be used as it is
 
 =back
 
@@ -1382,19 +1414,33 @@ This software is useful for processing your JIS X 0213 data by other system, and
 
 =over 4
 
-=item * Mnemonic is "utf8jp"
+=item *
 
-=item * UTF-8-SPUA-JP is UTF-8
+Mnemonic is "utf8jp"
 
-=item * Internal character encoding of Jacode4e and Jacode4e::RoundTrip, universally
+=item *
 
-=item * Implements JIS X 0213 character set on to Unicode Supplementary Private Use Area-A
+UTF-8-SPUA-JP is UTF-8
 
-=item * Code point ordered by JIS level, plane, row, cell
+=item *
 
-=item * Uniformly length encoding
+Internal character encoding of Jacode4e and Jacode4e::RoundTrip, universally
 
-=item * No grapheme clustering, one character by uniquely code point
+=item *
+
+Implements JIS X 0213 character set on to Unicode Supplementary Private Use Area-A
+
+=item *
+
+Code point ordered by JIS level, plane, row, cell
+
+=item *
+
+Uniformly length encoding
+
+=item *
+
+No grapheme clustering, one character by uniquely code point
 
 =back
 
@@ -2024,15 +2070,69 @@ Q6) Which character is best for single shift code to support CCS of JIS X 0213?
 
 =over 2
 
-=item * The single shift code must be a DBCS code, because field with DBCS type cannot store SBCS code in some cases
+=item *
 
-=item * Moreover, all GAIJI code points must be yours
+The single shift code must be a DBCS code, because field with DBCS type cannot store SBCS code in some cases
 
-=item * The impact of this solution must be minimum
+=item *
+
+Moreover, all GAIJI code points must be yours
+
+=item *
+
+The impact of this solution must be minimum
 
 =back
 
 A6) We selected "1-55-27" for single shift code. Because it called "ghost character" and cannot use any purpose
+
+=head1 How To Update This Distribution
+
+Someday all authors of Jacode4e::RoundTrip module may get run over by a bus.
+
+So we write here how to update this distribution for you.
+
+We wish you good luck.
+
+=over 2
+
+=item 1
+
+(MUST) update file "lib/Jacode4e/RoundTrip.pm"
+
+=item 2
+
+(MUST) update $VERSION of file "lib/Jacode4e/RoundTrip.pm"
+
+=item 3
+
+(MUST) append to change log to file "Changes"
+
+=item 4
+
+(if you need) update file "README"
+
+=item 5
+
+(if you need) update or add files "t/*.t"
+
+=item 6
+
+(if you need) update file "MANIFEST"
+
+=item 7
+
+repeat command: pmake test [Enter] until all tests PASS
+
+=item 8
+
+type command: pmake dist [Enter]
+
+=item 9
+
+upload *.tar.gz to PAUSE(The [Perl programming] Authors Upload Server)
+
+=back
 
 =head1 AUTHOR
 

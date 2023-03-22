@@ -16,7 +16,7 @@ my $tap;
   close TAP;
 }
 
-diag "\n=== complete TAP-DOM:";
+# diag "\n=== complete TAP-DOM:";
 my $tapdata = TAP::DOM->new( tap => $tap); # needs Test::Harness 3.22: , version => 13 );
 
 my $l = 5;

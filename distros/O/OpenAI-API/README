@@ -4,26 +4,41 @@ NAME
 
 VERSION
 
-    0.27
+    0.31
 
 SYNOPSIS
 
         use OpenAI::API;
-        use OpenAI::API::Request::Chat;
     
-        my $config = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
+        my $openai = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
+    
+        my $res = $openai->chat(
+            model    => "gpt-3.5-turbo",
+            messages => [
+                { "role" => "system",    "content" => "You are a helpful assistant." },
+                { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
+                { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
+                { "role" => "user",      "content" => "How do I use this module?" },
+            ],
+        );
+    
+        # that's roughly the same as:
+    
+        use OpenAI::API::Request::Chat;
     
         my $request = OpenAI::API::Request::Chat->new(
             model    => "gpt-3.5-turbo",
             messages => [
                 { "role" => "system",    "content" => "You are a helpful assistant." },
-                { "role" => "user",      "content" => "Who won the world series in 2020?" },
-                { "role" => "assistant", "content" => "The Los Angeles Dodgers won the World Series in 2020." },
-                { "role" => "user",      "content" => "Where was it played?" }
+                { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
+                { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
+                { "role" => "user",      "content" => "How do I use this module?" },
             ],
         );
     
-        my $res = $request->send($config);
+        my $res = $request->send();
+    
+        my $message = $res->{choices}[0]{message};
 
 DESCRIPTION
 

@@ -7,6 +7,8 @@ package Promise::ES6;
 use strict;
 use warnings;
 
+use Carp ();
+
 use constant {
 
     # These aren’t actually defined.
@@ -402,7 +404,7 @@ sub AWAIT_GET {
 
     return ${ $_[0]->[_VALUE_SR_IDX] } if UNIVERSAL::isa( $_[0]->[_VALUE_SR_IDX], _RESOLUTION_CLASS );
 
-    die ${ $_[0]->[_VALUE_SR_IDX] };
+    Carp::croak ${ $_[0]->[_VALUE_SR_IDX] };
 }
 
 use constant _noop => ();

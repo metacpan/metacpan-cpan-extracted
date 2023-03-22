@@ -1,0 +1,46 @@
+NAME
+
+Test::Builder::SubtestSelection - Select subtests by name or by number
+
+DESCRIPTION
+
+This subclass of the "Test::Builder" class allows you to select subtests by
+name or by number before running them. In your test script you have to use the
+subclass before your test builder based testing framework. At the command-line
+"prove" runs your test script and the subtest selection is based on the value
+given to the "--subtest" option.
+
+INSTALLATION
+
+To install this module manually, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DOCUMENTATION
+
+After the installation, you can find documentation for this module with the
+command:
+
+  perldoc App::Logtail3
+
+MAINTENANCE
+
+To maintain this module, run the following commands:
+
+  perl Makefile.PL
+  make PERL_CPANM_OPT=--notest installdeps 
+  make
+  make test
+
+The second command installs the module dependencies in a "local" directory
+using "cpanm".
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

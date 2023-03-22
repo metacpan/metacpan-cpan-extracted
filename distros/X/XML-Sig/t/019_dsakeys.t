@@ -31,7 +31,7 @@ SKIP: {
     close XML;
 
     my $verify_response = `xmlsec1 --verify --pubkey-cert-pem t/dsa.public.pem --trusted-pem t/dsa.public.pem  --id-attr:ID "foo" t/tmp.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "t/tmp.xml is verified using xmlsec1 and X509Certificate" )
+    ok( $verify_response =~ m/OK/, "t/tmp.xml is verified using xmlsec1 and X509Certificate" )
         or warn "calling xmlsec1 failed: '$verify_response'\n";
     unlink "t/tmp.xml";
 }

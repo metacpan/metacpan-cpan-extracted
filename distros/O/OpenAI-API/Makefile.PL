@@ -20,10 +20,12 @@ my %WriteMakefileArgs = (
         'Test::RequiresInternet' => '0',
     },
     PREREQ_PM => {
+        'AnyEvent'             => '7.17',
         'JSON::MaybeXS'        => '1.004002',
         'LWP::UserAgent'       => '6.47',
         'LWP::Protocol::https' => '6.10',
         'Moo'                  => '2.005005',
+        'Promises'             => '1.04',
         'namespace::clean'     => '0.27',
         'strictures'           => '2.000006',
         'Types::Standard'      => '2.002001',

@@ -25,6 +25,6 @@ use HTML::Blitz::Atom our @EXPORT_OK = qw(
     AT_P_VARHTML
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1

@@ -4,6 +4,7 @@ hax/block_end.c.inc
 hax/block_start.c.inc
 hax/COP_SEQ_RANGE_HIGH_set.c.inc
 hax/lexer-additions.c.inc
+hax/LOGOP_ANY.c.inc
 hax/make_argcheck_aux.c.inc
 hax/pad_block_start.c.inc
 hax/pad_leavemy.c.inc
@@ -16,15 +17,12 @@ lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm
 lib/XS/Parse/Sublike/Builder_data.pm.PL
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01func.t
 t/02func-signatures.t
 t/03func-deparse.t
+t/04func-named-params.t
 t/10stages-permit.t
 t/11stages-pre_subparse.t
 t/12stages-post_blockstart.t
@@ -50,3 +48,7 @@ t/registrations.xs
 t/stages.xs
 t/testcase.pm
 XSParseSublike.h
+README
+LICENSE
+META.yml
+META.json

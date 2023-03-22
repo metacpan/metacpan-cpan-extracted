@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Crypt::Bcrypt",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Digest::SHA" => 0,
     "Exporter" => "5.57",
     "MIME::Base64" => "2.21",
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Digest::SHA" => 0,
   "Exporter" => "5.57",
   "ExtUtils::ParseXS" => "2.21",

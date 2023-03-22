@@ -6,7 +6,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use parent qw(Database::Async::Engine);
 
@@ -184,15 +184,39 @@ async sub connect {
 
     # We're assuming TCP (either v4 or v6) here, but there's not really any reason we couldn't have
     # UNIX sockets or other transport layers here other than lack of demand so far.
-    my $sock = await $loop->connect(
-        service     => $uri->port,
-        host        => $uri->host,
-        socktype    => 'stream',
-    );
+    my @connect_params;
+    if ($uri->host and not $uri->host =~ m!^[/@]!) {
+        @connect_params = (
+            service     => $uri->port,
+            host        => $uri->host,
+            socktype    => 'stream',
+        );
+    } elsif ($uri->host eq '') {
+        @connect_params = (
+            addr => {
+                family   => 'unix',
+                socktype => 'stream',
+                path     => '/var/run/postgresql/.s.PGSQL.'.$uri->port,
+            }
+        );
+    } else {
+        @connect_params = (
+            addr => {
+                family   => 'unix',
+                socktype => 'stream',
+                path     => $uri->host.'/.s.PGSQL.'.$uri->port,
+            }
+        );
+    }
+    my $sock = await $loop->connect(@connect_params);
 
-    my $local  = join ':', $sock->sockhost_service(1);
-    my $remote = join ':', $sock->peerhost_service(1);
-    $log->tracef('Connected to %s as %s from %s', $endpoint, $remote, $local);
+    if ($sock->sockdomain == Socket::PF_INET or $sock->sockdomain == Socket::PF_INET6) {
+        my $local  = join ':', $sock->sockhost_service(1);
+        my $remote = join ':', $sock->peerhost_service(1);
+        $log->tracef('Connected to %s as %s from %s', $endpoint, $remote, $local);
+    } elsif ($sock->sockdomain == Socket::PF_UNIX) {
+        $log->tracef('Connected to %s as %s', $endpoint, $sock->peerpath);
+    }
 
     # We start with a null handler for read, because our behaviour varies depending on
     # whether we want to go through the SSL dance or not.
@@ -466,7 +490,7 @@ sub on_read {
         # the connection ASAP, and avoid any chance of barrelling through to a COMMIT or other
         # risky operation.
         $log->errorf('Failed to handle read, connection is no longer in a valid state: %s', $e);
-        $self->close_now;
+        $stream->close_now;
     } finally {
         $self->connected->set_numeric(0) if $eof;
     }
@@ -960,6 +984,56 @@ sub query { die 'use handle_query instead'; }
 
 sub active_query { shift->{active_query} }
 
+=head2 _remove_from_loop
+
+Called when this engine instance is removed from the main event loop, usually just before the instance
+is destroyed.
+
+Since we could be in various states of authentication or query processing, we potentially have many
+different elements to clean up here. We do these explicitly so that we can apply some ordering to the events:
+clear out things that relate to queries before dropping the connection, for example.
+
+=cut
+
+sub _remove_from_loop {
+    my ($self, $loop) = @_;
+    if(my $query = delete $self->{active_query}) {
+        $query->fail('disconnected') unless $query->completed->is_ready;
+    }
+    if(my $idle = delete $self->{idle}) {
+        $idle->cancel;
+    }
+    if(my $auth = delete $self->{authenticated}) {
+        $auth->cancel;
+    }
+    if(my $connected = delete $self->{connected}) {
+        $connected->finish;
+    }
+    if(my $outgoing = delete $self->{outgoing}) {
+        $outgoing->finish unless $outgoing->is_ready;
+    }
+    if(my $incoming = delete $self->{incoming}) {
+        $incoming->finish unless $incoming->is_ready;
+    }
+    if(my $stream = delete $self->{stream}) {
+        $stream->close_now;
+        $stream->remove_from_parent;
+    }
+    if(my $conn = delete $self->{connection}) {
+        $conn->cancel;
+    }
+    # Observable connection parameters - signal that no further updates are expected
+    for my $k (keys %{$self->{parameter}}) {
+        my $param = delete $self->{parameter}{$k};
+        $param->finish if $param;
+    }
+    if(my $ryu = delete $self->{ryu}) {
+        $ryu->remove_from_parent;
+    }
+    delete $self->{protocol};
+    return $self->next::method($loop);
+}
+
 1;
 
 __END__
@@ -1024,9 +1098,9 @@ a ->connection first
 
 Tom Molesworth C<< <TEAM@cpan.org> >>
 
-with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >>
+with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >> and Maryam Nafisi C<< <maryam@firstsource.tech> >>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

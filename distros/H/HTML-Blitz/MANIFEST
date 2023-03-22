@@ -18,10 +18,19 @@ Makefile.PL
 Makefile_PL_settings.plx
 MANIFEST			This list of files
 MANIFEST.SKIP
+simple-benchmark/bench.html
+simple-benchmark/bench.mt
+simple-benchmark/bench.pl
+simple-benchmark/bench.tmpl
+simple-benchmark/bench.tt
+simple-benchmark/bench.tx
 t/actions.t
+t/builder.t
+t/conflict.t
 t/errors.t
 t/marshal.t
 t/methods.t
+t/parser.t
 t/selector-combinators.t
 t/selectors.t
 t/special.t

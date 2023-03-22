@@ -1,10 +1,5 @@
 #!perl
-use strict;
-use warnings FATAL => 'all';
-use utf8;
-
-use Test::More tests => 4;
-
+use Test2::V0;
 use URL::Search qw($URL_SEARCH_RE extract_urls partition_urls);
 
 my @results = (
@@ -15,7 +10,7 @@ my @results = (
     [TEXT => ", and\n"],
     [URL => 'http://127.1:8080/cgi-bin/render.dll?index#query'],
     [TEXT => '. More: '],
-    [URL => 'ftp://host/dir/file.tar.gz'],
+    [URL => 'hTtpS://host/dir/file.tar.gz'],
     [TEXT => ".\nClick here"],
     [URL => 'http://A4.paper'],
     [TEXT => "\n("],
@@ -45,10 +40,14 @@ my $corpus = join '', map $_->[1], @results;
 
 #diag $corpus;
 
-is_deeply [partition_urls $corpus], \@results;
+is [partition_urls $corpus], \@results;
 
-is_deeply [extract_urls $corpus], [map $_->[0] eq 'URL' ? $_->[1] : (), @results];
+is [extract_urls $corpus], [map $_->[0] eq 'URL' ? $_->[1] : (), @results];
 
-ok $corpus =~ /$URL_SEARCH_RE/;
+if ($corpus =~ /$URL_SEARCH_RE/) {
+    is substr($corpus, $-[0], $+[0] - $-[0]), $results[1][1];
+} else {
+    fail "corpus matches \$URL_SEARCH_RE";
+}
 
-is substr($corpus, $-[0], $+[0] - $-[0]), $results[1][1];
+done_testing;

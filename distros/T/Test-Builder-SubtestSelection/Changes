@@ -1,5 +1,11 @@
 Release history for Test-Builder-SubtestSelection
 
+0.001003  2023-03-18
+          - improve installdeps phony target
+          - update prerequisite
+          - improve documentation and create readme file
+          - fix AUTHOR attribute
+
 0.001002  2023-02-24
           - update prerequisites
           - set minimum perl version

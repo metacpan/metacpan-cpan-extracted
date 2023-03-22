@@ -31,7 +31,7 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Suite/issues
   repository: http://github.com/Test-More/Test2-Suite/
-version: '0.000148'
+version: '0.000150'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

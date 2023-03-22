@@ -7,6 +7,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  POSIX: '0'
   Test::CheckDeps: '0.010'
   Test::Exception: '0'
   Test::MockModule: '0'
@@ -14,28 +15,58 @@ build_requires:
   Test::More: '0.94'
   Test::NoWarnings: '0'
   Test::Perl::Critic: '0'
-  perl: '5.014000'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: VolSurface-Utils
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  VolSurface::Utils:
+    file: lib/VolSurface/Utils.pm
+    version: '1.05'
 requires:
   Carp: '0'
+  Exporter: '0'
   File::Spec: '0'
   List::Util: '0'
   Math::Business::BlackScholes::Binaries::Greeks::Delta: '0'
   Math::Business::BlackScholesMerton: '0'
+  Math::Business::BlackScholesMerton::NonBinaries: '0'
   Math::CDF: '0'
   POSIX: '0'
   base: '0'
-  perl: '5.014000'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-VolSurface-Utils/issues
-  repository: git://github.com/binary-com/perl-VolSurface-Utils.git
-version: '1.04'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  homepage: https://github.com/binary-com/perl-VolSurface-Utils
+  repository: https://github.com/binary-com/perl-VolSurface-Utils.git
+version: '1.05'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'qinfeng-deriv <qinfeng@deriv.com>'
+  - 'Yng Shan <yngshan@binary.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Jun Bon <junbon@binary.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'VishalMenon-Deriv <vishal.menon@deriv.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Kaveh Mousavi Zamani <kavehmz@gmail.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

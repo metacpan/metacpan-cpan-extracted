@@ -1,3 +1,15 @@
+0.07 2023-03-19
+    - reduce dependencies by switching to 'feature' (i.e. 'no feature
+      "indirect"') instead of 'indirect' and Test2 instead of Test::More,
+      Test::Builder, Test::Fatal
+    - extend basic benchmark to cover Mojo::Template, Text::Xslate,
+      HTML::Template, and HTML::Template::Pro
+    - include benchmark files in the distribution
+    - add example to documentation for autogenerating script hashes from
+      template files for CSP
+    - extend test suite to cover more of HTML::Blitz::Builder, rule conflicts,
+      and HTML syntax corner cases
+
 0.06 2023-02-19
     - allow <math/> and <svg/> (i.e. math and svg elements can be self-closing)
     - treat param as void in the parser

@@ -10,11 +10,11 @@ VolSurface::Utils - A class that handles several volatility related methods
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Carp;
 use List::Util qw(notall);
-use Math::CDF qw(pnorm qnorm);
+use Math::CDF  qw(pnorm qnorm);
 use Math::Business::BlackScholesMerton::NonBinaries;
 use Math::Business::BlackScholes::Binaries::Greeks::Delta;
 use base qw( Exporter );
@@ -71,7 +71,8 @@ Returns the delta (spot delta or premium adjusted spot delta) correspond to a pa
         spot             => $spot,
         r_rate           => $r_rate,
         q_rate           => $q_rate,
-        premium_adjusted => $premium_adjusted
+        premium_adjusted => $premium_adjusted,
+        forward          => $forward
     });
 
 Spot delta of an option is the percentage of the foreign notional one must buy when selling the option to hold a hedged position in the spot markets.
@@ -84,7 +85,7 @@ sub get_delta_for_strike {
     my $args = shift;
 
     my %new_args = %$args;
-    my @required = qw(strike atm_vol t spot r_rate q_rate premium_adjusted);
+    my @required = qw(strike atm_vol t spot r_rate q_rate premium_adjusted forward);
     for (@required) {
         croak "Arg $_ is undef at get_delta_for_strike" unless defined $args->{$_};
     }
@@ -94,11 +95,13 @@ sub get_delta_for_strike {
 
     my $delta;
     if ($premium_adjusted) {
-        my $d2 = (log($S / $K) + ($r - $q - ($sigma**2) / 2) * $t) / ($sigma * sqrt($t));
-        $delta = ($K / $S) * exp(-1 * $r * $t) * pnorm($d2);
+        my $forward_adj = $new_args{forward} ? exp($new_args{q_rate} * $new_args{t}) : 1;
+        my $d2          = (log($S / $K) + ($r - $q - ($sigma**2) / 2) * $t) / ($sigma * sqrt($t));
+        $delta = ($K / $S) * $forward_adj * exp(-1 * $new_args{r_rate} * $new_args{t}) * pnorm($d2);
     } else {
-        my $d1 = (log($S / $K) + ($r - $q + ($sigma**2) / 2) * $t) / ($sigma * sqrt($t));
-        $delta = exp(-1 * $q * $t) * pnorm($d1);
+        my $forward_adj = $new_args{forward} ? 1 : exp(-1 * $new_args{q_rate} * $new_args{t});
+        my $d1          = (log($S / $K) + ($r - $q + ($sigma**2) / 2) * $t) / ($sigma * sqrt($t));
+        $delta = $forward_adj * pnorm($d1);
     }
 
     return $delta;
@@ -140,6 +143,10 @@ sub get_strike_for_spot_delta {
         croak 'Provided delta [' . $new_args{delta} . '] must be on [0,1]';
     }
 
+    if ($new_args{forward}) {
+        $new_args{delta} = $new_args{delta} * exp(-$new_args{q_rate} * $new_args{t});
+    }
+
     $new_args{normalInv} = qnorm($new_args{delta} / exp(-$new_args{q_rate} * $new_args{t}));
     my $k;
     if ($new_args{normalInv}) {
@@ -155,9 +162,8 @@ sub get_strike_for_spot_delta {
 sub _calculate_strike_for_vanilla_put {
     my $args = shift;
 
-    my ($normalInv, $delta, $sigma, $time_in_years, $r, $d, $S, $premium_adjusted) =
-        ($args->{normalInv}, $args->{delta}, $args->{atm_vol}, $args->{t},
-        $args->{r_rate}, $args->{q_rate}, $args->{spot}, $args->{premium_adjusted});
+    my ($normalInv, $delta, $sigma, $time_in_years, $r, $d, $S, $premium_adjusted) = (
+        $args->{normalInv}, $args->{delta}, $args->{atm_vol}, $args->{t}, $args->{r_rate}, $args->{q_rate}, $args->{spot}, $args->{premium_adjusted});
 
     #Step 1: Set initial k level with corresponding to spot delta without premium_adjusted
     my $k = $S * exp(($normalInv * $sigma * sqrt($time_in_years)) + ($r - $d + ($sigma * $sigma / 2)) * $time_in_years);
@@ -167,7 +173,7 @@ sub _calculate_strike_for_vanilla_put {
 
         # Step 2: Calculate option price and the corresponding delta
         my $option_price_1 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $k1, $time_in_years, $r, $r - $d, $sigma);
-        my $delta_1 = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_put($S, $k1, $time_in_years, $r, $r - $d, $sigma);
+        my $delta_1        = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_put($S, $k1, $time_in_years, $r, $r - $d, $sigma);
 
         # Step 3: Numerically evaluate option at slightly different strike and calculate its corresponding delta
         my $option_price_2 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
@@ -193,9 +199,8 @@ sub _calculate_strike_for_vanilla_put {
 sub _calculate_strike_for_vanilla_call {
     my $args = shift;
 
-    my ($normalInv, $delta, $sigma, $time_in_years, $r, $d, $S, $premium_adjusted) =
-        ($args->{normalInv}, $args->{delta}, $args->{atm_vol}, $args->{t},
-        $args->{r_rate}, $args->{q_rate}, $args->{spot}, $args->{premium_adjusted});
+    my ($normalInv, $delta, $sigma, $time_in_years, $r, $d, $S, $premium_adjusted) = (
+        $args->{normalInv}, $args->{delta}, $args->{atm_vol}, $args->{t}, $args->{r_rate}, $args->{q_rate}, $args->{spot}, $args->{premium_adjusted});
 
     #Step 1: Set initial k level with corresponding to spot delta without premium_adjusted.
     my $k = $S * exp(-($normalInv * $sigma * sqrt($time_in_years)) + ($r - $d + ($sigma * $sigma / 2)) * $time_in_years);
@@ -205,7 +210,7 @@ sub _calculate_strike_for_vanilla_call {
 
         # Step 2: Calculate option price and the corresponding delta
         my $option_price_1 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $k1, $time_in_years, $r, $r - $d, $sigma);
-        my $delta_1 = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_call($S, $k1, $time_in_years, $r, $r - $d, $sigma);
+        my $delta_1        = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_call($S, $k1, $time_in_years, $r, $r - $d, $sigma);
 
         # Step 3: Numerically evaluate option at slightly different strike and calculate its corresponding delta
         my $option_price_2 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
@@ -268,7 +273,7 @@ sub get_ATM_strike_for_spot_delta {
         ($new_args{atm_vol}, $new_args{t}, $new_args{r_rate}, $new_args{q_rate}, $new_args{spot}, $new_args{premium_adjusted});
 
     my $constant = ($premium_adjusted) ? -0.5 : 0.5;
-    my $strike = $S * exp(($r - $d + $constant * $sigma * $sigma) * $time_in_years);
+    my $strike   = $S * exp(($r - $d + $constant * $sigma * $sigma) * $time_in_years);
 
     return $strike;
 }
@@ -463,7 +468,8 @@ sub _strangle_difference {
         r_rate           => $r,
         q_rate           => $d,
         spot             => $S,
-        premium_adjusted => $premium_adjusted
+        premium_adjusted => $premium_adjusted,
+        forward          => $tiy >= 1 ? 1 : 0
     });
     my $consistent_put_strike = get_strike_for_spot_delta({
         delta            => $delta,
@@ -473,7 +479,8 @@ sub _strangle_difference {
         r_rate           => $r,
         q_rate           => $d,
         spot             => $S,
-        premium_adjusted => $premium_adjusted
+        premium_adjusted => $premium_adjusted,
+        forward          => $tiy >= 1 ? 1 : 0
     });
 
     #Step 4: Calculate the two call and put strikes for the market traded butterfly (ie with market conventional volatility of butterfly obtain on step 1.)
@@ -485,7 +492,8 @@ sub _strangle_difference {
         r_rate           => $r,
         q_rate           => $d,
         spot             => $S,
-        premium_adjusted => $premium_adjusted
+        premium_adjusted => $premium_adjusted,
+        forward          => $tiy >= 1 ? 1 : 0
     });
     my $market_conventional_put_strike = get_strike_for_spot_delta({
         delta            => $delta,
@@ -495,7 +503,8 @@ sub _strangle_difference {
         r_rate           => $r,
         q_rate           => $d,
         spot             => $S,
-        premium_adjusted => $premium_adjusted
+        premium_adjusted => $premium_adjusted,
+        forward          => $tiy >= 1 ? 1 : 0
     });
 
     #Step 5: Calculate the difference between the strangle struck at the market traded butterfly strikes(those obtained on step 4) valued with the smile volatility( ie the one build with market quoted volatilities), and the same strangle struck at same market traded butterfly strikes but valued with market conventional volatility of butterfly(ie. the one obtained on step 1).
@@ -535,7 +544,7 @@ sub _smile_approximation {
         croak "$0: Supported order 1 and 2. Not supported order [$order_approx].";
     }
     my $vol;
-    my $F = $S * exp(($r - $d) * $tiy);
+    my $F   = $S * exp(($r - $d) * $tiy);
     my $Y_1 = (log($k2 / $k) * log($k3 / $k)) / (log($k2 / $k1) * log($k3 / $k1));
     # At grid points k3 or k1, this is zero.
     my $Y_2 = (log($k3 / $k) * log($k / $k1)) / (log($k3 / $k2) * log($k2 / $k1));
@@ -568,7 +577,7 @@ sub _smile_approximation {
         $vol = _implied_vol($S, $tiy, $k, $S * 0.00001, $r, $d, $implied_vol_method);
     } else {
         $temp1 = sqrt($temp1);
-        $vol = $vol_k2 + ((-$vol_k2 + $temp1) / ($d1_k * $d2_k));
+        $vol   = $vol_k2 + ((-$vol_k2 + $temp1) / ($d1_k * $d2_k));
     }
 
     return $vol;
@@ -593,10 +602,10 @@ sub _implied_vol {
         return 0 if ($i > 35);
         if ($type eq 'VANILLA_CALL') {
             $option_price = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $k, $tiy, $r, $r - $d, $vol);
-            $vega = Math::Business::BlackScholes::Binaries::Greeks::Vega::vanilla_call($S, $k, $tiy, $r, $r - $d, $vol);
+            $vega         = Math::Business::BlackScholes::Binaries::Greeks::Vega::vanilla_call($S, $k, $tiy, $r, $r - $d, $vol);
         } else {
             $option_price = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $k, $tiy, $r, $r - $d, $vol);
-            $vega = Math::Business::BlackScholes::Binaries::Greeks::Vega::vanilla_put($S, $k, $tiy, $r, $r - $d, $vol);
+            $vega         = Math::Business::BlackScholes::Binaries::Greeks::Vega::vanilla_put($S, $k, $tiy, $r, $r - $d, $vol);
         }
 
         return 0 if ($vega <= 0.00000001);

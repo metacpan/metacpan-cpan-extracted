@@ -1,3 +1,8 @@
+0.016   2023-01-19  Released-By: PERLANCAR; Urgency: low
+
+        - Tweak schema for field_value_formatters to fix completion.
+
+
 0.015   2022-11-04  Released-By: PERLANCAR; Urgency: low
 
         - [ux] Add shorter alias option -n for --num-fields.

@@ -1,3 +1,11 @@
+1.11  2023-03-17
+    - fixed bad upload
+
+1.10  2023-03-17
+    - use HTTP 1.1 instead of 1.0 for range requests to comply with RFCs and
+      handle servers that ignore range headers in HTTP 1.0 requests
+      (eg recent versions of lighttpd)
+
 1.01  2023-01-31
     - bug correction: system errors were not correctly set
       (bug #146156 reported by Diab Jerius)

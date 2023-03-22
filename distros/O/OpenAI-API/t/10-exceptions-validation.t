@@ -59,7 +59,7 @@ my @test_cases = (
 for my $test (@test_cases) {
     my ( $method, $params, $exception ) = @{$test}{qw/method params exception/};
 
-    throws_ok { my $response = $openai->$method( %{$params} ); } $exception;
+    throws_ok { my $response = $openai->$method( %{$params} ); } $exception or diag($@);
 }
 
 done_testing();

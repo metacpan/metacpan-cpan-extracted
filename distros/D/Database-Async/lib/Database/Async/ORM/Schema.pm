@@ -3,7 +3,7 @@ package Database::Async::ORM::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use Database::Async::ORM::Type;
 

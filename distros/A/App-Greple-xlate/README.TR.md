@@ -8,7 +8,7 @@ App::Greple::xlate - greple için çeviri destek modülü
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Varsayılan olarak, orijinal ve çevrilmiş metin [git(1)](http://man.he.net/man
     </p>
 </div>
 
-Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini kullanın. Bu, `(?s).*` metninin tamamıyla eşleşen kalıbı belirtmek için bir kısa yoldur.
+Metnin tamamını çevirmek istiyorsanız, **--match-all** seçeneğini kullanın. Bu, kalıbın tüm metinle eşleştiğini belirtmek için kısa yoldur `(?s).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Eğer metnin tamamını çevirmek istiyorsanız, **--match-entire** seçeneğini
 
     Çeviri sonucunu STDERR çıktısında gerçek zamanlı olarak görün.
 
-- **--match-entire**
+- **--match-all**
 
     Dosyanın tüm metnini hedef alan olarak ayarlayın.
 

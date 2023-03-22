@@ -1,5 +1,10 @@
 Revision history for Database-Async
 
+0.018     2023-03-20 09:12:55+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - Perform cleanup when cancelling queries
+
 0.017     2021-12-08 22:50:12+08:00 Asia/Kuala_Lumpur
     [New features]
 

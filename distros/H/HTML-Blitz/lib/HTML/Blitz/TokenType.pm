@@ -13,6 +13,6 @@ use HTML::Blitz::Atom our @EXPORT_OK = qw(
     TT_DOCTYPE
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1

@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 26;
+our $VERSION = 27;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -480,16 +480,19 @@ sub _init($self) {
 
     $self->{usleep} = 0;
 
-    if(!defined($self->{config}->{ssl}) ||
-            !defined($self->{config}->{ssl}->{cert}) ||
-            !defined($self->{config}->{ssl}->{key})) {
-        croak("Missing or incomplete SSL config!");
-    }
-    if(!-f $self->{config}->{ssl}->{cert}) {
-        croak("SSL cert file " . $self->{config}->{ssl}->{cert} . " not found!");
-    }
-    if(!-f $self->{config}->{ssl}->{key}) {
-        croak("SSL key file " . $self->{config}->{ssl}->{key} . " not found!");
+    if(defined($config->{ip})) {
+        # SSL only needed for TCP. Unix domain sockets are unencrypted
+        if(!defined($self->{config}->{ssl}) ||
+                !defined($self->{config}->{ssl}->{cert}) ||
+                !defined($self->{config}->{ssl}->{key})) {
+            croak("Missing or incomplete SSL config!");
+        }
+        if(!-f $self->{config}->{ssl}->{cert}) {
+            croak("SSL cert file " . $self->{config}->{ssl}->{cert} . " not found!");
+        }
+        if(!-f $self->{config}->{ssl}->{key}) {
+            croak("SSL key file " . $self->{config}->{ssl}->{key} . " not found!");
+        }
     }
 
     if(!defined($self->{config}->{username})) {

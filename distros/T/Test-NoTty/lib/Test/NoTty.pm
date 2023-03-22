@@ -9,7 +9,7 @@ use parent qw(Exporter);
 use POSIX qw(setsid _exit WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
 
 our @EXPORT = 'without_tty';
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub without_tty(&@) {
     my ($code, @args) = @_;
@@ -49,7 +49,7 @@ sub without_tty(&@) {
 
         eval {
             die "setsid failed: $!"
-                unless setsid;
+                if setsid == -1;
 
             # Likewise, a limitation is that the only function return value we
             # can easily support is an integer process exit code:

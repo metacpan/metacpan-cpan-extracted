@@ -4,6 +4,10 @@ use warnings;
 use lib 'inc';
 use Module::Build::with::XSTests;
 
+my @extra_compiler_flags = qw( -I. -Ihax );
+
+push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
+
 my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Sublike',
    requires => {
@@ -22,7 +26,7 @@ my $build = Module::Build::with::XSTests->new(
    create_license => 1,
    create_readme  => 1,
 
-   extra_compiler_flags => [qw( -I. -Ihax )],
+   extra_compiler_flags => \@extra_compiler_flags,
 );
 
 $build->create_build_script;

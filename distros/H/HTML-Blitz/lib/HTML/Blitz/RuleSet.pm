@@ -35,7 +35,7 @@ use HTML::Blitz::ActionType qw(
 );
 use List::Util qw(all reduce);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 method new($class:) {
     bless {
@@ -642,6 +642,7 @@ method compile($name, $html) {
             }
 
         } else {
+            # uncoverable statement
             die "Internal error: unhandled token type '$token->{type}'";
         }
     }

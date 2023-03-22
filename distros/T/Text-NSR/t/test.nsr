@@ -1,0 +1,46 @@
+
+
+
+A1 First record, first field
+A2
+A3
+A4
+
+B1
+B2
+B3
+B4
+
+C1
+C2
+C3
+C4
+
+D1 Record deviating from fieldspec by having more than 4 fields
+D2
+D3
+D4
+D5 Additional field
+
+E1
+E2
+E3
+E4
+
+F1 Record deviating from fieldspec by having only 3 fields
+F2
+F3
+
+G1
+G2
+G3
+G4
+
+H1 Last record, first field\nNewline
+H2
+H3
+H4 Last record, last field
+
+
+
+

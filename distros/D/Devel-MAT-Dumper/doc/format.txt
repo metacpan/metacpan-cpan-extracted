@@ -354,3 +354,8 @@ Context:
 
   type: EVAL
     PTR   CODESV
+
+Mortals:
+  UINT    COUNT = $n
+  {PTR    ELEM}*$n
+  UINT    FLOOR

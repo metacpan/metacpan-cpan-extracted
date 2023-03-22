@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Enc;
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 # ABSTRACT: XML::Enc Encryption Support
 
@@ -12,7 +12,7 @@ use Crypt::PK::RSA;
 use Crypt::Mode::CBC;
 use Crypt::AuthEnc::GCM 0.062;
 use MIME::Base64 qw/decode_base64 encode_base64/;
-use Crypt::Random qw( makerandom_octet );
+use Crypt::PRNG qw( random_bytes );
 
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
@@ -357,8 +357,8 @@ sub _EncryptData {
     my $ivsize  = $encmethods{$method}->{ivsize};
     my $keysize = $encmethods{$method}->{keysize};
 
-    my $iv      = makerandom_octet ( Length => $ivsize);
-    ${$key}     = makerandom_octet ( Length => $keysize);
+    my $iv      = random_bytes ( $ivsize);
+    ${$key}     = random_bytes ( $keysize);
 
     if (defined $encmethods{$method} & $method !~ /gcm/ ){
         my $cbc = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
@@ -862,7 +862,7 @@ XML::Enc - XML::Enc Encryption Support
 
 =head1 VERSION
 
-version 0.08
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -1009,7 +1009,7 @@ Timothy Legge <timlegge@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by TImothy Legge.
+This software is copyright (c) 2023 by TImothy Legge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

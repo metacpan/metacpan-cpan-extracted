@@ -6,6 +6,7 @@ my $doc = MsOffice::Word::HTML::Writer->new(
   title => "Demo",
   WordDocument => {View => 'Print',
                    Compatibility => {DoNotExpandShiftReturn => ""} },
+  charset => "iso-8859-1",
  );
 $doc->write("hello, world");
 my $br = $doc->page_break;

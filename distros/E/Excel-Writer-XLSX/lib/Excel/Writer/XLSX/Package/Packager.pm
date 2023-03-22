@@ -33,7 +33,7 @@ use Excel::Writer::XLSX::Package::Theme;
 use Excel::Writer::XLSX::Package::VML;
 
 our @ISA     = qw(Exporter);
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 
 ###############################################################################
@@ -578,7 +578,7 @@ sub _write_styles_file {
     my $xf_formats         = $self->{_workbook}->{_xf_formats};
     my $palette            = $self->{_workbook}->{_palette};
     my $font_count         = $self->{_workbook}->{_font_count};
-    my $num_format_count   = $self->{_workbook}->{_num_format_count};
+    my $num_formats        = $self->{_workbook}->{_num_formats};
     my $border_count       = $self->{_workbook}->{_border_count};
     my $fill_count         = $self->{_workbook}->{_fill_count};
     my $custom_colors      = $self->{_workbook}->{_custom_colors};
@@ -593,7 +593,7 @@ sub _write_styles_file {
         $xf_formats,
         $palette,
         $font_count,
-        $num_format_count,
+        $num_formats,
         $border_count,
         $fill_count,
         $custom_colors,
@@ -771,8 +771,8 @@ sub _write_worksheet_rels_files {
             @{ $worksheet->{_external_hyper_links} },
             @{ $worksheet->{_external_drawing_links} },
             @{ $worksheet->{_external_vml_links} },
-            @{ $worksheet->{_external_table_links} },
             @{ $worksheet->{_external_background_links} },
+            @{ $worksheet->{_external_table_links} },
             @{ $worksheet->{_external_comment_links} },
         );
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -21,10 +21,12 @@ $code = do {
          gen_output;
       };
 
+my $FILE = __FILE__;
+
 is_deeply( [ split m/\n/, $code ],
            [ split m/\n/, <<"EOPERL" ],
 package TEST;
-# This module was generated automatically by ExtUtils::H2PM from t/04structure-constant.t
+# This module was generated automatically by ExtUtils::H2PM from $FILE
 
 use Carp;
 push \@EXPORT_OK, 'ENUMERATED_CONSTANT', 'pack_idname', 'unpack_idname';

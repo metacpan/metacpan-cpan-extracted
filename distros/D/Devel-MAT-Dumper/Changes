@@ -1,5 +1,13 @@
 Revision history for Devel-MAT-Dumper
 
+0.47    2023-03-21
+        [CHANGES]
+         * Also dump the mortals list to the dumpfile
+         * Use mro_get_linear_isa() to perform the package helper walk on
+           objects rather than reïmplementing our own bad DFS
+         * Delete the now-unused legacy helper API support
+           (RT147233, RT147085, RT145110)
+
 0.46    2022-09-12
         [CHANGES]
          * Bugfixes to SYNOPSIS example for latest v0.44 API shape

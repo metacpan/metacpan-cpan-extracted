@@ -30,6 +30,8 @@ OpenAI::API::Request::File::List - files endpoint
 
     my $res = $request->send();
 
+    my @files = $res->{data}->@*;
+
 =head1 DESCRIPTION
 
 Returns a list of files that belong to the user's organization.
@@ -38,6 +40,11 @@ Returns a list of files that belong to the user's organization.
 
 =head2 new()
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Files|https://platform.openai.com/docs/api-reference/files>
+OpenAI API Reference: L<Files|https://platform.openai.com/docs/api-reference/files>

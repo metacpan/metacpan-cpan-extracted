@@ -9,7 +9,7 @@ require JSON::XS;
 require HTTP::Tiny;
 use List::Util qw{first}; #import required
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -154,16 +154,20 @@ sub api {
   my $input            = shift; #or undef
   my $content          = defined($input) ? JSON::XS::encode_json($input) : '';                                     #Note: empty string stringifies to "" in JSON
   my $is_token         = $api_destination =~ m{v[0-9\.]+/token\b} ? 1 : 0;
-  my $access_token     = $is_token ? undef : $self->access_token;                                                  #Note: recursive call
   my $http_path        = '/' . $api_destination;
   my $url              = sprintf('https://%s%s', $self->http_hostname, $http_path);                                #e.g. "https://openapi.tuyaus.com/v1.0/token?grant_type=1"
   my $nonce            = Data::UUID->new->create_str;                                                              #Field description - nonce: the universally unique identifier (UUID) generated for each API request.
   my $t                = int(Time::HiRes::time() * 1000);                                                          #Field description - t: the 13-digit standard timestamp.
   my $content_sha256   = Digest::SHA::sha256_hex($content);                                                        #Content-SHA256 represents the SHA256 value of a request body
   my $headers          = '';                                                                                       #signature headers
-  $headers             = sprintf("secret:%s\n",  $self->client_secret) if $is_token;                               #TODO: add support for area_id and request_id
+  my @access_token     = ();
+  if ($is_token) {
+    $headers           = sprintf("secret:%s\n",  $self->client_secret);                                            #TODO: add support for area_id and request_id
+  } else {
+    $access_token[0]   = $self->access_token;                                                                      #Note: recursive call
+  }
   my $stringToSign     = join("\n", $http_method, $content_sha256, $headers, $http_path);
-  my $str              = join('',  $self->client_id, ($is_token ? () : $access_token), $t, $nonce, $stringToSign); #Signature algorithm - str = client_id + [access_token]? + t + nonce + stringToSign
+  my $str              = join('',  $self->client_id, @access_token, $t, $nonce, $stringToSign); #Signature algorithm - str = client_id + @access_token + t + nonce + stringToSign
   my $sign             = uc(Digest::SHA::hmac_sha256_hex($str, $self->client_secret));                             #Signature algorithm - sign = HMAC-SHA256(str, secret).toUpperCase()
   my $options          = {
                           headers => {
@@ -180,7 +184,7 @@ sub api {
     $options->{'headers'}->{'Signature-Headers'} = 'secret';
     $options->{'headers'}->{'secret'}            = $self->client_secret;
   } else {
-    $options->{'headers'}->{'access_token'}      = $access_token;
+    $options->{'headers'}->{'access_token'}      = $access_token[0];
   }
 
   local $Data::Dumper::Indent  = 1; #smaller index
@@ -245,7 +249,7 @@ sub access_token {
 
     my $response_time             = $output->{'t'};                       #UOM: milliseconds from epoch
     my $expire_time               = $output->{'result'}->{'expire_time'}; #UOM: seconds ref https://bestlab-platform.readthedocs.io/en/latest/bestlab_platform.tuya.html
-    $output->{'expire_time'}      = $response_time/1000 + $expire_time; #TODO: Account for margin of error
+    $output->{'expire_time'}      = $response_time/1000 + $expire_time;   #TODO: Account for margin of error
     $self->{'_access_token_data'} = $output;
   }
   my $access_token = $self->{'_access_token_data'}->{'result'}->{'access_token'} or die("Error: access_token not set");

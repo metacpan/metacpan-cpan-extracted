@@ -1,5 +1,29 @@
-@  changeset:   189:64b62a5ee47d
+@  changeset:   192:4c83cf8fbaa6
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 21 10:53:57 2023 +0100
+|  files:       lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Return info lines instead of printing to STDERR in runOnce() in PostgreSQL2Clacks
+|
+|
+o  changeset:   191:f46952f8b3e5
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Fri Mar 10 14:29:29 2023 +0100
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clacks_master_unixdomainsocket.xml example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Start working on Clacks version 27
+|
+|
+o  changeset:   190:6b1e5ac5ea3e
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 02 12:56:49 2023 +0100
+|  files:       Changes devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Emergency release of Version 26 due to wrong documentation in PostgreSQL2Clacks
+|
+|
+o  changeset:   189:64b62a5ee47d
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Thu Mar 02 12:46:14 2023 +0100
 |  files:       lib/Net/Clacks/PostgreSQL2Clacks.pm

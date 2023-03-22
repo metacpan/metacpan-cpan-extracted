@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 105 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 107 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Slack.pm',
@@ -87,6 +87,7 @@ my @module_files = (
     'Net/Async/Slack/Event/ResourcesRemoved.pm',
     'Net/Async/Slack/Event/ScopeDenied.pm',
     'Net/Async/Slack/Event/ScopeGranted.pm',
+    'Net/Async/Slack/Event/Shortcut.pm',
     'Net/Async/Slack/Event/StarAdded.pm',
     'Net/Async/Slack/Event/StarRemoved.pm',
     'Net/Async/Slack/Event/SubteamCreated.pm',
@@ -110,6 +111,7 @@ my @module_files = (
     'Net/Async/Slack/Event/UserResourceGranted.pm',
     'Net/Async/Slack/Event/UserResourceRemoved.pm',
     'Net/Async/Slack/Event/UserTyping.pm',
+    'Net/Async/Slack/Event/ViewSubmission.pm',
     'Net/Async/Slack/EventType.pm',
     'Net/Async/Slack/Message.pm',
     'Net/Async/Slack/RTM.pm',

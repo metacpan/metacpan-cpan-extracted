@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,10 +15,10 @@
    "name" : "Parallel-Pipes",
    "no_index" : {
       "package" : [
-         "Parallel::Pipe::Here",
-         "Parallel::Pipe::Impl",
-         "Parallel::Pipe::Impl::NoFork",
-         "Parallel::Pipe::There"
+         "Parallel::Pipes::Here",
+         "Parallel::Pipes::Impl",
+         "Parallel::Pipes::Impl::NoFork",
+         "Parallel::Pipes::There"
       ]
    },
    "prereqs" : {
@@ -41,11 +41,11 @@
    "provides" : {
       "Parallel::Pipes" : {
          "file" : "lib/Parallel/Pipes.pm",
-         "version" : "0.102"
+         "version" : "0.200"
       },
       "Parallel::Pipes::App" : {
          "file" : "lib/Parallel/Pipes/App.pm",
-         "version" : "0.102"
+         "version" : "0.200"
       }
    },
    "release_status" : "stable",
@@ -60,12 +60,12 @@
          "web" : "https://github.com/skaji/Parallel-Pipes"
       }
    },
-   "version" : "0.102",
+   "version" : "0.200",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

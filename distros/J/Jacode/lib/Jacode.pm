@@ -8,7 +8,7 @@ package Jacode;
 # Copyright (c) 2018, 2019, 2020, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.30';
+$VERSION = '2.13.4.31';
 $VERSION = $VERSION;
 
 use 5.00503;

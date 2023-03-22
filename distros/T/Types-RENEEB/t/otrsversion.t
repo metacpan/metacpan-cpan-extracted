@@ -6,9 +6,9 @@ use strict;
 use warnings;
 
 use Test::More;
-use Types::RENEEB qw(OTRSVersion);
+use Types::RENEEB qw(OPMVersion);
 
-my $Version = OTRSVersion();
+my $Version = OPMVersion();
 
 my @good = qw(2.0.0 31.0.0 13.13.13);
 my @bad  = (undef, qw/test 0 2 4.5 2.2.x 2.x/);

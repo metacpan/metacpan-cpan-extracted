@@ -13,7 +13,7 @@ use Test2::API qw(context release);
 use Scalar::Util qw( weaken refaddr );
 use B qw( svref_2object );
 
-our $VERSION = '0.000148';
+our $VERSION = '0.000150';
 
 our @EXPORT = qw(
    is_refcount
@@ -26,7 +26,13 @@ our @EXPORT_OK = qw(
 
 use base qw(Exporter);
 
-use constant HAVE_DEVEL_MAT_DUMPER => defined eval { require Devel::MAT::Dumper };
+use constant HAVE_DEVEL_MAT_DUMPER => defined eval {
+    package # No Index
+        Devel::MAT::Dumper;
+    our $HELPER_PER_PACKAGE;
+    our $HELPER_PER_MAGIC;
+    require Devel::MAT::Dumper;
+};
 
 =encoding UTF-8
 

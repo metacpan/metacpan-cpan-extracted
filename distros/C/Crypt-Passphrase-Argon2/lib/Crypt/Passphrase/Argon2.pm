@@ -1,12 +1,12 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.004';
+$Crypt::Passphrase::Argon2::VERSION = '0.005';
 use strict;
 use warnings;
 
-use parent 'Crypt::Passphrase::Encoder';
+use Crypt::Passphrase 0.010 -encoder;
 
 use Carp 'croak';
-use Crypt::Argon2 0.009;
+use Crypt::Argon2 0.014 'argon2_verify';
 
 my %settings_for = (
 	interactive => {
@@ -23,24 +23,21 @@ my %settings_for = (
 	}
 );
 
-my %encoder_for = (
-	argon2i  => \&Crypt::Argon2::argon2i_pass,
-	argon2d  => \&Crypt::Argon2::argon2d_pass,
-	argon2id => \&Crypt::Argon2::argon2id_pass,
-);
+my @identifiers = qw/argon2i argon2d argon2id/;
+my %encoder_for = map { no strict; $_ => \&{"Crypt::Argon2::$_\_pass"} } @identifiers;
 
 sub new {
 	my ($class, %args) = @_;
-	my $subtype     =  $args{subtype}     || 'argon2id';
+	my $subtype     =  $args{subtype}     // 'argon2id';
 	croak "Unknown subtype $subtype" unless $encoder_for{$subtype};
-	my $profile     =  $args{profile}     || 'moderate';
+	my $profile     =  $args{profile}     // 'moderate';
 	croak "Unknown profile $profile" unless $settings_for{$profile};
 	return bless {
-		memory_cost => $args{memory_cost} || $settings_for{$profile}{memory_cost},
-		time_cost   => $args{time_cost}   || $settings_for{$profile}{time_cost},
-		parallelism => $args{parallelism} ||  1,
-		output_size => $args{output_size} || 16,
-		salt_size   => $args{salt_size}   || 16,
+		memory_cost => $args{memory_cost} // $settings_for{$profile}{memory_cost},
+		time_cost   => $args{time_cost}   // $settings_for{$profile}{time_cost},
+		parallelism => $args{parallelism} //  1,
+		output_size => $args{output_size} // 16,
+		salt_size   => $args{salt_size}   // 16,
 		subtype     => $subtype,
 	}, $class;
 }
@@ -57,20 +54,13 @@ sub needs_rehash {
 	return Crypt::Argon2::argon2_needs_rehash($hash, @{$self}{qw/subtype time_cost memory_cost parallelism output_size salt_size/});
 }
 
-my %matcher_for = (
-	argon2i  => \&Crypt::Argon2::argon2i_verify,
-	argon2d  => \&Crypt::Argon2::argon2d_verify,
-	argon2id => \&Crypt::Argon2::argon2id_verify,
-);
-
 sub crypt_subtypes {
-	return keys %matcher_for;
+	return @identifiers;
 }
 
 sub verify_password {
 	my ($class, $password, $hash) = @_;
-	my ($type) = $hash =~ / \A \$ ([0-9A-Za-z]+) \$ /x;
-	return eval { $matcher_for{$type}->($hash, $password) };
+	return argon2_verify($hash, $password);
 }
 
 #ABSTRACT: An Argon2 encoder for Crypt::Passphrase
@@ -87,11 +77,20 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.004
+version 0.005
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+   encoder => {
+     module  => 'Argon2',
+     profile => 'interactive',
+   },
+ );
 
 =head1 DESCRIPTION
 
-This class implements an Argon2 encoder for Crypt::Passphrase. It is the recommended password encoder as of 2021.
+This class implements an Argon2 encoder for Crypt::Passphrase. It is the recommended password encoder as of 2023.
 
 The default settings are taken from the intermediate profile of libsodium's password hashing. You are highly encouraged to come up with your own settings: Crypt::Argon2 contains a C<argon2-calibrate> tool to assist you in this.
 

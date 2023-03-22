@@ -1,12 +1,7 @@
-#!/usr/bin/perl
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-srand(42);  # so reproducible
-#use open IO => ':locale';
-use open ':std', ':encoding(UTF-8)';
-select STDERR; $|=1; select STDOUT; $|=1;
-use Carp;
-
-use Test::More;
+#!/usr/bin/env perl
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
 
 use Data::Dumper::Interp;
 my $pkgname = "Data::Dumper::Interp";
@@ -57,10 +52,10 @@ require bigrat;
 
 diag "Perl ",u($^V),"\n\n";
 
-for my $modname ( qw/bigint bigfloat bigrat bignum 
+for my $modname ( qw/bigint bigfloat bigrat bignum
                      bogon
                      Data::Dumper Math::BigInt Math::BigFloat Math::BigRat/) {
-  # Not all these modules are explicitly used (e.g. bigfloat) 
+  # Not all these modules are explicitly used (e.g. bigfloat)
   # but if present, show their verions.
   eval "require $modname;";
   my $modpath = "${modname}.pm" =~ s/::/\//gr;
@@ -68,7 +63,7 @@ for my $modname ( qw/bigint bigfloat bigrat bignum
     no strict 'refs';
     my $path = $INC{$modpath};
     $path =~ s#^$ENV{HOME}/#\$HOME/# if $ENV{HOME};
-    diag sprintf "%-24s %s\n", 
+    diag sprintf "%-24s %s\n",
                  $modname . '@' . u(${"${modname}::VERSION"}),
                  $path;
   } else {
@@ -94,72 +89,67 @@ diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr},
      " VERSION=", (getPkgVar("VERSION") // "undef"),"\n";
 
 # Check default Foldwidth
-{
-  # 1/3/23: CPAN smoke tests failing because Term::ReadKey::GetTerminalSize
-  #   returns something different than `tput`; so we no longer try to check
-  #   that the "correct" value is returned, but only that COLUMNS overrides
-  #   what the terminal says, etc.
+# 1/3/23: CPAN smoke tests failing because Term::ReadKey::GetTerminalSize
+#   returns something different than `tput`; so we no longer try to check
+#   that the "correct" value is returned, but only that COLUMNS overrides
+#   what the terminal says, etc.
 
-  die "Expected initial ${pkgname}::Foldwidth to be undef"
-    if defined getPkgVar("Foldwidth");
+die "Expected initial ${pkgname}::Foldwidth to be undef"
+  if defined getPkgVar("Foldwidth");
+ivis("abc");
+my $expected = getPkgVar("Foldwidth") // die "Foldwidth remained undef";
+
+# COLUMNS should over-ride the actual terminal width
+setPkgVar("Foldwidth", undef); # re-enable auto-detect
+{ local $ENV{COLUMNS} = $expected + 13;
   ivis("abc");
-  my $expected = getPkgVar("Foldwidth") // die "Foldwidth remained undef";
+  die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," does not honor ENV{COLUMS}=$ENV{COLUMNS}"
+    unless u(getPkgVar("Foldwidth")) == $expected + 13;
+}
 
-  # COLUMNS should over-ride the actual terminal width
-  setPkgVar("Foldwidth", undef); # re-enable auto-detect
-  { local $ENV{COLUMNS} = $expected + 13;
+# Verify auto-detect works more than once
+setPkgVar("Foldwidth", undef); # re-enable auto-detect
+if (unix_compatible_os()) {
+  delete local $ENV{COLUMNS};
+  ivis("abc");
+  die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," not defaulted correctly, expecting $expected" unless getPkgVar('Foldwidth') == $expected;
+}
+
+# Should defauilt to 80 if there is no terminal and COLUMNS is unset
+setPkgVar("Foldwidth", undef); # re-enable auto-detect
+if (unix_compatible_os()) {
+  delete local $ENV{COLUMNS};
+  my $pid = fork();
+  if ($pid==0) {
+    require POSIX;
+    die "bug" unless POSIX::setsid()==$$; # Loose controlling tty
+    #for (*STDIN,*STDOUT,*STDERR) { close $_ or die "Can not close $_:$!" }
+    POSIX::close $_ for (0,1,2);
     ivis("abc");
-    die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," does not honor ENV{COLUMS}=$ENV{COLUMNS}"
-      unless u(getPkgVar("Foldwidth")) == $expected + 13;
+    exit(getPkgVar('Foldwidth') // 253);
   }
-
-  # Verify auto-detect works more than once
-  setPkgVar("Foldwidth", undef); # re-enable auto-detect
-  if (unix_compatible_os()) {
-    delete local $ENV{COLUMNS};
-    ivis("abc");
-    die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," not defaulted correctly, expecting $expected" unless getPkgVar('Foldwidth') == $expected;
-  }
-
-  # Should defauilt to 80 if there is no terminal and COLUMNS is unset
-  setPkgVar("Foldwidth", undef); # re-enable auto-detect
-  if (unix_compatible_os()) {
-    delete local $ENV{COLUMNS};
-    my $pid = fork();
-    if ($pid==0) {
-      require POSIX;
-      die "bug" unless POSIX::setsid()==$$; # Loose controlling tty
-      #for (*STDIN,*STDOUT,*STDERR) { close $_ or die "Can not close $_:$!" }
-      POSIX::close $_ for (0,1,2);
-      ivis("abc");
-      exit(getPkgVar('Foldwidth') // 253);
-    }
-    waitpid($pid,0);
-    die "With no tty, ${pkgname}::Foldwidth defaulted to ", ($? >> 8)|($? & !0xFF), " (not 80 as expected)"
-      unless $? == (80 << 8);
-    $? = 0;
-  }
+  waitpid($pid,0);
+  die "With no tty, ${pkgname}::Foldwidth defaulted to ", ($? >> 8)|($? & !0xFF), " (not 80 as expected)"
+    unless $? == (80 << 8);
+  $? = 0;
 }
 ok(1, "Foldwidth default initialization");
 
 # Basic check of printable unicode pass-thru
-{ my $vis_outstr = vis($unicode_str);
-  print "                unicode_str=\"$unicode_str\"\n";
-  print "${pkgname} output=$vis_outstr\n";
-  if (substr($vis_outstr,1,length($vis_outstr)-2) ne $unicode_str) {
-    die "Unicode does not come through unmolested!";
-  }
+my $vis_outstr = vis($unicode_str);
+diag "                unicode_str=\"$unicode_str\"\n";
+diag "${pkgname} output=$vis_outstr\n";
+if (substr($vis_outstr,1,length($vis_outstr)-2) ne $unicode_str) {
+  die "Unicode does not come through unmolested!";
 }
 ok(1, "Unicode wide char pass-thru");
 
-{ # Check that we recognize a Config arg of 'undef' as false, rather than
-  # acting like not args are present.  The result should be the object ref.
-  if (! ref callPkgNew()->Useqq(undef)) {
-    diag "WARNING: Data::Dumper methods do not recognize undef boolean args as 'false'.\n";
-  }
+# Check that we recognize a Config arg of 'undef' as false, rather than
+# acting like not args are present.  The result should be the object ref.
+if (! ref callPkgNew()->Useqq(undef)) {
+  diag "WARNING: Data::Dumper methods do not recognize undef boolean args as 'false'.\n";
 }
 ok(1, "Configmethod(undef) recognized as (false)");
 
 done_testing();
-
 

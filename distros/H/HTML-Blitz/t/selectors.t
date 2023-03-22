@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 use HTML::Blitz ();
 
 my $prefix = '<div id=irrelevant>1 2 3</div> <div class="x y">';

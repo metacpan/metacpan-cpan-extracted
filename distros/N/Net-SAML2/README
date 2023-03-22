@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.64
+    version 0.67
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -75,6 +75,9 @@ DESCRIPTION
     Net::SAML2 correctly perform the SSO process against numerous SAML
     Identity Providers (IdPs). It has been tested against:
 
+    Version 0.54 and newer support EncryptedAssertions. No changes required
+    to existing SP applications if EncryptedAssertions are not in use.
+
     Auth0 (requires Net::SAML2 >=0.39)
     Azure (Microsoft Office 365)
     GSuite (Google)
@@ -83,13 +86,10 @@ DESCRIPTION
     Mircosoft ADFS (not recently tested)
     Okta
     OneLogin
-    PingIdentity
-        Version 0.54 and newer support EncryptedAssertions. No changes
-        required to existing SP applications if EncryptedAssertions are not
-        in use.
-
+    PingIdentity (requires Net::SAML2 >=0.54)
     SAMLTEST.ID (requires Net::SAML2 >=0.63)
     Shibboleth (requires Net::SAML2 >=0.63)
+    SimpleSAMLphp
 
 MAJOR CAVEATS
     SP-side protocol only

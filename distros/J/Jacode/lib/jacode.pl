@@ -140,7 +140,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.30';
+$VERSION = '2.13.4.31';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -11028,11 +11028,15 @@ works as 'pkf' command on command line (shows help)
 
 =over 2
 
-=item 1. Open URL of "jacode.pl"
+=item 1
+
+Open URL of "jacode.pl"
 
 L<https://metacpan.org/dist/Jacode/view/lib/jacode.pl>
 
-=item 2. Click This
+=item 2
+
+Click This
 
   ----------------------------------
   Source (raw) <--- Click this (raw)
@@ -11049,9 +11053,13 @@ L<https://metacpan.org/dist/Jacode/view/lib/jacode.pl>
   Perl: v5.5.30
   ----------------------------------
 
-=item 3. Select All Text of Page
+=item 3
 
-=item 4. Save Text as "jacode.pl"
+Select All Text of Page
+
+=item 4
+
+Save Text as "jacode.pl"
 
 =back
 
@@ -11081,17 +11089,29 @@ What is good of this software
 
 =over 2
 
-=item * jcode.pl upper compatible
+=item *
 
-=item * pkf command upper compatible
+jcode.pl upper compatible
 
-=item * is Perl4 script and also Perl5 script
+=item *
 
-=item * supports HALFWIDTH KATAKANA
+pkf command upper compatible
 
-=item * supports UTF-8 by cp932 to Unicode table
+=item *
 
-=item * powered by Encode::from_to (not only Japanese!)
+is Perl4 script and also Perl5 script
+
+=item *
+
+supports HALFWIDTH KATAKANA
+
+=item *
+
+supports UTF-8 by cp932 to Unicode table
+
+=item *
+
+powered by Encode::from_to (not only Japanese!)
 
 =back
 
@@ -11107,7 +11127,9 @@ To easy documentation, this document uses following words for encoding name.
 
 =over 2
 
-=item * "euc"
+=item *
+
+"euc"
 
 means "EUC-JP"
 
@@ -11115,7 +11137,9 @@ L<https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP>
 
 L<https://ja.wikipedia.org/wiki/EUC-JP>
 
-=item * "jis"
+=item *
+
+"jis"
 
 means "ISO-2022-JP-1"
 
@@ -11125,7 +11149,9 @@ L<https://www.rfc-editor.org/rfc/rfc2237>
 
 L<https://en.wikipedia.org/wiki/JIS_X_0208>
 
-=item * "sjis"
+=item *
+
+"sjis"
 
 means "Microsoft CP932", B<Actually NOT "Shift_JIS">.
 
@@ -11135,7 +11161,9 @@ L<https://ja.wikipedia.org/wiki/Microsoft%E3%82%B3%E3%83%BC%E3%83%89%E3%83%9A%E3
 
 L<https://ja.wikipedia.org/wiki/Shift_JIS>
 
-=item * "utf8"
+=item *
+
+"utf8"
 
 means RFC 3629's "UTF-8"
 
@@ -11173,9 +11201,13 @@ So we must never omit it.
 
 =over 2
 
-=item * "h" means converting ZENKAKU-KATAKANA to HANKAKU-KATAKANA
+=item *
 
-=item * "z" means converting HANKAKU-KATAKANA to ZENKAKU-KATAKANA
+"h" means converting ZENKAKU-KATAKANA to HANKAKU-KATAKANA
+
+=item *
+
+"z" means converting HANKAKU-KATAKANA to ZENKAKU-KATAKANA
 
 =back
 
@@ -11266,9 +11298,13 @@ Converts encoding of "$line" from "xxx" to "yyy" then overwrites "$line".
 
 =over 2
 
-=item * "h" means converting ZENKAKU-KATAKANA to HANKAKU-KATAKANA
+=item *
 
-=item * "z" means converting HANKAKU-KATAKANA to ZENKAKU-KATAKANA
+"h" means converting ZENKAKU-KATAKANA to HANKAKU-KATAKANA
+
+=item *
+
+"z" means converting HANKAKU-KATAKANA to ZENKAKU-KATAKANA
 
 =back
 
@@ -11368,27 +11404,39 @@ Returns only "$encoding" when scalar context.
 
 =over 2
 
-=item * jis
+=item *
+
+jis
 
 can guess "$line" is jis encoded.
 
-=item * sjis
+=item *
+
+sjis
 
 can guess "$line" is sjis encoded.
 
-=item * euc
+=item *
+
+euc
 
 can guess "$line" is euc encoded.
 
-=item * utf8
+=item *
+
+utf8
 
 can guess "$line" is utf8 encoded.
 
-=item * binary
+=item *
+
+binary
 
 "$line" has binary data.
 
-=item * undef
+=item *
+
+undef
 
 cannot guess encoding of "$line".
 
@@ -11426,9 +11474,13 @@ And you can clear cache memory by calling "jacode::flushcache()".
 
 =over 2
 
-=item * 1 means that previous caching state was enable.
+=item *
 
-=item * 0 means that previous caching state was disable.
+1 means that previous caching state was enable.
+
+=item *
+
+0 means that previous caching state was disable.
 
 =back
 
@@ -11894,23 +11946,89 @@ Implementation of "jacode.pl"
 
 =over 2
 
-=item * Why is this written in Perl4?
+=item *
 
-=item * Why filename is "jacode.pl" not "jcode.pl" ?
+Why is this written in Perl4?
 
-=item * Why package "jcode" supported also?
+=item *
 
-=item * Why passing $line is by reference not by value to jacode::convert() ?
+Why filename is "jacode.pl" not "jcode.pl" ?
 
-=item * Why argument order of jacode::convert() is $OUTPUT_encoding, then $INPUT_encoding?
+=item *
 
-=item * Why jacode::getcode supports halfwidth KATAKANA?
+Why package "jcode" supported also?
 
-=item * Why conversion between UTF-8 and SJIS needs table ?
+=item *
 
-=item * Why is its table embedded in "jacode.pl"?
+Why passing $line is by reference not by value to jacode::convert() ?
 
-=item * Why 'sjis' means CP932 not Shift_JIS?
+=item *
+
+Why argument order of jacode::convert() is $OUTPUT_encoding, then $INPUT_encoding?
+
+=item *
+
+Why jacode::getcode supports halfwidth KATAKANA?
+
+=item *
+
+Why conversion between UTF-8 and SJIS needs table ?
+
+=item *
+
+Why is its table embedded in "jacode.pl"?
+
+=item *
+
+Why 'sjis' means CP932 not Shift_JIS?
+
+=back
+
+=head1 How To Update This Distribution
+
+Someday all authors of jacode.pl library and Jacode module may get run over by a bus.
+
+So we write here how to update this distribution for you.
+
+We wish you good luck.
+
+=over 2
+
+=item 1
+
+(MUST) update file "lib/jacode.pl" or/and "lib/Jacode.pm"
+
+=item 2
+
+(MUST) update $VERSION of file "lib/jacode.pl" and "lib/Jacode.pm"
+
+=item 3
+
+(MUST) append to change log to file "Changes"
+
+=item 4
+
+(if you need) update file "README"
+
+=item 5
+
+(if you need) update or add files "t/*.t"
+
+=item 6
+
+(if you need) update file "MANIFEST"
+
+=item 7
+
+repeat command: pmake test [Enter] until all tests PASS
+
+=item 8
+
+type command: pmake dist [Enter]
+
+=item 9
+
+upload *.tar.gz to PAUSE(The [Perl programming] Authors Upload Server)
 
 =back
 

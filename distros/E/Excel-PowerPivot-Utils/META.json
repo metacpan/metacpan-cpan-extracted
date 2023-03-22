@@ -4,7 +4,7 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,7 @@
       "test" : {
          "requires" : {
             "Cwd" : "0",
+            "DBD::SQLite" : "0",
             "DBI" : "0",
             "Excel::ValueWriter::XLSX" : "0",
             "LWP::UserAgent" : "0",
@@ -44,7 +45,7 @@
    "provides" : {
       "Excel::PowerPivot::Utils" : {
          "file" : "lib/Excel/PowerPivot/Utils.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       }
    },
    "release_status" : "stable",
@@ -56,6 +57,6 @@
          "url" : "https://github.com/damil/Excel-PowerPivot-Utils"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

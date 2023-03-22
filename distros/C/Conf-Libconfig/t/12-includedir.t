@@ -15,7 +15,6 @@ my $includedir_cfg = 't/include_dir.cfg';
 
 my $foo1 = new Conf::Libconfig;
 plan skip_all => 'libconfig version is too lower!' if ($foo1->getversion() < 1.4);
-plan skip_all => 'libconfig version is too higher!' if ($foo1->getversion() >= 1.7);
 my $foo2 = new Conf::Libconfig;
 my $foo3 = new Conf::Libconfig;
 my $foo4 = new Conf::Libconfig;
@@ -43,7 +42,7 @@ ok($foo2->write_file($cfg2), 'write file - status ok');
 ok($foo4->read_file($includedir_cfg), 'read @include file - status ok');
 
 cmp_deeply(
-	my $fooref = $foo4->fetch_hashref('.'),
+	my $fooref = $foo4->fetch_hashref(''),
 	{
  		'include_dir' => {
                     'hahaha' => 'happy!',

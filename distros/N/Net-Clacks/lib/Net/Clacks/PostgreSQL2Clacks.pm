@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 26;
+our $VERSION = 27;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -100,7 +100,10 @@ sub initFunctions($self) {
 
 sub run($self) {
     while(1) {
-        $self->runOnce();
+        my @lines = $self->runOnce();
+        foreach my $line (@lines) {
+            print STDERR $line, "\n";
+        }
         sleep(0.1);
     }
 
@@ -111,6 +114,7 @@ sub runOnce($self) {
     if(!$self->{dbh}->ping) {
         croak("Database connection failed!");
     }
+    my @lines;
 
     $self->{clacks}->doNetwork();
 
@@ -125,16 +129,16 @@ sub runOnce($self) {
         # We mostly do this to keep the inbuffer nice and empty.
         # Since we neither LISTEN nor expect any other message, we should be fine
         if($message->{type} eq 'serverinfo') {
-            print STDERR "Connected to ", $message->{data}, "\n";
+            push @lines, "Connected to " . $message->{data};
         } elsif($message->{type} eq 'disconnect') {
             if($message->{data} eq 'timeout') {
-                print STDERR "Connection timeout! If you use runOnce() instead of run(), make sure to call it at least every 10 seconds!\n";
+                push @lines, "Connection timeout! If you use runOnce() instead of run(), make sure to call it at least every 10 seconds!";
             }
-            print STDERR "Connection to server lost.\n";
+            push @lines, "Connection to server lost.";
         } elsif($message->{type} eq 'reconnected') {
-            print STDERR "Reconnected to server.\n";
+            push @lines, "Reconnected to server.";
         } else {
-            print STDERR "Clacks-Message: ", $message->{type}, " ignored.\n";
+            push @lines, "Clacks-Message: " . $message->{type} . " ignored.\n";
         }
     }
 
@@ -144,6 +148,15 @@ sub runOnce($self) {
 
         my ($command, $name, $value) = split/\§\§\§CLACKSDELIMETER\§\§\§/, $npayload;
 
+        if(!defined($name)) {
+            $name = '';
+        }
+
+        if(!defined($value)) {
+            $value = '';
+        }
+
+        my $line = join(' ', $command, $name, $value);
         if($command eq 'NOTIFY') {
             $self->{clacks}->notify($name);
         } elsif($command eq 'SET') {
@@ -158,12 +171,18 @@ sub runOnce($self) {
             $self->{clacks}->decrement($name, $value);
         } elsif($command eq 'REMOVE') {
             $self->{clacks}->remove($name);
+        } else {
+            $line = 'UNKNOWN COMMAND: ' . $line;
         }
+
+        push @lines, $line;
+        $self->{dbh}->commit;
+        $self->{clacks}->doNetwork();
     }
     $self->{dbh}->commit;
     $self->{clacks}->doNetwork();
 
-    return;
+    return @lines;
 }
 
 

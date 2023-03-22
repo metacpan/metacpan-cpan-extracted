@@ -8,7 +8,7 @@ App::Greple::xlate - modul de suport pentru traducere pentru Greple
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Apoi se adaugă opțiunea `--xlate` pentru a traduce zona selectată. Aceasta le
     </p>
 </div>
 
-Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-entire**. Aceasta este o prescurtare pentru a specifica modelul se potrivește cu întregul text `(?s).*`.
+Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-all**. Aceasta este o prescurtare pentru a specifica că modelul se potrivește cu întregul text `(?s).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Dacă doriți să traduceți întregul text, utilizați opțiunea **--match-enti
 
     Vedeți rezultatul traducerii în timp real în ieșirea STDERR.
 
-- **--match-entire**
+- **--match-all**
 
     Setați întregul text al fișierului ca zonă țintă.
 

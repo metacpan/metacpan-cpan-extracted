@@ -58,6 +58,8 @@ my @files = (
     't/issues/issue-20.xml',
     't/issues/issue-31.xml',
     't/issues/issue-38.xml',
+    't/lib/Test/XML/Sig.pm',
+    't/lib/Test/XML/Sig/Util.pm',
     't/pkcs8.private.key',
     't/release-trailing-space.t',
     't/rsa.cert.pem',

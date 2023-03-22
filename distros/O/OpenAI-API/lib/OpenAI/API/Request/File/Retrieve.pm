@@ -32,11 +32,16 @@ OpenAI::API::Request::File::Retrieve - retrieve file details
 
     use OpenAI::API::Request::File::Retrieve;
 
-    my $request = OpenAI::API::Request::File::List->new(
-        file_id => 'file-xxxxxxxxxx',
+    # retrieve an existing file id
+    my $file_id = OpenAI::API::Request::File::List->new->send->{data}[0]->{id};
+
+    my $request = OpenAI::API::Request::File::Retrieve->new(
+        file_id => $file_id,
     );
 
     my $res = $request->send();
+
+    my $filename = $res->{filename};
 
 =head1 DESCRIPTION
 
@@ -52,6 +57,11 @@ Returns information about a specific file.
 
 =back
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Files|https://platform.openai.com/docs/api-reference/files>
+OpenAI API Reference: L<Files|https://platform.openai.com/docs/api-reference/files>

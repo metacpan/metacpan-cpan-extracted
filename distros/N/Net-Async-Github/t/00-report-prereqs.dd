@@ -24,6 +24,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Adapter::Async' => '0',
                                       'Cache::LRU' => '0.04',
                                       'Dir::Self' => '0',
                                       'File::ShareDir' => '1.118',
@@ -41,6 +42,7 @@ do { my $x = {
                                       'Time::Moment' => '0.44',
                                       'URI' => '5.09',
                                       'URI::Template' => '0.24',
+                                      'Variable::Disposition' => '0',
                                       'indirect' => '0'
                                     }
                     },

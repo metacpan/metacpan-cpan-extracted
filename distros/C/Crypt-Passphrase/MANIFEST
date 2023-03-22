@@ -14,11 +14,13 @@ lib/Crypt/Passphrase/Fallback.pm
 lib/Crypt/Passphrase/MD5/Hex.pm
 lib/Crypt/Passphrase/PassphraseHash.pm
 lib/Crypt/Passphrase/SHA1/Hex.pm
+lib/Crypt/Passphrase/System.pm
 lib/Crypt/Passphrase/Validator.pm
 t/00-compile.t
-t/encoder.t
+t/10-validator.t
+t/20-encoder.t
+t/30-system.t
 t/lib/Crypt/Passphrase/Reversed.pm
-t/validator.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/with-dependencies.t

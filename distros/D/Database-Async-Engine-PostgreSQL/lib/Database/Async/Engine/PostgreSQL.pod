@@ -157,6 +157,15 @@ Marks a parameter update from the server.
 
 Resolves when we are idle and ready to process the next request.
 
+=head2 _remove_from_loop
+
+Called when this engine instance is removed from the main event loop, usually just before the instance
+is destroyed.
+
+Since we could be in various states of authentication or query processing, we potentially have many
+different elements to clean up here. We do these explicitly so that we can apply some ordering to the events:
+clear out things that relate to queries before dropping the connection, for example.
+
 =head1 Implementation notes
 
 Query sequence is essentially:
@@ -231,9 +240,9 @@ L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/a
 
 Tom Molesworth C<< <TEAM@cpan.org> >>
 
-with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >>
+with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >> and Maryam Nafisi C<< <maryam@firstsource.tech> >>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

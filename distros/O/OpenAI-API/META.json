@@ -32,10 +32,12 @@
       },
       "runtime" : {
          "requires" : {
+            "AnyEvent" : "7.17",
             "JSON::MaybeXS" : "1.004002",
             "LWP::Protocol::https" : "6.10",
             "LWP::UserAgent" : "6.47",
             "Moo" : "2.005005",
+            "Promises" : "1.04",
             "Types::Standard" : "2.002001",
             "namespace::clean" : "0.27",
             "perl" : "5.010",
@@ -62,6 +64,6 @@
          "web" : "https://github.com/nferraz/perl-openai-api"
       }
    },
-   "version" : 0.27,
+   "version" : 0.31,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

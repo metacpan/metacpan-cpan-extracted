@@ -1,5 +1,5 @@
 package DBIx::Class::CryptColumn;
-$DBIx::Class::CryptColumn::VERSION = '0.004';
+$DBIx::Class::CryptColumn::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -10,15 +10,12 @@ use parent 'DBIx::Class';
 
 __PACKAGE__->load_components(qw(InflateColumn::Crypt::Passphrase));
 
-__PACKAGE__->mk_classdata('_passphrase_columns');
-
 sub new {
 	my ($self, $attr, @rest) = @_;
 
-	my $ppr_cols = $self->_passphrase_columns;
-	for my $col (keys %{ $ppr_cols }) {
-		next unless exists $attr->{$col} && !ref $attr->{$col};
-		$attr->{$col} = $ppr_cols->{$col}->hash_password($attr->{$col});
+	for my $col (grep { !/^-/ } keys %{ $attr }) {
+		next unless my $inflate = $self->column_info($col)->{inflate_passphrase};
+		$attr->{$col} = $inflate->hash_password($attr->{$col});
 	}
 
 	return $self->next::method($attr, @rest);
@@ -38,11 +35,6 @@ sub register_column {
 		$self->throw_exception(q['inflate_passphrase' must be a hash reference]) unless ref $args eq 'HASH';
 
 		my $crypt_passphrase = Crypt::Passphrase->new(%{$args});
-
-		$self->_passphrase_columns({
-			%{ $self->_passphrase_columns // {} },
-			$column => $crypt_passphrase,
-		});
 
 		if (defined(my $name = $args->{verify_method})) {
 			$self->_export_sub($name, sub {
@@ -67,8 +59,8 @@ sub register_column {
 sub set_column {
 	my ($self, $col, $val, @rest) = @_;
 
-	my $passphrase_columns = $self->_passphrase_columns;
-	$val = $passphrase_columns->{$col}->hash_password($val) if exists $passphrase_columns->{$col};
+	my $inflate = $self->column_info($col)->{inflate_passphrase};
+	$val = $inflate->hash_password($val) if $inflate;
 
 	return $self->next::method($col, $val, @rest);
 }
@@ -89,7 +81,7 @@ DBIx::Class::CryptColumn - Automatically hash password/passphrase columns
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -100,12 +92,12 @@ version 0.004
          data_type         => 'integer',
          is_auto_increment => 1,
      },
-     passphrase => {
+     password => {
          data_type          => 'text',
          inflate_passphrase => {
              encoder        => 'Argon2',
-             verify_method  => 'verify_passphrase',
-             rehash_method  => 'passphrase_needs_rehash',
+             verify_method  => 'verify_password',
+             rehash_method  => 'password_needs_rehash',
          },
      },
  );
@@ -116,22 +108,22 @@ In application code:
 
  # 'plain' will automatically be hashed using the specified
  # inflate_passphrase arguments
- $rs->create({ passphrase => 'plain' });
+ $rs->create({ password => 'plain' });
 
  my $row = $rs->find({ id => $id });
 
  # Returns a Crypt::Passphrase::PassphraseHash object, which has
  # verify_password and needs_rehash as methods
- my $passphrase = $row->passphrase;
+ my $password = $row->password;
 
- if ($row->verify_passphrase($input)) {
-   if ($row->passphrase_needs_rehash) {
-     $row->update({ passphrase => $input });
+ if ($row->verify_password($input)) {
+   if ($row->password_needs_rehash) {
+     $row->update({ password => $input });
    }
    ...
  }
 
- $row->passphrase('new passphrase');
+ $row->password('new password');
 
 =head1 DESCRIPTION
 

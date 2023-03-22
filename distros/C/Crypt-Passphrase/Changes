@@ -1,5 +1,11 @@
 Revision history for Crypt-Passphrase
 
+0.012     2023-03-22 12:32:01+01:00 Europe/Amsterdam
+          - Allow descrypt to not need rehash
+
+0.011     2023-03-21 14:30:32+01:00 Europe/Amsterdam
+          - Add Crypt::Passphrase::System
+
 0.010     2023-03-14 23:04:53+01:00 Europe/Amsterdam
           - Add @CARP_NOT handler to import
           - More gracefully handle undefined passwords

@@ -6,7 +6,7 @@ package HTML::Blitz::ParseError;
 use HTML::Blitz::pragma;
 use overload fallback => 1, '""' => method (@) { $self->to_string };
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 method new($class:
     :$src_name,
@@ -22,16 +22,16 @@ method new($class:
 }
 
 fun _context($src_ref, $pos) {
-    my $n_line = substr($$src_ref, 0, $pos) =~ tr/\n// + 1;
+    my $n_line     = substr($$src_ref, 0, $pos) =~ tr/\n// + 1;
     my $line_start = rindex($$src_ref, "\n", $pos - 1) + 1;
     my $line_end   = index($$src_ref, "\n", $pos);
-    $line_end = length $$src_ref if $line_end == -1;
-    my $s_line = substr $$src_ref, $line_start, $line_end - $line_start;
-    my $lpos = $pos - $line_start;
+    $line_end      = length $$src_ref if $line_end == -1;
+    my $s_line     = substr $$src_ref, $line_start, $line_end - $line_start;
+    my $lpos       = $pos - $line_start;
     +{
         line_num => $n_line,
-        col_num => $lpos + 1,
-        line => $s_line,
+        col_num  => $lpos + 1,
+        line     => $s_line,
         m_prefix => substr($s_line, 0, $lpos) =~ tr/ \t/ /cr,
     }
 }

@@ -1,3 +1,95 @@
+0.9696 2023-03-22
+  [New Features]
+    * Added the dump method in the SPVM::ExchangeAPI class.
+  [Document Fix]
+    * Fixed the doc. The set_exception method in the SPVM::ExchangeAPI can't receive a string.
+    * Fixed the doc of the converson of the string Argument in SPVM::ExchangeAPI. Explicite using SvPV for conversion.
+    * Fixed the doc of the new_any_object_array. This was new_options wrongly.
+  [Exception Message Improvement]
+    * Improved the new_string method in the SPVM::ExchangeAPI class.
+    * Improved the new_string_from_bin method in the SPVM::ExchangeAPI class.
+  [Incompatible Changes]
+    * The new_string method in the SPVM::ExchangeAPI can receive undef.
+    * The new_string_from_bin method in the SPVM::ExchangeAPI can receive undef.
+    * The new_string_from_bin in the SPVM::ExchangeAPI is the same as the new_string method.
+    * Removed deprecated SPVM functions. This is now used from SPVM::Exchange::API.
+      -  new_byte_array
+      -  new_byte_array_unsigne
+      -  new_byte_array_len
+      -  new_byte_array_from_bin
+      -  new_byte_array_from_string
+      -  new_short_array
+      -  new_short_array_unsigned
+      -  new_short_array_len
+      -  new_short_array
+      -  new_short_array_unsigned
+      -  new_short_array_len
+      -  new_short_array_from_bin
+      -  new_int_array
+      -  new_int_array_unsigned
+      -  new_int_array_len
+      -  new_int_array_from_bin
+      -  new_long_array
+      -  new_long_array_unsigned
+      -  new_long_array_len
+      -  new_long_array_from_bin
+      -  new_float_array
+      -  new_float_array_len
+      -  new_float_array_from_bin
+      -  new_double_array
+      -  new_double_array_len
+      -  new_double_array_from_bin
+      -  new_string
+      -  new_string_from_bin
+      -  new_object_array
+      -  new_object_array_len
+      -  new_any_object_array
+      -  new_mulnum_array
+      -  new_mulnum_array_from_bin
+      -  new_string_array
+      -  new_string_array_len
+      -  get_exception
+      -  set_exception
+      -  get_memory_blocks_count
+      -  call_method
+      -  new_address_object
+    * Removed deprecated pointer_t class descriptor. This is now used as pointer descriptor.
+    * Removed the new_byte_array_from_string method in the SPVM::Exchange::API.
+    * Removed the new_string_from_bin method in the SPVM::Exchange::API.
+    * The new_byte_array method in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_byte_array_unsigned in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_short_array method in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_short_array_unsigned in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_short_array_from_bin in the SPVM::ExchangeAPI throw an exception when the binary is not divisible by 2.
+    * The new_short_array_from_bin in the SPVM::ExchangeAPI throw an exception when the array is undef.
+    * The new_int_array method in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_int_array_unsigned in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_int_array_from_bin in the SPVM::ExchangeAPI throw an exception when the binary is not divisible by 4.
+    * The new_int_array_from_bin in the SPVM::ExchangeAPI throw an exception when the array is undef.
+    * The new_long_array method in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_long_array_unsigned in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_long_array_from_bin in the SPVM::ExchangeAPI throw an exception when the binary is not divisible by 8.
+    * The new_long_array_from_bin in the SPVM::ExchangeAPI throw an exception when the array is undef.
+    * The new_float_array method in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_float_array_from_bin in the SPVM::ExchangeAPI throw an exception when the binary is not divisible by 4.
+    * The new_float_array_from_bin in the SPVM::ExchangeAPI throw an exception when the array is undef.
+    * The new_double_array method in the SPVM::ExchangeAPI throw an exception when the element is a reference.
+    * The new_double_array_from_bin in the SPVM::ExchangeAPI throw an exception when the binary is not divisible by 8.
+    * The new_double_array_from_bin in the SPVM::ExchangeAPI throw an exception when the array is undef.
+    * The new_string_array method in the SPVM::ExchangeAPI throws an exception when the element is a reference.
+  [Bug Fix]
+    * Fixed the bugs that exchange API call_method can't receive string number such as "8" if the type is numeric.
+    * Fixed the bugs that exchange API call_method can't receive string number such as "8" if the type is numeric reference.
+    * Fixed the return type of the get_anon_class_names in the Runtime class
+      [Before]
+      method get_anon_class_names : string ($class_name : string);
+      
+      [After]
+      method get_anon_class_names : string[] ($class_name : string);
+  [Changes]
+    * Added a warning when non-number-like value is passed to numeric argument in Excahnge API call_method.
+  [Exception Message Improvement]
+    * Improved exception messages in SPVM::ExchangeAPI.
 0.9695 2023-03-05
   [Incomaptible Changes]
     * The instance method is always resolved in the runtime from the instance type.

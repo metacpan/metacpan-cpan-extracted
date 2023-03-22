@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.17";
+our $VERSION = "0.19";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.17
+Version 0.19
 
 =head1 DESCRIPTION
 
@@ -48,9 +48,9 @@ specified by B<--xlate-format> option.
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
 </p>
 
-If you want to translate entire text, use B<--match-entire> option.
+If you want to translate entire text, use B<--match-all> option.
 This is a short-cut to specify the pattern matches entire text
-C<(?s).*>.
+C<(?s).+>.
 
 =head1 OPTIONS
 
@@ -158,7 +158,7 @@ You may be able to change these value if you are using Pro service.
 
 See the tranlsation result in real time in the STDERR output.
 
-=item B<--match-entire>
+=item B<--match-all>
 
 Set the whole text of the file as a target area.
 
@@ -537,7 +537,8 @@ option --xlabor --xlate-labor
 
 option --cache-clear --xlate-cache=clear
 
-option --match-entire    --re '\A(?s).+\z'
+option --match-all       --re '\A(?s).+\z'
+option --match-entire    --match-all
 option --match-paragraph --re '^(.+\n)+'
 option --match-podtext   -Mperl --pod --re '^(\w.*\n)(\S.*\n)*'
 

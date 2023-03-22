@@ -1,5 +1,5 @@
 package Crypt::Bcrypt;
-$Crypt::Bcrypt::VERSION = '0.010';
+$Crypt::Bcrypt::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -7,16 +7,17 @@ use XSLoader;
 XSLoader::load('Crypt::Bcrypt');
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw(bcrypt bcrypt_check bcrypt_prehashed bcrypt_check_prehashed bcrypt_hashed bcrypt_check_hashed bcrypt_needs_rehash);
+our @EXPORT_OK = qw(bcrypt bcrypt_check bcrypt_prehashed bcrypt_check_prehashed bcrypt_hashed bcrypt_check_hashed bcrypt_needs_rehash bcrypt_supported_prehashes);
 
-use Digest::SHA 'hmac_sha256';
+use Carp 'croak';
+use Digest::SHA;
 use MIME::Base64 2.21 qw(encode_base64);
 
 sub bcrypt {
 	my ($password, $subtype, $cost, $salt) = @_;
-	die "Unknown subtype $subtype" if $subtype !~ /^2[abxy]$/;
-	die "Invalid cost factor $cost" if $cost < 4 || $cost > 31;
-	die "Salt must be 16 bytes" if length $salt != 16;
+	croak "Unknown subtype $subtype" if $subtype !~ /^2[abxy]$/;
+	croak "Invalid cost factor $cost" if $cost < 4 || $cost > 31;
+	croak "Salt must be 16 bytes" if length $salt != 16;
 	my $encoded_salt = encode_base64($salt, "");
 	$encoded_salt =~ tr{A-Za-z0-9+/=}{./A-Za-z0-9}d;
 	return _bcrypt_hashpw($password, sprintf '$%s$%02d$%s', $subtype, $cost, $encoded_salt);
@@ -25,14 +26,22 @@ sub bcrypt {
 my $subtype_qr = qr/2[abxy]/;
 my $cost_qr = qr/\d{2}/;
 my $salt_qr = qr{ [./A-Za-z0-9]{22} }x;
+my $algo_qr = qr{ sha[0-9]+ }x;
+
+my %hash_for = (
+	sha256 => \&Digest::SHA::hmac_sha256,
+	sha384 => \&Digest::SHA::hmac_sha384,
+	sha512 => \&Digest::SHA::hmac_sha512,
+);
 
 sub bcrypt_prehashed {
-	my ($password, $subtype, $cost, $salt, $hash_algorithm) = @_;
-	if ($hash_algorithm) {
+	my ($password, $subtype, $cost, $salt, $algorithm) = @_;
+	if (length $algorithm) {
 		(my $encoded_salt = encode_base64($salt, "")) =~ tr{A-Za-z0-9+/=}{./A-Za-z0-9}d;
-		my $hashed_password = encode_base64(hmac_sha256($password, $encoded_salt), "");
+		my $hasher = $hash_for{$algorithm} || croak "No such hash $algorithm";
+		my $hashed_password = encode_base64($hasher->($password, $encoded_salt), "");
 		my $hash = bcrypt($hashed_password, $subtype, $cost, $salt);
-		$hash =~ s{ ^ \$ ($subtype_qr) \$ ($cost_qr) \$ ($salt_qr) }{\$bcrypt-sha256\$v=2,t=$1,r=$2\$$3\$}x or die $hash;
+		$hash =~ s{ ^ \$ ($subtype_qr) \$ ($cost_qr) \$ ($salt_qr) }{\$bcrypt-$algorithm\$v=2,t=$1,r=$2\$$3\$}x or croak $hash;
 		return $hash;
 	}
 	else {
@@ -42,11 +51,12 @@ sub bcrypt_prehashed {
 
 sub bcrypt_check_prehashed {
 	my ($password, $hash) = @_;
-	if ($hash =~ s/ ^ \$ bcrypt-sha256 \$ v=2,t=($subtype_qr),r=($cost_qr) \$ ($salt_qr) \$ /\$$1\$$2\$$3/x) {
-		return bcrypt_check(encode_base64(hmac_sha256($password, $3), ""), $hash);
+	if ($hash =~ s/ ^ \$ bcrypt-(\w+) \$ v=2,t=($subtype_qr),r=($cost_qr) \$ ($salt_qr) \$ /\$$2\$$3\$$4/x) {
+		my $hasher = $hash_for{$1} or return 0;
+		return bcrypt_check(encode_base64($hasher->($password, $4), ""), $hash);
 	}
 	else {
-		bcrypt_check($password, $hash);
+		return bcrypt_check($password, $hash);
 	}
 }
 
@@ -59,8 +69,8 @@ sub _get_parameters {
 	if ($hash =~ / \A \$ ($subtype_qr) \$ ($cost_qr) \$ /x) {
 		return ($1, $2, '');
 	}
-	elsif ($hash =~ / ^ \$ bcrypt-sha256 \$ v=2,t=($subtype_qr),r=($cost_qr) \$ /x) {
-		return ($1, $2, 'sha256');
+	elsif ($hash =~ / ^ \$ bcrypt-($algo_qr) \$ v=2,t=($subtype_qr),r=($cost_qr) \$ /x) {
+		return ($2, $3, $1);
 	}
 	return ('', 0, '');
 }
@@ -69,6 +79,10 @@ sub bcrypt_needs_rehash {
 	my ($hash, $wanted_subtype, $wanted_cost, $wanted_hash) = @_;
 	my ($my_subtype, $my_cost, $my_hash) = _get_parameters($hash);
 	return $my_subtype ne $wanted_subtype || $my_cost != $wanted_cost || $my_hash ne ($wanted_hash || '');
+}
+
+sub bcrypt_supported_prehashes {
+	return sort keys %hash_for;
 }
 
 1;
@@ -87,7 +101,7 @@ Crypt::Bcrypt - A modern bcrypt implementation
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -103,7 +117,7 @@ version 0.010
 
 This module provides a modern and user-friendly implementation of the bcrypt password hash.
 
-Note that in bcrypt passwords may only contain 72 characters. It may seem tempting to prehash the password before bcrypting it but that may make it vulnerable to password shucking, a salted solution (for example using a MAC) should be used instead if one wants to support large passwords.
+Note that in bcrypt passwords may only contain 72 characters and may not contain any null-byte. To work around this limitation this module supports prehashing the input in a way that prevents password shucking.
 
 The password is always expected to come as a (utf8-encoded) byte-string.
 
@@ -143,7 +157,7 @@ This checks if the C<$password> satisfies the C<$hash>, and does so in a timing-
 
 =head2 bcrypt_prehashed($password, $subtype, $cost, $salt, $hash_algorithm)
 
-This works like the C<bcrypt> functions, but pre-hashes the password using the specified hash. This is mainly useful to get around the 72 character limit. Currently only sha256 is supported. This uses a salt-keyed hash to prevent password shucking. If C<$hash_algorithm> is an empty string it will perform a normal C<bcrypt> operation.
+This works like the C<bcrypt> functions, but pre-hashes the password using the specified hash. This is mainly useful to get around the 72 character limit. Currently C<'sha256'>, C<'sha384'> and C<'sha512'> are supported (but note that sha512 doesn't actually fit in bcrypt's input limit so is a bit moot), this is keyed with the salt to prevent password shucking. If C<$hash_algorithm> is an empty string it will perform a normal C<bcrypt> operation.
 
 =head2 bcrypt_check_prehashed($password, $hash)
 
@@ -152,6 +166,10 @@ This verifies pre-hashed passwords as generated by C<bcrypt_prehashed>.
 =head2 bcrypt_needs_rehash($hash, $wanted_subtype, $wanted_cost, $wanted_hash = '')
 
 This returns true if the bcrypt hash uses a different subtype, cost or hash algorithm than desired.
+
+=head2 bcrypt_supported_prehashes()
+
+This returns a list of supported prehashes. Current that's C<('sha256', 'sha384', 'sha512')> but in the future it may include more.
 
 =head1 SEE OTHER
 

@@ -3,7 +3,7 @@ package Net::Async::Redis::Cluster::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use parent qw(Net::Async::Redis::Cluster);
 
@@ -19,6 +19,7 @@ API and behaviour should be identical to L<Net::Async::Redis::Cluster>, see ther
 
 =cut
 
+use Syntax::Keyword::Try;
 use Net::Async::Redis::XS;
 use Future::AsyncAwait;
 

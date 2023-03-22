@@ -24,7 +24,7 @@ is ($tapdom->{dom}[0]{lines}[$_]{raw},
     "empty archive with noempty_tap - replacement document - line $_"
   ) for 0..$#replacement_lines;
 
-# TARP::Archive with an empty TAP file inside
+# TAP::Archive with an empty TAP file inside
 $source = 't/tap-archive-2-with-empty.tgz';
 $tapdom = TAP::DOM::Archive->new (source => $source, noempty_tap => 1);
 
@@ -41,6 +41,7 @@ is ($tapdom->{dom}[4]{lines}[$_]{raw},
   ) for 0..$#replacement_lines;
 
 # again but provide already opened filehandle
+$source = 't/tap-archive-2-with-empty.tgz';
 open my $source_fh, '<', $source;
 $tapdom = TAP::DOM::Archive->new (source => $source_fh, noempty_tap => 1);
 is (@{$tapdom->{dom}},              5, "open filehandle - count tap docs");
@@ -70,5 +71,17 @@ is ($tapdom->{dom}[4]{lines}[$_]{raw},
     $replacement_lines[$_],
     "empty tap inside archive with noempty_tap - internal scalar filehandle - replacement document - line $_"
   ) for 0..$#replacement_lines;
+
+# TAP::Archive with non-TAP lines only inside
+$source = 't/partially_empty_tap.tgz';
+$tapdom = TAP::DOM::Archive->new (source => $source, noempty_tap => 1);
+
+is (@{$tapdom->{dom}},              3, "partially empty - count tap docs");
+is (@{$tapdom->{meta}{file_order}}, 3, "partially empty - count meta files");
+is ($tapdom->{meta}{file_order}[0], 't/affe.t',   "partially empty - meta file 0");
+is ($tapdom->{meta}{file_order}[1], 't/empty.t',  "partially empty - meta file 1");
+is ($tapdom->{meta}{file_order}[2], 'METAINFO.t', "partially empty - meta file 2");
+is ($tapdom->{dom}[1]{lines}[-1]{raw}, 'pragma +tapdom_error', "partially empty - empty tap inside archive with noempty_tap - replacement document - line -2");
+is ($tapdom->{dom}[1]{lines}[-1]{_children}[0]{raw}, '# no tap lines',       "partially empty - empty tap inside archive with noempty_tap - replacement document - line -1");
 
 done_testing();

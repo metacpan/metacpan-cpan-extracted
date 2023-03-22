@@ -24,7 +24,8 @@ use Test::More;
 # $reliable is set to true for them, irrespective of the value of $] ... except that on MS
 # Windows and (apparently) at least one instance of i686 linux (see
 # http://www.cpantesters.org/cpan/report/11de736c-0cd6-11ec-aef5-c3a30c210c3d), assignment of
-# subnormal values (within a specific range) is unreliable.
+# subnormal values (within a specific range) might be unreliable. (This script checks to see
+# if these subnormal values will assign correctly, and then responds appropriately.)
 #
 # For all other builds of perl, $reliable will be set to true if and only if:
 # 1) $] >= 5.03 && $Config{nvtype} eq 'double' && defined($Config{d_strtod})
@@ -60,16 +61,22 @@ else                                           { $MAX_DIG = 34;   # NV is Double
 
 my $reliable = 0;
 
-my $subnormal_issue = 0;
+my $subnormal_issue = 0; # See comments at the beginning of this script
 
 if($Config{nvtype} eq '__float128') {
- $subnormal_issue = 1 if $^O =~/MSWin/;
+  # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756 for details
+  # regarding this issue with subnormals.
+  # This is NOT an mpfr library issue - it's a perl issue (or, more
+  # accurately, a bug in the toolset that has built perl).
 
- # If 803e-4944 is mis-assigned to the value given below,
- # then, until evidence to the contrary is provided, we assume
- # that we are facing the bug with subnormals described at:
- # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756
- $subnormal_issue = 1 if sprintf('%a', 803e-4944) eq '0x1.069b16b796df96f69cf7p-16414';
+  my $prec = Rmpfr_get_default_prec();
+  Rmpfr_set_default_prec(113);
+  my $t1 = Math::MPFR->new('1e-4941'); # $t1 will be assigned correct value
+  my $t2 = Math::MPFR->new( 1e-4941 ); # $t2 will be assigned correct value
+                                       # unless the subnormal issue is present
+                                       # is present in this build of perl.
+  $subnormal_issue = 1 if $t1 != $t2;
+  Rmpfr_set_default_prec($prec);
 }
 
 if(
@@ -123,13 +130,10 @@ while(1) {
 
   my $str = $mantissa_sign . $mantissa . 'e' . $exponent;
   my $s_copy = $mantissa_sign . $mantissa . 'e' . $exponent;
-  my $float128_subnormal_issue = 0;
-  if($subnormal_issue) {
-    $float128_subnormal_issue = float128_subnormal_problem($s_copy * 1.0);
-  }
+
   my $nv;
 
-  if($reliable && !$float128_subnormal_issue) {
+  if($reliable && !$subnormal_issue) {
     $nv = $str * 1.0;
   }
   else {
@@ -143,18 +147,5 @@ while(1) {
 }
 
 done_testing();
-
-sub float128_subnormal_problem {
-
-  # Values inside these ranges are not assigned correctly on MS Windows.
-  # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756
-  if( (abs($_[0]) <= 1.56560127768297377334100959207326356e-4941 && abs($_[0]) >= 2 ** -16414)
-        ||
-      (abs($_[0]) <= 3.64519953188246812735328649559430889e-4951 && abs($_[0]) >= 1.82260010203204199023661059308858291e-4951  )
- ) {
-  return 1; # problem exists
-  }
-return 0;   # no problem
-}
 
 __END__

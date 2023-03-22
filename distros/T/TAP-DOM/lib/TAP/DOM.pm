@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.96-1-g9b41662
+# git description: v0.97-7-g357ca13
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.97';
+$TAP::DOM::VERSION = '0.98';
 use 5.006;
 use strict;
 use warnings;
@@ -256,11 +256,13 @@ sub new {
         my $document_data_regex = qr/^#\s*$DOC_DATA_PREFIX([^:]+)\s*:\s*(.*)$/;
         my $document_data_ignore = defined($DOC_DATA_IGNORE) ? qr/$DOC_DATA_IGNORE/ : undef;
 
-        my $parser = new TAP::Parser( { %args } );
+        my $parser = TAP::Parser->new( { %args } );
 
-        my $aggregate = new TAP::Parser::Aggregator;
+        my $aggregate = TAP::Parser::Aggregator->new;
         $aggregate->start;
 
+        my $count_tap_lines = 0;
+        my $found_pragma_tapdom_error = 0;
         while ( my $result = $parser->next ) {
                 no strict 'refs';
 
@@ -384,6 +386,7 @@ sub new {
                 # calculate severity
                 if ($entry->{is_test} or $entry->{is_plan}) {
                   no warnings 'uninitialized';
+                  $count_tap_lines++;
                   $entry->{severity} = $severity
                     ->{$entry->{type}}
                     ->{$entry->{is_ok}}
@@ -391,9 +394,18 @@ sub new {
                     ->{$entry->{is_actual_ok}}
                     ->{$entry->{has_skip}};
                 }
-                if ($entry->{is_pragma}) {
+
+                if ($entry->{is_pragma} or $entry->{is_unknown}) {
                   no warnings 'uninitialized';
-                  $entry->{severity} = $entry->{raw} =~ /^pragma\s+\+tapdom_error\s*$/ ? 5 : 0;
+                  if ($entry->{raw} =~ /^pragma\s+\+tapdom_error\s*$/) {
+                    $found_pragma_tapdom_error=1;
+                    $entry->{severity}   = 5;
+                    $entry->{is_unknown} = 0;
+                    $entry->{is_pragma}  = 1;
+                    $entry->{type}       = 'pragma';
+                  } else {
+                    $entry->{severity} = 0;
+                  }
                 }
                 $entry->{severity} = 0 if not defined $entry->{severity};
 
@@ -408,6 +420,53 @@ sub new {
                 }
         }
         @pragmas = $parser->pragmas;
+
+        if (!$count_tap_lines and !$found_pragma_tapdom_error and $NOEMPTY_TAP) {
+          # pragma +tapdom_error
+          my $error_entry = TAP::DOM::Entry->new(
+            'is_version'   => 0,
+            'is_plan'      => 0,
+            'is_test'      => 0,
+            'is_comment'   => 0,
+            'is_yaml'      => 0,
+            'is_unknown'   => 0,
+            'is_bailout'   => 0,
+            'is_actual_ok' => 0,
+            'is_pragma'    => 1,
+            'type'         => 'pragma',
+            'raw'          => 'pragma +tapdom_error',
+            'as_string'    => 'pragma +tapdom_error',
+            'severity'     => 5,
+            'has_todo'     => 0,
+            'has_skip'     => 0,
+          );
+          $error_entry->{is_has} = $IS_PRAGMA if $USEBITSETS;
+          foreach (qw(raw type as_string explanation)) { delete $error_entry->{$_} if $IGNORE{$_} }
+          # pragma +tapdom_error
+          my $error_comment = TAP::DOM::Entry->new(
+            'is_version'   => 0,
+            'is_plan'      => 0,
+            'is_test'      => 0,
+            'is_comment'   => 1,
+            'is_yaml'      => 0,
+            'is_unknown'   => 0,
+            'is_bailout'   => 0,
+            'is_actual_ok' => 0,
+            'is_pragma'    => 0,
+            'type'         => 'comment',
+            'raw'          => '# no tap lines',
+            'as_string'    => '# no tap lines',
+            'severity'     => 0,
+            'has_todo'     => 0,
+            'has_skip'     => 0,
+          );
+          $error_comment->{is_has} = $IS_COMMENT if $USEBITSETS;
+          foreach (qw(raw type as_string explanation)) { delete $error_comment->{$_} if $IGNORE{$_} }
+          $error_entry->{_children} //= [];
+          push @{$error_entry->{_children}}, $error_comment;
+          push @lines, $error_entry;
+          push @pragmas, 'tapdom_error';
+        }
 
         $aggregate->add( main => $parser );
         $aggregate->stop;
@@ -1304,7 +1363,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Steffen Schwigon.
+This software is copyright (c) 2023 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -51,7 +51,7 @@ SKIP: {
     }
 
     my $verify_response = `xmlsec1 --verify --pubkey-cert-pem t/rsa.cert.pem --untrusted-pem t/intermediate.pem --trusted-pem t/cacert.pem --id-attr:ID "Response" --id-attr:ID "Assertion" t/rsa.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "RSA verify XML:Sig signed: xmlsec1 Response is OK" )
+    ok( $verify_response =~ m/OK/, "RSA verify XML:Sig signed: xmlsec1 Response is OK" )
         or warn "calling xmlsec1 failed: '$verify_response'\n";
 }
 
@@ -89,7 +89,7 @@ SKIP: {
     }
 
     my $verify_response = `xmlsec1 --verify --id-attr:ID "Response" --id-attr:ID "Assertion" t/dsa.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "DSA verify XML:Sig signed: xmlsec1 Response is OK" )
+    ok( $verify_response =~ m/OK/, "DSA verify XML:Sig signed: xmlsec1 Response is OK" )
         or warn "calling xmlsec1 failed: '$verify_response'\n";
 }
 

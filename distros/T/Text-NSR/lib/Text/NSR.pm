@@ -5,7 +5,7 @@ use strict;
 
 use Path::Tiny;
 
-our $VERSION   = '0.10';
+our $VERSION   = '0.20';
 
 
 sub new {
@@ -17,7 +17,9 @@ sub new {
 
 	die "Text::NSR: no filepath given!" if !$self->{filepath};
 
-	die "Text::NSR: filepath '". $self->{filepath} ."' not found!" if !-f $self->{filepath};
+	$self->{pathtiny} = path($self->{filepath});
+
+	die "Text::NSR: filepath '". $self->{filepath} ."' not found!" if ! $self->{pathtiny}->exists;
 
 	return $self;
 }
@@ -25,19 +27,25 @@ sub new {
 sub read {
 	my $self = shift;
 
-	my $lines = path($self->{filepath})->slurp_utf8;
+	my $lines = $self->{pathtiny}->slurp_utf8;
 
 	$lines =~ s/^\n+//; # delete leading newlines
 	$lines =~ s/\n+$//; # delete trailing newlines
 
 	my @arr = split(/\n\n/, $lines);
 
+	my $newline = "\n";
 	my @records;
 	# each "stanza"
 	for my $elem (@arr){
 		my $cnt =()= $elem =~ /\n/g; # zero based; count newlines to see how many lines are in one "stanza"
 
 		my @fieldvalues = split(/\n/, $elem);
+
+		# replace literal newlines with newline chars
+		for(@fieldvalues){
+			$_ =~ s/\\n/\n/ if index($_, '\n') != -1;
+		}
 
 		if($self->{fieldspec}){
 			# my %hash = map { $self->{fieldspec}->[$_] => $fieldvalues[$_] } (0 .. $#{$self->{fieldspec}});
@@ -82,6 +90,9 @@ The guiding principal here is that each line in a file represents a value. And t
 single record. Multiple records then are separated by one empty line. Exactly one empty line. A second empty
 line will be interpreted as the first line of the next record. The only exception to this rule are leading or
 trailing newlines on the "whole file" scope. They are considered "padding" and are dropped.
+
+Values may contain newlines (line feed). In a raw NSR file, newlines are represented literal chars "\n" ("backslash"
+plus "n"). After record-parsing, these chars are replaced by the newline char in the resulting data structure.
 
 NSR files can be used to hold very simple human editable databases.
 

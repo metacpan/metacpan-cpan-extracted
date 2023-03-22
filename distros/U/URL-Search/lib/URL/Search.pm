@@ -5,7 +5,7 @@ use v5.10.0;  # recursive regex subgroups
 
 use Exporter 5.57 qw(import);
 
-our $VERSION = '0.000005';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(
     $URL_SEARCH_RE
@@ -23,7 +23,7 @@ our $URL_SEARCH_RE = do {
     }xms;
 
     my $protocol = qr{
-        (?: [Hh][Tt] | [Ff] ) [Tt][Pp] [Ss]?
+        [Hh][Tt][Tt][Pp] [Ss]?
     }xms;
 
     my $unreserved_subdelims_colon = qr{
@@ -179,13 +179,15 @@ __END__
 
 =encoding utf8
 
-=for highlighter language=perl
+=for github-markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/URL-Search/badge.svg?branch=main)](https://coveralls.io/github/mauke/URL-Search?branch=main)
 
 =head1 NAME
 
 URL::Search - search for URLs in plain text
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
   use URL::Search qw( $URL_SEARCH_RE extract_urls partition_urls );
 
@@ -205,12 +207,14 @@ request) the following entities:
 This variable is the core of this module. It contains a regex that matches a URL.
 
 NOTE: This regex uses capturing groups internally, so if you embed it in a
-bigger pattern, the numbering of any following capture groups will be off.
+bigger pattern, the numbering of any following capture groups will be off. If
+this is an issue, use named capture groups of the form C<< (?<NAME>...) >>
+instead. See L<perlre/Capture groups>.
 
-It only matches URLs with an explicit schema (one of C<http>, C<https>, C<ftp>,
-C<ftps>). The pattern is deliberately not anchored at the beginning, i.e. it
-will match C<http://foo> in C<"click herehttp://foo">. If you don't want that,
-use C</\b$URL_SEARCH_RE/>.
+It only matches URLs with an explicit schema (one of C<http> or C<https>). The
+pattern is deliberately not anchored at the beginning, i.e. it will match
+C<http://foo> in C<"click herehttp://foo">. If you don't want that, use
+C</\b$URL_SEARCH_RE/>.
 
 It tries to exclude artifacts of the surrounding text:
 
@@ -320,11 +324,10 @@ L<C<perldoc>|perldoc> command.
 
     perldoc URL::Search
 
-You can also look for information at
-L<https://metacpan.org/pod/URL::Search>.
+You can also look for information at L<https://metacpan.org/pod/URL::Search>.
 
 To see a list of open bugs, visit
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=URL-Search>.
+L<https://rt.cpan.org/Dist/Display.html?Name=URL-Search>.
 
 To report a new bug, send an email to
 C<bug-URL-Search [at] rt.cpan.org>.
@@ -335,10 +338,10 @@ Lukas Mai, C<< <l.mai at web.de> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2016, 2017 Lukas Mai.
+Copyright 2016, 2017, 2023 Lukas Mai.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See L<http://dev.perl.org/licenses/> for more information.
+See L<https://dev.perl.org/licenses/> for more information.

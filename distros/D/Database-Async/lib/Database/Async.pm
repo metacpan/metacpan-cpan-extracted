@@ -3,7 +3,7 @@ package Database::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use parent qw(Database::Async::DB IO::Async::Notifier);
 
@@ -171,7 +171,7 @@ In L<Database::Async>:
 use mro;
 no indirect;
 
-use Future::AsyncAwait;
+use Future::AsyncAwait qw(:experimental);
 use Syntax::Keyword::Try;
 
 use URI;
@@ -483,9 +483,13 @@ Assign the given query to the next available engine instance.
 async sub queue_query {
     my ($self, $query) = @_;
     $log->tracef('Queuing query %s', $query);
-    my $engine = await $self->pool->next_engine;
+    my $f = $self->pool->next_engine;
+    CANCEL { $f->cancel; return undef }
+    my $engine = await $f;
     $log->tracef('Query %s about to run on %s', $query, $engine);
-    return await $engine->handle_query($query);
+    my $q = $engine->handle_query($query);
+    CANCEL { $q->cancel; return undef }
+    return await $q;
 }
 
 sub diagnostics {
@@ -509,6 +513,17 @@ sub _add_to_loop {
         $self->pool
     );
     return;
+}
+
+sub _remove_from_loop {
+    my ($self, $loop) = @_;
+    if($self->{ryu}) {
+        $self->remove_child(delete $self->{ryu});
+    }
+    if($self->{pool}) {
+        $self->remove_child(delete $self->{pool});
+    }
+    return $self->next::method($loop);
 }
 
 1;
@@ -640,5 +655,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

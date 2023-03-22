@@ -3,7 +3,7 @@ package Database::Async::Backoff::None;
 use strict;
 use warnings;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use parent qw(Database::Async::Backoff);
 

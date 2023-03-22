@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
-
+use Test2::V0;
 use HTML::Blitz ();
 
 my $blitz = HTML::Blitz->new(
@@ -51,7 +48,7 @@ SKIP: {
         or skip 'Sereal::Decoder >=4.024 is not available', 2;
 
     my $tnew = Sereal::Decoder::decode_sereal $blob;
-    isa_ok $tnew, 'HTML::Blitz::Template', 'Sereal deserialized value';
+    isa_ok $tnew, 'HTML::Blitz::Template';
     #note $tnew->compile_to_string;
 
     is $tnew->process($data), $expected, 'Sereal deserialized template works';
@@ -66,7 +63,7 @@ SKIP: {
     note $blob;
 
     my $tnew = $enc->decode($blob);
-    isa_ok $tnew, 'HTML::Blitz::Template', 'JSON deserialized value';
+    isa_ok $tnew, 'HTML::Blitz::Template';
     #note $tnew->compile_to_string;
 
     is $tnew->process($data), $expected, 'JSON deserialized template works';

@@ -36,6 +36,7 @@ series of updates or inserts on measures or queries as batch operations.
 
 
 Obviously, this only works on a Windows platform with a local installation of
+
 Microsoft Office 2016 or greater.
 
 The exposed interface hides details about the interaction with the Excel object model documented in

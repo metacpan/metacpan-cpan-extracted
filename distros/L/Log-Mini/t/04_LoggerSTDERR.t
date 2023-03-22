@@ -5,10 +5,11 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Capture::Tiny qw(capture_stderr);
-use Log::Mini::LoggerSTDERR;
+use Log::Mini::Logger::STDERR;
+
 
 subtest 'creates correct object' => sub {
-    isa_ok(Log::Mini::LoggerSTDERR->new, 'Log::Mini::LoggerSTDERR');
+    isa_ok(Log::Mini::Logger::STDERR->new, 'Log::Mini::Logger::STDERR');
 };
 
 subtest 'prints to stderr' => sub {
@@ -50,7 +51,7 @@ subtest 'prints sprintf formatted line' => sub {
 };
 
 sub _build_logger {
-    my $logger = Log::Mini::LoggerSTDERR->new;
+    my $logger = Log::Mini::Logger::STDERR->new;
     $logger->set_level('debug');
     return $logger;
 }

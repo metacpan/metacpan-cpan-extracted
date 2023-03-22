@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ use Database::Async::Backoff::Exponential;
 use Database::Async::Backoff::None;
 
 use Future;
-use Future::AsyncAwait;
+use Future::AsyncAwait qw(:experimental);
 use Syntax::Keyword::Try;
 use Scalar::Util qw(blessed refaddr);
 use List::UtilsBy qw(extract_by);
@@ -153,11 +153,24 @@ async sub request_engine {
     $log->tracef('Pool requesting new engine');
     ++$self->{pending_count};
     my $delay = $self->backoff->next;
-    await $self->loop->delay_future(
-        after => $delay
-    ) if $delay;
-    await $self->{request_engine}->();
+    if($delay) {
+        my $f = $self->loop->delay_future(
+            after => $delay
+        );
+        CANCEL { $f->cancel }
+        await $f;
+    }
+    my $req = $self->{request_engine}->();
+    CANCEL { $req->cancel }
+    await $req;
     $self->backoff->reset;
+}
+
+sub _remove_from_loop {
+    my ($self, $loop) = @_;
+    $_->cancel for splice @{$self->{waiting}};
+    $self->unregister_engine($_) for splice @{$self->{ready}};
+    return $self->next::method($loop);
 }
 
 1;
@@ -168,5 +181,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
 

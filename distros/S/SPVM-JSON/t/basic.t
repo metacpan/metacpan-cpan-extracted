@@ -9,7 +9,7 @@ use lib "$FindBin::Bin/lib";
 use SPVM 'TestCase::JSON';
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 # encode
 {
@@ -35,7 +35,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 }
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

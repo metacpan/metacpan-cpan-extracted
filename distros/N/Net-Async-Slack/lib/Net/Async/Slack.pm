@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -385,9 +385,9 @@ sub http {
         $self->add_child(
             my $ua = Net::Async::HTTP->new(
                 fail_on_error            => 1,
-                close_after_request      => 1,
-                max_connections_per_host => 2,
-                pipeline                 => 0,
+                close_after_request      => 0,
+                max_connections_per_host => 4,
+                pipeline                 => 1,
                 max_in_flight            => 8,
                 decode_content           => 1,
                 timeout                  => 30,

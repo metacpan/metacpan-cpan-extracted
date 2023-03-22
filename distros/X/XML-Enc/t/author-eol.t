@@ -31,6 +31,8 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
+    't/lib/Test/XML/Enc.pm',
+    't/lib/Test/XML/Enc/Util.pm',
     't/release-trailing-space.t',
     't/sign-certonly.pem',
     't/sign-private.pem',

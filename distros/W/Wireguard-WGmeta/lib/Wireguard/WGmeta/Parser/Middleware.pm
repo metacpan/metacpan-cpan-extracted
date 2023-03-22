@@ -36,7 +36,7 @@ use Wireguard::WGmeta::Utils;
 use base 'Exporter';
 our @EXPORT = qw(parse_wg_config2 create_wg_config2);
 
-our $VERSION = "0.3.3";
+our $VERSION = "0.3.4";
 
 =head3 parse_wg_config2($config_file_content, $interface_name [, $wg_meta_prefix, $disabled_prefix, $use_checksum])
 
@@ -290,8 +290,9 @@ sub create_wg_config2($ref_interface_config, $wg_meta_prefix = '#+', $disabled_p
 # internal method to create on config line
 sub _write_line($attr_name, $attr_value, $is_disabled, $is_wg_meta) {
     my $cfg_line = '';
-    # if we have a comment
-    if (substr($attr_name, 0, 7) eq 'comment') {
+    # if we have a generic comment
+    my $generic_comment_key = INTERNAL_KEY_PREFIX . '_comment';
+    if (substr($attr_name, 0, length($generic_comment_key)) eq $generic_comment_key) {
         $cfg_line .= $attr_value . "\n";
     }
     else {

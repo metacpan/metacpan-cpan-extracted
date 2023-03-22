@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 use Test::More tests => 70;
+use Test::Lib;
+use Test::XML::Enc;
 use XML::Enc;
 use MIME::Base64 qw/decode_base64/;
-use File::Which;
 use File::Slurper qw/read_text/;
 
 my $plaintext = <<'UNENCRYPTED';
@@ -40,6 +41,9 @@ my %sesskey = (
                 'aes192-gcm'    => 'aes-192-GCM',
                 'aes256-gcm'    => 'aes-256-GCM',
             );
+
+my $xmlsec = get_xmlsec_features();
+my $lax_key_search = $xmlsec->{lax_key_search} ? '--lax-key-search' :  '';
 
 foreach my $km (@key_methods) {
     foreach my $dm (@data_methods) {
@@ -103,13 +107,9 @@ XML Security Library example: Original XML
 CONTENT
 
 SKIP: {
-            skip "xmlsec1 not installed", 5 unless which('xmlsec1');
+            skip "xmlsec1 not installed", 5 unless $xmlsec->{installed};
             skip "xmlsec1 no support for MGF element", 5 if $km eq 'rsa-oaep';
-            my $version;
-            if (`xmlsec1 version` =~ m/(\d+\.\d+\.\d+)/) {
-                $version = $1;
-            };
-            skip "xmlsec version 1.2.27 minimum for GCM", 5 if $version lt '1.2.27';
+            skip "xmlsec version 1.2.27 minimum for GCM", 5 if ! $xmlsec->{aes_gcm};
 
             ok( open XML, '>', 'plaintext.xml' );
             print XML $plaintext;
@@ -120,7 +120,7 @@ SKIP: {
             close ELEMENT;
 
             # Encrypt using xmlsec
-            my $encrypt_response = `xmlsec1 encrypt --pubkey-cert-pem t/sign-certonly.pem --session-key $sesskey{$dm} --xml-data plaintext.xml --output encrypted-element.xml element_tmpl.xml 2>&1`;
+            my $encrypt_response = `xmlsec1 encrypt $lax_key_search --pubkey-cert-pem t/sign-certonly.pem --session-key $sesskey{$dm} --xml-data plaintext.xml --output encrypted-element.xml element_tmpl.xml 2>&1`;
 
             my $encrypted = read_text('encrypted-element.xml');
 
@@ -143,7 +143,7 @@ SKIP: {
             print CONTENT $content_tmpl;
             close CONTENT;
 
-            $encrypt_response = `xmlsec1 encrypt --pubkey-cert-pem t/sign-certonly.pem   --session-key $sesskey{$dm} --xml-data plaintext.xml --output encrypted-content.xml --node-xpath '/PayInfo/CreditCard/Number' content-template.xml 2>&1`;
+            $encrypt_response = `xmlsec1 encrypt $lax_key_search --pubkey-cert-pem t/sign-certonly.pem   --session-key $sesskey{$dm} --xml-data plaintext.xml --output encrypted-content.xml --node-xpath '/PayInfo/CreditCard/Number' content-template.xml 2>&1`;
 
             $encrypted = read_text('encrypted-content.xml');
 

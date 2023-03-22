@@ -11,6 +11,7 @@ if ( !$ENV{OPENAI_API_KEY} ) {
 
 my @test_cases = qw(
     OpenAI::API
+    OpenAI::API::Config
     OpenAI::API::Request::Chat
     OpenAI::API::Request::Completion
     OpenAI::API::Request::Edit
@@ -30,7 +31,11 @@ for my $module (@test_cases) {
 
     if ($code) {
         eval($code);
-        ok( !$@, 'eval(SYNOPSIS)' );
+        if ($@) {
+            fail("Error: $@");
+        } else {
+            pass('eval(SYNOPSIS)');
+        }
     } else {
         fail('synopsis code not found');
     }

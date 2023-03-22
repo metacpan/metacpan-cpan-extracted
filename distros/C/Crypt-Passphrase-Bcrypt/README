@@ -1,5 +1,5 @@
 This archive contains the distribution Crypt-Passphrase-Bcrypt,
-version 0.005:
+version 0.006:
 
   A bcrypt encoder for Crypt::Passphrase
 

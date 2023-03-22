@@ -1,4 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Setup qw/bug silent/; # strict, warnings, Test::More, Carp etc.
 
 unless (($ENV{PERL_PERTURB_KEYS}//"") eq "2") {
   $ENV{PERL_PERTURB_KEYS} = "2"; # deterministic
@@ -117,7 +120,7 @@ while (time < $start_time+$time_limit) {
     die "Result contains magic token" if $r =~ /Magic/s;
     #diag "Iter $iter : vis result length = ",length($r);
   }
-} 
+}
 ok(1, "Stopped after time limit expired ($time_limit seconds).  $iter iterations completed.");
 
 done_testing();

@@ -38,6 +38,7 @@ do { my $x = {
                                       'MIME::Base64' => '0',
                                       'Path::Tiny' => '0',
                                       'Protocol::Database::PostgreSQL' => '2.000',
+                                      'Ryu' => '3.004',
                                       'Ryu::Async' => '0.017',
                                       'Syntax::Keyword::Try' => '0.25',
                                       'Template' => '2.28',

@@ -7,3 +7,5 @@ META.yml
 README.md
 t/01_load.t
 t/02_chinook.t
+xt/pod-coverage.t
+xt/pod.t

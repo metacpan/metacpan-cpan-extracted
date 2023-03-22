@@ -16,7 +16,7 @@ use constant {
     INTBITS => length(sprintf '%b', ~0),
 };
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 method new($class: $rules) {
     bless {

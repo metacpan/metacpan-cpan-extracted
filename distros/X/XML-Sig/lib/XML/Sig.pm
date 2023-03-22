@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.59';
+our $VERSION = '0.63';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -52,6 +52,9 @@ sub new {
     }
     bless $self, $class;
     $self->{ 'x509' } = exists $params->{ x509 } ? 1 : 0;
+    if ( exists $params->{ key_name } ) {
+        $self->{ key_name } = $params->{ key_name };
+    }
     if ( exists $params->{ 'key' } ) {
         $self->_load_key( $params->{ 'key' } );
     }
@@ -60,6 +63,9 @@ sub new {
     }
     if ( exists $params->{ 'cert_text' } ) {
         $self->_load_cert_text( $params->{ 'cert_text' } );
+    }
+    if ( exists $params->{ 'hmac_key' } ) {
+        $self->_load_hmac_key_info;
     }
 
     if ( exists $params->{ sig_hash } && grep { $_ eq $params->{ sig_hash } } ('sha224', 'sha256', 'sha384', 'sha512', 'ripemd160'))
@@ -79,10 +85,12 @@ sub new {
     }
 
     if (defined $self->{ key_type } && $self->{ key_type } eq 'dsa') {
-        if ( defined $params->{ sig_hash } && grep { $_ eq $params->{ sig_hash } } ('sha1', 'sha256')) {
-            $self->{ sig_hash } = $params->{ sig_hash };
-        }
-        else {
+        my $sig_size = $self->{ key_obj }->get_sig_size();
+
+        # The key size dictates the sig size
+        if ( $sig_size eq 48 ) {    # 1024-bit key
+            $self->{ sig_hash } = 'sha1';
+        } else {                    # 2048-bit or 3072-bit key
             $self->{ sig_hash } = 'sha256';
         }
     }
@@ -1070,7 +1078,7 @@ sub _load_ecdsa_key {
     or confess "Crypt::PK::ECC 0.036+ needs to be installed so
              that we can handle ECDSA signatures";
 
-    my $ecdsa_key = Crypt::PK::ECC->new('t/ecdsa.private.pem');
+    my $ecdsa_key = Crypt::PK::ECC->new(\$key_text);
 
     if ( $ecdsa_key ) {
         $self->{ key_obj } = $ecdsa_key;
@@ -1200,6 +1208,27 @@ sub _load_rsa_key {
     else {
         confess "did not get a new Crypt::OpenSSL::RSA object";
     }
+}
+
+##
+## _load_hmac_key_info()
+##
+## Arguments:
+##    none
+##
+## Returns: nothing
+##
+## Populate:
+##   self->{KeyInfo}
+##
+sub _load_hmac_key_info {
+    my $self = shift;
+
+    if (! defined $self->{ key_name }) {
+        return;
+    }
+
+    $self->{KeyInfo} = qq{<dsig:KeyInfo><dsig:KeyName>$self->{key_name}</dsig:KeyName></dsig:KeyInfo>};
 }
 
 ##
@@ -1380,10 +1409,6 @@ sub _load_key {
 sub _signature_xml {
     my $self = shift;
     my ($signed_info,$signature_value) = @_;
-
-    if (! defined $self->{KeyInfo} && defined $self->{ hmac_key }) {
-        $self->{KeyInfo} = '';
-    }
 
     return qq{<dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
             $signed_info
@@ -1669,7 +1694,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.59
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -1801,7 +1826,9 @@ hashing algorithm used when signing the SignedInfo.  RSA and ECDSA
 supports the hashes specified sha1, sha224, sha256, sha384 and sha512
 
 DSA supports only sha1 and sha256 (but you really should not sign
-anything with DSA anyway).
+anything with DSA anyway).  This is over-ridden by the key's signature
+size which is related to the key size.  1024-bit keys require sha1,
+2048-bit and 3072-bit keys require sha256.
 
 =item B<digest_hash>
 
@@ -1813,6 +1840,12 @@ sha384, sha512, ripemd160
 =item B<hmac_key>
 
 Base64 encoded hmac_key
+
+=item B<key_name>
+
+The name of the key that should be referenced.  In the case of
+xmlsec the --keys-file (ex. t/xmlsec-keys.xml) holds keys with a
+KeyName that is referenced by this name.
 
 =item B<no_xml_declaration>
 
@@ -2019,7 +2052,7 @@ Timothy Legge <timlegge@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Byrne Reese, Chris Andrews and Others; in detail:
+This software is copyright (c) 2023 by Byrne Reese, Chris Andrews and Others; in detail:
 
   Copyright 2009       Byrne, Michael Hendricks
             2010       Chris Andrews
@@ -2030,6 +2063,7 @@ This software is copyright (c) 2022 by Byrne Reese, Chris Andrews and Others; in
             2017       Mike Wisener, xmikew
             2019-2021  Timothy Legge
             2022       Timothy Legge, Wesley Schwengle
+            2023       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,5 +1,9 @@
 Revision history for Parallel-Pipes
 
+0.200  2023-03-18 10:15:49 JST
+    - Introduce "tick" functionality (#7)
+    - Rename internal packages (eg: Parallel::Pipe::Here -> Parallel::Pipes::Here)
+
 0.102  2022-03-06 03:05:54 JST
     - Add Parallel::Pipes::App->map method (#6)
 

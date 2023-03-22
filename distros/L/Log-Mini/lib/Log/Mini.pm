@@ -2,27 +2,35 @@ package Log::Mini;
 
 use strict;
 use warnings;
+use Module::Load qw/load/;
 
-our $VERSION = "0.2.1";
+require Carp;
 
-sub new {
+our $VERSION = "0.3.0";
+
+sub new
+{
     shift;
-    my ( $type, @args ) = @_;
+    my ($type, @args) = @_;
+
+    @args = () unless @args;
 
     $type = 'stderr' unless defined $type;
 
-    if ( $type eq 'file' ) {
-        require Log::Mini::LoggerFILE;
-        return Log::Mini::LoggerFILE->new(@_);
+    if ($type eq 'file') {
+        unshift(@args, $type);
     }
-    elsif ( $type eq 'null' ) {
-        require Log::Mini::LoggerNULL;
-        return Log::Mini::LoggerNULL->new(@args);
-    }
-    else {
-        require Log::Mini::LoggerSTDERR;
-        return Log::Mini::LoggerSTDERR->new(@args);
-    }
+
+    my $module_name = sprintf('Log::Mini::Logger::%s', uc($type));
+    my $logger;
+
+    eval {
+        load $module_name;
+
+        $logger = $module_name->new(@args);
+    } or do { Carp::croak(sprintf("Failed to load adapter: %s, %s\n", $type, $@)) };
+
+    return $logger;
 }
 
 1;

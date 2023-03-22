@@ -8,7 +8,7 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Vaikimisi trükitakse originaal- ja tõlgitud tekst "konfliktimärkide" formaadi
     </p>
 </div>
 
-Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on lühike valik, et määrata muster vastab kogu tekstile `(?s).*`.
+Kui soovite tõlkida kogu teksti, kasutage valikut **--match-all**. See on otsetee, et määrata muster vastab kogu tekstile `(?s).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Kui soovite tõlkida kogu teksti, kasutage **--match-entire** valikut. See on l�
 
     Näete tõlkimise tulemust reaalajas STDERR-väljundist.
 
-- **--match-entire**
+- **--match-all**
 
     Määrake kogu faili tekst sihtkohaks.
 

@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.53';
+$VERSION = '0.54';
 $VERSION = $VERSION;
 
 # internal use
@@ -31,6 +31,9 @@ my $system_encoding = undef;
 
 # encoding name of MBCS script
 my $script_encoding = undef;
+
+# package name of Sjis software family
+my $old_package = undef;
 
 # over US-ASCII
 my $over_ascii = undef;
@@ -114,20 +117,20 @@ sub import {
     $mb::ORIG_PROGRAM_NAME = $mb::ORIG_PROGRAM_NAME; # to avoid: Name "mb::ORIG_PROGRAM_NAME" used only once: possible typo at ...
 
     # Sjis software compatible subroutines
-    my $package = {
-        'sjis'      => 'Sjis',
-        'gbk'       => 'GBK',
-        'uhc'       => 'UHC',
-        'big5'      => 'Big5',
-        'big5hkscs' => 'Big5HKSCS',
-        'eucjp'     => 'EUCJP',
-        'gb18030'   => 'GB18030',
-        'rfc2279'   => 'RFC2279',
-        'utf8'      => 'UTF2',
-        'wtf8'      => 'WTF8',
-    }->{mb::get_script_encoding()};
+    $old_package = {qw(
+        sjis        Sjis::
+        gbk         GBK::
+        uhc         UHC::
+        big5        Big5::
+        big5hkscs   Big5HKSCS::
+        eucjp       EUCJP::
+        gb18030     GB18030::
+        rfc2279     RFC2279::
+        utf8        UTF2::
+        wtf8        WTF8::
+    )}->{mb::get_script_encoding()} || die;
     for my $subroutine (qw( chop chr do dosglob eval getc index index_byte lc lcfirst length ord require reverse rindex rindex_byte split substr tr uc ucfirst )) {
-        *{$package."::$subroutine"} = \&{"mb::$subroutine"};
+        *{$old_package . $subroutine} = \&{"mb::$subroutine"};
     }
 }
 
@@ -2188,7 +2191,7 @@ sub parse_expr {
     # do { block }       --> do { block }
     # eval { block }     --> eval { block }
     # try { block }      --> try { block }
-    elsif (/\G (?: mb:: )? ( (?: do | eval | try ) \s* ) ( \{ ) /xmsgc) {
+    elsif (/\G (?: mb:: | $old_package )? ( (?: do | eval | try ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
         $parsed .= parse_ambiguous_char();
@@ -2816,7 +2819,7 @@ sub parse_expr {
     # CORE::split --> mb::_split
     # mb::split   --> mb::_split
     # split       --> mb::_split
-    elsif (/\G (?: CORE:: | mb:: )? ( split ) \b /xmsgc) {
+    elsif (/\G (?: CORE:: | mb:: | $old_package )? ( split ) \b /xmsgc) {
         $parsed .= "mb::_split";
 
         # parse \s and '('
@@ -5409,31 +5412,48 @@ There are some MBCS encodings in the world.
 
 =over 2
 
-=item * in Japan since 1978, JIS C 6226-1978,
+=item *
 
-=item * in China since 1980, GB 2312-80,
+in Japan since 1978, JIS C 6226-1978,
 
-=item * in Taiwan since 1984, Big5,
+=item *
 
-=item * in South Korea since 1991, KS X 1002:1991,
+in China since 1980, GB 2312-80,
 
-=item * in Hong Kong since 1999, Hong Kong Supplementary Character Set, and more.
+=item *
+
+in Taiwan since 1984, Big5,
+
+=item *
+
+in South Korea since 1991, KS X 1002:1991,
+
+=item *
+
+in Hong Kong since 1999, Hong Kong Supplementary Character Set, and more.
 
 =back
 
 These encodings are still used today in most areas except the world wide web.
-Even if you are an avid Unicode proponent, you cannot change this fact.
 These encodings will be used for the following reasons:
 
 =over 2
 
-=item * To maintain round-trip compatibility in reading and appending data (included offline data).
+=item *
 
-=item * To maintain sorting order of strings.
+To maintain round-trip compatibility in reading and appending data (included offline data).
 
-=item * Can create screens (and forms) easy, since octet size of memory matches width of display (and printing).
+=item *
 
-=item * Size of character set is best for human brain and easy to use.
+To maintain sorting order of strings.
+
+=item *
+
+Can create screens (and forms) easy, since octet size of memory matches width of display (and printing).
+
+=item *
+
+Size of character set is best for human brain and easy to use.
 
 =back
 
@@ -5447,29 +5467,53 @@ This software has the following features
 
 =over 2
 
-=item * supports MBCS literals of Perl scripts
+=item *
 
-=item * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
+supports MBCS literals of Perl scripts
 
-=item * does not use the UTF8 flag to avoid MOJIBAKE
+=item *
 
-=item * escapes DAMEMOJI of scripts
+supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
 
-=item * handles raw encoding to support GAIJI
+=item *
 
-=item * adds multibyte anchoring to regular expressions
+does not use the UTF8 flag to avoid MOJIBAKE
 
-=item * rewrites character classes in regular expressions to work as MBCS codepoint
+=item *
 
-=item * supports special variables $`, $&, and $'
+escapes DAMEMOJI of scripts
 
-=item * does not change features of octet-oriented built-in functions
+=item *
 
-=item * You have using mb::* subroutines if you want codepoint semantics
+handles raw encoding to support GAIJI
 
-=item * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
+=item *
 
-=item * codepoint range by hyphen of tr/// and y/// support US-ASCII only
+adds multibyte anchoring to regular expressions
+
+=item *
+
+rewrites character classes in regular expressions to work as MBCS codepoint
+
+=item *
+
+supports special variables $`, $&, and $'
+
+=item *
+
+does not change features of octet-oriented built-in functions
+
+=item *
+
+You have using mb::* subroutines if you want codepoint semantics
+
+=item *
+
+lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
+
+=item *
+
+codepoint range by hyphen of tr/// and y/// support US-ASCII only
 
 =back
 
@@ -5499,51 +5543,97 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 =over 2
 
-=item * byte
+=item *
 
-=item * octet
+byte
 
-=item * encoding
+=item *
 
-=item * encode
+octet
 
-=item * decode
+=item *
 
-=item * character
+encoding
 
-=item * codepoint
+=item *
 
-=item * grapheme
+encode
 
-=item * SBCS(Single Byte Character Set, Single Byte Code Set)
+=item *
 
-=item * DBCS(Double Byte Character Set, Double Byte Code Set)
+decode
 
-=item * MBCS(Multibyte Character Set, Multibyte Code Set)
+=item *
 
-=item * multibyte anchoring
+character
 
-=item * character class
+=item *
 
-=item * HIRAGANA
+codepoint
 
-=item * KATAKANA
+=item *
 
-=item * KANJI
+grapheme
 
-=item * GAIJI
+=item *
 
-=item * GETA, GETA-MOJI, GETA-MARK
+SBCS(Single Byte Character Set, Single Byte Code Set)
 
-=item * MOJIBAKE
+=item *
 
-=item * DAMEMOJI
+DBCS(Double Byte Character Set, Double Byte Code Set)
 
-=item * CHANTOSHITAMOJI
+=item *
 
-=item * ZENKAKU(fullwidth)
+MBCS(Multibyte Character Set, Multibyte Code Set)
 
-=item * HANKAKU(halfwidth)
+=item *
+
+multibyte anchoring
+
+=item *
+
+character class
+
+=item *
+
+HIRAGANA
+
+=item *
+
+KATAKANA
+
+=item *
+
+KANJI
+
+=item *
+
+GAIJI
+
+=item *
+
+GETA, GETA-MOJI, GETA-MARK
+
+=item *
+
+MOJIBAKE
+
+=item *
+
+DAMEMOJI
+
+=item *
+
+CHANTOSHITAMOJI
+
+=item *
+
+ZENKAKU(fullwidth)
+
+=item *
+
+HANKAKU(halfwidth)
 
 =back
 
@@ -5564,13 +5654,21 @@ L<https://en.wikipedia.org/wiki/Big5>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+needs multibyte anchoring
 
-=item * needs escaping meta char of 2nd octet
+=item *
 
-=item * and DAMEMOJI samples, here
+has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item *
+
+needs escaping meta char of 2nd octet
+
+=item *
+
+and DAMEMOJI samples, here
 
 =back
 
@@ -5597,13 +5695,21 @@ L<https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+needs multibyte anchoring
 
-=item * needs escaping meta char of 2nd octet
+=item *
 
-=item * and DAMEMOJI samples, here
+has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item *
+
+needs escaping meta char of 2nd octet
+
+=item *
+
+and DAMEMOJI samples, here
 
 =back
 
@@ -5630,11 +5736,17 @@ L<https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd octet
+needs multibyte anchoring
 
-=item * safe US-ASCII casefolding of 2nd octet
+=item *
+
+needs no escaping meta char of 2nd octet
+
+=item *
+
+safe US-ASCII casefolding of 2nd octet
 
 =back
 
@@ -5652,13 +5764,21 @@ L<https://en.wikipedia.org/wiki/GB_18030>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd-4th octet
+needs multibyte anchoring
 
-=item * needs escaping meta char of 2nd octet
+=item *
 
-=item * and DAMEMOJI samples, here
+has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+needs escaping meta char of 2nd octet
+
+=item *
+
+and DAMEMOJI samples, here
 
 =back
 
@@ -5685,13 +5805,21 @@ L<https://en.wikipedia.org/wiki/GBK_(character_encoding)>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+needs multibyte anchoring
 
-=item * needs escaping meta char of 2nd octet
+=item *
 
-=item * and DAMEMOJI samples, here
+has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item *
+
+needs escaping meta char of 2nd octet
+
+=item *
+
+and DAMEMOJI samples, here
 
 =back
 
@@ -5720,13 +5848,21 @@ L<https://www.ietf.org/rfc/rfc2279.txt>
 
 =over 2
 
-=item * needs no multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd-4th octets
+needs no multibyte anchoring
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+=item *
 
-=item * allows encoding surrogate codepoints even if it is not pair
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+allows encoding surrogate codepoints even if it is not pair
 
 =back
 
@@ -5745,13 +5881,21 @@ L<https://en.wikipedia.org/wiki/Shift_JIS>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+needs multibyte anchoring
 
-=item * needs escaping meta char of 2nd octet
+=item *
 
-=item * and DAMEMOJI samples, here
+has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item *
+
+needs escaping meta char of 2nd octet
+
+=item *
+
+and DAMEMOJI samples, here
 
 =back
 
@@ -5778,11 +5922,17 @@ L<https://en.wikipedia.org/wiki/Unified_Hangul_Code>
 
 =over 2
 
-=item * needs multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd octet
+needs multibyte anchoring
 
-=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+=item *
+
+needs no escaping meta char of 2nd octet
+
+=item *
+
+has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
 
 =back
 
@@ -5806,13 +5956,21 @@ L<https://en.wikipedia.org/wiki/UTF-8>
 
 =over 2
 
-=item * needs no multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd-4th octets
+needs no multibyte anchoring
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+=item *
 
-=item * enforces surrogate codepoints must be paired
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+enforces surrogate codepoints must be paired
 
 =back
 
@@ -5834,13 +5992,21 @@ L<http://simonsapin.github.io/wtf-8/>
 
 =over 2
 
-=item * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+=item *
 
-=item * needs no multibyte anchoring
+superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
 
-=item * needs no escaping meta char of 2nd-4th octets
+=item *
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+needs no multibyte anchoring
+
+=item *
+
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
 
 =back
 
@@ -5938,7 +6104,9 @@ This software provides the following two special variables to easy to use
 
 =over 2
 
-=item * $mb::PERL
+=item *
+
+$mb::PERL
 
 $^X means perl interpreter of MBCS version
 
@@ -5948,7 +6116,9 @@ $^X means perl interpreter of MBCS version
   system(qq{ $^X       SBCS_perl_script.pl });   # for SBCS script
   system(qq{ $mb::PERL MBCS_perl_script.pl });   # for MBCS script
 
-=item * $mb::ORIG_PROGRAM_NAME
+=item *
+
+$mb::ORIG_PROGRAM_NAME
 
 $mb::ORIG_PROGRAM_NAME means $0 before transpiled it
 
@@ -6092,10 +6262,22 @@ Instead of this
 
 =head1 Porting from script with Sjis software
 
-The source of this software is the Sjis software family.
-mb.pm modulino also supports scripts written using those software.
+Users of Sjis software family will also love this software.
 
-  script encoding and subroutines
+=over 2
+
+=item *
+
+Support for byte-oriented regular expression feature has been dropped.
+
+=item *
+
+Support for MacOS (such as OS9) has been dropped.
+
+=back
+
+script encoding and subroutines (1 of 2)
+
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   always
   supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf2               wtf8
@@ -6103,25 +6285,57 @@ mb.pm modulino also supports scripts written using those software.
   mb::chop         Big5::chop         Big5HKSCS::chop         EUCJP::chop         GB18030::chop         GBK::chop         RFC2279::chop         Sjis::chop         UHC::chop         UTF2::chop         WTF8::chop
   mb::chr          Big5::chr          Big5HKSCS::chr          EUCJP::chr          GB18030::chr          GBK::chr          RFC2279::chr          Sjis::chr          UHC::chr          UTF2::chr          WTF8::chr
   mb::do           Big5::do           Big5HKSCS::do           EUCJP::do           GB18030::do           GBK::do           RFC2279::do           Sjis::do           UHC::do           UTF2::do           WTF8::do
-  mb::dosglob      Big5::dosglob      Big5HKSCS::dosglob      EUCJP::dosglob      GB18030::dosglob      GBK::dosglob      RFC2279::dosglob      Sjis::dosglob      UHC::dosglob      UTF2::dosglob      WTF8::dosglob
   mb::eval         Big5::eval         Big5HKSCS::eval         EUCJP::eval         GB18030::eval         GBK::eval         RFC2279::eval         Sjis::eval         UHC::eval         UTF2::eval         WTF8::eval
   mb::getc         Big5::getc         Big5HKSCS::getc         EUCJP::getc         GB18030::getc         GBK::getc         RFC2279::getc         Sjis::getc         UHC::getc         UTF2::getc         WTF8::getc
-  mb::index        Big5::index        Big5HKSCS::index        EUCJP::index        GB18030::index        GBK::index        RFC2279::index        Sjis::index        UHC::index        UTF2::index        WTF8::index
-  mb::index_byte   Big5::index_byte   Big5HKSCS::index_byte   EUCJP::index_byte   GB18030::index_byte   GBK::index_byte   RFC2279::index_byte   Sjis::index_byte   UHC::index_byte   UTF2::index_byte   WTF8::index_byte
-  mb::lc           Big5::lc           Big5HKSCS::lc           EUCJP::lc           GB18030::lc           GBK::lc           RFC2279::lc           Sjis::lc           UHC::lc           UTF2::lc           WTF8::lc
-  mb::lcfirst      Big5::lcfirst      Big5HKSCS::lcfirst      EUCJP::lcfirst      GB18030::lcfirst      GBK::lcfirst      RFC2279::lcfirst      Sjis::lcfirst      UHC::lcfirst      UTF2::lcfirst      WTF8::lcfirst
   mb::length       Big5::length       Big5HKSCS::length       EUCJP::length       GB18030::length       GBK::length       RFC2279::length       Sjis::length       UHC::length       UTF2::length       WTF8::length
   mb::ord          Big5::ord          Big5HKSCS::ord          EUCJP::ord          GB18030::ord          GBK::ord          RFC2279::ord          Sjis::ord          UHC::ord          UTF2::ord          WTF8::ord
   mb::require      Big5::require      Big5HKSCS::require      EUCJP::require      GB18030::require      GBK::require      RFC2279::require      Sjis::require      UHC::require      UTF2::require      WTF8::require
   mb::reverse      Big5::reverse      Big5HKSCS::reverse      EUCJP::reverse      GB18030::reverse      GBK::reverse      RFC2279::reverse      Sjis::reverse      UHC::reverse      UTF2::reverse      WTF8::reverse
-  mb::rindex       Big5::rindex       Big5HKSCS::rindex       EUCJP::rindex       GB18030::rindex       GBK::rindex       RFC2279::rindex       Sjis::rindex       UHC::rindex       UTF2::rindex       WTF8::rindex
-  mb::rindex_byte  Big5::rindex_byte  Big5HKSCS::rindex_byte  EUCJP::rindex_byte  GB18030::rindex_byte  GBK::rindex_byte  RFC2279::rindex_byte  Sjis::rindex_byte  UHC::rindex_byte  UTF2::rindex_byte  WTF8::rindex_byte
-  mb::split        Big5::split        Big5HKSCS::split        EUCJP::split        GB18030::split        GBK::split        RFC2279::split        Sjis::split        UHC::split        UTF2::split        WTF8::split
   mb::substr       Big5::substr       Big5HKSCS::substr       EUCJP::substr       GB18030::substr       GBK::substr       RFC2279::substr       Sjis::substr       UHC::substr       UTF2::substr       WTF8::substr
   mb::tr           Big5::tr           Big5HKSCS::tr           EUCJP::tr           GB18030::tr           GBK::tr           RFC2279::tr           Sjis::tr           UHC::tr           UTF2::tr           WTF8::tr
-  mb::uc           Big5::uc           Big5HKSCS::uc           EUCJP::uc           GB18030::uc           GBK::uc           RFC2279::uc           Sjis::uc           UHC::uc           UTF2::uc           WTF8::uc
-  mb::ucfirst      Big5::ucfirst      Big5HKSCS::ucfirst      EUCJP::ucfirst      GB18030::ucfirst      GBK::ucfirst      RFC2279::ucfirst      Sjis::ucfirst      UHC::ucfirst      UTF2::ucfirst      WTF8::ucfirst
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+=over 2
+
+=item *
+
+JPerl compatibility option supported by Sjis software has been dropped.
+
+You need to write *::ord(), *::reverse(), *::getc() always if you want JPerl like feature.
+For example, Sjis::ord(), Sjis::reverse(), Sjis::getc(), etc.
+
+=back
+
+script encoding and subroutines (2 of 2)
+
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  always
+  supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf2               wtf8
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  mb::dosglob      Big5::dosglob      Big5HKSCS::dosglob      EUCJP::dosglob      GB18030::dosglob      GBK::dosglob      RFC2279::dosglob      Sjis::dosglob      UHC::dosglob      UTF2::dosglob      WTF8::dosglob
+  mb::index        Big5::index        Big5HKSCS::index        EUCJP::index        GB18030::index        GBK::index        RFC2279::index        Sjis::index        UHC::index        UTF2::index        WTF8::index
+  mb::index_byte   Big5::index_byte   Big5HKSCS::index_byte   EUCJP::index_byte   GB18030::index_byte   GBK::index_byte   RFC2279::index_byte   Sjis::index_byte   UHC::index_byte   UTF2::index_byte   WTF8::index_byte
+  mb::rindex       Big5::rindex       Big5HKSCS::rindex       EUCJP::rindex       GB18030::rindex       GBK::rindex       RFC2279::rindex       Sjis::rindex       UHC::rindex       UTF2::rindex       WTF8::rindex
+  mb::rindex_byte  Big5::rindex_byte  Big5HKSCS::rindex_byte  EUCJP::rindex_byte  GB18030::rindex_byte  GBK::rindex_byte  RFC2279::rindex_byte  Sjis::rindex_byte  UHC::rindex_byte  UTF2::rindex_byte  WTF8::rindex_byte
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+=over 2
+
+=item *
+
+If you're on Microsoft Windows and want to glob() using a MBCS pattern, *::dosglob() is probably more convenient.
+
+=item *
+
+If you want the result of index() in bytes like JPerl, you need to write *::index_byte().
+Because *::index() returns position counted in characters like utf8 pragma environment.
+
+=item *
+
+If you want the result of rindex() in bytes like JPerl, you need to write *::rindex_byte().
+Because *::rindex() returns position counted in characters like utf8 pragma environment.
+
+=back
 
 =head1 Syntax Sugar of mb.pm modulino
 
@@ -6232,11 +6446,17 @@ In double quote, DAMEMOJI are double-byte characters that include the following 
 
 =over 2
 
-=item * (1) $ perl mb.pm script.pl
+=item 1
 
-=item * (2) mb.pm modulino escapes literal DAMEMOJI in your "script.pl" and save as new "script.oo.pl"
+$ perl mb.pm script.pl
 
-=item * (3) mb.pm executes "script.oo.pl"
+=item 2
+
+mb.pm modulino escapes literal DAMEMOJI in your "script.pl" and save as new "script.oo.pl"
+
+=item 3
+
+mb.pm executes "script.oo.pl"
 
 =back
 
@@ -7492,7 +7712,9 @@ For several reasons, we were unable to achieve the following features:
 
 =over 2
 
-=item * chdir() on Microsoft Windows
+=item *
+
+chdir() on Microsoft Windows
 
 Function chdir() cannot work if path is ended by chr(0x5C).
 
@@ -7517,7 +7739,9 @@ This is a lost technology in this century.
   $wd->chdir('..');
   $wd->open(my $fh, ...);
 
-=item * Limitation of Regular Expression
+=item *
+
+Limitation of Regular Expression
 
 This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or later can treat the codepoint string which exceeds 65534 octets with a regular expression, and only perl 5.10.1 or later can 32766 octets.
 
@@ -7549,7 +7773,9 @@ You can avoid the following bugs with little hacks.
 
 =over 2
 
-=item * Special Variables $` and $& need m/( Capture All )/
+=item *
+
+Special Variables $` and $& need m/( Capture All )/
 
 If you use the special variables $ ` or $&, you must enclose the entire regular expression in parentheses.
 Because $` and $& needs $1 to implement its.
@@ -7570,7 +7796,9 @@ Because $` and $& needs $1 to implement its.
 In the past, Perl scripts with special variables $` and $& had a problem with slow execution.
 Both that era and today, capturing by parentheses works well.
 
-=item * Return Value from tr///s
+=item *
+
+Return Value from tr///s
 
 tr/// (or y///) operator with /s modifier returns 1 always. If you need right
 value, you can use mb::tr().
@@ -7614,7 +7842,9 @@ To use with a read-only value without raising an exception, use the /r modifier.
 
   print mb::tr('bookkeeper','boep','peob','r'); # prints 'peekkoobor'
 
-=item * mb::substr as Lvalue
+=item *
+
+mb::substr as Lvalue
 
 If perl version is older than 5.14, mb::substr differs from CORE::substr, and cannot be used as an lvalue.
 To change part of a string, you need use the optional fourth argument which is the replacement string.
@@ -7631,13 +7861,17 @@ Unfortunately, we couldn't make following features. Could you tell us better ide
 
 =over 2
 
-=item * Cloister of Regular Expression
+=item *
+
+Cloister of Regular Expression
 
 The cloister (?i) and (?i:...) of a regular expression on encoding of big5, big5hkscs, gb18030, gbk, sjis, and uhc will not be implemented for the time being.
 I didn't implement this feature because it was difficult to implement and less necessary.
 If you're interested in this issue, try challenge it.
 
-=item * Look-behind Assertion
+=item *
+
+Look-behind Assertion
 
 The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from matching trail octet of the previous MBCS codepoint.
 
@@ -7650,12 +7884,16 @@ There are no plans to implement it in the future, too.
 
 =over 2
 
-=item * Delimiter of String and Regexp
+=item *
+
+Delimiter of String and Regexp
 
 qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint as the delimiter.
 I didn't implement this feature because it's rarely needed.
 
-=item * fc(), lc(), lcfirst(), uc(), and ucfirst()
+=item *
+
+fc(), lc(), lcfirst(), uc(), and ucfirst()
 
 fc() not supported. lc(), lcfirst(), uc(), and ucfirst() support US-ASCII only.
 
@@ -7667,23 +7905,31 @@ fc() not supported. lc(), lcfirst(), uc(), and ucfirst() support US-ASCII only.
   my $ucfirst_string = mb::Casing::ucfirst($string);
   my $fc_string      = mb::Casing::fc($string);
 
-=item * Hyphen of tr/// Supports US-ASCII Only
+=item *
+
+Hyphen of tr/// Supports US-ASCII Only
 
 Supported ranges of tr/// and y/// by hyphen are US-ASCII only.
 
-=item * Modifier /a /d /l and /u of Regular Expression
+=item *
+
+Modifier /a /d /l and /u of Regular Expression
 
 I have removed these modifiers to remove your headache.
 The concept of this software is not to use two or more encoding methods as literal string and literal of regexp in one Perl script.
 Therefore, modifier /a, /d, /l, and /u are not supported.
 \d means [0-9] always.
 
-=item * Empty Variable in Regular Expression
+=item *
+
+Empty Variable in Regular Expression
 
 An empty literal string as regexp means empty string. Unlike original Perl, if 'pattern' is an empty string, the last successfully matched regexp is NOT used.
 Similarly, empty string made by interpolated variable means empty string, too.
 
-=item * Named Codepoint
+=item *
+
+Named Codepoint
 
 A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon} is not supported.
 
@@ -7693,7 +7939,9 @@ A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N
   
   # By the way, you know how great it is to be able to write MBCS literal strings in your Perl scripts, right?
 
-=item * Unicode Properties (aka Codepoint Properties) of Regular Expression
+=item *
+
+Unicode Properties (aka Codepoint Properties) of Regular Expression
 
 Unicode properties (aka codepoint properties) of regexp are not available.
 Also (?[]) in regexp of perl 5.18 is not available. There is no plans to currently support these.
@@ -7711,7 +7959,9 @@ Thus, this feature is not available in scripts that require long-term maintenanc
   at Perl 5.12.1  \p{PosixAlpha}, and \p{Alpha}
   at Perl 5.14    \p{X_POSIX_Alpha}, \p{POSIX_Alpha}, \p{XPosixAlpha}, and \p{PosixAlpha}
 
-=item * \b{...} \B{...} Boundaries in Regular Expressions
+=item *
+
+\b{...} \B{...} Boundaries in Regular Expressions
 
 Following \b{...} \B{...} available starting in Perl 5.22 are not supported.
 
@@ -7728,14 +7978,18 @@ Following \b{...} \B{...} available starting in Perl 5.22 are not supported.
 
 This feature (\b{...} and \B{...}) considered not yet stable in the Perl specification.
 
-=item * ?? and m?? are Not Supported
+=item *
+
+?? and m?? are Not Supported
 
 Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or m??.
 As a result, you need to rewrite a script about $1,$2,$3,... You cannot use (?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
 Here's a quote words from Dan Kogai-san.
 "(I'm just a programmer,) so I can't fix the bug of the spec."
 
-=item * format
+=item *
+
+format
 
 Unlike JPerl, mb.pm modulino does not support the format feature.
 Because it is difficult to implement and you can write the same script in other any ways.
@@ -7798,9 +8052,13 @@ It's following two meanings:
 
 =over 2
 
-=item * Non-Text string
+=item *
 
-=item * Digital octet string
+Non-Text string
+
+=item *
+
+Digital octet string
 
 =back
 
@@ -7821,11 +8079,17 @@ Perl 5.8's string model will not be accepted by common people.
 
 =over 2
 
-=item * Information processing model of UNIX/C-ism
+=item *
 
-=item * Information processing model of perl3 or later
+Information processing model of UNIX/C-ism
 
-=item * Information processing model of this software
+=item *
+
+Information processing model of perl3 or later
+
+=item *
+
+Information processing model of this software
 
 =back
 
@@ -7840,9 +8104,13 @@ In UNIX Everything is a File
 
 =over 2
 
-=item * In UNIX everything is a stream of bytes
+=item *
 
-=item * In UNIX the filesystem is used as a universal name space
+In UNIX everything is a stream of bytes
+
+=item *
+
+In UNIX the filesystem is used as a universal name space
 
 =back
 
@@ -7850,19 +8118,33 @@ Native Encoding Scripting is ...
 
 =over 2
 
-=item * native encoding of file contents
+=item *
 
-=item * native encoding of file name on filesystem
+native encoding of file contents
 
-=item * native encoding of command line
+=item *
 
-=item * native encoding of environment variable
+native encoding of file name on filesystem
 
-=item * native encoding of API
+=item *
 
-=item * native encoding of network packet
+native encoding of command line
 
-=item * native encoding of database
+=item *
+
+native encoding of environment variable
+
+=item *
+
+native encoding of API
+
+=item *
+
+native encoding of network packet
+
+=item *
+
+native encoding of database
 
 =back
 
@@ -7870,13 +8152,17 @@ Ideally, We'd like to achieve these five Goals:
 
 =over 2
 
-=item * Goal #1:
+=item *
+
+Goal #1:
 
 Old byte-oriented programs should not spontaneously break on the old byte-oriented data they used to work on.
 
 This software attempts to achieve this goal by embedded functions work as traditional and stably.
 
-=item * Goal #2:
+=item *
+
+Goal #2:
 
 Old byte-oriented programs should magically start working on the new character-oriented data when appropriate.
 
@@ -7916,7 +8202,9 @@ There is a combination from (a) to (e) in data, script, and interpreter of old a
 The reason why JPerl is very excellent is that it is at the position of (c).
 That is, it is almost not necessary to write a special code to process new codepoint oriented script.
 
-=item * Goal #3:
+=item *
+
+Goal #3:
 
 Programs should run just as fast in the new character-oriented mode as in the old byte-oriented mode.
 
@@ -7926,7 +8214,9 @@ It is impossible. Because the following time is necessary.
 
 (2) Time of processing multibyte anchoring in regular expression
 
-=item * Goal #4:
+=item *
+
+Goal #4:
 
 Perl should remain one language, rather than forking into a byte-oriented Perl and a character-oriented Perl.
 
@@ -7941,7 +8231,9 @@ And you will get support from the Perl community, when you solve the problem by 
 
 mb.pm modulino remains one "language" and one "interpreter."
 
-=item * Goal #5:
+=item *
+
+Goal #5:
 
 mb.pm users will be able to maintain mb.pm by Perl.
 
@@ -8064,15 +8356,25 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * supports many MBCS encodings, Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
+=item *
 
-=item * JPerl-like syntax that supports "easy jobs must be easy"
+supports many MBCS encodings, Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
 
-=item * regexp ("m//", "qr//", and "s///") works as codepoint
+=item *
 
-=item * "split()" works as codepoint
+JPerl-like syntax that supports "easy jobs must be easy"
 
-=item * "tr///" works as codepoint
+=item *
+
+regexp ("m//", "qr//", and "s///") works as codepoint
+
+=item *
+
+"split()" works as codepoint
+
+=item *
+
+"tr///" works as codepoint
 
 =back
 
@@ -8080,9 +8382,13 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * have to type "perl mb.pm your_script.pl ..." on command line everytime
+=item *
 
-=item * have obtrusive files(your_script.oo.pl)
+have to type "perl mb.pm your_script.pl ..." on command line everytime
+
+=item *
+
+have obtrusive files(your_script.oo.pl)
 
 =back
 
@@ -8090,9 +8396,13 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * type only "perl your_script.pl ..." on command line
+=item *
 
-=item * no obtrusive files(your_script.oo.pl)
+type only "perl your_script.pl ..." on command line
+
+=item *
+
+no obtrusive files(your_script.oo.pl)
 
 =back
 
@@ -8100,17 +8410,29 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * supports only UTF-8 encoding
+=item *
 
-=item * have to write "$mb{qr/regexp/imsxo}" to do "m/regexp/imsxo" that works as codepoint
+supports only UTF-8 encoding
 
-=item * have to write "m<\G$mb{qr/regexp/imsxo}>gc" to do "m/regexp/imsxogc" that works as codepoint
+=item *
 
-=item * have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
+have to write "$mb{qr/regexp/imsxo}" to do "m/regexp/imsxo" that works as codepoint
 
-=item * have to write "UTF8::R2::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+=item *
 
-=item * have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+have to write "m<\G$mb{qr/regexp/imsxo}>gc" to do "m/regexp/imsxogc" that works as codepoint
+
+=item *
+
+have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
+
+=item *
+
+have to write "UTF8::R2::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+
+=item *
+
+have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
 
 =back
 
@@ -8160,6 +8482,54 @@ So I decided to make a new Sjis software, in a (really!) single file, by single 
 This is a short story of the beginnings of mb.pm modulino.
 
 --- Time flies.
+
+=head1 How To Update This Distribution
+
+Someday all authors of mb.pm modulino may get run over by a bus.
+
+So we write here how to update this distribution for you.
+
+We wish you good luck.
+
+=over 2
+
+=item 1
+
+(MUST) update file "lib/mb.pm"
+
+=item 2
+
+(MUST) update $VERSION of file "lib/mb.pm"
+
+=item 3
+
+(MUST) append to change log to file "Changes"
+
+=item 4
+
+(if you need) update file "README"
+
+=item 5
+
+(if you need) update or add files "t/*.t"
+
+=item 6
+
+(if you need) update file "MANIFEST"
+
+=item 7
+
+repeat command: pmake test [Enter] until all tests PASS
+
+=item 8
+
+type command: pmake dist [Enter]
+
+=item 9
+
+upload *.tar.gz to PAUSE(The [Perl programming] Authors Upload Server)
+
+=back
 
 =head1 AUTHOR
 

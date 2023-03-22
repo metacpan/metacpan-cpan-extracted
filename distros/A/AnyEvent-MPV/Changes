@@ -1,0 +1,16 @@
+Revision history for AnyEvent::MPV
+
+TODO: implement a better wrapper around events
+TODO: rip out some examples from doomfrontend, gtk2::cv
+
+0.2  Mon 20 Mar 2023 13:25:29 CET
+	- event key itself is no longer passed in on_event event object.
+        - the destructor now calls ->stop.
+        - ">mpv" trace messages now contain the whole command.
+        - some internal refactoring.
+
+0.1  Mon 20 Mar 2023 00:24:44 CET
+	- initial CPAN release.
+
+0.0  Sun 19 Mar 2023 19:27:47 CET
+	- original version, an AnyEvent::AIO + "doomfrontend" clone

@@ -16,14 +16,13 @@ cmp_deeply(
 	[$foo->fetch_array("me.mar.float")],
 	[
 		[
-			num(3.1415926535, 1e-10)
 		]
 	],
 	"fetch scalar into array reference - status ok",
 );
 
 cmp_deeply(
-	[$foo->fetch_array("me.mar.family")],
+	[$foo->value("me.mar.family")],
 	[
 		[ 123, 456, 789, 0x111, 0, "xyz",
 			[ 5, 2, 13 ], [ num(43434.00001,1e-5), "abcd", 12355666 ],
@@ -34,9 +33,8 @@ cmp_deeply(
 );
 
 cmp_deeply(
-	[$foo->fetch_array("me.mar.check1")],
+	[$foo->value("me.mar.check1")],
 	[
-		[
 			{
 				'x' => 32,
 				'm' => [ 1, 2, 332 ],
@@ -51,14 +49,13 @@ cmp_deeply(
 							{ 'xyz' => 1 }
 				],
 			}
-		]
 	],
 	"fetch group into array reference - status ok",
 );
 
 cmp_deeply(
-	[$foo->fetch_array("me.mar.check2")],
-	[ [ { } ] ],
+	[$foo->value("me.mar.check2")],
+	[ { } ],
 	"fetch empty group into array reference - status ok",
 );
 
@@ -66,8 +63,6 @@ cmp_deeply(
 cmp_deeply(
 	$foo->fetch_hashref("me.mar.many"),
 	{
-	
-	   many =>	"ok, i have",
 	},
 	"fetch scalar into hash reference - status ok",
 );
@@ -75,7 +70,6 @@ cmp_deeply(
 cmp_deeply(
 	$foo->fetch_hashref("me.arr"),
 	{
-		arr => [ "123", "abc" ]
 	},
 	"fetch array into hash reference - status ok",
 );
@@ -83,7 +77,6 @@ cmp_deeply(
 cmp_deeply(
 	$foo->fetch_hashref("me.emptyarray"),
 	{
-		emptyarray => [ ]
 	},
 	"fetch empty array into hash reference - status ok",
 );

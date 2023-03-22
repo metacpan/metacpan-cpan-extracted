@@ -27,14 +27,15 @@ foreach my $alg (@hash_alg) {
 SKIP: {
     skip "xmlsec1 not installed", 2 unless which('xmlsec1');
 
-    skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
+    skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 2
+        if (($major eq '3.0') and ($minor lt 7) and $alg eq 'ripemd160');
 
     ok( (open XML, '>', "t/tmp.xml"), "File t/tmp.xml opened for write");
     print XML $signed;
     close XML;
 
     my $verify_response = `xmlsec1 --verify --id-attr:ID "foo" t/tmp.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "t/tmp.xml is verified using xmlsec1" )
+    ok( $verify_response =~ m/OK/, "t/tmp.xml is verified using xmlsec1" )
         or warn "calling xmlsec1 failed: '$verify_response'\n";
     unlink "t/tmp.xml";
     }
@@ -57,14 +58,15 @@ foreach my $alg (@hash_alg) {
 SKIP: {
     skip "xmlsec1 not installed", 2 unless which('xmlsec1');
 
-    skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
+    skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 2
+        if (($major eq '3.0') and ($minor lt 7) and $alg eq 'ripemd160');
 
     ok( (open XML, '>', "t/tmp.xml"), "File opened for write");
     print XML $signed;
     close XML;
 
     my $verify_response = `xmlsec1 --verify --pubkey-cert-pem t/rsa.cert.pem --untrusted-pem t/intermediate.pem --trusted-pem t/cacert.pem --id-attr:ID "foo" t/tmp.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "t/tmp.xml RSA is verified using xmlsec1 - no X509" )
+    ok( $verify_response =~ m/OK/, "t/tmp.xml RSA is verified using xmlsec1 - no X509" )
         or warn "calling xmlsec1 failed: '$verify_response'\n";
     unlink "t/tmp.xml";
 
@@ -90,14 +92,15 @@ foreach my $alg (@hash_alg) {
 SKIP: {
     skip "xmlsec1 not installed", 2 unless which('xmlsec1');
 
-    skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
+    skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 2
+        if (($major eq '3.0') and ($minor lt 7) and $alg eq 'ripemd160');
 
     ok( (open XML, '>', "t/tmp.xml"), "File opened for write");
     print XML $signed;
     close XML;
 
     my $verify_response = `xmlsec1 --verify --pubkey-cert-pem t/rsa.cert.pem --untrusted-pem t/intermediate.pem --trusted-pem t/cacert.pem --id-attr:ID "foo" t/tmp.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "t/tmp.xml RSA is verified using xmlsec1" )
+    ok( $verify_response =~ m/OK/, "t/tmp.xml RSA is verified using xmlsec1" )
         or warn "calling xmlsec1 failed: '$verify_response'\n";
     unlink "t/tmp.xml";
 
@@ -119,16 +122,17 @@ foreach my $alg (@hash_alg) {
     SKIP: {
         skip "xmlsec1 not installed", 2 unless which('xmlsec1');
 
-        skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
+        skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 2
+            if (($major eq '3.0') and ($minor lt 7) and $alg eq 'ripemd160');
 
         ok( (open XML, '>', "t/tmp.xml"), "File opened for write");
         print XML $signed;
         close XML;
 
         my $verify_response = `xmlsec1 --verify --trusted-pem t/ecdsa.public.pem --id-attr:ID "foo" t/tmp.xml 2>&1`;
-        ok( $verify_response =~ m/^OK/, "ECDSA Response is verified using xmlsec1" )
+        ok( $verify_response =~ m/OK/, "ECDSA Response is verified using xmlsec1" )
             or warn "calling xmlsec1 failed: '$verify_response'\n";
-        if ($verify_response =~ m/^OK/) {
+        if ($verify_response =~ m/OK/) {
             unlink 't/tmp.xml';
         } else{
             print $signed;

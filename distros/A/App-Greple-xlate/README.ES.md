@@ -8,7 +8,7 @@ App::Greple::xlate - módulo de traducción para greple
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Por defecto, el texto original y traducido se imprime en el formato "marcador de
     </p>
 </div>
 
-Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata de un atajo para especificar el patrón que coincide con todo el texto `(?s).*`.
+Si desea traducir todo el texto, utilice la opción **--match-all**. Es un atajo para especificar que el patrón coincide con todo el texto `(?s).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Si desea traducir todo el texto, utilice la opción **--match-entire**. Se trata
 
     Ver el resultado de la traducción en tiempo real en la salida STDERR.
 
-- **--match-entire**
+- **--match-all**
 
     Establece todo el texto del fichero como área de destino.
 

@@ -1,5 +1,12 @@
 Revision history for ExtUtils-H2PM
 
+0.11    2023-03-20
+        [CHANGES]
+         * Overall module style refresh - docs, perl 5.14, etc...
+         * Declare requires List::Util 1.39 to get the ->key method on pairs()
+         * Use __FILE__ in unit tests to give it path separator independence
+           (for MSWin32)
+
 0.10    2016/05/23 17:32:10
         [CHANGES]
          * Added 'include_path' and 'define' options for configuring the

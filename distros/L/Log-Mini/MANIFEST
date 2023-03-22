@@ -5,10 +5,10 @@ META.json
 README.md
 cpanfile
 lib/Log/Mini.pm
-lib/Log/Mini/LoggerBase.pm
-lib/Log/Mini/LoggerFILE.pm
-lib/Log/Mini/LoggerNULL.pm
-lib/Log/Mini/LoggerSTDERR.pm
+lib/Log/Mini/Logger/Base.pm
+lib/Log/Mini/Logger/FILE.pm
+lib/Log/Mini/Logger/NULL.pm
+lib/Log/Mini/Logger/STDERR.pm
 minil.toml
 t/00_compile.t
 t/01_logger_builder.t

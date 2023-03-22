@@ -8,7 +8,7 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Par défaut, le texte original et traduit est imprimé dans le format "marqueur 
     </p>
 </div>
 
-Si vous voulez traduire un texte entier, utilisez l'option **--match-entire**. Il s'agit d'un raccourci pour spécifier que le motif correspond au texte entier `(?s).*`.
+Si vous souhaitez traduire un texte entier, utilisez l'option **--match-all**. Il s'agit d'un raccourci pour spécifier que le motif correspond au texte entier `(?s).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Si vous voulez traduire un texte entier, utilisez l'option **--match-entire**. I
 
     Voir le résultat de la traduction en temps réel dans la sortie STDERR.
 
-- **--match-entire**
+- **--match-all**
 
     Définissez l'ensemble du texte du fichier comme zone cible.
 

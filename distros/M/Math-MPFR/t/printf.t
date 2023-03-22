@@ -3,6 +3,13 @@ use strict;
 use Math::BigInt;
 use Math::MPFR qw(:mpfr);
 
+# Because of the way I (sisyphus) build this module with MS
+# Visual Studio, XSubs that take a filehandle argument might
+# not work correctly. It therefore suits my purposes to be
+# able to avoid calling (and testing) those XSubs.
+# Hence the references to $ENV{SISYPHUS_SKIP} in this script.
+
+
 print "1..5\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
@@ -25,9 +32,11 @@ else {warn "1a: $ret\n"}
 
 $ok .= 'b' if $ret == Rmpfr_printf("For testing: %.30RNf\n", $mpfr1);
 $ok .= 'c' if $ret == Rmpfr_printf("For testing: %.30R*f\n", GMP_RNDN, $mpfr1);
-$ok .= 'd' if $ret == Rmpfr_fprintf(\*STDOUT, "For testing: %.30Rf\n", $mpfr1);
-$ok .= 'e' if $ret == Rmpfr_fprintf(\*STDOUT, "For testing: %.30RNf\n", $mpfr1);
-$ok .= 'f' if $ret == Rmpfr_fprintf(\*STDOUT, "For testing: %.30R*f\n", GMP_RNDZ, $mpfr1);
+unless($ENV{SISYPHUS_SKIP}) {
+  $ok .= 'd' if $ret == Rmpfr_fprintf(\*STDOUT, "For testing: %.30Rf\n", $mpfr1);
+  $ok .= 'e' if $ret == Rmpfr_fprintf(\*STDOUT, "For testing: %.30RNf\n", $mpfr1);
+  $ok .= 'f' if $ret == Rmpfr_fprintf(\*STDOUT, "For testing: %.30R*f\n", GMP_RNDZ, $mpfr1);
+}
 $ok .= 'g' if $ret == Rmpfr_sprintf($buf, "For testing: %.30Rf\n", $mpfr1, 200);
 $ok .= 'h' if $ret == Rmpfr_sprintf($buf, "For testing: %.30RNf\n", $mpfr1, 200);
 $ok .= 'i' if $ret == Rmpfr_sprintf($buf, "For testing: %.30R*f\n", GMP_RNDN, $mpfr1, 60);
@@ -86,13 +95,15 @@ $ret = Rmpfr_printf("$ul", 0);
 if($ret == 3) {$ok .= 'x'}
 else {warn "1x: $ret\n"}
 
-$ret = Rmpfr_fprintf(\*STDOUT, "hello world", 0);
-if($ret == 11) {$ok .= 'y'}
-else {warn "1y: $ret\n"}
+unless($ENV{SISYPHUS_SKIP}) {
+  $ret = Rmpfr_fprintf(\*STDOUT, "hello world", 0);
+  if($ret == 11) {$ok .= 'y'}
+  else {warn "1y: $ret\n"}
 
-$ret = Rmpfr_fprintf(\*STDOUT, "$ul", 0);
-if($ret == 3) {$ok .= 'z'}
-else {warn "1z: $ret\n"}
+  $ret = Rmpfr_fprintf(\*STDOUT, "$ul", 0);
+  if($ret == 3) {$ok .= 'z'}
+  else {warn "1z: $ret\n"}
+}
 
 $ret = Rmpfr_sprintf($buf, "hello world", 0, 15);
 if($ret == 11) {$ok .= 'A'}
@@ -112,7 +123,11 @@ else {
 }
 
 Rmpfr_printf("\n", 0); # Otherwise Test::Harness gets confused
-if($ok eq 'abcdefghijkmnopqrstuvwxyzABCDE') {print "ok 1\n"}
+
+my $expected = $ENV{SISYPHUS_SKIP} ? 'abcghijkmnopqrstuvwxABCDE'
+                                   : 'abcdefghijkmnopqrstuvwxyzABCDE';
+
+if($ok eq $expected) {print "ok 1\n"}
 else {
   warn "got: $ok\n";
   print "not ok 1 $ok\n";
@@ -125,9 +140,11 @@ eval {Rmpfr_printf("%RNd", $mbi);};
 if($@ =~ /Unrecognised object/) {$ok .= 'a'}
 else {warn "2a got: $@\n"}
 
-eval {Rmpfr_fprintf(\*STDOUT, "%RDd", $mbi);};
-if($@ =~ /Unrecognised object/) {$ok .= 'b'}
-else {warn "2b got: $@\n"}
+unless($ENV{SISYPHUS_SKIP}) {
+  eval {Rmpfr_fprintf(\*STDOUT, "%RDd", $mbi);};
+  if($@ =~ /Unrecognised object/) {$ok .= 'b'}
+  else {warn "2b got: $@\n"}
+}
 
 eval {Rmpfr_sprintf($buf, "%RNd", $mbi, 200);};
 if($@ =~ /Unrecognised object/) {$ok .= 'c'}
@@ -140,9 +157,11 @@ else {warn "2c got: $@\n"}
 
 $ok .= 'd';
 
-eval {Rmpfr_fprintf(\*STDOUT, "%R*d", GMP_RNDN, $mbi, $ul);};
-if($@ =~ /must take 3 or 4 arguments/) {$ok .= 'e'}
-else {warn "2e got: $@\n"}
+unless($ENV{SISYPHUS_SKIP}) {
+  eval {Rmpfr_fprintf(\*STDOUT, "%R*d", GMP_RNDN, $mbi, $ul);};
+  if($@ =~ /must take 3 or 4 arguments/) {$ok .= 'e'}
+  else {warn "2e got: $@\n"}
+}
 
 eval {Rmpfr_sprintf($buf, "%R*d", GMP_RNDN, $mbi, $ul, 50);};
 if($@ =~ /must take 4 or 5 arguments/) {$ok .= 'f'}
@@ -152,14 +171,17 @@ eval {Rmpfr_sprintf("%RNd", $mbi);};
 if($@ =~ /must take 4 or 5 arguments/) {$ok .= 'g'}
 else {warn "2g got: $@\n"}
 
-eval {Rmpfr_fprintf(\*STDOUT, "%R*d", 4, $mbi);};
-if(MPFR_VERSION_MAJOR >= 3) {
-  if($@ =~ /Unrecognised object supplied/) {$ok .= 'h'}
-  else {warn "2h got: $@\n"}
-}
-else {
-  if($@ =~ /Invalid 3rd argument/) {$ok .= 'h'}
-  else {warn "2h got: $@\n"}
+
+unless($ENV{SISYPHUS_SKIP}) {
+  eval {Rmpfr_fprintf(\*STDOUT, "%R*d", 4, $mbi);};
+  if(MPFR_VERSION_MAJOR >= 3) {
+    if($@ =~ /Unrecognised object supplied/) {$ok .= 'h'}
+    else {warn "2h got: $@\n"}
+  }
+  else {
+    if($@ =~ /Invalid 3rd argument/) {$ok .= 'h'}
+    else {warn "2h got: $@\n"}
+  }
 }
 
 eval {Rmpfr_sprintf("%R*d", 4, $mbi, 50);};
@@ -185,7 +207,10 @@ else {
   else {warn "2j got: $@\n"}
 }
 
-if($ok eq 'abcdefghij') {print "ok 2\n"}
+$expected = $ENV{SISYPHUS_SKIP} ? 'acdfgij'
+                                : 'abcdefghij';
+
+if($ok eq $expected) {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 
 
@@ -237,9 +262,11 @@ else {
 
 $ok = '';
 
-eval{Rmpfr_fprintf(\*STDOUT, "%Pu\n", GMP_RNDN, 123);};
-if($@ =~ /In Rmpfr_fprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'a'}
-else {warn "\n5a: \$\@: $@\n"}
+unless($ENV{SISYPHUS_SKIP}) {
+  eval{Rmpfr_fprintf(\*STDOUT, "%Pu\n", GMP_RNDN, 123);};
+  if($@ =~ /In Rmpfr_fprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'a'}
+  else {warn "\n5a: \$\@: $@\n"}
+}
 
 eval{Rmpfr_sprintf ($buf, "%Pu\n", GMP_RNDN, 123, 100);};
 if($@ =~ /In Rmpfr_sprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'b'}
@@ -249,7 +276,9 @@ eval{Rmpfr_snprintf ($buf, 10, "%Pu\n", GMP_RNDN, 123, 100);};
 if($@ =~ /In Rmpfr_snprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'c'}
 else {warn "\n5c: \$\@: $@\n"}
 
-if($ok eq 'abc') {print "ok 5\n"}
+$expected = $ENV{SISYPHUS_SKIP} ? 'bc'
+                                : 'abc';
+if($ok eq $expected) {print "ok 5\n"}
 else {
   warn "5: \$ok: $ok\n";
   print "not ok 5\n";

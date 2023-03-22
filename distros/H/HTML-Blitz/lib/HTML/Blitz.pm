@@ -44,7 +44,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use overload ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 method new($class: @rules) {
     my $self = bless {
@@ -729,6 +729,10 @@ method apply_to_file($file) {
 
 1
 __END__
+
+=encoding utf8
+
+=for github-markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
 
 =head1 NAME
 
@@ -1854,6 +1858,8 @@ C<$filename> (which must be UTF-8 encoded) and calls C<apply_to_html($filename, 
 
 =head1 EXAMPLES
 
+=head2 Basic variables and lists/repetition
+
 The following is a complete program:
 
     use strict;
@@ -1945,6 +1951,96 @@ It produces the following output:
         </body>
     </html>
 
+=head2 Hashing inline scripts for Content-Security-Policy (CSP)
+
+If you want to protect against JavaScript code injection (also known as
+cross-site scripting or XSS), the first step is to properly escape all user
+input that is presented on a web page. HTML::Blitz aims to make this easy (by
+making it hard to interpolate raw HTML strings into a template).
+
+A second layer of defense is available in the form of the
+L<Content-Security-Policy
+(CSP)|https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP> HTTP response
+header. This header gives a web site fine-grained control over which sources a
+browser is allowed to load resources (including script code) from. In
+particular, for inline scripts (i.e. those embedded in HTML within
+C<< <script>...</script> >> tags) their L<SHA-2-based
+hashes|https://en.wikipedia.org/wiki/SHA-2> can be added to the
+CSP header. Any other scripts (such as those injected by an attacker) will not
+be executed by the browser, thwarting any XSS attempts.
+
+HTML::Blitz can be used to automatically extract and hash any script code
+embedded in templates. That way you can automatically compute a tailored CSP
+value.
+
+Sample HTML template code:
+
+=for highlighter language=html
+
+    <!doctype html>
+    <head>
+        <style>
+            #big-red-button {
+                color: white;
+                background-color: red;
+                font-size: larger;
+            }
+        </style>
+        <script>
+            console.log("Hello from the browser console");
+        </script>
+    </head>
+    <body>
+        <h1>CSP Example</h1>
+        <button id="big-red-button">Click me!</button>
+        <script>
+            document.getElementById('big-red-button').onclick = function () {
+                alert("Hello!");
+            };
+        </script>
+    </body>
+
+And the corresponding Perl code:
+
+=for highlighter language=perl
+
+    use strict;
+    use warnings;
+    use HTML::Blitz;
+    use Digest::SHA qw(sha256_base64);
+
+    # Digest::SHA generates unpadded base64, but CSP requires padding on all
+    # base64 strings. This function adds the required padding.
+    sub sha256_base64_padded {
+        my ($data) = @_;
+        my $hash = sha256_base64 $data;
+        $hash . '=' x (-length($hash) % 4)
+    }
+
+    # Returns the script code unchanged, but (as a side effect) adds its
+    # SHA-256 hash to the %seen_script_hashes variable.
+    my %seen_script_hashes;
+    my $add_hash = sub {
+        my ($script) = @_;
+        $seen_script_hashes{sha256_base64_padded $script} = 1;
+        $script
+    };
+
+    my $blitz = HTML::Blitz->new(
+        # hash the contents of all <script> tags without a src attribute
+        [ 'script:not([src])', [ transform_inner_sub => $add_hash ] ],
+        # ... other rules ...
+    );
+
+    my $html = $blitz->apply_to_file('scripts.html')->process();
+
+    my @hashes = sort keys %seen_script_hashes;
+    my $csp = "script-src " . (@hashes ? join(' ', map "'sha256-$_'", @hashes) : "'none'");
+    # Now you can set a response header of
+    #   Content-Security-Policy: $csp
+    # (and a response body of $html) and be sure that only scripts from the
+    # original template file will execute.
+
 =head1 RATIONALE
 
 (I.e. why does this module exist?)
@@ -1996,32 +2092,49 @@ consisting only of string constants, variables, calls to C<encode_entities>
 hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems (L<HTML::Blitz>, L<HTML::Zoom>,
-L<Template::Toolkit>) as well as L<HTML::Blitz::Builder>, which is rather the
-opposite of a template system.
+L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Pro>,
+L<Mojo::Template>, L<Text::Xslate>) as well as L<HTML::Blitz::Builder>, which
+is rather the opposite of a template system.
 
 Results:
 
 =over
 
-=item baseline
+=item L<Text::Xslate> v3.5.9
 
-457/s (0.0022s per iteration), 100% (of baseline performance, the theoretical maximum)
+1375/s (0.0007s per iteration), 380.9%
 
-=item HTML::Blitz
+=item L<HTML::Blitz> 0.06
 
-392/s (0.0026s per iteration), 85.8%
+678/s (0.0015s per iteration), 187.8%
 
-=item Template::Toolkit
+=item L<HTML::Template::Pro> 0.9524
 
-48.0/s (0.0208s per iteration), 10.5%
+653/s (0.0015s per iteration), 180.9%
 
-=item HTML::Blitz::Builder
+=item L<Mojo::Template> 9.31
 
-40.8/s (0.0245s per iteration), 8.9%
+463/s (0.0022s per iteration), 128.3%
 
-=item HTML::Zoom
+=item handwritten
 
-1.39/s (0.7194s per iteration), 0.3%
+361/s (0.0028s per iteration), 100.0%
+
+=item L<Template::Toolkit> 3.101
+
+38.6/s (0.0259s per iteration), 10.7%
+
+=item L<HTML::Template> 2.97
+
+33.5/s (0.0299s per iteration), 9.3%
+
+=item L<HTML::Blitz::Builder> 0.06
+
+32.9/s (0.0304s per iteration), 9.1%
+
+=item L<HTML::Zoom> 0.009009
+
+1.24/s (0.8065s per iteration), 0.3%
 
 =back
 
@@ -2042,8 +2155,27 @@ L<HTML::Zoom> by a factor of 200 or 300. A dataset that might take HTML::Blitz
 
 =item *
 
-HTML::Blitz is competitive with hand-written code that sacrifices all semblance
-of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
+HTML::Blitz and L<Mojo::Template> are faster than hand-written code. This is
+probably because the hand-written code appends each line separately to the
+output string and escapes each template parameter by calling
+L<C<HTML::Entities::encode_entities>|HTML::Entities/encode_entities( $string )>
+– whereas HTML::Blitz and L<Mojo::Template> fold all adjacent constant HTML
+pieces into one big string in advance and use their own optimized HTML escape
+routine.
+
+=item *
+
+HTML::Blitz can, depending on your workload, run faster than
+L<HTML::Template::Pro>, which is written in C for speed.
+
+=item *
+
+In this comparison, the only system that beats HTML::Blitz in terms of raw
+speed is the XS version of L<Text::Xslate> (by a factor of about 2). The only
+downsides are that it requires a C compiler and pulls in an entire object
+system as a dependency (L<Mouse>). (Without a C compiler it will still run, but
+the performance of its pure Perl backend is not competitive, reaching only
+about two thirds of the speed of L<HTML::Blitz::Builder>.)
 
 =back
 

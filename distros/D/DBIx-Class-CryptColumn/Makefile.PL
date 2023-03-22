@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Class-CryptColumn",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "DBIx::Class::CryptColumn",
   "PREREQ_PM" => {
     "Crypt::Passphrase" => "0.007",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.89",
     "lib" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

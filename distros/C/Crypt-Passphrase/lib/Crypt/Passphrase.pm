@@ -1,5 +1,5 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.010';
+$Crypt::Passphrase::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -114,7 +114,6 @@ sub hash_password {
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	return 1 if $hash !~ / \A \$ ([^\$]+) \$ /x;
 	return $self->{encoder}->needs_rehash($hash);
 }
 
@@ -159,7 +158,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 

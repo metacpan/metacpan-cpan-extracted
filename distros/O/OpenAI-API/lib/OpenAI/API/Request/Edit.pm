@@ -42,6 +42,8 @@ OpenAI::API::Request::Edit - edits endpoint
 
     my $res = $request->send();
 
+    my $text = $res->{choices}[0]{text};
+
 =head1 DESCRIPTION
 
 Creates a new edit for the provided input, instruction, and parameters.
@@ -79,6 +81,17 @@ An alternative to sampling with temperature.
 
 =back
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
+=head2 send_async()
+
+Send a request asynchronously. Returns a L<Promises> promise that will
+be resolved with the decoded JSON response. See L<OpenAI::API::Request>
+for an example.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Edits|https://platform.openai.com/docs/api-reference/edits>
+OpenAI API Reference: L<Edits|https://platform.openai.com/docs/api-reference/edits>

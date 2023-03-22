@@ -289,21 +289,8 @@ sub alias {
     #   Subquery column: optional
     #
     #   Function column: optional
-
+    #
     my ( $sf, $sql, $type, $identifier, $default ) = @_;
-    if ( ! $sf->{o}{alias}{use_defaults} && $type !~ /^(?:join|union|derived_table)\z/ ) {
-        $default = undef;
-    }
-    if ( defined $default ) {
-        if ( $sf->{i}{driver} eq 'Pg' ) {
-            $default = lc $default; ##
-        }
-        if ( ! $sf->{o}{G}{quote_identifiers} ) {
-            $default =~ s/\W/_/g;
-            $default =~ s/\ /_/g;
-            $default =~ s/_+\z//;
-        }
-    }
     my $prompt = 'AS ';
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {
@@ -312,7 +299,7 @@ sub alias {
         # Readline
         $alias = $tr->readline(
             $prompt,
-            { info => $info, default => $default }
+            { info => $info }
         );
         $sf->print_sql_info( $info );
     }
@@ -567,6 +554,38 @@ sub read_json {
         }
     }
 ###############################################################
+
+
+############################################################### 2.321  21.03.2023
+    if ( $file_fs eq ( $sf->{i}{f_settings} // '' ) ) {
+        my $changed;
+        if ( exists $ref->{alias}{'select'} ) {
+            if ( ! defined $ref->{alias}{'select_func_sq'} ) {
+                $ref->{alias}{'select_func_sq'} = $ref->{alias}{'select'};
+            }
+            delete $ref->{alias}{'select'};
+            $changed++;
+        }
+        if ( exists $ref->{alias}{'aggregate'} ) {
+            if ( ! defined $ref->{alias}{'select_func_sq'} ) {
+                $ref->{alias}{'select_func_sq'} = $ref->{alias}{'aggregate'};
+            }
+            delete $ref->{alias}{'aggregate'};
+            $changed++;
+        }
+        if ( exists $ref->{alias}{'use_defaults'} ) {
+            delete $ref->{alias}{'use_defaults'};
+            $changed++;
+        }
+        if ( $changed ) {
+            $sf->write_json( $sf->{i}{f_settings}, $ref );
+        }
+    }
+###############################################################
+
+
+
+
 
     return $ref;
 }

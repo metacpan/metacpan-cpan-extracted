@@ -5,14 +5,18 @@ author:
   - 'Timothy Legge <timlegge@cpan.org>'
 build_requires:
   Crypt::OpenSSL::Guess: '0'
+  Exporter: '0'
   File::Spec::Functions: '0'
   File::Which: '0'
+  Import::Into: '0'
   Test::Exception: '0'
+  Test::Lib: '0'
   Test::More: '0'
+  namespace::autoclean: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +25,7 @@ name: XML-Sig
 provides:
   XML::Sig:
     file: lib/XML/Sig.pm
-    version: '0.59'
+    version: '0.63'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -46,7 +50,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Sig/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Sig.git
-version: '0.59'
+version: '0.63'
 x_contributors:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Chris Andrews <chris@nodnol.org>'

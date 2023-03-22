@@ -1,5 +1,5 @@
 
-use Test::More tests => 20;
+use Test::More tests => 24;
 
 use lib 'lib';
 
@@ -25,6 +25,9 @@ is( scalar(@{$records->[5]}), 3, "record 5 array has 3 keys");
 is( scalar(@{$records->[6]}), 4, "record 6 array has 4 keys");
 is( scalar(@{$records->[7]}), 4, "record 7 array has 4 keys");
 
+like( $records->[3]->[0], qr/^D1 /, "record sample: D1");
+like( $records->[3]->[2], qr/^D3/, "record sample: D3");
+like( $records->[3]->[4], qr/^D5 /, "record sample: D5");
 
 
 $nsr = Text::NSR->new(filepath => 't/test.nsr', fieldspec => ['f1','f2','f3','f4'] );
@@ -42,4 +45,7 @@ is( scalar(keys %{$records->[4]}), 4, "record 4 hash has 4 keys");
 is( scalar(keys %{$records->[5]}), 3, "record 5 hash has 3 keys");
 is( scalar(keys %{$records->[6]}), 4, "record 6 hash has 4 keys");
 is( scalar(keys %{$records->[7]}), 4, "record 7 hash has 4 keys");
+
+is( index($records->[7]->{f1}, "\n"), 27, "Literal newline converted?");
+
 

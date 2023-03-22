@@ -1,5 +1,11 @@
 Revision history for URL-Search
 
+0.06      2023-03-20
+          - drop support for ftp: and ftps: URLs because current browsers don't
+            speak FTP anymore
+          - switch from Test::More to Test2::V0
+          - switch to a version number that's less crazy
+
 0.000005  2017-09-09
           - allow unescaped { } \ in query strings (apparently Pale Moon does
             this)

@@ -1,5 +1,16 @@
 Revision history for OpenAI-API
 
+0.31    2023-03-21
+        Document method send_async.
+
+0.30    2023-03-20
+        Implement method send_async.
+        Refactor configuration.
+
+0.28    2023-03-18
+        Asynchronous requests with AnyEvent and Promises.
+        Improve documentation examples (synopsis).
+
 0.27    2023-03-13
         Bugfix.
 
@@ -8,8 +19,6 @@ Revision history for OpenAI-API
 
 0.25    2023-03-09
         Add images and files endpoints. Refactor.
-
-0.24    2023-03-09
         Refactor with ResourceDispatcherRole.
 
 0.23    2023-03-08
@@ -17,23 +26,15 @@ Revision history for OpenAI-API
 
 0.22    2023-03-04
         Refactor endpoint / api_base parameters.
-
-0.21    2023-03-04
         Implement retry with sleep.
-
-0.20    2023-03-04
         Fix timeout.
 
 0.19    2023-03-03
         Update documentation.
-
-0.18    2023-03-03
         Add timeout parameter.
 
 0.17    2023-03-02
         Add github links to Makefile.PL
-
-0.16    2023-03-02
         Update documentation.
 
 0.15    2023-03-01
@@ -44,8 +45,6 @@ Revision history for OpenAI-API
 
 0.13    2023-02-27
         OpenAI::API::Request::* modules
-
-0.12    2023-02-27
         Require defined OPENAI_API_KEY.
 
 0.11    2023-02-24
@@ -53,11 +52,7 @@ Revision history for OpenAI-API
 
 0.10    2023-02-22
         Improve documentation.
-
-0.09    2023-02-22
         Minor changes, improve documentation.
-
-0.08    2023-02-22
         New methods, update documentation and tests.
 
 0.07    2023-01-03
@@ -65,8 +60,6 @@ Revision history for OpenAI-API
 
 0.03    2022-12-20
         Minor changes; more tests.
-
-0.02    2022-12-20
         Update README.
 
 0.01    2022-12-16

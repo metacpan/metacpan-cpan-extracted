@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,10 +34,10 @@ no_index:
 provides:
   Database::Async::Engine::PostgreSQL:
     file: lib/Database/Async/Engine/PostgreSQL.pm
-    version: '1.001'
+    version: '1.002'
   Database::Async::Engine::PostgreSQL::DDL:
     file: lib/Database/Async/Engine/PostgreSQL/DDL.pm
-    version: '1.001'
+    version: '1.002'
 requires:
   Bytes::Random::Secure: '0'
   Config::Tiny: '0'
@@ -51,6 +51,7 @@ requires:
   MIME::Base64: '0'
   Path::Tiny: '0'
   Protocol::Database::PostgreSQL: '2.000'
+  Ryu: '3.004'
   Ryu::Async: '0.017'
   Syntax::Keyword::Try: '0.25'
   Template: '2.28'
@@ -64,12 +65,13 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues
   homepage: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL
   repository: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git
-version: '1.001'
+version: '1.002'
 x_authority: cpan:TEAM
 x_contributors:
-  - 'Arash <arashThr@outlook.com>'
-  - 'Tom M <tom@audioboundary.com>'
   - 'Torsten Foertsch <torsten@binary.com>'
+  - 'Arash <arashThr@outlook.com>'
+  - 'maryam-deriv <71321691+maryam-deriv@users.noreply.github.com>'
+  - 'Tom M <tom@audioboundary.com>'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

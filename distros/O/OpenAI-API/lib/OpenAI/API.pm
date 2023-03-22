@@ -3,17 +3,58 @@ package OpenAI::API;
 use strict;
 use warnings;
 
-use Carp qw/croak/;
+use Carp ();
 
-use Moo;
-use strictures 2;
-use namespace::clean;
+use OpenAI::API::Config;
 
-with 'OpenAI::API::ConfigurationRole';
-with 'OpenAI::API::UserAgentRole';
-with 'OpenAI::API::RequestDispatcherRole';
+our $VERSION = 0.31;
 
-our $VERSION = 0.27;
+BEGIN {
+    my %module_dispatcher = (
+        chat           => 'OpenAI::API::Request::Chat',
+        completions    => 'OpenAI::API::Request::Completion',
+        edits          => 'OpenAI::API::Request::Edit',
+        embeddings     => 'OpenAI::API::Request::Embedding',
+        files          => 'OpenAI::API::Request::File::List',
+        file_retrieve  => 'OpenAI::API::Request::File::Retrieve',
+        image_create   => 'OpenAI::API::Request::Image::Generation',
+        models         => 'OpenAI::API::Request::Model::List',
+        model_retrieve => 'OpenAI::API::Request::Model::Retrieve',
+        moderations    => 'OpenAI::API::Request::Moderation',
+    );
+
+    for my $sub_name ( keys %module_dispatcher ) {
+        my $module = $module_dispatcher{$sub_name};
+
+        eval "require $module" or die $@;
+
+        no strict 'refs';
+        *{"$sub_name"} = sub {
+            my ( $self, %params ) = @_;
+            my $request = $module->new( %params, config => $self->config );
+            return $request->send();
+        };
+    }
+}
+
+sub new {
+    my $class = shift;
+
+    my %param = ref $_[0] ? %{ $_[0] } : @_;
+
+    my $self = bless \%param, ref $class || $class;
+
+    $self->{config} = OpenAI::API::Config->new(%param);
+
+    return $self;
+}
+
+sub config {
+    my ( $self, %param ) = @_;
+    return $self->{config};
+}
+
+1;
 
 __END__
 
@@ -26,21 +67,36 @@ OpenAI::API - Perl interface to OpenAI API
 =head1 SYNOPSIS
 
     use OpenAI::API;
-    use OpenAI::API::Request::Chat;
 
-    my $config = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
+    my $openai = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
+
+    my $res = $openai->chat(
+        model    => "gpt-3.5-turbo",
+        messages => [
+            { "role" => "system",    "content" => "You are a helpful assistant." },
+            { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
+            { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
+            { "role" => "user",      "content" => "How do I use this module?" },
+        ],
+    );
+
+    # that's roughly the same as:
+
+    use OpenAI::API::Request::Chat;
 
     my $request = OpenAI::API::Request::Chat->new(
         model    => "gpt-3.5-turbo",
         messages => [
             { "role" => "system",    "content" => "You are a helpful assistant." },
-            { "role" => "user",      "content" => "Who won the world series in 2020?" },
-            { "role" => "assistant", "content" => "The Los Angeles Dodgers won the World Series in 2020." },
-            { "role" => "user",      "content" => "Where was it played?" }
+            { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
+            { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
+            { "role" => "user",      "content" => "How do I use this module?" },
         ],
     );
 
-    my $res = $request->send($config);
+    my $res = $request->send();
+
+    my $message = $res->{choices}[0]{message};
 
 =head1 DESCRIPTION
 
@@ -88,9 +144,18 @@ perldoc command.
 
 =head1 METHODS
 
+OpenAI::API acts as a high-level interface for the OpenAI API, handling
+different actions while utilizing the configuration class.
+
 =head2 new()
 
 Creates a new OpenAI::API object.
+
+=over 4
+
+=item * config [optional]
+
+An OpenAI::API::Config object including the following properties:
 
 =over 4
 
@@ -112,6 +177,48 @@ The api_base URL for the OpenAI API. Default: 'https://api.openai.com/v1/'.
 The timeout value, in seconds. Default: 60 seconds.
 
 =back
+
+=back
+
+=head2 chat()
+
+L<Chat|OpenAI::API::Request::Chat> request.
+
+=head2 completions()
+
+L<Completion|OpenAI::API::Request::Completion> request.
+
+=head2 edits()
+
+L<Edit|OpenAI::API::Request::Edit> request.
+
+=head2 embeddings()
+
+L<Embedding|OpenAI::API::Request::Embedding> request.
+
+=head2 files()
+
+L<File List|OpenAI::API::Request::File::List> request.
+
+=head2 file_retrieve()
+
+L<File Retrieve|OpenAI::API::Request::File::Retrieve> request.
+
+=head2 image_create()
+
+L<Image Generation|OpenAI::API::Request::Image::Generation> request.
+
+=head2 models()
+
+L<Model List|OpenAI::API::Request::Model::List> request.
+
+=head2 model_retrieve()
+
+L<Model Retrieve|OpenAI::API::Request::Model::Retrieve> request.
+
+=head2 moderations()
+
+L<Moderation|OpenAI::API::Request::Moderation> request.
 
 =head1 RESOURCES
 

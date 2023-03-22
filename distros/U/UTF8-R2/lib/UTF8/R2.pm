@@ -5,13 +5,13 @@ package UTF8::R2;
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
-# Copyright (c) 2019, 2020, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.26';
+$VERSION = '0.27';
 $VERSION = $VERSION;
 
 use strict;
@@ -1121,23 +1121,41 @@ This software has the following features
 
 =over 2
 
-=item * supports UTF-8 literals of Perl scripts
+=item *
 
-=item * supports UTF-8(RFC3629), UTF-8(RFC2279), WTF8, RFC3629.ja_JP, and WTF8.ja_JP
+supports UTF-8 literals of Perl scripts
 
-=item * does not use the UTF8 flag to avoid MOJIBAKE
+=item *
 
-=item * handles raw encoding to support GAIJI
+supports UTF-8(RFC3629), UTF-8(RFC2279), WTF8, RFC3629.ja_JP, and WTF8.ja_JP
 
-=item * supports codepoint classes in regular expressions to work as UTF-8 codepoint
+=item *
 
-=item * does not change features of octet-oriented built-in functions
+does not use the UTF8 flag to avoid MOJIBAKE
 
-=item * You have using mb::* subroutines if you want codepoint semantics
+=item *
 
-=item * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
+handles raw encoding to support GAIJI
 
-=item * codepoint range by hyphen of mb::tr() supports US-ASCII only
+=item *
+
+supports codepoint classes in regular expressions to work as UTF-8 codepoint
+
+=item *
+
+does not change features of octet-oriented built-in functions
+
+=item *
+
+You have using mb::* subroutines if you want codepoint semantics
+
+=item *
+
+lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
+
+=item *
+
+codepoint range by hyphen of mb::tr() supports US-ASCII only
 
 =back
 
@@ -1160,13 +1178,21 @@ L<https://www.ietf.org/rfc/rfc2279.txt>
 
 =over 2
 
-=item * needs no multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd-4th octets
+needs no multibyte anchoring
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+=item *
 
-=item * allows encoding surrogate codepoints even if it is not pair
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+allows encoding surrogate codepoints even if it is not pair
 
 =back
 
@@ -1190,13 +1216,21 @@ L<https://en.wikipedia.org/wiki/UTF-8>
 
 =over 2
 
-=item * needs no multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd-4th octets
+needs no multibyte anchoring
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+=item *
 
-=item * enforces surrogate codepoints must be paired
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+enforces surrogate codepoints must be paired
 
 =back
 
@@ -1218,13 +1252,21 @@ L<http://simonsapin.github.io/wtf-8/>
 
 =over 2
 
-=item * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+=item *
 
-=item * needs no multibyte anchoring
+superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
 
-=item * needs no escaping meta char of 2nd-4th octets
+=item *
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+needs no multibyte anchoring
+
+=item *
+
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
 
 =back
 
@@ -1248,15 +1290,25 @@ L<https://en.wikipedia.org/wiki/UTF-8>
 
 =over 2
 
-=item * needs no multibyte anchoring
+=item *
 
-=item * needs no escaping meta char of 2nd-4th octets
+needs no multibyte anchoring
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+=item *
 
-=item * enforces surrogate codepoints must be paired
+needs no escaping meta char of 2nd-4th octets
 
-=item * optimized for ja_JP
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+enforces surrogate codepoints must be paired
+
+=item *
+
+optimized for ja_JP
 
 =back
 
@@ -1278,15 +1330,25 @@ L<http://simonsapin.github.io/wtf-8/>
 
 =over 2
 
-=item * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+=item *
 
-=item * needs no multibyte anchoring
+superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
 
-=item * needs no escaping meta char of 2nd-4th octets
+=item *
 
-=item * safe US-ASCII casefolding of 2nd-4th octet
+needs no multibyte anchoring
 
-=item * optimized for ja_JP
+=item *
+
+needs no escaping meta char of 2nd-4th octets
+
+=item *
+
+safe US-ASCII casefolding of 2nd-4th octet
+
+=item *
+
+optimized for ja_JP
 
 =back
 
@@ -1561,11 +1623,17 @@ The typical input/output flow of a program is:
 
 =over 2
 
-=item 1. Receive and decode
+=item 1
 
-=item 2. Process
+Receive and decode
 
-=item 3. Encode and output
+=item 2
+
+Process
+
+=item 3
+
+Encode and output
 
 =back
 
@@ -1610,9 +1678,13 @@ It's following two meanings:
 
 =over 2
 
-=item * Non-Text string
+=item *
 
-=item * Digital octet string
+Non-Text string
+
+=item *
+
+Digital octet string
 
 =back
 
@@ -1633,11 +1705,17 @@ Perl 5.8's string model will not be accepted by common people.
 
 =over 2
 
-=item * Information processing model of UNIX/C-ism
+=item *
 
-=item * Information processing model of perl3 or later
+Information processing model of UNIX/C-ism
 
-=item * Information processing model of this software
+=item *
+
+Information processing model of perl3 or later
+
+=item *
+
+Information processing model of this software
 
 =back
 
@@ -1652,9 +1730,13 @@ In UNIX Everything is a File
 
 =over 2
 
-=item * In UNIX everything is a stream of bytes
+=item *
 
-=item * In UNIX the filesystem is used as a universal name space
+In UNIX everything is a stream of bytes
+
+=item *
+
+In UNIX the filesystem is used as a universal name space
 
 =back
 
@@ -1662,19 +1744,33 @@ Native Encoding Scripting is ...
 
 =over 2
 
-=item * native encoding of file contents
+=item *
 
-=item * native encoding of file name on filesystem
+native encoding of file contents
 
-=item * native encoding of command line
+=item *
 
-=item * native encoding of environment variable
+native encoding of file name on filesystem
 
-=item * native encoding of API
+=item *
 
-=item * native encoding of network packet
+native encoding of command line
 
-=item * native encoding of database
+=item *
+
+native encoding of environment variable
+
+=item *
+
+native encoding of API
+
+=item *
+
+native encoding of network packet
+
+=item *
+
+native encoding of database
 
 =back
 
@@ -1682,13 +1778,17 @@ Ideally, We'd like to achieve these five Goals:
 
 =over 2
 
-=item * Goal #1:
+=item *
+
+Goal #1:
 
 Old byte-oriented programs should not spontaneously break on the old byte-oriented data they used to work on.
 
 This software attempts to achieve this goal by embedded functions work as traditional and stably.
 
-=item * Goal #2:
+=item *
+
+Goal #2:
 
 Old byte-oriented programs should magically start working on the new character-oriented data when appropriate.
 
@@ -1728,7 +1828,9 @@ There is a combination from (a) to (e) in data, script, and interpreter of old a
 The reason why JPerl is very excellent is that it is at the position of (c).
 That is, it is almost not necessary to write a special code to process new codepoint oriented script.
 
-=item * Goal #3:
+=item *
+
+Goal #3:
 
 Programs should run just as fast in the new character-oriented mode as in the old byte-oriented mode.
 
@@ -1736,7 +1838,9 @@ It is impossible. Because the following time is necessary.
 
 (1) Time of processing class of codepoint in regular expression
 
-=item * Goal #4:
+=item *
+
+Goal #4:
 
 Perl should remain one language, rather than forking into a byte-oriented Perl and a character-oriented Perl.
 
@@ -1751,7 +1855,9 @@ And you will get support from the Perl community, when you solve the problem by 
 
 UTF8::R2 module remains one "language" and one "interpreter."
 
-=item * Goal #5:
+=item *
+
+Goal #5:
 
 UTF8::R2 users will be able to maintain UTF8::R2 by Perl.
 
@@ -1850,15 +1956,25 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * supports many MBCS encodings, Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
+=item *
 
-=item * JPerl-like syntax that supports "easy jobs must be easy"
+supports many MBCS encodings, Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
 
-=item * regexp ("m//", "qr//", and "s///") works as codepoint
+=item *
 
-=item * "split()" works as codepoint
+JPerl-like syntax that supports "easy jobs must be easy"
 
-=item * "tr///" works as codepoint
+=item *
+
+regexp ("m//", "qr//", and "s///") works as codepoint
+
+=item *
+
+"split()" works as codepoint
+
+=item *
+
+"tr///" works as codepoint
 
 =back
 
@@ -1866,9 +1982,13 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * have to type "perl mb.pm your_script.pl ..." on command line everytime
+=item *
 
-=item * have obtrusive files(your_script.oo.pl)
+have to type "perl mb.pm your_script.pl ..." on command line everytime
+
+=item *
+
+have obtrusive files(your_script.oo.pl)
 
 =back
 
@@ -1876,9 +1996,13 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * type only "perl your_script.pl ..." on command line
+=item *
 
-=item * no obtrusive files(your_script.oo.pl)
+type only "perl your_script.pl ..." on command line
+
+=item *
+
+no obtrusive files(your_script.oo.pl)
 
 =back
 
@@ -1886,17 +2010,84 @@ We can use each advantages using following hints.
 
 =over 2
 
-=item * supports only UTF-8 encoding
+=item *
 
-=item * have to write "$mb{qr/regexp/imsxo}" to do "m/regexp/imsxo" that works as codepoint
+supports only UTF-8 encoding
 
-=item * have to write "m<\G$mb{qr/regexp/imsxo}>gc" to do "m/regexp/imsxogc" that works as codepoint
+=item *
 
-=item * have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
+have to write "$mb{qr/regexp/imsxo}" to do "m/regexp/imsxo" that works as codepoint
 
-=item * have to write "mb::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+=item *
 
-=item * have to write "mb::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+have to write "m<\G$mb{qr/regexp/imsxo}>gc" to do "m/regexp/imsxogc" that works as codepoint
+
+=item *
+
+have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
+
+=item *
+
+have to write "mb::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+
+=item *
+
+have to write "mb::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+
+=back
+
+=head1 GIVE US BUG REPORT
+
+I have tested and verified this software using the best of my ability.
+However, this software containing much regular expression is bound to contain some bugs.
+Thus, if you happen to find a bug that's in this software and not your own program, you can try to reduce it to a minimal test case and then report it to author's address.
+If you have an idea that could make this a more useful tool, please let share it.
+
+=head1 How To Update This Distribution
+
+Someday all authors of UTF8::R2 module may get run over by a bus.
+
+So we write here how to update this distribution for you.
+
+We wish you good luck.
+
+=over 2
+
+=item 1
+
+(MUST) update file "UTF8/R2.pm"
+
+=item 2
+
+(MUST) update $VERSION of file "UTF8/R2.pm"
+
+=item 3
+
+(MUST) append to change log to file "Changes"
+
+=item 4
+
+(if you need) update file "README"
+
+=item 5
+
+(if you need) update or add files "t/*.t"
+
+=item 6
+
+(if you need) update file "MANIFEST"
+
+=item 7
+
+repeat command: pmake test [Enter] until all tests PASS
+
+=item 8
+
+type command: pmake dist [Enter]
+
+=item 9
+
+upload *.tar.gz to PAUSE(The [Perl programming] Authors Upload Server)
 
 =back
 

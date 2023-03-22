@@ -8,7 +8,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Version 0.17
     </p>
 </div>
 
-如果你想翻译整个文本，使用**--match-entire**选项。这是指定模式匹配整个文本的捷径，`(?s).*`。
+如果你想翻译整个文本，使用**--match-all**选项。这是指定模式匹配整个文本的捷径，`(?s).+`。
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Version 0.17
 
     在STDERR输出中可以看到实时的翻译结果。
 
-- **--match-entire**
+- **--match-all**
 
     将文件的整个文本设置为目标区域。
 

@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::Syslog;
 
 # ABSTRACT: Send Log::Any logs to syslog
-our $VERSION = '1.713';
+our $VERSION = '1.714';
 
 use Log::Any::Adapter::Util qw{make_method};
 use base qw{Log::Any::Adapter::Base};
@@ -70,9 +70,10 @@ sub init {
     }
 
     # We want to avoid re-opening the syslog unnecessarily, so only do it if
-    # the parameters have changed.
+    # the parameters have changed or if we don't think Sys::Syslog has
+    # opened a log yet.
     my $new_params = $self->_log_params;
-    if ((not defined $log_params) or ($log_params ne $new_params)) {
+    if ((not defined $log_params) or ($log_params ne $new_params) or (not $Sys::Syslog::facility)) {
 
         $log_params = $new_params;
         openlog($self->{name}, $self->{options}, $self->{facility});
@@ -112,6 +113,15 @@ foreach my $method (Log::Any->logging_methods()) {
         return if $logging_levels{$method} <
                 $logging_levels{$self->{log_level}};
 
+        # Bad libraries may call Sys::Syslog::closelog() out from under
+        # us. If so, we should re-open the log with our desired
+        # parameters. We likely cannot protect against someone calling
+        # closelog() from outside Perl, but we could include an adaptor
+        # flag that calls openlog()/closelog() with every message if the
+        # program deems it necessary...
+        if (( not defined $Sys::Syslog::facility ) or ( $Sys::Syslog::facility ne $self->{facility} )) {
+          openlog($self->{name}, $self->{options}, $self->{facility});
+        }
         syslog($priority, join('', @_))
     });
 }
@@ -141,7 +151,7 @@ Log::Any::Adapter::Syslog - Send Log::Any logs to syslog
 
 =head1 VERSION
 
-version 1.713
+version 1.714
 
 =head1 SYNOPSIS
 

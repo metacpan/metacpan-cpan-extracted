@@ -13,7 +13,7 @@ use HTML::Blitz::TokenType qw(
     TT_DOCTYPE
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 method _fail(
     $msg,
@@ -398,6 +398,7 @@ method parse() {
         };
     }
 
+    # uncoverable statement
     die "Internal error: unparsable input '${\substr $$src_ref, pos($$src_ref), 10}'...";
 }
 

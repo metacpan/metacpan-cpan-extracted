@@ -1,5 +1,5 @@
 package Crypt::Passphrase::SHA1::Hex;
-$Crypt::Passphrase::SHA1::Hex::VERSION = '0.010';
+$Crypt::Passphrase::SHA1::Hex::VERSION = '0.012';
 use Crypt::Passphrase -validator;
 
 use Digest::SHA 'sha1_hex';
@@ -35,7 +35,7 @@ Crypt::Passphrase::SHA1::Hex - Validate against hexed SHA1 hashes with Crypt::Pa
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 DESCRIPTION
 

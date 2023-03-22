@@ -1,7 +1,5 @@
 <clacks>
     <appname>Clacks Master</appname>
-    <ip>127.0.0.1</ip>
-    <port>49888</port>
 
     <!-- This is the magic that makes Unix domain sockets possible
          In most (is not all) cases, you should use absolute paths.
@@ -17,20 +15,10 @@
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>60</interclackspingtimeout>
     <persistancefile>clackspersistance.dat</persistancefile>
-    <ssl>
-        <cert>exampleserver.crt</cert>
-        <key>exampleserver.key</key>
-    </ssl>
     <username>exampleuser</username>
     <password>unsafepassword</password>
     <throttle>
         <maxsleep>100</maxsleep>
         <step>5</step>
     </throttle>
-    <hosts>
-        <developmentbox>
-            <ip>128.0.0.1</ip>
-            <ip>::1</ip>
-        </developmentbox>
-    </hosts>
 </clacks>

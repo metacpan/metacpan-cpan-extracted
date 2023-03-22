@@ -1,45 +1,48 @@
-use 5.20.0;            # because this is the first perl version with hash slices
+use 5.20.0;  # because this is the minimal perl version with hash slices
 package Excel::PowerPivot::Utils;
 use utf8;
 use Moose;
-use Win32::OLE         qw/in/;
-use Scalar::Does       qw/does/;
-use List::Util         qw/all/;
+use Moose::Util::TypeConstraints qw/duck_type/;
+use Win32::OLE                   qw/in CP_UTF8/;
+use Scalar::Does                 qw/does/;
+use List::Util                   qw/all/;
+use POSIX                        qw/strftime/;
 use Log::Dispatch;
-use POSIX              qw/strftime/;
 
 
 #======================================================================
 # GLOBALS
 #======================================================================
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use constant {
   True                 => 1,
   False                => 0,
-  xlCmdTableCollection => 6, # see https://learn.microsoft.com/en-us/office/vba/api/excel.xlcmdtype
+  xlCmdTableCollection => 6,   # see https://learn.microsoft.com/en-us/office/vba/api/excel.xlcmdtype
 };
 
 my %ModelFormat_properties = ( # see https://learn.microsoft.com/en-us/office/vba/api/excel.model
-  Currency             => [qw/Symbol DecimalPlaces/],
-  Date                 => [qw/FormatString/],
+  Currency             => [qw/Symbol               DecimalPlaces/],
+  Date                 => [qw/FormatString                      /],
   DecimalNumber        => [qw/UseThousandSeparator DecimalPlaces/],
-  General              => [],
+  General              => [                                      ],
   PercentageNumber     => [qw/UseThousandSeparator DecimalPlaces/],
-  ScientificNumber     => [qw/DecimalPlaces/],
-  WholeNumber          => [qw/UseThousandSeparator/],
+  ScientificNumber     => [qw/DecimalPlaces                     /],
+  WholeNumber          => [qw/UseThousandSeparator              /],
  );
 
 
 my $YAML_separator_line = '#' . '='x70;
 
+
 #======================================================================
-# ATTRIBUTES AND THEIR BUILDERS
+# ATTRIBUTES AND THEIR BUILDERS, CONSTRUCTOR AND DESTRUCTOR
 #======================================================================
 
-has 'workbook' => (is => 'ro', lazy => True, builder => '_default_workbook');
-has 'log'      => (is => 'ro', lazy => True, builder => '_default_logger');
+has 'workbook' => (is => 'ro', isa => 'Win32::OLE',                        lazy => True, builder => '_default_workbook');
+has 'log'      => (is => 'ro', isa => duck_type([qw/debug info warning/]), lazy => True, builder => '_default_logger');
+has 'UTF8'     => (is => 'ro', isa => 'Bool');
 
 
 sub _default_workbook  {
@@ -60,6 +63,25 @@ sub _default_logger {
                      });
 }
 
+sub BUILD {
+  my ($self) = @_;
+
+  if ($self->UTF8) {
+    my $previous_CP = Win32::OLE->Option('CP');
+    if (($previous_CP // -1) != CP_UTF8) {
+      $self->{previous_CP} = $previous_CP;
+      Win32::OLE->Option(CP => CP_UTF8);
+    }
+  }
+}
+
+
+sub DEMOLISH {
+  my ($self) = @_;
+  if (exists $self->{previous_CP}) {
+    Win32::OLE->Option(CP => $self->{previous_CP});
+  }
+}
 
 
 
@@ -76,20 +98,12 @@ sub measures {
   my @measures;
   for my $wb_measure (in $excel_model->ModelMeasures) {
     my %measure = (
-      Name            => $wb_measure->Name,
-      AssociatedTable => $wb_measure->AssociatedTable->Name,
-      Formula         => $wb_measure->Formula,
-      Description     => $wb_measure->Description,
+      Name              => $wb_measure->Name,
+      AssociatedTable   => $wb_measure->AssociatedTable->Name,
+      Formula           => $wb_measure->Formula,
+      Description       => $wb_measure->Description,
+      FormatInformation => flatten_format_information($wb_measure),
      );
-
-    if (my $format_obj  = $wb_measure->FormatInformation) {
-      my $format_class = Win32::OLE->QueryObjectType($format_obj) =~ s/^ModelFormat//r;
-      my @property_values;
-      for my $format_property ($ModelFormat_properties{$format_class}->@*) {
-        push @property_values, $format_obj->{$format_property};
-      }
-      $measure{FormatInformation} = [$format_class, @property_values];
-    }
     push @measures, \%measure;
   }
 
@@ -146,6 +160,7 @@ sub inject_measures {
     $_->{EnableRefresh} = 0 foreach @refreshable_pivots;
   }
 
+
   # gather measures already existing in the Excel model
   $self->log->info("gathering measures from the existing Excel model");
   my %existing_measures = map {($_->Name => $_)} in $self->workbook->Model->ModelMeasures;
@@ -163,11 +178,18 @@ sub inject_measures {
              . "if you really want to change to '$measure->{AssociatedTable}', first delete "
              . "the existing measure";
 
-      # update properties of the existing measure
+      # update properties of the existing measure -- Description & Formula are just strings, FormatInformation is more complex
       $self->log->info("updating measure $measure->{Name}");
-      $existing->{FormatInformation} = $self->_build_model_format($measure);
-      $existing->{Description}       = $measure->{Description};
-      $existing->{Formula}           = $measure->{Formula};
+      for my $property (qw/Description Formula/) {
+        my $current = $existing->{$property} // "";
+        my $new_val = $measure->{$property}  // "";
+        $existing->{$property} = $new_val
+          if $new_val ne $current;
+      }
+      my $existing_format = flatten_format_information($existing);
+      my $new_format      = $measure->{FormatInformation} // [];
+      $existing->{FormatInformation} = $self->_build_model_format($measure)
+        if join("\t", @$existing_format) ne join("\t", @$new_format);
     }
 
     # otherwise, create a new measure in the Excel model
@@ -229,17 +251,34 @@ sub queries {
 
 
 sub queries_as_YAML {
-  my ($self) = @_;
+  my ($self, $col_name, $col_type) = @_;
+
+  # build code for nice reformatting of type arguments to the TransformColumnTypes() function
+  $col_name //= 8;
+  $col_type //= 40;
+  my $reformat_types = sub {
+    my ($types) = @_;
+    $types =~ s[{]["\n" . (' ' x $col_name) . '{']eg;
+    $types =~ s[("\w+",) ][$1 . (' 'x($col_type-$col_name-length($1)))]eg;
+    return $types;
+  };
 
   my $yaml = "";
 
   foreach my $query ($self->queries) {
+
+    # get the Power Query formula and reformat it if type arguments are on a single-line
+    my $formula = $query->{Formula};
+    $formula =~ s[(TransformColumnTypes.*?{)({.*})}][$1 . $reformat_types->($2) . '}']eg
+      if $col_name;
+
+    # build the YAML entry for that query
     $yaml .= "\n\n$YAML_separator_line\n"
           .  "- Name        : $query->{Name}\n"
           .  "$YAML_separator_line\n"
           .  "  Description : $query->{Description}\n"
           .  "  Formula     : |-\n"
-          .  $query->{Formula} =~ s/^/    /gmr;
+          .  $formula =~ s/^/    /gmr; # indentation of the formula code
   }
 
   return $yaml;
@@ -391,10 +430,10 @@ sub inject_relationships {
   $self->log->info("gathering existing relationships in model");
   my %existing_relationships 
     = map {my $fk_pk = sprintf "%s.%s=>%s.%s",
-                         $_->ForeignKeyTable->Name, $->ForeignKeyColumn->Name,
-                         $_->PrimaryKeyTable->Name, $->PrimaryKeyColumn->Name;
-           ($fk_pk => $_->Active)}
-          in $self->workbook->Model->ModelRelationships;
+                         $_->ForeignKeyTable->Name, $_->ForeignKeyColumn->Name,
+                         $_->PrimaryKeyTable->Name, $_->PrimaryKeyColumn->Name;
+           ($fk_pk => $_)
+          } in $self->workbook->Model->ModelRelationships;
 
   # handle each relationship to inject
   foreach my $rel (@$relationships_to_inject) {
@@ -402,7 +441,7 @@ sub inject_relationships {
 
     # if that relationship is alreay in the model, update its activity status
     if (my $existing = delete $existing_relationships{$fk_pk}) {
-      if ($existing->{Active} xor $rel->{Active}) {
+      if ($existing->Active xor $rel->{Active}) {
         $self->log->info("updating relationship $fk_pk");
         $existing->{Active} = $rel->{Active};
       }
@@ -506,6 +545,20 @@ sub invalid_options {
 }
 
 
+sub flatten_format_information {
+  my ($wb_measure) = @_;
+
+  my @format_information; # of shape: ($classname, $property1, ...)
+
+  if (my $format_obj  = $wb_measure->FormatInformation) {
+    my $format_class = Win32::OLE->QueryObjectType($format_obj) =~ s/^ModelFormat//r;
+    push @format_information, $format_class,
+                              map {$format_obj->{$_}} $ModelFormat_properties{$format_class}->@*;
+  }
+
+  return \@format_information
+}
+
 
 1;
 
@@ -520,7 +573,7 @@ Excel::PowerPivot::Utils - utilities for scripting Power Pivot models within Exc
 =head1 SYNOPSIS
 
   use Excel::PowerPivot::Utils;
-  my $ppu = Excel::PowerPivot::Utils->new; # will connect to the currently active workbook
+  my $ppu = Excel::PowerPivot::Utils->new(UTF8 => 1);
 
   # operations on the whole model ...
   print $ppu->whole_model_as_YAML;
@@ -592,15 +645,33 @@ Creates a new instance. Options are :
 
 =item workbook
 
-An OLE object representing an Excel workbook. 
-If none is supplied, it will default to the currently active workbook.
+A C<Win32::OLE> object representing an Excel workbook.
+If none is supplied, it will connect to the currently running Excel instance and take
+the active workbook as default.
 
 =item log
 
 A logger object equipped with C<debug>, C<info> and C<warning> methods.
 If none is supplied, a simple logger is automatically created from L<Log::Dispatch>.
 
+=item UTF8
+
+A boolean flag for setting the L<Win32::OLE> codepoint option to UTF8, so that
+strings are properly encoded/decoded between Perl and the OLE server.
+It is highly recommended to I<systematically set this option to true>, since
+this module is mostly used together with L<YAML>, which uses UTF8 encoding.
+
+This option will automatically trigger C<< Win32::OLE->Option(CP => CP_UTF8) >>
+at object construction time, and will set it back to the previous value at object
+destruction time. Beware however that this is a change in global state, so if
+your program performs other operations through L<Win32::OLE> during the lifetime
+of the C<Excel::PowerPivot::Utils> object, string handling might be affected.
+This is the reason why we require this option to be set explicitly instead of
+being enabled automatically by default.
+
 =back
+
+
 
 =head1 METHODS
 
@@ -665,6 +736,12 @@ L<https://learn.microsoft.com/en-us/office/vba/api/excel.queries.fastcombine>.
 
 =back
 
+
+=head3 delete_connection_for_query
+
+Deletes the OLEDB connection associated with the given query name.
+
+
 =head2 Utilities for relationships
 
 =head3 relationships
@@ -672,6 +749,8 @@ L<https://learn.microsoft.com/en-us/office/vba/api/excel.queries.fastcombine>.
 Returns information about relationships in the Excel model.
 Due to the inner constraints of Power Pivot, all relationships are many-to-one.
 The returned structure is a list of hashrefs containing :
+
+=over
 
 =item ForeignKey
 
@@ -736,7 +815,24 @@ the DAX formula
 
 optional description text
 
-=over
+=item FormatInformation
+
+an arrayref describing the format for displaying that measure. Formats are
+documented in L<https://learn.microsoft.com/en-us/office/vba/api/excel.model>.
+The first member of the array is the name of the ModelFormat object, followed by the values
+of its properties. The properties for each format are listed in the table below :
+
+  ModelFormat          Property 1           Property 2
+  ===========          ==========           ==========
+  Currency             Symbol               DecimalPlaces
+  Date                 FormatString
+  DecimalNumber        UseThousandSeparator DecimalPlaces
+  General
+  PercentageNumber     UseThousandSeparator DecimalPlaces
+  ScientificNumber     DecimalPlaces
+  WholeNumber          UseThousandSeparator
+
+=back
 
 =head3 measures_as_YAML
 
@@ -748,7 +844,10 @@ so that it is easily readable by humans.
   $ppu->inject_measures($measures, %options);
 
 Takes an arrayref or measure specifications. Each specification must be a hashref
-with keys C<Name>, C<AssociatedTable>, C<Formula> and optionally C<Description>.
+with keys C<Name>, C<AssociatedTable>, C<Formula> and optionally C<Description> and C<FormatInformation>.
+Values for those keys are strings, except for C<FormatInformation> which takes an arrayref according to the
+table above.
+
 For names corresponding to measures already in the model, this is an update operation;
 other measures in the list are added to the model.
 
@@ -759,11 +858,6 @@ Options are :
 =item delete_others
 
 If true, measures not mentioned in the list are deleted from the model. False by default.
-
-=item dont_refresh_pivots
-
-If true, the C<EnableRefresh> property in pivot caches is temporarily disabled, which allows
-for much faster operations on measures in the model. True by default.
 
 =back
 
@@ -791,6 +885,12 @@ corresponding subtrees.
 
 Unfortunately this module cannot add DAX computed columns to a model table ... because
 there is no available method for this task in the VBA interface for Excel.
+
+=item *
+
+For the same reason, there is no support either for manipulating hierarchies (i.e groups of columns
+in a dimension table).
+
 
 =item *
 
@@ -830,7 +930,7 @@ download the sqlite database
 =item 2.
 
 generate an Excel file with an Excel table for each database table
-(through the companion module L<Excel::ValueWriter::XLSX).
+(through the companion module L<Excel::ValueWriter::XLSX>).
 
 =item 3.
 

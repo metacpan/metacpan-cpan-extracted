@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More;
+use Test::More tests => 14;
 use Test::Deep;
 
 use Conf::Libconfig;
@@ -12,7 +12,6 @@ my $cfg2 = 't/2_foo.cfg';
 my %fooplc = ();
 
 my $foo = new Conf::Libconfig;
-plan skip_all => 'libconfig version is too higher!' if ($foo->getversion() >= 1.7);
 my $specfoo = new Conf::Libconfig;
 
 ok($foo->new(), 'new - status ok');

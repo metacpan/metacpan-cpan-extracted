@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::wordlist::modnames;
 
-our $DATE = '2021-06-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2023-01-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["array",[{description=>"\nArray of Perl WordList::* module names, where each element is of\n`perl::wordlist::modname` schema, e.g. `EN::Enable`, `EN::BIP39`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    EN::*\n\nand it will be expanded to e.g.:\n\n    [\"EN::Enable\", \"EN::BIP39\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::wordlilst::modname",{req=>1},{}],summary=>"Array of Perl WordList::* module names without the prefix, e.g. [\"EN::Enable\", \"EN::BIP39\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]}],["array"]];
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nArray of Perl WordList::* module names, where each element is of\n`perl::wordlist::modname` schema, e.g. `EN::Enable`, `EN::BIP39`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    EN::*\n\nand it will be expanded to e.g.:\n\n    [\"EN::Enable\", \"EN::BIP39\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::wordlist::modname",{req=>1}],summary=>"Array of Perl WordList::* module names without the prefix, e.g. [\"EN::Enable\", \"EN::BIP39\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Array of Perl WordList::* module names without the prefix, e.g. ["EN::Enable", "EN::BIP39"]
@@ -20,7 +21,7 @@ Sah::SchemaR::perl::wordlist::modnames - Array of Perl WordList::* module names 
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::perl::wordlist::modnames (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
+This document describes version 0.005 of Sah::SchemaR::perl::wordlist::modnames (from Perl distribution Sah-Schemas-WordList), released on 2023-01-19.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-WordList>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2021, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-WordList>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

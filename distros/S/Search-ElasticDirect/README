@@ -1,0 +1,49 @@
+Elasticsearch custom Perl driver
+
+Libraries
+
+  Search::ElasticDirect     : Abstraction layer of the elasticsearch API
+  Search::ElasticDirectHttp : http(s) low level communication functions
+
+Properties can be defined
+
+  At object creation       my $obj = Direct::ElasticSearch->new( host=> '127.0.0.1', ...)
+  direct, after the new()  $object->{authentication} = 'yes'
+  while using a method     $object->connect( username=> 'Joe', password=> '123', ...)
+
+Properties
+
+  timemout        http(s) timemout in seconds                             e.g  60
+  keep_alive      Whether to reuse the last connection                    e.g  1
+	method          http method GET, DELETE, PUT, POST                      e.g  GET
+  path            url path                                                e.g  _cat/health
+  param           url parameters  ...?p1=val1&p2=v2                       e.g  pretty=false
+  send_data       send data, like the    curl ...  --data '...'           e.g  '{"query": {"regexp" :{"src_filename": "server_.*"}}}'
+  format          data, json, json_pretty, yaml, txt    reply format      e.g  data
+                  data         %hash, @array, $scalar  (default)
+                  json         text formatted as json, one line
+                  json_pretty  text formatted as json, human readable
+                  yaml         text formatted as yaml
+                  text         just text
+  authentication  If FALSE then the  username and password are ignored    e.g  yes
+  username        used if the authentication is TRUE                      e.g  Joe
+  password        used if the authentication is TRUE                      e.g  MyPassword
+  verify_SSL      Whether to validate the SSL certificate of an https     e.g  0
+  PIT             if TRUE use point in time at paginate  search_after     e.g  yes 
+  certca          Certificate Authority public certificate                e.g  /etc/elasticsearch/chain.pem
+  cert            host's public admin certificate (used by searchguard)   e.g  /etc/elasticsearch/srv01_admin.pem
+  key             host's admin private key        (used by searchguard)   e.g  /etc/elasticsearch/srv01_admin.key
+
+
+Methods
+
+  new                          Create a new object and provides a connection to the ElasticSearch using varius methods
+  direct                       Pass through the request to ElasticSearch
+  DeepPagination_scroll        Retrieve massive amount of records using the   scroll
+  DeepPagination_search_after  Retrieve massive amount of records using the   search_after
+  DeepPagination_sql           Retrieve massive amount of records using the   sql
+  ActiveMaster                 TRUE if this server is the Active master otherelse FALSE
+
+    unless ( $connection->ActiveMaster ) {
+    die 'This server is not the active master'
+    }

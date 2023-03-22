@@ -14,7 +14,7 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     test_requires => {
-        perl         => '5.8.0', # for open my $fh, ">", \my $string
+        perl         => '5.10.0', # for //= operator
         'Test::More' => '0',
     },
     requires => {
@@ -23,6 +23,11 @@ my $builder = Module::Build->new(
       'XML::LibXML'  => undef,
     },
     add_to_cleanup     => [ 'App-Zip-X-*' ],
+    meta_merge => {
+      resources => {
+        repository => 'https://github.com/damil/App-Zip-X',
+       }
+     },
 );
 
 $builder->create_build_script();

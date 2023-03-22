@@ -14,11 +14,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,11 @@ for historical weather data
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
     $meteo = Weather::Meteo->new(ua => $ua);
+
+    my $weather = $meteo->weather({ latitude => 51.34, longitude => 1.42, date => '2022-12-25' });
+    my @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
+
+    print 'Number of cms of snow: ', $snowfall[1], "\n";
 
 =cut
 
@@ -66,9 +71,12 @@ sub new {
 
 =head2 weather
 
+    use Geo::Location::Point;
+
+    my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Print snowfall at 1AM on Christmas morning in Ramsgate
-    $weather = $meteo->weather({ latitude => 51.34, longitude => 1.42, date => '2022-12-25' });
-    my @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
+    $weather = $meteo->weather($ramsgate, '2022-12-25');
+    @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
 
@@ -80,6 +88,11 @@ sub weather {
 
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
+	} elsif((@_ == 2) && (ref($_[0]) =~ /::/) && ($_[0]->can('latitude'))) {
+		my $location = $_[0];
+		$param{latitude} = $location->latitude();
+		$param{longitude} = $location->longitude();
+		$param{'date'} = $_[1];
 	} elsif(ref($_[0])) {
 		Carp::croak('Usage: weather(latitude => $latitude, longitude => $logitude, date => "YYYY-MM-DD")');
 		return;

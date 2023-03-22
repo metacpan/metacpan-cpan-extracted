@@ -3,8 +3,10 @@ cpanfile
 lib/Test/Builder/SubtestSelection.pm
 lib/Test/Builder/SubtestSelection.pod
 LICENSE
+maint/AuthorExtensions.pl
 Makefile.PL
 MANIFEST			This list of files
+README
 t/nested-subtests.t
 t/no-subtest-selection.t
 t/single-subtest-selected-by-autoquoted-name.t

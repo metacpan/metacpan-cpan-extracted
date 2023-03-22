@@ -26,7 +26,7 @@ BEGIN {
   }
 }
 
-our $VERSION = "3.14";
+our $VERSION = "3.15";
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -897,11 +897,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 3.14
+Version 3.15
 
 =head1 DATE
 
-22 May 2022
+20 March 2023
 
 =head1 HISTORY
 

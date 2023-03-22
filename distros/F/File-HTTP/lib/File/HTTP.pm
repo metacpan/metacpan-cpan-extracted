@@ -16,7 +16,7 @@ use constant 1.03; # hash ref, perl 5.7.2
 # - Time::y2038 or Time::Local
 # - IO::Socket::SSL
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 our @EXPORT_OK = qw(
 	open stat open_at open_stream slurp_stream get post
@@ -483,8 +483,9 @@ sub _initiate {
 	}
 
 	$REQUEST_HEADERS = ($REQUEST_HEADERS && ref $REQUEST_HEADERS) ? $$REQUEST_HEADERS : do {
+		my $http_version = defined($self->[OFFSET]) ? '1.1' : '1.0';
 		my @h = (
-			"GET $self->[PATH] HTTP/1.0",
+			"GET $self->[PATH] HTTP/$http_version",
 			"Host: $self->[NETLOC]",
 			"User-Agent: $USER_AGENT",
 			"Connection: close",

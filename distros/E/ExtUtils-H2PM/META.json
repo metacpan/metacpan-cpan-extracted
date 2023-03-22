@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "ExtUtils-H2PM",
    "prereqs" : {
@@ -23,7 +23,8 @@
          "requires" : {
             "Exporter" : "5.57",
             "ExtUtils::CBuilder" : "0",
-            "List::Util" : "1.29"
+            "List::Util" : "1.39",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -35,7 +36,7 @@
    "provides" : {
       "ExtUtils::H2PM" : {
          "file" : "lib/ExtUtils/H2PM.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -44,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

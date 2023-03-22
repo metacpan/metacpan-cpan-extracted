@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase-Argon2
 
+0.005     2023-03-20 14:32:03+01:00 Europe/Amsterdam
+          - Use new argon2_verify function
+          - Make exceptions skip Crypt::Passphrase
+
 0.004     2023-02-10 23:04:34+01:00 Europe/Amsterdam
           - Add profile argument to constructor
 

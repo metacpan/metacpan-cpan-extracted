@@ -6,10 +6,13 @@ use warnings;
 use Test::More;
 
 use Crypt::Bcrypt qw/bcrypt/;
-use Crypt::Passphrase::Bcrypt;
+use Crypt::Passphrase;
 
-my $passphrase = Crypt::Passphrase::Bcrypt->new(
-	cost => 14,
+my $passphrase = Crypt::Passphrase->new(
+	encoder => {
+		module => 'Bcrypt',
+		cost   => 14,
+	},
 );
 
 my $password = 'password';
@@ -27,9 +30,12 @@ my $hash3 = bcrypt($password, '2b', 13, $salt);
 ok($passphrase->verify_password($password, $hash3), 'Manually created password with reduced rounds verifies');
 ok($passphrase->needs_rehash($hash3), 'Password with reduced rounds does need rehash');
 
-my $hashed = Crypt::Passphrase::Bcrypt->new(
-	cost => 14,
-	hash => 'sha256',
+my $hashed = Crypt::Passphrase->new(
+	encoder => {
+		module => 'Bcrypt',
+		cost   => 14,
+		hash   => 'sha256',
+	},
 );
 
 my $hash4 = $hashed->hash_password($password);

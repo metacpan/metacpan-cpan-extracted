@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 use HTML::Blitz ();
 use HTML::Blitz::Builder qw(mk_elem fuse_fragment);
 

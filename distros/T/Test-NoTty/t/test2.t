@@ -28,6 +28,19 @@ $error
 EOT
         exit 1;
     }
+    # See comment above for why we can't "simply" put a dependency on a
+    # version. Hence the dance here to make sure we have this bug fix:
+    #     Make it safe to fork before events in IPC
+    # For versions before the fix we see this output, which harness faults:
+    #
+    # ok 1 - We're actually running in a different process
+    # ok 2 - Random array of element found
+    # 1..0
+    # # No tests run!
+
+    my $need = 1.302138;
+    skip_all("Need Test2 $need or later for Test2::IPC bug fix")
+        if $Test2::API::VERSION < $need;
 }
 
 use Test2::IPC;

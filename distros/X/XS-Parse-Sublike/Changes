@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Sublike
 
+0.17    2023-03-21
+        [CHANGES]
+         * Experimental support for named param syntax in parse_subsignature()
+         * Support core perl's `method` syntax when available by setting
+           CVf_IsMETHOD (perl >= 5.37.10)
+
 0.16    2021-12-16
         [CHANGES]
          * No longer support ABI version 3 even in back-compatibility mode

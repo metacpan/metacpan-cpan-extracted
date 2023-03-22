@@ -1,22 +1,25 @@
 package Crypt::Passphrase::Bcrypt;
-$Crypt::Passphrase::Bcrypt::VERSION = '0.005';
+$Crypt::Passphrase::Bcrypt::VERSION = '0.006';
 use strict;
 use warnings;
 
-use parent 'Crypt::Passphrase::Encoder';
+use Crypt::Passphrase 0.010 -encoder;
 
 use Carp 'croak';
-use Crypt::Bcrypt 0.010 qw/bcrypt bcrypt_prehashed bcrypt_check_prehashed bcrypt_needs_rehash/;
+use Crypt::Bcrypt 0.011 qw/bcrypt bcrypt_prehashed bcrypt_check_prehashed bcrypt_needs_rehash bcrypt_supported_prehashes/;
+
+my %supported_prehash = map { $_ => 1 } bcrypt_supported_prehashes();
 
 sub new {
 	my ($class, %args) = @_;
-	my $subtype = $args{subtype} || '2b';
+	my $subtype = $args{subtype} // '2b';
 	croak "Unknown subtype $subtype" unless $subtype =~ / \A 2 [abxy] \z /x;
-	croak 'Invalid hash' if exists $args{hash} && $args{hash} ne 'sha256';
+	my $hash = $args{hash} // '';
+	croak 'Invalid hash' if length $args{hash} and not $supported_prehash{ $args{hash} };
 	return bless {
-		cost    => $args{cost} || 14,
+		cost    => $args{cost} // 14,
 		subtype => $subtype,
-		hash    => $args{hash} || '',
+		hash    => $hash,
 	}, $class;
 }
 
@@ -32,7 +35,7 @@ sub needs_rehash {
 }
 
 sub crypt_subtypes {
-	return qw/2a 2b 2x 2y bcrypt-sha256/;
+	return (qw/2a 2b 2x 2y/, map { "bcrypt-$_" } bcrypt_supported_prehashes());
 }
 
 sub verify_password {
@@ -56,7 +59,17 @@ Crypt::Passphrase::Bcrypt - A bcrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.005
+version 0.006
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+   encoder => {
+     module => 'Bcrypt',
+     cost   => 14,
+     hash   => 'sha256',
+   },
+ );
 
 =head1 DESCRIPTION
 
@@ -70,7 +83,7 @@ This class implements a bcrypt encoder for Crypt::Passphrase. For high-end param
 
 =item * cost
 
-This is the cost factor that is used to hash passwords.
+This is the cost factor that is used to hash passwords. It currently defaults to C<14>, but this may change in the future.
 
 =item * subtype
 
@@ -78,11 +91,11 @@ This is the cost factor that is used to hash passwords.
 
 =item * C<2b>
 
-This is the subtype the rest of the world has been using since 2014
+This is the subtype everyone has been using since 2014.
 
 =item * C<2y>
 
-This type is considered equivalent to C<2b>.
+This type is considered equivalent to C<2b>. It is common on php but not elsewhere.
 
 =item * C<2a>
 
@@ -98,7 +111,7 @@ This is C<2b> by default, and you're unlikely to want to change this.
 
 =item * hash
 
-Pre-hash the password using the specified hash. Currently only sha256 is supported. This is mainly useful to get around the 72 character limit. This uses a salt-keyed hash to prevent password shucking.
+Pre-hash the password using the specified hash. It will support any hash supported by L<Crypt::Bcrypt|Crypt::Bcrypt>, which is currently C<'sha256'>, C<'sha384'> and C<'sha512'>. This is mainly useful because plain bcrypt is not null-byte safe and only supports 72 characters of input. This uses a salt-keyed hash to prevent password shucking.
 
 =back
 

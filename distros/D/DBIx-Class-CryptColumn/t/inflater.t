@@ -15,7 +15,7 @@ $schema->storage->dbh->do($sql);
 my $rs = $schema->resultset('Foo');
 
 my $passphrase = TestInflate::Result::Foo->crypt_passphrase;;
-my $object = $passphrase->curry_with_password('moo');
+my $object = $passphrase->curry_with_hash($passphrase->hash_password('moo'));
 
 my $id = $rs->create({ passphrase => $object })->id;
 

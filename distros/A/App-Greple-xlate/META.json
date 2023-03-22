@@ -33,7 +33,6 @@
       },
       "develop" : {
          "recommends" : {
-            "App::Greple::msdoc" : "1.05",
             "App::Greple::xp" : "0.04",
             "Pod::Markdown" : "0"
          },
@@ -48,6 +47,7 @@
       "runtime" : {
          "requires" : {
             "App::Greple" : "9.02",
+            "App::Greple::msdoc" : "1.05",
             "App::sdif" : "v4.24.0",
             "Clipboard" : "0",
             "File::Share" : "0",
@@ -67,11 +67,11 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "0.17",
+   "version" : "0.19",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 use Moose;
 
@@ -235,6 +235,30 @@ sub artifact_request {
 }
 
 
+sub sp_post_binding {
+    my ($self, $idp, $param) = @_;
+
+    unless ($idp) {
+        croak("Unable to create a post binding without an IDP");
+    }
+
+    $param //= 'SAMLRequest';
+
+    my $post = Net::SAML2::Binding::POST->new(
+        url   => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'),
+        cert  => ($self->cert,),
+        $self->authnreq_signed ? (
+            key   => $self->key,
+        ) : (
+            insecure => 1,
+        ),
+        param => $param,
+    );
+
+    return $post;
+}
+
+
 sub sso_redirect_binding {
     my ($self, $idp, $param) = @_;
 
@@ -448,7 +472,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.64
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -633,6 +657,12 @@ LogoutRequest.
 Returns an ArtifactResolve request object created by this SP, intended
 for the given destination, which should be the identity URI of the
 IdP.
+
+=head2 sp_post_binding ( $idp, $param )
+
+Returns a POST binding object for this SP, configured against the
+given IDP for Single Sign On. $param specifies the name of the query
+parameter involved - typically C<SAMLRequest>.
 
 =head2 sso_redirect_binding( $idp, $param )
 

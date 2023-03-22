@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::wordlist::modname;
 
-our $DATE = '2021-06-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2023-01-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"EN::Enable",value=>"EN/Enable"},{valid=>0,value=>"Foo bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl WordList::* module name without the prefix, e.g. EN::Enable","x.completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["perl::modname","str"]];
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"EN::Enable",value=>"EN/Enable"},{valid=>0,value=>"Foo bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl WordList::* module name without the prefix, e.g. EN::Enable","x.completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Perl WordList::* module name without the prefix, e.g. EN::Enable
@@ -20,7 +21,7 @@ Sah::SchemaR::perl::wordlist::modname - Perl WordList::* module name without the
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::perl::wordlist::modname (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
+This document describes version 0.005 of Sah::SchemaR::perl::wordlist::modname (from Perl distribution Sah-Schemas-WordList), released on 2023-01-19.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-WordList>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2021, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-WordList>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

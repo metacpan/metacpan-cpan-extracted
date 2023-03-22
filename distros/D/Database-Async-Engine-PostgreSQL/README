@@ -143,6 +143,17 @@ METHODS
 
     Resolves when we are idle and ready to process the next request.
 
+ _remove_from_loop
+
+    Called when this engine instance is removed from the main event loop,
+    usually just before the instance is destroyed.
+
+    Since we could be in various states of authentication or query
+    processing, we potentially have many different elements to clean up
+    here. We do these explicitly so that we can apply some ordering to the
+    events: clear out things that relate to queries before dropping the
+    connection, for example.
+
 Implementation notes
 
     Query sequence is essentially:
@@ -192,10 +203,11 @@ AUTHOR
 
     Tom Molesworth <TEAM@cpan.org>
 
-    with contributions from Tortsten Förtsch <OPI@cpan.org>
+    with contributions from Tortsten Förtsch <OPI@cpan.org> and Maryam
+    Nafisi <maryam@firstsource.tech>.
 
 LICENSE
 
-    Copyright Tom Molesworth 2011-2021. Licensed under the same terms as
+    Copyright Tom Molesworth 2011-2023. Licensed under the same terms as
     Perl itself.
 

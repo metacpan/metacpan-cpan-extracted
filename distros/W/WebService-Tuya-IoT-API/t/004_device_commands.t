@@ -14,7 +14,7 @@ my $code          = $ENV{'TUYA_CODE'} || 'switch_1';
 my $skip          = not ($client_id and $client_secret and $deviceid);
 
 SKIP: {
-  skip "ENV TUYA_CLIENT_ID, TUYA_CLIENT_SECRET and TUYA_DEVICE must be set", 6 if $skip;
+  skip "ENV TUYA_CLIENT_ID, TUYA_CLIENT_SECRET and TUYA_DEVICEID must be set", 6 if $skip;
   my $ws    = WebService::Tuya::IoT::API->new(client_id=>$client_id, client_secret=>$client_secret);
   my $token = $ws->access_token;
   diag("Token: $token");

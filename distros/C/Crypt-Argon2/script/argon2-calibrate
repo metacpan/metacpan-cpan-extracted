@@ -34,10 +34,10 @@ my $type = prompt('What type of hash?', 'argon2id');
 my $encoder = $encoder{$type} or die "Invalid type $type";
 
 my $threads = prompt('How many threads may it use', 1);
-die 'Invalid number' unless $threads > 0;
+die "Invalid number '$threads'" unless $threads > 0;
 
 my $mem_cost = prompt('How much memory may it use (e.g. 32M)');
-die 'Invalid memory usage' unless $mem_cost =~ / ^ \d+ [hMG] $ /x;
+die "Invalid memory usage '$mem_cost'" unless $mem_cost =~ / ^ \d+ [hMG] $ /x;
 
 my $max_time = prompt('How much time may argon2 take? (in milliseconds)');
 die 'No time given' unless $max_time > 0;
@@ -61,7 +61,8 @@ mem_cost = $mem_cost
 time_cost = $time_cost
 END
 
-# PODNAME: argon2-calibrate - script to find the appropriate argon2 parameters
+# PODNAME: argon2-calibrate
+# ABSTRACT: a script to find the appropriate argon2 parameters
 
 __END__
 
@@ -71,11 +72,11 @@ __END__
 
 =head1 NAME
 
-argon2-calibrate - script to find the appropriate argon2 parameters
+argon2-calibrate - a script to find the appropriate argon2 parameters
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 DESCRIPTION
 

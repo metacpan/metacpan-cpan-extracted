@@ -16,7 +16,7 @@
 #
 
 XLATE_LANG   ?= JA
-XLATE_FORMAT ?= cm xtxt ifdef
+XLATE_FORMAT ?= xtxt cm
 
 ifeq ($(strip $(XLATE_FILES)),)
 override XLATE_FILES := \

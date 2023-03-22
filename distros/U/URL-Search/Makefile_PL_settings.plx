@@ -9,8 +9,7 @@ return {
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES => {},
     TEST_REQUIRES => {
-        'utf8'       => 0,
-        'Test::More' => 0,
+        'Test2::V0' => 0,
     },
     PREREQ_PM => {
         'strict'   => 0,

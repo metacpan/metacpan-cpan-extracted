@@ -4,7 +4,7 @@ use warnings;
 
 use Parallel::Pipes;
 
-our $VERSION = '0.102';
+our $VERSION = '0.200';
 
 sub _min { $_[0] < $_[1] ? $_[0] : $_[1] }
 
@@ -16,21 +16,29 @@ sub run {
     my $tasks = $argv{tasks} or die "need 'tasks' argument\n";
     my $before_work = $argv{before_work};
     my $after_work = $argv{after_work};
+    my $init_work = $argv{init_work};
+    my $idle_tick = $argv{idle_tick};
+    my $idle_work = $argv{idle_work};
 
-    my $pipes = Parallel::Pipes->new($num, $work);
+    my $pipes = Parallel::Pipes->new(
+        $num,
+        $work,
+        $idle_tick ? { idle_tick => $idle_tick, idle_work => $idle_work } : (),
+    );
+    $init_work->($pipes) if $init_work;
     while (1) {
         my @ready = $pipes->is_ready;
         if (my @written = grep { $_->is_written } @ready) {
             for my $written (@written) {
                 my $result = $written->read;
-                $after_work->($result) if $after_work;
+                $after_work->($result, $written) if $after_work;
             }
         }
         if (@$tasks) {
             my $min = _min $#{$tasks}, $#ready;
             for my $i (0 .. $min) {
                 my $task = shift @$tasks;
-                $before_work->($task) if $before_work;
+                $before_work->($task, $ready[$i]) if $before_work;
                 $ready[$i]->write($task);
             }
         } else {
@@ -41,7 +49,7 @@ sub run {
                     my @ready = $pipes->is_ready(@written);
                     for my $written (@ready) {
                         my $result = $written->read;
-                        $after_work->($result) if $after_work;
+                        $after_work->($result, $written) if $after_work;
                     }
                 } else {
                     die "unexpected";

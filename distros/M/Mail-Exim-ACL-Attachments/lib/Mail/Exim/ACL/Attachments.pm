@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.004;
+our $VERSION = 1.005;
 
 use Exporter qw(import);
 use IO::Uncompress::Unzip;
@@ -21,6 +21,7 @@ our %MACRO_ENABLED = (
     docm => 'Word Document',
     dot  => 'Word Template',
     dotm => 'Word Template',
+    one  => 'OneNote Export File',
     pot  => 'PowerPoint Template',
     potm => 'PowerPoint Template',
     ppa  => 'PowerPoint Add-in',
@@ -52,11 +53,15 @@ our %BLOCKED_BY_OUTLOOK = (
     ade           => 'Access Project Extension',
     adp           => 'Access Project',
     app           => 'Executable Application',
+    application   => 'ClickOnce Deployment Manifest File',
+    'appref-ms'   => 'ClickOnce Application Reference File',
     asp           => 'Active Server Page',
     aspx          => 'Active Server Page Extended',
     asx           => 'ASF Redirector file',
     bas           => 'BASIC Source Code',
     bat           => 'Batch Processing',
+    bgi           => 'Borland Graphics Interface',
+    cab           => 'Windows Cabinet File',
     cer           => 'Internet Security Certificate File',
     chm           => 'Compiled HTML Help',
     cmd           => 'Command File',
@@ -77,6 +82,7 @@ our %BLOCKED_BY_OUTLOOK = (
     htc           => 'HTML component file',
     inf           => 'Information or Setup File',
     ins           => 'IIS Internet Communications Settings',
+    iso           => 'Optical Disk Media File System',
     isp           => 'IIS Internet Service Provider Settings',
     its           => 'Internet Document Set',
     jar           => 'Java Archive',
@@ -173,7 +179,6 @@ our %ARCHIVES = (
     arj      => 'ARJ File',
     bz2      => 'bzip2 File',
     bzip2    => 'bzip2 File',
-    cab      => 'Windows Cabinet File',
     cpio     => 'CPIO Archive',
     deb      => 'Debian Package',
     dmg      => 'Disk Image',
@@ -182,7 +187,6 @@ our %ARCHIVES = (
     gz       => 'gzip File',
     gzip     => 'gzip File',
     hfs      => 'Disk Image',
-    iso      => 'Disk Image',
     lha      => 'LHA File',
     lzh      => 'LZH File',
     lzma     => 'LZMA File',
@@ -281,7 +285,7 @@ Mail::Exim::ACL::Attachments - Reject email attachments
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -421,7 +425,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2023 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -28,35 +28,38 @@ ok($ret, "RSA: Verifed Successfully");
 ok($sig->signer_cert);
 
 # Test signing with a DSA key
-my $dsasig = XML::Sig->new({ key => 't/dsa.private.key' });
-my $dsa_signed_xml = $dsasig->sign($xml);
-ok( open XML, '>', 't/dsa.xml' );
-print XML $dsa_signed_xml;
-ok( close XML, "DSA: Signed t/dsa.xml written Sucessfully");
-my $dsaret = $dsasig->verify($dsa_signed_xml);
-ok($dsaret, "XML:Sig DSA: Verifed Successfully");
+foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.private.key') {
 
-SKIP: {
-    skip "xmlsec1 not installed", 4 unless which('xmlsec1');
+    my $dsasig = XML::Sig->new({ key => $key });
+    my $dsa_signed_xml = $dsasig->sign($xml);
+    ok( open XML, '>', 't/dsa.xml' );
+    print XML $dsa_signed_xml;
+    ok( close XML, "DSA: Signed t/dsa.xml written Sucessfully with $key");
+    my $dsaret = $dsasig->verify($dsa_signed_xml);
+    ok($dsaret, "XML:Sig DSA: Verifed Successfully");
 
-    # Try whether xmlsec is correctly installed which
-    # doesn't seem to be the case on every cpan testing machine
+    SKIP: {
+        skip "xmlsec1 not installed", 1 unless which('xmlsec1');
 
-    my $output = `xmlsec1 --version`;
-    skip "xmlsec1 not correctly installed", 6 if $?;
+        # Try whether xmlsec is correctly installed which
+        # doesn't seem to be the case on every cpan testing machine
 
-    # Verify with xmlsec1
-    open my $dsafile, 't/dsa.xml' or die "no dsa signed xml";
-    my $dsaxml;
-    {
-        local undef $/;
-        $dsaxml = <$dsafile>;
+        my $output = `xmlsec1 --version`;
+        skip "xmlsec1 not correctly installed", 1 if $?;
+
+        # Verify with xmlsec1
+        open my $dsafile, 't/dsa.xml' or die "no dsa signed xml";
+        my $dsaxml;
+        {
+            local undef $/;
+            $dsaxml = <$dsafile>;
+        }
+
+        my $verify_response = `xmlsec1 --verify --id-attr:ID "ArtifactResolve" t/dsa.xml 2>&1`;
+        ok( $verify_response =~ m/OK/, "DSA verify XML:Sig signed with $key: xmlsec1 Response is OK" )
+            or warn "calling xmlsec1 failed: '$verify_response'\n";
+        unlink 't/dsa.xml';
     }
-
-    my $verify_response = `xmlsec1 --verify --id-attr:ID "ArtifactResolve" t/dsa.xml 2>&1`;
-    ok( $verify_response =~ m/^OK/, "DSA verify XML:Sig signed: xmlsec1 Response is OK" )
-        or warn "calling xmlsec1 failed: '$verify_response'\n";
-    unlink 't/dsa.xml';
 }
 
 # Test that XML::Sig can verify a xmlsec1 DSA signed xml
@@ -64,6 +67,17 @@ $xml = slurp_file('t/signed/saml_request-xmlsec1-dsa-signed.xml');
 my $xmlsec1_dsasig = XML::Sig->new();
 my $xmlsec_ret = $xmlsec1_dsasig->verify($xml);
 ok($xmlsec_ret, "xmlsec1: DSA Verifed Successfully");
+
+# Ensure xmlsec still verifies properly
+{
+    my $key = 't/dsa.public.pem';
+    SKIP: {
+        skip "xmlsec1 not installed", 1 unless which('xmlsec1');
+        my $verify_response = `xmlsec1 --verify --id-attr:ID "ArtifactResolve" t/signed/saml_request-xmlsec1-dsa-signed.xml 2>&1`;
+        ok( $verify_response =~ m/OK/, "DSA verify XML:Sig signed with $key: xmlsec1 Response is OK" )
+            or warn "calling xmlsec1 failed: '$verify_response'\n";
+    }
+}
 
 # Test that XML::Sig can verify a xmlsec1 RSA signed xml
 $xml = slurp_file('t/signed/saml_request-xmlsec1-rsa-signed.xml');

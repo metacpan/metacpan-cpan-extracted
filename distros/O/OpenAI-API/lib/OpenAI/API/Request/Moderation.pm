@@ -36,6 +36,10 @@ OpenAI::API::Request::Moderation - moderations endpoint
 
     my $res = $request->send();
 
+    if ( $res->{results}[0]{flagged} ) {
+        die "Input violates our Content Policy";
+    }
+
 =head1 DESCRIPTION
 
 Given a input text, outputs if the model classifies it as violating
@@ -53,6 +57,17 @@ OpenAI's content policy.
 
 =back
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
+=head2 send_async()
+
+Send a request asynchronously. Returns a L<Promises> promise that will
+be resolved with the decoded JSON response. See L<OpenAI::API::Request>
+for an example.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Moderations|https://platform.openai.com/docs/api-reference/moderations>
+OpenAI API Reference: L<Moderations|https://platform.openai.com/docs/api-reference/moderations>

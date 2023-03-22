@@ -312,6 +312,14 @@ Displaying up-to-date data to the user? What a strange and novel concept.
 
 This fixes some documentation issues.
 
+=head2 VERSION 27
+
+This fixes some small design issues:
+
+* Unix domain sockets don't use SSL. If only UDS are used in a Server, there is no requirement to specify server certificates.
+
+* runOnce() in L<Net::Clacks::PostgreSQL2Clacks> now returns the lines it would have formerly printed to STDERR. The non-returning run() still prints to STDERR.
+
 
 =head1 AUTHOR
 

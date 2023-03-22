@@ -8,15 +8,15 @@
  * License/Waiver or the Apache Public License 2.0, at your option. The terms of
  * these licenses can be found at:
  *
- * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
- * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
+ * - CC0 1.0 Universal : https://creativecommons.org/publicdomain/zero/1.0
+ * - Apache 2.0        : https://www.apache.org/licenses/LICENSE-2.0
  *
  * You should have received a copy of both of these licenses along with this
  * software. If not, they may be obtained at the above URLs.
  */
 
 /*For memory wiping*/
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <windows.h>
 #include <winbase.h> /* For SecureZeroMemory */
 #endif
@@ -132,7 +132,7 @@ void free_memory(const argon2_context *context, uint8_t *memory,
 #endif
 
 void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
-#if defined(_MSC_VER) && VC_GE_2005(_MSC_VER)
+#if defined(_MSC_VER) && VC_GE_2005(_MSC_VER) || defined(__MINGW32__)
     SecureZeroMemory(v, n);
 #elif defined memset_s
     memset_s(v, n, 0, n);

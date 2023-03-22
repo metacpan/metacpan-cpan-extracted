@@ -8,7 +8,7 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Standaard worden originele en vertaalde tekst afgedrukt in het "conflict marker"
     </p>
 </div>
 
-Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit is een short-cut om aan te geven dat het patroon overeenkomt met de hele tekst `(?s).*`.
+Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-all**. Dit is een snelkoppeling om aan te geven dat het patroon overeenkomt met de hele tekst `(?s).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Als u de hele tekst wilt vertalen, gebruik dan de optie **--match-entire**. Dit 
 
     Zie het resultaat van de vertaling in real time in de STDERR uitvoer.
 
-- **--match-entire**
+- **--match-all**
 
     Stel de hele tekst van het bestand in als doelgebied.
 

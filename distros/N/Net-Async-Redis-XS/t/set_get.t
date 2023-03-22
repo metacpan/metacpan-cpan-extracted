@@ -21,6 +21,8 @@ $loop->add(
 await $redis->connect;
 await $redis->set($key, $value);
 my $result = await $redis->get($key);
-is($result, $value);
+is($result, $value, 'value was set correctly');
+await $redis->del('random-array'); # don't care if it was there or not
+is((await $redis->lpush('random-array', qw(x y z))), 3, 'push to a random array gives 3 back');
 
 done_testing;

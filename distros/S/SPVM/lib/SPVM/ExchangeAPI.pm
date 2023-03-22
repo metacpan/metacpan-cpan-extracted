@@ -43,15 +43,6 @@ sub new {
 }
 
 # Instance Methods
-sub new_byte_array_from_string {
-  my ($self, $string) = @_;
-  
-  my $ret;
-  eval { $ret = $self->new_byte_array_from_bin($string) };
-  if ($@) { confess $@ }
-  
-  return $ret;
-}
 
 sub new_any_object_array {
   my ($self, $array_ref) = @_;
@@ -67,7 +58,7 @@ sub new_options {
   my ($self, $options) = @_;
   
   unless (ref $options eq 'HASH') {
-    confess "The options must be a hash reference";
+    confess "The \$options must be a hash reference";
   }
   
   my $array_ref = [];
@@ -84,7 +75,7 @@ sub new_options {
 }
 
 sub new_object_array {
-  my ($self, $type_name, $elems) = @_;
+  my ($self, $type_name, $elements) = @_;
   
   my $basic_type_name;
   my $type_dimension = 0;
@@ -97,29 +88,30 @@ sub new_object_array {
     }
   }
   
-  unless ($type_dimension >= 1 && $type_dimension <= 255) {
-    confess "Invalid type dimension";
-  }
   unless (defined $basic_type_name) {
-    confess "Invalid basic type name";
+    confess "The bacic type of the \"$type_name\" type can't be got";
   }
   
-  unless (defined $elems) {
+  unless ($type_dimension >= 1 && $type_dimension <= 255) {
+    confess "The dimention of the \"$type_name\" type must be greater than or equal to 1 and less than or equal to 255";
+  }
+  
+  unless (defined $elements) {
     return undef;
   }
   
-  # Check second argument
-  unless (ref $elems eq 'ARRAY') {
-    confess "The elements must be an array reference";
+  unless (ref $elements eq 'ARRAY') {
+    confess "The $elements must be an array reference";
   }
   
   my $ret;
   if ($type_dimension == 1) {
-    eval { $ret = $self->_xs_new_object_array($basic_type_name, $elems) };
+    eval { $ret = $self->_xs_new_object_array($basic_type_name, $elements) };
     if ($@) { confess $@ }
   }
   else {
-    eval { $ret = $self->_xs_new_muldim_array($basic_type_name, $type_dimension - 1, $elems) };
+    my $element_type_dimension = $type_dimension - 1;
+    eval { $ret = $self->_xs_new_muldim_array($basic_type_name, $element_type_dimension, $elements) };
     if ($@) { confess $@ }
   }
   
@@ -127,7 +119,7 @@ sub new_object_array {
 }
 
 sub new_mulnum_array {
-  my ($self, $type_name, $elems) = @_;
+  my ($self, $type_name, $elements) = @_;
   
   my $basic_type_name;
   my $type_dimension = 0;
@@ -140,24 +132,24 @@ sub new_mulnum_array {
     }
   }
   
-  unless ($type_dimension == 1) {
-    confess "Invalid type dimension";
-  }
   unless (defined $basic_type_name) {
-    confess "Invalid basic type name";
+    confess "The bacic type of the \"$type_name\" type can't be got";
   }
-
-  unless (defined $elems) {
+  
+  unless ($type_dimension == 1) {
+    confess "The dimention of the \"$type_name\" type must be 1";
+  }
+  
+  unless (defined $elements) {
     return undef;
   }
   
-  # Check second argument
-  unless (ref $elems eq 'ARRAY') {
-    confess "The elements must be an array reference";
+  unless (ref $elements eq 'ARRAY') {
+    confess "The \$elements must be an array reference";
   }
   
   my $ret;
-  eval { $ret = $self->_xs_new_mulnum_array($basic_type_name, $elems) };
+  eval { $ret = $self->_xs_new_mulnum_array($basic_type_name, $elements) };
   if ($@) { confess $@ }
   
   return $ret;
@@ -190,20 +182,6 @@ sub new_mulnum_array_from_bin {
   
   my $ret;
   eval { $ret = $self->_xs_new_mulnum_array_from_bin($basic_type_name, $elems) };
-  if ($@) { confess $@ }
-  
-  return $ret;
-}
-
-sub set_exception {
-  my ($self, $exception) = @_;
-  
-  if (defined $exception && !ref $exception) {
-    $exception = $self->new_string($exception);
-  }
-  
-  my $ret;
-  eval { $ret = $self->_xs_set_exception($exception) };
   if ($@) { confess $@ }
   
   return $ret;
@@ -243,11 +221,11 @@ sub new_float_array_len { my $ret; eval { $ret =  &xs_new_float_array_len(@_) };
 sub new_float_array_from_bin { my $ret; eval { $ret =  &xs_new_float_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
 sub new_string_array { my $ret; eval { $ret =  &xs_new_string_array(@_) }; if ($@) { confess $@ } $ret}
 sub get_exception { my $ret; eval { $ret =  &xs_get_exception(@_) }; if ($@) { confess $@ } $ret}
+sub set_exception { my $ret; eval { $ret =  &xs_set_exception(@_) }; if ($@) { confess $@ } $ret}
 sub string_object_to_string { my $ret; eval { $ret =  &xs_string_object_to_string(@_) }; if ($@) { confess $@ } $ret}
 sub get_memory_blocks_count { my $ret; eval { $ret =  &xs_get_memory_blocks_count(@_) }; if ($@) { confess $@ } $ret}
 sub call_method { my $ret; eval { $ret =  &xs_call_method(@_) }; if ($@) { confess $@ } $ret}
 sub new_string { my $ret; eval { $ret =  &xs_new_string(@_) }; if ($@) { confess $@ } $ret}
-sub new_string_from_bin { my $ret; eval { $ret =  &xs_new_string_from_bin(@_) }; if ($@) { confess $@ } $ret}
 sub string_object_to_bin { my $ret; eval { $ret =  &xs_string_object_to_bin(@_) }; if ($@) { confess $@ } $ret}
 sub array_length { my $ret; eval { $ret =  &xs_array_length(@_) }; if ($@) { confess $@ } $ret}
 sub array_to_elems { my $ret; eval { $ret =  &xs_array_to_elems(@_) }; if ($@) { confess $@ } $ret}
@@ -255,6 +233,7 @@ sub array_to_bin { my $ret; eval { $ret =  &xs_array_to_bin(@_) }; if ($@) { con
 sub array_set { my $ret; eval { $ret =  &xs_array_set(@_) }; if ($@) { confess $@ } $ret}
 sub array_get { my $ret; eval { $ret =  &xs_array_get(@_) }; if ($@) { confess $@ } $ret}
 sub new_address_object { my $ret; eval { $ret =  &xs_new_address_object(@_) }; if ($@) { confess $@ } $ret}
+sub dump { my $ret; eval { $ret =  &xs_dump(@_) }; if ($@) { confess $@ } $ret}
 
 1;
 
@@ -312,210 +291,519 @@ An stack.
 
 =back
 
+=head1 Perl Types
+
+Perl types used in this document.
+
+=head2 number
+
+Perl number scalar.
+
+=head2 integer
+
+Perl number scalar that is exepected to be an integer value.
+
+=head2 string
+
+Perl string scalar.
+
+=head2 binary
+
+Perl string scalar that is exepected to be a packed data.
+
+=head2 array_ref
+
+Perl array reference
+
+=head2 hash_ref
+
+Perl hash reference
+
 =head1 Instance Methods
 
 =head2 new_byte_array
+  
+  my $ret = $api->new_byte_array($array);
 
-  my $sp_nums = $api->new_byte_array([1, 2, 3]);
+Converts a Perl array reference to a SPVM C<byte> array using the convertion of L</"byte[] Argument"> and returns it.
 
-Converts a Perl numeric array reference to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<byte[]> type and returns it.
+Argument Types:
 
-If the argument is C<undef>, returns C<undef>.
+$array : L<array_ref|/"array_ref">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $array must be an array reference.
+
+Examples:
+
+  my $spvm_array = $api->new_byte_array([1, 2, 3]);
 
 =head2 new_byte_array_len
 
-  my $sp_nums = $api->new_byte_array_len($length);
+  my $ret = $api->new_byte_array_len($length);
 
-Create a new L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<byte[]> type with the length.
+Creates a SPVM C<byte> array with the $length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will occur.
+Argument Types:
 
-=head2 new_byte_array_from_bin
+$length : L<integer|/"integer">
 
-  my $pl_binary = pack('c3', 97, 98, 99);
-  my $sp_nums = $api->new_byte_array_from_bin($pl_binary);
+Return Type:
 
-Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<byte[]> type and returns it.
+L<SPVM::BlessedObject::Array>
 
-The Perl binary is interpreted as 8-bit signed integers. The length of the array is calcurated from the Perl binary.
+Exceptions:
 
-If the argument is C<undef>, returns C<undef>.
+The $length must be greater than or equal to 0.
 
 Examples:
   
-  # Convert Perl string to SPVM byte[]
-  my $pl_binary ="abc";
-  my $sp_nums = $api->new_byte_array_from_bin($pl_binary);
+  my $length = 10;
+  my $spvm_array = $api->new_byte_array_len($length);
 
-=head2 new_byte_array_from_string
+=head2 new_byte_array_from_bin
 
-  my $sp_nums = $api->new_byte_array_from_string("あいう");
+  my $spvm_array = $api->new_byte_array_from_bin($binary);
 
-The same as the L</"new_byte_array_from_bin"> method. Any decoding is not performed.
+Converts a Perl binary to a SPVM C<byte> array and returns it.
 
-=head2 new_short_array
-
-  my $sp_nums = $api->new_short_array([1, 2, 3]);
-
-Converts a Perl numeric array reference to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<short[]> type and returns it.
+The Perl binary is interpreted as 8-bit signed integer. The length of the array is calcurated from the Perl binary.
 
 If the argument is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$binary : L<binary|/"binary">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $binary must be defined.
+
+Examples:
+
+  my $binary = pack('c*', 97, 98, 99);
+  my $spvm_array = $api->new_byte_array_from_bin($binary);
+
+  my $string = "abc";
+  my $spvm_array = $api->new_byte_array_from_bin($string);
+  
+  my $string = "あいう";
+  my $spvm_array = $api->new_byte_array_from_bin($string);
+
+=head2 new_short_array
+  
+  my $ret = $api->new_short_array($array);
+
+Converts a Perl array reference to a SPVM C<short> array using the convertion of L</"short[] Argument"> and returns it.
+
+Argument Types:
+
+$array : L<array_ref|/"array_ref">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $array must be an array reference.
+
+Examples:
+
+  my $spvm_array = $api->new_short_array([1, 2, 3]);
 
 =head2 new_short_array_len
 
-  my $sp_nums = $api->new_short_array_len($length);
+  my $ret = $api->new_short_array_len($length);
 
-Create a new L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<short[]> type with the length.
+Creates a SPVM C<short> array with the $length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will occur.
+Argument Types:
+
+$length : L<integer|/"integer">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $length must be greater than or equal to 0.
+
+Examples:
+  
+  my $length = 10;
+  my $spvm_array = $api->new_short_array_len($length);
 
 =head2 new_short_array_from_bin
 
-  my $pl_binary = pack('c3', 97, 98, 99);
-  my $sp_nums = $api->new_short_array_from_bin($pl_binary);
+  my $spvm_array = $api->new_short_array_from_bin($binary);
 
-Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<short[]> type and returns it.
+Converts a Perl binary to a SPVM C<short> array and returns it.
 
-The Perl binary is interpreted as 16-bit signed integers. The length of the array is calcurated from the Perl binary.
+The Perl binary is interpreted as 16-bit signed integer. The length of the array is calcurated from the Perl binary.
 
 If the argument is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$binary : L<binary|/"binary">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $binary must be defined.
+
+Examples:
+
+  my $binary = pack('s*', 97, 98, 99);
+  my $spvm_array = $api->new_short_array_from_bin($binary);
 
 =head2 new_int_array
+  
+  my $ret = $api->new_int_array($array);
 
-  my $sp_nums = $api->new_int_array([1, 2, 3]);
+Converts a Perl array reference to a SPVM C<int> array using the convertion of L</"int[] Argument"> and returns it.
 
-Converts a Perl numeric array reference to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<int[]> type and returns it.
+Argument Types:
 
-If the argument is C<undef>, returns C<undef>.
+$array : L<array_ref|/"array_ref">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $array must be an array reference.
+
+Examples:
+
+  my $spvm_array = $api->new_int_array([1, 2, 3]);
 
 =head2 new_int_array_len
 
-  my $sp_nums = $api->new_int_array_len($length);
+  my $ret = $api->new_int_array_len($length);
 
-Create a new L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<int[]> type with the length.
+Creates a SPVM C<int> array with the $length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will occur.
+Argument Types:
+
+$length : L<integer|/"integer">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $length must be greater than or equal to 0.
+
+Examples:
+  
+  my $length = 10;
+  my $spvm_array = $api->new_int_array_len($length);
 
 =head2 new_int_array_from_bin
 
-  my $pl_binary = pack('l3', 97, 98, 99);
-  my $sp_nums = $api->new_int_array_from_bin($pl_binary);
+  my $spvm_array = $api->new_int_array_from_bin($binary);
 
-Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<int[]> type and returns it.
+Converts a Perl binary to a SPVM C<int> array and returns it.
 
-The Perl binary is interpreted as 32-bit signed integers. The length of the array is calcurated from the Perl binary.
+The Perl binary is interpreted as 32-bit signed integer. The length of the array is calcurated from the Perl binary.
 
 If the argument is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$binary : L<binary|/"binary">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $binary must be defined.
+
+Examples:
+
+  my $binary = pack('l*', 97, 98, 99);
+  my $spvm_array = $api->new_int_array_from_bin($binary);
 
 =head2 new_long_array
+  
+  my $ret = $api->new_long_array($array);
 
-  my $sp_nums = $api->new_long_array([1, 2, 3]);
+Converts a Perl array reference to a SPVM C<long> array using the convertion of L</"long[] Argument"> and returns it.
 
-Converts a Perl numeric array reference to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<long[]> type and returns it.
+L</"Argument Conversion"> is applied to each element.
 
-If the argument is C<undef>, returns C<undef>.
+If the $array is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$array : L<array_ref|/"array_ref">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $array must be an array reference.
+
+Examples:
+
+  my $spvm_array = $api->new_long_array([1, 2, 3]);
 
 =head2 new_long_array_len
 
-  my $sp_nums = $api->new_long_array_len($length);
+  my $ret = $api->new_long_array_len($length);
 
-Create a new L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<long[]> type with the length.
+Creates a SPVM C<long> array with the $length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will occur.
+Argument Types:
+
+$length : L<integer|/"integer">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $length must be greater than or equal to 0.
+
+Examples:
+  
+  my $length = 10;
+  my $spvm_array = $api->new_long_array_len($length);
 
 =head2 new_long_array_from_bin
 
-  my $pl_binary = pack('q3', 97, 98, 99);
-  my $sp_nums = $api->new_long_array_from_bin($pl_binary);
+  my $spvm_array = $api->new_long_array_from_bin($binary);
 
-Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<long[]> type and returns it.
+Converts a Perl binary to a SPVM C<long> array and returns it.
 
-The Perl binary is interpreted as 64-bit signed integers. The length of the array is calcurated from the Perl binary.
+The Perl binary is interpreted as 64-bit signed integer. The length of the array is calcurated from the Perl binary.
 
 If the argument is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$binary : L<binary|/"binary">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $binary must be defined.
+
+Examples:
+
+  my $binary = pack('q*', 97, 98, 99);
+  my $spvm_array = $api->new_long_array_from_bin($binary);
 
 =head2 new_float_array
+  
+  my $ret = $api->new_float_array($array);
 
-  my $sp_nums = $api->new_float_array([1.2, 2.5, 3.3]);
+Converts a Perl array reference to a SPVM C<float> array using the convertion of L</"float[] Argument"> and returns it.
 
-Converts a Perl numeric array reference to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<float[]> type and returns it.
+L</"Argument Conversion"> is applied to each element.
 
-If the argument is C<undef>, returns C<undef>.
+If the $array is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$array : L<array_ref|/"array_ref">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $array must be an array reference.
+
+Examples:
+
+  my $spvm_array = $api->new_float_array([1, 2, 3]);
 
 =head2 new_float_array_len
 
-  my $sp_nums = $api->new_float_array_len($length);
+  my $ret = $api->new_float_array_len($length);
 
-Create a new L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<float[]> type with the length.
+Creates a SPVM C<float> array with the $length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will occur.
+Argument Types:
+
+$length : L<floateger|/"floateger">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $length must be greater than or equal to 0.
+
+Examples:
+  
+  my $length = 10;
+  my $spvm_array = $api->new_float_array_len($length);
 
 =head2 new_float_array_from_bin
 
-  my $pl_binary = pack('f3', 0.5, 1.5, 2.5);
-  my $sp_nums = $api->new_float_array_from_bin($pl_binary);
+  my $spvm_array = $api->new_float_array_from_bin($binary);
 
-Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<float[]> type and returns it.
+Converts a Perl binary to a SPVM C<float> array and returns it.
 
-The Perl binary is interpreted as 32-bit floating point. The length of the array is calcurated from the Perl binary.
+The Perl binary is interpretted as 32-bit floating point. The length of the array is calcurated from the Perl binary.
 
 If the argument is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$binary : L<binary|/"binary">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $binary must be defined.
+
+Examples:
+
+  my $binary = pack('f*', 97.1, 98.2, 99.3);
+  my $spvm_array = $api->new_float_array_from_bin($binary);
 
 =head2 new_double_array
+  
+  my $ret = $api->new_double_array($array);
 
-  my $sp_nums = $api->new_double_array([1.2, 2.5, 3.3]);
+Converts a Perl array reference to a SPVM C<double> array using the convertion of L</"double[] Argument"> and returns it.
 
-Converts a Perl numeric array reference to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<double[]> type and returns it.
+L</"Argument Conversion"> is applied to each element.
 
-If the argument is C<undef>, returns C<undef>.
+If the $array is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$array : L<array_ref|/"array_ref">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $array must be an array reference.
+
+Examples:
+
+  my $spvm_array = $api->new_double_array([1, 2, 3]);
 
 =head2 new_double_array_len
 
-  my $sp_nums = $api->new_double_array_len($length);
+  my $ret = $api->new_double_array_len($length);
 
-Create a new L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<double[]> type with the length.
+Creates a SPVM C<double> array with the $length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will occur.
+Argument Types:
+
+$length : L<integer|/"integer">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $length must be greater than or equal to 0.
+
+Examples:
+  
+  my $length = 10;
+  my $spvm_array = $api->new_double_array_len($length);
 
 =head2 new_double_array_from_bin
 
-  my $pl_binary = pack('f3', 0.5, 1.5, 2.5);
-  my $sp_double_array = $api->new_double_array_from_bin($pl_binary);
+  my $spvm_array = $api->new_double_array_from_bin($binary);
 
-Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of the SPVM C<double[]> type and returns it.
+Converts a Perl binary to a SPVM C<double> array and returns it.
 
-The Perl binary is interpreted as 64-bit floating point. The length of the array is calcurated from the Perl binary.
+The Perl binary is interpretted as 64-bit floating point. The length of the array is calcurated from the Perl binary.
 
 If the argument is C<undef>, returns C<undef>.
+
+Argument Types:
+
+$binary : L<binary|/"binary">
+
+Return Type:
+
+L<SPVM::BlessedObject::Array>
+
+Exceptions:
+
+The $binary must be defined.
+
+Examples:
+
+  my $binary = pack('d*', 97.1, 98.2, 99.3);
+  my $spvm_array = $api->new_double_array_from_bin($binary);
 
 =head2 new_string
 
-  my $sp_string = $api->new_string("あいう");
+  my $spvm_string = $api->new_string($string);
 
-Converts a Perl string to a L<SPVM::BlessedObject::String> object. Any decoding is not performed.
+Converts a Perl string to a SPVM string using the convertion of L</"string Argument"> and returns it as a L<SPVM::BlessedObject::String> object.
 
-If the argument is C<undef>, returns C<undef>.
+Argument Types:
 
-=head2 new_string_from_bin
+$string : L<string|/"string">|L<SPVM::BlessedObject::String>
 
-  my $pl_binary = pack('c3', 97, 98, 99);
-  my $sp_string = $api->new_string_from_bin($pl_binary);
+Return Type:
 
-Converts a Perl binary to a L<SPVM::BlessedObject::String>.
+L<SPVM::BlessedObject::String>
 
-The Perl binary is interpreted as 8-bit signed integers. The length of the string is calcurated from the Perl binary.
+Exceptions:
 
-If the argument is C<undef>, returns C<undef>.
+The $string can't be a reference.
 
-=head2 new_options
+Examples:
 
-  my $byte_array = $api->new_options(
+  my $spvm_string = $api->new_string("abc");
+
+  my $spvm_string = $api->new_string("あいう");
+
+=head2 new_any_object_array
+
+  my $byte_array = $api->new_any_object_array(
     [SPVM::Byte->new(1), SPVM::Byte>new(2), SPVM::Byte->new(3)]
   );
 
 The alias for the following code using the L</"new_object_array"> method.
 
-  my $sp_array = $api->new_object_array('object[]', $pl_array);
+  my $spvm_array = $api->new_object_array('object[]', $array);
 
 =head2 new_options
 
@@ -549,12 +837,12 @@ Examples:
 
 Converts a Perl array reference to a L<SPVM::BlessedObject::Array> object that has the value of a multi-numeric array type and returns it.
 
-  my $pl_values = [
+  my $values = [
     {x => 0, y => 1, z => 2},
     {x => 3, y => 4, z => 5},
     {x => 6, y => 7, z => 8},
   ];
-  my $sp_mulnum_array = $api->new_mulnum_array("TestCase::Point_3i[]", $pl_values);
+  my $spvm_mulnum_array = $api->new_mulnum_array("TestCase::Point_3i[]", $values);
 
 The first argument is a SPVM array type name. If the type doesn't exist, an exception will occur.
 
@@ -563,7 +851,7 @@ The second argument is a Perl array of a hash references. Each hash reference mu
 =head2 new_mulnum_array_from_bin
 
   my $binary = pack('l9', (0, 1, 2), (3, 4, 5), (6, 7, 8));
-  my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3i[]", $binary);
+  my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3i[]", $binary);
 
 Converts a Perl binary to a L<SPVM::BlessedObject::Array> object that has the value of a multi-numeric array type and returns it.
 
@@ -576,60 +864,77 @@ Examples:
   # new_mulnum_array_from_bin - byte
   {
     my $binary = pack('c9', (0, 1, 2), (3, 4, 5), (6, 7, 8));
-    my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3b[]", $binary);
+    my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3b[]", $binary);
   }
 
   # new_mulnum_array_from_bin - short
   {
     my $binary = pack('s9', (0, 1, 2), (3, 4, 5), (6, 7, 8);;
-    my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3s[]", $binary);
+    my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3s[]", $binary);
   }
 
   # new_mulnum_array_from_bin - int
   {
     my $binary = pack('l9', (0, 1, 2), (3, 4, 5), (6, 7, 8));
-    my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3i[]", $binary);
+    my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3i[]", $binary);
   }
 
   # new_mulnum_array_from_bin - long
   {
     my $binary = pack('q9', (0, 1, 2), (3, 4, 5), (6, 7, 8));
-    my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3l[]", $binary);
+    my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3l[]", $binary);
   }
 
   # new_mulnum_array_from_bin - float
   {
     my $binary = pack('f9', (0, 1, 2), (3, 4, 5), (6, 7, 8));
-    my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3f[]", $binary);
+    my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3f[]", $binary);
   }
 
   # new_mulnum_array_from_bin - double
   {
     my $binary = pack('d9', (0, 1, 2), (3, 4, 5), (6, 7, 8));
-    my $sp_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3d[]", $binary);
+    my $spvm_mulnum_array = $api->new_mulnum_array_from_bin("TestCase::Point_3d[]", $binary);
   }
 
 =head2 get_exception
 
-  my $exception = $api->get_exception();
+  my $ret = $api->get_exception();
 
-Gets the exception in the current call stack as L<SPVM::BlessedObject::String> object.
+Returns the exception in the current thread stack.
+
+Return Type:
+
+L<SPVM::BlessedObject::String>|undef
 
 =head2 set_exception
 
-Sets an exception in the current call stack.
+  $api->set_exception($message);
 
-The argument must be a Perl string, a L<SPVM::BlessedObject::String> object or C<undef>. Otherwise an exception will occur.
+Sets an exception in the current thread stack.
+
+Argument Types:
+
+$message : L<SPVM::BlessedObject::String>|undef
+
+Exceptions:
+
+The $message must be a SPVM::BlessedObject::String object.
+
+Examples:
 
   $api->set_exception($api->new_string("abc"));
-  $api->set_exception("abc");
   $api->set_exception(undef);
 
 =head2 get_memory_blocks_count
 
-  my $count = $api->get_memory_blocks_count();
+  my $ret = $api->get_memory_blocks_count();
 
-Gets the count of memory blocks on the execution environment.
+Returns the count of memory blocks on the execution environment.
+
+Return Type:
+
+number
 
 Examples:
 
@@ -648,21 +953,67 @@ Examples:
 
 =head2 call_method
   
-  # Call an class method
-  my $ret = $api->call_method($class_name, $method_name, @args);
-
-  # Call an instance method
   my $ret = $api->call_method($invocant, $method_name, @args);
 
-Calls an class method or an instance method with arguments and return the return value.
+Calls a class method or an instance method. If the $invocant is a string, a class method is called. If the $invocant is a L<SPVM::BlessedObject::Class>, an instance method is called.
 
-If the count of arguments is less than the count of the arguments of the method, an exception will occur.
+The @args are converted by the rule of L</"Argument Conversion">.
 
-If the count of arguments is more than the count of the arguments of the method, an exception will occur.
-
-The arguments are converted by the rule of L</"Argument Conversion">.
+The $method_name allows static method name such as C<Foo::bar>.
 
 The return value is converted by the rule of L</"Return Value Conversion">.
+
+Argument Types:
+
+$invocant : string|L<SPVM::BlessedObject>
+
+$method_name : string
+
+@args : the list of the L<SPVM::BlessedObject> object of the argument types of the method (See also L</"Argument Conversion">)
+
+Return Type:
+
+L<SPVM::BlessedObject> of the return type of the method (See also L</"Return Value Conversion">)
+
+Exceptions:
+
+The exception message thrown by SPVM.
+
+The $invocant must be a SPVM::BlessedObject::Class object
+
+The static method call must be valid.
+
+The \"%s\" method in the \"%s\" class is not found.
+
+Too few arguments are passed to the \"%s\" method in the \"%s\" class.
+
+Too many arguments are passed to the \"%s\" method in the \"%s\" class.
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be an interger reference
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a floating-point reference
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a scalar reference of a hash reference
+
+The %dth argument of the \"%s\" field in the \"%s\" class is not found
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a number
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::String object
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject object
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be assinged to the argument type
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Class object
+
+The \"%s\" field in the %dth argument must be defined. The field is defined in the \"%s\" class
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a hash reference
+
+The object must be assigned to the %s type of the %dth argument of the \"%s\" method in the \"%s\" class
+
+The %dth argument of the \"%s\" method in the \"%s\" class must be a SPVM::BlessedObject::Array object
 
 Examples:
 
@@ -672,16 +1023,38 @@ Examples:
   # Instance method call
   $api->call_method($obj_int, "set_value", 5);
   my $value = $api->call_method($obj_int, "value");
-
+  
+  # Call static instance method
+  $api->call_method($object, "Foo::value");
+  
 =head2 class
 
-  my $class = $api->class('Int');
+  my $ret = $api->class($class_name);
 
-Creates a new L<SPVM::ExchangeAPI::Class> object.
+Creates a new L<SPVM::ExchangeAPI::Class> object with the $class_name and returns it.
 
 Examples:
+  
+  my $class = $api->class('Int');
+  my $spvm_object = $class->new(1);
 
-  $api->class('Int')->new(1);
+=head2 dump
+
+  my $ret = $api->dump($object);
+
+Generates the string by dumping a SPVM object using the L<dump|SPVM::Document::Language/"dump Operator"> operator and returns it.
+
+Argument Types:
+
+$object : L<SPVM::BlessedObject>|undef
+
+Return Type:
+
+L<SPVM::BlessedObject::String>
+
+Exceptions:
+
+The $object must be a SPVM::BlessedObject object.
 
 =head1 Argument Conversion
 
@@ -737,30 +1110,23 @@ A Perl scalar is converted to a value of the SPVM C<double> type using the L<SvN
 
 =head2 string Argument
 
-If the SPVM argument type is C<string>, the Perl scalar is converted by the following rules.
+If the SPVM argument type is C<string>, the Perl scalar is converted by the following rule.
 
-If any of the following rules does not match, an exception will occur.
+If the Perl scalar is C<undef>, it is converted to SPVM C<undef>.
 
-If the SPVM argument type is C<string>, the Perl non-ref scalar is converted to L<SPVM::BlessedObject::String> object.
+Else if the Perl scalar is a L<SPVM::BlessedObject::String> object, it is converted to the owned SPVM string.
 
-The non-ref scalar value is assumed to a Perl decoded string, and is converted to UTF-8 bytes.
+Else if the Perl scalar is a reference, an exception will be thrown.
 
-If the non-ref scalar value is Perl C<undef>, it is converted to Perl C<undef>.
-
-And the following L</"Perl SPVM::BlessedObject::String to SPVM String"> conversion is contined.
+Othwerwise the Perl scalar is converted to a SPVM string using perlapi L<SvPV|https://perldoc.perl.org/perlapi#SvPV>.
 
 Examples:
 
-  # Converts a Perl scalar to string type
+  SPVM::MyClass->foo($api->new_string("あいう"));
+
   SPVM::MyClass->foo("あいう");
-
-Perl can have SPVM string itself as L<SPVM::BlessedObject::String> object. This object is created by such as L</"new_string">, L</"new_string_from_bin">, or got as a return value of SPVM method.
-
-If the value is Perl C<undef>, it is converted to SPVM C<undef>
-
-  # Converts a Perl scalar to string type
-  my $string = $api->new_string("あいう");
-  SPVM::MyClass->foo($string);
+  
+  SPVM::MyClass->foo(undef);
 
 =head2 Class Argument
 
@@ -1224,7 +1590,7 @@ Examples:
 
 =head1 Return Value Conversion
 
-A SPVM return value is converted to a Perl value by the following rules.
+A SPVM return value is converted to a Perl value by the following rule.
 
 =head2 void Return Value
 

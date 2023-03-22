@@ -27,7 +27,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 
 ###############################################################################
@@ -470,7 +470,7 @@ sub set_style {
     my $self = shift;
     my $style_id = defined $_[0] ? $_[0] : 2;
 
-    if ( $style_id < 0 || $style_id > 48 ) {
+    if ( $style_id < 1 || $style_id > 48 ) {
         $style_id = 2;
     }
 

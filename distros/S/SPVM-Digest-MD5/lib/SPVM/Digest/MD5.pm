@@ -1,6 +1,6 @@
 package SPVM::Digest::MD5;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 1;
 
@@ -132,6 +132,10 @@ L<SPVM::Digest::MD5 - Github|https://github.com/yuki-kimoto/SPVM-Digest-MD5>
 =head1 Author
 
 Yuki Kimoto C<kimoto.yuki@gmail.com>
+
+=head1 Contributors
+
+L<Yoshiyuki Itoh|https://github.com/YoshiyukiItoh>
 
 =head1 Copyright & License
 

@@ -116,7 +116,7 @@ use constant FALSE => 0;
 use constant TRUE => 1;
 use constant INTEGRITY_HASH_SALT => 'wefnwioefh9032ur3';
 
-our $VERSION = "0.3.3"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.3.4"; # do not change manually, this variable is updated when calling make
 
 =head3 is_valid_interface($interface)
 

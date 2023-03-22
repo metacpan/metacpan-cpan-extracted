@@ -1,6 +1,6 @@
 {
     "name" : "Jacode4e",
-    "version" : "2.13.6.20",
+    "version" : "2.13.6.21",
     "abstract" : "Converts Character Encodings for Enterprise in Japan",
     "author" : [
         "ina <ina@cpan.org>"

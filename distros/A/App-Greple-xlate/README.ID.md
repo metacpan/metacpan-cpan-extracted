@@ -8,7 +8,7 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Secara default, teks asli dan terjemahan dicetak dalam format "penanda konflik" 
     </p>
 </div>
 
-Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini adalah jalan pintas untuk menentukan pola yang cocok dengan seluruh teks `(?).*`.
+Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-all**. Ini adalah jalan pintas untuk menentukan pola yang cocok dengan seluruh teks `(?).+`.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-entire**. Ini
 
     Lihat hasil terjemahan secara real time dalam output STDERR.
 
-- **--match-entire**
+- **--match-all**
 
     Mengatur seluruh teks file sebagai area target.
 

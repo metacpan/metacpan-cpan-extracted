@@ -24,6 +24,6 @@ use HTML::Blitz::Atom our @EXPORT_OK = qw(
     LT_ADJACENT_SIBLING
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1

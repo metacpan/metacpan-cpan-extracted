@@ -1,74 +1,75 @@
 #!/usr/bin/perl
 
-#  expandtab
-#   2021-06-11(fri) , 2022-10-19(wed)
+#  expandtab -- 下野寿之
+#   2021-06-11(fri) , 2022-10-19(wed) , 2023-03-22(wed)
 
 use 5.014 ; 
 use strict ; 
 use warnings ; # also confirmed on 5.011 5.014 5.018  
 use FindBin qw [ $Bin $Script ] ; 
-#my @argv = @ARGV ;
-use Getopt::Std ; getopts 'C:D:R:b:c:fi:rs:x' => \my %o ;
-use List::Util qw [ min max ] ; 
+use Getopt::Std ; 
+use Getopt::Long qw [ GetOptions :config bundling no_ignore_case pass_through ] ; 
 use Term::ANSIColor qw [ :constants color ]  ; $Term::ANSIColor::AUTORESET = 1 ; 
-#my $sdt = sprintf '%04d-%02d-%02d %02d:%02d:%02d', do{my @t= @{[localtime]}[5,4,3,2,1,0]; $t[0]+=1900; $t[1]++; @t } ; 
-#use Time::HiRes qw [ gettimeofday tv_interval ] ; my ${ dt_start } = [ gettimeofday ] ; 
+use List::Util qw [ max min ] ;
 BEGIN { 
   *width = eval'use Text::VisualWidth::UTF8 qw[width];1'? *Text::VisualWidth::UTF8::width : sub{length $_[0]} ; 
 }  
 
+GetOptions delcolor => \my$delcolor ; # 単に色を消すだけの、おまけの機能。
+GetOptions right => \my$right ; # 右揃えにする指定。
+GetOptions 'keep=s' => \my$keep ; # \r を入力から除去しない場合は, --keep CRLF と指定する。
+$keep //= '' ; 
+getopts 'C:D:b:c:fi:r:s:x' => \my %o ;
 & demo if exists $o{D} ; 
 
-sub delColor ($) {  $_[0] =~ s{ \e\[ [\d;]* m }{}xmsgr }  # ASCIIエスケープシーケンスによる着色を消す。
-if ( 0 eq ($o{C}//'') ) { while ( <> ) { print delColor $_ } ; exit } # -C0の指定で、単に色を取るというお節介な機能。
+sub delColor ( $ ) {  $_[0] =~ s{ \e\[ [\d;]* m }{}xmsgr }  # ASCIIエスケープシーケンスによる着色を消す。
+if ( $delcolor ) { while ( <> ) { print delColor $_ } ; exit } # 単に色を取るというお節介な機能。下でも使う。
 
 $o{b} //= ' ' ; # 間に埋める文字
 $o{c} //= ' ' ; # 列間で、列の直前に入れる文字
-$o{i} //= "\t" ; 
-my $optR0 = exists $o{R} && $o{R} eq 0 ; 
+$o{i} //= "\t" ; # 入力の区切り文字
+$o{r} //= 0    ; # 最も右側の列を何列について、文字幅の計算の対象外とするかの 値の指定
 
 ## 値の読取り
 my @C ; # セルの値
 my @L ; # ビジュアルな長さ
-my $rcnt = 0 ; # 行番号
+my $row = 0 ; # 行番号
 my $cmax = 0 ; # 最大の列数
 while ( <> ) { 
   chomp ; 
-  s/\r$//o unless $optR0 ; 
-  $C [ $rcnt ] = [ my @F = split /$o{i}/, $_ , -1 ] ; 
-  $L [ $rcnt ] = [ map { width ( delColor $_ ) } @F ]  ;  # <-- - length/width
+  s/\r$//o unless $keep eq 'CRLF' ;
+  $C [ $row ] = [ my @F = split /$o{i}/, $_ , -1 ] ; 
+  $L [ $row ] = [ map { width ( delColor $_ ) } @F ]  ;  # <-- - length/width
   $cmax = @F if @F > $cmax ; # 列数の最大値
-  $rcnt ++ 
+  $row ++ 
 }
 
 ## 各列において、Visual幅を算出する。 cmw は The Column's Max Width 
-my @cmw = map { my $c = $_ ; max map { $L[$_][$c] // 0 } 0 .. $rcnt - 1 }  0 .. $cmax - 1 ; 
+my @Lr ; for ( 0 .. $#L ) { @{$Lr[$_]} = @{$L[$_]} ; splice @{$Lr[$_]} , - min ( $o{r} , scalar @{$Lr[$_]} ) if $o{r} } 
+my @cmw = map { my $c = $_ ; max map { $Lr[$_][$c] // 0 } 0 .. $row - 1 }  0 .. $cmax - 1 ; 
+undef @Lr ; 
 
 # -x の指定があれば、less に渡す引数(-xによるタブ位置の指定)のみを出力して、終了。
 if ( $o{x} ) { my $s = 0 ; say "-x",join "," , map {$s += $_ + 1 } @cmw ; exit } 
 
 ## 出力
-for my $r ( 0 .. $rcnt -1 ) { 
+for my $r ( 0 .. $row -1 ) { 
   my @oneRow ; # ひとつの各行に、どんな列値を出すかを格納。
   my $spaceSpare = 0 ; # 「柔軟な伸び縮み」をするための仕組みを導入している。
   for my $c ( 0 .. ( $o{f} ? $#cmw : $#{$C[$r]}) ) { 
-  #for my $c ( 0 ..  $#{$C[$r]} ) { 
     ( $C[$r][$c] , $L[$r][$c] ) = ( '' , 0 ) if  ! defined $C[$r][$c] ; #! $L[$r][$c] ; #
     my $space = exists $o{s} ? min $cmw[$c] , $o{s} : $cmw[$c] ; # 仮の割り当て空間(半角何文字分にするか)の長さ
     my $addlen = $space + $spaceSpare - $L[$r][$c]; # 半角空白文字を何個ほど追加するか; --# if $cmw[$c] > $o{s}
     $spaceSpare = $addlen < 0 ? $addlen : 0 ; # 0 + min 0 , $addlen ; 
     my $addStr = $o{b} x max 0, $addlen ; # (前か後ろに)追加する文字列 (通常は、半角空白文字の連続)
-    push @oneRow, $o{r} ? $addStr . $C[$r][$c] : $C[$r][$c] . $addStr  ; # $o{b} : 間に埋める文字列。未指定なら半角空白' '。
-    #push @oneRow, $tmp ; 
+    push @oneRow, $right ? $addStr . $C[$r][$c] : $C[$r][$c] . $addStr  ; # $o{b} : 間に埋める文字列。未指定なら半角空白' '。
   }
   say join $o{c} , @oneRow ; # $o{c} : 列間で、列の直前に入れる文字。未指定なら半角空白 ' '。(connector)
 }
 exit 0 ;
 
 sub demo () {
-  #print $0 ; exit ;
   $o{D} //= '' ;
-  #@ARGV = @argv ; getopts 'D:' , \my%o ; 
   if ( $o{D} eq 1 ) { 
     say YELLOW '>  ' , my $cmd = "$0 @ARGV" ;
     open my $FH, '|-', $0, @ARGV ; #"$Bin/$Script @argv" ; 
@@ -85,6 +86,7 @@ sub demo () {
   }
   if ( $o{D} eq 4 ) { 
     #my $cmd = "perl -e ''" ; 
+
     open my $FH , '|-' , "$0 -c'|' -b. -f " ; 
     say {$FH} join "\t" , map { "$_"x(1+rand 3) } 1 .. $_ for 0..5 ;
   }
@@ -117,12 +119,15 @@ sub HELP_MESSAGE {
   -c char ; 列間で、列の直前に入れる文字。未指定なら半角空白 ' ' 。例として　 -c "|" 。connectorのcのつもり。
   -f : ある行が列の数が少ないときに、最も列数の多い行に合わせて、列の数を増やす指定。
   -i delim : 区切り文字の変更。未指定なら、タブ文字。(出力は空白文字うめであり、変えない。)
-  -r : 右揃えにする。この指定が無いと、左揃えである。
-  -s N : 出力の各セルにおいて、長すぎるセルを可能であれば埋めた空白をさらに幅何文字分(半角相当)まで縮めるか指定。
+  -r N  : 最も右側の列を何列について、文字幅の計算の対象外とするかの 値の指定。未指定なら 0。
+  -s N : (実験的)出力の各セルにおいて、長すぎるセルを可能であれば埋めた空白をさらに幅何文字分(半角相当)まで縮めるか指定。
   -x : less に渡す引数(-xによるタブ位置の指定)のみを出力して終了。時には、とても便利。
-  -C0 : 単に入力の着色(ASCIIエスケープシーケンスによるもの)を取り除く。$0の主題と直接関係ないが、$0のテスト機能であり、おまけの機能でもある。
   -D num : このコマンドの動作についてのデモを表示して終了。numは1〜4。(開発上テストでも使う。)
-  -R0 : 通常Windows形式の改行文字であるCRLFはCFの部分を取り除く。しかし-R0指定でその処理をわざと行わない(通常時に利用は想定されていない, テスト目的などを想定)。
+
+  --delcolor : 単に入力の着色(ASCIIエスケープシーケンスによるもの)を除去。テスト機能であり、おまけの機能である。
+  --right : 右揃えにする。この指定が無いと、左揃えである。
+  --keep 'CRLF' : Windows形式だと改行文字が CR LF となるが、そのCRの部分を取り除く操作を、このオプション指定だと抑制する(テスト目的などを想定)。
+
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
@@ -132,6 +137,9 @@ sub HELP_MESSAGE {
    * INT{ALRM}を使って15秒ごとに、一旦出力する機能を付けたい。
    * Ctrl+ZやCtrl+Cに対する機能を付けたい。
    * -x による less の -xに渡す数の配列を STDERR に出力したい。その場合、2次情報の出力を抑制する -20も実装することになるであろう。
-   * -rにおいて、特定の列だけ、または、特定の列以外を右寄せに出来ないだろうか?
+   * --rightにおいて、特定の列だけ、または、特定の列以外を右寄せに出来ないだろうか?
+   * 出力の最後が余分に1行出力されている問題が発生中。
+
+  Text::VisualWidth のインスートルがあらかじめ必要である。
 
 =cut

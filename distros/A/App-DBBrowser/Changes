@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.321    2023-03-21
+        - Removed option alias defaults.
+        - Update alias menu.
+        - Default plugin: SQLite.
+
 2.320    2023-03-14
         - Update default aliases.
 

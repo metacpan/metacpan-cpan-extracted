@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 use Test::More tests => 126;
+use Test::Lib;
+use Test::XML::Enc;
 use XML::Enc;
 use MIME::Base64 qw/decode_base64 encode_base64/;
-use File::Which;
 
 my $xml = <<'XML';
 <?xml version="1.0"?>
@@ -15,6 +16,9 @@ XML
 my @key_methods     = qw/rsa-1_5 rsa-oaep-mgf1p/;
 my @data_methods    = qw/aes128-cbc aes192-cbc aes256-cbc tripledes-cbc aes128-gcm aes192-gcm aes256-gcm/;
 my @oaep_mgf_algs   = qw/mgf1sha1 mgf1sha224 mgf1sha256 mgf1sha384 mgf1sha512/;
+
+my $xmlsec = get_xmlsec_features();
+my $lax_key_search = $xmlsec->{lax_key_search} ? '--lax_key_search': '';
 
 foreach my $km (@key_methods) {
     foreach my $dm (@data_methods) {
@@ -34,16 +38,16 @@ foreach my $km (@key_methods) {
         ok($encrypter->decrypt($encrypted) =~ /XML-SIG_1/, "Successfully Decrypted with XML::Enc");
 
         SKIP: {
-            skip "xmlsec1 not installed", 2 unless which('xmlsec1');
+            skip "xmlsec1 not installed", 2 unless $xmlsec->{installed};
             my $version;
             if (`xmlsec1 version` =~ m/(\d+\.\d+\.\d+)/) {
                 $version = $1;
             };
-            skip "xmlsec version 1.2.27 minimum for GCM", 2 if $version lt '1.2.27';
+            skip "xmlsec version 1.2.27 minimum for GCM", 2 if ! $xmlsec->{aes_gcm};
             ok( open XML, '>', 'tmp.xml' );
             print XML $encrypted;
             close XML;
-            my $verify_response = `xmlsec1 --decrypt --privkey-pem t/sign-private.pem tmp.xml 2>&1`;
+            my $verify_response = `xmlsec1 --decrypt $lax_key_search --privkey-pem t/sign-private.pem tmp.xml 2>&1`;
             ok( $verify_response =~ m/XML-SIG_1/, "Successfully decrypted with xmlsec1" )
                 or warn "calling xmlsec1 failed: '$verify_response'\n";
             unlink 'tmp.xml';

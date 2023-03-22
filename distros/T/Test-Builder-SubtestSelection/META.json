@@ -1,7 +1,7 @@
 {
    "abstract" : "Select subtests by name or by number",
    "author" : [
-      "Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>"
+      "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.143240",
@@ -28,13 +28,16 @@
       "configure" : {
          "requires" : {
             "Config" : "0",
-            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::Spec" : "0",
+            "lib" : "0",
+            "subs" : "0"
          }
       },
       "develop" : {
          "suggests" : {
             "App::Software::License" : "0",
-            "Pod::Markdown::Github" : "0"
+            "App::cpanminus" : "1.7046"
          }
       },
       "runtime" : {
@@ -54,7 +57,7 @@
    "provides" : {
       "Test::Builder::SubtestSelection" : {
          "file" : "lib/Test/Builder/SubtestSelection.pm",
-         "version" : "0.001002"
+         "version" : "0.001003"
       }
    },
    "release_status" : "stable",
@@ -68,5 +71,5 @@
          "web" : "https://github.com/XSven/Test-Builder-SubtestSelection"
       }
    },
-   "version" : "0.001002"
+   "version" : "0.001003"
 }

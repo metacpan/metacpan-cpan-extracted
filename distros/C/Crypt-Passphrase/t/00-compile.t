@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Crypt/Passphrase.pm',
@@ -15,6 +15,7 @@ my @module_files = (
     'Crypt/Passphrase/MD5/Hex.pm',
     'Crypt/Passphrase/PassphraseHash.pm',
     'Crypt/Passphrase/SHA1/Hex.pm',
+    'Crypt/Passphrase/System.pm',
     'Crypt/Passphrase/Validator.pm'
 );
 

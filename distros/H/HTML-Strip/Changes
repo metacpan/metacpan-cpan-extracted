@@ -1,5 +1,10 @@
 Revision history for Perl extension HTML::Strip.
 
+2.12  Mon 20 Mar 2023 19:17:06 EET
+    - update META.yml to version 2 spec
+    (patch contributed by Boyd Duffee)
+    - fixes test failure in t/420_pod_coverage.t with Test::Pod::Coverage installed 
+
 2.11  Tue 14 Mar 2023 13:18:29 EET
     - fix public VSC info for MetaCPAN (RT#115740)
     - add option to emit newlines for <br> and <p> tags

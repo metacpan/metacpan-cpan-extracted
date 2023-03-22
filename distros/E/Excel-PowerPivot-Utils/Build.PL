@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
       'Excel::ValueWriter::XLSX'  => 0,
       'LWP::UserAgent'            => 0,
       'DBI'                       => 0,
+      'DBD::SQLite'               => 0,
       'Cwd'                       => 0,
     },
 

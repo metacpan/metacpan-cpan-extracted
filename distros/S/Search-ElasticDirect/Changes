@@ -1,0 +1,41 @@
+Revision history for Search::ElasticDirect
+
+2.5.1  2023-03-20 18:30:00+02:00 Europe/Athens
+  - The connect method deleted. Its functionality merged to the new()
+  - POD edit
+
+2.5.0  2023-03-20 14:00:00+02:00 Europe/Athens
+  - Bug fixing release
+
+2.2.0  2023-03-19 19:30:00+02:00 Europe/Athens
+  - POD documentation
+
+2.1.9  2023-03-18 11:15:00+02:00 Europe/Athens
+  - POD documentation
+  - Add support for json, yaml format at DeepPagination_scroll
+
+2.1.7  2023-03-16 08:15:00+02:00 Europe/Athens
+  - new method DeepPagination_sql
+  - Support for multiple formats
+  - PIT (Point In Time) functionality at DeepPagination_search_after
+
+2.1.4  2023-03-10 10:40:00+02:00 Europe/Athens
+  - new method DeepPagination_search_after
+  - new method DeepPagination_scroll
+  - new method ActiveMaster
+  - http/https layer is used as a lower package
+
+2.0.5  2022-12-05 09:40:00+02:00 Europe/Athens
+  - Re-write everything
+
+2.0.1  2021-10-06 05:00:00+02:00 Europe/Athens
+  - HttpFetch handles the authorization by ssl key/cert
+
+1.0.2  2021-09-28 00:30:00+02:00 Europe/Athens
+  - The http related code is migrated to the ElasticDirectHttp module
+
+1.0.1  2021-09-27 05:30:00+02:00 Europe/Athens
+  - Json decode is through the Cpanel::JSON::XS
+
+1.0.0  2021-06-24 19:50:00+02:00 Europe/Athens
+  - Initial release

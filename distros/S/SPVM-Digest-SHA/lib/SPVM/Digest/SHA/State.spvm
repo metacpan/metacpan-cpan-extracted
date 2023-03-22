@@ -1,1 +1,1 @@
-class Digest::SHA::State : pointer_t;
+class Digest::SHA::State : pointer;

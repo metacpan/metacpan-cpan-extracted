@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Sys"
       }
    },
-   "version" : "0.44",
+   "version" : "0.45",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

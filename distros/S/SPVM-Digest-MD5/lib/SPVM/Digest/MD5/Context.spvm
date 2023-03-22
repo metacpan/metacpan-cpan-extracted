@@ -1,1 +1,1 @@
-class Digest::MD5::Context : pointer_t;
+class Digest::MD5::Context : pointer;

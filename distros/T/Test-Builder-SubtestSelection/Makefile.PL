@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 my %WriteMakefileArgs = (
   NAME             => 'Test::Builder::SubtestSelection',
-  AUTHOR           => 'Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>',
+  AUTHOR           => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
   VERSION_FROM     => 'lib/Test/Builder/SubtestSelection.pm',
   ABSTRACT_FROM    => 'lib/Test/Builder/SubtestSelection.pod',
   LICENSE          => 'Perl_5',
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     provides    => {
       'Test::Builder::SubtestSelection' => {
         file    => 'lib/Test/Builder/SubtestSelection.pm',
-        version => '0.001002',
+        version => '0.001003',
       },
     },
     resources => {
@@ -31,36 +31,13 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   clean     => { FILES    => 'Test-Builder-SubtestSelection-* cover_db' },
+  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   realclean => { FILES    => 'local' },
+  test      => { RECURSIVE_TEST_FILES => 1 },
 );
 
-unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) ) {
-  my $local_lib = "$ENV{ PWD }/local/lib/perl5";
-  require lib;
-  lib->import( $local_lib );
-
-  no warnings 'once';
-  *MY::postamble = sub {
-    my $make_fragment .= <<"MAKE_FRAGMENT";
-ifdef PERL5LIB
-  PERL5LIB := $local_lib:\$(PERL5LIB)
-else
-  export PERL5LIB := $local_lib
-endif
-
-.PHONY: installdeps
-installdeps: cpanfile
-	cpanm --no-man-pages --local-lib-contained $local_lib/../.. --installdeps .
-
-.PHONY: cover
-cover:
-	cover -test -ignore local -report vim
-MAKE_FRAGMENT
-
-    return $make_fragment;
-  }
-}
+require './maint/AuthorExtensions.pl'
+  unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) );
 
 WriteMakefile( %WriteMakefileArgs );

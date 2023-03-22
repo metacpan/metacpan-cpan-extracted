@@ -1,9 +1,13 @@
 Revision history for Log-AutoDump
 
+0.22    enable Data::Dumper's Purity
+
+0.21    enable Data::Dumper's Deepcopy variable
+
 0.20    make sure history works on all log levels
-
+ 
 0.19    make sure dummy works with history
-
+ 
 0.18    history
 
 0.17    docs

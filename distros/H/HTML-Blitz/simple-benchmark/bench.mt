@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <!--
+    Some men are born to good luck: all they do or try to do comes right—all
+    that falls to them is so much gain—all their geese are swans—all their
+    cards are trumps—toss them which way you will, they will always, like poor
+    puss, alight upon their legs, and only move on so much the faster. The
+    world may very likely not always think of them as they think of themselves,
+    but what care they for the world? what can it know about the matter?
+
+    One of these lucky beings was neighbour Hans. Seven long years he had
+    worked hard for his master. At last he said, ‘Master, my time is up; I must
+    go home and see my poor mother once more: so pray pay me my wages and let
+    me go.’ And the master said, ‘You have been a faithful and good servant,
+    Hans, so your pay shall be handsome.’ Then he gave him a lump of silver as
+    big as his head.
+
+    Hans took out his pocket-handkerchief, put the piece of silver into it,
+    threw it over his shoulder, and jogged off on his road homewards. As he
+    went lazily on, dragging one foot after another, a man came in sight,
+    trotting gaily along on a capital horse. ‘Ah!’ said Hans aloud, ‘what a
+    fine thing it is to ride on horseback! There he sits as easy and happy as
+    if he was at home, in the chair by his fireside; he trips against no
+    stones, saves shoe-leather, and gets on he hardly knows how.’ Hans did not
+    speak so softly but the horseman heard it all, and said, ‘Well, friend, why
+    do you go on foot then?’ ‘Ah!’ said he, ‘I have this load to carry: to be
+    sure it is silver, but it is so heavy that I can’t hold up my head, and you
+    must know it hurts my shoulder sadly.’ ‘What do you say of making an
+    exchange?’ said the horseman. ‘I will give you my horse, and you shall give
+    me the silver; which will save you a great deal of trouble in carrying such
+    a heavy load about with you.’ ‘With all my heart,’ said Hans: ‘but as you
+    are so kind to me, I must tell you one thing—you will have a weary task to
+    draw that silver about with you.’ However, the horseman got off, took the
+    silver, helped Hans up, gave him the bridle into one hand and the whip into
+    the other, and said, ‘When you want to go very fast, smack your lips loudly
+    together, and cry “Jip!”’
+
+    Hans was delighted as he sat on the horse, drew himself up, squared his
+    elbows, turned out his toes, cracked his whip, and rode merrily off, one
+    minute whistling a merry tune, and another singing,
+
+    ‘No care and no sorrow,
+    A fig for the morrow!
+    We’ll laugh and be merry,
+    Sing neigh down derry!’
+
+    After a time he thought he should like to go a little faster, so he smacked
+    his lips and cried ‘Jip!’ Away went the horse full gallop; and before Hans
+    knew what he was about, he was thrown off, and lay on his back by the
+    road-side. His horse would have ran off, if a shepherd who was coming by,
+    driving a cow, had not stopped it. Hans soon came to himself, and got upon
+    his legs again, sadly vexed, and said to the shepherd, ‘This riding is no
+    joke, when a man has the luck to get upon a beast like this that stumbles
+    and flings him off as if it would break his neck. However, I’m off now once
+    for all: I like your cow now a great deal better than this smart beast that
+    played me this trick, and has spoiled my best coat, you see, in this
+    puddle; which, by the by, smells not very like a nosegay. One can walk
+    along at one’s leisure behind that cow—keep good company, and have milk,
+    butter, and cheese, every day, into the bargain. What would I give to have
+    such a prize!’ ‘Well,’ said the shepherd, ‘if you are so fond of her, I
+    will change my cow for your horse; I like to do good to my neighbours, even
+    though I lose by it myself.’ ‘Done!’ said Hans, merrily. ‘What a noble
+    heart that good man has!’ thought he. Then the shepherd jumped upon the
+    horse, wished Hans and the cow good morning, and away he rode.
+        -->
+        <title>Templatized torture test - Bencherino!</title>
+
+<style>
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
+}
+
+.cardbox {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 510px));
+    gap: 20px;
+}
+
+.card {
+    border: 3px solid rebeccapurple;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #f7f1e6;
+}
+
+.card > img {
+    max-width: 100%;
+}
+
+</style>
+
+    </head>
+
+    <body>
+
+        <h1>A page with assorted random data</h1>
+
+        % for my $category (@$data) {
+        <section class="category">
+            <h2 class="cat-name cat-start" id="cid-<%= $category->{cid} %>"><%= $category->{name} %></h2>
+            <div class="cardbox">
+                % for my $card (@{$category->{card}}) {
+                <div class="card">
+                    <h3 class="card-name"><%= $card->{name} %></h3>
+                    <img src="<%= $card->{img_src} %>" alt="<%= $card->{img_alt} %>" />
+                    <!-- ^ HTML::Zoom requires this "/" -->
+                    <p>(Category: <a class="cat-name cat-link" href="#cid-<%= $category->{cid} %>"><%= $category->{name} %></a>)</p>
+                    <div class="description">
+                        % for my $para (@{$card->{description}}) {
+                        <p class="desc-para">
+                        <%= $para->{para} %>
+                        </p>
+                        % }
+                    </div>
+                    <h4>Locations</h4>
+                    <ul>
+                        % for my $location (@{$card->{location}}) {
+                        <li class="location">
+                            <p class="loc-name"><%= $location->{name} %></p>
+                            <h5>Times</h5>
+                            <ul class="times">
+                                % for my $time (@{$location->{times}}) {
+                                <li class="time"><%= $time->{time} %></li>
+                                % }
+                            </ul>
+                        </li>
+                        % }
+                    </ul>
+                </div>
+                % }
+            </div>
+        </section>
+        % }
+
+    </body>
+
+</html>

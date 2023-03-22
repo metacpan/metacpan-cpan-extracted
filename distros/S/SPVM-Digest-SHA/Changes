@@ -1,3 +1,6 @@
+0.06 2023-03-19
+  [Internal Compatible Changes]
+    * Use pointer instead of pointer_t
 0.05 2023-02-09
   [Incompatible Changes]
     This rename is needed for "[Fixed Build Process Bug]Fixed build process bugs by reading native resouces".

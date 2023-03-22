@@ -12,10 +12,10 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0.89'
   lib: '0'
-  perl: '5.010'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.006'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -26,10 +26,10 @@ name: DBIx-Class-CryptColumn
 provides:
   DBIx::Class::CryptColumn:
     file: lib/DBIx/Class/CryptColumn.pm
-    version: '0.004'
+    version: '0.005'
   DBIx::Class::InflateColumn::Crypt::Passphrase:
     file: lib/DBIx/Class/InflateColumn/Crypt/Passphrase.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Crypt::Passphrase: '0.007'
   DBIx::Class: '0'
@@ -37,13 +37,13 @@ requires:
   Sub::Util: '1.40'
   namespace::clean: '0'
   parent: '0'
-  perl: '5.010'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Leont/dbix-class-cryptcolumn/issues
   repository: git://github.com/Leont/dbix-class-cryptcolumn.git
-version: '0.004'
+version: '0.005'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

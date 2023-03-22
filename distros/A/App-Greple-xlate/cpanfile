@@ -6,6 +6,7 @@ requires 'Hash::Util';
 requires 'Clipboard';
 requires 'File::Share';
 requires 'App::Greple', '9.02';
+requires 'App::Greple::msdoc', '1.05';
 requires 'App::sdif', '4.24.0';
 requires 'Text::ANSI::Fold', '2.20';
 
@@ -15,6 +16,5 @@ on 'test' => sub {
 
 on 'develop' => sub {
     recommends 'Pod::Markdown';
-    recommends 'App::Greple::msdoc', '1.05';
     recommends 'App::Greple::xp', '0.04';
 };

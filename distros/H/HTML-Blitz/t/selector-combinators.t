@@ -1,6 +1,5 @@
 use v5.14.0;
-use warnings;
-use Test::More;
+use Test2::V0;
 use HTML::Blitz ();
 
 my $html = <<'_EOT_';

@@ -40,6 +40,8 @@ OpenAI::API::Request::Image::Generation - generates images from a prompt
 
     my $res = $request->send();
 
+    my @images = $res->{data}->@*;
+
 =head1 DESCRIPTION
 
 Creates an image given a prompt.
@@ -74,6 +76,11 @@ A unique identifier representing your end-user.
 
 =back
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Models|https://platform.openai.com/docs/api-reference/images>
+OpenAI API Reference: L<Models|https://platform.openai.com/docs/api-reference/images>

@@ -89,7 +89,7 @@ sub select {
             }
             else {
                 for my $complex_col ( @$complex_columns ) {
-                    my $alias = $ax->alias( $sql, 'select', $complex_col, $sf->{d}{default_alias}{$complex_col} );
+                    my $alias = $ax->alias( $sql, 'select_func_sq', $complex_col );
                     if ( length $alias ) {
                         $sql->{alias}{$complex_col} = $ax->prepare_identifier( $alias );
                     }
@@ -278,7 +278,7 @@ sub __add_aggregate_substmt {
             $sql->{aggr_cols}[$i] .= "$qt_col)";
         }
     }
-    my $alias = $ax->alias( $sql, 'aggregate', $sql->{aggr_cols}[$i], $sql->{aggr_cols}[$i] );
+    my $alias = $ax->alias( $sql, 'select_func_sq', $sql->{aggr_cols}[$i] );
     if ( length $alias ) {
         $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->prepare_identifier( $alias );
     }

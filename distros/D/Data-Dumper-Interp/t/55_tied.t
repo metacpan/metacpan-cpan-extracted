@@ -1,10 +1,11 @@
-#!/usr/bin/perl
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-#use open IO => ':locale';
-use open ':std', ':encoding(UTF-8)';
-STDOUT->autoflush();
-STDERR->autoflush();
-select STDERR;
+#!/usr/bin/env perl
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
+
+use Data::Dumper::Interp;
+use Scalar::Util qw(blessed reftype refaddr looks_like_number);
+use Clone qw/clone/;
 
 #
 # Verify handling of tied items (basically: Do no clone & substitute
@@ -13,12 +14,13 @@ select STDERR;
 
 package main::TieHash;
 require Tie::Hash;
+
 #use parent -norequire, 'Tie::StdHash';
 our @ISA = ('Tie::StdHash'); # https://github.com/rjbs/Dist-Zilla/issues/705
 use Carp;
 
 sub STORE {
-  croak "Write to tied Hash" unless $main::Initializing;
+  confess "Write to tied Hash" unless $main::Initializing;
   my $self = shift;
   $self->SUPER::STORE(@_);
 }
@@ -30,7 +32,7 @@ our @ISA = ('Tie::StdArray'); # https://github.com/rjbs/Dist-Zilla/issues/705
 use Carp;
 
 sub STORE {
-  croak "Write to tied Array" unless $main::Initializing;
+  confess "Write to tied Array" unless $main::Initializing;
   my $self = shift;
   $self->SUPER::STORE(@_);
 }
@@ -42,7 +44,7 @@ our @ISA = ('Tie::StdScalar'); # https://github.com/rjbs/Dist-Zilla/issues/705
 use Carp;
 
 sub STORE {
-  croak "Write to tied Scalar" unless $main::Initializing;
+  confess "Write to tied Scalar" unless $main::Initializing;
   my $self = shift;
   $self->SUPER::STORE(@_);
 }
@@ -54,9 +56,9 @@ our @ISA = ('Tie::StdHandle');
 use Carp;
 sub _checkwrite {
   my ($self, @args) = @_;
-  my ($methname) = ((caller(1))[3]); 
+  my ($methname) = ((caller(1))[3]);
   $methname =~ s/.*:://;
-  croak "Write to tied filehandle" unless $main::Initializing;
+  confess "Write to tied filehandle" unless $main::Initializing;
   eval "\$self->SUPER::${methname}(\@args)"; die $@ if $@;
 }
 sub STORE { &_checkwrite }
@@ -68,63 +70,76 @@ sub PRINTF { &_checkwrite }
 
 package main;
 
-use Test::More;
-use Data::Dumper::Interp;
-use Carp;
-
 our $Initializing = 1;
 
-sub get_bignum(;$) { 
-  state $count = 0;
-  use bignum; 
-  @_ ? 0+shift()+0 
-     : 999999999999999999999990000.123450000000007 + $count++;
+sub specified_bignum($) {
+  my $value = shift;
+  use bignum;
+  return ($value+0);
+}
+sub sample_bignum($) {
+  my $addon = shift;
+  use bignum;
+  return (999999999999999999543210000.123450000000007 + $addon);
 }
 
-my ($scal, @ary, %hash);
-my ($tscal, @tary, %thash);
+my ($scal, $scal0, @ary, %hash);
 
-tie $tscal, 'main::TieScalar'; 
-tie @tary,  'main::TieArray';  
-tie %thash, 'main::TieHash';   
+my $tscal0 = "PRE-TIED tscal0";
+my $tscal = "PRE-TIED tscal";
+my @tary = ("PRE-TIED tary[0]", "PRE-TIED tary[1]");
+my %thash= (k1 => "PRE-TIED thash{k1}", k2 => "PRE-TIED thash{k2}");
 
-# I don't know how to test this, but probably not relevant
-#tie *FH, 'main::TieHandle', ">", "/dev/null" or die $!;
+tie $tscal0, 'main::TieScalar';
 
-$scal  = get_bignum(123);
-$tscal = get_bignum(123);
+tie $tscal,  'main::TieScalar';
+tie @tary,   'main::TieArray';
+tie %thash,  'main::TieHash';
 
-@ary  = (0..9, 3.14, get_bignum());
-@tary = (0..9, 3.14, get_bignum());
+# I don't know how to test this, but probably not that important:
+#   tie *FH, 'main::TieHandle', ">", "/dev/null" or die $!;
+#   ...
 
-%hash  = (a => 111, b => 3.14, c => get_bignum());
-%thash = (a => 111, b => 3.14, c => get_bignum());
+$scal  = specified_bignum(123);
+$scal0 = 888;
+$tscal0 = 1999;
 
-$Initializing = 0;  # write to tied item will now throw
+$tscal = specified_bignum(1123);
+
+@ary  = (0..9, 3.14, sample_bignum(1));
+@tary = (1000..1009, 1003.14, sample_bignum(1001));
+
+%hash  = (a => 111, b => 3.14, c => sample_bignum(3));
+%thash = (a => 1111, b => 1003.14, c => sample_bignum(1003));
+
+$Initializing = 0;  # writes to tied items will now throw
 
 #$Data::Dumper::Interp::Debug = 1;
 
 $Data::Dumper::Interp::Foldwidth = 0; # disable wrap
+
 is( vis(\42), "\\42", "\\42" );
 is( vis(\"abc"), "\\\"abc\"", "\\\"abc\"" );
 
 foreach (
-         ['$scal', qr/^\Q(Math::Big\E\w+\Q)123\E$/],
-         ['\$scal', qr/^\Q\(Math::Big\E\w+\Q)123\E$/],
-         ['\@ary', qr/^\Q[0,1,2,3,4,5,6,7,8,9,3.14,(Math::Big\E\w+\Q)999999999999999999999990000.123450000000007]\E$/ ],
-         ['\%hash', qr/^\Q{a => 111,b => 3.14,c => (Math::Big\E\w+\Q)999999999999999999999990002.123450000000007}\E$/ ],
+         ['$scal',  qr/^\Q(Math::Big\E\w+\Q)123\E$/],
+         ['$tscal', qr/^\Q(Math::Big\E\w+\Q)1123\E$/],
+
+         ['[ $scal ]', qr/^\Q[(Math::Big\E\w+\Q)123]\E$/],
+         ['[ $tscal ]', qr/^\Q[(Math::Big\E\w+\Q)1123]\E$/],
+
+         ['\@ary', qr/^\Q[0,1,2,3,4,5,6,7,8,9,3.14,(Math::Big\E\w+\Q)999999999999999999543210001.123450000000007]\E$/ ],
+         ['\@tary', qr/^\Q[1000,1001,1002,1003,1004,1005,1006,1007,1008,1009,1003.14,(Math::BigFloat)999999999999999999543211001.123450000000007]\E$/ ],
+
+         ['\%hash', qr/^\Q{a => 111,b => 3.14,c => (Math::Big\E\w+\Q)999999999999999999543210003.123450000000007}\E$/ ],
+         ['\%thash', qr/^\Q{a => 1111,b => 1003.14,c => (Math::Big\E\w+\Q)999999999999999999543211003.123450000000007}\E$/ ],
+
         )
 {
-  my ($untied_item, $exp_re) = @$_;
-  my $got = eval "vis($untied_item)";
-  like($got, $exp_re, 
-      "Expected <<$exp_re>> got <<".u($got).">>");
-
-  (my $tied_item = $untied_item) =~ s/([a-zA-Z])/t$1/ or die;
-  my $s = eval "vis($tied_item)";
-  ok ( !$@, "vis($tied_item) : tied item not modified" );
+  my ($expr, $exp_re) = @$_;
+  my $got = eval "vis($expr)";
+  like($got, $exp_re, $expr);
 }
 
 done_testing();
-exit 0;
-
+#12345;

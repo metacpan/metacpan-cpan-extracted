@@ -1,0 +1,54 @@
+{
+   "abstract" : "Entry widget with a Tk::PopColor widget attached.",
+   "author" : [
+      "Hans Jeuken <hanje at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tk-ColorEntry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::Color" : "0.14",
+            "Imager" : "1.019",
+            "Imager::Screenshot" : "0.014",
+            "Test::Tk" : "2.00",
+            "Tk" : "800.024",
+            "Tk::PopList" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haje61/Tk-ColorEntry.git",
+         "web" : "https://github.com/haje61/Tk-ColorEntry"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

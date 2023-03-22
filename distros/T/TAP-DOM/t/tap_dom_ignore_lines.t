@@ -16,7 +16,7 @@ my $tap;
         close TAP;
 }
 
-diag "\n=== complete TAP-DOM:";
+# diag "\n=== complete TAP-DOM:";
 my $tapdata = TAP::DOM->new( tap => $tap); # needs Test::Harness 3.22: , version => 13 );
 
 #diag Dumper($tapdata);
@@ -46,7 +46,7 @@ is($tapdata->{lines}[6]{is_ok},   1,     "[3] is_ok");
 is($tapdata->{lines}[6]{raw},       "ok 3 - and another one",     "[3] raw");
 
 
-diag "\n=== complete TAP-DOM with pre-processing TAP:";
+# diag "\n=== complete TAP-DOM with pre-processing TAP:";
 my $tapdata2 = TAP::DOM->new( tap => $tap, preprocess_tap => 1 );
 
 #diag Dumper($tapdata2);
@@ -76,7 +76,7 @@ is($tapdata2->{lines}[4]{is_ok},   1,     "[3] is_ok");
 is($tapdata2->{lines}[4]{raw},       "ok 3 - and another one",     "[3] raw");
 
 
-diag "\n=== terse TAP-DOM without pre-process:";
+# diag "\n=== terse TAP-DOM without pre-process:";
 $tapdata2 = TAP::DOM->new( tap => $tap, ignorelines => qr/^## / ); # sic! use qr// here
 
 # diag Dumper($tapdata2);
@@ -106,7 +106,7 @@ is($tapdata2->{lines}[6]{is_ok},   1,     "[3] is_ok");
 is($tapdata2->{lines}[6]{raw},       "ok 3 - and another one",     "[3] raw");
 
 
-diag "\n=== terse TAP-DOM with pre-process tap:";
+# diag "\n=== terse TAP-DOM with pre-process tap:";
 $tapdata2 = TAP::DOM->new( tap => $tap, ignorelines => '^## ', preprocess_ignorelines => 1 );
 
 # diag Dumper($tapdata2);
@@ -136,7 +136,7 @@ is($tapdata2->{lines}[6]{is_ok},   1,     "[3] is_ok");
 is($tapdata2->{lines}[6]{raw},       "ok 3 - and another one",     "[3] raw");
 
 
-diag "\n=== terse TAP-DOM with pre-process tap:";
+# diag "\n=== terse TAP-DOM with pre-process tap:";
 $tapdata2 = TAP::DOM->new( tap => $tap, ignorelines => '^## ', preprocess_ignorelines => 1, preprocess_tap => 1 );
 
 # diag Dumper($tapdata2);

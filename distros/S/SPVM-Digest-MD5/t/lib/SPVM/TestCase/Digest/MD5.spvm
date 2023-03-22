@@ -1,7 +1,52 @@
 class TestCase::Digest::MD5 {
+  use Fn;
   use Digest::MD5;
-  static method test : int () {
-    
+
+  static method md5 : int () {
+    # Exception
+    {
+      eval { Digest::MD5->md5(undef); };
+      unless (Fn->contains($@, "The input must be defined")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method md5_hex : int () {
+    # Exception
+    {
+      eval { Digest::MD5->md5(undef); };
+      unless (Fn->contains($@, "The input must be defined")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method md5_base64 : int () {
+    # Exception
+    {
+      eval { Digest::MD5->md5(undef); };
+      unless (Fn->contains($@, "The input must be defined")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method add : int () {
+    # Exception
+    {
+      eval { Digest::MD5->new->add(undef); };
+      unless (Fn->contains($@, "The input must be defined")) {
+        return 0;
+      }
+    }
+    $@ = undef;
     return 1;
   }
 }

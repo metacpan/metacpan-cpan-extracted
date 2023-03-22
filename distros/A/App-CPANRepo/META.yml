@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::CPANRepo:
     file: lib/App/CPANRepo.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Class::Accessor::Lite::Lazy: '0'
   Getopt::Long: '0'
@@ -37,5 +37,9 @@ resources:
   bugtracker: https://github.com/Songmu/p5-App-CPANRepo/issues
   homepage: https://github.com/Songmu/p5-App-CPANRepo
   repository: git://github.com/Songmu/p5-App-CPANRepo.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:SONGMU
+x_contributors:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -389,6 +389,16 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       my $sp_values = $api->new_byte_array_from_bin(encode('UTF-8', "あ"));
       ok(SPVM::TestCase::ExchangeAPI->spvm_new_byte_array_from_bin($sp_values));
     }
+    
+    {
+      eval { my $sp_values = $api->new_byte_array_from_bin(undef); };
+      ok($@);
+    }
+    {
+      my $sp_values = $api->new_byte_array_from_bin("\xFF\xFE");
+      is($sp_values->[0], -1);
+      is($sp_values->[1], -2);
+    }
   }
   
   # new_short_array_from_bin
@@ -424,50 +434,6 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
     my $binary = pack('d*', 97, 98, $DOUBLE_PRECICE);
     my $sp_values = $api->new_double_array_from_bin($binary);
     ok(SPVM::TestCase::ExchangeAPI->spvm_new_double_array_binary_pack($sp_values));
-  }
-}
-
-# Convert a Perl string to a SPVM array
-{
-  # new_byte_array_from_string
-  {
-    {
-      my $sp_values = $api->new_byte_array_from_string("あいう");
-      ok(SPVM::TestCase::ExchangeAPI->new_byte_array_from_string($sp_values));
-    }
-    {
-      my $sp_values = $api->new_byte_array_from_string("\xFF\xFE");
-      is($sp_values->[0], -1);
-      is($sp_values->[1], -2);
-    }
-  }
-}
-
-# new_string_from_bin
-{
-  # new_string_from_bin - Argument decoded string, to_string, "" overload
-  {
-    my $sp_string = $api->new_string_from_bin("abc");
-    is($sp_string->to_string, "abc");
-    is("$sp_string", "abc");
-  }
-
-  # new_string_from_bin - Empty
-  {
-    my $sp_string = $api->new_string_from_bin("");
-    is($sp_string->to_string, "");
-  }
-
-  # new_string_from_bin - undef
-  {
-    eval { $api->new_string_from_bin(undef) };
-    like($@, qr/The binary must be defined/);
-  }
-
-  # new_string_from_bin - reference
-  {
-    eval { $api->new_string_from_bin([]) };
-    like($@, qr/The binary can't be a reference/);
   }
 }
 
@@ -801,15 +767,43 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
 
   # new_string - undef
   {
-    eval { $api->new_string(undef) };
-    like($@, qr/The string must be defined/);
+    my $sp_string = $api->new_string(undef);
+    ok(!defined $sp_string);
   }
 
   # new_string - reference
   {
     eval { $api->new_string([]) };
-    like($@, qr/The string can't be a reference/);
+    like($@, qr/The \$string must be a non-reference scalar or a SPVM::BlessedObject::String object or undef/);
     like($@, qr|XS_SPVM__ExchangeAPI_xs_new_string at SPVM\.xs line \d+|);
+  }
+  
+  # Extra
+  {
+    # new_string - Argument decoded string, to_string, "" overload
+    {
+      my $sp_string = $api->new_string("abc");
+      is($sp_string->to_string, "abc");
+      is("$sp_string", "abc");
+    }
+
+    # new_string - Empty
+    {
+      my $sp_string = $api->new_string("");
+      is($sp_string->to_string, "");
+    }
+
+    # new_string - undef
+    {
+      my $sp_string = $api->new_string(undef);
+      ok(!defined $sp_string);
+    }
+
+    # new_string - reference
+    {
+      eval { $api->new_string([]) };
+      like($@, qr/The \$string must be a non-reference scalar or a SPVM::BlessedObject::String object or undef/);
+    }
   }
 }
 
@@ -1095,6 +1089,37 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
     my $simple = SPVM::TestCase::Simple->new_options($options);
     is($simple->x, 0);
     is($simple->y, 0);
+  }
+}
+
+# dump
+{
+  # Object
+  {
+    my $point = SPVM::Point->new(100, 200);
+    
+    my $dump = $api->dump($point);
+    
+    is(ref $dump, "SPVM::BlessedObject::String");
+    
+    like($dump, qr|x|);
+    like($dump, qr|y|);
+    like($dump, qr|100|);
+    like($dump, qr|200|);
+  }
+  
+  # undef
+  {
+    my $dump = $api->dump(undef);
+    
+    like($dump, qr|undef|);
+  }
+  
+  # Exceptions
+  {
+    eval { $api->dump("string"); };
+    
+    like($@, qr|The \$object must be a SPVM::BlessedObject object|);
   }
 }
 

@@ -25,21 +25,15 @@ $doc->write("<br>il était une bergère");
 
 my $content = $doc->content;
 
-like($content, qr(<w:View>Print</w:View>), "View => print");
-like($content, qr(<w:Compatibility><w:DoNotExpandShiftReturn />),
-                    "Compatibility => DoNotExpandShiftReturn");
+like $content, qr(<w:View>Print</w:View>),                         "View => print";
+like $content, qr(<w:Compatibility><w:DoNotExpandShiftReturn />),  "Compatibility => DoNotExpandShiftReturn";
 
 my @break_right = $content =~ /page-break-before:right/g;
-is(scalar(@break_right), 1, "page break:right");
+is scalar(@break_right), 1,                                        "page break:right";
 
-
-like($content, qr(<em>April 1<sup>st</sup> joke</em>), 
-    "prevent HTML entity encoding");
-
-my $utf8_word = 'do&#287;mu&#351;'; # doğmuş
-like($content, qr/$utf8_word/, 'UTF8 support');
-
-like($content, qr/\bbergère\b/, 'bergère');
+like $content, qr(<em>April 1<sup>st</sup> joke</em>),             "prevent HTML entity encoding";
+like $content, qr/\bdoğmuş\b/,                                     "UTF8 word";
+like $content, qr/\bbergère\b/,                                    "bergère";
 
 done_testing;
 

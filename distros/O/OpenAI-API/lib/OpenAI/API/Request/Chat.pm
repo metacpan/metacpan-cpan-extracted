@@ -54,6 +54,8 @@ OpenAI::API::Request::Chat - chat endpoint
 
     my $res = $request->send();
 
+    my $message = $res->{choices}[0]{message};
+
 =head1 DESCRIPTION
 
 Given a chat conversation, the model will return a chat completion
@@ -125,6 +127,17 @@ to monitor and detect abuse.
 
 =back
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
+=head2 send_async()
+
+Send a request asynchronously. Returns a L<Promises> promise that will
+be resolved with the decoded JSON response. See L<OpenAI::API::Request>
+for an example.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Chat|https://platform.openai.com/docs/api-reference/chat>
+OpenAI API Reference: L<Chat|https://platform.openai.com/docs/api-reference/chat>

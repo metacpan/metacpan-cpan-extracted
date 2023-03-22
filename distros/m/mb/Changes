@@ -1,5 +1,12 @@
 Revision history for this software.
 
+0.54  2023-03-20 00:00:00
+  - fix transpiling Sjis::do { block } --> do { block }
+  - fix transpiling Sjis::eval { block } --> eval { block }
+  - fix transpiling Sjis::split --> mb::_split
+  - update POD
+  - created by INABA Hitoshi
+
 0.53  2023-03-17 00:00:00
   - supports Sjis::* subroutines when sjis encoding
   - supports GBK::* subroutines when gbk encoding

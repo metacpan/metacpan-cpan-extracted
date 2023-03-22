@@ -21,7 +21,7 @@ requires:
 resources:
   homepage: https://github.com/bingos/cpan-perl-releases
   repository: https://github.com/bingos/cpan-perl-releases.git
-version: '5.20230220'
+version: '5.20230320'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

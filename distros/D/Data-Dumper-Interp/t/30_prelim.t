@@ -1,12 +1,7 @@
-#!/usr/bin/perl
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-srand(42);  # so reproducible
-#use open IO => ':locale';
-use open ':std', ':encoding(UTF-8)';
-select STDERR; $|=1; select STDOUT; $|=1;
-use Carp;
-
-use Test::More;
+#!/usr/bin/env perl
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
 
 use Data::Dumper::Interp;
 
@@ -115,13 +110,12 @@ EOF
 }
 
 like( Data::Dumper::Interp->new()->Foldwidth(72)
-     ->vis({ "" => "Emp", A=>111,BBBBB=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi}), 
+     ->vis({ "" => "Emp", A=>111,BBBBB=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi}),
     expstr2re(do{chomp($_=<<'EOF'); $_}) );
 { "" => "Emp",A => 111,BBBBB => 222,C => {d => 888,e => 999},D => {},
   EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,F => \\\43,G => qr/foo.*bar/six
 }
 EOF
-
 
 is( vis [12345678,4], '[12345678,4]' );
 
@@ -182,9 +176,31 @@ EOF
 is( dvis('\%{}'), '\%{}' );
 
 # Once hit an assertion
-like( Data::Dumper::Interp->new()->Foldwidth(0)
-     ->vis(bless do{ \(my $x = []) },"Foo::Bar"), 
-     qr/^"Foo::Bar=\S+\(0x[0-9a-f]+\)"$/ );
+{ my $obj = bless do{ \(my $x = []) },"Foo::Bar";
+  like( Data::Dumper::Interp->new()->Foldwidth(0)->vis($obj),
+        qr/^\Q$obj\E$/ );
+}
+
+## Once hit an assertion
+#{ my @data = ( { crc => -1 } );
+#  push @data, \@data;
+#
+#  say "DD normal",
+#    Data::Dumper->new([\@data])
+#    ->Useqq(1)
+#    ->Terse(1)
+#    ->Indent(1)
+#    ->Quotekeys(0)
+#    ->Sparseseen(1)
+#    ->Dump;
+#
+#  my $obj = visnew;
+#  $obj->Values([\@data]);
+#  say "Hybrid: ", &Data::Dumper::Dump($obj);
+#
+#  say "vis: ", visnew->Debug(1)->Foldwidth(0)->vis(\@data);
+#}
+#die "tex";
 
 #say vis bless( do{ \(my $x = []) } );
 
@@ -196,7 +212,6 @@ is( Data::Dumper::Interp->new()->Foldwidth(4)->vis( [ [ ], 12345 ] ),
   12345
 ]
 EOF
-
 
 done_testing();
 

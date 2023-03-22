@@ -69,26 +69,3 @@ DEPENDENCIES
 
     perl version 5.005_03 to newest perl
 
-SEE ALSO
-
-    jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
-    https://metacpan.org/author/UTASHIRO
-    http://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
-    http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
-    ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
-    http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
-    https://twitter.com/uta46/status/11578906320
-
-    jacode - Perl program for Japanese character code conversion
-    https://metacpan.org/search?q=jacode.pl
-
-    Jacode4e - jacode.pl-like program for enterprise
-    https://metacpan.org/pod/Jacode4e
-
-    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
-    https://metacpan.org/pod/Jacode4e::RoundTrip
-
-    Other Tools
-    https://metacpan.org/release/Perl7-Handy
-    https://metacpan.org/release/UTF8-R2
-    https://metacpan.org/release/mb

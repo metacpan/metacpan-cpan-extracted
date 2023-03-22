@@ -4,7 +4,7 @@
       "Красимир Беров (berov@cpan.org)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -33,16 +33,16 @@
          "requires" : {
             "Authen::SASL" : "2.16",
             "Class::Method::Modifiers" : "2.13",
-            "Cpanel::JSON::XS" : "4.27",
+            "Cpanel::JSON::XS" : "4.32",
             "EV" : "4.33",
-            "Minion::Backend::SQLite" : "v5.0.5",
-            "Mojo::SQLite" : "3.007",
-            "Mojolicious" : "9.22",
-            "Mojolicious::Plugin::Authentication" : "1.37",
-            "Mojolicious::Plugin::OpenAPI" : "5.00",
+            "Minion::Backend::SQLite" : "v5.0.7",
+            "Mojo::SQLite" : "3.009",
+            "Mojolicious" : "9.28",
+            "Mojolicious::Plugin::Authentication" : "1.39",
+            "Mojolicious::Plugin::OpenAPI" : "5.07",
             "Mojolicious::Plugin::PODViewer" : "0.007",
             "Mojolicious::Plugin::RoutesConfig" : "0.07",
-            "Net::SMTP" : "3.13",
+            "Net::SMTP" : "3.14",
             "Role::Tiny" : "2.002004",
             "perl" : "5.026000"
          }
@@ -66,6 +66,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2022.2.16",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v2023.03.22",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -4,7 +4,7 @@
       "Timothy Legge <timlegge@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "Crypt::Mode::CBC" : "0",
             "Crypt::OpenSSL::X509" : "0",
             "Crypt::PK::RSA" : "0",
-            "Crypt::Random" : "0",
+            "Crypt::PRNG" : "0",
             "MIME::Base64" : "0",
             "XML::LibXML" : "0",
             "perl" : "5.008",
@@ -50,16 +50,21 @@
       },
       "test" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0",
+            "Exporter" : "0",
             "File::Slurper" : "0",
             "File::Which" : "0",
-            "Test::More" : "0"
+            "Import::Into" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "0",
+            "namespace::autoclean" : "0"
          }
       }
    },
    "provides" : {
       "XML::Enc" : {
          "file" : "lib/XML/Enc.pm",
-         "version" : "0.08"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -73,7 +78,7 @@
          "web" : "https://github.com/perl-net-saml2/perl-XML-Enc"
       }
    },
-   "version" : "0.08",
+   "version" : "0.11",
    "x_contributors" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],

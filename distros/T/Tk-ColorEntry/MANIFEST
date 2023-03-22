@@ -1,0 +1,12 @@
+Changes
+lib/Tk/ColorEntry.pm
+lib/Tk/ColorPicker.pm
+lib/Tk/PopColor.pm
+Makefile.PL
+MANIFEST
+README.md
+t/Tk-ColorEntry.t
+t/Tk-ColorPicker.t
+t/Tk-PopColor.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

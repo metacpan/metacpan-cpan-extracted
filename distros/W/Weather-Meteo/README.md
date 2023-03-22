@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -27,11 +27,19 @@ for historical weather data
     $ua->env_proxy(1);
     $meteo = Weather::Meteo->new(ua => $ua);
 
+    my $weather = $meteo->weather({ latitude => 51.34, longitude => 1.42, date => '2022-12-25' });
+    my @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
+
+    print 'Number of cms of snow: ', $snowfall[1], "\n";
+
 ## weather
 
+    use Geo::Location::Point;
+
+    my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Print snowfall at 1AM on Christmas morning in Ramsgate
-    $weather = $meteo->weather({ latitude => 51.34, longitude => 1.42, date => '2022-12-25' });
-    my @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
+    $weather = $meteo->weather($ramsgate, '2022-12-25');
+    @snowfall = @{$weather->{'hourly'}->{'snowfall'}};
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
 

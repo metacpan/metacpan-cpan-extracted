@@ -4,7 +4,7 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "MsOffice::Word::HTML::Writer" : {
          "file" : "lib/MsOffice/Word/HTML/Writer.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/damil/MsOffice-Word-HTML-Writer"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

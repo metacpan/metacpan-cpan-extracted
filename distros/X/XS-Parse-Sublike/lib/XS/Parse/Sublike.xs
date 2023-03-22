@@ -13,9 +13,37 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#if HAVE_PERL_VERSION(5, 37, 10)
+/* feature 'class' first became available in 5.37.9 but it wasn't until
+ * 5.37.10 that we could pass CVf_IsMETHOD to start_subparse()
+ */
+#  define HAVE_FEATURE_CLASS
+#endif
+
 #if HAVE_PERL_VERSION(5, 26, 0)
-#  if !HAVE_PERL_VERSION(5, 31, 3)
-#    include "parse_subsignature.c.inc"
+#  if HAVE_PERL_VERSION(5, 31, 3)
+    /* We're going to need to have access to *both* core and haxlib's
+     * parse_subsignature(). In order to do that we'll do some fairly fun
+     * hackery here
+     */
+#    define CORE_parse_subsignature(flags)  S_CORE_parse_subsignature(aTHX_ flags)
+    static OP *S_CORE_parse_subsignature(pTHX_ U32 flags)
+    {
+      return parse_subsignature(flags);
+    }
+#    undef parse_subsignature
+#  endif
+#  include "parse_subsignature.c.inc"
+
+#  define HAX_parse_subsignature(flags)  S_HAX_parse_subsignature(aTHX_ flags)
+  static OP *S_HAX_parse_subsignature(pTHX_ U32 flags)
+  {
+    return parse_subsignature(flags);
+  }
+
+#  if HAVE_PERL_VERSION(5, 31, 3)
+#    undef parse_subsignature
+#    define parse_subsignature CORE_parse_subsignature
 #  endif
 
 #  include "make_argcheck_aux.c.inc"
@@ -48,6 +76,11 @@ struct HooksAndData {
   for(hooki = nhooks - 1; \
     (hooki >= 0) && (hooks = hooksanddata[hooki].hooks, hookdata = hooksanddata[hooki].data), (hooki >= 0); \
     hooki--)
+
+/* Non-documented internal flags we use for our own purposes */
+enum {
+  XS_PARSE_SUBLIKE_ACTION_CVf_IsMETHOD = (1<<31),  /* do we set CVf_IsMETHOD? */
+};
 
 static int parse(pTHX_
   struct HooksAndData hooksanddata[],
@@ -109,7 +142,15 @@ static int parse(pTHX_
       ctx.actions |= XS_PARSE_SUBLIKE_ACTION_CVf_ANON;
   }
 
-  I32 floor_ix = start_subparse(FALSE, ctx.actions & XS_PARSE_SUBLIKE_ACTION_CVf_ANON ? CVf_ANON : 0);
+  int subparse_flags = 0;
+  if(ctx.actions & XS_PARSE_SUBLIKE_ACTION_CVf_ANON)
+    subparse_flags |= CVf_ANON;
+#ifdef HAVE_FEATURE_CLASS
+  if(ctx.actions & XS_PARSE_SUBLIKE_ACTION_CVf_IsMETHOD)
+    subparse_flags |= CVf_IsMETHOD;
+#endif
+
+  I32 floor_ix = start_subparse(FALSE, subparse_flags);
   SAVEFREESV(PL_compcv);
 
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_ATTRS) && (lex_peek_unichar(0) == ':')) {
@@ -206,7 +247,16 @@ static int parse(pTHX_
     else
 #endif
     {
-      sigop = parse_subsignature(0);
+      bool signature_named_params = false;
+      FOREACH_HOOKS_FORWARD {
+        if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS)
+          signature_named_params = true;
+      }
+
+      if(signature_named_params)
+        sigop = HAX_parse_subsignature(PARSE_SUBSIGNATURE_NAMED_PARAMS);
+      else
+        sigop = parse_subsignature(0);
 
       if(PL_parser->error_count) {
         assert(PL_scopestack_ix == was_scopestack_ix);
@@ -501,6 +551,23 @@ static int IMPL_xs_parse_sublike_any_v3(pTHX_ const void *hooksA, void *hookdata
   croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
 }
 
+#ifdef HAVE_FEATURE_CLASS
+static bool permit_core_method(pTHX_ void *hookdata)
+{
+  return FEATURE_CLASS_IS_ENABLED;
+}
+
+static void pre_subparse_core_method(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  ctx->actions |= XS_PARSE_SUBLIKE_ACTION_CVf_IsMETHOD;
+}
+
+static const struct XSParseSublikeHooks hooks_core_method = {
+  .permit = &permit_core_method,
+  .pre_subparse = &pre_subparse_core_method,
+};
+#endif
+
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
@@ -575,5 +642,8 @@ BOOT:
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@4",    1), PTR2UV(&IMPL_xs_parse_sublike_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 1), PTR2UV(&IMPL_register_xs_parse_sublike_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v4));
+#ifdef HAVE_FEATURE_CLASS
+  register_sublike(aTHX_ "method", &hooks_core_method, NULL, 4);
+#endif
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Net::Async::Slack::EventType;
 

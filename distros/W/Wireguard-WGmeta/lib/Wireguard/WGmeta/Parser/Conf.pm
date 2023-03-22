@@ -44,7 +44,7 @@ use constant INTERNAL_KEY_PREFIX => 'int_';
 use base 'Exporter';
 our @EXPORT = qw(parse_raw_wg_config INTERNAL_KEY_PREFIX);
 
-our $VERSION = "0.3.3";
+our $VERSION = "0.3.4";
 
 =head3 parse_raw_wg_config($file_content, $on_every_value, $on_new_section [, $skip, $wg_meta_prefix, $wg_disabled_prefix])
 
@@ -179,7 +179,7 @@ sub parse_raw_wg_config($file_content, $on_every_value, $on_new_section, $skip =
         }
         else {
             # Handle "normal" comments
-            $definitive_key = "comment_$generic_autokey";
+            $definitive_key = INTERNAL_KEY_PREFIX . "_comment_$generic_autokey";
             $definitive_value = $line;
         }
         $section_data->{$definitive_key} = $definitive_value;

@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::Fatal qw(exception);
+use Test2::V0;
 use HTML::Blitz ();
 
 my $html = <<'_EOT_';
@@ -59,18 +56,18 @@ for my $tag (qw(
         my ($good, $fragment) = @$torcher;
         my $document = "<script>$fragment</script>";
         if ($good) {
-            is exception { $blitz->apply_to_html('(torture-test)', $document)->process }, undef, "'$fragment' parses OK";
+            is dies { $blitz->apply_to_html('(torture-test)', $document)->process }, undef, "'$fragment' parses OK";
             my $expect = $html =~ s/SCRIPT/$fragment/r;
             is run(['script' => ['replace_inner_text', $fragment]]), $expect, "'$fragment' inserted";
             is run(['script' => ['replace_inner_var', 'txt']], { txt => $fragment }), $expect, "'$fragment' inserted (dynamic)";
             is run(['script' => ['transform_inner_sub', sub { $fragment }]]), $expect, "'$fragment' transformed";
             is run(['script' => ['transform_inner_var', 'fn']], { fn => sub { $fragment } }), $expect, "'$fragment' transformed (dynamic)";
         } else {
-            like exception { $blitz->apply_to_html('(torture-test)', $document)->process }, qr/\berror:.*\btag\b/, "'$fragment' is a parse error";
-            like exception { run(['script' => ['replace_inner_text', $fragment]]) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be inserted";
-            like exception { run(['script' => ['replace_inner_var', 'txt']], { txt => $fragment }) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be inserted (dynamic)";
-            like exception { run(['script' => ['transform_inner_sub', sub { $fragment }]]) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be transformed";
-            like exception { run(['script' => ['transform_inner_var', 'fn']], { fn => sub { $fragment } }) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be transformed (dynamic)";
+            like dies { $blitz->apply_to_html('(torture-test)', $document)->process }, qr/\berror:.*\btag\b/, "'$fragment' is a parse error";
+            like dies { run(['script' => ['replace_inner_text', $fragment]]) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be inserted";
+            like dies { run(['script' => ['replace_inner_var', 'txt']], { txt => $fragment }) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be inserted (dynamic)";
+            like dies { run(['script' => ['transform_inner_sub', sub { $fragment }]]) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be transformed";
+            like dies { run(['script' => ['transform_inner_var', 'fn']], { fn => sub { $fragment } }) }, qr/\Qcontents of <script> tag/, "'$fragment' cannot be transformed (dynamic)";
         }
     }
 }
@@ -82,8 +79,8 @@ for my $tag (qw(
     script
     style
 )) {
-    like exception { run([$tag => ['replace_inner_template' => $dummy_template]]) }, qr/\Q<$tag> tag cannot have descendant elements/, "cannot insert descendants into <$tag> (template)";
-    like exception { run([$tag => ['replace_inner_dyn_builder' => 'dyn']], { dyn => '.' }) }, qr/\Q<$tag> tag cannot have descendant elements/, "cannot insert descendants into <$tag> (builder)";
+    like dies { run([$tag => ['replace_inner_template' => $dummy_template]]) }, qr/\Q<$tag> tag cannot have descendant elements/, "cannot insert descendants into <$tag> (template)";
+    like dies { run([$tag => ['replace_inner_dyn_builder' => 'dyn']], { dyn => '.' }) }, qr/\Q<$tag> tag cannot have descendant elements/, "cannot insert descendants into <$tag> (builder)";
 }
 
 done_testing;

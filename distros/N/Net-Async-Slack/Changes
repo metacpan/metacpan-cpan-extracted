@@ -1,6 +1,11 @@
 
 Revision history for Net-Async-Slack
 
+0.012     2023-03-20 08:58:57+08:00 Asia/Singapore
+    [New features]
+
+    - support for view submission and shortcut callbacks from Slack socket mode
+
 0.011     2022-05-06 16:55:34+08:00 Asia/Kuala_Lumpur
     [New features]
 

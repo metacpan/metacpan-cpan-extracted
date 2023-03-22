@@ -1,6 +1,11 @@
 Revision history for Types::RENEEB
 ==================================
 
+0.10  2023-03-22 09:18:00
+
+   * replaced OTRS stuff with more generic OPM stuff (thanks to Steve Rogerson)
+   * worked on infrastructure (Github actions, ...) (thanks to Steve Rogerson)
+
 0.09  2021-01-27 08:14:00
 
    * fix test failures due to new OTRS::OPM::Parser version (thanks Slaven)

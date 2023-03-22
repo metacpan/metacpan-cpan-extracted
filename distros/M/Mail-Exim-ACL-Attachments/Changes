@@ -1,5 +1,9 @@
 Revision history for Mail::Exim::ACL::Attachments
 
+1.005  2023-03-20 12:42:47 CET
+
+  - Add the file extensions .application, .appref-ms, .bgi and .one
+
 1.004  2022-12-24 11:18:08 CET
 
   - Minor documentation changes

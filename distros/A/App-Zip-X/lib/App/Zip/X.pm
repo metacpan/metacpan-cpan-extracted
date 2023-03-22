@@ -1,5 +1,5 @@
 package App::Zip::X;
-
+use 5.10.0;
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Getopt::Long    qw(GetOptionsFromArray);
 use Archive::Zip    qw(AZ_OK);
 use XML::LibXML;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
@@ -61,7 +61,7 @@ sub extract {
 
   # add XML indentation if necessary
   if ($self->{xml_indent} && ($self->{member} =~ /\.xml$/i || $contents =~ /^<\?xml/)) {
-    my $dom   = XML::LibXML->load_xml(string => $contents);
+    my $dom   = XML::LibXML->load_xml(string => $contents, recover => 1);
     $contents = $dom->toString(XML_SIMPLE_INDENT); # already utf8-encoded 
   }
 
@@ -123,7 +123,7 @@ DAMI, C<< <dami at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by DAMI.
+Copyright (c) 2019, 2023 by DAMI.
 
 This is free software, licensed under:
 

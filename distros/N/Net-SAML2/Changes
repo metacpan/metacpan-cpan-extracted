@@ -1,5 +1,45 @@
 Revision history for Perl extension Net::SAML2.
 
+0.67 -- Sun Mar 19 10:03:23 ADT 2023
+
+  [ Significant Changes since 0.64 ]
+
+  This version supports sending request the the IdP as HTTP-POST requests.
+  SimpleSAMLphp is added as a tested/supported IdP
+  Numerous improvements to the testapp (see git repo) to improve testing
+  testapp can now be fully tested against any configured IdPs using Selenium
+
+  - 6c9cd5e Increment version for official release
+  - a0d4001 v0.66
+
+0.66 -- Sat Mar 18 20:49:26 ADT 2023
+
+  - 930f4af Increment version for another TRIAL release
+  - 63db958 v0.65
+  - 5023eda Update Changes for a TRIAL release
+
+0.65 -- Sun Mar 12 22:41:33 ADT 2023
+
+  [ Significant Changes since 0.64 ]
+
+  This version supports sending request the the IdP as HTTP-POST requests.
+  SimpleSAMLphp is added as a tested/supported IdP
+  Numerous improvements to the testapp (see git repo) to improve testing
+  testapp can now be fully tested against any configured IdPs using Selenium
+
+  - 8b902c4 Add SimpleSAMLphp to the list of tested IdPs
+  - 5fb1f81 testapp: Add tests to confirm the configuration of the IdPs
+  - 033d2e9 testapp: add id to links and buttons to help automate testing
+  - cf0b39b Create Author Tests to validate Schema of Generated XML
+  - c815c58 testapp: Don't show POST button for login if IdP does not support
+  - c093420 testapp: move slo to new format and fix wrong acs url
+  - 946c2fc testapp: Support HTTP-POST logout
+  - c5b0a2c testapp: Implement AuthnRequest via POST
+  - 41b7d12 Add Support for sending requests to IDP via HTTP-POST
+  - 0b378cb Update version in repo for next release
+  - fac9f54 testapp: move loading of configuration
+  - 7d4e50c v0.64
+
 0.64 -- Sun Feb 05 18:21:41 AST 2023
 
   Release 0.63-TRIAL as production release

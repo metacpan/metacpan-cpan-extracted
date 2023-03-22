@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "Digest::MD5" => 0,
     "Digest::SHA" => 0,
     "Encode" => 0,
+    "MIME::Base64" => 0,
     "Scalar::Util" => 0,
     "Unicode::Normalize" => 0,
     "parent" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "MIME::Base64" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "Unicode::Normalize" => 0,

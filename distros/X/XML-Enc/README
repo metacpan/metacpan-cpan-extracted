@@ -2,7 +2,7 @@ NAME
     XML::Enc - XML::Enc Encryption Support
 
 VERSION
-    version 0.08
+    version 0.11
 
 SYNOPSIS
         my $decrypter = XML::Enc->new(
@@ -121,7 +121,7 @@ AUTHOR
     Timothy Legge <timlegge@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by TImothy Legge.
+    This software is copyright (c) 2023 by TImothy Legge.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,13 @@
       "DAMI <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Zip-X",
    "prereqs" : {
@@ -29,22 +29,25 @@
       "test" : {
          "requires" : {
             "Test::More" : "0",
-            "perl" : "v5.8.0"
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "App::Zip::X" : {
          "file" : "lib/App/Zip/X.pm",
-         "version" : "1.0"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/App-Zip-X"
+      }
    },
-   "version" : "1.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

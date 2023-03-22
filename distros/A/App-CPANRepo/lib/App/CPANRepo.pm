@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use MetaCPAN::Client 1.005000;
 use Getopt::Long ();
@@ -25,6 +25,7 @@ sub resolve_repo {
         my $release = $self->_client->release($module->distribution);
         if ($release->resources->{repository}) {
             $repo = $release->resources->{repository}{url};
+            $repo =~ s{^git://github\.com}{https://github.com};
         }
     };
 

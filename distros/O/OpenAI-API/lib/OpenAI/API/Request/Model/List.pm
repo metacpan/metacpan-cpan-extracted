@@ -30,6 +30,8 @@ OpenAI::API::Request::Model::List - models endpoint
 
     my $res = $request->send();
 
+    my @models = $res->{data}->@*;
+
 =head1 DESCRIPTION
 
 Lists the currently available models, and provides basic information
@@ -39,6 +41,11 @@ about each one such as the owner and availability.
 
 =head2 new()
 
+=head2 send()
+
+Sends the request and returns a data structured similar to the one
+documented in the API reference.
+
 =head1 SEE ALSO
 
-OpenAI API Documentation: L<Models|https://platform.openai.com/docs/api-reference/models>
+OpenAI API Reference: L<Models|https://platform.openai.com/docs/api-reference/models>

@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/Schema/perl/wordlist/modname.pm','lib/Sah/Schema/perl/wordlist/modname_with_optional_args.pm','lib/Sah/Schema/perl/wordlist/modnames.pm','lib/Sah/Schema/perl/wordlist/modnames_with_optional_args.pm','lib/Sah/SchemaR/perl/wordlist/modname.pm','lib/Sah/SchemaR/perl/wordlist/modname_with_optional_args.pm','lib/Sah/SchemaR/perl/wordlist/modnames.pm','lib/Sah/SchemaR/perl/wordlist/modnames_with_optional_args.pm','lib/Sah/Schemas/WordList.pm'];
+my $filenames = ['lib/Perinci/Sub/XCompletion/perl_wordlist_modname_with_optional_args.pm','lib/Sah/Schema/perl/wordlist/modname.pm','lib/Sah/Schema/perl/wordlist/modname_with_optional_args.pm','lib/Sah/Schema/perl/wordlist/modnames.pm','lib/Sah/Schema/perl/wordlist/modnames_with_optional_args.pm','lib/Sah/SchemaR/perl/wordlist/modname.pm','lib/Sah/SchemaR/perl/wordlist/modname_with_optional_args.pm','lib/Sah/SchemaR/perl/wordlist/modnames.pm','lib/Sah/SchemaR/perl/wordlist/modnames_with_optional_args.pm','lib/Sah/Schemas/WordList.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

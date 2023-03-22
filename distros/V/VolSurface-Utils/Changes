@@ -1,12 +1,15 @@
 Revision history for VolSurface-Utils
 
+1.05      2023-03-20 07:42:17+00:00 UTC
+    Updated Utils.pm to support forward and premium adjusted
+
 1.04      2018-05-16 03:37:51+00:00 UTC
     BlackScholes::Binaries to BlackScholesMerton
 
 1.03      2017-02-20 06:14:01+00:00 UTC
     switch to dzil
-1.02
+1.02  2017-02-16 08:04:15 +0800 
 
-1.00 VolSurface-Utils
+1.00    2017-02-20 06:14:01+00:00 UTC
         First version, released on an unsuspecting world.
 

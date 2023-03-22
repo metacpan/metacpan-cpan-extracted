@@ -1,6 +1,5 @@
-0.3.3 2022-12-20 11:14:45 +0100 Tobias Bossert <bossert@oetiker.ch>
-
- -
+0.3.4 2023-03-20 Tobias Bossert (tobib at cpan.org)
+- Fixed incorrect handling of #+comment attributes
 
 0.3.3 2022-12-20 Tobias Bossert (tobib at cpan.org)
 - Fixed dead lock in some situations when a reload callback is called

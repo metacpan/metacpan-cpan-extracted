@@ -1,0 +1,272 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Validate::CodiceFiscale - Validate an Italian "Codice Fiscale"
+
+
+=head1 VERSION
+
+This document describes Validate::CodiceFiscale version 0.001.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Validate-CodiceFiscale">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Validate-CodiceFiscale.svg?branch=master">
+</a>
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Validate-CodiceFiscale">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Validate-CodiceFiscale.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Validate-CodiceFiscale">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Validate-CodiceFiscale.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/Validate-CodiceFiscale.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Validate-CodiceFiscale">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+One-liner:
+
+   $ perl -MValidate::CodiceFiscale=r -er RSSMRA98S03B833G
+
+Module usage:
+
+   use Validate::CodiceFiscale qw< assert_valid_cf is_valid_cf validate_cf >;
+
+   my $valid   = 'RSSMRA98S03B833G';
+   my $invalid = 'RSICRL99C51C967X';
+
+   # the first does not warn, the second does warn
+   eval { assert_valid_cf($valid);   1 } or warn "died: $@";
+   eval { assert_valid_cf($invalid); 1 } or warn "died: $@";
+
+   # plain boolean test, any error short-circuits
+   if (is_valid_cf($cf)) { ... }
+
+   # get everything that's wrong
+   if (my $errors = validate_cf($invalid)) {
+      say for $errors->@*; # array with error report, one line per error
+   }
+
+   # it's possible to pass additional validation options, like specific
+   # data. All are optional, if present they're validate, otherwise
+   # ignored.
+   assert_valid_cf($cf,
+      {
+         data => {
+            name => 'Foo',
+            surname => 'Bar',
+            sex => 'f',
+            birthdate => '1998-03-11',
+            birthplace => 'B833',
+         }
+      }
+   );
+
+   # the assertion short-circuits by default, failing at the first
+   # error. It's possible to check everyting and get a longer error
+   # message, in case.
+   assert_valid_cf($cf, { all_errors => 1 });
+
+   # it's also possible to wrap the error generation, by returning the
+   # exception to throw
+   assert_valid_cf($cf,
+      {
+         all_errors => 1,
+         on_error => sub {
+            my @errors = @_;
+            return "number of errors: $n_errors\n";
+         }
+      }
+   );
+
+   # of course, it's possible to throw the exception directly
+   use Ouch;
+   assert_valid_cf($cf, { on_error => sub { ouch 400, $_[0] } });
+
+=head1 DESCRIPTION
+
+This module performs partial validation of Italian Codice Fiscale,
+mainly at the syntactic level. For proper and legally acknowledged
+validation please refer to the official service by Agenzia delle Entrate
+at L<https://telematici.agenziaentrate.gov.it/VerificaCF/Scegli.do?parameter=verificaCf>.
+
+At the basic level, it allows spotting common errors that might come
+from copying/typing the Codice Fiscale, e.g. typing a 0 (zero) instead
+of an uppercase o letter, or similar errors with other digits/letters.
+
+The validation can optionally take additional data regarding the name,
+surname, birth date, birth place, and sex to perform a more thorough
+validation based on the official rules. This part is subject to false
+positives for the following reasons:
+
+=over
+
+=item *
+
+Places are required to be entered as official codes, but there is no
+validation that the specific code was active at the date of birth in the
+Codice Fiscale. As an example, the C<$valid> Codice Fiscale in the
+L</SYNOPSIS> is syntactally valid, but otherwise impossible because code
+C<B833> disappeared in 1995 (two places were merged together).
+
+=item *
+
+The algorithm to generate the CodiceFiscale might lead to the same
+string for different people. This is accounted for by using a
+substitution of digits with letters, but only Agenzia delle Entrate can
+tell whether the specific person holds the specific variant of the code.
+
+=back
+
+So well... use it to spot negatives, but don't trust positives too much.
+
+=head1 INTERFACE
+
+There are three main functions for doing checks, each targeting a
+different I<style> of use, plus an additional function that can be
+helpful for one-liners.
+
+=head2 B<< assert_valid_cf >>
+
+   assert_valid_cf($cf, %options);
+
+Check validity of the provided C<$cf> and throw an exception if the
+check fails.
+
+By default, the exception is thrown:
+
+=over
+
+=item *
+
+using L<Carp>'s C<croak> with a message containing a string joining all
+errors
+
+=item *
+
+as soon as one of the validation checks fails.
+
+=back
+
+Supported options:
+
+=over
+
+=item C<all_errors>
+
+collect all errors to be fed into the exception, not only the first one.
+
+=item C<data>
+
+pass additional data for validation, as a hash reference optionally
+containing keys C<name>, C<surname>, C<birthdate>, C<sex>,
+C<birthplace>.
+
+=item C<on_error>
+
+wrap the exception generation with a sub reference used as a callback
+with the following signature:
+
+   sub (@error_strings) { ... }
+
+The sub can throw the exception itself; otherwise, its return value will
+be used as the argument for C<die>.
+
+=back
+
+=head2 B<< is_valid_cf >>
+
+   my $boolean = is_valid_cf($cf, %options);
+
+Check the validity; it short-circuits at the first error. Returns a
+boolean value.
+
+It's possible to pass an additional key/value pair with key C<data> and
+a hash reference optionally containing keys C<name>, C<surname>,
+C<birthdate>, C<sex>, C<birthplace>.
+
+
+=head2 B<< r >>
+
+   $ perl -MValidate::CodiceFiscale=r -er RSSMRA98S03B833G
+
+The C<r> function can be useful in one-liners to check one or more codes
+from the command line. By default, the C<r> function will read input
+codes from C<@ARGV>.
+
+=head2 B<< validate_cf >>
+
+   my $errors = validate_cf($cf, %options);
+
+Check the validity and return C<undef> if no errors were encountered, or
+a reference to an array containing the list of errors otherwise.
+
+Supported options:
+
+=over
+
+=item C<all_errors>
+
+collect all errors to be fed into the exception, not only the first one.
+This option defaults to a true value, to collect all errors; it's
+possible to pass a I<false> value to short-circuit and exit at the first
+error.
+
+=item C<data>
+
+pass additional data for validation, as a hash reference optionally
+containing keys C<name>, C<surname>, C<birthdate>, C<sex>,
+C<birthplace>.
+
+=back
+
+=head1 SEE ALSO
+
+L<String::CodiceFiscale> is an alternative and precedent module to deal
+with Codice Fiscale. I'm a bit scared about using a class method
+C<error> to collect validation errors, hence this module.
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Validate-CodiceFiscale>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2023 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

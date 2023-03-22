@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 16;
+use Test::More tests => 40;
 use Test::Deep;
 
 use Conf::Libconfig;
@@ -21,6 +21,121 @@ my @arr = (1, 2, 3);
 my @arr_str = ("1", "2", "3");
 my @list = ("abc", 456, 0x888);
 my %hash = ("online", "玄幻小说", "story", "杀魂逆天");
+my $reference = { "key" => "value", "hello" => "world" };
+
+# set value test
+## is($foo->set_value("", $reference),
+## 	0,
+## 	"set empty key - set value status ok"
+## );
+## is($foo->value(""),
+## 	{},
+## 	"get empty key - get value status ok"
+## );
+is($foo->set_boolean_value("abc.boolean1", 0b00),
+	0,
+	"set boolean1 value - status ok"
+);
+is($foo->value("abc.boolean1"),
+	0,
+	"get boolean1 value - status ok"
+);
+is($foo->set_boolean_value("abc.boolean2", "tRuE"),
+	0,
+	"set boolean2 value - status ok"
+);
+is($foo->value("abc.boolean2"),
+	1,
+	"get boolean2 value - status ok"
+);
+
+is($foo->set_value("abc.int", 0b1),
+	0,
+	"set boolean value - status ok"
+);
+is($foo->value("abc.int"),
+	1,
+	"get boolean value - status ok"
+);
+is($foo->set_value("abc.bigint", 17223372036854775807),
+	0,
+	"set integer value - status ok"
+);
+is($foo->value("abc.bigint"),
+	-1223372036854775809,
+	"get integer value - status ok"
+);
+is($foo->set_value("abc.int", 100),
+	0,
+	"set integer value - status ok"
+);
+is($foo->value("abc.int"),
+	100,
+	"get integer value - status ok"
+);
+
+is($foo->set_value("abc.float", 100.00012),
+	0,
+	"set float value - status ok"
+);
+is($foo->value("abc.float"),
+	"100.00012",
+	"get float value - status ok"
+);
+
+is($foo->set_value("abc.floatv2", 1234e-2),
+	0,
+	"set float e value - status ok"
+);
+is($foo->value("abc.floatv2"),
+	1234e-2,
+	"get float e value - status ok"
+);
+
+is($foo->set_value("abc.string_example", "hello, world"),
+	0,
+	"set float e value - status ok"
+);
+is($foo->value("abc.string_example"),
+	"hello, world",
+	"get float e value - status ok"
+);
+
+is($foo->set_value("abc.array_ref", ["1","2","3"]),
+	0,
+	"set array ref string value - status ok"
+);
+is_deeply($foo->value("abc.array_ref"),
+	["1","2","3"],
+	"get array ref string value - status ok"
+);
+
+is($foo->set_value("abc.array_ref", [1,2,3,4]),
+	0,
+	"set array ref integer value - status ok"
+);
+is_deeply($foo->value("abc.array_ref"),
+	[1,2,3,4],
+	"get array ref integer value - status ok"
+);
+
+is($foo->set_value("abc.array_ref", [1.2,3.4]),
+	0,
+	"set array ref float value - status ok"
+);
+is_deeply($foo->value("abc.array_ref"),
+	["1.2","3.4"],
+	"get array ref float value - status ok"
+);
+
+is($foo->set_value("abc.hash_ref", { key => "value", num => 1, float => 3.14, bignum => 17223372036854775807, arr => [1,2,3], obj => { "k" => "v"} }),
+	0,
+	"set hash ref value - status ok"
+);
+is_deeply($foo->value("abc.hash_ref"),
+	{key => "value", num => 1, float => 3.14, bignum => -1223372036854775809, arr => [1,2,3], obj=>{"k"=>"v"}},
+	"get hash ref value - status ok"
+);
 
 # scalar test
 ok($foo->add("me.mar", $binarykey, "0b0"), "add bool scalar - status ok");

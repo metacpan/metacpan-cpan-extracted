@@ -23,7 +23,7 @@ use Net::Config;
 use Socket;
 use Time::Local;
 
-our $VERSION = '3.14';
+our $VERSION = '3.15';
 
 our $IOCLASS;
 my $family_key;
@@ -2024,11 +2024,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 3.14
+Version 3.15
 
 =head1 DATE
 
-22 May 2022
+20 March 2023
 
 =head1 HISTORY
 

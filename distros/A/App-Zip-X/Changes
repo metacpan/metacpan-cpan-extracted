@@ -1,5 +1,8 @@
 Revision history for App-Zip-X
 
+1.01    18.03.2023
+        activate LibXML option to recover from parsing errors
+
 0.01    29.10.2019
         First version
         

@@ -8,7 +8,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # VERSION
 
-Version 0.17
+Version 0.19
 
 # DESCRIPTION
 
@@ -36,7 +36,7 @@ Standardmäßig werden der ursprüngliche und der übersetzte Text im Format der
     </p>
 </div>
 
-Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--match-entire**. Dies ist eine Abkürzung, um das Muster für den gesamten Text `(?s).*` anzugeben.
+Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--match-all**. Dies ist eine Abkürzung, um das Muster für den gesamten Text `(?s).+` anzugeben.
 
 # OPTIONS
 
@@ -117,7 +117,7 @@ Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--matc
 
     Sehen Sie das Ergebnis der Übersetzung in Echtzeit in der STDERR-Ausgabe.
 
-- **--match-entire**
+- **--match-all**
 
     Legen Sie den gesamten Text der Datei als Zielbereich fest.
 

@@ -3,7 +3,7 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -257,6 +257,16 @@ sub teams {
     $self->api_get_list(
         uri   => $self->endpoint('team', org => $args{organisation}),
         class => 'Net::Async::Github::Team',
+    )
+}
+
+sub Net::Async::Github::Repository::forks {
+    my ($self, %args) = @_;
+    my $gh = $self->github;
+    $gh->validate_args(%args);
+    $gh->api_get_list(
+        uri   => $self->forks_url->process,
+        class => 'Net::Async::Github::Repository',
     )
 }
 
@@ -609,6 +619,28 @@ sub repos {
     }
 }
 
+sub org_repos {
+    my ($self, %args) = @_;
+    if(my $user = delete $args{owner}) {
+        $self->validate_owner_name($user);
+        $self->api_get_list(
+            endpoint => 'organization_repositories',
+            endpoint_args => {
+                org => $user,
+            },
+            class => 'Net::Async::Github::Repository',
+        )
+    } else {
+        $self->api_get_list(
+            endpoint => 'current_user_repositories',
+            endpoint_args => {
+                visibility => $args{visibility} // 'all',
+            },
+            class => 'Net::Async::Github::Repository',
+        )
+    }
+}
+
 sub repo {
     my ($self, %args) = @_;
     die 'need an owner name' unless my $owner = delete $args{owner};
@@ -669,6 +701,15 @@ sub users {
     $self->validate_args(%args);
     $self->api_get_list(
         uri   => '/users',
+        class => 'Net::Async::Github::User',
+    )
+}
+
+sub users_for_org {
+    my ($self, %args) = @_;
+    $self->validate_args(%args);
+    $self->api_get_list(
+        uri   => '/orgs/' . $args{owner} . '/members',
         class => 'Net::Async::Github::User',
     )
 }

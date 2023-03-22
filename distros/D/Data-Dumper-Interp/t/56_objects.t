@@ -1,10 +1,9 @@
-#!/usr/bin/perl
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-#use open IO => ':locale';
-use open ':std', ':encoding(UTF-8)';
-STDOUT->autoflush();
-STDERR->autoflush();
-select STDERR;
+#!/usr/bin/env perl
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
+
+use Data::Dumper::Interp;
 
 # Verify evaluation of overloaded deref operators.
 
@@ -51,10 +50,6 @@ use overload  '*{}' => sub { \*{Global} },
 
 package main;
 
-use Test::More;
-use Data::Dumper::Interp;
-use Carp;
-
 $Data::Dumper::Interp::Foldwidth = 0; # disable wrap
 
 my $hvobj = main::HVObj->new();
@@ -77,6 +72,7 @@ $Data::Dumper::Interp::Objects = 0;
 is (vis \@$hvobj, '[0,1,2,3,4,5,6,7,8,9]', "\@{HVObj}");
 is (vis \%$hvobj, '{a => 111,b => 222,c => 333}', "\%{HVObj}");
 is (vis $hvobj, q!bless(do{\(my $o = [[0,1,2,3,4,5,6,7,8,9],{a => 111,b => 222,c => 333}])},'main::HVObj')!, "HVObj: Objects handling disabled");
+
 is (vis $hobj, q<bless(do{\(my $o = \42)},'main::HObj')>, "HObj: Objects handling disabled");
 is (vis \%$hobj, '{a => 111,b => 222,c => 333}', "\%{HObj}");
 is (vis $sobj, q<bless({},'main::SObj')>, "SObj: Objects handling disabled");
@@ -94,7 +90,7 @@ is (vis $hobj, '{a => 111,b => 222,c => 333}', "HObj: Objects handling enabled")
 is (hvis(%$hobj), '(a => 111,b => 222,c => 333)', "\%HObj: Objects handling enabled");
 is (vis $sobj, q<\\"virtual value">, "SObj: Objects handling enabled");
 is (vis $$sobj, q<"virtual value">, "\$SObj: Objects handling enabled");
-like(Data::Dumper::Interp->new()->Deparse(1)->vis($cobj), 
+like(Data::Dumper::Interp->new()->Deparse(1)->vis($cobj),
      qr/^sub\s*{.*['"]from virtual coderef['"]\s*;?\s*}$/,
      "Cobj: Objects handling enabled");
 is(vis $gobj, q!\*::GObj::Global! , "Gobj: Objects handling enabled");

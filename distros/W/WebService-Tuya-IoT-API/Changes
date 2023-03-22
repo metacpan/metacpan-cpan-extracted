@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Tuya::IoT::API.
 
+0.03 2023-03-22
+  - Cleaned up is_token logic in api method
+  - Fixed test skip message
+
 0.02 2023-03-09
   - Dropped support for method api_version  - it was not implemented as I had envisioned - NOT 100% BACKWARDS COMPATABLE
   - Added wrapper methods

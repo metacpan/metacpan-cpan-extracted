@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.17";
+our $VERSION = "0.19";
 
 use v5.14;
 use warnings;
@@ -29,7 +29,7 @@ sub deepl {
 }
 
 sub clipboard {
-    use Clipboard;
+    require Clipboard and import Clipboard unless state $called++;
     my $from = shift;
     my $length = length $from;
     Clipboard->copy($from);

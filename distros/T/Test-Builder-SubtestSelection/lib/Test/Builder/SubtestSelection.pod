@@ -12,7 +12,7 @@ Test::Builder::SubtestSelection - Select subtests by name or by number
   # create test builder singleton instance first
   use Test::Builder::SubtestSelection;
 
-  # use test builder based framework
+  # use test builder based testing framework
   use Test::More tests => 2;
 
   subtest 'this' => sub {
@@ -23,7 +23,25 @@ Test::Builder::SubtestSelection - Select subtests by name or by number
     # or that  group of related test function calls
   };
 
+  # at the command-line
+  # run all subtests
+  prove -v -b t/basic.t
+
+  # run "this"
+  prove -v -b t/basic.t :: -s 1
+
+  # run "or that"
+  prove -v -b t/basic.t :: --subtest 'or that'
+
 =head1 DESCRIPTION
+
+This subclass of the L<Test::Builder> class allows you to select subtests by
+name or by number before running them. In your test script you have to use the
+subclass before your test builder based testing framework. At the command-line
+B<prove> runs your test script and the subtest selection is based on the value
+given to the C<--subtest> option.
+
+=head1 BACKGROUND
 
 The Modern Perl blog entries referred to in the L</"SEE ALSO"> section
 describe how usual Perl functions can be used to group related test function
@@ -33,25 +51,18 @@ calls are independent within the test script, which is anyway a good test
 discipline, it should be possible to run them individually. The L<Test::Named>
 module supports this approach.
 
-This C<Test::Builder::SubtestSelection> class is a subclass of L<Test::Builder>
+The C<Test::Builder::SubtestSelection> class is a subclass of L<Test::Builder>
 that overrides its C<subtest()> method. It assumes that L<Test::Builder>
-subtests are used to group related test function calls inside a test
-script. The class allows you to select subtests by name or by number to
-run them. The name of a subtest is more like a description. Any string is
-allowed and no special naming convention needs to be followed. If possible
-each string is treated as a regular expression; otherwise meta characters
-are properly quoted. The selection process itself applies to top-level
-(not nested) subtests only! The selection criteria (name or number) is the
-value of either the short C<-s> or long C<--subtest> option that have to
-be supplied together as arguments to the test script. To do so separate the
-arguments from prove's own arguments with the arisdottle (C<::>). Example:
-
-  # run all subtests
-  prove -v -b t/basic.t
-  # run "this"
-  prove -v -b t/basic.t :: -s 1
-  # run "or that"
-  prove -v -b t/basic.t :: --subtest 'or that'
+subtests are used to group related test function calls inside a test script.
+The class allows you to select subtests by name or by number before running
+them. The name of a subtest is more like a description. Any string is allowed
+and no special naming convention needs to be followed. If possible each string
+is treated as a regular expression; otherwise meta characters are properly
+quoted. The selection process itself applies to top-level (not nested) subtests
+only! The selection criteria (name or number) is the value of either the short
+C<-s> or long C<--subtest> option that have to be supplied together as
+arguments to the test script. To do so separate the arguments from B<prove>'s
+own arguments with the arisdottle (C<::>).
 
 =head1 SEE ALSO
 

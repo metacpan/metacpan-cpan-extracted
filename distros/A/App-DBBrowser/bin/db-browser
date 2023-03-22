@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.320';
+our $VERSION = '2.321';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.320
+Version 2.321
 
 =head1 SYNOPSIS
 
@@ -850,19 +850,13 @@ With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
 
 =head3 Aliases
 
-First five items: enable/disable user-defined aliases.
-
-Last item: enable alias defaults where aliases are optional.
+Enable user defined alias for
 
 =over
 
 =item
 
-Functions/Subqueries as columns
-
-=item
-
-AGGREGATE functions
+Functions/Subqueries in SELECT
 
 =item
 
@@ -875,10 +869,6 @@ JOIN
 =item
 
 UNION
-
-=item
-
-Optional alias defaults
 
 =back
 

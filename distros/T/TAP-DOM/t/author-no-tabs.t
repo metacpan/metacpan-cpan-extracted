@@ -29,6 +29,7 @@ my @files = (
     't/dom2tap.t',
     't/empty_tap.tap',
     't/empty_tap_archive.tgz',
+    't/no_tap_lines.tap',
     't/release-pod-coverage.t',
     't/some_tap.dom',
     't/some_tap.txt',

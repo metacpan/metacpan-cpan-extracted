@@ -1,4 +1,17 @@
-Revision history for Perl extension App-Greple-deepl
+Revision history for Perl extension App-Greple-xlate
+
+0.19 2023-03-22T12:40:45Z
+
+    - update xlate.el
+    - change --match-entire to --match-all
+    - set default format as "xtxt" and "cm"
+    - set DISPLAY only when DISPLAY is set
+    - require 'Clipboard' module on demand
+
+0.18 2023-03-19T11:20:45Z
+
+    - introduce -R option
+    - make debug message concise
 
 0.17 2023-03-14T10:06:34Z
 

@@ -25,7 +25,7 @@ sub slurp_binmode {
 }
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 # Copy test_files to test_files_tmp with replacing os newline
 TestFile::copy_test_files_tmp();
@@ -78,32 +78,32 @@ my $test_dir = "$FindBin::Bin";
 
 # open
 {
-  my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+  my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
   ok(SPVM::TestCase::IO::File->open($sp_file));
 }
 
 # read
 {
-  my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+  my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
   ok(SPVM::TestCase::IO::File->read($sp_file));
 }
 
 # getline
 {
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
     ok(SPVM::TestCase::IO::File->getline($sp_file));
   }
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
     ok(SPVM::TestCase::IO::File->getline_while($sp_file));
   }
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/file_eof.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/file_eof.txt");
     ok(SPVM::TestCase::IO::File->getline_eof($sp_file));
   }
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/long_line.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/long_line.txt");
     ok(SPVM::TestCase::IO::File->getline_long_line($sp_file));
   }
 }
@@ -111,32 +111,32 @@ my $test_dir = "$FindBin::Bin";
 # getline and chompr
 {
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
     ok(SPVM::TestCase::IO::File->getline_chompr($sp_file));
   }
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
     ok(SPVM::TestCase::IO::File->getline_chompr_while($sp_file));
   }
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/file_eof.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/file_eof.txt");
     ok(SPVM::TestCase::IO::File->getline_chompr_eof($sp_file));
   }
   {
-    my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/long_line.txt");
+    my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/long_line.txt");
     ok(SPVM::TestCase::IO::File->getline_chompr_long_line($sp_file));
   }
 }
 
 # getlines
 {
-  my $sp_file = SPVM::new_string("$test_dir/test_files_tmp/fread.txt");
+  my $sp_file = SPVM::api->new_string("$test_dir/test_files_tmp/fread.txt");
   ok(SPVM::TestCase::IO::File->getlines($sp_file));
 }
 
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

@@ -1,0 +1,442 @@
+NAME
+    AnyEvent::MPV - remote control mpv (https://mpv.io)
+
+SYNOPSIS
+       use AnyEvent::MPV;
+
+DESCRIPTION
+    This module allows you to remote control mpv (a video player). It also
+    is an AnyEvent user, you need to make sure that you use and run a
+    supported event loop.
+
+    There are other modules doing this, and I haven't looked much at them
+    other than to decide that they don't handle encodings correctly, and
+    since none of them use AnyEvent, I wrote my own. When in doubt, have a
+    look at them, too.
+
+    Knowledge of the mpv command interface
+    <https://mpv.io/manual/stable/#command-interface> is required to use
+    this module.
+
+    Features of this module are:
+
+    uses AnyEvent, so integrates well into most event-based programs
+    supports asynchronous and synchronous operation
+    allows you to properly pass binary filenames
+    accepts data encoded in any way (does not crash when mpv replies with
+    non UTF-8 data)
+    features a simple keybind/event system
+
+  OVERVIEW OF OPERATION
+    This module forks an mpv process and uses --input-ipc-client (or
+    equivalent) to create a bidirectional communication channel between it
+    and the mpv process.
+
+    It then speaks the somewhat JSON-looking (but not really being JSON)
+    protocol that mpv implements to both send it commands, decode and handle
+    replies, and handle asynchronous events.
+
+    Here is a very simple client:
+
+       use AnyEvent;
+       use AnyEvent::MPV;
+   
+       my $videofile = "./xyzzy.mp4";
+
+       my $mpv = AnyEvent::MPV->new (trace => 1);
+
+       $mpv->start ("--", $videofile);
+
+       my $timer = AE::timer 2, 0, my $quit = AE::cv;
+       $quit->recv;
+
+    This starts mpv with the two arguments "--" and $videofile, which it
+    should load and play. It then waits two seconds by starting a timer and
+    quits. The "trace" argument to the constructor makes mpv more verbose
+    and also prints the commands and responses, so you can have an idea what
+    is going on.
+
+    In my case, the above example would output something like this:
+
+       [uosc] Disabled because original osc is enabled!
+       mpv> {"event":"start-file","playlist_entry_id":1}
+       mpv> {"event":"tracks-changed"}
+        (+) Video --vid=1 (*) (h264 480x480 30.000fps)
+       mpv> {"event":"metadata-update"}
+       mpv> {"event":"file-loaded"}
+       Using hardware decoding (nvdec).
+       mpv> {"event":"video-reconfig"}
+       VO: [gpu] 480x480 cuda[nv12]
+       mpv> {"event":"video-reconfig"}
+       mpv> {"event":"playback-restart"}
+
+    This is not usually very useful (you could just run mpv as a simple
+    shell command), so let us load the file at runtime:
+
+       use AnyEvent;
+       use AnyEvent::MPV;
+   
+       my $videofile = "./xyzzy.mp4";
+
+       my $mpv = AnyEvent::MPV->new (
+          trace => 1,
+          args  => ["--pause", "--idle=yes"],
+       );
+
+       $mpv->start;
+       $mpv->cmd_recv (loadfile => $mpv->escape_binary ($videofile));
+       $mpv->cmd ("set", "pause", "no");
+
+       my $timer = AE::timer 2, 0, my $quit = AE::cv;
+       $quit->recv;
+
+    This specifies extra arguments in the constructor - these arguments are
+    used every time you "->start" mpv, while the arguments to "->start" are
+    only used for this specific clal to0 "start". The argument --pause keeps
+    mpv in pause mode (i.e. it does not play the file after loading it), and
+    "--idle=yes" tells mpv to not quit when it does not have a playlist - as
+    no files are specified on the command line.
+
+    To load a file, we then send it a "loadfile" command, which accepts, as
+    first argument, the URL or path to a video file. To make sure mpv does
+    not misinterpret the path as a URL, it was prefixed with ./ (similarly
+    to "protecting" paths in perls "open").
+
+    Since commands send *to* mpv are send in UTF-8, we need to escape the
+    filename (which might be in any encoding) using the "esscape_binary"
+    method - this is not needed if your filenames are just ascii, or
+    magically get interpreted correctly, but if you accept arbitrary
+    filenamews (e.g. from the user), you need to do this.
+
+    The "cmd_recv" method then queues the command, waits for a reply and
+    returns the reply data (or croaks on error). mpv would, at this point,
+    load the file and, if everything was successful, show the first frame
+    and pause. Note that, since mpv is implement rather synchronously
+    itself, do not expect commands to fail in many circumstances - for
+    example, fit he file does not exit, you will likely get an event, but
+    the "loadfile" command itself will run successfully.
+
+    To unpause, we send another command, "set", to set the "pause" property
+    to "no", this time using the "cmd" method, which queues the command, but
+    instead of waiting for a reply, it immediately returns a condvar that
+    cna be used to receive results.
+
+    This should then cause mpv to start playing the video.
+
+    It then again waits two seconds and quits.
+
+    Now, just waiting two seconds is rather, eh, unuseful, so let's look at
+    receiving events (using a somewhat embellished example):
+
+       use AnyEvent;
+       use AnyEvent::MPV;
+   
+       my $videofile = "xyzzy.mp4";
+
+       my $quit = AE::cv;
+
+       my $mpv = AnyEvent::MPV->new (
+          trace => 1,
+          args  => ["--pause", "--idle=yes"],
+          on_event => sub {
+             my ($mpv, $event, $data) = @_;
+
+             if ($event eq "start-file") {
+                $mpv->cmd ("set", "pause", "no");
+             } elsif ($event eq "end-file") {
+                print "end-file<$data->{reason}>\n";
+                $quit->send;
+             }
+          },
+       );
+
+       $mpv->start;
+       $mpv->cmd (loadfile => $mpv->escape_binary ($videofile));
+
+       $quit->recv;
+
+    This example uses a global condvar $quit to wait for the file to finish
+    playing. Also, most of the logic is now in an "on_event" callback, which
+    receives an event name and the actual event object.
+
+    The two events we handle are "start-file", which is emitted by mpv once
+    it has loaded a new file, and "end-file", which signals the end of a
+    file.
+
+    In the former event, we again set the "pause" property to "no" so the
+    movie starts playing. For the latter event, we tell the main program to
+    quit by invoking $quit.
+
+    This should conclude the basics of operation. There are a few more
+    examples later in the documentation.
+
+  ENCODING CONVENTIONS
+    As a rule of thumb, all data you pass to this module to be sent to mpv
+    is expected to be in unicode. To pass something that isn't, you need to
+    escape it using "escape_binary".
+
+    Data received from $mpv, however, is *not* decoded to unicode, as data
+    returned by mpv is not generally encoded in unicode, and the encoding is
+    usually unspecified. So if you receive data and expect it to be in
+    unicode, you need to first decode it from UTF-8, but note that this
+    might fail. This is not a limitation of this module - mpv simply does
+    not specify nor guarantee a specific encoding, or any encoding at all,
+    in its protocol.
+
+  METHODS
+    $mpv = AnyEvent::MPV->new (key => value...)
+        Creates a new "mpv" object, but does not yet do anything. The
+        support key-value pairs are:
+
+        mpv => $path
+            The path to the mpv binary to use - by default, "mpv" is used
+            and therefore, uses your "PATH" to find it.
+
+        args => [...]
+            Arguments to pass to mpv. These arguments are passed after the
+            hardcoded arguments used by this module, but before the
+            arguments passed ot "start". It does not matter whether you
+            specify your arguments using this key, or in the "start" call,
+            but when you invoke mpv multiple times, typically the arguments
+            used for all invocations go here, while arguments used for
+            specific invocations (e..g filenames) are passed to "start".
+
+        trace => false|true|coderef
+            Enables tracing if true. In trace mode, output from mpv is
+            printed to standard error using a "mpv>" prefix, and commands
+            sent to mpv are printed with a ">mpv" prefix.
+
+            If a code reference is passed, then instead of printing to
+            standard errort, this coderef is invoked with a first arfgument
+            being either "mpv>" or ">mpv", and the second argument being a
+            string to display. The default implementation simply does this:
+
+               sub {
+                  warn "$_[0] $_[1]\n";
+               }
+
+        on_eof => $coderef->($mpv)
+        on_event => $coderef->($mpv, $event, $data)
+        on_key => $coderef->($mpv, $string)
+            These are invoked by the default method implementation of the
+            same name - see below.
+
+    $string = $mpv->escape_binary ($string)
+        This module excects all command data sent to mpv to be in unicode.
+        Some things are not, such as filenames. To pass binary data such as
+        filenames through a comamnd, you need to escape it using this
+        method.
+
+        The simplest example is a "loadfile" command:
+
+           $mpv->cmd_recv (loadfile => $mpv->escape_binary ($path));
+
+    $started = $mpv->start (argument...)
+        Starts mpv, passing the given arguemnts as extra arguments to mpv.
+        If mpv is already running, it returns false, otherwise it returns a
+        true value, so you can easily start mpv on demand by calling "start"
+        just before using it, and if it is already running, it will not be
+        started again.
+
+        The arguments passwd to mpv are a set of hardcoded built-in
+        arguments, followed by the arguments specified in the constructor,
+        followed by the arguments passwd to this method. The built-in
+        arguments currently are --no-input-terminal, --really-quiet (or
+        --quiet in "trace" mode), and "--input-ipc-client" (or equivalent).
+
+        Some commonly used and/or even useful arguments you might want to
+        pass are:
+
+        --idle=yes or --idle=once to keep mpv from quitting when you don't
+        specify a file to play.
+        --pause, to keep mpv from instantly starting to play a file, in case
+        you want to inspect/change properties first.
+        --force-window=no (or similar), to keep mpv from instantly opening a
+        window, or to force it to do so.
+        --audio-client-name=yourappname, to make sure audio streams are
+        associated witht eh right program.
+        --wid=id, to embed mpv into another application.
+        --no-terminal, --no-input-default-bindings, --no-input-cursor,
+        --input-conf=/dev/null, --input-vo-keyboard=no - to ensure only you
+        control input.
+
+        The return value can be used to decide whether mpv needs
+        initializing:
+
+           if ($mpv->start) {
+              $mpv->bind_key (...);
+              $mpv->cmd (set => property => value);
+              ...
+           }
+
+        You can immediately starting sending commands when this method
+        returns, even if mpv has not yet started.
+
+    $mpv->stop
+        Ensures that mpv is being stopped, by killing mpv with a "TERM"
+        signal if needed. After this, you can "->start" a new instance
+        again.
+
+    $mpv->on_eof
+        This method is called when mpv quits - usually unexpectedly. The
+        default implementation will call the "on_eof" code reference
+        specified in the constructor, or do nothing if none was given.
+
+        For subclassing, see *SUBCLASSING*, below.
+
+    $mpv->on_event ($event, $data)
+        This method is called when mpv sends an asynchronous event. The
+        default implementation will call the "on_event" code reference
+        specified in the constructor, or do nothing if none was given.
+
+        The first/implicit argument is the $mpv object, the second is the
+        event name (same as "$data->{event}", purely for convenience), and
+        the third argument is the event object as sent by mpv (sans "event"
+        key). See List of events
+        <https://mpv.io/manual/stable/#list-of-events> in its documentation.
+
+        For subclassing, see *SUBCLASSING*, below.
+
+    $mpv->on_key ($string)
+        Invoked when a key declared by "->bind_key" is pressed. The default
+        invokes the "on_key" code reference specified in the constructor
+        with the $mpv object and the key name as arguments, or do nothing if
+        none was given.
+
+        For more details and examples, see the "bind_key" method.
+
+        For subclassing, see *SUBCLASSING*, below.
+
+    $mpv->cmd ($command => $arg, $arg...)
+        Queues a command to be sent to mpv, using the given arguments, and
+        immediately return a condvar.
+
+        See the mpv documentation
+        <https://mpv.io/manual/stable/#list-of-input-commands> for details
+        on individual commands.
+
+        The condvar can be ignored:
+
+           $mpv->cmd (set_property => "deinterlace", "yes");
+
+        Or it can be used to synchronously wait for the command results:
+
+           $cv = $mpv->cmd (get_property => "video-format");
+           $format = $cv->recv;
+
+           # or simpler:
+
+           $format = $mpv->cmd (get_property => "video-format")->recv;
+
+           # or even simpler:
+
+           $format = $mpv->cmd_recv (get_property => "video-format");
+
+        Or you can set a callback:
+
+           $cv = $mpv->cmd (get_property => "video-format");
+           $cv->cb (sub {
+              my $format = $_[0]->recv;
+           });
+
+        On error, the condvar will croak when "recv" is called.
+
+    $result = $mpv->cmd_recv ($command => $arg, $arg...)
+        The same as calling "cmd" and immediately "recv" on its return
+        value. Useful when you don't want to mess with mpv asynchronously or
+        simply needs to have the result:
+
+           $mpv->cmd_recv ("stop");
+           $position = $mpv->cmd_recv ("get_property", "playback-time");
+
+    $mpv->bind_key ($INPUT => $string)
+        This is an extension implement by this module to make it easy to get
+        key events. The way this is implemented is to bind a
+        "client-message" witha first argument of "AnyEvent::MPV" and the
+        $string you passed. This $string is then passed to the "on_key"
+        handle when the key is proessed, e.g.:
+
+           my $mpv = AnyEvent::MPV->new (
+              on_key => sub {
+                 my ($mpv, $key) = @_;
+
+                 if ($key eq "letmeout") {
+                    print "user pressed escape\n";
+                 }
+              },
+           );
+
+           $mpv_>bind_key (ESC => "letmeout");
+
+        The key configuration is lost when mpv is stopped and must be
+        (re-)done after every "start".
+
+    [$guard] = $mpv->observe_property ($name => $coderef->($mpv, $name,
+    $value))
+    [$guard] = $mpv->observe_property_string ($name => $coderef->($mpv,
+    $name, $value))
+        These methods wrap a registry system around mpv's "observe_property"
+        and "observe_property_string" commands - every time the named
+        property changes, the coderef is invoked with the $mpv object, the
+        name of the property and the new value.
+
+        For a list of properties that you can observe, see the mpv
+        documentation <https://mpv.io/manual/stable/#property-list>.
+
+        Due to the (sane :) way mpv handles these requests, you will always
+        get a property cxhange event right after registering an observer
+        (meaning you don't have to query the current value), and it is also
+        possible to register multiple observers for the same property - they
+        will all be handled properly.
+
+        When called in void context, the observer stays in place until mpv
+        is stopped. In any otrher context, these methods return a guard
+        object that, when it goes out of scope, unregisters the observe
+        using "unobserve_property".
+
+        Internally, this method uses observer ids of 2**52
+        (0x10000000000000) or higher - it will not interfere with lower
+        ovserver ids, so it is possible to completely ignore this system and
+        execute "observe_property" commands yourself, whilst listening to
+        "property-change" events - as long as your ids stay below 2**52.
+
+        Example: register observers for changtes in "aid" and "sid". Note
+        that a dummy statement is added to make sure the method is called in
+        void context.
+
+           sub register_observers {
+              my ($mpv) = @_;
+
+              $mpv->observe_property (aid => sub {
+                 my ($mpv, $name, $value) = @_;
+                 print "property aid (=$name) has changed to $value\n";
+              });
+
+              $mpv->observe_property (sid => sub {
+                 my ($mpv, $name, $value) = @_;
+                 print "property sid (=$name) has changed to $value\n";
+              });
+
+              () # ensure the above method is called in void context
+           }
+
+  SUBCLASSING
+    Like most perl objects, "AnyEvent::MPV" objects are implemented as
+    hashes, with the constructor simply storing all passed key-value pairs
+    in the object. If you want to subclass to provide your own "on_*"
+    methods, be my guest and rummage around in the internals as much as you
+    wish - the only guarantee that this module dcoes is that it will not use
+    keys with double colons in the name, so youc an use those, or chose to
+    simply not care and deal with the breakage.
+
+    If you don't want to go to the effort of subclassing this module, you
+    can also specify all event handlers as constructor keys.
+
+SEE ALSO
+    AnyEvent, the mpv command documentation
+    <https://mpv.io/manual/stable/#command-interface>.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

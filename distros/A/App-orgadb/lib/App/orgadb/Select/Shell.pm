@@ -10,9 +10,9 @@ use parent qw(Term::Shell);
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-04'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -493,7 +493,7 @@ App::orgadb::Select::Shell - Shell object for orgadb-sel
 
 =head1 VERSION
 
-This document describes version 0.015 of App::orgadb::Select::Shell (from Perl distribution App-orgadb), released on 2022-11-04.
+This document describes version 0.016 of App::orgadb::Select::Shell (from Perl distribution App-orgadb), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -536,7 +536,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.014     2023-03-20 14:24:00+01:00 Europe/Amsterdam
+          - Add argon2_verify and argon2_crypt
+
 0.013     2023-02-10 16:07:16+01:00 Europe/Amsterdam
           - Stricten up argon2_needs_rehash
 

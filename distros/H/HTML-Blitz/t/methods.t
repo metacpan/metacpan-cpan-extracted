@@ -1,8 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::Builder ();
-use Test::Fatal qw(exception);
+use Test2::V0;
+use Test2::API qw(context_do);
 use File::Temp qw(tempfile);
 use Fcntl qw(SEEK_SET);
 use FindBin qw($Bin);
@@ -12,8 +9,9 @@ my $tmpl_file = "$Bin/template/doc.html";
 
 sub fails_dummy {
     my ($blitz, $name) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    like exception { $blitz->apply_to_file($tmpl_file); }, qr/\berror: .* contains forbidden dummy marker\b/, "throws $name";
+    context_do {
+        like dies { $blitz->apply_to_file($tmpl_file); }, qr/\berror: .* contains forbidden dummy marker\b/, "throws $name";
+    };
 }
 
 {
@@ -50,17 +48,17 @@ my $hjonk = "hj\N{LATIN SMALL LETTER O WITH DOUBLE ACUTE}nk";
 
     {
         my $html = HTML::Blitz->new->apply_to_file($tmpl_file)->process;
-        is_deeply [$get_comments->($html)], [' lorem ipsum ', '# honk ', ' dolor sit #amet ', "# $hjonk "], 'all comments retained by default';
+        is [$get_comments->($html)], [' lorem ipsum ', '# honk ', ' dolor sit #amet ', "# $hjonk "], 'all comments retained by default';
     }
     {
         my $html = HTML::Blitz->new({ keep_comments_re => qr/\A#/ })->apply_to_file($tmpl_file)->process;
-        is_deeply [$get_comments->($html)], ['# honk ', "# $hjonk "], 'keep_comments_re works';
+        is [$get_comments->($html)], ['# honk ', "# $hjonk "], 'keep_comments_re works';
     }
     {
         my $blitz = HTML::Blitz->new;
         $blitz->set_keep_comments_re(qr/\A(?!#)/);
         my $html = $blitz->apply_to_file($tmpl_file)->process;
-        is_deeply [$get_comments->($html)], [' lorem ipsum ', ' dolor sit #amet '], 'set_keep_comments_re works';
+        is [$get_comments->($html)], [' lorem ipsum ', ' dolor sit #amet '], 'set_keep_comments_re works';
     }
 }
 
@@ -85,14 +83,14 @@ my $hjonk = "hj\N{LATIN SMALL LETTER O WITH DOUBLE ACUTE}nk";
         <h1>\N{INVERTED EXCLAMATION MARK}Document title with \N{EURO SIGN} \N{LATIN SMALL LETTER A WITH ACUTE}!</h1>
         <!--# $hjonk -->
         <label>Input: <input class=dummy value="XXX sample"></label>
-        <p class=dummy>XXX weird</p>
+        <p class=dummy>XXX \N{INVERTED QUESTION MARK}\N{INVERTED QUESTION MARK}weird??</p>
     </body>
 </html>
 _EOF_
 
     {
         my $fn = $template->compile_to_sub;
-        isa_ok $fn, 'CODE', '$template->compile_to_sub';
+        ref_ok $fn, 'CODE', '$template->compile_to_sub';
 
         $blitz->set_keep_doctype(0);
         my $fn2 = $blitz->apply_to_file($tmpl_file)->compile_to_sub;

@@ -30,17 +30,23 @@ DESCRIPTION
 
 FUNCTIONS
 
- module $name
+ module
+
+       module $name;
 
     Sets the name of the perl module to generate. This will apply a package
     header.
 
- include $file
+ include
+
+       include $file;
 
     Adds a file to the list of headers which will be included by the C
     program, to obtain the constants or structures from
 
- constant $name, %args
+ constant
+
+       constant $name, %args;
 
     Adds a numerical constant.
 
@@ -57,7 +63,9 @@ FUNCTIONS
       macro. If the given string is not defined, no constant will be
       generated.
 
- structure $name, %args
+ structure
+
+       structure $name, %args;
 
     Adds a structure definition. This requires a named argument, members.
     This should be an ARRAY ref containing an even number of
@@ -131,7 +139,15 @@ FUNCTIONS
     will take a list of fields and return a packed string, the unpack_
     function will take a string and return a list of fields.
 
- no_export, use_export, use_export_ok
+ no_export
+
+ use_export
+
+ use_export_ok
+
+       no_export;
+       use_export;
+       use_export_ok;
 
     Controls the export behaviour of the generated symbols. no_export
     creates symbols that are not exported by their package, they must be
@@ -142,12 +158,16 @@ FUNCTIONS
     The mode can be changed at any time to affect only the symbols that
     follow it. It defaults to use_export_ok.
 
- $perl = gen_output
+ gen_output
+
+       $perl = gen_output;
 
     Returns the generated perl code. This is used internally for testing
     purposes but normally would not be necessary; see instead write_output.
 
- write_output $filename
+ write_output
+
+       write_output $filename;
 
     Write the generated perl code into the named file. This would normally
     be used as the last function in the containing script, to generate the
@@ -159,18 +179,18 @@ FUNCTIONS
 
  include_path
 
+       include_path $path
+
     Adds an include path to the list of paths used by the compiler
 
-     include_path $path
-
  define
+
+       define $symbol;
+       define $symbol, $value;
 
     Adds a symbol to be defined on the compiler's commandline, by using the
     -D option. This is sometimes required to turn on particular optional
     parts of the included files. An optional value can also be specified.
-
-     define $symbol
-     define $symbol, $value;
 
 EXAMPLES
 
@@ -184,36 +204,36 @@ EXAMPLES
     module to contain the relevant constants and structure functions by
     writing, for example:
 
-     #!/usr/bin/perl
+       #!/usr/bin/perl
     
-     use ExtUtils::H2PM;
-     
-     module "Socket::Moonlaser";
+       use ExtUtils::H2PM;
     
-     include "moon/laser.h";
+       module "Socket::Moonlaser";
     
-     constant "AF_MOONLASER";
-     constant "PF_MOONLASER";
+       include "moon/laser.h";
     
-     constant "SOL_MOONLASER";
+       constant "AF_MOONLASER";
+       constant "PF_MOONLASER";
     
-     constant "MOONLASER_POWER",      name => "POWER";
-     constant "MOONLASER_WAVELENGTH", name => "WAVELENGTH";
+       constant "SOL_MOONLASER";
     
-     structure "struct laserwl",
-        members => [
-           lwl_nm_coarse => member_numeric,
-           lwl_nm_fine   => member_numeric,
-        ];
+       constant "MOONLASER_POWER",      name => "POWER";
+       constant "MOONLASER_WAVELENGTH", name => "WAVELENGTH";
     
-     write_output $ARGV[0];
+       structure "struct laserwl",
+          members => [
+             lwl_nm_coarse => member_numeric,
+             lwl_nm_fine   => member_numeric,
+          ];
+    
+       write_output $ARGV[0];
 
     If we save this script as, say, lib/Socket/Moonlaser.pm.PL, then when
     the distribution is built, the script will be used to generate the
     contents of the file lib/Socket/Moonlaser.pm. Once installed, any other
     code can simply
 
-     use Socket::Moonlaser qw( AF_MOONLASER );
+       use Socket::Moonlaser qw( AF_MOONLASER );
 
     to import a constant.
 
@@ -225,34 +245,34 @@ EXAMPLES
     generated output. The code can then be included in the actual
     lib/Socket/Moonlaser.pm (which will just be a normal perl module) by
 
-     package Socket::Moonlaser;
+       package Socket::Moonlaser;
     
-     use Socket::Moonlaser_const;
+       use Socket::Moonlaser_const;
     
-     sub get_power
-     {
-        getsockopt( $_[0], SOL_MOONLASER, POWER );
-     }
+       sub get_power
+       {
+          getsockopt( $_[0], SOL_MOONLASER, POWER );
+       }
     
-     sub set_power
-     {
-        setsockopt( $_[0], SOL_MOONLASER, POWER, $_[1] );
-     }
+       sub set_power
+       {
+          setsockopt( $_[0], SOL_MOONLASER, POWER, $_[1] );
+       }
     
-     sub get_wavelength
-     {
-        my $wl = getsockopt( $_[0], SOL_MOONLASER, WAVELENGTH );
-        defined $wl or return;
-        unpack_laserwl( $wl );
-     }
+       sub get_wavelength
+       {
+          my $wl = getsockopt( $_[0], SOL_MOONLASER, WAVELENGTH );
+          defined $wl or return;
+          unpack_laserwl( $wl );
+       }
     
-     sub set_wavelength
-     {
-        my $wl = pack_laserwl( $_[1], $_[2] );
-        setsockopt( $_[0], SOL_MOONLASER, WAVELENGTH, $wl );
-     }
+       sub set_wavelength
+       {
+          my $wl = pack_laserwl( $_[1], $_[2] );
+          setsockopt( $_[0], SOL_MOONLASER, WAVELENGTH, $wl );
+       }
     
-     1;
+       1;
 
     Sometimes, the actual C structure layout may not exactly match the
     semantics we wish to present to perl modules using this extension
@@ -263,69 +283,69 @@ EXAMPLES
     generated with a different name, and wrapped in higher-level functions
     in the main code. For example, in Moonlaser_const.pm.PL:
 
-     no_export;
+       no_export;
     
-     structure "struct sockaddr_ml",
-        pack_func   => "_pack_sockaddr_ml",
-        unpack_func => "_unpack_sockaddr_ml",
-        members => [
-           ml_family    => member_numeric,
-           ml_lat_deg   => member_numeric,
-           ml_long_deg  => member_numeric,
-           ml_lat_fine  => member_numeric,
-           ml_long_fine => member_numeric,
-        ];
+       structure "struct sockaddr_ml",
+          pack_func   => "_pack_sockaddr_ml",
+          unpack_func => "_unpack_sockaddr_ml",
+          members => [
+             ml_family    => member_numeric,
+             ml_lat_deg   => member_numeric,
+             ml_long_deg  => member_numeric,
+             ml_lat_fine  => member_numeric,
+             ml_long_fine => member_numeric,
+          ];
 
     This will generate a pack/unpack function pair taking or returning five
     arguments; these functions will not be exported. In our main
     Moonlaser.pm file we can wrap these to actually expose a different API:
 
-     sub pack_sockaddr_ml
-     {
-        @_ == 2 or croak "usage: pack_sockaddr_ml(lat, long)";
-        my ( $lat, $long ) = @_;
+       sub pack_sockaddr_ml
+       {
+          @_ == 2 or croak "usage: pack_sockaddr_ml(lat, long)";
+          my ( $lat, $long ) = @_;
     
-        return _pack_sockaddr_ml( AF_MOONLASER, int $lat, int $long,
-          ($lat - int $lat) * 1_000_000, ($long - int $long) * 1_000_000);
-     }
+          return _pack_sockaddr_ml( AF_MOONLASER, int $lat, int $long,
+            ($lat - int $lat) * 1_000_000, ($long - int $long) * 1_000_000);
+       }
     
-     sub unpack_sockaddr_ml
-     {
-        my ( $family, $lat, $long, $lat_fine, $long_fine ) =
-           _unpack_sockaddr_ml( $_[0] );
+       sub unpack_sockaddr_ml
+       {
+          my ( $family, $lat, $long, $lat_fine, $long_fine ) =
+             _unpack_sockaddr_ml( $_[0] );
     
-        $family == AF_MOONLASER or croak "expected family AF_MOONLASER";
+          $family == AF_MOONLASER or croak "expected family AF_MOONLASER";
     
-        return ( $lat + $lat_fine/1_000_000, $long + $long_fine/1_000_000 );
-     }
+          return ( $lat + $lat_fine/1_000_000, $long + $long_fine/1_000_000 );
+       }
 
     Sometimes, a structure will contain members which are themselves
     structures. Suppose a different definition of the above address, which
     at the C layer is defined as
 
-     struct angle
-     {
-        short         deg;
-        unsigned long fine;
-     };
+       struct angle
+       {
+          short         deg;
+          unsigned long fine;
+       };
     
-     struct sockaddr_ml
-     {
-        short        ml_family;
-        struct angle ml_lat, ml_long;
-     };
+       struct sockaddr_ml
+       {
+          short        ml_family;
+          struct angle ml_lat, ml_long;
+       };
 
     We can instead "flatten" this structure tree to obtain the five fields
     by naming the sub-members of the outer structure:
 
-     structure "struct sockaddr_ml",
-        members => [
-           "ml_family"    => member_numeric,
-           "ml_lat.deg"   => member_numeric,
-           "ml_lat.fine"  => member_numeric,
-           "ml_long.deg"  => member_numeric,
-           "ml_long.fine" => member_numeric,
-        ];
+       structure "struct sockaddr_ml",
+          members => [
+             "ml_family"    => member_numeric,
+             "ml_lat.deg"   => member_numeric,
+             "ml_lat.fine"  => member_numeric,
+             "ml_long.deg"  => member_numeric,
+             "ml_long.fine" => member_numeric,
+          ];
 
 TODO
 

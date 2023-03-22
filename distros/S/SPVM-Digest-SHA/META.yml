@@ -22,5 +22,5 @@ requires:
   SPVM: '0.9691'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Digest-SHA.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

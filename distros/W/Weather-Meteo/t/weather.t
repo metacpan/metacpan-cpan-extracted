@@ -2,7 +2,8 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 4;
+use Test::Most tests => 7;
+use Geo::Location::Point 0.07;	# FIXME: 0.08
 
 BEGIN {
 	use_ok('Weather::Meteo');
@@ -13,10 +14,10 @@ WEATHER: {
 		if(!-e 't/online.enabled') {
 			if(!$ENV{AUTHOR_TESTING}) {
 				diag('Author tests not required for installation');
-				skip('Author tests not required for installation', 3);
+				skip('Author tests not required for installation', 6);
 			} else {
 				diag('Test requires Internet access');
-				skip('Test requires Internet access', 3);
+				skip('Test requires Internet access', 6);
 			}
 		}
 
@@ -30,5 +31,11 @@ WEATHER: {
 		if($ENV{'TEST_VERBOSE'}) {
 			diag(Data::Dumper->new([$weather])->Dump());
 		}
+
+		my $location = new_ok('Geo::Location::Point' => [ latitude => 51.34, longitude => 1.42 ]);
+		$weather = $meteo->weather($location, '2022-12-25');
+		cmp_ok(scalar(@{$weather->{'hourly'}->{'rain'}}), '==', 24, '24 sets of hourly rainfall data');
+		@rain = @{$weather->{'hourly'}->{'rain'}};
+		isnt(qr/\D/, $rain[1]);	# Must only be digits
 	}
 }

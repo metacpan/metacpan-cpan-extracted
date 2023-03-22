@@ -1,5 +1,5 @@
 package Types::Dist;
-$Types::Dist::VERSION = '0.09';
+
 # ABSTRACT: Types related to distributions (e.g. distributions on CPAN)
 
 use v5.10;
@@ -64,7 +64,7 @@ Types::Dist - Types related to distributions (e.g. distributions on CPAN)
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 TYPES
 

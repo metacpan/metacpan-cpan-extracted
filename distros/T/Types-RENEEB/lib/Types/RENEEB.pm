@@ -1,5 +1,5 @@
 package Types::RENEEB;
-$Types::RENEEB::VERSION = '0.09';
+
 # ABSTRACT: Several predefined Type::Tiny types
 
 use v5.10;
@@ -10,7 +10,7 @@ use warnings;
 use Type::Library -base;
 use Type::Utils ();
 
-Type::Utils::extends(qw/Types::OTRS Types::Dist/);
+Type::Utils::extends(qw/Types::OPM Types::Dist/);
 
 1;
 
@@ -26,7 +26,7 @@ Types::RENEEB - Several predefined Type::Tiny types
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -38,19 +38,19 @@ version 0.09
     use Moo;
     use Types::RENEEB qw(
         DistName DistVersion
-        OTRSVersion OTRSVersionWildcard
+        OPMVersion OPMVersionWildcard
     );
 
     has distname     => ( is => 'ro', isa => DistName );
     has distversion  => ( is => 'ro', isa => DistVersion );
-    has otrs_version => ( is => 'ro', isa => OTRSVersion );
+    has opm_version => ( is => 'ro', isa => OPMVersion );
 
-    sub check_otrs_version {
-        OTRSVersion->('2.0.0');
+    sub check_opm_version {
+        OPMVersion->('2.0.0');
     }
 
-    sub check_otrs_version {
-        OTRSVersion->('2.0.x');
+    sub check_opm_version {
+        OPMVersion->('2.0.x');
     }
 
     1;
@@ -67,7 +67,7 @@ These C<Types::> modules are shipped in this distribution:
 
 =item * L<Types::Dist>
 
-=item * L<Types::OTRS>
+=item * L<Types::OPM>
 
 =back
 
@@ -124,24 +124,24 @@ And then use your class:
     my $object   = MyClass->new( prereqs => '/path/to/cpanfile' );
     my @features = $object->prereqs->features; # call features method from Module::CPANfile
 
-=head2 Types::OTRS
+=head2 Types::OPM
 
-=head3 OTRSVersion
+=head3 OPMVersion
 
-An OTRS version looks like 2.4.5 or 6.0.1.
+An OPM version looks like 2.4.5 or 6.0.1.
 
-=head3 OTRSVersionWildcard
+=head3 OPMVersionWildcard
 
-An OTRS version with wildcard as used in Addons. To define a version of the OTRS framework
+An OPM version with wildcard as used in Addons. To define a version of the OPM framework
 that is needed to install the addon, the developer can use 'x' as a wildcard.
 
-E.g. Addons for OTRS 6.x can be installed on any OTRS 6 installation, whilst addons that
-define 2.4.x as the framework version can only installed on any OTRS 2.4 installation, but
-not on OTRS 2.3 installation.
+E.g. Addons for OPM 6.x can be installed on any OPM 6 installation, whilst addons that
+define 2.4.x as the framework version can only installed on any OPM 2.4 installation, but
+not on OPM 2.3 installation.
 
 =head3 OPMFile
 
-An object of L<OTRS::OPM::Parser>.
+An object of L<OPM::Parser>.
 
 It checks if the file exists and can be parsed without an error.
 
@@ -151,9 +151,9 @@ It checks if the file exists and can be parsed without an error.
 
 =over 4
 
-=item * From String to OTRS::OPM::Parser
+=item * From String to OPM::Parser
 
-When a string is given, it is coerced into an L<OTRS::OPM::Parser> object.
+When a string is given, it is coerced into an L<OPM::Parser> object.
 
 =back
 

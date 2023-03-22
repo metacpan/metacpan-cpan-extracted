@@ -1,5 +1,5 @@
 package DBIx::Class::InflateColumn::Crypt::Passphrase;
-$DBIx::Class::InflateColumn::Crypt::Passphrase::VERSION = '0.004';
+$DBIx::Class::InflateColumn::Crypt::Passphrase::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ DBIx::Class::InflateColumn::Crypt::Passphrase - Inflate/deflate columns to passp
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ version 0.004
      passphrase => {
          data_type          => 'text',
          inflate_passphrase => {
-             encoders   => {
+             encoder         => {
                  module      => 'Argon2',
                  memory_cost => '64M',
                  time_cost   => 5,
