@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/File/complete_file
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.151'; # VERSION
+our $VERSION = '0.152'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/File/complete_file",
@@ -40,11 +40,15 @@ complete-file - Complete file and directory from local filesystem
 
 =head1 VERSION
 
-This document describes version 0.151 of complete-file (from Perl distribution App-CompleteCLIs), released on 2022-09-09.
+This document describes version 0.152 of complete-file (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
-B<complete-file> [B<--allow-dot>|B<--disallow-dot>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-dir>|B<--include-dir>] [B<--exclude-leaf>|B<--include-leaf>] [B<--file-ext-filter>=I<any>|B<--file-ext-filter-json>=I<json>] [B<--file-regex-filter>=I<re>] [B<--filter>=I<any>|B<--filter-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--handle-tilde>|B<--no-handle-tilde>|B<--nohandle-tilde>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--recurse>|B<-r>|B<--no-recurse>|B<--norecurse>] [B<--recurse-matching>=I<str>] [B<--starting-path>=I<str>] -- E<lt>I<word>E<gt>
+B<complete-file> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<complete-file> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<complete-file> [B<L<--allow-dot|/"--disallow-dot">>|B<L<--disallow-dot|/"--disallow-dot">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-dir|/"--exclude-dir">>|B<L<--include-dir|/"--exclude-dir">>] [B<L<--file-ext-filter|/"--file-ext-filter=s">>=I<any>|B<L<--file-ext-filter-json|/"--file-ext-filter=s">>=I<json>] [B<L<--file-regex-filter|/"--file-regex-filter=s">>=I<re>] [B<L<--filter|/"--filter=s">>=I<any>|B<L<--filter-json|/"--filter=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--handle-tilde|/"--no-handle-tilde">>|B<L<--no-handle-tilde|/"--no-handle-tilde">>|B<L<--nohandle-tilde|/"--no-handle-tilde">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--starting-path|/"--starting-path=s">>=I<str>] -- E<lt>I<L<word|/"--word=s*">>E<gt>
 
 =head1 OPTIONS
 
@@ -60,23 +64,10 @@ This is most useful when combined with C<starting_path> option to prevent user
 going up/outside the starting path.
 
 
-=item B<--exclude-dir>
-
-=item B<--exclude-leaf>
-
 =item B<--no-handle-tilde>
 
-=item B<--recurse>, B<-r>
+(No description)
 
-=item B<--recurse-matching>=I<s>
-
-Default value:
-
- "level-by-level"
-
-Valid values:
-
- ["level-by-level","all-at-once"]
 
 =item B<--starting-path>=I<s>
 
@@ -99,6 +90,14 @@ Can also be specified as the 1st command-line argument.
 =head2 Filtering options
 
 =over
+
+=item B<--exclude-dir>
+
+This is also an alternative to specifying full C<filter>. Set this to true if you
+do not want directories.
+
+If you only want directories, take a look at C<complete_dir()>.
+
 
 =item B<--file-ext-filter-json>=I<s>
 
@@ -325,7 +324,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

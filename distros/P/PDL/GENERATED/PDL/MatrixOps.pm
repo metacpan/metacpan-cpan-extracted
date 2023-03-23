@@ -349,26 +349,23 @@ the matrix will not be decomposed again.
 
 *PDL::det = \&det;
 sub det {
-  my($x) = shift;
-  my($opt) = shift;
+  my ($x, $opt) = @_;
   $opt = {} unless defined($opt);
-
   my($lu,$perm,$par);
   if(exists ($opt->{lu}) and (ref $opt->{lu} eq 'ARRAY')) {
-    ($lu,$perm,$par) =  @{$opt->{lu}};
+    ($lu,$perm,$par) = @{$opt->{lu}};
   } else {
     ($lu,$perm,$par) = lu_decomp($x);
     $opt->{lu} = [$lu,$perm,$par]
       if(exists($opt->{lu}));
   }
-   
-  ( (defined $lu) ? $lu->diagonal(0,1)->prodover * $par : 0 );
+  defined $lu ? $lu->diagonal(0,1)->prodover * $par : PDL->zeroes(sbyte,1);
 }
-#line 368 "MatrixOps.pm"
+#line 365 "MatrixOps.pm"
 
 
 
-#line 349 "matrixops.pd"
+#line 346 "matrixops.pd"
 
 
 =head2 determinant
@@ -451,11 +448,11 @@ sub determinant {
   
   return $sum;
 }
-#line 455 "MatrixOps.pm"
+#line 452 "MatrixOps.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -505,11 +502,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 509 "MatrixOps.pm"
+#line 506 "MatrixOps.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 959 "../../blib/lib/PDL/PP.pm"
 
 
    sub PDL::eigens_sym {
@@ -544,18 +541,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	if(wantarray);
       $e;                #just eigenvalues
    }
-#line 548 "MatrixOps.pm"
+#line 545 "MatrixOps.pm"
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *eigens_sym = \&PDL::eigens_sym;
-#line 555 "MatrixOps.pm"
+#line 552 "MatrixOps.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -623,7 +620,6 @@ numbers.  It might be useful to be able to return complex eigenvalues.
     $e = eigens($x);        # just eigenvalues
 
 
-
 =for bad
 
 eigens ignores the bad-value flag of the input ndarrays.
@@ -631,11 +627,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 635 "MatrixOps.pm"
+#line 631 "MatrixOps.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 959 "../../blib/lib/PDL/PP.pm"
 
 
    sub PDL::eigens {
@@ -683,18 +679,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return $e->index(0)->sever;  #just eigenvalues
       }
    }
-#line 687 "MatrixOps.pm"
+#line 683 "MatrixOps.pm"
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *eigens = \&PDL::eigens;
-#line 694 "MatrixOps.pm"
+#line 690 "MatrixOps.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -702,7 +698,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,m); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
+  Signature: (a(n,m); [t]w(wsize); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
 
 
 =for usage
@@ -754,7 +750,6 @@ orientation of the ellipsoid of transformation:
     }
 
 
-
 =for bad
 
 svd ignores the bad-value flag of the input ndarrays.
@@ -762,18 +757,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 766 "MatrixOps.pm"
+#line 761 "MatrixOps.pm"
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *svd = \&PDL::svd;
-#line 773 "MatrixOps.pm"
+#line 768 "MatrixOps.pm"
 
 
 
-#line 814 "matrixops.pd"
+#line 800 "matrixops.pd"
 
 
 =head2 lu_decomp
@@ -948,11 +943,11 @@ sub lu_decomp {
 
    wantarray ? ($out,$permute,$parity) : $out;
 }
-#line 952 "MatrixOps.pm"
+#line 947 "MatrixOps.pm"
 
 
 
-#line 993 "matrixops.pd"
+#line 979 "matrixops.pd"
 
 
 =head2 lu_decomp2
@@ -1070,11 +1065,11 @@ sub lu_decomp2 {
 
   wantarray ? ($out,$perm,$par) : $out;
 }
-#line 1074 "MatrixOps.pm"
+#line 1069 "MatrixOps.pm"
 
 
 
-#line 1115 "matrixops.pd"
+#line 1101 "matrixops.pd"
 
 
 =head2 lu_backsub
@@ -1288,11 +1283,11 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1292 "MatrixOps.pm"
+#line 1287 "MatrixOps.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1334,18 +1329,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1338 "MatrixOps.pm"
+#line 1333 "MatrixOps.pm"
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *simq = \&PDL::simq;
-#line 1345 "MatrixOps.pm"
+#line 1340 "MatrixOps.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1369,20 +1364,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1373 "MatrixOps.pm"
+#line 1368 "MatrixOps.pm"
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *squaretotri = \&PDL::squaretotri;
-#line 1380 "MatrixOps.pm"
+#line 1375 "MatrixOps.pm"
 
 
 
 
 
-#line 1410 "matrixops.pd"
+#line 1396 "matrixops.pd"
 
 
 =head1 AUTHOR
@@ -1395,7 +1390,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1399 "MatrixOps.pm"
+#line 1394 "MatrixOps.pm"
 
 
 

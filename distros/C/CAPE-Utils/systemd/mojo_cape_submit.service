@@ -1,0 +1,15 @@
+[Unit]
+Description=Listen on HTTP or HTTPS and submit stuff to CAPEv2
+After=syslog.target network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+EnvironmentFile=/usr/local/etc/mojo_cape_submit.env
+ExecStart=/usr/bin/sudo -u $CAPE_USER /usr/local/bin/mojo_cape_submit daemon -m production -l $LISTEN_ON
+TimeoutStartSec=300
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

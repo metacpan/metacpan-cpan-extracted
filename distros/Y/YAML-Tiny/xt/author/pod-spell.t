@@ -38,6 +38,7 @@ Net
 Olivier
 Poletti
 Rezic
+Richlv
 Slaven
 Steffen
 Tim
@@ -60,6 +61,7 @@ jkeenan
 lib
 neil
 nothingmuch
+richlv
 slaven
 smueller
 xdg

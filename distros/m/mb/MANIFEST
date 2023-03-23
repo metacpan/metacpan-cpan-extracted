@@ -102,4 +102,14 @@ t/7004_mb_split_sbcs.t
 t/7005_mb_split_mbcs.t
 t/7006_split_mbcs.t
 t/8001_specialvar.t
+t/8101_old_package_big5.t
+t/8102_old_package_big5hkscs.t
+t/8103_old_package_eucjp.t
+t/8104_old_package_gb18030.t
+t/8105_old_package_gbk.t
+t/8106_old_package_rfc2279.t
+t/8107_old_package_sjis.t
+t/8108_old_package_uhc.t
+t/8109_old_package_utf2.t
+t/8110_old_package_wtf8.t
 t/9001_podtest.t

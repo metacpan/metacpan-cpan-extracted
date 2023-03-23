@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.54';
+$VERSION = '0.56';
 $VERSION = $VERSION;
 
 # internal use
@@ -31,9 +31,6 @@ my $system_encoding = undef;
 
 # encoding name of MBCS script
 my $script_encoding = undef;
-
-# package name of Sjis software family
-my $old_package = undef;
 
 # over US-ASCII
 my $over_ascii = undef;
@@ -93,14 +90,14 @@ sub import {
     if (defined $_[0]) {
         my $encoding = $_[0];
         if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
-            set_script_encoding($encoding);
+            mb::set_script_encoding($encoding);
         }
         else {
             die "@{[__FILE__]} script_encoding '$encoding' not supported.\n";
         }
     }
     else {
-        set_script_encoding($system_encoding);
+        mb::set_script_encoding($system_encoding);
     }
 
     # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
@@ -117,19 +114,8 @@ sub import {
     $mb::ORIG_PROGRAM_NAME = $mb::ORIG_PROGRAM_NAME; # to avoid: Name "mb::ORIG_PROGRAM_NAME" used only once: possible typo at ...
 
     # Sjis software compatible subroutines
-    $old_package = {qw(
-        sjis        Sjis::
-        gbk         GBK::
-        uhc         UHC::
-        big5        Big5::
-        big5hkscs   Big5HKSCS::
-        eucjp       EUCJP::
-        gb18030     GB18030::
-        rfc2279     RFC2279::
-        utf8        UTF2::
-        wtf8        WTF8::
-    )}->{mb::get_script_encoding()} || die;
-    for my $subroutine (qw( chop chr do dosglob eval getc index index_byte lc lcfirst length ord require reverse rindex rindex_byte split substr tr uc ucfirst )) {
+    my $old_package = mb::get_old_package();
+    for my $subroutine (qw( chop chr do dosglob eval getc index index_byte length ord require reverse rindex rindex_byte substr tr )) {
         *{$old_package . $subroutine} = \&{"mb::$subroutine"};
     }
 }
@@ -168,7 +154,7 @@ END
     my $encoding = '';
     if (($encoding) = $ARGV[0] =~ /\A -e ( .+ ) \z/xms) {
         if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
-            set_script_encoding($encoding);
+            mb::set_script_encoding($encoding);
             shift @ARGV;
         }
         else {
@@ -178,7 +164,7 @@ END
     elsif ($ARGV[0] =~ /\A -e \z/xms) {
         $encoding = $ARGV[1];
         if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
-            set_script_encoding($encoding);
+            mb::set_script_encoding($encoding);
             shift @ARGV;
             shift @ARGV;
         }
@@ -187,7 +173,7 @@ END
         }
     }
     else {
-        set_script_encoding($system_encoding);
+        mb::set_script_encoding($system_encoding);
     }
 
     # poor "make"
@@ -851,6 +837,23 @@ sub mb::set_script_encoding ($) {
 # get script encoding name
 sub mb::get_script_encoding () {
     return $script_encoding;
+}
+
+#---------------------------------------------------------------------
+# get old package name
+sub mb::get_old_package () {
+    return {qw(
+        sjis        Sjis::
+        gbk         GBK::
+        uhc         UHC::
+        big5        Big5::
+        big5hkscs   Big5HKSCS::
+        eucjp       EUCJP::
+        gb18030     GB18030::
+        rfc2279     RFC2279::
+        utf8        UTF2::
+        wtf8        WTF8::
+    )}->{mb::get_script_encoding()} || die;
 }
 
 #---------------------------------------------------------------------
@@ -1903,6 +1906,7 @@ sub parse_ambiguous_char {
 # parse expression in script
 sub parse_expr {
     my $parsed = '';
+    my $old_package = mb::get_old_package();
 
     # __END__ or __DATA__
     if (/\G ^ ( (?: __END__ | __DATA__ ) $R .* ) \z/xmsgc) {
@@ -5402,6 +5406,10 @@ To install this software without make, type the following:
 
 =head1 DESCRIPTION
 
+MBCS has been said to be an acronym for Multi Byte "Character" Set.
+(However, these days, it should be considered an acronym for Multi Byte "Codepoint" Set.)
+In any case, it is certain that "M" and "B" in mb.pm modulino are the first two characters of MBCS.
+
 mb.pm modulino is a solution that can run your Perl script written in MBCS encoding.
 This software is a source code filter, a transpiler-modulino.
 
@@ -6280,7 +6288,7 @@ script encoding and subroutines (1 of 2)
 
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   always
-  supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf2               wtf8
+  supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf8               wtf8
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   mb::chop         Big5::chop         Big5HKSCS::chop         EUCJP::chop         GB18030::chop         GBK::chop         RFC2279::chop         Sjis::chop         UHC::chop         UTF2::chop         WTF8::chop
   mb::chr          Big5::chr          Big5HKSCS::chr          EUCJP::chr          GB18030::chr          GBK::chr          RFC2279::chr          Sjis::chr          UHC::chr          UTF2::chr          WTF8::chr
@@ -6310,7 +6318,7 @@ script encoding and subroutines (2 of 2)
 
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   always
-  supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf2               wtf8
+  supported        big5               big5hkscs               eucjp               gb18030               gbk               rfc2279               sjis               uhc               utf8               wtf8
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   mb::dosglob      Big5::dosglob      Big5HKSCS::dosglob      EUCJP::dosglob      GB18030::dosglob      GBK::dosglob      RFC2279::dosglob      Sjis::dosglob      UHC::dosglob      UTF2::dosglob      WTF8::dosglob
   mb::index        Big5::index        Big5HKSCS::index        EUCJP::index        GB18030::index        GBK::index        RFC2279::index        Sjis::index        UHC::index        UTF2::index        WTF8::index
@@ -8438,7 +8446,7 @@ have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/c
 
 =head1 GIVE US BUG REPORT
 
-I have tested and verified this software using the best of my ability.
+We have tested and verified this software using the best of my ability.
 However, this software containing much regular expression is bound to contain some bugs.
 Thus, if you happen to find a bug that's in this software and not your own program, you can try to reduce it to a minimal test case and then report it to author's address.
 If you have an idea that could make this a more useful tool, please let share it.

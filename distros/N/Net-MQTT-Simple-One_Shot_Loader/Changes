@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::MQTT::Simple::One_Shot_Loader.
+
+0.02 2023-03-21
+  - Added process time to return object
+  - Added requires Time::HiRes
+  - Skipped Net::MQTT::Simple import
+  - Cleaned up code
+
+0.01 2023-03-16
+  - original version
+

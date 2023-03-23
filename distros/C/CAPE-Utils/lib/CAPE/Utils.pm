@@ -1,3 +1,4 @@
+
 package CAPE::Utils;
 
 use 5.006;
@@ -12,6 +13,8 @@ use Hash::Merge;
 use IPC::Cmd qw[ run ];
 use Text::ANSITable;
 use File::Spec;
+use IPC::Cmd qw(run);
+use Net::Subnet;
 
 =head1 NAME
 
@@ -19,11 +22,11 @@ CAPE::Utils - A helpful library for with CAPE.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
@@ -33,8 +36,11 @@ Perhaps a little code snippet.
 
     use CAPE::Utils;
 
-    my $foo = CAPE::Utils->new();
-    ...
+    my $cape_util=CAPE::Utils->new();
+
+    my $sub_results=$cape_util->submit(items=>@to_detonate,unique=>0, quiet=>1);
+    use JSON;
+    print encode_json($sub_results)."\n";
 
 =head1 METHODS
 
@@ -77,6 +83,11 @@ sub new {
 			set_clock_to_now    => 1,
 			timeout             => 200,
 			enforce_timeout     => 0,
+			subnets             => '192.168.0.0/16,127.0.0.1/8,::1/128,172.16.0.0/12,10.0.0.0/8',
+			apikey              => '',
+			auth_by_IP_only     => 1,
+			incoming            => '/malware/client-incoming',
+			incoming_json       => '/malware/incoming-json',
 		},
 	};
 
@@ -1044,7 +1055,17 @@ Submits files to CAPE.
       - Default :: 0
 
     - unique :: Only submit it if it is unique.
-        - Unique :: 0
+        - Default :: 0
+
+    -quiet :: Do not print the results.
+        - Default :: 0
+
+The retuned value is a hash ref where the keys are successfully submitted files
+and values of those keys is the task ID.
+
+    my $sub_results=$cape_util->submit(items=>@to_detonate,unique=>0, quiet=>1);
+    use JSON;
+    print encode_json($sub_results)."\n";
 
 =cut
 
@@ -1126,9 +1147,32 @@ sub submit {
 		push( @to_run, '--tags', $opts{tags} );
 	}
 
+	my $added = {};
 	foreach (@to_submit) {
-		system( @to_run, $_ );
+		my @tmp_to_run = @to_run;
+		push( @tmp_to_run, $_ );
+		my ( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) = run(
+			command => \@tmp_to_run,
+			verbose => 0
+		);
+		my $results = join( '', @{$full_buf} );
+		if ( !$opts{quiet} ) {
+			print $results;
+		}
+
+		my @results_split = split( /\n/, $results );
+		foreach my $item (@results_split) {
+			$item =~ s/\e\[[0-9;]*m(?:\e\[K)?//g;
+			chomp($item);
+			if ( $item =~ /^Success\:\ File\ \".*\"\ added\ as\ task\ with\ ID\ \d+$/ ) {
+				$item =~ s/^Success\:\ File\ \"//;
+				my ( $file, $task ) = split( /\"\ added\ as\ task\ with\ ID\ /, $item );
+				$added->{$file} = $task;
+			}
+		}
 	}
+
+	return $added;
 }
 
 =head2 timestamp
@@ -1181,6 +1225,67 @@ sub shuffle {
 	return $array;
 }
 
+=head2 check_remote
+
+Checks the remote connection.
+
+Two variablesare required, API key and IP.
+
+=cut
+
+sub check_remote {
+	my ( $self, %opts ) = @_;
+
+	# if we don't have a API key, we can only auth via IP
+	if ( !$self->{config}->{_}->{auth_by_IP_only} && !defined( $opts{apikey} ) ) {
+		return 0;
+	}
+
+	# make sure the API key is what it is expecting if we are not using IP only
+	if (   !$self->{config}->{_}->{auth_by_IP_only}
+		&& defined( $opts{apikey} )
+		&& $opts{apikey} ne $self->{config}->{_}->{apikey} )
+	{
+		return 0;
+	}
+
+	# can't do anything else with out a IP
+	if ( !defined( $opts{ip} ) ) {
+		return 0;
+	}
+
+	my $subnets_string = $self->{config}->{_}->{subnets};
+	$subnets_string =~ s/[\ \t]+//g;
+	$subnets_string =~ s/\,+/,/g;
+	my @subnets_split = split( /,/, $subnets_string );
+	my @subnets;
+	foreach my $item (@subnets_split) {
+		if ( $item =~ /^[\:A-Fa-f0-9]+$/ ) {
+			push( @subnets, $item . '/128' );
+		}
+		elsif ( $item =~ /^[\:A-Fa-f0-9]+\/[0-9]+$/ ) {
+			push( @subnets, $item );
+		}
+		elsif ( $item =~ /^[\.0-9]+$/ ) {
+			push( @subnets, $item . '/32' );
+		}
+		elsif ( $item =~ /^[\.0-9]+\/[0-9]+$/ ) {
+			push( @subnets, $item );
+		}
+	}
+	my $allowed_subnets;
+	eval { $allowed_subnets = subnet_matcher(@subnets); };
+	if ($@) {
+		die( 'Failed it init subnet matcher... ' . $@ );
+	}
+
+	if ( $allowed_subnets->( $opts{ip} ) ) {
+		return 1;
+	}
+
+	return 0;
+}
+
 =head1 CONFIG FILE
 
 The default config file is '/usr/local/etc/cape_utils.ini'.
@@ -1228,6 +1333,16 @@ default with CAPEv2 in it's default config.
     timeout=200
     # default value for enforce timeout for submit
     enforce_timeout=0
+    # the api key to for with mojo_cape_submit
+    #apikey=
+    # auth by IP only for mojo_cape_submit
+    auth_by_IP_only=1
+    # comma seperated list of allowed subnets for mojo_cape_submit
+    subnets=192.168.0.0/16,127.0.0.1/8,::1/128,172.16.0.0/12,10.0.0.0/8
+    # incoming dir to use for mojo_cape_submit
+    incoming=/malware/client-incoming
+    # directory to store json data files for submissions recieved by mojo_cape_submit
+    incoming_json=/malware/incoming-json
 
 =head1 AUTHOR
 

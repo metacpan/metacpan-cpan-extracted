@@ -1,12 +1,12 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.005';
+$Crypt::Passphrase::Argon2::VERSION = '0.006';
 use strict;
 use warnings;
 
 use Crypt::Passphrase 0.010 -encoder;
 
 use Carp 'croak';
-use Crypt::Argon2 0.014 'argon2_verify';
+use Crypt::Argon2 0.014 qw/argon2_needs_rehash argon2_verify/;
 
 my %settings_for = (
 	interactive => {
@@ -24,7 +24,7 @@ my %settings_for = (
 );
 
 my @identifiers = qw/argon2i argon2d argon2id/;
-my %encoder_for = map { no strict; $_ => \&{"Crypt::Argon2::$_\_pass"} } @identifiers;
+my %encoder_for = map {; no strict; $_ => \&{"Crypt::Argon2::$_\_pass"} } @identifiers;
 
 sub new {
 	my ($class, %args) = @_;
@@ -51,7 +51,7 @@ sub hash_password {
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	return Crypt::Argon2::argon2_needs_rehash($hash, @{$self}{qw/subtype time_cost memory_cost parallelism output_size salt_size/});
+	return argon2_needs_rehash($hash, @{$self}{qw/subtype time_cost memory_cost parallelism output_size salt_size/});
 }
 
 sub crypt_subtypes {
@@ -77,7 +77,7 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

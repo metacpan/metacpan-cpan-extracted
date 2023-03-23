@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README.md
+t/001_load.t
+t/002_one_shot_object.t
+lib/Net/MQTT/Simple/One_Shot_Loader.pm
+perl-Net-MQTT-Simple-One_Shot_Loader.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

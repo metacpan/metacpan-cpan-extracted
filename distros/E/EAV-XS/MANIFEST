@@ -136,6 +136,7 @@ t/17-get-domain.t
 t/18-get-domain-type.t
 t/19-retired.t
 t/20-dots.t
+t/21-get-tld-type.t
 t/check-fail.txt
 t/check-pass.txt
 typemap

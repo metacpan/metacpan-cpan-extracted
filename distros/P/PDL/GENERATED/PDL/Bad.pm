@@ -287,7 +287,7 @@ sub PDL::orig_badvalue {
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -327,14 +327,14 @@ same as the input ndarray's flag.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *isbad = \&PDL::isbad;
 #line 334 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -373,14 +373,14 @@ same as the input ndarray's flag.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *isgood = \&PDL::isgood;
 #line 380 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -421,14 +421,14 @@ flag set.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *nbadover = \&PDL::nbadover;
 #line 428 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -470,7 +470,7 @@ flag set.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ngoodover = \&PDL::ngoodover;
 #line 477 "Bad.pm"
@@ -584,7 +584,7 @@ sub PDL::setbadat {
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -636,14 +636,14 @@ Also see L</setvaltobad> and L</setnantobad>.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setbadif = \&PDL::setbadif;
 #line 643 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -682,14 +682,14 @@ Any bad values in the input ndarrays are copied across to the output ndarray.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setvaltobad = \&PDL::setvaltobad;
 #line 689 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -726,14 +726,14 @@ bad flag set.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setnantobad = \&PDL::setnantobad;
 #line 733 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -769,14 +769,14 @@ bad flag set.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setinftobad = \&PDL::setinftobad;
 #line 776 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -812,14 +812,14 @@ bad flag set.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setnonfinitetobad = \&PDL::setnonfinitetobad;
 #line 819 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -855,14 +855,14 @@ operation, it clears the bad flag.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setbadtonan = \&PDL::setbadtonan;
 #line 862 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 setbadtoval
@@ -897,14 +897,14 @@ values are copied with no replacement.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *setbadtoval = \&PDL::setbadtoval;
 #line 904 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -933,14 +933,14 @@ If bad values are present, these are also cleared.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *badmask = \&PDL::badmask;
 #line 940 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -985,14 +985,14 @@ its bad value flag set to true.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *copybad = \&PDL::copybad;
 #line 992 "Bad.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1020,7 +1020,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *locf = \&PDL::locf;
 #line 1027 "Bad.pm"

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 7823d2dc7115855db5b38fda5a49c09041dccae0c7a752614163e0685598c78d COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 17c9c8d87eb17739c80dc71b1750052fd02ac3029ebaba6cedbdd3699734db6f Changes
+SHA256 e2597e9a46518201257f44b7f196bd1fda00105d6a631a442970418be2260225 INSTALL
+SHA256 1a2929dacaef239beca27a85f7f97b793628dfb22f07fdfb406cb6f3f0d22a6b LICENSE
+SHA256 1b0333048a4deeb5c18ec0953594bfb08fdd9c5cb2d58658b088886cc391d364 MANIFEST
+SHA256 b8408cc8d151d9bd45fb64afdb5ec5004a46078cde02b62313865704bb1a422c META.json
+SHA256 f297dc1148907d5ddcdb6f43d8da7ddd164f198e9447cfc198293e50dbfe9bb7 META.yml
+SHA256 4a398f8080bca35c3ff75e607b3a491ea2c81538f7245ec1a34cc9479f01d74f Makefile.PL
+SHA256 7db9439b4a93415f2a1c32ab5144322abe785f3744695b860e19a47e2422d206 README
+SHA256 b31fc4ec70d7a15f03a174fc7c624bc932f6c235c22a7a51815a3f21d509b3a9 bin/filite-client
+SHA256 45d34a2ad309ce5583aad4301ee46a65b23efc983acacd1c28d96d466c9a5187 dist.ini
+SHA256 2bcfd9b92323a11a9018c748872af8231227931468887dd7f0024ae0ca902849 doap.ttl
+SHA256 383a21cf171bd68d44e537b9dcd7dc804789eef220bb28f7be3c66b7f93d3abf examples/config.json
+SHA256 5b22f1d5f2fc6776298c1f3c2d12e65767bbf320c5104b055f9276c2f4b5d30b lib/App/Filite/Client.pm
+SHA256 1d3d4e15244c79bad47183ce0a312ba516c501910e9a11338f42101355bd9026 t/00start.t
+SHA256 2e1b76b082b699c9ab5e6bd285fe6be14a6a67570d0111ba9cc75f9439ed4092 t/01basic.t
+SHA256 383a21cf171bd68d44e537b9dcd7dc804789eef220bb28f7be3c66b7f93d3abf t/share/config.json
+SHA256 6472bf692aaf270d5f9dc40c5ecab8f826ecc92425c8bac4d1ea69bcbbddaea4 t/share/file.txt
+SHA256 6e678916223daf59ed89d3dc89a5d82a20502f3addeb9ab2f5b9febb110ddffa t/share/image.png
+SHA256 4be77a0dff891e5a59cadfb0e4109e74ad206ba421a9d2f2906b2868cbd5bf6e t/unit/App/Filite/Client.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCZByXqAAKCRDOv4Eoaip9
+OTEOAKC4VzGNDHgQKhb5X3VVMRs93wxKIQCgsobdZ0aX7TFOZP7DNREnKDSZtN0=
+=WJdD
+-----END PGP SIGNATURE-----

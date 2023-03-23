@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Role::FindMatch;
-{ $Net::CLI::Interact::Role::FindMatch::VERSION = '2.300003' }
+{ $Net::CLI::Interact::Role::FindMatch::VERSION = '2.300004' }
 
 use Moo::Role;
 

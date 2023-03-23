@@ -1,3 +1,8 @@
+0.152   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: complete-from-schema.
+
+
 0.151   2022-09-09  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLI: complete-random-string.

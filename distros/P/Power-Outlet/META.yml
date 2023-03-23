@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.46'
   Test::Simple: '0.44'
+  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,6 +24,8 @@ requires:
   HTTP::Tiny: '0'
   JSON: '0'
   List::MoreUtils: '0'
+  Net::MQTT::Simple: '1.24'
+  Net::MQTT::Simple::One_Shot_Loader: '0.02'
   Net::SNMP: '0'
   Net::UPnP: '0'
   Package::New: '0'
@@ -37,4 +40,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Power-Outlet/issues
   homepage: https://github.com/mrdvt92/perl-Power-Outlet
   repository: https://github.com/mrdvt92/perl-Power-Outlet.git
-version: '0.48'
+version: '0.50'

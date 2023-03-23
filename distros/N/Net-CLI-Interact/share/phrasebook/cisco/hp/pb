@@ -20,3 +20,23 @@ macro enable_paging
 macro disable_paging
     send no page
 
+macro begin_privileged
+    send enable
+    match user or pass or privileged
+
+macro end_privileged
+    send exit
+    match generic
+
+macro begin_configure
+    send configure terminal
+    match configure
+
+macro end_configure
+    send end
+    match privileged
+
+macro disconnect
+    send logout
+    match generic
+

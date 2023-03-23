@@ -77,7 +77,6 @@
          "requires" : {
             "CPAN::Meta" : "2.120900",
             "IPC::Cmd" : "0.72",
-            "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::Warn" : "0"
          }
@@ -96,6 +95,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.081",
+   "version" : "2.082",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

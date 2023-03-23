@@ -54,7 +54,7 @@ use warnings;
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -92,7 +92,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *browse = \&PDL::browse;
 #line 99 "Browser.pm"

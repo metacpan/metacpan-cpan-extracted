@@ -55,7 +55,7 @@ For more information on HDF4, see http://www.hdfgroup.org/products/hdf4/
 
 
 
-#line 325 "VS.pd"
+#line 308 "VS.pd"
 
 
 use PDL::Primitive;
@@ -143,11 +143,8 @@ sub new
             my $vg_name = " "x(PDL::IO::HDF->VNAMELENMAX+1);
             my $res = PDL::IO::HDF::VS::_Vinquire( $vg_id, $n_entries, $vg_name );
 
-            my $vg_class = "";
-            PDL::IO::HDF::VS::_Vgetclass( $vg_id, $vg_class );
-
             $vgroup->{$vg_name}->{ref} = $vg_ref;
-            $vgroup->{$vg_name}->{class} = $vg_class;
+            $vgroup->{$vg_name}->{class} = PDL::IO::HDF::VS::_Vgetclass( $vg_id );
 
             my $n_pairs = PDL::IO::HDF::VS::_Vntagrefs( $vg_id );
 
@@ -167,10 +164,8 @@ sub new
                 elsif($tag == 1962)
                 {   # Vdata
                     my $id = PDL::IO::HDF::VS::_VSattach( $self->{HID}, $ref, 'r' );
-                    my $name = " "x(PDL::IO::HDF->VNAMELENMAX+1);
-                    my $res = PDL::IO::HDF::VS::_VSgetname( $id, $name );
-                    my $class = "";
-                    PDL::IO::HDF::VS::_VSgetclass( $id, $class );
+                    my $name = PDL::IO::HDF::VS::_VSgetname( $id );
+                    my $class = PDL::IO::HDF::VS::_VSgetclass( $id );
                     PDL::IO::HDF::VS::_VSdetach( $id );
                     $vgroup->{$vg_name}->{attach}->{$name}->{type} = 'VData';
                     $vgroup->{$vg_name}->{attach}->{$name}->{ref} = $ref;
@@ -218,16 +213,14 @@ sub new
                 $mode="w";
             }
             $vdata_id = PDL::IO::HDF::VS::_VSattach( $self->{HID}, $vdata_ref, $mode );
-            my $vdata_size = 0;
             my $n_records = 0;
             my $interlace = 0;
             my $fields = "";
+            my $vdata_size = 0;
             my $vdata_name = "";
             
-            my $status = PDL::IO::HDF::VS::_VSinquire(
+            PDL::IO::HDF::VS::_VSinquire(
                             $vdata_id, $n_records, $interlace, $fields, $vdata_size, $vdata_name );
-            die "PDL::IO::HDF::VS::_VSinquire (vdata_id=$vdata_id)"
-                unless $status;
             $vdata->{$vdata_name}->{REF} = $vdata_ref;
             $vdata->{$vdata_name}->{NREC} = $n_records;
             $vdata->{$vdata_name}->{INTERLACE} = $interlace;
@@ -259,8 +252,8 @@ sub Vgetchildren
         unless defined( $self->{VGROUP}->{$name}->{children} );
     
     return sort keys %{$self->{VGROUP}->{$name}->{children}};
-#line 263 "VS.pm"
-#line 528 "VS.pd"
+#line 256 "VS.pm"
+#line 504 "VS.pd"
 } # End of Vgetchildren()...
 # Now defunct:
 sub Vgetchilds
@@ -276,8 +269,8 @@ sub Vgetattach
         unless defined( $self->{VGROUP}->{$name}->{attach} );
 
     return sort keys %{$self->{VGROUP}->{$name}->{children}};
-#line 280 "VS.pm"
-#line 543 "VS.pd"
+#line 273 "VS.pm"
+#line 519 "VS.pd"
 } # End of Vgetattach()...
 
 sub Vgetparents
@@ -287,8 +280,8 @@ sub Vgetparents
         unless defined( $self->{VGROUP}->{$name}->{parents} );
     
     return sort keys %{$self->{VGROUP}->{$name}->{parents}};
-#line 291 "VS.pm"
-#line 552 "VS.pd"
+#line 284 "VS.pm"
+#line 528 "VS.pd"
 } # End of Vgetparents()...     
 
 sub Vgetmains
@@ -296,8 +289,8 @@ sub Vgetmains
     my ($self) = @_;
     my @rlist;
     foreach( sort keys %{$self->{VGROUP}} )
-#line 300 "VS.pm"
-#line 559 "VS.pd"
+#line 293 "VS.pm"
+#line 535 "VS.pd"
     {
         push(@rlist, $_) 
             unless defined( $self->{VGROUP}->{$_}->{parents} );
@@ -380,8 +373,8 @@ sub VSgetnames
 {
     my $self = shift;
     return sort keys %{$self->{VDATA}};
-#line 384 "VS.pm"
-#line 641 "VS.pd"
+#line 377 "VS.pm"
+#line 617 "VS.pd"
 } # End of VSgetnames()...
 
 sub VSgetfieldnames
@@ -394,8 +387,8 @@ sub VSgetfieldnames
         unless defined( $self->{VDATA}->{$name} );
 
     return sort keys %{$self->{VDATA}->{$name}->{FIELDS}};
-#line 398 "VS.pm"
-#line 653 "VS.pd"
+#line 391 "VS.pm"
+#line 629 "VS.pd"
 } # End of VSgetfieldnames()...
 # Now defunct:
 sub VSgetfieldsnames
@@ -422,7 +415,7 @@ sub VSread
     my $interlace = 0;
     my $fields = "";
     my $vdata_name = "";
-    my $status = PDL::IO::HDF::VS::_VSinquire(
+    PDL::IO::HDF::VS::_VSinquire(
                     $vdata_id, $n_records, $interlace, $fields, $vdata_size, $vdata_name );
     my $data_type = PDL::IO::HDF::VS::_VFfieldtype(
                     $vdata_id, $self->{VDATA}->{$name}->{FIELDS}->{$field}->{INDEX} );
@@ -441,7 +434,7 @@ sub VSread
     {
         $data = ones( $PDL::IO::HDF::SDinvtypeTMAP2->{$data_type}, $n_records, $order );
     }
-    $status = PDL::IO::HDF::VS::_VSsetfields( $vdata_id, $field );
+    my $status = PDL::IO::HDF::VS::_VSsetfields( $vdata_id, $field );
     
     die "$sub: _VSsetfields\n"
         unless $status;
@@ -513,11 +506,11 @@ sub DESTROY
     my $self = shift;
     $self->close;
 } # End of DESTROY()...
-#line 517 "VS.pm"
+#line 510 "VS.pm"
 
 
 
-#line 776 "VS.pd"
+#line 752 "VS.pd"
 
 
 =head1 CURRENT AUTHOR & MAINTAINER
@@ -535,7 +528,7 @@ contribs of Patrick Leilde patrick.leilde@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 539 "VS.pm"
+#line 532 "VS.pm"
 
 
 

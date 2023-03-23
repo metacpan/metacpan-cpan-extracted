@@ -5,6 +5,7 @@
 		"Makefile",
 		"NEWS",
 		"README",
+		"SECURITY",
 		"africa",
 		"antarctica",
 		"asctime.c",
@@ -47,7 +48,6 @@
 		"zishrink.awk",
 		"zone.tab",
 		"zone1970.tab",
-		"zoneinfo2tdf.pl",
 	],
-	version => "2021b",
+	version => "2023a",
 }

@@ -162,7 +162,7 @@ sub gslinteg_qng{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -191,7 +191,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qng_meat = \&PDL::qng_meat;
 #line 198 "INTEG.pm"
@@ -217,7 +217,7 @@ sub gslinteg_qag{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -245,7 +245,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qag_meat = \&PDL::qag_meat;
 #line 252 "INTEG.pm"
@@ -271,7 +271,7 @@ sub gslinteg_qags{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -299,7 +299,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qags_meat = \&PDL::qags_meat;
 #line 306 "INTEG.pm"
@@ -325,7 +325,7 @@ sub gslinteg_qagp{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -353,7 +353,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagp_meat = \&PDL::qagp_meat;
 #line 360 "INTEG.pm"
@@ -379,7 +379,7 @@ sub gslinteg_qagi{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -407,7 +407,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagi_meat = \&PDL::qagi_meat;
 #line 414 "INTEG.pm"
@@ -433,7 +433,7 @@ sub gslinteg_qagiu{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -461,7 +461,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagiu_meat = \&PDL::qagiu_meat;
 #line 468 "INTEG.pm"
@@ -487,7 +487,7 @@ sub gslinteg_qagil{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -515,7 +515,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qagil_meat = \&PDL::qagil_meat;
 #line 522 "INTEG.pm"
@@ -541,7 +541,7 @@ sub gslinteg_qawc{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -569,7 +569,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qawc_meat = \&PDL::qawc_meat;
 #line 576 "INTEG.pm"
@@ -595,7 +595,7 @@ sub gslinteg_qaws{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -624,7 +624,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qaws_meat = \&PDL::qaws_meat;
 #line 631 "INTEG.pm"
@@ -657,7 +657,7 @@ sub gslinteg_qawo{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -686,7 +686,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qawo_meat = \&PDL::qawo_meat;
 #line 693 "INTEG.pm"
@@ -717,7 +717,7 @@ sub gslinteg_qawf{
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -746,7 +746,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *qawf_meat = \&PDL::qawf_meat;
 #line 753 "INTEG.pm"

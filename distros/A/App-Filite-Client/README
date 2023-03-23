@@ -1,0 +1,91 @@
+NAME
+    App::Filite::Client - client library for Filite servers
+
+SYNOPSIS
+      my $client = App::Filite::Client->new_from_config;
+      my $url = $client->share( 'path/to/file.txt' );
+      print "Shared to $url\n";
+
+DESCRIPTION
+    Share a file, chunk of text, or link via a Filite server.
+
+    Filite is a URL shortner, file sharer, and pastebin that you can
+    self-host.
+
+  Config File
+    Configuration is via a JSON-formatted file usually named
+    ~/.config/filite-client/config.json (see also File::XDG), though this can
+    be overridden using the `FILITE_CLIENT_CONFIG` environment variable.
+
+  Constructors
+    `new( %attrs )`
+        Moose-like constructor.
+
+    `new_from_config()`
+        Load %attrs from the config instead of as parameters.
+
+  Attributes
+    All attributes are read-write.
+
+    `server` Str
+        The filite server to share things via. This will typically be a URL
+        like "https://example.com/" or "http://example.net:8080".
+
+    `password` Str
+        Filite is a single user system so has a password but no username.
+
+    `useragent` Object
+        Can be set to a custom HTTP::Tiny instance. Cannot be specified in the
+        config file.
+
+    `errors` Int
+        The number of errors which have been seen so far. It makes little
+        sense to set this in the constructor or config file.
+
+  Methods
+    `share( $filename, \%opts )`
+        Accepts `text`, `file`, `link`, and `highlight` options. All of these
+        options are booleans.
+
+        $filename may be "-" to read from STDIN.
+
+    `share_text( $filename, \%opts )`
+        Accepts a `highlight` option, which is a boolean.
+
+        $filename may be "-" to read from STDIN.
+
+    `share_file( $filename, \%opts )`
+        The options are ignored.
+
+        $filename may be "-" to read from STDIN.
+
+    `share_link( $url, \%opts )`
+        The options are ignored.
+
+        $url may be "-" to read a URL from STDIN.
+
+    `execute( \@argv )`
+        Reads options and input filenames/URLs from @argv, like processing a
+        command-line. If @argv isn't given, then uses the global @ARGV.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-app-filite-client/issues>.
+
+SEE ALSO
+    <https://github.com/raftario/filite>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2023 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,5 +1,22 @@
 Revision history for this software.
 
+0.56  2023-03-23 00:00:00
+  - add t/8101_old_package_big5.t
+  - add t/8102_old_package_big5hkscs.t
+  - add t/8103_old_package_eucjp.t
+  - add t/8104_old_package_gb18030.t
+  - add t/8105_old_package_gbk.t
+  - add t/8106_old_package_rfc2279.t
+  - add t/8107_old_package_sjis.t
+  - add t/8108_old_package_uhc.t
+  - add t/8109_old_package_utf2.t
+  - add t/8110_old_package_wtf8.t
+  - created by INABA Hitoshi
+
+0.55  2023-03-23 00:00:00
+  - fix ver.0.54
+  - created by INABA Hitoshi
+
 0.54  2023-03-20 00:00:00
   - fix transpiling Sjis::do { block } --> do { block }
   - fix transpiling Sjis::eval { block } --> eval { block }

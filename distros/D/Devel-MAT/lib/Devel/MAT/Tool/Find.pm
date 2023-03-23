@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.50;
+package Devel::MAT::Tool::Find 0.51;
 
 use v5.14;
 use warnings;

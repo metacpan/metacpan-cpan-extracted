@@ -389,7 +389,7 @@ The full name for this projection is Adams Hemisphere in a Square.
 
 sub t_proj_adams_hemi 
     { 'PDL::Transform::Proj4::adams_hemi'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 393 "Proj4.pm"
 #line 394 "Proj4.pm"
 
 
@@ -410,7 +410,7 @@ The full name for this projection is Adams World in a Square I.
 
 sub t_proj_adams_ws1 
     { 'PDL::Transform::Proj4::adams_ws1'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 414 "Proj4.pm"
 #line 415 "Proj4.pm"
 
 
@@ -431,7 +431,7 @@ The full name for this projection is Adams World in a Square II.
 
 sub t_proj_adams_ws2 
     { 'PDL::Transform::Proj4::adams_ws2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 435 "Proj4.pm"
 #line 436 "Proj4.pm"
 
 
@@ -465,7 +465,7 @@ Projection Parameters
 
 sub t_proj_aea 
     { 'PDL::Transform::Proj4::aea'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 469 "Proj4.pm"
 #line 470 "Proj4.pm"
 
 
@@ -499,7 +499,7 @@ Projection Parameters
 
 sub t_proj_aeqd 
     { 'PDL::Transform::Proj4::aeqd'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 503 "Proj4.pm"
 #line 504 "Proj4.pm"
 
 
@@ -520,7 +520,7 @@ The full name for this projection is Affine transformation.
 
 sub t_proj_affine 
     { 'PDL::Transform::Proj4::affine'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 524 "Proj4.pm"
 #line 525 "Proj4.pm"
 
 
@@ -554,7 +554,7 @@ Projection Parameters
 
 sub t_proj_airy 
     { 'PDL::Transform::Proj4::airy'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 558 "Proj4.pm"
 #line 559 "Proj4.pm"
 
 
@@ -575,7 +575,7 @@ The full name for this projection is Aitoff.
 
 sub t_proj_aitoff 
     { 'PDL::Transform::Proj4::aitoff'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 579 "Proj4.pm"
 #line 580 "Proj4.pm"
 
 
@@ -596,7 +596,7 @@ The full name for this projection is Modified Stereographic of Alaska.
 
 sub t_proj_alsk 
     { 'PDL::Transform::Proj4::alsk'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 600 "Proj4.pm"
 #line 601 "Proj4.pm"
 
 
@@ -617,7 +617,7 @@ The full name for this projection is Apian Globular I.
 
 sub t_proj_apian 
     { 'PDL::Transform::Proj4::apian'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 621 "Proj4.pm"
 #line 622 "Proj4.pm"
 
 
@@ -638,7 +638,7 @@ The full name for this projection is August Epicycloidal.
 
 sub t_proj_august 
     { 'PDL::Transform::Proj4::august'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 642 "Proj4.pm"
 #line 643 "Proj4.pm"
 
 
@@ -659,7 +659,7 @@ The full name for this projection is Axis ordering.
 
 sub t_proj_axisswap 
     { 'PDL::Transform::Proj4::axisswap'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 663 "Proj4.pm"
 #line 664 "Proj4.pm"
 
 
@@ -680,7 +680,7 @@ The full name for this projection is Bacon Globular.
 
 sub t_proj_bacon 
     { 'PDL::Transform::Proj4::bacon'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 684 "Proj4.pm"
 #line 685 "Proj4.pm"
 
 
@@ -701,7 +701,7 @@ The full name for this projection is Bertin 1953.
 
 sub t_proj_bertin1953 
     { 'PDL::Transform::Proj4::bertin1953'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 705 "Proj4.pm"
 #line 706 "Proj4.pm"
 
 
@@ -722,7 +722,7 @@ The full name for this projection is Bipolar conic of western hemisphere.
 
 sub t_proj_bipc 
     { 'PDL::Transform::Proj4::bipc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 726 "Proj4.pm"
 #line 727 "Proj4.pm"
 
 
@@ -743,7 +743,7 @@ The full name for this projection is Boggs Eumorphic.
 
 sub t_proj_boggs 
     { 'PDL::Transform::Proj4::boggs'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 747 "Proj4.pm"
 #line 748 "Proj4.pm"
 
 
@@ -775,7 +775,7 @@ Projection Parameters
 
 sub t_proj_bonne 
     { 'PDL::Transform::Proj4::bonne'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 779 "Proj4.pm"
 #line 780 "Proj4.pm"
 
 
@@ -796,7 +796,7 @@ The full name for this projection is Cal Coop Ocean Fish Invest Lines/Stations.
 
 sub t_proj_calcofi 
     { 'PDL::Transform::Proj4::calcofi'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 800 "Proj4.pm"
 #line 801 "Proj4.pm"
 
 
@@ -817,7 +817,7 @@ The full name for this projection is Geodetic/cartesian conversions.
 
 sub t_proj_cart 
     { 'PDL::Transform::Proj4::cart'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 821 "Proj4.pm"
 #line 822 "Proj4.pm"
 
 
@@ -838,7 +838,7 @@ The full name for this projection is Cassini.
 
 sub t_proj_cass 
     { 'PDL::Transform::Proj4::cass'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 842 "Proj4.pm"
 #line 843 "Proj4.pm"
 
 
@@ -859,7 +859,7 @@ The full name for this projection is Central Cylindrical.
 
 sub t_proj_cc 
     { 'PDL::Transform::Proj4::cc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 863 "Proj4.pm"
 #line 864 "Proj4.pm"
 
 
@@ -891,7 +891,7 @@ Projection Parameters
 
 sub t_proj_ccon 
     { 'PDL::Transform::Proj4::ccon'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 895 "Proj4.pm"
 #line 896 "Proj4.pm"
 
 
@@ -923,7 +923,7 @@ Projection Parameters
 
 sub t_proj_cea 
     { 'PDL::Transform::Proj4::cea'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 927 "Proj4.pm"
 #line 928 "Proj4.pm"
 
 
@@ -965,7 +965,7 @@ Projection Parameters
 
 sub t_proj_chamb 
     { 'PDL::Transform::Proj4::chamb'->new( @_ ); }
-#line 506 "Proj4.pd"
+#line 969 "Proj4.pm"
 #line 970 "Proj4.pm"
 
 
@@ -997,7 +997,7 @@ Projection Parameters
 
 sub t_proj_col_urban 
     { 'PDL::Transform::Proj4::col_urban'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 1001 "Proj4.pm"
 #line 1002 "Proj4.pm"
 
 
@@ -1018,7 +1018,7 @@ The full name for this projection is Collignon.
 
 sub t_proj_collg 
     { 'PDL::Transform::Proj4::collg'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1022 "Proj4.pm"
 #line 1023 "Proj4.pm"
 
 
@@ -1039,7 +1039,7 @@ The full name for this projection is Compact Miller.
 
 sub t_proj_comill 
     { 'PDL::Transform::Proj4::comill'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1043 "Proj4.pm"
 #line 1044 "Proj4.pm"
 
 
@@ -1060,7 +1060,7 @@ The full name for this projection is Craster Parabolic (Putnins P4).
 
 sub t_proj_crast 
     { 'PDL::Transform::Proj4::crast'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1064 "Proj4.pm"
 #line 1065 "Proj4.pm"
 
 
@@ -1081,7 +1081,7 @@ The full name for this projection is Deformation model.
 
 sub t_proj_defmodel 
     { 'PDL::Transform::Proj4::defmodel'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1085 "Proj4.pm"
 #line 1086 "Proj4.pm"
 
 
@@ -1102,7 +1102,7 @@ The full name for this projection is Kinematic grid shift.
 
 sub t_proj_deformation 
     { 'PDL::Transform::Proj4::deformation'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1106 "Proj4.pm"
 #line 1107 "Proj4.pm"
 
 
@@ -1123,7 +1123,7 @@ The full name for this projection is Denoyer Semi-Elliptical.
 
 sub t_proj_denoy 
     { 'PDL::Transform::Proj4::denoy'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1127 "Proj4.pm"
 #line 1128 "Proj4.pm"
 
 
@@ -1144,7 +1144,7 @@ The full name for this projection is Eckert I.
 
 sub t_proj_eck1 
     { 'PDL::Transform::Proj4::eck1'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1148 "Proj4.pm"
 #line 1149 "Proj4.pm"
 
 
@@ -1165,7 +1165,7 @@ The full name for this projection is Eckert II.
 
 sub t_proj_eck2 
     { 'PDL::Transform::Proj4::eck2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1169 "Proj4.pm"
 #line 1170 "Proj4.pm"
 
 
@@ -1186,7 +1186,7 @@ The full name for this projection is Eckert III.
 
 sub t_proj_eck3 
     { 'PDL::Transform::Proj4::eck3'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1190 "Proj4.pm"
 #line 1191 "Proj4.pm"
 
 
@@ -1207,7 +1207,7 @@ The full name for this projection is Eckert IV.
 
 sub t_proj_eck4 
     { 'PDL::Transform::Proj4::eck4'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1211 "Proj4.pm"
 #line 1212 "Proj4.pm"
 
 
@@ -1228,7 +1228,7 @@ The full name for this projection is Eckert V.
 
 sub t_proj_eck5 
     { 'PDL::Transform::Proj4::eck5'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1232 "Proj4.pm"
 #line 1233 "Proj4.pm"
 
 
@@ -1249,7 +1249,7 @@ The full name for this projection is Eckert VI.
 
 sub t_proj_eck6 
     { 'PDL::Transform::Proj4::eck6'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1253 "Proj4.pm"
 #line 1254 "Proj4.pm"
 
 
@@ -1283,7 +1283,7 @@ Projection Parameters
 
 sub t_proj_eqc 
     { 'PDL::Transform::Proj4::eqc'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 1287 "Proj4.pm"
 #line 1288 "Proj4.pm"
 
 
@@ -1317,7 +1317,7 @@ Projection Parameters
 
 sub t_proj_eqdc 
     { 'PDL::Transform::Proj4::eqdc'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 1321 "Proj4.pm"
 #line 1322 "Proj4.pm"
 
 
@@ -1338,7 +1338,7 @@ The full name for this projection is Equal Earth.
 
 sub t_proj_eqearth 
     { 'PDL::Transform::Proj4::eqearth'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1342 "Proj4.pm"
 #line 1343 "Proj4.pm"
 
 
@@ -1359,7 +1359,7 @@ The full name for this projection is Extended Transverse Mercator.
 
 sub t_proj_etmerc 
     { 'PDL::Transform::Proj4::etmerc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1363 "Proj4.pm"
 #line 1364 "Proj4.pm"
 
 
@@ -1393,7 +1393,7 @@ Projection Parameters
 
 sub t_proj_euler 
     { 'PDL::Transform::Proj4::euler'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 1397 "Proj4.pm"
 #line 1398 "Proj4.pm"
 
 
@@ -1414,7 +1414,7 @@ The full name for this projection is Fahey.
 
 sub t_proj_fahey 
     { 'PDL::Transform::Proj4::fahey'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1418 "Proj4.pm"
 #line 1419 "Proj4.pm"
 
 
@@ -1435,7 +1435,7 @@ The full name for this projection is Foucaut.
 
 sub t_proj_fouc 
     { 'PDL::Transform::Proj4::fouc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1439 "Proj4.pm"
 #line 1440 "Proj4.pm"
 
 
@@ -1456,7 +1456,7 @@ The full name for this projection is Foucaut Sinusoidal.
 
 sub t_proj_fouc_s 
     { 'PDL::Transform::Proj4::fouc_s'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1460 "Proj4.pm"
 #line 1461 "Proj4.pm"
 
 
@@ -1477,7 +1477,7 @@ The full name for this projection is Gall (Gall Stereographic).
 
 sub t_proj_gall 
     { 'PDL::Transform::Proj4::gall'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1481 "Proj4.pm"
 #line 1482 "Proj4.pm"
 
 
@@ -1498,7 +1498,7 @@ The full name for this projection is Geocentric Latitude.
 
 sub t_proj_geoc 
     { 'PDL::Transform::Proj4::geoc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1502 "Proj4.pm"
 #line 1503 "Proj4.pm"
 
 
@@ -1519,7 +1519,7 @@ The full name for this projection is Geocentric.
 
 sub t_proj_geocent 
     { 'PDL::Transform::Proj4::geocent'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1523 "Proj4.pm"
 #line 1524 "Proj4.pm"
 
 
@@ -1540,7 +1540,7 @@ The full name for this projection is Geographic Offset.
 
 sub t_proj_geogoffset 
     { 'PDL::Transform::Proj4::geogoffset'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1544 "Proj4.pm"
 #line 1545 "Proj4.pm"
 
 
@@ -1572,7 +1572,7 @@ Projection Parameters
 
 sub t_proj_geos 
     { 'PDL::Transform::Proj4::geos'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 1576 "Proj4.pm"
 #line 1577 "Proj4.pm"
 
 
@@ -1593,7 +1593,7 @@ The full name for this projection is Ginsburg VIII (TsNIIGAiK).
 
 sub t_proj_gins8 
     { 'PDL::Transform::Proj4::gins8'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1597 "Proj4.pm"
 #line 1598 "Proj4.pm"
 
 
@@ -1627,7 +1627,7 @@ Projection Parameters
 
 sub t_proj_gn_sinu 
     { 'PDL::Transform::Proj4::gn_sinu'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 1631 "Proj4.pm"
 #line 1632 "Proj4.pm"
 
 
@@ -1648,7 +1648,7 @@ The full name for this projection is Gnomonic.
 
 sub t_proj_gnom 
     { 'PDL::Transform::Proj4::gnom'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1652 "Proj4.pm"
 #line 1653 "Proj4.pm"
 
 
@@ -1669,7 +1669,7 @@ The full name for this projection is Goode Homolosine.
 
 sub t_proj_goode 
     { 'PDL::Transform::Proj4::goode'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1673 "Proj4.pm"
 #line 1674 "Proj4.pm"
 
 
@@ -1690,7 +1690,7 @@ The full name for this projection is Modified Stereographic of 48 U.S..
 
 sub t_proj_gs48 
     { 'PDL::Transform::Proj4::gs48'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1694 "Proj4.pm"
 #line 1695 "Proj4.pm"
 
 
@@ -1711,7 +1711,7 @@ The full name for this projection is Modified Stereographic of 50 U.S..
 
 sub t_proj_gs50 
     { 'PDL::Transform::Proj4::gs50'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1715 "Proj4.pm"
 #line 1716 "Proj4.pm"
 
 
@@ -1747,7 +1747,7 @@ Projection Parameters
 
 sub t_proj_gstmerc 
     { 'PDL::Transform::Proj4::gstmerc'->new( @_ ); }
-#line 500 "Proj4.pd"
+#line 1751 "Proj4.pm"
 #line 1752 "Proj4.pm"
 
 
@@ -1768,7 +1768,7 @@ The full name for this projection is Guyou.
 
 sub t_proj_guyou 
     { 'PDL::Transform::Proj4::guyou'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1772 "Proj4.pm"
 #line 1773 "Proj4.pm"
 
 
@@ -1802,7 +1802,7 @@ Projection Parameters
 
 sub t_proj_hammer 
     { 'PDL::Transform::Proj4::hammer'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 1806 "Proj4.pm"
 #line 1807 "Proj4.pm"
 
 
@@ -1823,7 +1823,7 @@ The full name for this projection is Hatano Asymmetrical Equal Area.
 
 sub t_proj_hatano 
     { 'PDL::Transform::Proj4::hatano'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1827 "Proj4.pm"
 #line 1828 "Proj4.pm"
 
 
@@ -1855,7 +1855,7 @@ Projection Parameters
 
 sub t_proj_healpix 
     { 'PDL::Transform::Proj4::healpix'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 1859 "Proj4.pm"
 #line 1860 "Proj4.pm"
 
 
@@ -1876,7 +1876,7 @@ The full name for this projection is 3(6)-, 4(8)- and 7(14)-parameter Helmert sh
 
 sub t_proj_helmert 
     { 'PDL::Transform::Proj4::helmert'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1880 "Proj4.pm"
 #line 1881 "Proj4.pm"
 
 
@@ -1897,7 +1897,7 @@ The full name for this projection is Horizontal grid shift.
 
 sub t_proj_hgridshift 
     { 'PDL::Transform::Proj4::hgridshift'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1901 "Proj4.pm"
 #line 1902 "Proj4.pm"
 
 
@@ -1918,7 +1918,7 @@ The full name for this projection is Horner polynomial evaluation.
 
 sub t_proj_horner 
     { 'PDL::Transform::Proj4::horner'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1922 "Proj4.pm"
 #line 1923 "Proj4.pm"
 
 
@@ -1939,7 +1939,7 @@ The full name for this projection is Interrupted Goode Homolosine.
 
 sub t_proj_igh 
     { 'PDL::Transform::Proj4::igh'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1943 "Proj4.pm"
 #line 1944 "Proj4.pm"
 
 
@@ -1960,7 +1960,7 @@ The full name for this projection is Interrupted Goode Homolosine Oceanic View.
 
 sub t_proj_igh_o 
     { 'PDL::Transform::Proj4::igh_o'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 1964 "Proj4.pm"
 #line 1965 "Proj4.pm"
 
 
@@ -1996,7 +1996,7 @@ Projection Parameters
 
 sub t_proj_imw_p 
     { 'PDL::Transform::Proj4::imw_p'->new( @_ ); }
-#line 500 "Proj4.pd"
+#line 2000 "Proj4.pm"
 #line 2001 "Proj4.pm"
 
 
@@ -2017,7 +2017,7 @@ The full name for this projection is Icosahedral Snyder Equal Area.
 
 sub t_proj_isea 
     { 'PDL::Transform::Proj4::isea'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2021 "Proj4.pm"
 #line 2022 "Proj4.pm"
 
 
@@ -2038,7 +2038,7 @@ The full name for this projection is Kavraisky V.
 
 sub t_proj_kav5 
     { 'PDL::Transform::Proj4::kav5'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2042 "Proj4.pm"
 #line 2043 "Proj4.pm"
 
 
@@ -2059,7 +2059,7 @@ The full name for this projection is Kavraisky VII.
 
 sub t_proj_kav7 
     { 'PDL::Transform::Proj4::kav7'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2063 "Proj4.pm"
 #line 2064 "Proj4.pm"
 
 
@@ -2080,7 +2080,7 @@ The full name for this projection is Krovak.
 
 sub t_proj_krovak 
     { 'PDL::Transform::Proj4::krovak'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2084 "Proj4.pm"
 #line 2085 "Proj4.pm"
 
 
@@ -2101,7 +2101,7 @@ The full name for this projection is Laborde.
 
 sub t_proj_labrd 
     { 'PDL::Transform::Proj4::labrd'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2105 "Proj4.pm"
 #line 2106 "Proj4.pm"
 
 
@@ -2122,7 +2122,7 @@ The full name for this projection is Lambert Azimuthal Equal Area.
 
 sub t_proj_laea 
     { 'PDL::Transform::Proj4::laea'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2126 "Proj4.pm"
 #line 2127 "Proj4.pm"
 
 
@@ -2154,7 +2154,7 @@ Projection Parameters
 
 sub t_proj_lagrng 
     { 'PDL::Transform::Proj4::lagrng'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 2158 "Proj4.pm"
 #line 2159 "Proj4.pm"
 
 
@@ -2175,7 +2175,7 @@ The full name for this projection is Larrivee.
 
 sub t_proj_larr 
     { 'PDL::Transform::Proj4::larr'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2179 "Proj4.pm"
 #line 2180 "Proj4.pm"
 
 
@@ -2196,7 +2196,7 @@ The full name for this projection is Laskowski.
 
 sub t_proj_lask 
     { 'PDL::Transform::Proj4::lask'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2200 "Proj4.pm"
 #line 2201 "Proj4.pm"
 
 
@@ -2217,7 +2217,7 @@ The full name for this projection is Lat/long (Geodetic alias).
 
 sub t_proj_latlon 
     { 'PDL::Transform::Proj4::latlon'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2221 "Proj4.pm"
 #line 2222 "Proj4.pm"
 
 
@@ -2238,7 +2238,7 @@ The full name for this projection is Lat/long (Geodetic alias).
 
 sub t_proj_latlong 
     { 'PDL::Transform::Proj4::latlong'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2242 "Proj4.pm"
 #line 2243 "Proj4.pm"
 
 
@@ -2276,7 +2276,7 @@ Projection Parameters
 
 sub t_proj_lcc 
     { 'PDL::Transform::Proj4::lcc'->new( @_ ); }
-#line 502 "Proj4.pd"
+#line 2280 "Proj4.pm"
 #line 2281 "Proj4.pm"
 
 
@@ -2308,7 +2308,7 @@ Projection Parameters
 
 sub t_proj_lcca 
     { 'PDL::Transform::Proj4::lcca'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 2312 "Proj4.pm"
 #line 2313 "Proj4.pm"
 
 
@@ -2342,7 +2342,7 @@ Projection Parameters
 
 sub t_proj_leac 
     { 'PDL::Transform::Proj4::leac'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 2346 "Proj4.pm"
 #line 2347 "Proj4.pm"
 
 
@@ -2363,7 +2363,7 @@ The full name for this projection is Lee Oblated Stereographic.
 
 sub t_proj_lee_os 
     { 'PDL::Transform::Proj4::lee_os'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2367 "Proj4.pm"
 #line 2368 "Proj4.pm"
 
 
@@ -2384,7 +2384,7 @@ The full name for this projection is Lat/long (Geodetic alias).
 
 sub t_proj_longlat 
     { 'PDL::Transform::Proj4::longlat'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2388 "Proj4.pm"
 #line 2389 "Proj4.pm"
 
 
@@ -2405,7 +2405,7 @@ The full name for this projection is Lat/long (Geodetic).
 
 sub t_proj_lonlat 
     { 'PDL::Transform::Proj4::lonlat'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2409 "Proj4.pm"
 #line 2410 "Proj4.pm"
 
 
@@ -2426,7 +2426,7 @@ The full name for this projection is Loximuthal.
 
 sub t_proj_loxim 
     { 'PDL::Transform::Proj4::loxim'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2430 "Proj4.pm"
 #line 2431 "Proj4.pm"
 
 
@@ -2460,7 +2460,7 @@ Projection Parameters
 
 sub t_proj_lsat 
     { 'PDL::Transform::Proj4::lsat'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 2464 "Proj4.pm"
 #line 2465 "Proj4.pm"
 
 
@@ -2481,7 +2481,7 @@ The full name for this projection is McBryde-Thomas Flat-Pole Sine (No. 2).
 
 sub t_proj_mbt_fps 
     { 'PDL::Transform::Proj4::mbt_fps'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2485 "Proj4.pm"
 #line 2486 "Proj4.pm"
 
 
@@ -2502,7 +2502,7 @@ The full name for this projection is McBryde-Thomas Flat-Polar Sine (No. 1).
 
 sub t_proj_mbt_s 
     { 'PDL::Transform::Proj4::mbt_s'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2506 "Proj4.pm"
 #line 2507 "Proj4.pm"
 
 
@@ -2523,7 +2523,7 @@ The full name for this projection is McBride-Thomas Flat-Polar Parabolic.
 
 sub t_proj_mbtfpp 
     { 'PDL::Transform::Proj4::mbtfpp'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2527 "Proj4.pm"
 #line 2528 "Proj4.pm"
 
 
@@ -2544,7 +2544,7 @@ The full name for this projection is McBryde-Thomas Flat-Polar Quartic.
 
 sub t_proj_mbtfpq 
     { 'PDL::Transform::Proj4::mbtfpq'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2548 "Proj4.pm"
 #line 2549 "Proj4.pm"
 
 
@@ -2565,7 +2565,7 @@ The full name for this projection is McBryde-Thomas Flat-Polar Sinusoidal.
 
 sub t_proj_mbtfps 
     { 'PDL::Transform::Proj4::mbtfps'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2569 "Proj4.pm"
 #line 2570 "Proj4.pm"
 
 
@@ -2597,7 +2597,7 @@ Projection Parameters
 
 sub t_proj_merc 
     { 'PDL::Transform::Proj4::merc'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 2601 "Proj4.pm"
 #line 2602 "Proj4.pm"
 
 
@@ -2618,7 +2618,7 @@ The full name for this projection is Miller Oblated Stereographic.
 
 sub t_proj_mil_os 
     { 'PDL::Transform::Proj4::mil_os'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2622 "Proj4.pm"
 #line 2623 "Proj4.pm"
 
 
@@ -2639,7 +2639,7 @@ The full name for this projection is Miller Cylindrical.
 
 sub t_proj_mill 
     { 'PDL::Transform::Proj4::mill'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2643 "Proj4.pm"
 #line 2644 "Proj4.pm"
 
 
@@ -2671,7 +2671,7 @@ Projection Parameters
 
 sub t_proj_misrsom 
     { 'PDL::Transform::Proj4::misrsom'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 2675 "Proj4.pm"
 #line 2676 "Proj4.pm"
 
 
@@ -2692,7 +2692,7 @@ The full name for this projection is Mollweide.
 
 sub t_proj_moll 
     { 'PDL::Transform::Proj4::moll'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2696 "Proj4.pm"
 #line 2697 "Proj4.pm"
 
 
@@ -2713,7 +2713,7 @@ The full name for this projection is Molodensky-Badekas transformation.
 
 sub t_proj_molobadekas 
     { 'PDL::Transform::Proj4::molobadekas'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2717 "Proj4.pm"
 #line 2718 "Proj4.pm"
 
 
@@ -2734,7 +2734,7 @@ The full name for this projection is Molodensky transform.
 
 sub t_proj_molodensky 
     { 'PDL::Transform::Proj4::molodensky'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2738 "Proj4.pm"
 #line 2739 "Proj4.pm"
 
 
@@ -2768,7 +2768,7 @@ Projection Parameters
 
 sub t_proj_murd1 
     { 'PDL::Transform::Proj4::murd1'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 2772 "Proj4.pm"
 #line 2773 "Proj4.pm"
 
 
@@ -2802,7 +2802,7 @@ Projection Parameters
 
 sub t_proj_murd2 
     { 'PDL::Transform::Proj4::murd2'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 2806 "Proj4.pm"
 #line 2807 "Proj4.pm"
 
 
@@ -2836,7 +2836,7 @@ Projection Parameters
 
 sub t_proj_murd3 
     { 'PDL::Transform::Proj4::murd3'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 2840 "Proj4.pm"
 #line 2841 "Proj4.pm"
 
 
@@ -2857,7 +2857,7 @@ The full name for this projection is Natural Earth.
 
 sub t_proj_natearth 
     { 'PDL::Transform::Proj4::natearth'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2861 "Proj4.pm"
 #line 2862 "Proj4.pm"
 
 
@@ -2878,7 +2878,7 @@ The full name for this projection is Natural Earth 2.
 
 sub t_proj_natearth2 
     { 'PDL::Transform::Proj4::natearth2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2882 "Proj4.pm"
 #line 2883 "Proj4.pm"
 
 
@@ -2899,7 +2899,7 @@ The full name for this projection is Nell.
 
 sub t_proj_nell 
     { 'PDL::Transform::Proj4::nell'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2903 "Proj4.pm"
 #line 2904 "Proj4.pm"
 
 
@@ -2920,7 +2920,7 @@ The full name for this projection is Nell-Hammer.
 
 sub t_proj_nell_h 
     { 'PDL::Transform::Proj4::nell_h'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2924 "Proj4.pm"
 #line 2925 "Proj4.pm"
 
 
@@ -2941,7 +2941,7 @@ The full name for this projection is Nicolosi Globular.
 
 sub t_proj_nicol 
     { 'PDL::Transform::Proj4::nicol'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2945 "Proj4.pm"
 #line 2946 "Proj4.pm"
 
 
@@ -2962,7 +2962,7 @@ The full name for this projection is No operation.
 
 sub t_proj_noop 
     { 'PDL::Transform::Proj4::noop'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 2966 "Proj4.pm"
 #line 2967 "Proj4.pm"
 
 
@@ -2994,7 +2994,7 @@ Projection Parameters
 
 sub t_proj_nsper 
     { 'PDL::Transform::Proj4::nsper'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 2998 "Proj4.pm"
 #line 2999 "Proj4.pm"
 
 
@@ -3015,7 +3015,7 @@ The full name for this projection is New Zealand Map Grid.
 
 sub t_proj_nzmg 
     { 'PDL::Transform::Proj4::nzmg'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3019 "Proj4.pm"
 #line 3020 "Proj4.pm"
 
 
@@ -3065,7 +3065,7 @@ Projection Parameters
 
 sub t_proj_ob_tran 
     { 'PDL::Transform::Proj4::ob_tran'->new( @_ ); }
-#line 514 "Proj4.pd"
+#line 3069 "Proj4.pm"
 #line 3070 "Proj4.pm"
 
 
@@ -3103,7 +3103,7 @@ Projection Parameters
 
 sub t_proj_ocea 
     { 'PDL::Transform::Proj4::ocea'->new( @_ ); }
-#line 502 "Proj4.pd"
+#line 3107 "Proj4.pm"
 #line 3108 "Proj4.pm"
 
 
@@ -3139,7 +3139,7 @@ Projection Parameters
 
 sub t_proj_oea 
     { 'PDL::Transform::Proj4::oea'->new( @_ ); }
-#line 500 "Proj4.pd"
+#line 3143 "Proj4.pm"
 #line 3144 "Proj4.pm"
 
 
@@ -3185,7 +3185,7 @@ Projection Parameters
 
 sub t_proj_omerc 
     { 'PDL::Transform::Proj4::omerc'->new( @_ ); }
-#line 510 "Proj4.pd"
+#line 3189 "Proj4.pm"
 #line 3190 "Proj4.pm"
 
 
@@ -3206,7 +3206,7 @@ The full name for this projection is Ortelius Oval.
 
 sub t_proj_ortel 
     { 'PDL::Transform::Proj4::ortel'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3210 "Proj4.pm"
 #line 3211 "Proj4.pm"
 
 
@@ -3227,7 +3227,7 @@ The full name for this projection is Orthographic.
 
 sub t_proj_ortho 
     { 'PDL::Transform::Proj4::ortho'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3231 "Proj4.pm"
 #line 3232 "Proj4.pm"
 
 
@@ -3248,7 +3248,7 @@ The full name for this projection is Patterson Cylindrical.
 
 sub t_proj_patterson 
     { 'PDL::Transform::Proj4::patterson'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3252 "Proj4.pm"
 #line 3253 "Proj4.pm"
 
 
@@ -3282,7 +3282,7 @@ Projection Parameters
 
 sub t_proj_pconic 
     { 'PDL::Transform::Proj4::pconic'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 3286 "Proj4.pm"
 #line 3287 "Proj4.pm"
 
 
@@ -3303,7 +3303,7 @@ The full name for this projection is Peirce Quincuncial.
 
 sub t_proj_peirce_q 
     { 'PDL::Transform::Proj4::peirce_q'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3307 "Proj4.pm"
 #line 3308 "Proj4.pm"
 
 
@@ -3324,7 +3324,7 @@ The full name for this projection is Transformation pipeline manager.
 
 sub t_proj_pipeline 
     { 'PDL::Transform::Proj4::pipeline'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3328 "Proj4.pm"
 #line 3329 "Proj4.pm"
 
 
@@ -3345,7 +3345,7 @@ The full name for this projection is Polyconic (American).
 
 sub t_proj_poly 
     { 'PDL::Transform::Proj4::poly'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3349 "Proj4.pm"
 #line 3350 "Proj4.pm"
 
 
@@ -3366,7 +3366,7 @@ The full name for this projection is Retrieve coordinate value from pipeline sta
 
 sub t_proj_pop 
     { 'PDL::Transform::Proj4::pop'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3370 "Proj4.pm"
 #line 3371 "Proj4.pm"
 
 
@@ -3387,7 +3387,7 @@ The full name for this projection is Save coordinate value on pipeline stack.
 
 sub t_proj_push 
     { 'PDL::Transform::Proj4::push'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3391 "Proj4.pm"
 #line 3392 "Proj4.pm"
 
 
@@ -3408,7 +3408,7 @@ The full name for this projection is Putnins P1.
 
 sub t_proj_putp1 
     { 'PDL::Transform::Proj4::putp1'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3412 "Proj4.pm"
 #line 3413 "Proj4.pm"
 
 
@@ -3429,7 +3429,7 @@ The full name for this projection is Putnins P2.
 
 sub t_proj_putp2 
     { 'PDL::Transform::Proj4::putp2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3433 "Proj4.pm"
 #line 3434 "Proj4.pm"
 
 
@@ -3450,7 +3450,7 @@ The full name for this projection is Putnins P3.
 
 sub t_proj_putp3 
     { 'PDL::Transform::Proj4::putp3'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3454 "Proj4.pm"
 #line 3455 "Proj4.pm"
 
 
@@ -3471,7 +3471,7 @@ The full name for this projection is Putnins P3'.
 
 sub t_proj_putp3p 
     { 'PDL::Transform::Proj4::putp3p'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3475 "Proj4.pm"
 #line 3476 "Proj4.pm"
 
 
@@ -3492,7 +3492,7 @@ The full name for this projection is Putnins P4'.
 
 sub t_proj_putp4p 
     { 'PDL::Transform::Proj4::putp4p'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3496 "Proj4.pm"
 #line 3497 "Proj4.pm"
 
 
@@ -3513,7 +3513,7 @@ The full name for this projection is Putnins P5.
 
 sub t_proj_putp5 
     { 'PDL::Transform::Proj4::putp5'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3517 "Proj4.pm"
 #line 3518 "Proj4.pm"
 
 
@@ -3534,7 +3534,7 @@ The full name for this projection is Putnins P5'.
 
 sub t_proj_putp5p 
     { 'PDL::Transform::Proj4::putp5p'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3538 "Proj4.pm"
 #line 3539 "Proj4.pm"
 
 
@@ -3555,7 +3555,7 @@ The full name for this projection is Putnins P6.
 
 sub t_proj_putp6 
     { 'PDL::Transform::Proj4::putp6'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3559 "Proj4.pm"
 #line 3560 "Proj4.pm"
 
 
@@ -3576,7 +3576,7 @@ The full name for this projection is Putnins P6'.
 
 sub t_proj_putp6p 
     { 'PDL::Transform::Proj4::putp6p'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3580 "Proj4.pm"
 #line 3581 "Proj4.pm"
 
 
@@ -3597,7 +3597,7 @@ The full name for this projection is Quadrilateralized Spherical Cube.
 
 sub t_proj_qsc 
     { 'PDL::Transform::Proj4::qsc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3601 "Proj4.pm"
 #line 3602 "Proj4.pm"
 
 
@@ -3618,7 +3618,7 @@ The full name for this projection is Quartic Authalic.
 
 sub t_proj_qua_aut 
     { 'PDL::Transform::Proj4::qua_aut'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3622 "Proj4.pm"
 #line 3623 "Proj4.pm"
 
 
@@ -3652,7 +3652,7 @@ Projection Parameters
 
 sub t_proj_rhealpix 
     { 'PDL::Transform::Proj4::rhealpix'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 3656 "Proj4.pm"
 #line 3657 "Proj4.pm"
 
 
@@ -3673,7 +3673,7 @@ The full name for this projection is Robinson.
 
 sub t_proj_robin 
     { 'PDL::Transform::Proj4::robin'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3677 "Proj4.pm"
 #line 3678 "Proj4.pm"
 
 
@@ -3694,7 +3694,7 @@ The full name for this projection is Roussilhe Stereographic.
 
 sub t_proj_rouss 
     { 'PDL::Transform::Proj4::rouss'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3698 "Proj4.pm"
 #line 3699 "Proj4.pm"
 
 
@@ -3726,7 +3726,7 @@ Projection Parameters
 
 sub t_proj_rpoly 
     { 'PDL::Transform::Proj4::rpoly'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 3730 "Proj4.pm"
 #line 3731 "Proj4.pm"
 
 
@@ -3747,7 +3747,7 @@ The full name for this projection is S2.
 
 sub t_proj_s2 
     { 'PDL::Transform::Proj4::s2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3751 "Proj4.pm"
 #line 3752 "Proj4.pm"
 
 
@@ -3785,7 +3785,7 @@ Projection Parameters
 
 sub t_proj_sch 
     { 'PDL::Transform::Proj4::sch'->new( @_ ); }
-#line 502 "Proj4.pd"
+#line 3789 "Proj4.pm"
 #line 3790 "Proj4.pm"
 
 
@@ -3806,7 +3806,7 @@ The full name for this projection is Set coordinate value.
 
 sub t_proj_set 
     { 'PDL::Transform::Proj4::set'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3810 "Proj4.pm"
 #line 3811 "Proj4.pm"
 
 
@@ -3827,7 +3827,7 @@ The full name for this projection is Sinusoidal (Sanson-Flamsteed).
 
 sub t_proj_sinu 
     { 'PDL::Transform::Proj4::sinu'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3831 "Proj4.pm"
 #line 3832 "Proj4.pm"
 
 
@@ -3848,7 +3848,7 @@ The full name for this projection is Swiss. Obl. Mercator.
 
 sub t_proj_somerc 
     { 'PDL::Transform::Proj4::somerc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3852 "Proj4.pm"
 #line 3853 "Proj4.pm"
 
 
@@ -3880,7 +3880,7 @@ Projection Parameters
 
 sub t_proj_stere 
     { 'PDL::Transform::Proj4::stere'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 3884 "Proj4.pm"
 #line 3885 "Proj4.pm"
 
 
@@ -3901,7 +3901,7 @@ The full name for this projection is Oblique Stereographic Alternative.
 
 sub t_proj_sterea 
     { 'PDL::Transform::Proj4::sterea'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3905 "Proj4.pm"
 #line 3906 "Proj4.pm"
 
 
@@ -3922,7 +3922,7 @@ The full name for this projection is Transverse Central Cylindrical.
 
 sub t_proj_tcc 
     { 'PDL::Transform::Proj4::tcc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3926 "Proj4.pm"
 #line 3927 "Proj4.pm"
 
 
@@ -3943,7 +3943,7 @@ The full name for this projection is Transverse Cylindrical Equal Area.
 
 sub t_proj_tcea 
     { 'PDL::Transform::Proj4::tcea'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3947 "Proj4.pm"
 #line 3948 "Proj4.pm"
 
 
@@ -3964,7 +3964,7 @@ The full name for this projection is Times.
 
 sub t_proj_times 
     { 'PDL::Transform::Proj4::times'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3968 "Proj4.pm"
 #line 3969 "Proj4.pm"
 
 
@@ -3985,7 +3985,7 @@ The full name for this projection is Triangulation based transformation.
 
 sub t_proj_tinshift 
     { 'PDL::Transform::Proj4::tinshift'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 3989 "Proj4.pm"
 #line 3990 "Proj4.pm"
 
 
@@ -4019,7 +4019,7 @@ Projection Parameters
 
 sub t_proj_tissot 
     { 'PDL::Transform::Proj4::tissot'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 4023 "Proj4.pm"
 #line 4024 "Proj4.pm"
 
 
@@ -4051,7 +4051,7 @@ Projection Parameters
 
 sub t_proj_tmerc 
     { 'PDL::Transform::Proj4::tmerc'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4055 "Proj4.pm"
 #line 4056 "Proj4.pm"
 
 
@@ -4072,7 +4072,7 @@ The full name for this projection is Tobler-Mercator.
 
 sub t_proj_tobmerc 
     { 'PDL::Transform::Proj4::tobmerc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4076 "Proj4.pm"
 #line 4077 "Proj4.pm"
 
 
@@ -4093,7 +4093,7 @@ The full name for this projection is Geocentric/Topocentric conversion.
 
 sub t_proj_topocentric 
     { 'PDL::Transform::Proj4::topocentric'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4097 "Proj4.pm"
 #line 4098 "Proj4.pm"
 
 
@@ -4131,7 +4131,7 @@ Projection Parameters
 
 sub t_proj_tpeqd 
     { 'PDL::Transform::Proj4::tpeqd'->new( @_ ); }
-#line 502 "Proj4.pd"
+#line 4135 "Proj4.pm"
 #line 4136 "Proj4.pm"
 
 
@@ -4167,7 +4167,7 @@ Projection Parameters
 
 sub t_proj_tpers 
     { 'PDL::Transform::Proj4::tpers'->new( @_ ); }
-#line 500 "Proj4.pd"
+#line 4171 "Proj4.pm"
 #line 4172 "Proj4.pm"
 
 
@@ -4188,7 +4188,7 @@ The full name for this projection is Unit conversion.
 
 sub t_proj_unitconvert 
     { 'PDL::Transform::Proj4::unitconvert'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4192 "Proj4.pm"
 #line 4193 "Proj4.pm"
 
 
@@ -4220,7 +4220,7 @@ Projection Parameters
 
 sub t_proj_ups 
     { 'PDL::Transform::Proj4::ups'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4224 "Proj4.pm"
 #line 4225 "Proj4.pm"
 
 
@@ -4256,7 +4256,7 @@ Projection Parameters
 
 sub t_proj_urm5 
     { 'PDL::Transform::Proj4::urm5'->new( @_ ); }
-#line 500 "Proj4.pd"
+#line 4260 "Proj4.pm"
 #line 4261 "Proj4.pm"
 
 
@@ -4288,7 +4288,7 @@ Projection Parameters
 
 sub t_proj_urmfps 
     { 'PDL::Transform::Proj4::urmfps'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4292 "Proj4.pm"
 #line 4293 "Proj4.pm"
 
 
@@ -4324,7 +4324,7 @@ Projection Parameters
 
 sub t_proj_utm 
     { 'PDL::Transform::Proj4::utm'->new( @_ ); }
-#line 500 "Proj4.pd"
+#line 4328 "Proj4.pm"
 #line 4329 "Proj4.pm"
 
 
@@ -4345,7 +4345,7 @@ The full name for this projection is van der Grinten (I).
 
 sub t_proj_vandg 
     { 'PDL::Transform::Proj4::vandg'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4349 "Proj4.pm"
 #line 4350 "Proj4.pm"
 
 
@@ -4366,7 +4366,7 @@ The full name for this projection is van der Grinten II.
 
 sub t_proj_vandg2 
     { 'PDL::Transform::Proj4::vandg2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4370 "Proj4.pm"
 #line 4371 "Proj4.pm"
 
 
@@ -4387,7 +4387,7 @@ The full name for this projection is van der Grinten III.
 
 sub t_proj_vandg3 
     { 'PDL::Transform::Proj4::vandg3'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4391 "Proj4.pm"
 #line 4392 "Proj4.pm"
 
 
@@ -4408,7 +4408,7 @@ The full name for this projection is van der Grinten IV.
 
 sub t_proj_vandg4 
     { 'PDL::Transform::Proj4::vandg4'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4412 "Proj4.pm"
 #line 4413 "Proj4.pm"
 
 
@@ -4429,7 +4429,7 @@ The full name for this projection is Vertical grid shift.
 
 sub t_proj_vgridshift 
     { 'PDL::Transform::Proj4::vgridshift'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4433 "Proj4.pm"
 #line 4434 "Proj4.pm"
 
 
@@ -4463,7 +4463,7 @@ Projection Parameters
 
 sub t_proj_vitk1 
     { 'PDL::Transform::Proj4::vitk1'->new( @_ ); }
-#line 498 "Proj4.pd"
+#line 4467 "Proj4.pm"
 #line 4468 "Proj4.pm"
 
 
@@ -4484,7 +4484,7 @@ The full name for this projection is Wagner I (Kavraisky VI).
 
 sub t_proj_wag1 
     { 'PDL::Transform::Proj4::wag1'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4488 "Proj4.pm"
 #line 4489 "Proj4.pm"
 
 
@@ -4505,7 +4505,7 @@ The full name for this projection is Wagner II.
 
 sub t_proj_wag2 
     { 'PDL::Transform::Proj4::wag2'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4509 "Proj4.pm"
 #line 4510 "Proj4.pm"
 
 
@@ -4537,7 +4537,7 @@ Projection Parameters
 
 sub t_proj_wag3 
     { 'PDL::Transform::Proj4::wag3'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4541 "Proj4.pm"
 #line 4542 "Proj4.pm"
 
 
@@ -4558,7 +4558,7 @@ The full name for this projection is Wagner IV.
 
 sub t_proj_wag4 
     { 'PDL::Transform::Proj4::wag4'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4562 "Proj4.pm"
 #line 4563 "Proj4.pm"
 
 
@@ -4579,7 +4579,7 @@ The full name for this projection is Wagner V.
 
 sub t_proj_wag5 
     { 'PDL::Transform::Proj4::wag5'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4583 "Proj4.pm"
 #line 4584 "Proj4.pm"
 
 
@@ -4600,7 +4600,7 @@ The full name for this projection is Wagner VI.
 
 sub t_proj_wag6 
     { 'PDL::Transform::Proj4::wag6'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4604 "Proj4.pm"
 #line 4605 "Proj4.pm"
 
 
@@ -4621,7 +4621,7 @@ The full name for this projection is Wagner VII.
 
 sub t_proj_wag7 
     { 'PDL::Transform::Proj4::wag7'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4625 "Proj4.pm"
 #line 4626 "Proj4.pm"
 
 
@@ -4642,7 +4642,7 @@ The full name for this projection is Web Mercator / Pseudo Mercator.
 
 sub t_proj_webmerc 
     { 'PDL::Transform::Proj4::webmerc'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4646 "Proj4.pm"
 #line 4647 "Proj4.pm"
 
 
@@ -4663,7 +4663,7 @@ The full name for this projection is Werenskiold I.
 
 sub t_proj_weren 
     { 'PDL::Transform::Proj4::weren'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4667 "Proj4.pm"
 #line 4668 "Proj4.pm"
 
 
@@ -4695,7 +4695,7 @@ Projection Parameters
 
 sub t_proj_wink1 
     { 'PDL::Transform::Proj4::wink1'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4699 "Proj4.pm"
 #line 4700 "Proj4.pm"
 
 
@@ -4727,7 +4727,7 @@ Projection Parameters
 
 sub t_proj_wink2 
     { 'PDL::Transform::Proj4::wink2'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4731 "Proj4.pm"
 #line 4732 "Proj4.pm"
 
 
@@ -4759,7 +4759,7 @@ Projection Parameters
 
 sub t_proj_wintri 
     { 'PDL::Transform::Proj4::wintri'->new( @_ ); }
-#line 496 "Proj4.pd"
+#line 4763 "Proj4.pm"
 #line 4764 "Proj4.pm"
 
 
@@ -4780,12 +4780,12 @@ The full name for this projection is Geocentric grid shift.
 
 sub t_proj_xyzgridshift 
     { 'PDL::Transform::Proj4::xyzgridshift'->new( @_ ); }
-#line 485 "Proj4.pd"
+#line 4784 "Proj4.pm"
 #line 4785 "Proj4.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_proj4_dummy = \&PDL::_proj4_dummy;
 #line 4792 "Proj4.pm"
@@ -4840,7 +4840,7 @@ sub new
 } # End of PDL::Transform::adams_hemi::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 4844 "Proj4.pm"
 #line 4845 "Proj4.pm"
 
 
@@ -4891,7 +4891,7 @@ sub new
 } # End of PDL::Transform::adams_ws1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 4895 "Proj4.pm"
 #line 4896 "Proj4.pm"
 
 
@@ -4942,7 +4942,7 @@ sub new
 } # End of PDL::Transform::adams_ws2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 4946 "Proj4.pm"
 #line 4947 "Proj4.pm"
 
 
@@ -4993,7 +4993,7 @@ sub new
 } # End of PDL::Transform::aea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 4997 "Proj4.pm"
 #line 4998 "Proj4.pm"
 
 
@@ -5044,7 +5044,7 @@ sub new
 } # End of PDL::Transform::aeqd::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5048 "Proj4.pm"
 #line 5049 "Proj4.pm"
 
 
@@ -5095,7 +5095,7 @@ sub new
 } # End of PDL::Transform::affine::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5099 "Proj4.pm"
 #line 5100 "Proj4.pm"
 
 
@@ -5146,7 +5146,7 @@ sub new
 } # End of PDL::Transform::airy::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5150 "Proj4.pm"
 #line 5151 "Proj4.pm"
 
 
@@ -5197,7 +5197,7 @@ sub new
 } # End of PDL::Transform::aitoff::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5201 "Proj4.pm"
 #line 5202 "Proj4.pm"
 
 
@@ -5248,7 +5248,7 @@ sub new
 } # End of PDL::Transform::alsk::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5252 "Proj4.pm"
 #line 5253 "Proj4.pm"
 
 
@@ -5299,7 +5299,7 @@ sub new
 } # End of PDL::Transform::apian::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5303 "Proj4.pm"
 #line 5304 "Proj4.pm"
 
 
@@ -5350,7 +5350,7 @@ sub new
 } # End of PDL::Transform::august::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5354 "Proj4.pm"
 #line 5355 "Proj4.pm"
 
 
@@ -5401,7 +5401,7 @@ sub new
 } # End of PDL::Transform::axisswap::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5405 "Proj4.pm"
 #line 5406 "Proj4.pm"
 
 
@@ -5452,7 +5452,7 @@ sub new
 } # End of PDL::Transform::bacon::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5456 "Proj4.pm"
 #line 5457 "Proj4.pm"
 
 
@@ -5503,7 +5503,7 @@ sub new
 } # End of PDL::Transform::bertin1953::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5507 "Proj4.pm"
 #line 5508 "Proj4.pm"
 
 
@@ -5554,7 +5554,7 @@ sub new
 } # End of PDL::Transform::bipc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5558 "Proj4.pm"
 #line 5559 "Proj4.pm"
 
 
@@ -5605,7 +5605,7 @@ sub new
 } # End of PDL::Transform::boggs::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5609 "Proj4.pm"
 #line 5610 "Proj4.pm"
 
 
@@ -5656,7 +5656,7 @@ sub new
 } # End of PDL::Transform::bonne::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5660 "Proj4.pm"
 #line 5661 "Proj4.pm"
 
 
@@ -5707,7 +5707,7 @@ sub new
 } # End of PDL::Transform::calcofi::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5711 "Proj4.pm"
 #line 5712 "Proj4.pm"
 
 
@@ -5758,7 +5758,7 @@ sub new
 } # End of PDL::Transform::cart::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5762 "Proj4.pm"
 #line 5763 "Proj4.pm"
 
 
@@ -5809,7 +5809,7 @@ sub new
 } # End of PDL::Transform::cass::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5813 "Proj4.pm"
 #line 5814 "Proj4.pm"
 
 
@@ -5860,7 +5860,7 @@ sub new
 } # End of PDL::Transform::cc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5864 "Proj4.pm"
 #line 5865 "Proj4.pm"
 
 
@@ -5911,7 +5911,7 @@ sub new
 } # End of PDL::Transform::ccon::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5915 "Proj4.pm"
 #line 5916 "Proj4.pm"
 
 
@@ -5962,7 +5962,7 @@ sub new
 } # End of PDL::Transform::cea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 5966 "Proj4.pm"
 #line 5967 "Proj4.pm"
 
 
@@ -6013,7 +6013,7 @@ sub new
 } # End of PDL::Transform::chamb::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6017 "Proj4.pm"
 #line 6018 "Proj4.pm"
 
 
@@ -6064,7 +6064,7 @@ sub new
 } # End of PDL::Transform::col_urban::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6068 "Proj4.pm"
 #line 6069 "Proj4.pm"
 
 
@@ -6115,7 +6115,7 @@ sub new
 } # End of PDL::Transform::collg::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6119 "Proj4.pm"
 #line 6120 "Proj4.pm"
 
 
@@ -6166,7 +6166,7 @@ sub new
 } # End of PDL::Transform::comill::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6170 "Proj4.pm"
 #line 6171 "Proj4.pm"
 
 
@@ -6217,7 +6217,7 @@ sub new
 } # End of PDL::Transform::crast::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6221 "Proj4.pm"
 #line 6222 "Proj4.pm"
 
 
@@ -6268,7 +6268,7 @@ sub new
 } # End of PDL::Transform::defmodel::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6272 "Proj4.pm"
 #line 6273 "Proj4.pm"
 
 
@@ -6319,7 +6319,7 @@ sub new
 } # End of PDL::Transform::deformation::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6323 "Proj4.pm"
 #line 6324 "Proj4.pm"
 
 
@@ -6370,7 +6370,7 @@ sub new
 } # End of PDL::Transform::denoy::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6374 "Proj4.pm"
 #line 6375 "Proj4.pm"
 
 
@@ -6421,7 +6421,7 @@ sub new
 } # End of PDL::Transform::eck1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6425 "Proj4.pm"
 #line 6426 "Proj4.pm"
 
 
@@ -6472,7 +6472,7 @@ sub new
 } # End of PDL::Transform::eck2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6476 "Proj4.pm"
 #line 6477 "Proj4.pm"
 
 
@@ -6523,7 +6523,7 @@ sub new
 } # End of PDL::Transform::eck3::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6527 "Proj4.pm"
 #line 6528 "Proj4.pm"
 
 
@@ -6574,7 +6574,7 @@ sub new
 } # End of PDL::Transform::eck4::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6578 "Proj4.pm"
 #line 6579 "Proj4.pm"
 
 
@@ -6625,7 +6625,7 @@ sub new
 } # End of PDL::Transform::eck5::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6629 "Proj4.pm"
 #line 6630 "Proj4.pm"
 
 
@@ -6676,7 +6676,7 @@ sub new
 } # End of PDL::Transform::eck6::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6680 "Proj4.pm"
 #line 6681 "Proj4.pm"
 
 
@@ -6727,7 +6727,7 @@ sub new
 } # End of PDL::Transform::eqc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6731 "Proj4.pm"
 #line 6732 "Proj4.pm"
 
 
@@ -6778,7 +6778,7 @@ sub new
 } # End of PDL::Transform::eqdc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6782 "Proj4.pm"
 #line 6783 "Proj4.pm"
 
 
@@ -6829,7 +6829,7 @@ sub new
 } # End of PDL::Transform::eqearth::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6833 "Proj4.pm"
 #line 6834 "Proj4.pm"
 
 
@@ -6880,7 +6880,7 @@ sub new
 } # End of PDL::Transform::etmerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6884 "Proj4.pm"
 #line 6885 "Proj4.pm"
 
 
@@ -6931,7 +6931,7 @@ sub new
 } # End of PDL::Transform::euler::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6935 "Proj4.pm"
 #line 6936 "Proj4.pm"
 
 
@@ -6982,7 +6982,7 @@ sub new
 } # End of PDL::Transform::fahey::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 6986 "Proj4.pm"
 #line 6987 "Proj4.pm"
 
 
@@ -7033,7 +7033,7 @@ sub new
 } # End of PDL::Transform::fouc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7037 "Proj4.pm"
 #line 7038 "Proj4.pm"
 
 
@@ -7084,7 +7084,7 @@ sub new
 } # End of PDL::Transform::fouc_s::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7088 "Proj4.pm"
 #line 7089 "Proj4.pm"
 
 
@@ -7135,7 +7135,7 @@ sub new
 } # End of PDL::Transform::gall::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7139 "Proj4.pm"
 #line 7140 "Proj4.pm"
 
 
@@ -7186,7 +7186,7 @@ sub new
 } # End of PDL::Transform::geoc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7190 "Proj4.pm"
 #line 7191 "Proj4.pm"
 
 
@@ -7237,7 +7237,7 @@ sub new
 } # End of PDL::Transform::geocent::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7241 "Proj4.pm"
 #line 7242 "Proj4.pm"
 
 
@@ -7288,7 +7288,7 @@ sub new
 } # End of PDL::Transform::geogoffset::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7292 "Proj4.pm"
 #line 7293 "Proj4.pm"
 
 
@@ -7339,7 +7339,7 @@ sub new
 } # End of PDL::Transform::geos::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7343 "Proj4.pm"
 #line 7344 "Proj4.pm"
 
 
@@ -7390,7 +7390,7 @@ sub new
 } # End of PDL::Transform::gins8::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7394 "Proj4.pm"
 #line 7395 "Proj4.pm"
 
 
@@ -7441,7 +7441,7 @@ sub new
 } # End of PDL::Transform::gn_sinu::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7445 "Proj4.pm"
 #line 7446 "Proj4.pm"
 
 
@@ -7492,7 +7492,7 @@ sub new
 } # End of PDL::Transform::gnom::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7496 "Proj4.pm"
 #line 7497 "Proj4.pm"
 
 
@@ -7543,7 +7543,7 @@ sub new
 } # End of PDL::Transform::goode::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7547 "Proj4.pm"
 #line 7548 "Proj4.pm"
 
 
@@ -7594,7 +7594,7 @@ sub new
 } # End of PDL::Transform::gs48::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7598 "Proj4.pm"
 #line 7599 "Proj4.pm"
 
 
@@ -7645,7 +7645,7 @@ sub new
 } # End of PDL::Transform::gs50::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7649 "Proj4.pm"
 #line 7650 "Proj4.pm"
 
 
@@ -7696,7 +7696,7 @@ sub new
 } # End of PDL::Transform::gstmerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7700 "Proj4.pm"
 #line 7701 "Proj4.pm"
 
 
@@ -7747,7 +7747,7 @@ sub new
 } # End of PDL::Transform::guyou::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7751 "Proj4.pm"
 #line 7752 "Proj4.pm"
 
 
@@ -7798,7 +7798,7 @@ sub new
 } # End of PDL::Transform::hammer::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7802 "Proj4.pm"
 #line 7803 "Proj4.pm"
 
 
@@ -7849,7 +7849,7 @@ sub new
 } # End of PDL::Transform::hatano::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7853 "Proj4.pm"
 #line 7854 "Proj4.pm"
 
 
@@ -7900,7 +7900,7 @@ sub new
 } # End of PDL::Transform::healpix::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7904 "Proj4.pm"
 #line 7905 "Proj4.pm"
 
 
@@ -7951,7 +7951,7 @@ sub new
 } # End of PDL::Transform::helmert::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 7955 "Proj4.pm"
 #line 7956 "Proj4.pm"
 
 
@@ -8002,7 +8002,7 @@ sub new
 } # End of PDL::Transform::hgridshift::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8006 "Proj4.pm"
 #line 8007 "Proj4.pm"
 
 
@@ -8053,7 +8053,7 @@ sub new
 } # End of PDL::Transform::horner::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8057 "Proj4.pm"
 #line 8058 "Proj4.pm"
 
 
@@ -8104,7 +8104,7 @@ sub new
 } # End of PDL::Transform::igh::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8108 "Proj4.pm"
 #line 8109 "Proj4.pm"
 
 
@@ -8155,7 +8155,7 @@ sub new
 } # End of PDL::Transform::igh_o::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8159 "Proj4.pm"
 #line 8160 "Proj4.pm"
 
 
@@ -8206,7 +8206,7 @@ sub new
 } # End of PDL::Transform::imw_p::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8210 "Proj4.pm"
 #line 8211 "Proj4.pm"
 
 
@@ -8257,7 +8257,7 @@ sub new
 } # End of PDL::Transform::isea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8261 "Proj4.pm"
 #line 8262 "Proj4.pm"
 
 
@@ -8308,7 +8308,7 @@ sub new
 } # End of PDL::Transform::kav5::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8312 "Proj4.pm"
 #line 8313 "Proj4.pm"
 
 
@@ -8359,7 +8359,7 @@ sub new
 } # End of PDL::Transform::kav7::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8363 "Proj4.pm"
 #line 8364 "Proj4.pm"
 
 
@@ -8410,7 +8410,7 @@ sub new
 } # End of PDL::Transform::krovak::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8414 "Proj4.pm"
 #line 8415 "Proj4.pm"
 
 
@@ -8461,7 +8461,7 @@ sub new
 } # End of PDL::Transform::labrd::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8465 "Proj4.pm"
 #line 8466 "Proj4.pm"
 
 
@@ -8512,7 +8512,7 @@ sub new
 } # End of PDL::Transform::laea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8516 "Proj4.pm"
 #line 8517 "Proj4.pm"
 
 
@@ -8563,7 +8563,7 @@ sub new
 } # End of PDL::Transform::lagrng::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8567 "Proj4.pm"
 #line 8568 "Proj4.pm"
 
 
@@ -8614,7 +8614,7 @@ sub new
 } # End of PDL::Transform::larr::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8618 "Proj4.pm"
 #line 8619 "Proj4.pm"
 
 
@@ -8665,7 +8665,7 @@ sub new
 } # End of PDL::Transform::lask::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8669 "Proj4.pm"
 #line 8670 "Proj4.pm"
 
 
@@ -8716,7 +8716,7 @@ sub new
 } # End of PDL::Transform::latlon::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8720 "Proj4.pm"
 #line 8721 "Proj4.pm"
 
 
@@ -8767,7 +8767,7 @@ sub new
 } # End of PDL::Transform::latlong::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8771 "Proj4.pm"
 #line 8772 "Proj4.pm"
 
 
@@ -8818,7 +8818,7 @@ sub new
 } # End of PDL::Transform::lcc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8822 "Proj4.pm"
 #line 8823 "Proj4.pm"
 
 
@@ -8869,7 +8869,7 @@ sub new
 } # End of PDL::Transform::lcca::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8873 "Proj4.pm"
 #line 8874 "Proj4.pm"
 
 
@@ -8920,7 +8920,7 @@ sub new
 } # End of PDL::Transform::leac::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8924 "Proj4.pm"
 #line 8925 "Proj4.pm"
 
 
@@ -8971,7 +8971,7 @@ sub new
 } # End of PDL::Transform::lee_os::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 8975 "Proj4.pm"
 #line 8976 "Proj4.pm"
 
 
@@ -9022,7 +9022,7 @@ sub new
 } # End of PDL::Transform::longlat::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9026 "Proj4.pm"
 #line 9027 "Proj4.pm"
 
 
@@ -9073,7 +9073,7 @@ sub new
 } # End of PDL::Transform::lonlat::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9077 "Proj4.pm"
 #line 9078 "Proj4.pm"
 
 
@@ -9124,7 +9124,7 @@ sub new
 } # End of PDL::Transform::loxim::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9128 "Proj4.pm"
 #line 9129 "Proj4.pm"
 
 
@@ -9175,7 +9175,7 @@ sub new
 } # End of PDL::Transform::lsat::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9179 "Proj4.pm"
 #line 9180 "Proj4.pm"
 
 
@@ -9226,7 +9226,7 @@ sub new
 } # End of PDL::Transform::mbt_fps::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9230 "Proj4.pm"
 #line 9231 "Proj4.pm"
 
 
@@ -9277,7 +9277,7 @@ sub new
 } # End of PDL::Transform::mbt_s::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9281 "Proj4.pm"
 #line 9282 "Proj4.pm"
 
 
@@ -9328,7 +9328,7 @@ sub new
 } # End of PDL::Transform::mbtfpp::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9332 "Proj4.pm"
 #line 9333 "Proj4.pm"
 
 
@@ -9379,7 +9379,7 @@ sub new
 } # End of PDL::Transform::mbtfpq::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9383 "Proj4.pm"
 #line 9384 "Proj4.pm"
 
 
@@ -9430,7 +9430,7 @@ sub new
 } # End of PDL::Transform::mbtfps::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9434 "Proj4.pm"
 #line 9435 "Proj4.pm"
 
 
@@ -9481,7 +9481,7 @@ sub new
 } # End of PDL::Transform::merc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9485 "Proj4.pm"
 #line 9486 "Proj4.pm"
 
 
@@ -9532,7 +9532,7 @@ sub new
 } # End of PDL::Transform::mil_os::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9536 "Proj4.pm"
 #line 9537 "Proj4.pm"
 
 
@@ -9583,7 +9583,7 @@ sub new
 } # End of PDL::Transform::mill::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9587 "Proj4.pm"
 #line 9588 "Proj4.pm"
 
 
@@ -9634,7 +9634,7 @@ sub new
 } # End of PDL::Transform::misrsom::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9638 "Proj4.pm"
 #line 9639 "Proj4.pm"
 
 
@@ -9685,7 +9685,7 @@ sub new
 } # End of PDL::Transform::moll::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9689 "Proj4.pm"
 #line 9690 "Proj4.pm"
 
 
@@ -9736,7 +9736,7 @@ sub new
 } # End of PDL::Transform::molobadekas::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9740 "Proj4.pm"
 #line 9741 "Proj4.pm"
 
 
@@ -9787,7 +9787,7 @@ sub new
 } # End of PDL::Transform::molodensky::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9791 "Proj4.pm"
 #line 9792 "Proj4.pm"
 
 
@@ -9838,7 +9838,7 @@ sub new
 } # End of PDL::Transform::murd1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9842 "Proj4.pm"
 #line 9843 "Proj4.pm"
 
 
@@ -9889,7 +9889,7 @@ sub new
 } # End of PDL::Transform::murd2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9893 "Proj4.pm"
 #line 9894 "Proj4.pm"
 
 
@@ -9940,7 +9940,7 @@ sub new
 } # End of PDL::Transform::murd3::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9944 "Proj4.pm"
 #line 9945 "Proj4.pm"
 
 
@@ -9991,7 +9991,7 @@ sub new
 } # End of PDL::Transform::natearth::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 9995 "Proj4.pm"
 #line 9996 "Proj4.pm"
 
 
@@ -10042,7 +10042,7 @@ sub new
 } # End of PDL::Transform::natearth2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10046 "Proj4.pm"
 #line 10047 "Proj4.pm"
 
 
@@ -10093,7 +10093,7 @@ sub new
 } # End of PDL::Transform::nell::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10097 "Proj4.pm"
 #line 10098 "Proj4.pm"
 
 
@@ -10144,7 +10144,7 @@ sub new
 } # End of PDL::Transform::nell_h::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10148 "Proj4.pm"
 #line 10149 "Proj4.pm"
 
 
@@ -10195,7 +10195,7 @@ sub new
 } # End of PDL::Transform::nicol::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10199 "Proj4.pm"
 #line 10200 "Proj4.pm"
 
 
@@ -10246,7 +10246,7 @@ sub new
 } # End of PDL::Transform::noop::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10250 "Proj4.pm"
 #line 10251 "Proj4.pm"
 
 
@@ -10297,7 +10297,7 @@ sub new
 } # End of PDL::Transform::nsper::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10301 "Proj4.pm"
 #line 10302 "Proj4.pm"
 
 
@@ -10348,7 +10348,7 @@ sub new
 } # End of PDL::Transform::nzmg::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10352 "Proj4.pm"
 #line 10353 "Proj4.pm"
 
 
@@ -10399,7 +10399,7 @@ sub new
 } # End of PDL::Transform::ob_tran::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10403 "Proj4.pm"
 #line 10404 "Proj4.pm"
 
 
@@ -10450,7 +10450,7 @@ sub new
 } # End of PDL::Transform::ocea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10454 "Proj4.pm"
 #line 10455 "Proj4.pm"
 
 
@@ -10501,7 +10501,7 @@ sub new
 } # End of PDL::Transform::oea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10505 "Proj4.pm"
 #line 10506 "Proj4.pm"
 
 
@@ -10552,7 +10552,7 @@ sub new
 } # End of PDL::Transform::omerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10556 "Proj4.pm"
 #line 10557 "Proj4.pm"
 
 
@@ -10603,7 +10603,7 @@ sub new
 } # End of PDL::Transform::ortel::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10607 "Proj4.pm"
 #line 10608 "Proj4.pm"
 
 
@@ -10654,7 +10654,7 @@ sub new
 } # End of PDL::Transform::ortho::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10658 "Proj4.pm"
 #line 10659 "Proj4.pm"
 
 
@@ -10705,7 +10705,7 @@ sub new
 } # End of PDL::Transform::patterson::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10709 "Proj4.pm"
 #line 10710 "Proj4.pm"
 
 
@@ -10756,7 +10756,7 @@ sub new
 } # End of PDL::Transform::pconic::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10760 "Proj4.pm"
 #line 10761 "Proj4.pm"
 
 
@@ -10807,7 +10807,7 @@ sub new
 } # End of PDL::Transform::peirce_q::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10811 "Proj4.pm"
 #line 10812 "Proj4.pm"
 
 
@@ -10858,7 +10858,7 @@ sub new
 } # End of PDL::Transform::pipeline::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10862 "Proj4.pm"
 #line 10863 "Proj4.pm"
 
 
@@ -10909,7 +10909,7 @@ sub new
 } # End of PDL::Transform::poly::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10913 "Proj4.pm"
 #line 10914 "Proj4.pm"
 
 
@@ -10960,7 +10960,7 @@ sub new
 } # End of PDL::Transform::pop::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 10964 "Proj4.pm"
 #line 10965 "Proj4.pm"
 
 
@@ -11011,7 +11011,7 @@ sub new
 } # End of PDL::Transform::push::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11015 "Proj4.pm"
 #line 11016 "Proj4.pm"
 
 
@@ -11062,7 +11062,7 @@ sub new
 } # End of PDL::Transform::putp1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11066 "Proj4.pm"
 #line 11067 "Proj4.pm"
 
 
@@ -11113,7 +11113,7 @@ sub new
 } # End of PDL::Transform::putp2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11117 "Proj4.pm"
 #line 11118 "Proj4.pm"
 
 
@@ -11164,7 +11164,7 @@ sub new
 } # End of PDL::Transform::putp3::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11168 "Proj4.pm"
 #line 11169 "Proj4.pm"
 
 
@@ -11215,7 +11215,7 @@ sub new
 } # End of PDL::Transform::putp3p::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11219 "Proj4.pm"
 #line 11220 "Proj4.pm"
 
 
@@ -11266,7 +11266,7 @@ sub new
 } # End of PDL::Transform::putp4p::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11270 "Proj4.pm"
 #line 11271 "Proj4.pm"
 
 
@@ -11317,7 +11317,7 @@ sub new
 } # End of PDL::Transform::putp5::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11321 "Proj4.pm"
 #line 11322 "Proj4.pm"
 
 
@@ -11368,7 +11368,7 @@ sub new
 } # End of PDL::Transform::putp5p::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11372 "Proj4.pm"
 #line 11373 "Proj4.pm"
 
 
@@ -11419,7 +11419,7 @@ sub new
 } # End of PDL::Transform::putp6::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11423 "Proj4.pm"
 #line 11424 "Proj4.pm"
 
 
@@ -11470,7 +11470,7 @@ sub new
 } # End of PDL::Transform::putp6p::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11474 "Proj4.pm"
 #line 11475 "Proj4.pm"
 
 
@@ -11521,7 +11521,7 @@ sub new
 } # End of PDL::Transform::qsc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11525 "Proj4.pm"
 #line 11526 "Proj4.pm"
 
 
@@ -11572,7 +11572,7 @@ sub new
 } # End of PDL::Transform::qua_aut::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11576 "Proj4.pm"
 #line 11577 "Proj4.pm"
 
 
@@ -11623,7 +11623,7 @@ sub new
 } # End of PDL::Transform::rhealpix::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11627 "Proj4.pm"
 #line 11628 "Proj4.pm"
 
 
@@ -11674,7 +11674,7 @@ sub new
 } # End of PDL::Transform::robin::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11678 "Proj4.pm"
 #line 11679 "Proj4.pm"
 
 
@@ -11725,7 +11725,7 @@ sub new
 } # End of PDL::Transform::rouss::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11729 "Proj4.pm"
 #line 11730 "Proj4.pm"
 
 
@@ -11776,7 +11776,7 @@ sub new
 } # End of PDL::Transform::rpoly::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11780 "Proj4.pm"
 #line 11781 "Proj4.pm"
 
 
@@ -11827,7 +11827,7 @@ sub new
 } # End of PDL::Transform::s2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11831 "Proj4.pm"
 #line 11832 "Proj4.pm"
 
 
@@ -11878,7 +11878,7 @@ sub new
 } # End of PDL::Transform::sch::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11882 "Proj4.pm"
 #line 11883 "Proj4.pm"
 
 
@@ -11929,7 +11929,7 @@ sub new
 } # End of PDL::Transform::set::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11933 "Proj4.pm"
 #line 11934 "Proj4.pm"
 
 
@@ -11980,7 +11980,7 @@ sub new
 } # End of PDL::Transform::sinu::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 11984 "Proj4.pm"
 #line 11985 "Proj4.pm"
 
 
@@ -12031,7 +12031,7 @@ sub new
 } # End of PDL::Transform::somerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12035 "Proj4.pm"
 #line 12036 "Proj4.pm"
 
 
@@ -12082,7 +12082,7 @@ sub new
 } # End of PDL::Transform::stere::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12086 "Proj4.pm"
 #line 12087 "Proj4.pm"
 
 
@@ -12133,7 +12133,7 @@ sub new
 } # End of PDL::Transform::sterea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12137 "Proj4.pm"
 #line 12138 "Proj4.pm"
 
 
@@ -12184,7 +12184,7 @@ sub new
 } # End of PDL::Transform::tcc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12188 "Proj4.pm"
 #line 12189 "Proj4.pm"
 
 
@@ -12235,7 +12235,7 @@ sub new
 } # End of PDL::Transform::tcea::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12239 "Proj4.pm"
 #line 12240 "Proj4.pm"
 
 
@@ -12286,7 +12286,7 @@ sub new
 } # End of PDL::Transform::times::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12290 "Proj4.pm"
 #line 12291 "Proj4.pm"
 
 
@@ -12337,7 +12337,7 @@ sub new
 } # End of PDL::Transform::tinshift::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12341 "Proj4.pm"
 #line 12342 "Proj4.pm"
 
 
@@ -12388,7 +12388,7 @@ sub new
 } # End of PDL::Transform::tissot::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12392 "Proj4.pm"
 #line 12393 "Proj4.pm"
 
 
@@ -12439,7 +12439,7 @@ sub new
 } # End of PDL::Transform::tmerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12443 "Proj4.pm"
 #line 12444 "Proj4.pm"
 
 
@@ -12490,7 +12490,7 @@ sub new
 } # End of PDL::Transform::tobmerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12494 "Proj4.pm"
 #line 12495 "Proj4.pm"
 
 
@@ -12541,7 +12541,7 @@ sub new
 } # End of PDL::Transform::topocentric::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12545 "Proj4.pm"
 #line 12546 "Proj4.pm"
 
 
@@ -12592,7 +12592,7 @@ sub new
 } # End of PDL::Transform::tpeqd::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12596 "Proj4.pm"
 #line 12597 "Proj4.pm"
 
 
@@ -12643,7 +12643,7 @@ sub new
 } # End of PDL::Transform::tpers::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12647 "Proj4.pm"
 #line 12648 "Proj4.pm"
 
 
@@ -12694,7 +12694,7 @@ sub new
 } # End of PDL::Transform::unitconvert::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12698 "Proj4.pm"
 #line 12699 "Proj4.pm"
 
 
@@ -12745,7 +12745,7 @@ sub new
 } # End of PDL::Transform::ups::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12749 "Proj4.pm"
 #line 12750 "Proj4.pm"
 
 
@@ -12796,7 +12796,7 @@ sub new
 } # End of PDL::Transform::urm5::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12800 "Proj4.pm"
 #line 12801 "Proj4.pm"
 
 
@@ -12847,7 +12847,7 @@ sub new
 } # End of PDL::Transform::urmfps::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12851 "Proj4.pm"
 #line 12852 "Proj4.pm"
 
 
@@ -12898,7 +12898,7 @@ sub new
 } # End of PDL::Transform::utm::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12902 "Proj4.pm"
 #line 12903 "Proj4.pm"
 
 
@@ -12949,7 +12949,7 @@ sub new
 } # End of PDL::Transform::vandg::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 12953 "Proj4.pm"
 #line 12954 "Proj4.pm"
 
 
@@ -13000,7 +13000,7 @@ sub new
 } # End of PDL::Transform::vandg2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13004 "Proj4.pm"
 #line 13005 "Proj4.pm"
 
 
@@ -13051,7 +13051,7 @@ sub new
 } # End of PDL::Transform::vandg3::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13055 "Proj4.pm"
 #line 13056 "Proj4.pm"
 
 
@@ -13102,7 +13102,7 @@ sub new
 } # End of PDL::Transform::vandg4::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13106 "Proj4.pm"
 #line 13107 "Proj4.pm"
 
 
@@ -13153,7 +13153,7 @@ sub new
 } # End of PDL::Transform::vgridshift::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13157 "Proj4.pm"
 #line 13158 "Proj4.pm"
 
 
@@ -13204,7 +13204,7 @@ sub new
 } # End of PDL::Transform::vitk1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13208 "Proj4.pm"
 #line 13209 "Proj4.pm"
 
 
@@ -13255,7 +13255,7 @@ sub new
 } # End of PDL::Transform::wag1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13259 "Proj4.pm"
 #line 13260 "Proj4.pm"
 
 
@@ -13306,7 +13306,7 @@ sub new
 } # End of PDL::Transform::wag2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13310 "Proj4.pm"
 #line 13311 "Proj4.pm"
 
 
@@ -13357,7 +13357,7 @@ sub new
 } # End of PDL::Transform::wag3::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13361 "Proj4.pm"
 #line 13362 "Proj4.pm"
 
 
@@ -13408,7 +13408,7 @@ sub new
 } # End of PDL::Transform::wag4::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13412 "Proj4.pm"
 #line 13413 "Proj4.pm"
 
 
@@ -13459,7 +13459,7 @@ sub new
 } # End of PDL::Transform::wag5::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13463 "Proj4.pm"
 #line 13464 "Proj4.pm"
 
 
@@ -13510,7 +13510,7 @@ sub new
 } # End of PDL::Transform::wag6::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13514 "Proj4.pm"
 #line 13515 "Proj4.pm"
 
 
@@ -13561,7 +13561,7 @@ sub new
 } # End of PDL::Transform::wag7::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13565 "Proj4.pm"
 #line 13566 "Proj4.pm"
 
 
@@ -13612,7 +13612,7 @@ sub new
 } # End of PDL::Transform::webmerc::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13616 "Proj4.pm"
 #line 13617 "Proj4.pm"
 
 
@@ -13663,7 +13663,7 @@ sub new
 } # End of PDL::Transform::weren::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13667 "Proj4.pm"
 #line 13668 "Proj4.pm"
 
 
@@ -13714,7 +13714,7 @@ sub new
 } # End of PDL::Transform::wink1::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13718 "Proj4.pm"
 #line 13719 "Proj4.pm"
 
 
@@ -13765,7 +13765,7 @@ sub new
 } # End of PDL::Transform::wink2::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13769 "Proj4.pm"
 #line 13770 "Proj4.pm"
 
 
@@ -13816,7 +13816,7 @@ sub new
 } # End of PDL::Transform::wintri::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13820 "Proj4.pm"
 #line 13821 "Proj4.pm"
 
 
@@ -13867,7 +13867,7 @@ sub new
 } # End of PDL::Transform::xyzgridshift::new()...
 
 1;
-#line 479 "Proj4.pd"
+#line 13871 "Proj4.pm"
 #line 13872 "Proj4.pm"
 
 

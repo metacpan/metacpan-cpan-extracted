@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::RGB16 0.14;
+package Convert::Color::RGB16 0.16;
 
 use v5.14;
 use warnings;

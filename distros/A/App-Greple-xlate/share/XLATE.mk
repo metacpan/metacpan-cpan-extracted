@@ -23,8 +23,15 @@ override XLATE_FILES := \
 	$(filter-out README.%.md,\
 	$(wildcard *.docx *.pptx *.txt *.md *.pm))
 else
-override XLATE_FILES := $(subst |||, ,$(subst ",,$(XLATE_FILES)))
+override XLATE_FILES := $(subst |||, ,$(XLATE_FILES))
 endif
+
+# GNU Make treat strings containing double quotes differently on versions
+define REMOVE_QUOTE
+  override $1 := $$(subst ",,$$($1))
+endef
+$(foreach name,XLATE_LANG XLATE_FORMAT XLATE_FILES,\
+	$(eval $(call REMOVE_QUOTE,$(name))))
 
 define FOREACH
 $(foreach file,$(XLATE_FILES),

@@ -1,4 +1,25 @@
-Revision history for Perl module Net::Fastly
+Revision history for https://metacpan.org/dist/WebService-Fastly
+
+2.02 2023-03-23
+    * fix(purge): switch authentication type to 'token'
+    * feat(domain-ownerships): List domain-ownerships
+    * feat(events): implement 'filter[created_at]' property
+    * feat(mutual-authentication): implement 'include' property
+    * feat(object-store): implement api
+    * docs(backend): keepalive_time
+    * docs(pop): region, shield, latitude, longitude
+    * docs(product-enablement): brotli_compression
+    * docs(resource): terminology
+    * docs(results): fanout properties
+    * docs(tls/subscriptions): new 'failed' state
+    * docs(user): 'login' modification note removed
+
+2.01 2022-12-15
+    * New code-generated API client using Fastly's OpenAPI specification: https://dev.to/fastly/better-fastly-api-clients-with-openapi-generator-3lno
+    * New client interface: https://github.com/fastly/fastly-perl#documentation-for-api-endpoints
+    * Unsupported API endpoints: https://github.com/fastly/fastly-perl#issues
+
+Revision history for https://metacpan.org/dist/Net-Fastly
 
 1.12 2020-09-03
     * fix release engineering

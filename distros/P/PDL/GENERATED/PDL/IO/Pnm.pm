@@ -21,7 +21,7 @@ use DynaLoader;
 
 
 
-#line 9 "pnm.pd"
+#line 6 "pnm.pd"
 
 
 use strict;
@@ -72,7 +72,7 @@ sub dmax {
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -80,7 +80,7 @@ sub dmax {
 
 =for sig
 
-  Signature: (type(); byte+ [o] im(m,n); int ms => m; int ns => n;
+  Signature: (type(); byte+ [o] im(m,n); byte [t] buf(llen); int ms => m; int ns => n;
 			int isbin; PerlIO *fp)
 
 
@@ -105,14 +105,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pnminraw = \&PDL::pnminraw;
 #line 112 "Pnm.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -140,14 +140,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pnminascii = \&PDL::pnminascii;
 #line 147 "Pnm.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -177,7 +177,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *pnmout = \&PDL::pnmout;
 #line 184 "Pnm.pm"
@@ -186,7 +186,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 47 "pnm.pd"
+#line 44 "pnm.pd"
 
 =head2 rpnm
 

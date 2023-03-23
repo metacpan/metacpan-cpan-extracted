@@ -525,7 +525,6 @@ Yakutat
 Yakutsk
 Yangon
 Yekaterinburg
-Yellowknife
 Yerevan
 ZA
 ZM

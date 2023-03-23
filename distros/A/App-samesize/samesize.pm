@@ -1,6 +1,6 @@
 package App::samesize ; 
-our $VERSION = '0.016' ; 
-our $DATE = '2023-02-28T23:21+09:00' ; 
+our $VERSION = '0.017' ; 
+our $DATE = '2023-03-23T22:30+09:00' ; 
 
 =encoding utf8
 

@@ -10,18 +10,11 @@ sub new {
 }
 
 sub get_indobj_make {
-	my($this,$expr) = @_;
-	$expr =~ /^([a-zA-Z0-9]+)(?:=([0-9]+))?$/ or confess "Invalid index expr '$expr'\n";
-	my $name = $1; my $val = $2;
-	my $indobj;
-	if(defined $this->{$name}) {
-		$indobj = $this->{$name};
-	} else {
-		$indobj = PDL::PP::Ind->new($name);
-		$this->{$name}=$indobj;
-	}
-	if(defined $val) { $indobj->add_value($val); }
-	return $indobj;
+  my($this,$expr) = @_;
+  my ($name, $val) = $expr =~ /^([a-zA-Z0-9]+)(?:=([0-9]+))?$/ or confess "Invalid index expr '$expr'\n";
+  my $indobj = $this->{$name} //= PDL::PP::Ind->new($name);
+  $indobj->add_value($val) if defined $val;
+  return $indobj;
 }
 
 #####################################################################
@@ -53,14 +46,14 @@ sub set_from { my($this,$otherpar) = @_;
 	$this->{From} = $otherpar;
 }
 
-sub name {$_[0]->{Name}}
+sub name {$_[0]{Name}}
 
 # where it occurs in the C arrays that track it (at least name and size)
 sub set_index {
   my ($this, $i) = @_;
   $this->{Index} = $i;
 }
-sub get_index {$_[0]->{Index}}
+sub get_index {$_[0]{Index} // confess "unknown index for $_[0]{Name}"}
 
 sub get_initdim { my($this) = @_;
 	my $init = $this->{Value} //

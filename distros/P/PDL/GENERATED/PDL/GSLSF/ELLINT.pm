@@ -49,7 +49,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -74,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_Kcomp = \&PDL::gsl_sf_ellint_Kcomp;
 #line 81 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -106,14 +106,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_Ecomp = \&PDL::gsl_sf_ellint_Ecomp;
 #line 113 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -138,14 +138,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_F = \&PDL::gsl_sf_ellint_F;
 #line 145 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -170,14 +170,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_E = \&PDL::gsl_sf_ellint_E;
 #line 177 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -203,14 +203,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_P = \&PDL::gsl_sf_ellint_P;
 #line 210 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -236,14 +236,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_D = \&PDL::gsl_sf_ellint_D;
 #line 243 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -268,14 +268,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RC = \&PDL::gsl_sf_ellint_RC;
 #line 275 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -300,14 +300,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RD = \&PDL::gsl_sf_ellint_RD;
 #line 307 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -332,14 +332,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RF = \&PDL::gsl_sf_ellint_RF;
 #line 339 "ELLINT.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -364,7 +364,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_ellint_RJ = \&PDL::gsl_sf_ellint_RJ;
 #line 371 "ELLINT.pm"

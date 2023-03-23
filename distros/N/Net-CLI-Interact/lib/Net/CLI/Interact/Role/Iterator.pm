@@ -1,5 +1,5 @@
 package Net::CLI::Interact::Role::Iterator;
-{ $Net::CLI::Interact::Role::Iterator::VERSION = '2.300003' }
+{ $Net::CLI::Interact::Role::Iterator::VERSION = '2.300004' }
 
 use Moo::Role;
 use Sub::Quote;

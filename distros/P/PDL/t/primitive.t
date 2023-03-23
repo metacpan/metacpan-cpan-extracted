@@ -13,6 +13,7 @@ sub tapprox {
        diag "UNEQDIM\n";
        return 0;
     }
+    return 1 if $x->isempty and $y->isempty;
     my $d = max( abs($x-$y) );
     if($d >= 0.01) {
        diag "got=$x expected=$y\n";
@@ -211,6 +212,13 @@ setbadat $y, 0;
 setbadat $y, 2;
 is($y->which->nelem,0, "which nelem w BAD");
 
+{
+ok tapprox(sequence(4)->uniq, sequence(4)), 'sequence(4)->uniq';
+ok tapprox(ones(4)->uniq, ones(1)), 'ones(4)->uniq';
+ok tapprox(empty()->uniq, empty()), 'empty()->uniq';
+ok tapprox(pdl([[1]])->uniq, ones(1)), '2-deep uniq flattens'; # Data::Frame relies
+}
+
 ############################
 # Test intersect & setops
 my $temp = sequence(10);
@@ -226,6 +234,20 @@ ok(tapprox($c, pdl([2,3,4,8,9])), "setops XOR");
 #Test intersect again
 my $intersect_test=intersect(pdl(1,-5,4,0), pdl(0,3,-5,2));
 ok (all($intersect_test==pdl(-5,0)), 'Intersect test values');
+{
+# based on cases supplied by @jo-37
+my @cases = (
+  [ pdl(1), empty(), empty() ],
+  [ ones(1), empty(), empty() ],
+  [ ones(4), empty(), empty() ],
+  [ sequence(4), empty(), empty() ],
+  [ pdl(1), ones(2), ones(1) ],
+  [ ones(1), ones(2), ones(1) ],
+  [ ones(4), ones(2), ones(1) ],
+  [ sequence(4), ones(2), ones(1) ],
+);
+ok tapprox(setops($_->[0], 'AND', $_->[1]), $_->[2]), "$_->[0] AND $_->[1]" for @cases;
+}
 
 ##############################
 # Test uniqind

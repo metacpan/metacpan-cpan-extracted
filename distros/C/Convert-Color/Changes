@@ -1,5 +1,19 @@
 Revision history for Convert-Color
 
+0.16    2023-03-22
+        [BUGFIXES]
+         * Convert remaining tests to `float()` comparisons that were missed
+           in version 0.15 (RT145121)
+
+0.15    2023-03-22
+        [CHANGES]
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Use Test2's `float()` comparisons instead of `Test::Number::Delta`
+
+        [BUGFIXES]
+         * Remember to use approximate-equality tests for float comparisons
+           (RT145121)
+
 0.14    2023-01-05
         [CHANGES]
          * Cache the result of ->closest_to conversions for performance

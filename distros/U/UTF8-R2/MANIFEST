@@ -69,6 +69,7 @@ t/4008_UR2_index_byte.t
 t/4013_UR2_require.t
 t/4016_UR2_rindex_byte.t
 t/8001_UR2_specialvar.t
+t/8101_mb_package.t
 xt/1001_chop.t
 xt/1002_chr.t
 xt/1004_getc.t

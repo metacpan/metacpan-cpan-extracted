@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Role;
 # ABSTRACT: Load all roles used in StorageDisplay
 
-our $VERSION = '1.2.1'; # VERSION
+our $VERSION = '1.2.4'; # VERSION
 
 1;
 
@@ -1121,7 +1121,7 @@ StorageDisplay::Role - Load all roles used in StorageDisplay
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.4
 
 =head1 AUTHOR
 

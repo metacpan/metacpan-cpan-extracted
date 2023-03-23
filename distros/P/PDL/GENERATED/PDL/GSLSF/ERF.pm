@@ -49,7 +49,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -74,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_erfc = \&PDL::gsl_sf_erfc;
 #line 81 "ERF.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -106,14 +106,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_log_erfc = \&PDL::gsl_sf_log_erfc;
 #line 113 "ERF.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -138,14 +138,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_erf = \&PDL::gsl_sf_erf;
 #line 145 "ERF.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -170,14 +170,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_erf_Z = \&PDL::gsl_sf_erf_Z;
 #line 177 "ERF.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -202,7 +202,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_erf_Q = \&PDL::gsl_sf_erf_Q;
 #line 209 "ERF.pm"

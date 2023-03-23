@@ -678,11 +678,6 @@ use strict;
 				olson_description => "Central - NU (central)",
 				timezone_name => "America/Rankin_Inlet",
 			},
-			"Central - ON (Rainy R, Ft Frances)" => {
-				location_coords => "+4843-09434",
-				olson_description => "Central - ON (Rainy R, Ft Frances)",
-				timezone_name => "America/Rainy_River",
-			},
 			"Central - ON (west); Manitoba" => {
 				location_coords => "+4953-09709",
 				olson_description => "Central - ON (west); Manitoba",
@@ -693,30 +688,15 @@ use strict;
 				olson_description => "EST - ON (Atikokan); NU (Coral H)",
 				timezone_name => "America/Atikokan",
 			},
-			"Eastern - NU (Pangnirtung)" => {
-				location_coords => "+6608-06544",
-				olson_description => "Eastern - NU (Pangnirtung)",
-				timezone_name => "America/Pangnirtung",
-			},
-			"Eastern - NU (most east areas)" => {
+			"Eastern - NU (most areas)" => {
 				location_coords => "+6344-06828",
-				olson_description => "Eastern - NU (most east areas)",
+				olson_description => "Eastern - NU (most areas)",
 				timezone_name => "America/Iqaluit",
-			},
-			"Eastern - ON (Thunder Bay)" => {
-				location_coords => "+4823-08915",
-				olson_description => "Eastern - ON (Thunder Bay)",
-				timezone_name => "America/Thunder_Bay",
 			},
 			"Eastern - ON, QC (most areas)" => {
 				location_coords => "+4339-07923",
 				olson_description => "Eastern - ON, QC (most areas)",
 				timezone_name => "America/Toronto",
-			},
-			"Eastern - ON, QC (no DST 1967-73)" => {
-				location_coords => "+4901-08816",
-				olson_description => "Eastern - ON, QC (no DST 1967-73)",
-				timezone_name => "America/Nipigon",
 			},
 			"MST - BC (Creston)" => {
 				location_coords => "+4906-11631",
@@ -724,7 +704,7 @@ use strict;
 				timezone_name => "America/Creston",
 			},
 			"MST - BC (Dawson Cr, Ft St John)" => {
-				location_coords => "+5946-12014",
+				location_coords => "+5546-12014",
 				olson_description => "MST - BC (Dawson Cr, Ft St John)",
 				timezone_name => "America/Dawson_Creek",
 			},
@@ -743,15 +723,10 @@ use strict;
 				olson_description => "MST - Yukon (west)",
 				timezone_name => "America/Dawson",
 			},
-			"Mountain - AB; BC (E); SK (W)" => {
+			"Mountain - AB; BC (E); NT (E); SK (W)" => {
 				location_coords => "+5333-11328",
-				olson_description => "Mountain - AB; BC (E); SK (W)",
+				olson_description => "Mountain - AB; BC (E); NT (E); SK (W)",
 				timezone_name => "America/Edmonton",
-			},
-			"Mountain - NT (central)" => {
-				location_coords => "+6227-11421",
-				olson_description => "Mountain - NT (central)",
-				timezone_name => "America/Yellowknife",
 			},
 			"Mountain - NT (west)" => {
 				location_coords => "+682059-1334300",
@@ -861,11 +836,6 @@ use strict;
 		alpha2_code => "CL",
 		olson_name => "Chile",
 		regions => {
-			"Chile (most areas)" => {
-				location_coords => "-3327-07040",
-				olson_description => "Chile (most areas)",
-				timezone_name => "America/Santiago",
-			},
 			"Easter Island" => {
 				location_coords => "-2709-10926",
 				olson_description => "Easter Island",
@@ -875,6 +845,11 @@ use strict;
 				location_coords => "-5309-07055",
 				olson_description => "Region of Magallanes",
 				timezone_name => "America/Punta_Arenas",
+			},
+			"most of Chile" => {
+				location_coords => "-3327-07040",
+				olson_description => "most of Chile",
+				timezone_name => "America/Santiago",
 			},
 		},
 	},
@@ -975,15 +950,15 @@ use strict;
 		alpha2_code => "CY",
 		olson_name => "Cyprus",
 		regions => {
-			"Cyprus (most areas)" => {
-				location_coords => "+3510+03322",
-				olson_description => "Cyprus (most areas)",
-				timezone_name => "Asia/Nicosia",
-			},
 			"Northern Cyprus" => {
 				location_coords => "+3507+03357",
 				olson_description => "Northern Cyprus",
 				timezone_name => "Asia/Famagusta",
+			},
+			"most of Cyprus" => {
+				location_coords => "+3510+03322",
+				olson_description => "most of Cyprus",
+				timezone_name => "Asia/Nicosia",
 			},
 		},
 	},
@@ -1007,9 +982,9 @@ use strict;
 				olson_description => "Busingen",
 				timezone_name => "Europe/Busingen",
 			},
-			"Germany (most areas)" => {
+			"most of Germany" => {
 				location_coords => "+5230+01322",
-				olson_description => "Germany (most areas)",
+				olson_description => "most of Germany",
 				timezone_name => "Europe/Berlin",
 			},
 		},
@@ -1329,11 +1304,6 @@ use strict;
 		alpha2_code => "GL",
 		olson_name => "Greenland",
 		regions => {
-			"Greenland (most areas)" => {
-				location_coords => "+6411-05144",
-				olson_description => "Greenland (most areas)",
-				timezone_name => "America/Nuuk",
-			},
 			"National Park (east coast)" => {
 				location_coords => "+7646-01840",
 				olson_description => "National Park (east coast)",
@@ -1348,6 +1318,11 @@ use strict;
 				location_coords => "+7634-06847",
 				olson_description => "Thule/Pituffik",
 				timezone_name => "America/Thule",
+			},
+			"most of Greenland" => {
+				location_coords => "+6411-05144",
+				olson_description => "most of Greenland",
+				timezone_name => "America/Nuuk",
 			},
 		},
 	},
@@ -1819,11 +1794,6 @@ use strict;
 				olson_description => "Atyrau/Atirau/Gur'yev",
 				timezone_name => "Asia/Atyrau",
 			},
-			"Kazakhstan (most areas)" => {
-				location_coords => "+4315+07657",
-				olson_description => "Kazakhstan (most areas)",
-				timezone_name => "Asia/Almaty",
-			},
 			"Mangghystau/Mankistau" => {
 				location_coords => "+4431+05016",
 				olson_description => "Mangghystau/Mankistau",
@@ -1843,6 +1813,11 @@ use strict;
 				location_coords => "+5113+05121",
 				olson_description => "West Kazakhstan",
 				timezone_name => "Asia/Oral",
+			},
+			"most of Kazakhstan" => {
+				location_coords => "+4315+07657",
+				olson_description => "most of Kazakhstan",
+				timezone_name => "Asia/Almaty",
 			},
 		},
 	},
@@ -2042,9 +2017,9 @@ use strict;
 				olson_description => "Kwajalein",
 				timezone_name => "Pacific/Kwajalein",
 			},
-			"Marshall Islands (most areas)" => {
+			"most of Marshall Islands" => {
 				location_coords => "+0709+17112",
-				olson_description => "Marshall Islands (most areas)",
+				olson_description => "most of Marshall Islands",
 				timezone_name => "Pacific/Majuro",
 			},
 		},
@@ -2096,9 +2071,9 @@ use strict;
 				olson_description => "Dornod, Sukhbaatar",
 				timezone_name => "Asia/Choibalsan",
 			},
-			"Mongolia (most areas)" => {
+			"most of Mongolia" => {
 				location_coords => "+4755+10653",
-				olson_description => "Mongolia (most areas)",
+				olson_description => "most of Mongolia",
 				timezone_name => "Asia/Ulaanbaatar",
 			},
 		},
@@ -2206,60 +2181,65 @@ use strict;
 		alpha2_code => "MX",
 		olson_name => "Mexico",
 		regions => {
-			"Central Time" => {
-				location_coords => "+1924-09909",
-				olson_description => "Central Time",
-				timezone_name => "America/Mexico_City",
-			},
-			"Central Time - Bahia de Banderas" => {
+			"Bahia de Banderas" => {
 				location_coords => "+2048-10515",
-				olson_description => "Central Time - Bahia de Banderas",
+				olson_description => "Bahia de Banderas",
 				timezone_name => "America/Bahia_Banderas",
 			},
-			"Central Time - Campeche, Yucatan" => {
-				location_coords => "+2058-08937",
-				olson_description => "Central Time - Campeche, Yucatan",
-				timezone_name => "America/Merida",
+			"Baja California" => {
+				location_coords => "+3232-11701",
+				olson_description => "Baja California",
+				timezone_name => "America/Tijuana",
 			},
-			"Central Time - Durango; Coahuila, Nuevo Leon, Tamaulipas (most areas)" => {
-				location_coords => "+2540-10019",
-				olson_description => "Central Time - Durango; Coahuila, Nuevo Leon, Tamaulipas (most areas)",
-				timezone_name => "America/Monterrey",
-			},
-			"Central Time US - Coahuila, Nuevo Leon, Tamaulipas (US border)" => {
-				location_coords => "+2550-09730",
-				olson_description => "Central Time US - Coahuila, Nuevo Leon, Tamaulipas (US border)",
-				timezone_name => "America/Matamoros",
-			},
-			"Eastern Standard Time - Quintana Roo" => {
-				location_coords => "+2105-08646",
-				olson_description => "Eastern Standard Time - Quintana Roo",
-				timezone_name => "America/Cancun",
-			},
-			"Mountain Standard Time - Sonora" => {
-				location_coords => "+2904-11058",
-				olson_description => "Mountain Standard Time - Sonora",
-				timezone_name => "America/Hermosillo",
-			},
-			"Mountain Time - Baja California Sur, Nayarit, Sinaloa" => {
+			"Baja California Sur, Nayarit (most areas), Sinaloa" => {
 				location_coords => "+2313-10625",
-				olson_description => "Mountain Time - Baja California Sur, Nayarit, Sinaloa",
+				olson_description => "Baja California Sur, Nayarit (most areas), Sinaloa",
 				timezone_name => "America/Mazatlan",
 			},
-			"Mountain Time - Chihuahua (most areas)" => {
-				location_coords => "+2838-10605",
-				olson_description => "Mountain Time - Chihuahua (most areas)",
-				timezone_name => "America/Chihuahua",
+			"Campeche, Yucatan" => {
+				location_coords => "+2058-08937",
+				olson_description => "Campeche, Yucatan",
+				timezone_name => "America/Merida",
 			},
-			"Mountain Time US - Chihuahua (US border)" => {
+			"Central Mexico" => {
+				location_coords => "+1924-09909",
+				olson_description => "Central Mexico",
+				timezone_name => "America/Mexico_City",
+			},
+			"Chihuahua (US border - east)" => {
 				location_coords => "+2934-10425",
-				olson_description => "Mountain Time US - Chihuahua (US border)",
+				olson_description => "Chihuahua (US border - east)",
 				timezone_name => "America/Ojinaga",
 			},
-			"Pacific Time US - Baja California" => {
-				location_coords => "+3232-11701",
-				olson_description => "Pacific Time US - Baja California",
-				timezone_name => "America/Tijuana",
+			"Chihuahua (US border - west)" => {
+				location_coords => "+3144-10629",
+				olson_description => "Chihuahua (US border - west)",
+				timezone_name => "America/Ciudad_Juarez",
+			},
+			"Chihuahua (most areas)" => {
+				location_coords => "+2838-10605",
+				olson_description => "Chihuahua (most areas)",
+				timezone_name => "America/Chihuahua",
+			},
+			"Coahuila, Nuevo Leon, Tamaulipas (US border)" => {
+				location_coords => "+2550-09730",
+				olson_description => "Coahuila, Nuevo Leon, Tamaulipas (US border)",
+				timezone_name => "America/Matamoros",
+			},
+			"Durango; Coahuila, Nuevo Leon, Tamaulipas (most areas)" => {
+				location_coords => "+2540-10019",
+				olson_description => "Durango; Coahuila, Nuevo Leon, Tamaulipas (most areas)",
+				timezone_name => "America/Monterrey",
+			},
+			"Quintana Roo" => {
+				location_coords => "+2105-08646",
+				olson_description => "Quintana Roo",
+				timezone_name => "America/Cancun",
+			},
+			Sonora => {
+				location_coords => "+2904-11058",
+				olson_description => "Sonora",
+				timezone_name => "America/Hermosillo",
 			},
 		},
 	},
@@ -2420,9 +2400,9 @@ use strict;
 				olson_description => "Chatham Islands",
 				timezone_name => "Pacific/Chatham",
 			},
-			"New Zealand (most areas)" => {
+			"most of New Zealand" => {
 				location_coords => "-3652+17446",
-				olson_description => "New Zealand (most areas)",
+				olson_description => "most of New Zealand",
 				timezone_name => "Pacific/Auckland",
 			},
 		},
@@ -2490,9 +2470,9 @@ use strict;
 				olson_description => "Bougainville",
 				timezone_name => "Pacific/Bougainville",
 			},
-			"Papua New Guinea (most areas)" => {
+			"most of Papua New Guinea" => {
 				location_coords => "-0930+14710",
-				olson_description => "Papua New Guinea (most areas)",
+				olson_description => "most of Papua New Guinea",
 				timezone_name => "Pacific/Port_Moresby",
 			},
 		},
@@ -2775,9 +2755,9 @@ use strict;
 				olson_description => "MSK+08 - Magadan",
 				timezone_name => "Asia/Magadan",
 			},
-			"MSK+08 - Sakha (E); North Kuril Is" => {
+			"MSK+08 - Sakha (E); N Kuril Is" => {
 				location_coords => "+6728+15343",
-				olson_description => "MSK+08 - Sakha (E); North Kuril Is",
+				olson_description => "MSK+08 - Sakha (E); N Kuril Is",
 				timezone_name => "Asia/Srednekolymsk",
 			},
 			"MSK+08 - Sakhalin Island" => {
@@ -3068,7 +3048,7 @@ use strict;
 	},
 	TF => {
 		alpha2_code => "TF",
-		olson_name => "French Southern & Antarctic Lands",
+		olson_name => "French S. Terr.",
 		regions => {
 			"" => {
 				location_coords => "-492110+0701303",
@@ -3229,20 +3209,10 @@ use strict;
 				olson_description => "Crimea",
 				timezone_name => "Europe/Simferopol",
 			},
-			Transcarpathia => {
-				location_coords => "+4837+02218",
-				olson_description => "Transcarpathia",
-				timezone_name => "Europe/Uzhgorod",
-			},
-			"Ukraine (most areas)" => {
+			"most of Ukraine" => {
 				location_coords => "+5026+03031",
-				olson_description => "Ukraine (most areas)",
-				timezone_name => "Europe/Kiev",
-			},
-			"Zaporozhye and east Lugansk" => {
-				location_coords => "+4750+03510",
-				olson_description => "Zaporozhye and east Lugansk",
-				timezone_name => "Europe/Zaporozhye",
+				olson_description => "most of Ukraine",
+				timezone_name => "Europe/Kyiv",
 			},
 		},
 	},
@@ -3307,9 +3277,9 @@ use strict;
 				olson_description => "Alaska - Yakutat",
 				timezone_name => "America/Yakutat",
 			},
-			"Aleutian Islands" => {
+			"Alaska - western Aleutians" => {
 				location_coords => "+515248-1763929",
-				olson_description => "Aleutian Islands",
+				olson_description => "Alaska - western Aleutians",
 				timezone_name => "America/Adak",
 			},
 			"Central (most areas)" => {
@@ -3402,9 +3372,9 @@ use strict;
 				olson_description => "Hawaii",
 				timezone_name => "Pacific/Honolulu",
 			},
-			"MST - Arizona (except Navajo)" => {
+			"MST - AZ (except Navajo)" => {
 				location_coords => "+332654-1120424",
-				olson_description => "MST - Arizona (except Navajo)",
+				olson_description => "MST - AZ (except Navajo)",
 				timezone_name => "America/Phoenix",
 			},
 			"Mountain (most areas)" => {

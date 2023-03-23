@@ -150,33 +150,46 @@ METHODS
 
     *   $lpart = get_lpart ()
 
-        Returns local-part of the email after the is_email method call. If
+        Returns local-part of the email *after* the is_email method call. If
         the email address is invalid, then get_lpart returns nothing.
 
     *   $domain = get_domain ()
 
-        Returns domain-part of the email after the is_email method call. If
-        the email address is invalid, then get_domain returns nothing. The
-        returned value $domain could be an IPv4 address either IPv6 one,
+        Returns domain-part of the email *after* the is_email method call.
+        If the email address is invalid, then get_domain returns nothing.
+        The returned value $domain could be an IPv4 address either IPv6 one,
         depending on the specified email address passed to is_email ().
 
     *   $bool = get_is_ipv4 ()
 
         Returns whether or not the domain-part of the email contains an IPv4
-        address, after the is_email method call. If the email address is
+        address, *after* the is_email method call. If the email address is
         invalid, then get_is_ipv4 returns false.
 
     *   $bool = get_is_ipv6 ()
 
         Returns whether or not the domain-part of the email contains an IPv6
-        address, after the is_email method call. If the email address is
+        address, *after* the is_email method call. If the email address is
         invalid, then get_is_ipv6 returns false.
 
     *   $bool = get_is_domain ()
 
         Returns whether or not the domain-part of the email contains an
-        domain name, after the is_email method call. If the email address is
-        invalid, then get_is_domain returns false.
+        domain name, *after* the is_email method call. If the email address
+        is invalid, then get_is_domain returns false.
+
+    *   $tld_type = get_tld_type ()
+
+        Returns TLD type of the email *after* the is_email method call. If
+        the email address is invalid or an error has been occured, then
+        get_tld_type returns the "EAV::XS::TLD_INVALID" value.
+
+        The TLD type is a value that you pass as the "allow_tld" option to
+        new method. For instance, you may compare the return value of the
+        get_tld_type method with the value
+        "EAV::XS::TLD_GENERIC_RESTRICTED".
+
+        The list of TLD types may be found in the "TLD INFORMATION" section.
 
   TLD INFORMATION
     The current list of all TLDs can be found on IANA Root Zone Database
@@ -187,7 +200,7 @@ METHODS
     *   TLD_NOT_ASSIGNED - allow not assigned TLDs. On IANA website they are
         listed as "Not assigned" in the "TLD Manager" field.
 
-    *   TLD_COUNTRY_CODE - allow county-code TLDs.
+    *   TLD_COUNTRY_CODE - allow country-code TLDs.
 
     *   TLD_GENERIC - allow generic TLDs.
 

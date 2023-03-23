@@ -377,7 +377,7 @@ sub invert {
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -731,7 +731,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 #line 1573 "transform.pd"
@@ -740,9 +740,9 @@ sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 744 "Transform.pm"
+#line 967 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 746 "Transform.pm"
 #line 1578 "transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
@@ -774,9 +774,9 @@ sub map {
     my($x);
     if(defined ($x = $tmp->gethdr)) {
       my(%b) = %{$x};
-#line 992 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 990 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 994 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 778 "Transform.pm"
+#line 999 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 780 "Transform.pm"
 #line 1608 "transform.pd"
       $ohdr = \%b;
     }
@@ -787,9 +787,9 @@ sub map {
     }
     # deep-copy fits header into output
     my %foo = %{$tmp};
-#line 1005 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 1001 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 1007 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 791 "Transform.pm"
+#line 1010 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 793 "Transform.pm"
 #line 1617 "transform.pd"
     $ohdr = \%foo;
   } elsif(ref $tmp eq 'ARRAY') {
@@ -988,9 +988,9 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1206 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 1200 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 1208 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 992 "Transform.pm"
+#line 1209 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 994 "Transform.pm"
 #line 1814 "transform.pd"
           };
       } else {
@@ -1036,9 +1036,9 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1254 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 1246 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 1256 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1040 "Transform.pm"
+#line 1255 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1042 "Transform.pm"
 #line 1858 "transform.pd"
           };
       }
@@ -1150,12 +1150,12 @@ sub map {
   }
   return $out;
 }
-#line 1368 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1154 "Transform.pm"
 #line 1155 "Transform.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *map = \&PDL::map;
 #line 1162 "Transform.pm"

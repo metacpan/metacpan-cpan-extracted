@@ -1,5 +1,9 @@
 Revision history for Perl extension EAV::XS.
 
+0.7.6  Sun Mar 19 14:53:23 UTC 2023
+	- update IANA database
+	- added get_tld_type() method
+
 0.7.5  Thu Mar  9 13:53:46 UTC 2023
 	- update IANA database
 

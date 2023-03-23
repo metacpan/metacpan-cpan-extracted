@@ -1,5 +1,5 @@
 package Net::CLI::Interact::ActionSet;
-{ $Net::CLI::Interact::ActionSet::VERSION = '2.300003' }
+{ $Net::CLI::Interact::ActionSet::VERSION = '2.300004' }
 
 use Moo;
 use Sub::Quote;

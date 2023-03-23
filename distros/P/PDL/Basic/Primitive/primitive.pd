@@ -461,22 +461,22 @@ pp_def('norm',
        'long double sum=0;
         int flag = 0;
 	loop(n) %{
-           PDL_IF_BAD(if ( $ISGOOD(vec()) ) {,)
+           PDL_IF_BAD(if ( $ISGOOD(vec()) ),) {
               sum +=
                 PDL_IF_GENTYPE_REAL(
                   $vec()*$vec(),
                   creall($vec())*creall($vec()) + cimagl($vec())*cimagl($vec())
                 );
-           PDL_IF_BAD(flag = 1; },)
+           PDL_IF_BAD(flag = 1;,) }
         %}
-        PDL_IF_BAD(if ( flag ) {,)
+        PDL_IF_BAD(if ( flag ),) {
 	   if (sum > 0) {
 	      sum = sqrt(sum);
 	      loop(n) %{
                  PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
-                            else                 {,)
+                            else              ,) {
                     $norm() = $vec()/sum;
-                 PDL_IF_BAD(},)
+                 }
               %}
 	   } else {
 	      loop(n) %{
@@ -484,7 +484,7 @@ pp_def('norm',
                  else                 { $norm() = $vec(); }
               %}
            }
-        PDL_IF_BAD(} else {
+        } PDL_IF_BAD(else {
 	   loop(n) %{
               $SETBAD(norm());
            %}
@@ -737,20 +737,19 @@ Bad values are not considered unique by uniq and are ignored.
 # find as jumps in the sorted array
 # flattens in the process
 sub PDL::uniq {
-   use PDL::Core 'barf';
    my ($arr) = @_;
    return $arr if($arr->nelem == 0); # The null list is unique (CED)
-   my $srt  = $arr->clump(-1)->where($arr==$arr)->qsort;  # no NaNs or BADs for qsort
-   my $nans = $arr->clump(-1)->where($arr!=$arr);
-   my $uniq = ($srt->nelem > 0) ? $srt->where($srt != $srt->rotate(-1)) : $srt;
+   return $arr->flat if($arr->nelem == 1); # singleton list is unique
+   my $aflat = $arr->flat;
+   my $srt  = $aflat->where($aflat==$aflat)->qsort; # no NaNs or BADs for qsort
+   my $nans = $aflat->where($aflat!=$aflat);
+   my $uniq = ($srt->nelem > 1) ? $srt->where($srt != $srt->rotate(-1)) : $srt;
    # make sure we return something if there is only one value
-   my $answ = $nans;  # NaN values always uniq
-   if ( $uniq->nelem > 0 ) {
-      $answ = $uniq->append($answ);
-   } else {
-      $answ = ( ($srt->nelem == 0) ?  $srt : PDL::pdl( ref($srt), [$srt->index(0)] ) )->append($answ);
-   }
-   return $answ;
+   (
+      $uniq->nelem > 0 ? $uniq :
+      $srt->nelem == 0 ? $srt :
+      PDL::pdl( ref($srt), [$srt->index(0)] )
+   )->append($nans);
 }
 EOPM
 
@@ -3978,11 +3977,11 @@ sub PDL::setops {
 
   } elsif ($op eq 'AND') {
     # The intersection of the arrays.
-
+    return $x if $x->isempty;
+    return $y if $y->isempty;
     # Make ordered list of set union.
     my $union = append($x, $y)->qsort;
-
-    return $union->where($union == rotate($union, -1));
+    return $union->where($union == rotate($union, -1))->uniq;
   } else {
     print "The operation $op is not known!";
     return -1;

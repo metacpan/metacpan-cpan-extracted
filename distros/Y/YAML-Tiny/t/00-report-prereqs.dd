@@ -10,8 +10,8 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.133',
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Encode' => '0',
@@ -70,6 +70,7 @@ do { my $x = {
                                    'Test::More' => '0.88',
                                    'base' => '0',
                                    'lib' => '0',
+                                   'open' => '0',
                                    'perl' => '5.008001',
                                    'utf8' => '0',
                                    'vars' => '0'
@@ -130,7 +131,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::PromptIfStale' => '0',
                                            'Dist::Zilla::Plugin::Readme' => '0',
                                            'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.142180',
-                                           'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.004',
+                                           'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.006',
                                            'Dist::Zilla::Plugin::Run::AfterBuild' => '0.041',
                                            'Dist::Zilla::Plugin::Run::AfterRelease' => '0.038',
                                            'Dist::Zilla::Plugin::RunExtraTests' => '0.024',
@@ -141,7 +142,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Test::Compile' => '2.039',
                                            'Dist::Zilla::Plugin::Test::EOL' => '0.17',
                                            'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
-                                           'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000003',
+                                           'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000010',
                                            'Dist::Zilla::Plugin::Test::NoTabs' => '0.08',
                                            'Dist::Zilla::Plugin::Test::PodSpelling' => '2.006003',
                                            'Dist::Zilla::Plugin::Test::Portability' => '2.000007',
@@ -149,8 +150,8 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::TestRelease' => '0',
                                            'Dist::Zilla::Plugin::UploadToCPAN' => '0',
                                            'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
-                                           'Dist::Zilla::PluginBundle::Author::ETHER' => '0.119',
-                                           'Dist::Zilla::PluginBundle::Git::VersionManager' => '0',
+                                           'Dist::Zilla::PluginBundle::Author::ETHER' => '0.151',
+                                           'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
                                            'Software::License::Perl_5' => '0'
                                          }
                          }

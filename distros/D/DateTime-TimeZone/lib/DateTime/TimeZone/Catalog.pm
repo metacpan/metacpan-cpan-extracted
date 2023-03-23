@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.57';
+our $VERSION = '2.58';
 
 our @ALL =
 qw(
@@ -154,7 +154,6 @@ qw(
   America/Whitehorse
   America/Winnipeg
   America/Yakutat
-  America/Yellowknife
   Antarctica/Casey
   Antarctica/Davis
   Antarctica/Macquarie
@@ -498,7 +497,6 @@ Vancouver
 Whitehorse
 Winnipeg
 Yakutat
-Yellowknife
 ) ],
   'Antarctica' => [ qw(
 Casey
@@ -862,7 +860,6 @@ America/Regina
 America/Swift_Current
 America/Edmonton
 America/Cambridge_Bay
-America/Yellowknife
 America/Inuvik
 America/Creston
 America/Dawson_Creek
@@ -1695,6 +1692,7 @@ our %LINKS =
   'America/Thunder_Bay' => 'America/Toronto',
   'America/Tortola' => 'America/Puerto_Rico',
   'America/Virgin' => 'America/Puerto_Rico',
+  'America/Yellowknife' => 'America/Edmonton',
   'Antarctica/DumontDUrville' => 'Pacific/Port_Moresby',
   'Antarctica/McMurdo' => 'Pacific/Auckland',
   'Antarctica/South_Pole' => 'Pacific/Auckland',
@@ -1864,7 +1862,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2022g' }
+sub OlsonVersion { '2023a' }
 
 
 1;
@@ -2030,7 +2028,6 @@ so that applications can easily present a list of timezones.
   America/Whitehorse
   America/Winnipeg
   America/Yakutat
-  America/Yellowknife
 
 =head3 Antarctica
 
@@ -2445,9 +2442,8 @@ so that applications can easily present a list of timezones.
   America/Rankin_Inlet - Central - NU (central)
   America/Regina - CST - SK (most areas)
   America/Swift_Current - CST - SK (midwest)
-  America/Edmonton - Mountain - AB; BC (E); SK (W)
+  America/Edmonton - Mountain - AB; BC (E); NT (E); SK (W)
   America/Cambridge_Bay - Mountain - NU (west)
-  America/Yellowknife - Mountain - NT (central)
   America/Inuvik - Mountain - NT (west)
   America/Creston - MST - BC (Creston)
   America/Dawson_Creek - MST - BC (Dawson Cr, Ft St John)
@@ -2470,7 +2466,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Chile (CL)
 
-  America/Santiago - Chile (most areas)
+  America/Santiago - most of Chile
   America/Punta_Arenas - Region of Magallanes
   Pacific/Easter - Easter Island
 
@@ -2530,7 +2526,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Cyprus (CY)
 
-  Asia/Nicosia - Cyprus (most areas)
+  Asia/Nicosia - most of Cyprus
   Asia/Famagusta - Northern Cyprus
 
 =head3 Czechia (CZ)
@@ -2634,7 +2630,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Germany (DE)
 
-  Europe/Berlin - Germany (most areas)
+  Europe/Berlin - most of Germany
   Europe/Busingen - Busingen
 
 =head3 Ghana (GH)
@@ -2651,7 +2647,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Greenland (GL)
 
-  America/Nuuk - Greenland (most areas)
+  America/Nuuk - most of Greenland
   America/Danmarkshavn - National Park (east coast)
   America/Scoresbysund - Scoresbysund/Ittoqqortoormiit
   America/Thule - Thule/Pituffik
@@ -2765,7 +2761,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Kazakhstan (KZ)
 
-  Asia/Almaty - Kazakhstan (most areas)
+  Asia/Almaty - most of Kazakhstan
   Asia/Qyzylorda - Qyzylorda/Kyzylorda/Kzyl-Orda
   Asia/Qostanay - Qostanay/Kostanay/Kustanay
   Asia/Aqtobe - Aqtobe/Aktobe
@@ -2866,7 +2862,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Marshall Islands (MH)
 
-  Pacific/Majuro - Marshall Islands (most areas)
+  Pacific/Majuro - most of Marshall Islands
   Pacific/Kwajalein - Kwajalein
 
 =head3 Martinique (MQ)
@@ -2916,7 +2912,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Mongolia (MN)
 
-  Asia/Ulaanbaatar - Mongolia (most areas)
+  Asia/Ulaanbaatar - most of Mongolia
   Asia/Hovd - Bayan-Olgiy, Govi-Altai, Hovd, Uvs, Zavkhan
   Asia/Choibalsan - Dornod, Sukhbaatar
 
@@ -2962,7 +2958,7 @@ so that applications can easily present a list of timezones.
 
 =head3 New Zealand (NZ)
 
-  Pacific/Auckland - New Zealand (most areas)
+  Pacific/Auckland - most of New Zealand
   Pacific/Chatham - Chatham Islands
 
 =head3 Nicaragua (NI)
@@ -3020,7 +3016,7 @@ so that applications can easily present a list of timezones.
 
 =head3 Papua New Guinea (PG)
 
-  Pacific/Port_Moresby - Papua New Guinea (most areas)
+  Pacific/Port_Moresby - most of Papua New Guinea
   Pacific/Bougainville - Bougainville
 
 =head3 Paraguay (PY)
@@ -3090,7 +3086,7 @@ so that applications can easily present a list of timezones.
   Asia/Ust-Nera - MSK+07 - Oymyakonsky
   Asia/Magadan - MSK+08 - Magadan
   Asia/Sakhalin - MSK+08 - Sakhalin Island
-  Asia/Srednekolymsk - MSK+08 - Sakha (E); North Kuril Is
+  Asia/Srednekolymsk - MSK+08 - Sakha (E); N Kuril Is
   Asia/Kamchatka - MSK+09 - Kamchatka
   Asia/Anadyr - MSK+09 - Bering Sea
 
@@ -3291,7 +3287,7 @@ so that applications can easily present a list of timezones.
 =head3 Ukraine (UA)
 
   Europe/Simferopol - Crimea
-  Europe/Kyiv - Ukraine (most areas)
+  Europe/Kyiv - most of Ukraine
 
 =head3 United Arab Emirates (AE)
 
@@ -3327,7 +3323,7 @@ so that applications can easily present a list of timezones.
   America/North_Dakota/Beulah - Central - ND (Mercer)
   America/Denver - Mountain (most areas)
   America/Boise - Mountain - ID (south); OR (east)
-  America/Phoenix - MST - Arizona (except Navajo)
+  America/Phoenix - MST - AZ (except Navajo)
   America/Los_Angeles - Pacific
   America/Anchorage - Alaska (most areas)
   America/Juneau - Alaska - Juneau area
@@ -3335,7 +3331,7 @@ so that applications can easily present a list of timezones.
   America/Metlakatla - Alaska - Annette Island
   America/Yakutat - Alaska - Yakutat
   America/Nome - Alaska (west)
-  America/Adak - Aleutian Islands
+  America/Adak - Alaska - western Aleutians
   Pacific/Honolulu - Hawaii
 
 =head3 Uruguay (UY)
@@ -3474,6 +3470,7 @@ A linked zone is an alias from one name to another.
   America/Thunder_Bay => America/Toronto
   America/Tortola => America/Puerto_Rico
   America/Virgin => America/Puerto_Rico
+  America/Yellowknife => America/Edmonton
   Antarctica/DumontDUrville => Pacific/Port_Moresby
   Antarctica/McMurdo => Pacific/Auckland
   Antarctica/South_Pole => Pacific/Auckland

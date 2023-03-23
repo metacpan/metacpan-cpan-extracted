@@ -1,5 +1,12 @@
 Revision history for Crypt-Argon2
 
+0.016     2023-03-23 03:43:57+01:00 Europe/Amsterdam
+          - Reenable linking to pthread
+
+0.015     2023-03-22 16:21:00+01:00 Europe/Amsterdam
+          - Add optimized implementation
+          - Install argon2-calibrate
+
 0.014     2023-03-20 14:24:00+01:00 Europe/Amsterdam
           - Add argon2_verify and argon2_crypt
 

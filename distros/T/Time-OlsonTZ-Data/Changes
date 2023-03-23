@@ -1,3 +1,47 @@
+version 0.202301; 2023-03-22
+
+  * Olson database version 2023a: 351 canonical zones, 246 links
+
+version 0.202207; 2022-11-29
+
+  * Olson database version 2022g: 352 canonical zones, 245 links
+
+version 0.202206; 2022-10-29
+
+  * Olson database version 2022f: 352 canonical zones, 244 links
+
+version 0.202205; 2022-10-11
+
+  * Olson database version 2022e: 355 canonical zones, 241 links
+
+version 0.202204; 2022-09-24
+
+  * Olson database version 2022d: 355 canonical zones, 241 links
+
+version 0.202203; 2022-08-16
+
+  * Olson database version 2022c: 357 canonical zones, 239 links
+
+version 0.202202; 2022-08-11
+
+  * Olson database version 2022b: 357 canonical zones, 239 links
+
+version 0.202201; 2022-03-16
+
+  * Olson database version 2022a: 378 canonical zones, 217 links
+
+version 0.202105; 2021-10-22
+
+  * Olson database version 2021e: 378 canonical zones, 217 links
+
+version 0.202104; 2021-10-15
+
+  * Olson database version 2021d: 378 canonical zones, 217 links
+
+version 0.202103; 2021-10-01
+
+  * Olson database version 2021c: 378 canonical zones, 217 links
+
 version 0.202102; 2021-09-25
 
   * Olson database version 2021b: 378 canonical zones, 217 links

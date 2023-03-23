@@ -11,21 +11,32 @@
 # PODNAME: storage2dot
 # ABSTRACT: analyse and generate a graphical view of a machine storage
 
+
 use strict;
 use warnings;
 
-our $VERSION = '1.2.1'; # VERSION
+our $VERSION = '1.2.4'; # VERSION
 
-use StorageDisplay;
+# delay module loading so that local data collect can be done
+# without extra modules
+# use StorageDisplay;
 use StorageDisplay::Collect;
 
+my $cleanup_readmode=0;
 sub collect_from_remote {
     my $remote = shift;
     my $content='';
-    use Net::OpenSSH;
-    use Term::ReadKey;
+    eval {
+	require Net::OpenSSH;
+        Net::OpenSSH->import;
+        require Term::ReadKey;
+        Term::ReadKey->import;
+    } or die "Cannot load required modules (Net::OpenSSH and/or Term::ReadKey) for remote data collect: $!\n";
     END {
-        ReadMode('normal');
+        if ($cleanup_readmode) {
+            # in case of bug, always restore normal mode
+            ReadMode('normal');
+        }
     }
     my $ssh = Net::OpenSSH->new($remote);
     $ssh->error and
@@ -60,6 +71,7 @@ sub collect_from_remote {
     use POSIX ":sys_wait_h";
     my $sel = IO::Select->new(\*STDIN, $out);
     my $timeout = 1;
+    $cleanup_readmode=1;
     ReadMode('noecho');
     my ($in_closed,$out_closed) = (0,0);
     while(1) {
@@ -113,10 +125,13 @@ sub collect_from_remote {
         $sel->remove($out);
         close $out;
     }
+    ReadMode('normal');
+    $cleanup_readmode=0;
     return $content;
 }
 
 use Getopt::Long;
+use Pod::Usage;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Purity = 1;
@@ -133,6 +148,7 @@ my $replayfile;
 
 my $verbose;
 my $help;
+my $man;
 
 GetOptions ("d|data=s"       => \$data,      # string
             "r|remote=s"     => \$remote,  # string
@@ -141,14 +157,13 @@ GetOptions ("d|data=s"       => \$data,      # string
             "record-file=s"       => \$recordfile,  # string
             "replay-file=s"       => \$replayfile,  # string
             "verbose"        => \$verbose,     # flag
-            "h|help"           => \$help,     # flag
-    ) or die("Error in command line arguments\n");
+            "h|help"         => \$help,     # flag
+            "man"            => \$man,     # flag
+    ) or pod2usage(2);
 
 sub main() {
-    if (defined($help)) {
-        print "TODO: write help\n";
-        exit(0);
-    }
+    pod2usage(-exitval => 0, -verbose => 1) if $help;
+    pod2usage(-exitval => 0, -verbose => 2) if $man;
 
     if (defined($data) && (
             defined($remote)
@@ -165,9 +180,16 @@ sub main() {
         die "E: --replay cannot be used with --remote, nor --record\n";
     }
 
+    if (!$collect) {
+	require StorageDisplay or
+	    die "Cannot load the StorageDisplay module to handle collected data: $!\n";
+    }
+
     my $infos;
 
     if ($replayfile) {
+	require StorageDisplay::Collect::CMD::Replay or
+	    die "Replay requested, but unable to load the StorageDisplay::Collect::CMD::Replay module: $!\n";
         my $dh;
         open($dh, "<", $replayfile)
             or die "Cannot open '$replayfile': $!" ;
@@ -258,7 +280,104 @@ storage2dot - analyse and generate a graphical view of a machine storage
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.4
+
+=head1 SYNOPSIS
+
+B<storage2dot [OPTIONS]>
+
+  Options:
+    --remote|-r MACHINE   collect data on MACHINE (through SSH)
+    --collect-only|-c     generate plain data instead of dot file
+    --data|-d FILE        use FILE as data source
+    --output|-o FILE      write output into FILE
+    --record-file FILE    record shell commandsinto FILE [for tests]
+    --replay-file FILE    collect data from FILE [for tests]
+    --help|-h             brief documentation
+    --man                 full documentation
+
+This program can be used to collect data about the storage state from
+local or remote machines (through SSH) and use them to generate a DOT
+graphic representing them.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--remote MACHINE>
+
+Collect storage data on MACHINE (through SSH). By default, local
+storage data are collected (without SSH).
+
+=item B<--collect-only>
+
+By default, a DOT file is generated from the storage data. With this
+option, the program do not create the DOT file but only output the
+raw collected data for later analyze.
+
+=item B<--data FILE>
+
+In order to generate the DOT file, use the provided data. B<FILE> must
+have been created with the help of the previous option. No new data
+are collected when this option is used.
+
+=item B<--output FILE>
+
+Write generated data (DOT by default) into B<FILE> instead of the
+standard output.
+
+=item B<--record-file FILE>
+
+Write shell commands (and their output) that are used to collect data
+into B<FILE>. This is mainly used for reproducibility during tests.
+
+=item B<--replay-file FILE>
+
+Use information from B<FILE> instead of running real shell commands in
+order to collect data. B<FILE> must be This is mainly used for
+reproducibility during tests.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 EXAMPLES
+
+=over 8
+
+=item B<storage2dot -o state.dot>
+
+Generate a DOT file representing the state of the storage on the local machine.
+
+=item B<storage2dot -r host -o state.dot>
+
+Generate a DOT file representing the state of the storage on the
+remote B<host> machine. Only perl (and its standard modules) are
+required on the remote machine. Of course, a SSH account is also
+required.
+
+=item B<storage2dot -c -o state.data>
+
+Just collect data on current machine without generating a DOT file.
+Only perl (and its standard modules) are required on the current
+machine.
+
+=item B<storage2dot --data state.data -o state.dot>
+
+Generate a DOT file representing the state of the storage recorded in
+the state.data file. Extra perl modules are required for this command.
+
+=item B<dot -Tpdf state.dot >>B< state.pdf>
+
+Generate a PDF from the DOT file using dot(1).
+
+=back
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Convert::Color::X11;
 use Convert::Color::RGB8;
@@ -22,7 +22,7 @@ is( $red->blue,    0, 'red blue' );
 
 is( $red->name, "red", 'red name' );
 
-is_deeply( [ $red->as_rgb8->rgb8 ], [ 255, 0, 0 ], 'red as_rgb8' );
+is( [ $red->as_rgb8->rgb8 ], [ 255, 0, 0 ], 'red as_rgb8' );
 
 my $green = Convert::Color->new( 'x11:green' );
 
@@ -38,7 +38,7 @@ my $white = Convert::Color::RGB8->new( 255, 255, 255 )->as_x11;
 # contain other names with the same value, such as "Gray100"
 #   https://rt.cpan.org/Ticket/Display.html?id=66544
 
-isa_ok( $white, "Convert::Color::X11", '$white' );
-is_deeply( [ $white->as_rgb8->rgb8 ], [ 255, 255, 255 ], 'white as_rgb8' );
+isa_ok( $white, [ "Convert::Color::X11" ], '$white' );
+is( [ $white->as_rgb8->rgb8 ], [ 255, 255, 255 ], 'white as_rgb8' );
 
 done_testing;

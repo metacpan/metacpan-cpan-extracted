@@ -127,14 +127,14 @@ use warnings;
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *fitgauss1d = \&PDL::fitgauss1d;
 #line 134 "Gaussian.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *fitgauss1dr = \&PDL::fitgauss1dr;
 #line 141 "Gaussian.pm"

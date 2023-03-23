@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-Argon2
 
+0.006     2023-03-23 17:39:51+01:00 Europe/Amsterdam
+          - Fix compilation issue on perl 5.20 and below
+
 0.005     2023-03-20 14:32:03+01:00 Europe/Amsterdam
           - Use new argon2_verify function
           - Make exceptions skip Crypt::Passphrase

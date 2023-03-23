@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2023-03-09 13:51:47 */
+/* this file was auto-generated at 2023-03-19 14:42:18 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -757,7 +757,7 @@ const tld_t tld_list[] = {
     { "limited", 8, TLD_TYPE_GENERIC },
     { "limo", 5, TLD_TYPE_GENERIC },
     { "lincoln", 8, TLD_TYPE_GENERIC },
-    { "linde", 6, TLD_TYPE_GENERIC },
+    { "linde", 6, TLD_TYPE_NOT_ASSIGNED },
     { "link", 5, TLD_TYPE_GENERIC },
     { "lipsy", 6, TLD_TYPE_GENERIC },
     { "live", 5, TLD_TYPE_GENERIC },

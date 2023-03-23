@@ -41,7 +41,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.19
+    Version 0.20
 
 =cut
 
@@ -64,6 +64,7 @@ get_ip() {
     echo -n $ip
 }
 
+default_lang=EN-US
 repository=tecolicom/xlate
 hostname=xlate
 interactive=yes
@@ -164,7 +165,38 @@ do
 done	
 shift $((OPTIND - 1))
 
-: ${to_lang:=EN-US}
+: ${to_lang:="$default_lang"}
+
+: run make
+if [ "$run_make" == yes ]
+then
+    mod="App-Greple-xlate"
+    share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
+    declare -a opt
+    for m in "$@"
+    do
+	if [ -f "$m" ]
+	then
+	    # GNU Make behaves differently in different versions with
+	    # respect to double-quoted strings and spaces within them.
+	    files="${files:+$files|||}$m"
+	else
+	    opt+=("$m")
+	fi
+    done
+    unset MAKELEVEL
+    exec make -f $share/XLATE.mk \
+	 ${dryrun:+-n} \
+	 XLATE_LANG=\""$to_lang"\" \
+	 XLATE_DEBUG=$debug \
+	 XLATE_MAXLEN=$max \
+	 XLATE_USEAPI=$use_api \
+	 ${format:+XLATE_FORMAT=\""$format"\"} \
+	 ${files:+XLATE_FILES=\""$files"\"} \
+	 ${opt[@]}
+    exit 1
+fi
+
 : ${format:=xtxt}
 
 if [[ "$format" =~ ^(.+)-fold$ ]]
@@ -186,35 +218,6 @@ option+=(--all)
 [ "$refresh" == yes ] && option+=(--cache-clear)
 [ "$silent"  == yes ] && option+=(--no-xlate-progress)
 [ "$max"     != ""  ] && option+=(--xlate-maxlen="$max")
-
-: run make
-if [ "$run_make" == yes ]
-then
-    mod="App-Greple-xlate"
-    share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
-    declare -a opt
-    for m in $*
-    do
-	if [ -f "$m" ]
-	then
-	    # GNU Make behaves differently in different versions with
-	    # respect to double-quoted strings and spaces within them.
-	    file="${file:+$file|||}$m"
-	else
-	    opt+=("$m")
-	fi
-    done
-    unset MAKELEVEL
-    exec make -f $share/XLATE.mk \
-	 ${dryrun:+-n} \
-	 XLATE_LANG=$to_lang \
-	 XLATE_DEBUG=$debug \
-	 XLATE_MAXLEN=$max \
-	 XLATE_USEAPI=$use_api \
-	 ${file:+XLATE_FILES=\"$file\"} \
-	 ${opt[@]}
-    exit 1
-fi
 
 declare -a area
 case $1 in

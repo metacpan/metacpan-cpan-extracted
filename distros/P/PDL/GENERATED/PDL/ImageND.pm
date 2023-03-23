@@ -71,7 +71,7 @@ use Carp;
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -111,7 +111,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -138,7 +138,7 @@ sub PDL::convolve{
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *convolve = \&PDL::convolve;
 #line 145 "ImageND.pm"
@@ -192,7 +192,7 @@ sub PDL::ninterpol {
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -239,7 +239,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -296,7 +296,7 @@ sub PDL::rebin {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rebin = \&PDL::rebin;
 #line 303 "ImageND.pm"
@@ -440,7 +440,7 @@ sub PDL::kernctr {
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -448,7 +448,7 @@ sub PDL::kernctr {
 
 =for sig
 
-  Signature: (k0(); SV *k; SV *aa; SV *a)
+  Signature: (k0(); pdl *k; pdl *aa; pdl *a)
 
 
 =for ref
@@ -546,7 +546,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 use PDL::Options;
@@ -657,7 +657,7 @@ sub PDL::convolveND {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *convolveND = \&PDL::convolveND;
 #line 664 "ImageND.pm"

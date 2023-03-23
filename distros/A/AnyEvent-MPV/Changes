@@ -1,7 +1,10 @@
 Revision history for AnyEvent::MPV
 
-TODO: implement a better wrapper around events
-TODO: rip out some examples from doomfrontend, gtk2::cv
+1.0  Wed 22 Mar 2023 19:20:00 CET
+	- implement a registry wrapper around events.
+        - create json coder/decoder only once instead of per request.
+        - lots of random example snippets added, also, synopsis.
+        - used in production.
 
 0.2  Mon 20 Mar 2023 13:25:29 CET
 	- event key itself is no longer passed in on_event event object.

@@ -73,7 +73,7 @@ integration) as C<$la> and C<$lb>.
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -143,7 +143,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub init {
   my $opt;
@@ -169,14 +169,14 @@ sub init {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *init = \&PDL::GSL::INTERP::init;
 #line 176 "INTERP.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -216,7 +216,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub eval {
   my $opt;
@@ -230,14 +230,14 @@ sub eval {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *eval = \&PDL::GSL::INTERP::eval;
 #line 237 "INTERP.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -278,7 +278,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub deriv {
   my ($obj,$x) = @_;
@@ -291,14 +291,14 @@ sub deriv {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *deriv = \&PDL::GSL::INTERP::deriv;
 #line 298 "INTERP.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -339,7 +339,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub deriv2 {
   my ($obj,$x) = @_;
@@ -352,14 +352,14 @@ sub deriv2 {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *deriv2 = \&PDL::GSL::INTERP::deriv2;
 #line 359 "INTERP.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -400,7 +400,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub integ {
   my ($obj,$la,$lb) = @_;
@@ -413,7 +413,7 @@ sub integ {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *integ = \&PDL::GSL::INTERP::integ;
 #line 420 "INTERP.pm"

@@ -147,7 +147,6 @@ my @files = (
     'lib/DateTime/TimeZone/America/Whitehorse.pm',
     'lib/DateTime/TimeZone/America/Winnipeg.pm',
     'lib/DateTime/TimeZone/America/Yakutat.pm',
-    'lib/DateTime/TimeZone/America/Yellowknife.pm',
     'lib/DateTime/TimeZone/Antarctica/Casey.pm',
     'lib/DateTime/TimeZone/Antarctica/Davis.pm',
     'lib/DateTime/TimeZone/Antarctica/Macquarie.pm',

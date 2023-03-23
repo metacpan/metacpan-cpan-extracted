@@ -1,10 +1,57 @@
 ==================================================
-Changes from 2022-03-16 00:00:00 +0000 to present.
+Changes from 2022-03-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.2.1 at 2023-03-16 23:02:58 +0000
+version 1.2.4 at 2023-03-23 10:30:55 +0000
 ------------------------------------------
+
+  Change: 54b7e0f85c94d1e61e7aed56fd54f9f756ada24a
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-23 11:30:45 +0000
+
+    New release 
+
+  Change: 78d74b225069486ed979685565c47e39bb6fdac4
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-23 11:30:05 +0000
+
+    Fix tests for old JSON::PP versions support 
+
+  Change: 8bedc41c9d08a30cc0c49a5dcd682ea5b5f19e96
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-22 17:48:55 +0000
+
+    new release 
+
+  Change: ff6cbff489bf391d718f9d16e8834106cb2003be
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-22 17:47:04 +0000
+
+    cleanup sources 
+
+  Change: 954fcdf24763d1a77b8490b0122303d927473d08
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-22 17:07:41 +0000
+
+    New release 
+
+  Change: cd98a9f2ddb1f2d9478e741c6ef66ec9a7fbedad
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-22 17:07:41 +0000
+
+    Improve doc
+
+    storage2dot has a real manpage 
+
+  Change: 7b2c30dc3a89843347ee333ae36f8c723125fa92
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-22 16:43:13 +0000
+
+    Allows storage2dot to (somtimes) run without extra perl modules
+
+    - Move some Collect modules into their own file - use 'require'
+    instead of 'use' in storage2dot 
 
   Change: 49b7665194b95a922524a2988e7d86f2edd02da6
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

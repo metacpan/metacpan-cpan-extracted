@@ -129,8 +129,9 @@ sub new {
 
     # Enclose it all in a genericloop.
     my $nc = $coderef;
+    my $if_gentype = ($code.($badcode//'')) =~ /PDL_IF_GENTYPE_/;
     $coderef = PDL::PP::GenericSwitch->new($generictypes, undef,
-	  [grep {!$extrageneric->{$_}} @$parnames],'$PRIV(__datatype)');
+	  [grep {!$extrageneric->{$_}} @$parnames],'$PRIV(__datatype)',$if_gentype);
     push @{$coderef},$nc;
 
     # Do we have extra generic loops?
@@ -143,7 +144,7 @@ sub new {
     for(sort keys %glh) {
 	my $nc = $coderef;
 	$coderef = PDL::PP::GenericSwitch->new($generictypes,$no++,
-					    $glh{$_},$_);
+					    $glh{$_},$_,$if_gentype);
 	push @$coderef,$nc;
     }
 
@@ -159,14 +160,27 @@ sub new {
         'PDL_COMMENT("dims here are how many steps along those dims")',
         (map "register PDL_Indx __tinc0_$parnames->[$_] = PDL_BRC_INC(\$PRIV(broadcast).incs,__tnpdls,$_,0);", 0..$#$parnames),
         (map "register PDL_Indx __tinc1_$parnames->[$_] = PDL_BRC_INC(\$PRIV(broadcast).incs,__tnpdls,$_,1);", 0..$#$parnames),
+        eol_protect(
+         "#define ".$this->broadcastloop_macroname($backcode, 'START') . " " .
+           $this->broadcastloop_start($this->func_name($backcode))
+        )."\n",
+        eol_protect(
+         "#define ".$this->broadcastloop_macroname($backcode, 'END') . " " .
+           $this->broadcastloop_end
+        )."\n",
+        join('',map $_->get_incregisters, @$pobjs{sort keys %$pobjs}),
        ).
        $this->params_declare.
-       join('',map $_->get_incregisters, @$pobjs{sort keys %$pobjs}).
        $coderef->get_str($this,[])
        ;
     $this->{Code};
 
 } # new()
+
+sub eol_protect {
+  my ($text) = @_;
+  join " \\\n", split /\n/, $text;
+}
 
 sub params_declare {
     my ($this) = @_;
@@ -183,6 +197,11 @@ EOF
 }
 
 sub func_name { $_[1] ? "writebackdata" : "readdata" }
+
+sub broadcastloop_macroname {
+    my ($this, $backcode, $which) = @_;
+    "PDL_BROADCASTLOOP_${which}_$this->{Name}_".$this->func_name($backcode);
+}
 
 sub broadcastloop_start {
     my ($this, $funcname) = @_;
@@ -477,12 +496,12 @@ sub get_generictyperecs { my($types) = @_;
 
 # Types: BSULFD
 sub new {
-    my ($type,$types,$name,$varnames,$whattype) = @_;
+    my ($type,$types,$name,$varnames,$whattype,$if_gentype) = @_;
     my %vars; @vars{@$varnames} = ();
-    bless [get_generictyperecs($types), $name, \%vars, $whattype], $type;
+    bless [get_generictyperecs($types), $name, \%vars, $whattype, $if_gentype], $type;
 }
 
-sub myoffs {4}
+sub myoffs {5}
 
 sub myprelude {
     my ($this,$parent,$context) = @_;
@@ -504,7 +523,7 @@ sub myitemstart {
       ? PDL::PP::pp_line_numbers(__LINE__-1, "\t\tPDL_DECLARE_PARAMS_$parent->{Name}_$parent->{NullDataCheck}(@{[join ',', @param_ctypes]})\n")
       : join '', map $_->get_xsdatapdecl($_->adjusted_type($item)->ctype, $parent->{NullDataCheck}),
           map $parent->{ParObjs}{$_}, sort keys %{$this->[2]};
-    my @gentype_decls = map "#define PDL_IF_GENTYPE_".uc($_)."(t,f) ".
+    my @gentype_decls = !$this->[4] ? () : map "#define PDL_IF_GENTYPE_".uc($_)."(t,f) ".
 	($item->$_ ? 't' : 'f')."\n",
 	@GENTYPE_ATTRS;
     join '',
@@ -518,7 +537,7 @@ sub myitemend {
     my $item = $this->[0][$nth] || return "";
     join '',
 	"\n",
-	(map "#undef PDL_IF_GENTYPE_".uc($_)."\n", @GENTYPE_ATTRS),
+	(!$this->[4] ? () : map "#undef PDL_IF_GENTYPE_".uc($_)."\n", @GENTYPE_ATTRS),
 	PDL::PP::pp_line_numbers(__LINE__-1, "} break;\n");
 }
 
@@ -545,12 +564,12 @@ sub new {
 }
 sub myoffs { return 0; }
 sub myprelude {
-    my($this,$parent,$context, $backcode) = @_;
-    $parent->broadcastloop_start($parent->func_name($backcode));
+    my($this,$parent,$context,$backcode) = @_;
+    $parent->broadcastloop_macroname($backcode, 'START') . "\n";
 }
 
-sub mypostlude {my($this,$parent,$context) = @_;
-    $parent->broadcastloop_end;
+sub mypostlude {my($this,$parent,$context,$backcode) = @_;
+    $parent->broadcastloop_macroname($backcode, 'END') . "\n";
 }
 
 # Simple subclass of BroadcastLoop to implement writeback code
@@ -561,15 +580,18 @@ use Carp;
 our @ISA = "PDL::PP::BroadcastLoop";
 
 sub myprelude {
-    my($this,$parent,$context, $backcode) = @_;
-
+    my($this,$parent,$context,$backcode) = @_;
     # Set backcode flag if not defined. This will make the parent
     #   myprelude emit proper writeback code
-    $backcode = 1 unless defined($backcode);
-
-    $this->SUPER::myprelude($parent, $context, $backcode);
+    $this->SUPER::myprelude($parent, $context, $backcode // 1);
 }
 
+sub mypostlude {
+    my($this,$parent,$context,$backcode) = @_;
+    # Set backcode flag if not defined. This will make the parent
+    #   mypostlude emit proper writeback code
+    $this->SUPER::mypostlude($parent, $context, $backcode // 1);
+}
 
 ###########################
 #
@@ -707,7 +729,7 @@ sub get_str {my($this,$parent,$context) = @_;
     unless defined(my $type = $parent->{Gencurtype}[-1]);
   return $type->ppsym if !$this->[0];
   my $pobj = $parent->{ParObjs}{$this->[0]} // confess "not a defined parname";
-  $pobj->adjusted_type($type)->ctype;
+  $pobj->adjusted_type($type)->ppsym;
 }
 
 1;

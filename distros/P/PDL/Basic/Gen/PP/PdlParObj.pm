@@ -88,19 +88,10 @@ sub name {return (shift)->{Name}}
 
 sub add_inds {
 	my($this,$dimsobj) = @_;
-	$this->{IndObjs} = [map {$dimsobj->get_indobj_make($_)}
-		@{$this->{RawInds}}];
+	$this->{IndObjs} = [my @objs = map $dimsobj->get_indobj_make($_), @{$this->{RawInds}}];
 	my %indcount;
-	$this->{IndCounts} = [
-		map {
-			0+($indcount{$_->name}++);
-		} @{$this->{IndObjs}}
-	];
-	$this->{IndTotCounts} = [
-		map {
-			($indcount{$_->name});
-		} @{$this->{IndObjs}}
-	];
+	$this->{IndCounts} = [ map 0+($indcount{$_->name}++), @objs ];
+	$this->{IndTotCounts} = [ map $indcount{$_->name}, @objs ];
 }
 
 
@@ -127,11 +118,11 @@ sub finalcheck {
   return [] if $pdl->isnull;
   my @corr = ();
   my @dims = $pdl->dims;
-  my ($i,$ind) = (0,undef);
-  for $ind (@{$this->{IndObjs}}) {
+  my $i = 0;
+  for my $ind (@{$this->{IndObjs}}) {
     push @corr,[$i-1,$ind->{Value},$dims[$i-1]] if $dims[$i++] != $ind->{Value};
   }
-  return [@corr];
+  return \@corr;
 }
 
 # get index sizes for a parameter that has to be created
@@ -156,21 +147,22 @@ sub adjusted_type {
 }
 
 sub get_nname{ my($this) = @_;
-	"(\$PRIV(pdls[$this->{Number}]))";
+	"(\$PRIV(pdls)[$this->{Number}])";
 }
 
 sub get_nnflag { my($this) = @_;
-	"(\$PRIV(vtable->per_pdl_flags[$this->{Number}]))";
+	"(\$PRIV(vtable)->per_pdl_flags[$this->{Number}])";
+}
+
+sub get_substname {
+  my($this,$ind) = @_;
+  $this->{IndObjs}[$ind]->name.($this->{IndTotCounts}[$ind] > 1 ? $this->{IndCounts}[$ind] : '');
 }
 
 sub get_incname {
 	my($this,$ind,$for_local) = @_;
 	return "inc_sizes[PDL_INC_ID(__privtrans->vtable,$this->{Number},$ind)]" if !$for_local;
-	if($this->{IndTotCounts}[$ind] > 1) {
-	    "__inc_".$this->{Name}."_".($this->{IndObjs}[$ind]->name).$this->{IndCounts}[$ind];
-	} else {
-	    "__inc_".$this->{Name}."_".($this->{IndObjs}[$ind]->name);
-	}
+	"__inc_$this->{Name}_".$this->get_substname($ind);
 }
 
 sub get_incregisters {
@@ -192,23 +184,20 @@ sub do_access {
 	 {/^\s*(\w+)\s*=>\s*(\S*)\s*$/ or confess "Invalid subst $_ in ($inds) (no spaces in => value)\n"; ($1,$2)}
 		PDL::PP::Rule::Substitute::split_cpp($inds);
 # Generate the text
-	my $text;
-	$text = "(${pdl}_datap)"."[";
-	$text .= join '+','0',map {
-		$this->do_indterm($pdl,$_,\%subst,$context);
-	} (0..$#{$this->{IndObjs}});
-	$text .= "]";
+	my $text = "(${pdl}_datap)[" . join('+','0', map
+		$this->do_indterm($pdl,$_,\%subst,$context),
+	0..$#{$this->{IndObjs}}) . "]";
 # If not all substitutions made, the user probably made a spelling
 # error. Barf.
 	if(scalar(keys %subst) != 0) {
 		confess("Substitutions left: ".(join ',',sort keys %subst)."\n");
 	}
-       $text;
+	$text;
 }
 
 sub do_pdlaccess {
 	my($this) = @_;
-	PDL::PP::pp_line_numbers(__LINE__-1, '$PRIV(pdls['.$this->{Number}.'])');
+	PDL::PP::pp_line_numbers(__LINE__-1, '$PRIV(pdls)['.$this->{Number}.']');
 }
 
 sub do_pointeraccess {
@@ -222,25 +211,16 @@ sub do_physpointeraccess {
 }
 
 sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
-# Get informed
-	my $indname = $this->{IndObjs}[$ind]->name;
-	my $indno = $this->{IndCounts}[$ind];
-	my $indtot = $this->{IndTotCounts}[$ind];
+  my $substname = $this->get_substname($ind);
 # See if substitutions
-	my $substname = ($indtot>1 ? $indname.$indno : $indname);
-	my $incname = $indname.($indtot>1 ? $indno : "");
-	my $index;
-	if(defined $subst->{$substname}) {$index = delete $subst->{$substname};}
-	else {
+  my $index = delete($subst->{$substname}) //
 # No => get the one from the nearest context.
-		for(reverse @$context) {
-			if($_->[0] eq $indname) {$index = $_->[1]; last;}
-		}
-	}
-	if(!defined $index) {confess "Access Index not found: $pdl, $ind, $indname
-		On stack:".(join ' ',map {"($_->[0],$_->[1])"} @$context)."\n" ;}
-       return "(".($this->get_incname($ind,1))."*".
-               "PP_INDTERM(".$this->{IndObjs}[$ind]->get_size().", $index))";
+    (grep $_ eq $substname, map $_->[1], reverse @$context)[0];
+  confess "Access Index not found: $pdl, $ind, @{[$this->{IndObjs}[$ind]->name]}
+	  On stack:".(join ' ',map {"($_->[0],$_->[1])"} @$context)."\n"
+	  if !defined $index;
+  return "(".($this->get_incname($ind,1))."*".
+	 "PP_INDTERM(".$this->{IndObjs}[$ind]->get_size().", $index))";
 }
 
 sub get_xsdatapdecl { 

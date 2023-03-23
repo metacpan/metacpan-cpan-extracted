@@ -68,7 +68,7 @@ BEGIN {use PDL::MatrixOps;}
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -92,14 +92,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *acos = \&PDL::acos;
 #line 99 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -123,14 +123,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *asin = \&PDL::asin;
 #line 130 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -154,14 +154,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *atan = \&PDL::atan;
 #line 161 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -185,14 +185,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cosh = \&PDL::cosh;
 #line 192 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -216,14 +216,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sinh = \&PDL::sinh;
 #line 223 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -247,14 +247,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *tan = \&PDL::tan;
 #line 254 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -278,14 +278,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *tanh = \&PDL::tanh;
 #line 285 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -310,14 +310,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ceil = \&PDL::ceil;
 #line 317 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -342,14 +342,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *floor = \&PDL::floor;
 #line 349 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -385,14 +385,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *rint = \&PDL::rint;
 #line 392 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -417,14 +417,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *pow = \&PDL::pow;
 #line 424 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -448,14 +448,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *acosh = \&PDL::acosh;
 #line 455 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -479,14 +479,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *asinh = \&PDL::asinh;
 #line 486 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -510,14 +510,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *atanh = \&PDL::atanh;
 #line 517 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -542,14 +542,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *erf = \&PDL::erf;
 #line 549 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -574,14 +574,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *erfc = \&PDL::erfc;
 #line 581 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -606,14 +606,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessj0 = \&PDL::bessj0;
 #line 613 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -638,14 +638,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessj1 = \&PDL::bessj1;
 #line 645 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -670,14 +670,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessy0 = \&PDL::bessy0;
 #line 677 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -702,14 +702,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessy1 = \&PDL::bessy1;
 #line 709 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -738,14 +738,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessjn = \&PDL::bessjn;
 #line 745 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -774,14 +774,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bessyn = \&PDL::bessyn;
 #line 781 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -813,14 +813,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *lgamma = \&PDL::lgamma;
 #line 820 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -843,14 +843,14 @@ Bad values are treated as C<NaN> or C<inf>.
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *isfinite = \&PDL::isfinite;
 #line 850 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -875,14 +875,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *erfi = \&PDL::erfi;
 #line 882 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -909,14 +909,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ndtri = \&PDL::ndtri;
 #line 916 "Math.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -950,7 +950,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *polyroots = \&PDL::polyroots;
 #line 957 "Math.pm"

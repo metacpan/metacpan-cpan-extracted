@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Convert::Color::HSL;
 
@@ -15,7 +15,7 @@ is( $red->lightness,  0.5, 'red lightness' );
 
 is( $red->chroma,       1, 'red chroma' );
 
-is_deeply( [ $red->hsl ], [ 0, 1, 0.5 ], 'red hsl' );
+is( [ $red->hsl ], [ 0, 1, 0.5 ], 'red hsl' );
 
 my $green = Convert::Color::HSL->new( 120, 1, 0.5 );
 
@@ -25,7 +25,7 @@ is( $green->lightness,  0.5, 'green lightness' );
 
 is( $green->chroma,       1, 'green chroma' );
 
-is_deeply( [ $green->hsl ], [ 120, 1, 0.5 ], 'green hsl' );
+is( [ $green->hsl ], [ 120, 1, 0.5 ], 'green hsl' );
 
 my $blue = Convert::Color::HSL->new( 240, 1, 0.5 );
 
@@ -35,7 +35,7 @@ is( $blue->lightness,  0.5, 'blue lightness' );
 
 is( $blue->chroma,       1, 'blue chroma' );
 
-is_deeply( [ $blue->hsl ], [ 240, 1, 0.5 ], 'blue hsl' );
+is( [ $blue->hsl ], [ 240, 1, 0.5 ], 'blue hsl' );
 
 my $yellow = Convert::Color::HSL->new( '60,1,0.5' );
 
@@ -45,7 +45,7 @@ is( $yellow->lightness,  0.5, 'yellow lightness' );
 
 is( $yellow->chroma,       1, 'yellow chroma' );
 
-is_deeply( [ $yellow->hsl ], [ 60, 1, 0.5 ], 'yellow hsl' );
+is( [ $yellow->hsl ], [ 60, 1, 0.5 ], 'yellow hsl' );
 
 # "black" is anything at value 0
 my $black = Convert::Color::HSL->new( '0,1,0' );

@@ -240,3 +240,20 @@ get_is_domain(self)
         RETVAL = self->result != NULL ? self->result->is_domain : false;
     OUTPUT:
         RETVAL
+
+#
+# Return TLD type of the email after is_email() call.
+#
+int
+get_tld_type(self)
+        EAV::XS     self
+    CODE:
+        if (self->result == NULL || self->errcode != EEAV_NO_ERROR)
+            RETVAL = 0x00000002; /* TLD_INVALID from lib/EAV/XS.pm */
+        else
+            /* See details libeav/include/eav/auto_tld.h,
+             * specifically enum-values called TLD_TYPE_*.
+             */
+            RETVAL = 1 << (self->result->rc + 1);
+    OUTPUT:
+        RETVAL

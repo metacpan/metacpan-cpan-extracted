@@ -30,18 +30,6 @@ data/ge95142.ref.dot
 data/localhost.rawcmd
 data/localhost.ref.data
 data/localhost.ref.dot
-data/olddata/aya-2.rawcmd
-data/olddata/aya-2.ref.data
-data/olddata/aya-2.ref.dot
-data/olddata/dahu-node.rawcmd
-data/olddata/dahu-node.ref.data
-data/olddata/dahu-node.ref.dot
-data/olddata/eh91160u.rawcmd
-data/olddata/eh91160u.ref.data
-data/olddata/eh91160u.ref.dot
-data/olddata/yeti-node.rawcmd
-data/olddata/yeti-node.ref.data
-data/olddata/yeti-node.ref.dot
 data/yeti-node.rawcmd
 data/yeti-node.ref.data
 data/yeti-node.ref.dot
@@ -49,6 +37,8 @@ dist.ini
 lib/StorageDisplay.pm
 lib/StorageDisplay/Block.pm
 lib/StorageDisplay/Collect.pm
+lib/StorageDisplay/Collect/CMD/Remote.pm
+lib/StorageDisplay/Collect/CMD/Replay.pm
 lib/StorageDisplay/Data/Elem.pm
 lib/StorageDisplay/Data/FS.pm
 lib/StorageDisplay/Data/LUKS.pm
@@ -64,7 +54,8 @@ t/000-report-versions.t
 t/05_round.t
 t/06_int-data-dumper.t
 t/07_json.t
-t/10_reference.t
+t/10_scripts.t
+t/20_reference.t
 t/author-critic.t
 t/author-distmeta.t
 t/author-pod-syntax.t

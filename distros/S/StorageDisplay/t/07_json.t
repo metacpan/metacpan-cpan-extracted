@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Test2::V0;
+use Scalar::Util;
 
 my $json_text = q(
 {
@@ -38,9 +39,9 @@ my $perl_structure = {
 	'size' => '200G'
 };
 
-diag("JSON support from JSON::PP instead of JSON::MaybeXS");
-diag("\tboolean_values method required");
-diag("\tmodule included in basic perl modules");
+# JSON support from JSON::PP instead of JSON::MaybeXS
+# - boolean_values method required
+# - module included in basic perl modules
 use JSON::PP;
 # This load StorageDisplay::Collect::JSON;
 
@@ -59,15 +60,22 @@ eval {
 diag("JSON::PP: allow_bignum support: ".$bignum_support);
 
 use StorageDisplay::Collect;
-my $use_pp_parser = StorageDisplay::Collect::JSON::use_pp_parser();
-is(defined($use_pp_parser), !1,
+my $has_boolean_values = StorageDisplay::Collect::JSON::pp_parser_has_boolean_values();
+is(defined($has_boolean_values), !1,
     "StorageDisplay::Collect::JSON initialization is delayed");
 my $data_structure = StorageDisplay::Collect::JSON::decode_json($json_text);
-$use_pp_parser = StorageDisplay::Collect::JSON::use_pp_parser();
-is(defined($use_pp_parser), !0,
+$has_boolean_values = StorageDisplay::Collect::JSON::pp_parser_has_boolean_values();
+is(defined($has_boolean_values), !0,
     "StorageDisplay::Collect::JSON is initialized");
-diag("StorageDisplay::Collect::JSON uses plain JSON::PP: ".$use_pp_parser);
+diag("JSON::PP has boolean_values: ".$has_boolean_values);
 
+my $parser = StorageDisplay::Collect::JSON->new();
+ok(Scalar::Util::blessed $parser && $parser->isa("JSON::PP"), "StorageDisplay::Collect::JSON inherits JSON::PP");
+if ($boolean_support) {
+    is($parser->isa("StorageDisplay::Collect::JSON"), !1, "Directly uses JSON::PP::decode");
+} else {
+    ok($parser->isa("StorageDisplay::Collect::JSON"), "Wrapper around JSON::PP::decode");
+}
 
 is(
     $data_structure,

@@ -1,0 +1,295 @@
+#!perl
+
+=head1 NAME
+
+mojo_cape_submit - A mojolicious script for handling submissions of files for detonation.
+
+=head1 SYNOPSIS
+
+sudo -u cape mojo_cape_submit daemon -m production -l 'http://*:8080'
+
+=head1 DESCRIPTION
+
+This script is meant for running locally on a CAPEv2. It allows remote machines to
+to submit files for detonation.
+
+To work, this script needs to be running as the same user as CAPEv2.
+
+This will write activity to syslog.
+
+A systemd service file is provided at 'systemd/mojo_cape_submit.service' in this modules
+tarball. It expects the enviromental '/usr/local/etc/mojo_cape_submit.env' file to be setup
+with the variables 'CAPE_USER' and 'LISTEN_ON'. To lets say you want to listen on
+http://192.168.14.15:8080 with a user of cape, it would be like below.
+
+    CAPE_USER="cape"
+    LISTEN_ON="http://192.168.14.15:8080"
+
+Alternatively, this script can be invoked as a CGI script if it is ran as the user CAPEv2 is.
+
+=head1 CONFIGURATION
+
+If cape_utils has been configured and is working, this just requires two more additional
+bits configured.
+
+The first is the setting 'incoming'. This setting is a directory in which incoming files are
+placed for submission. By default this is '/malware/client-incoming'.
+
+The second is 'incoming_json'. This is a directory the data files for submitted files are written to.
+The name of the file is the task ID with '.json' appended. So task ID '123' would become '123.json'. The
+default directory for this is '/malware/incoming-json'.
+
+=head1 SECURITY
+
+By default this will auth of the remote IP via the setting 'subnets', which by default is
+'192.168.0.0/16,127.0.0.1/8,::1/128,172.16.0.0/12,10.0.0.0/8'. This value is a comma seperated
+string of subnets to accept submissions from.
+
+To enable the use of a API key, it requires setting the value of 'apikey' and setting
+'auth_by_IP_only' to '0'.
+
+=head1 SUBMISSION
+
+Submissions must be made using the post method.
+
+=head2 Submission Parameters
+
+Required ones are as below.
+
+    - filename :: The file being submitted.
+
+The following are optional and more or less "free form",
+but helps to set them to something sane and relevant.
+
+    - type :: The type of submission. Generally going
+              to be 'manual' or 'suricata_extract'.
+
+    - src_host :: The hostname of the sending system.
+
+    - src_ip :: The source IP for what Suricata picked up.
+
+    - src_port :: The source port for what Suricata picked up.
+
+    - dest_ip :: The destination IP for what Suricata picked up.
+
+    - dest_port :: The destination port for what Suricata picked up.
+
+    - proto :: Protocol, such as TCP or UDP.
+
+    - app_proto :: Application protocol, such as HTTP.
+
+    - flow_id  :: The flow ID Suricata picked it up from.
+
+    - http_host :: If HTTP, the host in the URL.
+
+    - http_url :: If HTTP, the path section of the URL.
+
+    - http_method :: If HTTP, the method, such as GET.
+
+    - http_proto :: If HTTP, the protocol version.
+
+    - http_status :: If HTTP, the status code of the session.
+
+    - http_ctype :: If HTTP, the content type.
+
+    - http_ua :: If HTTP, the useragent.
+
+=cut
+
+use Mojolicious::Lite -signatures;
+use Sys::Syslog;
+use JSON;
+use CAPE::Utils;
+use File::Slurp;
+use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
+	sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
+use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u
+	md5_file md5_file_hex md5_file_b64 md5_file_b64u );
+use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_b64u
+	sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
+
+# two are needed as /* and / don't overlap... so pass it to the_stuff to actually handle it
+post '/*' => sub ($c) {
+	the_stuff($c);
+};
+post '/' => sub ($c) {
+	the_stuff($c);
+};
+
+# sends stuff to syslog
+sub log_drek {
+	my ( $level, $message ) = @_;
+
+	if ( !defined($level) ) {
+		$level = 'info';
+	}
+
+	openlog( 'mojo_cape_submit', 'cons,pid', 'daemon' );
+	syslog( $level, '%s', $message );
+	closelog();
+}
+
+# handle it
+sub the_stuff {
+	my $c         = $_[0];
+	my $remote_ip = $c->{tx}{original_remote_address};
+	my $apikey    = $c->param('apikey');
+
+	# log the connection
+	my $message = 'Started. Remote IP: ' . $remote_ip . '  API key: ';
+	if ( defined($apikey) ) {
+		$message = $message . $apikey;
+	}
+	else {
+		$message = $message . 'undef';
+	}
+	log_drek( 'info', $message );
+
+	my $cape_util;
+	eval { $cape_util = CAPE::Utils->new(); };
+	if ($@) {
+		log_drek( 'err', $@ );
+		$c->render( text => "Error... please see syslog\n", status => 400, );
+		return;
+	}
+
+	if ( !-d $cape_util->{config}->{_}->{incoming} ) {
+		log_drek( 'err', 'incoming directory, "' . $cape_util->{config}->{_}->{incoming} . '", does not exist' );
+		$c->render( text => "Error... please see syslog\n", status => 400, );
+		return;
+	}
+
+	my $allow_remote;
+	eval { $allow_remote = $cape_util->check_remote( apikey => $apikey, ip => $remote_ip ); };
+	if ($@) {
+		log_drek( 'err', $@ );
+		$c->render( text => "Error... please see syslog\n", status => 400, );
+		return;
+	}
+	if ( !$allow_remote ) {
+		log_drek( 'info', 'API key or IP not allowed' );
+		$c->render( text => "IP not allowed or invalid API key\n", status => 403, );
+		return;
+	}
+
+	if ( $c->req->is_limit_exceeded ) {
+		log_drek( 'err', 'Log size exceeded' );
+		$c->render( text => 'File is too big.', status => 400 );
+		return;
+	}
+
+	my $file = $c->param('filename');
+	if ( !$file ) {
+		log_drek( 'err', 'No file specified' );
+		$c->render( text => 'No file specified', status => 400 );
+	}
+
+	#get file info and log it
+	my $name = $file->filename;
+	my $size = $file->size;
+	$name =~ s/\///;
+	log_drek( 'info', 'Got File... size=' . $size . ' filename="' . $name . '"' );
+	$name = $cape_util->{config}->{_}->{incoming} . '/' . $name;
+
+	# get all the possible additional info
+	my %additional_info;
+	$additional_info{src_ip}      = $c->param('src_ip');
+	$additional_info{src_port}    = $c->param('src_port');
+	$additional_info{dest_ip}     = $c->param('dest_ip');
+	$additional_info{dest_port}   = $c->param('dest_port');
+	$additional_info{proto}       = $c->param('proto');
+	$additional_info{app_proto}   = $c->param('app_proto');
+	$additional_info{flow_id}     = $c->param('flow_id');
+	$additional_info{http_host}   = $c->param('http_host');
+	$additional_info{http_url}    = $c->param('http_url');
+	$additional_info{http_method} = $c->param('http_method');
+	$additional_info{http_proto}  = $c->param('http_proto');
+	$additional_info{http_status} = $c->param('http_status');
+	$additional_info{http_ctype}  = $c->param('http_ctype');
+	$additional_info{http_ua}     = $c->param('http_ua');
+	$additional_info{type}        = $c->param('type');
+	$additional_info{src_host}    = $c->param('src_host');
+	$additional_info{sending_ip}  = $remote_ip;
+	$additional_info{apikey}      = $apikey;
+	$additional_info{name}        = $name;
+
+	# set the value for anything not defined to undef for the purpose of logging
+	foreach my $item ( keys(%additional_info) ) {
+		if ( !defined( $additional_info{$item} ) ) {
+			$additional_info{$item} = 'undef';
+		}
+	}
+
+	# log additional info
+	log_drek( 'info', 'Source Host: ' . $additional_info{src_host} );
+	log_drek( 'info', 'Submission Type: ' . $additional_info{type} );
+	log_drek( 'info',
+			  'proto='
+			. $additional_info{proto}
+			. ' src_ip='
+			. $additional_info{src_ip}
+			. ' src_port='
+			. $additional_info{src_port}
+			. ' dest_ip='
+			. $additional_info{dest_ip}
+			. ' dest_port='
+			. $additional_info{dest_port}
+			. ' flow_id='
+			. $additional_info{flow_id} );
+	if ( $additional_info{app_proto} eq 'http' ) {
+		log_drek( 'info', $additional_info{http_proto} . ' ' . $additional_info{http_host} );
+		log_drek( 'info',
+			$additional_info{http_method} . ' ' . $additional_info{http_status} . ' ' . $additional_info{http_url} );
+		log_drek( 'info', 'useragent: ' . $additional_info{http_ua} );
+	}
+	else {
+		log_drek( 'info', 'App Proto: ' . $additional_info{app_proto} );
+	}
+
+	# copy it into place
+	$file->move_to($name);
+	$additional_info{sha256} = lc( sha256_file_hex($name) );
+	log_drek( 'info', 'SHA256: ' . $additional_info{sha256} );
+	$additional_info{sha1} = lc( sha1_file_hex($name) );
+	log_drek( 'info', 'SHA1: ' . $additional_info{sha1} );
+	$additional_info{md5} = lc( md5_file_hex($name) );
+	log_drek( 'info', 'MD5: ' . $additional_info{md5} );
+
+	my $results;
+	eval { $results = $cape_util->submit( items => [$name], quiet => 1, ); };
+	if ($@) {
+		log_drek( 'err', $@ );
+		$c->render( text => "Error... please see syslog\n", status => 400, );
+		return;
+	}
+
+	my @submitted = keys( %{$results} );
+	if ( !defined( $submitted[0] ) ) {
+		log_drek( 'err', 'Submitting "' . $name . '" failed' );
+		$c->render( text => "Submission failed\n", status => 400, );
+		return;
+	}
+
+	log_drek( 'err', 'Submitting "' . $name . '" submitted as ' . $results->{ $submitted[0] } );
+	$c->render( text => "Submitted as task ID " . $results->{ $submitted[0] } . "\n", status => 200, );
+
+	if ( !-d $cape_util->{config}->{_}->{incoming_json} ) {
+		log_drek( 'err',
+			'incoming_json directory, "' . $cape_util->{config}->{_}->{incoming_json} . '", does not exist' );
+	}
+	else {
+		my $data_json      = encode_json( \%additional_info ) . "\n";
+		my $data_json_file = $cape_util->{config}->{_}->{incoming_json} . '/' . $results->{ $submitted[0] } . '.json';
+		eval { write_file( $data_json_file, $data_json ); };
+		if ($@) {
+			log_drek( 'err', 'Failed to write submission data JSON out to "' . $data_json_file . '"... ' . $@ );
+		}
+		else {
+			log_drek( 'info', 'Wrote submission data JSON out to "' . $data_json_file . '"' );
+		}
+	}
+
+	return;
+}
+
+app->start;

@@ -90,7 +90,8 @@ sub import {
   strict->import::into($target);
   warnings->import::into($target, FATAL => 'all');
 
-  use 5.010;  # say, state
+  #use 5.010;  # say, state
+  use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
   use 5.018;  # lexical_subs
   feature->import::into($target, qw/lexical_subs say state/);
   warnings->unimport::out_of($target, "experimental::lexical_subs");

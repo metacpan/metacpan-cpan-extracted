@@ -8,13 +8,13 @@ cape_utils - A utility to help with various basic tasks related to CAPEv2.
 
 cape_utils -a submit [B<-c> <config>] [B<--clock> <time>] [B<--timeout> <seconds>] [B<--machine> <machine>]
 [B<--package> <package>] [B<--options> <options>] [B<--tags> <tags>] [B<--enforce_timeout>]
-[B<--unique>] <file/dir> [<file/dir...]
+[B<--unique>] [B<--json>] [B<--quiet>] <file/dir> [<file/dir...]
 
-cape_utils -a running [B<-c> <config>] [B<-C>] [B<-w> <where>]
+cape_utils -a running [B<-c> <config>] [B<-C>] [B<-w> <where>] [B<--json>]
 
-cape_utils -a pending [B<-c> <config>] [B<-C>] [B<-w> <where>]
+cape_utils -a pending [B<-c> <config>] [B<-C>] [B<-w> <where>] [B<--json>]
 
-cape_utils -a tasks [B<-c> <config>] [B<-C>] [B<-w> <where>] [B<--direction> <dir>] [B<--order> <column>]
+cape_utils -a tasks [B<-c> <config>] [B<-C>] [B<-w> <where>] [B<--direction> <dir>] [B<--order> <column>] [B<--json>]
 
 cape_utils -a fail [B<-c> <config>] B<-w> <where>
 
@@ -29,6 +29,10 @@ Default: /usr/local/etc/cape_utils.ini
 =head2 -a <action>
 
 Action to perform.
+
+=head2 --json
+
+For submission or searches, output the results as JSON.
 
 =head1 Action: submit
 
@@ -82,6 +86,10 @@ Force it to run the entire period.
 =head2 --unique
 
 Only submit unique items.
+
+=head2 --quiet
+
+Do not print the output from the submission command.
 
 =head1 Action: running
 
@@ -162,6 +170,8 @@ sub help {
 
 -a <action>  Action to perform.
 
+--json       Output the result of searches or submissions as JSON.
+
 Action Specific Args...
 
 Action: submit
@@ -193,6 +203,7 @@ Action: submit
 
 --unique               Only submit unique items.
 
+--quiet                Do not print the output from the submission command.
 
 Action: running
 
@@ -200,6 +211,8 @@ Action: running
 
 -w <where>             Additional SQL args for use with statement for
                        getting running items.
+
+--json                 Output what is running as JSON.
 
 Action: pending
 
@@ -253,6 +266,7 @@ my $limit;
 my $order;
 my $direction;
 my $pretty;
+my $quiet;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -281,6 +295,7 @@ GetOptions(
 	'direction'       => \$direction,
 	'json'            => \$use_json,
 	'pretty'          => \$pretty,
+	'quiet'           => \$quiet,
 );
 
 if ($version) {
@@ -381,7 +396,10 @@ if ( $action eq 'tasks' ) {
 }
 
 if ( $action eq 'submit' ) {
-	$cape_utils->submit(
+	if ($use_json) {
+		$quiet = 1;
+	}
+	my $results = $cape_utils->submit(
 		items           => \@ARGV,
 		clock           => $clock,
 		timeout         => $timeout,
@@ -392,7 +410,19 @@ if ( $action eq 'submit' ) {
 		tags            => $tags,
 		enforce_timeout => $enforce_timeout,
 		unique          => $unique,
+		quiet           => $quiet,
 	);
+	if ($use_json) {
+		my $j = JSON->new;
+		if ($pretty) {
+			$j->pretty(1);
+		}
+		print $j->encode($results);
+		if ( !$pretty ) {
+			print "\n";
+		}
+	}
+
 	exit 0;
 }
 

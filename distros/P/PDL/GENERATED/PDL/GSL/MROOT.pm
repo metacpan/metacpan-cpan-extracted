@@ -27,20 +27,20 @@ use strict;
 use warnings;
 
 =head1 NAME
-                                                                    
+
 PDL::GSL::MROOT - PDL interface to multidimensional root-finding routines in GSL
-                                                                                
+
 =head1 DESCRIPTION
-       
-This is an interface to the multidimensional root-finding package present in the 
+
+This is an interface to the multidimensional root-finding package present in the
 GNU Scientific Library.
 
 At the moment there is a single function B<gslmroot_fsolver> which provides an interface
-to the algorithms in the GSL library that do not use derivatives.  
+to the algorithms in the GSL library that do not use derivatives.
 
 
-=head1 SYNOPSIS                                      
-            
+=head1 SYNOPSIS
+
    use PDL;
    use PDL::GSL::MROOT;
 
@@ -51,7 +51,7 @@ to the algorithms in the GSL library that do not use derivatives.
   $res = gslmroot_fsolver($init, \&rosenbrock,
                           {Method => 0, EpsAbs => $epsabs});
 
- 
+
   sub rosenbrock{
      my ($x) = @_;
      my $c = 1;
@@ -80,7 +80,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -107,7 +107,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub gslmroot_fsolver {
 	my ($x, $f_vect) = @_;
@@ -123,7 +123,7 @@ sub gslmroot_fsolver {
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gslmroot_fsolver = \&PDL::GSL::MROOT::gslmroot_fsolver;
 #line 130 "MROOT.pm"
@@ -144,9 +144,9 @@ The GSL documentation is online at
 
 =head1 AUTHOR
 
-This file copyright (C) 2006 Andres Jordan <ajordan@eso.org> 
+This file copyright (C) 2006 Andres Jordan <ajordan@eso.org>
 and Simon Casassus <simon@das.uchile.cl>
-All rights reserved. There is no warranty. You are allowed to redistribute this 
+All rights reserved. There is no warranty. You are allowed to redistribute this
 software/documentation under certain conditions. For details, see the file
 COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.

@@ -1,5 +1,10 @@
 Revision history for Devel-MAT
 
+0.51    2023-03-23
+        [BUGFIXES]
+         * Don't crash when loading files that claim non-existent SVs are
+           mortalized
+
 0.50    2023-03-03
         [CHANGES]
          * Improved tree-forming algorithm in `pmat-diff` that produces better

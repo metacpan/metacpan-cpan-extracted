@@ -14,15 +14,16 @@
 ##FIXME: Blessed structures are not formatted because we treat bless(...) as an atom
 
 use strict; use warnings FATAL => 'all'; use utf8;
-use 5.010;  # say, state
+#use 5.010;  # say, state
+use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
 use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs);
 use feature 'lexical_subs'; 
 no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
-our $VERSION = '5.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-03-21'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '5.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-03-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;

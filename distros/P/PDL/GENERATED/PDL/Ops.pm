@@ -84,7 +84,7 @@ $OVERLOADS{'+='} = sub { PDL::plus($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -123,7 +123,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *plus = \&PDL::plus;
 #line 130 "Ops.pm"
@@ -150,7 +150,7 @@ $OVERLOADS{'*='} = sub { PDL::mult($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -189,7 +189,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *mult = \&PDL::mult;
 #line 196 "Ops.pm"
@@ -216,7 +216,7 @@ $OVERLOADS{'-='} = sub { PDL::minus($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -255,7 +255,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *minus = \&PDL::minus;
 #line 262 "Ops.pm"
@@ -282,7 +282,7 @@ $OVERLOADS{'/='} = sub { PDL::divide($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -321,7 +321,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *divide = \&PDL::divide;
 #line 328 "Ops.pm"
@@ -344,7 +344,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -383,7 +383,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *gt = \&PDL::gt;
 #line 390 "Ops.pm"
@@ -406,7 +406,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -445,7 +445,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *lt = \&PDL::lt;
 #line 452 "Ops.pm"
@@ -468,7 +468,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -507,7 +507,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *le = \&PDL::le;
 #line 514 "Ops.pm"
@@ -530,7 +530,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -569,7 +569,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ge = \&PDL::ge;
 #line 576 "Ops.pm"
@@ -592,7 +592,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -631,7 +631,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *eq = \&PDL::eq;
 #line 638 "Ops.pm"
@@ -654,7 +654,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -693,7 +693,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ne = \&PDL::ne;
 #line 700 "Ops.pm"
@@ -720,7 +720,7 @@ $OVERLOADS{'<<='} = sub { PDL::shiftleft($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -759,7 +759,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *shiftleft = \&PDL::shiftleft;
 #line 766 "Ops.pm"
@@ -786,7 +786,7 @@ $OVERLOADS{'>>='} = sub { PDL::shiftright($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -825,7 +825,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *shiftright = \&PDL::shiftright;
 #line 832 "Ops.pm"
@@ -852,7 +852,7 @@ $OVERLOADS{'|='} = sub { PDL::or2($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -891,7 +891,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *or2 = \&PDL::or2;
 #line 898 "Ops.pm"
@@ -918,7 +918,7 @@ $OVERLOADS{'&='} = sub { PDL::and2($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -957,7 +957,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *and2 = \&PDL::and2;
 #line 964 "Ops.pm"
@@ -984,7 +984,7 @@ $OVERLOADS{'^='} = sub { PDL::xor($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1023,7 +1023,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *xor = \&PDL::xor;
 #line 1030 "Ops.pm"
@@ -1037,7 +1037,7 @@ BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1072,7 +1072,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *bitnot = \&PDL::bitnot;
 #line 1079 "Ops.pm"
@@ -1099,7 +1099,7 @@ $OVERLOADS{'**='} = sub { PDL::power($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1138,7 +1138,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *power = \&PDL::power;
 #line 1145 "Ops.pm"
@@ -1161,7 +1161,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1200,7 +1200,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *atan2 = \&PDL::atan2;
 #line 1207 "Ops.pm"
@@ -1227,7 +1227,7 @@ $OVERLOADS{'%='} = sub { PDL::modulo($_[0], $_[1], $_[0], 0); $_[0] };
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1266,7 +1266,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *modulo = \&PDL::modulo;
 #line 1273 "Ops.pm"
@@ -1289,7 +1289,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1328,7 +1328,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *spaceship = \&PDL::spaceship;
 #line 1335 "Ops.pm"
@@ -1342,7 +1342,7 @@ BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1377,7 +1377,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sqrt = \&PDL::sqrt;
 #line 1384 "Ops.pm"
@@ -1391,7 +1391,7 @@ BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1426,7 +1426,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *sin = \&PDL::sin;
 #line 1433 "Ops.pm"
@@ -1440,7 +1440,7 @@ BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1475,7 +1475,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *cos = \&PDL::cos;
 #line 1482 "Ops.pm"
@@ -1489,7 +1489,7 @@ BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1524,7 +1524,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *not = \&PDL::not;
 #line 1531 "Ops.pm"
@@ -1538,7 +1538,7 @@ BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1573,7 +1573,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *exp = \&PDL::exp;
 #line 1580 "Ops.pm"
@@ -1587,7 +1587,7 @@ BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1622,14 +1622,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *log = \&PDL::log;
 #line 1629 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1641,7 +1641,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Returns the real part of a complex number.
+Returns the real part of a complex number. Flows data back & forth.
 
 =for bad
 
@@ -1654,14 +1654,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *re = \&PDL::re;
 #line 1661 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1673,7 +1673,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Returns the imaginary part of a complex number.
+Returns the imaginary part of a complex number. Flows data back & forth.
 
 =for bad
 
@@ -1686,14 +1686,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *im = \&PDL::im;
 #line 1693 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1718,17 +1718,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 #line 1723 "Ops.pm"
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 #line 1728 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1763,7 +1763,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 959 "../../blib/lib/PDL/PP.pm"
 
 
 sub PDL::log10 {
@@ -1786,14 +1786,14 @@ sub PDL::log10 {
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *log10 = \&PDL::log10;
 #line 1793 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1818,14 +1818,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *assgn = \&PDL::assgn;
 #line 1825 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1850,14 +1850,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *carg = \&PDL::carg;
 #line 1857 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1882,14 +1882,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *conj = \&PDL::conj;
 #line 1889 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1915,14 +1915,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *czip = \&PDL::czip;
 #line 1922 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1960,14 +1960,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *ipow = \&PDL::ipow;
 #line 1967 "Ops.pm"
 
 
 
-#line 567 "ops.pd"
+#line 568 "ops.pd"
 
 
 =head2 abs
@@ -1983,14 +1983,14 @@ sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
 
 
-#line 579 "ops.pd"
+#line 580 "ops.pd"
 
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
 #line 1990 "Ops.pm"
 
 
 
-#line 581 "ops.pd"
+#line 582 "ops.pd"
 
 
 =head2 abs2
@@ -2006,7 +2006,7 @@ sub PDL::abs2 ($) { my $r = &PDL::abs; $r * $r }
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2031,7 +2031,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 959 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::r2C ($) {
   return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
@@ -2043,14 +2043,14 @@ sub PDL::r2C ($) {
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *r2C = \&PDL::r2C;
 #line 2050 "Ops.pm"
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 958 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2075,7 +2075,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 959 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::i2C ($) {
   return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
@@ -2087,14 +2087,14 @@ sub PDL::i2C ($) {
 
 
 
-#line 951 "../../blib/lib/PDL/PP.pm"
+#line 960 "../../blib/lib/PDL/PP.pm"
 
 *i2C = \&PDL::i2C;
 #line 2094 "Ops.pm"
 
 
 
-#line 624 "ops.pd"
+#line 625 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {

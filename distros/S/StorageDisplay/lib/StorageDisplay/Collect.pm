@@ -9,11 +9,16 @@
 use strict;
 use warnings;
 
+# Implementation note: this file must contains all required modules
+# required to collect data, but modules included in perl itself.
+# This file can be sent to remote machine through SSH, this is why
+# it must be self-contained.
+
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data.
 # No dependencies (but perl itself and its basic modules)
 
-our $VERSION = '1.2.1'; # VERSION
+our $VERSION = '1.2.4'; # VERSION
 
 
 sub collectors {
@@ -297,7 +302,7 @@ sub decode_json {
     $json_parser->decode(@_);
 }
 
-sub use_pp_parser {
+sub pp_parser_has_boolean_values {
     return $has_boolean_values;
 }
 
@@ -1879,9 +1884,10 @@ StorageDisplay::Collect - modules required to collect data.
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.4
 
-Main class, allows one to register collectors and run them (through the collect method)
+Main class, allows one to register collectors and run them
+(through the collect method)
 
 Collectors will be registered when their class is loaded
 

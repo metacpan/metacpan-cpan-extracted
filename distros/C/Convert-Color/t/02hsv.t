@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Convert::Color::HSV;
 
@@ -15,7 +15,7 @@ is( $red->value,        1, 'red value' );
 
 is( $red->chroma,       1, 'red chroma' );
 
-is_deeply( [ $red->hsv ], [ 0, 1, 1 ], 'red hsv' );
+is( [ $red->hsv ], [ 0, 1, 1 ], 'red hsv' );
 
 my $green = Convert::Color::HSV->new( 120, 1, 1 );
 
@@ -25,7 +25,7 @@ is( $green->value,        1, 'green value' );
 
 is( $green->chroma,       1, 'green chroma' );
 
-is_deeply( [ $green->hsv ], [ 120, 1, 1 ], 'green hsv' );
+is( [ $green->hsv ], [ 120, 1, 1 ], 'green hsv' );
 
 my $blue = Convert::Color::HSV->new( 240, 1, 1 );
 
@@ -35,7 +35,7 @@ is( $blue->value,        1, 'blue value' );
 
 is( $blue->chroma,       1, 'blue chroma' );
 
-is_deeply( [ $blue->hsv ], [ 240, 1, 1 ], 'blue hsv' );
+is( [ $blue->hsv ], [ 240, 1, 1 ], 'blue hsv' );
 
 my $yellow = Convert::Color::HSV->new( '60,1,1' );
 
@@ -45,7 +45,7 @@ is( $yellow->value,        1, 'yellow value' );
 
 is( $yellow->chroma,       1, 'yellow chroma' );
 
-is_deeply( [ $yellow->hsv ], [ 60, 1, 1 ], 'yellow hsv' );
+is( [ $yellow->hsv ], [ 60, 1, 1 ], 'yellow hsv' );
 
 # "black" is anything at value 0
 my $black = Convert::Color::HSV->new( '0,1,0' );

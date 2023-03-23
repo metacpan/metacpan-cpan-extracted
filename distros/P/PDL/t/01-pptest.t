@@ -259,6 +259,39 @@ pp_deft('output_op2',
     ANYVAL_FROM_CTYPE($COMP(v1), dt, $in(n=>1));
   ',
 );
+pp_deft('output_op3',
+  Pars => 'in(n=2); [o] out()',
+  OtherPars => '[o] PDL_Anyval v0; [o] PDL_Anyval v1',
+  Code => '
+    pdl_datatypes dt = $PDL(in)->datatype;
+    ANYVAL_FROM_CTYPE($COMP(v0), dt, $in(n=>0));
+    ANYVAL_FROM_CTYPE($COMP(v1), dt, $in(n=>1));
+  ',
+  PMCode => 'sub PDL::test_output_op3 { goto &PDL::_test_output_op3_int }',
+);
+
+pp_addhdr('
+typedef NV NV_ADD1;
+');
+pp_add_typemaps(string=><<'EOT');
+TYPEMAP: <<END_OF_TYPEMAP
+TYPEMAP
+NV_ADD1 T_NV_ADD1
+
+INPUT
+T_NV_ADD1
+  $var = SvNV($arg) + 1;
+
+OUTPUT
+T_NV_ADD1
+  sv_setnv($arg, $var - 1);
+END_OF_TYPEMAP
+EOT
+pp_deft('typem',
+  Pars => 'int [o] out()',
+  OtherPars => '[o] NV_ADD1 v1',
+  Code => '$out() = $COMP(v1); $COMP(v1) = 8;',
+);
 
 pp_done;
 
@@ -396,6 +429,13 @@ test_output_op2([5,7], my $v0_2, my $v1_2);
 is_deeply [$v0_2,$v1_2], [5,7], 'output OtherPars work 2';
 eval { test_output_op2(sequence(2,3), my $v0_2, my $v1_2) };
 isnt $@, '', 'broadcast with output OtherPars throws 2';
+
+test_output_op3([5,7], my $out3 = PDL->null, my $v0_3, my $v1_3);
+is_deeply [$v0_3,$v1_3], [5,7], 'output OtherPars work 3' or diag "got: ",$v0_3," ",$v1_3;
+
+my $o = test_typem(my $oth = 3);
+is "$o", 4;
+is "$oth", 7;
 
 done_testing;
 EOF

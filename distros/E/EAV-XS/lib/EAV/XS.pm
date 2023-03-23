@@ -122,7 +122,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = "0.7.5";
+our $VERSION = "0.7.6";
 
 require XSLoader;
 XSLoader::load('EAV::XS', $VERSION);
@@ -284,14 +284,14 @@ by B<is_email()> method.
 
 $lpart = B<get_lpart> ()
 
-Returns local-part of the email B<after> the B<is_email> method call.
+Returns local-part of the email I<after> the B<is_email> method call.
 If the email address is invalid, then B<get_lpart> returns nothing.
 
 =item *
 
 $domain = B<get_domain> ()
 
-Returns domain-part of the email B<after> the B<is_email> method call.
+Returns domain-part of the email I<after> the B<is_email> method call.
 If the email address is invalid, then B<get_domain> returns nothing.
 The returned value $domain could be an IPv4 address either IPv6 one,
 depending on the specified email address passed to B<is_email> ().
@@ -301,7 +301,7 @@ depending on the specified email address passed to B<is_email> ().
 $bool = B<get_is_ipv4> ()
 
 Returns whether or not the domain-part of the email contains an IPv4
-address, B<after> the B<is_email> method call.
+address, I<after> the B<is_email> method call.
 If the email address is invalid, then B<get_is_ipv4> returns false.
 
 =item *
@@ -309,7 +309,7 @@ If the email address is invalid, then B<get_is_ipv4> returns false.
 $bool = B<get_is_ipv6> ()
 
 Returns whether or not the domain-part of the email contains an IPv6
-address, B<after> the B<is_email> method call.
+address, I<after> the B<is_email> method call.
 If the email address is invalid, then B<get_is_ipv6> returns false.
 
 =item *
@@ -317,8 +317,24 @@ If the email address is invalid, then B<get_is_ipv6> returns false.
 $bool = B<get_is_domain> ()
 
 Returns whether or not the domain-part of the email contains an domain
-name, B<after> the B<is_email> method call.
+name, I<after> the B<is_email> method call.
 If the email address is invalid, then B<get_is_domain> returns false.
+
+=item *
+
+$tld_type = B<get_tld_type> ()
+
+Returns TLD type of the email I<after> the B<is_email> method call.
+If the email address is invalid or an error has been occured,
+then B<get_tld_type> returns the C<EAV::XS::TLD_INVALID> value.
+
+The TLD type is a value that you pass as the C<allow_tld> option
+to B<new> method. For instance, you may compare the return value
+of the B<get_tld_type> method with the value
+C<EAV::XS::TLD_GENERIC_RESTRICTED>.
+
+The list of TLD types may be found in the L</"TLD INFORMATION">
+section.
 
 =back
 
@@ -338,7 +354,7 @@ as "Not assigned" in the "TLD Manager" field.
 
 =item *
 
-TLD_COUNTRY_CODE - allow county-code TLDs.
+TLD_COUNTRY_CODE - allow country-code TLDs.
 
 =item *
 

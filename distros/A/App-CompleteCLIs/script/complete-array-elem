@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Util/complete_array_elem
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.151'; # VERSION
+our $VERSION = '0.152'; # VERSION
 
 # code_before_instantiate_cmdline
 use Complete::Util;
@@ -43,11 +43,15 @@ complete-array-elem - Complete from array
 
 =head1 VERSION
 
-This document describes version 0.151 of complete-array-elem (from Perl distribution App-CompleteCLIs), released on 2022-09-09.
+This document describes version 0.152 of complete-array-elem (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
-B<complete-array-elem> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude>=I<s>|B<--exclude-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--replace-map>=I<s>|B<--replace-map-json>=I<json>] [(B<--summaries>=I<str>)+|B<--summaries-json>=I<json>] -- E<lt>I<word>E<gt> E<lt>I<array>E<gt> ...
+B<complete-array-elem> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<complete-array-elem> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<complete-array-elem> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude|/"--exclude=s">>=I<s>|B<L<--exclude-json|/"--exclude=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--replace-map|/"--replace-map=s">>=I<s>|B<L<--replace-map-json|/"--replace-map=s">>=I<json>] [(B<L<--summaries|/"--summaries=s@">>=I<str>)+|B<L<--summaries-json|/"--summaries=s@">>=I<json>] -- E<lt>I<L<word|/"--word=s*">>E<gt> E<lt>I<L<array|/"--array=s@*">>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -99,6 +103,9 @@ Can also be specified as the 2nd command-line argument and onwards.
 
 =item B<--array>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 2nd command-line argument and onwards.
 
 Can be specified multiple times.
@@ -109,11 +116,17 @@ See C<--exclude>.
 
 =item B<--exclude>=I<s>
 
+(No description)
+
+
 =item B<--summaries-json>=I<s>
 
 See C<--summaries>.
 
 =item B<--summaries>=I<s@>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -324,7 +337,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

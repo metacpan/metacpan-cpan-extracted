@@ -3,10 +3,15 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Number::Delta;
+use Test2::V0;
+use Test2::Tools::Compare;
 
 use Convert::Color::HSL;
+
+use constant {
+   NEAR_SQRT1d25_OVER_2 => Test2::Tools::Compare::float( sqrt(1.25)/2, tolerance => 1e-6 ),
+   NEAR_1_OVER_2        => Test2::Tools::Compare::float( 1/2,          tolerance => 1e-6 ),
+};
 
 my $black = Convert::Color::HSL->new(   0, 1, 0 );
 my $white = Convert::Color::HSL->new(   0, 1, 1 );
@@ -17,11 +22,11 @@ my $blue  = Convert::Color::HSL->new( 240, 1, 0.5 );
 
 is( $black->dst_hsl( $black ), 0, 'black->dst_hsl black' );
 
-delta_ok( $black->dst_hsl( $red   ), sqrt(1.25/4), 'black->dst_hsl red' );
-delta_ok( $black->dst_hsl( $green ), sqrt(1.25/4), 'black->dst_hsl green' );
-delta_ok( $black->dst_hsl( $blue  ), sqrt(1.25/4), 'black->dst_hsl blue' );
+is( $black->dst_hsl( $red   ), NEAR_SQRT1d25_OVER_2, 'black->dst_hsl red' );
+is( $black->dst_hsl( $green ), NEAR_SQRT1d25_OVER_2, 'black->dst_hsl green' );
+is( $black->dst_hsl( $blue  ), NEAR_SQRT1d25_OVER_2, 'black->dst_hsl blue' );
 
-delta_ok( $black->dst_hsl( $white ), 0.5, 'black->dst_hsl white' );
+is( $black->dst_hsl( $white ), NEAR_1_OVER_2, 'black->dst_hsl white' );
 
 is( $red->dst_hsl( $cyan ), 1, 'red->dst_hsl cyan' );
 

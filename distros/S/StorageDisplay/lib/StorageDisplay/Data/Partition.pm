@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Partition;
 # ABSTRACT: Handle partition tables data for StorageDisplay
 
-our $VERSION = '1.2.1'; # VERSION
+our $VERSION = '1.2.4'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -664,7 +664,7 @@ StorageDisplay::Data::Partition - Handle partition tables data for StorageDispla
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.4
 
 =head1 AUTHOR
 

@@ -16,7 +16,7 @@ BEGIN { use_ok( 'Power::Outlet::Virtual' ); }
 }
 
 foreach my $id (1, '123', 'with space', 'with:colon') {
-  my $device = Power::Outlet::Virtual->new(id=>$id);
+  my $device = Power::Outlet::Virtual->new(id=>$id, cycle_duration=>2.5);
   isa_ok ($device, 'Power::Outlet::Virtual');
   is($device->id, $id, 'id');
   local $@;

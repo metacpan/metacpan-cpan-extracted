@@ -1,5 +1,11 @@
 Revision history for CAPE-Utils
 
+0.1.0   2023-03-23/18:15
+        - Add json output to -a submit
+		- submit now returns a hash of submitted files and task IDs
+		- add src_bin/mojo_cape_submit
+		- add src_bin/suricata_extract_submit
+
 0.0.1   2023-03-11/11:00
         - Initial version.
 

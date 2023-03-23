@@ -53,105 +53,105 @@ the copyright notice should be included in the file.
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_spheres = \&PDL::gl_spheres;
 #line 60 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_line_strip_col = \&PDL::gl_line_strip_col;
 #line 67 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_line_strip_nc = \&PDL::gl_line_strip_nc;
 #line 74 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_lines_col = \&PDL::gl_lines_col;
 #line 81 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_lines_nc = \&PDL::gl_lines_nc;
 #line 88 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_points_col = \&PDL::gl_points_col;
 #line 95 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_points_nc = \&PDL::gl_points_nc;
 #line 102 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_texts = \&PDL::gl_texts;
 #line 109 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_triangles_mat = \&PDL::gl_triangles_mat;
 #line 116 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_triangles_n_mat = \&PDL::gl_triangles_n_mat;
 #line 123 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_triangles_wn_mat = \&PDL::gl_triangles_wn_mat;
 #line 130 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_triangles = \&PDL::gl_triangles;
 #line 137 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_triangles_n = \&PDL::gl_triangles_n;
 #line 144 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_triangles_wn = \&PDL::gl_triangles_wn;
 #line 151 "OpenGLQ.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gl_arrows = \&PDL::gl_arrows;
 #line 158 "OpenGLQ.pm"

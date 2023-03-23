@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.27';
+$VERSION = '0.28';
 $VERSION = $VERSION;
 
 use strict;
@@ -1586,6 +1586,9 @@ You can use subroutines by mb.pm-like names.
 However...
 
   --------------------------------------------------
+  mb.pm                     script with
+  modulino                  use UTF8::R2 qw(*mb);
+  --------------------------------------------------
   mb::use Module            use Module              
   mb::no Module             no Module               
   mb::dosglob               glob                    
@@ -2038,7 +2041,7 @@ have to write "mb::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" t
 
 =head1 GIVE US BUG REPORT
 
-I have tested and verified this software using the best of my ability.
+We have tested and verified this software using the best of my ability.
 However, this software containing much regular expression is bound to contain some bugs.
 Thus, if you happen to find a bug that's in this software and not your own program, you can try to reduce it to a minimal test case and then report it to author's address.
 If you have an idea that could make this a more useful tool, please let share it.

@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.28  2023-03-23 00:00:00
+  - add t/8101_mb_package.t
+  - created by INABA Hitoshi
+
 0.27  2023-03-21 00:00:00
   - update POD
   - created by INABA Hitoshi

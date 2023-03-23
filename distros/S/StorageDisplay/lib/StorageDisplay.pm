@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.2.1'; # VERSION
+our $VERSION = '1.2.4'; # VERSION
 
 ## Main object
 
@@ -581,168 +581,6 @@ sub dotNode {
 
 1;
 
-###########################################################################
-###########################################################################
-package StorageDisplay::Collect::CMD::Remote;
-
-# FIXME
-use lib qw(.);
-use StorageDisplay::Collect;
-use Net::OpenSSH;
-use Term::ReadKey;
-END {
-    ReadMode('normal');
-}
-use Moose;
-use MooseX::NonMoose;
-extends 'StorageDisplay::Collect::CMD';
-
-has 'ssh' => (
-    is    => 'ro',
-    isa   => 'Net::OpenSSH',
-    required => 1,
-    );
-
-
-sub open_cmd_pipe {
-    my $self = shift;
-    my $ssh = $self->ssh;
-    my @cmd = @_;
-    print STDERR "[SSH]Running: ", join(' ', @cmd), "\n";
-    my ($dh, $pid) = $ssh->pipe_out(@cmd) or
-    die "pipe_out method failed: " . $ssh->error." for '".join("' '", @cmd)."'\n";
-    return $dh;
-}
-
-sub open_cmd_pipe_root {
-    my $self = shift;
-    my @cmd = (qw(sudo -S -p), 'sudo password:'."\n", '--', @_);
-    ReadMode('noecho');
-    my $dh = $self->open_cmd_pipe(@cmd);
-    my $c = ord($dh->getc);
-    $dh->ungetc($c);
-    ReadMode('normal');
-    return $dh;
-}
-
-around BUILDARGS => sub {
-    my $orig  = shift;
-    my $class = shift;
-    my $remote = shift;
-
-    my $ssh = Net::OpenSSH->new($remote);
-    $ssh->error and
-    die "Couldn't establish SSH connection: ". $ssh->error;
-
-    return $class->$orig(
-        'ssh' => $ssh,
-        );
-};
-
-1;
-
-###########################################################################
-package StorageDisplay::Collect::CMD::Replay;
-
-use parent -norequire => "StorageDisplay::Collect::CMD";
-use Scalar::Util 'blessed';
-use Data::Dumper;
-use Data::Compare;
-
-sub new {
-    my $class = shift;
-    my %args = ( @_ );
-    if (not exists($args{'replay-data'})) {
-        die 'replay-data argument required';
-    }
-    my $self = $class->SUPER::new(@_);
-    $self->{'_attr_replay_data'} = $args{'replay-data'};
-    $self->{'_attr_replay_data_nextid'}=0;
-    return $self;
-}
-
-sub _replay {
-    my $self = shift;
-    my $args = shift;
-    my $ignore_keys = shift;
-    my $msgerr = shift;
-
-    my $entry = $self->{'_attr_replay_data'}->[$self->{'_attr_replay_data_nextid'}++];
-    if (not defined($entry)) {
-        print STDERR "E: no record for $msgerr\n";
-        die "No records anymore\n";
-    }
-    foreach my $k (keys %{$args}) {
-        if (not exists($entry->{$k})) {
-            print STDERR "E: no record for $msgerr\n";
-            die "Missing '$k' in record:\n".Data::Dumper->Dump([$entry], ['record'])."\n";
-        }
-    }
-    if (! Compare($entry, $args, { ignore_hash_keys => $ignore_keys })) {
-        print STDERR "E: record for different arguments\n";
-        foreach my $k (@{$ignore_keys}) {
-            delete($entry->{$k});
-        }
-        die "Bad record:\n".
-            Data::Dumper->Dump([$args, $entry], ['requested', 'recorded'])."\n";
-    }
-    return $entry;
-}
-
-sub _replay_cmd {
-    my $self = shift;
-    my $args = { @_ };
-    my $cmd = $self->_replay(
-        $args,
-        ['stdout', 'root'],
-        "command ".$self->cmd2str(@{$args->{'cmd'}}),
-        );
-    my $cmdrequested = $self->cmd2str(@{$args->{'cmd'}});
-    if ($args->{'root'} != $cmd->{'root'}) {
-        print STDERR "W: Root mode different for $cmdrequested\n";
-    }
-    print STDERR "Replaying".($cmd->{'root'}?' (as root)':'')
-        .": ", $cmdrequested, "\n";
-    my @infos = @{$cmd->{'stdout'}};
-    my $infos = join("\n", @infos);
-    if (scalar(@infos)) {
-        # will add final endline
-        $infos .= "\n";
-    }
-    open(my $fh, "<",  \$infos);
-    return $fh;
-}
-
-sub open_cmd_pipe {
-    my $self = shift;
-    return $self->_replay_cmd(
-        'root' => 0,
-        'cmd' => [ @_ ],
-        );
-}
-
-sub open_cmd_pipe_root {
-    my $self = shift;
-    return $self->_replay_cmd(
-        'root' => 1,
-        'cmd' => [ @_ ],
-        );
-}
-
-sub has_file {
-    my $self = shift;
-    my $filename = shift;
-    my $fileaccess = $self->_replay(
-        {
-            'filename' => $filename,
-        },
-        [ 'value' ],
-        "file access check to '$filename'");
-    return $fileaccess->{'value'};
-}
-
-1;
-
 __END__
 
 =pod
@@ -755,9 +593,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.2.1
-
-Replay commands
+version 1.2.4
 
 =head1 AUTHOR
 

@@ -3,14 +3,15 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Convert::Color::RGB' );
-use_ok( 'Convert::Color::RGB8' );
-use_ok( 'Convert::Color::RGB16' );
-use_ok( 'Convert::Color::HSV' );
-use_ok( 'Convert::Color::HSL' );
-use_ok( 'Convert::Color::CMY' );
-use_ok( 'Convert::Color::CMYK' );
+require Convert::Color::RGB;
+require Convert::Color::RGB8;
+require Convert::Color::RGB16;
+require Convert::Color::HSV;
+require Convert::Color::HSL;
+require Convert::Color::CMY;
+require Convert::Color::CMYK;
 
+pass "Modules loaded";
 done_testing;

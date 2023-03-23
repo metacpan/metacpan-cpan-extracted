@@ -1,3 +1,20 @@
+2.082 2023-03-22
+- no changes from 2.081_03
+
+2.081_03 2023-03-20
+- allow OtherPars to set index-size of not-otherwise-used index
+- fix nested loop() bug for Pars with e.g. (n,n)
+
+2.081_02 2023-03-14
+- add pp_add_typemaps
+
+2.081_01 2023-02-27
+- drop erroneous Test::Deep dependency
+- fix `(my $tmp = $pa->inplace) += 1`
+- fix [o] OtherPars to work if PMCode
+- fix MatrixOps::det returning Perl 0 for some singular - thanks @wlmb for report
+- fix intersect bug (#419) - thanks @jo-37 for report
+
 2.081 2022-10-25
 - no changes from 2.080_02
 

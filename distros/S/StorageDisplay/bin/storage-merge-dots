@@ -14,7 +14,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.2.1'; # VERSION
+
+our $VERSION = '1.2.4'; # VERSION
 
 
 use StorageDisplay;
@@ -118,18 +119,21 @@ sub collect_from_remote {
 }
 
 use Getopt::Long;
+use Pod::Usage;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Purity = 1;
 
 my $help;
+my $man;
 my $verbose;
 my $vmnames={};
 
-GetOptions ("v|verbose+"        => \$verbose,     # flag
+GetOptions ("v|verbose+"      => \$verbose,     # flag
             "h|help"          => \$help,     # flag
+            "man"             => \$man,     # flag
 	    "vm=s"            => $vmnames,
-    ) or die("Error in command line arguments\n");
+    ) or pod2usage(2);
 
 my $dotfiles;
 
@@ -309,10 +313,8 @@ sub handle_dotfile {
 }
 
 sub main() {
-    if (defined($help)) {
-        print "TODO: write help\n";
-        exit(0);
-    }
+    pod2usage(-exitval => 0, -verbose => 1) if $help;
+    pod2usage(-exitval => 0, -verbose => 2) if $man;
 
     foreach my $dotfilename (@ARGV) {
 	print_info "handling $dotfilename";
@@ -361,7 +363,35 @@ storage-merge-dots - merge dot files created by storage2dot, adding inter links 
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.4
+
+=head1 SYNOPSIS
+
+B<storage-merge-dots [OPTIONS] DOTFILES...>
+
+  Options:
+    --vm VMNAME=HOSTNAME  associate vmname and hostname
+    --help|-h             brief documentation
+    --man                 full documentation
+
+This program can be used to merge several DOT files created by
+B<storage2dot> and produce (on stdout) a new DOT file with all the
+machine storage states. If DOT files contains a host and a virtual
+machine storage state, then they should be linked toguether in the
+generated DOT file.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--vm VMNAME=HOSTNAME>
+
+Use this option (possibly several times) in order to associate the
+B<VMNAME> virtual machine name on the host to the B<HOSTNAME> hostname
+of the virtual machine. By default, this program considers both are
+the same.
+
+=back
 
 =head1 AUTHOR
 

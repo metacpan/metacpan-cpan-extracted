@@ -9,7 +9,6 @@ build_requires:
   File::Path: '0'
   IPC::Cmd: '0.72'
   Pod::Select: '0'
-  Test::Deep: '0'
   Test::Exception: '0'
   Test::Warn: '0'
 configure_requires:
@@ -57,5 +56,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.081'
+version: '2.082'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

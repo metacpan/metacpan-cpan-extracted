@@ -3,7 +3,7 @@
 #
 package PDL::Image2D;
 
-our @EXPORT_OK = qw( conv2d med2d med2df box2d patch2d patchbad2d max2d_ind centroid2d crop cc8compt cc4compt ccNcompt polyfill pnpoly polyfillv rotnewsz rot2d bilin2d rescale2d fitwarp2d applywarp2d warp2d warp2d_kernel warp2d_kernel );
+our @EXPORT_OK = qw( conv2d med2d med2df box2d patch2d patchbad2d max2d_ind centroid2d crop cc8compt cc4compt ccNcompt polyfill pnpoly polyfillv rotnewsz rot2d bilin2d rescale2d fitwarp2d applywarp2d warp2d warp2d_kernel );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -44,7 +44,9 @@ of anywhere else to put them.
 use PDL;  # ensure qsort routine available
 use PDL::Math;
 use Carp;
-#line 48 "Image2D.pm"
+
+my %boundary2value = (Reflect=>1, Truncate=>2, Replicate=>3);
+#line 50 "Image2D.pm"
 
 
 
@@ -58,22 +60,22 @@ use Carp;
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 63 "Image2D.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 65 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 68 "Image2D.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 70 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-#line 73 "Image2D.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 75 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -81,14 +83,14 @@ use Carp;
 
 =for sig
 
-  Signature: (a(m,n); kern(p,q); [o]b(m,n); int opt)
+  Signature: (a(m,n); kern(p,q); [o]b(m,n); indx [t]mapi(isize); indx [t]mapj(jsize); int opt)
 
 =for ref
 
 2D convolution of an array with a kernel (smoothing)
 
 For large kernels, using a FFT routine,
-such as L<fftconvolve()|PDL::FFT/fftconvolve()> in C<PDL::FFT>,
+such as L<PDL::FFT/fftconvolve>,
 will be quicker.
 
 =for usage
@@ -116,11 +118,11 @@ will be quicker.
 Unlike the FFT routines, conv2d is able to process bad values.
 
 =cut
-#line 120 "Image2D.pm"
+#line 122 "Image2D.pm"
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 sub PDL::conv2d {
@@ -130,24 +132,22 @@ sub PDL::conv2d {
    my($x,$kern) = @_;
    my $c = $#_ == 2 ? $_[2] : $x->nullcreate;
    PDL::_conv2d_int($x,$kern,$c,
-	(!(defined $opt && exists $$opt{Boundary}))?0:
-	(($$opt{Boundary} eq "Reflect") +
-	2*($$opt{Boundary} eq "Truncate") +
-	3*($$opt{Boundary} eq "Replicate")));
+	(!($opt && exists $$opt{Boundary}))?0:$boundary2value{$$opt{Boundary}}
+	);
    return $c;
 }
 #line 140 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *conv2d = \&PDL::conv2d;
 #line 147 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -155,7 +155,7 @@ sub PDL::conv2d {
 
 =for sig
 
-  Signature: (a(m,n); kern(p,q); [o]b(m,n); double+ [t]tmp(pq); int opt)
+  Signature: (a(m,n); kern(p,q); [o]b(m,n); double+ [t]tmp(pq); indx [t]mapi(isize); indx [t]mapj(jsize); int opt)
 
 =for ref
 
@@ -194,7 +194,7 @@ kernel are bad, the output is set bad.
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::med2d {
    my $opt; $opt = pop @_ if ref($_[$#_]) eq 'HASH';
@@ -205,24 +205,22 @@ sub PDL::med2d {
        if all( $kern <= 0 );
    my $c = $#_ == 2 ? $_[2] : $x->nullcreate;
    PDL::_med2d_int($x,$kern,$c,
-	(!(defined $opt && exists $$opt{Boundary}))?0:
-	(($$opt{Boundary} eq "Reflect") +
-	2*($$opt{Boundary} eq "Truncate") +
-	3*($$opt{Boundary} eq "Replicate")));
+	(!($opt && exists $$opt{Boundary}))?0:$boundary2value{$$opt{Boundary}}
+   );
    return $c;
 }
-#line 215 "Image2D.pm"
+#line 213 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *med2d = \&PDL::med2d;
-#line 222 "Image2D.pm"
+#line 220 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -230,7 +228,7 @@ sub PDL::med2d {
 
 =for sig
 
-  Signature: (a(m,n); [o]b(m,n); int __p_size; int __q_size; int opt)
+  Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize); indx [t]mapj(jsize); int p_size=>p; int q_size=>q; int opt)
 
 
 =for ref
@@ -267,11 +265,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 271 "Image2D.pm"
+#line 269 "Image2D.pm"
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::med2df {
    my $opt; $opt = pop @_ if ref($_[$#_]) eq 'HASH';
@@ -282,24 +280,22 @@ sub PDL::med2df {
        if $p == 0 && $q == 0;
    my $c = $#_ == 3 ? $_[3] : $x->nullcreate;
    &PDL::_med2df_int($x,$c,$p,$q,
-	(!(defined $opt && exists $$opt{Boundary}))?0:
-	(($$opt{Boundary} eq "Reflect") +
-	2*($$opt{Boundary} eq "Truncate") +
-	3*($$opt{Boundary} eq "Replicate")));
+	(!($opt && exists $$opt{Boundary}))?0:$boundary2value{$$opt{Boundary}}
+   );
    return $c;
 }
-#line 292 "Image2D.pm"
+#line 288 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *med2df = \&PDL::med2df;
-#line 299 "Image2D.pm"
+#line 295 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -338,18 +334,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 342 "Image2D.pm"
+#line 338 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *box2d = \&PDL::box2d;
-#line 349 "Image2D.pm"
+#line 345 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -380,18 +376,18 @@ copied across.
 This routine does not handle bad values - use L</patchbad2d> instead
 
 =cut
-#line 384 "Image2D.pm"
+#line 380 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *patch2d = \&PDL::patch2d;
-#line 391 "Image2D.pm"
+#line 387 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -421,18 +417,18 @@ patchbad2d handles bad values. The output ndarray I<may> contain
 bad values, depending on the pattern of bad values in the input ndarray.
 
 =cut
-#line 425 "Image2D.pm"
+#line 421 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *patchbad2d = \&PDL::patchbad2d;
-#line 432 "Image2D.pm"
+#line 428 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -447,7 +443,7 @@ bad values, depending on the pattern of bad values in the input ndarray.
 
 Return value/position of maximum value in 2D image
 
-Contributed by Tim Jeness
+Contributed by Tim Jenness
 
 
 
@@ -459,18 +455,18 @@ are bad then the output is set bad.
 
 
 =cut
-#line 463 "Image2D.pm"
+#line 459 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *max2d_ind = \&PDL::max2d_ind;
-#line 470 "Image2D.pm"
+#line 466 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -497,18 +493,18 @@ something with negatives in...) then the output values are set bad.
 
 
 =cut
-#line 501 "Image2D.pm"
+#line 497 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *centroid2d = \&PDL::centroid2d;
-#line 508 "Image2D.pm"
+#line 504 "Image2D.pm"
 
 
 
-#line 803 "image2d.pd"
+#line 798 "image2d.pd"
 
 =head2 crop
 
@@ -536,11 +532,11 @@ sub PDL::crop {
   my ($y1, $y2) = $out->minmaximum;
   $x1->cat($x2, $y1, $y2)->mv(-1,0);
 }
-#line 540 "Image2D.pm"
+#line 536 "Image2D.pm"
 
 
 
-#line 833 "image2d.pd"
+#line 828 "image2d.pd"
 
 
 =head2 cc8compt
@@ -584,11 +580,11 @@ sub PDL::cc4compt{
 return ccNcompt(shift,4);
 }
 *cc4compt = \&PDL::cc4compt;
-#line 588 "Image2D.pm"
+#line 584 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -627,18 +623,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 631 "Image2D.pm"
+#line 627 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ccNcompt = \&PDL::ccNcompt;
-#line 638 "Image2D.pm"
+#line 634 "Image2D.pm"
 
 
 
-#line 1002 "image2d.pd"
+#line 997 "image2d.pd"
 
 =head2 polyfill
 
@@ -692,11 +688,11 @@ sub PDL::polyfill {
 }
 
 *polyfill = \&PDL::polyfill;
-#line 696 "Image2D.pm"
+#line 692 "Image2D.pm"
 
 
 
-#line 1059 "image2d.pd"
+#line 1054 "image2d.pd"
 
 
 =head2 pnpoly
@@ -776,11 +772,11 @@ sub PDL::pnpoly {
 }
 
 *pnpoly = \&PDL::pnpoly;
-#line 780 "Image2D.pm"
+#line 776 "Image2D.pm"
 
 
 
-#line 1142 "image2d.pd"
+#line 1137 "image2d.pd"
 
 
 =head2 polyfillv
@@ -833,11 +829,11 @@ sub PDL::polyfillv :lvalue {
 	return $im->where($msk);
 }
 *polyfillv = \&PDL::polyfillv;
-#line 837 "Image2D.pm"
+#line 833 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -883,18 +879,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 887 "Image2D.pm"
+#line 883 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rot2d = \&PDL::rot2d;
-#line 894 "Image2D.pm"
+#line 890 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -920,18 +916,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 924 "Image2D.pm"
+#line 920 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *bilin2d = \&PDL::bilin2d;
-#line 931 "Image2D.pm"
+#line 927 "Image2D.pm"
 
 
 
-#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -962,18 +958,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 966 "Image2D.pm"
+#line 962 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *rescale2d = \&PDL::rescale2d;
-#line 973 "Image2D.pm"
+#line 969 "Image2D.pm"
 
 
 
-#line 1459 "image2d.pd"
+#line 1454 "image2d.pd"
 
 
 
@@ -1004,7 +1000,7 @@ from the I<output> C<(u,v)> image to the I<input> C<(x,y)> image:
 
 The transformation is returned for the reverse direction (ie
 output to input image) since that is what is required by the
-L<warp2d()|/warp2d> routine.  The L<applywarp2d()|/applywarp2d>
+L</warp2d> routine.  The L</applywarp2d>
 routine can be used to convert a set of C<$u,$v> points given
 C<$px> and C<$py>.
 
@@ -1131,7 +1127,7 @@ Transform a set of points using a 2-D polynomial mapping
 
 Convert a set of points (stored in 1D ndarrays C<$u,$v>)
 to C<$x,$y> using the 2-D polynomial with coefficients stored in C<$px>
-and C<$py>.  See L<fitwarp2d()|/fitwarp2d>
+and C<$py>.  See L</fitwarp2d>
 for more information on the format of C<$px> and C<$py>.
 
 =cut
@@ -1398,18 +1394,19 @@ sub PDL::applywarp2d {
 } # sub: applywarp2d
 
 *applywarp2d = \&PDL::applywarp2d;
-#line 1402 "Image2D.pm"
+#line 1398 "Image2D.pm"
 
 
 
-#line 1894 "image2d.pd"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+
 
 
 =head2 warp2d
 
 =for sig
 
-  Signature: (img(m,n); double px(np,np); double py(np,np); [o] warp(m,n); { options })
+  Signature: (img(m,n); ldouble px(np,np); ldouble py(np,np); [o] warp(m,n); ldouble [t] poly(np); ldouble [t] kernel(ns); char *kernel_type; double noval; int nsamples => ns)
 
 =for ref
 
@@ -1424,7 +1421,7 @@ C<$py> ndarrays to warp the input image C<$img> into the output
 image C<$out>.
 
 The format for the polynomial transformation is described in
-the documentation for the L<fitwarp2d()|/fitwarp2d> routine.
+the documentation for the L</fitwarp2d> routine.
 
 At each point C<x,y>, the closest 16 pixel values are combined
 with an interpolation kernel to calculate the value at C<u,v>.
@@ -1469,7 +1466,7 @@ The options are:
 
 C<KERNEL> is used to specify which interpolation kernel to use
 (to see what these kernels look like, use the
-L<warp2d_kernel()|/warp2d_kernel> routine).
+L</warp2d_kernel> routine).
 The options are:
 
 =over 4
@@ -1519,12 +1516,23 @@ C<a = 0.54>.
 C<NOVAL> gives the value used to indicate that a pixel in the
 output image does not map onto one in the input image.
 
+
+=for bad
+
+warp2d ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
 =cut
+#line 1528 "Image2D.pm"
+
+
+
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 # support routine
 {
     my %warp2d = map { ($_,1) } qw( tanh sinc sinc2 lanczos hamming hann );
-
     # note: convert to lower case
     sub _check_kernel ($$) {
 	my $kernel = lc shift;
@@ -1535,48 +1543,42 @@ output image does not map onto one in the input image.
 	return $kernel;
     }
 }
-#line 1539 "Image2D.pm"
-
-
-
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
-
 
 sub PDL::warp2d {
     my $opts = PDL::Options->new( { KERNEL => "tanh", NOVAL => 0 } );
     $opts->options( pop(@_) ) if ref($_[$#_]) eq "HASH";
-
     die "Usage: warp2d( in(m,n), px(np,np); py(np,np); [o] out(m,n), {Options} )"
 	if $#_<2 || $#_>3;
     my $img = shift;
     my $px  = shift;
     my $py  = shift;
     my $out = $#_ == -1 ? PDL->null() : shift;
-
     # safety checks
     my $copt   = $opts->current();
     my $kernel = _check_kernel( $$copt{KERNEL}, "warp2d" );
-
-    &PDL::_warp2d_int( $img, $px, $py, $out, $kernel, $$copt{NOVAL} );
+    &PDL::_warp2d_int( $img, $px, $py, $out, $kernel, $$copt{NOVAL}, _get_kernel_size() );
     return $out;
 }
-#line 1565 "Image2D.pm"
+#line 1563 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *warp2d = \&PDL::warp2d;
-#line 1572 "Image2D.pm"
+#line 1570 "Image2D.pm"
 
 
 
-#line 2199 "image2d.pd"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
 =head2 warp2d_kernel
+
+=for sig
+
+  Signature: ([o] x(n); [o] k(n); ldouble [t] kernel(n); char *name; PDL_Indx nsize => n)
 
 =for ref
 
@@ -1587,39 +1589,37 @@ Return the specified kernel, as used by L</warp2d>
   ( $x, $k ) = warp2d_kernel( $name )
 
 The valid values for C<$name> are the same as the C<KERNEL> option
-of L<warp2d()|/warp2d>.
+of L</warp2d>.
 
 =for example
 
   line warp2d_kernel( "hamming" );
 
+
+=for bad
+
+warp2d_kernel ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
 =cut
-#line 1598 "Image2D.pm"
+#line 1607 "Image2D.pm"
 
 
 
-#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
-
+#line 959 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 sub PDL::warp2d_kernel ($) {
     my $kernel = _check_kernel( shift, "warp2d_kernel" );
-
-    my $nelem = _get_kernel_size();
-    my $x     = zeroes( $nelem );
-    my $k     = zeroes( $nelem );
-
-    &PDL::_warp2d_kernel_int( $x, $k, $kernel );
+    &PDL::_warp2d_kernel_int( my $x=PDL->null, my $k=PDL->null, $kernel, _get_kernel_size() );
     return ( $x, $k );
-
-#    return _get_kernel( $kernel );
 }
-*warp2d_kernel = \&PDL::warp2d_kernel;
 #line 1619 "Image2D.pm"
 
 
 
-#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *warp2d_kernel = \&PDL::warp2d_kernel;
 #line 1626 "Image2D.pm"
@@ -1628,13 +1628,13 @@ sub PDL::warp2d_kernel ($) {
 
 
 
-#line 30 "image2d.pd"
+#line 31 "image2d.pd"
 
 
 =head1 AUTHORS
 
 Copyright (C) Karl Glazebrook 1997 with additions by Robin Williams
-(rjrw@ast.leeds.ac.uk), Tim Jeness (timj@jach.hawaii.edu),
+(rjrw@ast.leeds.ac.uk), Tim Jenness (timj@jach.hawaii.edu),
 and Doug Burke (burke@ifa.hawaii.edu).
 
 All rights reserved. There is no warranty. You are allowed

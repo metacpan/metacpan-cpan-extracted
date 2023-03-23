@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.50;
+package Devel::MAT::Dumpfile 0.51;
 
 use v5.14;
 use warnings;
@@ -271,7 +271,14 @@ sub load
    if( my $mortalcount = $self->_read_uint ) {
       $self->{mortals_at} = \my @mortals_at;
       push @mortals_at, $self->_read_ptr for 1 .. $mortalcount;
-      $self->sv_at( $_ )->_set_is_mortal for @mortals_at;
+      foreach my $addr ( @mortals_at ) {
+         my $sv = $self->sv_at( $addr );
+         unless( $sv ) {
+            warn sprintf "SV address 0x%x is marked mortal but there is no SV", $addr;
+            next;
+         }
+         $sv->_set_is_mortal;
+      }
       $self->{mortal_floor} = $self->_read_uint;
    }
 

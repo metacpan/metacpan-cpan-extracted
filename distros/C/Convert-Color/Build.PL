@@ -14,8 +14,7 @@ my $build = Module::Build->new(
       'Sub::Util' => '1.40',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Number::Delta' => 0,
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

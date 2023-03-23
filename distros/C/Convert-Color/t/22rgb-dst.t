@@ -3,12 +3,16 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Number::Delta;
+use Test2::V0;
+use Test2::Tools::Compare;
 
 use Convert::Color::RGB;
 use Convert::Color::RGB8;
 use Convert::Color::RGB16;
+
+use constant {
+   NEAR_1_OVER_SQRT3 => Test2::Tools::Compare::float( 1/sqrt(3), tolerance => 1e-6 ),
+};
 
 my $black = Convert::Color::RGB->new( 0, 0, 0 );
 my $white = Convert::Color::RGB->new( 1, 1, 1 );
@@ -18,9 +22,9 @@ my $blue  = Convert::Color::RGB->new( 0, 0, 1 );
 
 is( $black->dst_rgb( $black ), 0, 'black->dst_rgb black' );
 
-delta_ok( $black->dst_rgb( $red   ), 1/sqrt(3), 'black->dst_rgb red' );
-delta_ok( $black->dst_rgb( $green ), 1/sqrt(3), 'black->dst_rgb green' );
-delta_ok( $black->dst_rgb( $blue  ), 1/sqrt(3), 'black->dst_rgb blue' );
+is( $black->dst_rgb( $red   ), NEAR_1_OVER_SQRT3, 'black->dst_rgb red' );
+is( $black->dst_rgb( $green ), NEAR_1_OVER_SQRT3, 'black->dst_rgb green' );
+is( $black->dst_rgb( $blue  ), NEAR_1_OVER_SQRT3, 'black->dst_rgb blue' );
 
 is( $black->dst_rgb( $white ), 1, 'black->dst_rgb white' );
 
@@ -41,9 +45,9 @@ my $blue8  = Convert::Color::RGB8->new(   0,   0, 255 );
 is( $black8->dst_rgb8( $black8 ), 0, 'black8->dst_rgb8 black8' );
 is( $black8->dst_rgb8( $black  ), 0, 'black8->dst_rgb8 black' );
 
-delta_ok( $black8->dst_rgb8( $red8   ), 1/sqrt(3), 'black8->dst_rgb8 red8' );
-delta_ok( $black8->dst_rgb8( $green8 ), 1/sqrt(3), 'black8->dst_rgb8 green8' );
-delta_ok( $black8->dst_rgb8( $blue8  ), 1/sqrt(3), 'black8->dst_rgb8 blue8' );
+is( $black8->dst_rgb8( $red8   ), NEAR_1_OVER_SQRT3, 'black8->dst_rgb8 red8' );
+is( $black8->dst_rgb8( $green8 ), NEAR_1_OVER_SQRT3, 'black8->dst_rgb8 green8' );
+is( $black8->dst_rgb8( $blue8  ), NEAR_1_OVER_SQRT3, 'black8->dst_rgb8 blue8' );
 
 is( $black8->dst_rgb8( $white8 ), 1, 'black8->dst_rgb8 white8' );
 is( $black8->dst_rgb8( $white  ), 1, 'black8->dst_rgb8 white' );
@@ -65,9 +69,9 @@ my $blue16  = Convert::Color::RGB16->new(      0,      0, 0xffff );
 is( $black16->dst_rgb16( $black16 ), 0, 'black16->dst_rgb16 black16' );
 is( $black16->dst_rgb16( $black   ), 0, 'black16->dst_rgb16 black' );
 
-is( $black16->dst_rgb16( $red16   ), 1/sqrt(3), 'black16->dst_rgb16 red16' );
-is( $black16->dst_rgb16( $green16 ), 1/sqrt(3), 'black16->dst_rgb16 green16' );
-is( $black16->dst_rgb16( $blue16  ), 1/sqrt(3), 'black16->dst_rgb16 blue16' );
+is( $black16->dst_rgb16( $red16   ), NEAR_1_OVER_SQRT3, 'black16->dst_rgb16 red16' );
+is( $black16->dst_rgb16( $green16 ), NEAR_1_OVER_SQRT3, 'black16->dst_rgb16 green16' );
+is( $black16->dst_rgb16( $blue16  ), NEAR_1_OVER_SQRT3, 'black16->dst_rgb16 blue16' );
 
 is( $black16->dst_rgb16( $white16 ), 1, 'black16->dst_rgb16 white16' );
 is( $black16->dst_rgb16( $white   ), 1, 'black16->dst_rgb16 white' );

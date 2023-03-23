@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Convert::Color::VGA;
 use Convert::Color::RGB;
@@ -18,7 +18,7 @@ is( $red->blue,  0, 'red blue' );
 is( $red->name,  "red", 'red name' );
 is( $red->index, 1,     'red index' );
 
-is_deeply( [ $red->as_rgb8->rgb8 ], [ 255, 0, 0 ], 'red as_rgb8' );
+is( [ $red->as_rgb8->rgb8 ], [ 255, 0, 0 ], 'red as_rgb8' );
 
 my $green = Convert::Color::VGA->new( 2 );
 
