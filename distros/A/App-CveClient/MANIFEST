@@ -1,0 +1,11 @@
+.perltidyrc
+cve-client
+lib/App/CveClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/cve_schema50.CVE-2022-24903.json
+t/cve_schema50.CVE-2022-24903.txt
+t/cve_schema50.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

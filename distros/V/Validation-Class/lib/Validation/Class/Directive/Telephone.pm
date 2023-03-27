@@ -9,7 +9,7 @@ use base 'Validation::Class::Directive';
 
 use Validation::Class::Util;
 
-our $VERSION = '7.900058'; # VERSION
+our $VERSION = '7.900059'; # VERSION
 
 
 has 'mixin'   => 1;
@@ -49,7 +49,7 @@ Validation::Class::Directive::Telephone - Telephone Directive for Validation Cla
 
 =head1 VERSION
 
-version 7.900058
+version 7.900059
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,62 @@
+{
+   "abstract" : "CLI-based client / toolbox for CVE.org",
+   "author" : [
+      "Haelwenn (lanodan) Monnier <contact+cve-client@hacktivis.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-CveClient",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Std" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "contact+cve-client@hacktivis.me"
+      },
+      "homepage" : "https://hacktivis.me/git/cve-client/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://hacktivis.me/git/cve-client.git/",
+         "web" : "https://hacktivis.me/git/cve-client/"
+      }
+   },
+   "version" : "v1.0.4",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

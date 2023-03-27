@@ -12,7 +12,7 @@ use Scalar::Util ('refaddr');
 use Validation::Class::Util ('prototype_registry');
 use Validation::Class ();
 
-our $VERSION = '7.900058'; # VERSION
+our $VERSION = '7.900059'; # VERSION
 
 
 sub new {
@@ -108,7 +108,7 @@ Validation::Class::Simple - Simple Ad-Hoc Data Validation
 
 =head1 VERSION
 
-version 7.900058
+version 7.900059
 
 =head1 SYNOPSIS
 

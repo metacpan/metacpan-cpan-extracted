@@ -14,7 +14,7 @@ use Exporter ();
 
 use Validation::Class::Prototype;
 
-our $VERSION = '7.900058'; # VERSION
+our $VERSION = '7.900059'; # VERSION
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
@@ -607,7 +607,7 @@ Validation::Class - Powerful Data Validation Framework
 
 =head1 VERSION
 
-version 7.900058
+version 7.900059
 
 =head1 SYNOPSIS
 
@@ -1792,8 +1792,6 @@ Validation::Class does not validate blessed objects. If you need a means for
 validating object types you should use a modern object system like L<Moo>,
 L<Mouse>, or L<Moose>. Alternatively, you could use decoupled object
 validators like L<Type::Tiny>, L<Params::Validate> or L<Specio>.
-
-=back
 
 =head1 AUTHOR
 

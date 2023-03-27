@@ -9,13 +9,13 @@ use base 'Validation::Class::Directive';
 
 use Validation::Class::Util;
 
-our $VERSION = '7.900058'; # VERSION
+our $VERSION = '7.900059'; # VERSION
 
 
 has 'mixin'   => 1;
 has 'field'   => 1;
 has 'multi'   => 1;
-has 'message' => '%s must contain between %s characters';
+has 'message' => '%s must be between %s';
 
 sub validate {
 
@@ -39,9 +39,9 @@ sub validate {
             $min = scalar($min);
             $max = scalar($max);
 
-            my $value = length($param);
+            # warn $min, ',', $max, ',', $param;
 
-            unless ( $value >= $min && $value <= $max ) {
+            unless ( $param >= $min && $param <= $max ) {
 
                 $self->error(@_, "$min-$max");
 
@@ -67,7 +67,7 @@ Validation::Class::Directive::Between - Between Directive for Validation Class F
 
 =head1 VERSION
 
-version 7.900058
+version 7.900059
 
 =head1 SYNOPSIS
 

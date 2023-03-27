@@ -610,3 +610,8 @@ Version 0.21 Mar 2, 2023
 	Updated syntax xHarbour from version 2 to version 6
 	Updated syntax xslt from version 4 to version 10
 	Updated syntax yacas from version 2 to version 5
+
+	Version 0.21 Mar 27 2023
+	Fixed method SuggestSyntax in Syntax::Kamelon
+	Fixed method CreateExtIndex in Syntax::Kamelon::Indexer
+

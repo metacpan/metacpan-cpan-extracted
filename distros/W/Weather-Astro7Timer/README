@@ -1,0 +1,37 @@
+Weather-Astro7Timer
+
+Weather::Astro7Timer - Simple client for the 7Timer.info Weather Forecast service
+
+INSTALLATION
+
+Normally you would expect to use a package manager like cpanm to install as:
+
+    cpanm Weather::Astro7Timer
+
+But to install this module manually, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+CPAN:
+    https://metacpan.org/pod/Weather::Astro7Timer
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Weather::Astro7Timer
+
+Source code and issues on GitHub:
+    https://github.com/dkechag/Weather-Astro7Timer
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2023 by Dimitrios Kechagias.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -11,7 +11,7 @@ use Syntax::Kamelon::Indexer;
 use Module::Load::Conditional qw[can_load];
 use Data::Dumper;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 my @attributes = qw (
 	Alert
@@ -666,16 +666,13 @@ sub StateSet {
 sub SuggestSyntax {
 	my ($self, $file) = @_;
 	my $hsh = $self->{INDEXER}->Extensions;
-	foreach my $key (keys %$hsh) {
-		my $reg = $key;
-		$reg =~ s/\./\\./g;
-		$reg =~ s/\+/\\+/g;
-		$reg =~ s/\*/.*/g;
-		$reg = "$reg\$";
-		if ($file =~ /$reg/) {
-			return $hsh->{$key}->[0]
-		}
+	my $ext;
+	if ($file =~ /(\.[^\.]+)$/) {
+		$ext = $1;
 	}
+	return undef unless defined $ext;
+	my $key = "*$ext";
+	return $hsh->{$key}->[0] if exists $hsh->{$key};
 	return undef;
 }
 

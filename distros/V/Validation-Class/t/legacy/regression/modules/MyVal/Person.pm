@@ -4,7 +4,8 @@ use Validation::Class;
 
 mixin TMP => {
     required => 1,
-    between => '1-255'
+    min_length => 1,
+    max_length => 255,
 };
 
 field name => {

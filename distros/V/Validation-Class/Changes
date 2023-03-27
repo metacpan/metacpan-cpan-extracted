@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2021-06-22 00:00:00 +0000 to present.
+Changes from 2022-03-27 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900058 at 2022-06-22 11:58:15 +0000
+version 7.900059 at 2023-03-27 21:16:00 +0000
 ---------------------------------------------
+
+  Change: 8e4779d9d7127d11626058d1809df691b91dd35a
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2023-03-27 22:16:38 +0000
+
+    Wrong usage of between-directive in test 
+
+  Change: 7efcee6e33044b40a4d83c4423b01a7eda6fba38
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2023-03-27 21:26:57 +0000
+
+    Fix POD error 
+
+  Change: 261609a9971e6fcc12722c59cf12d8fb2f733503
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2023-03-27 20:57:24 +0000
+
+    Fixed the between-directive to actually check the range, not the length
+
+    This fixes rt-114159 (https://rt.cpan.org/Ticket/Display.html?id=114159) 
+
+---------------------------------------------
+version 7.900058 at 2022-06-22 11:59:18 +0000
+---------------------------------------------
+
+  Change: b4a0da93209dcec255df34c614ec4d2597c989f3
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-06-22 13:59:18 +0000
+
+    v7.900058 
 
   Change: b687cf15cb4d82d62c7e76b1f213a81438e20d23
   Author: Christiaan Kras <c.kras@pcc-online.net>
@@ -70,5 +100,5 @@ version 7.900058 at 2022-06-22 11:58:15 +0000
     the base class. 
 
 ===============================================
-Plus 1 release after 2021-06-22 00:00:00 +0000.
+Plus 1 release after 2022-03-27 00:00:00 +0000.
 ===============================================

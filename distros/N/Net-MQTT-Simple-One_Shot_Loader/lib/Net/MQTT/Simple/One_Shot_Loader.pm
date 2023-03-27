@@ -3,7 +3,7 @@ use strict;
 use warnings;
 require Net::MQTT::Simple; #skip import
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -48,7 +48,8 @@ Returns an object representing the first message that matches the subscription t
 }
 
 {
-  package Net::MQTT::Simple;
+  package #hide from CPAN
+    Net::MQTT::Simple;
   use strict;
   use warnings;
   use Time::HiRes qw{};

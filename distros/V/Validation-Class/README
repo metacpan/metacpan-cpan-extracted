@@ -1258,7 +1258,3 @@ POD ERRORS
 
       Unknown directive: =method
 
-    Around line 1182:
-
-      =back without =over
-

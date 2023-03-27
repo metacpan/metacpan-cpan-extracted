@@ -37,10 +37,16 @@ __EOF
 	print keys(%hash);
 }
 
+=head 1 Pod
+
+We are now in POD
+
+=cut
+
 sub blah {
 }
 
 &blah;
 prg("test");
 
-
+1;

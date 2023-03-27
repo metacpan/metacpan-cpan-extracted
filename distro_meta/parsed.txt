@@ -84476,3 +84476,9 @@ K/KU/KUERBIS/Term-TablePrint-0.157.tar.gz
 Z/ZE/ZEFRAM/Time-OlsonTZ-Data-0.202302.tar.gz
 H/HA/HANJE/Tk-ColorEntry-0.02.tar.gz
 B/BI/BINARY/WWW-OneAll-0.03.tar.gz
+L/LA/LANODAN/App-CveClient-1.0.4-1.tar.gz
+G/GE/GENE/MIDI-Drummer-Tiny-0.4201.tar.gz
+M/MR/MRDVT/Net-MQTT-Simple-One_Shot_Loader-0.03.tar.gz
+H/HA/HANJE/Syntax-Kamelon-0.22.tar.gz
+C/CK/CKRAS/Validation-Class-7.900059.tar.gz
+D/DK/DKECHAG/Weather-Astro7Timer-0.1.tar.gz

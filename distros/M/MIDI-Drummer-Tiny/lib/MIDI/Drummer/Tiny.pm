@@ -3,14 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4103';
+our $VERSION = '0.4201';
 
+use Moo;
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::Util qw(sum0);
 use Math::Bezier ();
-use MIDI::Util qw(dura_size reverse_dump set_chan_patch set_time_signature);
-use Moo;
+use MIDI::Util qw(dura_size reverse_dump set_time_signature);
 use Music::CreatingRhythms ();
 use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
@@ -41,8 +41,8 @@ sub BUILD {
 has verbose   => ( is => 'ro', default => sub { 0 } );
 has kit       => ( is => 'ro', default => sub { 0 } );
 has reverb    => ( is => 'ro', default => sub { 15 } );
-has channel   => ( is => 'ro', default => sub { 9 } );
-has volume    => ( is => 'ro', default => sub { 100 } );
+has channel   => ( is => 'rw', default => sub { 9 } );
+has volume    => ( is => 'rw', default => sub { 100 } );
 has bpm       => ( is => 'rw', default => sub { 120 } );
 has file      => ( is => 'ro', default => sub { 'MIDI-Drummer.mid' } );
 has bars      => ( is => 'ro', default => sub { 4 } );
@@ -580,6 +580,22 @@ sub set_bpm {
 }
 
 
+sub set_channel {
+    my ($self, $channel) = @_;
+    $channel //= 9;
+    $self->channel($channel);
+    $self->score->noop( 'c' . $channel );
+}
+
+
+sub set_volume {
+    my ($self, $volume) = @_;
+    $volume ||= 0;
+    $self->volume($volume);
+    $self->score->noop( 'V' . $volume );
+}
+
+
 sub sync {
     my $self = shift;
     $self->score->synch(@_);
@@ -620,13 +636,13 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4103
+version 0.4201
 
 =head1 SYNOPSIS
 
- use MIDI::Drummer::Tiny;
+  use MIDI::Drummer::Tiny;
 
- my $d = MIDI::Drummer::Tiny->new(
+  my $d = MIDI::Drummer::Tiny->new(
     file      => 'drums.mid',
     bpm       => 100,
     volume    => 100,
@@ -636,42 +652,46 @@ version 0.4103
     #kit   => 25, # TR-808 if using GM Level 2
     #kick  => 36, # Override default patch
     #snare => 40, # "
- );
+  );
 
- $d->count_in(1);  # Closed hi-hat for 1 bar
+  $d->count_in(1);  # Closed hi-hat for 1 bar
 
- $d->metronome54;  # 5/4 time for the number of bars
+  $d->metronome54;  # 5/4 time for the number of bars
 
- $d->rest($d->whole);
+  $d->rest($d->whole);
 
- $d->set_time_sig('4/4');
+  $d->set_time_sig('4/4');
 
- $d->metronome44(3);  # 4/4 time for 3 bars
+  $d->metronome44(3);  # 4/4 time for 3 bars
 
- $d->flam($d->quarter, $d->snare);
- $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
- $d->note($d->sixteenth, $d->crash1);
- $d->accent_note(127, $d->sixteenth, $d->crash2);
+  $d->flam($d->quarter, $d->snare);
+  $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
+  $d->note($d->sixteenth, $d->crash1);
+  $d->accent_note(127, $d->sixteenth, $d->crash2);
 
- my $patterns = [ $d->euclidean(5, 16), $d->euclidean(7, 16) ];
- $d->pattern( instrument => $d->kick, patterns => $patterns );
+  my $patterns = [ $d->euclidean(5, 16), $d->euclidean(7, 16) ];
+  $d->pattern( instrument => $d->kick, patterns => $patterns );
 
- # Alternate kick and snare
- $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
+  # Alternate kick and snare
+  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
     for 1 .. $d->beats * $d->bars;
 
- # Same but with beat-strings:
- $d->sync_patterns(
+  # Same but with beat-strings:
+  $d->sync_patterns(
     $d->open_hh => [ '1111' ],
     $d->snare   => [ '0101' ],
     $d->kick    => [ '1010' ],
- ) for 1 .. $d->bars;
+  ) for 1 .. $d->bars;
 
- $d->add_fill('...');
+  $d->add_fill('...'); # see doc...
 
- print 'Count: ', $d->counter, "\n";
+  print 'Count: ', $d->counter, "\n";
 
- $d->write;
+  # As a convenience, and sometimes necessity:
+  $d->set_bpm(200); # handy for tempo changes
+  $d->set_channel;  # reset back to 9 if ever changed
+
+  $d->write;
 
 =head1 DESCRIPTION
 
@@ -1079,7 +1099,26 @@ are B<not> reset.
 
 =head2 set_bpm
 
+  $d->set_bpm($bpm);
+
 Reset the beats per minute.
+
+=head2 set_channel
+
+  $d->set_channel;
+  $d->set_channel($channel);
+
+Reset the channel to C<9> by default, or the given argument if
+different.
+
+=head2 set_volume
+
+  $d->set_volume;
+  $d->set_volume($volume);
+
+Set the volume to the given argument (0-127).
+
+If not given a B<volume> argument, this method mutes (sets to C<0>).
 
 =head2 sync
 

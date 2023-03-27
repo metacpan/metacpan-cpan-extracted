@@ -1,5 +1,10 @@
 Revision history for Perl extension Net::MQTT::Simple::One_Shot_Loader.
 
+0.03 2023-03-27
+  - Updated package to hide package Net::MQTT::Simple from CPAN indexer
+  - Updated tests to pass when IO::Socket::SSL is unavailable - Fixed #1 GitHub
+  - Updated tests to added method can tests for response object
+
 0.02 2023-03-21
   - Added process time to return object
   - Added requires Time::HiRes

@@ -1,5 +1,5 @@
 Name:           perl-Net-MQTT-Simple-One_Shot_Loader
-Version:        0.02
+Version:        0.03
 Release:        1%{?dist}
 Summary:        Perl package to add one_shot method to Net::MQTT::Simple
 License:        MIT
@@ -10,8 +10,11 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Net::MQTT::Simple) >= 1.24
+BuildRequires:  perl(IO::Socket::IP)
 BuildRequires:  perl(Time::HiRes)
 Requires:       perl(Net::MQTT::Simple) >= 1.24
+Requires:       perl(IO::Socket::IP)
+Requires:       perl(IO::Socket::SSL)
 Requires:       perl(Time::HiRes)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 

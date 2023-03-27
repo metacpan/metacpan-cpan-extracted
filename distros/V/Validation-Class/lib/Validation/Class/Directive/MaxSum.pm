@@ -9,7 +9,7 @@ use base 'Validation::Class::Directive';
 
 use Validation::Class::Util;
 
-our $VERSION = '7.900058'; # VERSION
+our $VERSION = '7.900059'; # VERSION
 
 
 has 'mixin'     => 1;
@@ -55,7 +55,7 @@ Validation::Class::Directive::MaxSum - MaxSum Directive for Validation Class Fie
 
 =head1 VERSION
 
-version 7.900058
+version 7.900059
 
 =head1 SYNOPSIS
 

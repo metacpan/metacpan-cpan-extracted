@@ -13,7 +13,7 @@ Validation::Class::Cookbook - Recipes for Validation::Class
 
 =head1 VERSION
 
-version 7.900058
+version 7.900059
 
 =head1 GUIDED TOUR
 

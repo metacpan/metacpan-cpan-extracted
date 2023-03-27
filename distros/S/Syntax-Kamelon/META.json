@@ -50,6 +50,6 @@
          "web" : "https://github.com/haje61/Kamelon"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

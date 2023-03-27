@@ -88,9 +88,10 @@ sub CreateExtIndex {
 	my $self = shift;
 	my $index = $self->{INDEX};
 	my %eindex = ();
-	for (keys %$index) {
+	for (sort keys %$index) {
 		my $lang = $_;
-		my @o = $index->{$lang}->{'ext'};
+		my $extl = $index->{$lang}->{'ext'};
+		my @o = split(/;/, $extl);
 		for (@o) {
 			my $e = $_;
 			if (exists $eindex{$e}) {

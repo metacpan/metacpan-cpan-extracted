@@ -26,6 +26,16 @@ subtest basic => sub {
     is $score[4][0], 'note', 'note added';
     is $d->counter, 2, 'incremented counter';
 
+    $d->set_channel(0);
+    is $d->channel, 0, 'set_channel';
+    $d->set_channel;
+    is $d->channel, 9, 'set_channel';
+
+    $d->set_volume;
+    is $d->volume, 0, 'set_volume';
+    $d->set_volume(100);
+    is $d->volume, 100, 'set_volume';
+
     $d->set_time_sig('5/8');
 
     is $d->beats, 5, 'beats computed';

@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900058
+version 7.900059
 
 # SYNOPSIS
 
@@ -1200,11 +1200,3 @@ This software is copyright (c) 2011 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 1195:
-
-    &#x3d;back without =over
