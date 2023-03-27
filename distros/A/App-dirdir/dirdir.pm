@@ -1,12 +1,12 @@
 package App::dirdir ;  
-our $VERSION = '0.023' ; 
-our $DATE = '2023-03-221T16:32+09:00' ; 
+our $VERSION = '0.024' ; 
+our $DATE = '2023-03-241T13:20+09:00' ; 
 
 =encoding utf8
 
 =head1 NAME
 
-App::dirdir -- 「何階層潜った所から最大何階層下までディレクトリを持つディレクトリが何個存在するか」を行列状に示す。
+App::dirdir -- 「何階層潜った所から最大何階層下までディレクトリを持つディレクトリが何個存在するか」を三角行列状に示す。
 
  dirdir -- 他に dirdig dirdim dirdist というコマンドも作るので、それに名前を合わせた。2次元行列状の出力なので2回同じ語を繰り返した。
 

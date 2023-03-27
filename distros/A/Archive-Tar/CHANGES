@@ -1,3 +1,11 @@
+3.00  25/03/2023 (Chris Lindee, Reini Urban, Paul Bolle, Michiel Beijen, Paulo Custodio, Michael R. Davis && Manfred Stock)
+- RT #119949: Correctly concat prefix on directories
+- enabled t/90_symlink.t for all platforms with symlinks
+- Fix pod typo 'Archive::Tar::Files'
+- Update links under SEE ALSO
+- Skip symlink tests on Windows/msys2
+- Support extraction of large files
+
 2.40  27/07/2021 (KHW && ATOOMIC)
 - Generalize for EBCDIC
 - Update GitHub workflow with deprecated add-path

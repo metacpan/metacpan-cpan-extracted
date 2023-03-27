@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.14  2023-03-25 00:00:00
+  - update POD
+  - created by INABA Hitoshi
+
 0.13  2021-05-08 00:00:00
   - fix confess() messages
   - created by INABA Hitoshi

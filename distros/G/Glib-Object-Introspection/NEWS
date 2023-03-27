@@ -1,3 +1,12 @@
+Overview of changes in Glib::Object::Introspection 0.050
+========================================================
+- Add CI pipeline (on Gnome GitLab server)
+- Add POD documentation to perli11ndoc (thanks oldtechaa!)
+- Clean up string evals and return undef, hazardous style choices
+- Update the README file to Markdown format, update links
+- Update links in Glib::Object::Introspection POD
+- Add support for new girffi API
+
 Overview of changes in Glib::Object::Introspection 0.049
 ========================================================
 

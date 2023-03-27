@@ -46,7 +46,13 @@ generic_interface_init (gpointer iface, gpointer data)
 		       g_base_info_get_name (info), vfunc_name, perl_method_name,
 		       field_offset, g_vfunc_info_get_offset (vfunc_info),
 		       iface);
+
+#if GI_CHECK_VERSION (1, 72, 0)
+		G_STRUCT_MEMBER (gpointer, iface, field_offset) =
+                        g_callable_info_get_closure_native_address (vfunc_info, callback_info->closure);
+#else
 		G_STRUCT_MEMBER (gpointer, iface, field_offset) = callback_info->closure;
+#endif
 
 		g_base_info_unref (field_interface_info);
 		g_base_info_unref (field_type_info);

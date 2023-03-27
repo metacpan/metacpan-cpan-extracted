@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.4.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.4.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/01
+## Modified 2023/03/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,7 +24,7 @@ BEGIN
     use vars qw( $VERSION $VERBOSE $DEBUG );
     use Class::Struct qw( struct );
     use Want;
-    $VERSION    = 'v0.4.1';
+    $VERSION    = 'v0.4.2';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -749,8 +749,8 @@ sub join
     my $prev_prefix = $tbl_o->prefix;
     my $prev_fields_hash = $q->table_object->fields;
     my $prev_fields_list = CORE::join( '|', sort( keys( %$prev_fields_hash ) ) );
-    my $re = qr/(?<!\.)\b($prev_fields_list)\b/;
-    $prev_fields =~ s/(?<!\.)\b($prev_fields_list)\b/${prev_prefix}.$1/gs;
+    my $re = qr/(?<![\.\"])\b($prev_fields_list)\b/;
+    $prev_fields =~ s/(?<![\.\"])\b($prev_fields_list)\b/${prev_prefix}.$1/gs;
     my $fields = $new_fields ? CORE::join( ', ', $prev_fields, $new_fields ) : $prev_fields;
     $q2->join_fields( $fields );
     #my $from_table = $q2->from_table;
@@ -1075,7 +1075,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.4.1
+v0.4.2
 
 =head1 DESCRIPTION
 

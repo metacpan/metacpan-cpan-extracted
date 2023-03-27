@@ -1,0 +1,10 @@
+(?<![^/])\.
+^[^/]*\.(?:tar|gz)\z
+^MANIFEST\.(?!SKIP\z)
+^MYMETA\.
+^Makefile\z
+^Makefile\.(?!PL\z)
+^blib/
+^maint/
+^pm_to_blib\z
+^unused/

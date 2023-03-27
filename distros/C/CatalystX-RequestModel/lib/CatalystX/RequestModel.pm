@@ -1,6 +1,6 @@
 package CatalystX::RequestModel;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Class::Method::Modifiers;
 use Scalar::Util;
@@ -658,7 +658,7 @@ will get interpretated as an HTTP 415 status client error if you are using L<Cat
 
 =head1 COPYRIGHT
  
-    2022
+    2023
 
 =head1 LICENSE
 

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/12/22
+## Modified 2023/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG $VERBOSE );
     use Devel::Confess;
-    $VERSION = 'v0.5.0';
+    $VERSION = 'v0.5.1';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -325,7 +325,7 @@ sub format_statement
         if( $prefix ) 
         {
             s{
-                (?<!\.)\b($ok_list)\b(\s*)?(?!\.)
+                (?<![\.\"])\b($ok_list)\b(\s*)?(?!\.)
             }
             {
                 my( $field, $spc ) = ( $1, $2 );
@@ -976,43 +976,63 @@ sub select
     my $tables   = CORE::join( '|', @{$tbl_o->database_object->tables} );
     if( @_ )
     {
-        my $data = ( @_ == 1 ) ? shift( @_ ) : [ @_ ];
+        # Get aliases
+        my $alias = $self->alias();
+        my $data = ( @_ == 1 && ref( $_[0] ) ) ? shift( @_ ) : [ @_ ];
         if( ref( $data ) eq 'SCALAR' )
         {
             $fields = $$data;
         }
         elsif( $self->_is_array( $data ) )
         {
+            # Remove from the provided list any name that are aliases
+            for( my $i = 0; $i < scalar( @$data ); $i++ )
+            {
+                foreach my $n ( keys( %$alias ) )
+                {
+                    if( lc( $alias->{ $n } ) eq lc( $data->[$i] ) )
+                    {
+                        splice( @$data, $i, 1 );
+                        $i--;
+                    }
+                }
+            }
             # No fields provided after all? We fallback to use the magic '*' optimizer
-            $fields = @$data ? CORE::join( ', ', @$data ) : '*';
+            $fields = @$data
+                ? CORE::join( ', ', @$data )
+                : scalar( keys( %$alias ) )
+                    ? ''
+                    : ( $prefix ? "${prefix}.*" : '*' );
         }
         else
         {
             $fields = $data;
         }
-        # Now, we eventually add the table and database specification to the fields
-        $fields =~ s{
-            (?<!\.)\b($ok_list)\b(\s*)?(?!\.)
-        }
-        {
-            my( $field, $spc ) = ( $1, $2 );
-            if( $` =~ /\s+(?:AS|FROM)\s+$/i || !$field )
-            {
-                "${field}${spc}";
-            }
-            elsif( $prefix )
-            {
-                "${prefix}.${field}${spc}";
-            }
-            else
-            {
-                "${field}${spc}";
-            }
-        }gex;
-        $fields =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
         
-        # Get aliases
-        my $alias = $self->alias();
+        if( length( $fields ) )
+        {
+            # Now, we eventually add the table and database specification to the fields
+            $fields =~ s{
+                (?<![\.\"])\b($ok_list)\b(\s*)?(?!\.)
+            }
+            {
+                my( $field, $spc ) = ( $1, $2 );
+                if( $` =~ /\s+(?:AS|FROM)\s+$/i || !$field )
+                {
+                    "${field}${spc}";
+                }
+                elsif( $prefix )
+                {
+                    "${prefix}.${field}${spc}";
+                }
+                else
+                {
+                    "${field}${spc}";
+                }
+            }gex;
+            $fields =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
+        }
+        
         $self->messagef_colour( 3, "<green>%d</> aliases were provided: <red>%s</>", scalar( keys( %$alias ) ), join( ', ', keys( %$alias ) ) );
         if( $alias && %$alias )
         {
@@ -1023,12 +1043,27 @@ sub select
                 {
                     CORE::push( @aliases, "${prefix}.${f} AS \"" . $alias->{ $f } . "\"" );
                 }
+                elsif( $f =~ /\b(?:$ok_list)\b/ ||
+                       $f =~ /\w\([^\)]*\)/ )
+                {
+                    $f =~ s{
+                        (?<![\.\"])\b($ok_list)\b(\s*)?(?!\.)
+                    }
+                    {
+                        my( $ok, $spc ) = ( $1, $2 );
+                        "${prefix}.${ok}${spc}";
+                    }gex if( $prefix );
+                    $f =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
+                    CORE::push( @aliases, "$f AS " . "\"" . $alias->{ $f } . "\"" );
+                }
                 else
                 {
                     CORE::push( @aliases, "$f AS " . "\"" . $alias->{ $f } . "\"" );
                 }
             }
-            $fields = join( ', ', $fields, @aliases );
+            $fields = length( $fields )
+                ? join( ', ', $fields, @aliases )
+                : join( ', ', @aliases );
         }
     }
     else
@@ -1241,10 +1276,12 @@ sub _group_order
     if( @_ )
     {
         my $clause = '';
-        my $data   = ( @_ == 1 && !$self->_is_object( $_[0] ) ) ? shift( @_ ) : [ @_ ];
+        my $fields_ref = $tbl_o->fields();
+        my $data   = ( @_ == 1 && ( !$self->_is_object( $_[0] ) || $self->_is_array( $_[0] ) ) && !exists( $fields_ref->{ "$_[0]" } ) )
+            ? shift( @_ )
+            : [ @_ ];
         if( $self->_is_array( $data ) )
         {
-            my $fields_ref = $tbl_o->fields();
             my $prefix     = $tbl_o->prefix;
             my $fields     = join( '|', keys( %$fields_ref ) );
             my $db         = $tbl_o->database();
@@ -1285,12 +1322,12 @@ sub _group_order
                        !$bind )
                 {
                     $field =~ s{
-                        (?<!\.)\b($fields)\b(\s*)?(?!\.)
+                        (?<![\.\"])\b($fields)\b(\s*)?(?!\.)
                     }
                     {
                         my( $ok, $spc ) = ( $1, $2 );
-                        "$table.$ok$spc";
-                    }gex;
+                        "${prefix}.${ok}${spc}";
+                    }gex if( $prefix );
                     $field =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
                     $components->push( $field );
                 }
@@ -1376,11 +1413,11 @@ sub _having
                        !$bind )
                 {
                     $field =~ s{
-                        (?<!\.)\b($fields)\b(\s*)?(?!\.)
+                        (?<![\.\"])\b($fields)\b(\s*)?(?!\.)
                     }
                     {
                         my( $ok, $spc ) = ( $1, $2 );
-                        "$prefix.$ok$spc";
+                        "${prefix}.${ok}${spc}";
                     }gex if( $prefix );
                     $field =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
                     push( @clause, $self->new_clause({
@@ -1650,12 +1687,12 @@ sub _value2bind
     }geix;
     $$str =~ s
     {
-        (?<!\.)\b($fields)\b(\s*)?(?!\.)
+        (?<![\.\"])\b($fields)\b(\s*)?(?!\.)
     }
     {
         my( $ok, $spc ) = ( $1, $2 );
-        "$table.$ok$spc";
-    }gex;
+        "$prefix.$ok$spc";
+    }gex if( $prefix );
     $$str =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
     push( @$ref, @binded ) if( @binded );
     return( 1 );
@@ -1725,10 +1762,17 @@ sub _where_having
                     {
                         my $op_object = shift( @arg );
                         $clause = $process_where_condition->( $op_object );
+                        push( @list, $clause );
                         next;
                     }
                     # This is an already formulated clause
                     elsif( $self->_is_object( $arg[0] ) && $arg[0]->isa( 'DB::Object::Query::Clause' ) )
+                    {
+                        push( @list, shift( @arg ) );
+                        next;
+                    }
+                    # An expression
+                    elsif( $self->_is_a( $arg[0] => 'DB::Object::Expression' ) )
                     {
                         push( @list, shift( @arg ) );
                         next;
@@ -1808,7 +1852,7 @@ sub _where_having
                     
                     unless( $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
                     {
-                        $field =~ s/\b(?<!\.)($fields)\b/$prefix.$1/gs if( $prefix );
+                        $field =~ s/\b(?<![\.\"])($fields)\b/$prefix.$1/gs if( $prefix );
                     }
                     my $i_am_negative = 0;
                     if( $self->_is_a( $value, 'DB::Object::NOT' ) )
@@ -1953,6 +1997,7 @@ sub _where_having
                         CORE::push( @list, $cl );
                     }
                 }
+                # End while @arg loop
                 $clause = $self->new_clause->merge( $tbl_o->database_object->$agg_op( @list ) );
             }
             elsif( $data )
@@ -1989,9 +2034,10 @@ BEGIN
     use common::sense;
     use parent qw( Module::Generic );
     use Devel::Confess;
-    use overload ('""'     => 'as_string',
-                  fallback => 1,
-                 );
+    use overload (
+        '""'     => 'as_string',
+        fallback => 1,
+    );
     our( $VERSION ) = '0.1';
 };
 
@@ -2075,7 +2121,7 @@ sub merge
         {
             # Safeguard against garbage
             # Special treatment for DB::Object::Fields::Field::Overloaded who are already formatted
-            if( $self->_is_object( $this ) && $this->isa( 'DB::Object::Fields::Field::Overloaded' ) )
+            if( $self->_is_a( $this => [qw( DB::Object::Fields::Field::Overloaded DB::Object::Expression )] ) )
             {
                 push( @clause, $this );
                 next;
@@ -2143,7 +2189,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

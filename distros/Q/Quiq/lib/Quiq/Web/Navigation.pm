@@ -145,13 +145,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
 use Quiq::Hash::Db;
 use POSIX ();
-use Quiq::Url;
+use Quiq::UrlObj;
 
 # -----------------------------------------------------------------------------
 
@@ -389,7 +389,7 @@ URL, der genutzt wird, wenn kein Rückkehr-URL definiert ist.
 
 =head4 Returns
 
-(Object) URL-Objekt (siehe Quiq::Url)
+(Object) URL-Objekt (siehe Quiq::UrlObj)
 
 =head4 Description
 
@@ -401,7 +401,7 @@ Liefere den URL der Rückkehrseite als Objekt.
 
 sub backUrlObj {
     my $self = shift;
-    return Quiq::Url->new($self->backUrl);
+    return Quiq::UrlObj->new($self->backUrl);
 }
 
 # -----------------------------------------------------------------------------
@@ -463,7 +463,7 @@ URL, der genutzt wird, wenn kein Vorgänger-URL definiert ist.
 
 =head4 Returns
 
-(Object) URL-Objekt (siehe Quiq::Url)
+(Object) URL-Objekt (siehe Quiq::UrlObj)
 
 =head4 Description
 
@@ -475,14 +475,14 @@ Liefere den URL der Vorgängerseite als Objekt.
 
 sub prevUrlObj {
     my $self = shift;
-    return Quiq::Url->new($self->prevUrl);
+    return Quiq::UrlObj->new($self->prevUrl);
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

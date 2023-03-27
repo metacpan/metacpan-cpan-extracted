@@ -3,6 +3,12 @@
 (defvar xlate-default-target-lang "EN-US"
   "Default target language for translation.")
 
+(defvar xlate-languages
+  '("BG" "CS" "DA" "DE" "EL" "EN-GB" "EN-US" "ES" "ET" "FI"
+    "FR" "HU" "ID" "IT" "JA" "KO" "LT" "LV" "NB" "NL" "PL"
+    "PT-BR" "PT-PT" "RO" "RU" "SK" "SL" "SV" "TR" "UK" "ZH")
+  "List of supported languages for xlate command.")
+
 (defun xlate-buffer (&optional prefix)
   "Execute deepl command on current buffer."
   (interactive "P")
@@ -16,8 +22,9 @@ If called with a prefix argument (C-u), prompt for the target language."
   (interactive
    (list (region-beginning) (region-end)
          (if current-prefix-arg
-             (read-string (format "Target language (default: %s): "
-                                  xlate-default-target-lang))
+             (completing-read (format "Target language (default: %s): "
+                                      xlate-default-target-lang)
+                              xlate-languages nil t)
            nil)))
   (let ((lang (or target-lang xlate-default-target-lang)))
     (shell-command-on-region

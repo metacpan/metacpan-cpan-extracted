@@ -6,14 +6,14 @@ use Carp qw/croak/;
 use Mojo::UserAgent;
 use Mojo::Util qw(b64_encode);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use vars qw/$errstr/;
 sub errstr { return $errstr }
 
 sub new {    ## no critic (ArgUnpacking)
     my $class = shift;
-    my %args = @_ % 2 ? %{$_[0]} : @_;
+    my %args  = @_ % 2 ? %{$_[0]} : @_;
 
     for (qw/subdomain public_key private_key/) {
         $args{$_} || croak "Param $_ is required.";
@@ -56,11 +56,16 @@ sub request {
 
     $errstr = '';    # reset
 
-    my $ua = $self->__ua;
+    # Format the query params if exist
+    my $ref_url_params = delete $params{query_params};
+    my $query_params   = "?";
+    $query_params = $query_params . join("&", @$ref_url_params) if $ref_url_params;
+
+    my $ua     = $self->__ua;
     my $header = {Authorization => 'Basic ' . b64_encode($self->{public_key} . ':' . $self->{private_key}, '')};
     $header->{'Content-Type'} = 'application/json' if %params;
     my @extra = %params ? (json => \%params) : ();
-    my $tx = $ua->build_tx($method => $self->{endpoint} . $url . '.json' => $header => @extra);
+    my $tx    = $ua->build_tx($method => $self->{endpoint} . $url . '.json' . $query_params => $header => @extra);
     $tx->req->headers->accept('application/json');
 
     $tx = $ua->start($tx);

@@ -1,11 +1,16 @@
-Revision history for Org-To-HTML-WordPress
+0.003   2023-01-19  Released-By: PERLANCAR; Urgency: low
 
-0.002   2016-12-24 (PERLANCAR)
+        - No functional changes.
+
+        - Tweak Abstract.
+
+
+0.002   2016-12-24  Released-By: PERLANCAR
 
 	- Move CLI script org-to-html-wordpress to App-OrgUtils to reduce
 	  dependencies of this dist.
 
 
-0.001   2016-11-14 (PERLANCAR)
+0.001   2016-11-14  Released-By: PERLANCAR
 
         - First release.

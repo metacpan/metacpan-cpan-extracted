@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2159,6 +2159,90 @@ sub maxFileNumber {
 
 # -----------------------------------------------------------------------------
 
+=head3 minFileNumber() - Liefere den numerisch größten Dateinamen
+
+=head4 Synopsis
+
+  $min = $class->minFileNumber($dir,$max,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Pfad des Verzeichnisses
+
+=item $max
+
+Der Wert, mit dem die Zählung beginnt.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Wirf keine Exception, wenn ein Dateiname nicht mit einer Nummer
+beginnt.
+
+=back
+
+=head4 Description
+
+Liefere den numerisch kleinsten Dateinamen aus Verzeichnis $dir.
+Die Methode ist nützlich, wenn die Dateinamen mit einer Zahl
+NNNNNN beginnen und man die Datei mit der kleinsten Zahl ermitteln
+möchte um einer neu erzeugten Datei die nächstniedrigere Nummer
+zuzuweisen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub minFileNumber {
+    my ($class,$dir,$max) = splice @_,0,3;
+    # @_: @opt
+
+    # Options
+
+    my $sloppy = 0;
+    
+    Quiq::Option->extract(\@_,
+        -sloppy => \$sloppy,
+    );
+
+    # Verarbeitung
+
+    my $min = $max;
+    my $dh = Quiq::DirHandle->new($dir);
+    while (my $file = $dh->next) {
+        if ($file eq '.' || $file eq '..') {
+            next;
+        }
+        my ($n) = $file =~ /^(\d+)/;
+        if (!defined($n)) {
+            if ($sloppy) {
+                next;
+            }
+            $class->throw(
+                'PATH-00099: Dateiname beginnt nicht mit Ziffernfolge',
+                File => $file,
+            );
+        }
+        if ($n+0 < $min) {
+            $min = $n+0;
+        }
+    }
+    $dh->close;
+
+    return $min;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 mkdir() - Erzeuge Verzeichnis
 
 =head4 Synopsis
@@ -4002,7 +4086,7 @@ sub uid {
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

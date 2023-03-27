@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "HTTP::Tiny" => 0,
     "URI::Escape" => 0
   },
-  "VERSION" => "2.5.1",
+  "VERSION" => "2.5.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

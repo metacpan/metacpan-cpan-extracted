@@ -55,7 +55,13 @@ sv_to_callback (GIArgInfo * arg_info,
 
 	dwarn ("  -> closure %p from info %p\n",
 	       callback_info->closure, callback_info);
+
+#if GI_CHECK_VERSION (1, 72, 0)
+        return g_callable_info_get_closure_native_address (callback_interface_info,
+                                                           callback_info->closure);
+#else
 	return callback_info->closure;
+#endif
 }
 
 static gpointer

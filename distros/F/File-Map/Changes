@@ -1,5 +1,9 @@
 Revision history for File-Map
 
+0.68      2023-03-25 10:32:11+01:00 Europe/Amsterdam
+          - Re-eliminate second magic vtable
+          - Eliminate all CODE blocks in XS
+
 0.67      2020-06-26 00:26:54+02:00 Europe/Amsterdam
           - Fix unresolved symbol "madvise" on QNX NTO
           - Fix regression that could cause empty maps to crash upon reuse.

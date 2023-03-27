@@ -48,4 +48,7 @@ is_deeply( $records[0]->{'record'}->[7], ['003@', '', '0', '1027146724'],
 );
 ok(Catmandu::Importer::PICA->new(file => "./t/files/ppxml.xml", type=> "PicaPlusXML"), 'PicaPlusXML');
 
+is 'HASH', ref $records[0], 'unbless PICA::Data';
+is 'ARRAY', ref $records[0]->{record}[0], 'unbless PICA::Data::Field';
+
 done_testing;

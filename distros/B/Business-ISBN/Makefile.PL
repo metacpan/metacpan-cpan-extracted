@@ -65,7 +65,7 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
-		'Business::ISBN::Data' => '20191107',
+		'Business::ISBN::Data' => '20230322.001',
 		},
 
 	'META_MERGE' => {
@@ -73,7 +73,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {

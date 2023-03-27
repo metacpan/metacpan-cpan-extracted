@@ -1,6 +1,7 @@
 Changes
 lib/OpenAI/API.pm
 lib/OpenAI/API/Config.pm
+lib/OpenAI/API/Error.pm
 lib/OpenAI/API/Request.pm
 lib/OpenAI/API/Request/Chat.pm
 lib/OpenAI/API/Request/Completion.pm
@@ -16,8 +17,9 @@ Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
 META.yml			Module YAML meta-data (added by MakeMaker)
-README
+README.md
 t/00-load.t
+t/01-completions-raw.t
 t/01-completions.t
 t/02-edits.t
 t/03-moderations.t
@@ -29,6 +31,7 @@ t/10-exceptions-validation.t
 t/11-exceptions-internet.t
 t/12-exceptions-timeout.t
 t/20-pod-synopsis.t
+t/30-async-raw.t
 t/30-async.t
 t/31-async-error.t
 t/manifest.t

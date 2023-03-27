@@ -296,7 +296,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 use Quiq::Html::Table::List;
 use Quiq::Hash;
@@ -616,7 +616,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

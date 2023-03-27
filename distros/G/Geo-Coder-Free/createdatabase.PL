@@ -2,7 +2,7 @@
 
 # Import geo-coding data into an SQLite database.
 
-# Copyright 2020-2022 Nigel Horne.
+# Copyright 2020-2023 Nigel Horne.
 
 # The program code is released under the following licence: GPL2 for personal use on a single computer.
 # All other users (including Commercial, Charity, Educational, Government)
@@ -13,10 +13,17 @@
 # see bin/download_databases which will download the databases and call this script
 
 # Download the OPENADDR_HOME data from http://results.openaddresses.io.
-#	/usr/bin/wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global.zip
-#	/usr/bin/wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global-sa.zip
-
-#	Remove all the data you're not going to use, I only keep au, ca, us
+#	cd $OPENADDR_HOME
+#	wget --quiet https://data.openaddresses.io/openaddr-collected-global.zip
+#	wget --quiet https://data.openaddresses.io/openaddr-collected-global-sa.zip
+# or
+#	wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global.zip
+#	wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global-sa.zip
+# Remove all the data you're not going to use, I only keep au, ca, us
+#	unzip openaddr-collected-global.zip
+#	unzip openaddr-collected-global-sa.zip
+#	echo ?? | sed 's/ /\n/g' | egrep -v '(au|ca|us)' | xargs rm -rf
+#	rm -rf summary
 
 # Download the WHOSONFIRST_HOME data from repositories such as
 #	https://github.com/whosonfirst-data/whosonfirst-data-venue-us.git
@@ -41,6 +48,7 @@
 
 # TODO: perhaps use a layered approach to the database schema
 # TODO: import https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates%2Bcities.json
+# TODO: as the database is a simple key/value pair, perhaps CDB will be better
 
 use 5.010;
 use strict;
@@ -54,7 +62,7 @@ use File::Copy;
 use File::Open::NoCache::ReadOnly 0.02;
 use File::Slurp;
 use Geo::Coder::Abbreviations;
-use JSON;
+use JSON::MaybeXS;
 use LWP::UserAgent::Throttled;
 use Locale::AU;	# TODO: use Locale::Geocode
 use Locale::CA;
@@ -205,6 +213,17 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 21161
 		}, {
+			'LAT' => 39.633018,
+			'LON' => -76.272558,
+			'NAME' => 'BALLPARK RESTAURANT',
+			'NUMBER' => 3418,
+			'STREET' => 'CONOWINGO RD',
+			'CITY' => 'DUBLIN',
+			'COUNTY' => 'HARFORD',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21154
+		}, {
 			'NAME' => 'NCBI',
 			'LAT' => 38.99516556,
 			'LON' => -77.09943963,
@@ -280,6 +299,16 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 21701,
+		}, {
+			'LAT' => 39.342986,
+			'LON' => -77.239770,
+			'NUMBER' => 3923,
+			'STREET' => 'SUGARLOAF CT',
+			'CITY' => 'MONROVIA',
+			'COUNTY' => 'FREDERICK',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21770
 		}, {
 			'NAME' => 'ALBERT EINSTEIN HIGH SCHOOL',
 			'LAT' => 39.03869019,
@@ -407,9 +436,9 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20902,
 		}, {
+			'NAME' => 'LA CASITA PUPESERIA AND MARKET',
 			'LAT' => 38.993369,
 			'LON' => -77.009501,
-			'NAME' => 'LA CASITA PUPESERIA AND MARKET',
 			'NUMBER' => 8214,
 			'STREET' => 'PINEY BRANCH RD',
 			'CITY' => 'SILVER SPRING',
@@ -417,6 +446,17 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20910,
+		}, {
+			'LAT' => 38.991667,
+			'LON' => -77.030473,
+			'NAME' => 'NOAA LIBRARY',
+			'NUMBER' => 1315,
+			'STREET' => 'EAST-WEST HIGHWAY',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910
 		}, {
 			'NAME' => 'SNIDERS',
 			'LAT' => 39.0088797,
@@ -532,6 +572,16 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20852
+		}, {
+			'LAT' => 38.996764,
+			'LON' => -76.849323,
+			'NAME' => 'NASA',
+			'STREET' => '',
+			'CITY' => 'GREENBELT',
+			'COUNTY' => 'PRINCE GEORGES',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20771
 		}, {
 			'LAT' => 39.190009,
 			'LON' => -76.841152,
@@ -743,6 +793,25 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 22180
 		}, {
+			'LAT' => 39.124843,
+			'LON' => -77.535445,
+			'NUMBER' => 818,
+			'STREET' => 'FERNDALE TERRACE NE',
+			'CITY' => 'LEESBURG',
+			'COUNTY' => 'LOUDOUN',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20176
+		}, {
+			'LAT' => 39.136193,
+			'LON' => -77.693198,
+			'STREET' => 'PURCELLVILLE GATEWAY DR',
+			'CITY' => 'PURCELLVILLE',
+			'COUNTY' => 'LOUDOUN',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20132
+		}, {
 			'LAT' => 38.25075,
 			'LON' => -76.9602533333333,
 			'STREET' => '',
@@ -868,6 +937,14 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'KENT',
 			'COUNTRY' => 'GB',
 		}, {
+			'LAT' => 51.340826,
+			'LON' => 1.406519,
+			'NAME' => 'RAMSGATE STATION',
+			'STREET' => 'STATION APPROACH RD',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB'
+		}, {
 			'LAT' => 51.5082675,
 			'LON' => -0.0754225,
 			'NAME' => 'TOWER OF LONDON',
@@ -917,13 +994,13 @@ if(!-r $cities_sql) {
 
 exit(0) if($ENV{'AUTOMATED_TESTING'});
 
-if(!(-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) {
-	print "Consider downloading http://download.geonames.org/export/dump/allCountries.zip to lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt\n";
+if(!(-r 'downloads/allCountries.txt')) {
+	print "Consider downloading http://download.geonames.org/export/dump/allCountries.zip to downloads/allCountries.txt\n";
 }
 
 my $oa = $ENV{'OPENADDR_HOME'};
 
-exit(0) if(!defined($oa));
+exit(0) if((!defined($oa)) || (length($oa) == 0));
 
 $Data::Dumper::Sortkeys = 1;
 
@@ -1090,10 +1167,10 @@ $ua->throttle({ 'api.zippopotam.us' => 1 });
 $ua->env_proxy(1);
 
 # Import the Maxmind databases
-if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
+if((-r 'downloads/allCountries.txt') &&
    # open(my $fin, '<', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
    # open(my $fin1, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db') &&
-   (my $all_countries = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) &&
+   (my $all_countries = File::Open::NoCache::ReadOnly->new('downloads/allCountries.txt')) &&
    (my $admin1 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin1.db')) &&
    (my $admin2 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db'))) {
    # open(my $fin2, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
@@ -1105,7 +1182,7 @@ if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
 	aio_readahead($fin2, 0, AIO_READAHEAD_SIZE);
 
 	$| = 1;
-	printf "%-70s\r", 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt';
+	printf "%-70s\r", 'downloads/allCountries.txt';
 	$| = 0;
 	print "\n" if(MAX_INSERT_COUNT == 1);
 
@@ -1245,7 +1322,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 		print "\n" if(DEBUG);
 		$| = 0;
 
-		my $j = JSON->new()->utf8();
+		my $j = JSON::MaybeXS->new()->utf8();
 		my $data = File::Slurp::read_file($geojson_file);
 		$data = $j->decode($data);
 		my $properties = $data->{'properties'};
@@ -1648,7 +1725,7 @@ if(my $dr5hn = $ENV{'DR5HN_HOME'}) {
 	print "\n" if(DEBUG);
 	$| = 0;
 
-	my $j = JSON->new()->utf8();
+	my $j = JSON::MaybeXS->new()->utf8();
 
 	my $data = File::Slurp::read_file($filename);
 	$data = $j->decode($data);
@@ -1924,6 +2001,7 @@ print "\n" if(DEBUG);
 $| = 0;
 if($dbh) {
 	$dbh->commit();
+	$dbh->do('pragma optimize');
 	$dbh->disconnect();
 }
 if($redis) {
@@ -2064,7 +2142,7 @@ sub import {
 				$unknown_zips{"$country/$zip"} = 1;
 				return 0;
 			}
-			my $rc = JSON->new()->utf8()->decode($res->content());
+			my $rc = JSON::MaybeXS->new()->utf8()->decode($res->content());
 			if(!defined($rc)) {
 				# print "\n", Data::Dumper->new([\$row])->Dump();
 				return 0;
@@ -2707,7 +2785,7 @@ sub get_wof {
 		return;
 	}
 
-	my $j = JSON->new()->utf8();
+	my $j = JSON::MaybeXS->new()->utf8();
 	my $data = File::Slurp::read_file($filename);
 	$data = $j->decode($data);
 	my $properties = $data->{'properties'};

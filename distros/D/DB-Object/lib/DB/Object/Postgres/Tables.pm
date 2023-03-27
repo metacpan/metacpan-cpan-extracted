@@ -589,7 +589,8 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 =head1 SYNOPSIS
 
     use DB::Object::Postgres::Tables;
-    my $this = DB::Object::Postgres::Tables->new || die( DB::Object::Postgres::Tables->error, "\n" );
+    my $this = DB::Object::Postgres::Tables->new || 
+        die( DB::Object::Postgres::Tables->error, "\n" );
 
 =head1 VERSION
 
@@ -597,7 +598,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 DESCRIPTION
 
-This is a PostgreSQL table object class.
+This is a PostgreSQL table object class. It inherits from L<DB::Object::Tables>
 
 =head1 METHODS
 
@@ -816,9 +817,11 @@ Not implemented in PostgreSQL.
 
 =head2 structure
 
-This returns in list context an hash and in scalar context an hash reference of the table structure.
+This returns, in list context, an hash and, in scalar context, an hash reference of the table structure.
 
 The hash, or hash reference returned contains the column name and its definition.
+
+The data returned is cached, so it fetches the information from PostgreSQL only once.
 
 This method will also set the following object properties:
 

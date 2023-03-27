@@ -1,5 +1,10 @@
 Revision history for OpenAI-API
 
+0.33    2023-03-26
+        Add OpenAI::API::Error module.
+        Add option to return HTTP::Response object.
+        Fix tests ("/edits" endpoint is broken)
+
 0.31    2023-03-21
         Document method send_async.
 

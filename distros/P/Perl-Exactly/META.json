@@ -1,6 +1,6 @@
 {
     "name" : "Perl-Exactly",
-    "version" : "0.06",
+    "version" : "0.07",
     "abstract" : "ensures exactly version of perl",
     "author" : [
         "ina <ina@cpan.org>"
@@ -11,8 +11,8 @@
         "perl_5"
     ],
     "meta-spec" : {
-       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-       "version" : 2
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
@@ -20,65 +20,47 @@
             "http://dev.perl.org/licenses/"
         ],
         "repository" : {
-             "url" : "https://github.com/ina-cpan/Perl-Exactly"
+            "url" : "https://github.com/ina-cpan/Perl-Exactly"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
             }
         },
         "configure" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
             }
         },
         "runtime" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
             }
         }
     }

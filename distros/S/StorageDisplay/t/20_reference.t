@@ -22,6 +22,24 @@ use Path::Class;
 #file_contents_eq('utf8.txt',   'ååå', { encoding => 'UTF-8' });
 #file_contents_eq('latin1.txt', 'ååå', { encoding => 'UTF-8' });
 
+sub load_data {
+    my $filename = shift;
+
+    my $contents;
+    my $dh;
+    open($dh, "<", $filename)
+	or die "Cannot open '$filename': $!" ;
+    $contents=join('', <$dh>);
+    close($dh);
+    {
+	my $VAR1;
+	eval($contents); ## no critic (ProhibitStringyEval)
+	#print STDERR "c: $content\n";
+	return $VAR1;
+    }
+}
+
+
 sub test_reference {
     my $file = shift;
     my $basename = $file->basename;
@@ -45,7 +63,12 @@ sub test_reference {
                  '-o', $data->stringify],
         "storage2dot generates ".$data->stringify);
     ok(-f $data, "file ".$data->stringify." was generated");
-    files_eq_or_diff($refdata, $data, $opts);
+
+    my $struct_data_ref = load_data($refdata);
+    my $struct_data = load_data($data);
+
+    is($struct_data, $struct_data_ref, "data for $basename are the same as the reference")
+	or files_eq_or_diff($refdata, $data, $opts);
 
     unlink $dot if -f $dot;
     script_runs(['bin/storage2dot',

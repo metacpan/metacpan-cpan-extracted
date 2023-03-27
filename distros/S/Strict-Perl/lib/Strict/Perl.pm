@@ -5,10 +5,10 @@ package Strict::Perl;
 #
 # http://search.cpan.org/dist/Strict-Perl/
 #
-# Copyright (c) 2014, 2015, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2015, 2017, 2018, 2019, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2019.07';
+$VERSION = '2023.03';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -306,19 +306,17 @@ Strict::Perl - Perl module to restrict old/unsafe constructs
 
 =head1 SYNOPSIS
 
-  use Strict::Perl 2019.07; # must version, must match
+  use Strict::Perl 2023.03; # must version, must match
 
 =head1 DESCRIPTION
 
-Strict::Perl provides a restricted scripting environment excluding old/unsafe
-constructs, on both modern Perl and traditional Perl.
+Strict::Perl provides a restricted scripting environment excluding old/unsafe constructs, on both modern Perl and traditional Perl.
 
-Strict::Perl works in concert with Modern::Open and Fake::Our if those are used
-in your script.
+Strict::Perl works in concert with Modern::Open and Fake::Our if those are used in your script.
 
 Version specify is required when use Strict::Perl, like;
 
-  use Strict::Perl 2019.07;
+  use Strict::Perl 2023.03;
 
 It's die if specified version doesn't match Strict::Perl's version.
 
@@ -395,20 +393,21 @@ This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
-=over 4
+=over 2
 
-=item * L<ina|http://search.cpan.org/~ina/> - CPAN
+=item *
 
-=item * L<A Complete History of CPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - The BackPAN
+L<ina|http://search.cpan.org/~ina/> - CPAN
+
+=item *
+
+L<A Complete History of CPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - The BackPAN
 
 =back
 

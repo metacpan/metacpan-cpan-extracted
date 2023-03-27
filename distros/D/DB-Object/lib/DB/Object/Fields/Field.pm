@@ -55,7 +55,7 @@ sub init
     $self->{name}           = '';
     $self->{pos}            = '';
     $self->{prefixed}       = 0;
-    $self->{query_object}    = '';
+    $self->{query_object}   = '';
     $self->{table_object}   = '';
     $self->{type}           = '';
     $self->{_init_params_order}   = [qw( table_object query_object default pos type prefixed name )];
@@ -196,6 +196,11 @@ sub _find_siblings
 sub _op_overload
 {
     my( $self, $val, $swap, $op ) = @_;
+    if( $self->_is_a( $val => 'DB::Object::IN' ) )
+    {
+        return( $val->_opt_overload( $self, 1, $op ) );
+    }
+    
     # print( STDERR ref( $self ), "::_op_overload: Parameters provided are: '", join( "', '", @_ ), "'\n" );
     my $field = $self->name;
     my $map =

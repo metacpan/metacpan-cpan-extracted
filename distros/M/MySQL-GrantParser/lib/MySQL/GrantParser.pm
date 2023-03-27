@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_005;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use DBI;
 use Carp;
@@ -85,6 +85,9 @@ sub parse {
 sub parse_stmts {
     my $stmts = shift;
     my @grants = ();
+    my $q = q{['`]};
+    my $Q = q{[^'`]};
+
     for my $stmt (@$stmts) {
         my $parsed = {
             with       => '',
@@ -96,33 +99,55 @@ sub parse_stmts {
             host       => '',
         };
 
-        if ($stmt =~ s/\s+IDENTIFIED WITH\s+'([^']+)'\s+AS\s+(.+?)\s+//) {
-            # my $auth_plugin = $1; # eg: mysql_native_password
-            $parsed->{identified} = "PASSWORD $2";
-        }
-        if ($stmt =~ s/\s+IDENTIFIED WITH\s+'([^']+)'\s+//) {
-            # no AS
-            $parsed->{identified} = "";
-        }
-        if ($stmt =~ /\ACREATE\s+USER\s+'(.*)'\@'(.+)'/) {
-            $parsed->{user}   = $1;
-            $parsed->{host}   = $2;
-        }
-
-        if ($stmt =~ s/\s+WITH\s+(.+?)\z//) {
-            $parsed->{with} = $1;
-        }
-        if ($stmt =~ s/\s+REQUIRE\s+(.+?)\z//) {
-            $parsed->{require} = $1;
-        }
-        if ($stmt =~ s/\s+IDENTIFIED BY\s+(.+?)\z//) {
-            $parsed->{identified} = $1;
-        }
-        if ($stmt =~ /\AGRANT\s+(.+?)\s+ON\s+(.+?)\s+TO\s+'(.*)'\@'(.+)'\z/) {
+        if ($stmt =~ s/\AGRANT (.+?) ON (.+?) TO ${q}(${Q}+?)${q}\@${q}(${Q}+?)${q}\s*//) {
             $parsed->{privs}  = parse_privs($1);
             $parsed->{object} = $2;
             $parsed->{user}   = $3;
             $parsed->{host}   = $4;
+        }
+        if ($stmt =~ s/\ACREATE USER ${q}(${Q}+?)${q}\@${q}(${Q}+?)${q}\s*//) {
+            $parsed->{user}   = $1;
+            $parsed->{host}   = $2;
+        }
+
+        if ($stmt =~ s/\AIDENTIFIED BY PASSWORD ${q}(${Q}+?)${q}\s*//) {
+            $parsed->{identified} = "PASSWORD '$1'";
+        }
+        if ($stmt =~ s/\AIDENTIFIED WITH ${q}(${Q}+?)${q} AS ${q}(${Q}+?)${q}\s*//) {
+            # my $auth_plugin = $1; # eg: mysql_native_password
+            $parsed->{identified} = "PASSWORD '$2'";
+        }
+        if ($stmt =~ s/\AIDENTIFIED WITH ${q}(${Q}+?)${q}\s*//) {
+            # no AS
+            # my $auth_plugin = $1; # eg: mysql_native_password
+            $parsed->{identified} = '';
+        }
+
+        if ($stmt =~ s/\AREQUIRE //) {
+            if ($stmt =~ s/\ANONE\s*//) {
+                $parsed->{require} = '';
+            } elsif ($stmt =~ s/\A(SSL|X509)\s*//) {
+                $parsed->{require} = $1;
+            } else {
+                my @tls_options = ();
+                while ($stmt =~ s/\A((?:CIPHER|ISSUER|SUBJECT) ${q}${Q}+?${q})\s*//g) {
+                    push @tls_options, $1;
+                }
+                $parsed->{require} = join ' ', @tls_options;
+            }
+        }
+
+        if ($stmt =~ s/\AWITH //) {
+            my @with = ();
+            if ($stmt =~ s/\AGRANT OPTION\s*//) {
+                push @with, 'GRANT OPTION';
+            }
+            while ($stmt =~ s/\A(MAX_\w+ \d+)\s*//g) {
+                push @with, $1;
+                $parsed->{object} ||= '*.*';
+                $parsed->{privs} = ['USAGE'] unless @{ $parsed->{privs} };
+            }
+            $parsed->{with} = join ' ', @with;
         }
 
         push @grants, $parsed;
@@ -154,7 +179,7 @@ sub pack_grants {
                 },
             };
         }
-        $packed->{$user_host}{objects}{$object}  = $grant if (scalar(@{ $grant->{privs} || []}) > 0);
+        $packed->{$user_host}{objects}{$object}  = $grant if $object;
         $packed->{$user_host}{options}{required} = $required if $required;
 
         if ($identified) {
@@ -178,7 +203,9 @@ sub parse_privs {
     my @priv_list = ();
 
     while ($privs =~ /\G([^,(]+(?:\([^)]+\))?)\s*,\s*/g) {
-        push @priv_list, $1;
+        my $priv = $1;
+        $priv =~ s/`//g; # trim quote for MySQL 8.0
+        push @priv_list, $priv;
     }
 
     return \@priv_list;

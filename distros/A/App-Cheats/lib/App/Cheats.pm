@@ -8,13 +8,9 @@ use warnings;
 
 App::Cheats - Cheatsheet
 
-=head1 VERSION
-
-Version 0.06
-
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 ENVIRONMENT
 

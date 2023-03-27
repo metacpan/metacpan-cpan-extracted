@@ -1,0 +1,1 @@
+wmf('Objdetect', [qw(objdetect)]);

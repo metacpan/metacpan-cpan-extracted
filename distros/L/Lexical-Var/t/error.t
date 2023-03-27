@@ -14,9 +14,9 @@ like $@, qr/\ALexical::Var does no default unimportation/;
 eval q{ Lexical::Var->import('foo'); };
 like $@, qr/\Aimport list for Lexical::Var must alternate /;
 eval q{ Lexical::Var->import('$foo', \1); };
-like $@, qr/\Acan't set up lexical variable outside compilation/;
+like $@, qr/\Acan't set up Lexical::Var lexical variable outside compilation/;
 eval q{ Lexical::Var->unimport('$foo'); };
-like $@, qr/\Acan't set up lexical variable outside compilation/;
+like $@, qr/\Acan't set up Lexical::Var lexical variable outside compilation/;
 
 eval q{ use Lexical::Var; };
 like $@, qr/\ALexical::Var does no default importation/;

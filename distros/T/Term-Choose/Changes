@@ -1,5 +1,10 @@
 Revision history for Term::Choose
 
+
+1.759   2023-03-26
+    - Update table char_width.
+    - Bugfix line_fold.
+
 1.758   2023-03-17
     - LineFold.pm: use ansi escape to reset colors.
     - Uniocde 15.0.

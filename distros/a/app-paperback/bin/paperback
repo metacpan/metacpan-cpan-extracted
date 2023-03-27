@@ -31,7 +31,7 @@ Options:
 
 =head1 VERSION
 
-Version 1.37
+Version 1.42
 
 =head1 DESCRIPTION
 
@@ -340,7 +340,7 @@ Hector M. Monacci
 
 =head1 LICENSE
 
-Copyright 2022 - Hector M. Monacci.
+Copyright 2023 - Hector M. Monacci.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

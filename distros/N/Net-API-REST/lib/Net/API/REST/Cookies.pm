@@ -67,29 +67,22 @@ sub fetch
 {
     my $self = shift( @_ );
     my $ref = $self->{_cookies};
-    $self->message( 3, "Fetching cookie from Apache headers: ", $self->request->as_string );
     my $cookies = {};
     try
     {
-        $self->message( 3, "Getting Apache pool object." );
         my $pool = $self->_request->pool;
-        $self->message( 3, "Apache pool object is: '$pool'" );
-        $self->message( 3, "Getting an APR Table object instance." );
         # my $o = APR::Request::Apache2->handle( $self->request->pool );
         my $o = APR::Request::Apache2->handle( $self->_request );
         if( $o->jar_status =~ /^(?:Missing input data|Success)$/ )
         {
-            $self->message( 3, "Object is '$o'. Returning the jar. Object has method 'jar'? ", ( $o->can( 'jar' ) ? 'yes' : 'no' ) );
             my $j = $o->jar;
             foreach my $cookie_name ( keys( %$j ) )
             {
                 $cookies->{ $cookie_name } = $j->{ $cookie_name };
             }
-            $self->messagef( 3, "%d cookies found using APR::Request::Apache2.", scalar( keys( %$cookies ) ) );
         }
         else
         {
-            $self->message( 3, "Malformed cookie found: ", $o->jar_status );
             my $cookie_header = $self->request->headers( 'Cookie' );
 #           foreach my $cookie ( CORE::split( /\;[[:blank:]]*/, $cookie_header ) )
 #           {
@@ -107,14 +100,11 @@ sub fetch
     }
     catch( $e )
     {
-        $self->message( 3, "An error occurred while trying to get cookies using APR::Request::Apache2, reverting to Cookie::Baker" );
     }
     my $cookie_header = $self->request->headers( 'Cookie' );
-    $self->message( 3, "Raw cookie header found is '$cookie_header'" );
     if( !scalar( keys( %$cookies ) ) && $cookie_header )
     {
         $cookies = Cookie::Baker::crush_cookie( $cookie_header );
-        $self->messagef( 3, "%d cookies found using Cookie::Baker: %s", scalar( keys( %$cookies ) ), join( ', ', sort( keys( %$cookies ) ) ) );
     }
     ## We are called in void context like $jar->fetch which means we fetch the cookies and add them to our stack internally
     if( !defined( wantarray() ) )
@@ -137,7 +127,6 @@ sub make
     return( $self->error( "Cookie name was not provided." ) ) if( !$opts->{name} );
     $opts->{request} = $self->request;
     $opts->{debug} = $self->debug;
-    $self->message( 3, "Creating cookie with following parameters: ", sub{ $self->dumper( $opts ) } );
     my $c = Net::API::REST::Cookie->new( $opts ) ||
     return( $self->pass_error( Net::API::REST::Cookie->error ) );
     return( $c );

@@ -1,0 +1,8 @@
+0.002   2023-01-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Bencher-Scenario-{SortHashKeys,Sort-HashKeys}.
+
+
+0.001   2017-05-24  Released-By: PERLANCAR
+
+        - First release.

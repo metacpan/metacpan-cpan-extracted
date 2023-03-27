@@ -1,21 +1,15 @@
-use strict;
-use warnings;
-
-use Test::More tests => 6;
-
-use Test::Fatal;
-
+use Test2::V0;
 use File::Open qw(fsysopen_nothrow fopendir_nothrow fopen_nothrow fsysopen fopendir fopen);
 
 my $evil = __FILE__ . "\0";
 my $evildir = ".\0";
 
 like $_, qr/\Q: $evil: / for
-    exception { fopen $evil, 'r' },
-    exception { fsysopen $evil, 'r' },
+    dies { fopen $evil, 'r' },
+    dies { fsysopen $evil, 'r' },
 ;
 like $_, qr/\Q: $evildir: / for
-    exception { fopendir $evildir },
+    dies { fopendir $evildir },
 ;
 
 is $_, undef for
@@ -23,3 +17,5 @@ is $_, undef for
     fsysopen_nothrow($evil, 'r'),
     fopendir_nothrow($evildir),
 ;
+
+done_testing;

@@ -1,0 +1,273 @@
+#!perl
+
+use strict;
+use warnings;
+use JSON::PP;
+use File::Basename;
+use File::Spec::Functions;
+use File::Temp qw(tempdir);
+use File::Path qw(make_path);
+use File::Basename qw(dirname);
+use Cwd;
+use IPC::Open2;
+use Data::Dumper;
+
+my $HEADERS_FILE = 'maint/headers.txt';
+my $HEADERS_DIR = '/usr/include/opencv4/opencv2';
+my $CVDIR = '../opencv/modules/python/src2';
+my $PYSCRIPT = <<'EOF';
+import hdr_parser, json, sys
+parser = hdr_parser.CppHeaderParser()
+json.dump([[*x,parser.parse(x[1])] for x in [json.loads(x) for x in sys.stdin.read().splitlines()]], sys.stdout)
+EOF
+
+my @HEADERS = map {
+  chomp; my ($dest, @files) = split / /; map [$dest, $_], @files;
+} do { local @ARGV = $HEADERS_FILE; grep !/^\s*#/, <> };
+my %dest2headers; push @{$dest2headers{$_->[0]}}, $_->[1] for @HEADERS;
+
+my $tdir = tempdir(CLEANUP=>1);
+my %force_wrap = (
+  RotatedRect => [['.*angle.*']],
+  RNG => [['.*']],
+  TermCriteria => [['.*']],
+);
+my $class_re = join '|', keys %force_wrap;
+my $cons_re = join '|',
+  map "$_\\((?:".join('|', '', @{$force_wrap{$_}[0]}).")\\)", # always default
+  keys %force_wrap;
+sub process_header {
+  my ($dir, $file) = @_;
+  open my $fh, '<', catfile($dir, "$file.hpp") or die "$file.hpp: $!";
+  my $outfile = catfile($tdir, "$file.hpp");
+  my $outdir = dirname $outfile;
+  make_path $outdir or die "$outdir: $!" if !-d $outdir;
+  open my $outfh, '>', $outfile or die "$outfile: $!";
+  my $intext = do { local $/; <$fh> };
+  $intext =~ s/(class\s+)(CV_EXPORTS)(\s+(?:$class_re))/$1${2}_W$3/g;
+  $intext =~ s/^(\s*)($cons_re)/${1}CV_WRAP $2/gm;
+  $intext =~ s/^(\s*)((?:.*?boundingRect|void\s+fill)\()/${1}CV_WRAP $2/gm;
+  print $outfh $intext;
+  $outfile;
+}
+
+my $json_data;
+{
+my $old_dir = getcwd();
+chdir $CVDIR or die "chdir: $!";
+my $pid = open2(my $child_out, my $child_in, qw(python3 -c), $PYSCRIPT);
+print $child_in map encode_json([$_->[0], process_header($HEADERS_DIR, $_->[1])])."\n", @HEADERS;
+close $child_in;
+$json_data = decode_json do { local $/; <$child_out> };
+chdir $old_dir or die "chdir: $!";
+}
+
+my %force = map +($_=>1), qw(
+  cv.batchDistance
+  cv.sum
+  cv.wrapperEMD
+  cv.GeneralizedHough.detect
+  cv.RNG.fill
+  cv.Algorithm.read
+  cv.Algorithm.write
+  cv.FileNode.keys
+  cv.FileNode.rawSize
+  cv.FileStorage.getFirstTopLevelNode
+  cv.FileStorage.operator[]
+  cv.KeyPoint.overlap
+  cv.KeyPoint.convert
+  cv.RotatedRect.boundingRect
+  cv.cvtColor
+  cv.rectangle
+  cv.ellipse2Poly
+  cv.getAffineTransform
+  cv.getGaborKernel
+  cv.fitEllipseDirect
+  cv.drawContours
+  cv.findContours
+  cv.threshold
+  cv.hconcat
+  cv.mixChannels
+  cv.logPolar
+  cv.equalizeHist
+  cv.normalize
+  cv.minMaxLoc
+  cv.imread
+  cv.imencode
+  cv.imshow
+  cv.addText
+  cv.waitKey
+  cv.namedWindow
+  cv.selectROI
+  cv.destroyWindow
+  cv.VideoCapture.read
+  cv.VideoCapture.open
+  cv.VideoCapture.get
+  cv.VideoCapture.getBackendName
+  cv.VideoWriter.open
+  cv.VideoWriter.write
+  cv.VideoWriter.fourcc
+  cv.cvtColorTwoPlane
+  cv.LineSegmentDetector.compareSegments
+  cv.LineSegmentDetector.detect
+  cv.LineSegmentDetector.drawSegments
+  cv.Subdiv2D.initDelaunay
+  cv.Subdiv2D.insert
+  cv.Subdiv2D.getTriangleList
+  cv.Subdiv2D.getVoronoiFacetList
+  cv.QRCodeDetector.detectAndDecodeMulti
+  cv.groupRectangles
+  cv.CascadeClassifier.load
+  cv.CascadeClassifier.detectMultiScale
+  cv.CascadeClassifier.read
+  cv.HOGDescriptor.detectMultiScale
+  cv.HOGDescriptor.compute
+  cv.Tracker.init
+  cv.Tracker.update
+  cv.SparseOpticalFlow.calc
+);
+my %class = map +($_=>1), qw(
+  LineSegmentDetector Tracker VideoCapture VideoWriter QRCodeDetector
+  CascadeClassifier Subdiv2D TrackerKCF TrackerCSRT TrackerMIL
+  FileNode FileStorage DMatch KeyPoint Algorithm CLAHE GeneralizedHough
+  HOGDescriptor SparsePyrLKOpticalFlow DISOpticalFlow SparseOpticalFlow
+  TermCriteria RNG RotatedRect
+);
+my $skip_re = join '|',
+  qr/^cv\.ipp/,
+  qr/^cv\.moments/,
+  qr/^cv\.HuMoments/,
+  qr/\.Params$/,
+  ;
+my $inc_all = 0;
+my %valid_arg = map +($_=>1), qw(json all);
+
+if (@ARGV) {
+  die "Usage: $0 [json|all]" if @ARGV != 1 or !$valid_arg{$ARGV[0]};
+  if ($ARGV[0] eq 'json') {
+    print Dumper $json_data;
+    exit;
+  } elsif ($ARGV[0] eq 'all') {
+    $inc_all = 1;
+  }
+}
+my (%dest2enums, %dest2funcs, %dest2classdefs, %dest2class2create);
+for (@$json_data) {
+  my ($dest, $file, $d) = @$_;
+print "$file -> |$dest|\n";
+  for my $t (@$d) {
+    my ($name, $ret, $flags, $args, $ret_cpp, $doc) = @$t;
+    if ($inc_all and $name =~ $skip_re) {
+print "SKIP: $name\n";
+      next;
+    }
+    if ($name =~ /^enum\s+/) {
+print "enum: $name\n";
+      for my $t (@$args) {
+        my ($ename) = @$t;
+        die "badly-formatted enum name $ename\n" if !(my ($pname) = $ename =~ /^const\s+(cv\..+)/);
+        $pname =~ s#\.#::#g;
+        push @{$dest2enums{$dest}}, $pname;
+      }
+    } elsif ($name =~ /^(?:class|struct) cv\.(.*)/) {
+      my $cname = $1;
+      next if !$inc_all and !$class{$cname};
+      $ret =~ s/^:\s*//;
+      $ret = [map {(my $r=$_)=~s/^cv:://;$r} split /\s*,\s*/, $ret];
+print "class: $cname\n";
+      $cname =~ s/\./::/g;
+      push @{$dest2classdefs{$dest}}, [$cname, $ret, $doc];
+    } elsif ($ret =~ /^Ptr_/ and $name =~ /^cv\.(.*)\.create/) {
+      my $cname = $1;
+print "class::create: $cname\n";
+      (my $colons = $name) =~ s/\./::/g;
+      $args = [] if @$args == 1 and $args->[0][0] =~ /Params/; # temporary
+      $dest2class2create{$dest}{$cname} ||= [1, $colons, []];
+      push @{$dest2class2create{$dest}{$cname}[2]}, [$args, $doc];
+    } elsif ($ret =~ /^Ptr_/ and $name =~ /^cv\.(create(.*))/) {
+      my ($full, $cname) = ($1, $2);
+print "classcreate: $cname\n";
+      $dest2class2create{$dest}{$cname} ||= [1, "cv::$full", []];
+      push @{$dest2class2create{$dest}{$cname}[2]}, [$args, $doc];
+    } elsif ($name =~ /^cv\.([^.]+)\.\1/) { # Python constructors
+      my $cname = $1;
+print "class.class: $cname @{[0+@$args]}\n";
+      $dest2class2create{$dest}{$cname} ||= [0, "cv::$cname", []];
+      push @{$dest2class2create{$dest}{$cname}[2]}, [$args, $doc];
+    } elsif ($inc_all or $force{$name}) {
+      my (undef, @n) = split /\./, $name;
+      my $func = pop @n;
+      my $ismethod = 0+!!((grep /^[A-Z]/, @n) && !(grep $_ eq '/S', @$flags));
+      my $name_alias = $name;
+      if (my @aliases = grep /^=/, @$flags) {
+        die ">1 aliases for $name: @aliases" if @aliases > 1;
+        $aliases[0] =~ s/^=//;
+        if ($aliases[0] !~ /\d$/) { # we replace their numbering with ours
+          (my $colons = $name) =~ s/\./::/g;
+          $func = [$ismethod ? $func : $colons, $aliases[0]];
+          $name_alias .= "/$aliases[0]";
+        }
+      }
+      push @{$dest2funcs{$dest}}, [join('::', @n), $func, $doc, $ismethod, $ret, @$args];
+      print "$name_alias\n";
+    }
+  }
+}
+
+for my $bits (qw(8U 8S 16U 16S 32S 32F 64F)) {
+  push @{$dest2enums{''}}, "CV_${bits}", (map "CV_${bits}C$_", 1..4), "CV_${bits}C|int n";
+}
+push @{$dest2enums{''}}, qw(CV_PI CV_2PI CV_LOG2 INT_MAX);
+
+writefile($_, 'constlist.txt', $dest2enums{$_}) for keys %dest2enums;
+
+sub genfile {
+  my ($d) = @_;
+  local $Data::Dumper::Indent = 0;
+  local $Data::Dumper::Sortkeys = 1;
+  local $Data::Dumper::Terse = 1;
+  ["(", (map Dumper($_).",", @$d), ");"];
+}
+
+sub writefile {
+  my ($dest, $filebase, $list) = @_;
+  my $file = $dest ? catfile(ucfirst($dest), $filebase) : $filebase;
+  my $dir = ucfirst $dest;
+  if ($dest and !-d $dir) {
+    my %n2f = (
+    'Makefile.PL' => "wmf('$dir', [qw(@{$dest2headers{$dest}})]);\n",
+    'module.pd' => <<EOF,
+use strict;
+use warnings;
+use File::Spec::Functions;
+require ''.catfile(updir, 'genpp.pl');
+
+# for pdlpp_mkgen: =head1 NAME PDL::OpenCV::$dir
+genheader("$dir");
+
+pp_done();
+EOF
+    );
+    mkdir $dir or die "$dir: $!";
+    for (keys %n2f) {
+      my $file = catfile($dir, $_);
+      open my $fh, , '>', $file or die "$file: $!";
+      print $fh $n2f{$_};
+    }
+  }
+  my $new = join '', map "$_\n", @$list;
+  my $old = -f $file ? do { local $/; open my $fh, '<', $file or die "$file: $!"; <$fh> } : '';
+  return if $new eq $old;
+  open my $fh, '>', $file or die "$file: $!";
+  print $fh $new;
+}
+
+writefile($_, 'funclist.pl', genfile($dest2funcs{$_})) for keys %dest2funcs;
+
+for my $dest (keys %dest2classdefs) {
+  for my $c (@{$dest2classdefs{$dest}}) {
+    next unless my $extra = $dest2class2create{$dest}{$c->[0]};
+    push @$c, @$extra;
+  }
+}
+writefile($_, 'classes.pl', genfile($dest2classdefs{$_})) for keys %dest2classdefs;

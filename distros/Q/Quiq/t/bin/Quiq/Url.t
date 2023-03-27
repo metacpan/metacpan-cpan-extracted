@@ -16,24 +16,6 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_new : Test(4) {
-    my $self = shift;
-
-    my $urlObj = Quiq::Url->new;
-    $self->is(ref($urlObj),'Quiq::Url');
-    $self->is($urlObj->url,'');
-
-    my $url = 'http://user:passw@host.domain:8080/this/is/a/path'.
-        '?arg1=val1&arg1=val2&arg2=val3#search';
-    $urlObj = Quiq::Url->new($url);
-    $self->is($urlObj->url,$url);    
-
-    $urlObj = Quiq::Url->new(a=>1,b=>2,a=>3,d=>4);
-    $self->is($urlObj->url,'?a=1&a=3&b=2&d=4');    
-}
-
-# -----------------------------------------------------------------------------
-
 sub test_encode : Test(5) {
     my $self = shift;
 

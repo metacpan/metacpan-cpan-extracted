@@ -8,7 +8,7 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Kui soovite tõlkida kogu teksti, kasutage valikut **--match-all**. See on otset
     - `accumulate`
 
         Vaikimisi käitumise kohaselt eemaldatakse kasutamata andmed vahemälufailist. Kui te ei soovi neid eemaldada ja failis hoida, kasutage `accumulate`.
+
+# COMMAND LINE INTERFACE
+
+Seda moodulit saab hõlpsasti kasutada käsurealt, kasutades repositooriumis sisalduvat käsku `xlate`. Kasutamise kohta vaata `xlate` abiinfot.
+
+# EMACS
+
+Laadige repositooriumis sisalduv fail `xlate.el`, et kasutada `xlate` käsku Emacs redaktorist. `xlate-region` funktsioon tõlkida antud piirkonda. Vaikimisi keel on `EN-US` ja te võite määrata keele, kutsudes seda prefix-argumendiga.
 
 # ENVIRONMENT
 

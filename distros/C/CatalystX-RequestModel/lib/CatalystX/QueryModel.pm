@@ -1,7 +1,5 @@
 package CatalystX::QueryModel;
 
-our $VERSION = '0.009';
-
 use Class::Method::Modifiers;
 use Scalar::Util;
 use Moo::_Utils;

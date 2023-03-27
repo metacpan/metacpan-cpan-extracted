@@ -34,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Exporter-Almighty";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-exporter-almighty>;
@@ -56,14 +56,14 @@
 	dc:issued            "2023-01-27"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Avoid experimental::builtin warnings on Perl 5.36+.";
+		], [
 			a doap-changeset:Change;
 			rdfs:label "Adding any enums to an exporter now makes your package a subclass of Type::Library instead of Exporter::Tiny.";
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Rely on Type::Library's grouping/tagging for any type constraints in the exporter.";
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Avoid experimental::builtin warnings on Perl 5.36+.";
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -120,6 +120,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001004.tar.gz>;
 	doap:revision        "0.001004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/v_0-001005>
+	a                    doap:Version;
+	dc:identifier        "Exporter-Almighty-0.001005"^^xsd:string;
+	dc:issued            "2023-03-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "No longer need to decide between Lexical::Var and Alt::Lexical::Var::ButSupportsModernPerl as part of Makefile.PL.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "More useful test output from t/00start.t.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Almighty-0.001005.tar.gz>;
+	doap:revision        "0.001005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

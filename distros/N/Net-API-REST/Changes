@@ -1,5 +1,10 @@
 Revision history for Perl module Net::API::REST
 
+v0.8.1 2023-03-24T16:24:44+0900
+    - Changing approach in method reply() in Net::API::REST for post-response callback using $r->pool->cleanup_register
+    - Corrected method route() for using per HTTP method class method, such as _get => My::Module->list
+    - Corrected method variables() in class Net::API::REST::Endpoint to use the right support method.
+
 v0.8.0 2023-01-05T12:01:28+0900
     - Adding support in method reply() in Net::API::REST for Text::PO::String and its 'locale' value, if set
 

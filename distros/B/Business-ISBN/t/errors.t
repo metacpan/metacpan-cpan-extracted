@@ -8,13 +8,13 @@ can_ok( $class, qw( error_text error ) );
 subtest bad_group => sub {
 	can_ok( $class, qw(error_is_bad_group error_text error) );
 	# blake and taylor fake ISBNs for their DVDs
-	my @bad_isbns = qw(9786316294241 6316294247);
+	my @bad_isbns = qw(9786616294241 6616294247);
 
 	foreach my $try ( @bad_isbns ) {
 		my $isbn = $class->new( $try );
 		ok( ! $isbn->is_valid, "ISBN $try is invalid" );
 		ok( $isbn->error, "ISBN $try is an error" );
-		like( $isbn->error_text, qr/group/, "ISBN $try error text mentions 'group'" );
+		like( $isbn->error_text, qr/Invalid group/, "ISBN $try error text mentions 'group'" );
 		ok( $isbn->error_is_bad_group, "ISBN $try has a bad group" );
 		}
 

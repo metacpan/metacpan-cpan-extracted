@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Data::Compare" => 0,
     "English" => 0,
+    "File::Temp" => 0,
     "FindBin" => 0,
     "Import::Into" => 0,
     "Math::BigFloat" => "1.999837",
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "parent" => 0
   },
-  "VERSION" => "5.007",
+  "VERSION" => "5.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,6 +73,7 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "English" => 0,
   "Exporter" => 0,
+  "File::Temp" => 0,
   "FindBin" => 0,
   "Import::Into" => 0,
   "List::Util" => "1.33",

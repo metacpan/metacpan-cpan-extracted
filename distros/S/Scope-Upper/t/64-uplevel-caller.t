@@ -12,14 +12,18 @@ sub callstack {
  my $i = 1;
  my @stack;
  while (1) {
-  my @c = $check_args ? do { package DB; caller($i++) }
-                      : caller($i++);
+  my @c = $check_args ? do {
+   my $frame = ("$]" >= 5.037_010) ? ($i + 1) : $i;
+   package DB;
+   caller($frame)
+  } : caller($i);
   last unless @c;
   if ($check_args) {
    my $args = $c[4] ? [ @DB::args ] : undef;
    push @c, $args;
   }
   push @stack, \@c;
+  ++$i;
  }
  return \@stack;
 }

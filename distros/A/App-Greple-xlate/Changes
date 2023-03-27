@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.21 2023-03-25T04:12:11Z
+
+    - introduce xate -l option
+    - update xlate.el to complete language list
+
 0.20 2023-03-23T05:55:33Z
 
     - pass -t and -o parameters to make

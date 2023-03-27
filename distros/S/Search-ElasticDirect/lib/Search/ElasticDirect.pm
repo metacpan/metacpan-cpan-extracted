@@ -3,7 +3,7 @@
 # George Bouras, george.mpouras@yandex.com and Joan Ntzougani
 
 package Search::ElasticDirect;
-our $VERSION = '2.5.1';
+our $VERSION = '2.5.2';
 
 use strict;
 use warnings;
@@ -34,7 +34,7 @@ my $url      = '';
     #############
 
 
-#   Create new object and provide a connection to the ElasticSearch using varius methods
+#   Create new object and connect to the ElasticSearch using varius methods
 sub new
 {
 my $class = shift || __PACKAGE__;
@@ -108,13 +108,20 @@ if ($self->{port}    > 65535)   {$self->{error} = "port ($self->{port}) should b
   if ('https' eq $self->{protocol}) {
 
     # https searchguard
-    if ( (! $self->{authentication}) && (defined $self->{certca}) && (defined $self->{cert}) && (defined $self->{key}) ) {
+    if ((defined $self->{certca}) && (defined $self->{cert}) && (defined $self->{key})) {
     unless (-f $self->{certca}) {$self->{error} = "missing ssl certca file $self->{certca}"; return $self}
-    unless (-f $self->{cert}  ) {$self->{error} = "missing ssl cart file $self->{cert}";     return $self}
+    unless (-f $self->{cert}  ) {$self->{error} = "missing ssl cert file $self->{cert}";     return $self}
     unless (-f $self->{key}   ) {$self->{error} = "missing ssl key file $self->{key}";       return $self}
-    $self->{connect}     = Search::ElasticDirectHttp::HTTP_Tiny_https_certca_cert_key($self->{timeout}, $self->{keep_alive}, $self->{verify_SSL}, $self->{certca}, $self->{cert}, $self->{key});
-    $self->{url}         = "https://$self->{host}:$self->{port}";
-    $self->{description} = 'SearchGuard, CA certificate, cert admin, key admin'
+    $self->{connect} = Search::ElasticDirectHttp::HTTP_Tiny_https_certca_cert_key($self->{timeout}, $self->{keep_alive}, $self->{verify_SSL}, $self->{certca}, $self->{cert}, $self->{key});
+
+      if ($self->{authentication}) {
+      $self->{url}         = "https://$self->{username}:$self->{password}\@$self->{host}:$self->{port}";
+      $self->{description} = 'SearchGuard, CA certificate, cert admin, key admin'
+      }
+      else {
+      $self->{url}         = "https://$self->{host}:$self->{port}";
+      $self->{description} = 'SearchGuard, CA certificate, cert admin, key admin'
+      }
     }
 
     # https username, password, certificate. Usually you want this one
@@ -650,7 +657,7 @@ Search::ElasticDirect - An interface to ElasticSearch API, version independent
 
 =head1 VERSION
 
-version 2.5.1
+version 2.5.2
 
 =head1 SYNOPSIS
 
@@ -674,6 +681,14 @@ version 2.5.1
 An interface to ElasticSearch API, version independent
 
 The DeepPagination methods are added to help with complexity of the scroll/cursor/search_after APIs
+
+=head1 NAME
+
+Search::ElasticDirect - An interface to ElasticSearch API, version independent
+
+=head1 VERSION
+
+version 2.5.1
 
 =head1 ERRORS
 
@@ -953,7 +968,16 @@ B<Dancer2::Plugin::ElasticSearch> ElasticSearch wrapper for Dancer
 
 Any ideas or contributors are welcome
 
-=cut
+=head1 AUTHOR
+
+George Bouras <george.mpouras@yandex.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by George Bouras.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

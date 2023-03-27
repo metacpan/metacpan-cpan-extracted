@@ -22,8 +22,19 @@ the same terms as the Perl 5 programming language system itself.
 use Test2::V0;
 
 my @modules = qw(
-	Carp
+	Eval::TypeTiny
+	Exporter::Shiny
+	Import::Into
+	Module::Runtime
+	Type::Library
+	Type::Registry
+	Types::Common
+	
 	Test2::V0
+	Test2::Tools::Spec
+	Test2::Require::AuthorTesting
+	Test2::Require::Module
+	Test2::Plugin::BailOnFail
 );
 
 diag "\n####";

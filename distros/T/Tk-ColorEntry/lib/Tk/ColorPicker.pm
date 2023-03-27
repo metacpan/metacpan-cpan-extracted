@@ -3,7 +3,7 @@ package Tk::ColorPicker;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -11,6 +11,7 @@ use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'ColorPicker';
 
 require Tk::NoteBook;
+require Tk::Pane;
 use Convert::Color;
 use Imager::Screenshot 'screenshot';
 
@@ -40,7 +41,7 @@ Tk::ColorPicker - Frame based megawidget for selecting a color.
 
 Tk::ColorPicker lets you edit a color in RGB, CMY and HSV space.
 It has a facility to pick a screen color with your mouse.
-And it offers a history of previous selected colors.
+It offers a history of previous selected colors.
 It can work in color depths of 4, 8, 12 or 16 bits per channel.
 You can switch color depth on the fly.
 
@@ -89,7 +90,7 @@ Default value 200. Sets the length of all channel sliders.
 =item Switch: B<-updatecall>
 
 Set this callback to reflect changes to the outside.
-Gets the current coloras parameter.
+Gets the current color as parameter.
 
 =back
 
@@ -112,7 +113,7 @@ sub Populate {
 	my $dvar = '';
 	my $rvar = '';
 	$self->{COLORDEPTH} = \$dvar;
-	$self->{CONFIG} = 2;
+	$self->{CONFIG} = 1;
 	$self->{DEPTHVAR} = \$rvar; #used for the radiobuttons in depthselect
 	$self->{HISTORY} = [];
 	$self->{SLIDERHEIGHT} = 200;
@@ -157,14 +158,19 @@ sub Populate {
 	}
 	$self->{VARPOOL} = \%varpool;
 	my $recent = $nb->add('Recent', -label => 'Recent');
-	my $history = $recent->Frame(
+	my $hp = $recent->Scrolled('Pane',
+		-sticky => 'new',
+		-scrollbars => 'osoe',
 	)->pack(
-		-anchor => 'nw',
+		-expand => 1,
+		-fill => 'both',
 	);
+	my $history = $hp->Frame->pack(-anchor => 'nw');
 	$self->Advertise(History => $history);
 
 	
 	$self->ConfigSpecs(
+		-balloon => ['PASSIVE'],
 		-colordepth => ['METHOD', undef, undef, 8],
 		-depthselect =>['METHOD', undef, undef, 0],
 		-historycolumns => ['PASSIVE', undef, undef, 6],
@@ -267,6 +273,12 @@ sub ChannelUpdateRGB {
 	
 }
 
+sub ClassInit {
+	my ($class,$mw) = @_;
+	$mw->bind($class, '<Escape>','pickCancel');
+	return $class->SUPER::ClassInit($mw);
+}
+
 sub colordepth {
 	my ($self, $value) = @_;
 	my $valref = $self->{COLORDEPTH};
@@ -285,11 +297,9 @@ sub colordepth {
 			my $var = $varpool->{$_};
 			my $oldval = $$var;
 			$self->Subwidget($_)->configure(-from => $newmax);
-# 			unless ($self->ConfigMode) {
-				my $ratio = ($newmax + 1)/($oldmax + 1);
-				my $newval = $oldval * $ratio;
-				$$var = $newval;
-# 			}
+			my $ratio = ($newmax + 1)/($oldmax + 1);
+			my $newval = $oldval * $ratio;
+			$$var = $newval;
 		}
 		$self->UpdateCall($self->compoundColor);
 	}
@@ -298,11 +308,7 @@ sub colordepth {
 
 =item B<colorDepth>I<($hexcolor)>
 
-=over 4
-
 Returns the color depth of $hexcolor.
-
-=back
 
 =cut
 
@@ -323,11 +329,7 @@ sub colorDepth {
 
 =item B<compoundColor>
 
-=over 4
-
 Returns a hex color string based on the Red, Green and Blue channels.
-
-=back
 
 =cut
 
@@ -351,9 +353,8 @@ sub ConfigMode {
 
 =item B<convertDepth>(I<$string>, ?<I$depth>?)
 
-=over 4
-
-=back
+Converts the depth of $string to $depth.
+If $depth is not specified, B<-colordepth> is used
 
 =cut
 
@@ -414,11 +415,7 @@ sub depthselect {
 
 =item B<hex2rgb>I<($hex)>
 
-=over 4
-
 Converts $hex to Red, Green Blue values.
-
-=back
 
 =cut
 
@@ -437,12 +434,8 @@ sub hex2rgb {
 
 =item B<hexString>(I<$num>, ?I<$depth>?>)
 
-=over 4
-
 Returns the hexadecimal notation of $num.
-If depth is not specified, B<-colordepth> is used
-
-=back
+If $depth is not specified, B<-colordepth> is used
 
 =cut
 
@@ -457,18 +450,13 @@ sub hexString {
 
 sub History {
 	my $self = shift;
-# 	$self->{HISTORY} = shift if $_;
 	return $self->{HISTORY};
 }
 
 =item B<historyAdd>(I<$color>)
 
-=over 4
-
 Adds color to the History list.
 Saves the list and updates the history tab.
-
-=back
 
 =cut
 
@@ -478,16 +466,11 @@ sub historyAdd {
 	$self->historyLoad;
 	$self->historyNew($color);
 	$self->historySave;
-	$self->historyUpdate;
 }
 
 =item B<historyClear>
 
-=over 4
-
 Clears the history list.
-
-=back
 
 =cut
 
@@ -498,11 +481,7 @@ sub historyClear {
 
 =item B<historyLoad>
 
-=over 4
-
 Loads the history file if it is specified.
-
-=back
 
 =cut
 
@@ -525,11 +504,7 @@ sub historyLoad {
 
 =item B<historyNew>(I<$color>)
 
-=over 4
-
 Adds $color to the history list
-
-=back
 
 =cut
 
@@ -546,11 +521,7 @@ sub historyNew {
 
 =item B<historyReset>
 
-=over 4
-
 Clears the history list. Then saves and updates.
-
-=back
 
 =cut
 
@@ -563,11 +534,7 @@ sub historyReset {
 
 =item B<historySave>
 
-=over 4
-
 Saves the history list.
-
-=back
 
 =cut
 
@@ -594,16 +561,13 @@ sub historySelect {
 
 =item B<historyUpdate>
 
-=over 4
-
 Updates the history tab.
-
-=back
 
 =cut
 
 sub historyUpdate {
 	my $self = shift;
+	$self->historyLoad;
 	my $history = $self->History;
 	my $column = 0;
 	my $row = 0;
@@ -615,19 +579,12 @@ sub historyUpdate {
 	}
 	for (@$history) {
 		my $color = $_;
-		my $depth = $self->colorDepth($color);
-		my ($r, $g, $b) = $self->hex2rgb($color);
-		my $max = (2**$depth) - 1;
-		if ($r > $max/2) { $r = 0 } else { $r = $max }
-		if ($g > $max/2) { $g = 0 } else { $g = $max }
-		if ($b > $max/2) { $b = 0 } else { $b = $max }
+		next unless $self->validate($color);
 		my $l = $page->Label(
 			-cursor => 'hand1',
 			-background => $color,
 			-borderwidth => $self->cget('-indborderwidth'),
-			-foreground => $self->rgb2hex($r, $g, $b, $depth),
 			-relief => $self->cget('-indrelief'),
-			-text => $depth,
 			-width => $self->cget('-indicatorwidth'),
 		)->grid(
 			-column => $column,
@@ -636,7 +593,8 @@ sub historyUpdate {
 			-pady => 2,
 		);
 		$l->bind('<ButtonRelease-1>', [$self, 'historySelect', $color]);
-		
+		my $balloon = $self->cget('-balloon');
+		$balloon->attach($l, -balloonmsg => $color) if defined $balloon;
 		$column ++;
 		if ($column eq $numcolumns) {
 			$column = 0;
@@ -677,12 +635,8 @@ sub IsRGB {
 
 =item B<maxChannelValue>
 
-=over 4
-
 Returns the maximum values for the Red, Green, Blue, Cyan, Magenta and Yellow channels,
 based on B<-colordepth>.
-
-=back
 
 =cut
 
@@ -693,18 +647,9 @@ sub maxChannelValue {
 	return (2**$depth) - 1 if $depth ne '';
 }
 
-sub OnEscape {
-	my $self = shift;
-	if (exists $self->{'_bindsave'}) {
-		$self->pickCancel
-	} else {
-		$self->Subwidget('Pop')->popDown;
-	}
-}
-
 sub pickActivate {
 	my $self = shift;
-	return if exists $self->{'_bindsave'};
+	return if $self->pickInProgress;
 	my $bindsave = $self->bind('<Button-1>');
 	$self->{'_bindsave'} = $bindsave;
 	$self->{'_cursorsave'} = $self->toplevel->cget('-cursor');
@@ -714,10 +659,9 @@ sub pickActivate {
 	$self->toplevel->configure(-cursor => 'crosshair');
 }
 
-
 sub pickCancel {
 	my $self = shift;
-	return unless exists $self->{'_bindsave'};
+	return unless $self->pickInProgress;
 	my $bindsave = delete $self->{'_bindsave'};
 	$self->bind('<Button-1>', $bindsave);
 	my $cursor = delete $self->{'_cursorsave'};
@@ -735,7 +679,7 @@ sub pickInProgress {
 
 sub pickRelease {
 	my ($self, $x, $y) = @_;
-	return unless exists $self->{'_bindsave'};
+	return unless $self->pickInProgress;
 	my $img = screenshot;
 	my $color = $img->getpixel(x => $x, y=> $y);
 	my $red = $self->hexString($color->red, 8);
@@ -749,7 +693,6 @@ sub pickRelease {
 
 sub PostConfig {
 	my $self = shift;
-	$self->colordepth($self->colordepth);
 	$self->historyLoad;
 	$self->historyUpdate;
 	$self->ConfigMode(0);
@@ -771,7 +714,6 @@ sub put {
 
 Converts the red, green and blue values to a hexstring.
 If depth is not specified, B<-colordepth> is used.
-
 
 =cut
 
@@ -879,11 +821,7 @@ Same as Perl.
 
 =head1 AUTHOR
 
-=over 4
-
-=item Hans Jeuken (hanje at cpan dot org)
-
-=back
+Hans Jeuken (hanje at cpan dot org)
 
 =cut
 

@@ -26,20 +26,15 @@ sub register {
         $debugbar->stop;
     });
 
-    $app->hook(after_dispatch => sub {
-        my $c = shift;
-        
-        if (!$c->stash('mojo.static') && !$c->res->is_redirect && $c->res->body =~ m/<\/body>/) {
+    $app->hook(after_render => sub {
+        my ($c, $output, $format) = @_;
+
+        if (!$c->stash('mojo.static') && !$c->res->is_redirect && $$output =~ m/<\/body>/) {
             # Render the debugbar html
             my $html = $debugbar->render;
 
-            my $body = $c->res->body;
-
             # Inject the debugbar html
-            $body =~ s/<\/body>/$html\n<\/body>/ig;
-
-            # Set the new body html
-            $c->res->body($body);
+            $$output =~ s/<\/body>/$html\n<\/body>/ig;
         }
     });
 }

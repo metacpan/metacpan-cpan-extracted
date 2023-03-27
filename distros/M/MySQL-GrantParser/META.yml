@@ -3,33 +3,37 @@ abstract: 'parse SHOW GRANTS and return as hash reference'
 author:
   - 'HIROSE Masaaki <hirose31@gmail.com>'
 build_requires:
-  Test::More: 0.96
+  Test::More: '0.96'
 configure_requires:
-  Module::Build::Tiny: 0.039
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MySQL-GrantParser
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 provides:
   MySQL::GrantParser:
     file: lib/MySQL/GrantParser.pm
-    version: 1.003
+    version: '1.004'
 requires:
-  DBI: 0
-  perl: 5.008005
+  DBI: '0'
+  perl: '5.008005'
 resources:
   bugtracker: https://github.com/hirose31/MySQL-GrantParser/issues
   homepage: https://github.com/hirose31/MySQL-GrantParser
   repository: https://github.com/hirose31/MySQL-GrantParser.git
-version: 1.003
+version: '1.004'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

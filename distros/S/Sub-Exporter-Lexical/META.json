@@ -3,7 +3,7 @@
    "author" : [
       "Ricardo Signes <cpan@semiotic.systems>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -29,10 +29,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Sub::Exporter" : "0.978",
-            "if" : "0",
-            "perl" : "v5.37.2",
+            "perl" : "5.012",
             "warnings" : "0"
          }
       },
@@ -61,7 +59,7 @@
          "web" : "https://github.com/rjbs/Sub-Exporter-Lexical"
       }
    },
-   "version" : "0.100000",
+   "version" : "1.000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037002"
@@ -89,7 +87,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
             "name" : "@RJBS/CheckPrereqsIndexed",
-            "version" : "0.021"
+            "version" : "0.022"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckExtraTests",
@@ -209,7 +207,7 @@
                   "version_regexp" : "(?^:^([0-9]+\\.[0-9]+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -276,7 +274,7 @@
                   ],
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
@@ -383,7 +381,7 @@
                }
             },
             "name" : "@RJBS/PodWeaver",
-            "version" : "4.009"
+            "version" : "4.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::RJBSMisc",
@@ -410,7 +408,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -434,7 +432,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -451,12 +449,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.100000",
+                  "tag" : "1.000",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -476,7 +474,7 @@
                   "remotes_must_exist" : 0
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -487,7 +485,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.40.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -509,11 +507,21 @@
             "version" : "6.030"
          },
          {
+            "class" : "Dist::Zilla::Plugin::PerlVersionPrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::PerlVersionPrereqs" : {
+                  "perl_version" : "5.037"
+               }
+            },
+            "name" : "5.037",
+            "version" : "0.01"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::RemovePrereqs",
             "config" : {
                "Dist::Zilla::Plugin::RemovePrereqs" : {
                   "modules_to_remove" : [
-                     "Lexical::Sub"
+                     "builtin"
                   ]
                }
             },
@@ -581,7 +589,6 @@
    },
    "x_contributors" : [
       "Hans Dieter Pearcey <hdp@weftsoar.net>",
-      "Ricardo SIGNES <rjbs@cpan.org>",
       "Ricardo Signes <rjbs@semiotic.systems>"
    ],
    "x_generated_by_perl" : "v5.37.2",

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.11.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.11.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/12/22
+## Modified 2023/03/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -32,7 +32,7 @@ BEGIN
     use Module::Generic::File qw( sys_tmpdir );
     use POSIX ();
     use Want;
-    $VERSION     = 'v0.11.0';
+    $VERSION     = 'v0.11.2';
     use Devel::Confess;
 };
 
@@ -649,7 +649,9 @@ sub get_sql_type { return( shift->error( "The driver has not provided support fo
 
 sub host { return( shift->_set_get_scalar( 'host', @_ ) ); }
 
-## $rv = $dbh->last_insert_id($catalog, $schema, $table, $field, \%attr);
+sub IN { return( DB::Object::IN->new( splice( @_, 1 ) ) ); }
+
+# $rv = $dbh->last_insert_id($catalog, $schema, $table, $field, \%attr);
 sub last_insert_id
 {
     my $self = shift( @_ );
@@ -2132,7 +2134,7 @@ BEGIN
 sub new
 {
     my $that = shift( @_ );
-    my $val = [ @_ ];
+    my $val = ( scalar( @_ ) == 1 && ref( $_[0] ) eq 'ARRAY' ) ? [ @{$_[0]} ] : [ @_ ];
     return( bless( { value => $val } => ( ref( $that ) || $that ) ) );
 }
 
@@ -2149,6 +2151,101 @@ BEGIN
 };
 
 sub operator { return( 'AND' ); }
+
+# NOTE: package DB::Object::Expression
+package DB::Object::Expression;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use overload (
+        '""'    => 'as_string',
+        'bool'  => sub{1},
+        fallback => 1,
+    );
+};
+
+sub new
+{
+    my $that = shift( @_ );
+    my $val = ( scalar( @_ ) == 1 && ref( $_[0] ) eq 'ARRAY' ) ? [ @{$_[0]} ] : [ @_ ];
+    return( bless( { value => $val } => ( ref( $that ) || $that ) ) );
+}
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $vals = $self->components;
+    return( join( ' ', @$vals ) );
+}
+
+sub components { return( wantarray() ? @{$_[0]->{value}} : $_[0]->{value} ); }
+
+
+# Ref:
+# <https://www.postgresql.org/docs/12/functions-subquery.html#FUNCTIONS-SUBQUERY-IN>
+# <https://www.postgresql.org/docs/12/functions-comparisons.html#FUNCTIONS-COMPARISONS-IN-SCALAR>
+# <https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_in>
+# <https://www.sqlite.org/lang_expr.html#the_in_and_not_in_operators>
+# NOTE: package DB::Object::IN
+package DB::Object::IN;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent -norequire, qw( DB::Object::Operator );
+    use Scalar::Util ();
+    use overload (
+        '""'    => 'as_string',
+        'bool'  => sub{1},
+        '=='    => sub{ &_opt_overload( @_, '==' ) },
+        '!='    => sub{ &_opt_overload( @_, '!=' ) },
+        fallback => 1,
+    );
+};
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $vals = $self->value;
+    my @list = ();
+    foreach my $elem ( @$vals )
+    {
+        next unless( defined( $elem ) );
+        if( Scalar::Util::blessed( $elem ) &&
+            $elem->isa( 'DB::Object::Statement' ) )
+        {
+            push( @list, $elem->as_string );
+        }
+        else
+        {
+            push( @list, $elem );
+        }
+    }
+    local $" = ',';
+    my $sql = "IN (@list)";
+    return( $sql );
+}
+
+sub operator { return( 'IN' ); }
+
+sub _opt_overload
+{
+    my( $self, $val, $swap, $op ) = @_;
+    my $map =
+    {
+    '!=' => 'NOT ',
+    '==' => '',
+    };
+    my $not = $map->{ $op };
+    my $in = $self->as_string;
+    my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
+        ? $val->name
+        : ( $val eq '?' || $self->_is_number( $val ) )
+            ? $val
+            : qq{'${val}'};
+    return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
+}
 
 # NOTE: package DB::Object::NOT
 package DB::Object::NOT;
@@ -2389,7 +2486,7 @@ Sometimes, having placeholders in expression makes it difficult to work, so you 
 
 =head1 VERSION
 
-    v0.11.0
+    v0.11.2
 
 =head1 DESCRIPTION
 

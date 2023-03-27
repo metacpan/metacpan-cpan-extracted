@@ -9,7 +9,8 @@ BEGIN {
 
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
+#use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
+use t_Setup qw/bug /; # strict, warnings, Test::More, Carp etc.
 
 use Scalar::Util qw(blessed reftype looks_like_number);
 
@@ -161,8 +162,9 @@ sub check($$@) {
   my ($desc, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller
   my @expected = ref($expected_arg) eq "ARRAY" ? @$expected_arg : ($expected_arg);
-  die "ARE WE USING THIS FEATURE?" if @actual != 1;
-  die "ARE WE USING THIS FEATURE?" if @expected != 1;
+  confess "zero 'actual' results" if @actual==0;
+  confess "ARE WE USING THIS FEATURE? (@actual)" if @actual != 1;
+  confess "ARE WE USING THIS FEATURE? (@expected)" if @expected != 1;
   confess "\nTESTa FAILED: $desc\n"
          ."Expected ".scalar(@expected)." results, but got ".scalar(@actual).":\n"
          ."expected=(@expected)\n"
@@ -375,6 +377,17 @@ our $ABC_hr = \%ABC_h;
 our $ABC_obj = $main::global_obj;
 our $ABC_regexp = $main::global_regexp;
 
+package main::Mybase;
+sub new { bless \do{ my $t = 1000+$_[1] }, $_[0] }
+use overload 
+  '""' => sub{ my $self=shift; "Mybase-ish-".$$self },
+  # Implement '&' so Data::Dumper::Interp::_show_as_number 
+  # will decide it should be displayed as an unquoted number.
+  '&'  => sub{ my ($self,$operand,$swapped)=@_; $$self & $operand },
+  ;
+package main::Myderived;
+our @ISA = ("main::Mybase");
+    
 package main;
 
 $_ = "GroupA.GroupB";
@@ -499,21 +512,49 @@ my $ratstr  = '1/9';
   # no 'bignum' etc. in effect, just explicit class names
   use Math::BigFloat;
   my $bigf = Math::BigFloat->new($bigfstr);
-  die unless blessed($bigf) =~ /^Math::BigFloat/;
+  die unless $bigf->isa("Math::BigFloat");
 
   use Math::BigRat;
   my $rat = Math::BigRat->new($ratstr);
-  die unless blessed($rat) =~ /^Math::BigRat/;
+  die unless $rat->isa("Math::BigRat");
 
-  # Without stringification
+  # No stringification if disabled
   { local $Data::Dumper::Interp::Objects = 0;
     my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
   }
-  # With explicit stringification of BigFloat only
+  # No stringification if only some other class enabled (string)
+  { local $Data::Dumper::Interp::Objects = 'Some::Other::Class';
+    my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
+  }
+  # No stringification if only some other class enabled (regex)
+  { local $Data::Dumper::Interp::Objects = qr/Some::Other::Class/;
+    my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
+  }
+  # Yes if globally enabled 
+  { local $Data::Dumper::Interp::Objects = 1;
+    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+  }
+  # Yes if enabled only that class (regex)
   { local $Data::Dumper::Interp::Objects = [qr/^Math::BigFloat/];
     checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
-    # But not other classes
-    my $s = vis($rat); die "bug($s)" unless $s =~ /^bless.*BigRat/s;
+  }
+  # Yes if enabled only that class (string)
+  { local $Data::Dumper::Interp::Objects = 'Math::BigFloat';
+    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+  }
+  # Yes if enabled for class as well as others (string)
+  { local $Data::Dumper::Interp::Objects = ['Somewhat::Bogus', 'Math::BigFloat'];
+    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+  }
+  # Yes if enabled for class as well as others (regex)
+  { local $Data::Dumper::Interp::Objects = ['AAA', qr/Bogus/, qr/^Math::BigFloat/, qr/xx/];
+    checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
+  }
+  # Yes if enabled only for a base class (string)
+  { local $Data::Dumper::Interp::Objects = ['main::Mybase'];
+    my $obj = main::Myderived->new(42);
+    $obj->isa("main::Mybase") or die "urp";
+    checklit(sub{eval $_[0]}, $obj, qr/\(main::Myderived\)Mybase-ish-1042/);
   }
 }
 
@@ -529,7 +570,7 @@ my $ratstr  = '1/9';
   eval <<'EOF';
     use bigrat;
     my $rat = eval $ratstr // die;
-    die unless blessed($rat) =~ /^Math::BigRat/;
+    die unless $rat->isa("Math::BigRat");
     checklit(sub{eval $_[0]}, $rat, qr/(?:\(Math::BigRat[^\)]*\))?${ratstr}/);
 EOF
   die "urp\n$@" if $@

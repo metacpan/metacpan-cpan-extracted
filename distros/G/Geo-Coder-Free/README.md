@@ -12,7 +12,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.29
+Version 0.31
 
 # SYNOPSIS
 
@@ -57,7 +57,7 @@ The database also will include data from Who's On First
 [https://whosonfirst.org](https://whosonfirst.org).
 
 Takes one optional parameter, directory,
-which tells the library where to find the MaxMind and GeoNames files admin1db,
+which tells the object where to find the MaxMind and GeoNames files admin1db,
 admin2.db and cities.\[sql|csv.gz\].
 If that parameter isn't given,
 the module will attempt to find the databases,
@@ -197,7 +197,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

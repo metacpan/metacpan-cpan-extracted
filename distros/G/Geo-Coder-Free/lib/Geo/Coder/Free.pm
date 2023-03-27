@@ -2,6 +2,7 @@ package Geo::Coder::Free;
 
 # TODO: Don't have Maxmind as a separate database
 # TODO: Rename openaddresses.sql as geo_code_free.sql
+# TODO: Consider Data::Dumper::Names instead of Data::Dumper
 
 use strict;
 use warnings;
@@ -21,11 +22,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 our $alternatives;
 our $abbreviations;
@@ -85,11 +86,20 @@ but that can't be guaranteed.
 =cut
 
 sub new {
-	my($proto, %param) = @_;
+	my($proto, %args) = @_;
 	my $class = ref($proto) || $proto;
 
-	# Geo::Coder::Free->new not Geo::Coder::Free::new
-	return unless($class);
+	if(!defined($class)) {
+		# Using Geo::Coder::Free->new not Geo::Coder::Free::new
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 
 	if(!$alternatives) {
 		my $keep = $/;
@@ -103,18 +113,18 @@ sub new {
 		}
 	}
 	my $rc = {
-		maxmind => Geo::Coder::Free::MaxMind->new(%param),
+		maxmind => Geo::Coder::Free::MaxMind->new(%args),
 		alternatives => $alternatives
 	};
 
-	if((!$param{'openaddr'}) && $ENV{'OPENADDR_HOME'}) {
-		$param{'openaddr'} = $ENV{'OPENADDR_HOME'};
+	if((!$args{'openaddr'}) && $ENV{'OPENADDR_HOME'}) {
+		$args{'openaddr'} = $ENV{'OPENADDR_HOME'};
 	}
 
-	if($param{'openaddr'}) {
-		$rc->{'openaddr'} = Geo::Coder::Free::OpenAddresses->new(%param);
+	if($args{'openaddr'}) {
+		$rc->{'openaddr'} = Geo::Coder::Free::OpenAddresses->new(%args);
 	}
-	if(my $cache = $param{'cache'}) {
+	if(my $cache = $args{'cache'}) {
 		$rc->{'cache'} = $cache;
 	}
 
@@ -462,7 +472,7 @@ L<http://search.cpan.org/dist/Geo-Coder-Free/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)
@@ -483,6 +493,6 @@ See L<https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.m
 # See also lib/Geo/Coder/Free/Local.pm
 __DATA__
 St Lawrence, Thanet, Kent = Ramsgate, Kent
-St Peters, Thanet, Kent = St Peters, Kent
+St Peters, Thanet, Kent = Broadstairs, Kent
 Minster, Thanet, Kent = Ramsgate, Kent
 Tyne and Wear = Borough of North Tyneside

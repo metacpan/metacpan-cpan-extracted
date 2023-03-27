@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.230370';
+$App::RouterColorizer::VERSION = '1.230830';
 use Moose;
 
 use feature 'signatures';
@@ -333,6 +333,9 @@ s/^ ( \QPhysical interface: \E \S+                                     ) $/$self
 
     $line =~ s/^ ( \Q  Input rate     : \E $NUM \N+ ) $/$self->_colorize($1, $INFO)/exx;
     $line =~ s/^ ( \Q  Output rate    : \E $NUM \N+ ) $/$self->_colorize($1, $INFO)/exx;
+
+    $line =~ s/^ ( \Q    Input packets : \E $NUM \N+ ) $/$self->_colorize($1, $INFO)/exx;
+    $line =~ s/^ ( \Q    Output packets: \E $NUM \N+ ) $/$self->_colorize($1, $INFO)/exx;
 
     $line =~ s/^ ( \Q  Active alarms  : None\E ) $/$self->_colorize($1, $GREEN)/exx;
     $line =~ s/^ ( \Q  Active alarms  : \E \N+ ) $/$self->_colorize($1, $RED)/exx;
@@ -760,7 +763,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.230370
+version 1.230830
 
 =head1 DESCRIPTION
 

@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Glib;
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
@@ -309,7 +309,7 @@ Glib::Object::Introspection - Dynamically create Perl language bindings
 
 Glib::Object::Introspection uses the gobject-introspection and libffi projects
 to dynamically create Perl bindings for a wide variety of libraries.  Examples
-include gtk+, webkit, libsoup and many more.
+include Gtk, webkit, libsoup and many more.
 
 =head1 DESCRIPTION FOR LIBRARY USERS
 
@@ -726,7 +726,7 @@ behavior.
 
 =item perl-Glib: L<Glib>
 
-=item gobject-introspection: L<http://live.gnome.org/GObjectIntrospection>
+=item gobject-introspection: L<https://gi.readthedocs.io/en/latest/>
 
 =item libffi: L<http://sourceware.org/libffi/>
 
@@ -736,7 +736,7 @@ behavior.
 
 =over
 
-=item Emmanuele Bassi <ebassi at linux intel com>
+=item Emmanuele Bassi <ebassi at gnome org>
 
 =item muppet <scott asofyet org>
 

@@ -20,12 +20,13 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.09';
+$VERSIONE = '0.27';
 $VERSIONE = $VERSIONE;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use FindBin;
 use File::Path;
 use File::Copy;
@@ -43,6 +44,7 @@ C:\> pmake xtest
 C:\> pmake install
 C:\> pmake dist
 C:\> pmake ptar
+C:\> pmake xzvf
 C:\> pmake pwget
 END
     }
@@ -57,6 +59,7 @@ $ ./pmake.bat xtest
 $ ./pmake.bat install
 $ ./pmake.bat dist
 $ ./pmake.bat ptar
+$ ./pmake.bat xzvf
 $ ./pmake.bat pwget
 
 END
@@ -64,9 +67,11 @@ END
 }
 
 # get file list
-open(FH_MANIFEST, 'MANIFEST');
-chomp(my @file = <FH_MANIFEST>);
-close FH_MANIFEST;
+my @file = ();
+if (open(FH_MANIFEST, 'MANIFEST')) {
+    chomp(@file = <FH_MANIFEST>);
+    close FH_MANIFEST;
+}
 
 for my $target (@ARGV) {
 
@@ -137,6 +142,9 @@ for my $target (@ARGV) {
     # make dist
     elsif ($target eq 'dist') {
 
+        # your PAUSE ID here
+        my $author = q{ina <ina@cpan.org>};
+
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
         chomp(my $name_as_filesystem = <FH_MANIFEST>);
@@ -189,19 +197,83 @@ for my $target (@ARGV) {
         die "'VERSION' not found.\n"  unless $version;
         die "'ABSTRACT' not found.\n" unless $abstract;
 
+        my %requires_version = (qw(
+            Archive::Tar         0.072
+            Compress::Zlib       1.03
+            Config               0
+            ExtUtils::MakeMaker  5.4302
+            Fcntl                1.03
+            File::Basename       2.6
+            File::Copy           2.02
+            File::Path           1.0401
+            FindBin              1.42
+            IOas::CP932          0.06
+            IOas::CP932IBM       0.06
+            IOas::CP932NEC       0.06
+            IOas::CP932X         0.06
+            IOas::SJIS2004       0.06
+            Jacode4e::RoundTrip  2.13.81.8
+            UTF8::R2             0.05
+            strict               1.01
+        ));
+        my %requires = (qw(
+            perl                 5.005_03
+        ));
+        my %provides = ();
+        for my $file (grep /\.(pl|pm|t|bat)\z/i, @file) {
+            if (open FILE, $file) {
+                while (<FILE>) {
+                    chomp;
+                    if (/^use\s+([0-9]+(\.[0-9]*)?)/) {
+                        $requires{'perl'} = $1;
+                    }
+                    elsif (/^use\s+([A-Za-z][^;\s]*).*;/) {
+                        $requires{$1} = ($requires_version{$1} || '0');
+                    }
+                    elsif (/^package\s+([A-Za-z][^;\s]*).*;/) {
+                        $provides{$1} = $file;
+                    }
+                }
+                close(FILE);
+            }
+        }
+        delete @requires{keys %provides};
+        if ($package eq 'Char') {
+            delete @requires{qw(
+                Ebig5hkscs
+                Ebig5plus
+                Egb18030
+                Egbk 
+                Ehp15
+                Einformixv6als
+                Ekps9566
+                Euhc
+            )};
+            delete @provides{qw(
+                Esjis
+                Sjis
+            )};
+        }
+
+        #                                                12345678
+        my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} sort keys %requires;
+
         # write Makefile.PL
         open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
         binmode FH_MAKEFILEPL;
-        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract);
+        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author);
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{%s},
     'VERSION'   => q{%s},
     'ABSTRACT'  => q{%s},
-    'PREREQ_PM' => { },
-    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
+    'PREREQ_PM' => {
+%s
+    },
+    'AUTHOR'    => q{%s},
 );
 
 __END__
@@ -227,9 +299,14 @@ END
         #     version: 1.4
         #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
 
+        #                                      12     1234
+        my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}"} sort keys %provides;
+        my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}            sort keys %requires;
+        #                                      12
+
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $requires_as_yml, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -238,22 +315,11 @@ name: %s
 version: %s
 abstract: %s
 author:
-  - ina <ina@cpan.org>
+  - %s
 license: perl
 generated_by: pmake.bat
 requires:
-  Archive::Tar: 0.072
-  Compress::Zlib: 1.03
-  Config: 0
-  ExtUtils::MakeMaker: 5.4302
-  Fcntl: 1.03
-  File::Basename: 2.6
-  File::Copy: 2.02
-  File::Path: 1.0401
-  FindBin: 1.42
-  Getopt::Std: 1.01
-  perl: 5.005_03
-  strict: 1.01
+%s
 build_requires:
   Test: 1.122
 resources:
@@ -282,15 +348,20 @@ END
         #       "version" : 2
         #   },
 
+        #                                          1234567890123456
+        my $requires_as_json = join ",\n", map {qq{                "$_" : "$requires{$_}"}}                            sort keys %requires;
+        my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}"\n        }}} sort keys %provides;
+        #                                          12345678          123456789012                          12345678
+
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json);
 {
     "name" : "%s",
     "version" : "%s",
     "abstract" : "%s",
     "author" : [
-        "ina <ina@cpan.org>"
+        "%s"
     ],
     "dynamic_config" : 1,
     "generated_by" : "pmake.bat",
@@ -298,8 +369,8 @@ END
         "perl_5"
     ],
     "meta-spec" : {
-       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-       "version" : 2
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
@@ -307,65 +378,23 @@ END
             "http://dev.perl.org/licenses/"
         ],
         "repository" : {
-             "url" : "https://github.com/ina-cpan/%s"
+            "url" : "https://github.com/ina-cpan/%s"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+%s
             }
         },
         "configure" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+%s
             }
         },
         "runtime" : {
             "requires" : {
-                "Archive::Tar" : "0.072",
-                "Compress::Zlib" : "1.03",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Getopt::Std" : "1.01",
-                "Test" : "1.122",
-                "Test::Harness" : "1.1602",
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "Test" : "1.122"
+%s
             }
         }
     }
@@ -778,6 +807,34 @@ LICENSING
         close FH_LICENSE;
         check_usascii('LICENSE');
 
+        # write CONTRIBUTING
+        open(FH_CONTRIBUTING,'>CONTRIBUTING') || die "Can't open file: CONTRIBUTING\n";
+        binmode FH_CONTRIBUTING;
+        print FH_CONTRIBUTING <<'TO_CONTRIBUTE';
+# Contributing to this project
+
+Before you go crazy with huge changes, send some small e-mail to check
+that we want to change the tools in that way. E-mail that have one logical
+change are better.
+
+Good e-mail, patches, improvements, new features - are a fantastic help.
+They should remain focused in scope and avoid containing unrelated commits.
+
+**Please ask first** before embarking on any significant e-mail (e.g.
+implementing features, refactoring code, porting to a different language),
+otherwise you risk spending a lot of time working on something that the
+project's developers might not want to merge into the project.
+
+Please adhere to the coding conventions used throughout a project
+(indentation, accurate comments, etc.) and any other requirements (such
+as test coverage).
+
+**IMPORTANT**: By submitting a patch, you agree to allow the project owner
+to license your work under the same license as that used by the project.
+TO_CONTRIBUTE
+        close FH_CONTRIBUTING;
+        check_usascii('CONTRIBUTING');
+
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
@@ -920,12 +977,13 @@ LICENSING
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
-if ($ARGV[0] ne 'xzvf') {
+if (scalar(@ARGV) == 0) {
     die <<END;
 
 usage: ptar xzvf file1.tar.gz file2.tar.gz ...
@@ -938,6 +996,10 @@ e(x)tract
 (f)ile
 
 END
+}
+
+if ($ARGV[0] eq 'xzvf') {
+    () = shift @ARGV;
 }
 
 for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
@@ -1012,6 +1074,45 @@ END
         }
     }
 
+    # unzip and untar *.tar.gz
+    elsif ($target =~ /^xzvf$/) {
+        for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
+
+            if ($^O =~ /(?:solaris|linux)/i) {
+                system(qq{gzip -cd $gzfile | tar -xvf -});
+            }
+            else {
+                eval q{
+                    use Compress::Zlib;
+                    use Archive::Tar;
+                };
+
+                my $gz = gzopen($gzfile, 'rb');
+                (my $tarfile = $gzfile) =~ s/\.gz$//xmsi;
+                open(FH_TAR, ">$tarfile") || die "Can't open file: $tarfile\n";
+                binmode FH_TAR;
+                while ($gz->gzreadline(my $line)) {
+                    print FH_TAR $line;
+                }
+                $gz->gzclose;
+                close FH_TAR;
+
+                my $tar = Archive::Tar->new($tarfile,1);
+                for my $file ($tar->list_files){
+                    if (-e $file) {
+                        print STDERR "skip $file is already exists.\n";
+                    }
+                    else {
+                        print STDERR "x $file\n";
+                        $tar->extract($file);
+                    }
+                }
+                unlink $tarfile;
+            }
+        }
+        last;
+    }
+
     # make pwget
     elsif ($target =~ /^pwget(?:\.bat)?$/) {
 
@@ -1020,7 +1121,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1151,38 +1252,41 @@ sub _runtests {
     #   Consult the user's guide for more details about POSIX paths: #'
     #     http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
 
-    if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
-        $ENV{'CYGWIN'} = join(' ', $ENV{'CYGWIN'}, 'nodosfilewarning');
+    if (exists $ENV{'CYGWIN'}) {
+        if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
+            $ENV{'CYGWIN'} = join(' ', $ENV{'CYGWIN'}, 'nodosfilewarning');
+        }
     }
 
     my $scriptno = 0;
     for my $script (@script) {
-        my @result = qx{$^X $script};
-        my($tests) = $result[0] =~ /^1..([0-9]+)/;
+        next if not -e $script;
 
         my $testno = 1;
         my $ok = 0;
         my $not_ok = 0;
-        for my $result (@result) {
-            if ($result =~ /^ok /) {
-                $ok++;
+        if (my @result = qx{$^X $script}) {
+            if (my($tests) = shift(@result) =~ /^1..([0-9]+)/) {
+                for my $result (@result) {
+                    if ($result =~ /^ok /) {
+                        $ok++;
+                    }
+                    elsif ($result =~ /^not ok /) {
+                        push @{$fail_testno[$scriptno]}, $testno;
+                        $not_ok++;
+                    }
+                    $testno++;
+                }
+                if ($ok == $tests) {
+                    printf("$script ok\n");
+                    $ok_script++;
+                }
+                else {
+                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+                    $not_ok_script++;
+                }
             }
-            elsif ($result =~ /^not ok /) {
-                push @{$fail_testno[$scriptno]}, $testno;
-                $not_ok++;
-            }
-            $testno++;
         }
-
-        if ($ok == $tests) {
-            printf("$script ok\n");
-            $ok_script++;
-        }
-        else {
-            printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
-            $not_ok_script++;
-        }
-
         $total_ok += $ok;
         $total_not_ok += $not_ok;
         $scriptno++;
@@ -1246,6 +1350,7 @@ pmake - make of Perl Poor Tools
   pmake.bat install
   pmake.bat dist
   pmake.bat ptar
+  pmake.bat xzvf
   pmake.bat pwget
 
 =head1 DEPENDENCIES
@@ -1266,17 +1371,6 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-=head1 SEE ALSO
-
- CPAN Directory INABA Hitoshi
- http://search.cpan.org/~ina/
-
- BackPAN
- http://backpan.perl.org/authors/id/I/IN/INA/
-
- Recent Perl packages by "INABA Hitoshi"
- http://code.activestate.com/ppm/author:INABA-Hitoshi/
 
 =cut
 

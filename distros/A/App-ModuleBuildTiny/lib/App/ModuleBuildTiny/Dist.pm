@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 use CPAN::Meta;
 use Config;

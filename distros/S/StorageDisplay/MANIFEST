@@ -54,6 +54,7 @@ t/000-report-versions.t
 t/05_round.t
 t/06_int-data-dumper.t
 t/07_json.t
+t/08_bigint.t
 t/10_scripts.t
 t/20_reference.t
 t/author-critic.t

@@ -20,6 +20,8 @@ sub callPkgNew(@) {
   $r
 }
 
+use File::Temp qw/tempfile tempdir/;
+
 # ---------- Check stuff other than formatting or interpolation --------
 
 sub unix_compatible_os() {
@@ -112,25 +114,34 @@ setPkgVar("Foldwidth", undef); # re-enable auto-detect
 if (unix_compatible_os()) {
   delete local $ENV{COLUMNS};
   ivis("abc");
-  die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," not defaulted correctly, expecting $expected" unless getPkgVar('Foldwidth') == $expected;
+  die "${pkgname}::Foldwidth=",u(getPkgVar('Foldwidth'))," not defaulted correctly, expecting $expected" unless getPkgVar('Foldwidth') == $expected;
 }
 
 # Should defauilt to 80 if there is no terminal and COLUMNS is unset
 setPkgVar("Foldwidth", undef); # re-enable auto-detect
 if (unix_compatible_os()) {
   delete local $ENV{COLUMNS};
+  my $tmp = File::Temp->new(); # auto-removed when DESTROYed
   my $pid = fork();
   if ($pid==0) {
     require POSIX;
+    # Prevent Term::ReadKey::GetTerminalSize() from working
+    close(STDOUT) or die; open(STDOUT,">&",$tmp) or die "$! ";
+    close(STDERR) or die; open(STDERR,">&",$tmp) or die "$! ";
+    close(STDIN) or die;
     die "bug" unless POSIX::setsid()==$$; # Loose controlling tty
-    #for (*STDIN,*STDOUT,*STDERR) { close $_ or die "Can not close $_:$!" }
-    POSIX::close $_ for (0,1,2);
+    open(my $ttyfd, "</dev/tty") && die "/dev/tty unexpectedly still available";
+    die "WHAT?? (should still be undef)" if defined(getPkgVar('Foldwidth'));
+    setPkgVar("Foldwidth", undef); # re-enable auto-detect
     ivis("abc");
     exit(getPkgVar('Foldwidth') // 253);
   }
   waitpid($pid,0);
-  die "With no tty, ${pkgname}::Foldwidth defaulted to ", ($? >> 8)|($? & !0xFF), " (not 80 as expected)"
-    unless $? == (80 << 8);
+  my $wstat = $?;
+  seek($tmp,0,0) or die "seek tmp:$!";
+  while (<$tmp>) { print "##subproc:$_"; }
+  die "With no tty, ${pkgname}::Foldwidth defaulted to ", ($wstat >> 8)|($wstat & !0xFF), " (not 80 as expected)"
+    unless $wstat == (80 << 8);
   $? = 0;
 }
 ok(1, "Foldwidth default initialization");

@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'Net-API-REST-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

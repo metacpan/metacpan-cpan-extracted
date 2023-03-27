@@ -22,8 +22,8 @@ use feature 'lexical_subs';
 no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
-our $VERSION = '5.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-03-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '5.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-03-25'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -415,11 +415,26 @@ say "@##repl (truncate...) at ",__LINE__ if $debug;
   my $overload_depth;
   CHECK: {
     if (my $class = blessed($item)) {
-      # Is the Objects() feature enabled?
-      last unless any { ref($_) eq "Regexp" ? $class =~ $_
-                                            : ($_ eq "1" || $_ eq $class)
-                      } @$objects;
+      my $enabled;
+      OSPEC:
+      foreach my $ospec (@$objects) {
+        if (ref($ospec) eq "Regexp") {
+          my @stack = ($class);
+          my %seen;
+          while (my $c = shift @stack) {
+            $enabled=1, last OSPEC if $c =~ $ospec;
+            last CHECK if $seen{$c}++; # circular ISAs !
+            no strict 'refs';
+            push @stack, @{"${c}::ISA"};
+          }
+        } else {
+          $enabled=1, last OSPEC if ($ospec eq "1" || $item->isa($ospec));
+        }
+      }
+      last 
+        unless $enabled;
       if (overload::Overloaded($item)) {
+say "@##repl overloaded '$class' at ",__LINE__ if $debug;
         # N.B. Overloaded(...) also returns true if it's a NAME of an
         # overloaded package; should not happen in this case.
         warn("Recursive overloads on $item ?\n"),last
@@ -473,7 +488,7 @@ say "@##repl (overload...) at ",__LINE__ if $debug;
       # No overloaded operator (that we care about); just stringify the ref
       # except for refs to a regex which Data::Dumper formats nicely by itself.
       unless ($class eq "Regexp") {
-say "@##repl (not overloaded, not Regexp) at ",__LINE__ if $debug;
+say "@##repl (no overload repl, not Regexp) at ",__LINE__ if $debug;
         #$item = "$item";  # will show with "quotes"
         $item = "${magic_noquotes_pfx}$item"; # show without "quotes"
         $changed = 1;
@@ -719,11 +734,13 @@ sub _show_as_number(_) {
         feature->unimport( 'bitwise' );
         warnings->unimport("experimental::bitwise");
       };
+      $@ = "";
     }
     no warnings "once";
     # Use FF... so we can see what $value was in debug messages below
     my $dummy = ($value & "\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}");
   };
+  say "##_san $value \$@=$@" if $Debug;
   if ($@) {
     if ($@ =~ /".*" isn't numeric/) {
       return 1; # Ergo $value must be numeric
@@ -733,6 +750,11 @@ sub _show_as_number(_) {
       # is numeric but just doesn't support bitwise operators,
       # for example BigRat.
       return 1 if defined blessed($value);
+    }
+    if ($@ =~ /no method found/) { # overloaded but does not do '&'
+      # It must use overloads, but does not implement '&'
+      # Assume it is string-ish
+      return 0 if defined blessed($value); # else our mistake, isn't overloaded
     }
     warn "# ".__PACKAGE__." : value=",_dbshow($value),
          "\n    Unhandled warn/exception from unary & :$@\n"
@@ -1612,7 +1634,7 @@ A I<false> value disables special handling of objects
 and internals are shown as with Data::Dumper.
 
 A "1" (the default) enables for all objects, otherwise only
-for the specified class name(s).
+for the specified class name(s) [or derived classes].
 
 When enabled, object internals are never shown.
 If the stringification ('""') operator,

@@ -25,6 +25,8 @@ CreatingRhythms
 Gene
 Hollos
 Music
+OEIS
+SqrtContinued
 cfcv
 cfsqrt
 chsequl

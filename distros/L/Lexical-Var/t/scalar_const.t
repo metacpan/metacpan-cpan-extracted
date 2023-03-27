@@ -47,15 +47,15 @@ eval q{
 };
 like $@, qr/\ACan't modify constant item /;
 
-is_deeply eval q{
-	use Lexical::Var '$foo' => \(my $x=undef);
+is_deeply scalar(eval q{
+	use Lexical::Var '$foo' => \(my $x = my $y = undef);
 	[$foo];
-}, [undef];
+}), [undef];
 
 # test that non-constant undef $foo is not a const op
 eval q{
 	die;
-	use Lexical::Var '$foo' => \(my $x=undef);
+	use Lexical::Var '$foo' => \(my $x = my $y = undef);
 	$foo = 456;
 };
 like $@, qr/\ADied /;
@@ -63,7 +63,7 @@ like $@, qr/\ADied /;
 # test that non-constant undef $foo does not participate in constant folding
 eval q{
 	die;
-	use Lexical::Var '$foo' => \(my $x=undef);
+	use Lexical::Var '$foo' => \(my $x = my $y = undef);
 	!$foo = 456;
 };
 like $@, qr/\ACan't modify not /;

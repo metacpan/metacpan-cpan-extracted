@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Test::More tests => 12;
 
 BEGIN { $SIG{__WARN__} = sub { die "WARNING: $_[0]" }; }
@@ -13,7 +14,7 @@ sub test_case($) {
 	if($err eq "") {
 		is $result, 123;
 	} else {
-		like $err, qr/\Acan't set up lexical /;
+		like $err, qr/\Acan't set up Lexical::Var lexical /;
 	}
 }
 

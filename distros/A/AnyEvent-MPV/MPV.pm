@@ -223,7 +223,7 @@ use Scalar::Util ();
 use AnyEvent ();
 use AnyEvent::Util ();
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 sub OBSID() { 0x10000000000000 } # 2**52
 
@@ -569,9 +569,9 @@ For subclassing, see I<SUBCLASSING>, below.
 =cut
 
 sub on_event {
-   my ($self, $key) = @_;
+   my ($self, $event, $data) = @_;
 
-   $self->{on_event}($self, $key) if $self->{on_event};
+   $self->{on_event}($self, $event, $data) if $self->{on_event};
 }
 
 =item $mpv->on_key ($string)

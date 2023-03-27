@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.15
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.5.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/02/24
+## Modified 2023/03/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,7 +33,7 @@ BEGIN
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
     use Nice::Try;
-    $VERSION     = 'v0.4.15';
+    $VERSION     = 'v0.5.0';
     use Devel::Confess;
 };
 
@@ -1200,6 +1200,7 @@ sub _dsn
 # AUTOLOAD is inherited
 # AUTOLOAD
 
+# NOTE: DESTROY
 DESTROY
 {
     my $self  = shift( @_ );
@@ -1231,6 +1232,7 @@ DESTROY
     }
 }
 
+# NOTE: END
 END
 {
     # foreach my $dbh ( @DBH )
@@ -1345,7 +1347,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v0.4.15
+    v0.5.0
 
 =head1 DESCRIPTION
 

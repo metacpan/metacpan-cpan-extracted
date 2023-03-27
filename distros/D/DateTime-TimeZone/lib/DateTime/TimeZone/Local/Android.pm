@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.58';
+our $VERSION = '2.59';
 
 use Try::Tiny;
 

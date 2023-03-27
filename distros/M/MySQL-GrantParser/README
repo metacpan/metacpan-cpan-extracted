@@ -2,15 +2,6 @@ NAME
 
     MySQL::GrantParser - parse SHOW GRANTS and return as hash reference
 
-INSTALLATION
-
-    To install this module, run the following commands:
-
-        perl Build.PL
-        ./Build
-        ./Build test
-        ./Build install
-
 SYNOPSIS
 
         use MySQL::GrantParser;

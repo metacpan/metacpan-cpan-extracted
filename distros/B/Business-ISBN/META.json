@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -31,7 +31,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Business::ISBN::Data" : "20191107",
+            "Business::ISBN::Data" : "20230322.001",
             "perl" : "5.008"
          }
       },
@@ -49,10 +49,10 @@
       "homepage" : "https://github.com/briandfoy/business-isbn",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/business-isbn.git",
+         "url" : "https://github.com/briandfoy/business-isbn",
          "web" : "https://github.com/briandfoy/business-isbn"
       }
    },
-   "version" : "3.007",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "3.008",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

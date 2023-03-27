@@ -43,6 +43,10 @@ SAMPLE of Perl/Exactly.pm.conf
           5.026 => 'C:/Perl526/bin/perl.exe',
           5.028 => 'C:/Perl528/bin/perl.exe',
           5.030 => 'C:/Perl530/bin/perl.exe',
+          5.032 => 'C:/Perl532/bin/perl.exe',
+          5.034 => 'C:/Perl534/bin/perl.exe',
+          5.036 => 'C:/Perl536/bin/perl.exe',
+          5.038 => 'C:/Perl538/bin/perl.exe',
       ) :
 
       # UNIX-like system
@@ -61,6 +65,10 @@ SAMPLE of Perl/Exactly.pm.conf
           5.026 => '/path/to/perl/5.026/bin/perl',
           5.028 => '/path/to/perl/5.028/bin/perl',
           5.030 => '/path/to/perl/5.030/bin/perl',
+          5.032 => '/path/to/perl/5.032/bin/perl',
+          5.034 => '/path/to/perl/5.034/bin/perl',
+          5.036 => '/path/to/perl/5.036/bin/perl',
+          5.038 => '/path/to/perl/5.038/bin/perl',
       )
   }
   __END__

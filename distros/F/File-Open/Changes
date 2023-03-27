@@ -1,37 +1,41 @@
 Revision history for File-Open
 
+1.0103  2023-03-26
+        - Document `fopendir` and `fopendir_nothrow`.
+        - Switch from Test::More to Test2::V0.
+
 1.0102  2017-04-16
-        Don't rely on '.' in @INC.
+        - Don't rely on '.' in @INC.
 
 1.0101  2016-02-13
-        Implement fopendir().
-        Fix hyperlinks in documentation.
-        Don't use Exporter features that exist in 5.57+ only.
+        - Implement fopendir().
+        - Fix hyperlinks in documentation.
+        - Don't use Exporter features that exist in 5.57+ only.
 
 1.0001  2013-10-22
-        Add some examples to documentation.
+        - Add some examples to documentation.
 
 1.0     2013-08-17
-        Minor code cleanup.
+        - Minor code cleanup.
 
 0.100   2013-05-15
-        Support default layers set with 'use open'.
+        - Support default layers set with 'use open'.
 
 0.032   2013-05-14
-        A bit more documentation for layers and methods.
+        - A bit more documentation for layers and methods.
 
 0.031   2011-08-17
-        Skip failing tests on windows.
-        Switch to Dist::Zilla.
+        - Skip failing tests on windows.
+        - Switch to Dist::Zilla.
 
 0.03    2011-08-16
-        Try to run on 5.6.
-        Don't rely on tmpdir either; get a unique scratch test directory.
-        Disallow \0 in filenames.
+        - Try to run on 5.6.
+        - Don't rely on tmpdir either; get a unique scratch test directory.
+        - Disallow \0 in filenames.
 
 0.021   2011-08-08
-        Fix build failure on 5.8.
-        Don't rely on CWD being writable for testing.
+        - Fix build failure on 5.8.
+        - Don't rely on CWD being writable for testing.
 
 0.02    2011-08-04
-        First version, released on an unsuspecting world.
+        - First version, released on an unsuspecting world.

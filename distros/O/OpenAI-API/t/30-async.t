@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use AnyEvent;
-use Data::Dumper;
 use Test::More;
 use Test::RequiresInternet;
 
@@ -28,8 +27,9 @@ my $cv = AnyEvent->condvar;    # Create a condition variable
 
 $request->send_async()->then(
     sub {
-        my $response_data = shift;
-        pass();
+        my $content = shift;
+        isa_ok( $content, 'HASH' );
+        like( $content->{choices}[0]{text}, qr{test}, 'got expected string' );
     }
 )->catch(
     sub {

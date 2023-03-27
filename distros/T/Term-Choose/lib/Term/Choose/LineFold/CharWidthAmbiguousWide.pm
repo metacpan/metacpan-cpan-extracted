@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.758';
+our $VERSION = '1.759';
 
 use Exporter qw( import );
 
@@ -14,7 +14,6 @@ our @EXPORT_OK = qw( table_char_width );
 # test with gnome-terminal - ambiguous characters set to wide
 
 # Control characters, non-characters and surrogates are removed before using this table.
-# However - to have less ranges in table_char_width - surrogates and non-characters return 1.
 
 
 sub table_char_width { [
@@ -375,7 +374,8 @@ sub table_char_width { [
 [  0x109d,   0x109d, 0],
 [  0x109e,   0x10ff, 1],
 [  0x1100,   0x115f, 2],
-[  0x1160,   0x135c, 1],
+[  0x1160,   0x11ff, 0],
+[  0x1200,   0x135c, 1],
 [  0x135d,   0x135f, 0],
 [  0x1360,   0x1711, 1],
 [  0x1712,   0x1714, 0],
@@ -839,7 +839,8 @@ sub table_char_width { [
 [  0xabed,   0xabed, 0],
 [  0xabee,   0xabff, 1],
 [  0xac00,   0xd7a3, 2],
-[  0xd7a4,   0xdfff, 1],
+[  0xd7a4,   0xd7ff, 1],
+#[  0xd800,   0xdfff, -1],
 [  0xe000,   0xfaff, 2],
 [  0xfb00,   0xfb1d, 1],
 [  0xfb1e,   0xfb1e, 0],
@@ -1174,8 +1175,8 @@ sub table_char_width { [
 [ 0x1f130,  0x1f169, 2],
 [ 0x1f16a,  0x1f16f, 1],
 [ 0x1f170,  0x1f1ac, 2],
-[ 0x1f1ad,  0x1f1e5, 1],
-[ 0x1f1e6,  0x1f202, 2],
+[ 0x1f1ad,  0x1f1ff, 1],
+[ 0x1f200,  0x1f202, 2],
 [ 0x1f203,  0x1f20f, 1],
 [ 0x1f210,  0x1f23b, 2],
 [ 0x1f23c,  0x1f23f, 1],

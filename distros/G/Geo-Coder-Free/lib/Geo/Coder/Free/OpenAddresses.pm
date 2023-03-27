@@ -47,11 +47,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ our $VERSION = '0.30';
     } else {
     	$geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => '/usr/share/geo-coder-free/data');
     }
-    $location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
+    my $location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
     my @matches = $geocoder->geocode({ scantext => 'arbitrary text', region => 'GB' });
 
@@ -104,7 +104,7 @@ sub new {
 	return unless($class);
 
 	if(my $openaddr = $param{'openaddr'}) {
-		Carp::carp "Can't find the directory $openaddr"
+		Carp::croak "Can't find the directory $openaddr"
 			if((!-d $openaddr) || (!-r $openaddr));
 		return bless { openaddr => $openaddr, cache => $param{'cache'} }, $class;
 	}
@@ -810,6 +810,9 @@ sub geocode {
 		}
 	}
 
+	# ::diag(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)");
+	# print(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)\n");
+
 	if(($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
 		# print Data::Dumper->new([\%addr])->Dump();
 		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
@@ -996,7 +999,7 @@ VWF, openaddresses.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

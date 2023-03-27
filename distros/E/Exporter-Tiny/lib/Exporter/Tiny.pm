@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.006000';
+our $VERSION   = '1.006001';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 BEGIN {

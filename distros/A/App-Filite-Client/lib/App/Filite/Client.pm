@@ -5,7 +5,7 @@ use warnings;
 package App::Filite::Client;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.001001';
 
 use Carp qw( croak );
 use File::XDG;
@@ -68,17 +68,19 @@ sub _parse_opts {
 ## no Test::Tabs
 sub _print_usage {
 	print <<"STDERR"; return 0;
-$0: share via a filite server
+filite-client: share via a filite server
 
 Usage:
-  $0 [options] [filename]
-  cat blah | $0 [options] -
+  filite-client -T [filename]
+  filite-client -F [filename]
+  filite-client -L [url]
+  cat blah | filite-client [options]
 
 Options:
-  --text             Share as text
-  --file             Share as file
-  --link             Share as link
-  --highlight        Syntax highligh text
+  --text, -T         Share as text
+  --file, -F         Share as file
+  --link, -L         Share as link
+  --highlight, -H    Syntax highligh text
   --help, --usage    Show this usage information
 
 STDERR

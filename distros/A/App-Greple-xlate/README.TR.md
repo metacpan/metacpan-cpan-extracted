@@ -8,7 +8,7 @@ App::Greple::xlate - greple için çeviri destek modülü
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Metnin tamamını çevirmek istiyorsanız, **--match-all** seçeneğini kullanı
     - `accumulate`
 
         Varsayılan davranışa göre, kullanılmayan veriler önbellek dosyasından kaldırılır. Bunları kaldırmak ve dosyada tutmak istemiyorsanız, `accumulate` kullanın.
+
+# COMMAND LINE INTERFACE
+
+Bu modülü, depoda bulunan `xlate` komutunu kullanarak komut satırından kolayca kullanabilirsiniz. Kullanım için `xlate` yardım bilgisine bakın.
+
+# EMACS
+
+Emacs editöründen `xlate` komutunu kullanmak için depoda bulunan `xlate.el` dosyasını yükleyin. `xlate-region` fonksiyonu verilen bölgeyi çevirir. Varsayılan dil `EN-US`'dir ve prefix argümanı ile çağırarak dili belirtebilirsiniz.
 
 # ENVIRONMENT
 

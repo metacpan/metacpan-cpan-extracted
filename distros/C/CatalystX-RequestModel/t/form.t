@@ -34,15 +34,15 @@ use Catalyst::Test 'Example';
     'person.profile.status' => 'pending',
     'person.profile.zip' => 78621,
     'person.credit_cards[0]._delete' => 0,
-    'person.credit_cards[0].card_number' => 123123123123123,
+    'person.credit_cards[0].card_number' => 1231231231,
     'person.credit_cards[0].expiration' => '3000-01-01',
     'person.credit_cards[0].id' => 1,
     'person.credit_cards[1]._delete' => 0,
-    'person.credit_cards[1].card_number' => 4444445555556666,
+    'person.credit_cards[1].card_number' => 44444455555,
     'person.credit_cards[1].expiration' => '4000-01-01',
     'person.credit_cards[1].id' => 2,
     'person.credit_cards[1]._delete' => 0,
-    'person.credit_cards[].card_number' => 88888889999999,
+    'person.credit_cards[].card_number' => 888888899,
     'person.credit_cards[].expiration' => '5000-01-01',
     'person.credit_cards[].id' => 3,
     'person.person_roles[0]._nop' => 1,
@@ -57,18 +57,18 @@ use Catalyst::Test 'Example';
     credit_cards => [
       {
         _delete => 0,
-        card_number => "123123123123123",
+        card_number => "1231231231",
         expiration => "3000-01-01",
         id => 1,
       },
       {
         _delete => 0,
-        card_number => "4444445555556666",
+        card_number => "44444455555",
         expiration => "4000-01-01",
         id => 2,
       },
       {
-        card_number => "88888889999999",
+        card_number => "888888899",
         expiration => "5000-01-01",
         id => 3,
       },
@@ -174,7 +174,6 @@ use Catalyst::Test 'Example';
   is $res->code, 500;
 }
 
-
 {
   ok my $body_parameters = [
     username => 'jjn',
@@ -190,7 +189,3 @@ use Catalyst::Test 'Example';
 }
 
 done_testing;
-
-__END__
-
-

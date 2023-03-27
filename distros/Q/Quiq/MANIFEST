@@ -231,6 +231,7 @@ lib/Quiq/TreeFormatter.pm
 lib/Quiq/Udl.pm
 lib/Quiq/Unindent.pm
 lib/Quiq/Url.pm
+lib/Quiq/UrlObj.pm
 lib/Quiq/Web/Navigation.pm
 lib/Quiq/Xml/LibXml.pm
 lib/Quiq/XTerm.pm
@@ -468,6 +469,7 @@ t/bin/Quiq/TreeFormatter.t
 t/bin/Quiq/Udl.t
 t/bin/Quiq/Unindent.t
 t/bin/Quiq/Url.t
+t/bin/Quiq/UrlObj.t
 t/bin/Quiq/Web/Navigation.t
 t/bin/Quiq/Xml/LibXml.t
 t/bin/Quiq/XTerm.t

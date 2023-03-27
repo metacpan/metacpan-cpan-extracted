@@ -18,9 +18,7 @@ BEGIN {
 }
 require_ok $pkg;
 
-# FIXME: https://github.com/gbv/Catmandu-PICA/issues/79
-SKIP: {
-    skip "PICA::Data 2.06 not _fully_ compatible with Catmandu";
+{
     my $fixer = Catmandu::Fix->new(
         fixes => [q|
     do pica_each()
@@ -66,7 +64,9 @@ SKIP: {
         fixes => [q|
     add_field(counter,'')
     do pica_each('2...')
-        append(counter,'+')
+        unless pica_match($t)
+            append(counter,'+')
+        end
     end
     |]);
     my $importer = Catmandu::Importer::PICA->new(
@@ -74,7 +74,8 @@ SKIP: {
         type => "Plain"
     );
     my $record = $fixer->fix( $importer->first );
-    is $record->{counter}, '++++++', 'iterated over all 2...fields';
+    is $record->{counter}, '+++++', 'iterated over all 2...fields';
+    is @{$record->{record}}, 16, 'does not remove fields (#84)';
 }
 
 done_testing;

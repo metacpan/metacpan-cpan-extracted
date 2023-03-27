@@ -5,10 +5,10 @@ package Perl::Exactly;
 #
 # http://search.cpan.org/dist/Perl-Exactly/
 #
-# Copyright (c) 2014, 2015, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2015, 2017, 2018, 2019, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -130,18 +130,17 @@ Perl::Exactly - ensures exactly version of perl
 
 =head1 DESCRIPTION
 
-  Perl::Exactly ensures that perl interpreter matches to required version
-  exactly. If running perl doesn't match required version then Perl::Exactly
-  finds it using Perl/Exactly.pm.conf, and executes script again on it.
-  When exactly version of perl not found, script will die.
+Perl::Exactly ensures that perl interpreter matches to required version exactly.
+If running perl doesn't match required version then Perl::Exactly finds it using Perl/Exactly.pm.conf, and executes script again on it.
+When exactly version of perl not found, script will die.
 
 =head1 INSTALLATION
 
-  1. Copy Perl/Exactly.pm and Perl/Exactly.pm.conf to @INC directory.
+Copy Perl/Exactly.pm and Perl/Exactly.pm.conf to @INC directory.
 
 =head1 CONFIGURATION
 
-  1. Edit Perl/Exactly.pm.conf to define paths of perls.
+Edit Perl/Exactly.pm.conf to define paths of perls.
 
 =head1 SAMPLE of Perl/Exactly.pm.conf
 
@@ -164,6 +163,10 @@ Perl::Exactly - ensures exactly version of perl
           5.026 => 'C:/Perl526/bin/perl.exe',
           5.028 => 'C:/Perl528/bin/perl.exe',
           5.030 => 'C:/Perl530/bin/perl.exe',
+          5.032 => 'C:/Perl532/bin/perl.exe',
+          5.034 => 'C:/Perl534/bin/perl.exe',
+          5.036 => 'C:/Perl536/bin/perl.exe',
+          5.038 => 'C:/Perl538/bin/perl.exe',
       ) :
 
       # UNIX-like system
@@ -182,31 +185,32 @@ Perl::Exactly - ensures exactly version of perl
           5.026 => '/path/to/perl/5.026/bin/perl',
           5.028 => '/path/to/perl/5.028/bin/perl',
           5.030 => '/path/to/perl/5.030/bin/perl',
+          5.032 => '/path/to/perl/5.032/bin/perl',
+          5.034 => '/path/to/perl/5.034/bin/perl',
+          5.036 => '/path/to/perl/5.036/bin/perl',
+          5.038 => '/path/to/perl/5.038/bin/perl',
       )
   }
   __END__
 
 =head1 AUTHOR
 
-  INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
 
-  This project was originated by INABA Hitoshi.
+This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-  This software is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself. See L<perlartistic>.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
-  This software is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
-  ina - CPAN
-  http://search.cpan.org/~ina/
+ ina - CPAN
+ http://search.cpan.org/~ina/
 
-  BackPAN - A Complete History of CPAN
-  http://backpan.perl.org/authors/id/I/IN/INA/
+ BackPAN - A Complete History of CPAN
+ http://backpan.perl.org/authors/id/I/IN/INA/
 
 =cut

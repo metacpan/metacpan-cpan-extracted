@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -28,12 +28,16 @@ Tk::ColorEntry is an entry widget with a label packed to it's right.
 The background color of the label is used as indicator for the current color.
 Clicking the entry widget pops a L<Tk::ColorPop> widget.
 
-Pressing escape causes the ColorPop to widthdraw, or if a pick operation is in motion
-cancels the pick operation.
+Pressing escape causes the ColorPop to widthdraw. If a pick operation is active
+cancels the pick operation instead.
 
 =head1 OPTIONS
 
 =over 4
+
+=item Switch: B<-command>
+
+Callback to be executed when a color is selected. The color is given as parameter.
 
 =item Switch: B<-entryerrorcolor>
 
@@ -60,7 +64,15 @@ Default value 1. Borderwidth of the ColorPop widget.
 
 Default value 'raised'. Relief of the ColorPop widget.
 
+=item Switch: B<-variable>
+
+Reference to the variable where the current value is held.
+
 =back
+
+=head1 METHODS
+
+=over 4
 
 =cut
 
@@ -69,9 +81,7 @@ sub Populate {
 
 	$self->SUPER::Populate($args);
 	
-	my $var = '';
 	my $entry = $self->Entry(
-		-textvariable => \$var,
 	)->pack(
 		-side => 'left', 
 		-fill => 'x',
@@ -87,8 +97,7 @@ sub Populate {
 	$self->Advertise('Entry', $entry);
 	my $pop = $self->PopColor(
 		-updatecall => sub {
-			$var = shift;
-			$self->EntryUpdate;
+			$self->put(shift);
 		},
 		-widget => $self,
 	);
@@ -100,7 +109,11 @@ sub Populate {
 	$entry->bind('<Key>', [$self, 'OnKey']);
 	$entry->bind('<Escape>', [$self, 'OnEscape']);
 
+	my $var = '';
 	$self->ConfigSpecs(
+		-width => [$entry],
+		-font => [$entry],
+		-command => ['CALLBACK', undef, undef, sub {}],
 		-entryerrorcolor => ['PASSIVE', undef, undef, '#FF0000'],
 		-entryforeground => ['PASSIVE', undef, undef, $self->Subwidget('Entry')->cget('-foreground')],
 		-indborderwidth => [{
@@ -117,6 +130,7 @@ sub Populate {
 		}, undef, undef, 'sunken'],
 		-popborderwidth => [{-borderwidth => $pop}, undef, undef, 1],
 		-poprelief => [{-relief => $pop}, undef, undef, 'raised'],
+		-variable => [{-textvariable => $entry}, undef, undef, \$var],
 		DEFAULT => [ $pop ],
 	);
 
@@ -139,14 +153,26 @@ sub EntryUpdate {
 	}
 }
 
+=item B<get>
+
+Returns the contents of the entry widget if it is a valid color.
+
+=cut
+
+sub get {
+	my $self = shift;
+	my $color = $self->Subwidget('Entry')->get;
+	return $color if $self->validate($color);
+}
+
 sub OnEscape {
 	my $self = shift;
 	if ($self->pickInProgress) {
 		$self->pickCancel
 	} else {
 		my $save = delete $self->{'e_save'};
-		$self->popDown;
 		$self->put($save) if defined $save;
+		$self->popCancel;
 	}
 }
 
@@ -157,10 +183,18 @@ sub OnKey {
 	$self->EntryUpdate;
 }
 
+sub popCancel {
+	my $self = shift;
+	delete $self->{'e_save'};
+	$self->Subwidget('Pop')->popCancel;
+}
+
 sub popDown {
 	my $self = shift;
 	delete $self->{'e_save'};
 	$self->Subwidget('Pop')->popDown;
+	my $color = $self->Subwidget('Entry')->get;
+	$self->Callback('-command', $color) if $self->validate($color);
 }
 
 sub popFlip {
@@ -179,6 +213,13 @@ sub popUp {
 	$self->Subwidget('Pop')->popUp;
 }
 
+=item B<put>(I<$color>)
+
+$color becomes the content of the entry widget.
+Adjusts the sliders if $color is a valid color.
+
+=cut;
+
 sub put {
 	my ($self, $color) = @_;
 	unless (defined($color)) {
@@ -191,17 +232,15 @@ sub put {
 	$self->EntryUpdate;
 }
 
+=back
+
 =head1 LICENSE
 
 Same as Perl.
 
 =head1 AUTHOR
 
-=over 4
-
-=item Hans Jeuken (hanje at cpan dot org)
-
-=back
+Hans Jeuken (hanje at cpan dot org)
 
 =cut
 

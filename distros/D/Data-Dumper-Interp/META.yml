@@ -5,6 +5,7 @@ author:
 build_requires:
   Data::Compare: '0'
   English: '0'
+  File::Temp: '0'
   FindBin: '0'
   Import::Into: '0'
   Math::BigFloat: '1.999837'
@@ -51,7 +52,7 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '5.007'
+version: '5.009'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

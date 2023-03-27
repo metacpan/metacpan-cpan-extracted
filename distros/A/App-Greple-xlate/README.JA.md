@@ -8,7 +8,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Version 0.20
     - `accumulate`
 
         デフォルトの動作では、未使用のデータはキャッシュファイルから削除されます。削除せずに残しておきたい場合は、`蓄積`を使用してください。
+
+# COMMAND LINE INTERFACE
+
+リポジトリに含まれる`xlate`コマンドを使用することで、コマンドラインから本モジュールを簡単に使用することができます。使い方については、`xlate`のヘルプ情報を参照してください。
+
+# EMACS
+
+Emacsエディタから`xlate`コマンドを使うには、リポジトリに含まれている`xlate.el`ファイルを読み込んでください。`xlate-region`関数は、指定された地域を翻訳します。デフォルトの言語は`EN-US`で、prefix引数で言語を指定することができます。
 
 # ENVIRONMENT
 

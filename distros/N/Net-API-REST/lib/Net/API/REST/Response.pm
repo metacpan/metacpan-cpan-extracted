@@ -100,7 +100,6 @@ sub content_encoding
     my $self = shift( @_ );
     my( $pack, $file, $line ) = caller;
     my $sub = ( caller( 1 ) )[3];
-    $self->message( 3, "Got called from package $pack in file $file at line $line in sub $sub with args: '", join( "', '", @_ ), "'." );
     try
     {
         return( $self->_request->content_encoding( @_ ) );
@@ -179,15 +178,12 @@ sub cookie_new_ok_but_hang_on
     
     try
     {
-        $self->message( 3, "Using Apache request pool '" . $self->_request->pool . "'." );
         my $c = APR::Request::Cookie->new( $self->_request->pool, %$hash );
-        $self->message( 3, "Success, returning an APR::Request::Cookie '$c' (", ref( $c ), ") object with properties: ", sub{ $self->dumper( $hash ) } );
         return( $self->error( "Unable to create an APR::Request::Cookie object: $@ (" . APR::Request::Error::strerror() . ")" ) ) if( !ref( $c ) && $@ );
         return( $c );
     }
     catch( $e )
     {
-        $self->message( 3, "Failed creating an APR::Request::Cookie object, returning an error." );
         return( $self->error( "An error occurred while trying to call APR::Request::Cookie method \"new\": $e" ) );
     }
 }
@@ -200,7 +196,6 @@ sub cookie_new
     ## No value is ok to remove a cookie, but it needs to be an empty string, not undef
     # return( $self->error( "No value was provided for cookie \"$opts->{name}\"." ) ) if( !length( $opts->{value} ) && !defined( $opts->{value} ) );
     my $c = $self->request->cookies->make( $opts ) || return( $self->pass_error( $self->request->cookies->error ) );
-    $self->message( 3, "Success, returning an (", ref( $c ), ") cookie object '$c' with properties: ", sub{ $self->dumper( $opts ) } );
     return( $c );
 }
 

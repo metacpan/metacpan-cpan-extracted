@@ -40,9 +40,11 @@ OpenAI::API::Request::Edit - edits endpoint
         instruction => "Fix the spelling mistakes",
     );
 
-    my $res = $request->send();
+    # NOTE: the "/edits" endpoint is currently broken
 
-    my $text = $res->{choices}[0]{text};
+    #my $res = $request->send();
+    #
+    #my $text = $res->{choices}[0]{text};
 
 =head1 DESCRIPTION
 

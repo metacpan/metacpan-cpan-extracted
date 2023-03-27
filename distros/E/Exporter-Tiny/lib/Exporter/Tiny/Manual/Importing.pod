@@ -160,10 +160,6 @@ C<export_lexically> is included in a stable release of Perl.
 If you install L<Lexical::Var>, then lexical imports should work on versions
 of Perl as old as 5.12.
 
-That module does have issues that prevent it from being installed on Perl
-5.22+. The L<Alt::Lexical::Var::ButSupportModernPerl> module includes patches
-to fix it.
-
 =head2 Unimporting
 
 You can unimport the functions that MyUtils added to your namespace:

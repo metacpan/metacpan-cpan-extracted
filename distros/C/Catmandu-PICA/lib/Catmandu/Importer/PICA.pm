@@ -2,7 +2,7 @@ package Catmandu::Importer::PICA;
 use strict;
 use warnings;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use Catmandu::Sane;
 use PICA::Data qw(pica_parser);
@@ -37,8 +37,11 @@ sub generator {
     my ($self) = @_;
 
     sub {
-        my $next = $self->parser->next;
-        return $next ? {%$next} : undef;
+        my $next = $self->parser->next || return;
+
+        # Catmandu does not like blessed objects/arrays
+        $next->{record} = [ map { [@$_] } @{ $next->{record} } ];
+        return {%$next};
     };
 }
 

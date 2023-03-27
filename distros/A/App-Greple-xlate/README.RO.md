@@ -8,7 +8,7 @@ App::Greple::xlate - modul de suport pentru traducere pentru Greple
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Modulul **xlate** poate stoca în memoria cache textul traducerii pentru fiecare
     - `accumulate`
 
         Prin comportament implicit, datele neutilizate sunt eliminate din fișierul cache. Dacă nu doriți să le eliminați și să le păstrați în fișier, utilizați `acumulare`.
+
+# COMMAND LINE INTERFACE
+
+Puteți utiliza cu ușurință acest modul din linia de comandă folosind comanda `xlate` inclusă în depozit. Consultați informațiile din ajutorul `xlate` pentru utilizare.
+
+# EMACS
+
+Încărcați fișierul `xlate.el` inclus în depozit pentru a utiliza comanda `xlate` din editorul Emacs. Funcția `xlate-region` traduce regiunea dată. Limba implicită este `EN-US` și puteți specifica limba invocând-o cu argumentul prefix.
 
 # ENVIRONMENT
 

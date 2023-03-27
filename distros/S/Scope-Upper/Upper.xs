@@ -2034,9 +2034,11 @@ static int su_uplevel_runops_hook_entersub(pTHX) {
    AvFILLp(av) = fill;
   }
 
+#if !XSH_HAS_PERL(5, 37, 10)
   /* should be referenced by PL_curpad[0] and *_ */
   assert(SvREFCNT(PL_curpad[0]) > 1);
   SvREFCNT_dec(PL_curpad[0]);
+#endif
 
   PL_curpad[0] = (SV *) av;
  }
@@ -3136,7 +3138,9 @@ PPCODE:
  /* warnings (9) */
  {
   SV *mask = NULL;
-#if XSH_HAS_PERL(5, 9, 4)
+#if XSH_HAS_PERL(5, 37, 6)
+  char *old_warnings = cop->cop_warnings;
+#elif XSH_HAS_PERL(5, 9, 4)
   STRLEN *old_warnings = cop->cop_warnings;
 #else
   SV *old_warnings = cop->cop_warnings;
@@ -3169,7 +3173,9 @@ context_info_warnings_on:
    if (!mask)
     mask = su_newmortal_pvn(WARN_ALLstring, WARNsize);
   } else {
-#if XSH_HAS_PERL(5, 9, 4)
+#if XSH_HAS_PERL(5, 37, 6)
+   mask = su_newmortal_pvn((char *) old_warnings, RCPV_LEN(old_warnings));
+#elif XSH_HAS_PERL(5, 9, 4)
    mask = su_newmortal_pvn((char *) (old_warnings + 1), old_warnings[0]);
 #else
    mask = sv_mortalcopy(old_warnings);

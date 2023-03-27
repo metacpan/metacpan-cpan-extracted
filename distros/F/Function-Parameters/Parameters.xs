@@ -107,7 +107,7 @@ See http://dev.perl.org/licenses/ for more information.
 
 WARNINGS_ENABLE
 
-#define HAVE_BUG_129090 (HAVE_PERL_VERSION(5, 21, 7) && !HAVE_PERL_VERSION(5, 25, 5))
+#define HAVE_BUG_GH_15557 (HAVE_PERL_VERSION(5, 21, 7) && !HAVE_PERL_VERSION(5, 25, 5))
 
 #define HINTK_CONFIG MY_PKG "/config"
 #define HINTSK_FLAGS "flags"
@@ -1521,7 +1521,7 @@ static int parse_fun(pTHX_ Sentinel sen, OP **pop, const char *keyword_ptr, STRL
 
         SvREFCNT_inc_simple_void(PL_compcv);
 
-#if HAVE_BUG_129090
+#if HAVE_BUG_GH_15557
         {
             CV *const outside = CvOUTSIDE(PL_compcv);
             if (outside) {
@@ -2170,7 +2170,20 @@ static int kw_flags_enter(pTHX_ Sentinel **ppsen, const char *kw_ptr, STRLEN kw_
             return FALSE;
         }
         sv = *psv;
-        if (!(SvROK(sv) && (sv2 = SvRV(sv), SvTYPE(sv2) == SVt_PVHV))) {
+        if (!SvROK(sv)) {
+            /* something is wrong: $^H{'Function::Parameters/config'} has turned into a string */
+            dSP;
+
+            PUSHMARK(SP);
+            call_pv(MY_PKG "::_warn_config_not_a_reference", G_VOID);
+
+            /* don't warn twice within the same scope */
+            hv_delete(hints, HINTK_CONFIG, sizeof HINTK_CONFIG - 1, G_DISCARD);
+
+            return FALSE;
+        }
+        sv2 = SvRV(sv);
+        if (SvTYPE(sv2) != SVt_PVHV) {
             croak("%s: internal error: $^H{'%s'} not a hashref: %"SVf, MY_PKG, HINTK_CONFIG, SVfARG(sv));
         }
         if (lex_bufutf8()) {

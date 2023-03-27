@@ -45,11 +45,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -512,7 +512,7 @@ sub geocode {
 		# }
 		# # return @rc;
 		# my @locations;
-		# 
+		#
 		# foreach my $l(@rc) {
 			# if(exists($l->{'latitude'})) {
 				# push @locations, Geo::Location::Point->new({
@@ -527,7 +527,7 @@ sub geocode {
 				# # return;
 			# }
 		# }
-		# 
+		#
 		# return @locations;
 	# }
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
@@ -692,7 +692,7 @@ VWF, MaxMind and geonames.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

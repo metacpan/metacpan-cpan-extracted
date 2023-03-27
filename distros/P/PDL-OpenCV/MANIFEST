@@ -1,0 +1,59 @@
+Changes
+classes.pl
+constlist.txt
+Demo.m
+doxyparse.pl
+funclist.pl
+genpp.pl
+genwrap.pl
+Highgui/constlist.txt
+Highgui/funclist.pl
+Highgui/Makefile.PL
+Highgui/module.pd
+Imgcodecs/constlist.txt
+Imgcodecs/funclist.pl
+Imgcodecs/Makefile.PL
+Imgcodecs/module.pd
+Imgproc/classes.pl
+Imgproc/constlist.txt
+Imgproc/funclist.pl
+Imgproc/Makefile.PL
+Imgproc/module.pd
+maint/genlists
+maint/headers.txt
+Makefile.PL
+MANIFEST			This list of files
+Objdetect/classes.pl
+Objdetect/constlist.txt
+Objdetect/funclist.pl
+Objdetect/Makefile.PL
+Objdetect/module.pd
+opencv.pd
+README
+submodmf.pl
+t/frames.avi
+t/opencv_basic.t
+t/qrcode.png
+t/qrcode.t
+t/tracking.t
+t/videocapture.t
+Tracking/classes.pl
+Tracking/constlist.txt
+Tracking/funclist.pl
+Tracking/Makefile.PL
+Tracking/module.pd
+typemap
+Videoio/classes.pl
+Videoio/constlist.txt
+Videoio/funclist.pl
+Videoio/Makefile.PL
+Videoio/module.pd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/OpenCV.pm                  mod=PDL::OpenCV pd=opencv.pd (added by pdlpp_mkgen)
+GENERATED/PDL/OpenCV/Highgui.pm          mod=PDL::OpenCV::Highgui pd=Highgui/module.pd (added by pdlpp_mkgen)
+GENERATED/PDL/OpenCV/Imgcodecs.pm        mod=PDL::OpenCV::Imgcodecs pd=Imgcodecs/module.pd (added by pdlpp_mkgen)
+GENERATED/PDL/OpenCV/Imgproc.pm          mod=PDL::OpenCV::Imgproc pd=Imgproc/module.pd (added by pdlpp_mkgen)
+GENERATED/PDL/OpenCV/Objdetect.pm        mod=PDL::OpenCV::Objdetect pd=Objdetect/module.pd (added by pdlpp_mkgen)
+GENERATED/PDL/OpenCV/Tracking.pm         mod=PDL::OpenCV::Tracking pd=Tracking/module.pd (added by pdlpp_mkgen)
+GENERATED/PDL/OpenCV/Videoio.pm          mod=PDL::OpenCV::Videoio pd=Videoio/module.pd (added by pdlpp_mkgen)

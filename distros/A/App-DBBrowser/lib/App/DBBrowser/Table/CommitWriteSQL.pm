@@ -44,7 +44,7 @@ sub commit_sql {
         $rows_to_execute = [ [ @{$sql->{set_args}}, @{$sql->{where_args}} ] ];
         my $all_arrayref = [];
         if ( ! eval {
-            my $sth = $dbh->prepare( "SELECT * FROM " . $sql->{table} . $sql->{where_stmt} );
+            my $sth = $dbh->prepare( "SELECT * FROM $sql->{table} " . $sql->{where_stmt} );
             $sth->execute( @{$sql->{where_args}} );
             my $col_names = $sth->{NAME};
             $all_arrayref = $sth->fetchall_arrayref;

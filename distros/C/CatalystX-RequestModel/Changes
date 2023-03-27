@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension CatalystX-RequestModel.
 
+0.013 - 26 March 2023
+  - Fixed minor issue with noisy error if doing a form upload to a request model
+    that didn't support it.
+  - Fixed test case that failed on some platforms
+  - Distribution meta data fixes, including copyright update
+
 0.012 - 30 December 2022
   - Fixed typo in previous release
 

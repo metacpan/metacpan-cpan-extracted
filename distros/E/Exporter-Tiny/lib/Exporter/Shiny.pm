@@ -7,7 +7,7 @@ use warnings;
 use Exporter::Tiny ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.006000';
+our $VERSION   = '1.006001';
 
 sub import {
 	my $me     = shift;

@@ -26,7 +26,7 @@ eval q{
 	use Lexical::Var '&foo' => sub () { 1 };
 	push @values, foo;
 };
-like $@, qr/\Acan't reference lexical subroutine without \& sigil/;
+like $@, qr/\Acan't reference Lexical::Var lexical subroutine without \& sigil/;
 is_deeply \@values, [];
 }
 
@@ -35,7 +35,7 @@ eval q{
 	use Lexical::Var '&foo' => sub () { 1 };
 	push @values, foo();
 };
-like $@, qr/\Acan't reference lexical subroutine without \& sigil/;
+like $@, qr/\Acan't reference Lexical::Var lexical subroutine without \& sigil/;
 is_deeply \@values, [];
 
 { local $TODO = "bareword ref without parens works funny";
@@ -44,7 +44,7 @@ eval q{
 	use Lexical::Var '&foo' => sub ($) { 1+$_[0] };
 	push @values, foo 10;
 };
-like $@, qr/\Acan't reference lexical subroutine without \& sigil/;
+like $@, qr/\Acan't reference Lexical::Var lexical subroutine without \& sigil/;
 is_deeply \@values, [];
 }
 
@@ -53,7 +53,7 @@ eval q{
 	use Lexical::Var '&foo' => sub ($) { 1+$_[0] };
 	push @values, foo(10);
 };
-like $@, qr/\Acan't reference lexical subroutine without \& sigil/;
+like $@, qr/\Acan't reference Lexical::Var lexical subroutine without \& sigil/;
 is_deeply \@values, [];
 
 { local $TODO = "constant subs work funny";
@@ -62,7 +62,7 @@ eval q{
 	use Lexical::Var '&foo' => sub () { 1 };
 	push @values, bar;
 };
-like $@, qr/\Acan't reference lexical subroutine without \& sigil/;
+like $@, qr/\Acan't reference Lexical::Var lexical subroutine without \& sigil/;
 is_deeply \@values, [];
 
 @values = ();
@@ -70,7 +70,7 @@ eval q{
 	use Lexical::Var '&foo' => sub () { 1 };
 	push @values, bar();
 };
-like $@, qr/\Acan't reference lexical subroutine without \& sigil/;
+like $@, qr/\Acan't reference Lexical::Var lexical subroutine without \& sigil/;
 is_deeply \@values, [];
 }
 

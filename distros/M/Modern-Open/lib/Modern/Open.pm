@@ -5,10 +5,10 @@ package Modern::Open;
 #
 # https://metacpan.org/release/Modern-Open
 #
-# Copyright (c) 2014, 2015, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2014, 2015, 2018, 2019, 2020, 2021, 2023 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -262,9 +262,8 @@ Modern::Open - Autovivification, Autodie, and 3-args open support
 
 =head1 DESCRIPTION
 
-Modern::Open provides autovivification and autodie support of open(),
-opendir(), sysopen(), pipe(), socket(), and accept() on perl 5.00503
-or later. And supports three-argument open(), too.
+Modern::Open provides autovivification and autodie support of open(), opendir(), sysopen(), pipe(), socket(), and accept() on perl 5.00503 or later.
+And supports three-argument open(), too.
 
 =head1 AUTHOR
 
@@ -274,38 +273,57 @@ This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
-=over 4
+=over 2
 
-=item * L<announcing-perl-7|https://www.perl.com/article/announcing-perl-7/> - Announcing Perl 7 Jun 24, 2020 by brian d foy
+=item *
 
-=item * L<open|http://perldoc.perl.org/functions/open.html> - Perl Programming Documentation
+L<announcing-perl-7|https://www.perl.com/article/announcing-perl-7/> - Announcing Perl 7 Jun 24, 2020 by brian d foy
 
-=item * L<Three-arg open() (Migrating to Modern Perl)|http://modernperlbooks.com/mt/2010/04/three-arg-open-migrating-to-modern-perl.html> - Modern Perl Programming
+=item *
 
-=item * L<Pre-Modern Perl VS Post-Modern Perl: FIGHT!|http://blogs.perl.org/users/buddy_burden/2013/06/pre-modern-perl-vs-post-modern-perl-fight.html> - A blog about the Perl programming language
+L<open|http://perldoc.perl.org/functions/open.html> - Perl Programming Documentation
 
-=item * L<perl - open my $fh, "comand |"; # isn't modern|http://blog.livedoor.jp/dankogai/archives/51176081.html> - 404 Blog Not Found
+=item *
 
-=item * L<Migrating scripts back to Perl 5.005_03|http://www.perlmonks.org/?node_id=289351> - PerlMonks
+L<Three-arg open() (Migrating to Modern Perl)|http://modernperlbooks.com/mt/2010/04/three-arg-open-migrating-to-modern-perl.html> - Modern Perl Programming
 
-=item * L<Goodnight, Perl 5.005|http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html> - ONLamp.com
+=item *
 
-=item * L<Perl 5.005_03 binaries|http://guest.engelschall.com/~sb/download/win32/> - engelschall.com
+L<Pre-Modern Perl VS Post-Modern Perl: FIGHT!|http://blogs.perl.org/users/buddy_burden/2013/06/pre-modern-perl-vs-post-modern-perl-fight.html> - A blog about the Perl programming language
 
-=item * L<Welcome to CP5.5.3AN|http://cp5.5.3an.barnyard.co.uk/> - cp5.5.3an.barnyard.co.uk
+=item *
 
-=item * L<ina|http://search.cpan.org/~ina/> - CPAN
+L<perl - open my $fh, "comand |"; # isn't modern|http://blog.livedoor.jp/dankogai/archives/51176081.html> - 404 Blog Not Found
 
-=item * L<The BackPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - A Complete History of CPAN
+=item *
+
+L<Migrating scripts back to Perl 5.005_03|http://www.perlmonks.org/?node_id=289351> - PerlMonks
+
+=item *
+
+L<Goodnight, Perl 5.005|http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html> - ONLamp.com
+
+=item *
+
+L<Perl 5.005_03 binaries|http://guest.engelschall.com/~sb/download/win32/> - engelschall.com
+
+=item *
+
+L<Welcome to CP5.5.3AN|http://cp5.5.3an.barnyard.co.uk/> - cp5.5.3an.barnyard.co.uk
+
+=item *
+
+L<ina|http://search.cpan.org/~ina/> - CPAN
+
+=item *
+
+L<The BackPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - A Complete History of CPAN
 
 =back
 

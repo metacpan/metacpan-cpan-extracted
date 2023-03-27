@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 BEGIN { $^H |= 0x20000 if "$]" < 5.008; }
 
@@ -54,5 +54,29 @@ eval q{
 };
 is $@, "";
 is_deeply \@values, [ qw(B C A) ];
+
+SKIP: {
+	skip "key/value hash slicing not available on this Perl", 4
+		unless "$]" >= 5.019004;
+
+	@values = ();
+	eval q{
+		use strict;
+		use Lexical::Var '%foo' => { qw(a A b B c C) };
+		push @values, %foo{qw(b c a)};
+	};
+	is $@, "";
+	is_deeply \@values, [ qw(b B c C a A) ];
+
+	@values = ();
+	eval q{
+		use strict;
+		use Lexical::Var '%foo' => { qw(a A b B c C) };
+		my @i = qw(b c a);
+		push @values, %foo{@i};
+	};
+	is $@, "";
+	is_deeply \@values, [ qw(b B c C a A) ];
+}
 
 1;

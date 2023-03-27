@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Ingo Schmid'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  Alien::OpenCV: '0'
+  ExtUtils::CppGuess: '0.22'
+  ExtUtils::MakeMaker: '6.3002'
+  PDL: '2.082'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-OpenCV
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDL: '2.079'
+version: 0.001
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

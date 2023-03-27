@@ -29,7 +29,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 # -----------------------------------------------------------------------------
 
@@ -169,7 +169,7 @@ sub isRaw {
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

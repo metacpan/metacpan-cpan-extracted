@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.15 2023-03-25 00:00:00
+  - update POD
+  - created by INABA Hitoshi
+
 0.14 2021-09-19 00:00:00
   - finds mb.pm from $ENV{'PERL_LOCAL_LIB_ROOT'}, $FindBin::Bin, and "$FindBin::Bin/lib" then from @INC
   - created by INABA Hitoshi

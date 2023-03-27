@@ -1,7 +1,8 @@
 use warnings;
 use strict;
 
-use Test::More tests => 84;
+BEGIN { unshift @INC, "./t/lib"; }
+use Test::More tests => 96;
 
 BEGIN { $^H |= 0x20000 if "$]" < 5.008; }
 
@@ -197,6 +198,16 @@ is_deeply \@values, [];
 
 @values = ();
 eval q{
+	use strict;
+	use Lexical::Var '$foo' => \(my$x=1);
+	no Lexical::Var '$bar';
+	push @values, $foo;
+};
+is $@, "";
+is_deeply \@values, [ 1 ];
+
+@values = ();
+eval q{
 	no strict;
 	use Lexical::Var '$foo' => \(my$x=1);
 	{
@@ -278,6 +289,19 @@ eval q{
 };
 is $@, "";
 is_deeply \@values, [ 1 ];
+
+@values = ();
+eval q{
+	no strict;
+	our $value_a = "aaa";
+	use Lexical::Var '$foo' => \$value_a;
+	sub {
+		no Lexical::Var '$foo' => \$value_a;
+		push @values, $foo;
+	}->();
+};
+is $@, "";
+is_deeply \@values, [ undef ];
 
 @values = ();
 eval q{
@@ -458,7 +482,7 @@ is_deeply \@values, [ 1, 2, 3, 1 ];
 @values = ();
 eval q{
 	use strict;
-	BEGIN { $SIG{__WARN__} = sub {}; }   # bogus redefinition warning
+	no warnings "$]" >= 5.027007 ? "shadow" : "misc";
 	my $foo = 1;
 	push @values, $foo;
 	{
@@ -491,7 +515,7 @@ is_deeply \@values, [ 1, undef, 3, 1 ];
 @values = ();
 eval q{
 	use strict;
-	BEGIN { $SIG{__WARN__} = sub {}; }   # bogus redefinition warning
+	no warnings "$]" >= 5.027007 ? "shadow" : "misc";
 	our $foo;
 	push @values, $foo;
 	{
@@ -504,5 +528,70 @@ eval q{
 };
 is $@, "";
 is_deeply \@values, [ undef, 2, undef, undef ];
+
+@values = ();
+eval q{
+	use strict;
+	no warnings "$]" >= 5.027007 ? "shadow" : "misc";
+	use Lexical::Var '$foo' => \(my$x=2);
+	push @values, $foo;
+	our $foo;
+	push @values, $foo;
+	no Lexical::Var '$foo' => \$foo;
+	push @values, $foo;
+};
+is $@, "";
+is_deeply \@values, [ 2, undef, undef ];
+
+@values = ();
+eval q{
+	use strict;
+	no warnings "$]" >= 5.027007 ? "shadow" : "misc";
+	use Lexical::Var '$foo' => \(my$x=2);
+	use Lexical::Var '$foo_alias' => \$foo;
+	push @values, $foo;
+	our $foo;
+	push @values, $foo;
+	no Lexical::Var '$foo' => \$foo_alias;
+	push @values, $foo;
+};
+is $@, "";
+is_deeply \@values, [ 2, undef, undef ];
+
+SKIP: { skip "\"class\" unavailable", 4 if "$]" < 5.037009;
+
+@values = ();
+eval q{
+	use feature "class";
+	no warnings "experimental::class";
+	class Test0 {
+		field $foo;
+		use Lexical::Var '$foo' => \(my$x=2);
+		push @values, $foo;
+	}
+};
+is $@, "";
+is_deeply \@values, [ 2 ];
+
+@values = ();
+eval q{
+	use feature "class";
+	no warnings "experimental::class";
+	class Test1 {
+		field $foo = 1;
+		method aa {
+			push @values, $foo;
+			use Lexical::Var '$foo' => \(my$x=2);
+			push @values, $foo;
+			use Lexical::Var '$self' => \(my$x=3);
+			push @values, $self;
+		}
+	}
+	Test1->new->aa;
+};
+is $@, "";
+is_deeply \@values, [ 1, 2, 3 ];
+
+}
 
 1;

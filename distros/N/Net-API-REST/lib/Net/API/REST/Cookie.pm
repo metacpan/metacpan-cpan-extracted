@@ -52,7 +52,6 @@ sub init
     return( $self->error( "No Net::API::REST::Request object was provided." ) ) if( !$self->{request} );
     return( $self->error( "Net::API::REST::Request value provided is not an object." ) ) if( !Scalar::Util::blessed( $self->{request} ) );
     return( $self->error( "request value provided is not a Net::API::REST::Request object." ) ) if( !$self->{request}->isa( 'Net::API::REST::Request' ) );
-    $self->message( 3, "Returning cookie with value: '", $self->as_string, "'." );
     return( $self );
 }
 
@@ -85,7 +84,6 @@ sub as_string
     if( my $t = $self->expires )
     {
         ( my $dt_str = "$t" ) =~ s/\bUTC\b/GMT/;
-        $self->message( 3, "Setting the expiration timestamp to '$dt_str'." );
         push( @parts, sprintf( 'Expires=%s', $dt_str ) );
     }
     ## Number of seconds until the cookie expires
@@ -98,9 +96,7 @@ sub as_string
     }
     push( @parts, 'Secure' ) if( $self->secure );
     push( @parts, 'HttpOnly' ) if( $self->http_only );
-    $self->message( 3, "cookie components are: ", sub{ $self->dumper( \@parts ) });
     my $c = join( '; ', @parts );
-    $self->message( 3, "Returning cookie string: '$c'." );
     $self->{_cache_value} = $c;
     CORE::delete( $self->{_reset} );
     return( $c );
@@ -126,11 +122,9 @@ sub expires
     {
         $self->reset( @_ );
         my $exp = shift( @_ );
-        $self->message( 3, "Received expiration value of '$exp'." );
         my $dt;
         if( $exp =~ /^\d+$/ )
         {
-            $self->message( 3, "Value is actually a unix timestamp." );
             try
             {
                 $dt = DateTime->from_epoch( epoch => $exp, time_zone => 'local' );
@@ -142,7 +136,6 @@ sub expires
         }
         elsif( $exp =~ /^([\+\-]?\d+)([YMDhms])$/ )
         {
-            $self->message( 3, "Value is actually a variable time." );
             my $interval =
             {
                 's' => 1,
@@ -158,12 +151,10 @@ sub expires
         }
         elsif( lc( $exp ) eq 'now' )
         {
-            $self->message( 3, "Value is actually a special keyword." );
             $dt = DateTime->now;
         }
         else
         {
-            $self->message( 3, "Don't know what to do with '$exp'. Using provided value as is." );
             $dt = "$exp";
         }
         $dt = $self->_header_datetime( $dt ) if( Scalar::Util::blessed( $dt ) && $dt->isa( 'DateTime' ) );
@@ -233,13 +224,10 @@ sub _header_datetime
         return( $self->error( "Date time provided ($dt) is not an object." ) ) if( !Scalar::Util::blessed( $_[0] ) );
         return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime object." ) ) if( !$_[0]->isa( 'DateTime' ) );
         $dt = shift( @_ );
-        $self->message( 3, "Using the DateTime provided to us ($dt)." );
     }
-    $self->message( 3, "Generating a new DateTime object." ) if( !defined( $dt ) );
     $dt = DateTime->now if( !defined( $dt ) );
     my $fmt = Net::API::REST::DateTime->new;
     $dt->set_formatter( $fmt );
-    $self->message( 3, "Returning datetime object '$dt'." );
     return( $dt );
 }
 

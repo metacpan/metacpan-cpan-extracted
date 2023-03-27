@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.17 2023-03-25 00:00:00
+  - update POD
+  - created by INABA Hitoshi
+
 0.16 2019-07-14 00:00:00
   - fix quoting in Makefile.PL
   - created by INABA Hitoshi

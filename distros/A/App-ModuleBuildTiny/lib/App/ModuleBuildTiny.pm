@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -194,9 +194,16 @@ sub get_settings_file {
 	return catfile(glob('~'), qw/.mbtiny conf/);
 }
 
+my %default_settings = (
+	auto_bump => 1,
+	auto_git  => 1,
+	auto_scan => 1,
+);
+
 sub get_settings {
+	my $default = shift // {};
 	my $settings_file = get_settings_file;
-	my $settings = -f $settings_file ? read_json($settings_file) : {};
+	my $settings = -f $settings_file ? read_json($settings_file) : $default;
 	for my $item (@config_items) {
 		my ($key, $description, $type, $default) = @{$item};
 		next unless exists $settings->{$key};
@@ -433,10 +440,9 @@ my %actions = (
 	mint => sub {
 		my @arguments = @_;
 
-		my $settings = get_settings;
+		my $settings = get_settings(\%default_settings);
 
 		my $distname = decode_utf8(shift @arguments // die "No distribution name given\n");
-		die "Directory $distname already exists\n" if -e $distname;
 
 		my %args = (
 			author   => $settings->{author},
@@ -461,6 +467,7 @@ my %actions = (
 
 		my $license = create_license_for(delete $args{license}, $args{author});
 
+		die "Directory $args{dirname} already exists\n" if -e $args{dirname};
 		mkdir $args{dirname};
 		chdir $args{dirname};
 		$args{module_name} = $distname =~ s/-/::/gr;
@@ -470,7 +477,9 @@ my %actions = (
 		write_maniskip($distname);
 		write_json('dist.json', \%config);
 
-		regenerate(\@regenerate_files, \%args, scan => 1);
+		write_json('metamerge.json', { name => $distname }) if $distname ne $args{dirname};
+
+		regenerate(\@regenerate_files, \%args, scan => $config{auto_scan});
 
 		if ($args{init_git}) {
 			require Git::Wrapper;

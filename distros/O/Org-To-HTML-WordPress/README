@@ -1,27 +1,161 @@
-SYNOPSIS
+NAME
+    Org::To::HTML::WordPress - Export Org document to HTML (WordPress
+    variant)
 
+VERSION
+    This document describes version 0.003 of Org::To::HTML::WordPress (from
+    Perl distribution Org-To-HTML-WordPress), released on 2023-01-19.
+
+SYNOPSIS
      use Org::To::HTML::WordPress qw(org_to_html_wordpress);
-    
+
      # use like you would use Org::To::HTML's org_to_html()
 
 DESCRIPTION
-
     This is a subclass of Org::To::HTML that produces WordPress-variant of
     HTML. Currently the differences are:
 
-      * SRC Block
+    *   SRC Block
 
-      Instead of:
+        Instead of:
 
-       <PRE CLASS="block block_src"> ... </PRE>
+         <PRE CLASS="block block_src"> ... </PRE>
 
-      will instead use:
+        will instead use:
 
-       [sourcecode language="..."]
-       ...
-       [/sourcecode]
+         [sourcecode language="..."]
+         ...
+         [/sourcecode]
+
+FUNCTIONS
+  org_to_html_wordpress
+    Usage:
+
+     org_to_html_wordpress(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Export Org document to HTML (WordPress variant).
+
+    This is the non-OO interface. For more customization, consider
+    subclassing Org::To::HTML.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   css_url => *str*
+
+        Add a link to CSS document.
+
+    *   exclude_tags => *array[str]*
+
+        Exclude trees that carry one of these tags.
+
+        If the whole document doesn't have any of these tags, then the whole
+        document will be exported. Otherwise, trees that do not carry one of
+        these tags will be excluded. If a selected tree is a subtree, the
+        heading hierarchy above it will also be selected for export, but not
+        the text below those headings.
+
+        exclude_tags is evaluated after include_tags.
+
+    *   html_title => *str*
+
+        HTML document title, defaults to source_file.
+
+    *   ignore_unknown_settings => *bool*
+
+        (No description)
+
+    *   include_tags => *array[str]*
+
+        Include trees that carry one of these tags.
+
+        Works like Org's 'org-export-select-tags' variable. If the whole
+        document doesn't have any of these tags, then the whole document
+        will be exported. Otherwise, trees that do not carry one of these
+        tags will be excluded. If a selected tree is a subtree, the heading
+        hierarchy above it will also be selected for export, but not the
+        text below those headings.
+
+    *   inline_images => *bool* (default: 1)
+
+        If set to true, will make link to an image filename into an <img>
+        element instead of <a>.
+
+    *   naked => *bool*
+
+        Don't wrap exported HTML with HTML/HEAD/BODY elements.
+
+    *   source_file => *str*
+
+        Source Org file to export.
+
+    *   source_str => *str*
+
+        Alternatively you can specify Org string directly.
+
+    *   target_file => *str*
+
+        HTML file to write to.
+
+        If not specified, HTML string will be returned.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-To-HTML-WordPress>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Org-To-HTML-WordPress>.
 
 SEE ALSO
-
     Org::To::HTML
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2016 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-HTML-WordPress
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

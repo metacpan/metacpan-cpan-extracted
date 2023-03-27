@@ -1,10 +1,44 @@
 ==================================================
-Changes from 2022-03-23 00:00:00 +0000 to present.
+Changes from 2022-03-25 00:00:00 +0000 to present.
 ==================================================
 
-------------------------------------------
-version 1.2.4 at 2023-03-23 10:30:55 +0000
-------------------------------------------
+-----------------------------------------
+version 2.02 at 2023-03-25 21:20:35 +0000
+-----------------------------------------
+
+  Change: e045f542357fd3a76cec89ec8ef6569255b76373
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-25 22:20:28 +0000
+
+    new release 
+
+  Change: 8277cd79a69507ad23df7945383ecb461f982bfa
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-25 22:19:58 +0000
+
+    Try to avoid testing depending on perl interger sizes
+
+    Data files are compared after loading them in perl. We do not compare
+    directly the files contents.
+
+    The files themselves can be different, in particular when perl has
+    been compiled with different integer sizes. 
+
+-----------------------------------------
+version 2.01 at 2023-03-24 23:33:01 +0000
+-----------------------------------------
+
+  Change: 96559bee68774182135f9b4cefefe01c064111d9
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-25 00:33:01 +0000
+
+    switch to a decimal version number 
+
+  Change: 34b929b430459827304520dbed73686696025dcc
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-03-25 00:30:31 +0000
+
+    JSON::PP: avoid Math::Big* when not required on old versions 
 
   Change: 54b7e0f85c94d1e61e7aed56fd54f9f756ada24a
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

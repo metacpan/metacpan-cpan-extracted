@@ -35,14 +35,13 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Combinatorics" : "0",
-            "Carp" : "0",
             "Data::Munge" : "0",
             "Integer::Partition" : "0",
             "List::Util" : "1.33",
-            "Math::NumSeq::SqrtContinued" : "0",
             "Math::Sequence::DeBruijn" : "0",
             "Moo" : "2",
             "Music::AtonalUtil" : "0",
+            "OEIS" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
@@ -69,7 +68,7 @@
          "web" : "https://github.com/ology/Music-CreatingRhythms"
       }
    },
-   "version" : "0.0602",
+   "version" : "0.0700",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -302,6 +301,7 @@
                      "Bruijn",
                      "Christoffel",
                      "Hollos",
+                     "OEIS",
                      "cfcv",
                      "cfsqrt",
                      "chsequl",

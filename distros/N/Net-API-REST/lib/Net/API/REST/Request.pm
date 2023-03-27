@@ -90,7 +90,6 @@ sub init
         my $auth = $headers->{Authorization};
         $self->auth( $auth ) if( length( $auth ) );
         my $ctype_raw = $self->content_type;
-        $self->message( 3, "Content-type of data received is '$ctype_raw'." );
         my $accept_raw = $self->accept;
         ## Content-Type: application/json; charset=utf-8
         my $ctype_def = $self->_split_str( $ctype_raw );
@@ -110,11 +109,9 @@ sub init
         my $enc   = CORE::exists( $ctype_def->{param}->{charset} ) 
             ? lc( $ctype_def->{param}->{charset} ) 
             : undef();
-        $self->message( 3, "Found content type of '$ctype' and charset of '$enc'. \$ctype_def is: ", sub{ $self->dumper( $ctype_def ) } );
         $self->charset( $enc ) if( length( $enc ) );
     
         my $json = $self->json;
-        $self->messagef( 3, "Loading http payload data into buffer \$payload for length %d.", $self->length );
 #       my $payload = '';
 #       if( $self->length > 0 )
 #       {
@@ -127,7 +124,6 @@ sub init
         my $payload = $self->data;
         ## An error occurred while reading the payload
         return if( !defined( $payload ) );
-        $self->messagef( 3, "Content-type is '$ctype' and length is %d", CORE::length( $payload ) );
         if( $ctype eq 'application/json' && CORE::length( $payload ) )
         {
             my $json_data = '';
@@ -137,7 +133,6 @@ sub init
             }
             catch( $e )
             {
-                $self->message( 3, "Error while trying to decode json paylod '$payload': $e" );
                 return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Json data provided is malformed." }) );
             }
             $self->payload( $json_data );
@@ -273,12 +268,10 @@ sub close
     my $sock = IO::File->new;
     if( $sock->fdopen( $fd, 'w' ) )
     {
-        $self->message( 3, "Closing the Apache client connection." );
         return( $sock->close );
     }
     else
     {
-        $self->message( 3, "Could not get a writable file handle on the socket file descriptor '$fd'." );
         return( 0 );
     }
 }
@@ -314,10 +307,8 @@ sub cookie
 {
     my $self = shift( @_ );
     my $name = shift( @_ );
-    $self->message( 3, "Got here to get cookie name '$name'." );
     ## An erro has occurred if this is undef
     my $jar = $self->cookies || return( undef() );
-    $self->message( 3, "Found cookies jar object '$jar'. Getting cookie '$name'" );
     my $v;
     try
     {
@@ -326,7 +317,6 @@ sub cookie
     }
     catch( $e )
     {
-        $self->message( 3, "An error occurred while trying to get the cookie for '$name': $e" );
     }
     return( $v );
 }
@@ -376,22 +366,18 @@ sub data
     {
         if( $max_size && $self->length > $max_size )
         {
-            $self->messagef( 3, "Total data submitted (%d bytes) is bigger than the limit you set in Apache configuration ($max_size).", $self->length );
             return( $self->error({ code => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE, message => "Total data submitted (" . $self->length . " bytes) is bigger than the limit you set in Apache configuration ($max_size)." }) );
         }
-        $self->messagef( 3, "Reading %d bytes of data", $self->length );
         $r->read( $payload, $self->length );
     }
     elsif( lc( $ctype ) eq 'application/json' )
     {
-        $self->message( 3, "No data length is provided, but type is json so we read until the end." );
         if( $max_size )
         {
             while( $r->read( $payload, 1096, CORE::length( $payload ) ) )
             {
                 if( length( $payload ) > $max_size )
                 {
-                    $self->messagef( 3, "Total json payload submitted (%d bytes) is bigger than the limit you set in Apache configuration ($max_size).", $self->length );
                     return( $self->error({ code => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE, message => "Total json payload submitted (" . $self->length . " bytes) is bigger than the limit you set in Apache configuration ($max_size)." }) );
                 }
             }
@@ -401,26 +387,21 @@ sub data
             1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
         }
     }
-    $self->messagef( 3, "Found %d bytes of data read from http client.", CORE::length( $payload ) );
     try
     {
         ## This is set during the init() phase
         my $charset = $self->charset;
-        $self->message( 3, "Found charset '$charset'." );
         if( $charset )
         {
-            $self->message( 3, "Decoding charset encoding with '$charset'." );
             $payload = Encode::decode( $charset, $payload, Encode::FB_CROAK );
         }
         else
         {
-            $self->message( 3, "Decoding charset with default encoding 'utf8'." );
             $payload = Encode::decode_utf8( $payload, Encode::FB_CROAK );
         }
     }
     catch( $e )
     {
-        $self->message( 3, "Character decoding failed with error: $e" );
         return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Error while decoding payload received from http client: $e" }) );
     }
     $self->{data} = $payload;
@@ -703,7 +684,6 @@ sub params
     {
         @$upload_fields{ @uploads } = ( 1 ) x scalar( @uploads );
     }
-    # $self->message( 3, "Found the following keys in post data: '", join( "', '", @params ), "'," );
     my $form = {};
     #my $io = IO::File->new( ">/tmp/form_data.txt" );
     #my $io2 = IO::File->new( ">/tmp/form_data_after_our_decoding.txt" );
@@ -713,7 +693,6 @@ sub params
     foreach my $k ( @params )
     {
         my( @values ) = $r->param( $k );
-        # $self->message( 3, "Adding value '", $values[0], "' for key '$k'." );
         #$raw->print( "$k => " );
         #$io->print( "$k => " );
         my $name = utf8::is_utf8( $k ) ? $k : Encode::decode_utf8( $k );
@@ -797,17 +776,13 @@ sub preferred_language
     {
         return( $self->error( "No supported languages list was provided as array reference." ) );
     }
-    # $self->messagef( 3, "Our support languages are '%s'.", join( "', '", @$ok_langs ) );
     ## No supported languages was provided
     return( '' ) if( !scalar( @$ok_langs ) );
-    # $self->message( 3, "Client accept language is: '", $self->accept_language, "'." );
     ## The user has not set his/her preferred languages
     my $accept_langs = $self->accept_language || return( '' );
-    # $self->message( 3, "http accept language is '$accept_langs', initiating a HTTP::AcceptLanguage object." );
     my $al = HTTP::AcceptLanguage->new( $accept_langs );
     ## Get the most suitable one
     my $ok = $al->match( @$ok_langs );
-    # $self->messagef( 3, "Best match found based on our support languages '%s' is '$ok'", join( "', '", @$ok_langs ) );
     return( $ok ) if( CORE::length( $ok ) );
     ## No match, we return empty. undef is for error only
     return( '' );
@@ -900,9 +875,7 @@ sub remote_ip
 {
     my $self = shift( @_ );
     ## my $vers = $self->server_version;
-    ## $self->message( 3, "Checking if server version '$vers' is higher than 2.2" );
     my $serv = $self->request;
-    $self->message( 3, "Is the REMOTE_ADDR environment variable available? (", $self->env( 'REMOTE_ADDR' ), ")" );
     ## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
     ## We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
     ## e.g. 2.4.16 > 2.2 will return false !!
@@ -954,7 +927,6 @@ sub reply
     my $r    = $self->request;
     my( $call_pack, $call_file, $call_line ) = caller;
     my $call_sub = ( caller(1) )[3];
-    $self->message( 2, "Got Apache request object $r from package $call_pack in file $call_file at line $call_line from sub $call_sub" );
     if( $code !~ /^[0-9]+$/ )
     {
         #$r->custom_response( Apache2::Const::SERVER_ERROR, "Was expecting an organisation id" );
@@ -979,7 +951,6 @@ sub reply
         : CORE::exists( $ref->{ 'error' } ) 
             ? $ref->{ 'error' } 
             : undef();
-    $self->message( 2, "Returning http status with code $code" );
     $r->status( $code );
     if( defined( $msg ) )
     {
@@ -1065,7 +1036,6 @@ sub server_version
         try
         {
             my $desc = Apache2::ServerUtil::get_server_description();
-            $self->message( 3, "Apache description is: '$desc'" );
             if( $desc =~ /\bApache\/([\d\.]+)/ )
             {
                 $vers = $1;
@@ -1073,9 +1043,7 @@ sub server_version
         }
         catch( $e )
         {
-            $self->message( 3, "Failed getting version from Apache2::ServerUtil::get_server_description()" );
         }
-        $self->message( 3, "Found Apache version '$vers' from its description" );
     }
     
     # NOTE: to test our alternative approach
@@ -1102,7 +1070,6 @@ sub server_version
             }
         }
     }
-    $self->message( 3, "Returning version '$vers'." );
     if( $vers )
     {
         $self->{_server_version} = $SERVER_VERSION = version->parse( $vers );
@@ -1184,7 +1151,6 @@ sub type
     elsif( !CORE::length( $self->{type} ) )
     {
         my $ctype_raw = $self->content_type;
-        $self->message( 3, "Content-type of data received is '$ctype_raw'." );
         ## Content-Type: application/json; charset=utf-8
         my $ctype_def = $self->_split_str( $ctype_raw );
         ## Accept: application/json; version=1.0; charset=utf-8
@@ -1275,14 +1241,12 @@ sub _split_str
     {
         defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
     }
-    # $self->message( 3, "Field parts are: ", sub{ $self->dumper( \@parts ) } );
     my $header_val = shift( @parts );
     my $param = {};
     foreach my $frag ( @parts )
     {
         $frag =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
         my( $attribute, $value ) = split( /[[:blank:]]*\=[[:blank:]]*/, $frag, 2 );
-        # $self->message( 3, "\tAttribute is '$attribute' and value '$value'. Fragment processed was '$frag'" );
         $value =~ s/^\"|\"$//g;
         ## Check character string and length. Should not be more than 255 characters
         ## http://tools.ietf.org/html/rfc1341
@@ -2216,7 +2180,11 @@ Note: sharing variables really means it. The variable is not copied.  Only its r
      
 =head2 pool
 
-Returns the pool associated with the request as a L<APR::Pool> object.
+Returns the pool associated with the request as a L<APR::Pool> object of the L<Apache2 connection|Apache2::Connection>. If you rather want access to the pool object of the Apache2 request itself, use L</request>, such as:
+
+    # $rest being a Net::API::REST object
+    my $request_pool = $rest->request->request->pool;
+    $request_pool->cleanup_register( \&cleanup );
 
 =head2 preferred_language( array ref )
 

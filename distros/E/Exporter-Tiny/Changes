@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.006001	2023-03-24
+
+ [ Documentation ]
+ - Don't mention Alt::Lexical::Var::ButSupportModernPerl in manual.
+
+ [ Packaging ]
+ - No longer dynamically recommend Alt::Lexical::Var::ButSupportModernPerl.
+
 1.006000	2022-11-21
 
  [ Packaging ]

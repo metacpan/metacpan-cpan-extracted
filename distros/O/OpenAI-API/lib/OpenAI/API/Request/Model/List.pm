@@ -30,7 +30,7 @@ OpenAI::API::Request::Model::List - models endpoint
 
     my $res = $request->send();
 
-    my @models = $res->{data}->@*;
+    my @models = @{ $res->{data} };
 
 =head1 DESCRIPTION
 

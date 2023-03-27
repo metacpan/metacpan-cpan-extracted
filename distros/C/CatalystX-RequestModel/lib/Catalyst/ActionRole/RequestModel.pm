@@ -1,7 +1,5 @@
 package Catalyst::ActionRole::RequestModel;
 
-our $VERSION = '0.001';
-
 use Moose::Role;
 use Catalyst::Utils;
 use CatalystX::RequestModel::Utils::InvalidContentType;
@@ -37,7 +35,8 @@ sub _get_request_model {
   } @models;
 
   if(exists $self->attributes->{RequestModel}) {
-    return CatalystX::RequestModel::Utils::InvalidContentType->throw(ct=>$ctx->req->content_type) unless @matching_models;
+    my ($content_type, @params) = $ctx->req->content_type; # handle "multipart/form-data; boundary=xYzZY"
+    return CatalystX::RequestModel::Utils::InvalidContentType->throw(ct=>$content_type) unless @matching_models;
   }
 
   ## Query

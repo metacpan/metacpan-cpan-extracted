@@ -1,17 +1,17 @@
 use v5.12.0;
 use warnings;
-package Sub::Exporter::Lexical 0.100000;
+package Sub::Exporter::Lexical 1.000;
 # ABSTRACT: to export lexically-available subs with Sub::Exporter
 
+# I know about if.pm!  But we can't use it here because "use Lexical::Sub" will
+# call import and then it dies "does no default importation".  And then what
+# about this *utterly ridiculous* require?  Well, that's to avoid the prereq
+# scanner picking up Lexical::Sub, which I do not want to just RemovePrereqs
+# on, because that runs after the thing that adds optional prereqs.
 BEGIN {
-  if ($] >= 5.021 && $] < 5.037002) {
-    use Carp ();
-    Carp::confess("There is no functioning lexical exporter between perl v5.20 and v5.38");
-  }
+  if ($] <  5.037002) { eval "require Lexical::Sub;" || die $@ }
+  else                { require builtin;      }
 }
-
-use if $] < 5.021, 'Lexical::Sub';
-use if $] >= 5.037002, 'builtin';
 
 use Sub::Exporter -setup => {
   exports => [ qw(lexical_installer) ],
@@ -136,8 +136,7 @@ sub lexical_installer {
       }
 
       if ($] >= 5.037002) { builtin::export_lexically($name, $code); }
-      elsif ($] <= 5.021) { Lexical::Sub->import($name, $code); }
-      else { Carp::confess("This code should be unreachable.") }
+      else                { Lexical::Sub->import($name, $code); }
     }
   };
 }
@@ -156,7 +155,7 @@ Sub::Exporter::Lexical - to export lexically-available subs with Sub::Exporter
 
 =head1 VERSION
 
-version 0.100000
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -270,17 +269,13 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Hans Dieter Pearcey Ricardo SIGNES Signes
+=for stopwords Hans Dieter Pearcey Ricardo Signes
 
 =over 4
 
 =item *
 
 Hans Dieter Pearcey <hdp@weftsoar.net>
-
-=item *
-
-Ricardo SIGNES <rjbs@cpan.org>
 
 =item *
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.156';
+our $VERSION = '0.157';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -398,12 +398,7 @@ sub __copy_table {
                 $str =~ s/\e\[[\d;]*m/\x{feff}/g;
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-                if ($self->{binary_filter} == 2 ) {
-                    $str = sprintf("%v02X", $str) =~ tr/./ /r;
-                }
-                else {
-                    $str = $self->{binary_string};
-                }
+                $str = $self->{binary_filter} == 2 ? sprintf("%v02X", $str) =~ tr/./ /r : $self->{binary_string};
             }
             $str =~ s/\t/ /g;
             $str =~ s/\v+/\ \ /g;
@@ -698,9 +693,6 @@ sub __cols_to_string {
                 $str = $str . $tab;
             }
         }
-        #if ( $self->{color} ) {
-        #    $str = $str . RESET; # reset colors after each row
-        #}
         $tbl_copy->[$row] = $str;   # overwrite $tbl_copy to save memory
         if ( $progress->{count_progress_bars} ) {         #
             if ( $count >= $progress->{next_update} ) {   #
@@ -719,60 +711,81 @@ sub __cols_to_string {
 sub __print_single_row {
     my ( $self, $tbl_orig, $row, $w_col_names, $footer ) = @_;
     my $term_w = get_term_width();
-    my $len_key = max( @{$w_col_names} ) + 1;
-    if ( $len_key > int( $term_w / 100 * 33 ) ) {
-        $len_key = int( $term_w / 100 * 33 );
+    my $max_key_w = max( @{$w_col_names} ) + 1;
+    if ( $max_key_w > int( $term_w / 3 ) ) {
+        $max_key_w = int( $term_w / 3 );
     }
     my $separator = ' : ';
-    my $len_sep = length( $separator );
-    my $col_max = $term_w - ( $len_key + $len_sep + 1 );
+    my $sep_w = length( $separator );
+    my $max_value_w = $term_w - ( $max_key_w + $sep_w + 1 );
     my $separator_row = ' ';
     my $row_data = [ ' Close with ENTER' ];
+    my $last_color_prev_value;
 
     for my $col ( 0 .. $#{$tbl_orig->[0]} ) {
         push @$row_data, $separator_row;
-        my $key = $tbl_orig->[0][$col];
-        if ( ! defined $key ) {
-            $key = $self->{undef};
+        my $key = $tbl_orig->[0][$col] // $self->{undef};
+        if ( $self->{binary_filter} && substr( $key, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
+            $key = $self->{binary_filter} == 2 ? sprintf("%v02X", $key) =~ tr/./ /r : $self->{binary_string};
         }
+        my @color;
         if ( $self->{color} ) {
-            $key =~ s/\e\[[\d;]*m//g;
+            $key =~ s/\x{feff}//g;
+            $key =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
         }
         $key =~ s/\t/ /g;
         $key =~ s/\v+/\ \ /g;
         $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-        $key = cut_to_printwidth( $key, $len_key );
-        my $copy_sep = $separator;
+        my $key_w = print_columns( $key );
+        if ( $key_w > $max_key_w ) {
+            $key = cut_to_printwidth( $key, $max_key_w );
+        }
+        elsif ( $key_w < $max_key_w ) {
+            $key = ( ' ' x ( $max_key_w - $key_w ) ) . $key;
+        }
+        if ( @color ) {
+            $key =~ s/\x{feff}/shift @color/ge;
+            $key = $key . "\e[0m";
+        }
         my $value = $tbl_orig->[$row][$col];
+        # $value: color and invalid char handling in `line_fold`
         if ( ! length $value ) {
             $value = ' '; # to show also keys/columns with no values
-        }
-        if ( $self->{color} ) {
-            $value =~ s/\e\[[\d;]*m//g;
-        }
-        if ( $self->{binary_filter} && substr( $value, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-            if ( $self->{binary_filter} == 2 ) {
-                $value = sprintf("%v02X", $value) =~ tr/./ /r;
-            }
-            else {
-                $value = $self->{binary_string};
-            }
         }
         if ( ref $value ) {
             $value = _handle_reference( $value );
         }
-        for my $line ( line_fold( $value, $col_max, { join => 0 } ) ) {
-            push @$row_data, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $copy_sep, $line;
-            $key      = '' if $key;
-            $copy_sep = '' if $copy_sep;
+        if ( $self->{binary_filter} && substr( $value, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
+            $value = $self->{binary_filter} == 2 ? sprintf("%v02X", $value) =~ tr/./ /r : $self->{binary_string};
+        }
+        if ( $self->{color} ) {
+            # color is reset only at the end of a table row
+            if ( $col && length $tbl_orig->[$row][$col-1] ) {
+                $last_color_prev_value = ( $tbl_orig->[$row][$col-1] =~ /(\e\[[\d;]*m)/g )[-1] // $last_color_prev_value;
+            }
+            if ( $last_color_prev_value ) {
+                $value = $last_color_prev_value . $value;
+            }
+        }
+        my $subseq_tab = ' ' x ( $max_key_w + $sep_w );
+        my $count;
+
+        for my $line ( line_fold( $value, $max_value_w, { join => 0, color => $self->{color} } ) ) {
+            if ( ! $count++ ) {
+                push @$row_data, $key . $separator . $line;
+            }
+            else {
+                push @$row_data, $subseq_tab . $line;
+            }
         }
     }
     my $regex = qr/^\Q$separator_row\E\z/;
     # Choose
     choose(
         $row_data,
-        { prompt => '', layout => 2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0,
-          search => $self->{search}, skip_items => $regex, footer => $footer, page => $self->{page} }
+        { prompt => '', layout => 2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, empty => ' ',
+          search => $self->{search}, skip_items => $regex, footer => $footer, page => $self->{page},
+          color => $self->{color} }
     );
 }
 
@@ -793,7 +806,7 @@ sub __search {
         my $string = $term->readline(
             $prompt,
             { info => $error_message, hide_cursor => 2, clear_screen => defined $error_message ? 1 : 2,
-              color => $self->{color}, default => $default }
+              default => $default }
         );
         if ( ! length $string ) {
             return;
@@ -910,7 +923,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.156
+Version 0.157
 
 =cut
 
@@ -1117,8 +1130,15 @@ Default: 0
 
 =head3 color
 
-Setting I<color> to C<1> enables the support for color and text formatting escape sequences except for the current
-selected element. If set to C<2>, also for the current selected element the color support is enabled (inverted colors).
+Enable the support for ANSI SGR escape sequences.
+
+0 - off (default)
+
+1 - enabled except for the current selected row
+
+2 - enabled
+
+Numbers with added escape sequences are aligned to the left.
 
 Default: 0
 

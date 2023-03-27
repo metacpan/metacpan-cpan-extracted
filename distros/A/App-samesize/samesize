@@ -25,10 +25,12 @@ my $cntD = 0 ; # 削除したファイルの個数
 my $sizetotal = 0 ; # 出力したバイトサイズの合計値
 my $maxdup = 0 ; # 最大何重に重なったか
 
-getopts '~:2b:d:Df:l:mnv:' , \my%o ; 
+getopts '~:2b:d:Df:Fl:mnv:' , \my%o ; 
 $o{d} //= '' ; # 日時情報の制御。0を含むなら出さない。sを含むなら秒単位。
 $o{'~'} //= '' ; # いろんな順序の制御を逆にする。パラメータに応じて。
 
+
+my $d3 = sub ($) { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ; # 数を3桁区切りに変換する。
 my @F0 = @ARGV ? @ARGV : glob '*' ; # glob '*' はディレクトリのファイルは抽出しない。
 
 if ( $o{D} ) { # -Dは破壊的ゆえ、色々ここで仕込む。↓
@@ -48,7 +50,7 @@ sub main () {
     do{ my $t = $_ ; chdir $t ; push @F0 , grep{ !-d && ($_=catfile $t,$_) } glob '*' ; chdir $d0 ; next } if -d ; 
     next if $fseen{ $_ } ++ ;
     next if -l $_ && 0 eq ($o{l}//'') ;  # -l0 を指定すると、シンボリックリンクファイルは、対象外。
-    my $size = ( stat ) [7] ; # <-- - lstat でなくて stat なので、シンボリックリンクのファイルはその先の中身を見る。
+    my $size = ( stat ) [7] // 0 ; # <-- - lstat でなくて stat なので、シンボリックリンクのファイルはその先の中身を見る。
     next if $size <  ( $o{b} // 0 ) ; # 最小のバイトサイズの条件を満たさない場合は、対象外。
     push @{ $s2f{$size} } , $_ ;
   }
@@ -59,8 +61,10 @@ sub main () {
   @sizes = reverse @sizes if $o{'~'} =~ /s/ ;
   
   my $fmt = do { my $t = max @sizes , 0 ; my $d = length "$t" ; "%${d}s" } ; # サイズの数値のフォーマットを"%7d"のように決める。
+  my (%cc,%ccb) ; # $cc{ $freq } で その $freq の頻度で現れた 異なるバイトサイズが 何個有ったかを数える。
   for my $size ( @sizes ) { 
     my @files = sort @{ $s2f{$size} } ; # ファイルの一覧
+    do { $cc { scalar @files } ++ ; $ccb { scalar @files } += $size } if $o{F} ; 
     $maxdup = @files if @files > $maxdup ;
     @files = sort {(stat $a)[9] <=> (stat $b)[9]} @files if $o{t} || $o{'~'} =~ /t/oi ;
     @files = reverse @files if $o{'~'} =~ /t/oi ;
@@ -89,6 +93,12 @@ sub main () {
       $cntF ++ 
     }
   }
+
+  return if ! $o{F} ;
+  say join "\t" , qw[ frq diff bytes bytes/diff ] ;
+  for ( sort { $a <=> $b} keys %cc ) { 
+    say join "\t" , $_ , $cc{$_} , $ccb{$_} * $cc{$_} , $ccb{$_} ;
+  }
 }
 
 sub dtwhen ( $ ) { 
@@ -96,16 +106,17 @@ sub dtwhen ( $ ) {
   strftime $fmt , localtime $_[0] ;
 }
 
+
+
 END{ print STDERR RESET '' } ; # ENDの順序は重要。最初に書いたものが最後に実行される。このENDで文字の着色を消すことが出来る。
 
 END {
   exit if 0 eq ( $o{v} // '' ) ;
   say STDERR BOLD FAINT " --  " , 
-    $cntF ," file(s) shown. " , ( $cntD ? "$cntD file(s) removed. " : '' ) ,   
+    $cntF ," file(s) shown with ", $d3 -> ( $sizetotal ), " bytes in total ; " , ( $cntD ? "$cntD file(s) removed. " : '' ) ,   
   'Format : byte-size, md5-value, ', ($o{d} =~ /0/ ? '' : '{a,m,c}time, ') , 'filename. ' , 
-  'Total byte size shown : ' , $sizetotal , 
-  '; Maximum duplication : ' , $maxdup , 
-  sprintf( "; %.6f", tv_interval $time_start , [ gettimeofday ] ) , " sec in process. " , 
+  ' ; Max dup. : ' , $maxdup , 
+  sprintf( "; %.3f", tv_interval $time_start , [ gettimeofday ] ) , " sec in proc. " , 
   "(App::samesize\@$App::samesize::VERSION)" ;
 }
 

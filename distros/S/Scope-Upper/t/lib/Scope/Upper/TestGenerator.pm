@@ -32,7 +32,7 @@ my @blocks = (
  [ 'eval q[',   '];' ],
 );
 
-push @blocks, [ 'given (1) {', '}' ] if "$]" >= 5.010_001;
+push @blocks, [ 'given (1) {', '}' ] if "$]" >= 5.010_001 and "$]" < 5.037_010;
 
 my %exports = (
  verbose_is => \&verbose_is,

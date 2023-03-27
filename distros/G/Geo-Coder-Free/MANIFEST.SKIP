@@ -78,3 +78,5 @@ conf/GSLAL032003003
 \bcounties.txt
 \bstates.txt
 \ballCountries.txt
+doanloads/*
+downloads/allCountries.txt

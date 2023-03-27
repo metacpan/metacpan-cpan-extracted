@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Music/CreatingRhythms.pm',
+    'lib/Music/CreatingRhythms/SqrtContinued.pm',
     't/00-compile.t',
     't/01-methods.t'
 );

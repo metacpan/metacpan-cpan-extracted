@@ -79,3 +79,5 @@ dropbox
 \.icloud$
 \A\.github\b
 
+\.gitattributes\b
+.circleci/

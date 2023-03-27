@@ -67,11 +67,11 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

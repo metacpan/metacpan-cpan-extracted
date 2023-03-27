@@ -3,7 +3,7 @@ package Tk::PopColor;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 use Tk;
 
 use base qw(Tk::Derived Tk::Poplevel);
@@ -28,8 +28,8 @@ Tk::PopColor - Pop A Tk::ColorPicker widget relative to a widget.
 
 Inherits L<Tk::Poplevel>
 
-TK::PopColor is a L<Tk::Poplevel> containing  a L<Tk::ColorPicker>
-See there for options and methods.
+Tk::PopColor is a L<Tk::Poplevel> containing  a L<Tk::ColorPicker>.
+See these two for options and methods.
 
 =cut
 
@@ -54,7 +54,13 @@ sub Populate {
 
 sub popDown {
 	my $self = shift;
+	my $color = $self->compoundColor;
 	$self->historyAdd($self->compoundColor);
+	$self->SUPER::popDown
+}
+
+sub popCancel {
+	my $self = shift;
 	$self->SUPER::popDown
 }
 
@@ -62,6 +68,7 @@ sub popUp {
 	my $self = shift;
 	$self->ConfigMode(1);
 	$self->SUPER::popUp;
+	$self->historyUpdate;
 	$self->after(300, ['ConfigMode', $self, 0]);;
 }
 
@@ -72,11 +79,7 @@ Same as Perl.
 
 =head1 AUTHOR
 
-=over 4
-
-=item Hans Jeuken (hanje at cpan dot org)
-
-=back
+Hans Jeuken (hanje at cpan dot org)
 
 =cut
 

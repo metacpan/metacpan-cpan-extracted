@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.758';
+our $VERSION = '1.759';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -916,7 +916,7 @@ sub __prepare_cell {
                 }
                 $str = $emphasised . $str;
             }
-            return $str . normal(); # if \e[
+            return $str . normal();
         }
         else {
             if ( $emphasised ) {
@@ -1275,7 +1275,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.758
+Version 1.759
 
 =cut
 
@@ -1532,14 +1532,13 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 
 =head3 color
 
-Enable the support for SGR ANSI escape sequences.
+Enable the support for ANSI SGR escape sequences.
 
 0 - off (default)
 
-1 - Enables the support for SGR ANSI escape sequences but the current selected element is not colored.
+1 - enabled but the current selected element is not colored.
 
-2 - Enables the support for SGR ANSI escape sequences including for the current selected element (shown
-in inverted colors).
+2 - enabled
 
 =head3 default
 

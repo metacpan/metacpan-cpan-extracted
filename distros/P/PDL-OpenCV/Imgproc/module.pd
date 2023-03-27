@@ -1,0 +1,9 @@
+use strict;
+use warnings;
+use File::Spec::Functions;
+require ''.catfile(updir, 'genpp.pl');
+
+# for pdlpp_mkgen: =head1 NAME PDL::OpenCV::Imgproc
+genheader("Imgproc");
+
+pp_done();

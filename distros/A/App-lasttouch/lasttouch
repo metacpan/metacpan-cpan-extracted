@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use File::Find ; 
+use Time::HiRes qw[ stat tv_interval time gettimeofday ] ;
+use Getopt::Std ; 
+#use Getopt::Long qw [ GetOptions :config bundling no_ignore_case pass_through ] ; # GetOptionsFromArray ] ;
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use Pod::Perldoc ;
+use POSIX qw { strftime } ;
+use feature qw[ say ] ;
+
+my $start_time = [ gettimeofday ] ;
+my %o ; 
+getopts '1,:acd:g:',\%o ; 
+$o{d} //= 1 ; # ディレトクリに対する処理を抑制するかどうか。0が明示的に与えられたら抑制。
+$o{g} //= 12 ; # 最近アクセスされたファイルを最大何個取り出すか
+my $sf = $o{a} ? 8 : $o{c} ? 10 : 9 ; # stat で返される配列の何番目をみるか。  9 は変更時刻。
+my @ Files = () ;
+
+main () ; exit 0 ;
+
+sub wanted {
+  my @s = stat $_ ;
+  my $xtime = $s[ $sf ] ; # 8 は atime, 9 は mtime, 10 は ctime
+  my $bytes = $s[ 7 ] ; 
+  push @ Files , App::lasttouch::fileinfo -> new ( $_ , $xtime, $bytes ) if ! ( -d _ && do { $_.='/' ;1} ) || $o{d} ; 
+}
+
+sub main { 
+  my @sdir = @ARGV ? @ARGV : qw[ . ] ; 
+  find ( { wanted => \& wanted , no_chdir => 1 } , @sdir ) ;
+  my $now = time ; 
+  $_ -> { elapsed } = $now - $_->{xtime} for @Files ; # 新たな要素を、追加している。
+  @ Files = sort { $a ->{elapsed} <=> $b->{elapsed} } @Files ; 
+
+  say join "\t", "diff_seconds", "sec_before", $o{1} ? 'date_time' : () , "byte_size", "file_name" ; 
+  my $mrec0 = 0 ; 
+  my $shown = 0 ;
+  for ( splice @Files , 0 , $o{g} ) { 
+    my @t ; 
+    my $mrec = $_->{elapsed} ; 
+    push @t , sprintf "%0.6f" , $mrec - $mrec0 ;
+    push @t , sprintf "%0.6f" , $mrec ; 
+    push @t , strftime '%Y-%m-%d %H:%M:%S' , localtime  $_ -> {xtime} if $o{1} ;
+    push @t , $_ -> {bytes}, $_ -> {name} ; 
+    $t[-2] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g if $o{','} // '' ne "0" ; 
+    say join "\t" , @t ;
+    $shown ++ ; 
+    $mrec0 = $mrec ; 
+  }
+  my $num = @ Files ; 
+  my $elps = sprintf "%.6f" , tv_interval $start_time ; 
+  say STDERR CYAN "Files processed : $num ; Shown above : $shown ;  Elapsed seconds : $elps" ;
+}
+
+sub HELP_MESSAGE { # <-- - サブコマンドが呼ばれているときはそのヘルプが呼ばれる。
+  local @ARGV = do { my ($x,@y) = 0 ; 1 while ( @y = caller $x++ )[ 0 ] eq "Getopt::Std" ; $y[1] } ;
+  Pod::Perldoc -> run ;
+}
+sub VERSION_MESSAGE { $ Getopt::Std::STANDARD_HELP_VERSION = 1 } ; 
+
+
+package App::lasttouch::fileinfo ;
+
+sub new ( $ ) { #say 1 ;
+  my $ins = { name => $_[1] , xtime => $_[2] , bytes => $_[3] } ; 
+  return bless $ins ;
+} 
+
+=encoding utf8
+
+=head1 NAME
+
+ lastaccess DIRNAME 
+
+ DIRNAMEの下にあるファイルで、最後に変更された順にファイルを表示する。
+
+ オプション: 
+
+   -a   : 各ファイルの変更日時ではなくて、アクセスされた日時(atime)を見る。
+   -c   : 各ファイルの変更日時ではなくて、作成された日時(ctime)を見る。 
+   -d 0 : 途中で現れるディレクトリに対する処理を抑制する。
+   -g N : 最大最近の何個を取り出すかの指定。未指定なら12。
+   -1   : 日時情報を YYYY-MM-DD HH:MM:SS の形式で与える。
+   -, 0 : 3桁区切りのコンマを抑制する。
+
+  開発メモ : 
+    * 深い階層は --maxdepth などで制限を加えたい。また、-.0 のようなピリオドファイルを追いかけないオプションも加えたい。
+
+=cut

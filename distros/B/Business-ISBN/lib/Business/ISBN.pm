@@ -84,7 +84,7 @@ use vars qw(
 use Carp qw(carp croak cluck);
 use Exporter qw(import);
 
-use Business::ISBN::Data 20191107; # now a separate module
+use Business::ISBN::Data 20230322.001; # now a separate module
 # ugh, hack
 *group_data = *Business::ISBN::country_data;
 sub _group_data {
@@ -127,7 +127,7 @@ BEGIN {
 		);
 	};
 
-our $VERSION   = '3.007';
+our $VERSION   = '3.008';
 
 sub ARTICLE_CODE_OUT_OF_RANGE () { -5 }
 sub INVALID_PREFIX            () { -4 };
@@ -898,7 +898,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This module is licensed under the Artistic License 2.0. See the LICENSE
 file in the distribution, or https://opensource.org/licenses/Artistic-2.0

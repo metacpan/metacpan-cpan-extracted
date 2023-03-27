@@ -60,7 +60,7 @@
    "provides" : {
       "Exporter::Almighty" : {
          "file" : "lib/Exporter/Almighty.pm",
-         "version" : "0.001004"
+         "version" : "0.001005"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Almighty/project"
    },
-   "version" : "0.001004",
+   "version" : "0.001005",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

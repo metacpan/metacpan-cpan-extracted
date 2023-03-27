@@ -1,5 +1,16 @@
 Revision history for Geo-Coder-Free
 
+0.31	Fri Mar 24 17:30:06 EDT 2023
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+	Port to Solaris
+	Local.pm doesn't contain states/provinces' locations, so quick return on search for those
+	Use JSON::MaybeXS instead of JSON
+	Fix truncate
+	Use perl shell rather than CPAN to install missing modules
+	Move temporary downloads to their own directory to stop them being installed
+	Some local matches in US missed in the quick lookup
+	Die, rather than warn, if the openaddr database can't be opened
+
 0.30	Wed Mar  9 09:47:33 EST 2022
 	Fix treating "30 Cross Street" as "30 X St"
 	Latest DB.pm from VWF

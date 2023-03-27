@@ -1,0 +1,14 @@
+PDL::OpenCV
+
+This is an attempt to interface OpenCV from perl and PDL.
+There is a C abstraction layer
+because of conflicts between perl and OpenCV (C++) headers.
+
+The idiom used is that OpenCV Mat objects are created only to be used
+to wrap PDL ndarrays' data, which simplifies object lifecycle management.
+
+Currently this is compiled for OpenCV 4.2 and 4.5. At least between
+major versions, the API is changing.
+
+OpenCV has a multitude of functions and classes. Wrappers are generated
+from the data that Python bindings are generated from.

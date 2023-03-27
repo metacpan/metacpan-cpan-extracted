@@ -26,10 +26,10 @@ no_index:
 provides:
   App::Greple::xlate:
     file: lib/App/Greple/xlate.pm
-    version: '0.20'
+    version: '0.21'
   App::Greple::xlate::deepl:
     file: lib/App/Greple/xlate/deepl.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   App::Greple: '9.02'
   App::Greple::msdoc: '1.05'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-Greple-xlate/issues
   homepage: https://github.com/kaz-utashiro/App-Greple-xlate
   repository: https://github.com/kaz-utashiro/App-Greple-xlate.git
-version: '0.20'
+version: '0.21'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

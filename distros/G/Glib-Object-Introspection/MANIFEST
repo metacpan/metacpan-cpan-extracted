@@ -28,8 +28,8 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 NEWS
-perl-Glib-Object-Introspection.doap
-README
+perl-glib-object-introspection.doap
+README.md
 t/00-basic-types.t
 t/arg-checks.t
 t/arrays.t

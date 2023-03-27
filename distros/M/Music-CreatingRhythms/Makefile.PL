@@ -18,14 +18,13 @@ my %WriteMakefileArgs = (
   "NAME" => "Music::CreatingRhythms",
   "PREREQ_PM" => {
     "Algorithm::Combinatorics" => 0,
-    "Carp" => 0,
     "Data::Munge" => 0,
     "Integer::Partition" => 0,
     "List::Util" => "1.33",
-    "Math::NumSeq::SqrtContinued" => 0,
     "Math::Sequence::DeBruijn" => 0,
     "Moo" => 2,
     "Music::AtonalUtil" => 0,
+    "OEIS" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -37,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0602",
+  "VERSION" => "0.0700",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,17 +45,16 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Algorithm::Combinatorics" => 0,
-  "Carp" => 0,
   "Data::Munge" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Integer::Partition" => 0,
   "List::Util" => "1.33",
-  "Math::NumSeq::SqrtContinued" => 0,
   "Math::Sequence::DeBruijn" => 0,
   "Moo" => 2,
   "Music::AtonalUtil" => 0,
+  "OEIS" => 0,
   "Test::More" => "0.88",
   "namespace::clean" => 0,
   "strict" => 0,

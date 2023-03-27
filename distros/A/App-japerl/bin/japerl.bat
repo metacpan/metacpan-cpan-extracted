@@ -19,10 +19,10 @@ undef(@rem=@rem);
 #
 # https://metacpan.org/dist/App-japerl
 #
-# Copyright (c) 2018, 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 $VERSION = $VERSION;
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use FindBin;
@@ -140,16 +140,17 @@ App::japerl - JPerl-again Perl glocalization scripting environment
 
 =head1 SYNOPSIS
 
-  japerl [switches] [--] script.pl [arguments]
+  japerl [switches] [--] MBCS_script.pl [arguments]
 
 =head1 DESCRIPTION
 
-japerl was created with the intention of succeeding JPerl.
-japerl provides glocalization script environment on both modern Perl
-and traditional Perl by using mb.pm modulino.
+japerl.bat is a wrapper for the mb.pm modulino.
+This software assists in the execution of Perl scripts written in MBCS encoding.
 
-This is often misunderstood, but japerl and jacode.pl have different
-purposes and functions.
+It differs in function and purpose from jacode.pl, which has a similar name and is often misunderstood.
+jacode.pl is mainly used to convert I/O data encoding.
+
+On the other hand, mb.pm modulino handles script you wrote, and it does not convert its encoding.
 
        software
   <<elder   younger>>     software purpose
@@ -162,28 +163,46 @@ purposes and functions.
 
 This software can do the following.
 
-=over 4
+=over 2
 
-=item * choose one perl interpreter in system
+=item *
 
-=item * select local use libraries
+choose one perl interpreter in system
 
-=item * execute script written in system native encoding
+=item *
+
+select local use libraries
+
+=item *
+
+execute script written in system native encoding
 
 =back
 
-May you do good magic with japerl.
-
 =head1 How to find mb.pm modulino ?
 
- Running japerl.bat requires mb.pm modulino.
- japerl.bat finds for mb.pm modulino in the following order and
- uses the first mb.pm found.
- 
- 1. @PERL_LOCAL_LIB_ROOT
- 2. $FindBin::Bin
- 3. $FindBin::Bin/lib
- 4. @INC
+Running japerl.bat requires mb.pm modulino.
+japerl.bat finds for mb.pm modulino in the following order and uses the first mb.pm found.
+
+=over 2
+
+=item 1
+
+@PERL_LOCAL_LIB_ROOT
+
+=item 2
+
+$FindBin::Bin
+
+=item 3
+
+$FindBin::Bin/lib
+
+=item 4
+
+@INC
+
+=back
 
 =head1 AUTHOR
 

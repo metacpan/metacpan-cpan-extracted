@@ -1,7 +1,17 @@
 Changelog for Catmandu-PICA
 
+1.12 2023-03-27T09:00:33Z
+  - Fix #84 in pica_each
+  - Change wrong example using reject (#64)
+  - Allow bare subfields in pica_match/pica_map
+
+1.11 2023-03-26T19:48:47Z
+  - Add fixes to modify PICA records: pica_remove, pica_keep, pica_tag, pica_occurrence
+  - Add pica_diff binder to support creating PICA Patches
+  - Fix #79
+
 1.10 2023-02-09T18:43:54Z
-   - Quick fix to avoid failing test (see #79 for details).
+  - Quick fix to avoid failing test (see #79 for details)
 
 1.09 2022-09-19T08:41:44Z
    - Support writing annotated PICA

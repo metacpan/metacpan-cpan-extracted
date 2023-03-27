@@ -9,7 +9,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -190,6 +190,19 @@ data only when the cache file exists for target file.
 
         By default behavior, unused data is removed from the cache file.  If
         you don't want to remove them and keep in the file, use `accumulate`.
+
+# COMMAND LINE INTERFACE
+
+You can easily use this module from the command line by using the
+`xlate` command included in the repository. See the `xlate` help
+information for usage.
+
+# EMACS
+
+Load the `xlate.el` file included in the repository to use `xlate`
+command from Emacs editor.  `xlate-region` function translate the
+given region.  Default language is `EN-US` and you can specify
+language invoking it with prefix argument.
 
 # ENVIRONMENT
 

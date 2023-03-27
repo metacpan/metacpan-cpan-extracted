@@ -5,10 +5,10 @@ package Fake::Our;
 #
 # http://search.cpan.org/dist/Fake-Our/
 #
-# Copyright (c) 2014, 2015, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2015, 2017, 2018, 2019, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -47,8 +47,7 @@ Fake::Our - Fake 'our' support for perl 5.00503
 
 =head1 DESCRIPTION
 
-Fake::Our provides fake 'our' support on perl 5.00503. This is a module to help
-writing portable programs and modules across recent and old versions of Perl.
+Fake::Our provides fake 'our' support on perl 5.00503. This is a module to help writing portable programs and modules across recent and old versions of Perl.
 Using this module is deprecated, since it gives your script "no strict qw(vars)".
 Moreover, this module is incomplete and limited.
 
@@ -60,12 +59,9 @@ This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 BUGS
 
@@ -77,27 +73,47 @@ Fake::Our can't lvalue our, like:
 
 =head1 SEE ALSO
 
-=over 4
+=over 2
 
-=item * L<our|http://perldoc.perl.org/functions/our.html> - Perl Programming Documentation
+=item *
 
-=item * L<Re: Problems with 'our' definition with perl 5.00503|http://www.perlmonks.org/?node_id=471212> - PerlMonks
+L<our|http://perldoc.perl.org/functions/our.html> - Perl Programming Documentation
 
-=item * L<Migrating scripts back to Perl 5.005_03|http://www.perlmonks.org/?node_id=289351> - PerlMonks
+=item *
 
-=item * L<Goodnight, Perl 5.005|http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html> - ONLamp.com
+L<Re: Problems with 'our' definition with perl 5.00503|http://www.perlmonks.org/?node_id=471212> - PerlMonks
 
-=item * L<Perl 5.005_03 binaries|http://guest.engelschall.com/~sb/download/win32/> - engelschall.com
+=item *
 
-=item * L<Welcome to CP5.5.3AN|http://cp5.5.3an.barnyard.co.uk/> - cp5.5.3an.barnyard.co.uk
+L<Migrating scripts back to Perl 5.005_03|http://www.perlmonks.org/?node_id=289351> - PerlMonks
 
-=item * L<Strict::Perl|http://search.cpan.org/dist/Strict-Perl/> - CPAN
+=item *
 
-=item * L<japerl|http://search.cpan.org/dist/japerl/> - CPAN
+L<Goodnight, Perl 5.005|http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html> - ONLamp.com
 
-=item * L<ina|http://search.cpan.org/~ina/> - CPAN
+=item *
 
-=item * L<A Complete History of CPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - The BackPAN
+L<Perl 5.005_03 binaries|http://guest.engelschall.com/~sb/download/win32/> - engelschall.com
+
+=item *
+
+L<Welcome to CP5.5.3AN|http://cp5.5.3an.barnyard.co.uk/> - cp5.5.3an.barnyard.co.uk
+
+=item *
+
+L<Strict::Perl|http://search.cpan.org/dist/Strict-Perl/> - CPAN
+
+=item *
+
+L<japerl|http://search.cpan.org/dist/japerl/> - CPAN
+
+=item *
+
+L<ina|http://search.cpan.org/~ina/> - CPAN
+
+=item *
+
+L<A Complete History of CPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - The BackPAN
 
 =back
 

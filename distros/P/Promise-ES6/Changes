@@ -1,5 +1,8 @@
 Revision history for Perl module Promise::ES6
 
+0.28 Sun 26 Mar 2023
+- Fix compatibility with Awaitable 0.64 and earlier.
+
 0.27 Wed 22 Mar 2023
 - Tweak AWAIT_GET to conform to Awaitable 0.65 test suite, which added
   a new requirement for error reporting. Errors will now “come from”

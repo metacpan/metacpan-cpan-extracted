@@ -8,14 +8,12 @@ return {
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES => {},
     TEST_REQUIRES => {
+        'if'          => 0,
+        'open'        => 0,
         'File::Spec'  => 0,
         'File::Temp'  => '0.19',
         'IO::Handle'  => 0,
-        'Test::Fatal' => 0,
-        'Test::More'  => 0,
-        $] < 5.010 ? () : (
-            'open'    => 0,
-        ),
+        'Test2::V0'   => 0,
     },
     PREREQ_PM => {
         'Carp'           => 0,
@@ -30,7 +28,5 @@ return {
         'Test::Pod' => 1.22,
     },
 
-    META_MERGE => { dynamic_config => 1 },
-
-    bonus => { github => 'mauke' },
+    REPOSITORY => [ github => 'mauke' ],
 };

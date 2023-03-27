@@ -1,5 +1,18 @@
 Revision history for Perl module DB::Object
 
+v0.11.2 2023-03-24T19:19:29+0900
+    - Minor correction in method _opt_overload() in class DB::Object::IN
+
+v0.11.1 2023-03-24T13:08:15+0900
+    - Updated DB::Object::Query::_group_order() to accept an array object as an argument.
+    - Added method columns() in DB::Object::Tables
+    - Improved method select() in DB::Object::Query
+    - Corrected method _group_order() in DB::Object::Query to use the right column prefix
+    - Added the class DB::Object::IN in DB::Object and method DB::Object::IN() to implement the SQL operator "IN"
+    - Added the class DB::Object::Expression inside DB::Object
+    - Corrected a warning due to undefined value in DB::Object::Fields
+    - Corrected method _where_having() in DB::Object::Query that did not handle properly embedded operators AND/OR
+
 v0.11.0 2022-12-22T21:35:05+0900
     - Minor correction to method format_update() in DB::Object::Query
     - Implemented handling of use of unknown fields (via the $tbl->fo->some_field mechanism)

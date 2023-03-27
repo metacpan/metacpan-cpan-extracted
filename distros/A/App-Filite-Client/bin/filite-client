@@ -21,15 +21,16 @@ filite-client - command-line client for Filite servers
   filite-client: share via a filite server
   
   Usage:
-    filite-client [options] [filename]
-	 filite-client [options] [url]
-    cat blah | filite-client [options] -
+    filite-client -T [filename]
+    filite-client -F [filename]
+    filite-client -L [url]
+    cat blah | filite-client [options]
   
   Options:
-    --text             Share as text
-    --file             Share as file
-    --link             Share as link
-    --highlight        Syntax highligh text
+    --text, -T         Share as text
+    --file, -F         Share as file
+    --link, -L         Share as link
+    --highlight, -H    Syntax highligh text
     --help, --usage    Show this usage information
 
 =head1 DESCRIPTION

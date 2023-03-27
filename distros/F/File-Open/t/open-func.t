@@ -1,16 +1,10 @@
-use warnings;
-use strict;
-
-use Test::More tests => 91;
-
-use File::Spec qw(tempfile);
-use File::Temp;
-use Test::Fatal;
-
+use Test2::V0;
+use File::Spec ();
+use File::Temp ();
 use File::Open qw(fsysopen_nothrow fopen_nothrow fsysopen fopen fopendir);
 
 my $DIR = File::Temp->newdir('F_O_test.XXXXXX', CLEANUP => 1, EXLOCK => 0, TMPDIR => 1);
--w $DIR or BAIL_OUT "$DIR: I can't test open() without a writeable temp directory";
+-w $DIR or skip_all "$DIR: I can't test open() without a writeable temp directory";
 
 sub scratch {
     my ($stem) = @_;
@@ -21,18 +15,18 @@ sub scratch {
 my $nofile = scratch "nosuchfile";
 
 like $_, qr/\Q: $nofile: / for
-    exception { fopen $nofile },
-    exception { fopen $nofile, 'r' },
-    exception { fopen $nofile, 'r+' },
-    exception { fopen $nofile, '<' },
-    exception { fopen $nofile, '+<' },
-    exception { fopen $nofile, 'rb' },
-    exception { fopen $nofile, 'r+b' },
-    exception { fopen $nofile, '<b' },
-    exception { fopen $nofile, '+<b' },
-    exception { fsysopen $nofile, 'r' },
-    exception { fsysopen $nofile, 'w' },
-    exception { fsysopen $nofile, 'rw' },
+    dies { fopen $nofile },
+    dies { fopen $nofile, 'r' },
+    dies { fopen $nofile, 'r+' },
+    dies { fopen $nofile, '<' },
+    dies { fopen $nofile, '+<' },
+    dies { fopen $nofile, 'rb' },
+    dies { fopen $nofile, 'r+b' },
+    dies { fopen $nofile, '<b' },
+    dies { fopen $nofile, '+<b' },
+    dies { fsysopen $nofile, 'r' },
+    dies { fsysopen $nofile, 'w' },
+    dies { fsysopen $nofile, 'rw' },
 ;
 
 is $_, undef for
@@ -165,7 +159,7 @@ SKIP: {
         my $fh = fsysopen $scratch, 'w';
         ok close $fh;
     } {
-        like exception { fsysopen $scratch, 'w', {creat => 0666, excl => 1} }, qr/\Q: $scratch: /;
+        like dies { fsysopen $scratch, 'w', {creat => 0666, excl => 1} }, qr/\Q: $scratch: /;
     } {
         my $fh = fsysopen $scratch, 'w', {creat => 0, append => 1};
         ok print $fh "$token\n$scratch\n";
@@ -211,3 +205,5 @@ SKIP: {
     }
 }
 unlink $scratch;
+
+done_testing;

@@ -1,0 +1,11 @@
+ core/base core/mat core/types core core/persistence
+highgui highgui
+imgcodecs imgcodecs
+imgproc imgproc
+tracking tracking video/tracking
+videoio videoio
+objdetect objdetect
+#features2d features2d
+#bgsegm bgsegm video/background_segm
+#calib3d calib3d
+#flann flann/miniflann

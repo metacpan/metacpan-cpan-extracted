@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# yum install libaio-devel
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
@@ -25,7 +27,8 @@ BEGIN {
 			die "You need $list to test this package";
 		}
 		print "Installing $list\n";
-		system("cpan -i $list");
+		# system("cpan -i $list");
+		system('perl -MCPAN -e \'CPAN::Shell->install("' . join('", "', @needfull) . '")\'');
 	}
 }
 
@@ -56,16 +59,17 @@ if(eval { require Geo::libpostal; }) {
 }
 
 my @dirs = (
-	'lib/Geo/Coder/Free/GeoNames',
-	'lib/Geo/Coder/Free/GeoNames/databases',
+	'downloads',
+	# 'lib/Geo/Coder/Free/GeoNames',
+	# 'lib/Geo/Coder/Free/GeoNames/databases',
 	'lib/Geo/Coder/Free/MaxMind',
-	'lib/Geo/Coder/Free/MaxMind/databases'
+	'lib/Geo/Coder/Free/MaxMind/databases',
 );
 
 foreach my $dir(@dirs) {
 	if(! -d $dir) {
 		print "Creating the download directory $dir\n";
-		mkdir $dir || die "$dir: $@";
+		mkdir $dir, 0755 || die "$dir: $@";
 	}
 }
 
@@ -76,7 +80,8 @@ my %urls = (
 	# 'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
 	# This data are 7 years out of date, and are unconsistent with the Geonames database
 	'https://github.com/apache/commons-csv/blob/master/src/test/resources/org/apache/commons/csv/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
-	'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
+	# 'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
+	'http://download.geonames.org/export/dump/allCountries.zip' => 'downloads/allCountries.zip',
 );
 
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
@@ -138,30 +143,47 @@ foreach my $url(keys %urls) {
 		print "Downloading $url to $file if a newer version is available\n";
 		if($use_withcache &&
 		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
+			if($ENV{'AUTOMATED_TESTING'}) {
+				print STDERR "Can't download $url";
+				exit(0);
+			}
 			die "$url: LWP error $rc";
 		} elsif(LWP::Simple::is_error($rc = LWP::Simple::mirror($url, $file))) {
+			if($ENV{'AUTOMATED_TESTING'}) {
+				print STDERR "Can't download $url";
+				exit(0);
+			}
 			die "$url: LWP error $rc";
 		}
 	} else {
 		print "Downloading $url to $file\n";
 		if($use_withcache &&
 		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::getstore($url, $file))) {
+			if($ENV{'AUTOMATED_TESTING'}) {
+				print STDERR "Can't download $url";
+				exit(0);
+			}
 			die "$url: LWP error $rc";
 		} elsif(LWP::Simple::is_error($rc = LWP::Simple::getstore($url, $file))) {
+			if($ENV{'AUTOMATED_TESTING'}) {
+				print STDERR "Can't download $url";
+				exit(0);
+			}
 			die "$url: LWP error $rc";
 		}
 	}
 	die $file if(!-r $file);
 }
 
-if(!(-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) {
-	my $zip = 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip';
+if(!(-r 'downloads/allCountries.txt')) {
+	my $zip = 'downloads/allCountries.zip';
 	system("unzip $zip");
-	rename 'allCountries.txt', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt';
+	rename 'allCountries.txt', 'downloads/allCountries.txt';
 	# Save disc space, but prevent more than one download
-	if(open(my $fout, '>', $zip)) {
-		close($fout);
-	}
+	# if(open(my $fout, '>', $zip)) {
+		# close($fout);
+	# }
+	truncate $zip, 0;
 }
 
 # London's areas are not complete within Maxmind.  Here are a few to get started
@@ -174,6 +196,35 @@ if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 		"GB.ENG.P5\tLondon\tLondon\t2648110\n",
 		"GB.ENG.G5\tTooting\tTooting\t2648110\n",	# Not in the database, but Balham is close
 		"GB.ENG.A5\tBedfordshire\tBedfordshire\t2648110\n";
+}
+
+# For bin/create_sqlite
+my $build_requires = {
+	'App::csv2sqlite' => 0,
+	'CHI' => 0,
+	'CHI::Driver::RawMemory' => 0,
+	'Cwd' => 0,
+	'Config::Auto' => 0,
+	'File::Basename' => 0,
+	'File::Copy' => 0,
+	'File::Slurp' => 0,
+	'File::Spec' => 0,
+	'autodie' => 0,
+	'Geo::Coder::Abbreviations' => 0.03,
+	'Geo::Location::Point' => 0.02,
+	'IPC::System::Simple' => 0,
+	'JSON::MaybeXS' => 0,
+	'LWP::UserAgent::Throttled' => 0,
+	'LWP::Protocol::https' => 0,
+	'Try::Tiny' => 0
+};
+
+if($^O ne 'solaris') {
+	$build_requires->{'File::Open::NoCache::ReadOnly'} = 0.02;
+	$build_requires->{'IO::AIO'} = 0;
+}
+if($ENV{'OSM_HOME'}) {
+	$build_requires->{'XML::LibXML::Reader'} = 0;
 }
 
 my $test_requires = {
@@ -209,27 +260,8 @@ WriteMakefile(
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
-	BUILD_REQUIRES => {	# For bin/create_sqlite
-		'App::csv2sqlite' => 0,
-		'CHI' => 0,
-		'CHI::Driver::RawMemory' => 0,
-		'Cwd' => 0,
-		'Config::Auto' => 0,
-		'File::Basename' => 0,
-		'File::Copy' => 0,
-		'File::Open::NoCache::ReadOnly' => 0.02,
-		'File::Slurp' => 0,
-		'File::Spec' => 0,
-		'autodie' => 0,
-		'Geo::Coder::Abbreviations' => 0.03,
-		'Geo::Location::Point' => 0.02,
-		'IO::AIO' => 0,
-		'IPC::System::Simple' => 0,
-		'JSON' => 0,
-		'LWP::UserAgent::Throttled' => 0,
-		'Try::Tiny' => 0,
-		'XML::LibXML::Reader' => 0,	# FIXME: only if $OSM_HOME is set
-	}, TEST_REQUIRES => $test_requires,
+	BUILD_REQUIRES => $build_requires,
+	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Carp' => 0,
 		'DBI' => 0,

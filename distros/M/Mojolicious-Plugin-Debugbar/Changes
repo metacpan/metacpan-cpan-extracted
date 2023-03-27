@@ -5,3 +5,6 @@ Revision history for Mojolicious-Plugin-Debugbar
 
 0.0.2   2019-09-09
         Update readme
+
+0.1.0   2023-03-27
+        Use after_render instead of after_dispatch

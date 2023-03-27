@@ -25,12 +25,14 @@ define pod <<"=cut"
 	-f#  from lang (ignored)
 	-t#  to lang
 	-m#  max length per API call
+	-l#  show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
-
-    Docker and Make options
+    Make options
 	-M   run make
+	-n   run make with -n dry-run option
+    Docker options
 	-G   mount git top-level directory
-	-B   batch mode (non-interactive)
+	-B   run in non-interactive (batch) mode
 	-R   mount read-only
 	-D   run xlate on the container
 	-C   run any command on the container
@@ -41,7 +43,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.20
+    Version 0.21
 
 =cut
 
@@ -140,7 +142,10 @@ do
 done
 OPTIND=1
 
-while getopts "${EXOPT}"'Macrsnp:w:o:f:t:m:h' OPT
+mod="App-Greple-xlate"
+share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
+
+while getopts "${EXOPT}"'Macrsnp:w:o:f:t:m:l:h' OPT
 do
     case $OPT in
 	[$EXOPT]) : ignore ;;
@@ -156,6 +161,17 @@ do
 	f) from_lang="$OPTARG" ;;
 	t)   to_lang="$OPTARG" ;;
 	m)       max="$OPTARG" ;;
+	l)
+	    file="$share/$OPTARG"
+	    if [ -f "$file" ]
+	    then
+		cat $file
+	    else
+		echo $share
+		ls -1 $share | sed 's/^/\t/'
+	    fi
+	    exit
+	    ;;
 	h)
 	    help="$(sed -r -e 's/^=[a-z]+[0-9]* *//' <<< "$pod")"
 	    exec echo "$help"
@@ -170,8 +186,6 @@ shift $((OPTIND - 1))
 : run make
 if [ "$run_make" == yes ]
 then
-    mod="App-Greple-xlate"
-    share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
     declare -a opt
     for m in "$@"
     do

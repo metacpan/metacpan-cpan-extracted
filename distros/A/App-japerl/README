@@ -4,16 +4,20 @@ NAME
 
 SYNOPSIS
 
-  $ japerl [switches] [--] script.pl [arguments]
+  $ japerl [switches] [--] MBCS_script.pl [arguments]
 
 DESCRIPTION
 
-  japerl was created with the intention of succeeding JPerl.
-  japerl provides glocalization script environment on both modern Perl
-  and traditional Perl by using mb.pm modulino.
+  japerl.bat is a wrapper for the mb.pm modulino.
+  This software assists in the execution of Perl scripts written in MBCS
+  encoding.
 
-  This is often misunderstood, but japerl and jacode.pl have different
-  purposes and functions.
+  It differs in function and purpose from jacode.pl, which has a similar
+  name and is often misunderstood. jacode.pl is mainly used to convert
+  I/O data encoding.
+
+  On the other hand, mb.pm modulino handles script you wrote, and it
+  does not convert its encoding.
 
        software
   <<elder   younger>>     software purpose
@@ -28,8 +32,6 @@ DESCRIPTION
   - choose one perl interpreter in system
   - select local use libraries
   - execute script written in system native encoding
-
-  May you do good magic with japerl.
 
 How to find mb.pm modulino ?
 

@@ -7,7 +7,7 @@ use Carp ();
 
 use OpenAI::API::Config;
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 BEGIN {
     my %module_dispatcher = (
@@ -66,37 +66,45 @@ OpenAI::API - Perl interface to OpenAI API
 
 =head1 SYNOPSIS
 
-    use OpenAI::API;
+    {
+        use OpenAI::API;
 
-    my $openai = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
+        my $openai = OpenAI::API->new();    # uses OPENAI_API_KEY environment variable
 
-    my $res = $openai->chat(
-        model    => "gpt-3.5-turbo",
-        messages => [
-            { "role" => "system",    "content" => "You are a helpful assistant." },
-            { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
-            { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
-            { "role" => "user",      "content" => "How do I use this module?" },
-        ],
-    );
+        my $res = $openai->chat(
+            model    => "gpt-3.5-turbo",
+            messages => [
+                { "role" => "system",    "content" => "You are a helpful assistant." },
+                { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
+                { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
+                { "role" => "user",      "content" => "How do I use this module?" },
+            ],
+            max_tokens  => 20,
+            temperature => 0,
+        );
+    }
 
     # that's roughly the same as:
 
-    use OpenAI::API::Request::Chat;
+    {
+        use OpenAI::API::Request::Chat;
 
-    my $request = OpenAI::API::Request::Chat->new(
-        model    => "gpt-3.5-turbo",
-        messages => [
-            { "role" => "system",    "content" => "You are a helpful assistant." },
-            { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
-            { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
-            { "role" => "user",      "content" => "How do I use this module?" },
-        ],
-    );
+        my $request = OpenAI::API::Request::Chat->new(
+            model    => "gpt-3.5-turbo",
+            messages => [
+                { "role" => "system",    "content" => "You are a helpful assistant." },
+                { "role" => "user",      "content" => "How can I access OpenAI's APIs in Perl?" },
+                { "role" => "assistant", "content" => "You can use the OpenAI::API module." },
+                { "role" => "user",      "content" => "How do I use this module?" },
+            ],
+            max_tokens => 20,
+            temperature => 0,
+        );
 
-    my $res = $request->send();
+        my $res = $request->send();
 
-    my $message = $res->{choices}[0]{message};
+        my $message = $res->{choices}[0]{message};
+    }
 
 =head1 DESCRIPTION
 

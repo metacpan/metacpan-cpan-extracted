@@ -50,9 +50,11 @@ OpenAI::API::Request::Chat - chat endpoint
             { "role" => "assistant", "content" => "The Los Angeles Dodgers won the World Series in 2020." },
             { "role" => "user",      "content" => "Where was it played?" }
         ],
+        max_tokens  => 20,
+        temperature => 0,
     );
 
-    my $res = $request->send();
+    my $res = $request->send();    # or: $request->send( http_response => 1 );
 
     my $message = $res->{choices}[0]{message};
 

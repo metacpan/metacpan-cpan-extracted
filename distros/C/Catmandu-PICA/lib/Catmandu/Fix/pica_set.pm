@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_set;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);

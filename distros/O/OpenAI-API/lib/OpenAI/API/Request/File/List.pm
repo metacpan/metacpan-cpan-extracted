@@ -30,7 +30,7 @@ OpenAI::API::Request::File::List - files endpoint
 
     my $res = $request->send();
 
-    my @files = $res->{data}->@*;
+    my @files = @{ $res->{data} };
 
 =head1 DESCRIPTION
 

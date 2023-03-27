@@ -11,9 +11,22 @@ create_perl_callback_closure (GICallableInfo *cb_info, SV *code)
 
 	info->interface = g_base_info_ref (cb_info);
 	info->cif = g_new0 (ffi_cif, 1);
+
+#if GI_CHECK_VERSION (1, 72, 0)
+        info->closure =
+                g_callable_info_create_closure (info->interface,
+                                                info->cif,
+                                                invoke_perl_code,
+                                                info);
+#else
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	info->closure =
-		g_callable_info_prepare_closure (info->interface, info->cif,
-		                                 invoke_perl_code, info);
+		g_callable_info_prepare_closure (info->interface,
+                                                 info->cif,
+		                                 invoke_perl_code,
+                                                 info);
+        G_GNUC_END_IGNORE_DEPRECATIONS
+#endif
 	/* FIXME: This should most likely use SvREFCNT_inc instead of
 	 * newSVsv. */
 	info->code = newSVsv (code);
@@ -47,9 +60,23 @@ create_perl_callback_closure_for_named_sub (GICallableInfo *cb_info, gchar *sub_
 	info = g_new0 (GPerlI11nPerlCallbackInfo, 1);
 	info->interface = g_base_info_ref (cb_info);
 	info->cif = g_new0 (ffi_cif, 1);
+
+#if GI_CHECK_VERSION (1, 72, 0)
 	info->closure =
-		g_callable_info_prepare_closure (info->interface, info->cif,
-		                                 invoke_perl_code, info);
+		g_callable_info_create_closure (info->interface,
+                                                info->cif,
+		                                invoke_perl_code,
+                                                info);
+#else
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+	info->closure =
+		g_callable_info_prepare_closure (info->interface,
+                                                 info->cif,
+		                                 invoke_perl_code,
+                                                 info);
+        G_GNUC_END_IGNORE_DEPRECATIONS
+#endif
+
 	info->sub_name = sub_name;
 	info->code = NULL;
 	info->data = NULL;
@@ -70,8 +97,15 @@ release_perl_callback (gpointer data)
 	/* g_callable_info_free_closure reaches into info->cif, so it needs to
 	 * be called before we free it.  See
 	 * <https://bugzilla.gnome.org/show_bug.cgi?id=652954>. */
+#if defined(GI_CHECK_VERSION) && GI_CHECK_VERSION (1, 72, 0)
+        if (info->closure)
+                g_callable_info_destroy_closure (info->interface, info->closure);
+#else
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	if (info->closure)
 		g_callable_info_free_closure (info->interface, info->closure);
+        G_GNUC_END_IGNORE_DEPRECATIONS
+#endif
 	if (info->cif)
 		g_free (info->cif);
 

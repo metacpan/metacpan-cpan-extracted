@@ -2,7 +2,7 @@ package Geo::Coder::Free::Display::query;
 
 use strict;
 use warnings;
-use JSON;
+use JSON::MaybeXS;
 
 # Run a query on the database
 

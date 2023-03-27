@@ -8,7 +8,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speicher
     - `accumulate`
 
         In der Standardeinstellung werden nicht verwendete Daten aus der Cache-Datei entfernt. Wenn Sie sie nicht entfernen und in der Datei behalten wollen, verwenden Sie `accumulate`.
+
+# COMMAND LINE INTERFACE
+
+Sie können dieses Modul ganz einfach von der Kommandozeile aus verwenden, indem Sie den Befehl `xlate` verwenden, der im Repository enthalten ist. Siehe die `xlate`-Hilfeinformationen zur Verwendung.
+
+# EMACS
+
+Laden Sie die Datei `xlate.el` aus dem Repository, um den Befehl `xlate` im Emacs-Editor zu verwenden. Die Funktion `xlate-region` übersetzt die angegebene Region. Die Standardsprache ist `EN-US` und Sie können die Sprache mit dem Präfix-Argument angeben.
 
 # ENVIRONMENT
 

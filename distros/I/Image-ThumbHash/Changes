@@ -1,0 +1,5 @@
+0.02  2023-03-25
+    - Fix test failure on `-Duselongdouble` builds.
+
+0.01  2023-03-24
+    - initial release

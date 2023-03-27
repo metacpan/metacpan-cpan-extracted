@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use Config::Auto;
 use CGI::Info;
+use Data::Dumper;
 use File::Spec;
 use Template::Filters;
 use Template::Plugin::EnvHash;
@@ -158,7 +159,7 @@ sub new {
 		_info => $info,
 		_lingua => $args{lingua},
 		_logger => $args{logger},
-		# _cachedir => $args{cachedir},
+		_cachedir => $args{cachedir},
 		# _page => $info->param('page'),
 	};
 
@@ -191,6 +192,7 @@ sub get_template_path {
 	my $dir = $self->{_config}->{rootdir} || $self->{_info}->rootdir();
 	if($self->{_logger}) {
 		$self->{_logger}->debug("Rootdir: $dir");
+		$self->{_logger}->debug(Data::Dumper->new([$self->{_config}])->Dump());
 	}
 	$dir .= '/templates';
 
@@ -343,7 +345,10 @@ sub html {
 		$vals->{as_string} = $info->as_string();
 
 		$template->process($filename, $vals, \$rc) ||
-			die $template->error();
+			if(my $err = $template->error()) {
+                                die $err;
+                        }
+                        die "Unknown error in template: $filename";
 	} elsif($filename =~ /\.(html?|txt)$/) {
 		open(my $fin, '<', $filename) || die "$filename: $!";
 
@@ -481,11 +486,11 @@ sub _append_browser_type {
 
 	if(-d $directory) {
 		if($self->{_info}->is_search_engine()) {
-			$rc = "$directory/search:$directory/web:$directory/robot:";
+			$rc = "$directory/search:$directory/robot:";
 		} elsif($self->{_info}->is_mobile()) {
 			$rc = "$directory/mobile:";
 		} elsif($self->{_info}->is_robot()) {
-			$rc = "$directory/robot:";
+			$rc = "$directory/robot:$directory/search:";
 		}
 		$rc .= "$directory/web:";
 

@@ -14,6 +14,7 @@ eg/pfold-set.pl
 eg/play-christoffel-set.pl
 eg/play-euclid-set.pl
 lib/Music/CreatingRhythms.pm
+lib/Music/CreatingRhythms/SqrtContinued.pm
 t/00-compile.t
 t/01-methods.t
 t/author-eol.t

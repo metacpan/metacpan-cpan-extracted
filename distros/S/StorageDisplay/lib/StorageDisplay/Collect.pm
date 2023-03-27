@@ -18,7 +18,7 @@ package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data.
 # No dependencies (but perl itself and its basic modules)
 
-our $VERSION = '1.2.4'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 
 sub collectors {
@@ -250,7 +250,7 @@ sub new {
     }
     eval {
 	# ignore if not supported
-        $parser->allow_bignum;
+	$parser->allow_bignum;
     };
     return $parser;
 }
@@ -273,12 +273,22 @@ sub decode {
         elsif ($ref_type eq 'ARRAY') {
             _convert_bools($_) for @{ $_[0] };
         }
-        elsif (
-               $ref_type eq 'JSON::PP::Boolean'           # JSON::PP
-            || $ref_type eq 'Types::Serialiser::Boolean'  # JSON::XS
-        ) {
+        elsif ($ref_type eq 'JSON::PP::Boolean') {
             $_[0] = $_[0] ? 1 : 0;
         }
+	elsif ($ref_type eq 'Math::BigInt') {
+	    if ($_[0]->beq($_[0]->numify())) {
+		# old versions of JSON::PP always use Math::Big*
+		# even if this is not required
+		$_[0] = $_[0]->numify();
+	    }
+	}
+	elsif ($ref_type eq 'Math::BigFloat') {
+	    if ($_[0]->is_int()
+		&& $_[0]->beq($_[0]->numify())) {
+		$_[0] = $_[0]->numify();
+	    }
+	}
         else {
             ++$unrecognized{$ref_type};
         }
@@ -1884,7 +1894,7 @@ StorageDisplay::Collect - modules required to collect data.
 
 =head1 VERSION
 
-version 1.2.4
+version 2.02
 
 Main class, allows one to register collectors and run them
 (through the collect method)

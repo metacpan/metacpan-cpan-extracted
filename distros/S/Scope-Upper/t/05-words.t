@@ -339,8 +339,11 @@ $var =~ s{.}{do { my $x; UP }}e;
 is $var, 1, 'subst : do block preserved' unless $^P;
 
 SKIP: {
- skip 'Perl 5.10 required to test given/when' => 4 * ($^P ? 4 : 5) + 4
-                                                                if "$]" < 5.010;
+ my $skip_count = 4 * ($^P ? 4 : 5) + 4;
+ skip 'Perl 5.10 required to test given/when'
+      => $skip_count if "$]" < 5.010;
+ skip 'Not testing deprecated given/when on Perl 5.37.10 or later'
+      => $skip_count if "$]" >= 5.037010;
 
  eval <<'TEST_GIVEN';
   BEGIN {

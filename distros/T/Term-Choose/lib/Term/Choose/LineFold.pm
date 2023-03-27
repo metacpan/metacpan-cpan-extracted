@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.758';
+our $VERSION = '1.759';
 
 use Exporter qw( import );
 
@@ -99,13 +99,14 @@ sub line_fold {
     if ( ! length $str ) {
         return $str;
     }
+    my $max_tab_width = int( $avail_width / 2 );
     for ( $opt->{init_tab}, $opt->{subseq_tab} ) {
         if ( length ) {
             s/\t/ /g;
             s/\v+/\ \ /g;
             s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-            if ( length > $avail_width / 4 ) {
-                $_ = cut_to_printwidth( $_, int( $avail_width / 2 ) );
+            if ( length > $max_tab_width ) {
+                $_ = cut_to_printwidth( $_, $max_tab_width );
             }
         }
         else {
@@ -175,7 +176,7 @@ sub line_fold {
                 last;
             }
         }
-        $paragraphs[-1] .= "\e[m";
+        $paragraphs[-1] .= "\e[0m";
     }
     if ( $opt->{join} ) {
         return join( "\n", @paragraphs );

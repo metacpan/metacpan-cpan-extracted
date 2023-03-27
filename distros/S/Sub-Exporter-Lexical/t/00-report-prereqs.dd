@@ -14,10 +14,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
                                       'Sub::Exporter' => '0.978',
-                                      'if' => '0',
-                                      'perl' => 'v5.37.2',
+                                      'perl' => '5.012',
                                       'warnings' => '0'
                                     }
                     },

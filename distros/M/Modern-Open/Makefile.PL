@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Modern::Open},
-    'VERSION'   => q{0.13},
+    'VERSION'   => q{0.14},
     'ABSTRACT'  => q{Autovivification, Autodie, and 3-args open support},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -15,7 +15,7 @@ WriteMakefile(
         'FindBin' => '1.42',
         'Socket' => '0',
         'lib' => '0',
-        'perl' => '5.005_03',
+        'perl' => '5.00503',
         'strict' => '1.01',
     },
     'AUTHOR'    => q{ina <ina@cpan.org>},

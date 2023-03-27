@@ -117,7 +117,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.7.3
+        v0.8.1
 
 DESCRIPTION
     The purpose of this module is to provide a powerful, yet simple
@@ -537,6 +537,15 @@ METHODS
 
     It will json encode the returned data and print it out back to the
     client after setting the http returned code.
+
+    If a "cleanup" hash property is provided with a callback code reference
+    as a value, it will be set as a cleanup callback by calling
+    "$r->pool->cleanup_register". See
+    <https://perl.apache.org/docs/2.0/user/handlers/http.html#PerlCleanupHan
+    dler>
+
+    The Net::API::REST object will be passed as the first and only argument
+    to the callback routine.
 
   request()
     Returns the Net::API::REST::Request object. This object is set early

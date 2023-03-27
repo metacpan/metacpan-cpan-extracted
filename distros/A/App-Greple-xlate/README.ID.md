@@ -8,7 +8,7 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Modul **xlate** dapat menyimpan teks terjemahan dalam cache untuk setiap file da
     - `accumulate`
 
         Secara default, data yang tidak digunakan akan dihapus dari file cache. Jika Anda tidak ingin menghapusnya dan menyimpannya di dalam file, gunakan `accumulate`.
+
+# COMMAND LINE INTERFACE
+
+Anda dapat dengan mudah menggunakan modul ini dari baris perintah dengan menggunakan perintah `xlate` yang disertakan dalam repositori. Lihat informasi bantuan `xlate` untuk penggunaan.
+
+# EMACS
+
+Muat file `xlate.el` yang disertakan dalam repositori untuk menggunakan perintah `xlate` dari editor Emacs. Fungsi `xlate-region` menerjemahkan wilayah tertentu. Bahasa default adalah `EN-US` dan Anda dapat menentukan bahasa yang digunakan dengan argumen awalan.
 
 # ENVIRONMENT
 

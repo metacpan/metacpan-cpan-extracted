@@ -8,7 +8,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Version 0.20
     - `accumulate`
 
         기본 동작에 따라 사용하지 않는 데이터는 캐시 파일에서 제거됩니다. 제거하지 않고 파일에 유지하려면 `accumulate`를 사용하세요.
+
+# COMMAND LINE INTERFACE
+
+리포지토리에 포함된 `xlate` 명령을 사용하여 명령줄에서 이 모듈을 쉽게 사용할 수 있습니다. 사용법은 `xlate` 도움말 정보를 참조하세요.
+
+# EMACS
+
+저장소에 포함된 `xlate.el` 파일을 로드하여 Emacs 편집기에서 `xlate` 명령을 사용합니다. `xlate-region` 함수는 지정된 지역을 번역합니다. 기본 언어는 `EN-US`이며 접두사 인수를 사용하여 호출하는 언어를 지정할 수 있습니다.
 
 # ENVIRONMENT
 

@@ -1,3 +1,25 @@
+1.208 2023-03-26
+================
+
+[Quiq::Database::Connection]
+* copyData(): Methode verbessert
+
+[Quiq::Path]
+* minFileNumber(): Methode hinzugefügt
+
+[Quiq::Shell]
+* new(): Option "sloppy" hinzugefügt
+
+[Quiq::Url]
+* new(): Auf Dummy-Objekt zu Aufruf der Klassenmethoden reduziert
+* href(): Methode hinzugefügt
+
+[Quiq::UrlObj]
+Klasse hinzugefügt
+
+[Quiq::Web::Navigation]
+* Klasse Quiq::UrlObj eingeführt
+
 1.207 2023-02-04
 ================
 

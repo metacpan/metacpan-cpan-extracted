@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -3780,7 +3780,7 @@ sub recreateTable {
 
 =head4 Synopsis
 
-  $destDb->copyData($srcDb,$table,%options);
+  $n = $destDb->copyData($srcDb,$table,%options);
 
 =head4 Arguments
 
@@ -3818,6 +3818,10 @@ werden, die nicht übereinstimmen.
 
 =back
 
+=head4 Returns
+
+(Integer) Anzahl der kopierten Datensätze.
+
 =head4 Description
 
 Kopiere die Daten der Tabelle $table aus der Quelldatenbank $srcDb
@@ -3848,66 +3852,68 @@ sub copyData {
     # Prüfe, ob die Zieltabelle auf der Quelldatenbank existiert.
     # Wenn nein, haben wir hier nichts zu tun.
 
-    if (!$srcDb->tableExists($srcTable)) {
-        return;
-    }
+    my $cnt = 0;
+    if ($srcDb->tableExists($srcTable)) {
+        # Erstelle Abbildung der Kolumnen
 
-    # Erstelle Abbildung der Kolumnen
+        my @destTitles = $self->titles($destTable);
+        my @srcTitles = $srcDb->titles($srcTable);
+        my $srcTitleH = Quiq::Hash->new(\@srcTitles,1)->unlockKeys;
 
-    my @destTitles = $self->titles($destTable);
-    my @srcTitles = $srcDb->titles($srcTable);
-    my $srcTitleH = Quiq::Hash->new(\@srcTitles,1)->unlockKeys;
-
-    my %map; # Abbildung Kolumnen Zieltabelle => Quelltabelle
-    for my $destTitle (@destTitles) {
-        if ($srcTitleH->{$destTitle}) {
-            $map{$destTitle} = $destTitle; # Kolumnenname bleibt gleich
+        my %map; # Abbildung Kolumnen Zieltabelle => Quelltabelle
+        for my $destTitle (@destTitles) {
+            if ($srcTitleH->{$destTitle}) {
+                $map{$destTitle} = $destTitle; # Kolumnenname bleibt gleich
+            }
         }
-    }
-    for my $srcTitle (@srcTitles) {
-        if (my $destTitle = $mapH->{$srcTitle}) {
-            $map{$destTitle} = $srcTitle; # Kolumne wurde umbenannt
+        for my $srcTitle (@srcTitles) {
+            if (my $destTitle = $mapH->{$srcTitle}) {
+                $map{$destTitle} = $srcTitle; # Kolumne wurde umbenannt
+            }
         }
-    }
-    # Alle anderen Kolumnen werden nicht beachtet
+        # Alle anderen Kolumnen werden nicht beachtet
 
-    @destTitles = @srcTitles = ();
-    for my $destTitle (keys %map) {
-        push @destTitles,$destTitle;
-        push @srcTitles,$map{$destTitle};
-    }
-    
-    # Selektiere die Daten aus der Quelltablle
+        @destTitles = @srcTitles = ();
+        for my $destTitle (keys %map) {
+            push @destTitles,$destTitle;
+            push @srcTitles,$map{$destTitle};
+        }
 
-    my $cur = $srcDb->select(
-        -select => @srcTitles,
-        -from => $srcTable,
-        -raw => 1,
-        -cursor => 1,
-    );
+        # Selektiere die Daten aus der Quelltablle
 
-    # Kopiere die Daten in Chunks der Größe $chunkSize
+        my $cur = $srcDb->select(
+            -select => @srcTitles,
+            -from => $srcTable,
+            -raw => 1,
+            -cursor => 1,
+        );
 
-    while (1) {
-        my $i = 0;
-        my @rows;
-        while (my $row = $cur->fetch) {
-            $i++;
-            push @rows,$row;
-            if ($i == $chunkSize) {
+        # Kopiere die Daten in Chunks der Größe $chunkSize
+
+        while (1) {
+            my $i = 0;
+            my @rows;
+            while (my $row = $cur->fetch) {
+                $i++;
+                $cnt++;
+                push @rows,$row;
+                if ($i == $chunkSize) {
+                    last;
+                }
+            }
+            if (@rows) {
+                $self->insertMulti($destTable,\@destTitles,\@rows);
+            }
+            if (@rows < $chunkSize) {
                 last;
             }
         }
-        if (@rows) {
-            $self->insertMulti($destTable,\@destTitles,\@rows);
-        }
-        if (@rows < $chunkSize) {
-            last;
-        }
+        $cur->close;
     }
-    $cur->close;
 
-    return;
+    printf "$destTable: %s rows copied\n",$cnt;
+
+    return $cnt;
 }
 
 # -----------------------------------------------------------------------------
@@ -6072,7 +6078,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

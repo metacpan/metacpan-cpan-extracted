@@ -55,7 +55,7 @@ diag("JSON::PP: boolean_values support: ".$boolean_support);
 my $bignum_support = 0;
 eval {
     $jsonparser->allow_bignum;
-    $bignum_support =1;
+    $bignum_support = 1;
 };
 diag("JSON::PP: allow_bignum support: ".$bignum_support);
 

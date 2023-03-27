@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.037002;
+use 5.012;
 
 use ExtUtils::MakeMaker 6.78;
 
@@ -14,12 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sub-Exporter-Lexical",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.037002",
+  "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Sub::Exporter::Lexical",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "Sub::Exporter" => "0.978",
-    "if" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -29,7 +27,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.100000",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,12 +35,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Sub::Exporter" => "0.978",
   "Test::More" => "0.96",
-  "if" => 0,
   "lib" => 0,
   "strict" => 0,
   "warnings" => 0
@@ -57,5 +53,12 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ($] < 5.037) {
+    $WriteMakefileArgs{PREREQ_PM} = {
+        %{ $WriteMakefileArgs{PREREQ_PM} },
+        "Lexical::Sub" => "0.010",
+    };
+}
 
 WriteMakefile(%WriteMakefileArgs);

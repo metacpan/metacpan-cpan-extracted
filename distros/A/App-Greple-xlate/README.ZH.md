@@ -8,7 +8,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ Version 0.20
     - `accumulate`
 
         根据默认行为，未使用的数据会从缓存文件中删除。如果你不想删除它们并保留在文件中，使用`accumulate`。
+
+# COMMAND LINE INTERFACE
+
+你可以通过使用版本库中的`xlate`命令从命令行轻松使用这个模块。请参阅 `xlate` 的帮助信息了解用法。
+
+# EMACS
+
+加载存储库中的`xlate.el`文件，从Emacs编辑器中使用`xlate`命令。`xlate-region`函数翻译给定的区域。默认的语言是`EN-US`，你可以用前缀参数指定调用语言。
 
 # ENVIRONMENT
 

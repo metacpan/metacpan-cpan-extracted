@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.58';
+our $VERSION = '2.59';
 
 use DateTime::TimeZone;
 use File::Spec;
@@ -107,7 +107,7 @@ DateTime::TimeZone::Local - Determine the local system's time zone
 
 =head1 VERSION
 
-version 2.58
+version 2.59
 
 =head1 SYNOPSIS
 

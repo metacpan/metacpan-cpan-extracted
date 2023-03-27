@@ -46,7 +46,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 use Quiq::Path;
 use Quiq::FileHandle;
@@ -288,7 +288,7 @@ sub dropColumn {
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

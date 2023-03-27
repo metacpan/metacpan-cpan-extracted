@@ -1,0 +1,27 @@
+---
+abstract: 'Binary search a list for insertion point'
+author:
+  - 'Ruben Westerberg <drclaw@mac.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-Insertion
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Combination: '0'
+  Template::Plex: v0.5.0
+  perl: '5.024000'
+resources:
+  repository: git://github.com/drclaw1394/perl5-list-insertion.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

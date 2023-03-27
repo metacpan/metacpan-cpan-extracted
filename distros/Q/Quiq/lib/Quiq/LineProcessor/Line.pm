@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 # -----------------------------------------------------------------------------
 
@@ -388,7 +388,7 @@ sub dump {
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

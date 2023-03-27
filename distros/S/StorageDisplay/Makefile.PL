@@ -57,6 +57,8 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Math::BigFloat" => 0,
+    "Math::BigInt" => 0,
     "Path::Class" => 0,
     "Test2::V0" => 0,
     "Test::File::Contents" => 0,
@@ -64,7 +66,7 @@ my %WriteMakefileArgs = (
     "Test::Script" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.2.4",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,6 +80,8 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::Select" => 0,
   "JSON::PP" => 0,
+  "Math::BigFloat" => 0,
+  "Math::BigInt" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "MooseX::NonMoose" => 0,

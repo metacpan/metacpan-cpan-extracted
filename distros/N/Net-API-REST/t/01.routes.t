@@ -143,7 +143,6 @@ sub board_member
 {
 	my $self = shift( @_ );
 	print( "Got here for board_member with arguments: '", join( "', '", @_ ), "'\n" );
-	$self->message( 1, "Variables are: ", sub{ $self->dumper( $self->request->variables ) } );
 }
 
 sub callback

@@ -94,7 +94,6 @@ sub new {
                 $msg = "$class: No rejection value given";
             }
 
-            require Carp;
             Carp::carp($msg);
         }
 
@@ -404,7 +403,9 @@ sub AWAIT_GET {
 
     return ${ $_[0]->[_VALUE_SR_IDX] } if UNIVERSAL::isa( $_[0]->[_VALUE_SR_IDX], _RESOLUTION_CLASS );
 
-    Carp::croak ${ $_[0]->[_VALUE_SR_IDX] };
+    my $err = ${ $_[0]->[_VALUE_SR_IDX] };
+    die $err if substr($err, -1) eq "\n";
+    Carp::croak $err;
 }
 
 use constant _noop => ();

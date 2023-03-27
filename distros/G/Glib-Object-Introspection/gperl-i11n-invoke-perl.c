@@ -29,13 +29,13 @@ invoke_perl_code (ffi_cif* cif, gpointer resp, gpointer* args, gpointer userdata
 	info = (GPerlI11nPerlCallbackInfo *) userdata;
 	cb_interface = (GICallableInfo *) info->interface;
 
-	_prepare_perl_invocation_info (&iinfo, cb_interface, args);
-
 	/* set perl context */
 	GPERL_CALLBACK_MARSHAL_INIT (info);
 
 	ENTER;
 	SAVETMPS;
+
+	_prepare_perl_invocation_info (&iinfo, cb_interface, args);
 
 	PUSHMARK (SP);
 
@@ -315,7 +315,12 @@ invoke_perl_signal_handler (ffi_cif* cif, gpointer resp, gpointer* args, gpointe
 		cb_info->args_converter = SvREFCNT_inc (signal_info->args_converter);
 
 	c_closure.closure = *closure;
+
+#if GI_CHECK_VERSION (1, 72, 0)
+        c_closure.callback = g_callable_info_get_closure_native_address (signal_info->interface, cb_info->closure);
+#else
 	c_closure.callback = cb_info->closure;
+#endif
 	/* If marshal_data is non-NULL, gi_cclosure_marshal_generic uses it as
 	 * the callback.  Hence we pass NULL so that c_closure.callback is
 	 * used. */
@@ -444,6 +449,7 @@ _fill_ffi_return_value (GITypeInfo *return_info,
 				*(ffi_arg *) resp = (ffi_arg) arg->v_pointer;
 				break;
 			}
+			g_base_info_unref (interface_info);
 			break;
 		}
 	    default:

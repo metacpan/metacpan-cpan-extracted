@@ -325,7 +325,7 @@ sub format_statement
         {
             # $self->message_colour( 3, "Prefix to be used is '<green>$field_prefix</>'." );
             $field =~ s{
-                (?<!\.)\b($ok_list)\b(\s*)?(?!\.)
+                (?<![\.\"])\b($ok_list)\b(\s*)?(?!\.)
             }
             {
                 my( $field, $spc ) = ( $1, $2 );

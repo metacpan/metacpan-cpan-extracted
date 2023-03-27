@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
         'Promises'             => '1.04',
         'namespace::clean'     => '0.27',
         'strictures'           => '2.000006',
+        'Throwable'            => '1.001',
         'Types::Standard'      => '2.002001',
     },
     META_MERGE => {

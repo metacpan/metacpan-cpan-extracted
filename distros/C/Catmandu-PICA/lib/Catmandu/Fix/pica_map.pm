@@ -1,6 +1,6 @@
 package Catmandu::Fix::pica_map;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use Catmandu::Sane;
 use Moo;
@@ -31,22 +31,26 @@ sub _build_fixer {
         'pluck'         => $self->pluck         // 0,
         'nested_arrays' => $self->nested_arrays // 0,
         'value'         => $self->value,
-        'force_array' => ( $key =~ /^(\$.*|[0-9]+)$/ ) ? 1 : 0,
+        'force_array'   => ( $key =~ /^(\$.*|[0-9]+)$/ ) ? 1 : 0,
     );
 
+    my $pica_path = $self->pica_path;
+    $pica_path = "..../*$pica_path"
+      if $pica_path =~ /^\$/;    # TODO: migrate into PICA::Data
+
     sub {
-        my $data = $_[0];
-        my $matches = pica_match( $data, $self->pica_path, %opt );
+        my $data    = $_[0];
+        my $matches = pica_match( $data, $pica_path, %opt );
         if ( defined $matches ) {
             $matches = [$matches]
-                if !ref($matches) || ( $opt{split} && !$opt{force_array} );
+              if !ref($matches) || ( $opt{split} && !$opt{force_array} );
             while (@$matches) {
                 $data = $creator->( $data, shift @$matches );
             }
 
         }
         return $data;
-        }
+    }
 }
 
 1;
@@ -63,29 +67,30 @@ Catmandu::Fix::pica_map - copy pica values of one field to a new field
     pica_map(021A, dc_title);
 
     # Copy from field 021A subfield a to field dc_title
-    pica_map(021Aa, dc_title);
+    pica_map(021A$a, dc_title);
 
     # Copy from field 021A subfield a and d to field dc_title and join them 
-    pica_map(021Aad, dc_title, join:' / ');
+    pica_map(021A$ad, dc_title, join:' / ');
  
     # Copy from field 021A subfield d and a in given order to field dc_title 
-    pica_map(021Ada, dc_title, pluck:1);
+    pica_map(021A$da, dc_title, pluck:1);
 
     # Copy from field 021A subfield a and d to field dc_title and append them to an array
-    pica_map(021Ada, dc_title.$append);
+    pica_map(021A$da, dc_title.$append);
 
     # Copy from field 021A all subfields to field dc_title and split them to an array
-    pica_map(021Ada, dc_title, split:1);
+    pica_map(021A$da, dc_title, split:1);
 
     # Copy from all fields 005A all subfields to field bibo_issn and split them to an array of arrays
     pica_map(005A, bibo_issn, split:1, nested_arrays:1);
 
     # Copy from field 144Z with occurrence 01 subfield a to dc_subject
-    pica_map('144Z[01]a','dc_subject');
+    pica_map('144Z/01$a','dc_subject');
 
 =head1 SEE ALSO
 
-See L<PICA::Path> for a definition of PICA path expressions and mapping rules or test files for more examples. See L<PICA::Data>
-for more methods to process parsed PICA+ records.
+See L<PICA::Path> for a definition of PICA path expressions and mapping rules
+or test files for more examples. See L<PICA::Data> for more methods to process
+parsed PICA+ records.
 
 =cut

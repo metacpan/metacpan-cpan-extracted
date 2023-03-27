@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v1.1.0
+## Version v1.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2022/12/22
+## Modified 2023/03/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use DB::Object::Fields::Field;
     use Devel::Confess;
-    our( $VERSION ) = 'v1.1.0';
+    our( $VERSION ) = 'v1.1.1';
 };
 
 use strict;
@@ -80,13 +80,16 @@ sub _initiate_field_object
     my $def   = $self->table_object->default;
     my $types = $self->table_object->types;
     my $const = $self->table_object->types_const;
+    $const->{ $field }->{constant} //= q{''};
+    $const->{ $field }->{name} //= '';
+    $const->{ $field }->{type} //= '';
     my $hash  =
     {
     debug        => ( $self->debug || 0 ),
     name         => $field,
-    type         => $types->{ $field },
-    default      => $def->{ $field },
-    pos          => $fields->{ $field },
+    type         => ( $types->{ $field } // '' ),
+    default      => ( $def->{ $field } // '' ),
+    pos          => ( $fields->{ $field } // '' ),
     const        => $const->{ $field },
     prefixed     => $self->{prefixed},
     query_object => $self->query_object,
@@ -235,7 +238,7 @@ DB::Object::Fields - Tables Fields Object Accessor
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 

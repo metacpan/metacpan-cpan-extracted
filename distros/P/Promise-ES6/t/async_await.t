@@ -7,7 +7,7 @@ use Test::More;
 
 use Config;
 if ($Config{'config_args'} =~ m<DEBUGGING>) {
-    plan skip_all => 'DEBUGGING perls confuse Future::AsyncAwait (as of 0.59, at least).';
+    plan skip_all => "DEBUGGING perls (config_args=$Config{'config_args'}) confuse Future::AsyncAwait (as of 0.59, at least).";
 }
 
 # This test throws unhandled-rejection warnings … do they matter?

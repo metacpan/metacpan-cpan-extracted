@@ -65,21 +65,6 @@ if (defined $app) {
 	$entry->bind('<Key>', sub { $picker->put($entry->get) });
 }
 
-# 	#testing accessors
-# 	my @accessors = qw(Colored ColorInf FoldButtons FoldInf highlightinterval LoopActive NoHighlighting);
-# 	for (@accessors) {
-# 		my $method = $_;
-# 		push @tests, [sub {
-# 			my $default = $text->$method;
-# 			$text->$method('blieb');
-# 			my $res1 = $text->$method;
-# 			$text->$method('quep');
-# 			my $res2 = $text->$method;
-# 			$text->$method($default);
-# 			return (($res1 eq 'blieb') and ($res2 eq 'quep'));
-# 		}, 1, "Accessor $method"];
-# 	}
-
 push @tests, (
 	[ sub { return defined $picker }, 1, 'ColorPicker widget created' ],
 );

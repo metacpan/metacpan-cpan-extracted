@@ -45,7 +45,7 @@ my @tests = (
                 objects => {
                     '*.*' => {
                         privs => [qw(USAGE)],
-                        with => '',
+                        with => 'MAX_USER_CONNECTIONS 5',
                     },
                     '`orcl`.*' => {
                         privs => [qw(SELECT INSERT UPDATE DELETE)],

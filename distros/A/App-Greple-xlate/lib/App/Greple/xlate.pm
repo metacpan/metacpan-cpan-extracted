@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 DESCRIPTION
 
@@ -212,6 +212,19 @@ you don't want to remove them and keep in the file, use C<accumulate>.
 =back
 
 =back
+
+=head1 COMMAND LINE INTERFACE
+
+You can easily use this module from the command line by using the
+C<xlate> command included in the repository. See the C<xlate> help
+information for usage.
+
+=head1 EMACS
+
+Load the F<xlate.el> file included in the repository to use C<xlate>
+command from Emacs editor.  C<xlate-region> function translate the
+given region.  Default language is C<EN-US> and you can specify
+language invoking it with prefix argument.
 
 =head1 ENVIRONMENT
 

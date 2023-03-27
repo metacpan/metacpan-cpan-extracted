@@ -1,55 +1,56 @@
 package Catmandu::Fix::Bind::pica_each;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use Moo;
 use Catmandu::Sane;
 use Catmandu::Util;
 use Catmandu::Fix::Has;
 use PICA::Path;
+use Scalar::Util 'reftype';
 
 with 'Catmandu::Fix::Bind', 'Catmandu::Fix::Bind::Group';
 
-has done => (is => 'ro');
+has done => ( is => 'ro' );
 has pica_path => (
     fix_arg => 1,
-    coerce => sub { $_[0] ne '....' ? PICA::Path->new($_[0]) : undef },
+    coerce  => sub { $_[0] ne '....' ? PICA::Path->new( $_[0] ) : undef },
     default => sub { '....' }
 );
 
 sub unit {
-    my ($self,$data) = @_;
+    my ( $self, $data ) = @_;
     $self->{done} = 0;
     $data;
 }
 
 sub bind {
-    my ($self,$mvar,$code) = @_;
+    my ( $self, $data, $code ) = @_;
+    return $data if $self->done or reftype( $data->{record} ) ne 'ARRAY';
 
-    return $mvar if $self->done;
-
-    my $rows = $mvar->{record} // [];
-
-    if ($self->pica_path) {
-        @$rows = grep { $self->pica_path->match_field($_) } @{$rows};
-    } 
+    my $fields = $data->{record};
 
     my @new = ();
 
-    for my $row (@{$rows}) {
+    for my $field ( @{$fields} ) {
+        if ( $self->pica_path && !$self->pica_path->match_field($field) ) {
+            push @new, $field;
+        }
+        else {
+            $data->{record} = [$field];
 
-        $mvar->{record} = [$row];
+            my $fixed = $code->($data);
 
-        my $fixed = $code->($mvar);
-
-        push @new, @{$fixed->{record}} if defined($fixed) && exists $fixed->{record};
+            push @new, @{ $fixed->{record} }
+              if defined($fixed) && exists $fixed->{record};
+        }
     }
 
-    $mvar->{record} = \@new if exists $mvar->{record};
+    $data->{record} = \@new if exists $data->{record};
 
     $self->{done} = 1;
 
-    $mvar;
+    $data;
 }
 
 1;
@@ -66,13 +67,6 @@ Catmandu::Fix::Bind::pica_each - a binder that loops over PICA fields
     do pica_each()
         if pica_match("039Da","E-Paper")
             pica_map("039D9",editions.$append)
-        end
-    end
-
-    # Delete all the 041A subject fields
-    do pica_each()
-        if pica_match("041A",".*")
-            reject()
         end
     end
 
@@ -94,21 +88,21 @@ If a PICA record contains:
 then the fix
 
     do pica_each()
-        pica_map("041A8",subject.$append)
+        pica_map("041A$8",subject.$append)
     end
 
 will have the same effect as
 
-    pica_map("041A8",subject.$append)
+    pica_map("041A$8",subject.$append)
 
-because C<pica_map> by default loops over all repeated PICA fields. But the 
-C<pica_each> bind has the advantage to process fields in context. E.g. to 
-only map fields where the subfield $8 doesn't contain 'Miscellaneous' you 
-can write:
+because C<pica_map> by default loops over all repeated PICA fields. But the
+C<pica_each> bind has the advantage to process fields in context. E.g. to only
+map fields where the subfield C<$8> doesn't contain 'Miscellaneous' you can
+write:
 
     do pica_each()
-        unless pica_match("041A8","Miscellaneous")
-            pica_map("041A8",subject.$append)
+        unless pica_match("041A$8","Miscellaneous")
+            pica_map("041A$8",subject.$append)
         end
     end
 

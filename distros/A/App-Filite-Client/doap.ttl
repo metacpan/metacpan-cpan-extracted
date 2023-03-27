@@ -34,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "App-Filite-Client";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/App-Filite-Client/v_0-001000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/App-Filite-Client/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/App-Filite-Client/v_0-001001>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-app-filite-client>;
@@ -49,6 +49,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-Filite-Client-0.001000.tar.gz>;
 	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-Filite-Client/v_0-001001>
+	a                    doap:Version;
+	dc:identifier        "App-Filite-Client-0.001001"^^xsd:string;
+	dc:issued            "2023-03-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Better --usage output";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-Filite-Client-0.001001.tar.gz>;
+	doap:revision        "0.001001"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -16,14 +16,14 @@ user@swXX> show interfaces
   CoS queues     : 0 supported, 0 maximum usable queues
   Current address: Unspecified, Hardware address: Unspecified
 [36m  Last flapped   : Never[0m
-    Input packets : 10[4m732[24m471
-    Output packets: 10[4m732[24m311
+[36m    Input packets : 10[4m732[24m471[0m
+[36m    Output packets: 10[4m732[24m311[0m
   Interface transmit statistics: Disabled
 
 [36m  Logical interface vcp-255/1/0.32768 (Index 3) (SNMP ifIndex 102)[0m
     Flags: Encapsulation: Unspecified
-    Input packets : 10[4m732[24m471
-    Output packets: 10[4m732[24m311
+[36m    Input packets : 10[4m732[24m471[0m
+[36m    Output packets: 10[4m732[24m311[0m
 
 [32mPhysical interface: vcp-255/1/1, Enabled, Physical link is Up[0m
   Interface index: 67, SNMP ifIndex: 103
@@ -34,14 +34,14 @@ user@swXX> show interfaces
   CoS queues     : 0 supported, 0 maximum usable queues
   Current address: Unspecified, Hardware address: Unspecified
 [36m  Last flapped   : Never[0m
-    Input packets : 10[4m707[24m511
-    Output packets: 10[4m706[24m936
+[36m    Input packets : 10[4m707[24m511[0m
+[36m    Output packets: 10[4m706[24m936[0m
   Interface transmit statistics: Disabled
 
 [36m  Logical interface vcp-255/1/1.32768 (Index 4) (SNMP ifIndex 104)[0m
     Flags: Encapsulation: Unspecified
-    Input packets : 10[4m707[24m511
-    Output packets: 10[4m706[24m936
+[36m    Input packets : 10[4m707[24m511[0m
+[36m    Output packets: 10[4m706[24m936[0m
 
 [1;31mPhysical interface: ge-0/0/0, Enabled, Physical link is Down[0m
   Interface index: 146, SNMP ifIndex: 501
@@ -64,8 +64,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/0.0 (Index 87) (SNMP ifIndex 502)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: Trunk-Mode
 
@@ -90,8 +90,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/1.0 (Index 88) (SNMP ifIndex 505)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : [4m312[24m782
-    Output packets: 9[4m882[24m094
+[36m    Input packets : [4m312[24m782[0m
+[36m    Output packets: 9[4m882[24m094[0m
     Protocol eth-switch
       Flags: None
 
@@ -116,8 +116,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/2.0 (Index 89) (SNMP ifIndex 507)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: Trunk-Mode
 
@@ -142,8 +142,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/3.0 (Index 90) (SNMP ifIndex 509)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 9[4m882[24m211
+[36m    Input packets : 0[0m
+[36m    Output packets: 9[4m882[24m211[0m
     Protocol eth-switch
       Flags: None
 
@@ -168,8 +168,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/4.0 (Index 91) (SNMP ifIndex 511)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 9[4m882[24m120
+[36m    Input packets : 0[0m
+[36m    Output packets: 9[4m882[24m120[0m
     Protocol eth-switch
       Flags: None
 
@@ -240,8 +240,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/7.0 (Index 94) (SNMP ifIndex 517)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: Trunk-Mode
 
@@ -266,8 +266,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/8.0 (Index 95) (SNMP ifIndex 519)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: Trunk-Mode
 
@@ -338,8 +338,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-0/0/11.0 (Index 98) (SNMP ifIndex 525)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : [4m109[24m866
-    Output packets: 9[4m882[24m932
+[36m    Input packets : [4m109[24m866[0m
+[36m    Output packets: 9[4m882[24m932[0m
     Protocol eth-switch
       Flags: None
 
@@ -364,8 +364,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/0.0 (Index 73) (SNMP ifIndex 541)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : [4m236[24m126
-    Output packets: 9[4m850[24m603
+[36m    Input packets : [4m236[24m126[0m
+[36m    Output packets: 9[4m850[24m603[0m
     Protocol eth-switch
       Flags: None
 
@@ -390,8 +390,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/1.0 (Index 74) (SNMP ifIndex 543)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 26
-    Output packets: 9[4m887[24m036
+[36m    Input packets : 26[0m
+[36m    Output packets: 9[4m887[24m036[0m
     Protocol eth-switch
       Flags: None
 
@@ -416,8 +416,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/2.0 (Index 75) (SNMP ifIndex 549)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : [4m1[24m729
-    Output packets: 9[4m884[24m206
+[36m    Input packets : [4m1[24m729[0m
+[36m    Output packets: 9[4m884[24m206[0m
     Protocol eth-switch
       Flags: None
 
@@ -442,8 +442,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/3.0 (Index 76) (SNMP ifIndex 551)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
 ---(more)---                                              Flags: None
 
@@ -468,8 +468,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/4.0 (Index 77) (SNMP ifIndex 553)[0m
     Flags: Up SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
-    Input packets : 47
-    Output packets: 9[4m882[24m032
+[36m    Input packets : 47[0m
+[36m    Output packets: 9[4m882[24m032[0m
     Protocol eth-switch
       Flags: Trunk-Mode
 
@@ -494,8 +494,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/5.0 (Index 78) (SNMP ifIndex 555)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : [4m42[24m282
-    Output packets: 5[4m850[24m497
+[36m    Input packets : [4m42[24m282[0m
+[36m    Output packets: 5[4m850[24m497[0m
     Protocol eth-switch
       Flags: None
 
@@ -520,8 +520,8 @@ user@swXX> show interfaces
 
 ---(more)---                                        [36m  Logical interface ge-1/0/6.0 (Index 81) (SNMP ifIndex 557)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : [4m120[24m010
-    Output packets: 9[4m063[24m998
+[36m    Input packets : [4m120[24m010[0m
+[36m    Output packets: 9[4m063[24m998[0m
     Protocol eth-switch
       Flags: None
 
@@ -546,8 +546,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/7.0 (Index 82) (SNMP ifIndex 559)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: None
 
@@ -572,8 +572,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/8.0 (Index 83) (SNMP ifIndex 561)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: None
 
@@ -598,8 +598,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/9.0 (Index 84) (SNMP ifIndex 563)[0m
     Flags: Device-Down SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: None
 
@@ -624,8 +624,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/10.0 (Index 85) (SNMP ifIndex 545)[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 9[4m882[24m124
+[36m    Input packets : 0[0m
+[36m    Output packets: 9[4m882[24m124[0m
     Protocol eth-switch
       Flags: None
 
@@ -650,8 +650,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface ge-1/0/11.0 (Index 86) (SNMP ifIndex 547)[0m
     Flags: Device-Down SNMP-Traps 0x40[4m004[24m000 Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: Trunk-Mode
 
@@ -766,13 +766,13 @@ user@swXX> show interfaces
   Link flags     : None
   Current address: 00:0b:ca:fe:00:01, Hardware address: 00:0b:ca:fe:00:00
 [36m  Last flapped   : Never[0m
-    Input packets : 0
-    Output packets: 343[4m092[24m461
+[36m    Input packets : 0[0m
+[36m    Output packets: 343[4m092[24m461[0m
 
 [36m  Logical interface bme0.32768 (Index 5) (SNMP ifIndex 38)[0m
     Flags: Encapsulation: ENET2
-    Input packets : 292[4m472[24m790
-    Output packets: 257[4m352[24m717
+[36m    Input packets : 292[4m472[24m790[0m
+[36m    Output packets: 257[4m352[24m717[0m
     Protocol inet, MTU: [4m1[24m562
       Flags: Is-Primary
       Addresses, Flags: Primary Is-Default Is-Preferred Is-Primary
@@ -788,8 +788,8 @@ user@swXX> show interfaces
 
 [36m  Logical interface bme0.32769 (Index 7) (SNMP ifIndex 39)[0m
     Flags: Down 0x20[4m000[24m000 LinkAddress 0-0 Encapsulation: unknown
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
       Flags: None
 
@@ -800,8 +800,8 @@ user@swXX> show interfaces
   Interface flags: Point-To-Point SNMP-Traps
   Link flags     : None
 [36m  Last flapped   : Never[0m
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [32mPhysical interface: gre, Enabled, Physical link is Up[0m
   Interface index: 10, SNMP ifIndex: 8
@@ -809,16 +809,16 @@ user@swXX> show interfaces
   Current address: Unspecified, Hardware address: Unspecified
   Device flags   : Present Running
   Interface flags: Point-To-Point SNMP-Traps
-    Input packets : 0
----(more 84%)---                                            Output packets: 0
+[36m    Input packets : 0[0m
+---(more 84%)---                                        [36m    Output packets: 0[0m
 
 [32mPhysical interface: ipip, Enabled, Physical link is Up[0m
   Interface index: 11, SNMP ifIndex: 9
   Type: IPIP, Link-level type: IP-over-IP, MTU: Unlimited, Speed: Unlimited
   Device flags   : Present Running
   Interface flags: SNMP-Traps
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [32mPhysical interface: jsrv, Enabled, Physical link is Up[0m
   Interface index: 133, SNMP ifIndex: 568
@@ -828,13 +828,13 @@ user@swXX> show interfaces
   Link flags     : None
   Current address: 12:35:67:89:68:40, Hardware address: 12:35:67:89:68:40
 [36m  Last flapped   : Never[0m
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [36m  Logical interface jsrv.1 (Index 72) (SNMP ifIndex 569)[0m
     Flags: Up 0x20[4m004[24m000 Encapsulation: unknown
-    Input packets : 0
-    Output packets: 1
+[36m    Input packets : 0[0m
+[36m    Output packets: 1[0m
     Protocol inet, MTU: [4m1[24m500
       Flags: Is-Primary
       Addresses, Flags: Primary Is-Default Is-Preferred Is-Primary
@@ -847,13 +847,13 @@ user@swXX> show interfaces
   Interface flags: SNMP-Traps
   Link flags     : None
 [36m  Last flapped   : Never[0m
-    Input packets : 442[4m741[24m614
-    Output packets: 442[4m741[24m614
+[36m    Input packets : 442[4m741[24m614[0m
+[36m    Output packets: 442[4m741[24m614[0m
 
 [36m  Logical interface lo0.16384 (Index 64) (SNMP ifIndex 21)[0m
     Flags: Encapsulation: Unspecified
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol inet, MTU: Unlimited
       Flags: None
       Addresses, Flags: Primary
@@ -865,8 +865,8 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Link flags     : None
 [36m  Last flapped   : Never[0m
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [1;31mPhysical interface: me0, Enabled, Physical link is Down[0m
   Interface index: 1, SNMP ifIndex: 33
@@ -875,13 +875,13 @@ user@swXX> show interfaces
   Interface flags: Hardware-Down SNMP-Traps
   Current address: 12:35:67:89:68:42, Hardware address: 12:35:67:89:68:7f
 [36m  Last flapped   : [4m2[24m021-01-25 19:52:05 MST (29w0d 16:26 ago)[0m
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [36m  Logical interface me0.0 (Index 6) (SNMP ifIndex 34)[0m
     Flags: Device-Down SNMP-Traps Encapsulation: ENET2
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
     Protocol eth-switch
 ---(more 92%)---                                              Flags: Is-Primary
 
@@ -891,22 +891,22 @@ user@swXX> show interfaces
   Current address: Unspecified, Hardware address: Unspecified
   Device flags   : Present Running
   Interface flags: SNMP-Traps
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [32mPhysical interface: pimd, Enabled, Physical link is Up[0m
   Interface index: 26, SNMP ifIndex: 11
   Type: PIMD, Link-level type: PIM-Decapsulator, MTU: Unlimited, Speed: Unlimited
   Device flags   : Present Running
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [32mPhysical interface: pime, Enabled, Physical link is Up[0m
   Interface index: 25, SNMP ifIndex: 10
   Type: PIME, Link-level type: PIM-Encapsulator, MTU: Unlimited, Speed: Unlimited
   Device flags   : Present Running
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [32mPhysical interface: tap, Enabled, Physical link is Up[0m
   Interface index: 12, SNMP ifIndex: 7
@@ -916,8 +916,8 @@ user@swXX> show interfaces
   Interface flags: SNMP-Traps
   Link flags     : None
 [36m  Last flapped   : Never[0m
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 [32mPhysical interface: vlan, Enabled, Physical link is Up[0m
   Interface index: 132, SNMP ifIndex: 503
@@ -927,14 +927,14 @@ user@swXX> show interfaces
   Link flags     : None
   Current address: 12:35:67:89:68:41, Hardware address: 12:35:67:89:68:41
 [36m  Last flapped   : Never[0m
-    Input packets : 10[4m279[24m909
-    Output packets: 4[4m911[24m225
+[36m    Input packets : 10[4m279[24m909[0m
+[36m    Output packets: 4[4m911[24m225[0m
 
 [36m  Logical interface vlan.102 (Index 69) (SNMP ifIndex 566)[0m
 [36m    Description: Router Network[0m
     Flags: Up SNMP-Traps 0x[4m4[24m000 Encapsulation: ENET2
-    Input packets : 10[4m279[24m909
-    Output packets: 4[4m911[24m228
+[36m    Input packets : 10[4m279[24m909[0m
+[36m    Output packets: 4[4m911[24m228[0m
     Protocol inet, MTU: [4m1[24m500
       Flags: Is-Primary, User-MTU
       Addresses, Flags: Is-Default Is-Preferred Is-Primary
@@ -957,8 +957,8 @@ user@swXX> show interfaces
   Link flags     : None
   Current address: 12:35:67:89:68:42, Hardware address: 12:35:67:89:68:42
 ---(more 99%)---                                        [36m  Last flapped   : Never[0m
-    Input packets : 0
-    Output packets: 0
+[36m    Input packets : 0[0m
+[36m    Output packets: 0[0m
 
 {master:1}
 user@swXX> show interfaces terse 

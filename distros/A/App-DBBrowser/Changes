@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.322    2023-03-23
+        - Bugfix update/delete with unquoted table name.
+
 2.321    2023-03-21
         - Removed option alias defaults.
         - Update alias menu.

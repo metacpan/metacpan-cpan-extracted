@@ -27,6 +27,7 @@ t/src/long/bar.tar
 t/src/long/foo.tbz
 t/src/long/foo.tgz
 t/src/long/foo.txz
+t/src/long/prefix-directory-concat.tar
 t/src/short/b
 t/src/short/bar.tar
 t/src/short/foo.tbz

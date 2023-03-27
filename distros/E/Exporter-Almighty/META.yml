@@ -29,7 +29,7 @@ optional_features: {}
 provides:
   Exporter::Almighty:
     file: lib/Exporter/Almighty.pm
-    version: '0.001004'
+    version: '0.001005'
 requires:
   Eval::TypeTiny: '0'
   Exporter::Shiny: '1.006000'
@@ -45,5 +45,5 @@ resources:
   homepage: https://metacpan.org/release/Exporter-Almighty
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-exporter-almighty.git
-version: '0.001004'
+version: '0.001005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

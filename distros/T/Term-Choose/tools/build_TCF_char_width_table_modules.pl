@@ -90,59 +90,6 @@ sub width_east_asian {
     return 'N';
 }
 
-# Gnome-Terminal -> guake, tilda, terminator, lxterminal, tilix, sakura, xfce4-terminal (alacritty)
-# KDE Konsole -> yakuake, kitty
-
-my %info = (
-    "Arabic Number Format Characters" => [
-        'Win32 Console  1',
-        'KDE Konsole    0',
-        'Gnome-Terminal 0',
-    ],
-    "Hangul Jamo 0x1160..0x11ff" => [
-        'KDE Konsole    1',
-        'Win32 Console  1',
-        'Gnome-Terminal 0',
-    ],
-    "Regional Indicator Symbol Letters A-Z" => [
-        'Gnome-Terminal 1',
-        'Win32 Console  1',
-        'KDE Konsole    2',
-    ],
-);
-my @info;
-for my $key ( sort keys %info ) {
-    push @info, "\e[4m$key:\e[0m";
-    for my $e ( @{$info{$key}} ) {
-        push @info, ( ' ' x 4 ) . $e;
-    }
-}
-my $config = {                                  # Defaults: take the bigger value because too much space does less harm than to little space
-    'arabic_number_format_characters'   => 1,   # 0, [1]
-    'hangul_jamo_1160_11ff'             => 1,   # 0, [1]
-    'regional_indicator_symbol_letters' => 1,   # 1, [2]
-};
-my $menu = [
-    [ 'arabic_number_format_characters',   "- Arabic Number Format Characters",       [ 0, 1 ] ],
-    [ 'hangul_jamo_1160_11ff',             "- Hangul Jamo 0x1160..0x11ff",            [ 0, 1 ] ],
-    [ 'regional_indicator_symbol_letters', "- Regional Indicator Symbol Letters A-Z", [ 1, 2 ] ],
-];
-if ( @ARGV ) {
-    my $return = settings_menu( 
-        $menu, $config,
-        { info => join( "\n", @info ), prompt => "\nUsed width:", clear_screen => 1, back => 'Exit', confirm => 'Confirm', color => 1 }
-    );
-    exit if ! defined $return;
-}
-my $cust_width;
-for my $key ( keys %$config ) {
-    for my $e ( @$menu ) {
-        if ( $e->[0] eq $key ) {
-            $cust_width->{$key} = $e->[2][$config->{$key}];
-        }
-    }
-}
-
 
 my $unicode_data = unicode_data();
 my $east_asian_width_table = east_asian_width_table();
@@ -155,13 +102,14 @@ for my $c ( 0x0 .. 0x10ffff ) {
     my $bidi_class = $unicode_data->[$c]{bidi_class} // '';
     my $east_asian_width = width_east_asian( $east_asian_width_table, $c );
     my $print_width;
-    if ( chr( $c ) =~ /\p{Cc}/ ) {
+    if ( $category =~ /^(?:Cc|Cs)\z/ ) {
         # Other, control
+        # Other, surrogate
         $print_width = [ -1, -1 ];
     }
     elsif ( $c == 0x00AD ) {
         # Soft Hyphen (in Cf)
-        # http://unicode.org/reports/tr14/#SoftHyphen  terminals use 1 resp 2 print-width
+        # http://unicode.org/reports/tr14/#SoftHyphen  but terminals use 1 resp 2 print-width
         # Ambiguous
         $print_width = [ 1, 2 ];
     }
@@ -171,21 +119,17 @@ for my $c ( 0x0 .. 0x10ffff ) {
         # categories might not be up to date
         $print_width = [ 0, 0 ];
     }
-    elsif ( $category eq 'Cf' && ( $bidi_class ne 'AN' || $cust_width->{arabic_number_format_characters} == 0 ) ) {
+    elsif ( $category eq 'Cf' && $bidi_class ne 'AN' ) {
         # Cf = Other, format
         # AN = bidi clas arbic number
         # https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf # 9.2 Arabic -> Signs Spanning Numbers -> Unlike ...
         $print_width = [ 0, 0 ];
     }
-    elsif ( $c >= 0x1160 && $c <= 0x11FF && $cust_width->{hangul_jamo_1160_11ff} == 0 ) {
-#        # Hangul Jamo: Medial vowels, Old medial vowels, Final consonants, Old final consonants
+    #elsif ( $c >= 0x1160 && $c <= 0x11FF || $c >= 0x0D7B0 && $c <= 0x0D7FF ) {
+    elsif ( $c >= 0x1160 && $c <= 0x11FF ) {
 #        # https://www.unicode.org/versions/Unicode14.0.0/ch18.pdf # 18.6 Hangul -> Hangul Jamo
 #        # https://devblogs.microsoft.com/oldnewthing/20201009-00/?p=104351
         $print_width = [ 0, 0 ];
-    }
-    elsif ( $cust_width->{regional_indicator_symbol_letters} == 2 && $c >= 0x1f1e6 && $c <= 0x1f1ff ) {
-        # Regional Indicator Symbol Letters A - Z   OtherSymbol
-        $print_width = [ 2, 2 ];
     }
     elsif ( $east_asian_width =~ /^(?:W|F)\z/ ) {
         # W = Wide, F = Fullwidth
@@ -202,9 +146,6 @@ for my $c ( 0x0 .. 0x10ffff ) {
     $width_normal->[$c] = $print_width->[0];
     $width_ambiguous->[$c] = $print_width->[1];
 }
-
-# 0x01734  HANUNOO SIGN PAMUDPOD  SpacingMark   -> Gnome-Terminal  print width == 0
-
 
 
 sub build_ranges {
@@ -263,7 +204,6 @@ our \@EXPORT_OK = qw( table_char_width );
 # test with gnome-terminal - ambiguous characters set to $amb
 
 # Control characters, non-characters and surrogates are removed before using this table.
-# However - to have less ranges in table_char_width - surrogates and non-characters return 1.
 
 
 sub table_char_width { [
@@ -272,7 +212,7 @@ sub table_char_width { [
     my $number_of_ranges = 0;
     for my $r ( @$ranges ) {
         my $cm = '#';
-        # less than 0 is \p{C}
+        # less than 0 is Cc and Cs
         if ( $r->{width} >= 0 ) {
             $cm = '';
             $number_of_ranges++;

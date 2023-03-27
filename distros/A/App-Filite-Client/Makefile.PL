@@ -45,7 +45,7 @@ my $meta = {
                                          },
                           },
   "provides"           => {
-                            "App::Filite::Client" => { file => "lib/App/Filite/Client.pm", version => "0.001000" },
+                            "App::Filite::Client" => { file => "lib/App/Filite/Client.pm", version => 0.001001 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -59,7 +59,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Filite-Client/project",
                           },
-  "version"            => "0.001000",
+  "version"            => 0.001001,
   "x_provides_scripts" => { "filite-client" => { file => "bin/filite-client" } },
 };
 

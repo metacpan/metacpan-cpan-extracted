@@ -1,0 +1,147 @@
+use strict;
+use warnings;
+require './genpp.pl';
+
+pp_addpm ({At=>'Top'},<<'EOPM');
+use strict;
+use warnings;
+
+=head1 NAME
+
+PDL::OpenCV - PDL interface to OpenCV
+
+=head1 SYNOPSIS
+
+  use PDL::OpenCV::Videoio; # ucfirsted name of the OpenCV "module"
+  my $vfile='t/frames.avi';
+  my $vc = PDL::OpenCV::VideoCapture->new; # name of the OpenCV class
+  die "Failed to open $vfile" if !$vc->open($vfile);
+  my ($frame, $res) = $vc->read;
+  die "Failed to read" if !$res;
+  my $writer = PDL::OpenCV::VideoWriter->new;
+  # note 4th arg is an OpenCV "Size" - PDL upgrades array-ref to ndarray
+  $writer->open($outfile, PDL::OpenCV::VideoWriter::fourcc('M','P','4','V'), 20, [map $frame->dim($_), 1,2], 1);
+  while ($res) {
+    $writer->write($frame);
+    # and/or display it, or feed it to a Tracker, or...
+    ($frame, $res) = $vc->read;
+  }
+
+=head1 DESCRIPTION
+
+Use PDL::OpenCV to call OpenCV functions on your data using Perl/PDL.
+
+As can be seen above, this distribution is structured to very closely
+match the structure of OpenCV v4 itself. That means the submodules
+match the "classes" and/or "modules" in OpenCV, with the obvious exception
+of the C<Mat> class which needs special handling to thinly wrap ndarrays
+going into and coming back from OpenCV.
+
+=head1 BINDING NOTES
+
+This includes method/function names which are exactly the same
+as in OpenCV, without being modified for the common Perl idiom
+of snake_casing. This is intended to make the OpenCV documentation
+trivially easy to use for the PDL binding (where a binding exists),
+including available tutorials.
+
+The API is generated from the Python bindings that are part of OpenCV. In
+imitation of that, you are not currently able, as with "normal" PDL
+functions, to pass in output ndarrays.
+
+Where things do not work as you would expect from a PDL and/or OpenCV
+point of view, and it is not documented as doing so, this is a bug -
+please report it as shown at L</BUGS> below.
+
+=head2 Image formats
+
+In PDL, images are often C<byte,3,x,y> or occasionally (e.g. in
+L<PDL::Graphics::Simple>) C<byte,x,y,3>. The 3 is always R,G,B. Sometimes
+4 is supported, in which case the 4th column will be an alpha
+(transparency) channel, or 1, which means the image is grayscale.
+
+OpenCV has the concepts of "depth" and "channels".
+
+"Depth" is bit-depth (and data type) per pixel and per channel: the
+bit-depth will be a multiple of 8, and the data type will be integer
+(signed or unsigned) or floating-point.
+
+"Channels" resembles the above 1/3/4 point, with the important caveat
+that the default for OpenCV image-reading is to format data not as R,G,B,
+but B,G,R. This is for historical reasons, being the format returned by
+the cameras first used at the start of OpenCV. Use
+L<PDL::OpenCV::Imgproc/cvtColor> if your application requires otherwise.
+
+PDL data for use with OpenCV must be dimensioned C<(channels,x,y)>
+where C<channels> might be 1 if grayscale. This module will not use
+heuristics to guess what you meant if you only supply 2-dimensional data.
+This can lead to surprising results: e.g. with
+L<PDL::OpenCV::ImgProc/EMD>, the two histogram inputs must be 3D, with
+a C<channels> of 1. From the relevant test:
+
+  my $a = pdl float, q[[1 1] [1 2] [0 3] [0 4] [1 5]];
+  my $b = pdl float, q[[0 1] [1 2] [0 3] [1 4]];
+  my ($flow,$res) = EMD($a->dummy(0),$b->dummy(0),DIST_L2);
+
+If you get an exception C<Unrecognized or unsupported array type>,
+that is the cause.
+
+Be careful when scaling byte-valued inputs to maximise dynamic range:
+
+  $frame = ($frame * (255/$max))->byte; # works
+  $frame = ($frame * 255/$max)->byte;   # multiply happens first and overflows
+
+=head2 OpenCV minor data-types
+
+In OpenCV, as well as the most important type (C<Mat>), there are various
+helper types including C<Rect>, C<Size>, and C<Scalar> (often used for
+specifying colours). This distribution wraps these as ndarrays of
+appropriate types and dimensions.
+
+While in C++ there are often default values for the constructors
+and/or polymorphic ways to call them with fewer than the full number
+of arguments, this is currently not possible in PDL. Therefore, e.g. with
+a C<Scalar>, you have to supply all four values (just give zeroes for
+the ones that don't matter, e.g. the alpha value for a colour on a
+non-alpha image).
+
+=head2 Modules and packages
+
+This distro reproduces the structure of OpenCV's various
+modules, so that e.g. the C<tracking> module is made available
+as L<PDL::OpenCV::Tracking>. Loading that makes available the
+C<PDL::OpenCV::Tracker> package which has various methods like C<new>.
+
+=head2 Constants
+
+OpenCV defines various constants in its different modules. This distro
+will remove C<cv::> from the beginning of these, then put them in
+their loading module. E.g. in C<imgproc>, C<COLOR_GRAY2RGB> will be
+C<PDL::OpenCV::Imgproc::COLOR_GRAY2RGB> (and exported by default).
+
+However, further-namespaced constants, like C<cv::Subdiv2D::PTLOC_VERTEX>,
+will I<not> be exported, and will be available as
+e.g. C<PDL::OpenCV::Imgproc::Subdiv2D::PTLOC_VERTEX>.
+
+=cut
+EOPM
+
+pp_addpm ({At=>'Bot'},<<'EOPM');
+=head1 BUGS
+
+Please report bugs at L<https://github.com/PDLPorters/PDL-OpenCV/issues>,
+or on the mailing list(s) at L<https://pdl.perl.org/?page=mailing-lists>.
+
+=head1 AUTHOR
+
+Ingo Schmid and the PDL Porters. Same terms as PDL itself.
+
+=cut
+EOPM
+
+our $VERSION = 0.001;
+pp_setversion($VERSION);
+
+genheader('', 1);
+
+pp_done();

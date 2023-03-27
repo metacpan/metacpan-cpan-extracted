@@ -1,0 +1,2 @@
+0.001 2023-03-26
+- binding of OpenCV modules highgui, img{codecs,proc}, objdetect, tracking

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">
+	<!-- Downloaded from http://devfloat.net/free-search-box-css-templates/ -->
+	<head>
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+		<meta http-equiv="Content-Language" content="fr">
+		<meta name="robots" content="INDEX,FOLLOW">
+		<meta name="language" content="FRANCAIS">
+		<meta name="object" content="Index">
+		<meta name="owner" content="Nigel Horne">
+		<meta name="Author" content="Nigel Horne">
+		[% IF twitter %]
+			<meta name="twitter:site" content="@[% twitter %]">
+			[% IF SiteTitle %]
+				<meta name="twitter:title" content="[% SiteTitle.join(" ") %]">
+			[% END %]
+		[% END %]
+		<title>
+			[% IF title %]
+				[% title %]
+			[% ELSE %]
+				Free Geo-Coding Website - alpha test
+			[% END %]
+		</title>
+		[% IF description %]
+			<meta name="description" content="[% description %]" />
+		[% ELSE %]
+			<meta name="description" content="Coming Soon - an openaddresses.io, whosonfirst.org, Maxmind and Geonames based geo-coding website" />
+		[% END %]
+		<link rel="stylesheet" href="/css/style.css">
+	</head>
+	<body onload="document.Filter.q.focus()">
+		<h1>Free Geo-Coding Website - alpha test</h1>
+		<p>Enter the Location to Search For</p>
+		<p>
+			Only Australia, US and Canada are currently supported,
+			along with some from Great Britain.
+		</p>
+		<p>Try "1600 Pennsylvania Avenue NW Washington DC USA"</p>
+		<p>Fork me at <a href="https://github.com/nigelhorne/Geo-Coder-Free">GitHub</a>
+		<form method="post" action="/cgi-bin/page.fcgi?page=query" onsubmit="return isNotEmpty(this.q)" name="Filter">
+			<input id="page" name="page" value="query" type="hidden">
+			<input id="action" name="action" value="query" type="hidden">
+			<div id="container">
+				<div class="cell"><input name="q" type="search" placeholder="Enter location"></div>
+				<!--
+				<div class="cell"><div class="button">Resecher</div></div>
+				-->
+				<div class="cell"><input type="submit" value="Resecher" class="button" /></div>
+			</div>
+		</form>
+		<p>
+			This product includes GeoLite2 data created by MaxMind, available from
+			<a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+			Also thanks to
+			<a href="http://www.geonames.org">geonames</a>,
+			<a href="https://whosonfirst.org/docs/license">whosonfirst</a>
+			<a href="https://openaddresses.io/">openaddresses</a> et
+			<a href="https://github.com/openvenues/libpostal">libpostal</a>.
+		</p>
+	</body>
+</html>

@@ -1,5 +1,9 @@
 Revision history for MySQL-GrantParser
 
+1.004     2023-03-24 11:12:16+00:00 UTC
+    [IMPROVEMENTS]
+        - Support MySQL 5.8
+
 1.003     2017-02-06 12:00:21+00:00 UTC
     [IMPROVEMENTS]
         - Support no password user in MySQL 5.7

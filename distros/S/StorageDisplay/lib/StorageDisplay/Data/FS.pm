@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::FS;
 # ABSTRACT: Handle filesystem data for StorageDisplay
 
-our $VERSION = '1.2.4'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -384,7 +384,7 @@ StorageDisplay::Data::FS - Handle filesystem data for StorageDisplay
 
 =head1 VERSION
 
-version 1.2.4
+version 2.02
 
 =head1 AUTHOR
 

@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Exporter-Almighty>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-almighty/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001005	2023-03-24
+
+ [ Test Suite ]
+ - More useful test output from t/00start.t.
+
+ [ Packaging ]
+ - No longer need to decide between Lexical::Var and
+   Alt::Lexical::Var::ButSupportsModernPerl as part of Makefile.PL.
+
 0.001004	2023-03-08
 
  - Added: All constants exported by Exporter::Almighty-based modules now

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v0.5.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.6.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2023/03/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $VERBOSE $DEBUG );
     use DB::Object::Fields;
-    $VERSION    = 'v0.5.1';
+    $VERSION    = 'v0.6.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -128,6 +128,14 @@ sub avoid
     my $self  = shift( @_ );
     my $q = $self->_reset_query;
     return( $q->avoid( @_ ) );
+}
+
+sub columns
+{
+    my $self = shift( @_ );
+    my $fields = $self->fields;
+    my $cols = [sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields )];
+    return( $self->new_array( $cols ) );
 }
 
 sub constant
@@ -733,7 +741,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v0.5.1
+    v0.6.0
 
 =head1 DESCRIPTION
 
@@ -792,6 +800,12 @@ Provided with a table alias and this will call L<DB::Object::Query/table_alias> 
 Takes a list of array reference of column to avoid in the next query.
 
 This is a convenient wrapper around L<DB::Object::Query/avoid>
+
+=head2 columns
+
+Returns an L<array object|Module::Generic::Array> of the table columns.
+
+This information is provided by L</fields>, which is in turn provided by L</structure>
 
 =head2 constant
 
@@ -1074,6 +1088,12 @@ It toggles sort mode on and consequently disable reverse mode.
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/stat>, L<DB::Object::Postgres::Tables/stat> or L<DB::Object::SQLite::Tables/stat>
 
+=head2 structure
+
+The implementation is driver specific.
+
+This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/structure>, L<DB::Object::Postgres::Tables/structure> or L<DB::Object::SQLite::Tables/structure>
+
 =head2 table
 
 Returns the table name. This is read-only.
@@ -1106,12 +1126,6 @@ This is used to help manage binded value with the right type, or helps when conv
 
 If nothing is found, it returns an empty list in list context and L<perlfunc/undef> in scalar context.
 
-=head2 structure
-
-The implementation is driver specific.
-
-This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/structure>, L<DB::Object::Postgres::Tables/structure> or L<DB::Object::SQLite::Tables/structure>
-
 =head2 unix_timestamp
 
 This is a convenient wrapper around L<DB::Object::Query/unix_timestamp>
@@ -1138,7 +1152,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<DB::Object::Mysql::Tables>, L<DB::Object::Postgres::Tables> or L<DB::Object::SQLite::Tables>
 
 =head1 AUTHOR
 

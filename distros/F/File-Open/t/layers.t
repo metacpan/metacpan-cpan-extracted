@@ -1,15 +1,12 @@
-use warnings;
-use strict;
+use Test2::V0;
+BEGIN {
+    if ($^V lt v5.10.0) {
+        skip_all "'use open' integration requires perl v5.10+";
+    }
+}
 
-use Test::More
-    $] >= 5.010
-        ? (tests => 18)
-        : (skip_all => "'use open' integration requires perl v5.10+")
-;
-
-use File::Spec qw(tempfile);
-use File::Temp;
-
+use File::Spec ();
+use File::Temp ();
 use File::Open qw(fopen);
 
 sub slurp {
@@ -25,7 +22,7 @@ sub istext ($$) {
 }
 
 my $DIR = File::Temp->newdir('F_O_test.XXXXXX', CLEANUP => 1, EXLOCK => 0, TMPDIR => 1);
--w $DIR or BAIL_OUT "$DIR: I can't test open() without a writeable temp directory";
+-w $DIR or skip_all "$DIR: I can't test open() without a writeable temp directory";
 
 sub scratch {
     my ($stem) = @_;
@@ -146,3 +143,5 @@ for my $encoding (':encoding(ISO-8859-1)') {
         istext $got, "b\@\xc3\x9f\xe2\x82\xac";
     }
 }
+
+done_testing;

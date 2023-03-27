@@ -8,7 +8,7 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # DESCRIPTION
 
@@ -153,6 +153,14 @@ De module **xlate** kan de tekst van de vertaling voor elk bestand in de cache o
     - `accumulate`
 
         Standaard worden ongebruikte gegevens uit het cachebestand verwijderd. Als u ze niet wilt verwijderen en in het bestand wilt houden, gebruik dan `accumuleren`.
+
+# COMMAND LINE INTERFACE
+
+U kunt deze module gemakkelijk gebruiken vanaf de commandoregel met het commando `xlate` dat in het archief is opgenomen. Zie de `xlate` help informatie voor gebruik.
+
+# EMACS
+
+Laad het `xlate.el` bestand in het archief om het `xlate` commando te gebruiken vanuit de Emacs editor. `xlate-region` functie vertaalt de gegeven regio. De standaardtaal is `EN-US` en u kunt de taal specificeren met het prefix argument.
 
 # ENVIRONMENT
 

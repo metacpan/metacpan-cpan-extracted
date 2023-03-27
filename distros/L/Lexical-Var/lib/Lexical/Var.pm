@@ -4,12 +4,12 @@ Lexical::Var - static variables without namespace pollution
 
 =head1 SYNOPSIS
 
-	use Lexical::Var '$foo' => \$Remote::foo;
-	use Lexical::Var '$const' => \123;
-	use Lexical::Var '@bar' => [];
-	use Lexical::Var '%baz' => { a => 1, b => 2 };
-	use Lexical::Var '&quux' => sub { $_[0] + 1 };
-	use Lexical::Var '*wibble' => Symbol::gensym();
+    use Lexical::Var '$foo' => \$Remote::foo;
+    use Lexical::Var '$const' => \123;
+    use Lexical::Var '@bar' => [];
+    use Lexical::Var '%baz' => { a => 1, b => 2 };
+    use Lexical::Var '&quux' => sub { $_[0] + 1 };
+    use Lexical::Var '*wibble' => Symbol::gensym();
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,9 @@ definition statement up to the end of the immediately enclosing block,
 except where it is shadowed within a nested block.  This is the same
 lexical scoping that the C<my>, C<our>, and C<state> keywords supply.
 Definitions from L<Lexical::Var> and from C<my>/C<our>/C<state> can shadow
-each other.  These lexical definitions propagate into string C<eval>s,
+each other (except that L<Lexical::Var> can't shadow a
+C<my>/C<our>/C<state> subroutine prior to Perl 5.19.1).
+These lexical definitions propagate into string C<eval>s,
 on Perl versions that support it (5.9.3 and later).
 
 This module only manages variables of static duration (the kind of
@@ -61,11 +63,11 @@ variable for each invocation of a function, use C<my>.
 package Lexical::Var;
 
 { use 5.006; }
-use Lexical::SealRequireHints 0.006;
+use Lexical::SealRequireHints 0.012;
 use warnings;
 use strict;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -109,7 +111,8 @@ the parser needs to look up the subroutine early, in order to let any
 prototype affect parsing, and it looks up the subroutine by a different
 mechanism than is used to generate the call op.  (Some forms of sigilless
 call have other complications of a similar nature.)  If an attempt
-is made to call a lexical subroutine via a bareword on an older Perl,
+is made to call a L<Lexical::Var> lexical subroutine
+via a bareword on an older Perl,
 this module will probably still be able to intercept the call op, and
 will throw an exception to indicate that the parsing has gone wrong.
 However, in some cases compilation goes further wrong before this
@@ -127,6 +130,11 @@ subroutine call if the subroutine exists, but the parser doesn't look at
 lexically-defined subroutines for this purpose.  The call interpretation
 can be forced by prefixing the first argument expression with a C<+>,
 or by wrapping the whole argument list in parentheses.
+
+In the earlier Perl versions that support C<my>/C<our>/C<state>
+subroutines, starting from Perl 5.17.4, the mechanism for core lexical
+subroutines suffers a couple of bugs that mean that L<Lexical::Var> can't
+shadow subroutines declared that way.  This was fixed in Perl 5.19.1.
 
 On Perls built for threading (even if threading is not actually used),
 scalar constants that are defined by literals in the Perl source don't
@@ -161,6 +169,10 @@ on the same Perl versions.  Other kinds of indirection
 within a C<BEGIN> block, such as calling via a normal function, do not
 cause this problem.
 
+When judging whether the C<unimport> method should hide a subroutine,
+this module can't distinguish between a lexical subroutine established
+by this module and a C<state> subroutine.  This may change in the future.
+
 =head1 SEE ALSO
 
 L<Attribute::Lexical>,
@@ -174,7 +186,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011, 2012, 2013
+Copyright (C) 2009, 2010, 2011, 2012, 2013, 2023
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

@@ -21,11 +21,11 @@ L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>.
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -65,7 +65,7 @@ sub new {
 	# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
 	return unless($class);
 
-	bless {
+	return bless {
 		data => xsv_slurp(
 			shape => 'aoh',
 			text_csv => {
@@ -110,12 +110,22 @@ sub geocode {
 	my $location = $param{location}
 		or Carp::croak('Usage: geocode(location => $location)');
 
+	# Only used to geoloate full addresses, not states/provinces
+	return if($location !~ /,.+,/);
+
+	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
+
+	# Look for a quick match, we may get lucky
 	my $lc = lc($location);
+	if($lc =~ /(.+), usa$/) {
+		$lc = "$1, us";
+	}
 	foreach my $row(@{$self->{'data'}}) {
 		my $rc = Geo::Location::Point->new($row);
 		my $str = lc($rc->as_string());
 
 		# ::diag("Compare $str->$lc");
+		# print "Compare $str->$lc\n";
 		if($str eq $lc) {
 			return $rc;
 		}
@@ -136,13 +146,19 @@ sub geocode {
 		$ap = $self->{'ap'}->{'gb'} // Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code => 0);
 		$self->{'ap'}->{'gb'} = $ap;
 	} elsif($location =~ /Canada$/) {
+		# TODO: no Canadian addresses yet
+		return;
 		$ap = $self->{'ap'}->{'ca'} // Lingua::EN::AddressParse->new(country => 'CA', auto_clean => 1, force_case => 1, force_post_code => 0);
 		$self->{'ap'}->{'ca'} = $ap;
 	} elsif($location =~ /Australia$/) {
+		# TODO: no Australian addresses yet
+		return;
 		$ap = $self->{'ap'}->{'au'} // Lingua::EN::AddressParse->new(country => 'AU', auto_clean => 1, force_case => 1, force_post_code => 0);
 		$self->{'ap'}->{'au'} = $ap;
 	}
 	if($ap) {
+		# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
+
 		my $l = $location;
 		if($l =~ /(.+), (England|UK)$/i) {
 			$l = "$1, GB";
@@ -151,6 +167,7 @@ sub geocode {
 			# Carp::croak($ap->report());
 			# ::diag('Address parse failed: ', $ap->report());
 		} else {
+			# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
 			my %c = $ap->components();
 			# ::diag(Data::Dumper->new([\%c])->Dump());
 			my %addr = ( 'location' => $l );
@@ -205,11 +222,14 @@ sub geocode {
 		# Try Geo::StreetAddress::US, which is rather buggy
 
 		my $l = $1;
-		$l =~ s/,/ /g;
+		$l =~ tr/,/ /;
 		$l =~ s/\s\s+/ /g;
+
+		# ::diag(__PACKAGE__, ': ', __LINE__, ": $location ($l)");
 
 		# Work around for RT#122617
 		if(($location !~ /\sCounty,/i) && (my $href = (Geo::StreetAddress::US->parse_location($l) || Geo::StreetAddress::US->parse_address($l)))) {
+			# ::diag(Data::Dumper->new([$href])->Dump());
 			if(my $state = $href->{'state'}) {
 				if(length($state) > 2) {
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
@@ -246,6 +266,20 @@ sub geocode {
 					if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 						$rc->{'country'} = 'US';
 						return $rc;
+					}
+					# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
+					if($street && !$href->{'number'}) {
+						# If you give a building with
+						# no street to G:S:US it puts
+						# the building name into the
+						# street field
+						$addr{'name'} = $street;
+						delete $addr{'road'};
+
+						if(my $rc = $self->_search(\%addr, ('name', 'city', 'state', 'country'))) {
+							$rc->{'country'} = 'US';
+							return $rc;
+						}
 					}
 				}
 			}
@@ -313,6 +347,9 @@ sub geocode {
 			$libpostal_is_installed = LIBPOSTAL_NOT_INSTALLED;
 		}
 	}
+
+	# ::diag(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)");
+	# print(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)\n");
 
 	if(($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
 		if($addr{'house_number'} && !$addr{'number'}) {
@@ -509,7 +546,7 @@ sub reverse_geocode {
 		Carp::croak('Usage: reverse_geocode(latlng => $location)');
 	}
 
-	# ::diag('x' x 40);
+	# ::diag(__LINE__, ": $latitude,$longitude");
 	my @rc;
 	foreach my $row(@{$self->{'data'}}) {
 		if(defined($row->{'latitude'}) && defined($row->{'longitude'})) {
@@ -571,7 +608,7 @@ it under the same terms as Perl itself.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)
@@ -581,7 +618,7 @@ must apply in writing for a licence for use from Nigel Horne at `<njh at nigelho
 
 1;
 
-# Ensure you use abbreviations, e.e. RD not ROAD
+# Ensure you use abbreviations, e.g. RD not ROAD
 __DATA__
 "name","number","road","city","state_district","state","country","latitude","longitude"
 "ST ANDREWS CHURCH",,"CHURCH HILL","EARLS COLNE",,"ESSEX","GB",51.926793,0.70408
@@ -592,6 +629,7 @@ __DATA__
 "",106,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.33995174,1.31570211
 "",114,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.34015944,1.31580976
 "MINSTER CEMETERY",116,"TOTHILL ST","RAMSGATE",,"KENT","GB",51.34203083,1.31609075
+"RAMSGATE STATION",,"STATION APPROACH RD","RAMSGATE","","KENT","GB",51.340826,1.406519
 "ST MARY THE VIRGIN CHURCH",,"CHURCH ST","RAMSGATE",,"KENT","GB",51.33090893,1.31559716
 "",20,"MELBOURNE AVE","RAMSGATE",,"KENT","GB",51.34772374,1.39532565
 "TOBY CARVERY",,"NEW HAINE RD","RAMSGATE",,"KENT","GB",51.357510,1.388894
@@ -601,6 +639,7 @@ __DATA__
 "WALTER E. WASHINGTON CONVENTION CENTER",801,"MT VERNON PL NW","WASHINGTON","","DC","US",38.904022,-77.023113
 "",7,"JORDAN MILL COURT","WHITE HALL","BALTIMORE","MD","US",39.6852333333333,-76.6071166666667
 "ALL SAINTS EPISCOPAL CHURCH",203,"E CHATSWORTH RD","REISTERSTOWN","BALTIMORE","MD","US",39.467270,-76.823947
+"BALLPARK RESTAURANT",3418,"CONOWINGO RD","DUBLIN","HARFORD","MD","US",39.633018,-76.272558
 "NCBI",,"MEDLARS DR","BETHESDA","MONTGOMERY","MD","US",38.99516556,-77.09943963
 "",,"CENTER DR","BETHESDA","MONTGOMERY","MD","US",38.99698114,-77.10031119
 "",,"NORFOLK AVE","BETHESDA","MONTGOMERY","MD","US",38.98939358,-77.09819543
@@ -610,6 +649,7 @@ __DATA__
 "PATAPSCO VALLEY STATE PARK'",8020,"BALTIMORE NATIONAL PK","ELLICOTT CITY","HOWARD","MD","US",39.29491,-76.78051
 "",,"ANNANDALE RD","EMMITSBURG","FREDERICK","MD","US",39.683529,-77.349405
 "UTICA DISTRICT PARK",,,"FREDERICK","FREDERICK","MD","US",39.5167883333333,-77.4015166666667
+"",3923,"SUGARLOAF CT","MONROVIA","FREDERICK","MD","US",39.342986,-77.239770
 "ALBERT EINSTEIN HIGH SCHOOL",11135,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.03869019,-77.0682871
 "POST OFFICE",10325,"KENSINGTON PKWY","KENSINGTON","MONTGOMERY","MD","US",39.02554455,-77.07178215
 "NEWPORT MILL MIDDLE SCHOOL",11311,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.0416107,-77.06884708
@@ -624,6 +664,7 @@ __DATA__
 "",2232,"HILDAROSE DR","SILVER SPRING","MONTGOMERY","MD","US",39.019385,-77.049779,
 "FOREST GLEN MEDICAL CENTER",9801,"GEORGIA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.016042,-77.042148
 "LA CASITA PUPESERIA AND MARKET",8214,"PINEY BRANCH RD","SILVER SPRING","MONTGOMERY","MD","US",38.993369,-77.009501
+"NOAA LIBRARY",1315,"EAST-WEST HIGHWAY","SILVER SPRING","MONTGOMERY","MD","US",38.991667,-77.030473
 "SNIDERS",1936,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.0088797,-77.04162824
 "",1954,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.008961,-77.04303
 "",1956,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.008845,-77.043317
@@ -634,6 +675,7 @@ __DATA__
 "",1406,"LANGBROOK PLACE","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
 "BP",2601,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.0147541,-77.05466857
 "OMEGA STUDIOS",12412,,"ROCKVILLE","MONTGOMERY","MD","US",39.06412645,-77.11252263
+"NASA",,"","GREENBELT","PRINCE GEORGES","MD","US",38.996764,-76.849323
 "",7001,"CRADLEROCK FARM COURT","COLUMBIA","HOWARD","MD","US",39.190009,-76.841152
 "BANGOR AIRPORT",,"GODFREY BOULEVARD","BANGOR","PENOBSCOT","ME","US",44.406700,-68.597114
 "",86,"ALLEN POINT LANE","BLUE HILLS","HANCOCK","ME","US",44.35378018,-68.57383976
@@ -643,7 +685,7 @@ __DATA__
 "",898,"SOUTH GREENSFERRY RD","COUER D'ALENE","KOOTENAI","ID","US",47.69556,-116.91564
 "",,"DOUGLAS AVE","FORT WAYNE","ALLEN","IN","US",41.074247,-85.138531
 "JOHN GLENN AIRPORT",4600,,"COLUMBUS","FRANKLIN","OH","US",39.997959,-82.88132
-"MIDDLE RIDGE PLAZA",,,"AMHERST","LOHRAIN","OH","US,41.379695,-82.222877
+"MIDDLE RIDGE PLAZA",,,"AMHERST","LOHRAIN","OH","US",41.379695,-82.222877
 "RESIDENCE INN BY MARRIOTT",6364,"FRANTZ RD","DUBLIN",,"OH","US",40.097097,-83.123745
 "TOWPATH TRAVEL PLAZA",,,"BROADVIEW HEIGHTS","CUYAHOGA","OH","US",41.291654,-81.675815
 "NEW STANTON SERVICE PLAZA",,,"HEMPFIELD",,"PA","US",40.206267,-79.565682
@@ -651,5 +693,7 @@ __DATA__
 "HUNTLEY MEADOWS PARK",3701,"LOCKHEED BLVD","ALEXANDRIA","","VA","US",38.75422, -77.1058666666667
 "",14900,"CONFERENCE CENTER DR","CHANTILLY","FAIRFAX","VA","US",38.873934,-77.461939
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
+"",818,"FERNDALE TERRACE NE","LEESBURG","LOUDOUN","VA","US",39.124843,-77.535445
+"",,"PURCELLVILLE GATEWAY DR","PURCELLVILLE","LOUDOUN","VA","US",39.136193,-77.693198
 "THE CAPITAL GRILLE RESTAURANT",1861,,"MCLEAN","FAIRFAX","VA","US",38.915635,-77.22573
 "",,"","COLONIAL BEACH","WESTMORELAND","VA","US",38.25075,-76.9602533333333

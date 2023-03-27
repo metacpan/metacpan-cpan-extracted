@@ -941,10 +941,25 @@ _use_generic_signal_marshaller_for (class, const gchar *package, const gchar *si
 	                                                   "ClosureMarshal");
 	g_assert (closure_marshal_info);
 	cif = g_new0 (ffi_cif, 1);
+
+        #if defined(GI_CHECK_VERSION) && GI_CHECK_VERSION (1, 72, 0)
+	closure = g_callable_info_create_closure (closure_marshal_info,
+	                                          cif,
+	                                          invoke_perl_signal_handler,
+	                                          signal_info);
+        if (closure != NULL)
+                closure =
+                        (ffi_closure *) g_callable_info_get_closure_native_address (closure_marshal_info,
+                                                                                    closure);
+        #else
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	closure = g_callable_info_prepare_closure (closure_marshal_info,
 	                                           cif,
 	                                           invoke_perl_signal_handler,
 	                                           signal_info);
+        G_GNUC_END_IGNORE_DEPRECATIONS
+        #endif
+
 	g_base_info_unref (closure_marshal_info);
 
 	dwarn ("package = %s, signal = %s => closure = %p\n",

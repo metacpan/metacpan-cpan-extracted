@@ -76,6 +76,6 @@
          "web" : "https://gitlab.com/jackdeguest/DB-Object"
       }
    },
-   "version" : "v0.11.0",
+   "version" : "v0.11.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -14,7 +14,7 @@ use XML::LibXML qw//;
   BEGIN {
     if (!@ARGV) {
       local $@;
-      $have_display = eval 'use Gtk3; Gtk3::init_check ()';
+      $have_display = eval {use Gtk3; Gtk3::init_check ()};
     }
   }
 
@@ -164,7 +164,7 @@ sub construct_basename {
 sub find_attribute {
   my ($self, $element, $attribute) = @_;
   my $attribute_list = $element->find ("\@$attribute");
-  return undef if $attribute_list->size != 1;
+  return if $attribute_list->size != 1;
   return $attribute_list->pop->value;
 }
 
@@ -967,7 +967,7 @@ sub format_sub_virtual_methods {
 sub format_deprecation_docs {
   my ($self, $element) = @_;
   my $deprecated = $self->find_attribute ($element, 'deprecated') // 0;
-  return undef unless $deprecated;
+  return unless $deprecated;
 
   my $text = '';
 
@@ -981,7 +981,7 @@ sub format_deprecation_docs {
     $text .= '  ' . $doc_dep_list->pop->textContent;
   }
 
-  return undef if $text eq '';
+  return if $text eq '';
   return $text;
 }
 
@@ -1011,7 +1011,7 @@ sub format_docs {
   my $dep = $self->format_deprecation_docs ($element);
   $text .= "\n\n$dep\n" if defined $dep;
 
-  return undef if $text eq '';
+  return if $text eq '';
 
   # Extract code blocks so that they are not wrapped.
   my $code_block_pattern = qr/\|\[\n?(.*?)\n?\]\|/s;
@@ -1076,7 +1076,7 @@ sub format_full_type_names {
 sub format_version_constraint {
   my ($self, $element) = @_;
   my $version = $self->find_attribute ($element, 'version');
-  return undef if !defined $version;
+  return if !defined $version;
   return "Since: $version.";
 }
 
@@ -1501,7 +1501,7 @@ sub setup_result_view {
     my ($x, $y) = $result_view->window_to_buffer_coords ('widget', $event->x, $event->y);
     my $iter = $result_view->get_iter_at_location ($x, $y);
     if (!$iter) {
-      return undef;
+      return;
     }
     my $tags = $iter->get_tags ();
     foreach my $tag (@$tags) {
@@ -1509,7 +1509,7 @@ sub setup_result_view {
         return $tag;
       }
     }
-    return undef;
+    return;
   };
 
   $result_view->{__hovering} = FALSE;
@@ -1653,7 +1653,7 @@ sub quit {
 package PathBar;
 
 # The BEGIN { eval } dance is to support not loading Gtk3 in text mode.
-BEGIN { eval 'use Glib::Object::Subclass qw/Gtk3::Box/;' }
+BEGIN { eval {use Glib::Object::Subclass qw/Gtk3::Box/;} }
 
 sub TRUE () {1}
 sub FALSE () {0}
@@ -1724,7 +1724,7 @@ sub update_buttons {
 package PathLabel;
 
 # The BEGIN { eval } dance is to support not loading Gtk3 in text mode.
-BEGIN { eval 'use Glib::Object::Subclass qw/Gtk3::Label/;' }
+BEGIN { eval {use Glib::Object::Subclass qw/Gtk3::Label/;} }
 
 sub TRUE () {1}
 sub FALSE () {0}
@@ -1876,3 +1876,64 @@ sub _format_children {
   @indices = $self->_add_omission_markers (@indices);
   return join ' ▸ ', map { $self->_format_child ($_) } @indices;
 }
+
+__END__
+
+=encoding utf8
+ 
+=head1 NAME
+ 
+perli11ndoc - view documentation of installed libraries bound using
+Glib::Object::Introspection
+ 
+=head1 ABSTRACT
+ 
+perli11ndoc allows you to view Perl documentation for Glib libraries bound to
+Perl using Glib::Object::Introspection. Glib::Object::Introspection uses the
+gobject-introspection and libffi projects to dynamically create Perl bindings
+for a wide variety of libraries. Examples include gtk+, webkit, libsoup and
+many more. All libraries currently installed will be shown with Perl-specific
+documentation and examples. Where Glib::Object::Introspection differs from the
+C library, differences are pointed out and the Perl-specific interface is
+defined.
+ 
+=head1 DEPENDENCIES
+
+perli11ndoc requires that XML::LibXML be installed to run. It also requires
+that the corresponding C library headers be installed on the system to provide
+documentation. For instance, on a Debian-based system you would need
+libgtk-3-dev to see the Perl introspected documentation for Gtk3.
+
+=head1 SEE ALSO
+ 
+=over
+ 
+=item perl-Glib: L<Glib>
+ 
+=item gobject-introspection: L<http://live.gnome.org/GObjectIntrospection>
+ 
+=item libffi: L<http://sourceware.org/libffi/>
+
+=item Glib::Object::Introspection: L<https://metacpan.org/pod/Glib::Object::Introspection>
+ 
+=back
+ 
+=head1 AUTHORS
+ 
+=over
+ 
+=item Emmanuele Bassi <ebassi at linux intel com>
+ 
+=item muppet <scott asofyet org>
+ 
+=item Torsten Schönfeld <kaffeetisch at gmx de>
+ 
+=back
+ 
+=head1 LICENSE
+ 
+This utility is free software; you can redistribute it and/or modify it under
+the terms of the Lesser General Public License (LGPL).  For more information,
+see http://www.fsf.org/licenses/lgpl.txt
+ 
+=cut

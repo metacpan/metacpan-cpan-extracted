@@ -25,7 +25,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.207';
+our $VERSION = '1.208';
 
 use Time::HiRes ();
 use Quiq::Duration;
@@ -94,6 +94,10 @@ Zeichenkette, die jeder Meldung im Log vorangestellt wird.
 
 Unterdrücke stdout und stderr.
 
+=item sloppy => $bool
+
+Ignoriere den Exitcode.
+
 =item time => $bool (Default: 0)
 
 Gib nach jedem Kommando die Zeit aus, die es benötigt hat.
@@ -132,6 +136,7 @@ sub new {
         logRewrite => undef,
         msgPrefix => '',
         quiet => 0,
+        sloppy => 0,
         time => 0,
         timePrefix => '',
         timeSummary => 0,
@@ -295,7 +300,7 @@ sub exec {
     my $capture = undef;
     my $outputTo = undef;
     my $quiet = $self->get('quiet');
-    my $sloppy = 0;
+    my $sloppy = $self->get('sloppy');
 
     if (@_) {
         Quiq::Option->extract(\@_,
@@ -572,7 +577,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.207
+1.208
 
 =head1 AUTHOR
 

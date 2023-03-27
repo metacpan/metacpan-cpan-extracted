@@ -1,3 +1,108 @@
+version 0.010; 2023-03-24
+
+  * bugfix: interact nicely with lexical subroutines on Perl 5.17.4
+    and above
+
+  * bugfix: avoid overrunning Perl's value stack on threading Perl builds
+
+  * bugfix: where cancellation of a lexical item is requested via
+    unimportation, and a specific referent to cancel is given, don't
+    cancel if the specific referent was previously set up but has been
+    shadowed by a core lexical item
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints
+    (for more comprehensive coverage, for not breaking version-implied
+    features, and for require argument context)
+
+  * thread safety: use thread-safe wrap_op_checker() API to control
+    op checking
+
+  * thread safety: avoid using thread-unaware static storage to cache
+    thread-specific Perl values
+
+  * port to Perl 5.21.7 which made PADNAME a distinct type
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * port to Perl 5.33.1, which defines a PERL_VERSION_GE() macro that
+    clashes with the one this module previously had
+
+  * in a couple of tests, work around a bug in Perl 5.37.4 (which was
+    fixed in Perl 5.37.5) which caused false test failures
+
+  * in documentation and error messages, make explicit distinction
+    between Lexical::Var lexical variables/subroutines and core lexical
+    variables/subroutines
+
+  * use some pad API features more cleanly
+
+  * be more conservative about the fake referent used when constructing
+    references to lexically-established scalars
+
+  * in a test, avoid a context problem when combining is_deeply and eval
+
+  * future-proof pad handling for the possibility of PL_comppad being
+    the target pad
+
+  * put whitespace around C string literals being pasted, for C++11
+    compatibility
+
+  * make ->unimport methods return an empty list
+
+  * test that suppression of a lexical subroutine brings the package
+    subroutine back into effect not just for calling, but also for the
+    syntactic and semantic effects of prototypes
+
+  * test with key/value array slices and key/value hash slices available
+    from Perl 5.19.4
+
+  * test that pad operations work correctly around lexical imports from
+    the builtin modle available from Perl 5.35.7
+
+  * test that pad operations work correctly around fields and $self in
+    the new core class system available from Perl 5.37.9
+
+  * test superficially the ability to operate with threads
+
+  * test that all modules have matching version numbers
+
+  * don't apply the fake referent workaround for buggy core checking of
+    rv2Xv ops on Perl 5.21.4 and above, where the bug has been fixed
+
+  * in test suite, suppress shadowing warnings by category, rather than
+    discarding all warnings
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * delete undocumented partially-developed functions
+
+  * in XS declare as const some data that never changes
+
+  * update the manipulation of read-only flags to account for the
+    SVf_PROTECT introduced in Perl 5.21.5, although the only code that
+    manipulates those flags isn't actually used on Perl versions new
+    enough to have the new flag
+
+  * use new names for pad API items such as PadnameOURSTASH()
+
+  * in XS, rename some poorly-named variables and functions
+
+  * in XS, refactor Perl version comparisons
+
+  * in XS, better argument parenthesisation in some macros
+
+  * avoid some compiler warnings that arise on Perl 5.6
+
+  * rename internal gen_*_op() function into a better style
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.009; 2013-08-25
 
   * update for perl 5.19.3's tracking of the last named item in a pad

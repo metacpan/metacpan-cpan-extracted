@@ -28,7 +28,6 @@ lib/Geo/Coder/Free/Display/index.pm
 lib/Geo/Coder/Free/Display/query.pm
 lib/Geo/Coder/Free/Local.pm
 lib/Geo/Coder/Free/MaxMind.pm
-lib/Geo/Coder/Free/MaxMind/databases/MAXMIND.LICENCE
 lib/Geo/Coder/Free/OpenAddresses.pm
 lib/Geo/Coder/Free/Utils.pm
 LICENSE
@@ -63,6 +62,7 @@ t/noplan.t
 t/openaddr.t
 t/pod-cm.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
@@ -73,8 +73,9 @@ t/unused.t
 t/used.t
 t/vars.t
 t/whosonfirst.t
-templates/Geo/Coder/Free/Display/index.tmpl
-templates/Geo/Coder/Free/Display/query.txt
+templates/default/Geo/Coder/Free/Display/index.tmpl
+templates/default/Geo/Coder/Free/Display/query.txt
+templates/fr/Geo/Coder/Free/Display/index.tmpl
 typhoon/openaddresses.ddl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

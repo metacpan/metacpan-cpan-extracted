@@ -1,5 +1,19 @@
 Revision history for Perl module and script App::paperback.
 
+1.42  Mon Mar 27 15:00:00 2023
+	- Further change 2022 to 2023!
+
+1.41  Mon Mar 27 12:00:00 2023
+	- Increase read buffer from 200 to 1024 bytes
+
+1.40  Mon Mar 27 09:30:00 2023
+	- Change 2022 to 2023!
+
+1.39  Mon Mar 27 09:00:00 2023
+	- Harmonize error messages. Shorten some processing.
+
+1.38  Sat Mar 25 15:00:00 2023
+	- Just process Root and Pages once in getPage (first page)
 
 1.37  Mon Oct 3 09:00:00 2022
 	- Fix regression in calcRotateMatrix

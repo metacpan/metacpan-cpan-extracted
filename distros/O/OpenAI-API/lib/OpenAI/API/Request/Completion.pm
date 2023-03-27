@@ -51,7 +51,7 @@ OpenAI::API::Request::Completion - completions endpoint
         temperature => 0,
     );
 
-    my $res = $request->send();
+    my $res = $request->send();    # or: $request->send( http_response => 1 );
 
     my $text = $res->{choices}[0]{text};
 

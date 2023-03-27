@@ -4,13 +4,13 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lexical-Var",
    "prereqs" : {
@@ -19,6 +19,7 @@
             "ExtUtils::CBuilder" : "0.15",
             "Module::Build" : "0",
             "Test::More" : "0",
+            "if" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -37,7 +38,7 @@
             "B::Hooks::OP::Check" : "< 0.19"
          },
          "requires" : {
-            "Lexical::SealRequireHints" : "0.006",
+            "Lexical::SealRequireHints" : "0.012",
             "XSLoader" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -48,18 +49,23 @@
    "provides" : {
       "Lexical::Sub" : {
          "file" : "lib/Lexical/Sub.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Lexical::Var" : {
          "file" : "lib/Lexical/Var.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Lexical-Var@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Lexical-Var"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.009"
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

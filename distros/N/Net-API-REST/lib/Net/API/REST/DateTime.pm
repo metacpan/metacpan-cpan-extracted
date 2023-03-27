@@ -199,7 +199,6 @@ sub parse_date
     {
         $tz = '';
     }
-    $self->messagef( 3, "Returning: %04d-%02d-%02d %02d:%02d:%02d%s", $yr, $mon, $day, $hr, $min, $sec, $tz );
     return( sprintf( "%04d-%02d-%02d %02d:%02d:%02d%s",
            $yr, $mon, $day, $hr, $min, $sec, $tz ) );
 }
@@ -213,7 +212,6 @@ sub str2datetime
     ## e.g. Sun, 06 Oct 2019 06:41:11 GMT
     if( $str =~ /^[SMTWF][a-z][a-z], (\d{2}) ([JFMAJSOND][a-z][a-z]) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT$/ )
     {
-    	$self->message( 3, "Found a strictl compliant http date string: '$str'." );
     	my $d;
     	try
     	{
@@ -235,7 +233,6 @@ sub str2datetime
     }
     
     my @d = $self->parse_date( $str );
-    $self->message( 3, "Parsing string '$str' yielded: ", sub{ $self->dumper( \@d ) } );
     return if( !scalar( @d ) );
 #     $d[ 0 ] -= 1900;  ## year
 #     $d[ 1 ]--;        ## month
@@ -301,7 +298,6 @@ sub str2datetime
 		}
     }
     
-    ## $self->message( 3, "Generating a DateTime object." );
 	try
 	{
 		my $dt = DateTime->new(

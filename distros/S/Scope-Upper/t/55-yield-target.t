@@ -81,6 +81,8 @@ SKIP: {
 SKIP: {
  skip 'perl 5.10 is required to test interaction with given/when' => 6
                                                                 if "$]" < 5.010;
+ skip 'Not testing deprecated given/when on Perl 5.37.10 or later'
+      => 6 if "$]" >= 5.037010;
 
  @res = eval <<'TESTCASE';
   BEGIN {

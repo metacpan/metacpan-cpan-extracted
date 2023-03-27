@@ -1,5 +1,7 @@
 Revision history for Log-AutoDump
 
+0.23    pod
+
 0.22    enable Data::Dumper's Purity
 
 0.21    enable Data::Dumper's Deepcopy variable

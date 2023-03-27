@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.157   2023-03-26
+        - Term::Choose minimum version 1.759.
+        - Enable color in print_single_row.
+
 0.156   2023-03-12
         - Bugfix validation option 'binary_filter'
 

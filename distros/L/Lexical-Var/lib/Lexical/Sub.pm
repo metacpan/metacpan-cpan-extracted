@@ -4,8 +4,8 @@ Lexical::Sub - subroutines without namespace pollution
 
 =head1 SYNOPSIS
 
-	use Lexical::Sub quux => sub { $_[0] + 1 };
-	use Lexical::Sub carp => \&Carp::carp;
+    use Lexical::Sub quux => sub { $_[0] + 1 };
+    use Lexical::Sub carp => \&Carp::carp;
 
 =head1 DESCRIPTION
 
@@ -33,12 +33,21 @@ A name definition supplied by this module takes effect from the end of the
 definition statement up to the end of the immediately enclosing block,
 except where it is shadowed within a nested block.  This is the same
 lexical scoping that the C<my>, C<our>, and C<state> keywords supply.
+Definitions from L<Lexical::Sub> and from C<my>/C<our>/C<state> can
+shadow each other, on Perl versions where these duration keywords can
+be applied to subroutines (5.17.4 and later), except that L<Lexical::Sub>
+can't shadow a C<my>/C<our>/C<state> subroutine prior to Perl 5.19.1.
 These lexical definitions propagate into string C<eval>s, on Perl versions
 that support it (5.9.3 and later).
 
+This module only manages subroutines of static duration (the kind of
+duration that subroutines declared without C<my> have).
+To get a fresh subroutine for each invocation of a function, use C<my
+sub>, on a Perl version that supports it (5.17.4 and later).
+
 This module is implemented through the mechanism of L<Lexical::Var>.
-Its distinct name and declaration syntax exist to make lexical subroutine
-declarations clearer.
+Its distinct name and declaration syntax exist to make
+L<Lexical::Var> lexical subroutine declarations clearer.
 
 =cut
 
@@ -48,7 +57,7 @@ package Lexical::Sub;
 use warnings;
 use strict;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 require Lexical::Var;
 die "mismatched versions of Lexical::Var and Lexical::Sub modules"
@@ -88,7 +97,8 @@ the parser needs to look up the subroutine early, in order to let any
 prototype affect parsing, and it looks up the subroutine by a different
 mechanism than is used to generate the call op.  (Some forms of sigilless
 call have other complications of a similar nature.)  If an attempt
-is made to call a lexical subroutine via a bareword on an older Perl,
+is made to call a L<Lexical::Sub>
+lexical subroutine via a bareword on an older Perl,
 this module will probably still be able to intercept the call op, and
 will throw an exception to indicate that the parsing has gone wrong.
 However, in some cases compilation goes further wrong before this
@@ -107,6 +117,11 @@ lexically-defined subroutines for this purpose.  The call interpretation
 can be forced by prefixing the first argument expression with a C<+>,
 or by wrapping the whole argument list in parentheses.
 
+In the earlier Perl versions that support C<my>/C<our>/C<state>
+subroutines, starting from Perl 5.17.4, the mechanism for core lexical
+subroutines suffers a couple of bugs that mean that L<Lexical::Sub> can't
+shadow subroutines declared that way.  This was fixed in Perl 5.19.1.
+
 Package hash entries get created for subroutine names that are used,
 even though the subroutines are not actually being stored or looked
 up in the package.  This can occasionally result in a "used only once"
@@ -122,6 +137,10 @@ on the same Perl versions.  Other kinds of indirection
 within a C<BEGIN> block, such as calling via a normal function, do not
 cause this problem.
 
+When judging whether the C<unimport> method should hide a subroutine,
+this module can't distinguish between a lexical subroutine established
+by this module and a C<state> subroutine.  This may change in the future.
+
 =head1 SEE ALSO
 
 L<Lexical::Import>,
@@ -133,7 +152,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011, 2012, 2013
+Copyright (C) 2009, 2010, 2011, 2012, 2013, 2023
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

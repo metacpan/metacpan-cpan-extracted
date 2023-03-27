@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Needs App::csv2sqlite
+
 set -e
 set -x
 

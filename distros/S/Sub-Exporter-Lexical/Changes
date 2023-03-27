@@ -1,4 +1,9 @@
-Revision history for 5663624464
+Revision history for 4706634976
+
+1.000     2023-03-24 11:17:23-04:00 America/New_York
+        - This version should work on v5.12+ but ONLY if you have a working
+          Lexical::Sub installed (or are on v5.37.2 or later).  This requires
+          Lexical::Var 0.10, just released.
 
 0.100000  2023-01-10 21:58:54-05:00 America/New_York
         - switch guts to builtin::export_lexically

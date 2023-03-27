@@ -1,8 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More tests => 12;
-
+use Test2::V0;
 use File::Open;
 
 ok defined &File::Open::fopen;
@@ -18,3 +14,5 @@ ok !exists &fsysopen;
 ok !exists &fsysopen_nothrow;
 ok !exists &fopendir;
 ok !exists &fopendir_nothrow;
+
+done_testing;

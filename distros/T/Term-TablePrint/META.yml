@@ -23,7 +23,7 @@ requires:
   Exporter: '0'
   List::Util: '1.33'
   Scalar::Util: '0'
-  Term::Choose: '1.757'
+  Term::Choose: '1.759'
   Term::Choose::Util: '0.137'
   Term::Form::ReadLine: '0.552'
   constant: '0'
@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-TablePrint/issues
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.156'
+version: '0.157'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

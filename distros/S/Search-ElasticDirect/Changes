@@ -1,5 +1,8 @@
 Revision history for Search::ElasticDirect
 
+2.5.2  2023-03-24 13:10:00+02:00 Europe/Athens
+  - Fix a bug certification check when both certca, key, cert were defined
+
 2.5.1  2023-03-20 18:30:00+02:00 Europe/Athens
   - The connect method deleted. Its functionality merged to the new()
   - POD edit
