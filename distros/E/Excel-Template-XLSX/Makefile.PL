@@ -3,21 +3,21 @@ require 5.012000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Excel::Template::XLSX',
   'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
-  'VERSION_FROM' => 'lib/Excel/Template/XLSX.pm',
   'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'Test::Differences' => 0,
-                   'Graphics::ColorUtils' => 0,
-                   'Test::CheckManifest' => '1.29',
                    'Excel::Writer::XLSX' => '1.01',
-                   'Test::More' => 0,
+                   'Test::CheckManifest' => '1.29',
                    'XML::Twig' => 0,
+                   'Template::Tiny' => 0,
+                   'Test::Differences' => 0,
                    'Scalar::Util' => 0,
+                   'Test::More' => 0,
                    'Archive::Zip' => 0,
-                   'Template::Tiny' => 0
-                 }
+                   'Graphics::ColorUtils' => 0
+                 },
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Excel/Template/XLSX.pm',
+  'NAME' => 'Excel::Template::XLSX'
 )
 ;

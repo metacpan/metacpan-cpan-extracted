@@ -1,0 +1,11 @@
+0.004   2023-03-30  Released-By: PERLANCAR
+
+        - First release, moved Data::Sah::Value::perl::Path::filenames from
+          Data-Sah-DefaultValue.
+
+        - [incompatible change] [perl rule Path::filenames] Rename argument
+          'recursive' to 'recurse', 'include' to 'include_name_pattern',
+          'exclude' to 'exclude_name_pattern'.
+
+        - [perl rule Path::filenames] Add arguments 'include_type',
+          'exclude_type'.

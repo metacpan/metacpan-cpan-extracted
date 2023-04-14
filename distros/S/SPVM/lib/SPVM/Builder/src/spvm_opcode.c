@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_opcode.h"
 #include "spvm_compiler.h"
 #include "spvm_allocator.h"

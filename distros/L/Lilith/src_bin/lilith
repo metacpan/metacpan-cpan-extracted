@@ -14,9 +14,11 @@ lilith [B<-c> <config>] B<-a> create_tables
 
 lilith [B<-c> <config>] B<-a> dump_self
 
-lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--id> <row_id>
+lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--id> <row_id> [B<--raw>]
 
-lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--event> <event_id>
+lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--event> <event_id> [B<--raw>]
+
+lilith [B<-c> <config>] B<-a> extend [B<-Z>] [B<-m> <minutes>]
 
 lilith [B<-c> <config>] B<-a> generate_baphomet_yamls B<--dir> <dir>
 
@@ -85,6 +87,19 @@ Fetch event via row ID.
 
 Fetch the event via the event ID.
 
+=head2 extend
+
+Prints a LibreNMS style extend.
+
+=head3 -Z
+
+Enable Gzip+Base64 LibreNMS style extend compression.
+
+=head3 -m <minutes>
+
+How far back to search. For the extend action, 5 minutes
+is the default.
+
 =head2 -a generate_baphomet_yamls
 
 Generate the YAMLs for Baphomet.
@@ -123,6 +138,8 @@ The output type.
 How far back to to in minutes.
 
     - Default :: 1440
+
+    - Default, extend :: 5
 
 =head4 --order <column>
 
@@ -481,6 +498,9 @@ Description :: Fetch the information for the specified event.
 --event <id>   Event ID to fetch.
                Default :: undef
 
+--raw          Print the raw EVE JSON.
+               Default :: undef
+
 Action :: extend
 Description :: LibreNMS style SNMP extend.
 
@@ -727,6 +747,7 @@ my $user  = 0;
 my $group = 0;
 my $librenms_compress;
 my $dir;
+my $raw;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -1374,7 +1395,6 @@ if ( $action eq 'class_map' ) {
 #
 # print short SNMP class names
 #
-
 
 if ( $action eq 'get_short_class_snmp_list' ) {
 	my $class_list = $lilith->get_short_class_snmp_list;

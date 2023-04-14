@@ -1,3 +1,7 @@
+0.020     2023-04-06 09:41:11-07:00 America/Los_Angeles
+
+    - Add ability to peek at a line that is being buffered
+
 0.019     2021-01-04 23:13:09-08:00 America/Los_Angeles
 
     - Add 'pending_data' method

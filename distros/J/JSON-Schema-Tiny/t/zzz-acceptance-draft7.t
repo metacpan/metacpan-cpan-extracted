@@ -42,6 +42,7 @@ acceptance_tests(
           optional/content.json
         ) ] },
       { file => 'definitions.json', group_description => [ 'valid definition', 'validate definition against metaschema' ] },
+      # only same-document, same-base JSON pointers are supported in $ref
       { file => 'ref.json', group_description => [
           '$ref prevents a sibling $id from changing the base uri',
           'remote ref, containing refs itself',
@@ -52,6 +53,10 @@ acceptance_tests(
           'relative refs with absolute uris and defs',
           '$id must be resolved against nearest parent, not just immediate parent',
           'URN base URI with URN and anchor ref',
+          'ref to if',
+          'ref to then',
+          'ref to else',
+          'ref with absolute-path-reference',
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
       { file => 'optional/cross-draft.json', group_description => 'refs to future drafts are processed as future drafts' },

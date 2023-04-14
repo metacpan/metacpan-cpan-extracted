@@ -18,7 +18,7 @@ my @test_cases = (
     {
         method            => 'models',
         params            => {},
-        expected_response => superhashof(
+        expected_response => noclass(superhashof(
             {
                 object => 'list',
                 data   => array_each(
@@ -32,12 +32,12 @@ my @test_cases = (
                     )
                 ),
             }
-        ),
+        )),
     },
     {
         method            => 'model_retrieve',
         params            => { model => 'text-davinci-003' },
-        expected_response => {
+        expected_response => noclass({
             id         => 'text-davinci-003',
             created    => ignore(),
             object     => 'model',
@@ -45,7 +45,7 @@ my @test_cases = (
             parent     => ignore(),
             permission => array_each( ignore() ),
             root       => 'text-davinci-003',
-        },
+        }),
     },
 
 );

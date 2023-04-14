@@ -10,28 +10,39 @@ SYNOPSIS
      $obj->parse_handle($input_file_handler, $out);
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = PYX::Hist->new(%parameters);
 
-            *       "output_handler"
+    Constructor.
 
-                     Output handler.
-                     Default value is \*STDOUT.
+    *       "output_handler"
 
-    "parse($pyx[, $out])"
-             Parse PYX text or array of PYX text and print histogram of PYX input.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+             Output handler.
+             Default value is \*STDOUT.
 
-    "parse_file($input_file[, $out])"
-             Parse file with PYX data and print histogram of PYX input.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+  "parse"
+     $obj->parse($pyx, $out);
 
-    "parse_handler($input_file_handler[, $out])"
-             Parse PYX handler and print histogram of PYX input.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+    Parse PYX text or array of PYX text and print histogram of PYX input. If
+    $out not present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_file"
+     $obj->parse_file($input_file, $out);
+
+    Parse file with PYX data and print histogram of PYX input. If $out not
+    present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_handler"
+     $obj->parse_handle($input_file_handler, $out);
+
+    Parse PYX handler and print histogram of PYX input. If $out not present,
+    use 'output_handler'.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -159,10 +170,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2014-2020 Michal Josef Špaček
+    © 2014-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.07
 

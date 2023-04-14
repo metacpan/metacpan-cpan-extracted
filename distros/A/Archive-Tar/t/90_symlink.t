@@ -24,7 +24,7 @@ my %Map     = (
     ],
     File::Spec->catfile( $Dir, "linktest_missing_dir.tar" ) => [
         [ 0, qr/SECURE EXTRACT MODE/ ],
-        [ 0, qr/File exists/ ],
+        [ 0, qr/Could not create directory/ ],
     ],
 );
 

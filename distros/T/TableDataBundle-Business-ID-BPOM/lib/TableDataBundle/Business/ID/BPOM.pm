@@ -3,9 +3,9 @@
 package TableDataBundle::Business::ID::BPOM;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-27'; # DATE
+our $DATE = '2023-02-07'; # DATE
 our $DIST = 'TableDataBundle-Business-ID-BPOM'; # DIST
-our $VERSION = '20221027.0.0'; # VERSION
+our $VERSION = '20230207.0.0'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules related to Indonesia's BPOM (Badan Pengawas Obat dan Makanan, or the National Agency or Drug and Food Control)
@@ -22,7 +22,7 @@ TableDataBundle::Business::ID::BPOM - Collection of TableData:: modules related 
 
 =head1 VERSION
 
-This document describes version 20221027.0.0 of TableDataBundle::Business::ID::BPOM (from Perl distribution TableDataBundle-Business-ID-BPOM), released on 2022-10-27.
+This document describes version 20230207.0.0 of TableDataBundle::Business::ID::BPOM (from Perl distribution TableDataBundle-Business-ID-BPOM), released on 2023-02-07.
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

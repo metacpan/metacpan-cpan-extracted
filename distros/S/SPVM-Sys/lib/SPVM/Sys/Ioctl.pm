@@ -27,3 +27,10 @@ See the L<ioctl|https://linux.die.net/man/2/ioctl> function in Linux.
 On Windows, C<ioctl> calls C<ioctlsocket>.
 
 See the L<ioctlsocket|https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-ioctlsocket> function in Windows.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

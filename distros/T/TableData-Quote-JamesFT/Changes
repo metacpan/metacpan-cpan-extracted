@@ -1,3 +1,10 @@
+0.003   2023-02-07  Released-By: PERLANCAR; Urgency: low
+
+        - No data changes.
+
+        - [dzil] Add TableData plugins.
+
+
 0.002   2021-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename module Tables::Quotes::JamesFT ->

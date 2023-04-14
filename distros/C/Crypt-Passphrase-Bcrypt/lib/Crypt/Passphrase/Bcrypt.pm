@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Bcrypt;
-$Crypt::Passphrase::Bcrypt::VERSION = '0.006';
+$Crypt::Passphrase::Bcrypt::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -43,6 +43,10 @@ sub verify_password {
 	return bcrypt_check_prehashed($password, $hash);
 }
 
+sub binary_safe {
+	return 0;
+}
+
 1;
 
 #ABSTRACT: A bcrypt encoder for Crypt::Passphrase
@@ -59,7 +63,7 @@ Crypt::Passphrase::Bcrypt - A bcrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

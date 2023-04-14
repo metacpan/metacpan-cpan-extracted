@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Value::Property;
@@ -33,3 +33,26 @@ $ret = Wikibase::Datatype::Print::Value::Property::print($obj, {
 	'cb' => $cache,
 });
 is($ret, 'instance of', 'Get printed value (translated).');
+
+# Test.
+$cache = Wikibase::Cache::Backend::Basic->new;
+$obj = Wikibase::Datatype::Value::Property->new(
+	'value' => 'P1963',
+);
+$ret = Wikibase::Datatype::Print::Value::Property::print($obj, {
+	'cb' => $cache,
+});
+is($ret, 'P1963', 'Get printed value (not translated).');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Property->new(
+	'value' => 'P31',
+);
+eval {
+	Wikibase::Datatype::Print::Value::Property::print($obj, {
+		'cb' => 'bad_callback',
+	});
+};
+is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache::Backend.\n",
+	"Option 'cb' must be a instance of Wikibase::Cache::Backend.");
+clean();

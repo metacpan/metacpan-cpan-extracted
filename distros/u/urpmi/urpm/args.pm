@@ -270,7 +270,6 @@ my %options_spec = (
 	    $options{recommends} = 1;
 	},
 	suggests => sub { 
-	    $urpm->{error}("--suggests now displays the suggested packages, see --allow-suggests for previous behaviour");
 	    $urpm->{error}("You should now use --recommends.");
 	    $options{recommends} = 1;
 	},
@@ -285,10 +284,7 @@ my %options_spec = (
 	force => \$options{force},
 	'parallel=s' => \$options{parallel},
 	'env=s' => \$options{env},
-	requires => sub {
-	    $urpm->{error}("--requires behaviour changed, use --requires-recursive to get the old behaviour");
-	    $options{requires} = 1;
-	},
+	requires => sub { $options{requires} = 1 },
 	'requires-recursive|d' => \$options{deps},
 	u => \$options{upgrade},
 	a => \$options{all},

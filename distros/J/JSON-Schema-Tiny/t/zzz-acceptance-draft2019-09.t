@@ -51,6 +51,8 @@ acceptance_tests(
           vocabulary.json
         ) ] },
       { file => 'defs.json', group_description => [ 'valid definition', 'validate definition against metaschema' ] },
+      { file => 'not.json', group_description => 'collect annotations inside a \'not\', even if collection is disabled' },
+      # only same-document, same-base JSON pointers are supported in $ref
       { file => 'ref.json', group_description => [
           'remote ref, containing refs itself',
           'Recursive references between schemas',
@@ -61,6 +63,10 @@ acceptance_tests(
           'order of evaluation: $id and $anchor and $ref',
           'URN base URI with URN and anchor ref',
           'URN ref with nested pointer ref',
+          'ref to if',
+          'ref to then',
+          'ref to else',
+          'ref with absolute-path-reference',
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
       { file => 'optional/cross-draft.json', group_description => [

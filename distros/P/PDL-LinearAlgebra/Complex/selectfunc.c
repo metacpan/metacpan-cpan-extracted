@@ -28,9 +28,10 @@ extern Core *PDL;
 int xerbla_(char *sub, int *info) { return 0; }
 
 #define SEL_FUNC2(letter, letter2, type, pdl_type, args, init, uninit) \
-  static SV* letter ## letter2 ## select_func; \
+  static SV* letter ## letter2 ## select_func = NULL; \
   void letter ## letter2 ## select_func_set(SV* func) { \
-    letter ## letter2 ## select_func = func; \
+    if (letter ## letter2 ## select_func) SvREFCNT_dec(letter ## letter2 ## select_func); \
+    SvREFCNT_inc(letter ## letter2 ## select_func = func); \
   } \
   PDL_Long letter ## letter2 ## select_wrapper args \
   { \

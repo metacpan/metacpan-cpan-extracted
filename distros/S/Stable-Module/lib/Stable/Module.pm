@@ -5,10 +5,10 @@ package Stable::Module;
 #
 # http://search.cpan.org/dist/Stable-Module/
 #
-# Copyright (c) 2014, 2016, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2014, 2016, 2017, 2018, 2019, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.09';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -20,6 +20,7 @@ use IO::File;
 
 use vars qw($re_char $hide_stderr);
 
+#---------------------------------------------------------------------
 sub VERSION {
     my($self,$version) = @_;
     if ($version != $Stable::Module::VERSION) {
@@ -28,6 +29,7 @@ sub VERSION {
     }
 }
 
+#---------------------------------------------------------------------
 sub BEGIN {
     if (($^O eq 'MSWin32') and (defined $ENV{'OS'}) and ($ENV{'OS'} eq 'Windows_NT')) {
         $hide_stderr = '2>NUL';
@@ -37,6 +39,7 @@ sub BEGIN {
     }
 }
 
+#---------------------------------------------------------------------
 sub import {
     my($caller,$filename,$line) = caller;
 
@@ -177,10 +180,12 @@ sub import {
     *IO::Handle::say   = \&_say if not defined(*IO::Handle::say);
 }
 
+#---------------------------------------------------------------------
 sub unimport {
     # nothing
 }
 
+#---------------------------------------------------------------------
 sub _fileparse {
     my($fullname,@suffixlist) = @_;
 
@@ -238,6 +243,7 @@ sub _fileparse {
     }
 }
 
+#---------------------------------------------------------------------
 sub _basename {
     my($fullname,@suffixlist) = @_;
 
@@ -305,6 +311,7 @@ sub _basename {
     return $name;
 }
 
+#---------------------------------------------------------------------
 sub _dirname {
     my($fullname) = @_;
 
@@ -326,6 +333,7 @@ sub _dirname {
     return $dirname;
 }
 
+#---------------------------------------------------------------------
 sub _strip_trailing_sep {
     my($dirname) = @_;
 
@@ -339,6 +347,7 @@ sub _strip_trailing_sep {
     return join '', @char;
 }
 
+#---------------------------------------------------------------------
 sub _mkpath {
     my $path = _dos_path($_[0]);
 
@@ -388,6 +397,7 @@ sub _mkpath {
     }
 }
 
+#---------------------------------------------------------------------
 sub _rmtree {
     my $root = _dos_path($_[0]);
 
@@ -427,6 +437,7 @@ sub _rmtree {
     }
 }
 
+#---------------------------------------------------------------------
 sub _copy {
     my $source = _dos_path($_[0]);
     my $dest   = _dos_path($_[1]);
@@ -442,6 +453,7 @@ sub _copy {
     }
 }
 
+#---------------------------------------------------------------------
 sub _move {
     my $source = _dos_path($_[0]);
     my $dest   = _dos_path($_[1]);
@@ -457,6 +469,7 @@ sub _move {
     }
 }
 
+#---------------------------------------------------------------------
 sub _dos_path {
     my($path) = @_;
 
@@ -466,6 +479,7 @@ sub _dos_path {
     return $path;
 }
 
+#---------------------------------------------------------------------
 sub _is_directory {
     my($unknown) = @_;
 
@@ -478,6 +492,7 @@ sub _is_directory {
     return undef;
 }
 
+#---------------------------------------------------------------------
 sub _MSWin32_5Cended_path {
     if ((@_ >= 1) and ($_[0] ne '')) {
         if ($^O =~ /\A (?: MSWin32 | NetWare | symbian | dos ) \z/oxms) {
@@ -490,6 +505,7 @@ sub _MSWin32_5Cended_path {
     return undef;
 }
 
+#---------------------------------------------------------------------
 sub _first(&@) {
     my $coderef = shift @_;
     for (@_) {
@@ -500,6 +516,7 @@ sub _first(&@) {
     return undef;
 }
 
+#---------------------------------------------------------------------
 sub _shuffle(@) {
     my @a = \(@_);
     my $n;
@@ -507,11 +524,13 @@ sub _shuffle(@) {
     return map { $n = rand($i--); (${$a[$n]}, $a[$n] = $a[$i])[0]; } @_;
 }
 
+#---------------------------------------------------------------------
 sub _uniq {
     my %seen = ();
     return grep { not $seen{$_}++ } @_;
 }
 
+#---------------------------------------------------------------------
 sub _say {
     my $currfh = select();
     my $handle;
@@ -540,8 +559,7 @@ Stable::Module - frequently used modules on Perl5 application
 
 =head1 DESCRIPTION
 
-Stable::Module provides frequently used modules on Perl5 application, on both
-modern Perl and traditional Perl.
+Stable::Module provides frequently used modules on Perl5 application, on both modern Perl and traditional Perl.
 
 Stable::Module works as:
 
@@ -557,12 +575,12 @@ Stable::Module works as:
   use List::MoreUtils qw(all any none notall uniq);
   use feature         qw(say);
 
-fileparse, basename, dirname, mkpath, rmtree, copy, and move can treat multibyte
-encoding of path name.
+fileparse, basename, dirname, mkpath, rmtree, copy, and move can treat multibyte encoding of path name.
 
 =head1 BUGS
 
-  It is not possible to specify a regular expression to @suffixes.
+It is not possible to specify a regular expression to @suffixes.
+
   my @fileparse = fileparse($path, @suffixes);
   my $basename  = basename($path, @suffixes);
 
@@ -574,20 +592,21 @@ This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
-=over 4
+=over 2
 
-=item * L<ina|http://search.cpan.org/~ina/> - CPAN
+=item *
 
-=item * L<The BackPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - A Complete History of CPAN
+L<ina|http://search.cpan.org/~ina/> - CPAN
+
+=item *
+
+L<The BackPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - A Complete History of CPAN
 
 =back
 

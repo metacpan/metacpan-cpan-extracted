@@ -21,11 +21,11 @@ use Archive::Tar;
 use IO::File;
 use IO::Uncompress::Unzip qw($UnzipError);
 use File::stat;
+use Config;
 #
 my $libver;
-my $CFLAGS = ' ';
-
-# = ' -DNDEBUG -DBOOST_DISABLE_ASSERTS -O2 -ffast-math -funroll-loops -fno-align-functions -fno-align-loops';
+my $CFLAGS = $Config{osname} eq 'MSWin32' ? '' :
+    ' -DNDEBUG -DBOOST_DISABLE_ASSERTS -O2 -ffast-math -fno-align-functions -fno-align-loops -fno-omit-frame-pointer ';
 my $LDFLAGS = ' ';    # https://wiki.freebsd.org/LinkTimeOptimization
 #
 sub write_file {
@@ -306,8 +306,7 @@ sub alien {
                 chdir $kid->absolute->stringify;
                 warn($_) && system($_ )
                     for './configure --prefix=' .
-                    $pre->absolute,    # . ' CFLAGS="-Ofast" LDFLAGS="-Ofast"',
-                    'make', 'make install';
+                    $pre->absolute . ' CFLAGS="-Ofast" LDFLAGS="-Ofast" ', 'make', 'make install';
                 chdir $cwd->stringify;
             }
             else {
@@ -327,7 +326,7 @@ sub process_xs {
     push @parts, my $file_base = basename( $source, '.xs' );
     my $archdir = catdir( qw/blib arch auto/, @parts );
     my $tempdir = 'temp';
-    my $c_file  = catfile( $tempdir, "$file_base.c" );
+    my $c_file  = catfile( $tempdir, "$file_base.cxx" );
     require ExtUtils::ParseXS;
     mkpath( $tempdir, $opt{verbose}, oct '755' );
     ExtUtils::ParseXS::process_file(

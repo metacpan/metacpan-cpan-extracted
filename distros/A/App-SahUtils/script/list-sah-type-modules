@@ -8,9 +8,9 @@ use Perinci::CmdLine::Any;
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -79,11 +79,15 @@ list-sah-type-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.482 of list-sah-type-modules (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of list-sah-type-modules (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
-B<list-sah-type-modules> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--dist-contains>=I<str>] [(B<--dist-in>=I<str>)+|B<--dist-in-json>=I<json>] [B<--dist-is>=I<str>] [B<--dist-isnt>=I<str>] [B<--dist-max>=I<str>] [B<--dist-min>=I<str>] [B<--dist-not-contains>=I<str>] [(B<--dist-not-in>=I<str>)+|B<--dist-not-in-json>=I<json>] [B<--dist-xmax>=I<str>] [B<--dist-xmin>=I<str>] [B<--dist>=I<str>] [(B<--exclude-field>=I<str>)+|B<--exclude-fields-json>=I<json>] [(B<--field>=I<str>)+|B<--fields-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--might-fail>|B<--no-might-fail>|B<--nomight-fail>] [B<--might-fail-is>|B<--no-might-fail-is>|B<--nomight-fail-is>] [B<--might-fail-isnt>|B<--no-might-fail-isnt>|B<--nomight-fail-isnt>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [(B<--prio-in>=I<int>)+|B<--prio-in-json>=I<json>] [B<--prio-is>=I<int>] [B<--prio-isnt>=I<int>] [B<--prio-max>=I<int>] [B<--prio-min>=I<int>] [(B<--prio-not-in>=I<int>)+|B<--prio-not-in-json>=I<json>] [B<--prio-xmax>=I<int>] [B<--prio-xmin>=I<int>] [B<--prio>=I<int>] [B<--random>|B<--no-random>|B<--norandom>] [B<--result-limit>=I<int>] [B<--result-start>=I<int>] [B<--rule-contains>=I<str>] [(B<--rule-in>=I<str>)+|B<--rule-in-json>=I<json>] [B<--rule-is>=I<str>] [B<--rule-isnt>=I<str>] [B<--rule-max>=I<str>] [B<--rule-min>=I<str>] [B<--rule-not-contains>=I<str>] [(B<--rule-not-in>=I<str>)+|B<--rule-not-in-json>=I<json>] [B<--rule-xmax>=I<str>] [B<--rule-xmin>=I<str>] [B<--rule>=I<str>] [(B<--sort>=I<str>)+|B<--sort-json>=I<json>] [B<--summary-contains>=I<str>] [(B<--summary-in>=I<str>)+|B<--summary-in-json>=I<json>] [B<--summary-is>=I<str>] [B<--summary-isnt>=I<str>] [B<--summary-max>=I<str>] [B<--summary-min>=I<str>] [B<--summary-not-contains>=I<str>] [(B<--summary-not-in>=I<str>)+|B<--summary-not-in-json>=I<json>] [B<--summary-xmax>=I<str>] [B<--summary-xmin>=I<str>] [B<--summary>=I<str>] [B<--v-arg>=I<str>] [B<--v-contains>=I<str>] [(B<--v-in>=I<str>)+|B<--v-in-json>=I<json>] [B<--v-is>=I<str>] [B<--v-isnt>=I<str>] [B<--v-max>=I<str>] [B<--v-min>=I<str>] [B<--v-not-contains>=I<str>] [(B<--v-not-in>=I<str>)+|B<--v-not-in-json>=I<json>] [B<--v-xmax>=I<str>] [B<--v-xmin>=I<str>] [B<--with-field-names>|B<--without-field-names>] -- [I<query>]
+B<list-sah-type-modules> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<list-sah-type-modules> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-sah-type-modules> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--dist-contains|/"--dist-contains=s">>=I<str>] [(B<L<--dist-in|/"--dist-in=s@">>=I<str>)+|B<L<--dist-in-json|/"--dist-in=s@">>=I<json>] [B<L<--dist-is|/"--dist-is=s">>=I<str>] [B<L<--dist-isnt|/"--dist-isnt=s">>=I<str>] [B<L<--dist-max|/"--dist-max=s">>=I<str>] [B<L<--dist-min|/"--dist-min=s">>=I<str>] [B<L<--dist-not-contains|/"--dist-not-contains=s">>=I<str>] [(B<L<--dist-not-in|/"--dist-not-in=s@">>=I<str>)+|B<L<--dist-not-in-json|/"--dist-not-in=s@">>=I<json>] [B<L<--dist-xmax|/"--dist-xmax=s">>=I<str>] [B<L<--dist-xmin|/"--dist-xmin=s">>=I<str>] [B<L<--dist|/"--dist=s">>=I<str>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--might-fail|/"--might-fail">>|B<L<--no-might-fail|/"--might-fail">>|B<L<--nomight-fail|/"--might-fail">>] [B<L<--might-fail-is|/"--might-fail-is">>|B<L<--no-might-fail-is|/"--might-fail-is">>|B<L<--nomight-fail-is|/"--might-fail-is">>] [B<L<--might-fail-isnt|/"--might-fail-isnt">>|B<L<--no-might-fail-isnt|/"--might-fail-isnt">>|B<L<--nomight-fail-isnt|/"--might-fail-isnt">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--prio-in|/"--prio-in=s@">>=I<int>)+|B<L<--prio-in-json|/"--prio-in=s@">>=I<json>] [B<L<--prio-is|/"--prio-is=s">>=I<int>] [B<L<--prio-isnt|/"--prio-isnt=s">>=I<int>] [B<L<--prio-max|/"--prio-max=s">>=I<int>] [B<L<--prio-min|/"--prio-min=s">>=I<int>] [(B<L<--prio-not-in|/"--prio-not-in=s@">>=I<int>)+|B<L<--prio-not-in-json|/"--prio-not-in=s@">>=I<json>] [B<L<--prio-xmax|/"--prio-xmax=s">>=I<int>] [B<L<--prio-xmin|/"--prio-xmin=s">>=I<int>] [B<L<--prio|/"--prio=s">>=I<int>] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [B<L<--rule-contains|/"--rule-contains=s">>=I<str>] [(B<L<--rule-in|/"--rule-in=s@">>=I<str>)+|B<L<--rule-in-json|/"--rule-in=s@">>=I<json>] [B<L<--rule-is|/"--rule-is=s">>=I<str>] [B<L<--rule-isnt|/"--rule-isnt=s">>=I<str>] [B<L<--rule-max|/"--rule-max=s">>=I<str>] [B<L<--rule-min|/"--rule-min=s">>=I<str>] [B<L<--rule-not-contains|/"--rule-not-contains=s">>=I<str>] [(B<L<--rule-not-in|/"--rule-not-in=s@">>=I<str>)+|B<L<--rule-not-in-json|/"--rule-not-in=s@">>=I<json>] [B<L<--rule-xmax|/"--rule-xmax=s">>=I<str>] [B<L<--rule-xmin|/"--rule-xmin=s">>=I<str>] [B<L<--rule|/"--rule=s">>=I<str>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--summary-contains|/"--summary-contains=s">>=I<str>] [(B<L<--summary-in|/"--summary-in=s@">>=I<str>)+|B<L<--summary-in-json|/"--summary-in=s@">>=I<json>] [B<L<--summary-is|/"--summary-is=s">>=I<str>] [B<L<--summary-isnt|/"--summary-isnt=s">>=I<str>] [B<L<--summary-max|/"--summary-max=s">>=I<str>] [B<L<--summary-min|/"--summary-min=s">>=I<str>] [B<L<--summary-not-contains|/"--summary-not-contains=s">>=I<str>] [(B<L<--summary-not-in|/"--summary-not-in=s@">>=I<str>)+|B<L<--summary-not-in-json|/"--summary-not-in=s@">>=I<json>] [B<L<--summary-xmax|/"--summary-xmax=s">>=I<str>] [B<L<--summary-xmin|/"--summary-xmin=s">>=I<str>] [B<L<--summary|/"--summary=s">>=I<str>] [B<L<--v-arg|/"--v-arg=s">>=I<str>] [B<L<--v-contains|/"--v-contains=s">>=I<str>] [(B<L<--v-in|/"--v-in=s@">>=I<str>)+|B<L<--v-in-json|/"--v-in=s@">>=I<json>] [B<L<--v-is|/"--v-is=s">>=I<str>] [B<L<--v-isnt|/"--v-isnt=s">>=I<str>] [B<L<--v-max|/"--v-max=s">>=I<str>] [B<L<--v-min|/"--v-min=s">>=I<str>] [B<L<--v-not-contains|/"--v-not-contains=s">>=I<str>] [(B<L<--v-not-in|/"--v-not-in=s@">>=I<str>)+|B<L<--v-not-in-json|/"--v-not-in=s@">>=I<json>] [B<L<--v-xmax|/"--v-xmax=s">>=I<str>] [B<L<--v-xmin|/"--v-xmin=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
 
 =head1 DESCRIPTION
 
@@ -539,11 +543,56 @@ Only return records where the 'v' field is greater than specified value.
 
 =over
 
-=item B<--query>=I<s>, B<-q>
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
 
 Search.
 
-Can also be specified as the 1st command-line argument.
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
 
 =back
 
@@ -762,7 +811,8 @@ List of available configuration parameters:
  prio.not_in (see --prio-not-in)
  prio.xmax (see --prio-xmax)
  prio.xmin (see --prio-xmin)
- query (see --query)
+ queries (see --query)
+ query_boolean (see --query-boolean)
  random (see --random)
  result_limit (see --result-limit)
  result_start (see --result-start)
@@ -848,7 +898,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

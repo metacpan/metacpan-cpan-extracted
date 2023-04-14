@@ -21,6 +21,7 @@ is_patch("001A \$x.\n003@ \$01", "  003@ \$01", "001A \$x.\n003@ \$01", 'nothing
 
 # TODO: ignore non-existing fields to remove
 
+is_diff("012X \$ab\n012X \$ab","","- 012X \$ab",'remove identical fields (sort)');
 
 # TODO: test keeping same fields before and after modifications
 # my $s = "000A \$0.";

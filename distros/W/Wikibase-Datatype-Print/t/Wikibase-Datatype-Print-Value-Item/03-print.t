@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Value::Item;
@@ -33,3 +33,26 @@ $ret = Wikibase::Datatype::Print::Value::Item::print($obj, {
 	'cb' => $cache,
 });
 is($ret, 'metre', 'Get printed value (translated).');
+
+# Test.
+$cache = Wikibase::Cache::Backend::Basic->new;
+$obj = Wikibase::Datatype::Value::Item->new(
+	'value' => 'Q42',
+);
+$ret = Wikibase::Datatype::Print::Value::Item::print($obj, {
+	'cb' => $cache,
+});
+is($ret, 'Q42', 'Get printed value (not translated).');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Item->new(
+	'value' => 'Q11573',
+);
+eval {
+	Wikibase::Datatype::Print::Value::Item::print($obj, {
+		'cb' => 'bad_callback',
+	});
+};
+is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache::Backend.\n",
+	"Option 'cb' must be a instance of Wikibase::Cache::Backend.");
+clean();

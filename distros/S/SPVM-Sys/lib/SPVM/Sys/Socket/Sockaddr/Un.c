@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 #include "spvm_socket_util.h"
 
@@ -20,7 +23,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct sockaddr_un* socket_address = env->new_memory_stack(env, stack, sizeof(struct sockaddr_un));
 
-  void* obj_socket_address = env->new_pointer_by_name(env, stack, "Sys::Socket::Sockaddr::Un", socket_address, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_socket_address = env->new_pointer_object_by_name(env, stack, "Sys::Socket::Sockaddr::Un", socket_address, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_socket_address;

@@ -1,5 +1,8 @@
 Revision history for Perl module Text::PO
 
+v0.6.0 2023-04-14T21:28:01+0900
+    - Added JavaScript function fetchLocalen() in share/gettext.js
+
 v0.5.0 2023-01-04T19:55:54+0900
     - Changed gettext.js class GettextString property 'lang' to 'locale'
     - Implemented the class Text::PO::String containing the localised string and its locale property returned by Text::PO::Gettext methods

@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "B::Hooks::OP::Check" : "< 0.19"
          },
          "requires" : {
-            "Lexical::SealRequireHints" : "0.008",
+            "Lexical::SealRequireHints" : "0.012",
             "XSLoader" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -48,7 +48,7 @@
    "provides" : {
       "IO::ExplicitHandle" : {
          "file" : "lib/IO/ExplicitHandle.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

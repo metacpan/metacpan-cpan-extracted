@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 3 "kmeans.pd"
 
+#line 3 "kmeans.pd"
 
 use Carp;
 use PDL::LiteF;
@@ -95,8 +95,8 @@ plot the clusters if there are only 2 vars in $data,
 
 
 
-#line 74 "kmeans.pd"
 
+#line 74 "kmeans.pd"
 
 #line 75 "kmeans.pd"
 
@@ -129,19 +129,15 @@ sub random_cluster {
   } while (PDL::any $cluster->sumover == 0 );
   return $cluster;
 }
-#line 107 "kmeans.pd"
+#line 133 "Kmeans.pm"
 #line 134 "Kmeans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
 *_random_cluster = \&PDL::_random_cluster;
-#line 141 "Kmeans.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -168,27 +164,20 @@ Usage:
     perldl> p $ic = $c_mask->which_cluster                
     [0 0 1 1 2 2]
 
-
-
 =for bad
 
 which_cluster processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 181 "Kmeans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *which_cluster = \&PDL::which_cluster;
-#line 188 "Kmeans.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -197,8 +186,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (data(o,v); centroid(c,v); short [o]cluster(o,c))
-
-
 
 =for ref
 
@@ -230,7 +217,6 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
      [0 0 0 1]    # cluster 1 membership
     ]
 
-
   
 
 =for bad
@@ -238,20 +224,15 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
 assign processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 244 "Kmeans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *assign = \&PDL::assign;
-#line 251 "Kmeans.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -260,7 +241,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (data(o,v); cluster(o,c); float+ [o]m(c,v); float+ [o]ss(c,v))
-
 
 =for ref
 
@@ -302,7 +282,6 @@ Takes data dim [obs x var] and mask dim [obs x cluster], returns mean and ss (ms
      [17.5    5]
     ]
 
-
   
 
 =for bad
@@ -310,21 +289,18 @@ Takes data dim [obs x var] and mask dim [obs x cluster], returns mean and ss (ms
 centroid processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 316 "Kmeans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *centroid = \&PDL::centroid;
-#line 323 "Kmeans.pm"
+
+
 
 
 
 #line 431 "kmeans.pd"
-
 
 #line 432 "kmeans.pd"
 
@@ -359,20 +335,18 @@ sub _d_point2line {
 
   return _d_p2l( $self->mv(0,-1)->dog, $p1->mv(0,-1)->dog, $p2->mv(0,-1)->dog );
 }
-#line 466 "kmeans.pd"
-#line 364 "Kmeans.pm"
+#line 339 "Kmeans.pm"
+#line 340 "Kmeans.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_d_p2l = \&PDL::_d_p2l;
-#line 371 "Kmeans.pm"
+
+
 
 
 
 #line 494 "kmeans.pd"
-
 
 #line 495 "kmeans.pd"
 
@@ -738,8 +712,8 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 860 "kmeans.pd"
-#line 743 "Kmeans.pm"
+#line 716 "Kmeans.pm"
+#line 717 "Kmeans.pm"
 
 
 

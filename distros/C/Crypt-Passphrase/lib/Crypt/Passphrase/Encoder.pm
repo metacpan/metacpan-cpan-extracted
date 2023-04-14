@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.012';
+$Crypt::Passphrase::Encoder::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -24,6 +24,10 @@ sub accepts_hash {
 	return $hash =~ $self->{accepts_hash};
 }
 
+sub binary_safe {
+	return 1;
+}
+
 1;
 
 #ABSTRACT: Base class for Crypt::Passphrase encoders
@@ -40,7 +44,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.012
+version 0.015
 
 =head1 DESCRIPTION
 
@@ -59,6 +63,10 @@ This method will return true if the password needs a rehash. This may either mea
 =head2 crypt_subtypes()
 
 This method returns the types of crypt entries this validator supports. This is used to implement C<accepts_hash>.
+
+=head2 binary_safe()
+
+This method returns true if the encoder can take arbitrary binary inputs.
 
 =head2 random_bytes($count)
 

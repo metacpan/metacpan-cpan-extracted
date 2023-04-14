@@ -87,5 +87,6 @@ t/postfix_deref_qq.t
 t/scalar_attributes.t
 t/qr_combine.t
 t/PPR_ERROR_multiple.t
+t/perl_v5.38.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

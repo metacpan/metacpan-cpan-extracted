@@ -1,0 +1,35 @@
+NAME
+
+Tuple::Munge - manipulate Perl's tuple object representations
+
+DESCRIPTION
+
+This module provides functions to manipulate Perl's tuples, the data
+structures that were introduced in Perl 5.37.9 to support the core class
+system.  As of Perl 5.37.10, the Perl core notably lacks both general
+manipulation facilities and documentation for these data structures.
+
+Tuple data structures are experimental, so the feature could change
+significantly or disappear entirely in future versions of Perl.
+Be mindful of the portability issues (requiring a recent Perl and having
+doubtful forward portability) in any decision about whether to use tuples.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2023 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

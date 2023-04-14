@@ -2,9 +2,25 @@ Story-Interact
 ==============
 
 Created:      2023-01-10
+Home page:    <https://story-interact.xlc.pl/>
 Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001010	2023-04-10
+
+ [ Documentation ]
+ - Add link to https://story-interact.xlc.pl/.
+
+ [ Test Suite ]
+ - Provide more useful diagnostic output from 00start.t.
+ - Tidy up test suite.
+
+ [ Other ]
+ - Allow stories to define a special page called `_prelude` which is
+   prepended to the source code of every other page.
+ - Support defining characters in subclasses of Story::Interact::Character.
+ - Support query strings in `next_page` links.
 
 0.001009	2023-02-17
 

@@ -22,10 +22,12 @@ Linear
 Number
 Observatory
 PDL
+Range
 Ratio
 Role
 Sequence
 Smithsonian
+Tree
 Types
 Utils
 djerius

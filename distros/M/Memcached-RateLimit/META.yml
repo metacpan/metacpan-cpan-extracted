@@ -31,8 +31,11 @@ resources:
   bugtracker: https://github.com/uperl/Memcached-RateLimit/issues
   homepage: https://metacpan.org/pod/Memcached::RateLimit
   repository: git://github.com/uperl/Memcached-RateLimit.git
-version: '0.07'
-x_generated_by_perl: v5.37.5
+version: '0.08'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Dylan Hardison (DHARDISON)'
+x_generated_by_perl: v5.37.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

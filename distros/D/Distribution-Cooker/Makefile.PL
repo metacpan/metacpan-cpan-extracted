@@ -63,7 +63,8 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '1',
+		'Perl::Version' => '0',
+		'Test::More'    => '1',
 		},
 
 	'PREREQ_PM'     => {
@@ -84,7 +85,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {

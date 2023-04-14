@@ -13,7 +13,7 @@ use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -22,7 +22,7 @@ sub print {
 		$opts_hr = {};
 	}
 
-	if (! defined $opts_hr) {
+	if (! exists $opts_hr->{'lang'}) {
 		$opts_hr->{'lang'} = 'en';
 	}
 

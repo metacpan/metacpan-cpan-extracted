@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::Ioctl::Constant {
   native static method FIONBIO : int ();
 }

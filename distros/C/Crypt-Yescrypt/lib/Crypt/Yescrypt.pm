@@ -1,5 +1,5 @@
 package Crypt::Yescrypt;
-$Crypt::Yescrypt::VERSION = '0.001';
+$Crypt::Yescrypt::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -7,7 +7,9 @@ use XSLoader;
 XSLoader::load('Crypt::Yescrypt');
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw(yescrypt yescrypt_check yescrypt_needs_rehash);
+our @EXPORT_OK = qw(yescrypt yescrypt_check yescrypt_needs_rehash yescrypt_kdf);
+
+1;
 
 # ABSTRACT: A Perl interface to the yescrypt password hash
 
@@ -23,13 +25,13 @@ Crypt::Yescrypt - A Perl interface to the yescrypt password hash
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
-=head2 yescrypt($password, $salt, $flags, $block_count, $block_size, $parallelism, $time, $upgrades)
+=head2 yescrypt($password, $salt, $flags, $block_count, $block_size, $parallelism = 1, $time = 0, $upgrades = 0)
 
 This function processes the $password with the given $salt and parameters. It encodes the resulting tag and the parameters as a password string (e.g. C<$y$j9T$SALT$HIA0o5.HmkE9HhZ4H8X1r0aRYrqdcv0IJEZ2PLpqpz6>).
 
@@ -41,7 +43,9 @@ This verifies that the C<$password> matches C<$hash>. All parameters and the tag
 
 This returns true if the yescrypt C<$hash> uses a different parameters than the given parameters.
 
-1;
+=head2 yescrypt_kdf($password, $salt, $output_size, $flags, $block_count, $block_size, $parallelism = 1, $time = 0, $upgrades = 0)
+
+This function processes the $password with the given $salt and parameters. It returns only the hash, without parameters or encoding.
 
 =head1 AUTHOR
 

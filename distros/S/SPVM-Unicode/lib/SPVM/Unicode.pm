@@ -1,82 +1,87 @@
 package SPVM::Unicode;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
+
 1;
 
-=head1 NAME
+=encoding utf8
 
-SPVM::Unicode - SPVM Unicode Utilities.
+=head1 Name
 
-=head1 SYNOPSYS
+SPVM::Unicode - Unicode Utilities.
+
+=head1 Description
+
+The Unicode class of L<SPVM> has methods for Unicode utilities.
+
+=head1 Usage
 
   use Unicode;
   
-  # Get Unicode codepoints from UTF-8 string with the byte offset and proceed the offset to next UTF-8 character position
   my $string = "あいうえお";
   my $pos = 0;
-  while ((my $uchar = Unicode->uchar($string, \$pos)) >= 0) {
+  while ((my $uchar = Unicode->uchar($string, \$pos)) >= 0);
     # ...
   }
 
-=head1 DESCRIPTION
-
-L<Unicode|SPVM::Unicode> is L<SPVM> Unicode utilities. This module privides the methods to convert UTF-8 bytes to/from Unicode codepoints.
-
-=head1 CLASS METHODS
+=head1 Class Methods
 
 =head2 ERROR_INVALID_UTF8
 
   static method INVALID_UTF8 : int ();
 
-return -2. this means uchar function find invalid utf8.
+Returns -2.
 
 =head2 is_unicode_scalar_value
 
-  static method is_unicode_scalar_value : int ($code_point: int) {
+  static method is_unicode_scalar_value : int ($code_point: int);
 
-Check if the given value is a Unicode scalar values.
-
-The range of Unicode scalar values are the range of Unicode code points(C<0> to C<0x10FFFF>) except for the range of surrogate code points(C<0xD800> to C<0xDFFF>).
+If the code point $code_point is a Unicode scalar value, returns 1. Otherwise returns 0.
 
 =head2 uchar
 
   static method uchar : int ($string : string, $offset_ref : int*);
-  
-Get a Unicode codepoint from UTF-8 string with the byte offset and proceed the offset to next UTF-8 character position.
 
-If offset is over the string length, this method returns -1.
+Gets a Unicode codepoint by parsing UTF-8 string $string with the offset $$offset_ref  and proceed the offset to the next parsing posision.
 
-If invalid UTF-8 character is found, this method returns -2. This is the same value of the return value of ERROR_INVALID_UTF8 method.
+If $$offset_ref is over the string length, returns -1.
+
+If an invalid UTF-8 character is found, returns the value of L</"ERROR_INVALID_UTF8">.
 
 =head2 uchar_to_utf8
 
   static method uchar_to_utf8 : string ($unicode_code_point : int);
 
-Convert a Unicode codepoint to a UTF-8 character.
+Converts the Unicode codepoint $unicode_code_point to a UTF-8 character.
 
-If the argument value is invalid Unicode code point, this method returns undef.
+If the $unicode_code_point is invalid Unicode code point, returns undef.
 
 =head2 utf8_to_utf16
 
-  static method utf8_to_utf16 : short[] ($utf8_string : string) {
+  static method utf8_to_utf16 : short[] ($string : string);
 
-Convert a UTF-8 string to a UTF-16 string.
+Converts the UTF-8 string $string to a UTF-16 string, and returns it.
 
 =head2 utf16_to_utf8
 
-  static method utf16_to_utf8 : string ($utf16_string : short[]) {
+  static method utf16_to_utf8 : string ($string : short[]);
 
-Convert a UTF-16 string to a UTF-8 string.
+Converts the UTF-16 string $string to a UTF-8 string, and returns it.
 
 =head2 utf32_to_utf16
 
-  static method utf32_to_utf16 : short[] ($utf32_string : int[]);
+  static method utf32_to_utf16 : short[] ($string : int[]);
 
-Convert a UTF-32 string to a UTF-16 string.
+Converts the UTF-32 string $string to a UTF-16 string, and returns it.
 
 =head2 utf16_to_utf32
 
-  static method utf16_to_utf32 : int[] ($utf16_string : short[]);
+  static method utf16_to_utf32 : int[] ($string : short[]);
 
-Convert a UTF-16 string to UTF-32 string.
+Converts the UTF-16 string $string to a UTF-32 string, and returns it.
 
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

@@ -1,14 +1,16 @@
 package CXC::Number::Sequence::Failure;
 
+# ABSTRACT: CXC::Number::Sequence Exceptions
+
+use v5.28;
 use strict;
 use warnings;
-
-# ABSTRACT: CXC::Number::Sequence Exceptions
+use experimental 'signatures';
 
 use parent 'Exporter::Tiny';
 use custom::failures ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 our @EXPORT_OK;
 BEGIN {
@@ -24,11 +26,10 @@ BEGIN {
     @EXPORT_OK = map { s/::/_/r } @failures;
 }
 
-sub _exporter_expand_sub {
-    my $class = shift;
-    my ( $name, $args, $globals ) = @_;
-    my $failure = __PACKAGE__ . '::' . ( $name =~ s/_/::/gr );
-    ## no critic ( BuiltinFunctions::ProhibitStringyEval)
+sub _exporter_expand_sub ( $, $name, $, $, $ ) {
+    my $failure = __PACKAGE__ . q{::} . ( $name =~ s/_/::/gr );
+    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     $name => eval "sub () { '$failure' }";
 }
 
@@ -46,7 +47,7 @@ CXC::Number::Sequence::Failure - CXC::Number::Sequence Exceptions
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 INTERNALS
 
@@ -54,7 +55,7 @@ version 0.08
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

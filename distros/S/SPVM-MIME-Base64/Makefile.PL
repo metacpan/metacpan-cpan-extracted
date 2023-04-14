@@ -15,7 +15,7 @@ if ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.9691',
+  'SPVM' => '0.9701',
 );
 
 WriteMakefile(
@@ -24,10 +24,24 @@ WriteMakefile(
   PREREQ_PM         => {}, # e.g., Module::Name => 1.1
   ABSTRACT_FROM     => 'lib/SPVM/MIME/Base64.pm', # retrieve abstract from module
   AUTHOR            => 'Yuki Kimoto<kimoto.yuki@gmail.com>',
-  LICENSE           => 'perl_5',
+  LICENSE           => 'mit',
   NORECURS => 1,
   test => {TESTS => 't/*.t'},
   clean => {FILES => ".spvm_build"},
+  META_MERGE => {
+    'meta-spec' => { version => 2 },
+    resources => {
+      repository => {
+        type => 'git',
+        url  => 'https://github.com/yuki-kimoto/SPVM-MIME-Base64.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-MIME-Base64',
+      },
+    },
+    no_index => {
+      directory => [],
+    }
+  },
+  NORECURS => 1,
   CONFIGURE_REQUIRES => {
     %configure_and_runtime_requires,
   },
@@ -39,8 +53,6 @@ WriteMakefile(
   },
 );
 sub MY::postamble {
-  
-  use SPVM::Builder::Util::API;
   
   my $make_rule = "";
   

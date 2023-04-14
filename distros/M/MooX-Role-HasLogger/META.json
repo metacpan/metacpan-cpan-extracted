@@ -4,13 +4,13 @@
       "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MooX-Role-HasLogger",
    "no_index" : {
@@ -28,13 +28,16 @@
       "configure" : {
          "requires" : {
             "Config" : "0",
-            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::Spec" : "0",
+            "lib" : "0",
+            "subs" : "0"
          }
       },
       "develop" : {
          "suggests" : {
             "App::Software::License" : "0",
-            "Pod::Markdown::Github" : "0"
+            "App::cpanminus" : "1.7046"
          }
       },
       "runtime" : {
@@ -43,7 +46,8 @@
             "Moo" : "2.004000",
             "MooX::TypeTiny" : "0.002003",
             "Type::Tiny" : "0",
-            "namespace::clean" : "0"
+            "namespace::clean" : "0",
+            "perl" : "5.008009"
          }
       },
       "test" : {
@@ -52,6 +56,16 @@
             "Test::More" : "0",
             "Test::Output" : "0"
          }
+      }
+   },
+   "provides" : {
+      "MooX::Role::HasLogger" : {
+         "file" : "lib/MooX/Role/HasLogger.pm",
+         "version" : "0.001002"
+      },
+      "MooX::Role::HasLogger::Types" : {
+         "file" : "lib/MooX/Role/HasLogger/Types.pm",
+         "version" : "0.001002"
       }
    },
    "release_status" : "stable",
@@ -65,5 +79,5 @@
          "web" : "https://github.com/XSven/MooX-Role-HasLogger"
       }
    },
-   "version" : "0.001001"
+   "version" : "0.001002"
 }

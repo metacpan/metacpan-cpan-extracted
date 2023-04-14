@@ -1,0 +1,22 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README
+lib/Tuple/Munge.pm
+lib/Tuple/Munge.xs
+t/basic.t
+t/magic.t
+t/context.t
+t/ops.t
+t/pod_cvg.t
+t/pod_syn.t
+t/prototype.t
+t/return_ro.t
+t/slot_value.t
+t/threads.t
+t/tuple_ref.t
+t/usage.t
+SIGNATURE    Added here by Module::Build

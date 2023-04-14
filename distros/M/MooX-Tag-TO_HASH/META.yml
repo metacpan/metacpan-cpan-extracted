@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +29,15 @@ no_index:
 provides:
   MooX::Tag::TO_HASH:
     file: lib/MooX/Tag/TO_HASH.pm
-    version: '0.03'
+    version: '0.05'
   MooX::Tag::TO_HASH::Util:
     file: lib/MooX/Tag/TO_HASH/Util.pm
-    version: '0.03'
+    version: '0.05'
   MooX::Tag::TO_JSON:
     file: lib/MooX/Tag/TO_JSON.pm
-    version: '0.03'
+    version: '0.05'
 requires:
-  JSON::MaybeXS: '0'
+  JSON::MaybeXS: '1.00400'
   Moo::Role: '0'
   MooX::TaggedAttributes: '0.18'
   Ref::Util: '0'
@@ -48,7 +48,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH
   repository: https://gitlab.com/djerius/moox-tag-to_hash.git
-version: '0.03'
-x_generated_by_perl: v5.28.3
+version: '0.05'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

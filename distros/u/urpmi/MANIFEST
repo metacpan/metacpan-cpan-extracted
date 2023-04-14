@@ -196,6 +196,16 @@ t/data/SPECS/handle-conflict-deps2/c-2.spec
 t/data/SPECS/handle-conflict-deps2/d1-1.spec
 t/data/SPECS/handle-conflict-deps2/d1-2.spec
 t/data/SPECS/handle-conflict-deps2/d2.spec
+t/data/SPECS/kernel-1/kernel-desktop1.spec
+t/data/SPECS/kernel-1/kernel-desktop2.spec
+t/data/SPECS/kernel-1/kernel-desktop3.spec
+t/data/SPECS/kernel-1/kernel-desktop4.spec
+t/data/SPECS/kernel-1/kernel-desktop5.spec
+t/data/SPECS/kernel-2/kernel-desktop1.spec
+t/data/SPECS/kernel-2/kernel-desktop2.spec
+t/data/SPECS/kernel-2/kernel-desktop3.spec
+t/data/SPECS/kernel-2/kernel-desktop4.spec
+t/data/SPECS/kernel-2/kernel-desktop5.spec
 t/data/SPECS/multi-line-macro.spec
 t/data/SPECS/multi-line-macro2.spec
 t/data/SPECS/obsolete-and-conflict/a.spec
@@ -437,6 +447,7 @@ t/superuser--mirrorlist.t
 t/superuser--obsolete-and-conflict.t
 t/superuser--ordering-scriptlets.t
 t/superuser--orphans.t
+t/superuser--orphans-kernels.t
 t/superuser--prefer.t
 t/superuser--prefer2.t
 t/superuser--priority-upgrade.t

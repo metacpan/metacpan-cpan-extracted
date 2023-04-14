@@ -1,5 +1,11 @@
 Changelog for Catmandu-PICA
 
+1.13 2023-04-14T09:01:25Z
+  - pica_keep: allow multiple fields
+  - pica_remove: make path optional
+  - fix pica_diff
+  - Add importer option 'level' to split and reduce record to level 0, 1, or 2
+
 1.12 2023-03-27T09:00:33Z
   - Fix #84 in pica_each
   - Change wrong example using reject (#64)

@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '35';
+our $VERSION = '36';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -586,7 +586,7 @@ sub do_exec {
     # PAR is used and rakubrew itself does the `exec`.
     # (Windows also uses PAR, but has a .bat shim that
     # does the `exec`.)
-    if ($distro_format eq 'macos') {
+    if ($distro_format eq 'macos' || $distro_format eq 'macos_arm') {
         de_par_environment;
     }
     

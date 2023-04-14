@@ -10,7 +10,10 @@ my $test = new_ok('Test::Compile::Internal');
 
 # Run some of the basic meithods, with basic test conditions
 # ..mostly just to ensure they get executed
-my $result = $test->all_pl_files_ok('t/scripts/lib.pl');
+
+my $result;
+
+$result = $test->all_pl_files_ok('t/scripts/messWithLib.pl');
 $test->ok($result, "all_pl_files_ok returns true value");
 
 $result = $test->all_pm_files_ok('lib/');
@@ -18,6 +21,13 @@ $test->ok($result, "all_pm_files_ok returns true value");
 
 $result = $test->all_files_ok();
 $test->ok($result, "all_files_ok returns true value");
+
+TODO: {
+    local $TODO = "testing scripts that don't compile, cause the test to fail";
+
+    $result = $test->all_files_ok('t/scripts/failure.pl');
+    $test->ok($result, "failure.pl doesn't compile");
+}
 
 # Fin...
 $test->done_testing();

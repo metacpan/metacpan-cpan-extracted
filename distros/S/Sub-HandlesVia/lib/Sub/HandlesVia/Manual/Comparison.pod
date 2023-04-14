@@ -79,6 +79,9 @@ native traits, and L<MouseX::NativeTraits>.
        uniqstr_in_place : SubHV                       
                 unshift : SubHV  DataP  Moose  Mouse  
 
+  Blessed ============================================
+  (Accepts any method name.)
+
   Bool ===============================================
                     not : SubHV  DataP  Moose  Mouse  
                   reset : SubHV                       
@@ -101,6 +104,11 @@ native traits, and L<MouseX::NativeTraits>.
                     inc : SubHV  DataP  Moose  Mouse  
                   reset : SubHV  DataP  Moose  Mouse  
                     set : SubHV         Moose  Mouse  
+
+  Enum ===============================================
+                 assign : SubHV                       
+                     is : SubHV                       
+                    set : SubHV                       
 
   Hash ===============================================
                accessor : SubHV  DataP  Moose  Mouse  

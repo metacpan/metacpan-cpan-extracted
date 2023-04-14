@@ -14,47 +14,60 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Path::Tiny;
 use YAML::Syck;
+use App::VTide::Sessions;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.21');
+our $VERSION = version->new('1.0.1');
 our $NAME    = 'start';
-our $OPTIONS = [
-    'windows|w=i',
-    'test|T!',
-    'verbose|v+',
-];
-sub details_sub { return ( $NAME, $OPTIONS )};
+our $OPTIONS =
+  [ 'windows|w=i', 'add|add-to-session|a', 'test|T!', 'verbose|v+', ];
+sub details_sub { return ( $NAME, $OPTIONS ) }
+
+has sessions => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        App::VTide::Sessions->new(
+            sessions_file => path $ENV{HOME},
+            '.vtide/sessions.yml'
+        );
+    },
+);
 
 sub run {
     my ($self) = @_;
 
-    my ( $name, $dir ) = $self->session_dir(
-        $self->options->files->[0]
-    );
+    my ( $name, $dir ) = $self->session_dir( $self->options->files->[0] );
 
     local $CWD = $dir;
 
     $self->save_session( $name, $dir );
 
-    $self->hooks->run('start_pre', $name, $dir);
+    $self->hooks->run( 'start_pre', $name, $dir );
 
     $self->ctags();
+
+    if ( $self->options->default->{add} ) {
+        $self->sessions->add_session($name);
+    }
 
     return $self->tmux( $self->vtide->config->data->{title} || $name, $name );
 }
 
 sub ctags {
-    my ( $self ) = @_;
-    my $ctags = path('/usr', 'bin', 'ctags');
+    my ($self) = @_;
+    my $ctags = path( '/usr', 'bin', 'ctags' );
 
     return if !$self->config->get->{start}{ctags} || !-x $ctags;
 
-    my @cmd = ($ctags, $self->config->get->{start}{ctags});
+    my @cmd = ( $ctags, $self->config->get->{start}{ctags} );
 
-    for my $exclude (@{ $self->config->get->{start}{"ctags-exclude"} }) {
+    for my $exclude ( @{ $self->config->get->{start}{"ctags-exclude"} } ) {
         if ( $self->config->get->{start}{"ctags-excludes"}{$exclude} ) {
-            push @cmd, map {"--exclude=$_"} @{ $self->config->get->{start}{"ctags-excludes"}{$exclude} };
+            push @cmd,
+              map { "--exclude=$_" }
+              @{ $self->config->get->{start}{"ctags-excludes"}{$exclude} };
         }
         else {
             push @cmd, "--exclude=$exclude";
@@ -68,21 +81,22 @@ sub tmux {
     my ( $self, $title, $name ) = @_;
 
     eval { require Term::Title; }
-        and Term::Title::set_titlebar($title);
+      and Term::Title::set_titlebar($title);
 
-    my %session = map {/(^[^:]+)/xms; $1 => 1} `tmux ls`;
+    my %session = map { /(^[^:]+)/xms; $1 => 1 } `tmux ls`;
     if ( $session{$name} ) {
+
         # reconnect
         exec 'tmux', 'attach-session', '-t', $name;
     }
 
-    my $v    = $self->defaults->{verbose} ? '--verbose' : '';
+    my $v = $self->defaults->{verbose} ? '--verbose' : '';
     $v .= " --name $name";
-    my $tmux = 'tmux -u2 ';
+    my $tmux  = 'tmux -u2 ';
     my $count = $self->defaults->{windows} || $self->config->get->{count};
 
     for my $window ( 1 .. $count ) {
-        $tmux .= $self->tmux_window($window, "vtide run $v", $name);
+        $tmux .= $self->tmux_window( $window, "vtide run $v", $name );
     }
     $tmux .= "select-window -t 1";
 
@@ -92,7 +106,7 @@ sub tmux {
     }
 
     mkdir '.vtide' if !-d '.vtide';
-    my $fh = path('.vtide', 'start.log')->opena;
+    my $fh = path( '.vtide', 'start.log' )->opena;
     print {$fh} '[' . localtime . "] START TMUX $tmux\n";
 
     system $tmux;
@@ -103,12 +117,13 @@ sub tmux {
 sub tmux_window {
     my ( $self, $term, $cmd, $name, $split ) = @_;
     my $conf = !$term ? {} : $self->config->get->{terminals}{$term};
-    my $out = $split ? ''
-        : $term == 1 ? "new-session -s $name '$cmd $term' \\; "
-        :              "new-window '$cmd $term' \\; ";
+    my $out =
+        $split     ? ''
+      : $term == 1 ? "new-session -s $name '$cmd $term' \\; "
+      :              "new-window '$cmd $term' \\; ";
     my $letter = !$term ? '' : 'a';
 
-    if ( ! $conf || ref $conf ne 'HASH' ) {
+    if ( !$conf || ref $conf ne 'HASH' ) {
         $conf = {};
     }
 
@@ -116,17 +131,19 @@ sub tmux_window {
     $split ||= $conf->{split};
 
     for my $split ( split //xms, ( $split || '' ) ) {
-        next if ! defined $split || $split eq '';
+        next if !defined $split || $split eq '';
 
-        my $arg = $split eq 'H' ? 'split-window -h'
-            : $split eq 'h'     ? 'split-window -dh'
-            : $split eq 'V'     ? 'split-window -v'
-            : $split eq 'v'     ? 'split-window -dv'
-            : $split =~ /^\d$/x ? 'select-pane -t ' . $split
-            :                     die "Unknown split for terminal $term $split (split = '$split')!\n";
+        my $arg =
+            $split eq 'H'     ? 'split-window -h'
+          : $split eq 'h'     ? 'split-window -dh'
+          : $split eq 'V'     ? 'split-window -v'
+          : $split eq 'v'     ? 'split-window -dv'
+          : $split =~ /^\d$/x ? 'select-pane -t ' . $split
+          :   die "Unknown split for terminal $term $split (split = '$split')!\n";
 
-         $out .= $split =~ /^\d$/xms ? "$arg \\; " : "$arg '$cmd $term$letter' \\; ";
-         $letter++ if $letter;
+        $out .=
+          $split =~ /^\d$/xms ? "$arg \\; " : "$arg '$cmd $term$letter' \\; ";
+        $letter++ if $letter;
     }
 
     if ( $conf->{tmux} ) {
@@ -140,12 +157,11 @@ sub auto_complete {
     my ($self) = @_;
 
     my $file     = $self->history;
-    my $sessions = eval { LoadFile( $file ) } || {};
+    my $sessions = eval { LoadFile($file) } || {};
 
     my $env = $self->options->files->[-1];
-    print join ' ',
-        grep { $env ne 'start' ? /^$env/xms : 1 }
-        sort keys %{ $sessions->{sessions} };
+    print join ' ', grep { $env ne 'start' ? /^$env/xms : 1 }
+      sort keys %{ $sessions->{sessions} };
 
     return;
 }
@@ -160,7 +176,7 @@ App::VTide::Command::Start - Start a session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Start version 0.1.21
+This documentation refers to App::VTide::Command::Start version 1.0.1
 
 =head1 SYNOPSIS
 

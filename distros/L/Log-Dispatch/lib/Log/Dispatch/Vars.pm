@@ -3,7 +3,7 @@ package Log::Dispatch::Vars;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Exporter qw( import );
 
@@ -69,7 +69,7 @@ Log::Dispatch::Vars - Variables used internally by multiple packages
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 DESCRIPTION
 
@@ -78,8 +78,6 @@ There are no user-facing parts here.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -91,7 +89,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

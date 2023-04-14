@@ -12,9 +12,9 @@ use Nodejs::Util qw(get_nodejs_path);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2023-03-30'; # DATE
 our $DIST = 'Data-Sah-DefaultValue'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(gen_default_value_code);
 
@@ -107,7 +107,7 @@ Data::Sah::DefaultValueJS - Generate code to set default value
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::DefaultValueJS (from Perl distribution Data-Sah-DefaultValue), released on 2023-01-20.
+This document describes version 0.003 of Data::Sah::DefaultValueJS (from Perl distribution Data-Sah-DefaultValue), released on 2023-03-30.
 
 =head1 SYNOPSIS
 

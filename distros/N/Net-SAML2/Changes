@@ -1,5 +1,29 @@
 Revision history for Perl extension Net::SAML2.
 
+0.69 -- Tue Apr 04 20:20:22 ADT 2023
+
+  [ Significant Changes since 0.67 ]
+
+  - Simply 0.67 issued as a production release
+  - Couple of small by fixes Wesley Schwengle (waterkip)
+
+  - 4953468 Increment version for production release
+  - b44d100 v0.68
+  - c296c49 Update Changes for release
+
+0.68 -- Mon Apr 03 19:17:59 ADT 2023
+
+  [ Significant Changes since 0.67 ]
+
+  - Couple of small by fixes Wesley Schwengle (waterkip)
+
+  [ Change Log ]
+  - 4f4d6d4 Increment version for next release
+  - 8e993b2 Fix artifact response status codes from assertions
+  - d7dbf62 Refactor key selection for metadata generation
+  - 4fa07de Fix version after release
+  - 52870d2 v0.67
+
 0.67 -- Sun Mar 19 10:03:23 ADT 2023
 
   [ Significant Changes since 0.64 ]

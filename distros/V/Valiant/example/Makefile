@@ -22,7 +22,9 @@ update_db:
 update: update_cpanlib update_db
 
 server:
-	@DBIC_TRACE=1 perl -Ilib -I ../lib/  ./lib/Example/PSGI.pm
+	@DBIC_TRACE=1 perl -Ilib -I ../lib/ \
+	-I /Users/jnapiorkowski/Desktop/Catalyst/Catalyst-Runtime/lib \
+	./lib/Example/PSGI.pm
 
 dependencies:
 	@ack '^use ' -h --nobreak | perl -nle'++$lines{$_}; END { print for sort grep $lines{$_}==1, keys %lines; }

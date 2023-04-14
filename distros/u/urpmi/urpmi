@@ -114,7 +114,7 @@ sub usage () {
                    known programs: %s
 ", join(', ', urpm::download::ftp_http_downloaders()))
    . N("  --curl-options - additional options to pass to curl
-") . N("  --rsync-options- additional options to pass to rsync
+") . N("  --rsync-options - additional options to pass to rsync
 ") . N("  --wget-options - additional options to pass to wget
 ") . N("  --prozilla-options - additional options to pass to prozilla
 ") . N("  --aria2-options - additional options to pass to aria2

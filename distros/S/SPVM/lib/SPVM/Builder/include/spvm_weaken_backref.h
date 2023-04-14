@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_WEAKEN_BACKREF_H
 #define SPVM_WEAKEN_BACKREF_H
 

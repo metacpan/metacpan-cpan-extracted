@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "ExtUtils::CBuilder" : "0.280236",
+            "JSON::PP" : "2.27105",
             "Time::Piece" : "1.12"
          }
       },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.9696",
+   "version" : "0.9705",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

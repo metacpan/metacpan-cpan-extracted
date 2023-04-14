@@ -1,0 +1,57 @@
+App::Prove::Plugin::KohaBootstrap
+
+This prove plugin allows to run Koha tests on a separate database
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+USAGE
+
+Create a database named `koha_test`, grant access on it to your usual DB user,
+then run:
+
+	prove -P KohaBootstrap=database,koha_test -r t
+
+Or, create a .proverc file in the Koha root directory with the following
+contents:
+
+	-P KohaBootstrap=database,koha_test
+
+and run:
+
+	prove -r t
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Prove::Plugin::KohaBootstrap
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Prove-Plugin-KohaBootstrap
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/App-Prove-Plugin-KohaBootstrap
+
+    Search CPAN
+        https://metacpan.org/release/App-Prove-Plugin-KohaBootstrap
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Julian Maurice.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

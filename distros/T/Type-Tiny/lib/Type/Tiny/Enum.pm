@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '2.002001';
+	$Type::Tiny::Enum::VERSION   = '2.004000';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
@@ -462,6 +462,63 @@ __END__
 =head1 NAME
 
 Type::Tiny::Enum - string enum type constraints
+
+=head1 SYNOPSIS
+
+Using via L<Types::Standard>:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Enum );
+    
+    has name    => ( is => 'ro', isa => Str );
+    has status  => ( is => 'ro', isa => Enum[ 'alive', 'dead' ] );
+    
+    sub neigh {
+      my ( $self ) = @_;
+      return if $self->status eq 'dead';
+      ...;
+    }
+  }
+
+Using Type::Tiny::Enum's export feature:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Tiny::Enum Status => [ 'alive', 'dead' ];
+    
+    has name    => ( is => 'ro', isa => Str );
+    has status  => ( is => 'ro', isa => Status, default => STATUS_ALIVE );
+    
+    sub neigh {
+      my ( $self ) = @_;
+      return if $self->status eq STATUS_DEAD;
+      ...;
+    }
+  }
+
+Using Type::Tiny::Enum's object-oriented interface:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Tiny::Enum;
+    
+    my $Status = Type::Tiny::Enum->new(
+      name   => 'Status',
+      values => [ 'alive', 'dead' ],
+    );
+    
+    has name    => ( is => 'ro', isa => Str );
+    has status  => ( is => 'ro', isa => $Status, default => $Status->[0] );
+    
+    sub neigh {
+      my ( $self ) = @_;
+      return if $self->status eq $Status->[0];
+      ...;
+    }
+  }
 
 =head1 STATUS
 

@@ -10,9 +10,9 @@ use Org::Parser::Tiny;
 use Sort::Sub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 our %SPEC;
 
@@ -287,7 +287,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.483 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2022-10-11.
+This document describes version 0.484 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2023-01-19.
 
 =head1 DESCRIPTION
 
@@ -362,6 +362,8 @@ Path to an Org file.
 
 =item * B<level> => I<posint> (default: 1)
 
+(No description)
+
 
 =back
 
@@ -390,6 +392,8 @@ Path to an Org file.
 "-" means standard input.
 
 =item * B<level> => I<posint> (default: 1)
+
+(No description)
 
 =item * B<sort_args> => I<array[str]>
 
@@ -448,7 +452,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

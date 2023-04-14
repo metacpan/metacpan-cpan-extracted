@@ -54,12 +54,12 @@ my $dev_null = File::Spec->devnull;
 {
   mkpath $exe_dir;
 
-  # --print-dependent-resources, -p
-  for my $option ('--print-dependent-resources', '-p'){
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -I $test_dir/lib/SPVM -I t/02_vm/lib/SPVM $option MyExe);
+  # --required-resources, -r
+  for my $option ('--required-resources', '-r'){
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -I $test_dir/lib/SPVM --class-path t/02_vm/lib/SPVM $option MyExe);
     my @lines = `$spvmcc_cmd`;
-    is($lines[0], '{class_name:"TestCase::NativeAPI2",resource_class_name:"TestCase::Resource::Mylib1::V1_0_0",resource_mode:"mode1",resource_args:["args1","args2"]}' . "\n");
-    is($lines[1], '{class_name:"TestCase::NativeAPI2",resource_class_name:"TestCase::Resource::Mylib2::V1_0_0",resource_mode:undefined,resource_args:[]}' . "\n");
+    is($lines[0], '{"caller_class_name":"TestCase::NativeAPI2","resource":{"argv":["args1","args2"],"class_name":"TestCase::Resource::Mylib1","mode":"mode1"}}' . "\n");
+    is($lines[1], '{"caller_class_name":"TestCase::NativeAPI2","resource":{"class_name":"TestCase::Resource::Mylib2"}}' . "\n");
   }
   
   # Basic
@@ -95,12 +95,16 @@ my $dev_null = File::Spec->devnull;
   {
     my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I $test_dir/lib/SPVM -o $exe_dir/myexe --config $test_dir/myexe.debug.config MyExe);
     my $spvmcc_output = `$spvmcc_cmd 2>&1 1>$dev_null`;
-    like($spvmcc_output, qr/\Q-O0 -g/);
-    like($spvmcc_output, qr/-lm\b/);
-    like($spvmcc_output, qr/-L\./);
-    like($spvmcc_output, qr/-std=gnu99/);
     like($spvmcc_output, qr/NativeAPI2\.o/);
     like($spvmcc_output, qr/NativeAPI2\.precompile\.o/);
+    like($spvmcc_output, qr/\Q-O0 -g/);
+    like($spvmcc_output, qr/-L\./);
+    like($spvmcc_output, qr/-lm\b/);
+    like($spvmcc_output, qr/-std=c99/);
+    
+    # Note: Arguments of the link command(these contain -l flags) must be
+    # after object file names for resolving symbol names properly
+    like($spvmcc_output, qr/NativeAPI2\.o.+-L\..+-lm\b/);
     
     warn "$spvmcc_output";
 

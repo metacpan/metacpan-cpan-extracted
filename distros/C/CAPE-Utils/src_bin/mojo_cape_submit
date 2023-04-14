@@ -94,6 +94,12 @@ but helps to set them to something sane and relevant.
 
     - http_ua :: If HTTP, the useragent.
 
+=head1 PINGING
+
+If you submit a file with a file with the size of 10 and matching
+/01234567890/ it will return "TEST RECIEVED\n", provided the submitter is authed.
+At that point it will just stop processing of it.
+
 =cut
 
 use Mojolicious::Lite -signatures;
@@ -187,6 +193,18 @@ sub the_stuff {
 	#get file info and log it
 	my $name = $file->filename;
 	my $size = $file->size;
+
+	# if size is 10, test if the contents are a test ping packet
+	if ( $size == 10 ) {
+		my $file_data = $file->slurp;
+		if ( $file_data =~ /1234567890/ ) {
+			log_drek( 'info', 'got ping test, size=10 payload=01234567890' );
+			$c->render( text => "TEST RECIEVED\n", status => 200, );
+			return;
+		}
+	}
+
+	# clean up the filename and log it
 	$name =~ s/\///;
 	log_drek( 'info', 'Got File... size=' . $size . ' filename="' . $name . '"' );
 	$name = $cape_util->{config}->{_}->{incoming} . '/' . $name;

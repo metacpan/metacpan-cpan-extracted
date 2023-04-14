@@ -1,3 +1,7 @@
+0.231010  2023-04-11 11:33:36+02:00 Europe/Brussels
+    - Fixes
+       - binaries: fixed bug preventing the alignment of multiple files at once
+
 0.211710  2021-06-20 15:52:12+02:00 Europe/Brussels
     - Additions
        - binaries: support for multithreading (--threads option)

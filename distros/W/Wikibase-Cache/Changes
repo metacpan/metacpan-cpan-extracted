@@ -1,0 +1,11 @@
+0.03 2023-04-13T09:20:16+02:00
+ - Move Wikibase::Cache::Backend to separate distribution.
+ - Update example files.
+
+0.02 2023-04-11T23:06:27+02:00
+ - Add doc for Wikibase::Cache.
+ - Add error check for right Wikibase::Cache::Backend class.
+ - Add tests for Wikibase::Cache constructor.
+
+0.01 2023-04-05T23:26:17+02:00
+ - First version.

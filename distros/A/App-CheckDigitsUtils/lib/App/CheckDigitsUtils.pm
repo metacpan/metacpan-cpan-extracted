@@ -10,7 +10,7 @@ use Perinci::Object;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-CheckDigitsUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -35,6 +35,7 @@ our %argspecs_common = (
     method => {
         schema => ['str*', in=>\@known_methods, 'x.in.summaries'=>\@known_methods_summaries],
         cmdline_aliases => {m=>{}},
+        req => 1,
     },
 );
 
@@ -214,7 +215,7 @@ App::CheckDigitsUtils - Utilities related to check digits (CLI for Algorithm::Ch
 
 =head1 VERSION
 
-This document describes version 0.001 of App::CheckDigitsUtils (from Perl distribution App-CheckDigitsUtils), released on 2023-01-28.
+This document describes version 0.002 of App::CheckDigitsUtils (from Perl distribution App-CheckDigitsUtils), released on 2023-01-28.
 
 =head1 SYNOPSIS
 
@@ -265,7 +266,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<method> => I<str>
+=item * B<method>* => I<str>
 
 (No description)
 
@@ -387,7 +388,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<method> => I<str>
+=item * B<method>* => I<str>
 
 (No description)
 

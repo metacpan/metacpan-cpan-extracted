@@ -25,7 +25,8 @@ sub find_all_perl_modules {
             my $rel_path = File::Spec->abs2rel( $file, $base );
             return if $rel_path =~ /^blib/;
             $rel_path =~ s/^[t\/]*lib\///;
-            $rel_path =~ s/\//::/g;
+            $rel_path =~ s/\//::/g;  # *nix path
+            $rel_path =~ s/\\/::/g;  # windows path
             $rel_path =~ s/\.pm$//;
 
             push( @modules, $rel_path );

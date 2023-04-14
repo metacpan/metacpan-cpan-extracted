@@ -1,0 +1,6 @@
+0.02 2023-04-13T09:26:32+02:00
+ - Fix dependency to Wikibase::Cache::Backend.
+ - Fix error message.
+
+0.01 2023-04-05T23:30:55+02:00
+ - First version.

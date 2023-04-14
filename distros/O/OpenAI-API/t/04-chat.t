@@ -42,7 +42,6 @@ my @test_cases = (
             content => re('^\s*$'),
         },
     },
-
 );
 
 for my $test (@test_cases) {

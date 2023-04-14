@@ -32,6 +32,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.031",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tulamili/App-dirdim/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tulamili/App-dirdim.git",
+         "web" : "https://github.com/tulamili/App-dirdim"
+      }
+   },
+   "version" : "0.046",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

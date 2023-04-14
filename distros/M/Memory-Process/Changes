@@ -1,3 +1,18 @@
+0.06 2023-04-01T13:13:24+02:00
+ - Fix supported OSes.
+
+0.05 2023-03-30T15:44:51+02:00
+ - Add names for example files.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix repository url.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rewrite doc to use =head2.
+ - Rewrite tests from IO::CaptureOutput to Capture::Tiny.
+ - Sort methods in SYNOPSIS section in doc.
+ - Update author name.
+ - Update copyright years.
+ - Update Module::Install to 1.19 version.
+
 0.04 2015-10-29T20:04:23+01:00
  - Add reset() method.
  - Fix requires.

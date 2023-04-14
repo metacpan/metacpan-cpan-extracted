@@ -1,3 +1,14 @@
+version 0.004; 2023-04-06
+
+  * port test C code to Perl 5.33.1, which defines a PERL_VERSION_GE()
+    macro that clashes with the one this code previously had
+
+  * in test C code, avoid a compiler warning that arises on Perl 5.20
+
+  * in test C code, rename some macros for better style
+
+  * in test C code, better argument parenthesisation in a macro
+
 version 0.003; 2017-07-31
 
   * update linkable-finding code to handle new Windows builds with

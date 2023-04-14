@@ -2,8 +2,8 @@ NAME
     App::PDFUtils - Command-line utilities related to PDF files
 
 VERSION
-    This document describes version 0.014 of App::PDFUtils (from Perl
-    distribution App-PDFUtils), released on 2022-10-07.
+    This document describes version 0.015 of App::PDFUtils (from Perl
+    distribution App-PDFUtils), released on 2023-02-10.
 
 SYNOPSIS
     This distribution provides tha following command-line utilities related
@@ -12,6 +12,10 @@ SYNOPSIS
     *   add-pdf-password
 
     *   compress-pdf
+
+    *   convert-epub-to-pdf
+
+    *   epub2pdf
 
     *   grep-from-pdf
 
@@ -46,7 +50,11 @@ FUNCTIONS
 
     *   files* => *array[filename]*
 
+        (No description)
+
     *   password* => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -83,9 +91,53 @@ FUNCTIONS
 
     *   files* => *array[filename]*
 
+        (No description)
+
     *   overwrite => *bool*
 
+        (No description)
+
     *   setting => *str* (default: "ebook")
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_epub_to_pdf
+    Usage:
+
+     convert_epub_to_pdf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert epub file to PDF.
+
+    This utility is a simple wrapper to "ebook-convert". It allows setting
+    output filenames ("foo.epub.pdf") so you don't have to specify them
+    manually. It also allows processing multiple files in a single
+    invocation
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   overwrite => *bool*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -129,6 +181,8 @@ FUNCTIONS
         Output path.
 
     *   overwrite => *bool*
+
+        (No description)
 
     *   pages => *uint_range*
 
@@ -176,6 +230,8 @@ FUNCTIONS
         Input file.
 
     *   quiet => *bool*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -231,7 +287,11 @@ FUNCTIONS
 
     *   files* => *array[filename]*
 
+        (No description)
+
     *   passwords => *array[str]*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -278,7 +338,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2017 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

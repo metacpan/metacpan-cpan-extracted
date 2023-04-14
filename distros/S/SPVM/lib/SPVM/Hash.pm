@@ -257,3 +257,8 @@ If the $key exists, the value is deleted and returned.
 
 If not, the $default value is returned.
 
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

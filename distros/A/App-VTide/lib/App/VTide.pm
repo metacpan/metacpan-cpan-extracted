@@ -17,7 +17,7 @@ use App::VTide::Hooks;
 use Path::Tiny;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.21');
+our $VERSION = version->new('1.0.1');
 
 has config => (
     is      => 'rw',
@@ -48,12 +48,18 @@ sub run {
             default       => { test => 0, },
             auto_complete => sub {
                 my ( $option, $auto, $errors ) = @_;
-                my $sub_command = $option->files->[0] || '';
+
+                my $sub_command =
+                     $option->cmd
+                  || $ARGV[ $option->opt->{auto_complete} - 1 ]
+                  || '';
                 if ( $sub_command eq '--' ) {
                     print join ' ', sort @sub_commands;
                     return;
                 }
-                elsif ( grep { /^$sub_command./ } @sub_commands ) {
+                elsif ( $sub_command && grep { /^$sub_command./ }
+                    @sub_commands )
+                {
                     print join ' ', sort grep { /^$sub_command/ } @sub_commands;
                     return;
                 }
@@ -75,7 +81,12 @@ sub run {
                 my $sub_command = shift @args || '';
 
                 if ( grep { /^$sub_command./ } @sub_commands ) {
-                    $getopt->cmd($sub_command);
+                    if ( grep { $_ eq $sub_command } @sub_commands ) {
+                        $getopt->cmd($sub_command);
+                    }
+                    else {
+                        unshift @args, $sub_command;
+                    }
                 }
                 elsif ( !$self->sub_commands->{$sub_command} ) {
                     $getopt->cmd( $ENV{VTIDE_DIR} ? 'edit' : 'start' );
@@ -95,6 +106,8 @@ sub run {
             },
         },
         [
+            'add|add-to-session|a',
+            'update|u!',
             'name|n=s',
             'test|T!',
             'verbose|v+',
@@ -127,6 +140,8 @@ sub run {
         unshift @{ $opt->files }, $opt->cmd;
     }
 
+    $subcommand->options->default(
+        { %{$options}, %{ $subcommand->options->default } } );
     eval {
         $subcommand->run;
         1;
@@ -159,11 +174,11 @@ sub _sub_commands {
 
     mkdir $sub_file->parent if !-d $sub_file->parent;
 
-    if ( -f $sub_file && path($0)->stat->mtime ne $sub_file->stat->mtime ) {
-        unlink $sub_file;
-    }
+    #if ( -f $sub_file && path($0)->stat->mtime ne $sub_file->stat->mtime ) {
+    #    unlink $sub_file;
+    #}
 
-    return LoadFile("$sub_file") if -f $sub_file;
+    #return LoadFile("$sub_file") if -f $sub_file;
 
     return $self->_generate_sub_command();
 }
@@ -182,6 +197,7 @@ sub _generate_sub_command {
     my $sub_commands = {};
     for my $command ( reverse sort @commands ) {
         my ( $name, $conf ) = $command->details_sub;
+
         $sub_commands->{$name} = $conf;
     }
 
@@ -200,7 +216,7 @@ App::VTide - A vim/tmux based IDE for the terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide version 0.1.21
+This documentation refers to App::VTide version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -208,7 +224,7 @@ This documentation refers to App::VTide version 0.1.21
     vtide init
     vtide [start] [project]
   With in a session
-    vtide (edit|run|conf|grep|recent|split|refresh|save|help) [options]
+    vtide (edit|run|conf|grep|recent|split|refresh|save|sessions|help) [options]
 
   COMMANDS:
     conf    Show editor config settings
@@ -220,6 +236,8 @@ This documentation refers to App::VTide version 0.1.21
     refresh Refreshes the autocomplete cache
     run     Run a projects terminal command
     save    Make/Save changes to a projects config file
+    sessions
+            run of save a session
     split   Simply split up a tmux widow (using the same syntax as the config)
     start   Open a project in Tmux
 

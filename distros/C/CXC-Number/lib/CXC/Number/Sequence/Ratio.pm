@@ -5,14 +5,11 @@ package CXC::Number::Sequence::Ratio;
 use strict;
 use warnings;
 
-use feature ':5.24';
-use experimental 'lexical_subs';
+use v5.28;
 
 # ABSTRACT: ratio sequence
 
-use Carp;
-
-use Types::Standard qw( Optional );
+use Types::Standard        qw( Optional );
 use Types::Common::Numeric qw( PositiveInt );
 use Math::BigInt;
 use List::Util qw( max );
@@ -41,7 +38,7 @@ extends 'CXC::Number::Sequence';
 
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 my sub nelem {
     my ( $ratio, $w0, $Dr ) = @_;
@@ -49,9 +46,7 @@ my sub nelem {
     $w0 = $w0->copy->babs;
     $Dr = $Dr->copy->babs;
 
-    return (
-        ( ( $w0 - ( 1 - $ratio ) * $Dr ) / $w0 )->blog / $ratio->copy->blog )
-      ->bceil + 1;
+    return ( ( ( $w0 - ( 1 - $ratio ) * $Dr ) / $w0 )->blog / $ratio->copy->blog )->bceil + 1;
 }
 
 my sub DRn_factory {
@@ -76,8 +71,7 @@ my sub covers_range {
     return if $Dr <= $w0 / ( 1 - $ratio );
 
     my $min_w0 = $Dr * ( 1 - $ratio );
-    parameter_constraint->throw(
-        "spacing ($w0) is too small to cover range; must be >= $min_w0\n" );
+    parameter_constraint->throw( "spacing ($w0) is too small to cover range; must be >= $min_w0\n" );
 }
 
 my sub e0_le_min {
@@ -116,8 +110,7 @@ my %ArgBuild;
 %ArgBuild = (
     ( MIN | SOFT_MAX | W0 | RATIO ),
     sub {
-        { elements =>
-              e0_le_min( $_->ratio, $_->w0, $_->min, $_->soft_max, $_->min ) };
+        { elements => e0_le_min( $_->ratio, $_->w0, $_->min, $_->soft_max, $_->min ) };
     },
 
     ( MIN | NELEM | W0 | RATIO ),
@@ -130,8 +123,7 @@ my %ArgBuild;
 
     ( SOFT_MIN | MAX | W0 | RATIO ),
     sub {
-        { elements =>
-              e0_ge_max( $_->ratio, $_->w0, $_->soft_min, $_->max, $_->max ) };
+        { elements => e0_ge_max( $_->ratio, $_->w0, $_->soft_min, $_->max, $_->max ) };
     },
 
 
@@ -141,8 +133,7 @@ my %ArgBuild;
         my $DRn = DRn_factory( $_->w0, $_->ratio );
         my $E0  = $_->max;
 
-        { elements => [ map { $E0 - $_ } $DRn->( reverse 0 .. $_->nelem - 1 ) ]
-        };
+        { elements => [ map { $E0 - $_ } $DRn->( reverse 0 .. $_->nelem - 1 ) ], };
 
     },
 
@@ -158,14 +149,9 @@ my %ArgBuild;
             # shrink & grow!
             elsif ( $_->e0 < $_->max ) {
 
-                my $low = e0_ge_max(
-                    1 / $_->ratio,
-                    $_->w0 / $_->ratio,
-                    $_->min, $_->e0, $_->e0
-                );
+                my $low = e0_ge_max( 1 / $_->ratio, $_->w0 / $_->ratio, $_->min, $_->e0, $_->e0, );
 
-                my $high
-                  = e0_le_min( $_->ratio, $_->w0, $_->e0, $_->max, $_->e0 );
+                my $high = e0_le_min( $_->ratio, $_->w0, $_->e0, $_->max, $_->e0 );
 
                 # low and high share an edge; remove it.
                 my @elements = ( $low->@* );
@@ -184,8 +170,8 @@ my %ArgBuild;
 );
 
 # need the parens otherwise the => operator turns them into strings
+## no critic(ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions)
 my @ArgsCrossValidate = ( [
-
         E0 | MIN | MAX,
         sub {
             parameter_constraint->throw( "min < max\n" )
@@ -226,7 +212,7 @@ my @ArgsCrossValidate = ( [
 around BUILDARGS => buildargs_factory(
     map       => \%ArgMap,
     build     => \%ArgBuild,
-    xvalidate => \@ArgsCrossValidate
+    xvalidate => \@ArgsCrossValidate,
 );
 
 
@@ -331,7 +317,7 @@ CXC::Number::Sequence::Ratio - Numeric Sequence with Relative Fractional Spacing
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -538,7 +524,7 @@ results in
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

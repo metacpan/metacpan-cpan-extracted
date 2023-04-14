@@ -3,7 +3,7 @@ package Log::Dispatch::File::Locked;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Fcntl qw(:DEFAULT :flock);
 
@@ -59,7 +59,7 @@ Log::Dispatch::File::Locked - Subclass of Log::Dispatch::File to facilitate lock
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -81,13 +81,12 @@ version 2.70
 
 =head1 DESCRIPTION
 
-This module acts exactly like L<Log::Dispatch::File> except that it
-obtains an exclusive lock on the file while opening it.
+This module acts exactly like L<Log::Dispatch::File> except that it obtains an
+exclusive lock on the file while opening it.
 
-Note that if you are using this output because you want to write to a file
-from multiple processes, you should open the file with the append C<mode>
-(C<<< >> >>>), or else it's quite likely that one process will overwrite
-another.
+Note that if you are using this output because you want to write to a file from
+multiple processes, you should open the file with the append C<mode> (C<<< >>
+>>>), or else it's quite likely that one process will overwrite another.
 
 =head1 SEE ALSO
 
@@ -96,8 +95,6 @@ L<perlfunc/flock>
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -109,7 +106,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

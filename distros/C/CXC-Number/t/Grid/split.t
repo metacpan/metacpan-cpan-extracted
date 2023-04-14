@@ -2,7 +2,8 @@
 
 use Test2::V0;
 
-use aliased 'CXC::Number::Grid';
+use CXC::Number::Grid;
+use constant Grid => 'CXC::Number::Grid';
 
 subtest 'all excludes' => sub {
 
@@ -39,13 +40,9 @@ subtest 'lead excludes' => sub {
 
     is( $grids[0]->nbins, $grid->nbins - 3, 'nbins' );
 
-    is(
-        $grids[0]->_raw_edges,
-        [ $grid->_raw_edges->@[ 3 .. 11 ] ],
-        'raw edges'
-    );
-    is( $grids[0]->_include, [ $grid->_include->@[ 3 .. 10 ] ], 'include' );
-    is( $grids[0]->oob,      $grid->oob,                        'oob' );
+    is( $grids[0]->_raw_edges, [ $grid->_raw_edges->@[ 3 .. 11 ] ], 'raw edges' );
+    is( $grids[0]->_include,   [ $grid->_include->@[ 3 .. 10 ] ],   'include' );
+    is( $grids[0]->oob,        $grid->oob,                          'oob' );
 
 };
 
@@ -60,14 +57,9 @@ subtest 'trail excludes' => sub {
 
     is( $grids[0]->nbins, $grid->nbins - 3, 'nbins' );
 
-    is(
-        $grids[0]->_raw_edges,
-        [ $grid->_raw_edges->@[ 0 .. ( 11 - 3 ) ] ],
-        'raw edges'
-    );
-    is( $grids[0]->_include, [ $grid->_include->@[ 0 .. ( 10 - 3 ) ] ],
-        'include' );
-    is( $grids[0]->oob, $grid->oob, 'oob' );
+    is( $grids[0]->_raw_edges, [ $grid->_raw_edges->@[ 0 .. ( 11 - 3 ) ] ], 'raw edges' );
+    is( $grids[0]->_include,   [ $grid->_include->@[ 0 .. ( 10 - 3 ) ] ],   'include' );
+    is( $grids[0]->oob,        $grid->oob,                                  'oob' );
 
 };
 
@@ -84,12 +76,8 @@ subtest 'mixed excludes' => sub {
 
         is( $grids[0]->nbins, 3, 'nbins' );
 
-        is(
-            $grids[0]->_raw_edges,
-            [ $grid->_raw_edges->@[ 3 .. 6 ] ],
-            'raw edges'
-        );
-        is( $grids[0]->_include, [ $grid->_include->@[ 3 .. 5 ] ], 'include' );
+        is( $grids[0]->_raw_edges, [ $grid->_raw_edges->@[ 3 .. 6 ] ], 'raw edges' );
+        is( $grids[0]->_include,   [ $grid->_include->@[ 3 .. 5 ] ],   'include' );
 
         is( $grids[0]->oob, $grid->oob, 'oob' );
     };
@@ -98,12 +86,8 @@ subtest 'mixed excludes' => sub {
 
         is( $grids[1]->nbins, 2, 'nbins' );
 
-        is(
-            $grids[1]->_raw_edges,
-            [ $grid->_raw_edges->@[ 8 .. 10 ] ],
-            'raw edges'
-        );
-        is( $grids[1]->_include, [ $grid->_include->@[ 8 .. 9 ] ], 'include' );
+        is( $grids[1]->_raw_edges, [ $grid->_raw_edges->@[ 8 .. 10 ] ], 'raw edges' );
+        is( $grids[1]->_include,   [ $grid->_include->@[ 8 .. 9 ] ],    'include' );
 
         is( $grids[1]->oob, $grid->oob, 'oob' );
     };

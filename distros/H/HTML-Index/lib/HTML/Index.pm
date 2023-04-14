@@ -1,6 +1,6 @@
 package HTML::Index;
 
-$VERSION = '0.15';
+$VERSION = '0.19';
 
 #------------------------------------------------------------------------------
 #
@@ -96,7 +96,7 @@ parentheses, and logical operators (OR, AND, NOT).
 
 =head1 AUTHOR
 
-Ave Wrigley <Ave.Wrigley@itn.co.uk>
+Ave Wrigley <ave.wrigley@gmail.com>
 
 =head1 COPYRIGHT
 

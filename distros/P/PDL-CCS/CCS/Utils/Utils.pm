@@ -1,26 +1,28 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::CCS::Utils;
 
-@EXPORT_OK  = qw( PDL::PP nnz PDL::PP nnza PDL::PP ccs_encode_pointers PDL::PP ccs_decode_pointer PDL::PP ccs_pointerlen PDL::PP ccs_xindex1d PDL::PP ccs_xindex2d PDL::PP ccs_dump_which );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(nnz nnza ccs_encode_pointers ccs_decode_pointer ccs_pointerlen ccs_xindex1d ccs_xindex2d ccs_dump_which );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::CCS::Utils::VERSION = 1.23.20;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.23.22';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Utils $VERSION;
 
 
 
 
+
+
+
+#line 13 "ccsutils.pd"
 
 #use PDL::CCS::Config;
 use strict;
@@ -40,35 +42,27 @@ PDL::CCS::Utils - Low-level utilities for compressed storage sparse PDLs
  ## ... stuff happens
 
 =cut
-
-
-
-
-
-
+#line 46 "Utils.pm"
 
 =head1 FUNCTIONS
-
-
 
 =cut
 
 
 
 
+
+#line 51 "ccsutils.pd"
+
 *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
 
-
-
+#line 69 "ccsutils.pd"
 =pod
 
 =head1 Non-missing Value Counts
 
 =cut
-
-
-
-
+#line 66 "Utils.pm"
 
 =head2 nnz
 
@@ -85,21 +79,18 @@ For k>1 dimensional PDLs, projects via number of nonzero elements
 to N-1 dimensions by computing the number of nonzero elements
 along the the 1st dimension.
 
-
 =for bad
 
 nnz does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *nnz = \&PDL::nnz;
+
 
 
 
@@ -116,16 +107,12 @@ For 1d PDLs, should be equivalent to:
 
  $nnz = nelem(which(!$a->approx(0,$eps)));
 
-
 =for bad
 
 nnza does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
-
-
 
 
 
@@ -135,15 +122,15 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+
+#line 171 "ccsutils.pd"
+
 =pod
 
 =head1 Encoding Utilities
 
 =cut
-
-
-
-
+#line 134 "Utils.pm"
 
 =head2 ccs_encode_pointers
 
@@ -167,13 +154,10 @@ guaranteed to be stably sorted along dimension $N():
  or
   $ixix->at($i)             < $ixix->at($j)               ##-- ... stable
 
-
-
 =for bad
 
 ccs_encode_pointers does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -192,20 +176,21 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *ccs_encode_pointers = \&PDL::ccs_encode_pointers;
 
 
 
+
+
+#line 248 "ccsutils.pd"
 
 =pod
 
 =head1 Decoding Utilities
 
 =cut
-
-
-
-
+#line 194 "Utils.pm"
 
 =head2 ccs_decode_pointer
 
@@ -220,13 +205,10 @@ If unspecified, $proj() defaults to:
 
  sequence($ptr->dim(0))
 
-
-
 =for bad
 
 ccs_decode_pointer does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -254,7 +236,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *ccs_decode_pointer = \&PDL::ccs_decode_pointer;
+
 
 
 
@@ -266,17 +250,13 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (ptr(Nplus1); [o]ptrlen(N))
 
-
 Get number of non-missing values for each axis value from a CCS-encoded
 offset pointer vector $ptr().
-
-
 
 =for bad
 
 ccs_pointerlen does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -292,27 +272,27 @@ sub PDL::ccs_pointerlen {
 }
 
 
+
 *ccs_pointerlen = \&PDL::ccs_pointerlen;
 
 
 
+
+
+#line 348 "ccsutils.pd"
 
 =pod
 
 =head1 Indexing Utilities
 
 =cut
-
-
-
-
+#line 290 "Utils.pm"
 
 =head2 ccs_xindex1d
 
 =for sig
 
   Signature: (which(Ndims,Nnz); a(Na); [o]nzia(NnzA); [o]nnza())
-
 
 Compute indices $nzai() along dimension C<NNz> of $which() whose initial values $which(0,$nzai)
 match some element of $a().  Appropriate for indexing a sparse encoded PDL
@@ -324,13 +304,10 @@ In list context, returns a list ($nzai,$nnza), where $nnza() is the number of in
 and $nzai are those C<Nnz> indices.  In scalar context, trims the output vector $nzai() to $nnza()
 elements.
 
-
-
 =for bad
 
 ccs_xindex1d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -352,7 +329,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *ccs_xindex1d = \&PDL::ccs_xindex1d;
+
 
 
 
@@ -364,7 +343,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (which(Ndims,Nnz); a(Na); b(Nb); [o]ab(Nab); [o]nab())
 
-
 Compute indices along dimension C<NNz> of $which() corresponding to any combination
 of values in the Cartesian product of $a() and $b().  Appropriate for indexing a
 2d sparse encoded PDL with non-missing entries at $which() via the ND-index piddle
@@ -375,13 +353,10 @@ In list context, returns a list ($ab,$nab), where $nab() is the number of indice
 and $ab are those C<Nnz> indices.  In scalar context, trims the output vector $ab() to $nab()
 elements.
 
-
-
 =for bad
 
 ccs_xindex2d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -406,20 +381,21 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *ccs_xindex2d = \&PDL::ccs_xindex2d;
 
 
 
+
+
+#line 513 "ccsutils.pd"
 
 =pod
 
 =head1 Debugging Utilities
 
 =cut
-
-
-
-
+#line 399 "Utils.pm"
 
 =head2 ccs_dump_which
 
@@ -427,19 +403,15 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (indx which(Ndims,Nnz); SV *HANDLE; char *fmt; char *fsep; char *rsep)
 
-
 Print a text dump of an index PDL to the filehandle C<HANDLE>, which default to C<STDUT>.
 C<$fmt> is a printf() format to use for output, which defaults to "%d".
 C<$fsep> and C<$rsep> are field-and record separators, which default to
 a single space and C<$/>, respectively.
 
-
-
 =for bad
 
 ccs_dump_which does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -457,10 +429,14 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *ccs_dump_which = \&PDL::ccs_dump_which;
 
 
 
+
+
+#line 583 "ccsutils.pd"
 
 ##---------------------------------------------------------------------
 =pod
@@ -482,7 +458,6 @@ Probably many.
 
 =cut
 
-
 ##---------------------------------------------------------------------
 =pod
 
@@ -503,15 +478,8 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-
-
-
-;
-
-
+#line 482 "Utils.pm"
 
 # Exit with OK status
 
 1;
-
-		   

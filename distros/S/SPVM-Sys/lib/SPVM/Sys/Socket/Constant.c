@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 // Windows 8.1+
 #define _WIN32_WINNT 0x0603
 
@@ -2481,7 +2484,7 @@ int32_t SPVM__Sys__Socket__Constant__IN6ADDR_ANY(SPVM_ENV* env, SPVM_VALUE* stac
   struct in6_addr* address = env->new_memory_stack(env, stack, sizeof(struct in6_addr));
   
   int32_t e = 0;
-  void* obj_address = env->new_pointer_by_name(env, stack, "Sys::Socket::In6_addr", address, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_address = env->new_pointer_object_by_name(env, stack, "Sys::Socket::In6_addr", address, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_address;
@@ -2501,7 +2504,7 @@ int32_t SPVM__Sys__Socket__Constant__IN6ADDR_LOOPBACK(SPVM_ENV* env, SPVM_VALUE*
   struct in6_addr* address = env->new_memory_stack(env, stack, sizeof(struct in6_addr));
   
   int32_t e = 0;
-  void* obj_address = env->new_pointer_by_name(env, stack, "Sys::Socket::In6_addr", address, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_address = env->new_pointer_object_by_name(env, stack, "Sys::Socket::In6_addr", address, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_address;

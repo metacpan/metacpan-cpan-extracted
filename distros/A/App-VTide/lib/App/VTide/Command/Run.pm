@@ -22,7 +22,7 @@ use Data::Dumper    qw/Dumper/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.21');
+our $VERSION = version->new('1.0.1');
 our $NAME    = 'run';
 our $OPTIONS = [ 'name|n=s', 'test|T!', 'save|s=s', 'verbose|v+', ];
 our $LOCAL   = 1;
@@ -395,7 +395,7 @@ sub _globs2files {
                 next GLOB;
             }
         }
-        elsif ( $recurse && -d $glob ) {
+        if ( $recurse && -d $glob ) {
             push @files, map {
                 -d $_
                   ? $self->_globs2files( $groups, $helper, $recurse, $_ )
@@ -420,7 +420,7 @@ sub load_env {
     my ( $self, $env_extra ) = @_;
     if ( $env_extra && ref $env_extra eq 'HASH' ) {
         for my $env ( keys %{$env_extra} ) {
-            my $orig = $ENV{$env};
+            my $orig = $ENV{$env} // '';
             $ENV{$env} = $env_extra->{$env};
             $ENV{$env} =~ s/[\$]$env/$orig/xms;
         }
@@ -486,7 +486,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.21
+This documentation refers to App::VTide::Command::Run version 1.0.1
 
 =head1 SYNOPSIS
 

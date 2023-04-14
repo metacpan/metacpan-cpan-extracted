@@ -79,6 +79,17 @@ sub resource {
   }
 }
 
+sub interface {
+  my $self = shift;
+  if (@_) {
+    $self->{interface} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{interface};
+  }
+}
+
 sub only_lib_files {
   my $self = shift;
   if (@_) {
@@ -233,34 +244,52 @@ sub generate_dir {
   }
 }
 
-sub generate_spvm_module_file {
+sub generate_spvm_class_file {
   my ($self) = @_;
   
   # Class name
   my $class_name = $self->class_name;
   
-  my $spvm_module_content = <<"EOS";
-class $class_name {
+  # User name
+  my $user_name = $self->user_name;
+  unless (defined $user_name) {
+    $user_name = '[--user-name]'
+  }
+  
+  # Year
+  my $year = $self->_year;
+
+  my $interface = $self->interface;
+  
+  my $attributes = "";
+  if ($interface) {
+    $attributes = ": interface_t ";
+  }
+  
+  my $spvm_class_content = <<"EOS";
+# Copyright (c) $year $user_name
+# MIT License
+
+class $class_name ${attributes}{
 
 }
 EOS
   
   # Generate file
-  my $spvm_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'spvm');
+  my $spvm_class_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'spvm');
   my $lib_dir = $self->lib_dir;
-  $spvm_module_rel_file = $self->create_lib_rel_file($spvm_module_rel_file);
-  $self->generate_file($spvm_module_rel_file, $spvm_module_content);
+  $spvm_class_rel_file = $self->create_lib_rel_file($spvm_class_rel_file);
+  $self->generate_file($spvm_class_rel_file, $spvm_class_content);
 }
 
-sub generate_perl_module_file {
+sub generate_perl_class_file {
   my ($self) = @_;
   
   # Class name
   my $class_name = $self->class_name;
   
   # Year
-  my $today_tp = Time::Piece::localtime;
-  my $year = $today_tp->year;
+  my $year = $self->_year;
   
   # User name
   my $user_name = $self->user_name;
@@ -280,23 +309,148 @@ sub generate_perl_module_file {
   if ($only_lib_files) {
     $version = '';
   }
+
+  my $interface = $self->interface;
+  my $resource = $self->resource;
   
-  # Content
-  my $perl_module_content = <<"EOS";
-package SPVM::$class_name;
+  # Description
+  my $description;
+  my $main_doc;
+  if ($interface) {
+    $description = "The $class_name interface of L<SPVM> has interface methods for someting.";
+    $main_doc  = <<"EOS";
+=head1 Usage
 
-$version
+  interface $class_name;
 
-1;
+=head1 Interface Methods
 
-=head1 Name
 
-SPVM::$class_name - Short Description
 
-=head1 Description
+EOS
+  }
+  elsif ($resource) {
+    $description = "The $class_name resource of L<SPVM> is a L<resouce|SPVM::Document::Resource> for someting.";
+    
+    my $native = $self->native;
+    my $new_method;
+    if ($native eq 'c') {
+      $new_method = 'new_c99';
+    }
+    elsif ($native eq 'c++') {
+      $new_method = 'new_cpp';
+    }
+    
+    my $native_class_ext;
+    if (defined $native) {
+      if ($native eq 'c') {
+        $native_class_ext = 'c';
+      }
+      elsif ($native eq 'c++') {
+        $native_class_ext = 'cpp';
+      }
+    }
+    
+    # extern C for C++
+    my $extern_c_start;
+    my $extern_c_end;
+    if ($native eq 'c++') {
+      $extern_c_start = qq(extern "C" {);
+      $extern_c_end = "}";
+    }
+    else {
+      $extern_c_start = '';
+      $extern_c_end = '';
+    }
+    
+    $main_doc  = <<"EOS";
+=head1 Usage
 
-C<SPVM::$class_name> is the C<$class_name> class in L<SPVM> language.
+MyClass.config:
+  
+  my \$config = SPVM::Builder::Config->$new_method(file => __FILE__);
+  
+  \$config->use_resource('$class_name');
+  
+  \$config;
 
+MyClass.$native_class_ext:
+
+  #include "spvm_native.h"
+  #include "foo.h"
+  
+  $extern_c_start
+  
+  int32_t SPVM__MyClass__test(SPVM_ENV* env, SPVM_VALUE* stack) {
+    
+    // Use functions in foo.h
+    
+    return 0;
+  }
+  
+  $extern_c_end
+  
+=head1 Original Product
+
+
+
+=head1 Original Product Version
+
+
+
+=head1 Language
+
+
+
+=head1 Language Specification
+
+
+
+=head1 Required Libraries
+
+
+
+=head1 Required Linker Flags
+
+
+
+=head1 Required Resources
+
+
+
+=head1 Header Files
+
+
+
+=head1 Source Files
+
+
+
+=head1 Compiler Flags
+
+
+
+=head1 How to Create Resource
+
+
+
+=head2 Donwload
+
+
+
+=head2 Extracting Source Files
+
+
+
+=head2 Extracting Header Files
+
+
+
+EOS
+  }
+  else {
+    $description = "The $class_name class of L<SPVM> has methods for someting.";
+    $main_doc  = <<"EOS";
 =head1 Usage
 
   use $class_name;
@@ -313,6 +467,27 @@ C<SPVM::$class_name> is the C<$class_name> class in L<SPVM> language.
 
 
 
+EOS
+  }
+  
+  # Content
+  my $perl_class_content = "";
+  $perl_class_content = <<"EOS";
+package SPVM::$class_name;
+
+$version
+
+1;
+
+=head1 Name
+
+SPVM::$class_name - Short Description
+
+=head1 Description
+
+$description
+
+$main_doc
 =head1 Repository
 
 
@@ -323,17 +498,16 @@ $user_name C<$user_email>
 
 =head1 Copyright & License
 
-Copyright $year-$year $user_name, all rights reserved.
+Copyright (c) $year $user_name
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 
 EOS
 
   # Generate file
-  my $perl_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'pm');
-  $perl_module_rel_file =  $self->create_lib_rel_file($perl_module_rel_file);
-  $self->generate_file($perl_module_rel_file, $perl_module_content);
+  my $perl_class_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'pm');
+  $perl_class_rel_file =  $self->create_lib_rel_file($perl_class_rel_file);
+  $self->generate_file($perl_class_rel_file, $perl_class_content);
 }
 
 sub generate_native_config_file {
@@ -346,14 +520,26 @@ sub generate_native_config_file {
   my $native = $self->native;
   my $new_method;
   if ($native eq 'c') {
-    $new_method = 'new_gnu99';
+    $new_method = 'new_c99';
   }
   elsif ($native eq 'c++') {
     $new_method = 'new_cpp';
   }
   
+  # User name
+  my $user_name = $self->user_name;
+  unless (defined $user_name) {
+    $user_name = '[--user-name]'
+  }
+  
+  # Year
+  my $year = $self->_year;
+  
   # Content
   my $native_config_content = <<"EOS";
+# Copyright (c) $year $user_name
+# MIT License
+
 use strict;
 use warnings;
 use SPVM::Builder::Config;
@@ -369,7 +555,7 @@ EOS
   $self->generate_file($native_config_rel_file, $native_config_content);
 }
 
-sub generate_native_module_file {
+sub generate_native_class_file {
   my ($self) = @_;
 
   # Class name
@@ -389,28 +575,41 @@ sub generate_native_module_file {
   }
 
   # Generate file
-  my $native_module_ext;
+  my $native_class_ext;
   if (defined $native) {
     if ($native eq 'c') {
-      $native_module_ext = 'c';
+      $native_class_ext = 'c';
     }
     elsif ($native eq 'c++') {
-      $native_module_ext = 'cpp';
+      $native_class_ext = 'cpp';
     }
   }
   
   # Content
   my $native_class_name = $class_name;
   $native_class_name =~ s/::/__/g;
-  my $native_module_file = $class_name;
-  $native_module_file =~ s/::/\//g;
-  $native_module_file .= ".$native_module_ext";
-  my $native_module_content = <<"EOS";
+  my $native_class_file = $class_name;
+  $native_class_file =~ s/::/\//g;
+  $native_class_file .= ".$native_class_ext";
+
+  # User name
+  my $user_name = $self->user_name;
+  unless (defined $user_name) {
+    $user_name = '[--user-name]'
+  }
+  
+  # Year
+  my $year = $self->_year;
+  
+  my $native_class_content = <<"EOS";
+// Copyright (c) $year $user_name
+// MIT License
+
 #include "spvm_native.h"
 
 $extern_c_start
 
-static const char* FILE_NAME = "$native_module_file";
+static const char* FILE_NAME = "$native_class_file";
 
 int32_t SPVM__${native_class_name}__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
@@ -422,35 +621,35 @@ int32_t SPVM__${native_class_name}__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
 $extern_c_end
 EOS
   
-  my $native_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, $native_module_ext);
-  $native_module_rel_file =  $self->create_lib_rel_file($native_module_rel_file);
-  $self->generate_file($native_module_rel_file, $native_module_content);
+  my $native_class_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, $native_class_ext);
+  $native_class_rel_file =  $self->create_lib_rel_file($native_class_rel_file);
+  $self->generate_file($native_class_rel_file, $native_class_content);
 }
 
-sub generate_gitkeep_file_for_native_module_include_dir {
+sub generate_gitkeep_file_for_native_class_include_dir {
   my ($self) = @_;
 
   # Class name
   my $class_name = $self->class_name;
   
   # Generate file
-  my $gitkeep_rel_file_for_native_module_include_dir = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'native');
-  $gitkeep_rel_file_for_native_module_include_dir .= '/include/.gitkeep';
-  $gitkeep_rel_file_for_native_module_include_dir =  $self->create_lib_rel_file($gitkeep_rel_file_for_native_module_include_dir);
-  $self->generate_file($gitkeep_rel_file_for_native_module_include_dir, '');
+  my $gitkeep_rel_file_for_native_class_include_dir = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'native');
+  $gitkeep_rel_file_for_native_class_include_dir .= '/include/.gitkeep';
+  $gitkeep_rel_file_for_native_class_include_dir =  $self->create_lib_rel_file($gitkeep_rel_file_for_native_class_include_dir);
+  $self->generate_file($gitkeep_rel_file_for_native_class_include_dir, '');
 }
 
-sub generate_gitkeep_file_for_native_module_src_dir {
+sub generate_gitkeep_file_for_native_class_src_dir {
   my ($self) = @_;
 
   # Class name
   my $class_name = $self->class_name;
   
   # Generate file
-  my $gitkeep_rel_file_for_native_module_include_dir = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'native');
-  $gitkeep_rel_file_for_native_module_include_dir .= '/src/.gitkeep';
-  $gitkeep_rel_file_for_native_module_include_dir =  $self->create_lib_rel_file($gitkeep_rel_file_for_native_module_include_dir);
-  $self->generate_file($gitkeep_rel_file_for_native_module_include_dir, '');
+  my $gitkeep_rel_file_for_native_class_include_dir = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'native');
+  $gitkeep_rel_file_for_native_class_include_dir .= '/src/.gitkeep';
+  $gitkeep_rel_file_for_native_class_include_dir =  $self->create_lib_rel_file($gitkeep_rel_file_for_native_class_include_dir);
+  $self->generate_file($gitkeep_rel_file_for_native_class_include_dir, '');
 }
 
 sub generate_gitignore_file {
@@ -564,8 +763,8 @@ sub generate_makefile_pl_file {
   # Precompile make rule
   my $make_rule_precompile = $self->precompile && !$resource ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('$class_name');" : '';
 
-  my $perl_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'pm');
-  $perl_module_rel_file =  $self->create_lib_rel_file($perl_module_rel_file);
+  my $perl_class_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'pm');
+  $perl_class_rel_file =  $self->create_lib_rel_file($perl_class_rel_file);
   
   # "Makefile.PL" content
   my $makefile_pl_content = <<"EOS";
@@ -578,11 +777,11 @@ use Getopt::Long 'GetOptions';
 
 GetOptions(
   'meta' => \\my \$meta,
-  'no-build-spvm-modules' => \\my \$no_build_spvm_modules,
+  'no-build-spvm-classes' => \\my \$no_build_spvm_classes,
 );
 
 if (\$meta) {
-  \$no_build_spvm_modules = 1;
+  \$no_build_spvm_classes = 1;
 }
 
 unless (\$meta) {
@@ -592,10 +791,10 @@ unless (\$meta) {
 my \%configure_and_runtime_requires = ('SPVM' => '$SPVM::VERSION');
 WriteMakefile(
   NAME              => 'SPVM::$class_name',
-  VERSION_FROM      => '$perl_module_rel_file',
-  LICENSE           => 'perl_5',
+  VERSION_FROM      => '$perl_class_rel_file',
+  LICENSE           => 'mit',
   (\$] >= 5.005 ?     ## Add these new keywords supported since 5.005
-    (ABSTRACT_FROM  => '$perl_module_rel_file',
+    (ABSTRACT_FROM  => '$perl_class_rel_file',
      AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
   test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
@@ -628,7 +827,7 @@ sub MY::postamble {
 
   my \$make_rule = '';
   
-  unless (\$no_build_spvm_modules) {
+  unless (\$no_build_spvm_classes) {
     require SPVM::Builder::Util::API;
     
     $make_rule_native
@@ -674,7 +873,52 @@ EOS
   $self->generate_file($basic_test_rel_file, $basic_test_content);
 }
 
-sub generate_basic_test_spvm_module_file {
+sub generate_license_file {
+  my ($self) = @_;
+  
+  # Class name
+  my $class_name = $self->class_name;
+  
+  # User name
+  my $user_name = $self->user_name;
+  unless (defined $user_name) {
+    $user_name = '[--user-name]'
+  }
+  
+  # Year
+  my $year = $self->_year;
+  
+  # Content
+  my $license_content = <<"EOS";
+MIT License
+
+Copyright (c) $year $user_name
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+EOS
+  
+  # Generate file
+  my $license_rel_file = 'LICENSE';
+  $self->generate_file($license_rel_file, $license_content);
+}
+
+sub generate_basic_test_spvm_class_file {
   my ($self) = @_;
   
   # Class name
@@ -684,17 +928,17 @@ sub generate_basic_test_spvm_module_file {
   my $resource = $self->resource;
   
   # Content
-  my $basic_test_spvm_module_content;
+  my $basic_test_spvm_class_content;
   
   if ($resource) {
-    $basic_test_spvm_module_content = <<"EOS";
+    $basic_test_spvm_class_content = <<"EOS";
 class TestCase::$class_name {
   native static method test : int ();
 }
 EOS
   }
   else {
-    $basic_test_spvm_module_content = <<"EOS";
+    $basic_test_spvm_class_content = <<"EOS";
 class TestCase::$class_name {
   use $class_name;
   static method test : int () {
@@ -706,9 +950,9 @@ EOS
   }
   
   # Generate file
-  my $basic_test_spvm_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", 'spvm');
-  $basic_test_spvm_module_rel_file = "t/lib/$basic_test_spvm_module_rel_file";
-  $self->generate_file($basic_test_spvm_module_rel_file, $basic_test_spvm_module_content);
+  my $basic_test_spvm_class_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", 'spvm');
+  $basic_test_spvm_class_rel_file = "t/lib/$basic_test_spvm_class_rel_file";
+  $self->generate_file($basic_test_spvm_class_rel_file, $basic_test_spvm_class_content);
 }
 
 sub generate_basic_test_native_config_file {
@@ -724,7 +968,7 @@ sub generate_basic_test_native_config_file {
   my $native = $self->native;
   my $new_method;
   if ($native eq 'c') {
-    $new_method = 'new_gnu99';
+    $new_method = 'new_c99';
   }
   elsif ($native eq 'c++') {
     $new_method = 'new_cpp';
@@ -748,7 +992,7 @@ EOS
   $self->generate_file($basic_test_native_config_rel_file, $basic_test_native_config_content);
 }
 
-sub generate_basic_test_native_module_file {
+sub generate_basic_test_native_class_file {
   my ($self) = @_;
   
   # Class name
@@ -773,7 +1017,7 @@ sub generate_basic_test_native_module_file {
   # Content
   my $native_class_name = $class_name;
   $native_class_name =~ s/::/__/g;
-  my $basic_test_native_module_content = <<"EOS";
+  my $basic_test_native_class_content = <<"EOS";
 #include "spvm_native.h"
 
 $extern_c_start
@@ -791,18 +1035,18 @@ $extern_c_end
 EOS
   
   # Generate file
-  my $native_module_ext;
+  my $native_class_ext;
   if (defined $native) {
     if ($native eq 'c') {
-      $native_module_ext = 'c';
+      $native_class_ext = 'c';
     }
     elsif ($native eq 'c++') {
-      $native_module_ext = 'cpp';
+      $native_class_ext = 'cpp';
     }
   }
-  my $basic_test_native_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", $native_module_ext);
-  $basic_test_native_module_rel_file = "t/lib/$basic_test_native_module_rel_file";
-  $self->generate_file($basic_test_native_module_rel_file, $basic_test_native_module_content);
+  my $basic_test_native_class_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", $native_class_ext);
+  $basic_test_native_class_rel_file = "t/lib/$basic_test_native_class_rel_file";
+  $self->generate_file($basic_test_native_class_rel_file, $basic_test_native_class_content);
 }
 
 sub generate_dist {
@@ -815,11 +1059,16 @@ sub generate_dist {
   }
   
   if ($class_name =~ /-/) {
-    confess "The class name can't contain \"-\"";
+    confess "The class name cannnot contain \"-\"";
   }
   
   my $native = $self->native;
+  my $interface = $self->interface;
   my $resource = $self->resource;
+  
+  if ($interface && $resource) {
+    die "The --interface option and the --resource option cannot be specified at the same time"
+  }
   
   my $class_name_rel_file = $class_name;
   $class_name_rel_file =~ s|::|/|g;
@@ -828,31 +1077,31 @@ sub generate_dist {
   my $output_dir = $self->output_dir;
   $self->generate_dir($output_dir);
   
-  # Generate SPVM module file
+  # Generate SPVM class file
   unless ($resource) {
-    $self->generate_spvm_module_file;
+    $self->generate_spvm_class_file;
   }
   
-  # Generate Perl module file
+  # Generate Perl class file
   my $no_pm_file = $self->no_pm_file;
   unless ($no_pm_file) {
-    $self->generate_perl_module_file;
+    $self->generate_perl_class_file;
   }
   
   if ($native) {
     # Generate native config file
     $self->generate_native_config_file;
     
-    # Generate native module file
+    # Generate native class file
     unless ($resource) {
-      $self->generate_native_module_file;
+      $self->generate_native_class_file;
     }
     
-    # Generate ".gitkeep" file for native module include directory
-    $self->generate_gitkeep_file_for_native_module_include_dir;
+    # Generate ".gitkeep" file for native class include directory
+    $self->generate_gitkeep_file_for_native_class_include_dir;
     
-    # Generate ".gitkeep" file for native module src directory
-    $self->generate_gitkeep_file_for_native_module_src_dir;
+    # Generate ".gitkeep" file for native class src directory
+    $self->generate_gitkeep_file_for_native_class_src_dir;
   }
   
   my $only_lib_files = $self->only_lib_files;
@@ -875,17 +1124,30 @@ sub generate_dist {
     # Generate t/basic.t file
     $self->generate_basic_test_file;
 
-    # Generate basic test SPVM module file
-    $self->generate_basic_test_spvm_module_file;
+    # Generate basic test SPVM class file
+    $self->generate_basic_test_spvm_class_file;
 
+    # Generate license file
+    $self->generate_license_file;
+    
     if ($resource) {
-      # Generate basic test native module file
-      $self->generate_basic_test_native_module_file;
+      # Generate basic test native class file
+      $self->generate_basic_test_native_class_file;
 
       # Generate basic test native config file
       $self->generate_basic_test_native_config_file;
     }
   }
+}
+
+sub _year {
+  my ($self) = @_;
+  
+  # Year
+  my $today_tp = Time::Piece::localtime;
+  my $year = $today_tp->year;
+  
+  return $year;
 }
 
 1;
@@ -894,7 +1156,11 @@ sub generate_dist {
 
 SPVM::Dist - Generating SPVM Distrubution
 
-=head2 SYNOPSYS
+=head2 Description
+
+The SPVM::Dist class has methods to generate a SPVM Distrubution.
+
+=head2 Usage
 
   my $dist = SPVM::Dist->new(
     class_name => 'Math',
@@ -902,6 +1168,8 @@ SPVM::Dist - Generating SPVM Distrubution
   
   $dist->generate_dist;
 
-=head2 DESCRIPTION
+=head1 Copyright & License
 
-C<SPVM::Dist> generates a SPVM Distrubution.
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

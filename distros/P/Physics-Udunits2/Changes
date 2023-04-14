@@ -1,5 +1,9 @@
 Revision history for Perl extension Physics::Udunits2.
 
+0.04
+    - fixing type in example
+    - better installation instructions
+
 0.03  Thu Aug  6 11:43:44 CEST 2009
     - adding documentation
 	- adding tests

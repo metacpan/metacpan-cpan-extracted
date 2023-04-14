@@ -1,0 +1,938 @@
+#!perl
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-01-20'; # DATE
+our $DIST = 'App-SahUtils'; # DIST
+our $VERSION = '0.483'; # VERSION
+
+our %SPEC;
+
+$SPEC{app} = {
+    v => 1.1,
+    summary => 'Show Data::Sah::Value::{,perl,js} module',
+    args => {
+        name => {
+            schema => ['perl::modname*'],
+            pos => 0,
+            completion => sub {
+                my %args = @_;
+                require Complete::Module;
+                require Complete::Util;
+                Complete::Util::combine_answers(
+                    Complete::Module::complete_module(
+                        word => $args{word},
+                        ns_prefix => 'Data::Sah::Value',
+                    ),
+                    Complete::Module::complete_module(
+                        word => $args{word},
+                        ns_prefix => 'Data::Sah::Value::perl',
+                    ),
+                    Complete::Module::complete_module(
+                        word => $args{word},
+                        ns_prefix => 'Data::Sah::Value::js',
+                    ),
+                );
+            },
+        },
+        list => {
+            schema => ['bool', is=>1],
+            cmdline_aliases => {l=>{}},
+        },
+    },
+};
+sub app {
+    my %args = @_;
+
+    my $name = $args{name};
+
+    if ($args{list}) {
+        my @res;
+        require Module::List::Tiny;
+        my $res = Module::List::Tiny::list_modules(
+            'Data::Sah::Value::', {list_modules=>1, recurse=>1});
+        for (sort keys %$res) {
+            s/\AData::Sah::Value:://;
+            push @res, $_;
+        }
+        return [200, "OK", \@res];
+    } elsif ($name) {
+        require File::Slurper;
+        require Module::Path::More;
+        $name =~ /\A\w+(::\w+)*\z/
+            or return [400, "Invalid module name '$name'"];;
+        my $found;
+        for my $prefix ("Data::Sah::Value", "Data::Sah::Value::perl", "Data::Sah::Value::js", "") {
+            my $fullname = "$prefix\::$name";
+            my $path = Module::Path::More::module_path(module => $fullname);
+            next unless $path;
+            $found++;
+            return [200, "OK", File::Slurper::read_text($path)];
+        }
+        return [404, "No such value rule module name '$name'"] unless $found;
+    } else {
+        return [400, "Please specify name of a Sah value rule module (or -l)"];
+    }
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    pass_cmdline_object => 1,
+)->run;
+
+# ABSTRACT: List Sah coerce rule modules
+# PODNAME: show-sah-value-rule-modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+show-sah-value-rule-modules - List Sah coerce rule modules
+
+=head1 VERSION
+
+This document describes version 0.483 of show-sah-value-rule-modules (from Perl distribution App-SahUtils), released on 2023-01-20.
+
+=head1 SYNOPSIS
+
+B<show-sah-value-rule-modules> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<show-sah-value-rule-modules> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<show-sah-value-rule-modules> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--dist-contains|/"--dist-contains=s">>=I<str>] [(B<L<--dist-in|/"--dist-in=s@">>=I<str>)+|B<L<--dist-in-json|/"--dist-in=s@">>=I<json>] [B<L<--dist-is|/"--dist-is=s">>=I<str>] [B<L<--dist-isnt|/"--dist-isnt=s">>=I<str>] [B<L<--dist-max|/"--dist-max=s">>=I<str>] [B<L<--dist-min|/"--dist-min=s">>=I<str>] [B<L<--dist-not-contains|/"--dist-not-contains=s">>=I<str>] [(B<L<--dist-not-in|/"--dist-not-in=s@">>=I<str>)+|B<L<--dist-not-in-json|/"--dist-not-in=s@">>=I<json>] [B<L<--dist-xmax|/"--dist-xmax=s">>=I<str>] [B<L<--dist-xmin|/"--dist-xmin=s">>=I<str>] [B<L<--dist|/"--dist=s">>=I<str>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>] [(B<L<--field|/"--fields-json=s">>=I<str>)+|B<L<--fields-json|/"--fields-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--might-fail|/"--might-fail">>|B<L<--no-might-fail|/"--might-fail">>|B<L<--nomight-fail|/"--might-fail">>] [B<L<--might-fail-is|/"--might-fail-is">>|B<L<--no-might-fail-is|/"--might-fail-is">>|B<L<--nomight-fail-is|/"--might-fail-is">>] [B<L<--might-fail-isnt|/"--might-fail-isnt">>|B<L<--no-might-fail-isnt|/"--might-fail-isnt">>|B<L<--nomight-fail-isnt|/"--might-fail-isnt">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--prio-in|/"--prio-in=s@">>=I<int>)+|B<L<--prio-in-json|/"--prio-in=s@">>=I<json>] [B<L<--prio-is|/"--prio-is=s">>=I<int>] [B<L<--prio-isnt|/"--prio-isnt=s">>=I<int>] [B<L<--prio-max|/"--prio-max=s">>=I<int>] [B<L<--prio-min|/"--prio-min=s">>=I<int>] [(B<L<--prio-not-in|/"--prio-not-in=s@">>=I<int>)+|B<L<--prio-not-in-json|/"--prio-not-in=s@">>=I<json>] [B<L<--prio-xmax|/"--prio-xmax=s">>=I<int>] [B<L<--prio-xmin|/"--prio-xmin=s">>=I<int>] [B<L<--prio|/"--prio=s">>=I<int>] [B<L<--query-boolean|/"--query-boolean=s">>=I<str>|B<L<--and|/"--query-boolean=s">>|B<L<--or|/"--query-boolean=s">>] [(B<L<--query|/"--query=s@">>=I<str>)+|B<L<--queries-json|/"--query=s@">>=I<json>|(B<L<-q|/"--query=s@">>=I<str>)+] [B<L<--random|/"--random">>|B<L<--no-random|/"--random">>|B<L<--norandom|/"--random">>] [B<L<--result-limit|/"--result-limit=s">>=I<int>] [B<L<--result-start|/"--result-start=s">>=I<int>] [B<L<--rule-contains|/"--rule-contains=s">>=I<str>] [(B<L<--rule-in|/"--rule-in=s@">>=I<str>)+|B<L<--rule-in-json|/"--rule-in=s@">>=I<json>] [B<L<--rule-is|/"--rule-is=s">>=I<str>] [B<L<--rule-isnt|/"--rule-isnt=s">>=I<str>] [B<L<--rule-max|/"--rule-max=s">>=I<str>] [B<L<--rule-min|/"--rule-min=s">>=I<str>] [B<L<--rule-not-contains|/"--rule-not-contains=s">>=I<str>] [(B<L<--rule-not-in|/"--rule-not-in=s@">>=I<str>)+|B<L<--rule-not-in-json|/"--rule-not-in=s@">>=I<json>] [B<L<--rule-xmax|/"--rule-xmax=s">>=I<str>] [B<L<--rule-xmin|/"--rule-xmin=s">>=I<str>] [B<L<--rule|/"--rule=s">>=I<str>] [(B<L<--sort|/"--sort=s@">>=I<str>)+|B<L<--sort-json|/"--sort=s@">>=I<json>] [B<L<--summary-contains|/"--summary-contains=s">>=I<str>] [(B<L<--summary-in|/"--summary-in=s@">>=I<str>)+|B<L<--summary-in-json|/"--summary-in=s@">>=I<json>] [B<L<--summary-is|/"--summary-is=s">>=I<str>] [B<L<--summary-isnt|/"--summary-isnt=s">>=I<str>] [B<L<--summary-max|/"--summary-max=s">>=I<str>] [B<L<--summary-min|/"--summary-min=s">>=I<str>] [B<L<--summary-not-contains|/"--summary-not-contains=s">>=I<str>] [(B<L<--summary-not-in|/"--summary-not-in=s@">>=I<str>)+|B<L<--summary-not-in-json|/"--summary-not-in=s@">>=I<json>] [B<L<--summary-xmax|/"--summary-xmax=s">>=I<str>] [B<L<--summary-xmin|/"--summary-xmin=s">>=I<str>] [B<L<--summary|/"--summary=s">>=I<str>] [B<L<--v-arg|/"--v-arg=s">>=I<str>] [B<L<--v-contains|/"--v-contains=s">>=I<str>] [(B<L<--v-in|/"--v-in=s@">>=I<str>)+|B<L<--v-in-json|/"--v-in=s@">>=I<json>] [B<L<--v-is|/"--v-is=s">>=I<str>] [B<L<--v-isnt|/"--v-isnt=s">>=I<str>] [B<L<--v-max|/"--v-max=s">>=I<str>] [B<L<--v-min|/"--v-min=s">>=I<str>] [B<L<--v-not-contains|/"--v-not-contains=s">>=I<str>] [(B<L<--v-not-in|/"--v-not-in=s@">>=I<str>)+|B<L<--v-not-in-json|/"--v-not-in=s@">>=I<json>] [B<L<--v-xmax|/"--v-xmax=s">>=I<str>] [B<L<--v-xmin|/"--v-xmin=s">>=I<str>] [B<L<--with-field-names|/"--with-field-names">>|B<L<--without-field-names|/"--with-field-names">>] -- [I<L<query|/"--query=s@">>] ...
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for dist options
+
+=over
+
+=item B<--dist-contains>=I<s>
+
+Only return records where the 'dist' field contains specified text.
+
+=item B<--dist-in-json>=I<s>
+
+Only return records where the 'dist' field is in the specified values (JSON-encoded).
+
+See C<--dist-in>.
+
+=item B<--dist-in>=I<s@>
+
+Only return records where the 'dist' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dist-is>=I<s>
+
+Only return records where the 'dist' field equals specified value.
+
+=item B<--dist-isnt>=I<s>
+
+Only return records where the 'dist' field does not equal specified value.
+
+=item B<--dist-max>=I<s>
+
+Only return records where the 'dist' field is less than or equal to specified value.
+
+=item B<--dist-min>=I<s>
+
+Only return records where the 'dist' field is greater than or equal to specified value.
+
+=item B<--dist-not-contains>=I<s>
+
+Only return records where the 'dist' field does not contain specified text.
+
+=item B<--dist-not-in-json>=I<s>
+
+Only return records where the 'dist' field is not in the specified values (JSON-encoded).
+
+See C<--dist-not-in>.
+
+=item B<--dist-not-in>=I<s@>
+
+Only return records where the 'dist' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dist-xmax>=I<s>
+
+Only return records where the 'dist' field is less than specified value.
+
+=item B<--dist-xmin>=I<s>
+
+Only return records where the 'dist' field is greater than specified value.
+
+=item B<--dist>=I<s>
+
+Only return records where the 'dist' field equals specified value.
+
+=back
+
+=head2 Filtering for might_fail options
+
+=over
+
+=item B<--might-fail>
+
+Only return records where the 'might_fail' field equals specified value.
+
+=item B<--might-fail-is>
+
+Only return records where the 'might_fail' field equals specified value.
+
+=item B<--might-fail-isnt>
+
+Only return records where the 'might_fail' field does not equal specified value.
+
+=back
+
+=head2 Filtering for prio options
+
+=over
+
+=item B<--prio-in-json>=I<s>
+
+Only return records where the 'prio' field is in the specified values (JSON-encoded).
+
+See C<--prio-in>.
+
+=item B<--prio-in>=I<s@>
+
+Only return records where the 'prio' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--prio-is>=I<s>
+
+Only return records where the 'prio' field equals specified value.
+
+=item B<--prio-isnt>=I<s>
+
+Only return records where the 'prio' field does not equal specified value.
+
+=item B<--prio-max>=I<s>
+
+Only return records where the 'prio' field is less than or equal to specified value.
+
+=item B<--prio-min>=I<s>
+
+Only return records where the 'prio' field is greater than or equal to specified value.
+
+=item B<--prio-not-in-json>=I<s>
+
+Only return records where the 'prio' field is not in the specified values (JSON-encoded).
+
+See C<--prio-not-in>.
+
+=item B<--prio-not-in>=I<s@>
+
+Only return records where the 'prio' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--prio-xmax>=I<s>
+
+Only return records where the 'prio' field is less than specified value.
+
+=item B<--prio-xmin>=I<s>
+
+Only return records where the 'prio' field is greater than specified value.
+
+=item B<--prio>=I<s>
+
+Only return records where the 'prio' field equals specified value.
+
+=back
+
+=head2 Filtering for rule options
+
+=over
+
+=item B<--rule-contains>=I<s>
+
+Only return records where the 'rule' field contains specified text.
+
+=item B<--rule-in-json>=I<s>
+
+Only return records where the 'rule' field is in the specified values (JSON-encoded).
+
+See C<--rule-in>.
+
+=item B<--rule-in>=I<s@>
+
+Only return records where the 'rule' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--rule-is>=I<s>
+
+Only return records where the 'rule' field equals specified value.
+
+=item B<--rule-isnt>=I<s>
+
+Only return records where the 'rule' field does not equal specified value.
+
+=item B<--rule-max>=I<s>
+
+Only return records where the 'rule' field is less than or equal to specified value.
+
+=item B<--rule-min>=I<s>
+
+Only return records where the 'rule' field is greater than or equal to specified value.
+
+=item B<--rule-not-contains>=I<s>
+
+Only return records where the 'rule' field does not contain specified text.
+
+=item B<--rule-not-in-json>=I<s>
+
+Only return records where the 'rule' field is not in the specified values (JSON-encoded).
+
+See C<--rule-not-in>.
+
+=item B<--rule-not-in>=I<s@>
+
+Only return records where the 'rule' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--rule-xmax>=I<s>
+
+Only return records where the 'rule' field is less than specified value.
+
+=item B<--rule-xmin>=I<s>
+
+Only return records where the 'rule' field is greater than specified value.
+
+=item B<--rule>=I<s>
+
+Only return records where the 'rule' field equals specified value.
+
+=back
+
+=head2 Filtering for summary options
+
+=over
+
+=item B<--summary-contains>=I<s>
+
+Only return records where the 'summary' field contains specified text.
+
+=item B<--summary-in-json>=I<s>
+
+Only return records where the 'summary' field is in the specified values (JSON-encoded).
+
+See C<--summary-in>.
+
+=item B<--summary-in>=I<s@>
+
+Only return records where the 'summary' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-is>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=item B<--summary-isnt>=I<s>
+
+Only return records where the 'summary' field does not equal specified value.
+
+=item B<--summary-max>=I<s>
+
+Only return records where the 'summary' field is less than or equal to specified value.
+
+=item B<--summary-min>=I<s>
+
+Only return records where the 'summary' field is greater than or equal to specified value.
+
+=item B<--summary-not-contains>=I<s>
+
+Only return records where the 'summary' field does not contain specified text.
+
+=item B<--summary-not-in-json>=I<s>
+
+Only return records where the 'summary' field is not in the specified values (JSON-encoded).
+
+See C<--summary-not-in>.
+
+=item B<--summary-not-in>=I<s@>
+
+Only return records where the 'summary' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-xmax>=I<s>
+
+Only return records where the 'summary' field is less than specified value.
+
+=item B<--summary-xmin>=I<s>
+
+Only return records where the 'summary' field is greater than specified value.
+
+=item B<--summary>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=back
+
+=head2 Filtering for v options
+
+=over
+
+=item B<--v-arg>=I<s>
+
+Only return records where the 'v' field equals specified value.
+
+=item B<--v-contains>=I<s>
+
+Only return records where the 'v' field contains specified text.
+
+=item B<--v-in-json>=I<s>
+
+Only return records where the 'v' field is in the specified values (JSON-encoded).
+
+See C<--v-in>.
+
+=item B<--v-in>=I<s@>
+
+Only return records where the 'v' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--v-is>=I<s>
+
+Only return records where the 'v' field equals specified value.
+
+=item B<--v-isnt>=I<s>
+
+Only return records where the 'v' field does not equal specified value.
+
+=item B<--v-max>=I<s>
+
+Only return records where the 'v' field is less than or equal to specified value.
+
+=item B<--v-min>=I<s>
+
+Only return records where the 'v' field is greater than or equal to specified value.
+
+=item B<--v-not-contains>=I<s>
+
+Only return records where the 'v' field does not contain specified text.
+
+=item B<--v-not-in-json>=I<s>
+
+Only return records where the 'v' field is not in the specified values (JSON-encoded).
+
+See C<--v-not-in>.
+
+=item B<--v-not-in>=I<s@>
+
+Only return records where the 'v' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--v-xmax>=I<s>
+
+Only return records where the 'v' field is less than specified value.
+
+=item B<--v-xmin>=I<s>
+
+Only return records where the 'v' field is greater than specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
+
+Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C show-sah-value-rule-modules show-sah-value-rule-modules
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete show-sah-value-rule-modules 'p/*/`show-sah-value-rule-modules`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/show-sah-value-rule-modules.conf>, F</home/u1/show-sah-value-rule-modules.conf>, or F</etc/show-sah-value-rule-modules.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ detail (see --detail)
+ dist (see --dist)
+ dist.contains (see --dist-contains)
+ dist.in (see --dist-in)
+ dist.is (see --dist-is)
+ dist.isnt (see --dist-isnt)
+ dist.max (see --dist-max)
+ dist.min (see --dist-min)
+ dist.not_contains (see --dist-not-contains)
+ dist.not_in (see --dist-not-in)
+ dist.xmax (see --dist-xmax)
+ dist.xmin (see --dist-xmin)
+ exclude_fields (see --exclude-field)
+ fields (see --field)
+ format (see --format)
+ might_fail (see --might-fail)
+ might_fail.is (see --might-fail-is)
+ might_fail.isnt (see --might-fail-isnt)
+ naked_res (see --naked-res)
+ prio (see --prio)
+ prio.in (see --prio-in)
+ prio.is (see --prio-is)
+ prio.isnt (see --prio-isnt)
+ prio.max (see --prio-max)
+ prio.min (see --prio-min)
+ prio.not_in (see --prio-not-in)
+ prio.xmax (see --prio-xmax)
+ prio.xmin (see --prio-xmin)
+ queries (see --query)
+ query_boolean (see --query-boolean)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ rule (see --rule)
+ rule.contains (see --rule-contains)
+ rule.in (see --rule-in)
+ rule.is (see --rule-is)
+ rule.isnt (see --rule-isnt)
+ rule.max (see --rule-max)
+ rule.min (see --rule-min)
+ rule.not_contains (see --rule-not-contains)
+ rule.not_in (see --rule-not-in)
+ rule.xmax (see --rule-xmax)
+ rule.xmin (see --rule-xmin)
+ sort (see --sort)
+ summary (see --summary)
+ summary.contains (see --summary-contains)
+ summary.in (see --summary-in)
+ summary.is (see --summary-is)
+ summary.isnt (see --summary-isnt)
+ summary.max (see --summary-max)
+ summary.min (see --summary-min)
+ summary.not_contains (see --summary-not-contains)
+ summary.not_in (see --summary-not-in)
+ summary.xmax (see --summary-xmax)
+ summary.xmin (see --summary-xmin)
+ v (see --v-arg)
+ v.contains (see --v-contains)
+ v.in (see --v-in)
+ v.is (see --v-is)
+ v.isnt (see --v-isnt)
+ v.max (see --v-max)
+ v.min (see --v-min)
+ v.not_contains (see --v-not-contains)
+ v.not_in (see --v-not-in)
+ v.xmax (see --v-xmax)
+ v.xmin (see --v-xmin)
+ with_field_names (see --with-field-names)
+
+=head1 ENVIRONMENT
+
+=head2 SHOW_SAH_VALUE_RULE_MODULES_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/show-sah-value-rule-modules.conf
+
+=head2 /home/u1/show-sah-value-rule-modules.conf
+
+=head2 /etc/show-sah-value-rule-modules.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SahUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
+
+=head1 SEE ALSO
+
+L<list-sah-value-rule-modules>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

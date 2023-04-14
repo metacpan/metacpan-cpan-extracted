@@ -1,0 +1,35 @@
+---
+abstract: 'A HealthCheck that uses parallelization for running checks'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HealthCheck-Parallel
+provides:
+  HealthCheck::Parallel:
+    file: lib/HealthCheck/Parallel.pm
+    version: v0.0.2
+requires:
+  HealthCheck: v1.8.1
+  Parallel::ForkManager: '0'
+  perl: v5.10.0
+resources:
+  repository: git://github.com/GrantStreetGroup/p5-healthcheck-parallel.git
+version: v0.0.2
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

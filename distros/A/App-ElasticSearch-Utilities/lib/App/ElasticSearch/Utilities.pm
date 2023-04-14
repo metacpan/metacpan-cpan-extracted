@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '8.4'; # VERSION
+our $VERSION = '8.5'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:all);
@@ -20,7 +20,7 @@ use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Time::Local;
 use URI;
 use URI::QueryParam;
-use YAML::XS;
+use YAML::XS ();
 
 # Control loading ARGV
 my $ARGV_AT_INIT    = 1;
@@ -804,7 +804,8 @@ sub es_index_days_old {
             }
         }
         $date[1]--; # move 1-12 -> 0-11
-        my $idx_time = timegm( 0,0,0, @date );
+        my $idx_time = eval { timegm( 0,0,0, @date ) };
+        return unless $idx_time;
         my $diff = $NOW - $idx_time;
         $diff++;    # Add one second
         debug({color=>"yellow"}, sprintf "es_index_days_old(%s) - Time difference is %0.3f", $index, $diff/86400);
@@ -1085,7 +1086,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 8.4
+version 8.5
 
 =head1 SYNOPSIS
 
@@ -1101,7 +1102,6 @@ B<SEARCHING>:
 
 B<MONITORING>:
 
-    scripts/es-nagios-check.pl - Monitor ES remotely or via NRPE with this script
     scripts/es-graphite-dynamic.pl - Perform index maintenance on daily indexes
     scripts/es-status.pl - Command line utility for ES Metrics
     scripts/es-storage-overview.pl - View how shards/data is aligned on your cluster
@@ -1115,8 +1115,9 @@ B<MAINTENANCE>:
 
 B<MANAGEMENT>:
 
-    scripts/es-copy-index.pl - Copy an index from one cluster to another
     scripts/es-apply-settings.pl - Apply settings to all indexes matching a pattern
+    scripts/es-cluster-settings.pl - Manage cluster settings
+    scripts/es-copy-index.pl - Copy an index from one cluster to another
     scripts/es-storage-overview.pl - View how shards/data is aligned on your cluster
 
 B<DEPRECATED>:
@@ -1715,7 +1716,7 @@ L<https://github.com/reyjrar/es-utils>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Brad Lhotsky.
+This software is Copyright (c) 2023 by Brad Lhotsky.
 
 This is free software, licensed under:
 

@@ -19,7 +19,7 @@ name: App-CheckDigitsUtils
 provides:
   App::CheckDigitsUtils:
     file: lib/App/CheckDigitsUtils.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Algorithm::CheckDigits: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CheckDigitsUtils
   homepage: https://metacpan.org/release/App-CheckDigitsUtils
   repository: git://github.com/perlancar/perl-App-CheckDigitsUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

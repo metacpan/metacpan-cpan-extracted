@@ -3,13 +3,13 @@ package Log::Dispatch::Output;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Carp ();
 use Try::Tiny;
 use Log::Dispatch;
 use Log::Dispatch::Types;
-use Log::Dispatch::Vars qw( @OrderedLevels );
+use Log::Dispatch::Vars        qw( @OrderedLevels );
 use Params::ValidationCompiler qw( validation_for );
 
 use base qw( Log::Dispatch::Base );
@@ -203,7 +203,7 @@ Log::Dispatch::Output - Base class for all Log::Dispatch::* objects
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -238,8 +238,8 @@ version 2.70
 
 =head1 DESCRIPTION
 
-This module is the base class from which all Log::Dispatch::* objects
-should be derived.
+This module is the base class from which all Log::Dispatch::* objects should be
+derived.
 
 =head1 CONSTRUCTOR
 
@@ -253,12 +253,12 @@ This class provides the following methods:
 
 =head2 $output->_basic_init(%p)
 
-This should be called from a subclass's constructor. Make sure to
-pass the arguments in @_ to it. It sets the object's name and minimum
-level from the passed parameters  It also sets up two other attributes which
-are used by other Log::Dispatch::Output methods, level_names and level_numbers.
-Subclasses will perform parameter validation in this method, and must also call
-the superclass's method.
+This should be called from a subclass's constructor. Make sure to pass the
+arguments in @_ to it. It sets the object's name and minimum level from the
+passed parameters  It also sets up two other attributes which are used by other
+Log::Dispatch::Output methods, level_names and level_numbers. Subclasses will
+perform parameter validation in this method, and must also call the
+superclass's method.
 
 =head2 $output->name
 
@@ -274,29 +274,28 @@ Returns the object's maximum log level.
 
 =head2 $output->accepted_levels
 
-Returns a list of the object's accepted levels (by name) from minimum
-to maximum.
+Returns a list of the object's accepted levels (by name) from minimum to
+maximum.
 
 =head2 $output->log( level => $, message => $ )
 
-Sends a message if the level is greater than or equal to the object's
-minimum level. This method applies any message formatting callbacks
-that the object may have.
+Sends a message if the level is greater than or equal to the object's minimum
+level. This method applies any message formatting callbacks that the object may
+have.
 
 =head2 $output->_should_log ($)
 
-This method is called from the C<log()> method with the log level of
-the message to be logged as an argument. It returns a boolean value
-indicating whether or not the message should be logged by this
-particular object. The C<log()> method will not process the message
-if the return value is false.
+This method is called from the C<log()> method with the log level of the
+message to be logged as an argument. It returns a boolean value indicating
+whether or not the message should be logged by this particular object. The
+C<log()> method will not process the message if the return value is false.
 
 =head2 $output->_level_as_number ($)
 
-This method will take a log level as a string (or a number) and return
-the number of that log level. If not given an argument, it returns
-the calling object's log level instead. If it cannot determine the
-level then it will croak.
+This method will take a log level as a string (or a number) and return the
+number of that log level. If not given an argument, it returns the calling
+object's log level instead. If it cannot determine the level then it will
+croak.
 
 =head2 $output->add_callback( $code )
 
@@ -309,21 +308,19 @@ Remove the given callback from the list of callbacks.
 
 =head1 SUBCLASSING
 
-This class should be used as the base class for all logging objects
-you create that you would like to work under the Log::Dispatch
-architecture. Subclassing is fairly trivial. For most subclasses, if
-you simply copy the code in the SYNOPSIS and then put some
-functionality into the C<log_message> method then you should be all
-set. Please make sure to use the C<_basic_init> method as described above.
+This class should be used as the base class for all logging objects you create
+that you would like to work under the Log::Dispatch architecture. Subclassing
+is fairly trivial. For most subclasses, if you simply copy the code in the
+SYNOPSIS and then put some functionality into the C<log_message> method then
+you should be all set. Please make sure to use the C<_basic_init> method as
+described above.
 
-The actual logging implementation should be done in a C<log_message>
-method that you write. B<Do not override C<log>!>.
+The actual logging implementation should be done in a C<log_message> method
+that you write. B<Do not override C<log>!>.
 
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -335,7 +332,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::IO::Dirent : pointer {
   native method d_ino : int ();
   native method d_reclen : int ();

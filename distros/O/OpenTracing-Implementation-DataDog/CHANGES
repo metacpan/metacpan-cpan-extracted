@@ -1,6 +1,44 @@
 CHANGE LOG
 ==========
 
+
+2023-04-12 - v0.45.0
+--------------------
+
+### Added
+  - now supports sending errors as expected by DataDog
+
+
+2023-04-06 - v0.44.0
+--------------------
+
+### Added
+  - now uses a span-buffer to collect spans and flush together
+  - stop trying to make a http-request after first error
+  - support for `DD_TRACE_PARTIAL_FLUSH_MIN_SPANS` to flush the span buffer
+  - METAcpan support in MakeFile
+
+### Changed
+  - most methods of `DataDog::Client` are now being 'private'
+
+### Fixed
+  - type checks for `agent_url` and `DD_TRACE_AGENT_URL`
+
+
+2023-03-23 - v0.43.3
+--------------------
+
+### Added
+  - support for setting the Agent URL with the DD_TRACE_AGENT_URL env variable
+  - support for setting a custom hostname with DD_HOSTNAME or constructor params
+
+### Changed
+  - internals of how and where DD_ENV is being handled, in SpanContext
+
+### Removed
+  - support for setting the host with the DD_HOST env variable
+
+
 2022-11-24 - v0.43.2
 --------------------
 

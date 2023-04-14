@@ -25,13 +25,13 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Exporter::Shiny" => { file => "lib/Exporter/Shiny.pm", version => 1.006001 },
-                        "Exporter::Tiny"  => { file => "lib/Exporter/Tiny.pm", version => 1.006001 },
+                        "Exporter::Shiny" => { file => "lib/Exporter/Shiny.pm", version => 1.006002 },
+                        "Exporter::Tiny"  => { file => "lib/Exporter/Tiny.pm", version => 1.006002 },
                       },
   "release_status" => "stable",
   "resources"      => {
                         bugtracker   => { web => "https://github.com/tobyink/p5-exporter-tiny/issues" },
-                        homepage     => "https://metacpan.org/release/Exporter-Tiny",
+                        homepage     => "https://exportertiny.github.io/",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
                                           type => "git",
@@ -41,7 +41,7 @@ my $meta = {
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project",
                         x_IRC        => "irc://irc.perl.org/#moops",
                       },
-  "version"        => 1.006001,
+  "version"        => 1.006002,
 };
 
 my %dynamic_config;

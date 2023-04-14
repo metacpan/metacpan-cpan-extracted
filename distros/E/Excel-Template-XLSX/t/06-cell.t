@@ -19,7 +19,7 @@ $File::Temp::KEEP_ALL = 0;
 my $efilename = q[./t/06-cell.xlsx];
 TODO: {
   local $TODO = "Restore programmitically generated expected Excel worksheet";
-  ok(0, 'Add ability to programmactically generate Excel Worksheet');
+  ok(0, 'Add ability to programmatically generate Excel Worksheet');
 }
 =for nothing
 # Create expected workbook content
@@ -56,7 +56,7 @@ $self->parse_template();
 my $sheet = $twbk->get_worksheet_by_name('Sheet1');
 
 is( int( $sheet->{_row_sizes}{0}[0] ), 20, 'Row Height' );
-is( int( $sheet->{_col_sizes}{3}[0] ), 25, 'Column Width' );
+is( int( $sheet->{_col_info}{3}[0] ), 25, 'Column Width' );
 
 # Test that expected workbook was parsed correctly as a template
 for (qw[A1 A2]) {

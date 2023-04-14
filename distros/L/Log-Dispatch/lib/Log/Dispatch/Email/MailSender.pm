@@ -8,10 +8,10 @@ package Log::Dispatch::Email::MailSender;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Log::Dispatch::Types;
-use Mail::Sender ();
+use Mail::Sender               ();
 use Params::ValidationCompiler qw( validation_for );
 
 use base qw( Log::Dispatch::Email );
@@ -114,7 +114,7 @@ Log::Dispatch::Email::MailSender - Subclass of Log::Dispatch::Email that uses th
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -156,8 +156,7 @@ The port to use when connecting. This defaults to 25.
 =item * auth ($)
 
 Optional. The SMTP authentication protocol to use to login to the server. At
-the time of writing Mail::Sender only supports LOGIN, PLAIN, CRAM-MD5 and
-NTLM.
+the time of writing Mail::Sender only supports LOGIN, PLAIN, CRAM-MD5 and NTLM.
 
 Some protocols have module dependencies. CRAM-MD5 depends on Digest::HMAC_MD5
 and NTLM on Authen::NTLM.
@@ -190,8 +189,6 @@ The reply-to address.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Log-Dispatch can be found at L<https://github.com/houseabsolute/Log-Dispatch>.
@@ -202,7 +199,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

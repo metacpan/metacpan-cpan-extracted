@@ -3,7 +3,7 @@ package Log::Dispatch::Email::MailSend;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Mail::Send;
 use Try::Tiny;
@@ -56,7 +56,7 @@ Log::Dispatch::Email::MailSend - Subclass of Log::Dispatch::Email that uses the 
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -82,10 +82,9 @@ method using the L<Mail::Send> module.
 
 =head1 CHANGING HOW MAIL IS SENT
 
-Since L<Mail::Send> is a subclass of L<Mail::Mailer>, you can change
-how mail is sent from this module by simply C<use>ing L<Mail::Mailer>
-in your code before mail is sent. For example, to send mail via smtp,
-you could do:
+Since L<Mail::Send> is a subclass of L<Mail::Mailer>, you can change how mail
+is sent from this module by simply C<use>ing L<Mail::Mailer> in your code
+before mail is sent. For example, to send mail via smtp, you could do:
 
   use Mail::Mailer 'smtp', Server => 'foo.example.com';
 
@@ -94,8 +93,6 @@ For more details, see the L<Mail::Mailer> docs.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -107,7 +104,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

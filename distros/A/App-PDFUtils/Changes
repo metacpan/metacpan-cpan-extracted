@@ -1,3 +1,8 @@
+0.015   2023-02-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: convert-epub-to-pdf (epub2pdf).
+
+
 0.014   2022-10-07  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] [cli less-pdf-text] --pdf-raw does not take argument.

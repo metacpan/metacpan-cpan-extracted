@@ -1,4 +1,4 @@
-package Net::Address::IP::Cipher 0.5;
+package Net::Address::IP::Cipher 0.6;
 
 use 5.012;
 use strict;
@@ -17,7 +17,7 @@ address, for pseudo anonymization.
 
 =head1 VERSION
 
-Version 0.5
+Version 0.6
 
 =head1 SYNOPSIS
 
@@ -300,13 +300,9 @@ You can also look for information at:
 
 L<https://github.com/huguei/p5-Net-Address-IP-Cipher/issues>
 
-=item * CPAN Ratings
+=item * MetaCPAN
 
-L<http://cpanratings.perl.org/d/Net-Address-IP-Cipher>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Net-Address-IP-Cipher/>
+L<https://metacpan.org/dist/Net-Address-IP-Cipher>
 
 =back
 
@@ -322,7 +318,7 @@ Jean-Philippe Aumasson:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Hugo Salgado.
+Copyright 2023 Hugo Salgado.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

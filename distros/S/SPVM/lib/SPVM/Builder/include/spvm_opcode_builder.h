@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_BYTECODE_BUILDER_H
 #define SPVM_BYTECODE_BUILDER_H
 

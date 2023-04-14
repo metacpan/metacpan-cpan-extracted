@@ -1,6 +1,6 @@
 package CatalystX::RequestModel;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use Class::Method::Modifiers;
 use Scalar::Util;
@@ -170,7 +170,7 @@ Using it in a controller:
 
     sub root :Chained(/root) PathPart('register') CaptureArgs(0)  { }
 
-    sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) RequestModel(RegistrationRequest) {
+    sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(RegistrationRequest) {
       my ($self, $c, $request_model) = @_;
       ## Do something with the $request_model (instance of 'Example::Model::RegistrationRequest').
     }
@@ -603,9 +603,9 @@ You can also do nesting and indexing with query params (See L<CatalystX::QueryMo
 L<CatalystX::QueryModel::DoesQueryModel>)
 
 B<IMPORTANT NOTE>: Due to a limitation in how Catalyst finds subroutine attributes on an action we cannot
-determine the order of declaration of dissimilar attributes (such as RequestModel and QueryModel).  As a
+determine the order of declaration of dissimilar attributes (such as BodyModel and QueryModel).  As a
 result when you have both attibutes on an action we will process and add to the arguments list first the
-Request (body) Models and then the Query models, even if you list the Query model first in the method
+Body Models and then the Query models, even if you list the Query model first in the method
 declaration.
 
 =head1 CONTENT BODY PARSERS

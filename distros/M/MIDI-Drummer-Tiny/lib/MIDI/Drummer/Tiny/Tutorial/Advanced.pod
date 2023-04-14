@@ -1,0 +1,229 @@
+package MIDI::Drummer::Tiny::Tutorial::Advanced;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MIDI::Drummer::Tiny::Tutorial::Advanced
+
+=head1 VERSION
+
+version 0.4206
+
+=head1 Advanced Grooves
+
+=head2 Cold Sweat (Clyde Stubblefield)
+
+  my $accent = 30;
+
+  for my $n (1 .. $d->bars) {
+      $d->note($d->eighth, $d->closed_hh, $d->kick);
+      $d->note($d->eighth, $d->closed_hh);
+
+      $d->note($d->eighth, $d->closed_hh, $d->snare);
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->accent_note($accent, $d->sixteenth, $d->snare);
+
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->accent_note($accent, $d->sixteenth, $d->snare);
+      $d->note($d->eighth, $d->open_hh, $d->kick);
+
+      $d->note($d->eighth, $d->pedal_hh);
+      $d->note($d->eighth, $d->closed_hh, $d->snare);
+
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->accent_note($accent, $d->sixteenth, $d->snare);
+      $d->note($d->eighth, $d->closed_hh, $d->kick);
+
+      $d->note($d->eighth, $d->closed_hh, $d->snare);
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->accent_note($accent, $d->sixteenth, $d->snare);
+
+      $d->note($d->sixteenth, $d->closed_hh);
+      $d->accent_note($accent, $d->sixteenth, $d->snare);
+      $d->note($d->eighth, $d->closed_hh, $d->kick);
+
+      $d->note($d->eighth, $d->closed_hh, $d->snare);
+      $d->note($d->eighth, $d->closed_hh);
+  }
+
+=head2 Fool in the Rain (John Bonham)
+
+  my ($min, $max) = (30, 127);
+
+  for my $n (1 .. $d->bars) {
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+      $d->rest($d->triplet_eighth);
+      $d->note($d->triplet_eighth, $d->open_hh, $d->kick);
+
+      $d->note($d->triplet_eighth, $d->pedal_hh);
+      $d->accent_note($min, $d->triplet_eighth, $d->snare);
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+
+      $d->accent_note($max, $d->triplet_eighth, $d->snare);
+      $d->rest($d->triplet_eighth);
+      $d->note($d->triplet_eighth, $d->closed_hh);
+
+      $d->note($d->triplet_eighth, $d->closed_hh);
+      $d->accent_note($min, $d->triplet_eighth, $d->snare);
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+  }
+
+=head2 The Purdie Shuffle (Bernard Purdie)
+
+  my $accent = 30;
+
+  for my $n (1 .. $d->bars) {
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+      $d->accent_note($accent, $d->triplet_eighth, $d->snare);
+      $d->note($d->triplet_eighth, $d->closed_hh);
+
+      $d->note($d->triplet_eighth, $d->closed_hh);
+      $d->accent_note($accent, $d->triplet_eighth, $d->snare);
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->snare);
+      $d->accent_note($accent, $d->triplet_eighth, $d->snare);
+      $d->note($d->triplet_eighth, $d->closed_hh);
+
+      $d->note($d->triplet_eighth, $d->closed_hh);
+      $d->accent_note($accent, $d->triplet_eighth, $d->snare);
+      $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+  }
+
+=head2 The Black Page (Frank Zappa)
+
+This is an exercise for the reader. It is one of the most advanced
+grooves ever. It makes use of a number of "tuplets". For instance: a
+half note triplet duration with groups of 5 notes for quarter notes
+within. Oof!
+
+Please see this
+L<long program|https://github.com/ology/MIDI-Drummer-Tiny/blob/master/eg/black-page>,
+which is in the F<eg/> directory of this distribution.
+
+=head1 Utility Method
+
+=head2 sync()
+
+This method is identical to the MIDI score method. It's just a
+convenient wrapper for the drummer, as shown below.
+
+=head1 Beat-string Patterns
+
+=head2 pattern()
+
+If bit-strings are considered to be beats (C<1> for a note-on strike
+and C<0> for no strike), then we shall call them "beat-strings." :)
+
+  $d->pattern(
+      patterns   => [qw( 0101 0101 0110 0110 )],
+      instrument => $d->snare,
+      %options,
+  );
+
+The options and their defaults are the following:
+
+  duration: quarter-note
+  beats:    given by constructor
+  repeat:   1
+  negate:   0 (flip the bit values)
+  vary:     {
+      0 => sub { $self->rest( $args{duration} ) },
+      1 => sub { $self->note( $args{duration}, $args{instrument} ) },
+  }
+
+Those are all fairly obvious except for the last "vary" option. This
+defines what to do (or not do) given the digit of the beat-string.
+For C<0>, we rest - for the given (or default) duration. For C<1>, we
+add a note to the score.
+
+This "vary" option can be made up on the fly, by the caller. We can
+therefore provide different behaviors to perform, when this method is
+called.
+
+Now the string doesn't need to contain only ones and zeros! The string
+could have a C<2> in it! The "vary" would then need to contain a C<2>
+key, with instructions for what to do - like roll, possibly.
+
+=head2 sync_patterns()
+
+Ok. That's fine for a single voice. But more often we want to
+multitrack different parts simultaneously? Enter the C<sync_patterns>
+method.
+
+  $d->sync_patterns(
+      $d->open_hh => [ '11111111') ],
+      $d->snare   => [ '0101' ],
+      $d->kick    => [ '1010' ],
+  ) for 1 .. $d->bars;
+
+The hi-hat is 8 beats long. The kick and snare are 4 beats each. This
+means that the kick and snare are quarter notes, and the hi-hat will
+be treated as eighth notes, because a "common multiple" is computed.
+
+=head2 sync() Revisited
+
+For finer-grain control, you should use the above C<pattern> method
+combined with the C<sync> method:
+
+  $d->sync(
+    sub { $d->pattern(
+        instrument => $d->closed_hh,
+        patterns   => [ '11111111' ]
+    )},
+    sub { $d->pattern(
+        instrument => $d->snare,
+        patterns   => [ $my_pattern->($snare_onset, 16) ]
+    )},
+    sub { $d->pattern(
+        instrument => $d->kick,
+        patterns   => [ $my_pattern->($kick_onset, 16) ]
+    )},
+  ) for 1 .. $d->bars - 1;
+
+Why C<bars - 1>? Because next up is a one measure fill!
+
+What is C<my_pattern>? That is an imaginary routine that takes a
+number of onsets and a total number of beats; much like the C<euclid>
+function in the
+L<CreatingRhythms|https://metacpan.org/pod/Music::CreatingRhythms>
+module. Hint hint. ;)
+
+=head1 Fills
+
+This is a work in progress, and is tricky to get right... It uses
+beat-stings:
+
+  $d->add_fill(
+      sub { # this is the fill itself
+          my $self = shift;
+          return {
+            duration         => 16, # a 16-beat fill
+            $self->closed_hh => '00000000',
+            $self->snare     => '11111111',
+            $self->kick      => '10001000',
+          };
+      },
+      # the phrase to play before the fill
+      $d->closed_hh => [ '11111111' ],
+      $d->snare     => [ '0101' ],
+      $d->kick      => [ '1010' ],
+  );
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014-2023 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

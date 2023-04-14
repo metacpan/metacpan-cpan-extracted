@@ -21,7 +21,6 @@ requires 'FFmpeg::Command' => 0;
 requires 'File::Path' => 0;
 requires 'File::Spec::Functions' => 0;
 requires 'File::Temp' => 0;
-requires 'IO::CaptureOutput' => 0;
 requires 'Image::Random' => 0;
 requires 'Readonly' => 0;
 requires 'Video::Delay::Const' => 0;
@@ -35,7 +34,7 @@ test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

@@ -20,8 +20,8 @@ DESCRIPTION
     hashing, and more. These bindings have been created using FFI via
     FFI::Platypus.
 
-    While we also intend to eventually fix Crypt::NaCl::Sodium so that it
-    can use newer versions of LibSodium.
+    We also intend to eventually fix Crypt::NaCl::Sodium so that it can use
+    newer versions of LibSodium.
 
 Crypto Auth Functions
     LibSodium provides a few Crypto Auth Functions
@@ -350,6 +350,33 @@ Public Key Cryptography - Crypto Boxes
     <https://doc.libsodium.org/public-key_cryptography/authenticated_encrypt
     ion#combined-mode> function decrypts a cipher text produced by
     crypto_box_easy.
+
+  crypto_box_seal
+        use Sodium::FFI qw(crypto_box_keypair crypto_box_seal);
+        my ($public_key, $secret_key) = crypto_box_keypair();
+        my $msg = "test";
+        my $cipher_text = crypto_box_seal($msg, $public_key);
+
+    The crypto_box_seal
+    <https://doc.libsodium.org/public-key_cryptography/sealed_boxes>
+    function encrypts a message for a recipient whose public key is
+    provided. The function creates a new key pair for each message and
+    attaches the public key to the ciphertext. The secret key is overwritten
+    and is not accessible after this function returns.
+
+  crypto_box_seal_open
+        use Sodium::FFI qw(crypto_box_keypair crypto_box_seal crypto_box_seal_open);
+        my ($public_key, $secret_key) = crypto_box_keypair();
+        my $msg = "test";
+        my $cipher_text = crypto_box_seal($msg, $public_key);
+        my $decrypted = crypto_box_seal_open($cipher_text, $public_key, $secret_key);
+        if ($decrypted eq $msg) {
+            say "Yay!";
+        }
+
+    The crypto_box_seal_open
+    <https://doc.libsodium.org/public-key_cryptography/sealed_boxes>
+    function decrypts a cipher text produced by crypto_box_seal.
 
   crypto_box_seed_keypair
         use Sodium::FFI qw(crypto_box_seed_keypair crypto_sign_SEEDBYTES randombytes_buf);

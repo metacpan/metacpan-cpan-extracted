@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class MIME::Base64 {
   native static method encode_base64 : string ($str : string, $eol = undef : string);
   

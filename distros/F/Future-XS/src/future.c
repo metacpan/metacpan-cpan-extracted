@@ -108,6 +108,14 @@ struct FutureXS
   SV *precedent_f;
 };
 
+#ifdef USE_ITHREADS
+static int future_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param);
+
+static MGVTBL vtbl = {
+  .svt_dup = &future_dup,
+};
+#endif
+
 bool Future_sv_is_future(pTHX_ SV *sv)
 {
   if(!SvROK(sv) || !SvOBJECT(SvRV(sv)))
@@ -119,15 +127,17 @@ bool Future_sv_is_future(pTHX_ SV *sv)
   return false;
 }
 
-#define get_future(sv)  S_get_future(aTHX_ sv)
-static struct FutureXS *S_get_future(pTHX_ SV *sv)
+#define get_future(sv)        S_get_future(aTHX_ sv, FALSE)
+#define maybe_get_future(sv)  S_get_future(aTHX_ sv, TRUE)
+static struct FutureXS *S_get_future(pTHX_ SV *sv, bool nullok)
 {
   assert(sv);
   assert(SvROK(sv) && SvOBJECT(SvRV(sv)));
   // TODO: Add some safety checking about class
   struct FutureXS *self = INT2PTR(struct FutureXS *, SvIV(SvRV(sv)));
-  assert(self);
-  return self;
+  if(self || nullok)
+    return self;
+  croak("Future::XS instance %" SVf " is not available in this thread", SVfARG(sv));
 }
 
 SV *Future_new(pTHX_ const char *cls)
@@ -173,6 +183,11 @@ SV *Future_new(pTHX_ const char *cls)
   SV *ret = newSV(0);
   sv_setref_pv(ret, cls, self);
 
+#ifdef USE_ITHREADS
+  MAGIC *mg = sv_magicext(SvRV(ret), SvRV(ret), PERL_MAGIC_ext, &vtbl, NULL, 0);
+  mg->mg_flags |= MGf_DUP;
+#endif
+
   return ret;
 }
 
@@ -205,24 +220,42 @@ SV *Future_new_proto(pTHX_ SV *f1)
   return ret;
 }
 
+#ifdef USE_ITHREADS
+
+static int future_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param)
+{
+  /* We don't currently support duplicating a Future instance across thread
+   * creation/return. For now just zero out the pointer and complain if anyone
+   * tries to access it.
+   * This at least means that incidental Future instances that happen to exist
+   * in main thread memory won't be disturbed when sidecar threads are joined.
+   */
+  sv_setiv(mg->mg_obj, 0);
+}
+#endif
+
+#define clear_callback(cb)  S_clear_callback(aTHX_ cb)
+static void S_clear_callback(pTHX_ struct FutureXSCallback *cb)
+{
+  int flags = cb->flags;
+  if(flags & CB_SEQ_ANY) {
+    SvREFCNT_dec(cb->seq.thencode);
+    SvREFCNT_dec(cb->seq.elsecode);
+    SvREFCNT_dec(cb->seq.catches);
+    SvREFCNT_dec(cb->seq.f);
+  }
+  else {
+    SvREFCNT_dec(CB_NONSEQ_CODE(cb));
+  }
+}
+
 #define destroy_callbacks(self)  S_destroy_callbacks(aTHX_ self)
 static void S_destroy_callbacks(pTHX_ struct FutureXS *self)
 {
   AV *callbacksav = self->callbacks;
   while(callbacksav && AvFILLp(callbacksav) > -1) {
     struct FutureXSCallback *cb = (struct FutureXSCallback *)AvARRAY(self->callbacks)[AvFILLp(callbacksav)--];
-
-    int flags = cb->flags;
-    if(flags & CB_SEQ_ANY) {
-      SvREFCNT_dec(cb->seq.thencode);
-      SvREFCNT_dec(cb->seq.elsecode);
-      SvREFCNT_dec(cb->seq.catches);
-      SvREFCNT_dec(cb->seq.f);
-    }
-    else {
-      SvREFCNT_dec(CB_NONSEQ_CODE(cb));
-    }
-
+    clear_callback(cb);
     Safefree(cb);
   }
 }
@@ -241,7 +274,12 @@ void Future_destroy(pTHX_ SV *f)
 #  define UNREF(p)  SvREFCNT_dec((SV *)p)
 #endif
 
-  struct FutureXS *self = get_future(f);
+  /* Defend against being run during global destruction */
+  if(!f || !SvROK(f))
+    return;
+  struct FutureXS *self = maybe_get_future(f);
+  if(!self)
+    return;
 
   if(future_debug &&
     (!self->ready || (self->failure && !self->reported))) {
@@ -662,6 +700,7 @@ static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb)
     // TODO: CB_SEQ_IM*
 
     SV *f2 = invoke_seq_callback(self, f1, cb);
+    clear_callback(cb);
     return f2;
   }
 
@@ -671,9 +710,9 @@ static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb)
 
   cb->flags |= CB_DONE|CB_FAIL;
   if(cb->seq.thencode)
-    cb->seq.thencode = wrap_cb(f1, "sequence", cb->seq.thencode);
+    cb->seq.thencode = wrap_cb(f1, "sequence", sv_2mortal(cb->seq.thencode));
   if(cb->seq.elsecode)
-    cb->seq.elsecode = wrap_cb(f1, "sequence", cb->seq.elsecode);
+    cb->seq.elsecode = wrap_cb(f1, "sequence", sv_2mortal(cb->seq.elsecode));
   cb->seq.f = sv_rvweaken(newSVsv(fseq));
 
   push_callback(self, cb);
@@ -1040,7 +1079,12 @@ AV *Future_get_failure_av(pTHX_ SV *f)
 
 void Future_cancel(pTHX_ SV *f)
 {
-  struct FutureXS *self = get_future(f);
+  /* Specifically don't make it an error to ->cancel a future instance not
+   * available in this thread; as it often appears in defer / DESTROY / etc
+   */
+  struct FutureXS *self = maybe_get_future(f);
+  if(!self)
+    return;
 
   if(self->ready)
     return;
@@ -1130,7 +1174,7 @@ SV *Future_followed_by(pTHX_ SV *f, SV *code)
   struct FutureXSCallback cb = {
     .flags        = CB_SEQ_ANY|CB_SELF,
     .seq.thencode = code,
-    .seq.elsecode = code,
+    .seq.elsecode = SvREFCNT_inc(code),
   };
 
   return make_sequence(f, &cb);

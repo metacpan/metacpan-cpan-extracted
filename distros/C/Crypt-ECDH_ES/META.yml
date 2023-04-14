@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,11 +18,12 @@ name: Crypt-ECDH_ES
 provides:
   Crypt::ECDH_ES:
     file: lib/Crypt/ECDH_ES.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Crypt::Curve25519: '0'
   Crypt::Rijndael: '0'
+  Crypt::URandom: '0'
   Digest::SHA: '0'
   Exporter: '5.57'
   Getopt::Long: '0'
@@ -33,7 +34,9 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-ECDH_ES
   repository: git://github.com/Leont/crypt-ecdh_es.git
-version: '0.003'
+version: '0.004'
 x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

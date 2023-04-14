@@ -26,7 +26,8 @@ sub attributes {
 		$a->H3,
 		$a->H4,
 		$a->H5,
-		$a->H6
+		$a->H6,
+		$a->IMAGE
 	);
 }
 
@@ -120,6 +121,12 @@ sub add_h5 {
 sub add_h6 {
 	my ($self, %args) = @_;
 	$self->h6->add($self, %args);
+	return $self;
+}
+
+sub add_image {
+	my ($self, %args) = @_;
+	$self->image->add($self, %args);
 	return $self;
 }
 

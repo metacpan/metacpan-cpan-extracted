@@ -115,7 +115,7 @@ my @header_files = ('ppport.h', @spvm_header_files);
 WriteMakefile(
     NAME              => 'SPVM',
     VERSION_FROM      => 'lib/SPVM.pm', # finds $VERSION
-    LICENSE           => 'perl_5',
+    LICENSE           => 'mit',
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/SPVM.pm', # retrieve abstract from module
        AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
@@ -144,7 +144,8 @@ WriteMakefile(
     EXE_FILES => ['script/spvmcc', 'script/spvmdist'],
     PREREQ_PM => {
         'ExtUtils::CBuilder' => '0.280236',
-        'Time::Piece' => '1.12'
+        'Time::Piece' => '1.12',
+        'JSON::PP' => '2.27105',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.92',
@@ -166,8 +167,6 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Array');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Hash');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Format');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time::Info');
     
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Compiler');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Runtime');

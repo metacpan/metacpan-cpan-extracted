@@ -1,6 +1,6 @@
 package OpenTracing::Role::Tracer;
 
-our $VERSION = 'v0.85.0';
+our $VERSION = 'v0.86.0';
 
 use syntax qw/maybe/;
 

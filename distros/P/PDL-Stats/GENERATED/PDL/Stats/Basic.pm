@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 4 "stats_basic.pd"
 
+#line 4 "stats_basic.pd"
 
 use PDL::LiteF;
 use PDL::NiceSlice;
@@ -68,8 +68,6 @@ or
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
 
 
 =head2 stdv
@@ -77,8 +75,6 @@ or
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -92,20 +88,15 @@ Sample standard deviation.
 stdv processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 98 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *stdv = \&PDL::stdv;
-#line 105 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -114,8 +105,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -129,20 +118,15 @@ Unbiased estimate of population standard deviation.
 stdv_unbiased processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 135 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *stdv_unbiased = \&PDL::stdv_unbiased;
-#line 142 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -151,8 +135,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -166,20 +148,15 @@ Sample variance.
 var processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 172 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *var = \&PDL::var;
-#line 179 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -188,8 +165,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -203,20 +178,15 @@ Unbiased estimate of population variance.
 var_unbiased processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 209 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *var_unbiased = \&PDL::var_unbiased;
-#line 216 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -225,8 +195,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -239,7 +207,6 @@ Standard error of the mean. Useful for calculating confidence intervals.
     $ci_95_upper = $data->average + 1.96 * $data->se;
     $ci_95_lower = $data->average - 1.96 * $data->se;
 
-
   
 
 =for bad
@@ -247,20 +214,15 @@ Standard error of the mean. Useful for calculating confidence intervals.
 se processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 253 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *se = \&PDL::se;
-#line 260 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -269,8 +231,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -284,20 +244,15 @@ Sum of squared deviations from the mean.
 ss processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 290 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ss = \&PDL::ss;
-#line 297 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -306,8 +261,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -321,20 +274,15 @@ Sample skewness, measure of asymmetry in data. skewness == 0 for normal distribu
 skew processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 327 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *skew = \&PDL::skew;
-#line 334 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -343,8 +291,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -358,20 +304,15 @@ Unbiased estimate of population skewness. This is the number in GNumeric Descrip
 skew_unbiased processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 364 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *skew_unbiased = \&PDL::skew_unbiased;
-#line 371 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -380,8 +321,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -395,20 +334,15 @@ Sample kurtosis, measure of "peakedness" of data. kurtosis == 0 for normal distr
 kurt processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 401 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *kurt = \&PDL::kurt;
-#line 408 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -417,8 +351,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); float+ [o]b())
-
-
 
 =for ref
 
@@ -432,20 +364,15 @@ Unbiased estimate of population kurtosis. This is the number in GNumeric Descrip
 kurt_unbiased processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 438 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *kurt_unbiased = \&PDL::kurt_unbiased;
-#line 445 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -454,8 +381,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
-
 
 =for ref
 
@@ -469,20 +394,15 @@ Sample covariance. see B<corr> for ways to call
 cov processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 475 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cov = \&PDL::cov;
-#line 482 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -491,8 +411,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n,m); float+ [o]c(m,m))
-
-
 
 =for ref
 
@@ -530,7 +448,6 @@ for the same cov matrix table using B<cov>,
 
     perldl> p $a->dummy(2)->cov($a->dummy(1)) 
 
-
   
 
 =for bad
@@ -538,20 +455,15 @@ for the same cov matrix table using B<cov>,
 cov_table processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 544 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cov_table = \&PDL::cov_table;
-#line 551 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -560,8 +472,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
-
 
 =for ref
 
@@ -597,20 +507,15 @@ but it is easier and faster to use B<corr_table>.
 corr processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 603 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *corr = \&PDL::corr;
-#line 610 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -619,8 +524,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n,m); float+ [o]c(m,m))
-
-
 
 =for ref
 
@@ -654,7 +557,6 @@ for the same result using B<corr>,
 
 This is also how to use B<t_corr> and B<n_pair> with such a table.
 
-
   
 
 =for bad
@@ -662,20 +564,15 @@ This is also how to use B<t_corr> and B<n_pair> with such a table.
 corr_table processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 668 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *corr_table = \&PDL::corr_table;
-#line 675 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -684,8 +581,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (r(); n(); [o]t())
-
-
 
 =for usage
 
@@ -709,20 +604,15 @@ t significance test for Pearson correlations.
 t_corr processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 715 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *t_corr = \&PDL::t_corr;
-#line 722 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -731,8 +621,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); indx [o]c())
-
-
 
 =for ref
 
@@ -746,20 +634,15 @@ Returns the number of good pairs between 2 lists. Useful with B<corr> (esp. when
 n_pair processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 752 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *n_pair = \&PDL::n_pair;
-#line 759 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -768,8 +651,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
-
 
 =for usage
 
@@ -787,20 +668,15 @@ Calculates correlations from B<dev_m> vals. Seems faster than doing B<corr> from
 corr_dev processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 793 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *corr_dev = \&PDL::corr_dev;
-#line 800 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -809,8 +685,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(m); float+ [o]t(); [o]d())
-
-
 
 =for usage
 
@@ -832,20 +706,15 @@ Independent sample t-test, assuming equal var.
 t_test processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 838 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *t_test = \&PDL::t_test;
-#line 845 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -854,8 +723,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(m); float+ [o]t(); [o]d())
-
-
 
 =for ref
 
@@ -873,20 +740,15 @@ Independent sample t-test, NOT assuming equal var. ie Welch two sample t test. D
 t_test_nev processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 879 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *t_test_nev = \&PDL::t_test_nev;
-#line 886 "Basic.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -895,8 +757,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]t(); [o]d())
-
-
 
 =for ref
 
@@ -910,21 +770,18 @@ Paired sample t-test.
 t_test_paired processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 916 "Basic.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *t_test_paired = \&PDL::t_test_paired;
-#line 923 "Basic.pm"
+
+
 
 
 
 #line 1251 "stats_basic.pd"
-
 
 #line 1252 "stats_basic.pd"
 
@@ -968,7 +825,6 @@ sub PDL::binomial_test {
 
   return $p;
 }
-
 
 =head1 METHODS
 
@@ -1173,7 +1029,6 @@ Usage:
               ]
             ];
 
-
 =cut
 
 *group_by = \&PDL::group_by;
@@ -1340,7 +1195,6 @@ sub _array_to_pdl {
   return wantarray? ($pdl, \%level) : $pdl;
 }
 
-
 =head1 SEE ALSO
 
 PDL::Basic (hist for frequency counts)
@@ -1360,8 +1214,8 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1687 "stats_basic.pd"
-#line 1365 "Basic.pm"
+#line 1218 "Basic.pm"
+#line 1219 "Basic.pm"
 
 
 

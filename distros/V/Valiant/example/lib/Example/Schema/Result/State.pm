@@ -9,8 +9,8 @@ __PACKAGE__->table("state");
 __PACKAGE__->load_components(qw/Valiant::Result/);
 
 __PACKAGE__->add_columns(
-  id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1 },
-  name => { data_type => 'varchar', is_nullable => 0, size => '24' },
+  id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1, tag=>'value' },
+  name => { data_type => 'varchar', is_nullable => 0, size => '24', tag=>'label' },
   abbreviation => { data_type => 'varchar', is_nullable => 0, size => '24' },
 );
 

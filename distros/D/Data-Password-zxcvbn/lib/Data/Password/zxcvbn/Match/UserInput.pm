@@ -2,7 +2,7 @@ package Data::Password::zxcvbn::Match::UserInput;
 use Moo;
 use mro;
 extends 'Data::Password::zxcvbn::Match::Dictionary';
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: match class for words that match other user-supplied information
 
 
@@ -105,7 +105,7 @@ Data::Password::zxcvbn::Match::UserInput - match class for words that match othe
 
 =head1 VERSION
 
-version 1.0.6
+version 1.1.2
 
 =head1 DESCRIPTION
 

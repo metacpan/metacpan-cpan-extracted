@@ -84,7 +84,7 @@
    "provides" : {
       "Sodium::FFI" : {
          "file" : "lib/Sodium/FFI.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -99,8 +99,9 @@
          "web" : "https://github.com/genio/sodium-ffi"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_contributors" : [
+      "brian d foy <briandfoy@pobox.com>",
       "Chase Whitener <cwhitener@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.32.1",

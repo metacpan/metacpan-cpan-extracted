@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::TwoScalp::Seq2Seq;
 # ABSTRACT: internal class for two-scalp tool
-$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.211710';
+$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.231010';
 use Moose;
 use namespace::autoclean;
 
@@ -268,7 +268,7 @@ Bio::MUST::Apps::TwoScalp::Seq2Seq - internal class for two-scalp tool
 
 =head1 VERSION
 
-version 0.211710
+version 0.231010
 
 =head1 AUTHOR
 

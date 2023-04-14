@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4201';
+our $VERSION = '0.4206';
 
 use Moo;
 use strictures 2;
@@ -636,7 +636,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4201
+version 0.4206
 
 =head1 SYNOPSIS
 
@@ -1140,6 +1140,8 @@ The F<t/*> test file and the F<eg/*> programs in this distribution.
 
 Also F<eg/drum-fills-advanced> in the L<Music::Duration::Partition>
 distribution.
+
+L<https://ology.github.io/midi-drummer-tiny-tutorial/>
 
 L<Data::Dumper::Compact>
 

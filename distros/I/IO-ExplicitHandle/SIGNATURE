@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,27 +12,26 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 5ca244d176410fd301baac053530c46b7bfe1fe3 .gitignore
-SHA1 4b2b8ea3b8db36ab2f9b33c1dd28f4f42a7ff1f8 Build.PL
-SHA1 692f9f778097321d3ea4cb69d84235b564f68831 Changes
-SHA1 997ee7cf337a3882ddb60f0644fecccd6542cf68 MANIFEST
-SHA1 3d84a75b47cb6c6088aeb046ede6e5c8d4d5a311 META.json
-SHA1 660d784be575c19f1b846b72faae3088b7adfbc8 META.yml
-SHA1 df1b9f3bd611bd7f470e37a8b013b71495ff6138 README
-SHA1 7396d6218fa6f95f41656cf537c0a25b22c1a694 lib/IO/ExplicitHandle.pm
-SHA1 95af42d18f264ff591917fee7e73810a9d2303e9 lib/IO/ExplicitHandle.xs
-SHA1 fa33a99a635ef67aa8e84c325e58b6f03714d73a t/lib/t/scope_0.pm
-SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
-SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
-SHA1 7ea41cc6733f2df8b6b2109d14fd0c7e2f8e9acf t/scope.t
-SHA1 5d01500d8704201b77656055f1bf518d41876de5 t/stricture.t
-SHA1 0f9711fb90a84398cfa2c0da7aba635422dc3d7e t/threads.t
+SHA256 c92e68364a9034b3f442392658172fb29e888763631c9e7a680fa19df4246f13 .gitignore
+SHA256 fbc655f566b7a6112035b2703ca29cd92f5407da64491ca315ee3547783f796f Build.PL
+SHA256 4fdf7224f6a32764b6132309ff963b7399d40fd9b90e16cc983764ae5913c019 Changes
+SHA256 648088e73f897d85b134aa9039759c44d68c37e98adf152c02f8b6ad87fa501b MANIFEST
+SHA256 3fe001b7edd0c806aa435503c25d4d48ed7290011c6ef8c91752ec42d241e54f META.json
+SHA256 f620cfdf828905ebc50802f9e230c2d97260dd9c246615a1d6e49085a89fcf4d META.yml
+SHA256 425edb6029a0e9af4f22fdd0f476efa372e4aac2969273e1907ba6f8e92c159d README
+SHA256 0bf3f057f75e015c3165c0ee25aa92dce2576ee20b680ead3812b919b48f3516 lib/IO/ExplicitHandle.pm
+SHA256 5d2b30830be22254fffeb3a33a5647cb1d14d2799334279384db6103224213fe lib/IO/ExplicitHandle.xs
+SHA256 a682c7d60d2b7e1615da4af9359f202cf8b4ae82c7df75549204e82ca03dbff0 t/lib/t/scope_0.pm
+SHA256 3679257bdfb4a07658e98a41325f82c1744f7dae6d1d0151f1b216af0c1df5c9 t/pod_cvg.t
+SHA256 e16860066c4ca9b2ee9e7d4604297def8a58b53bf0ca03eed863b5d9c5a2ac91 t/pod_syn.t
+SHA256 726845007e92cd3cee4b16598755aa4c918b2c538280b47d7f819aaa41f9878d t/scope.t
+SHA256 33fa98edf7dbf5c899213655483c1c38376fa5e4cdaec806619918ef0d07c498 t/stricture.t
+SHA256 f3898fe55d7837ce4f0577ef0812689ff8d289a793b5498f551a3e3b1815306a t/threads.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAll+CdAACgkQOV9mt2VyAVG8IgCeOKyoKOuUseCJPS7fm+Sxrzm3
-TRQAn3osfz5wofYK5rtwLFey5smNhRkq
-=XA0b
+iEYEAREDAAYFAmQvd8sACgkQOV9mt2VyAVE62QCeIbBt34Rdic9IawMJwD4i+qDG
+45UAn1iGu7TIeOI4kJBRNAbsJvMq3t5B
+=HO3D
 -----END PGP SIGNATURE-----

@@ -1,6 +1,6 @@
-#! perl -T
+#! perl -I. -w -T
+use t::Test::abeltje;
 
-use Test::More tests => 1;
 
 BEGIN {
     use_ok('Business::IBAN::Validator');
@@ -9,3 +9,5 @@ BEGIN {
 diag(
     "Testing Business::IBAN::Validator $Business::IBAN::Validator::VERSION, Perl $], $^X"
 );
+
+abeltje_done_testing(2);

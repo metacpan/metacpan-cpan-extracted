@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 our @EXPORT_OK = qw(list_org_todos);
 
@@ -56,7 +56,7 @@ App::ListOrgTodos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.483 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2022-10-11.
+This document describes version 0.484 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
@@ -114,6 +114,8 @@ than 7) but <2011-07-10 Sun +1y -14d> will (warning period 14 days is already
 passed by that time).
 
 =item * B<files>* => I<array[filename]>
+
+(No description)
 
 =item * B<from_level> => I<int> (default: 1)
 
@@ -243,7 +245,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

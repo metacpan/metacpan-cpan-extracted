@@ -81,8 +81,17 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
 
             plan tests => 1;
 
-            cmp_ok(scalar @got, "==", 0,
-                   "'$test' gives two output args");
+            # The output should ideally be nothing, but some backend libraries
+            # return two undefs.
+
+            subtest 'output when no inverse exists' => sub {
+                plan tests => 1 + @got;
+                ok(@got == 0 || @got == 2,
+                   "'$test' gives zero or two output args");
+                for my $got (@got) {
+                    is($got, undef, "'$test' output arg is undef");
+                }
+            }
 
         } else {
 

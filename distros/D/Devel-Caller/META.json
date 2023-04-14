@@ -4,13 +4,13 @@
       "Richard Clamp <richardc@unixbeard.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-Caller",
    "no_index" : {
@@ -38,5 +38,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.06"
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/richardc/perl-devel-caller.git",
+         "web" : "https://github.com/richardc/perl-devel-caller"
+      }
+   },
+   "version" : "2.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

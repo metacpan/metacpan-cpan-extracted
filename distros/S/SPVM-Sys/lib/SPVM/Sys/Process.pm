@@ -193,3 +193,10 @@ See the detail of the L<https://linux.die.net/man/3/execv> function in the case 
 The usleep() function suspends execution of the calling thread for (at least) usec microseconds. The sleep may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.
 
 See the detail of the L<usleep|https://linux.die.net/man/3/usleep> function in the case of Linux.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-CheckDigitsUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CheckDigitsUtils/check_check_digits",
@@ -40,7 +40,7 @@ check-check-digits - Check the check digit(s) of numbers
 
 =head1 VERSION
 
-This document describes version 0.001 of check-check-digits (from Perl distribution App-CheckDigitsUtils), released on 2023-01-28.
+This document describes version 0.002 of check-check-digits (from Perl distribution App-CheckDigitsUtils), released on 2023-01-28.
 
 =head1 SYNOPSIS
 

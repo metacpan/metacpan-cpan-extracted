@@ -121,7 +121,8 @@ sub pdlapprox {
   my $ok = (defined($got) && defined($want)
 	    && cmp_dims($got,$want)
 	    && all(matchpdla($want,$got,$eps)));
-  isok(labstr($label,$ok,$got,$want), $ok);
+  isok(labstr($label,$ok,$got,$want), $ok)
+    or diag "got=$got\nwant=$want";
 }
 
 

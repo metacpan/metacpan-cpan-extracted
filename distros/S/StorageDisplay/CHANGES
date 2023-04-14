@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2022-03-25 00:00:00 +0000 to present.
+Changes from 2022-04-03 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 2.02 at 2023-03-25 21:20:35 +0000
+version 2.03 at 2023-04-03 12:21:51 +0000
+-----------------------------------------
+
+  Change: 7cb5d3601cdf54946b55a52baca86c8d618a4a5d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-03 14:21:42 +0000
+
+    new release 
+
+  Change: e1a0487fd584acc4be760e632705e406cab9012c
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-03 14:13:31 +0000
+
+    Fix bug to remotely collect data 
+
+-----------------------------------------
+version 2.02 at 2023-03-25 21:20:28 +0000
 -----------------------------------------
 
   Change: e045f542357fd3a76cec89ec8ef6569255b76373

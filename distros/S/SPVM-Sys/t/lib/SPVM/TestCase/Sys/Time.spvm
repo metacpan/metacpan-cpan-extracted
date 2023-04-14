@@ -5,7 +5,6 @@ class TestCase::Sys::Time {
   use Sys::Time::Timespec;
   use Sys::Time::Constant as TIME;
   use Sys::Time::Itimerval;
-  use Time;
   
   static method gettimeofday : int () {
     
@@ -156,7 +155,7 @@ class TestCase::Sys::Time {
 
   static method clock_nanosleep : int () {
     
-    my $start = Time->time;
+    my $start = Sys::Time->time;
     
     my $request = Sys::Time::Timespec->new;
     $request->set_tv_sec(1);
@@ -170,7 +169,7 @@ class TestCase::Sys::Time {
       return 0;
     }
     
-    unless (Time->time - $start >= 1) {
+    unless (Sys::Time->time - $start >= 1) {
       return 0;
     }
     
@@ -179,7 +178,7 @@ class TestCase::Sys::Time {
 
   static method nanosleep : int () {
     
-    my $start = Time->time;
+    my $start = Sys::Time->time;
     
     my $ts = Sys::Time::Timespec->new;
     $ts->set_tv_sec(1);
@@ -191,7 +190,7 @@ class TestCase::Sys::Time {
       return 0;
     }
     
-    unless (Time->time - $start >= 1) {
+    unless (Sys::Time->time - $start >= 1) {
       return 0;
     }
     

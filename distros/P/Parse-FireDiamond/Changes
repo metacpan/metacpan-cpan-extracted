@@ -1,0 +1,21 @@
+0.004   2023-03-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix data.
+
+
+0.003   2023-03-28  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        - [incompatible change] Rename function for better clarity:
+          parse_fire_diamond_text{,_notation}.
+
+        - Forgot to add explanation for reactivity numbers.
+
+
+0.002   2023-03-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Make data available to other packages.
+
+
+0.001   2023-03-28  Released-By: PERLANCAR
+
+        - First release.

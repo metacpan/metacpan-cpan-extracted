@@ -1,3 +1,73 @@
+Fri Apr 14 08:29:32 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.62 - list_bucket, buckets]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- minor pod updates
+	(buckets)
+	- return if null or error, not _remember_errors()
+	(list_bucket): likewise
+	* src/main/perl/t/01-api: diag before bailing out
+	* src/main/perl/t/04-list-buckets.t
+	- added test for listing non-existent bucket
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- minor pod tweak, alphabetize methods
+
+Wed Mar 29 08:12:48 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.61 - delete_keys(), refactoring]:
+	* s3-perl.pl
+	- added ASCII table output, refactored
+	* NEWS.md: updated
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- some perlcritic refactoring
+	- pod updates
+	(list_bucket): use different markers for v1, v2
+	(list_bucket_all)
+	- throw $EVAL_ERROR "The server has stopped responding"
+	(_make_request): light refactoring
+	(_sendrequest): accept keep_root and pass to _xpc_of_content()
+	(_xpc_of_content): NoAttr => $TRUE
+	(_remember_errors): return false if no error
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- some perlcritic refactoring
+	(add_key): check reftype properly
+	(set_acl): send conten-length
+	* src/main/perl/lib/Amazon/S3/Constants.pm.in
+	- additional constants for refactoring
+	- move subs from t/01-api.t to S3TestUtils.pm
+	* src/main/perl/t/01-api.t: refactoring
+	* src/main/perl/t/02-logger.t: likewise
+	* src/main/perl/t/03-region.t: likewise
+	* src/main/perl/t/04-list-buckets.t: likewise
+	* src/main/perl/t/05-multipart-upload.t: likewise
+	* src/main/perl/t/06-list-multipart-uploads.t: likewise
+	* src/main/perl/test.localstack: converted to bash script
+	* src/main/perl/S3TestUtils.pm: new
+	* cpan/buildspec.yml: add above to distribution
+
+Mon Mar 27 10:47:54 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.61 - delete_keys()]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* README.md: generated
+	* configure.ac: add check for make-cpan-dist.pl
+	* cpan/Makefile.am: use automake var for above
+	* src/main/perl/lib/Amazon/S3/.pm.in
+	(_make_request): don't encode the query string twice
+	(_send_request): precendence wrt regexp
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	(delete_keys): new
+	(_format_delete_keys): new
+	* src/main/perl/lib/Amazon/S3/Constants.pm.in
+	- new constants to support delete_keys() method
+	* src/main/perl/lib/Makefile.am: stop make on error
+	* src/main/perl/t/01-api.t: added tests for delete_keys()
+	* src/main/perl/test.localstack: save logs
+
 Fri Feb 10 07:47:22 2023  Rob Lauer  <rlauer6@comcast.net>>
 
 	[0.60 - logging]:

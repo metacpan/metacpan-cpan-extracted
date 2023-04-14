@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Org/To/Text/org_to_text
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Org/To/Text/org_to_text",
@@ -36,11 +36,15 @@ org-to-text - Export Org document to text
 
 =head1 VERSION
 
-This document describes version 0.483 of org-to-text (from Perl distribution App-OrgUtils), released on 2022-10-11.
+This document describes version 0.484 of org-to-text (from Perl distribution App-OrgUtils), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
-B<org-to-text> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [(B<--exclude-tags>=I<str>)+|B<--exclude-tags-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--ignore-unknown-settings>|B<--no-ignore-unknown-settings>|B<--noignore-unknown-settings>] [(B<--include-tags>=I<str>)+|B<--include-tags-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--source-file>=I<str>] [B<--source-str>=I<str>] [B<--target-file>=I<str>]
+B<org-to-text> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<org-to-text> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<org-to-text> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [(B<L<--exclude-tags|/"--exclude-tags=s@">>=I<str>)+|B<L<--exclude-tags-json|/"--exclude-tags=s@">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-unknown-settings|/"--ignore-unknown-settings">>|B<L<--no-ignore-unknown-settings|/"--ignore-unknown-settings">>|B<L<--noignore-unknown-settings|/"--ignore-unknown-settings">>] [(B<L<--include-tags|/"--include-tags=s@">>=I<str>)+|B<L<--include-tags-json|/"--include-tags=s@">>=I<json>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--source-file|/"--source-file=s">>=I<str>] [B<L<--source-str|/"--source-str=s">>=I<str>] [B<L<--target-file|/"--target-file=s">>=I<str>]
 
 =head1 DESCRIPTION
 
@@ -76,6 +80,9 @@ exclude_tags is evaluated after include_tags.
 Can be specified multiple times.
 
 =item B<--ignore-unknown-settings>
+
+(No description)
+
 
 =item B<--include-tags-json>=I<s>
 
@@ -367,7 +374,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

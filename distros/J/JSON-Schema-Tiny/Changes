@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Tiny
 
+0.020     2023-04-12 03:28:28Z
+         - update test results and exemptions for TJSA 1.019
+
 0.019     2023-01-08 19:54:14Z
          - fix warning when using a $ref to a URI with no fragment
          - update test skip list for latest release of the test suite

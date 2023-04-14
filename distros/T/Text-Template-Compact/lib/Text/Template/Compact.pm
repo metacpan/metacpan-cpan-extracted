@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Encode;
 use Carp;
-our $VERSION = "0.1.12";
+our $VERSION = "0.1.13";
 
 sub getDataType($){
 	# return empty string if not reference type.
@@ -937,6 +937,12 @@ sub print_block{
 	return;
 }
 
+sub _clean_error {
+    my ($error) = @_;
+    $error=~s/^Execution of .* aborted due to compilation errors.\n//m;
+    return $error;
+}
+
 # print %eval tag
 sub print_evalperl{
 	my($tmpl,$tag)=@_;
@@ -946,7 +952,7 @@ sub print_evalperl{
 	my $a_code =ord('a');
 	@data and $code = "my(".join(',',map{my $c=chr($_+$a_code);"\$$c"}(0..$#data)).")=\@data;$code";
 	my $r = eval "{no warnings; $code;}";
-	$@ and $tmpl->{printer}->( "[eval failed: $@]");
+	$@ and $tmpl->{printer}->( sprintf "[eval failed: %s]", _clean_error($@) );
 	$tag->{result} and $tmpl->setExprValue($tag,$tag->{result},$r);
 	return;
 }
@@ -990,7 +996,7 @@ sub print_if_code{
 	@data and $code = "my(".join(',',map{my $c=chr($_+$a_code);"\$$c"}(0..$#data)).")=\@data;$code";
 	local $_ = $tmpl->{param};
 	my $value = eval "no warnings; $code";
-	$@ and $tmpl->{printer}->( "[eval failed: $@]");
+	$@ and $tmpl->{printer}->( sprintf "[eval failed: %s]", _clean_error($@) );
 
 	$value and return print_else($tmpl,$tag);
 	$tag=$tag->{next};
@@ -1776,8 +1782,8 @@ symbol $$ is reference to whole of template object.
 	${ "売り上げ"."合計" }
 	${user.phone||"not available"}
 	${user.mobile?"携帯ユーザ":"PCユーザ"}
-	E<lt>a href="?who=${data#uri}"E<gt>${data#nobr}E<lt>/aE<gt>
-	E<lt>textarea name="a"E<gt>${body#nobr}E<lt>/textareaE<gt>
+	<a href="?who=${data#uri}">${data#nobr}</a>
+	<textarea name="a">${body#nobr}</textarea>
 
 Print expression to place of control tag.
 And you can omit part of '%print' in tag, such as ${expr}.

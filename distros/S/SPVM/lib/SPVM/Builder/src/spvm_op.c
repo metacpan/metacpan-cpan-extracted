@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1706,7 +1709,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
         }
         default: {
           assert(SPVM_TYPE_is_mulnum_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag));
-          type = SPVM_TYPE_new(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag | SPVM_TYPE_C_FLAG_REF);
+          type = SPVM_TYPE_new(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag | SPVM_NATIVE_C_TYPE_FLAG_REF);
         }
       }
       break;
@@ -1741,7 +1744,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
         }
         default: {
           assert(SPVM_TYPE_is_mulnum_ref_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag));
-          type = SPVM_TYPE_new(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag & ~SPVM_TYPE_C_FLAG_REF);
+          type = SPVM_TYPE_new(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag & ~SPVM_NATIVE_C_TYPE_FLAG_REF);
         }
       }
       break;
@@ -1868,9 +1871,9 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   class->op_class = op_class;
   class->op_extends = op_extends;
   
-  class->module_dir = compiler->cur_dir;
-  class->module_rel_file = compiler->cur_rel_file;
-  class->module_file = compiler->cur_file;
+  class->class_path = compiler->cur_dir;
+  class->class_rel_file = compiler->cur_rel_file;
+  class->class_file = compiler->cur_file;
   
   if (op_extends) {
     SPVM_OP* op_name_parent_class = op_extends->first;
@@ -1882,11 +1885,11 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     SPVM_OP_build_use(compiler, op_use, op_name_parent_class, op_name_class_alias, is_require);
   }
   
-  if (class->module_dir) {
-    SPVM_CONSTANT_STRING_new(compiler, class->module_dir, strlen(class->module_dir));
+  if (class->class_path) {
+    SPVM_CONSTANT_STRING_new(compiler, class->class_path, strlen(class->class_path));
   }
-  SPVM_CONSTANT_STRING_new(compiler, class->module_rel_file, strlen(class->module_rel_file));
-  SPVM_CONSTANT_STRING_new(compiler, class->module_file, strlen(class->module_file));
+  SPVM_CONSTANT_STRING_new(compiler, class->class_rel_file, strlen(class->class_rel_file));
+  SPVM_CONSTANT_STRING_new(compiler, class->class_file, strlen(class->class_file));
   
   if (!op_type) {
     // Class is anon
@@ -1925,7 +1928,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   if (!class->is_anon) {
     assert(!islower(class_name[0]));
     
-    // If class name is different from the class name corresponding to the module file, compile error occur.
+    // If class name is different from the class name corresponding to the class file, compile error occur.
     if (strcmp(class_name, compiler->cur_rel_file_class_name) != 0) {
       // If class fail load by if (require xxx) syntax, that is ok
       const char* not_found_class_class_name = SPVM_HASH_get(compiler->not_found_class_class_symtable, class_name, strlen(class_name));
@@ -2049,7 +2052,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       // interface statement
       else if (op_decl->id == SPVM_OP_C_ID_INTERFACE) {
         if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
-          SPVM_COMPILER_error(compiler, "The interface statement can't be used in the definition of the multi-numeric type at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "The interface statement cannnot be used in the definition of the multi-numeric type at %s line %d", op_decl->file, op_decl->line);
         }
         const char* interface_name = op_decl->uv.interface->class_name;
         
@@ -2064,7 +2067,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_CLASS_VAR* class_var = op_decl->uv.class_var;
 
         if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
-          SPVM_COMPILER_error(compiler, "The interface can't have class variables at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "The interface cannnot have class variables at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->class_vars, op_decl->uv.class_var);
 
@@ -2193,7 +2196,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_FIELD* field = op_decl->uv.field;
         
         if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
-          SPVM_COMPILER_error(compiler, "The interface can't have fields at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "The interface cannnot have fields at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->fields, field);
         
@@ -2462,13 +2465,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       }
       else if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
         if (method->is_required) {
-          SPVM_COMPILER_error(compiler, "The method defined in the class can't have the method attribute \"required\" at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The method defined in the class cannnot have the method attribute \"required\" at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       
       if (method->is_native) {
         if (method->op_block) {
-          SPVM_COMPILER_error(compiler, "The native method can't have the block at %s line %d", method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "The native method cannnot have the block at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
       
@@ -2493,7 +2496,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
 
           if (method->is_required) {
             if (class->required_method) {
-              SPVM_COMPILER_error(compiler, "The interface can't have multiple required methods \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
+              SPVM_COMPILER_error(compiler, "The interface cannnot have multiple required methods \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
             }
             class->required_method = method;
           }
@@ -2523,10 +2526,10 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     // mulnum_t
     else if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
       if (class->methods->length > 0) {
-        SPVM_COMPILER_error(compiler, "The multi-numeric type can't have methods at %s line %d", op_class->file, op_class->line);
+        SPVM_COMPILER_error(compiler, "The multi-numeric type cannnot have methods at %s line %d", op_class->file, op_class->line);
       }
       if (class->class_vars->length > 0) {
-        SPVM_COMPILER_error(compiler, "The multi-numeric type can't have class variables at %s line %d", op_class->file, op_class->line);
+        SPVM_COMPILER_error(compiler, "The multi-numeric type cannnot have class variables at %s line %d", op_class->file, op_class->line);
       }
       if (class->fields->length == 0) {
         SPVM_COMPILER_error(compiler, "The multi-numeric type must have at least one field at %s line %d", class->op_class->file, class->op_class->line);
@@ -2608,7 +2611,7 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
   class_var->name = op_name->uv.name;
   
   if (strstr(name, "::")) {
-    SPVM_COMPILER_error(compiler, "The class varaible name \"%s\" can't contain \"::\" at %s line %d", class_var->name, op_name->file, op_name->line);
+    SPVM_COMPILER_error(compiler, "The class varaible name \"%s\" cannnot contain \"::\" at %s line %d", class_var->name, op_name->file, op_name->line);
   }
   
   class_var->op_name = op_name;
@@ -2688,7 +2691,7 @@ SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP
   field->name = op_name_field->uv.name;
 
   if (strstr(field->op_name->uv.name, "::")) {
-    SPVM_COMPILER_error(compiler, "The field name \"%s\" can't contain \"::\" at %s line %d", field->name, op_name_field->file, op_name_field->line);
+    SPVM_COMPILER_error(compiler, "The field name \"%s\" cannnot contain \"::\" at %s line %d", field->name, op_name_field->file, op_name_field->line);
   }
 
   // Type
@@ -2771,7 +2774,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   }
   const char* method_name = op_name_method->uv.name;
   if (strstr(method_name, "::")) {
-    SPVM_COMPILER_error(compiler, "The method name \"%s\" can't contain \"::\" at %s line %d", method_name, op_name_method->file, op_name_method->line);
+    SPVM_COMPILER_error(compiler, "The method name \"%s\" cannnot contain \"::\" at %s line %d", method_name, op_name_method->file, op_name_method->line);
   }
   
   // Block is method block
@@ -2790,7 +2793,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   
   method->is_init = is_init;
   if (!is_init && strcmp(method_name, "INIT") == 0) {
-    SPVM_COMPILER_error(compiler, "\"INIT\" can't be used as a method name at %s line %d", op_name_method->file, op_name_method->line);
+    SPVM_COMPILER_error(compiler, "\"INIT\" cannnot be used as a method name at %s line %d", op_name_method->file, op_name_method->line);
   }
 
   // Method attributes
@@ -2851,9 +2854,9 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     method->access_control_type = SPVM_ATTRIBUTE_C_ID_PUBLIC;
   }
   
-  // Native method can't have block
+  // Native method cannnot have block
   if ((method->is_native) && op_block) {
-    SPVM_COMPILER_error(compiler, "The native method can't have the block at %s line %d", op_block->file, op_block->line);
+    SPVM_COMPILER_error(compiler, "The native method cannnot have the block at %s line %d", op_block->file, op_block->line);
   }
   
   // method args
@@ -2926,7 +2929,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
 
     // DESTROY doesn't have arguments without invocant
     if (method->args_length != 1) {
-      SPVM_COMPILER_error(compiler, "The DESTROY destructor method can't have arguments at %s line %d", op_method->file, op_method->line);
+      SPVM_COMPILER_error(compiler, "The DESTROY destructor method cannnot have arguments at %s line %d", op_method->file, op_method->line);
     }
   }
   
@@ -3134,7 +3137,7 @@ SPVM_OP* SPVM_OP_build_var_decl(SPVM_COMPILER* compiler, SPVM_OP* op_var_decl, S
   op_var->uv.var->var_decl = var_decl;
   
   if (strstr(op_var->uv.var->name, "::")) {
-    SPVM_COMPILER_error(compiler, "The local variable \"%s\" can't contain \"::\" at %s line %d", op_var->uv.var->name, op_var->file, op_var->line);
+    SPVM_COMPILER_error(compiler, "The local variable \"%s\" cannnot contain \"::\" at %s line %d", op_var->uv.var->name, op_var->file, op_var->line);
   }
   
   return op_var;
@@ -3547,7 +3550,7 @@ SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
 SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_original) {
   
   // Type
-  SPVM_TYPE* type = SPVM_TYPE_new(compiler, op_type_original->uv.type->basic_type->id, op_type_original->uv.type->dimension, SPVM_TYPE_C_FLAG_REF);
+  SPVM_TYPE* type = SPVM_TYPE_new(compiler, op_type_original->uv.type->basic_type->id, op_type_original->uv.type->dimension, SPVM_NATIVE_C_TYPE_FLAG_REF);
   
   // Type OP
   SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, op_type_original->file, op_type_original->line);
@@ -3559,7 +3562,7 @@ SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_origin
 SPVM_OP* SPVM_OP_build_mutable_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_child) {
   
   // Type
-  SPVM_TYPE* type = SPVM_TYPE_new(compiler, op_type_child->uv.type->basic_type->id, op_type_child->uv.type->dimension, op_type_child->uv.type->flag | SPVM_TYPE_C_FLAG_MUTABLE);
+  SPVM_TYPE* type = SPVM_TYPE_new(compiler, op_type_child->uv.type->basic_type->id, op_type_child->uv.type->dimension, op_type_child->uv.type->flag | SPVM_NATIVE_C_TYPE_FLAG_MUTABLE);
   
   // Type OP
   SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, op_type_child->file, op_type_child->line);

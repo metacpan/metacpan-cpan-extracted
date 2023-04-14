@@ -41,6 +41,8 @@ The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
     filestore=/var/log/suricata/files
     # a file of IPs or subnets to ignore SRC or DEST IPs of
     #ignore=
+    # a file of regex to use for checking host names go ignore
+    #ignoreHosts=
 
 =cut
 
@@ -103,31 +105,51 @@ if ( !defined($filestore) ) {
 
 # read in the file of IPs to ignore
 my $ignore_file = $config->{_}->{ignore};
-my $ignore_raw  = '';
-if ( defined($ignore_file) && -f $ignore_file ) {
-	$ignore_raw = read_file($ignore_file);
-}
-my @to_ignore_raw = split( /\n/, $ignore_raw );
-@to_ignore_raw = grep( !/^\w*\#/, @to_ignore_raw );
-@to_ignore_raw = grep( !/^\w*$/,  @to_ignore_raw );
-
-# process the @to_ignore_raw adding subnets if needed
 my @to_ignore;
-foreach my $item (@to_ignore_raw) {
+if ( defined($ignore_file) && -f $ignore_file ) {
+	log_something( 'info', 'reading in ignore file... ' . $ignore_file );
+	my $ignore_raw = read_file($ignore_file);
 
-	# remove any white space at the start or end
-	$item =~ s/^[\ \t]+//;
-	$item =~ s/[\ \t]+$//;
-	if ( $item =~ /^[0-9\.]+$/ ) {
-		$item = $item . '/32';
+	my @to_ignore_raw = split( /\n/, $ignore_raw );
+	@to_ignore_raw = grep( !/^\w*\#/, @to_ignore_raw );
+	@to_ignore_raw = grep( !/^\w*$/,  @to_ignore_raw );
+
+	# process the @to_ignore_raw adding subnets if needed
+	my $ignored = 0;
+	foreach my $item (@to_ignore_raw) {
+
+		# remove any white space at the start or end
+		$item =~ s/^[\ \t]+//;
+		$item =~ s/[\ \t]+$//;
+		if ( $item =~ /^[0-9\.]+$/ ) {
+			$item = $item . '/32';
+		}
+		if ( $item =~ /^[0-9\:]+$/ ) {
+			$item = $item . '/128';
+		}
+		push( @to_ignore, $item );
+
+		$ignored++;
 	}
-	if ( $item =~ /^[0-9\:]+$/ ) {
-		$item = $item . '/128';
-	}
-	push( @to_ignore, $item );
+
+	log_something( 'info', 'ignoring ' . $ignored . ' subnets or IPs' );
 }
-
 my $white_list = subnet_matcher @to_ignore;
+
+# read in the file of IPs to ignore
+my $ignoreHosts_file = $config->{_}->{ignoreHosts};
+my @hosts_to_ignore;
+if ( defined($ignoreHosts_file) && -f $ignoreHosts_file ) {
+	log_something( 'info', 'reading in ignoreHosts file... ' . $ignoreHosts_file );
+	my $ignoreHosts_raw = read_file($ignoreHosts_file);
+
+	@hosts_to_ignore = split( /\n/, $ignoreHosts_raw );
+	@hosts_to_ignore = grep( !/^\w*\#/, @hosts_to_ignore );
+	@hosts_to_ignore = grep( !/^\w*$/,  @hosts_to_ignore );
+
+	my $found_regex=$#hosts_to_ignore;
+	log_something( 'info', $found_regex . ' regexs loaded to ignore for hosts' );
+}
 
 # create a tmpdir and chdir to it
 my $tempdir = tempdir();
@@ -210,12 +232,18 @@ foreach my $file (@files) {
 
 		my $add_it = 1;
 		if ( $white_list->($src_ip) ) {
-			log_something( 'info', 'White Listed Source IP: ' . $src_ip );
+			log_something( 'info', 'Ignore Listed Source IP: ' . $src_ip );
 			$add_it = 0;
 		}
 		if ( $white_list->($dest_ip) ) {
-			log_something( 'info', 'White Listed Destination IP: ' . $dest_ip );
+			log_something( 'info', 'Ignore Listed Destination IP: ' . $dest_ip );
 			$add_it = 0;
+		}
+		foreach my $item (@hosts_to_ignore) {
+			if ( $http_host =~ /$item/ ) {
+				log_something( 'info', 'Ignore Listed Host, "' . $item . '": ' . $http_host );
+				$add_it = 0;
+			}
 		}
 
 		$name

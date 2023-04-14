@@ -53,7 +53,7 @@ in Date::ICal
 =head1 AUTHOR
 
 Rich Bowen, and the Reefknot team. Alas, Reefknot is no more. See
-http://datetime.perl.org/ for more modern modules.
+L<https://github.com/houseabsolute/DateTime.pm/wiki> or L<https://metacpan.org/> for more modern modules.
 
 Last touched by $Author: rbowen $
 

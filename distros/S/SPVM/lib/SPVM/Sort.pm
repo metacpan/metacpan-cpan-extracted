@@ -84,7 +84,7 @@ Sorts the range of the elements of C<byte> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Int|SPVM::Comparator::Int> comparator is used to compare each element.
 
@@ -92,7 +92,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -122,7 +122,7 @@ Sorts the range of the elements of C<double> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Double|SPVM::Comparator::Double> comparator is used to compare each element.
 
@@ -130,7 +130,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -160,7 +160,7 @@ Sorts the range of the elements of C<float> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Float|SPVM::Comparator::Float> comparator is used to compare each element.
 
@@ -168,7 +168,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -198,7 +198,7 @@ Sorts the range of the elements of C<float> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Float|SPVM::Comparator::Float> comparator is used to compare each element.
 
@@ -206,7 +206,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -236,7 +236,7 @@ Sorts the range of the elements of C<int> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Int|SPVM::Comparator::Int> comparator is used to compare each element.
 
@@ -244,7 +244,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -274,7 +274,7 @@ Sorts the range of the elements of C<long> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Long|SPVM::Comparator::Long> comparator is used to compare each element.
 
@@ -282,7 +282,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -312,13 +312,13 @@ Sorts the range of the elements of object array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator|SPVM::Comparator> comparator is used to compare each element.
 
 Exceptions:
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -332,7 +332,7 @@ Sorts the range of the elements of C<short> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Int|SPVM::Comparator::Int> comparator is used to compare each element.
 
@@ -340,7 +340,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -370,7 +370,7 @@ Sorts the range of the elements of C<string> $array in-place.
 
 The sorted range is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 The L<Comparator::Int|SPVM::Comparator::Int> comparator is used to compare each element.
 
@@ -378,7 +378,7 @@ Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0.
 
 The $comparator must be defined.
 
@@ -399,3 +399,29 @@ The alias for the following code using L</"sort_string">
 The alias for the following code using L</"sort_string">
 
   Sort->sort_string($array, method : int ($a : string, $b : string) { return $b cmp $a; }, $offset, $length);
+
+=head2 sort_options_asc
+
+  static method sort_options_asc : void ($options : object[]);
+
+Sorts the $options by the dictionaly asc order of the key.
+
+Exceptions:
+
+The $options must be defined. Otherwise an exception is thrown.
+
+The length of the $options must be an even number. Otherwise an exception is thrown.
+
+The key of the $options must be defined. Otherwise an exception is thrown.
+
+The key of the $options must be the string type. Otherwise an exception is thrown.
+
+Examples:
+
+  Sort->sort_options({key2 => 1, key3 => 2, key1 => 3});
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

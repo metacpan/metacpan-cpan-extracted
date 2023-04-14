@@ -1,5 +1,14 @@
 Revision history for JIP-Debug
 
+0.031        2023-03-01
+        Added Perl 5.36 into ".travis.yml".
+        Small changes in distro.
+
+0.03         2018-04-22
+        Added function to_debug_truncate.
+        Updated Data::Dumper requirement to 2.160.
+        Added DUMPER_TRAILING_COMMA=1 to configuration.
+
 0.021        2018-01-07
         Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
 

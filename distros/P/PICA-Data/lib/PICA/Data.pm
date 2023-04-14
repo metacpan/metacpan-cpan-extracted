@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.06';
+our $VERSION = '2.09';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -72,7 +72,7 @@ sub pica_fields {
 
     $record = $record->{record} if reftype $record eq 'HASH';
 
-    return $record unless @_;
+    return [@$record] unless @_;
 
     my $matcher = eval {pica_field_matcher(@_)};
     return [] unless $matcher;
@@ -456,7 +456,7 @@ sub _pica_module {
     my $base = shift;
     my $type = lc(shift) // '';
 
-    if ($type =~ /^(pica)?plus$/) {
+    if ($type =~ /^(pica)?plus|norm(alized)$/) {
         "${base}::Plus"->new(@_);
     }
     elsif ($type eq 'binary') {
@@ -836,6 +836,11 @@ two arguments (path and value) to replace, add or remove a subfield value.
 Remove all fields matching given PICA Path expressions. Subfields and positions
 in the path are ignored.
 
+=head2 pica_split( $level )
+
+Reduce and split record to given level except for identifiers PPN/ILN. Returns
+a list of records.
+
 =head1 ACCESSORS
 
 All accessors of C<PICA::Data> are also available as L</FUNCTIONS>, prefixed
@@ -883,6 +888,12 @@ Returns the record id, if given.
 
 Tell whether the record is empty (no fields).
 
+=head2 split($level)
+
+Reduce and split the record into title record (level=0), holding records
+(level=1) or copy/item records (level=2). PPN and ILN are included for level 1
+and 2 respectively.
+
 =head1 METHODS
 
 =head2 write( [ $type [, @options] ] | $writer )
@@ -913,7 +924,7 @@ instance of L<PICA::Field> but this feature may be removed in a future version.
 =head2 remove( $path [, $path..] )
 
 Remove all fields matching given PICA Path expressions. Subfields and positions
-are ignored.
+are ignored so far.
 
 =head2 update( ... )
 

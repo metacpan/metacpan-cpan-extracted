@@ -5,7 +5,7 @@ Please note that this module is long-since abandoned. While I do accept
 patches, and occasionally apply them, for the most part it is
 recommended that you move off of this module and use the various modules
 developed by the datetime project. You can find out more about the
-datetime project at http://datetime.perl.org/
+datetime project at https://github.com/houseabsolute/DateTime.pm/wiki
 
 Rich Bowen - RBOW@CPAN.ORG
 ~;

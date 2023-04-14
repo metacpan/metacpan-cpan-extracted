@@ -10,7 +10,9 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit;
-$Spreadsheet::Edit::VERSION = '3.003';
+our $VERSION = '3.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-04'; # DATE from Dist::Zilla::Plugin::OurDate
+
 # TODO FIXME: Integrate with Spreadsheet::Read and provide a formatting API
 #
 # TODO: Need api to *read* options without changing them
@@ -502,13 +504,14 @@ sub _fmt_colx(;$$) {
          ], $indent, $foldwidth
 }
 
-# Is a title omitted from colx?
+# Is a title a special symbol or looks like a cx number?
 sub __unindexed_title($$) {
   my ($title, $num_cols) = @_;
+oops unless defined $title;
   $title eq ""
   || $title eq '^'
   || $title eq '$'
-  || ( ($title =~ /^[1-9]\d*$/ || $title eq "0")
+  || ( ($title =~ /^[1-9]\d*$/ || $title eq "0") # not with leading zeros
        && $title <= $num_cols )
 }
 sub _unindexed_title { #method for use by tests
@@ -516,14 +519,31 @@ sub _unindexed_title { #method for use by tests
   __unindexed_title(shift(), $$self->{num_cols});
 }
 
-# Return { title => cx, ... }
-sub _get_indexed_titles {
+# Return (normals, unindexed) where each is [title => cx, ...] sorted by cx
+sub _get_usable_titles { 
   my $self = shift;
   my ($rows, $title_rx, $num_cols) = @$$self{qw{rows title_rx num_cols}};
   my $title_row = $rows->[$title_rx // oops];
-  return {
-    map{ my $t = $title_row->[$_];
-         __unindexed_title($t,$num_cols) ? () : ($t => $_) } 0 .. $num_cols-1 };
+  my @unindexed;
+  my @normals;
+  my %seen;
+  for my $cx (0 .. $num_cols-1) {
+    my $title = $title_row->[$cx];
+    next if $title eq "";
+    if ($seen{$title}++) {
+      $self->_carponce("Warning: Non-unique title ", visq($title), " will not be usable for COLSPEC\n") unless $$self->{silent};
+      @normals = grep{ $_->[0] ne $title } @normals;
+      @unindexed = grep{ $_->[0] ne $title } @unindexed;
+      next;
+    }
+    if (__unindexed_title($title, $num_cols)) {
+      push @unindexed, [$title, $cx];
+    } else {
+      push @normals, [$title, $cx];
+    }
+  }
+  [sort { $a->[1] <=> $b->[1] } @normals],
+    [sort { $a->[1] <=> $b->[1] } @unindexed]
 }
 
 # Non-OO api: Explicitly create a new sheet and make it the "current sheet".
@@ -807,13 +827,16 @@ sub __self_opthash_1arg  { unshift @_,1; goto &__self_opthash_Nargs }
 sub __self_opthash_2args { unshift @_,2; goto &__self_opthash_Nargs }
 sub __self_opthash_3args { unshift @_,3; goto &__self_opthash_Nargs }
 
-# Check that an option hash has only valid keys
-sub __validate_opthash($$;$) {
-  my ($opthash, $valid_keys, $optdesc) = @_;
+# Check that an option hash has only valid keys, and values aren't undef
+sub __validate_opthash($$;@) {
+  my ($opthash, $valid_keys, %opts) = @_;
   return unless defined $opthash; # silently accept undef
   foreach my $k (keys %$opthash) {
-    croak "Unrecognized ",($optdesc//"option")," '$k'"
+    croak "Unrecognized ",($opts{desc}//"option")," '$k'"
       unless first{$_ eq $k} @$valid_keys;
+    confess "Option '$k' must be defined"
+      if $opts{undef_ok} && !defined($opthash->{$k})
+                         && !grep{$_ eq $k} @{$opts{undef_ok}};
   }
   $opthash
 }
@@ -1306,7 +1329,7 @@ sub title_row() {
 sub rx() { ${ &__selfmustonly }->{current_rx} }
 sub crow() {
   my $self = &__selfmustonly;
-  ${ $self->_onlyinapply("row() method") }->{rows}->[$$self->{current_rx}]
+  ${ $self->_onlyinapply("crow() method") }->{rows}->[$$self->{current_rx}]
 }
 sub linenum() {
   my $self = &__selfmustonly;
@@ -1428,7 +1451,7 @@ sub fmt_sheet($) {
 #   when the user actually did not pass any {OPTARGS} argument.  
 #
 sub __methretmsg($;$) {
-  my ($items, $retvals) = @_;
+  my $items = $_[0];
   oops unless ref($items) eq "ARRAY";
   my $showitems =
     (ref($items->[0]) eq "HASH" && !(keys %{$items->[0]}))
@@ -1437,11 +1460,11 @@ sub __methretmsg($;$) {
   my ($fn, $lno, $subname) = __fn_ln_methname();
   my $msg = ">[$fn:$lno] $subname";
   $msg .= " " if @$showitems;
-  if ($retvals) {
+  if (@_ > 1) {
+    my $retvals = to_aref($_[1]);
+    oops unless @$retvals;
     $msg .= @$showitems == 0 ? "()" : fmt_list(@$showitems);
     oops "terminal newline in final log item" if $msg =~ /\n"?\z/s;
-    $retvals = to_aref($retvals); # $foo -> [$foo]
-    oops unless @$retvals;
     $msg .= " -> ";
     $msg .= fmt_list(@$retvals);
   } else {
@@ -1565,7 +1588,7 @@ sub _apply_to_rows($$$;$$$) {
 # When building %colx, conflicts are resolved using these priorities:
 #
 #   User-defined aliases (ALWAYS valid)
-#   Titles
+#   Titles (if unique)
 #   Trimmed titles (with leading & trailing spaces removed)
 #   Automatic aliases
 #   ABC letter-codes
@@ -1594,12 +1617,14 @@ sub _rebuild_colx {
   %$colx = ();
   %$colx_desc = ();
 
-  my sub __putback($$$) {
-    my ($key, $cx, $desc) = @_;
+  my sub __putback($$$;$) {
+    my ($key, $cx, $desc, $nomasking) = @_;
     if (defined (my $ocx = $colx->{$key})) {
-      $self->_carponce("Warning: ", visq($key), " ($desc) is MASKED BY (",
-                       $colx_desc->{$key}, ")")
-        unless $cx == $ocx || $silent;
+      if ($cx != $ocx) {
+        oops if $nomasking; # _get_usable_titles should have screen out
+        $self->_carponce("Warning: ", visq($key), " ($desc) is MASKED BY (",
+                         $colx_desc->{$key}, ")") unless $silent;
+      }
     } else {
       oops if exists $colx->{$key};
       $colx->{$key} = $cx;
@@ -1615,24 +1640,24 @@ sub _rebuild_colx {
 
   if (defined $title_rx) {
     # Add non-conflicting titles
-    my $indexed_titles = $self->_get_indexed_titles;
-    while (my ($title, $cx) = each %$indexed_titles) {
-      __putback($title, $cx, __fmt_cx($cx).": Title");
+    my ($normal_titles, $unindexed_titles) = $self->_get_usable_titles;
+    foreach (@$normal_titles) {
+      my ($title, $cx) = @$_;
+      __putback($title, $cx, __fmt_cx($cx).": Title", 1); # nomasking==1
     }
     # Titles with leading & trailing spaces trimmed off
-    while (my ($title, $cx) = each %$indexed_titles) {
+    foreach (@$normal_titles) {
+      my ($title, $cx) = @$_;
       my $key = $title;
       $key =~ s/\A\s+//s; $key =~ s/\s+\z//s;
       if ($key ne $title) {
-        __putback($key, $cx, __fmt_cx($cx).": Title trimmed of lead/trailing spaces");
+        __putback($key, $cx, __fmt_cx($cx).": Title sans lead/trailing spaces",1);
       }
     }
     # Automatic aliases
     # N.B. These come from all titles, not just "normal" ones
-    my $title_row = $rows->[$title_rx];
-    for my $cx (0 .. $num_cols-1) {  # each @{aref overload} does not work
-      my $title = $title_row->[$cx];
-      next if $title eq "";
+    foreach (@$normal_titles, @$unindexed_titles) {
+      my ($title, $cx) = @$_;
       my $ident = title2ident($title);
       __putback($ident, $cx, __fmt_cx($cx).": Automatic alias for title");
     }
@@ -1792,9 +1817,8 @@ sub alias(@) {
   my $self = &__selfmust;
   my $opthash = ref($_[0]) eq 'HASH' ? shift() : {};
   if ($opthash) {
-    __validate_opthash($opthash,
-                       [qw(optional)],
-                       "alias option");
+    __validate_opthash($opthash, [qw(optional)],
+                       desc => "alias option");
   }
   croak "'alias' expects an even number of arguments\n"
     unless scalar(@_ % 2)==0;
@@ -1883,7 +1907,8 @@ sub title_rx(;$@) {
 
   __validate_opthash( $opthash,
                       [qw(required min_rx max_rx first_cx last_cx)],
-                      "autodetect option" );
+                      desc => "autodetect option",
+                      undef_ok => [] );
   my $rx = -999;
   if (@_ == 0) {
     # A return value was requested
@@ -1923,6 +1948,7 @@ sub _autodetect_title_rx {
   # Filter out titles which can not be used as a COLSPEC
   my @required_specs = $opthash->{required}
                          ? to_array($opthash->{required}) : ();
+  croak "undef value in {required}" if grep{! defined} @required_specs;
   @required_specs = grep{ !__unindexed_title($_, $num_cols) } @required_specs;
 
   my $min_rx   = __validate_nonnegi($opthash->{min_rx}//0, "min_rx");
@@ -2605,7 +2631,8 @@ sub read_spreadsheet($;@) {
       qw/tempdir use_gnumeric sheetname/, # for OpenAsCsv
       qw/required min_rx max_rx first_cx last_cx/, # for title_rx
                       ],
-                      "read_spreadsheet option" );
+      desc => "read_spreadsheet option",
+      undef_ok => [qw/title_rx verbose silent debug use_gnumeric/] );
 
   # convert {encoding} to {iolayers}
   if (my $enc = delete $opthash->{encoding}) {
@@ -3593,10 +3620,10 @@ C<read_spreadsheet> automatically sets the title row.
 Titles are disabled and any existing COLSPECs derived from
 titles are invalidated.  Auto-detection is I<disabled>.
 
-=head2 title_rx {AUTODETECT_OPTIONS} ;
+=head2 title_rx {AUTODETECT_OPTIONS} 'auto';
 
-Auto-detection of a title row is immediately performed, using
-C<< {AUTODETECT_OPTIONS} >> to modify existing auto-detect options
+Immediately perform auto-detection of the title row using
+C<< {AUTODETECT_OPTIONS} >> to modify any existing auto-detect options
 (see C<read_spreadsheet> for a description of the options).
 
 

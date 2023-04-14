@@ -3,12 +3,12 @@ abstract: 'Perl module for structured errors.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Capture::Tiny: 0
   Cwd: 0
   English: 0
   ExtUtils::MakeMaker: 6.59
   File::Spec::Functions: 0
   FindBin: 0
-  IO::CaptureOutput: 1.02
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -40,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Error-Pure
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Error-Pure
-version: '0.30'
+version: '0.31'

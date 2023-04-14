@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More 0.90;
-use Crypt::Argon2 qw/argon2i_pass argon2i_raw argon2i_verify argon2id_pass argon2_needs_rehash/;
+use Crypt::Argon2 qw/argon2i_pass argon2i_raw argon2_verify argon2_pass argon2_needs_rehash/;
 
 sub hashtest {
 	my ($t_cost, $m_cost, $parallelism, $password, $salt, $hexref, $mcfref) = @_;
@@ -12,7 +12,7 @@ sub hashtest {
 	subtest "argon2i($t_cost, $m_cost, $parallelism, $password, $salt)", sub {
 		my $encoded = argon2i_pass($password, $salt, $t_cost, $m_cost, $parallelism, 32);
 		is($encoded, $mcfref, "$t_cost:$m_cost:$parallelism($password, $salt) encodes as expected");
-		ok(argon2i_verify($encoded, $password), "$t_cost:$m_cost:$parallelism($password, $salt) matches as expected");
+		ok(argon2_verify($encoded, $password), "$t_cost:$m_cost:$parallelism($password, $salt) matches as expected");
 		my $hex = unpack "H*", argon2i_raw($password, $salt, $t_cost, $m_cost, $parallelism, 32);
 		is($hex, $hexref, "$t_cost:$m_cost:$parallelism($password, $salt) verifies as expected");
 	};
@@ -49,7 +49,7 @@ if ($ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING}) {
 }
 
 subtest 'needs_rehash', sub {
-	my $encoded = argon2id_pass('password', 'saltsalt', 2, '64M', 1, 32);
+	my $encoded = argon2_pass('argon2id', 'password', 'saltsalt', 2, '64M', 1, 32);
 	ok(!argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 32, 8), 'No rehash with same parameters');
 	ok(argon2_needs_rehash($encoded, 'argon2i', 2, '64M', 1, 32, 8), 'Rehash with different argon2 variant');
 	ok(argon2_needs_rehash($encoded, 'argon2id', 3, '64M', 1, 32, 8), 'Rehash with different time cost');

@@ -1,0 +1,21 @@
+App-dirdir-0.010.tar.gz
+App-dirdir-0.010/META.json
+App-dirdir-0.010/META.yml
+App-dirdir-0.020.tar.gz
+App-dirdir-0.021.tar.gz
+App-dirdir-0.023.tar.gz
+App-dirdir-0.024.tar.gz
+App-dirstrata-0.030.tar.gz
+Changes
+dirdir
+dirdir.pm
+dirstrata
+dirstrata.pm
+INSTALL
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+tmp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

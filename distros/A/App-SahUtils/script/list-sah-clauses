@@ -8,9 +8,9 @@ use Perinci::CmdLine::Any;
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -86,10 +86,10 @@ die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 $SPEC{list_sah_clauses}{args}{type} = {
     schema => ['str*', match => qr/\A\w+(::\w+)*\z/], # XXX sah::type_name
     req => 1,
-    pos => 0,
+    #pos => 0,
     'x.schema.entity' => 'sah::type_name',
 };
-$SPEC{list_sah_clauses}{args}{query}{pos} = 1;
+#$SPEC{list_sah_clauses}{args}{query}{pos} = 1;
 
 Perinci::CmdLine::Any->new(
     url => '/main/list_sah_clauses',
@@ -110,7 +110,7 @@ list-sah-clauses - List clauses of a Sah type
 
 =head1 VERSION
 
-This document describes version 0.482 of list-sah-clauses (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of list-sah-clauses (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,8 @@ C<*> marks required options.
 
 =item B<--type>=I<sah>::type_name*
 
-Can also be specified as the 1st command-line argument.
+(No description)
+
 
 =back
 
@@ -551,11 +552,56 @@ Only return records where the 'tags' field equals specified value.
 
 =over
 
-=item B<--query>=I<s>, B<-q>
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
 
 Search.
 
-Can also be specified as the 2nd command-line argument.
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
 
 =back
 
@@ -788,7 +834,8 @@ List of available configuration parameters:
  prio.not_in (see --prio-not-in)
  prio.xmax (see --prio-xmax)
  prio.xmin (see --prio-xmin)
- query (see --query)
+ queries (see --query)
+ query_boolean (see --query-boolean)
  random (see --random)
  result_limit (see --result-limit)
  result_start (see --result-start)
@@ -856,7 +903,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

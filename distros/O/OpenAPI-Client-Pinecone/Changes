@@ -1,0 +1,10 @@
+Revision history for OpenAPI-Client-Pinecone
+
+0.03    2023-04-11
+        Rename methods.
+        Update documentation.
+        Update Makefile.PL.
+
+0.01    2023-04-10
+        First version, released on an unsuspecting world.
+

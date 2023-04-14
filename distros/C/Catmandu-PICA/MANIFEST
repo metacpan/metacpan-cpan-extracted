@@ -33,6 +33,7 @@ t/20-pica-diff.t
 t/30-modify.t
 t/Catmandu-Fix-pica_map.t
 t/bugfix_pica_map.t
+t/files/bgb.pp
 t/files/dump.dat
 t/files/minimal.pp
 t/files/picaplus.dat

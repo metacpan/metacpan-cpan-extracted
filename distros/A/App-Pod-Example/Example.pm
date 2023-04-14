@@ -18,7 +18,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $HASH => q{#};
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 # Constructor.
 sub new {
@@ -29,6 +29,14 @@ sub new {
 
 	# Process params.
 	set_params($self, @params);
+
+	# Object.
+	return $self;
+}
+
+# Run.
+sub run {
+	my $self = shift;
 
 	# Process arguments.
 	$self->{'_opts'} = {
@@ -55,7 +63,7 @@ sub new {
 		print STDERR "\t-r\t\tRun example.\n";
 		print STDERR "\t-s section\tUse section (default EXAMPLE).\n";
 		print STDERR "\t--version\tPrint version.\n";
-		exit 1;
+		return 1;
 	}
 	$self->{'_pod_file_or_module'} = shift @ARGV;
 	$self->{'_args'} = \@ARGV;
@@ -71,21 +79,13 @@ sub new {
 		err 'Cannot process any action (-p or -r options).';
 	}
 
-	# Object.
-	return $self;
-}
-
-# Run.
-sub run {
-	my $self = shift;
-
 	# Get example code.
 	my $code = get($self->{'_pod_file_or_module'}, $self->{'_section'}, $self->{'_number'});
 
 	# No code.
 	if (! defined $code) {
 		print "No code.\n";
-		return;
+		return 0;
 	}
 
 	# Print.
@@ -120,7 +120,7 @@ sub run {
 		unlink $tempfile;
 	}
 
-	return;
+	return 0;
 }
 
 sub _debug {
@@ -177,6 +177,8 @@ Returns undef.
 
 =head1 EXAMPLE
 
+=for comment filename=print_enumerated.pl
+
  use strict;
  use warnings;
 
@@ -222,12 +224,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2021 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

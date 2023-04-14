@@ -1,5 +1,14 @@
 Revision history for AnyEvent::MPV
 
+1.03 Sat 01 Apr 2023 08:30:44 CEST
+	- only create a write-watcher if the commands cnanot be written
+          immediately, whic h lowers overhead and improves responsiveness
+          in practically all situations.
+        - better portability to 32 bit perls.
+
+1.02 Thu 30 Mar 2023 19:32:43 CEST
+	- trace was only effective on the first ->start.
+
 1.01 Thu 23 Mar 2023 20:21:53 CET
 	- the default on_event method implementation failed
           to pass the event data to the on_event callback.

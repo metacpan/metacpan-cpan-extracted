@@ -21,28 +21,25 @@ name: Data-Sah-DefaultValue
 provides:
   Data::Sah::DefaultValue:
     file: lib/Data/Sah/DefaultValue.pm
-    version: '0.002'
+    version: '0.003'
   Data::Sah::DefaultValueCommon:
     file: lib/Data/Sah/DefaultValueCommon.pm
-    version: '0.002'
+    version: '0.003'
   Data::Sah::DefaultValueJS:
     file: lib/Data/Sah/DefaultValueJS.pm
-    version: '0.002'
+    version: '0.003'
   Data::Sah::Value::js::Math::random:
     file: lib/Data/Sah/Value/js/Math/random.pm
-    version: '0.002'
+    version: '0.003'
   Data::Sah::Value::js::Str::repeat:
     file: lib/Data/Sah/Value/js/Str/repeat.pm
-    version: '0.002'
+    version: '0.003'
   Data::Sah::Value::perl::Math::random:
     file: lib/Data/Sah/Value/perl/Math/random.pm
-    version: '0.002'
-  Data::Sah::Value::perl::Path::filenames:
-    file: lib/Data/Sah/Value/perl/Path/filenames.pm
-    version: '0.002'
+    version: '0.003'
   Data::Sah::Value::perl::Str::repeat:
     file: lib/Data/Sah/Value/perl/Str/repeat.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Data::Dmp: '0.242'
   Exporter: '5.57'
@@ -58,7 +55,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-DefaultValue
   homepage: https://metacpan.org/release/Data-Sah-DefaultValue
   repository: git://github.com/perlancar/perl-Data-Sah-DefaultValue.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -236,7 +233,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -348,7 +345,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

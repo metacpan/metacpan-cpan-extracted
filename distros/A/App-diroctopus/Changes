@@ -1,0 +1,33 @@
+
+Revision history for the module "App::diroctopus" : 
+
+[Verseions in the past]
+% hg log -f dirdeep
+changeset:   1436:af4b3a00cf13
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Apr 09 10:52:04 2019 +0900
+summary:     dirdeep -y1を初期設定とした。
+
+changeset:   1421:acfd52e55367
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Mar 26 15:16:42 2019 +0900
+summary:     dirdeep -Sを実装しようとした。-Lを実装しようとした。
+
+changeset:   1420:bf78c610d371
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Mar 26 13:05:34 2019 +0900
+summary:     dirdeep cmpProcを実装
+
+changeset:   1419:6ae7901057d1
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Mar 26 10:51:01 2019 +0900
+summary:     dirdeep 一応動く。いろいろオプション追加ずみ。Warning対策中
+
+
+[Versions in recent]
+
+0.025  2023-04-06 : 
+  - 他の関連のコマンドに無い有用性があると思い、単独のコマンドを持つモジュールとして提供することに決めた。
+  - コマンドの元の名前はdirdeep だが、蛸の足を連想させる動きであり、想起容易さを考えdiroctopus (10文字) とした。
+  - 昨日思いつき App::dirdimで実施した、英語のマニュアルを *.pm に書けば良いというアイデアを踏襲した。
+  - 昨日折角久しぶりにプログラミングをしたこと、および dirdeep を発掘したことが、このモジュール作りのきっかけである。

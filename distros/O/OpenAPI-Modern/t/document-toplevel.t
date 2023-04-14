@@ -6,6 +6,9 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use lib 't/lib';
+use Helper;
+
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
@@ -53,18 +56,26 @@ subtest 'top level document fields' => sub {
     evaluator => my $js = JSON::Schema::Modern->new,
     schema => 1,
   );
+
   cmp_deeply(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
         instanceLocation => '',
-        keywordLocation => '',
-        absoluteKeywordLocation => 'http://localhost:1234/api',
-        error => 'invalid document type: integer',
+        keywordLocation => '/type',
+        absoluteKeywordLocation => SCHEMA.'#/type',
+        error => 'got integer, not object',
       },
     ],
     'document is wrong type',
   );
+
+  is(
+    document_result($doc),
+    q!'': got integer, not object!,
+    'stringified errors',
+  );
+
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -76,13 +87,19 @@ subtest 'top level document fields' => sub {
     [
       {
         instanceLocation => '',
-        keywordLocation => '/openapi',
-        absoluteKeywordLocation => 'http://localhost:1234/api#/openapi',
-        error => 'openapi keyword is required',
+        keywordLocation => '/required',
+        absoluteKeywordLocation => SCHEMA.'#/required',
+        error => 'missing property: openapi',
       },
     ],
     'missing openapi',
   );
+  is(
+    document_result($doc),
+    q!'': missing property: openapi!,
+    'stringified errors',
+  );
+
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -111,6 +128,11 @@ subtest 'top level document fields' => sub {
     ],
     'missing /info properties',
   );
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/info': missing properties: title, version
+'': not all properties are valid
+ERRORS
+
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -119,14 +141,21 @@ subtest 'top level document fields' => sub {
       openapi => '2.1.3',
     },
   );
+
   cmp_deeply(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
-        keywordLocation => '/openapi',
-        absoluteKeywordLocation => 'http://localhost:1234/api#/openapi',
+        instanceLocation => '/openapi',
+        keywordLocation => '/properties/openapi/pattern',
+        absoluteKeywordLocation => SCHEMA.'#/properties/openapi/pattern',
         error => 'unrecognized openapi version 2.1.3',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/properties',
+        absoluteKeywordLocation => SCHEMA.'#/properties',
+        error => 'not all properties are valid',
       },
     ],
     'invalid openapi version',
@@ -149,14 +178,24 @@ subtest 'top level document fields' => sub {
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
+        instanceLocation => '/jsonSchemaDialect',
+        keywordLocation => '/properties/jsonSchemaDialect/type',
+        absoluteKeywordLocation => SCHEMA.'#/properties/jsonSchemaDialect/type',
+        error => 'got null, not string',
+      },
+      {
         instanceLocation => '',
-        keywordLocation => '/jsonSchemaDialect',
-        absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
-        error => 'jsonSchemaDialect value is not a string',
+        keywordLocation => '/properties',
+        absoluteKeywordLocation => SCHEMA.'#/properties',
+        error => 'not all properties are valid',
       },
     ],
     'null jsonSchemaDialect is rejected',
   );
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/jsonSchemaDialect': got null, not string
+'': not all properties are valid
+ERRORS
 
 
   $js->add_schema({
@@ -198,6 +237,11 @@ subtest 'top level document fields' => sub {
     ],
     'bad jsonSchemaDialect is rejected',
   );
+
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/jsonSchemaDialect/$vocabulary/https:~1~1unknown': "https://unknown" is not a known vocabulary
+'/jsonSchemaDialect': "https://metaschema/with/wrong/spec" is not a valid metaschema
+ERRORS
 
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -244,6 +288,19 @@ subtest 'top level document fields' => sub {
     'missing paths (etc), and bad types for top level fields',
   );
 
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'': missing property: paths
+'': missing property: components
+'': missing property: webhooks
+'': no subschemas are valid
+'/externalDocs': got string, not object
+'/security': got string, not array
+'/servers': got string, not array
+'/tags': got string, not array
+'': not all properties are valid
+ERRORS
+
+
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
@@ -274,6 +331,13 @@ subtest 'top level document fields' => sub {
     ],
     'bad types for paths, webhooks, components',
   );
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/components': got string, not object
+'/paths': got string, not object
+'/webhooks': got string, not object
+'': not all properties are valid
+ERRORS
+
 
   $js = JSON::Schema::Modern->new;
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -337,6 +401,7 @@ subtest 'top level document fields' => sub {
       'https://json-schema.org/draft/2020-12/vocab/applicator' => false,
     },
   });
+
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',

@@ -7,7 +7,7 @@ use Types::Standard qw(Object CodeRef);
 use Type::Params -sigs;
 use namespace::clean;
 
-our $VERSION = '1.1.1'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: base role for "closed" lists
 
 
@@ -51,7 +51,7 @@ Sietima::Role::SubscriberOnly - base role for "closed" lists
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 SYNOPSIS
 

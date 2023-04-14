@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Test::DWG::LibreDWG::JSON;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::Test::DWG::LibreDWG::JSON->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+test-dwg-libredwg-json - Script to test DWG file by LibreDWG conversoions via JSON.
+
+=head1 SYNOPSIS
+
+ test-dwg-libredwg-json [-d test_dir] [-h] [-v level] [--version] dwg_file
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-d test_dir>
+
+Test directory. If dosn't exist, create dir in system tmp.
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-v level>
+
+Verbosity level.
+
+Default value is 0, max is 9.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<dwg_file>
+
+AutoCAD DWG file to test.
+
+=back
+
+=head1 EXAMPLE
+
+ test-dwg-libredwg-json __FILE__.dwg
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-JSON>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

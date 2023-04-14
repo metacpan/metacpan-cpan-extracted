@@ -71,7 +71,7 @@ Calls the gocardless API and populates the resource object with the data.
 sub find_with_client {
     my ( $self,$sub_key ) = @_;
 
-    my $path = sprintf( $self->endpoint,$self->id );
+    my $path = sprintf( $self->endpoint,( $self->id // '' ) );
     my $data = $self->client->api_get( $path );
 
     $data = $data->{$sub_key} if $sub_key;

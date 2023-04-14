@@ -137,3 +137,10 @@ Get a group entry by the user id. The group entry is a L<Sys::User::Group|SPVM::
   native static method getgrnam : Sys::User::Group ($name : string)
 
 Get a group entry by the user id. The group entry is a L<Sys::User::Group|SPVM::Sys::User::Group> object.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

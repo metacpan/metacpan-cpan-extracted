@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 3 "glm.pd"
 
+#line 3 "glm.pd"
 
 use strict;
 use warnings;
@@ -85,8 +85,6 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
 
 
 =head2 fill_m
@@ -94,8 +92,6 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
 =for sig
 
   Signature: (a(n); float+ [o]b(n))
-
-
 
 =for ref
 
@@ -115,7 +111,6 @@ Replaces bad values with sample mean. Mean is set to 0 if all obs are bad. Can b
       [      7       3       7 5.66667]
      ] 
 
-
   
 
 =for bad
@@ -124,18 +119,14 @@ The output pdl badflag is cleared.
   
 
 =cut
-#line 128 "GLM.pm"
 
-
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*fill_m = \&PDL::fill_m;
-#line 135 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*fill_m = \&PDL::fill_m;
+
+
+
 
 
 
@@ -144,8 +135,6 @@ The output pdl badflag is cleared.
 =for sig
 
   Signature: (a(n); [o]b(n))
-
-
 
 =for ref
 
@@ -166,7 +155,6 @@ Replaces bad values with random sample (with replacement) of good observations f
      [7 3 7 7]
     ]
 
-
   
 
 =for bad
@@ -175,18 +163,14 @@ The output pdl badflag is cleared.
   
 
 =cut
-#line 179 "GLM.pm"
 
-
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*fill_rand = \&PDL::fill_rand;
-#line 186 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*fill_rand = \&PDL::fill_rand;
+
+
+
 
 
 
@@ -196,12 +180,9 @@ The output pdl badflag is cleared.
 
   Signature: (a(n); float+ [o]b(n))
 
-
-
 =for ref
 
 Replaces values with deviations from the mean. Can be done inplace.
-
 
   
 
@@ -210,20 +191,15 @@ Replaces values with deviations from the mean. Can be done inplace.
 dev_m processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 216 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dev_m = \&PDL::dev_m;
-#line 223 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -233,11 +209,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]b(n))
 
-
 =for ref
 
 Standardize ie replace values with z_scores based on sample standard deviation from the mean (replace with 0s if stdv==0). Can be done inplace.
-
 
   
 
@@ -246,20 +220,15 @@ Standardize ie replace values with z_scores based on sample standard deviation f
 stddz processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 252 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *stddz = \&PDL::stddz;
-#line 259 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -269,12 +238,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); b(n); float+ [o]c())
 
-
-
 =for ref
 
 Sum of squared errors between actual and predicted values.
-
 
   
 
@@ -283,20 +249,15 @@ Sum of squared errors between actual and predicted values.
 sse processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 289 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sse = \&PDL::sse;
-#line 296 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -306,12 +267,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); b(n); float+ [o]c())
 
-
-
 =for ref
 
 Mean of squared errors between actual and predicted values, ie variance around predicted value.
-
 
   
 
@@ -320,20 +278,15 @@ Mean of squared errors between actual and predicted values, ie variance around p
 mse processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 326 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mse = \&PDL::mse;
-#line 333 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -343,12 +296,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); b(n); float+ [o]c())
 
-
-
 =for ref
 
 Root mean squared error, ie stdv around predicted value.
-
 
   
 
@@ -357,20 +307,15 @@ Root mean squared error, ie stdv around predicted value.
 rmse processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 363 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rmse = \&PDL::rmse;
-#line 370 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -379,8 +324,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n,m); b(m); float+ [o]c(n))
-
-
 
 =for ref
 
@@ -392,7 +335,6 @@ Calculates predicted prob value for logistic regression.
 
     $pred = $x->glue(1,ones($x->dim(0)))->pred_logistic( $m{b} );
 
-
   
 
 =for bad
@@ -400,20 +342,15 @@ Calculates predicted prob value for logistic regression.
 pred_logistic processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 406 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pred_logistic = \&PDL::pred_logistic;
-#line 413 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -423,7 +360,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]c())
 
-
 =for usage
 
     my $d0 = $y->d0();
@@ -432,7 +368,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Null deviance for logistic regression.
 
-
   
 
 =for bad
@@ -440,20 +375,15 @@ Null deviance for logistic regression.
 d0 processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 446 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *d0 = \&PDL::d0;
-#line 453 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -462,7 +392,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
 
 =for usage
 
@@ -475,7 +404,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Model deviance for logistic regression.
 
-
   
 
 =for bad
@@ -483,20 +411,15 @@ Model deviance for logistic regression.
 dm processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 489 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dm = \&PDL::dm;
-#line 496 "GLM.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -506,12 +429,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(); b(); float+ [o]c())
 
-
-
 =for ref
 
 Deviance residual for logistic regression.
-
 
   
 
@@ -520,21 +440,18 @@ Deviance residual for logistic regression.
 dvrs processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 526 "GLM.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dvrs = \&PDL::dvrs;
-#line 533 "GLM.pm"
+
+
 
 
 
 #line 593 "glm.pd"
-
 
 #line 594 "glm.pd"
 
@@ -1766,7 +1683,6 @@ Usage:
     ss  [ 18.450705  73.813294 0.57026483]
     ss_err  [ 23.036272  10.827623  5.0104731]
 
-
 =cut
 
 *ols_rptd = \&PDL::ols_rptd;
@@ -1851,7 +1767,6 @@ sub PDL::ols_rptd {
 
   return %r;
 }
-
 
 =head2 logistic
 
@@ -2598,8 +2513,8 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2657 "glm.pd"
-#line 2603 "GLM.pm"
+#line 2517 "GLM.pm"
+#line 2518 "GLM.pm"
 
 
 

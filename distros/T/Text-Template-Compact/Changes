@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Template::Compact
 
+0.1.13 23/04/04(火) 10:33:11
+    - fix ticket https://rt.cpan.org/Public/Bug/Display.html?id=146913 , perls 5.37.9 and later changes eval error message.
+
 0.1.11 08/11/07(金) 01:41:01
 	- rename from tTemplate to Text::Template::Compact
 

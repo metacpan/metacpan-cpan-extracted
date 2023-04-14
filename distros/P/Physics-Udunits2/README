@@ -7,14 +7,19 @@ INSTALLATION
 
 To install this module type the following:
 
+   export UDUNITS2_LIBDIR=/my/home/udunits2/lib
+   export UDUNITS2_INCDIR=/my/home/udunits2/include
    perl Makefile.PL
    make
    make test
    make install
 
+UDUNITS_LIBDIR and UDUNITS_INCDIR is only required if udunits2 is not installed
+in standard places like /usr, /usr/local, /opt, /opt/local
+
 DEPENDENCIES
 
-This module requires these other modules and libraries:
+This module requires the following library:
 
  udunits-2 package from http://www.unidata.ucar.edu/software/udunits/ 
 

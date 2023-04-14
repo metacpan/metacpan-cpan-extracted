@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.21";
+our $VERSION = "0.23";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.21
+Version 0.23
 
 =head1 DESCRIPTION
 
@@ -459,12 +459,14 @@ sub cache_file {
     }
 }
 
+my $json_obj = JSON->new->utf8->canonical->pretty;
+
 sub read_cache {
     my $file = shift;
     %$new_cache = %$old_cache = ();
     if (open my $fh, $file) {
 	my $json = do { local $/; <$fh> };
-	my $hash = $json eq '' ? {} : decode_json $json;
+	my $hash = $json eq '' ? {} : $json_obj->decode($json);
 	%$old_cache = %$hash;
 	warn "read cache from $file\n";
     }
@@ -474,7 +476,7 @@ sub write_cache {
     return if $dryrun;
     my $file = shift;
     if (open my $fh, '>', $file) {
-	my $json = encode_json $new_cache;
+	my $json = $json_obj->encode($new_cache);
 	print $fh $json;
 	warn "write cache to $file\n";
     }

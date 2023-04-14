@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.042     2023-04-08 21:22:13Z
+          - improvements to some errors resulting from parsing an invalid
+            OpenAPI document
+
 0.041     2023-03-13 02:47:59Z
           - now detecting and erroring on two /paths with the same template
             semantics

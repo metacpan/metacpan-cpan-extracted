@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Mnet::T;
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 # functions with silent pragma option
 Mnet::T::test_perl({
@@ -83,9 +83,9 @@ Mnet::T::test_perl({
     expect  => '',
 });
 
-# stdout/stederr with silent pragma
+# stdout/stderr with silent pragma
 Mnet::T::test_perl({
-    name    => 'stdout/stederr with silent pragma',
+    name    => 'stdout/stderr with silent pragma',
     perl    => <<'    perl-eof',
         use warnings;
         use strict;
@@ -98,6 +98,30 @@ Mnet::T::test_perl({
     expect  => <<'    expect-eof',
         stdout
         stderr
+    expect-eof
+});
+
+# --quiet overriding silent pragma
+Mnet::T::test_perl({
+    name    => '--quiet overriding silent pragma',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log qw( DEBUG INFO WARN FATAL );
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        use Mnet::Opts::Set::Debug;
+        use Mnet::Opts::Set::Silent;
+        my $cli = Mnet::Opts::Cli->new;
+        DEBUG("debug");
+        INFO("info");
+        WARN("warn");
+        FATAL("fatal");
+    perl-eof
+    args    => '--quiet',
+    expect  => <<'    expect-eof',
+        WRN - main warn
+        DIE - main fatal
     expect-eof
 });
 

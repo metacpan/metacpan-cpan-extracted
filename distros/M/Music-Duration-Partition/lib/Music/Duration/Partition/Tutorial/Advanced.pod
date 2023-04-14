@@ -1,0 +1,266 @@
+package Music::Duration::Partition::Tutorial::Advanced;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Music::Duration::Partition::Tutorial::Advanced
+
+=head1 VERSION
+
+version 0.0814
+
+=head1 Usage Examples
+
+=head2 Shuffling the Motif
+
+By shuffling a single generated motif, you can get permutations of the
+durations.
+
+  use List::Util qw(shuffle);
+  use MIDI::Util qw(setup_score);
+  use Music::Duration::Partition ();
+  use Music::Scales qw(get_scale_MIDI);
+
+  my $score = setup_score(bpm => 90);
+
+  my @scale = get_scale_MIDI('A', 3, 'pminor');
+
+  # instantiate a 4 beat phrase generator
+  my $mdp = Music::Duration::Partition->new(
+      pool => [qw(qn en sn)],
+      #pool => [qw(twn thn tqn ten tsn)],
+  );
+
+  # get a single motif of note durations
+  my $motif = $mdp->motif;
+
+  # repeat 2 measures, 8 times
+  for my $i (1 .. 8) {
+      # get a fresh set of random scale pitches for the motif
+      my @voices = map { $scale[ int rand @scale ] } 0 .. $#$motif;
+
+      # every other measure, shuffle the motif durations
+      my @phrase = $i % 2 ? @$motif : shuffle @$motif;
+
+      $mdp->add_to_score($score, \@phrase, \@voices);
+
+      $score->r('wn');
+  }
+
+  $score->write_score('shuffled.mid');
+
+=head2 Computing Voices
+
+Play the same motif but with different voices computed by the Voss
+method.
+
+  use MIDI::Util qw(setup_score);
+  use Music::Duration::Partition ();
+  use Music::Scales qw(get_scale_MIDI);
+  use Music::Voss qw(powers);
+
+  my $score = setup_score(bpm => 90);
+
+  my $mdp = Music::Duration::Partition->new(
+      pool => [qw(qn en sn)],
+  );
+
+  my $motif = $mdp->motif;
+
+  # get the scale and compute a generating function
+  my ($scale, $genf) = voss('A', 5, 'minor');
+
+  for my $i (1 .. 8) {
+      my @voices = map { $scale->[ $genf->($_) % @$scale ] } 0 .. $#$motif;
+
+      $mdp->add_to_score($score, $motif, \@voices);
+
+      $score->r('wn');
+  }
+
+  $score->write_score('voss.mid');
+
+  sub voss {
+      my ($note, $octave, $named) = @_;
+
+      my @scale = get_scale_MIDI($note, $octave, $named);
+
+      my $seed = [ map { sub { int rand 2 } } @scale ];
+      my $genf = powers(calls => $seed);
+
+      return \@scale, $genf;
+  }
+
+=head2 Weights and Grouping
+
+Triplet durations will be twice as likely to be chosen, and will be
+played in groups of 3.
+
+  use MIDI::Util qw(setup_score);
+  use Music::Duration::Partition ();
+  use Music::Scales qw(get_scale_MIDI);
+
+  my $score = setup_score(bpm => 120);
+
+  my @scale = get_scale_MIDI('C', 4, 'major');
+
+  my $mdp = Music::Duration::Partition->new(
+      size    => 8,
+      pool    => [qw(hn qn ten)],
+      weights => [   1, 1, 2   ],
+      groups  => [   1, 1, 3   ],
+      verbose => 1,
+  );
+
+  my $motif = $mdp->motif;
+
+  for my $i (1 .. 4) {
+      for my $n (0 .. $#$motif) {
+          $score->n($motif->[$n], $scale[ int rand @scale ]);
+      }
+  }
+
+  $score->n('wn', $scale[0]);
+
+  $score->write_score('weighted-grouped.mid');
+
+=head2 Figured Bass
+
+Play a an alternating, randomized bass-line of 2 motifs, for 3 beats
+and rest for the 4th. Also play a steady closed hi-hat simultaneously.
+
+  use MIDI::Drummer::Tiny ();
+  use MIDI::Util qw(set_chan_patch);
+  use Music::Duration::Partition ();
+  use Music::Scales qw(get_scale_MIDI);
+  use Music::VoiceGen ();
+
+  my $d = MIDI::Drummer::Tiny->new(file => 'figured.mid');
+
+  $d->sync(
+      \&beat, # must come first so the channel is 9
+      \&bass,
+  );
+
+  $d->write;
+
+  sub beat {
+      for my $n (1 .. 8) {
+          $d->note($d->quarter, $d->closed_hh) for 1 .. 4;
+      }
+  }
+
+  sub bass {
+      set_chan_patch($d->score, 0, 35); # fretless bass on channel 0
+
+      my $mdp = Music::Duration::Partition->new(
+          size => 3,
+          pool => [qw(qn en sn)],
+      );
+
+      my @motifs = $mdp->motifs(2);
+
+      my @pitches = get_scale_MIDI('A', 2, 'pminor');
+
+      my $voice = Music::VoiceGen->new(
+          pitches   => \@pitches,
+          intervals => [qw(-4 -3 -2 2 3 4)],
+      );
+
+      my @notes1 = map { $voice->rand } $motifs[0]->@*;
+
+      for my $i (1 .. 8) {
+          if ($i % 2) {
+              $mdp->add_to_score($d->score, $motifs[0], \@notes1);
+          }
+          else {
+              my @notes2 = map { $voice->rand } $motifs[1]->@*;
+              $mdp->add_to_score($d->score, $motifs[1], \@notes2);
+          }
+
+          $d->rest($d->quarter);
+      }
+  }
+
+=head2 7/8 Time
+
+In C<x/8> time, the Music::Duration::Partition C<size> must be the
+number of beats (i.e. 7 here) divided by 2.
+
+  use MIDI::Drummer::Tiny ();
+  use MIDI::Util qw(set_chan_patch);
+  use Music::Duration::Partition ();
+  use Music::Scales qw(get_scale_MIDI);
+  use Music::VoiceGen ();
+
+  my $d = MIDI::Drummer::Tiny->new(
+      file      => 'odd-meter.mid',
+      bpm       => 90,
+      signature => '7/8',
+      bars      => 8,
+  );
+
+  $d->sync(
+      \&drums,
+      \&bass,
+  );
+
+  $d->write;
+
+  sub drums {
+      $d->metronome78($d->bars * 2);
+  }
+
+  sub bass {
+      set_chan_patch($d->score, 0, 35);
+
+      my $mdp = Music::Duration::Partition->new(
+          size   => 3.5, # == 7/2
+          pool   => [qw(qn en)],
+          groups => [   1, 2  ],
+      );
+
+      my ($motif1, $motif2) = $mdp->motifs(2);
+
+      my @pitches = get_scale_MIDI('C', 2, 'pminor');
+      my @intervals = qw(-3 -2 -1 1 2 3);
+      my $voice = Music::VoiceGen->new(
+          pitches   => \@pitches,
+          intervals => \@intervals,
+      );
+      my @voices1 = map { $voice->rand } @$motif1;
+
+      # add 2 bars to the score
+      for my $n (1 .. $d->bars) {
+          $mdp->add_to_score($score, $motif1, \@voices1);
+
+          # get a fresh set of voices
+          my @voices2 = map { $voice->rand } @$motif2;
+          $mdp->add_to_score($score, $motif2, \@voices2);
+      }
+
+      $d->note($d->whole, $pitches[0]);
+  }
+
+=head1 Quick-start
+
+Go back to the L<Music::Duration::Partition::Tutorial::Quickstart>
+tutorial.
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019-2023 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,14 +1,12 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_TYPE_H
 #define SPVM_TYPE_H
 
 #include <stdio.h>
 
 #include "spvm_typedecl.h"
-
-enum {
-  SPVM_TYPE_C_FLAG_REF = 1,
-  SPVM_TYPE_C_FLAG_MUTABLE = 2,
-};
 
 struct spvm_type {
   const char* name;

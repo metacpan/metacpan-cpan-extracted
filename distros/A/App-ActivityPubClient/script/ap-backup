@@ -1,0 +1,158 @@
+#!/usr/bin/env perl
+# AP-Client: CLI-based client / toolbox for ActivityPub
+# Copyright © 2020-2023 AP-Client Authors <https://hacktivis.me/git/ap-client/>
+# SPDX-License-Identifier: BSD-3-Clause
+use strict;
+use utf8;
+use open ":std", ":encoding(UTF-8)";
+our $VERSION = 'v0.1.3';
+
+use Getopt::Std;
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+use LWP::UserAgent;
+use MIME::Base64;
+use JSON;
+
+=head1 NAME
+
+ap-backup - Backup an ActivityPub account
+
+=head1 SYNOPSIS
+
+B<ap-backup.pl> <-u user:password|-o OAuth-Bearer-Token> <url>
+
+=head1 DESCRIPTION
+
+ap-backup is used to backup an ActivityPub account, authentication is required.
+
+=over 4
+
+=item B<-u>
+
+HTTP Basic Auth
+
+=item B<-o>
+
+OAuth2 Bearer Token
+
+=item B<url>
+
+ActivityPub user URL or outbox URL
+
+=back
+
+Activities are saved in the current working directory via their id, it's recommended to launch in a dedicated directory.
+
+Known to work against Pleroma.
+
+=head1 LICENSE
+
+BSD-3-Clause
+
+=cut
+
+my %options = ();
+my $auth;
+my $ua = LWP::UserAgent->new;
+
+$ua->agent("AP-Client Backup <https://hacktivis.me/git/ap-client/>");
+
+sub save_collection {
+	my ($items) = @_;
+	my $filename;
+
+	foreach my $item (@{$items}) {
+		if ($item->{"id"}) {
+			$filename = $item->{"id"};
+
+			# replace / in URLs with _
+			$filename =~ tr/\//_/;
+		} else {
+			die "id property undefined" if not $_->{"id"};
+		}
+
+		#print "Saving ", $item->{"id"}, " to ", $filename, "\n";
+
+		open(my $fh, '>', $filename) or die "couldn't open", $filename;
+		print $fh encode_json($item);
+		close $fh;
+	}
+}
+
+sub apc2s_backup {
+	my ($url) = @_;
+
+	my $req = HTTP::Request->new(GET => $url);
+	$req->header('Accept'        => 'application/activity+json');
+	$req->header('Authorization' => $auth);
+
+	my $res = $ua->request($req);
+
+	if ($res->is_success) {
+		print "Got $url\n";
+		my $content_type  = $res->header("Content-Type");
+		my $content_match = /application\/([^+]*+)?json(; .*)?/;
+		if ($content_type =~ $content_match) {
+			my $response = decode_json($res->content);
+
+			if ($response->{"type"} eq "OrderedCollection") {
+				if (not $response->{"first"}) {
+					die "“first” property of OrderedCollection undefined";
+				}
+
+				print "Fetching first property: ", $response->{"first"}, "\n";
+				apc2s_backup($response->{"first"});
+			} elsif ($response->{"type"} eq "OrderedCollectionPage") {
+				if ($response->{"orderedItems"}) {
+					save_collection($response->{"orderedItems"});
+					print "next: ", $response->{"next"}, "\n"
+					  if $response->{"next"};
+					print "prev: ", $response->{"prev"}, "\n"
+					  if $response->{"prev"};
+
+					if ($response->{"next"}) {
+						print "Fetching next property\n";
+						apc2s_backup($response->{"next"});
+					} else {
+						print "No “next” property defined, done?\n";
+					}
+				} else {
+					die
+"OrderedCollectionPage without “orderedItems” defined is unsupported";
+				}
+			} elsif ($response->{"type"} eq "Person") {
+				if ($response->{"outbox"}) {
+					print "Fetching outbox property: ", $response->{"outbox"},
+					  "\n";
+					apc2s_backup($response->{"outbox"});
+				} else {
+					die "Person actor with no outbox";
+				}
+			} else {
+				die "Unknown type: ", $response->{"type"};
+			}
+		} else {
+			die "Got ", $content_type, " instead of ", $content_match;
+		}
+	} else {
+		die "Got ", $res->status_line, " instead of 2xx";
+	}
+}
+
+getopts("u:o:", \%options);
+
+if ($#ARGV != 0) {
+	print "usage: ap-backup.pl <-u user:password|-o OAuth-Bearer-Token> <url>\n";
+	exit 1;
+}
+
+if (defined $options{u}) {
+	$auth = "Basic " . encode_base64($options{u});
+}
+if (defined $options{o}) {
+	$auth = "Bearer " . $options{o};
+}
+
+print "Authorization: $auth";
+print "Fetching: ", $ARGV[0], "\n";
+apc2s_backup($ARGV[0]);

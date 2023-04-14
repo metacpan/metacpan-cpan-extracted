@@ -27,6 +27,7 @@ sub default_theme($self) {
     radio_buttons => +{errors_classes=>'is-invalid'},
     radio_button => +{class=>'custom-control-input', errors_classes=>'is-invalid'},
     model_errors => +{ class=>'alert alert-danger', role=>'alert' },
+    form_has_errors => +{ class=>'alert alert-danger', role=>'alert' },
     attributes => {
       password => {
         password => { autocomplete=>'new-password' }

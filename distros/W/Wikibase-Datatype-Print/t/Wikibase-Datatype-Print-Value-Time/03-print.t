@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Value::Time;
@@ -41,3 +41,16 @@ $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {
 	'print_name' => 1,
 });
 is($ret, '01 September 2020 (proleptic Gregorian calendar)', 'Get printed value. Explicit mapping.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Time->new(
+	'value' => '+2020-09-01T00:00:00Z',
+);
+eval {
+	Wikibase::Datatype::Print::Value::Time::print($obj, {
+		'cb' => 'bad_callback',
+	});
+};
+is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache::Backend.\n",
+	"Option 'cb' must be a instance of Wikibase::Cache::Backend.");
+clean();

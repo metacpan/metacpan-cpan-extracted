@@ -16,12 +16,13 @@ meta-spec:
 name: Catalyst-ActionRole-RenderView
 requires:
   Catalyst: '5.90060'
+  CatalystX::Errors: '0.001009'
   Moose::Role: '2.0602'
 resources:
   bugtracker: https://github.com/jjn1056/Catalyst-ActionRole-RenderView/issues
   homepage: https://github.com/jjn1056/Catalyst-ActionRole-RenderView
   repository: https://github.com/jjn1056/Catalyst-ActionRole-RenderView.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -47,7 +47,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '2.80';
+$VERSION = '2.84';
 
 sub ProcessMOV($$;$);
 sub ProcessKeys($$$);
@@ -62,6 +62,7 @@ sub Process_mebx($$$);
 sub Process_3gf($$$);
 sub Process_gps0($$$);
 sub Process_gsen($$$);
+sub ProcessKenwood($$$);
 sub ProcessRIFFTrailer($$$);
 sub ProcessTTAD($$$);
 sub ProcessNMEA($$$);
@@ -418,6 +419,18 @@ my %channelLabel = (
     0x1ffff => 'Discrete_65535',
 );
 
+my %qtFlags = ( #12
+    0 => 'undef',       22 => 'unsigned int',   71 => 'float[2] size',
+    1 => 'UTF-8',       23 => 'float',          72 => 'float[4] rect',
+    2 => 'UTF-16',      24 => 'double',         74 => 'int64s',
+    3 => 'ShiftJIS',    27 => 'BMP',            75 => 'int8u',
+    4 => 'UTF-8 sort',  28 => 'QT atom',        76 => 'int16u',
+    5 => 'UTF-16 sort', 65 => 'int8s',          77 => 'int32u',
+    13 => 'JPEG',       66 => 'int16s',         78 => 'int64u',
+    14 => 'PNG',        67 => 'int32s',         79 => 'double[3][3]',
+    21 => 'signed int', 70 => 'float[2] point',
+);
+
 # properties which don't get inherited from the parent
 my %dontInherit = (
     ispe => 1,  # size of parent may be different
@@ -434,15 +447,16 @@ my %dupDirOK = ( ipco => 1, '----' => 1 );
 my %eeStd = ( stco => 'stbl', co64 => 'stbl', stsz => 'stbl', stz2 => 'stbl',
               stsc => 'stbl', stts => 'stbl' );
 
+# atoms required for generating ImageDataMD5
+my %md5Box = ( vide => { %eeStd }, soun => { %eeStd } );
+
 # boxes and their containers for the various handler types that we want to save
 # when the ExtractEmbedded is enabled (currently only the 'gps ' container name is
 # used, but others have been checked against all available sample files and may be
 # useful in the future if the names are used for different boxes on other locations)
 my %eeBox = (
     # (note: vide is only processed if specific atoms exist in the VideoSampleDesc)
-    vide => { %eeStd,
-        JPEG => 'stsd',
-    },
+    vide => { %eeStd, JPEG => 'stsd' },
     text => { %eeStd },
     meta => { %eeStd },
     sbtl => { %eeStd },
@@ -652,10 +666,17 @@ my %eeBox2 = (
         Name => 'HTCInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::HTCInfo' },
     },
-    udta => {
-        Name => 'UserData',
+    udta => [{
+        Name => 'KenwoodData',
+        Condition => '$$valPt =~ /^VIDEOUUUUUUUUUUUUUUUUUUUUUU/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::Stream',
+            ProcessProc => \&ProcessKenwood,
+        },
+    },{
+        Name => 'FLIRData',
         SubDirectory => { TagTable => 'Image::ExifTool::FLIR::UserData' },
-    },
+    }],
     thum => { #PH
         Name => 'ThumbnailImage',
         Groups => { 2 => 'Preview' },
@@ -763,6 +784,13 @@ my %eeBox2 = (
         SubDirectory => { TagTable => 'Image::ExifTool::Samsung::Trailer' },
     },
     # 'samn'? - seen in Vantrue N2S sample video
+    mpvd => {
+        Name => 'MotionPhotoVideo',
+        Notes => 'MP4-format video saved in Samsung motion-photo HEIC images.',
+        Binary => 1,
+        # note that this may be written and/or deleted, but can't currently be added back again
+        Writable => 1,
+    },
 );
 
 # stuff seen in 'skip' atom (70mai Pro Plus+ MP4 videos)
@@ -1144,7 +1172,10 @@ my %eeBox2 = (
         },
         {
             Name => 'GarminGPS',
-            Condition => '$$valPt=~/^\x9b\x63\x0f\x8d\x63\x74\x40\xec\x82\x04\xbc\x5f\xf5\x09\x17\x28/ and $$self{OPTIONS}{ExtractEmbedded}',
+            Condition => q{
+                $$valPt=~/^\x9b\x63\x0f\x8d\x63\x74\x40\xec\x82\x04\xbc\x5f\xf5\x09\x17\x28/ and
+                $$self{OPTIONS}{ExtractEmbedded}
+            },
             SubDirectory => {
                 TagTable => 'Image::ExifTool::QuickTime::Stream',
                 ProcessProc => \&ProcessGarminGPS,
@@ -1352,12 +1383,14 @@ my %eeBox2 = (
         },
         { #https://github.com/google/spatial-media/blob/master/docs/spherical-video-rfc.md
             Name => 'SphericalVideoXML',
+            # (this tag is readable/writable as a block through the Extra SphericalVideoXML tags)
             Condition => '$$valPt=~/^\xff\xcc\x82\x63\xf8\x55\x4a\x93\x88\x14\x58\x7a\x02\x52\x1f\xdd/',
             WriteGroup => 'GSpherical', # write only GSpherical XMP tags here
             HandlerType => 'vide',      # only write in video tracks
             SubDirectory => {
                 TagTable => 'Image::ExifTool::XMP::Main',
                 Start => 16,
+                ProcessProc => 'Image::ExifTool::XMP::ProcessGSpherical',
                 WriteProc => 'Image::ExifTool::XMP::WriteGSpherical',
             },
         },
@@ -1944,7 +1977,7 @@ my %eeBox2 = (
             Name => 'SanyoMOV',
             Condition => q{
                 $$valPt =~ /^SANYO DIGITAL CAMERA\0/ and
-                $self->{VALUE}->{FileType} eq "MOV"
+                $$self{FileType} eq "MOV"
             },
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Sanyo::MOV',
@@ -1955,7 +1988,7 @@ my %eeBox2 = (
             Name => 'SanyoMP4',
             Condition => q{
                 $$valPt =~ /^SANYO DIGITAL CAMERA\0/ and
-                $self->{VALUE}->{FileType} eq "MP4"
+                $$self{FileType} eq "MP4"
             },
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Sanyo::MP4',
@@ -6034,6 +6067,7 @@ my %eeBox2 = (
     plID => { #10 (or TV season)
         Name => 'PlayListID',
         Format => 'int8u',  # actually int64u, but split it up
+        Count => 8,
         Writable => 'int32s', #27
     },
     purd => 'PurchaseDate', #7
@@ -7128,7 +7162,7 @@ my %eeBox2 = (
             $$self{AudioFormat} = $val;
             return undef unless $val =~ /^[\w ]{4}$/i;
             # check for protected audio format
-            $self->OverrideFileType('M4P') if $val eq 'drms' and $$self{VALUE}{FileType} eq 'M4A';
+            $self->OverrideFileType('M4P') if $val eq 'drms' and $$self{FileType} eq 'M4A';
             return $val;
         },
         # see this link for print conversions (not complete):
@@ -8750,6 +8784,16 @@ sub HandleItemInfo($)
                     $et->VPrint(0, "$$et{INDENT}    [snip $snip bytes]\n") if $snip;
                 }
             }
+            # do MD5 checksum of AVIF "av01" image data
+            if ($type eq 'av01' and $$et{ImageDataMD5}) {
+                my $md5 = $$et{ImageDataMD5};
+                my $tot = 0;
+                foreach $extent (@{$$item{Extents}}) {
+                    $raf->Seek($$extent[1] + $base, 0) or $et->Warn('Seek error in av01 image data'), last;
+                    $tot += $et->ImageDataMD5($raf, $$extent[2], 'av01 image', 1);
+                }
+                $et->VPrint(0, "$$et{INDENT}(ImageDataMD5: $tot bytes of av01 data)\n") if $tot;
+            }
             next unless $name;
             # assemble the data for this item
             undef $buff;
@@ -9218,9 +9262,9 @@ sub ProcessMOV($$;$)
     } else {
         # check on file type if called with a RAF
         $$tagTablePtr{$tag} or return 0;
+        my $fileType;
         if ($tag eq 'ftyp' and $size >= 12) {
             # read ftyp atom to see what type of file this is
-            my $fileType;
             if ($raf->Read($buff, $size-8) == $size-8) {
                 $raf->Seek(-($size-8), 1);
                 my $type = substr($buff, 0, 4);
@@ -9245,13 +9289,15 @@ sub ProcessMOV($$;$)
             $et->SetFileType();     # MOV
         }
         SetByteOrder('MM');
-        $$et{PRIORITY_DIR} = 'XMP';   # have XMP take priority
+        # have XMP take priority except for HEIC
+        $$et{PRIORITY_DIR} = 'XMP' unless $fileType and $fileType eq 'HEIC';
     }
     my $fast = $$et{OPTIONS}{FastScan} || 0;
     $$raf{NoBuffer} = 1 if $fast;   # disable buffering in FastScan mode
 
     my $ee = $$et{OPTIONS}{ExtractEmbedded};
-    if ($ee) {
+    my $md5 = $$et{ImageDataMD5};
+    if ($ee or $md5) {
         $unkOpt = $$et{OPTIONS}{Unknown};
         require 'Image/ExifTool/QuickTimeStream.pl';
     }
@@ -9333,7 +9379,7 @@ sub ProcessMOV($$;$)
         # set flag to store additional information for ExtractEmbedded option
         my $handlerType = $$et{HandlerType};
         if ($eeBox{$handlerType} and $eeBox{$handlerType}{$tag}) {
-            if ($ee) {
+            if ($ee or $md5) {
                 # (there is another 'gps ' box with a track log that doesn't contain offsets)
                 if ($tag ne 'gps ' or $eeBox{$handlerType}{$tag} eq $dirID) {
                     $eeTag = 1;
@@ -9343,6 +9389,9 @@ sub ProcessMOV($$;$)
                 EEWarn($et);
             }
         } elsif ($ee and $ee > 1 and $eeBox2{$handlerType} and $eeBox2{$handlerType}{$tag}) {
+            $eeTag = 1;
+            $$et{OPTIONS}{Unknown} = 1;
+        } elsif ($md5 and $md5Box{$handlerType} and $md5Box{$handlerType}{$tag}) {
             $eeTag = 1;
             $$et{OPTIONS}{Unknown} = 1;
         }
@@ -9577,7 +9626,7 @@ ItemID:         foreach $id (keys %$items) {
                     }
                     if ($tag eq 'stbl') {
                         # process sample data when exiting SampleTable box if extracting embedded
-                        ProcessSamples($et) if $ee;
+                        ProcessSamples($et) if $ee or $md5;
                     } elsif ($tag eq 'minf') {
                         $$et{HandlerType} = ''; # reset handler type at end of media info box
                     }
@@ -9637,6 +9686,7 @@ ItemID:         foreach $id (keys %$items) {
                             }
                         }
                         $langInfo or $langInfo = $tagInfo;
+                        my $str = $qtFlags{$flags} ? " ($qtFlags{$flags})" : '';
                         $et->VerboseInfo($tag, $langInfo,
                             Value   => ref $value ? $$value : $value,
                             DataPt  => \$val,
@@ -9645,7 +9695,7 @@ ItemID:         foreach $id (keys %$items) {
                             Size    => $len,
                             Format  => $format,
                             Index   => $index,
-                            Extra   => sprintf(", Type='${type}', Flags=0x%x, Lang=0x%.4x",$flags,$lang),
+                            Extra   => sprintf(", Type='${type}', Flags=0x%x%s, Lang=0x%.4x",$flags,$str,$lang),
                         ) if $verbose;
                         # use "Keys" in path instead of ItemList if this was defined by a Keys tag
                         my $isKey = $$tagInfo{Groups} && $$tagInfo{Groups}{1} && $$tagInfo{Groups}{1} eq 'Keys';
@@ -9774,7 +9824,7 @@ ItemID:         foreach $id (keys %$items) {
         ++$index if defined $index;
     }
     # tweak file type based on track content ("iso*" and "dash" ftyp only)
-    if ($topLevel and $$et{VALUE}{FileType} and $$et{VALUE}{FileType} eq 'MP4' and
+    if ($topLevel and $$et{FileType} and $$et{FileType} eq 'MP4' and
         $$et{save_ftyp} and $$et{HasHandler} and $$et{save_ftyp} =~ /^(iso|dash)/ and
         $$et{HasHandler}{soun} and not $$et{HasHandler}{vide})
     {
@@ -9839,7 +9889,7 @@ information from QuickTime and MP4 video, M4A audio, and HEIC image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2022, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2023, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

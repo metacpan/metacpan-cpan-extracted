@@ -44,7 +44,6 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "HTTP::Request::Common" : "0",
-            "Hash::Merge" : "0",
             "IPC::Cmd" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
@@ -71,6 +70,6 @@
          "web" : "https://github.com/LilithSec/CAPE-Utils"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

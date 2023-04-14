@@ -5,32 +5,56 @@ Geo::FIT - Decode Garmin FIT files
 # SYNOPSIS
 
     use Geo::FIT;
-    $fit = Geo::FIT->new();
-    $fit->file( $fname )
-    $fit->open;
-    $fit->fetch_header;
-    $fit->fetch;
-    $fit->data_message_callback_by_name( $message name,   \&callback_function [, \%callback_data, ... ] );
-    $fit->data_message_callback_by_num(  $message number, \&callback_function [, \%callback_data, ... ] );
+
+Create an instance, assign a FIT file to it, open it:
+
+    my $fit = Geo::FIT->new();
+    $fit->file( $fname );
+    $fit->open or die $fit->error;
+
+Register a callback to get some info on where we've been and when:
+
+    my $record_callback = sub {
+        my ($self, $descriptor, $values) = @_;
+
+        my $time= $self->field_value( 'timestamp',     $descriptor, $values );
+        my $lat = $self->field_value( 'position_lat',  $descriptor, $values );
+        my $lon = $self->field_value( 'position_long', $descriptor, $values );
+
+        print "Time was: ", join("\t", $time, $lat, $lon), "\n"
+        };
+
+    $fit->data_message_callback_by_name('record', $record_callback ) or die $fit->error;
+
+    my @header_things = $fit->fetch_header;
+
+    1 while ( $fit->fetch );
+
     $fit->close;
 
 # DESCRIPTION
 
 `Geo::FIT` is a Perl class to provide interfaces to decode Garmin FIT files (\*.fit).
 
-The module also provides a script to read and print the contents for FIT files (`fitdump.pl`), as well as a script to convert FIT files to TCX files (`fit2tcx.pl`).
+The module also provides a script to read and print the contents of FIT files ([fitdump.pl](https://metacpan.org/pod/fitdump.pl)), a script to convert FIT files to TCX files ([fit2tcx.pl](https://metacpan.org/pod/fit2tcx.pl)), and a script to convert a locations file to GPX format ([locations2gpx.pl](https://metacpan.org/pod/locations2gpx.pl)).
 
-## Constructor
+## Constructor Methods
 
 - new()
 
     creates a new object and returns it.
 
+- clone()
+
+    Returns a copy of a `Geo::FIT` instance.
+
+    `clone()` is experimental and support for it may be removed at any time. Use with caution particularly if there are open filehandles, it which case it is recommended to `close()` before cloning.
+
+    It also does not return a full deep copy if any callbacks are registered, it creates a reference to them. There is no known way to make deep copies of anonymous subroutines in Perl (if you know of one, please make a pull request).
+
+    The main use for c&lt;clone()> is immediately after `new()`, and `file()`, to create a copy for later use.
+
 ## Class methods
-
-- version\_string()
-
-    returns a string representing the version of this class.
 
 - message\_name(_message spec_)
 
@@ -48,17 +72,13 @@ The module also provides a script to read and print the contents for FIT files (
 
     returns the field index for _field spec_ in _message spec_ or undef.
 
-- cat\_header(_protocol version_, _profile version_, _file length_\[, _refrencne to a scalar_\])
+- protocol\_version\_string()
 
-    composes the binary form of a .FIT file header, concatenates the scalar and it, and returns the reference to the scalar. If the 4th argument is omitted, it returns the reference to the binary form. _file length_ is assumed not to include the file header and trailing CRC.
+    returns a string representing the .FIT protocol version on which this class based.
 
-- crc\_of\_string(_old CRC_, _reference to a scalar_, _offset in scalar_, _counts_)
+- profile\_version\_string()
 
-    calculate CRC-16 of the specified part of the scalar.
-
-- my\_endian
-
-    returns the endian (0 for little endian and 1 for big endian) of the current system.
+    returns a string representing the .FIT profile version on which this class based.
 
 ## Object methods
 
@@ -76,44 +96,33 @@ The module also provides a script to read and print the contents for FIT files (
 
 - fetch()
 
-    reads a message in the .FIT file, and returns `1` on success, or `undef` on failure or EOF.
+    reads a message in the .FIT file, and returns `1` on success, or `undef` on failure or EOF. `fetch_header()` must have been called before the first attempt to `fetch()` after opening the file.
 
-- unit\_table(_unit_ => _unit conversion table_)
+    If a data message callback is registered, `fetch()` will return the value returned by the callback. It is therefore important to define explicit return statements and values in any callback (this includes returning true if that is the desired outcome after `fetch()`).
 
-    sets _unit conversion table_ for _unit_.
+- error()
 
-- semicircles\_to\_degree(_boolean_)
-- mps\_to\_kph(_boolean_)
+    returns an error message recorded by a method.
 
-    wrapper methods of `unit_table()` method.
+- crc()
 
-- use\_gmtime(_boolean_)
+    CRC-16 calculated from the contents of a .FIT file.
 
-    sets the flag which of GMT or local timezone is used for `date_time` type value conversion.
+- crc\_expected()
 
-- protocol\_version\_string()
+    CRC-16 attached to the end of a .FIT file. Only available after all contents of the file has been read.
 
-    returns a string representing the .FIT protocol version on which this class based.
+- trailing\_garbages()
 
-- protocol\_version\_string(_version number_)
-
-    returns a string representing the .FIT protocol version _version number_.
-
-- profile\_version\_string()
-
-    returns a string representing the .FIT protocol version on which this class based.
-
-- profile\_version\_string(_version number_)()
-
-    returns a string representing the .FIT profile version _version number_.
-
-- data\_message\_callback\_by\_name(_message name_, _callback function_\[, _callback data_, ...\])
-
-    register a function _callback function_ which is called when a data message with the name _message name_ is fetched.
+    number of octets after CRC-16, 0 usually.
 
 - data\_message\_callback\_by\_num(_message number_, _callback function_\[, _callback data_, ...\])
 
     register a function _callback function_ which is called when a data message with the messag number _message number_ is fetched.
+
+- data\_message\_callback\_by\_name(_message name_, _callback function_\[, _callback data_, ...\])
+
+    register a function _callback function_ which is called when a data message with the name _message name_ is fetched.
 
 - switched(_data message descriptor_, _array of values_, _data type table_)
 
@@ -123,41 +132,76 @@ The module also provides a script to read and print the contents for FIT files (
 
     converts an array of character codes to a Perl string.
 
+- field\_list( _$descriptor_ )
+
+    Given a data message descriptor, returns the list of fields described in it.
+
+- field\_value( _$field_, _$descriptor_, _$values_ )
+
+    Returns the value the field named _$field_ (a string).
+
+    The other arguments consist of the data message descriptor (_$descriptor_, a hash reference) and the values fetched from a data message (_$values_, an array reference). These are simply the references passed to data message callbacks by `fetch()`, if any are registered, and are simply to be passed on to this method (please do not modifiy them).
+
+    For example, we can define and register a callback for `file_id` data messages and get the name of the manufacturer of the device that recorded the FIT file:
+
+        my $file_id_callback = sub {
+            my ($self, $descriptor, $values) = @_;
+            my $value = $self->field_value( 'manufacturer', $descriptor, $values );
+
+            print "The manufacturer is: ", $value, "\n"
+            };
+
+        $fit->data_message_callback_by_name('file_id', $file_id_callback ) or die $fit->error;
+
+        1 while ( $fit->fetch );
+
+- field\_value\_as\_read( _$field_, _$descriptor_, _$value_ \[, $type \] )
+
+    Convert the value parsed and returned by `field_value()` back to what it was when read from the FIT file and returns it.
+
+    This method is mostly for developers or if there is a particular need to inspect the data more closely, it should be seldomly used. Arguments are similar to `field_value()`, except for the last one, which should be a single value (not a reference) corresponding to the value the former method has or would return.
+
+    If _$value_ was obtained from a call to `named_type_value()` after having provided an explicit named type derived from `switch()`, that named type needs to be provided as a fourth argument.
+
+    As an example, we can obtain the actual value recorded in the FIT file for the manufacturer by adding these to the callback defined above:
+
+            my $as_read = $self->field_value_as_read( 'manufacturer', $descriptor, $value );
+            print "The manufacturer's value as recorded in the FIT file is: ", $as_read, "\n"
+
 - value\_cooked(_type name_, _field attributes table_, _invalid_, _value_)
+
+    This method is now deprecated and is no longer supported. Please use `field_value()` instead.
 
     converts _value_ to a (hopefully) human readable form.
 
 - value\_uncooked(_type name_, _field attributes table_, _invalid_, _value representation_)
 
+    This method is now deprecated and is no longer supported. Please use `field_value_as_read()` instead.
+
     converts a human readable representation of a datum to an original form.
 
-- error()
+- use\_gmtime(_boolean_)
 
-    returns an error message recorded by a method.
+    sets the flag which of GMT or local timezone is used for `date_time` type value conversion. Defaults to true.
 
-- crc\_expected()
+- unit\_table(_unit_ => _unit conversion table_)
 
-    CRC-16 attached to the end of a .FIT file. Only available after all contents of the file has been read.
+    sets _unit conversion table_ for _unit_.
 
-- crc()
+- semicircles\_to\_degree(_boolean_)
+- mps\_to\_kph(_boolean_)
 
-    CRC-16 calculated from the contents of a .FIT file.
-
-- trailing\_garbages()
-
-    number of octets after CRC-16, 0 usually.
+    wrapper methods of `unit_table()` method. `semicircle_to_deg()` defaults to true.
 
 - close()
 
     closes opened file handles.
 
-- cat\_definition\_message(_data message descriptor_\[, _reference to a scalar_\])
+- profile\_version\_string()
 
-    composes the binary form of a definition message after _data message descriptor_, concatenates the scalar and it, and returns the reference to the scalar. If the 2nd argument is omitted, returns the reference to the binary form.
+    Returns a string representation of the profile version used by the device or application that created the FIT file opened in the instance.
 
-- endian\_convert(_endian converter_, _reference to a scalar_, _offset in the scalar_)
-
-    apply _endian converter_ to the specified part of the scalar.
+    `fetch_header()` must have been called at least once for this method to be able to return a value, will raise an exception otherwise.
 
 ## Constants
 
@@ -285,7 +329,7 @@ Nothing in particular so far.
 
 # SEE ALSO
 
-[Geo::TCX](https://metacpan.org/pod/Geo%3A%3ATCX)
+[fit2tcx.pl](https://metacpan.org/pod/fit2tcx.pl), [fitdump.pl](https://metacpan.org/pod/fitdump.pl), [locations2gpx.pl](https://metacpan.org/pod/locations2gpx.pl), [Geo::TCX](https://metacpan.org/pod/Geo%3A%3ATCX), [Geo::Gpx](https://metacpan.org/pod/Geo%3A%3AGpx).
 
 # BUGS AND LIMITATIONS
 
@@ -303,7 +347,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-fit](https://g
 
 # VERSION
 
-1.05
+1.08
 
 # LICENSE AND COPYRIGHT
 

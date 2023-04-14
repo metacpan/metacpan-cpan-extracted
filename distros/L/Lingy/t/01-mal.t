@@ -1,60 +1,57 @@
-use strict; use warnings;
-
-use Test::More;
-use Capture::Tiny;
-
-use lib 'lib';
-
-use Lingy::REPL;
-use Lingy::Printer;
+use Lingy::Test;
 
 my %plan = (
-    2 => 14,
-    3 => 28,
-    4 => 186,
-    5 => 4,
-    6 => 41,
-    7 => 143,
-    8 => 54,
-    9 => 138,
-    10 => 89,
+    2 => 14,    # 14
+    3 => 28,    # 31
+    4 => 187,   # 178
+    5 => 4,     # 8
+    6 => 55,    # 65
+    7 => 144,   # 147
+    8 => 54,    # 65
+    9 => 138,   # 139
+    A => 91,    # 108
 );
 
 my @files = sort
-    -d 'test' ? glob("test/mal/*") :
-    -d 't' ? glob("t/mal/*") :
+    -d 'test' ? glob("test/mal/*.yaml") :
+    -d 't' ? glob("t/mal/*.yaml") :
     die "Can't find test directory";
 
-my $i = 1;
-for my $file (@files) {
-    my $repl = Lingy::REPL->new;
+if (my $step = $ENV{LINGY_TEST_MAL_STEP}) {
+    @files = grep /$step/, @files;
+}
 
-    $i++;
-    # next unless $i == 6;
-    # last if $i == 9;
+my $runtime = Lingy::RT->init;
+
+for my $file (@files) {
+    $file =~ /step(.)/ or die;
+    my $n = $1;
 
     subtest $file => sub {
-        plan tests => $plan{$i};
+        plan tests => $plan{$n};
 
-        for my $test (read_mal_test_file($file)) {
+        my @tests = read_yaml_test_file($file);
+
+        for my $test (@tests) {
             my ($expr, $got, $want, $like, $out, $err);
             if (my $note = $test->{note}) {
                 note $note;
             }
-            ($out) = Capture::Tiny::capture {
-                for (@{$test->{expr}}) {
-                    $expr .= $_;
-                    $got = eval { $repl->rep($_) };
-                    if ($@) {
-                        die $@ if $@ =~ /(^>>|^---\s| via package ")/;
-                        $err .= ref($@)
-                        ? "Error: " . Lingy::Printer::pr_str($@)
-                        : $@;
+            ($out) = capture(
+                sub {
+                    for (@{$test->{expr}}) {
+                        $expr .= $_;
+                        my @got = eval { $runtime->rep($_) };
+                        if ($@) {
+                            die $@ if $@ =~ /(^>>|^---\s| via package ")/;
+                            $err .= ref($@)
+                            ? "Error: " . Lingy::Printer::pr_str($@)
+                            : $@;
+                        }
+                        $got = $got[0];
                     }
-                }
-            };
-
-#             ::XXX { expr=>$expr, got=>$got, want=>$want, like=>$like, out=>$out, err=>$err};
+                },
+            );
 
             chomp $expr;
             $expr =~ s/\n/\\n/g;
@@ -64,12 +61,22 @@ for my $file (@files) {
                 $like = qr<^$like$>;
 
                 if (defined $err) {
+                    chomp $err;
                     like $err, $like,
                         sprintf("e %-40s -> ERROR: '%s'", "'$expr'", $like);
                 } else {
                     like $out, $like,
                         sprintf("o %-40s -> '%s'", "'$expr'", $like);
                 }
+            } elsif (defined $err and not $test->{eok}) {
+                XXX $test, {
+                    expr=>$expr,
+                    got=>$got,
+                    want=>$want,
+                    like=>$like,
+                    out=>$out,
+                    err=>$err,
+                };
             }
 
             if (length($got) and $want = $test->{want}) {
@@ -82,37 +89,24 @@ for my $file (@files) {
     }
 }
 
-sub read_mal_test_file {
+sub read_yaml_test_file {
+    require YAML::PP;
     my ($file) = @_;
-    open IN, '<', $file or die "Can't open '$file' for input: $!";
-    my @tests;
 
-    my $t = {};
-    while ($_ = <IN>) {
-        if (s/^;; //) {
-            chomp;
-            $t->{note} = $_;
-        } elsif (/(?:^;;|;>>>|^\s*$)/) {
-        } elsif (s/^;\///) {
-            my $like = $t->{like} //= [];
-            push @$like, $_;
+    my $tests = YAML::PP::LoadFile($file);
 
-        } elsif (s/^;=>//) {
-            my $want = $t->{want} //= [];
-            push @$want, $_;
-
-        } else {
-            if ($t->{expr} and ($t->{like} or $t->{want})) {
-                push @tests, $t;
-                $t = {};
-            }
-            my $expr = $t->{expr} //= [];
-            push @$expr, $_;
-        }
-    }
-    push @tests, $t if $t->{expr};
-
-    return @tests;
+    map {
+        my $t = {};
+        $t->{note} = $_->{say} if defined $_->{say};
+        $t->{expr} = ref($_->{mal}) ? $_->{mal} : [ $_->{mal} ]
+            if defined $_->{mal};
+        $t->{want} = ref($_->{out}) ? $_->{out} : [ $_->{out} ]
+            if defined $_->{out};
+        $t->{like} = ref($_->{err}) ? $_->{err} : [ $_->{err} ]
+            if defined $_->{err};
+        $t->{eok} = defined($_->{eok});
+        defined($t->{expr}) ? ($t) : ();
+    } @$tests;
 }
 
 done_testing;

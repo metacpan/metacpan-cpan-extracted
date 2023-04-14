@@ -30,7 +30,7 @@
 #       wait for email that file has been indexed and on cpan, unless trial ver
 #       git add Changes Mnet-*.tar.gz && git commit -m 'latest release'
 #       git push origin master
-#       git tag "v<RELEASE>" `git log -1 --pretty=%H`
+#       git tag -a "v<RELEASE>" `git log -1 --pretty=%H`
 #       git push origin "v<RELEASE>"
 #       git push --delete origin "v<RELEASE>", to PERMANENTLY delete old tag
 #       git restore lib/Mnet.pm, to restore $VERSION variable to "dev"

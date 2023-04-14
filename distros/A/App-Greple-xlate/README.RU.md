@@ -8,7 +8,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 # VERSION
 
-Version 0.21
+Version 0.23
 
 # DESCRIPTION
 

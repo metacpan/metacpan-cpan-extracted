@@ -57,7 +57,7 @@ note(qq|\nVerify that accuracy depends on invocand, not class.\n\n|);
     my ($mant, $expo) = $x -> sparts();
     cmp_ok($mant, '==', 3, "value of significand");
     cmp_ok($expo, '==', 0, "value of exponent");
-    cmp_ok($mant -> accuracy(), '==', 10, "accuracy of significand");
+    cmp_ok($mant -> accuracy(), '==', 20, "accuracy of significand");
     cmp_ok($expo -> accuracy(), '==', 20, "accuracy of exponent");
 }
 
@@ -71,7 +71,7 @@ note(qq|\nVerify that precision depends on invocand, not class.\n\n|);
     my ($mant, $expo) = $x -> sparts();
     cmp_ok($mant, '==', 3, "value of significand");
     cmp_ok($expo, '==', 0, "value of exponent");
-    cmp_ok($mant -> precision(), '==', 10, "precision of significand");
+    cmp_ok($mant -> precision(), '==', 20, "precision of significand");
     cmp_ok($expo -> precision(), '==', 20, "precision of exponent");
 }
 

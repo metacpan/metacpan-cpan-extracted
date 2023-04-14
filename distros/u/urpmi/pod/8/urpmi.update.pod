@@ -75,12 +75,12 @@ Verbose mode.
 =item B<--curl>
 
 Use curl for downloading distant
-files. By default curl is used if available, or wget instead.
+files. By default wget is used if available, or curl instead.
 
 =item B<--wget>
 
-Use wget for downloading distant files. By default curl
-is used if available, or wget instead.
+Use wget for downloading distant files. By default wget
+is used if available, or curl instead.
 
 =item B<--curl-options> I<'options'>
 

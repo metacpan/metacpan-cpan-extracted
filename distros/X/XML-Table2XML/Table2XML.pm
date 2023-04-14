@@ -6,7 +6,7 @@ use Carp;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(parseHeaderForXML addXMLLine commonParent offsetNodesXML);
-our $VERSION = '1.4';
+our $VERSION = '1.41';
 my $LINEFEED = "";
 my $XMLDIRECTIVE = '<?xml version="1.0"?>';
 my $ENCODING = 'iso-8859-1';

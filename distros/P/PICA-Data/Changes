@@ -1,5 +1,14 @@
 Revision history for PICA::Data
 
+2.09 2023-04-14T07:03:05Z
+    - Remove duplicate fields from patches
+    - Add field methods clone and equal
+
+2.08 2023-03-28T07:09:39Z
+    - Let pica_fields return a new array reference
+    - Document pica_split
+    - Make "norm(alized)" alias for "plus" format
+
 2.06 2023-01-31T09:15:07Z
     - Fix default --level value in command line interface
     - Add PICA::Data::Field

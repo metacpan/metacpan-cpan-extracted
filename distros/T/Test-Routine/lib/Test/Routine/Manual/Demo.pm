@@ -1,6 +1,6 @@
 use v5.12.0;
 use warnings;
-package Test::Routine::Manual::Demo 0.030;
+package Test::Routine::Manual::Demo 0.031;
 # ABSTRACT: a walkthrough, in code, of Test::Routine
 
 #pod =head1 The Demo
@@ -447,7 +447,7 @@ Test::Routine::Manual::Demo - a walkthrough, in code, of Test::Routine
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 PERL VERSION
 

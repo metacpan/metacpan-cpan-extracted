@@ -1,0 +1,118 @@
+#*****************************************************************************
+# I/O control
+#*****************************************************************************
+--no-standard-output
+--no-standard-error-output
+--warning-output
+--no-logfile
+--no-show-options
+
+#*****************************************************************************
+# FORMATTING OPTIONS
+#*****************************************************************************
+
+#-----------------------------------------------------------------------------
+# Basic Options
+#-----------------------------------------------------------------------------
+--indent-columns=4
+--maximum-line-length=100
+--output-line-ending="unix"
+--converge
+
+#-----------------------------------------------------------------------------
+# Code Indentation Control
+#-----------------------------------------------------------------------------
+--continuation-indentation=4
+--closing-token-indentation=0
+--no-indent-closing-brace
+--no-outdent-long-lines
+--no-outdent-labels
+--no-outdent-keywords
+--no-outdent-long-quotes
+
+#-----------------------------------------------------------------------------
+# Whitespace Control
+#-----------------------------------------------------------------------------
+--all-containers-tightness=1
+--tight-secret-operators
+--no-space-terminal-semicolon
+--no-space-for-semicolon
+--add-semicolons
+--delete-semicolons
+--add-whitespace
+--delete-old-whitespace
+--trim-qw
+
+#-----------------------------------------------------------------------------
+# Comment Controls
+#-----------------------------------------------------------------------------
+--indent-block-comments
+--no-outdent-long-comments
+--minimum-space-to-comment=1
+--ignore-side-comment-lengths
+--hanging-side-comments
+--closing-side-comments
+--closing-side-comment-interval=20
+--closing-side-comment-maximum-text=20
+--closing-side-comments-balanced
+--closing-side-comment-else-flag=0
+--static-block-comments
+--no-static-side-comments
+
+#-----------------------------------------------------------------------------
+# Skipping Selected Sections of Code
+#-----------------------------------------------------------------------------
+--format-skipping
+
+#-----------------------------------------------------------------------------
+# Line Break Control
+#-----------------------------------------------------------------------------
+--no-cuddled-else
+--no-opening-brace-on-new-line
+--no-opening-sub-brace-on-new-line
+--no-opening-anonymous-sub-brace-on-new-line
+--no-brace-left-and-indent
+--opening-brace-always-on-right
+--opening-token-right
+--vertical-tightness=0
+--vertical-tightness-closing=0
+--block-brace-vertical-tightness=0
+--delete-old-newlines
+--add-newlines
+--want-break-before="% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x="
+--break-before-all-operators
+
+#-----------------------------------------------------------------------------
+# Controlling List Formatting
+#-----------------------------------------------------------------------------
+--break-at-old-comma-breakpoints
+--comma-arrow-breakpoints=0
+--maximum-fields-per-table=40
+
+#-----------------------------------------------------------------------------
+# Retaining or Ignoring Existing Line Breaks
+#-----------------------------------------------------------------------------
+--no-keep-interior-semicolons
+--break-at-old-logical-breakpoints
+--break-at-old-keyword-breakpoints
+--break-at-old-logical-breakpoints
+--break-at-old-ternary-breakpoints
+--break-at-old-attribute-breakpoints
+
+#-----------------------------------------------------------------------------
+# Blank Line Control
+#-----------------------------------------------------------------------------
+--keep-old-blank-lines=1
+--maximum-consecutive-blank-lines=1
+--no-blanks-before-comments
+--blanks-before-blocks
+--blanks-before-subs
+--long-block-line-count=8
+
+#-----------------------------------------------------------------------------
+# Other Controls
+#-----------------------------------------------------------------------------
+--look-for-autoloader
+--look-for-selfloader
+--pass-version-line
+--vxl='q' # (old behaviour for module import)

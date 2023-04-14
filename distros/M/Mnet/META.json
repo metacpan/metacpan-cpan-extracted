@@ -47,6 +47,6 @@
          "web" : "https://github.com/menzascripting/Mnet"
       }
    },
-   "version" : "5.23",
+   "version" : "5.24",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

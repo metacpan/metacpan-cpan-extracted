@@ -1,9 +1,52 @@
 ==================================================
-Changes from 2020-09-02 00:00:00 +0000 to present.
+Changes from 2021-04-12 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.4 at 2022-09-02 19:54:37 +0000
+version 8.5 at 2023-04-12 23:55:28 +0000
+----------------------------------------
+
+  Change: 52766654c246913695280adfc9fd74247543d4f4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-04-12 16:51:37 +0000
+
+    Prepping 8.5 release 
+
+  Change: b3de99668fa520fc98432f4a1cbaddc40b6d76bd
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-04-12 16:47:40 +0000
+
+    Minor Improvements
+
+    * Remove old script `es-nagios-check.pl` * Update documentation * Disable
+    imports from `YAML::XS` 
+
+  Change: 159f1dad0a7f81d8b436ef00ab1d9086a04d1c0a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-04-12 16:33:58 +0000
+
+    Fix bug in date parsing logic 
+
+  Change: 853c42e60acef360f1f2e91d6cbc82ce77afe74e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2023-04-12 16:33:58 +0000
+
+    es-cluster-settings.pl to manage cluster settings
+
+    Added `es-cluster-settings.pl` to the distribution to manage cluster
+    settings more easily. 
+
+  Change: 250fe6f9738808b493c518fe58c98a1f750d58c9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-09-08 12:06:35 +0000
+
+    Fix warning for unitialized values
+
+    ``` Use of uninitialized value $out_of in numeric gt (>) at
+    ~/perl5/perlbrew/perls/perl-5.32.1/bin/es-search.pl line 624. ``` 
+
+----------------------------------------
+version 8.4 at 2022-09-02 19:51:04 +0000
 ----------------------------------------
 
   Change: b6112b07c154fe669e7ab9407b3b20f6f845e7bc
@@ -410,43 +453,6 @@ version 7.9 at 2021-07-30 18:19:09 +0000
 
     Fix warnings when we encounter an unallocated shard 
 
-----------------------------------------
-version 7.8 at 2020-09-16 18:12:23 +0000
-----------------------------------------
-
-  Change: 7dbb50ff27914898417120f617def09279f8adc0
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-09-16 11:12:23 +0000
-
-    Better handling of percentages
-
-    For `--top` queries, be consistent about handling of the number of decimal
-    places. Default to showing 3 digits to the right of the decimal, but allow
-    a user to override it with `--precision`.
-
-    Show the percentages in the summary when using `--days` greater than 1.
-
-    Update the documentation. 
-
-  Change: e55ca5e32f64bc10c1def43c4766b93fe1430679
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-09-04 13:00:37 +0000
-
-    Add percentages to es-search.pl aggs
-
-    Whenever an aggregation is used, output the percentage from 0-1 with the
-    doc count. Additionally, in sub aggs, calculate the percentage of the
-    parent bucket. 
-
-  Change: 27a31a79da70aef08ec04586b9496160f2127007
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-06-08 09:52:42 +0000
-
-    Remove the HOME paths from the lookup
-
-    In the previous release, I added a check for the HOME environment variable,
-    but I neglected to remove the originals from the search path. 
-
 =================================================
-Plus 84 releases after 2020-09-02 00:00:00 +0000.
+Plus 85 releases after 2021-04-12 00:00:00 +0000.
 =================================================

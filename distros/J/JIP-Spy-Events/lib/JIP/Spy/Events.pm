@@ -10,67 +10,80 @@ use English qw(-no_match_vars);
 
 use JIP::Spy::Event;
 
-our $VERSION = version->declare('v0.0.1');
+our $VERSION = version->declare('v0.0.2');
 our $AUTOLOAD;
 
 sub new {
-    my ($class, %param) = @ARG;
+    my ( $class, %param ) = @ARG;
 
     my $state = {
         on_spy_event => {},
         events       => [],
         times        => {},
+        skip_methods => {},
         want_array   => 0,
     };
 
-    if ($param{'want_array'}) {
-        $state->{'want_array'} = 1;
+    if ( $param{want_array} ) {
+        $state->{want_array} = 1;
+    }
+
+    if ( my $skip_methods = $param{skip_methods} ) {
+        foreach my $method_name ( @{$skip_methods} ) {
+            $state->{skip_methods}->{$method_name} = undef;
+        }
     }
 
     return bless $state, $class;
-}
+} ## end sub new
 
 sub events {
     my ($self) = @ARG;
 
-    return $self->{'events'};
+    return $self->{events};
 }
 
 sub times {
     my ($self) = @ARG;
 
-    return $self->{'times'};
+    return $self->{times};
 }
 
 sub want_array {
     my ($self) = @ARG;
 
-    return $self->{'want_array'};
+    return $self->{want_array};
+}
+
+sub skip_methods {
+    my ($self) = @ARG;
+
+    return $self->{skip_methods};
 }
 
 sub clear {
     my ($self) = @ARG;
 
-    @{ $self->events } = ();
-    %{ $self->times }  = ();
+    @{ $self->events() } = ();
+    %{ $self->times() }  = ();
 
     return $self;
 }
 
 sub on_spy_event {
-    my ($self, %declarations) = @ARG;
+    my ( $self, %declarations ) = @ARG;
 
     if (%declarations) {
-        $self->{'on_spy_event'} = \%declarations;
+        $self->{on_spy_event} = \%declarations;
     }
 
-    return $self->{'on_spy_event'};
+    return $self->{on_spy_event};
 }
 
 sub AUTOLOAD {
-    my ($self, @arguments) = @ARG;
+    my ( $self, @arguments ) = @ARG;
 
-    if (!blessed $self) {
+    if ( !blessed $self ) {
         croak q{Can't call "AUTOLOAD" as a class method};
     }
 
@@ -91,16 +104,16 @@ sub isa {
 }
 
 sub can {
-    my ($self, $method_name) = @ARG;
+    my ( $self, $method_name ) = @ARG;
 
-    if (blessed $self) {
+    if ( blessed $self ) {
         no warnings 'misc';
         goto &UNIVERSAL::can;
     }
     else {
         my $code;
         no warnings 'misc';
-        $code = UNIVERSAL::can($self, $method_name);
+        $code = UNIVERSAL::can( $self, $method_name );
 
         return $code;
     }
@@ -116,48 +129,50 @@ sub VERSION {
     goto &UNIVERSAL::VERSION;
 }
 
-sub DESTROY {}
+sub DESTROY { }
 
 sub _handle_event {
-    my ($self, %param) = @ARG;
+    my ( $self, %param ) = @ARG;
+
+    return $self if exists $self->skip_methods()->{ $param{method_name} };
 
     {
-        my $event = {
-            method    => $param{'method_name'},
-            arguments => $param{'arguments'},
-        };
-
-        if ($self->want_array) {
-            $event->{want_array} = $param{'want_array'};
-        }
-
-        push @{ $self->events }, $event;
-    }
-
-    my $times = $self->times->{$param{'method_name'}} // 0;
-    $times += 1;
-    $self->times->{$param{'method_name'}} = $times;
-
-    if (my $on_spy_event = $self->on_spy_event->{$param{'method_name'}}) {
-        if (ref $on_spy_event ne 'CODE') {
-            croak sprintf(
-                q{"%s" is not a callback},
-                $param{'method_name'},
-            );
-        }
-
-        my $event = JIP::Spy::Event->new(
-            method     => $param{'method_name'},
-            arguments  => $param{'arguments'},
-            want_array => $param{'want_array'},
-            times      => $times,
+        my %event = (
+            method    => $param{method_name},
+            arguments => $param{arguments},
         );
 
-        return $on_spy_event->($self, $event);
+        if ( $self->want_array() ) {
+            $event{want_array} = $param{want_array};
+        }
+
+        push @{ $self->events() }, \%event;
     }
 
-    return $self;
-}
+    my $times = $self->times()->{ $param{method_name} } // 0;
+    $times += 1;
+    $self->times()->{ $param{method_name} } = $times;
+
+    my $on_spy_event = $self->on_spy_event()->{ $param{method_name} };
+
+    return $self if !$on_spy_event;
+
+    if ( ( reftype($on_spy_event) || q{} ) ne 'CODE' ) {
+        croak sprintf(
+            q{"%s" is not a callback},
+            $param{method_name},
+        );
+    }
+
+    my $event = JIP::Spy::Event->new(
+        method     => $param{method_name},
+        arguments  => $param{arguments},
+        want_array => $param{want_array},
+        times      => $times,
+    );
+
+    return $on_spy_event->( $self, $event );
+} ## end sub _handle_event
 
 1;
 
@@ -169,7 +184,7 @@ JIP::Spy::Events
 
 =head1 VERSION
 
-This document describes L<JIP::Spy::Events> version C<v0.0.1>.
+This document describes L<JIP::Spy::Events> version C<v0.0.2>.
 
 =head1 SYNOPSIS
 
@@ -179,27 +194,27 @@ Testing with L<Test::More>:
 
     use_ok 'JIP::Spy::Events';
 
-    my $spy_events = JIP::Spy::Events->new;
+    my $spy_events = JIP::Spy::Events->new();
 
-    is_deeply $spy_events->events, [];
-    is_deeply $spy_events->times,  {};
+    is_deeply $spy_events->events(), [];
+    is_deeply $spy_events->times(), {};
 
-    is $spy_events->foo,     $spy_events;
+    is $spy_events->foo(),   $spy_events;
     is $spy_events->foo(42), $spy_events;
 
-    is_deeply $spy_events->events, [
+    is_deeply $spy_events->events(), [
         { method => 'foo', arguments => [] },
         { method => 'foo', arguments => [42] },
     ];
 
-    is_deeply $spy_events->times, { foo => 2 };
+    is_deeply $spy_events->times(), { foo => 2 };
 
-    is $spy_events->clear, $spy_events;
+    is $spy_events->clear(), $spy_events;
 
-    is_deeply $spy_events->events, [];
-    is_deeply $spy_events->times,  {};
+    is_deeply $spy_events->events(), [];
+    is_deeply $spy_events->times(), {};
 
-    done_testing;
+    done_testing();
 
 Testing with L<Test::More>, and want_array is turning on:
 
@@ -207,19 +222,19 @@ Testing with L<Test::More>, and want_array is turning on:
 
     use_ok 'JIP::Spy::Events';
 
-    my $spy_events = JIP::Spy::Events->new(want_array => 1);
+    my $spy_events = JIP::Spy::Events->new( want_array => 1 );
 
-    $spy_events->foo;
-    scalar $spy_events->foo;
-    ( () = $spy_events->foo );
+    $spy_events->foo();
+    scalar $spy_events->foo();
+    ( () = $spy_events->foo() );
 
-    is_deeply $spy_events->events, [
+    is_deeply $spy_events->events(), [
         { method => 'foo', arguments => [], want_array => undef },
         { method => 'foo', arguments => [], want_array => q{} },
         { method => 'foo', arguments => [], want_array => 1 },
     ];
 
-    done_testing;
+    done_testing();
 
 FizzBuzz example:
 
@@ -227,13 +242,13 @@ FizzBuzz example:
 
     use_ok 'JIP::Spy::Events';
 
-    my $spy_events = JIP::Spy::Events->new;
+    my $spy_events = JIP::Spy::Events->new();
 
     $spy_events->on_spy_event(
         just_do_it => sub {
             my ($spy, $event) = @_;
 
-            my $attempt = $event->arguments->[0];
+            my $attempt = $event->arguments()->[0];
 
             return (
                 !($attempt % 3)  ? 'Fizz' :
@@ -253,7 +268,7 @@ FizzBuzz example:
         'Buzz',
     ];
 
-    done_testing;
+    done_testing();
 
 =head1 ATTRIBUTES
 
@@ -261,31 +276,31 @@ L<JIP::Spy::Events> implements the following attributes.
 
 =head2 events
 
-    $spy_events->events;
+    $spy_events->events();
 
 =head2 times
 
-    $spy_events->times;
+    $spy_events->times();
 
 =head2 want_array
 
-    $spy_events->want_array; # undef/1/q{}
+    $spy_events->want_array(); # undef/1/q{}
 
 =head2 on_spy_event
 
-    $spy_events->on_spy_event;
+    $spy_events->on_spy_event();
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-    my $spy_events = JIP::Spy::Events->new;
+    my $spy_events = JIP::Spy::Events->new();
 
 Build new L<JIP::Spy::Events> object.
 
 =head2 clear
 
-    $spy_events->clear;
+    $spy_events->clear();
 
 =head1 DIAGNOSTICS
 
@@ -301,7 +316,7 @@ L<Sub:Spy>, L<Module::Spy>
 
 =head1 AUTHOR
 
-Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
+Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 

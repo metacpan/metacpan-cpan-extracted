@@ -142,13 +142,13 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-- GitHub
+- GitHub Source Repository
 
     [https://github.com/pjacklam/p5-Math-BigInt-Constant](https://github.com/pjacklam/p5-Math-BigInt-Constant)
 
 - RT: CPAN's request tracker
 
-    [https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Constant](https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Constant)
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Constant](https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Constant)
 
 - MetaCPAN
 
@@ -157,10 +157,6 @@ You can also look for information at:
 - CPAN Testers Matrix
 
     [http://matrix.cpantesters.org/?dist=Math-BigInt-Constant](http://matrix.cpantesters.org/?dist=Math-BigInt-Constant)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt-Constant](https://cpanratings.perl.org/dist/Math-BigInt-Constant)
 
 # LICENSE
 

@@ -202,6 +202,7 @@ ext/zstd/contrib/pzstd/utils/test/ThreadPoolTest.cpp
 ext/zstd/contrib/pzstd/utils/test/WorkQueueTest.cpp
 ext/zstd/contrib/recovery/Makefile
 ext/zstd/contrib/recovery/recover_directory.c
+ext/zstd/contrib/seekable_format/README.md
 ext/zstd/contrib/seekable_format/examples/Makefile
 ext/zstd/contrib/seekable_format/examples/parallel_compression.c
 ext/zstd/contrib/seekable_format/examples/parallel_processing.c
@@ -251,6 +252,7 @@ ext/zstd/examples/streaming_memory_usage.c
 ext/zstd/lib/BUCK
 ext/zstd/lib/Makefile
 ext/zstd/lib/README.md
+ext/zstd/lib/common/allocations.h
 ext/zstd/lib/common/bits.h
 ext/zstd/lib/common/bitstream.h
 ext/zstd/lib/common/compiler.h
@@ -456,6 +458,8 @@ ext/zstd/tests/cli-tests/dictionaries/dictionary-mismatch.sh.stderr.exact
 ext/zstd/tests/cli-tests/dictionaries/golden.sh
 ext/zstd/tests/cli-tests/dictionaries/setup
 ext/zstd/tests/cli-tests/dictionaries/setup_once
+ext/zstd/tests/cli-tests/file-stat/compress-file-to-dir-without-write-perm.sh
+ext/zstd/tests/cli-tests/file-stat/compress-file-to-dir-without-write-perm.sh.stderr.exact
 ext/zstd/tests/cli-tests/file-stat/compress-file-to-file.sh
 ext/zstd/tests/cli-tests/file-stat/compress-file-to-file.sh.stderr.exact
 ext/zstd/tests/cli-tests/file-stat/compress-file-to-stdout.sh
@@ -502,11 +506,15 @@ ext/zstd/tests/fuzz/fuzz_data_producer.c
 ext/zstd/tests/fuzz/fuzz_data_producer.h
 ext/zstd/tests/fuzz/fuzz_helpers.c
 ext/zstd/tests/fuzz/fuzz_helpers.h
+ext/zstd/tests/fuzz/fuzz_third_party_seq_prod.h
 ext/zstd/tests/fuzz/huf_decompress.c
 ext/zstd/tests/fuzz/huf_round_trip.c
 ext/zstd/tests/fuzz/raw_dictionary_round_trip.c
 ext/zstd/tests/fuzz/regression_driver.c
 ext/zstd/tests/fuzz/seekable_roundtrip.c
+ext/zstd/tests/fuzz/seq_prod_fuzz_example/Makefile
+ext/zstd/tests/fuzz/seq_prod_fuzz_example/README.md
+ext/zstd/tests/fuzz/seq_prod_fuzz_example/example_seq_prod.c
 ext/zstd/tests/fuzz/sequence_compression_api.c
 ext/zstd/tests/fuzz/simple_compress.c
 ext/zstd/tests/fuzz/simple_decompress.c
@@ -517,6 +525,7 @@ ext/zstd/tests/fuzz/zstd_frame_info.c
 ext/zstd/tests/fuzz/zstd_helpers.c
 ext/zstd/tests/fuzz/zstd_helpers.h
 ext/zstd/tests/fuzzer.c
+ext/zstd/tests/golden-compression/PR-3517-block-splitter-corruption-test
 ext/zstd/tests/golden-compression/http
 ext/zstd/tests/golden-compression/huffman-compressed-larger
 ext/zstd/tests/golden-compression/large-literal-and-match-lengths

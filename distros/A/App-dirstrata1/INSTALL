@@ -1,0 +1,30 @@
+
+## INSTALL
+
+cpanm App::dirstrata1
+
+## UNINSTALL 
+
+cpanm -U App::dirstrata1
+
+■ コマンド dirstrata1 を使えるようにする方法 : 
+
+   インストール:  	cpanm    App::dirstrata1
+アンインストール: 	cpanm –U App::dirstrata1
+
+cpanm が使えない場合は、cpan でも良いが、インストールしたモジュールの
+アンインストールが難しくなるであろう。(アンインストールとは、インストール
+したモジュールを除去することで、インストール前の元の状態に戻すことである。)
+
+上記の cpanm を使った方法は、Perlのモジュールのインストールでよく用いられる方法である。
+
+■ cpanm や cpan による一般的なインストールの方法は、下記で網羅的に説明をしている。
+  世界中どこでも古い環境でもインストール可能するために、あらゆる場面を想定した。
+
+1. https://metacpan.org/release/TULAMILI/Table-Hack-0.12/source/Table-Hack.pdf
+2. https://www.ite.or.jp/wp/wp-content/uploads/opendata/tool201807.pdf
+
+上記2個のURLにある同じPDF形式ファイルは、2018年に下野寿之が書いたものであり、
+それぞれ26ページである。
+
+-- 2023-04-07(fri) Toshiyuki Shimono bin4tsv@gmail.com

@@ -4,8 +4,6 @@ use Sub::WrapInType ();
 
 sub twice { $_[0] * 2 }
 
-$SIG{__WARN__} = \&Carp::cluck;
-
 sub twice_method {
   my ($class, $num) = @_;
   $num * 2;

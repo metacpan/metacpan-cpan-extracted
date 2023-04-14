@@ -1,6 +1,8 @@
-use strict;
-use warnings;
+#!perl
+
 use Test::More;
 
-use Test::DistManifest;
+eval "use Test::DistManifest";
+plan skip_all => "Test::DistManifest required for testing the manifest"
+  if $@;
 manifest_ok();

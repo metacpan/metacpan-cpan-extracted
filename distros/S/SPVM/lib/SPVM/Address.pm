@@ -22,4 +22,10 @@ C<SPVM::Address> is a L<SPVM> class to have a address.
 
   static method new : Address ();
 
-Creates a new L<Address|SPVM::Address> object. The address is C<NULL> of C<C language>.
+Creates a new L<Address|SPVM::Address> object. The address is C<NULL> of the C language.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

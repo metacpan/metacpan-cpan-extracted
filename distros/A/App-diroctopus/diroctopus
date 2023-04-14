@@ -1,0 +1,273 @@
+#!/usr/bin/perl 
+use 5.014 ; use strict ; use warnings  ;
+use feature qw [ say ] ;
+use Time::HiRes qw[gettimeofday tv_interval] ; my $time_start = [ gettimeofday ] ; 
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use File::Spec::Functions qw[ catfile splitdir rel2abs updir ] ; 
+use Getopt::Std ; 
+use List::Util qw [ sum sum0 ] ;
+
+getopts '.:LSd:g:l:s:x:y:' , \my%o ; 
+defined $o{s} ? ( srand $o{s} )  : ( $o{s} = srand ) ; # ランダムseed 
+$o{g} //= 12 ; # 最大いくつのパスを出力するか
+$o{l} //= 1 ; # 最小のディスタンス (距離)
+$o{y} //= 1 ; 
+
+push @ARGV , $o{x} if defined $o{x} ;
+#say BRIGHT_BLUE map "[$_]" , @ARGV ;
+
+my $OutRec = 0 ; # 出力するレコード数
+my $I = catfile '' , '' ; # OS毎に異なる可能性のある、ファイルパスの区切り文字を取得。 
+my $start_dir = $ARGV [0] // "." ; # 先頭のディレクトリ 
+my $root = ::dirtree -> new () ;
+chdir $start_dir or die ;#say map "[$_]" , & get_dirs ( $start_dir ) ;
+
+& main ; 
+exit 0 ;
+
+END{
+ print RESET "" ; #print rand ;
+} ;
+
+
+package dirtree ;
+use 5.014 ; use strict ; use warnings ;
+use List::Util qw [ reduce ] ;
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Cwd qw [ getcwd abs_path ] ;
+
+sub RAND{ return 0 } ;
+sub new { my $R = {} ; bless $R ; } # 上記で初期化のやり方が正しいのどうか気になっている #sub new { my %keep = () ; bless \%keep ; } 
+
+sub build_recursive ( $$ ) { #  第1引数に子ディレクトリの名前
+  my ( $oyaIns , $name , $dep ) = @_ ;
+	opendir my $dh , '.' ; # この関数の最後でここに戻るため # まだ親ディレクトリにいる筈
+
+  #if ( $o{S} ) {     my @ff = grep { ! /\A\.{1,2}\Z/ } readdir $dh ;    if ( @ff == 1  and -d "$name" ) {      $name = "./$name" ;    } ;   }
+  chdir $name or do { say STDERR FAINT YELLOW "Cannot change into the directory `$_' so skipped at : " , getcwd ; return }  ;
+
+	my $ins = new () ; #my $ins = new ( $_[1] ) ; 
+	push @{ $oyaIns -> { children } } , $ins ;
+	$ins -> { name } = $name ; # ディレクトリ名
+	$ins -> { parent } = $oyaIns ; # 親のインスタンス
+	$ins -> {farness} = $dep  + RAND ; # 深さを代入 # depth distance 
+	$ins -> build_recursive ( $_  , $dep + 1 ) for get_dirs () ; # $_[1] ) ;
+	chdir $dh ; 
+}
+
+sub shrink_recursive () { 
+  my $ins = $_[0] ;
+  my @sons = @{ $ins->{ children } } ; 
+  if ( @sons == 1 ) {
+    my $son = $sons[0] ;
+    $son -> { name } = "$ins->{name}$I$I$son->{name}" ;
+    $son -> { parent } = $ins -> { parent } ; 
+    $ins -> { children } = $son -> { children } ; 
+    $ins -> { parent }{ children } = [ $son ] ; 
+    #
+  }
+  $_ -> shrink_recursive for @{ $ins -> { children } } ;
+}
+
+# そのインスタンスの下のディレクトリファイルの一覧を文字列の配列で返す。
+sub get_dirs () { 
+  opendir my $dh , '.' or 
+  do { 1; 
+    my $tmp = "." ;
+    say STDERR FAINT BOLD YELLOW "Cannot open the directory `$tmp' so skipped at : " , getcwd  ; 
+    return () ;
+  } ; 
+  my @dirs ;
+  @dirs = grep { ! /\A\.{1,2}\Z/ && -d $_ } readdir $dh ; 
+  @dirs = grep { ! /\A\./ } @dirs if exists $o{'.'} && $o{'.'} eq "0" ; # 隠しファイルに関する処理
+  @dirs = grep { ! -l $_ } @dirs if ! $o{L}  ;
+  chdir $dh ;
+  return @dirs ; 
+}
+
+# そのインスタンスの子孫のインスタンスを全て辿って、farness値の最も大きなインスタンスを探し出す。
+sub scan () { 
+  my $ins = $_[0] ;
+	return $ins if ! exists $ins -> { children }  ; # definedの方が良い?
+  my @targets = ( $ins , map { $_->scan() }  @{ $ins -> {children} } )  ;
+
+  # 関数内関数にする必要がある。そうでないとインスタンスに対する関数と解釈される。
+  sub cmpproc ($$) { 
+    my ( $fA , $fB ) = ( $_[0] -> {farness} , $_[1] -> {farness} ) ; 
+    my $tmp = int $fA <=> int $fB ; #my $tmp = $fA <=> $fB ; 
+    if ( $tmp == 1 ) { return $_[0] } elsif ( $tmp == -1 ) { return $_[1] } ;
+    # 整数化すると等しくなった場合の処理
+    $fA = $_[0]->{farness} += rand if $fA == int $fA ; # 整数であれば乱数を足す
+    $fB = $_[1]->{farness} += rand if $fB == int $fB ; # 整数であれば乱数を足す
+    return $_[0] if $fA > $fB ; #$_[0]->{farness} > $_[1]->{farness} ;
+    return $_[1] ;
+  }
+  my $ret = reduce { cmpproc($a,$b) } @targets ;
+  #print CYAN sprintf '%0.2f ' , $ret->{farness} ; 
+  return $ret ; 
+}
+
+sub pathProc () { 
+	my $watch = $_[0] ;
+	my @pathProc = () ; 
+	while ( $watch->{parent}{name} ) {
+	   #$watch -> {d} = 0 ; # <--
+	   $watch -> rebuild ( 0 ) ; #<--
+       unshift @pathProc , $watch->{name} ;
+	   $watch = $watch -> {parent} ;
+	} 
+	return join $I , @pathProc ;
+}
+
+sub rebuild ($){ 
+	my ( $watch , $d ) = @_ ;#$_[0] ;
+	$watch -> {farness} = $d + RAND ;
+	$_ -> rebuild ( $d +1 ) for grep { $_->{farness} >= 1 }  @{ $watch -> {children} } ;
+}
+
+package main ;
+
+
+# ディレクトリ名のパスから、ファイルの個数とサイズを返す。
+sub leafs ($) { 
+	opendir my ( $dh ) , $_[0] ; 
+	my @files = grep { ! m/\A\.{1,2}\Z/ } readdir $dh ;
+	return scalar @files , sum0 map { -s "$_[0]$I$_" } @files ;
+}
+# ディレクトリ名のパスから、$o{d}の値に応じて、ディレクトリの個数、それ以外のファイル個数、ファイルサイズの合計を返す
+sub dirfinum ($) { 
+  no warnings qw [ experimental ] ;
+  my ($dirname) = @_ ; 
+  $dirname =~ s/$I[^$I]+$// if $o{d} =~ /[FDS]/ ; #print RED "[$dirname] " ;
+	opendir my ( $dh ) , $dirname ; 
+	my @files = grep { ! m/\A\.{1,2}\Z/  } readdir $dh ;
+	my $ddirs = grep  { -d "$dirname$I$_" } @files ;
+	my @ret ; 
+  given ( $o{d} ) { 
+    push @ret , join "+" , $ddirs , scalar @files - $ddirs  when /d/i && /f/i ;
+    push @ret , $ddirs when /d/i ;
+    push @ret , scalar @files - $ddirs when /f/i ;
+  }
+  push @ret , sum0 map { -s "$dirname$I$_" } @files  if $o{d} =~ m/s/i ;
+
+	return join ":" , @ret ; #, sum0 map { -s "$_[0]$I$_" } @files ;
+}
+
+# ディリクトリ名の連結したパス名から、それぞれのディレクトリに、付属するディレクトリの数を数える
+sub path2dnum ( $ $ ) { 
+  my @f = splitdir $_[0] ;
+  my $tdir = "." ;
+  if ( exists $o{d} ) { 
+   for ( @f ) { 
+  	$tdir .= $I . $_ ;
+  	my $dnum = dirfinum ( $tdir ) ;
+  	$_ .= FAINT "($dnum)" ;
+   }
+  }
+  #* YELLOW = sub { BRIGHT_YELLOW @_ } ;
+  $f[ - $_[1] ] = YELLOW $f[ - $_[1] ] if  $o{y} eq '1' ;
+  grep { $f[ $_ ] = YELLOW $f[ $_ ] } -$_[1] .. -1 if  $o{y} eq '2' ;  
+  join $I , @f ;
+}
+
+sub main () {
+
+  # ヘッダの出力
+  my @header ; 
+  push @header , "Distance" ;
+  push @header , "Directory_path" ; 
+  push @header , "File_number" , "File_bytesize_sum" if ! exists $o{d} ;
+  say UNDERLINE join "\t" , @header ;
+
+  $root -> build_recursive ( "." , 0 ) ; #  第二引数 my $depth = 0 ;
+  $root -> shrink_recursive if $o{S} ;
+  my $first ; # 最初のディレクトリに相当するインスタンス 
+  my $furthest ; # 最も離れたインスタンス
+  my $distance ;  # その最も離れた距離を格納
+  my $path  ; # ディレクトリ名のパス
+
+  $first = $root -> {children}[0];
+  
+  for ( 1 .. $o{g} ) { 
+    $furthest = $first -> scan ;
+    $distance = $furthest -> {farness} ;
+    $path = $furthest -> pathProc ;
+    my $steps = splitdir $path ;
+    last if $distance < $o{l} ;
+    my @lf = leafs $path if ! exists $o{d} ;
+    #say CYAN "$furthest->{name}, $distance, $path" ; 
+    my $decopath = path2dnum ( $path , $distance ) ;#if defined $o{d} ; #&& $o{d} == 1 ;
+    do { say join "\t" , (int $distance).(FAINT "/".$steps ) ,  $decopath.$I, @lf ; $OutRec ++ } 
+  }
+  
+  # メインの後の出力
+  * REVERSE = sub { @_ } ;
+  print STDERR " -- " ;
+  print STDERR BOLD " NO OUTPUT RECORD ! -- " if $OutRec == 0 ;
+  print STDERR REVERSE ITALIC " Output records: " , CLEAR " $OutRec " ; 
+  print STDERR " " , REVERSE ITALIC " Used random seed: " , CLEAR " $o{s} " ;
+  say STDERR " " , REVERSE ITALIC " Process time: " , CLEAR " " , ( tv_interval $time_start , [ gettimeofday ] ) , " second(s)." ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+　$0 [dirname]
+   
+ 主要な機能:   
+  その下の階層たちに多数のファイルを持つディレクトリに対して、その構造を把握するためにつかう。
+  与えられたディレトリの下のディレクトリ全てに対して、それらを木構造と見なす。最初に与えた
+  ディリクトリはその木構造のルート(根)と見なす。探索したディレクトリをその木構造のノード(頂点)と見なす。
+  そして、下記の計算を反復する。
+    1. 最も深い(最も下にある)ディレクトリを最初に探し出す。
+    2. それに対応する頂点から根までの経路から、最も遠い頂点に相当するディレクトリを探し出す。
+    3. 既に探し出した全てのそれぞれの頂点から根までの経路から、同様に最も遠いものを探し出す。
+    4. 反復的に3.を必要な回数に達するまで繰り返す。
+ 補足: 探し出す頂点は、多数ある中から1つを選ぶが、等確率にランダムに選ぶ。
+ オプション: 
+    -. 0 : ピリオドでファイル名が始まる隠しファイルは探索しない。
+    -g N : 最大限N個を探し出すこととする。
+    -l N : 探索を続ける際に、遠さの最小限を設定する。
+    -s N : 乱数シードをNに設定する。
+    -d str : strの値により、出力するパスに現れる各ディレクトリに次の補助情報を括弧内に追加。
+     -d d : その下のディレクトリの個数を出力。
+     -d f : その下のディレクトリ以外のファイルの個数を出力。
+     -d s : その下のディレクトリにあるファイルのバイトサイズの合計を出力。
+     -d D : その上のディレクトリの直下にあるディレクトリの個数を出力。(兄弟ディレクトリに相当)
+     -d F : その上のディレクトリの直下にある、ディレクトリ以外のファイルの個数を出力。
+    -y N : Nの値により，出力するパスの部分的な強調のさせ方に関して下記の異なる動作をする。
+     -y 0 : 着色をしない。
+     -y 1 : 分岐の発生したディレクトリの1箇所のみを明るい色で強調する。(初期設定)
+     -y 2 : 分岐の発生したディレクトリ箇所から下も全て明るい色で強調する。
+    -x DIRNAME ; ディレクトリ名をオプション上で指定する
+    -L シンボリックリンクに関する処理 (辿るようにする)
+ 開発上のメモ
+    * 初期化時に、blessの前に、$x->{name}がうまくいかなかった。
+    * $first を $root から分ける必要があったのか
+    * given を使ったこと
+    * 具体的なファイル名 -f で。
+    *  (乱数の利用の最適か -- 比較せよ MSソフトで)
+    *  ( 最遠距離の等しいものが多数あるばあいに、出力優先順位を考えた方が良さそう。)
+    *  (ランダムになってない!?)
+    * -h Nを実装したい。
+    * -S で 直下にファイルがたった1個のディレクトリしかない場合に、縮めることをしようとしたが、厄介。
+    * 総ファイル数/総ディレクトリ数を出力したい。簡単にできる処理のはず。
+    * 分岐点から下のディレクトリ数またはファイル数を知りたい
+    * /Applicationの下の各アプリは、ディレクトリ構成にそれぞれ特徴がある。もつと調べてみたい。(特定のフレーズが現れる、分かり安くバージョン情報が現れるなど)
+    * inode でいろいろうまくやれないか
+    * 複数のディレクトリを引数に与えられ時の処理を加えたい。
+    * Ctrl+Cに対する処理を加えたい。
+    * Getopt::Longを使って --usage を使えるようにしたい。

@@ -1,0 +1,137 @@
+To support the Keysight 82357B USB-GPIB adapter for use with thw LinuxGpib Controller in this directory
+you can install LinuxGpib on Linux with something like this, tested on Ubuntu 22.10
+
+cd /working/directory
+wget --content-disposition --no-check-certificate https://sourceforge.net/projects/linux-gpib/files/latest/download
+tar xvfz linux-gpib-4.3.5.tar.gz 
+cd linux-gpib-4.3.5/
+tar xvf linux-gpib-kernel-4.3.5.tar.gz
+cd linux-gpib-kernel-4.3.5
+make
+sudo make install
+sudo modprobe gpib_common
+sudo modprobe agilent_82357a
+cd ..
+tar xvf linux-gpib-user-4.3.5.tar.gz
+./configure
+make
+sudo make install
+(configure /etc/gpib.conf, /etc/udev/rules.d/99-agilent_82357a.rules using examples below)
+(plug in Keysight 82357B, lights will flash a bit, then show one green 'READY'.
+  lsusb should show: something like:
+   Bus 001 Device 007: ID 0957:0718 Agilent Technologies, Inc. 82357B ()
+(ibtest should now work)
+cd language/perl
+perl Makefile.PL
+make
+sudo make install
+(can now load LinuxGpib in perl and use the LinuxGpib.pm Controller)
+
+See https://gist.github.com/turingbirds/6eb05c9267a6437183a9567700e8581a
+for more guidance, especially for older kernels
+
+/etc/gpib should look like:
+
+
+/***********************************************************************
+                 GPIB.CONF IEEE488 library config file
+                             -------------------
+
+   copyright            : (C) 2002 by Frank Mori Hess
+                          (C) 1994 by C.Schroeter
+   email                : fmhess@users.sourceforge.net
+ ***************************************************************************/
+/***************************************************************************
+ *    
+ *   Syntax:
+ *
+ *         interface { ... } starts new interface board section
+ *         device {...} device configuration
+ *
+ ***************************************************************************/
+
+/* This section configures the configurable driver characteristics
+ * for an interface board, such as board address, and interrupt level.
+ * minor = 0 configures /dev/gpib0, minor = 1 configures /dev/gpib1, etc.
+ */
+
+interface {
+	minor = 0	/* board index, minor = 0 uses /dev/gpib0, minor = 1 uses /dev/gpib1, etc. */
+	board_type = "agilent_82357a"	/* type of interface board being used */
+	name = "violet"	/* optional name, allows you to get a board descriptor using ibfind() */
+	pad = 0	/* primary address of interface             */
+	sad = 0	/* secondary address of interface           */
+	timeout = T3s	/* timeout for commands */
+
+	eos = 0x0a	/* EOS Byte, 0xa is newline and 0xd is carriage return */
+	set-reos = yes	/* Terminate read if EOS */
+	set-bin = no	/* Compare EOS 8-bit */
+	set-xeos = no	/* Assert EOI whenever EOS byte is sent */
+	set-eot = yes	/* Assert EOI with last byte on writes */
+
+/* settings for boards that lack plug-n-play capability */
+	base = 0	/* Base io ADDRESS                  */
+	irq  = 0	/* Interrupt request level */
+	dma  = 0	/* DMA channel (zero disables)      */
+
+/* pci_bus and pci_slot can be used to distinguish two pci boards supported by the same driver */
+/*	pci_bus = 0 */
+/*	pci_slot = 7 */
+
+	master = yes	/* interface board is system controller */
+}
+
+
+/* Now the device sections define the device characteristics for each device.
+ * These are only used if you want to open the device using ibfind() (instead
+ * of ibdev() )
+ */
+
+device {
+	minor = 0	/* minor number for interface board this device is connected to */
+	name = "sme03"	/* device mnemonic */
+	pad = 28	/* The Primary Address */
+	sad = 0	/* Secondary Address */
+
+	eos = 0xa	/* EOS Byte */
+	set-reos = no /* Terminate read if EOS */
+	set-bin = no /* Compare EOS 8-bit */
+}
+
+device {
+	minor = 0
+	name = "scope"
+	pad = 8
+	sad = 0
+}
+
+device {
+        minor = 0
+        name = "PFG5105"
+        pad = 4
+        sad = 0
+}
+
+
+
+To automatically install the firmware,
+/etc/udev/rules.d/99-agilent_82357a.rules should look like
+
+#82357a without firmware
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0957", ATTR{idProduct}=="0007", ENV{DEVICE}="$devnode", RUN+="/usr/local/lib/udev/gpib_udev_fxloader"
+#82357b without firmware
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0957", ATTR{idProduct}=="0518", ENV{DEVICE}="$devnode", RUN+="/usr/local/lib/udev/gpib_udev_fxloader"
+
+#automatically set the correct --board-type option
+ACTION=="add|change", SUBSYSTEM=="usb", DRIVER=="agilent_82357a_gpib", ATTRS{serial}=="*", ENV{GPIB_CONFIG_OPTIONS}+="--board-type agilent_82357a", ENV{SERIAL}="$attr{serial}"
+
+#82357a with firmware
+ACTION=="add|change", SUBSYSTEM=="usb", DRIVER=="agilent_82357a_gpib", ATTRS{idVendor}=="0957", ATTRS{idProduct}=="0107", RUN+="/usr/local/lib/udev/gpib_udev_config"
+#82357b with firmware
+ACTION=="add|change", SUBSYSTEM=="usb", DRIVER=="agilent_82357a_gpib", ATTRS{idVendor}=="0957", ATTRS{idProduct}=="0718", RUN+="/usr/local/lib/udev/gpib_udev_config"
+
+#this rule generates new "change" udev events for devices supported by the 
+#driver after the module is loaded.
+#it is needed because if the driver is not already loaded when the hardware is plugged in,
+#then the initial hardware "add" event will not be able to accomplish anything.
+SUBSYSTEM=="module", ACTION=="add", DEVPATH=="/module/agilent_82357a", RUN+="/usr/local/lib/udev/gpib_udevadm_wrapper trigger --property-match DRIVER=agilent_82357a_gpib"

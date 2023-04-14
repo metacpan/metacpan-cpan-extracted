@@ -1,5 +1,9 @@
 Revision history for CtrlO::PDF
 
+0.31 Wed Apr 5 2023
+
+    * Start new page if not enough space for initial text
+
 0.30 Mon Jan 20 2023
 
     * Remove support for PDF::API2, greatly simplifying the code

@@ -2,7 +2,8 @@
 
 use Test2::V0;
 
-use aliased 'CXC::Number::Sequence::Fixed' => 'Sequence';
+use CXC::Number::Sequence::Fixed;
+use constant Sequence => 'CXC::Number::Sequence::Fixed';
 
 my %exp = ( elements => [ 0.5, 1.3, 2.1, 2.9, 3.7, 4.5, 5.3, 6.1, 6.9, 7.7 ], );
 

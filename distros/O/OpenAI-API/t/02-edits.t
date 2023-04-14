@@ -11,7 +11,7 @@ if ( !$ENV{OPENAI_API_KEY} ) {
     plan skip_all => 'This test requires an OPENAI_API_KEY environment variable';
 }
 
-plan skip_all => 'edits endpoint is broken';
+#plan skip_all => 'edits endpoint is broken';
 
 my $openai = OpenAI::API->new();
 

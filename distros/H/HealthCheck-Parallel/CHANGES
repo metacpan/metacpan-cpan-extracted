@@ -1,0 +1,14 @@
+Changelog for HealthCheck-Parallel
+
+v0.0.2 2023-03-28T15:40:10
+ - No changes found
+
+v0.0.1 2023-03-27T18:38:10
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #1: SM-4101 (Mitch McCracken)
+ - POD Abstract wording fix (Andrew Hewus Fresh)
+ - Add tests (Mitch McCracken)
+ - cpanfile dependencies (Mitch McCracken)
+ - New HealthCheck::Parallel library (Mitch McCracken)
+ - Create distribution files (Mitch McCracken)
+ - Initial Commit (Mitch McCracken)

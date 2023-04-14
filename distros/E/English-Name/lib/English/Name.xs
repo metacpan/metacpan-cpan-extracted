@@ -70,7 +70,7 @@ static I32 hash_name_filter(pTHX_ IV action, SV* value) {
 		for (i = 0; i < sizeof aliases / sizeof *aliases; ++i) {
 			if (aliases[i].key.length == len && strEQ(aliases[i].key.pointer, name)) {
 				if (aliases[i].autovivify && !hv_exists_no_uvar(PL_defstash, aliases[i].key.pointer, aliases[i].key.length))
-					gv_fetchpvn(aliases[i].value.pointer, aliases[i].value.length, GV_ADD, SVt_PV);
+					gv_fetchpvn_flags(aliases[i].value.pointer, aliases[i].value.length, GV_ADD, SVt_PV);
 				magic->mg_obj = newSVpvn(aliases[i].value.pointer, aliases[i].value.length);
 				return 0;
 			}

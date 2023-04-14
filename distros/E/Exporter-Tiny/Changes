@@ -2,9 +2,19 @@ Exporter-Tiny
 =============
 
 Created:      2013-09-05
+Home page:    <https://exportertiny.github.io/>
 Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+1.006002	2023-03-31
+
+ [ Documentation ]
+ - Link to Exporter::Almighty in pod.
+ - Update copyright dates.
+
+ [ Packaging ]
+ - Set homepage in metadata to https://exportertiny.github.io.
 
 1.006001	2023-03-24
 

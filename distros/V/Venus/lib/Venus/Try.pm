@@ -40,6 +40,14 @@ sub build_self {
 
 # METHODS
 
+sub any {
+  my ($self) = @_;
+
+  $self->on_default(sub{(@_)});
+
+  return $self;
+}
+
 sub call {
   my ($self, $callback) = @_;
 
@@ -81,6 +89,8 @@ sub callback {
 sub catch {
   my ($self, $package, $callback) = @_;
 
+  $callback ||= sub{(@_)};
+
   push @{$self->on_catch}, [$package, $self->callback($callback)];
 
   return $self;
@@ -97,7 +107,12 @@ sub default {
 sub error {
   my ($self, $variable) = @_;
 
-  $self->on_default(sub{($$variable) = @_}) if $variable;
+  if ($variable) {
+    $self->on_default(sub{($$variable) = @_})
+  }
+  else {
+    $self->catch('Venus::Error');
+  }
 
   return $self;
 }
@@ -125,7 +140,7 @@ sub finally {
 sub maybe {
   my ($self) = @_;
 
-  $self->on_default(sub{''});
+  $self->on_default(sub{(undef)});
 
   return $self;
 }
@@ -362,6 +377,57 @@ This package provides the following methods:
 
 =cut
 
+=head2 any
+
+  any() (Try)
+
+The any method registers a default C<catch> condition that returns whatever
+value was encoutered on error and returns it as a result.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item any example 1
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    die 'Oops!';
+  });
+
+  my $any = $try->any;
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=over 4
+
+=item any example 2
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    die $try;
+  });
+
+  my $any = $try->any;
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=cut
+
 =head2 call
 
   call(Str | CodeRef $method) (Try)
@@ -482,7 +548,8 @@ I<Since C<0.01>>
 
 The catch method takes a package or ref name, and when triggered checks whether
 the captured exception is of the type specified and if so executes the given
-callback.
+callback. If no callback is provided the exception is captured in a L</default>
+operation and returned as a result.
 
 I<Since C<0.01>>
 
@@ -507,6 +574,52 @@ I<Since C<0.01>>
 
     return [@args];
   });
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=over 4
+
+=item catch example 2
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    my (@args) = @_;
+
+    $try->throw->error;
+  });
+
+  my $catch = $try->catch('Venus::Try::Error', sub {
+
+    return (@_);
+  });
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=over 4
+
+=item catch example 3
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+
+    $try->throw->error;
+  });
+
+  my $catch = $try->catch('Venus::Try::Error');
 
   # bless({ on_catch => ... }, "Venus::Try")
 
@@ -556,7 +669,8 @@ I<Since C<0.01>>
   error(Ref $variable) (Try)
 
 The error method takes a scalar reference and assigns any uncaught exceptions
-to it during execution.
+to it during execution. If no variable is provided a L</catch> operation will
+be registered to capture all L<Venus::Error> exceptions.
 
 I<Since C<0.01>>
 
@@ -577,6 +691,28 @@ I<Since C<0.01>>
   });
 
   my $error = $try->error(\my $object);
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=over 4
+
+=item error example 2
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    my (@args) = @_;
+
+    $try->throw->error;
+  });
+
+  my $error = $try->error;
 
   # bless({ on_catch => ... }, "Venus::Try")
 
@@ -681,7 +817,7 @@ I<Since C<0.01>>
   maybe() (Try)
 
 The maybe method registers a default C<catch> condition that returns falsy,
-i.e. an empty string, if an exception is encountered.
+i.e. an undefined value, if an exception is encountered.
 
 I<Since C<0.01>>
 

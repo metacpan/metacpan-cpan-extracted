@@ -13,7 +13,7 @@ with 'Venus::Role::Optional';
 
 # VERSION
 
-our $VERSION = '1.17';
+our $VERSION = '1.19';
 
 # AUTHORITY
 
@@ -61,7 +61,7 @@ sub build_proxy {
 
   return sub { $self->caches->get($method) } if $self->caches->exists($method);
 
-  return unless my $source = $self->sources($method)->random;
+  return if !(my $source = $self->sources($method)->random);
 
   return sub { $source->build(faker => $self)->execute(@args) };
 }
@@ -137,7 +137,7 @@ Extensible Fake Data Generator
 
 =head1 VERSION
 
-1.17
+1.19
 
 =cut
 
@@ -2912,5 +2912,14 @@ B<example 1>
 =head1 AUTHORS
 
 Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

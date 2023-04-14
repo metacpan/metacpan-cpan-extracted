@@ -1,12 +1,12 @@
 {
-   "abstract" : "Google/RE2 Resource",
+   "abstract" : "The Resource of Google/RE2",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9692"
+            "SPVM" : "0.9701"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9692"
+            "SPVM" : "0.9701"
          }
       }
    },
@@ -44,6 +44,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Resource-RE2"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

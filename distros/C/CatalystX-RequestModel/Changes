@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension CatalystX-RequestModel.
 
+0.014 - 08 April 2023
+  - Added BodyModel as an alias to RequestModel and noted in the docs that
+    its prefered going forward
+
 0.013 - 26 March 2023
   - Fixed minor issue with noisy error if doing a form upload to a request model
     that didn't support it.

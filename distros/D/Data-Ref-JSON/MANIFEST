@@ -1,0 +1,20 @@
+MANIFEST
+README.md
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Data/Ref/JSON.pm
+t/001_load.t
+drj.pl
+dro.pl
+drp.pl
+test-files/README.md
+test-files/adobe-example-5.json
+test-files/tc01.pl
+test-files/tc02.pl
+test-files/tc03.pl
+MYMETA.yml
+MYMETA.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

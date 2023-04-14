@@ -200,6 +200,10 @@ lib/SPVM/Sys/Time/Timezone.c
 lib/SPVM/Sys/Time/Timezone.config
 lib/SPVM/Sys/Time/Timezone.pm
 lib/SPVM/Sys/Time/Timezone.spvm
+lib/SPVM/Sys/Time/Tm.c
+lib/SPVM/Sys/Time/Tm.config
+lib/SPVM/Sys/Time/Tm.pm
+lib/SPVM/Sys/Time/Tm.spvm
 lib/SPVM/Sys/Time/Tms.c
 lib/SPVM/Sys/Time/Tms.config
 lib/SPVM/Sys/Time/Tms.pm
@@ -216,6 +220,7 @@ lib/SPVM/Sys/User/Passwd.c
 lib/SPVM/Sys/User/Passwd.config
 lib/SPVM/Sys/User/Passwd.pm
 lib/SPVM/Sys/User/Passwd.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

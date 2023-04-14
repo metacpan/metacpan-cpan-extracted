@@ -51,4 +51,10 @@ ok(Catmandu::Importer::PICA->new(file => "./t/files/ppxml.xml", type=> "PicaPlus
 is 'HASH', ref $records[0], 'unbless PICA::Data';
 is 'ARRAY', ref $records[0]->{record}[0], 'unbless PICA::Data::Field';
 
+my %levels = (0 => 1, 1 => 56, 2 => 353);
+while (my ($level, $count) = each %levels) {
+  $importer = Catmandu::Importer::PICA->new(file => "./t/files/bgb.pp", type => "plain", level => $level);
+  is $importer->count, $count, "level=$level";
+}
+
 done_testing;

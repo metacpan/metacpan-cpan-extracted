@@ -3,18 +3,33 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
-#define PERL_DECIMAL_VERSION \
-	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
-#define PERL_VERSION_GE(r,v,s) \
-	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#define Q_PERL_VERSION_DECIMAL(r,v,s) ((r)*1000000 + (v)*1000 + (s))
+#define Q_PERL_DECIMAL_VERSION \
+	Q_PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define Q_PERL_VERSION_GE(r,v,s) \
+	(Q_PERL_DECIMAL_VERSION >= Q_PERL_VERSION_DECIMAL(r,v,s))
+#define Q_PERL_VERSION_LT(r,v,s) \
+	(Q_PERL_DECIMAL_VERSION < Q_PERL_VERSION_DECIMAL(r,v,s))
+
+#if (Q_PERL_VERSION_GE(5,17,6) && Q_PERL_VERSION_LT(5,17,11)) || \
+	(Q_PERL_VERSION_GE(5,19,3) && Q_PERL_VERSION_LT(5,21,1))
+PERL_STATIC_INLINE void suppress_unused_warning(void)
+{
+	(void) S_croak_memory_wrap;
+}
+#endif /* (>=5.17.6 && <5.17.11) || (>=5.19.3 && <5.21.1) */
+
+#if Q_PERL_VERSION_LT(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
 
 #ifndef cBOOL
 # define cBOOL(x) ((bool)!!(x))
 #endif /* !cBOOL */
 
 #ifndef newSVpvs
-# define newSVpvs(s) newSVpvn(""s"", (sizeof(""s"")-1))
+# define newSVpvs(s) newSVpvn("" s "", (sizeof("" s "")-1))
 #endif /* !newSVpvs */
 
 #ifndef OpMORESIB_set
@@ -27,36 +42,44 @@
 # define OpSIBLING(o) (0 + (o)->op_sibling)
 #endif /* !OpSIBLING */
 
-#define QPFX xAd8NP3gxZglovQRL5Hn_
-#define QPFXS STRINGIFY(QPFX)
-#define QCONCAT0(a,b) a##b
-#define QCONCAT1(a,b) QCONCAT0(a,b)
-#define QPFXD(name) QCONCAT1(QPFX, name)
+#if Q_PERL_VERSION_GE(5,7,3)
+# define PERL_UNUSED_THX() NOOP
+#else /* <5.7.3 */
+# define PERL_UNUSED_THX() ((void)(aTHX+0))
+#endif /* <5.7.3 */
 
-#if defined(WIN32) && PERL_VERSION_GE(5,13,6)
-# define MY_BASE_CALLCONV EXTERN_C
-# define MY_BASE_CALLCONV_S "EXTERN_C"
+#define Q_PFX xAd8NP3gxZglovQRL5Hn_
+#define Q_PFXS STRINGIFY(Q_PFX)
+#define Q_CONCAT0(a,b) a##b
+#define Q_CONCAT1(a,b) Q_CONCAT0(a,b)
+#define Q_PFXD(name) Q_CONCAT1(Q_PFX, name)
+
+#if defined(WIN32) && Q_PERL_VERSION_GE(5,13,6)
+# define Q_BASE_CALLCONV EXTERN_C
+# define Q_BASE_CALLCONV_S "EXTERN_C"
 #else /* !(WIN32 && >= 5.13.6) */
-# define MY_BASE_CALLCONV PERL_CALLCONV
-# define MY_BASE_CALLCONV_S "PERL_CALLCONV"
+# define Q_BASE_CALLCONV PERL_CALLCONV
+# define Q_BASE_CALLCONV_S "PERL_CALLCONV"
 #endif /* !(WIN32 && >= 5.13.6) */
 
-#define MY_EXPORT_CALLCONV MY_BASE_CALLCONV
+#define Q_EXPORT_CALLCONV Q_BASE_CALLCONV
 
 #if defined(WIN32) || defined(__CYGWIN__)
-# define MY_IMPORT_CALLCONV_S MY_BASE_CALLCONV_S" __declspec(dllimport)"
+# define Q_IMPORT_CALLCONV_S Q_BASE_CALLCONV_S " __declspec(dllimport)"
 #else
-# define MY_IMPORT_CALLCONV_S MY_BASE_CALLCONV_S
+# define Q_IMPORT_CALLCONV_S Q_BASE_CALLCONV_S
 #endif
 
 #ifndef rv2cv_op_cv
 
+# define Q_RV2CV_CONST_REF_RESOLVES Q_PERL_VERSION_GE(5,11,2)
+
 # define RV2CVOPCV_MARK_EARLY     0x00000001
 # define RV2CVOPCV_RETURN_NAME_GV 0x00000002
 
-# define Perl_rv2cv_op_cv QPFXD(roc0)
+# define Perl_rv2cv_op_cv Q_PFXD(roc0)
 # define rv2cv_op_cv(cvop, flags) Perl_rv2cv_op_cv(aTHX_ cvop, flags)
-MY_EXPORT_CALLCONV CV *QPFXD(roc0)(pTHX_ OP *cvop, U32 flags)
+Q_EXPORT_CALLCONV CV *Q_PFXD(roc0)(pTHX_ OP *cvop, U32 flags)
 {
 	OP *rvop;
 	CV *cv;
@@ -76,14 +99,14 @@ MY_EXPORT_CALLCONV CV *QPFXD(roc0)(pTHX_ OP *cvop, U32 flags)
 				return NULL;
 			}
 		} break;
-#if PERL_VERSION_GE(5,11,2)
+# if Q_RV2CV_CONST_REF_RESOLVES
 		case OP_CONST: {
 			SV *rv = cSVOPx_sv(rvop);
 			if(!SvROK(rv)) return NULL;
 			cv = (CV*)SvRV(rv);
 			gv = NULL;
 		} break;
-#endif /* >=5.11.2 */
+# endif /* Q_RV2CV_CONST_REF_RESOLVES */
 		default: {
 			return NULL;
 		} break;
@@ -125,6 +148,7 @@ static SV *THX_newSV_type(pTHX_ svtype type)
 static OP *THX_entersub_extract_args(pTHX_ OP *entersubop)
 {
 	OP *pushop, *aop, *bop, *cop;
+	PERL_UNUSED_THX();
 	if(!(entersubop->op_flags & OPf_KIDS)) return NULL;
 	pushop = cUNOPx(entersubop)->op_first;
 	if(!OpHAS_SIBLING(pushop)) {
@@ -177,17 +201,17 @@ static OP *THX_ck_entersub_args_stalk(pTHX_ OP *entersubop, OP *stalkcvop)
 	return entersubop;
 }
 
-# define Perl_ck_entersub_args_list QPFXD(eal0)
+# define Perl_ck_entersub_args_list Q_PFXD(eal0)
 # define ck_entersub_args_list(o) Perl_ck_entersub_args_list(aTHX_ o)
-MY_EXPORT_CALLCONV OP *QPFXD(eal0)(pTHX_ OP *entersubop)
+Q_EXPORT_CALLCONV OP *Q_PFXD(eal0)(pTHX_ OP *entersubop)
 {
 	return ck_entersub_args_stalk(entersubop, newOP(OP_PADANY, 0));
 }
 
-# define Perl_ck_entersub_args_proto QPFXD(eap0)
+# define Perl_ck_entersub_args_proto Q_PFXD(eap0)
 # define ck_entersub_args_proto(o, gv, sv) \
 	Perl_ck_entersub_args_proto(aTHX_ o, gv, sv)
-MY_EXPORT_CALLCONV OP *QPFXD(eap0)(pTHX_ OP *entersubop, GV *namegv,
+Q_EXPORT_CALLCONV OP *Q_PFXD(eap0)(pTHX_ OP *entersubop, GV *namegv,
 	SV *protosv)
 {
 	const char *proto;
@@ -206,10 +230,10 @@ MY_EXPORT_CALLCONV OP *QPFXD(eap0)(pTHX_ OP *entersubop, GV *namegv,
 	return ck_entersub_args_stalk(entersubop, newGVOP(OP_GV, 0, stalkgv));
 }
 
-# define Perl_ck_entersub_args_proto_or_list QPFXD(ean0)
+# define Perl_ck_entersub_args_proto_or_list Q_PFXD(ean0)
 # define ck_entersub_args_proto_or_list(o, gv, sv) \
 	Perl_ck_entersub_args_proto_or_list(aTHX_ o, gv, sv)
-MY_EXPORT_CALLCONV OP *QPFXD(ean0)(pTHX_ OP *entersubop, GV *namegv,
+Q_EXPORT_CALLCONV OP *Q_PFXD(ean0)(pTHX_ OP *entersubop, GV *namegv,
 	SV *protosv)
 {
 	if(SvTYPE(protosv) == SVt_PVCV ? SvPOK(protosv) : SvOK(protosv))
@@ -244,6 +268,7 @@ MY_EXPORT_CALLCONV OP *QPFXD(ean0)(pTHX_ OP *entersubop, GV *namegv,
 #  define op_null(o) THX_op_null(aTHX_ o)
 static void THX_op_null(pTHX_ OP *o)
 {
+	PERL_UNUSED_THX();
 	if(o->op_type == OP_NULL) return;
 	/* must not be used on any op requiring non-trivial clearing */
 	o->op_targ = o->op_type;
@@ -257,6 +282,7 @@ static void THX_op_null(pTHX_ OP *o)
 static MAGIC *THX_mg_findext(pTHX_ SV *sv, int type, MGVTBL const *vtbl)
 {
 	MAGIC *mg;
+	PERL_UNUSED_THX();
 	if(sv)
 		for(mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic)
 			if(mg->mg_type == type && mg->mg_virtual == vtbl)
@@ -325,11 +351,11 @@ static MAGIC *THX_sv_magicext(pTHX_ SV *sv, SV *obj, int type,
 #  define PERL_MAGIC_ext '~'
 # endif /* !PERL_MAGIC_ext */
 
-# if !PERL_VERSION_GE(5,9,3)
+# if Q_PERL_VERSION_LT(5,9,3)
 typedef OP *(*Perl_check_t)(pTHX_ OP *);
 # endif /* <5.9.3 */
 
-# if !PERL_VERSION_GE(5,10,1)
+# if Q_PERL_VERSION_LT(5,10,1)
 typedef unsigned Optype;
 # endif /* <5.10.1 */
 
@@ -338,6 +364,7 @@ typedef unsigned Optype;
 static void THX_wrap_op_checker(pTHX_ Optype opcode,
 	Perl_check_t new_checker, Perl_check_t *old_checker_p)
 {
+	PERL_UNUSED_THX();
 	if(*old_checker_p) return;
 	OP_REFCNT_LOCK;
 	if(!*old_checker_p) {
@@ -348,18 +375,19 @@ static void THX_wrap_op_checker(pTHX_ Optype opcode,
 }
 # endif /* !wrap_op_checker */
 
-static MGVTBL mgvtbl_checkcall;
+static MGVTBL const mgvtbl_checkcall;
 
 typedef OP *(*Perl_call_checker)(pTHX_ OP *, GV *, SV *);
 
-# define Perl_cv_get_call_checker QPFXD(gcc0)
+# define Perl_cv_get_call_checker Q_PFXD(gcc0)
 # define cv_get_call_checker(cv, THX_ckfun_p, ckobj_p) \
 	Perl_cv_get_call_checker(aTHX_ cv, THX_ckfun_p, ckobj_p)
-MY_EXPORT_CALLCONV void QPFXD(gcc0)(pTHX_ CV *cv,
+Q_EXPORT_CALLCONV void Q_PFXD(gcc0)(pTHX_ CV *cv,
 	Perl_call_checker *THX_ckfun_p, SV **ckobj_p)
 {
 	MAGIC *callmg = SvMAGICAL((SV*)cv) ?
-		mg_findext((SV*)cv, PERL_MAGIC_ext, &mgvtbl_checkcall) : NULL;
+		mg_findext((SV*)cv, PERL_MAGIC_ext, (MGVTBL*)&mgvtbl_checkcall)
+		: NULL;
 	if(callmg) {
 		*THX_ckfun_p = DPTR2FPTR(Perl_call_checker, callmg->mg_ptr);
 		*ckobj_p = callmg->mg_obj;
@@ -369,23 +397,24 @@ MY_EXPORT_CALLCONV void QPFXD(gcc0)(pTHX_ CV *cv,
 	}
 }
 
-# define Perl_cv_set_call_checker QPFXD(scc0)
+# define Perl_cv_set_call_checker Q_PFXD(scc0)
 # define cv_set_call_checker(cv, THX_ckfun, ckobj) \
 	Perl_cv_set_call_checker(aTHX_ cv, THX_ckfun, ckobj)
-MY_EXPORT_CALLCONV void QPFXD(scc0)(pTHX_ CV *cv,
+Q_EXPORT_CALLCONV void Q_PFXD(scc0)(pTHX_ CV *cv,
 	Perl_call_checker THX_ckfun, SV *ckobj)
 {
 	if(THX_ckfun == Perl_ck_entersub_args_proto_or_list &&
 			ckobj == (SV*)cv) {
 		if(SvMAGICAL((SV*)cv))
 			sv_unmagicext((SV*)cv, PERL_MAGIC_ext,
-				&mgvtbl_checkcall);
+				(MGVTBL*)&mgvtbl_checkcall);
 	} else {
-		MAGIC *callmg =
-			mg_findext((SV*)cv, PERL_MAGIC_ext, &mgvtbl_checkcall);
+		MAGIC *callmg = mg_findext((SV*)cv, PERL_MAGIC_ext,
+					(MGVTBL*)&mgvtbl_checkcall);
 		if(!callmg)
 			callmg = sv_magicext((SV*)cv, &PL_sv_undef,
-				PERL_MAGIC_ext, &mgvtbl_checkcall, NULL, 0);
+					PERL_MAGIC_ext,
+					(MGVTBL*)&mgvtbl_checkcall, NULL, 0);
 		if(callmg->mg_flags & MGf_REFCOUNTED) {
 			SvREFCNT_dec(callmg->mg_obj);
 			callmg->mg_flags &= ~MGf_REFCOUNTED;
@@ -443,50 +472,66 @@ BOOT:
 SV *
 callchecker0_h()
 CODE:
+#if PERL_VERSION & 1
+# define Q_CODE_PERL_SUBVERSION_CRITERION \
+	" && PERL_SUBVERSION == " STRINGIFY(PERL_SUBVERSION)
+# define Q_TEXT_PERL_SUBVERSION_CRITERION "." STRINGIFY(PERL_SUBVERSION)
+#else /* !(PERL_VERSION & 1) */
+# define Q_CODE_PERL_SUBVERSION_CRITERION ""
+# define Q_TEXT_PERL_SUBVERSION_CRITERION ""
+#endif /* !(PERL_VERSION & 1) */
+#define Q_DEFFN(RETTYPE, PUBNAME, PRIVNAME, ARGTYPES, ARGNAMES) \
+	Q_IMPORT_CALLCONV_S " " RETTYPE " " \
+		Q_PFXS PRIVNAME "(pTHX_ " ARGTYPES ");\n" \
+	"#define Perl_" PUBNAME " " Q_PFXS PRIVNAME "\n" \
+	"#define " PUBNAME "(" ARGNAMES ") " \
+		"Perl_" PUBNAME "(aTHX_ " ARGNAMES ")\n"
+#if Q_PROVIDE_RV2CV_OP_CV
+# define Q_CODE_PROVIDE_RV2CV_OP_CV \
+	"#define RV2CVOPCV_MARK_EARLY     0x00000001\n" \
+	"#define RV2CVOPCV_RETURN_NAME_GV 0x00000002\n" \
+	Q_DEFFN("CV *", "rv2cv_op_cv", "roc0", "OP *, U32", "cvop, flags")
+#else /* !Q_PROVIDE_RV2CV_OP_CV */
+# define Q_CODE_PROVIDE_RV2CV_OP_CV ""
+#endif /* !Q_PROVIDE_RV2CV_OP_CV */
+#if Q_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST
+# define Q_CODE_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST \
+	Q_DEFFN("OP *", "ck_entersub_args_list", "eal0", "OP *", "o") \
+	Q_DEFFN("OP *", "ck_entersub_args_proto", "eap0", \
+		"OP *, GV *, SV *", "o, gv, sv") \
+	Q_DEFFN("OP *", "ck_entersub_args_proto_or_list", "ean0", \
+		"OP *, GV *, SV *", "o, gv, sv")
+#else /* !Q_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST */
+# define Q_CODE_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST ""
+#endif /* !Q_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST */
+#if Q_PROVIDE_CV_SET_CALL_CHECKER
+# define Q_CODE_PROVIDE_CV_SET_CALL_CHECKER \
+	"typedef OP *(*Perl_call_checker)(pTHX_ OP *, GV *, SV *);\n" \
+	Q_DEFFN("void", "cv_get_call_checker", "gcc0", \
+		"CV *, Perl_call_checker *, SV **", "cv, fp, op") \
+	Q_DEFFN("void", "cv_set_call_checker", "scc0", \
+		"CV *, Perl_call_checker, SV *", "cv, f, o")
+#else /* !Q_PROVIDE_CV_SET_CALL_CHECKER */
+# define Q_CODE_PROVIDE_CV_SET_CALL_CHECKER ""
+#endif /* !Q_PROVIDE_CV_SET_CALL_CHECKER */
 	RETVAL = newSVpvs(
 		"/* DO NOT EDIT -- generated "
-			"by Devel::CallChecker version "XS_VERSION" */\n"
-		"#ifndef "QPFXS"INCLUDED\n"
-		"#define "QPFXS"INCLUDED 1\n"
+			"by Devel::CallChecker version " XS_VERSION " */\n"
+		"#ifndef " Q_PFXS "INCLUDED\n"
+		"#define " Q_PFXS "INCLUDED 1\n"
 		"#ifndef PERL_VERSION\n"
 		" #error you must include perl.h before callchecker0.h\n"
-		"#elif !(PERL_REVISION == "STRINGIFY(PERL_REVISION)
-			" && PERL_VERSION == "STRINGIFY(PERL_VERSION)
-#if PERL_VERSION & 1
-			" && PERL_SUBVERSION == "STRINGIFY(PERL_SUBVERSION)
-#endif /* PERL_VERSION & 1 */
-			")\n"
+		"#elif !(PERL_REVISION == " STRINGIFY(PERL_REVISION)
+			" && PERL_VERSION == " STRINGIFY(PERL_VERSION)
+			Q_CODE_PERL_SUBVERSION_CRITERION ")\n"
 		" #error this callchecker0.h is for Perl "
-			STRINGIFY(PERL_REVISION)"."STRINGIFY(PERL_VERSION)
-#if PERL_VERSION & 1
-			"."STRINGIFY(PERL_SUBVERSION)
-#endif /* PERL_VERSION & 1 */
-			" only\n"
+			STRINGIFY(PERL_REVISION) "." STRINGIFY(PERL_VERSION)
+			Q_TEXT_PERL_SUBVERSION_CRITERION " only\n"
 		"#endif /* Perl version mismatch */\n"
-#define DEFFN(RETTYPE, PUBNAME, PRIVNAME, ARGTYPES, ARGNAMES) \
-	MY_IMPORT_CALLCONV_S" "RETTYPE" "QPFXS PRIVNAME"(pTHX_ "ARGTYPES");\n" \
-	"#define Perl_"PUBNAME" "QPFXS PRIVNAME"\n" \
-	"#define "PUBNAME"("ARGNAMES") Perl_"PUBNAME"(aTHX_ "ARGNAMES")\n"
-#if Q_PROVIDE_RV2CV_OP_CV
-		"#define RV2CVOPCV_MARK_EARLY     0x00000001\n"
-		"#define RV2CVOPCV_RETURN_NAME_GV 0x00000002\n"
-		DEFFN("CV *", "rv2cv_op_cv", "roc0", "OP *, U32", "cvop, flags")
-#endif /* Q_PROVIDE_RV2CV_OP_CV */
-#if Q_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST
-		DEFFN("OP *", "ck_entersub_args_list", "eal0", "OP *", "o")
-		DEFFN("OP *", "ck_entersub_args_proto", "eap0",
-			"OP *, GV *, SV *", "o, gv, sv")
-		DEFFN("OP *", "ck_entersub_args_proto_or_list", "ean0",
-			"OP *, GV *, SV *", "o, gv, sv")
-#endif /* Q_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST */
-#if Q_PROVIDE_CV_SET_CALL_CHECKER
-		"typedef OP *(*Perl_call_checker)(pTHX_ OP *, GV *, SV *);\n"
-		DEFFN("void", "cv_get_call_checker", "gcc0",
-			"CV *, Perl_call_checker *, SV **", "cv, fp, op")
-		DEFFN("void", "cv_set_call_checker", "scc0",
-			"CV *, Perl_call_checker, SV *", "cv, f, o")
-#endif /* Q_PROVIDE_CV_SET_CALL_CHECKER */
-		"#endif /* !"QPFXS"INCLUDED */\n"
+		Q_CODE_PROVIDE_RV2CV_OP_CV
+		Q_CODE_PROVIDE_CK_ENTERSUB_ARGS_PROTO_OR_LIST
+		Q_CODE_PROVIDE_CV_SET_CALL_CHECKER
+		"#endif /* !" Q_PFXS "INCLUDED */\n"
 	);
 OUTPUT:
 	RETVAL

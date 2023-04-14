@@ -40,13 +40,13 @@ if ($meta) {
 # http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.9692',
+  'SPVM' => '0.9701',
   'SPVM::Resource::SocketUtil' => '0.02',
 );
 WriteMakefile(
   NAME              => 'SPVM::Sys',
   VERSION_FROM      => 'lib/SPVM/Sys.pm',
-  LICENSE           => 'perl_5',
+  LICENSE           => 'mit',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Sys.pm',
      AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
@@ -113,6 +113,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Timespec');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Timezone');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Itimerval');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Tm');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Tms');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Select');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Select::Fd_set');

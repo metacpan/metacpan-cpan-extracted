@@ -5,10 +5,10 @@ use warnings;
 
 use App::Pod::Example;
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 # Run.
-App::Pod::Example->new->run;
+exit App::Pod::Example->new->run;
 
 # Print version.
 sub VERSION_MESSAGE {
@@ -95,12 +95,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2021 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

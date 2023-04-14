@@ -8,7 +8,7 @@ use Error::Pure::Utils qw(err_helper);
 use List::Util qw(none);
 use Readonly;
 
-our $VERSION = 0.30;
+our $VERSION = 0.31;
 
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
@@ -172,12 +172,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2008-2022 Michal Josef Špaček
+© 2008-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.30
+0.31
 
 =cut

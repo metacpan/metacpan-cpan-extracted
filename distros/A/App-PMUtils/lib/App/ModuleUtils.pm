@@ -3,9 +3,9 @@
 package App::ModuleUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-28'; # DATE
+our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.742'; # VERSION
+our $VERSION = '0.743'; # VERSION
 
 1;
 # ABSTRACT: Alias for App::PMUtils
@@ -22,7 +22,7 @@ App::ModuleUtils - Alias for App::PMUtils
 
 =head1 VERSION
 
-This document describes version 0.742 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2022-09-28.
+This document describes version 0.743 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2023-01-28.
 
 =head1 HOMEPAGE
 
@@ -60,7 +60,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

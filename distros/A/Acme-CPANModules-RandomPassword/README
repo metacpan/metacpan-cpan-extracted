@@ -1,21 +1,22 @@
 NAME
-    Acme::CPANModules::RandomPassword - Generating random passwords
+    Acme::CPANModules::RandomPassword - List of modules for generating
+    random passwords
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::RandomPassword (from Perl distribution
-    Acme-CPANModules-RandomPassword), released on 2021-05-26.
+    Acme-CPANModules-RandomPassword), released on 2023-04-10.
 
 DESCRIPTION
-    Generating
-
     App::genpw can generate passwords with patterns and wordlists. It loads
     secure random number generator if available. By default it generates
     12-20 character-long passwords comprising of ASCII letters and digits.
     There are several variants which are basically wrappers for convenience:
     App::genpw::base64, App::genpw::base58, App::genpw::base56,
     App::genpw::wordlist (use words from wordlists), App::genpw::ind (use
-    Indonesian words).
+    Indonesian words). The module will use "rand()" from
+    "Data::Entropy::Algorithms" if the module is available, for stronger
+    random number generation.
 
     Crypt::GeneratePassword creates secure random pronounceable passwords.
     It provides function "word()" which generates a sequence of letters with
@@ -59,54 +60,78 @@ DESCRIPTION
 
     Text::Password::Pronounceable
 
+    For other types of random data, see other lists mentioned in the See
+    Also section.
+
     Keywords: random secure password
 
-ACME::MODULES ENTRIES
-    *   App::genpw
+ACME::CPANMODULES ENTRIES
+    App::genpw
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::genpw::base64
+    App::genpw::base64
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::genpw::base58
+    App::genpw::base58
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::genpw::base56
+    App::genpw::base56
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::genpw::wordlist
+    App::genpw::wordlist
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::genpw::ind
+    App::genpw::ind
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Crypt::GeneratePassword
+    Crypt::GeneratePassword
+        Author: NEILB <https://metacpan.org/author/NEILB>
 
-    *   Crypt::RandPasswd
+    Crypt::RandPasswd
+        Author: JANITOR <https://metacpan.org/author/JANITOR>
 
-    *   Crypt::PassGen
+    Crypt::PassGen
+        Author: TJENNESS <https://metacpan.org/author/TJENNESS>
 
-    *   Data::SimplePassword
+    Data::SimplePassword
+        Author: RYOCHIN <https://metacpan.org/author/RYOCHIN>
 
-    *   String::MkPasswd
+    String::MkPasswd
+        Author: CGRAU <https://metacpan.org/author/CGRAU>
 
-    *   Data::Random::String
+    Data::Random::String
+        Author: MAKIS <https://metacpan.org/author/MAKIS>
 
-    *   Data::Random
+    Data::Random
+        Author: BAREFOOT <https://metacpan.org/author/BAREFOOT>
 
-    *   Text::Password::Pronounceable::RandomCase
+    Text::Password::Pronounceable::RandomCase
+        Author: MDOM <https://metacpan.org/author/MDOM>
 
-    *   String::Random
+    String::Random
+        Author: SHLOMIF <https://metacpan.org/author/SHLOMIF>
 
-    *   String::Urandom
+    String::Urandom
+        Author: MBROOKS <https://metacpan.org/author/MBROOKS>
 
-    *   Crypt::XkcdPassword
+    Crypt::XkcdPassword
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
-    *   CtrlO::Crypt::XkcdPassword
+    CtrlO::Crypt::XkcdPassword
+        Author: DOMM <https://metacpan.org/author/DOMM>
 
-    *   App::GenPass
+    App::GenPass
+    Crypt::PW44
+        Author: BRIAND <https://metacpan.org/author/BRIAND>
 
-    *   Crypt::PW44
+    Crypt::YAPassGen
+        Author: GIULIENK <https://metacpan.org/author/GIULIENK>
 
-    *   Crypt::YAPassGen
+    Session::Token
+        Author: FRACTAL <https://metacpan.org/author/FRACTAL>
 
-    *   Session::Token
-
-    *   Text::Password::Pronounceable
+    Text::Password::Pronounceable
+        Author: TSIBLEY <https://metacpan.org/author/TSIBLEY>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -137,7 +162,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -146,14 +173,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-RandomPassword>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Rand
-    omPassword>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Acme::CPANModules::Import::NEILB::Passwords, which is extracted from
@@ -170,9 +189,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Rand
+    omPassword>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

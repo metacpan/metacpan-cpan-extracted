@@ -7,7 +7,7 @@ use XSLoader;
 use base qw( Exporter  );
 use 5.008;
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 XSLoader::load __PACKAGE__, $VERSION;
 
 our @EXPORT_OK = qw( caller_cv caller_args caller_vars called_with called_as_method );
@@ -83,9 +83,27 @@ sub called_with {
             $op = $op->sibling;
         }
 
-        if ($op->name =~ "pad(sv|av|hv)") {
+        if ($op->name =~ /padsv_store/) {
+            # A padsv_store is a 5.37 optimization that combines a padsv and
+            # an sassign into a single op. The new op steals the targ slot
+            # of the original padsv.
+            #
+            # https://github.com/Perl/perl5/commit/9fdd7fc
+            print "Copying from pad\n" if $DEBUG;
+            if ($want_names) {
+                push @return, $padn->ARRAYelt( $op->targ )->PVX;
+            }
+            else {
+                push @return, $padv->ARRAYelt( $op->targ )->object_2svref;
+            }
+            next;
+        }
+        elsif ($op->name =~ "pad(sv|av|hv)") {
             if ($op->next->next->name eq "sassign") {
                 print "sassign in two ops, this is the target skipping\n" if $DEBUG;
+                next;
+            } elsif ($op->next->name eq "padsv_store") {
+                print "padsv_store in one op, this is the target, skipping\n" if $DEBUG;
                 next;
             }
 
@@ -144,6 +162,9 @@ sub called_with {
         elsif ($op->name eq "const") {
             if ($op->next->next->name eq "sassign") {
                 print "sassign in two ops, this is the target, skipping\n" if $DEBUG;
+                next;
+            } elsif ($op->next->name eq "padsv_store") {
+                print "padsv_store in one op, this is the target, skipping\n" if $DEBUG;
                 next;
             }
 
@@ -229,7 +250,7 @@ called as a method.
 All of these routines are susceptible to the same limitations as
 C<caller> as described in L<perlfunc/caller>
 
-The deparsing of the optree perfomed by called_with is fairly simple-minded
+The deparsing of the optree performed by called_with is fairly simple-minded
 and so a bit flaky.
 
 =over
@@ -253,7 +274,7 @@ PadWalker by Robin Houston
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002, 2003, 2006, 2007, 2008, 2010, 2013 Richard Clamp.
+Copyright (c) 2002, 2003, 2006, 2007, 2008, 2010, 2013, 2023 Richard Clamp.
 All Rights Reserved.
 
 This module is free software. It may be used, redistributed and/or

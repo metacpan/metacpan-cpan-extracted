@@ -5,19 +5,19 @@ IO::ExplicitHandle - force I/O handles to be explicitly specified
 DESCRIPTION
 
 This module provides a lexically-scoped pragma that prohibits I/O
-operations that use an implicit default I/O handle.  For example, "print
-123" implicitly uses the "currently selected" I/O handle (controlled
-by select).  Within the context of the pragma, I/O operations must
-be explicitly told which handle they are to operate on.  For example,
-"print STDOUT 123" explicitly uses the program's standard output stream.
+operations that implicitly default to an I/O handle determined at runtime.
+For example, "print 123" implicitly uses the "currently selected" I/O
+handle (controlled by select).  Within the context of the pragma, I/O
+operations must be explicitly told which handle they are to operate on.
+For example, "print STDOUT 123" explicitly uses the program's standard
+output stream.
 
-The affected operations that use the "currently selected" I/O handle are
-print, printf, say, close, write, and the magic variables $|, $^, $~, $=,
-$-, and $%.  The affected operations that use the "last read" I/O handle
-are eof, tell, and the magic variable $..  One form of the .. operator can
-implicitly read $., but it cannot be reliably distinguished at compile
-time from the more common list-generating form, so it is not affected
-by this module.
+The affected operations are those that use either the "currently selected"
+I/O handle or the "last read" I/O handle.  The affected operations that
+use the "currently selected" I/O handle are print, printf, say, close,
+write, and the magic variables $|, $^, $~, $=, $-, and $%.  The affected
+operations that use the "last read" I/O handle are eof, tell, and the
+magic variable $..
 
 INSTALLATION
 
@@ -32,7 +32,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 COPYRIGHT
 
-Copyright (C) 2012, 2017 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2012, 2017, 2023 Andrew Main (Zefram) <zefram@fysh.org>
 
 LICENSE
 

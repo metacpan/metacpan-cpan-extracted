@@ -1,6 +1,6 @@
 # NAME
 
-Teng::Plugin::SearchBySQLAbstractMore - use [SQL::Abstract::More](http://search.cpan.org/perldoc?SQL::Abstract::More) as Query Builder for Teng
+Teng::Plugin::SearchBySQLAbstractMore - use [SQL::Abstract::More](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3AMore) as Query Builder for Teng
 
 # SYNOPSIS
 
@@ -158,7 +158,7 @@ return SQL::Abstract::More object.
     YourClass->sql_abstract_more_new_option(sql_dialect => 'Oracle');
 
 This method's arguments are passed to SQL::Abstract::More->new().
-see [SQL::Abstract::More](http://search.cpan.org/perldoc?SQL::Abstract::More) new options.
+see [SQL::Abstract::More](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3AMore) new options.
 
 ## replace\_teng\_search
 
@@ -174,27 +174,22 @@ and you want to use same usage with SQL::Abstract::More.
     package YourClass;
     use Teng::Plugin::SearchBySQLAbstract::More; # no need to use ->load_plugin();
     
-
     YourClass->install_sql_abstract_more; # search_sql_abstract_more is defined as YourClass::search
     YourClass->install_sql_abstract_more(alias => 1); # same as the above
 
     YourClass->install_sql_abstract_more(replace => 1); # Teng::Search is replaced by search_sql_abstract_more
     
-
     YourClass->install_sql_abstract_more(alias => 'complex_search');
     # sql_abstract_more is defined as YourClass::complex_search
     
-
     YourClass->install_sql_abstract_more(alias => 'complex_search', pager => 1);
     # sql_abstract_more is defined as YourClass::complex_search
     # sql_abstract_more_pager is defined as YourClass::complex_search_with_pager
     
-
     YourClass->install_sql_abstract_more(alias => 'complex_search', pager => 1, pager_alias => 'complex_search_paged');
     # sql_abstract_more is defined as YourClass::complex_search
     # sql_abstract_more_pager is defined as YourClass::complex_search_paged
     
-
     # use different pager
     YourClass->install_sql_abstract_more(pager => 1); # or pager => 'simple' / 'Pager'
     YourClass->install_sql_abstract_more(pager => 'mysql_found_rows'); # or pager => 'Pager::MySQL::FoundRows'
@@ -289,16 +284,12 @@ You can also look for information at:
 
     [http://search.cpan.org/dist/Teng-Plugin-SearchBySQLAbstractMore/](http://search.cpan.org/dist/Teng-Plugin-SearchBySQLAbstractMore/)
 
-
-
 # SEE ALSO
 
-- [Teng](http://search.cpan.org/perldoc?Teng)
-- [SQL::Abstract::More](http://search.cpan.org/perldoc?SQL::Abstract::More)
+- [Teng](https://metacpan.org/pod/Teng)
+- [SQL::Abstract::More](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3AMore)
 
 # ACKNOWLEDGEMENTS
-
-
 
 # LICENSE AND COPYRIGHT
 
@@ -309,5 +300,3 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
-

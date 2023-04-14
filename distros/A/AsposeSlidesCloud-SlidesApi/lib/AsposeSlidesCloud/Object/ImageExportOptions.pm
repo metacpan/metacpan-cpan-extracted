@@ -249,6 +249,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'show_hidden_slides' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowHiddenSlides',
+    	description => 'Show hidden slides. If true, hidden are exported.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -261,7 +268,8 @@ __PACKAGE__->swagger_types( {
     'notes_position' => 'string',
     'comments_position' => 'string',
     'comments_area_width' => 'int',
-    'comments_area_color' => 'string'
+    'comments_area_color' => 'string',
+    'show_hidden_slides' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -274,7 +282,8 @@ __PACKAGE__->attribute_map( {
     'notes_position' => 'NotesPosition',
     'comments_position' => 'CommentsPosition',
     'comments_area_width' => 'CommentsAreaWidth',
-    'comments_area_color' => 'CommentsAreaColor'
+    'comments_area_color' => 'CommentsAreaColor',
+    'show_hidden_slides' => 'ShowHiddenSlides'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,11 +1,11 @@
 package Workflow::Inotify;
 
-# this class just contains pod
+# this package just provides pod
 
 use strict;
 use warnings;
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.5'; ## no critic (RequireInterpolation)
 
 1;
 
@@ -154,9 +154,25 @@ Example:
 
 =back
 
+=head2 Application Configuration
+
+You can create a section in the configuration file that is named for
+the handler class. For example, if your handler class is
+C<Worflow::S3::Uploader>, then create a section in the configuration
+file named C<workflow_s3_uploader>. Place any values you wish in that
+section. The configuration object is passed to your handler's C<new()>
+method so you can access the values as needed. The configuration
+object is an instance of L<Config::IniFiles>.
+
+If you use the parent class L<Workflow::Inotify::Handler>, its
+C<new()> method will automatically create setters and getters for these
+values.
+
+See L<Workflow::Inotify::Handler> for more details.
+
 =head1 VERSION
 
-This documentation refers to version 1.0.3
+This documentation refers to version 1.0.5
 
 =head1 REPOSITORY
 
@@ -164,10 +180,10 @@ L<https://github.com/rlauer6/perl-Workflow-Inotify.git>
 
 =head1 AUTHOR
 
-Rob Lauer - <rlauer6@comast.net>
+Rob Lauer - <rlauer6@comcast.net>
 
 =head1 SEE ALSO 
 
-L<Linux::Inotify2>
+L<Linux::Inotify2>, L<Config::IniFiles>
 
 =cut

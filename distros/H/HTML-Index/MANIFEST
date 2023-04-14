@@ -28,3 +28,5 @@ t/parser.t
 t/soundex.t
 t/stem.t
 t/stopwords.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

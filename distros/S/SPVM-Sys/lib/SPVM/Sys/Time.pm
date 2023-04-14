@@ -4,17 +4,53 @@ package SPVM::Sys::Time;
 
 =head1 Name
 
-SPVM::Sys::Time - Time System Call
+SPVM::Sys::Time - System Calls for Time Manipulation
+
+=head1 Description
+
+The Sys::Process class of L<SPVM> has methods to call system calls for time manipulation.
 
 =head1 Usage
   
   use Sys::Time;
 
-=head1 Description
-
-C<Sys::Process> provides the methods to call the system call for the time manipulation.
+  my $epoch = Sys::Time->time;
+  
+  my $time_info_local = Sys::Time->localtime($epoch);
+  
+  my $time_info_utc = Sys::Time->gmtime($epoch);
 
 =head1 Class Methods
+
+=head2 time
+
+  static method time : long ();
+
+Gets the current epoch time. 
+
+This method is the same as C<time> function of C<Linux>.
+
+  my $epoch = Sys::Time->time;
+
+=head2 localtime
+
+  static method localtime : Sys::Time::Tm ($time : long);
+
+Converts an epoch $time to the L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object that is local time.
+
+This method is the same as C<localtime> function of C<Linux>.
+
+  my $time_info = Sys::Time->localtime($epoch);
+
+=head2 gmtime
+
+  static method gmtime : Sys::Time::Tm ($time : long);
+
+Converts an epoch $time to the L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object that is C<UTC>.
+
+This method is the same as C<gmtime> function of C<Linux>.
+
+  my $time_info = Sys::Time->gmtime($epoch);
 
 =head2 gettimeofday
 
@@ -105,4 +141,10 @@ See the detail of the L<nanosleep|https://linux.die.net/man/3/nanosleep> functio
 The rqtp is a L<Sys::Time::Timespec> object.
 
 The rmtp is a L<Sys::Time::Timespec> object.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
 

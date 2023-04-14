@@ -4,6 +4,7 @@ use warnings;
 use Test2::V0;
 use Types::Standard qw( Int Undef );
 use Sub::WrapInType qw( install_sub );
+use Sub::Util qw( subname );
 
 subtest 'Install typed method' => sub {
 
@@ -26,6 +27,8 @@ subtest 'Install typed method' => sub {
   ok __PACKAGE__->can('add');
 
   is $wraped_sub, \&add;
+
+  is subname(\&add), 'main::add';
 
   is add(1, 2), 3;
 

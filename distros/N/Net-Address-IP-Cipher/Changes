@@ -1,5 +1,8 @@
 Revision history for Net-Address-IP-Cipher
 
+0.6     2023-04-13/13:45
+        Updating documentation links to metacpan.
+
 0.4     2018-05-24/1013
         Removed prerequisite for Mime::Base64 and Cript::PBKDF2
         and replaced by Crypt::KeyDerivation.

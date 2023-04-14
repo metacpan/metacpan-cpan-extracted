@@ -1,0 +1,14 @@
+name: Example-Distribution
+abstract: "this is an example"
+abstract_html: 'this is an <strong>example</strong>'
+github: https://github.com/you/example-distribution
+issues: https://github.com/you/example-distribution/issues
+copyright: "Copyright © 2023 You. All rights reserved."
+theme:
+  light: "#dad5d4"
+  dark: "#020d12"
+  primary: "#4f3064"
+  secondary: "#ea2010"
+  info: "#f7346c"
+homepage:
+  animation: swirl1

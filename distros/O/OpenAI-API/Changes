@@ -1,5 +1,18 @@
 Revision history for OpenAI-API
 
+0.37    2023-04-09
+        Replace AnyEvent with IO::Async::Loop
+        Replace Promises with IO::Async::Future
+        Update documentation.
+
+0.35    2023-04-03
+        Implement add_message() and send_message() chat methods.
+
+0.34    2023-04-02
+        Add OpenAI::API::Response modules.
+        Fix tests.
+        "/edits" endpoint is working again.
+
 0.33    2023-03-26
         Add OpenAI::API::Error module.
         Add option to return HTTP::Response object.

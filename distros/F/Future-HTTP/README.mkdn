@@ -16,21 +16,21 @@ Future::HTTP - provide the most appropriate HTTP client with a Future API
     })->get();
 
 This module is a wrapper combining [Future](https://metacpan.org/pod/Future) with the API provided
-by [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP). The backend used for the HTTP protocols
+by [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP). The backend used for the HTTP protocols
 depends on whether one of the event loops is loaded.
 
 ## Supported event loops
 
 Currently, the following backends are supported:
 
-- [HTTP::Tiny](https://metacpan.org/pod/HTTP::Tiny)
-- [HTTP::Tiny::Paranoid](https://metacpan.org/pod/HTTP::Tiny::Paranoid)
+- [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny)
+- [HTTP::Tiny::Paranoid](https://metacpan.org/pod/HTTP%3A%3ATiny%3A%3AParanoid)
 - [Mojolicious](https://metacpan.org/pod/Mojolicious)
 - [AnyEvent](https://metacpan.org/pod/AnyEvent)
-- [IO::Async](https://metacpan.org/pod/IO::Async)
+- [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync)
 
 Support
-is planned for [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) and [POE](https://metacpan.org/pod/POE)
+is planned for [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) and [POE](https://metacpan.org/pod/POE)
 but has not materialized yet.
 
 # METHODS
@@ -58,7 +58,7 @@ synchronous.
     })->get;
 
 Retrieves the URL and returns the body and headers, like
-the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP).
 
 ## `$ua->http_head($url, %options)`
 
@@ -72,7 +72,7 @@ the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
     })->get;
 
 Retrieves the header of the URL and returns the headers,
-like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP).
 
 ## `$ua->http_post($url, $body, %options)`
 
@@ -87,7 +87,7 @@ like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
     })->get;
 
 Posts the content to the URL and returns the body and headers,
-like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP).
 
 ## `$ua->http_request($method, $url, %options)`
 
@@ -102,13 +102,13 @@ like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
     })->get;
 
 Posts the content to the URL and returns the body and headers,
-like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP).
 
 # SEE ALSO
 
 [Future](https://metacpan.org/pod/Future)
 
-[AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP) for the details of the API
+[AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP) for the details of the API
 
 # REPOSITORY
 
@@ -124,7 +124,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Future-HTTP](https://rt.cpan.org/Public/Dist/Display.html?Name=Future-HTTP)
-or via mail to [future-http-Bugs@rt.cpan.org](https://metacpan.org/pod/future-http-Bugs@rt.cpan.org).
+or via mail to [future-http-Bugs@rt.cpan.org](https://metacpan.org/pod/future-http-Bugs%40rt.cpan.org).
 
 # AUTHOR
 
@@ -132,7 +132,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2016-2020 by Max Maischein `corion@cpan.org`.
+Copyright 2016-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

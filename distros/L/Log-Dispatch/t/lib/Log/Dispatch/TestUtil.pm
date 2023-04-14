@@ -44,4 +44,6 @@ A cheap version of Test::Deep::cmp_deeply.
 
 Dump a value to a single line using Data::Dumper.
 
+=back
+
 =cut

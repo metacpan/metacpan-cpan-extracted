@@ -134,7 +134,7 @@ sub do_binary_release_mswin32 {
   requires 'Alien::7zip' => '0.03';
   requires 'Alien::Build::CommandSequence';
 
-  start_url 'https://sourceforge.net/projects/gnuplot/files/gnuplot/5.4.6/gp546-win64-mingw.7z/download';
+  start_url 'https://sourceforge.net/projects/gnuplot/files/gnuplot/5.4.6/gp546-win64-mingw-2.7z/download';
   plugin 'Download';
   extract [ '%{sevenzip} x %{.install.download}' ];
   plugin 'Build::Copy';

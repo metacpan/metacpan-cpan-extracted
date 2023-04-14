@@ -1,0 +1,887 @@
+$VAR1 = bless( {
+                 'component_type' => 'Python::File',
+                 'perl_file_path' => undef,
+                 'perl_source_code' => undef,
+                 'perl_source_code_full' => undef,
+                 'python_file_path' => 't/00_includes.py',
+                 'python_line_number_begin' => undef,
+                 'python_line_number_end' => undef,
+                 'python_preparsed' => [
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# DEV NOTE, CORRELATION PYIN000: any changes to test includes below must also be made in lib/Python/Include.pm',
+                                                  'python_line_number_begin' => 1,
+                                                  'python_line_number_end' => 1,
+                                                  'python_source_code' => '# DEV NOTE, CORRELATION PYIN000: any changes to test includes below must also be made in lib/Python/Include.pm'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 2,
+                                                  'python_line_number_end' => 2,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #0',
+                                                  'python_line_number_begin' => 3,
+                                                  'python_line_number_end' => 3,
+                                                  'python_source_code' => '# regex #0'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 4,
+                                                  'python_line_number_end' => 4,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import FOO',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 5,
+                                                  'python_line_number_end' => 5,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 6,
+                                                  'python_line_number_end' => 6,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 7,
+                                                  'python_line_number_end' => 7,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 8,
+                                                  'python_line_number_end' => 9,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import \\
+    FOO',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 10,
+                                                  'python_line_number_end' => 10,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #1',
+                                                  'python_line_number_begin' => 11,
+                                                  'python_line_number_end' => 11,
+                                                  'python_source_code' => '# regex #1'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 12,
+                                                  'python_line_number_end' => 12,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import FOO, BAR, BAT, BAX',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 13,
+                                                  'python_line_number_end' => 13,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO , B.AR, BA.T, B.A.X',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 14,
+                                                  'python_line_number_end' => 14,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO,B.AR,BA.T,B.A.X# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 15,
+                                                  'python_line_number_end' => 15,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO, B.AR, BA.T, B.A.X  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 16,
+                                                  'python_line_number_end' => 18,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import \\
+    FOO, B.AR, \\
+    BA.T, B.A.X  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 19,
+                                                  'python_line_number_end' => 19,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #2',
+                                                  'python_line_number_begin' => 20,
+                                                  'python_line_number_end' => 20,
+                                                  'python_source_code' => '# regex #2'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 21,
+                                                  'python_line_number_end' => 21,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import BAR',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 22,
+                                                  'python_line_number_end' => 22,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 23,
+                                                  'python_line_number_end' => 23,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 24,
+                                                  'python_line_number_end' => 24,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 25,
+                                                  'python_line_number_end' => 28,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from \\
+    F.OO \\
+    import \\
+    B.AR  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 29,
+                                                  'python_line_number_end' => 29,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from . import BAR',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 30,
+                                                  'python_line_number_end' => 30,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from . import B.AR',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 31,
+                                                  'python_line_number_end' => 31,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from . import B.AR# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 32,
+                                                  'python_line_number_end' => 32,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from . import B.AR  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 33,
+                                                  'python_line_number_end' => 36,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from \\
+    . \\
+    import \\
+    B.AR  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 37,
+                                                  'python_line_number_end' => 37,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #3',
+                                                  'python_line_number_begin' => 38,
+                                                  'python_line_number_end' => 38,
+                                                  'python_source_code' => '# regex #3'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 39,
+                                                  'python_line_number_end' => 39,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import BAR, BAT, BAX',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 40,
+                                                  'python_line_number_end' => 40,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR , BA.T, B.A.X',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 41,
+                                                  'python_line_number_end' => 41,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR,BA.T,B.A.X# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 42,
+                                                  'python_line_number_end' => 42,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR, BA.T, B.A.X  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 43,
+                                                  'python_line_number_end' => 46,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from \\
+    F.OO \\
+    import B.AR, \\
+    BA.T, B.A.X  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 47,
+                                                  'python_line_number_end' => 50,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import \\
+    BAR, \\
+    BAT, \\
+    BAX',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 51,
+                                                  'python_line_number_end' => 54,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import FU, FEW, \\
+    BAR, BHAR \\
+    ,BAT, \\
+    BAX, BHAX',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 55,
+                                                  'python_line_number_end' => 58,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import F.U, F.E.W, \\
+    B.AR, BH.AR, \\
+    BA.T, \\
+    B.A.X, B.H.A.X  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 59,
+                                                  'python_line_number_end' => 59,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #4',
+                                                  'python_line_number_begin' => 60,
+                                                  'python_line_number_end' => 60,
+                                                  'python_source_code' => '# regex #4'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 61,
+                                                  'python_line_number_end' => 61,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import ( BAR, BAT, BAX )',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 62,
+                                                  'python_line_number_end' => 62,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import ( B.AR , BA.T, B.A.X, )',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 63,
+                                                  'python_line_number_end' => 63,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import(B.AR,BA.T,B.A.X)#test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 64,
+                                                  'python_line_number_end' => 64,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import ( B.AR, BA.T, B.A.X )  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 1,
+                                                  'python_line_number_begin' => 65,
+                                                  'python_line_number_end' => 69,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import (
+    BAR,
+    BAT,
+    BAX
+)',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 1,
+                                                  'python_line_number_begin' => 70,
+                                                  'python_line_number_end' => 74,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import ( FU, FEW,
+    BAR, BHAR,
+    BAT,
+    BAX, BHAX,
+)',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 1,
+                                                  'python_line_number_begin' => 75,
+                                                  'python_line_number_end' => 79,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import ( F.U, F.E.W,
+    B.AR, BH.AR,
+    BA.T,
+    B.A.X, B.H.A.X
+)',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 1,
+                                                  'python_line_number_begin' => 80,
+                                                  'python_line_number_end' => 84,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import ( \\
+    BAR, \\
+    BAT,# test comment
+    BAX \\
+)# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 1,
+                                                  'python_line_number_begin' => 85,
+                                                  'python_line_number_end' => 89,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import ( FU, FEW, \\
+    BAR, BHAR, \\
+    BAT,
+    BAX, BHAX \\
+)',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 90,
+                                                  'python_line_number_end' => 98,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from \\
+    F.OO \\
+    import \\
+    ( \\
+    F.U, F.E.W, \\
+    B.AR, BH.AR, \\
+    BA.T, \\
+    B.A.X, B.H.A.X \\
+)',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 99,
+                                                  'python_line_number_end' => 99,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #5',
+                                                  'python_line_number_begin' => 100,
+                                                  'python_line_number_end' => 100,
+                                                  'python_source_code' => '# regex #5'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 101,
+                                                  'python_line_number_end' => 101,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import FOO as F',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 102,
+                                                  'python_line_number_end' => 102,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO as F',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 103,
+                                                  'python_line_number_end' => 103,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO as F# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 104,
+                                                  'python_line_number_end' => 104,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import F.OO as F  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 105,
+                                                  'python_line_number_end' => 108,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'import \\
+    F.OO \\
+    as \\
+    F  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Blank',
+                                                  'perl_source_code' => '',
+                                                  'python_line_number_begin' => 109,
+                                                  'python_line_number_end' => 109,
+                                                  'python_source_code' => ''
+                                                }, 'Python::Blank' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Comment',
+                                                  'indentation' => undef,
+                                                  'is_actually_string_literal' => undef,
+                                                  'perl_source_code' => '# regex #6',
+                                                  'python_line_number_begin' => 110,
+                                                  'python_line_number_end' => 110,
+                                                  'python_source_code' => '# regex #6'
+                                                }, 'Python::Comment' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 111,
+                                                  'python_line_number_end' => 111,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from FOO import BAR as B',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 112,
+                                                  'python_line_number_end' => 112,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR as B',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 113,
+                                                  'python_line_number_end' => 113,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR as B# test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => undef,
+                                                  'python_line_number_begin' => 114,
+                                                  'python_line_number_end' => 114,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from F.OO import B.AR as B  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' ),
+                                         bless( {
+                                                  'component_type' => 'Python::Include',
+                                                  'perl_source_code' => undef,
+                                                  'python_alias' => undef,
+                                                  'python_file_path' => 't/00_includes.py',
+                                                  'python_has_parentheses' => 0,
+                                                  'python_line_number_begin' => 115,
+                                                  'python_line_number_end' => 120,
+                                                  'python_modules' => undef,
+                                                  'python_source_code' => 'from \\
+    F.OO \\
+    import \\
+    B.AR \\
+    as \\
+    B  # test comment',
+                                                  'python_subcomponents' => undef
+                                                }, 'Python::Include' )
+                                       ],
+                 'python_source_code' => '# DEV NOTE, CORRELATION PYIN000: any changes to test includes below must also be made in lib/Python/Include.pm
+
+# regex #0
+import FOO
+import F.OO
+import F.OO# test comment
+import F.OO  # test comment
+import \\
+    FOO
+
+# regex #1
+import FOO, BAR, BAT, BAX
+import F.OO , B.AR, BA.T, B.A.X
+import F.OO,B.AR,BA.T,B.A.X# test comment
+import F.OO, B.AR, BA.T, B.A.X  # test comment
+import \\
+    FOO, B.AR, \\
+    BA.T, B.A.X  # test comment
+
+# regex #2
+from FOO import BAR
+from F.OO import B.AR
+from F.OO import B.AR# test comment
+from F.OO import B.AR  # test comment
+from \\
+    F.OO \\
+    import \\
+    B.AR  # test comment
+from . import BAR
+from . import B.AR
+from . import B.AR# test comment
+from . import B.AR  # test comment
+from \\
+    . \\
+    import \\
+    B.AR  # test comment
+
+# regex #3
+from FOO import BAR, BAT, BAX
+from F.OO import B.AR , BA.T, B.A.X
+from F.OO import B.AR,BA.T,B.A.X# test comment
+from F.OO import B.AR, BA.T, B.A.X  # test comment
+from \\
+    F.OO \\
+    import B.AR, \\
+    BA.T, B.A.X  # test comment
+from FOO import \\
+    BAR, \\
+    BAT, \\
+    BAX
+from FOO import FU, FEW, \\
+    BAR, BHAR \\
+    ,BAT, \\
+    BAX, BHAX
+from F.OO import F.U, F.E.W, \\
+    B.AR, BH.AR, \\
+    BA.T, \\
+    B.A.X, B.H.A.X  # test comment
+
+# regex #4
+from FOO import ( BAR, BAT, BAX )
+from FOO import ( B.AR , BA.T, B.A.X, )
+from FOO import(B.AR,BA.T,B.A.X)#test comment
+from FOO import ( B.AR, BA.T, B.A.X )  # test comment
+from FOO import (
+    BAR,
+    BAT,
+    BAX
+)
+from FOO import ( FU, FEW,
+    BAR, BHAR,
+    BAT,
+    BAX, BHAX,
+)
+from F.OO import ( F.U, F.E.W,
+    B.AR, BH.AR,
+    BA.T,
+    B.A.X, B.H.A.X
+)
+from FOO import ( \\
+    BAR, \\
+    BAT,# test comment
+    BAX \\
+)# test comment
+from FOO import ( FU, FEW, \\
+    BAR, BHAR, \\
+    BAT,
+    BAX, BHAX \\
+)
+from \\
+    F.OO \\
+    import \\
+    ( \\
+    F.U, F.E.W, \\
+    B.AR, BH.AR, \\
+    BA.T, \\
+    B.A.X, B.H.A.X \\
+)
+
+# regex #5
+import FOO as F
+import F.OO as F
+import F.OO as F# test comment
+import F.OO as F  # test comment
+import \\
+    F.OO \\
+    as \\
+    F  # test comment
+
+# regex #6
+from FOO import BAR as B
+from F.OO import B.AR as B
+from F.OO import B.AR as B# test comment
+from F.OO import B.AR as B  # test comment
+from \\
+    F.OO \\
+    import \\
+    B.AR \\
+    as \\
+    B  # test comment',
+                 'python_source_code_full' => undef
+               }, 'Python::File' );
+

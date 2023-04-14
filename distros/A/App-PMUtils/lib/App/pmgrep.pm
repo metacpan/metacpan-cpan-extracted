@@ -11,9 +11,9 @@ use AppBase::Grep;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-28'; # DATE
+our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.742'; # VERSION
+our $VERSION = '0.743'; # VERSION
 
 our %SPEC;
 
@@ -146,7 +146,7 @@ App::pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.742 of App::pmgrep (from Perl distribution App-PMUtils), released on 2022-09-28.
+This document describes version 0.743 of App::pmgrep (from Perl distribution App-PMUtils), released on 2023-01-28.
 
 =head1 FUNCTIONS
 
@@ -183,6 +183,8 @@ Require all patterns to match, instead of just one.
 
 =item * B<color> => I<str> (default: "auto")
 
+Specify when to show color (never, always, or autoE<sol>when interactive).
+
 =item * B<count> => I<true>
 
 Supress normal output, return a count of matching lines.
@@ -198,17 +200,23 @@ Google search and a few other search engines.
 
 =item * B<ignore_case> => I<bool>
 
+If set to true, will search case-insensitively.
+
 =item * B<invert_match> => I<bool>
 
 Invert the sense of matching.
 
 =item * B<line_number> => I<true>
 
+Show line number along with matches.
+
 =item * B<modules> => I<perl::modnames>
 
 If not specified, all installed Perl modules will be searched.
 
 =item * B<pattern> => I<str>
+
+Specify *string* to search for.
 
 =item * B<pm> => I<bool> (default: 1)
 
@@ -224,9 +232,15 @@ Whether to include .pod files.
 
 =item * B<quiet> => I<true>
 
+Do not print matches, only return appropriate exit code.
+
 =item * B<recursive> => I<true>
 
+(No description)
+
 =item * B<regexps> => I<array[str]>
+
+Specify additional *regexp pattern* to search for.
 
 
 =back
@@ -274,7 +288,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

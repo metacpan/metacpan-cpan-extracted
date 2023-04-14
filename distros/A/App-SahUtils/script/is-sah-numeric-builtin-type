@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/SahUtils/is_sah_numeric_builtin_type
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SahUtils/is_sah_numeric_builtin_type",
@@ -38,11 +38,15 @@ is-sah-numeric-builtin-type - Check that a string or array schema is a Sah numer
 
 =head1 VERSION
 
-This document describes version 0.482 of is-sah-numeric-builtin-type (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of is-sah-numeric-builtin-type (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
-B<is-sah-numeric-builtin-type> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<schema>E<gt>
+B<is-sah-numeric-builtin-type> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<is-sah-numeric-builtin-type> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<is-sah-numeric-builtin-type> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<schema|/"--schema=s*">>E<gt>
 
 =head1 DESCRIPTION
 
@@ -64,6 +68,9 @@ See C<--schema>.
 Can also be specified as the 1st command-line argument.
 
 =item B<--schema>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -211,7 +218,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

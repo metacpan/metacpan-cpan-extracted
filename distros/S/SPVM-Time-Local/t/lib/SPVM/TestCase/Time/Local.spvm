@@ -1,12 +1,12 @@
 class TestCase::Time::Local {
-  use Time;
-  use Time::Info;
+  use Sys::Time;
+  use Sys::Time::Tm;
   use Time::Local;
   
   static method time_info : int () {
-    my $time_info = Time::Info->new;
+    my $time_info = Sys::Time::Tm->new;
     
-    unless ($time_info isa Time::Info) {
+    unless ($time_info isa Sys::Time::Tm) {
       return 0;
     }
     
@@ -14,28 +14,28 @@ class TestCase::Time::Local {
   }
   
   static method time : long () {
-    my $time = Time->time;
+    my $time = Sys::Time->time;
     
     return $time;
   }
 
-  static method localtime : Time::Info ($time : long) {
-    my $time_info = Time->localtime($time);
+  static method localtime : Sys::Time::Tm ($time : long) {
+    my $time_info = Sys::Time->localtime($time);
     
     return $time_info;
   }
 
-  static method gmtime : Time::Info ($time : long) {
-    my $time_info = Time->gmtime($time);
+  static method gmtime : Sys::Time::Tm ($time : long) {
+    my $time_info = Sys::Time->gmtime($time);
     
     return $time_info;
   }
 
   static method timelocal : int () {
     {
-      my $time = Time->time();
+      my $time = Sys::Time->time();
       
-      my $time_info = Time->localtime($time);
+      my $time_info = Sys::Time->localtime($time);
       
       my $time_ret = Time::Local->timelocal($time_info);
       
@@ -52,9 +52,9 @@ class TestCase::Time::Local {
 
   static method timegm : int () {
     {
-      my $time = Time->time();
+      my $time = Sys::Time->time();
       
-      my $time_info = Time->gmtime($time);
+      my $time_info = Sys::Time->gmtime($time);
       
       my $time_ret = Time::Local->timegm($time_info);
 

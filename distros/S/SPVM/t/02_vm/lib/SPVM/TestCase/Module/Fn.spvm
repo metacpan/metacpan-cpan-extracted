@@ -2,10 +2,11 @@ class TestCase::Module::Fn {
   use Fn;
   use TestCase::Minimal;
   use Complex_2d;
-  use Time;
   use Array;
-  use Time::Info;
   use Point;
+  use TestCase::Pointer;
+  use Hash;
+  use Sort;
   
   static method GET_CODE_POINT_ERROR_OVER_STRING_RANGE : int () {
     
@@ -689,12 +690,11 @@ class TestCase::Module::Fn {
     return 1;
   }
   
-  static method crand : int () {
+  static method crand : int ($seed : int) {
     
     my $founds_plus = new int[10];
     my $founds_minus = new int[10];
     my $rand = 0;
-    my $seed = (int)Time->time;
     for (my $i = 0; $i < 100000; $i++) {
       $rand = Fn->crand(\$seed);
       my $dig0 = $rand % 10;
@@ -1841,7 +1841,7 @@ class TestCase::Module::Fn {
     
     # Class
     {
-      my $object = Time::Info->new;
+      my $object = TestCase::Pointer->new(3);
       
       unless (Fn->is_pointer_class($object)) {
         return 0;
@@ -2519,13 +2519,12 @@ class TestCase::Module::Fn {
     return 1;
   }
 
-  static method rand : int () {
+  static method rand : int ($seed : int) {
     
     # 0 <= random_number < 1
     {
       my $rand = 0.0;
       my $invalid_range = 0;
-      my $seed = (int)Time->time;
       for (my $i = 0; $i < 100000; $i++) {
         $rand = Fn->rand(\$seed);
         
@@ -2545,7 +2544,6 @@ class TestCase::Module::Fn {
       my $founds_plus = new int[10];
       my $founds_minus = new int[10];
       my $rand = 0.0;
-      my $seed = (int)Time->time;
       for (my $i = 0; $i < 100000; $i++) {
         $rand = Fn->rand(\$seed);
         
@@ -2565,7 +2563,6 @@ class TestCase::Module::Fn {
       my $founds_plus = new int[10];
       my $founds_minus = new int[10];
       my $rand = 0.0;
-      my $seed = (int)Time->time;
       for (my $i = 0; $i < 100000; $i++) {
         $rand = Fn->rand(\$seed, 10);
         
@@ -4073,4 +4070,173 @@ class TestCase::Module::Fn {
     
     return 1;
   }
+
+  static method merge_options : int () {
+    
+    {
+      my $merged_options = Fn->merge_options({key1 => 1, key2 => 2}, {key3 => "abc", key4 => "def"});
+      unless (@$merged_options == 8) {
+        return 0;
+      }
+      
+      Sort->sort_options_asc($merged_options);
+      
+      unless ($merged_options->[0]->(string) eq "key1") {
+        return 0;
+      }
+      
+      unless ($merged_options->[1]->(int) == 1) {
+        return 0;
+      }
+      unless ($merged_options->[2]->(string) eq "key2") {
+        return 0;
+      }
+      unless ($merged_options->[3]->(int) == 2) {
+        return 0;
+      }
+      unless ($merged_options->[4]->(string) eq "key3") {
+        return 0;
+      }
+      unless ($merged_options->[5]->(string) eq "abc") {
+        return 0;
+      }
+      unless ($merged_options->[6]->(string) eq "key4") {
+        return 0;
+      }
+      unless ($merged_options->[7]->(string) eq "def") {
+        return 0;
+      }
+    }
+    
+    {
+      my $merged_options = Fn->merge_options({key1 => 1, key2 => 2}, {key2 => "abc", key4 => "def"});
+      unless (@$merged_options == 6) {
+        return 0;
+      }
+      
+      Sort->sort_options_asc($merged_options);
+      
+      unless ($merged_options->[0]->(string) eq "key1") {
+        return 0;
+      }
+      
+      unless ($merged_options->[1]->(int) == 1) {
+        return 0;
+      }
+      unless ($merged_options->[2]->(string) eq "key2") {
+        return 0;
+      }
+      unless ($merged_options->[3]->(string) eq "abc") {
+        return 0;
+      }
+      unless ($merged_options->[4]->(string) eq "key4") {
+        return 0;
+      }
+      unless ($merged_options->[5]->(string) eq "def") {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { Fn->merge_options(undef, {}); };
+        unless (Fn->contains($@, "The \$options1 must be defined")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options({}, undef); };
+        unless (Fn->contains($@, "The \$options2 must be defined")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options(["a"], {}); };
+        unless (Fn->contains($@, "The length of the \$options1 must be an even number")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options({}, ["a"]); };
+        unless (Fn->contains($@, "The length of the \$options2 must be an even number")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options([(object)undef, 1], {}); };
+        unless (Fn->contains($@, "The key of the \$options1 must be defined")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options({}, [(object)undef, 1]); };
+        unless (Fn->contains($@, "The key of the \$options2 must be defined")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options([(object)1, 1], {}); };
+        unless (Fn->contains($@, "The key of the \$options1 must be the string type")) {
+          return 0;
+        }
+      }
+      {
+        eval { Fn->merge_options({}, [(object)1, 1]); };
+        unless (Fn->contains($@, "The key of the \$options2 must be the string type")) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method object_to_int : int () {
+    
+    {
+      my $int = Fn->object_to_int(Int->new(1));
+      unless ($int isa int) {
+        return 0;
+      }
+      if ($int == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $int = Fn->object_to_int(undef);
+      
+      unless ($int == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method object_to_long : int () {
+    
+    {
+      my $long = Fn->object_to_long(Int->new(1));
+      unless ($long isa long) {
+        return 0;
+      }
+      if ($long == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $long = Fn->object_to_long(undef);
+      unless ($long == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

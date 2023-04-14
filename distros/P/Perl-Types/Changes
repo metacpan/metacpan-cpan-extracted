@@ -1,0 +1,10 @@
+Revision history for Perl-Types.
+
+0.001     2023-04-09 22:40:05-05:00 America/Chicago
+
+  - HOLIDAY EDITION: Happy Easter!
+  - Initial alpha prototype version
+  - Support basic data types
+  - Support limited data structures
+  - Support classes
+  - Tests, run basic data type & data structure tests

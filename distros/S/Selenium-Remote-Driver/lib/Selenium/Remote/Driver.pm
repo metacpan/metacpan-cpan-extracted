@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.48';
+$Selenium::Remote::Driver::VERSION = '1.49';
 use strict;
 use warnings;
 
@@ -1730,7 +1730,7 @@ sub button_up {
                     parameters => { "pointerType" => "mouse" },
                     actions    => [
                         {
-                            type     => "pointerDown",
+                            type     => "pointerUp",
                             duration => 0,
                             button   => 0,
                         },
@@ -1885,7 +1885,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

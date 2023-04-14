@@ -3,26 +3,35 @@ package Amazon::S3::Bucket;
 use strict;
 use warnings;
 
-use Amazon::S3::Constants qw{:all};
-
+use Amazon::S3::Constants qw(:all);
 use Carp;
 use Data::Dumper;
-use Digest::MD5 qw(md5 md5_hex);
+use Digest::MD5       qw(md5 md5_hex);
 use Digest::MD5::File qw(file_md5 file_md5_hex);
-use English qw{-no_match_vars};
+use English           qw(-no_match_vars);
 use File::stat;
 use IO::File;
 use IO::Scalar;
 use MIME::Base64;
-use Scalar::Util qw{reftype};
+use Scalar::Util qw(reftype);
 use URI;
+use XML::Simple; ## no critic (DiscouragedModules)
 
-use parent qw{Class::Accessor::Fast};
+use parent qw(Class::Accessor::Fast);
 
-our $VERSION = '0.60'; ## no critic
+our $VERSION = '0.62'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
-  qw{bucket creation_date account buffer_size region logger verify_region });
+  qw(
+    bucket
+    creation_date
+    account
+    buffer_size
+    region
+    logger
+    verify_region
+  ),
+);
 
 ########################################################################
 sub new {
@@ -62,7 +71,7 @@ sub new {
   }
 
   return $self;
-} ## end sub new
+}
 
 ########################################################################
 sub _uri {
@@ -82,10 +91,10 @@ sub _uri {
 
   if ( $account->dns_bucket_names ) {
     $uri =~ s/^\///xsm;
-  } ## end if ( $self->account->dns_bucket_names)
+  }
 
   return $uri;
-} ## end sub _uri
+}
 
 ########################################################################
 sub add_key {
@@ -103,9 +112,9 @@ sub add_key {
     $conf->{'x-amz-acl'} = $conf->{acl_short};
 
     delete $conf->{acl_short};
-  } ## end if ( $conf->{acl_short...})
+  }
 
-  if ( ref $value eq 'SCALAR' ) {
+  if ( ref($value) && reftype($value) eq 'SCALAR' ) {
     my $md5_hex = file_md5_hex( ${$value} );
     my $md5     = pack 'H*', $md5_hex;
 
@@ -118,7 +127,7 @@ sub add_key {
     $value = _content_sub( ${$value}, $self->buffer_size );
 
     $conf->{'x-amz-content-sha256'} = 'UNSIGNED-PAYLOAD';
-  } ## end if ( ref $value eq 'SCALAR')
+  }
   else {
     $conf->{'Content-Length'} ||= length $value;
 
@@ -127,7 +136,7 @@ sub add_key {
     my $md5_base64 = encode_base64($md5);
 
     $conf->{'Content-MD5'} = $md5_base64;
-  } ## end else [ if ( ref $value eq 'SCALAR')]
+  }
 
   # If we're pushing to a bucket that's under
   # DNS flux, we might get a 307 Since LWP doesn't support actually
@@ -137,8 +146,8 @@ sub add_key {
     return $self->_add_key(
       { headers => $conf,
         data    => $value,
-        key     => $key
-      }
+        key     => $key,
+      },
     );
   };
 
@@ -148,22 +157,24 @@ sub add_key {
   if ($EVAL_ERROR) {
     my $rsp = $account->last_response;
 
-    if ( $rsp->code eq '301' ) {
+    if ( $rsp->code eq $HTTP_MOVED_PERMANENTLY ) {
       $self->region( $rsp->headers->{'x-amz-bucket-region'} );
     }
 
     $retval = $self->_add_key(
       { headers => $conf,
         data    => $value,
-        key     => $key
-      }
+        key     => $key,
+      },
     );
   }
 
   return $retval;
-} ## end sub add_key
+}
 
+########################################################################
 sub _add_key {
+########################################################################
   my ( $self, @args ) = @_;
 
   my ( $data, $headers, $key ) = @{ $args[0] }{qw{data headers key}};
@@ -176,9 +187,9 @@ sub _add_key {
         headers => $headers,
         data    => $data,
         region  => $self->region,
-      }
+      },
     );
-  } ## end if ( ref $value )
+  }
   else {
     return $account->_send_request_expect_nothing(
       { method  => 'PUT',
@@ -186,17 +197,18 @@ sub _add_key {
         headers => $headers,
         data    => $data,
         region  => $self->region,
-      }
+      },
     );
   }
-} ## end else [ if ( ref $value ) ]
+}
+
 ########################################################################
 sub add_key_filename {
 ########################################################################
   my ( $self, $key, $value, $conf ) = @_;
 
   return $self->add_key( $key, \$value, $conf );
-} ## end sub add_key_filename
+}
 
 ########################################################################
 sub upload_multipart_object {
@@ -277,7 +289,6 @@ sub upload_multipart_object {
 
       return ( \$buffer, $bytes );
     };
-
   }
 
   my $headers = $parameters{headers} || {};
@@ -287,16 +298,23 @@ sub upload_multipart_object {
   $logger->trace( sprintf 'multipart id: %s', $id );
 
   my $part = 1;
+
   my %parts;
+
   my $key = $parameters{key};
 
-  eval {
+  my $retval = eval {
     while (1) {
       my ( $buffer, $length ) = $parameters{callback}->();
       last if !$buffer;
 
       my $etag = $self->upload_part_of_multipart_upload(
-        { id => $id, key => $key, data => $buffer, part => $part } );
+        { id   => $id,
+          key  => $key,
+          data => $buffer,
+          part => $part,
+        },
+      );
 
       $parts{ $part++ } = $etag;
     }
@@ -331,8 +349,8 @@ sub initiate_multipart_upload {
     { region  => $self->region,
       method  => 'POST',
       path    => $self->_uri($key) . '?uploads=',
-      headers => $conf
-    }
+      headers => $conf,
+    },
   );
 
   my $response = $acct->_do_http($request);
@@ -342,7 +360,7 @@ sub initiate_multipart_upload {
   my $r = $acct->_xpc_of_content( $response->content );
 
   return $r->{UploadId};
-} ## end sub initiate_multipart_upload
+}
 
 #
 # Upload a part of a file as part of a multipart upload operation
@@ -409,8 +427,8 @@ sub upload_part_of_multipart_upload {
       method  => 'PUT',
       path    => $self->_uri($key) . $params,
       headers => $conf,
-      data    => $data
-    }
+      data    => $data,
+    },
   );
 
   my $response = $acct->_do_http($request);
@@ -423,10 +441,10 @@ sub upload_part_of_multipart_upload {
   if ($etag) {
     $etag =~ s/^"//xsm;
     $etag =~ s/"$//xsm;
-  } ## end if ($etag)
+  }
 
   return $etag;
-} ## end sub upload_part_of_multipart_upload
+}
 
 ########################################################################
 sub make_xml_document_simple {
@@ -436,6 +454,7 @@ sub make_xml_document_simple {
   my $xml = q{<?xml version="1.0" encoding="UTF-8"?>};
   my $xml_template
     = '<Part><PartNumber>%s</PartNumber><ETag>%s</ETag></Part>';
+
   my @parts;
 
   foreach my $part_num ( sort { $a <=> $b } keys %{$parts_hr} ) {
@@ -485,7 +504,7 @@ sub complete_multipart_upload {
   my $conf = {
     'Content-MD5'    => $md5_base64,
     'Content-Length' => length $content,
-    'Content-Type'   => 'application/xml'
+    'Content-Type'   => 'application/xml',
   };
 
   my $acct   = $self->account;
@@ -496,8 +515,8 @@ sub complete_multipart_upload {
       method  => 'POST',
       path    => $self->_uri($key) . $params,
       headers => $conf,
-      data    => $content
-    }
+      data    => $content,
+    },
   );
 
   my $response = $acct->_do_http($request);
@@ -508,7 +527,7 @@ sub complete_multipart_upload {
   }
 
   return $TRUE;
-} ## end sub complete_multipart_upload
+}
 
 #
 # Stop a multipart upload
@@ -530,8 +549,8 @@ sub abort_multipart_upload {
   my $request = $acct->_make_request(
     { region => $self->region,
       method => 'DELETE',
-      path   => $self->_uri($key) . $params
-    }
+      path   => $self->_uri($key) . $params,
+    },
   );
 
   my $response = $acct->_do_http($request);
@@ -539,7 +558,7 @@ sub abort_multipart_upload {
   $acct->_croak_if_response_error($response);
 
   return $TRUE;
-} ## end sub abort_multipart_upload
+}
 
 #
 # List all the uploaded parts for an ongoing multipart upload
@@ -563,8 +582,8 @@ sub list_multipart_upload_parts {
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri($key) . $params,
-      headers => $conf
-    }
+      headers => $conf,
+    },
   );
 
   my $response = $acct->_do_http($request);
@@ -573,7 +592,7 @@ sub list_multipart_upload_parts {
 
   # Just return the XML, let the caller figure out what to do with it
   return $response->content;
-} ## end sub list_multipart_upload_parts
+}
 
 #
 # List all the currently active multipart upload operations
@@ -590,8 +609,8 @@ sub list_multipart_uploads {
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri() . '?uploads',
-      headers => $conf
-    }
+      headers => $conf,
+    },
   );
 
   my $response = $acct->_do_http($request);
@@ -600,7 +619,7 @@ sub list_multipart_uploads {
 
   # Just return the XML, let the caller figure out what to do with it
   return $response->content;
-} ## end sub list_multipart_uploads
+}
 
 ########################################################################
 sub head_key {
@@ -608,7 +627,7 @@ sub head_key {
   my ( $self, $key ) = @_;
 
   return $self->get_key( $key, 'HEAD' );
-} ## end sub head_key
+}
 
 ########################################################################
 sub get_key {
@@ -619,7 +638,7 @@ sub get_key {
 
   if ( ref $filename ) {
     $filename = ${$filename};
-  } ## end if ( ref $filename )
+  }
 
   my $acct = $self->account;
 
@@ -629,8 +648,8 @@ sub get_key {
     { region  => $self->region,
       method  => $method,
       path    => $uri,
-      headers => {}
-    }
+      headers => {},
+    },
   );
 
   my $retval;
@@ -638,7 +657,7 @@ sub get_key {
   my $response = $acct->_do_http( $request, $filename );
 
   return $retval
-    if $response->code == 404;
+    if $response->code eq $HTTP_NOT_FOUND;
 
   $acct->_croak_if_response_error($response);
 
@@ -647,7 +666,7 @@ sub get_key {
   if ($etag) {
     $etag =~ s/^"//xsm;
     $etag =~ s/"$//xsm;
-  } ## end if ($etag)
+  }
 
   $retval = {
     content_length => $response->content_length || 0,
@@ -667,15 +686,15 @@ sub get_key {
     # etag so it should be lc'd for comparison.
     croak "Computed and Response MD5's do not match:  $md5 : $etag"
       if $md5 ne lc $etag;
-  } ## end if ( $method eq 'GET' )
+  }
 
   foreach my $header ( $response->headers->header_field_names ) {
     next if $header !~ /x-amz-meta-/ixsm;
     $retval->{ lc $header } = $response->header($header);
-  } ## end foreach my $header ( $response...)
+  }
 
   return $retval;
-} ## end sub get_key
+}
 
 ########################################################################
 sub get_key_filename {
@@ -684,10 +703,10 @@ sub get_key_filename {
 
   if ( !defined $filename ) {
     $filename = $key;
-  } ## end if ( !defined $filename)
+  }
 
   return $self->get_key( $key, $method, \$filename );
-} ## end sub get_key_filename
+}
 
 ########################################################################
 # See: https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html
@@ -747,7 +766,7 @@ sub copy_object {
   }
 
   return $acct->_xpc_of_content( $response->content );
-} ## end sub copy_key
+}
 
 ########################################################################
 sub delete_key {
@@ -763,10 +782,124 @@ sub delete_key {
     { method  => 'DELETE',
       region  => $self->region,
       path    => $self->_uri($key),
-      headers => {}
-    }
+      headers => {},
+    },
   );
-} ## end sub delete_key
+}
+
+########################################################################
+sub _format_delete_keys {
+########################################################################
+  my (@args) = @_;
+
+  my @keys;
+
+  if ( ref $args[0] ) {
+    if ( reftype( $args[0] ) eq 'ARRAY' ) { # list of keys, no version ids
+      foreach my $key ( @{ $args[0] } ) {
+        if ( ref($key) && reftype($key) eq 'HASH' ) {
+
+          push @keys,
+            {
+            Key => [ $key->{Key} ],
+            defined $key->{VersionId}
+            ? ( VersionId => [ $key->{VersionId} ] )
+            : (),
+            };
+        }
+        else { # array of keys
+          push @keys, { Key => [$key], };
+        }
+      }
+    }
+    elsif ( reftype( $args[0] ) eq 'CODE' ) { # sub that returns key, version id
+      while ( my (@object) = $args[0]->() ) {
+        last if !@object || !defined $object[0];
+
+        push @keys,
+          {
+          Key => [ $object[0] ],
+          defined $object[1] ? ( VersionId => [ $object[1] ] ) : (),
+          };
+      }
+    }
+    else {                                    # list of keys
+      croak 'argument must be array or list';
+    }
+  }
+  elsif (@args) {
+    @keys = map { { Key => [$_] } } @args;
+  }
+  else {
+    croak 'must specify keys';
+  }
+
+  croak 'must not exceed ' . $MAX_DELETE_KEYS . ' keys'
+    if @keys > $MAX_DELETE_KEYS;
+
+  return \@keys;
+}
+
+#  @args => list of keys
+#  $args[0] => array of hashes (Key, [VersionId]) VersionId is optional
+#  $args[0] => array of scalars (keys)
+#  $args[0] => code reference that returns key, version id or empty
+#  $args[0] => hash ({ quiet => 1, keys => $keys})
+
+# Throws exception if no keys or in wrong format...
+########################################################################
+sub delete_keys {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my ( $keys, $quiet_mode );
+
+  if ( ref $args[0] && reftype( $args[0] ) eq 'HASH' ) {
+    ( $keys, $quiet_mode ) = @{ $args[0] }{qw(keys quiet)};
+    $keys = _format_delete_keys($keys);
+  }
+  else {
+    $keys = _format_delete_keys(@args);
+  }
+
+  if ( defined $quiet_mode ) {
+    $quiet_mode = $quiet_mode ? 'true' : 'false';
+  }
+  else {
+    $quiet_mode = 'false';
+  }
+
+  my $content = {
+    xmlns  => $S3_XMLNS,
+    Quiet  => [$quiet_mode],
+    Object => $keys,
+  };
+
+  my $xml_content = XMLout(
+    $content,
+    RootName => 'Delete',
+    XMLDecl  => $XMLDECL,
+  );
+
+  my $conf    = {};
+  my $account = $self->account;
+
+  my $md5        = md5($xml_content);
+  my $md5_base64 = encode_base64($md5);
+
+  chomp $md5_base64;
+
+  $conf->{'Content-MD5'} = $md5_base64;
+
+  return $account->_send_request(
+    { method  => 'POST',
+      region  => $self->region,
+      path    => $self->_uri() . '?delete',
+      headers => $conf,
+      data    => $xml_content,
+    },
+  );
+}
 
 ########################################################################
 sub delete_bucket {
@@ -777,7 +910,7 @@ sub delete_bucket {
     if @_ > 1;
 
   return $self->account->delete_bucket($self);
-} ## end sub delete_bucket
+}
 
 ########################################################################
 sub list_v2 {
@@ -791,10 +924,10 @@ sub list_v2 {
 
   if ( $conf->{'marker'} ) {
     $conf->{'continuation-token'} = delete $conf->{'marker'};
-  } ## end if ( $conf->{'marker'})
+  }
 
   return $self->list($conf);
-} ## end sub list_v2
+}
 
 ########################################################################
 sub list {
@@ -806,7 +939,7 @@ sub list {
   $conf->{bucket} = $self->bucket;
 
   return $self->account->list_bucket($conf);
-} ## end sub list
+}
 
 ########################################################################
 sub list_all_v2 {
@@ -818,7 +951,7 @@ sub list_all_v2 {
   $conf->{bucket} = $self->bucket;
 
   return $self->account->list_bucket_all_v2($conf);
-} ## end sub list_all_v2
+}
 
 ########################################################################
 sub list_all {
@@ -830,7 +963,7 @@ sub list_all {
   $conf->{bucket} = $self->bucket;
 
   return $self->account->list_bucket_all($conf);
-} ## end sub list_all
+}
 
 ########################################################################
 sub get_acl {
@@ -843,8 +976,8 @@ sub get_acl {
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri($key) . '?acl=',
-      headers => {}
-    }
+      headers => {},
+    },
   );
 
   my $old_redirectable = $account->ua->requests_redirectable;
@@ -859,30 +992,30 @@ sub get_acl {
     my $old_host = $account->host;
     $account->host( $uri->host );
 
-    my $request = $account->_make_request(
+    $request = $account->_make_request(
       { region  => $self->region,
         method  => 'GET',
         path    => $uri->path,
-        headers => {}
-      }
+        headers => {},
+      },
     );
 
     $response = $account->_do_http($request);
 
     $account->ua->requests_redirectable($old_redirectable);
     $account->host($old_host);
-  } ## end if ( $response->code =~...)
+  }
 
   my $content;
 
   # do we test for NOT FOUND, returning undef?
-  if ( $response->code ne '404' ) {
+  if ( $response->code ne $HTTP_NOT_FOUND ) {
     $account->_croak_if_response_error($response);
     $content = $response->content;
   }
 
   return $content;
-} ## end sub get_acl
+}
 
 ########################################################################
 sub set_acl {
@@ -899,24 +1032,27 @@ sub set_acl {
 
   my $path = $self->_uri( $conf->{key} ) . '?acl=';
 
-  my $hash_ref
-    = ( $conf->{acl_short} )
-    ? { 'x-amz-acl' => $conf->{acl_short} }
-    : {};
+  my $headers = {};
+
+  if ( $conf->{acl_short} ) {
+    $headers->{'x-amz-acl'} = $conf->{acl_short};
+  }
 
   my $xml = $conf->{acl_xml} || $EMPTY;
 
   my $account = $self->account;
 
+  $headers->{'Content-Length'} = length $xml;
+
   return $account->_send_request_expect_nothing(
     { method  => 'PUT',
       path    => $path,
-      headers => $hash_ref,
+      headers => $headers,
       data    => $xml,
-      region  => $self->region
-    }
+      region  => $self->region,
+    },
   );
-} ## end sub set_acl
+}
 
 ########################################################################
 sub get_location_constraint {
@@ -928,8 +1064,8 @@ sub get_location_constraint {
   my $xpc = $account->_send_request(
     { region => $self->region,
       method => 'GET',
-      path   => $self->bucket . '/?location='
-    }
+      path   => $self->bucket . '/?location=',
+    },
   );
 
   my $lc;
@@ -939,16 +1075,16 @@ sub get_location_constraint {
       if $account->_remember_errors($xpc);
 
     return $lc;
-  } ## end if ( !$xpc )
+  }
 
   $lc = $xpc->{content};
 
   if ( defined $lc && $lc eq $EMPTY ) {
     $lc = undef;
-  } ## end if ( defined $lc && $lc...)
+  }
 
   return $lc;
-} ## end sub get_location_constraint
+}
 
 # proxy up the err requests
 
@@ -966,7 +1102,7 @@ sub err {
   my ($self) = @_;
 
   return $self->account->err;
-} ## end sub err
+}
 
 ########################################################################
 sub errstr {
@@ -974,7 +1110,7 @@ sub errstr {
   my ($self) = @_;
 
   return $self->account->errstr;
-} ## end sub errstr
+}
 
 ########################################################################
 sub error {
@@ -982,7 +1118,7 @@ sub error {
   my ($self) = @_;
 
   return $self->account->error;
-} ## end sub err
+}
 
 ########################################################################
 sub _content_sub {
@@ -1013,7 +1149,7 @@ sub _content_sub {
       $fh->binmode;
 
       $remaining = $stat->size;
-    } ## end if ( !$fh->opened )
+    }
 
     my $read = $fh->read( $buffer, $blksize );
 
@@ -1026,13 +1162,13 @@ sub _content_sub {
         or croak "close of upload content $filename failed: $OS_ERROR";
 
       $buffer ||= $EMPTY; # LWP expects an empty string on finish, read returns 0
-    } ## end if ( !$read )
+    }
 
     $remaining -= length $buffer;
 
     return $buffer;
   };
-} ## end sub _content_sub
+}
 
 1;
 
@@ -1113,9 +1249,10 @@ operating in only 1 region, set the region in the C<account> object
 
 =item logger
 
-Sets the logger object (should be an object capable of providing at
-least a C<debug> and C<trace> method for recording log messages. If no
-logger object is passed the C<account> object's logger object will be used.
+Sets the logger.  The logger should be a blessed reference capable of
+providing at least a C<debug> and C<trace> method for recording log
+messages. If no logger object is passed the C<account> object's logger
+object will be used.
 
 =item verify_region
 
@@ -1149,7 +1286,7 @@ A string identifier for the object being written to the bucket.
 
 =item value
 
-A SCALAR string representing the contents of the object..
+A SCALAR string representing the contents of the object.
 
 =item configuration
 
@@ -1269,6 +1406,82 @@ HASH will contain the following members:
 
 =back
 
+=head2 delete_key $key_name
+
+Permanently removes C<$key_name> from the bucket. Returns a
+boolean value indicating the operations success.
+
+=head2 delete_keys @keys
+
+=head2 delete_keys $keys
+
+Permanently removes keys from the bucket. Returns the response body
+from the API call. Returns C<undef> on non '2xx' return codes.
+
+See <Deleting Amazon S3 object | https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html>
+
+The argument to C<delete_keys> can be:
+
+=over 5
+
+=item * list of key names
+
+=item * an array of hashes where each hash reference contains the keys
+C<Key> and optionally C<VersionId>.
+
+=item * an array of scalars where each scalar is a key name
+
+=item * a hash of options where the hash contains
+
+=item * a callback that returns the key and optionally the version id
+
+=over 10
+
+=item quiet
+
+Boolean indicating quiet mode
+
+=item keys
+
+An array of keys containing scalars or hashes as describe above.
+
+=back
+
+=back
+
+Examples:
+
+ # delete a list of keys
+ $bucket->delete_keys(qw( foo bar baz));
+
+ # delete an array of keys
+ $bucket->delete_keys([qw(foo bar baz)]);
+
+ # delete an array of keys in quiet mode 
+ $bucket->delete({ quiet => 1, keys => [ qw(foo bar baz) ]);
+
+ # delete an array of versioned objects
+ $bucket->delete_keys([ { Key => 'foo', VersionId => '1'} ]);
+
+ # callback
+ my @key_list = qw(foo => 1, bar => 3, biz => 1);
+
+ $bucket->delete_keys(
+   sub {
+     return ( shift @key_list, shift @key_list );
+   }
+ );
+
+I<When using a callback, the keys are deleted in bulk. The
+C<DeleteObjects> API is only called once.>
+
+=head2 delete_bucket
+
+Permanently removes the bucket from the server. A bucket
+cannot be removed if it contains any keys (contents).
+
+This is an alias for C<$s3-E<gt>delete_bucket($bucket)>.
+
 =head2 get_key $key_name, [$method]
 
 Takes a key and an optional HTTP method and fetches it from
@@ -1296,17 +1509,6 @@ On success, the method returns a HASHREF containing:
 This method works like C<get_key>, but takes an added
 filename that the S3 resource will be written to.
 
-=head2 delete_key $key_name
-
-Permanently removes C<$key_name> from the bucket. Returns a
-boolean value indicating the operations success.
-
-=head2 delete_bucket
-
-Permanently removes the bucket from the server. A bucket
-cannot be removed if it contains any keys (contents).
-
-This is an alias for C<$s3->delete_bucket($bucket)>.
 
 =head2 list
 
@@ -1628,5 +1830,6 @@ Rob Lauer
 Jojess Fournier
 Tim Mullin
 Todd Rinaldo
+luiserd97
 
 =cut

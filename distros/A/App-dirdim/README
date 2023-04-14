@@ -1,5 +1,67 @@
 This module provides a UNIX-like command `dirdim'. 
 
- Copyright (c) 2022 Toshiyuki SHIMONO. All rights reserved.
+ Copyright (c) 2022-2023 Toshiyuki SHIMONO. All rights reserved.
  This program is free software; you can redistribute it and/or
  modify it under the same terms as Perl itself.
+
+
+■■ 概要 ■■
+
+このモジュールをインストールすると、コマンド dirdim が使えるようになる。
+
+このコマンドは、下記の様に使うと、引数に指定したそれぞれのディレクトリの直下に、
+何個の非ディレクトリのファイルと、何個のディレクトリのファイルが存在するかを
+表形式(TSV形式;タブ文字区切り形式)で出力する。
+
+> dirdim blib .git   # コマンドの引数に blib と .git というディレクトリを指定
+
+nondir  subdir  given_dir
+0   6   blib/
+8   5   .git/
+8   11  total
+
+(タブ文字で区切っているだけなので、表示の仕方により縦位置がずれて見えることに注意。
+縦揃えをするには、App::expandtab をインストールすると使えるコマンド expandtab
+ を使うと良い。)
+
+■■ 目的 ■■
+
+多数のディレクトリがある場合に、それぞれのディレクトリに何個のファイルがあるかを
+即座に知る方法(たとえばシェル芸)は困難である。そのため、10文字以内のコマンドと
+いくつかのオプションで様々な追加機能で、便利な機能を実現するため、このコマンドを
+作成した。
+
+■■ オプションの例 ■■
+
+オプションとしては、たとえば -v を与えることにより、具体的なファイルを出力する。
+(具体例を出すことで、コマンドの動作の正しさの確信を高める効用がある。)
+
+> dirdim -v blib .git  
+
+nondir  subdir  given_dir   fileName_minstr fileName_maxstr
+0   6   blib/   arch/   script/
+8   5   .git/   COMMIT_EDITMSG  refs/
+8   11  total
+
+オプションの別の例として、 -d を与えることにより、指定したディレクトリファイルの
+直下のファイルのみでなくて、最も深いディレクトリ階層にあるファイルの例とその深さを
+知ることが出来る。
+
+> dirdim -d blib .git  
+
+nondir  subdir  depth   alltree given_dir   An example at the deepest
+0   6   5   25  blib/   lib/auto/App/dirdim/.exists
+8   5   5   218 .git/   logs/refs/remotes/origin/master
+8   11  5   243 total
+
+■■ 補足 ■■
+
+このコマンドの出力は ANSIエスケープシーケンスにより、テキストに黄色などの色が
+着いている。この着色を消すには、App::colorplusをインストールすると使える
+colorplus のコマンドを使って、 colorplus -0 に dirdim の出力を渡すと良い。
+
+例:  
+> dirdim * | cololrplus -0
+
+なお、上記の説明で > は全てコマンドラインのプロンプト文字列を表しており、
+実際のコマンド、それより後の文字列である。

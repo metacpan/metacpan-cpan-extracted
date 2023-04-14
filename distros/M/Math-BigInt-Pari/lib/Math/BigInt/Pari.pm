@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.3009';
+our $VERSION = '1.3011';
 
 use Math::Pari qw(PARI pari2pv gdivent bittest
                   gcmp gcmp0 gcmp1 gcd ifact gpui gmul
@@ -391,25 +391,21 @@ You can also look for information at:
 
 =over 4
 
-=item GitHub
+=item * GitHub Source Repository
 
 L<https://github.com/pjacklam/p5-Math-BigInt-Pari>
 
-=item RT: CPAN's request tracker
+=item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Pari>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Pari>
 
-=item MetaCPAN
+=item * MetaCPAN
 
 L<https://metacpan.org/release/Math-BigInt-Pari>
 
-=item CPAN Testers Matrix
+=item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-Pari>
-
-=item CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt-Pari>
 
 =back
 

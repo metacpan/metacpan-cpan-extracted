@@ -31,3 +31,25 @@ eatmydata make testall
 
 If you didn't alter the tests data, you can further speedup a re-run by using:
 [[ -d t/media ]] && mv -f t/02create_pkgs.t{,.i}
+
+You can selectively run some tests:
+# Run everything:
+PERL_DL_NONLAZY=1 perl "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t 
+# Only run everything orphans tests:
+PERL_DL_NONLAZY=1 perl "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*orphans*.t
+# If you want to see the output:
+perl t/superuser--orphans.t
+
+
+Layout:
+=======
+
+The testsuite layout is :
+t/
+  *.t the tests
+  helper.pm common stuff for the tests
+  data/  data for the tests
+     SPECS/ spec files for generating test rpms
+     rpm-*/ some old rpm v3 pkgs & some buggy rpms in order to check rpmlib itself
+  media/ where test rpms & test repos are generated
+

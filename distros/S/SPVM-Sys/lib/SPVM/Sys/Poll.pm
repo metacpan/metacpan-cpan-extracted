@@ -25,3 +25,10 @@ poll() performs a similar task to select(2): it waits for one of a set of file d
 See the L<poll|https://linux.die.net/man/2/poll> function in Linux.
 
 The file discritors are a L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> object.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

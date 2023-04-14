@@ -8,6 +8,20 @@ undef $ENV{$_} foreach grep { /^DD_/ } keys %ENV;
 
 my @cases = (
     {
+        name        => 'Does create the default URI',
+        make_client => sub {
+            Client->new(
+                http_user_agent => bless({}, 'MyStub::UserAgent'),
+            )
+        },
+        uri => {
+            scheme => 'http',
+            host   => 'localhost',
+            port   => '8126',
+            path   => '/v0.3/traces',
+        },
+    },
+    {
         name        => 'Does create the correct URI from given parameters',
         make_client => sub {
             Client->new(
@@ -26,21 +40,18 @@ my @cases = (
         },
     },
     {
-        name        => 'Uses the DD_HOST env variable for default host',
+        name        => 'Uses the DD_TRACE_AGENT_URL env variable',
         make_client => sub {
-            local $ENV{DD_HOST} = 'dd-host';
+            local $ENV{DD_TRACE_AGENT_URL} = 'https://agent.tst:9999/v0/traces';
             Client->new(
                 http_user_agent => bless({}, 'MyStub::UserAgent'),
-                scheme          => 'https',
-                port            => '1234',
-                path            => 'my/traces',
             )
         },
         uri => {
             scheme => 'https',
-            host   => 'dd-host',
-            port   => '1234',
-            path   => '/my/traces',
+            host   => 'agent.tst',
+            port   => '9999',
+            path   => '/v0/traces',
         },
     },
     {
@@ -62,9 +73,9 @@ my @cases = (
         },
     },
     {
-        name        => 'DD_HOST takes precedence over DD_AGENT_HOST',
+        name        => 'DD_TRACE_AGENT_URL takes precedence over others',
         make_client => sub {
-            local $ENV{DD_HOST}       = 'dd-host';
+            local $ENV{DD_TRACE_AGENT_URL} = 'https://agent.tst:9999/v0/traces';
             local $ENV{DD_AGENT_HOST} = 'dd-agent-host';
             Client->new(
                 http_user_agent => bless({}, 'MyStub::UserAgent'),
@@ -75,9 +86,9 @@ my @cases = (
         },
         uri => {
             scheme => 'https',
-            host   => 'dd-host',
-            port   => '1234',
-            path   => '/my/traces',
+            host   => 'agent.tst',
+            port   => '9999',
+            path   => '/v0/traces',
         },
     },
 );

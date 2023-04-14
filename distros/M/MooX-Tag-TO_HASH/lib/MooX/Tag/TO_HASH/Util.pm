@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Exporter 'import';
 
@@ -20,9 +20,9 @@ BEGIN {
         LC_TO_HASH => 'to_hash',
         UC_TO_JSON => 'TO_JSON',
         UC_TO_HASH => 'TO_HASH',
-        map { uc( $_ ) => $_ } 'omit_if_empty',
+        map { uc() => $_ } 'omit_if_empty',
         'if_exists', 'if_defined', 'no_recurse', 'alt_name', 'predicate',
-        'type',      'bool',       'num',        'str'
+        'type',      'bool',       'num',        'str',
     );
 }
 
@@ -34,12 +34,8 @@ our %EXPORT_TAGS = ( all => [ 'make_tag_handler', keys %CONSTANTS ] );
 our @EXPORT_OK   = ( map { @$_ } values %EXPORT_TAGS );
 
 our %ALLOWED = (
-    +( LC_TO_JSON ) => {
-        map { $_ => undef } OMIT_IF_EMPTY,
-        IF_EXISTS, IF_DEFINED, BOOL, NUM, STR
-    },
-    +( LC_TO_HASH ) =>
-      { map { $_ => undef } OMIT_IF_EMPTY, IF_EXISTS, IF_DEFINED, NO_RECURSE },
+    +( LC_TO_JSON ) => { map { $_ => undef } OMIT_IF_EMPTY, IF_EXISTS, IF_DEFINED, BOOL, NUM, STR },
+    +( LC_TO_HASH ) => { map { $_ => undef } OMIT_IF_EMPTY, IF_EXISTS, IF_DEFINED, NO_RECURSE },
 );
 
 sub _croak {
@@ -47,12 +43,18 @@ sub _croak {
     goto \&Carp::croak;
 }
 
+sub _croak_tag_attr {
+    my ( $tag, $attr, $msg ) = @_;
+    $attr = join( ', ', @$attr ) if 'ARRAY' eq ref $attr;
+    _croak( "[$attr] => $tag: $msg" );
+}
 
 
 
 
 
-sub make_tag_handler {
+
+sub make_tag_handler {    ## no critic(Subroutines::ProhibitExcessComplexity)
     my ( $tag ) = @_;
     my $package = caller();
 
@@ -61,38 +63,37 @@ sub make_tag_handler {
     _croak( "unsupported tag: $tag" )
       unless defined $allowed;
 
-    set_subname "$package\::tag_handler" => sub {
+    set_subname "$package\::${tag}_tag_handler" => sub {
         my ( $orig, $attrs, %opt ) = @_;
         my $spec = $opt{$tag};
 
-       # if no to_$tag, or to_$tag has been processed (e.g. it's now a json ref)
-       # pass on to original routine.
+        # if no to_$tag, or to_$tag has been processed (e.g. it's now a json ref)
+        # pass on to original routine.
         return $orig->( $attrs, %opt )
           if !defined $spec || ref( $spec );
 
         my %spec;
         if ( $spec ne '1' ) {
-            my ( $alt_name, @stuff ) = split( ',', $spec );
-            defined $_ and _croak( "unknown option: $_ " )
+            my ( $alt_name, @stuff ) = split( /,/, $spec );
+            defined() and _croak_tag_attr( $tag, $attrs, "unknown option: $_ " )
               for grep { !exists $allowed->{$_} } @stuff;
             $spec{ +ALT_NAME } = $alt_name if length( $alt_name );
             $spec{$_} = 1 for @stuff;
 
             # consistency checks if more than one attribute is passed to has.
             if ( ref $attrs && @{$attrs} > 1 ) {
-                _croak(
-                    "can't specify alternate name if more than one attribute is defined"
-                ) if exists $spec{ +ALT_NAME };
-                _croak(
-                    "can't specify predicate name if more than one attribute is defined"
-                ) if defined $opt{ +PREDICATE } && $opt{ +PREDICATE } ne '1';
+                _croak_tag_attr( $tag, $attrs,
+                    q{can't specify alternate name if more than one attribute is defined} )
+                  if exists $spec{ +ALT_NAME };
+                _croak_tag_attr( $tag, $attrs,
+                    q{can't specify predicate name if more than one attribute is defined} )
+                  if defined $opt{ +PREDICATE } && $opt{ +PREDICATE } ne '1';
             }
 
             if ( $tag eq UC_TO_JSON ) {
                 $spec{ +TYPE } = do {
                     my ( $type, @types ) = grep exists $spec{$_}, TYPES;
-                    _croak( "specify exactly zero or one of "
-                          . join( ', ', TYPES ) )
+                    _croak_tag_attr( $tag, $attrs, 'specify exactly zero or one of ' . join( ', ', TYPES ) )
                       if @types;
                     $type;
                 };
@@ -122,7 +123,7 @@ sub make_tag_handler {
                 $opt{ +PREDICATE } //= 1;
                 $to{$attr}{ +PREDICATE }
                   = $opt{ +PREDICATE } eq '1'
-                  ? 'has_' . $attr
+                  ? ( substr( $attr, 0, 1 ) eq '_' ? '_has' : 'has_' ) . $attr
                   : $opt{ +PREDICATE };
             }
         }
@@ -145,7 +146,7 @@ MooX::Tag::TO_HASH::Util
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =for Pod::Coverage make_tag_handler
 
@@ -153,7 +154,7 @@ version 0.03
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-moox-tag-to_hash@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH
+Please report any bugs or feature requests to bug-moox-tag-to_hash@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH>
 
 =head2 Source
 

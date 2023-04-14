@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.20'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.22'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -168,7 +168,7 @@ sub ccs_accum_hash {
  ).($args{init_missingOut} || 'missingOut = $missing();').q(
  nMissingInit = $N()-1;
  nMissing     = nMissingInit;
- ).(defined($args{tmp_reset}) ? $args{tmp_reset} :  'tmp = $nzvalsIn(NnzIn=>0);').q( /* initialize tmp */
+ ).(defined($args{tmp_reset}) ? $args{tmp_reset} :  'if ($SIZE(NnzIn) == 0) $CROAK("called with empty nzvalsIn"); tmp = $nzvalsIn(NnzIn=>0);').q( /* initialize tmp */
  //
  //-- loop
  for (nnzii_prev=0,nnzii=1; nnzii<sizeNnzIn && nnzoi<sizeNnzOut; nnzii_prev=nnzii++) {

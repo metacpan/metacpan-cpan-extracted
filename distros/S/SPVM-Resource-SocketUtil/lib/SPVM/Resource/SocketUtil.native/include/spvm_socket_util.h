@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM__SOCKET_UTIL_H
 #define SPVM__SOCKET_UTIL_H
 

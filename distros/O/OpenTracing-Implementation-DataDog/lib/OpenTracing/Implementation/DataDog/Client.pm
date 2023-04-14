@@ -39,24 +39,31 @@ agent.
 
 
 
-our $VERSION = 'v0.43.2';
+our $VERSION = 'v0.45.0';
 
 use English;
 
 use Moo;
+use Sub::HandlesVia;
+#   XXX Order matters: Sub::HandlesVia::Manual::WithMoo - Potential load order
 use MooX::Attribute::ENV;
+use MooX::ProtectedAttributes;
 use MooX::Should;
 
 use Carp;
+use Data::Validate::URI qw/is_uri/;
 use HTTP::Request ();
 use JSON::MaybeXS qw(JSON);
 use LWP::UserAgent;
 use PerlX::Maybe qw/maybe provided/;
-use Types::Standard qw/Enum HasMethods/;
+use Types::Standard qw/ArrayRef Bool Enum HasMethods Maybe Str/;
+use Types::Common::Numeric qw/IntRange/;
 
 use OpenTracing::Implementation::DataDog::Utils qw(
     nano_seconds
 );
+
+use constant MAX_SPANS => 20_000; # this is just an arbitrary, hardcoded number
 
 
 
@@ -82,7 +89,7 @@ and returns a L<HTTP::Response> compliant response object.
 has http_user_agent => (
     is => 'lazy',
     should => HasMethods[qw/request/],
-    handles => { send_http_request => 'request' },
+    handles => { _send_http_request => 'request' },
 );
 
 sub _build_http_user_agent {
@@ -109,14 +116,13 @@ has scheme => (
 =head2 C<host>
 
 The host-name where the DataDog agent is running, which defaults to
-C<localhost> or the value of either C<DD_HOST> or C<DD_AGENT_HOST> environment
-variable if set.
+C<localhost> or the value of C<DD_AGENT_HOST> environment variable if set.
 
 =cut
 
 has host => (
     is      => 'ro',
-    env_key => [ 'DD_HOST', 'DD_AGENT_HOST' ],
+    env_key => 'DD_AGENT_HOST',
     default => 'localhost',
 );
 
@@ -133,18 +139,6 @@ has port => (
     is => 'ro',
     env_key => 'DD_TRACE_AGENT_PORT',
     default => '8126',
-);
-
-=head2 C<env>
-
-The environment name to pass to the agent. By default, no environment is passed.
-
-=cut
-
-has env => (
-    is      => 'ro',
-    env_key => 'DD_ENV',
-    default => undef,
 );
 
 
@@ -165,6 +159,22 @@ has path => (
 
 
 
+=head2 C<agent_url>
+
+The complete URL the DataDog agent is listening at, and defaults to the value of
+the C<DD_TRACE_AGENT_URL> environment variable if set. If this is set, it takes
+precedence over any of the other settings.
+
+=cut
+
+has agent_url => (
+    is => 'ro',
+    env_key => 'DD_TRACE_AGENT_URL',
+    should  => Maybe[Str->where( sub { is_uri($_) } )],
+);
+
+
+
 has uri => (
     is => 'lazy',
     init_arg => undef,
@@ -173,16 +183,42 @@ has uri => (
 sub _build_uri {
     my $self = shift;
     
-    return "$self->{ scheme }://$self->{ host }:$self->{ port }/$self->{ path }"
+    return
+        $self->agent_url
+        //
+        "$self->{ scheme }://$self->{ host }:$self->{ port }/$self->{ path }"
 }
 #
 # URI::Template is a nicer solution for this and more dynamic
 
 
+
+protected_has _default_http_headers => (
+    is          => 'lazy',
+    isa         => ArrayRef,
+    init_arg    => undef,
+    handles_via => 'Array',
+    handles     => {
+        _default_http_headers_list => 'all',
+    },
+);
+
+sub _build__default_http_headers {
+    return [
+        'Content-Type'                  => 'application/json; charset=UTF-8',
+        'Datadog-Meta-Lang'             => 'perl',
+        'Datadog-Meta-Lang-Interpreter' => $EXECUTABLE_NAME,
+        'Datadog-Meta-Lang-Version'     => $PERL_VERSION->stringify,
+        'Datadog-Meta-Tracer-Version'   => $VERSION,
+    ]
+}
+
+
+
 has _json_encoder => (
     is              => 'lazy',
     init_arg        => undef,
-    handles         => { json_encode => 'encode' },
+    handles         => { _json_encode => 'encode' },
 );
 
 sub _build__json_encoder {
@@ -190,6 +226,60 @@ sub _build__json_encoder {
 }
 #
 # I just love readable and consistant JSONs
+
+
+
+=head2 C<span_buffer_threshold>
+
+This sets the size limit of the span buffer. When this number is reached, this
+C<Client> will send off the buffered spans using the internal C<user_agent>.
+
+This number can be set on instantiation, or will take it from the
+C<DD_TRACE_PARTIAL_FLUSH_MIN_SPANS> environment variable. If nothing is set, it
+defaults to 100.
+
+The number can not be set to anything higher than 20_000.
+
+If this number is C<0> (zero), spans will be sent with each call to
+C<send_span>.
+
+=cut
+
+has span_buffer_threshold => (
+    is      => 'rw',
+    isa     => IntRange[ 0, MAX_SPANS ],
+    env_key => 'DD_TRACE_PARTIAL_FLUSH_MIN_SPANS',
+    default => 100,
+);
+
+
+
+protected_has _span_buffer => (
+    is          => 'rw',
+    isa         => ArrayRef,
+    init_args   => undef,
+    default     => sub { [] },
+    handles_via => 'Array',
+    handles     => {
+        _buffer_span         => 'push',
+        _span_buffer_size    => 'count',
+        _buffered_spans      => 'all',
+        _empty_span_buffer   => 'clear',
+    },
+);
+
+
+
+protected_has _client_halted => (
+    is            => 'rw',
+    isa           => Bool,
+    reader        => '_has_client_halted',
+    default       => 0,
+    handles_via   => 'Bool',
+    handles       => {
+        _halt_client => 'set'
+    },
+);
 
 
 
@@ -206,7 +296,7 @@ OpenTracing::Implementation::DataDog::Tracer>:
 
 This method gets called by the L<DataDog::Tracer|
 OpenTracing::Implementation::DataDog::Tracer> to send a L<Span> with its
-specific L<DataDog::SpanContext|OpenTracing::Implementation::DataDog::Tracer>.
+specific L<DataDog::SpanContext|OpenTracing::Implementation::DataDog::SpanContext>.
 
 This will typically get called during C<on_finish>.
 
@@ -216,14 +306,31 @@ This will typically get called during C<on_finish>.
 
 =item C<$span>
 
-A L<OpenTracing Span|OpenTracing::Interface::Span> compliant object, that will
+An L<OpenTracing Span|OpenTracing::Interface::Span> compliant object, that will
 be serialised (using L<to_struct> and converted to JSON).
 
 =back
 
 =head3 Returns
 
-A boolean, that comes from L<< C<is_succes>|HTTP::Response#$r->is_success >>.
+=over
+
+=item C<undef>
+
+in case something went wrong during the HTTP-request or the client has been
+halted in any previous call.
+
+=item a positive int
+
+indicating the number of collected spans, in case this client has only buffered
+the span.
+
+=item a negative int
+
+indicating the number of flushed spans, in case the client has succesfully
+flushed the spans collected in the buffer.
+
+=back
 
 =cut
 
@@ -231,11 +338,26 @@ sub send_span {
     my $self = shift;
     my $span = shift;
     
-    my $data = $self->to_struct( $span );
+    return
+        if $self->_has_client_halted();
+    # do not add more spans to the buffer
     
-    my $resp = $self->http_post_struct_as_json( [[ $data ]] );
+    my $new_span_buffer_size = $self->_buffer_span($span);
     
-    return $resp->is_success
+    return $new_span_buffer_size
+        unless ( $new_span_buffer_size // 0 ) > 0;
+    # this should be the number of spans in the buffer, should not be undef or 0
+    
+    return $new_span_buffer_size
+        unless $self->_should_flush_span_buffer();
+    
+    my $flushed = $self->_flush_span_buffer();
+    
+    return
+        unless defined $flushed;
+    
+    return -$flushed
+    
 }
 
 
@@ -274,6 +396,10 @@ a hashreference with the following keys:
 
 =item C<type> (optional)
 
+=item C<env> (optional)
+
+=item C<hostname> (optional)
+
 =item C<name>
 
 =item C<start>
@@ -304,10 +430,7 @@ sub to_struct {
     my $context = $span->get_context();
     
     my %meta_data = (
-        maybe
-        env => $self->env,
-
-        $span->get_tags,
+        _fixup_span_tags( $span->get_tags ),
         $context->get_baggage_items,
     );
     
@@ -325,6 +448,12 @@ sub to_struct {
         maybe
         type      => $context->get_service_type,
         
+        maybe
+        env       => $context->get_environment,
+        
+        maybe
+        hostname  => $context->get_hostname,
+        
         name      => $span->get_operation_name,
         start     => nano_seconds( $span->start_time() ),
         duration  => nano_seconds( $span->duration() ),
@@ -332,7 +461,8 @@ sub to_struct {
         maybe
         parent_id => $span->get_parent_span_id(),
         
-#       error     => ... ,
+        provided _is_with_errors( $span ),
+        error     => 1,
         
         provided %meta_data,
         meta      => { %meta_data },
@@ -345,33 +475,6 @@ sub to_struct {
     #       this behaves with JSON
     
     return $data
-}
-
-
-
-sub http_post_struct_as_json {
-    my $self = shift;
-    my $struct = shift;
-    
-    my $encoded_data = $self->json_encode($struct);
-    do { warn "$encoded_data\n" }
-        if $ENV{OPENTRACING_DEBUG};
-    
-    
-    my $header = [
-        'Content-Type'                  => 'application/json; charset=UTF-8',
-        'Datadog-Meta-Lang'             => 'perl',
-        'Datadog-Meta-Lang-Interpreter' => $EXECUTABLE_NAME,
-        'Datadog-Meta-Lang-Version'     => $PERL_VERSION->stringify,
-        'Datadog-Meta-Tracer-Version'   => $VERSION,
-        'X-Datadog-Trace-Count'         => scalar @{$struct->[0]},
-    ];
-    
-    my $rqst = HTTP::Request->new( 'POST', $self->uri, $header, $encoded_data );
-        
-    my $resp = $self->send_http_request( $rqst );
-    
-    return $resp;
 }
 
 
@@ -429,5 +532,181 @@ For details, see the full text of the license in the file LICENSE.
 
 
 =cut
+
+
+# _fixup_span_tags
+#
+# rename and or remove key value pairs from standard OpenTracing to what
+# DataDog expects to be send
+#
+sub _fixup_span_tags {
+    my %tags = @_;
+    
+    my $error = delete $tags { error };
+    
+    $tags { 'error.type'    } = delete $tags{ 'error.kind' }
+        if $error;
+    
+    $tags { 'error.message' } = delete $tags{ 'message' }
+        if $error;
+    
+    return %tags;
+}
+
+
+
+# _flush_span_buffer
+#
+# Flushes the spans in the span buffer and send them off to the DataDog agent
+# over HTTP.
+#
+# Returns the number off flushed spans or `undef` in case of an error.
+#
+sub _flush_span_buffer {
+    my $self = shift;
+    
+    my @structs = map {$self->to_struct($_) } $self->_buffered_spans();
+    
+    my $resp = $self->_http_post_struct_as_json( [ \@structs ] )
+        or return;
+    
+    $self->_empty_span_buffer();
+    
+    return scalar @structs;
+}
+
+
+
+# checks if there is an exisiting 'error' tag
+#
+sub _is_with_errors {
+    my $span = shift;
+    return exists { $span->get_tags() }->{ error }
+}
+
+
+
+# _http_headers_with_trace_count
+#
+# Returns a list of HTTP Headers needed for DataDog
+#
+# This feature was originally added, so the Trace-Count could dynamically set
+# per request. That was a design flaw, and now the count is hardcoded to '1',
+# until we figured out how to send multiple spans.
+#
+sub _http_headers_with_trace_count {
+    my $self = shift;
+    my $count = shift;
+    
+    return (
+        $self->_default_http_headers_list,
+        
+        maybe
+        'X-Datadog-Trace-Count' => $count,
+    )
+}
+
+
+
+# _http_post_struct_as_json
+#
+# Takes a given data structure and sends an HTTP POST request to the tracing
+# agent.
+#
+# It is the caller's responsibility to generate the correct data structure!
+#
+# Maybe returns an HTTP::Response object, which may indicate a failure.
+#
+sub _http_post_struct_as_json {
+    my $self = shift;
+    my $struct = shift;
+    
+    return
+        if $self->_has_client_halted();
+    # this shouldn't be needed, but will happen on DEMOLISH & spans in buffer
+
+    my $encoded_data = $self->_json_encode($struct);
+    do { warn "$encoded_data\n" }
+        if $ENV{OPENTRACING_DEBUG};
+    
+    my @headers = $self->_http_headers_with_trace_count( scalar @{$struct->[0]} );
+    my $rqst = HTTP::Request->new( 'POST', $self->uri, \@headers, $encoded_data );
+    
+    my $resp = $self->_send_http_request( $rqst );
+    if ( $resp->is_error ) {
+        #
+        # not interested in what the error actually has been, no matter what it
+        # was, this client will be halted, be it an error in the data send (XXX)
+        # or a problem with the recipient tracing agent.
+        #
+        $self->_halt_client();
+        warn sprintf "DataDog::Client being halted due to an error [%s]\n",
+            $resp->status_line;
+        return;
+    }
+    
+    return $resp;
+}
+
+
+
+# _last_buffered_span
+#
+# Returns the last span added to the buffer.
+#
+# nothing special, but just easier to read the code where it is used
+#
+sub _last_buffered_span {
+    my $self = shift;
+    
+    return $self->_span_buffer->[-1]
+}
+
+
+
+# _should_flush_span_buffer
+#
+# Returns a 'Boolean'
+#
+# For obvious reasons, it should be flushed if the limit has been reached.
+# But another reason is when the root-span has been just added. It is the first
+# span being created, but it is therefor the last one being closed and send.
+#
+sub _should_flush_span_buffer {
+    my $self = shift;
+    
+    return (
+        $self->_last_buffered_span()->is_root_span
+        or
+        $self->_span_buffer_threshold_reached()
+    );
+}
+
+
+
+# _span_buffer_threshold_reached
+#
+# Returns a 'Boolean', being 'true' once the limit has been reached
+#
+sub _span_buffer_threshold_reached {
+    my $self = shift;
+    
+    return $self->_span_buffer_size >= $self->span_buffer_threshold
+}
+
+
+
+# DEMOLISH
+#
+# This should not happen, but just in case something went completely wrong, this
+# will try to flush the buffered spans as a last resort.
+#
+sub DEMOLISH {
+    my ($self) = @_;
+    
+    $self->_flush_span_buffer() if $self->_span_buffer_size(); # send leftovers
+    
+    return;
+}
 
 1;

@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase-Argon2
 
+0.007     2023-04-07 16:30:06+02:00 Europe/Amsterdam
+          - Add Crypt::Passphrase::Argon2::Encrypted
+          - Move more implementation details down into Crypt::Argon2
+
 0.006     2023-03-23 17:39:51+01:00 Europe/Amsterdam
           - Fix compilation issue on perl 5.20 and below
 

@@ -1,0 +1,12 @@
+1.0.2     2023-04-04 10:41:29+01:00 Europe/London
+ - change serialisation of dictionaries, some cpantesters had problems
+   parsing them
+ - fix dependency versions in minted libraries
+
+1.0.1     2023-04-03 15:39:15+01:00 Europe/London
+ - fixes for minting profile: added missing dependencies, fixed some
+   module names
+ - added more instructions to scripts
+
+1.0.0     2023-04-03 15:03:49+01:00 Europe/London
+ - initial release

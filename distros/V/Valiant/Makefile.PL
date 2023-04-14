@@ -16,7 +16,9 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Valiant",
   "PREREQ_PM" => {
+    "Attribute::Handlers" => 0,
     "Carp" => 0,
+    "Catalyst::View::BasePerRequest" => 0,
     "Class::Method::Modifiers" => 0,
     "DBIx::Class" => 0,
     "Data::Dumper" => 0,
@@ -37,15 +39,17 @@ my %WriteMakefileArgs = (
     "String::CamelCase" => 0,
     "Sub::Util" => 0,
     "Text::Autoformat" => 0,
-    "URI" => 0,
+    "URI" => "5.17",
     "namespace::autoclean" => 0,
     "overload" => 0
   },
   "TEST_REQUIRES" => {
+    "Catalyst::Runtime" => 0,
     "DBIx::Class" => 0,
     "DBIx::Class::Candy" => 0,
     "DateTime" => 0,
     "DateTime::Format::Strptime" => 0,
+    "HTML::Escape" => 0,
     "Moo" => "2.004004",
     "MooseX::MarkAsMethods" => 0,
     "MooseX::NonMoose" => "0.26",
@@ -55,15 +59,18 @@ my %WriteMakefileArgs = (
     "Test::Needs" => "0.002006",
     "Type::Tiny" => "1.012001"
   },
-  "VERSION" => "0.001017",
+  "VERSION" => "0.001021",
   "test" => {
-    "TESTS" => "t/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/html/*.t t/validator/*.t"
+    "TESTS" => "t/*.t t/catalyst/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/html/*.t t/html/util/*.t t/validator/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
+  "Attribute::Handlers" => 0,
   "Carp" => 0,
+  "Catalyst::Runtime" => 0,
+  "Catalyst::View::BasePerRequest" => 0,
   "Class::Method::Modifiers" => 0,
   "DBIx::Class" => 0,
   "DBIx::Class::Candy" => 0,
@@ -92,7 +99,7 @@ my %FallbackPrereqs = (
   "Test::Needs" => "0.002006",
   "Text::Autoformat" => 0,
   "Type::Tiny" => "1.012001",
-  "URI" => 0,
+  "URI" => "5.17",
   "namespace::autoclean" => 0,
   "overload" => 0
 );

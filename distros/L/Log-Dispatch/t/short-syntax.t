@@ -7,7 +7,7 @@ use Test::More;
 use FindBin qw( $Bin );
 use lib "$Bin/lib";
 
-use File::Temp qw( tempdir );
+use File::Temp              qw( tempdir );
 use Log::Dispatch::TestUtil qw( cmp_deeply );
 use Log::Dispatch;
 

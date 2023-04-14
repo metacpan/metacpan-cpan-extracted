@@ -1,5 +1,5 @@
 package Selenium::Remote::Mock::RemoteConnection;
-$Selenium::Remote::Mock::RemoteConnection::VERSION = '1.48';
+$Selenium::Remote::Mock::RemoteConnection::VERSION = '1.49';
 # ABSTRACT: utility class to mock the responses from Selenium server
 
 use strict;
@@ -181,7 +181,7 @@ Selenium::Remote::Mock::RemoteConnection - utility class to mock the responses f
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

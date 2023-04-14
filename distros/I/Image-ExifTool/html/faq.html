@@ -47,6 +47,7 @@ ol.index { margin: 0; padding: 0 0 0 2em }
 <li><a href="#Q29">ARGFILE options</a></li>
 <li><a href="#Q30">Extracting all metadata</a></li>
 <li><a href="#Q31">Rewriting the entire file</a></li>
+<li><a href="#Q32">Safely removing all metadata</a></li>
 </ol>
 </div>
 
@@ -216,6 +217,12 @@ parsing strings when writing date/time tags with ExifTool 10.32 or later if
 POSIX::strptime or Time::Piece is installed (use "<code>exiftool -ver -v</code>"
 to check the installed packages).  The format of the <code>-d</code> argument is
 the same for reading and writing.</blockquote>
+
+<blockquote>The <code>-n</code> option may be used to disable all of the
+date/time reformatting when reading and writing which will allow otherwise
+invalid date/time values to be written (eg. partial EXIF dates).  The
+reformatting may be disabled on a per-tag basis by adding "<code>#</code>"
+to the tag name instead of using <code>-n</code></blockquote>
 
 <blockquote><b>Special feature</b>: A value of "<code>now</code>" may be used to
 represent the current time when writing any date/time tag.  For example:
@@ -961,7 +968,23 @@ coordinate styles to the proper format for the specific tag used.
 
 <blockquote>ExifTool 12.22 and later allow combined lat/lon GPSCoordinates
 values to be written to GPSLatitude and GPSLongitude, and the appropriate
-latitude or longitude part will be pulled from the input string.</blockquote>
+latitude or longitude part will be pulled from the input string.  Version 12.36
+and later make Composite:GPSPosition writable, allowing EXIF GPS coorinates and
+reference directions to be all writable via a single tag:
+
+<pre><span class='blk'># write all 4 EXIF GPS tags (version 12.36 and later)</span>
+exiftool -gpsposition="42 30 0.00 S, 33 15 0.00 W"
+exiftool -gpsposition="-42.5, -33.25"</pre>
+
+Version 12.44 and later make Composite:GPSLatitude/GPSLongitude writable,
+allowing the separate EXIF coordinate and reference direction tags to be written
+together.  (Note that the Composite group must be specified here because these
+tags are otherwise avoided when writing due to possible confusion when
+attempting to write EXIF tags.)
+
+<pre><span class='blk'># write EXIF:GPSLatitude and GPSLatitudeRef together (12.44 and later)</span>
+exiftool -composite:gpslatitude="42 30 0.00 S" a.jpg
+exiftool -composite:gpslatitude="-42.5" a.jpg</pre></blockquote>
 
 <blockquote>When reading, by default ExifTool reports coordinates in the format
 <pre>DDD deg MM' SS.SS"</pre>
@@ -1761,8 +1784,29 @@ not seekable, so in-place editing is not possible with these files and again,
 like 1, two completely different algorithms would be required.</li>
 </ol></blockquote>
 
+<a name="Q32"></a>
+<p>32. <b>"How do I safely delete all metadata from a file?"</b></p>
+
+<blockquote>First of all, all metadata shouldn't be removed from some file types
+(such as RAW images) because this information is necessary for display of the
+image.  JPEG is the most popular image format and most suited to erasing all
+metadata because the image and metadata are well separated in this format.
+However, even with JPEG images care should be taken because the metadata
+may contain color space information which should be maintained to preserve the
+color rendition.</blockquote>
+
+<blockquote>Here is a command that may be used to safely delete all metadata
+from .JPG images in a directory:
+
+<pre>exiftool -ext jpg -all= --icc_profile:all -tagsfromfile @ -colorspacetags DIR</pre>
+
+This command deletes all metadata except the ICC Profile if it exists, then
+copies back any EXIF color space tags (adding any mandatory EXIF tags using
+default values if necessary).
+</blockquote>
+
 <hr>
-<i>Last revised Jun 11, 2022</i>
+<i>Last revised Mar 27, 2023</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

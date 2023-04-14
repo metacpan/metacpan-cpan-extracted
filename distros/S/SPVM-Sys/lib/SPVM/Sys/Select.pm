@@ -69,3 +69,10 @@ The C<$writefds> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
 The C<$exceptfds> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
 
 The C<$timeout> is a L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> object.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

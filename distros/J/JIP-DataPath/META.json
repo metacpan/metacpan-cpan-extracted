@@ -1,16 +1,16 @@
 {
    "abstract" : "provides a way to access data elements in a deep, complex and nested data structure.",
    "author" : [
-      "Vladimir Zhavoronkov <flyweight@yandex.ru>"
+      "Volodymyr Zhavoronkov <flyweight@yandex.ru>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JIP-DataPath",
    "no_index" : {
@@ -57,6 +57,6 @@
          "web" : "https://github.com/outtaspace/jip_datapath"
       }
    },
-   "version" : "0.042",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.043",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

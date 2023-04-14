@@ -1,3 +1,8 @@
+3.02  13/04/2023 (Manfred Stock)
+- Test block sizes up to (2**31 - 1) bytes only (fix for 32bit perls)
+- Don't match on message from exception in symlink test
+- Improve formatting of $Archive::Tar::RESOLVE_SYMLINK documentation
+
 3.00  25/03/2023 (Chris Lindee, Reini Urban, Paul Bolle, Michiel Beijen, Paulo Custodio, Michael R. Davis && Manfred Stock)
 - RT #119949: Correctly concat prefix on directories
 - enabled t/90_symlink.t for all platforms with symlinks

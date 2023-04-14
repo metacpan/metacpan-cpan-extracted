@@ -1,0 +1,231 @@
+NAME
+    Web::PerlDistSite - generate fairly flashy websites for CPAN distributions
+
+DESCRIPTION
+    Basically a highly specialized static site generator.
+
+  Prerequisites
+    You will need cpanm.
+
+    You will need nodejs with npm.
+
+    You will need make.
+
+  Setup
+    Create a directory and copy the example Makefile and package.json files
+    from this distribution into it. Then run `make install` to install
+    additional Nodejs and Perl dependencies.
+
+  Site Configuration
+    Configuration is via a file config.yaml. This is a YAML file containing a
+    hash with the following keys. Each key is optional, unless noted as
+    required. An example config.yaml is included in this distribution.
+
+    `theme` *(required)*
+        A hashref of colour codes. You need at least "primary", "secondary",
+        "light", and "dark". "info", "success", "warning", and "danger" are
+        also allowed.
+
+          theme:
+            light: "#e4e3e1"
+            dark: "#32201D"
+            primary: "#763722"
+            secondary: "#E4A042"
+
+        A good colour generator can be found at
+        <https://huemint.com/bootstrap-basic/> if you're stuck for ideas.
+
+        The `theme` hashref can also include Bootstrap's non-colour SASS
+        options. See <https://getbootstrap.com/docs/5.2/customize/options/>.
+
+        An example is:
+
+          theme:
+            light: "#e4e3e1"
+            dark: "#32201D"
+            primary: "#763722"
+            secondary: "#E4A042"
+            "enable-shadows": "true"
+
+    `name` *(required)*
+        The name of the project you're building a website for. This is assumed
+        to be a CPAN distribution name, like "Exporter-Tiny" or "Foo-Bar-Baz".
+
+    `abstract` *(required)*
+        A short plain-text summary of the project.
+
+    `abstract_html`
+        A short HTML summary of the project.
+
+    `copyright` *(required)*
+        A short plain-text copyright statement for the website footers.
+
+    `github`
+        Link to a GitHub repo for the site. Expected to be of the form
+        "https://github.com/username/reponame".
+
+    `issues`
+        Link to an issue tracker.
+
+    `sponsor`
+        Hashref containing project sponsorship info. The "html" key is
+        required. The "href" key is optional.
+
+          sponsor:
+            html: "<strong>Please sponsor us!</strong> Blah blah blah."
+            href: https://paypal.example/foo-bar-baz
+
+    `menu`
+        A list of files to include in the navbar. If this key is missing, will
+        be loaded from menu.yaml instead.
+
+    `homepage`
+        Hashref of options for the homepage (index.html). May contain keys
+        "animation", "banner", "banner_fixation", "banner_position_x", and
+        "banner_position_y".
+
+        The "animation" may be "waves1", "waves2", "swirl1", "attract1", or
+        "circles1". Each of these will create a pretty animation on the
+        homepage. Some day I'll add support for more animations.
+
+        If "animation" is not defined, then "banner" can be used to supply the
+        URL of a static image to use instead of an animation.
+
+        "banner_fixation" can be "scroll" or "fixed", and defaults to the
+        latter. "banner_position_x" can be "left", "center", or "right".
+        "banner_position_y" can be "top", "center", or "bottom". These each
+        default to "center".
+
+        "hero_options" is *itself* a hashref and allows various parts of the
+        banner/animation to be overridden. In particular, "title" and
+        "abstract".
+
+          homepage:
+            animation: waves1
+            hero_options:
+              title: "Blah"
+              abstract: "Blah blah blah"
+
+        In the future, more homepage options may be available.
+
+    `dist_dir`
+        Directory for output. Defaults to a subdirectory called "docs".
+
+    `root_url`
+        URL for the output. Can be an absolute URL, but something like "/" is
+        probably okay. (That's the default.)
+
+    `codestyle`
+        Name of a highlight.js theme, used for code syntax highlighting.
+        Defaults to "github".
+
+    `pod_filter`
+        A list of section names which will be filtered out of pages generated
+        from pod files. Uses "|" as a separator. Defaults to:
+        "NAME|BUGS|AUTHOR|THANKS|COPYRIGHT AND LICENCE|DISCLAIMER OF
+        WARRANTIES".
+
+    `pod_titlecase`
+        Boolean. Should ALL CAPS "=head1" headings from pod be converted to
+        Title Case? Defaults to true.
+
+    `pod_downgrade_headings`
+        Converts pod "=head1" to `<h2>` tags in HTML, etc.
+
+  Menu Configuration
+    The menu can be configured under the `menu` key of config.yaml, or in a
+    separate file menu.yaml. This is a list of menu items. For example:
+
+      - name: installation
+        title: Installation
+        source: _pages/installation.md
+      - name: hints
+        title: Hints and Tips
+        source: _pages/hints.pod
+      - name: manual
+        title: Manual
+        children:
+          - name: Foo-Bar
+            pod: Foo::Bar
+          - name: Foo-Bar-Baz
+            pod: Foo::Bar::Baz
+
+    The `name` key is used for the output filename. ".html" is automatically
+    appended.
+
+    The `title` key is the title of the document generated. It is used in the
+    navbar and in the page's `title` element.
+
+    Each entry needs a `source` which is an input filename. The input may be
+    pod or markdown. (At some future point, HTML input will also be
+    supported.)
+
+    If the `pod` key is found, we'll find the pod via @INC, like perldoc does.
+    This will helpfully also default `title` and `name` for you!
+
+    A `children` key allows child pages to be listed. Only one level of
+    nesting is supported in the navbar, but if further levels of nesting are
+    used, these pages will still be built. (You'll just need to link to them
+    manually somehow.)
+
+    A list item like this can be used to add dividers:
+
+          - divider: true
+
+    If the input is pod, you can also provide `pod_filter`, `pod_titlecase`,
+    and `pod_downgrade_headings` settings which override the global settings.
+
+    If the input is markdown, you may use "----" (four hyphens) on a line by
+    itself to divide the page into cute sections.
+
+  Homepage
+    You'll need a file called _pages/index.md for the site's homepage. The
+    filename may be configurable some day.
+
+  Custom CSS
+    You can create a file called custom.scss containing custom SCSS code to
+    override or add to the defaults.
+
+  Adding Images
+    If you create a directory called images, this will be copied to
+    docs/assets/images/ during the build process. This should be used for
+    things like background images, etc.
+
+  Building the Site
+    Running `make all` will build the site.
+
+    Running `make clean` will remove the `docs` directory and also any
+    temporary SCSS files created during the build process.
+
+EXAMPLE
+    Example: <https://github.com/exportertiny/exportertiny.github.io>
+
+    Generated this site: <https://exportertiny.github.io>
+
+  More Examples
+    *   <https://typetiny.toby.ink/>
+
+    *   <https://story-interact.xlc.pl/>
+
+    *   <https://ology.github.io/midi-drummer-tiny-tutorial/>
+
+    *   <https://ology.github.io/music-duration-partition-tutorial/>
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-web-perldistsite/issues>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2023 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

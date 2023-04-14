@@ -1,3 +1,11 @@
+0.20 2023-03-29T11:56:59+02:00
+ - Add name for example.
+ - Move code from constructor to run(). Fix and improve tests.
+ - Rewrite helper library to return exit code.
+ - Rewrite tests from IO::CaptureOutput to Capture::Tiny.
+ - Update copyright years.
+ - Update dependency for Pod::Example to 0.12 (with support for filenames).
+
 0.19 2021-01-28T11:13:49+01:00
  - Fix bugtracker.
  - Update LICENSE AND COPYRIGHT secion in doc.

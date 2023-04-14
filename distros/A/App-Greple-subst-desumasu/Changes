@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-subst-desumasu
 
+0.07 2023-04-03T01:30:19Z
+
+    - 「はない」→「はありません」を辞書に追加
+    - ドキュメント中のタイポを修正
+
 0.06 2023-02-25T01:31:51Z
 
     - 否定形の表現を追加

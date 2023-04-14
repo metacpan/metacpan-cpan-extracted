@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 // Windows 8.1+
 #define _WIN32_WINNT 0x0603
 
@@ -768,7 +771,7 @@ int32_t SPVM__Sys__Socket__getaddrinfo_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   if (status == 0) {
     int32_t fields_length = 1;
-    void* obj_res = env->new_pointer_by_name(env, stack, "Sys::Socket::AddrinfoLinkedList", res, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_res = env->new_pointer_object_by_name(env, stack, "Sys::Socket::AddrinfoLinkedList", res, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     env->set_elem_object(env, stack, obj_res_array, 0, obj_res);
   }

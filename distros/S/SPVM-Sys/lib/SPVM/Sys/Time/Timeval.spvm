@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::Time::Timeval : pointer {
   
   native static method new : Sys::Time::Timeval ();

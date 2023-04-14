@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_class_var_access.h"
 
 #include "spvm_allocator.h"

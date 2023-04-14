@@ -16,7 +16,7 @@ is_deeply(
 	\@ret,
 	[
 		'Aliases:',
-		'  pes (cs)',
+		decode_utf8('  pes domácí (cs)'),
 	],
 	'Print aliases test (cs).',
 );

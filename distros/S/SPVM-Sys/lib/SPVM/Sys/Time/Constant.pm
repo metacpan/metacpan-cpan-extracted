@@ -195,3 +195,10 @@ Get the constant value of C<ITIMER_VIRTUAL>. If the system doesn't define this c
   static method TIMER_ABSTIME : int ();
 
 Get the constant value of C<TIMER_ABSTIME>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

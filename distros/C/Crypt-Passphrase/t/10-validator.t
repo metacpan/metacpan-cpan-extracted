@@ -6,19 +6,31 @@ use warnings;
 use Test::More;
 
 use Crypt::Passphrase;
-use Crypt::Passphrase::MD5::Hex;
 
-my $validator = Crypt::Passphrase::MD5::Hex->new;
+use lib 't/lib';
 
-ok($validator->accepts_hash('098f6bcd4621d373cade4e832627b4f6'));
-ok($validator->verify_password('test', '098f6bcd4621d373cade4e832627b4f6'));
+my @tests = (
+	[ 'MD5::Hex', '098f6bcd4621d373cade4e832627b4f6' ],
+	[ 'SHA1::Hex', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3' ],
+	[ 'MD5::Base64', 'CY9rzUYh03PK3k6DJie09g' ],
+	[ 'SHA1::Base64', 'qUqP5cyxm6YcTAhz05Hph5gvu9M' ],
+);
 
-my $passphrase = Crypt::Passphrase->new(encoder => $validator); # naughty
-ok $passphrase->verify_password('test', '098f6bcd4621d373cade4e832627b4f6');
-ok !$passphrase->verify_password('test', '098f6bcd4621d373');
+my $passphrase = Crypt::Passphrase->new(
+	encoder => 'Reversed',
+	validators => [ map { $_->[0]} @tests ],
+);
 
-my $passphrase2 = Crypt::Passphrase->new(encoder => 'SHA1::Hex');
-ok $passphrase2->verify_password('test', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3');
-ok !$passphrase2->verify_password('test', 'a94a8fe5ccb19ba');
+for my $test (@tests) {
+	my ($short_name, $hash) = @$test;
+	(my $file = $short_name) =~ s{(\w+)::(\w+)}{Crypt/Passphrase/$1/$2.pm};
+	require $file;
+	my $module = "Crypt::Passphrase::$short_name";
+	my $object = $module->new;
+	ok($object->accepts_hash($hash), "$short_name accepts hash $hash");
+	ok($object->verify_password('test', $hash), "$short_name verifies hash $hash");
+	ok($passphrase->verify_password('test', $hash), "$short_name verifies hash $hash throught C::P too");
+	ok($passphrase->needs_rehash($hash), "$hash needs rehash");
+}
 
 done_testing;

@@ -40,7 +40,7 @@ urpm::download - download routines for the urpm* tools
 =cut
 
 
-sub ftp_http_downloaders() { qw(curl wget prozilla aria2) }
+sub ftp_http_downloaders() { qw(wget curl prozilla aria2) }
 
 sub available_ftp_http_downloaders() {
     my %binaries = (
@@ -75,8 +75,8 @@ my %warned;
 sub preferred_downloader {
     my ($urpm, $medium, $use_metalink) = @_;
 
-    my @available = urpm::download::available_ftp_http_downloaders();
-    my @metalink_downloaders = urpm::download::available_metalink_downloaders();
+    my @available = available_ftp_http_downloaders();
+    my @metalink_downloaders = available_metalink_downloaders();
     my $metalink_disabled = !$$use_metalink && $medium->{disable_metalink};
 
     if ($$use_metalink && !$metalink_disabled) {
@@ -346,6 +346,7 @@ sub sync_wget {
 	"/usr/bin/wget",
 	($options->{'limit-rate'} ? "--limit-rate=$options->{'limit-rate'}" : @{[]}),
 	($options->{resume} ? "--continue" : "--force-clobber"),
+	"--no-timestamping", #- timestamping conflicts with --force-clobber
 	($options->{proxy} ? set_proxy({ type => "wget", proxy => $options->{proxy} }) : @{[]}),
 	($options->{retry} ? ('-t', $options->{retry}) : @{[]}),
 	($options->{callback} ? ("--progress=bar:force", "-o", "-") :
@@ -478,18 +479,13 @@ sub sync_curl {
 	    }
 	}
     }
-    # Indicates whether this option is available in our curl
-    our $location_trusted;
-    if (!defined $location_trusted) {
-	$location_trusted = `/usr/bin/curl -h` =~ /location-trusted/ ? 1 : 0;
-    }
     #- http files (and other files) are correctly managed by curl wrt conditional download.
     #- options for ftp files, -R (-O <file>)*
     #- options for http files, -R (-O <file>)*
     my $result;
     if (my @all_files = (
-	    (map { ("-O", $_) } @ftp_files),
-	    (map { m|/| ? ("-O", $_) : @{[]} } @other_files)))
+	    (map { (_curl_output_option($_), $_) } @ftp_files),
+	    (map { m|/| ? (_curl_output_option($_), $_) : @{[]} } @other_files)))
     {
 	my @l = (@ftp_files, @other_files);
 	my $cmd = join(" ", map { "'$_'" } "/usr/bin/curl",
@@ -500,7 +496,7 @@ sub sync_curl {
 	    ($options->{retry} ? ('--retry', $options->{retry}) : @{[]}),
 	    ($options->{quiet} ? "-s" : @{[]}),
 	    ($options->{"no-certificate-check"} ? "-k" : @{[]}),
-	    $location_trusted ? "--location-trusted" : @{[]},
+	    "--location-trusted",
 	    "-R",
 	    "-f",
 	    "--disable-epsv",
@@ -514,6 +510,15 @@ sub sync_curl {
     }
     chdir $cwd;
     $result;
+}
+
+sub _curl_output_option {
+    my ($remote_file) = @_;
+    #- curl 7.86 changed the -O option to remove any trailing query part from the output
+    #- file name. So if we have a query part, use the -o option instead. If not, use the
+    #- -O option to avoid bloating the command line.
+    my $local_file = basename($remote_file);
+    $local_file =~ /\?/ ? ('-o', $local_file) : '-O';
 }
 
 sub _curl_action {
@@ -1032,7 +1037,7 @@ sub _sync_webfetch_raw {
 	if ($preferred eq 'aria2') {
 	    sync_aria2($urpm, $medium, $rel_files, $options);
 	} else {
-	  my $sync = $urpm::download::{"sync_$preferred"} or die N("no webfetch found, supported webfetch are: %s\n", join(", ", urpm::download::ftp_http_downloaders()));
+	  my $sync = $urpm::download::{"sync_$preferred"} or die N("no webfetch found, supported webfetch are: %s\n", join(", ", ftp_http_downloaders()));
 
 	  my @l = @$files;
 	  while (@l) {

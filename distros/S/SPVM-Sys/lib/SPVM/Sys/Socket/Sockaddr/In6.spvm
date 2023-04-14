@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer {
   use Sys::Socket::In6_addr;
   

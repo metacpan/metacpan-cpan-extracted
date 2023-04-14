@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Math : precompile {
   use Complex_2f;
   use Complex_2d;
@@ -113,8 +116,8 @@ class Math : precompile {
   
   native static method conj : Complex_2d ($z : Complex_2d);
   native static method conjf : Complex_2f ($z : Complex_2f);
-  native static method copysign : double ($x1 : double, $x2 : double);
-  native static method copysignf : float ($x1 : float, $x2 : float);
+  native static method copysign : double ($x : double, $y : double);
+  native static method copysignf : float ($x : float, $y : float);
   native static method cos : double ($x : double);
   native static method cosf : float ($x : float);
   native static method cosh : double ($x : double);
@@ -174,8 +177,8 @@ class Math : precompile {
   native static method expm1f : float ($x : float);
   native static method fabs : double ($x : double);
   native static method fabsf : float ($x : float);
-  native static method fdim : double ($x1 : double, $x2 : double);
-  native static method fdimf : float ($x1 : float, $x2 : float);
+  native static method fdim : double ($x : double, $y : double);
+  native static method fdimf : float ($x : float, $y : float);
   native static method FE_DOWNWARD : int ();
   native static method FE_TONEAREST : int ();
   native static method FE_TOWARDZERO : int ();
@@ -183,14 +186,14 @@ class Math : precompile {
   native static method fesetround : int ($round : int);
   native static method floor : double ($x : double);
   native static method floorf : float ($x : float);
-  native static method fma : double ($x1 : double, $x2 : double, $x3 : double);
-  native static method fmaf : float ($x1 : float, $x2 : float, $x3 : float);
-  native static method fmax : double ($x1 : double, $x2 : double);
-  native static method fmaxf : float ($x1 : float, $x2 : float);
-  native static method fmin : double ($x1 : double, $x2 : double);
-  native static method fminf : float ($x1 : float, $x2 : float);
-  native static method fmod : double ($x1 : double, $x2 : double);
-  native static method fmodf : float ($x1 : float, $x2 : float);
+  native static method fma : double ($x : double, $y : double, $x3 : double);
+  native static method fmaf : float ($x : float, $y : float, $x3 : float);
+  native static method fmax : double ($x : double, $y : double);
+  native static method fmaxf : float ($x : float, $y : float);
+  native static method fmin : double ($x : double, $y : double);
+  native static method fminf : float ($x : float, $y : float);
+  native static method fmod : double ($x : double, $y : double);
+  native static method fmodf : float ($x : float, $y : float);
   native static method FP_ILOGB0 : int ();
   native static method FP_ILOGBNAN : int ();
   native static method FP_INFINITE : int ();
@@ -210,22 +213,22 @@ class Math : precompile {
   native static method INFINITYF : float ();
   native static method isfinite : int ($x : double);
   native static method isfinitef : int($x : float);
-  native static method isgreater : int ($x1 : double, $x2 : double);
-  native static method isgreaterequal : int ($x1 : double, $x2 : double);
-  native static method isgreaterequalf : int ($x1 : float, $x2 : float);
-  native static method isgreaterf : int ($x1 : float, $x2 : float);
+  native static method isgreater : int ($x : double, $y : double);
+  native static method isgreaterequal : int ($x : double, $y : double);
+  native static method isgreaterequalf : int ($x : float, $y : float);
+  native static method isgreaterf : int ($x : float, $y : float);
   native static method isinf : int ($x : double);
   native static method isinff : int($x : float);
-  native static method isless : int ($x1 : double, $x2 : double);
-  native static method islessequal : int ($x1 : double, $x2 : double);
-  native static method islessequalf : int ($x1 : float, $x2 : float);
-  native static method islessf : int ($x1 : float, $x2 : float);
-  native static method islessgreater : int ($x1 : double, $x2 : double);
-  native static method islessgreaterf : int ($x1 : float, $x2 : float);
+  native static method isless : int ($x : double, $y : double);
+  native static method islessequal : int ($x : double, $y : double);
+  native static method islessequalf : int ($x : float, $y : float);
+  native static method islessf : int ($x : float, $y : float);
+  native static method islessgreater : int ($x : double, $y : double);
+  native static method islessgreaterf : int ($x : float, $y : float);
   native static method isnan : int ($x : double);
   native static method isnanf : int ($x : float);
-  native static method isunordered : int ($x1 : double, $x2 : double);
-  native static method isunorderedf : int ($x1 : float, $x2 : float);
+  native static method isunordered : int ($x : double, $y : double);
+  native static method isunorderedf : int ($x : float, $y : float);
   
   static method labs : long ($x : long) {
     if ($x < 0) {
@@ -254,23 +257,23 @@ class Math : precompile {
   native static method lroundf : long ($x : float);
   native static method modf : double ($x : double, $intpart : double*);
   native static method modff : float ($x : float, $intpart : float*);
-  native static method nan : double ($str : string);
+  native static method nan : double ($string : string);
   native static method NAN : double ();
   native static method NANF : float ();
-  native static method nanf : float ($str : string);
+  native static method nanf : float ($string : string);
   native static method nearbyint : double ($x : double);
   native static method nearbyintf : float ($x : float);
-  native static method nextafter : double ($x1 : double, $x2 : double);
-  native static method nextafterf : float ($x1 : float, $x2 : float);
-  native static method nexttoward : double ($x1 : double, $x2 : double);
-  native static method nexttowardf : float ($x1 : float, $x2 : double);
+  native static method nextafter : double ($x : double, $y : double);
+  native static method nextafterf : float ($x : float, $y : float);
+  native static method nexttoward : double ($x : double, $y : double);
+  native static method nexttowardf : float ($x : float, $y : double);
   static method PI : double () { return 0x1.921fb54442d18p+1; }
   native static method pow : double ($x : double, $y : double);
   native static method powf : float ($x : float, $y : float);
-  native static method remainder : double ($x1 : double, $x2 : double);
-  native static method remainderf : float ($x1 : float, $x2 : float);
-  native static method remquo : double ($x1 : double, $x2 : double, $quo : int*);
-  native static method remquof : float ($x1 : float, $x2 : float, $quo : int*);
+  native static method remainder : double ($x : double, $y : double);
+  native static method remainderf : float ($x : float, $y : float);
+  native static method remquo : double ($x : double, $y : double, $quo : int*);
+  native static method remquof : float ($x : float, $y : float, $quo : int*);
   native static method round : double ($x : double);
   native static method roundf : float ($x : float);
   native static method scalbln : double ($x : double, $exp : long);

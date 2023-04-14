@@ -1,6 +1,6 @@
-#!perl
+# -*- mode: perl; -*-
 
-# todo: could be faster,storing values of tokes as BigInt instead integer
+# todo: could be faster,storing values of tokes as Math::BigInt instead integer
 #       makes it slower (due to $k < $last)
 #       Roman.pm uses 4.2s for 1...4000 compared to our 6.5s (new())
 #       and 5.7s (roman()), so actually we are pretty fast (we construct a
@@ -17,7 +17,7 @@
 #   $class->SUPER::badd(@_);
 #   }
 # The problem is the additional overhead (about 2%) and the problem to write
-# the above for _all_ functions of BigInt. That's rather long. AUTOLOAD does
+# the above for _all_ functions of Math::BigInt. That's rather long. AUTOLOAD does
 # not work, since it steps in _after_ inheritance. Do we really need this?
 # 2001-11-08: Don't think we need it, othe subclasses don't do it, either. Tels
 
@@ -32,7 +32,7 @@ require Exporter;
 
 our ($VERSION, @ISA, @EXPORT_OK);
 
-$VERSION   = '1.09';    # current version of this package
+$VERSION   = '1.10';    # current version of this package
 @ISA       = qw(Exporter Math::BigInt);
 @EXPORT_OK = qw( as_number tokens roman error );
 
@@ -262,8 +262,8 @@ sub bstr
   return '' if $x->is_zero();
   return 'NaN' if $x->is_nan;
 
-  # make sure that we calculate with BigInt's, otherwise objectify() will
-  # try to make copies of us via bstr(), resulting in deep recursion
+  # make sure that we calculate with Math::BigInt objects, otherwise objectify()
+  # will try to make copies of us via bstr(), resulting in deep recursion
   my $rem = $x->as_number(); $rem->babs();
   ## get the biggest symbol
   #return $bt if $rem == $bv;
@@ -630,7 +630,7 @@ I think this is really not needed, since you can always use:
 =head2 '0'-'9' as tokens
 
 0-9 in the token set produce wrong results in new() if the given argument
-consists only of 0-9. That is because first a BigInt is tried to be
+consists only of 0-9. That is because first a Math::BigInt is tried to be
 constructed, and in this case, would succeed.
 
 =head2 Reporting bugs

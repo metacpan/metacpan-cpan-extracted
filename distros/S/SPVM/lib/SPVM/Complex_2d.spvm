@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Complex_2d : mulnum_t {
   has re : double;
   has im : double;

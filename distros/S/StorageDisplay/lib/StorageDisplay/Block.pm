@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Block;
 # ABSTRACT: Base package for block devices DAG
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 1;
 
@@ -305,7 +305,7 @@ StorageDisplay::Block - Base package for block devices DAG
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

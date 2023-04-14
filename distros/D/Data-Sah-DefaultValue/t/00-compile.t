@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/DefaultValue.pm',
@@ -15,7 +15,6 @@ my @module_files = (
     'Data/Sah/Value/js/Math/random.pm',
     'Data/Sah/Value/js/Str/repeat.pm',
     'Data/Sah/Value/perl/Math/random.pm',
-    'Data/Sah/Value/perl/Path/filenames.pm',
     'Data/Sah/Value/perl/Str/repeat.pm'
 );
 

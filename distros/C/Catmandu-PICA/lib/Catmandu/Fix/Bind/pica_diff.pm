@@ -1,6 +1,6 @@
 package Catmandu::Fix::Bind::pica_diff;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Moo;
 use Catmandu::Sane;
@@ -13,9 +13,7 @@ sub bind {
     my ( $self, $data, $code ) = @_;
     return if reftype( $data->{record} ) ne 'ARRAY';
 
-    my $ppn = pica_fields( $data->{record}, '003@' );
-
-    # TODO: $data->pica_fields should do, will be fixed in PICA-Data 2.07
+    my $ppn    = pica_fields( $data->{record}, '003@' );
     my $before = [ map { [@$_] } @{ $data->{record} } ];
 
     $code->($data);

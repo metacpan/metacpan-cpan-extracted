@@ -359,13 +359,70 @@ class TestCase::MIME::Base64 {
   }
 
   static method encoded_base64_length : int () {
+    {
+      my $ok = 1;
+      my $encode_tests = [
+        "" => 0,
+        "a" => 5,
+        "aa" => 5,
+        "aaa" => 5,
+        "aaaa" => 9,
+        "aaaaa" => 9,
+      ];
+
+      for (my $i = 0; $i < @$encode_tests; $i += 2) {
+        my $encoded_length = MIME::Base64->encoded_base64_length($encode_tests->[$i]);
+        unless ( $encoded_length == Fn->to_int($encode_tests->[$i+1])) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+
+    {
+      my $ok = 1;
+      my $encode_tests = [
+        "" => 0,
+        "a" => 4,
+        "aa" => 4,
+        "aaa" => 4,
+        "aaaa" => 8,
+        "aaaaa" => 8,
+      ];
+
+      for (my $i = 0; $i < @$encode_tests; $i += 2) {
+        my $encoded_length = MIME::Base64->encoded_base64_length($encode_tests->[$i], "");
+        unless ( $encoded_length == Fn->to_int($encode_tests->[$i+1])) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+
+    {
+      my $ok = 1;
+
+      for (my $i = 50; $i <= 100; $i++) {
+        my $a = Fn->repeat("a", $i);
+        my $a_enc = MIME::Base64->encode_base64($a);
+        unless ( MIME::Base64->encoded_base64_length($a) == length $a_enc ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+
     # Exception
     {
-      {
-        eval { MIME::Base64->encoded_base64_length(undef); };
-        unless (Fn->contains($@, "The input must be defined")) {
-          return 0;
-        }
+      eval { MIME::Base64->encoded_base64_length(undef); };
+      unless (Fn->contains($@, "The input must be defined")) {
+        return 0;
       }
     }
     $@ = undef;
@@ -373,13 +430,57 @@ class TestCase::MIME::Base64 {
   }
 
   static method decoded_base64_length : int () {
+    {
+      my $ok = 1;
+      my $decode_tests = [
+        "" => 0,
+        "a" => 0,
+        "aa" => 1,
+        "aaa" => 2,
+        "aaaa" => 3,
+        "aaaaa" => 3,
+        "aaaaaa" => 4,
+        "aaaaaaa" => 5,
+        "aaaaaaaa" => 6,
+        "=aaaa" => 0,
+        "a=aaa" => 0,
+        "aa=aa" => 1,
+        "aaa=a" => 2,
+        "aaaa=" => 3,
+        "a\na\na a" => 3,
+      ];
+
+      for (my $i = 0; $i < @$decode_tests; $i += 2) {
+        my $decoded_length = MIME::Base64->decoded_base64_length($decode_tests->[$i]);
+        unless ( $decoded_length == Fn->to_int($decode_tests->[$i+1])) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+
+    {
+      my $ok = 1;
+
+      for (my $i = 50; $i <= 100; $i++) {
+        my $a = Fn->repeat("a", $i);
+        my $a_enc = MIME::Base64->encode_base64($a);
+        unless ( MIME::Base64->decoded_base64_length($a_enc) == $i ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+
     # Exception
     {
-      {
-        eval { MIME::Base64->decoded_base64_length(undef); };
-        unless (Fn->contains($@, "The input must be defined")) {
-          return 0;
-        }
+      eval { MIME::Base64->decoded_base64_length(undef); };
+      unless (Fn->contains($@, "The input must be defined")) {
+        return 0;
       }
     }
     $@ = undef;

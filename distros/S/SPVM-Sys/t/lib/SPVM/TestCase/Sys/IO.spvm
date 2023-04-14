@@ -6,7 +6,7 @@ class TestCase::Sys::IO {
   use Sys::IO::Stat;
   use Sys;
   use Sys::IO::Utimbuf;
-  use Time;
+  use Sys::Time;
 
   static method open : int ($test_dir : string, $tmp_dir : string) {
     
@@ -1865,7 +1865,7 @@ class TestCase::Sys::IO {
     
     my $utimbuf = Sys::IO::Utimbuf->new;
     
-    my $time = Time->time;
+    my $time = Sys::Time->time;
     
     my $actime = $utimbuf->set_actime($time);
     my $modtime = $utimbuf->set_modtime($time);

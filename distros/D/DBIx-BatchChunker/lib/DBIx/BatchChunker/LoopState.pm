@@ -3,7 +3,7 @@ package DBIx::BatchChunker::LoopState;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Loop state object for DBIx::BatchChunker
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -75,19 +75,37 @@ has progress_bar => (
     required => 1,
 );
 
-#pod =head2 timer
+#pod =head2 total_timer
 #pod
-#pod Timer for chunk messages.  Always spans the time between chunk messages.
+#pod Epoch timer for the start of the entire operation.
 #pod
 #pod =cut
 
-has timer => (
+has total_timer => (
+    is       => 'ro',
+    isa      => PositiveNum,
+    lazy     => 0,  # must be set on creation
+    default  => sub { time() },
+);
+
+#pod =head2 chunk_timer
+#pod
+#pod Epoch timer for the start of each chunk.
+#pod
+#pod =for Pod::Coverage timer
+#pod
+#pod =cut
+
+has chunk_timer => (
     is       => 'rw',
     isa      => PositiveNum,
     default  => sub { time() },
 );
 
-sub _mark_timer { shift->timer(time); }
+# Backwards-compatibility
+*timer = \&chunk_timer;
+
+sub _mark_chunk_timer { shift->chunk_timer(time); }
 
 #pod =head2 start
 #pod
@@ -197,6 +215,34 @@ has multiplier_step => (
     },
 );
 
+sub _increase_multiplier {
+    my $ls = shift;
+    my $lr = $ls->last_range;
+
+    $lr->{min} = $ls->multiplier_range if !defined $lr->{min} || $ls->multiplier_range > $lr->{min};
+
+    # If we have a min/max range, bisect down the middle, which will now be higher than the
+    # previous minimum.  If not, keep accelerating the stepping.
+    $ls->multiplier_step(
+        defined $lr->{max} ? ($lr->{max} - $lr->{min}) / 2 : $ls->multiplier_step * 2
+    );
+}
+
+sub _decrease_multiplier {
+    my $ls = shift;
+    my $lr = $ls->last_range;
+
+    $lr->{max} = $ls->multiplier_range if !defined $lr->{max} || $ls->multiplier_range < $lr->{max};
+
+    # If we have a min/max range, bisect down the middle.  If not, walk back to the previous range
+    # and decelerate the stepping, which should bring it to a halfway point from this range and
+    # last.
+    $ls->multiplier_range( $lr->{min} || ($ls->multiplier_range - $ls->multiplier_step) );
+    $ls->multiplier_step(
+        defined $lr->{min} ? ($lr->{max} - $lr->{min}) / 2 : $ls->multiplier_step / 2
+    );
+}
+
 #pod =head2 checked_count
 #pod
 #pod A check counter to make sure the chunk resizing isn't taking too long.  After ten checks,
@@ -265,7 +311,7 @@ sub _reset_chunk_state {
     my $ls = shift;
     $ls->start   (undef);
     $ls->prev_end($ls->end);
-    $ls->_mark_timer;
+    $ls->_mark_chunk_timer;
 
     $ls->last_range      ({});
     $ls->multiplier_range(0);
@@ -292,7 +338,7 @@ DBIx::BatchChunker::LoopState - Loop state object for DBIx::BatchChunker
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 
@@ -331,9 +377,15 @@ use this attribute:
     my $progress_bar = $bc->loop_state->progress_bar;
     $progress_bar->message('Found something here');
 
-=head2 timer
+=head2 total_timer
 
-Timer for chunk messages.  Always spans the time between chunk messages.
+Epoch timer for the start of the entire operation.
+
+=head2 chunk_timer
+
+Epoch timer for the start of each chunk.
+
+=for Pod::Coverage timer
 
 =head2 start
 
@@ -402,7 +454,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2022 by Grant Street Group.
+This software is Copyright (c) 2018 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

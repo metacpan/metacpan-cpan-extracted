@@ -46,7 +46,8 @@
             "POE::Wheel::FollowTail" : "1.368",
             "Sys::Hostname" : "0",
             "Sys::Syslog" : "0",
-            "TOML" : "0.97",
+            "TOML" : "0",
+            "Term::ANSIColor" : "0",
             "Text::ANSITable" : "0.608",
             "YAML::PP" : "0",
             "perl" : "5.006"
@@ -65,6 +66,6 @@
          "web" : "https://github.com/LilithSec/Lilith"
       }
    },
-   "version" : "v0.2.2",
+   "version" : "v0.3.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,11 @@
 Revision history for Lingua-Jspell
 
+1.98 April 8, 2023
+   - verif now accepts negative features
+    
+1.97 March 31, 2023
+   - allthat function
+
 1.96 August 1, 2021
    - C99 compliance
     

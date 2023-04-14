@@ -1,5 +1,30 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001021 2023 April 10
+          - Added missing distribution dependencies
+          - minor tweaks to some naming and formating in the example application
+
+0.001020 2023 April 9
+          - fixed issue with control logic when repeat had an empty set.
+          - improved error messaging in the 'path' utility export helper
+          - updated example application to improve controller consistency and make 
+            better use of view features.
+
+0.001019 2023 April 8
+          - Fixed test cases that regressed in previous release
+          - Fixed assorted bugs in Catalyst::View::Valiant
+          - Lots of tweaks to the example / test application
+
+0.001018 2023 April 6
+          - Totally reworked how the HTML generation code integrates with an underlying
+          view.  This shouldn't be a breaking change but makes it possible to integrate those
+          modules with modern views like Xslate which provide autoescaping features for safety
+          - Build new example view based on this for Catalyst.  Changed all the example code
+          to use these new features.
+          - Lots of small documentation improvements and bug fixes, including issues that caused
+          fails to install on some systems as reported by CPAN testers.
+          - Lots of additional fixes and tweaks to the Catalyst example application.
+
 0.001017 2022 December 6
           - Lots of updates and additions to the example application.
           - Lots of updates to the totally undocumented tag builder ;)
@@ -35,7 +60,7 @@ The following logs changes for the CPAN distribution Valiant
           - New DBIC result method set_columns_recursively
           - Move the DBIC resultset validator for set size into its own module (SetSize)
           - Valiant::HTML::Form checks its model for a csrf_token
-          - numerous non breaking bug fixes to Valiant::HTML::Formbuilder
+          - numerous non breaking bug fixes to Valiant::HTML::FormBuilder
           - 'read_attribute_for_html' allows a model to tell the formbuilder how to
             read attributes for display purposes.  Useful for deflating or reformatting
           - enhancements to Valiant::HTML::Tagbuilder

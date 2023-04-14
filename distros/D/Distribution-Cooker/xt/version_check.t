@@ -1,10 +1,13 @@
 #!perl
 use v5.26;
 
-#use Module::Extract::DeclaredPerlVersion;
+use Test::More 1;
+
+eval 'use Module::Extract::DeclaredMinimumPerl';
+plan skip_all => 'Module::Extract::DeclaredMinimumPerl required for this test' if $@;
+
 use Mojo::Util qw(dumper);
 use Perl::Version;
-use Test::More 1;
 
 diag( <<"HERE" );
 	Module:   @{[ module_minimum()   ]}
@@ -19,7 +22,6 @@ done_testing();
 # Get the declared versions from the modules
 sub module_minimum {
 	state $ff = require File::Find;
-	state $rc = require Module::Extract::DeclaredMinimumPerl;
 	state $min_version = undef;
 
 	return $min_version if defined $min_version;

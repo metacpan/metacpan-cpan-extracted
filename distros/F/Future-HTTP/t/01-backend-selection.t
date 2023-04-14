@@ -21,8 +21,8 @@ if( $ok ) {
 };
 
 Test::Without::Module->import( qw( HTTP::Tiny ) );
-isn't( Future::HTTP->best_implementation, 'Future::HTTP::Tiny',
+isnt( Future::HTTP->best_implementation, 'Future::HTTP::Tiny',
     "We select a different socket backend if HTTP::Tiny is unavailable");
 
-isn't( Future::HTTP->best_implementation, 'Future::HTTP::Tiny',
+isnt( Future::HTTP->best_implementation, 'Future::HTTP::Tiny',
     "We select a different pipe backend if HTTP::Tiny is unavailable");

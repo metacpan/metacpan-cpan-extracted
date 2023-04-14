@@ -1,3 +1,7 @@
+0.15 2023-04-02
+    * AnyEvent backend fixes, don't lose an intermediate Future anymore
+    * Switch from Test::More::isn't() to Test::More::isnt()
+
 0.14 2020-06-13
     * Fix automatic event loop backend selection
     * Add ->is_async() method to detect what kind of user agent we have

@@ -79,6 +79,7 @@ lib/Venus/Role/Explainable.pm
 lib/Venus/Role/Makeable.pm
 lib/Venus/Role/Mappable.pm
 lib/Venus/Role/Matchable.pm
+lib/Venus/Role/Mockable.pm
 lib/Venus/Role/Optional.pm
 lib/Venus/Role/Pluggable.pm
 lib/Venus/Role/Printable.pm
@@ -165,6 +166,7 @@ t/Venus_Role_Explainable.t
 t/Venus_Role_Makeable.t
 t/Venus_Role_Mappable.t
 t/Venus_Role_Matchable.t
+t/Venus_Role_Mockable.t
 t/Venus_Role_Optional.t
 t/Venus_Role_Pluggable.t
 t/Venus_Role_Printable.t

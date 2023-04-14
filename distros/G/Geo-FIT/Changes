@@ -1,5 +1,18 @@
 Revision history for Geo-FIT
 
+1.08 [2023-04-09]
+    New methods and deprecations:
+        - field_list(), field_value(), field_value_as_read() added
+        - value_cook() and value_uncook() marked as deprecated
+
+    New defaults in constructor: semicircle_to_deg() and use_gmtime() now default to true.
+
+1.07 [2023-04-01]
+    Fixed the documentation regarding the return value of fetch()
+
+1.06 [2023-03-30]
+    Fixed options in fitdump.pl script
+
 1.05 [2023-03-18]
     Updated to FIT 21.107 profile
 

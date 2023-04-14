@@ -1,10 +1,9 @@
 requires 'Catalyst', '5.90130';
 requires 'Catalyst::Model::DBIC::Schema', '0.65';
 requires 'Catalyst::Plugin::ConfigLoader', '0.34';
-requires 'Catalyst::Plugin::RedirectTo', '0.003';
-requires 'Catalyst::ControllerRole::At', '0.006';
-requires 'CatalystX::Errors', '0.001007';
-requires 'Catalyst::Plugin::URI';
+requires 'Catalyst::Plugin::RedirectTo', '0.004';
+requires 'Catalyst::ControllerRole::At', '0.007';
+requires 'Catalyst::Plugin::URI', '0.005';
 requires 'Catalyst::View::MojoTemplate', '0.004';
 requires 'Catalyst::Plugin::Session';
 requires 'Catalyst::Action::RenderView';
@@ -13,9 +12,10 @@ requires 'Catalyst::Plugin::CurrentComponents', '0.010';
 requires 'Catalyst::Plugin::ServeFile', '0.004';
 requires 'Catalyst::Plugin::CSRFToken', '0.001';
 requires 'CatalystX::Errors', '0.001009';
-requires 'CatalystX::RequestModel', '0.009';
-requires 'Catalyst::ControllerPerContext', '0.002';
-requires 'Catalyst::View::BasePerRequest', '0.009';
+requires 'CatalystX::RequestModel', '0.014';
+requires 'Catalyst::ControllerPerContext', '0.003';
+requires 'Catalyst::View::BasePerRequest', '0.010';
+requires 'Catalyst::ActionRole::RenderView', '0.001';
 
 requires 'DBIx::Class', '0.082840';
 requires 'DBIx::Class::Helpers', '2.033003';

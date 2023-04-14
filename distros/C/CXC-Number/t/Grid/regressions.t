@@ -11,7 +11,7 @@ sub Failure { join( '::', 'CXC::Number::Grid::Failure', @_ ) }
 subtest 'overlap' => sub {
 
     subtest 'use numerical comparison' => sub {
-       # this will blow up if Tree::Range isn't set up for numerical comparisons
+        # this will blow up if Tree::Range isn't set up for numerical comparisons
 
         my $gti = Grid->new( {
             edges   => [ -1, 2, 4, 5 ],

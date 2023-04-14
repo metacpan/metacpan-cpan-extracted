@@ -2,7 +2,7 @@ package Catmandu::Importer::PICA;
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Catmandu::Sane;
 use PICA::Data qw(pica_parser);
@@ -12,6 +12,8 @@ with 'Catmandu::Importer';
 
 has type   => ( is => 'ro', default => sub { 'xml' } );
 has parser => ( is => 'lazy' );
+has level  => ( is => 'ro', default => sub { -1 } );
+has queue  => ( is => 'ro', default => sub { [] } );
 
 sub _build_parser {
     my ($self) = @_;
@@ -37,7 +39,14 @@ sub generator {
     my ($self) = @_;
 
     sub {
-        my $next = $self->parser->next || return;
+        my $queue = $self->queue;
+        my $next  = @$queue ? shift @$queue : $self->parser->next;
+        return unless $next;
+
+        if ( $self->level > -1 ) {
+            push @$queue, $next->split( $self->level );
+            $next = shift @$queue;
+        }
 
         # Catmandu does not like blessed objects/arrays
         $next->{record} = [ map { [@$_] } @{ $next->{record} } ];
@@ -92,6 +101,11 @@ default value C<xml> for PicaXML, C<plain> for human-readable PICA+
 serialization (where C<$> is used as subfield indicator), C<plus> or
 C<picaplus> for normalized PICA+, C<binary> for binary PICA+ and C<ppxml> for
 the PICA+ XML variant of the DNB.
+
+=item level
+
+Split and reduce records to level 0, 1 or 2 with identifiers of broader levels
+included.
 
 =back
 

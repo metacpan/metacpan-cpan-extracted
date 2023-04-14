@@ -188,7 +188,10 @@ architectures (32 and 64 bit).
 
 =item B<-a>
 
-If multiple packages match the given substring, install them all.
+If multiple packages match the request, install them all.
+
+If this option is not set and there are several results, the user will be
+asked to select one unless --auto is set (in which case one will be picked).
 
 =item B<-p>
 
@@ -403,7 +406,7 @@ manpage.
 =item B<--downloader> I<program name>
 
 Use a specific program for downloading distant files via http or ftp.
-By default curl is used if available, or wget instead.
+By default wget is used if available, or curl instead.
 
 =item B<--curl-options> I<'options'>
 

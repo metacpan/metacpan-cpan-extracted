@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Tuple-Munge-*
+/lib/Tuple/Munge.c
+/lib/Tuple/Munge.o

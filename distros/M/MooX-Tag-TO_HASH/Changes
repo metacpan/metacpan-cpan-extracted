@@ -1,5 +1,18 @@
 Revision history for MooX-Tag-TO_HASH
 
+0.05      2023-04-01 13:50:03-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * require JSON::Maybe::XS >= 1.00400.  SREZIC++
+
+
+0.04      2023-03-31 21:52:05-04:00 America/New_York
+
+  [BUG FIX]
+
+    * incorrect predicate names for attributes that start with an underscore.
+
 0.03      2022-10-29 22:06:53-04:00 America/New_York
 
   [BUG FIX]

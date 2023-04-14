@@ -105,7 +105,8 @@ sub pdlapprox {
   isok($label,
        defined($got) && defined($want)
        && cmp_dims($got,$want)
-       && all(matchpdla($want,$got,$eps)));
+       && all(matchpdla($want,$got,$eps)))
+    or diag "got=$got\nwant=$want";
 }
 
 print "loaded ", __FILE__, "\n";

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -348,7 +348,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.482 of App::SahUtils (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of App::SahUtils (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
@@ -364,6 +364,8 @@ L<Sah> and L<Data::Sah>:
 =item * L<format-with-sah>
 
 =item * L<get-sah-type>
+
+=item * L<get-value-with-sah>
 
 =item * L<is-sah-builtin-type>
 
@@ -401,6 +403,8 @@ L<Sah> and L<Data::Sah>:
 
 =item * L<list-sah-type-modules>
 
+=item * L<list-sah-value-rule-modules>
+
 =item * L<normalize-sah-schema>
 
 =item * L<resolve-sah-schema>
@@ -412,6 +416,8 @@ L<Sah> and L<Data::Sah>:
 =item * L<show-sah-filter-rule-module>
 
 =item * L<show-sah-schema-module>
+
+=item * L<show-sah-value-rule-modules>
 
 =item * L<validate-with-sah>
 
@@ -438,6 +444,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
+(No description)
 
 
 =back
@@ -474,6 +482,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+(No description)
+
 
 =back
 
@@ -508,6 +518,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
+(No description)
 
 
 =back
@@ -545,6 +557,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+(No description)
+
 
 =back
 
@@ -579,6 +593,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
+(No description)
 
 
 =back
@@ -616,6 +632,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+(No description)
+
 
 =back
 
@@ -650,6 +668,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
+(No description)
 
 
 =back
@@ -687,6 +707,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+(No description)
+
 
 =back
 
@@ -721,6 +743,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
+(No description)
 
 
 =back
@@ -758,6 +782,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+(No description)
+
 
 =back
 
@@ -793,6 +819,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
+(No description)
 
 
 =back
@@ -844,7 +872,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

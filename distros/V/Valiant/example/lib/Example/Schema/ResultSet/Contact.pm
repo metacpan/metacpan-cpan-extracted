@@ -8,4 +8,8 @@ sub new_contact($self) {
   return $contact;
 }
 
+sub filter_by_request($self, $request) {
+  return $self->page_or_last($request->page);
+}
+
 1;

@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <unistd.h>
@@ -216,7 +219,7 @@ int32_t SPVM__Sys__User__getpwent(SPVM_ENV* env, SPVM_VALUE* stack) {
     stack[0].oval = NULL;
   }
   else {
-    void* obj_sys_ent_passwd = env->new_pointer_by_name(env, stack, "Sys::User::Passwd", pwent, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_sys_ent_passwd = env->new_pointer_object_by_name(env, stack, "Sys::User::Passwd", pwent, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     stack[0].oval = obj_sys_ent_passwd;
   }
@@ -275,7 +278,7 @@ int32_t SPVM__Sys__User__getgrent(SPVM_ENV* env, SPVM_VALUE* stack) {
     stack[0].oval = NULL;
   }
   else {
-    void* obj_sys_ent_group = env->new_pointer_by_name(env, stack, "Sys::User::Group", grent, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_sys_ent_group = env->new_pointer_object_by_name(env, stack, "Sys::User::Group", grent, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     stack[0].oval = obj_sys_ent_group;
   }
@@ -370,7 +373,7 @@ int32_t SPVM__Sys__User__getpwuid(SPVM_ENV* env, SPVM_VALUE* stack) {
     stack[0].oval = NULL;
   }
   else {
-    void* obj_sys_ent_passwd = env->new_pointer_by_name(env, stack, "Sys::User::Passwd", pwent, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_sys_ent_passwd = env->new_pointer_object_by_name(env, stack, "Sys::User::Passwd", pwent, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     stack[0].oval = obj_sys_ent_passwd;
   }
@@ -408,7 +411,7 @@ int32_t SPVM__Sys__User__getpwnam(SPVM_ENV* env, SPVM_VALUE* stack) {
     stack[0].oval = NULL;
   }
   else {
-    void* obj_sys_ent_passwd = env->new_pointer_by_name(env, stack, "Sys::User::Passwd", pwent, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_sys_ent_passwd = env->new_pointer_object_by_name(env, stack, "Sys::User::Passwd", pwent, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     stack[0].oval = obj_sys_ent_passwd;
   }
@@ -441,7 +444,7 @@ int32_t SPVM__Sys__User__getgrgid(SPVM_ENV* env, SPVM_VALUE* stack) {
     stack[0].oval = NULL;
   }
   else {
-    void* obj_sys_ent_group = env->new_pointer_by_name(env, stack, "Sys::User::Group", grent, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_sys_ent_group = env->new_pointer_object_by_name(env, stack, "Sys::User::Group", grent, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     stack[0].oval = obj_sys_ent_group;
   }
@@ -479,7 +482,7 @@ int32_t SPVM__Sys__User__getgrnam(SPVM_ENV* env, SPVM_VALUE* stack) {
     stack[0].oval = NULL;
   }
   else {
-    void* obj_sys_ent_group = env->new_pointer_by_name(env, stack, "Sys::User::Group", grent, &e, __func__, FILE_NAME, __LINE__);
+    void* obj_sys_ent_group = env->new_pointer_object_by_name(env, stack, "Sys::User::Group", grent, &e, __func__, FILE_NAME, __LINE__);
     if (e) { return e; }
     stack[0].oval = obj_sys_ent_group;
   }

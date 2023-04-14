@@ -1,0 +1,25 @@
+Revision history for Crypt-HSM
+
+0.006     2023-04-09 12:16:50+02:00 Europe/Amsterdam
+          - Further improve refcounting on compilers without atomics
+          - Stricten up pointer usage
+
+0.005     2023-04-05 23:20:57+02:00 Europe/Amsterdam
+          - Make refcounting implementation compilers without atomics
+          - Make verify throw exceptions on error
+          - Move MIN definition up to fix compilation issues
+          - Explicitly ask ppport.h for mg_findext
+
+0.004     2023-03-31 17:38:21+02:00 Europe/Amsterdam
+          - Fix various compilation issues
+
+0.003     2023-03-30 16:55:10+02:00 Europe/Amsterdam
+          - Add refcounting to provider
+          - Store provider object in magic for thread safety.
+
+0.002     2023-03-29 13:45:36+02:00 Europe/Amsterdam
+          - Add mechanism arguments to cryptographic methods
+          - Make softhsm test a user test, only run if $HSM_PIN is set
+
+0.001     2023-03-28 15:17:26+02:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

@@ -11,7 +11,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"POT-Creation-Date: 2022-06-13 18:28+0300\n"
 "PO-Revision-Date: 2021-08-22 18:54+0000\n"
 "Last-Translator: Dmitry <dmitrydmitry761@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/MageiaLinux/mageia/"
@@ -37,39 +37,39 @@ msgstr "软件包安装"
 msgid "Please wait..."
 msgstr "请稍候..."
 
-#: ../gurpm/RPMProgressDialog.pm:290
+#: ../gurpm/RPMProgressDialog.pm:291
 #, c-format
 msgid "Verifying package signatures..."
 msgstr "正在校验软件包的签名..."
 
-#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
+#: ../gurpm/RPMProgressDialog.pm:310 ../urpm/install.pm:108
 #, c-format
 msgid "Preparing..."
 msgstr "正在准备..."
 
-#: ../gurpm/RPMProgressDialog.pm:313
+#: ../gurpm/RPMProgressDialog.pm:314
 #, c-format
 msgid "Removing package `%s' ..."
 msgstr "移除包 `%s'  中"
 
-#: ../gurpm/RPMProgressDialog.pm:316
+#: ../gurpm/RPMProgressDialog.pm:317
 #, c-format
 msgid "Installing package `%s' (%s/%s)..."
 msgstr "正在安装软件包“%s”(%s/%s)..."
 
-#: ../gurpm/RPMProgressDialog.pm:345
+#: ../gurpm/RPMProgressDialog.pm:346
 #, c-format
 msgid "Downloading package `%s'..."
 msgstr "正在下载软件包“%s”..."
 
-#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:127
+#: ../gurpm/RPMProgressDialog.pm:350 ../gurpmi:127
 #, c-format
 msgid "Cancel"
 msgstr "取消"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
-#: ../urpm/media.pm:1833
+#: ../gurpm/RPMProgressDialog.pm:360 ../urpm.pm:454 ../urpm/download.pm:882
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1153 ../urpm/media.pm:1686
+#: ../urpm/media.pm:1837
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...获取失败: %s"
@@ -170,7 +170,7 @@ msgstr "确定"
 msgid "Options:"
 msgstr "选项："
 
-#: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:56
 #: ../urpmi.removemedia:40 ../urpmi.update:33 ../urpmq:41
 #, c-format
 msgid "  --help         - print this help message.\n"
@@ -380,7 +380,7 @@ msgstr ""
 msgid "You may want to update your urpmi database."
 msgstr "您可能需要更新您的 urpmi 数据库。"
 
-#: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:581
+#: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:583
 #, c-format
 msgid "Installation failed:"
 msgstr "安装失败: "
@@ -544,52 +544,52 @@ msgstr "命令行声明的代理服务器无效\n"
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: 无法读取 rpm 文件“%s”\n"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "unexpected expression %s"
 msgstr "意外表达式 %s"
 
-#: ../urpm/args.pm:390
+#: ../urpm/args.pm:391
 #, c-format
 msgid "missing expression before %s"
 msgstr "%s 前缺少表达式"
 
-#: ../urpm/args.pm:396
+#: ../urpm/args.pm:397
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "意外表达式 %s(建议：使用 -a 或 -o?)"
 
-#: ../urpm/args.pm:400
+#: ../urpm/args.pm:401
 #, c-format
 msgid "no expression to close"
 msgstr "没有要关闭的表达式"
 
-#: ../urpm/args.pm:409
+#: ../urpm/args.pm:410
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr "默认情况下，urpmf 使用正则表达式。您应该使用选项“--literal”"
 
-#: ../urpm/args.pm:483
+#: ../urpm/args.pm:484
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "chroot 目录不存在"
 
-#: ../urpm/args.pm:506
+#: ../urpm/args.pm:507
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "没有 %2$s 无法使用 %1$s"
 
-#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
+#: ../urpm/args.pm:510 ../urpm/args.pm:513 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "无法和 %2$s 一起使用 %1$s"
 
-#: ../urpm/args.pm:520
+#: ../urpm/args.pm:521
 #, c-format
 msgid "Too many arguments\n"
 msgstr "参数太多\n"
 
-#: ../urpm/args.pm:528
+#: ../urpm/args.pm:529
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -605,7 +605,7 @@ msgstr ""
 "\n"
 "用法:\n"
 
-#: ../urpm/args.pm:534
+#: ../urpm/args.pm:535
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "版权 (C) %s %s"
@@ -873,22 +873,22 @@ msgstr "未定义基础"
 msgid "Cannot connect to ldap uri:"
 msgstr "无法连接到 ldap uri:"
 
-#: ../urpm/lock.pm:98
+#: ../urpm/lock.pm:111
 #, c-format
 msgid "%s database is locked, process %d is already using it"
 msgstr "%s 数据库已锁定，进程 %d 正在使用它"
 
-#: ../urpm/lock.pm:100
+#: ../urpm/lock.pm:113
 #, c-format
 msgid "%s database is locked (another program is already using it)"
 msgstr "%s 数据库已锁定(其它程序正在使用它)"
 
-#: ../urpm/lock.pm:114
+#: ../urpm/lock.pm:127
 #, c-format
 msgid "%s database is locked. Waiting..."
 msgstr "%s 数据库已锁定。等候中..."
 
-#: ../urpm/lock.pm:115
+#: ../urpm/lock.pm:128
 #, c-format
 msgid "aborting"
 msgstr "中止"
@@ -978,12 +978,12 @@ msgstr "尝试忽略相关性检查而安装吗?"
 msgid "Try harder to install (--force)?"
 msgstr "尝试强制安装吗(使用 --force)?"
 
-#: ../urpm/main_loop.pm:591
+#: ../urpm/main_loop.pm:593
 #, c-format
 msgid "Packages are up to date"
 msgstr "软件包已为最新"
 
-#: ../urpm/main_loop.pm:602 ../urpm/parallel.pm:340
+#: ../urpm/main_loop.pm:604 ../urpm/parallel.pm:340
 #, c-format
 msgid "Installation is possible"
 msgstr "可以安装"
@@ -1104,182 +1104,182 @@ msgstr "添加介质“%s”"
 msgid "failed to copy media.cfg to %s (%d)"
 msgstr "将 media.cfg 复制到 %s 失败 (%d)"
 
-#: ../urpm/media.pm:1115
+#: ../urpm/media.pm:1119
 #, c-format
 msgid "directory %s does not exist"
 msgstr "目录 %s 不存在"
 
-#: ../urpm/media.pm:1123
+#: ../urpm/media.pm:1127
 #, c-format
 msgid "this location doesn't seem to contain any distribution"
 msgstr "此位置似乎不包含任何发行版"
 
-#: ../urpm/media.pm:1147
+#: ../urpm/media.pm:1151
 #, c-format
 msgid "unable to parse media.cfg"
 msgstr "无法分析 media.cfg"
 
-#: ../urpm/media.pm:1150
+#: ../urpm/media.pm:1154
 #, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr "无法访问发行版介质(未发现 media.cfg 文件)"
 
-#: ../urpm/media.pm:1184
+#: ../urpm/media.pm:1188
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "跳过不兼容的介质“%s”(原因是 %s)"
 
-#: ../urpm/media.pm:1242
+#: ../urpm/media.pm:1246
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "正在获取 media.cfg 文件..."
 
-#: ../urpm/media.pm:1285
+#: ../urpm/media.pm:1289
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "试图选择不存在的介质“%s”"
 
-#: ../urpm/media.pm:1288
+#: ../urpm/media.pm:1292
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "选择多个介质: %s"
 
-#: ../urpm/media.pm:1347
+#: ../urpm/media.pm:1351
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "删除介质“%s”"
 
-#: ../urpm/media.pm:1438
+#: ../urpm/media.pm:1442
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "正在从介质“%s”重新配置 urpmi"
 
-#: ../urpm/media.pm:1472
+#: ../urpm/media.pm:1476
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...重新配置失败"
 
-#: ../urpm/media.pm:1478
+#: ../urpm/media.pm:1482
 #, c-format
 msgid "reconfiguration done"
 msgstr "重新配置完成"
 
-#: ../urpm/media.pm:1494
+#: ../urpm/media.pm:1498
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "生成命名文件出错：依赖关系 %d 未找到"
 
-#: ../urpm/media.pm:1515
+#: ../urpm/media.pm:1519
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "介质“%s”已为最新"
 
-#: ../urpm/media.pm:1526
+#: ../urpm/media.pm:1530
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "正在检查综合文件 [%s]"
 
-#: ../urpm/media.pm:1546
+#: ../urpm/media.pm:1550
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "读取介质“%s”的综合文件出现问题"
 
-#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
+#: ../urpm/media.pm:1563 ../urpm/media.pm:1658
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "正在复制介质“%2$s”的 [%1$s]..."
 
-#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
+#: ../urpm/media.pm:1565 ../urpm/media.pm:1635 ../urpm/media.pm:1888
 #, c-format
 msgid "...copying failed"
 msgstr "...复制失败"
 
-#: ../urpm/media.pm:1627
+#: ../urpm/media.pm:1631
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "正在复制“%s”的描述文件..."
 
-#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
+#: ../urpm/media.pm:1633 ../urpm/media.pm:1662
 #, c-format
 msgid "...copying done"
 msgstr "...复制完成"
 
-#: ../urpm/media.pm:1660
+#: ../urpm/media.pm:1664
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "复制 [%s] 失败(文件太小了)"
 
-#: ../urpm/media.pm:1708
+#: ../urpm/media.pm:1712
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "正在计算所获取的源综合文件的 md5sum"
 
-#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
+#: ../urpm/media.pm:1714 ../urpm/media.pm:2197
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "获取[%s]失败(md5sum 不匹配)"
 
-#: ../urpm/media.pm:1725
+#: ../urpm/media.pm:1729
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "在 %s 上 genhdlist2 失败"
 
-#: ../urpm/media.pm:1735
+#: ../urpm/media.pm:1739
 #, c-format
 msgid "comparing %s and %s"
 msgstr "比较 %s 和 %s"
 
-#: ../urpm/media.pm:1765
+#: ../urpm/media.pm:1769
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "介质“%2$s”的 hdlist 文件 %1$s 无效"
 
-#: ../urpm/media.pm:1791
+#: ../urpm/media.pm:1795
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "正在复制“%s”的 MD5SUM..."
 
-#: ../urpm/media.pm:1831
+#: ../urpm/media.pm:1835
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "无效的 MD5SUM 文件(从 %s 下载)"
 
-#: ../urpm/media.pm:1834
+#: ../urpm/media.pm:1838
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "介质“%s”未发现元数据"
 
-#: ../urpm/media.pm:1866
+#: ../urpm/media.pm:1870
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "正在获取“%s”的源综合文件..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1936
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "正在检查“%s”的公共密钥文件..."
 
-#: ../urpm/media.pm:1944
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...从公钥文件“%2$s”中导入了密钥 %1$s"
 
-#: ../urpm/media.pm:1948
+#: ../urpm/media.pm:1952
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "无法导入“%s”的公共密钥文件"
 
-#: ../urpm/media.pm:1989
+#: ../urpm/media.pm:1993
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "介质“%s”未发现综合文件"
 
-#: ../urpm/media.pm:2022
+#: ../urpm/media.pm:2026
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "已更新介质“%s”"
 
-#: ../urpm/media.pm:2187
+#: ../urpm/media.pm:2191
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "获取[%s]失败"
@@ -1299,88 +1299,88 @@ msgstr "无法从镜像列表 %s 里找到一个镜像"
 msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr "找到地理位置较近的 %s %.2f %.2f，从时区 %s"
 
-#: ../urpm/mirrors.pm:306
+#: ../urpm/mirrors.pm:320
 #, c-format
 msgid "getting mirror list from %s"
 msgstr "从 %s 中获得镜像列表"
 
-#: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
+#: ../urpm/msg.pm:116 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
 msgid "Nn"
 msgstr "nN否"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
-#: ../urpm/msg.pm:75 ../urpme:38 ../urpmi.addmedia:133
+#: ../urpm/msg.pm:117 ../urpme:38 ../urpmi.addmedia:135
 #, c-format
 msgid "Yy"
 msgstr "yY是"
 
-#: ../urpm/msg.pm:100 ../urpme:158 ../urpmi.addmedia:136
+#: ../urpm/msg.pm:153 ../urpme:158 ../urpmi.addmedia:138
 #, c-format
 msgid " (y/N) "
 msgstr "(是(y)/否(N))[否]"
 
-#: ../urpm/msg.pm:129
+#: ../urpm/msg.pm:182
 #, c-format
 msgid "Sorry, bad choice, try again\n"
 msgstr "对不起，选择无效，请再试一次\n"
 
-#: ../urpm/msg.pm:160
+#: ../urpm/msg.pm:220
 #, c-format
 msgid "Package"
 msgstr "软件包"
 
-#: ../urpm/msg.pm:160
+#: ../urpm/msg.pm:220
 #, c-format
 msgid "Version"
 msgstr "版本"
 
-#: ../urpm/msg.pm:160
+#: ../urpm/msg.pm:220
 #, c-format
 msgid "Release"
 msgstr "释放"
 
-#: ../urpm/msg.pm:160
+#: ../urpm/msg.pm:220
 #, c-format
 msgid "Arch"
 msgstr "架构"
 
-#: ../urpm/msg.pm:169
+#: ../urpm/msg.pm:229
 #, c-format
 msgid "(recommended)"
 msgstr "（推荐）"
 
-#: ../urpm/msg.pm:184
+#: ../urpm/msg.pm:244
 #, c-format
 msgid "medium \"%s\""
 msgstr "介质“%s”"
 
-#: ../urpm/msg.pm:184
+#: ../urpm/msg.pm:244
 #, c-format
 msgid "command line"
 msgstr "命令行"
 
-#: ../urpm/msg.pm:198
+#: ../urpm/msg.pm:273
 #, c-format
 msgid "B"
 msgstr "B"
 
-#: ../urpm/msg.pm:198
+#: ../urpm/msg.pm:273
 #, c-format
 msgid "KB"
 msgstr "KB"
 
-#: ../urpm/msg.pm:198
+#: ../urpm/msg.pm:273
 #, c-format
 msgid "MB"
 msgstr "MB"
 
-#: ../urpm/msg.pm:198
+#: ../urpm/msg.pm:273
 #, c-format
 msgid "GB"
 msgstr "GB"
 
-#: ../urpm/msg.pm:198 ../urpm/msg.pm:207
+#: ../urpm/msg.pm:273 ../urpm/msg.pm:282
 #, c-format
 msgid "TB"
 msgstr "TB"
@@ -1644,17 +1644,17 @@ msgstr "为了 %s，您应该重新启动您的会话"
 msgid "You should restart %s for %s"
 msgstr "为了 %2$s，您应该重新启动 %1$s"
 
-#: ../urpm/sys.pm:377
+#: ../urpm/sys.pm:428
 #, c-format
 msgid "Can't write file"
 msgstr "无法写入文件"
 
-#: ../urpm/sys.pm:377
+#: ../urpm/sys.pm:428
 #, c-format
 msgid "Can't open file"
 msgstr "无法打开文件"
 
-#: ../urpm/sys.pm:390
+#: ../urpm/sys.pm:441
 #, c-format
 msgid "Can't move file %s to %s"
 msgstr "无法将文件 %s 移动到 %s"
@@ -1684,7 +1684,7 @@ msgstr "  --parallel     - 在多个机器上分布的运行 urpmi。\n"
 msgid "  --root         - use another root for rpm removal.\n"
 msgstr "  --root         - 使用另一个 root 删除 rpm。\n"
 
-#: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
+#: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:74
 #: ../urpmi.removemedia:45 ../urpmi.update:49 ../urpmq:68
 #, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
@@ -2179,7 +2179,7 @@ msgstr ""
 "  --use-distrib  - 从发行版树中实时配置 urpmi，特别用于在 --root 选项\n"
 "                   下安装 chroot。\n"
 
-#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:38
+#: ../urpmi:111 ../urpmi.addmedia:61 ../urpmi.update:38
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
 msgstr "  --metalink     - 生成并使用本地 metallink。\n"
@@ -2207,8 +2207,8 @@ msgstr "  --curl-options - 给 curl 传递额外的选项\n"
 
 #: ../urpmi:117
 #, c-format
-msgid "  --rsync-options- additional options to pass to rsync\n"
-msgstr "  --rsync-options- 给 rsync 传递额外的选项\n"
+msgid "  --rsync-options - additional options to pass to rsync\n"
+msgstr "  --rsync-options - 给 rsync 传递额外的选项\n"
 
 #: ../urpmi:118
 #, c-format
@@ -2225,7 +2225,7 @@ msgstr "  --prozilla-options - 给 prozilla 传递额外的选项\n"
 msgid "  --aria2-options - additional options to pass to aria2\n"
 msgstr "  --aria2-options - 给 aria2 传递额外的选项\n"
 
-#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:39
+#: ../urpmi:121 ../urpmi.addmedia:62 ../urpmi.update:39
 #, c-format
 msgid "  --limit-rate   - limit the download speed.\n"
 msgstr "  --limit-rate   - 降低下载速度。\n"
@@ -2239,7 +2239,7 @@ msgstr ""
 "  --resume       - 续传未下载完成的文件\n"
 "                   (--no-resume 禁用它，默认是禁用的)。\n"
 
-#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:40 ../urpmq:74
+#: ../urpmi:124 ../urpmi.addmedia:63 ../urpmi.update:40 ../urpmq:74
 #, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
@@ -2248,7 +2248,7 @@ msgstr ""
 "  --proxy        - 使用指定的 HTTP 代理，默认的端口号是\n"
 "                   1080(格式如 <proxyhost[:port]>)。\n"
 
-#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:42 ../urpmq:76
+#: ../urpmi:126 ../urpmi.addmedia:65 ../urpmi.update:42 ../urpmq:76
 #, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
@@ -2463,7 +2463,7 @@ msgstr ""
 "\n"
 "仍然继续安装吗?"
 
-#: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:136
+#: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:138
 #, c-format
 msgid " (Y/n) "
 msgstr "(是(Y)/否(n))[是]"
@@ -2538,10 +2538,10 @@ msgstr "(只是测试，安装将不会实际发生)"
 msgid "Press Enter when mounted..."
 msgstr "挂载后按 Enter..."
 
-#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', 'https:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "usage: urpmi.addmedia [options] <name> <url>\n"
 "where <url> is one of\n"
@@ -2549,6 +2549,7 @@ msgid ""
 "       ftp://<login>:<password>@<host>/<path>\n"
 "       ftp://<host>/<path>\n"
 "       http://<host>/<path>\n"
+"       https://<host>/<path>\n"
 "       cdrom://<path>\n"
 "\n"
 "usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
@@ -2583,27 +2584,27 @@ msgstr ""
 "\n"
 "而 [选项] 可以来自\n"
 
-#: ../urpmi.addmedia:56 ../urpmi.update:34 ../urpmq:71
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:71
 #, c-format
 msgid "  --wget         - use wget to retrieve distant files.\n"
 msgstr "  --wget         - 用 wget 取远程文件。\n"
 
-#: ../urpmi.addmedia:57 ../urpmi.update:35 ../urpmq:72
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:72
 #, c-format
 msgid "  --curl         - use curl to retrieve distant files.\n"
 msgstr "  --curl         - 用 crul 取远程文件。\n"
 
-#: ../urpmi.addmedia:58 ../urpmi.update:36 ../urpmq:73
+#: ../urpmi.addmedia:59 ../urpmi.update:36 ../urpmq:73
 #, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
 msgstr "  --prizlla      - 用 prozilla 取远程文件。\n"
 
-#: ../urpmi.addmedia:59 ../urpmi.update:37
+#: ../urpmi.addmedia:60 ../urpmi.update:37
 #, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
 msgstr "  --aria2         - 用 aria2 取远程文件。\n"
 
-#: ../urpmi.addmedia:66
+#: ../urpmi.addmedia:67
 #, c-format
 msgid ""
 "  --update       - create an update medium, \n"
@@ -2612,7 +2613,7 @@ msgstr ""
 "  --update       - 创建更新介质，\n"
 "                   或忽略非更新介质(如果和 --distrib 一起使用)\n"
 
-#: ../urpmi.addmedia:68
+#: ../urpmi.addmedia:69
 #, c-format
 msgid ""
 "  --xml-info     - use the specific policy for downloading xml info files\n"
@@ -2623,104 +2624,109 @@ msgstr ""
 "                   以下中的一个: never, on-demand, update-only, always. cf "
 "urpmi.cfg(5)\n"
 
-#: ../urpmi.addmedia:70
+#: ../urpmi.addmedia:71
 #, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
 msgstr "  --probe-synthesis - 使用综合文件。\n"
 
-#: ../urpmi.addmedia:71
+#: ../urpmi.addmedia:72
 #, c-format
 msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr "  --probe-rpms   - 使用 rpm 文件(而不是综合文件)。\n"
 
-#: ../urpmi.addmedia:72
+#: ../urpmi.addmedia:73
 #, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
 msgstr "  --no-probe     - 不试图查找任何综合文件文件。\n"
 
-#: ../urpmi.addmedia:74
+#: ../urpmi.addmedia:75
 #, c-format
 msgid ""
 "  --distrib      - automatically create all media from an installation\n"
 "                   medium.\n"
 msgstr "  --distrib      - 自动从安装介质创建全部介质。\n"
 
-#: ../urpmi.addmedia:76
+#: ../urpmi.addmedia:77
 #, c-format
 msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
 msgstr "  --interactive  - 对于 --distrib，请求每个介质的确认\n"
 
-#: ../urpmi.addmedia:77
+#: ../urpmi.addmedia:78
 #, c-format
 msgid "  --all-media    - with --distrib, add every listed media\n"
 msgstr "  --all-media    - 对于 --distrib，添加列出的每个介质\n"
 
-#: ../urpmi.addmedia:78
+#: ../urpmi.addmedia:79
+#, fuzzy, c-format
+msgid "  --ignorearch   - with --distrib, add media from incompatible archs\n"
+msgstr "  --ignorearch   - 允许安装体系不匹配的 RPM。\n"
+
+#: ../urpmi.addmedia:80
 #, c-format
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr "  --virtual      - 创建常为最新的虚拟介质。\n"
 
-#: ../urpmi.addmedia:79 ../urpmi.update:45
+#: ../urpmi.addmedia:81 ../urpmi.update:45
 #, c-format
 msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
 msgstr "  --no-md5sum    - 禁用 MD5SUM 文件检查。\n"
 
-#: ../urpmi.addmedia:80
+#: ../urpmi.addmedia:82
 #, c-format
 msgid "  --nopubkey     - don't import pubkey of added media\n"
 msgstr "  --nopubkey     - 不导入所添加介质的密钥\n"
 
-#: ../urpmi.addmedia:81
+#: ../urpmi.addmedia:83
 #, c-format
 msgid "  --raw          - add the media in config, but don't update it.\n"
 msgstr "  --raw          - 在配置中添加介质，但不进行更新。\n"
 
-#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:54
+#: ../urpmi.addmedia:84 ../urpmi.removemedia:43 ../urpmi.update:54
 #, c-format
 msgid "  -q             - quiet mode.\n"
 msgstr "  -q             - 安静模式。\n"
 
-#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:55
+#: ../urpmi.addmedia:85 ../urpmi.removemedia:44 ../urpmi.update:55
 #, c-format
 msgid "  -v             - verbose mode.\n"
 msgstr "  -v             - 详细的提示。\n"
 
-#: ../urpmi.addmedia:96
+#: ../urpmi.addmedia:98
 #, c-format
 msgid "known xml-info policies are %s"
 msgstr "已知的 xml-info 策略是 %s"
 
-#: ../urpmi.addmedia:107
+#: ../urpmi.addmedia:109
 #, c-format
 msgid "no argument needed for --distrib --mirrorlist <url>"
 msgstr "没有参数需要于 --distrib --mirrorlist <url>"
 
-#: ../urpmi.addmedia:112
+#: ../urpmi.addmedia:114
 #, c-format
 msgid "bad <url> (for local directory, the path must be absolute)"
 msgstr "无效的 <url> (如果是本地目录，必须是绝对路径)"
 
-#: ../urpmi.addmedia:116
+#: ../urpmi.addmedia:118
 #, c-format
 msgid "Only superuser is allowed to add media"
 msgstr "只允许超级用户添加介质"
 
-#: ../urpmi.addmedia:119
+#: ../urpmi.addmedia:121
 #, c-format
 msgid "creating config file [%s]"
 msgstr "创建配置文件[%s]"
 
-#: ../urpmi.addmedia:120
+#: ../urpmi.addmedia:122
 #, c-format
 msgid "Can't create config file [%s]"
 msgstr "无法创建配置文件[%s]"
 
-#: ../urpmi.addmedia:128
+#: ../urpmi.addmedia:130
 #, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
 msgstr "使用 --distrib 不需要提供 <综合文件的相对路径>"
 
-#: ../urpmi.addmedia:136
+#: ../urpmi.addmedia:138
 #, c-format
 msgid ""
 "\n"
@@ -2729,17 +2735,17 @@ msgstr ""
 "\n"
 "您是否想要添加介质“%s”?"
 
-#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#: ../urpmi.addmedia:159 ../urpmi.addmedia:184
 #, c-format
 msgid "unable to add medium"
 msgstr "无法添加介质"
 
-#: ../urpmi.addmedia:164
+#: ../urpmi.addmedia:167
 #, c-format
 msgid "<relative path of synthesis> missing\n"
 msgstr "<综合文件的相对路径>找不到\n"
 
-#: ../urpmi.addmedia:167
+#: ../urpmi.addmedia:170
 #, c-format
 msgid "Can't use %s with remote medium"
 msgstr "远程介质无法使用 %s"

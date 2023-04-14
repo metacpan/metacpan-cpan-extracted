@@ -1,164 +1,98 @@
-Changes on 2015-02-04 for repository at:
-  Fetch URL: ssh://git@github.com/abeltje/Business-IBAN-Validator
-  Push  URL: ssh://git@github.com/abeltje/Business-IBAN-Validator
+Changes on 2023-04-12 for repository at:
+  Fetch URL: ssh://git@source.test-smoke.org:9999/~/Business-IBAN-Validator
+  Push  URL: ssh://git@source.test-smoke.org:9999/~/Business-IBAN-Validator
 
 Enjoy!
 
-________________________________________________________________________________
-[d69a246] by Abe Timmerman on Wed, 4 Feb 2015 16:00:08 +0100
+0.07 2023-04-12T17:48:19+02:00 (0dda5ff => Abe Timmerman)
+ - (Abe Timmerman, Wed, 12 Apr 2023 17:48:19 +0200) Autocommit for
+   distribution Business::IBAN::Validator 0.07 (minor)
 
-     Merge pull request #1 from Tekki/master
+0.06_02 2023-03-03T13:06:06+01:00 (efb0d3d => Abe Timmerman)
+ - (Abe Timmerman, Fri, 3 Mar 2023 13:06:06 +0100) Autocommit for
+   distribution Business::IBAN::Validator 0.06_02 (test)
 
-        Update to registry version 54 (january 2015) by Tekki.
-________________________________________________________________________________
-[084bc5c] by Tekki on Wed, 4 Feb 2015 15:34:05 +0100
+0.06_01 2023-03-03T12:59:19+01:00 (beea72c => Abe Timmerman)
+ - (Abe Timmerman, Fri, 3 Mar 2023 12:59:19 +0100) Autocommit for
+   distribution Business::IBAN::Validator 0.06_01 (test)
 
-     Update to registry version 54 (january 2015).
+0.06 2015-02-04T16:11:44+01:00 (b26745d => Abe Timmerman)
+ - (Abe Timmerman, Wed, 4 Feb 2015 16:11:44 +0100) Autocommit for
+   distribution Business::IBAN::Validator 0.06
 
+ - (Abe Timmerman, Wed, 1 Mar 2023 10:07:48 +0100) Introduce
+   t::Test::abeltje 1.08
+ -     Do some cosmetics on the files in the distro.
 
-M	README
-M	lib/Business/IBAN/Database.pm
-M	lib/Business/IBAN/Validator.pm
-M	t/020-iban-auto.t
-________________________________________________________________________________
-[b083599] by abeltje on Tue, 12 Nov 2013 11:53:51 +0100
+ - (Abe Timmerman, Wed, 1 Mar 2023 20:13:30 +0100) Update to SWIFT document
+   version 93: February 2023
+ -     The SWIFT website now also supplies a new document in txt format
+ -     (tab-separated, with a heading per line) that we now use to generate
+   the
+ -     Database-module and the auto-example-test.
+ -     Split the util-functions into their own module for multiple use and
+ -     better maintainance.
 
-     Autocommit for distribution Business::IBAN::Validator 0.05
+ - (Abe Timmerman, Wed, 1 Mar 2023 20:18:10 +0100) Add the new SWIFT
+   documents to the repository
+ -     We used these for generation of the Business::IBAN::Database module
+   and
+ -     the t/020-iban-auto.t test.
 
+ - (Abe Timmerman, Fri, 3 Mar 2023 12:57:25 +0100) Make VERSION a string so
+   we can have beta-versions
 
-M	Changes
-M	debian/changelog
-M	lib/Business/IBAN/Validator.pm
-________________________________________________________________________________
-[dc07c3b] by abeltje on Tue, 12 Nov 2013 11:51:11 +0100
+0.05 2013-11-12T11:53:51+01:00 (b083599 => abeltje)
+ - (abeltje, Tue, 12 Nov 2013 11:53:51 +0100) Autocommit for distribution
+   Business::IBAN::Validator 0.05
 
-     RT-90271 - Peter Heimann: Update to IBAN Registry Release 46 November
-        2013
-        - Country name capitalization should be unified
-        - Country Qatar added in SWIFT IBAN Registry, Release 46, November
-        2013
-        - Added the IBAN Registry document Release 46
-        - Remove support/ dir from the CPAN-distribution
+ - (Tekki, Wed, 4 Feb 2015 15:34:05 +0100) Update to registry version 54
+   (january 2015).
 
+ - (Abe Timmerman, Wed, 4 Feb 2015 16:00:08 +0100) Merge pull request #1
+   from Tekki/master
+ -     Update to registry version 54 (january 2015) by Tekki.
 
-M	MANIFEST
-M	MANIFEST.SKIP
-M	lib/Business/IBAN/Database.pm
-A	support/IBAN_Registry_201311.pdf
-A	support/rt-90271-Business-IBAN-Validator.patch
-M	t/020-iban-auto.t
-________________________________________________________________________________
-[aa5f448] by abeltje on Mon, 4 Nov 2013 23:18:34 +0100
+0.04 2013-11-04T23:18:34+01:00 (aa5f448 => abeltje)
+ - (abeltje, Mon, 4 Nov 2013 23:18:34 +0100) Autocommit for distribution
+   Business::IBAN::Validator 0.04
 
-     Autocommit for distribution Business::IBAN::Validator 0.04
+ - (abeltje, Tue, 12 Nov 2013 11:51:11 +0100) RT-90271 - Peter Heimann:
+   Update to IBAN Registry Release 46 November 2013
+ -     - Country name capitalization should be unified
+ -     - Country Qatar added in SWIFT IBAN Registry, Release 46, November
+   2013
+ -     - Added the IBAN Registry document Release 46
+ -     - Remove support/ dir from the CPAN-distribution
 
+0.00_00 2013-07-06T07:55:19+02:00 (c0a255e => abeltje)
+ - (abeltje, Sat, 6 Jul 2013 07:55:19 +0200) Initial commit for the
+   Business::IBAN::Validator
 
-M	Changes
-M	debian/changelog
-M	lib/Business/IBAN/Validator.pm
-________________________________________________________________________________
-[b661912] by abeltje on Fri, 18 Oct 2013 10:01:39 +0200
+ - (abeltje, Sat, 6 Jul 2013 09:17:59 +0200) Add some more info.
 
-     As of 1 July 2013, Croatia is part of SEPA.
+ - (abeltje, Sun, 7 Jul 2013 11:50:40 +0200) Add debian/ directory for easy
+   packaging, don't include in the tarball.
 
+ - (Abe Timmerman, Sun, 7 Jul 2013 12:07:24 +0200) Create debian/changelog
+   (dch --create).
 
-M	t/020-iban-auto.t
-________________________________________________________________________________
-[0d93ee3] by abeltje on Fri, 18 Oct 2013 09:58:24 +0200
+ - (abeltje, Mon, 8 Jul 2013 08:41:16 +0200) Be consistent in errors for
+   invalid IBAN country codes.
 
-     As of 1 July 2013, Croatia is part of the SEPA.
+ - (abeltje, Thu, 11 Jul 2013 15:11:24 +0200) Add developer tests, example
+   script and fix MANIFEST*
 
+ - (abeltje, Mon, 15 Jul 2013 15:26:30 +0200) Loosen the EUMM version
+   requirement.
 
-M	lib/Business/IBAN/Database.pm
-________________________________________________________________________________
-[ed0100b] by Abe Timmerman on Fri, 18 Oct 2013 09:53:17 +0200
+ - (abeltje, Mon, 15 Jul 2013 15:29:44 +0200) Autocommit for distribution
+   Business::IBAN::Validator 0.02
 
-     Re-release for debian.
+ - (Abe Timmerman, Fri, 18 Oct 2013 09:53:17 +0200) Re-release for debian.
 
+ - (abeltje, Fri, 18 Oct 2013 09:58:24 +0200) As of 1 July 2013, Croatia is
+   part of the SEPA.
 
-M	debian/changelog
-M	lib/Business/IBAN/Validator.pm
-________________________________________________________________________________
-[8733aa9] by abeltje on Mon, 15 Jul 2013 15:29:44 +0200
-
-     Autocommit for distribution Business::IBAN::Validator 0.02
-
-
-M	Changes
-M	debian/changelog
-M	lib/Business/IBAN/Validator.pm
-________________________________________________________________________________
-[337c050] by abeltje on Mon, 15 Jul 2013 15:26:30 +0200
-
-     Loosen the EUMM version requirement.
-
-
-M	Makefile.PL
-________________________________________________________________________________
-[ad69509] by abeltje on Thu, 11 Jul 2013 15:11:24 +0200
-
-     Add developer tests, example script and fix MANIFEST*
-
-
-M	MANIFEST
-M	MANIFEST.SKIP
-A	META.json
-A	META.yml
-A	bin/chk-iban
-M	lib/Business/IBAN/Validator.pm
-A	xt/00-manifest.t
-A	xt/01-compile.t
-A	xt/02-pod_syntax.t
-A	xt/03-pod-coverage.t
-________________________________________________________________________________
-[286cd2a] by abeltje on Mon, 8 Jul 2013 08:41:16 +0200
-
-     Be consistent in errors for invalid IBAN country codes.
-
-
-M	lib/Business/IBAN/Validator.pm
-________________________________________________________________________________
-[5f188f1] by Abe Timmerman on Sun, 7 Jul 2013 12:07:24 +0200
-
-     Create debian/changelog (dch --create).
-
-
-M	debian/changelog
-________________________________________________________________________________
-[7e0e0f0] by abeltje on Sun, 7 Jul 2013 11:50:40 +0200
-
-     Add debian/ directory for easy packaging, don't include in the tarball.
-
-
-M	MANIFEST.SKIP
-A	debian/changelog
-A	debian/compat
-A	debian/control
-A	debian/copyright
-A	debian/rules
-________________________________________________________________________________
-[240dfb6] by abeltje on Sat, 6 Jul 2013 09:17:59 +0200
-
-     Add some more info.
-
-
-M	Changes
-A	README
-________________________________________________________________________________
-[c0a255e] by abeltje on Sat, 6 Jul 2013 07:55:19 +0200
-
-     Initial commit for the Business::IBAN::Validator
-
-
-A	Changes
-A	MANIFEST
-A	MANIFEST.SKIP
-A	Makefile.PL
-A	lib/Business/IBAN/Database.pm
-A	lib/Business/IBAN/Validator.pm
-A	support/IBAN_Registry.pdf
-A	support/IBAN_Registry.txt
-A	support/extract_ibandb.pl
-A	t/00-load.t
-A	t/010-basic.t
-A	t/020-iban-auto.t
+ - (abeltje, Fri, 18 Oct 2013 10:01:39 +0200) As of 1 July 2013, Croatia is
+   part of SEPA.

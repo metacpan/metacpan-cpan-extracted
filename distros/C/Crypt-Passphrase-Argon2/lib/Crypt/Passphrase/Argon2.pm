@@ -1,12 +1,12 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.006';
+$Crypt::Passphrase::Argon2::VERSION = '0.007';
 use strict;
 use warnings;
 
 use Crypt::Passphrase 0.010 -encoder;
 
 use Carp 'croak';
-use Crypt::Argon2 0.014 qw/argon2_needs_rehash argon2_verify/;
+use Crypt::Argon2 0.017 qw/argon2_pass argon2_needs_rehash argon2_verify argon2_types/;
 
 my %settings_for = (
 	interactive => {
@@ -23,30 +23,33 @@ my %settings_for = (
 	}
 );
 
-my @identifiers = qw/argon2i argon2d argon2id/;
-my %encoder_for = map {; no strict; $_ => \&{"Crypt::Argon2::$_\_pass"} } @identifiers;
+my %valid_types = map { ($_ => 1) } argon2_types;
 
-sub new {
-	my ($class, %args) = @_;
+sub _settings_for {
+	my %args = @_;
 	my $subtype     =  $args{subtype}     // 'argon2id';
-	croak "Unknown subtype $subtype" unless $encoder_for{$subtype};
+	croak "Unknown subtype $subtype" unless $valid_types{$subtype};
 	my $profile     =  $args{profile}     // 'moderate';
 	croak "Unknown profile $profile" unless $settings_for{$profile};
-	return bless {
+	return {
 		memory_cost => $args{memory_cost} // $settings_for{$profile}{memory_cost},
 		time_cost   => $args{time_cost}   // $settings_for{$profile}{time_cost},
 		parallelism => $args{parallelism} //  1,
 		output_size => $args{output_size} // 16,
 		salt_size   => $args{salt_size}   // 16,
 		subtype     => $subtype,
-	}, $class;
+	};
+}
+
+sub new {
+	my ($class, %args) = @_;
+	return bless _settings_for(%args), $class;
 }
 
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
-	my $encoder = $encoder_for{ $self->{subtype} };
-	return $encoder->($password, $salt, @{$self}{qw/time_cost memory_cost parallelism output_size/});
+	return argon2_pass($self->{subtype}, $password, $salt, @{$self}{qw/time_cost memory_cost parallelism output_size/});
 }
 
 sub needs_rehash {
@@ -55,7 +58,7 @@ sub needs_rehash {
 }
 
 sub crypt_subtypes {
-	return @identifiers;
+	return argon2_types;
 }
 
 sub verify_password {
@@ -77,7 +80,7 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

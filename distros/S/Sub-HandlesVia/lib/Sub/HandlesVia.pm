@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.046';
+our $VERSION   = '0.050000';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -220,6 +220,7 @@ L<Sub::HandlesVia::HandlerLibrary::Blessed>,
 L<Sub::HandlesVia::HandlerLibrary::Bool>,
 L<Sub::HandlesVia::HandlerLibrary::Code>,
 L<Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Sub::HandlesVia::HandlerLibrary::Enum>,
 L<Sub::HandlesVia::HandlerLibrary::Hash>,
 L<Sub::HandlesVia::HandlerLibrary::Number>,
 L<Sub::HandlesVia::HandlerLibrary::Scalar>, and

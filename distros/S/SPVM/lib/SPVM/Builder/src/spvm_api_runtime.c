@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include <stdint.h>
 #include <assert.h>
 #include <string.h>
@@ -91,15 +94,11 @@
 
 
 
-
-
-
 SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
   
   void* env_runtime_init[]  = {
     SPVM_API_RUNTIME_new_object,
     SPVM_API_RUNTIME_free_object,
-    NULL,
     SPVM_API_RUNTIME_get_opcodes,
     SPVM_API_RUNTIME_get_opcodes_length,
     SPVM_API_RUNTIME_get_runtime_codes,
@@ -119,8 +118,8 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     SPVM_API_RUNTIME_get_type_is_ref,
     SPVM_API_RUNTIME_get_class_id_by_name,
     SPVM_API_RUNTIME_get_class_name_id,
-    SPVM_API_RUNTIME_get_class_module_rel_file_id,
-    SPVM_API_RUNTIME_get_class_module_dir_id,
+    SPVM_API_RUNTIME_get_class_class_rel_file_id,
+    SPVM_API_RUNTIME_get_class_class_path_id,
     SPVM_API_RUNTIME_get_class_is_anon,
     SPVM_API_RUNTIME_get_class_fields_base_id,
     SPVM_API_RUNTIME_get_class_fields_length,
@@ -133,18 +132,15 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     SPVM_API_RUNTIME_get_class_var_id_by_index,
     SPVM_API_RUNTIME_get_class_var_id_by_name,
     SPVM_API_RUNTIME_get_class_var_name_id,
-    NULL, // reserved36
     SPVM_API_RUNTIME_get_class_var_class_id,
     SPVM_API_RUNTIME_get_field_id_by_index,
     SPVM_API_RUNTIME_get_field_id_by_name,
     SPVM_API_RUNTIME_get_field_name_id,
     SPVM_API_RUNTIME_get_field_type_id,
-    NULL, // reserved42
     SPVM_API_RUNTIME_get_field_class_id,
     SPVM_API_RUNTIME_get_method_id_by_index,
     SPVM_API_RUNTIME_get_method_id_by_name,
     SPVM_API_RUNTIME_get_method_name_id,
-    NULL, // reserved47
     SPVM_API_RUNTIME_get_method_return_type_id,
     SPVM_API_RUNTIME_get_method_class_id,
     SPVM_API_RUNTIME_get_method_is_class_method,
@@ -184,6 +180,7 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     SPVM_API_RUNTIME_get_class_is_pointer,
     SPVM_API_RUNTIME_get_method_is_enum,
     SPVM_API_RUNTIME_get_type_flag,
+    SPVM_API_RUNTIME_is_object_type,
   };
   SPVM_ENV_RUNTIME* env_runtime = calloc(1, sizeof(env_runtime_init));
   memcpy(env_runtime, env_runtime_init, sizeof(env_runtime_init));
@@ -400,7 +397,7 @@ int32_t SPVM_API_RUNTIME_get_type_is_ref(SPVM_RUNTIME* runtime, int32_t type_id)
   
   assert(type);
   
-  int32_t is_ref = type->flag & SPVM_TYPE_C_FLAG_REF;
+  int32_t is_ref = type->flag & SPVM_NATIVE_C_TYPE_FLAG_REF;
   
   return is_ref;
 }
@@ -529,26 +526,26 @@ int32_t SPVM_API_RUNTIME_get_class_is_anon(SPVM_RUNTIME* runtime, int32_t class_
   return class_is_anon;
 }
 
-int32_t SPVM_API_RUNTIME_get_class_module_rel_file_id(SPVM_RUNTIME* runtime, int32_t class_id) {
+int32_t SPVM_API_RUNTIME_get_class_class_rel_file_id(SPVM_RUNTIME* runtime, int32_t class_id) {
   
   SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class(runtime, class_id);
   
   assert(class);
   
-  int32_t class_module_rel_file_id = class->module_rel_file_id;
+  int32_t class_class_rel_file_id = class->class_rel_file_id;
   
-  return class_module_rel_file_id;
+  return class_class_rel_file_id;
 }
 
-int32_t SPVM_API_RUNTIME_get_class_module_dir_id(SPVM_RUNTIME* runtime, int32_t class_id) {
+int32_t SPVM_API_RUNTIME_get_class_class_path_id(SPVM_RUNTIME* runtime, int32_t class_id) {
   
   SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class(runtime, class_id);
   
   assert(class);
   
-  int32_t class_module_dir_id = class->module_dir_id;
+  int32_t class_class_path_id = class->class_path_id;
   
-  return class_module_dir_id;
+  return class_class_path_id;
 }
 
 int32_t SPVM_API_RUNTIME_get_class_fields_base_id(SPVM_RUNTIME* runtime, int32_t class_id) {
@@ -1286,4 +1283,34 @@ SPVM_ALLOCATOR* SPVM_API_RUNTIME_get_allocator(SPVM_RUNTIME* runtime) {
 
 void SPVM_API_RUNTIME_build(SPVM_RUNTIME* runtime, int32_t* runtime_codes) {
   SPVM_RUNTIME_build(runtime, runtime_codes);
+}
+
+int32_t SPVM_API_RUNTIME_is_object_type(SPVM_RUNTIME* runtime, int32_t basic_type_id, int32_t type_dimension, int32_t flag) {
+  
+  int32_t is_object_type;
+  if (type_dimension == 0) {
+    int32_t basic_type_category = SPVM_API_RUNTIME_get_basic_type_category(runtime, basic_type_id);
+    
+    switch (basic_type_category) {
+      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
+      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
+      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
+      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
+      {
+        is_object_type = 1;
+        break;
+      }
+      default: {
+        is_object_type = 0;
+      }
+    }
+  }
+  else if (type_dimension >= 1) {
+    is_object_type = 1;
+  }
+  else {
+    assert(0);
+  }
+  
+  return is_object_type;
 }

@@ -1,3 +1,8 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
+// The original source code is MIME/QuotedPrint.xs
+
 #include "spvm_native.h"
 
 #include <assert.h>
@@ -7,34 +12,6 @@
 #include <iostream>
 
 extern "C" {
-
-/*
-
-Original source is MIME/QuotedPrint.xs
-
-Copyright 1997-2004 Gisle Aas
-
-This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
-
-The tables and some of the code that used to be here was borrowed from
-metamail, which comes with this message:
-
-  Copyright (c) 1991 Bell Communications Research, Inc. (Bellcore)
-
-  Permission to use, copy, modify, and distribute this material
-  for any purpose and without fee is hereby granted, provided
-  that the above copyright notice and this permission notice
-  appear in all copies, and that the name of Bellcore not be
-  used in advertising or publicity pertaining to this
-  material without the specific, prior written permission
-  of an authorized representative of Bellcore.  BELLCORE
-  MAKES NO REPRESENTATIONS ABOUT THE ACCURACY OR SUITABILITY
-  OF THIS MATERIAL FOR ANY PURPOSE.  IT IS PROVIDED "AS IS",
-  WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-
-*/
 
 #define MAX_LINE  76 /* size of encoded lines */
 

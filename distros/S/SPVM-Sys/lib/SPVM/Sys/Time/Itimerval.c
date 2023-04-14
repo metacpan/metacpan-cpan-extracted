@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <sys/time.h>
@@ -14,7 +17,7 @@ int32_t SPVM__Sys__Time__Itimerval__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct itimerval* st_it = env->new_memory_stack(env, stack, sizeof(struct itimerval));
   
-  void* obj_it = env->new_pointer_by_name(env, stack, "Sys::Time::Itimerval", st_it, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_it = env->new_pointer_object_by_name(env, stack, "Sys::Time::Itimerval", st_it, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
 
   stack[0].oval = obj_it;
@@ -54,7 +57,7 @@ int32_t SPVM__Sys__Time__Itimerval__copy_it_interval(SPVM_ENV* env, SPVM_VALUE* 
   struct timeval* copy_st_it_it_interval = env->new_memory_stack(env, stack, sizeof(struct timeval));
   memcpy(copy_st_it_it_interval, &st_it->it_interval, sizeof(struct timeval));
 
-  void* obj_tv = env->new_pointer_by_name(env, stack, "Sys::Time::Timeval", copy_st_it_it_interval, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_tv = env->new_pointer_object_by_name(env, stack, "Sys::Time::Timeval", copy_st_it_it_interval, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
 
   stack[0].oval = obj_tv;
@@ -101,7 +104,7 @@ int32_t SPVM__Sys__Time__Itimerval__copy_it_value(SPVM_ENV* env, SPVM_VALUE* sta
   struct timeval* copy_st_it_it_value = env->new_memory_stack(env, stack, sizeof(struct timeval));
   memcpy(copy_st_it_it_value, &st_it->it_value, sizeof(struct timeval));
 
-  void* obj_tv = env->new_pointer_by_name(env, stack, "Sys::Time::Timeval", copy_st_it_it_value, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_tv = env->new_pointer_object_by_name(env, stack, "Sys::Time::Timeval", copy_st_it_it_value, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
 
   stack[0].oval = obj_tv;

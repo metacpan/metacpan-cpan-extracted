@@ -1,3 +1,21 @@
+0.021   2023-02-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Sort releases by name.
+
+
+0.020   2023-02-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Use App::MetaCPANUtils to workaround hard limit of 5000 when accessing
+          FastAPI directly. As a consequence we are also a lot faster since we
+          request 'first' field directly and do not need to check each
+          distribution's first release date.
+
+
+0.019   2023-02-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: list_new_cpan_dists_html.
+
+
 0.018   2022-09-09  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.017 & 0.017.2

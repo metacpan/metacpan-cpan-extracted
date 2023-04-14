@@ -10,6 +10,7 @@ on 'test' => sub {
     requires 'Test::More' => 0.98;
     requires 'Data::Dumper';
     requires 'Math::BigInt';
+    requires 'Devel::CheckBin';
 };
 on 'configure' => sub {
     requires 'Archive::Tar';

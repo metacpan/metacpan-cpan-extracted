@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Comparator : interface_t {
   required method : int ($x1 : object, $x2 : object);
 }

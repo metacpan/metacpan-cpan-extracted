@@ -35,7 +35,7 @@ package DynaLoader::Functions;
 use warnings;
 use strict;
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -437,7 +437,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011, 2012, 2013, 2017
+Copyright (C) 2011, 2012, 2013, 2017, 2023
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

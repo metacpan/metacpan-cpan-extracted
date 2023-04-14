@@ -92,11 +92,11 @@ Get only C<enum> methods if this option is true.
 
 =back
 
-=head2 get_module_file
+=head2 get_class_file
 
-  method get_module_file : string ($class_name : string);
+  method get_class_file : string ($class_name : string);
 
-Gets the module file name and returns it.
+Gets the class file name and returns it.
 
 =head2 build_precompile_class_source
 
@@ -114,7 +114,7 @@ Gets the anon class names and returns it.
 
   method get_method_is_class_method : int ($class_name : string, $method_name : string);
 
-Checks if the method is a class method. If it is so, returns C<1>, otherwise returns C<0>.
+Checks if the method is a class method. If it is so, returns 1, otherwise returns 0.
 
 =head2 build_precompile_method_source
 
@@ -180,7 +180,6 @@ The instance of the L<Env|SPVM::Env> class is build by the L</"build_env"> metho
 
 =head1 Copyright & License
 
-Copyright 2023-2023 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License

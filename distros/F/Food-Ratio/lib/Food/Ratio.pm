@@ -2,7 +2,7 @@
 #
 # Ultima Ratio Coquorum
 
-package Food::Ratio 0.01;
+package Food::Ratio 0.02;
 use Object::Pad 0.52;
 class Food::Ratio :strict(params);
 use Carp 'croak';

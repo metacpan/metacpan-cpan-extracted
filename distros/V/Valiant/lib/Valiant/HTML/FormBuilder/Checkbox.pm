@@ -70,7 +70,7 @@ around 'checkbox', sub {
 
 =head1 NAME
 
-Valiant::HTML::Formbuilder::Checkbox - A custom formbuilder for checkbox content
+Valiant::HTML::FormBuilder::Checkbox - A custom formbuilder for checkbox content
 
 =head1 SYNOPSIS
 

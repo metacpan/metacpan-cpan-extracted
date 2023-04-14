@@ -37,7 +37,6 @@ xt/author/bnok-mbi.t
 xt/author/bpi-mbf.t
 xt/author/btmod-btdiv-mbi.t
 xt/author/constructors-a-p-r.t
-xt/author/critic.t
 xt/author/lib-arithmetic-binary-_add.dat
 xt/author/lib-arithmetic-binary-_add.t
 xt/author/lib-arithmetic-binary-_div.dat

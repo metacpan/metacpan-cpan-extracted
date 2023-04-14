@@ -2,9 +2,8 @@ package Data::Password::zxcvbn::Match::Dictionary;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
 use Data::Password::zxcvbn::Combinatorics qw(nCk enumerate_substitution_maps);
-use Data::Password::zxcvbn::RankedDictionaries;
 use List::AllUtils qw(min);
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: match class for words in passwords
 
 
@@ -41,7 +40,10 @@ sub make {
     my ($class, $password, $opts) = @_;
     ## no critic (ProhibitPackageVars)
     my $dictionaries = $opts->{ranked_dictionaries}
-        || \%Data::Password::zxcvbn::RankedDictionaries::ranked_dictionaries;
+        || do {
+            require Data::Password::zxcvbn::RankedDictionaries;
+            \%Data::Password::zxcvbn::RankedDictionaries::ranked_dictionaries;
+        };
     my $l33t_table = $opts->{l33t_table} || \%l33t_table;
 
     my @matches;
@@ -282,11 +284,6 @@ sub feedback_warning {
             return 'This is similar to a commonly used password';
         }
     }
-    elsif ($self->dictionary_name =~ /english/) {
-        if ($is_sole_match) {
-            return 'A word by itself is easy to guess';
-        }
-    }
     elsif ($self->dictionary_name =~ /names$/) {
         if ($is_sole_match) {
             return 'Names and surnames by themselves are easy to guess'
@@ -295,6 +292,10 @@ sub feedback_warning {
             return 'Common names and surnames are easy to guess';
         }
     }
+    elsif ($is_sole_match) {
+        return 'A word by itself is easy to guess';
+    }
+
     return undef;
 }
 
@@ -344,7 +345,7 @@ Data::Password::zxcvbn::Match::Dictionary - match class for words in passwords
 
 =head1 VERSION
 
-version 1.0.6
+version 1.1.2
 
 =head1 DESCRIPTION
 

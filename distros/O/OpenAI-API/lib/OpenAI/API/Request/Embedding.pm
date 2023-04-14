@@ -33,41 +33,41 @@ OpenAI::API::Request::Embedding - embeddings endpoint
 
     my $request = OpenAI::API::Request::Embedding->new(
         model => "text-embedding-ada-002",
-        input => "The food was delicious and the waiter...",
+        input => 'The quick brown fox jumps over the lazy dog.',
     );
 
-    my $res = $request->send();
+    my $res = $request->send();    # or: my $res = $request->send(%args);
 
 =head1 DESCRIPTION
+
+This module provides a request class for interacting with the OpenAI
+API's embedding endpoint. It inherits from L<OpenAI::API::Request>.
 
 Get a vector representation of a given input that can be easily consumed
 by machine learning models and algorithms.
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
-=head2 new()
+=head2 model
 
-=over 4
+The model to use for generating embeddings.
 
-=item * model
+=head2 input
 
-=item * input
+The input content for which to generate embeddings.
 
-=item * user [optional]
+=head2 user [optional]
 
-=back
+The user identifier for the request.
 
-=head2 send()
+=head1 INHERITED METHODS
 
-Sends the request and returns a data structured similar to the one
-documented in the API reference.
+This module inherits the following methods from L<OpenAI::API::Request>:
 
-=head2 send_async()
+=head2 send
 
-Send a request asynchronously. Returns a L<Promises> promise that will
-be resolved with the decoded JSON response. See L<OpenAI::API::Request>
-for an example.
+=head2 send_async
 
 =head1 SEE ALSO
 
-OpenAI API Reference: L<Embeddings|https://platform.openai.com/docs/api-reference/embeddings>
+L<OpenAI::API::Request>, L<OpenAI::API::Config>

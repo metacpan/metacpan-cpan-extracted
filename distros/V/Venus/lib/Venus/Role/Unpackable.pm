@@ -14,7 +14,9 @@ sub unpack {
 
   require Venus::Unpack;
 
-  return Venus::Unpack->from($self)->do('args', @args)->all;
+  my $name = (caller(1))[3] =~ s/.*::(\w+)$/$1/gr;
+
+  return Venus::Unpack->from($self)->name($name)->do('args', @args)->all;
 }
 
 # EXPORTS
@@ -56,7 +58,7 @@ Unpackable Role for Perl 5
   my $example = Example->new;
 
   # $example->unpack("hello", 123, 1.23)->signature(
-  #   'example', 'string', 'number', 'float',
+  #   'string', 'number', 'float',
   # );
 
 =cut
@@ -92,7 +94,6 @@ I<Since C<2.01>>
   my $example = Example->new;
 
   my $results = $example->unpack("hello", 123, 1.23)->signature(
-    'example-1',
     'any',
   );
 
@@ -109,7 +110,6 @@ I<Since C<2.01>>
   my $example = Example->new;
 
   my $results = $example->unpack("hello", 123, 1.23)->signature(
-    'example-2',
     'string',
     'number | float',
   );
@@ -127,7 +127,6 @@ I<Since C<2.01>>
   my $example = Example->new;
 
   my $results = $example->unpack("hello", 123, 1.23)->signature(
-    'example-3',
     'string',
     'number',
     'float',

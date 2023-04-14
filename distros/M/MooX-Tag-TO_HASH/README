@@ -25,9 +25,10 @@ prevent that).
 TO_HASH method, this is no longer recommended. See discussion under
 "DEPRECATED BEHAVIOR" below.].
 
-If the class provides a "modify_hashr" method, it will be called as
+If the class provides a "_modify_hashr" method (or for backwards
+compatibility, "modify_hashr"), it will be called as
 
-    $self->modify_hashr( \%hash );
+    $self->_modify_hashr( \%hash );
 
 and should modify the passed hash in place.
 

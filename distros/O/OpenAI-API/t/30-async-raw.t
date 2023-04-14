@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use AnyEvent;
+use IO::Async::Loop;
 use JSON::MaybeXS;
 use Test::More;
 use Test::RequiresInternet;
@@ -24,9 +24,9 @@ my $request = OpenAI::API::Request::Completion->new(
     temperature => 0,
 );
 
-my $cv = AnyEvent->condvar;    # Create a condition variable
+my $loop = IO::Async::Loop->new();
 
-$request->send_async( http_response => 1 )->then(
+my $future = $request->send_async( http_response => 1 )->then(
     sub {
         my $response = shift;
         isa_ok( $response, 'HTTP::Response' );
@@ -39,11 +39,10 @@ $request->send_async( http_response => 1 )->then(
         diag("Error: $error\n");
         fail();
     }
-)->finally(
-    sub {
-        done_testing();
-        $cv->send();
-    }
 );
 
-$cv->recv;    # keep the script running until the request is completed.
+$loop->await($future);
+
+my $res = $future->get;
+
+done_testing();

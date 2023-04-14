@@ -1,55 +1,98 @@
 use strict; use warnings;
 package Lingy::Env;
 
-use Lingy::Types;
+use Lingy::Common;
+
+sub space { shift->{space} }
 
 sub new {
-    my $class = shift;
+    my ($class, %args) = @_;
     my $self = bless {
-        outer => undef,
-        stash => {},
-        @_
+        outer => $args{outer},
+        space => $args{space} // {},
     }, $class;
-    my $binds = [ @{$self->{binds} // []} ];
-    my $exprs = $self->{exprs} // [];
+    my $binds = [ @{$args{binds} // []} ];
+    my $exprs = $args{exprs} // [];
     while (@$binds) {
         if ("$binds->[0]" eq '&') {
             shift @$binds;
             $exprs = [list([@$exprs])];
         }
-        $self->set(shift(@$binds), shift(@$exprs) // nil);
+        $self->{space}{shift(@$binds)} = (shift(@$exprs) // nil);
     }
-    delete $self->{binds};
-    delete $self->{exprs};
-    return $self;
-}
-
-sub add {
-    my ($self, $ns) = @_;
-    my $stash = $self->{stash};
-    %$stash = (%$stash, %$ns);
+    if (my $outer = $self->{outer}) {
+        $self->{LOOP} = $outer->{LOOP} if $outer->{LOOP};
+        $self->{RECUR} = $outer->{RECUR} if $outer->{RECUR};
+    }
     return $self;
 }
 
 sub set {
-    my ($self, $key, $val) = @_;
-    $self->{stash}{$key} = $val;
-}
-
-sub find {
-    my ($self, $key) = @_;
-    while ($self) {
-        return $self if defined $self->{stash}{$key};
-        $self = $self->{outer};
-    }
-    return;
+    my ($self, $symbol, $value) = @_;
+    my $space = $self->{space};
+    $space->{$symbol} = $value;
+    return ref($space) eq 'HASH'
+        ? $symbol
+        : symbol($space->name . "/$symbol");
 }
 
 sub get {
-    my ($self, $key) = @_;
-    my $env = $self->find($key) or
-        die "'$key' not found\n";
-    $env->{stash}{$key};
+    my ($self, $symbol, $optional) = @_;
+
+    return $self->get_qualified($symbol, $optional)
+        if $symbol =~ m{./.};
+
+    while ($self) {
+        my $ns = $self->space;
+        if (defined(my $value = $ns->{$symbol})) {
+            return $value;
+        }
+        if (ref($ns) ne 'HASH') {
+            if (my $refer_ns_map = $Lingy::RT::refer{$ns->name}) {
+                if (my $refer_ns_name = $refer_ns_map->{$symbol}) {
+                    if (my $refer_ns = $Lingy::RT::ns{$refer_ns_name}) {
+                        if (defined(my $value = $refer_ns->{$symbol})) {
+                            return $value;
+                        }
+                    }
+                }
+            }
+        }
+        $self = $self->{outer};
+    }
+
+    return if $optional;
+
+    err "Unable to resolve symbol: '$symbol' in this context";
+}
+
+sub get_qualified {
+    my ($self, $symbol, $optional) = @_;
+
+    $symbol =~ m{^(.*)/(.*)$} or die;
+    my $space_name = $1;
+    my $ns = $Lingy::RT::ns{$space_name}
+        or err "No such namespace: '$space_name'";
+    my $symbol_name = $2;
+
+    if (defined(my $value = $ns->{$symbol_name})) {
+        return $value;
+    }
+    if (ref($ns) ne 'HASH') {
+        if (my $refer_ns_map = $Lingy::RT::refer{$ns->name}) {
+            if (my $refer_ns_name = $refer_ns_map->{$symbol_name}) {
+                if (my $refer_ns = $Lingy::RT::ns{$refer_ns_name}) {
+                    if (defined(my $value = $refer_ns->{$symbol_name})) {
+                        return $value;
+                    }
+                }
+            }
+        }
+    }
+
+    return if $optional;
+
+    err "Unable to resolve symbol: '$symbol' in this context";
 }
 
 1;

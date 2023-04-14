@@ -19,11 +19,10 @@ my @test_cases = (
     {
         method           => 'completions',
         params           => { model => 'text-davinci-003', prompt => 'How would you explain the idea of justice?' },
-        exception_re     => qr/timed out/i,
         exception_struct => noclass(
             superhashof(
                 {
-                    message  => re('timed out'),
+                    message  => ignore(),
                     request  => ignore(),
                     response => ignore(),
                 }
@@ -33,8 +32,8 @@ my @test_cases = (
 );
 
 for my $test (@test_cases) {
-    my ( $method, $params, $exception_re, $exception_struct ) =
-        @{$test}{qw/method params exception_re exception_struct/};
+    my ( $method, $params, $exception_struct ) =
+        @{$test}{qw/method params exception_struct/};
 
     eval {
         my $response = $openai->$method( %{$params} );
@@ -42,8 +41,8 @@ for my $test (@test_cases) {
         1;
     } or do {
         my $error = $@;
-        like( $error, $exception_re );
-        cmp_deeply( $error, $exception_struct );
+        is( $error->response->code, 500, 'response code' );
+        cmp_deeply( $error, $exception_struct, 'data structure' );
     };
 }
 

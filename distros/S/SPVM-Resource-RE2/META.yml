@@ -1,14 +1,14 @@
 ---
-abstract: 'Google/RE2 Resource'
+abstract: 'The Resource of Google/RE2'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.9692'
+  SPVM: '0.9701'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,8 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.9692'
+  SPVM: '0.9701'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Resource-RE2.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

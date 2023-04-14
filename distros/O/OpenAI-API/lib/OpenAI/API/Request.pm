@@ -1,9 +1,9 @@
 package OpenAI::API::Request;
 
-use AnyEvent;
+use IO::Async::Loop;
+use IO::Async::Future;
 use JSON::MaybeXS;
 use LWP::UserAgent;
-use Promises qw/deferred/;
 
 use Moo;
 use strictures 2;
@@ -19,6 +19,10 @@ has 'config' => (
         die "config must be an instance of OpenAI::API::Config"
             unless ref $_[0] eq 'OpenAI::API::Config';
     },
+    coerce => sub {
+        return $_[0] if ref $_[0] eq 'OpenAI::API::Config';
+        return OpenAI::API::Config->new( %{ $_[0] } );
+    },
 );
 
 has 'user_agent' => (
@@ -27,9 +31,22 @@ has 'user_agent' => (
     builder => '_build_user_agent',
 );
 
+has 'event_loop' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_event_loop',
+);
+
 sub _build_user_agent {
     my ($self) = @_;
     $self->{user_agent} = LWP::UserAgent->new( timeout => $self->config->timeout );
+}
+
+sub _build_event_loop {
+    my ($self) = @_;
+    my $class = $self->config->event_loop_class;
+    eval "require $class" or die "Failed to load event loop class $class: $@";
+    return $class->new();
 }
 
 sub endpoint {
@@ -40,11 +57,28 @@ sub method {
     die "Must be implemented";
 }
 
+sub _parse_response {
+    my ( $self, $res ) = @_;
+
+    my $class = ref $self || $self;
+
+    # Replace s/Request/Response/ to find the response module
+    ( my $response_module = $class ) =~ s/Request/Response/;
+
+    # Require the OpenAI::API::Response module
+    eval "require $response_module" or die $@;
+
+    # Return the OpenAI::API::Response object
+    my $decoded_res = decode_json( $res->decoded_content );
+    return $response_module->new($decoded_res);
+}
+
 sub request_params {
     my ($self) = @_;
     my %request_params = %{$self};
     delete $request_params{config};
     delete $request_params{user_agent};
+    delete $request_params{event_loop};
     return \%request_params;
 }
 
@@ -66,7 +100,7 @@ sub send {
         return $res;
     }
 
-    return decode_json( $res->decoded_content );
+    return $self->_parse_response($res);
 }
 
 sub _get {
@@ -86,24 +120,24 @@ sub _post {
 sub send_async {
     my ( $self, %args ) = @_;
 
-    my $res_promise =
+    my $res_future =
           $self->method eq 'POST' ? $self->_post_async()
         : $self->method eq 'GET'  ? $self->_get_async()
         :                           die "Invalid method";
 
     if ( $args{http_response} ) {
-        return $res_promise;
+        return $res_future;
     }
 
-    # Return a new promise that resolves to $res->decoded_content
-    my $decoded_content_promise = $res_promise->then(
+    # Return a new future that resolves to $res->decoded_content
+    my $decoded_content_future = $res_future->then(
         sub {
             my $res = shift;
-            return decode_json( $res->decoded_content );
+            return $self->_parse_response($res);
         }
     );
 
-    return $decoded_content_promise;
+    return $decoded_content_future;
 }
 
 sub _get_async {
@@ -144,19 +178,13 @@ sub _request_headers {
 sub _send_request {
     my ( $self, $req ) = @_;
 
-    my $cond_var = AnyEvent->condvar;
+    my $loop = IO::Async::Loop->new();
 
-    $self->_async_http_send_request($req)->then(
-        sub {
-            $cond_var->send(@_);
-        }
-    )->catch(
-        sub {
-            $cond_var->send(@_);
-        }
-    );
+    my $future = $self->_async_http_send_request($req);
 
-    my $res = $cond_var->recv();
+    $loop->await($future);
+
+    my $res = $future->get;
 
     if ( !$res->is_success ) {
         OpenAI::API::Error->throw(
@@ -213,20 +241,22 @@ sub _http_send_request {
 sub _async_http_send_request {
     my ( $self, $req ) = @_;
 
-    my $d = deferred;
+    my $future = IO::Async::Future->new;
 
-    AnyEvent::postpone {
-        eval {
-            my $res = $self->_http_send_request($req);
-            $d->resolve($res);
-            1;
-        } or do {
-            my $err = $@;
-            $d->reject($err);
-        };
-    };
+    $self->event_loop->later(
+        sub {
+            eval {
+                my $res = $self->_http_send_request($req);
+                $future->done($res);
+                1;
+            } or do {
+                my $err = $@;
+                $future->fail($err);
+            };
+        }
+    );
 
-    return $d->promise();
+    return $future;
 }
 
 1;
@@ -254,6 +284,14 @@ API. It should not be used directly.
         'POST'
     }
 
+    # somewhere else...
+
+    use OpenAI::API::Request::NewRequest;
+
+    my $req = OpenAI::API::Request::NewRequest->new(...);
+
+    my $res = $req->send();    # or: my $res = $req->send_async();
+
 =head1 DESCRIPTION
 
 This module provides a base class for creating request objects for the
@@ -262,21 +300,22 @@ requests, with support for HTTP GET and POST methods.
 
 =head1 ATTRIBUTES
 
-=over 4
-
-=item * config
+=head2 config
 
 An instance of L<OpenAI::API::Config> that provides configuration
 options for the OpenAI API client. Defaults to a new instance of
 L<OpenAI::API::Config>.
 
-=item * user_agent
+=head2 user_agent
 
 An instance of L<LWP::UserAgent> that is used to make HTTP
 requests. Defaults to a new instance of L<LWP::UserAgent> with a timeout
 set to the value of C<config-E<gt>timeout>.
 
-=back
+=head2 event_loop
+
+An instance of an event loop class, specified by
+C<config-E<gt>event_loop_class> option.
 
 =head1 METHODS
 
@@ -290,40 +329,44 @@ endpoint for the specific request.
 This method must be implemented by subclasses. It should return the HTTP
 method for the specific request.
 
-=head2 send
+=head2 send(%args)
 
-Send a request synchronously.
+This method sends the request and returns the parsed response. If the
+'http_response' key is present in the %args hash, it returns the raw
+L<HTTP::Response> object instead of the parsed response.
 
     my $response = $request->send();
 
-=head2 send_async
+    my $response = $request->send( http_response => 1 );
 
-Send a request asynchronously. Returns a L<Promises> promise that will
-be resolved with the decoded JSON response.
+=head2 send_async(%args)
+
+This method sends the request asynchronously and returns a
+L<IO::Async::Future> object. If the 'http_response' key is present in
+the %args hash, it resolves to the raw L<HTTP::Response> object instead
+of the parsed response.
 
 Here's an example usage:
 
-    my $cv = AnyEvent->condvar;    # Create a condition variable
+    use IO::Async::Loop;
 
-    $request->send_async()->then(
+    my $loop = IO::Async::Loop->new();
+
+    my $future = $request->send_async()->then(
         sub {
-            my $response_data = shift;
-            print "Response data: " . Dumper($response_data);
+            my $content = shift;
+            # ...
         }
     )->catch(
         sub {
             my $error = shift;
-            print "$error\n";
-        }
-    )->finally(
-        sub {
-            print "Request completed\n";
-            $cv->send();    # Signal the condition variable when the request is completed
+            # ...
         }
     );
 
-    $cv->recv;              # Keep the script running until the request is completed.
+    $loop->await($future);
 
-=head1 SEE ALSO
+    my $res = $future->get;
 
-L<OpenAI::API::Config>
+Note: if you want to use a different event loop, you must pass it via
+the L<config|OpenAI::API::Config> attribute.

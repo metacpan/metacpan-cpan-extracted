@@ -11,8 +11,12 @@ dist.ini
 lib/Crypt/Passphrase.pm
 lib/Crypt/Passphrase/Encoder.pm
 lib/Crypt/Passphrase/Fallback.pm
+lib/Crypt/Passphrase/MD5/Base64.pm
 lib/Crypt/Passphrase/MD5/Hex.pm
 lib/Crypt/Passphrase/PassphraseHash.pm
+lib/Crypt/Passphrase/Pepper/Base.pm
+lib/Crypt/Passphrase/Pepper/Simple.pm
+lib/Crypt/Passphrase/SHA1/Base64.pm
 lib/Crypt/Passphrase/SHA1/Hex.pm
 lib/Crypt/Passphrase/System.pm
 lib/Crypt/Passphrase/Validator.pm

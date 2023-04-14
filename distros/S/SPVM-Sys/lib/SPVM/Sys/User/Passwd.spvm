@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::User::Passwd : pointer {
   native method pw_name : string ();
   native method pw_passwd : string ();

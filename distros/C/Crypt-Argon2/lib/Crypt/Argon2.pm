@@ -1,16 +1,19 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.016';
+$Crypt::Argon2::VERSION = '0.017';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
 our @EXPORT_OK = qw/
+	argon2_raw argon2_pass argon2_verify
 	argon2id_raw argon2id_pass argon2id_verify
 	argon2i_raw argon2i_pass argon2i_verify
-	argon2d_raw argon2_needs_rehash
-	argon2_verify argon2_crypt/;
+	argon2d_raw argon2_pass argon2_verify
+	argon2_needs_rehash argon2_types/;
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION || 0);
+
+our $type_regex = qr/argon2(?:i|d|id)/;
 
 my %multiplier = (
 	k => 1,
@@ -30,18 +33,8 @@ sub argon2_needs_rehash {
 	return 0;
 }
 
-sub argon2_verify {
-	my ($name) = $_[0] =~ $regex or return !!0;
-	my $verify = do { no strict; \&{"$name\_verify"} };
-	goto &{$verify};
-}
-
-sub argon2_crypt {
-	my ($password, $settings) = @_;
-	my ($name, $version, $m_got, $t_got, $parallel_got, $salt, $hash) = $settings =~ $regex or return undef;
-	my $length = length $hash ? int(3 / 4 * length $hash) : 16;
-	my $pass = do { no strict; \&{"$name\_pass"} };
-	return eval { $pass->($password, $salt, $t_got, $m_got, $parallel_got, $length) };
+sub argon2_types {
+	return qw/argon2id argon2i argon2d/;
 }
 
 1;
@@ -60,11 +53,11 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
- use Crypt::Argon2 qw/argon2id_pass argon2id_verify/;
+ use Crypt::Argon2 qw/argon2id_pass argon2_verify/;
 
  sub add_pass {
    my ($user, $password) = @_;
@@ -76,7 +69,7 @@ version 0.016
  sub check_password {
    my ($user, $password) = @_;
    my $encoded = fetch_encoded($user);
-   return argon2id_verify($encoded, $password);
+   return argon2_verify($encoded, $password);
  }
 
 =head1 DESCRIPTION
@@ -87,11 +80,15 @@ To find appropriate parameters, the bundled program C<argon2-calibrate> can be u
 
 =head1 FUNCTIONS
 
-=head2 argon2id_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+=head2 argon2_pass($type, $password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
 
 This function processes the C<$password> with the given C<$salt> and parameters. It encodes the resulting tag and the parameters as a password string (e.g. C<$argon2id$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$wWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA>).
 
 =over 4
+
+=item * C<$type>
+
+The argon2 type that is used. This must be one of C<'argon2id'>, C<'argon2i'> or C<'argon2d'>.
 
 =item * C<$password>
 
@@ -119,49 +116,39 @@ This is the size of the raw result in bytes. Typical values are 16 or 32.
 
 =back
 
-=head2 argon2id_verify($encoded, $password)
+=head2 argon2_verify($encoded, $password)
 
 This verifies that the C<$password> matches C<$encoded>. All parameters and the tag value are extracted from C<$encoded>, so no further arguments are necessary.
+
+=head2 argon2_raw($type, $password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2_pass>, but returns the binary tag instead of a formatted string.
+
+=head2 argon2id_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+=func argon2i_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+=func argon2d_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+This function processes the C<$password> much like C<argon2_pass> does, but the C<$type> argument is set like the function name.
+
+=head2 argon2id_verify($encoded, $password)
+=func argon2i_verify($encoded, $password)
+=func argon2d_verify($encoded, $password)
+
+This verifies that the C<$password> matches C<$encoded> and the given type. All parameters and the tag value are extracted from C<$encoded>, so no further arguments are necessary.
 
 =head2 argon2id_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+=func argon2i_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+=func argon2d_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
 
-This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2i_pass>, but returns the binary tag instead of a formatted string.
-
-=head2 argon2i_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-
-This function processes the C<$password> with the given C<$salt> and parameters much like argon2id_pass, but uses the argon2i variant instead.
-
-=head2 argon2i_verify($encoded, $password)
-
-This verifies that the C<$password> matches C<$encoded>. All parameters and the tag value are extracted from C<$encoded>, so no further arguments are necessary.
-
-=head2 argon2i_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-
-This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2i_pass>, but returns the binary tag instead of a formatted string.
-
-=head2 argon2d_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-
-This function processes the C<$password> with the given C<$salt> and parameters much like argon2id_pass, but uses the argon2d variant instead.
-
-=head2 argon2d_verify($encoded, $password
-
-This verifies that the C<$password> matches C<$encoded>. All parameters and the tag value are extracted from C<$encoded>, so no further arguments are necessary.
-
-=head2 argon2d_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
-
-This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2i_pass>, but returns a binary tag for argon2d instead of a formatted string for argon2i.
+This function processes the C<$password> much like C<argon2_raw> does, but the C<$type> argument is set like the function name.
 
 =head2 argon2_needs_rehash($encoded, $type, $t_cost, $m_cost, $parallelism, $salt_length, $output_length)
 
 This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>), C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$salt_length> or C<$output_length> arguments mismatches or any of the parameters of the password-encoded hash.
 
-=head2 argon2_verify($encoded, $password)
+=head2 argon2_types
 
-This will verify the hash using C<argon2id_verify>, C<argon2i_verify> or C<argon2d_verify>, depending on the identifier in C<$encoded>.
-
-=head2 argon2_crypt($password, $settings)
-
-This function implements a C<crypt()> like interface to argon2. C<$password> is a password, but C<$settings> is a settings string (a password hash that may lack anything beyond the final C<$>).
+This returns all supported argon2 subtypes. Currently that's C<'argon2id'>, C<'argon2i'> and C<'argon2d'>.
 
 =head2 ACKNOWLEDGEMENTS
 

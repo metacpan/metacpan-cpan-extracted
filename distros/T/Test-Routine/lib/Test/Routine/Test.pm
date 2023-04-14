@@ -1,5 +1,5 @@
 use v5.12.0;
-package Test::Routine::Test 0.030;
+package Test::Routine::Test 0.031;
 # ABSTRACT: a test method in a Test::Routine role
 
 use Moose;
@@ -29,7 +29,7 @@ Test::Routine::Test - a test method in a Test::Routine role
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 OVERVIEW
 

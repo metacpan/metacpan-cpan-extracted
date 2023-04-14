@@ -7,10 +7,10 @@ use Text::HyperScript qw(raw);
 sub main {
     my $raw = raw('<p>hello, world!</p>');
 
-    isa_ok( $raw, 'Text::HyperScript::Element' );
+    isa_ok( $raw, 'Text::HyperScript::NodeString' );
 
-    is( $raw->markup, '<p>hello, world!</p>' );
-    is( "${raw}",     '<p>hello, world!</p>' );
+    is( $raw->to_string, '<p>hello, world!</p>' );
+    is( "${raw}",        '<p>hello, world!</p>' );
 
     done_testing;
 }

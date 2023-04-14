@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
+use t_Common qw/oops/; # strict, warnings, Carp
+use t_TestCommon ':silent', qw/bug/; # Test::More etc.
 
 use Data::Dumper::Interp;
 my $pkgname = "Data::Dumper::Interp";
@@ -64,7 +65,7 @@ for my $modname ( qw/bigint bigfloat bigrat bignum
   if ($INC{$modpath}) {
     no strict 'refs';
     my $path = $INC{$modpath};
-    $path =~ s#^$ENV{HOME}/#\$HOME/# if $ENV{HOME};
+    $path =~ s#^\Q$ENV{HOME}/\E#\$HOME/# if $ENV{HOME};
     diag sprintf "%-24s %s\n",
                  $modname . '@' . u(${"${modname}::VERSION"}),
                  $path;

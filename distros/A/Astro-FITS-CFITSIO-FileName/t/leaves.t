@@ -70,17 +70,14 @@ my @Tests = (
     },
 
     XTENSION => {
-        pass => [
-            qw{ A a ASCII ascii I i IMAGE image T t TABLE table B b BINTABLE bintable }
-        ],
+        pass => [qw{ A a ASCII ascii I i IMAGE image T t TABLE table B b BINTABLE bintable }],
         fail => [qw{ foo }],
     },
 
     HDUlocation => {
         pass => [
             qw{ +3 [PRIMARY] [P] [3] [0] [EVENTS] },
-            '[ EVENTS, 2]',
-            '[EVENTS, 2, b ]',
+            '[ EVENTS, 2]', '[EVENTS, 2, b ]',
             '[EVENTS, b ]',
             '[3; images(17)]',
             '[3; images(exposure > 100)]',
@@ -104,9 +101,7 @@ my @Tests = (
     },
 
     FileType => {
-        pass => [
-            qw{ file:// ftp:// http:// https:// ftps:// stream:// gsiftp:// root:// shmem:// mem:// }
-        ],
+        pass => [qw{ file:// ftp:// http:// https:// ftps:// stream:// gsiftp:// root:// shmem:// mem:// }],
         fail => [qw{ ssh:// }],
     },
 
@@ -141,12 +136,7 @@ my @Tests = (
     },
 
     ImageSection => {
-        pass => [
-            '[1:512:2, 2:512:2]',
-            '[*, 512:256]',
-            '[*:2, 512:256:2]',
-            '[-*, *]',
-        ],
+        pass => [ '[1:512:2, 2:512:2]', '[*, 512:256]', '[*:2, 512:256:2]', '[-*, *]', ],
     },
 
     pixFilter => {

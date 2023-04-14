@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,33 +12,32 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 28471ed9c62bbfb12a2afac9911c6dd919b7f9f5 .gitignore
-SHA1 f34e5db24a9ababe49ae281e723f98675a0169ad Build.PL
-SHA1 2a03825714cc27cfead4445266f6eca9ab570f14 Changes
-SHA1 ed757788d1aec2d2c3a87f40dd5ad4585def7816 MANIFEST
-SHA1 b36885f12a506254a0749826ca2b6e854e3116cf META.json
-SHA1 a89628c6a82fdf7aee67196e4d3ddfffd5d8ba0e META.yml
-SHA1 e5143ca74f252449f51ae1f5971cc92cfb80f794 README
-SHA1 df9ab5f6152be6ce3790805957d44039b5eea363 lib/Devel/CallChecker.pm
-SHA1 df333dd9a5563f8f0afa0cd8d60a6caa56bc76bd lib/Devel/CallChecker.xs
-SHA1 7bbcdddd858a25a26167ee5f7ff642efbcf1b646 t/callck.t
-SHA1 19955e7370031cec5f5787f26d9632ac9fe52c3b t/callck.xs
-SHA1 f02cae7124e7060dbd03f4b62113532e08b289d9 t/lib/t/LoadXS.pm
-SHA1 3652419516be8528af3d5e7cb45d06f7ccbb7237 t/lib/t/WriteHeader.pm
-SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
-SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
-SHA1 5592ca771efd6617e525dd115c575ba2106ba14d t/rv2cvopcv.t
-SHA1 c8ddecbc62112ef846d14ebdaf91b50156d80ed5 t/rv2cvopcv.xs
-SHA1 102817fd6fa671998951fdf1dc56333bdf56532c t/threads.t
-SHA1 1ad7681a845fdecc219ce5b0ced752ec084beb1d t/threads1.xs
-SHA1 30e0563165e2583c63ec573887503a8ce8e5a643 t/threads2.xs
-SHA1 80af1f40b1054da5c48fe7b3d22f1796cd24d3d8 typemap
+SHA256 93b7de35e3b9e01825354d186737790db4426434b89d67b9b5d4bc416cebf13c .gitignore
+SHA256 793a6920cfd3a554077dbe33d6e19f75e7eb02c1664f2533cd745fb500c757e0 Build.PL
+SHA256 7653e00a89460baa8b794c18786f472efb658d3836e7e403dd457512b14361ed Changes
+SHA256 7c3461cd24be7bf774a9b8f41b35ef4d4cfdf36b9c81b948ec59c7696be2b294 MANIFEST
+SHA256 e92aeb67143f8f19b996339fbd564880b8fd3005904aee2e674aaccf325d6201 META.json
+SHA256 34731ba8d0a5e567300b06a11464c228d9ee85f2d3e00e3e3c6e0cea0cdced27 META.yml
+SHA256 17fb06e3c2d6f62dbfada360f19834cb31453a3fdda5a566955b0882597b5cb0 README
+SHA256 2a36b7fb95c5e7386d2af3957071305eca00655fd7300629f04f0cba53314afb lib/Devel/CallChecker.pm
+SHA256 53a0f1f0e3b5c9cdacf3f9285da63c7731a269d0cdca768ee5290995a3c0259a lib/Devel/CallChecker.xs
+SHA256 b164d049c4c4f717270c59c5b46645990acde922e995b5f575d10831b9cc738f t/callck.t
+SHA256 cc4d18d8c070d7545aa078792fab45bd43dfd32ec74ffe11c9f16ae5229dce64 t/callck.xs
+SHA256 47a6b7a7b9201a6d33a8d11310b80ac13e9be60c5e809899e7232b7e05217860 t/lib/t/LoadXS.pm
+SHA256 459c6f1151a22bfcbc921c248196995028e4a4282884c19471edbe6d80c26397 t/lib/t/WriteHeader.pm
+SHA256 3679257bdfb4a07658e98a41325f82c1744f7dae6d1d0151f1b216af0c1df5c9 t/pod_cvg.t
+SHA256 e16860066c4ca9b2ee9e7d4604297def8a58b53bf0ca03eed863b5d9c5a2ac91 t/pod_syn.t
+SHA256 7df417659f64a5286437d0968a0a51f95fefe38fbeb857eed0a7dd6db7dd6137 t/rv2cvopcv.t
+SHA256 a188c6122309825246990a856dee98478d640270338675c2b0d0aadef137a55b t/rv2cvopcv.xs
+SHA256 e677e276eb8d17ebb5d4aff66808e38fcaeaeff23c369a7404d624684e98d3d5 t/threads.t
+SHA256 1ae17126136a115d97b7587de72588b998bde50b1632ffb949e02e574217e115 t/threads1.xs
+SHA256 59f9347a5cb3e9ab86a35fc9bc60a394b55b0f3414f5f615dee870f6041f3d1a t/threads2.xs
+SHA256 7c78b44035627c9b84b6c8e065aed9c3389865a58698d97a3b8324d576d47df5 typemap
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAll4OqkACgkQOV9mt2VyAVFDDQCgpuEcBg81kbhbf+eho952VNNr
-nBgAn0PVrAvAjMGbYGQ3SuD2wjlktxGf
-=u2BU
+iEYEAREDAAYFAmQ0Ly8ACgkQOV9mt2VyAVET5ACfdjEjeFljQRXcBpSPMk3bd+vF
+xRwAn2g2KEXdy5UlgTawF6hjk+8/8cqT
+=lX94
 -----END PGP SIGNATURE-----

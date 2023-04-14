@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '2.06';
+our $VERSION = '2.09';
 
 use PICA::Data::Field;
 use Carp         qw(croak);

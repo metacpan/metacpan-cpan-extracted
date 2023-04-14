@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::PageSource::DBI;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001009';
+our $VERSION   = '0.001010';
 
 use Moo;
 use Types::Common -types;
@@ -21,14 +21,20 @@ has 'dbh' => (
 );
 
 has 'sth' => (
-	is        => 'ro',
+	is        => 'lazy',
 	isa       => Object,
-	builder   => 1,
+	builder   => sub { my $s = shift; $s->dbh->prepare( $s->sql ) },
+);
+
+has 'sql' => (
+	is        => 'lazy',
+	isa       => Str,
+	builder   => sub { 'SELECT content FROM page WHERE id=?' }
 );
 
 sub _build_sth {
-	my ( $self ) = @_;
-	return $self->dbh->prepare('SELECT content FROM page WHERE id=?');
+	
+	return ;
 }
 
 sub get_source_code {

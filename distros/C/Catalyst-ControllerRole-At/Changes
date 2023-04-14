@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::ControllerRole::At
 
+0.007   07 April 2023
+        - Allow quotes in Via (Both Via(root) and Via('root') should
+        work as expected).  Tests included.
+
 0.006   30 December 2018
         - Silence a silly warning with At()
 

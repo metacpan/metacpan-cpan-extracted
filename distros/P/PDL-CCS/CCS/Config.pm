@@ -17,22 +17,28 @@ our %EXPORT_TAGS = (config=>['%ccsConfig'], Func=>\@Export, default=>\@EXPORT, a
                'INDX_TYPEDEF' => 'typedef PDL_Indx CCS_Indx;  /**< typedef for CCS indices */
 ',
                'INT_TYPE_CHRS' => [
+                                    'A',
                                     'B',
                                     'S',
                                     'U',
                                     'L',
+                                    'K',
                                     'N',
+                                    'P',
                                     'Q'
                                   ],
                'INT_TYPE_KEYS' => [
+                                    'PDL_SB',
                                     'PDL_B',
                                     'PDL_S',
                                     'PDL_US',
                                     'PDL_L',
+                                    'PDL_UL',
                                     'PDL_IND',
+                                    'PDL_ULL',
                                     'PDL_LL'
                                   ],
-               'INT_TYPE_MAX_IONAME' => 'ccs_indx'
+               'INT_TYPE_MAX_IONAME' => 'longlong'
              );
 
 *PDL::ccs_indx = *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices

@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.2.2
-* Copyright(c) 2021-2022 DEGUEST Pte. Ltd.
+* Version v0.2.3
+* Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2022/12/30
+* Modified 2023/04/14
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -809,6 +809,17 @@
     {
         this._value = str;
         this.locale = locale;
+        var self = this;
+        Object.defineProperty(this, 'length', 
+        {
+            get: function()
+            {
+                return( self._value.length );
+            },
+            // writable: false,
+            configurable: false,
+            enumerable: true
+        });
     };
 
     Object.getOwnPropertyNames(String.prototype).forEach(function(key)
@@ -819,7 +830,7 @@
             return func.apply(this._value, arguments);
         };
     });
-
+    
     GettextString.prototype.setLocale = function(locale)
     {
         this.locale = locale;
@@ -935,6 +946,25 @@
             return( this.dngettext( this.domain, msgid ) );
         },
         
+        /**
+         * Given an original string, this return the sprintf formatted localised equivalent
+         *
+         * @example
+         *     p.gettext( "Hello %s, welcome to %s", "Jacques", "Tokyo”, etc... )
+         *
+         * @param  {String} msgid      String to be translated
+         * @param  {Array}  parameters List of parameters passed to sprintf
+         * @return {String} Localised formatted string
+         */
+        gettextf: function()
+        {
+            var self = this;
+            var args = Array.from(arguments);
+            var thisText = self.dngettext( self.domain, args.shift() );
+            args.unshift( thisText );
+            return( new GettextString( sprintf.apply( null, args ), self.locale ) );
+        },
+
         /**
          * Translates a string using a specific domain
          *
@@ -1192,6 +1222,52 @@
             {
                 var locWeb = k.replace( '_', '-' );
                 spans.push( '<span lang="' + locWeb + '">' + self.dngettext( self.domain, key, { locale: k }) + '</span>' );
+            });
+            return( spans );
+        },
+    
+        /**
+         * Get an array of <span> html element each for one language and its related localised content depending on whether there is one or more than one elements
+         *
+         * @example
+         *     p.fetchLocalen( "%d person", "%d persons", 2 )
+         *     // Returns:
+         *     // <span lang="de-DE">2 Personen</span>
+         *     // <span lang="fr-FR">2 personnes</span>
+         *     // <span lang="ja-JP">2人</span>
+         *     // <span lang="ko-KR">2명</span>
+         *
+         * @param  {String} msgid        String to be translated when count is not plural
+         * @param  {String} msgidPlural  String to be translated when count is plural
+         * @param  {Number} count        Number count for the plural
+         * @return {Array} An array of span html elements
+         */
+        fetchLocalen: function(key, plural, count)
+        {
+            var self = this;
+            if( arguments.length < 3 )
+            {
+                throw new Error( "Missing argument. fetchLocalen( key, plural, count )" );
+            }
+            var args = Array.from(arguments);
+            args.splice(0,3);
+            
+            var hash = self.getDomainHash();
+            var spans = [];
+            // Browsing through each available locale language
+            // Make it predictable using sort()
+            Object.keys(hash).sort().forEach(function(k, index)
+            {
+                var locWeb = k.replace( '_', '-' );
+                var text = self.dngettext( self.domain, key, plural, count, { locale: k })
+                // Clone
+                var params = args.slice();
+                params.unshift( text );
+                if( params.length == 1 )
+                {
+                    params.push( count );
+                }
+                spans.push( '<span lang="' + locWeb + '">' + sprintf.apply( null, params ) + '</span>' );
             });
             return( spans );
         },
@@ -1540,7 +1616,8 @@
             var args = Array.from(arguments);
             // First argument is the locale key string
             var thisKey = args.shift();
-            var res = self.fetchLocale( thisKey );
+            // var res = self.fetchLocale( thisKey );
+            var res = self.fetchLocale(arguments);
             if( res.length > 0 )
             {
                 for( var i=0; i<res.length; i++ )
@@ -1796,7 +1873,7 @@
             // return( thisKey );
             return( new GettextString( thisKey ) );
         },
-    
+
         /**
          * Given an original string, this return the sprintf formatted localised equivalent
          *
@@ -2899,9 +2976,18 @@ From version v0.2.0, the string returned is a C<GettextString> object, which inh
 
 =head1 EXTENDED METHODS
 
+=head2 gettext
+
+This is the same as L</gettext>, except it will format the localised string using sprintf and the supplied arguments.
+
+Provided with a C<msgid> represented by a string, and this return a localised version of the string formatted using sprintf and with provided arguments, if any is found and is translated, otherwise returns the C<msgid> that was provided.
+
+    po.gettextf( "Hello %s", "John" );
+    # With locale of fr_FR, this would return "Bonjour John"
+
 =head2 addItem
 
-This takes a <locale>, a message id and its localised version and it will add this to the current dictionary for the current domain.
+This takes a C<locale>, a message id and its localised version and it will add this to the current dictionary for the current domain.
 
 =head2 charset
 
@@ -2943,6 +3029,52 @@ Given an original string (msgid), this returns an array of <span> html element e
     <span lang="fr-FR">Salut !</span>
     <span lang="ja-JP">今日は！</span>
     <span lang="ko-KR">안녕하세요!</span>
+
+=head2 fetchLocalen
+
+Given a string in singular and plural form and the count value, this will return the appropriate locale version, if any were found.
+
+It will do so for all the languages activated for this particular domain.
+
+Thus, you could do:
+
+    var po = new Gettext({
+        domain: self.po_domain,
+        locale: "en-GB",
+        path: '/public/locale',
+        debug: false,
+    });
+
+    var po_de = new Gettext({
+        domain: self.po_domain,
+        locale: "de-DE",
+        path: '/public/locale',
+        debug: false,
+    });
+
+    var po_fr = new Gettext({
+        domain: self.po_domain,
+        locale: "fr-FR",
+        path: '/public/locale',
+        debug: false,
+    });
+
+    var po_ja = new Gettext({
+        domain: self.po_domain,
+        locale: "ja-JP",
+        path: '/public/locale',
+        debug: false,
+    });
+
+and then:
+
+    var array = po.fetchLocalen( "%d person", "%d persons", 2 );
+
+    // Returns:
+    <span lang="de-DE">2 Personen</span>
+    <span lang="en-GB">2 persons</span>
+    <span lang="fr-FR">2 personnes</span>
+    <span lang="ja-JP">2人</span>
 
 =head2 getData
 
@@ -3357,7 +3489,7 @@ L<https://en.wikipedia.org/wiki/Gettext>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

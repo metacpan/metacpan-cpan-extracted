@@ -3,7 +3,7 @@ package DBIx::BatchChunker;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run large database changes safely
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -187,7 +187,7 @@ our $DB_MAX_ID = ~0;
 #pod
 #pod =head3 rs
 #pod
-#pod A L<DBIx::Class::ResultSet>. This is used by all methods as the base ResultSet onto which
+#pod A L<DBIx::Class::ResultSet>.  This is used by all methods as the base ResultSet onto which
 #pod the DB changes will be applied.  Required for DBIC processing.
 #pod
 #pod =cut
@@ -200,7 +200,7 @@ has rs => (
 
 #pod =head3 rsc
 #pod
-#pod A L<DBIx::Class::ResultSetColumn>. This is only used to override L</rs> for min/max
+#pod A L<DBIx::Class::ResultSetColumn>.  This is only used to override L</rs> for min/max
 #pod calculations.  Optional.
 #pod
 #pod =cut
@@ -209,6 +209,29 @@ has rsc => (
     is        => 'ro',
     isa       => InstanceOf['DBIx::Class::ResultSetColumn'],
     required  => 0,
+);
+
+#pod =head3 count_rs
+#pod
+#pod A L<DBIx::Class::ResultSet>, only used to override L</rs> for row counting calculations.
+#pod For 99.9% of cases, you do not need to set this.  Though, it could be used for the rare
+#pod case where the original Resulset would run into indexing problems with its row counting
+#pod statement and needs something broader to compensate.
+#pod
+#pod B<WARNING:> Do not set this unless you know what you're doing.  Having a different C<COUNT>
+#pod ResultSet from the base ResultSet means that the row counts to size up the chunk workload
+#pod will be different from the workload itself.  If the row counts are too high, you may end
+#pod up with workloads that are too quick and L<runtime targeting|/target_time> may compensate
+#pod with an overly large chunk size, anyway.  If the row counts are too low, you risk having
+#pod a oversized chunk that gets processed and locks rows for too long, and chunk resizing may
+#pod even skip blocks that it thinks have no rows to process.
+#pod
+#pod =cut
+
+has count_rs => (
+    is       => 'ro',
+    isa      => InstanceOf['DBIx::Class::ResultSet'],
+    required => 0,
 );
 
 #pod =head3 dbic_retry_opts
@@ -449,6 +472,8 @@ has cldr => (
 #pod
 #pod (This was previously defaulted to off, and called C<debug>, prior to v1.0.0.)
 #pod
+#pod =for Pod::Coverage debug
+#pod
 #pod =cut
 
 has verbose => (
@@ -589,6 +614,26 @@ has 'sleep' => (
     default  => 0.5,
 );
 
+#pod =head3 max_runtime
+#pod
+#pod The number of seconds that the entire process is allowed to run.  If you have a
+#pod long-running I<and idempotent> operation that you don't want to run for days, you can set
+#pod this attribute, execute the operation, and run it again at a later date.  The L</min_id>
+#pod will be set to the last-used ID, so the operation can be continued with another
+#pod L</execute> call.  Or you can use this to figure out if it finished or not.
+#pod
+#pod Turned off by default.  If you use this, you should add in extra multipler operations to
+#pod separate out the time math, like C<6 * 60 * 60> for 6 hours.
+#pod
+#pod =cut
+
+has max_runtime => (
+    is       => 'ro',
+    isa      => PositiveOrZeroNum,
+    required => 0,
+    default  => 0,
+);
+
 #pod =head3 process_past_max
 #pod
 #pod Boolean that controls whether to check past the L</max_id> during the loop.  If the loop
@@ -675,6 +720,10 @@ has min_chunk_percent => (
 #pod Manually setting this is not recommended, as each database is different and the
 #pod information may have changed between the DB change development and deployment.  Instead,
 #pod use L</calculate_ranges> to fill in these values right before running the loop.
+#pod
+#pod When the operation is finished, C<min_id> will be set to the last processed ID, just in
+#pod case it was stopped early and needs to be restarted (eg: L</max_runtime> is set).
+#pod Alternately, you can run L</calculate_ranges> again to confirm from the database.
 #pod
 #pod =cut
 
@@ -774,6 +823,10 @@ has loop_state => (
 # Backwards-compatibility
 *_loop_state = \&loop_state;
 
+#pod =for Pod::Coverage BUILDARGS BUILD
+#pod
+#pod =cut
+
 around BUILDARGS => sub {
     my $next  = shift;
     my $class = shift;
@@ -797,6 +850,9 @@ around BUILDARGS => sub {
         $args{rsc}     = $rs->get_column( $args{id_name} );
     }
     $rsc = $args{rsc};
+
+    # Default count_rs is just $rs
+    $args{count_rs} //= $rs if defined $rs;
 
     # Auto-add dbic_storage, if available
     if (!defined $args{dbic_storage} && (defined $rs || defined $rsc)) {
@@ -1062,6 +1118,7 @@ sub calculate_ranges {
 #pod         single_rows       => 1,    # does $coderef get a single $row or the whole $chunk_rs / $stmt
 #pod         min_chunk_percent => 0.25, # minimum row count of chunk size percentage; defaults to 0.5 (or 50%)
 #pod         target_time       => 5,    # target runtime for dynamic chunk size scaling; default is 5 seconds
+#pod         max_runtime       => 12 * 60 * 60, # stop processing after 12 hours
 #pod
 #pod         progress_name => 'Updating Accounts',  # easier than creating your own progress_bar
 #pod
@@ -1132,13 +1189,19 @@ sub execute {
         );
         $ls->chunk_count     (undef);
 
+        # Early loop exit because of maximum run time
+        if ($self->max_runtime && time - $ls->total_timer > $self->max_runtime) {
+            $progress->message('Ran past the maximum run time');
+            last;
+        }
+
         next unless $self->_process_past_max_checker;
 
         # The actual DB processing
         next unless $self->_process_block;
 
         # Record the time quickly
-        $ls->prev_runtime(time - $ls->timer);
+        $ls->prev_runtime(time - $ls->chunk_timer);
 
         # Give the DB a little bit of breathing room
         sleep $self->sleep if $self->sleep;
@@ -1150,6 +1213,9 @@ sub execute {
         # End-of-loop activities (skipped by early next)
         $ls->_reset_chunk_state;
     }
+
+    # Re-set min_id and clear the loop state
+    $self->min_id( $ls->prev_end );
     $self->clear_loop_state;
 
     # Keep the finished time from the progress bar, in case there are other loops or output
@@ -1171,10 +1237,11 @@ sub execute {
 sub _process_block {
     my ($self) = @_;
 
-    my $ls      = $self->loop_state;
-    my $conn    = $self->dbi_connector;
-    my $coderef = $self->coderef;
-    my $rs      = $self->rs;
+    my $ls       = $self->loop_state;
+    my $conn     = $self->dbi_connector;
+    my $coderef  = $self->coderef;
+    my $rs       = $self->rs;
+    my $count_rs = $self->count_rs // $rs;
 
     # Figure out if the row count is worth the work
     my $chunk_rs;
@@ -1198,8 +1265,8 @@ sub _process_block {
             );
         });
     }
-    elsif (defined $rs) {
-        $chunk_rs = $rs->search({
+    elsif (defined $count_rs) {
+        $chunk_rs = $count_rs->search({
             $self->id_name => { -between => [$ls->start, $ls->end] },
         });
 
@@ -1229,7 +1296,7 @@ sub _process_block {
             # Transactional work
             if ($self->dbic_storage) {
                 $self->_dbic_block_runner( txn => sub {
-                    $self->loop_state->_mark_timer;  # reset timer on retries
+                    $self->loop_state->_mark_chunk_timer;  # reset timer on retries
 
                     my $sth = $self->dbic_storage->dbh->prepare(@prepare_args);
                     $sth->execute(@execute_args);
@@ -1239,7 +1306,7 @@ sub _process_block {
             }
             else {
                 $conn->txn(sub {
-                    $self->loop_state->_mark_timer;  # reset timer on retries
+                    $self->loop_state->_mark_chunk_timer;  # reset timer on retries
 
                     my $sth = $_->prepare(@prepare_args);
                     $sth->execute(@execute_args);
@@ -1252,7 +1319,7 @@ sub _process_block {
             # Bulk work (or DML)
             if ($self->dbic_storage) {
                 $self->_dbic_block_runner( run => sub {
-                    $self->loop_state->_mark_timer;  # reset timer on retries
+                    $self->loop_state->_mark_chunk_timer;  # reset timer on retries
 
                     my $sth = $self->dbic_storage->dbh->prepare(@prepare_args);
                     $sth->execute(@execute_args);
@@ -1262,7 +1329,7 @@ sub _process_block {
             }
             else {
                 $conn->run(sub {
-                    $self->loop_state->_mark_timer;  # reset timer on retries
+                    $self->loop_state->_mark_chunk_timer;  # reset timer on retries
 
                     my $sth = $_->prepare(@prepare_args);
                     $sth->execute(@execute_args);
@@ -1279,7 +1346,7 @@ sub _process_block {
             # Transactional work
             $self->_dbic_block_runner( txn => sub {
                 # reset timer/$rs on retries
-                $self->loop_state->_mark_timer;
+                $self->loop_state->_mark_chunk_timer;
                 $chunk_rs->reset;
 
                 while (my $row = $chunk_rs->next) { $self->coderef->($self, $row) }
@@ -1289,7 +1356,7 @@ sub _process_block {
             # Bulk work
             $self->_dbic_block_runner( run => sub {
                 # reset timer/$rs on retries
-                $self->loop_state->_mark_timer;
+                $self->loop_state->_mark_chunk_timer;
                 $chunk_rs->reset;
 
                 $self->coderef->($self, $chunk_rs);
@@ -1347,7 +1414,7 @@ sub _process_past_max_checker {
             $_->selectrow_array(@{ $self->max_stmt });
         });
     }
-    $ls->_mark_timer;  # the above query shouldn't impact runtimes
+    $ls->_mark_chunk_timer;  # the above query shouldn't impact runtimes
 
     # Convert $new_max_id if necessary
     $new_max_id = Math::BigInt->new($new_max_id) if $self->_check_bignums($new_max_id);
@@ -1406,7 +1473,8 @@ sub _chunk_count_checker {
         return 1;
     }
 
-    my $chunk_percent = $ls->chunk_count / $ls->chunk_size;
+    my $chunk_percent    = $ls->chunk_count / $ls->chunk_size;
+    my $count_check_time = time - $ls->chunk_timer;  # should only include the COUNT time at this point
     $ls->checked_count( $ls->checked_count + 1 );
 
     if    ($ls->chunk_count == 0 && $self->min_chunk_percent > 0) {
@@ -1437,24 +1505,34 @@ sub _chunk_count_checker {
     elsif ($chunk_percent > 1 + $self->min_chunk_percent) {
         # Too many rows: Backtrack to the previous range and try to bisect
         $self->_print_chunk_status('shrunk');
-
-        $ls->_mark_timer;
-
-        # If we have a min/max range, bisect down the middle.  If not, walk back
-        # to the previous range and decelerate the stepping, which should bring
-        # it to a halfway point from this range and last.
-        my $lr = $ls->last_range;
-        $lr->{max} = $ls->multiplier_range if !defined $lr->{max} || $ls->multiplier_range < $lr->{max};
-        $ls->multiplier_range( $lr->{min} || ($ls->multiplier_range - $ls->multiplier_step) );
-        $ls->multiplier_step(
-            defined $lr->{min} ? ($lr->{max} - $lr->{min}) / 2 : $ls->multiplier_step / 2
-        );
-
+        $ls->_mark_chunk_timer;
+        $ls->_decrease_multiplier;
         $ls->prev_check('too many rows');
         return 0;
     }
+    elsif ($self->target_time && $count_check_time > $self->target_time * 1.05) {
+        # COUNT statement too slow: Backtrack to the previous range and try to bisect
 
-    # The above three are more important than skipping the count checks.  Better to
+        # This is a rare failure, so print a warning
+        my $integer = $self->cldr->decimal_formatter;
+        my $decimal = $self->cldr->decimal_formatter(
+            minimum_fraction_digits => 2,
+            maximum_fraction_digits => 2,
+        );
+        $progress->message( sprintf(
+            'WARNING: COUNT statement was too slow; took %5s sec to return %s rows.',
+            $decimal->format($count_check_time),
+            $integer->format( $ls->chunk_count )
+        ) );
+
+        $self->_print_chunk_status('shrunk');
+        $ls->_mark_chunk_timer;
+        $ls->_decrease_multiplier;
+        $ls->prev_check('COUNT too slow');
+        return 0;
+    }
+
+    # The above four are more important than skipping the count checks.  Better to
     # have too few rows than too many.  The single ID check prevents infinite loops
     # from bisecting, though.
 
@@ -1471,17 +1549,8 @@ sub _chunk_count_checker {
     elsif ($chunk_percent < $self->min_chunk_percent) {
         # Too few rows: Keep the start ID and accelerate towards a better endpoint
         $self->_print_chunk_status('expanded');
-
-        $ls->_mark_timer;
-
-        # If we have a min/max range, bisect down the middle.  If not, keep
-        # accelerating the stepping.
-        my $lr = $ls->last_range;
-        $lr->{min} = $ls->multiplier_range if !defined $lr->{min} || $ls->multiplier_range > $lr->{min};
-        $ls->multiplier_step(
-            defined $lr->{max} ? ($lr->{max} - $lr->{min}) / 2 : $ls->multiplier_step * 2
-        );
-
+        $ls->_mark_chunk_timer;
+        $ls->_increase_multiplier;
         $ls->prev_check('too few rows');
         return 0;
     }
@@ -1703,7 +1772,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 
@@ -1860,13 +1929,28 @@ usage.
 
 =head3 rs
 
-A L<DBIx::Class::ResultSet>. This is used by all methods as the base ResultSet onto which
+A L<DBIx::Class::ResultSet>.  This is used by all methods as the base ResultSet onto which
 the DB changes will be applied.  Required for DBIC processing.
 
 =head3 rsc
 
-A L<DBIx::Class::ResultSetColumn>. This is only used to override L</rs> for min/max
+A L<DBIx::Class::ResultSetColumn>.  This is only used to override L</rs> for min/max
 calculations.  Optional.
+
+=head3 count_rs
+
+A L<DBIx::Class::ResultSet>, only used to override L</rs> for row counting calculations.
+For 99.9% of cases, you do not need to set this.  Though, it could be used for the rare
+case where the original Resulset would run into indexing problems with its row counting
+statement and needs something broader to compensate.
+
+B<WARNING:> Do not set this unless you know what you're doing.  Having a different C<COUNT>
+ResultSet from the base ResultSet means that the row counts to size up the chunk workload
+will be different from the workload itself.  If the row counts are too high, you may end
+up with workloads that are too quick and L<runtime targeting|/target_time> may compensate
+with an overly large chunk size, anyway.  If the row counts are too low, you risk having
+a oversized chunk that gets processed and locks rows for too long, and chunk resizing may
+even skip blocks that it thinks have no rows to process.
 
 =head3 dbic_retry_opts
 
@@ -1983,6 +2067,8 @@ total numbers.  This is still subject to non-interactivity checks from L</progre
 
 (This was previously defaulted to off, and called C<debug>, prior to v1.0.0.)
 
+=for Pod::Coverage debug
+
 =head2 Common Attributes
 
 =head3 id_name
@@ -2061,6 +2147,17 @@ between the two.
 
 (This was previously defaulted to 0 seconds, prior to v1.0.0.)
 
+=head3 max_runtime
+
+The number of seconds that the entire process is allowed to run.  If you have a
+long-running I<and idempotent> operation that you don't want to run for days, you can set
+this attribute, execute the operation, and run it again at a later date.  The L</min_id>
+will be set to the last-used ID, so the operation can be continued with another
+L</execute> call.  Or you can use this to figure out if it finished or not.
+
+Turned off by default.  If you use this, you should add in extra multipler operations to
+separate out the time math, like C<6 * 60 * 60> for 6 hours.
+
 =head3 process_past_max
 
 Boolean that controls whether to check past the L</max_id> during the loop.  If the loop
@@ -2117,11 +2214,17 @@ Manually setting this is not recommended, as each database is different and the
 information may have changed between the DB change development and deployment.  Instead,
 use L</calculate_ranges> to fill in these values right before running the loop.
 
+When the operation is finished, C<min_id> will be set to the last processed ID, just in
+case it was stopped early and needs to be restarted (eg: L</max_runtime> is set).
+Alternately, you can run L</calculate_ranges> again to confirm from the database.
+
 =head3 loop_state
 
 A L<DBIx::BatchChunker::LoopState> object designed to hold variables during the
 processing loop.  The object will be cleared out after use.  Most of the complexity is
 needed for chunk resizing.
+
+=for Pod::Coverage BUILDARGS BUILD
 
 =head1 CONSTRUCTORS
 
@@ -2203,6 +2306,7 @@ If either of the min/max statements don't return any ID data, this method will r
         single_rows       => 1,    # does $coderef get a single $row or the whole $chunk_rs / $stmt
         min_chunk_percent => 0.25, # minimum row count of chunk size percentage; defaults to 0.5 (or 50%)
         target_time       => 5,    # target runtime for dynamic chunk size scaling; default is 5 seconds
+        max_runtime       => 12 * 60 * 60, # stop processing after 12 hours
 
         progress_name => 'Updating Accounts',  # easier than creating your own progress_bar
 
@@ -2300,7 +2404,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2022 by Grant Street Group.
+This software is Copyright (c) 2018 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

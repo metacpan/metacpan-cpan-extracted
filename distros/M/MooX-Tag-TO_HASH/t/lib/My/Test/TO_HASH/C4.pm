@@ -11,8 +11,7 @@ has secret_admirer => ( is => 'ro', );
 
 sub modify_hashr {
     my ( $self, $hashr ) = @_;
-    $hashr->{$_} = uc $hashr->{$_}
-      for grep defined $hashr->{$_}, keys %$hashr;
+    $hashr->{$_} = uc $hashr->{$_} for grep defined $hashr->{$_}, keys %$hashr;
 }
 
 1;

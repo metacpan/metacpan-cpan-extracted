@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 3 "distr.pd"
 
+#line 3 "distr.pd"
 
 use strict;
 use warnings;
@@ -86,8 +86,6 @@ Or, play with different distributions with B<plot_distr> :)
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
 
 
 =head2 mme_beta
@@ -95,8 +93,6 @@ Or, play with different distributions with B<plot_distr> :)
 =for sig
 
   Signature: (a(n); float+ [o]alpha(); float+ [o]beta())
-
-
 
 =for usage
 
@@ -106,7 +102,6 @@ Or, play with different distributions with B<plot_distr> :)
 
 beta distribution. pdf: f(x; a,b) = 1/B(a,b) x^(a-1) (1-x)^(b-1)
 
-
   
 
 =for bad
@@ -114,20 +109,15 @@ beta distribution. pdf: f(x; a,b) = 1/B(a,b) x^(a-1) (1-x)^(b-1)
 mme_beta processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 120 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mme_beta = \&PDL::mme_beta;
-#line 127 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -137,12 +127,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); a(); b(); float+ [o]p())
 
-
-
 =for ref
 
 probability density function for beta distribution. x defined on [0,1].
-
 
   
 
@@ -151,20 +138,15 @@ probability density function for beta distribution. x defined on [0,1].
 pdf_beta processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 157 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pdf_beta = \&PDL::pdf_beta;
-#line 164 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -174,8 +156,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); int [o]n_(); float+ [o]p())
 
-
-
 =for usage
 
     my ($n, $p) = $data->mme_binomial;
@@ -184,7 +164,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 binomial distribution. pmf: f(k; n,p) = (n k) p^k (1-p)^(n-k) for k = 0,1,2..n 
 
-
   
 
 =for bad
@@ -192,20 +171,15 @@ binomial distribution. pmf: f(k; n,p) = (n k) p^k (1-p)^(n-k) for k = 0,1,2..n
 mme_binomial processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 198 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mme_binomial = \&PDL::mme_binomial;
-#line 205 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -215,12 +189,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (ushort x(); ushort n(); p(); float+ [o]out())
 
-
-
 =for ref
 
 probability mass function for binomial distribution.
-
 
   
 
@@ -229,20 +200,15 @@ probability mass function for binomial distribution.
 pmf_binomial processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 235 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pmf_binomial = \&PDL::pmf_binomial;
-#line 242 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -252,8 +218,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]l())
 
-
-
 =for usage
 
     my $lamda = $data->mle_exp;
@@ -262,7 +226,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 exponential distribution. mle same as method of moments estimate.
 
-
   
 
 =for bad
@@ -270,20 +233,15 @@ exponential distribution. mle same as method of moments estimate.
 mle_exp processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 276 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mle_exp = \&PDL::mle_exp;
-#line 283 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -293,12 +251,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); l(); float+ [o]p())
 
-
-
 =for ref
 
 probability density function for exponential distribution.
-
 
   
 
@@ -307,20 +262,15 @@ probability density function for exponential distribution.
 pdf_exp processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 313 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pdf_exp = \&PDL::pdf_exp;
-#line 320 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -330,8 +280,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]shape(); float+ [o]scale())
 
-
-
 =for usage
 
     my ($shape, $scale) = $data->mme_gamma();
@@ -340,7 +288,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 two-parameter gamma distribution
 
-
   
 
 =for bad
@@ -348,20 +295,15 @@ two-parameter gamma distribution
 mme_gamma processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 354 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mme_gamma = \&PDL::mme_gamma;
-#line 361 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -371,12 +313,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); a(); t(); float+ [o]p())
 
-
-
 =for ref
 
 probability density function for two-parameter gamma distribution.
-
 
   
 
@@ -385,20 +324,15 @@ probability density function for two-parameter gamma distribution.
 pdf_gamma processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 391 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pdf_gamma = \&PDL::pdf_gamma;
-#line 398 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -408,8 +342,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]m(); float+ [o]v())
 
-
-
 =for usage
 
     my ($m, $v) = $data->mle_gaussian();
@@ -418,7 +350,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 gaussian aka normal distribution. same results as $data->average and $data->var. mle same as method of moments estimate.
 
-
   
 
 =for bad
@@ -426,20 +357,15 @@ gaussian aka normal distribution. same results as $data->average and $data->var.
 mle_gaussian processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 432 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mle_gaussian = \&PDL::mle_gaussian;
-#line 439 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -449,12 +375,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); m(); v(); float+ [o]p())
 
-
-
 =for ref
 
 probability density function for gaussian distribution.
-
 
   
 
@@ -463,20 +386,15 @@ probability density function for gaussian distribution.
 pdf_gaussian processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 469 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pdf_gaussian = \&PDL::pdf_gaussian;
-#line 476 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -486,12 +404,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]p())
 
-
-
 =for ref
 
 geometric distribution. mle same as method of moments estimate.
-
 
   
 
@@ -500,20 +415,15 @@ geometric distribution. mle same as method of moments estimate.
 mle_geo processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 506 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mle_geo = \&PDL::mle_geo;
-#line 513 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -523,12 +433,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (ushort x(); p(); float+ [o]out())
 
-
-
 =for ref
 
 probability mass function for geometric distribution. x >= 0.
-
 
   
 
@@ -537,20 +444,15 @@ probability mass function for geometric distribution. x >= 0.
 pmf_geo processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 543 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pmf_geo = \&PDL::pmf_geo;
-#line 550 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -560,12 +462,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]p())
 
-
-
 =for ref
 
 shifted geometric distribution. mle same as method of moments estimate.
-
 
   
 
@@ -574,20 +473,15 @@ shifted geometric distribution. mle same as method of moments estimate.
 mle_geosh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 580 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mle_geosh = \&PDL::mle_geosh;
-#line 587 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -597,12 +491,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (ushort x(); p(); float+ [o]out())
 
-
-
 =for ref
 
 probability mass function for shifted geometric distribution. x >= 1.
-
 
   
 
@@ -611,20 +502,15 @@ probability mass function for shifted geometric distribution. x >= 1.
 pmf_geosh processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 617 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pmf_geosh = \&PDL::pmf_geosh;
-#line 624 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -634,8 +520,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]m(); float+ [o]v())
 
-
-
 =for usage
 
     my ($m, $v) = $data->mle_lognormal();
@@ -644,7 +528,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 lognormal distribution. maximum likelihood estimation.
 
-
   
 
 =for bad
@@ -652,20 +535,15 @@ lognormal distribution. maximum likelihood estimation.
 mle_lognormal processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 658 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mle_lognormal = \&PDL::mle_lognormal;
-#line 665 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -675,8 +553,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]m(); float+ [o]v())
 
-
-
 =for usage
 
     my ($m, $v) = $data->mme_lognormal();
@@ -685,7 +561,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 lognormal distribution. method of moments estimation.
 
-
   
 
 =for bad
@@ -693,20 +568,15 @@ lognormal distribution. method of moments estimation.
 mme_lognormal processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 699 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mme_lognormal = \&PDL::mme_lognormal;
-#line 706 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -716,12 +586,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); m(); v(); float+ [o]p())
 
-
-
 =for ref
 
 probability density function for lognormal distribution. x > 0. v > 0.
-
 
   
 
@@ -730,20 +597,15 @@ probability density function for lognormal distribution. x > 0. v > 0.
 pdf_lognormal processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 736 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pdf_lognormal = \&PDL::pdf_lognormal;
-#line 743 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -753,8 +615,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]r(); float+ [o]p())
 
-
-
 =for usage
 
     my ($r, $p) = $data->mme_nbd();
@@ -763,7 +623,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 negative binomial distribution. pmf: f(x; r,p) = (x+r-1  r-1) p^r (1-p)^x for x=0,1,2...
 
-
   
 
 =for bad
@@ -771,20 +630,15 @@ negative binomial distribution. pmf: f(x; r,p) = (x+r-1  r-1) p^r (1-p)^x for x=
 mme_nbd processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 777 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mme_nbd = \&PDL::mme_nbd;
-#line 784 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -794,12 +648,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (ushort x(); r(); p(); float+ [o]out())
 
-
-
 =for ref
 
 probability mass function for negative binomial distribution.
-
 
   
 
@@ -808,20 +659,15 @@ probability mass function for negative binomial distribution.
 pmf_nbd processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 814 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pmf_nbd = \&PDL::pmf_nbd;
-#line 821 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -831,8 +677,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]k(); float+ [o]xm())
 
-
-
 =for usage
 
     my ($k, $xm) = $data->mme_pareto();
@@ -841,7 +685,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 pareto distribution. pdf: f(x; k,xm) = k xm^k / x^(k+1) for x >= xm > 0.
 
-
   
 
 =for bad
@@ -849,20 +692,15 @@ pareto distribution. pdf: f(x; k,xm) = k xm^k / x^(k+1) for x >= xm > 0.
 mme_pareto processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 855 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mme_pareto = \&PDL::mme_pareto;
-#line 862 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -872,12 +710,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); k(); xm(); float+ [o]p())
 
-
-
 =for ref
 
 probability density function for pareto distribution. x >= xm > 0.
-
 
   
 
@@ -886,20 +721,15 @@ probability density function for pareto distribution. x >= xm > 0.
 pdf_pareto processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 892 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pdf_pareto = \&PDL::pdf_pareto;
-#line 899 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -909,8 +739,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (a(n); float+ [o]l())
 
-
-
 =for usage
 
     my $lamda = $data->mle_poisson();
@@ -919,7 +747,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 poisson distribution. pmf: f(x;l) = e^(-l) * l^x / x!
 
-
   
 
 =for bad
@@ -927,20 +754,15 @@ poisson distribution. pmf: f(x;l) = e^(-l) * l^x / x!
 mle_poisson processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 933 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mle_poisson = \&PDL::mle_poisson;
-#line 940 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -950,12 +772,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); l(); float+ [o]p())
 
-
-
 =for ref
 
 Probability mass function for poisson distribution. Uses Stirling's formula for x > 85.
-
 
   
 
@@ -964,20 +783,15 @@ Probability mass function for poisson distribution. Uses Stirling's formula for 
 pmf_poisson processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 970 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pmf_poisson = \&PDL::pmf_poisson;
-#line 977 "Distr.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -987,12 +801,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(); l(); [o]p())
 
-
-
 =for ref
 
 Probability mass function for poisson distribution. Uses Stirling's formula for all values of the input. See http://en.wikipedia.org/wiki/Stirling's_approximation for more info.
-
 
   
 
@@ -1001,21 +812,18 @@ Probability mass function for poisson distribution. Uses Stirling's formula for 
 pmf_poisson_stirling processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1007 "Distr.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pmf_poisson_stirling = \&PDL::pmf_poisson_stirling;
-#line 1014 "Distr.pm"
+
+
 
 
 
 #line 1138 "distr.pd"
-
 
 #line 1139 "distr.pd"
 
@@ -1042,22 +850,20 @@ sub PDL::pmf_poisson_factorial {
 		return _pmf_poisson_factorial(@_);
 	}
 }
-#line 1165 "distr.pd"
-#line 1047 "Distr.pm"
+#line 854 "Distr.pm"
+#line 855 "Distr.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_pmf_poisson_factorial = \&PDL::_pmf_poisson_factorial;
-#line 1054 "Distr.pm"
+
+
 
 
 
 
 
 #line 1200 "distr.pd"
-
 
 #line 1201 "distr.pd"
 
@@ -1203,8 +1009,8 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>, David Mert
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1346 "distr.pd"
-#line 1208 "Distr.pm"
+#line 1013 "Distr.pm"
+#line 1014 "Distr.pm"
 
 
 

@@ -2,8 +2,8 @@ NAME
     Complete::Sah - Sah-related completion routines
 
 VERSION
-    This document describes version 0.010 of Complete::Sah (from Perl
-    distribution Complete-Sah), released on 2023-01-19.
+    This document describes version 0.011 of Complete::Sah (from Perl
+    distribution Complete-Sah), released on 2023-01-28.
 
 SYNOPSIS
      use Complete::Sah qw(complete_from_schema);
@@ -22,6 +22,15 @@ FUNCTIONS
     if schema is "[str => in => [qw/new open resolved rejected/]]", then we
     can complete from the "in" clause. Or for something like "[int =>
     between => [1, 20]]" we can complete using values from 1 to 20.
+
+    Tip: If you want to give summary for each entry in "in" clause, you can
+    use the "x.in.summaries" attribute, example:
+
+     # schema
+     ['str', {
+         in => ['b', 'g'],
+         'x.in.summaries' => ['Male/boy', 'Female/girl'],
+     }]
 
     This function is not exported by default, but exportable.
 

@@ -2,18 +2,17 @@ package Astro::FITS::CFITSIO::FileName;
 
 # ABSTRACT: parse and generate CFITSIO extended file names.
 
-## no critic (ProhibitSubroutinePrototypes)
+use v5.26;
 
 use strict;
 use warnings;
 
-use v5.26;
+our $VERSION = '0.07';
 
-our $VERSION = '0.05';
-
-use Types::Standard qw[ Str ArrayRef StrMatch Enum Bool Optional Dict ];
+use Types::Standard        qw[ Str ArrayRef StrMatch Enum Bool Optional Dict ];
 use Types::Common::Numeric qw[ PositiveOrZeroInt PositiveInt ];
-use Ref::Util qw[ is_arrayref ];
+use Scalar::Util           qw[ blessed ];
+use Ref::Util              qw[ is_arrayref ];
 
 use Astro::FITS::CFITSIO::FileName::Regexp -all;
 
@@ -28,144 +27,12 @@ use experimental 'signatures', 'postderef', 'declared_refs', 'refaliasing';
 
 use namespace::clean;
 
-use overload '""', "_stringify", fallback => 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+BEGIN { with 'MooX::Tag::TO_HASH'; }
+
+use overload
+  q{""}    => '_stringify',
+  bool     => sub { die "don't use ${\__PACKAGE__} in boolean context" },
+  fallback => 1;
 
 
 
@@ -181,6 +48,7 @@ has base_filename => (
     is       => 'ro',
     isa      => Str,
     required => 1,
+    to_hash  => 1,
 );
 
 
@@ -201,6 +69,7 @@ has file_type => (
     is        => 'ro',
     isa       => Str,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -221,6 +90,7 @@ has output_name => (
     is        => 'ro',
     isa       => Str,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -241,6 +111,7 @@ has extname => (
     is        => 'ro',
     isa       => Str,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -261,6 +132,7 @@ has extver => (
     is        => 'ro',
     isa       => PositiveInt,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -280,10 +152,10 @@ has extver => (
 
 
 has xtension => (
-    is => 'ro',
-    isa =>
-      StrMatch [qr{\A A | ASCII | I | IMAGE | T| TABLE | B | BINTABLE \z}xi],
+    is        => 'ro',
+    isa       => StrMatch [qr{\A [AITB] | ASCII | IMAGE | TABLE | BINTABLE \z}xi],
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -304,6 +176,7 @@ has image_cell_spec => (
     is        => 'ro',
     isa       => Str,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -324,6 +197,7 @@ has hdunum => (
     is        => 'ro',
     isa       => PositiveOrZeroInt,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -344,6 +218,7 @@ has compress_spec => (
     is        => 'ro',
     isa       => Str,
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -364,6 +239,7 @@ has image_section => (
     is        => 'ro',
     isa       => ArrayRef [ StrMatch [$PixelRange] ],
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -403,9 +279,10 @@ has pix_filter => (
     isa => Dict [
         datatype     => Optional [ Enum [qw( b i j r d )] ],
         discard_hdus => Optional [Bool],
-        expr         => Str
+        expr         => Str,
     ],
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -426,6 +303,7 @@ has col_filter => (
     is        => 'ro',
     isa       => ArrayRef [Str],
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -446,6 +324,7 @@ has row_filter => (
     is        => 'ro',
     isa       => ArrayRef [Str],
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -481,10 +360,11 @@ has bin_spec => (
     isa => ArrayRef [
         Dict [
             datatype => Optional [ Enum [qw( b i j r d )] ],
-            expr => Optional[Str]
-        ]
+            expr     => Optional [Str],
+        ],
     ],
     predicate => 1,
+    to_hash   => ',if_defined',
 );
 
 
@@ -496,7 +376,7 @@ has bin_spec => (
 has filename => (
     is       => 'lazy',
     init_arg => undef,
-    builder  => 1
+    builder  => 1,
 );
 
 
@@ -509,16 +389,161 @@ sub _stringify ( $self, @ ) {
     $self->filename;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 around BUILDARGS => sub ( $orig, $class, @args ) {
 
     return $class->parse_filename( $args[0] )
       if @args == 1 && !ref $args[0];
 
-    my \%args = $class->$orig( @args );
+    my %args = $class->$orig( @args )->%*;
+
+    if ( defined( my $filename = delete $args{filename} ) ) {
+        _croak( 'specify only one of C<filename> or <base_filename>' )
+          if exists $args{base_filename};
+        %args = ( $class->parse_filename( $filename )->%*, %args );
+    }
 
     $args{$_} = [ $args{$_} ]
-      for grep { $args{$_} && !is_arrayref( $args{$_} ) }
-      qw( col_filter row_filter bin_spec );
+      for grep { $args{$_} && !is_arrayref( $args{$_} ) } qw( col_filter row_filter bin_spec );
 
     return \%args;
 };
@@ -527,21 +552,20 @@ sub BUILD ( $self, $ ) {
 
     my $is_image = $self->has_image_section || $self->has_pix_filter;
 
-    _croak(
-        "can't specify column, row, or bin/histogram specs if it's an image" )
+    _croak( q{can't specify column, row, or bin/histogram specs if it's an image} )
       if $is_image
       && ( $self->has_col_filter
         || $self->has_row_filter
         || $self->has_bin_spec );
 
-    _croak( "must specify extname if extver is specified" )
+    _croak( q{must specify extname if extver is specified} )
       if $self->has_extver && !$self->has_extname;
 
-    _croak( "don't specify both extname and hdunum" )
+    _croak( q{don't specify both extname and hdunum} )
       if $self->has_extname && $self->has_hdunum;
 
     # compress spec can only be used if nothing else is specified.
-    _croak( "specify compress spec by itself" )
+    _croak( q{specify compress spec by itself} )
       if $self->has_compress_spec
       && ( $self->has_extname
         || $self->has_extver
@@ -564,9 +588,11 @@ sub BUILD ( $self, $ ) {
 
 
 
+
+
 sub parse_filename ( $, $filename ) {
 
-    _croak( "can't parse filename: @{[ $filename // '<undef>' ]}" )
+    _croak( q|can't parse filename: @{[ $filename // '<undef>' ]}| )
       unless defined $filename && $filename =~ $FileName;
 
     my %match = %+;
@@ -574,40 +600,31 @@ sub parse_filename ( $, $filename ) {
     if ( exists $match{col_bin_row} ) {
         # * didn't match [image_section][pix filter]
         # * found a bunch of things.
-        for my $spec (
-            $match{col_bin_row} =~ /( \[ $PossiblyQuotedStringInSpec \] )/xg )
-        {
+        for my $spec ( $match{col_bin_row} =~ /( \[ $PossiblyQuotedStringInSpec \] )/xg ) {
 
             if ( $spec =~ $binSpec ) {
                 push(
                     ( $match{bin_spec} //= [] )->@*,
                     { (
-                            exists $+{bin_spec_expression}
-                            ? ( expr => $+{bin_spec_expression} )
+                            exists $+{bin_spec_expression} ? ( expr => $+{bin_spec_expression} )
                             : ()
                         ),
                         (
-                            exists $+{bin_spec_datatype}
-                            ? ( datatype => $+{bin_spec_datatype} )
+                            exists $+{bin_spec_datatype} ? ( datatype => $+{bin_spec_datatype} )
                             : (),
-                        )
+                        ),
                     },
                 );
             }
             elsif ( $spec =~ $colFilter ) {
 
-                push(
-                    ( $match{col_filter} //= [] )->@*,
-                    $+{col_filter} =~ m/$PossiblyQuotedStringInList/g
-                );
+                push( ( $match{col_filter} //= [] )->@*, $+{col_filter} =~ m/$PossiblyQuotedStringInList/g );
             }
             elsif ( $spec =~ $rowFilter ) {
                 push( ( $match{row_filter} //= [] )->@*, $+{row_filter} );
             }
             else {
-                _croak(
-                    "$spec is not a bin/histogram spec, column filter, or row filter"
-                );
+                _croak( q{spec is not a bin/histogram spec, column filter, or row filter} );
             }
         }
         delete $match{col_bin_row};
@@ -617,9 +634,8 @@ sub parse_filename ( $, $filename ) {
       = exists( $match{image_section_x} ) + exists( $match{image_section_y} );
 
     if ( $image_section ) {
-        _croak(
-            "internal error: missing either image_section_x or image_section_y"
-        ) unless $image_section == 2;
+        _croak( q{internal error: missing either image_section_x or image_section_y} )
+          unless $image_section == 2;
         $match{image_section}
           = [ delete @match{ 'image_section_x', 'image_section_y' } ];
     }
@@ -633,8 +649,7 @@ sub parse_filename ( $, $filename ) {
                 : ()
             ),
             (
-                exists $match{pix_filter_datatype}
-                ? ( datatype => delete $match{pix_filter_datatype} )
+                exists $match{pix_filter_datatype} ? ( datatype => delete $match{pix_filter_datatype} )
                 : ()
             ),
             expr => delete $match{pix_filter_expression},
@@ -643,7 +658,7 @@ sub parse_filename ( $, $filename ) {
     }
 
     # remove undefined entries
-    delete @match { grep ! defined $match{$_}, keys %match };
+    delete @match{ grep !defined $match{$_}, keys %match };
 
     \%match;
 }
@@ -685,19 +700,19 @@ sub render_base_filename ( $self ) {
 }
 
 sub render_file_type ( $self ) {
-    $self->has_file_type ? $self->file_type : '';
+    $self->has_file_type ? $self->file_type : q{};
 }
 
 sub render_output_name ( $self ) {
     $self->has_output_name
       ? sprintf( '(%s)', $self->output_name )
-      : '';
+      : q{};
 }
 
 sub render_compress_spec ( $self ) {
     return $self->has_compress_spec
       ? sprintf( '[compress %s]', $self->compress_spec )
-      : '';
+      : q{};
 }
 
 sub render_hdu ( $self ) {
@@ -705,92 +720,84 @@ sub render_hdu ( $self ) {
     my @render;
 
     if ( $self->has_hdunum ) {
-        push @render, '[', $self->hdunum;
-        push @render, ';', $self->image_cell_spec
+        push @render, q{[}, $self->hdunum;
+        push @render, q{;}, $self->image_cell_spec
           if $self->has_image_cell_spec;
-        push @render, ']';
+        push @render, q{]};
     }
 
     elsif ( $self->has_extname ) {
-        push @render, '[', $self->extname;
-        push @render, ',', $self->extver if $self->has_extver;
-        push @render, ',', $self->xtension if $self->has_xtension;
-        push @render, ';', $self->image_cell_spec
+        push @render, q{[}, $self->extname;
+        push @render, q{,}, $self->extver   if $self->has_extver;
+        push @render, q{,}, $self->xtension if $self->has_xtension;
+        push @render, q{;}, $self->image_cell_spec
           if $self->has_image_cell_spec;
-        push @render, ']';
+        push @render, q{]};
     }
 
-    return join ('', @render );
+    return join( q{}, @render );
 }
 
 sub render_image_section ( $self ) {
 
     $self->has_image_section
       ? sprintf( '[%s,%s]', $self->image_section->[0], $self->image_section->[1] )
-      : '';
+      : q{};
 }
 
 sub render_pix_filter ( $self ) {
 
-    return '' unless $self->has_pix_filter;
+    return q{} unless $self->has_pix_filter;
 
     my @render;
 
-    push @render, '[', 'pix';
+    push @render, q{[}, 'pix';
     push @render, $self->pix_filter->{datatype}
       if exists $self->pix_filter->{datatype};
-    push @render, '1'
+    push @render, q{1}
       if exists $self->pix_filter->{discard_hdus}
       && $self->pix_filter->{discard_hdus};
-    push @render, ' ';
+    push @render, q{ };
     push @render, $self->pix_filter->{expr}, ']';
 
-    return join( '', @render );
+    return join( q{}, @render );
 
 }
 
 sub render_col_filter ( $self ) {
     return $self->has_col_filter
-      ? '[col ' . join(';', $self->col_filter->@* ) . ']'
-      : '';
+      ? '[col ' . join( q{;}, $self->col_filter->@* ) . q{]}
+      : q{};
 }
 
 sub render_row_filter ( $self ) {
     return $self->has_row_filter
-      ? join('', map { "[$_]" } $self->row_filter->@* )
-      : '';
+      ? join( q{}, map { "[$_]" } $self->row_filter->@* )
+      : q{};
 }
 
 sub render_bin_spec ( $self ) {
 
-    return '' unless $self->has_bin_spec;
+    return q{} unless $self->has_bin_spec;
 
     my @render;
 
     for ( $self->bin_spec->@* ) {
         push @render, '[bin';
         push @render, $_->{datatype} if exists $_->{datatype};
-        push @render, ' ', $_->{expr} if exists $_->{expr};
-        push @render, ']';
+        push @render, q{ }, $_->{expr} if exists $_->{expr};
+        push @render, q{]};
     }
 
-    return join( '', @render );
+    return join( q{}, @render );
 }
 
 sub _build_filename ( $self ) {
-    return join(
-        '',
-        $self->render_file_type,
-        $self->render_base_filename,
-        $self->render_output_name,
-        $self->render_compress_spec,
-        $self->render_hdu,
-        $self->render_image_section,
-        $self->render_pix_filter,
-        $self->render_col_filter,
-        $self->render_row_filter,
-        $self->render_bin_spec,
-    );
+    return join( q{},
+        $self->render_file_type,     $self->render_base_filename, $self->render_output_name,
+        $self->render_compress_spec, $self->render_hdu,           $self->render_image_section,
+        $self->render_pix_filter,    $self->render_col_filter,    $self->render_row_filter,
+        $self->render_bin_spec, );
 }
 
 
@@ -802,34 +809,25 @@ sub _build_filename ( $self ) {
 
 
 
-sub _maybe ( $self, $attr ) {
 
-    my $mth = "has_$attr";
-    return ( $self->$mth ? ( $attr => $self->$attr ) : () );
+
+# backwards compatibility;
+sub to_hash;
+*to_hash = \&TO_HASH;
+
+
+
+
+
+
+
+
+
+
+sub clone_with ( $self, @args ) {
+    my %attr = @args == 1 ? $args[0]->%* : @args;
+    return blessed( $self )->new( ( $self->TO_HASH->%*, %attr ) );
 }
-
-sub to_hash ( $self ) {
-
-    return {
-        base_filename => $self->base_filename,
-        map { $self->_maybe( $_ ) }
-          qw( file_type
-          output_name
-          extname
-          extver
-          xtension
-          image_cell_spec
-          hdunum
-          compress_spec
-          image_section
-          pix_filter
-          col_filter
-          row_filter
-          bin_spec
-           )
-           };
-}
-
 
 1;
 
@@ -856,7 +854,7 @@ Astro::FITS::CFITSIO::FileName - parse and generate CFITSIO extended file names.
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -896,7 +894,7 @@ set, use the C<has_pix_filter> method.
 
 =head2 Manipulating a filename
 
-L<Astro::FITS::CFITSIO::FileName> objects are meant to be immutable, so
+C<Astro::FITS::CFITSIO::FileName> objects are meant to be immutable, so
 manipulating attributes has to be done outside of the object.
 
 One way is to call the L</parse_filename> class method on the original
@@ -905,147 +903,7 @@ L</to_hash> object method, which returns a hash of attributes for a
 particular object.  Both of these hashes may be fed into the class
 constructor.
 
-=head1 CLASS METHODS
-
-=head2 new
-
-   $fileobj = Astro::FITS::CFITSIO::FileName->new( $filename );
-   $fileobj = Astro::FITS::CFITSIO::FileName->new( \%args );
-
-In the first example, parse a fully specified CFITSIO filename and populate
-the attributes.
-
-In the second example the following arguments are available.
-
-=over
-
-=item base_filename I<Str>
-
-I<Required.>
-
-=item file_type I<Enum>
-
-I<Optional>
-
-One of the CFITSIO supported file types, as a string.
-
-=item output_name I<Str>
-
-I<Optional>
-
-=item extname I<Str>
-
-I<Optional>
-
-Don't use this with the L</hdunum> option.
-
-=item extver I<PositiveInt>
-
-I<Optional>
-
-Don't use this with L</hdunum>. L</extname> must also be set.
-
-=item xtension I<Enum>
-
-I<Optional>
-
-The type of the HDU.  It is case insensitive and may be one of
-
- A | ASCII |  I | IMAGE | T | TABLE | B | BINTABLE
-
-=item image_cell_spec
-
-I<Optional>
-
-Images can be stored in vector cells; this specifies which cell to access.
-Its value is not validated.
-
-=item hdunum I<Positive Non Zero Integer>
-
-I<Optional>
-
-The HDU index. C<0> is the primary HDU.  Do not use this with L</extname>.
-
-=item compress_spec
-
-I<Optional>
-
-The image tile compression specification.
-Its value is not validated.
-
-=item image_section
-
-I<Optional>
-
-An array of two elements containing (as strings) the pixel ranges for the image axes.
-
-=item pix_filter
-
-I<Optional>
-
-A hashref containing the pixel filter.  The hash has the following entries:
-
-=over
-
-=item datatype
-
-I<Optional>
-
-=item discard_hdus
-
-I<Optional>
-
-=item expr
-
-I<Required> The filter expression.
-
-=back
-
-=item col_filter
-
-I<Optional>
-
-An array of column filters, as strings. Not validated.
-
-=item row_filter
-
-I<Optional>
-
-An array of row filters, as strings. Not validated.
-
-=item bin_spec
-
-I<Optional>
-
-An arrayref of hashrefs containing binning/histogram specifications.
-
-The hashes have the following entries:
-
-=over
-
-=item datatype
-
-Optional.
-
-=item expr
-
-The binning expression.
-
-=back
-
-=back
-
-=head2 parse_filename
-
-  $attr = $class->parse_filename( $filename );
-
-Parses an extended CFITSIO filename and returns a hash which may be fed
-into the L<Astro::FITS::CFITSIO::FileName> constructor.   Typically
-it's easier to just call the class constructor with the filename as a single argument,
-
-If a subclass needs to amend the parsing, this is the method to override.
-
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 base_filename
 
@@ -1170,11 +1028,166 @@ This is optional. See L</has_bin_spec>.
 
 This returns the full CFITSIO filename based on all of the attributes.
 
+=head1 CONSTRUCTORS
+
+=head2 new
+
+   $fileobj = Astro::FITS::CFITSIO::FileName->new( $filename );
+   $fileobj = Astro::FITS::CFITSIO::FileName->new( \%args );
+   $fileobj = Astro::FITS::CFITSIO::FileName->new( \%args );
+
+In the first example, parse a fully specified CFITSIO filename and populate
+the attributes.
+
+In the second example the following arguments are available.
+
+=over
+
+=item base_filename I<Str>
+
+=item filename I<Str>
+
+One (and only one) of these is I<Required>.
+
+If C<base_filename> is specified, it provides the value for the C<base_filename> attribute.
+
+If C<filename> is provided, it is parsed using L</parse_filename> and provides an initial
+set of attributes; additional attributes specified in the constructor will override them.
+
+=item file_type I<Enum>
+
+I<Optional>
+
+One of the CFITSIO supported file types, as a string.
+
+=item output_name I<Str>
+
+I<Optional>
+
+=item extname I<Str>
+
+I<Optional>
+
+Don't use this with the L</hdunum> option.
+
+=item extver I<PositiveInt>
+
+I<Optional>
+
+Don't use this with L</hdunum>. L</extname> must also be set.
+
+=item xtension I<Enum>
+
+I<Optional>
+
+The type of the HDU.  It is case insensitive and may be one of
+
+ A | ASCII |  I | IMAGE | T | TABLE | B | BINTABLE
+
+=item image_cell_spec
+
+I<Optional>
+
+Images can be stored in vector cells; this specifies which cell to access.
+Its value is not validated.
+
+=item hdunum I<Positive Non Zero Integer>
+
+I<Optional>
+
+The HDU index. C<0> is the primary HDU.  Do not use this with L</extname>.
+
+=item compress_spec
+
+I<Optional>
+
+The image tile compression specification.
+Its value is not validated.
+
+=item image_section
+
+I<Optional>
+
+An array of two elements containing (as strings) the pixel ranges for the image axes.
+
+=item pix_filter
+
+I<Optional>
+
+A hashref containing the pixel filter.  The hash has the following entries:
+
+=over
+
+=item datatype
+
+I<Optional>
+
+=item discard_hdus
+
+I<Optional>
+
+=item expr
+
+I<Required> The filter expression.
+
+=back
+
+=item col_filter
+
+I<Optional>
+
+An array of column filters, as strings. Not validated.
+
+=item row_filter
+
+I<Optional>
+
+An array of row filters, as strings. Not validated.
+
+=item bin_spec
+
+I<Optional>
+
+An arrayref of hashrefs containing binning/histogram specifications.
+
+The hashes have the following entries:
+
+=over
+
+=item datatype
+
+Optional.
+
+=item expr
+
+The binning expression.
+
+=back
+
+=back
+
+=head2 clone_with
+
+  $new = $old->clone_with( %attr | \%attr );
+
+Create a new C<Astro::FITS::CFITSIO::FileName> object based on an
+existing one with the specified modified attributes.
+
+=head1 CLASS METHODS
+
+=head2 parse_filename
+
+  $attr = $class->parse_filename( $filename );
+
+Parses an extended CFITSIO filename and returns a hash which may be
+fed into the C<Astro::FITS::CFITSIO::FileName> constructor.  Typically
+it's easier to just call the class constructor with the filename as a
+single argument.
+
+If a subclass needs to amend the parsing, this is the method to
+override.
+
 =head1 METHODS
-
-=head2 has_bin_spec
-
-returns true if the L</bin_spec> attribute is present.
 
 =head2 has_file_type
 
@@ -1257,9 +1270,11 @@ might return
 
   [extname, 2]
 
-=head2 to_hash
+=head2 to_hash (deprecated)
 
-  $hash = $self->to_hash;
+=head2 TO_HASH
+
+  $hash = $self->TO_HASH;
 
 returns a hashref containing the object's attributes.  This can be used to modify the attributes
 and then pass them to the class constructor to create a modified object.
@@ -1270,6 +1285,8 @@ and then pass them to the class constructor to create a modified object.
 
 Stringification is overloaded to return the filename as returned by the L</filename> attribute.
 
+=head1 INTERNALS
+
 =for Pod::Coverage BUILD
 BUILDARGS
 
@@ -1277,7 +1294,7 @@ BUILDARGS
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-astro-fits-cfitsio-filename@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-FileName
+Please report any bugs or feature requests to bug-astro-fits-cfitsio-filename@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-FileName>
 
 =head2 Source
 

@@ -1,3 +1,13 @@
+0.07 2023-03-30T15:48:16+02:00
+ - Move bugtracker to github.
+ - Regen META.yml file.
+
+0.06 2023-03-30T12:53:11+02:00
+ - Add names for example files.
+ - Rewrite doc to use =head2.
+ - Rewrite usage in tests from IO::CaptureOutput to Capture::Tiny.
+ - Update copyright years.
+
 0.05 2020-04-24T15:24:08+02:00
  - Fix Makefile.PL fails with no '.' in @INC.
  - Improve LICENSE AND COPYRIGHT section in doc.

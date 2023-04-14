@@ -1,7 +1,7 @@
 package Plack::Middleware::Auth::JWT;
 
 # ABSTRACT: Token-based Auth (aka Bearer Token) using JSON Web Tokens (JWT)
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.907'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,9 +9,10 @@ use warnings;
 use parent qw(Plack::Middleware);
 use Plack::Util;
 use Plack::Util::Accessor
-    qw(decode_args decode_callback psgix_claims psgix_token token_required ignore_invalid_token token_header_name token_query_name);
+    qw(decode_args decode_callback psgix_claims psgix_token token_required ignore_invalid_token token_header_name token_query_name _env);
 use Plack::Request;
 use Crypt::JWT 0.020 qw(decode_jwt);
+use JSON qw(encode_json);
 
 sub prepare_app {
     my $self = shift;
@@ -47,6 +48,7 @@ sub prepare_app {
 
 sub call {
     my ( $self, $env ) = @_;
+    $self->_env($env);
 
     my $token;
 
@@ -75,13 +77,14 @@ sub call {
             return decode_jwt( token => $token, %{ $self->decode_args } );
         }
     };
-    if ($@) {
+    if ($@ || !$claims) {
+        my $e = $@;
         if ($self->ignore_invalid_token) {
             return $self->app->($env);
         }
         else {
-            # TODO hm, if token cannot be decoded: 401 or 400?
-            return $self->unauthorized( 'Cannot decode JWT: ' . $@ );
+            $e =~ s/ at .*$//; # don't leak implementation detail on error!
+            return $self->unauthorized( 'Invalid token: ' . $e );
         }
     }
     else {
@@ -98,13 +101,30 @@ sub unauthorized {
     my $self = shift;
     my $body = shift || 'Authorization required';
 
-    return [
-        401,
-        [   'Content-Type'   => 'text/plain',
-            'Content-Length' => length $body
-        ],
-        [$body]
-    ];
+    my $env = $self->_env;
+    if ($env->{HTTP_ACCEPT} && $env->{HTTP_ACCEPT} =~ m{application/json}i ) {
+        my $ident = $body =~/exp claim check failed/ ? 'token_expired' : 'token_invalid';
+        my $data = encode_json({
+            ident=>$ident,
+            message=>$body,
+        });
+        return [
+            401,
+            [   'Content-Type'   => 'application/json',
+                'Content-Length' => length $data
+            ],
+            [$data]
+        ];
+    }
+    else {
+        return [
+            401,
+            [   'Content-Type'   => 'text/plain',
+                'Content-Length' => length $body
+            ],
+            [$body]
+        ];
+    }
 }
 
 1;
@@ -121,7 +141,7 @@ Plack::Middleware::Auth::JWT - Token-based Auth (aka Bearer Token) using JSON We
 
 =head1 VERSION
 
-version 0.906
+version 0.907
 
 =head1 SYNOPSIS
 
@@ -265,6 +285,8 @@ regression in the tests caused by an update in L<Crypt::JWT> error
 messages. The same issue was also reported by SREZIC.
 
 =item * L<Michael R. Davis|https://github.com/mrdvt92> for fixing a typo.
+
++item * L<Balloon Metainfo XR GmbH|https://balloon-events.com/> for supporting Open Source and sponsoring some improvements.
 
 =back
 

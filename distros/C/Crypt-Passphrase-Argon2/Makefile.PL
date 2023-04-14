@@ -18,8 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Crypt::Passphrase::Argon2",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Crypt::Argon2" => "0.014",
+    "Crypt::Argon2" => "0.017",
     "Crypt::Passphrase" => "0.010",
+    "MIME::Base64" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,11 +39,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Crypt::Argon2" => "0.014",
+  "Crypt::Argon2" => "0.017",
   "Crypt::Passphrase" => "0.010",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "MIME::Base64" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

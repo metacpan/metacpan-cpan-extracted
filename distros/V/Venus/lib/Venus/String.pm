@@ -2892,18 +2892,6 @@ I<Since C<0.08>>
 
 =back
 
-=over 4
-
-=item stringified example 3
-
-  # given: synopsis;
-
-  my $stringified = $self->stringified;
-
-  # ...
-
-=back
-
 =cut
 
 =head2 strip

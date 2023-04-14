@@ -2,9 +2,9 @@
 package Require::HookChain;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-15'; # DATE
+our $DATE = '2023-02-07'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -127,7 +127,7 @@ Require::HookChain - Chainable require hook
 
 =head1 VERSION
 
-This document describes version 0.005 of Require::HookChain (from Perl distribution Require-HookChain), released on 2022-11-15.
+This document describes version 0.006 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-07.
 
 =head1 SYNOPSIS
 
@@ -261,7 +261,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

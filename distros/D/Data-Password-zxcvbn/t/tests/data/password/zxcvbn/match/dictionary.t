@@ -300,7 +300,7 @@ subtest 'making' => sub {
         test_making(
             'wow',undef,undef,
             [
-                cmp_simple_match(0,2,'wow','us_tv_and_film',323),
+                cmp_simple_match(0,2,'wow','us_tv_and_film',329),
             ],
             'default dictionaries',
         );

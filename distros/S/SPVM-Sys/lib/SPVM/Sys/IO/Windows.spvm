@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::IO::Windows {
   native static method is_symlink : int ($path : string);
   native static method unlink : int ($pathname : string);

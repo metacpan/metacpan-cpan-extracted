@@ -22,12 +22,11 @@ no_index:
     - t
     - inc
 requires:
-  AnyEvent: '7.17'
+  IO::Async: '0.802'
   JSON::MaybeXS: '1.004002'
   LWP::Protocol::https: '6.10'
   LWP::UserAgent: '6.47'
   Moo: '2.005005'
-  Promises: '1.04'
   Throwable: '1.001'
   Types::Standard: '2.002001'
   namespace::clean: '0.27'
@@ -36,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/nferraz/perl-openai-api/issues
   repository: https://github.com/nferraz/perl-openai-api.git
-version: 0.33
+version: 0.37
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,158 +1,254 @@
 package SPVM::Resource::RE2;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 
 =head1 Name
 
-SPVM::Resource::RE2 - Google/RE2 Resource
+SPVM::Resource::RE2 - The Resource of Google/RE2
 
 =head1 Description
 
-C<SPVM::Resource::RE2> is the C<Resource::RE2> class in L<SPVM>. This is a L<SPVM resource|SPVM::Document::Resource> of L<Google/RE2|https://github.com/google/re2>.
-
-L<Google/RE2|https://github.com/google/re2> is a regular expression library written by C<C++>.
+SPVM::Resource::RE2 is a L<resource|SPVM::Document::Resource> of L<SPVM> for the L<Google/RE2|https://github.com/google/re2>.
 
 =head1 Usage
 
-MyRE2.config:
+MyClass.config:
   
   my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
   my $resource = $config->use_resource('Resource::RE2');
   
   if ($^O eq 'MSWin32') {
-    $config->add_static_libs('stdc++', 'winpthread', 'gcc');
+    $config->add_static_lib('stdc++', 'winpthread', 'gcc');
   }
   else {
-    $config->add_libs('stdc++');
+    $config->add_lib('stdc++');
   }
   
-  $config->add_ldflags('-pthread');
+  $config->add_ldflag('-pthread');
   
   $config;
 
-MyRE2.spvm:
+MyClass.cpp:
 
-  class MyRE2 {
-    native static method match : int ();
-  }
-
-MyRE2.cpp:
-
-  #include "spvm_native.h"
-  
   #include "re2/re2.h"
   
   extern "C" {
   
-  int32_t SPVM__MyRE2__match(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__MyClass__test(SPVM_ENV* env, SPVM_VALUE* stack) {
     
-    if (RE2::PartialMatch("abcde", "bcd")) {
-      stack[0].ival = 1;
-    }
-    else {
-      stack[0].ival = 0;
-    }
+    int32_t match = RE2::PartialMatch("abcde", "bcd");
     
     return 0;
   }
   
   }
 
-myre2.pl:
+=head1 Original Product
 
-  use FindBin;
-  use lib "$FindBin::Bin";
-  use SPVM 'MyRE2';
-  
-  my $match = SPVM::MyRE2->match;
+L<Google/RE2|https://github.com/google/re2>
 
-=head1 Library Version
+=head1 Original Product Version
 
-L<Google/RE2 2023-02-01|https://github.com/google/re2/releases/tag/2023-02-01>.
+L<Google/RE2 2023-02-01|https://github.com/google/re2/releases/tag/2023-02-01>
 
-If a new release exists, it will be upgraded.
+=head1 Language
 
-=head1 User Config
+C++
 
-Recommended user config:
+=head1 Language Specification
 
-  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
-  my $resource = $config->use_resource('Resource::RE2');
-  
-  if ($^O eq 'MSWin32') {
-    $config->add_static_libs('stdc++', 'winpthread', 'gcc');
-  }
-  else {
-    $config->add_libs('stdc++');
-  }
-  
-  $config->add_ldflags('-pthread');
+C++17
 
-=head1 Resource Config
+=head1 Required Libraries
 
-  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
-  
-  $config->add_ccflags('-pthread', '-Wno-unused-parameter', '-Wno-missing-field-initializers');
-  
-  $config->ext('cc');
-  
-  my @source_files = qw(
-    re2/dfa.cc
-    re2/prefilter_tree.cc
-    re2/stringpiece.cc
-    re2/bitstate.cc
-    re2/unicode_casefold.cc
-    re2/simplify.cc
-    re2/filtered_re2.cc
-    re2/onepass.cc
-    re2/bitmap256.cc
-    re2/re2.cc
-    re2/parse.cc
-    re2/set.cc
-    re2/prog.cc
-    re2/prefilter.cc
-    re2/mimics_pcre.cc
-    re2/regexp.cc
-    re2/nfa.cc
-    re2/tostring.cc
-    re2/perl_groups.cc
-    re2/unicode_groups.cc
-    re2/compile.cc
-    util/strutil.cc
-    util/rune.cc
-    util/pcre.cc
-  );
-  
-  $config->add_source_files(@source_files);
+Windows:
 
-=head1 How to Create This Resource
+=over 2
 
-=head2 Getting Product
+=item * stdc++ (The static link is preffered)
+
+=item * winpthread (The static link is preffered)
+
+=item * gcc (The static link is preffered)
+
+=back
+
+Unix/Linux/Mac:
+
+=over 2
+
+=item * stdc++
+
+=back
+
+=head1 Required Linker Flags
+
+=over 2
+
+=item * -pthread
+
+=back
+
+=head1 Header Files
+
+=over 2
+
+=item * util/logging.h
+
+=item * util/test.h
+
+=item * util/mix.h
+
+=item * util/util.h
+
+=item * util/mutex.h
+
+=item * util/strutil.h
+
+=item * util/malloc_counter.h
+
+=item * util/pcre.h
+
+=item * util/flags.h
+
+=item * util/utf.h
+
+=item * util/benchmark.h
+
+=item * re2/prefilter.h
+
+=item * re2/re2.h
+
+=item * re2/sparse_set.h
+
+=item * re2/unicode_casefold.h
+
+=item * re2/filtered_re2.h
+
+=item * re2/pod_array.h
+
+=item * re2/stringpiece.h
+
+=item * re2/prefilter_tree.h
+
+=item * re2/bitmap256.h
+
+=item * re2/sparse_array.h
+
+=item * re2/set.h
+
+=item * re2/regexp.h
+
+=item * re2/testing/regexp_generator.h
+
+=item * re2/testing/tester.h
+
+=item * re2/testing/exhaustive_tester.h
+
+=item * re2/testing/string_generator.h
+
+=item * re2/walker-inl.h
+
+=item * re2/fuzzing/compiler-rt/include/fuzzer/FuzzedDataProvider.h
+
+=item * re2/unicode_groups.h
+
+=item * re2/prog.h
+
+=back
+
+=head1 Source Files
+
+=over 2
+
+=item * re2/dfa.cc
+
+=item * re2/prefilter_tree.cc
+
+=item * re2/stringpiece.cc
+
+=item * re2/bitstate.cc
+
+=item * re2/unicode_casefold.cc
+
+=item * re2/simplify.cc
+
+=item * re2/filtered_re2.cc
+
+=item * re2/onepass.cc
+
+=item * re2/bitmap256.cc
+
+=item * re2/re2.cc
+
+=item * re2/parse.cc
+
+=item * re2/set.cc
+
+=item * re2/prog.cc
+
+=item * re2/prefilter.cc
+
+=item * re2/mimics_pcre.cc
+
+=item * re2/regexp.cc
+
+=item * re2/nfa.cc
+
+=item * re2/tostring.cc
+
+=item * re2/perl_groups.cc
+
+=item * re2/unicode_groups.cc
+
+=item * re2/compile.cc
+
+=item * util/strutil.cc
+
+=item * util/rune.cc
+
+=item * util/pcre.cc
+
+=back
+
+=head1 Compiler Flags
+
+=over 2
+
+=item * -pthread
+
+=item * -Wno-unused-parameter
+
+=item * -Wno-missing-field-initializers
+
+=back
+
+=head1 How to Create Resource
+
+=head2 Download
 
   mkdir -p original.tmp
   git clone https://github.com/google/re2.git original.tmp/re2
-  git -C original.tmp/re2 checkout tags/2023-02-01 -b 2023-02-01
+  git -C original.tmp/re2 checkout tags/2023-02-01 -b branch_2023-02-01
   git -C original.tmp/re2 branch
 
-=head2 Source Files
+=head2 Extracting Source Files
 
 All files of C<Google/RE2> is copied by the following steps into the C<src> directory.
 
   rsync -av --exclude='*.h' original.tmp/re2/ lib/SPVM/Resource/RE2.native/src/
 
-=head1 Header Files
+The source files that is used in the config are extracted by the following command.
+
+  find lib/SPVM/Resource/RE2.native/src/* | perl -p -e 's|^\Qlib/SPVM/Resource/RE2.native/src/||' | grep -P '(util|re2)/\w+\.cc$' | grep -v -P 'util/(test|benchmark|fuzz)\.cc$'
+
+=head1 Extracting Header Files
 
 Header files of C<Google/RE2> is copied into the C<include> directory by the following way.
 
   rsync -av --include='*/' --include='*.h' --exclude='*' original.tmp/re2/ lib/SPVM/Resource/RE2.native/include/
-
-=head2 Extracting Source Files
-
-The source files that is used in the config are extracted by the following command.
-
-  find lib/SPVM/Resource/RE2.native/src/* | perl -p -e 's|^\Qlib/SPVM/Resource/RE2.native/src/||' | grep -P '(util|re2)/\w+\.cc$' | grep -v -P 'util/(test|benchmark|fuzz)\.cc$'
 
 =head1 Repository
 
@@ -164,7 +260,7 @@ YuKi Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2023-2023 YuKi Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
+

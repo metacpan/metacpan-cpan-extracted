@@ -23,331 +23,331 @@ name: StorageDisplay
 provides:
   StorageDisplay:
     file: lib/StorageDisplay.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Block:
     file: lib/StorageDisplay/Block.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Block::NoSystem:
     file: lib/StorageDisplay/Block.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Block::System:
     file: lib/StorageDisplay/Block.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::BlockTreeElement:
     file: lib/StorageDisplay/Block.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::CMD:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::CMD::Local:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::CMD::LocalBySSH:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::CMD::Proxy::Recorder:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::CMD::Remote:
     file: lib/StorageDisplay/Collect/CMD/Remote.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::CMD::Replay:
     file: lib/StorageDisplay/Collect/CMD/Replay.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::Collector:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::DeviceMapper:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::FS:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::Host:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::JSON:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::LSI::Megacli:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::LSI::Sas2ircu:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::LUKS:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::LVM:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::Libvirt:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::MD:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::Partitions:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Collect::SystemBlocks:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Elem:
     file: lib/StorageDisplay/Data/Elem.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::FS:
     file: lib/StorageDisplay/Data/FS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::FS::AllSWAP:
     file: lib/StorageDisplay/Data/FS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::FS::FS:
     file: lib/StorageDisplay/Data/FS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::FS::SWAP::Elem:
     file: lib/StorageDisplay/Data/FS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::FS::SWAP::File:
     file: lib/StorageDisplay/Data/FS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::FS::SWAP::Partition:
     file: lib/StorageDisplay/Data/FS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LUKS:
     file: lib/StorageDisplay/Data/LUKS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LUKS::Decrypted:
     file: lib/StorageDisplay/Data/LUKS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LUKS::Decrypted::None:
     file: lib/StorageDisplay/Data/LUKS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LUKS::Decrypted::Present:
     file: lib/StorageDisplay/Data/LUKS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LUKS::Encrypted:
     file: lib/StorageDisplay/Data/LUKS.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::Elem:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::Group:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::PVs::Base:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::UnassignedPVs:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::UnassignedPVs::PVs:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::VG:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::VG::LVs:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::VG::LVs::LV:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::VG::PVs:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::VG::PVs::PV:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::LVM::XV:
     file: lib/StorageDisplay/Data/LVM.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Libvirt:
     file: lib/StorageDisplay/Data/Libvirt.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Libvirt::VM:
     file: lib/StorageDisplay/Data/Libvirt.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Libvirt::VM::Block:
     file: lib/StorageDisplay/Data/Libvirt.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::GPT:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::MSDOS:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::None:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::Table:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::Table::Part:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::Table::Part::Data:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::Table::Part::Free:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Partition::Table::Part::SubTable:
     file: lib/StorageDisplay/Data/Partition.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::Container:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::ContainerDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::Device:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::Elem:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::Megacli:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::Megacli::BBU::Status:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::Megacli::RawDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::Megacli::State:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::Megacli::State::RaidDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::SASIrcu:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::SASIrcu::MissingRawDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::SASIrcu::RawDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::SASIrcu::State:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::LSI::SASIrcu::State::RaidDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::MD:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::MD::Container:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::MD::Device:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::MD::State:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::MD::State::RaidDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::RaidDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::RawDevice:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::RAID::State:
     file: lib/StorageDisplay/Data/RAID.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Data::Root:
     file: lib/StorageDisplay/Data/Root.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Moose::Cached:
     file: lib/StorageDisplay/Moose/Cached.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Elem::Kind:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::HasBlock:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Iterable:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::ProvideName::Plain:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::ProvideName::Recursive:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Base:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Base::Elem:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Base::HTML:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::FromBlockState:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Grey:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::IsLabel:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::IsSubGraph:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Label::HTML:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Label::HTML::Table:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Machine:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::Plain:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::SubInternal:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::WithFree:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::WithSize:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::Style::WithUsed:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   StorageDisplay::Role::WithName:
     file: lib/StorageDisplay/Role.pm
-    version: '2.02'
+    version: '2.03'
   is_collector:
     file: lib/StorageDisplay/Collect.pm
-    version: '2.02'
+    version: '2.03'
 requires:
   Carp: '0'
   Data::Compare: '0'
@@ -376,7 +376,7 @@ requires:
   perl: v5.14.0
   strict: '0'
   warnings: '0'
-version: '2.02'
+version: '2.03'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -2,9 +2,11 @@ package CXC::Number::Sequence::Fixed;
 
 # ABSTRACT: CXC::Number::Sequence with arbitrary values
 
+use v5.28;
+
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use namespace::clean;
 
@@ -37,7 +39,7 @@ CXC::Number::Sequence::Fixed - CXC::Number::Sequence with arbitrary values
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -55,7 +57,7 @@ This subclass of L<CXC::Number::Sequence> specifies the exact elements in a sequ
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

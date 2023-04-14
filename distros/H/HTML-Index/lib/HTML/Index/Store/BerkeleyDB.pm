@@ -2,6 +2,15 @@ package HTML::Index::Store::BerkeleyDB;
 
 #------------------------------------------------------------------------------
 #
+# Pragmas
+#
+#------------------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+#------------------------------------------------------------------------------
+#
 # Modules
 #
 #------------------------------------------------------------------------------
@@ -207,7 +216,7 @@ module, that uses Berkeley DB files to store the inverted index.
 
 =head1 AUTHOR
 
-Ave Wrigley <Ave.Wrigley@itn.co.uk>
+Ave Wrigley <ave.wrigley@gmail.com>
 
 =head1 COPYRIGHT
 

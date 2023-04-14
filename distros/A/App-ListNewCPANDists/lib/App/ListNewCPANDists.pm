@@ -6,14 +6,13 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2023-02-08'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
 my $sch_date = ['date*', 'x.perl.coerce_to' => 'DateTime', 'x.perl.coerce_rules'=>['From_str::natural']];
-my $URL_PREFIX = 'https://fastapi.metacpan.org/v1';
 
 our $db_schema_spec = {
     summary => __PACKAGE__,
@@ -61,12 +60,13 @@ mirror, but can be just an empty directory. If you use happen to use
 (which also defaults to `~/cpan`) to store the database.
 
 _
-        tags => ['common'],
+        tags => ['common', 'category:local-cpan'],
     },
     db_name => {
         summary => 'Filename of database',
         schema =>'filename*',
         default => 'index-lncd.db',
+        tags => ['common', 'category:db'],
     },
 );
 
@@ -110,6 +110,21 @@ our %args_filter = (
     include_author_re => {
         schema => 're*',
         tags => ['category:filtering'],
+    },
+);
+
+our %args_time = (
+    from_time => {
+        schema => $sch_date,
+        pos => 0,
+        cmdline_aliases => {from=>{}},
+        tags => ['category:time-filtering'],
+    },
+    to_time   => {
+        schema => $sch_date,
+        pos => 1,
+        cmdline_aliases => {to=>{}},
+        tags => ['category:time-filtering'],
     },
 );
 
@@ -182,98 +197,6 @@ sub _init {
     $App::ListNewCPANDists::state;
 }
 
-sub _http_tiny {
-    state $obj = do {
-        require HTTP::Tiny;
-        HTTP::Tiny->new;
-    };
-    $obj;
-}
-
-sub _get_dist_release_times {
-    require Time::Local;
-
-    my ($state, $dist) = @_;
-
-    # save an API call if we can find a cache in database
-    my $dbh = $state->{dbh};
-    my ($distinfo) = $dbh->selectrow_hashref(
-        "SELECT * FROM dist WHERE name=?",
-        {},
-        $dist,
-    );
-    return $distinfo if $distinfo && $distinfo->{mtime} >= time() - 8*3600; # cache for 8 hours
-    my $row_exists = $distinfo ? 1:0;
-
-    # find first release time & version
-    unless ($distinfo) {
-        my $res = _http_tiny->post("$URL_PREFIX/release/_search?size=1&sort=date", {
-            content => _json_encode({
-                query => {
-                    terms => {
-                        distribution => [$dist],
-                    },
-                },
-                fields => [qw/name date version version_numified/],
-            }),
-        });
-
-        die "Can't retrieve first release information of distribution '$dist': ".
-            "$res->{status} - $res->{reason}\n" unless $res->{success};
-        my $api_res = _json_decode($res->{content});
-        my $hit = $api_res->{hits}{hits}[0];
-        die "No release information for distribution '$dist'" unless $hit;
-        $hit->{fields}{date} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)/
-            or die "Can't parse date '$hit->{fields}{date}'";
-        my $time = Time::Local::timegm($6, $5, $4, $3, $2-1, $1);
-        $distinfo = {
-            name => $dist,
-            first_time => $time,
-            first_version => $hit->{fields}{version},
-        };
-    }
-
-    # find latest release time & version
-    {
-        my $res = _http_tiny->post("$URL_PREFIX/release/_search?size=1&sort=date:desc", {
-            content => _json_encode({
-                query => {
-                    terms => {
-                        distribution => [$dist],
-                    },
-                },
-                fields => [qw/name date version version_numified/],
-            }),
-        });
-
-        die "Can't retrieve latest release information of distribution '$dist': ".
-            "$res->{status} - $res->{reason}\n" unless $res->{success};
-        my $api_res = _json_decode($res->{content});
-        my $hit = $api_res->{hits}{hits}[0];
-        die "No release information for distribution '$dist'" unless $hit;
-        $hit->{fields}{date} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)/
-            or die "Can't parse date '$hit->{fields}{date}'";
-        my $time = Time::Local::timegm($6, $5, $4, $3, $2-1, $1);
-        $distinfo->{latest_time} = $time;
-        $distinfo->{latest_version} = $hit->{fields}{version};
-    }
-
-    # cache to database
-    if ($row_exists) {
-        $dbh->do("UPDATE dist SET first_version=?,first_time=?,latest_version=?,latest_time=?, mtime=? WHERE name=?", {},
-                 $distinfo->{first_version}, $distinfo->{first_time}, $distinfo->{latest_version}, $distinfo->{latest_time},
-                 time(),
-                 $distinfo->{name},
-             );
-    } else {
-        $dbh->do("INSERT INTO dist (name,first_version,first_time,latest_version,latest_time, mtime) VALUES (?,?,?,?,?, ?)", {},
-                 $distinfo->{name}, $distinfo->{first_version}, $distinfo->{first_time}, $distinfo->{latest_version}, $distinfo->{latest_time},
-                 time(),
-             );
-    }
-    $distinfo;
-}
-
 $SPEC{list_new_cpan_dists} = {
     v => 1.1,
     summary => 'List new CPAN distributions in a given time period',
@@ -290,18 +213,7 @@ _
     args => {
         %args_common,
         %args_filter,
-        from_time => {
-            schema => $sch_date,
-            pos => 0,
-            cmdline_aliases => {from=>{}},
-            tags => ['category:time-filtering'],
-        },
-        to_time   => {
-            schema => $sch_date,
-            pos => 1,
-            cmdline_aliases => {to=>{}},
-            tags => ['category:time-filtering'],
-        },
+        %args_time,
 
         today => {
             schema => 'true*',
@@ -429,56 +341,32 @@ sub list_new_cpan_dists {
     log_trace("Retrieving releases from %s to %s ...",
               $from_time->datetime, $to_time->datetime);
 
-    # list all releases in the time period and collect unique list of
-    # distributions
-    my $res = _http_tiny->post("$URL_PREFIX/release/_search?size=5000&sort=name", {
-        content => _json_encode({
-            query => {
-                range => {
-                    date => {
-                        gte => $from_time->datetime,
-                        lte => $to_time->datetime,
-                    },
-                },
-            },
-            fields => [qw/name author distribution abstract date version version_numified/],
-        }),
-    });
-    return [$res->{status}, "Can't retrieve releases: $res->{reason}"]
-        unless $res->{success};
+    require App::MetaCPANUtils;
+    my $api_res = App::MetaCPANUtils::list_metacpan_releases(
+        from_date => $from_time,
+        to_date => $to_time,
+        fields => [qw/author date distribution abstract first/],
+        sort => 'release',
+    );
 
-    my $api_res = _json_decode($res->{content});
-    my %dists;
-    my @res;
-    my $num_hits = @{ $api_res->{hits}{hits} };
-    my $i = 0;
-  HIT:
-    for my $hit (@{ $api_res->{hits}{hits} }) {
-        $i++;
-        my $dist = $hit->{fields}{distribution};
-        next if $dists{ $dist }++;
-        log_trace("[#%d/%d] Got distribution %s", $i, $num_hits, $dist);
-        # find the first release of this distribution
-        my $distinfo = _get_dist_release_times($state, $dist);
-        unless ($distinfo->{first_time} >= $from_time->epoch &&
-                    $distinfo->{first_time} <= $to_time->epoch) {
-            log_trace("First release of distribution %s is not in this time period, skipped", $dist);
-            next;
-        }
+    #fields => [qw/name author distribution abstract date version version_numified/],
+
+    return [500, "Can't list MetaCPAN releases: $api_res->[0] - $api_res->[1]"]
+        unless $api_res->[0] == 200;
+
+    my @rows;
+    for my $row0 (@{ $api_res->[2] }) {
+        next unless $row0->{first};
         my $row = {
-            dist => $dist,
-            #release => $hit->{fields}{name},
-            author => $hit->{fields}{author},
-            first_version => $distinfo->{first_version},
-            first_time => $distinfo->{first_time},
-            latest_version => $distinfo->{latest_version},
-            latest_time => $distinfo->{latest_time},
-            abstract => $hit->{fields}{abstract},
-            date => $hit->{fields}{date},
+            dist => $row0->{distribution},
+            author => $row0->{author},
+            abstract => $row0->{abstract},
+            date => $row0->{date},
         };
         log_trace "row=%s", $row;
 
       FILTER: {
+            my $dist = $row->{dist};
             if ($args{exclude_dists} && @{ $args{exclude_dists} } &&
                     (grep {$dist eq $_} @{ $args{exclude_dists} })) {
                 log_info "Distribution %s is in exclude_dists, skipped", $dist;
@@ -502,7 +390,7 @@ sub list_new_cpan_dists {
                 log_info "Author %s is in exclude_authors, skipped", $row->{author};
                 next HIT;
             }
-            if ($args{exclude_author_re} && $hit->{fields}{author} =~ /$args{exclude_author_re}/) {
+            if ($args{exclude_author_re} && $row->{author} =~ /$args{exclude_author_re}/) {
                 log_info "Author %s matches exclude_author_re, skipped", $row->{author};
                 next HIT;
             }
@@ -511,22 +399,22 @@ sub list_new_cpan_dists {
                 log_info "Author %s is not in include_authors, skipped", $row->{author};
                 next HIT;
             }
-            if ($args{include_author_re} && $hit->{fields}{author} !~ /$args{include_author_re}/) {
+            if ($args{include_author_re} && $row->{author} !~ /$args{include_author_re}/) {
                 log_info "Author %s does not match include_author_re, skipped", $row->{author};
                 next HIT;
             }
         }
 
-        push @res, $row;
+        push @rows, $row;
     }
 
     my %resmeta = (
-        'table.fields'        => [qw/dist author first_version first_time  latest_version latest_time abstract/],
-        'table.field_formats' => [undef,  undef, undef,        'datetime', undef,         'datetime', undef],
-        'func.stats' => create_new_cpan_dists_stats(dists => \@res)->[2],
+        'table.fields'        => [qw/dist author abstract date/],
+        'table.field_formats' => [undef,  undef, undef, 'datetime'],
+        'func.stats' => create_new_cpan_dists_stats(dists => \@rows)->[2],
     );
 
-    [200, "OK", \@res, \%resmeta];
+    [200, "OK", \@rows, \%resmeta];
 }
 
 $SPEC{create_new_cpan_dists_stats} = {
@@ -606,35 +494,10 @@ sub list_monthly_new_cpan_dists {
     );
 }
 
-$SPEC{list_monthly_new_cpan_dists_html} = {
-    v => 1.1,
-    summary => 'List new CPAN distributions in a given month (HTML format)',
-    description => <<'_',
-
-Like `list_monthly_new_cpan_dists` but produces HTML table instead of data
-structure.
-
-_
-    args => {
-        %args_filter,
-        month => {
-            schema => ['int*', min=>1, max=>12],
-            req => 1,
-            pos => 0,
-        },
-        year => {
-            schema => ['int*', min=>1990, max=>9999],
-            req => 1,
-            pos => 1,
-        },
-    },
-};
-sub list_monthly_new_cpan_dists_html {
+sub _htmlize {
     require HTML::Entities;
 
-    my %args = @_;
-
-    my $res = list_monthly_new_cpan_dists(%args);
+    my $res = shift;
 
     my @html;
 
@@ -685,6 +548,60 @@ sub list_monthly_new_cpan_dists_html {
     [200, "OK", join("", @html), {'cmdline.skip_format'=>1}];
 }
 
+$SPEC{list_new_cpan_dists_html} = {
+    v => 1.1,
+    summary => 'List new CPAN distributions in a given month (HTML format)',
+    description => <<'_',
+
+Like `list_new_cpan_dists` but produces HTML table instead of data structure.
+
+_
+    args => {
+        %args_common,
+        %args_filter,
+        %args_time,
+    },
+};
+sub list_new_cpan_dists_html {
+    my %args = @_;
+
+    my $res = list_new_cpan_dists(%args);
+
+    _htmlize($res);
+}
+
+$SPEC{list_monthly_new_cpan_dists_html} = {
+    v => 1.1,
+    summary => 'List new CPAN distributions in a given month (HTML format)',
+    description => <<'_',
+
+Like `list_monthly_new_cpan_dists` but produces HTML table instead of data
+structure.
+
+_
+    args => {
+        %args_common,
+        %args_filter,
+        month => {
+            schema => ['int*', min=>1, max=>12],
+            req => 1,
+            pos => 0,
+        },
+        year => {
+            schema => ['int*', min=>1990, max=>9999],
+            req => 1,
+            pos => 1,
+        },
+    },
+};
+sub list_monthly_new_cpan_dists_html {
+    my %args = @_;
+
+    my $res = list_monthly_new_cpan_dists(%args);
+
+    _htmlize($res);
+}
+
 1;
 
 # ABSTRACT: List new CPAN distributions in a given time period
@@ -701,7 +618,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.018 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2022-09-09.
+This document describes version 0.021 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2023-02-08.
 
 =head1 FUNCTIONS
 
@@ -719,6 +636,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<dists> => I<array>
+
+(No description)
 
 
 =back
@@ -755,23 +674,43 @@ Arguments ('*' denotes required arguments):
 
 =item * B<exclude_author_re> => I<re>
 
+(No description)
+
 =item * B<exclude_authors> => I<array[cpan::pause_id]>
+
+(No description)
 
 =item * B<exclude_dist_re> => I<re>
 
+(No description)
+
 =item * B<exclude_dists> => I<array[perl::distname]>
+
+(No description)
 
 =item * B<include_author_re> => I<re>
 
+(No description)
+
 =item * B<include_authors> => I<array[cpan::pause_id]>
+
+(No description)
 
 =item * B<include_dist_re> => I<re>
 
+(No description)
+
 =item * B<include_dists> => I<array[perl::distname]>
+
+(No description)
 
 =item * B<month>* => I<int>
 
+(No description)
+
 =item * B<year>* => I<int>
+
+(No description)
 
 
 =back
@@ -806,25 +745,58 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cpan> => I<dirname>
+
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
+
+Defaults to C<~/cpan>. This actually does not need to be a real CPAN local
+mirror, but can be just an empty directory. If you use happen to use
+L<App::lcpan>, you can use the local CPAN mirror generated by L<lcpan>
+(which also defaults to C<~/cpan>) to store the database.
+
+=item * B<db_name> => I<filename> (default: "index-lncd.db")
+
+Filename of database.
+
 =item * B<exclude_author_re> => I<re>
+
+(No description)
 
 =item * B<exclude_authors> => I<array[cpan::pause_id]>
 
+(No description)
+
 =item * B<exclude_dist_re> => I<re>
+
+(No description)
 
 =item * B<exclude_dists> => I<array[perl::distname]>
 
+(No description)
+
 =item * B<include_author_re> => I<re>
+
+(No description)
 
 =item * B<include_authors> => I<array[cpan::pause_id]>
 
+(No description)
+
 =item * B<include_dist_re> => I<re>
+
+(No description)
 
 =item * B<include_dists> => I<array[perl::distname]>
 
+(No description)
+
 =item * B<month>* => I<int>
 
+(No description)
+
 =item * B<year>* => I<int>
+
+(No description)
 
 
 =back
@@ -896,23 +868,43 @@ Filename of database.
 
 =item * B<exclude_author_re> => I<re>
 
+(No description)
+
 =item * B<exclude_authors> => I<array[cpan::pause_id]>
+
+(No description)
 
 =item * B<exclude_dist_re> => I<re>
 
+(No description)
+
 =item * B<exclude_dists> => I<array[perl::distname]>
+
+(No description)
 
 =item * B<from_time> => I<date>
 
+(No description)
+
 =item * B<include_author_re> => I<re>
+
+(No description)
 
 =item * B<include_authors> => I<array[cpan::pause_id]>
 
+(No description)
+
 =item * B<include_dist_re> => I<re>
+
+(No description)
 
 =item * B<include_dists> => I<array[perl::distname]>
 
+(No description)
+
 =item * B<last_month> => I<true>
+
+(No description)
 
 =item * B<last_week> => I<true>
 
@@ -920,7 +912,11 @@ Monday is the start of the week.
 
 =item * B<last_year> => I<true>
 
+(No description)
+
 =item * B<this_month> => I<true>
+
+(No description)
 
 =item * B<this_week> => I<true>
 
@@ -928,11 +924,104 @@ Monday is the start of the week.
 
 =item * B<this_year> => I<true>
 
+(No description)
+
 =item * B<to_time> => I<date>
+
+(No description)
 
 =item * B<today> => I<true>
 
+(No description)
+
 =item * B<yesterday> => I<true>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 list_new_cpan_dists_html
+
+Usage:
+
+ list_new_cpan_dists_html(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+List new CPAN distributions in a given month (HTML format).
+
+Like C<list_new_cpan_dists> but produces HTML table instead of data structure.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<cpan> => I<dirname>
+
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
+
+Defaults to C<~/cpan>. This actually does not need to be a real CPAN local
+mirror, but can be just an empty directory. If you use happen to use
+L<App::lcpan>, you can use the local CPAN mirror generated by L<lcpan>
+(which also defaults to C<~/cpan>) to store the database.
+
+=item * B<db_name> => I<filename> (default: "index-lncd.db")
+
+Filename of database.
+
+=item * B<exclude_author_re> => I<re>
+
+(No description)
+
+=item * B<exclude_authors> => I<array[cpan::pause_id]>
+
+(No description)
+
+=item * B<exclude_dist_re> => I<re>
+
+(No description)
+
+=item * B<exclude_dists> => I<array[perl::distname]>
+
+(No description)
+
+=item * B<from_time> => I<date>
+
+(No description)
+
+=item * B<include_author_re> => I<re>
+
+(No description)
+
+=item * B<include_authors> => I<array[cpan::pause_id]>
+
+(No description)
+
+=item * B<include_dist_re> => I<re>
+
+(No description)
+
+=item * B<include_dists> => I<array[perl::distname]>
+
+(No description)
+
+=item * B<to_time> => I<date>
+
+(No description)
 
 
 =back
@@ -980,7 +1069,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

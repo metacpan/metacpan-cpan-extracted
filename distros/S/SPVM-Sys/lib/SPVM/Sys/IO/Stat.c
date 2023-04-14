@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <assert.h>
@@ -14,7 +17,7 @@ int32_t SPVM__Sys__IO__Stat__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   // So sizeof(struct stat) * 2 is allocated.
   struct stat* st_stat = env->new_memory_stack(env, stack, sizeof(struct stat) * 2);
   
-  void* obj_stat = env->new_pointer_by_name(env, stack, "Sys::IO::Stat", st_stat, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_stat = env->new_pointer_object_by_name(env, stack, "Sys::IO::Stat", st_stat, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_stat;

@@ -21,17 +21,17 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt-Constant
+    GitHub Source Repository
+        https://github.com/pjacklam/p5-Math-BigInt-Constant
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-BigInt-Constant
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Constant
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Math-BigInt-Constant
+    MetaCPAN
+        https://metacpan.org/release/Math-BigInt-Constant
 
-    Search CPAN
-        http://search.cpan.org/dist/Math-BigInt-Constant
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-BigInt-Constant
 
 COPYRIGHT AND LICENCE
 

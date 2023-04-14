@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Story-Interact
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
-Source: https://metacpan.org/release/Story-Interact
+Source: https://story-interact.xlc.pl/
 
 Files: Changes
  META.json
@@ -24,6 +24,8 @@ Files: Changes
  lib/Story/Interact/State.pm
  lib/Story/Interact/Syntax.pm
  t/integration/house-story.t
+ t/integration/story-with-prelude.t
+ t/integration/uri-query.t
  t/integration/waterfall.t
 Copyright: Copyright 2023 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
@@ -38,6 +40,10 @@ Files: INSTALL
  examples/house/main.page.pl
  examples/house/sleep.page.pl
  t/share/override/living_room.page.pl
+ t/share/story-with-prelude/_prelude.page.pl
+ t/share/story-with-prelude/main.page.pl
+ t/share/uri-query/main.page.pl
+ t/share/uri-query/other.page.pl
 Copyright: Unknown
 License: Unknown
 
@@ -45,7 +51,6 @@ Files: README
  lib/Story/Interact.pm
  t/00start.t
  t/01basic.t
- t/unit/Story/Interact.t
 Copyright: This software is copyright (c) 2023 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

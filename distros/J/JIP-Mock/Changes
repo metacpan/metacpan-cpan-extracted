@@ -1,0 +1,11 @@
+Revision history for JIP-Mock
+
+v0.0.3    2023-04-02
+  - Added call_original method.
+
+v0.0.2    2023-03-31
+  - More documentation.
+  - Improved portability of some tests.
+
+v0.0.1    2023-03-30
+  - First version, released on an unsuspecting world.

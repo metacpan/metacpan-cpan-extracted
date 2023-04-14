@@ -194,7 +194,7 @@ Mnet::T::test_perl({
     expect  => <<'    expect-eof',
         dbg - Mnet::Expect::Cli::Ios close starting
         dbg - Mnet::Expect::Cli _command_expect matched prompt_re
-        dbg - Mnet::Expect::Cli _command_expect matched prompts null for timeout
+        dbg - Mnet::Expect::Cli _command_expect matched prompts (null=timeout)
         dbg - Mnet::Expect::Cli::Ios close finished
         --- - Mnet::Log finished, no errors
     expect-eof

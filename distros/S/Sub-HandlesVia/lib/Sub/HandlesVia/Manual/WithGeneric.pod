@@ -108,6 +108,7 @@ L<Sub::HandlesVia::HandlerLibrary::Blessed>,
 L<Sub::HandlesVia::HandlerLibrary::Bool>,
 L<Sub::HandlesVia::HandlerLibrary::Code>,
 L<Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Sub::HandlesVia::HandlerLibrary::Enum>,
 L<Sub::HandlesVia::HandlerLibrary::Hash>,
 L<Sub::HandlesVia::HandlerLibrary::Number>,
 L<Sub::HandlesVia::HandlerLibrary::Scalar>, and

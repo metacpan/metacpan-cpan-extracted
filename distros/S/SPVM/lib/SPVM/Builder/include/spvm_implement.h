@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_IMPLEMENT_H
 #define SPVM_IMPLEMENT_H
 
@@ -36,9 +39,9 @@ enum {
 
 static const char* SPVM_IMPLEMENT_STRING_LITERALS[] = {
   "The memory allocation for the call stack failed",
-  "The value can't be cast to the non-assignable type",
-  "The read-only string can't be cast to the mutable string type",
-  "Integral type values can't be divided by 0",
+  "The value cannnot be cast to the non-assignable type",
+  "The read-only string cannnot be cast to the mutable string type",
+  "Integral type values cannnot be divided by 0",
   "The left operand of the \".\" operator must be defined",
   "The right operand of the \".\" operator must be defined",
   "The object creating failed",
@@ -48,9 +51,9 @@ static const char* SPVM_IMPLEMENT_STRING_LITERALS[] = {
   "The length of the string must be greater than or equal to 0",
   "The array must be defined",
   "The index of the array access must be greater than or equal to 0 and less than the length of the array",
-  "The element can't be assigned to the non-assignable type",
+  "The element cannnot be assigned to the non-assignable type",
   "The invocant of the field access must be defined",
-  "The unboxing conversion can't be performed on the undefined value",
+  "The unboxing conversion cannnot be performed on the undefined value",
   "The source of the unboxing conversion must be the corresponding numeric object type",
   "The memory allocation for the weaken back reference failed",
   "The operand of the copy operator must be a string type, a numeric type, or a multi numeric type",
@@ -685,9 +688,9 @@ static inline void SPVM_IMPLEMENT_NEW_OBJECT_ARRAY(SPVM_ENV* env, SPVM_VALUE* st
   }
 }
 
-static inline void SPVM_IMPLEMENT_NEW_MULDIM_ARRAY(SPVM_ENV* env, SPVM_VALUE* stack, void** out, int32_t basic_type_id, int32_t element_dimension, int32_t length, int32_t* error) {
+static inline void SPVM_IMPLEMENT_NEW_MULDIM_ARRAY(SPVM_ENV* env, SPVM_VALUE* stack, void** out, int32_t basic_type_id, int32_t type_dimension, int32_t length, int32_t* error) {
   if (length >= 0) {
-    void* object = env->new_muldim_array_raw(env, stack, basic_type_id, element_dimension, length);
+    void* object = env->new_muldim_array_raw(env, stack, basic_type_id, type_dimension, length);
     if (object == NULL) {
       void* exception = env->new_string_nolen_raw(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_NEW_ARRAY_FAILED]);
       env->set_exception(env, stack, exception);
@@ -1457,7 +1460,7 @@ static inline void SPVM_IMPLEMENT_SAY(SPVM_ENV* env, SPVM_VALUE* stack, void* st
   fprintf(stdout, "\n");
 }
 
-static inline void SPVM_IMPLEMENT_WARN(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* module_dir, const char* module_dir_sep, const char* module_rel_file, int32_t line) {
+static inline void SPVM_IMPLEMENT_WARN(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* class_path, const char* class_path_sep, const char* class_rel_file, int32_t line) {
   int32_t empty_or_undef = 0;
   if (string) {
     const char* bytes = env->get_chars(env, stack, string);
@@ -1468,7 +1471,7 @@ static inline void SPVM_IMPLEMENT_WARN(SPVM_ENV* env, SPVM_VALUE* stack, void* s
       // Add line and file information if last character is not '\n'
       int32_t add_line_file;
       if (bytes[string_length - 1] != '\n') {
-        fprintf(stderr, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_WARN_AT], module_dir, module_dir_sep, module_rel_file, line);
+        fprintf(stderr, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_WARN_AT], class_path, class_path_sep, class_rel_file, line);
       }
     }
     else {
@@ -1480,7 +1483,7 @@ static inline void SPVM_IMPLEMENT_WARN(SPVM_ENV* env, SPVM_VALUE* stack, void* s
   }
 
   if (empty_or_undef) {
-    fprintf(stderr, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_WARN_UNDEF], module_dir, module_dir_sep, module_rel_file, line);
+    fprintf(stderr, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_WARN_UNDEF], class_path, class_path_sep, class_rel_file, line);
   }
 
   fflush(stderr);
@@ -2667,7 +2670,7 @@ static inline void SPVM_IMPLEMENT_RETURN_MULNUM_DOUBLE(SPVM_ENV* env, SPVM_VALUE
 #define SPVM_IMPLEMENT_CALL_CLASS_METHOD(env, stack, error, method_id, args_stack_length) (error = env->call_method(env, stack, method_id, args_stack_length))
 #define SPVM_IMPLEMENT_CALL_INSTANCE_METHOD(env, stack, error, method_id, args_stack_length) (error = env->call_method(env, stack, method_id, args_stack_length))
 
-static inline int SPVM_IMPLEMENT_CALL_INTERFACE_METHOD(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* interface_name, const char* method_name, int32_t args_stack_length, int32_t* error, char* tmp_buffer) {
+static inline void SPVM_IMPLEMENT_CALL_INTERFACE_METHOD(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* interface_name, const char* method_name, int32_t args_stack_length, int32_t* error, char* tmp_buffer) {
   int32_t entity_method_id = env->get_instance_method_id(env, stack, object, method_name);
   if (entity_method_id < 0) {
     memset(tmp_buffer, sizeof(tmp_buffer), 0);

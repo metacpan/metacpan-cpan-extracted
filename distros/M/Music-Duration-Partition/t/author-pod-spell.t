@@ -18,14 +18,22 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+Advanced
 Boggs
 Duration
 Gene
+Instantiation
 Music
 Partition
+Quickstart
+Tutorial
+VLC
+Voss
 durations
 gene
 hn
+homebrew
 lib
 qn
+th
 wn

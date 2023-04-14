@@ -473,6 +473,21 @@ class TestCase::ExchangeAPI {
     return $values;
   }
 
+  static method return_any_object_array_only : object[] ($values : object[]) {
+    
+    return $values;
+  }
+
+  static method return_muldim_array_only : byte[][] ($values : byte[][]) {
+    
+    return $values;
+  }
+  
+  static method return_mulnum_array_only : Complex_2d[] ($values : Complex_2d[]) {
+    
+    return $values;
+  }
+  
   static method argument_perl_array_ref_to_spvm_string_array : int ($values : string[], $undef : string[]) {
     
     unless (@$values == 4) {
@@ -1332,5 +1347,16 @@ class TestCase::ExchangeAPI {
   
   static method optional_args_int : int ($args0 : int, $args1 = 5 : int) {
     return $args0 + $args1;
+  }
+  
+  static method die : void ($message : string) {
+    
+    die $message;
+  }
+  
+  static method die_with_error_code : void ($message : string, $error_code : int) {
+    
+    set_error_code($error_code);
+    die $message;
   }
 }

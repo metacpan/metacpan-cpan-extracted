@@ -5,12 +5,13 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.signaturefiles
 bin/pronom2wxhexeditor.pl
 bin/pronom_statistics.pl
 bin/pronomidentify.pl
 dist.ini
 lib/File/FormatIdentification/Pronom.pm
 lib/File/FormatIdentification/Regex.pm
-t/DROID_SignatureFile_V93.xml
+t/DROID_SignatureFile_V111.xml
 t/File/FormatIdentification/Pronom.t
 t/File/FormatIdentification/Regex.t

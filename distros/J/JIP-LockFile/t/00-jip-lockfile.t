@@ -11,8 +11,8 @@ use English qw(-no_match_vars);
 BEGIN {
     plan tests => 12;
 
-    use_ok 'JIP::LockFile', '0.062';
-};
+    use_ok 'JIP::LockFile', '0.063';
+}
 
 my $NEED_TMP_FILE = 1;
 
@@ -34,57 +34,57 @@ subtest 'Require some module' => sub {
 subtest 'new()' => sub {
     plan tests => 7;
 
-    eval { JIP::LockFile->new };
+    eval { JIP::LockFile->new() };
     if ($EVAL_ERROR) {
         like $EVAL_ERROR, qr{Mandatory \s argument \s "lock_file" \s is \s missing}x;
     }
 
-    eval { JIP::LockFile->new(lock_file => undef) };
+    eval { JIP::LockFile->new( lock_file => undef ) };
     if ($EVAL_ERROR) {
         like $EVAL_ERROR, qr{Bad \s argument \s "lock_file"}x;
     }
 
-    eval { JIP::LockFile->new(lock_file => q{}) };
+    eval { JIP::LockFile->new( lock_file => q{} ) };
     if ($EVAL_ERROR) {
         like $EVAL_ERROR, qr{Bad \s argument \s "lock_file"}x;
     }
 
-    my $obj = init_obj();
-    ok $obj, 'got instance of JIP::LockFile';
+    my $sut = init_sut();
+    ok $sut, 'got instance of JIP::LockFile';
 
-    isa_ok $obj, 'JIP::LockFile';
+    isa_ok $sut, 'JIP::LockFile';
 
-    can_ok $obj, qw(new lock_file lock try_lock unlock is_locked error);
+    can_ok $sut, qw(new lock_file lock try_lock unlock is_locked error);
 
-    is $obj->lock_file, $EXECUTABLE_NAME;
+    is $sut->lock_file(), $EXECUTABLE_NAME;
 };
 
 subtest 'not is_locked() at startup' => sub {
     plan tests => 1;
 
-    cmp_ok init_obj()->is_locked, q{==}, 0;
+    cmp_ok init_sut()->is_locked(), q{==}, 0;
 };
 
 subtest 'unlock on non-is_locked() changes nothing' => sub {
     plan tests => 2;
 
-    is ref(init_obj()->unlock), 'JIP::LockFile';
-    cmp_ok init_obj()->is_locked, q{==}, 0;
+    is ref( init_sut()->unlock() ), 'JIP::LockFile';
+    cmp_ok init_sut()->is_locked(), q{==}, 0;
 };
 
 subtest 'lock()' => sub {
     plan tests => 5;
 
-    my $obj = init_obj($NEED_TMP_FILE);
+    my $sut = init_sut($NEED_TMP_FILE);
 
-    is ref($obj->lock), 'JIP::LockFile';
-    cmp_ok $obj->is_locked, q{==}, 1;
+    is ref( $sut->lock() ), 'JIP::LockFile';
+    cmp_ok $sut->is_locked(), q{==}, 1;
 
     # Re-locking changes nothing
-    is ref($obj->lock), 'JIP::LockFile';
-    cmp_ok $obj->is_locked, q{==}, 1;
+    is ref( $sut->lock() ), 'JIP::LockFile';
+    cmp_ok $sut->is_locked(), q{==}, 1;
 
-    is_deeply $obj->get_lock_data, {
+    is_deeply $sut->get_lock_data(), {
         pid             => $PROCESS_ID,
         executable_name => $EXECUTABLE_NAME,
     };
@@ -93,14 +93,14 @@ subtest 'lock()' => sub {
 subtest 'unlock()' => sub {
     plan tests => 3;
 
-    my $obj = init_obj($NEED_TMP_FILE)->lock;
+    my $sut = init_sut($NEED_TMP_FILE)->lock();
 
-    ok -f $obj->lock_file;
+    ok -f $sut->lock_file();
 
-    $obj->unlock;
+    $sut->unlock();
 
-    cmp_ok $obj->is_locked, q{==}, 0;
-    ok not -f $obj->lock_file;
+    cmp_ok $sut->is_locked(), q{==}, 0;
+    ok not -f $sut->lock_file();
 };
 
 subtest 'unlocking on scope exit' => sub {
@@ -109,9 +109,9 @@ subtest 'unlocking on scope exit' => sub {
     my $lock_file;
 
     {
-        my $obj = init_obj($NEED_TMP_FILE);
-        $lock_file = $obj->lock_file;
-        $obj->lock;
+        my $sut = init_sut($NEED_TMP_FILE);
+        $lock_file = $sut->lock_file();
+        $sut->lock();
     }
 
     ok not -f $lock_file;
@@ -120,18 +120,16 @@ subtest 'unlocking on scope exit' => sub {
 subtest 'Lock or raise an exception' => sub {
     plan tests => 4;
 
-    my $obj = init_obj($NEED_TMP_FILE)->lock;
+    my $sut = init_sut($NEED_TMP_FILE)->lock();
 
-    my $lock_file        = quotemeta $obj->lock_file;
+    my $lock_file        = quotemeta $sut->lock_file();
     my $lock_file_quoted = $lock_file;
 
-    my $concurrent_obj = JIP::LockFile->new(lock_file => $obj->lock_file);
+    my $concurrent_sut = JIP::LockFile->new( lock_file => $sut->lock_file() );
 
-    is $concurrent_obj->error, undef;
+    is $concurrent_sut->error(), undef;
 
-    eval {
-        $concurrent_obj->lock;
-    };
+    eval { $concurrent_sut->lock(); };
     if ($EVAL_ERROR) {
         my $last_error = quotemeta $OS_ERROR;
 
@@ -143,69 +141,69 @@ subtest 'Lock or raise an exception' => sub {
         }x;
     }
 
-    is $concurrent_obj->error, $OS_ERROR;
+    is $concurrent_sut->error(), $OS_ERROR;
 
-    is_deeply $obj->get_lock_data, $concurrent_obj->get_lock_data;
+    is_deeply $sut->get_lock_data(), $concurrent_sut->get_lock_data();
 };
 
 subtest 'try_lock()' => sub {
     plan tests => 7;
 
-    my $obj       = init_obj($NEED_TMP_FILE)->try_lock;
-    my $lock_file = $obj->lock_file;
+    my $sut       = init_sut($NEED_TMP_FILE)->try_lock();
+    my $lock_file = $sut->lock_file();
 
     # Re-locking changes nothing
-    cmp_ok $obj->try_lock->is_locked, q{==}, 1;
+    cmp_ok $sut->try_lock->is_locked(), q{==}, 1;
 
-    my $concurrent_obj = JIP::LockFile->new(lock_file => $obj->lock_file);
+    my $concurrent_sut = JIP::LockFile->new( lock_file => $sut->lock_file() );
 
-    is $concurrent_obj->error, undef;
+    is $concurrent_sut->error(), undef;
 
     # Or just return undef
-    is($concurrent_obj->try_lock, undef);
+    is( $concurrent_sut->try_lock(), undef );
 
-    is $concurrent_obj->error, $OS_ERROR;
+    is $concurrent_sut->error(), $OS_ERROR;
 
-    is_deeply $obj->get_lock_data, {
+    is_deeply $sut->get_lock_data(), {
         pid             => $PROCESS_ID,
         executable_name => $EXECUTABLE_NAME,
     };
 
-    is_deeply $obj->get_lock_data, {
+    is_deeply $sut->get_lock_data(), {
         pid             => $PROCESS_ID,
         executable_name => $EXECUTABLE_NAME,
     };
 
-    is_deeply $obj->get_lock_data, $concurrent_obj->get_lock_data;
+    is_deeply $sut->get_lock_data(), $concurrent_sut->get_lock_data();
 };
 
 subtest 'get_lock_data() before lock' => sub {
     plan tests => 1;
 
-    my $obj = init_obj($NEED_TMP_FILE);
+    my $sut = init_sut($NEED_TMP_FILE);
 
-    is $obj->get_lock_data, undef;
+    is $sut->get_lock_data(), undef;
 };
 
 subtest 'get_lock_data() after lock' => sub {
     plan tests => 1;
 
-    my $obj = init_obj($NEED_TMP_FILE)->try_lock;
+    my $sut = init_sut($NEED_TMP_FILE)->try_lock();
 
-    is_deeply $obj->get_lock_data, {
+    is_deeply $sut->get_lock_data(), {
         pid             => $PROCESS_ID,
         executable_name => $EXECUTABLE_NAME,
     };
 };
 
-sub init_obj {
+sub init_sut {
     my ($need_tmp_file) = @ARG;
 
     my $lock_file
         = $need_tmp_file
-        ? File::Temp->new->filename
+        ? File::Temp->new->filename()
         : $EXECUTABLE_NAME;
 
-    return JIP::LockFile->new(lock_file => $lock_file);
+    return JIP::LockFile->new( lock_file => $lock_file );
 }
 

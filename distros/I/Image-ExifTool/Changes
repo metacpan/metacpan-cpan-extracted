@@ -4,8 +4,179 @@ ExifTool Version History
 
 RSS feed: https://exiftool.org/rss.xml
 
-Note: The most recent production release is Version 12.50. (Other versions are
+Note: The most recent production release is Version 12.60. (Other versions are
 considered development releases, and are not uploaded to MetaCPAN.)
+
+Apr. 5, 2023 - Version 12.60 (production release)
+
+  - Added a new Sony FileFormat value
+  - Added Validate warning about duplicate EXIF
+  - Added ability to edit JPEG APP1 EXIF segment with incorrect header
+  - Decode a few new Sony ARW tags
+  - Improved -htmldump of non-EXIF-based maker notes
+  - Enhanced -geotag from CSV files support GPSSpeed (with variable units),
+    "bearing" for GPSTrack, and GPSDateTime in format "dd.mm.YYYY HH:MM:SS"
+  - Enhanced ImageDataMD5 to also support CRW, RAF, X3F and AVIF images
+  - Enhanced -efile option to also record updated and created file names
+  - Family 8 group names may now also be used in Composite Require/Desire tags
+  - Fixed handling of undefined tags in -if conditions to conform with
+    documentation and match -p and -tagsFromFile behaviour when -m or -f option
+    is used
+  - Fixed problem where setting the Geotime value didn't work when using an
+    advanced-formatting expression containing a greater-than symbol (>)
+
+Mar. 28, 2023 - Version 12.59
+
+  - COMPATIBILITY WARNING: Changed the calculated ImageDataMD5 for JPEG images
+    to include all data from the SOS to the EOI (including the SOS marker but
+    not the EOI marker)
+  - Added new -fileNUM option to load tags from alternate files
+  - Added family 8 groups for accessing tags from alternate files
+  - Added new XMP-et:OriginalImageMD5 tag for storing ImageDataMD5 value
+  - Added verbose ImageDataMD5 message for JPEG files
+  - Added a new Nikon LensID (thanks Warren Hatch)
+  - Decode a new Olympus tag and improved decoding of another (thanks Herb)
+  - Decode a couple of new PanasonicRaw tags
+  - Decode image coordinates for a couple more VNT object types
+  - Enhanced ImageDataMD5 to also support MRW, CR3, IIQ, PNG, MOV/MP4 and some
+    RIFF-based files
+  - Improved verbose messages when deleting NikonApp trailer
+  - Patched to avoid structure warnings when copying tags from Nikon files
+    containing NKSC metadata
+  - Fixed %-C filename format code to work properly with the -fileOrder and
+    -progress options
+  - Fixed potential ValueConv warning when reading LIF files
+  - API Changes:
+      - Added SetAlternateFile method
+
+Mar. 15, 2023 - Version 12.58
+
+  - Added Extra ImageDataMD5 tag to calculate MD5 of image data only
+  - Added support for reading DJI APP4 and APP7 JPEG segments
+  - Added a new SonyModelID value
+  - Decode a few new Nikon tags (thanks Warren Hatch)
+  - Downgraded "Windows file times" to a minor warning when Win32::API or
+    Win32API::File is not installed while reading metadata
+  - Patched possible runtime warning when API IgnoreTags option is used to
+    ignore FileType
+  - Fixed problem extracting NetName from Windows LNK files
+  - Fixed issue where the %C filename format code would increment the count on
+    an output filename collision, but it is supposed to count the input files
+
+Feb. 23, 2023 - Version 12.57
+
+  - Added two new Nikon Z lenses (thanks LibRaw)
+  - Added a new Sigma LensType (thanks LibRaw)
+  - Added a new Olympus LensType (thanks Herb)
+  - Decode more new Nikon tags (thanks Warren Hatch)
+  - Decode Photoshop LayerColors, LayerSections and LayerVisible tags
+  - Improved Verbose output for QuickTime-format files
+  - Set family 1 group name for Garmin GPS from uuid atom
+  - Enhanced -progress option to allow message to be displayed every NUM files
+  - Significant improvements to parsing of Nikon ShotInfo records for newer
+    models
+  - Removed hex dump of APP segments from -v3 output when writing
+  - Fixed bug writing negative MIE GPS coordinates
+  - Fixed bug where a duplicate XMP could be generated when writing XMP to a
+    JPEG XL image which already contained XMP
+  - Fixed problem where HEAD lines may be duplicated in an output file if the -p
+    option was combined with -w+ or -W+
+
+Feb. 9, 2023 - Version 12.56
+
+  - Added support for VNT files (both Scene7 Vignette and V-Note document)
+  - Added read support for InfiRay IJPEG metadata (thanks Marcos Del Sol Vives)
+  - Added some new Sony LensType values (thanks Jos Roost and Francois Piette)
+  - Added a new FujiFilm VideoRecordingMode value (thanks Greybeard)
+  - Added two new Canon LensTypes and CanonModelIDs (thanks Norbert Wasser)
+  - Added ability to extract semantic images from Apple ProRaw DNG files
+  - Added read support for the PNG cICP chunk
+  - Decode more Nikon tags (thanks Warren Hatch)
+  - Extract PreviewImage from Insta360 trailer record 0x200
+  - Extract EmbeddedImageRectangle and some other new tags from VNT files
+  - Minor improvement to arg_files/xmp2exif.args (thanks StarGeek)
+  - Enhanced -ee option to extract metadata from all frames of a multipart EXR
+    image
+  - Removed EXR Layout tag and incorporated into new Flags tag
+  - Patched possible hang problem when reading corrupted .rm audio files
+
+Jan. 17, 2023 - Version 12.55
+
+  - Added support for geotagging from FlightAware KML files
+  - Decode two more types of timed GPS from MOV/MP4 videos (66 types now)
+  - Decode a few new Nikon tags (thanks Warren Hatch)
+  - Decode a new Samsung HEIC tag
+  - Decode FujiFilm RollAngle
+  - Fixed bug where the FlatName property wasn't working properly for some
+    user-defined structure tags
+
+Jan. 6, 2023 - Version 12.54
+
+  - Decode a number of new Apple tags (thanks Frank Rupprecht)
+  - Increased precision of Sony FocusDistance2 conversion
+  - Fixed problem where GPSAltitude wasn't being set when geotagging from KML
+    files
+  - Fixed bug writing HEIC/AVIF files which have a zero-sized mdat (ie. media
+    data extends to end of file) which could cause an incorrect mdat size to be
+    written
+
+Jan. 4, 2023 - Version 12.53
+
+  - Added support for a number of new XMP tags written by ACR 15.1
+  - Added a new Nikon LensID
+  - Decode timed GPS from Lamax S9 dual dashcam MOV videos
+  - Decode a number of new Nikon tags (thanks Warren Hatch)
+  - Decode a couple of new Canon tags (thanks John Moyer)
+  - Decode FujiFilm BWMagentaGreen tag
+  - Enable block-write of EXIF to JXL files
+  - Accept values of "now" and "Z" when writing EXIF OffsetTime tags
+  - Changed priority of XMP when reading/writing HEIC files so that it is no
+    longer preferred as with other QuickTime-based formats
+  - Changed family 1 group name of Canon DR4 tags from CanonVRD to CanonDR4 to
+    allow newer tags to be differentiated from older ones.  The family 0 group
+    name for both remains CanonVRD
+  - Patched to recognize JXL EXIF box with non-zero header length
+  - Patched to avoid runtime error when writing a PDF with an Info dictionary
+    which was stored incorrectly as a direct object
+  - Fixed problem writing EXIF to JXL images where a new EXIF box was created
+    even if one previously existed
+
+Dec. 6, 2022 - Version 12.52
+
+  - Added a few new Nikon LensID's (thanks LibRaw and Chris)
+  - Added Slovak translations (thanks Peter Bagin)
+  - Made SphericalVideoXML readable/writable as a block
+  - Improved handling of Matroska metadata tags, including language support
+  - Improved French translations (thanks Philippe Bonnaure of GraphicConverter)
+  - Improved Composite:GPSAltitude conversion to honour -lang setting
+  - Improved -v2 messages to indicate files extracted from zip archives
+
+Nov. 21, 2022 - Version 12.51
+
+  - Added a new Olympus LensType (thanks Herb)
+  - Extract C2PA JUMBF metadata from PNG images and extract C2PA Salt values
+  - Decode NikonSettings for Z9 firmware 3.0 (thanks Warren Hatch)
+  - Decode additional camm metadata from Insta360 Pro2 MP4 videos
+  - Improved Verbose output when writing Composite tags to add a "+" sign to
+    indicate related tags that are being written
+  - Enhanced -geotag option CSV format to support GPSImgDirection column
+  - Fixed problem where -w+ option didn't work in Windows if there were Unicode
+    characters in the path name
+  - Fixed problem where only the last image of the sequence was extracted
+    (multiple times) when using -ee2 to extract embedded images from FLIR SEQ
+    files
+  - Fixed issue where GPS reference directions may be unknowingly written when
+    using ExifTool 12.44 or later to write GPSLatitude or GPSLongitude without
+    specifying a group name.  The fix was to Avoid writing the Composite tags
+    unless the Composite group is specified explicitly
+  - Fixed -geotag to write orientation and track tags even if some tags in the
+    category were missing
+  - Fixed inconsistency in selecting which tag to output with the -json option
+    when multiple tags with the same JSON key exist and the -TAG# feature is
+    used to disable print conversion
+  - Fixed problem writing QuickTime:PlayListID
+  - Fixed problem writing QuickTime tags when specifying tag ID (ie. family 7
+    group) as well as a language code
 
 Nov. 8, 2022 - Version 12.50 (production release)
 
@@ -41,6 +212,8 @@ Nov. 8, 2022 - Version 12.50 (production release)
   - Fixed decoding of AF points for some newer Nikon models
   - Fixed inconsistent year and time zone for Kenwood dashcam timed GPS in MP4
     videos
+
+History of older versions (back to Nov. 19, 2003 - Version 1.00) -->
 
 Oct. 19, 2022 - Version 12.49
 
@@ -219,7 +392,7 @@ Apr. 7, 2022 - Version 12.41
   - Enhanced -v0 option to also print new file name when renaming, moving or
     copying a file
   - Updated xmp2exif.args and exif2xmp.args helper files to reflect the IPTC
-    Photometadata Mapping Guidelines version 2202.1
+    Photometadata Mapping Guidelines version 2022.1
   - Made "Invalid Xxx data" a minor warning for MakerNote data
   - Patched to allow writing of MP4 videos which have other tracks with a
     missing sample description entry
@@ -419,8 +592,6 @@ Aug. 12, 2021 - Version 12.30 (production release)
     profile to be added back later since QuickTime item property containers
     currently can't be created)
   - Patched to remove 2 GB size limit when reading Photoshop ImageSourceData
-
-History of older versions (back to Nov. 19, 2003 - Version 1.00) -->
 
 July 9, 2021 - Version 12.29
 

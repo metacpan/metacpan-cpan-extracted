@@ -6,6 +6,9 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use lib 't/lib';
+use Helper;
+
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
@@ -14,6 +17,9 @@ use JSON::Schema::Modern::Document::OpenAPI;
 use JSON::Schema::Modern::Utilities 'jsonp';
 use YAML::PP;
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
+
+# the document where most constraints are defined
+use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
@@ -80,6 +86,7 @@ YAML
     'extracted the correct location of all operationIds',
   );
 
+
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js = JSON::Schema::Modern->new,
@@ -89,9 +96,9 @@ YAML
   cmp_deeply(
     [ map $_->TO_JSON, $doc->errors ],
     [ map +{
-        instanceLocation => '',
-        keywordLocation => $_.'/operationId',
-        absoluteKeywordLocation => Mojo::URL->new('http://localhost:1234/api')->fragment($_.'/operationId')->to_string,
+        instanceLocation => $_.'/operationId',
+        keywordLocation => '',
+        absoluteKeywordLocation => SCHEMA,
         error => 'duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete',
       },
       (
@@ -107,6 +114,15 @@ YAML
     ],
     'duplicate operationIds all identified',
   );
+
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/components/callbacks/callback_a/$url_a/patch/operationId': duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete
+'/components/pathItems/path_item_c/get/callbacks/callback_d/$url_d/patch/operationId': duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete
+'/components/pathItems/path_item_c/get/operationId': duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete
+'/paths/~1foo~1{foo_id}/post/callbacks/callback_f/$url_f/patch/operationId': duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete
+'/paths/~1foo~1{foo_id}/post/operationId': duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete
+'/webhooks/webhook_b/put/operationId': duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete
+ERRORS
 };
 
 done_testing;

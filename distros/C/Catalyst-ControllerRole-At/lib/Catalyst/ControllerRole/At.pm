@@ -1,7 +1,7 @@
 package Catalyst::ControllerRole::At;
 
 use Moose::Role;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 sub _parse_At_attr {
   my ($self, $app, $action_subname, $value) = @_;
@@ -79,7 +79,7 @@ sub _parse_At_attr {
   }
 
   if(
-    my ($key, $value) = map { $_ =~ /^(.*?)(?:\(\s*(.+?)\s*\))?$/ } grep { $_ =~m/^Via\(.+\)$/ } 
+    my ($key, $value) = map { $_ =~ /^(.*?)(?:\(\s*['"]?(.+?)['"]?\s*\))?$/ } grep { $_ =~m/^Via\(.+\)$/ } 
       @{$self->meta->get_method($action_subname)->attributes||[]})
   {
     $chained = join '/', grep { defined $_  } map { $expansions{$_} ? $expansions{$_} : $_ } split('\/',$value);

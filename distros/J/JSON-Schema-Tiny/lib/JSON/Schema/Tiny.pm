@@ -1,10 +1,10 @@
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.018-5-gca48552
+package JSON::Schema::Tiny; # git description: v0.019-2-gecd0a20
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use experimental 0.026 qw(signatures postderef args_array_with_signatures);
@@ -1273,7 +1273,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

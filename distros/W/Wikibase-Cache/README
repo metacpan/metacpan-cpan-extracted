@@ -1,0 +1,127 @@
+NAME
+    Wikibase::Cache - Wikibase cache class.
+
+SYNOPSIS
+     use Wikibase::Cache;
+
+     my $obj = Wikibase::Cache->new(%params);
+     my $backend_ret = $obj->get($type, $key);
+     my $backend_ret = $obj->save($type, $key, $value);
+
+METHODS
+  "new"
+     my $obj = Wikibase::Cache->new(%params);
+
+    Constructor.
+
+    *       "backend"
+
+            Wikibase::Cache::Backend backend class.
+
+            Default value is 'Basic' = Wikibase::Cache::Backend::Basic.
+
+    Returns instance of object.
+
+  "get"
+     my $backend_ret = $obj->get($type, $key);
+
+    Get cached value for $type and $key. Example $type is 'label' and $key
+    is Wikidata QID like 'Q42'. Returns something like 'Douglas Adams'.
+
+    Returns backend return value(s).
+
+  "save"
+     my $backend_ret = $obj->save($type, $key, $value);
+
+    Save cached value for $type and $key. Example $type is 'label' and $key
+    is Wikidata QID like 'Q42' (Douglas Adams). Another example $type is
+    'description' and $key is Wikidata QID like 'Q42' (English science
+    fiction writer and humourist).
+
+    Returns backend return value(s).
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             Backend must inherit 'Wikibase::Cache::Backend' abstract class.
+             Cannot load module '%s'.
+                     Error: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Wikibase::Cache;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 qid_or_pid\n";
+             exit 1;
+     }
+     my $qid_or_pid = $ARGV[0];
+
+     # Object.
+     my $obj = Wikibase::Cache->new;
+
+     # Get translated QID.
+     my $translated_qid_or_pid = $obj->get('label', $qid_or_pid) || $qid_or_pid;
+
+     # Print out.
+     print $translated_qid_or_pid."\n";
+
+     # Output for nothing:
+     # Usage: ./get_cached_value.pl qid_or_pid
+
+     # Output for 'P31':
+     # instance of
+
+     # Output for 'Q42':
+     # Q42
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure qw(err);
+     use Wikibase::Cache;
+
+     $Error::Pure::TYPE = 'Error';
+
+     # Object.
+     my $obj = Wikibase::Cache->new;
+
+     # Save label for 'Q42'.
+     $obj->save('label', 'Q42', 'Douglas Adams');
+
+     # Get translated QID.
+     my $translated_qid = $obj->get('label', 'Q42');
+
+     # Print out.
+     print $translated_qid."\n";
+
+     # Output:
+     # #Error [../Wikibase/Cache/Backend/Basic.pm:60] Wikibase::Cache::Backend::Basic doesn't implement save() method.
+
+DEPENDENCIES
+    Class::Utils, English, Error::Pure.
+
+SEE ALSO
+    Wikibase::Cache::Backend
+        TODO
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-Cache>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

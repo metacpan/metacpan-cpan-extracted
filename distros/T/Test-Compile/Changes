@@ -1,5 +1,19 @@
 Revision history for Perl extension Test-Compile
 
+v3.2.2	  2023-04-06
+    - Finally understand (and fix?) the test failures on windows
+
+v3.2.1	  2023-04-05
+    - Try to resolve some issues highlighted by CpanTesters
+
+v3.2.0	  2023-04-03
+    - Sort the output of all_pl_files() and all_pm_files()
+
+v3.1.1	  2023-03-28
+    - Proof read and correct the POD
+    - Be more consistent about where we search for files (by default)
+    - Update copyright (2023)
+
 v3.1.0	  2022-06-02
     - (Tom Hukins) Treat files with .psgi extensions as perl
     - (Tom Hukins) Look for file in a case insensitive manner

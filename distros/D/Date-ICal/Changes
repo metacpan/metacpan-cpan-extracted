@@ -1,3 +1,8 @@
+2023-04-04  skim
+
+    * RT#147274: Fix link to datetime project (http://datetime.perl.org is dead).
+    * Update README file.
+
 2022-09-07  skim
 
     * RT#124548: Fix year in timegm(), four digit number now.

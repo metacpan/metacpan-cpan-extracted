@@ -6,9 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Acme/CPANModules/FakeData.pm',
+    'Acme/CPANModules/GeneratingFakeData.pm',
+    'Acme/CPANModules/GeneratingMockData.pm',
+    'Acme/CPANModules/GeneratingRandomData.pm',
+    'Acme/CPANModules/MockData.pm',
     'Acme/CPANModules/RandomData.pm'
 );
 

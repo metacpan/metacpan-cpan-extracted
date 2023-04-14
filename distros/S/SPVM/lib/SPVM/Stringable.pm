@@ -34,3 +34,9 @@ Interface methods.
   required method to_string : string ();
 
 The implementation must return the string expression.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

@@ -106,3 +106,9 @@ Sets C<tms_cstime>.
 
   $tv->set_tms_cstime(12);
 
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

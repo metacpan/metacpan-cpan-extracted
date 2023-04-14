@@ -1,6 +1,6 @@
 use v5.12.0;
 use warnings;
-package Test::Routine::Compositor 0.030;
+package Test::Routine::Compositor 0.031;
 # ABSTRACT: the tool for turning test routines into runnable classes
 
 use Carp qw(confess);
@@ -84,7 +84,7 @@ Test::Routine::Compositor - the tool for turning test routines into runnable cla
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 PERL VERSION
 

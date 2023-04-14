@@ -134,6 +134,14 @@ sub check {
   return $self->constraints->renew(@args)->result;
 }
 
+sub checker {
+  my ($self, $data) = @_;
+
+  $self->expression($data) if $data;
+
+  return $self->defer('check');
+}
+
 sub clear {
   my ($self) = @_;
 
@@ -576,10 +584,11 @@ sub validate {
 }
 
 sub validator {
-  my ($self) = @_;
-  return sub {
-    $self->validate(@_)
-  }
+  my ($self, $data) = @_;
+
+  $self->expression($data) if $data;
+
+  return $self->defer('validate');
 }
 
 sub value {
@@ -1367,6 +1376,39 @@ I<Since C<1.23>>
   my $check = $assert->check(time);
 
   # 0
+
+=back
+
+=cut
+
+=head2 checker
+
+  checker(Str $expr) (CodeRef)
+
+The checker method calls L</expression> with the type assertion signature
+provided and returns a coderef which calls the L</check> method when called.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item checker example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $checker = $assert->checker('string');
+
+  # sub { ... }
+
+  # $checker->('hello');
+
+  # true
+
+  # $checker->(['goodbye']);
+
+  # false
 
 =back
 
@@ -2927,7 +2969,7 @@ I<Since C<1.23>>
 
 =head2 validator
 
-  validator() (CodeRef)
+  validator(Str $expr) (CodeRef)
 
 The validator method returns a coderef that can be used as a value validator,
 which returns the data provided if the data provided passes the registered
@@ -2943,11 +2985,17 @@ I<Since C<1.40>>
 
   package main;
 
-  $assert->constraint(float => sub { $_->value > 1 });
+  my $validator = $assert->validator('string');
 
-  my $result = $assert->validator;
+  # sub { ... }
 
-  # sub {...}
+  # $validator->('hello');
+
+  # "hello"
+
+  # $validator->(['goodbye']);
+
+  # Exception! (isa Venus::Error)
 
 =back
 

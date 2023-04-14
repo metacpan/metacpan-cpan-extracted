@@ -7,7 +7,7 @@ use Moose;
 use namespace::autoclean;
 
 #------------------------------------------------------------------------------
-# 继承 PDK::Device::Role 方法属性,同时具体实现其指定方法
+# 继承 Net::Connector::Role 方法属性,同时具体实现其指定方法
 #------------------------------------------------------------------------------
 with 'PDK::Device::Role';
 
@@ -16,7 +16,7 @@ with 'PDK::Device::Role';
 #------------------------------------------------------------------------------
 sub _prompt {
   my $self   = shift;
-  my $prompt = '(?:>> Standalone ADC) - (.*?)# ';
+  my $prompt = '>> Standalone ADC - (.*?)# ';
   return $prompt;
 }
 
@@ -87,7 +87,14 @@ sub _errorCodes {
 #------------------------------------------------------------------------------
 sub _bufferCodes {
   my $self    = shift;
-  my %mapping = (more => '--more--', interact => {'Display private keys' => "n", 'Confirm Sync to Peer' => "y",});
+  my %mapping = (
+    more     => '--more--',
+    interact => {
+      'Display private keys'                                => "n\n",
+      'Confirm Sync to Peer'                                => "y\n",
+      'Enter passphrase for key \'\/root\/\.ssh\/id_rsa\':' => "18688992112\r"
+    }
+  );
 
   # 返回数据字典
   return \%mapping;

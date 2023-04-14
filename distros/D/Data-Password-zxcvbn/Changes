@@ -1,3 +1,21 @@
+1.1.2     2023-04-04 15:50:54+01:00 Europe/London
+ - *actually* re-generate dictionaries with the new serialisation;
+    perl 5.18 couldn't parse the previous one
+
+1.1.1     2023-04-04 10:43:32+01:00 Europe/London
+ - change serialisation of dictionaries, some cpantesters had problems
+   parsing them
+ - fix dependency versions
+
+1.1.0     2023-04-03 15:05:29+01:00 Europe/London
+ - authoring this distribution now requires the modules in
+   Data::Password::zxcvbn::AuthorTools
+ - the list of most common passwords has been updated: the previous
+   list was at least 20 years old, this one is only 3 years old
+ - some dictionaries have been renamed (male_names ->
+   english_male_names, for example) to better support non-English
+   dictionaries
+
 1.0.6     2022-08-18 09:29:41+01:00 Europe/London
  - declare minimum perl version, use mro explicitly
 

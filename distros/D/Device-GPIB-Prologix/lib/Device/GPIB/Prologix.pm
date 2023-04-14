@@ -9,10 +9,10 @@ package Device::GPIB::Prologix;
 use strict;
 use Device::SerialPort;
 
-$Device::GPIB::Prologix::VERSION = '0.04';
+$Device::GPIB::Prologix::VERSION = '0.06';
 $Device::GPIB::Prologix::debug = 0;
 
-sub new
+sub new($$)
 {
     my ($class, $port) = @_;
 
@@ -55,12 +55,14 @@ sub new
     $self->{serialport}->read_const_time(0);
     $self->{serialport}->stty_icanon(0);
 
+    $self->{CurrentAddress} = -1;
+    
     return unless $self->initialised();
 
     return $self;
 }
 
-sub initialised
+sub initialised($)
 {
     my ($self) = @_;
 
@@ -72,7 +74,7 @@ sub initialised
     return 1; # OK
 }
 
-sub send
+sub send($$)
 {
     my ($self, $s) = @_;
     
@@ -84,7 +86,15 @@ sub send
     $self->{serialport}->write("\n"); # Trigger transmission
 }
 
-sub read_to_timeout
+sub sendTo($$)
+{
+    my ($self, $s, $addr) = @_;
+    
+    $self->addr($addr) if defined $addr;
+    $self->send($s);
+}
+
+sub read_to_timeout($)
 {
     my ($self) = @_;
 
@@ -95,12 +105,12 @@ sub read_to_timeout
 	my $x = unpack('H*', $ch);
 	debug("got $count, $ch: $x");
 	return $buf
-	    unless $count;
+	    unless $count;  # Timeout
 	$buf .= $ch;
     }
 }
 
-sub read_to_eol
+sub read_to_eol($)
 {
     my ($self) = @_;
 
@@ -112,7 +122,12 @@ sub read_to_eol
 	{
 	    my $x = unpack('H*', $ch);
 	    debug("got $count, $ch: $x");
-	    if ($ch eq "\r")
+	    if ($ch eq ';' && $self->{EOIMode}) # Experimental
+	    {
+		# Not EOI/LF mode, so this is the last char
+		last;
+	    }
+	    elsif ($ch eq "\r")
 	    {
 		# ignore CR
 	    }
@@ -137,33 +152,44 @@ sub read_to_eol
     return $buf;
 }
 
-sub read
+# REad until a char or timeout.
+# $waitfor can be either 'eoi' or the decimal number of the char < 256
+sub read_until_timeout_or($$)
 {
-    my ($self, $eoi) = @_;
-
+    my ($self, $waitfor) = @_;
+    
     my $cmd = '++read';
-    $cmd .= ' eoi'
-	if defined($eoi);
-    $self->send($cmd);   
+    $cmd .= " $waitfor"
+	if defined($waitfor);
+    $self->send($cmd);
     return $self->read_to_eol();
 }
 
-sub read_binary
+sub read($)
 {
-    my ($self) = @_;
+    my ($self, $addr) = @_;
 
+    $self->addr($addr) if defined $addr;
+    return $self->read_until_timeout_or('eoi'); # Only works if EOI is enabled
+}
+
+sub read_binary($)
+{
+    my ($self, $addr) = @_;
+
+    $self->addr($addr) if defined $addr;
     $self->send('++read eoi');   
     return $self->read_to_timeout();
 }
 
-sub warning
+sub warning($)
 {
     my ($s) = @_;
 
     print "WARNING: $s\n";
 }
 
-sub debug
+sub debug($)
 {
     my ($s) = @_;
 
@@ -171,7 +197,7 @@ sub debug
 	if $Device::GPIB::Prologix::debug;
 }
 
-sub close
+sub close($)
 {
     my ($self) = @_;
 
@@ -182,7 +208,7 @@ sub close
     }
 }
 
-sub DESTROY
+sub DESTROY($)
 {
     my ($self) = @_;
 
@@ -193,7 +219,7 @@ sub DESTROY
 ### Implementations of low level Prologix commands
 ###
 
-sub version
+sub version($)
 {
     my ($self) = @_;
 
@@ -203,7 +229,7 @@ sub version
     return $self->read_to_eol();
 }
 
-sub auto
+sub auto($$)
 {
     my ($self, $value) = @_;
     
@@ -219,17 +245,21 @@ sub auto
     }
 }
 
-sub addr
+sub addr($$$)
 {
     my ($self, $addr, $sad) = @_;
     
     if (defined($addr))
     {
-	my $cmd = "++addr $addr";
-	$cmd .= " $sad"
-	    if defined $sad;
-	$self->send($cmd);
-	return;
+	if ($addr != $self->{CurrentAddress})
+	{
+	    my $cmd = "++addr $addr";
+	    $cmd .= " $sad"
+		if defined $sad;
+	    $self->send($cmd);
+	    $self->{CurrentAddress} = $addr;
+	    return;
+	}
     }
     else
     {
@@ -238,14 +268,15 @@ sub addr
     }
 }
 
-sub clr
+sub clr($)
 {
-    my ($self) = @_;
+    my ($self, $addr) = @_;
 
+    $self->addr($addr) if defined $addr;
     $self->send('++clr');   
 }
 
-sub eoi
+sub eoi($$)
 {
     my ($self, $val) = @_;
 
@@ -261,7 +292,7 @@ sub eoi
     }
 }
 
-sub eos
+sub eos($$)
 {
     my ($self, $val) = @_;
 
@@ -277,7 +308,7 @@ sub eos
     }
 }
 
-sub eot_enable
+sub eot_enable($$)
 {
     my ($self, $val) = @_;
 
@@ -293,7 +324,7 @@ sub eot_enable
     }
 }
 
-sub eot_char
+sub eot_char($$)
 {
     my ($self, $val) = @_;
 
@@ -309,28 +340,30 @@ sub eot_char
     }
 }
 
-sub ifc
+sub ifc($)
 {
     my ($self) = @_;
 
     $self->send('++ifc');   
 }
 
-sub llo
+sub llo($)
 {
-    my ($self) = @_;
+    my ($self, $addr) = @_;
 
+    $self->addr($addr) if defined $addr;
     $self->send('++llo');   
 }
 
-sub loc
+sub loc($)
 {
-    my ($self) = @_;
+    my ($self, $addr) = @_;
 
+    $self->addr($addr) if defined $addr;
     $self->send('++loc');   
 }
 
-sub lon
+sub lon($$)
 {
     my ($self, $val) = @_;
 
@@ -346,7 +379,7 @@ sub lon
     }
 }
 
-sub mode
+sub mode($$)
 {
     my ($self, $val) = @_;
 
@@ -362,21 +395,21 @@ sub mode
     }
 }
 
-sub read_tmo_ms
+sub read_tmo_ms($$)
 {
     my ($self, $val) = @_;
 
     $self->send('++read_tmo_ms ' . int($val));
 }
 
-sub rst
+sub rst($)
 {
     my ($self) = @_;
 
     $self->send('++rst');   
 }
 
-sub savecfg
+sub savecfg($$)
 {
     my ($self, $val) = @_;
 
@@ -392,11 +425,11 @@ sub savecfg
     }
 }
 
-sub spoll
+sub spoll($$$)
 {
     my ($self, $addr, $sad) = @_;
     
-    my $cmd = 'spoll';
+    my $cmd = '++spoll';
     $cmd .= " $addr"
 	if defined($addr);
     $cmd .= " $sad"
@@ -404,7 +437,7 @@ sub spoll
     $self->send($cmd);
 }
 
-sub srq
+sub srq($)
 {
     my ($self) = @_;
 
@@ -412,7 +445,7 @@ sub srq
     return $self->read_to_eol();
 }
 
-sub status
+sub status($$)
 {
     my ($self, $val) = @_;
 
@@ -428,18 +461,17 @@ sub status
     }
 }
 
-sub trg
+sub trg($@)
 {
     my ($self, @addrs) = @_;
 
     my $cmd = '++trg';
     while (@addrs)
     {
-	$cmd .+ ' ' . shift(@addrs);
+	$cmd .= ' ' . shift(@addrs);
     }
     $self->send($cmd);
 }
-
 
 1;
 
@@ -448,12 +480,15 @@ __END__
 =head1 NAME
 
 Device::GPIB::Prologix - Interface to Prologix GPIB-USB Controller
+This module is now obsoleted by and replaced by Device::GPIB::Controllers::Prologix, 
+part of the new Device::GPIB module.
 
 =head1 SYNOPSIS
 
   use Device::GPIB::Prologix;
   my $d = Device::GPIB::Prologix->new('/dev/ttyUSB0');
-  $d->send('id?');
+  my $address = 17;
+  $d->sendTo($address, 'id?');
   my $id = $d->read();
 
 =head1 DESCRIPTION
@@ -479,6 +514,12 @@ None by default.
 $d->send($command);
 
 Sends the $command to the currently addressed device.
+
+=item sendTo
+
+$d->sendTo($address, $command);
+
+Sets the current address if necessary, sends the $command to the specified device.
 
 =item read_to_timeout
 
@@ -556,7 +597,7 @@ Sends the Selected Device Clear (SDC) message to the currently specified GPIB ad
 
 =item eoi
 
-$d->eoi($bool;
+$d->eoi($bool);
 
 Enables or disables the assertion of the EOI signal with the last character.
 
@@ -697,6 +738,12 @@ Specify the device status byte to be returned when serial polled by a GPIB contr
 $d->trg($pad1, $sad1, ......);
 
 issues Group Execute Trigger GPIB command to devices at the specified addresses. Up to 15 addresses maybe specified.
+
+=item id
+
+$d->id()
+
+Queries the device for its ID and retuens it. If there is no device at the assigned address, returns empty string
 
 =back
 

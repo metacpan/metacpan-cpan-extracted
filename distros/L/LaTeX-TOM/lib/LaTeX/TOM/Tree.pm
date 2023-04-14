@@ -12,7 +12,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # "constructor"
 #
@@ -187,7 +187,7 @@ sub toLaTeX {
     foreach my $node (@{$tree->{nodes}}) {
 
         if ($node->{type} eq 'TEXT' ||
-                $node->{type} eq 'COMMENT') {
+            $node->{type} eq 'COMMENT') {
 
             $str .= $node->{content};
         }

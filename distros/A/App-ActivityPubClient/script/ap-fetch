@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+# AP-Client: CLI-based client / toolbox for ActivityPub
+# Copyright © 2020-2023 AP-Client Authors <https://hacktivis.me/git/ap-client/>
+# SPDX-License-Identifier: BSD-3-Clause
+use strict;
+use utf8;
+use open ":std", ":encoding(UTF-8)";
+our $VERSION = 'v0.1.3';
+
+use Getopt::Std;
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use JSON;
+use App::ActivityPubClient qw(print_object);
+
+=head1 NAME
+
+ap-fetch - Fetch ActivityStream object, optionally pretty printing it
+
+=head1 SYNOPSIS
+
+B<ap-fetch> [-r|-j|-u <user:pass>] <URI>
+
+=head1 DESCRIPTION
+
+ap-fetch fetches an URI, decodes it as an ActivityStream object.
+
+=over 4
+
+=item B<-j>
+
+Pipe into jq(1)
+
+=item B<-r>
+
+Raw output, print server's output without any decoding
+
+=item B<-u user:pass>
+
+Pass username and password for HTTP Basic Auth.
+
+=back
+
+=head1 LICENSE
+
+BSD-3-Clause
+
+=cut
+
+my %options = ();
+my $ua      = LWP::UserAgent->new;
+
+getopts("rju:", \%options);
+
+if ($#ARGV != 0) {
+	print "usage: ap-fetch.pl [-r|-j|-u user:pass] <url>\n";
+	print " -j  Pipe into jq(1)\n";
+	print " -r  Raw output\n";
+	print " -u user:pass  HTTP Basic Auth credentials\n";
+	print
+"By default, when -j and -r are absent it pipes the data into ap-represent.pl.\n";
+	exit 1;
+}
+
+$ua->agent("AP-Client fetch <https://hacktivis.me/git/ap-client/>");
+my $req = HTTP::Request->new(GET => $ARGV[0]);
+$req->header('Accept' => 'application/activity+json');
+
+if (defined $options{u}) {
+	my ($user, $password) = split(/:/, $options{u});
+	$req->authorization_basic($user, $password);
+}
+
+my $res = $ua->request($req);
+
+if ($res->is_success) {
+	my $content_type  = $res->header("Content-Type");
+	my $content_match = qr{^application/([^+]*\+)?json(; .*)?};
+
+	if ($content_type =~ $content_match) {
+		if (defined $options{r}) {
+			print $res->content;
+		} elsif (defined $options{j}) {
+			open(my $pipe_out, '|-', 'jq .')
+			  or die "Couldn't open a pipe into jq: $!";
+			print $pipe_out $res->content;
+			close($pipe_out);
+		} else {
+			my $object = decode_json($res->content);
+			print_object(1, $object);
+			print "\n";
+		}
+	} else {
+		print STDERR "Got $content_type instead of $content_match\n";
+		exit 1;
+	}
+} else {
+	print STDERR "Got $res->status_line instead of 2xx\n";
+	exit 1;
+}

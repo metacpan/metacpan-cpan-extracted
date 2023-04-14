@@ -6,14 +6,25 @@ use Config                        qw( %Config );
 use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 my %WriteMakefileArgs = (
-  NAME          => 'MooX::Role::HasLogger',
-  AUTHOR        => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
-  VERSION_FROM  => 'lib/MooX/Role/HasLogger.pm',
-  ABSTRACT_FROM => 'lib/MooX/Role/HasLogger.pod',
-  LICENSE       => 'Perl_5',
-  META_MERGE    => {
+  NAME             => 'MooX::Role::HasLogger',
+  AUTHOR           => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
+  VERSION_FROM     => 'lib/MooX/Role/HasLogger.pm',
+  ABSTRACT_FROM    => 'lib/MooX/Role/HasLogger.pod',
+  LICENSE          => 'Perl_5',
+  MIN_PERL_VERSION => '5.8.9',
+  META_MERGE       => {
     'meta-spec' => { version => 2 },
-    resources   => {
+    provides    => {
+      'MooX::Role::HasLogger' => {
+        file    => 'lib/MooX/Role/HasLogger.pm',
+        version => '0.001002',
+      },
+      'MooX::Role::HasLogger::Types' => {
+        file    => 'lib/MooX/Role/HasLogger/Types.pm',
+        version => '0.001002',
+      },
+    },
+    resources => {
       repository => {
         type => 'git',
         url  => 'git://github.com/XSven/MooX-Role-HasLogger.git',
@@ -24,35 +35,13 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   clean     => { FILES    => 'MooX-Role-HasLogger-* cover_db' },
+  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   realclean => { FILES    => 'local' },
+  test      => { RECURSIVE_TEST_FILES => 1 },
 );
 
-unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) ) {
-  my $local_lib = "$ENV{ PWD }/local/lib/perl5";
-  require lib; lib->import( $local_lib );
-
-  no warnings 'once';
-  *MY::postamble = sub {
-    my $make_fragment .= <<"MAKE_FRAGMENT";
-ifdef PERL5LIB
-  PERL5LIB := $local_lib:\$(PERL5LIB)
-else
-  export PERL5LIB := $local_lib
-endif
-
-.PHONY: installdeps
-installdeps: cpanfile
-	cpanm --no-man-pages --local-lib-contained $local_lib/../.. --installdeps .
-
-.PHONY: cover
-cover:
-	cover -test -ignore local -report vim
-MAKE_FRAGMENT
-
-    return $make_fragment;
-  }
-}
+require './maint/AuthorExtensions.pl'
+  unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) );
 
 WriteMakefile( %WriteMakefileArgs );

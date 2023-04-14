@@ -1,10 +1,10 @@
 package POE::Filter::PPPHDLC;
 
-use 5.006001;
+use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub DEBUG () { 0 }
 
@@ -12,7 +12,9 @@ sub HDLC_BUFFER () { 0 }
 
 sub new {
   my $class = shift;
-  return bless [''], $class;
+  return bless [
+    '', # HDLC_BUFFER
+  ], $class;
 }
 
 # only arg is an array ref of chunks
@@ -110,7 +112,10 @@ sub PPPGOODFCS16 () { 0xf0b8 } # Good final FCS value
 
 sub _pppfcs16 {
   my $fcs = shift;
-  $fcs = ($fcs >> 8) ^ $fcstab[($fcs ^ ord($1)) & 0xff] while $_[0] =~ m/(.)/g;
+  # BUGFIX: https://rt.cpan.org/Public/Bug/Display.html?id=141718
+  # As above, the /s is important.  If it is omitted, the . will not match \n
+  # and the checksum calculation will be wrong.
+  $fcs = ($fcs >> 8) ^ $fcstab[($fcs ^ ord($1)) & 0xff] while $_[0] =~ m/(.)/sg;
   return $fcs & 0xffff;
 }
 
@@ -124,7 +129,6 @@ sub _frame_check {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
@@ -151,7 +155,7 @@ RFC1662.
 
 =head1 AUTHOR
 
-Benjamin Smith, E<lt>bsmith@cpan.orgE<gt>
+Benjamin Smith E<lt>bsmith@cabbage.org.ukE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

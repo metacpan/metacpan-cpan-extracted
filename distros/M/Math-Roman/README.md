@@ -257,7 +257,7 @@ I think this is really not needed, since you can always use:
 ## '0'-'9' as tokens
 
 0-9 in the token set produce wrong results in new() if the given argument
-consists only of 0-9. That is because first a BigInt is tried to be
+consists only of 0-9. That is because first a Math::BigInt is tried to be
 constructed, and in this case, would succeed.
 
 ## Reporting bugs

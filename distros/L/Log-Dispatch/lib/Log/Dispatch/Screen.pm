@@ -3,7 +3,7 @@ package Log::Dispatch::Screen;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Encode qw( encode );
 use IO::Handle;
@@ -76,7 +76,7 @@ Log::Dispatch::Screen - Object for logging to the screen
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -97,14 +97,11 @@ version 2.70
 
 =head1 DESCRIPTION
 
-This module provides an object for logging to the screen (really
-C<STDOUT> or C<STDERR>).
+This module provides an object for logging to the screen (really C<STDOUT> or
+C<STDERR>).
 
-Note that a newline will I<not> be added automatically at the end of a
-message by default. To do that, pass C<< newline => 1 >>.
-
-The handle will be autoflushed, but this module opens it's own handle to fd 1
-or 2 instead of using the global C<STDOUT> or C<STDERR>.
+Note that a newline will I<not> be added automatically at the end of a message
+by default. To do that, pass C<< newline => 1 >>.
 
 =for Pod::Coverage new log_message
 
@@ -117,16 +114,17 @@ parameters documented in L<Log::Dispatch::Output>:
 
 =item * stderr (0 or 1)
 
-Indicates whether or not logging information should go to C<STDERR>. If
-false, logging information is printed to C<STDOUT> instead.
+Indicates whether or not logging information should go to C<STDERR>. If false,
+logging information is printed to C<STDOUT> instead.
 
 This defaults to true.
 
 =item * utf8 (0 or 1)
 
-If this is true, then the output uses C<binmode> to apply the
-C<:encoding(UTF-8)> layer to the relevant handle for output. This will not
-affect C<STDOUT> or C<STDERR> in other parts of your code.
+If this is true, then the output will be encoded using the UTF-8 encoding. If
+you have I<already> applied an encoding layer to the relevant filehandle,
+C<STDOUT> or C<STDERR>, then your output will end up double-encoded if this is
+true.
 
 This defaults to false.
 
@@ -135,8 +133,6 @@ This defaults to false.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -148,7 +144,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -5,6 +5,7 @@ lib/SPVM/Math.c
 lib/SPVM/Math.config
 lib/SPVM/Math.pm
 lib/SPVM/Math.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md

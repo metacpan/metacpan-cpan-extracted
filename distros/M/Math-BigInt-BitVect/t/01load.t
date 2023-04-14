@@ -6,15 +6,16 @@ use warnings;
 use Test::More tests => 2;
 
 BEGIN {
-    use_ok('Math::BigInt');
     use_ok('Math::BigInt::BitVect');
+    use_ok('Math::BigInt');         # Math::BigInt is required for the tests
 };
 
-my @mods = ('Math::BigInt',
+my @mods = (
+            'Math::BigInt',
             'Math::BigInt::Lib',
             'Math::BigInt::BitVect',
             'Bit::Vector',
-            );
+           );
 
 diag("");
 diag("Testing with Perl $], $^X");

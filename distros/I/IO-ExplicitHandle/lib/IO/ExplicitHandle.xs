@@ -3,34 +3,63 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
-#define PERL_DECIMAL_VERSION \
-	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
-#define PERL_VERSION_GE(r,v,s) \
-	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#define Q_PERL_VERSION_DECIMAL(r,v,s) ((r)*1000000 + (v)*1000 + (s))
+#define Q_PERL_DECIMAL_VERSION \
+	Q_PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define Q_PERL_VERSION_GE(r,v,s) \
+	(Q_PERL_DECIMAL_VERSION >= Q_PERL_VERSION_DECIMAL(r,v,s))
+#define Q_PERL_VERSION_LT(r,v,s) \
+	(Q_PERL_DECIMAL_VERSION < Q_PERL_VERSION_DECIMAL(r,v,s))
 
-#if !PERL_VERSION_GE(5,7,2)
+#if Q_PERL_VERSION_LT(5,7,2)
 # undef dNOOP
 # define dNOOP extern int Perl___notused_func(void)
 #endif /* <5.7.2 */
 
+#if (Q_PERL_VERSION_GE(5,17,6) && Q_PERL_VERSION_LT(5,17,11)) || \
+	(Q_PERL_VERSION_GE(5,19,3) && Q_PERL_VERSION_LT(5,21,1))
+PERL_STATIC_INLINE void suppress_unused_warning(void)
+{
+	(void) S_croak_memory_wrap;
+}
+#endif /* (>=5.17.6 && <5.17.11) || (>=5.19.3 && <5.21.1) */
+
+#ifndef SVfARG
+# define SVfARG(p) ((void *)(p))
+#endif /* !SVfARG */
+
 #ifndef hv_fetchs
 # define hv_fetchs(hv, keystr, lval) \
-		hv_fetch(hv, ""keystr"", sizeof(keystr)-1, lval)
+		hv_fetch(hv, "" keystr "", sizeof(keystr)-1, lval)
 #endif /* !hv_fetchs */
 
 #ifndef hv_deletes
 # define hv_deletes(hv, keystr, flags) \
-		hv_delete(hv, ""keystr"", sizeof(keystr)-1, flags)
+		hv_delete(hv, "" keystr "", sizeof(keystr)-1, flags)
 #endif /* !hv_deletes */
 
 #ifndef newSVpvs
-# define newSVpvs(string) newSVpvn(""string"", sizeof(string)-1)
+# define newSVpvs(string) newSVpvn("" string "", sizeof(string)-1)
 #endif /* !newSVpvs */
 
-#ifndef qerror
-# define qerror(m) Perl_qerror(aTHX_ m)
-#endif /* !qerror */
+#if Q_PERL_VERSION_GE(5,9,5)
+# ifndef qerror
+#  define qerror(m) Perl_qerror(aTHX_ m)
+# endif /* !qerror */
+#else /* <5.9.5 */
+# undef qerror
+# define qerror(m) THX_qerror(aTHX_ m)
+static void THX_qerror(pTHX_ SV *msg)
+{
+	if(PL_in_eval)
+		sv_catsv(ERRSV, msg);
+	else if(PL_errors)
+		sv_catsv(PL_errors, msg);
+	else
+		Perl_warn(aTHX_ "%" SVf "", SVfARG(msg));
+	PL_error_count++;
+}
+#endif /* <5.9.5 */
 
 #ifndef GvNAMELEN_get
 # define GvNAMELEN_get GvNAMELEN
@@ -40,15 +69,15 @@
 # define GvNAME_get GvNAME
 #endif /* !GvNAME_get */
 
-#if !PERL_VERSION_GE(5,9,3)
+#if Q_PERL_VERSION_LT(5,9,3)
 typedef OP *(*Perl_check_t)(pTHX_ OP *);
 #endif /* <5.9.3 */
 
-#if !PERL_VERSION_GE(5,10,1)
+#if Q_PERL_VERSION_LT(5,10,1)
 typedef unsigned Optype;
 #endif /* <5.10.1 */
 
-#if PERL_VERSION_GE(5,7,3)
+#if Q_PERL_VERSION_GE(5,7,3)
 # define PERL_UNUSED_THX() NOOP
 #else /* <5.7.3 */
 # define PERL_UNUSED_THX() ((void)(aTHX+0))
@@ -70,7 +99,7 @@ static void THX_wrap_op_checker(pTHX_ Optype opcode,
 }
 #endif /* !wrap_op_checker */
 
-#define Q_HAVE_SAY PERL_VERSION_GE(5,9,3)
+#define Q_HAVE_SAY Q_PERL_VERSION_GE(5,9,3)
 
 #define STRICT_HINT_KEY "IO::ExplicitHandle/strict"
 
@@ -126,7 +155,7 @@ static OP *THX_myck_rv2sv(pTHX_ OP *op)
 	if(op->op_type == OP_RV2SV && (op->op_flags & OPf_KIDS) &&
 			(rvop = cUNOPx(op)->op_first) &&
 			(rvop->op_type == OP_GV) && (gv = cGVOPx_gv(rvop)) &&
-			GvNAMELEN_get(gv) == 1) {
+			isGV((SV*)gv) && GvNAMELEN_get(gv) == 1) {
 		char nc = *GvNAME_get(gv);
 		switch(nc) {
 			case '|':

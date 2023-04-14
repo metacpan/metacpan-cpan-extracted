@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 ## Main object
 
@@ -593,7 +593,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

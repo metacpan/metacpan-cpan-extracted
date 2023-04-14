@@ -1,5 +1,6 @@
 name = "App-optex"
 readme_from = "script/optex"
+abstract_from = "script/optex"
 script_files = [ "script/optex" ]
 # badges = ["travis"]
 authority="cpan:UTASHIRO"

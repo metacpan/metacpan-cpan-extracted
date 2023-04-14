@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/pdfgrep/pdfgrep
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/pdfgrep/pdfgrep",
@@ -42,11 +42,15 @@ pdfgrep - Short alias for grep-from-pdf
 
 =head1 VERSION
 
-This document describes version 0.014 of pdfgrep (from Perl distribution App-PDFUtils), released on 2022-10-07.
+This document describes version 0.015 of pdfgrep (from Perl distribution App-PDFUtils), released on 2023-02-10.
 
 =head1 SYNOPSIS
 
-B<pdfgrep> [B<--all>] [B<--color>=I<str>] [B<--count>|B<-c>] [B<--dash-prefix-inverts>|B<--no-dash-prefix-inverts>|B<--nodash-prefix-inverts>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [(B<--file>=I<filename>)+|B<--files-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--ignore-case>|B<-i>|B<--no-ignore-case>|B<--noignore-case>] [B<--invert-match>|B<-v>|B<--no-invert-match>|B<--noinvert-match>] [B<--line-number>|B<-n>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet-arg>|B<-q>|B<--silent>] [(B<--regexp>=I<str>)+|B<--regexps-json>=I<json>|(B<-e>=I<str>)+] -- [I<pattern>] [I<file>] ...
+B<pdfgrep> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<pdfgrep> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<pdfgrep> [B<L<--all|/"--all">>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--count|/"--count, -c">>|B<L<-c|/"--count, -c">>] [B<L<--dash-prefix-inverts|/"--dash-prefix-inverts">>|B<L<--no-dash-prefix-inverts|/"--dash-prefix-inverts">>|B<L<--nodash-prefix-inverts|/"--dash-prefix-inverts">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--invert-match|/"--invert-match, -v">>|B<L<-v|/"--invert-match, -v">>|B<L<--no-invert-match|/"--invert-match, -v">>|B<L<--noinvert-match|/"--invert-match, -v">>] [B<L<--line-number|/"--line-number, -n">>|B<L<-n|/"--line-number, -n">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quiet-arg|/"--quiet-arg, --silent, -q">>|B<L<-q|/"--quiet-arg, --silent, -q">>|B<L<--silent|/"--quiet-arg, --silent, -q">>] [(B<L<--regexp|/"--regexps-json=s">>=I<str>)+|B<L<--regexps-json|/"--regexps-json=s">>=I<json>|(B<L<-e|/"--regexps-json=s">>=I<str>)+] -- [I<L<pattern|/"--pattern=s">>] [I<L<file|/"--files-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -80,13 +84,19 @@ Can also be specified as the 2nd command-line argument and onwards.
 
 =item B<--pattern>=I<s>
 
+Specify *string* to search for.
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--regexp>=I<s@>
 
+Specify additional *regexp pattern* to search for.
+
 Can be specified multiple times.
 
 =item B<--regexps-json>=I<s>
+
+Specify additional *regexp pattern* to search for (JSON-encoded).
 
 See C<--regexp>.
 
@@ -106,6 +116,8 @@ Can be specified multiple times.
 
 =item B<--color>=I<s>
 
+Specify when to show color (never, always, or auto/when interactive).
+
 Default value:
 
  "auto"
@@ -119,6 +131,8 @@ Valid values:
 Supress normal output, return a count of matching lines.
 
 =item B<--quiet-arg>, B<--silent>, B<-q>
+
+Do not print matches, only return appropriate exit code.
 
 =back
 
@@ -179,6 +193,8 @@ Google search and a few other search engines.
 
 =item B<--ignore-case>, B<-i>
 
+If set to true, will search case-insensitively.
+
 =item B<--invert-match>, B<-v>
 
 Invert the sense of matching.
@@ -190,6 +206,8 @@ Invert the sense of matching.
 =over
 
 =item B<--line-number>, B<-n>
+
+Show line number along with matches.
 
 =back
 
@@ -335,7 +353,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

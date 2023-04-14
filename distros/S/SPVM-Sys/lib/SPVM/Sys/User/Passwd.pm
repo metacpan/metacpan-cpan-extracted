@@ -67,3 +67,10 @@ Get the home directory.
   method pw_shell : string ();
 
 Get the shell program.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

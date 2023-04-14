@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Email::Sender::Simple" => "2.600",
     "Email::Stuffer" => "0.020",
     "List::AllUtils" => "0.19",
+    "Mail::DMARC::PurePerl" => "1.20230215",
     "Moo" => "2.005005",
     "Moo::Role" => "2.005005",
     "MooX::Traits" => "0.005",
@@ -43,15 +44,16 @@ my %WriteMakefileArgs = (
     "Data::Printer" => "1.001000",
     "Email::Sender::Transport::Test" => "2.600",
     "Import::Into" => "1.002005",
+    "Net::DNS::Resolver::Mock" => "1.20230216",
     "Path::Tiny" => "0.144",
     "Test2::API" => "1.302192",
     "Test2::V0" => "0.000145",
     "URI" => "5.17",
     "lib" => "0.65"
   },
-  "VERSION" => "1.1.1",
+  "VERSION" => "1.1.2",
   "test" => {
-    "TESTS" => "t/*.t t/tests/*.t t/tests/sietima/*.t t/tests/sietima/multi-role/*.t t/tests/sietima/role/*.t t/tests/sietima/role/subscriberonly/*.t"
+    "TESTS" => "t/*.t t/tests/*.t t/tests/sietima/*.t t/tests/sietima/multi-role/*.t t/tests/sietima/role/*.t t/tests/sietima/role/nospoof/*.t t/tests/sietima/role/subscriberonly/*.t"
   }
 );
 
@@ -68,9 +70,11 @@ my %FallbackPrereqs = (
   "Email::Stuffer" => "0.020",
   "Import::Into" => "1.002005",
   "List::AllUtils" => "0.19",
+  "Mail::DMARC::PurePerl" => "1.20230215",
   "Moo" => "2.005005",
   "Moo::Role" => "2.005005",
   "MooX::Traits" => "0.005",
+  "Net::DNS::Resolver::Mock" => "1.20230216",
   "Path::Tiny" => "0.144",
   "Test2::API" => "1.302192",
   "Test2::V0" => "0.000145",

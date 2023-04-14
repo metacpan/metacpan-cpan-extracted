@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.43.2';
+our $VERSION = 'v0.45.0';
 
 =head1 NAME
 
@@ -133,6 +133,22 @@ has default_service_type => (
 
 
 
+has default_environment => (
+    is          => 'ro',
+    should      => Str,
+    predicate   => 1,
+);
+
+
+
+has default_hostname => (
+    is          => 'ro',
+    should      => Str,
+    predicate   => 1,
+);
+
+
+
 sub build_span {
     my $self = shift;
     my %opts = @_;
@@ -177,6 +193,12 @@ sub build_context {
     my $service_type  = delete $opts{ service_type }
         || $self->default_service_type;
     
+    my $environment   = delete $opts{ environment }
+        || $self->default_environment;
+    
+    my $hostname   = delete $opts{ hostname }
+        || $self->default_hostname;
+    
     my $span_context = SpanContext->new(
         
         %opts,
@@ -188,6 +210,12 @@ sub build_context {
         
         maybe
         service_type    => $service_type,
+        
+        maybe
+        environment     => $environment,
+        
+        maybe
+        hostname        => $hostname,
         
     );
     
@@ -209,12 +237,16 @@ sub inject_context_into_hash_reference   {
         $carrier,
         {
             opentracing_context => {
-                trace_id  => $context->trace_id,
-                span_id   => $context->span_id,
-                resource  => $context->get_resource_name,
-                service   => $context->get_service_name,
+                trace_id      => $context->trace_id,
+                span_id       => $context->span_id,
+                resource      => $context->get_resource_name,
+                service       => $context->get_service_name,
                 maybe
-                type      => $context->get_service_type,
+                type          => $context->get_service_type,
+                maybe
+                environment   => $context->get_environment,
+                maybe
+                hostname      => $context->get_hostname,
             }
             
         }

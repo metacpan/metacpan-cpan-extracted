@@ -4,7 +4,7 @@ SPVM::Document::Modules - SPVM Standard Modules
 
 =head1 Description
 
-The list of SPVM Standard Modules. All Standard modules are yet experimental status.
+The list of SPVM Standard Modules. All Standard classes are yet experimental status.
 
 =head1 Standard Modules
 
@@ -108,15 +108,11 @@ The list of SPVM Standard Modules. All Standard modules are yet experimental sta
 
 =item * L<StringList|SPVM::StringList>
 
-=item * L<Time|SPVM::Time>
-
-=item * L<Time::Info|SPVM::Time::Info>
-
 =back
 
 =head1 CPAN Modules
 
-The list of some CPAN modules. All CPAN modules are yet experimental status.
+The list of some CPAN classes. All CPAN classes are yet experimental status.
 
 =over 2
 
@@ -160,13 +156,13 @@ The list of some CPAN modules. All CPAN modules are yet experimental status.
 
 =item * L<Regex|SPVM::Regex>
 
-=item * L<Resource::RE2|SPVM::Resource::RE2>
+=item * L<Resource::Libpng|SPVM::Resource::Libpng>
 
-=item * L<Resource::Re2::V2022_06_01|SPVM::Resource::Re2::V2022_06_01>
+=item * L<Resource::RE2|SPVM::Resource::RE2>
 
 =item * L<Resource::SocketUtil|SPVM::Resource::SocketUtil>
 
-=item * L<Resource::Zlib::V1_2_11|SPVM::Resource::Zlib::V1_2_11>
+=item * L<Resource::Zlib|SPVM::Resource::Zlib>
 
 =item * L<Sys|SPVM::Sys>
 
@@ -195,3 +191,9 @@ The list of some CPAN modules. All CPAN modules are yet experimental status.
 =item * L<Unicode|SPVM::Unicode>
 
 =back
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

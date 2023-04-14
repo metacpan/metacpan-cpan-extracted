@@ -1,6 +1,134 @@
+# 			 The "Artistic License"
+# 
+# 				Preamble
+# 
+# The intent of this document is to state the conditions under which a
+# Package may be copied, such that the Copyright Holder maintains some
+# semblance of artistic control over the development of the package,
+# while giving the users of the package the right to use and distribute
+# the Package in a more-or-less customary fashion, plus the right to make
+# reasonable modifications.
+# 
+# Definitions:
+# 
+# 	"Package" refers to the collection of files distributed by the
+# 	Copyright Holder, and derivatives of that collection of files
+# 	created through textual modification.
+# 
+# 	"Standard Version" refers to such a Package if it has not been
+# 	modified, or has been modified in accordance with the wishes
+# 	of the Copyright Holder as specified below.
+# 
+# 	"Copyright Holder" is whoever is named in the copyright or
+# 	copyrights for the package.
+# 
+# 	"You" is you, if you're thinking about copying or distributing
+# 	this Package.
+# 
+# 	"Reasonable copying fee" is whatever you can justify on the
+# 	basis of media cost, duplication charges, time of people involved,
+# 	and so on.  (You will not be required to justify it to the
+# 	Copyright Holder, but only to the computing community at large
+# 	as a market that must bear the fee.)
+# 
+# 	"Freely Available" means that no fee is charged for the item
+# 	itself, though there may be fees involved in handling the item.
+# 	It also means that recipients of the item may redistribute it
+# 	under the same conditions they received it.
+# 
+# 1. You may make and give away verbatim copies of the source form of the
+# Standard Version of this Package without restriction, provided that you
+# duplicate all of the original copyright notices and associated disclaimers.
+# 
+# 2. You may apply bug fixes, portability fixes and other modifications
+# derived from the Public Domain or from the Copyright Holder.  A Package
+# modified in such a way shall still be considered the Standard Version.
+# 
+# 3. You may otherwise modify your copy of this Package in any way, provided
+# that you insert a prominent notice in each changed file stating how and
+# when you changed that file, and provided that you do at least ONE of the
+# following:
+# 
+#     a) place your modifications in the Public Domain or otherwise make them
+#     Freely Available, such as by posting said modifications to Usenet or
+#     an equivalent medium, or placing the modifications on a major archive
+#     site such as uunet.uu.net, or by allowing the Copyright Holder to include
+#     your modifications in the Standard Version of the Package.
+# 
+#     b) use the modified Package only within your corporation or organization.
+# 
+#     c) rename any non-standard executables so the names do not conflict
+#     with standard executables, which must also be provided, and provide
+#     a separate manual page for each non-standard executable that clearly
+#     documents how it differs from the Standard Version.
+# 
+#     d) make other distribution arrangements with the Copyright Holder.
+# 
+# 4. You may distribute the programs of this Package in object code or
+# executable form, provided that you do at least ONE of the following:
+# 
+#     a) distribute a Standard Version of the executables and library files,
+#     together with instructions (in the manual page or equivalent) on where
+#     to get the Standard Version.
+# 
+#     b) accompany the distribution with the machine-readable source of
+#     the Package with your modifications.
+# 
+#     c) give non-standard executables non-standard names, and clearly
+#     document the differences in manual pages (or equivalent), together
+#     with instructions on where to get the Standard Version.
+# 
+#     d) make other distribution arrangements with the Copyright Holder.
+# 
+# 5. You may charge a reasonable copying fee for any distribution of this
+# Package.  You may charge any fee you choose for support of this
+# Package.  You may not charge a fee for this Package itself.  However,
+# you may distribute this Package in aggregate with other (possibly
+# commercial) programs as part of a larger (possibly commercial) software
+# distribution provided that you do not advertise this Package as a
+# product of your own.  You may embed this Package's interpreter within
+# an executable of yours (by linking); this shall be construed as a mere
+# form of aggregation, provided that the complete Standard Version of the
+# interpreter is so embedded.
+# 
+# 6. The scripts and library files supplied as input to or produced as
+# output from the programs of this Package do not automatically fall
+# under the copyright of this Package, but belong to whoever generated
+# them, and may be sold commercially, and may be aggregated with this
+# Package.  If such scripts or library files are aggregated with this
+# Package via the so-called "undump" or "unexec" methods of producing a
+# binary executable image, then distribution of such an image shall
+# neither be construed as a distribution of this Package nor shall it
+# fall under the restrictions of Paragraphs 3 and 4, provided that you do
+# not represent such an executable image as a Standard Version of this
+# Package.
+# 
+# 7. C subroutines (or comparably compiled subroutines in other
+# languages) supplied by you and linked into this Package in order to
+# emulate subroutines and variables of the language defined by this
+# Package shall not be considered part of this Package, but are the
+# equivalent of input as in Paragraph 6, provided these subroutines do
+# not change the language in any way that would cause it to fail the
+# regression tests for the language.
+# 
+# 8. Aggregation of this Package with a commercial distribution is always
+# permitted provided that the use of this Package is embedded; that is,
+# when no overt attempt is made to make this Package's interfaces visible
+# to the end user of the commercial distribution.  Such use shall not be
+# construed as a distribution of this Package.
+# 
+# 9. The name of the Copyright Holder may not be used to endorse or promote
+# products derived from this software without specific prior written permission.
+# 
+# 10. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+# WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
 package Net::validMX;
 
 use strict;
+use warnings;
+
 use Net::DNS;
 
 use vars qw(
@@ -18,7 +146,7 @@ BEGIN {
     require Exporter;
 
     @ISA     = qw(Exporter DynaLoader);
-    $VERSION = '2.5.0';
+    $VERSION = '2.5.1';
     $DEBUG   = 0;
     $ALLOW_IP_ADDRESS_AS_MX = 1;
     $FLAG_INTRANETS = 1;
@@ -31,27 +159,31 @@ sub version      { $VERSION; }
 @EXPORT_OK = qw(check_valid_mx get_output_result check_email_and_mx check_email_validity get_domain_from_email);
 
 sub new {
-  my (%self) = @_;
+  my $self = bless {}, shift;
 
-  my ($self);
-
-  $DEBUG = $self{'debug'} if ($self{'debug'} ne '');
-  $ALLOW_IP_ADDRESS_AS_MX = $self{'allow_ip_address_as_mx'} if ($self{'allow_ip_address_as_mx'} ne '');
-  $FLAG_INTRANETS = $self{'flag_intranets'} if ($self{'flag_intranets'} ne '');
-  $RESOLUTION_PROBLEM_RETURN = $self{'resolution_problem_return'} if ($self{'resolution_problem_return'} ne '');
-  $QUERY_TIMEOUT = $self{'query_timeout'} if ($self{'query_timeout'} ne '');
-
-  $self = \%self;
-  bless $self;
+  $DEBUG = $self->{'debug'} if (defined $self->{'debug'} and $self->{'debug'} ne '');
+  $ALLOW_IP_ADDRESS_AS_MX = $self->{'allow_ip_address_as_mx'} if (defined $self->{'allow_ip_address_as_mx'} and $self->{'allow_ip_address_as_mx'} ne '');
+  $FLAG_INTRANETS = $self->{'flag_intranets'} if (defined $self->{'flag_intranets'} and $self->{'flag_intranets'} ne '');
+  $RESOLUTION_PROBLEM_RETURN = $self->{'resolution_problem_return'} if (defined $self->{'resolution_problem_return'} and $self->{'resolution_problem_return'} ne '');
+  $QUERY_TIMEOUT = $self->{'query_timeout'} if (defined $self->{'query_timeout'} and $self->{'query_timeout'} ne '');
 
   return $self;
+}
+
+sub get_debug {
+  return $DEBUG;
+}
+
+sub set_debug {
+  my $debug = shift;
+  $DEBUG = $debug;
 }
 
 sub get_output_result {
   my ($email, $rv, $reason) = @_;
   my ($output);
 
-  $output = "$email\n\tValid MX? ".&Net::validMX::int_to_truefalse($rv);
+  $output = "$email\n\tValid MX? ".Net::validMX::int_to_truefalse($rv);
   if ($reason ne '') {
     $output .= " - $reason";
   }
@@ -121,7 +253,7 @@ sub check_valid_mx {
     $res->udp_timeout($params{'query_timeout'});              #Number of Seconds before query will fail
 
     #Strip domain name from an email address
-    $domain = &get_domain_from_email($params{'email'});
+    $domain = get_domain_from_email($params{'email'});
 
     #Deny Explicit IP Address Domains
     if ($domain =~ /^\[.*\]$/) {
@@ -214,9 +346,9 @@ sub check_valid_mx {
             @answer2 = $packet->answer;
 
             print "DEBUG: $i - Resolution type of ".$answer[$i]->exchange.": ".$answer2[0]->type."\n" if $params{'debug'}; 
-            if ($answer2[0]->type eq "A") {
+            if ($answer2[0]->type =~ /^A{1,4}/) {
               print "DEBUG: $i - A Name Address for ".$answer[$i]->exchange.": ".$answer2[0]->address."\n" if $params{'debug'};
-              ($rv, $reason) = &invalid_mx($answer2[0]->address);
+              ($rv, $reason) = invalid_mx($answer2[0]->address);
               if ($rv == 1 or ($rv == 2 && $i == $#answer)) {
                 if ($rv == 2) {
                   $reason .= ' - All MX Records Failed';
@@ -241,7 +373,7 @@ sub check_valid_mx {
                   @answer3 = $packet->answer; 
                   print "DEBUG: $i - CNAME Resolution of Type: ".$answer3[0]->type." - Address: ".$answer3[0]->address."\n" if $params{'debug'};
                   if ($answer3[0]->type eq "A") {
-                    ($rv, $reason) = &invalid_mx($answer3[0]->address);
+                    ($rv, $reason) = invalid_mx($answer3[0]->address);
                     if ($rv == 1 or ($rv == 2 && $i == $#answer)) {
                       if ($rv == 2) {
                         $reason .= ' - All MX Records Failed';
@@ -261,7 +393,7 @@ sub check_valid_mx {
                 }
               } else {
                 if ($params{'allow_ip_address_as_mx'} > 0 && $answer[$i]->exchange =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) {
-                  ($rv, $reason) = &invalid_mx($answer[$i]->exchange);
+                  ($rv, $reason) = invalid_mx($answer[$i]->exchange);
                   if ($rv) {
                     return (0, $reason);
                   } else {
@@ -288,7 +420,7 @@ sub check_valid_mx {
             } else {
               #PERHAPS WE'LL ALLOW AN IP ADDRESS AS AN MX FOR CLOWNS WHO CONFIGURE DNS INCORRECTLY
               if ($params{'allow_ip_address_as_mx'} > 0 && $answer[$i]->exchange =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) {
-                ($rv, $reason) = &invalid_mx($answer[$i]->exchange);
+                ($rv, $reason) = invalid_mx($answer[$i]->exchange);
                 if ($rv) {
                   return (0, $reason);
                 } else {
@@ -300,6 +432,8 @@ sub check_valid_mx {
 
             # Keep looping, unless this was the last answer in the MX
             # resolution packet.
+            # XXX $packet->header->ancount, in the case of corrupt packets,
+            # may differ from the actual number of records and may return unwanted failures
             if ($i == $#answer) {
 
               #MX RECORD RETURNED DOES NOT RESOLVE
@@ -318,7 +452,7 @@ sub check_valid_mx {
     print "DEBUG: Checking Implicit MX is set to $check_implicit_mx\n" if $params{'debug'};
 
     if ($check_implicit_mx > 0) {
-      ($rv, $reason) = &check_implicit_mx($domain, $res, $params{'debug'}, $params{'resolution_problem_return'});
+      ($rv, $reason) = check_implicit_mx($domain, $res, $params{'debug'}, $params{'resolution_problem_return'});
       if (defined $rv) {
         return ($rv, $reason);
       }
@@ -333,7 +467,7 @@ sub check_valid_mx {
   return (1,'');
 }
 
-sub check_implicit_mx ($$) {
+sub check_implicit_mx {
   my ($SenderDomain, $res, $debug, $resolution_problem_return) = @_;
  
   my ($rv, $reason, $packet, @answer, @answer2, $resolution_problem_status);
@@ -361,7 +495,7 @@ sub check_implicit_mx ($$) {
     @answer = $packet->answer;
     if ($answer[0]->type eq "A") {
       print "DEBUG: $SenderDomain has no MX Records - Using Implicit A Record: ".$answer[0]->address."\n" if $debug;
-      ($rv, $reason) = &invalid_mx($answer[0]->address);
+      ($rv, $reason) = invalid_mx($answer[0]->address);
       if ($rv) {
         print "DEBUG: Test Failed - $reason\n" if $debug;
         return (0, $reason);
@@ -385,7 +519,7 @@ sub check_implicit_mx ($$) {
           @answer2 = $packet->answer;
           if ($answer2[0]->type eq "A") {
              print "DEBUG: CNAME Resolution of Type: ".$answer2[0]->type." - Address: ".$answer2[0]->address."\n" if $debug;
-            ($rv, $reason) = &invalid_mx($answer2[0]->address);
+            ($rv, $reason) = invalid_mx($answer2[0]->address);
             if ($rv > 0) {
               print "DEBUG: Test Failed - $reason\n" if $debug;
               return (0, $reason);
@@ -407,7 +541,7 @@ sub check_implicit_mx ($$) {
     print "DEBUG: Test Failed - $reason\n" if $debug;
     return (0, $reason);
   }
-  return undef;
+  return;
 }
 
 sub invalid_mx {
@@ -436,9 +570,24 @@ sub invalid_mx {
     return (2, "Invalid use of private IP (e.g. $ip) range for MX");
   }
 
+  #fc00::/7
+  if ($flag_intranets && $ip =~ /^fc00\:0\:/i) {
+    return (2, "Invalid use of unique local address (e.g. $ip) range for MX");
+  }
+
+  #fd00::/8
+  if ($flag_intranets && $ip =~ /^fd00\:0\:/i) {
+    return (2, "Invalid use of private IP (e.g. $ip) range for MX");
+  }
+
   #DHCP auto-discover added per Matthew van Eerde recomendation 169.254/16
   if ($ip =~ /^169\.254\./) {
     return (1, "Invalid use of a DHCP auto-discover IP range ($ip) as an MX record");
+  }
+
+  #IPv6 link-local addresses fe80::/10
+  if ($ip =~ /^fe80\:0\:/i) {
+    return (1, "Invalid use of a link-local IP range ($ip) as an MX record");
   }
 
   #Multicast 224/8 through 239/8 added per Matthew van Eerde recomendation
@@ -496,14 +645,14 @@ sub check_email_and_mx {
   print "DEBUG: e-mail address is now: $email<br>\n" if $debug;
 
   # CHECK FOR A VALIDLY CONSTRUCTED E-MAIL ADDRESS
-  ($rv) = &Net::validMX::check_email_validity($email);
+  ($rv) = Net::validMX::check_email_validity($email);
   
   if ($rv < 1) {
     return($rv, "Failed check_email_validity", $email);
   }
 
   # CHECK FOR VALID MX RECORD
-  ($rv, $fail_reason) = &Net::validMX::check_valid_mx($email);
+  ($rv, $fail_reason) = Net::validMX::check_valid_mx($email);
 
   if ($rv < 1) {
     return($rv, $fail_reason, $email);
@@ -621,7 +770,7 @@ sub dns_lookup {
 
 sub check_spf_for_domain {
   my ($domain, %params) = @_;
-  my ($dns, $query, $result, $spf_line, @clauses, $clause, $found_spf);
+  my ($dns, $query, $spf_line, @clauses, $found_spf);
 
   $dns = Net::DNS::Resolver->new;
   $query = $dns->search($domain, 'TXT');
@@ -630,7 +779,7 @@ sub check_spf_for_domain {
     return ("suspect", "no TXT record found");
   }
 
-  foreach $result ($query->answer) {
+  foreach my $result ($query->answer) {
     next unless $result->type eq 'TXT';
     $spf_line = $result->txtdata;
 
@@ -640,7 +789,7 @@ sub check_spf_for_domain {
       # split into clauses
       @clauses = split / /, $spf_line;
 
-      foreach $clause (@clauses) {
+      foreach my $clause (@clauses) {
         # ignore clauses that reject email - only false accepts are good spam indicators
         next if $clause =~ /^[-~]/;
         if ($clause =~ /^.?all/) {
@@ -702,7 +851,7 @@ To use the module in your programs you will use the line:
 To check if an email address could be valid by checking the DNS, call
 the function check_valid_mx with a single email address as the only argument:
 
-	($rv, $reason) = &Net::validMX::check_valid_mx('kevin.mcgrail@peregrinehw.com');
+	($rv, $reason) = Net::validMX::check_valid_mx('kevin.mcgrail@peregrinehw.com');
 
 check_valid_mx will return a true/false integer as the first value and a descriptive text message as warranted.
 
@@ -714,9 +863,9 @@ NOTE: In the event of a DNS resolution problem, we do NOT return a failure.  We 
 To check if an email address is formatted correctly, call the function
 check_email_validity with a single email address as the only argument:
 
-	$rv = &Net::validMX::check_valid_mx('kevin.mcgrail@peregrinehw.com');
+	$rv = Net::validMX::check_valid_mx('kevin.mcgrail@peregrinehw.com');
 
-check_email_validity will return a true/false integer where > 0 indicates that the email address looks valid.
+check_email_validity will return a true/false integer where E<gt> 0 indicates that the email address looks valid.
 
 
 =head2 check_email_and_mx
@@ -724,39 +873,59 @@ check_email_validity will return a true/false integer where > 0 indicates that t
 To check if an email address is formatted correctly, sanitize the email address some common end-user errors(*) and run check_valid_mx all from a single function, 
 use the function check_email_and_mx with a single email address as the only argument:
 
-        ($rv, $reason, $sanitized_email) = &Net::validMX::check_valid_mx('kevin.mcgrail@peregrinehw.com');
+        ($rv, $reason, $sanitized_email) = Net::validMX::check_valid_mx('kevin.mcgrail@peregrinehw.com');
 
-check_email_and_mx will return a true/false integer where > 0 indicates that the email address looks valid, a descriptive text message 
+check_email_and_mx will return a true/false integer where E<gt> 0 indicates that the email address looks valid, a descriptive text message 
 as warranted, and a sanitized version of the email address argument.
 
 (*) Common end-user errors that are fixed: 
+
+=over 4
 
 =item All spaces are stripped.  Many users seem to enter things like Bob and Carol @ a big isp.com.
 
 =item Emails ending in @aol. or @aol are fixed to be @aol.com.  Also done for hotmail.com, live.com & gmail.com.  
 
+=back
+
+=cut
+
 =head2 get_domain_from_email
+
+=over 4
 
 To extract the domain part and local part from an email address, use the function 
 get_domain_from_email with a single email address as the only argument:
 
-	$domain = &Net::validMX::get_domain_from_email('kevin.mcgrail@peregrinehw.com');
+	$domain = Net::validMX::get_domain_from_email('kevin.mcgrail@peregrinehw.com');
 
 get_domain_from_email will return a string with the domain part of the email address argument.
 
 Optionally, you can also receive the local part as well:
 
-        ($local, $domain) = &Net::validMX::get_domain_from_email('kevin.mcgrail@peregrinehw.com');
+        ($local, $domain) = Net::validMX::get_domain_from_email('kevin.mcgrail@peregrinehw.com');
 
--head2 check_spf_for_domain
+=back
+
+=cut
+
+=head2 check_spf_for_domain
+
+=over 4
 
 To check if a domain is properly configured to send email, call the function check_spf_for_domain with a domain name as the only argument:
 
-	($rv, $reason) = &Net::validMX::check_spf_for_domain('peregrinehw.com');
+	($rv, $reason) = Net::validMX::check_spf_for_domain('peregrinehw.com');
 
 check_spf_for_domain will return "valid", "suspect", or "bad" as the first value and a descriptive text message as warranted.
 
+=back
+
+=cut
+
 =head2 EXAMPLE
+
+=over 4
 
 The distribution contains an example program to demonstrate working functionality as well to utilize as a command line interface
 to query one or more email addresses.
@@ -770,6 +939,10 @@ or
 If you supply only one email address argument, the program will exit with a exit status of 0 for a success and 1 for a failure:
 
 	perl example/check_email_and_mx.pl kevin.mcgrail@failed || echo 'This email is no good'     
+
+=back
+
+=cut
 
 =head2 MIMEDEFANG
 
@@ -795,12 +968,12 @@ sub filter_sender {
   my ($rv, $reason);
   #md_syslog('warning', "Testing $sender, $ip, $hostname, $helo");
 
-  if (&is_authorized_sender($sender, $RelayAddr)) {
+  if (is_authorized_sender($sender, $RelayAddr)) {
     return ('CONTINUE', "ok");
   }
 
   if ($sender ne '<>') {
-    ($rv, $reason) = &check_valid_mx($sender);
+    ($rv, $reason) = check_valid_mx($sender);
     unless ($rv) {
       md_syslog('warning', "Rejecting $sender - Invalid MX: $reason.");
       return ('REJECT', "Sorry; $sender has an invalid MX record: $reason.");
@@ -820,7 +993,7 @@ L<perlartistic>
 =head1 AUTHOR INFORMATION
 
 Kevin A. McGrail
-kevin.mcgrail-netvalidmx@pccc.com
+kevin.mcgrail-netvalidmx@mcgrail.com
 
 =head1 UPDATE HISTORY
 
@@ -838,11 +1011,13 @@ kevin.mcgrail-netvalidmx@pccc.com
 
 =item v2.5  Released May 8, 2020.  Numerous bug fixes and moved to The McGrail Foundation.  This product is in active use in production system.
 
+=item v2.5.1 Released April 4, 2023. Documentation bug fixes and ipv6 improvements.
+
 =back
 
 =head1 HOMEPAGE
 
-Releases can be found at http://www.pccc.com/downloads/Net-validMX and
+Releases can be found at http://www.mcgrail.com/downloads/Net-validMX and
 on CPAN at http://search.cpan.org/~kmcgrail/.
 
 =head1 CAVEATS
@@ -851,36 +1026,16 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-=head1 TODO
-
-=over 4
-
-=item - I'd like to have the example script automatically built to have the correct #!/usr/bin/perl line and possibly installed in /usr/local/bin.
-
-=item - I'd like to clean up the pod text so that the code snippets aren't wrapped by pod2text on the README export.
-
-=item - I'd like to add more IPv6 support including the use of private network addresses (fc00::/7 & fe80:).
-
-=item - Need to finish the ability to override default variables, procedural and OO methods and complete the documentation.
-
-=head1 SOLVED TODO ITEMS
-
-=item - I'd like to convert the example script(s) into test script(s).  
-
-SOLVED: Test::More was a great way to achieve this!
-
-=item - I'd like to know more info on what/how to make a META.yml file.
-
-SOLVED: I was using MakeMaker v6.03.  Instead I upgraded to 6.30 and make dist or make distdir then created the META.yml file.  I also used a trick from Net::DNS' Makefile.PL to add the license, author and abstract data directly to the META.yml file.
-
-=item - I'd like to make it so that the Makefile.PL creates a README on the fly from the pod in the library instead of pod2text lib/Net/validMX.pm > README.
-
-SOLVED: Thanks to Andreas J. Koenig for a post he wrote that dealt with my exact problem.  I added the PREOP and DIST_DEFAULT to the Makefile.PL.  I then modified this to use the same MANIFEST trick that is used for metafile and I'm happy with the end result.
-
-=back
+=cut
 
 =head1 CREDITS
 
+=over 4
+
+=encoding utf-8
+
 Based on an idea from Les Miksell and much input from Jan Pieter Cornet.  Additional thanks to David F. Skoll, Matthew van Eerde, and Mark Damrose for testing and suggestions, plus Bill Cole & Karsten Bräckelmann for code contributions.  And sincere apologies in advance if I missed anyone!
+
+=back
 
 =cut

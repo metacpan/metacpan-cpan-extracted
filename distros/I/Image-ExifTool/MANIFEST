@@ -90,6 +90,7 @@ html/TagNames/ID3.html
 html/TagNames/IPTC.html
 html/TagNames/ISO.html
 html/TagNames/ITC.html
+html/TagNames/InfiRay.html
 html/TagNames/JFIF.html
 html/TagNames/JPEG.html
 html/TagNames/JSON.html
@@ -301,6 +302,7 @@ lib/Image/ExifTool/ISO.pm
 lib/Image/ExifTool/ITC.pm
 lib/Image/ExifTool/Import.pm
 lib/Image/ExifTool/InDesign.pm
+lib/Image/ExifTool/InfiRay.pm
 lib/Image/ExifTool/JPEG.pm
 lib/Image/ExifTool/JPEGDigest.pm
 lib/Image/ExifTool/JSON.pm
@@ -323,6 +325,7 @@ lib/Image/ExifTool/Lang/ko.pm
 lib/Image/ExifTool/Lang/nl.pm
 lib/Image/ExifTool/Lang/pl.pm
 lib/Image/ExifTool/Lang/ru.pm
+lib/Image/ExifTool/Lang/sk.pm
 lib/Image/ExifTool/Lang/sv.pm
 lib/Image/ExifTool/Lang/tr.pm
 lib/Image/ExifTool/Lang/zh_cn.pm
@@ -527,6 +530,9 @@ t/ExifTool_3.out
 t/ExifTool_30.out
 t/ExifTool_31.out
 t/ExifTool_32.out
+t/ExifTool_33.out
+t/ExifTool_34.out
+t/ExifTool_35.out
 t/ExifTool_4.out
 t/ExifTool_5.out
 t/ExifTool_6.out
@@ -615,6 +621,8 @@ t/InDesign.t
 t/InDesign_2.out
 t/InDesign_3.out
 t/InDesign_4.out
+t/InfiRay.t
+t/InfiRay_2.out
 t/JSON.t
 t/JSON_2.out
 t/JVC.t
@@ -646,6 +654,7 @@ t/Lang_15.out
 t/Lang_16.out
 t/Lang_17.out
 t/Lang_18.out
+t/Lang_19.out
 t/Lang_2.out
 t/Lang_3.out
 t/Lang_4.out
@@ -897,6 +906,7 @@ t/Writer_56.out
 t/Writer_58.out
 t/Writer_59.out
 t/Writer_6.out
+t/Writer_60.out
 t/Writer_7.out
 t/Writer_9.out
 t/XMP.t
@@ -1032,6 +1042,7 @@ t/images/IPTC.jpg
 t/images/ISO.iso
 t/images/ITC.itc
 t/images/InDesign.indd
+t/images/InfiRay.jpg
 t/images/JSON.json
 t/images/JVC.jpg
 t/images/JVC2.jpg

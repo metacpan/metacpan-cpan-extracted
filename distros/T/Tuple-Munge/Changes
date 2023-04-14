@@ -1,0 +1,18 @@
+version 0.001; 2023-04-12
+
+  * bugfix: when peephole optimising tuple_slot/tuple_set_slot followed
+    by an rv2xv op, don't assume that the rv2xv op will remain largely
+    unchanged by later peephole optimisation
+
+  * bugfix: in the optimised version of tuple_slot/tuple_set_slot followed
+    by rv2gv, if the slot value references a `fake' glob copy, yield a
+    `real' copy of the glob copy, as a real rv2gv op does, rather than
+    the glob copy itself
+
+  * when peephole optimising tuple_slot/tuple_set_slot followed by an
+    rv2xv op, incorporate the whole rv2xv job into the tuple-related op,
+    rather than punt tricky cases at runtime to the rv2xv op
+
+version 0.000; 2023-03-29
+
+  * initial released version

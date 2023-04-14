@@ -18,22 +18,24 @@ my @test_cases = (
     {
         method            => 'files',
         params            => {},
-        expected_response => superhashof(
-            {
-                object => 'list',
-                data   => array_each(
-                    superhashof(
-                        {
-                            id         => ignore(),
-                            object     => 'file',
-                            bytes      => ignore(),
-                            created_at => ignore(),
-                            filename   => ignore(),
-                            purpose    => ignore(),
-                        }
-                    )
-                ),
-            }
+        expected_response => noclass(
+            superhashof(
+                {
+                    object => 'list',
+                    data   => array_each(
+                        superhashof(
+                            {
+                                id         => ignore(),
+                                object     => 'file',
+                                bytes      => ignore(),
+                                created_at => ignore(),
+                                filename   => ignore(),
+                                purpose    => ignore(),
+                            }
+                        )
+                    ),
+                }
+            )
         ),
     },
 );

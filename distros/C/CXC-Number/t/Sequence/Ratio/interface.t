@@ -2,7 +2,8 @@
 
 use Test2::V0;
 
-use aliased 'CXC::Number::Sequence::Ratio' => 'Sequence';
+use CXC::Number::Sequence::Ratio;
+use constant Sequence => 'CXC::Number::Sequence::Ratio';
 
 sub Failure { join( '::', 'CXC::Number::Sequence::Failure', @_ ) }
 

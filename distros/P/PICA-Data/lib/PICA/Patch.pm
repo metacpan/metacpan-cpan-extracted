@@ -1,12 +1,13 @@
 package PICA::Patch;
 use v5.14.1;
 
-our $VERSION = '2.06';
+our $VERSION = '2.09';
 
 use PICA::Schema qw(field_identifier);
+use PICA::Data::Field;
 
 use Exporter 'import';
-our @EXPORT_OK = qw(pica_diff pica_patch);
+our @EXPORT_OK   = qw(pica_diff pica_patch);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 # Compare full fields, ignoring annotation of the latter
@@ -42,9 +43,9 @@ sub pica_diff {
     my (@diff, $i, $j);
 
     my $changed = sub {
-        my @field = @{$_[0]};
-        annotation(\@field, $_[1]);
-        push @diff, \@field;
+        my $field = PICA::Data::Field->new(@{$_[0]});
+        $field->annotation($_[1]);
+        push @diff, $field;
     };
 
     while ($i < @$a && $j < @$b) {
@@ -67,6 +68,16 @@ sub pica_diff {
     }
     while ($j < @$b) {
         $changed->($b->[$j++], '+');
+    }
+
+    # remove identical fields (could also be done in sort_fields)
+    for (my $i = 0; $i < $#diff;) {
+        if ($diff[$i]->equal($diff[$i + 1])) {
+            splice @diff, $i + 1, 1;
+        }
+        else {
+            $i++;
+        }
     }
 
     bless {record => \@diff}, 'PICA::Data';

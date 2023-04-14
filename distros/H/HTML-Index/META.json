@@ -1,0 +1,63 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Index",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BerkeleyDB" : "0",
+            "Carp" : "0",
+            "Carp::Assert" : "0",
+            "Class::Struct" : "0",
+            "Compress::Zlib" : "0",
+            "Data::Dumper" : "0",
+            "Fcntl" : "0",
+            "File::Path" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Lingua::Stem" : "0",
+            "Text::Soundex" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avewrigley/HTML-Index/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/avewrigley/HTML-Index.git",
+         "web" : "https://github.com/avewrigley/HTML-Index/"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

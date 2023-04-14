@@ -45,7 +45,6 @@ my(%params) =
 	TEST_REQUIRES =>
 	{
 		'Test::More'	=> '1.001002',
-		'Test::Pod'		=> '1.51',
 	},
 	VERSION_FROM => 'lib/Config/Tiny.pm',
 );

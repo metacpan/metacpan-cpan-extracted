@@ -36,5 +36,5 @@ requires:
 resources:
   homepage: https://yoe.github.io/SReview
   repository: https://github.com/yoe/SReview.git
-version: v0.9.0
+version: v0.9.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

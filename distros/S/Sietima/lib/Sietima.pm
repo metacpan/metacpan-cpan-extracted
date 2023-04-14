@@ -14,7 +14,7 @@ use Email::Address;
 use namespace::clean;
 
 with 'MooX::Traits';
-our $VERSION = '1.1.1'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: minimal mailing list manager
 
 
@@ -145,7 +145,7 @@ Sietima - minimal mailing list manager
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 SYNOPSIS
 

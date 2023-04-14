@@ -250,6 +250,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -864,14 +865,14 @@ docker-check:
 	$(MAKE) dist
 	@echo "Building docker image..."
 	@docker run -t --rm -v $(abs_builddir):/$(PACKAGE) \
-		`docker build . -q -f build-aux/build-debian.dockerfile` \
+		`docker build . -q -f build-aux/build.dockerfile` \
 		sh /$(PACKAGE)/build-aux/check-package.sh /$(PACKAGE)/$(DIST_ARCHIVES) $(distdir)
 
 docker-valgrind:
 	$(MAKE) dist
 	@echo "Building docker image..."
 	@docker run -t --rm -v $(abs_builddir):/$(PACKAGE) \
-		`docker build . -q -f build-aux/build-debian.dockerfile` \
+		`docker build . -q -f build-aux/build.dockerfile` \
 		sh /$(PACKAGE)/build-aux/valgrind-package.sh /$(PACKAGE)/$(DIST_ARCHIVES) $(distdir)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

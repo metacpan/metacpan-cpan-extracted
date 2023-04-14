@@ -12,16 +12,23 @@ use version;
 use Carp;
 use English qw/ -no_match_vars /;
 use Path::Tiny;
-use YAML::Syck qw/ LoadFile /;
+use YAML::Syck          qw/ LoadFile /;
 use Hash::Merge::Simple qw/ merge /;
 
-our $VERSION = version->new('0.1.21');
+our $VERSION = version->new('1.0.1');
 
-has global_config => (
+has global_base => (
     is      => 'rw',
     default => sub {
         mkdir path $ENV{HOME}, '.vtide' if !-d path $ENV{HOME}, '.vtide';
-        return path $ENV{HOME}, '.vtide/defaults.yml';
+        return path $ENV{HOME}, '.vtide';
+    },
+);
+has global_config => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        return path $_[0]->global_base, 'defaults.yml';
     },
 );
 
@@ -30,7 +37,7 @@ has history_file => (
     default => sub {
         if ( $ENV{VTIDE_DIR} && -d $ENV{VTIDE_DIR} ) {
             mkdir path $ENV{VTIDE_DIR}, '.vtide'
-                if !-d path $ENV{VTIDE_DIR}, '.vtide';
+              if !-d path $ENV{VTIDE_DIR}, '.vtide';
             return path $ENV{VTIDE_DIR}, '.vtide/history.log';
         }
 
@@ -39,6 +46,11 @@ has history_file => (
     },
 );
 
+has local_base => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub { return path $ENV{VTIDE_DIR}, '.vtide' || '.vtide' },
+);
 has local_config => (
     is      => 'rw',
     lazy    => 1,
@@ -89,21 +101,21 @@ sub changed {
     $self->local_time($local_time);
 
     return
-           !$self->data
-        || ( $global_time && $global_orig < $global_time )
-        || ( $local_time  && $local_orig < $local_time );
+         !$self->data
+      || ( $global_time && $global_orig < $global_time )
+      || ( $local_time  && $local_orig < $local_time );
 }
 
 sub history {
     my ( $self, @command ) = @_;
 
     return
-        if $command[0] eq 'run' || grep { $_ eq '--auto-complete' } @command;
+      if $command[0] eq 'run' || grep { $_ eq '--auto-complete' } @command;
 
     my $fh = $self->history_file->opena;
     print {$fh} '['
-        . localtime . '] '
-        . ( join ' ', map { /[^\w.\/-]/ ? "'$_'" : $_ } @command ), "\n";
+      . localtime . '] '
+      . ( join ' ', map { /[^\w.\/-]/ ? "'$_'" : $_ } @command ), "\n";
     return;
 }
 
@@ -117,7 +129,7 @@ App::VTide::Config - Manage configuration for VTide
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Config version 0.1.21
+This documentation refers to App::VTide::Config version 1.0.1
 
 =head1 SYNOPSIS
 

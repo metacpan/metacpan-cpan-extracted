@@ -1,10 +1,11 @@
 package Crypt::ECDH_ES;
-$Crypt::ECDH_ES::VERSION = '0.003';
+$Crypt::ECDH_ES::VERSION = '0.004';
 use strict;
 use warnings;
 
 use Carp;
 use Crypt::Curve25519;
+use Crypt::URandom qw/urandom/;
 use Crypt::Rijndael;
 use Digest::SHA qw/sha256 hmac_sha256/;
 
@@ -12,31 +13,12 @@ use Exporter 5.57 'import';
 our @EXPORT_OK = qw/ecdhes_encrypt ecdhes_decrypt ecdhes_generate_key/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-my $csprng = ($^O eq 'MSWin32') ?
-do {
-	require Win32::API;
-	my $genrand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)') or croak "Could not import SystemFunction036: $^E";
-	sub {
-		my $count = shift;
-		$genrand->Call(my $buffer, $count) or croak "Could not read from csprng: $^E";
-		return $buffer;
-	}
-} :
-do {
-	open my $urandom, '<:raw', '/dev/urandom' or croak 'Couldn\'t open /dev/urandom';
-	sub {
-		my $count = shift;
-		read $urandom, my $buffer, $count or croak "Couldn't read from csprng: $!";
-		return $buffer;
-	};
-};
-
 my $format = 'C/a C/a n/a N/a';
 
 sub ecdhes_encrypt {
 	my ($public_key, $data) = @_;
 
-	my $private = curve25519_secret_key($csprng->(32));
+	my $private = curve25519_secret_key(urandom(32));
 	my $public  = curve25519_public_key($private);
 	my $shared  = curve25519_shared_secret($private, $public_key);
 
@@ -73,15 +55,7 @@ sub ecdhes_decrypt {
 }
 
 sub ecdhes_generate_key {
-	my $buf;
-	if ($^O eq 'MSWin32') {
-		$buf = $csprng->(32);
-	}
-	else {
-		open my $fh, '<:raw', '/dev/random' or croak "Couldn't open /dev/random: $!";
-		read $fh, $buf, 32 or croak "Can't read from /dev/random: $!";
-		close $fh;
-	}
+	my $buf = urandom(32);
 	my $secret = curve25519_secret_key($buf);
 	my $public = curve25519_public_key($secret);
 	return ($public, $secret);
@@ -103,7 +77,7 @@ Crypt::ECDH_ES - A fast and small hybrid crypto system
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

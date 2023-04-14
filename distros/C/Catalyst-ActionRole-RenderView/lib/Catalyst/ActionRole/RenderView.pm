@@ -1,18 +1,6 @@
 package Catalyst::ActionRole::RenderView;
 
-our $VERSION = '0.001';
-
-{
-  package Catalyst::ActionRole::RenderView::Utils::NoView;
-   
-  use Moose;
-  with 'CatalystX::Utils::DoesHttpException';
-   
-  sub status_code { 500 }
-  sub error { "No View can be found to render." }
-
-  __PACKAGE__->meta->make_immutable;
-}
+our $VERSION = '0.002';
 
 use Moose::Role;
 use Catalyst::ActionRole::RenderView::Utils::NoView;

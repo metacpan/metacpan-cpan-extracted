@@ -10,47 +10,8 @@
 #		define _GNU_SOURCE
 #endif
 
-#ifdef __CYGWIN__
-#	undef WIN32
-#	undef _WIN32
-#	define madvise posix_madvise
-#endif
-
 #include <assert.h>
-#ifdef WIN32
-#	include <windows.h>
-#	include <io.h>
-#	define PROT_NONE  0
-#	define PROT_READ  1
-#	define PROT_WRITE 2
-#	define PROT_EXEC  4
-#	define MAP_SHARED  0
-#	define MAP_PRIVATE 1
-#	define MAP_ANONYMOUS 2
-#else /* WIN32 */
-#	include <string.h>
-#	include <sys/types.h>
-#	include <sys/mman.h>
-#	include <unistd.h>
-#endif /* WIN32 */
-
-#ifdef __QNX__
-# define madvise posix_madvise
-#endif
-
-#ifndef MAP_ANONYMOUS
-#	define MAP_ANONYMOUS MAP_ANON
-#elif !defined MAP_ANON
-#	define MAP_ANON MAP_ANONYMOUS
-#endif /* MAP_ANONYMOUS */
-
-#ifndef MAP_FILE
-#	define MAP_FILE 0
-#endif
-
-#ifndef MAP_VARIABLE
-#	define MAP_VARIABLE 0
-#endif
+#include "mmap-compat.c"
 
 #ifndef MIN
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -61,6 +22,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "perliol.h"
 #define NEED_mg_findext
 #define NEED_sv_unmagicext
 #include "ppport.h"
@@ -88,82 +50,7 @@ struct mmap_info {
 #endif
 };
 
-#ifdef WIN32
-
-static DWORD page_size() {
-	static DWORD pagesize = 0;
-	if (pagesize == 0) {
-		SYSTEM_INFO info;
-		GetSystemInfo(&info);
-		pagesize = info.dwPageSize;
-	}
-	return pagesize;
-}
-
-static DWORD old_protect;
-
-#define munmap(address, length) ( UnmapViewOfFile(address) ? 0 : -1 )
-#define msync(address, length, flags) ( FlushViewOfFile(address, length) ? 0 : -1 ) 
-#define mlock(address, length) ( VirtualLock(address, length) ? 0 : -1 )
-#define munlock(address, length) ( VirtualUnlock(address, length) ? 0 : -1 )
-#define mprotect(address, length, prot) ( VirtualProtect(address, length, winflags[prot & PROT_ALL].createflag, &old_protect) ? 0 : -1 )
-
-#ifndef FILE_MAP_EXECUTE
-#	define FILE_MAP_EXECUTE 0
-#endif
-
-static const struct {
-	DWORD createflag;
-	DWORD viewflag;
-} winflags[] = {
-	{ 0             ,         0 },                                     /* PROT_NONE */
-	{ PAGE_READONLY ,         FILE_MAP_READ       },                   /* PROT_READ */
-	{ PAGE_READWRITE,         FILE_MAP_WRITE      },                   /* PROT_WRITE */
-	{ PAGE_READWRITE,         FILE_MAP_ALL_ACCESS },                   /* PROT_READ | PROT_WRITE */
-	{ PAGE_EXECUTE_READ     , FILE_MAP_READ       | FILE_MAP_EXECUTE}, /* PROT_NONE | PROT_EXEC */
-	{ PAGE_EXECUTE_READ     , FILE_MAP_READ       | FILE_MAP_EXECUTE}, /* PROT_READ | PROT_EXEC */
-	{ PAGE_EXECUTE_READWRITE, FILE_MAP_WRITE      | FILE_MAP_EXECUTE}, /* PROT_WRITE | PROT_EXEC */
-	{ PAGE_EXECUTE_READWRITE, FILE_MAP_ALL_ACCESS | FILE_MAP_EXECUTE}, /* PROT_READ| PROT_WRITE | PROT_EXEC */
-};
-
-#define madvise(address, length, advice) 0
-
-#else
-
-static size_t page_size() {
-	static size_t pagesize = 0;
-	if (pagesize == 0) {
-		pagesize = sysconf(_SC_PAGESIZE);
-	}
-	return pagesize;
-}
-#endif
-
-#ifdef VMS
-#define madvise(address, length, advice) 0
-#endif
-
-#ifndef MADV_NORMAL
-#	define MADV_NORMAL 0
-#	define MADV_RANDOM 0
-#	define MADV_SEQUENTIAL 0
-#	define MADV_WILLNEED 0
-#	define MADV_DONTNEED 0
-#endif
-
 #define die_sys(format) Perl_croak(aTHX_ format, strerror(errno))
-
-static void real_croak_sv(pTHX_ SV* value) {
-	dSP;
-	PUSHMARK(SP);
-	XPUSHs(value);
-	PUTBACK;
-	call_pv("Carp::croak", G_VOID | G_DISCARD);
-}
-#define real_croak_pvs(string) real_croak_sv(aTHX_ sv_2mortal(newSVpvs(string)))
-#define croak_sys(format) real_croak_sv(aTHX_ sv_2mortal(newSVpvf(format, strerror(errno))))
-
-#define PROT_ALL (PROT_READ | PROT_WRITE | PROT_EXEC)
 
 static void reset_var(SV* var, struct mmap_info* info) {
 	SvPVX(var) = info->fake_address;
@@ -172,7 +59,7 @@ static void reset_var(SV* var, struct mmap_info* info) {
 	SvPOK_only_UTF8(var);
 }
 
-static void mmap_fixup(pTHX_ SV* var, struct mmap_info* info, const char* string, STRLEN len) {
+static void S_mmap_fixup(pTHX_ SV* var, struct mmap_info* info, const char* string, STRLEN len) {
 	if (ckWARN(WARN_SUBSTR)) {
 		Perl_warn(aTHX_ "Writing directly to a memory mapped file is not recommended");
 		if (SvCUR(var) > info->fake_length)
@@ -188,19 +75,20 @@ static void mmap_fixup(pTHX_ SV* var, struct mmap_info* info, const char* string
 		SvPV_free(var);
 	reset_var(var, info);
 }
+#define mmap_fixup(var, info, string, len) S_mmap_fixup(aTHX_ var, info, string, len)
 
 static int mmap_write(pTHX_ SV* var, MAGIC* magic) {
 	struct mmap_info* info = (struct mmap_info*) magic->mg_ptr;
 	if (info->real_length) {
 		if (!SvOK(var))
-			mmap_fixup(aTHX_ var, info, NULL, 0);
+			mmap_fixup(var, info, NULL, 0);
 		else if (!SvPOK(var)) {
 			STRLEN len;
 			const char* string = SvPV(var, len);
-			mmap_fixup(aTHX_ var, info, string, len);
+			mmap_fixup(var, info, string, len);
 		}
 		else if (SvPVX(var) != info->fake_address)
-			mmap_fixup(aTHX_ var, info, SvPVX(var), SvCUR(var));
+			mmap_fixup(var, info, SvPVX(var), SvCUR(var));
 		else {
 			if (ckWARN(WARN_SUBSTR) && SvCUR(var) != info->fake_length) {
 				Perl_warn(aTHX_ "Writing directly to a memory mapped file is not recommended");
@@ -304,29 +192,11 @@ static void check_new_variable(pTHX_ SV* var) {
 	SvUPGRADE(var, SVt_PVMG);
 }
 
-#define BITS32_MASK 0xFFFFFFFF
-
 static void* do_mapping(pTHX_ size_t length, int prot, int flags, int fd, Off_t offset) {
 	void* address;
-#ifdef WIN32
-	HANDLE file;
-	HANDLE mapping;
-	DWORD viewflag;
-	Off_t maxsize = offset + length;
-	prot &= PROT_ALL;
-	file = (flags & MAP_ANONYMOUS) ? INVALID_HANDLE_VALUE : (HANDLE)_get_osfhandle(fd);
-	mapping = CreateFileMapping(file, NULL, winflags[prot].createflag, maxsize >> 32, maxsize & BITS32_MASK, NULL);
-	if (mapping == NULL)
-		croak_sys("Could not map: %s");
-	viewflag = (flags & MAP_PRIVATE) ? (FILE_MAP_COPY | ( prot & PROT_EXEC ? FILE_MAP_EXECUTE : 0 ) ) : winflags[prot].viewflag;
-	address = MapViewOfFile(mapping, viewflag, offset >> 32, offset & BITS32_MASK, length);
-	CloseHandle(mapping);
-	if (address == NULL)
-#else
 	address = mmap(0, length, prot, flags | MAP_VARIABLE, fd, offset);
 	if (address == MAP_FAILED)
-#endif
-		croak_sys("Could not map: %s");
+		die_sys("Could not map: %s");
 	return address;
 }
 
@@ -368,17 +238,18 @@ static void add_magic(pTHX_ SV* var, struct mmap_info* magical, int writable, in
 
 static int _is_mappable(pTHX_ int fd) {
 	Stat_t info;
-	return Fstat(fd, &info) == 0 && (S_ISREG(info.st_mode) || S_ISBLK(info.st_mode));
+	return Fstat(fd, &info) == 0 && (S_ISREG(info.st_mode) || S_ISBLK(info.st_mode) || S_ISCHR(info.st_mode));
 }
 
 #define is_mappable(fd) _is_mappable(aTHX_ fd)
 
-static struct mmap_info* get_mmap_magic(pTHX_ SV* var, const char* funcname) {
+static struct mmap_info* S_get_mmap_magic(pTHX_ SV* var, const char* funcname) {
 	MAGIC* magic;
 	if (!SvMAGICAL(var) || (magic = mg_findext(var, PERL_MAGIC_ext, &mmap_table)) == NULL)
 		Perl_croak(aTHX_ "Could not %s: this variable is not memory mapped", funcname);
 	return (struct mmap_info*) magic->mg_ptr;
 }
+#define get_mmap_magic(var, funcname) S_get_mmap_magic(aTHX_ var, funcname)
 
 #ifdef USE_ITHREADS
 static void magic_end(pTHX_ void* pre_info) {
@@ -397,28 +268,30 @@ static map prots = {
 	{ STR_WITH_LEN("+>"), PROT_READ | PROT_WRITE },
 };
 
-static int S_protection_value(pTHX_ SV* mode, int fallback) {
+static int S_protection_pvn(pTHX_ const char* mode, size_t mode_len) {
 	int i;
-	STRLEN len;
-	const char* value = SvPV(mode, len);
 	for (i = 0; i < sizeof prots / sizeof *prots; ++i) {
-		if (prots[i].length == len && strEQ(value, prots[i].key))
+		if (prots[i].length == mode_len && strnEQ(mode, prots[i].key, mode_len))
 			return prots[i].value;
 	}
-	if (fallback && SvIOK(mode))
-		return SvIV(mode);
-	Perl_croak(aTHX_ "No such mode '%s' known", SvPV_nolen(mode));
+	Perl_croak(aTHX_ "No such mode '%s' known", mode);
 }
-#define protection_value(prot, fallback) S_protection_value(aTHX_ prot, fallback)
+#define protection_pvn(mode, mode_len) S_protection_pvn(aTHX_ mode, mode_len)
 
-#define YES &PL_sv_yes
+static int S_protection_sv(pTHX_ SV* mode_sv) {
+	STRLEN mode_len;
+	const char* mode = SvPV(mode_sv, mode_len);
+	const char* end = memchr(mode, ':', mode_len);
+	return protection_pvn(mode, end ? end - mode : mode_len);
+}
+#define protection_sv(mode) S_protection_sv(aTHX_ mode)
 
 #define MAP_CONSTANT(cons) newCONSTSUB(stash, #cons, newSVuv(cons))
 #define ADVISE_CONSTANT(key, value) hv_store(advise_constants, key, sizeof key - 1, newSVuv(value), 0)
 
 #define EMPTY_MAP(info) ((info)->real_length == 0)
 
-static void boot(pTHX) {
+static void S_boot(pTHX) {
 	HV* stash = get_hv("File::Map::", FALSE);
 	HV* advise_constants = newHV();
 
@@ -479,6 +352,7 @@ static void boot(pTHX) {
 	ADVISE_CONSTANT("spaceavail", MADV_SPACEAVAIL);
 #endif
 }
+#define boot() S_boot(aTHX)
 
 #if PTRSIZE == 8 && (defined(WIN32) || defined(__CYGWIN__))
 #ifndef ULLONG_MAX
@@ -490,14 +364,14 @@ static void boot(pTHX) {
 #define PTR_MAX ULONG_MAX
 #endif
 
-void S__mmap_impl(pTHX_ SV* var, size_t length, int prot, int flags, int fd, Off_t offset, int utf8) {
+void S_mmap_impl(pTHX_ SV* var, size_t length, int prot, int flags, int fd, Off_t offset, int utf8) {
 	check_new_variable(aTHX_ var);
 
 	ptrdiff_t correction = offset % page_size();
 	void* address;
 	struct mmap_info* magical;
 	if (length > PTR_MAX - correction)
-		real_croak_pvs("can't map: length + offset overflows");
+		Perl_croak(aTHX_ "can't map: length + offset overflows");
 
 	if (length)
 		address = do_mapping(aTHX_ length + correction, prot, flags, fd, offset - correction);
@@ -515,24 +389,118 @@ void S__mmap_impl(pTHX_ SV* var, size_t length, int prot, int flags, int fd, Off
 	SvSETMAGIC(var);
 	add_magic(aTHX_ var, magical, prot & PROT_WRITE, utf8);
 }
-#define _mmap_impl(var, length, prot, flags, fd, offset, utf8) S__mmap_impl(aTHX_ var, length, prot, flags, fd, offset, utf8)
+#define mmap_impl(var, length, prot, flags, fd, offset, utf8) S_mmap_impl(aTHX_ var, length, prot, flags, fd, offset, utf8)
 
-#define _protection_value(mode) protection_value(mode, FALSE);
+static const map mappable = {
+	{ STR_WITH_LEN("unix"), 1 },
+	{ STR_WITH_LEN("perlio"), 1 },
+	{ STR_WITH_LEN("crlf"), 1 },
+	{ STR_WITH_LEN("stdio"), 1 },
+	{ STR_WITH_LEN("flock"), 1 },
+	{ STR_WITH_LEN("creat"), 1 },
+	{ STR_WITH_LEN("mmap"), 1 },
+};
 
-void S_sync(pTHX_ SV* var, SV* sync) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "sync");
+static int S_map_get(pTHX_ const map table, size_t table_size, const char* name, int fallback) {
+	int i;
+	for (i = 0; i < table_size; ++i) {
+		if (strEQ(name, table[i].key))
+			return table[i].value;
+	}
+	return fallback;
+}
+#define map_get(table, name, default) S_map_get(aTHX_ table, sizeof table / sizeof *table, name, default)
+
+int S_check_layers(pTHX_ PerlIO* fh) {
+	PerlIO* current;
+	if (PerlIO_fileno(fh) < 0)
+		Perl_croak(aTHX_ "Can't map fake filehandle");
+	for (current = fh; *current; current = PerlIONext(current)) {
+		if (!map_get(mappable, (*current)->tab->name, 0) || (*current)->flags & PERLIO_F_CRLF)
+			Perl_croak(aTHX_ "Shouldn't map non-binary filehandle");
+	}
+	return (*fh)->flags & PERLIO_F_UTF8;
+}
+#define check_layers(fh) S_check_layers(aTHX_ fh)
+
+size_t S_get_length(pTHX_ PerlIO* fh, Off_t offset, SV* length_sv) {
+	Stat_t info;
+	Fstat(PerlIO_fileno(fh), &info);
+	size_t length = SvOK(length_sv) ? SvIV(length_sv) : info.st_size - offset;
+	size_t end = offset + length;
+	if (offset < 0 || end > info.st_size && !S_ISCHR(info.st_mode))
+		Perl_croak(aTHX_ "Window (%ld,%lu) is outside the file", offset, length);
+	return length;
+}
+#define get_length(fh, offset, length) S_get_length(aTHX_ fh, offset, length)
+
+#define READONLY sv_2mortal(newSVpvs("<"))
+#define undef &PL_sv_undef
+
+void S_map_handle(pTHX_ SV* var, PerlIO* fh, SV* mode, Off_t offset, SV* length_sv) {
+	int utf8 = check_layers(fh);
+	size_t length = get_length(fh, offset, length_sv);
+	mmap_impl(var, length, protection_sv(mode), MAP_SHARED | MAP_FILE, PerlIO_fileno(fh), offset, utf8);
+}
+#define map_handle(var, fh, mode, offset, length) S_map_handle(aTHX_ var, fh, mode, offset, length)
+
+void S_map_file(pTHX_ SV* var, SV* filename, SV* mode, Off_t offset, SV* length_sv) {
+	STRLEN mode_len;
+	const char* mode_raw = SvPV(mode, mode_len);
+	if (memchr(mode_raw, ':', mode_len) == NULL) {
+		SV* newmode = sv_2mortal(newSVsv(mode));
+		sv_catpvs(newmode, ":raw");
+		mode_raw = SvPV(newmode, mode_len);
+	}
+	GV* gv = MUTABLE_GV(sv_2mortal(newSV_type(SVt_NULL)));
+	gv_init_pvn(gv, CopSTASH(PL_curcop),  "__ANONIO__", 10, GV_ADDMULTI);
+	if (!do_openn(gv, mode_raw, mode_len, 0, 0, 0, NULL, &filename, 1))
+		Perl_croak(aTHX_ "Couldn't open file %s: %s", SvPV_nolen(filename), strerror(errno));
+	map_handle(var, IoIFP(GvIO(gv)), mode, offset, length_sv);
+}
+#define map_file(var, filename, mode, offset, length) S_map_file(aTHX_ var, filename, mode, offset, length)
+
+static const map flags = {
+	{ STR_WITH_LEN("shared") , MAP_SHARED },
+	{ STR_WITH_LEN("private"), MAP_PRIVATE },
+};
+
+void S_map_anonymous(pTHX_ SV* var, size_t length, const char* flag_name) {
+	int flag = map_get(flags, flag_name, -1);
+	if (flag == -1)
+		Perl_croak(aTHX_ "No such flag '%s'", flag_name);
+	if (length == 0)
+		Perl_croak(aTHX_ "Zero length specified for anonymous map");
+	mmap_impl(var, length, PROT_READ | PROT_WRITE, flag | MAP_ANONYMOUS, -1, 0, 0);
+}
+#define map_anonymous(var, length, flag_name) S_map_anonymous(aTHX_ var, length, flag_name)
+
+void S_sys_map(pTHX_ SV* var, size_t length, int protection, int flags, SV* fh, Off_t offset) {
+	if (flags & MAP_ANONYMOUS)
+		mmap_impl(var, length, protection, flags, -1, offset, 0);
+	else {
+		PerlIO* pio = IoIFP(sv_2io(fh)); // XXX error check
+		int utf8 = check_layers(pio);
+		int fd = PerlIO_fileno(pio);
+		mmap_impl(var, length, protection, flags, fd, offset, utf8);
+	}
+}
+#define sys_map(var, length, protection, flags, fh, offset) S_sys_map(aTHX_ var, length, protection, flags, fh, offset)
+
+void S_sync(pTHX_ SV* var, bool sync) {
+	struct mmap_info* info = get_mmap_magic(var, "sync");
 	if (EMPTY_MAP(info))
 		return;
 	if (SvREADONLY(var) && ckWARN(WARN_IO))
 		Perl_warn(aTHX_ "Syncing a readonly map makes no sense");
-	if (msync(info->real_address, info->real_length, SvTRUE(sync) ? MS_SYNC : MS_ASYNC ) == -1)
+	if (msync(info->real_address, info->real_length, sync ? MS_SYNC : MS_ASYNC ) == -1)
 		die_sys("Could not sync: %s");
 }
 #define sync(var, sync) S_sync(aTHX_ var, sync)
 
 #ifdef __linux__
 void S_remap(pTHX_ SV* var, size_t new_size) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "remap");
+	struct mmap_info* info = get_mmap_magic(var, "remap");
 	ptrdiff_t correction = info->real_length - info->fake_length;
 	void* new_address;
 CODE:
@@ -555,13 +523,12 @@ CODE:
 #endif
 
 void S_unmap(pTHX_ SV* var) {
-	get_mmap_magic(aTHX_ var, "unmap");
+	get_mmap_magic(var, "unmap");
 	sv_unmagicext(var, PERL_MAGIC_ext, (MGVTBL*)&mmap_table);
 }
 #define unmap(var) S_unmap(aTHX_ var)
 
-void S_pin(pTHX_ SV* var) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "pin");
+void S_pin(pTHX_ struct mmap_info* info) {
 #ifndef VMS
 	if (EMPTY_MAP(info))
 		return;
@@ -573,8 +540,7 @@ void S_pin(pTHX_ SV* var) {
 }
 #define pin(var) S_pin(aTHX_ var)
 
-void S_unpin(pTHX_ SV* var) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "unpin");
+void S_unpin(pTHX_ struct mmap_info* info) {
 #ifndef VMS
 	if (EMPTY_MAP(info))
 		return;
@@ -586,9 +552,7 @@ void S_unpin(pTHX_ SV* var) {
 }
 #define unpin(var) S_unpin(aTHX_ var)
 
-void S_advise(pTHX_ SV* var, SV* name) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "advise");
-
+void S_advise(pTHX_ struct mmap_info* info, SV* name) {
 	HV* constants = (HV*) *hv_fetch(PL_modglobal, "File::Map::ADVISE_CONSTANTS", 27, 0);
 	HE* value = hv_fetch_ent(constants, name, 0, 0);
 
@@ -604,8 +568,8 @@ void S_advise(pTHX_ SV* var, SV* name) {
 #define advise(var, name) S_advise(aTHX_ var, name)
 
 void S_protect(pTHX_ SV* var, SV* prot) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "protect");
-	int prot_val = protection_value(prot, TRUE);
+	struct mmap_info* info = get_mmap_magic(var, "protect");
+	int prot_val = SvIOK(prot) ? SvIV(prot) : protection_sv(prot);
 	if (!EMPTY_MAP(info))
 		mprotect(info->real_address, info->real_length, prot_val);
 	if (prot_val & PROT_WRITE)
@@ -615,8 +579,7 @@ void S_protect(pTHX_ SV* var, SV* prot) {
 }
 #define protect(var, prot) S_protect(aTHX_ var, prot)
 
-void S_lock_map(pTHX_ SV* var) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "lock_map");
+void S_lock_map(pTHX_ struct mmap_info* info) {
 #ifdef USE_ITHREADS
 	LEAVE;
 	SAVEDESTRUCTOR_X(magic_end, info);
@@ -629,7 +592,7 @@ void S_lock_map(pTHX_ SV* var) {
 
 #ifdef USE_ITHREADS
 SV* S_wait_until(pTHX_ SV* block, SV* var) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "wait_until");
+	struct mmap_info* info = get_mmap_magic(var, "wait_until");
 	if (info->owner != aTHX)
 		Perl_croak(aTHX_ "Trying to wait on an unlocked map");
 	SAVESPTR(DEFSV);
@@ -647,16 +610,14 @@ SV* S_wait_until(pTHX_ SV* block, SV* var) {
 }
 #define wait_until(block, var) S_wait_until(aTHX_ block, var)
 
-void S_notify(pTHX_ SV* var) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "notify");
+void S_notify(pTHX_ struct mmap_info* info) {
 	if (info->owner != aTHX)
 		Perl_croak(aTHX_ "Trying to notify on an unlocked map");
 	COND_SIGNAL(&info->cond);
 }
 #define notify(var) S_notify(aTHX_ var)
 
-void S_broadcast(pTHX_ SV* var) {
-	struct mmap_info* info = get_mmap_magic(aTHX_ var, "broadcast");
+void S_broadcast(pTHX_ struct mmap_info* info) {
 	if (info->owner != aTHX)
 		Perl_croak(aTHX_ "Trying to broadcast on an unlocked map");
 	COND_BROADCAST(&info->cond);
@@ -669,13 +630,17 @@ MODULE = File::Map				PACKAGE = File::Map
 PROTOTYPES: DISABLED
 
 BOOT:
-    boot(aTHX);
+    boot();
 
-void _mmap_impl(SV* var, size_t length, int prot, int flags, int fd, Off_t offset, int utf8 = 0)
+void map_file(SV* var, SV* filename, SV* mode = READONLY, Off_t offset = 0, SV* length = undef)
 
-int _protection_value(SV* mode)
+void map_handle(SV* var, PerlIO* fh, SV* mode = READONLY, Off_t offset = 0, SV* length = undef)
 
-void sync(SV* var, SV* sync = YES)
+void map_anonymous(SV* var, size_t length, const char* flag_name = "shared")
+
+void sys_map(SV* var, size_t length, int protection, int flags, SV* fh = undef, Off_t offset = 0)
+
+void sync(SV* var, bool sync = TRUE)
 
 #ifdef __linux__
 void remap(SV* var, size_t new_size)
@@ -684,22 +649,22 @@ void remap(SV* var, size_t new_size)
 
 void unmap(SV* var)
 
-void pin(SV* var)
+void pin(struct mmap_info* var)
 
-void unpin(SV* var)
+void unpin(struct mmap_info* var)
 
-void advise(SV* var, SV* name)
+void advise(struct mmap_info* var, SV* name)
 
 void protect(SV* var, SV* prot)
 
-void lock_map(SV* var)
+void lock_map(struct mmap_info* var)
 
 #ifdef USE_ITHREADS
 SV* wait_until(SV* block, SV* var)
 	PROTOTYPE: &@
 
-void notify(SV* var)
+void notify(struct mmap_info* var)
 
-void broadcast(SV* var)
+void broadcast(struct mmap_info* var)
 
 #endif /* USE ITHREADS */

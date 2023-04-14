@@ -6,6 +6,9 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use lib 't/lib';
+use Helper;
+
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
@@ -53,16 +56,22 @@ subtest 'bad subschemas' => sub {
     'subschemas identified, and error found',
   );
 
-  my $serialized = JSON::Schema::Modern::Result->new(
-    valid => 0,
-    errors => [ $doc->errors ],
-    exception => 1,
-  );
-
   is(
-    index($serialized, "'/components/schemas/alpha_schema/not/minimum': got string, not number\n"), 0,
+    index(document_result($doc), "'/components/schemas/alpha_schema/not/minimum': got string, not number\n"), 0,
     'errors serialize using the instance locations within the document',
   );
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/components/schemas/alpha_schema/not/minimum': got string, not number
+'/components/schemas/alpha_schema/not': not all properties are valid
+'/components/schemas/alpha_schema/not': subschema 3 is not valid
+'/components/schemas/alpha_schema/not': subschema 0 is not valid
+'/components/schemas/alpha_schema': not all properties are valid
+'/components/schemas/alpha_schema': subschema 1 is not valid
+'/components/schemas/alpha_schema': subschema 0 is not valid
+'/components/schemas': not all additional properties are valid
+'/components': not all properties are valid
+'': not all properties are valid
+ERRORS
 };
 
 subtest 'identify subschemas' => sub {

@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Data::Dump' => '0',
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
                                       'Dist::Zilla::Plugin::CheckMetaResources' => '0',
@@ -71,7 +72,8 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::TrailingSpace' => '0.0203',
                                       'Test::Vars' => '0.015',
-                                      'Test::Version' => '1'
+                                      'Test::Version' => '1',
+                                      'aliased' => '0'
                                     }
                     },
        'runtime' => {
@@ -84,11 +86,12 @@ do { my $x = {
                                       'Math::BigInt' => '0',
                                       'Moo' => '0',
                                       'MooX::StrictConstructor' => '0',
+                                      'MooX::Tag::TO_HASH' => '0.04',
                                       'Ref::Util' => '0',
                                       'Safe::Isa' => '0',
                                       'Tree::Range::RB' => '0',
                                       'Type::Library' => '0',
-                                      'Type::Params' => '0',
+                                      'Type::Params' => '2.002',
                                       'Type::Tiny' => '1.016',
                                       'Type::Utils' => '0',
                                       'Types::Common::Numeric' => '0',
@@ -114,8 +117,7 @@ do { my $x = {
                                    'Storable' => '0',
                                    'Test2::V0' => '0.000119',
                                    'Test::Lib' => '0',
-                                   'Test::More' => '0',
-                                   'aliased' => '0'
+                                   'Test::More' => '0'
                                  }
                  }
      };

@@ -11,7 +11,7 @@ base 'Faker::Plugin::EnUs';
 
 # VERSION
 
-our $VERSION = '1.17';
+our $VERSION = '1.19';
 
 # METHODS
 
@@ -44,7 +44,7 @@ Internet Domain Word for Faker
 
 =head1 VERSION
 
-1.17
+1.19
 
 =cut
 
@@ -139,5 +139,20 @@ I<Since C<1.10>>
   # bless(..., "Faker::Plugin::EnUs::InternetDomainWord")
 
 =back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

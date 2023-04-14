@@ -1,26 +1,28 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::CCS::Ops;
 
-@EXPORT_OK  = qw( PDL::PP ccs_binop_align_block_mia );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(ccs_binop_align_block_mia );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::CCS::Ops::VERSION = 1.23.20;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.23.22';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ops $VERSION;
 
 
 
 
+
+
+
+#line 13 "ccsops.pd"
 
 #use PDL::CCS::Version;
 use strict;
@@ -40,26 +42,20 @@ PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
  ## ... stuff happens
 
 =cut
-
-
-
-
-
-
+#line 46 "Ops.pm"
 
 =head1 FUNCTIONS
-
-
 
 =cut
 
 
 
 
+
+#line 51 "ccsops.pd"
+
 *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
-
-
-
+#line 59 "Ops.pm"
 
 =head2 ccs_binop_align_block_mia
 
@@ -69,7 +65,6 @@ PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
     indx ixa(Ndims,NnzA); indx ixb(Ndims,NnzB); indx    istate(State);
     indx [o]nzai(NnzC);   indx [o]nzbi(NnzC);   indx [o]ostate(State);
     )
-
 
 Partially aligns a pair of lexicographically sorted index-vector lists C<$ixa()> and C<$ixb()>,
 e.g. for block-wise incremental computation of binary operations over sparse index-encoded PDLs,
@@ -119,17 +114,12 @@ This ought to be the case for all operations if missing values are C<BAD> (see L
 but might cause unexpected results if e.g. missing values are zero and the operation
 in question is addition.
 
-
-
 =for bad
 
 ccs_binop_align_block_mia does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
-
-
 
 
 
@@ -138,6 +128,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+
+
+#line 220 "ccsops.pd"
 
 ##---------------------------------------------------------------------
 =pod
@@ -159,7 +152,6 @@ No support for (pseudo)-threading.
 
 =cut
 
-
 ##---------------------------------------------------------------------
 =pod
 
@@ -180,15 +172,8 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-
-
-
-;
-
-
+#line 176 "Ops.pm"
 
 # Exit with OK status
 
 1;
-
-		   

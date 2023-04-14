@@ -2,7 +2,7 @@ package Sodium::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Carp qw(croak);
 use Exporter qw(import);
@@ -483,6 +483,66 @@ our %function = (
             my $msg_len = $cipher_len - Sodium::FFI::crypto_box_MACBYTES;
             my $msg = "\0" x $msg_len;
             my $ret = $xsub->($msg, $cipher_text, $cipher_len, $nonce, $pk, $sk);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return $msg;
+        }
+    ],
+
+    # int
+    # crypto_box_seal(unsigned char *c, const unsigned char *m,
+    #               unsigned long long mlen, const unsigned char *pk)
+    'crypto_box_seal' => [
+        ['string', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $message, $pk) = @_;
+
+            if (length($pk) != Sodium::FFI::crypto_box_PUBLICKEYBYTES) {
+                croak(
+                    "The public key must be crypto_box_PUBLICKEYBYTES in length"
+                );
+            }
+
+            my $message_len = length($message);
+
+            my $cipher_len  = Sodium::FFI::crypto_box_SEALBYTES + $message_len;
+            my $cipher_text = "\0" x $cipher_len;
+
+            my $ret = $xsub->($cipher_text, $message, $message_len, $pk);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return $cipher_text;
+        }
+    ],
+
+    # crypto_box_seal_open(unsigned char *m, const unsigned char *c,
+    #               unsigned long long clen,
+    #               const unsigned char *pk, const unsigned char *sk)
+    'crypto_box_seal_open' => [
+        ['string', 'string', 'size_t', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $cipher_text, $pk, $sk) = @_;
+
+            if (length($pk) != Sodium::FFI::crypto_box_PUBLICKEYBYTES) {
+                croak(
+                    "The public key must be crypto_box_PUBLICKEYBYTES in length"
+                );
+            }
+            if (length($sk) != Sodium::FFI::crypto_box_SECRETKEYBYTES) {
+                croak(
+                    "The secret key must be crypto_box_SECRETKEYBYTES in length"
+                );
+            }
+
+            if (length($cipher_text) < crypto_box_SEALBYTES) {
+                return -1;
+            }
+
+            my $msg = "\0" x (length($cipher_text) - crypto_box_SEALBYTES);
+            my $ret
+                = $xsub->($msg, $cipher_text, length($cipher_text), $pk, $sk);
             if ($ret != 0) {
                 croak("Some internal error happened");
             }
@@ -1052,7 +1112,7 @@ C library. Sodium is a modern, easy-to-use software library for encryption, decr
 signatures, password hashing, and more. These bindings have been created using FFI
 via L<FFI::Platypus>.
 
-While we also intend to eventually fix L<Crypt::NaCl::Sodium> so that it can use newer versions
+We also intend to eventually fix L<Crypt::NaCl::Sodium> so that it can use newer versions
 of LibSodium.
 
 =head1 Crypto Auth Functions
@@ -1369,6 +1429,33 @@ function randomly generates a secret key and a corresponding public key.
 
 The L<crypto_box_open_easy|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption#combined-mode>
 function decrypts a cipher text produced by L<crypto_box_easy>.
+
+=head2 crypto_box_seal
+
+    use Sodium::FFI qw(crypto_box_keypair crypto_box_seal);
+    my ($public_key, $secret_key) = crypto_box_keypair();
+    my $msg = "test";
+    my $cipher_text = crypto_box_seal($msg, $public_key);
+
+The L<crypto_box_seal|https://doc.libsodium.org/public-key_cryptography/sealed_boxes>
+function encrypts a message for a recipient whose public key is provided. The
+function creates a new key pair for each message and attaches the public key
+to the ciphertext. The secret key is overwritten and is not accessible after
+this function returns.
+
+=head2 crypto_box_seal_open
+
+    use Sodium::FFI qw(crypto_box_keypair crypto_box_seal crypto_box_seal_open);
+    my ($public_key, $secret_key) = crypto_box_keypair();
+    my $msg = "test";
+    my $cipher_text = crypto_box_seal($msg, $public_key);
+    my $decrypted = crypto_box_seal_open($cipher_text, $public_key, $secret_key);
+    if ($decrypted eq $msg) {
+        say "Yay!";
+    }
+
+The L<crypto_box_seal_open|https://doc.libsodium.org/public-key_cryptography/sealed_boxes>
+function decrypts a cipher text produced by L<crypto_box_seal>.
 
 =head2 crypto_box_seed_keypair
 

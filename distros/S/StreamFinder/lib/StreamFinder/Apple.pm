@@ -403,6 +403,7 @@ sub new
 	$self->{'albumartist'} = $url2fetch;
 	my @epiTitles = ();
 	my @epiStreams = ();
+	my @epiGenres = ();
 
 	if ($self->{'id'} !~ m#\/#) {   #PAGE (multiple episodes):
 		print STDERR "i:FETCHING PAGE URL ($url2fetch)...\n"  if ($DEBUG);
@@ -439,15 +440,19 @@ sub new
 			my $stream = $2;
 			next  if ($self->{'secure'} && $stream !~ /^https/o);
 
-			my $title = ($pre =~ s#\"name\\?\"\:\\?\"([^\\\"]+)##so) ? $1 : '';
-			$title ||= ($html =~ s#\"itunesTitle\\?\"\:\\?\"([^\\\"]+)##so) ? $1 : '';
+			my $title = ($pre =~ s#\"(?:name|itunesTitle)\\?\"\:\\?\"(.+?)\\?\"\,##so) ? $1 : '';
 			next  unless ($title);
 
+			$title =~ s#\\##g;
 			$title = HTML::Entities::decode_entities($title);
 			$title = uri_unescape($title);
 			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+			my $genre = ($pre =~ m#\"genreNames\\?\"\:\[\\?\"(.+?)\\?\"[\,\]]#so) ? $1 : '';
+			$genre =~ s#\\##g;
+
 			push @epiStreams, $stream;
 			push @epiTitles, $title;
+			push @epiGenres, $genre;
 		}
  	}
 
@@ -496,8 +501,16 @@ sub new
 		$self->{'year'} = $1  if ($prodlistitemdata =~ m#\>([\d]+)\D*\<\/time\>#s);
 	}
 	$self->{'genre'} ||= $1  if ($html =~ m#\<li\s+class\=\"inline\-list\_\_item[^\>]+\>(.*?)\<\/li\>#s);
-	$self->{'title'} = $1  if ($html =~ m#\"name\\?\"\:\\?\"([^\\\"]+)#s);
-	$self->{'title'} ||= $1  if ($html =~ m#\"itunesTitle\\?\"\:\\?\"([^\\\"]+)#s);
+	if ($html =~ m#\<h1(.+?)\<\/h1\>#si) {
+		my $titlestuff = $1;
+		if ($titlestuff =~ m#\s+aria\-label\=\"([^\"]+)#s) {
+			$self->{'title'} = $1;
+		} elsif ($titlestuff =~ m#\>(.+?)\<\/span\>#s) {
+			$self->{'title'} = $1;
+		}
+	}
+	$self->{'title'} ||= $1  if ($html =~ s#\"(?:name|itunesTitle)\\?\"\:\\?\"(.+?)\\?\"\,##so);
+	$self->{'title'} =~ s#\\##g;
 	if ($html =~ m#episode\-description\>(.+?)\<\/section\>#s) {
 		$self->{'description'} = $1;
 		$self->{'description'} =~ s#\<p[^\>]*\>(.+?)\<\/p\>#$1#s;
@@ -544,7 +557,7 @@ sub new
 					if ($self->{'artist'});
 			$self->{'playlist'} .= "#EXTALB:" . $self->{'album'} . "\n"
 					if ($self->{'album'});
-			$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"
+			$self->{'playlist'} .= "#EXTGENRE:" . ($epiGenres[$i] || $self->{'genre'}) . "\n"
 					if ($self->{'genre'});
 			$self->{'playlist'} .= $epiStreams[$i] . "\n";
 		}

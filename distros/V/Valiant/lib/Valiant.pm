@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001017';
+our $VERSION = '0.001021';
 $VERSION = eval $VERSION;
 
 1;
@@ -1446,7 +1446,7 @@ Or to any dog charity that fits best with your personal beliefs and economic mea
 
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2022, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2023, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

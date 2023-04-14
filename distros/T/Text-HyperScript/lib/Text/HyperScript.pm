@@ -4,7 +4,7 @@ use warnings;
 
 package Text::HyperScript;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Exporter::Lite;
 
@@ -12,7 +12,7 @@ our @EXPORT = qw(raw true false text h);
 
 sub raw {
     my $html = $_[0];
-    return bless \$html, 'Text::HyperScript::Element';
+    return bless \$html, 'Text::HyperScript::NodeString';
 }
 
 sub true {
@@ -51,7 +51,7 @@ sub h {
     my @contents;
 
     for my $data (@_) {
-        if ( ref $data eq 'Text::HyperScript::Element' ) {
+        if ( ref $data eq 'Text::HyperScript::NodeString' ) {
             push @contents, ${$data};
             next;
         }
@@ -124,23 +124,23 @@ sub h {
 
     if ( @contents == 0 ) {
         $html .= " />";
-        return bless \$html, 'Text::HyperScript::Element';
+        return bless \$html, 'Text::HyperScript::NodeString';
     }
 
     $html .= q(>) . join( q{}, @contents ) . qq(</${tag}>);
-    return bless \$html, 'Text::HyperScript::Element';
+    return bless \$html, 'Text::HyperScript::NodeString';
 }
 
-package Text::HyperScript::Element;
+package Text::HyperScript::NodeString;
 
-use overload q("") => \&markup;
+use overload q("") => \&to_string;
 
 sub new {
     my ( $class, $html ) = @_;
     return bless \$html, $class;
 }
 
-sub markup {
+sub to_string {
     return ${ $_[0] };
 }
 
@@ -285,16 +285,16 @@ You could pass to these types:
 
 Plain text as content.
 
-This value always applied html/xml escape by L<HTML::Escape#escape_html>.
+This value always applied html/xml escape.
 
-=item C<Text::HyperScript::Element>
+=item C<Text::HyperScript::NodeString>
 
 Raw html/xml string as content.
 
 B<This value does not applied html/xml escape>,
 B<you should not use this type for untrusted text>.
 
-=item C<ArrayRef[ Str | Text::HyperScript::Element ]>
+=item C<ArrayRef[ Str | Text::HyperScript::NodeString ]>
 
 The ArrayRef of C<$content>.
 
@@ -313,12 +313,12 @@ you should use this function for wrapping untrusted content.
 
 =head2 raw
 
-This function makes a instance of C<Text::HyperScript::Element>.
+This function makes a instance of C<Text::HyperScript::NodeString>.
 
-Instance of C<Text::HyperScript::Element> has C<markup> method,
+Instance of C<Text::HyperScript::NodeString> has C<to_string> method,
 that return text with html/xml markup.
 
-The value of C<Text::HyperScript::Element> is not escaped by L<HTML::Escape::escape_html>,
+The value of C<Text::HyperScript::NodeString> always does not escaped,
 you should not use this function for display untrusted content. 
 Please use C<text> instead of this function.
 

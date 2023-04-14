@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moose;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.046';
+our $VERSION   = '0.050000';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -176,7 +176,7 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Moose::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.046';
+our $VERSION   = '0.050000';
 
 use Moose::Role;
 
@@ -215,7 +215,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Moose::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.046';
+our $VERSION   = '0.050000';
 
 use Moose::Role;
 requires '_shv_toolkit';

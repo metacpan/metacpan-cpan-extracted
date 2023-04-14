@@ -8,13 +8,16 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit::IO;
-$Spreadsheet::Edit::IO::VERSION = '3.003';
+our $VERSION = '3.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-04'; # DATE from Dist::Zilla::Plugin::OurDate
+
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
 use Exporter 'import';
 our @EXPORT_OK = qw(@sane_CSV_read_options @sane_CSV_write_options
                     cx2let let2cx cxrx2sheetaddr convert_spreadsheet OpenAsCsv
                     sheetname_from_spec filepath_from_spec
+                    form_spec_with_sheetname
                    );
 
 # TODO: Provide "known_attributes" function ala Text::CSV::known_attributes()
@@ -597,7 +600,7 @@ sub filepath_from_spec($) {
 #die "TEX";
 
 # Construct a file + sheetname spec in the preferred form for humans to read
-sub _form_spec_with_sheetname($$) {
+sub form_spec_with_sheetname($$) {
   my ($filepath, $sheetname) = @_;
   confess "bug" if defined sheetname_from_spec($filepath);
    "${filepath}[${sheetname}]"
@@ -1222,6 +1225,11 @@ Functions which decompose strings giving a spreadsheet path and possibly sheetna
 as "FILEPATH!SHEETNAME", "FILEPATH|||SHEETNAME", or "FILEPATH[SHEETNAME]".
 C<sheetname_from_spec> returns C<undef> if the input does not have a
 a sheetname suffix.
+
+=head2 form_spec_with_sheetname(PATH, SHEENAME)
+
+Composes a combined string in a "preferred" format ("PATH!SHEETNAME" or one of the others;
+which is not specified).
 
 =cut
 

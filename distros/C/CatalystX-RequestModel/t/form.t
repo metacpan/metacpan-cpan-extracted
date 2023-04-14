@@ -51,7 +51,7 @@ use Catalyst::Test 'Example';
   ];
 
   ok my $res = request POST '/account/one', $body_parameters;
-  ok my $data = eval $res->content;  
+  ok my $data = eval $res->content;
  
   is_deeply $data, +{
     credit_cards => [

@@ -5,47 +5,40 @@ use warnings;
 use SPVM::Builder::Util;
 
 sub create_make_rule_native { SPVM::Builder::Util::create_make_rule_native(@_) }
+
 sub create_make_rule_precompile { SPVM::Builder::Util::create_make_rule_precompile(@_) }
+
+sub create_default_config { SPVM::Builder::Util::create_default_config(@_) }
 
 1;
 
 =head1 Name
 
-SPVM::Builder::Util::API - Public APIs of the utility of SPVM Builder
-
-=head1 Usage
-    
-  # Create native make rule
-  my $native_make_rule
-    = SPVM::Builder::Util::API::create_make_rule_native('Foo');
-  
-  # Create precompile make rule
-  my $precompile_make_rule
-    = SPVM::Builder::Util::API::create_make_rule_precompile('Foo');
+SPVM::Builder::Util::API - Defining Public Functions of SPVM::Builder::Util
 
 =head1 Description
 
-B<SPVM::Builder::Util::API> is the public APIs of the utilities of SPVM Builder. 
+The SPVM::Builder::Util::API class defines the public functions of the L<SPVM::Builder::Util> class.
 
-L<SPVM::Builder::Util> is a private modules of L<SPVM>.
+=head1 Usage
 
-The names and arguments of the functions are changed without warnings in the future release.
-
-However, the functions is useful to create the content of Makefile.
-
-B<SPVM::Builder::Util::API> provides the public APIs to call the functions of L<SPVM::Builder::Util>. These APIs is public and stable.
+  my $native_make_rule = SPVM::Builder::Util::API::create_make_rule_native('Foo');
+  
+  my $precompile_make_rule = SPVM::Builder::Util::API::create_make_rule_precompile('Foo');
 
 =head1 Functions
 
 =head2 create_make_rule_native
 
-Create native compile make rule.
+  my $make_rule = SPVM::Builder::Util::API::create_make_rule_native($class_name);
 
-This is used in Makefile.PL of your distributed module.
-  
+Creates a rule written by C<make> commands to generate a dynamic library for the class $class_name that contains native methods, and returns the rule.
+
+Examples:
+
   # Makefile.PL
   sub MY::postamble {
-
+    
     my $make_rule = '';
     
     # Native compile make rule
@@ -56,12 +49,15 @@ This is used in Makefile.PL of your distributed module.
 
 =head2 create_make_rule_precompile
 
-Create precompile make rule.
+  my $make_rule = SPVM::Builder::Util::API::create_make_rule_precompile($class_name);
 
-This is used in Makefile.PL of your distributed module.
+Creates a rule written by C<make> commands to generate a dynamic library for the class $class_name that contains precompiled methods, and returns the rule.
 
+Examples:
+
+  # Makefile.PL
   sub MY::postamble {
-
+    
     my $make_rule = '';
     
     # Precompile make rule
@@ -69,3 +65,19 @@ This is used in Makefile.PL of your distributed module.
     
     return $make_rule;
   }
+
+=head2 create_default_config
+
+  my $config = SPVM::Builder::Util::API::create_default_config();
+
+Creates a default config, and returns it. The config is a L<SPVM::Builder::Config> object.
+
+The current implementation is the following one.
+
+  my $config = SPVM::Builder::Config->new_c99(file_optional => 1);
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

@@ -12,9 +12,9 @@ use List::Util qw(first);
 use Perinci::Result::Format::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-27'; # DATE
+our $DATE = '2023-02-06'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-TableData'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub _md2pod {
     require Markdown::To::POD;
@@ -31,7 +31,7 @@ sub _process_module {
 
     my $filename = $input->{filename};
 
-    $self->require_from_build($input, $package);
+    $self->require_from_build({reload=>1}, $input, $package);
 
     my $td_name = $package;
     $td_name =~ s/\ATableData:://;
@@ -39,6 +39,9 @@ sub _process_module {
   ADD_SYNOPSIS_SECTION:
     {
         my @pod;
+        push @pod, "To use from Perl code:\n";
+        push @pod, "\n";
+
         push @pod, " use $package;\n\n";
         push @pod, " my \$td = $package->new;\n";
         push @pod, "\n";
@@ -59,6 +62,20 @@ sub _process_module {
         push @pod, "See also L<TableDataRole::Spec::Basic> for other methods.\n";
         push @pod, "\n";
 
+        push @pod, "To use from command-line (using L<tabledata> CLI):\n";
+        push @pod, "\n";
+
+        push @pod, " # Display as ASCII table and view with pager\n";
+        push @pod, " % tabledata $td_name --page\n";
+        push @pod, "\n";
+
+        push @pod, " # Get number of rows\n";
+        push @pod, " % tabledata --action count_rows $td_name\n";
+        push @pod, "\n";
+
+        push @pod, "See the L<tabledata> CLI's documentation for other available actions and options.\n";
+        push @pod, "\n";
+
         $self->add_text_to_section(
             $document, join("", @pod), 'SYNOPSIS',
             {
@@ -72,10 +89,18 @@ sub _process_module {
     {
         no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my @pod;
-        my $no_stats = \%{"$package\::NO_STATS"};
-        last if $no_stats;
+        my $no_stats = ${"$package\::NO_STATS"};
+        if ($no_stats) {
+            $self->log_debug("Package $package sets \$NO_STATS, skip generating TABLEDATA STATISTICS POD section");
+            last;
+        }
         my $stats = \%{"$package\::STATS"};
-        last unless keys %$stats;
+        unless (keys %$stats) {
+            $self->log_debug("Package $package does not define keys in \%STATS, skip generating TABLEDATA STATISTICS POD section");
+            #use Package::MoreUtil; use DDC; dd( Package::MoreUtil::list_package_contents($package) );
+            #use DDC; dd \%INC;
+            last;
+        }
         my $str = Perinci::Result::Format::Lite::format(
             [200,"OK",$stats], "text-pretty");
         $str =~ s/^/ /gm;
@@ -123,7 +148,7 @@ Pod::Weaver::Plugin::TableData - Plugin to use when building TableData::* distri
 
 =head1 VERSION
 
-This document describes version 0.002 of Pod::Weaver::Plugin::TableData (from Perl distribution Pod-Weaver-Plugin-TableData), released on 2021-09-27.
+This document describes version 0.003 of Pod::Weaver::Plugin::TableData (from Perl distribution Pod-Weaver-Plugin-TableData), released on 2023-02-06.
 
 =head1 SYNOPSIS
 
@@ -177,13 +202,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

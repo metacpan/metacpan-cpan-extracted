@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 3;
+use Test::More 'tests' => 4;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Print::Form;
@@ -55,6 +55,50 @@ Statements:
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Get printed value.');
+
+# Test.
+$obj = Wikibase::Datatype::Form->new(
+        'grammatical_features' => [
+                # singular
+                Wikibase::Datatype::Value::Item->new(
+                        'value' => 'Q110786',
+                ),
+                # nominative case
+                Wikibase::Datatype::Value::Item->new(
+                        'value' => 'Q131105',
+                ),
+        ],
+        'id' => 'L469-F1',
+        'representations' => [
+                Wikibase::Datatype::Value::Monolingual->new(
+                        'language' => 'cs',
+                        'value' => 'pes',
+                ),
+        ],
+        'statements' => [
+                Wikibase::Datatype::Statement->new(
+                        'snak' => Wikibase::Datatype::Snak->new(
+                                'datatype' => 'string',
+                                'datavalue' => Wikibase::Datatype::Value::String->new(
+                                       'value' => decode_utf8('pɛs'),
+                                ),
+                                'property' => 'P898',
+                        ),
+                ),
+        ],
+);
+$ret = Wikibase::Datatype::Print::Form::print($obj, {
+	'lang' => 'en',
+});
+$right_ret = decode_utf8(<<'END');
+Id: L469-F1
+Representation: pes (cs)
+Grammatical features: Q110786, Q131105
+Statements:
+  P898: pɛs (normal)
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Get printed value (options with language set).');
 
 # Test.
 eval {

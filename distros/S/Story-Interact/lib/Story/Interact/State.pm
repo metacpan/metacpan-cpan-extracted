@@ -5,11 +5,12 @@ use warnings;
 package Story::Interact::State;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001009';
+our $VERSION   = '0.001010';
 
 use Story::Interact::Character ();
 
 use Moo;
+use Module::Runtime qw( use_package_optimistically );
 use Types::Common -types;
 use namespace::clean;
 
@@ -43,6 +44,12 @@ has 'character_class' => (
 	builder   => sub { 'Story::Interact::Character' },
 );
 
+has 'params' => (
+	is        => 'rw',
+	isa       => HashRef,
+	builder   => sub { {} },
+);
+
 sub BUILD {
 	my ( $self, $arg ) = @_;
 	$self->define_npc( player => ( name => 'Anon' ) );
@@ -56,7 +63,9 @@ sub player {
 sub define_npc {
 	my ( $self, $code, %attrs ) = @_;
 	return if defined $self->character->{$code};
-	$self->character->{$code} = $self->character_class->new( %attrs );
+	
+	my $character_class = delete( $attrs{class} ) // $self->character_class;
+	$self->character->{$code} = use_package_optimistically( $character_class )->new( %attrs );
 }
 
 sub update_from_page {

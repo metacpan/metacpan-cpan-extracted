@@ -22,18 +22,17 @@ requires 'Error::Pure' => 0.16;
 requires 'List::Util' => 1.41;
 requires 'PYX::Parser' => 0.02;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=PYX-Hist';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/PYX-Hist/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-Hist';
 resources 'repository' => 'git://github.com/michal-josef-spacek/PYX-Hist';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.22;
 test_requires 'File::Object' => 0.07;
-test_requires 'IO::CaptureOutput' => 0;
+test_requires 'Capture::Tiny' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.07';
 
 # Run.
 WriteAll();

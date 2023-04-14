@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-OpenAI::API::Request::Edit - edits endpoint
+OpenAI::API::Request::Edit - Request class for OpenAI API content editing
 
 =head1 SYNOPSIS
 
@@ -36,64 +36,53 @@ OpenAI::API::Request::Edit - edits endpoint
 
     my $request = OpenAI::API::Request::Edit->new(
         model       => "text-davinci-edit-001",
-        input       => "What day of the wek is it?",
-        instruction => "Fix the spelling mistakes",
+        instruction => 'Correct the grammar in the following text:',
+        input       => 'the cat sat on teh mat.',
     );
 
-    # NOTE: the "/edits" endpoint is currently broken
-
-    #my $res = $request->send();
-    #
-    #my $text = $res->{choices}[0]{text};
+    my $res  = $request->send();            # or: my $res  = $request->send(%args)
+    my $text = $res->{choices}[0]{text};    # or: my $text = "$res";
 
 =head1 DESCRIPTION
 
-Creates a new edit for the provided input, instruction, and parameters.
+This module provides a request class for interacting with the OpenAI
+API's content editing endpoint. It inherits from L<OpenAI::API::Request>.
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
-=head2 new()
-
-=over 4
-
-=item * model
+=head2 model
 
 ID of the model to use. You can use the text-davinci-edit-001 or
 code-davinci-edit-001 model with this endpoint.
 
-=item * input [optional]
+=head2 input [optional]
 
 The input text to use as a starting point for the edit.
 
-=item * instruction
+=head2 instruction
 
 The instruction that tells the model how to edit the prompt.
 
-=item * n [optional]
+=head2 n [optional]
 
 How many edits to generate for the input and instruction.
 
-=item * temperature [optional]
+=head2 temperature [optional]
 
 What sampling temperature to use, between 0 and 2.
 
-=item * top_p [optional]
+=head2 top_p [optional]
 
 An alternative to sampling with temperature.
 
-=back
+=head1 INHERITED METHODS
 
-=head2 send()
+This module inherits the following methods from L<OpenAI::API::Request>:
 
-Sends the request and returns a data structured similar to the one
-documented in the API reference.
+=head2 send(%args)
 
-=head2 send_async()
-
-Send a request asynchronously. Returns a L<Promises> promise that will
-be resolved with the decoded JSON response. See L<OpenAI::API::Request>
-for an example.
+=head2 send_async(%args)
 
 =head1 SEE ALSO
 
-OpenAI API Reference: L<Edits|https://platform.openai.com/docs/api-reference/edits>
+L<OpenAI::API::Request>, L<OpenAI::API::Config>

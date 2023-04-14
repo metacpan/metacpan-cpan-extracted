@@ -3,18 +3,16 @@ abstract: 'use L<SQL::Abstract::More> as Query Builder for Teng'
 author:
   - 'Ktat, C<< <ktat at cpan.org> >>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  ExtUtils::MakeMaker: '6.42'
+  Test::More: '0'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.6.4, CPAN::Meta::Converter version 2.132140'
-license: gpl
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Teng-Plugin-SearchBySQLAbstractMore
 no_index:
   directory:
@@ -25,10 +23,11 @@ no_index:
     - eg
     - examples
     - author
+    - builder
 provides:
   Teng::Plugin::SearchBySQLAbstractMore:
     file: lib/Teng/Plugin/SearchBySQLAbstractMore.pm
-    version: 0.12
+    version: '0.13'
   Teng::Plugin::SearchBySQLAbstractMore::Pager:
     file: lib/Teng/Plugin/SearchBySQLAbstractMore/Pager.pm
   Teng::Plugin::SearchBySQLAbstractMore::Pager::Count:
@@ -38,14 +37,16 @@ provides:
   Teng::Plugin::SearchBySQLAbstractMore::Pager::MySQLFoundRows:
     file: lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/MySQLFoundRows.pm
 requires:
-  Data::Page: 0
-  Data::Page::NoTotalEntries: 0
-  SQL::Abstract::More: 0
-  Teng: 0.17
+  Data::Page: '0'
+  Data::Page::NoTotalEntries: '0'
+  SQL::Abstract::More: '0'
+  Teng: '0.17'
 resources:
   bugtracker: https://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore/issues
   homepage: https://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore
-  repository: git://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore.git
-version: 0.12
+  repository: https://github.com/ktat/Teng-Plugin-SearchBySQLAbstractMore.git
+version: '0.13'
 x_contributors:
   - 'ktat <ktat.is@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

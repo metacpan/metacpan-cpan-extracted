@@ -55,7 +55,7 @@
    "provides" : {
       "Nanoid" : {
          "file" : "lib/Nanoid.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/tkzwtks/Nanoid-perl"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "AnaTofuZ <anatofuz@gmail.com>",
       "Eugene Alvin Villar <seav80@gmail.com>"

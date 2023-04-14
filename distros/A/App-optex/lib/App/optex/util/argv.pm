@@ -63,8 +63,8 @@ In this example,
 
     optex -Mutil::argv::function(debug,message=hello,count=3)
 
-option I<debug> has value 1, I<message> has string "hello", and
-I<count> also has string "3".
+option B<debug> has value 1, B<message> has string "hello", and
+B<count> also has string "3".
 
 =head1 FUNCTION
 
@@ -87,14 +87,14 @@ sub times {
     }
 }
 
-=item B<times>(I<count>=I<n>,I<suffix>=I<str>)
+=item B<times>(B<count>=I<n>,B<suffix>=I<str>)
 
-Multiply each arguments.  Default I<count> is 2.
+Multiply each arguments.  Default B<count> is 2.
 
     % optex echo -Mutil::argv::times(count=3) 1 2 3
     1 1 1 2 2 2 3 3 3
 
-Put I<suffix> to duplicated arguments.
+Put B<suffix> to duplicated arguments.
 
     % optex echo -Mutil::argv::times(suffix=.bak) a b c
     a a.bak b b.bak c c.bak
@@ -137,11 +137,10 @@ will print:
 
 ######################################################################
 
-my @persist;
-
 use App::optex::Tmpfile;
 
 sub proc {
+    state @persist;
     argv {
 	for (@_) {
 	    my($command) = /^ \<\( (.*) \) $/x or next;
@@ -160,12 +159,44 @@ Process substitution.
 
     % optex diff -Mutil::argv::proc= '<(date)' '<(date -u)'
 
-=back
+=cut
+
+######################################################################
+
+use App::optex::Tmpfile;
+
+sub filter {
+    state @persist;
+    my %arg = @_;
+    my $command = $arg{command} or die "command parameter is required.\n";
+    argv {
+	for (@_) {
+	    -e $_ or next;
+	    my $tmp = new App::optex::Tmpfile;
+	    $tmp->write(`$command < $_`)->rewind;
+	    push @persist, $tmp;
+	    $_ = $tmp->path;
+	}
+	@_;
+    }
+}
+
+=item B<filter>(B<command>=I<command>)
+
+Execute filter command for each file.  Specify any command which
+should be invoked for each argument.
+
+    % optex diff -Mutil::argv::filter=command='cat -n' foo bar
+
+In this example, C<foo> and C<bar> are replaced by the result output
+of C<cat -n < foo> and C<cat -n < bar>. The replacement only occurs
+when the file corresponding to the argument exists.
 
 =cut
 
 ######################################################################
-######################################################################
+
+=back
 
 =head1 OPTIONS
 

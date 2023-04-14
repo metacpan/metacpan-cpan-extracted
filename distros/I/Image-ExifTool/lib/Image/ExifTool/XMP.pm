@@ -50,7 +50,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 require Exporter;
 
-$VERSION = '3.55';
+$VERSION = '3.58';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -87,6 +87,7 @@ my %stdPath = (
     'MicrosoftPhoto' => 'microsoft',
     'prismusagerights' => 'pur',
     'GettyImagesGIFT' => 'getty',
+    'hdr_metadata' => 'hdr',
 );
 
 # translate ExifTool XMP family 1 group names back to standard XMP namespace prefixes
@@ -197,6 +198,7 @@ my %xmpNS = (
     sdc       => 'http://ns.nikon.com/sdc/1.0/',
     ast       => 'http://ns.nikon.com/asteroid/1.0/',
     nine      => 'http://ns.nikon.com/nine/1.0/',
+    hdr_metadata => 'http://ns.adobe.com/hdr-metadata/1.0/',
 );
 
 # build reverse namespace lookup
@@ -751,6 +753,10 @@ my %sRangeMask = (
         Name => 'album',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Album' },
     },
+    et => {
+        Name => 'et',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::ExifTool' },
+    },
     prism => {
         Name => 'prism',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::prism' },
@@ -894,6 +900,10 @@ my %sRangeMask = (
     nine => {
         Name => 'nine',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::nine' },
+    },
+    hdr => {
+        Name => 'hdr',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::hdr' },
     },
 );
 
@@ -1728,6 +1738,14 @@ my %sPantryItem = (
         List => 'Seq',
     },
     RangeMaskMapInfo => { Name => 'RangeMask', Struct => \%sRangeMask, FlatName => 'RangeMask' },
+    # new for ACR 15.1 (not sure if these are integer or real, so just guess)
+    HDREditMode    => { Writable => 'integer' },
+    SDRBrightness  => { Writable => 'real' },
+    SDRContrast    => { Writable => 'real' },
+    SDRHighlights  => { Writable => 'real' },
+    SDRShadows     => { Writable => 'real' },
+    SDRWhites      => { Writable => 'real' },
+    SDRBlend       => { Writable => 'real' },
 );
 
 # Tiff namespace properties (tiff)
@@ -2279,7 +2297,13 @@ my %sPantryItem = (
         PrintConvInv => '$val=~s/\s*m$//; $val',
     },
     NativeDigest => { }, #PH
-    # new Exif
+    # the following written incorrectly by ACR 15.1
+    # SubSecTime (should not be written according to Exif4XMP 2.32 specification)
+    # SubSecTimeOriginal (should not be written according to Exif4XMP 2.32 specification)
+    # SubSecTimeDigitized (should not be written according to Exif4XMP 2.32 specification)
+    # SerialNumber (should be BodySerialNumber)
+    # Lens (should be XMP-aux)
+    # LensInfo (should be XMP-aux)
 );
 
 # Exif extended properties (exifEX, ref 12)
@@ -2528,6 +2552,14 @@ my %sPantryItem = (
     TABLE_DESC => 'XMP Adobe Album',
     NOTES => 'Adobe Album namespace tags.',
     Notes => { },
+);
+
+# ExifTool namespace properties (et)
+%Image::ExifTool::XMP::ExifTool = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-et', 2 => 'Image' },
+    NAMESPACE   => 'et',
+    OriginalImageMD5 => { Notes => 'used to store ExifTool ImageDataMD5 digest' },
 );
 
 # table to add tags in other namespaces
@@ -3077,7 +3109,7 @@ sub ScanForXMP($$)
             undef $buff;
         }
     }
-    unless ($$et{VALUE}{FileType}) {
+    unless ($$et{FileType}) {
         $$et{FILE_TYPE} = $$et{FILE_EXT};
         $et->SetFileType('<unknown file containing XMP>', undef, '');
     }
@@ -3519,6 +3551,7 @@ NoLoop:
             DirLen   => length $$dataPt,
             IgnoreProp => $$subdir{IgnoreProp}, # (allow XML to ignore specified properties)
             IsExtended => 1, # (hack to avoid Duplicate warning for embedded XMP)
+            NoStruct => 1,   # (don't try to build structures since this isn't true XMP)
         );
         my $oldOrder = GetByteOrder();
         SetByteOrder($$subdir{ByteOrder}) if $$subdir{ByteOrder};
@@ -4355,8 +4388,10 @@ sub ProcessXMP($$;$)
 
     # restore structures if necessary
     if ($$et{IsStruct}) {
-        require 'Image/ExifTool/XMPStruct.pl';
-        RestoreStruct($et, $keepFlat);
+        unless ($$dirInfo{NoStruct}) {
+            require 'Image/ExifTool/XMPStruct.pl';
+            RestoreStruct($et, $keepFlat);
+        }
         delete $$et{IsStruct};
     }
     # reset NO_LIST flag (must do this _after_ RestoreStruct() above)
@@ -4392,7 +4427,7 @@ information.
 
 =head1 AUTHOR
 
-Copyright 2003-2022, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2023, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

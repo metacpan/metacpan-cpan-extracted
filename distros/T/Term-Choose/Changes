@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.760   2023-04-06
+    - Option binary_filter for line_fold.
+
 1.759   2023-03-26
     - Update table char_width.
     - Bugfix line_fold.

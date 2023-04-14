@@ -1,0 +1,112 @@
+#!/usr/bin/bash
+
+# PODNAME: zxcvbn-build-data-leipzig
+# ABSTRACT: generate word ranking data from uni-leipzig corpora
+
+# usage:
+#
+# download Corpora Collection tarballs from
+# https://wortschatz.uni-leipzig.de/en/download/
+#
+#   zxcvbn-build-data-leipzig $tarball_path > data/$whatever.txt
+#
+# then you can use those text files as input to
+# Data::Password::zxcvbn::AuthorTools::BuildRankedDictionaries
+
+tarball="$1"
+
+if [[ ! -f "$tarball" ]]; then
+    >&2 cat <<HELP
+Usage:
+
+Download Corpora Collection tarballs from
+https://wortschatz.uni-leipzig.de/en/download/
+
+Then run:
+
+  zxcvbn-build-data-leipzig $tarball_path > data/$whatever.txt
+
+Then you can use those text files as input to
+Data::Password::zxcvbn::AuthorTools::BuildRankedDictionaries
+
+HELP
+
+    exit 1
+fi
+
+# note: this is a bash script with embedded perl, instead of a perl
+# script with IPC::Run, because IPC::Run kept dropping bits of the
+# output and I got fed up with trying to fix it; this works
+#
+# also, since these data files are pretty big, using `sort` saves me
+# from having to re-invent its mixed ram/disk storage strategy
+
+tar -x --wildcards '*-words.txt' -O -f "$tarball" | \
+    perl -E 'use v5.26; use strict; use warnings; use Text::Unidecode;
+binmode STDIN, ":utf8";
+
+# filter out non-simple words, fold everything to lowercase ASCII
+while (my $line = <>) {
+    chomp $line;
+    my ($rank, $word, $count) = split /\t/,$line;
+
+    $word = unidecode($word);
+
+    next unless $word =~ /^\w+$/;
+
+    print fc($word),"\t$count\n";
+}
+' | sort | \
+    perl -E 'use v5.26; use strict; use warnings;
+
+my ($current_word, $current_count) = ("",0);
+
+# add up consecutive lines for the same word; this is needed
+# because the previous filter will produce identical output
+# for differing inputs, in different places; the `sort` brings
+# the identical words together
+while (my $line = <>) {
+    chomp $line;
+    my ($word, $count) = split /\t/, $line;
+
+    if ($word eq $current_word) {
+        $current_count += $count;
+    }
+    else {
+        print "$current_word\t$current_count\n" if $current_word;
+        ($current_word, $current_count) = ($word, $count);
+    }
+}
+print "$current_word\t$current_count\n" if $current_word;
+' | sort -k2nr
+
+exit
+
+# POD goes here
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+zxcvbn-build-data-leipzig - generate word ranking data from uni-leipzig corpora
+
+=head1 VERSION
+
+version 1.0.2
+
+=head1 AUTHOR
+
+Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by BroadBean UK, a CareerBuilder Company.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

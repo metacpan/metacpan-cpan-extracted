@@ -49,7 +49,11 @@ sub view {
 
 	$c->stash(talk => $talk);
 	$c->stash(stylesheets => ['/review.css']);
-	$c->render(template => "review/" . $c->srconfig->get("review_template"), variant => $variant);
+	my $template = $c->srconfig->get("review_template");
+	if(!defined($template)) {
+		$template = ($talk->get_flag("is_injected") ? "confirm" : "full");
+	}
+	$c->render(template => "review/$template", variant => $variant);
 }
 
 sub update {
@@ -65,20 +69,23 @@ sub update {
 		        $talk = SReview::Talk->by_nonce($c->stash('nonce'));
                 };
                 if($@) {
+			$c->stash(talk => SReview::Talk->new(talkid => 0, eventname => $c->srconfig->get("event"), title => "Not found"));
+			$c->res->code(404);
                         $c->stash(error => $@);
-                        $c->render(variant => 'error');
-                        return;
+                        return $c->render(variant => 'error');
                 }
 	}
         $c->stash(talk => $talk);
         if(!admin_for($c, $talk) && $talk->state ne 'preview' && $talk->state ne 'broken') {
                 $c->stash(error => 'This talk is not currently available for review. Please try again later!');
                 $c->render(variant => 'error');
+		$c->res->code(403);
                 return;
         }
         $talk->add_correction(serial => 0);
         if($c->param('serial') != $talk->corrections->{serial}) {
                 $c->stash(error => 'This talk was updated (probably by someone else) since you last loaded it. Please reload the page, and try again.');
+		$c->res->code(409);
                 $c->render(variant => 'error');
                 return;
         }
@@ -94,6 +101,7 @@ sub update {
         }
 	if(!defined($c->param("video_state"))) {
 		$c->stash(error => 'Invalid submission data; missing parameter <t>video_state</t>.');
+		$c->res->code(400);
 		$c->render(variant => "error");
 		return;
 	}
@@ -101,6 +109,7 @@ sub update {
 		if($talk->corrections->{serial} == 0)  {
 			$c->stash(error => 'No corrections have yet been applied to this talk. Unless (at least) start and end times are applied through this webinterface, the likelihood that the video starts and ends at the correct time is very low. Please go back and set the correct start and end times; if by extreme coincidence this video does start and end at the correct time, then please select the "there are problems" option in the previous screen, and submit the form without any changes.');
 			$c->render(variant => "error");
+			$c->res->code(400);
 			return;
 		}
                 $talk->add_correction(serial => -1);
@@ -112,6 +121,7 @@ sub update {
         my $corrections = {};
 	if(!defined($c->param("audio_channel"))) {
 		$c->stash(error => 'Invalid submission data; missing parameter <t>audio_channel</t>.');
+		$c->res->code(400);
 		$c->render(variant => 'error');
 		return;
 	}

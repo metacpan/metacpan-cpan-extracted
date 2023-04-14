@@ -1,0 +1,49 @@
+NAME
+    test-dwg-libredwg-json - Script to test DWG file by LibreDWG
+    conversoions via JSON.
+
+SYNOPSIS
+     test-dwg-libredwg-json [-d test_dir] [-h] [-v level] [--version] dwg_file
+
+ARGUMENTS
+    *       "-d test_dir"
+
+            Test directory. If dosn't exist, create dir in system tmp.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-v level"
+
+            Verbosity level.
+
+            Default value is 0, max is 9.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "dwg_file"
+
+            AutoCAD DWG file to test.
+
+EXAMPLE
+     test-dwg-libredwg-json __FILE__.dwg
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-JSON>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -37,7 +37,7 @@ if ((my $link = $repo ) =~ /github/) { <<~EOF
 }
 
 elsif ((my $link = $repo ) =~ /gitlab/) { <<~EOF
-   The public repository for this code is managed with $vcs and is hosted at GitHub.
+   The public repository for this code is managed with $vcs and is hosted at GitLab.
    It is available via the web at:
 
      $repo
@@ -88,7 +88,7 @@ to clean up the PERL5LIB environment variable when you are done!
 Working without Dist::Zilla
 ---------------------------
 
-This directory contains a working Makefile.PL that will allow you to
+This directory contains a working Build.PL that will allow you to
 work without `Dist::Zilla`.
 
 If you have installed dependencies into a local directory, make sure that
@@ -96,9 +96,9 @@ is in your `PERL5LIB` path.
 
 Then, as usual,
 
-  $ perl Makefile.PL
-  $ make
-  $ make test
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
 
 Working with Dist::Zilla
 ------------------------

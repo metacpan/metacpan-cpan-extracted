@@ -1,17 +1,16 @@
 use strict;
 use warnings;
 
+use Capture::Tiny qw(capture);
 use English;
 use Error::Pure::Utils qw(clean);
-use IO::CaptureOutput qw(capture);
 use PYX::Hist;
 use Test::More 'tests' => 5;
 use Test::NoWarnings;
 
 # Test.
 my $obj = PYX::Hist->new;
-my ($stdout, $stderr);
-capture sub {
+my ($stdout, $stderr) = capture sub {
 	$obj->parse(<<'END');
 (pyx
 (data
@@ -22,7 +21,7 @@ capture sub {
 )data
 )pyx
 END
-} => \$stdout, \$stderr;
+};
 is($stdout, <<'END', 'Stdout output.');
 [ data ] 2
 [ pyx  ] 1

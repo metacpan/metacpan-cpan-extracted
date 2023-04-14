@@ -3,9 +3,9 @@
 package TableDataBundle::Business::ID::DGIP;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-01'; # DATE
+our $DATE = '2023-02-07'; # DATE
 our $DIST = 'TableDataBundle-Business-ID-DGIP'; # DIST
-our $VERSION = '20220831.0.0'; # VERSION
+our $VERSION = '20230207.0.0'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules related to the Directorate General of Intellectual Property
@@ -22,7 +22,7 @@ TableDataBundle::Business::ID::DGIP - Collection of TableData:: modules related 
 
 =head1 VERSION
 
-This document describes version 20220831.0.0 of TableDataBundle::Business::ID::DGIP (from Perl distribution TableDataBundle-Business-ID-DGIP), released on 2022-09-01.
+This document describes version 20230207.0.0 of TableDataBundle::Business::ID::DGIP (from Perl distribution TableDataBundle-Business-ID-DGIP), released on 2023-02-07.
 
 =head1 DESCRIPTION
 
@@ -162,7 +162,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Setup qw/bug silent/; # strict, warnings, Test::More, Carp etc.
+use t_Common qw/oops/; # strict, warnings, Carp, etc.
+use t_TestCommon ':silent', qw/bug/; # Test::More etc.
 
 #
 # Verify that internal function _show_as_number() distinguishes numerics

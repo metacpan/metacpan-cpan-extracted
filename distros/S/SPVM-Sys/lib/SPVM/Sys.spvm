@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys {
   use Sys::OS;
   use Sys::Env;
@@ -5,7 +8,6 @@ class Sys {
   use Sys::Ioctl;
   use Sys::User;
   use Sys::Time;
-  use Time;
   use Sys::Process;
   use Sys::IO::Stat;
   
@@ -435,15 +437,15 @@ class Sys {
   }
   
   static method time : long () {
-    return Time->time();
+    return Sys::Time->time();
   }
   
-  static method localtime : Time::Info ($time : long) {
-    return Time->localtime($time);
+  static method localtime : Sys::Time::Tm ($time : long) {
+    return Sys::Time->localtime($time);
   }
   
-  static method gmtime : Time::Info ($time : long) {
-    return Time->gmtime($time);
+  static method gmtime : Sys::Time::Tm ($time : long) {
+    return Sys::Time->gmtime($time);
   }
   
   static method process_id : int () {

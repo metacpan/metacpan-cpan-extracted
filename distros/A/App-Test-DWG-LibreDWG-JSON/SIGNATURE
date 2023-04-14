@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 428253401ff34c21f0d6cebd931224e21284895e46f4b75038449ae676b317c5 CONCEPT
+SHA256 657ceaa53e1fbdeeefaf6a676a73e7e318267a1c4996567f4d50cd4bddacfad8 Changes
+SHA256 d9c55e90d621c5737ec9e01cb22610669e358f4295696203bb6c1f8def2f2b75 JSON.pm
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 72de355dbe693c4c2ca56894c1502958740158105143629a1042f03bc2f16d3d MANIFEST
+SHA256 16a101393e04ce056cab9ba20d3862970b7c165f240002c6e2c0ec7167d013a5 META.yml
+SHA256 42590b5f3e7529f8970788e402e7036dc19a3b1f7bcbffe31cc583b5c197c6c7 Makefile.PL
+SHA256 ca0b12015277fbce3664123c18004a053dd65e49082542677220633d9fe92f69 README
+SHA256 d1fad2038125e2d3d962407b0cda4ac34617c1585e96e7198c2e96dd5d816fdf bin/test-dwg-libredwg-json
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 812196adb04150966ef4a171903b5538c871546afa1ff4acedf813b38898b4f4 t/App-Test-DWG-LibreDWG-JSON/01-use.t
+SHA256 42edde704a89c8b9ae34b7614a49cab49a6f0467f9e36f0f4e47270e778044fc t/App-Test-DWG-LibreDWG-JSON/02-version.t
+SHA256 ebb32f431f01b3e0e8d693f82dc27c80e4d5862edf0b30e0a88dabbe9da2b606 t/App-Test-DWG-LibreDWG-JSON/03-new.t
+SHA256 22fdc713774eae6f756dc2c043a37ccce221af19103154cba67f8382dca141b3 t/App-Test-DWG-LibreDWG-JSON/04-run.t
+SHA256 649b5c8ee71f7cd38401347fac12844eb05653770e29f1e910102d526a883ae5 xt/App-Test-DWG-LibreDWG-JSON/01-pod_coverage.t
+SHA256 9269601e3887a4332b7b26160c36902a6c106068a86159cf873bc449b85b544d xt/App-Test-DWG-LibreDWG-JSON/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmQkz3gACgkQojV9Rpe/
+B8swaw/+M/OqPMgwoaUjn20VoukHPPdmYoeBIXBGhG05hiWn/IM0U52bqTzVQ2aj
+c9d4larqHg8puyLdEdAOxPIXDnzz9znub9CF+hJFjcbVPqi7EJHzMEs9Z3+4zaQ8
+/xKTTQCxLgH+cTcDNVZjc5+SIPU83IoTmpWT5ZNKYGlcsKAlj0+UCQgy3NIeow6b
+g+RgoymUYQaG7iJgNEz6uskL3NtUeFlC2b4bMHj63j3/w0s6Rnp81owcjpn67Ib4
+cjGccba2PBhGSIbLzPOhOlk36I+xPUAxwEUpldWPZEPzp1u+PuxukNst/kN668hG
+GiZg4oLOTeh4KtiYfQKnQ6MFDuQ0mE+VI54PMAlmgugkXga6PQxirJ6GFgl2924e
+EENpw7JJDei1PMB88B1NyljX3KTmQtKYWoO0vzExlQP8ion7VmQ3Du00hAI1Q8wo
+Ut/D5B1ceRksvLxPLIAKo8aSguRBsR30wrFd475SISCMT1RbfrCm5ENWLYcEwXl+
+itG2gZ14F2VuEIV4MpqZ9/fQa6RQgK2aJDeHRZ5DFdVA01lNO604aekzDY4j5dk6
+CzhdFd4HNaUx7D8MV5KNt0wF2xCIGcfzDRKVG2nOopptRE9zChNA9VWg68VoDKve
+IGEPDca0Y2KpnIQi1Osr0TXL0pm4baOauPJ8Dr46v4mva/Dk5cc=
+=SvY7
+-----END PGP SIGNATURE-----

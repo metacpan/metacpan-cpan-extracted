@@ -1,5 +1,8 @@
-Device-GPIB-Prologix version 0.01
+Device-GPIB-Prologix version 0.06
 =================================
+
+This module is now obsoleted by and replaced by Device::GPIB::Controllers::Prologix, part
+of the new Device::GPIB module.
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for

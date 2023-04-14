@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-our $VERSION = '0.1910';
+our $VERSION = '0.1912';
 
 1;
 
@@ -25,7 +25,7 @@ Task::MusicBundle - MIDI and music creation modules
 
 =head1 VERSION
 
-version 0.1910
+version 0.1912
 
 =head1 SYNOPSIS
 
@@ -40,14 +40,14 @@ version 0.1910
 =head1 DESCRIPTION
 
 This is a bundle to install various MIDI and Music modules related to
-the creation of music.  This is B<not> a bundle of B<all> the MIDI and
-Music modules out there.  Analysis, lyrics, notation, and tablature
+the creation of music. This is B<not> a bundle of B<all> the MIDI and
+Music modules out there. Analysis, lyrics, notation, and tablature
 things are not included.
 
 If you would like to see a specific module included (or discluded),
-please email me or use rt.cpan.org.
+please email me or open a GitHub pull request for this distribution.
 
-Some modules in the C<CONTENTS> are 10 years or older. But so what?
+Some modules are 10 years or older. But so what?
 B<Music is older than agriculture>.
 
 =head1 CONTENTS
@@ -59,6 +59,8 @@ L<Csound>
 L<Guitar::Scale>
 
 L<MIDI>
+
+L<MIDI::Bassline::Walk>
 
 L<MIDI::Chord::Guitar>
 
@@ -97,6 +99,10 @@ L<Music::Chord::Note>
 L<Music::Chord::Positions>
 
 L<Music::Chord::Progression>
+
+L<Music::Chord::Progression::Transform>
+
+L<Music::CreatingRhythms>
 
 L<Music::Duration>
 
@@ -152,7 +158,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2013-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

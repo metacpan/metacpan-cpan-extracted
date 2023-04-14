@@ -10,7 +10,7 @@ setlocale(LC_CTYPE, "pt_PT");
 use locale;
 
 use base 'Exporter';
-our @EXPORT_OK = (qw.onethat verif nlgrep setstopwords
+our @EXPORT_OK = (qw.allthat onethat verif nlgrep setstopwords
                      onethatverif any2str hash2str isguess.);
 
 our %EXPORT_TAGS = (basic => [qw.onethat verif onethatverif
@@ -32,7 +32,7 @@ Lingua::Jspell - Perl interface to the Jspell morphological analyser.
 
 =cut
 
-our $VERSION = '1.96';
+our $VERSION = '1.98';
 our $JSPELL;
 our $JSPELLLIB;
 our $MODE = { nm => "af", flags => 0 };
@@ -500,6 +500,24 @@ sub onethat {
     return () ;
 }
 
+
+=head2 allthat
+
+Returns all Feature Structures from the supplied list that
+verifies the used Feature Structure Pattern.
+
+  @analyses = allthat( { CAT=>'adj' }, @features);
+
+  @analyses = allthat( { CAT=>'adj' }, $pt->fea("espanhol"));
+
+=cut
+
+sub allthat {
+    my ($a, @b) = @_;
+    return grep {verif($a, $_)} @b;
+}
+
+
 =head2 verif
 
 Returns a true value if the second Feature Structure verifies the
@@ -507,12 +525,21 @@ first Feature Structure Pattern.
 
    if (verif( $pattern, $feature) )  { ... }
 
+Use a value of undef, or an empty string, in the pattern, to force that key not to exist:
+
+   if (verif( { FSEM => undef }, $feature)) { .. }
+
 =cut
 
 sub verif {
-    my ($a, $b) = @_;
-    for (keys %$a) {
-        return 0 if (!defined($b->{$_}) || $a->{$_} ne $b->{$_});
+    my ($patt, $b) = @_;
+    for (keys %$patt) {
+        if (!defined($patt->{$_}) || $patt->{$_} eq "") {
+            return 0 if exists $b->{$_};
+        }
+        else {
+            return 0 if (!defined($b->{$_}) || $patt->{$_} ne $b->{$_});
+        }
     }
     return 1;
 }

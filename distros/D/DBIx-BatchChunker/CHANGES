@@ -1,6 +1,17 @@
 Changelog for DBIx-BatchChunker
 
-v1.0.0 2022-07-28T17:19:52
+v1.0.1 2023-03-30T22:01:34
+ - Update README / LICENSE / Makefile (Brendan Byrd)
+ - xt & POD fixes (Brendan Byrd)
+ - Pull request #12: SM-4113 (Brendan Byrd)
+ - Add count_rs attribute (Brendan Byrd)
+ - Add maximum run time feature (Brendan Byrd)
+ - Add COUNT statement target_time check in chunk count checker routine
+   (Brendan Byrd)
+ - Rename $ls->timer to chunk_timer and create total_timer attribute
+   (Brendan Byrd)
+
+v1.0.0 2022-07-28T17:07:40
  - Add POD coverage exception for 'debug' (Brendan Byrd)
  - Pull request #11: SRE-5577 (Brendan Byrd)
  - Update README / Prep for version v1.0.0 (Brendan Byrd)

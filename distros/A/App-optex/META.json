@@ -1,10 +1,10 @@
 {
-   "abstract" : "optex command module direcrtory",
+   "abstract" : "General purpose command option wrapper",
    "author" : [
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.5.4"
+         "version" : "v0.6.0"
       },
       "App::optex::Tmpfile" : {
          "file" : "lib/App/optex/Tmpfile.pm"
@@ -93,16 +93,17 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/optex",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/optex.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/optex.git",
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.5.4",
+   "version" : "v0.6",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 0
 }

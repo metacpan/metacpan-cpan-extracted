@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Moose::Cached;
 # ABSTRACT: Moose extension for StorageDisplay
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 use Carp;
 
@@ -97,7 +97,7 @@ StorageDisplay::Moose::Cached - Moose extension for StorageDisplay
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

@@ -7,6 +7,7 @@ requires 'Clipboard';
 requires 'File::Share';
 requires 'App::Greple', '9.02';
 requires 'App::Greple::msdoc', '1.05';
+requires 'App::optex::textconv', '1.04';
 requires 'App::sdif', '4.24.0';
 requires 'Text::ANSI::Fold', '2.20';
 

@@ -18,12 +18,13 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Plack-Middleware-Auth-JWT",
-  "dist_version" => "0.906",
+  "dist_version" => "0.907",
   "license" => "perl",
   "module_name" => "Plack::Middleware::Auth::JWT",
   "recursive_test_files" => 1,
   "requires" => {
     "Crypt::JWT" => "0.020",
+    "JSON" => 0,
     "Plack::Middleware" => 0,
     "Plack::Request" => 0,
     "Plack::Util" => 0,

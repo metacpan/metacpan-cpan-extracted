@@ -1,3 +1,24 @@
+v1.23.22 Fri, 14 Apr 2023 14:11:53 +0200 mohawk2
+	+ PR #7 from mowhawk2/tweaks: error-handling tweaks & bugfixes for PDL v2.082
+	  - stop passing in outputs in ccs_binop_vector_mia
+	  - DRY in CCS::Functions
+	  - stop passing in outputs in recode
+	  - done_testing means no need count-padding in CCS/t/06_matops.t
+	  - DRY in CCS/t/06_matops.t
+	  - use params not globals in CCS/t/06_matops.t
+	  - _ufuncsub to give stack-trace if $vals1 is empty
+	  - zap old files
+	  - MANIFEST.SKIP expansion
+	  - zap patches
+	  - zap nullbarf file
+	  - zap CVS remnants
+	  - if empty nzvalsIn, stack-trace instead of SEGV
+	  - empty nzvalsIn, stack-trace instead of SEGV
+
+v1.23.21 Sat Apr 8 12:01:01 2023 +0200 moocow
+	+ adjust test expectations for CCS/Utils/t/02_encode.t
+	+ port mohawk2 test tweaks from https://github.com/moocow-the-bovine/PDL-HMM/pull/2/
+
 v1.23.20 Tue, 19 Apr 2022 11:03:00 +0200 moocow
 	+ fixed variable-clobbering warning in 02_encode.t
 	+ type-mismatch fixes for ccs ufunc counters https://github.com/moocow-the-bovine/PDL-CCS/issues/6

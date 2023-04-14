@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+
+##  入力文字列で指定された各ディレクトリの直下にあるファイルのサイズを
+##  取得するプログラム
+##
+##   2016/06/18 - 06/20 , 2018/03/28  下野寿之 Shimono Toshiyuki developed in Tokyo, Japan.
+
+use 5.008 ; use strict ; use warnings ;
+use Getopt::Std ; 
+use Cwd ; # getcwd を使う為
+use List::Util qw[ sum sum0 max ] ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+sub core ( $$ )  ;
+sub sigint ( ) ;
+
+$| = 1 ; 
+getopts '_!.bdg:lm:nqM' , \my %o ; 
+
+& Init ;
+& main ; 
+exit 0 ;
+
+sub Init ( ) { 
+  $o{m} //= 6 ; # 何階層まで調べるか
+  #$o{g} //= 1 ; # 何個のファイル名を取り出すか
+  HELP_MESSAGE () if ! @ARGV ;
+  * CYAN = * RESET = sub ($) { $_[0] } if $o{q} ;
+}
+
+my $fnbd ; # fileNumByDepth ; 配列へのリファレンスと
+my $L ; 
+    
+sub main ( ) { 
+
+  my $dir0 = getcwd ;# print YELLOW $dir0 ;
+
+  sub sigint ( ) {
+    print STDERR YELLOW join ("\t", @{ $fnbd } ) ;    
+    print STDERR BRIGHT_YELLOW " To terminate, press Ctrl + BackSlash (Yen mark)." ;
+    print STDERR "\n" , ' ' x $L ;
+    sleep 1 ;
+  }
+
+  sub core ( $$ ) { # 1番目の引数は、配列 @{$fnbd} へのリファレンス。2番目の引数は深さ
+    $SIG{INT} = 'sigint' ;
+    my $depth = $_[1] + 1 ;
+    my @files = grep {! /^\.{1,2}$/} $o{'.'} ? glob '.* *'  : glob '*' ; 
+    my @dirs = grep { -d $_ && ! ( -l $_  && ! $o{l} ) } @files ;
+    my $addition =  $o{b} ? sum0 ( map { -s $_ // 0 } @files )  : $o{d} ? @dirs :  @files ; 
+    if ( ! $o{M} ) { $_[0] -> [ $depth -1 ] += $addition } else { $_[0] -> [$depth-1] = $addition if $addition > ($_[0]->[$depth-1]//0) } 
+
+    use Scalar::Util qw[dualvar] ; 
+    $_[0] -> [ $depth -1 ] = dualvar $_[0]->[$depth]//0+0, UNDERLINE join " " , splice @{[@files]} , 0, $o{g} if defined $o{g}; 
+
+    if ( $depth >= $o{m} ) { 
+      $_[0] ->[ $depth ] = "inf" if @dirs  ; 
+      return 
+    }; # $o{m} で指定された階層よりは深くは行くことはない。
+    for ( @dirs ) {
+        my $dir1 = getcwd ; 
+        print STDERR "\r" . (' 'x100), CYAN "\r", substr( "$dir1 $_", 0,100) ."\r" if $o{'!'} ;
+        chdir ( $_ ) and  core $_[0] , $depth ; # <- chdir が成功したら true
+        chdir ($dir1) or die "Cannot return to where it exists.\n" ; # <-- - もしも直前にいたディレクトリに戻れない場合、どうする??
+    }
+  }
+
+  my $outsep = $o{'_'} ? " " : "\t" ;
+
+  my @nondir = grep { ! -d $_ } @ARGV ; 
+  print STDERR ( CYAN '* Non-directories: [ ' . RESET join (' ', @nondir ) . CYAN " ]". RESET "\n" ) if @nondir ;
+
+  @ARGV = grep { -d $_ } @ARGV ;
+
+  $L = max 0, map { length } @ARGV ;
+  our @nomARGV = map { substr ' ' x $L . $_ , -$L } @ARGV  ; #<-- 
+
+  for( @ARGV ) {  # ^このループは与えられたパスについて反復。
+    $fnbd = undef ; # fileNumByDepth ; 
+    print shift @nomARGV , "\t"  if ! $o{'!'} ; # <-- 
+    chdir ($_) or next ; #print "-1\n" and next ; 
+    core $fnbd , 0 ;
+    do { print STDERR (' 'x100) , "\r" ; print shift @nomARGV , "\t" } if $o{'!'} ;
+    @{ $fnbd } = do { my $n=0; map {do { $n++ ; CYAN ("$n:") . RESET ("$_") } } @{ $fnbd } } if $o{n} ;
+    print join ( $outsep , @{ $fnbd } ) , "\n" ;    
+    chdir ($dir0) or print STDERR BRIGHT_RED "Cannot return to the original directory.\n" ; 
+  }
+
+}
+
+sub Chdir ( $ ) { no warnings ; chdir($_) or do { print STDERR BRIGHT_RED " 'Access_fail: $_' \n"; 0} ; use warnings } 
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+   $0 directory [directory]..
+     引数で指定されたディレクトリごとに、すぐ直下のファイルの数、
+    2段階下のファイルの数、3段階の下のファイルの数、..、指定された任意の数下った段階の
+    ディレクトリにあるファイルの数を分かり安く表示する。
+     (多数のデータファイルがあり、Unix/Linuxの ls コマンドでもファイル一覧の取得に
+     時間がかかる状況、もしくは、tree コマンドよりも簡潔な情報が欲しい時に役に立つ。)
+ オプション : 
+   -b : 各深さのファイルのバイトサイズの合計を与える。(Byte sum)
+   -d : ディレクトリの個数のみ数える。(Directory number is counted.)
+   -l : シンボリックリンクをたどる。(無限参照を引き起こし得るので、要注意。) (symblic Links are traced.)
+   -m num : 最も潜る深さを指定する。未指定なら、6。 (the Maximum depth)
+   -n : 深さを コロン:の前に表示する。(explicitly shows the depth Number with :)
+   -q : 着色をしない。 (no coloring. visually Quiet.)
+   -M : (最も大きなサイズのみを記録; 最も大きな数のファイルを持つディレクトリがどこにあるかを探す。)
+   -.  : ファイル名が ピリオドで始まるような .* に合致する物も探索対象とする。ただし、 . と ..　は除く。(The hidden files whose name begin with "." are also counted.)
+   -_ : タブ文字の代わりに空白文字ひとつとする。(Space character is used instead of tab character in the output.)
+   -! : どのディレクトリを見ているかをリアルタイムにSTDERR に出力する。(<- 実験的な機能)
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 開発メモ : 
+   * perl -t または perl -T により chdir関数の箇所で警告/エラーが出ないようにするには、別のコーディングが必要であろう。
+   * 途中で出現したディレクトリ名毎に、その下に何個のファイルが含まれていたかを表示するようにしたい。
+=cut
+

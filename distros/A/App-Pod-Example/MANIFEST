@@ -1,7 +1,7 @@
 bin/pod-example
 Changes
 Example.pm
-examples/ex1.pl
+examples/print_enumerated.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 use utf8;
 use List::Util qw<min max>;
 
@@ -105,9 +105,15 @@ our $GRAMMAR = qr{
                 |
                     (?&PerlSubroutineDeclaration)
                 |
+                    (?&PerlMethodDeclaration)
+                |
                     (?&PerlUseStatement)
                 |
                     (?&PerlPackageDeclaration)
+                |
+                    (?&PerlClassDeclaration)
+                |
+                    (?&PerlFieldDeclaration)
                 |
                     (?&PerlControlBlock)
                 |
@@ -174,6 +180,14 @@ our $GRAMMAR = qr{
         (?> ; | (?&PerlBlock) )
     )) # End of rule
 
+        (?<PerlMethodDeclaration>   (?<PerlStdMethodDeclaration>
+            method \b                          (?>(?&PerlOWS))
+            (?>(?&PerlQualifiedIdentifier))       (?&PerlOWS)
+            (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
+            (?> ; | (?&PerlBlock) )
+    )) # End of rule
+
         (?<PerlSignature>   (?<PerlStdSignature>
             \(
                 (?>(?&PerlOWS))
@@ -183,11 +197,17 @@ our $GRAMMAR = qr{
 
         (?<PerlParameterDeclaration>   (?<PerlStdParameterDeclaration>
             (?:
-                    \$  (?>(?&PerlOWS))
-                (?: =   (?>(?&PerlOWS))  (?&PerlConditionalExpression)?+ (?>(?&PerlOWS)) )?+
+                \$                                   (?>(?&PerlOWS))
+                (?:
+                    (?: = | //= | \|\|= )            (?>(?&PerlOWS))
+                    (?&PerlConditionalExpression)?+  (?>(?&PerlOWS))
+                )?+
             |
-                (?&PerlVariableScalar) (?>(?&PerlOWS))
-                (?: =   (?>(?&PerlOWS))  (?&PerlConditionalExpression)   (?>(?&PerlOWS)) )?+
+                (?&PerlVariableScalar)               (?>(?&PerlOWS))
+                (?:
+                    (?: = | //= | \|\|= )            (?>(?&PerlOWS))
+                    (?&PerlConditionalExpression)    (?>(?&PerlOWS))
+                )?+
             |
                 (?&PerlVariableArray) (?>(?&PerlOWS))
             |
@@ -213,19 +233,28 @@ our $GRAMMAR = qr{
     )) # End of rule
 
         (?<PerlReturnExpression>   (?<PerlStdReturnExpression>
-        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+            return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
     )) # End of rule
 
         (?<PerlReturnStatement>   (?<PerlStdReturnStatement>
-        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
-        (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
+            return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+            (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
     )) # End of rule
 
         (?<PerlPackageDeclaration>   (?<PerlStdPackageDeclaration>
-        package
-            (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
-        (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-            (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+            package
+                (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+            (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
+                (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+    )) # End of rule
+
+        (?<PerlClassDeclaration>   (?<PerlStdClassDeclaration>
+            class
+                (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+                (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
+                |   (?>(?&PerlOWS)) : (?>(?&PerlOWS)) isa (?= \( ) (?&PPR_X_quotelike_body)
+                )?+
+                (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
     )) # End of rule
 
         (?<PerlExpression>   (?<PerlStdExpression>
@@ -305,6 +334,8 @@ our $GRAMMAR = qr{
                     (?=  % )  (?&PerlHashAccess)
               |
                     (?&PerlAnonymousSubroutine)
+              |
+                    (?&PerlAnonymousMethod)
               |
                     (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
               |
@@ -464,7 +495,7 @@ our $GRAMMAR = qr{
                 )?+
 
             | # Phasers...
-                (?> BEGIN | END | CHECK | INIT | UNITCHECK ) \b   (?>(?&PerlOWS))
+                (?> BEGIN | END | CHECK | INIT | UNITCHECK | ADJUST ) \b   (?>(?&PerlOWS))
                 (?&PerlBlock)
 
             | # Try/catch/finallys...
@@ -601,6 +632,24 @@ our $GRAMMAR = qr{
             (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
             (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
             (?&PerlAttributes)?+
+    )) # End of rule
+
+        (?<PerlFieldDeclaration>   (?<PerlStdFieldDeclaration>
+            field \b
+                (?>(?&PerlOWS)) [\$\@%]
+                (?>(?&PerlOWS)) (?&PerlIdentifier)
+            (?:
+                (?>(?&PerlOWS)) :
+                (?>(?&PerlOWS)) param
+                (?:
+                    (?= \( ) (?&PPR_X_quotelike_body)  # )
+                )?+
+            )?+
+            (?:
+                (?>(?&PerlOWS)) (?: //= | \|\|= | = )
+                (?>(?&PerlOWS)) (?&PerlConditionalExpression)
+            )?+
+            (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
     )) # End of rule
 
         (?<PerlDoBlock>   (?<PerlStdDoBlock>
@@ -752,6 +801,14 @@ our $GRAMMAR = qr{
                 (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
                 (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
             )
+            (?&PerlBlock)
+    )) # End of rule
+
+        (?<PerlAnonymousMethod>   (?<PerlStdAnonymousMethod>
+            method \b
+            (?>(?&PerlOWS))
+            (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
             (?&PerlBlock)
     )) # End of rule
 
@@ -2865,7 +2922,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.001006
+This document describes PPR::X version 0.001007
 
 
 =head1 SYNOPSIS

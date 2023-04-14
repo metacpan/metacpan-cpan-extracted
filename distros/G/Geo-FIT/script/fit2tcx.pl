@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.08';
 
 =encoding utf-8
 
@@ -49,7 +49,7 @@ die usage() if $help;
 my ($from, $to);
 if (@ARGV) {
     $from = shift @ARGV;
-    @ARGV and $to = shift @ARGV;
+    @ARGV and $to = shift @ARGV
 }
 
 # consider adding $double_precision to GetOptions(), renaming $pf to $print_format
@@ -237,23 +237,21 @@ my %activity_def = (
     ],
     );
 
-my (@lap, $beg_end);
-foreach $beg_end (split /,/, $lap, -1) {
+my @lap;
+for my $beg_end (split /,/, $lap, -1) {
     if ($beg_end =~ /-/) {
-        push @lap, $`, $';
-    }
-    else {
-        push @lap, $beg_end, $beg_end;
+        push @lap, $`, $'
+    } else {
+        push @lap, $beg_end, $beg_end
     }
 }
 
 if (@lap && $lap_start > 0) {
     for (my $i = 0 ; $i < @lap ; ++$i) {
         if ($lap[$i] =~ /^(\*|all)?$/i) {
-            $lap[$i] = $i % 2 ? $lap_max : 0;
-        }
-        else {
-            $lap[$i] -= $lap_start;
+            $lap[$i] = $i % 2 ? $lap_max : 0
+        } else {
+            $lap[$i] -= $lap_start
         }
     }
 }
@@ -263,54 +261,46 @@ sub cmp_long {
 
     if ($a < $b) {
         if ($a - $b <= -180) {
-            1;
+            1
+        } else {
+            -1
         }
-        else {
-            -1;
-        }
-    }
-    elsif ($a > $b) {
+    } elsif ($a > $b) {
         if ($a - $b >= 180) {
-            -1;
+            -1
+        } else {
+            1
         }
-        else {
-            1;
-        }
-    }
-    else {
-        0;
+    } else {
+        0
     }
 }
 
 sub tpmask_rect {
     my ($lat, $lon, $lat_sw, $lon_sw, $lat_ne, $lon_ne) = @_;
-    $lat >= $lat_sw && $lat <= $lat_ne && &cmp_long($lon, $lon_sw) >= 0 && &cmp_long($lon, $lon_ne) <= 0;
+    $lat >= $lat_sw && $lat <= $lat_ne && &cmp_long($lon, $lon_sw) >= 0 && &cmp_long($lon, $lon_ne) <= 0
 }
 
 sub tpmask_make {
     my ($masks, $maskv) = @_;
-    my $mask;
 
-    foreach $mask (split /:|\s+/, $masks) {
+    for my $mask (split /:|\s+/, $masks) {
         my @v = split /,/, $mask;
 
         if (@v % 2) {
-            die "$mask: not a sequence of latitude and longitude pairs";
-        }
-        elsif (@v < 4) {
-            die "$mask: \# of vertices < 2";
-        }
-        elsif (@v > 4) {
-            die "$mask: sorry but arbitrary polygons are not implemented";
-        }
-        else {
+            die "$mask: not a sequence of latitude and longitude pairs"
+        } elsif (@v < 4) {
+            die "$mask: \# of vertices < 2"
+        } elsif (@v > 4) {
+            die "$mask: sorry but arbitrary polygons are not implemented"
+        } else {
             grep {
-                s/^\s+|\s+$//g;
+                s/^\s+|\s+$//g
             } @v;
 
             $v[0] > $v[2] and @v[0, 2] = @v[2, 0];
             &cmp_long($v[1], $v[3]) > 0 and @v[1, 3] = @v[3, 1];
-            push @$maskv, [\&tpmask_rect, @v];
+            push @$maskv, [\&tpmask_rect, @v]
         }
     }
 }
@@ -321,7 +311,7 @@ my @tpmask;
 my @tpfake;
 &tpmask_make($tpfake, \@tpfake);
 
-my %memo = ('tpv' => [], 'trackv' => [], 'lapv' => [], 'av' => []);
+my $memo = { 'tpv' => [], 'trackv' => [], 'lapv' => [], 'av' => [] };
 my $fit = new Geo::FIT;
 
 $fit->use_gmtime(1);
@@ -335,11 +325,10 @@ sub cb_file_id {
     my $file_type = $obj->value_cooked(@{$desc}{qw(t_type a_type I_type)}, $v->[$desc->{i_type}]);
 
     if ($file_type eq 'activity') {
-        1;
-    }
-    else {
+        1
+    } else {
         $obj->error("$file_type: not an activity");
-        undef;
+        undef
     }
 }
 
@@ -353,7 +342,7 @@ sub cb_device_info {
 
         if (ref $t_attr eq 'HASH') {
             $attr = $t_attr;
-            $tname = $attr->{type_name};
+            $tname = $attr->{type_name}
         }
 
         my $ver = $obj->value_cooked(@{$desc}{qw(t_software_version a_software_version I_software_version)}, $v->[$desc->{i_software_version}]);
@@ -367,9 +356,9 @@ sub cb_device_info {
                 'VersionMajor' => $major,
                 'VersionMinor' => $minor,
             }
-        };
+        }
     }
-    1;
+    1
 }
 
 sub cb_record {
@@ -388,10 +377,9 @@ sub cb_record {
     defined $lat and defined $lon and $tp{Position} = +{'LatitudeDegrees' => $lat, 'LongitudeDegrees' => $lon};
 
     if (defined $desc->{i_enhanced_altitude} && $v->[$desc->{i_enhanced_altitude}] != $desc->{I_enhanced_altitude}) {
-        $tp{AltitudeMeters} = $obj->value_processed($v->[$desc->{i_enhanced_altitude}], $desc->{a_enhanced_altitude});
-    }
-    elsif (defined $desc->{i_altitude} && $v->[$desc->{i_altitude}] != $desc->{I_altitude}) {
-        $tp{AltitudeMeters} = $obj->value_processed($v->[$desc->{i_altitude}], $desc->{a_altitude});
+        $tp{AltitudeMeters} = $obj->value_processed($v->[$desc->{i_enhanced_altitude}], $desc->{a_enhanced_altitude})
+    } elsif (defined $desc->{i_altitude} && $v->[$desc->{i_altitude}] != $desc->{I_altitude}) {
+        $tp{AltitudeMeters} = $obj->value_processed($v->[$desc->{i_altitude}], $desc->{a_altitude})
     }
 
     $tp{DistanceMeters} = $obj->value_processed($v->[$desc->{i_distance}], $desc->{a_distance})
@@ -399,8 +387,7 @@ sub cb_record {
 
     if (defined $desc->{i_enhanced_speed} && $v->[$desc->{i_enhanced_speed}] != $desc->{I_enhanced_speed}) {
         $speed = $obj->value_processed($v->[$desc->{i_enhanced_speed}], $desc->{a_enhanced_speed})
-    }
-    elsif (defined $desc->{i_speed} && $v->[$desc->{i_speed}] != $desc->{I_speed}) {
+    } elsif (defined $desc->{i_speed} && $v->[$desc->{i_speed}] != $desc->{I_speed}) {
         $speed = $obj->value_processed($v->[$desc->{i_speed}], $desc->{a_speed})
     }
 
@@ -412,18 +399,18 @@ sub cb_record {
         my %tpx;
         $tpx{Speed} = $speed if defined $speed;
         $tpx{Watts} = $watts if defined $watts;
-        $tp{Extensions} = +{'TPX' => \%tpx};
+        $tp{Extensions} = +{'TPX' => \%tpx}
     }
 
-    my ($miss, $k);
-    foreach $k (@tp_exclude) {
-        delete $tp{$k};
+    my $miss;
+    for my $k (@tp_exclude) {
+        delete $tp{$k}
     }
-    foreach $k (@must) {
-        defined $tp{$k} or ++$miss;
+    for my $k (@must) {
+        defined $tp{$k} or ++$miss
     }
     push @{$memo->{tpv}}, \%tp if !$miss;
-    1;
+    1
 }
 
 sub track_end {
@@ -435,7 +422,7 @@ sub track_end {
 
         @{$memo->{tpv}} = ();
         $memo->{ntps} += $ntps;
-        push @{$memo->{trackv}}, \%track;
+        push @{$memo->{trackv}}, \%track
     }
 }
 
@@ -445,9 +432,9 @@ sub cb_event {
     my $event_type = $obj->named_type_value($desc->{t_event_type}, $v->[$desc->{i_event_type}]);
 
     if ($event_type eq 'stop_all') {
-        &track_end($memo);
+        &track_end($memo)
     }
-    1;
+    1
 }
 
 my %intensity = (
@@ -476,10 +463,9 @@ sub cb_lap {
             if defined $desc->{i_total_distance} && $v->[$desc->{i_total_distance}] != $desc->{I_total_distance};
 
         if (defined $desc->{i_enhanced_max_speed} && $v->[$desc->{i_enhanced_max_speed}] != $desc->{I_enhanced_max_speed}) {
-            $lap{MaximumSpeed} = $obj->value_processed($v->[$desc->{i_enhanced_max_speed}], $desc->{a_enhanced_max_speed});
-        }
-        elsif (defined $desc->{i_max_speed} && $v->[$desc->{i_max_speed}] != $desc->{I_max_speed}) {
-            $lap{MaximumSpeed} = $obj->value_processed($v->[$desc->{i_max_speed}], $desc->{a_max_speed});
+            $lap{MaximumSpeed} = $obj->value_processed($v->[$desc->{i_enhanced_max_speed}], $desc->{a_enhanced_max_speed})
+        } elsif (defined $desc->{i_max_speed} && $v->[$desc->{i_max_speed}] != $desc->{I_max_speed}) {
+            $lap{MaximumSpeed} = $obj->value_processed($v->[$desc->{i_max_speed}], $desc->{a_max_speed})
         }
 
         $lap{Calories} = $v->[$desc->{i_total_calories}]
@@ -506,10 +492,9 @@ sub cb_lap {
             if defined $desc->{i_total_fat_calories} && $v->[$desc->{i_total_fat_calories}] != $desc->{I_total_calories};
 
         if (defined $desc->{i_enhanced_avg_speed} && $v->[$desc->{i_enhanced_avg_speed}] != $desc->{I_enhanced_avg_speed}) {
-            $lx{AvgSpeed} = $obj->value_processed($v->[$desc->{i_enhanced_avg_speed}], $desc->{a_enhanced_avg_speed});
-        }
-        elsif (defined $desc->{i_avg_speed} && $v->[$desc->{i_avg_speed}] != $desc->{I_avg_speed}) {
-            $lx{AvgSpeed} = $obj->value_processed($v->[$desc->{i_avg_speed}], $desc->{a_avg_speed});
+            $lx{AvgSpeed} = $obj->value_processed($v->[$desc->{i_enhanced_avg_speed}], $desc->{a_enhanced_avg_speed})
+        } elsif (defined $desc->{i_avg_speed} && $v->[$desc->{i_avg_speed}] != $desc->{I_avg_speed}) {
+            $lx{AvgSpeed} = $obj->value_processed($v->[$desc->{i_avg_speed}], $desc->{a_avg_speed})
         }
 
         $lx{MaxBikeCadence} = $v->[$desc->{i_max_cadence}] if defined $desc->{i_max_cadence} && $v->[$desc->{i_max_cadence}] != $desc->{I_max_cadence};
@@ -517,9 +502,9 @@ sub cb_lap {
         $lx{MaxWatts} = $v->[$desc->{i_max_power}] * $pw_fix + $pw_fix_b if defined $desc->{i_max_power} && $v->[$desc->{i_max_power}] != $desc->{I_max_power};
         %lx and $x{LX} = \%lx;
         %x and $lap{Extensions} = \%x;
-        push @{$memo->{lapv}}, \%lap;
+        push @{$memo->{lapv}}, \%lap
     }
-    1;
+    1
 }
 
 my %sport = (
@@ -531,7 +516,7 @@ sub cb_session {
     my ($obj, $desc, $v, $memo) = @_;
 
     unless (@{$memo->{lapv}}) {
-        &cb_lap($obj, $desc, $v, $memo) || return undef;
+        &cb_lap($obj, $desc, $v, $memo) || return undef
     }
 
     if (@{$memo->{lapv}}) {
@@ -542,43 +527,36 @@ sub cb_session {
         $activity{Lap} = [@{$memo->{lapv}}];
         @{$memo->{lapv}} = ();
         $activity{Creator} = $memo->{Creator} if defined $memo->{Creator};
-        push @{$memo->{av}}, \%activity;
+        push @{$memo->{av}}, \%activity
     }
 
     delete $memo->{Creator};
-    1;
+    1
 }
 
 sub output {
     my ($datum, $def, $indent, $T) = @_;
 
     if (ref $datum eq 'ARRAY') {
-        my $datum1;
-
-        foreach $datum1 (@$datum) {
-            &output($datum1, $def, $indent, $T);
+        for my $datum1 (@$datum) {
+            &output($datum1, $def, $indent, $T)
         }
-    }
-    else {
+    } else {
         $T->print("$indent<$def->{name}");
-
         my $attrv = $def->{attr};
 
         if (ref $attrv eq 'ARRAY') {
-            my $attr;
-
-            foreach $attr (@$attrv) {
+            for my $attr (@$attrv) {
                 my ($aname, $aformat, $afixed) = @{$attr}{qw(name format fixed)};
 
                 $T->print(" $aname=\"");
 
                 if (defined $afixed) {
-                    $T->print($afixed);
+                    $T->print($afixed)
+                } elsif (defined $aformat) {
+                    $T->printf("%$aformat", $datum->{'<a>' . $aname})
                 }
-                elsif (defined $aformat) {
-                    $T->printf("%$aformat", $datum->{'<a>' . $aname});
-                }
-                $T->print("\"");
+                $T->print("\"")
             }
         }
 
@@ -587,9 +565,8 @@ sub output {
         my ($sub, $format) = @{$def}{qw(sub format)};
 
         if (defined $format and $format ne '') {
-            $T->printf("%$format", $datum);
-        }
-        elsif (ref $sub eq 'ARRAY') {
+            $T->printf("%$format", $datum)
+        } elsif (ref $sub eq 'ARRAY') {
             $T->print("\n");
 
             my $subindent = $indent . ' ' x $indent_n;
@@ -598,20 +575,20 @@ sub output {
             for ($i = 0 ; $i < @$sub ;) {
                 my $subdef = $sub->[$i++];
                 my $subdatum = $datum->{$subdef->{name}};
-                defined $subdatum and &output($subdatum, $subdef, $subindent, $T);
+                defined $subdatum and &output($subdatum, $subdef, $subindent, $T)
             }
-            $T->print($indent);
+            $T->print($indent)
         }
-        $T->print("</$def->{name}>\n");
+        $T->print("</$def->{name}>\n")
     }
 }
 
-$fit->data_message_callback_by_name('file_id', \&cb_file_id, \%memo) || die $fit->error;
-$fit->data_message_callback_by_name('device_info', \&cb_device_info, \%memo) || die $fit->error;
-$fit->data_message_callback_by_name('record', \&cb_record, \%memo) || die $fit->error;
-$fit->data_message_callback_by_name('event', \&cb_event, \%memo) || die $fit->error;
-$fit->data_message_callback_by_name('lap', \&cb_lap, \%memo) || die $fit->error;
-$fit->data_message_callback_by_name('session', \&cb_session, \%memo) || die $fit->error;
+$fit->data_message_callback_by_name('file_id',     \&cb_file_id,     $memo) or die $fit->error;
+$fit->data_message_callback_by_name('device_info', \&cb_device_info, $memo) or die $fit->error;
+$fit->data_message_callback_by_name('record',      \&cb_record,      $memo) or die $fit->error;
+$fit->data_message_callback_by_name('event',       \&cb_event,       $memo) or die $fit->error;
+$fit->data_message_callback_by_name('lap',         \&cb_lap,         $memo) or die $fit->error;
+$fit->data_message_callback_by_name('session',     \&cb_session,     $memo) or die $fit->error;
 $fit->file($from);
 $fit->open || die $fit->error;
 
@@ -623,18 +600,18 @@ sub dead {
     (undef, $fn, $l) = caller(0);
     ($p, undef, undef, $subr) = caller(1);
     $obj->close;
-    die "$p::$subr\#$l\@$fn: $err\n";
+    die "$p::$subr\#$l\@$fn: $err\n"
 }
 
 my ($fsize, $proto_ver, $prof_ver, $h_extra, $h_crc_expected, $h_crc_calculated) = $fit->fetch_header;
 
 defined $fsize || &dead($fit);
 
-my ($proto_major, $proto_minor) = $fit->protocol_version_major($proto_ver);
-my ($prof_major, $prof_minor) = $fit->profile_version_major($prof_ver);
+my $protocol_version          = $fit->protocol_version( $proto_ver );
+my ($prof_major, $prof_minor) = $fit->profile_version(  $prof_ver  );
 
 if ($verbose) {
-    printf "File size: %lu, protocol version: %u.%02u, profile_verion: %u.%02u\n", $fsize, $proto_major, $proto_minor, $prof_major, $prof_minor;
+    printf "File size: %lu, protocol version: %u, profile_version: %u.%02u\n", $fsize, $protocol_version, $prof_major, $prof_minor;
 
     if ($h_extra ne '') {
         print "Hex dump of extra octets in the file header";
@@ -643,13 +620,13 @@ if ($verbose) {
         for ($i = 0, $n = length($h_extra) ; $i < $n ; ++$i) {
             print "\n  " if !($i % 16);
             print ' ' if !($i % 4);
-            printf " %02x", ord(substr($h_extra, $i, 1));
+            printf " %02x", ord(substr($h_extra, $i, 1))
         }
-        print "\n";
+        print "\n"
     }
 
     if (defined $h_crc_calculated) {
-        printf "File header CRC: expected=0x%04X, calculated=0x%04X\n", $h_crc_expected, $h_crc_calculated;
+        printf "File header CRC: expected=0x%04X, calculated=0x%04X\n", $h_crc_expected, $h_crc_calculated
     }
 }
 
@@ -658,14 +635,13 @@ $fit->EOF || &dead($fit);
 
 if ($verbose) {
     printf "CRC: expected=0x%04X, calculated=0x%04X\n", $fit->crc_expected, $fit->crc;
-
     my $garbage_size = $fit->trailing_garbages;
-    print "Trailing $garbage_size octets garbages skipped\n" if $garbage_size > 0;
+    print "Trailing $garbage_size octets garbages skipped\n" if defined $garbage_size and $garbage_size > 0
 }
 
 $fit->close;
 
-my $av = $memo{av};
+my $av = $memo->{av};
 
 if (@$av) {
     my ($i, $j);
@@ -680,15 +656,15 @@ if (@$av) {
                 for ($r = 1 ; $r < @lap ; $r += 2) {
                     if ($p >= $lap[$r - 1] && $p <= $lap[$r]) {
                         $lv->[$q++] = $lv->[$p];
-                        last;
+                        last
                     }
                 }
             }
-            splice @$lv, $q;
+            splice @$lv, $q
         }
-        @$lv and $av->[$j++] = $av->[$i];
+        @$lv and $av->[$j++] = $av->[$i]
     }
-    splice @$av, $j;
+    splice @$av, $j
 }
 
 sub minus_long {
@@ -697,12 +673,11 @@ sub minus_long {
     $a -= $b;
 
     if ($a < -180) {
-        $a += 360;
+        $a += 360
+    } elsif ($a > 180) {
+        $a = 360 - $a
     }
-    elsif ($a > 180) {
-        $a = 360 - $a;
-    }
-    $a;
+    $a
 }
 
 if (@$av && (@tpmask || @tpfake)) {
@@ -721,13 +696,13 @@ if (@$av && (@tpmask || @tpfake)) {
                 my ($r, $s);
 
                 for ($r = $s = 0 ; $r < @$tpv ; ++$r) {
-                    my ($mask, $masked);
+                    my $masked;
 
-                    foreach $mask (@tpmask) {
+                    for my $mask (@tpmask) {
                         if ($mask->[0]->(@{$tpv->[$r]->{Position}}{qw(LatitudeDegrees LongitudeDegrees)}, @$mask[1 .. $#$mask])) {
-                            $memo{ntps} -= 1;
+                            $memo->{ntps} -= 1;
                             $masked = 1;
-                            last;
+                            last
                         }
                     }
 
@@ -735,7 +710,7 @@ if (@$av && (@tpmask || @tpfake)) {
                         my $tp_cur = $tpv->[$r]->{Position};
                         my ($cur_lat, $cur_long) = @$tp_cur{qw(LatitudeDegrees LongitudeDegrees)};
 
-                        foreach $mask (@tpfake) {
+                        for my $mask (@tpfake) {
                             if ($mask->[0]->($cur_lat, $cur_long, @$mask[1 .. $#$mask])) {
                                 my $y;
 
@@ -744,7 +719,7 @@ if (@$av && (@tpmask || @tpfake)) {
                                     my $sq = ($prev_lat - $cur_lat) ** 2 + &minus_long($prev_long, $cur_long) ** 2;
                                     my (@x, $x_lat, $x_long);
 
-                                    foreach $x_lat (@$mask[3, 1]) {
+                                    for $x_lat (@$mask[3, 1]) {
                                         my $x_sq = ($prev_lat - $x_lat) ** 2;
 
                                         if ($x_sq <= $sq) {
@@ -757,12 +732,12 @@ if (@$av && (@tpmask || @tpfake)) {
                                                 &cmp_long($x_long, $mask->[4]) <= 0 and push @x, [$x_lat, $x_long];
                                                 $x_long = $prev_long - $diff_long;
                                                 $x_long < -180 and $x_long += 360;
-                                                &cmp_long($x_long, $mask->[2]) >= 0 and &cmp_long($x_long, $mask->[4]) <= 0 and push @x, [$x_lat, $x_long];
+                                                &cmp_long($x_long, $mask->[2]) >= 0 and &cmp_long($x_long, $mask->[4]) <= 0 and push @x, [$x_lat, $x_long]
                                             }
                                         }
                                     }
 
-                                    foreach $x_long (@$mask[2, 4]) {
+                                    for $x_long (@$mask[2, 4]) {
                                         my $x_sq = &minus_long($prev_long, $x_long) ** 2;
 
                                         if ($x_sq <= $sq) {
@@ -773,7 +748,7 @@ if (@$av && (@tpmask || @tpfake)) {
                                             unless ($x_lat < $mask->[1]) {
                                                 $x_lat <= $mask->[3] and push @x, [$x_lat, $x_long];
                                                 $x_lat = $prev_lat - $diff_lat;
-                                                $x_lat >= $mask->[1] and $x_lat <= $mask->[3] and push @x, [$x_lat, $x_long];
+                                                $x_lat >= $mask->[1] and $x_lat <= $mask->[3] and push @x, [$x_lat, $x_long]
                                             }
                                         }
                                     }
@@ -791,35 +766,34 @@ $prev_lat, $prev_long, $cur_lat, $cur_long, @$mask[1 .. 4]);
                                             my $x_sq = ($x[0]->[0] - $cur_lat) ** 2 + &minus_long($x[0]->[1], $cur_long) ** 2;
 
                                             $x_sq < $y_sq and ($y, $y_sq) = ($x[0], $x_sq);
-                                            shift @x;
+                                            shift @x
                                         }
                                     }
-                                }
-                                else {
+                                } else {
                                     ($y) = sort {
                                         (($a->[0] - $cur_lat) ** 2 + &minus_long($a->[1], $cur_long) ** 2)
                                             cmp (($b->[0] - $cur_lat) ** 2 + &minus_long($b->[1], $cur_long) ** 2)
-                                            } ([$cur_lat, $mask->[4]], [$cur_lat, $mask->[2]], [$mask->[1], $cur_long], [$mask->[3], $cur_long]);
+                                            } ([$cur_lat, $mask->[4]], [$cur_lat, $mask->[2]], [$mask->[1], $cur_long], [$mask->[3], $cur_long])
                                 }
 
                                 @$tp_cur{qw(LatitudeDegrees LongitudeDegrees)} = @$y;
-                                last;
+                                last
                             }
                         }
                         $tp_prev = $tp_cur;
-                        $tpv->[$s++] = $tpv->[$r];
+                        $tpv->[$s++] = $tpv->[$r]
                     }
                 }
                 splice @$tpv, $s;
-                @$tpv and $trkv->[$v++] = $trkv->[$u];
+                @$tpv and $trkv->[$v++] = $trkv->[$u]
             }
             splice @$trkv, $v;
-            @$trkv and $lv->[$q++] = $lv->[$p];
+            @$trkv and $lv->[$q++] = $lv->[$p]
         }
         splice @$lv, $q;
-        @$lv and $av->[$j++] = $av->[$i];
+        @$lv and $av->[$j++] = $av->[$i]
     }
-    splice @$av, $j;
+    splice @$av, $j
 }
 
 if (@$av) {
@@ -828,16 +802,12 @@ if (@$av) {
     defined $T || &dead($fit, "new FileHandle \"> $to\": $!");
     $T->print($start);
 
-    my ($skip, $a);
+    my $skip;
 
-    if ($tplimit > 0 && ($skip = $memo{ntps} / $tplimit) > 1) {
-        foreach $a (@$av) {
-            my $l;
-
-            foreach $l (@{$a->{Lap}}) {
-                my $t;
-
-                foreach $t (@{$l->{Track}}) {
+    if ($tplimit > 0 && ($skip = $memo->{ntps} / $tplimit) > 1) {
+        for my $a (@$av) {
+            for my $l (@{$a->{Lap}}) {
+                for my $t (@{$l->{Track}}) {
                     my $tpv = $t->{Trackpoint};
                     my ($j, @mv);
 
@@ -848,7 +818,7 @@ if (@$av) {
                             for ($j = $i + 1 ; $j < @$tpv ; ++$j) {
                                 if (defined $tpv->[$j]->{AltitudeMeters}) {
                                     if (($updown = $tpv->[$j]->{AltitudeMeters} - $tpv->[$i]->{AltitudeMeters})) {
-                                        last;
+                                        last
                                     }
                                 }
                             }
@@ -859,18 +829,17 @@ if (@$av) {
                                 for ($k = $j + 1 ; $k < @$tpv ; ++$k) {
                                     if (defined $tpv->[$k]->{AltitudeMeters}) {
                                         if (($tpv->[$k]->{AltitudeMeters} - $tpv->[$j]->{AltitudeMeters}) / $updown < 0) {
-                                            last;
+                                            last
                                         }
                                     }
                                 }
 
                                 if ($k < @$tpv && $k - $i > $skip) {
-                                    push @mv, $k;
+                                    push @mv, $k
                                 }
-                                $i = $j;
-                            }
-                            else {
-                                last;
+                                $i = $j
+                            } else {
+                                last
                             }
                         }
                     }
@@ -892,32 +861,32 @@ if (@$av) {
                                         defined ($tpx = $x->{TPX}) &&
                                         defined ($w = $tpx->{Watts})) {
                                     $wsum += $w;
-                                    ++$wn;
+                                    ++$wn
                                 }
 
                                 if (defined $tpv->[$k]->{Cadence}) {
                                     $csum += $tpv->[$k]->{Cadence};
-                                    ++$cn;
+                                    ++$cn
                                 }
                             }
 
                             $tpv->[$j] = $tpv->[$k - 1];
                             $tpv->[$j]->{Extensions}->{TPX}->{Watts} = $wsum / $wn if $wn > 0;
                             $tpv->[$j]->{Cadence} = $csum / $cn if $cn > 0;
-                            $i = $k;
+                            $i = $k
                         }
                     }
-                    $j < @$tpv and splice @$tpv, $j;
+                    $j < @$tpv and splice @$tpv, $j
                 }
             }
         }
     }
 
-    foreach $a (@$av) {
-        &output($a, \%activity_def, $indent, $T);
+    for my $a (@$av) {
+        &output($a, \%activity_def, $indent, $T)
     }
     $T->print($end);
-    $T->close;
+    $T->close
 }
 
 =head1 DEPENDENCIES
@@ -944,7 +913,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.05
+1.08
 
 =head1 LICENSE AND COPYRIGHT
 

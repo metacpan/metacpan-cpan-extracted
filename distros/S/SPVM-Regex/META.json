@@ -1,12 +1,12 @@
 {
-   "abstract" : "Regular Expression",
+   "abstract" : "Regular Expressions",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Regex"
       }
    },
-   "version" : "0.21",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

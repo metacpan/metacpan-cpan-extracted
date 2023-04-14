@@ -3,7 +3,7 @@ package Log::Dispatch::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -51,7 +51,7 @@ Log::Dispatch::Handle - Object for logging to IO::Handle classes
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -71,9 +71,9 @@ version 2.70
 
 =head1 DESCRIPTION
 
-This module supplies a very simple object for logging to some sort of
-handle object. Basically, anything that implements a C<print()>
-method can be passed the object constructor and it should work.
+This module supplies a very simple object for logging to some sort of handle
+object. Basically, anything that implements a C<print()> method can be passed
+the object constructor and it should work.
 
 =for Pod::Coverage new log_message
 
@@ -94,8 +94,6 @@ The handle object. This object must implement a C<print()> method.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Log-Dispatch can be found at L<https://github.com/houseabsolute/Log-Dispatch>.
@@ -106,7 +104,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

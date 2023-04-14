@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -305,13 +308,12 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
   SPVM_STRING_BUFFER_add(string_buffer, "  char* class_var_name;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  char* class_name;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  char* method_name;\n");
-  SPVM_STRING_BUFFER_add(string_buffer, "  int32_t element_dimension;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  char* constant_string;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t constant_string_length;\n");
 
-  SPVM_STRING_BUFFER_add(string_buffer, "  char* module_dir;\n");
-  SPVM_STRING_BUFFER_add(string_buffer, "  char* module_dir_sep;\n");
-  SPVM_STRING_BUFFER_add(string_buffer, "  char* module_rel_file;\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "  char* class_path;\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "  char* class_path_sep;\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "  char* class_rel_file;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t field_index;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t fields_length;\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  char tmp_buffer[256];\n");
@@ -1899,14 +1901,14 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
         int32_t basic_type_id = opcode->operand1;
         int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, basic_type_id);
         const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
-        int32_t element_dimension = opcode->operand3;
+        int32_t type_dimension = opcode->operand3;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  basic_type_name = \"");
         SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
         SPVM_STRING_BUFFER_add(string_buffer, "\";\n");
 
-        SPVM_STRING_BUFFER_add(string_buffer, "  element_dimension = ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, element_dimension);
+        SPVM_STRING_BUFFER_add(string_buffer, "  type_dimension = ");
+        SPVM_STRING_BUFFER_add_int(string_buffer, type_dimension);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 
         SPVM_STRING_BUFFER_add(string_buffer, "  length = *(int32_t*)&");
@@ -1920,7 +1922,7 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
         SPVM_STRING_BUFFER_add(string_buffer, "  if (!error) {\n"
                                               "    SPVM_IMPLEMENT_NEW_MULDIM_ARRAY(env, stack, ");
         SPVM_PRECOMPILE_add_operand_address(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ", basic_type_id, element_dimension, length, &error);\n"
+        SPVM_STRING_BUFFER_add(string_buffer, ", basic_type_id, type_dimension, length, &error);\n"
                                               "  }\n");
         
         break;
@@ -2726,41 +2728,41 @@ void SPVM_PRECOMPILE_build_method_source(SPVM_PRECOMPILE* precompile, SPVM_STRIN
       case SPVM_OPCODE_C_ID_WARN: {
         int32_t line = opcode->operand1;
         
-        int32_t module_rel_file_id = SPVM_API_RUNTIME_get_class_module_rel_file_id(runtime, current_class_id);
-        int32_t module_dir_id = SPVM_API_RUNTIME_get_class_module_dir_id(runtime, current_class_id);
-        const char* module_rel_file = SPVM_API_RUNTIME_get_constant_string_value(runtime, module_rel_file_id, NULL);
-        const char* module_dir = NULL;
-        const char* module_dir_sep;
-        if (module_dir_id >= 0) {
-          module_dir_sep = "/";
-          module_dir = SPVM_API_RUNTIME_get_constant_string_value(runtime, module_dir_id, NULL);
+        int32_t class_rel_file_id = SPVM_API_RUNTIME_get_class_class_rel_file_id(runtime, current_class_id);
+        int32_t class_path_id = SPVM_API_RUNTIME_get_class_class_path_id(runtime, current_class_id);
+        const char* class_rel_file = SPVM_API_RUNTIME_get_constant_string_value(runtime, class_rel_file_id, NULL);
+        const char* class_path = NULL;
+        const char* class_path_sep;
+        if (class_path_id >= 0) {
+          class_path_sep = "/";
+          class_path = SPVM_API_RUNTIME_get_constant_string_value(runtime, class_path_id, NULL);
         }
         else {
-          module_dir_sep = "";
-          module_dir = "";
+          class_path_sep = "";
+          class_path = "";
         }
 
         SPVM_STRING_BUFFER_add(string_buffer, "  string = ");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 
-        SPVM_STRING_BUFFER_add(string_buffer, "  module_dir = \"");
-        SPVM_STRING_BUFFER_add(string_buffer, module_dir);
+        SPVM_STRING_BUFFER_add(string_buffer, "  class_path = \"");
+        SPVM_STRING_BUFFER_add(string_buffer, class_path);
         SPVM_STRING_BUFFER_add(string_buffer, "\";\n");
 
-        SPVM_STRING_BUFFER_add(string_buffer, "  module_dir_sep = \"");
-        SPVM_STRING_BUFFER_add(string_buffer, module_dir_sep);
+        SPVM_STRING_BUFFER_add(string_buffer, "  class_path_sep = \"");
+        SPVM_STRING_BUFFER_add(string_buffer, class_path_sep);
         SPVM_STRING_BUFFER_add(string_buffer, "\";\n");
 
-        SPVM_STRING_BUFFER_add(string_buffer, "  module_rel_file = \"");
-        SPVM_STRING_BUFFER_add(string_buffer, module_rel_file);
+        SPVM_STRING_BUFFER_add(string_buffer, "  class_rel_file = \"");
+        SPVM_STRING_BUFFER_add(string_buffer, class_rel_file);
         SPVM_STRING_BUFFER_add(string_buffer, "\";\n");
         
         SPVM_STRING_BUFFER_add(string_buffer, "  line = ");
         SPVM_STRING_BUFFER_add_int(string_buffer, line);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 
-        SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_IMPLEMENT_WARN(env, stack, string, module_dir, module_dir_sep, module_rel_file, line);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_IMPLEMENT_WARN(env, stack, string, class_path, class_path_sep, class_rel_file, line);\n");
         break;
       }
       case SPVM_OPCODE_C_ID_GET_ERROR_CODE: {

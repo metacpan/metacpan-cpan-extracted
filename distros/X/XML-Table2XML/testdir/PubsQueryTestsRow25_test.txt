@@ -19,6 +19,6 @@ TQ456MC2222	12.Dez.93	TQ456	Net 60	10	7896	Fricative Bookshop	89 Madison St.	MC2
 X999BU2075	21.Feb.93	X999	ON invoice	35	7896	Fricative Bookshop	89 Madison St.	BU2075	You Can Combat Computer Stress!	business	0736	New Moon Books
 423LL922MC3021	14.Sep.94	423LL922	ON invoice	15	8042	Bookbeat	679 Carson St.	MC3021	The Gourmet Microwave	mod_cook	0877	Binnet & Hardley
 423LL930BU1032	14.Sep.94	423LL930	ON invoice	10	8042	Bookbeat	679 Carson St.	BU1032	The Busy Executive's Database Guide	business	1389	Algodata Infosystems
-P723BU1111	11.Mär.93	P723	Net 30	25	8042	Bookbeat	679 Carson St.	BU1111	Cooking with Computers: Surreptitious Balance Sheets	business	1389	Algodata Infosystems
+P723BU1111	11.Mar.93	P723	Net 30	25	8042	Bookbeat	679 Carson St.	BU1111	Cooking with Computers: Surreptitious Balance Sheets	business	1389	Algodata Infosystems
 QA879.1PC1035	22.Mai.93	QA879.1	Net 30	30	8042	Bookbeat	679 Carson St.	PC1035	But Is It User Friendly?	popular_comp	1389	Algodata Infosystems
 

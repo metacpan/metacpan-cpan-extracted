@@ -1,5 +1,8 @@
 package HTML::Index::Store;
 
+use strict;
+use warnings;
+
 use Carp;
 no Carp::Assert;
 use Compress::Zlib;
@@ -262,6 +265,8 @@ sub filter
     return wantarray ? @n : $n[0];
 }
 
+=back
+
 =head1 SUB-CLASSABLE METHODS
 
 =over 4
@@ -403,33 +408,20 @@ sub nkeys
 
 sub _deflate
 {
+    my $self = shift;
     my $data = shift;
     return $data unless $self->{COMPRESS};
-    my ( $deflate, $out, $status );
-    ( $deflate, $status ) = deflateInit( -Level => Z_BEST_COMPRESSION )
-        or croak "deflateInit failed: $status\n"
-    ;
-    ( $out, $status ) = $deflate->deflate( \$data );
-    croak "deflate failed: $status\n" unless $status == Z_OK;
-    $data = $out;
-    ( $out, $status ) = $deflate->flush();
-    croak "flush failed: $status\n" unless $status == Z_OK;
-    $data .= $out;
-    return $data;
+    my $compressed = compress( $data );
+    return $compressed || $data;
 }
 
 sub _inflate
 {
+    my $self = shift;
     my $data = shift;
     return $data unless $self->{COMPRESS};
-    my ( $inflate, $status );
-    ( $inflate, $status ) = inflateInit()
-        or croak "inflateInit failed: $status\n"
-    ;
-    ( $data, $status ) = $inflate->inflate( \$data )
-        or croak "inflate failed: $status\n"
-    ;
-    return $data;
+    my $uncompressed = uncompress( $data );
+    return $uncompressed || $data;
 }
 
 sub _get
@@ -437,7 +429,7 @@ sub _get
     my $self = shift;
     my $table = shift;
     my $key = shift;
-    return _inflate( $self->get( $table, $key ) );
+    return $self->_inflate( $self->get( $table, $key ) );
 }
 
 sub _put
@@ -446,7 +438,7 @@ sub _put
     my $table = shift;
     my $key = shift;
     my $val = shift;
-    $self->put( $table, $key, _deflate( $val ) );
+    $self->put( $table, $key, $self->_deflate( $val ) );
 }
 
 sub _stem
@@ -454,7 +446,7 @@ sub _stem
     my $self = shift;
     my $w = shift;
     return $w unless $self->{stemmer};
-    $wa = $self->{stemmer}->stem( $w );
+    my $wa = $self->{stemmer}->stem( $w );
     carp "stem $w -> $wa->[0]\n" if $self->{VERBOSE};
     return $wa->[0];
 }
@@ -675,7 +667,7 @@ sub _remove_file_id
 
 =head1 AUTHOR
 
-Ave Wrigley <Ave.Wrigley@itn.co.uk>
+Ave Wrigley <ave.wrigley@gmail.com>
 
 =head1 COPYRIGHT
 

@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.001007';
+our $VERSION = '0.001008';
 use utf8;
 use List::Util qw<min max>;
 
@@ -132,6 +132,14 @@ our $GRAMMAR = qr{
                     (?> ; | (?&PerlBlock) )
                     # End of inlining
                 |
+                    # Inlined (?&PerlMethodDeclaration)
+                        method \b                          (?>(?&PerlOWS))
+                        (?>(?&PerlQualifiedIdentifier))       (?&PerlOWS)
+                        (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+                        (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
+                        (?> ; | (?&PerlBlock) )
+                    # End of inlining
+                |
                     # Inlined (?&PerlUseStatement)
                     (?: use | no ) (?>(?&PerlNWS))
                     (?>
@@ -152,6 +160,38 @@ our $GRAMMAR = qr{
                         (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
                     (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
                         (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+                    # End of inlining
+                |
+                    # Inlined (?&PerlClassDeclaration)
+                    class
+                    (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+                    (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
+                    |   (?>(?&PerlOWS)) : (?>(?&PerlOWS)) isa (?= \( ) (?&PPR_quotelike_body)
+                    )?+
+                    (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+                    # End of inlining
+                |
+                    # Inlined (?&PerlFieldDeclaration)
+                    field \b
+                    (?:
+                            (?>(?&PerlOWS)) \$
+                            (?>(?&PerlOWS)) (?&PerlIdentifier)
+                        (?:
+                            (?>(?&PerlOWS)) :
+                            (?>(?&PerlOWS)) param
+                            (?:
+                                (?= \( ) (?&PPR_quotelike_body)    # )
+                            )?+
+                        )?+
+                    |
+                            (?>(?&PerlOWS)) [\@%]
+                            (?>(?&PerlOWS)) (?&PerlIdentifier)
+                    )
+                    (?:
+                        (?>(?&PerlOWS)) (?: //= | \|\|= | = )
+                        (?>(?&PerlOWS)) (?&PerlConditionalExpression)
+                    )?+
+                    (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
                     # End of inlining
                 |
                     (?&PerlControlBlock)
@@ -219,6 +259,14 @@ our $GRAMMAR = qr{
         (?> ; | (?&PerlBlock) )
         ) # End of rule (?<PerlSubroutineDeclaration>)
 
+        (?<PerlMethodDeclaration>
+            method \b                          (?>(?&PerlOWS))
+            (?>(?&PerlQualifiedIdentifier))       (?&PerlOWS)
+            (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
+            (?> ; | (?&PerlBlock) )
+        ) # End of rule (?<PerlMethodDeclaration>)
+
         (?<PerlSignature>
             \(
                 (?>(?&PerlOWS))
@@ -228,11 +276,17 @@ our $GRAMMAR = qr{
 
         (?<PerlParameterDeclaration>
             (?:
-                    \$  (?>(?&PerlOWS))
-                (?: =   (?>(?&PerlOWS))  (?&PerlConditionalExpression)?+ (?>(?&PerlOWS)) )?+
+                \$                                   (?>(?&PerlOWS))
+                (?:
+                    (?: = | //= | \|\|= )            (?>(?&PerlOWS))
+                    (?&PerlConditionalExpression)?+  (?>(?&PerlOWS))
+                )?+
             |
-                (?&PerlVariableScalar) (?>(?&PerlOWS))
-                (?: =   (?>(?&PerlOWS))  (?&PerlConditionalExpression)   (?>(?&PerlOWS)) )?+
+                (?&PerlVariableScalar)               (?>(?&PerlOWS))
+                (?:
+                    (?: = | //= | \|\|= )            (?>(?&PerlOWS))
+                    (?&PerlConditionalExpression)    (?>(?&PerlOWS))
+                )?+
             |
                 (?&PerlVariableArray) (?>(?&PerlOWS))
             |
@@ -258,19 +312,28 @@ our $GRAMMAR = qr{
         ) # End of rule (?<PerlUseStatement>)
 
         (?<PerlReturnExpression>
-        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+            return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
         ) # End of rule (?<PerlReturnExpression>)
 
         (?<PerlReturnStatement>
-        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
-        (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
+            return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+            (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
         ) # End of rule (?<PerlReturnStatement>)
 
         (?<PerlPackageDeclaration>
-        package
-            (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
-        (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-            (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+            package
+                (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+            (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
+                (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+        ) # End of rule (?<PerlPackageDeclaration>)
+
+        (?<PerlClassDeclaration>
+            class
+                (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+                (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
+                |   (?>(?&PerlOWS)) : (?>(?&PerlOWS)) isa (?= \( ) (?&PPR_quotelike_body)
+                )?+
+                (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
         ) # End of rule (?<PerlPackageDeclaration>)
 
         (?<PerlExpression>
@@ -352,6 +415,8 @@ our $GRAMMAR = qr{
                     (?=  % )  (?&PerlHashAccess)
               |
                     (?&PerlAnonymousSubroutine)
+              |
+                    (?&PerlAnonymousMethod)
               |
                     (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
               |
@@ -518,7 +583,7 @@ our $GRAMMAR = qr{
                 )?+
 
             | # Phasers...
-                (?> BEGIN | END | CHECK | INIT | UNITCHECK ) \b   (?>(?&PerlOWS))
+                (?> BEGIN | END | CHECK | INIT | UNITCHECK | ADJUST ) \b   (?>(?&PerlOWS))
                 (?&PerlBlock)
 
             | # Try/catch/finallys...
@@ -656,6 +721,24 @@ our $GRAMMAR = qr{
             (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
             (?&PerlAttributes)?+
         ) # End of rule (?<PerlVariableDeclaration>)
+
+        (?<PerlFieldDeclaration>
+            field \b
+                (?>(?&PerlOWS)) [\$\@%]
+                (?>(?&PerlOWS)) (?&PerlIdentifier)
+            (?:
+                (?>(?&PerlOWS)) :
+                (?>(?&PerlOWS)) param
+                (?:
+                    (?= \( ) (?&PPR_quotelike_body)  # )
+                )?+
+            )?+
+            (?:
+                (?>(?&PerlOWS)) (?: //= | \|\|= | = )
+                (?>(?&PerlOWS)) (?&PerlConditionalExpression)
+            )?+
+            (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
+        ) # End of rule (?<PerlFieldDeclaration>)
 
         (?<PerlDoBlock>
             do (?>(?&PerlOWS)) (?&PerlBlock)
@@ -808,6 +891,14 @@ our $GRAMMAR = qr{
             )
             (?&PerlBlock)
         ) # End of rule (?<PerlAnonymousSubroutine>)
+
+        (?<PerlAnonymousMethod>
+            method \b
+            (?>(?&PerlOWS))
+            (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            (?: (?>(?&PerlSignature))   (?&PerlOWS) )?+    # Parameter list
+            (?&PerlBlock)
+        ) # End of rule (?<PerlAnonymousMethod>)
 
         (?<PerlVariable>
             (?= [\$\@%] )
@@ -2919,7 +3010,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.001007
+This document describes PPR version 0.001008
 
 
 =head1 SYNOPSIS

@@ -19,7 +19,7 @@ package t::lib::nativecall {
     #~ diag $Config{ccsymbols};
     #
     sub compile_test_lib ( $name, $aggs = '' ) {
-        my $c_file = path("t/src/$name.c")->canonpath;
+        my $c_file = path( grep { -f $_ } "t/src/$name.cxx", "t/src/$name.c" )->canonpath;
         my $o_file = path( "t/src/$name" . $Config{_o} )->canonpath;
         my $l_file = path( "t/src/$name." . $Config{so} )->canonpath;
         diag sprintf 'Building %s into %s', $c_file, $l_file;

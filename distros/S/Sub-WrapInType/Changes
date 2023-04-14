@@ -1,5 +1,8 @@
 Revision history for Perl extension Sub-WrapInType
 
+0.08 2023-04-09T00:25:58Z
+    - Update Type::Tiny version
+
 0.07 2021-03-14T02:46:50Z
     - Fix install_method to install the typed method
 

@@ -40,8 +40,8 @@ sub load_dynamic_libs {
         at_runtime => 1,
       );
       
-      my $get_method_names_options = $runtime->api->new_options({
-        $category => $runtime->api->class('Int')->new(1)
+      my $get_method_names_options = $runtime->__api->new_options({
+        $category => $runtime->__api->class('Int')->new(1)
       });
       
       my $method_names = $runtime->get_method_names($class_name, $get_method_names_options)->to_strings;
@@ -49,17 +49,17 @@ sub load_dynamic_libs {
       if (@$method_names) {
         # Build classs - Compile C source codes and link them to SPVM precompile method
         # Shared library which is already installed in distribution directory
-        my $module_file = $runtime->get_module_file($class_name)->to_string;
-        my $dynamic_lib_file = SPVM::Builder::Util::get_dynamic_lib_file_dist($module_file, $category);
+        my $class_file = $runtime->get_class_file($class_name)->to_string;
+        my $dynamic_lib_file = SPVM::Builder::Util::get_dynamic_lib_file_dist($class_file, $category);
         
         # Try to build the shared library at runtime if shared library is not found
         unless (-f $dynamic_lib_file) {
-          my $module_file = $runtime->get_module_file($class_name)->to_string;
+          my $class_file = $runtime->get_class_file($class_name)->to_string;
           my $method_names = $runtime->get_method_names($class_name, $get_method_names_options)->to_strings;
           my $anon_class_names = $runtime->get_anon_class_names($class_name)->to_strings;
           my $dl_func_list = SPVM::Builder::Util::create_dl_func_list($class_name, $method_names, $anon_class_names, {category => $category});
           my $precompile_source = $runtime->build_precompile_class_source($class_name)->to_string;
-          $dynamic_lib_file = $cc->build_at_runtime($class_name, {module_file => $module_file, category => $category, dl_func_list => $dl_func_list, precompile_source => $precompile_source});
+          $dynamic_lib_file = $cc->build_at_runtime($class_name, {class_file => $class_file, category => $category, dl_func_list => $dl_func_list, precompile_source => $precompile_source});
         }
         
         if (-f $dynamic_lib_file) {
@@ -71,8 +71,8 @@ sub load_dynamic_libs {
 
   # Set function addresses of native and precompile methods
   for my $category ('precompile', 'native') {
-    my $get_method_names_options = $runtime->api->new_options({
-      $category => $runtime->api->class('Int')->new(1)
+    my $get_method_names_options = $runtime->__api->new_options({
+      $category => $runtime->__api->class('Int')->new(1)
     });
     
     for my $class_name (keys %{$dynamic_lib_files->{$category}}) {
@@ -86,10 +86,10 @@ sub load_dynamic_libs {
       for my $method_name (sort keys %$method_addresses) {
         my $cfunc_address = $method_addresses->{$method_name};
         if ($category eq 'native') {
-          $runtime->set_native_method_address($class_name, $method_name, $runtime->api->new_address_object($cfunc_address));
+          $runtime->set_native_method_address($class_name, $method_name, $runtime->__api->new_address_object($cfunc_address));
         }
         elsif ($category eq 'precompile') {
-          $runtime->set_precompile_method_address($class_name, $method_name, $runtime->api->new_address_object($cfunc_address));
+          $runtime->set_precompile_method_address($class_name, $method_name, $runtime->__api->new_address_object($cfunc_address));
         }
       }
     }
@@ -99,12 +99,12 @@ sub load_dynamic_libs {
 sub init_runtime {
   unless ($RUNTIME) {
     unless ($BUILDER) {
-      my $build_dir = $ENV{SPVM_BUILD_DIR};
+      my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
       $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
     }
     
     my $builder_compiler = SPVM::Builder::Compiler->new(
-      module_dirs => $BUILDER->module_dirs
+      class_paths => $BUILDER->class_paths
     );
     # Load SPVM Compilers
     $builder_compiler->use("Compiler", __FILE__, __LINE__);
@@ -133,8 +133,8 @@ sub init_runtime {
     $BUILDER_API = SPVM::ExchangeAPI->new(env => $BUILDER_ENV, stack => $BUILDER_STACK);
     
     $COMPILER = $BUILDER_API->class("Compiler")->new;
-    for my $module_dir (@{$BUILDER->module_dirs}) {
-      $COMPILER->add_module_dir($module_dir);
+    for my $class_path (@{$BUILDER->class_paths}) {
+      $COMPILER->add_class_path($class_path);
     }
     $RUNTIME = $COMPILER->build_runtime;
 
@@ -216,7 +216,7 @@ sub build_class {
   my ($class_name, $file, $line) = @_;
   
   unless ($BUILDER) {
-    my $build_dir = $ENV{SPVM_BUILD_DIR};
+    my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
     $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
   }
   
@@ -277,3 +277,13 @@ END {
   $BUILDER_STACK = undef;
   $BUILDER_ENV = undef;
 }
+
+=head1 Name
+
+SPVM::Global - SPVM Global Instance for Perl Interpreter
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

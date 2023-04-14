@@ -7,9 +7,9 @@ use warnings;
 use Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-20'; # DATE
+our $DATE = '2023-03-30'; # DATE
 our $DIST = 'Data-Sah-DefaultValue'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     +{
@@ -49,7 +49,7 @@ Data::Sah::Value::perl::Str::repeat
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Value::perl::Str::repeat (from Perl distribution Data-Sah-DefaultValue), released on 2023-01-20.
+This document describes version 0.003 of Data::Sah::Value::perl::Str::repeat (from Perl distribution Data-Sah-DefaultValue), released on 2023-03-30.
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.006001';
+our $VERSION   = '1.006002';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 BEGIN {
@@ -528,14 +528,13 @@ L<Exporter::Tiny::Manual::Importing>
 Please report any bugs to
 L<https://github.com/tobyink/p5-exporter-tiny/issues>.
 
-=head1 SUPPORT
-
-B<< IRC: >> support is available through in the I<< #moops >> channel
-on L<irc.perl.org|http://www.irc.perl.org/channels.html>.
-
 =head1 SEE ALSO
 
+L<https://exportertiny.github.io/>.
+
 Simplified interface to this module: L<Exporter::Shiny>.
+
+Less tiny version, with more features: L<Exporter::Almighty>.
 
 Other interesting exporters: L<Sub::Exporter>, L<Exporter>.
 
@@ -545,7 +544,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

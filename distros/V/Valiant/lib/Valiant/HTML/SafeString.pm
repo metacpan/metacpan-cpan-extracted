@@ -5,14 +5,23 @@ use strict;
 use Exporter 'import';
 use HTML::Escape ();
 use Scalar::Util (); 
+use Carp;
 
 use overload 
-  bool => sub {1}, 
+  bool => sub { shift->to_bool }, 
   '""' => sub { shift->to_string },
+  '+' => sub {
+    my ($self, $other, $reverse) = @_;
+    carp "Can only join two safe string objects" unless (ref($other) eq ref($self));
+  
+    return $reverse
+        ? raw("${other}${self}")
+        : raw("${self}${other}");
+  },
   fallback => 1;
 
-our @EXPORT_OK = qw(raw flattened_raw safe flattened_safe is_safe escape_html concat);
-our %EXPORT_TAGS = (all => \@EXPORT_OK);
+our @EXPORT_OK = qw(raw flattened_raw safe flattened_safe is_safe escape_html safe_concat concat);
+our %EXPORT_TAGS = (all => \@EXPORT_OK, core => ['raw', 'safe', 'escape_html', 'safe_concat']);
 
 sub _make_safe {
   my $string_to_make_safe = shift;
@@ -54,8 +63,10 @@ sub safe {
   }
 }
 
+sub safe_concat { return flattened_safe(@_) }
+
 sub flattened_safe {
-  my $string = join '', map { is_safe($_) ? $_->to_string : escape_html($_) } @_;
+  my $string = join '', map { is_safe($_) ? $_->to_string : escape_html($_) } grep { defined($_) } @_;
   return _make_safe $string;
 }
 
@@ -67,6 +78,8 @@ sub new {
 sub concat { return flattened_safe(@_) }
 
 sub to_string { return ${$_[0]} }
+
+sub to_bool { return ${$_[0]} ? 1 : 0 }
 
 1;
 
@@ -141,9 +154,13 @@ altogether in a single safe string.
 
 Returns the raw string, suitable for display.
 
+=head2 to_bool
+
+Returns a boolean indicating if the string is empty or not.
+
 =head1 OVERLOADING
 
-String context calles C<to_string>; Boolean context returns 'true'.
+String context calles C<to_string>; Boolean context returns true unless the string is empty.
 
 =head1 SEE ALSO
  

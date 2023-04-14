@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
 		'DBI'                   => '0',
 		'File::Slurp'           => '0',
 		'Config::Tiny'          => '2.28',
-		'Hash::Merge'           => '0',
 		'Text::ANSITable'       => '0.608',
 		'YAML'                  => 0,
 		'IPC::Cmd'              => 0,

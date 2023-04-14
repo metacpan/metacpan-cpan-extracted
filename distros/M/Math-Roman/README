@@ -17,23 +17,6 @@ perldoc command.
 
     perldoc Math::Roman
 
-You can also look for information at:
-
-    GitHub
-        https://github.com/pjacklam/p5-Math-Roman
-
-    RT: CPAN's request tracker
-        https://rt.cpan.org/Dist/Display.html?Name=Math-Roman
-
-    MetaCPAN
-        https://metacpan.org/release/Math-Roman
-
-    CPAN Testers Matrix
-        http://matrix.cpantesters.org/?dist=Math-Roman
-
-    CPAN Ratings
-        https://cpanratings.perl.org/dist/Math-Roman
-
 COPYRIGHT AND LICENCE
 
 Copyright 2001-2008 Tels, http://bloodgate.com

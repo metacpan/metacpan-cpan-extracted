@@ -3,21 +3,28 @@ abstract: 'A validator for the structure of IBANs.'
 author:
   - 'Abe Timmerman <abeltje@cpan.org>'
 build_requires:
-  Test::Exception: 0
-  Test::More: 0.88
+  Test::Fatal: '0'
+  Test::Simple: '0.88'
+  Test::Warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.56
+  ExtUtils::MakeMaker: '6.56'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Business-IBAN-Validator
 no_index:
   directory:
     - t
     - inc
 requires:
-  Hash::Util: 0
-version: 0.06
+  Hash::Util: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/abeltje/Business-IBAN-Validator
+version: '0.07'
+x_bugtracker:
+  web: https://github.com/abeltje/Business-IBAN-Validator/issues
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

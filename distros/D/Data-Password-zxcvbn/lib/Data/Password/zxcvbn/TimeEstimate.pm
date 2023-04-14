@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 our @EXPORT_OK=qw(estimate_attack_times guesses_to_score display_time);
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: functions to estimate cracking times
 
 
@@ -98,7 +98,7 @@ Data::Password::zxcvbn::TimeEstimate - functions to estimate cracking times
 
 =head1 VERSION
 
-version 1.0.6
+version 1.1.2
 
 =head1 SYNOPSIS
 

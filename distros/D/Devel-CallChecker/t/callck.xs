@@ -4,18 +4,33 @@
 #include "callck_callchecker0.h"
 #include "XSUB.h"
 
-#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
-#define PERL_DECIMAL_VERSION \
-	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
-#define PERL_VERSION_GE(r,v,s) \
-	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#define Q_PERL_VERSION_DECIMAL(r,v,s) ((r)*1000000 + (v)*1000 + (s))
+#define Q_PERL_DECIMAL_VERSION \
+	Q_PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define Q_PERL_VERSION_GE(r,v,s) \
+	(Q_PERL_DECIMAL_VERSION >= Q_PERL_VERSION_DECIMAL(r,v,s))
+#define Q_PERL_VERSION_LT(r,v,s) \
+	(Q_PERL_DECIMAL_VERSION < Q_PERL_VERSION_DECIMAL(r,v,s))
+
+#if (Q_PERL_VERSION_GE(5,17,6) && Q_PERL_VERSION_LT(5,17,11)) || \
+	(Q_PERL_VERSION_GE(5,19,3) && Q_PERL_VERSION_LT(5,21,1))
+PERL_STATIC_INLINE void suppress_unused_warning(void)
+{
+	(void) S_croak_memory_wrap;
+}
+#endif /* (>=5.17.6 && <5.17.11) || (>=5.19.3 && <5.21.1) */
+
+#if Q_PERL_VERSION_LT(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
 
 #ifndef cBOOL
 # define cBOOL(x) ((bool)!!(x))
 #endif /* !cBOOL */
 
 #ifndef PERL_UNUSED_VAR
-# define PERL_UNUSED_VAR(x) ((void)x)
+# define PERL_UNUSED_VAR(x) ((void)(x))
 #endif /* !PERL_UNUSED_VAR */
 
 #ifndef PERL_UNUSED_ARG
@@ -122,12 +137,12 @@ PREINIT:
 	Perl_call_checker ckfun;
 	SV *ckobj;
 CODE:
-#define croak_fail() croak("fail at " __FILE__ " line %d", __LINE__)
+#define croak_fail() croak("fail at %s line %d", __FILE__, __LINE__)
 #define croak_fail_ne(h, w) \
-	croak("fail %p!=%p at " __FILE__ " line %d", (h), (w), __LINE__)
-#define check_cc(cv, xckfun, xckobj) \
+	croak("fail %p!=%p at %s line %d", (h), (w), __FILE__, __LINE__)
+#define check_cc(pcv, xckfun, xckobj) \
 	do { \
-		cv_get_call_checker((cv), &ckfun, &ckobj); \
+		cv_get_call_checker((pcv), &ckfun, &ckobj); \
 		if (ckfun != (xckfun)) \
 			croak_fail_ne(FPTR2DPTR(void *, ckfun), xckfun); \
 		if (ckobj != (xckobj)) \
@@ -171,35 +186,35 @@ CODE:
 	;
 
 void
-cv_set_call_checker_lists(CV *cv)
+cv_set_call_checker_lists(CV *pcv)
 PROTOTYPE: $
 CODE:
-	cv_set_call_checker(cv, THX_ck_entersub_args_lists, &PL_sv_undef);
+	cv_set_call_checker(pcv, THX_ck_entersub_args_lists, &PL_sv_undef);
 
 void
-cv_set_call_checker_scalars(CV *cv)
+cv_set_call_checker_scalars(CV *pcv)
 PROTOTYPE: $
 CODE:
-	cv_set_call_checker(cv, THX_ck_entersub_args_scalars, &PL_sv_undef);
+	cv_set_call_checker(pcv, THX_ck_entersub_args_scalars, &PL_sv_undef);
 
 void
-cv_set_call_checker_proto(CV *cv, SV *proto)
+cv_set_call_checker_proto(CV *pcv, SV *proto)
 PROTOTYPE: $$
 CODE:
 	if (SvROK(proto))
 		proto = SvRV(proto);
-	cv_set_call_checker(cv, Perl_ck_entersub_args_proto, proto);
+	cv_set_call_checker(pcv, Perl_ck_entersub_args_proto, proto);
 
 void
-cv_set_call_checker_proto_or_list(CV *cv, SV *proto)
+cv_set_call_checker_proto_or_list(CV *pcv, SV *proto)
 PROTOTYPE: $$
 CODE:
 	if (SvROK(proto))
 		proto = SvRV(proto);
-	cv_set_call_checker(cv, Perl_ck_entersub_args_proto_or_list, proto);
+	cv_set_call_checker(pcv, Perl_ck_entersub_args_proto_or_list, proto);
 
 void
-cv_set_call_checker_multi_sum(CV *cv)
+cv_set_call_checker_multi_sum(CV *pcv)
 PROTOTYPE: $
 CODE:
-	cv_set_call_checker(cv, THX_ck_entersub_multi_sum, &PL_sv_undef);
+	cv_set_call_checker(pcv, THX_ck_entersub_multi_sum, &PL_sv_undef);

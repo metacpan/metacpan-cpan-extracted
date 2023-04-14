@@ -1,0 +1,8 @@
+Revision history for Crypt-Passphrase-Argon2-AES
+
+0.002     2023-04-11 14:21:32+0200
+          - Explicitly require Crypt::Rijndael 1.16
+
+0.001     2023-04-07 16:19:25+0200
+          - Initial release to an unsuspecting world
+

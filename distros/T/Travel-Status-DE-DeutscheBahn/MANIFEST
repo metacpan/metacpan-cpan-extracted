@@ -9,6 +9,7 @@ lib/Travel/Status/DE/HAFAS.pm
 lib/Travel/Status/DE/HAFAS/Journey.pm
 lib/Travel/Status/DE/HAFAS/Message.pm
 lib/Travel/Status/DE/HAFAS/Polyline.pm
+lib/Travel/Status/DE/HAFAS/Stop.pm
 lib/Travel/Status/DE/HAFAS/StopFinder.pm
 MANIFEST			This list of files
 README.md

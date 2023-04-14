@@ -23,7 +23,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed refaddr >;
 
-our $VERSION = '1.999837';
+our $VERSION = '1.999838';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -350,34 +350,34 @@ sub accuracy {
     if (@_ > 0) {
         my $a = shift;
         if (defined $a) {
-            $a = $a->numify() if ref($a) && $a->can('numify');
+            $a = $a -> can('numify') ? $a -> numify() : 0 + "$a" if ref($a);
             # also croak on non-numerical
-            if (!$a || $a <= 0) {
-                croak('Argument to accuracy must be greater than zero');
-            }
-            if (int($a) != $a) {
-                croak('Argument to accuracy must be an integer');
-            }
+            croak "accuracy must be a number, not '$a'"
+              unless $a =~/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\z/;
+            croak "accuracy must be an integer, not '$a'"
+              if $a != int $a;
+            croak "accuracy must be greater than zero, not '$a'"
+              if $a <= 0;
         }
 
         if (ref($x)) {
             # Set instance variable.
-            $x = $x->bround($a) if $a; # not for undef, 0
-            $x->{_a} = $a;        # set/overwrite, even if not rounded
-            delete $x->{_p};      # clear P
+            $x = $x->bround($a) if defined $a;
+            $x->{_a} = $a;      # set/overwrite, even if not rounded
+            $x->{_p} = undef;   # clear P
             # Why return class variable here? Fixme!
             $a = ${"${class}::accuracy"} unless defined $a;
         } else {
             # Set class variable.
-            ${"${class}::accuracy"} = $a; # set global A
-            ${"${class}::precision"} = undef; # clear global P
+            ${"${class}::accuracy"}  = $a;      # set global A
+            ${"${class}::precision"} = undef;   # clear global P
         }
 
         return $a;              # shortcut
     }
 
     # Return instance variable.
-    return $x->{_a} if ref($x) && (defined($x->{_a}) || defined($x->{_p}));
+    return $x->{_a} if ref($x);
 
     # Return class variable.
     return ${"${class}::accuracy"};
@@ -396,30 +396,31 @@ sub precision {
     if (@_ > 0) {
         my $p = shift;
         if (defined $p) {
-            $p = $p->numify() if ref($p) && $p->can('numify');
-            if ($p != int $p) {
-                croak('Argument to precision must be an integer');
-            }
+            $p = $p -> can('numify') ? $p -> numify() : 0 + "$p" if ref($p);
+            croak "precision must be a number, not '$p'"
+              unless $p =~/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\z/;
+            croak "precision must be an integer, not '$p'"
+              if $p != int $p;
         }
 
         if (ref($x)) {
             # Set instance variable.
-            $x = $x->bfround($p) if $p; # not for undef, 0
-            $x->{_p} = $p;         # set/overwrite, even if not rounded
-            delete $x->{_a};       # clear A
+            $x = $x->bfround($p) if defined $p;
+            $x->{_p} = $p;      # set/overwrite, even if not rounded
+            $x->{_a} = undef;   # clear A
             # Why return class variable here? Fixme!
             $p = ${"${class}::precision"} unless defined $p;
         } else {
             # Set class variable.
-            ${"${class}::precision"} = $p; # set global P
-            ${"${class}::accuracy"} = undef; # clear global A
+            ${"${class}::precision"} = $p;      # set global P
+            ${"${class}::accuracy"}  = undef;   # clear global A
         }
 
         return $p;              # shortcut
     }
 
     # Return instance variable.
-    return $x->{_p} if ref($x) && (defined($x->{_a}) || defined($x->{_p}));
+    return $x->{_p} if ref($x);
 
     # Return class variable.
     return ${"${class}::precision"};
@@ -3770,7 +3771,7 @@ sub bfround {
     # no-op for Math::BigInt objects if $n <= 0
     $x = $x->bround($x->length()-$scale, $mode) if $scale > 0;
 
-    delete $x->{_a};            # delete to save memory
+    $x->{_a} = undef;
     $x->{_p} = $scale;          # store new _p
     $x;
 }
@@ -4003,8 +4004,8 @@ sub mantissa {
         return $class->new($x->{sign}, @r);
     }
     my $m = $x->copy();
-    delete $m->{_p};
-    delete $m->{_a};
+    $m -> precision(undef);
+    $m -> accuracy(undef);
 
     # that's a bit inefficient:
     my $zeros = $LIB->_zeros($m->{value});

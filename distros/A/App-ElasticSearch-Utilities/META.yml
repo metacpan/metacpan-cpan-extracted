@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.013002'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -69,30 +69,30 @@ requires:
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '8.4'
+version: '8.5'
 x_Dist_Zilla:
   perl:
-    version: '5.034000'
+    version: '5.036000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: MakeMaker
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -190,7 +190,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::InsertCopyright
       name: InsertCopyright
@@ -234,19 +234,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
       version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::CPANFile
+      name: CPANFile
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: ChangelogFromGit
@@ -277,11 +281,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
@@ -290,7 +294,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 1
           filename: t/00-compile.t
@@ -318,7 +322,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: CheckPrereqsIndexed
@@ -328,10 +332,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
-            - Changes
-            - META.json
-            - META.yml
             - README.mkdn
+            - cpanfile
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -350,7 +352,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.40.0
           repo_root: .
       name: Git::NextVersion
       version: '2.048'
@@ -365,39 +367,39 @@ x_Dist_Zilla:
           untracked_files: die
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
-            - Changes
             - CopyIndexes.mkdn
-            - META.json
             - Maintenance.mkdn
             - README.mkdn
             - Searching.mkdn
+            - cpanfile
             - dist.ini
+            - weaver.ini
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.40.0
           repo_root: .
       name: Git::Check
       version: '2.048'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -405,7 +407,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -418,11 +420,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-8.4
+          tag: release-8.5
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -431,14 +433,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -446,7 +448,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -460,55 +462,55 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.40.0
           repo_root: .
       name: Git::Push
       version: '2.048'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.025'
+      version: '6.030'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.025'
+      is_trial: 0
+    version: '6.030'
 x_contributors:
   - 'Alexey Shatlovsky <alexey.shatlovsky@booking.com>'
   - 'Alexey Surikov <ksurent@gmail.com>'
@@ -523,6 +525,6 @@ x_contributors:
   - 'Samit Badle <Samit.Badle@gmail.com>'
   - 'Takumi Sakamoto <takumi.saka@gmail.com>'
   - 'Vitaly Shupak <vitaly.shupak@deshaw.com>'
-x_generated_by_perl: v5.34.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: BSD

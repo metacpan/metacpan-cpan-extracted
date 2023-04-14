@@ -10,11 +10,11 @@ Book::Collate - Tools to Collate and Report Text Documents
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 =head1 SYNOPSIS
@@ -25,12 +25,12 @@ word count reports.
 
 =cut 
 
-#use lib 'lib/Book/Collate';
-use Book::Collate::Section;
 use Book::Collate::Book;
 use Book::Collate::Report;
+use Book::Collate::Section;
+use Book::Collate::Utils;
+use Book::Collate::Words;
 use Book::Collate::Writer::Report;
-#use Text;
 
 
 =head1 AUTHOR
@@ -39,13 +39,7 @@ Leam Hall, C<< <leamhall at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to i
-C<bug-book::collate at rt.cpan.org>, or through the web interface at 
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Book::Collate>.  
-I will be notified, and then you'll automatically be notified of progress 
-on your bug as I make changes.
-
-
+Please report any bugs or feature requests to L<https://github.com/LeamHall/book_collate/issues>. 
 
 
 =head1 SUPPORT
@@ -59,14 +53,6 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Book::Collate>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Book::Collate>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Book::Collate>
@@ -79,7 +65,7 @@ L<https://metacpan.org/release/Book::Collate>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by Leam Hall.
+This software is Copyright (c) 2023 by Leam Hall.
 
 This is free software, licensed under:
 

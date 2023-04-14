@@ -1,5 +1,5 @@
 package English::Name;
-$English::Name::VERSION = '0.002';
+$English::Name::VERSION = '0.003';
 use v5.10;
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ English::Name - ${^ENGLISH_NAME} for magic variables
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

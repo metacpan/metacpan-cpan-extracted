@@ -223,9 +223,9 @@ use Scalar::Util ();
 use AnyEvent ();
 use AnyEvent::Util ();
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
-sub OBSID() { 0x10000000000000 } # 2**52
+sub OBSID() { 2**52 }
 
 our $JSON = eval { require JSON::XS; JSON::XS:: }
           || do  { require JSON::PP; JSON::PP:: };
@@ -398,7 +398,7 @@ sub start {
 
    $self->{fh} = $fh;
 
-   my $trace = delete $self->{trace} || sub { };
+   my $trace = $self->{trace} || sub { };
 
    $trace = sub { warn "$_[0] $_[1]\n" } if $trace && !ref $trace;
 
@@ -490,11 +490,14 @@ sub start {
 
       $wbuf .= "$cmd\n";
 
-      $self->{ww} ||= AE::io $fh, 1, sub {
+      my $wcb = sub {
          my $len = syswrite $fh, $wbuf;
          substr $wbuf, 0, $len, "";
          undef $self->{ww} unless length $wbuf;
       };
+
+      $wcb->();
+      $self->{ww} ||= AE::io $fh, 1, $wcb if length $wbuf;
 
       $cv
    };

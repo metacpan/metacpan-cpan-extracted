@@ -2,7 +2,6 @@ class TestCase::Sys {
   use Sys;
   use Sys::IO;
   use Sys::OS;
-  use Time;
   use Sys::IO::Constant as IO;
 
   static method A : int () {

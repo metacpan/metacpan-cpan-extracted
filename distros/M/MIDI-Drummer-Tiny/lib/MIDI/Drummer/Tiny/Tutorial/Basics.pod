@@ -1,0 +1,122 @@
+package MIDI::Drummer::Tiny::Tutorial::Basics;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MIDI::Drummer::Tiny::Tutorial::Basics
+
+=head1 VERSION
+
+version 0.4206
+
+=head1 Methods and Techniques
+
+=head2 Counting-in
+
+Four beats in 4/4:
+
+  $d->count_in(1);  # Closed hi-hat for 1 bar
+
+A steady, traditional metronome pulse:
+
+  $d->count_in({ bars => 32, patch => $d->bell });
+
+=head2 Of Rests, Notes, and Accents
+
+Rest for a whole note:
+
+  $d->rest($d->whole);
+
+Add a single quarter-note with both the closed hihat and the bass drum, to the score:
+
+  $d->note($d->quarter, $d->closed_hh, $d->kick);
+
+Add an accented snare to the score:
+
+  my $accent_value = 127;
+  $d->accent_note($accent_value, $d->sixteenth, $d->snare);
+
+Do the opposite and add a "ghost note" that is less than the average volume (usually 100), to the score:
+
+  my $accent_value = 50;
+  $d->accent_note($accent_value, $d->sixteenth, $d->snare);
+
+=head1 A Flam
+
+A "flam" is a stroke preceded by a grace note. Often this is done with the snare alone, but any part of the kit is fair game.
+
+  $d->flam($d->quarter); # play the snare by default
+
+Play the the hi-tom for the grace-note, then the snare:
+
+  $d->flam($d->eighth, $d->hi_tom);
+
+Again, play the the hi-tom for the grace-note, followed by the low-tom:
+
+  $d->flam($d->sixteenth, $d->hi_tom, $d->low_tom);
+
+=head1 Rolls
+
+A drum roll is a rapid succession of beats, usually on the same drum.
+
+This module does two types: "straight" and "curved" - i.e. flat or with a crescendo.
+
+=head2 Straight
+
+Roll the snare in 32nd notes for an eighth-note duration, with equal volume for each stroke:
+
+  $d->roll($d->eighth, $d->thirtysecond);
+
+Roll the hi-tom in 32nd notes for an quarter-note duration:
+
+  $d->roll($d->quarter, $d->thirtysecond, $d->hi_tom);
+
+=head2 Crescendo
+
+Roll the snare from a volume of 50 up to 127 in a linear fashion:
+
+  $d->crescendo_roll([50, 127], $d->eighth, $d->thirtysecond);
+
+Roll the snare from a volume of 50 up to 127 with a curve (as illustrated in the main module's documentation):
+
+  $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
+
+Roll the hi-tom from a volume of 127 B<down> to 50:
+
+  $d->crescendo_roll([127, 50], $d->eighth, $d->thirtysecond, $d->hi_tom);
+
+=head1 Changing Attribute Values
+
+A few of the attributes may be reset in the middle of a piece (after object construction).
+
+These are the time signature, beats per minute, MIDI channel, and the volume.
+
+  $d->set_time_sig('5/4');
+
+  $d->set_bpm($d->bpm / 3);
+
+  $d->set_channel;    # reset to channel 9 (the drum channel)
+  $d->set_channel(0); # set the channel to something else
+
+  $d->set_volume;      # set to 0 - mute
+  $d->set_volume(127); # or any number up to 127
+
+=cut
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014-2023 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

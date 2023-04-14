@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 1 "ts.pd"
 
+#line 1 "ts.pd"
 
 =encoding utf8
 
@@ -67,22 +67,18 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
 *_acf = \&PDL::_acf;
-#line 74 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_acvf = \&PDL::_acvf;
-#line 81 "TS.pm"
+
+
 
 
 
 #line 112 "ts.pd"
-
 
 #line 113 "ts.pd"
 
@@ -154,12 +150,10 @@ sub PDL::acvf {
   $h ||= $self->dim(0) - 1;
   return $self->_acvf($h+1);
 }
-#line 184 "ts.pd"
-#line 159 "TS.pm"
+#line 154 "TS.pm"
+#line 155 "TS.pm"
 
 
-
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -169,32 +163,24 @@ sub PDL::acvf {
 
   Signature: (x(t); [o]dx(t))
 
-
 =for ref
 
 Differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0). Can be done inplace.
-
-
 
 =for bad
 
 diff does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 187 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *diff = \&PDL::diff;
-#line 194 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -204,32 +190,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); [o]ix(n))
 
-
 =for ref
 
 Integration. Opposite of differencing. IX(t) = X(t) + X(t-1), IX(0) = X(0). Can be done inplace.
-
-
 
 =for bad
 
 inte does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 222 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *inte = \&PDL::inte;
-#line 229 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -239,11 +217,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(t); indx d(); [o]xd(t))
 
-
 =for ref
 
 Deseasonalize data using moving average filter the size of period d.
-
 
   
 
@@ -252,21 +228,18 @@ Deseasonalize data using moving average filter the size of period d.
 dseason processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 258 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dseason = \&PDL::dseason;
-#line 265 "TS.pm"
+
+
 
 
 
 #line 362 "ts.pd"
-
 
 #line 363 "ts.pd"
 
@@ -300,19 +273,15 @@ sub PDL::fill_ma {
 
   return $x_filled;
 }
-#line 396 "ts.pd"
-#line 305 "TS.pm"
+#line 277 "TS.pm"
+#line 278 "TS.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_fill_ma = \&PDL::_fill_ma;
-#line 312 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -322,13 +291,11 @@ sub PDL::fill_ma {
 
   Signature: (x(t); a(); [o]xf(t))
 
-
 =for ref
 
 Filter, exponential smoothing. xf(t) = a * x(t) + (1-a) * xf(t-1)
 
 =for usage
-
 
   
 
@@ -337,20 +304,15 @@ Filter, exponential smoothing. xf(t) = a * x(t) + (1-a) * xf(t-1)
 filter_exp does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 343 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *filter_exp = \&PDL::filter_exp;
-#line 350 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -360,11 +322,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(t); indx q(); [o]xf(t))
 
-
 =for ref
 
 Filter, moving average. xf(t) = sum(x(t-q .. t+q)) / (2q + 1)
-
 
   
 
@@ -373,20 +333,15 @@ Filter, moving average. xf(t) = sum(x(t-q .. t+q)) / (2q + 1)
 filter_ma does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 379 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *filter_ma = \&PDL::filter_ma;
-#line 386 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -395,8 +350,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
-
 
 =for ref
 
@@ -408,27 +361,20 @@ Usage:
 
     $mae = $y->mae( $y_pred );
 
-
-
 =for bad
 
 mae processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 421 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mae = \&PDL::mae;
-#line 428 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -437,8 +383,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
-
 
 =for ref
 
@@ -450,27 +394,20 @@ Usage:
 
     $mape = $y->mape( $y_pred );
 
-
-
 =for bad
 
 mape processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 463 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mape = \&PDL::mape;
-#line 470 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -479,8 +416,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (a(n); b(n); float+ [o]c())
-
-
 
 =for ref
 
@@ -492,27 +427,20 @@ Usage:
 
     $wmape = $y->wmape( $y_pred );
 
-
-
 =for bad
 
 wmape processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 505 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *wmape = \&PDL::wmape;
-#line 512 "TS.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -521,7 +449,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (r(h); longlong t(); [o]Q())
-
 
 =for ref
 
@@ -545,7 +472,6 @@ Usage:
     perldl> p 1 - gsl_cdf_chisq_P( $chisq, 5 )
     0.0480112934306748
 
-
   
 
 =for bad
@@ -553,21 +479,18 @@ Usage:
 portmanteau does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 559 "TS.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *portmanteau = \&PDL::portmanteau;
-#line 566 "TS.pm"
+
+
 
 
 
 #line 700 "ts.pd"
-
 
 #line 701 "ts.pd"
 
@@ -626,20 +549,18 @@ sub PDL::pred_ar {
     return $x->append($ext($b->dim(0) : -1));
   }
 }
-#line 759 "ts.pd"
-#line 631 "TS.pm"
+#line 553 "TS.pm"
+#line 554 "TS.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_pred_ar = \&PDL::_pred_ar;
-#line 638 "TS.pm"
+
+
 
 
 
 #line 790 "ts.pd"
-
 
 #line 791 "ts.pd"
 
@@ -867,8 +788,8 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1018 "ts.pd"
-#line 872 "TS.pm"
+#line 792 "TS.pm"
+#line 793 "TS.pm"
 
 
 

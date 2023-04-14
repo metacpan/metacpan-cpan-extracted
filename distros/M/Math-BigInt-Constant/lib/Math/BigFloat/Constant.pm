@@ -5,7 +5,7 @@ package Math::BigFloat::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Math::BigFloat '1.999802';
 our @ISA = qw( Math::BigFloat );
@@ -194,13 +194,13 @@ You can also look for information at:
 
 =over 4
 
-=item * GitHub
+=item * GitHub Source Repository
 
 L<https://github.com/pjacklam/p5-Math-BigInt-Constant>
 
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Constant>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Constant>
 
 =item * MetaCPAN
 
@@ -209,10 +209,6 @@ L<https://metacpan.org/release/Math-BigInt-Constant>
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-Constant>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt-Constant>
 
 =back
 

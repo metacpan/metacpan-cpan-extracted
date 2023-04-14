@@ -27,5 +27,6 @@ src/encoding.h
 src/thread.c
 src/thread.h
 t/test.t
+typemap
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

@@ -16,20 +16,20 @@ name: Book-Collate
 provides:
   Book::Collate:
     file: lib/Book/Collate.pm
-    version: v0.0.1
+    version: v0.0.2
   Book::Collate::Book:
     file: lib/Book/Collate/Book.pm
-    version: v0.0.1
+    version: v0.0.2
   Book::Collate::Report:
     file: lib/Book/Collate/Report.pm
-    version: v0.0.1
+    version: v0.0.2
   Book::Collate::Section:
     file: lib/Book/Collate/Section.pm
-    version: v0.0.1
+    version: v0.0.2
   Book::Collate::Writer::Report:
     file: lib/Book/Collate/Writer/Report.pm
     version: v0.0.1
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: v0.0.1
+version: v0.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,9 @@
+0.743   2023-01-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli pmlist][bugfix] '/' (from completion) etc were not yet
+          normalized to '::'.
+
+
 0.742   2022-09-28  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

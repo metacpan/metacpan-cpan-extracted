@@ -1,0 +1,46 @@
+Log-Any-Progress
+
+This module makes it easy to use Log::Any to log incremental
+progress, similar in concept to Term::ProgressBar.  It can be
+useful for monitoring the progress of a long-running process and to
+get an idea of how long that process might take to finish.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Any::Progress
+
+You can also look for information at:
+
+    GitHub (report bugs or suggest features here)
+        https://github.com/larryl/Log-Any-Progress
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Any-Progress
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Log-Any-Progress
+
+    Search CPAN
+        https://metacpan.org/release/Log-Any-Progress
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Larry Leszczynski.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

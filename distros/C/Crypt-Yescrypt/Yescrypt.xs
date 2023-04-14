@@ -57,8 +57,8 @@ char* yescrypt(SV* password, SV* salt, UV flavor, UV n, UV r, UV p = 1, UV t = 0
 	STRLEN password_len, salt_len;
 	int rc;
 	yescrypt_local_t local;
-	static uint8_t settings[PREFIX_LEN + 1];
-	static uint8_t buf[PREFIX_LEN + 1 + HASH_LEN + 1];
+	uint8_t settings[PREFIX_LEN + 1];
+	uint8_t buf[PREFIX_LEN + 1 + HASH_LEN + 1];
 	CODE:
 		yescrypt_params_t params = { flavor, (uint64_t)1 << n, r, p, t, g, 0 };
 		if (!yescrypt_init_local(&local)) {
@@ -78,7 +78,7 @@ int yescrypt_check(SV* password, const char* hash, STRLEN length(hash))
 	STRLEN password_len, setting_len;
 	int rc;
 	yescrypt_local_t local;
-	static uint8_t outhash[PREFIX_LEN + 1 + HASH_LEN + 1];
+	uint8_t outhash[PREFIX_LEN + 1 + HASH_LEN + 1];
 	CODE:
 		if (!yescrypt_init_local(&local)) {
 			password_raw = SvPVbyte(password, password_len);
@@ -96,7 +96,7 @@ int yescrypt_check(SV* password, const char* hash, STRLEN length(hash))
 
 int yescrypt_needs_rehash(SV* hash, UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
 	PREINIT:
-	static uint8_t settings[PREFIX_LEN + 1];
+	uint8_t settings[PREFIX_LEN + 1];
 	char *hash_raw, *setting;
 	STRLEN hash_len, setting_len;
 	CODE:
@@ -105,5 +105,28 @@ int yescrypt_needs_rehash(SV* hash, UV flavor, UV n, UV r, UV p = 1, UV t = 0, U
 		setting = yescrypt_encode_params_r(&params, "", 0, settings, sizeof(settings));
 		setting_len = strlen(settings);
 		RETVAL = hash_len < setting_len || !timing_safe_compare(hash_raw, setting, setting_len - 1);
+	OUTPUT:
+		RETVAL
+
+SV* yescrypt_kdf(SV* password, SV* salt, size_t buffer_size, UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
+	PREINIT:
+	char *password_raw, *salt_raw;
+	STRLEN password_len, salt_len;
+	int rc;
+	yescrypt_local_t local;
+	CODE:
+		if (!yescrypt_init_local(&local)) {
+			yescrypt_params_t params = { flavor, 1ul << n, r, p, t, g, 0 };
+			password_raw = SvPVbyte(password, password_len);
+			salt_raw = SvPVbyte(salt, salt_len);
+
+			RETVAL = newSV(buffer_size);
+			rc = yescrypt_kdf(NULL, &local, password_raw, password_len, salt_raw, salt_len, &params, SvPVX(RETVAL), buffer_size);
+			yescrypt_free_local(&local);
+			if (rc == 0) {
+				SvPOK_only(RETVAL);
+				SvCUR(RETVAL) = buffer_size;
+			}
+		}
 	OUTPUT:
 		RETVAL

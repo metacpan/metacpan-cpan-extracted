@@ -22,8 +22,8 @@ use feature 'lexical_subs';
 no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
-our $VERSION = '5.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-03-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '5.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-12'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -55,32 +55,44 @@ use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
 use overload ();
 
+our $addrvis_ndigits = 3;
+our $addrvis_a2abv =  {}; # address => abbreviated hex
+sub addrvis_forget(;$) {
+  $addrvis_ndigits = $_[0] || 3;
+  $addrvis_a2abv =  {};
+}
+sub addrvis(_) {
+  # Display an address as decimal:hex showing only the last few digits.
+  # The number of digits shown increases when collisions occur.
+  # The arg can be a numeric address or a ref from which the addr is taken.
+  # If the arg is a ref, the result is REFTYPE<dec:hex> otherwise just dec:hex
+  my $arg = shift // return("undef");
+  my $refarg = ref($arg) ne "";
+  my $a = $refarg ? refaddr($arg) : $arg;
+  my sub abbr_hex($) { 
+       substr(sprintf("%0*x", $addrvis_ndigits, $_[0]), -$addrvis_ndigits) }
+  my sub abbr_dec($) { 
+       substr(sprintf("%0*d", $addrvis_ndigits, $_[0]), -$addrvis_ndigits) }
+  if (! exists $addrvis_a2abv->{$a}) {
+    my $abbr = abbr_hex($a);
+    while (grep{$abbr eq $_} values %$addrvis_a2abv) {
+      ++$addrvis_ndigits;
+      $addrvis_a2abv = { map{ $_ => abbr_hex($_) } keys %$addrvis_a2abv };
+      $abbr = abbr_hex($a);
+    }
+    $addrvis_a2abv->{$a} = $abbr;
+  }
+  my $rawabbr = abbr_dec($a).":".$addrvis_a2abv->{$a};
+  $refarg ? reftype($arg)."<${rawabbr}>" : $rawabbr
+}
+
+=for Pod::Coverage addrvis_forget
+ 
+=cut
+
 #####################################
 # Internal debug-message utilities
 #####################################
-sub _dbrefvis(_) {
-  # Display an address as decimal:hex showing only the last digits
-  # The arg can be a numeric address or a ref from which the addr is taken.
-  my $a = shift // return("undef");
-  my $pfx = "";
-  if (ref $a) {
-    $pfx = reftype($a);
-    $a = refaddr($a);
-  }
-  state $ndigits = 3;
-  state $a_to_abbr = {};  # address => abbreviated repr
-  my sub abbr_hex($) { substr(sprintf("%0*x", $ndigits, $_[0]), -$ndigits) }
-  if (! exists $a_to_abbr->{$a}) {
-    my $abbr = abbr_hex($a);
-    while (grep{$abbr eq $_} values %$a_to_abbr) {
-      ++$ndigits;
-      $a_to_abbr = { map{ $_ => abbr_hex($_) } keys %$a_to_abbr };
-      $abbr = abbr_hex($a);
-    }
-    $a_to_abbr->{$a} = $abbr;
-  }
-  "$pfx<".substr($a, -$ndigits).":".$a_to_abbr->{$a}.">"
-}
 sub _dbshow(_) {
   my $v = shift;
   blessed($v) ? "(".blessed($v).")".$v   # stringify with (classname) prefix
@@ -88,8 +100,8 @@ sub _dbshow(_) {
 }
 sub _dbvis(_) {
   my $v = shift;
-  chomp( my $s = Data::Dumper->new([$v])
-                   ->Useqq(1)->Terse(1)->Indent(0)->Sortkeys(\&__sortkeys)->Dump );
+  chomp( my $s = Data::Dumper->new([$v])->Useqq(1)->Terse(1)->Indent(0)
+                                        ->Sortkeys(\&__sortkeys)->Dump );
   $s
 }
 sub _dbvisq(_) {
@@ -98,6 +110,7 @@ sub _dbvisq(_) {
   $s
 }
 sub _dbavis(@) { "(" . join(", ", map{_dbvis} @_) . ")" }
+sub _dbrefvis(_) { addrvis($_[0])._dbvis($_[0]) }
 
 our $_dbmaxlen = 300;
 sub _dbrawstr(_) { "«".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)."..." : $_[0])."»" }
@@ -124,6 +137,7 @@ use Exporter 'import';
 our @EXPORT    = qw(visnew
                     vis  avis  alvis  ivis  dvis  hvis  hlvis
                     visq avisq alvisq ivisq dvisq hvisq hlvisq
+                    addrvis refvis
                     u quotekey qsh __forceqsh qshpath);
 
 our @EXPORT_OK = qw($Debug $MaxStringwidth $Truncsuffix $Objects $Foldwidth
@@ -206,7 +220,8 @@ $Foldwidth      = undef        unless defined $Foldwidth;  # undef auto-detects
 $Foldwidth1     = undef        unless defined $Foldwidth1; # override for 1st
 
 # The following override Data::Dumper defaults
-$Useqq          = "utf8:controlpics" unless defined $Useqq;
+#$Useqq          = "unicode:controlpic" unless defined $Useqq;
+$Useqq          = "unicode" unless defined $Useqq;
 $Quotekeys      = 0            unless defined $Quotekeys;
 $Sortkeys       = \&__sortkeys unless defined $Sortkeys;
 $Sparseseen     = 1            unless defined $Sparseseen;
@@ -316,6 +331,16 @@ sub alvis(@)  { substr &avis,  1, -1 }  # bare List without parenthesis
 sub alvisq(@) { substr &avisq, 1, -1 }
 sub hlvis(@)  { substr &hvis,  1, -1 }
 sub hlvisq(@) { substr &hvisq, 1, -1 }
+
+# TODO: Integrate this more deeply to avoid duplicating information when
+#       $v -> blessed and object does *not* stringify.  Currently we get:
+#          "HASH<584:4b8>Foo::Bar=HASH(0x5555558fd4b8)"
+#       Stringifying objects are ok, e.g. 
+#          "HASH<632:c38>(Math::BigInt)32"
+sub refvis(_) { my $obj = &__getobj_s->_Vistype('s');
+                my ($v) = $obj->Values;
+                (ref($v) ne "" ? addrvis($v) : "").$obj->Dump
+              }
 
 # Trampolines which replace the call frame with a call directly to the
 # interpolation code which uses $package DB to access the user's context.
@@ -615,8 +640,8 @@ sub _preprocess { # modifies an item by ref
   my ($self, $cloned_itemref, $orig_itemref) = @_;
   my ($debug, $seenhash) = @$self{qw/Debug Seenhash/};
 
-say "##pp AAA cloned=",_dbrefvis($cloned_itemref)," -> ",_dbvis($$cloned_itemref) if $debug;
-say "##         orig=",_dbrefvis($orig_itemref)," -> ",_dbvis($$orig_itemref)," at ",__LINE__ if $debug;
+say "##pp AAA cloned=",addrvis($cloned_itemref)," -> ",_dbvis($$cloned_itemref) if $debug;
+say "##         orig=",addrvis($orig_itemref)," -> ",_dbvis($$orig_itemref)," at ",__LINE__ if $debug;
 
   # Pop back if this item was visited previously
   if ($seenhash->{ refaddr($cloned_itemref) }++) {
@@ -626,18 +651,20 @@ say "##         orig=",_dbrefvis($orig_itemref)," -> ",_dbvis($$orig_itemref)," 
 
   # About TIED VARIABLES:
   # We must never modify a tied variable because of user-defined side-effects.
-  # Therefore before we might modify a tied variable, the variable must
-  # first be made to be not tied.   N.B. the whole structure was cloned
-  # beforehand, so this does not untie the user's variables.
+  # So if we do want to replace a tied variable we untie it first.
+  # N.B. The whole structure was cloned, so this does not untie the 
+  # user's variables.
 
-    # Side note: Saving refs to members of tied containers is a user error
-    # because such refs point to a magic temporary rather than the actual 
-    # storage in the container (which in general is impossible because tied 
-    # data may be stored externally).  Perl seems to re-use the temporaries,
-    # and bad things (refcount problems?) happen if you store such a ref 
-    # inside a tied container and then untie the container.
-    # Data::Dumper will abort with warning "cannot handle ref type 10"
-    # if called with \$tiedhash{key} [why?]
+    # Side note: Taking a ref to a member of a tied container, 
+    # e.g. \$tiedhash{key}, actually returns a tied scalar or some other 
+    # magical thing which, every time it is read, re-fetches the "referenced" 
+    # datum from the container into a temporary and returns a ref to the temp.
+    # The same temporary is used each time, so the returned ref is the same 
+    # and the illusion of being a normal hash is maintained.
+    # However Data::Dumper can abort with "cannot handle ref type 10"
+    # when it sees such things.  Also, if the magical ref is itself
+    # stored elsewhere in the container and then the container is *untied*,
+    # bat things happend (refcount problems?)
 
   # Our Item is only ever a scalar, either the top-level item from the user
   # or a member of a container we unroll below.  In either case the scalar
@@ -653,7 +680,17 @@ say "##         orig=",_dbrefvis($orig_itemref)," -> ",_dbvis($$orig_itemref)," 
 
   if (defined(my $repl = $self->_replacement($$orig_itemref))) {
     say "##pp Item REPLACED by ",_dbvis($repl)," at ",__LINE__ if $debug;
-    $$cloned_itemref = $repl;
+    # If the item is $#array then the following assignment will try to
+    # change the length of 'array', but blow up because the value is a string.
+    # I suspect similar things could happen with true read-only values
+    # but it appears that Clone::clone makes them writeable.
+    # Anyway, use eval and just leave it as-is if the assignment fails.
+    #
+    eval { $$cloned_itemref = $repl };
+    if ($@) {
+      say "##pp Item *can not* be REPLACED by ",_dbvis($repl)," ($@) at ",__LINE__ if $debug;
+      return;
+    }
     return
   }
 
@@ -1161,15 +1198,15 @@ sub _postprocess_DD_result {
   while ((pos()//0) < length) {
        if (/\G[\\\*]/gc)                         { atom($&) } # glued fwd
     elsif (/\G[,;]/gc)                           { commasemi($&) }
-    elsif (/\G"(?:[^"\\]++|\\.)*+"/gc)           { atom($&) } # "quoted"
-    elsif (/\G'(?:[^'\\]++|\\.)*+'/gc)           { atom($&) } # 'quoted'
-    elsif (m(\Gqr/(?:[^\\\/]++|\\.)*+/[a-z]*)gc) { atom($&) } # Regexp
+    elsif (/\G"(?:[^"\\]++|\\.)*+"/gsc)          { atom($&) } # "quoted"
+    elsif (/\G'(?:[^'\\]++|\\.)*+'/gsc)          { atom($&) } # 'quoted'
+    elsif (m(\Gqr/(?:[^\\\/]++|\\.)*+/[a-z]*)gsc){ atom($&) } # Regexp
 
     # With Deparse(1) the body has arbitrary Perl code, which we can't parse
     elsif (/\Gsub\s*${curlies_re}/gc)            { atom($&) } # sub{...}
 
     # $VAR1->[ix] $VAR1->{key} or just $varname
-    elsif (/\G(?:my\s+)?\$(?:${userident_re}|\s*->\s*|${balanced_re})++/gc) { atom($&) }
+    elsif (/\G(?:my\s+)?\$(?:${userident_re}|\s*->\s*|${balanced_re})++/gsc) { atom($&) }
 
     elsif (/\G\b[A-Za-z_][A-Za-z0-9_]*+\b/gc) { atom($&) } # bareword?
     elsif (/\G-?\d[\deE\.]*+\b/gc)            { atom($&) } # number
@@ -1433,10 +1470,17 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
     #    and @ARGV=("-i","/file/path")
 
   # Functions to format one thing
-  say vis $ref;     #-->{abc => [1,2,3,4,5], def => undef}
-  say vis \@ARGV;   #-->["-i", "/file/path"]  # any scalar
-  say avis @ARGV;   #-->("-i", "/file/path")
-  say hvis %hash;   #-->(abc => [1,2,3,4,5], def => undef)
+  say vis $ref;      #prints {abc => [1,2,3,4,5], def => undef}
+  say vis \@ARGV;    #prints ["-i", "/file/path"]  # any scalar
+  say avis @ARGV;    #prints ("-i", "/file/path")
+  say hvis %hash;    #prints (abc => [1,2,3,4,5], def => undef)
+
+  # Format a reference with abbreviated referent address
+  say refvis $ref;   #prints HASH<457:1c9>{abc => [1,2,3,4,5], ...}
+  
+  # Just abbreviate a referent address or arbitrary number
+  say addrvis $ref;           # HASH<457:1c9>
+  say addrvis refaddr($ref);  # 457:1c9
 
   # Stringify objects
   { use bigint;
@@ -1487,7 +1531,7 @@ with pre- and post-processing to "improve" the results:
 
 =over 2
 
-=item * Output is compact (1 line if possibe,
+=item * Output is compact (1 line if possible,
 otherwise folded at your terminal width), WITHOUT a trailing newline.
 
 =item * Printable Unicode characters appear as themselves.
@@ -1529,13 +1573,15 @@ from interpolating it beforehand.
 
 =head2 dvis 'string to be interpolated'
 
-Like C<ivis> with the addition that interpolated expressions
+Like C<ivis> with the addition that interpolated items
 are prefixed with a "exprtext=" label.
 
 The 'd' in 'dvis' stands for B<d>ebugging messages, a frequent use case where
 brevity of typing is more highly prized than beautiful output.
 
-=head2 vis [SCALAREXPR]
+=head2 vis optSCALAREXPR
+
+=head2 refvis optSCALAREXPR
 
 =head2 avis LIST
 
@@ -1543,6 +1589,9 @@ brevity of typing is more highly prized than beautiful output.
 
 C<vis> formats a single scalar ($_ if no argument is given)
 and returns the resulting string.
+
+C<refvis> is the same as C<vis> except if the argument is a reference
+then the result includes the object's abbreviated address (see C<addrvis>).
 
 C<avis> formats an array (or any list) as comma-separated values in parenthesis.
 
@@ -1558,7 +1607,9 @@ The "l" variants return a bare list without the enclosing parenthesis.
 
 =head2 dvisq 'string to be interpolated'
 
-=head2 visq [SCALAREXPR]
+=head2 visq optSCALAREXPR
+
+=head2 refvisq optSCALAREXPR
 
 =head2 avisq LIST
 
@@ -1573,6 +1624,24 @@ The 'q' variants display strings in 'single quoted' form if possible.
 Internally, Data::Dumper is called with C<Useqq(0)>, but depending on
 the version of Data::Dumper the result may be "double quoted" anyway
 if wide characters are present.
+
+=head2 addrvis REF
+
+=head2 addrvis NUMBER
+
+Abbreviate object addresses, showing only the last few digits
+in both decimal and hex.  The result is like I<< "HASHE<lt>457:1c9E<gt>" >>
+for references, I<< "457:1c9" >> for a plain numbers, 
+or I<"undef"> if the argument is undefined.
+
+Initially 3 digits are shown, but the number of digits increases over
+time if necessary to keep new results unambiguous.  
+Every unique value is remembered internally, so
+calling this with billions of unique values will use a lot of memory.
+
+B<refvis> is essentially the same as
+
+  addrvis(REF).vis(REF)   # e.g. "HASH<457:1c9>{ key=>value, ... }"
 
 =head1 OBJECT-ORIENTED INTERFACES
 
@@ -1656,7 +1725,7 @@ value, e.g. "A.20" sorts before "A.100".  See C<Data::Dumper> documentation.
 
 =head2 Useqq
 
-The default is "unicode:controlpic" except for
+The default is "unicode" except for
 functions/methods with 'q' in their name, which force C<Useqq(0)>.
 
 0 means generate 'single quoted' strings when possible.
@@ -1665,7 +1734,7 @@ functions/methods with 'q' in their name, which force C<Useqq(0)>.
 Non-ASCII charcters will be shown as hex escapes.
 
 Otherwise generate "double quoted" strings enhanced according to option
-keywords given as a :-separated list, e.g. Useqq("unicode:controlpic").
+keywords given as a :-separated list, e.g. Useqq("unicode:controlpics").
 The avilable options are:
 
 =over 4
@@ -1676,7 +1745,7 @@ All printable
 characters are shown as themselves rather than hex escapes, and
 '\n', '\t', etc. are shown for common ASCII control codes.
 
-=item "controlpic"
+=item "controlpics"
 
 Show ASCII control characters using single "control picture" characters,
 for example '␤' is shown for newline instead of '\n'.

@@ -1,5 +1,5 @@
 use v5.12.0;
-package Test::Routine::Runner 0.030;
+package Test::Routine::Runner 0.031;
 # ABSTRACT: tools for running Test::Routine tests
 
 use Moose;
@@ -102,7 +102,7 @@ Test::Routine::Runner - tools for running Test::Routine tests
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 OVERVIEW
 

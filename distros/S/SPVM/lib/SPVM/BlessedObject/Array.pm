@@ -2,37 +2,30 @@ package SPVM::BlessedObject::Array;
 
 use strict;
 use warnings;
+use Carp 'confess';
 
 use base 'SPVM::BlessedObject';
 
 use overload '@{}' => sub {
   my ($array) = @_;
   
-  my $elements = $array->to_elems;
+  my $elems = $array->to_elems;
   
-  return $elements;
+  return $elems;
 };
 
 use overload fallback => 1;
 
 use SPVM::ExchangeAPI;
 
-sub length {
-  my $self = shift;
-  
-  $self->api->array_length($self);
-}
+sub length { my $ret; eval { $ret =  shift->_xs_length(@_) }; if ($@) { confess $@ } $ret; }
 
-sub to_elems {
-  my $self = shift;
-  
-  $self->api->array_to_elems($self);
-}
+sub to_elems { my $ret; eval { $ret =  shift->_xs_to_elems(@_) }; if ($@) { confess $@ } $ret; }
 
 sub to_strings {
   my $self = shift;
   
-  my $elems = $self->api->array_to_elems($self);
+  my $elems = $self->to_elems;
   
   my $strings = [map { $_->to_string } @$elems];
   
@@ -42,112 +35,125 @@ sub to_strings {
 sub to_bins {
   my $self = shift;
   
-  my $elems = $self->api->array_to_elems($self);
+  my $elems = $self->to_elems;
   
-  my $strings = [map { $_->to_bin } @$elems];
+  my $binaries = [map { $_->to_bin } @$elems];
   
-  return $strings;
+  return $binaries;
 }
 
-sub to_bin {
-  my $self = shift;
+sub to_bin { my $ret; eval { $ret =  shift->_xs_to_bin(@_) }; if ($@) { confess $@ } $ret; }
 
-  $self->api->array_to_bin($self);
-}
+sub set { my $ret; eval { $ret =  shift->_xs_set(@_) }; if ($@) { confess $@ } $ret; }
 
-sub set {
-  my $self = shift;
-  
-  $self->api->array_set($self, @_);
-}
-
-sub get {
-  my $self = shift;
-  
-  $self->api->array_get($self, @_);
-}
+sub get { my $ret; eval { $ret =  shift->_xs_get(@_) }; if ($@) { confess $@ } $ret; }
 
 1;
 
 =head1 Name
 
-SPVM::BlessedObject::Array - Array based blessed object
+SPVM::BlessedObject::Array - SPVM Array
 
 =head2 DESCRIPTION
 
-SPVM::BlessedObject::Array is array based blessed object.
-
-This object contains SPVM array object.
+The object of the C<SPVM::BlessedObject::Array> class holds a SPVM array.
 
 =head1 Usage
 
-  # Get the value of an array element
-  my $value = $sp_array->get(2);
-
-  # Set the value of an array element
-  $sp_array->set(2 => 5);
+  # Gets an element of the array
+  my $elem = $blessed_object_array->get(2);
   
-  # Convert SPVM array to Perl array reference
-  my $elems = $sp_array->to_elems;
-
-  # Convert SPVM array to Perl binary data
-  my $binary = $sp_array->to_bin;
+  # Sets an element of the array
+  $blessed_object_array->set(2 => 5);
   
+  # Converts a SPVM array to a Perl array reference
+  my $elems = $blessed_object_array->to_elems;
+  
+  # Converts a SPVM array to a binary
+  my $binary = $blessed_object_array->to_bin;
+
 =head1 Methods
 
 =head2 get
 
-  my $value = $sp_array->get(2);
+  my $elem = $blessed_object_array->get($index);
 
-Get the value of an array element.
+Returns an element of the array with the index.
 
 =head2 set
 
-  $sp_array->set(2 => 5);
+  $blessed_object_array->set($index, $elem);
 
-Set the value of an array element
+Sets an element of the array with the index.
+
+If the $elem cannnot be assigned to the element of the array, an exception is thrown.
 
 =head2 to_elems
 
-  my $elems = $sp_array->to_elems;
+  my $elems = $blessed_object_array->to_elems;
 
-Convert SPVM array to Perl array reference.
+Converts a SPVM array to a Perl array reference and returns it.
 
 =head2 to_bin
 
-  my $binary = $sp_array->to_bin;
+  my $binary = $blessed_object_array->to_bin;
 
-Convert SPVM array to binary data.
+Converts a SPVM array to a binary and returns it.
 
-Binary data is unpacked by C<unpack> function.
+This binary is unpacked by L<unpack|https://perldoc.perl.org/functions/unpack> function.
 
-An exmaple when array is int array:
+If the array is an object array, an excetion is thrown.
 
-  my @nums = unpack 'l*', $binary;
+Examples:
+
+  # byte[]
+  my @elems = unpack 'c*', $binary;
+  
+  # short[]
+  my @elems = unpack 's*', $binary;
+  
+  # int[]
+  my @elems = unpack 'l*', $binary;
+
+  # long[]
+  my @elems = unpack 'q*', $binary;
+
+  # float[]
+  my @elems = unpack 'f*', $binary;
+
+  # double[]
+  my @elems = unpack 'd*', $binary;
 
 =head2 to_strings
 
-  my $elems = $sp_array->to_strings;
+  my $elems = $blessed_object_array->to_strings;
 
-Convert SPVM C<string> array to Perl string array reference by calling C<to_string> method of each element.
+Converts a SPVM string array to a Perl array reference and returns it.
+
+Each element calls L<to_string|SPVM::BlessedObject::String/"to_string"> method.
 
 =head2 to_bins
 
-  my $elems = $sp_array->to_bins;
+  my $elems = $blessed_object_array->to_bins;
 
-Convert SPVM C<string> array to Perl binary array reference by calling C<to_bin> method of each element.
+Converts a SPVM string array to Perl array reference and returns it.
+
+Each element calls L<to_bin|SPVM::BlessedObject::String/"to_bin"> method.
 
 =head1 Operators
 
-L<SPVM::BlessedObject::Array> overloads the following operators.
+Overloads the following operators.
 
 =head2 array dereference
   
-Array dereference get the elements of the array.
+  my @elems = @$array;
 
-  # Get elements
-  my @elements = @$array;
+This is the same as the following operation.
 
-This is the same as the following.
+  my @elems = @{$array->to_elems};
 
-  my @elements = @{$array->to_elems};
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

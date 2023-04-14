@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::pica_match;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Catmandu::Sane;
 use Catmandu::Fix::pica_map;
@@ -48,17 +48,15 @@ Catmandu::Fix::Condition::pica_match - Conditionals on PICA fields
    
    # pica_match(PICA_PATH,REGEX)
    
-   if pica_match('021Aa','My funny title')
+   if pica_match('021A$a','My funny title')
    	add_field('my.funny.title','true')
    end
 
-   # pica_match(PICA_PATH)
-   # checks whether a field exists
+   # pica_match(PICA_PATH)  # checks whether a field exists
    
-   # pica_match($9)
-   # checks whether a subfield exists
+   # pica_match($9)      # checks whether a subfield exists
 
-   if pica_match('001U0')
+   if pica_match('001$U0')
    	add_field('my.encode_info','true')
    end
 

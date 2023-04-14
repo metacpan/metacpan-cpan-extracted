@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -517,11 +517,15 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.482 of validate-with-sah (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of validate-with-sah (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
-B<validate-with-sah> [B<--coerce>|B<--no-coerce>|B<--nocoerce>] [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>|B<--multiple-data-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>|B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<--schema-file-type>=I<str>|B<-t>=I<str>] [B<--schema-file>=I<str>|B<-f>=I<str>] [B<--schema-module>=I<str>|B<-m>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] -- [I<schema>] [I<data>]
+B<validate-with-sah> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<validate-with-sah> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<validate-with-sah> [B<L<--coerce|/"--no-coerce">>|B<L<--no-coerce|/"--no-coerce">>|B<L<--nocoerce|/"--no-coerce">>] [B<L<--compiler|/"--compiler=s, -C">>=I<str>|B<L<-C|/"--compiler=s, -C">>=I<str>] [(B<L<--config-path|/"--config-path=s">>=I<path>)+|B<L<--no-config|/"--no-config">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--core|/"--core">>] [B<L<--core-or-pp|/"--core-or-pp">>] [B<L<--data-file-type|/"--data-file-type=s">>=I<str>] [B<L<--data-file|/"--data-file=filename">>=I<str>] [B<L<--data-with-result|/"--data-with-result, -d">>|B<L<-d|/"--data-with-result, -d">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--linenum|/"--linenum, -l">>|B<L<-l|/"--linenum, -l">>] [B<L<--multiple-data-file|/"--multiple-data-file=filename">>=I<str>] [B<L<--multiple-data|/"--multiple-data=s">>=I<any>|B<L<--multiple-data-json|/"--multiple-data=s">>=I<json>] [B<L<--(no)naked-res|/"--no-naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--no-modules|/"--no-modules">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--pp|/"--pp">>] [B<L<--return-type|/"--str-val">>=I<str>|B<L<--bool|/"--str-val">>|B<L<--bool-val|/"--str-val">>|B<L<--full|/"--str-val">>|B<L<-r|/"--str-val">>=I<str>|B<L<--str-val|/"--str-val">>] [B<L<--schema-file-type|/"--schema-file-type=s, -t">>=I<str>|B<L<-t|/"--schema-file-type=s, -t">>=I<str>] [B<L<--schema-file|/"--schema-file=filename, -f">>=I<str>|B<L<-f|/"--schema-file=filename, -f">>=I<str>] [B<L<--schema-module|/"--schema-module=s, -m">>=I<str>|B<L<-m|/"--schema-module=s, -m">>=I<str>] [B<L<--show-code|/"--show-code, -c">>|B<L<-c|/"--show-code, -c">>] [B<L<--show-raw-compile|/"--show-raw-compile, -R">>|B<L<-R|/"--show-raw-compile, -R">>] [B<L<--show-schema|/"--show-schema, -s">>|B<L<-s|/"--show-schema, -s">>] [B<L<--with-debug|/"--with-debug">>] -- [I<L<schema|/"--schema=s">>] [I<L<data|/"--data=s">>]
 
 
 
@@ -628,6 +632,9 @@ See C<--data>.
 Can also be specified as the 2nd command-line argument.
 
 =item B<--data>=I<s>
+
+(No description)
+
 
 Can also be specified as the 2nd command-line argument.
 
@@ -798,7 +805,13 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--schema-module>=I<s>, B<-m>
 
+(No description)
+
+
 =item B<--schema>=I<s>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -1233,7 +1246,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

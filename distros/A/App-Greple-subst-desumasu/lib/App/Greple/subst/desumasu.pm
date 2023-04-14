@@ -1,6 +1,6 @@
 package App::Greple::subst::desumasu;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use 5.014;
 use warnings;
@@ -32,9 +32,9 @@ App::Greple::subst::desumasu - Japanese DESU/MASU dictionary for App::Greple::su
 greple -Msubst module based on
 L<desumasu-converter|https://github.com/kssfilo/desumasu-converter>.
 
-This is a simple checker/converter module for Japanese writing style
-so called DUSU/MASU (ですます調: 敬体) and DEARU (である調: 常体).
-This is not my own idea and the dictionary is based on
+This is a simple checker/converter module for the Japanese writing
+styles so called DESU/MASU (ですます調: 敬体) and DEARU (である調: 常
+体).  This is not my own idea and the dictionary is based on
 L<https://github.com/kssfilo/desumasu-converter>.
 
 See article L<https://kanasys.com/tech/722> for detail.
@@ -51,10 +51,10 @@ See article L<https://kanasys.com/tech/722> for detail.
 
 Convert DESU/MASU to DEARU style.
 
-DESU (です) and MASU (ます) sometimes followed by NE (ね) in frank
-situation, and that NE (ね) is removed from converted result by
-default.  Option with B<-n> keep that NE (ね), and option with B<-N>
-igonore them.
+DESU (です) and MASU (ます) are sometimes followed by NE (ね) in an
+open situation, and that NE (ね) is removed from the converted result
+by default.  Option with B<-n> keeps the NE (ね), and option with
+B<-N> igonores it.
 
 =item B<--desumasu>
 
@@ -86,8 +86,8 @@ command in L<App::sdif> to visualize the difference.
 =item B<--overwrite>
 
 To update the file, use these options.  Option B<--create> make new
-file with C<.new> suffix.  Option B<--replace> update the target file
-with backup, while option B<--overwrite> does without backup.
+file with extention C<.new>.  Option B<--replace> updates the target
+file with backup, while option B<--overwrite> does it without backup.
 
 =back
 

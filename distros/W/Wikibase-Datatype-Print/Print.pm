@@ -3,7 +3,7 @@ package Wikibase::Datatype::Print;
 use strict;
 use warnings;
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 1;
 
@@ -79,31 +79,31 @@ TODO
 
 =item L<Wikibase::Datatype::Print::Value::Globecoordinate>
 
-TODO
+Wikibase globe coordinate item pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::Item>
 
-TODO
+Wikibase item value pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::Monolingual>
 
-TODO
+Wikibase monolingual value pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::Property>
 
-TODO
+Wikibase property value pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::Quantity>
 
-TODO
+Wikibase quantity value pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::String>
 
-TODO
+Wikibase string value pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::Time>
 
-TODO
+Wikibase time value pretty print helpers.
 
 =back
 
@@ -137,12 +137,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.04
 
 =cut

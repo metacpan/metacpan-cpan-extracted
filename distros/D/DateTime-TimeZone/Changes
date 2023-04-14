@@ -1,3 +1,10 @@
+2.60    2023-03-28
+
+- This release is based on version 2023c of the Olson database. The 2023c
+  release has the same zone data as 2023a, undoing the changes for Lebanon
+  from the past week.
+
+
 2.59    2023-03-23
 
 - This release is based on version 2023b of the Olson database. This release

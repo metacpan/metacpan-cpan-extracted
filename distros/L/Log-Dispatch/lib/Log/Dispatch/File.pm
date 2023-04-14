@@ -3,12 +3,12 @@ package Log::Dispatch::File;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use IO::Handle;
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
-use Scalar::Util qw( openhandle );
+use Scalar::Util               qw( openhandle );
 
 use base qw( Log::Dispatch::Output );
 
@@ -183,7 +183,7 @@ Log::Dispatch::File - Object for logging to files
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -231,9 +231,8 @@ The filename to be opened for writing.
 
 =item * mode ($)
 
-The mode the file should be opened with. Valid options are 'write',
-'>', 'append', '>>', or the relevant constants from Fcntl. The
-default is 'write'.
+The mode the file should be opened with. Valid options are 'write', '>',
+'append', '>>', or the relevant constants from Fcntl. The default is 'write'.
 
 =item * binmode ($)
 
@@ -241,8 +240,8 @@ A layer name to be passed to binmode, like ":encoding(UTF-8)" or ":raw".
 
 =item * close_after_write ($)
 
-Whether or not the file should be closed after each write. This
-defaults to false.
+Whether or not the file should be closed after each write. This defaults to
+false.
 
 If this is true, then the mode will always be append, so that the file is not
 re-written for each new message.
@@ -258,20 +257,19 @@ Whether or not the file should be autoflushed. This defaults to true.
 
 =item * syswrite ($)
 
-Whether or not to perform the write using L<perlfunc/syswrite>(),
-as opposed to L<perlfunc/print>(). This defaults to false.
-The usual caveats and warnings as documented in L<perlfunc/syswrite> apply.
+Whether or not to perform the write using L<perlfunc/syswrite>(), as opposed to
+L<perlfunc/print>(). This defaults to false. The usual caveats and warnings as
+documented in L<perlfunc/syswrite> apply.
 
 =item * permissions ($)
 
-If the file does not already exist, the permissions that it should
-be created with. Optional. The argument passed must be a valid
-octal value, such as 0600 or the constants available from Fcntl, like
-S_IRUSR|S_IWUSR.
+If the file does not already exist, the permissions that it should be created
+with. Optional. The argument passed must be a valid octal value, such as 0600
+or the constants available from Fcntl, like S_IRUSR|S_IWUSR.
 
-See L<perlfunc/chmod> for more on potential traps when passing octal
-values around. Most importantly, remember that if you pass a string
-that looks like an octal value, like this:
+See L<perlfunc/chmod> for more on potential traps when passing octal values
+around. Most importantly, remember that if you pass a string that looks like an
+octal value, like this:
 
  my $mode = '0644';
 
@@ -287,8 +285,6 @@ which is probably not what you want.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Log-Dispatch can be found at L<https://github.com/houseabsolute/Log-Dispatch>.
@@ -299,7 +295,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

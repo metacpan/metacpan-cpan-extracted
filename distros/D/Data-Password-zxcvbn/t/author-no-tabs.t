@@ -17,6 +17,8 @@ use Test::NoTabs;
 my @files = (
     'lib/Data/Password/zxcvbn.pm',
     'lib/Data/Password/zxcvbn/AdjacencyGraph.pm',
+    'lib/Data/Password/zxcvbn/AdjacencyGraph/Common.pm',
+    'lib/Data/Password/zxcvbn/AdjacencyGraph/English.pm',
     'lib/Data/Password/zxcvbn/Combinatorics.pm',
     'lib/Data/Password/zxcvbn/Match.pm',
     'lib/Data/Password/zxcvbn/Match/BruteForce.pm',
@@ -29,6 +31,8 @@ my @files = (
     'lib/Data/Password/zxcvbn/Match/UserInput.pm',
     'lib/Data/Password/zxcvbn/MatchList.pm',
     'lib/Data/Password/zxcvbn/RankedDictionaries.pm',
+    'lib/Data/Password/zxcvbn/RankedDictionaries/Common.pm',
+    'lib/Data/Password/zxcvbn/RankedDictionaries/English.pm',
     'lib/Data/Password/zxcvbn/TimeEstimate.pm',
     'scripts/zxcvbn-password-strength',
     't/author-critic.t',

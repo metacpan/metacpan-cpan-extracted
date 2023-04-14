@@ -38,8 +38,7 @@ subtest 'overlap' => sub {
         my $grid2 = Grid->new( edges => [ 1.1, 2.2 ], include => [1] );
         my $grid3 = Grid->new( edges => [ 2.3, 3.4 ], include => [0] );
 
-        my $gridN = overlay_n( $grid1, $grid2, $grid3,
-            { snap_dist => 0.1, snap_to => 'overlay' } );
+        my $gridN = overlay_n( $grid1, $grid2, $grid3, { snap_dist => 0.1, snap_to => 'overlay' } );
 
         # grid1 < grid 2
         #  before snap
@@ -77,8 +76,7 @@ subtest 'overlap' => sub {
           = Grid->new( edges => [ 0, 1, 2, 3 ], include => [ 0, 0, 0 ] );
         my $grid2 = Grid->new( edges => [ 1.1, 1.9 ], include => [1] );
 
-        my $gridN = overlay_n( $grid1, $grid2,
-            { snap_dist => 0.1, snap_to => 'underlay' } );
+        my $gridN = overlay_n( $grid1, $grid2, { snap_dist => 0.1, snap_to => 'underlay' } );
 
         # grid1 < grid 2
         #  before snap

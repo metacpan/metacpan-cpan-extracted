@@ -19,7 +19,7 @@ use constant false => 0;
 use Carp qw(carp croak);
 use File::Basename qw(fileparse);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my %error_handlers = (
     0 => sub { warn "parse error: $_[0].\n" },
@@ -371,7 +371,7 @@ sub _stage3 {
     my $tree = shift;
     my $parent = shift;
 
-    for (my $i = 0; $i< @{$tree->{nodes}}; $i++) {
+    for (my $i = 0; $i < @{$tree->{nodes}}; $i++) {
 
         my $node = $tree->{nodes}[$i];
 

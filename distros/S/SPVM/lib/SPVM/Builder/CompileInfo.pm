@@ -7,72 +7,6 @@ use Carp 'confess';
 use File::Basename 'dirname';
 
 # Fields
-sub output_file {
-  my $self = shift;
-  if (@_) {
-    $self->{output_file} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{output_file};
-  }
-}
-
-sub cc {
-  my $self = shift;
-  if (@_) {
-    $self->{cc} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{cc};
-  }
-}
-
-sub ccflags {
-  my $self = shift;
-  if (@_) {
-    $self->{ccflags} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{ccflags};
-  }
-}
-
-sub optimize {
-  my $self = shift;
-  if (@_) {
-    $self->{optimize} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{optimize};
-  }
-}
-
-sub builder_include_dir {
-  my $self = shift;
-  if (@_) {
-    $self->{builder_include_dir} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{builder_include_dir};
-  }
-}
-
-sub include_dirs {
-  my $self = shift;
-  if (@_) {
-    $self->{include_dirs} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{include_dirs};
-  }
-}
-
 sub source_file {
   my $self = shift;
   if (@_) {
@@ -84,14 +18,14 @@ sub source_file {
   }
 }
 
-sub class_name {
+sub output_file {
   my $self = shift;
   if (@_) {
-    $self->{class_name} = $_[0];
+    $self->{output_file} = $_[0];
     return $self;
   }
   else {
-    return $self->{class_name};
+    return $self->{output_file};
   }
 }
 
@@ -106,40 +40,63 @@ sub config {
   }
 }
 
-sub create_merged_ccflags {
-  my ($self) = @_;
+# Class methods
+sub new {
+  my $class = shift;
   
-  my @merged_ccflags;
-  
-  if (defined $self->optimize) {
-    push @merged_ccflags, split(/ +/, $self->optimize);
-  }
-  
-  push @merged_ccflags, @{$self->ccflags};
+  my $self = {@_};
 
-  my $builder_include_dir = $self->builder_include_dir;
-  push @merged_ccflags, "-I$builder_include_dir";
-
-  my $include_dirs = $self->include_dirs;
-  my @include_dirs_ccflags = map { "-I$_" } @$include_dirs;
-  push @merged_ccflags, @include_dirs_ccflags;
+  bless $self, $class;
   
-  return \@merged_ccflags;
+  return $self;
 }
 
+# Instance Methods
 sub create_compile_command {
   my ($self) = @_;
+  
+  my $config = $self->config;
 
-  my $cc = $self->cc;
-  my $class_name = $self->class_name;
+  my $cc = $config->cc;
   my $output_file = $self->output_file;
   my $source_file = $self->source_file;
   
-  my $merged_ccflags = $self->create_merged_ccflags;
+  my $compile_command_args = $self->create_compile_command_args;
   
-  my @compile_command = ($cc, '-c', '-o', $output_file, @$merged_ccflags, $source_file);
+  my @compile_command = ($cc, '-c', '-o', $output_file, @$compile_command_args, $source_file);
   
   return \@compile_command;
+}
+
+sub create_compile_command_args {
+  my ($self) = @_;
+  
+  my $config = $self->config;
+  
+  my @compile_command_args;
+  
+  if (defined $config->optimize) {
+    push @compile_command_args, split(/ +/, $config->optimize);
+  }
+  
+  push @compile_command_args, @{$config->ccflags};
+  
+  # include directories
+  {
+    my @all_include_dirs;
+    
+    my $spvm_core_include_dir = $config->spvm_core_include_dir;
+    push @all_include_dirs, $spvm_core_include_dir;
+    
+    my $include_dirs = $config->include_dirs;
+    push @all_include_dirs, @$include_dirs;
+    
+    my @all_include_dirs_args = map { "-I$_" } @all_include_dirs;
+    
+    push @compile_command_args, @all_include_dirs_args;
+  }
+  
+  return \@compile_command_args;
 }
 
 # Instance methods
@@ -152,99 +109,38 @@ sub to_string {
   return $compile_command_string;
 }
 
-# Class methods
-sub new {
-  my $class = shift;
-  
-  my $self = {@_};
-
-  bless $self, $class;
-  
-  unless (defined $self->ccflags) {
-    $self->ccflags([]);
-  }
-
-  unless (defined $self->include_dirs) {
-    $self->include_dirs([]);
-  }
-  
-  return $self;
-}
-
 1;
 
 =head1 Name
 
-SPVM::Builder::CompileInfo - Link Information
+SPVM::Builder::CompileInfo - Compilation Information
 
 =head1 Description
 
-C<SPVM::Builder::CompileInfo> is a compile information. This infromation is used by the compileer.
+The SPVM::Builder::CompileInfo class has methods to manipulate compilation information.
 
 =head1 Fields
-
-=head2 output_file
-
-  my $output_file = $compile_info->output_file;
-  $compile_info->output_file($output_file);
-
-Get and set the source file that is compiled.
-
-=head2 cc
-
-  my $cc = $compile_info->cc;
-  $compile_info->cc($cc);
-
-Get and set the compileer name.
-
-=head2 ccflags
-
-  my $ccflags = $compile_info->ccflags;
-  $compile_info->ccflags($ccflags);
-
-Get and set the compileer flags.  The default value is C<[]>.
-
-=head2 optimize
-
-  my $optimize = $compile_info->optimize;
-  $compile_info->optimize($optimize);
-
-Get and set the optimize.
-
-=head2 builder_include_dir
-
-  my $builder_include_dir = $compile_info->builder_include_dir;
-  $compile_info->builder_include_dir($builder_include_dir);
-
-Get and set the builder include directory.
-
-=head2 include_dirs
-
-  my $include_dirs = $source_file->include_dirs;
-  $source_file->include_dirs($include_dirs);
-
-Get and set the include directories. The default is C<[]>.
-
-=head2 source_file
-
-  my $source_file = $compile_info->source_file;
-  $compile_info->source_file($source_file);
-
-Get and set the source file.
-
-=head2 class_name
-
-  my $class_name = $compile_info->class_name;
-  $compile_info->class_name($class_name);
-
-Get and set the class name.
 
 =head2 config
 
   my $config = $compile_info->config;
   $compile_info->config($config);
 
-Get and set the L<config|SPVM::Builder::Config> that is used to compile the source file.
+Gets and sets a L<SPVM::Builder::Config> object used to compile the source file.
+
+=head2 source_file
+
+  my $source_file = $compile_info->source_file;
+  $compile_info->source_file($source_file);
+
+Gets and sets the source file.
+
+=head2 output_file
+
+  my $output_file = $compile_info->output_file;
+  $compile_info->output_file($output_file);
+
+Gets and sets the output file.
 
 =head1 Class Methods
 
@@ -252,40 +148,44 @@ Get and set the L<config|SPVM::Builder::Config> that is used to compile the sour
 
   my $compile_info = SPVM::Builder::CompileInfo->new;
 
+Creates a new L<SPVM::Builder::CompileInfo> object.
+
 =head1 Instance Methods
-
-=head2 new
-
-  my $compile_info = SPVM::Builder::CompileInfo->new;
-
-Create a new C<SPVM::Builder::CompileInfo> object.
-
-=head2 create_merged_ccflags
-
-  my $merged_ccflags = $compile_info->create_merged_ccflags;
-
-Get the merged ccflags as an array reference.
-
-Examples:
-
-  [qw(-O2 -Iinclude_dir)]
 
 =head2 create_compile_command
 
   my $compile_command = $compile_info->create_compile_command;
 
-Get the compile command as an array reference.
+Creates the compilation command, and returns it. The return value is an array reference.
 
-Examples:
+The following one is an example of the return value.
 
-  [qw(cc -c -o foo.o -O2 -Iinclude_dir foo.c)]
+  [qw(cc -o foo.o -c -O2 -Ipath/include foo.c)]
 
-=head2 to_string
+=head2 create_compile_command_args
 
-  my $string = $compile_info->to_string;
+  my $config_args = $compile_info->create_compile_command_args;
 
-Get the string representaion of the L<compile command|/"create_compile_command">.
+Creates the parts of the arguments of the compilation command from the information of the L</"config"> field, and returns it. The return value is an array reference.
 
-Examples:
+The C<-c> option, the C<-o> option and the source file name are not contained.
 
-  cc -c -O2 -Iinclude_dir -o foo.o foo.c 
+The following one is an example of the return value.
+
+  [qw(-O2 -Ipath/include)]
+
+=head2 to_cmd
+
+  my $compile_command_string = $compile_info->to_cmd;
+
+Calls the L<create_compile_command|/"create_compile_command"> method and joins all elements of the returned array reference with a space, and returns it.
+
+The following one is an example of the return value.
+
+  "cc -c -o foo.o -O2 -Ipath/include foo.c"
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

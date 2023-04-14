@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0805';
+our $VERSION = '0.0814';
 
 use Moo;
 use strictures 2;
@@ -55,7 +55,8 @@ has _mrd => (
 
 sub _build__mrd {
     my ($self) = @_;
-    die 'Sizes of weights and pool not equal' unless @{ $self->weights } == @{ $self->pool };
+    die 'Sizes of weights and pool not equal'
+        unless @{ $self->weights } == @{ $self->pool };
     return Math::Random::Discrete->new($self->weights, $self->pool);
 }
 
@@ -230,41 +231,32 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0805
+version 0.0814
 
 =head1 SYNOPSIS
 
-  use Music::Duration::Partition;
+  use Music::Duration::Partition ();
 
   my $mdp = Music::Duration::Partition->new(
     size => 8,                  # 2 measures in 4/4 time
     pool => [qw(hn dqn qn en)], # made from these durations
   );
 
-  # the pool may also be weighted
+  # the pool may be optionally weighted
   $mdp = Music::Duration::Partition->new(
     size    => 100,
     pool    => [qw(d50  d25)],
-    weights => [   0.7, 0.3 ], # optional
+    weights => [   0.7, 0.3 ],
   );
 
   # the pool may also be grouped
   $mdp = Music::Duration::Partition->new(
     pool   => [qw(hn qn tqn)],
-    groups => [   1, 1, 3   ], # optional
+    groups => [   1, 1, 3   ],
   );
 
   my $motif  = $mdp->motif;  # list-ref of pool members
   my @motifs = $mdp->motifs; # list of motifs
-
-  # midi usage:
-  # use List::Util qw(shuffle);
-  # use MIDI::Simple ();
-  # use Music::Scales qw(get_scale_MIDI);
-  # my $score = MIDI::Simple->new;
-  # my @notes = shuffle get_scale_MIDI('C', 4, 'major');
-  # $mdp->add_to_score($score, $motif, \@notes);
-  # $score->write_score('motif.mid');
 
 =head1 DESCRIPTION
 
@@ -278,6 +270,10 @@ durations whose lengths are less than or equal to C<5> quarter notes.
 
 To generate a measure in C<5/8> time, set B<size> equal to C<2.5>
 (meaning 5 eighth notes).
+
+For MIDI usage, please see
+L<Music::Duration::Partition::Tutorial::Quickstart> and
+L<Music::Duration::Partition::Tutorial::Advanced>.
 
 =head1 ATTRIBUTES
 
@@ -326,7 +322,7 @@ Default: Random item from B<pool>
 
 The frequencies of pool item selection.
 
-The number of weights must equal the number of B<pool> entries.  The
+The number of weights must equal the number of B<pool> entries. The
 weights do not have to sum to 1 and can be any relative numbers.
 
 Default: Equal probability for each pool entry
@@ -341,7 +337,7 @@ The number of groups must equal the number of B<pool> entries.
 
 Default: C<0> for each pool entry
 
-* C<0> and C<1> mean the same thing for grouping.  So if needed, an
+* C<0> and C<1> mean the same thing for grouping. So if needed, an
 entry should have a value greater than one.
 
 =head2 remainder
@@ -350,7 +346,7 @@ entry should have a value greater than one.
 
 Append any remaining duration ticks to the end of the motif.
 
-Default: C<1>  "Yes. Make it so."
+Default: C<1> "Yes. Make it so."
 
 =head2 verbose
 
@@ -397,6 +393,8 @@ Add the B<motif> and B<pitches> to the B<score>.
 
 The F<eg/*> and F<t/01-methods.t> programs in this distribution.
 
+L<https://ology.github.io/music-duration-partition-tutorial/>
+
 L<List::Util>
 
 L<Math::Random::Discrete>
@@ -411,7 +409,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Gene Boggs.
+This software is copyright (c) 2019-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

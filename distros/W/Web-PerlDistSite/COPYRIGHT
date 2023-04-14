@@ -1,0 +1,70 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Web-PerlDistSite
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Web-PerlDistSite
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Web/PerlDistSite/Common.pm
+ lib/Web/PerlDistSite/Compile.pm
+ lib/Web/PerlDistSite/Component.pm
+ lib/Web/PerlDistSite/Component/LayoutScss.pm
+ lib/Web/PerlDistSite/Component/MainScss.pm
+ lib/Web/PerlDistSite/MenuItem.pm
+ lib/Web/PerlDistSite/MenuItem/Divider.pm
+ lib/Web/PerlDistSite/MenuItem/File.pm
+ lib/Web/PerlDistSite/MenuItem/Homepage.pm
+ lib/Web/PerlDistSite/MenuItem/MarkdownFile.pm
+ lib/Web/PerlDistSite/MenuItem/Pod.pm
+ lib/Web/PerlDistSite/MenuItem/PodFile.pm
+ lib/Web/PerlDistSite/MenuItem/_PodCommon.pm
+Copyright: Copyright 2023 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ examples/site1/Makefile
+ examples/site1/_pages/index.md
+ examples/site1/_pages/installation.md
+ examples/site1/config.yaml
+ examples/site1/custom.scss
+ examples/site1/images/.exists
+ examples/site1/menu.yaml
+ examples/site1/package.json
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/Web/PerlDistSite.pm
+ t/00start.t
+ t/01basic.t
+ t/unit/Web/PerlDistSite.t
+Copyright: This software is copyright (c) 2023 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2023 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2023 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

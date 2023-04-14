@@ -28,6 +28,7 @@ use DynaLoader;
 
 
 
+
 #line 30 "trans.pd"
 
 use PDL::Func;
@@ -60,7 +61,7 @@ This module provides some transcendental functions for matrices.
 Moreover it provides sec, asec, sech, asech, cot, acot, acoth, coth, csc,
 acsc, csch, acsch. Beware, importing this module will overwrite the hidden
 PDL routine sec. If you need to call it specify its origin module : PDL::Basic::sec(args)
-#line 64 "Trans.pm"
+#line 65 "Trans.pm"
 
 
 
@@ -73,8 +74,6 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 
 
-
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -118,37 +117,29 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
   = pdl(1);
  ->t->geexp(6,1,, ( = null), ( = null));
 
-
-
 =for bad
 
 geexp does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 131 "Trans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geexp = \&PDL::geexp;
-#line 138 "Trans.pm"
 
-
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*__Ccgeexp = \&PDL::__Ccgeexp;
-#line 145 "Trans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*__Ccgeexp = \&PDL::__Ccgeexp;
+
+
+
 
 *__Ncgeexp = \&PDL::__Ncgeexp;
-#line 152 "Trans.pm"
+
+
 
 
 
@@ -160,15 +151,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (complex [io,phys]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n))
 
-
 =for ref
 
 Complex version of geexp. The value used for trace normalization is not returned.
 The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 "EXPOKIT: Software Package for Computing Matrix Exponentials".
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
-
-
 
 =cut
 
@@ -180,21 +168,18 @@ sub PDL::cgeexp {
   goto &PDL::__Ncgeexp;
 }
 *cgeexp = \&PDL::cgeexp;
-#line 184 "Trans.pm"
+#line 172 "Trans.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrsqrt = \&PDL::__Cctrsqrt;
-#line 191 "Trans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrsqrt = \&PDL::__Nctrsqrt;
-#line 198 "Trans.pm"
+
+
 
 
 
@@ -206,8 +191,6 @@ sub PDL::cgeexp {
 
   Signature: (complex [io,phys]A(n,n);int uplo();complex [phys,o] B(n,n);int [o]info())
 
-
-
 =for ref
 
 Root square of complex triangular matrix. Uses a recurrence of Björck and Hammarling.
@@ -215,8 +198,6 @@ Root square of complex triangular matrix. Uses a recurrence of Björck and Hammar
 Report No. 336, Manchester Centre for Computational Mathematics,
 Manchester, England, January 1999. It's available at http://www.ma.man.ac.uk/~higham/pap-mf.html)
 If uplo is true, A is lower triangular.
-
-
 
 =cut
 
@@ -228,21 +209,18 @@ sub PDL::ctrsqrt {
   goto &PDL::__Nctrsqrt;
 }
 *ctrsqrt = \&PDL::ctrsqrt;
-#line 232 "Trans.pm"
+#line 213 "Trans.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrfun = \&PDL::__Cctrfun;
-#line 239 "Trans.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrfun = \&PDL::__Nctrfun;
-#line 246 "Trans.pm"
+
+
 
 
 
@@ -254,12 +232,10 @@ sub PDL::ctrsqrt {
 
   Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info(); complex [t]diag(n);SV* func)
 
-
 =for ref
 
 Apply an arbitrary function to a complex triangular matrix. Uses a recurrence of Parlett.
 If uplo is true, A is lower triangular.
-
 
 =cut
 
@@ -271,7 +247,8 @@ sub PDL::ctrfun {
   goto &PDL::__Nctrfun;
 }
 *ctrfun = \&PDL::ctrfun;
-#line 275 "Trans.pm"
+#line 251 "Trans.pm"
+
 
 
 
@@ -1263,7 +1240,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1267 "Trans.pm"
+#line 1244 "Trans.pm"
 
 
 

@@ -1,3 +1,45 @@
+version 0.009; 2023-04-10
+
+  * port to Perl 5.33.1, which defines a PERL_VERSION_GE() macro that
+    clashes with the one this module previously had
+
+  * skip thread tests on some old versions of Perl (around 5.10.0) where
+    a core bug makes thread creation violate an internal assertion and
+    causes crashes
+
+  * skip thread tests on pre-5.8.9 Perls where a core bug makes thread
+    creation corrupt memory
+
+  * skip thread tests on pre-5.8.3 Perls where a core bug makes thread
+    completion break the global PL_sv_placeholder
+
+  * put whitespace around C string literals being pasted, for C++11
+    compatibility
+
+  * avoid using C preprocessor directives inside a macro argument list
+    (which is not valid)
+
+  * in XS code in the test suite, when croaking, avoid using __FILE__
+    as part of a format string, in case it includes a metacharacter
+
+  * document the intended scope of this module's backporting effort
+
+  * fix a documentation wording glitch
+
+  * in XS declare as const some data that never changes
+
+  * refactor thread tests
+
+  * in XS, refactor Perl version comparisons
+
+  * in XS, rename some macros for better style
+
+  * in XS, better argument parenthesisation in some macros
+
+  * avoid some compiler warnings
+
+  * in .gitignore, list temporary files produced by test XS compilation
+
 version 0.008; 2017-07-26
 
   * update test suite to not rely on . in @INC, which is no longer

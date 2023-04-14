@@ -1,3 +1,10 @@
+0.006   2023-02-07  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update mentioned module's name.
+
+
 0.005   2022-11-15  Released-By: PERLANCAR
 
         - First release, split from Require-HookChain.

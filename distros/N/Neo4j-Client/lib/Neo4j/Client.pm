@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '0.46';
+our $VERSION = '0.51';
 
 =head1 NAME
 
@@ -25,7 +25,8 @@ Neo4j::Client - Build and use the libneo4j-client library
 Chris Leishman's
 L<libneo4j-client|https://github.com/cleishm/libneo4j-client> is a C
 library for communication with a Neo4j server via the Bolt
-protocol. 
+protocol. A fork at L<https://github.com/majensen/libneo4j-client> enables
+the library to run on Neo4j versions up through 5.0.x.
 
 Installing this module will attempt to build the API portion of the
 library on your machine. C<libneo4j-client>'s interactive shell and
@@ -53,7 +54,7 @@ Thanks L<ETJ|https://metacpan.org/author/ETJ> (a.k.a mohawk) for beaming me aboa
 
 =head1 LICENSE
 
-This packaging software is Copyright (c) 2020 by Mark A. Jensen.
+This packaging software is Copyright (c) 2023 by Mark A. Jensen.
 
 This is free software, licensed under:
 

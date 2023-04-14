@@ -9,9 +9,9 @@ use Scalar::Util qw(refaddr);
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 our %SPEC;
 
@@ -263,11 +263,15 @@ move-done-org-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.483 of move-done-org-todos (from Perl distribution App-OrgUtils), released on 2022-10-11.
+This document describes version 0.484 of move-done-org-todos (from Perl distribution App-OrgUtils), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
-B<move-done-org-todos> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-pat>=I<re>] [B<--format>=I<name>|B<--json>] [B<--include-pat>=I<re>] [B<--(no)naked-res>] [B<--no-dry-run>|B<-N>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<undone_file>E<gt> [I<done_file>]
+B<move-done-org-todos> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<move-done-org-todos> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<move-done-org-todos> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-pat|/"--exclude-pat=s">>=I<re>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--include-pat|/"--include-pat=s">>=I<re>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-dry-run|/"--no-dry-run, -N">>|B<L<-N|/"--no-dry-run, -N">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<undone_file|/"--undone-file=s*">>E<gt> [I<L<done_file|/"--done-file=s">>]
 
 
 
@@ -330,6 +334,9 @@ Exclude todo items under this headline pattern.
 Only include todo items under this headline pattern.
 
 =item B<--undone-file>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -647,7 +654,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <assert.h>
@@ -18,7 +21,7 @@ int32_t SPVM__Sys__Time__Tms__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct tms* st_tms = env->new_memory_stack(env, stack, sizeof(struct tms));
 
-  void* obj_st_tms = env->new_pointer_by_name(env, stack, "Sys::Time::Tms", st_tms, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_st_tms = env->new_pointer_object_by_name(env, stack, "Sys::Time::Tms", st_tms, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_st_tms;

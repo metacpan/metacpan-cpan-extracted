@@ -2,7 +2,7 @@ package CXC::Number::Grid::Role::PDL;
 
 # ABSTRACT: Role to return PDL objects
 
-use feature ':5.24';
+use v5.28;
 use PDL::Lite ();
 
 use Moo::Role;
@@ -10,7 +10,7 @@ use Moo::Role;
 use experimental 'signatures';
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 sub _convert ( $self, $bignum ) {
     require Ref::Util;
@@ -18,6 +18,15 @@ sub _convert ( $self, $bignum ) {
     return Ref::Util::is_plain_arrayref( $bignum )
       ? PDL->pdl( [ map { $_->numify } $bignum->@* ] )
       : $bignum->numify;
+}
+
+
+
+
+
+
+sub include ( $self ) {
+    return PDL->pdl( $self->_include );
 }
 
 #
@@ -44,7 +53,7 @@ CXC::Number::Grid::Role::PDL - Role to return PDL objects
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -58,11 +67,13 @@ L<Math::BigFloat> arrays as piddles and passed L<Math::BigFloat> scalars as Perl
 
 =head1 INTERNALS
 
+=for Pod::Coverage include
+
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

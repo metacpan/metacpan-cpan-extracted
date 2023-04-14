@@ -58,8 +58,9 @@ sub _runningCommands {
 # 具体实现 _healthCheckCommands,设置抓取设备健康检查配置的脚本
 #------------------------------------------------------------------------------
 sub _healthCheckCommands {
-  my $self     = shift;
-  my $commands = ["screen-length disable", "dis version", "dis environment"];
+  my $self = shift;
+  my $commands
+    = ["dis cpu-usage", "dis memory", "dis stp down-port", "dis fan", "dis environment", "dis clock", "dis ntp-service status"];
   return $commands;
 }
 

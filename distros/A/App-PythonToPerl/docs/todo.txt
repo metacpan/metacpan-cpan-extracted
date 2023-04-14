@@ -1,0 +1,26 @@
+translate multiple Python files 
+translate multiple directories recursively
+
+handle chunking vs comments
+create all Python enclosing block types (conditionals, loops, any other blocks)
+pre-parse all Python enclosing block types
+translate all Python enclosing block types using internal translator, not external translator
+
+follow & find all Python dependencies & sub-dependencies
+translate all Python dependencies & sub-dependencies
+
+implement 1 Python shim (math)
+implement 10 Python shims (DBI, etc)
+implement 100 Python shims (all important Python libraries)
+
+manually correct external translator's errors
+train external translator on manual corrections
+retranslate and retrain until external translator is correct
+
+create all remaining Python component types (variables, operators, etc)
+implement Python grammar in EBNF using Parse::Eyapp
+fully parse all Python component types
+translate all Python component types using internal translator, not external translator
+
+completely remove reliance on external translator
+

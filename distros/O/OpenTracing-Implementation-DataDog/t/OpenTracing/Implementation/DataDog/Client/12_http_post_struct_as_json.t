@@ -17,15 +17,12 @@ subtest "Test a single request" => sub {
     
     or return;
     
+    local $ENV{DD_TRACE_AGENT_URL} = 'https://test-host:1234/my/traces';
     my $datadog_client;
     lives_ok {
         $datadog_client = Client->new(
             http_user_agent => $http_user_agent,
-            scheme          => 'https',
-            host            => 'test-host',
-            port            => '1234',
-            path            => 'my/traces',
-        ) # we do need defaults here, to not break when ENV was set already
+        )
     } "Created a 'datadog_client'"
     
     or return;
@@ -36,7 +33,7 @@ subtest "Test a single request" => sub {
     
     my $response;
     lives_ok {
-        $response = $datadog_client->http_post_struct_as_json(
+        $response = $datadog_client->_http_post_struct_as_json(
             [[ $struct1, $struct2, $struct3 ]]
         )
     } "Made a 'http_post_struct_as_json' call"
@@ -57,6 +54,10 @@ subtest "Test a single request" => sub {
         "... and send the expected JSON";
     
     my $headers = $test_request->headers;
+    
+    is $headers->header('Datadog-Meta-Lang'), 'perl',
+        "... that contains the default Datadog-Meta-Lang [perl]";
+    
     is $headers->header('X-Datadog-Trace-Count'), 3,
         "... that contains the expected number of 'structs'";
     

@@ -1,22 +1,32 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::Time {
+  use Sys::Time::Tm;
+  use Sys::Time::Tms;
   use Sys::Time::Timeval;
   use Sys::Time::Timezone;
   use Sys::Time::Itimerval;
   use Sys::Time::Timespec;
-  use Sys::Time::Tms;
+  
+  native static method time : long ();
+  
+  native static method localtime : Sys::Time::Tm ($time : long);
+  
+  native static method gmtime : Sys::Time::Tm ($time : long);
   
   native static method gettimeofday : int ($tv : Sys::Time::Timeval, $tz : Sys::Time::Timezone);
-
+  
   native static method clock : long ();
-
+  
   native static method clock_gettime : int ($clk_id : int, $tp : Sys::Time::Timespec);
-
+  
   native static method clock_getres : int ($clk_id : int, $res : Sys::Time::Timespec);
-
+  
   native static method setitimer : int ($which : int, $new_value : Sys::Time::Itimerval, $old_value : Sys::Time::Itimerval);
-
+  
   native static method getitimer : int ($which : int, $curr_value : Sys::Time::Itimerval);
-
+  
   native static method times : long ($buffer : Sys::Time::Tms);
   
   native static method clock_nanosleep : int ($clockid : int, $flags : int, $request : Sys::Time::Timespec, $remain : Sys::Time::Timespec);

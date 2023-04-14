@@ -15,7 +15,7 @@ if($@) {
 
 	my $vars = {
 	    url1 => 'rockvillebb',
-	    url2 => ' nigel.horne ',
+	    url2 => ' nigel.horne.961 ',
 	};
 
 	taint_checking_ok();
@@ -36,5 +36,5 @@ if($@) {
 	ok(defined($c));
 	tainted_ok($vars->{'url2'});
 	untainted_ok($c);
-	ok($c eq 'https://www.facebook.com/nigel.horne', 'Nigel Horne');
+	ok($c eq 'https://www.facebook.com/nigel.horne.961', 'Nigel Horne');
 }

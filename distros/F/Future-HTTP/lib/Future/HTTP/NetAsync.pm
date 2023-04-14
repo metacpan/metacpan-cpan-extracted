@@ -9,7 +9,7 @@ use feature 'signatures';
 use HTTP::Request;
 use IO::Async::Future;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 with 'Future::HTTP::Handler';
 
@@ -226,7 +226,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

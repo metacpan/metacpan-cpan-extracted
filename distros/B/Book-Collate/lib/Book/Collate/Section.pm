@@ -11,11 +11,11 @@ Section
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 =head1 SYNOPSIS
@@ -59,9 +59,25 @@ sub new {
     _filename       => $data{filename},
   };
   bless $self, $class;
-  $self->_write_headless_data();
-  $self->_write_report();
+  $self->{_raw_data}      = $self->_trim($self->{_raw_data});
+  $self->{_title}         = $self->_pull_title($self->{_raw_data});
+  $self->{_headless_data} = $self->_write_headless_data($self->{_raw_data});
+  $self->_write_report($self->{_headless_data});
   return $self;
+}
+
+=head2 _trim
+
+Removes leading and trailing whitespace. Note that this also removes
+the final newline.
+
+=cut
+
+sub _trim {
+  my ( $self, $string )  = @_;
+  my $caller = caller();
+  ( my $new_string ) = $string =~ m/^\s*(\S.*\S)\s*$/s;
+  return $new_string;
 }
 
 =head2 avg_sentence_length
@@ -94,14 +110,14 @@ sub filename { return $_[0]->{_filename}; }
 
 =head2 grade_level
 
-Returns the Flesch-Kincaid Grade Level score per: https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
+Returns the Flesch-Kincaid Grade Level score per: 
+  https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
 
 =cut
 
 sub grade_level {
   my ($self)  = @_;
-  my $f = sprintf("%0.2f", $self->{_report}->grade_level());
-  return $f;
+  return $self->{_report}->grade_level();
 }
 
 =head2 header
@@ -119,7 +135,7 @@ sub header {
     chomp($line);
     $line =~ s/^\s*//;
     next unless length($line);  # Skips extra blank lines at start.
-    $self->{_header}  = $line;
+    $self->{_header}  = $self->_trim($line);
     last;
   }
   return $self->{_header};
@@ -160,25 +176,26 @@ Returns the number of sentences.
 sub sentence_count { $_[0]->{_report}->sentence_count };
 
 
+=head2 sorted_word_list
+
+Returns a hash of the words used, in lowercase, with the usage count of that word as the key.
+
+=cut
+
+sub sorted_word_list {
+  my $self  = shift;
+  my %word_list = $self->{_report}->sorted_word_list();
+  return %word_list;
+}
+
+
 =head2 title
 
 Returns the title.
 
 =cut
 
-sub title { 
-  my ($self)  = @_;
-  my (@lines) = split(/\n/, $self->raw_data() );
-  foreach my $line (@lines) {
-    if ( $line =~ m/TITLE:/ ) {
-      chomp($line);
-      $line =~ s/^\s*TITLE:\s*//;
-      $self->{_title}  = $line;
-      last;
-    }
-  }
-  return $self->{_title};
-}
+sub title { return $_[0]->{_title} };
 
 =head2 word_count
 
@@ -196,48 +213,46 @@ Returns a hash of the words used, in lowercase, with the usage count of that wor
 
 sub word_list {
   my $self  = shift;
-  my %word_list = $self->{_report}->sorted_word_list();
+  my %word_list = $self->{_report}->word_list;
   return %word_list;
 }
 
-=head2 write_report
+=head2 write_fry_stats
 
-Writes the report file.
-
-=cut
-
-sub write_report {
-  my $self    = shift;
-  my $string  = "Grade Level: " . $self->grade_level() . "\n";
-  $string     .= "Word Frequency List:\n";
-  my %word_list = $self->{_report}->sorted_word_list();
-  my @unsorted_keys = ( keys %word_list );
-  my @sorted_keys = reverse ( sort { $a <=> $b } @unsorted_keys );
-  my $max_keys = 25;
-  foreach my $count ( @sorted_keys ){
-    $string .= "  $count  ";
-    foreach my $word ( @{$word_list{$count}} ){
-      $string .= " $word";
-    }
-    $string .= "\n";
-    $max_keys -= 1;
-    last unless $max_keys;
-  }
-  return $string;
-}
-
-
-=head2 _write_report
-
-Writes the report data.
+Returns a string with the Fry stats.
 
 =cut
 
-sub _write_report {
-  my ($self)  = @_;
-  my $text = $self->headless_data;
-  $self->{_report} = Book::Collate::Report->new( string => $self->headless_data() );
+sub write_fry_stats {
+  my $self = shift;
+  return $self->{_report}->write_fry_stats();
 }
+
+#=head2 write_report
+#
+#Writes the report file.
+#
+#=cut
+#
+#sub write_report {
+#  my $self    = shift;
+#  my $string  = "Grade Level: " . $self->grade_level() . "\n";
+#  $string     .= "Word Frequency List:\n";
+#  my %word_list = $self->{_report}->sorted_word_list();
+#  my @unsorted_keys = ( keys %word_list );
+#  my @sorted_keys = reverse ( sort { $a <=> $b } @unsorted_keys );
+#  my $max_keys = 25;
+#  foreach my $count ( @sorted_keys ){
+#    $string .= "  $count  ";
+#    foreach my $word ( @{$word_list{$count}} ){
+#      $string .= " $word";
+#    }
+#    $string .= "\n";
+#    $max_keys -= 1;
+#    last unless $max_keys;
+#  }
+#  return $string;
+#}
 
 =head2 _write_headless_data
 
@@ -246,15 +261,47 @@ Writes the headless data.
 =cut
 
 sub _write_headless_data {
-  my ($self)  = @_;
-  my $data;
+  my ($self, $data)  = @_;
   ($data = $self->raw_data) =~ s/^TITLE:.*\n//;
-  $data =~ s/^\s*//;
-  # TODO: Not sure this covers multiple empty blank lines.
+  $data   = $self->_trim($data);
   $data =~ s/^.*\n// if $self->{_has_header};
-  $data =~ s/^\s*(.*)\s*$/$1/;
-  $self->{_headless_data} = $data;
+  #$data =~ s/^\s*(.*)\s*$/$1/;
+  #$self->{_headless_data} = $data;
+  return $self->_trim($data);
 }
+
+=head2 _write_report
+
+Writes the report data.
+
+=cut
+
+sub _write_report {
+  my ($self, $text)  = @_;
+  $self->{_report} = Book::Collate::Report->new( string => $text );
+}
+
+=head2 _pull_title
+
+Returns the title and the data absent the title.
+
+=cut
+
+sub _pull_title { 
+  my ($self, $data)  = @_;
+  my $title;
+  my $new_data;
+  my (@lines) = split(/\n/, $data );
+  foreach my $line (@lines) {
+    if ( $line =~ m/TITLE:/ ) {
+      $line   =~ s/^\s*TITLE:\s*//;
+      $title  = $self->_trim($line);
+      last;
+    }
+  }
+  return $title;
+}
+
 
 =head1 AUTHOR
 
@@ -262,7 +309,7 @@ Leam Hall, C<< <leamhall at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to L<https://github.com/LeamHall/bookbot/issues>.  
+Please report any bugs or feature requests to L<https://github.com/LeamHall/book_collate/issues>.  
 
 
 
@@ -292,7 +339,7 @@ Besides Larry Wall, you can blame the folks on IRC Libera#perl for this stuff ex
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by Leam Hall.
+This software is Copyright (c) 2023 by Leam Hall.
 
 This is free software, licensed under:
 

@@ -20,5 +20,6 @@ Jerius
 Observatory
 Regexp
 Smithsonian
+Types
 djerius
 lib

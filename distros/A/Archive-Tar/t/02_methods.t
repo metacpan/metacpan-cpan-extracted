@@ -572,9 +572,9 @@ SKIP: {                             ### pesky warnings
 
 ### extract tests with different $EXTRACT_BLOCK_SIZE values ###
 SKIP: {                             ### pesky warnings
-    skip $ebcdic_skip_msg, 517 if ord "A" != 65;
+    skip $ebcdic_skip_msg, 431 if ord "A" != 65;
 
-    skip('no IO::String', 517) if   !$Archive::Tar::HAS_PERLIO &&
+    skip('no IO::String', 431) if   !$Archive::Tar::HAS_PERLIO &&
                                     !$Archive::Tar::HAS_PERLIO &&
                                     !$Archive::Tar::HAS_IO_STRING &&
                                     !$Archive::Tar::HAS_IO_STRING;
@@ -588,7 +588,7 @@ SKIP: {                             ### pesky warnings
     ) {
         my($obj, $struct) = @$aref;
 
-        for my $block_size ((1, BLOCK, 1024 * 1024, 2**31 - 4096, 2**31, 2**32)) {
+        for my $block_size ((1, BLOCK, 1024 * 1024, 2**31 - 4096, 2**31 - 1)) {
             local $Archive::Tar::EXTRACT_BLOCK_SIZE = $block_size;
 
             ok( $obj->extract,  "   Extracted with 'extract'" );

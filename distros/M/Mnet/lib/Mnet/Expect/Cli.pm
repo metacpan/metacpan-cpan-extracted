@@ -244,7 +244,11 @@ sub _login {
             if ($self->{password_in}) {
                 $self->debug("_login password_in prompt starting");
                 {
-                    local $SIG{INT} = sub { system("stty echo 2>/dev/null") };
+                    local $SIG{INT} = sub {
+                        system("stty echo 2>/dev/null");
+                        syswrite STDERR, "\n\n";
+                        $self->fatal("interrupt signal received");
+                    };
                     syswrite STDERR, "\nEnter $self->{password_in}: ";
                     system("stty -echo 2>/dev/null");
                     chomp($password = <STDIN>);
@@ -360,9 +364,9 @@ sub close {
 
     $expect->close($command)
 
-This method sends closes the current expect session, sending the optional
-input command first. Timeouts are gracefully handled. Refer to the close
-method in the L<Mnet::Expect> module for more information.
+This method sends closes the current expect session, sending the optional input
+command first. Timeouts and disconnects are gracefully handled. Refer to the
+close method in the L<Mnet::Expect> module for more information.
 
 =cut
 
@@ -404,23 +408,23 @@ The optional prompts reference argument can be used to handle prompts that may
 occur when running a command, such as confirmation prompts. It should contain
 pairs of regex strings and responses. The regex string values should be what
 goes in between the forward slash characters of a regular expression. The
-response can be a string that is sent to the expect session without a carraige
-return, or may be a code reference that gets the current object and output as
-input args and returns a response string. An null prompt regex string is
-activated for timeouts. An undef prompt response causes an immediate return of
-output.
+response can be a string that is sent to the expect session with or without a
+carraige return, or may be a code reference that gets the current object and
+output as input args and returns a response string. A null prompt regex string
+is activated for timeouts and disconnects. An undef prompt response causes an
+immediate return of output.
 
     # sends $command, uses default timeout, defines some prompts
     my $output = $expect->command($command, undef, [
 
-        # send 1.2.3.4 if matched by expect -re /ip/
-        'ip' => '1.2.3.4\r',
+        # send 1.2.3.4 and carraige return if matched by expect -re /ip/
+        'ip' => "1.2.3.4\r",
 
         # code ref
         'confirm? ' => sub { my $output = shift; return "y" },
 
-        # returns prior output on timeout, might be undef
-        undef => undef,
+        # returns received output on timeout, might be undef
+        '' => undef,
 
     ]);
 
@@ -492,7 +496,7 @@ sub _command_expect {
     my $output = undef;
 
     # store input prompt regexes and responses, also timeout regex/response
-    #   timeout prompt is separated because it's not an expect -re like others
+    #   null timeout prompt is separate, it's not an expect -re like others
     my $prompt_regexes = [];
     my $prompt_responses = [];
     my ($timeout_regex_flag, $timeout_response) = (undef, undef);
@@ -505,9 +509,10 @@ sub _command_expect {
         } else {
             push @$prompt_regexes, $regex;
             push @$prompt_responses, $response;
+            $regex = "/$regex/";
         }
         $response = Mnet::Dump::line($response);
-        $self->debug("_command_expect input prompt /$regex/ = $response");
+        $self->debug("_command_expect input prompt $regex = $response");
     }
 
     # prepare regexes used for expect call
@@ -536,7 +541,7 @@ sub _command_expect {
         #   return prior output if response undef or code ref returning undef
         #   otherwise return undef output
         if (not $expect and $timeout_regex_flag) {
-            $self->debug("_command_expect matched prompts null for timeout");
+            $self->debug("_command_expect matched prompts (null=timeout)");
             $self->_command_expect_prompt($timeout_response, $output) // last;
             $output = undef;
             last;

@@ -6,19 +6,20 @@ use Example::Syntax;
 
 extends 'Example::Controller';
 
-sub register :Chained(../unauth) CaptureArgs(0) ($self, $c, $user) {
+sub new_entity :Via('*Public') At('register/...') ($self, $c, $user) {
   return $c->redirect_to_action('#home') && $c->detach if $user->registered;
-  $c->next_action($user);
+  $c->view('HTML::Register', registration => $user);
+  $c->action->next($user);
 }
 
-  sub create :Chained(register) Args(0) PathPart('') Verbs(GET, POST) ($self, $c, $user) {
-    $c->view('HTML::Register', registration => $user);
+  sub init :GET Via('new_entity') At('init') ($self, $c, $user) {
+    return $c->view->set_http_ok;
   }
 
-    sub POST :Action RequestModel(RegistrationRequest) ($self, $c, $request) {    
-      return $c->user->register($request) ?
-        $c->redirect_to_action('#login') :
-          $c->view->set_http_bad_request;
-    }
+  sub create :POST Via('new_entity') At('') BodyModel(RegistrationRequest) ($self, $c, $user, $request) {
+    return $user->register($request) ?
+      $c->redirect_to_action('*Login') :
+        $c->view->set_http_bad_request;
+  }
 
 __PACKAGE__->meta->make_immutable; 

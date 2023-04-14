@@ -1,0 +1,10 @@
+0.002   2023-03-29  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild with Parse::FireDiamond 0.004 to fix generated POD.
+
+
+0.001   2023-03-28  Released-By: PERLANCAR
+
+        - First release.

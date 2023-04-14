@@ -61,7 +61,7 @@ The $handler is a L<Scope::Guard::Handler|SPVM::Scope::Guard::Handler> object.
 
 Exceptions:
 
-The $handler must be defined.
+The $handler must be defined. Otherwize an exception is thrown.
 
 =head1 Instance Methods
 
@@ -78,3 +78,9 @@ If L</"dismiss"> is true, the handler is not executed.
 =head2 Scope::Guard
 
 C<SPVM::Scope::Guard> is a port of Perl's L<Scope::Guard> to L<SPVM>.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

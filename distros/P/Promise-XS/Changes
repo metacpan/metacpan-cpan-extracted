@@ -1,5 +1,8 @@
 Revision history for Perl extension Promise::XS:
 
+0.20 Mon 10 Apr 2023
+- Version bump to “fix” CPAN Testers.
+
 0.19 Thu 16 Mar 2023
 - Fix a couple free-after-use bugs.
   Thank you, @andk!

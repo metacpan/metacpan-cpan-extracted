@@ -7,7 +7,8 @@ use Test2::V0;
 
 use Set::Partition;
 
-use aliased 'CXC::Number::Sequence::Linear' => 'Sequence';
+use CXC::Number::Sequence::Linear;
+use constant Sequence => 'CXC::Number::Sequence::Linear';
 use Carp;
 
 sub new {
@@ -94,9 +95,8 @@ range.
     is(
         $sequence,
         object {
-            call min => float( 1.0 );
-            call max =>
-              float( $exp{min} + ( $exp{nelem} - 1 ) * $exp{spacing} );
+            call min     => float( 1.0 );
+            call max     => float( $exp{min} + ( $exp{nelem} - 1 ) * $exp{spacing} );
             call spacing => meta {
                 prop size => 9;
                 prop this => array {
@@ -116,8 +116,7 @@ range.
     is(
         $sequence,
         object {
-            call min =>
-              float( $exp{max} - ( $exp{nelem} - 1 ) * $exp{spacing} );
+            call min     => float( $exp{max} - ( $exp{nelem} - 1 ) * $exp{spacing} );
             call max     => float( $exp{max} );
             call spacing => meta {
                 prop size => 9;
@@ -398,7 +397,7 @@ covers the specified range.
 
 
 {
-    my %exp = ( center => 0, soft_min => -5.5, soft_max => 2, spacing => 1 );
+    my %exp      = ( center => 0, soft_min => -5.5, soft_max => 2, spacing => 1 );
     my $sequence = new( %exp );
 
     is(
@@ -442,8 +441,7 @@ isa_ok(
 
     isa_ok(
         dies {
-            CXC::Number::Sequence::Linear->new( map { $_ => $args{$_} }
-                  @{ $_->[0] } )
+            CXC::Number::Sequence::Linear->new( map { $_ => $args{$_} } @{ $_->[0] } )
         },
         ['CXC::Number::Sequence::Failure::parameter::IllegalCombination'],
         join( ' ', 'underspecified: ', @{ $_->[0] } ),

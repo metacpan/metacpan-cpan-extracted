@@ -30,13 +30,20 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.61';
+$VERSION = '1.64';
 
 sub ConvertTimecode($);
 sub ProcessSGLT($$$);
 sub ProcessSLLT($$$);
 sub ProcessLucas($$$);
 sub WriteRIFF($$);
+
+# RIFF chunks containing image data (to include in ImageDataMD5 digest)
+my %isImageData = (
+    LIST_movi => 1, # (AVI: contains ##db, ##dc, ##wb)
+    data => 1,      # (WAV)
+    'VP8 '=>1, VP8L=>1, ANIM=>1, ANMF=>1, ALPH=>1, # (WebP)
+);
 
 # recognized RIFF variants
 my %riffType = (
@@ -1522,7 +1529,7 @@ my %code2charset = (
         },
         # (can't calculate duration like this for compressed audio types)
         RawConv => q{
-            return undef if $$self{VALUE}{FileType} =~ /^(LA|OFR|PAC|WV)$/;
+            return undef if $$self{FileType} =~ /^(LA|OFR|PAC|WV)$/;
             return(($val[0] and not ($val[2] or $val[3])) ? $val[1] / $val[0] : undef);
         },
         PrintConv => 'ConvertDuration($val)',
@@ -1980,6 +1987,7 @@ sub ProcessRIFF($$)
     my $unknown = $et->Options('Unknown');
     my $validate = $et->Options('Validate');
     my $ee = $et->Options('ExtractEmbedded');
+    my $md5 = $$et{ImageDataMD5};
 
     # verify this is a valid RIFF file
     return 0 unless $raf->Read($buff, 12) == 12;
@@ -1996,7 +2004,7 @@ sub ProcessRIFF($$)
     $$raf{NoBuffer} = 1 if $et->Options('FastScan'); # disable buffering in FastScan mode
     $mime = $riffMimeType{$type} if $type;
     $et->SetFileType($type, $mime);
-    $$et{VALUE}{FileType} .= ' (RF64)' if $rf64;
+    $$et{VALUE}{FileType} .= ' (RF64)' if $rf64 and $$et{VALUE}{FileType};
     $$et{RIFFStreamType} = '';      # initialize stream type
     $$et{RIFFStreamCodec} = [];     # initialize codec array
     SetByteOrder('II');
@@ -2059,6 +2067,10 @@ sub ProcessRIFF($$)
         # (in LIST_movi chunk: ##db = uncompressed DIB, ##dc = compressed DIB, ##wb = audio data)
         if ($tagInfo or (($verbose or $unknown) and $tag !~ /^(data|idx1|LIST_movi|RIFF|\d{2}(db|dc|wb))$/)) {
             $raf->Read($buff, $len2) == $len2 or $err=1, last;
+            if ($md5 and $isImageData{$tag}) {
+                $md5->add($buff);
+                $et->VPrint(0, "$$et{INDENT}(ImageDataMD5: '${tag}' chunk, $len2 bytes)\n");
+            }
             my $setGroups;
             if ($tagInfo and ref $tagInfo eq 'HASH' and $$tagInfo{SetGroups}) {
                 $setGroups = $$et{SET_GROUP0} = $$et{SET_GROUP1} = $$tagInfo{SetGroups};
@@ -2085,18 +2097,27 @@ sub ProcessRIFF($$)
             # extract information from remaining file as an embedded file
             $$et{DOC_NUM} = ++$$et{DOC_COUNT};
             next; # (must not increment $pos)
-        } elsif ($tag eq 'LIST_movi' and $ee) {
-            next; # parse into movi chunk
         } else {
-            if ($len > 0x7fffffff and not $et->Options('LargeFileSupport')) {
-                $et->Warn("Stopped parsing at large $tag chunk (LargeFileSupport not set)");
-                last;
+            my $rewind;
+            # do MD5 if required
+            if ($md5 and $isImageData{$tag}) {
+                $rewind = $raf->Tell();
+                $et->ImageDataMD5($raf, $len2, "'${tag}' chunk");
             }
-            if ($validate and $len2) {
-                # (must actually try to read something after seeking to detect error)
-                $raf->Seek($len2-1, 1) and $raf->Read($buff, 1) == 1 or $err = 1, last;
-            } else {
-                $raf->Seek($len2, 1) or $err=1, last;
+            if ($tag eq 'LIST_movi' and $ee) {
+                $raf->Seek($rewind, 0) or $err = 1, last if $rewind;
+                next; # parse into movi chunk
+            } elsif (not $rewind) {
+                if ($len > 0x7fffffff and not $et->Options('LargeFileSupport')) {
+                    $et->Warn("Stopped parsing at large $tag chunk (LargeFileSupport not set)");
+                    last;
+                }
+                if ($validate and $len2) {
+                    # (must actually try to read something after seeking to detect error)
+                    $raf->Seek($len2-1, 1) and $raf->Read($buff, 1) == 1 or $err = 1, last;
+                } else {
+                    $raf->Seek($len2, 1) or $err=1, last;
+                }
             }
         }
         $pos += $len2;
@@ -2126,7 +2147,7 @@ including AVI videos, WAV audio files and WEBP images.
 
 =head1 AUTHOR
 
-Copyright 2003-2022, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2023, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

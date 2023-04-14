@@ -8,7 +8,7 @@ use Log::Dispatch::Vars
     qw( %CanonicalLevelNames %LevelNamesToNumbers @OrderedLevels );
 use Scalar::Util qw( refaddr );
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _level_as_number {
@@ -93,7 +93,7 @@ Log::Dispatch::Base - Code shared by dispatch and output objects.
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -105,16 +105,13 @@ version 2.70
 
 =head1 DESCRIPTION
 
-Unless you are me, you probably don't need to know what this class
-does.
+Unless you are me, you probably don't need to know what this class does.
 
 =for Pod::Coverage .*
 
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -126,7 +123,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

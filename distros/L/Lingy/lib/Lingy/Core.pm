@@ -1,98 +1,36 @@
-use strict; use warnings;
 package Lingy::Core;
 
-use Lingy::Types;
-use Lingy::Reader;
+use Lingy::NS 'lingy.core';
+
+use Lingy::Env;
 use Lingy::Eval;
 use Lingy::Printer;
 
-use Exporter 'import';
-
-our @EXPORT = qw< slurp str >;
-
 our %meta;
 
-sub ns {
-    +{
-        '*' => \&multiply,
-        '+' => \&add,
-        '-' => \&subtract,
-        '/' => \&divide,
-        '<' => \&less_than,
-        '<=' => \&less_equal,
-        '=' => \&equal_to,
-        '==' => \&equal_to,
-        '>' => \&greater_than,
-        '>=' => \&greater_equal,
+# Initialize the lingy.core namespace by setting some dynamic vars and loading
+# Lingy/core.ly.
+#
+sub init {
+    my $self = shift;
 
-        'apply' => \&apply,
-        'assoc' => \&assoc,
-        'atom' => \&atom_,
-        'atom?' => \&atom_q,
-        'concat' => \&concat,
-        'conj' => \&conj,
-        'cons' => \&cons,
-        'contains?' => \&contains_q,
-        'count' => \&count,
-        'dec' => \&dec,
-        'deref' => \&deref,
-        'dissoc' => \&dissoc,
-        'empty?' => \&empty_q,
-        'false?' => \&false_q,
-        'first' => \&first,
-        'fn?' => \&fn_q,
-        'get' => \&get,
-        'getenv' => \&getenv,
-        'hash-map' => \&hash_map_,
-        'join' => \&join_,
-        'keys' => \&keys,
-        'keyword' => \&keyword_,
-        'keyword?' => \&keyword_q,
-        'list' => \&list_,
-        'list?' => \&list_q,
-        'macro?' => \&macro_q,
-        'map' => \&map_,
-        'map?' => \&map_q,
-        'meta' => \&meta,
-        'nil?' => \&nil_q,
-        'nth' => \&nth,
-        'number' => \&number_,
-        'number?' => \&number_q,
-        'pr-str' => \&pr_str,
-        'println' => \&println,
-        'prn' => \&prn,
-        'range' => \&range,
-        'read-string' => \&read_string,
-        'readline' => \&readline_,
-        'reset!' => \&reset,
-        'rest' => \&rest,
-        'seq' => \&seq,
-        'sequential?' => \&sequential_q,
-        'slurp' => \&slurp,
-        'str' => \&str,
-        'string?' => \&string_q,
-        'swap!' => \&swap,
-        'symbol' => \&symbol_,
-        'symbol?' => \&symbol_q,
-        'throw' => \&throw,
-        'time-ms' => \&time_ms,
-        'true?' => \&true_q,
-        'vals' => \&vals,
-        'vec' => \&vec,
-        'vector' => \&vector_,
-        'vector?' => \&vector_q,
-        'with-meta' => \&with_meta,
+    my $env = $Lingy::RT::env;
+    $env->set('*file*', string($ARGV[0]));
+    $env->set('*ARGV*', list([map string($_), @ARGV[1..$#ARGV]]));
+    $env->set(
+        '*command-line-args*',
+        list([map string($_), @ARGV[1..$#ARGV]])
+    );
+    $env->set(eval => sub { Lingy::Eval::eval($_[0], $env) });
 
-        'PPP' => \&PPP,
-        'WWW' => \&WWW,
-        'XXX' => \&XXX,
-        'YYY' => \&YYY,
-        'ZZZ' => \&ZZZ,
-    }
+    $self->load;
+
+    Lingy::RT->rep(qq((def *host* \"${\ Lingy::RT->host}\")));
+
+    return $self;
 }
 
-sub add { $_[0] + $_[1] }
-
+# These sub need to be able to be called directly:
 sub apply {
     my ($fn, @args) = @_;
     push @args, @{pop(@args)};
@@ -101,263 +39,492 @@ sub apply {
         : Lingy::Eval::eval($fn->(@args));
 }
 
-sub assoc {
-    my ($map, @pairs) = @_;
-    for (my $i = 0; $i < @pairs; $i += 2) {
-        $pairs[$i] = qq<"$pairs[$i]>
-            if $pairs[$i]->isa('string');
-    }
-    hash_map([%$map, @pairs]);
-}
-
-sub atom_ { atom(@_) }
-
-sub atom_q { boolean(ref($_[0]) eq 'atom') }
-
-sub concat { list([map @$_, @_]) }
-
-sub conj {
-    my ($o, @args) = @_;
-    my $type = ref($o);
-    $type eq 'list' ? list([reverse(@args), @$o]) :
-    $type eq 'vector' ? vector([@$o, @args]) :
-    $type eq 'nil' ? nil :
-    throw("conj first arg type '$type' not allowed");
-}
-
-sub cons { list([$_[0], @{$_[1]}]) }
-
-sub contains_q {
-    my ($map, $key) = @_;
-    return false unless ref($map) eq 'hash_map';
-    $key = qq<"$key> if $key->isa('string');
-    boolean(exists $map->{"$key"});
-}
-
-sub count { number(ref($_[0]) eq 'nil' ? 0 : scalar @{$_[0]}) }
-
-sub dec { number($_[0] - 1) }
-
-sub deref { $_[0]->[0] }
-
-sub dissoc {
-    my ($map, @keys) = @_;
-    @keys = map {
-        $_->isa('string') ? qq<"$_> : "$_";
-    } @keys;
-    $map = { %$map };
-    delete $map->{$_} for @keys;
-    hash_map([%$map]);
-}
-
-sub divide { $_[0] / $_[1] }
-
-sub empty_q { boolean(@{$_[0]} == 0) }
-
-sub equal_to {
-    my ($x, $y) = @_;
-    return false
-        unless
-            ($x->isa('Lingy::List') and $y->isa('Lingy::List')) or
-            (ref($x) eq ref($y));
-    if ($x->isa('Lingy::List')) {
-        return false unless @$x == @$y;
-        for (my $i = 0; $i < @$x; $i++) {
-            my $bool = equal_to($x->[$i], $y->[$i]);
-            return false if "$bool" eq '0';
-        }
-        return true;
-    }
-    if ($x->isa('hash_map')) {
-        my @xkeys = sort map "$_", keys %$x;
-        my @ykeys = sort map "$_", keys %$y;
-        return false unless @xkeys == @ykeys;
-        my @xvals = map $x->{$_}, @xkeys;
-        my @yvals = map $y->{$_}, @ykeys;
-        for (my $i = 0; $i < @xkeys; $i++) {
-            return false unless "$xkeys[$i]" eq "$ykeys[$i]";
-            my $bool = equal_to($xvals[$i], $yvals[$i]);
-            return false if "$bool" eq '0';
-        }
-        return true;
-    }
-    boolean($$x eq $$y);
-}
-
-sub false_q { boolean(ref($_[0]) eq 'boolean' and not "$_[0]") }
-
-sub first { ref($_[0]) eq 'nil' ? nil : @{$_[0]} ? $_[0]->[0] : nil }
-
-sub fn_q { boolean(ref($_[0]) =~ /^(function|CODE)$/) }
-
-sub get {
-    my ($map, $key) = @_;
-    return nil unless ref($map) eq 'hash_map';
-    $key = qq<"$key> if $key->isa('string');
-    $map->{"$key"} // nil;
-}
-
-sub getenv {
-    my ($var) = @_;
-    my $val = $ENV{$var};
-    defined($val) ? string($val) : nil;
-}
-
-sub greater_equal { $_[0] >= $_[1] }
-
-sub greater_than { $_[0] > $_[1] }
-
-sub hash_map_ { hash_map([@_]) }
-
-sub join_ { string(join ${str($_[0])}, map ${str($_)}, @{$_[1]}) }
-
-sub keys {
-    my ($map) = @_;
-    my @keys = map {
-        s/^"// ? string($_) :
-        s/^:// ? keyword($_) :
-        symbol("$_");
-    } keys %$map;
-    list([@keys]);
-}
-
-sub keyword_ { keyword($_[0]) }
-
-sub keyword_q { boolean(ref($_[0]) eq 'keyword') }
-
-sub less_equal { $_[0] <= $_[1] }
-
-sub less_than { $_[0] < $_[1] }
-
-sub list_ { list([@_]) }
-
-sub list_q { boolean(ref($_[0]) eq 'list') }
-
-sub macro_q { boolean(ref($_[0]) eq 'macro') }
-
-sub map_ { list([ map apply($_[0], $_, []), @{$_[1]} ]) }
-
-sub map_q { boolean(ref($_[0]) eq "hash_map") }
-
-sub meta { $meta{"$_[0]"} // nil}
-
-sub multiply { $_[0] * $_[1] }
-
-sub nil_q { boolean(ref($_[0]) eq 'nil') }
-
-sub nth {
-    my ($list, $index) = @_;
-    die "Index '$index' out of range" if $index >= @$list;
-    $list->[$index];
-}
-
-sub number_ { number("$_[0]" + 0) }
-
-sub number_q { boolean(ref($_[0]) eq "number") }
-
-sub pr_str { string(join ' ', map Lingy::Printer::pr_str($_), @_) }
-
-sub println {
-    printf "%s\n", join ' ',
-        map Lingy::Printer::pr_str($_, 1), @_;
-    nil;
-}
-
-sub prn {
-    printf "%s\n", join ' ',
-    map Lingy::Printer::pr_str($_), @_;
-    nil;
-}
-
-sub range {
-    my ($x, $y) = @_;
-    if (not defined $y) {
-        $y = $x;
-        $x = number(0);
-    }
-    if ($y < $x) {
-        list([map number($_), reverse(($y+1)..$x)]);
-    } else {
-        list([map number($_), $x..($y-1)]);
-    }
-}
-
-sub readline_ {
-    require Lingy::ReadLine;
-    my $l = Lingy::ReadLine::readline($_[0], $REPL::env) // return;
-    chomp $l;
-    string($l);
-}
-
-sub read_string { Lingy::Reader->new->read_str(@_) }
-
-sub reset { $_[0]->[0] = $_[1] }
-
 sub rest {
     my ($list) = @_;
-    return list([]) if $list->isa('nil') or not @$list;
+    return list([]) if $list->isa('Lingy::Lang::Nil') or not @$list;
     list([@{$list}[1..(@$list-1)]]);
 }
 
 sub seq {
     my ($o) = @_;
     my $type = ref($o);
-    $type eq 'list' ? @$o ? $o : nil :
-    $type eq 'vector' ? @$o ? list([@$o]) : nil :
-    $type eq 'string' ? length($$o)
+    $type eq 'Lingy::Lang::List' ? @$o ? $o : nil :
+    $type eq 'Lingy::Lang::Vector' ? @$o ? list([@$o]) : nil :
+    $type eq 'Lingy::Lang::String' ? length($$o)
         ? list([map string($_), split //, $$o]) : nil :
-    $type eq 'nil' ? nil :
+    $type eq 'Lingy::Lang::Nil' ? nil :
     throw("seq does not support type '$type'");
 }
 
-sub sequential_q { boolean(ref($_[0]) =~ /^(list|vector)/) }
-
-sub slurp {
-    my ($file) = @_;
-    open my $slurp, '<', "$file" or
-        die "Couldn't open '$file' for input";
-    local $/;
-    string(<$slurp>);
+sub str {
+    string(join '', map Lingy::Printer::pr_str($_, 1), @_);
 }
 
-sub str { string(join '', map Lingy::Printer::pr_str($_, 1), @_) }
+our %ns = (
 
-sub string_q { boolean(ref($_[0]) eq "string") }
+fn('all-ns' =>
+    '0' => sub {
+        list([
+            map { $Lingy::RT::ns{$_} }
+            sort keys %Lingy::RT::ns
+        ]);
+    },
+),
 
-sub subtract { $_[0] - $_[1] }
+fn('apply' =>
+    '*' => \&apply),
 
-sub symbol_ { symbol($_[0]) }
+fn('assoc' =>
+    '*' => sub {
+        my ($map, @pairs) = @_;
+        for (my $i = 0; $i < @pairs; $i += 2) {
+            $pairs[$i] = qq<"$pairs[$i]>
+                if $pairs[$i]->isa('Lingy::Lang::String');
+        }
+        hash_map([%$map, @pairs]);
+    },
+),
 
-sub symbol_q { boolean(ref($_[0]) eq 'symbol') }
+fn('atom' =>
+    '*' => sub { atom(@_) }),
 
-sub swap {
-    my ($atom, $fn, @args) = @_;
-    $atom->[0] = apply($fn, deref($atom), \@args);
-}
+fn('atom?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'Lingy::Lang::Atom') }),
 
-sub throw { die $_[0] }
+fn('boolean?' =>
+    '1' => sub { boolean($_[0]->isa('Lingy::Lang::Boolean')) }),
 
-sub time_ms {
-    require Time::HiRes;
-    my ($s, $m) = Time::HiRes::gettimeofday();
-    number($s * 1000 + $m / 1000);
-}
+fn('concat' =>
+    '*' => sub { list([map @$_, @_]) }),
 
-sub true_q { boolean(ref($_[0]) eq 'boolean' and "$_[0]") }
+fn('conj' =>
+    '*' => sub {
+        my ($o, @args) = @_;
+        my $type = ref($o);
+        $type eq 'Lingy::Lang::List' ? list([reverse(@args), @$o]) :
+        $type eq 'Lingy::Lang::Vector' ? vector([@$o, @args]) :
+        $type eq 'Lingy::Lang::Nil' ? nil :
+        throw("conj first arg type '$type' not allowed");
+    },
+),
 
-sub vals { list([ values %{$_[0]} ]) }
+fn('cons' =>
+    '2' => sub { list([$_[0], @{$_[1]}]) }),
 
-sub vec { vector([@{$_[0]}]) }
+fn('contains?' =>
+    '2' => sub {
+        my ($map, $key) = @_;
+        return false unless ref($map) eq 'Lingy::Lang::HashMap';
+        $key = qq<"$key> if $key->isa('Lingy::Lang::String');
+        boolean(exists $map->{"$key"});
+    },
+),
 
-sub vector_ { vector([@_]) }
+fn('count' =>
+    '1' => sub {
+        number(ref($_[0]) eq 'Lingy::Lang::Nil' ? 0 : scalar @{$_[0]})
+    },
+),
 
-sub vector_q { boolean(ref($_[0]) eq "vector") }
+fn('create-ns' =>
+    '1' => sub {
+        my ($name) = @_;
+        err "Invalid ns name '$name'"
+            unless $name =~ /^\w+(\.\w+)*$/;
+        Lingy::NS->new(
+            name => $name,
+            refer => $Lingy::RT::core->name,
+        );
+    },
+),
 
-sub with_meta {
-    my ($o, $m) = @_;
-    $o = ref($o) eq 'CODE' ? sub { goto &$o } : $o->clone;
-    $meta{$o} = $m;
-    $o;
-}
+fn('dec' =>
+    '1' => sub { $_[0] - 1 }),
+
+fn('deref' =>
+    '1' => sub { $_[0]->[0] }),
+
+fn('dissoc' =>
+    '*' => sub {
+        my ($map, @keys) = @_;
+        @keys = map {
+            $_->isa('Lingy::Lang::String') ? qq<"$_> : "$_";
+        } @keys;
+        $map = { %$map };
+        delete $map->{$_} for @keys;
+        hash_map([%$map]);
+    },
+),
+
+fn('empty?' =>
+    '1' => sub { boolean(@{$_[0]} == 0) }),
+
+fn('false?' =>
+    '1' => sub {
+        boolean(ref($_[0]) eq 'Lingy::Lang::Boolean' and not "$_[0]"),
+    },
+),
+
+fn('find-ns' =>
+    '1' => sub {
+        $Lingy::RT::ns{$_[0]} // nil
+    },
+),
+
+fn('first' =>
+    '1' => sub {
+        ref($_[0]) eq 'Lingy::Lang::Nil' ? nil : @{$_[0]} ? $_[0]->[0] : nil;
+    },
+),
+
+fn('fn?' =>
+    '1' => sub {
+        boolean(ref($_[0]) =~ /^(Lingy::Lang::Function|CODE)$/);
+    },
+),
+
+fn('get' =>
+    '2' => sub {
+        my ($map, $key) = @_;
+        return nil unless ref($map) eq 'Lingy::Lang::HashMap';
+        $key = qq<"$key> if $key->isa('Lingy::Lang::String');
+        $map->{"$key"} // nil;
+    },
+),
+
+fn('getenv' =>
+    '1' => sub {
+        my $val = $ENV{$_[0]};
+        defined($val) ? string($val) : nil;
+    },
+),
+
+fn('hash-map' =>
+    '*' => sub { hash_map([@_]) }),
+
+fn('inc' =>
+    '1' => sub { $_[0] + 1 }),
+
+fn('in-ns' =>
+    '1' => sub {
+        my ($name) = @_;
+        err "Invalid ns name '$name'"
+            unless $name =~ /^\w+(\.\w+)*$/;
+        Lingy::NS->new(
+            name => $name,
+        )->current;
+        nil;
+    },
+),
+
+fn('join' =>
+    '2' => sub {
+        string(join ${str($_[0])}, map ${str($_)}, @{$_[1]});
+    },
+),
+
+fn('keys' =>
+    '1' => sub {
+        list([
+            map {
+                s/^"// ? string($_) :
+                s/^:// ? keyword($_) :
+                symbol("$_");
+            } keys %{$_[0]}
+        ]);
+    },
+),
+
+fn('keyword' =>
+    '1' => sub { keyword($_[0]) }),
+
+fn('keyword?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'Lingy::Lang::Keyword') }),
+
+fn('list' =>
+    '*' => sub { list([@_]) }),
+
+fn('list?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'Lingy::Lang::List') }),
+
+fn('macro?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'macro') }),
+
+fn('macroexpand' => '1' => sub {
+        Lingy::Eval::macroexpand($_[0], $Lingy::Eval::ENV);
+    },
+),
+
+fn('map' =>
+    '2' => sub {
+        list([ map apply($_[0], $_, []), @{$_[1]} ]);
+    },
+),
+
+fn('map?' =>
+    '1' => sub { boolean(ref($_[0]) eq "Lingy::Lang::HashMap") }),
+
+fn('meta' =>
+    '1' => sub { $meta{"$_[0]"} // nil}),
+
+fn('name' =>
+    '1' => sub {
+        string($_[0] =~ m{(.*?)/(.*)} ? $2 : "$_[0]");
+    },
+),
+
+fn('namespace' =>
+    '1' => sub {
+        $_[0] =~ m{(.*?)/(.*)} ? string($1) : nil;
+    },
+),
+
+fn('next' =>
+    '1' => sub { seq(rest($_[0])) }),
+
+fn('nil?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'Lingy::Lang::Nil') }),
+
+fn('-ns' =>
+    '1' => sub {
+        my ($name) = @_;
+        err "Invalid ns name '$name'"
+            unless $name =~ /^\w+(\.\w+)*$/;
+        Lingy::NS->new(
+            name => $name,
+            refer => $Lingy::RT::core->name,
+        )->current;
+        nil;
+    },
+),
+
+fn('ns-name' =>
+    '1' => sub { string($_[0]->{' NAME'}) }),
+
+fn('nth' =>
+    '2' => sub {
+        my ($list, $index) = @_;
+        ($index >= 0 and $index < @$list)
+            ? $list->[$index]
+            : err "Index '$index' out of range";
+    },
+    '3' => sub {
+        my ($list, $index, $default) = @_;
+        ($index >= 0 and $index < @$list)
+            ? $list->[$index]
+            : $default;
+    },
+),
+
+fn('number' =>
+    '1' => sub { number("$_[0]" + 0) }),
+
+fn('number?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'Lingy::Lang::Number') }),
+
+fn('pos?', =>
+    '1' => sub { $_[0] > 0 ? true : false }),
+
+fn('pr-str' =>
+    '*' => sub {
+        string(join ' ', map Lingy::Printer::pr_str($_), @_);
+    },
+),
+
+fn('println' =>
+    '*' => sub {
+        printf "%s\n", join ' ',
+            map Lingy::Printer::pr_str($_, 1), @_;
+        nil;
+    },
+),
+
+fn('prn' =>
+    '*' => sub {
+        printf "%s\n", join ' ',
+        map Lingy::Printer::pr_str($_), @_;
+        nil;
+    },
+),
+
+fn('quot' =>
+    '2' => sub { number(int($_[0] / $_[1])) }),
+
+fn('range' =>
+    '2' => sub {
+        my ($x, $y) = @_;
+        if (not defined $y) {
+            $y = $x;
+            $x = number(0);
+        }
+        if ($y < $x) {
+            list([map number($_), reverse(($y+1)..$x)]);
+        } else {
+            list([map number($_), $x..($y-1)]);
+        }
+    },
+),
+
+fn('read-string' => '1' => sub {
+        my @forms = $Lingy::RT::reader->read_str($_[0]);
+        return @forms ? $forms[0] : nil;
+    },
+),
+
+fn('readline' =>
+    '0' => sub {
+        require Lingy::ReadLine;
+        my $l = Lingy::ReadLine::readline() // return;
+        chomp $l;
+        string($l);
+    },
+),
+
+fn('reduce' =>
+    '2' => sub {
+        my ($fn, $coll) = @_;
+        (@$coll == 0) ? apply($fn, []) :
+        (@$coll == 1) ? $coll->[0] :
+        apply(\&reduce_3, [$fn, shift(@$coll), $coll]);
+    },
+    '3' => sub {
+        my ($fn, $val, $coll) = @_;
+        for my $e (@$coll) {
+            $val = apply($fn, [$val, $e]);
+        }
+        $val;
+    },
+),
+
+fn('reset!' =>
+    '2' => sub { $_[0]->[0] = $_[1] }),
+
+fn('resolve' =>
+    '1' => sub {
+        my ($symbol) = @_;
+        my ($ns_name, $sym_name, $var);
+        if ($symbol =~ /(.*?)\/(.*)/) {
+            ($ns_name, $sym_name) = ($1, $2);
+        }
+        else {
+            $ns_name = $Lingy::RT::ns;
+            $sym_name = $symbol;
+        }
+
+        my $ns = $Lingy::RT::ns{$ns_name} or return nil;
+        if (exists $ns->{$sym_name}) {
+            $var = $ns_name . '/' . $sym_name;
+        } else {
+            my $ref;
+            if (($ref = $Lingy::RT::refer{$ns_name}) and
+                defined($ns_name = $ref->{$sym_name})
+            ) {
+                $var = $ns_name . '/' . $sym_name;
+            } else {
+                return nil;
+            }
+        }
+        return var($var);
+    },
+),
+
+fn('rest' =>
+    '1' => \&rest),
+
+fn('seq' =>
+    '1' => \&seq),
+
+fn('seq?' =>
+    '1' => sub {$_[0]->isa('Lingy::Base::List')}),
+
+fn('sequential?' => '1' => sub {
+        boolean(ref($_[0]) =~ /^(Lingy::Lang::List|Lingy::Lang::Vector)/);
+    },
+),
+
+fn('slurp' =>
+    '1' => sub { string(slurp($_[0])) }),
+
+fn('str' =>
+    '*' => \&str),
+
+fn('string?' =>
+    '1' => sub { boolean(ref($_[0]) eq "Lingy::Lang::String") }),
+
+fn('swap!' =>
+    '*' => sub {
+        my ($atom, $fn, @args) = @_;
+        $atom->[0] = apply($fn, [$atom->[0], @args]);
+    },
+),
+
+fn('symbol' =>
+    '1' => sub { symbol("$_[0]") }),
+
+fn('symbol?' =>
+    '1' => sub { boolean(ref($_[0]) eq 'Lingy::Lang::Symbol') }),
+
+fn('the-ns' =>
+    '1' => sub {
+        $_[0]->isa('Lingy::NS') ? $_[0] :
+        $_[0]->isa('Lingy::Lang::Symbol') ? do {
+            $Lingy::RT::ns{$_[0]} //
+            err "No namespace: '$_[0]' found";
+        } : err "Invalid argument for the-ns: '$_[0]'";
+    },
+),
+
+fn('throw' =>
+    '1' => sub { die $_[0] }),
+
+fn('time-ms' =>
+    '0' => sub {
+        require Time::HiRes;
+        my ($s, $m) = Time::HiRes::gettimeofday();
+        number($s * 1000 + $m / 1000);
+    },
+),
+
+fn('true?' =>
+    '1' => sub {
+        boolean(ref($_[0]) eq 'Lingy::Lang::Boolean' and "$_[0]");
+    },
+),
+
+fn('type' =>
+    '1' => sub {
+        type(
+            $_[0]->can('lingy_class')
+                ? $_[0]->lingy_class
+                : ref($_[0])
+        );
+    },
+),
+
+fn('vals' =>
+    '1' => sub { list([ values %{$_[0]} ]) }),
+
+fn('var' =>
+        '1' => sub { var($_[0]) }),
+
+fn('vec' =>
+    '1' => sub { vector([@{$_[0]}]) }),
+
+fn('vector' =>
+    '*' => sub { vector([@_]) }),
+
+fn('vector?' =>
+    '1' => sub { boolean(ref($_[0]) eq "Lingy::Lang::Vector") }),
+
+fn('with-meta' =>
+    '2' => sub {
+        my ($o, $m) = @_;
+        $o = ref($o) eq 'CODE' ? sub { goto &$o } : $o->clone;
+        $meta{$o} = $m;
+        $o;
+    },
+),
+
+);
 
 1;

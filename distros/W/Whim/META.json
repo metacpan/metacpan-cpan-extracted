@@ -4,7 +4,7 @@
       "Jason McIntosh <jmac@jmac.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "mit"
    ],
@@ -73,7 +73,7 @@
    "provides" : {
       "Whim" : {
          "file" : "lib/Whim.pm",
-         "version" : "v1.2021.6.17.0"
+         "version" : "v1.2023.4.6.0"
       },
       "Whim::Command::listen" : {
          "file" : "lib/Whim/Command/listen.pm"
@@ -107,11 +107,12 @@
       },
       "homepage" : "https://github.com/jmacdotorg/whim",
       "repository" : {
-         "url" : "git://github.com/jmacdotorg/whim.git",
+         "type" : "git",
+         "url" : "https://github.com/jmacdotorg/whim.git",
          "web" : "https://github.com/jmacdotorg/whim"
       }
    },
-   "version" : "1.2021.06.17.0",
+   "version" : "1.2023.04.06.0",
    "x_authority" : "cpan:JMAC",
    "x_contributors" : [
       "Brian Wisti <brianwisti@pobox.com>",

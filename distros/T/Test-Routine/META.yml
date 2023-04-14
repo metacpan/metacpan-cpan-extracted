@@ -47,10 +47,10 @@ resources:
   bugtracker: https://github.com/rjbs/Test-Routine/issues
   homepage: https://github.com/rjbs/Test-Routine
   repository: https://github.com/rjbs/Test-Routine.git
-version: '0.030'
+version: '0.031'
 x_Dist_Zilla:
   perl:
-    version: '5.037002'
+    version: '5.037010'
   plugins:
     -
       class: inc::BuildDemo
@@ -74,7 +74,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Filter/CheckPrereqsIndexed'
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::CheckExtraTests
       name: '@Filter/CheckExtraTests'
@@ -164,7 +164,7 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.40.0
           repo_root: .
       name: '@Filter/Git::NextVersion'
       version: '2.048'
@@ -195,7 +195,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Filter/Test::ReportPrereqs'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: '@Filter/Git::Remote::Check'
@@ -216,76 +216,76 @@ x_Dist_Zilla:
             - '@RJBS'
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@RJBS/SingleEncoding'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Name
               name: '@RJBS/Name'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Version
               name: '@RJBS/Version'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@RJBS/Prelude'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Synopsis'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Description'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Overview'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Stability'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@RJBS/PerlSupport'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: Attributes
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: Methods
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: Functions
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@RJBS/Leftovers'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@RJBS/postlude'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Authors
               name: '@RJBS/Authors'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@RJBS/Contributors'
@@ -293,17 +293,17 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@RJBS/Legal'
-              version: '4.018'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@RJBS/List'
-              version: '4.018'
+              version: '4.019'
       name: '@Filter/PodWeaver'
-      version: '4.009'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@Filter/RJBSMisc'
-      version: '5.021'
+      version: '5.023'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Filter/GithubMeta'
@@ -320,7 +320,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.40.0
           repo_root: .
       name: '@Filter/@Git/Check'
       version: '2.048'
@@ -338,7 +338,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -351,11 +351,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.030'
+          tag: '0.031'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -369,7 +369,7 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.40.0
           repo_root: .
       name: '@Filter/@Git/Push'
       version: '2.048'
@@ -377,7 +377,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.38.0
+          git_version: 2.40.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -450,10 +450,12 @@ x_contributors:
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'gregor herrmann <gregoa@debian.org>'
   - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Matthew Horsfall <wolfsage@gmail.com>'
   - 'Ricardo Signes <rjbs@cpan.org>'
   - 'Ricardo Signes <rjbs@semiotic.systems>'
+  - 'Ricardo Signes <rjbs@users.noreply.github.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.37.2
+x_generated_by_perl: v5.37.10
 x_rjbs_perl_window: standard
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

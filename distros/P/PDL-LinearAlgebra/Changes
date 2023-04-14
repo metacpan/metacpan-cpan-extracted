@@ -1,3 +1,9 @@
+0.37 2023-04-01
+- install pdldoc using PDL::Doc
+
+0.36 2023-03-29
+- memory-manage CODE-refs properly to work with PDL 2.083+
+
 0.35 2022-07-17
 - fix `$real x $native_complex` (#18) - thanks @KJ7LNW for report
 

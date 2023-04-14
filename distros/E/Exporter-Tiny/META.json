@@ -48,11 +48,11 @@
    "provides" : {
       "Exporter::Shiny" : {
          "file" : "lib/Exporter/Shiny.pm",
-         "version" : "1.006001"
+         "version" : "1.006002"
       },
       "Exporter::Tiny" : {
          "file" : "lib/Exporter/Tiny.pm",
-         "version" : "1.006001"
+         "version" : "1.006002"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
       "bugtracker" : {
          "web" : "https://github.com/tobyink/p5-exporter-tiny/issues"
       },
-      "homepage" : "https://metacpan.org/release/Exporter-Tiny",
+      "homepage" : "https://exportertiny.github.io/",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -72,6 +72,6 @@
       "x_IRC" : "irc://irc.perl.org/#moops",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project"
    },
-   "version" : "1.006001",
+   "version" : "1.006002",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

@@ -14,18 +14,22 @@ sub AUTOLOAD {
   
   my $method_name = $AUTOLOAD;
   
+  # If the class method is not found, AUTOLOAD is called.
   unless (ref $self) {
     my $class_name = $self;
     $class_name =~ s/^SPVM:://;
     $method_name =~ s/^.*:://;
     
-    Carp::confess("The \"$method_name\" method in the \"$class_name\" class is not defined");
+    Carp::confess("The \"$method_name\" method in the \"$class_name\" class is not found");
   }
   
+  # For a static instant method call
   $method_name =~ s/^SPVM:://;
+  
+  # For an instance method call
   $method_name =~ s/^BlessedObject::Class:://;
   
-  my $ret = $self->api->call_method($self, $method_name, @_);
+  my $ret = $self->__api->call_method($self, $method_name, @_);
   
   return $ret;
 }
@@ -34,52 +38,53 @@ sub AUTOLOAD {
 
 =head1 Name
 
-SPVM::BlessedObject::Class - Class based blessed object
+SPVM::BlessedObject::Class - SPVM Class
 
 =head1 Description
 
-SPVM::BlessedObject::Class is class based blessed object.
-
-This object contains class based SPVM object.
-
-You can call all methods declaraed in the class.
+The object of the C<SPVM::BlessedObject::Class> class holds an instance of a SPVM class.
 
 =head1 Usage
 
-  # lib/SPVM/Point.spvm
-  class Point {
-    haz x : int;
-    haz y : int;
-    
-    static method new : Point ($x : int, $y : int) {
-      my $self = new Point;
-      
-      $self->{x} = $x;
-      $self->{y} = $y;
-      
-      return $self;
-    }
-    
-    method clear : void () {
-      $self->{x} = 0;
-      $self->{y} = 0;
-    }
-    
-    method set_x : void ($value : int) {
-      $self->{x} = $value;
-    }
-    
-    method x () {
-      return $self->{x};
-    }
-  }
-  
-  # main.pl
-  use FindBin;
-  use lib "$FindBin::lib";
   use SPVM 'Point';
   
-  my $point = Point->new;
+  my $point = SPVM::Point->new;
   $point->set_x(4);
   my $x = $point->x;
   $point->clear;
+
+=head1 Instance Methods
+
+=head2 AUTOLOAD
+  
+  # Instance method call
+  my $ret = $blessed_object_class->foo(@args);
+  
+  # Static instance method call
+  my $ret = $blessed_object_class->SPVM::MyClass::foo(@args);
+
+Calls a SPVM instance method using L<SPVM::ExchangeAPI/"call_method"> with the arguments, and returns the return value.
+
+The static instance method call is allowed.
+
+If the class or the method is not found, an exception is thrown.
+
+If the invocant cannnot be assigned to the class of the static method call, an exception is thrown.
+
+Examples:
+
+  use SPVM 'Point';
+  
+  # Creates a SPVM::BlessedObject::Class object of the Point class.
+  my $point = Point->new;
+  
+  # Calls instance methods in the Point class.
+  $point->set_x(4);
+  my $x = $point->x;
+  $point->clear;
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

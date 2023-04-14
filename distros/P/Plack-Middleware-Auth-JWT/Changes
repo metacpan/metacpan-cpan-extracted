@@ -1,5 +1,13 @@
 Revision history for Plack::Middleware::Auth::JWT
 
+0.907     2023-04-04 16:17:16+02:00
+    - remove "at /Foo/Bar.pm line 123" from error message
+    - render error message as json when Accept headers is set to application/json
+    - add 'ident' to json error and set it to token_expired for the special case
+      when the token is expired (becuase the error returned by Crypt::JWT is
+      a bit ... cryptic
+
+
 0.906     2022-02-22 09:51:35+01:00
      - Fixed type-o in see also doc (Michael R. Davis)
 

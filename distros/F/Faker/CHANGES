@@ -1,3 +1,13 @@
+1.19 2023-04-09
+
+- [update] Fix CPANTs test failures
+
+1.18 2023-04-05
+
+- [feature] Implement user-agent plugin
+- [update] Resolve test failure reports
+- [update] Update architecture and documentation
+
 1.17 2022-12-16
 
 - [feature] Include Faker command-line interface

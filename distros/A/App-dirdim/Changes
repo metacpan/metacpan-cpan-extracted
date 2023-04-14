@@ -5,3 +5,19 @@ Revision history for the module "App::dirdim"
 -.---  2021-05-29 Also once included "dirdim" on App::Bin4TSV
 0.030  2022-04-25 Some small functions are updated in "dirdim".
 0.031  2022-04-25T22:34+09:00 Changed the operation behavior when no arguments are given.
+0.040  2023-03-29 出力表の列名の表記の簡潔化。それと、ディレクトリの深さに対するバグの除去。
+
+0.041  2023-04-05 GitHub経由のプルリクエストに応じた。
+          - 潜在的な"貢献者"にソースコードの大元を発見してもらいやすくするために META_MERGE の項目を書いた。
+          - さらに .gitignoreに5項目を追加。
+          - 他に、英語版のHelpを書いた。dirdim --helpは日本語、perldoc App::dirdim は日本語とした。
+          - 2次情報の出力の書式を変えた。さらに簡潔になるように。
+          - totalを出力するようにした。
+          - ディレクトリでシンボリックリンクファイルを数えていなかったのを、デバッグして数えるようにした。
+0.042  2023-04-05 デバッグ。dirdim -d . . でundefを扱うことによる警告が出た。(テスト不足かも。)
+0.043  2023-04-05 MetaCPANのモジュール一覧で、1モジュール1行のモジュール説明が表示されるように変更。
+0.044  2023-04-05 英文のマニュアルに加筆。SEE ALSO も書いた。
+
+0.046  2023-04-06 
+          - オプション -a を実装。通常は非ディレクトリファイルについて警告を出さないようにする。
+          - README をGitHubを分かりやすいように書き換えた(日本語の文章を初めてそこに書いた)。

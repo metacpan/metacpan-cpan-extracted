@@ -1,3 +1,7 @@
+2.07 Tuesday 11th April, 2023
+        Fix compatibility with bleadperl https://rt.cpan.org/Public/Bug/Display.html?id=144051
+        Small Pod and Distribution cleanups contributed by Tom Hukins based on other rt.cpan tickets https://github.com/richardc/perl-devel-caller/pull/1
+
 2.06 Wednesday 16th January, 2013
        Corrected some pod syntax RT#56456
        Handle the new padrange op added in 5.17 RT#81704

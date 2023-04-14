@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Astro/FITS/CFITSIO/FileName.pm',
-    'Astro/FITS/CFITSIO/FileName/Regexp.pm'
+    'Astro/FITS/CFITSIO/FileName/Regexp.pm',
+    'Astro/FITS/CFITSIO/FileName/Types.pm'
 );
 
 

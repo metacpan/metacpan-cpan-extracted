@@ -31,7 +31,7 @@ which will return true if the attribute was set. For example, the
 
   Manipulating a filename
 
-Astro::FITS::CFITSIO::FileName objects are meant to be immutable, so
+"Astro::FITS::CFITSIO::FileName" objects are meant to be immutable, so
 manipulating attributes has to be done outside of the object.
 
 One way is to call the "parse_filename" class method on the original

@@ -1,10 +1,10 @@
 #!perl
-use 5.10.0;
+use strict;
+use warnings;
 use Test2::V0;
 use IO::Socket::SSL;
 
 my @modules = <<'EOM' =~ m/([A-Z][A-Za-z0-9:]+)/g;
-Net::Gemini::URI
 Net::Gemini::Server
 Net::Gemini
 EOM

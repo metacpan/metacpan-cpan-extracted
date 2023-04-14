@@ -1,11 +1,15 @@
 package Astro::FITS::CFITSIO::FileName::Regexp;
 
-# ABSTRACT: Regular expressions to match parts of CFITSIO  file names.
+# ABSTRACT: Regular expressions to match parts of CFITSIO file names.
 
+## no critic(RegularExpressions::ProhibitComplexRegexes)
+## no critic(Variables::ProhibitPackageVars)
+
+use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use Exporter::Shiny 1.00200 qw(
   $FileName
@@ -34,7 +38,7 @@ our $ATOMS = qr{
   )
 
   (?<XTENSION>
-    (?i)A | ASCII | I | IMAGE | T | TABLE | B | BINTABLE?
+    (?i)[AITB] | ASCII | IMAGE | TABLE | BINTABLE?
   )
 
   (?<EXTVER>
@@ -45,35 +49,35 @@ our $ATOMS = qr{
   # definition of what's in it), but exclude things that mess up the parse
   (?<EXTNAME>
     [^\s,:[\]\#;]+
-    \#?
+    [#]?
   )
 
  (?<PositiveOrZeroInt>
-     [0-9]*
+     \d*
  )
 
  (?<PositiveInt>
-     0*[1-9][0-9]*
+     0*[1-9]\d*
  )
 
 )
 }x;
 
 our $OutputName = qr {
-     \( \s*
-       (?<output_name>[^\)]+)
-     \s* \)
+     [(] \s*
+       (?<output_name>[^)]+)
+     \s* [)]
 }x;
 
 our $TemplateName = qr {
-     \( \s*
-       (?<template_name>[^\)]+)
-     \s* \)
+     [(] \s*
+       (?<template_name>[^)]+)
+     \s* [)]
 }x;
 
 
 our $PixelRange = qr{
-    ( -?\*
+    ( -?[*]
       |
       -?(?&PositiveInt)\s*:(?&PositiveInt)
     )
@@ -92,7 +96,7 @@ our $ImageSection = qr {
 our $pixFilter = qr {
    \[ \s*
       (?<pix_filter>
-      pix(?<pix_filter_datatype>b|i|j|r|d)?
+      pix(?<pix_filter_datatype>[bijrd])?
       (?<pix_filter_discard_hdus>1)?
       \s+
       (?<pix_filter_expression> [^[\]]+)
@@ -115,7 +119,7 @@ our $rowFilter = qr {
 
 our $binSpec = qr{
   \[ \s*
-    bin(?<bin_spec_datatype> b|i|j|r|d)?
+    bin(?<bin_spec_datatype> [bijrd])?
     (?: \s+
        (?<bin_spec_expression>( [^\]]+) )
     )?
@@ -133,7 +137,7 @@ our $CompressSpec = qr {
 }xi;
 
 our $HDUlocation = qr{
-    \+(?<hdunum> (?&HDUNUM) )
+    [+](?<hdunum> (?&HDUNUM) )
     |
     # [ ... ]
     \[ \s*
@@ -202,17 +206,19 @@ __END__
 
 =head1 NAME
 
-Astro::FITS::CFITSIO::FileName::Regexp - Regular expressions to match parts of CFITSIO  file names.
+Astro::FITS::CFITSIO::FileName::Regexp - Regular expressions to match parts of CFITSIO file names.
 
 =head1 VERSION
 
-version 0.05
+version 0.07
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-astro-fits-cfitsio-filename@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-FileName
+Please report any bugs or feature requests to bug-astro-fits-cfitsio-filename@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-FileName>
 
 =head2 Source
 

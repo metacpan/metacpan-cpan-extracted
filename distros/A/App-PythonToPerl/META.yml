@@ -1,0 +1,125 @@
+---
+abstract: 'translates Python source code into Perl source code'
+author:
+  - 'William N. Braswell, Jr. <wbraswell@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PythonToPerl
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  App::PythonToPerl:
+    file: lib/App/PythonToPerl.pm
+    version: '0.021'
+  Champ:
+    file: lib/Champ.pm
+    version: '0.001'
+  Python::Blank:
+    file: lib/Python/Blank.pm
+    version: '0.001'
+  Python::Class:
+    file: lib/Python/Class.pm
+    version: '0.007'
+  Python::Class::hashref::hashref:
+    file: lib/Python/Class.pm
+    version: '0.001'
+  Python::Comment:
+    file: lib/Python/Comment.pm
+    version: '0.002'
+  Python::CommentDoubleQuotes:
+    file: lib/Python/CommentDoubleQuotes.pm
+    version: '0.001'
+  Python::CommentSingleQuotes:
+    file: lib/Python/CommentSingleQuotes.pm
+    version: '0.001'
+  Python::Component:
+    file: lib/Python/Component.pm
+    version: '0.002'
+  Python::Component::arrayref:
+    file: lib/Python/Component.pm
+    version: '0.001'
+  Python::Component::hashref:
+    file: lib/Python/Component.pm
+    version: '0.001'
+  Python::File:
+    file: lib/Python/File.pm
+    version: '0.022'
+  Python::File::arrayref:
+    file: lib/Python/File.pm
+    version: '0.001'
+  Python::File::hashref:
+    file: lib/Python/File.pm
+    version: '0.001'
+  Python::Function:
+    file: lib/Python/Function.pm
+    version: '0.015'
+  Python::Function::hashref::hashref:
+    file: lib/Python/Function.pm
+    version: '0.001'
+  Python::FunctionDecorator:
+    file: lib/Python/FunctionDecorator.pm
+    version: '0.001'
+  Python::Include:
+    file: lib/Python/Include.pm
+    version: '0.008'
+  Python::Include::hashref::hashref:
+    file: lib/Python/Include.pm
+    version: '0.001'
+  Python::InnerClass:
+    file: lib/Python/InnerClass.pm
+    version: '0.001'
+  Python::InnerFunction:
+    file: lib/Python/InnerFunction.pm
+    version: '0.001'
+  Python::LocalClass:
+    file: lib/Python/LocalClass.pm
+    version: '0.001'
+  Python::Method:
+    file: lib/Python/Method.pm
+    version: '0.002'
+  Python::Shebang:
+    file: lib/Python/Shebang.pm
+    version: '0.001'
+  Python::Unknown:
+    file: lib/Python/Unknown.pm
+    version: '0.016'
+  Python::Whitespace:
+    file: lib/Python/Whitespace.pm
+    version: '0.001'
+requires:
+  Exporter: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  LWP::Protocol::https: '0'
+  OpenAI::API: '0'
+  Perl::Type::Class: '0'
+  Perl::Types: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#perl11
+  bugtracker: https://gitlab.com/scienceperl/app-pythontoperl/-/issues
+  repository: https://gitlab.com/scienceperl/app-pythontoperl
+version: '0.001'
+x_generated_by_perl: v5.22.1
+x_serialization_backend: 'YAML::Tiny version 1.69'
+x_spdx_expression: GPL-3.0-only

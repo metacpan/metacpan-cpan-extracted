@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Sietima::Types qw(Address AddressFromStr);
 use namespace::clean;
 
-our $VERSION = '1.1.1'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: role for lists with a posting address
 
 
@@ -36,7 +36,7 @@ Sietima::Role::WithPostAddress - role for lists with a posting address
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 SYNOPSIS
 

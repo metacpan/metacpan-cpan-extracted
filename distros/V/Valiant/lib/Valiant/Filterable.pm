@@ -115,8 +115,8 @@ sub filters {
   foreach my $info(@filter_info) {
     my ($package_part, $args) = @$info;
     my $filter_package = $self->_filter_package($package_part);
-
-    unless((ref($args)||'') eq 'HASH') {
+    
+    unless( (ref($args)||'') eq 'HASH') {
       $args = $filter_package->normalize_shortcut($args);
       throw_exception InvalidFilterArgs => ( args => $args) unless ref($args) eq 'HASH';
     }
@@ -149,7 +149,6 @@ sub _normalize_filter_package {
     push @project_inc, join '::', (@parts, $class->default_filter_namepart, $package);
     pop @parts;
   }
-  push @project_inc, join '::', $class->default_filter_namepart, $package; # Not sure we should allow (add flag?)
   return @project_inc;
 }
 

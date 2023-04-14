@@ -8,7 +8,7 @@ build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
-  Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog: 0.16
+  Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog: 0.24
   Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun: 0.17
   Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman: 0.15
   Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human: 0.15
@@ -35,6 +35,7 @@ meta-spec:
 name: Wikibase-Datatype-Print
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
@@ -42,13 +43,11 @@ requires:
   Class::Utils: 0.03
   DateTime::Format::ISO8601: 0
   Error::Pure: 0.15
-  List::MoreUtils: 0
   Unicode::UTF8: 0
-  Wikibase::Cache: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print/issues
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
-version: '0.01'
+version: '0.04'

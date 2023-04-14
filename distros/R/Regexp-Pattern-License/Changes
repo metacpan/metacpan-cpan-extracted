@@ -7,6 +7,12 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.10.1	2023-04-02
+
+ [ Bug Fixes ]
+ - fix test library to support Perl 5.37.10
+   Yves Orton++
+
 v3.10.0	2023-01-17
 
  [ Documentation ]

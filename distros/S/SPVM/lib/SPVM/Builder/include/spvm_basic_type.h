@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_BASIC_TYPE_H
 #define SPVM_BASIC_TYPE_H
 

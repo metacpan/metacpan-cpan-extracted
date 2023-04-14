@@ -17,13 +17,14 @@ my %WriteMakefileArgs = (
   "NAME" => "Catalyst::ActionRole::RenderView",
   "PREREQ_PM" => {
     "Catalyst" => "5.90060",
+    "CatalystX::Errors" => "0.001009",
     "Moose::Role" => "2.0602"
   },
   "TEST_REQUIRES" => {
     "Catalyst::Test" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Catalyst" => "5.90060",
   "Catalyst::Test" => 0,
+  "CatalystX::Errors" => "0.001009",
   "Moose::Role" => "2.0602",
   "Test::Most" => 0
 );

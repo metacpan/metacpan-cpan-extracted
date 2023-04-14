@@ -38,90 +38,87 @@ __END__
 
 =head1 NAME
 
-OpenAI::API::Request::Completion - completions endpoint
+OpenAI::API::Request::Completion - Request class for OpenAI API text
+completion
 
 =head1 SYNOPSIS
 
     use OpenAI::API::Request::Completion;
 
-    my $request = OpenAI::API::Request::Completion->new(
-        model       => "text-davinci-003",
-        prompt      => "Say this is a test",
-        max_tokens  => 7,
-        temperature => 0,
+    my $completion = OpenAI::API::Request::Completion->new(
+        model      => 'text-davinci-003',
+        prompt     => 'Once upon a time',
+        max_tokens => 50,
     );
 
-    my $res = $request->send();    # or: $request->send( http_response => 1 );
+    my $res  = $completion->send();         # or: my $res = $completion->send( http_response => 1 );
+    my $text = $res->{choices}[0]{text};    # or: my $text = "$res";
 
-    my $text = $res->{choices}[0]{text};
 
 =head1 DESCRIPTION
 
-Given a prompt, the model will return one or more predicted completions.
+This module provides a request class for interacting with the OpenAI API's
+chat-based completion endpoint. It inherits from L<OpenAI::API::Request>.
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
-=head2 new()
-
-=over 4
-
-=item * model
+=head2 model
 
 ID of the model to use.
 
 See L<Models overview|https://platform.openai.com/docs/models/overview>
 for a reference of them.
 
-=item * prompt
+=head2 prompt
 
 The prompt for the text generation.
 
-=item * suffix [optional]
+=head2 suffix [optional]
 
 The suffix that comes after a completion of inserted text.
 
-=item * max_tokens [optional]
+=head2 max_tokens [optional]
 
 The maximum number of tokens to generate.
 
 Most models have a context length of 2048 tokens (except for the newest
 models, which support 4096.
 
-=item * temperature [optional]
+=head2 temperature [optional]
 
 What sampling temperature to use, between 0 and 2. Higher values like
 0.8 will make the output more random, while lower values like 0.2 will
 make it more focused and deterministic.
 
-=item * top_p [optional]
+=head2 top_p [optional]
 
 An alternative to sampling with temperature, called nucleus sampling.
 
 We generally recommend altering this or C<temperature> but not both.
 
-=item * n [optional]
+=head2 n [optional]
 
 How many completions to generate for each prompt.
 
 Use carefully and ensure that you have reasonable settings for
 C<max_tokens> and C<stop>.
 
-=item * stop [optional]
+=head2 stop [optional]
 
 Up to 4 sequences where the API will stop generating further tokens. The
 returned text will not contain the stop sequence.
 
-=item * frequency_penalty [optional]
+=head2 frequency_penalty [optional]
 
 Number between -2.0 and 2.0. Positive values penalize new tokens based
 on their existing frequency in the text so far.
 
-=item * presence_penalty [optional]
+=head2 presence_penalty [optional]
 
 Number between -2.0 and 2.0. Positive values penalize new tokens based
 on whether they appear in the text so far.
 
-=item * best_of [optional]
+=head2 best_of [optional]
 
 Generates best_of completions server-side and returns the "best" (the
 one with the highest log probability per token).
@@ -129,19 +126,27 @@ one with the highest log probability per token).
 Use carefully and ensure that you have reasonable settings for
 C<max_tokens> and C<stop>.
 
-=back
+=head1 METHODS
 
-=head2 send()
+=head2 add_message($role, $content)
 
-Sends the request and returns a data structured similar to the one
-documented in the API reference.
+This method adds a new message with the given role and content to the
+messages attribute.
 
-=head2 send_async()
+=head2 send_message($content)
 
-Send a request asynchronously. Returns a L<Promises> promise that will
-be resolved with the decoded JSON response. See L<OpenAI::API::Request>
-for an example.
+This method adds a user message with the given content, sends the request,
+and returns the response. It also adds the assistant's response to the
+messages attribute.
+
+=head1 INHERITED METHODS
+
+This module inherits the following methods from L<OpenAI::API::Request>:
+
+=head2 send(%args)
+
+=head2 send_async(%args)
 
 =head1 SEE ALSO
 
-OpenAI API Reference: L<Completions|https://platform.openai.com/docs/api-reference/completions>
+L<OpenAI::API::Request>, L<OpenAI::API::Config>

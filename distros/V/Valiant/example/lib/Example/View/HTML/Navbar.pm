@@ -1,23 +1,23 @@
 package Example::View::HTML::Navbar;
 
-use Moose;
+use Moo;
 use Example::Syntax;
-use Valiant::HTML::TagBuilder 'nav', 'a', 'div', 'button', 'span';
-
-extends 'Example::View::HTML';
+use Example::View::HTML
+  -tags => qw(nav a div button span),
+  -util => qw($sf content_for path ),
 
 has active_link => (is=>'ro', required=>1, default=>sub($self) { $self->ctx->req->uri->path });
 
-our @links = (
-  +{ href => '/', title => 'Home' },
-  +{ href => '/account', title => 'Account Details' },
-  +{ href => '/todos', title => 'Todo List' },
-  +{ href => '/contacts', title => 'Contact List' },
-  +{ href => '/logout', title => 'Logout' },
-);
-
-sub links($self) {
+sub links :Renders ($self) {
   my $class = "nav-item nav-link";
+  state @links = (
+    +{ href => '/', title => 'Home' },
+    +{ href => path('/account/edit'), title => 'Account Details' },
+    +{ href => path('/todos/list'), title => 'Todo List' },
+    +{ href => path('/contacts/list'), title => 'Contact List' },
+    +{ href => path('/session/logout'), title => 'Logout' },
+  );
+
   return map {
     a +{
       class => ( $self->active_link eq $_->{href} ? "$class active" : $class), 
@@ -40,4 +40,4 @@ sub render($self, $c) {
   ];
 }
 
-__PACKAGE__->meta->make_immutable();
+1;

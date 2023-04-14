@@ -1,7 +1,7 @@
 use strict; use warnings;
 package Lingy::Reader;
 
-use Lingy::Types;
+use Lingy::Common;
 
 sub new {
     my $class = shift;
@@ -13,34 +13,45 @@ sub new {
 
 sub read_str {
     my ($self, $str) = @_;
-    $self->{tokens} = tokenize($str);
-    $self->read_form;
+    my $tokens = $self->{tokens} = tokenize($str);
+    my @forms;
+    while (@$tokens) {
+        my $form = $self->read_form;
+        if (defined $form) {
+            push @forms, $form;
+        }
+    }
+    return @forms;
 }
 
 sub tokenize {
-    [ $_[0] =~ /
-        (?:
-            [\s,] |
-            ;.*
-        )*
-        (
-            ~@ |
-            [\[\]{}()'`~^@] |
-            "(?:
-                \\. |
-                [^\\"]
-            )*"? |
-            [^\s\[\]{}('"`,;)]*
-        )
-    /xog ];
+    [
+        grep length,
+        $_[0] =~ /
+            (?:                     # Ignore:
+                [\s,] |                 # whitespace, commas,
+                ;.*                     # comments
+            )*
+            (                       # Capture all these tokens:
+                ~@ |                    # Unquote-splice token
+                [\[\]{}()'`~^@] |       # Single character tokens
+                "(?:                    # Quoted string
+                    \\. |                 # Escaped char
+                    [^\\"]                # Any other char
+                )*"? |                    # Match if missing ending quote
+                                        # Other tokens
+                [^\s\[\]\{\}\(\)\'\"\`\,\;]*
+            )
+        /xog
+    ];
 }
 
 sub read_form {
     my ($self) = @_;
     local $_ = $self->{tokens}[0];
-    /^\($/ ? $self->read_list('list', ')') :
-    /^\[$/ ? $self->read_list('vector', ']') :
-    /^\{$/ ? $self->read_hash_map('hash_map', '}') :
+    /^\($/ ? $self->read_list('Lingy::Lang::List', ')') :
+    /^\[$/ ? $self->read_list('Lingy::Lang::Vector', ']') :
+    /^\{$/ ? $self->read_hash_map('Lingy::Lang::HashMap', '}') :
     /^'$/ ? $self->read_quote('quote') :
     /^`$/ ? $self->read_quote('quasiquote') :
     /^~$/ ? $self->read_quote('unquote') :
@@ -62,7 +73,7 @@ sub read_list {
         }
         push @$list, $self->read_form;
     }
-    die "Reached end of input in 'read_list'";
+    err "Reached end of input in 'read_list'";
 }
 
 sub read_hash_map {
@@ -77,7 +88,7 @@ sub read_hash_map {
         }
         push @$pairs, $self->read_form, $self->read_form;
     }
-    die "Reached end of input in 'read_hash_map'";
+    err "Reached end of input in 'read_hash_map'";
 }
 
 my $string_re = qr/"((?:\\.|[^\\"])*)"/;
@@ -93,7 +104,7 @@ sub read_scalar {
 
     if (/^"/) {
         s/^$string_re$/$1/ or
-            die "Reached end of input looking for '\"'";
+            err "Reached end of input looking for '\"'";
         s/\\([nt\"\\])/$unescape->{$1}/ge;
         return string($_);
     }
@@ -128,7 +139,7 @@ sub with_meta {
         symbol('with-meta'),
         $form,
         $meta,
-    ], 'list';
+    ], 'Lingy::Lang::List';
 }
 
 1;

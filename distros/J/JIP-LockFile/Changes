@@ -1,5 +1,9 @@
 Revision history for JIP-LockFile
 
+0.063  2023-03-01
+  - Added Perl 5.36 into ".travis.yml".
+  - Small changes in distro.
+
 0.062  2020-06-09
   - Improved portability of some tests.
 

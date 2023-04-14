@@ -1,3 +1,20 @@
+0.48 2023-04-07
+  [New Features and Incompatible Changes]
+    * Added the Sys::Time::Tm class.
+    * Added the following methods in Sys::Time class.
+    
+      static method time : long ();
+      static method localtime : Sys::Time::Tm ($time : long);
+      static method gmtime : Sys::Time::Tm ($time : long);
+    * Use the Sys::Time::Tm class instead of the Time class in all place.
+0.47 2023-04-06
+  [License Change]
+    * The license is changed to MIT License.
+  [Prerequirement Change]
+    * SPVM 0.9701 is required.
+0.46 2023-03-31
+  [Internal Compatible Changes]
+    * Use new_pointer_ojbect_by_name instead of the deprecated new_pointer_by_name Native API.
 0.45  2022-06-21
   [Internal Compatible Changes]
     * Use SPVM::ExchangeAPI method instead of SPVM functions.

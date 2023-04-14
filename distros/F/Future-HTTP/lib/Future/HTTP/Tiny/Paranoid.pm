@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 extends 'Future::HTTP::Tiny';
 
@@ -155,7 +155,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

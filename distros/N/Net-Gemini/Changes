@@ -1,5 +1,16 @@
 Revision history for Net-Gemini
 
+0.05    2023-04-11
+        Somehow Encode.pm had gone AWOL, and other bugfixes. Parse for
+        charset and encode to UTF-8 by default in gmitool, and add a
+        flag to only show the links from text/gemini content.
+
+0.04    2023-04-02
+        Sneakily rely on URI.pm for URL handling. Add a bin/gmitool
+        utility script, gets gemini resources. Various breaking
+        interface changes. Better ensure that the socket gets closed
+        when not needed.
+
 0.03    2022-10-27
         Set a minimum bar on IO::Socket:SSL for can_ipv6. Disable
         automatic build on Windows due to test failures.

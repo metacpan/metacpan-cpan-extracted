@@ -13,6 +13,7 @@ sub account_for($self, $user) {
     { prefetch => ['profile', {profile=>'state'}, {profile=>'employment'}, 'credit_cards', {person_roles => 'role' }] }
   );
   $account->build_related_if_empty('profile'); # Needed since the relationship is optional
+  $account->profile->build_related_if_empty('employment'); # Needed since the relationship is optional
   $account->profile->status('pending') unless defined($account->profile->status);
   return $account;
 }

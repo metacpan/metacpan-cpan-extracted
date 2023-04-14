@@ -1,7 +1,7 @@
 package Khonsu;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use PDF::API2;
 
 use Khonsu::File;
@@ -28,7 +28,7 @@ Khonsu - The great new Khonsu!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -76,6 +76,16 @@ Perhaps a little code snippet.
 			colour => '#fff'
 		},
 		overflow => 1,
+	);
+
+	$khonsu->add_page(
+		background => '#fff'
+	)->add_image(
+		image => 't/test.png',
+		x => 20,
+		y => 20,
+		w => $khonsu->page->w - 40,
+		h => $khonsu->page->h - 40,
 	);
 
 	$khonsu->save();

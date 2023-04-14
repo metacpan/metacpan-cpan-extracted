@@ -13,7 +13,6 @@ my (%MAKEFILE);
 		       'Test::More' =>0,
                        'Net::DNS' => 0.53
                      },
-  'linkext'       => { LINKTYPE=>'' },
   'dist'          => {
                        COMPRESS=>'gzip -9f', 
                        SUFFIX => 'gz', 
@@ -21,6 +20,9 @@ my (%MAKEFILE);
                      },
   'AUTHOR'        => 'The McGrail Foundation & Kevin A. McGrail <kevin.mcgrail-netvalidmx@mcgrail.com>',
   'ABSTRACT'      => 'Perl DNS mail exchange & email format validation module',
+  'PMLIBDIRS' => [ 'lib' ],
+  'EXE_FILES' => [ 'example/check_email_and_mx.pl' ],
+  'INSTALLDIRS' => 'perl',
 );
 
 WriteMakefile(%MAKEFILE);

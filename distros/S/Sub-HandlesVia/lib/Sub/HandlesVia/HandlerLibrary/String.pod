@@ -362,7 +362,7 @@ Returns C<< uc($object->attr) >>.
   say $bob->is_alive; ## ==> false
   say $bob->is_dead;  ## ==> true
 
-See also L<MooX::Enumeration> and L<MooseX::Enumeration>.
+See also L<Sub::HandlesVia::HandlerLibrary::Enum>, L<MooX::Enumeration> and L<MooseX::Enumeration>.
 
 =head2 Match with curried regexp
 

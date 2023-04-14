@@ -11,7 +11,7 @@ set of modules
 
 # VERSION
 
-0.35
+0.38
 
 # DESCRIPTION
 
@@ -26,11 +26,11 @@ such lower level interface with the API.
 
 # Do Not Use This Module Directly
 
-You should go straight to [Business::GoCardless::Pro](https://metacpan.org/pod/Business::GoCardless::Pro) and start there.
+You should go straight to [Business::GoCardless::Pro](https://metacpan.org/pod/Business%3A%3AGoCardless%3A%3APro) and start there.
 
 # SEE ALSO
 
-[Business::GoCardless::Pro](https://metacpan.org/pod/Business::GoCardless::Pro)
+[Business::GoCardless::Pro](https://metacpan.org/pod/Business%3A%3AGoCardless%3A%3APro)
 
 # AUTHOR
 

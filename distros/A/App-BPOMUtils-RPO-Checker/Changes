@@ -1,3 +1,14 @@
+0.012   2023-03-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust to Data::Sah::Value::perl::Path::filenames 0.004.
+
+
+0.011   2023-03-16  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] A line of code was accidentally deleted causing PDF type
+          check to always fail.
+
+
 0.010   2023-03-16  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Don't check symbol & double dot twice (in

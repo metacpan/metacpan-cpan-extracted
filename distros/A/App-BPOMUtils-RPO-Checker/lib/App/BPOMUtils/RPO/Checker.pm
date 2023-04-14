@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-16'; # DATE
+our $DATE = '2023-03-30'; # DATE
 our $DIST = 'App-BPOMUtils-RPO-Checker'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_rpo_check_label_files_design
@@ -20,7 +20,7 @@ our %SPEC;
 
 our %argspec0plus_filenames = (
     filenames => {
-        schema => ['array*', of=>'filename', 'x.perl.default_value_rules' => [['Path::filenames'=>{recursive=>1}]]],
+        schema => ['array*', of=>'filename', 'x.perl.default_value_rules' => [['Path::filenames'=>{recurse=>1}]]],
         pos => 0,
         slurpy => 1,
     },
@@ -127,6 +127,7 @@ sub bpom_rpo_check_files {
                     unless $filename =~ /\.(bmp)$/i;
             } elsif ($mime_type eq 'application/pdf') {
                 push @errors, {file=>$filename, message=>"File type is PDF but extension is not pdf"}
+                    unless $filename =~ /\.(pdf)$/i;
             } else {
                 push @errors, {file=>$filename, message=>"File type is not JPEG/GIF/BMP/PDF"};
             }
@@ -229,7 +230,7 @@ App::BPOMUtils::RPO::Checker - Various checker utilities to help with Processed 
 
 =head1 VERSION
 
-This document describes version 0.010 of App::BPOMUtils::RPO::Checker (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-16.
+This document describes version 0.012 of App::BPOMUtils::RPO::Checker (from Perl distribution App-BPOMUtils-RPO-Checker), released on 2023-03-30.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,13 @@
+This module provides a UNIX-like command `dirstrata1'. 
+
+ Copyright (c) 2016-2023 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+
+📁📂 概要 📂📁
+
+このモジュールをインストールすると、コマンド dirstrata1 が使えるようになる。
+
+
+📁📂 実行例 📂📁

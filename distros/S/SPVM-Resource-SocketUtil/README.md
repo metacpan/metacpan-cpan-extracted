@@ -1,4 +1,4 @@
 # SPVM::Resource::SocketUtil
 
-SPVM::Resource::SocketUtil is a SPVM module.
+<a href="https://metacpan.org/pod/SPVM::Resource::SocketUtil">SPVM::Resource::SocketUtil</a>
 

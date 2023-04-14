@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use strict;
 use warnings;
@@ -44,14 +44,16 @@ sub generate {
         for my $idx ( 0 .. $step ) {
             my $byte;
 
-            $byte = $bytes->[$idx] & $mask;
+            if ( defined $bytes->[$idx] ) {
+                $byte = $bytes->[$idx] & $mask;
 
-            if ( defined $alphabet_array[$byte] ) {
-                $id .= $alphabet_array[$byte];
-
-                if ( length $id == $size ) {
-                    return $id;
+                if ( defined $alphabet_array[$byte] ) {
+                    $id .= $alphabet_array[$byte];
                 }
+            }
+
+            if ( length $id == $size ) {
+                return $id;
             }
         }
     }

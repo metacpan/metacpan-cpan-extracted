@@ -18,12 +18,15 @@ FFI
 GCM
 Sodium
 Whitener
+brian
+briandfoy
 capoeirab
 chacha
 cwhitener
 decrypt
 decrypts
 deterministically
+foy
 lib
 libsodium
 unpadded

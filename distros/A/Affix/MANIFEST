@@ -638,6 +638,9 @@ t/58_affix_import_vars.t
 t/63_affix_raw_pointer.t
 t/64_affix_wchar_t.t
 t/70_affix_varargs.t
+t/80_affix_mangle.t
+t/82_affix_mangle_itanium.t
+t/85_affix_mangle_rust.t
 t/99_valgrind.t
 t/lib/nativecall.pm
 t/src/41_argless.c
@@ -652,6 +655,9 @@ t/src/56_affix_arrayref.c
 t/src/58_affix_import_vars.c
 t/src/64_affix_wchar_t.c
 t/src/70_affix_varargs.c
+t/src/82_affix_mangle_itanium.cxx
+t/src/85_affix_mangle_rust/Cargo.toml
+t/src/85_affix_mangle_rust/src/lib.rs
 t/src/99_valgrind.c
 t/src/std.h
 META.yml

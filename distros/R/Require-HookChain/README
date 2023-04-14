@@ -2,8 +2,8 @@ NAME
     Require::HookChain - Chainable require hook
 
 VERSION
-    This document describes version 0.005 of Require::HookChain (from Perl
-    distribution Require-HookChain), released on 2022-11-15.
+    This document describes version 0.006 of Require::HookChain (from Perl
+    distribution Require-HookChain), released on 2023-02-07.
 
 SYNOPSIS
     Say you want to create a require hook to prepend some code to the module
@@ -126,7 +126,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2017 by perlancar
+    This software is copyright (c) 2023, 2022, 2020, 2017 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

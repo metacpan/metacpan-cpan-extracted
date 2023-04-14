@@ -1,5 +1,11 @@
 Revision history for JIP-DataPath
 
+0.043        2023-02-26
+        Added default_value method.
+        Added is_default_value method.
+        Added Perl 5.36 into ".travis.yml".
+        Small changes in distro.
+
 0.042        2020-06-08
         Exporting without inheriting from Exporter.
         More documentation.

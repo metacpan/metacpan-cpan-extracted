@@ -1,73 +1,34 @@
 #!/usr/bin/env perl -w
 
-## no critic
-
 use warnings;
 use strict;
 
-use lib 'lib';
+use lib qw( . lib);
 
 use Data::Dumper;
 use Digest::MD5::File qw(file_md5_hex);
-use English qw{-no_match_vars};
-use File::Temp qw{ tempfile };
+use English           qw{-no_match_vars};
+use File::Temp        qw{ tempfile };
+use List::Util        qw(any);
 use Test::More;
 
-our $OWNER_ID;
-our $OWNER_DISPLAYNAME;
+use S3TestUtils qw(:constants :subs);
+
 our @REGIONS = (undef);
 
 if ( $ENV{AMAZON_S3_REGIONS} ) {
   push @REGIONS, split /\s*,\s*/xsm, $ENV{AMAZON_S3_REGIONS};
 }
 
-my $host;
+my $host = set_s3_host();
 
-my $skip_owner_id;
-my $skip_permissions;
-my $skip_acls;
+my $bucket_name = make_bucket_name();
 
-if ( exists $ENV{AMAZON_S3_LOCALSTACK} ) {
-  $host = 'localhost:4566';
-
-  $ENV{'AWS_ACCESS_KEY_ID'}     = 'test';
-  $ENV{'AWS_ACCESS_KEY_SECRET'} = 'test';
-
-  $ENV{'AMAZON_S3_EXPENSIVE_TESTS'} = 1;
-
-  $skip_owner_id    = 1;
-  $skip_permissions = 1;
-  $skip_acls        = 1;
-}
-else {
-  $host = $ENV{AMAZON_S3_HOST};
-}
-
-my $secure = $host ? 0 : 1;
-
-# - do not use DNS bucket names for testing if a mocking service is used
-# - override this by setting AMAZON_S3_DNS_BUCKET_NAMES to any value
-# - your tests may fail unless you have DNS entry for the bucket name
-#   e.g 127.0.0.1 net-amazon-s3-test-test.localhost
-
-my $dns_bucket_names
-  = ( $host && !exists $ENV{AMAZON_S3_DNS_BUCKET_NAMES} ) ? 0 : 1;
-
-$skip_acls //= exists $ENV{AMAZON_S3_MINIO}
-  || exists $ENV{AMAZON_S3_SKIP_ACL_TESTS};
-
-my $no_region_constraint //= exists $ENV{AMAZON_S3_MINIO}
-  || exists $ENV{AMAZON_S3_SKIP_REGION_CONSTRAINT_TEST};
-
-my $aws_access_key_id     = $ENV{'AWS_ACCESS_KEY_ID'};
-my $aws_secret_access_key = $ENV{'AWS_ACCESS_KEY_SECRET'};
-my $token                 = $ENV{'AWS_SESSION_TOKEN'};
-
-if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'} ) {
+if ( !$ENV{AMAZON_S3_EXPENSIVE_TESTS} ) {
   plan skip_all => 'Testing this module for real costs money.';
 }
 else {
-  plan tests => 76 * scalar(@REGIONS) + 2;
+  plan tests => 85 * scalar(@REGIONS) + 2;
 }
 
 ########################################################################
@@ -77,44 +38,14 @@ else {
 use_ok('Amazon::S3');
 use_ok('Amazon::S3::Bucket');
 
-my $s3;
+my $s3 = get_s3_service($host);
 
-if ( $ENV{AMAZON_S3_CREDENTIALS} ) {
-  require Amazon::Credentials;
-
-  $s3 = Amazon::S3->new(
-    { credentials      => Amazon::Credentials->new,
-      host             => $host,
-      secure           => $secure,
-      dns_bucket_names => $dns_bucket_names,
-      level            => $ENV{DEBUG} ? 'trace' : 'error',
-    }
-  );
-  ( $aws_access_key_id, $aws_secret_access_key, $token )
-    = $s3->get_credentials;
-}
-else {
-  $s3 = Amazon::S3->new(
-    { aws_access_key_id     => $aws_access_key_id,
-      aws_secret_access_key => $aws_secret_access_key,
-      token                 => $token,
-      host                  => $host,
-      secure                => $secure,
-      dns_bucket_names      => $dns_bucket_names,
-      level                 => $ENV{DEBUG} ? 'trace' : 'error',
-    }
-  );
+if ( !$s3 || $EVAL_ERROR ) {
+  BAIL_OUT( 'could not initialize s3 object: ' . $EVAL_ERROR );
 }
 
-# list all buckets that i own
-my $response = eval { return $s3->buckets; };
-
-if ( $EVAL_ERROR || !$response ) {
-  BAIL_OUT($EVAL_ERROR);
-}
-
-$OWNER_ID          = $response->{owner_id};
-$OWNER_DISPLAYNAME = $response->{owner_displayname};
+# bail if test bucket already exists
+our ( $OWNER_ID, $OWNER_DISPLAYNAME ) = check_test_bucket($s3);
 
 for my $location (@REGIONS) {
   # this test formerly used the same bucket name for both regions,
@@ -123,29 +54,27 @@ for my $location (@REGIONS) {
   # To test the bucket constraint policy below then we need to use a
   # different bucket name. The old comment here was...
   #
-  # create a bucket
-  # make sure it's a valid hostname for EU testing
-  # we use the same bucket name for both in order to force one or the
-  # other to have stale DNS
+  #   > create a bucket
+  #   > make sure it's a valid hostname for EU testing
+  #   > we use the same bucket name for both in order to force one or the
+  #   > other to have stale DNS
 
   $s3->region($location);
   $host = $s3->host;
 
-  my $bucketname_raw;
-  my $bucketname;
+  my $bucket_name_raw;
+  my $bucket_name;
   my $bucket_obj;
   my $bucket_suffix;
 
-  while (1) {
+  while ($TRUE) {
 
-    $bucketname_raw = sprintf 'net-amazon-s3-test-%s%s',
-      lc($aws_access_key_id), $bucket_suffix // '';
-
-    $bucketname = '/' . $bucketname_raw;
+    $bucket_name_raw = make_bucket_name();
+    $bucket_name     = $SLASH . $bucket_name_raw;
 
     $bucket_obj = eval {
       $s3->add_bucket(
-        { bucket              => $bucketname,
+        { bucket              => $bucket_name,
           acl_short           => 'public-read',
           location_constraint => $location
         }
@@ -159,21 +88,22 @@ for my $location (@REGIONS) {
     last if $bucket_obj;
 
     # 409 indicates bucket name not yet available...
-    if ( $s3->last_response->code ne '409' ) {
-      BAIL_OUT("could not create $bucketname");
+    if ( $s3->last_response->code ne $HTTP_CONFLICT ) {
+      BAIL_OUT("could not create $bucket_name");
     }
 
     $bucket_suffix = '-2';
   }
 
-  is( ref $bucket_obj,
-    'Amazon::S3::Bucket',
-    'create bucket in ' . ( $location // 'DEFAULT_REGION' ) )
-    or BAIL_OUT("could not create bucket $bucketname");
+  is(
+    ref $bucket_obj,
+    'Amazon::S3::Bucket', sprintf 'create bucket (%s) in %s ',
+    $bucket_name,         $location // 'DEFAULT_REGION'
+  ) or BAIL_OUT("could not create bucket $bucket_name");
 
   SKIP: {
-    if ($no_region_constraint) {
-      skip "No region constraints", 1;
+    if ( $ENV{AMAZON_S3_SKIP_REGION_CONSTRAINT_TEST} ) {
+      skip 'No region constraints', 1;
     }
 
     is( $bucket_obj->get_location_constraint, $location );
@@ -181,33 +111,41 @@ for my $location (@REGIONS) {
 
   SKIP: {
 
-    if ( $skip_acls || !$bucket_obj ) {
-      skip "ACLs only for Amazon S3", 3;
+    if ( $ENV{AMAZON_S3_SKIP_ACLS} || !$bucket_obj ) {
+      skip 'ACLs only for Amazon S3', 3;
     }
 
     like_acl_allusers_read($bucket_obj);
 
-    ok( $bucket_obj->set_acl( { acl_short => 'private' } ) );
-    unlike_acl_allusers_read($bucket_obj);
+    my $rsp = $bucket_obj->set_acl( { acl_short => 'private' } );
 
+    ok( $rsp, 'set_acl - private' )
+      or diag(
+      Dumper( [ response => $rsp, $s3->err, $s3->errstr, $s3->error ] ) );
+
+    unlike_acl_allusers_read($bucket_obj);
   }
 
   # another way to get a bucket object (does no network I/O,
   # assumes it already exists).  Read Amazon::S3::Bucket.
-  $bucket_obj = $s3->bucket($bucketname);
-  is( ref $bucket_obj, "Amazon::S3::Bucket" );
+  $bucket_obj = $s3->bucket($bucket_name);
+  is( ref $bucket_obj, 'Amazon::S3::Bucket' );
 
   # fetch contents of the bucket
   # note prefix, marker, max_keys options can be passed in
 
-  $response = $bucket_obj->list
-    or BAIL_OUT( $s3->err . ": " . $s3->errstr );
+  my $response = $bucket_obj->list();
+
+  if ( !$response ) {
+    BAIL_OUT( sprintf 'could not list bucket: %s', $bucket_name );
+  }
 
   SKIP: {
-    skip "invalid response to 'list'"
-      if !$response;
+    if ( !$response ) {
+      skip 'invalid response to "list"';
+    }
 
-    is( $response->{bucket}, $bucketname_raw )
+    is( $response->{bucket}, $bucket_name_raw )
       or BAIL_OUT( Dumper [$response] );
 
     ok( !$response->{prefix} );
@@ -221,7 +159,7 @@ for my $location (@REGIONS) {
     is_deeply( $response->{keys}, [] )
       or diag( Dumper( [$response] ) );
 
-    is( undef, $bucket_obj->get_key("non-existing-key") );
+    is( undef, $bucket_obj->get_key('non-existing-key') );
   }
 
   my $keyname = 'testing.txt';
@@ -231,6 +169,7 @@ for my $location (@REGIONS) {
     # Create a publicly readable key, then turn it private with a short acl.
     # This key will persist past the end of the block.
     my $value = 'T';
+
     $bucket_obj->add_key(
       $keyname, $value,
       { content_type        => 'text/plain',
@@ -241,33 +180,39 @@ for my $location (@REGIONS) {
 
     my $url
       = $s3->dns_bucket_names
-      ? "http://$bucketname_raw.$host/$keyname"
-      : "http://$host/$bucketname/$keyname";
+      ? "http://$bucket_name_raw.$host/$keyname"
+      : "http://$host/$bucket_name/$keyname";
 
     SKIP: {
-      if ($skip_acls) {
-        skip "ACLs only for Amazon S3", 3;
+      if ( $ENV{AMAZON_S3_SKIP_ACLS} ) {
+        skip 'ACLs only for Amazon S3', 3;
       }
 
-      is_request_response_code( $url, 200,
-        "can access the publicly readable key" );
+      is_request_response_code( $url, $HTTP_OK,
+        'can access the publicly readable key' );
 
       like_acl_allusers_read( $bucket_obj, $keyname );
 
       ok(
-        $bucket_obj->set_acl( { key => $keyname, acl_short => 'private' } ) );
+        $bucket_obj->set_acl(
+          { key       => $keyname,
+            acl_short => 'private'
+          }
+        )
+      );
     }
 
     SKIP: {
-      if ($skip_acls) {
-        skip 'ACLs only for Amazon S3', 1;
+      if ( $ENV{AMAZON_S3_SKIP_PERMISSIONS} ) {
+        skip 'Mocking service does not enforce ACLs', 1;
       }
 
-      is_request_response_code( $url, 403, "cannot access the private key" );
+      is_request_response_code( $url, $HTTP_FORBIDDEN,
+        'cannot access the private key' );
     }
 
     SKIP: {
-      if ($skip_acls) {
+      if ( $ENV{AMAZON_S3_SKIP_ACLS} ) {
         skip 'ACLs only for Amazon S3', 5;
       }
 
@@ -282,7 +227,7 @@ for my $location (@REGIONS) {
       );
 
       is_request_response_code( $url,
-        200, "can access the publicly readable key after acl_xml set" );
+        $HTTP_OK, 'can access the publicly readable key after acl_xml set' );
 
       like_acl_allusers_read( $bucket_obj, $keyname );
 
@@ -296,12 +241,12 @@ for my $location (@REGIONS) {
     }
 
     SKIP: {
-      if ( $skip_acls || $ENV{LOCALSTACK} ) {
-        skip 'LocalStack does not enforce ACLs', 2;
+      if ( $ENV{AMAZON_S3_SKIP_PERMISSIONS} ) {
+        skip 'Mocking service does not enforce ACLs', 2;
       }
 
       is_request_response_code( $url,
-        403, 'cannot access the private key after acl_xml set' );
+        $HTTP_FORBIDDEN, 'cannot access the private key after acl_xml set' );
 
       unlike_acl_allusers_read( $bucket_obj, $keyname );
     }
@@ -326,18 +271,22 @@ for my $location (@REGIONS) {
 
     my $url
       = $s3->dns_bucket_names
-      ? "http://$bucketname_raw.$host/$keyname2"
-      : "http://$host/$bucketname/$keyname2";
+      ? "http://$bucket_name_raw.$host/$keyname2"
+      : "http://$host/$bucket_name/$keyname2";
 
     SKIP: {
-      skip 'LocalStack does not enforce ACLs', 1
-        if $skip_permissions || $skip_acls;
+      if ( $ENV{AMAZON_S3_SKIP_PERMISSIONS} ) {
+        skip 'Mocking service does not enforce ACLs', 1;
+      }
 
-      is_request_response_code( $url, 403, "cannot access the private key" );
+      is_request_response_code( $url, $HTTP_FORBIDDEN,
+        'cannot access the private key' );
     }
 
     SKIP: {
-      skip 'ACLs only for Amazon S3', 4 if $skip_acls;
+      if ( $ENV{AMAZON_S3_SKIP_ACLS} ) {
+        skip 'ACLs only for Amazon S3', 4;
+      }
 
       unlike_acl_allusers_read( $bucket_obj, $keyname2 );
 
@@ -350,7 +299,7 @@ for my $location (@REGIONS) {
       );
 
       is_request_response_code( $url,
-        200, "can access the publicly readable key" );
+        $HTTP_OK, 'can access the publicly readable key' );
 
       like_acl_allusers_read( $bucket_obj, $keyname2 );
 
@@ -370,10 +319,11 @@ for my $location (@REGIONS) {
     }
 
     if ( !$response ) {
-      BAIL_OUT( $s3->err . ": " . $s3->errstr );
+      BAIL_OUT( $s3->err . ': ' . $s3->errstr );
     }
 
-    is( $response->{bucket}, $bucketname_raw, "list($v) - bucketname " );
+    is( $response->{bucket}, $bucket_name_raw, sprintf 'list(%s) - %s',
+      $v, $bucket_name );
 
     ok( !$response->{prefix}, "list($v) - prefix empty" )
       or diag( Dumper [$response] );
@@ -397,7 +347,10 @@ for my $location (@REGIONS) {
     is( $key->{size}, 1, "list($v) - size == 1" );
 
     SKIP: {
-      skip 'LocalStack has different owner for bucket', 1 if $skip_owner_id;
+      if ( $ENV{AMAZON_S3_SKIP_OWNER_ID_TEST} ) {
+        skip 'mocking service has different owner for bucket', 1;
+      }
+
       is( $key->{owner_id}, $OWNER_ID, "list($v) - owner id " )
         or diag( Dumper [$key] );
     }
@@ -413,6 +366,7 @@ for my $location (@REGIONS) {
 
   # now play with the file methods
   my ( $fh, $lorem_ipsum ) = tempfile();
+
   print {$fh} <<'EOT';
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
@@ -428,7 +382,7 @@ EOT
   my $lorem_ipsum_md5  = file_md5_hex($lorem_ipsum);
   my $lorem_ipsum_size = -s $lorem_ipsum;
 
-  $keyname .= "2";
+  $keyname .= '2';
 
   $bucket_obj->add_key_filename(
     $keyname,
@@ -441,7 +395,7 @@ EOT
   $response = $bucket_obj->get_key($keyname);
 
   is( $response->{content_type}, 'text/plain', 'get_key - content_type' );
-  like( $response->{value}, qr/Lorem ipsum/, 'get_key - Lorem ipsum' );
+  like( $response->{value}, qr/Lorem\sipsum/xsm, 'get_key - Lorem ipsum' );
 
   is( $response->{etag}, $lorem_ipsum_md5, 'get_key - etag' )
     or diag( Dumper [$response] );
@@ -457,7 +411,7 @@ EOT
   is( $response->{content_type},
     'text/plain', 'get_key_filename - content_type' );
 
-  is( $response->{value}, '', 'get_key_filename - value empty' );
+  is( $response->{value}, $EMPTY, 'get_key_filename - value empty' );
 
   is( $response->{etag}, $lorem_ipsum_md5, 'get_key_filename - etag == md5' );
 
@@ -479,20 +433,21 @@ EOT
 
   isa_ok( $copy_result, 'HASH', 'copy_object returns a hash reference' );
 
-  $bucket_obj->delete_key($keyname);
   $response = $bucket_obj->list;
 
   ok( ( grep {"$keyname.bak"} @{ $response->{keys} } ), 'found the copy' );
 
-  $bucket_obj->delete_key($keyname);
-  $bucket_obj->delete_key("$keyname.bak");
+  if ( !$ENV{AMAZON_S3_KEEP_BUCKET} ) {
+    $bucket_obj->delete_key($keyname);
+    $bucket_obj->delete_key("$keyname.bak");
+  }
 
   # try empty files
   $keyname .= '3';
-  $bucket_obj->add_key( $keyname, '' );
+  $bucket_obj->add_key( $keyname, $EMPTY );
   $response = $bucket_obj->get_key($keyname);
 
-  is( $response->{value}, '', 'empty object - value empty' );
+  is( $response->{value}, $EMPTY, 'empty object - value empty' );
 
   is(
     $response->{etag},
@@ -510,12 +465,12 @@ EOT
   # fetch contents of the bucket
   # note prefix, marker, max_keys options can be passed in
   $response = $bucket_obj->list
-    or die $s3->err . ": " . $s3->errstr;
+    or die $s3->err . ': ' . $s3->errstr;
 
-  $bucketname =~ s/^\///;
+  $bucket_name =~ s/^\///xsm;
 
-  is( $response->{bucket}, $bucketname,
-    'delete key from bucket - bucketname' );
+  is( $response->{bucket}, $bucket_name,
+    'delete key from bucket - ' . $bucket_name );
 
   ok( !$response->{prefix}, 'delete key from bucket - prefix empty' );
 
@@ -530,81 +485,228 @@ EOT
   is_deeply( $response->{keys}, [],
     'delete key from bucket - empty list of keys' );
 
-  ok( $bucket_obj->delete_bucket(), 'delete bucket' );
+  ######################################################################
+  # delete multiple keys from bucket
+  # TODO: test deleting specific versions
+  #
+
+  SKIP: {
+    if ( $ENV{AMAZON_S3_KEEP_BUCKET} ) {
+      skip 'keeping bucket', 9;
+    }
+
+    $keyname = 'foo-';
+
+    for ( 1 .. 8 ) {
+      $bucket_obj->add_key( "$keyname$_", $EMPTY );
+    }
+
+    $response = $bucket_obj->list
+      or die $s3->err . ': ' . $s3->errstr;
+
+    my @key_list = @{ $response->{keys} };
+
+    is( 8, scalar @key_list, 'wrote 8 keys for delete_keys() test' );
+
+    ######################################################################
+    # quietly delete version keys - first two
+    ######################################################################
+    my $delete_rsp = $bucket_obj->delete_keys(
+      { quiet => 1,
+        keys  => [ map { $_->{key} } @key_list[ ( 0, 1 ) ] ]
+      }
+    );
+
+    ok( !$delete_rsp, 'delete_keys() quiet response - empty' )
+      or BAIL_OUT(
+      'could not delete quietly '
+        . Dumper(
+        [ response      => $delete_rsp,
+          last_request  => $s3->get_last_request,
+          last_response => $s3->get_last_response,
+        ]
+        )
+      );
+
+    $response = $bucket_obj->list
+      or die $s3->err . ': ' . $s3->errstr;
+
+    is(
+      scalar @{ $response->{keys} },
+      -2 + scalar(@key_list),
+      'delete versioned keys'
+    );
+
+    shift @key_list;
+    shift @key_list;
+
+    ######################################################################
+    # delete list of keys - next two keys
+    ######################################################################
+    $delete_rsp
+      = $bucket_obj->delete_keys( map { $_->{key} } @key_list[ ( 0, 1 ) ] );
+
+    ok( $delete_rsp, 'delete_keys() response' );
+
+    $response = $bucket_obj->list
+      or die $s3->err . ': ' . $s3->errstr;
+
+    is(
+      scalar @{ $response->{keys} },
+      -2 + scalar(@key_list),
+      'delete list of keys'
+    );
+
+    shift @key_list;
+    shift @key_list;
+
+    ######################################################################
+    # delete array of keys - next two keys
+    #####################################################################
+    $delete_rsp
+      = $bucket_obj->delete_keys( map { $_->{key} } @key_list[ ( 0, 1 ) ] );
+
+    ok( $delete_rsp, 'delete_keys() response' );
+
+    $response = $bucket_obj->list
+      or die $s3->err . ': ' . $s3->errstr;
+
+    is(
+      scalar @{ $response->{keys} },
+      -2 + scalar(@key_list),
+      'delete array of keys'
+    );
+
+    shift @key_list;
+    shift @key_list;
+
+    ######################################################################
+    # callback - last two keys
+    ######################################################################
+    $delete_rsp = $bucket_obj->delete_keys(
+      sub {
+        my $key = shift @key_list;
+        return ( $key->{key} );
+      }
+    );
+
+    ok( $delete_rsp, 'delete_keys() response' );
+
+    $response = $bucket_obj->list
+      or die $s3->err . ': ' . $s3->errstr;
+
+    is( scalar @{ $response->{keys} }, 0, 'delete keys from callback' )
+      or diag( Dumper( [ response => $response, key_list => \@key_list ] ) );
+
+    #
+    # delete multiple keys from bucket
+    ######################################################################
+  }
+
+  SKIP: {
+    if ( $ENV{AMAZON_S3_KEEP_BUCKET} ) {
+      skip 'keeping bucket', 1;
+    }
+
+    ok( $bucket_obj->delete_bucket(), 'delete bucket' );
+  }
 }
 
 # see more docs in Amazon::S3::Bucket
 
 # local test methods
+########################################################################
 sub is_request_response_code {
+########################################################################
   my ( $url, $code, $message ) = @_;
+
   my $request = HTTP::Request->new( 'GET', $url );
 
-  #warn $request->as_string();
   my $response = $s3->ua->request($request);
 
   is( $response->code, $code, $message )
-    or diag( Dumper($response) );
+    or diag( Dumper( [ response_code => $response ] ) );
+
+  return;
 }
 
+########################################################################
 sub like_acl_allusers_read {
-  my ( $bucketobj, $keyname ) = @_;
+########################################################################
+  my ( $bucket_obj, $keyname ) = @_;
 
-  my $message = acl_allusers_read_message( 'like', @_ );
+  my $message = acl_allusers_read_message( 'like', $bucket_obj, $keyname );
 
-  my $acl = $bucketobj->get_acl($keyname);
+  my $acl = $bucket_obj->get_acl($keyname);
 
-  like( $acl, qr(AllUsers.+READ), $message )
-    or diag( Dumper [$acl] );
+  like( $acl, qr/AllUsers.+READ/xsm, $message )
+    or diag( Dumper( [ acl => $acl ] ) );
 
+  return;
 }
 
+########################################################################
 sub unlike_acl_allusers_read {
-  my ( $bucketobj, $keyname ) = @_;
-  my $message = acl_allusers_read_message( 'unlike', @_ );
-  unlike( $bucketobj->get_acl($keyname), qr(AllUsers.+READ), $message );
+########################################################################
+  my ( $bucket_obj, $keyname ) = @_;
+
+  my $message = acl_allusers_read_message( 'unlike', $bucket_obj, $keyname );
+
+  my $acl = $bucket_obj->get_acl($keyname);
+
+  unlike( $bucket_obj->get_acl($keyname), qr/AllUsers.+READ/xsm, $message )
+    or diag( Dumper( [ acl => $acl ] ) );
+
+  return;
 }
 
+########################################################################
 sub acl_allusers_read_message {
-  my ( $like_or_unlike, $bucketobj, $keyname ) = @_;
-  my $message = $like_or_unlike . "_acl_allusers_read: " . $bucketobj->bucket;
-  $message .= " - $keyname" if $keyname;
+########################################################################
+  my ( $like_or_unlike, $bucket_obj, $keyname ) = @_;
+
+  my $message = sprintf '%s_acl_allusers_read: %s', $like_or_unlike,
+    $bucket_obj->bucket;
+
+  if ($keyname) {
+    $message .= " - $keyname";
+  }
+
   return $message;
 }
 
+########################################################################
 sub acl_xml_from_acl_short {
-  my $acl_short = shift || 'private';
+########################################################################
+  my ($acl_short) = @_;
 
-  my $public_read = '';
-  if ( $acl_short eq 'public-read' ) {
-    $public_read = qq~
-            <Grant>
-                <Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:type="Group">
-                    <URI>http://acs.amazonaws.com/groups/global/AllUsers</URI>
-                </Grantee>
-                <Permission>READ</Permission>
-            </Grant>
-        ~;
-  }
+  $acl_short //= 'private';
 
-  return qq~<?xml version="1.0" encoding="UTF-8"?>
-    <AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-        <Owner>
-            <ID>$OWNER_ID</ID>
-            <DisplayName>$OWNER_DISPLAYNAME</DisplayName>
-        </Owner>
-        <AccessControlList>
-            <Grant>
-                <Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:type="CanonicalUser">
-                    <ID>$OWNER_ID</ID>
-                    <DisplayName>$OWNER_DISPLAYNAME</DisplayName>
-                </Grantee>
-                <Permission>FULL_CONTROL</Permission>
-            </Grant>
-            $public_read
-        </AccessControlList>
-    </AccessControlPolicy>~;
+  my $public_read
+    = $acl_short eq 'public-read' ? $PUBLIC_READ_POLICY : $EMPTY;
+
+  my $policy = <<"END_OF_POLICY";
+<?xml version="1.0" encoding="UTF-8"?>
+<AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+    <Owner>
+        <ID>$OWNER_ID</ID>
+        <DisplayName>$OWNER_DISPLAYNAME</DisplayName>
+    </Owner>
+    <AccessControlList>
+        <Grant>
+            <Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:type="CanonicalUser">
+                <ID>$OWNER_ID</ID>
+                <DisplayName>$OWNER_DISPLAYNAME</DisplayName>
+            </Grantee>
+            <Permission>FULL_CONTROL</Permission>
+        </Grant>
+        $public_read
+    </AccessControlList>
+</AccessControlPolicy>
+END_OF_POLICY
+
+  return $policy;
 }
 
+1;

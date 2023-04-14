@@ -9,7 +9,6 @@ use Config::Tiny;
 use DBI;
 use File::Slurp;
 use Config::Tiny;
-use Hash::Merge;
 use IPC::Cmd qw[ run ];
 use Text::ANSITable;
 use File::Spec;
@@ -22,11 +21,11 @@ CAPE::Utils - A helpful library for with CAPE.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 1.0.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '1.0.1';
 
 =head1 SYNOPSIS
 
@@ -85,7 +84,7 @@ sub new {
 			enforce_timeout     => 0,
 			subnets             => '192.168.0.0/16,127.0.0.1/8,::1/128,172.16.0.0/12,10.0.0.0/8',
 			apikey              => '',
-			auth_by_IP_only     => 1,
+			auth                => 'ip',
 			incoming            => '/malware/client-incoming',
 			incoming_json       => '/malware/incoming-json',
 		},
@@ -96,7 +95,12 @@ sub new {
 		$config = $base_config;
 	}
 	else {
-		$config = %{ merge( $base_config, $config ) };
+		my @to_merge = keys( %{ $base_config->{_} } );
+		foreach my $item (@to_merge) {
+			if ( !defined( $config->{_}->{$item} ) ) {
+				$config->{_}->{$item} = $base_config->{_}->{$item};
+			}
+		}
 	}
 
 	# init the object
@@ -1231,22 +1235,40 @@ Checks the remote connection.
 
 Two variablesare required, API key and IP.
 
+    $results=$cape_utils->check_remote(apikey=>$apikey, remote=>$remote_ip);
+    if (!$results){
+        print "unauthed\n";
+        return;
+    }
+
 =cut
 
 sub check_remote {
 	my ( $self, %opts ) = @_;
 
 	# if we don't have a API key, we can only auth via IP
-	if ( !$self->{config}->{_}->{auth_by_IP_only} && !defined( $opts{apikey} ) ) {
+	if ( ( $self->{config}->{_}->{auth} ne 'ip' || $self->{config}->{_}->{auth} ne 'either' )
+		&& !defined( $opts{apikey} ) )
+	{
 		return 0;
 	}
 
 	# make sure the API key is what it is expecting if we are not using IP only
-	if (   !$self->{config}->{_}->{auth_by_IP_only}
+	if (   $self->{config}->{_}->{auth} ne 'ip'
 		&& defined( $opts{apikey} )
 		&& $opts{apikey} ne $self->{config}->{_}->{apikey} )
 	{
-		return 0;
+		# don't return if it is either as IP may still go off
+		if ( $self->{config}->{_}->{auth} ne 'either' ) {
+			return 0;
+		}
+	}
+
+	# if we have a apikey and method is set to apikey or either, we are good to return true
+	if ( defined( $opts{apikey} )
+		&& ( $self->{config}->{_}->{auth} ne 'apikey' || $self->{config}->{_}->{auth} ne 'either' ) )
+	{
+		return 1;
 	}
 
 	# can't do anything else with out a IP
@@ -1333,10 +1355,14 @@ default with CAPEv2 in it's default config.
     timeout=200
     # default value for enforce timeout for submit
     enforce_timeout=0
+    # how to auth for mojo_cape_submit
+    # ip = match against subnets
+    # apikey = use apikey
+    # both = require both to match
+    # either = either may work
+    auth=ip
     # the api key to for with mojo_cape_submit
     #apikey=
-    # auth by IP only for mojo_cape_submit
-    auth_by_IP_only=1
     # comma seperated list of allowed subnets for mojo_cape_submit
     subnets=192.168.0.0/16,127.0.0.1/8,::1/128,172.16.0.0/12,10.0.0.0/8
     # incoming dir to use for mojo_cape_submit

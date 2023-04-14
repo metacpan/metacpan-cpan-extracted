@@ -1,10 +1,10 @@
+use v5.26;
 use utf8;
 
 package Distribution::Cooker;
-use v5.26;
 use experimental qw(signatures);
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 use Carp                  qw(croak carp);
 use Cwd;
@@ -89,7 +89,6 @@ This uses L<Mojo::Template> to render the templates, and various
 settings. The values from C<template_vars> are passed to the templates
 and its keys are available as named variables.
 
-
 By default, these tag settings are used because these characters
 are unlikely to appear in Perl code:
 
@@ -113,10 +112,11 @@ F<CVS> directories.
 sub cook ( $self ) {
 	my $dir = lc $self->dist;
 
-	make_path( $dir ) or croak "mkdir $dir: $!";
-	chdir $dir        or croak "chdir $dir: $!";
+	my $cwd = Cwd::getcwd;
 
-	my $cwd = cwd();
+	make_path( $dir );
+	croak "<$dir> does not exist" unless -d $dir;
+	chdir $dir        or croak "chdir $dir: $!";
 
 	my $files = $self->template_files;
 
@@ -569,7 +569,7 @@ sub get_config ( $class ) {
 		my $config = Config::IniFiles->new( -file => $file );
 
 		foreach my $row ( @table ) {
-			my( $config_name, $section, $field ) = @_;
+			my( $config_name, $section, $field ) = @$row;
 			$hash->{$config_name} = $config->val( $section, $field )
 				if $config->exists( $section, $field );
 			}
@@ -588,7 +588,7 @@ C<prompt> cannot work.
 
 =cut
 
-sub prompt ( $class, @args ) {
+sub prompt ( @args ) {
 	return unless is_interactive();
 
 	print join "\n", @args;

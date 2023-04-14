@@ -2,7 +2,7 @@ NAME
     Date::ICal - Perl extension for ICalendar date objects.
 
 VERSION
-    $Rev: 368 $
+    $Revision: 680 $
 
 SYNOPSIS
         use Date::ICal;
@@ -11,7 +11,7 @@ SYNOPSIS
         $ical = Date::ICal->new( epoch => time );
         $ical = Date::ICal->new( year => 1964,
             month => 10, day => 16, hour => 16,
-            min => 12, sec => 47, tz => '0530' );
+            min => 12, sec => 47 );
 
         $hour = $ical->hour;
         $year = $ical->year;
@@ -26,8 +26,8 @@ SYNOPSIS
 
         $ical += 'P6DT12H';
 
-        $duration = $ical1 - $ical2;
-        $ical3 = $ical1 - $duration;
+        $duration = $ical - $ical2;
+        $ical3 = $ical - $duration;
 
 DESCRIPTION
     Date::ICal talks the ICal date format, and is intended to be a base
@@ -35,15 +35,16 @@ DESCRIPTION
     also.
 
 AUTHOR
-    Rich Bowen
+    Rich Bowen, and the Reefknot team. Alas, Reefknot is no more. See
+    <https://github.com/houseabsolute/DateTime.pm/wiki> for more modern and
+    accurate modules.
 
-    Last touched by $Author: rbowen $
+    Last touched by $Author: michal-josef-spacek $
 
 METHODS
     Date::ICal has the following methods available:
 
   new
-
     A new Date::ICal object can be created with any valid ICal string:
 
         my $ical = Date::ICal->new( ical => '19971024T120000' );
@@ -85,7 +86,7 @@ METHODS
 
         my $ical = Date::ICal->new( ical => '19971024T120000',
                                     offset => "-0800");
-   
+
     Note that as of version 1.44, new() tries to be intelligent about
     figuring out your local time zone. If you enter a time that's not
     *explicitly* in UTC, it looks at the environment variable $TZ, if it
@@ -93,7 +94,6 @@ METHODS
     complain.
 
   ical
-
         $ical_string = $ical->ical;
 
     Retrieves, or sets, the date on the object, using any valid ICal
@@ -107,7 +107,6 @@ METHODS
         $ical_string = $ical->ical( offset => '+0545' );
 
   epoch
-
         $epoch_time = $ical->epoch;
     
         $ical->epoch( 98687431 );
@@ -123,21 +122,18 @@ METHODS
     may not be in synch. And, of course, the same will go for any subclasses
     of this class.
 
-  _offset_to_seconds
-
+  offset_to_seconds
         $seconds_plus_or_minus = offset_to_seconds($offset);
-   
+
     Changes -0600 to -21600. Not object method, no side-effects.
 
-  _offset_from_seconds
-
+  offset_from_seconds
         $seconds_plus_or_minus = offset_from_seconds($offset_in_seconds);
-   
+
     Changes -18000 (seconds) to -0600 (hours, minutes). Not object method,
     no side-effects.
 
   offset
-
         $offset = $ical->offset;
    
         # We need tests for these.  
@@ -155,12 +151,12 @@ METHODS
     BE CAREFUL about using this function on objects that were initialized
     with an offset. If you started an object with:
 
-        my $d = new(ical=>'19700101120000', offset=>'+0100'); 
+        my $d = new(ical=>'19700101120000', offset=>'+0100');
 
     and you then call:
 
-        $d->offset('+0200'); 
-    
+        $d->offset('+0200');
+
     you'll be saying "Yeah, I know I *said* it was in +0100, but really I
     want it to be in +0200 now and forever." Which may be your intention, if
     you're trying to transpose a whole set of dates to another timezone---
@@ -168,9 +164,8 @@ METHODS
     method. Either way will work.
 
   add
-
         $self->add( year => 3, month => 2, week => 1, day => 12,
-                    hour => 1, minute => 34, sec => 59 );
+                    hour => 1, min => 34, sec => 59 );
         $date->add( duration => 'P1WT1H1M1S' ); # add 1 wk, 1 hr, 1 min, and 1 sec
 
     Adds a duration to a Date::ICal object.
@@ -182,7 +177,7 @@ METHODS
 
     If a value is undefined or omitted, 1 is assumed:
 
-        $ical->add( 'minute' ); # add a minute
+        $ical->add( 'min' ); # add a minute
 
     The result will be normalized. That is, the output time will have
     meaningful values, rather than being 48:73 pm on the 34th of
@@ -213,7 +208,6 @@ METHODS
     result in Mar 30.
 
   add_overload
-
         $date = $date1 + $duration;
 
     Where $duration is either a duration string, or a Date::ICal::Duration
@@ -225,14 +219,12 @@ METHODS
     of +=, modifies the existing object.
 
   duration_value
-
     Given a duration string, this function returns the number of days,
     seconds, and months represented by that duration. In that order. Seems
     odd to me. This should be considered an internal function, and you
     should expect the API to change in the very near future.
 
   subtract
-
       $duration = $date1 - $date2;
 
     Subtract one Date::ICal object from another to give a duration - the
@@ -253,16 +245,14 @@ METHODS
     If $X is a duration string, or a Date::ICal::Diration object, then $d
     will be an object in the same class as $date1;
 
-        $newdate = $date - $duration; 
+        $newdate = $date - $duration;
 
   clone
-
         $copy = $date->clone;
 
     Returns a replica of the date object, including all attributes.
 
   compare
-
         $cmp = $date1->compare($date2);
 
         @dates = sort {$a->compare($b)} @dates;
@@ -271,7 +261,6 @@ METHODS
     returns -1 if $a < $b, 0 if $a == $b, 1 if $a > $b.
 
   day
-
         my $day = $date->day;
 
     Returns the day of the month.
@@ -279,7 +268,6 @@ METHODS
     Day is in the range 1..31
 
   month
-
         my $month = $date->month;
 
     Returns the month of the year.
@@ -287,20 +275,17 @@ METHODS
     Month is returned as a number in the range 1..12
 
   year
-
         my $year = $date->year;
 
     Returns the year.
 
   jd2greg
-
         ($year, $month, $day) = jd2greg( $jd );
 
         Convert number of days on or after Jan 1, 1 CE (Gregorian) to
         gregorian year,month,day.
 
   greg2jd
-
         $jd = greg2jd( $year, $month, $day );
 
         Convert gregorian year,month,day to days on or after Jan 1, 1 CE
@@ -309,7 +294,6 @@ METHODS
         or > last day of month.
 
   days_this_year
-
       $yday = Date::ICal::days_this_year($day, $month, $year);
 
     Returns the number of days so far this year. Analogous to the yday
@@ -317,13 +301,11 @@ METHODS
     epoch.
 
   day_of_week
-
         my $day_of_week = $date->day_of_week
 
     Returns the day of week as 0..6 (0 is Sunday, 6 is Saturday).
 
   hour
-
         my $hour = $date->hour
 
     Returns the hour of the day.
@@ -331,7 +313,6 @@ METHODS
     Hour is in the range 0..23
 
   min
-
         my $min = $date->min;
 
     Returns the minute.
@@ -339,7 +320,6 @@ METHODS
     Minute is in the range 0..59
 
   sec
-
         my $sec = $date->sec;
 
     Returns the second.
@@ -348,7 +328,6 @@ METHODS
     seconds. But I'm not sure if we're going to go there.
 
   julian
-
       my $jd = $date->jd;
 
     Returns a listref, containing two elements. The date as a julian day,
@@ -364,6 +343,7 @@ METHODS
 TODO
     - add gmtime and localtime methods, perhaps?
     - Fix the INTERNALS file so that it actually reflects reality
+
 INTERNALS
     Please see the file INTERNALS for discussion on the internals.
 
@@ -376,7 +356,7 @@ AUTHOR
 SEE ALSO
     datetime@perl.org mailing list
 
-    http://datetime.perl.org/
+    <https://github.com/houseabsolute/DateTime.pm/wiki>
 
     Time::Local
 
@@ -387,7 +367,7 @@ NAME
     Date::ICal::Duration - durations in iCalendar format, for math purposes.
 
 VERSION
-    $Revision: 368 $
+    $Revision: 1.61 $
 
 SYNOPSIS
         use Date::ICal::Duration;
@@ -416,13 +396,15 @@ SYNOPSIS
         $d->as_seconds ();   # returns just seconds
         $d->as_elements ();  # returns a hash of elements, like the accessors above
         $d->as_ical();       # returns an iCalendar duration string
-    
+
 DESCRIPTION
     This is a trivial class for representing duration objects, for doing
     math in Date::ICal
 
 AUTHOR
-    Rich Bowen, and the Reefknot team.
+    Rich Bowen, and the Reefknot team. Alas, Reefknot is no more. See
+    <https://github.com/houseabsolute/DateTime.pm/wiki> or
+    <https://metacpan.org/> for more modern modules.
 
     Last touched by $Author: rbowen $
 
@@ -430,7 +412,6 @@ METHODS
     Date::ICal::Duration has the following methods available:
 
   new
-
     A new Date::ICal::Duration object can be created with an iCalendar
     string :
 
@@ -438,7 +419,7 @@ METHODS
         # 3 weeks, 2 days, positive direction
         my $ical = Date::ICal::Duration->new ( ical => '-P6H3M30S' );
         # 6 hours, 3 minutes, 30 seconds, negative direction
-    
+
     Or with a number of seconds:
 
         my $ical = Date::ICal::Duration->new ( seconds => "3600" );
@@ -458,23 +439,20 @@ METHODS
     The sign defaults to "+", but "+" and "-" are legal values.
 
   sign, weeks, days, hours, minutes, seconds
-
     Read-only accessors for the elements of the object.
 
   as_seconds
-
     Returns the duration in raw seconds.
 
     WARNING -- this folds in the number of days, assuming that they are
     always 86400 seconds long (which is not true twice a year in areas that
     honor daylight savings time). If you're using this for date arithmetic,
-    consider using the *add()* method from a the Date::ICal manpage object,
-    as this will behave better. Otherwise, you might experience some error
-    when working with times that are specified in a time zone that observes
-    daylight savings time.
+    consider using the *add()* method from a Date::ICal object, as this will
+    behave better. Otherwise, you might experience some error when working
+    with times that are specified in a time zone that observes daylight
+    savings time.
 
   as_days
-
         $days = $duration->as_days;
 
     Returns the duration as a number of days. Not to be confused with the
@@ -487,12 +465,10 @@ METHODS
     days.
 
   as_ical
-
     Return the duration in an iCalendar format value string (e.g.,
     "PT2H0M0S")
 
   as_elements
-
     Returns the duration as a hashref of elements.
 
 INTERNALS
@@ -508,32 +484,26 @@ INTERNALS
     future versions.
 
   _set_from_ical ($self, $duration_string)
-
     Converts a RFC2445 DURATION format string to the internal storage
     format.
 
   _parse_ical_string ($string)
-
     Regular expression for parsing iCalendar into usable values.
 
   _set_from_components ($self, $hashref)
-
     Converts from a hashref to the internal storage format. The hashref can
     contain elements "sign", "weeks", "days", "hours", "minutes", "seconds".
 
   _set_from_ical ($self, $num_seconds)
-
     Sets internal data storage properly if we were only given seconds as a
     parameter.
 
   $self->_hms();
-
     Return an arrayref to hours, minutes, and second components, or undef if
     nsecs is undefined. If given an arrayref, computes the new nsecs value
     for the duration.
 
   $self->_wd()
-
     Return an arrayref to weeks and day components, or undef if ndays is
     undefined. If Given an arrayref, computs the new ndays value for the
     duration.

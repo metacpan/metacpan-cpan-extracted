@@ -2,25 +2,27 @@
 use strict;
 use warnings;
 
-use 5.016000;
+use 5.018;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "ease-of-use wrapper for ODF::lpOD",
+  "ABSTRACT" => "fix and enhance ODF::lpOD",
   "AUTHOR" => "Jim Avera",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "ODF-lpOD_Helper",
   "LICENSE" => "unrestricted",
-  "MIN_PERL_VERSION" => "5.016000",
+  "MIN_PERL_VERSION" => "5.018",
   "NAME" => "ODF::lpOD_Helper",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Data::Dumper::Interp" => 0,
+    "Data::Dumper::Interp" => "5.013",
     "Exporter" => 0,
+    "List::Util" => 0,
     "ODF::lpOD" => 0,
+    "Scalar::Util" => 0,
     "constant" => 0,
     "feature" => 0,
     "parent" => 0,
@@ -28,10 +30,23 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Archive::Zip" => 0,
+    "Cwd" => 0,
+    "Data::Dumper" => 0,
     "Encode" => 0,
+    "English" => 0,
+    "File::Basename" => 0,
+    "File::Copy" => 0,
+    "File::Path" => 0,
+    "File::Spec" => 0,
+    "File::Spec::Functions" => 0,
+    "File::Temp" => "0.23",
     "FindBin" => 0,
+    "Getopt::Long" => 0,
+    "Guard" => 0,
     "Import::Into" => 0,
     "Test::More" => "0.98",
+    "Time::HiRes" => 0,
     "autovivification" => 0,
     "bytes" => 0,
     "indirect" => 0,
@@ -40,7 +55,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.000",
+  "VERSION" => "3.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,14 +63,29 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::Zip" => 0,
   "Carp" => 0,
-  "Data::Dumper::Interp" => 0,
+  "Cwd" => 0,
+  "Data::Dumper" => 0,
+  "Data::Dumper::Interp" => "5.013",
   "Encode" => 0,
+  "English" => 0,
   "Exporter" => 0,
+  "File::Basename" => 0,
+  "File::Copy" => 0,
+  "File::Path" => 0,
+  "File::Spec" => 0,
+  "File::Spec::Functions" => 0,
+  "File::Temp" => "0.23",
   "FindBin" => 0,
+  "Getopt::Long" => 0,
+  "Guard" => 0,
   "Import::Into" => 0,
+  "List::Util" => 0,
   "ODF::lpOD" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => "0.98",
+  "Time::HiRes" => 0,
   "autovivification" => 0,
   "bytes" => 0,
   "constant" => 0,

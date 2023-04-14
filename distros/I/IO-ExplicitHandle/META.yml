@@ -17,7 +17,7 @@ configure_requires:
 conflicts:
   B::Hooks::OP::Check: '< 0.19'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,9 +26,9 @@ name: IO-ExplicitHandle
 provides:
   IO::ExplicitHandle:
     file: lib/IO/ExplicitHandle.pm
-    version: '0.001'
+    version: '0.002'
 requires:
-  Lexical::SealRequireHints: '0.008'
+  Lexical::SealRequireHints: '0.012'
   XSLoader: '0'
   perl: '5.006'
   strict: '0'
@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ExplicitHandle
   license: http://dev.perl.org/licenses/
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

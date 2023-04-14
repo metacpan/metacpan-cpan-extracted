@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_remove;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Moo;
 use Catmandu::Fix::Has;
@@ -11,19 +11,23 @@ use Scalar::Util 'reftype';
 
 has path => (
     fix_arg => 1,
-    coerce  => sub { PICA::Path->new( $_[0] ) }
+    coerce  => sub { $_[0] ? PICA::Path->new( $_[0] ) : undef },
+    default => sub { undef }
 );
 
 sub fix {
     my ( $self, $data ) = @_;
     return $data if reftype $data->{record} ne 'ARRAY';
 
-    # TODO: put this into PICA::Data
+    # TODO: put this into PICA::Data?
 
-    my $path   = $self->path;
+    my $path   = $self->path ? PICA::Path->new( $self->path ) : 0;
     my $fields = $data->{record};
 
-    if ( $path->subfields ) {
+    if ( !$path ) {
+        $fields = [];
+    }
+    elsif ( $path->subfields ) {
         my $subfield_regex = $path->{subfield};
         $fields = [];
 
@@ -60,17 +64,18 @@ Catmandu::Fix::pica_remove - remove PICA (sub)fields
 
 =head1 SYNOPSIS
 
-    # delete all the 041A subject fields
+    # remove all 041A subject fields
     pica_remove(041A)
 
     # remove all $9 subfields from all level 0 fields
     pica_remove('0...$9')
-
-=head1 DESCRIPTION
+    
+    # remove all fields, resulting in an empty record
+    pica_remove()
 
 =head1 FUNCTIONS
 
-=head2 pica_remove(PATH)
+=head2 pica_remove([PATH])
 
 Delete all (sub)fields from the PICA record, referenced by a L<PICA Path expression|https://format.gbv.de/query/picapath>.
 Fields are also removed if all subfields have been removed.

@@ -36,7 +36,7 @@ sub     set_group
                 {
                 alert "Range not valid"; return FALSE;
                 }
-        unless ($start->before($end))
+        if ($start->after($end))
                 {
                 alert "Start element is not before end element";
                 return FALSE;

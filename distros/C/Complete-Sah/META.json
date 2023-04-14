@@ -60,7 +60,7 @@
    "provides" : {
       "Complete::Sah" : {
          "file" : "lib/Complete/Sah.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Sah"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

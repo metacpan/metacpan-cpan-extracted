@@ -2,31 +2,27 @@ package CXC::Number::Sequence::Linear;
 
 # ABSTRACT: Numeric Sequence with Equal Spacing
 
+use v5.28;
 use strict;
 use warnings;
-
-use feature ':5.24';
-use experimental 'lexical_subs';
-
-use Carp;
 
 use Hash::Wrap 0.11 {
     -as        => 'wrap_attrs_ro',
     -immutable => 1,
-    -exists    => 'has'
+    -exists    => 'has',
 };
+
 use Types::Standard qw( Optional Bool );
 use CXC::Number::Sequence::Failure -all;
 use CXC::Number::Sequence::Types -all;
 use CXC::Number::Sequence::Utils qw( buildargs_factory );
 
-use enum
-  qw( BITMASK: MIN MAX SOFT_MIN SOFT_MAX CENTER NELEM SPACING RANGEW ALIGN FORCE_EXTREMA );
+use enum qw( BITMASK: MIN MAX SOFT_MIN SOFT_MAX CENTER NELEM SPACING RANGEW ALIGN FORCE_EXTREMA );
 
 
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 extends 'CXC::Number::Sequence';
 
@@ -51,13 +47,12 @@ my %ArgMap = (
     rangew        => { type => Optional [BigPositiveNum], flag => RANGEW },
     soft_max      => { type => Optional [BigNum],         flag => SOFT_MAX },
     soft_min      => { type => Optional [BigNum],         flag => SOFT_MIN },
-    force_extrema => { type => Optional [Bool], flag => FORCE_EXTREMA },
+    force_extrema => { type => Optional [Bool],           flag => FORCE_EXTREMA },
 );
 
 my sub build_sequence {
     my $attr = wrap_attrs_ro( shift );
-    my @seq
-      = map { $attr->min + $attr->spacing * $_ } 0 .. ( $attr->nelem - 1 );
+    my @seq  = map { $attr->min + $attr->spacing * $_ } 0 .. ( $attr->nelem - 1 );
 
     # make sure that the bounds exactly match what is specified if the
     # sequence is exactly covering [min,max], just in case roundoff error
@@ -73,10 +68,11 @@ my sub build_sequence {
 }
 
 # need the parens otherwise the => operator turns them into strings
+## no critic( ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions )
 my @ArgsCrossValidate = ( [
         MIN | MAX,
         sub {
-            parameter_constraint->throw( "min < max\n" )
+            parameter_constraint->throw( 'min < max' )
               unless $_->min < $_->max;
         },
     ],
@@ -84,7 +80,7 @@ my @ArgsCrossValidate = ( [
     [
         MIN | SOFT_MAX,
         sub {
-            parameter_constraint->throw( "min < soft_max\n" )
+            parameter_constraint->throw( 'min < soft_max' )
               unless $_->min < $_->soft_max;
         },
     ],
@@ -92,7 +88,7 @@ my @ArgsCrossValidate = ( [
     [
         SOFT_MIN | MAX,
         sub {
-            parameter_constraint->throw( "soft_min < max" )
+            parameter_constraint->throw( 'soft_min < max' )
               unless $_->soft_min < $_->max;
         },
     ],
@@ -100,7 +96,7 @@ my @ArgsCrossValidate = ( [
     [
         SOFT_MIN | SOFT_MAX,
         sub {
-            parameter_constraint->throw( "soft_min < soft_max" )
+            parameter_constraint->throw( 'soft_min < soft_max' )
               unless $_->soft_min < $_->soft_max;
         },
     ],
@@ -108,7 +104,7 @@ my @ArgsCrossValidate = ( [
     [
         CENTER | SOFT_MIN,
         sub {
-            parameter_constraint->throw( "soft_min < center\n" )
+            parameter_constraint->throw( 'soft_min < center' )
               unless $_->soft_min < $_->center;
         },
     ],
@@ -116,7 +112,7 @@ my @ArgsCrossValidate = ( [
     [
         CENTER | SOFT_MAX,
         sub {
-            parameter_constraint->throw( "center < soft_max\n" )
+            parameter_constraint->throw( 'center < soft_max' )
               unless $_->center < $_->soft_max;
         },
     ],
@@ -124,7 +120,7 @@ my @ArgsCrossValidate = ( [
     [
         CENTER | MIN,
         sub {
-            parameter_constraint->throw( "min < center\n" )
+            parameter_constraint->throw( 'min < center' )
               unless $_->min < $_->center;
         },
     ],
@@ -132,7 +128,7 @@ my @ArgsCrossValidate = ( [
     [
         CENTER | MAX,
         sub {
-            parameter_constraint->throw( "center < max\n" )
+            parameter_constraint->throw( 'center < max' )
               unless $_->center < $_->max;
         },
     ],
@@ -159,8 +155,8 @@ my %ArgBuild;
 
     #----------------------------------------
 
-# The sequence covers [ MIN= (max-min) / 2 - (nelem - 1 ) * spacing, MIN + ( nelem - 1 ) * spacing ]
-# nelem = ceil( ( max - min ) / spacing )
+    # The sequence covers [ MIN= (max-min) / 2 - (nelem - 1 ) * spacing, MIN + ( nelem - 1 ) * spacing ]
+    # nelem = ceil( ( max - min ) / spacing )
 
     ( MIN | MAX | SPACING ),
     sub {
@@ -187,7 +183,7 @@ my %ArgBuild;
                     min     => $_->min,
                     max     => $_->min + ( $_->nelem - 1 ) * $_->spacing,
                     nelem   => $_->nelem,
-                    spacing => $_->spacing
+                    spacing => $_->spacing,
                 } ) };
     },
 
@@ -204,8 +200,8 @@ my %ArgBuild;
                 } ) };
     },
 
-#----------------------------------------
-# The sequence exactly covers [ MIN = center - spacing * (nelem-1) / 2, MIN + nelem * spacing ]
+    #----------------------------------------
+    # The sequence exactly covers [ MIN = center - spacing * (nelem-1) / 2, MIN + nelem * spacing ]
 
     ( CENTER | SPACING | NELEM ),
     sub {
@@ -252,7 +248,7 @@ my %ArgBuild;
                     min     => $_->center - ( $nelem - 1 ) / 2 * $_->spacing,
                     max     => $_->center + ( $nelem - 1 ) / 2 * $_->spacing,
                     nelem   => $nelem,
-                    spacing => $_->spacing
+                    spacing => $_->spacing,
                 } ) };
 
     },
@@ -311,7 +307,7 @@ my %ArgBuild;
                     min     => $_->min,
                     max     => $_->min + $nelem * $_->spacing,
                     nelem   => $nelem,
-                    spacing => $_->spacing
+                    spacing => $_->spacing,
                 } ) };
     },
 
@@ -326,7 +322,7 @@ my %ArgBuild;
                     min     => $_->max - ( $nelem - 1 ) * $_->spacing,
                     max     => $_->max,
                     nelem   => $nelem,
-                    spacing => $_->spacing
+                    spacing => $_->spacing,
                 } ) };
     },
 
@@ -353,15 +349,15 @@ my %ArgBuild;
 
     ( MIN | MAX | NELEM | ALIGN ),
     sub {
-        parameter_constraint->throw( "nelem > 2" )
+        parameter_constraint->throw( 'nelem > 2' )
           unless $_->nelem > 2;
 
         my ( $P, $f ) = $_->align->@*;
         my $spacing = ( $_->max - $_->min ) / ( $_->nelem - 2 );
         my $E0      = $P - $f * $spacing;
         my $imin    = ( ( $_->min - $E0 ) / $spacing )->bfloor;
-        my $imax    = ( ( $_->max - $E0 ) / $spacing )->bceil;
-        my $min     = $E0 + $imin * $spacing;
+        # my $imax    = ( ( $_->max - $E0 ) / $spacing )->bceil;
+        my $min = $E0 + $imin * $spacing;
 
         {
             elements => build_sequence( {
@@ -408,7 +404,7 @@ CXC::Number::Sequence::Linear - Numeric Sequence with Equal Spacing
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -427,7 +423,7 @@ class for additional methods.
 
 Sequence extrema may be specified or may be calculated from other
 parameters, such as spacing, the number of elements, or a sequence center,
-and the sequence may be aligned on a fiducial value,
+and the sequence may be aligned on a fiducial value.
 
 Sequence extrema  may be  I<hard>, indicating that  the sequence  must exactly
 cover the  extrema, or I<soft>, indicating  that the sequence may  cover a
@@ -585,7 +581,7 @@ If an unknown parameter is passed, C<new> will throw an exception of class
 C<CXC::Number::Sequence::Failure::parameter::unknown>.
 
 If a parameter value is illegal (e.g., a negative spacing),
-or a combination of values is illegal ( e.g. C<< min > max >>, C<new>
+or a combination of values is illegal ( e.g. C<< min > max >> ), C<new>
 will throw an exception of class
 C<CXC::Number::Sequence::Failure::parameter::constraint>.
 
@@ -593,7 +589,7 @@ C<CXC::Number::Sequence::Failure::parameter::constraint>.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

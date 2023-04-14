@@ -1,26 +1,28 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::CCS::MatrixOps;
 
-@EXPORT_OK  = qw( PDL::PP ccs_matmult2d_sdd PDL::PP ccs_matmult2d_zdd PDL::PP ccs_vnorm  ccs_vcos_zdd PDL::PP _ccs_vcos_zdd PDL::PP ccs_vcos_pzd );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(ccs_matmult2d_sdd ccs_matmult2d_zdd ccs_vnorm ccs_vcos_zdd _ccs_vcos_zdd ccs_vcos_pzd );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::CCS::MatrixOps::VERSION = 1.23.20;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.23.22';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::MatrixOps $VERSION;
 
 
 
 
+
+
+
+#line 20 "ccsmatops.pd"
 
 #use PDL::CCS::Version;
 use strict;
@@ -40,26 +42,20 @@ PDL::CCS::MatrixOps - Low-level matrix operations for compressed storage sparse 
  ## ... stuff happens
 
 =cut
-
-
-
-
-
-
+#line 46 "MatrixOps.pm"
 
 =head1 FUNCTIONS
-
-
 
 =cut
 
 
 
 
+
+#line 59 "ccsmatops.pd"
+
 *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
-
-
-
+#line 59 "MatrixOps.pm"
 
 =head2 ccs_matmult2d_sdd
 
@@ -71,7 +67,6 @@ PDL::CCS::MatrixOps - Low-level matrix operations for compressed storage sparse 
     zc(O);
     [o]c(O,N)
     )
-
 
 Two-dimensional matrix multiplication of a sparse index-encoded PDL
 $a() with a dense pdl $b(), with output to a dense pdl $c().
@@ -89,21 +84,18 @@ a $missinga()-row ("M") to an output column ("O"), i.e.
 
 $SIZE(Ndimsa) is assumed to be 2.
 
-
 =for bad
 
 ccs_matmult2d_sdd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *ccs_matmult2d_sdd = \&PDL::ccs_matmult2d_sdd;
+
 
 
 
@@ -119,7 +111,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
     [o]c(O,N)
     )
 
-
 Two-dimensional matrix multiplication of a sparse index-encoded PDL
 $a() with a dense pdl $b(), with output to a dense pdl $c().
 
@@ -130,21 +121,18 @@ built-in PDL::Primitive::matmult().
 "Missing" values in $a() are treated as zero.
 $SIZE(Ndimsa) is assumed to be 2.
 
-
 =for bad
 
 ccs_matmult2d_zdd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *ccs_matmult2d_zdd = \&PDL::ccs_matmult2d_zdd;
+
 
 
 
@@ -159,7 +147,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
     float+ [o]vnorm(M);
     ; int sizeM=>M)
 
-
 Computes the Euclidean lengths of each column-vector $a(i,*) of a sparse index-encoded pdl $a()
 of logical dimensions (M,N), with output to a dense piddle $vnorm().
 "Missing" values in $a() are treated as zero,
@@ -171,8 +158,6 @@ This is basically the same thing as:
 
 ... but should be must faster to compute for sparse index-encoded piddles.
 
-
-
 =for bad
 
 ccs_vnorm() always clears the bad-status flag on $vnorm().
@@ -182,12 +167,13 @@ ccs_vnorm() always clears the bad-status flag on $vnorm().
 
 
 
-
-
 *ccs_vnorm = \&PDL::ccs_vnorm;
 
 
 
+
+
+#line 235 "ccsmatops.pd"
 
 =pod
 
@@ -202,7 +188,6 @@ ccs_vnorm() always clears the bad-status flag on $vnorm().
     float+ [t]anorm(M);
     int sizeM=>M;
   )
-
 
 Computes the vector cosine similarity of a dense row-vector $b(N) with respect to each column $a(i,*)
 of a sparse index-encoded PDL $a() of logical dimensions (M,N), with output to a dense piddle
@@ -229,7 +214,6 @@ multiple $b() vectors simultaneously:
 
   $bx   = random($N, $NB);                   ##-- get $NB random vectors of size $N
   $vcos = ccs_vcos_zdd($ixa,$nza, $bx, $M);  ##-- $vcos is now ($M,$NB)
-
 
 =for bad
 
@@ -263,10 +247,7 @@ sub ccs_vcos_zdd {
 }
 
 *PDL::ccs_vcos_zdd = \&ccs_vcos_zdd;
-
-
-
-
+#line 251 "MatrixOps.pm"
 
 =head2 _ccs_vcos_zdd
 
@@ -291,9 +272,8 @@ Always clears the bad status flag on the output piddle $vcos.
 
 
 
-
-
 *_ccs_vcos_zdd = \&PDL::_ccs_vcos_zdd;
+
 
 
 
@@ -309,7 +289,6 @@ Always clears the bad status flag on the output piddle $vcos.
     anorm(M);
     float+ [o]vcos(M);)
 
-
 Computes the vector cosine similarity of a sparse index-encoded row-vector $b() of logical dimension (N)
 with respect to each column $a(i,*) a sparse Harwell-Boeing row-encoded PDL $a() of logical dimensions (M,N),
 with output to a dense piddle $vcos(M).
@@ -317,7 +296,6 @@ with output to a dense piddle $vcos(M).
 and magnitudes for $a() are passed in the obligatory parameter $anorm().
 Usually much faster than L<ccs_vcos_zdd()|/ccs_vcos_zdd> if a CRS pointer over logical dimension (N) is available
 for $a().
-
 
 =for bad
 
@@ -328,12 +306,13 @@ ccs_vcos_pzd() always clears the bad status flag on the output piddle $vcos.
 
 
 
-
-
 *ccs_vcos_pzd = \&PDL::ccs_vcos_pzd;
 
 
 
+
+
+#line 480 "ccsmatops.pd"
 
 ##---------------------------------------------------------------------
 =pod
@@ -357,7 +336,6 @@ of the former.
 
 =cut
 
-
 ##---------------------------------------------------------------------
 =pod
 
@@ -378,15 +356,8 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-
-
-
-;
-
-
+#line 360 "MatrixOps.pm"
 
 # Exit with OK status
 
 1;
-
-		   

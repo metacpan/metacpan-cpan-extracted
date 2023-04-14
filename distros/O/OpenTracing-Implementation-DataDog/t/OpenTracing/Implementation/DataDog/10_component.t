@@ -24,7 +24,8 @@ subtest "Setup the tracer" => sub {
     lives_ok {
         $global_tracer = Tracer->new(
             client => {
-                http_user_agent => $fake_user_agent
+                http_user_agent => $fake_user_agent,
+                span_buffer_threshold => 4,
             },
             default_resource_name  => __FILE__,
         )
@@ -77,12 +78,16 @@ subtest "Check the requests" => sub {
     cmp_deeply(
         \@structs =>
         [
-            [[ superhashof { name => 'two'   } ]],
-            [[ superhashof { name => 'one_a' } ]],
-            [[ superhashof { name => 'two'   } ]],
-            [[ superhashof { name => 'two'   } ]],
-            [[ superhashof { name => 'one_b' } ]],
-            [[ superhashof { name => 'zero'  } ]],
+            [[
+                ( superhashof { name => 'two'   } ),
+                ( superhashof { name => 'one_a' } ),
+                ( superhashof { name => 'two'   } ),
+                ( superhashof { name => 'two'   } ),
+            ]],
+            [[
+                ( superhashof { name => 'one_b' } ),
+                ( superhashof { name => 'zero'  } ),
+            ]],
         ],
         "Got the right spans in the expected order"
     );

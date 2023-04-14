@@ -40,12 +40,12 @@ BUGS
     Please report any bugs to
     <https://github.com/tobyink/p5-exporter-tiny/issues>.
 
-SUPPORT
-    IRC: support is available through in the *#moops* channel on irc.perl.org
-    <http://www.irc.perl.org/channels.html>.
-
 SEE ALSO
+    <https://exportertiny.github.io/>.
+
     Simplified interface to this module: Exporter::Shiny.
+
+    Less tiny version, with more features: Exporter::Almighty.
 
     Other interesting exporters: Sub::Exporter, Exporter.
 
@@ -53,7 +53,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
+    This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

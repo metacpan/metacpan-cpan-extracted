@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>

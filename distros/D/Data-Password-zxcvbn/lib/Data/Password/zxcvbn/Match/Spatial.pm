@@ -1,10 +1,9 @@
 package Data::Password::zxcvbn::Match::Spatial;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
-use Data::Password::zxcvbn::AdjacencyGraph;
 use Data::Password::zxcvbn::Combinatorics qw(nCk);
 use List::AllUtils qw(min);
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: match class for sequences of nearby keys
 
 
@@ -60,7 +59,10 @@ sub estimate_guesses {
 sub make {
     my ($class, $password, $opts) = @_;
     my $graphs = $opts->{graphs}
-        || \%Data::Password::zxcvbn::AdjacencyGraph::graphs; ## no critic (ProhibitPackageVars)
+        || do {
+            require Data::Password::zxcvbn::AdjacencyGraph;
+            \%Data::Password::zxcvbn::AdjacencyGraph::graphs; ## no critic (ProhibitPackageVars)
+        };
 
     my $length = length($password);
     my @matches = ();
@@ -184,7 +186,7 @@ Data::Password::zxcvbn::Match::Spatial - match class for sequences of nearby key
 
 =head1 VERSION
 
-version 1.0.6
+version 1.1.2
 
 =head1 DESCRIPTION
 

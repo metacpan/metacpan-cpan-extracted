@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <sys/time.h>
@@ -12,7 +15,7 @@ int32_t SPVM__Sys__Time__Timespec__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct timespec* st_tv = env->new_memory_stack(env, stack, sizeof(struct timespec));
   
-  void* obj_tv = env->new_pointer_by_name(env, stack, "Sys::Time::Timespec", st_tv, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_tv = env->new_pointer_object_by_name(env, stack, "Sys::Time::Timespec", st_tv, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
 
   stack[0].oval = obj_tv;

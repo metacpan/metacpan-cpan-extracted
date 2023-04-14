@@ -3,7 +3,7 @@ NAME
     Algorithm::CheckDigits)
 
 VERSION
-    This document describes version 0.001 of App::CheckDigitsUtils (from
+    This document describes version 0.002 of App::CheckDigitsUtils (from
     Perl distribution App-CheckDigitsUtils), released on 2023-01-28.
 
 SYNOPSIS
@@ -40,7 +40,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   method => *str*
+    *   method* => *str*
 
         (No description)
 
@@ -157,7 +157,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   method => *str*
+    *   method* => *str*
 
         (No description)
 

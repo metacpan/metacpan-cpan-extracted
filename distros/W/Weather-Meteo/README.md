@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -16,7 +16,7 @@ Version 0.04
 # DESCRIPTION
 
 Weather::Meteo provides an interface to open-meteo.com
-for historical weather data
+for historical weather data from 1940.
 
 # METHODS
 
@@ -71,6 +71,36 @@ Lots of thanks to the folks at [https://open-meteo.com](https://open-meteo.com).
 # BUGS
 
 # SEE ALSO
+
+Open Meteo API: [https://open-meteo.com/en/docs#api\_form](https://open-meteo.com/en/docs#api_form)
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Weather::Meteo
+
+You can also look for information at:
+
+- MetaCPAN
+
+    [https://metacpan.org/release/Weather-Meteo](https://metacpan.org/release/Weather-Meteo)
+
+- RT: CPAN's request tracker
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Weather-Meteo](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Weather-Meteo)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/Weather-Meteo](http://cpants.cpanauthors.org/dist/Weather-Meteo)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Weather-Meteo](http://matrix.cpantesters.org/?dist=Weather-Meteo)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=Weather-Meteo](http://deps.cpantesters.org/?module=Weather-Meteo)
 
 # LICENSE AND COPYRIGHT
 

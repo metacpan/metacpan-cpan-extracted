@@ -12,10 +12,10 @@ use English qw(-no_match_vars);
 ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 
 BEGIN {
-    plan tests => 11;
+    plan tests => 13;
 
-    use_ok 'JIP::DataPath', '0.042';
-};
+    use_ok 'JIP::DataPath', '0.043';
+}
 
 subtest 'Require some module' => sub {
     plan tests => 1;
@@ -35,7 +35,7 @@ subtest 'Require some module' => sub {
 subtest 'new(). exceptions' => sub {
     plan tests => 2;
 
-    my $done = eval { return JIP::DataPath->new; };
+    my $done = eval { return JIP::DataPath->new(); };
     if ($EVAL_ERROR) {
         like $EVAL_ERROR, qr{^Mandatory \s argument \s "document" \s is \s missing}x;
     }
@@ -46,14 +46,14 @@ subtest 'new(). exceptions' => sub {
 subtest 'new()' => sub {
     plan tests => 4;
 
-    my $o = JIP::DataPath->new(document => 42);
-    ok $o, 'got instance if JIP::DataPath';
+    my $sut = init_sut(42);
+    ok $sut, 'got instance of JIP::DataPath';
 
-    isa_ok $o, 'JIP::DataPath';
+    isa_ok $sut, 'JIP::DataPath';
 
-    can_ok $o, qw(new get get_new contains set perform path);
+    can_ok $sut, qw(new get get_new contains set perform path default_value is_default_value);
 
-    is $o->document, 42;
+    is $sut->document(), 42;
 };
 
 subtest 'get()' => sub {
@@ -62,11 +62,11 @@ subtest 'get()' => sub {
     subtest 'when document is not defined' => sub {
         plan tests => 3;
 
-        my $o = JIP::DataPath->new(document => undef);
+        my $sut = init_sut(undef);
 
-        is $o->get([qw()]),    undef;
-        is $o->get([qw(foo)]), undef;
-        is $o->get([qw(0)]),   undef;
+        is $sut->get( [qw()] ),    undef;
+        is $sut->get( [qw(foo)] ), undef;
+        is $sut->get( [qw(0)] ),   undef;
     };
 
     subtest 'when document is defined' => sub {
@@ -75,51 +75,51 @@ subtest 'get()' => sub {
         my $document = {
             foo => {
                 bar => [
-                    {wtf => 42},
+                    { wtf => 42 },
                 ],
             },
         };
 
-        my $o = JIP::DataPath->new(document => $document);
+        my $sut = init_sut($document);
 
-        is_deeply $o->get([qw()]),          $document;
-        is_deeply $o->get([qw(foo)]),       $document->{'foo'};
-        is_deeply $o->get([qw(foo bar)]),   $document->{'foo'}->{'bar'};
-        is_deeply $o->get([qw(foo bar 0)]), $document->{'foo'}->{'bar'}->[0];
+        is_deeply $sut->get( [qw()] ),          $document;
+        is_deeply $sut->get( [qw(foo)] ),       $document->{foo};
+        is_deeply $sut->get( [qw(foo bar)] ),   $document->{foo}->{bar};
+        is_deeply $sut->get( [qw(foo bar 0)] ), $document->{foo}->{bar}->[0];
 
-        is $o->get([qw(foo bar 0 wtf)]), $document->{'foo'}->{'bar'}->[0]->{'wtf'};
+        is $sut->get( [qw(foo bar 0 wtf)] ), $document->{foo}->{bar}->[0]->{wtf};
 
         # side effects
         is_deeply $document, {
             foo => {
                 bar => [
-                    {wtf => 42},
+                    { wtf => 42 },
                 ],
             },
         };
     };
 
-    subtest 'default_value' => sub {
+    subtest 'default value' => sub {
         plan tests => 9;
 
-        my $document = {foo => 'bar'};
+        my $document = { foo => 'bar' };
 
-        my $o = JIP::DataPath->new(document => $document);
+        my $sut = init_sut($document);
 
-        is_deeply $o->get([qw()]),     $document;
-        is_deeply $o->get([qw()], 42), $document;
+        is_deeply $sut->get( [qw()] ),                        $document;
+        is_deeply $sut->get( [qw()], $sut->default_value() ), $document;
 
-        is_deeply $o->get([qw(foo)]),     $document->{'foo'};
-        is_deeply $o->get([qw(foo)], 42), $document->{'foo'};
+        is_deeply $sut->get( [qw(foo)] ),     $document->{foo};
+        is_deeply $sut->get( [qw(foo)], 42 ), $document->{foo};
 
-        is_deeply $o->get([qw(foo bar)]),     undef;
-        is_deeply $o->get([qw(foo bar)], 42), 42;
+        is_deeply $sut->get( [qw(foo bar)] ),                        undef;
+        is_deeply $sut->get( [qw(foo bar)], $sut->default_value() ), $sut->default_value();
 
-        is_deeply $o->get([qw(foo bar 0)]),     undef;
-        is_deeply $o->get([qw(foo bar 0)], 42), 42;
+        is_deeply $sut->get( [qw(foo bar 0)] ),                        undef;
+        is_deeply $sut->get( [qw(foo bar 0)], $sut->default_value() ), $sut->default_value();
 
         # side effects
-        is_deeply $document, {foo => 'bar'};
+        is_deeply $document, { foo => 'bar' };
     };
 };
 
@@ -131,13 +131,13 @@ subtest 'get_new()' => sub {
 
         my $document = undef;
 
-        my $o = JIP::DataPath->new(document => $document)->get_new([]);
+        my $sut = init_sut($document)->get_new( [] );
 
-        isa_ok $o, 'JIP::DataPath';
+        isa_ok $sut, 'JIP::DataPath';
 
-        is $o->get([qw()]),    undef;
-        is $o->get([qw(foo)]), undef;
-        is $o->get([qw(0)]),   undef;
+        is $sut->get( [qw()] ),    undef;
+        is $sut->get( [qw(foo)] ), undef;
+        is $sut->get( [qw(0)] ),   undef;
     };
 
     subtest 'when document is defined' => sub {
@@ -146,22 +146,22 @@ subtest 'get_new()' => sub {
         my $document = {
             foo => {
                 bar => [
-                    {wtf => 42},
+                    { wtf => 42 },
                 ],
             },
         };
 
-        my $o = JIP::DataPath->new(document => $document)->get_new([qw(foo bar)]);
+        my $sut = init_sut($document)->get_new( [qw(foo bar)] );
 
-        is_deeply $o->get([qw()]),      $document->{'foo'}->{'bar'};
-        is_deeply $o->get([qw(0)]),     $document->{'foo'}->{'bar'}->[0];
-        is_deeply $o->get([qw(0 wtf)]), $document->{'foo'}->{'bar'}->[0]->{'wtf'};
+        is_deeply $sut->get( [qw()] ),      $document->{foo}->{bar};
+        is_deeply $sut->get( [qw(0)] ),     $document->{foo}->{bar}->[0];
+        is_deeply $sut->get( [qw(0 wtf)] ), $document->{foo}->{bar}->[0]->{wtf};
 
         # side effects
         is_deeply $document, {
             foo => {
                 bar => [
-                    {wtf => 42},
+                    { wtf => 42 },
                 ],
             },
         };
@@ -170,28 +170,28 @@ subtest 'get_new()' => sub {
     subtest 'when path_parts is empty' => sub {
         plan tests => 3;
 
-        my $document = {foo => 'bar'};
+        my $document = { foo => 'bar' };
 
-        my $o = JIP::DataPath->new(document => $document)->get_new([]);
+        my $sut = init_sut($document)->get_new( [] );
 
-        isa_ok $o, 'JIP::DataPath';
+        isa_ok $sut, 'JIP::DataPath';
 
-        is_deeply $o->get([]),        $document;
-        is_deeply $o->get([qw(foo)]), $document->{'foo'};
+        is_deeply $sut->get( [] ),        $document;
+        is_deeply $sut->get( [qw(foo)] ), $document->{foo};
     };
 
-    subtest 'default_value' => sub {
+    subtest 'default value' => sub {
         plan tests => 3;
 
-        my $document = {foo => 'bar'};
+        my $document = { foo => 'bar' };
 
-        my $o = JIP::DataPath->new(document => $document);
+        my $sut = init_sut($document);
 
-        is $o->get_new([qw(not exists)]),     undef;
-        is $o->get_new([qw(not exists)], 42), 42;
+        is $sut->get_new( [qw(not exists)] ),     undef;
+        is $sut->get_new( [qw(not exists)], 42 ), 42;
 
         # side effects
-        is_deeply $document, {foo => 'bar'};
+        is_deeply $document, { foo => 'bar' };
     };
 };
 
@@ -203,11 +203,11 @@ subtest 'contains()' => sub {
 
         my $document = undef;
 
-        my $o = JIP::DataPath->new(document => $document);
+        my $sut = init_sut($document);
 
-        is $o->contains([qw()]),    1;
-        is $o->contains([qw(foo)]), 0;
-        is $o->contains([qw(0)]),   0;
+        is $sut->contains( [qw()] ),    1;
+        is $sut->contains( [qw(foo)] ), 0;
+        is $sut->contains( [qw(0)] ),   0;
     };
 
     subtest 'when document is defined' => sub {
@@ -216,24 +216,24 @@ subtest 'contains()' => sub {
         my $document = {
             foo => {
                 bar => [
-                    {wtf => 42},
+                    { wtf => 42 },
                 ],
             },
         };
 
-        my $o = JIP::DataPath->new(document => $document);
+        my $sut = init_sut($document);
 
-        is $o->contains([qw()]),              1;
-        is $o->contains([qw(foo)]),           1;
-        is $o->contains([qw(foo bar)]),       1;
-        is $o->contains([qw(foo bar 0)]),     1;
-        is $o->contains([qw(foo bar 0 wtf)]), 1;
+        is $sut->contains( [qw()] ),              1;
+        is $sut->contains( [qw(foo)] ),           1;
+        is $sut->contains( [qw(foo bar)] ),       1;
+        is $sut->contains( [qw(foo bar 0)] ),     1;
+        is $sut->contains( [qw(foo bar 0 wtf)] ), 1;
 
         # side effects
         is_deeply $document, {
             foo => {
                 bar => [
-                    {wtf => 42},
+                    { wtf => 42 },
                 ],
             },
         };
@@ -246,69 +246,69 @@ subtest 'set()' => sub {
     subtest 'when document is not defined' => sub {
         plan tests => 6;
 
-        my $o = JIP::DataPath->new(document => undef);
+        my $sut = init_sut(undef);
 
-        is $o->set([]),  1;
-        is $o->document, undef;
+        is $sut->set( [] ),  1;
+        is $sut->document(), undef;
 
-        is $o->set([], undef), 1;
-        is $o->document,       undef;
+        is $sut->set( [], undef ), 1;
+        is $sut->document(),       undef;
 
-        is $o->set([], 42), 1;
-        is $o->document,    42;
+        is $sut->set( [], 42 ), 1;
+        is $sut->document(),    42;
     };
 
     subtest 'when document is a HASH' => sub {
         plan tests => 10;
 
-        my $o = JIP::DataPath->new(document => undef);
+        my $sut = init_sut(undef);
 
         {
-            my $result = $o->set([], {foo => undef});
+            my $result = $sut->set( [], { foo => undef } );
             is $result, 1;
 
-            is_deeply $o->document, {foo => undef};
+            is_deeply $sut->document(), { foo => undef };
         }
         {
-            my $result = $o->set([qw(foo)], {bar => undef});
+            my $result = $sut->set( [qw(foo)], { bar => undef } );
             is $result, 1;
 
-            is_deeply $o->document, {
+            is_deeply $sut->document(), {
                 foo => {
                     bar => undef,
                 },
             };
         }
         {
-            my $result = $o->set([qw(foo bar)], []);
+            my $result = $sut->set( [qw(foo bar)], [] );
             is $result, 1;
 
-            is_deeply $o->document, {
+            is_deeply $sut->document(), {
                 foo => {
                     bar => [],
                 },
             };
         }
         {
-            my $result = $o->set([qw(foo bar)], [{wtf => undef}]);
+            my $result = $sut->set( [qw(foo bar)], [ { wtf => undef } ] );
             is $result, 1;
 
-            is_deeply $o->document, {
+            is_deeply $sut->document(), {
                 foo => {
                     bar => [
-                        {wtf => undef},
+                        { wtf => undef },
                     ],
                 },
             };
         }
         {
-            my $result = $o->set([qw(foo bar 0)], {wtf => 42});
+            my $result = $sut->set( [qw(foo bar 0)], { wtf => 42 } );
             is $result, 1;
 
-            is_deeply $o->document, {
+            is_deeply $sut->document(), {
                 foo => {
                     bar => [
-                        {wtf => 42},
+                        { wtf => 42 },
                     ],
                 },
             };
@@ -319,27 +319,29 @@ subtest 'set()' => sub {
 subtest 'perform()' => sub {
     plan tests => 4;
 
-    my $o = JIP::DataPath->new(document => {
-        foo => {
-            bar => [
-                {wtf => 42},
-            ],
+    my $sut = init_sut(
+        {
+            foo => {
+                bar => [
+                    { wtf => 42 },
+                ],
+            },
         },
-    });
+    );
 
     subtest 'perform get()' => sub {
         plan tests => 3;
 
         {
-            my $result = $o->perform('get', [qw(foo bar 0 wtf)]);
+            my $result = $sut->perform( 'get', [qw(foo bar 0 wtf)] );
             is $result, 42;
         }
         {
-            my $result = $o->perform('get', [qw(tratata)]);
+            my $result = $sut->perform( 'get', [qw(tratata)] );
             is $result, undef;
         }
         {
-            my $result = $o->perform('get', [qw(tratata)], 42);
+            my $result = $sut->perform( 'get', [qw(tratata)], 42 );
             is $result, 42;
         }
     };
@@ -347,34 +349,68 @@ subtest 'perform()' => sub {
     subtest 'perform set()' => sub {
         plan tests => 1;
 
-        my $result = $o->perform('set', [qw(foo bar 0 wtf)], 100_500);
+        my $result = $sut->perform( 'set', [qw(foo bar 0 wtf)], 100_500 );
         is $result, 1;
     };
 
     subtest 'perform contains()' => sub {
         plan tests => 1;
 
-        my $result = $o->perform('contains', [qw(foo bar 0 wtf)]);
+        my $result = $sut->perform( 'contains', [qw(foo bar 0 wtf)] );
         is $result, 1;
     };
 
-    is_deeply $o->document, {
+    is_deeply $sut->document(), {
         foo => {
             bar => [
-                {wtf => 100_500},
+                { wtf => 100_500 },
             ],
         },
     };
 };
 
+subtest 'default_value()' => sub {
+    my $sut = init_sut();
+
+    is $sut->default_value(), 'JIP::DataPath::default_value', 'object method';
+    is $sut->default_value(), JIP::DataPath::default_value(), 'class method';
+};
+
+subtest 'is_default_value()' => sub {
+    my $sut = init_sut();
+
+    my $default_value = $sut->default_value();
+
+    my @tests = (
+        { value => undef,  result => 0, name => 'undefined' },
+        { value => q{},    result => 0, name => 'empty string' },
+        { value => [],     result => 0, name => 'arrayref' },
+        { value => {},     result => 0, name => 'hashref' },
+        { value => \42,    result => 0, name => 'scalarref' },
+        { value => qr{42}, result => 0, name => 'regexp' },
+        { value => 42,     result => 0, name => 'random number' },
+        { value => '42',   result => 0, name => 'random string' },
+
+        { value => $default_value, result => 1, name => 'default_value' },
+    );
+
+    foreach my $test (@tests) {
+        is(
+            $sut->is_default_value( $test->{value} ),
+            $test->{result},
+            $test->{name},
+        );
+    }
+};
+
 subtest 'path()' => sub {
     plan tests => 2;
 
-    my $o = JIP::DataPath::path(42);
+    my $sut = JIP::DataPath::path(42);
 
-    isa_ok $o, 'JIP::DataPath';
+    isa_ok $sut, 'JIP::DataPath';
 
-    is $o->document, 42;
+    is $sut->document(), 42;
 };
 
 subtest '_accessor()' => sub {
@@ -386,14 +422,14 @@ subtest '_accessor()' => sub {
                 wtf => 42,
             },
             bar => [
-                [11, 22],
+                [ 11, 22 ],
             ],
         };
     };
 
     my $document = $build_document->();
 
-    my $o = JIP::DataPath->new(document => $document);
+    my $sut = init_sut($document);
 
     my @tests = (
         {
@@ -409,7 +445,7 @@ subtest '_accessor()' => sub {
         {
             path     => [qw(foo wtf)],
             contains => 1,
-            context  => $document->{'foo'},
+            context  => $document->{foo},
         },
         {
             path     => [qw(bar)],
@@ -419,17 +455,17 @@ subtest '_accessor()' => sub {
         {
             path     => [qw(bar 0)],
             contains => 1,
-            context  => $document->{'bar'},
+            context  => $document->{bar},
         },
         {
             path     => [qw(bar 0 0)],
             contains => 1,
-            context  => $document->{'bar'}->[0],
+            context  => $document->{bar}->[0],
         },
         {
             path     => [qw(bar 0 1)],
             contains => 1,
-            context  => $document->{'bar'}->[0],
+            context  => $document->{bar}->[0],
         },
         {
             path     => [qw(1 wtf 1 wtf)],
@@ -444,19 +480,27 @@ subtest '_accessor()' => sub {
     );
 
     foreach my $test (@tests) {
-        my ($contains, $context) = $o->_accessor($test->{'path'});
+        my ( $contains, $context ) = $sut->_accessor( $test->{path} );
+
         is(
             $contains,
-            $test->{'contains'},
+            $test->{contains},
             sprintf(
                 'contains "%s"',
-                join(q{/}, @{ $test->{'path'} }),
+                join( q{/}, @{ $test->{path} } ),
             ),
         );
-        is_deeply $context,  $test->{'context'};
+
+        is_deeply $context, $test->{context};
     }
 
     # side effects
-    is_deeply $o->document, $build_document->();
+    is_deeply $sut->document(), $build_document->();
 };
+
+sub init_sut {
+    my ($document) = @ARG;
+
+    return JIP::DataPath->new( document => $document );
+}
 

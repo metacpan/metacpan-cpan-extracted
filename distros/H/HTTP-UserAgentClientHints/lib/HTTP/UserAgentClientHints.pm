@@ -4,7 +4,7 @@ use warnings;
 use HTTP::UserAgentClientHints::BrandVersion;
 use HTTP::UserAgentClientHints::Util;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $HTTP_HEADER_PREFIX = 'Sec-CH-UA';
 
@@ -17,6 +17,7 @@ my @FIELDS = qw/
     Model
     Full-Version-List
     Full-Version
+    Platform-Version
 /;
 
 # Build getters
@@ -159,6 +160,10 @@ To get the value of Sec-CH-UA-Mobile
 
 To get the value of Sec-CH-UA-Platform
 
+=head3 platform_version
+
+To get the value of Sec-CH-UA-Platform-Version
+
 =head3 arch
 
 To get the value of Sec-CH-UA-Arch
@@ -179,6 +184,7 @@ To get the value of Sec-CH-UA-Full-Version-List as an object of L<HTTP::UserAgen
 
 To get the value of Sec-CH-UA-Full-Version
 
+
 =head2 Getters for Sec-CH-UA* raw values
 
 =head3 ua_raw
@@ -186,6 +192,8 @@ To get the value of Sec-CH-UA-Full-Version
 =head3 mobile_raw
 
 =head3 platform_raw
+
+=head3 platform_version_raw
 
 =head3 arch_raw
 
@@ -208,7 +216,7 @@ To get a string for C<Accept-CH> header in order to request UA-CH. By default, t
 
 =begin html
 
-<a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/README.pod"><img src="https://img.shields.io/badge/Version-0.04-green?style=flat"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/actions"><img src="https://github.com/bayashi/HTTP-UserAgentClientHints/workflows/main/badge.svg?_t=1645096718"/></a> <a href="https://coveralls.io/r/bayashi/HTTP-UserAgentClientHints"><img src="https://coveralls.io/repos/bayashi/HTTP-UserAgentClientHints/badge.png?_t=1645096718&branch=main"/></a>
+<a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/README.pod"><img src="https://img.shields.io/badge/Version-0.05-green?style=flat"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/HTTP-UserAgentClientHints/actions"><img src="https://github.com/bayashi/HTTP-UserAgentClientHints/workflows/main/badge.svg?_t=1681289447"/></a> <a href="https://coveralls.io/r/bayashi/HTTP-UserAgentClientHints"><img src="https://coveralls.io/repos/bayashi/HTTP-UserAgentClientHints/badge.png?_t=1681289447&branch=main"/></a>
 
 =end html
 

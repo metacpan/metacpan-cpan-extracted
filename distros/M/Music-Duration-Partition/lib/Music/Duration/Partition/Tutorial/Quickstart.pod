@@ -1,0 +1,131 @@
+package Music::Duration::Partition::Tutorial::Quickstart;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Music::Duration::Partition::Tutorial::Quickstart
+
+=head1 VERSION
+
+version 0.0814
+
+=head1 Setup
+
+=head2 Import Modules
+
+  use MIDI::Util qw(setup_score);
+  use Music::Duration::Partition ();
+  use Music::Scales qw(get_scale_MIDI);
+
+=head2 Get a Score
+
+  my $score = setup_score();
+
+=head2 Construct an object
+
+  my $mdp = Music::Duration::Partition->new(
+      size    => 8, # 2 measures in 4/4
+      pool    => [qw(hn dqn qn en)],
+      verbose => 1,
+  );
+
+More attributes may be set, but we'll leave that for the advanced
+tutorial.
+
+=head1 Phrases
+
+=head2 A single motif
+
+  my $a_motif = $mdp->motif;
+  # e.g. ['qn','en','en','hn','qn','qn','dqn','en']
+
+A "motif" is (usually) a short phrase that is used in the development
+or progression of a piece of music.
+
+For this module, a motif is an ordered set of rhythmic durations.
+
+=head2 Multiple motifs
+
+  my @motifs = $mdp->motifs(4);
+
+Return a set of motifs.
+
+=head1 Pitches and Voices
+
+=head2 Define pitches
+
+  my @pitches = get_scale_MIDI('C', 4, 'major');
+
+Use the scale method to get a set of pitches in the key of C major, in
+the fourth octave.
+
+=head2 Collect voices
+
+  my @voices;
+
+  for my $motif (@motifs) {
+      my @notes;
+
+      for my $i (@$motif) {
+          push @notes, $pitches[ int rand @pitches ];
+      }
+
+      push @voices, \@notes;
+  }
+
+Here the voices to be played, are collected and correspond directly to
+the motifs.
+
+=head1 Finish
+
+=head2 Add notes to the score
+
+  for my $i (1 .. 4) {
+      for my $n (0 .. $#motifs) {
+          $mdp->add_to_score($score, $motifs[$n], $voices[$n]);
+      }
+  }
+
+Loop over the indices of the motifs and voices, adding each to the
+score, repeated four times.
+
+=head2 And Write
+
+  $score->write_score('duration-partition.mid');
+
+Write the score out to a MIDI file.
+
+=head1 MIDI Playback
+
+Use the venerable command-line program,
+L<timidity++|https://timidity.sourceforge.net/|>,
+which is likely available through your package manager (e.g. apt,
+homebrew). You can also use the excellent, cross platform program,
+L<VLC|https://www.videolan.org/vlc/|>.
+
+  > timidity duration-partition.mid
+
+Voila!
+
+=head1 Advanced
+
+Next is the L<Music::Duration::Partition::Tutorial::Advanced>
+tutorial.
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019-2023 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

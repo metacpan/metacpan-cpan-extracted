@@ -1,6 +1,6 @@
 package OpenTracing::Role::Span;
 
-our $VERSION = 'v0.85.0';
+our $VERSION = 'v0.86.0';
 
 
 
@@ -226,6 +226,8 @@ sub get_parent_span_id {
 # those are used
 
 
+
+sub is_root_span { ! shift->get_parent_span_id() }
 
 # _set_context
 #

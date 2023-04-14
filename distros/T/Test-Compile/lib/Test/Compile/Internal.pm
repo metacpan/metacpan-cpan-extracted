@@ -3,7 +3,8 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = version->declare("v3.1.0");
+use version; our $VERSION = version->declare("v3.2.2");
+use File::Find;
 use File::Spec;
 use Test::Builder;
 use IPC::Open3 ();
@@ -85,7 +86,7 @@ sub all_pm_files_ok {
     my $ok = 1;
     for my $file ( $self->all_pm_files(@dirs) ) {
         my $testok = $self->pm_file_compiles($file);
-	$ok = $testok ? $ok : 0;
+        $ok = $testok ? $ok : 0;
         $test->ok($testok, "$file compiles");
     }
     return $ok;
@@ -109,7 +110,7 @@ sub all_pl_files_ok {
     my $ok = 1;
     for my $file ( $self->all_pl_files(@dirs) ) {
         my $testok = $self->pl_file_compiles($file);
-	$ok = $testok ? $ok : 0;
+        $ok = $testok ? $ok : 0;
         $test->ok($testok, "$file compiles");
     }
     return $ok;
@@ -144,24 +145,23 @@ extension.
 If you provide a list of C<@dirs>, it'll use that as a list of files to process, or
 directories to search for perl modules.
 
-If you don't provide C<dirs>, it'll search for perl modules in the F<blib> directory,
-unless that directory doesn't exist, in which case it'll search the F<lib> directory.
+If you don't provide C<dirs>, it'll search for perl modules in the F<blib/lib> directory,
+if that directory exists, otherwise it'll search the F<lib> directory.
 
 Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
-
-The order of the files returned is machine-dependent. If you want them
-sorted, you'll have to sort them yourself.
 
 =cut
 
 sub all_pm_files {
     my ($self, @dirs) = @_;
 
-    @dirs = @dirs ? @dirs : _pm_starting_points();
+    @dirs = @dirs ? @dirs : $self->_default_locations('lib');
 
     my @pm;
     for my $file ( $self->_find_files(@dirs) ) {
-        push @pm, $file if $file =~ /\.pm$/;
+        if ( $self->_perl_module($file) ) {
+            push @pm, $file;
+        }
     }
     return @pm;
 }
@@ -175,33 +175,22 @@ If you provide a list of C<@dirs>, it'll use that as a list of files to process,
 directories to search for perl scripts.
 
 If you don't provide C<dirs>, it'll search for perl scripts in the F<blib/script/> 
-directory, or if that doesn't exist, the F<script/> directory, or if that doesn't exist,
-the F<bin/> directory.
+and F<blib/bin/> directories if F<blib> exists, otherwise it'll search the F<script/>
+and F<bin/> directories
 
 Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
-
-The order of the files returned is machine-dependent. If you want them
-sorted, you'll have to sort them yourself.
 
 =cut
 
 sub all_pl_files {
     my ($self, @dirs) = @_;
 
-    @dirs = @dirs ? @dirs : _pl_starting_points();
+    @dirs = @dirs ? @dirs : $self->_default_locations('script', 'bin');
 
     my @pl;
     for my $file ( $self->_find_files(@dirs) ) {
-        if ( $file =~ /\.p(?:l|sgi)$/i ) {
-            # Files with .pl or .psgi extensions are perl scripts
+        if ( $self->_perl_script($file) ) {
             push @pl, $file;
-        }
-        elsif ( $file =~ /(?:^[^.]+$)/ ) {
-            # Files with no extension, but a perl shebang are perl scripts
-            my $shebang = $self->_read_shebang($file);
-            if ( $shebang =~ m/perl/ ) {
-                push @pl, $file;
-            }
         }
     }
     return @pl;
@@ -240,16 +229,6 @@ access to some of its methods.
 
 =over 4
 
-=item C<done_testing()>
-
-Declares that you are done testing, no more tests will be run after this point.
-
-=cut
-sub done_testing {
-    my ($self, @args) = @_;
-    $self->{test}->done_testing(@args);
-}
-
 =item C<ok($test, $name)>
 
 Your basic test. Pass if C<$test> is true, fail if C<$test> is false. Just
@@ -259,6 +238,17 @@ like C<Test::Simple>'s C<ok()>.
 sub ok {
     my ($self, @args) = @_;
     $self->{test}->ok(@args);
+}
+
+=item C<done_testing()>
+
+Declares that you got to the end of your test plan, no more tests will be run after
+this point.
+
+=cut
+sub done_testing {
+    my ($self, @args) = @_;
+    $self->{test}->done_testing(@args);
 }
 
 =item C<plan(tests =E<gt> $count)>
@@ -321,7 +311,7 @@ sub _run_command {
 
     my $output;
     for my $handle ( $stdout, $stderr ) {
-	if ( $handle ) {
+        if ( $handle ) {
             while ( my $line = <$handle> ) {
                 push @$output, $line;
             }
@@ -339,28 +329,25 @@ sub _run_command {
 sub _find_files {
     my ($self, @searchlist) = @_;
 
-    my @output;
-    for my $file (@searchlist) {
-        if (defined($file) && -f $file) {
-            push @output, $file;
-        } elsif (defined($file) && -d $file) {
-            local *DH;
-            opendir DH, $file or next;
-            my @newfiles = readdir DH;
-            closedir DH;
-            @newfiles = File::Spec->no_upwards(@newfiles);
-            @newfiles = grep { $_ ne "CVS" && $_ ne ".svn" && $_ ne ".git" } @newfiles;
-            for my $newfile (@newfiles) {
-                my $filename = File::Spec->catfile($file, $newfile);
-                if (-f $filename) {
-                    push @output, $filename;
-                } else {
-                    push @searchlist, File::Spec->catdir($file, $newfile);
-                }
+    my @filelist;
+    my $addFile = sub {
+        my ($fname) = @_;
+
+        if ( -f $fname ) {
+            if ( !($fname =~ m/CVS|\.svn|\.git/) ) {
+                push @filelist, $fname;
             }
         }
+    };
+
+    for my $item ( @searchlist ) {
+        $addFile->($item);
+        if ( -d $item ) {
+            no warnings 'File::Find';
+            find({wanted => sub{$addFile->($File::Find::name)}, no_chdir => 1}, $item);
+        }
     }
-    return @output;
+    return (sort @filelist);
 }
 
 # Check the syntax of a perl file
@@ -372,8 +359,8 @@ sub _perl_file_compiles {
         return 0;
     }
 
-    my @inc = ('blib/lib', @INC);
-    my $taint = $self->_is_in_taint_mode($file);
+    my @inc = (File::Spec->catdir("blib", "lib"), @INC);
+    my $taint = $self->_taint_mode($file);
     my $command = join(" ", (qq{"$^X"}, (map { qq{"-I$_"} } @inc), "-c$taint", $file));
     if ( $self->verbose() ) {
         $self->{test}->diag("Executing: " . $command);
@@ -390,17 +377,19 @@ sub _perl_file_compiles {
     return $compiles;
 }
 
-# Where do we expect to find perl modules?
-sub _pm_starting_points {
-    return 'blib' if -e 'blib';
-    return 'lib';
-}
+# Where do we expect to find perl files?
+sub _default_locations {
+    my ($self, @dirs) = @_;
 
-# Where do we expect to find perl programs?
-sub _pl_starting_points {
-    return 'blib/script' if -e 'blib/script';
-    return 'script' if -e 'script';
-    return 'bin'    if -e 'bin';
+    my @locations = ();
+    my $prefix = -e 'blib' ? "blib" : ".";
+    for my $dir ( @dirs ) {
+        my $location = File::Spec->catfile($prefix, $dir);
+        if ( -e $location ) {
+            push @locations, $location;
+        }
+    }
+    return @locations;
 }
 
 # Extract the shebang line from a perl program
@@ -415,7 +404,7 @@ sub _read_shebang {
 }
 
 # Should the given file be checked with taint mode on?
-sub _is_in_taint_mode {
+sub _taint_mode {
     my ($self, $file) = @_;
 
     my $shebang = $self->_read_shebang($file);
@@ -424,6 +413,33 @@ sub _is_in_taint_mode {
         $taint = $1;
     }
     return $taint;
+}
+
+# Does this file look like a perl script?
+sub _perl_script {
+    my ($self, $file) = @_;
+
+    # Files with .pl or .psgi extensions are perl scripts
+    if ( $file =~ /\.p(?:l|sgi)$/i ) {
+        return 1;
+    }
+
+    # Files with no extension, but a perl shebang are perl scripts
+    if ( $file =~ /(?:^[^.]+$)/ ) {
+        my $shebang = $self->_read_shebang($file);
+        if ( $shebang =~ m/perl/ ) {
+            return 1;
+        }
+    }
+}
+
+# Does this file look like a perl module?
+sub _perl_module {
+    my ($self, $file) = @_;
+
+    if ( $file =~ /\.pm$/ ) {
+        return 1;
+    }
 }
 
 1;
@@ -436,7 +452,7 @@ Evan Giles, C<< <egiles@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2021 by the authors.
+Copyright 2007-2023 by the authors.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -445,5 +461,8 @@ it under the same terms as Perl itself.
 
 L<Test::Strict> provides functions to ensure your perl files compile, with
 the added bonus that it will check you have used strict in all your files.
+
+L<Test::LoadAllModules> just handles modules, not script files, but has more
+fine-grained control.
 
 =cut

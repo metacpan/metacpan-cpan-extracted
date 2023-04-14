@@ -1,6 +1,6 @@
 package App::optex::textconv::msdoc;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use v5.14;
 use warnings;

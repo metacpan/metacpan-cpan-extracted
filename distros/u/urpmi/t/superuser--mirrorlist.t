@@ -10,11 +10,13 @@ BEGIN {
     if (is_mageia()) {
 	plan 'no_plan';
     } else {
-	plan skip_all => "Needs a Mageia specific patch that introduces Time::ZoneInfo->current_zone()";
+	plan skip_all => "Needs a Mageia specific patch that introduces Time::ZoneInfo->current_zone() as well as a mirrorlist API server";
     }
 }
 
 BEGIN { use_ok 'urpm::cfg' }
+
+need_one_valid_mirror();
 
 need_root_and_prepare();
 
@@ -32,3 +34,13 @@ if ($ENV{AUTHOR_TESTING}) {
     is(`rpm -q --qf '%{name}' --root $::pwd/root $name`, $name, "$name is installed");
 }
 urpmi_removemedia('-a');
+
+sub need_one_valid_mirror() {
+    require urpm;
+    require urpm::mirrors;
+    my @mirrors = urpm::mirrors::_list(urpm->new, urpm::mirrors::_MIRRORLIST());
+    if ($#mirrors == 0 && $mirrors[0]->{url} =~ m!mageia.fis.unb.br/distrib/!) {
+        warn ">> Only one unusable mirrors\n";
+	exit(0);
+    }
+}

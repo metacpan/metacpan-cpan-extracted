@@ -1,10 +1,12 @@
 package WWW::Mechanize::Chrome::Node;
 use strict;
+use 5.016; # __SUB__
 use Moo 2;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 use Carp qw( croak );
+use JSON;
 
 use Scalar::Util 'weaken';
 
@@ -19,7 +21,7 @@ WWW::Mechanize::Chrome::Node - represent a Chrome HTML node in Perl
 
 =cut
 
-our $VERSION = '0.68';
+our $VERSION = '0.70';
 
 =head1 MEMBERS
 
@@ -91,10 +93,7 @@ Another id of this node within Chrome
 
 has 'objectId' => (
     is => 'lazy',
-    default => sub( $self ) {
-        my $obj = $self->driver->send_message('DOM.resolveNode', nodeId => $self->nodeId)->get;
-        $obj->{object}->{objectId}
-    },
+    default => sub { $_[0]->_fetchObjectId()->get },
 );
 
 =head2 C<driver>
@@ -158,6 +157,10 @@ sub fetchNode( $class, %options ) {
             $driver->send_message( 'DOM.requestNode', objectId => $info{objectId} )
         })->then(sub( $info ) {
             %info = (%info, %$info);
+            $driver->send_message( 'DOM.describeNode', objectId => $info{objectId} )
+        })->then(sub( $info ) {
+            %info = (%info, %{$info->{node}}, nodeId => 0+$nodeId);
+
             Future->done( \%info );
         });
     };
@@ -181,16 +184,18 @@ sub fetchNode( $class, %options ) {
         my $node = {
             cachedNodeId => $nodeId,
             objectId => $body->{ objectId },
-            backendNodeId => $attr->{ backendNodeId },
+            backendNodeId => $body->{backendNodeId} || $attr->{ backendNodeId },
+            nodeId => $nodeId,
+            parentId => $body->{ parentId },
             attributes => {
                 @{ $attributes },
             },
             nodeName => $nodeName,
-            driver => $driver,
-            nodeId => $nodeId,
+            #driver => $driver,
             #mech => $s,
             #_generation => $s->_generation,
         };
+        $node->{driver} = $driver;
         my $n = $class->new( $node );
 
         # Fetch additional data into the object
@@ -208,13 +213,33 @@ sub fetchNode( $class, %options ) {
     });
 }
 
+sub _fetchObjectId( $self ) {
+    #warn "Realizing objectId";
+    if( $self->{objectId}) {
+        return Future->done( $self->{objectId} )
+    } else {
+        weaken(my $s=$self);
+        $self->driver->send_message('DOM.resolveNode', nodeId => 0+$self->nodeId)->then(sub( $obj ) {
+            $s->{objectId} = $obj->{object}->{objectId};
+            Future->done( $obj->{object}->{objectId} );
+        });
+    }
+}
 
 sub _fetchNodeId($self) {
-    $self->driver->send_message('DOM.requestNode', objectId => $self->objectId)->then(sub($d) {
-        #$self->backendNodeId( $d->{backendNodeId} );
-        $self->{nodeId} = 0+$d->{nodeId};
-        $self->cachedNodeId( 0+$d->{nodeId} );
-        Future->done( 0+$d->{nodeId} );
+    weaken( my $s = $self );
+    $self->_fetchObjectId->then(sub( $objectId ) {
+        $self->driver->send_message('DOM.requestNode', objectId => $objectId)
+    })->then(sub($d) {
+        if( ! exists $d->{node} ) {
+            # Ugh - that node has gone away before we could request it ...
+            Future->done( $d->{nodeId} );
+        } else {
+            $s->{backendNodeId} = 0+$d->{node}->{backendNodeId};
+            $s->{nodeId} = 0+$d->{node}->{nodeId} // 0+$s->{nodeId}; # keep old one ...
+            $s->cachedNodeId( 0+$d->{node}->{nodeId} // 0+$s->{nodeId} );
+            Future->done( $s->{nodeId} );
+        };
     });
 }
 
@@ -265,24 +290,80 @@ the current value of the attribute.
 
 =cut
 
-sub _fetch_attribute( $self, $attribute ) {
-    $self->driver->send_message('Runtime.getProperties',
-        objectId => $self->objectId,
+sub _false_to_undef( $val ) {
+    if( ref $val and ref $val eq 'JSON::PP::Boolean' ) {
+        $val = $val ? $val : undef;
+    }
+    return $val
+}
+
+sub _fetch_attribute_eval( $self, $attribute ) {
+    weaken(my $s=$self);
+    $self->_fetchObjectId
+    ->then( sub( $objectId ) {
+        $s->driver->send_message('Runtime.callFunctionOn',
+            functionDeclaration => '(o,a) => { console.log(o[a]); return o[a] }',
+            arguments => [ { objectId => $objectId }, { value => $attribute } ],
+            objectId => $objectId,
+            returnByValue => JSON::true
+        )
+    })
+    ->then(sub($res) {
+        $res = $res->{result}->{value};
+        return Future->done( _false_to_undef( $res ))
+    });
+}
+
+sub _fetch_attribute_attribute( $self, $attribute ) {
+    $self->driver->send_message('DOM.getAttributes',
+        nodeId => 0+$self->nodeId,
     )
-    ->then(sub( $res ) {
-        (my $result) = grep { $_->{name} eq $attribute } @{$res->{result}};
-        $result ||= {};
-        return Future->done( $result->{value}->{value} )
+    ->then(sub($_res) {
+        my %attr = @{ $_res->{attributes} };
+        my $res = $attr{ $attribute };
+        return Future->done( _false_to_undef( $res ))
+    });
+}
+
+sub _fetch_attribute_property( $self, $attribute ) {
+    $self->_fetchObjectId
+    ->then( sub( $objectId ) {
+    $self->driver->send_message('Runtime.getProperties',
+        objectId => $objectId,
+        #ownProperties => JSON::true,
+        #accessorPropertiesOnly => JSON::true,
+        #returnByValue => JSON::true
+    )})
+    ->then(sub($_res) {
+        (my $attr) = grep { $_->{name} eq $attribute } @{ $_res->{result} };
+        $attr //= {};
+        my $res = $attr->{value}->{value};
+        return Future->done( _false_to_undef( $res ))
+    });
+}
+
+sub _fetch_attribute( $self, $attribute ) {
+    weaken(my $s=$self);
+    my $attr = $s->_fetch_attribute_attribute( $attribute )->then(sub ($val) {
+        if( ! defined $val) {
+            my $attr = $s->_fetch_attribute_property( $attribute )->then(sub ($val) {
+                if( ! defined $val) {
+                    return $s->_fetch_attribute_eval( $attribute )
+                } else {
+                    return Future->done( $val )
+                }
+            })
+        } else {
+                return Future->done( $val )
+        }
     });
 }
 
 sub get_attribute_future( $self, $attribute, %options ) {
     my $s = $self;
     weaken $s;
-    if( exists $self->attributes->{ $attribute } and !$options{live}) {
-        return Future->done( $self->attributes->{ $attribute })
 
-    } elsif( $attribute eq 'innerHTML' ) {
+    if( $attribute eq 'innerHTML' ) {
         my $html = $s->get_attribute_future('outerHTML')
         ->then(sub( $html ) {
             # Strip first and last tag in a not so elegant way
@@ -294,14 +375,27 @@ sub get_attribute_future( $self, $attribute, %options ) {
 
     } elsif( $attribute eq 'outerHTML' ) {
         my $nid = $s->_fetchNodeId();
+        # If we only have a backendNodeId, use that
         my $html = $nid->then(sub( $nodeId ) {
-            $s->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
+            (my $key) = grep { $s->$_ } (qw(backendNodeId nodeId));
+            my $val;
+
+            if( ! $key ) {
+                $key = 'nodeId';
+                $val = 0+$nodeId;
+            } else {
+                $val = $self->$key;
+            };
+
+            #$s->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
+            $s->driver->send_message('DOM.getOuterHTML', $key => $val )
         })->then(sub( $res ) {
             Future->done( $res->{outerHTML} )
         });
         return $html
 
     } else {
+        #warn "Fetching '$attribute'";
         return $self->_fetch_attribute($attribute);
     }
 }
@@ -329,7 +423,7 @@ sub set_attribute_future( $self, $attribute, $value ) {
     if( defined $value ) {
         $r = $self->_fetchNodeId()
            ->then(sub( $nodeId ) {
-            $self->driver->send_message(
+            $s->driver->send_message(
                 'DOM.setAttributeValue',
                 name => $attribute,
                 value => ''.$value,
@@ -340,7 +434,7 @@ sub set_attribute_future( $self, $attribute, $value ) {
     } else {
         $r = $self->_fetchNodeId()
            ->then(sub( $nodeId ) {
-            $self->driver->send_message('DOM.removeAttribute',
+            $s->driver->send_message('DOM.removeAttribute',
                 name => $attribute,
                 nodeId => 0+$nodeId
             )
@@ -376,7 +470,27 @@ Returns the text of the node and the contained child nodes.
 =cut
 
 sub get_text( $self ) {
-    $self->get_attribute('textContent')
+    # We need to describe all the children and concatenate their
+    # contents to retrieve the text...
+
+    #$self->driver->send_message('DOM.describeNode',
+    #    nodeId => 0+$self->nodeId, depth => -1)->then(sub($info) {
+    #
+    #    my $text = '';
+    #
+    #    my $collect_text = sub( $n ) {
+    #        if( $n->{nodeType} == 3 ) {
+    #            $text .= $n->{nodeValue} // '';
+    #        };
+    #        for( $n->{children}->@* ) {
+    #            __SUB__->($_);
+    #        }
+    #    };
+    #    $collect_text->( $info->{node} );
+    #
+    #    Future->done( $text )
+    #})->get;
+    $self->get_attribute('innerText')
 }
 
 =head2 C<< ->set_text >>
@@ -392,7 +506,7 @@ sub set_text_future( $self, $value ) {
     weaken $s;
     my $nid = $self->_nodeId();
     $nid->then(sub( $nodeId ) {
-        $self->driver->send_message('DOM.setNodeValue', nodeId => 0+$nodeId, value => $value )
+        $s->driver->send_message('DOM.setNodeValue', nodeId => 0+$nodeId, value => $value )
     });
 }
 
@@ -432,7 +546,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

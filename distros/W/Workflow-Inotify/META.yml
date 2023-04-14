@@ -22,10 +22,10 @@ no_index:
 provides:
   Workflow::Inotify:
     file: lib/Workflow/Inotify.pm
-    version: v1.0.3
+    version: v1.0.5
   Workflow::Inotify::Handler:
     file: lib/Workflow/Inotify/Handler.pm
-    version: v1.0.3
+    version: v1.0.5
 requires:
   Class::Accessor::Fast: '0'
   Config::IniFiles: '0'
@@ -39,5 +39,5 @@ resources:
   bugtracker: http://github.com/rlauer6/perl-Workflow-Inotify/issues
   homepage: http://github.com/rlauer6/perl-Workflow-Inotify
   repository: git://github.com/rlauer6/perl-Workflow-Inotify.git
-version: v1.0.3
+version: v1.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

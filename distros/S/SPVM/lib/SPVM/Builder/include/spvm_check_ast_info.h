@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_CHECK_AST_INFO_H
 #define SPVM_CHECK_AST_INFO_H
 

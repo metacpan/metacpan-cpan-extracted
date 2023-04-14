@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,145 +20,145 @@ name: TableDataBundle-Business-ID-DGIP
 provides:
   TableData::Business::ID::DGIP::Class:
     file: lib/TableData/Business/ID/DGIP/Class.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::1:
     file: lib/TableData/Business/ID/DGIP/Class/1.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::10:
     file: lib/TableData/Business/ID/DGIP/Class/10.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::11:
     file: lib/TableData/Business/ID/DGIP/Class/11.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::12:
     file: lib/TableData/Business/ID/DGIP/Class/12.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::13:
     file: lib/TableData/Business/ID/DGIP/Class/13.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::14:
     file: lib/TableData/Business/ID/DGIP/Class/14.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::15:
     file: lib/TableData/Business/ID/DGIP/Class/15.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::16:
     file: lib/TableData/Business/ID/DGIP/Class/16.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::17:
     file: lib/TableData/Business/ID/DGIP/Class/17.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::18:
     file: lib/TableData/Business/ID/DGIP/Class/18.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::19:
     file: lib/TableData/Business/ID/DGIP/Class/19.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::2:
     file: lib/TableData/Business/ID/DGIP/Class/2.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::20:
     file: lib/TableData/Business/ID/DGIP/Class/20.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::21:
     file: lib/TableData/Business/ID/DGIP/Class/21.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::22:
     file: lib/TableData/Business/ID/DGIP/Class/22.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::23:
     file: lib/TableData/Business/ID/DGIP/Class/23.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::24:
     file: lib/TableData/Business/ID/DGIP/Class/24.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::25:
     file: lib/TableData/Business/ID/DGIP/Class/25.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::26:
     file: lib/TableData/Business/ID/DGIP/Class/26.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::27:
     file: lib/TableData/Business/ID/DGIP/Class/27.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::28:
     file: lib/TableData/Business/ID/DGIP/Class/28.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::29:
     file: lib/TableData/Business/ID/DGIP/Class/29.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::3:
     file: lib/TableData/Business/ID/DGIP/Class/3.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::30:
     file: lib/TableData/Business/ID/DGIP/Class/30.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::31:
     file: lib/TableData/Business/ID/DGIP/Class/31.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::32:
     file: lib/TableData/Business/ID/DGIP/Class/32.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::33:
     file: lib/TableData/Business/ID/DGIP/Class/33.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::34:
     file: lib/TableData/Business/ID/DGIP/Class/34.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::35:
     file: lib/TableData/Business/ID/DGIP/Class/35.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::36:
     file: lib/TableData/Business/ID/DGIP/Class/36.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::37:
     file: lib/TableData/Business/ID/DGIP/Class/37.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::38:
     file: lib/TableData/Business/ID/DGIP/Class/38.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::39:
     file: lib/TableData/Business/ID/DGIP/Class/39.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::4:
     file: lib/TableData/Business/ID/DGIP/Class/4.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::40:
     file: lib/TableData/Business/ID/DGIP/Class/40.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::41:
     file: lib/TableData/Business/ID/DGIP/Class/41.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::42:
     file: lib/TableData/Business/ID/DGIP/Class/42.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::43:
     file: lib/TableData/Business/ID/DGIP/Class/43.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::44:
     file: lib/TableData/Business/ID/DGIP/Class/44.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::45:
     file: lib/TableData/Business/ID/DGIP/Class/45.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::5:
     file: lib/TableData/Business/ID/DGIP/Class/5.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::6:
     file: lib/TableData/Business/ID/DGIP/Class/6.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::7:
     file: lib/TableData/Business/ID/DGIP/Class/7.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::8:
     file: lib/TableData/Business/ID/DGIP/Class/8.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableData::Business::ID::DGIP::Class::9:
     file: lib/TableData/Business/ID/DGIP/Class/9.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
   TableDataBundle::Business::ID::DGIP:
     file: lib/TableDataBundle/Business/ID/DGIP.pm
-    version: v20220831.0.0
+    version: v20230207.0.0
 requires:
   File::Basename: '0'
   File::ShareDir: '0'
@@ -172,7 +172,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataBundle-Business-ID-DGIP
   homepage: https://metacpan.org/release/TableDataBundle-Business-ID-DGIP
   repository: git://github.com/perlancar/perl-TableDataBundle-Business-ID-DGIP.git
-version: 20220831.0.0
+version: 20230207.0.0
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -201,62 +201,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
@@ -322,11 +322,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -335,7 +335,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.024'
+              version: '6.028'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -483,12 +483,16 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::TableData
+              name: -TableData
+              version: '0.003'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -576,7 +580,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -584,7 +588,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Extras
       name: 'lint-prereqs / assume-provided'
@@ -592,52 +596,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.024'
+      version: '6.028'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.024'
+    version: '6.028'
 x_authority: cpan:PERLANCAR
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

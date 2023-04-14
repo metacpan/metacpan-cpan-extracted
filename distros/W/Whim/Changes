@@ -1,5 +1,11 @@
 Revision history for Perl extension Whim
 
+1.2023.04.06.0 2023-04-07T02:52:01Z
+
+    - Whim now uses its own user agent string, rather than the LWP
+    default. This should make it less susceptible to having its requests
+    refused by CDNs and similar services.
+
 1.2021.06.17.0 2021-06-17T17:33:52Z
 
     - `whim send` now prints whether or not every target got a

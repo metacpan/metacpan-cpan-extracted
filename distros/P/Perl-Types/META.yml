@@ -1,0 +1,94 @@
+---
+abstract: 'enable Perl data types'
+author:
+  - 'William N. Braswell, Jr. <wbraswell@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Types
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Perl::Type::Class:
+    file: lib/Perl/Type/Class.pm
+    version: '0.0022'
+  Perl::Types:
+    file: lib/Perl/Types.pm
+    version: '0.005'
+  arrayref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  boolean:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  character:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  filehandleref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  hashref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  hashref::arrayref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  hashref::hashref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  hashref::hashref::hashref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  integer:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  number:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  string:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  string::arrayref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  string::hashref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  string::hashref::arrayref:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+  void:
+    file: lib/Perl/Types.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  English: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#perl11
+  bugtracker: https://gitlab.com/scienceperl/perl-types/-/issues
+  repository: https://gitlab.com/scienceperl/perl-types
+version: '0.001'
+x_generated_by_perl: v5.22.1
+x_serialization_backend: 'YAML::Tiny version 1.69'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

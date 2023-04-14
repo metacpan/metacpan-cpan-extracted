@@ -7,23 +7,61 @@
 #   to December 337 BC."
 #    -- Malcolm Wilson. Structure and Method in Aristotle's Meteorologica
 
+# NOTE this silently accepts URI with userinfo; those probably
+# should be failed?
+#
+# KLUGE this may break if the URI module ever gets URI/gemini.pm
+package URI::gemini {
+    use URI;
+    use parent 'URI::_server';
+    sub default_port { 1965 }
+    sub userinfo     { return undef }    # gemini has no userinfo
+    sub secure       { 1 }
+
+    sub canonical {
+        my $self  = shift;
+        my $other = $self->SUPER::canonical;
+        $self->SUPER::userinfo(undef);    # gemini has no userinfo
+
+        my $slash_path =
+             defined( $other->authority )
+          && !length( $other->path )
+          && !defined( $other->query );
+
+        if ($slash_path) {
+            $other = $other->clone if $other == $self;
+            $other->path("/");
+        }
+        $other;
+    }
+}
+
 package Net::Gemini;
-our $VERSION = '0.03';
-use 5.10.0;
+our $VERSION = '0.05';
+use strict;
+use warnings;
 use Encode ();
 use IO::Socket::SSL;
-use Net::Gemini::URI;
+use Net::SSLeay;
 
-sub code    { $_[0]{_code} }
+sub _DEFAULT_BUFSIZE () { 4096 }
+
+sub code    { $_[0]{_code} }      # 0..6 response code
 sub content { $_[0]{_buf} }
-sub error   { $_[0]{_error} }
+sub error   { $_[0]{_error} }     # error message for 0 code
 sub host    { $_[0]{_host} }
 sub meta    { $_[0]{_meta} }
 sub port    { $_[0]{_port} }
 sub socket  { $_[0]{_socket} }
-sub status  { $_[0]{_status} }
+sub status  { $_[0]{_status} }    # two digit '1x', '2x', ... response code
 sub uri     { $_[0]{_uri} }
 
+# see VERIFICATION below; the caller should supply a custom callback.
+# the default is thus "Trust On Almost Any Use" (TOAAU) or similar to
+# what gg(1) of gmid does
+sub _verify_ssl { 1 }
+
+# minimal method to get a resource (see also ->request)
 sub get {
     my ( $class, $source, %param ) = @_;
     my %obj;
@@ -31,42 +69,40 @@ sub get {
         @obj{qw(_code _error)} = ( 0, "source is not defined" );
         goto BLESSING;
     }
-    my $type = ref $source;
-    if ( $type eq "" ) {
-        my $err;
-        ( $obj{_uri}, $err ) = Net::Gemini::URI->new($source);
-        unless ( defined $obj{_uri} ) {
-            @obj{qw(_code _error)} = ( 0, "could not parse '$source': $err" );
-            goto BLESSING;
-        }
-        @obj{qw/_host _port/} = $obj{_uri}->hostport;
-    } elsif ( $type eq 'ARRAY' ) {
-        # one use of this is if there is already a Net::Gemini::URI
-        # object, another is to use a different host and port for the
-        # connection than otherwise would be used. SNI will by default
-        # use PeerHost which comes from the _host
-        @obj{qw/_uri _host _port/} = @$source[ 0 .. 2 ];
-    } else {
-        @obj{qw(_code _error)} = ( 0, "unknown type '$type'" );
+
+    $obj{_uri} = URI->new($source);
+    unless ( $obj{_uri}->scheme eq 'gemini' ) {
+        @obj{qw(_code _error)} = ( 0, "could not parse '$source'" );
         goto BLESSING;
     }
-    my $yuri;
-    eval {
-        $yuri = Encode::encode( 'UTF-8', $obj{_uri}->canonical, Encode::FB_CROAK );
-        1;
-    } or do {
-        @obj{qw(_code _error)} = ( 0, "failed to encode URI: $@" );
-        goto BLESSING;
-    };
+    @obj{qw/_host _port/} = ( $obj{_uri}->host, $obj{_uri}->port );
+
+    my $yuri = $obj{_uri}->canonical;
     if ( length $yuri > 1024 ) {
         @obj{qw(_code _error)} = ( 0, "URI is too long" );
         goto BLESSING;
     }
 
+    # VERIFICATION is based on the following link though much remains up
+    # to the caller to manage
+    # gemini://makeworld.space/gemlog/2020-07-03-tofu-rec.gmi
     eval {
-        # NOTE the default here is to verify the peer, which is not the
-        # TOFU advised by the gemini specification.
         $obj{_socket} = IO::Socket::SSL->new(
+            SSL_hostname        => $obj{_host},    # SNI
+            SSL_verify_callback => sub {
+                my ( $ok, $ctx_store, $certname, $error, $cert, $depth ) = @_;
+                if ( $depth != 0 ) {
+                    return 1 if $param{tofu};
+                    return $ok;
+                }
+                ( $param{verify_ssl} || \&_verify_ssl )->(
+                    @obj{qw(_host _port)},
+                    Net::SSLeay::X509_get_fingerprint( $cert, 'sha256' ),
+                    Net::SSLeay::P_ASN1_TIME_get_isotime( Net::SSLeay::X509_get_notAfter($cert) ),
+                    $ok,
+                    $cert
+                );
+            },
             ( exists $param{ssl} ? %{ $param{ssl} } : () ),
             PeerHost => $obj{_host},
             PeerPort => $obj{_port},
@@ -84,11 +120,17 @@ sub get {
         @obj{qw(_code _error)} = ( 0, "send URI failed: $!" );
         goto BLESSING;
     }
+    # KLUGE we're done with the connection as a writer at this point,
+    # but IO::Socket::SSL does not appear to offer a public means to
+    # only call shutdown and nothing else. using this is a bit risky
+    # should the IO::Socket::SSL internals change
+    Net::SSLeay::shutdown( ${ *{ $obj{_socket} } }{'_SSL_object'} )
+      if $param{early_shutdown};
 
     # get the STATUS SPACE header response (and, probably, more)
     $obj{_buf} = '';
     while (1) {
-        my $n = sysread $obj{_socket}, my $buf, $param{bufsize} || 4096;
+        my $n = sysread $obj{_socket}, my $buf, $param{bufsize} || _DEFAULT_BUFSIZE;
         unless ( defined $n ) {
             @obj{qw(_code _error)} = ( 0, "recv response failed: $!" );
             goto BLESSING;
@@ -113,6 +155,7 @@ sub get {
     # the event the server is being naughty and trickling bytes in one
     # by one (probably you will want a timeout somewhere, or an async
     # version of this code)
+    my $bufsize = $param{bufsize} || _DEFAULT_BUFSIZE;
     while (1) {
         if ( $obj{_buf} =~ m/^(.{0,1024}?)\r\n/ ) {
             $obj{_meta} = $1;
@@ -125,10 +168,10 @@ sub get {
                     $obj{_meta} = Encode::decode( 'UTF-8', $obj{_meta}, Encode::FB_CROAK );
                     1;
                 } or do {
-                    @obj{qw(_code _error)} = ( 0, "failed to decode meta" );
+                    @obj{qw(_code _error)} = ( 0, "failed to decode meta: $@" );
                     goto BLESSING;
                 };
-                substr $obj{_buf}, 0, $len + 2, ''; # +2 for the \r\n
+                substr $obj{_buf}, 0, $len + 2, '';    # +2 for the \r\n
             }
             last;
         } else {
@@ -137,7 +180,8 @@ sub get {
                 @obj{qw(_code _error)} = ( 0, "meta is too long" );
                 goto BLESSING;
             }
-            my $n = sysread $obj{_socket}, my $buf, $param{bufsize} || 4096;
+            my $buf;
+            my $n = sysread $obj{_socket}, $buf, $bufsize;
             unless ( defined $n ) {
                 @obj{qw(_code _error)} = ( 0, "recv response failed: $!" );
                 goto BLESSING;
@@ -151,21 +195,32 @@ sub get {
     }
 
   BLESSING:
+    close $obj{_socket} if defined $obj{_socket} and $obj{_code} != 2;
     bless( \%obj, $class ), $obj{_code};
 }
 
+# drain what remains (if anything) via a callback interface. assumes
+# that a ->get call has been made
 sub getmore {
     my ( $self, $callback, %param ) = @_;
 
     my $len = length $self->{_buf};
-    $callback->( $len, $self->{_buf} ) or return;
-    # _buf is not cleared on the assumption that the object will go out
-    # of scope soon enough
-
-    while (1) {
-        $len = sysread $self->{_socket}, my $buf, $param{bufsize} || 4096;
-        $callback->( $len, $buf ) or return;
+    if ($len) {
+        $callback->( $self->{_buf}, $len ) or return;
     }
+
+    my $bufsize = $param{bufsize} || 4096;
+    while (1) {
+        my $buf;
+        $len = sysread $self->{_socket}, $buf, $bufsize;
+        if ( !defined $len ) {
+            die "sysread failed: $!\n";
+        } elsif ( $len == 0 ) {
+            last;
+        }
+        $callback->( $buf, $len ) or return;
+    }
+    close $self->{_socket};
 }
 
 1;
@@ -194,12 +249,18 @@ Net::Gemini - a small gemini client
 
 =head1 DESCRIPTION
 
-This module implements code that may help implement a gemini client.
+This module implements code that may help implement a gemini
+client in Perl.
 
 =head2 CAVEATS
 
-The default SSL verification scheme is used. So it's not TOFU (Trust on
-First Use); that will require customizing L<IO::Socket::SSL>.
+It's a pretty beta module.
+
+The default SSL verification is more or less to accept the connection;
+this is perhaps not ideal. The caller will need to implement TOFU or a
+similar means of verifying the other end.
+
+L<gemini://makeworld.space/gemlog/2020-07-03-tofu-rec.gmi>
 
 =head1 METHODS
 
@@ -207,15 +268,17 @@ First Use); that will require customizing L<IO::Socket::SSL>.
 
 =item B<get> I<URI> [ parameters ... ]
 
-Tries to obtain the given gemini I<URI>. Returns an object and a result
-code. The result code will be C<0> if there was a problem with the
-request (e.g. that the URI failed to parse, or the connection failed) or
-otherwise a gemini code in the range of C<1> to C<6> inclusive, which
-will indicate the next steps any subsequent code probably should take.
+Tries to obtain the given gemini I<URI>.
+
+Returns an object and a result code. The socket is set to use the
+C<:raw> B<binmode>. The result code will be C<0> if there was a problem
+with the request--that the URI failed to parse, or the connection
+failed--or otherwise a gemini code in the range of C<1> to C<6>
+inclusive, which will indicate the next steps any subsequent code
+should take.
 
 For code C<2> responses the response body may be split between
-B<content> and whatever remains unread in the socket, and will be
-undecoded.
+B<content> and whatever remains unread in the socket, if anything.
 
 Parameters include:
 
@@ -226,13 +289,47 @@ Parameters include:
 Size of buffer to use for requests, 4096 by default. Note that a naughty
 server may return data in far smaller increments than this.
 
+=item B<early_shutdown> => I<boolean>
+
+If true, attempts an early shutdown of the SSL connection after the
+request is sent. This fiddles with the internal state of
+L<IO::Socket::SSL> as the C<shutdown> call does not appear to be exposed
+outside the module.
+
+Use with caution.
+
 =item B<ssl> => { params }
 
 Passes the given parameters to the L<IO::Socket::SSL> constructor. These
 could be used to configure e.g. the C<SSL_verify_mode> or to set a
-verification callback.
+verification callback, or to specify a custom SNI host via
+C<SSL_hostname>.
 
-IO::Socket::SSL::set_defaults may also be of use in client code.
+=item B<tofu> => I<boolean>
+
+If true, only the leaf certificate will be checked. Otherwise, the full
+certificate chain will be verified by default, which is probably not
+what you want when trusting the very first leaf certificate seen.
+
+=item B<verify_ssl> => code-reference
+
+Custom callback function to handle SSL verification. The default is to
+accept the connection (Trust On All Uses), which is perhaps not ideal.
+The callback function is passed the host, port, certificate digest, and
+certificate expiration date (compatible with
+L<DateTime::Format::RFC3339>) and should return a C<1> to verify the
+connection, or C<0> to not.
+
+  ...->get( $url, ..., verify_ssl => sub {
+    my ($host, $port, $digest, $expire_date, $ok, $raw_cert) = @_;
+    return 1 if int rand 2; # certificate is OK
+    return 0;
+  } );
+
+The "okay?" boolean and raw certificate is also passed; these could be
+used to allow certificates that other code was able to verify, or to
+perform custom checks on the certificate using probably various routines
+from L<Net::SSLeay>.
 
 =back
 
@@ -247,8 +344,7 @@ to be decoded.
   my $body = '';
   $gem->getmore(
       sub {
-          my ( $status, $buffer ) = @_;
-          return 0 if !defined $status or $status == 0;
+          my ( $buffer, $length ) = @_;
           $body .= $buffer;
           return 1;
       }
@@ -265,7 +361,9 @@ The I<bufsize> parameter is as for B<get>.
 =item B<code>
 
 Code of the request, C<0> to C<6> inclusive. Pretty important, so is
-also returned by B<get>.
+also returned by B<get>. C<0> is an extension to the specification, and
+is used for connection errors (e.g. host not found) and other problems
+outside the gemini protocol.
 
 =item B<content>
 
@@ -306,16 +404,12 @@ returned from the server.
 
 =head1 BUGS
 
-None known. But it is a rather incomplete module; that may be
-considered a bug?
+None known. But it is a rather incomplete module; that may be considered
+a bug? The interface is very much subject to change.
 
 =head1 SEE ALSO
 
-L<Net::Gemini::URI>
-
 L<gemini://gemini.circumlunar.space/docs/specification.gmi> (v0.16.1)
-
-RFC 3986
 
 =head1 COPYRIGHT AND LICENSE
 

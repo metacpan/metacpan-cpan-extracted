@@ -40,6 +40,17 @@ functions.  In normal use, L</callchecker0_h> and L</callchecker_linkable>
 should be called at build time (not authoring time) for the module that
 wishes to use the C functions.
 
+The purpose of this module is specifically to provide the Perl 5.14.0
+version of the C<cv_set_call_checker> API to earlier Perl versions where
+the core doesn't have C<cv_set_call_checker> at all.  This module does not
+attempt to backport later refinements of the C<cv_set_call_checker> API.
+Thus an XS module that uses this module can be sure of having at least
+the Perl 5.14.0 version of C<cv_set_call_checker> available, regardless
+of which Perl version it is running on, but cannot be sure of having
+any more refined version of the API available.  Such a module will have
+access to the core's version of the API as normal on Perl versions where
+the core supplies it, and is free to use the ordinary mechanisms of Perl
+version portability to manage the differences between versions of the API.
 
 =cut
 
@@ -49,7 +60,7 @@ package Devel::CallChecker;
 use warnings;
 use strict;
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(callchecker0_h callchecker_linkable);
@@ -113,7 +124,7 @@ apply a prototype to a subroutine call.  From version 5.11.2 onwards, the
 subroutine can be determined if the RV that the C<rv2cv> is to operate
 on is provided by a suitable C<gv> or C<const> op.  Prior to 5.11.2,
 only a C<gv> op will do.  A C<gv> op is suitable if the GV's CV slot
-is populated.  A C<const> op is suitable if the constant value must be
+is populated.  A C<const> op is suitable if the constant value is
 an RV pointing to a CV.  Details of this process may change in future
 versions of Perl.
 
@@ -273,7 +284,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011, 2012, 2013, 2015, 2017
+Copyright (C) 2011, 2012, 2013, 2015, 2017, 2023
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

@@ -1,5 +1,33 @@
 Revision history for Music-Duration-Partition
 
+0.0814 2023-04-10 23:55:17
+    - Improve tutorials.
+
+0.0813 2023-04-10 22:58:34
+    - Improve tutorials.
+
+0.0812 2023-04-08 19:32:15
+    - Improve tutorials.
+
+0.0811 2023-04-08 18:45:44
+    - Improve documentation.
+
+0.0810 2023-04-08 18:18:09
+    - Fix copyright
+
+0.0809 2023-04-08 17:56:40
+    - Update the Quickstart tutorial.
+
+0.0808 2023-04-08 17:53:35
+    - Fix typo in quickstart tutorial.
+    - Add link to tutorial.
+
+0.0807 2023-04-08 14:54:14
+    - Fix the name of the Advanced package.
+
+0.0806 2023-04-08 14:49:23
+    - Add Quickstart and Advanced tutorial POD.
+
 0.0805 2023-02-05 16:08:13
     - Improve SYNOPSIS.
 

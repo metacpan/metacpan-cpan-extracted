@@ -1,6 +1,6 @@
 package Catmandu::Fix::Bind::pica_each;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Moo;
 use Catmandu::Sane;
@@ -65,8 +65,8 @@ Catmandu::Fix::Bind::pica_each - a binder that loops over PICA fields
     # Only add field 039D subfield $9 to the editions when the subfield $a 
     contains a 'E-Paper'
     do pica_each()
-        if pica_match("039Da","E-Paper")
-            pica_map("039D9",editions.$append)
+        if pica_match("039D$a","E-Paper")
+            pica_map("039D$9",editions.$append)
         end
     end
 

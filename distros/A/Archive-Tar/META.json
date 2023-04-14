@@ -56,6 +56,6 @@
          "web" : "https://github.com/jib/archive-tar-new"
       }
    },
-   "version" : "3.00",
+   "version" : "3.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

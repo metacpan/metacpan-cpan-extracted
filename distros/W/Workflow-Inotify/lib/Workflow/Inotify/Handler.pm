@@ -5,12 +5,46 @@ use warnings;
 
 use Config::IniFiles;
 
-use parent qw(Class::Accessor::Fast);
-
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(qw(config));
 
-our $VERSION = '1.0.3'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.0.5'; ## no critic (RequireInterpolation)
+
+use List::Util qw(any);
+use Readonly;
+
+Readonly our $TRUE  => 1;
+Readonly our $FALSE => 0;
+
+our @EXPORT_OK = qw(boolean);
+
+use parent qw(Exporter Class::Accessor::Fast);
+
+########################################################################
+sub boolean {
+########################################################################
+  my ( $value, @default ) = @_;
+
+  my $default_value;
+
+  if (@default) {
+    $default_value = $default[0];
+  }
+
+  $value =~ s/\s*([^ ]+)\s*/$1/xsm;
+
+  return $default_value
+    if !defined $value
+    && defined $default_value;
+
+  return $FALSE
+    if !defined $value || any { $value eq $_ } qw( 0 false off no );
+
+  return $TRUE
+    if any { $value eq $_ } qw( 1 true on yes );
+
+  die "invalid value ($value) for boolean variable";
+}
 
 ########################################################################
 sub new {
@@ -19,7 +53,7 @@ sub new {
 
   $class = ref($class) || $class;
 
-  if ( $config && !$config ) {
+  if ( $config && !ref $config ) {
     if ( -e $config ) {
       $config = Config::IniFiles->new( -file => $config );
     }
@@ -37,21 +71,28 @@ sub get_app_config {
 ########################################################################
   my ($self) = @_;
 
-  my $section_name = ref $self;
+  my $section_name = lc ref $self;
   $section_name =~ s/::/_/xsmg;
 
   return
-    if !$self->config->SectionExists($section_name);
+    if !$self->get_config->SectionExists($section_name);
 
   my %section_config;
 
-  foreach ( $self->config->Parameters($section_name) ) {
-    $section_config{$_} = $self->config->val( $section_name, $_ );
+  foreach ( $self->get_config->Parameters($section_name) ) {
+    $section_config{$_} = $self->get_config->val( $section_name, $_ );
   }
 
   my @extra_vars = keys %section_config;
 
   if (@extra_vars) {
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+
+    for (@extra_vars) {
+      die "attempt to redefine $_\n"
+        if defined *{ ref($self) . q{::} . "get_$_" }{CODE};
+    }
+
     $self->mk_accessors(@extra_vars);
 
     for (@extra_vars) {
@@ -237,17 +278,20 @@ inside the directory (not for the directory itself).
 
 =back
 
+=head2 boolean
+
+ boolean(value)
+
+Return a boolean value by converting anything that smells like a boolean.
+
+ 1, 0
+ on, off
+ true, false
+ yes, no
+
 =head2 handler
 
  handler( event )
-
-An instance of L<Linux::Inotify::Event>.  See L<Linux::Inotify2>
-
-=back
-
-=head2 config
-
-The method of your class that will handle the event.
 
 =over 5
 

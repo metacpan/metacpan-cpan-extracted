@@ -1,16 +1,23 @@
 
+v5.24   2023-04-07
+
+  - output perl warn/die stderr without log prefix when --quiet is enabled
+  - cli --quiet/silent options override those Mnet::Opts::Set pragma modules
+  - allow ctrl-c during Mnet::Expect::Cli (and ::Cli::Ios) password_in entry
+
+
 v5.23   2022-02-01
 
-    - improved Mnet::Expect::Cli::Ios prompt_re in config mode
-    - new Mnet::Report::Table tsv output
+  - improved Mnet::Expect::Cli::Ios prompt_re in config mode
+  - new Mnet::Report::Table tsv output
 
 
 v5.22   2021-02-15
 
-    - new Mnet::Stanza::ios templating function
+  - new Mnet::Stanza::ios templating function
 
 
 v5.21   2020-08-30
 
-    - cpan release
+  - cpan release
 

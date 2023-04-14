@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+use v5.26;
+use strict;
+use warnings;
+use JSON::MaybeXS;
+use Path::Tiny;
+use Text::Unidecode;
+use List::Util qw(min max);
+use open ':std',':locale';
+our $VERSION = '1.0.2'; # VERSION
+# PODNAME: zxcvbn-build-data-names-data-fb-leak
+# ABSTRACT: generate name ranking data from FB leaked dumps
+
+
+my ($input_file_name, @countries) = @ARGV;
+
+unless ($input_file_name && @countries) {
+    warn <<'HELP';
+Usage:
+
+Get the data from https://github.com/philipperemy/name-dataset
+(currently two zipfiles at
+https://github.com/philipperemy/name-dataset/tree/master/names_dataset/v3
+), extract the zip file
+
+Then
+
+    zxcvbn-build-names-data-fb-leak $json_file_path @countries > data/${whatever}_names.txt
+
+Then you can use those text files as input to
+Data::Password::zxcvbn::AuthorTools::BuildRankedDictionaries
+HELP
+    exit 1;
+}
+
+my $names_data = decode_json(path($input_file_name)->slurp_raw);
+
+my %output_names;
+
+for my $raw_name (keys $names_data->%*) {
+    my $data = $names_data->{$raw_name};
+
+    my $name = fc(unidecode($raw_name));
+    next unless $name =~ /^\w+$/;
+
+    # due to the `unidecode` and `fc`, multiple $raw_name may produce
+    # the same $name; here we take a possibly-already-there rank into
+    # account
+    my @ranks = grep { defined } (
+        $data->{rank}->@{@countries},
+        # that `// ()` is needed because `grep` auto-vivifies
+        # non-existent hash elements in its input list (it needs to
+        # create l-value aliases to every input element!)
+        $output_names{$name} // ()
+    ) or next;
+
+    my $rank = min @ranks;
+
+    $output_names{$name} = $rank;
+}
+
+say for sort { $output_names{$a} <=> $output_names{$b} } keys %output_names;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+zxcvbn-build-data-names-data-fb-leak - generate name ranking data from FB leaked dumps
+
+=head1 VERSION
+
+version 1.0.2
+
+=head1 AUTHOR
+
+Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by BroadBean UK, a CareerBuilder Company.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,3612 @@
+File size: 11074, protocol version: 16, profile_version: 21.72
+File header CRC: expected=0xB45F, calculated=0xB45F
+Local message type: 0 (20 octets, message name: file_id, message number: 0)
+  serial_number (3-1-UINT32Z): 3407998384
+  time_created (4-1-UINT32): 2022-11-19T17:10:20 (1037830220)
+  unknown7 (7-1-UINT32, INVALID): 4294967295
+  manufacturer (1-1-UINT16): garmin (1)
+  garmin_product (2-1-UINT16, original name: product): edge_830 (3122)
+  number (5-1-UINT16, INVALID): 65535
+  type (0-1-ENUM): activity (4)
+Local message type: 1 (24 octets, message name: file_creator, message number: 49)
+  xxx2 (2-20-STRING, INVALID): ""
+  software_version (0-1-UINT16): 950
+  hardware_version (1-1-UINT8, INVALID): 255
+Local message type: 2 (11 octets, message number: 288)
+  xxx253 (253-1-UINT32): 1037830221
+  xxx2 (2-1-UINT16): 1010
+  xxx0 (0-1-SINT8): -2
+  xxx1 (1-1-SINT8): 83
+  xxx252 (252-1-UINT8): 1
+  xxx251 (251-1-BYTE, INVALID): 255
+Local message type: 3 (16 octets, message name: event, message number: 21)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  timer_trigger (3-1-UINT32, original name: data): manual (0)
+  xxx17 (17-1-UINT16, INVALID): 65535
+  xxx18 (18-1-UINT16, INVALID): 65535
+  event (0-1-ENUM): timer (0)
+  event_type (1-1-ENUM): start (0)
+  event_group (4-1-UINT8): 0
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  serial_number (3-1-UINT32Z): 3407998384
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16): garmin (1)
+  garmin_product (4-1-UINT16, original name: product): edge_830 (3122)
+  software_version (5-1-UINT16): 9.50 (950)
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): creator (0)
+  local_device_type (1-1-UINT8, original name: device_type, INVALID): 255
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  serial_number (3-1-UINT32Z, INVALID): 0
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16): garmin (1)
+  garmin_product (4-1-UINT16, original name: product): edge_830 (3122)
+  software_version (5-1-UINT16): 9.50 (950)
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): device1 (1)
+  local_device_type (1-1-UINT8, original name: device_type): barometer (4)
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  serial_number (3-1-UINT32Z, INVALID): 0
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16): garmin (1)
+  garmin_product (4-1-UINT16, original name: product): 3107
+  software_version (5-1-UINT16): 4.80 (480)
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): device2 (2)
+  local_device_type (1-1-UINT8, original name: device_type): gps (0)
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  serial_number (3-1-UINT32Z, INVALID): 0
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16, INVALID): 65535
+  product (4-1-UINT16, INVALID): 65535
+  software_version (5-1-UINT16, INVALID): 65535
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): heart_rate (3)
+  local_device_type (1-1-UINT8, original name: device_type): 7
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 5 (15 octets, message name: source, message number: 22)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  unknown0 (0-1-UINT8): device2 (2)
+  unknown1 (1-1-UINT8): device2 (2)
+  unknown2 (2-1-UINT8, INVALID): 255
+  unknown3 (3-1-UINT8): device1 (1)
+  unknown4 (4-1-UINT8, INVALID): 255
+  unknown5 (5-1-ENUM): 0
+  unknown6 (6-1-UINT8, INVALID): 255
+  unknown7 (7-1-UINT8, INVALID): 255
+  unknown8 (8-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+Local message type: 6 (26 octets, message number: 141)
+  xxx253 (253-1-UINT32): 1037830221
+  xxx1 (1-1-UINT32): 1037750400
+  xxx2 (2-1-UINT32): 1038355200
+  xxx3 (3-1-UINT32, INVALID): 4294967295
+  xxx4 (4-1-SINT32, INVALID): 2147483647
+  xxx5 (5-1-SINT32, INVALID): 2147483647
+  xxx0 (0-1-ENUM): 1
+Local message type: 7 (68 octets, message name: device_settings, message number: 2)
+  utc_offset (1-1-UINT32): 0
+  time_offset (2-1-UINT32): 71582488 s (71582488)
+  unknown49 (49-1-UINT16, INVALID): 65535
+  autosync_min_time (59-1-UINT16, INVALID): 65535
+  active_time_zone (0-1-UINT8): 0
+  unknown3 (3-1-ENUM): 0
+  time_mode (4-1-ENUM): hour12 (0)
+  time_zone_offset (5-1-SINT8): 0.0 hr (0)
+  unknown10 (10-1-ENUM): 0
+  unknown11 (11-1-ENUM): 0
+  backlight_mode (12-1-ENUM): auto_brightness (3)
+  unknown13 (13-1-UINT8): 0
+  unknown14 (14-1-UINT8): 60
+  unknown15 (15-1-UINT8): 50
+  unknown16 (16-1-ENUM, INVALID): 255
+  unknown17 (17-1-ENUM, INVALID): 255
+  unknown18 (18-1-ENUM, INVALID): 255
+  unknown22 (22-1-ENUM): 0
+  unknown26 (26-1-ENUM): 254
+  unknown29 (29-1-ENUM): 0
+  unknown33 (33-1-UINT8): 0
+  unknown38 (38-1-ENUM): 1
+  unknown41 (41-1-ENUM): 1
+  date_mode (47-1-ENUM): month_day (1)
+  unknown48 (48-1-ENUM): 0
+  unknown52 (52-1-ENUM): 1
+  unknown53 (53-1-ENUM): 1
+  unknown54 (54-1-ENUM): 0
+  unknown75 (75-1-ENUM, INVALID): 255
+  xxx77 (77-1-ENUM): 14
+  lactate_threshold_autodetect_enabled (80-1-ENUM): 1
+  unknown85 (85-1-ENUM): 0
+  xxx91 (91-2-UINT8Z): {3, 8}
+  number_of_screens (94-1-UINT8, INVALID): 255
+  unknown97 (97-1-UINT8Z): 1
+  unknown98 (98-1-ENUM, INVALID): 255
+  xxx106 (106-1-ENUM): 1
+  xxx109 (109-1-ENUM): 1
+  xxx110 (110-1-ENUM): 1
+  xxx111 (111-1-ENUM): 1
+  xxx121 (121-1-ENUM): 1
+  xxx144 (144-1-ENUM): 1
+  xxx170 (170-15-UINT8): {8, 7, 9, 13, 11, 12, 5, 6, 14, 10, 1, 4, 0, 2, 3}
+  xxx173 (173-1-ENUM, INVALID): 255
+Local message type: 8 (71 octets, message name: user_profile, message number: 3)
+  friendly_name (0-16-STRING): "edge830"
+  wake_time (28-1-UINT32): 21645
+  sleep_time (29-1-UINT32): 79200
+  unknown35 (35-1-UINT32, INVALID): 4294967295
+  unknown40 (40-1-FLOAT32, INVALID): NaN
+  unknown42 (42-1-UINT32, INVALID): 4294967295
+  weight (4-1-UINT16): 86.2 kg (862)
+  user_running_step_length (31-1-UINT16, INVALID): 65535
+  user_walking_step_length (32-1-UINT16, INVALID): 65535
+  unknown33 (33-1-UINT16, INVALID): 65535
+  unknown34 (34-1-UINT16, INVALID): 65535
+  unknown38 (38-1-UINT16, INVALID): 65535
+  gender (1-1-ENUM): male (1)
+  age (2-1-UINT8): 49 years (49)
+  height (3-1-UINT8): 1.78 m (178)
+  language (5-1-ENUM): french (1)
+  elev_setting (6-1-ENUM): metric (0)
+  weight_setting (7-1-ENUM): statute (1)
+  resting_heart_rate (8-1-UINT8): 0 bpm (0)
+  default_max_biking_heart_rate (10-1-UINT8): 185 bpm (185)
+  default_max_heart_rate (11-1-UINT8): 185 bpm (185)
+  hr_setting (12-1-ENUM): max (1)
+  speed_setting (13-1-ENUM): metric (0)
+  dist_setting (14-1-ENUM): metric (0)
+  power_setting (16-1-ENUM): percent_ftp (1)
+  activity_class (17-1-ENUM): athlete=0,level=40,level_max=32 (40)
+  position_setting (18-1-ENUM): degree_minute (1)
+  temperature_setting (21-1-ENUM): metric (0)
+  unknown24 (24-1-UINT8): 73
+  height_setting (30-1-ENUM): statute (1)
+  unknown36 (36-1-UINT8): 0
+  xxx44 (44-1-UINT8): 1
+  xxx45 (45-1-UINT8Z): 1
+  xxx57 (57-1-ENUM): 0
+Local message type: 9 (156 octets, message name: sensor, message number: 147)
+  unknown0 (0-1-UINT32Z): 3782987815
+  sensor_id (2-16-STRING): "970791"
+  unknown13 (13-1-UINT32, INVALID): 4294967295
+  unknown18 (18-4-UINT8Z, INVALID): {0, 0, 0, 0}
+  unknown20 (20-12-UINT8Z, INVALID): {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  unknown28 (28-4-UINT8, INVALID): {255, 255, 255, 255}
+  unknown29 (29-4-UINT8, INVALID): {255, 255, 255, 255}
+  unknown30 (30-4-UINT8, INVALID): {255, 255, 255, 255}
+  xxx70 (70-1-UINT32, INVALID): 4294967295
+  message_index (254-1-UINT16): selected=0,reserved=0,mask=0 (0)
+  wheel_size (10-1-UINT16): 2096 mm (2096)
+  unknown11 (11-1-UINT16, INVALID): 65535
+  unknown21 (21-1-UINT16, INVALID): 65535
+  unknown25 (25-1-UINT16, INVALID): 65535
+  unknown26 (26-1-UINT16, INVALID): 65535
+  unknown32 (32-1-UINT16, INVALID): 65535
+  unknown33 (33-1-UINT16, INVALID): 65535
+  unknown34 (34-1-UINT16, INVALID): 65535
+  unknown35 (35-1-UINT16, INVALID): 65535
+  unknown40 (40-1-UINT16Z, INVALID): 0
+  xxx55 (55-1-UINT16, INVALID): 65535
+  xxx56 (56-1-UINT16, INVALID): 65535
+  xxx57 (57-1-UINT16, INVALID): 65535
+  xxx73 (73-1-UINT16Z, INVALID): 0
+  unknown1 (1-1-UINT8): 0
+  unknown3 (3-1-ENUM): 1
+  unknown4 (4-1-ENUM, INVALID): 255
+  unknown5 (5-1-ENUM): 0
+  unknown6 (6-1-ENUM): 1
+  unknown7 (7-1-ENUM, INVALID): 255
+  unknown8 (8-1-ENUM, INVALID): 255
+  unknown9 (9-1-UINT8): 125
+  unknown12 (12-1-UINT8, INVALID): 255
+  unknown14 (14-1-UINT8, INVALID): 255
+  unknown15 (15-1-UINT8, INVALID): 255
+  unknown16 (16-1-UINT8, INVALID): 255
+  unknown17 (17-1-UINT8Z, INVALID): 0
+  unknown19 (19-1-UINT8Z, INVALID): 0
+  unknown27 (27-1-UINT8, INVALID): 255
+  unknown31 (31-1-UINT8, INVALID): 255
+  unknown36 (36-1-ENUM, INVALID): 255
+  unknown37 (37-7-ENUM, INVALID): {255, 255, 255, 255, 255, 255, 255}
+  unknown38 (38-7-ENUM, INVALID): {255, 255, 255, 255, 255, 255, 255}
+  unknown39 (39-7-ENUM, INVALID): {255, 255, 255, 255, 255, 255, 255}
+  unknown41 (41-7-UINT8, INVALID): {255, 255, 255, 255, 255, 255, 255}
+  unknown42 (42-1-ENUM, INVALID): 255
+  unknown43 (43-1-ENUM, INVALID): 255
+  unknown44 (44-1-UINT8Z, INVALID): 0
+  unknown47 (47-1-ENUM, INVALID): 255
+  unknown48 (48-1-ENUM, INVALID): 255
+  xxx50 (50-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx51 (51-1-ENUM): 0
+  xxx52 (52-1-ENUM): 4
+  xxx53 (53-1-UINT8, INVALID): 255
+  xxx54 (54-1-ENUM, INVALID): 255
+  xxx59 (59-1-UINT8, INVALID): 255
+  xxx60 (60-1-ENUM, INVALID): 255
+  xxx61 (61-1-ENUM, INVALID): 255
+  xxx62 (62-1-UINT8, INVALID): 255
+  xxx71 (71-1-ENUM, INVALID): 255
+  xxx72 (72-1-UINT8, INVALID): 255
+  xxx82 (82-1-ENUM, INVALID): 255
+  xxx83 (83-1-UINT8, INVALID): 255
+  xxx84 (84-1-UINT8, INVALID): 255
+Local message type: 10 (45 octets, message number: 79)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  xxx16 (16-1-UINT32): 3925738502
+  xxx17 (17-1-SINT32): 0
+  xxx18 (18-1-SINT32): 0
+  xxx19 (19-1-SINT32): 0
+  unknown0 (0-1-UINT16): 0
+  unknown3 (3-1-UINT16): 860
+  unknown8 (8-1-UINT16): 1
+  unknown9 (9-1-UINT16): 0
+  unknown11 (11-1-UINT16): 0
+  unknown12 (12-1-UINT16): 200
+  unknown13 (13-1-UINT16): 0
+  xxx20 (20-1-UINT16): 0
+  unknown1 (1-1-UINT8): 49
+  unknown2 (2-1-UINT8): 178
+  unknown4 (4-1-ENUM): 1
+  unknown5 (5-1-ENUM): 70
+  unknown6 (6-1-UINT8): 176
+  unknown7 (7-1-SINT8): 1
+  unknown10 (10-1-UINT8): 60
+  unknown14 (14-1-UINT8): 0
+Local message type: 11 (49 octets, message name: sport, message number: 12)
+  name (3-32-STRING): "MOUNTAIN"
+  unknown4 (4-1-UINT16): 45
+  sport (0-1-ENUM): cycling (2)
+  sub_sport (1-1-ENUM): mountain (8)
+  unknown5 (5-1-ENUM): 1
+  unknown6 (6-1-ENUM): 0
+  unknown7 (7-1-UINT8, INVALID): 255
+  unknown8 (8-1-UINT8): 0
+  unknown9 (9-1-UINT8): 4
+  unknown10 (10-3-UINT8): {255, 125, 0}
+  unknown12 (12-1-UINT8): 1
+  xxx15 (15-1-ENUM): 1
+  xxx17 (17-1-ENUM): 2
+  xxx18 (18-1-ENUM): 0
+Local message type: 12 (85 octets, message number: 13)
+  unknown4 (4-1-UINT32): 804672
+  unknown5 (5-1-SINT32, INVALID): 2147483647
+  unknown6 (6-1-SINT32, INVALID): 2147483647
+  unknown31 (31-1-UINT32, INVALID): 4294967295
+  unknown33 (33-1-UINT32, INVALID): 4294967295
+  xxx54 (54-1-UINT32): 1200000
+  xxx73 (73-1-SINT32, INVALID): 2147483647
+  xxx74 (74-1-SINT32, INVALID): 2147483647
+  xxx90 (90-1-UINT32): 18000
+  message_index (254-1-UINT16): selected=0,reserved=0,mask=0 (0)
+  unknown2 (2-1-UINT16): 6706
+  unknown8 (8-1-UINT16): 1341
+  unknown10 (10-1-UINT16, INVALID): 65535
+  unknown19 (19-1-UINT16): 60
+  unknown32 (32-1-UINT16, INVALID): 65535
+  unknown52 (52-1-UINT16): 2682
+  xxx64 (64-1-UINT16): 255
+  xxx69 (69-1-UINT16): 750
+  xxx80 (80-1-UINT16): 5400
+  unknown1 (1-1-ENUM): 0
+  unknown3 (3-1-ENUM): 6
+  unknown7 (7-1-ENUM): 0
+  unknown9 (9-1-ENUM, INVALID): 255
+  unknown12 (12-1-ENUM): 0
+  unknown13 (13-1-ENUM): 1
+  unknown14 (14-1-ENUM): 0
+  unknown15 (15-1-ENUM): 0
+  unknown18 (18-1-ENUM): 2
+  unknown25 (25-1-ENUM): 1
+  unknown27 (27-1-ENUM): 2
+  unknown30 (30-1-ENUM): 0
+  unknown34 (34-1-ENUM, INVALID): 255
+  unknown50 (50-1-ENUM): 1
+  unknown51 (51-1-ENUM): 0
+  unknown53 (53-1-ENUM): 1
+  xxx58 (58-1-ENUM): 1
+  xxx61 (61-1-ENUM, INVALID): 255
+  xxx62 (62-1-ENUM): 1
+  xxx63 (63-1-ENUM): 0
+  xxx67 (67-1-ENUM): 1
+  xxx70 (70-1-ENUM): 2
+  xxx75 (75-1-ENUM): 0
+  xxx76 (76-1-ENUM): 0
+  xxx78 (78-1-ENUM): 1
+  xxx83 (83-1-ENUM): 1
+  xxx84 (84-1-ENUM): 1
+  xxx89 (89-1-ENUM): 1
+Local message type: 13 (16 octets, message name: zones_target, message number: 7)
+  xxx254 (254-1-UINT16): 2
+  functional_threshold_power (3-1-UINT16): 200 watts (200)
+  unknown8 (8-1-UINT16, INVALID): 65535
+  max_heart_rate (1-1-UINT8, INVALID): 255
+  threshold_heart_rate (2-1-UINT8): 0 bpm (0)
+  hr_calc_type (5-1-ENUM): percent_max_hr (1)
+  pwr_calc_type (7-1-ENUM): 1
+  unknown9 (9-1-ENUM): 1
+  unknown10 (10-1-ENUM): 1
+  unknown11 (11-1-ENUM): 0
+  unknown12 (12-1-ENUM): 0
+  unknown13 (13-1-ENUM): 7
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  position_lat (0-1-SINT32): 45.3913221 deg (541539567)
+  position_long (1-1-SINT32): -75.7397311 deg (-903610189)
+  distance (5-1-UINT32): 0.00 m (0)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2875
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 5 deg.C (5)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:25 (1037830225)
+  xxx4 (4-1-SINT32): -65000
+  unknown0 (0-1-UINT16): 4205
+  charge_level (2-1-UINT8): 94 % (94)
+  temperature (3-1-SINT8): 5 deg.C (5)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:30 (1037830230)
+  position_lat (0-1-SINT32): 45.3913397 deg (541539777)
+  position_long (1-1-SINT32): -75.7397672 deg (-903610620)
+  distance (5-1-UINT32): 3.26 m (326)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 5.342 km/h (1484)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:31 (1037830231)
+  position_lat (0-1-SINT32): 45.3913548 deg (541539957)
+  position_long (1-1-SINT32): -75.7397918 deg (-903610913)
+  distance (5-1-UINT32): 5.82 m (582)
+  grit (114-1-FLOAT32): 32.8125
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 6.718 km/h (1866)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:32 (1037830232)
+  position_lat (0-1-SINT32): 45.3913734 deg (541540178)
+  position_long (1-1-SINT32): -75.7398141 deg (-903611179)
+  distance (5-1-UINT32): 8.51 m (851)
+  grit (114-1-FLOAT32): 32.8125
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 7.625 km/h (2118)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:33 (1037830233)
+  position_lat (0-1-SINT32): 45.3913943 deg (541540428)
+  position_long (1-1-SINT32): -75.7398353 deg (-903611432)
+  distance (5-1-UINT32): 11.34 m (1134)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 7.693 km/h (2137)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:36 (1037830236)
+  position_lat (0-1-SINT32): 45.3914568 deg (541541174)
+  position_long (1-1-SINT32): -75.7398979 deg (-903612179)
+  distance (5-1-UINT32): 19.86 m (1986)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 17
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 6.718 km/h (1866)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:37 (1037830237)
+  position_lat (0-1-SINT32): 45.3914729 deg (541541366)
+  position_long (1-1-SINT32): -75.7399162 deg (-903612398)
+  distance (5-1-UINT32): 22.14 m (2214)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 9
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 6.718 km/h (1866)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:38 (1037830238)
+  position_lat (0-1-SINT32): 45.3914887 deg (541541554)
+  position_long (1-1-SINT32): -75.7399359 deg (-903612633)
+  distance (5-1-UINT32): 24.46 m (2446)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:40 (1037830240)
+  position_lat (0-1-SINT32): 45.3915128 deg (541541842)
+  position_long (1-1-SINT32): -75.7399675 deg (-903613009)
+  distance (5-1-UINT32): 28.11 m (2811)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 7.222 km/h (2006)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:42 (1037830242)
+  position_lat (0-1-SINT32): 45.3915468 deg (541542247)
+  position_long (1-1-SINT32): -75.7399829 deg (-903613193)
+  distance (5-1-UINT32): 32.05 m (3205)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.988 km/h (1941)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:43 (1037830243)
+  position_lat (0-1-SINT32): 45.3915651 deg (541542466)
+  position_long (1-1-SINT32): -75.7399966 deg (-903613357)
+  distance (5-1-UINT32): 34.35 m (3435)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:44 (1037830244)
+  position_lat (0-1-SINT32): 45.3915651 deg (541542466)
+  position_long (1-1-SINT32): -75.7399966 deg (-903613357)
+  distance (5-1-UINT32): 34.35 m (3435)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:45 (1037830245)
+  position_lat (0-1-SINT32): 45.3915843 deg (541542695)
+  position_long (1-1-SINT32): -75.7400344 deg (-903613808)
+  distance (5-1-UINT32): 37.95 m (3795)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.718 km/h (1866)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:46 (1037830246)
+  position_lat (0-1-SINT32): 45.3915832 deg (541542682)
+  position_long (1-1-SINT32): -75.7400625 deg (-903614143)
+  distance (5-1-UINT32): 40.11 m (4011)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.718 km/h (1866)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:47 (1037830247)
+  position_lat (0-1-SINT32): 45.3915777 deg (541542616)
+  position_long (1-1-SINT32): -75.7400919 deg (-903614494)
+  distance (5-1-UINT32): 42.47 m (4247)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:50 (1037830250)
+  position_lat (0-1-SINT32): 45.3915547 deg (541542342)
+  position_long (1-1-SINT32): -75.7401615 deg (-903615324)
+  distance (5-1-UINT32): 48.43 m (4843)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:52 (1037830252)
+  position_lat (0-1-SINT32): 45.3915323 deg (541542074)
+  position_long (1-1-SINT32): -75.7402097 deg (-903615899)
+  distance (5-1-UINT32): 52.96 m (5296)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.988 km/h (1941)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:57 (1037830257)
+  position_lat (0-1-SINT32): 45.3914861 deg (541541523)
+  position_long (1-1-SINT32): -75.7403157 deg (-903617164)
+  distance (5-1-UINT32): 62.67 m (6267)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:58 (1037830258)
+  position_lat (0-1-SINT32): 45.3914779 deg (541541425)
+  position_long (1-1-SINT32): -75.7403387 deg (-903617438)
+  distance (5-1-UINT32): 64.69 m (6469)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 6.919 km/h (1922)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:10:59 (1037830259)
+  position_lat (0-1-SINT32): 45.3914722 deg (541541357)
+  position_long (1-1-SINT32): -75.7403640 deg (-903617740)
+  distance (5-1-UINT32): 66.74 m (6674)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 7.052 km/h (1959)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:00 (1037830260)
+  position_lat (0-1-SINT32): 45.3914648 deg (541541269)
+  position_long (1-1-SINT32): -75.7403897 deg (-903618047)
+  distance (5-1-UINT32): 68.90 m (6890)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.6 m (2878)
+  speed (6-1-UINT16): 7.254 km/h (2015)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:07 (1037830267)
+  position_lat (0-1-SINT32): 45.3913439 deg (541539826)
+  position_long (1-1-SINT32): -75.7405787 deg (-903620301)
+  distance (5-1-UINT32): 89.14 m (8914)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.0 m (2875)
+  speed (6-1-UINT16): 11.621 km/h (3228)
+  unknown61 (61-1-UINT16): 2875
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:09 (1037830269)
+  position_lat (0-1-SINT32): 45.3912929 deg (541539218)
+  position_long (1-1-SINT32): -75.7406386 deg (-903621016)
+  distance (5-1-UINT32): 96.48 m (9648)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.8 m (2874)
+  speed (6-1-UINT16): 12.665 km/h (3518)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:11 (1037830271)
+  position_lat (0-1-SINT32): 45.3912413 deg (541538603)
+  position_long (1-1-SINT32): -75.7406896 deg (-903621625)
+  distance (5-1-UINT32): 103.47 m (10347)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 8
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 11.621 km/h (3228)
+  unknown61 (61-1-UINT16): 2872
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:12 (1037830272)
+  position_lat (0-1-SINT32): 45.3912171 deg (541538314)
+  position_long (1-1-SINT32): -75.7407150 deg (-903621928)
+  distance (5-1-UINT32): 106.81 m (10681)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 11.657 km/h (3238)
+  unknown61 (61-1-UINT16): 2871
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:13 (1037830273)
+  position_lat (0-1-SINT32): 45.3911939 deg (541538037)
+  position_long (1-1-SINT32): -75.7407382 deg (-903622204)
+  distance (5-1-UINT32): 109.94 m (10994)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 11.657 km/h (3238)
+  unknown61 (61-1-UINT16): 2871
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:15 (1037830275)
+  position_lat (0-1-SINT32): 45.3911435 deg (541537436)
+  position_long (1-1-SINT32): -75.7407862 deg (-903622777)
+  distance (5-1-UINT32): 116.67 m (11667)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.0 m (2870)
+  speed (6-1-UINT16): 12.092 km/h (3359)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:19 (1037830279)
+  position_lat (0-1-SINT32): 45.3910222 deg (541535988)
+  position_long (1-1-SINT32): -75.7408298 deg (-903623297)
+  distance (5-1-UINT32): 130.65 m (13065)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.4 m (2867)
+  speed (6-1-UINT16): 12.092 km/h (3359)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:20 (1037830280)
+  position_lat (0-1-SINT32): 45.3909925 deg (541535634)
+  position_long (1-1-SINT32): -75.7408312 deg (-903623314)
+  distance (5-1-UINT32): 133.95 m (13395)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.4 m (2867)
+  speed (6-1-UINT16): 11.689 km/h (3247)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:21 (1037830281)
+  position_lat (0-1-SINT32): 45.3909700 deg (541535366)
+  position_long (1-1-SINT32): -75.7408328 deg (-903623333)
+  distance (5-1-UINT32): 136.45 m (13645)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.4 m (2867)
+  speed (6-1-UINT16): 9.572 km/h (2659)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:22 (1037830282)
+  position_lat (0-1-SINT32): 45.3909480 deg (541535103)
+  position_long (1-1-SINT32): -75.7408301 deg (-903623301)
+  distance (5-1-UINT32): 138.89 m (13889)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 19
+  altitude (2-1-UINT16): 73.4 m (2867)
+  speed (6-1-UINT16): 8.532 km/h (2370)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:23 (1037830283)
+  position_lat (0-1-SINT32): 45.3909262 deg (541534843)
+  position_long (1-1-SINT32): -75.7408298 deg (-903623297)
+  distance (5-1-UINT32): 141.32 m (14132)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 20
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 8.363 km/h (2323)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:24 (1037830284)
+  position_lat (0-1-SINT32): 45.3909015 deg (541534548)
+  position_long (1-1-SINT32): -75.7408326 deg (-903623331)
+  distance (5-1-UINT32): 144.07 m (14407)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 13
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 8.363 km/h (2323)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:25 (1037830285)
+  position_lat (0-1-SINT32): 45.3908699 deg (541534172)
+  position_long (1-1-SINT32): -75.7408273 deg (-903623267)
+  distance (5-1-UINT32): 147.59 m (14759)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 7
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 9.004 km/h (2501)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:25 (1037830285)
+  xxx4 (4-1-SINT32): -37000
+  unknown0 (0-1-UINT16): 4212
+  charge_level (2-1-UINT8): 94 % (94)
+  temperature (3-1-SINT8): 5 deg.C (5)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:28 (1037830288)
+  position_lat (0-1-SINT32): 45.3907732 deg (541533018)
+  position_long (1-1-SINT32): -75.7407757 deg (-903622652)
+  distance (5-1-UINT32): 159.16 m (15916)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 12.665 km/h (3518)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:29 (1037830289)
+  position_lat (0-1-SINT32): 45.3907404 deg (541532626)
+  position_long (1-1-SINT32): -75.7407445 deg (-903622280)
+  distance (5-1-UINT32): 163.55 m (16355)
+  grit (114-1-FLOAT32): 28.125
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 12.326 km/h (3424)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:30 (1037830290)
+  position_lat (0-1-SINT32): 45.3907067 deg (541532225)
+  position_long (1-1-SINT32): -75.7407160 deg (-903621939)
+  distance (5-1-UINT32): 167.90 m (16790)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 12.629 km/h (3508)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:32 (1037830292)
+  position_lat (0-1-SINT32): 45.3906425 deg (541531459)
+  position_long (1-1-SINT32): -75.7406562 deg (-903621226)
+  distance (5-1-UINT32): 176.39 m (17639)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 12.326 km/h (3424)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:36 (1037830296)
+  position_lat (0-1-SINT32): 45.3905703 deg (541530597)
+  position_long (1-1-SINT32): -75.7405282 deg (-903619699)
+  distance (5-1-UINT32): 189.32 m (18932)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 12.326 km/h (3424)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:37 (1037830297)
+  position_lat (0-1-SINT32): 45.3905622 deg (541530500)
+  position_long (1-1-SINT32): -75.7404909 deg (-903619254)
+  distance (5-1-UINT32): 192.38 m (19238)
+  grit (114-1-FLOAT32): 28.125
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:38 (1037830298)
+  position_lat (0-1-SINT32): 45.3905446 deg (541530290)
+  position_long (1-1-SINT32): -75.7404446 deg (-903618701)
+  distance (5-1-UINT32): 196.43 m (19643)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 13
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:39 (1037830299)
+  position_lat (0-1-SINT32): 45.3905337 deg (541530160)
+  position_long (1-1-SINT32): -75.7404073 deg (-903618256)
+  distance (5-1-UINT32): 199.60 m (19960)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.415 km/h (2893)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:40 (1037830300)
+  position_lat (0-1-SINT32): 45.3905271 deg (541530082)
+  position_long (1-1-SINT32): -75.7403705 deg (-903617817)
+  distance (5-1-UINT32): 202.56 m (20256)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.379 km/h (2883)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:41 (1037830301)
+  position_lat (0-1-SINT32): 45.3905259 deg (541530067)
+  position_long (1-1-SINT32): -75.7403356 deg (-903617401)
+  distance (5-1-UINT32): 205.29 m (20529)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.346 km/h (2874)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:42 (1037830302)
+  position_lat (0-1-SINT32): 45.3905218 deg (541530019)
+  position_long (1-1-SINT32): -75.7403066 deg (-903617055)
+  distance (5-1-UINT32): 207.60 m (20760)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 10.012 km/h (2781)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:43 (1037830303)
+  position_lat (0-1-SINT32): 45.3904961 deg (541529712)
+  position_long (1-1-SINT32): -75.7402697 deg (-903616615)
+  distance (5-1-UINT32): 211.59 m (21159)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 9.540 km/h (2650)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:44 (1037830304)
+  position_lat (0-1-SINT32): 45.3904798 deg (541529518)
+  position_long (1-1-SINT32): -75.7402431 deg (-903616297)
+  distance (5-1-UINT32): 214.35 m (21435)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 9.439 km/h (2622)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:45 (1037830305)
+  position_lat (0-1-SINT32): 45.3904402 deg (541529045)
+  position_long (1-1-SINT32): -75.7402317 deg (-903616161)
+  distance (5-1-UINT32): 218.76 m (21876)
+  grit (114-1-FLOAT32): 28.125
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 10.012 km/h (2781)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:46 (1037830306)
+  position_lat (0-1-SINT32): 45.3904125 deg (541528714)
+  position_long (1-1-SINT32): -75.7402179 deg (-903615997)
+  distance (5-1-UINT32): 222.01 m (22201)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 10.012 km/h (2781)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:47 (1037830307)
+  position_lat (0-1-SINT32): 45.3903891 deg (541528435)
+  position_long (1-1-SINT32): -75.7401987 deg (-903615768)
+  distance (5-1-UINT32): 224.93 m (22493)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 10.346 km/h (2874)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:56 (1037830316)
+  position_lat (0-1-SINT32): 45.3901115 deg (541525123)
+  position_long (1-1-SINT32): -75.7400895 deg (-903614465)
+  distance (5-1-UINT32): 256.93 m (25693)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.8 m (2869)
+  speed (6-1-UINT16): 10.814 km/h (3004)
+  unknown61 (61-1-UINT16): 2869
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:58 (1037830318)
+  position_lat (0-1-SINT32): 45.3900680 deg (541524605)
+  position_long (1-1-SINT32): -75.7400678 deg (-903614206)
+  distance (5-1-UINT32): 262.04 m (26204)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 10.480 km/h (2911)
+  unknown61 (61-1-UINT16): 2871
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:11:59 (1037830319)
+  position_lat (0-1-SINT32): 45.3900465 deg (541524348)
+  position_long (1-1-SINT32): -75.7400540 deg (-903614041)
+  distance (5-1-UINT32): 264.65 m (26465)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 5
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 10.447 km/h (2902)
+  unknown61 (61-1-UINT16): 2872
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:00 (1037830320)
+  position_lat (0-1-SINT32): 45.3900296 deg (541524146)
+  position_long (1-1-SINT32): -75.7400385 deg (-903613857)
+  distance (5-1-UINT32): 266.79 m (26679)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 74.8 m (2874)
+  speed (6-1-UINT16): 8.464 km/h (2351)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:01 (1037830321)
+  position_lat (0-1-SINT32): 45.3900128 deg (541523946)
+  position_long (1-1-SINT32): -75.7400300 deg (-903613755)
+  distance (5-1-UINT32): 268.76 m (26876)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 39
+  altitude (2-1-UINT16): 75.2 m (2876)
+  speed (6-1-UINT16): 9.169 km/h (2547)
+  unknown61 (61-1-UINT16): 2876
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:02 (1037830322)
+  position_lat (0-1-SINT32): 45.3899913 deg (541523690)
+  position_long (1-1-SINT32): -75.7400203 deg (-903613639)
+  distance (5-1-UINT32): 271.24 m (27124)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 8.935 km/h (2482)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -460
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:03 (1037830323)
+  position_lat (0-1-SINT32): 45.3899708 deg (541523445)
+  position_long (1-1-SINT32): -75.7400141 deg (-903613565)
+  distance (5-1-UINT32): 273.58 m (27358)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 76.0 m (2880)
+  speed (6-1-UINT16): 8.867 km/h (2463)
+  unknown61 (61-1-UINT16): 2880
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:04 (1037830324)
+  position_lat (0-1-SINT32): 45.3899525 deg (541523227)
+  position_long (1-1-SINT32): -75.7400083 deg (-903613496)
+  distance (5-1-UINT32): 275.66 m (27566)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 76.0 m (2880)
+  speed (6-1-UINT16): 8.464 km/h (2351)
+  unknown61 (61-1-UINT16): 2880
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:05 (1037830325)
+  position_lat (0-1-SINT32): 45.3899298 deg (541522956)
+  position_long (1-1-SINT32): -75.7400046 deg (-903613452)
+  distance (5-1-UINT32): 278.20 m (27820)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 5
+  altitude (2-1-UINT16): 76.4 m (2882)
+  speed (6-1-UINT16): 8.464 km/h (2351)
+  unknown61 (61-1-UINT16): 2882
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:06 (1037830326)
+  position_lat (0-1-SINT32): 45.3899025 deg (541522630)
+  position_long (1-1-SINT32): -75.7400007 deg (-903613405)
+  distance (5-1-UINT32): 281.25 m (28125)
+  grit (114-1-FLOAT32): 7.03125047683716
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 77.0 m (2885)
+  speed (6-1-UINT16): 8.230 km/h (2286)
+  unknown61 (61-1-UINT16): 2885
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:07 (1037830327)
+  position_lat (0-1-SINT32): 45.3898795 deg (541522356)
+  position_long (1-1-SINT32): -75.7399953 deg (-903613341)
+  distance (5-1-UINT32): 283.83 m (28383)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 77.2 m (2886)
+  speed (6-1-UINT16): 8.431 km/h (2342)
+  unknown61 (61-1-UINT16): 2886
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:08 (1037830328)
+  position_lat (0-1-SINT32): 45.3898569 deg (541522086)
+  position_long (1-1-SINT32): -75.7399886 deg (-903613261)
+  distance (5-1-UINT32): 286.39 m (28639)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 77.6 m (2888)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2888
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:09 (1037830329)
+  position_lat (0-1-SINT32): 45.3898338 deg (541521810)
+  position_long (1-1-SINT32): -75.7399838 deg (-903613204)
+  distance (5-1-UINT32): 288.97 m (28897)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 77.8 m (2889)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2889
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:10 (1037830330)
+  position_lat (0-1-SINT32): 45.3898107 deg (541521535)
+  position_long (1-1-SINT32): -75.7399803 deg (-903613162)
+  distance (5-1-UINT32): 291.54 m (29154)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 78.2 m (2891)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2891
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:11 (1037830331)
+  position_lat (0-1-SINT32): 45.3897878 deg (541521261)
+  position_long (1-1-SINT32): -75.7399775 deg (-903613129)
+  distance (5-1-UINT32): 294.10 m (29410)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 78.4 m (2892)
+  speed (6-1-UINT16): 8.431 km/h (2342)
+  unknown61 (61-1-UINT16): 2892
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:12 (1037830332)
+  position_lat (0-1-SINT32): 45.3897655 deg (541520995)
+  position_long (1-1-SINT32): -75.7399737 deg (-903613084)
+  distance (5-1-UINT32): 296.59 m (29659)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 78.6 m (2893)
+  speed (6-1-UINT16): 8.431 km/h (2342)
+  unknown61 (61-1-UINT16): 2893
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:13 (1037830333)
+  position_lat (0-1-SINT32): 45.3897469 deg (541520774)
+  position_long (1-1-SINT32): -75.7399715 deg (-903613057)
+  distance (5-1-UINT32): 298.59 m (29859)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.0 m (2895)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2895
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:14 (1037830334)
+  position_lat (0-1-SINT32): 45.3897251 deg (541520513)
+  position_long (1-1-SINT32): -75.7399689 deg (-903613026)
+  distance (5-1-UINT32): 301.02 m (30102)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 79.2 m (2896)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2896
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:15 (1037830335)
+  position_lat (0-1-SINT32): 45.3897080 deg (541520309)
+  position_long (1-1-SINT32): -75.7399663 deg (-903612995)
+  distance (5-1-UINT32): 302.93 m (30293)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2897
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:16 (1037830336)
+  position_lat (0-1-SINT32): 45.3896868 deg (541520057)
+  position_long (1-1-SINT32): -75.7399656 deg (-903612987)
+  distance (5-1-UINT32): 305.27 m (30527)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:17 (1037830337)
+  position_lat (0-1-SINT32): 45.3896642 deg (541519787)
+  position_long (1-1-SINT32): -75.7399656 deg (-903612987)
+  distance (5-1-UINT32): 307.79 m (30779)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.0 m (2900)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2900
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:18 (1037830338)
+  position_lat (0-1-SINT32): 45.3896390 deg (541519486)
+  position_long (1-1-SINT32): -75.7399660 deg (-903612991)
+  distance (5-1-UINT32): 310.59 m (31059)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.0 m (2900)
+  speed (6-1-UINT16): 8.262 km/h (2295)
+  unknown61 (61-1-UINT16): 2900
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:19 (1037830339)
+  position_lat (0-1-SINT32): 45.3896123 deg (541519168)
+  position_long (1-1-SINT32): -75.7399636 deg (-903612963)
+  distance (5-1-UINT32): 313.56 m (31356)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.4 m (2902)
+  speed (6-1-UINT16): 8.363 km/h (2323)
+  unknown61 (61-1-UINT16): 2902
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:20 (1037830340)
+  position_lat (0-1-SINT32): 45.3895800 deg (541518782)
+  position_long (1-1-SINT32): -75.7399570 deg (-903612884)
+  distance (5-1-UINT32): 317.19 m (31719)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.4 m (2902)
+  speed (6-1-UINT16): 8.363 km/h (2323)
+  unknown61 (61-1-UINT16): 2902
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:21 (1037830341)
+  position_lat (0-1-SINT32): 45.3895453 deg (541518368)
+  position_long (1-1-SINT32): -75.7399463 deg (-903612756)
+  distance (5-1-UINT32): 321.13 m (32113)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.6 m (2903)
+  speed (6-1-UINT16): 8.363 km/h (2323)
+  unknown61 (61-1-UINT16): 2903
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:22 (1037830342)
+  position_lat (0-1-SINT32): 45.3895140 deg (541517995)
+  position_long (1-1-SINT32): -75.7399376 deg (-903612653)
+  distance (5-1-UINT32): 324.67 m (32467)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.6 m (2903)
+  speed (6-1-UINT16): 8.363 km/h (2323)
+  unknown61 (61-1-UINT16): 2903
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:23 (1037830343)
+  position_lat (0-1-SINT32): 45.3894811 deg (541517603)
+  position_long (1-1-SINT32): -75.7399281 deg (-903612539)
+  distance (5-1-UINT32): 328.33 m (32833)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.6 m (2903)
+  speed (6-1-UINT16): 8.834 km/h (2454)
+  unknown61 (61-1-UINT16): 2903
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:24 (1037830344)
+  position_lat (0-1-SINT32): 45.3894428 deg (541517146)
+  position_long (1-1-SINT32): -75.7399229 deg (-903612477)
+  distance (5-1-UINT32): 332.61 m (33261)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.6 m (2903)
+  speed (6-1-UINT16): 11.354 km/h (3154)
+  unknown61 (61-1-UINT16): 2903
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:25 (1037830345)
+  position_lat (0-1-SINT32): 45.3894060 deg (541516706)
+  position_long (1-1-SINT32): -75.7399129 deg (-903612358)
+  distance (5-1-UINT32): 336.78 m (33678)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.6 m (2903)
+  speed (6-1-UINT16): 12.798 km/h (3555)
+  unknown61 (61-1-UINT16): 2903
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:25 (1037830345)
+  xxx4 (4-1-SINT32): -35000
+  unknown0 (0-1-UINT16): 4219
+  charge_level (2-1-UINT8): 94 % (94)
+  temperature (3-1-SINT8): 4 deg.C (4)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:26 (1037830346)
+  position_lat (0-1-SINT32): 45.3893676 deg (541516248)
+  position_long (1-1-SINT32): -75.7399022 deg (-903612231)
+  distance (5-1-UINT32): 341.12 m (34112)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 12.931 km/h (3592)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:27 (1037830347)
+  position_lat (0-1-SINT32): 45.3893290 deg (541515788)
+  position_long (1-1-SINT32): -75.7398900 deg (-903612085)
+  distance (5-1-UINT32): 345.51 m (34551)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.270 km/h (3686)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:28 (1037830348)
+  position_lat (0-1-SINT32): 45.3892909 deg (541515333)
+  position_long (1-1-SINT32): -75.7398849 deg (-903612024)
+  distance (5-1-UINT32): 349.77 m (34977)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.270 km/h (3686)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:29 (1037830349)
+  position_lat (0-1-SINT32): 45.3892528 deg (541514879)
+  position_long (1-1-SINT32): -75.7398767 deg (-903611926)
+  distance (5-1-UINT32): 354.03 m (35403)
+  grit (114-1-FLOAT32): 23.4375
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 12.798 km/h (3555)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:30 (1037830350)
+  position_lat (0-1-SINT32): 45.3892133 deg (541514408)
+  position_long (1-1-SINT32): -75.7398598 deg (-903611724)
+  distance (5-1-UINT32): 358.61 m (35861)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 12.931 km/h (3592)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:31 (1037830351)
+  position_lat (0-1-SINT32): 45.3891735 deg (541513933)
+  position_long (1-1-SINT32): -75.7398475 deg (-903611578)
+  distance (5-1-UINT32): 363.14 m (36314)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.000 km/h (3611)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:32 (1037830352)
+  position_lat (0-1-SINT32): 45.3891412 deg (541513547)
+  position_long (1-1-SINT32): -75.7398310 deg (-903611381)
+  distance (5-1-UINT32): 366.96 m (36696)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.000 km/h (3611)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:33 (1037830353)
+  position_lat (0-1-SINT32): 45.3891045 deg (541513110)
+  position_long (1-1-SINT32): -75.7398161 deg (-903611203)
+  distance (5-1-UINT32): 371.17 m (37117)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.068 km/h (3630)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:34 (1037830354)
+  position_lat (0-1-SINT32): 45.3890639 deg (541512625)
+  position_long (1-1-SINT32): -75.7397986 deg (-903610995)
+  distance (5-1-UINT32): 375.89 m (37589)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.068 km/h (3630)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:35 (1037830355)
+  position_lat (0-1-SINT32): 45.3890263 deg (541512177)
+  position_long (1-1-SINT32): -75.7397790 deg (-903610761)
+  distance (5-1-UINT32): 380.32 m (38032)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 13.068 km/h (3630)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:36 (1037830356)
+  position_lat (0-1-SINT32): 45.3890037 deg (541511907)
+  position_long (1-1-SINT32): -75.7397655 deg (-903610600)
+  distance (5-1-UINT32): 383.00 m (38300)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 11.822 km/h (3284)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:37 (1037830357)
+  position_lat (0-1-SINT32): 45.3889849 deg (541511683)
+  position_long (1-1-SINT32): -75.7397559 deg (-903610485)
+  distance (5-1-UINT32): 385.23 m (38523)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 9
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 9.641 km/h (2678)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:38 (1037830358)
+  position_lat (0-1-SINT32): 45.3889674 deg (541511474)
+  position_long (1-1-SINT32): -75.7397437 deg (-903610340)
+  distance (5-1-UINT32): 387.29 m (38729)
+  grit (114-1-FLOAT32): 14.0625009536743
+  flow (115-1-FLOAT32): 22
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 4.802 km/h (1334)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:39 (1037830359)
+  position_lat (0-1-SINT32): 45.3889577 deg (541511358)
+  position_long (1-1-SINT32): -75.7397344 deg (-903610229)
+  distance (5-1-UINT32): 388.57 m (38857)
+  grit (114-1-FLOAT32): 32.8125
+  flow (115-1-FLOAT32): 56
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 3.661 km/h (1017)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:40 (1037830360)
+  position_lat (0-1-SINT32): 45.3889517 deg (541511286)
+  position_long (1-1-SINT32): -75.7397264 deg (-903610133)
+  distance (5-1-UINT32): 389.48 m (38948)
+  grit (114-1-FLOAT32): 25.78125
+  flow (115-1-FLOAT32): 53
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 3.528 km/h (980)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:41 (1037830361)
+  position_lat (0-1-SINT32): 45.3889451 deg (541511208)
+  position_long (1-1-SINT32): -75.7397119 deg (-903609960)
+  distance (5-1-UINT32): 390.82 m (39082)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 39
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 3.661 km/h (1017)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:42 (1037830362)
+  position_lat (0-1-SINT32): 45.3889408 deg (541511157)
+  position_long (1-1-SINT32): -75.7397010 deg (-903609830)
+  distance (5-1-UINT32): 391.79 m (39179)
+  grit (114-1-FLOAT32): 32.8125
+  flow (115-1-FLOAT32): 21
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 4.802 km/h (1334)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:43 (1037830363)
+  position_lat (0-1-SINT32): 45.3889411 deg (541511160)
+  position_long (1-1-SINT32): -75.7396884 deg (-903609680)
+  distance (5-1-UINT32): 392.77 m (39277)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 2.117 km/h (588)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:44 (1037830364)
+  position_lat (0-1-SINT32): 45.3889438 deg (541511192)
+  position_long (1-1-SINT32): -75.7396785 deg (-903609562)
+  distance (5-1-UINT32): 393.52 m (39352)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 52
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:46 (1037830366)
+  position_lat (0-1-SINT32): 45.3889448 deg (541511204)
+  position_long (1-1-SINT32): -75.7396831 deg (-903609617)
+  distance (5-1-UINT32): 393.60 m (39360)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:47 (1037830367)
+  position_lat (0-1-SINT32): 45.3889438 deg (541511192)
+  position_long (1-1-SINT32): -75.7396905 deg (-903609705)
+  distance (5-1-UINT32): 393.60 m (39360)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 0 (171 octets, message name: lap, message number: 19)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:47 (1037830367)
+  start_time (2-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  start_position_lat (3-1-SINT32): 45.3913221 deg (541539567)
+  start_position_long (4-1-SINT32): -75.7397311 deg (-903610189)
+  end_position_lat (5-1-SINT32): 45.3889448 deg (541511204)
+  end_position_long (6-1-SINT32): -75.7396831 deg (-903609617)
+  total_elapsed_time (7-1-UINT32): 145.744 s (145744)
+  total_timer_time (8-1-UINT32): 145.744 s (145744)
+  total_distance (9-1-UINT32): 393.60 m (39360)
+  total_cycles (10-1-UINT32, INVALID): 4294967295
+  nec_lat (27-1-SINT32): 45.3915843 deg (541542695)
+  nec_long (28-1-SINT32): -75.7396775 deg (-903609550)
+  swc_lat (29-1-SINT32): 45.3889408 deg (541511157)
+  swc_long (30-1-SINT32): -75.7408328 deg (-903623333)
+  total_work (41-1-UINT32, INVALID): 4294967295
+  time_standing (98-1-UINT32, INVALID): 4294967295
+  avg_left_power_phase (102-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_left_power_phase_peak (103-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase (104-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase_peak (105-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_power_position (106-2-UINT16, INVALID): {65535, 65535}
+  max_power_position (107-2-UINT16, INVALID): {65535, 65535}
+  total_grit (149-1-FLOAT32): 1.08749997615814 kGrit (1.08749997615814)
+  avg_flow (154-1-FLOAT32): 3.50719285011292 Flow (3.50719285011292)
+  message_index (254-1-UINT16): selected=0,reserved=0,mask=0 (0)
+  total_calories (11-1-UINT16): 15 kcal (15)
+  total_fat_calories (12-1-UINT16, INVALID): 65535
+  avg_speed (13-1-UINT16): 9.724 km/h (2701)
+  max_speed (14-1-UINT16): 13.270 km/h (3686)
+  avg_power (19-1-UINT16, INVALID): 65535
+  max_power (20-1-UINT16, INVALID): 65535
+  total_ascent (21-1-UINT16): 8 m (8)
+  total_descent (22-1-UINT16): 3 m (3)
+  normalized_power (33-1-UINT16, INVALID): 65535
+  left_right_balance (34-1-UINT16, INVALID): 65535
+  wkt_step_index (71-1-UINT16, INVALID): 65535
+  unknown96 (96-1-UINT16, INVALID): 65535
+  unknown97 (97-1-UINT16, INVALID): 65535
+  stand_count (99-1-UINT16, INVALID): 65535
+  avg_vam (121-1-UINT16): 0.464 km/h (129)
+  enhanced_avg_respiration_rate (136-1-UINT16, INVALID): 65535
+  enhanced_max_respiration_rate (137-1-UINT16, INVALID): 65535
+  xxx143 (143-1-UINT16, INVALID): 65535
+  xxx145 (145-1-UINT16): 21
+  jump_count (151-1-UINT16): 0
+  xxx155 (155-1-UINT16): 3
+  event (0-1-ENUM): lap (9)
+  event_type (1-1-ENUM): stop (1)
+  avg_heart_rate (15-1-UINT8, INVALID): 255
+  max_heart_rate (16-1-UINT8, INVALID): 255
+  avg_cadence (17-1-UINT8, INVALID): 255
+  max_cadence (18-1-UINT8, INVALID): 255
+  intensity (23-1-ENUM, INVALID): 255
+  lap_trigger (24-1-ENUM): manual (0)
+  sport (25-1-ENUM): cycling (2)
+  event_group (26-1-UINT8, INVALID): 255
+  sub_sport (39-1-ENUM): mountain (8)
+  avg_temperature (50-1-SINT8): 3 deg.C (3)
+  max_temperature (51-1-SINT8): 5 deg.C (5)
+  unknown72 (72-1-ENUM, INVALID): 255
+  avg_fractional_cadence (80-1-UINT8, INVALID): 255
+  max_fractional_cadence (81-1-UINT8, INVALID): 255
+  total_fractional_cycles (82-1-UINT8, INVALID): 255
+  avg_left_torque_effectiveness (91-1-UINT8, INVALID): 255
+  avg_right_torque_effectiveness (92-1-UINT8, INVALID): 255
+  avg_left_pedal_smoothness (93-1-UINT8, INVALID): 255
+  avg_right_pedal_smoothness (94-1-UINT8, INVALID): 255
+  avg_combined_pedal_smoothness (95-1-UINT8, INVALID): 255
+  avg_left_pco (100-1-SINT8, INVALID): 127
+  avg_right_pco (101-1-SINT8, INVALID): 127
+  avg_cadence_position (108-2-UINT8, INVALID): {255, 255}
+  max_cadence_position (109-2-UINT8, INVALID): {255, 255}
+  min_temperature (124-1-SINT8): 2 deg.C (2)
+  xxx152 (152-1-UINT8, INVALID): 255
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:12:50 (1037830370)
+  position_lat (0-1-SINT32): 45.3889476 deg (541511238)
+  position_long (1-1-SINT32): -75.7397034 deg (-903609859)
+  distance (5-1-UINT32): 393.60 m (39360)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 80.8 m (2904)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2904
+  unknown66 (66-1-SINT16): -459
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 2 deg.C (2)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:25 (1037830405)
+  xxx4 (4-1-SINT32): -24000
+  unknown0 (0-1-UINT16): 4218
+  charge_level (2-1-UINT8): 94 % (94)
+  temperature (3-1-SINT8): 3 deg.C (3)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:26 (1037830406)
+  position_lat (0-1-SINT32): 45.3890029 deg (541511897)
+  position_long (1-1-SINT32): -75.7397310 deg (-903610188)
+  distance (5-1-UINT32): 393.60 m (39360)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.8 m (2899)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2900
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:39 (1037830419)
+  position_lat (0-1-SINT32): 45.3890138 deg (541512027)
+  position_long (1-1-SINT32): -75.7397337 deg (-903610220)
+  distance (5-1-UINT32): 393.77 m (39377)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 3.931 km/h (1092)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:42 (1037830422)
+  position_lat (0-1-SINT32): 45.3890412 deg (541512354)
+  position_long (1-1-SINT32): -75.7396663 deg (-903609416)
+  distance (5-1-UINT32): 399.76 m (39976)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 6.649 km/h (1847)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:46 (1037830426)
+  position_lat (0-1-SINT32): 45.3891179 deg (541513269)
+  position_long (1-1-SINT32): -75.7395008 deg (-903607441)
+  distance (5-1-UINT32): 415.25 m (41525)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 13.302 km/h (3695)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:50 (1037830430)
+  position_lat (0-1-SINT32): 45.3892122 deg (541514394)
+  position_long (1-1-SINT32): -75.7393426 deg (-903605554)
+  distance (5-1-UINT32): 431.46 m (43146)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 79.2 m (2896)
+  speed (6-1-UINT16): 12.830 km/h (3564)
+  unknown61 (61-1-UINT16): 2897
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:51 (1037830431)
+  position_lat (0-1-SINT32): 45.3892289 deg (541514594)
+  position_long (1-1-SINT32): -75.7393122 deg (-903605192)
+  distance (5-1-UINT32): 434.48 m (43448)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 79.2 m (2896)
+  speed (6-1-UINT16): 11.318 km/h (3144)
+  unknown61 (61-1-UINT16): 2897
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:52 (1037830432)
+  position_lat (0-1-SINT32): 45.3892369 deg (541514689)
+  position_long (1-1-SINT32): -75.7392782 deg (-903604786)
+  distance (5-1-UINT32): 437.01 m (43701)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 25
+  altitude (2-1-UINT16): 79.2 m (2896)
+  speed (6-1-UINT16): 9.508 km/h (2641)
+  unknown61 (61-1-UINT16): 2897
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:53 (1037830433)
+  position_lat (0-1-SINT32): 45.3892562 deg (541514919)
+  position_long (1-1-SINT32): -75.7392435 deg (-903604372)
+  distance (5-1-UINT32): 440.48 m (44048)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 21
+  altitude (2-1-UINT16): 79.2 m (2896)
+  speed (6-1-UINT16): 9.508 km/h (2641)
+  unknown61 (61-1-UINT16): 2897
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:54 (1037830434)
+  position_lat (0-1-SINT32): 45.3892658 deg (541515034)
+  position_long (1-1-SINT32): -75.7392088 deg (-903603958)
+  distance (5-1-UINT32): 443.25 m (44325)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 12
+  altitude (2-1-UINT16): 79.2 m (2896)
+  speed (6-1-UINT16): 9.508 km/h (2641)
+  unknown61 (61-1-UINT16): 2897
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:55 (1037830435)
+  position_lat (0-1-SINT32): 45.3892826 deg (541515234)
+  position_long (1-1-SINT32): -75.7391721 deg (-903603520)
+  distance (5-1-UINT32): 446.66 m (44666)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 9.842 km/h (2734)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -458
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:58 (1037830438)
+  position_lat (0-1-SINT32): 45.3893331 deg (541515837)
+  position_long (1-1-SINT32): -75.7390568 deg (-903602144)
+  distance (5-1-UINT32): 457.28 m (45728)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 9
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 10.012 km/h (2781)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:13:59 (1037830439)
+  position_lat (0-1-SINT32): 45.3893521 deg (541516064)
+  position_long (1-1-SINT32): -75.7390051 deg (-903601528)
+  distance (5-1-UINT32): 461.82 m (46182)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 10.012 km/h (2781)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:00 (1037830440)
+  position_lat (0-1-SINT32): 45.3893687 deg (541516262)
+  position_long (1-1-SINT32): -75.7389600 deg (-903600990)
+  distance (5-1-UINT32): 465.80 m (46580)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 79.8 m (2899)
+  speed (6-1-UINT16): 10.012 km/h (2781)
+  unknown61 (61-1-UINT16): 2900
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:06 (1037830446)
+  position_lat (0-1-SINT32): 45.3894428 deg (541517146)
+  position_long (1-1-SINT32): -75.7386285 deg (-903597034)
+  distance (5-1-UINT32): 492.84 m (49284)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.8 m (2899)
+  speed (6-1-UINT16): 11.488 km/h (3191)
+  unknown61 (61-1-UINT16): 2900
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:13 (1037830453)
+  position_lat (0-1-SINT32): 45.3894567 deg (541517312)
+  position_long (1-1-SINT32): -75.7382555 deg (-903592584)
+  distance (5-1-UINT32): 521.76 m (52176)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 13.068 km/h (3630)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:15 (1037830455)
+  position_lat (0-1-SINT32): 45.3894687 deg (541517454)
+  position_long (1-1-SINT32): -75.7381688 deg (-903591550)
+  distance (5-1-UINT32): 528.62 m (52862)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 16
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 12.125 km/h (3368)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:18 (1037830458)
+  position_lat (0-1-SINT32): 45.3894742 deg (541517520)
+  position_long (1-1-SINT32): -75.7380592 deg (-903590242)
+  distance (5-1-UINT32): 537.21 m (53721)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:19 (1037830459)
+  position_lat (0-1-SINT32): 45.3894789 deg (541517576)
+  position_long (1-1-SINT32): -75.7380188 deg (-903589760)
+  distance (5-1-UINT32): 540.41 m (54041)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 22
+  altitude (2-1-UINT16): 79.4 m (2897)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2898
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:20 (1037830460)
+  position_lat (0-1-SINT32): 45.3894801 deg (541517590)
+  position_long (1-1-SINT32): -75.7379749 deg (-903589237)
+  distance (5-1-UINT32): 543.84 m (54384)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 12
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:21 (1037830461)
+  position_lat (0-1-SINT32): 45.3894859 deg (541517660)
+  position_long (1-1-SINT32): -75.7379289 deg (-903588688)
+  distance (5-1-UINT32): 547.50 m (54750)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:22 (1037830462)
+  position_lat (0-1-SINT32): 45.3894921 deg (541517734)
+  position_long (1-1-SINT32): -75.7378833 deg (-903588144)
+  distance (5-1-UINT32): 551.12 m (55112)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:23 (1037830463)
+  position_lat (0-1-SINT32): 45.3894950 deg (541517768)
+  position_long (1-1-SINT32): -75.7378418 deg (-903587649)
+  distance (5-1-UINT32): 554.37 m (55437)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 10.714 km/h (2976)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:25 (1037830465)
+  position_lat (0-1-SINT32): 45.3894826 deg (541517621)
+  position_long (1-1-SINT32): -75.7377272 deg (-903586282)
+  distance (5-1-UINT32): 563.35 m (56335)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 79.6 m (2898)
+  speed (6-1-UINT16): 14.141 km/h (3928)
+  unknown61 (61-1-UINT16): 2899
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:25 (1037830465)
+  xxx4 (4-1-SINT32): -25000
+  unknown0 (0-1-UINT16): 4215
+  charge_level (2-1-UINT8): 94 % (94)
+  temperature (3-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:30 (1037830470)
+  position_lat (0-1-SINT32): 45.3894718 deg (541517492)
+  position_long (1-1-SINT32): -75.7373985 deg (-903582360)
+  distance (5-1-UINT32): 589.02 m (58902)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 78.6 m (2893)
+  speed (6-1-UINT16): 15.520 km/h (4311)
+  unknown61 (61-1-UINT16): 2894
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:31 (1037830471)
+  position_lat (0-1-SINT32): 45.3894761 deg (541517543)
+  position_long (1-1-SINT32): -75.7373367 deg (-903581623)
+  distance (5-1-UINT32): 593.87 m (59387)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 78.4 m (2892)
+  speed (6-1-UINT16): 16.189 km/h (4497)
+  unknown61 (61-1-UINT16): 2893
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:36 (1037830476)
+  position_lat (0-1-SINT32): 45.3895082 deg (541517926)
+  position_long (1-1-SINT32): -75.7370709 deg (-903578452)
+  distance (5-1-UINT32): 614.97 m (61497)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 30
+  altitude (2-1-UINT16): 77.8 m (2889)
+  speed (6-1-UINT16): 12.528 km/h (3480)
+  unknown61 (61-1-UINT16): 2890
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:37 (1037830477)
+  position_lat (0-1-SINT32): 45.3895091 deg (541517936)
+  position_long (1-1-SINT32): -75.7370185 deg (-903577826)
+  distance (5-1-UINT32): 619.03 m (61903)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 16
+  altitude (2-1-UINT16): 77.4 m (2887)
+  speed (6-1-UINT16): 12.528 km/h (3480)
+  unknown61 (61-1-UINT16): 2888
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:38 (1037830478)
+  position_lat (0-1-SINT32): 45.3895096 deg (541517943)
+  position_long (1-1-SINT32): -75.7369729 deg (-903577282)
+  distance (5-1-UINT32): 622.55 m (62255)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 8
+  altitude (2-1-UINT16): 77.4 m (2887)
+  speed (6-1-UINT16): 12.528 km/h (3480)
+  unknown61 (61-1-UINT16): 2888
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:39 (1037830479)
+  position_lat (0-1-SINT32): 45.3895094 deg (541517940)
+  position_long (1-1-SINT32): -75.7369376 deg (-903576861)
+  distance (5-1-UINT32): 625.25 m (62525)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 77.0 m (2885)
+  speed (6-1-UINT16): 10.314 km/h (2865)
+  unknown61 (61-1-UINT16): 2886
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:40 (1037830480)
+  position_lat (0-1-SINT32): 45.3895148 deg (541518004)
+  position_long (1-1-SINT32): -75.7369097 deg (-903576528)
+  distance (5-1-UINT32): 627.51 m (62751)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 19
+  altitude (2-1-UINT16): 77.0 m (2885)
+  speed (6-1-UINT16): 9.137 km/h (2538)
+  unknown61 (61-1-UINT16): 2886
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:41 (1037830481)
+  position_lat (0-1-SINT32): 45.3895206 deg (541518074)
+  position_long (1-1-SINT32): -75.7368912 deg (-903576308)
+  distance (5-1-UINT32): 628.71 m (62871)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 21
+  altitude (2-1-UINT16): 76.8 m (2884)
+  speed (6-1-UINT16): 7.088 km/h (1969)
+  unknown61 (61-1-UINT16): 2885
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:42 (1037830482)
+  position_lat (0-1-SINT32): 45.3895357 deg (541518254)
+  position_long (1-1-SINT32): -75.7368938 deg (-903576339)
+  distance (5-1-UINT32): 630.36 m (63036)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 31
+  altitude (2-1-UINT16): 76.6 m (2883)
+  speed (6-1-UINT16): 7.088 km/h (1969)
+  unknown61 (61-1-UINT16): 2884
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:43 (1037830483)
+  position_lat (0-1-SINT32): 45.3895357 deg (541518254)
+  position_long (1-1-SINT32): -75.7368938 deg (-903576339)
+  distance (5-1-UINT32): 630.36 m (63036)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 18
+  altitude (2-1-UINT16): 76.6 m (2883)
+  speed (6-1-UINT16): 7.088 km/h (1969)
+  unknown61 (61-1-UINT16): 2884
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:44 (1037830484)
+  position_lat (0-1-SINT32): 45.3895655 deg (541518609)
+  position_long (1-1-SINT32): -75.7369530 deg (-903577045)
+  distance (5-1-UINT32): 636.17 m (63617)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 76.4 m (2882)
+  speed (6-1-UINT16): 9.439 km/h (2622)
+  unknown61 (61-1-UINT16): 2883
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:46 (1037830486)
+  position_lat (0-1-SINT32): 45.3895777 deg (541518755)
+  position_long (1-1-SINT32): -75.7369879 deg (-903577462)
+  distance (5-1-UINT32): 639.23 m (63923)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 76.4 m (2882)
+  speed (6-1-UINT16): 9.774 km/h (2715)
+  unknown61 (61-1-UINT16): 2883
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:47 (1037830487)
+  position_lat (0-1-SINT32): 45.3895958 deg (541518971)
+  position_long (1-1-SINT32): -75.7370560 deg (-903578274)
+  distance (5-1-UINT32): 644.90 m (64490)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 76.4 m (2882)
+  speed (6-1-UINT16): 9.774 km/h (2715)
+  unknown61 (61-1-UINT16): 2883
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:48 (1037830488)
+  position_lat (0-1-SINT32): 45.3896080 deg (541519116)
+  position_long (1-1-SINT32): -75.7370965 deg (-903578757)
+  distance (5-1-UINT32): 648.35 m (64835)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 76.2 m (2881)
+  speed (6-1-UINT16): 9.774 km/h (2715)
+  unknown61 (61-1-UINT16): 2882
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:14:55 (1037830495)
+  position_lat (0-1-SINT32): 45.3896914 deg (541520112)
+  position_long (1-1-SINT32): -75.7373941 deg (-903582308)
+  distance (5-1-UINT32): 673.43 m (67343)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 76.0 m (2880)
+  speed (6-1-UINT16): 12.161 km/h (3378)
+  unknown61 (61-1-UINT16): 2881
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:01 (1037830501)
+  position_lat (0-1-SINT32): 45.3897282 deg (541520550)
+  position_long (1-1-SINT32): -75.7377417 deg (-903586455)
+  distance (5-1-UINT32): 700.96 m (70096)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.4 m (2877)
+  speed (6-1-UINT16): 16.290 km/h (4525)
+  unknown61 (61-1-UINT16): 2878
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:02 (1037830502)
+  position_lat (0-1-SINT32): 45.3897354 deg (541520637)
+  position_long (1-1-SINT32): -75.7378020 deg (-903587174)
+  distance (5-1-UINT32): 705.74 m (70574)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 75.2 m (2876)
+  speed (6-1-UINT16): 15.685 km/h (4357)
+  unknown61 (61-1-UINT16): 2877
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:05 (1037830505)
+  position_lat (0-1-SINT32): 45.3897525 deg (541520841)
+  position_long (1-1-SINT32): -75.7379754 deg (-903589243)
+  distance (5-1-UINT32): 719.45 m (71945)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.6 m (2873)
+  speed (6-1-UINT16): 16.124 km/h (4479)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:07 (1037830507)
+  position_lat (0-1-SINT32): 45.3897717 deg (541521069)
+  position_long (1-1-SINT32): -75.7380875 deg (-903590580)
+  distance (5-1-UINT32): 728.46 m (72846)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 16.124 km/h (4479)
+  unknown61 (61-1-UINT16): 2873
+  unknown66 (66-1-SINT16): -457
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:08 (1037830508)
+  position_lat (0-1-SINT32): 45.3897784 deg (541521149)
+  position_long (1-1-SINT32): -75.7381389 deg (-903591193)
+  distance (5-1-UINT32): 732.55 m (73255)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.0 m (2870)
+  speed (6-1-UINT16): 16.124 km/h (4479)
+  unknown61 (61-1-UINT16): 2872
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:10 (1037830510)
+  position_lat (0-1-SINT32): 45.3898042 deg (541521457)
+  position_long (1-1-SINT32): -75.7382457 deg (-903592468)
+  distance (5-1-UINT32): 741.34 m (74134)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.8 m (2869)
+  speed (6-1-UINT16): 15.451 km/h (4292)
+  unknown61 (61-1-UINT16): 2871
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:11 (1037830511)
+  position_lat (0-1-SINT32): 45.3898210 deg (541521658)
+  position_long (1-1-SINT32): -75.7383029 deg (-903593150)
+  distance (5-1-UINT32): 746.14 m (74614)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 15.181 km/h (4217)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:12 (1037830512)
+  position_lat (0-1-SINT32): 45.3898363 deg (541521840)
+  position_long (1-1-SINT32): -75.7383601 deg (-903593833)
+  distance (5-1-UINT32): 750.92 m (75092)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 15.080 km/h (4189)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:13 (1037830513)
+  position_lat (0-1-SINT32): 45.3898499 deg (541522003)
+  position_long (1-1-SINT32): -75.7384172 deg (-903594514)
+  distance (5-1-UINT32): 755.61 m (75561)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.814 km/h (4115)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:14 (1037830514)
+  position_lat (0-1-SINT32): 45.3898587 deg (541522107)
+  position_long (1-1-SINT32): -75.7384694 deg (-903595136)
+  distance (5-1-UINT32): 759.77 m (75977)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.645 km/h (4068)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:15 (1037830515)
+  position_lat (0-1-SINT32): 45.3898702 deg (541522245)
+  position_long (1-1-SINT32): -75.7385236 deg (-903595783)
+  distance (5-1-UINT32): 764.17 m (76417)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.645 km/h (4068)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:16 (1037830516)
+  position_lat (0-1-SINT32): 45.3898790 deg (541522350)
+  position_long (1-1-SINT32): -75.7385772 deg (-903596423)
+  distance (5-1-UINT32): 768.49 m (76849)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.544 km/h (4040)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:17 (1037830517)
+  position_lat (0-1-SINT32): 45.3898915 deg (541522499)
+  position_long (1-1-SINT32): -75.7386305 deg (-903597059)
+  distance (5-1-UINT32): 772.88 m (77288)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.342 km/h (3984)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:18 (1037830518)
+  position_lat (0-1-SINT32): 45.3899044 deg (541522653)
+  position_long (1-1-SINT32): -75.7386843 deg (-903597700)
+  distance (5-1-UINT32): 777.33 m (77733)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.310 km/h (3975)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:19 (1037830519)
+  position_lat (0-1-SINT32): 45.3899157 deg (541522787)
+  position_long (1-1-SINT32): -75.7387367 deg (-903598326)
+  distance (5-1-UINT32): 781.62 m (78162)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.342 km/h (3984)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:20 (1037830520)
+  position_lat (0-1-SINT32): 45.3899318 deg (541522979)
+  position_long (1-1-SINT32): -75.7387900 deg (-903598961)
+  distance (5-1-UINT32): 786.16 m (78616)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 14.342 km/h (3984)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:25 (1037830525)
+  position_lat (0-1-SINT32): 45.3900105 deg (541523918)
+  position_long (1-1-SINT32): -75.7390286 deg (-903601808)
+  distance (5-1-UINT32): 806.74 m (80674)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 13.874 km/h (3854)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:25 (1037830525)
+  xxx4 (4-1-SINT32): -26000
+  unknown0 (0-1-UINT16): 4213
+  charge_level (2-1-UINT8): 94 % (94)
+  temperature (3-1-SINT8): 2 deg.C (2)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:26 (1037830526)
+  position_lat (0-1-SINT32): 45.3900228 deg (541524065)
+  position_long (1-1-SINT32): -75.7390755 deg (-903602367)
+  distance (5-1-UINT32): 810.64 m (81064)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 12.262 km/h (3406)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:27 (1037830527)
+  position_lat (0-1-SINT32): 45.3900338 deg (541524197)
+  position_long (1-1-SINT32): -75.7391198 deg (-903602896)
+  distance (5-1-UINT32): 814.32 m (81432)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 12
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.822 km/h (3284)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:28 (1037830528)
+  position_lat (0-1-SINT32): 45.3900542 deg (541524440)
+  position_long (1-1-SINT32): -75.7391744 deg (-903603548)
+  distance (5-1-UINT32): 819.15 m (81915)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 9
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.822 km/h (3284)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:29 (1037830529)
+  position_lat (0-1-SINT32): 45.3900749 deg (541524687)
+  position_long (1-1-SINT32): -75.7392277 deg (-903604183)
+  distance (5-1-UINT32): 823.91 m (82391)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 5
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 13.673 km/h (3798)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:34 (1037830534)
+  position_lat (0-1-SINT32): 45.3901913 deg (541526075)
+  position_long (1-1-SINT32): -75.7394670 deg (-903607038)
+  distance (5-1-UINT32): 846.53 m (84653)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 12.967 km/h (3602)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:35 (1037830535)
+  position_lat (0-1-SINT32): 45.3902111 deg (541526312)
+  position_long (1-1-SINT32): -75.7395021 deg (-903607457)
+  distance (5-1-UINT32): 850.06 m (85006)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 12.629 km/h (3508)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:36 (1037830536)
+  position_lat (0-1-SINT32): 45.3902271 deg (541526503)
+  position_long (1-1-SINT32): -75.7395480 deg (-903608005)
+  distance (5-1-UINT32): 854.06 m (85406)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 12.629 km/h (3508)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:37 (1037830537)
+  position_lat (0-1-SINT32): 45.3902503 deg (541526779)
+  position_long (1-1-SINT32): -75.7396023 deg (-903608652)
+  distance (5-1-UINT32): 859.04 m (85904)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 12.629 km/h (3508)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:38 (1037830538)
+  position_lat (0-1-SINT32): 45.3902752 deg (541527076)
+  position_long (1-1-SINT32): -75.7396552 deg (-903609283)
+  distance (5-1-UINT32): 863.99 m (86399)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.2 m (2866)
+  speed (6-1-UINT16): 12.629 km/h (3508)
+  unknown61 (61-1-UINT16): 2868
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:39 (1037830539)
+  position_lat (0-1-SINT32): 45.3902878 deg (541527227)
+  position_long (1-1-SINT32): -75.7396909 deg (-903609709)
+  distance (5-1-UINT32): 867.11 m (86711)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 12.463 km/h (3462)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:40 (1037830540)
+  position_lat (0-1-SINT32): 45.3902982 deg (541527351)
+  position_long (1-1-SINT32): -75.7397209 deg (-903610068)
+  distance (5-1-UINT32): 869.68 m (86968)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 12.060 km/h (3350)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:41 (1037830541)
+  position_lat (0-1-SINT32): 45.3903089 deg (541527478)
+  position_long (1-1-SINT32): -75.7397514 deg (-903610431)
+  distance (5-1-UINT32): 872.33 m (87233)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 8
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.891 km/h (3303)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -456
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:42 (1037830542)
+  position_lat (0-1-SINT32): 45.3903210 deg (541527623)
+  position_long (1-1-SINT32): -75.7397923 deg (-903610919)
+  distance (5-1-UINT32): 875.79 m (87579)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.891 km/h (3303)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:43 (1037830543)
+  position_lat (0-1-SINT32): 45.3903394 deg (541527842)
+  position_long (1-1-SINT32): -75.7398323 deg (-903611397)
+  distance (5-1-UINT32): 879.53 m (87953)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.185 km/h (3107)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:44 (1037830544)
+  position_lat (0-1-SINT32): 45.3903617 deg (541528109)
+  position_long (1-1-SINT32): -75.7398666 deg (-903611806)
+  distance (5-1-UINT32): 883.18 m (88318)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.185 km/h (3107)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:45 (1037830545)
+  position_lat (0-1-SINT32): 45.3903826 deg (541528358)
+  position_long (1-1-SINT32): -75.7399021 deg (-903612229)
+  distance (5-1-UINT32): 886.79 m (88679)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.185 km/h (3107)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:46 (1037830546)
+  position_lat (0-1-SINT32): 45.3904011 deg (541528579)
+  position_long (1-1-SINT32): -75.7399375 deg (-903612652)
+  distance (5-1-UINT32): 890.25 m (89025)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 3
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.185 km/h (3107)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:47 (1037830547)
+  position_lat (0-1-SINT32): 45.3904179 deg (541528779)
+  position_long (1-1-SINT32): -75.7399741 deg (-903613088)
+  distance (5-1-UINT32): 893.64 m (89364)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 11.153 km/h (3098)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:48 (1037830548)
+  position_lat (0-1-SINT32): 45.3904312 deg (541528938)
+  position_long (1-1-SINT32): -75.7400095 deg (-903613510)
+  distance (5-1-UINT32): 896.77 m (89677)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.0 m (2865)
+  speed (6-1-UINT16): 10.951 km/h (3042)
+  unknown61 (61-1-UINT16): 2867
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:49 (1037830549)
+  position_lat (0-1-SINT32): 45.3904404 deg (541529047)
+  position_long (1-1-SINT32): -75.7400433 deg (-903613914)
+  distance (5-1-UINT32): 899.61 m (89961)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.850 km/h (3014)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:50 (1037830550)
+  position_lat (0-1-SINT32): 45.3904520 deg (541529186)
+  position_long (1-1-SINT32): -75.7400756 deg (-903614299)
+  distance (5-1-UINT32): 902.44 m (90244)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.850 km/h (3014)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:51 (1037830551)
+  position_lat (0-1-SINT32): 45.3904598 deg (541529279)
+  position_long (1-1-SINT32): -75.7401022 deg (-903614617)
+  distance (5-1-UINT32): 904.64 m (90464)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 10.850 km/h (3014)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:52 (1037830552)
+  position_lat (0-1-SINT32): 45.3904729 deg (541529435)
+  position_long (1-1-SINT32): -75.7401210 deg (-903614841)
+  distance (5-1-UINT32): 906.70 m (90670)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 8.129 km/h (2258)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:53 (1037830553)
+  position_lat (0-1-SINT32): 45.3904866 deg (541529599)
+  position_long (1-1-SINT32): -75.7401345 deg (-903615002)
+  distance (5-1-UINT32): 908.54 m (90854)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 25
+  altitude (2-1-UINT16): 72.6 m (2863)
+  speed (6-1-UINT16): 7.556 km/h (2099)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:54 (1037830554)
+  position_lat (0-1-SINT32): 45.3905020 deg (541529782)
+  position_long (1-1-SINT32): -75.7401391 deg (-903615057)
+  distance (5-1-UINT32): 910.29 m (91029)
+  grit (114-1-FLOAT32): 32.8125
+  flow (115-1-FLOAT32): 20
+  altitude (2-1-UINT16): 72.6 m (2863)
+  speed (6-1-UINT16): 6.214 km/h (1726)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:55 (1037830555)
+  position_lat (0-1-SINT32): 45.3905171 deg (541529963)
+  position_long (1-1-SINT32): -75.7401403 deg (-903615071)
+  distance (5-1-UINT32): 911.97 m (91197)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 27
+  altitude (2-1-UINT16): 72.6 m (2863)
+  speed (6-1-UINT16): 6.214 km/h (1726)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:56 (1037830556)
+  position_lat (0-1-SINT32): 45.3905352 deg (541530178)
+  position_long (1-1-SINT32): -75.7401391 deg (-903615057)
+  distance (5-1-UINT32): 913.94 m (91394)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 15
+  altitude (2-1-UINT16): 72.4 m (2862)
+  speed (6-1-UINT16): 6.012 km/h (1670)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 0 (171 octets, message name: lap, message number: 19)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:56 (1037830556)
+  start_time (2-1-UINT32): 2022-11-19T17:12:47 (1037830367)
+  start_position_lat (3-1-SINT32): 45.3889438 deg (541511192)
+  start_position_long (4-1-SINT32): -75.7396905 deg (-903609705)
+  end_position_lat (5-1-SINT32): 45.3905171 deg (541529963)
+  end_position_long (6-1-SINT32): -75.7401403 deg (-903615071)
+  total_elapsed_time (7-1-UINT32): 189.803 s (189803)
+  total_timer_time (8-1-UINT32): 189.803 s (189803)
+  total_distance (9-1-UINT32): 518.37 m (51837)
+  total_cycles (10-1-UINT32, INVALID): 4294967295
+  nec_lat (27-1-SINT32): 45.3905171 deg (541529963)
+  nec_long (28-1-SINT32): -75.7368912 deg (-903576308)
+  swc_lat (29-1-SINT32): 45.3889436 deg (541511190)
+  swc_long (30-1-SINT32): -75.7401403 deg (-903615071)
+  total_work (41-1-UINT32, INVALID): 4294967295
+  time_standing (98-1-UINT32, INVALID): 4294967295
+  avg_left_power_phase (102-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_left_power_phase_peak (103-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase (104-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase_peak (105-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_power_position (106-2-UINT16, INVALID): {65535, 65535}
+  max_power_position (107-2-UINT16, INVALID): {65535, 65535}
+  total_grit (149-1-FLOAT32): 0.09375 kGrit (0.09375)
+  avg_flow (154-1-FLOAT32): 3.47014927864075 Flow (3.47014927864075)
+  message_index (254-1-UINT16): selected=0,reserved=0,mask=1 (1)
+  total_calories (11-1-UINT16): 9 kcal (9)
+  total_fat_calories (12-1-UINT16, INVALID): 65535
+  avg_speed (13-1-UINT16): 9.832 km/h (2731)
+  max_speed (14-1-UINT16): 16.492 km/h (4581)
+  avg_power (19-1-UINT16, INVALID): 65535
+  max_power (20-1-UINT16, INVALID): 65535
+  total_ascent (21-1-UINT16): 0 m (0)
+  total_descent (22-1-UINT16): 8 m (8)
+  normalized_power (33-1-UINT16, INVALID): 65535
+  left_right_balance (34-1-UINT16, INVALID): 65535
+  wkt_step_index (71-1-UINT16, INVALID): 65535
+  unknown96 (96-1-UINT16, INVALID): 65535
+  unknown97 (97-1-UINT16, INVALID): 65535
+  stand_count (99-1-UINT16, INVALID): 65535
+  avg_vam (121-1-UINT16, INVALID): 65535
+  enhanced_avg_respiration_rate (136-1-UINT16, INVALID): 65535
+  enhanced_max_respiration_rate (137-1-UINT16, INVALID): 65535
+  xxx143 (143-1-UINT16, INVALID): 65535
+  xxx145 (145-1-UINT16): 20
+  jump_count (151-1-UINT16): 0
+  xxx155 (155-1-UINT16): 4
+  event (0-1-ENUM): lap (9)
+  event_type (1-1-ENUM): stop (1)
+  avg_heart_rate (15-1-UINT8, INVALID): 255
+  max_heart_rate (16-1-UINT8, INVALID): 255
+  avg_cadence (17-1-UINT8, INVALID): 255
+  max_cadence (18-1-UINT8, INVALID): 255
+  intensity (23-1-ENUM, INVALID): 255
+  lap_trigger (24-1-ENUM): manual (0)
+  sport (25-1-ENUM): cycling (2)
+  event_group (26-1-UINT8, INVALID): 255
+  sub_sport (39-1-ENUM): mountain (8)
+  avg_temperature (50-1-SINT8): 1 deg.C (1)
+  max_temperature (51-1-SINT8): 2 deg.C (2)
+  unknown72 (72-1-ENUM, INVALID): 255
+  avg_fractional_cadence (80-1-UINT8, INVALID): 255
+  max_fractional_cadence (81-1-UINT8, INVALID): 255
+  total_fractional_cycles (82-1-UINT8, INVALID): 255
+  avg_left_torque_effectiveness (91-1-UINT8, INVALID): 255
+  avg_right_torque_effectiveness (92-1-UINT8, INVALID): 255
+  avg_left_pedal_smoothness (93-1-UINT8, INVALID): 255
+  avg_right_pedal_smoothness (94-1-UINT8, INVALID): 255
+  avg_combined_pedal_smoothness (95-1-UINT8, INVALID): 255
+  avg_left_pco (100-1-SINT8, INVALID): 127
+  avg_right_pco (101-1-SINT8, INVALID): 127
+  avg_cadence_position (108-2-UINT8, INVALID): {255, 255}
+  max_cadence_position (109-2-UINT8, INVALID): {255, 255}
+  min_temperature (124-1-SINT8): 0 deg.C (0)
+  xxx152 (152-1-UINT8, INVALID): 255
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:57 (1037830557)
+  position_lat (0-1-SINT32): 45.3905520 deg (541530379)
+  position_long (1-1-SINT32): -75.7401360 deg (-903615020)
+  distance (5-1-UINT32): 915.81 m (91581)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 11
+  altitude (2-1-UINT16): 72.4 m (2862)
+  speed (6-1-UINT16): 5.846 km/h (1624)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:58 (1037830558)
+  position_lat (0-1-SINT32): 45.3905647 deg (541530530)
+  position_long (1-1-SINT32): -75.7401346 deg (-903615003)
+  distance (5-1-UINT32): 917.22 m (91722)
+  grit (114-1-FLOAT32): 28.125
+  flow (115-1-FLOAT32): 8
+  altitude (2-1-UINT16): 72.4 m (2862)
+  speed (6-1-UINT16): 6.548 km/h (1819)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:15:59 (1037830559)
+  position_lat (0-1-SINT32): 45.3905800 deg (541530713)
+  position_long (1-1-SINT32): -75.7401344 deg (-903615001)
+  distance (5-1-UINT32): 918.91 m (91891)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 72.4 m (2862)
+  speed (6-1-UINT16): 6.548 km/h (1819)
+  unknown61 (61-1-UINT16): 2864
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:06 (1037830566)
+  position_lat (0-1-SINT32): 45.3907336 deg (541532545)
+  position_long (1-1-SINT32): -75.7400762 deg (-903614306)
+  distance (5-1-UINT32): 936.69 m (93669)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 72.6 m (2863)
+  speed (6-1-UINT16): 8.399 km/h (2333)
+  unknown61 (61-1-UINT16): 2865
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:14 (1037830574)
+  position_lat (0-1-SINT32): 45.3909178 deg (541534743)
+  position_long (1-1-SINT32): -75.7399390 deg (-903612670)
+  distance (5-1-UINT32): 959.85 m (95985)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 72.8 m (2864)
+  speed (6-1-UINT16): 9.508 km/h (2641)
+  unknown61 (61-1-UINT16): 2866
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:21 (1037830581)
+  position_lat (0-1-SINT32): 45.3910412 deg (541536215)
+  position_long (1-1-SINT32): -75.7397789 deg (-903610759)
+  distance (5-1-UINT32): 978.40 m (97840)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 73.4 m (2867)
+  speed (6-1-UINT16): 9.205 km/h (2557)
+  unknown61 (61-1-UINT16): 2869
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:22 (1037830582)
+  position_lat (0-1-SINT32): 45.3910544 deg (541536373)
+  position_long (1-1-SINT32): -75.7397573 deg (-903610502)
+  distance (5-1-UINT32): 980.62 m (98062)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.6 m (2868)
+  speed (6-1-UINT16): 9.104 km/h (2529)
+  unknown61 (61-1-UINT16): 2870
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:23 (1037830583)
+  position_lat (0-1-SINT32): 45.3910650 deg (541536499)
+  position_long (1-1-SINT32): -75.7397334 deg (-903610217)
+  distance (5-1-UINT32): 982.82 m (98282)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 73.8 m (2869)
+  speed (6-1-UINT16): 9.004 km/h (2501)
+  unknown61 (61-1-UINT16): 2871
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:24 (1037830584)
+  position_lat (0-1-SINT32): 45.3910765 deg (541536636)
+  position_long (1-1-SINT32): -75.7397063 deg (-903609893)
+  distance (5-1-UINT32): 985.30 m (98530)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 74.0 m (2870)
+  speed (6-1-UINT16): 8.968 km/h (2491)
+  unknown61 (61-1-UINT16): 2872
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:25 (1037830585)
+  position_lat (0-1-SINT32): 45.3910857 deg (541536746)
+  position_long (1-1-SINT32): -75.7396826 deg (-903609610)
+  distance (5-1-UINT32): 987.38 m (98738)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 74.0 m (2870)
+  speed (6-1-UINT16): 8.834 km/h (2454)
+  unknown61 (61-1-UINT16): 2872
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 15 (13 octets, message name: battery, message number: 104)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:25 (1037830585)
+  xxx4 (4-1-SINT32): -27000
+  unknown0 (0-1-UINT16): 4209
+  charge_level (2-1-UINT8): 93 % (93)
+  temperature (3-1-SINT8): 1 deg.C (1)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:26 (1037830586)
+  position_lat (0-1-SINT32): 45.3910957 deg (541536866)
+  position_long (1-1-SINT32): -75.7396630 deg (-903609377)
+  distance (5-1-UINT32): 989.27 m (98927)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 74.0 m (2870)
+  speed (6-1-UINT16): 8.399 km/h (2333)
+  unknown61 (61-1-UINT16): 2872
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:27 (1037830587)
+  position_lat (0-1-SINT32): 45.3911071 deg (541537001)
+  position_long (1-1-SINT32): -75.7396482 deg (-903609200)
+  distance (5-1-UINT32): 990.96 m (99096)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 12
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 8.096 km/h (2249)
+  unknown61 (61-1-UINT16): 2873
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:28 (1037830588)
+  position_lat (0-1-SINT32): 45.3911266 deg (541537234)
+  position_long (1-1-SINT32): -75.7396361 deg (-903609056)
+  distance (5-1-UINT32): 993.32 m (99332)
+  grit (114-1-FLOAT32): 14.0625
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 7.895 km/h (2193)
+  unknown61 (61-1-UINT16): 2873
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:29 (1037830589)
+  position_lat (0-1-SINT32): 45.3911450 deg (541537454)
+  position_long (1-1-SINT32): -75.7396318 deg (-903609004)
+  distance (5-1-UINT32): 995.38 m (99538)
+  grit (114-1-FLOAT32): 32.8125
+  flow (115-1-FLOAT32): 5
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 7.726 km/h (2146)
+  unknown61 (61-1-UINT16): 2873
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:30 (1037830590)
+  position_lat (0-1-SINT32): 45.3911633 deg (541537672)
+  position_long (1-1-SINT32): -75.7396313 deg (-903608999)
+  distance (5-1-UINT32): 997.36 m (99736)
+  grit (114-1-FLOAT32): 37.5
+  flow (115-1-FLOAT32): 5
+  altitude (2-1-UINT16): 74.2 m (2871)
+  speed (6-1-UINT16): 7.592 km/h (2109)
+  unknown61 (61-1-UINT16): 2873
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:31 (1037830591)
+  position_lat (0-1-SINT32): 45.3911843 deg (541537922)
+  position_long (1-1-SINT32): -75.7396401 deg (-903609103)
+  distance (5-1-UINT32): 999.79 m (99979)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 4
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 7.592 km/h (2109)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:32 (1037830592)
+  position_lat (0-1-SINT32): 45.3912050 deg (541538169)
+  position_long (1-1-SINT32): -75.7396499 deg (-903609220)
+  distance (5-1-UINT32): 1002.21 m (100221)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 2
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 7.592 km/h (2109)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:33 (1037830593)
+  position_lat (0-1-SINT32): 45.3912239 deg (541538395)
+  position_long (1-1-SINT32): -75.7396572 deg (-903609308)
+  distance (5-1-UINT32): 1004.40 m (100440)
+  grit (114-1-FLOAT32): 18.75
+  flow (115-1-FLOAT32): 1
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 7.657 km/h (2127)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:34 (1037830594)
+  position_lat (0-1-SINT32): 45.3912434 deg (541538628)
+  position_long (1-1-SINT32): -75.7396676 deg (-903609431)
+  distance (5-1-UINT32): 1006.71 m (100671)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.4 m (2872)
+  speed (6-1-UINT16): 7.625 km/h (2118)
+  unknown61 (61-1-UINT16): 2874
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:40 (1037830600)
+  position_lat (0-1-SINT32): 45.3913247 deg (541539597)
+  position_long (1-1-SINT32): -75.7396945 deg (-903609752)
+  distance (5-1-UINT32): 1016.00 m (101600)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 6
+  altitude (2-1-UINT16): 74.6 m (2873)
+  speed (6-1-UINT16): 4.266 km/h (1185)
+  unknown61 (61-1-UINT16): 2875
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:41 (1037830601)
+  position_lat (0-1-SINT32): 45.3913288 deg (541539646)
+  position_long (1-1-SINT32): -75.7396959 deg (-903609769)
+  distance (5-1-UINT32): 1016.48 m (101648)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 42
+  altitude (2-1-UINT16): 74.8 m (2874)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2876
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:42 (1037830602)
+  position_lat (0-1-SINT32): 45.3913185 deg (541539524)
+  position_long (1-1-SINT32): -75.7396995 deg (-903609812)
+  distance (5-1-UINT32): 1016.48 m (101648)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.8 m (2874)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2876
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:43 (1037830603)
+  position_lat (0-1-SINT32): 45.3913197 deg (541539538)
+  position_long (1-1-SINT32): -75.7397045 deg (-903609872)
+  distance (5-1-UINT32): 1016.67 m (101667)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.8 m (2874)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2876
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 14 (35 octets, message name: record, message number: 20)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:44 (1037830604)
+  position_lat (0-1-SINT32): 45.3913217 deg (541539562)
+  position_long (1-1-SINT32): -75.7397090 deg (-903609925)
+  distance (5-1-UINT32): 1016.96 m (101696)
+  grit (114-1-FLOAT32): 0
+  flow (115-1-FLOAT32): 0
+  altitude (2-1-UINT16): 74.8 m (2874)
+  speed (6-1-UINT16): 0.000 km/h (0)
+  unknown61 (61-1-UINT16): 2876
+  unknown66 (66-1-SINT16): -455
+  heart_rate (3-1-UINT8, INVALID): 255
+  temperature (13-1-SINT8): 0 deg.C (0)
+Local message type: 3 (16 octets, message name: event, message number: 21)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:44 (1037830604)
+  timer_trigger (3-1-UINT32, original name: data): manual (0)
+  xxx17 (17-1-UINT16, INVALID): 65535
+  xxx18 (18-1-UINT16, INVALID): 65535
+  event (0-1-ENUM): timer (0)
+  event_type (1-1-ENUM): stop_all (4)
+  event_group (4-1-UINT8): 0
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:44 (1037830604)
+  serial_number (3-1-UINT32Z): 3407998384
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16): garmin (1)
+  garmin_product (4-1-UINT16, original name: product): edge_830 (3122)
+  software_version (5-1-UINT16): 9.50 (950)
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): creator (0)
+  local_device_type (1-1-UINT8, original name: device_type, INVALID): 255
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:44 (1037830604)
+  serial_number (3-1-UINT32Z, INVALID): 0
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16): garmin (1)
+  garmin_product (4-1-UINT16, original name: product): edge_830 (3122)
+  software_version (5-1-UINT16): 9.50 (950)
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): device1 (1)
+  local_device_type (1-1-UINT8, original name: device_type): barometer (4)
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:44 (1037830604)
+  serial_number (3-1-UINT32Z, INVALID): 0
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16): garmin (1)
+  garmin_product (4-1-UINT16, original name: product): 3107
+  software_version (5-1-UINT16): 4.80 (480)
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): device2 (2)
+  local_device_type (1-1-UINT8, original name: device_type): gps (0)
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 4 (58 octets, message name: device_info, message number: 23)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:44 (1037830604)
+  serial_number (3-1-UINT32Z, INVALID): 0
+  cum_operating_time (7-1-UINT32, INVALID): 4294967295
+  unknown8 (8-1-UINT32, INVALID): 4294967295
+  unknown15 (15-1-UINT32, INVALID): 4294967295
+  unknown16 (16-1-UINT32, INVALID): 4294967295
+  unknown24 (24-1-UINT32Z, INVALID): 0
+  xxx31 (31-1-UINT32, INVALID): 4294967295
+  manufacturer (2-1-UINT16, INVALID): 65535
+  product (4-1-UINT16, INVALID): 65535
+  software_version (5-1-UINT16, INVALID): 65535
+  battery_voltage (10-1-UINT16, INVALID): 65535
+  xxx13 (13-1-UINT16, INVALID): 65535
+  device_index (0-1-UINT8): heart_rate (3)
+  local_device_type (1-1-UINT8, original name: device_type): 7
+  hardware_version (6-1-UINT8, INVALID): 255
+  unknown9 (9-1-UINT8, INVALID): 255
+  battery_status (11-1-UINT8, INVALID): 255
+  ant_network (22-1-ENUM, INVALID): 255
+  source_type (25-1-ENUM): local (5)
+  xxx29 (29-6-UINT8, INVALID): {255, 255, 255, 255, 255, 255}
+  xxx30 (30-1-UINT8, INVALID): 255
+  battery_level (32-1-UINT8, INVALID): 255
+Local message type: 3 (16 octets, message name: event, message number: 21)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:51 (1037830611)
+  data (3-1-UINT32): 200
+  xxx17 (17-1-UINT16, INVALID): 65535
+  xxx18 (18-1-UINT16, INVALID): 65535
+  event (0-1-ENUM): 48
+  event_type (1-1-ENUM): marker (3)
+  event_group (4-1-UINT8): 1
+Local message type: 0 (171 octets, message name: lap, message number: 19)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:52 (1037830612)
+  start_time (2-1-UINT32): 2022-11-19T17:15:56 (1037830556)
+  start_position_lat (3-1-SINT32): 45.3905352 deg (541530178)
+  start_position_long (4-1-SINT32): -75.7401391 deg (-903615057)
+  end_position_lat (5-1-SINT32): 45.3913217 deg (541539562)
+  end_position_long (6-1-SINT32): -75.7397090 deg (-903609925)
+  total_elapsed_time (7-1-UINT32): 47.825 s (47825)
+  total_timer_time (8-1-UINT32): 47.825 s (47825)
+  total_distance (9-1-UINT32): 104.99 m (10499)
+  total_cycles (10-1-UINT32, INVALID): 4294967295
+  nec_lat (27-1-SINT32): 45.3913288 deg (541539646)
+  nec_long (28-1-SINT32): -75.7396313 deg (-903608999)
+  swc_lat (29-1-SINT32): 45.3905352 deg (541530178)
+  swc_long (30-1-SINT32): -75.7401391 deg (-903615057)
+  total_work (41-1-UINT32, INVALID): 4294967295
+  time_standing (98-1-UINT32, INVALID): 4294967295
+  avg_left_power_phase (102-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_left_power_phase_peak (103-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase (104-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase_peak (105-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_power_position (106-2-UINT16, INVALID): {65535, 65535}
+  max_power_position (107-2-UINT16, INVALID): {65535, 65535}
+  total_grit (149-1-FLOAT32): 0.196875005960464 kGrit (0.196875005960464)
+  avg_flow (154-1-FLOAT32): 2.72790694236755 Flow (2.72790694236755)
+  message_index (254-1-UINT16): selected=0,reserved=0,mask=2 (2)
+  total_calories (11-1-UINT16): 3 kcal (3)
+  total_fat_calories (12-1-UINT16, INVALID): 65535
+  avg_speed (13-1-UINT16): 7.902 km/h (2195)
+  max_speed (14-1-UINT16): 9.508 km/h (2641)
+  avg_power (19-1-UINT16, INVALID): 65535
+  max_power (20-1-UINT16, INVALID): 65535
+  total_ascent (21-1-UINT16): 2 m (2)
+  total_descent (22-1-UINT16): 0 m (0)
+  normalized_power (33-1-UINT16, INVALID): 65535
+  left_right_balance (34-1-UINT16, INVALID): 65535
+  wkt_step_index (71-1-UINT16, INVALID): 65535
+  unknown96 (96-1-UINT16, INVALID): 65535
+  unknown97 (97-1-UINT16, INVALID): 65535
+  stand_count (99-1-UINT16, INVALID): 65535
+  avg_vam (121-1-UINT16): 0.144 km/h (40)
+  enhanced_avg_respiration_rate (136-1-UINT16, INVALID): 65535
+  enhanced_max_respiration_rate (137-1-UINT16, INVALID): 65535
+  xxx143 (143-1-UINT16, INVALID): 65535
+  xxx145 (145-1-UINT16): 7
+  jump_count (151-1-UINT16): 0
+  xxx155 (155-1-UINT16): 1
+  event (0-1-ENUM): lap (9)
+  event_type (1-1-ENUM): stop (1)
+  avg_heart_rate (15-1-UINT8, INVALID): 255
+  max_heart_rate (16-1-UINT8, INVALID): 255
+  avg_cadence (17-1-UINT8, INVALID): 255
+  max_cadence (18-1-UINT8, INVALID): 255
+  intensity (23-1-ENUM, INVALID): 255
+  lap_trigger (24-1-ENUM): session_end (7)
+  sport (25-1-ENUM): cycling (2)
+  event_group (26-1-UINT8, INVALID): 255
+  sub_sport (39-1-ENUM): mountain (8)
+  avg_temperature (50-1-SINT8): 0 deg.C (0)
+  max_temperature (51-1-SINT8): 0 deg.C (0)
+  unknown72 (72-1-ENUM, INVALID): 255
+  avg_fractional_cadence (80-1-UINT8, INVALID): 255
+  max_fractional_cadence (81-1-UINT8, INVALID): 255
+  total_fractional_cycles (82-1-UINT8, INVALID): 255
+  avg_left_torque_effectiveness (91-1-UINT8, INVALID): 255
+  avg_right_torque_effectiveness (92-1-UINT8, INVALID): 255
+  avg_left_pedal_smoothness (93-1-UINT8, INVALID): 255
+  avg_right_pedal_smoothness (94-1-UINT8, INVALID): 255
+  avg_combined_pedal_smoothness (95-1-UINT8, INVALID): 255
+  avg_left_pco (100-1-SINT8, INVALID): 127
+  avg_right_pco (101-1-SINT8, INVALID): 127
+  avg_cadence_position (108-2-UINT8, INVALID): {255, 255}
+  max_cadence_position (109-2-UINT8, INVALID): {255, 255}
+  min_temperature (124-1-SINT8): 0 deg.C (0)
+  xxx152 (152-1-UINT8, INVALID): 255
+Local message type: 1 (120 octets, message number: 140)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:52 (1037830612)
+  unknown2 (2-1-SINT32): 54473
+  unknown3 (3-1-SINT32): 0
+  unknown5 (5-1-SINT32): 197870
+  unknown6 (6-1-SINT32): 1306060
+  unknown7 (7-1-SINT32): 0
+  xxx21 (21-1-SINT32): 0
+  xxx24 (24-1-SINT32, INVALID): 2147483647
+  xxx26 (26-1-SINT32): 0
+  xxx27 (27-1-SINT32): 0
+  xxx28 (28-1-SINT32): 0
+  xxx29 (29-1-SINT32): 0
+  xxx32 (32-1-SINT32): 5013652
+  xxx35 (35-1-UINT32): 383419
+  xxx36 (36-1-UINT32): 101696
+  xxx37 (37-1-SINT32): 0
+  xxx38 (38-1-SINT32): 0
+  xxx39 (39-1-SINT32): 0
+  xxx40 (40-1-SINT32): 0
+  xxx48 (48-1-UINT32): 1037812612
+  unknown9 (9-1-UINT16): 0
+  unknown10 (10-1-UINT16): 61103
+  unknown14 (14-1-UINT16): 0
+  unknown15 (15-1-UINT16): 0
+  unknown16 (16-1-UINT16): 0
+  xxx43 (43-1-SINT16): 0
+  xxx44 (44-1-SINT16): 0
+  xxx45 (45-1-SINT16): 0
+  unknown0 (0-1-UINT8): 60
+  unknown1 (1-1-UINT8): 0
+  unknown4 (4-1-UINT8): 0
+  unknown8 (8-1-SINT8): 0
+  unknown11 (11-1-ENUM): 2
+  unknown12 (12-1-ENUM): 8
+  unknown13 (13-1-UINT8): 0
+  unknown17 (17-1-SINT8): 0
+  unknown18 (18-1-UINT8): 0
+  unknown19 (19-1-UINT8): 0
+  xxx20 (20-1-UINT8): 0
+  xxx22 (22-1-UINT8): 18
+  xxx23 (23-1-UINT8): 0
+  xxx30 (30-1-SINT8): -5
+  xxx31 (31-1-SINT8): 83
+  xxx33 (33-1-UINT8): 0
+  xxx34 (34-1-ENUM): 1
+  xxx41 (41-1-ENUM): 0
+  xxx42 (42-1-UINT8): 0
+  xxx46 (46-1-UINT8): 1
+  xxx47 (47-1-ENUM, INVALID): 255
+  xxx51 (51-1-ENUM, INVALID): 255
+  xxx52 (52-1-ENUM): 0
+Local message type: 2 (231 octets, message name: session, message number: 18)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:52 (1037830612)
+  start_time (2-1-UINT32): 2022-11-19T17:10:21 (1037830221)
+  start_position_lat (3-1-SINT32): 45.3913221 deg (541539567)
+  start_position_long (4-1-SINT32): -75.7397311 deg (-903610189)
+  total_elapsed_time (7-1-UINT32): 383.372 s (383372)
+  total_timer_time (8-1-UINT32): 383.372 s (383372)
+  total_distance (9-1-UINT32): 1016.96 m (101696)
+  total_cycles (10-1-UINT32, INVALID): 4294967295
+  nec_lat (29-1-SINT32): 45.3915843 deg (541542695)
+  nec_long (30-1-SINT32): -75.7368912 deg (-903576308)
+  swc_lat (31-1-SINT32): 45.3889408 deg (541511157)
+  swc_long (32-1-SINT32): -75.7408328 deg (-903623333)
+  xxx38 (38-1-SINT32): 541539562
+  xxx39 (39-1-SINT32): -903609925
+  total_work (48-1-UINT32, INVALID): 4294967295
+  unknown110 (110-32-STRING): "MOUNTAIN"
+  time_standing (112-1-UINT32, INVALID): 4294967295
+  avg_left_power_phase (116-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_left_power_phase_peak (117-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase (118-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_right_power_phase_peak (119-4-UINT8, INVALID): {255, 255, 255, 255}
+  avg_power_position (120-2-UINT16, INVALID): {65535, 65535}
+  max_power_position (121-2-UINT16, INVALID): {65535, 65535}
+  training_load_peak (168-1-SINT32): 0.8312 (54473)
+  total_grit (181-1-FLOAT32): 1.37812495231628 kGrit (1.37812495231628)
+  avg_flow (187-1-FLOAT32): 3.37704300880432 Flow (3.37704300880432)
+  message_index (254-1-UINT16): selected=0,reserved=0,mask=0 (0)
+  total_calories (11-1-UINT16): 27 kcal (27)
+  total_fat_calories (13-1-UINT16, INVALID): 65535
+  avg_speed (14-1-UINT16): 9.551 km/h (2653)
+  max_speed (15-1-UINT16): 16.492 km/h (4581)
+  avg_power (20-1-UINT16, INVALID): 65535
+  max_power (21-1-UINT16, INVALID): 65535
+  total_ascent (22-1-UINT16): 10 m (10)
+  total_descent (23-1-UINT16): 10 m (10)
+  first_lap_index (25-1-UINT16): 0
+  num_laps (26-1-UINT16): 3
+  normalized_power (34-1-UINT16, INVALID): 65535
+  training_stress_score (35-1-UINT16, INVALID): 65535
+  intensity_factor (36-1-UINT16, INVALID): 65535
+  left_right_balance (37-1-UINT16, INVALID): 65535
+  threshold_power (45-1-UINT16, INVALID): 65535
+  unknown106 (106-1-UINT16): 0
+  unknown107 (107-1-UINT16, INVALID): 65535
+  unknown108 (108-1-UINT16, INVALID): 65535
+  stand_count (113-1-UINT16, INVALID): 65535
+  avg_vam (139-1-UINT16): 0.338 km/h (94)
+  xxx151 (151-1-UINT16, INVALID): 65535
+  enhanced_avg_respiration_rate (169-1-UINT16, INVALID): 65535
+  enhanced_max_respiration_rate (170-1-UINT16, INVALID): 65535
+  xxx177 (177-1-UINT16, INVALID): 65535
+  xxx178 (178-1-UINT16): 48
+  xxx179 (179-1-UINT16, INVALID): 65535
+  enhanced_min_respiration_rate (180-1-UINT16, INVALID): 65535
+  jump_count (183-1-UINT16): 0
+  xxx196 (196-1-UINT16): 8
+  event (0-1-ENUM): lap (9)
+  event_type (1-1-ENUM): stop (1)
+  sport (5-1-ENUM): cycling (2)
+  sub_sport (6-1-ENUM): mountain (8)
+  avg_heart_rate (16-1-UINT8, INVALID): 255
+  max_heart_rate (17-1-UINT8, INVALID): 255
+  avg_cadence (18-1-UINT8, INVALID): 255
+  max_cadence (19-1-UINT8, INVALID): 255
+  total_training_effect (24-1-UINT8): 0.0 (0)
+  event_group (27-1-UINT8, INVALID): 255
+  trigger (28-1-ENUM): activity_end (0)
+  avg_temperature (57-1-SINT8): 2 deg.C (2)
+  max_temperature (58-1-SINT8): 5 deg.C (5)
+  unknown81 (81-1-ENUM): 0
+  avg_fractional_cadence (92-1-UINT8, INVALID): 255
+  max_fractional_cadence (93-1-UINT8, INVALID): 255
+  total_fractional_cycles (94-1-UINT8, INVALID): 255
+  avg_left_torque_effectiveness (101-1-UINT8, INVALID): 255
+  avg_right_torque_effectiveness (102-1-UINT8, INVALID): 255
+  avg_left_pedal_smoothness (103-1-UINT8, INVALID): 255
+  avg_right_pedal_smoothness (104-1-UINT8, INVALID): 255
+  avg_combined_pedal_smoothness (105-1-UINT8, INVALID): 255
+  unknown109 (109-1-UINT8, INVALID): 255
+  sport_index (111-1-UINT8, INVALID): 255
+  avg_left_pco (114-1-SINT8, INVALID): 127
+  avg_right_pco (115-1-SINT8, INVALID): 127
+  avg_cadence_position (122-2-UINT8, INVALID): {255, 255}
+  max_cadence_position (123-2-UINT8, INVALID): {255, 255}
+  total_anaerobic_training_effect (137-1-UINT8): 0.0 (0)
+  xxx138 (138-2-UINT8): {18, 0}
+  min_temperature (150-1-SINT8): 0 deg.C (0)
+  xxx184 (184-1-ENUM): 0
+  xxx185 (185-1-UINT8, INVALID): 255
+  xxx188 (188-1-ENUM): 0
+  xxx202 (202-1-UINT8, INVALID): 255
+Local message type: 5 (19 octets, message name: activity, message number: 34)
+  timestamp (253-1-UINT32): 2022-11-19T17:16:52 (1037830612)
+  total_timer_time (0-1-UINT32): 383.372 s (383372)
+  local_timestamp (5-1-UINT32): 1037812612
+  num_sessions (1-1-UINT16): 1
+  type (2-1-ENUM): manual (0)
+  event (3-1-ENUM): activity (26)
+  event_type (4-1-ENUM): stop (1)
+  event_group (6-1-UINT8, INVALID): 255
+CRC: expected=0xFAC6, calculated=0xFAC6

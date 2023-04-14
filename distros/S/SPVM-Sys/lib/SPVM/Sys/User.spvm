@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::User {
   use Sys::User::Passwd;
   use Sys::User::Group;

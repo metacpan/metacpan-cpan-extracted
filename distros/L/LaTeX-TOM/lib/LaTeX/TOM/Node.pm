@@ -14,7 +14,7 @@ use warnings;
 use constant true  => 1;
 use constant false => 0;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # Make a new Node: turn input hash into object.
 #
@@ -212,10 +212,8 @@ sub getNextGroupNode {
 
         # see if we should skip a node
         elsif ($next->{type} eq 'COMMENT' ||
-                ($next->{type} eq 'TEXT' &&
-                ($next->{content} =~ /^\s*$/ ||
-                 $next->{content} =~ /^\s*\[\s*[0-9]+\s*\]\s*$/
-                ))) {
+              ($next->{type} eq 'TEXT' &&
+               $next->{content} =~ /^\s*(?:\[\s*[0-9]+\s*\]\s*)?$/)) {
 
             next;
         }

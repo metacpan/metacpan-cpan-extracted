@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PDFUtils/compress_pdf
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PDFUtils/compress_pdf",
@@ -38,11 +38,15 @@ compress-pdf - Make PDF smaller
 
 =head1 VERSION
 
-This document describes version 0.014 of compress-pdf (from Perl distribution App-PDFUtils), released on 2022-10-07.
+This document describes version 0.015 of compress-pdf (from Perl distribution App-PDFUtils), released on 2023-02-10.
 
 =head1 SYNOPSIS
 
-B<compress-pdf> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--overwrite>|B<-O>|B<--no-overwrite>|B<--nooverwrite>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--setting>=I<str>|B<-s>=I<str>] -- E<lt>I<files>E<gt> ...
+B<compress-pdf> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<compress-pdf> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<compress-pdf> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--setting|/"--setting=s, -s">>=I<str>|B<L<-s|/"--setting=s, -s">>=I<str>] -- E<lt>I<L<files|/"--files=s@*">>E<gt> ...
 
 
 
@@ -74,11 +78,17 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--files>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
 =item B<--overwrite>, B<-O>
+
+(No description)
+
 
 =item B<--setting>=I<s>, B<-s>
 
@@ -391,7 +401,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

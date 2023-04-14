@@ -7,9 +7,11 @@ use warnings FATAL => 'all';
 use Test::More;
 use English qw(-no_match_vars);
 
-plan tests => 9;
+plan tests => 10;
 
-use_ok 'JIP::Spy::Events', 'v0.0.1';
+BEGIN {
+    use_ok 'JIP::Spy::Events', 'v0.0.2';
+}
 
 subtest 'Require some module' => sub {
     plan tests => 1;
@@ -29,51 +31,50 @@ subtest 'Require some module' => sub {
 subtest 'new()' => sub {
     plan tests => 7;
 
-    my $o = JIP::Spy::Events->new;
-    ok $o, 'got instance of JIP::Spy::Events';
+    my $sut = JIP::Spy::Events->new();
+    ok $sut, 'got instance of JIP::Spy::Events';
 
-    isa_ok $o, 'JIP::Spy::Events';
+    isa_ok $sut, 'JIP::Spy::Events';
 
-    can_ok $o, qw(
+    can_ok $sut, qw(
         new
         events
         times
         want_array
+        skip_methods
         clear
         on_spy_event
         _handle_event
     );
 
-    is_deeply $o->events,       [];
-    is_deeply $o->times,        {};
-    is_deeply $o->on_spy_event, {};
+    is_deeply $sut->events(), [];
+    is_deeply $sut->times(),        {};
+    is_deeply $sut->on_spy_event(), {};
 
-    is $o->want_array, 0;
+    is $sut->want_array(), 0;
 };
 
 subtest '_handle_event' => sub {
     plan tests => 3;
 
-    my $o = JIP::Spy::Events->new;
+    my $sut = JIP::Spy::Events->new();
 
-    my $result = $o->_handle_event(
+    my $result = $sut->_handle_event(
         method_name => 'tratata',
         arguments   => ['42'],
         want_array  => 1,
     );
 
-    is_deeply $o->events, [
+    is_deeply $sut->events(), [
         {
-            method     => 'tratata',
-            arguments  => ['42'],
+            method    => 'tratata',
+            arguments => ['42'],
         },
     ];
 
-    is_deeply $o->times, {
-        tratata => 1,
-    };
+    is_deeply $sut->times(), { tratata => 1 };
 
-    is $result, $o;
+    is $result, $sut;
 };
 
 subtest 'AUTOLOAD() as class method' => sub {
@@ -90,27 +91,25 @@ subtest 'AUTOLOAD() as class method' => sub {
 subtest 'AUTOLOAD()' => sub {
     plan tests => 8;
 
-    my $o = JIP::Spy::Events->new;
+    my $sut = JIP::Spy::Events->new();
 
     {
-        $o->tratata;
+        $sut->tratata();
 
-        is_deeply $o->events, [
+        is_deeply $sut->events(), [
             {
                 method    => 'tratata',
                 arguments => [],
             },
         ];
 
-        is_deeply $o->times, {
-            tratata => 1,
-        };
+        is_deeply $sut->times(), { tratata => 1 };
     }
 
     {
-        my $result = $o->tratata('42');
+        my $result = $sut->tratata('42');
 
-        is_deeply $o->events, [
+        is_deeply $sut->events(), [
             {
                 method    => 'tratata',
                 arguments => [],
@@ -121,17 +120,15 @@ subtest 'AUTOLOAD()' => sub {
             },
         ];
 
-        is_deeply $o->times, {
-            tratata => 2,
-        };
+        is_deeply $sut->times(), { tratata => 2 };
 
-        is_deeply $result, $o;
+        is_deeply $result, $sut;
     }
 
     {
-        my @results = $o->tratata('100500');
+        my @results = $sut->tratata('100500');
 
-        is_deeply $o->events, [
+        is_deeply $sut->events(), [
             {
                 method    => 'tratata',
                 arguments => [],
@@ -146,25 +143,23 @@ subtest 'AUTOLOAD()' => sub {
             },
         ];
 
-        is_deeply $o->times, {
-            tratata => 3,
-        };
+        is_deeply $sut->times(), { tratata => 3 };
 
-        is_deeply \@results, [$o];
+        is_deeply \@results, [$sut];
     }
 };
 
 subtest 'AUTOLOAD() with want_array' => sub {
     plan tests => 9;
 
-    my $o = JIP::Spy::Events->new(want_array => 1);
+    my $sut = JIP::Spy::Events->new( want_array => 1 );
 
-    is $o->want_array, 1;
+    is $sut->want_array(), 1;
 
     {
-        $o->tratata;
+        $sut->tratata();
 
-        is_deeply $o->events, [
+        is_deeply $sut->events(), [
             {
                 method     => 'tratata',
                 arguments  => [],
@@ -172,15 +167,13 @@ subtest 'AUTOLOAD() with want_array' => sub {
             },
         ];
 
-        is_deeply $o->times, {
-            tratata => 1,
-        };
+        is_deeply $sut->times(), { tratata => 1 };
     }
 
     {
-        my $result = $o->tratata('42');
+        my $result = $sut->tratata('42');
 
-        is_deeply $o->events, [
+        is_deeply $sut->events(), [
             {
                 method     => 'tratata',
                 arguments  => [],
@@ -193,17 +186,15 @@ subtest 'AUTOLOAD() with want_array' => sub {
             },
         ];
 
-        is_deeply $o->times, {
-            tratata => 2,
-        };
+        is_deeply $sut->times(), { tratata => 2 };
 
-        is_deeply $result, $o;
+        is_deeply $result, $sut;
     }
 
     {
-        my @results = $o->tratata('100500');
+        my @results = $sut->tratata('100500');
 
-        is_deeply $o->events, [
+        is_deeply $sut->events(), [
             {
                 method     => 'tratata',
                 arguments  => [],
@@ -221,82 +212,98 @@ subtest 'AUTOLOAD() with want_array' => sub {
             },
         ];
 
-        is_deeply $o->times, {
-            tratata => 3,
-        };
+        is_deeply $sut->times(), { tratata => 3 };
 
-        is_deeply \@results, [$o];
+        is_deeply \@results, [$sut];
     }
+};
+
+subtest 'AUTOLOAD() with skip_methods' => sub {
+    plan tests => 5;
+
+    my $sut = JIP::Spy::Events->new(
+        skip_methods => [qw(tratata)],
+    );
+
+    is_deeply $sut->skip_methods(), { tratata => undef };
+
+    is $sut->tratata(), $sut;
+    is $sut->ololo(),   $sut;
+
+    is_deeply $sut->events(), [
+        {
+            method    => 'ololo',
+            arguments => [],
+        },
+    ];
+
+    is_deeply $sut->times(), { ololo => 1 };
 };
 
 subtest 'clear()' => sub {
     plan tests => 2;
 
-    my $o = JIP::Spy::Events->new;
+    my $sut = JIP::Spy::Events->new();
 
-    $o->tratata->clear;
+    $sut->tratata->clear();
 
-    is_deeply $o->events, [];
-    is_deeply $o->times,  {};
+    is_deeply $sut->events(), [];
+    is_deeply $sut->times(), {};
 };
 
 subtest 'on_spy_event' => sub {
     plan tests => 11;
 
-    my $o = JIP::Spy::Events->new;
+    my $sut = JIP::Spy::Events->new();
 
-    $o->on_spy_event(
+    $sut->on_spy_event(
         tratata => 'not a callback',
     );
 
-    eval { $o->tratata } or do {
+    eval { $sut->tratata() } or do {
         like $EVAL_ERROR, qr{
             ^
             "tratata" \s is \s not \s a \s callback
         }x;
     };
 
-    is_deeply $o->events, [
+    is_deeply $sut->events(), [
         {
-            method     => 'tratata',
-            arguments  => [],
+            method    => 'tratata',
+            arguments => [],
         },
     ];
 
-    is_deeply $o->times, {
-        tratata => 1,
-    };
+    is_deeply $sut->times(), { tratata => 1 };
 
-    $o->clear;
+    $sut->clear();
 
-    $o->on_spy_event(
+    $sut->on_spy_event(
         tratata => sub {
-            my ($spy, $event) = @ARG;
+            my ( $spy, $event ) = @ARG;
 
-            is $spy, $o;
+            is $spy, $sut;
 
-            is $event->method,     'tratata';
-            is $event->want_array, q{};
-            is $event->times,      1;
+            is $event->method(),     'tratata';
+            is $event->want_array(), q{};
+            is $event->times(),      1;
 
-            is_deeply $event->arguments, ['42'];
+            is_deeply $event->arguments(), ['42'];
 
             return '100500';
         },
     );
 
-    my $result = $o->tratata('42');
+    my $result = $sut->tratata('42');
 
-    is_deeply $o->events, [
+    is_deeply $sut->events(), [
         {
             method    => 'tratata',
             arguments => ['42'],
         },
     ];
 
-    is_deeply $o->times, {
-        tratata => 1,
-    };
+    is_deeply $sut->times(), { tratata => 1 };
 
     is $result, '100500';
 };

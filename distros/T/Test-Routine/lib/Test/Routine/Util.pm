@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Test::Routine::Util 0.030;
+package Test::Routine::Util 0.031;
 # ABSTRACT: helpful exports for dealing with test routines
 
 #pod =head1 OVERVIEW
@@ -91,7 +91,7 @@ Test::Routine::Util - helpful exports for dealing with test routines
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 OVERVIEW
 

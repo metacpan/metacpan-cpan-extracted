@@ -51,7 +51,7 @@ subtest 'specify all values' => sub {
             field cow => 'Daisy';
             field hen => hash {
                 field Camilla => 'friendly';
-                field Ginger => hash {
+                field Ginger  => hash {
                     field hen => 'Ginger';
                     field cow => U();
                     end;

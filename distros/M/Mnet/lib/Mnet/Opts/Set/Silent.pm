@@ -12,6 +12,8 @@ Mnet::Opts::Set::Silent - Use this module to enable --silent option
 
 This module can be used as a pragma to enable the L<Mnet::Log> --silent option.
 
+Note that the --quiet and --silent options override this pragma.
+
 =cut
 
 # required modules

@@ -1,3 +1,15 @@
+0.067   2023-03-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Set default year to current year.
+
+
+0.066   2023-03-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Add K/I/0 .. K/I/3 statuses.
+
+        - [doc] Mention PP 55/2022, add notes about laws.
+
+
 0.065   2021-12-14  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -14,13 +14,13 @@ The tokenizing the source codes of SPVM language is explained.
 
 =head2 Character Set
 
-The source codes of SPVM language are expected to be written by the C<UTF-8> charcter set.
+The source codes of SPVM language are expected to be written by the UTF-8 charcter set.
 
 =head2 Line Terminators
 
 The line terminators are C<LF>, C<CR>, and C<CRLF> of ASCII.
 
-When a line terminator appears, the current line number is incremented by C<1>. The line terminator is converted to C<LF> of ASCII.
+When a line terminator appears, the current line number is incremented by 1. The line terminator is converted to C<LF> of ASCII.
 
 =head2 Space Character
 
@@ -28,17 +28,17 @@ Space characters are C<SP>, C<HT>, C<FF> of ASCII and the L<line terminators|/"L
 
 =head2 Word Character
 
-The word characters are alphabet(C<a-zA-Z>), number(C<0-9>), and underscore(C<_>) of ASCII.
+The word characters are alphabet(C<a-zA-Z>), number(0-9), and underscore(C<_>) of ASCII.
 
 =head2 Symbol Name
 
 A symbol name is the characters that are composed of L<word characters|/"Word Character"> and C<::>.
 
-A symbol name can't contains C<__>, and can't begin with a number C<0-9>.
+A symbol name cannnot contains C<__>, and cannnot begin with a number 0-9.
 
-A symbol name can't begin with C<::>, and can't end with C<::>.
+A symbol name cannnot begin with C<::>, and cannnot end with C<::>.
 
-A symbol name can't contains C<::::>, and can't begin with a number C<0-9>.
+A symbol name cannnot contains C<::::>, and cannnot begin with a number 0-9.
 
   # Symbol names
   foo
@@ -58,19 +58,19 @@ A class name is a L<symbol name|/"Symbol Name">.
 
 The part names of a class name must begin uppercase letter. If the class name is C<Foo:Bar::Baz>, part names are C<Foo>, C<Bar>, and C<Baz>.
 
-A class name must be the name that the relative L<module|/"Module"> file path's all C</> are replaced with C<::> and the trailing C<.spvm> is removed. For example, If the relative module file path is C<Foo/Bar/Baz.spvm>, the class name must be C<Foo::Bar::Baz>.
+A class name must be the name that the relative class file path's all C</> are replaced with C<::> and the trailing C<.spvm> is removed. For example, If the relative class file path is C<Foo/Bar/Baz.spvm>, the class name must be C<Foo::Bar::Baz>.
 
-  # Valid class name in the module file "Foo/Bar/Baz.spvm"
+  # Valid class name in the class file "Foo/Bar/Baz.spvm"
   class Foo::Bar::Baz {
     
   }
 
-  # Invalid class name in the module file "Foo/Bar/Baz.spvm"
+  # Invalid class name in the class file "Foo/Bar/Baz.spvm"
   class Foo::Bar::Hello {
     
   }
 
-If class names are invalid, a compilation error will occur.
+If class names are invalid, a compilation error occurs.
 
 Examples:
   
@@ -94,7 +94,7 @@ A method name is a L<symbol name|/"Symbol Name"> that doesn't contains C<::>.
 
 0-length method name is valid. This is used in the L<anon method|/"Anon Method">.
 
-If method names are invalid, a compilation error will occur.
+If method names are invalid, a compilation error occurs.
 
 Examples:
 
@@ -121,7 +121,7 @@ A method name that is the same as a L<keyword/"Keyword"> is allowed.
 
 A field name is a L<symbol name|/"Symbol Name"> that doesn't contains C<::>.
 
-If field names are invalid, a compilation error will occur.
+If field names are invalid, a compilation error occurs.
 
 Examples:
 
@@ -147,7 +147,7 @@ The field name that is the same as a L<keyword/"Keyword"> is allowed.
 
 A variable name begins with C<$> and is followed by a L<symbol name|/"Symbol Name">.
 
-The L<symbol name|/"Symbol Name"> can be wrapped by C<{> and C<}>. If a opening C<{> exists and the closing C<}> doesn't exists, a compilation error will occur.
+The L<symbol name|/"Symbol Name"> can be wrapped by C<{> and C<}>. If a opening C<{> exists and the closing C<}> doesn't exists, a compilation error occurs.
 
 Examples:
 
@@ -170,7 +170,7 @@ Examples:
 
 A class variable name is a L<variable name|/"Variable Name">.
 
-If class variable names are invalid, a compilation error will occur.
+If class variable names are invalid, a compilation error occurs.
 
 Examples:
 
@@ -464,19 +464,19 @@ A interger literal is a L<numeric literal/"Numeric Literal"> to write a constant
 
 =head3 Integer Literal Decimal Notation
 
-The interger literal decimal notation is the way to write an L<integer literal|/"Integer Literal"> using decimal numbers C<0-9>.
+The interger literal decimal notation is the way to write an L<integer literal|/"Integer Literal"> using decimal numbers 0-9.
 
-A minus C<-> can be at the beginning, and is followed by one or more of C<0-9>.
+A minus - can be at the beginning, and is followed by one or more of 0-9.
 
-C<_> can be used as a separator at the any positions after the first C<0-9>. C<_> has no meaning.
+C<_> can be used as a separator at the any positions after the first 0-9. C<_> has no meaning.
 
 The suffix C<L> or C<l> can be at the end.
 
 If the suffix C<L> or C<l> exists, the return type is the L<long type|/"long Type">. Otherwise the return type is the L<int type|/"int Type">.
 
-If the return type is the L<int type|/"int Type"> and the value is greater than the max value of L<int type|/"int Type"> or less than the minimal value of L<int type|/"int Type">, a compilation error will occur.
+If the return type is the L<int type|/"int Type"> and the value is greater than the max value of L<int type|/"int Type"> or less than the minimal value of L<int type|/"int Type">, a compilation error occurs.
 
-If the return type is the L<long type|/"long Type"> and the value is greater than the max value of L<long type|/"long Type"> or less than the minimal value of L<long type|/"long Type">, a compilation error will occur.
+If the return type is the L<long type|/"long Type"> and the value is greater than the max value of L<long type|/"long Type"> or less than the minimal value of L<long type|/"long Type">, a compilation error occurs.
 
 Examples:
 
@@ -491,7 +491,7 @@ Examples:
 
 The interger literal hexadecimal notation is the way to write an L<integer literal|/"Integer Literal"> using hexadecimal numbers C<0-9a-zA-Z>.
 
-A minus C<-> can be at the beginning, and is followed by C<0x> or C<0X>, and is followed by one or more C<0-9a-zA-Z>.
+A minus - can be at the beginning, and is followed by C<0x> or C<0X>, and is followed by one or more C<0-9a-zA-Z>.
 
 C<_> can be used as a separator at the any positions after C<0x> or C<0X>. C<_> has no meaning.
 
@@ -499,27 +499,27 @@ The suffix C<L> or C<l> can be at the end.
 
 If the suffix C<L> or C<l> exists, the return type is the L<long type|/"long Type">. Otherwise the return type is the L<int type|/"int Type">.
 
-If the return type is the L<int type|/"int Type"> and the value that is except for C<-> is greater than hexadecimal C<FFFFFFFF>, a compilation error will occur.
+If the return type is the L<int type|/"int Type"> and the value that is except for - is greater than hexadecimal C<FFFFFFFF>, a compilation error occurs.
 
-If the return type is the L<long type|/"long Type"> and the value that is except for C<-> is greater than hexadecimal C<FFFFFFFFFFFFFFFF>, a compilation error will occur.
+If the return type is the L<long type|/"long Type"> and the value that is except for - is greater than hexadecimal C<FFFFFFFFFFFFFFFF>, a compilation error occurs.
 
-If the return type is the L<int type|/"int Type">, the value that is except for C<-> is interpreted as unsigned 32 bit integer C<uint32_t> type in C<C language>, and the following conversion is performed.
+If the return type is the L<int type|/"int Type">, the value that is except for - is interpreted as unsigned 32 bit integer C<uint32_t> type in the C language, and the following conversion is performed.
 
   uint32_t value_uint32_t;
   int32_t value_int32_t = (int32_t)value_uint32_t;
 
-And if C<-> exists, the following conversion is performed.
+And if - exists, the following conversion is performed.
 
   value_int32_t = -value_int32_t;
 
-For example, C<0xFFFFFFFF> is the same as C<-1>, C<-0xFFFFFFFF> is the same as C<1>.
+For example, C<0xFFFFFFFF> is the same as -1, C<-0xFFFFFFFF> is the same as 1.
 
-If the return type is the L<long type|/"long Type">, the value that is except for C<-> is interpreted as unsigned 64 bit integer C<uint64_t> type in C<C language>, and the following conversion is performed.
+If the return type is the L<long type|/"long Type">, the value that is except for - is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
 
   uint64_t value_uint64_t;
   value_int64_t = (int64_t)value_uint64_t;
 
-And if C<-> exists, the following conversion is performed.
+And if - exists, the following conversion is performed.
 
   value_int64_t = -value_int64_t;
 
@@ -537,37 +537,37 @@ Examples:
 
 =head3 Integer Literal Octal Notation
 
-The interger literal octal notation is the way to write an L<integer literal|/"Integer Literal"> using octal numbers C<0-7>.
+The interger literal octal notation is the way to write an L<integer literal|/"Integer Literal"> using octal numbers 0-7.
 
-A minus C<-> can be at the beginning, and is followed by C<0>, and is followed by one or more C<0-7>.
+A minus - can be at the beginning, and is followed by 0, and is followed by one or more 0-7.
 
-C<_> can be used as a separator at the any positions after C<0>. C<_> has no meaning.
+C<_> can be used as a separator at the any positions after 0. C<_> has no meaning.
 
 The suffix C<L> or C<l> can be at the end.
 
 If the suffix C<L> or C<l> exists, the return type is the L<long type|/"long Type">. Otherwise the return type is the L<int type|/"int Type">.
 
-If the return type is the L<int type|/"int Type"> and the value that is except for C<-> is greater than octal C<37777777777>, a compilation error will occur.
+If the return type is the L<int type|/"int Type"> and the value that is except for - is greater than octal 37777777777, a compilation error occurs.
 
-If the return type is the L<long type|/"long Type"> and the value that is except for C<-> is greater than octal C<1777777777777777777777>, a compilation error will occur.
+If the return type is the L<long type|/"long Type"> and the value that is except for - is greater than octal 1777777777777777777777, a compilation error occurs.
 
-If the return type is the L<int type|/"int Type">, the value that is except for C<-> is interpreted as unsigned 32 bit integer C<uint32_t> type in C<C language>, and the following conversion is performed.
+If the return type is the L<int type|/"int Type">, the value that is except for - is interpreted as unsigned 32 bit integer C<uint32_t> type in the C language, and the following conversion is performed.
 
   uint32_t value_uint32_t;
   int32_t value_int32_t = (int32_t)value_uint32_t;
 
-And if C<-> exists, the following conversion is performed.
+And if - exists, the following conversion is performed.
 
   value_int32_t = -value_int32_t;
 
-For example, C<037777777777> is the same as C<-1>, C<-037777777777> is the same as C<1>.
+For example, 037777777777 is the same as -1, -037777777777 is the same as 1.
 
-If the return type is the L<long type|/"long Type">, the value that is except for C<-> is interpreted as unsigned 64 bit integer C<uint64_t> type in C<C language>, and the following conversion is performed.
+If the return type is the L<long type|/"long Type">, the value that is except for - is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
 
   uint64_t value_uint64_t;
   value_int64_t = (int64_t)value_uint64_t;
 
-And if C<-> exists, the following conversion is performed.
+And if - exists, the following conversion is performed.
 
   value_int64_t = -value_int64_t;
 
@@ -582,9 +582,9 @@ Examples:
 
 =head3 Integer Literal Binary Notation
 
-The interger literal binary notation is the way to write an L<integer literal|/"Integer Literal"> using binary numbers C<0> and C<1>.
+The interger literal binary notation is the way to write an L<integer literal|/"Integer Literal"> using binary numbers 0 and 1.
 
-A minus C<-> can be at the beginning, and is followed by C<0b> or C<0B>, and is followed by one or more C<0> and C<1>.
+A minus - can be at the beginning, and is followed by C<0b> or C<0B>, and is followed by one or more 0 and 1.
 
 C<_> can be used as a separator at the any positions after C<0b> or C<0B>. C<_> has no meaning.
 
@@ -592,27 +592,27 @@ The suffix C<L> or C<l> can be at the end.
 
 If the suffix C<L> or C<l> exists, the return type is the L<long type|/"long Type">. Otherwise the return type is the L<int type|/"int Type">.
 
-If the return type is the L<int type|/"int Type"> and the value that is except for C<-> is greater than binary C<11111111111111111111111111111111>, a compilation error will occur.
+If the return type is the L<int type|/"int Type"> and the value that is except for - is greater than binary 11111111111111111111111111111111, a compilation error occurs.
 
-If the return type is the L<long type|/"long Type"> and the value that is except for C<-> is greater than binary C<1111111111111111111111111111111111111111111111111111111111111111>, a compilation error will occur.
+If the return type is the L<long type|/"long Type"> and the value that is except for - is greater than binary 1111111111111111111111111111111111111111111111111111111111111111, a compilation error occurs.
 
-If the return type is the L<int type|/"int Type">, the value that is except for C<-> is interpreted as unsigned 32 bit integer C<uint32_t> type in C<C language>, and the following conversion is performed.
+If the return type is the L<int type|/"int Type">, the value that is except for - is interpreted as unsigned 32 bit integer C<uint32_t> type in the C language, and the following conversion is performed.
 
   uint32_t value_uint32_t;
   int32_t value_int32_t = (int32_t)value_uint32_t;
 
-And if C<-> exists, the following conversion is performed.
+And if - exists, the following conversion is performed.
 
   value_int32_t = -value_int32_t;
 
-For example, C<0b11111111111111111111111111111111> is the same as C<-1>, C<-0b11111111111111111111111111111111> is the same as C<1>.
+For example, C<0b11111111111111111111111111111111> is the same as -1, C<-0b11111111111111111111111111111111> is the same as 1.
 
-If the return type is the L<long type|/"long Type">, the value that is except for C<-> is interpreted as unsigned 64 bit integer C<uint64_t> type in C<C language>, and the following conversion is performed.
+If the return type is the L<long type|/"long Type">, the value that is except for - is interpreted as unsigned 64 bit integer C<uint64_t> type in the C language, and the following conversion is performed.
 
   uint64_t value_uint64_t;
   value_int64_t = (int64_t)value_uint64_t;
 
-And if C<-> exists, the following conversion is performed.
+And if - exists, the following conversion is performed.
 
   value_int64_t = -value_int64_t;
 
@@ -631,19 +631,19 @@ The floating point litral is a L<numeric literal/"Numeric Literal"> to write a c
 
 =head3 Floating Point Literal Decimal Notation
 
-The floating point litral decimal notation is the way to write a L<floating point literal|/"Floating Point Literal"> using decimal numbers C<0-9> in source codes.
+The floating point litral decimal notation is the way to write a L<floating point literal|/"Floating Point Literal"> using decimal numbers 0-9 in source codes.
 
-A minus C<-> can be at the beginning, and is followed by one or more C<0-9>
+A minus - can be at the beginning, and is followed by one or more 0-9
 
-C<_> can be used as a separator at the any positions after the first C<0-9>.
+C<_> can be used as a separator at the any positions after the first 0-9.
 
 And can be followed by a floating point part.
 
-A floating point part is C<.> and is followed by one or more C<0-9>.
+A floating point part is . and is followed by one or more 0-9.
 
 And can be followed by an exponent part.
 
-An exponent part is C<e> or C<E> and is followed by C<+>, C<->, or C<"">, and followed by one or more C<0-9>.
+An exponent part is C<e> or C<E> and is followed by C<+>, -, or C<"">, and followed by one or more 0-9.
 
 And can be followed by a suffix is C<f>, C<F>, C<d>, or C<D>.
 
@@ -651,9 +651,9 @@ one of a floating point part, an exponent part, or a suffix must exist.
 
 If the suffix C<f> or C<F> exists, the return type is the L<float type|/"float Type">. Otherwise the return type is the L<double type|/"double Type">.
 
-If the return type is the L<float type|/"float Type">, the floating point literal is parsed by the C<strtof> function of C<C language>. If the parsing fails, a compilation error will occur.
+If the return type is the L<float type|/"float Type">, the floating point literal is parsed by the C<strtof> function of the C language. If the parsing fails, a compilation error occurs.
 
-If the return type is the L<double type|/"double Type">, the floating point literal is parsed by the C<strtod> function of C<C language>. If the parsing fails, a compilation error will occur.
+If the return type is the L<double type|/"double Type">, the floating point literal is parsed by the C<strtod> function of the C language. If the parsing fails, a compilation error occurs.
 
 Examples:
 
@@ -673,17 +673,17 @@ Examples:
 
 The floating point litral hexadecimal notation is the way to write a L<floating point literal|/"Floating Point Literal"> using hexadecimal numbers C<0-9a-zA-Z> in source codes.
 
-A minus C<-> can be at the beginning, and is followed by C<0x> or C<0X>, and is followed by one or more C<0-9a-zA-Z>.
+A minus - can be at the beginning, and is followed by C<0x> or C<0X>, and is followed by one or more C<0-9a-zA-Z>.
 
 C<_> can be used as a separator at the any positions after C<0x> or C<0X>.
 
 And can be followed by a floating point part.
 
-A floating point part is C<.> and is followed by one or more C<0-9a-zA-Z>.
+A floating point part is . and is followed by one or more C<0-9a-zA-Z>.
 
 And can be followed by an exponent part.
 
-An exponent part is C<p> or C<P> and is followed by C<+>, C<->, or C<"">, and followed by one or more decimal numbers C<0-9>.
+An exponent part is C<p> or C<P> and is followed by C<+>, -, or C<"">, and followed by one or more decimal numbers 0-9.
 
 And can be followed by a suffix C<f>, C<F>, C<d>, or C<D> if an exponent part exist.
 
@@ -691,9 +691,9 @@ one of a floating point part or an exponent part must exist.
 
 If the suffix C<f> or C<F> exists, the return type is the L<float type|/"float Type">. Otherwise the return type is the L<double type|/"double Type">.
 
-If the return type is the L<float type|/"float Type">, the floating point literal is parsed by the C<strtof> function of C<C language>. If the parsing fails, a compilation error will occur.
+If the return type is the L<float type|/"float Type">, the floating point literal is parsed by the C<strtof> function of the C language. If the parsing fails, a compilation error occurs.
 
-If the return type is the L<double type|/"double Type">, the floating point literal is parsed by the C<strtod> function of C<C language>. If the parsing fails, a compilation error will occur.
+If the return type is the L<double type|/"double Type">, the floating point literal is parsed by the C<strtod> function of the C language. If the parsing fails, a compilation error occurs.
 
 Examples:
   
@@ -721,7 +721,7 @@ And ends with C<'>.
 
 The return type is the L<byte type|/"byte Type">.
 
-If the format of the character literal is invalid, a compilation error will occur.
+If the format of the character literal is invalid, a compilation error occurs.
 
 =head3 Character Literal Escape Characters
 
@@ -862,11 +862,11 @@ The return type is a L<string type|/"string Type">.
 
 A character literal begins with C<">.
 
-And is followed by zero or more than zero C<UTF-8> character, or L<string literal escape characters|/"String Literal Escape Characters">, or L<variable expansions|/"Variable Expansion">.
+And is followed by zero or more than zero UTF-8 character, or L<string literal escape characters|/"String Literal Escape Characters">, or L<variable expansions|/"Variable Expansion">.
 
 And ends with C<">.
 
-If the format of the string literal is invalid, a compilation error will occur.
+If the format of the string literal is invalid, a compilation error occurs.
 
 Examples:
 
@@ -1017,7 +1017,7 @@ Examples:
 
 =head3 Unicode Escape Character
 
-The Unicode escape character is the way to write an C<UTF-8> character using an Unicode code point that is written by hexadecimal numbers C<0-9a-fA-F>.
+The Unicode escape character is the way to write an UTF-8 character using an Unicode code point that is written by hexadecimal numbers C<0-9a-fA-F>.
 
 The Unicode escape character can be used as an escape character of the L<string literal|/"String Literal">.
 
@@ -1027,7 +1027,7 @@ And is followed by one or more C<0-9a-fA-F>.
 
 And ends with C<}>.
 
-If the Unicode code point is not a Unicode scalar value, a compilation error will occur.
+If the Unicode code point is not a Unicode scalar value, a compilation error occurs.
 
 Examples:
   
@@ -1045,7 +1045,7 @@ For example, C<\s> is ASCII chracters C<\s>, C<\d> is ASCII chracters <\d>.
 
 The raw escape character can be used as an escape character of the L<string literal|/"String Literal">.
 
-The raw escape character is designed to be used by regular expression modules such as L<Regex|SPVM::Regex>.
+The raw escape character is designed to be used by regular expression classes such as L<Regex|SPVM::Regex>.
 
 The list of raw escape characters.
   
@@ -1059,13 +1059,13 @@ The list of raw escape characters.
 
 =head2 Octal Escape Character
 
-The octal escape character is the way to write an ASCII code using octal numbers C<0-7>.
+The octal escape character is the way to write an ASCII code using octal numbers 0-7.
 
 The octal escape character can be used as an escape character of the L<string literal|/"String Literal"> and the L<character literal|/"Character Literal">.
 
-The octal escape character begins with C<\o{>, and it must be followed by one to three C<0-7>, and ends with C<}>.
+The octal escape character begins with C<\o{>, and it must be followed by one to three 0-7, and ends with C<}>.
 
-Or the octal escape character begins with C<\0>, C<\1>, C<\2>, C<\3>, C<\4>, C<\5>, C<\6>, C<\7>, and it must be followed by one or two C<0-7>.
+Or the octal escape character begins with C<\0>, C<\1>, C<\2>, C<\3>, C<\4>, C<\5>, C<\6>, C<\7>, and it must be followed by one or two 0-7.
 
   # Octal escape ch1racters in ch1racter literals
   '\0'
@@ -2171,7 +2171,7 @@ Examples:
   
   }
 
-In a class block, L<loading modules|/"Loading Module">, L<class variables|/"Class Variable">, L<fields|/"Field Definition">, L<enumerations|/"Enumeration Definition">, L<methods|/"Method Definition">, L<allow statements|/"Allowing Private Access">, L<interface guarantees|/"Interface Guarantee"> and a L<INIT block|/"INIT Block"> can be defined.
+In a class block, L<loading classes|/"Loading Class">, L<class variables|/"Class Variable">, L<fields|/"Field Definition">, L<enumerations|/"Enumeration Definition">, L<methods|/"Method Definition">, L<allow statements|/"Allowing Private Access">, L<interface guarantees|/"Interface Guarantee"> and a L<INIT block|/"INIT Block"> can be defined.
 
   class Foo {
     
@@ -2183,7 +2183,7 @@ In a class block, L<loading modules|/"Loading Module">, L<class variables|/"Clas
       # ...
     }
     
-    # Loading modules
+    # Loading classes
     use Point;
     
     # Interface guarantees
@@ -2207,7 +2207,7 @@ In a class block, L<loading modules|/"Loading Module">, L<class variables|/"Clas
     }
   }
 
-If more than one class is defined in a L<module|/"Module"> file, a compilation error will occur.
+If more than one class is defined in a class file, a compilation error occurs.
 
 =head2 Class Attribute
 
@@ -2284,9 +2284,9 @@ The list of class attributes.
 
 =end html
 
-Only one of class attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error will occur.
+Only one of class attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error occurs.
 
-If more than one of C<interface_t>, C<mulnum_t>, and C<pointer> are specified, a compilation error will occur.
+If more than one of C<interface_t>, C<mulnum_t>, and C<pointer> are specified, a compilation error occurs.
 
 =head2 Destructor
 
@@ -2300,13 +2300,13 @@ The destructor is the L<method|/"Method"> that is called when the object is dest
 
 The name of the destructor must be C<DESTROY>.
 
-A destructor can't have its arguments.
+A destructor cannnot have its arguments.
 
 The retrun type must be L<void type|/"void Type">.
 
 A destructor must be an L<instance method|/"Instance Method">.
 
-If the definition of the destructor is invalid, a compilation error will occur.
+If the definition of the destructor is invalid, a compilation error occurs.
 
 If an L<exception|/"Exception"> occurs in the destructor, the exception is not thrown. Instead, a warnings message is printed to C<STDERR>.
 
@@ -2333,7 +2333,7 @@ The C<allow> syntax allows the private access from the other classes.
 
 The C<allow> syntax must be defined directory under the L<class definition|/"Class Definition">.
   
-The module that is the C<OPERAND> of the C<allow> syntax is loaded by the same way as the L<use syntax|/"Loading Module">.
+The class that is the C<OPERAND> of the C<allow> syntax is loaded by the same way as the L<use syntax|/"Loading Class">.
 
 Examples:
 
@@ -2350,9 +2350,9 @@ The C<interface> syntax guarantees that the class has the required method define
 
 The C<interface> syntax must be defined directory under the L<class definition|/"Class Definition">.
 
-If the required method of the interface is not defined in the current class, a compilation error will occur.
+If the required method of the interface is not defined in the current class, a compilation error occurs.
 
-If a method defined in the interface is defined, the method must have the same type of arguments as the method defined in the interface, and the return value must be able to be assigned without an implicite conversion to the method defined in the interface. Otherwise a compilation error will occur.
+If a method defined in the interface is defined, the method must have the same type of arguments as the method defined in the interface, and the return value must be able to be assigned without an implicite conversion to the method defined in the interface. Otherwise a compilation error occurs.
 
 The current class B<is expected to> have all methods defined in the interface.
 
@@ -2405,13 +2405,13 @@ A class inherits a class using the C<extends> keyword.
     
   }
 
-The parant class must be a L<class type|/"Class Type">. Otherwise a compilation error will occur.
+The parant class must be a L<class type|/"Class Type">. Otherwise a compilation error occurs.
 
-The name of the parant class must be different from the name of the class. Otherwise a compilation error will occur.
+The name of the parant class must be different from the name of the class. Otherwise a compilation error occurs.
 
-The all super classes must be different from its own class. Otherwise a compilation error will occur.
+The all super classes must be different from its own class. Otherwise a compilation error occurs.
 
-The field that name is the same as the field of the super class can't be defined. Otherwise a compilation error will occur.
+The field that name is the same as the field of the super class cannnot be defined. Otherwise a compilation error occurs.
 
 The parts of the definitions of the fields of the all super classes are copied to the class.
 
@@ -2478,7 +2478,7 @@ A interface must have only one required method. The required method is the metho
 
 The type of the interface is the L<interface type|/"Interface Type">.
 
-The class that has L<interface Guarantees|/"Interface Guarantee"> must have the required method that is declared in the interface. Otherwise a compilation error will occur.
+The class that has L<interface Guarantees|/"Interface Guarantee"> must have the required method that is declared in the interface. Otherwise a compilation error occurs.
 
   class Point {
     interface Stringable;
@@ -2496,9 +2496,9 @@ The class that has L<interface Guarantees|/"Interface Guarantee"> must have the 
   my $stringable = (Stringable)Point->new(1, 2);
   my $string = $stringable->to_string;
 
-A interface can't have L<filed definitions|/"Field Definition">.
+A interface cannnot have L<filed definitions|/"Field Definition">.
 
-A interface can't have L<class variable definitions|/"Class Variable Definition">.
+A interface cannnot have L<class variable definitions|/"Class Variable Definition">.
 
 A interface can have L<interface Guarantees|/"Interface Guarantee">.
 
@@ -2510,9 +2510,9 @@ A interface can have L<interface Guarantees|/"Interface Guarantee">.
     method to_string : string ();
   }
 
-If the interface definition is invalid, a compilation error will occur.
+If the interface definition is invalid, a compilation error occurs.
 
-C<new> operator can't create the objects from interfaces.
+C<new> operator cannnot create the objects from interfaces.
 
 The interface can have the method implementation.
 
@@ -2527,18 +2527,9 @@ This method is called by the static instance method call.
 
   $self->Stringable::call_to_string;
 
-=head1 Module
+=head2 Class File Name
 
-A module means a user defined L<type/"Type"> in a module file. A module is one of a L<class|/"Class">, an L<interface|/"Interface"> or, a L<multi-numeric type|/"Multi-Numeric Type">.
-
-  # lib/path/SPVM/Foo/Bar.spvm
-  class Foo::Bar {
-  
-  }
-
-=head2 Module File Name
-
-Modules must be placed in the class loading path with the following file name.
+A class must be written in the following class file.
 
 Change C<::> to C</>. Add ".spvm" at the end.
 
@@ -2546,16 +2537,16 @@ Change C<::> to C</>. Add ".spvm" at the end.
   SPVM/Foo/Bar.spvm
   SPVM/Foo/Bar/Baz.spvm
 
-=head2 Loading Module
+=head2 Loading Class
 
-The C<use> syntax loads a module.
+The C<use> syntax loads a class.
   
   # Load a class
   use Foo;
 
-If the class does not exist, a compilation error will occur.
+If the class does not exist, a compilation error occurs.
 
-Modules are loaded at compile-time.
+Classes are loaded at compile-time.
 
 C<use> syntax must be defined directly under the L<class definition|/"Class Definition">.
 
@@ -2563,9 +2554,9 @@ C<use> syntax must be defined directly under the L<class definition|/"Class Defi
     use Foo;
   }
 
-=head2 Module Alias
+=head2 Class Alias
 
-C<alias> syntax create an alias name for a module name.
+The C<alias> keyword creates a alias name for a class name.
   
   # Create alias
   alias Foo::Bar as FB;
@@ -2585,11 +2576,11 @@ You can create an alias at the same time as loading a class by C<use>.
   
   use Foo::Bar as FB;
 
-=head2 Load Module Selective
+=head2 Load Class Selective
 
-In SPVM, there is an if require Statement that loads a module only if it exists in the module path, and if it does not exist, the block does not exist.
+In SPVM, there is an if require Statement that loads a class only if it exists in the class path, and if it does not exist, the block does not exist.
 
-It was designed to implement a part of features of "#ifdef" in C<C language>.
+It was designed to implement a part of features of "#ifdef" in the C language.
 
   if (require Foo) {
   
@@ -2606,7 +2597,7 @@ if require Statement can be followed by else Statement.
 
 Note that elsif Statement cannot be followed.
 
-Let's look at an example. if Foo does not exist, no a compilation error will occur and it is assumed that there is no if block
+Let's look at an example. if Foo does not exist, no a compilation error occurs and it is assumed that there is no if block
 
 Therefore, "$foo = new Foo;" does not result in a compilation error because it is assumed that there is no if block.
 
@@ -2620,9 +2611,9 @@ In the other hand, the else block exists, so a warning is issued.
     warn "Warning: Can't load Foo";
   }
 
-=head2 Default Loaded Modules
+=head2 Default Loaded Classes
 
-The following modules are loaded by default. These modules are deeply related to the features of SPVM language itself, such as L<type conversion|/"Type Conversion">.
+The following classes are loaded by default. These classes are deeply related to the features of SPVM language itself, such as L<type conversion|/"Type Conversion">.
 
 =over 2
 
@@ -2666,9 +2657,9 @@ A Class variable must be defined directly under the L<class definition|/"Class D
 
 The type must be a L<numeric type|/"Numeric Type"> or an L<object type|/"Object Type">.
 
-The class variable mame must follow the rule defined in the L<class variable name|/"Class Variable Name">, and must not contain C<::>. Otherwise a compilation error will occur.
+The class variable mame must follow the rule defined in the L<class variable name|/"Class Variable Name">, and must not contain C<::>. Otherwise a compilation error occurs.
 
-If a class name with the same name is defined, a compilation error will occur.
+If a class name with the same name is defined, a compilation error occurs.
 
 L<Class variable attributes|/"Class Variable Attribute"> can be specified.
 
@@ -2719,7 +2710,7 @@ The list of class variable attributes.
       <b>private</b>
     </td>
     <td>
-      The class variable is private. The class variable can't be accessed from other classes. This is default setting.
+      The class variable is private. The class variable cannnot be accessed from other classes. This is default setting.
     </td>
   </tr>
   <tr>
@@ -2727,7 +2718,7 @@ The list of class variable attributes.
       <b>protected</b>
     </td>
     <td>
-      The class variable is protected. The class variable can't be accessed from other classes except for the child classes.
+      The class variable is protected. The class variable cannnot be accessed from other classes except for the child classes.
     </td>
   </tr>
   <tr>
@@ -2758,9 +2749,9 @@ The list of class variable attributes.
 
 =end html
 
-Only one of class variable attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error will occur.
+Only one of class variable attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error occurs.
 
-If more than one of C<ro>, C<wo>, and C<rw> are specified, a compilation error will occur
+If more than one of C<ro>, C<wo>, and C<rw> are specified, a compilation error occurs
 
 =head2 Class Variable Accessor
 
@@ -2865,7 +2856,7 @@ The field definition needs the L<type|/"Type">. The type must be a L<numeric typ
 
 The field names must follows the rule of the L<field name|/"Field Name">. Otherwise an compilation error will occur.
 
-Field names cannot be duplicated. If so, a compilation error will occur.
+Field names cannot be duplicated. If it cannot, a compilation error occurs.
 
 L<Field attributes|/"Field Attribute"> can be specified.
 
@@ -2889,7 +2880,7 @@ The list of field attributes.
       <b>private</b>
     </td>
     <td>
-      This field is private. This field can't be accessed from other class. This is default setting.
+      This field is private. This field cannnot be accessed from other class. This is default setting.
     </td>
   </tr>
   <tr>
@@ -2897,7 +2888,7 @@ The list of field attributes.
       <b>protected</b>
     </td>
     <td>
-      This field is protected. This field can't be accessed from other class except for the child classes.
+      This field is protected. This field cannnot be accessed from other class except for the child classes.
     </td>
   </tr>
   <tr>
@@ -2936,9 +2927,9 @@ The list of field attributes.
 
 =end html
 
-Only one of field attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error will occur.
+Only one of field attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error occurs.
 
-If more than one of C<ro>, C<wo>, and C<rw> are specified at the same time, a compilation error will occur
+If more than one of C<ro>, C<wo>, and C<rw> are specified at the same time, a compilation error occurs
 
 A field reader is an L<instance method|/"Instance Method">. It has no arguments. The return type of a field reader is the same as its field type, except for the C<byte> and C<short> type.
 
@@ -2974,9 +2965,9 @@ The field access is an L<operator|/"Operator"> to get or set the field.
 
 The field access has three different syntax.
 
-If the invocant is different from the following three field access, a compilation error will occur.
+If the invocant is different from the following three field access, a compilation error occurs.
 
-If the field name does not found, a compilation error will occur
+If the field name does not found, a compilation error occurs
 
 =head3 Field Access of the class
 
@@ -3039,11 +3030,11 @@ Method names must be follow the rule of L</"Method Name">.
 
 The argument names must be follow the rule of L</"Local Variable Name">.
 
-The minimal length of arguments is C<0>. The max length of arguments is C<255>.
+The minimal length of arguments is 0. The max length of arguments is 255.
 
-The types of the arguments must be a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type">, an L<object type|/"Object Type">, or L</"Reference Type">. Otherwise a compilation error will occur.
+The types of the arguments must be a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type">, an L<object type|/"Object Type">, or L</"Reference Type">. Otherwise a compilation error occurs.
 
-The type of the return value must be the L<void type|/"void Type">, a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type"> or an L<object type|/"Object Type">. Otherwise a compilation error will occur.
+The type of the return value must be the L<void type|/"void Type">, a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type"> or an L<object type|/"Object Type">. Otherwise a compilation error occurs.
 
 Defined methods can be called using L</"Method Call"> syntax.
 
@@ -3057,7 +3048,7 @@ A method has L</"Method Block"> except for the case that the method has the C<na
 
 =head3 Variable Length Arguments
 
-C<...> after the type of the argument indicates the argument is a variable length argument. Only the last argument can become a variable length argument.
+... after the type of the argument indicates the argument is a variable length argument. Only the last argument can become a variable length argument.
 
   static method METHOD_NAME : RETURN_TYPE (ARG_NAME1 : ARG_TYPE1, ARG_NAME2 : ARG_TYPE2...) {
   
@@ -3205,13 +3196,13 @@ Method attributes are attributes used in a L<method definition|/"Method Definiti
   </tr>
 </table>
 
-If C<native> and C<precompile> attributes can't used together.
+If C<native> and C<precompile> attributes cannnot used together.
 
-Only one of method attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error will occur.
+Only one of method attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error occurs.
 
 C<required> can be only used in a method of a L<interface|/"Interface">.
 
-If the specifed attribute is not found or the way to specify is invalid, a compilation error will occur.
+If the specifed attribute is not found or the way to specify is invalid, a compilation error occurs.
 
 Examples:
   
@@ -3232,7 +3223,7 @@ Examples:
 
 =head2 Native Method
 
-A native method is the L<method|/"Method"> that is written by native languages such as C<C language>, C<C++>.
+A native method is the L<method|/"Method"> that is written by native languages such as the C language, C<C++>.
 
 A native method is defined by the C<native> L<method attribute|/"Method Attributes">.
 
@@ -3240,7 +3231,7 @@ A native method is defined by the C<native> L<method attribute|/"Method Attribut
 
 A native method doesn't have its L<method block|/"Method Block">.
 
-About the way to write native methods, please see L<SPVM Native Module|SPVM::Document::NativeModule> and L<SPVM Native API|SPVM::Document::NativeAPI>.
+About the way to write native methods, please see L<SPVM Native Class|SPVM::Document::NativeClass> and L<SPVM Native API|SPVM::Document::NativeAPI>.
 
 =head2 Precompiled Method
 
@@ -3287,7 +3278,7 @@ The C<enum> keyword defines an enumeration. An enumeration defines constant valu
 
 An enumeration must be defined directly under the L<class definition|/"Class Definition">.
 
-The first value of an enumeration begins with C<0>. The next value is incremented by C<1>, and this is continued in the same way. In this example, C<FLAG1> is C<0>, C<FALG2> is C<1>, and C<FLAG3> is C<2>.
+The first value of an enumeration begins with 0. The next value is incremented by 1, and this is continued in the same way. In this example, C<FLAG1> is 0, C<FALG2> is 1, and C<FLAG3> is 2.
 
 The type of a value of an enumeration is the L<int type|/"int Type">.
 
@@ -3313,9 +3304,9 @@ The value can be set explicitly.
     FLAG3,
   }
 
-In the above example, C<FLAG1> is C<0>, C<FALG2> is C<4>, and C<FLAG3> is C<5>.
+In the above example, C<FLAG1> is 0, C<FALG2> is 4, and C<FLAG3> is 5.
 
-If an enumeration definition is invalid, a compilation error will occur.
+If an enumeration definition is invalid, a compilation error occurs.
 
 Examples:
 
@@ -3378,7 +3369,7 @@ B<The list of enumeration attributes:>
 
 =end html
 
-Only one of enumeration attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error will occur.
+Only one of enumeration attributes C<private>, C<protected> or C<public> can be specified. Otherwise a compilation error occurs.
 
 =head2 Getting Enumeration Value
 
@@ -3499,9 +3490,9 @@ A scope is the part that is surrounded by a L<scope block|/"Scope Block">.
     # End of scope
   }
 
-When a object that is not L<undef|/"Undefined Value"> is assigned to a L<local variable|/"Local Variable">, the reference count is incremented by C<1>.
+When a object that is not L<undef|/"Undefined Value"> is assigned to a L<local variable|/"Local Variable">, the reference count is incremented by 1.
 
-At the end of scope, the reference count is decremented by C<1>. If the reference count becomes C<0>, the object will be destroyed.
+At the end of scope, the reference count is decremented by 1. If the reference count becomes 0, the object will be destroyed.
 
 See also L<garbage collection|/"Garbage Collection">.
 
@@ -3731,7 +3722,7 @@ The each charcter can be get using C<-E<gt>[]>.
   my $char1 = $string->[1];
   my $char2 = $string->[2];
 
-By default, each character can't be set.
+By default, each character cannnot be set.
   
   # a compilation error.
   $string_const->[0] = 'd';
@@ -3751,19 +3742,19 @@ The length of the string can be got using a L<string length operator|/"String Le
 
 =head1 Undefined Value
 
-An undefined value is represented by C<undef>.
+An undefined value is represented by undef.
 
   undef
 
 An undefined value can be assigned to an L<object type|/"Object Type">.
 
-In the level of L<native APIs|SPVM:Document::NativeAPI>, C<undef> is defined as C<(void*)NULL>.
+In the level of L<native APIs|SPVM:Document::NativeAPI>, undef is defined as C<(void*)NULL>.
 
   (void*)NULL
 
 An undefined value can be compared by the C<==> operator and the C<!=> operator. An undefined value is guaranteed not to be equal to the any created object.
 
-The type of C<undef> is L<undefined type|/"Undefined Type">
+The type of undef is L<undefined type|/"Undefined Type">
 
 Examples:
   
@@ -3837,7 +3828,7 @@ The type of a field must be a L<numeric type|/"Numeric Type">.
 
 The types of all fields must be the same types.
 
-The length of the fields must be less than or equal to C<255>.
+The length of the fields must be less than or equal to 255.
 
 The multi-numeric type must end with the following suffix.
 
@@ -4179,19 +4170,19 @@ In other words, the integer types within C<int> are the L<byte type|/"byte Type"
 
 =head2 byte Type
 
-C<byte> type is the L<integer type|/"Integer Type"> that represents a signed 8-bit integer. This is the same type as C<int8_t> type of C<C language>.
+C<byte> type is the L<integer type|/"Integer Type"> that represents a signed 8-bit integer. This is the same type as C<int8_t> type of the C language.
 
 =head2 short Type
 
-C<short> type  is the L<integer type|/"Integer Type"> that represents a signed 16-bit integer. This is the same type as C<int16_t> type of C<C language>.
+C<short> type  is the L<integer type|/"Integer Type"> that represents a signed 16-bit integer. This is the same type as C<int16_t> type of the C language.
 
 =head2 int Type
 
-C<int> type is  is the L<integer type|/"Integer Type"> that represents signed 32-bit integer. This is the same as C<int32_t> type of C<C language>.
+C<int> type is  is the L<integer type|/"Integer Type"> that represents signed 32-bit integer. This is the same as C<int32_t> type of the C language.
 
 =head2 long Type
 
-C<long> type is the L<integer type|/"Integer Type"> that represents a signed 64-bit integer. This is the same type as C<int64_t> type of C<C language>.
+C<long> type is the L<integer type|/"Integer Type"> that represents a signed 64-bit integer. This is the same type as C<int64_t> type of the C language.
 
 =head2 Floating Point Type
 
@@ -4239,11 +4230,11 @@ B<Floating Point Type> are the following two.
 
 =head2 float Type
 
-The C<float> type is a L<floating point type|/"Floating Point Type"> that represents a single precision(32bit) floating point. This is the same type as C<float> type of C<C language>.
+The C<float> type is a L<floating point type|/"Floating Point Type"> that represents a single precision(32bit) floating point. This is the same type as C<float> type of the C language.
 
 =head2 double Type
 
-The C<double> type is a L<floating point type|/"Floating Point Type"> that represents a double precision(64bit) floating point. This is the same type as C<double> type of C<C language>.
+The C<double> type is a L<floating point type|/"Floating Point Type"> that represents a double precision(64bit) floating point. This is the same type as C<double> type of the C language.
 
 =head2 Class Type
 
@@ -4398,7 +4389,7 @@ The array type is the L<type|Type> for the L<array|/"Array">. The array type is 
   # 3 dimensional array
   int[][][]
 
-The maximam value of dimesions is C<255>. Otherwise an compilation error will occur.
+The maximam value of dimesions is 255. Otherwise an compilation error will occur.
 
 The array type is an L<object type|/"Object Type">.
 
@@ -4515,7 +4506,7 @@ The any object array type C<object[]> is the type that any L<object array type|/
   my $array : object[] = new object[3];
   my $array : object[] = new Point[][3];
 
-If a invalid type is assigned, a compilation error will occur.
+If a invalid type is assigned, a compilation error occurs.
 
 Any Object Array Type is an L<array type|/"Array Type">.
 
@@ -4534,7 +4525,7 @@ You can get and set the element using the L<get array element|/"Getting Array El
   # Setting the element of any object array
   $array->[0] = Int->new(5);
 
-When setting the element of any object array, the element type is checked. If the dimension of the element is not the dimension of the array - C<1>, an L<exception|/"Exception"> is thrown.
+When setting the element of any object array, the element type is checked. If the dimension of the element is not the dimension of the array - 1, an L<exception|/"Exception"> is thrown.
 
 =head2 string Type
 
@@ -4591,9 +4582,9 @@ Reference Type is a Type that can store the address of a variable. Add C<*> afte
 
 Only the address of the Local Variable acquired by L</"Reference Operator"> can be assigned to the value of Reference Type.
 
-If only Local Variable Declaration of Reference Type is performed, a compilation error will occur
+If only Local Variable Declaration of Reference Type is performed, a compilation error occurs
 
-Reference Type can be used as Type of the L<local variable declaration|/"Local Variable Declaration">. The address of the Local Variable must be stored by the Reference Operator. In case of only Local Variable Declaration, a compilation error will occur
+Reference Type can be used as Type of the L<local variable declaration|/"Local Variable Declaration">. The address of the Local Variable must be stored by the Reference Operator. In case of only Local Variable Declaration, a compilation error occurs
 
 Reference Type can be used as Type of argument in the L<method definition|/"Method Definition">.
 
@@ -4603,7 +4594,7 @@ Reference Type cannot be used as the field type in the L<class definition|/"Clas
 
 Reference Type cannot be used as the type of Class Variable in the L<class definition|/"Class Definition">.
 
-If the Reference Type is used at an Invalid location, a compilation error will occur
+If the Reference Type is used at an Invalid location, a compilation error occurs
 
 See L</"Reference"> for a detailed explanation of Reference.
 
@@ -4654,7 +4645,7 @@ Omitting the L<type|/"Type"> when the L<local variable declaration|/"Local Varia
 
 The assignability at compile-time is explained.
 
-The assignability is false, a compilation error will occur.
+The assignability is false, a compilation error occurs.
 
 =head2 Assignability to Numeric
 
@@ -5196,7 +5187,7 @@ Examples:
 
 The castability at compile-time is explained.
 
-The castability is false, a compilation error will occur.
+The castability is false, a compilation error occurs.
 
 =head2 Castability to Numeric
 
@@ -5884,7 +5875,7 @@ The numeric widening conversion is a L<type conversion|"Type Conversion"> from a
 
 See also L<numeric types order|/"Numeric Type Order"> abount the order of numeric type.
 
-The return value of a converion are same as the return value of the type cast of C<C language>.
+The return value of a converion are same as the return value of the type cast of the C language.
   
   (TYPE)OPERAND
 
@@ -5966,7 +5957,7 @@ The numeric narrowing conversion is a L<conversion|"Type Conversion"> from a wid
 
 See also L<numeric types order|/"Numeric Type Order"> abount the order of numeric type.
 
-The return value of a converion are same as the return value of the type cast of C<C language>.
+The return value of a converion are same as the return value of the type cast of the C language.
   
   (TYPE)OPERAND
 
@@ -6126,21 +6117,21 @@ The unboxing conversion is a L<type coversion|/"Type Conversion"> to convert the
 
 The bool conversion is a L<type conversion|/"Type Conversion"> that is performed on the L<conditional operand|/"Conditional Operand">.
 
-The type of the C<OPERAND> of the bool conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> of the bool conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error occurs.
 
 The bool conversion returns the following value corresponding to the type of the condional operand.
 
 If the type is the L<int type|/"int Type">, return the value.
 
-If the type is the L<undef|/"Undefined Type">, return C<0>.
+If the type is the L<undef|/"Undefined Type">, return 0.
 
-If the type is the value returned by the L<TRUE method of Bool|SPVM::Bool|/"TRUE">, return C<1>.
+If the type is the value returned by the L<TRUE method of Bool|SPVM::Bool|/"TRUE">, return 1.
 
-If the type is the value returned by the L<FALSE method of Bool|SPVM::Bool|/"FALSE">, return C<0>.
+If the type is the value returned by the L<FALSE method of Bool|SPVM::Bool|/"FALSE">, return 0.
 
 If the type is an L<integer type within int|/"Integer Type Within int">, the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the C<OPERAND>.
 
-And the following operation in C<C language> is performed on the C<OPERAND> .
+And the following operation in the C language is performed on the C<OPERAND> .
 
   !!OPERAND
 
@@ -6252,7 +6243,7 @@ The runtime assignability is the assignability at runtime.
 
 The L<isa operator|/"isa Operator"> checks the L<runtime assignability/"Runtime Assignability">
 
-The runtime assignability is false, an exception will be thrown.
+The runtime assignability is false, an exception is thrown.
 
 If the type of the distribution is an L<object type|/"Object Type"> and the type of the source is L<undef|/"Undefined Type">, the runtime assignability is true.
 
@@ -6307,7 +6298,7 @@ The type comment can be used the type of the L<field decralation|/"Field Definit
   
   my $replace : object of string|Regex::Replacer;
 
-If the type specified as the type comment is not found, a compilation error will occur.
+If the type specified as the type comment is not found, a compilation error occurs.
 
 Type comments have no meanings at runtime.
 
@@ -6339,7 +6330,7 @@ The C<if> statement is a L<statement|/"Statement"> for conditional branch.
 
 First, The L<bool conversion|/"Bool Conversion"> is performed on the condition.
 
-Next, if the condition is not C<0>, the execution position jumps to the beginning of the L<if block|/"if Block">. Otherwise jumps to the end of the L<if block|/"if Block">.
+Next, if the condition is not 0, the execution position jumps to the beginning of the L<if block|/"if Block">. Otherwise jumps to the end of the L<if block|/"if Block">.
 
 The L<local variable declartion|/"Local Variable Declaration"> and the initialization in the condition of the C<if> statement are allowed.
 
@@ -6380,7 +6371,7 @@ If the C<condition 1> doesn't match, the execution position jumps to the end of 
 
 Next, The L<bool conversion|/"Bool Conversion"> is performed on the C<condition 2>.
 
-Next, if the C<condition 2> is not C<0>, the execution position jumps to the beginning of the L<elsif block|/"elsif Block">. Otherwise jumps to the end of the L<elsif block|/"elsif Block">
+Next, if the C<condition 2> is not 0, the execution position jumps to the beginning of the L<elsif block|/"elsif Block">. Otherwise jumps to the end of the L<elsif block|/"elsif Block">
 
 Multiple C<elsif> statements are allowed.
 
@@ -6534,7 +6525,7 @@ The value of the L<case statement|/"case Statement"> must be one of the L<charac
 
 If it is a L<character literal|/"Character Literal">, the value is converted to the L<int type|/"int Type"> at compile-time.
 
-The values of the case statements can't be duplicated. If so, a compilation error will occur.
+The values of the case statements cannnot be duplicated. If it cannot, a compilation error occurs.
 
 If the condition matches the value of a C<case> statement, the program jumps to the beginning of the L<case block|/"case Block">.
 
@@ -6685,7 +6676,7 @@ The C<while> statement is a L<statement|/"Statement"> for loop.
 
 First, The L<bool conversion|/"Bool Conversion"> is performed on the condition.
 
-Next, If the condition is C<0>, the program jumps to the end of the L<while block|/"while Block">. Otherwise the program goes to the beginning of the L<while block|/"while Block">.
+Next, If the condition is 0, the program jumps to the end of the L<while block|/"while Block">. Otherwise the program goes to the beginning of the L<while block|/"while Block">.
 
 When the program reaches the end of the L<while block|/"while Block">, it jumps back to the while statement and evaluates the condition again.
 
@@ -6821,11 +6812,11 @@ The C<return> statement is a L<statement|/"Statement"> to return a value.
   // non-void
   return OPERAND;
 
-If the return type of the current L<method|/"Method Definition"> is the L<void type|/"void Type">, the C<OPERAND> can't exist. If so, a compilation error will occur.
+If the return type of the current L<method|/"Method Definition"> is the L<void type|/"void Type">, the C<OPERAND> cannnot exist. If it cannot, a compilation error occurs.
 
-If the return type of the current L<method|/"Method Definition"> is the non-void type, the C<OPERAND> must exist. Otherwise a compilation error will occur.
+If the return type of the current L<method|/"Method Definition"> is the non-void type, the C<OPERAND> must exist. Otherwise a compilation error occurs.
 
-The type of the C<OPERAND> must be able to L<assign|/"Assignability"> to the return type of the current method. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be able to L<assign|/"Assignability"> to the return type of the current method. Otherwise a compilation error occurs.
 
 =head2 Empty Statement
 
@@ -6900,7 +6891,7 @@ Examples:
 
   -OPERAND
 
-The unary minus operator C<-> returns the negative value of the C<OPERAND>.
+The unary minus operator - returns the negative value of the C<OPERAND>.
 
 Compilation Errors:
 
@@ -6946,15 +6937,15 @@ The C<RETURN_TYPE> is the type after the L<binary numeric conversion|/"Binary Nu
 
 =head2 Subtraction Operator
 
-The subtraction operator C<-> is an L<operator|/"Operator"> to calculate the result of the subtraction of two numbers.
+The subtraction operator - is an L<operator|/"Operator"> to calculate the result of the subtraction of two numbers.
 
   LEFT_OPERAND - RIGHT_OPERAND
 
-The left operand and the right operand must be a L<numeric type|/"Numeric Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be a L<numeric type|/"Numeric Type">. Otherwise a compilation error occurs.
 
 the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed on the left operand and the right operand.
 
-The subtraction operator performs the operation that exactly same as the following operation in C<C language>.
+The subtraction operator performs the operation that exactly same as the following operation in the C language.
 
   x - y;
 
@@ -6966,11 +6957,11 @@ The multiplication operator is an L<operator|/"Operator"> to calculate the resul
 
   LEFT_OPERAND * RIGHT_OPERAND
 
-The left operand and the right operand must be a L<numeric type|/"Numeric Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be a L<numeric type|/"Numeric Type">. Otherwise a compilation error occurs.
 
 the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed on the left operand and the right operand.
 
-The multiplication operator performs the operation that exactly same as the following operation in C<C language>.
+The multiplication operator performs the operation that exactly same as the following operation in the C language.
 
   x * y;
 
@@ -6982,17 +6973,17 @@ The division operator C</> is an L<operator|/"Operator"> to culcurate the divisi
 
   LEFT_OPERAND / RIGHT_OPERAND
 
-The left operand and the right operand must be a L<numeric type|/"Numeric Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be a L<numeric type|/"Numeric Type">. Otherwise a compilation error occurs.
 
 the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed on the left operand and the right operand.
 
-The division operator performs the operation that exactly same as the following operation in C<C language>.
+The division operator performs the operation that exactly same as the following operation in the C language.
 
   x / y;
 
 The return type of the division operator is the type after the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed.
 
-If the two operands are L<integer types|/"Integer Type"> and the value of the right operand is C<0>, an L<exception|/"Exception"> is thrown.
+If the two operands are L<integer types|/"Integer Type"> and the value of the right operand is 0, an L<exception|/"Exception"> is thrown.
 
 =head2 Division Unsigned Int Operator
 
@@ -7000,15 +6991,15 @@ The division unsigned int operator C<divui> is an L<operator|/"Operator"> to cul
 
   LEFT_OPERAND divui RIGHT_OPERAND
 
-The left operand and the right operand must be an L<int type|/"int Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be an L<int type|/"int Type">. Otherwise a compilation error occurs.
 
-The division unsigned int operator performs the operation that exactly same as the following operation in C<C language>.
+The division unsigned int operator performs the operation that exactly same as the following operation in the C language.
 
   (uint32_t)x / (uint32_t)y;
 
 The return type of the division operator is the L<int type|/"int Type">.
 
-If the value of the right operand is C<0>, an L<exception|/"Exception"> is thrown.
+If the value of the right operand is 0, an L<exception|/"Exception"> is thrown.
 
 =head2 Division Unsigned Long Operator
 
@@ -7016,15 +7007,15 @@ The division unsigned long operator C<divul> is an L<operator|/"Operator"> to cu
 
   LEFT_OPERAND divul RIGHT_OPERAND
 
-The left operand and the right operand must be an L<long type|/"long Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be an L<long type|/"long Type">. Otherwise a compilation error occurs.
 
-The division unsigned long operator performs the operation that exactly same as the following operation in C<C language>.
+The division unsigned long operator performs the operation that exactly same as the following operation in the C language.
 
   (uint64_t)x / (uint64_t)y;
 
 The return type of the division operator is the L<long type|/"long Type">.
 
-If the value of the right operand is C<0>, an L<exception|/"Exception"> is thrown.
+If the value of the right operand is 0, an L<exception|/"Exception"> is thrown.
 
 =head2 Remainder Operator
 
@@ -7032,17 +7023,17 @@ The remainder operator C<%> is an L<operator|/"Operator"> to calculate a remaind
 
   LEFT_OPERAND % RIGHT_OPERAND
 
-The left operand and the right operand must be an L<integer type|/"Integer Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be an L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
 
 the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed on the left operand and the right operand.
 
-The remainder operator performs the operation that exactly same as the following operation in C<C language>.
+The remainder operator performs the operation that exactly same as the following operation in the C language.
 
   x % y;
 
 the return type of Remainder Operator is the type that the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed.
 
-If the right operand is C<0>, the remainder operator throw an L<exception|/"Exception">.
+If the right operand is 0, the remainder operator throw an L<exception|/"Exception">.
 
 =head2 Remainder Unsigned Int Operator
 
@@ -7050,15 +7041,15 @@ The remainder unsigned int operator C<remui> is an L<operator|/"Operator"> to ca
 
   LEFT_OPERAND remui RIGHT_OPERAND
 
-The left operand and the right operand must be a L<int type|/"int Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be a L<int type|/"int Type">. Otherwise a compilation error occurs.
 
-The remainder unsigned int operator performs the operation that exactly same as the following operation in C<C language>.
+The remainder unsigned int operator performs the operation that exactly same as the following operation in the C language.
 
   (uint32_t)x % (uint32_t)y;
 
 The return type of the remainder unsigned int operator is the L<int type|/"int Type">.
 
-If the value of the right operand is C<0>, an L<exception|/"Exception"> is thrown .
+If the value of the right operand is 0, an L<exception|/"Exception"> is thrown .
 
 =head2 Remainder Unsigned Long Operator
 
@@ -7066,15 +7057,15 @@ The remainder unsigned long operator C<remul> is an L<operator|/"Operator"> to c
 
   LEFT_OPERAND remul RIGHT_OPERAND
 
-The left operand and the right operand must be a L<long type|/"long Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be a L<long type|/"long Type">. Otherwise a compilation error occurs.
 
-The remainder unsigned long operator performs the operation that exactly same as the following operation in C<C language>.
+The remainder unsigned long operator performs the operation that exactly same as the following operation in the C language.
 
   (ulong64_t)x % (ulong64_t)y;
 
 The return type of the remainder unsigned long operator is the L<long type|/"long Type">.
 
-If the value of the right operand is C<0>, an L<exception|/"Exception"> is thrown .
+If the value of the right operand is 0, an L<exception|/"Exception"> is thrown .
 
 =head2 Increment Operator
 
@@ -7082,12 +7073,12 @@ Increment operators are the L<pre-increment operator|/"Pre-Increment Operator"> 
 
 =head3 Pre-Increment Operator
 
-The pre-increment operator adds C<1> to the value of the C<OPERAND> and returns the value after the incrementation.
+The pre-increment operator adds 1 to the value of the C<OPERAND> and returns the value after the incrementation.
   
   # Pre-increment operator
   ++OPERAND
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The pre-increment operator performs the same operation as the following.
 
@@ -7116,12 +7107,12 @@ Examples:
 
 =head3 Post-Increment Operator
 
-The post-increment operator adds C<1> to the value of the C<OPERAND> and returns the value before the incrementation.
+The post-increment operator adds 1 to the value of the C<OPERAND> and returns the value before the incrementation.
   
   # Post-increment operator
   OPERAND++
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The post-increment operator performs the same operation as the following.
 
@@ -7154,12 +7145,12 @@ Decrement operators are the L<pre-decrement operator|/"Pre-Decrement Operator"> 
 
 =head3 Pre-Decrement Operator
 
-The pre-decrement operator subtracts C<1> to the value of the C<OPERAND> and returns the value after the decrementation.
+The pre-decrement operator subtracts 1 to the value of the C<OPERAND> and returns the value after the decrementation.
   
   # Pre-decrement operator
   --OPERAND
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access">, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access">, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The pre-decrement operator performs the same operation as the following.
 
@@ -7188,12 +7179,12 @@ Examples:
 
 =head3 Post-Decrement Operator
 
-The post-decrement operator subtracts C<1> to the value of the C<OPERAND> and returns the value before the decrementation.
+The post-decrement operator subtracts 1 to the value of the C<OPERAND> and returns the value before the decrementation.
   
   # Post-decrement operator
   OPERAND--
 
-The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"The array Access">, a L<dereference|/"Dereference">. Otherwise a compilation error occurs.
 
 The post-decrement operator performs the same operation as the following.
 
@@ -7232,11 +7223,11 @@ The bit AND operator C<&> is an L<operator|/"Operator"> to performe a bit AND op
 
   LEFT_OPERAND & RIGHT_OPERAND
 
-The left operand and the right operand must be an L<integer type/"Integer Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be an L<integer type/"Integer Type">. Otherwise a compilation error occurs.
 
 A L<binary numeric widening conversion|/"Binary Numeric Conversion"> is performed.
 
-The return value is the same as the follwoing operation of C<C language>.
+The return value is the same as the follwoing operation of the C language.
 
   x & y;
 
@@ -7255,11 +7246,11 @@ The bit OR operator C<|> is an L<operator|/"Operator"> to performe a bit OR oper
 
   LEFT_OPERAND | RIGHT_OPERAND
 
-The left operand and the right operand must be an L<integer type/"Integer Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be an L<integer type/"Integer Type">. Otherwise a compilation error occurs.
 
 A L<binary numeric widening conversion|/"Binary Numeric Conversion"> is performed.
 
-The return value is the same as the follwoing operation of C<C language>.
+The return value is the same as the follwoing operation of the C language.
 
   x | y;
 
@@ -7278,11 +7269,11 @@ The bit NOT operator C<~> is an L<operator|/"Operator"> to perform the bit NOT o
 
   ~OPERAND
 
-The type of the C<OPERAND> must is an L<integer type|/"Integer Type">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must is an L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion|/"Numeric Widening Conversion"> is performed.
 
-The return value is the same as the follwoing operation of C<C language>.
+The return value is the same as the follwoing operation of the C language.
 
   ~x
 
@@ -7303,17 +7294,17 @@ The left shift operator C<E<lt>E<lt>> is an L<operator|/"Operator"> to perform t
 
   LEFT_OPERAND << RIGHT_OPERAND
 
-The left operand must be the L<integer type|/"Integer Type">. Otherwise a compilation error will occur.
+The left operand must be the L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion/"Numeric Widening Conversion"> is performed on the left operand.
 
-The right operand must be the L<integer type|/"Integer Type"> except for the L<long type|/"long Type">. Otherwise a compilation error will occur.
+The right operand must be the L<integer type|/"Integer Type"> except for the L<long type|/"long Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion/"Numeric Widening Conversion"> is performed on the right operand.
 
 The return type is the same as the type of the left operand.
 
-The calculation result of the left shift operator is the same as the following calculation in C<C language>.
+The calculation result of the left shift operator is the same as the following calculation in the C language.
 
   x << y;
 
@@ -7323,17 +7314,17 @@ The arithmetic right shift operator C<E<gt>E<gt>> is an L<operator|/"Operator"> 
 
   LEFT_OPERAND >> RIGHT_OPERAND
 
-The left operand must be the L<integer type|/"Integer Type">. Otherwise a compilation error will occur.
+The left operand must be the L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion/"Numeric Widening Conversion"> is performed on the left operand.
 
-The right operand must be the L<integer type|/"Integer Type"> except for the L<long type|/"long Type">. Otherwise a compilation error will occur.
+The right operand must be the L<integer type|/"Integer Type"> except for the L<long type|/"long Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion/"Numeric Widening Conversion"> is performed on the right operand.
 
 The return type is the same as the type of the left operand.
 
-The operation result of the arithmetic right shift Operator is the operation that exactly same as the following operation in C<C language>.
+The operation result of the arithmetic right shift Operator is the operation that exactly same as the following operation in the C language.
 
   x >> y;
 
@@ -7343,17 +7334,17 @@ The logical right shift operator C<E<gt>E<gt>E<gt>>is an L<operator|/"Operator">
 
   LEFT_OPERAND >>> RIGHT_OPERAND
 
-The left operand must be the L<integer type|/"Integer Type">. Otherwise a compilation error will occur.
+The left operand must be the L<integer type|/"Integer Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion/"Numeric Widening Conversion"> is performed on the left operand.
 
-The right operand must be the L<integer type|/"Integer Type"> except for the L<long type|/"long Type">. Otherwise a compilation error will occur.
+The right operand must be the L<integer type|/"Integer Type"> except for the L<long type|/"long Type">. Otherwise a compilation error occurs.
 
 The L<numeric widening conversion/"Numeric Widening Conversion"> is performed on the right operand.
 
 The return type is the same as the type of the left operand.
 
-The operation result of logical right shift Operator is the same as the following calculation in C<C language>.
+The operation result of logical right shift Operator is the same as the following calculation in the C language.
   
   // In the case that the left operand is a int type
   (uint32_t)x >> y;
@@ -7465,11 +7456,11 @@ The list of numeric comparison operators.
 
 =end html
 
-The types of the left operand and the right operand must be comparable types. Otherwise a compilation error will occur.
+The types of the left operand and the right operand must be comparable types. Otherwise a compilation error occurs.
 
 In Numeric Type Comparison, the L<binary numeric conversion|/"Binary Numeric Conversion"> is performed for The left operand and the right operand.
 
-the Numeric Comparison Operation is performed that exactly same as the following operation in C<C language>.
+the Numeric Comparison Operation is performed that exactly same as the following operation in the C language.
 
   # Numeric Type Comparison, Object Type Comparison
   (int32_t)(x == y);
@@ -7496,7 +7487,7 @@ The string comparison operator is a L<comparison operator|/"Comparison Operator"
 
 The type of the left operand and the right operand must be the L<string type|/"string Type"> or L<byte[] type|"byte[] Type">.
 
-The return type is the L<int type|/"int Type">. If the condition is satisfied, return C<1>, otherwise C<0>.
+The return type is the L<int type|/"int Type">. If the condition is satisfied, return 1, otherwise 0.
 
 The list of string comparison operators.
 
@@ -7577,9 +7568,9 @@ The return type is L<int type|/"int Type">.
 
 If the right type is a L<numeric type|/"Numeric Type">, the L<multi-numeric type|/"Multi-Numeric Type">, L</"Any Object Type">, L</"Reference Type">, it checks the L<assignability|/"Assignability"> at compile-time.
 
-If the assignability is true, it is replaced with C<1>. Otherwise it is replaced with C<0>.
+If the assignability is true, it is replaced with 1. Otherwise it is replaced with 0.
 
-If the right type is other type, it checks the L<runtime assignability|/"Runtime Assignability"> at runtime. If the runtime assignability is true, it returns C<1>. Otherwise return C<0>.
+If the right type is other type, it checks the L<runtime assignability|/"Runtime Assignability"> at runtime. If the runtime assignability is true, it returns 1. Otherwise return 0.
 
 Examples:
 
@@ -7605,19 +7596,19 @@ The C<is_type> operator is a L<comparison operator|/"Comparison Operator"> to ch
 
   LEFT_OPERAND is_type RIGHT_TYPE
 
-If the type of the instance of the left operand is the right type, return C<1>. Otherwise return C<0>.
+If the type of the instance of the left operand is the right type, return 1. Otherwise return 0.
 
 The return type is L<int type|/"int Type">.
 
-The left operand of the is_type operator must be an object type. Otherwise a compilation error will occur.
+The left operand of the is_type operator must be an object type. Otherwise a compilation error occurs.
 
-The right type of the is_type operator must be an object type. Otherwise a compilation error will occur.
+The right type of the is_type operator must be an object type. Otherwise a compilation error occurs.
 
-The right type of the is_type operator can't be the any object type. If so, a compilation error will occur.
+The right type of the is_type operator cannnot be the any object type. If it cannot, a compilation error occurs.
 
-The right type of the is_type operator can't be the any object array type. If so, a compilation error will occur.
+The right type of the is_type operator cannnot be the any object array type. If it cannot, a compilation error occurs.
 
-The right type of the is_type operator can't be an interface type. If so, a compilation error will occur.
+The right type of the is_type operator cannnot be an interface type. If it cannot, a compilation error occurs.
 
 Examples:
 
@@ -7639,7 +7630,7 @@ The C<is_compile_type> operator is a L<comparison operator|/"Comparison Operator
 
   LEFT_OPERAND is_compile_type RIGHT_TYPE
 
-If the compilation-time type of the left operand is the right type, return C<1>. Otherwise return C<0>.
+If the compilation-time type of the left operand is the right type, return 1. Otherwise return 0.
 
 The return type is L<int type|/"int Type">.
 
@@ -7676,7 +7667,7 @@ If the C<OPERAND> is defined, it returns the type name of the object. If not, re
 
 The return type is the L<string type|/"string Type">.
 
-If the C<OPERAND> is not an L<object type|/"Object Type">, a compilation error will occur.
+If the C<OPERAND> is not an L<object type|/"Object Type">, a compilation error occurs.
 
 Examples:
   
@@ -7694,7 +7685,7 @@ It returns the string representation of the object.
 
 The return type is the L<string type|/"string Type">.
 
-If the C<OPERAND> is not an L<object type|/"Object Type">, a compilation error will occur.
+If the C<OPERAND> is not an L<object type|/"Object Type">, a compilation error occurs.
 
 The string representation may be changed from SPVM version to version. Please don't use C<dump> operator for the purpose of the data serialization.
 
@@ -7714,9 +7705,9 @@ The left operand and the right operand must be an L<operator|/"Operator">.
 
 The return type of the logical AND operator is the L<int type|/"int Type">.
 
-Thg logical AND operator performs the L<bool conversion|/"Bool Conversion"> to the left operand. If the evaluated value is C<0>, return C<0>. Otherwise proceed to the evaluation of the right operand.
+Thg logical AND operator performs the L<bool conversion|/"Bool Conversion"> to the left operand. If the evaluated value is 0, return 0. Otherwise proceed to the evaluation of the right operand.
 
-It performs the L<bool conversion|/"Bool Conversion"> to the right operand. If the evaluated value is C<0>, return C<0>. Otherwise return the evaluated value.
+It performs the L<bool conversion|/"Bool Conversion"> to the right operand. If the evaluated value is 0, return 0. Otherwise return the evaluated value.
 
 =head3 Logical OR Operator
 
@@ -7726,9 +7717,9 @@ The logical OR operator C<||> is a L<logical operator|/"Logical Operator"> to pe
 
 The return type of the logical OR operator is the L<int type|/"int Type">.
 
-Thg logical OR operator performs the L<bool conversion|/"Bool Conversion"> to the left operand. If the evaluated value is not C<0>, return the evaluated value. Otherwise proceed to the evaluation of the right operand.
+Thg logical OR operator performs the L<bool conversion|/"Bool Conversion"> to the left operand. If the evaluated value is not 0, return the evaluated value. Otherwise proceed to the evaluation of the right operand.
 
-It performs the L<bool conversion|/"Bool Conversion"> to the right operand. If the evaluated value is not C<0>, return the evaluated value. Otherwise return C<0>.
+It performs the L<bool conversion|/"Bool Conversion"> to the right operand. If the evaluated value is not 0, return the evaluated value. Otherwise return 0.
 
 =head3 Logical NOT Operator
 
@@ -7738,15 +7729,15 @@ The logical NOT operator C<!> is a L<logical operator|/"Logical Operator"> to pe
 
 The return type of the logical NOT operator is the L<int type|/"int Type">.
 
-Thg logical NOT operator performs the L<bool conversion|/"Bool Conversion"> to the C<OPERAND>. If the evaluated value is C<0>, returns C<1>. Otherwise return C<0>.
+Thg logical NOT operator performs the L<bool conversion|/"Bool Conversion"> to the C<OPERAND>. If the evaluated value is 0, returns 1. Otherwise return 0.
 
 =head2 String Concatenation Operator
 
-String concatenation operator C<.> is an L<operator|/"Operator"> to concat two strings.
+String concatenation operator . is an L<operator|/"Operator"> to concat two strings.
 
   LEFT_OPERAND . RIGHT_OPERAND
 
-The left operand and the right operand must be a L<string type|/"string Type">, L</"byte[] Type">, or L<numeric type|/"Numeric Type">. Otherwise a compilation error will occur.
+The left operand and the right operand must be a L<string type|/"string Type">, L</"byte[] Type">, or L<numeric type|/"Numeric Type">. Otherwise a compilation error occurs.
 
 If the type of the C<OPERAND> is numeric type, a L<numeric-to-string conversion|/"Numeric-to-String Conversion"> is performed.
 
@@ -7881,7 +7872,7 @@ The array length operator is an L<operator|/"Operator"> to get the length of the
 
   @OPERAND
 
-The operand must be an L<operator|/"Operator"> that type is an the L<array type|/"Array Type">. Otherwise a compilation error will occur.
+The operand must be an L<operator|/"Operator"> that type is an the L<array type|/"Array Type">. Otherwise a compilation error occurs.
 
 The array length operator returns the L<int type|/"int Type"> value that is the length of the L<array|/"Array">.
 
@@ -7905,17 +7896,17 @@ The C<new_string_len> operator is an L<operator|/"Operator"> to create a L<strin
 
   new_string_len OPERAND
 
-The type of the C<OPERAND> must be an L<integer type within int|/"Integer Type Within int">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be an L<integer type within int|/"Integer Type Within int">. Otherwise a compilation error occurs.
 
 The L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the C<OPERAND>.
 
 The C<new_string_len> operator returns a new string that length is the length specified by the C<OPERAND> and all characters are C<\0>.
 
-The character just after the last character is C<\0>. The string created by the new_string_len operator can be used as C<C language> string ending with C<\0>.
+The character just after the last character is C<\0>. The string created by the new_string_len operator can be used as the C language string ending with C<\0>.
 
 The return type is the L<string type|/"string Type">.
 
-The length specified by the C<OPERAND> must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+The length specified by the C<OPERAND> must be greater than or equal to 0. Otherwise an exception is thrown.
 
 Examples:
   
@@ -7928,7 +7919,7 @@ The C<copy> operator is an L<operator|/"Operator"> to copy the object.
 
   copy OPERAND
 
-The operand must be an L<operator|/"Operator"> that type is a L<object type|/"object Type">. Otherwise a compilation error will occur.
+The operand must be an L<operator|/"Operator"> that type is a L<object type|/"object Type">. Otherwise a compilation error occurs.
 
 If the type of operand is none of a L<string type|/"string Type">, a L<numeric type|/"Numeric Type">, a L<multi-numeric type|/"Multi-Numeric Type">,
 An L<exception|/"Exception"> is thorwn.
@@ -7950,9 +7941,9 @@ The C<is_read_only> is an L<operator|/"Operator"> to check if the L<string|/"Str
 
   is_read_only OPERAND
 
-The operand must be a L<string type|/"string Type">. Otherwise a compilation error will occur.
+The operand must be a L<string type|/"string Type">. Otherwise a compilation error occurs.
 
-If the string is read-only, the C<is_read_only> operator returns C<1>, otherwise returns C<0>.
+If the string is read-only, the C<is_read_only> operator returns 1, otherwise returns 0.
 
 The return type is an L<int type|/"int Type">.
 
@@ -7968,9 +7959,9 @@ The string length operator C<length> is an L<operator|/"Operator"> to get the le
 
   length OPERAND
 
-The returned length is the byte size. Note that the length is not the count of C<UTF-8> characters.
+The returned length is the byte size. Note that the length is not the count of UTF-8 characters.
 
-The type of the C<OPERAND> must be the L<string type|/"string Type">. Otherwise a compilation error will occur.
+The type of the C<OPERAND> must be the L<string type|/"string Type">. Otherwise a compilation error occurs.
 
 The return type is the L<int type|/"int Type">.
 
@@ -7990,7 +7981,7 @@ The C<scalar> operator is an L<Operator|/"Operator"> that returns the value of t
 
   scalar OPERAND
 
-The operand must be an L</"The array Length Operator">. Otherwise a compilation error will occur.
+The operand must be an L</"The array Length Operator">. Otherwise a compilation error occurs.
 
 Examples:
   
@@ -8010,13 +8001,13 @@ The C<isweak> operator checks whether the L<field|/"Field"> is L<weak reference|
 
   isweak OBJECT->{FIELD_NAME};
 
-The type of the object must be the L<class type|/"Class Type">. Otherwise a compilation error will occur.
+The type of the object must be the L<class type|/"Class Type">. Otherwise a compilation error occurs.
 
-If the field name is not found, a compilation error will occur.
+If the field name is not found, a compilation error occurs.
 
-The type of the field targetted by the C<isweak> operator is not an L<object type|/"Object Type">, a compilation error will occur.
+The type of the field targetted by the C<isweak> operator is not an L<object type|/"Object Type">, a compilation error occurs.
 
-If the field is weaken, the C<isweak> operator returns C<1>, otherwise returns C<0>.
+If the field is weaken, the C<isweak> operator returns 1, otherwise returns 0.
 
 The return type of the C<isweak> operator is the L<int type|/"int Type">.
 
@@ -8035,17 +8026,17 @@ The C<has_impl> operator checks the existence of the method implementation.
 
   has_impl OPERAND
 
-The operand must the object that has a L<class type|/"Class Type"> or an L<interface type|/"Interface Type">. Otherwise a compilation error will occur.
+The operand must the object that has a L<class type|/"Class Type"> or an L<interface type|/"Interface Type">. Otherwise a compilation error occurs.
 
-If the class or the interface doesn't have the method declaration, a compilation error will occur.
+If the class or the interface doesn't have the method declaration, a compilation error occurs.
 
-The method name must be a L<method name|/"Method Name">. Otherwise a compilation error will occur.
+The method name must be a L<method name|/"Method Name">. Otherwise a compilation error occurs.
 
 If method name is not specified, the method name become C<"">.
 
 The return type is L<int type|/"int Type">.
 
-If the class or the interface has the method implementation, returns C<1>, otherwise returns C<0>.
+If the class or the interface has the method implementation, returns 1, otherwise returns 0.
 
 Examples:
 
@@ -8071,13 +8062,13 @@ The setting local variable is an L<operator|/"Operator"> to set the value of L</
 
   $var = VALUE
 
-The assignment of the value must satisfy the L<assignability|/"Assignability">. Otherwise a compilation error will occur.
+The assignment of the value must satisfy the L<assignability|/"Assignability">. Otherwise a compilation error occurs.
 
 The return value is the value after the assignment.
 
-If the type of the assigned value is an L<object type|/"Object Type">, the reference count of the object is incremented by C<1>.
+If the type of the assigned value is an L<object type|/"Object Type">, the reference count of the object is incremented by 1.
 
-If an object has already been assigned to $var before the assignment, the reference count of the object is decremented by C<1>.
+If an object has already been assigned to $var before the assignment, the reference count of the object is decremented by 1.
 
 See the L<scope|/"Scope"> to know the L<garbage collection|/"Garbage Collection"> of local variables.
 
@@ -8091,9 +8082,9 @@ C<CLASS_NAME::> can be omitted if the class variable belongs to the current L<cl
 
   $CLASS_VARIABLE_NAME
 
-If the class variable does not found, a compilation error will occur.
+If the class variable does not found, a compilation error occurs.
 
-If the class variable is C<private> and it is accessed outside of the class, a compilation error will occur.
+If the class variable is C<private> and it is accessed outside of the class, a compilation error occurs.
 
 Examples:
 
@@ -8116,19 +8107,19 @@ B<Setting Class Variable operator> is an L<operator|/"Operator"> to set L</"Clas
 
   $CLASS_VARIABLE_NAME = VALUE
 
-If the assignment does not satisfy the L<assignability|/"Assignability">, a compilation error will occur.
+If the assignment does not satisfy the L<assignability|/"Assignability">, a compilation error occurs.
 
 The return value is the value after the setting.
 
 The return type is the type of the class variable.
 
-If the class variable does not found, a compilation error will occur.
+If the class variable does not found, a compilation error occurs.
 
-If the class variable is C<private> and it is accessed outside of the class, a compilation error will occur.
+If the class variable is C<private> and it is accessed outside of the class, a compilation error occurs.
 
-If the type of the assigned value is an L<object type|/"Object Type">, the reference count of the object is incremented by C<1>.
+If the type of the assigned value is an L<object type|/"Object Type">, the reference count of the object is incremented by 1.
 
-If an object has already been assigned to $CLASS_VARIABLE_NAME before the assignment, the reference count of the object is decremented by C<1>.
+If an object has already been assigned to $CLASS_VARIABLE_NAME before the assignment, the reference count of the object is decremented by 1.
 
 Examples:
 
@@ -8168,9 +8159,9 @@ The return value is the value after the setting.
 
 The return type is the L<string type|/"string Type">.
 
-The reference count of the assigned value is incremented by C<1>.
+The reference count of the assigned value is incremented by 1.
 
-If an string has already been assigned to the exception variable before the assignment, the reference count of the string is decremented by C<1>.
+If an string has already been assigned to the exception variable before the assignment, the reference count of the string is decremented by 1.
 
 Examples:
 
@@ -8199,15 +8190,15 @@ The setting field is an L<operator|/"Operator"> to set the L<field|/"Field"> of 
 
 The type of invocant is a L<class type|/"Class Type">.
 
-If the assignment does not satisfy the L<assignability|/"Assignability">, a compilation error will occur.
+If the assignment does not satisfy the L<assignability|/"Assignability">, a compilation error occurs.
 
 The return value is the value after the setting. 
 
 The return type is the field type.
 
-If the type of assigned value is a L<basic object type|/"Object Type">, the reference count of the object is incremented by C<1>.
+If the type of assigned value is a L<basic object type|/"Object Type">, the reference count of the object is incremented by 1.
 
-If an object has already been assigned to the field before the assignment, the reference count of that object is decremented by C<1>.
+If an object has already been assigned to the field before the assignment, the reference count of that object is decremented by 1.
 
 Examples:
 
@@ -8222,7 +8213,7 @@ B<Getting Multi-Numeric Field operator> is an L<operator|/"Operator"> to get Fie
 
 The invocant is the L<multi-numeric type|/"Multi-Numeric Type">.
   
-If the field names does not found in the L</"Class">, a compilation error will occur
+If the field names does not found in the L</"Class">, a compilation error occurs
 
 Getting Multi-Numeric Field operator returns the field value in the multi-numeric value.
 
@@ -8241,7 +8232,7 @@ Setting Multi-Numeric Field operator is an L<operator|/"Operator"> to set Field 
 
 The invocant is the L<multi-numeric type|/"Multi-Numeric Type">.
 
-If the field names does not found in the L</"Class">, a compilation error will occur.
+If the field names does not found in the L</"Class">, a compilation error occurs.
 
 Setting Multi-Numeric Field operator returns the value of the field after setting. 
 
@@ -8270,9 +8261,9 @@ The getting array element returns the element that is specifed by the index.
 
 The return type is the type of the element.
 
-The array must be defined. Otherwise an exception will be thrown.
+The array must be defined. Otherwise an exception is thrown.
 
-The index must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+The index must be greater than or equal to 0. Otherwise an exception is thrown.
 
 Examples:
 
@@ -8301,13 +8292,13 @@ The right operand must be L<assigned|/"Assignability"> to the element of the arr
 
 The setting array element returns the value of the element that is set.
 
-The array must be defined. Otherwise an exception will be thrown.
+The array must be defined. Otherwise an exception is thrown.
 
-The index must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+The index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-If the right operand is an L<object type|/"Object Type">, the reference count of the object is incremented by C<1>.
+If the right operand is an L<object type|/"Object Type">, the reference count of the object is incremented by 1.
 
-If an object has already been assigned to the field before the assignment, the reference count of the object is decremented by C<1>.
+If an object has already been assigned to the field before the assignment, the reference count of the object is decremented by 1.
 
 Examples:
 
@@ -8334,7 +8325,7 @@ The class name must be the name of the L<class|/"Class"> defined by the L<class 
 
 The fields of the created object are initialized by the L<initial value|/"Initial Value">.
 
-The reference count of the created object is C<0>. If the object is assigned to a local variable, a class variable, or a field by L</"Assignment Operator">, the reference count is incremented by C<1>.
+The reference count of the created object is 0. If the object is assigned to a local variable, a class variable, or a field by L</"Assignment Operator">, the reference count is incremented by 1.
 
 Examples:
 
@@ -8352,7 +8343,7 @@ The length must be an L<integer type within int|/"Integer Type Within int">. Oth
 
 The L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on the length.
 
-The length must be greater than or equal to C<0>. Otherwise an exception will be thrown.
+The length must be greater than or equal to 0. Otherwise an exception is thrown.
 
 All elements of the array are initialized by the L<initial value|/"Initial Value">.
 
@@ -8382,7 +8373,7 @@ Examples:
   # 3 dimentional int array
   my $nums = new int[][][3];
 
-The max dimention is C<255>.
+The max dimention is 255.
 
 =head2 Array Initialization
 
@@ -8397,7 +8388,7 @@ And the array is initialized by the elements.
 
 And the created array is returned.
 
-The type of the created array is the type that C<1> dimension is added to the type of the first element.
+The type of the created array is the type that 1 dimension is added to the type of the first element.
 
 If no element is specified, the type of the create array becomes L<any object type|/"Any Object Type">.
 
@@ -8427,7 +8418,7 @@ The array initialization has another syntax using C<{}>.
 
 This is the same as above array init syntax, but the type of the created array is always L</"Any Object Array Type"> C<object[]>.
 
-And if the length of the elements is odd number, a compilation error will occur.
+And if the length of the elements is odd number, a compilation error occurs.
 
 Examples:
 
@@ -8443,7 +8434,7 @@ The reference operator C<\> is the L<operator|/"Operator"> to create a L<referen
 
   \OPERAND
 
-The operand must be a L<local variable|/"Local Variable"> that type is a L<numeric type|/"Numeric Type"> or a L<multi-numeric type|/"Multi-Numeric Type">. Otherwise a compilation error will occur.
+The operand must be a L<local variable|/"Local Variable"> that type is a L<numeric type|/"Numeric Type"> or a L<multi-numeric type|/"Multi-Numeric Type">. Otherwise a compilation error occurs.
 
 The return type is the L<reference type|/"Reference Type"> of the C<OPERAND>.
 
@@ -8467,7 +8458,7 @@ Obtaining a value by Dereference is an L<operator|/"Operator"> to obtain the act
 
   $VARIABLE
 
-The variable Type must be Reference Type. Otherwise a compilation error will occur.
+The variable Type must be Reference Type. Otherwise a compilation error occurs.
 
 The value obtained by Dereference returns the L<operator|/"Operator">.
 
@@ -8487,9 +8478,9 @@ Setting a value with Dereference is an L<operator|/"Operator"> to set the actual
 
   $VARIABLE = OPERAND
 
-The variable Type must be Reference Type. Otherwise a compilation error will occur.
+The variable Type must be Reference Type. Otherwise a compilation error occurs.
 
-The type of operator must match the type of the variable when dereferenced. Otherwise a compilation error will occur.
+The type of operator must match the type of the variable when dereferenced. Otherwise a compilation error occurs.
 
 Setting a value with Dereference returns the set value. This is the L<operator|/"Operator">.
 
@@ -8514,7 +8505,7 @@ B<Getting Multi-Numeric Field via Dereference operator> is an L<operator|/"Opera
 
 The invocant is L</"Multi-Numeric Reference Type">.
 
-If the field names does not found in the L</"Class">, a compilation error will occur
+If the field names does not found in the L</"Class">, a compilation error occurs
 
 The getting multi-numeric field via dereference operator returns the field value in the multi-numeric value.
 
@@ -8534,7 +8525,7 @@ The setting multi-numeric field via dereference operator is an L<operator|/"Oper
 
 The invocant is L</"Multi-Numeric Reference Type">.
 
-If the field names does not found in the L</"Class">, a compilation error will occur
+If the field names does not found in the L</"Class">, a compilation error occurs
 
 The setting multi-numeric field via dereference operator returns the value of the field after setting.
 
@@ -8569,7 +8560,7 @@ The getting current file name C<__FILE__> is an L<operator|/"Operator"> to get t
 
   __FILE__
 
-The current file name means the relative path from the base path of the module file. For example, if the class loaded path is C</mypath> and the class name is C<Foo::Bar>, the absolute path is C</mypath/SPVM/Foo/Bar.spvm> and the relative path is C<SPVM/Foo/Bar.spvm>. C<SPVM/Foo/Bar.spvm> is the current file name.
+The current file name means the relative path from the base path of the class file. For example, if the class loaded path is C</mypath> and the class name is C<Foo::Bar>, the absolute path is C</mypath/SPVM/Foo/Bar.spvm> and the relative path is C<SPVM/Foo/Bar.spvm>. C<SPVM/Foo/Bar.spvm> is the current file name.
 
 Examples:
 
@@ -8737,7 +8728,7 @@ The C<error> operatoer is an L<operator|/"Operator"> to get the current error co
 
   error
 
-This value is set to C<0> at the beginning of the L<eval block|eval Block>.
+This value is set to 0 at the beginning of the L<eval block|eval Block>.
 
 If A L<exception|/"Exception"> is catched, the current error code is set to the value of L<error_code|/"error_code">.
 
@@ -8751,7 +8742,7 @@ The type cast is the L<operator|/"Operator"> to perform an L<explicite type conv
   # Postfix Type Cast
   OPERAND->(TYPE)
 
-If the type cast doesn't have the L<castability|"Castability">, a compilation error will occur.
+If the type cast doesn't have the L<castability|"Castability">, a compilation error occurs.
 
 A type cast performs a L<type conversion|/"Type Conversion">, merely copying, or copying with a runtime type checking.
 
@@ -8820,7 +8811,7 @@ The C<die> operator is a L<void retruning operator|/"void Returning Operator"> t
 
   die OPERAND;
 
-The operand must be the L<string type|/"string Type">. If not a compilation error will occur.
+The operand must be the L<string type|/"string Type">. If not a compilation error occurs.
 
 You can specify the error message to the C<OPERAND>.
 
@@ -8829,7 +8820,7 @@ You can specify the error message to the C<OPERAND>.
 
 The error message is set to the L<exception variable|/"Exception Variable"> C<$@>.
 
-If an exception will be thrown, the program prints the error message to the standard error with the stack traces and finishes with error code C<255>.
+If an exception is thrown, the program prints the error message to the standard error with the stack traces and finishes with error code 255.
 
 The stack traces constain the class names, the method names, the file names and the line numbers.
 
@@ -8880,7 +8871,7 @@ The C<make_read_only> operator is a L<void retruning operator|/"void Returning O
 
 The oeprand must be a L<string type|/"string Type">.
 
-Read-only strings can't be cast to L<string type|/"string Type"> qualified by L<mutable|/"mutable Type Qualifier">.
+Read-only strings cannnot be cast to L<string type|/"string Type"> qualified by L<mutable|/"mutable Type Qualifier">.
 
   # A string
   my $string = new_string_len 3;
@@ -8897,11 +8888,11 @@ The C<weaken> operator is a L<void retruning operator|/"void Returning Operator"
 
   weaken OBJECT->{FIELD_NAME};
 
-The type of the object must be the L<class type|/"Class Type">. Otherwise a compilation error will occur.
+The type of the object must be the L<class type|/"Class Type">. Otherwise a compilation error occurs.
 
-If the field name is not found, a compilation error will occur.
+If the field name is not found, a compilation error occurs.
 
-The type of the field targetted by the C<weaken> statement is not an L<object type|/"Object Type">, a compilation error will occur.
+The type of the field targetted by the C<weaken> statement is not an L<object type|/"Object Type">, a compilation error occurs.
 
 See L</"Weak Reference"> to know the behavior of the C<weaken> statement.
 
@@ -8916,11 +8907,11 @@ The C<unweaken> operator is a L<void retruning operator|/"void Returning Operato
 
   unweaken OBJECT->{FIELD_NAME};
 
-The type of the object must be the L<class type|/"Class Type">. Otherwise a compilation error will occur.
+The type of the object must be the L<class type|/"Class Type">. Otherwise a compilation error occurs.
 
-If the field name is not found, a compilation error will occur.
+If the field name is not found, a compilation error occurs.
 
-The type of the field targetted by the C<unweaken> statement is not an L<object type|/"Object Type">, a compilation error will occur.
+The type of the field targetted by the C<unweaken> statement is not an L<object type|/"Object Type">, a compilation error occurs.
 
 See L</"Weak Reference"> to know the behavior of the C<unweaken> statement.
 
@@ -8939,9 +8930,9 @@ A method defined as the L<class method|/"Class Method"> can be called using the 
 
   ClassName->MethodName(ARGS1, ARGS2, ...);
 
-If the number of arguments does not correct, a compilation error will occur.
+If the number of arguments does not correct, a compilation error occurs.
 
-If the types of arguments have no type compatible, a compilation error will occur.
+If the types of arguments have no type compatible, a compilation error occurs.
 
 Examples:
 
@@ -8953,9 +8944,9 @@ A method defined as the L<instance method|/"Instance Method"> can be called usin
 
   Instance->MethodName(ARGS1, ARGS2, ...);
 
-If the number of arguments does not correct, a compilation error will occur.
+If the number of arguments does not correct, a compilation error occurs.
 
-If the types of arguments have no type compatible, a compilation error will occur.
+If the types of arguments have no type compatible, a compilation error occurs.
 
 The called method is resolved from the type of the instance.
 
@@ -8979,7 +8970,7 @@ The C<items> operator gets the stack length of the arguments passed to the metho
 
 Note that the stack length of the arguments is different from the length of the arguments.
 
-If the method call is the instance method call, the stack length of the arguments is the length of the arguments + C<1> for the invocant.
+If the method call is the instance method call, the stack length of the arguments is the length of the arguments + 1 for the invocant.
 
 If an argument is a multi-numeric type, the stack length of the argument becomes the length of the fields.
 
@@ -9075,11 +9066,11 @@ See L</"Setting Exception Variable"> to set Exception Variable Value.
 
 =head1 Garbage Collection
 
-The object is destroyed when the reference count becomes C<0>.
+The object is destroyed when the reference count becomes 0.
 
-If the object is an Array that has Object Type values ​​as elements, the reference count of all Array elements that are not Undefined Value is decremented by C<1> before Garbage Collection
+If the object is an Array that has Object Type values ​​as elements, the reference count of all Array elements that are not Undefined Value is decremented by 1 before Garbage Collection
 
-When an object is a L<class type|/"Class Type"> and has a field of Object Type, the reference count of the objects owned by all fields of Object Type that are not Undefined Value is decremented by C<1> before Garbage Collection. If Weak Reference is set to the object saved in Field, Weak Reference is destroyed before the reference count is decremented by C<1>.
+When an object is a L<class type|/"Class Type"> and has a field of Object Type, the reference count of the objects owned by all fields of Object Type that are not Undefined Value is decremented by 1 before Garbage Collection. If Weak Reference is set to the object saved in Field, Weak Reference is destroyed before the reference count is decremented by 1.
 
 When the object has Back references of Weak Reference, Undefined Value is assigned to all fields registered as back References and all back References are deleted.
 
@@ -9123,7 +9114,7 @@ If there is no weaken statement, the reference count of $foo and the reference c
 
 When a weaken statement is executed, $foo has the reference count of 2 and $bar has the reference count of 1.
 
-When the Scope ends, the reference count of $bar is decremented by C<1> and becomes 0, so it is destroyed correctly.
+When the Scope ends, the reference count of $bar is decremented by 1 and becomes 0, so it is destroyed correctly.
 
 Even if there are 3 circular references, you can release them correctly by setting Weak Reference in 1 Field.
 
@@ -9143,11 +9134,11 @@ As a syntax related to Weak Reference, Weak Reference can be destroyed the L<wea
 
 =head1 Standard IO
 
-C<stdin>, C<stdout>, C<stderr> in C<C language> is set to the binary mode on all systems.
+C<stdin>, C<stdout>, C<stderr> in the C language is set to the binary mode on all systems.
 
 This means the escape character of the string literal C<"\n"> is not coverted to C<"\r\n"> when it is got from C<stdin> and it is printed to C<stdout> and C<stderr>.
 
-C<stdin>, C<stdout>, C<stderr> can be changed to the text mode using the L<native module|SPVM::Document::NativeModule>, but don't do that.
+C<stdin>, C<stdout>, C<stderr> can be changed to the text mode using the L<native class|SPVM::Document::NativeClass>, but don't do that.
 
 =head1 See Also
 
@@ -9156,3 +9147,9 @@ C<stdin>, C<stdout>, C<stderr> can be changed to the text mode using the L<nativ
 You can see more examples in the following test codes.
 
 L<Examples of SPVM|https://github.com/yuki-kimoto/SPVM/tree/master/t/default/lib/SPVM/TestCase>
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

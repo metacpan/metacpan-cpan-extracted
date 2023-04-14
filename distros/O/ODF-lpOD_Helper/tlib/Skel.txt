@@ -1,0 +1,28 @@
+Front Stuff outside the 2-column Section
+XXX
+
+YYY
+
+LEAVE THIS ONE UNTOUCHED:
+Lorem ipsum ***5 consecutive-spaces: :(5 of them) newline:
+:(no leading spaces) another newline:
+:(3 leading spaces on this line). ***non: :breaking spaces: :(5 nb spaces) amet, consectetur tab here: :there
+adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mumble fratz
+veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+This has xml < meta & characters > &amp; so-forth.
+This «Paragraph» has ☺Unicode and bold	<tabthere and     multi-space and italic and underlined and larger text.
+AAA CCC
+DDD
+EEE :(3 spaces): FFF
+
+**NAME**
+**PHONE**
+**ADDR1**
+**ADDR2**
+**ADDR3**
+
+
+

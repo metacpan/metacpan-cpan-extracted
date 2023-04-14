@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-textconv
 
+1.05 2023-04-14T05:03:38Z
+
+    - Support forced line breaks in paragraphs.
+
 1.04 2023-03-09T03:50:37Z
 
     - Introduce textconv::git module to handle git file object.

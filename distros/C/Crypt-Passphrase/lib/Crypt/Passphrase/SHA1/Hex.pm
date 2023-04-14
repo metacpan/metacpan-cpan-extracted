@@ -1,8 +1,11 @@
 package Crypt::Passphrase::SHA1::Hex;
-$Crypt::Passphrase::SHA1::Hex::VERSION = '0.012';
+$Crypt::Passphrase::SHA1::Hex::VERSION = '0.015';
+use strict;
+use warnings;
+
 use Crypt::Passphrase -validator;
 
-use Digest::SHA 'sha1_hex';
+use Digest::SHA 'sha1';
 
 sub new {
 	my $class = shift;
@@ -11,12 +14,12 @@ sub new {
 
 sub accepts_hash {
 	my ($self, $hash) = @_;
-	return $hash =~ / ^ [A-Fa-f0-9]{40} $/x;
+	return $hash =~ / ^ [a-f0-9]{40} $/xi;
 }
 
 sub verify_password {
 	my ($self, $password, $hash) = @_;
-	return sha1_hex($password) eq lc $hash;
+	return sha1($password) eq pack('H40', $hash);
 }
 
 1;
@@ -35,7 +38,7 @@ Crypt::Passphrase::SHA1::Hex - Validate against hexed SHA1 hashes with Crypt::Pa
 
 =head1 VERSION
 
-version 0.012
+version 0.015
 
 =head1 DESCRIPTION
 

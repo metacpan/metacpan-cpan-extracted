@@ -7,7 +7,7 @@ use Moose;
 use namespace::autoclean;
 
 #------------------------------------------------------------------------------
-# 继承 Net::Device::Role 方法属性,同时具体实现其指定方法
+# 继承 Net::Connector::Role 方法属性,同时具体实现其指定方法
 #------------------------------------------------------------------------------
 with 'PDK::Device::Role';
 
@@ -16,7 +16,7 @@ with 'PDK::Device::Role';
 #------------------------------------------------------------------------------
 sub _prompt {
   my $self   = shift;
-  my $prompt = '^.*?(\((?:active|passive)\))?[>#]\s*$';
+  my $prompt = '.*?\((?:active|passive)\)[>#]';
   return $prompt;
 }
 
@@ -57,6 +57,8 @@ sub truncateCommand {
   $buff =~ s/ \cH//g;                     # 捕捉数字之间空白符
   $buff =~ s/(\c[\S+)+\cM(\c[\[K)?//g;    # 捕捉字符信息
   $buff =~ s/\cM(\c[\S+)+\c[>//g;         # 登陆成功提示符
+                                          #$buff =~ s/^\s*$//mg;
+                                          # 返回修正数据
   return $buff;
 }
 

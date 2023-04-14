@@ -26,7 +26,7 @@ no_index:
 provides:
   Nanoid:
     file: lib/Nanoid.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Bytes::Random::Secure: '0'
   perl: '5.010'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/tkzwtks/Nanoid-perl/issues
   homepage: https://github.com/tkzwtks/Nanoid-perl
   repository: https://github.com/tkzwtks/Nanoid-perl.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'AnaTofuZ <anatofuz@gmail.com>'
   - 'Eugene Alvin Villar <seav80@gmail.com>'

@@ -17,7 +17,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use URI;
 
-our $VERSION = '0.68';
+our $VERSION = '0.70';
 our @CARP_NOT;
 
 =head1 NAME
@@ -480,15 +480,15 @@ sub on_response( $self, $connection, $message ) {
 
         if( my $listeners = $self->listener->{ $response->{method} } ) {
             @$listeners = grep { defined $_ } @$listeners;
-            if( $self->_log->is_trace ) {
-                if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
-                    $self->log( 'trace', "Notifying listeners", $response );
-                };
-            } else {
-                if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
-                    $self->log( 'debug', sprintf "Notifying listeners for '%s'", $response->{method} );
-                };
-            };
+            #if( $self->_log->is_trace ) {
+            #    if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
+            #        $self->log( 'trace', "Notifying listeners", $response );
+            #    };
+            #} else {
+            #    if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
+            #        $self->log( 'debug', sprintf "Notifying listeners for '%s'", $response->{method} );
+            #    };
+            #};
             for my $listener (@$listeners) {
                 eval {
                     $listener->notify( $response );
@@ -501,9 +501,9 @@ sub on_response( $self, $connection, $message ) {
                 weaken $listeners->[$_]
                     if not isweak $listeners->[$_];
             };
-            if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
-                $self->log('trace', "Message handled", $response);
-            };
+            #if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
+            #    $self->log('trace', "Message handled", $response);
+            #};
 
             $handled++;
         };
@@ -633,12 +633,14 @@ sub _send_packet( $self, $response, $method, %params ) {
             payload => $msg
         });
     };
-
-    $self->log( 'trace', "Sent message", $payload );
+if( $method ne 'Target.sendMessageToTarget' ) {
+    $self->log( 'trace', "Sent '$method' message", $payload );
+};
     my $result;
     try {
         $result = $self->transport->send( $payload );
     } catch {
+        $self->log( 'error', "Sent '$method' message", $payload );
         $self->log('error', $_ );
         $result = Future->fail( $_ );
     };
@@ -950,7 +952,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.68';
+our $VERSION = '0.70';
 
 has 'protocol' => (
     is => 'ro',
@@ -1015,7 +1017,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -1,0 +1,14 @@
+.perltidyrc
+Changes
+lib/JIP/Mock.pm
+lib/JIP/Mock/Control.pm
+lib/JIP/Mock/Event.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_jip_mock.t
+t/01_jip_mock_control.t
+t/02_jip_mock_event.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

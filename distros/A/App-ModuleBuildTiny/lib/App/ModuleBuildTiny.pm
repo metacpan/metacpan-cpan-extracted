@@ -1,9 +1,8 @@
 package App::ModuleBuildTiny;
 
 use 5.014;
-use strict;
 use warnings;
-our $VERSION = '0.037';
+our $VERSION = '0.040';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -20,14 +19,13 @@ use File::Spec::Functions qw/catfile catdir curdir rel2abs/;
 use Getopt::Long 2.36 'GetOptionsFromArray';
 use JSON::PP qw/decode_json/;
 use Module::Runtime 'require_module';
-use Pod::Simple::Text 3.23;
 use Text::Template;
 
 use App::ModuleBuildTiny::Dist;
 
 use Env qw/$AUTHOR_TESTING $RELEASE_TESTING $AUTOMATED_TESTING $EXTENDED_TESTING $NONINTERACTIVE_TESTING $SHELL $HOME $USERPROFILE/;
 
-Getopt::Long::Configure(qw/require_order gnu_compat/);
+Getopt::Long::Configure(qw/require_order gnu_compat bundling/);
 
 sub prompt {
 	my($mess, $def) = @_;
@@ -226,6 +224,17 @@ sub get_config {
 	return $config;
 }
 
+sub extra_tests {
+	my @dirs;
+	if ($AUTHOR_TESTING) {
+		push @dirs, catdir('xt', 'author');
+		push @dirs, glob 'xt/*.t';
+	}
+	push @dirs, catdir('xt', 'release') if $RELEASE_TESTING;
+	push @dirs, catdir('xt', 'extended') if $EXTENDED_TESTING;
+	return grep -e, @dirs;
+}
+
 my @regenerate_files = qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
 
 my %actions = (
@@ -250,17 +259,16 @@ my %actions = (
 		my @arguments = @_;
 		$AUTHOR_TESTING = 1;
 		GetOptionsFromArray(\@arguments, 'release!' => \$RELEASE_TESTING, 'author!' => \$AUTHOR_TESTING, 'automated!' => \$AUTOMATED_TESTING,
-			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING) or return 2;
-		my @dirs = 't';
-		if ($AUTHOR_TESTING) {
-			push @dirs, catdir('xt', 'author');
-			push @dirs, glob 'xt/*.t';
-		}
-		push @dirs, catdir('xt', 'release') if $RELEASE_TESTING;
-		push @dirs, catdir('xt', 'extended') if $EXTENDED_TESTING;
-		@dirs = grep -e, @dirs;
+			'extended!' => \$EXTENDED_TESTING, 'non-interactive!' => \$NONINTERACTIVE_TESTING, 'jobs=i' => \my $jobs, 'inc|I=s@' => \my @inc)
+			or return 2;
+		my @tests;
+		push @tests, 't' if -e 't';
+		push @tests, extra_tests();
 		my $dist = App::ModuleBuildTiny::Dist->new;
-		return $dist->run(command => [ 'prove', '-br', @dirs ], build => 1, verbose => 1);
+		my @args;
+		push @args, '-j', $jobs if defined $jobs;
+		push @args, map {; '-I', rel2abs($_) } @inc;
+		return $dist->run(commands => [ [ 'prove', '-br', @args, @tests ] ], build => 1, verbose => 1);
 	},
 	upload => sub {
 		my @arguments = @_;
@@ -271,9 +279,12 @@ my %actions = (
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		$dist->preflight_check(%opts);
 		local ($AUTHOR_TESTING, $RELEASE_TESTING) = (1, 1);
-		$dist->run(command => [ catfile(curdir, 'Build'), 'test' ], build => 1, verbose => !$opts{silent}) or return 1;
+		my @commands = ([ catfile(curdir, 'Build'), 'test' ]);
+		my @extra_tests = extra_tests;
+		push @commands, [ 'prove', '-br', @extra_tests ] if @extra_tests;
+		$dist->run(commands => \@commands, build => 1, verbose => !$opts{silent}) or return 1;
 
-		my $sure = prompt_yn('Do you want to continue the release process?', 'n');
+		my $sure = prompt_yn('Do you want to continue the release process?', !!0);
 		if ($sure) {
 			my $file = $dist->write_tarball($dist->fullname);
 			require CPAN::Upload::Tiny;
@@ -305,13 +316,13 @@ my %actions = (
 		die "No arguments given to run\n" if not @arguments;
 		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1)) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new();
-		return $dist->run(command => \@arguments, build => $build, verbose => 1);
+		return $dist->run(commands => [ \@arguments ], build => $build, verbose => 1);
 	},
 	shell => sub {
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, 'build!' => \my $build) or return 2;
 		my $dist = App::ModuleBuildTiny::Dist->new();
-		return $dist->run(command => [ $SHELL ], build => $build, verbose => 0);
+		return $dist->run(commands => [ [ $SHELL ] ], build => $build, verbose => 0);
 	},
 	listdeps => sub {
 		my @arguments = @_;
@@ -345,13 +356,14 @@ my %actions = (
 	regenerate => sub {
 		my @arguments = @_;
 		my $config = get_config;
-		my %opts = (
-			bump   => $config->{auto_bump},
-			commit => $config->{auto_git},
-			scan   => $config->{auto_scan},
-		);
+		my %opts;
 		GetOptionsFromArray(\@arguments, \%opts, qw/trial bump! version=s verbose dry_run|dry-run commit! scan! message=s/) or return 2;
 		my @files = @arguments ? @arguments : @regenerate_files;
+		if (!@arguments) {
+			$opts{bump}   //= $config->{auto_bump};
+			$opts{commit} //= $config->{auto_git};
+			$opts{scan}   //= $config->{auto_scan};
+		}
 
 		regenerate(\@files, $config, %opts);
 
@@ -442,7 +454,7 @@ my %actions = (
 
 		my $settings = get_settings(\%default_settings);
 
-		my $distname = decode_utf8(shift @arguments // die "No distribution name given\n");
+		my $distname = decode_utf8(shift @arguments // die "No distribution name given\n") =~ s/::/-/gr;
 
 		my %args = (
 			author   => $settings->{author},
@@ -476,16 +488,20 @@ my %actions = (
 		write_changes(%args, distname => $distname);
 		write_maniskip($distname);
 		write_json('dist.json', \%config);
+		mkdir 't';
 
 		write_json('metamerge.json', { name => $distname }) if $distname ne $args{dirname};
 
 		regenerate(\@regenerate_files, \%args, scan => $config{auto_scan});
 
 		if ($args{init_git}) {
+			my $ignore = join "\n", qw/*.bak *.swp *.swo *.tdy *.tar.gz/, "$distname-*", '';
+			write_text('.gitignore', $ignore);
+
 			require Git::Wrapper;
 			my $git = Git::Wrapper->new('.');
 			$git->init;
-			$git->add(@regenerate_files, 'Changes', 'MANIFEST.SKIP', 'dist.json', $module_file);
+			$git->add(@regenerate_files, 'Changes', 'MANIFEST.SKIP', 'dist.json', '.gitignore', $module_file, grep -e, 'metamerge.json');
 			$git->commit({ message => 'Initial commit' });
 		}
 

@@ -1,19 +1,21 @@
 package Example::View::HTML::Home;
 
-use Moose;
+use Moo;
 use Example::Syntax;
-use Valiant::HTML::TagBuilder 'div', 'blockquote', 'cond';
-
-extends 'Example::View::HTML';
+use Example::View::HTML
+  -tags => qw(div blockquote),
+  -views => 'HTML::Page', 'HTML::Navbar';
 
 has info => (is=>'rw', predicate=>'has_info');
 
 sub render($self, $c) {
-  $c->view('HTML::Layout' => page_title=>'Homepage', sub($layout) {
-    $c->view('HTML::Navbar' => active_link=>'/'),
-    blockquote +{ cond=>$self->has_info, class=>"alert alert-primary", role=>"alert" }, $self->info,
+  html_page page_title => 'Sign In', sub($page) {
+    html_navbar active_link=>'/',
+    blockquote +{ if=>$self->has_info, 
+      class=>"alert alert-primary", 
+      role=>"alert" }, $self->info,
     div 'Welcome to your Example application Homepage';
-  });
+  };
 }
 
-__PACKAGE__->meta->make_immutable();
+1;

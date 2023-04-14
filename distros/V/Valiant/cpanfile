@@ -20,9 +20,12 @@ requires 'overload';
 requires 'DBIx::Class';
 requires 'Sub::Util';
 requires 'HTML::Escape';
-requires 'URI';
+requires 'URI', '5.17';
 requires 'Module::Pluggable::Object';
 requires 'Class::Method::Modifiers';
+requires 'Catalyst::View::BasePerRequest';
+requires 'Sub::Util';
+requires 'Attribute::Handlers';
 
 on test => sub {
   requires 'Test::Most' => '0.34';
@@ -37,4 +40,6 @@ on test => sub {
   requires 'DBIx::Class';
   requires 'DBIx::Class::Candy';
   requires 'Test::DBIx::Class'=> '0.52';
+  requires 'HTML::Escape';
+  requires 'Catalyst::Runtime';
 };

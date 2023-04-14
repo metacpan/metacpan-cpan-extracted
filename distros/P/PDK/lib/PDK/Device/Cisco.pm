@@ -58,7 +58,15 @@ sub _runningCommands {
 #------------------------------------------------------------------------------
 sub _healthCheckCommands {
   my $self     = shift;
-  my $commands = ["terminal length 0", "show ip arp", "show cdp neighbor"];
+  my $commands = [
+    "show system resources",
+    "show system resources",
+    "show spanning-tree summary",
+    "show environment fan",
+    "show environment temperature",
+    "show clock",
+    "show ntp peers"
+  ];
   return $commands;
 }
 

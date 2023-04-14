@@ -1,0 +1,146 @@
+package MIDI::Drummer::Tiny::Tutorial::Quickstart;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MIDI::Drummer::Tiny::Tutorial::Quickstart
+
+=head1 VERSION
+
+version 0.4206
+
+=head1 Import the Module
+
+  use MIDI::Drummer::Tiny ();
+
+=head1 Object Instantiation
+
+=head2 Use the defaults
+
+  my $d = MIDI::Drummer::Tiny->new;
+
+=head2 Attribute configuration
+
+  my $d = MIDI::Drummer::Tiny->new(
+      file       => 'drums.mid',
+      bpm        => 120,
+      channel    => 10,
+      volume     => 120,
+      signature  => '5/4', # OR:
+      #beats     => 5,
+      #divisions => 4,
+      bars       => 8,
+      reverb     => 0,
+      kick       => 36, # Override default patch
+      snare      => 40, # "
+      verbose    => 1,
+  );
+
+=head1 Drum Set Components
+
+=head2 Kick and snare-like things
+
+acoustic_bass, electric_bass ("kick")
+
+acoustic_snare, electric_snare, side_stick, clap
+
+=head2 Cymbals
+
+open_hh, closed_hh, pedal_hh
+
+crash1, crash2, splash, china
+
+ride1, ride2, ride_bell
+
+=head2 Toms
+
+hi_tom, hi_mid_tom, low_mid_tom, low_tom, hi_floor_tom, low_floor_tom
+
+=head2 Miscellaneous
+
+click, bell (metronome), tambourine, cowbell, vibraslap, etc.
+
+=head1 Handy Duration Aliases
+
+whole, triplet_whole, dotted_whole, double_dotted_whole
+
+half, triplet_half, dotted_half, double_dotted_half
+
+quarter, triplet_quarter, dotted_quarter, double_dotted_quarter
+
+eighth, triplet_eighth, dotted_eighth, double_dotted_eighth
+
+etc. up to 128th notes
+
+=head1 Basic Beats
+
+=head2 Rock
+
+  $d->metronome44;
+  # OR
+  $d->metronome44($d->bars, 1);
+
+That's it!
+
+=head2 Swing
+
+  $d->metronome44swing;
+
+That's it!
+
+=head2 Viennese Waltz
+
+  for my $n (1 .. $d->bars) {
+      $d->note($d->quarter, $d->ride1, $d->kick);
+      $d->note($d->quarter, $d->ride1, $d->snare);
+      $d->note($d->quarter, $d->ride1, $d->snare);
+  }
+
+In 3/4 time
+
+=head2 Disco
+
+  for my $n ( 0 .. $d->bars - 1 ) {
+      $d->note( $d->sixteenth, $d->closed_hh, $d->kick );
+      $d->note( $d->sixteenth, $d->closed_hh );
+      $d->note( $d->sixteenth, $d->closed_hh );
+      $d->note( $d->sixteenth, $d->open_hh );
+      $d->note( $d->sixteenth, $d->pedal_hh, $d->kick, $d->snare );
+      $d->note( $d->sixteenth, $d->closed_hh );
+      $d->note( $d->sixteenth, $d->closed_hh );
+      $d->note( $d->sixteenth, $d->closed_hh );
+  }
+
+This beat is extra-cheesy.
+
+=head1 And Finally...
+
+We need to write-out the score to a MIDI file.
+
+  $d->write;
+
+=head1 MIDI Playback
+
+Use the venerable command-line program, L<timidity++|https://timidity.sourceforge.net/|> - which is likely available through your package manager (e.g. apt, homebrew). You can also use the excellent, cross platform program, L<VLC|https://www.videolan.org/vlc/|>.
+
+  > timidity drums.mid
+
+Easy!
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014-2023 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

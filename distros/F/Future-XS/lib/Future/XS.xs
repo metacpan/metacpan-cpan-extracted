@@ -273,13 +273,13 @@ then(SV *self, ...)
 
     SV *thencode = &PL_sv_undef;
     if(items) {
-      thencode = ST(1);
+      thencode = newSVsv(ST(1));
       items--;
     }
 
     SV *elsecode = &PL_sv_undef;
     if(items % 2) {
-      elsecode = ST(1 + items);
+      elsecode = newSVsv(ST(1 + items));
       items--;
     }
 
@@ -305,7 +305,7 @@ else(SV *self, SV *code)
   CODE:
     CHECK_INSTANCE(self);
     warn_void_context(ix ? "else_with_f" : "else");
-    RETVAL = future_then(self, ix, NULL, code);
+    RETVAL = future_then(self, ix, NULL, newSVsv(code));
   OUTPUT:
     RETVAL
 
@@ -321,7 +321,7 @@ catch(SV *self, ...)
 
     SV *elsecode = &PL_sv_undef;
     if(items % 2) {
-      elsecode = ST(items);
+      elsecode = newSVsv(ST(items));
       items--;
     }
 
@@ -339,7 +339,7 @@ followed_by(SV *self, SV *code)
   CODE:
     CHECK_INSTANCE(self);
     warn_void_context("followed_by");
-    RETVAL = future_followed_by(self, code);
+    RETVAL = future_followed_by(self, newSVsv(code));
   OUTPUT:
     RETVAL
 
@@ -423,7 +423,8 @@ set_label(SV *self, SV *label)
 SV *
 label(SV *self)
   CODE:
-    RETVAL = future_get_label(self);
+    SV *label = future_get_label(self);
+    RETVAL = label ? newSVsv(label) : &PL_sv_undef;
   OUTPUT:
     RETVAL
 

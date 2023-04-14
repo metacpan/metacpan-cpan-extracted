@@ -17,6 +17,10 @@ t/pod.t
 t/pod_coverage.t
 t/run.t
 t/test_manifest
+templates/.github/workflows/linux.yml
+templates/.github/workflows/macos.yml
+templates/.github/workflows/release.yml
+templates/.github/workflows/windows.yml
 templates/Changes
 templates/lib/Foo.pm
 templates/LICENSE

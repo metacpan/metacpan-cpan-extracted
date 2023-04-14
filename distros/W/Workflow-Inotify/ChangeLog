@@ -1,3 +1,30 @@
+Sat Apr  8 09:37:54 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.5]:
+	* VERSION: bump
+	* src/main/perl/lib/Workflow/Inotify/Handler.pm.in
+	(parent): Exporter, Class::Accessor::Fast
+	- Readonly $TRUE, $FALSE
+	* README.md: generated
+	* NEWS: updated
+
+Fri Mar 31 09:16:25 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.4]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* src/main/perl/lib/Workflow/Inotify.pm.in
+	- updated pod 
+	* src/main/perl/lib/Workflow/Inotify/Handler.pm.in
+	- pod
+	(boolean): new
+	(new)
+	- load config if scalar
+	(get_app_config):
+	- section name must be lower case
+	- don't allow redefinition of getter
+	* README.md: generated
+
 Fri Feb 10 10:40:18 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.3]:

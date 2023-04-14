@@ -9,6 +9,7 @@ use Mojo::Template;
 use Mojo::JSON qw/encode_json decode_json/;
 use SReview::Config::Common;
 use SReview::Talk::State;
+use SReview::Talk::Progress;
 use DateTime::Format::Pg;
 
 my $config = SReview::Config::Common::setup;
@@ -60,6 +61,17 @@ has 'talkid' => (
         },
 );
 
+has 'upstreamid' => (
+	is => 'ro',
+	isa => 'Str',
+	builder => '_probe_upstreamid',
+	lazy => 1,
+);
+
+sub _probe_upstreamid {
+	return shift->_get_pathinfo->{raw}{upstreamid}
+}
+
 =head2 pathinfo
 
 Helper property to look up information from the database. Should not be
@@ -79,7 +91,7 @@ sub _load_pathinfo {
 
 	my $pathinfo = {};
 
-	my $eventdata = $pg->db->dbh->prepare("SELECT events.id AS eventid, events.name AS event, events.outputdir AS event_output, rooms.name AS room, rooms.outputname AS room_output, rooms.id AS room_id, talks.starttime, talks.starttime::date AS date, to_char(starttime, 'DD Month yyyy at HH:MI') AS readable_date, to_char(talks.starttime, 'yyyy') AS year, talks.endtime, talks.slug, talks.title, talks.subtitle, talks.state, talks.nonce, talks.apologynote FROM talks JOIN events ON talks.event = events.id JOIN rooms ON rooms.id = talks.room WHERE talks.id = ?");
+	my $eventdata = $pg->db->dbh->prepare("SELECT events.id AS eventid, events.name AS event, events.outputdir AS event_output, rooms.name AS room, rooms.outputname AS room_output, rooms.id AS room_id, talks.starttime, talks.starttime::date AS date, to_char(starttime, 'DD Month yyyy at HH:MI') AS readable_date, to_char(talks.starttime, 'yyyy') AS year, talks.endtime, talks.slug, talks.title, talks.subtitle, talks.state, talks.progress, talks.nonce, talks.apologynote, talks.upstreamid FROM talks JOIN events ON talks.event = events.id JOIN rooms ON rooms.id = talks.room WHERE talks.id = ?");
 	$eventdata->execute($self->talkid);
 	my $row = $eventdata->fetchrow_hashref();
 
@@ -309,6 +321,24 @@ has 'event_output' => (
 
 sub _load_event_output {
 	return shift->_get_pathinfo->{raw}{event_output};
+}
+
+=head2 progress
+
+The current progress value of the talk, as an L<SReview::Talk::Progress>
+
+=cut
+
+has 'progress' => (
+	lazy => 1,
+	is => 'rw',
+	isa => 'SReview::Talk::Progress',
+	builder => '_load_progress',
+);
+
+sub _load_progress {
+	my $self = shift;
+	return SReview::Talk::Progress->new($self->_get_pathinfo->{raw}{progress});
 }
 
 =head2 state

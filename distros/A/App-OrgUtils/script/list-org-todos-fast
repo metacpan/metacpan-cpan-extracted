@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListOrgHeadlinesFast/list_org_todos
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListOrgHeadlinesFast/list_org_todos",
@@ -38,11 +38,15 @@ list-org-todos-fast - List Org todos
 
 =head1 VERSION
 
-This document describes version 0.483 of list-org-todos-fast (from Perl distribution App-OrgUtils), released on 2022-10-11.
+This document describes version 0.484 of list-org-todos-fast (from Perl distribution App-OrgUtils), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
-B<list-org-todos-fast> [B<--ascendant-match>=I<any>] [B<--format>=I<name>|B<--json>] [(B<--has-tag>=I<str>)+|B<--has-tags-json>=I<json>] [B<--is-done>|B<--isnt-done>] [(B<--lacks-tag>=I<str>)+|B<--lacks-tags-json>=I<json>] [B<--level>=I<int>] [B<--match>=I<any>] [B<--max-level>=I<int>] [B<--min-level>=I<int>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--parent-match>=I<any>] -- E<lt>I<input>E<gt>
+B<list-org-todos-fast> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<list-org-todos-fast> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-org-todos-fast> [B<L<--ascendant-match|/"--ascendant-match=s">>=I<any>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [(B<L<--has-tag|/"--has-tags-json=s">>=I<str>)+|B<L<--has-tags-json|/"--has-tags-json=s">>=I<json>] [B<L<--is-done|/"--is-done">>|B<L<--isnt-done|/"--is-done">>] [(B<L<--lacks-tag|/"--lacks-tags-json=s">>=I<str>)+|B<L<--lacks-tags-json|/"--lacks-tags-json=s">>=I<json>] [B<L<--level|/"--level=s">>=I<int>] [B<L<--match|/"--match=s">>=I<any>] [B<L<--max-level|/"--max-level=s">>=I<int>] [B<L<--min-level|/"--min-level=s">>=I<int>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--parent-match|/"--parent-match=s">>=I<any>] -- E<lt>I<L<input|/"--input=s*">>E<gt>
 
 =head1 DESCRIPTION
 
@@ -107,6 +111,9 @@ See C<--lacks-tag>.
 
 =item B<--level>=I<s>
 
+(No description)
+
+
 =item B<--match>=I<s>
 
 Only include headline which matches this.
@@ -117,7 +124,13 @@ C</.../i> it is assumed to be a regex.
 
 =item B<--max-level>=I<s>
 
+(No description)
+
+
 =item B<--min-level>=I<s>
+
+(No description)
+
 
 =item B<--parent-match>=I<s>
 
@@ -271,7 +284,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

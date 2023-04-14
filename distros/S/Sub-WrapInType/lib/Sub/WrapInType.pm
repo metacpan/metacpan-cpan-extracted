@@ -5,11 +5,11 @@ use warnings;
 use parent 'Exporter';
 use Class::InsideOut qw( register readonly id );
 use Types::Standard -types;
-use Type::Params qw( multisig compile compile_named );
+use Type::Params qw( signature );
 use Sub::Util qw( set_subname );
 use namespace::autoclean;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our @EXPORT  = qw( wrap_sub wrap_method install_sub install_method );
 
 readonly params    => my %params;
@@ -30,20 +30,29 @@ my $DEFAULT_OPTIONS = +{
 };
 
 sub new {
-  my $class = shift;
-  state $check = multisig(
-    [ $ParamsTypes, $ReturnTypes, CodeRef, $Options, +{ default => sub { $DEFAULT_OPTIONS } } ],
-    compile_named(
-      params  => $ParamsTypes,
-      isa     => $ReturnTypes,
-      code    => CodeRef,
-      options => $Options, +{ default => sub { $DEFAULT_OPTIONS } },
-    ),
+  state $check = signature(
+    method => 1,
+    multi => [
+      +{
+        positional => [
+          $ParamsTypes,
+          $ReturnTypes,
+          CodeRef,
+          $Options, +{ default => sub { $DEFAULT_OPTIONS } }
+        ],
+      },
+      +{
+        named_to_list => 1,
+        named => [
+          params  => $ParamsTypes,
+          isa     => $ReturnTypes,
+          code    => CodeRef,
+          options => $Options, +{ default => sub { $DEFAULT_OPTIONS } },
+        ],
+      },
+    ],
   );
-  my ($params_types, $return_types, $code, $options) = do {
-    my @args = $check->(@_);
-    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( params isa code options )};
-  };
+  my ($class, $params_types, $return_types, $code, $options) = $check->(@_);
   $options = +{ %$DEFAULT_OPTIONS, %$options };
 
   my $typed_code =
@@ -68,11 +77,12 @@ sub new {
 sub _create_typed_code {
   my ($class, $params_types, $return_types, $code, $options) = @_;
   my $params_types_checker =
-      ref $params_types eq 'ARRAY' ? compile(@$params_types)
-    : ref $params_types eq 'HASH'  ? compile_named(%$params_types)
-    :                                compile($params_types);
+      ref $params_types eq 'ARRAY' ? signature(positional => $params_types)
+    : ref $params_types eq 'HASH'  ? signature(named => [%$params_types], bless => 0)
+    :                                signature(positional => [$params_types]);
   my $return_types_checker =
-    ref $return_types eq 'ARRAY' ? compile(@$return_types) : compile($return_types);
+    ref $return_types eq 'ARRAY' ? signature(positional => $return_types)
+    :                              signature(positional => [$return_types]);
 
   if ( ref $return_types eq 'ARRAY' ) {
     if ( $options->{skip_invocant} ) {
@@ -113,43 +123,47 @@ sub _is_env_ndebug {
 }
 
 sub wrap_sub {
-  state $check = multisig(
-    +{ message => << 'EOS' },
+  state $check = signature(
+    message => << 'EOS',
 USAGE: wrap_sub(\@parameter_types, $return_type, $subroutine)
     or wrap_sub(params => \@params_types, returns => $return_types, code => $subroutine)
 EOS
-    [ $ParamsTypes, $ReturnTypes, CodeRef ],
-    compile_named(
-      params => $ParamsTypes,
-      isa    => $ReturnTypes,
-      code   => CodeRef,
-    ),
+    multi => [
+      +{ positional => [ $ParamsTypes, $ReturnTypes, CodeRef ] },
+      +{
+        named_to_list => 1,
+        named => [
+          params => $ParamsTypes,
+          isa    => $ReturnTypes,
+          code   => CodeRef,
+        ],
+      },
+    ],
   );
-  my ($params_types, $return_types, $code) = do {
-    my @args = $check->(@_);
-    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( params isa code )};
-  };
+  my ($params_types, $return_types, $code) = $check->(@_);
 
   __PACKAGE__->new($params_types, $return_types, $code, +{ check => !_is_env_ndebug() });
 }
 
 sub wrap_method {
-  state $check = multisig(
-    +{ message => << 'EOS' },
+  state $check = signature(
+    message => << 'EOS',
 USAGE: wrap_method(\@parameter_types, $return_type, $subroutine)
     or wrap_method(params => \@params_types, returns => $return_types, code => $subroutine)
 EOS
-    [ $ParamsTypes, $ReturnTypes, CodeRef ],
-    compile_named(
-      params => $ParamsTypes,
-      isa    => $ReturnTypes,
-      code   => CodeRef,
-    ),
+    multi => [
+      +{ positional => [ $ParamsTypes, $ReturnTypes, CodeRef ] },
+      +{
+        named_to_list => 1,
+        named => [
+          params => $ParamsTypes,
+          isa    => $ReturnTypes,
+          code   => CodeRef,
+        ],
+      },
+    ],
   );
-  my ($params_types, $return_types, $code) = do {
-    my @args = $check->(@_);
-    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( params isa code )};
-  };
+  my ($params_types, $return_types, $code) = $check->(@_);
 
   my $options = +{
     skip_invocant => 1,
@@ -159,56 +173,61 @@ EOS
 }
 
 sub install_sub {
-  state $check = multisig(
-    +{ message => << 'EOS' },
+  state $check = signature(
+    message => << 'EOS',
 USAGE: install_sub($name, \@parameter_types, $return_type, $subroutine)
     or install_sub(name => $name, params => \@params_types, returns => $return_types, code => $subroutine)
 EOS
-    [ Str, $ParamsTypes, $ReturnTypes, CodeRef ],
-    compile_named(
-      name   => Str,
-      params => $ParamsTypes,
-      isa    => $ReturnTypes,
-      code   => CodeRef,
-    ),
+    multi => [
+      +{ positional => [ Str, $ParamsTypes, $ReturnTypes, CodeRef ] },
+      +{
+        named_to_list => 1,
+        named => [
+          name   => Str,
+          params => $ParamsTypes,
+          isa    => $ReturnTypes,
+          code   => CodeRef,
+        ],
+      },
+    ],
   );
-  my ($name, $params_types, $return_types, $code) = do {
-    my @args = $check->(@_);
-    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( name params isa code )};
-  };
+  my ($name, $params_types, $return_types, $code) = $check->(@_);
 
   _install($name, wrap_sub($params_types, $return_types, $code), scalar caller);
 }
 
 sub install_method {
-  state $check = multisig(
-    +{ message => << 'EOS' },
+  state $check = signature(
+    message => << 'EOS',
 USAGE: install_method($name, \@parameter_types, $return_type, $subroutine)
     or install_method(name => $name, params => \@params_types, returns => $return_types, code => $subroutine)
 EOS
-    [ Str, $ParamsTypes, $ReturnTypes, CodeRef ],
-    compile_named(
-      name   => Str,
-      params => $ParamsTypes,
-      isa    => $ReturnTypes,
-      code   => CodeRef,
-    ),
+    multi => [
+      +{ positional => [ Str, $ParamsTypes, $ReturnTypes, CodeRef ] },
+      +{
+        named => [
+          name   => Str,
+          params => $ParamsTypes,
+          isa    => $ReturnTypes,
+          code   => CodeRef,
+        ],
+        named_to_list => 1,
+      },
+    ],
   );
-  my ($name, $params_types, $return_types, $code) = do {
-    my @args = $check->(@_);
-    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( name params isa code )};
-  };
+  my ($name, $params_types, $return_types, $code) = $check->(@_);
 
   _install($name, wrap_method($params_types, $return_types, $code), scalar caller);
 }
 
 sub _install {
   my ($name, $code, $pkg) = @_;
+  my $fullname = "${pkg}::${name}";
   {
     no strict 'refs';
-    *{"${pkg}::${name}"} = $code;
+    *{$fullname} = $code;
   }
-  set_subname($name, $code);
+  set_subname($fullname, $code);
 }
 
 1;

@@ -1,3 +1,5 @@
+1.127   2023-04-03
+  - Fix unable to generate tables with single header line
 1.126   2014-05-28
   - Test script (lpod_test) bug fix.
 1.125   2014-05-21

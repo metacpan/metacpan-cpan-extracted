@@ -7,7 +7,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Safe::Isa;
 use JSON::MaybeXS ();
@@ -79,16 +79,16 @@ sub TO_JSON {
                 $value = $value ? JSON::MaybeXS::true : JSON::MaybeXS::false;
             }
             elsif ( exists $opt->{ +NUM } ) {
-                $value = 0 + $value;
+                $value = 0+ $value;
             }
             elsif ( exists $opt->{ +STR } ) {
-                $value = '' . $value;
+                $value = q{} . $value;
             }
         }
         $json{$name} = $value;
     }
 
-    if ( defined( my $mth = $self->can( 'modify_jsonr' ) ) ) {
+    if ( defined( my $mth = $self->can( '_modify_jsonr' ) // $self->can( 'modify_jsonr' ) ) ) {
         $self->$mth( \%json );
     }
     elsif ( defined( $mth = $self->can( 'modify_json' ) ) ) {
@@ -125,7 +125,7 @@ MooX::Tag::TO_JSON - Controlled translation of Moo objects into JSON appropriate
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -156,8 +156,8 @@ version 0.03
 # resulting in
 
  $VAR1 = {
-           'cow' => 'Daisy',
            'hen' => undef,
+           'cow' => 'Daisy',
            'goose' => 'Frank',
            'barn_door_closed' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' )
          };
@@ -192,9 +192,10 @@ also prevent that).
 L<TO_JSON> method, this is no longer recommended. See discussion
 under L<DEPRECATED BEHAVIOR> below.].
 
-If the class provides a C<modify_jsonr> method, it will be called as
+If the class provides a C<_modify_jsonr> method (or, for backwards
+capability, C<modify_jsonr>), it will be called as
 
-    $self->modify_jsonr( \%json );
+    $self->_modify_jsonr( \%json );
 
 and should modify the passed hash in place.
 
@@ -300,11 +301,11 @@ This method is added to the consuming class or role.
 # resulting in
 
  $VAR1 = {
-           'HORSE' => 'Ed',
            'HEN' => 'Ruby',
-           'BARN_DOOR_CLOSED' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
            'COW' => 'Daisy',
-           'GOOSE' => 'Donald'
+           'BARN_DOOR_CLOSED' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+           'GOOSE' => 'Donald',
+           'HORSE' => 'Ed'
          };
 
 =head1 DEPRECATED BEHAVIOR
@@ -348,7 +349,7 @@ Note it does not output C<Parent>.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-moox-tag-to_hash@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH
+Please report any bugs or feature requests to bug-moox-tag-to_hash@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH>
 
 =head2 Source
 

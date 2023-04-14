@@ -1,0 +1,72 @@
+{
+   "abstract" : "Interface to L<https://timezonedb.com> for looking up Timezone data",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "TimeZone-TimeZoneDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "URI" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Geo::Location::Point" : "0.08",
+            "IPC::System::Simple" : "0",
+            "Test::Carp" : "0",
+            "Test::Compile" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "WWW::RT::CPAN" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-TimeZone-TimeZoneDB@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/TimeZone-TimeZoneDB/issues",
+         "x_url" : "https://github.com/nigelhorne/TimeZone-TimeZoneDB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/TimeZone-TimeZoneDB.git",
+         "web" : "https://github.com/nigelhorne/TimeZone-TimeZoneDB",
+         "x_repository" : "https://github.com/nigelhorne/TimeZone-TimeZoneDB"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

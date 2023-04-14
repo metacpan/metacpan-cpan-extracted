@@ -9,8 +9,9 @@
 #   trustworthy does not get caught, but the evil cannot pass through."
 
 package Net::Gemini::Server;
-our $VERSION = '0.03';
-use 5.10.0;
+our $VERSION = '0.05';
+use strict;
+use warnings;
 # the below code mostly cargo culted from example/ssl_server.pl
 use IO::Socket::SSL;
 
@@ -18,7 +19,7 @@ DESTROY { undef $_[0]{_context}; undef $_[0]{_socket} }
 
 sub new {
     my ( $class, %param ) = @_;
-    $param{listen}{LocalPort} //= 1965;
+    $param{listen}{LocalPort} = 1965 unless defined $param{listen}{LocalPort};
     my %obj;
     my $ioclass = IO::Socket::SSL->can_ipv6 || 'IO::Socket::INET';
     $obj{_socket} = $ioclass->new(
@@ -52,7 +53,8 @@ sub withforks {
             close $client;
             next;
         }
-        my $parent = fork // die "fork failed: $!";
+        my $parent = fork;
+        die "fork failed: $!" unless defined $parent;
         if ($parent) {
             close $client;
             next;

@@ -89,13 +89,14 @@ the site with a moderate load.  An alternate ExifTool homepage is available at
 <br><a href="#ack">Acknowledgements</a>
 <br><a href="#license">License</a>
 <br><a href="#donate">Donate</a>
+<br><a href="#background">Background</a>
 <br><a href="#contact">Contact Me</a>
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-12.50.tar.gz">
-Download        Version 12.50</a> (4.9 MB) -
-<a href="history.html">Nov. 8, 2022</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-12.60.tar.gz">
+Download        Version 12.60</a> (5.0 MB) -
+<a href="history.html">Apr. 5, 2023</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -148,8 +149,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-12.50.zip">
-         exiftool-12.50.zip</a> (6.5 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-12.60.zip">
+         exiftool-12.60.zip</a> (6.6 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -166,8 +167,8 @@ if you have any problems/comments with this version.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="ExifTool-12.50.dmg">
-         ExifTool-12.50.dmg</a> (3.1 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-12.60.dmg">
+         ExifTool-12.60.dmg</a> (3.2 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
 libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
@@ -211,7 +212,7 @@ for the SHA1 and MD5 checksums to verify these distribution packages</a>.</li>
 <li>Reads and writes maker notes of many digital cameras</li>
 <li>Reads <a href="TagNames/QuickTime.html#Stream">timed metadata</a> (eg. GPS track) from MOV/MP4/M2TS/AVI videos</li>
 <li>Numerous output formatting options (including tab-delimited, HTML, XML and JSON)</li>
-<li>Multi-lingual output (cs, de, en, en-ca, en-gb, es, fi, fr, it, ja, ko, nl, pl, ru, sv, tr, zh-cn or zh-tw)</li>
+<li>Multi-lingual output (cs, de, en, en-ca, en-gb, es, fi, fr, it, ja, ko, nl, pl, ru, sk, sv, tr, zh-cn or zh-tw)</li>
 <li><a href="geotag.html">Geotags images</a> from GPS track log files (with time drift correction!)</li>
 <li><a href="geotag.html#Reverse">Generates track logs</a> from geotagged images</li>
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images</li>
@@ -235,6 +236,10 @@ for the SHA1 and MD5 checksums to verify these distribution packages</a>.</li>
 <li>Conditionally processes files based on value of any meta information</li>
 <li>Ability to <a href="config.html">add custom user-defined tags</a></li>
 <li><a href="TagNames/MWG.html">Support for MWG</a> (Metadata Working Group) recommendations</li>
+<li>Ability to read tags from multiple files simultaneously, allowing metadata to be compared
+and combined between files</li>
+<li>Generates MD5 hash of image data only for many file types (for comparison and validation
+of image data)</li>
 <li>Recognizes <a href="TagNames/index.html">thousands of different tags</a></li>
 <li>Tested with images from <a href="https://exiftool.org/models.html">thousands of different camera models</a></li>
 <li>Advanced <a href="verbose.html">verbose</a> and <a href="htmldump.html">HTML-based
@@ -478,6 +483,8 @@ for each file format.</p>
 <tr><td><a href="TagNames/Torrent.html">TORRENT</a></td><td>R</td><td>BitTorrent description file</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Torrent.html">Torrent</a></td></tr>
 <tr><td><a href="TagNames/Text.html">TXT</a></td><td>R</td><td>Text files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Text.html">Text</a></td></tr>
 <tr><td><a href="TagNames/VCard.html">VCF, VCARD</a></td><td>R</td><td>Virtual Card</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html">VCard</a></td></tr>
+<tr><td>VNT</td><td>R</td><td>Scene7 Vignette (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
+<tr><td><a href="TagNames/VCard.html#VNote">VNT</a></td><td>R</td><td>V-Note document</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html#VNote">VNote</a></td></tr>
 <tr><td>VOB</td><td>R</td><td>Video Object (<a href="TagNames/MPEG.html">MPEG</a>-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a></td></tr>
 <tr><td><a href="TagNames/CanonVRD.html">VRD</a></td><td>R/W/C<span class=sup>2</span></td><td>Canon DPP Recipe Data</td><td>-</td><td>-</td><td>R/W/C</td><td>-</td><td>R/W/C <a href="TagNames/CanonVRD.html">CanonVRD</a><span class=sup>2</span></td></tr>
 <tr><td>VSD</td><td>R</td><td>Microsoft Visio Drawing (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>R</td><td>R</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
@@ -519,30 +526,41 @@ of meta information in JPEG images:</p>
 <tr><td>APP2 - <a href="TagNames/ICC_Profile.html">ICC</a></td><td>R/W/C</td><td>International Color Consortium (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/MPF.html">MPF</a></td><td>R</td><td>Multi-Picture Format</td></tr>
+<tr><td>APP2 - <a href="TagNames/InfiRay.html#Version">InfiRay Version</a></td><td>R</td><td>InfiRay IJPEG Version header</td></tr>
 <tr><td>APP2 - PreviewImage</td><td>R</td><td>Samsung/GE APP2 preview image (multi-segment)</td></tr>
 <tr><td>APP3 - <a href="TagNames/Kodak.html#Meta">Kodak Meta</a></td><td>R/W</td><td>Kodak Meta information (EXIF-like)</td></tr>
 <tr><td>APP3 - <a href="TagNames/Stim.html">Stim</a></td><td>R</td><td>Stereo Still Image format</td></tr>
 <tr><td>APP3 - <a href="TagNames/JPEG.html#JPS">JPS</a></td><td>R</td><td>JPEG Stereo image</td></tr>
-<tr><td>APP3 - ThermalData</td><td>R</td><td>Thermal data from DJI RJPEG file (multi-segment)</td></tr>
+<tr><td>APP3 - ThermalData</td><td>R</td><td>DJI RJPEG thermal data (multi-segment)</td></tr>
+<tr><td>APP3 - ImagingData</td><td>R</td><td>InfiRay IJPEG IR+thermal+visible data (multi-segment)</td></tr>
 <tr><td>APP3 - PreviewImage</td><td>R</td><td>Samsung/HP preview image (multi-segment)</td></tr>
 <tr><td>APP4 - <a href="TagNames/Scalado.html">Scalado</a></td><td>R</td><td>(presumably written by <a href="http://www.scalado.com/">Scalado</a> mobile software)</td></tr>
 <tr><td>APP4 - <a href="TagNames/DJI.html#ThermalParams">ThermalParams</a></td><td>R</td><td>Thermal parameters from DJI RJPEG file</td></tr>
+<tr><td>APP4 - <a href="TagNames/DJI.html#ThermalParams2">ThermalParams2</a></td><td>R</td><td>DJI thermal parameters type 2</td></tr>
+<tr><td>APP4 - <a href="TagNames/DJI.html#ThermalParams3">ThermalParams3</a></td><td>R</td><td>DJI thermal parameters type 3</td></tr>
 <tr><td>APP4 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready in non-standard location (multi-segment)</td></tr>
+<tr><td>APP4 - <a href="TagNames/InfiRay.html#Factory">InfiRay Factory</a></td><td>R</td><td>InfiRay IJPEG Factory Temperature</td></tr>
 <tr><td>APP4 - PreviewImage</td><td>R</td><td>(continued from APP3)</td></tr>
 <tr><td>APP5 - <a href="TagNames/Ricoh.html#RMETA">Ricoh RMETA</a></td><td>R</td><td>Ricoh custom fields</td></tr>
 <tr><td>APP5 - <a href="TagNames/Samsung.html#APP5">Samsung UniqueID</a></td><td>R</td><td>Samsung Unique ID</td></tr>
 <tr><td>APP5 - ThermalCalibration</td><td>R</td><td>Thermal calibration data from DJI RJPEG file</td></tr>
+<tr><td>APP5 - <a href="TagNames/InfiRay.html#Picture">InfiRay Picture</a></td><td>R</td><td>InfiRay IJPEG Picture Temperature</td></tr>
 <tr><td>APP5 - PreviewImage</td><td>R</td><td>(continued from APP4)</td></tr>
 <tr><td>APP6 - <a href="TagNames/JPEG.html#EPPIM">EPPIM</a></td><td>R</td><td>Toshiba PrintIM</td></tr>
 <tr><td>APP6 - <a href="TagNames/JPEG.html#NITF">NITF</a></td><td>R</td><td>National Imagery Transmission Format</td></tr>
 <tr><td>APP6 - <a href="TagNames/HP.html#TDHD">HP TDHD</a></td><td>R</td><td>Hewlett-Packard Photosmart R837 TDHD information</td></tr>
 <tr><td>APP6 - <a href="TagNames/GoPro.html#GPMF">GoPro</a></td><td>R</td><td>GoPro Metadata Format (GPMF) information</td></tr>
 <tr><td>APP6 - DJI DTAT</td><td>R</td><td>DJI Thermal Analysis Tool record (JSON format)</td></tr>
+<tr><td>APP6 - <a href="TagNames/InfiRay.html#MixMode">InfiRay MixMode</a></td><td>R</td><td>InfiRay IJPEG Mix Mode</td></tr>
 <tr><td>APP7 - <a href="TagNames/Pentax.html">Pentax</a></td><td>R</td><td>Pentax APP7 maker notes</td></tr>
 <tr><td>APP7 - <a href="TagNames/Qualcomm.html">Qualcomm</a></td><td>R</td><td>Qualcomm Camera Attributes</td></tr>
 <tr><td>APP7 - Huawei</td><td>R</td><td>Huawei APP7 maker notes (extract with Unknown option)</td></tr>
+<tr><td>APP7 - <a href="TagNames/InfiRay.html#OpMode">InfiRay OpMode</a></td><td>R</td><td>InfiRay IJPEG Operation Mode</td></tr>
+<tr><td>APP6 - <a href="TagNames/DJI.html#Info">DJI Info</a></td><td>R</td><td>DJI debug information</td></tr>
 <tr><td>APP8 - <a href="TagNames/JPEG.html#SPIFF">SPIFF</a></td><td>R</td><td>Still Picture Interchange File Format</td></tr>
+<tr><td>APP8 - <a href="TagNames/InfiRay.html#Isothermal">InfiRay Isothermal</a></td><td>R</td><td>InfiRay IJPEG Isothermal</td></tr>
 <tr><td>APP9 - <a href="TagNames/JPEG.html#MediaJukebox">Media Jukebox</a></td><td>R</td><td>Media Jukebox XML information</td></tr>
+<tr><td>APP9 - <a href="TagNames/InfiRay.html#Sensor">InfiRay Sensor</a></td><td>R</td><td>InfiRay IJPEG Sensor Information</td></tr>
 <tr><td>APP10 - Comment</td><td>R</td><td>PhotoStudio Unicode Comment</td></tr>
 <tr><td>APP11 - <a href="TagNames/JPEG.html#HDR">JPEG-HDR</a></td><td>R</td><td>JPEG-HDR compressed ratio image</td></tr>
 <tr><td>APP11 - <a href="TagNames/Jpeg2000.html">JUMBF</a></td><td>R</td><td>Jpeg Universal Metadata Box Format (multi-segment)</td></tr>
@@ -741,8 +759,9 @@ information that can be very useful for debugging or when decoding new tags.</p>
 
 <p>A tag name is a "handle" that is used to refer to a specific piece of meta
 information.  Tag names are entered on the command line with a leading
-'<code>-</code>', in the order you want them displayed.  Case is not
-significant.  The tag name may be prefixed by a <a href="#groups">group name</a>
+'<code>-</code>', in the order you want them displayed.  Valid characters
+in a tag name are A-Z (case is not significant), 0-9, hyphen (-)
+and underline (_).  The tag name may be prefixed by a <a href="#groups">group name</a>
 (separated by a colon) to identify a specific information type or location.  A
 special tag name of "<code>All</code>" may be used to represent all tags, or all
 tags in a specified group. For example:</p>
@@ -817,56 +836,58 @@ of the group names in each family:</p>
 <blockquote><table class=norm>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
-<td class=sm>AFCP, AIFF, APE, APP0, APP1, APP11, APP12, APP13, APP14, APP15, APP3, APP4,
-APP5, APP6, APP8, ASF, Audible, CanonVRD, Composite, DICOM, DNG, DV, DjVu,
-Ducky, EXE, EXIF, ExifTool, FITS, FLAC, FLIR, File, Flash, FlashPix, Font,
-FotoStation, GIF, GIMP, GeoTiff, GoPro, H264, HTML, ICC_Profile, ID3, IPTC,
-ISO, ITC, JFIF, JPEG, JSON, JUMBF, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE,
-MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg,
-OpenEXR, Opus, PDF, PICT, PLIST, PNG, PSP, Palm, Parrot, PanasonicRaw,
+<td class=sm>AFCP, AIFF, APE, APP0, APP1, APP11, APP12, APP13, APP14, APP15, APP2, APP3,
+APP4, APP5, APP6, APP8, ASF, Audible, CanonVRD, Composite, DICOM, DNG, DV,
+DjVu, Ducky, EXE, EXIF, ExifTool, FITS, FLAC, FLIR, File, Flash, FlashPix,
+Font, FotoStation, GIF, GIMP, GeoTiff, GoPro, H264, HTML, ICC_Profile, ID3,
+IPTC, ISO, ITC, JFIF, JPEG, JSON, JUMBF, Jpeg2000, LNK, Leaf, Lytro, M2TS,
+MIE, MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta,
+Ogg, OpenEXR, Opus, PDF, PICT, PLIST, PNG, PSP, Palm, Parrot, PanasonicRaw,
 PhotoCD, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
 RIFF, RSRC, RTF, Radiance, Rawzor, Real, Red, SVG, SigmaRaw, Stim, Theora,
 Torrent, Trailer, UserParam, VCard, Vorbis, WTV, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td class=sm>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, Apple, Audible,
-CBOR, CIFF, CameraIFD, Canon, CanonCustom, CanonRaw, CanonVRD, Casio,
-Chapter#, Composite, DICOM, DJI, DNG, DV, DjVu, DjVu-Meta, Ducky, EPPIM,
-EXE, EXIF, ExifIFD, ExifTool, FITS, FLAC, FLIR, File, Flash, FlashPix, Font,
-FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GPS, GeoTiff, GlobParamIFD,
-GoPro, GraphConv, H264, HP, HTC, HTML, HTML-dc, HTML-ncc, HTML-office,
-HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh,
-ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ISO, ITC, Insta360,
-InteropIFD, ItemList, JFIF, JFXX, JPEG, JPEG-HDR, JPS, JSON, JUMBF, JVC,
-Jpeg2000, KDC_IFD, Keys, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
-KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, Lyrics3, Lytro, M2TS, MAC,
-MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
-MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
-MIFF, MISB, MNG, MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS,
-MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD, Microsoft,
-Minolta, MinoltaRaw, Motorola, NITF, Nikon, NikonCapture, NikonCustom,
-NikonScan, NikonSettings, NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR,
-Opus, PDF, PICT, PNG, PNG-pHYs, PSP, Palm, Panasonic, PanasonicRaw, Pentax,
+CBOR, CIFF, CameraIFD, Canon, CanonCustom, CanonDR4, CanonRaw, CanonVRD,
+Casio, Chapter#, Composite, DICOM, DJI, DNG, DV, DjVu, DjVu-Meta, Ducky,
+EPPIM, EXE, EXIF, ExifIFD, ExifTool, FITS, FLAC, FLIR, File, Flash,
+FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GPS,
+GSpherical, Garmin, GeoTiff, GlobParamIFD, GoPro, GraphConv, H264, HP, HTC,
+HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv,
+ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-meta, ICC-view, ICC_Profile,
+ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, IPTC#, ISO, ITC, InfiRay, Insta360, InteropIFD, ItemList, JFIF, JFXX,
+JPEG, JPEG-HDR, JPS, JSON, JUMBF, JVC, Jpeg2000, KDC_IFD, Keys, Kodak,
+KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf,
+LeafSubIFD, Leica, Lyrics3, Lytro, M2TS, MAC, MIE-Audio, MIE-Camera,
+MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image,
+MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview,
+MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MISB, MNG, MOBI, MOI,
+MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS, MakerNotes, MakerUnknown,
+Matroska, MediaJukebox, Meta, MetaIFD, Microsoft, Minolta, MinoltaRaw,
+Motorola, NITF, Nikon, NikonCapture, NikonCustom, NikonScan, NikonSettings,
+NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR, Opus, PDF, PICT, PNG,
+PNG-cICP, PNG-pHYs, PSP, Palm, Panasonic, PanasonicRaw, Parrot, Pentax,
 PhaseOne, PhotoCD, PhotoMechanic, Photoshop, PictureInfo, PostScript,
 PreviewIFD, PrintIM, ProfileIFD, Qualcomm, QuickTime, RAF, RAF2, RIFF,
 RMETA, RSRC, RTF, Radiance, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP,
 Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx, Red, Ricoh, SPIFF, SR2,
 SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw,
 Sony, SonyIDC, Stim, SubIFD, System, Theora, Torrent, Track#, UserData,
-UserParam, VCalendar, VCard, Version0, Vorbis, WTV, XML, XMP, XMP-DICOM,
-XMP-Device, XMP-GAudio, XMP-GDepth, XMP-GFocus, XMP-GImage, XMP-GPano,
-XMP-GSpherical, XMP-LImage, XMP-MP, XMP-MP1, XMP-PixelLive, XMP-aas,
-XMP-acdsee, XMP-album, XMP-apple-fi, XMP-aux, XMP-cc, XMP-cell,
-XMP-creatorAtom, XMP-crs, XMP-dc, XMP-dex, XMP-digiKam, XMP-drone-dji,
-XMP-dwc, XMP-exif, XMP-exifEX, XMP-expressionmedia, XMP-extensis, XMP-fpv,
-XMP-getty, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx,
+VCalendar, VCard, VNote, Version0, Vorbis, WTV, XML, XMP, XMP-DICOM,
+XMP-Device, XMP-GAudio, XMP-GCamera, XMP-GCreations, XMP-GDepth, XMP-GFocus,
+XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-LImage, XMP-MP, XMP-MP1,
+XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album, XMP-apple-fi, XMP-ast,
+XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs, XMP-dc,
+XMP-dex, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-exif, XMP-exifEX,
+XMP-expressionmedia, XMP-extensis, XMP-fpv, XMP-getty, XMP-hdr, XMP-ics,
+XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft,
+XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-pdf, XMP-pdfx,
 XMP-photomech, XMP-photoshop, XMP-plus, XMP-pmi, XMP-prism, XMP-prl,
-XMP-prm, XMP-pur, XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ,
-XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
-ZIP, iTunes
+XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-swf, XMP-tiff, XMP-x, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights,
+XMP-xmpTPg, ZIP, iTunes
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Device, Document, ExifTool, Image, Location, Other,
@@ -879,7 +900,7 @@ Preview, Printing, Time, Unknown, Video
 <td>Copy#
 </td></tr>
 <tr><td><b>5&nbsp;(Metadata&nbsp;Path)</b></td>
-<td><i>[experimental]</i> eg. JPEG-APP1-IFD0-ExifIFD
+<td>eg. JPEG-APP1-IFD0-ExifIFD
 </td></tr>
 <tr><td><b>6&nbsp;(EXIF/TIFF&nbsp;Format)</b></td>
 <td>int8u, string, int16u, int32u, rational64u, int8s, undef, int16s, int32s,
@@ -890,6 +911,8 @@ leading "0x" if the <a href="ExifTool.html#HexTagIDs">HexTagIDs API option</a>
 is set, as are characters in non-numerical ID's which are not valid in a group
 name.  Note that unlike other group names, family 7 group names are case
 sensitive.)</td></tr>
+<tr><td><b>8&nbsp;(File&nbsp;Number)</b></td>
+<td>File# (for files loaded via <code>-file<i>NUM</i></code> option)</td></tr>
 </table></blockquote>
 
 <p>The exiftool output can be organized based on these groups using the
@@ -1191,15 +1214,17 @@ Defender</b> may speed things up significantly.</p>
 
 <p>The processing speed of ExifTool can be improved when extracting information
 by reducing the amount of work that it must do.  Decrease the number of
-extracted tags by specifying them individually (<code>-TAG</code>) or by group
-(<code>-GROUP:all</code>), and disable the composite tags (<code>-e</code>) and
-the print conversions (<code>-n</code>) if these features aren't required.  Note
-that the exclude options (<code>-x</code> or <code>--TAG</code>) are not very
-efficient, and may have a negative impact on performance if a large number of
-tags are excluded individually.  The exception is XMP groups, which are bypassed
-in processing so they are never even extracted -- specifying
+extracted tags by specifying desired tags individually (<code>-TAG</code>) or by
+group (<code>-GROUP:all</code>), and disable the composite tags (<code>-e</code>)
+and the print conversions (<code>-n</code>) if these features aren't required. 
+Note that the exclude options (<code>-x</code> or <code>--TAG</code>) are not
+very efficient, and may have a negative impact on performance if a large number
+of tags are excluded individually.  The exception is XMP groups, which are
+bypassed in processing so they are never even extracted -- specifying
 <code>--XMP-crs:all</code> and <code>-XMP-crd:all</code> may speed processing
-significantly by avoiding processing of bulky Adobe image-editing information.</p>
+significantly by avoiding processing of bulky Adobe image-editing information.
+The <a href="ExifTool.html#IgnoreTags">API IgnoreTags option</a> (added in
+ExifTool 12.43) may also be used for significant speed benefits in some cases.</p>
 
 <p>The <code>-fast</code> option can significantly increase speed when
 extracting information from JPEG images which are piped across a slow network
@@ -1296,6 +1321,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: GUI front-end for ExifTool to patch Canon ISO information</li>
 <!-- dead <li><a href="http://home.roadrunner.com/~dick/ExifAuto.htm">ExifAuto</a>: GUI front-end for ExifTool to perform simple operations</li> -->
 <li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Utility for showing and changing geo data of image files</li>
+<li><a href="https://github.com/nemethviktor/GeoTagNinja#readme">GeoTagNinja</a>: Open-source geotagger for Windows</li>
 <li><a href="http://www.moonsoftware.com/exifmixer.asp">ExifMixer</a>: GUI extension for the exiftool command-line interface</li>
 <!-- dead <li><a href="http://fliggs.wordpress.com/2009/02/01/exifdropper-v090902-released/">ExifDropper</a>: Graphical front-end for ExifTool with drag-and-drop</li> -->
 <!-- dead <li><a href="http://gpstamper.wordpress.com/geotagger/">GPStamper Geotagger</a>: A simple Windows GUI front end for geotagging images</li> -->
@@ -1313,6 +1339,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://www.abscreensavers.com/random-photo-screensaver/">Random Photo Screensaver</a>: Photo screensaver with metadata display</li>
 <li><a href="https://www.picageotag.com/en/">PicaGeoTag</a>: Geolocate your photos</li>
 <li><a href="https://onedrive.live.com/?authkey=%21ACLDz87Pi7VH%5FWA&amp;id=6266D5E1E0FBB1B8%2193728&amp;cid=6266D5E1E0FBB1B8">PictureTools</a>: Tools for viewing pictures and editing EXIF data or renaming files</li>
+<li><a href="https://nordlien.github.io/PhotoTags-Synchronizer/">PhotoTags-Synchronizer</a>: Windows GUI for tagging and synchronizing metadata</li>
 </ul>
 
 <p><b><a name="related_mac">MacOS</a></b></p>
@@ -1516,6 +1543,25 @@ $<input name="amount" value="0.00" size="6">
 exiftool.org and pay for web site hosting, and for the Mac Mini used to generate
 distribution files, run the necessary Windows virtual machine, and maintain
 source-code and forum backups.)</i></p>
+
+<h2><a name="background">Phil's Background</a></h2>
+
+<p>Phil has a master's degree in nuclear physics and is now officially retired
+from his position at Queen's University where he worked with the Nobel-prize-winning
+<a href="https://sno.phy.queensu.ca">Sudbury Neutrino Observatory</a> (SNO) team
+and other SNOLab experiments from 1990 to 2020.  For SNO he wrote the software
+to aquire, format, store and display all of the hundreds of terabytes of data
+generated by the detector; software that continues to be used by
+<a href="https://snoplus.phy.queensu.ca">SNO+</a> for their even greater data
+volume.</p>
+
+<p>ExifTool started as a simple utility used to display metadata from
+images hosted on the SNO web site, but quickly expanded in scope as Phil got
+involved with digital photography beginning in 2001.  During retirement Phil
+continues to enjoy digital photography, a hobby which he now applies to bird
+watching. A selection of his birding pictures may be found in his recent
+<a href="https://www.blurb.ca/b/11481065-birds-of-kingston">Birds of Kingston</a>
+book.</p>
 
 <h2><a name="contact">Contact Me</a></h2>
 

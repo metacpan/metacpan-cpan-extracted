@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::OS {
   native static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
   

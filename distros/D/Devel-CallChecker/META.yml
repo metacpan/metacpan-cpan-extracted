@@ -21,7 +21,7 @@ configure_requires:
 conflicts:
   B::Hooks::OP::Check: '< 0.19'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ name: Devel-CallChecker
 provides:
   Devel::CallChecker:
     file: lib/Devel/CallChecker.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   DynaLoader: '0'
   DynaLoader::Functions: '0.001'
@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-CallChecker
   license: http://dev.perl.org/licenses/
-version: '0.008'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

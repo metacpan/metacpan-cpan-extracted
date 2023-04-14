@@ -10,9 +10,9 @@ use Data::Sah::CoerceCommon;
 our %SPEC;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 $SPEC{coerce_with_sah} = {
     v => 1.1,
@@ -327,11 +327,15 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.482 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
-B<coerce-with-sah> [(B<--coerce-rule>=I<str>)+|B<--coerce-rules-json>=I<json>] [B<--coerce-to>=I<str>] [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--data-as-json>=I<str>] [B<--data-as-perl>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-as-json>=I<str>] [B<--multiple-data-as-perl>=I<str>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--return-type>=I<str>|B<-r>=I<str>] [B<--show-code>|B<-c>] [B<--show-rules>] -- E<lt>I<type>E<gt>
+B<coerce-with-sah> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<coerce-with-sah> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<coerce-with-sah> [(B<L<--coerce-rule|/"--coerce-rules-json=s">>=I<str>)+|B<L<--coerce-rules-json|/"--coerce-rules-json=s">>=I<json>] [B<L<--coerce-to|/"--coerce-to=s">>=I<str>] [B<L<--compiler|/"--compiler=s, -C">>=I<str>|B<L<-C|/"--compiler=s, -C">>=I<str>] [(B<L<--config-path|/"--config-path=s">>=I<path>)+|B<L<--no-config|/"--no-config">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--data-as-json|/"--data-as-json=s">>=I<str>] [B<L<--data-as-perl|/"--data-as-perl=s">>=I<str>] [B<L<--data-with-result|/"--data-with-result, -d">>|B<L<-d|/"--data-with-result, -d">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--linenum|/"--linenum, -l">>|B<L<-l|/"--linenum, -l">>] [B<L<--multiple-data-as-json|/"--multiple-data-as-json=s">>=I<str>] [B<L<--multiple-data-as-perl|/"--multiple-data-as-perl=s">>=I<str>] [B<L<--(no)naked-res|/"--no-naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--return-type|/"--return-type=s, -r">>=I<str>|B<L<-r|/"--return-type=s, -r">>=I<str>] [B<L<--show-code|/"--show-code, -c">>|B<L<-c|/"--show-code, -c">>] [B<L<--show-rules|/"--show-rules">>] -- E<lt>I<L<type|/"--type=s*">>E<gt>
 
 
 
@@ -361,6 +365,9 @@ Don't coerce data, show coerce rules that will be used.
 
 =item B<--coerce-rule>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--coerce-rules-json>=I<s>
@@ -368,6 +375,9 @@ Can be specified multiple times.
 See C<--coerce-rule>.
 
 =item B<--coerce-to>=I<s>
+
+(No description)
+
 
 =item B<--compiler>=I<s>, B<-C>
 
@@ -392,6 +402,9 @@ Valid values:
  ["val","bool_coerced+val","bool_coerced+str_errmsg+val"]
 
 =item B<--type>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -707,8 +720,8 @@ String. Specify additional command-line options.
                                                                "GyMMMEd"           => "E, MMM d, y G",
                                                                "H"                 => "HH",
                                                                "h"                 => "h a",
-                                                               "hm"                => "h:mm a",
                                                                "Hm"                => "HH:mm",
+                                                               "hm"                => "h:mm a",
                                                                "hms"               => "h:mm:ss a",
                                                                "Hms"               => "HH:mm:ss",
                                                                "hmsv"              => "h:mm:ss a v",
@@ -1098,7 +1111,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

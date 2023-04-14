@@ -1,7 +1,13 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Fn {
   use StringBuffer;
   use StringList;
   use IntList;
+  use Hash;
+  use Sort;
+  use List;
   
   enum {
     GET_CODE_POINT_ERROR_OVER_STRING_RANGE = -1,
@@ -550,7 +556,7 @@ class Fn {
     
     if ($base == 0) {
       unless ($exponant != 0) {
-        die "If the \$base number is 0, the \$exponant number can't be 0";
+        die "If the \$base number is 0, the \$exponant number cannnot be 0";
       }
     }
     
@@ -569,7 +575,7 @@ class Fn {
     
     if ($base == 0) {
       unless ($exponant != 0) {
-        die "If the \$base number is 0, the \$exponant number can't be 0";
+        die "If the \$base number is 0, the \$exponant number cannnot be 0";
       }
     }
     
@@ -1135,7 +1141,7 @@ class Fn {
       
       if ($code_point < 0) {
         if ($code_point == &GET_CODE_POINT_ERROR_INVALID_UTF8) {
-          die "The range format of the $arg_name can't be contain a invalid Unicode code point";
+          die "The range format of the $arg_name cannnot be contain a invalid Unicode code point";
         }
         else {
           die "Calling the get_code_point method in the Fn class to the $arg_name returns an error code: $code_point";
@@ -1173,4 +1179,59 @@ class Fn {
     return [$min_code_point, $max_code_point];
   }
   
+  precompile static method merge_options : object[] ($options1 : object[], $options2 : object[]) {
+    unless ($options1) {
+      die "The \$options1 must be defined";
+    }
+    
+    unless ($options2) {
+      die "The \$options2 must be defined";
+    }
+    
+    my $options1_length = @$options1;
+    unless ($options1_length % 2 == 0) {
+      die "The length of the \$options1 must be an even number";
+    }
+    
+    my $options2_length = @$options2;
+    unless ($options2_length % 2 == 0) {
+      die "The length of the \$options2 must be an even number";
+    }
+    
+    my $merged_options_h = Hash->new;
+    
+    for (my $i = 0; $i < $options1_length; $i += 2) {
+      unless ($options1->[$i]) {
+        die "The key of the \$options1 must be defined";
+      }
+      
+      unless ($options1->[$i] isa string) {
+        die "The key of the \$options1 must be the string type";
+      }
+      my $name = (string)$options1->[$i];
+      my $value = $options1->[$i + 1];
+      $merged_options_h->set($name, $value);
+    }
+    
+    for (my $i = 0; $i < $options2_length; $i += 2) {
+      unless ($options2->[$i]) {
+        die "The key of the \$options2 must be defined";
+      }
+      
+      unless ($options2->[$i] isa string) {
+        die "The key of the \$options2 must be the string type";
+      }
+      my $name = (string)$options2->[$i];
+      my $value = $options2->[$i + 1];
+      $merged_options_h->set($name, $value);
+    }
+    
+    my $merged_options = $merged_options_h->to_array;
+    
+    return $merged_options;
+  }
+  
+  native static method object_to_int : int ($object : object);
+    
+  native static method object_to_long : long ($object : object);
 }

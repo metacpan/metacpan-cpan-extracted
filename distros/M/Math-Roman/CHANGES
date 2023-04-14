@@ -1,4 +1,8 @@
-1.09 2021-7-15
+1.10 2023-04-03
+
+  * Update documentation.
+
+1.09 2021-07-15
 
  * Sync with Math-BigInt distribution now that Math::BigInt->new("X") no longer
    returns a NaN, but returns 0, just like CORE::hex("X").

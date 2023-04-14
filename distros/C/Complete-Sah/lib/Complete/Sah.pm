@@ -10,9 +10,9 @@ use Complete::Util qw(combine_answers complete_array_elem hashify_answer);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-01-28'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 our @EXPORT_OK = qw(complete_from_schema);
@@ -31,6 +31,15 @@ Employ some heuristics to complete a value from Sah schema. For example, if
 schema is `[str => in => [qw/new open resolved rejected/]]`, then we can
 complete from the `in` clause. Or for something like `[int => between => [1,
 20]]` we can complete using values from 1 to 20.
+
+Tip: If you want to give summary for each entry in `in` clause, you can use the
+`x.in.summaries` attribute, example:
+
+    # schema
+    ['str', {
+        in => ['b', 'g'],
+        'x.in.summaries' => ['Male/boy', 'Female/girl'],
+    }]
 
 _
     args => {
@@ -364,7 +373,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.010 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-01-19.
+This document describes version 0.011 of Complete::Sah (from Perl distribution Complete-Sah), released on 2023-01-28.
 
 =head1 SYNOPSIS
 
@@ -387,6 +396,15 @@ Employ some heuristics to complete a value from Sah schema. For example, if
 schema is C<< [str =E<gt> in =E<gt> [qw/new open resolved rejected/]] >>, then we can
 complete from the C<in> clause. Or for something like C<< [int =E<gt> between =E<gt> [1,
 20]] >> we can complete using values from 1 to 20.
+
+Tip: If you want to give summary for each entry in C<in> clause, you can use the
+C<x.in.summaries> attribute, example:
+
+ # schema
+ ['str', {
+     in => ['b', 'g'],
+     'x.in.summaries' => ['Male/boy', 'Female/girl'],
+ }]
 
 This function is not exported by default, but exportable.
 

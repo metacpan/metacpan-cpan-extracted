@@ -21,7 +21,7 @@ name: Excel-PowerPivot-Utils
 provides:
   Excel::PowerPivot::Utils:
     file: lib/Excel/PowerPivot/Utils.pm
-    version: '0.2'
+    version: '0.3'
 requires:
   List::Util: '1.33'
   Log::Dispatch: '0'
@@ -34,5 +34,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Excel-PowerPivot-Utils
-version: '0.2'
+version: '0.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

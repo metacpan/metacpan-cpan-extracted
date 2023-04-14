@@ -1,4 +1,4 @@
-Table2XML version 0.01
+Table2XML version 1.41
 ======================
 
 table2xml is an algorithm having two functions that allow the conversion of tabular data to XML
@@ -37,7 +37,7 @@ Encode and for testing: Test::More and Test::XML
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006 by Roland Kapl
+Copyright (C) 2023 by Roland Kapl
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

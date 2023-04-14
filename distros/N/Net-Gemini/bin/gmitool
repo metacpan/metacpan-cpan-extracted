@@ -1,0 +1,368 @@
+#!perl
+#
+# gmitool - a small utility for gemini, part of Net::Gemini
+
+use strict;
+use warnings;
+use Cpanel::JSON::XS      qw(decode_json encode_json);
+use Encode                qw(decode);
+use File::Path            qw(make_path);
+use File::Slurper         qw(read_text write_text);
+use File::Spec::Functions qw(catdir catfile);
+use Getopt::Long          qw(GetOptionsFromArray);
+use Net::Gemini 0.05;
+use Parse::MIME 'parse_mime_type';
+use URI ();
+
+Getopt::Long::Configure('bundling');
+
+sub MAX_REDIRECTS { 5 }
+
+my $Allow_Verified = 0;    # allow verified certificates (e.g. Let's Encrypt)
+my $Force_Update   = 0;    # clobber known_hosts?
+my $Hosts_Dirty    = 0;    # do we need to update known_hosts?
+my $Known_Hosts;           # hashref, from/to JSON
+my $Show_Status = 0;       # log various things to stderr
+
+die "gmitool: command [args ..]\n" unless @ARGV;
+
+my %commands = ( get => \&get, link => \&link );
+
+my $cmd = shift;
+if ( $cmd =~ m{^gemini://} ) {
+    unshift @ARGV, $cmd;
+    $cmd = 'get';
+} elsif ( !exists $commands{$cmd} ) {
+    die "gmitool: no such command '$cmd' (", join( ' ', sort keys %commands ),
+      ")\n";
+}
+$commands{$cmd}->( \@ARGV );
+
+# gets a gemini page
+sub get {
+    my ($args) = @_;
+    GetOptionsFromArray(
+        $args,
+        'A'       => \$Allow_Verified,
+        'C=s'     => \my $client_cert,
+        'E=s'     => \my $output_encoding,
+        'H=s'     => \my $sni_host,
+        'K=s'     => \my $client_key,
+        'S'       => \$Show_Status,
+        'V=s'     => \my $verify,
+        'f'       => \$Force_Update,
+        'links|l' => \my $Only_Links,
+        't=i',    => \my $timeout
+    ) or exit 64;
+
+    my $resource = $args->[0];
+    die "Usage: gmitool get [options] url\n"
+      unless defined $resource and length $resource;
+
+    # meta and URL are UTF-8 and may appear in STDERR
+    binmode *STDERR, ':encoding(UTF-8)';
+
+    # default if -E not specified and content has a charset
+    $output_encoding = ':encoding(UTF-8)' unless defined $output_encoding;
+
+    my ( $known_hosts_file, %param, @unveils );
+
+    if ( defined $client_cert ) {
+        $param{ssl}->{SSL_cert_file} = $client_cert;
+        push @unveils, [ $client_cert, 'r' ];
+    }
+    if ( defined $client_key ) {
+        $param{ssl}->{SSL_key_file} = $client_key;
+        push @unveils, [ $client_key, 'r' ];
+    }
+    if ( defined $sni_host ) {
+        $param{ssl}->{SSL_hostname} = $sni_host;
+    }
+    $param{ssl}->{Timeout} = $timeout || 30;
+
+    if ( defined $verify ) {
+        if ( $verify eq 'peer' ) {
+            $param{ssl}->{SSL_verify_mode}     = 1;       # SSL_VERIFY_PEER
+            $param{ssl}->{SSL_verify_callback} = undef;
+        } elsif ( $verify eq 'none' ) {
+            warn "NOTICE no certificate verification\n" if $Show_Status;
+            $param{ssl}->{SSL_verify_mode}     = 0;       # SSL_VERIFY_NONE
+            $param{ssl}->{SSL_verify_callback} = undef;
+        } else {
+            die "gmitool: unknown verify mode '$verify'\n";
+        }
+    } else {
+        die "gmitool: HOME is not set" unless defined $ENV{HOME};
+        my $cache_dir = catdir( $ENV{HOME}, qw{.cache gmitool} );
+        make_path($cache_dir);
+        $known_hosts_file = catfile( $cache_dir, 'known_hosts' );
+        my $buf;
+        eval { $buf = read_text($known_hosts_file) };
+        $Known_Hosts = decode_json($buf) if defined $buf and length $buf;
+        push @unveils, [ $cache_dir, 'cw' ];
+        @param{qw(tofu verify_ssl)} = ( 1, \&verify_ssl );
+    }
+
+    my $pledge = eval {
+        require OpenBSD::Pledge;
+        require OpenBSD::Unveil;
+        OpenBSD::Unveil->import;
+        1;
+    };
+    if ($pledge) {
+        OpenBSD::Pledge::pledge(qw{cpath dns inet rpath unveil wpath});
+        unveil( $ENV{SSL_CERT_DIR},  'r' ) if exists $ENV{SSL_CERT_DIR};
+        unveil( $ENV{SSL_CERT_FILE}, 'r' ) if exists $ENV{SSL_CERT_FILE};
+        unveil(qw{/etc/ssl r});
+        # URI may dynamically load URI::_foreign. TODO most of @INC may
+        # need to be allowed if other random modules load random things
+        # after the unveil
+        my $u = $INC{"URI.pm"};
+        $u =~ s{[^/]+$}{};
+        unveil( $u, "r" );
+        for my $pathperm (@unveils) { unveil(@$pathperm) }
+        unveil();
+    }
+
+    my ( $gem, $code );
+    my $redirects = -1;
+
+  REQUEST:
+    ( $gem, $code ) = Net::Gemini->get( $resource, %param );
+    if ( $pledge and $code != 3 ) {
+        OpenBSD::Pledge::pledge(qw{cpath rpath wpath});
+    }
+    if ( $code == 2 ) {
+        warn "META " . $gem->meta . "\n" if $Show_Status;
+        my $encoded;
+        my ( $type, $sub, $pr ) = parse_mime_type( $gem->meta );
+        $encoded = 1 if exists $pr->{charset}    and $pr->{charset} !~ m/(?i)utf-8/;
+        $encoded = 0 if defined $output_encoding and $output_encoding eq '';
+        if ($Only_Links) {
+            if ( $type eq 'text' and $sub eq 'gemini' ) {
+                show_links($gem);
+                goto CLEANUP;
+            }
+        }
+        if ($encoded) {
+            # TODO more efficient way to do this?
+            my $body = '';
+            $gem->getmore( sub { $body .= $_[0]; 1 } );
+            binmode STDOUT, $output_encoding if defined $output_encoding;
+            print decode( $pr->{charset}, $body, Encode::FB_CROAK );
+        } else {
+            binmode STDOUT, ':raw';    # garbage in, garbage out
+            $gem->getmore( sub { syswrite STDOUT, $_[0]; 1 } );
+        }
+    } elsif ( $code == 0 ) {
+        my $e = $gem->error;
+        chomp $e;
+        die "gmitool: error: $e\n";
+    } elsif ( $code == 3 ) {
+        die "gmitool: too many redirects ($redirects) " . $gem->meta . "\n"
+          if ++$redirects >= MAX_REDIRECTS;
+        my $new = $gem->meta;
+        $resource = URI->new_abs( $new, $gem->{_uri} );
+        warn "REDIRECT " . $resource . "\n" if $Show_Status;
+        sleep 1;    # don't be too quick about a loop
+        goto REQUEST;
+    } elsif ( $code == 4 ) {
+        die 'gmitool: temporary-failure ' . $gem->status . ' ' . $gem->meta . "\n";
+    } elsif ( $code == 5 ) {
+        die 'gmitool: permanent-failure ' . $gem->status . ' ' . $gem->meta . "\n";
+    } elsif ( $code == 6 ) {
+        die 'gmitool: client-certificate ' . $gem->status . ' ' . $gem->meta . "\n";
+    }
+
+  CLEANUP:
+    if ($Hosts_Dirty) {
+        write_text( $known_hosts_file, encode_json($Known_Hosts) );
+    }
+}
+
+# extracts links in text/gemini input
+sub link {
+    my ($args) = @_;
+    GetOptionsFromArray( $args, 'base|b=s' => \my $base ) or exit 64;
+    $base = '.' unless defined $base;
+    while ( my $line = readline ) {
+        if ( $line =~ m/^=>\s*(\S+)/ ) {
+            my $u = URI->new_abs( $1, $base );
+            print $u->canonical, "\n";
+        }
+    }
+}
+
+# parse and qualify links out of what is assumed to be text/gemini
+# content. links can be followed by an optional description:
+#   =>/about/
+#   => photos/ all the cats
+sub show_links {
+    my ($gem) = @_;
+    my $base = $gem->{_uri};
+    binmode *STDOUT, ':raw';
+    my $buf = '';
+    my $eom;
+    $gem->getmore(
+        sub {
+            $buf .= $_[0];
+            $eom = 0;
+            while ( $buf =~ m{^=>[ \t]*(\S+)([ \t]+[^\r\n]*)?[\r\n]}gm ) {
+                print URI->new_abs( $1, $base )->canonical, "\n";
+                $eom = $+[0];
+            }
+            substr $buf, 0, $eom, '' if $eom;
+            1;
+        }
+    );
+}
+
+sub verify_ssl {
+    my ( $host, $port, $digest, $expire_date, $okay ) = @_;
+    return 1 if $Allow_Verified and $okay;
+    my $key = join( '|', $host, $port );
+    if ( $Force_Update or !exists $Known_Hosts->{$key} ) {
+        $Known_Hosts->{$key} = { digest => $digest, expire => $expire_date };
+        $Hosts_Dirty = 1;
+    } else {
+        if ( $Known_Hosts->{$key}{digest} ne $digest ) {
+            warn qq(gmitool: digest mismatch "$host|$port"\n),
+              "  notAfter (old): $Known_Hosts->{$key}{expire}\n",
+              "  notAfter (new): $expire_date\n";
+            exit 1;
+        }
+    }
+    return 1;
+}
+
+__END__
+
+=head1 NAME
+
+gmitool - a Net::Gemini command line tool
+
+=head1 SYNOPSIS
+
+  gmitool get [-A] [-E encoding-layer] [-C cert-file -K key-file] \
+              [-H sni-host] [-S] [-V peer|none] \
+              [-f] [-l] [-t seconds] \
+              gemini://example.org
+  gmitool link [-b base-url] < text-gemini-content
+
+=head1 DESCRIPTION
+
+B<gmitool> offers various gemini protocol related utilities. It is part
+of the L<Net::Gemini> module. Subcommands include:
+
+=head2 get
+
+Gets a gemini page and prints it to standard out, if all goes well
+(garbage in, garbage out). Options:
+
+=over 4
+
+=item C<-A>
+
+Accept verified leaf certificates without going through the usual TOFU
+path, assuming that the certificate can be verified. Probably good with
+sites that use "Let's Encrypt" as these certificates change frequently
+and would otherwise need the use of the C<-f> flag to force updates, and
+usually will (but may not) verify correctly.
+
+=item C<-C> I<certificate-file>
+
+Client certificate file, use with C<-K> for when B<gmitool> must use a
+custom certificate.
+
+=item C<-E> I<encoding-layer>
+
+Specifies the output encoding should the remote content have C<charset>
+associated with it; the default in such a case is to convert to UTF-8.
+If set to the empty string C<-E ''> then C<:raw> will be used--garbage
+in, garbage out. Otherwise, the I<encoding-layer> should be something
+Perl supports such as C<:encoding(UTF-8)>.
+
+=item C<-K> I<key-file>
+
+Client private key file, use with C<-C>.
+
+=item C<-H> I<hostname>
+
+Use the given I<hostname> as the SNI host instead of the default that is
+taken from the URL given.
+
+=item C<-S>
+
+Show various diagnostic information (the META field, redirects, etc).
+
+=item C<-V> I<mode>
+
+Specifies a custom certificate verification mode. By default Trust On
+First Use (TOFU) is used, which only checks the first leaf certificate
+against the C<known_hosts> table.
+
+Verification modes include C<peer> to verify the peer certificates (the
+full chain), and C<none> to do no verification. There may be hostname
+verification regardless; SSL is pretty complicated. See also C<-A>.
+
+The C<SSL_CERT_FILE> and C<SSL_CERT_DIR> environment variables can be
+used to customize the trusted certificate authority certificates.
+
+=item C<-f>
+
+Force update of TOFU certificates. Updates to the cache will not happen
+if C<-A> is used and the certificate can be verified.
+
+=item C<-l>
+
+Only show the links of the content if the response is text/gemini.
+
+=item C<-t> I<seconds>
+
+Custom timeout for the connection, 30 seconds by default.
+
+=back
+
+=head2 link
+
+Extracts link from text/gemini input, and qualifies any relative links
+if the C<-b> option is given.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<SSL_CERT_DIR>
+
+Custom directory for SSL certificate authority certificates. The default
+is the operating system (OS) default, which could be C</etc/ssl> or
+similar. Customize this and the next to specify that only certain
+certificate authorities should be trusted, as opposed to everything that
+ships with the OS by default.
+
+  env SSL_CERT_DIR=/some/where SSL_CERT_FILE=/dev/null gmitool ...
+
+=item C<SSL_CERT_FILE>
+
+Custom file for SSL certificate authorities.
+
+=back
+
+=head1 FILES
+
+C<~/.cache/gmitool/known_hosts> is where the TOFU records are stored.
+JSON format, UTF-8 encoding.
+
+=head1 EXIT STATUS
+
+The B<gmitool> utility exits 0 on success, and >0 if an error occurs.
+
+=head1 SEE ALSO
+
+L<Net::Gemini>, L<ftp(1)>, L<openssl(1)>, L<nc(1)>
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=cut

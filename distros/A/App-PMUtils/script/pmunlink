@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PMUtils/pmunlink
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-28'; # DATE
+our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.742'; # VERSION
+our $VERSION = '0.743'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PMUtils/pmunlink",
@@ -40,11 +40,15 @@ pmunlink - Unlink (remove) locally installed Perl module
 
 =head1 VERSION
 
-This document describes version 0.742 of pmunlink (from Perl distribution App-PMUtils), released on 2022-09-28.
+This document describes version 0.743 of pmunlink (from Perl distribution App-PMUtils), released on 2023-01-28.
 
 =head1 SYNOPSIS
 
-B<pmunlink> [B<--all>|B<-a>|B<--no-all>|B<--noall>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pm>=I<int>] [B<--pmc>=I<int>] [B<--pod>=I<int>] -- [I<module>] ...
+B<pmunlink> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<pmunlink> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<pmunlink> [B<L<--all|/"--all, -a">>|B<L<-a|/"--all, -a">>|B<L<--no-all|/"--all, -a">>|B<L<--noall|/"--all, -a">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--pm|/"--pm=s">>=I<int>] [B<L<--pmc|/"--pmc=s">>=I<int>] [B<L<--pod|/"--pod=s">>=I<int>] -- [I<L<module|/"--module=s@">>] ...
 
 =head1 OPTIONS
 
@@ -65,6 +69,9 @@ See C<--module>.
 Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--module>=I<s@>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -273,7 +280,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -71,7 +71,7 @@ Initializes L</"x"> and L</"y">.
 
   method clear : void ();
 
-Sets L</"x"> and L</"y"> to C<0>.
+Sets L</"x"> and L</"y"> to 0.
 
 =head2 clone
 
@@ -86,3 +86,9 @@ Creates a new C<Point> object that clones myself.
 Stringifies the C<Point> object as the following format.
 
   (1,2)
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

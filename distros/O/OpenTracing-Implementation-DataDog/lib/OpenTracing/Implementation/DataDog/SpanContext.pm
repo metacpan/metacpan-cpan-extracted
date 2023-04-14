@@ -6,7 +6,7 @@ OpenTracing::Implementation::DataDog::SpanContext - A DataDog Implementation
 
 =cut
 
-our $VERSION = 'v0.43.2';
+our $VERSION = 'v0.45.0';
 
 
 =head1 SYNOPSIS
@@ -17,6 +17,8 @@ our $VERSION = 'v0.43.2';
         service_name  => "MyFancyService",
         service_type  => "web",
         resource_name => "/clients/{client_id}/contactdetails",
+        environment   => 'staging',
+        hostname      => 'web.01.host',
     );
     #
     # please do not add parameter values in the resource,
@@ -145,6 +147,40 @@ has resource_name => (
     should          => NonEmptyStr->where( 'length($_) <= 5000' ),
     required        => 1,
     reader          => 'get_resource_name',
+    trigger         => Lock,
+);
+
+
+
+=head2 C<environment>
+
+An optional C<NonEmptyString> where C<length <= 5000>.
+
+=cut
+
+has environment => (
+    is              => 'ro',
+    should          => NonEmptyStr->where( 'length($_) <= 5000' ),
+    required        => 0,
+    env_key         => 'DD_ENV',
+    reader          => 'get_environment',
+    trigger         => Lock,
+);
+
+
+
+=head2 C<hostname>
+
+An optional C<NonEmptyString> where C<length <= 5000>.
+
+=cut
+
+has hostname => (
+    is              => 'ro',
+    should          => NonEmptyStr->where( 'length($_) <= 5000' ),
+    required        => 0,
+    env_key         => 'DD_HOSTNAME',
+    reader          => 'get_hostname',
     trigger         => Lock,
 );
 
@@ -285,6 +321,58 @@ A cloned C<DataDog::SpanContext>
 =cut
 
 sub with_resource_name { $_[0]->clone_with( resource_name => $_[1] ) }
+
+
+
+=head2 C<with_environment>
+
+Creates a cloned object, with a new value for C<environment>.
+
+    $span_context_new = $root_span->with_environment( 'development' );
+
+=head3 Required Positional Parameter(s)
+
+=over
+
+=item C<environment>
+
+A C<NonEmptyString> where C<length <= 5000>.
+
+=back
+
+=head3 Returns
+
+A cloned C<DataDog::SpanContext>
+
+=cut
+
+sub with_environment { $_[0]->clone_with( environment => $_[1] ) }
+
+
+
+=head2 C<with_hostname>
+
+Creates a cloned object, with a new value for C<hostname>.
+
+    $span_context_new = $root_span->with_hostname( 'web.01.host' );
+
+=head3 Required Positional Parameter(s)
+
+=over
+
+=item C<hostname>
+
+A C<NonEmptyString> where C<length <= 5000>.
+
+=back
+
+=head3 Returns
+
+A cloned C<DataDog::SpanContext>
+
+=cut
+
+sub with_hostname { $_[0]->clone_with( hostname => $_[1] ) }
 
 
 

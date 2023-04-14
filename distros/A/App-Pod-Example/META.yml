@@ -3,11 +3,11 @@ abstract: 'Base class for pod_example script.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Capture::Tiny: 0
   English: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0.05
-  IO::CaptureOutput: 0
-  Readonly: 0
+  File::Spec::Functions: 0
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 1.02
@@ -35,7 +35,7 @@ requires:
   File::Temp: 0
   Getopt::Std: 0
   IO::Barf: 0.04
-  Pod::Example: 0.03
+  Pod::Example: 0.12
   Readonly: 0
   perl: 5.6.0
 resources:
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Pod-Example
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Pod-Example
-version: '0.19'
+version: '0.20'

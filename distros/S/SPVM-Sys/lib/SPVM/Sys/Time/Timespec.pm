@@ -73,3 +73,10 @@ Gets C<tv_nsec>.
 Sets C<tv_nsec>.
 
   $tv->set_tv_nsec(34);
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

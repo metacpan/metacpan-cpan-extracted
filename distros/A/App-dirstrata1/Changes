@@ -1,0 +1,148 @@
+
+Revision history for the module "App::diroctopus" : 
+
+
+
+
+[Versions in recent]
+
+0.050  2023-04-07 fri : 
+  - dirhier の名前を dirstrata1 に変更。dir+hierは意味が広すぎて、名前空間を無駄に占有していると思うため。strata1の1はsimpleの意味を込めた。
+
+
+[Verseions in the past]
+ % hg log -f dirhier | cat
+changeset:   1415:9203a8cd87a7
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Fri Mar 22 19:25:32 2019 +0900
+summary:     dirhier ヘルプの文面を少し書換
+
+changeset:   1376:a9142ee70bd5
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Aug 28 18:04:56 2018 +0900
+summary:     updir 作成
+
+changeset:   1375:f5a90e9c77ba
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Aug 27 21:25:19 2018 +0900
+summary:     dirhier 開発メモを追加。出現したディレクトリごとに何個のファイルを下にもっていたかのデータを分かり安く表示したい。
+
+changeset:   1367:dbb16be8efa4
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Jul 31 11:26:52 2018 +0900
+summary:     dirhier 後でバックアウトするかも。dualvar を使って -g を実装し、さらに ? を infで代替
+
+changeset:   1366:bfbd04e90f3c
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Tue Jul 31 10:54:27 2018 +0900
+summary:     dirhier コメントや空白の調整(主に除去)
+
+changeset:   1116:c9b9dfae58fe
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Apr 02 11:21:00 2018 +0900
+summary:     dirhier 主にマニュアルの書換
+
+changeset:   1104:d2a0a572364f
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Thu Mar 29 13:53:30 2018 +0900
+summary:     dirhier いくつかのオプションを実装。 -q 色なし  -_  出力区切りが空白 -!
+
+changeset:   1103:2219d9eba116
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Thu Mar 29 11:45:04 2018 +0900
+summary:     dirhier -nを実装。数字の前に深さを出力する
+
+changeset:   1102:ce3c80ff736b
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Thu Mar 29 11:26:45 2018 +0900
+summary:     dirhier -. オプションを追加した。
+
+changeset:   1101:98e039e18531
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Mar 28 21:27:23 2018 +0900
+summary:     dirhier -bバイトオプションを加えた。
+
+changeset:   1100:95c9cd4ed2bf
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Mar 28 21:15:28 2018 +0900
+summary:     dirhier 大幅に動作を書き換えた。出力を分かり安くした。
+
+changeset:   1099:58b100e75805
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Mar 28 19:28:15 2018 +0900
+summary:     dirhier リファクタ及び-空白を-_に変更。
+
+changeset:   1028:0cf30f35e2d8
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Sun Jul 23 15:43:42 2017 +0900
+summary:     dirhier -a を -: に変更
+
+changeset:   993:25ed9c28cfcb
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Jan 24 18:32:43 2017 +0900
+summary:     13個のファイルについて、/usr/bin/env perl を /usr/bin/perl に書き戻し
+
+changeset:   747:c3d41137a8b4
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 19:36:03 2016 +0900
+summary:     dirhier 開発メモを追加
+
+changeset:   744:5f30c5339233
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 16:36:56 2016 +0900
+summary:     dirhier Ctrl+C の機能を少し強化。Ctrl+Cの2回押しで、終了するようにしたつもり。完全ではない。
+
+changeset:   740:f2bd6cbf140d
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 12:32:49 2016 +0900
+summary:     dirhier ヘルプで、使用例を追加。
+
+changeset:   739:bb40eb55cb08
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 10:51:51 2016 +0900
+summary:     dirhier デバグ ; no warnings のつづりを訂正
+
+changeset:   738:fd74f299203e
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 10:49:54 2016 +0900
+summary:     dirhier と dirsizes に プログラムの一行目は -t を追加し、 セキュリティ上注意が必要なperl コマンドの前後を warnings のオンオフを取り付けた。
+
+changeset:   737:f97afd7cc68b
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 10:45:03 2016 +0900
+summary:     usec と dirhier と dirsizes に プログラムの一行目は -t を追加し、 セキュリティ上注意が必要なperl コマンドの前後を warnings のオンオフを取り付けた。
+
+changeset:   736:384a4ff61aeb
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 15 09:43:24 2016 +0900
+summary:     dirhir で -T を削除
+
+changeset:   729:ee10a89adbe9
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Aug 09 21:00:02 2016 +0900
+summary:     107個のファイルについて、1行目を書換。env と -T  を使う様にした。
+
+changeset:   696:3adefbbe837b
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 08 16:23:36 2016 +0900
+summary:     ヘルプの動作を最新化した。9ファイルについて
+
+changeset:   660:5eead596bd84
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Jul 28 19:19:44 2016 +0900
+summary:     37個のプログラムファイルについて、ディレクトリを変更または名前の変更
+
+changeset:   553:e5d06deb37a5
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Jul 06 17:28:37 2016 +0900
+summary:     dirhier デバグ -1の表示が少し崩れていたので。ただし、表示のブログラムがやや分かりにくくなっている
+
+changeset:   552:5eab0d686a5b
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Jul 06 17:00:36 2016 +0900
+summary:     dirhier -dオプションを実装。ディレクトリのみを計数対象とした。
+
+changeset:   551:373680f151ee
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Jul 06 16:46:24 2016 +0900
+summary:     dirhier ディレクトリの階層構造を調べる

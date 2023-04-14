@@ -1,3 +1,10 @@
+0.10 2023-04-07
+  [Prerequirement Changes]
+    * SPVM::Sys 0.48 is required.
+  [Incompatible Changes]
+    * Use Sys::Time::Tm instead of Time::Info in all places.
+  [License Change]
+    * The license is changed to MIT License.
 0.09 2023-03-19
   [Internal Compatible Changes]
     * Use pointer instead of pointer_t

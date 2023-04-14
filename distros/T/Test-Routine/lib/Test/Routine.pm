@@ -1,6 +1,6 @@
 use v5.12.0;
 use warnings;
-package Test::Routine 0.030;
+package Test::Routine 0.031;
 # ABSTRACT: composable units of assertion
 
 #pod =head1 SYNOPSIS
@@ -328,7 +328,7 @@ Test::Routine - composable units of assertion
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -551,7 +551,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex White Dagfinn Ilmari Mannsåker gregor herrmann Jesse Luehrs Ricardo Signes Yanick Champoux
+=for stopwords Alex White Dagfinn Ilmari Mannsåker gregor herrmann Jesse Luehrs Matthew Horsfall Ricardo Signes Yanick Champoux
 
 =over 4
 
@@ -573,11 +573,19 @@ Jesse Luehrs <doy@tozt.net>
 
 =item *
 
+Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
 Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
 Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =item *
 

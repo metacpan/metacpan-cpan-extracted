@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 // This is for XSI strerror_r
 #define _POSIX_C_SOURCE 200112L
 #undef _GNU_SOURCE

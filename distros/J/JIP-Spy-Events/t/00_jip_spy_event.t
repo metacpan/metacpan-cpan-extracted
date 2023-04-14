@@ -9,7 +9,9 @@ use English qw(-no_match_vars);
 
 plan tests => 4;
 
-use_ok 'JIP::Spy::Event', 'v0.0.1';
+BEGIN {
+    use_ok 'JIP::Spy::Event', 'v0.0.2';
+}
 
 subtest 'Require some module' => sub {
     plan tests => 1;
@@ -29,32 +31,32 @@ subtest 'Require some module' => sub {
 subtest 'new()' => sub {
     plan tests => 7;
 
-    my $o = JIP::Spy::Event->new;
-    ok $o, 'got instance of JIP::Spy::Event';
+    my $sut = JIP::Spy::Event->new();
+    ok $sut, 'got instance of JIP::Spy::Event';
 
-    isa_ok $o, 'JIP::Spy::Event';
+    isa_ok $sut, 'JIP::Spy::Event';
 
-    can_ok $o, qw(new method arguments want_array times);
+    can_ok $sut, qw(new method arguments want_array times);
 
-    is $o->method,     undef;
-    is $o->arguments,  undef;
-    is $o->want_array, undef;
-    is $o->times,      undef;
+    is $sut->method(),     undef;
+    is $sut->arguments(),  undef;
+    is $sut->want_array(), undef;
+    is $sut->times(),      undef;
 };
 
 subtest 'new() with arguments' => sub {
     plan tests => 4;
 
-    my $o = JIP::Spy::Event->new(
+    my $sut = JIP::Spy::Event->new(
         method     => 'tratata',
         arguments  => [],
         want_array => 1,
         times      => 1,
     );
 
-    is $o->method,     'tratata';
-    is $o->want_array, 1;
-    is $o->times,      1;
+    is $sut->method(),     'tratata';
+    is $sut->want_array(), 1;
+    is $sut->times(),      1;
 
-    is_deeply $o->arguments,  [];
+    is_deeply $sut->arguments(), [];
 };

@@ -1,3 +1,4 @@
+use lib qw(.);
 use inc::Module::Install;
 name 'Text-Template-Compact';
 requires( perl => '5.8.3' );

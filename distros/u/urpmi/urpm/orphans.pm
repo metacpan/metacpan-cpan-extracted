@@ -1,7 +1,7 @@
 package urpm::orphans;
 
 use strict;
-use urpm::util qw(add2hash_ append_to_file cat_ output_safe partition put_in_hash uniq wc_l);
+use urpm::util qw(add2hash_ append_to_file cat_ member output_safe partition put_in_hash uniq wc_l);
 use urpm::msg;
 use urpm;
 
@@ -421,6 +421,27 @@ sub _get_current_kernel_package() {
     -e "/boot/vmlinuz-$release" && ($release, `rpm -qf --qf '%{name}' /boot/vmlinuz-$release`);
 }
 
+=item _replace_kernel_by_its_provide($urpm, $pkg)
+
+Take a dep, replace it by the pkg providing it.
+Eg:
+Return the current kernel's package so that we can filter out current running
+kernel:
+
+On mdv & mga[1-8], it's for getting the fullname of the matching pkg.
+Eg: kernel-desktop-5.15.45-1.mga8 -> kernel-desktop-5.15.45-1.mga8-1-1.x86_64
+
+On mga9+:
+We've "kernel-desktop[== 5.15.45-1]", we want to find pkg providing that, eg the NVRA of the pkg named 'kernel-desktop' whose version matches.
+
+=cut
+
+sub _replace_kernel_by_its_provide {
+    my ($urpm, $pkg) = @_;
+    my ($req) = grep { /^kernel/ } $pkg->requires;
+    my @a = $urpm->find_candidate_packages($req);
+    $a[0];
+}
 
 =item _kernel_callback ($pkg, $unreq_list)
 
@@ -430,7 +451,7 @@ _fast_ version w/o looking at all non kernel packages requires on
 kernels (like "urpmi_find_leaves '^kernel'" would)
 
 _all_unrequested_orphans blacklists nearly all kernels b/c of packages
-like 'ndiswrapper' or 'basesystem' that requires 'kernel'
+like 'ndiswrapper' or 'basesystem' that requires 'kernel' (on mga < 9)
 
 rationale: other packages only require 'kernel' or a sub package we
 do not care about (eg: kernel-devel, kernel-firmware, kernel-latest)
@@ -438,9 +459,12 @@ so it's useless to look at them
 
 =cut
 
+# @req_by_latest_kernels tracks kernels needed by kernel*-latest
+# %requested_kernels tracks which pkgs requires which kernel pkg
+# %kernels tracks !"*-latest" kernels (to be later filtered)
 my (@req_by_latest_kernels, %requested_kernels, %kernels);
 sub _kernel_callback { 
-    my ($pkg, $unreq_list) = @_;
+    my ($urpm, $pkg, $unreq_list) = @_;
     my $shortname = $pkg->name;
     my $n = $pkg->fullname;
 
@@ -461,9 +485,10 @@ sub _kernel_callback {
 
     # keep track of packages required by latest kernels in order not to try removing requested kernels:
     if ($n =~ /latest/) {
-        push @req_by_latest_kernels, $pkg->requires;
+        my $kpkg = _replace_kernel_by_its_provide($urpm, $pkg);
+        push @req_by_latest_kernels, scalar $kpkg->fullname if $kpkg;
     } else {
-        $kernels{$shortname} = $pkg;
+        $kernels{$n} = $pkg;
     }
 }
 
@@ -494,23 +519,37 @@ sub _all_unrequested_orphans {
 
     my (%l, %provides);
     # 1- list explicit provides (not files) from installed packages:
+
+    my $need_expand = 0;
     foreach my $pkg (@$unreq) {
-	$l{$pkg->name} = $pkg;
+	$l{$pkg->fullname} = $pkg;
+	my $n = $pkg->name;
+	# Instead of hardcoding desktop/linus/server/... flavors, blacklist:
+	$need_expand++ if $n =~ /^kernel-(\w+)$/ && !member($1, qw(doc firmware source));
 	push @{$provides{$_}}, $pkg foreach $pkg->provides_nosense;
     }
     my $unreq_list = unrequested_list($urpm);
+
+    # we need to replace/augment eg "kernel-desktop" by the "kernel-desktop-V-R" for each installed kernel:
+    if ($need_expand) {
+	$kernels{$_->fullname} = $_ foreach grep { /^kernel/ } @$unreq;
+    }
 
     my ($current_kernel_version, $current_kernel) = _get_current_kernel_package();
 
     # 2- check if "unrequested" packages are still needed:
     while (my $pkg = shift @$req) {
         # do not do anything regarding kernels if we failed to detect the running one (ie: chroot)
- 	_kernel_callback($pkg, $unreq_list) if $current_kernel;
+	_kernel_callback($urpm, $pkg, $unreq_list) if $current_kernel;
 	foreach my $prop ($pkg->requires, $pkg->recommends_nosense) {
 	    my $n = URPM::property2name($prop);
 	    foreach my $p (@{$provides{$n} || []}) {
-		if ($p != $pkg && $l{$p->name} && $p->provides_overlap($prop)) {
-		    delete $l{$p->name};
+		# FIXME: hackish in order to fix orphaning kernels with virtualbox installed on mga9+
+		# TODO: check if something else that's not orphaned still provides it instead
+		next if $n eq 'kmod(vboxdrv.ko)';
+		my $pfn = $p->fullname;
+		if ($p != $pkg && $l{$pfn} && $p->provides_overlap($prop)) {
+		    delete $l{$pfn};
 		    push @$req, $p;
 		}
 	    }
@@ -572,6 +611,8 @@ Returns the list of unrequested packages (aka orphans).
 
 It is quite fast. the slow part is the creation of
 $installed_packages_packed (using installed_packages_packed())
+
+Used by C<urpmq --auto_orphans>
 
 =cut
 

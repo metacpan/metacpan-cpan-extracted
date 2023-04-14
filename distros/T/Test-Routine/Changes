@@ -1,5 +1,11 @@
 Revision history for Test-Routine
 
+0.031     2023-04-11 21:37:45-04:00 America/New_York
+        - The run_test method now returns the pass/fail of the subtest
+          represented by a test method.  Since run_test is often around-ed, you
+          may need to adjust how you modify its return!
+          Thanks, Matthew Horsfall.
+
 0.030     2023-01-05 19:03:17-05:00 America/New_York
         - this version of Test-Routine now requires Perl v5.12 (but its prereqs
           already did)

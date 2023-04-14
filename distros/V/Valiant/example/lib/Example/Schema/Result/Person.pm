@@ -123,10 +123,6 @@ sub account($self) {
   $self->result_source->resultset->account_for($self);
 }
 
-sub new_todo($self) {
-  return $self->todos->new_result(+{status=>'active'});
-}
-
 sub request_todos($self, $request) {
   my $todos = $self->todos->available->newer_first;
   return $todos = $todos->filter_by_request($request);
@@ -145,20 +141,9 @@ sub register($self, $request) {
 }
 
 sub update_account($self, $request) {
-  $self->context('account')->update($request->nested_params);
-}
-
-sub role_checkbox_options($self) {
-  return $self->result_source->schema->resultset('Role')
-    ->search_rs(
-      +{}, 
-      +{
-        columns => [
-          { value=>'id' },
-          { label=>'label' },
-        ]
-      }
-    );
+  $self->context('account')->set_columns_recursively($request->nested_params);
+ $self->context('account')->update; 
+  return $self->valid;
 }
 
 1;

@@ -1,19 +1,15 @@
 #!perl
 #
 # gemini server tests. NOTE this server is mostly to test the
-# Net::Gemini client with
+# Net::Gemini client with, probably you may want vger or gmid or really
+# anything besides this on a real server(TM)
 
+use strict;
+use warnings;
 use Test2::V0;
-plan 3;
+plan 2;
 
 use Net::Gemini::Server;
-
-SKIP: {
-    skip("no author tests", 1) unless $ENV{AUTHOR_TEST_JMATES};
-    diag "trying to listen on 1965 (conflict risk with gemini daemon)";
-    my $serv = Net::Gemini::Server->new;
-    is( $serv->port, 1965 );
-}
 
 {
     my $serv = Net::Gemini::Server->new(

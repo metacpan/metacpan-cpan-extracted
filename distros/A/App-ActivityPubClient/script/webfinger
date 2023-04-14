@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+# AP-Client: CLI-based client / toolbox for ActivityPub
+# Copyright © 2020-2023 AP-Client Authors <https://hacktivis.me/git/ap-client/>
+# SPDX-License-Identifier: BSD-3-Clause
+use strict;
+use utf8;
+our $VERSION = 'v0.1.3';
+
+use LWP::UserAgent;
+use HTTP::Request::Common;
+
+=head1 NAME
+
+webfinger - Fetch account over WebFinger
+
+=head1 SYNOPSIS
+
+B<webfinger> <user@host>
+=cut
+
+my $ua = LWP::UserAgent->new;
+$ua->agent("AP-Client fetch <https://hacktivis.me/git/ap-client/>");
+
+if ($#ARGV != 0) {
+	print "usage: webfinger <user\@host>\n";
+	exit 1;
+}
+
+my ($user, $host) = ($ARGV[0] =~ m/^@?([^@]+)@([^@]+)$/)
+  or die 'Error: "' . $ARGV[0] . q{" Doesn't matches user@host};
+
+my $req = HTTP::Request->new(
+	GET => "https://$host/.well-known/webfinger?resource=acct:$user\@$host");
+$req->header('Accept' => 'application/json,application/xml');
+
+my $res = $ua->request($req);
+
+if ($res->is_success) {
+	print $res->content;
+} else {
+	print STDERR "Got ", $res->status_line, " instead of 2xx\n";
+	exit 1;
+}

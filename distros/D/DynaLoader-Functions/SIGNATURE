@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,24 +12,23 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 72acbec5f6a757fc486eb6098bf0d4ff9b40b99d .gitignore
-SHA1 c85a6ff1255c171fca44a6121e7d0be44efc30f5 Build.PL
-SHA1 e03d959d16b184b8d67b50706ba6ee7a4d82d021 Changes
-SHA1 d72180562d84a62d61ea4982386ed95db4a20ccb MANIFEST
-SHA1 20736d686e8afea6dd978d842a4f9432f8c2d02f META.json
-SHA1 5061d6cce4044ba5296622d37740ca1d9950afd8 META.yml
-SHA1 4e904d13b7b78937d91b61c47b9457e4d2acb4e5 README
-SHA1 b004fd96f1124410fc0c613eecb560792a6c4c04 lib/DynaLoader/Functions.pm
-SHA1 8a3ed5289676357f05592090a09e7ef841b5a476 t/dyna_low.c
-SHA1 312d487c13a77c08b9cf209a3e97a74506ec17cd t/dyna_low.t
-SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
-SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA256 883f6a49528899dde53db5c04250446c484bae29ba8753638295a0690ac9f59f .gitignore
+SHA256 e7414b4b17910df418050ba38fc923d6e2df83955638dc99668ce8e816c1a523 Build.PL
+SHA256 c5814d235be305d73fdda6594c12105d9ea4f7b37aafa46f9c7afb25b60e1ef7 Changes
+SHA256 8b520d6bb04d9aeff1bc22222778e28d16fcb4bdf7ba265447fe63887e934b1b MANIFEST
+SHA256 f631925693ed886309d7d9d8b756048812f19b20a51550d3dfee790cbed09ac5 META.json
+SHA256 47b624df72e20055438285488ef43a362537b2fe6e1b2ab5a2e2153ecc607493 META.yml
+SHA256 add1d76b99a0eafc7660dd3334a8eed85fb2df8ee098c2ae37b092d8d0226d6a README
+SHA256 29d3027e14c416589d2405a065f03d6079b85232a5223d7522cdffbc9faa4ef4 lib/DynaLoader/Functions.pm
+SHA256 c4782bcea80f1628c656c673cb096d056313743d417a402ee1eaae733248de2a t/dyna_low.c
+SHA256 954e9f010fe1ac9b5f3b255e06b015625fa421c70ffd46eb565c7ff21094e23d t/dyna_low.t
+SHA256 3679257bdfb4a07658e98a41325f82c1744f7dae6d1d0151f1b216af0c1df5c9 t/pod_cvg.t
+SHA256 e16860066c4ca9b2ee9e7d4604297def8a58b53bf0ca03eed863b5d9c5a2ac91 t/pod_syn.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAll/aq0ACgkQOV9mt2VyAVEpDACeJfbu41oUt3rEgpPCIn7iwqr4
-YLIAn2r8mIXaKS3acyNpb111RfncD6ox
-=NEsz
+iEYEAREDAAYFAmQvIHgACgkQOV9mt2VyAVGzFwCeMFiFFqtNW6In5p4NtKI4ZSR+
+9WQAn1ifwSspusYfJuipwUlA4KfSZy3f
+=fjKj
 -----END PGP SIGNATURE-----

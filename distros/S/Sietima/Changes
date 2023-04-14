@@ -1,3 +1,6 @@
+1.1.2     2023-03-31 16:51:00+01:00 Europe/London
+ - new role NoSpoof::DMARC, which replaces the From only when needed
+
 1.1.1     2023-02-28 13:02:33+00:00 Europe/London
  - documentation fixes
  - simplified SubscriberOnly::Moderate

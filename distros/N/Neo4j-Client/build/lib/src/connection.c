@@ -287,7 +287,7 @@ neo4j_connection_t *establish_connection(const char *hostname,
         errno = NEO4J_PROTOCOL_NEGOTIATION_FAILED;
         goto failure;
     }
-    if ((protocol_version < 1) || (protocol_version > 4))
+    if ((protocol_version < 1) || (protocol_version > 5))
     {
         errno = NEO4J_PROTOCOL_NEGOTIATION_FAILED;
         goto failure;
@@ -423,8 +423,13 @@ int negotiate_protocol_version(neo4j_iostream_t *iostream,
         return -1;
     }
 
-    // Here, add 3 as a supported version, and also 2 (identical to 1)
-    uint32_t supported_versions[4] = { htonl(4), htonl(3), htonl(2), htonl(1) };
+    // Here, add 5, 4, 3 as supported versions, leave 1 and 2 behind
+    // Using version ranges as described
+    // (https://neo4j.com/docs/bolt/current/bolt/handshake/#bolt-version43)
+    // 5.6-5.2, 4.4-4.0, 3
+    // (allowing 5.1 causes an unusual issue)
+    uint32_t supported_versions[4] = { htonl(0x040605),htonl(0x000004), 
+				       htonl(0x030404),htonl(0x000003) };
     if (neo4j_ios_write_all(iostream, supported_versions,
                 sizeof(supported_versions), NULL) < 0)
     {

@@ -60,4 +60,3 @@ pdlok("o=[0,1,0]: path", $path, pdl(long, [[0,0,0],[0,1,1]]));
 
 print "\n";
 # end of t/XX_yyyy.t
-

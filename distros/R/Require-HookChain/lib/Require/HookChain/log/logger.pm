@@ -8,9 +8,9 @@ package Require::HookChain::log::logger;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-15'; # DATE
+our $DATE = '2023-02-07'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -42,7 +42,7 @@ Require::HookChain::log::logger - Log a message to Log::ger
 
 =head1 VERSION
 
-This document describes version 0.005 of Require::HookChain::log::logger (from Perl distribution Require-HookChain), released on 2022-11-15.
+This document describes version 0.006 of Require::HookChain::log::logger (from Perl distribution Require-HookChain), released on 2023-02-07.
 
 =head1 SYNOPSIS
 
@@ -50,9 +50,11 @@ This document describes version 0.005 of Require::HookChain::log::logger (from P
  # now each time we require(), a logging statement is produced at the trace level
 
 A demo (L<nauniq> is a Perl script you can get from CPAN, and
-L<Log::ger::Screen> is a module to show log statements on the terminal; note
+L<Log::ger::Screen> is a module to show log statements on the terminal. Note
 that the loading of L<strict>.pm and L<warnings>.pm are not logged because they
-are already loaded by C<Log::ger::Screen>):
+are already loaded by C<Log::ger::Screen>. If you want logging of such modules
+you can try L<Require::HookChain::log::stderr> which avoids the use of any
+module itself.
 
  $ TRACE=1 PERL5OPT="-MLog::ger::Screen -MRequire::HookChain=log::logger" nauniq ~/samples/1.csv
  Require::HookChain::log::logger: Require-ing App/nauniq.pm (called from package main file /home/u1/perl5/perlbrew/perls/perl-5.34.0/bin/nauniq:7) ...
@@ -107,7 +109,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

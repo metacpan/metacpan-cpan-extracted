@@ -1,13 +1,12 @@
 package Example::Model::TodosQuery;
 
 use Moo;
-use CatalystX::RequestModel;
+use CatalystX::QueryModel;
 use Valiant::Validations;
 use Example::Syntax;
 
 extends 'Catalyst::Model';
-content_type 'application/x-www-form-urlencoded';
-content_in 'query';
+namespace 'todo';
 
 has status => (is=>'ro', property=>1); 
 has page => (is=>'ro', property=>1); 

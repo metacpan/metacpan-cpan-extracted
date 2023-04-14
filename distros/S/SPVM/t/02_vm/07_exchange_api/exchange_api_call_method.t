@@ -19,6 +19,7 @@ use SPVM 'TestCase'; my $use_test_line = __LINE__;
 
 use SPVM 'TestCase::ExchangeAPI';
 use SPVM 'TestCase::Point_3i';
+use SPVM 'Point';
 
 use SPVM 'Hash';
 use SPVM 'List';
@@ -66,78 +67,128 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
 
 # call_method
 {
-  my $obj_int = $api->call_method("Int", "new", 1);
-  isa_ok($obj_int, "SPVM::BlessedObject");
-  my $value = $obj_int->value;
-  is($value, 1);
-}
-
-# class
-{
-  my $obj_int = $api->class("Int")->new(1);
-  isa_ok($obj_int, "SPVM::BlessedObject");
-  my $value = $obj_int->value;
-  is($value, 1);
-}
-
-# Argument general exception
-{
-  # Argument general exception - too few arguments
   {
-    eval {
-      SPVM::Int->new;
-    };
-    like($@, qr/Too few arguments are passed to the "new" method in the "Int" class/);
+    my $obj_int = $api->call_method("Int", "new", 1);
+    isa_ok($obj_int, "SPVM::BlessedObject");
+    my $value = $obj_int->value;
+    is($value, 1);
   }
   
-  # Argument general exception - too many arguments
+  # Static instance method call
   {
-    eval {
-      SPVM::Int->new(1, 2);
-    };
-    like($@, qr/Too many arguments are passed to the "new" method in the "Int" class/);
+    {
+      my $list = SPVM::FloatList->new([]);
+      $list->SPVM::FloatList::push(1);
+      is_deeply($list->length, 1);
+    }
+  }
+
+  # Invalid argument type
+  {
+    {
+      my $list = SPVM::IntList->new([]);
+      eval { $list->push(undef) };
+      ok($@);
+    }
+    {
+      eval { SPVM::IntList->new(1) };
+      ok($@);
+    }
+  }
+
+  # Error code
+  {
+    {
+      my $error = $api->new_error;
+      is($error->code, 0);
+      my $message = "Error";
+      eval { SPVM::TestCase::ExchangeAPI->die($message, $error); };
+      is($error->code, 1);
+    }
+    {
+      my $error = $api->new_error;
+      is($error->code, 0);
+      my $message = "Error";
+      my $error_code = 2;
+      eval { SPVM::TestCase::ExchangeAPI->die_with_error_code($message, $error_code, $error); };
+      is($error->code, 2);
+    }
+  }
+
+  # Binding SPVM class to Perl class
+  {
+    # Calls a non-defined method
+    {
+      eval { SPVM::Int->not_defined_method };
+      like($@, qr|The "not_defined_method" method in the "Int" class is not found|);
+    }
   }
 }
 
 # Argument conversion
 {
-  # Argument Perl scalar to SPVM number
+  # Argument conversion - Exceptions
   {
-    # Perl scalar to SPVM byte
+    # Argument conversiongeneral exception - too few arguments
     {
-      my $total = SPVM::TestCase->sum_byte(8, 3);
-      is($total, 11);
+      eval {
+        SPVM::Int->new;
+      };
+      like($@, qr/Too few arguments are passed to the "new" method in the "Int" class/);
     }
+    
+    # Argument conversiongeneral exception - too many arguments
     {
-      my $total = SPVM::TestCase->sum_byte("8", "3");
-      is($total, 11);
+      eval {
+        SPVM::Int->new(1, 2);
+      };
+      like($@, qr/Too many arguments are passed to the "new" method in the "Int" class/);
     }
+  }
+
+  # Argument conversion - Numeric type
+  {
+    # Argument conversion - byte
     {
-      my $total = SPVM::TestCase->sum_byte("8ab", "3");
-      is($total, 11);
+      {
+        my $total = SPVM::TestCase->sum_byte(8, 3);
+        is($total, 11);
+      }
+      {
+        my $total = SPVM::TestCase->sum_byte("8", "3");
+        is($total, 11);
+      }
+      {
+        my $total = SPVM::TestCase->sum_byte("8ab", "3");
+        is($total, 11);
+      }
     }
 
-    # Perl scalar to SPVM short
+    # Argument conversion - short
     {
-      my $total = SPVM::TestCase->sum_short(8, 3);
-      is($total, 11);
+      {
+        my $total = SPVM::TestCase->sum_short(8, 3);
+        is($total, 11);
+      }
+      {
+        my $total = SPVM::TestCase->sum_short("8", "3");
+        is($total, 11);
+      }
     }
+    
+    # Argument conversion - int
     {
-      my $total = SPVM::TestCase->sum_short("8", "3");
-      is($total, 11);
+      {
+        my $total = SPVM::TestCase->sum_int(8, 3);
+        is($total, 11);
+      }
+      {
+        my $total = SPVM::TestCase->sum_int("8", "3");
+        is($total, 11);
+      }
     }
-
-    # Perl scalar to SPVM int
-    {
-      my $total = SPVM::TestCase->sum_int(8, 3);
-      is($total, 11);
-    }
-    {
-      my $total = SPVM::TestCase->sum_int("8", "3");
-      is($total, 11);
-    }
-
-    # Perl scalar to SPVM long
+    
+    # Argument conversion - long
     {
       {
         my $total = SPVM::TestCase->sum_long(8, 3);
@@ -153,71 +204,75 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       }
     }
 
-    # Perl scalar to SPVM float
+    # Argument conversion - float
     {
-      my $total = SPVM::TestCase->sum_float(0.25, 0.25);
-      cmp_ok($total, '==', 0.5);
+      {
+        my $total = SPVM::TestCase->sum_float(0.25, 0.25);
+        cmp_ok($total, '==', 0.5);
+      }
+      {
+        my $total = SPVM::TestCase->sum_float("0.25", "0.25");
+        cmp_ok($total, '==', 0.5);
+      }
     }
+    
+    # Argument conversion - double
     {
-      my $total = SPVM::TestCase->sum_float("0.25", "0.25");
-      cmp_ok($total, '==', 0.5);
-    }
-
-    # Perl scalar to SPVM double
-    {
-      my $total = SPVM::TestCase->sum_double(0.25, 0.25);
-      cmp_ok($total, '==', 0.5);
-    }
-    {
-      my $total = SPVM::TestCase->sum_double("0.25", "0.25");
-      cmp_ok($total, '==', 0.5);
+      {
+        my $total = SPVM::TestCase->sum_double(0.25, 0.25);
+        cmp_ok($total, '==', 0.5);
+      }
+      {
+        my $total = SPVM::TestCase->sum_double("0.25", "0.25");
+        cmp_ok($total, '==', 0.5);
+      }
     }
   }
 
-  # Argument Perl scalar to SPVM string
+  # Argument conversion - string
   {
-    # Argument Perl non-ref scalar to SPVM string
+    # Argument conversion - string
     {
-      # Argument Perl non-ref scalar to SPVM string - ascii
+      # Argument conversion - string - ascii
       {
         my $ok = SPVM::TestCase::ExchangeAPI->argument_non_ref_scalar_to_string_ascii("ABC");
         ok($ok);
       }
 
-      # Argument Perl non-ref scalar to SPVM string - UTF-8
+      # Argument conversion - string - UTF-8
       {
         my $ok = SPVM::TestCase::ExchangeAPI->argument_non_ref_scalar_to_string_decoded_string("あいう");
         ok($ok);
       }
 
-      # Argument Perl non-ref scalar to SPVM string - numeric
+      # Argument conversion - string - numeric
       {
         my $ok = SPVM::TestCase::ExchangeAPI->argument_non_ref_scalar_to_string_number(4.12);
         ok($ok);
       }
 
-      # Argument Perl non-ref scalar to SPVM string - undef
+      # Argument conversion - string - undef
       {
         my $ok = SPVM::TestCase::ExchangeAPI->argument_non_ref_scalar_to_string_undef(undef);
         ok($ok);
       }
     }
     
-    # Argument Perl SPVM::BlessedObject::String to SPVM string
+    # Argument conversion - string
     {
-      # Argument Perl SPVM::BlessedObject::String to SPVM string
+      # Argument conversion - string
       {
         my $ok = SPVM::TestCase::ExchangeAPI->argument_blessed_object_string_to_string($api->new_string("あいう"));
         ok($ok);
       }
 
-      # Argument Perl SPVM::BlessedObject::String to SPVM string - undef
+      # Argument conversion - undef
       {
         my $ok = SPVM::TestCase::ExchangeAPI->argument_blessed_object_string_to_string_undef(undef);
         ok($ok);
       }
       
-      # Argument Perl SPVM::BlessedObject::String to SPVM string - exception invalid type
+      # Argument conversion - exception invalid type
       {
         eval { SPVM::TestCase::ExchangeAPI->argument_non_ref_scalar_to_string_ascii({}) };
         ok($@);
@@ -225,10 +280,10 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
     }
   }
 
-  # Argument Perl reference to SPVM numeric reference
+  # Argument conversion - numeric reference
   {
     {
-      # Argument Perl reference to SPVM byte reference
+      # Argument conversion - byte reference
       {
         my $num_byte = $BYTE_MIN;
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_byte(\$num_byte);
@@ -244,7 +299,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_byte(\$num_byte);
         is($num_byte, $BYTE_MIN + 1);
       }
-      # Argument Perl reference to SPVM short reference
+      # Argument conversion - short reference
       {
         my $num_short = $SHORT_MIN;
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_short(\$num_short);
@@ -255,7 +310,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_short(\$num_short);
         is($num_short, $SHORT_MIN + 1);
       }
-      # Argument Perl reference to SPVM int reference
+      # Argument conversion - int reference
       {
         my $num_int = $INT_MIN;
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_int(\$num_int);
@@ -266,7 +321,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_int(\$num_int);
         is($num_int, $INT_MIN + 1);
       }
-      # Argument Perl reference to SPVM long reference
+      # Argument conversion - long reference
       {
         my $num_long = $LONG_MIN;
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_long(\$num_long);
@@ -277,7 +332,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_long(\$num_long);
         is($num_long, $LONG_MIN + 1);
       }
-      # Argument Perl reference to SPVM float reference
+      # Argument conversion - float reference
       {
         my $num_float = POSIX::FLT_MIN();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_float(\$num_float);
@@ -288,7 +343,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_float(\$num_float);
         is($num_float, POSIX::FLT_MIN() + 1);
       }
-      # Argument Perl reference to SPVM double reference
+      # Argument conversion - double reference
       {
         my $num_double = POSIX::DBL_MIN();
         SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_double(\$num_double);
@@ -301,9 +356,9 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       }
     }
 
-    # Argument Perl reference to SPVM numeric reference exception
+    # Argument conversion - numeric reference exception
     {
-      # Argument Perl reference to SPVM byte reference exception
+      # Argument conversion - byte reference exception
       {
         my $num_byte = $BYTE_MIN;
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_byte($num_byte) };
@@ -312,7 +367,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_byte({}) };
         ok($@);
       }
-      # Argument Perl reference to SPVM short reference exception
+      # Argument conversion - short reference exception
       {
         my $num_short = $SHORT_MIN;
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_short($num_short) };
@@ -321,7 +376,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_short({}) };
         ok($@);
       }
-      # Argument Perl reference to SPVM int reference exception
+      # Argument conversion - int reference exception
       {
         my $num_int = $INT_MIN;
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_int($num_int) };
@@ -330,7 +385,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_int({}) };
         ok($@);
       }
-      # Argument Perl reference to SPVM long reference exception
+      # Argument conversion - long reference exception
       {
         my $num_long = $LONG_MIN;
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_long($num_long) };
@@ -339,7 +394,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_long({}) };
         ok($@);
       }
-      # Argument Perl reference to SPVM float reference exception
+      # Argument conversion - float reference exception
       {
         my $num_float = POSIX::FLT_MIN();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_float($num_float) };
@@ -348,7 +403,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_float({}) };
         ok($@);
       }
-      # Argument Perl reference to SPVM double reference exception
+      # Argument conversion - double reference exception
       {
         my $num_double = POSIX::DBL_MIN();
         eval { SPVM::TestCase::ExchangeAPI->call_method_numeric_ref_arg_double($num_double) };
@@ -360,237 +415,134 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
     }
   }
 
-  # Argument Perl array reference to SPVM array
+  # Argument conversion - any object
   {
-    # Argument Perl array reference to SPVM byte array
+    # Argument conversion - any object - array
     {
-      my $perl_array_ref = [1, $BYTE_MAX, $BYTE_MIN];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_byte_array($perl_array_ref, undef);
-      ok($ok);
+      my $spvm_array = $api->new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
+      my $spvm_array_ret = SPVM::TestCase::ExchangeAPI->return_any_object_only($spvm_array);
+      ok(ref $spvm_array_ret, "SPVM::BlessedObject::Array");
+      is($spvm_array_ret->__get_type_name, "byte[]");
+      is_deeply($spvm_array_ret->to_elems, [1, $BYTE_MAX, $BYTE_MIN]);
     }
-    # Argument Perl array reference to SPVM short array
+    
+    # Argument conversion - any object - string
     {
-      my $perl_array_ref = [1, $SHORT_MAX, $SHORT_MIN];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_short_array($perl_array_ref, undef);
-      ok($ok);
-    }
-    # Argument Perl array reference to SPVM int array
-    {
-      my $perl_array_ref = [1, $INT_MAX, $INT_MIN];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_int_array($perl_array_ref, undef);
-      ok($ok);
-    }
-    # Argument Perl array reference to SPVM long array
-    {
-      my $perl_array_ref = [1, $LONG_MAX, $LONG_MIN];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_long_array($perl_array_ref, undef);
-      ok($ok);
-    }
-    # Argument Perl array reference to SPVM float array
-    {
-      my $perl_array_ref = [0.5, $FLT_MAX, $FLT_MIN];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_float_array($perl_array_ref, undef);
-      ok($ok);
-    }
-    # Argument Perl array reference to SPVM double array
-    {
-      my $perl_array_ref = [0.5, $DBL_MAX, $DBL_MIN];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_double_array($perl_array_ref, undef);
-      ok($ok);
+      my $spvm_string = $api->new_string("abc");
+      my $spvm_string_ret = SPVM::TestCase::ExchangeAPI->return_any_object_only($spvm_string);
+      ok(ref $spvm_string_ret, "SPVM::BlessedObject::String");
+      is($spvm_string_ret->__get_type_name, "string");
+      is("$spvm_string", "$spvm_string_ret");
     }
 
-    # Argument Perl array reference to SPVM string array
+    # Argument conversion - any object - class
     {
-      my $perl_array_ref = ["あいう", "えお", "ab", undef];
-      my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_string_array($perl_array_ref, undef);
-      ok($ok);
+      my $spvm_object = SPVM::Point->new(1, 2);
+      my $spvm_object_ret = SPVM::TestCase::ExchangeAPI->return_any_object_only($spvm_object);
+      ok(ref $spvm_object_ret, "SPVM::BlessedObject::Class");
+      is($spvm_object_ret->__get_type_name, "Point");
+      is($spvm_object->x, $spvm_object_ret->x);
+      is($spvm_object->y, $spvm_object_ret->y);
     }
   }
-
-  # Argument SPVM::BlessedObject::Array
+  
+  # Argument conversion - numeric array
   {
-    # Argument SPVM array to SPVM byte array
+    # Argument conversion - byte array
     {
       my $spvm_array = $api->new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_array_to_spvm_byte_array($spvm_array, undef);
       ok($ok);
     }
-    # Argument SPVM array to SPVM short array
+    # Argument conversion - short array
     {
       my $spvm_array = $api->new_short_array([1, $SHORT_MAX, $SHORT_MIN]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_array_to_spvm_short_array($spvm_array, undef);
       ok($ok);
     }
-    # Argument SPVM array to SPVM int array
+    # Argument conversion - int array
     {
       my $spvm_array = $api->new_int_array([1, $INT_MAX, $INT_MIN]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_array_to_spvm_int_array($spvm_array, undef);
       ok($ok);
     }
-    # Argument SPVM array to SPVM long array
+    # Argument conversion - long array
     {
       my $spvm_array = $api->new_long_array([1, $LONG_MAX, $LONG_MIN]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_array_to_spvm_long_array($spvm_array, undef);
       ok($ok);
     }
-    # Argument SPVM array to SPVM float array
+    # Argument conversion - float array
     {
       my $spvm_array = $api->new_float_array([0.5, $FLT_MAX, $FLT_MIN]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_array_to_spvm_float_array($spvm_array, undef);
       ok($ok);
     }
-    # Argument SPVM array to SPVM double array
+    # Argument conversion - double array
     {
       my $spvm_array = $api->new_double_array([0.5, $DBL_MAX, $DBL_MIN]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_array_to_spvm_double_array($spvm_array, undef);
       ok($ok);
     }
-    # Argument SPVM array to SPVM string array
+    # Argument conversion - string array
     {
       my $spvm_string_array = $api->new_string_array(["あいう", "えお", "ab", undef]);
       my $ok = SPVM::TestCase::ExchangeAPI->argument_spvm_string_array_to_spvm_string_array($spvm_string_array, undef);
       ok($ok);
     }
-  }
-
-  # Argument multi numeric
-  {
+    
+    # Argument conversion - numeric array - Extra
     {
-      # Argument multi numeric - byte
+      # Argument conversion - byte array
       {
-        my $input = {x => 1, y => 3, z => $BYTE_MAX};
-        my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_byte($input);
-        is_deeply($output, $input);
+        my $perl_array_ref = [1, $BYTE_MAX, $BYTE_MIN];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_byte_array($perl_array_ref, undef);
+        ok($ok);
+      }
+      # Argument conversion - short array
+      {
+        my $perl_array_ref = [1, $SHORT_MAX, $SHORT_MIN];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_short_array($perl_array_ref, undef);
+        ok($ok);
+      }
+      # Argument conversion - int array
+      {
+        my $perl_array_ref = [1, $INT_MAX, $INT_MIN];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_int_array($perl_array_ref, undef);
+        ok($ok);
+      }
+      # Argument conversion - long array
+      {
+        my $perl_array_ref = [1, $LONG_MAX, $LONG_MIN];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_long_array($perl_array_ref, undef);
+        ok($ok);
+      }
+      # Argument conversion - float array
+      {
+        my $perl_array_ref = [0.5, $FLT_MAX, $FLT_MIN];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_float_array($perl_array_ref, undef);
+        ok($ok);
+      }
+      # Argument conversion - double array
+      {
+        my $perl_array_ref = [0.5, $DBL_MAX, $DBL_MIN];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_double_array($perl_array_ref, undef);
+        ok($ok);
       }
 
-      # Argument multi numeric - short
+      # Argument conversion - string array
       {
-        my $input = {x => 1, y => 3, z => $SHORT_MAX};
-        my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_short($input);
-        is_deeply($output, $input);
-      }
-
-      # Argument multi numeric - int
-      {
-        my $input = {x => 1, y => 3, z => $INT_MAX};
-        my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_int($input);
-        is_deeply($output, $input);
-      }
-
-      # Argument multi numeric - long
-      {
-        my $input = {x => 1, y => 3, z => $LONG_MAX};
-        my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_long($input);
-        is_deeply($output, $input);
-      }
-
-      # Argument multi numeric - float
-      {
-        my $input = {x => 1, y => 3, z => $FLT_MAX};
-        my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_float($input);
-        is_deeply($output, $input);
-      }
-
-      # Argument multi numeric - double
-      {
-        my $input = {x => 1, y => 3, z => $DBL_MAX};
-        my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_double($input);
-        is_deeply($output, $input);
-      }
-    }
-
-    # Argument multi numeric exception
-    {
-      # Argument multi numeric exception - byte, field not found
-      {
-        my $input = {x => 1, y => 3};
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_byte($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - short, field not found
-      {
-        my $input = {x => 1, y => 3};
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_short($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - int, field not found
-      {
-        my $input = {x => 1, y => 3};
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_int($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - long, field not found
-      {
-        my $input = {x => 1, y => 3};
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_long($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - float, field not found
-      {
-        my $input = {x => 1, y => 3};
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_float($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - double, field not found
-      {
-        my $input = {x => 1, y => 3};
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_double($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric exception - byte, not hash reference
-      {
-        my $input = 1;
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_byte($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - short, not hash reference
-      {
-        my $input = 1;
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_short($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - int, not hash reference
-      {
-        my $input = 1;
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_int($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - long, not hash reference
-      {
-        my $input = 1;
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_long($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - float, not hash reference
-      {
-        my $input = 1;
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_float($input) };
-        ok($@);
-      }
-
-      # Argument multi numeric - double, not hash reference
-      {
-        my $input = 1;
-        eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_double($input) };
-        ok($@);
+        my $perl_array_ref = ["あいう", "えお", "ab", undef];
+        my $ok = SPVM::TestCase::ExchangeAPI->argument_perl_array_ref_to_spvm_string_array($perl_array_ref, undef);
+        ok($ok);
       }
     }
   }
 
-  # Argument multi numeric array
+  # Argument conversion - multi numeric array
   {
     
-    # Argument multi numeric array - byte
+    # Argument conversion - multi numeric array - byte
     {
       my $values = [
         {x => $BYTE_MIN, y => 1, z => 2},
@@ -603,7 +555,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is_deeply($out_values, $values);
     }
 
-    # Argument multi numeric array - short
+    # Argument conversion - multi numeric array - short
     {
       my $values = [
         {x => $SHORT_MIN, y => 1, z => 2},
@@ -616,7 +568,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is_deeply($out_values, $values);
     }
 
-    # Argument multi numeric array - int
+    # Argument conversion - multi numeric array - int
     {
       my $values = [
         {x => $INT_MIN, y => 1, z => 2},
@@ -629,7 +581,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is_deeply($out_values, $values);
     }
 
-    # Argument multi numeric array - long
+    # Argument conversion - multi numeric array - long
     {
       my $values = [
         {x => $LONG_MIN, y => 1, z => 2},
@@ -642,7 +594,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is_deeply($out_values, $values);
     }
 
-    # Argument multi numeric array - float
+    # Argument conversion - multi numeric array - float
     {
       my $values = [
         {x => $FLT_MIN, y => 1, z => 2},
@@ -655,7 +607,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is_deeply($out_values, $values);
     }
 
-    # Argument multi numeric array - double
+    # Argument conversion - multi numeric array - double
     {
       my $values = [
         {x => $DBL_MIN, y => 1, z => 2},
@@ -667,42 +619,176 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       my $out_values = $spvm_values->to_elems;
       is_deeply($out_values, $values);
     }
+
+    # Argument conversion - multi numeric type - Exceptions
+    {
+      {
+        # Argument conversion - multi-numeric byte
+        {
+          my $input = {x => 1, y => 3, z => $BYTE_MAX};
+          my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_byte($input);
+          is_deeply($output, $input);
+        }
+
+        # Argument conversion - multi-numeric short
+        {
+          my $input = {x => 1, y => 3, z => $SHORT_MAX};
+          my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_short($input);
+          is_deeply($output, $input);
+        }
+
+        # Argument conversion - multi-numeric int
+        {
+          my $input = {x => 1, y => 3, z => $INT_MAX};
+          my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_int($input);
+          is_deeply($output, $input);
+        }
+
+        # Argument conversion - multi-numeric long
+        {
+          my $input = {x => 1, y => 3, z => $LONG_MAX};
+          my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_long($input);
+          is_deeply($output, $input);
+        }
+
+        # Argument conversion - multi-numeric float
+        {
+          my $input = {x => 1, y => 3, z => $FLT_MAX};
+          my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_float($input);
+          is_deeply($output, $input);
+        }
+
+        # Argument conversion - multi-numeric double
+        {
+          my $input = {x => 1, y => 3, z => $DBL_MAX};
+          my $output = SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_double($input);
+          is_deeply($output, $input);
+        }
+      }
+
+      # Argument conversion - multi numeric exception
+      {
+        # Argument conversion - multi numeric exception - byte, field not found
+        {
+          my $input = {x => 1, y => 3};
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_byte($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric short, field not found
+        {
+          my $input = {x => 1, y => 3};
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_short($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric int, field not found
+        {
+          my $input = {x => 1, y => 3};
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_int($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric long, field not found
+        {
+          my $input = {x => 1, y => 3};
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_long($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric float, field not found
+        {
+          my $input = {x => 1, y => 3};
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_float($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric double, field not found
+        {
+          my $input = {x => 1, y => 3};
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_double($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi numeric exception - byte, not hash reference
+        {
+          my $input = 1;
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_byte($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric short, not hash reference
+        {
+          my $input = 1;
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_short($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric int, not hash reference
+        {
+          my $input = 1;
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_int($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric long, not hash reference
+        {
+          my $input = 1;
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_long($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric float, not hash reference
+        {
+          my $input = 1;
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_float($input) };
+          ok($@);
+        }
+
+        # Argument conversion - multi-numeric double, not hash reference
+        {
+          my $input = 1;
+          eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_arg_double($input) };
+          ok($@);
+        }
+      }
+    }
   }
 
-  # Argument multi numeric reference
+  # Argument conversion - multi numeric reference
   {
     {
-      # Argument multi numeric reference - byte
+      # Argument conversion - multi numeric reference - byte
       {
         my $point = {x => $BYTE_MIN, y => 1, z => 2};
         SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_byte(\$point);
         is_deeply($point, {x => $BYTE_MIN + 1, y => 2, z => 3});
       }
-      # Argument multi numeric reference - short
+      # Argument conversion - multi numeric reference - short
       {
         my $point = {x => $SHORT_MIN, y => 1, z => 2};
         SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_short(\$point);
         is_deeply($point, {x => $SHORT_MIN + 1, y => 2, z => 3});
       }
-      # Argument multi numeric reference - int
+      # Argument conversion - multi numeric reference - int
       {
         my $point = {x => $INT_MIN, y => 1, z => 2};
         SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_int(\$point);
         is_deeply($point, {x => $INT_MIN + 1, y => 2, z => 3});
       }
-      # Argument multi numeric reference - long
+      # Argument conversion - multi numeric reference - long
       {
         my $point = {x => $LONG_MIN, y => 1, z => 2};
         SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_long(\$point);
         is_deeply($point, {x => $LONG_MIN + 1, y => 2, z => 3});
       }
-      # Argument multi numeric reference - float
+      # Argument conversion - multi numeric reference - float
       {
         my $point = {x => $FLT_MIN, y => 1, z => 2};
         SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_float(\$point);
         is_deeply($point, {x => $FLT_MIN + 1, y => 2, z => 3});
       }
-      # Argument multi numeric reference - double
+      # Argument conversion - multi numeric reference - double
       {
         my $point = {x => $DBL_MIN, y => 1, z => 2};
         SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_double(\$point);
@@ -710,76 +796,76 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       }
     }
     
-    # Argument multi numeric reference exception
+    # Argument conversion - multi numeric reference exception
     {
-      # Argument multi numeric reference exception - byte, key not found
+      # Argument conversion - multi numeric reference exception - byte, key not found
       {
         my $point = {x => $BYTE_MIN, y => 1};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_byte(\$point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - short, key not found
+      # Argument conversion - multi numeric reference exception - short, key not found
       {
         my $point = {x => $SHORT_MIN, y => 1};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_short(\$point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - int, key not found
+      # Argument conversion - multi numeric reference exception - int, key not found
       {
         my $point = {x => $INT_MIN, y => 1};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_int(\$point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - long, key not found
+      # Argument conversion - multi numeric reference exception - long, key not found
       {
         my $point = {x => $LONG_MIN, y => 1};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_long(\$point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - float, key not found
+      # Argument conversion - multi numeric reference exception - float, key not found
       {
         my $point = {x => $FLT_MIN, y => 1};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_float(\$point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - double, key not found
+      # Argument conversion - multi numeric reference exception - double, key not found
       {
         my $point = {x => $DBL_MIN, y => 1};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_double(\$point) };
         ok($@);
       }
 
-      # Argument multi numeric reference exception - byte, not reference of hash reference
+      # Argument conversion - multi numeric reference exception - byte, not reference of hash reference
       {
         my $point = {x => $BYTE_MIN, y => 1, z => 2};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_byte($point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - short, not reference of hash reference
+      # Argument conversion - multi numeric reference exception - short, not reference of hash reference
       {
         my $point = {x => $SHORT_MIN, y => 1, z => 2};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_short($point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - int, not reference of hash reference
+      # Argument conversion - multi numeric reference exception - int, not reference of hash reference
       {
         my $point = {x => $INT_MIN, y => 1, z => 2};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_int($point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - long, not reference of hash reference
+      # Argument conversion - multi numeric reference exception - long, not reference of hash reference
       {
         my $point = {x => $LONG_MIN, y => 1, z => 2};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_long($point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - float, not reference of hash reference
+      # Argument conversion - multi numeric reference exception - float, not reference of hash reference
       {
         my $point = {x => $FLT_MIN, y => 1, z => 2};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_float($point) };
         ok($@);
       }
-      # Argument multi numeric reference exception - double, not reference of hash reference
+      # Argument conversion - multi numeric reference exception - double, not reference of hash reference
       {
         my $point = {x => $DBL_MIN, y => 1, z => 2};
         eval { SPVM::TestCase::ExchangeAPI->call_method_multi_numeric_ref_arg_double($point) };
@@ -788,7 +874,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
 
     }
 
-    # Argument multi numeric reference and numeric reference mixed
+    # Argument conversion - multi numeric reference and numeric reference mixed
     {
       {
         my $point1 = {x => $BYTE_MIN, y => 1, z => 2};
@@ -804,9 +890,9 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
     }
   }
   
-  # Argument various patterns
+  # Argument conversion - Extra
   {
-    # Argument - Empty List push
+    # Argument conversion - Empty List push
     {
       {
         my $list = SPVM::ByteList->new([]);
@@ -850,7 +936,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       }
     }
 
-    # Argument - Empty List new
+    # Argument conversion - Empty List new
     {
       {
         my $list = SPVM::IntList->new([]);
@@ -862,7 +948,7 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       }
     }
 
-    # Argument - Pass list
+    # Argument conversion - Pass list
     {
       # Pass list
       {
@@ -875,13 +961,13 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       }
     }
 
-    # Argument - Pass list
+    # Argument conversion - Pass list
     {
       SPVM::List->new($api->new_object_array("object[]", []));
       ok(1);
     }
     
-    # Argument - object[] array of any object
+    # Argument conversion - object[] array of any object
     {
       my $args = $api->new_object_array('object[]', [SPVM::Int->new(1), SPVM::Double->new(3)]);
       ok(SPVM::TestCase::ExchangeAPI->arg_array_of_any_object($args));
@@ -889,81 +975,81 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
   }
 }
 
-# Return value conversion
+# Return value conversion - value conversion
 {
-  # Return void
+  # Return value conversion - void
   {
-    # Return void
+    # Return value conversion - void
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_void;
       ok(!defined $value);
     }
   }
 
-  # Return numeric
+  # Return value conversion - numeric
   {
-    # Return numeric - byte
+    # Return value conversion - numeric - byte
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_byte;
       is($value, $BYTE_MIN);
     }
     
-    # Return numeric - short
+    # Return value conversion - numeric - short
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_short;
       is($value, $SHORT_MIN);
     }
     
-    # Return numeric - int
+    # Return value conversion - numeric - int
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_int;
       is($value, $INT_MIN);
     }
     
-    # Return numeric - long
+    # Return value conversion - numeric - long
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_long;
       is($value, $LONG_MIN);
     }
     
-    # Return numeric - float
+    # Return value conversion - numeric - float
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_float;
       is($value, $FLT_MIN);
     }
     
-    # Return numeric - double
+    # Return value conversion - numeric - double
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_double;
       is($value, $DBL_MIN);
     }
   }
 
-  # Return string
+  # Return value conversion - string
   {
-    # Return string
+    # Return value conversion - string
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_string;
       is(ref $value, 'SPVM::BlessedObject::String');
       ok($value eq "あいう");
     }
 
-    # Return string undef
+    # Return value conversion - string undef
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_string_undef;
       ok(!defined $value);
     }
 
-    # Return string empty
+    # Return value conversion - string empty
     {
       my $values = SPVM::TestCase->string_empty();
       is($values, "");
     }
   }
 
-  # Return object
+  # Return value conversion - object
   {
-    # Return object
+    # Return value conversion - object
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_object;
       is($value->get_class_name, 'TestCase::Minimal');
@@ -972,34 +1058,104 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is($value->y, 2);
     }
 
-    # Return object undef
+    # Return value conversion - object undef
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_object_undef;
       ok(!defined $value);
     }
   }
 
-  # Return any object
+  # Return value conversion - any object
   {
-    # Return any object
+    # Return value conversion - any object - class
     {
-      my $value = SPVM::TestCase::ExchangeAPI->return_any_object;
-      is($value->get_class_name, 'TestCase::Minimal');
-      isa_ok($value, 'SPVM::BlessedObject::Class');
-      is($value->x, 1);
-      is($value->y, 2);
+      my $spvm_object = SPVM::Point->new(1, 2);
+      my $spvm_object_ret = SPVM::TestCase::ExchangeAPI->return_any_object_only($spvm_object);
+      ok(ref $spvm_object_ret, "SPVM::BlessedObject::Class");
+      is($spvm_object_ret->__get_type_name, "Point");
+      is($spvm_object->x, $spvm_object_ret->x);
+      is($spvm_object->y, $spvm_object_ret->y);
     }
 
-    # Return any object undef
+    # Return value conversion - any object - array
+    {
+      my $spvm_array = $api->new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
+      my $spvm_array_ret = SPVM::TestCase::ExchangeAPI->return_any_object_only($spvm_array);
+      ok(ref $spvm_array_ret, "SPVM::BlessedObject::Array");
+      is($spvm_array_ret->__get_type_name, "byte[]");
+      is_deeply($spvm_array_ret->to_elems, [1, $BYTE_MAX, $BYTE_MIN]);
+    }
+    
+    # Return value conversion - any object - string
+    {
+      my $spvm_string = $api->new_string("abc");
+      my $spvm_string_ret = SPVM::TestCase::ExchangeAPI->return_any_object_only($spvm_string);
+      ok(ref $spvm_string_ret, "SPVM::BlessedObject::String");
+      is($spvm_string_ret->__get_type_name, "string");
+      is("$spvm_string", "$spvm_string_ret");
+    }
+
+    # Return value conversion - any object undef
     {
       my $value = SPVM::TestCase::ExchangeAPI->return_any_object_undef;
       ok(!defined $value);
     }
+    
+    # Extra
+    {
+      # Return value conversion - any object - class
+      {
+        my $value = SPVM::TestCase::ExchangeAPI->return_any_object;
+        is($value->get_class_name, 'TestCase::Minimal');
+        isa_ok($value, 'SPVM::BlessedObject::Class');
+        is($value->x, 1);
+        is($value->y, 2);
+      }
+    }
   }
 
-  # Return array
+  # Return value conversion - multi numeric
   {
-    # Return numeric array
+    # Return value conversion - multi numeric - byte
+    {
+      my $value = SPVM::TestCase::ExchangeAPI->return_byte_multi_numeric;
+      is_deeply($value, {x => 1, y => 2, z => $BYTE_MIN});
+    }
+    
+    # Return value conversion - multi numeric - short
+    {
+      my $value = SPVM::TestCase::ExchangeAPI->return_short_multi_numeric;
+      is_deeply($value, {x => 1, y => 2, z => $SHORT_MIN});
+    }
+    
+    # Return value conversion - multi numeric - int
+    {
+      my $value = SPVM::TestCase::ExchangeAPI->return_int_multi_numeric;
+      is_deeply($value, {x => 1, y => 2, z => $INT_MIN});
+    }
+    
+    # Return value conversion - multi numeric - long
+    {
+      my $value = SPVM::TestCase::ExchangeAPI->return_long_multi_numeric;
+      is_deeply($value, {x => 1, y => 2, z => $LONG_MIN});
+    }
+    
+    # Return value conversion - multi numeric - float
+    {
+      my $value = SPVM::TestCase::ExchangeAPI->return_float_multi_numeric;
+      is_deeply($value, {x => 1, y => 2, z => $FLT_MIN});
+    }
+    
+    # Return value conversion - multi numeric - double
+    {
+      my $value = SPVM::TestCase::ExchangeAPI->return_double_multi_numeric;
+      is_deeply($value, {x => 1, y => 2, z => $DBL_MIN});
+    }
+  }
+
+  # Return value conversion - array
+  {
+    # Return value conversion - numeric array
     {
       {
         my $blessed_array = SPVM::TestCase::ExchangeAPI->return_numeric_array;
@@ -1007,119 +1163,171 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
         is_deeply($values, [1, 2, 3]);
       }
 
-      # Return array undef
+      # Return value conversion - array undef
       {
         my $blessed_array = SPVM::TestCase::ExchangeAPI->return_numeric_array_undef;
         ok(!defined $blessed_array);
       }
     }
-    
-    # Return object array
+      
+    # Return value conversion - object array
     {
+      # Return value conversion - object array
       {
-        my $blessed_array = SPVM::TestCase::ExchangeAPI->return_object_array;
-        my $values = $blessed_array->to_elems;
-        is($values->[0]->x, 1);
-        is($values->[0]->y, 2);
-        is($values->[1]->x, 3);
-        is($values->[1]->y, 4);
+        {
+          my $blessed_array = SPVM::TestCase::ExchangeAPI->return_object_array;
+          my $values = $blessed_array->to_elems;
+          is($values->[0]->x, 1);
+          is($values->[0]->y, 2);
+          is($values->[1]->x, 3);
+          is($values->[1]->y, 4);
+        }
+
+        # Return value conversion - array undef
+        {
+          my $blessed_array = SPVM::TestCase::ExchangeAPI->return_object_array_undef;
+          ok(!defined $blessed_array);
+        }
       }
 
-      # Return array undef
+      # Return value conversion - any object array
       {
-        my $blessed_array = SPVM::TestCase::ExchangeAPI->return_object_array_undef;
-        ok(!defined $blessed_array);
-      }
-    }
+        {
+          my $blessed_array = SPVM::TestCase::ExchangeAPI->return_any_object_array;
+          my $values = $blessed_array->to_elems;
+          is($values->[0]->x, 1);
+          is($values->[0]->y, 2);
+          is($values->[1]->x, 3);
+          is($values->[1]->y, 4);
+        }
 
-    # Return oarray
-    {
-      {
-        my $blessed_array = SPVM::TestCase::ExchangeAPI->return_any_object_array;
-        my $values = $blessed_array->to_elems;
-        is($values->[0]->x, 1);
-        is($values->[0]->y, 2);
-        is($values->[1]->x, 3);
-        is($values->[1]->y, 4);
-      }
-
-      # Return array undef
-      {
-        my $blessed_array = SPVM::TestCase::ExchangeAPI->return_any_object_array_undef;
-        ok(!defined $blessed_array);
-      }
-    }
-
-    # Return mutil numeric array
-    {
-      {
-        my $blessed_array = SPVM::TestCase::ExchangeAPI->return_multi_numeric_array;
-        my $values = $blessed_array->to_elems;
-        is_deeply($values, [{x => 1, y => 0, z => 0}, {x => 0, y => 0, z => 5}]);
+        # Return value conversion - array undef
+        {
+          my $blessed_array = SPVM::TestCase::ExchangeAPI->return_any_object_array_undef;
+          ok(!defined $blessed_array);
+        }
+        
+        # Return value conversion - any object array
+        {
+          my $values = SPVM::TestCase::ExchangeAPI->return_any_object_array->to_elems;
+          is($values->[0]->x, 1);
+          is($values->[0]->y, 2);
+          is($values->[1]->x, 3);
+          is($values->[1]->y, 4);
+        }
       }
 
-      # Return array undef
+      # Return value conversion - mutil numeric array
       {
-        my $blessed_array = SPVM::TestCase::ExchangeAPI->return_multi_numeric_array_undef;
-        ok(!defined $blessed_array);
+        {
+          my $blessed_array = SPVM::TestCase::ExchangeAPI->return_multi_numeric_array;
+          my $values = $blessed_array->to_elems;
+          is_deeply($values, [{x => 1, y => 0, z => 0}, {x => 0, y => 0, z => 5}]);
+        }
+
+        # Return value conversion - array undef
+        {
+          my $blessed_array = SPVM::TestCase::ExchangeAPI->return_multi_numeric_array_undef;
+          ok(!defined $blessed_array);
+        }
       }
-    }
-  }
 
-  # Return multi numeric
-  {
-    # Return multi numeric - byte
-    {
-      my $value = SPVM::TestCase::ExchangeAPI->return_byte_multi_numeric;
-      is_deeply($value, {x => 1, y => 2, z => $BYTE_MIN});
-    }
-    
-    # Return multi numeric - short
-    {
-      my $value = SPVM::TestCase::ExchangeAPI->return_short_multi_numeric;
-      is_deeply($value, {x => 1, y => 2, z => $SHORT_MIN});
-    }
-    
-    # Return multi numeric - int
-    {
-      my $value = SPVM::TestCase::ExchangeAPI->return_int_multi_numeric;
-      is_deeply($value, {x => 1, y => 2, z => $INT_MIN});
-    }
-    
-    # Return multi numeric - long
-    {
-      my $value = SPVM::TestCase::ExchangeAPI->return_long_multi_numeric;
-      is_deeply($value, {x => 1, y => 2, z => $LONG_MIN});
-    }
-    
-    # Return multi numeric - float
-    {
-      my $value = SPVM::TestCase::ExchangeAPI->return_float_multi_numeric;
-      is_deeply($value, {x => 1, y => 2, z => $FLT_MIN});
-    }
-    
-    # Return multi numeric - double
-    {
-      my $value = SPVM::TestCase::ExchangeAPI->return_double_multi_numeric;
-      is_deeply($value, {x => 1, y => 2, z => $DBL_MIN});
-    }
-  }
-
-  # Return oarray
-  {
-    # Return oarray
-    {
-      my $values = SPVM::TestCase::ExchangeAPI->return_any_object_array->to_elems;
-      is($values->[0]->x, 1);
-      is($values->[0]->y, 2);
-      is($values->[1]->x, 3);
-      is($values->[1]->y, 4);
+      # Return value conversion - mutil dimensional array
+      {
+        my $spvm_array = $api->new_muldim_array_len("byte[][]", 3);
+        my $spvm_array_ret = SPVM::TestCase::ExchangeAPI->return_muldim_array_only($spvm_array);
+        is(ref $spvm_array_ret, "SPVM::BlessedObject::Array");
+        is($spvm_array_ret->__get_type_name, "byte[][]");
+        is($spvm_array_ret->length, 3);
+      }
     }
   }
 }
 
-# Various tests
+# Extra
 {
+  # Pass 8-bit characters
+  {
+    my $chars_8bit = "\xff\xfe";
+    my $string = SPVM::TestCase::ExchangeAPI->pass_and_return_string($chars_8bit);
+    my $bytes = $string->to_bin;
+    is($chars_8bit, $bytes);
+  }
+  
+  # Optional argument
+  {
+    my $value = SPVM::TestCase::ExchangeAPI->optional_args_int(3);
+    is($value, 8);
+  }
+  
+  # Numeric type exception
+  {
+    is(SPVM::Byte->new(5)->value, 5);
+    is(SPVM::Short->new(5)->value, 5);
+    is(SPVM::Int->new(5)->value, 5);
+    is(SPVM::Long->new(5)->value, 5);
+    is(SPVM::Float->new(5)->value, 5);
+    is(SPVM::Double->new(5)->value, 5);
+
+    is(SPVM::Byte->new(1.5)->value, 1);
+    is(SPVM::Short->new(1.5)->value, 1);
+    is(SPVM::Int->new(1.5)->value, 1);
+    is(SPVM::Long->new(1.5)->value, 1);
+    is(SPVM::Float->new(1.5)->value, 1.5);
+    is(SPVM::Double->new(1.5)->value, 1.5);
+
+    eval { SPVM::Byte->new(undef) };
+    ok($@);
+    eval { SPVM::Short->new(undef) };
+    ok($@);
+    eval { SPVM::Int->new(undef) };
+    ok($@);
+    eval { SPVM::Long->new(undef) };
+    ok($@);
+    eval { SPVM::Float->new(undef) };
+    ok($@);
+    eval { SPVM::Double->new(undef) };
+    ok($@);
+    
+    my $bool = SPVM::Bool->TRUE;
+    
+    eval { SPVM::Byte->new($bool) };
+    ok($@);
+    eval { SPVM::Short->new($bool) };
+    ok($@);
+    eval { SPVM::Int->new($bool) };
+    ok($@);
+    eval { SPVM::Long->new($bool) };
+    ok($@);
+    eval { SPVM::Float->new($bool) };
+    ok($@);
+    eval { SPVM::Double->new($bool) };
+    ok($@);
+
+    my $ref = {};
+    
+    eval { SPVM::Byte->new($ref) };
+    ok($@);
+    eval { SPVM::Short->new($ref) };
+    ok($@);
+    eval { SPVM::Int->new($ref) };
+    ok($@);
+    eval { SPVM::Long->new($ref) };
+    ok($@);
+    eval { SPVM::Float->new($ref) };
+    ok($@);
+    eval { SPVM::Double->new($ref) };
+    ok($@);
+  }
+
+  # Inheritance
+  {
+    my $point = SPVM::Point3D->new(1, 2);
+    
+    is($point->x, 1);
+    is($point->y, 2);
+  }
+  
   # Any object array
   {
     {
@@ -1247,111 +1455,73 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
       is($object->get_minimal->get_x, 3);
     }
   }
-}
-
-# Pass 8-bit characters
-{
-  my $chars_8bit = "\xff\xfe";
-  my $string = SPVM::TestCase::ExchangeAPI->pass_and_return_string($chars_8bit);
-  my $bytes = $string->to_bin;
-  is($chars_8bit, $bytes);
-}
-
-# Optional argument
-{
-  my $value = SPVM::TestCase::ExchangeAPI->optional_args_int(3);
-  is($value, 8);
-}
-
-# Numeric type exception
-{
-  is(SPVM::Byte->new(5)->value, 5);
-  is(SPVM::Short->new(5)->value, 5);
-  is(SPVM::Int->new(5)->value, 5);
-  is(SPVM::Long->new(5)->value, 5);
-  is(SPVM::Float->new(5)->value, 5);
-  is(SPVM::Double->new(5)->value, 5);
-
-  is(SPVM::Byte->new(1.5)->value, 1);
-  is(SPVM::Short->new(1.5)->value, 1);
-  is(SPVM::Int->new(1.5)->value, 1);
-  is(SPVM::Long->new(1.5)->value, 1);
-  is(SPVM::Float->new(1.5)->value, 1.5);
-  is(SPVM::Double->new(1.5)->value, 1.5);
-
-  eval { SPVM::Byte->new(undef) };
-  ok($@);
-  eval { SPVM::Short->new(undef) };
-  ok($@);
-  eval { SPVM::Int->new(undef) };
-  ok($@);
-  eval { SPVM::Long->new(undef) };
-  ok($@);
-  eval { SPVM::Float->new(undef) };
-  ok($@);
-  eval { SPVM::Double->new(undef) };
-  ok($@);
   
-  my $bool = SPVM::Bool->TRUE;
-  
-  eval { SPVM::Byte->new($bool) };
-  ok($@);
-  eval { SPVM::Short->new($bool) };
-  ok($@);
-  eval { SPVM::Int->new($bool) };
-  ok($@);
-  eval { SPVM::Long->new($bool) };
-  ok($@);
-  eval { SPVM::Float->new($bool) };
-  ok($@);
-  eval { SPVM::Double->new($bool) };
-  ok($@);
-
-  my $ref = {};
-  
-  eval { SPVM::Byte->new($ref) };
-  ok($@);
-  eval { SPVM::Short->new($ref) };
-  ok($@);
-  eval { SPVM::Int->new($ref) };
-  ok($@);
-  eval { SPVM::Long->new($ref) };
-  ok($@);
-  eval { SPVM::Float->new($ref) };
-  ok($@);
-  eval { SPVM::Double->new($ref) };
-  ok($@);
-}
-
-# Inheritance
-{
-  my $point = SPVM::Point3D->new(1, 2);
-  
-  is($point->x, 1);
-  is($point->y, 2);
-}
-
-# Static instance method call
-{
+  # Convert a scalar value to SPVM numeric object
   {
-    my $list = SPVM::FloatList->new([]);
-    $list->SPVM::FloatList::push(1);
-    is_deeply($list->length, 1);
+
+    # SPVM::Byte->new
+    {
+      {
+        my $spvm_value = SPVM::Byte->new(-128);
+        is($spvm_value->get_class_name, 'Byte');
+        is(ref $spvm_value, 'SPVM::BlessedObject::Class');
+        ok($spvm_value->isa('SPVM::BlessedObject::Class'));
+        is($spvm_value->value, -128);
+      }
+    }
+    
+    # SPVM::Short->new
+    {
+      {
+        my $spvm_value = SPVM::Short->new(-32768);
+        is($spvm_value->get_class_name, 'Short');
+        ok($spvm_value->isa('SPVM::BlessedObject::Class'));
+        is($spvm_value->value, -32768);
+      }
+    }
+
+    # SPVM::Int->new
+    {
+      {
+        my $spvm_value = SPVM::Int->new(-2147483648);
+        is($spvm_value->get_class_name, 'Int');
+        ok($spvm_value->isa('SPVM::BlessedObject::Class'));
+        is($spvm_value->value, -2147483648);
+      }
+    }
+    # SPVM::Long->new
+    {
+      {
+        my $spvm_value = SPVM::Long->new(-9223372036854775808);
+        is($spvm_value->get_class_name, 'Long');
+        ok($spvm_value->isa('SPVM::BlessedObject::Class'));
+        is($spvm_value->value, -9223372036854775808);
+      }
+    }
+
+    # SPVM::Float->new
+    {
+      {
+        my $spvm_value = SPVM::Float->new($FLT_MAX);
+        is($spvm_value->get_class_name, 'Float');
+        ok($spvm_value->isa('SPVM::BlessedObject::Class'));
+        is($spvm_value->value, $FLT_MAX);
+      }
+    }
+
+    # SPVM::Double->new
+    {
+      {
+        my $spvm_value = SPVM::Double->new($DBL_MAX);
+        is($spvm_value->get_class_name, 'Double');
+        ok($spvm_value->isa('SPVM::BlessedObject::Class'));
+        is($spvm_value->value, $DBL_MAX);
+      }
+    }
   }
 }
 
-# Invalid argument type
-{
-  {
-    my $list = SPVM::IntList->new([]);
-    eval { $list->push(undef) };
-    ok($@);
-  }
-  {
-    eval { SPVM::IntList->new(1) };
-    ok($@);
-  }
-}
+$api->set_exception(undef);
 
 # All object is freed
 my $end_memory_blocks_count = $api->get_memory_blocks_count();

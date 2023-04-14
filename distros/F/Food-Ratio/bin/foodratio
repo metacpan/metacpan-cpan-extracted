@@ -55,8 +55,8 @@ foodratio - calculate ingredient ratios
   2 water wet
   4 flour dry
   $ foodratio recipe
-  $ foodratio --ratio id:flour
-  $ foodratio --mass 55 --weigh group:wet
+  $ foodratio --ratio id:flour recipe
+  $ foodratio --mass 55 --weigh group:wet recipe
 
 =head1 DESCRIPTION
 
@@ -95,6 +95,29 @@ Sets the ingredient or ingredient group to use as the basis for the
 B<mass> argument, which by default is otherwise the total mass.
 
 =back
+
+=head1 EXAMPLE
+
+Given a file containing
+
+  160 cornmeal flour dry
+  150 flour flour dry
+  11 bpowder dry
+  3.5 salt dry
+  30 sugar dry
+  250 milk wet
+  70 oil fat wet
+  58 egg wet
+
+one may weigh an egg and discover that it is 55 grams, and rescale the
+recipe based on that
+
+  $ foodratio cornbread    | grep cornmeal
+  160     21.84%  cornmeal        flour   dry
+  $ foodratio --mass 55 --weigh id:egg cornbread  | grep cornmeal
+  151.7   21.84%  cornmeal        flour   dry
+
+and know to use 152 grams of cornmeal instead of 160.
 
 =head1 SEE ALSO
 

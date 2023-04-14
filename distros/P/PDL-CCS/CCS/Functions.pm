@@ -9,7 +9,13 @@ use PDL::VectorValued;
 use PDL;
 use strict;
 
-our $VERSION = '1.23.20'; ##-- update with perl-reversion from Perl::Version module
+my @ccs_binops = qw(
+  plus minus mult divide modulo power
+  gt ge lt le eq ne spaceship
+  and2 or2 xor shiftleft shiftright
+);
+
+our $VERSION = '1.23.22'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -19,11 +25,7 @@ our @EXPORT_OK =
    ##
    ##-- Vector Operations (compat)
    qw(ccs_binop_vector_mia),
-   (map { "ccs_${_}_vector_mia" } (
-				   qw(plus minus mult divide modulo power),
-				   qw(gt ge lt le eq ne spaceship),
-				   qw(and2 or2 xor shiftleft shiftright),
-				  )),
+   (map "ccs_${_}_vector_mia", @ccs_binops),
    ##
    ##-- qsort
    qw(ccs_qsort),
@@ -225,37 +227,15 @@ and uses \&PDLCODE to perform underlying computation.
 sub ccs_binop_vector_mia {
   my ($opName,$pdlCode) = @_;
   return sub :lvalue {
-    my ($wi,$nzvals_in, $vec,$nzvals_out) = @_;
-    $nzvals_out = zeroes(($nzvals_in->type > $vec->type ? $nzvals_in->type : $vec->type), $nzvals_in->nelem)
-      if (!defined($nzvals_out));
-    $pdlCode->($nzvals_in, $vec->index($wi), $nzvals_out, 0);
-    return $nzvals_out;
+    my ($wi, $nzvals_in, $vec) = @_;
+    my $tmp = $pdlCode->($nzvals_in, $vec->index($wi), 0); # $tmp for perl -d
   };
 }
 
-##-- Arithmetic
-*PDL::ccs_plus_vector_mia   = *ccs_plus_vector_mia   = ccs_binop_vector_mia('plus',\&PDL::plus);      ##-- addition
-*PDL::ccs_minus_vector_mia  = *ccs_minus_vector_mia  = ccs_binop_vector_mia('minus',\&PDL::minus);    ##-- subtraction
-*PDL::ccs_mult_vector_mia   = *ccs_mult_vector_mia   = ccs_binop_vector_mia('mult',\&PDL::mult);      ##-- multiplication
-*PDL::ccs_divide_vector_mia = *ccs_divide_vector_mia = ccs_binop_vector_mia('divide',\&PDL::divide);  ##-- division
-*PDL::ccs_modulo_vector_mia = *ccs_modulo_vector_mia = ccs_binop_vector_mia('modulo',\&PDL::modulo);  ##-- modulo
-*PDL::ccs_power_vector_mia  = *ccs_power_vector_mia  = ccs_binop_vector_mia('power',\&PDL::power);    ##-- potentiation
-
-##-- Comparison
-*PDL::ccs_gt_vector_mia = *ccs_gt_vector_mia = ccs_binop_vector_mia('gt',\&PDL::gt);        ##-- greater-than
-*PDL::ccs_ge_vector_mia = *ccs_ge_vector_mia = ccs_binop_vector_mia('ge',\&PDL::ge);        ##-- greater-than-or-equal
-*PDL::ccs_lt_vector_mia = *ccs_lt_vector_mia = ccs_binop_vector_mia('lt',\&PDL::lt);        ##-- less-than
-*PDL::ccs_le_vector_mia = *ccs_le_vector_mia = ccs_binop_vector_mia('le',\&PDL::le);        ##-- less-than-or-equal
-*PDL::ccs_eq_vector_mia = *ccs_eq_vector_mia = ccs_binop_vector_mia('eq',\&PDL::eq);        ##-- equality
-*PDL::ccs_ne_vector_mia = *ccs_ne_vector_mia = ccs_binop_vector_mia('ne',\&PDL::ne);        ##-- inequality
-*PDL::ccs_spaceship_vector_mia = *ccs_spaceship_vector_mia = ccs_binop_vector_mia('spaceship',\&PDL::spaceship); ##-- <=>
-
-##-- Logic & Bitwise
-*PDL::ccs_and2_vector_mia = *ccs_and2_vector_mia = ccs_binop_vector_mia('and',\&PDL::and2);     ##-- logical AND (and2)
-*PDL::ccs_or2_vector_mia  = *ccs_or2_vector_mia  = ccs_binop_vector_mia('or',\&PDL::or2);       ##-- logical OR   (or2)
-*PDL::ccs_xor_vector_mia  = *ccs_xor_vector_mia  = ccs_binop_vector_mia('xor',\&PDL::xor);      ##-- binary XOR  (xor)
-*PDL::ccs_shiftleft_vector_mia = *ccs_shiftleft_vector_mia = ccs_binop_vector_mia('shiftleft',\&PDL::shiftleft);     ##-- <<
-*PDL::ccs_shiftright_vector_mia = *ccs_shiftright_vector_mia = ccs_binop_vector_mia('shiftright',\&PDL::shiftright); ##-- >>
+for (@ccs_binops) {
+  no strict 'refs';
+  *{"PDL::ccs_${_}_vector_mia"} = *{"ccs_${_}_vector_mia"} = ccs_binop_vector_mia($_, PDL->can($_));
+}
 
 ##======================================================================
 ## Sorting

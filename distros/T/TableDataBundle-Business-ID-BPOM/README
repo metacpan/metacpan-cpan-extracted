@@ -4,9 +4,9 @@ NAME
     National Agency or Drug and Food Control)
 
 VERSION
-    This document describes version 20221027.0.0 of
+    This document describes version 20230207.0.0 of
     TableDataBundle::Business::ID::BPOM (from Perl distribution
-    TableDataBundle-Business-ID-BPOM), released on 2022-10-27.
+    TableDataBundle-Business-ID-BPOM), released on 2023-02-07.
 
 DESCRIPTION
     This distribution contains the following TableData:: modules:
@@ -48,7 +48,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

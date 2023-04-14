@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
+use t_Common qw/oops/; # strict, warnings, Carp, etc.
+use t_TestCommon ':silent', qw/bug/; # Test::More etc.
 
 use Data::Dumper::Interp;
 
@@ -179,6 +180,13 @@ is( dvis('\%{}'), '\%{}' );
 { my $obj = bless do{ \(my $x = []) },"Foo::Bar";
   like( Data::Dumper::Interp->new()->Foldwidth(0)->vis($obj),
         qr/^\Q$obj\E$/ );
+}
+
+# Once caused << "<NQMagic...>0" isn't numeric in scalar assignment >>
+# when the apparent reference to a zero was to be replaced by a reference
+# to "<NQMagic...>0" in the cloned data.
+{ my @ary = (42);
+  ok( eval{ vis(\$#ary) }, 'vis(\$#array) did not hit a bug' );
 }
 
 ## Once hit an assertion

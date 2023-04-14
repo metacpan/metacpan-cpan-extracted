@@ -1,0 +1,8 @@
+Revision history for Perl extension Device::GPIB.
+
+0.01  Thu Mar 30 13:02:50 2023
+	- original version; created by h2xs 1.23 with options
+		-X -n Device::GPIB
+1.0   2023-03-30
+      - Integrated with much previously existing code, ready for publication on CPAN.
+      

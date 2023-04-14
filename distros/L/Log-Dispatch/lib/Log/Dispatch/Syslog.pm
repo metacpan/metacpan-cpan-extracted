@@ -3,12 +3,12 @@ package Log::Dispatch::Syslog;
 use strict;
 use warnings;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
-use Scalar::Util qw( reftype );
-use Sys::Syslog 0.28 ();
+use Scalar::Util               qw( reftype );
+use Sys::Syslog 0.28           ();
 use Try::Tiny;
 
 use base qw( Log::Dispatch::Output );
@@ -137,7 +137,7 @@ Log::Dispatch::Syslog - Object for logging to system log.
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -157,12 +157,12 @@ version 2.70
 
 =head1 DESCRIPTION
 
-This module provides a simple object for sending messages to the
-system log (via UNIX syslog calls).
+This module provides a simple object for sending messages to the system log
+(via UNIX syslog calls).
 
-Note that logging may fail if you try to pass UTF-8 characters in the
-log message. If logging fails and warnings are enabled, the error
-message will be output using Perl's C<warn>.
+Note that logging may fail if you try to pass UTF-8 characters in the log
+message. If logging fails and warnings are enabled, the error message will be
+output using Perl's C<warn>.
 
 =for Pod::Coverage new log_message
 
@@ -175,30 +175,27 @@ parameters documented in L<Log::Dispatch::Output>:
 
 =item * ident ($)
 
-This string will be prepended to all messages in the system log.
-Defaults to $0.
+This string will be prepended to all messages in the system log. Defaults to
+$0.
 
 =item * logopt ($)
 
-A string containing the log options (separated by any separator you
-like). See the openlog(3) and Sys::Syslog docs for more details.
-Defaults to ''.
+A string containing the log options (separated by any separator you like). See
+the openlog(3) and Sys::Syslog docs for more details. Defaults to ''.
 
 =item * facility ($)
 
-Specifies what type of program is doing the logging to the system log.
-Valid options are 'auth', 'authpriv', 'cron', 'daemon', 'kern',
-'local0' through 'local7', 'mail, 'news', 'syslog', 'user',
-'uucp'. Defaults to 'user'
+Specifies what type of program is doing the logging to the system log. Valid
+options are 'auth', 'authpriv', 'cron', 'daemon', 'kern', 'local0' through
+'local7', 'mail, 'news', 'syslog', 'user', 'uucp'. Defaults to 'user'
 
 =item * socket ($, \@, or \%)
 
-Tells what type of socket to use for sending syslog messages. Valid
-options are listed in C<Sys::Syslog>.
+Tells what type of socket to use for sending syslog messages. Valid options are
+listed in C<Sys::Syslog>.
 
-If you don't provide this, then we let C<Sys::Syslog> simply pick one
-that works, which is the preferred option, as it makes your code more
-portable.
+If you don't provide this, then we let C<Sys::Syslog> simply pick one that
+works, which is the preferred option, as it makes your code more portable.
 
 If you pass an array reference, it is dereferenced and passed to
 C<Sys::Syslog::setlogsock()>.
@@ -224,8 +221,6 @@ This defaults to false.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Log-Dispatch/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Log-Dispatch can be found at L<https://github.com/houseabsolute/Log-Dispatch>.
@@ -236,7 +231,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2023 by Dave Rolsky.
 
 This is free software, licensed under:
 

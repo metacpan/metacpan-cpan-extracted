@@ -1,6 +1,5 @@
 Build.PL
 Changes
-demo/test_book_collate.pl
 lib/Book/Collate.pm
 lib/Book/Collate/Book.pm
 lib/Book/Collate/Report.pm
@@ -15,4 +14,3 @@ t/00-load.t
 t/01-kwalitee.t
 t/pod-coverage.t
 t/pod.t
-xt/boilerplate.t

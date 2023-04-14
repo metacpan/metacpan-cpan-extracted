@@ -8,17 +8,19 @@ use JSON::MaybeXS;
 use LWP::UserAgent;
 use URI;
 
+use constant FIRST_YEAR => 1940;
+
 =head1 NAME
 
 Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather data
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -30,7 +32,7 @@ our $VERSION = '0.04';
 =head1 DESCRIPTION
 
 Weather::Meteo provides an interface to open-meteo.com
-for historical weather data
+for historical weather data from 1940.
 
 =head1 METHODS
 
@@ -109,6 +111,15 @@ sub weather {
 		return;
 	}
 
+	if($date =~ /^(\d{4})-/) {
+		my $year = $1;
+
+		return if($1 < FIRST_YEAR);
+	} else {
+		Carp::carp("'$date' is not a valid date");
+		return;
+	}
+
 	my $uri = URI->new("https://$self->{host}/v1/archive");
 	my %query_parameters = (
 		'latitude' => $latitude,
@@ -116,10 +127,13 @@ sub weather {
 		'start_date' => $date,
 		'end_date' => $date,
 		'hourly' => 'temperature_2m,rain,snowfall,weathercode',
-		'timezone' => 'Europe/London',
+		'daily' => 'weathercode,temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum,precipitation_hours',
+		'timezone' => 'Europe/London',	# FIXME
+			# https://stackoverflow.com/questions/16086962/how-to-get-a-time-zone-from-a-location-using-latitude-and-longitude-coordinates
 		'windspeed_unit' => 'mph',
 		'precipitation_unit' => 'inch'
 	);
+
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string();
 
@@ -186,6 +200,40 @@ Lots of thanks to the folks at L<https://open-meteo.com>.
 =head1 BUGS
 
 =head1 SEE ALSO
+
+Open Meteo API: L<https://open-meteo.com/en/docs#api_form>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Weather::Meteo
+
+You can also look for information at:
+
+=over 4
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Weather-Meteo>
+
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Weather-Meteo>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/Weather-Meteo>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Weather-Meteo>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=Weather-Meteo>
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -5,7 +5,7 @@ use warnings;
 use base 'Excel::Writer::XLSX';
 use Excel::Writer::XLSX::Utility;
 
-use version; our $VERSION = version->declare("v1.1.2");
+use version; our $VERSION = version->declare("v1.1.3");
 
 use Archive::Zip;
 use Graphics::ColorUtils 'rgb2hls', 'hls2rgb';

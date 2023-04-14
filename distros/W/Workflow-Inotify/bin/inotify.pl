@@ -34,7 +34,7 @@ Readonly::Hash our %EVENTS => (
   IN_OPEN          => IN_OPEN,
 );
 
-our $VERSION = '1.0.3'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.0.5'; ## no critic (RequireInterpolationOfMetachars)
 
 our %WATCH_HANDLERS;
 our $KEEP_GOING = $TRUE;

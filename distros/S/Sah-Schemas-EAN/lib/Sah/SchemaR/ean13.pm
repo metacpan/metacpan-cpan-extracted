@@ -1,12 +1,13 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::ean13;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2023-01-27'; # DATE
+our $VERSION = '0.009'; # VERSION
 
-our $rschema = ["str",[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",examples=>[{valid=>1,validated_value=>5901234123457,value=>"5-901234-123457"},{summary=>"Invalid checkdigit",valid=>0,value=>"123-4567890-123"},{summary=>"Less than 13 digits",valid=>0,value=>1234567890},{summary=>"More than 13 digits",valid=>0,value=>12345678901234}],match=>"\\A[0-9]{13}\\z",summary=>"EAN-13 number","x.perl.coerce_rules"=>["From_str::to_ean13"]}],["str"]];
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\nLength must be 13 digits.\n\n",examples=>[{valid=>1,validated_value=>5901234123457,value=>"5-901234-123457"},{summary=>"Invalid checkdigit",valid=>0,value=>"123-4567890-123"},{summary=>"Less than 13 digits",valid=>0,value=>1234567890},{summary=>"More than 13 digits",valid=>0,value=>12345678901234}],match=>"\\A[0-9]{13}\\z",summary=>"EAN-13 number (e.g. 5-901234-123457)","x.perl.coerce_rules"=>["From_str::to_ean13"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: EAN-13 number
+# ABSTRACT: EAN-13 number (e.g. 5-901234-123457)
 
 __END__
 
@@ -16,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::ean13 - EAN-13 number
+Sah::SchemaR::ean13 - EAN-13 number (e.g. 5-901234-123457)
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::ean13 (from Perl distribution Sah-Schemas-EAN), released on 2020-03-08.
+This document describes version 0.009 of Sah::SchemaR::ean13 (from Perl distribution Sah-Schemas-EAN), released on 2023-01-27.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-EAN>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-EAN>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

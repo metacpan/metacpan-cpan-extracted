@@ -9,6 +9,7 @@ Makefile.PL
 README
 dist.ini
 lib/Crypt/Passphrase/Argon2.pm
+lib/Crypt/Passphrase/Argon2/Encrypted.pm
 t/00-compile.t
 t/basic.t
 xt/author/pod-syntax.t

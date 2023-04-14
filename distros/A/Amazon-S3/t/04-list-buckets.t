@@ -5,25 +5,23 @@
 use warnings;
 use strict;
 
-use lib 'lib';
+use lib qw(. lib);
 
 use English qw{-no_match_vars};
+
+use S3TestUtils qw(:constants :subs);
 
 use Test::More;
 use Data::Dumper;
 
-my $aws_access_key_id     = $ENV{'AWS_ACCESS_KEY_ID'}     // 'foo';
-my $aws_secret_access_key = $ENV{'AWS_ACCESS_KEY_SECRET'} // 'foo';
-my $token                 = $ENV{'AWS_SESSION_TOKEN'};
-
-my $host = $ENV{AMAZON_S3_HOST};
+my $host = set_s3_host();
 
 if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'} ) {
   plan skip_all => 'Testing this module for real costs money.';
-} ## end if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'...})
+}
 else {
-  plan tests => 16;
-} ## end else [ if ( !$ENV{'AMAZON_S3_EXPENSIVE_TESTS'...})]
+  plan tests => 11;
+}
 
 ########################################################################
 # BEGIN TESTS
@@ -32,73 +30,66 @@ else {
 use_ok('Amazon::S3');
 use_ok('Amazon::S3::Bucket');
 
-my $s3;
+my $s3 = get_s3_service($host);
 
-if ( $ENV{AMAZON_S3_CREDENTIALS} ) {
-  require Amazon::Credentials;
+my $bucket_name = make_bucket_name();
 
-  $s3 = Amazon::S3->new(
-    { credentials => Amazon::Credentials->new,
-      host        => $host,
-      log_level   => $ENV{DEBUG} ? 'debug' : undef,
-    }
-  );
-  ( $aws_access_key_id, $aws_secret_access_key, $token )
-    = $s3->get_credentials;
-} ## end if ( $ENV{AMAZON_S3_CREDENTIALS...})
-else {
-  $s3 = Amazon::S3->new(
-    { aws_access_key_id     => $aws_access_key_id,
-      aws_secret_access_key => $aws_secret_access_key,
-      token                 => $token,
-      debug                 => $ENV{DEBUG},
-      host                  => $host,
-      secure                => $host ? 0 : 1,         # if host then probably container
-    }
-  );
-} ## end else [ if ( $ENV{AMAZON_S3_CREDENTIALS...})]
+my $bucket_obj = create_bucket( $s3, $bucket_name );
 
-my $bucketname_raw = sprintf 'net-amazon-s3-test-%s', lc $aws_access_key_id;
-
-my $bucketname = '/' . $bucketname_raw;
-
-my $bucket_obj = eval { $s3->add_bucket( { bucket => $bucketname } ); };
+ok( ref $bucket_obj, 'created bucket - ' . $bucket_name );
 
 if ( $EVAL_ERROR || !$bucket_obj ) {
   BAIL_OUT( $s3->err . ": " . $s3->errstr );
-} ## end if ( $EVAL_ERROR || !$bucket_obj)
+}
 
-is( ref $bucket_obj, 'Amazon::S3::Bucket', 'created bucket' . $bucketname )
-  or BAIL_OUT("could not create bucket $bucketname");
+my $bad_bucket = $s3->bucket( { bucket => 'does-not-exists' } );
 
-my $response = $bucket_obj->list
-  or BAIL_OUT( $s3->err . ": " . $s3->errstr );
+my $response = $bad_bucket->list( { bucket => $bad_bucket } );
 
-is( $response->{bucket}, $bucketname_raw, 'no bucket name in list response' )
-  or do {
-  diag( Dumper( [$response] ) );
-  BAIL_OUT( Dumper [$response] );
-  };
+ok( !defined $response, 'undef returned on non-existent bucket' );
 
-ok( !$response->{prefix}, 'no prefix in list response' );
-ok( !$response->{marker}, 'no marker in list response' );
+like( $bad_bucket->errstr, qr/does\snot\sexist/xsm, 'errstr populated' )
+  or diag(
+  Dumper(
+    [ response => $response,
+      errstr   => $bad_bucket->errstr,
+      err      => $bad_bucket->err,
+    ]
+  )
+  );
 
-is( $response->{max_keys}, 1_000, 'max keys default = 1000' )
-  or BAIL_OUT( Dumper [$response] );
+my $max_keys = 25;
 
-is( $response->{is_truncated}, 0, 'is_truncated 0' );
+########################################################################
+subtest 'list (check response elements)' => sub {
+########################################################################
+  my $response = $bucket_obj->list
+    or BAIL_OUT( $s3->err . ": " . $s3->errstr );
 
-is_deeply( $response->{keys}, [], 'no keys in bucket yet' )
-  or BAIL_OUT( Dumper( [$response] ) );
+  is( $response->{bucket}, $bucket_name, 'no bucket name in list response' )
+    or do {
+    diag( Dumper( [$response] ) );
+    BAIL_OUT( Dumper [$response] );
+    };
 
-foreach my $key ( 0 .. 9 ) {
-  my $keyname = sprintf 'testing-%02d.txt', $key;
-  my $value   = 'T';
+  ok( !$response->{prefix}, 'no prefix in list response' );
+  ok( !$response->{marker}, 'no marker in list response' );
 
-  $bucket_obj->add_key( $keyname, $value );
-} ## end foreach my $key ( 0 .. 9 )
+  is( $response->{max_keys}, 1_000, 'max keys default = 1000' )
+    or BAIL_OUT( Dumper [$response] );
 
+  is( $response->{is_truncated}, 0, 'is_truncated 0' );
+
+  is_deeply( $response->{keys}, [], 'no keys in bucket yet' )
+    or BAIL_OUT( Dumper( [$response] ) );
+};
+
+########################################################################
 subtest 'list_all' => sub {
+########################################################################
+
+  add_keys( $bucket_obj, $max_keys );
+
   my $response = $bucket_obj->list_all;
 
   is( ref $response, 'HASH', 'response isa HASH' )
@@ -107,46 +98,49 @@ subtest 'list_all' => sub {
   is( ref $response->{keys}, 'ARRAY', 'keys element is an ARRAY' )
     or diag( Dumper( [$response] ) );
 
-  is( @{ $response->{keys} }, 10, '10 keys returned' )
+  is( @{ $response->{keys} }, $max_keys, $max_keys . ' keys returned' )
     or diag( Dumper( [$response] ) );
 
   foreach my $key ( @{ $response->{keys} } ) {
     is( ref $key, 'HASH', 'array element isa HASH' )
       or diag( Dumper( [$key] ) );
 
-    like( $key->{key}, qr/testing-\d{2}.txt/, 'keyname' )
+    like( $key->{key}, qr/testing-\d{2}[.]txt/xsm, 'keyname' )
       or diag( Dumper( [$key] ) );
 
-  } ## end foreach my $key ( @{ $response...})
+  }
 };
 
+########################################################################
 subtest 'list' => sub {
+########################################################################
 
   my $marker = '';
   my $iter   = 0; # so we don't loop forever if this is busted
 
   my @key_list;
+  my $page_size = int $max_keys / 2;
 
   while ( $marker || !$iter ) {
-    last if $iter++ > 5;
+    last if $iter++ > $max_keys;
 
-    $response = $bucket_obj->list(
-      { 'max-keys' => 3,
+    my $response = $bucket_obj->list(
+      { 'max-keys' => $page_size,
         marker     => $marker,
-        delimiter  => '/'
+        delimiter  => '/',
       }
     );
 
     if ( !$response ) {
       BAIL_OUT( $s3->err . ": " . $s3->errstr );
-    } ## end if ( !$response )
+    }
 
-    is( $response->{bucket}, $bucketname_raw, 'no bucket name' );
+    is( $response->{bucket}, $bucket_name, 'no bucket name' );
 
     ok( !$response->{prefix}, 'no prefix' )
       or diag( Dumper [$response] );
 
-    is( $response->{max_keys}, 3, 'max-keys 3' );
+    is( $response->{max_keys}, $page_size, 'max-keys ' . $page_size );
 
     is( ref $response->{keys}, 'ARRAY' )
       or BAIL_OUT( Dumper( [$response] ) );
@@ -154,24 +148,29 @@ subtest 'list' => sub {
     push @key_list, @{ $response->{keys} };
 
     $marker = $response->{next_marker};
-  } ## end while ( $marker || !$iter)
 
-  is( @key_list, 10, 'got 10 keys' )
-    or diag( Dumper( \@key_list ) );
+    last if !$marker;
+  }
+
+  is( @key_list, $max_keys, $max_keys . ' returned' )
+    or diag( Dumper( [ key_list => \@key_list ] ) );
 };
 
-subtest 'list-v2' => sub {
+########################################################################
+subtest 'list_v2' => sub {
+########################################################################
 
   my $marker = '';
   my $iter   = 0; # so we don't loop forever if this is busted
 
   my @key_list;
+  my $page_size = int $max_keys / 2;
 
   while ( $marker || !$iter ) {
-    last if $iter++ > 5;
+    last if $iter++ > $max_keys;
 
-    $response = $bucket_obj->list_v2(
-      { 'max-keys' => 3,
+    my $response = $bucket_obj->list_v2(
+      { 'max-keys' => $page_size,
         $marker ? ( 'marker' => $marker ) : (),
         delimiter => '/',
       }
@@ -179,14 +178,14 @@ subtest 'list-v2' => sub {
 
     if ( !$response ) {
       BAIL_OUT( $s3->err . ": " . $s3->errstr );
-    } ## end if ( !$response )
+    }
 
-    is( $response->{bucket}, $bucketname_raw, 'no bucket name' );
+    is( $response->{bucket}, $bucket_name, 'no bucket name' );
 
     ok( !$response->{prefix}, 'no prefix' )
       or diag( Dumper [$response] );
 
-    is( $response->{max_keys}, 3, 'max-keys 3' );
+    is( $response->{max_keys}, $page_size, 'max-keys ' . $page_size );
 
     is( ref $response->{keys}, 'ARRAY' )
       or BAIL_OUT( Dumper( [$response] ) );
@@ -194,26 +193,41 @@ subtest 'list-v2' => sub {
     push @key_list, @{ $response->{keys} };
 
     $marker = $response->{next_marker};
-  } ## end while ( $marker || !$iter)
 
-  is( @key_list, 10, 'got 10 keys' )
+    last if !$marker;
+  }
+
+  is( @key_list, $max_keys, $max_keys . ' returned' )
     or diag( Dumper( \@key_list ) );
 };
 
-$response = $s3->list_bucket_all( { bucket => $bucketname } );
+########################################################################
+subtest 'list_bucket_all' => sub {
+########################################################################
 
-is( ref $response,          'HASH', 'list_bucket_all response is a HASH' );
-is( @{ $response->{keys} }, 10,     'got all 10 keys' );
+  $max_keys += add_keys( $bucket_obj, $max_keys, 'foo/' );
 
-$response = $s3->list_bucket_all_v2( { bucket => $bucketname } );
-is( ref $response,          'HASH', 'list_bucket_all_v2 response is a HASH' );
-is( @{ $response->{keys} }, 10,     'got all 10 keys' );
+  my $response = $s3->list_bucket_all( { bucket => $bucket_name } );
 
-foreach my $key ( 0 .. 9 ) {
-  my $keyname = sprintf 'testing-%02d.txt', $key;
+  is( ref $response, 'HASH', 'list_bucket_all response is a HASH' );
 
-  $bucket_obj->delete_key($keyname);
-} ## end foreach my $key ( 0 .. 9 )
+  is( @{ $response->{keys} }, $max_keys, $max_keys . ' returned' );
+};
+
+########################################################################
+subtest 'list_bucket_all_v2' => sub {
+########################################################################
+
+  my $response = $s3->list_bucket_all_v2( { bucket => $bucket_name } );
+
+  is( ref $response, 'HASH', 'list_bucket_all_v2 response is a HASH' );
+
+  is( @{ $response->{keys} }, $max_keys, $max_keys . ' returned' );
+
+  foreach ( @{ $response->{keys} } ) {
+    $bucket_obj->delete_key( $_->{key} );
+  }
+};
 
 $bucket_obj->delete_bucket;
 

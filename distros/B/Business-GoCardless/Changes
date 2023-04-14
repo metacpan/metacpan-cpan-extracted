@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.38     2023-04-03
+        - Fix a warning in Business::GoCardless::Resource
+
 0.37     2023-02-01
         - Add verified_at to Mandate object
 

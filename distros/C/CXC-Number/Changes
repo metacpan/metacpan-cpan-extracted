@@ -1,5 +1,52 @@
 Revision history for CXC-Number
 
+0.12      2023-04-10 13:42:39-04:00 America/New_York
+
+  [BUGFIX]
+
+    * CXC::Number::Grid
+      * The object returned by ->pdl() should have returned a PDL
+        ndarray object for the 'include' method instead of a Perl array.
+      * the objects returned by ->pdl() and ->bignum() didn't contain
+        all of the attributes of the parent object.
+
+  [ENHANCEMENTS]
+
+    * CXC::Number::Grid
+      * new methods: to_string, and, and_n
+      * new overloads: logical AND (&)
+
+
+0.11      2023-04-03 21:16:09-04:00 America/New_York
+
+  [BUGFIX]
+
+    * CXC::Number::Grid: use of '|' overload when 'bitwise' feature
+      was on resulted in a exception.
+
+0.10      2023-04-02 17:53:43-04:00 America/New_York
+
+  [BUILD]
+
+    * require Perl 5.28 (not 5.26) as state variables are initialized
+      in list context. CPANTesters FTW (++BINGOS, ++SREZIC)
+
+    * CXC::Number::Grid:
+      * Change "snap-to" distance in tests to see if CPAN failures are
+        due to floating point comparison issues.
+
+  [ENHANCEMENTS]
+
+    * Grid constructor can accept bin boundries instead of edges
+
+0.09      2023-04-01 21:14:51-04:00 America/New_York
+
+  [ENHANCEMENTS]
+
+    * CXC::Number::Grid
+      * new methods: TO_HASH, combine_bins, not, or, or_n
+      * new overloads: logical NOT (!), logical OR (|)
+
 0.08      2022-07-27 10:09:20-04:00 America/New_York
 
   [BUILD FIX]
@@ -16,12 +63,12 @@ Revision history for CXC-Number
 
   [BUG FIX]
 
-    * Number::Grid::overlay_n compard range extrema as strings instead
+    * CXC::Number::Grid::overlay_n compared range extrema as strings instead
       of numbers.  Ooops.
 
   [ENHANCEMENT]
 
-    * The edges argument to Number::Grid->new can take a Number::Sequence object
+    * The edges argument to CXC::Number::Grid->new can take a CXC::Number::Sequence object
 
 0.05      2021-05-03 10:13:09-04:00 America/New_York
 

@@ -22,12 +22,15 @@ lib/PDK/Device/Fortinet.pm
 lib/PDK/Device/H3c.pm
 lib/PDK/Device/Hillstone.pm
 lib/PDK/Device/Huawei.pm
+lib/PDK/Device/Juniper.pm
 lib/PDK/Device/Neteye.pm
 lib/PDK/Device/Netscreen.pm
+lib/PDK/Device/Nexus.pm
 lib/PDK/Device/NexusApi.pm
 lib/PDK/Device/Paloalto.pm
 lib/PDK/Device/Radware.pm
 lib/PDK/Device/Role.pm
+lib/PDK/Device/Ruijie.pm
 lib/PDK/Device/Srx.pm
 lib/PDK/Device/Topsec.pm
 lib/PDK/Firewall/Element/Address/Asa.pm

@@ -30,6 +30,7 @@ my @files = (
     't/lib/My/Test/TO_JSON/C4_deprecated.pm',
     't/lib/My/Test/TO_JSON/R1.pm',
     't/parent_modifiers.t',
+    't/regressions/leadingunderscore_in_attr.t',
     't/to_hash/class.t',
     't/to_hash/modify.t',
     't/to_hash/modify_deprecated.t',

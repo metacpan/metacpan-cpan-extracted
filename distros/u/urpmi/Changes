@@ -1,3 +1,31 @@
+Version 8.131 - 13 April 2023
+
+- urpmi:
+  o Fix --auto-orphans vs new kernel naming
+    (having multuple "kernel" pkgs with different versions)
+
+Version 8.130 - 28 January 2023
+
+- library:
+  o force timestamping=off when using wget to avoid conflict with --force-clobber
+
+Version 8.129 - 21 January 2023
+
+- library:
+  o prefer wget to curl as the default downloader (mga#24362)
+  o fix curl options to allow it to follow HTTP redirections (mga#31339)
+- cpan_testers:
+  o Skip mirrorlist tests if there's only one broken mirror such as on mga[1-6]
+- urpmq:
+  o --requires/suggests: do not warn about 14y+ old behavior change (mga#26448)
+
+Version 8.128 - 5 November 2022
+
+- library:
+  o fix download with curl 7.86+ when the URL has a query part (mga#31047)
+- gurpmi2:
+  o fix Cancel button getting lost after first batch of downloads is done
+
 Version 8.127 - 31 October 2021
 
 - Convert from bdb backend to sqlite also when not chrooted

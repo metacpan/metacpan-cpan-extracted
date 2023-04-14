@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 // The maximum number of sockets that a Windows Sockets application can use is not affected by the manifest constant FD_SETSIZE

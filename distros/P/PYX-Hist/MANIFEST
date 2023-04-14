@@ -1,7 +1,7 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
-examples/ex3.pl
+examples/hist.pl
+examples/hist_with_bad_end_element.pl
+examples/hist_with_missing_element.pl
 Hist.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

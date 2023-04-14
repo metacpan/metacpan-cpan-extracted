@@ -2,6 +2,15 @@ package HTML::Index::Store::DataDumper;
 
 #------------------------------------------------------------------------------
 #
+# Pragmas
+#
+#------------------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+#------------------------------------------------------------------------------
+#
 # Modules
 #
 #------------------------------------------------------------------------------
@@ -106,7 +115,7 @@ module, that uses Data::Dumper files to store the inverted index.
 
 =head1 AUTHOR
 
-Ave Wrigley <Ave.Wrigley@itn.co.uk>
+Ave Wrigley <ave.wrigley@gmail.com>
 
 =head1 COPYRIGHT
 

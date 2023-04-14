@@ -1,15 +1,47 @@
-# severity = brutal
-
-theme = (pbp + freenode)
+severity = brutal
 verbose = 9
 
-[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+exclude = Freenode
 
+
+
+[-BuiltinFunctions::RequireBlockGrep]
+[-BuiltinFunctions::RequireBlockMap]
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+[-Documentation::ProhibitUnbalancedParens]
+[-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBriefOpen]
+[-NamingConventions::Capitalization]
+[-Documentation::PodSpelling]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::ProhibitExplicitReturnUndef]
 [-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::ProhibitNestedSubs]
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+[-TryTiny::RequireUse]
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+[-ValuesAndExpressions::ProhibitFiletest_f]
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[-ValuesAndExpressions::ProhibitVersionStrings]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-ValuesAndExpressions::RequireNumericVersion]
+[-Variables::ProhibitPunctuationVars]
 
-[Variables::ProhibitUnusedVarsStricter]
+[CodeLayout::RequireTidyCode]
+perltidyrc = perltidy.rc
 
-[TryTiny::RequireUse]
-
-[TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Moo Moo::Role strictures Test2::V0
+[Community::StrictWarnings]
+extra_importers = Moo Moo::Role strictures Test2::V0

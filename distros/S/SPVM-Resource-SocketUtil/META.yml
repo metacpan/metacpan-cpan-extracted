@@ -1,11 +1,11 @@
 ---
-abstract: 'The Resource for Socket Utilities'
+abstract: 'Resource for Socket Utilities'
 author:
-  - USER_NAME<USER_MAIL>
+  - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.9662'
+  SPVM: '0.9701'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,7 +17,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  SPVM: '0.9701'
 resources: {}
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

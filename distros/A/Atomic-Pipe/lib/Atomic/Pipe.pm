@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use IO();
 use Fcntl();
@@ -323,6 +323,7 @@ sub set_mixed_data_mode {
 
 sub get_line_burst_or_data {
     my $self = shift;
+    my %params = @_;
 
     my $rh = $self->{+RH} // croak "Not a read handle";
 
@@ -339,6 +340,8 @@ sub get_line_burst_or_data {
         strip_term    => 0,
     };
 
+    my $peek;
+
     while (1) {
         $self->throw_invalid('Incomplete message received before EOF')
             if $self->{+EOF} && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
@@ -352,6 +355,7 @@ sub get_line_burst_or_data {
             return (line => $line) if $self->{+EOF} && !$self->{+IN_BUFFER_SIZE} && defined($line) && length($line);
 
             $buffer->{lines} = $line;
+            $peek = $line if $params{peek_line} && defined($line) && length($line);
         }
 
         if ($buffer->{in_message}) {
@@ -403,6 +407,8 @@ sub get_line_burst_or_data {
         }
 
         unless ($self->{+IN_BUFFER_SIZE} || $self->fill_buffer()) {
+            return (peek => $peek) if $peek && !$self->{+EOF};
+
             return unless $self->{+EOF};
 
             # Do at least one more iteration after EOF
@@ -887,7 +893,7 @@ order.
     # Chunks will be set to the number of atomic chunks the message was split
     # into. It is fine to ignore the value returned, it will always be an
     # integer 1 or larger.
-    my $chunks = $w->send_message("Hello");
+    my $chunks = $w->write_message("Hello");
 
     # $msg now contains "Hello";
     my $msg = $r->read_message;
@@ -1297,12 +1303,20 @@ Enable mixed-data mode. Also makes read-side non-blocking.
 
 =item ($type, $data) = $r->get_line_burst_or_data()
 
+=item ($type, $data) = $r->get_line_burst_or_data(peek_line => 1)
+
 Get a line, a burst, or a message from the pipe. Always non-blocking, will
 return C<< (undef, undef) >> if no complete line/burst/message is ready.
 
-$type will be one of: C<undef>, C<'line'>, C<'burst'>, or C<'message'>.
+$type will be one of: C<undef>, C<'line'>, C<'burst'>, C<'message'>, or C<'peek'>.
 
-$data will either be C<undef>, or a complete line, burst, or message.
+$data will either be C<undef>, or a complete line, burst, message, or a buffered line that has no newline termination.
+
+The C<peek_line> option, when true, will cause this to return C<'peek'> and a
+buffered line not terminated by a newline, if such a line has been read and is
+pending in the buffer. Calling this multiple times will return the same peek
+line (and anything added to the buffer since the last read) until the buffer
+reads a newline or hits EOF.
 
 =back
 

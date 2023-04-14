@@ -53,11 +53,7 @@ for my $tpars (
     isa_ok( $got, $class );
 }
 
-for (
-    [ [ 0, 0 ]   => [ 0, 0 ] ],
-    [ [ 0, 0.3 ] => [ 0, 0.3 ] ],
-    [ 2 => [ 2, 0.5 ] ] )
-{
+for ( [ [ 0, 0 ] => [ 0, 0 ] ], [ [ 0, 0.3 ] => [ 0, 0.3 ] ], [ 2 => [ 2, 0.5 ] ] ) {
 
     my ( $in, $exp ) = @$_;
 
@@ -77,11 +73,7 @@ subtest 'Sequence' => sub {
     ok( lives { Sequence->assert_coerce( [ 0, 1, 2 ] ) }, "three edges" )
       or diag $@;
 
-    isa_ok(
-        dies { Sequence->assert_coerce( [0] ) },
-        ["Error::TypeTiny::Assertion"],
-        "one edge"
-    );
+    isa_ok( dies { Sequence->assert_coerce( [0] ) }, ["Error::TypeTiny::Assertion"], "one edge" );
 
     isa_ok( dies { Sequence->assert_coerce( [ 10, 9, 8 ] ) },
         ["Error::TypeTiny::Assertion"], "decreasing" );
@@ -101,8 +93,7 @@ subtest 'Spacing' => sub {
     ok( lives { Spacing->assert_coerce( -1 ) }, "w0 < 0" )
       or diag $@;
 
-    isa_ok( dies { Spacing->assert_coerce( 0 ) },
-        ["Error::TypeTiny::Assertion"], "zero" );
+    isa_ok( dies { Spacing->assert_coerce( 0 ) }, ["Error::TypeTiny::Assertion"], "zero" );
 };
 
 subtest 'Ratio' => sub {
@@ -113,14 +104,11 @@ subtest 'Ratio' => sub {
     ok( lives { Ratio->assert_coerce( 1.5 ) }, "positive, > 1" )
       or diag $@;
 
-    isa_ok( dies { Ratio->assert_coerce( 0 ) },
-        ["Error::TypeTiny::Assertion"], "zero" );
+    isa_ok( dies { Ratio->assert_coerce( 0 ) }, ["Error::TypeTiny::Assertion"], "zero" );
 
-    isa_ok( dies { Ratio->assert_coerce( -1 ) },
-        ["Error::TypeTiny::Assertion"], "negative" );
+    isa_ok( dies { Ratio->assert_coerce( -1 ) }, ["Error::TypeTiny::Assertion"], "negative" );
 
-    isa_ok( dies { Ratio->assert_coerce( 1 ) },
-        ["Error::TypeTiny::Assertion"], "1" );
+    isa_ok( dies { Ratio->assert_coerce( 1 ) }, ["Error::TypeTiny::Assertion"], "1" );
 
 };
 

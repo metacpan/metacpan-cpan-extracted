@@ -37,6 +37,11 @@ lib/Story/Interact/Syntax.pm
 t/00start.t
 t/01basic.t
 t/integration/house-story.t
+t/integration/story-with-prelude.t
+t/integration/uri-query.t
 t/integration/waterfall.t
 t/share/override/living_room.page.pl
-t/unit/Story/Interact.t
+t/share/story-with-prelude/_prelude.page.pl
+t/share/story-with-prelude/main.page.pl
+t/share/uri-query/main.page.pl
+t/share/uri-query/other.page.pl

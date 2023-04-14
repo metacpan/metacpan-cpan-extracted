@@ -4,13 +4,13 @@
       "Abe Timmerman <abeltje@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-IBAN-Validator",
    "no_index" : {
@@ -22,8 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Exception" : "0",
-            "Test::More" : "0.88"
+            "Test::Fatal" : "0",
+            "Test::Simple" : "0.88",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
@@ -33,10 +34,21 @@
       },
       "runtime" : {
          "requires" : {
-            "Hash::Util" : "0"
+            "Hash::Util" : "0",
+            "perl" : "5.008"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/abeltje/Business-IBAN-Validator"
+      }
+   },
+   "version" : "0.07",
+   "x_bugtracker" : {
+      "web" : "https://github.com/abeltje/Business-IBAN-Validator/issues"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

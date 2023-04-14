@@ -3,9 +3,9 @@ package Acme::CPANModules::PortedFrom::Python;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-13'; # DATE
+our $DATE = '2023-01-31'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Python'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -67,14 +67,9 @@ Acme::CPANModules::PortedFrom::Python - Modules/applications that are ported fro
 
 =head1 VERSION
 
-This document describes version 0.005 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2022-11-13.
+This document describes version 0.006 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2023-01-31.
 
 =head1 DESCRIPTION
-
-=head2 SEE ALSO
-
-L<Acme::CPANModules::PortedFrom::Ruby> and other
-C<Acme::CPANModules::PortedFrom::*> modules.
 
 If you know of others, please drop me a message.
 
@@ -155,6 +150,9 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Por
 
 =head1 SEE ALSO
 
+L<Acme::CPANModules::PortedFrom::Ruby> and other
+C<Acme::CPANModules::PortedFrom::*> modules.
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -183,7 +181,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

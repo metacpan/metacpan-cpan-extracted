@@ -4,6 +4,7 @@ examples/documents/css/github.css
 examples/documents/index.md
 examples/documents/subdir/foo.md
 examples/markdown_viewer
+lib/iniweb.pm
 lib/Mojolicious/Plugin/DirectoryServer.pm
 LICENSE
 Makefile.PL

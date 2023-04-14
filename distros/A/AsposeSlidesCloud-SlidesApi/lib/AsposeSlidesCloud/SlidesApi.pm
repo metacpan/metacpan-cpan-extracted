@@ -29835,6 +29835,7 @@ sub split {
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
+# @param ExportOptions $options Export options. (optional)
 {
     my $params = {
     'document' => {
@@ -29885,6 +29886,11 @@ sub split {
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
+        required => '0',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
         required => '0',
     },
     };
@@ -29981,6 +29987,11 @@ sub split_and_save_online {
     if ( exists $args{'document'} && $args{'document'}) {
         push(@$files, $args{'document'});
     }
+    # body params
+    if ( exists $args{'options'} && $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -30006,6 +30017,7 @@ sub split_and_save_online {
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
+# @param ExportOptions $options Export options. (optional)
 {
     my $params = {
     'document' => {
@@ -30051,6 +30063,11 @@ sub split_and_save_online {
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
+        required => '0',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
         required => '0',
     },
     };
@@ -30142,6 +30159,11 @@ sub split_online {
     if ( exists $args{'document'} && $args{'document'}) {
         push(@$files, $args{'document'});
     }
+    # body params
+    if ( exists $args{'options'} && $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,

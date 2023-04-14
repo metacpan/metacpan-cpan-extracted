@@ -1,5 +1,5 @@
 use v5.12.0;
-package Test::Routine::Common 0.030;
+package Test::Routine::Common 0.031;
 # ABSTRACT: a role composed by all Test::Routine roles
 
 use Moose::Role;
@@ -30,9 +30,13 @@ sub run_test {
   $ctx->trace->set_detail("at $file line $line");
 
   my $name = $test->name;
-  Test::Abortable::subtest($test->description, sub { $self->$name });
+
+  # Capture and return whether the test as a whole succeeded or not
+  my $rc = Test::Abortable::subtest($test->description, sub { $self->$name });
 
   $ctx->release;
+
+  return $rc;
 }
 
 1;
@@ -49,7 +53,7 @@ Test::Routine::Common - a role composed by all Test::Routine roles
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 OVERVIEW
 

@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/OrgUtils/reverse_org_headlines
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-11'; # DATE
+our $DATE = '2023-01-19'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.483'; # VERSION
+our $VERSION = '0.484'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/OrgUtils/reverse_org_headlines",
@@ -38,11 +38,15 @@ reverse-org-headlines - Reverse Org headlines
 
 =head1 VERSION
 
-This document describes version 0.483 of reverse-org-headlines (from Perl distribution App-OrgUtils), released on 2022-10-11.
+This document describes version 0.484 of reverse-org-headlines (from Perl distribution App-OrgUtils), released on 2023-01-19.
 
 =head1 SYNOPSIS
 
-B<reverse-org-headlines> [B<--format>=I<name>|B<--json>] [B<--level>=L<posint|Sah::Schema::posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- [I<file>]
+B<reverse-org-headlines> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<reverse-org-headlines> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<reverse-org-headlines> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--level|/"--level=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<file|/"--file=s">>]
 
 =head1 OPTIONS
 
@@ -215,7 +219,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 class TestCase::Sys::Process {
   use Sys::Process;
   use Sys::Process::Constant as PROCESS;
-  use Time;
+  use Sys::Time;
   
   static method fork : int () {
     
@@ -21,7 +21,7 @@ class TestCase::Sys::Process {
 
   static method getpriority : int () {
     
-    my $start = Time->time;
+    my $start = Sys::Time->time;
     
     my $nice = Sys::Process->getpriority(PROCESS->PRIO_PROCESS, 0);
     
@@ -41,7 +41,7 @@ class TestCase::Sys::Process {
 
   static method setpriority : int () {
     
-    my $start = Time->time;
+    my $start = Sys::Time->time;
     
     my $status = -1;
     eval { $status = Sys::Process->setpriority(PROCESS->PRIO_PROCESS, 0, 0); };
@@ -60,7 +60,7 @@ class TestCase::Sys::Process {
   
   static method sleep : int () {
     
-    my $start = Time->time;
+    my $start = Sys::Time->time;
     
     my $rest = Sys::Process->sleep(1);
     
@@ -68,7 +68,7 @@ class TestCase::Sys::Process {
       return 0;
     }
     
-    unless (Time->time - $start >= 1) {
+    unless (Sys::Time->time - $start >= 1) {
       return 0;
     }
     
@@ -238,7 +238,7 @@ class TestCase::Sys::Process {
 
   static method usleep : int () {
     
-    my $start = Time->time;
+    my $start = Sys::Time->time;
     
     my $status = Sys::Process->usleep(1_100_000);
     
@@ -246,7 +246,7 @@ class TestCase::Sys::Process {
       return 0;
     }
     
-    unless (Time->time - $start >= 1) {
+    unless (Sys::Time->time - $start >= 1) {
       return 0;
     }
     

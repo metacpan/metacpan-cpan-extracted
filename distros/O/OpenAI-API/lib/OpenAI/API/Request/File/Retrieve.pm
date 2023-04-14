@@ -35,13 +35,15 @@ OpenAI::API::Request::File::Retrieve - retrieve file details
     # retrieve an existing file id
     my $file_id = OpenAI::API::Request::File::List->new->send->{data}[0]->{id};
 
-    my $request = OpenAI::API::Request::File::Retrieve->new(
-        file_id => $file_id,
-    );
+    if ($file_id) {
+        my $request = OpenAI::API::Request::File::Retrieve->new(
+            file_id => $file_id,
+        );
 
-    my $res = $request->send();
+        my $res = $request->send();
 
-    my $filename = $res->{filename};
+        my $filename = $res->{filename};
+    }
 
 =head1 DESCRIPTION
 

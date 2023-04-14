@@ -3,7 +3,7 @@ use Moo::Role;
 use Sietima::Policy;
 use namespace::clean;
 
-our $VERSION = '1.1.1'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: interface for mail stores
 
 
@@ -25,7 +25,7 @@ Sietima::MailStore - interface for mail stores
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 DESCRIPTION
 

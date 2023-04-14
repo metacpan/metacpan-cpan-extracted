@@ -1,6 +1,7 @@
-use 5.20.0;  # because this is the minimal perl version with hash slices
+use 5.20.0;                # because this is the minimal perl version with hash slices
 package Excel::PowerPivot::Utils;
 use utf8;
+use feature 'postderef';   # required for perl 5.20 and 5.22; no longer required after 5.24
 use Moose;
 use Moose::Util::TypeConstraints qw/duck_type/;
 use Win32::OLE                   qw/in CP_UTF8/;
@@ -14,7 +15,7 @@ use Log::Dispatch;
 # GLOBALS
 #======================================================================
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use constant {
   True                 => 1,

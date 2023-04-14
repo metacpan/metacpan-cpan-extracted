@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-28'; # DATE
+our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.742'; # VERSION
+our $VERSION = '0.743'; # VERSION
 
 our %SPEC;
 
@@ -318,7 +318,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.742 of App::PMUtils (from Perl distribution App-PMUtils), released on 2022-09-28.
+This document describes version 0.743 of App::PMUtils (from Perl distribution App-PMUtils), released on 2023-01-28.
 
 =head1 SYNOPSIS
 
@@ -412,6 +412,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<module> => I<array[perl::modname]>
 
+(No description)
+
 
 =back
 
@@ -455,11 +457,19 @@ Absolutify each path.
 
 =item * B<module> => I<array[perl::modname]>
 
+(No description)
+
 =item * B<pm> => I<int> (default: 1)
+
+(No description)
 
 =item * B<pmc> => I<int> (default: 0)
 
+(No description)
+
 =item * B<pod> => I<int> (default: 0)
+
+(No description)
 
 
 =back
@@ -512,13 +522,23 @@ and it won't change directory if the module doesn't exist.
 
 =item * B<module> => I<array[perl::modname]>
 
+(No description)
+
 =item * B<pm> => I<int> (default: 1)
+
+(No description)
 
 =item * B<pmc> => I<int> (default: 0)
 
+(No description)
+
 =item * B<pod> => I<int> (default: 0)
 
+(No description)
+
 =item * B<prefix> => I<int> (default: 0)
+
+(No description)
 
 
 =back
@@ -559,11 +579,19 @@ Get all found files for each module instead of the first one.
 
 =item * B<module> => I<array[perl::modname]>
 
+(No description)
+
 =item * B<pm> => I<int> (default: 1)
+
+(No description)
 
 =item * B<pmc> => I<int> (default: 0)
 
+(No description)
+
 =item * B<pod> => I<int> (default: 0)
+
+(No description)
 
 
 =back
@@ -606,6 +634,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<releases>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -725,7 +755,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

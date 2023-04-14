@@ -620,7 +620,7 @@ sub show_bases {
 sub display_aggregations {
     my ($aggregations,$total_docs) = (@_);
 
-    my $out_of =  $aggregations->{out_of}{value};
+    my $out_of = $aggregations->{out_of}{value} || 0;
     $OUT_OF = $out_of if $out_of > $OUT_OF;
     my $steps = exists $aggregations->{step} ? $aggregations->{step}{buckets}
                 : [ $aggregations ];
@@ -749,7 +749,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 8.4
+version 8.5
 
 =head1 SYNOPSIS
 
@@ -1358,7 +1358,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Brad Lhotsky.
+This software is Copyright (c) 2023 by Brad Lhotsky.
 
 This is free software, licensed under:
 

@@ -37,13 +37,13 @@ command.
 
 You can also look for information at:
 
-- GitHub
+- GitHub Source Repository
 
     [https://github.com/pjacklam/p5-Math-BigInt-Pari](https://github.com/pjacklam/p5-Math-BigInt-Pari)
 
 - RT: CPAN's request tracker
 
-    [https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Pari](https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Pari)
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Pari](https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Pari)
 
 - MetaCPAN
 
@@ -52,10 +52,6 @@ You can also look for information at:
 - CPAN Testers Matrix
 
     [http://matrix.cpantesters.org/?dist=Math-BigInt-Pari](http://matrix.cpantesters.org/?dist=Math-BigInt-Pari)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt-Pari](https://cpanratings.perl.org/dist/Math-BigInt-Pari)
 
 # LICENSE
 

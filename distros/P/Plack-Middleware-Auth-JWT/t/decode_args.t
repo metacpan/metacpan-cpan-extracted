@@ -6,6 +6,7 @@ use HTTP::Request::Common;
 use Plack::Test;
 use Plack::Builder;
 use Crypt::JWT qw(encode_jwt);
+use JSON qw(decode_json);
 
 my $app = sub {
     my $env = shift;
@@ -180,7 +181,7 @@ subtest 'some bad tokens' => sub {
                     Authorization => "Bearer " . $jwt_bad_secret
                 );
                 is( $res->code, 401, 'status 401' );
-                like( $res->content, qr/(?:decode failed|cannot decode)/i, 'cannot decode' );
+                like( $res->content, qr/(?:decode failed|cannot decode|Invalid token)/i, 'cannot decode' );
             };
 
             subtest 'expired token' => sub {
@@ -193,6 +194,22 @@ subtest 'some bad tokens' => sub {
                     $res->content,
                     qr/exp claim check failed/,
                     'exp claim check failed'
+                );
+            };
+
+            subtest 'expired token json' => sub {
+                my $res = $cb->(
+                    GET "http://localhost",
+                    Authorization => "Bearer " . $jwt_expired,
+                    Accept => 'application/json',
+                );
+                is( $res->code, 401, 'status 401' );
+                is ($res->header('Content-Type'),'application/json','got json');
+                my $data = decode_json($res->content);
+                is($data->{ident},'token_expired','error ident token_expired');
+                like($data->{message},
+                    qr/exp claim check failed/,
+                    'error message exp claim check failed'
                 );
             };
 

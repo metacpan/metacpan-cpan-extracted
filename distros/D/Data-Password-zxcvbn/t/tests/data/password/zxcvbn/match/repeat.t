@@ -134,14 +134,14 @@ subtest 'making, recursing to other matchers' => sub {
     );
 
     test_recursing(
-        'a',2,{},
-        12, [ cmp_match(0,0,'BruteForce',token=>'a') ],
+        'x',2,{},
+        12, [ cmp_match(0,0,'BruteForce',token=>'x') ],
         'brute force',
     );
 
     test_recursing(
         'batterystaple',3,{},
-        28391350, [
+        31906462, [
             cmp_match(0,6,'Dictionary',token=>'battery'),
             cmp_match(7,12,'Dictionary',token=>'staple'),
         ],

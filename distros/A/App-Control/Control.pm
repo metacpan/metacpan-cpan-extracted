@@ -1,6 +1,6 @@
 package App::Control;
 
-$VERSION = '1.02';
+$VERSION = '1.07';
 
 use strict;
 use warnings;
@@ -365,7 +365,7 @@ returns true if the pid in the pidfile is running.
 
 =head1 AUTHOR
 
-Ave Wrigley <Ave.Wrigley@itn.co.uk>
+Ave Wrigley <ave.wrigley@gmail.com>
 
 =head1 COPYRIGHT
 

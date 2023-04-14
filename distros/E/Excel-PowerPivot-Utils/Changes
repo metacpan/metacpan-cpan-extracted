@@ -1,5 +1,7 @@
 Revision history for Excel-PowerPivot-Utils
 
+0.3      27.03.2023
+  - added "use feature 'postderef'", required for perl 5.20 and 5.22
 
 0.2      18.03.2023
   - refactored treatment of FormatInformation

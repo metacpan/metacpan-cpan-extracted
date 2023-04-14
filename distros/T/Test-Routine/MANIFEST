@@ -28,6 +28,7 @@ t/lib/NoGood.pm
 t/lib/NoGood2.pm
 t/method-filter.t
 t/mxms.t
+t/return.t
 t/test-traits.t
 t/todo/mxrp.t
 t/unsafe-name.t

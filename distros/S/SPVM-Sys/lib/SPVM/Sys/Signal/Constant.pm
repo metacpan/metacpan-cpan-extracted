@@ -514,3 +514,9 @@ Get the constant value of C<SIG_ERR>. If the system doesn't define this constant
 
 Get the constant value of C<SIG_IGN>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

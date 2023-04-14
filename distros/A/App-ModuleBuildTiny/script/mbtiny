@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use App::ModuleBuildTiny;
 
-our $VERSION = '0.037';
+our $VERSION = '0.040';
 
 modulebuildtiny(@ARGV);
 
@@ -35,7 +35,7 @@ This regenerates the given files. If no files are given, it defaults to all six 
 
 =item * bump
 
-Bump the version of the distribution before regenerating. The default for this can be set in the configuration.
+Bump the version of the distribution before regenerating. The default for this when regenerating all files can be set in the configuration.
 
 =item * version = <new-version>
 
@@ -51,7 +51,7 @@ Make the new version a trial version.
 
 =item * commit
 
-Create a git commit for the version bump. The default for this can be set in the configuration.
+Create a git commit for the version bump. The default for this when regenerating all files can be set in the configuration.
 
 =item * verbose
 

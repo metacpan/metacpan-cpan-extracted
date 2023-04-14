@@ -1,3 +1,8 @@
+0.003   2023-02-06  Released-By: PERLANCAR
+
+        - Show example of using with 'tabledata' CLI in generated Synopsis.
+
+
 0.002   2021-09-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Show get_row_count() example in generated Synopsis.

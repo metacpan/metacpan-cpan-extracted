@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::IO::Stat : pointer {
   use Sys::User;
   use Sys::IO::Constant as IO;

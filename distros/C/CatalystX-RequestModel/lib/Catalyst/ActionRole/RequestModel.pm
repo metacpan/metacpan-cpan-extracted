@@ -16,11 +16,14 @@ around 'execute', sub {
 
 sub _get_request_model {
   my ($self, $controller, $ctx) = @_;
-  return unless exists $self->attributes->{RequestModel} || exists $self->attributes->{QueryModel};
+  return unless exists $self->attributes->{RequestModel} ||
+    exists $self->attributes->{QueryModel} || 
+    exists $self->attributes->{BodyModel};
 
   my @models = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
      map {split ',', $_ }  # Allow RequestModel(Model1,Model2)
-    @{$self->attributes->{RequestModel} || []};
+    @{$self->attributes->{RequestModel} || []},
+    @{$self->attributes->{BodyModel} || []};
 
   my $request_content_type = $ctx->req->content_type;
 
@@ -34,7 +37,7 @@ sub _get_request_model {
     $self->_build_request_model_instance($controller, $ctx, $_)
   } @models;
 
-  if(exists $self->attributes->{RequestModel}) {
+  if(exists($self->attributes->{RequestModel}) || exists($self->attributes->{BodyModel})) {
     my ($content_type, @params) = $ctx->req->content_type; # handle "multipart/form-data; boundary=xYzZY"
     return CatalystX::RequestModel::Utils::InvalidContentType->throw(ct=>$content_type) unless @matching_models;
   }
@@ -81,7 +84,7 @@ Catalyst::ActionRole::RequestModel - Inflate a Request Model
 
     sub root :Chained(/root) PathPart('account') CaptureArgs(0)  { }
 
-      sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) RequestModel(AccountRequest) {
+      sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(AccountRequest) {
         my ($self, $c, $request_model) = @_;
         ## Do something with the $request_model
       }
@@ -97,7 +100,7 @@ Catalyst::ActionRole::RequestModel - Inflate a Request Model
 Moves creating the request model into the action class execute phase.  The following two actions are essentially
 the same in effect:
 
-    sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) RequestModel(AccountRequest) {
+    sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(AccountRequest) {
       my ($self, $c, $request_model) = @_;
       ## Do something with the $request_model
     }
@@ -125,6 +128,10 @@ This action role defines the following method attributes
 
 =head2 RequestModel
 
+Deprecated; for now this is an alias for BodyModel.  Use BodyModel instead and please convert your code to use.
+
+=head2 BodyModel
+
 Should be the name of a L<Catalyst::Model> subclass that does <CatalystX::RequestModel::DoesRequestModel>.  You may 
 supply more than one value to handle different request content types (the code will match the incoming
 content type to an available request model and throw an L<CatalystX::RequestModel::Utils::InvalidContentType>
@@ -132,7 +139,7 @@ exception if none of the available models match.
 
 Example of an action with more than one request model, which will be matched based on request content type.
 
-    sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) RequestModel(AccountRequestForm) RequestModel(AccountRequestJSON) {
+    sub update :POST Chained('root') PathPart('') Args(0) Does(RequestModel) BodyModel(AccountRequestForm) RequestModel(AccountRequestJSON) {
       my ($self, $c, $request_model) = @_;
       ## Do something with the $request_model
     }
@@ -152,7 +159,7 @@ exception if none of the available models match.
         my ($self, $c, $paging_model) = @_;
       }
 
-B<NOTE>: In the situation where you have QueryModel and Request model for the same action, the request models
+B<NOTE>: In the situation where you have QueryModel and BodyModel for the same action, the request models
 will be added first to the action argument list, followed by the query models, no matter what order they appear
 in the action method declaration.  This is due to a limitation in how Catalyst collects the subroutine attributes
 (we can't know the order of dissimilar attributes since this information is stored in a hash, not an array, and

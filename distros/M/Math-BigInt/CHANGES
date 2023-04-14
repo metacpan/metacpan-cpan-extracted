@@ -1,3 +1,9 @@
+1.999838 2023-03-30
+
+ * Fix CPAN RT #146411 regarding infinite recursion in bitwise operations. This
+   happened when arguments were upgraded and downgraded and upgraded again ad
+   infinitum. Add tests to verify the fix.
+
 1.999837 2022-07-02
 
  * Improve the interoperability between objects of different classes for the

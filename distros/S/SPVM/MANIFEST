@@ -60,7 +60,6 @@ lib/SPVM/Builder/API.pm
 lib/SPVM/Builder/CC.pm
 lib/SPVM/Builder/CompileInfo.pm
 lib/SPVM/Builder/Compiler.pm
-lib/SPVM/Builder/Compiler/Util.pm
 lib/SPVM/Builder/Config.pm
 lib/SPVM/Builder/Config/Exe.pm
 lib/SPVM/Builder/Env.pm
@@ -218,6 +217,7 @@ lib/SPVM/Document/NativeAPI/Compiler.pm
 lib/SPVM/Document/NativeAPI/Precompile.pm
 lib/SPVM/Document/NativeAPI/Runtime.pm
 lib/SPVM/Document/NativeAPI/StringBuffer.pm
+lib/SPVM/Document/NativeClass.pm
 lib/SPVM/Document/NativeModule.pm
 lib/SPVM/Document/Resource.pm
 lib/SPVM/Document/Tutorial.pm
@@ -238,6 +238,7 @@ lib/SPVM/Error/NotSupported.pm
 lib/SPVM/Error/System.pm
 lib/SPVM/ExchangeAPI.pm
 lib/SPVM/ExchangeAPI/Class.pm
+lib/SPVM/ExchangeAPI/Error.pm
 lib/SPVM/Float.pm
 lib/SPVM/FloatList.pm
 lib/SPVM/FloatList.spvm
@@ -295,14 +296,9 @@ lib/SPVM/Stringer.pm
 lib/SPVM/Stringer.spvm
 lib/SPVM/StringList.pm
 lib/SPVM/StringList.spvm
-lib/SPVM/Time.c
-lib/SPVM/Time.config
 lib/SPVM/Time.pm
-lib/SPVM/Time.spvm
-lib/SPVM/Time/Info.c
-lib/SPVM/Time/Info.config
 lib/SPVM/Time/Info.pm
-lib/SPVM/Time/Info.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 ppport.h
@@ -382,7 +378,7 @@ t/01_syntax/lib/SPVM/CompileError/BitNot/NotIntegral.spvm
 t/01_syntax/lib/SPVM/CompileError/Bool/NotNumericObject.spvm
 t/01_syntax/lib/SPVM/CompileError/CallMethod/ClassNotFound.spvm
 t/01_syntax/lib/SPVM/CompileError/CallMethod/NotFound.spvm
-t/01_syntax/lib/SPVM/CompileError/Class/ClassNameDifferntFromModuleName.spvm
+t/01_syntax/lib/SPVM/CompileError/Class/ClassNameDifferntFromClassFileName.spvm
 t/01_syntax/lib/SPVM/CompileError/Class/classPartNameStartWithLowerCase.spvm
 t/01_syntax/lib/SPVM/CompileError/Class/NotClosed.spvm
 t/01_syntax/lib/SPVM/CompileError/ClassVar/OurClassVarNameColon2Twice.spvm
@@ -606,7 +602,6 @@ t/02_vm/08_module/ShortList.t
 t/02_vm/08_module/Sort.t
 t/02_vm/08_module/StringBuffer.t
 t/02_vm/08_module/StringList.t
-t/02_vm/08_module/Time.t
 t/02_vm/09_stdio/stdio.t
 t/02_vm/99_extra/examples.t
 t/02_vm/lib/SPVM/4foo.spvm
@@ -710,7 +705,6 @@ t/02_vm/lib/SPVM/TestCase/Module/ShortList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Sort.spvm
 t/02_vm/lib/SPVM/TestCase/Module/StringBuffer.spvm
 t/02_vm/lib/SPVM/TestCase/Module/StringList.spvm
-t/02_vm/lib/SPVM/TestCase/Module/Time.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiClass.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiClass/FloatMatrix.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiPackage.spvm
@@ -761,16 +755,16 @@ t/02_vm/lib/SPVM/TestCase/Ref.spvm
 t/02_vm/lib/SPVM/TestCase/Refcnt.spvm
 t/02_vm/lib/SPVM/TestCase/Refop.spvm
 t/02_vm/lib/SPVM/TestCase/Remainder.spvm
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.config
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.mode1.config
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/include/mylib1_source1.h
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/include/mylib1_source2.h
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/src/extra.c
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/src/mylib1_source1.c
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/src/mylib1_source2.c
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib2/V1_0_0.config
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib2/V1_0_0.native/include/mylib2_source1.h
-t/02_vm/lib/SPVM/TestCase/Resource/Mylib2/V1_0_0.native/src/mylib2_source1.c
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.config
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.mode1.config
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.native/include/mylib1_source1.h
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.native/include/mylib1_source2.h
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.native/src/extra.c
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.native/src/mylib1_source1.c
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.native/src/mylib1_source2.c
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib2.config
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib2.native/include/mylib2_source1.h
+t/02_vm/lib/SPVM/TestCase/Resource/Mylib2.native/src/mylib2_source1.c
 t/02_vm/lib/SPVM/TestCase/Return.spvm
 t/02_vm/lib/SPVM/TestCase/Say.spvm
 t/02_vm/lib/SPVM/TestCase/Seqop.spvm

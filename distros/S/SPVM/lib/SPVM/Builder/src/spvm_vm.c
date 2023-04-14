@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include <stdint.h>
 #include <assert.h>
 #include <string.h>
@@ -782,9 +785,9 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, int32_t current_me
       }
       case SPVM_OPCODE_C_ID_NEW_MULDIM_ARRAY: {
         int32_t basic_type_id = opcode->operand1;
-        int32_t element_dimension = opcode->operand3;
+        int32_t type_dimension = opcode->operand3;
         int32_t length = int_vars[opcode->operand2];
-        SPVM_IMPLEMENT_NEW_MULDIM_ARRAY(env, stack, &object_vars[opcode->operand0], basic_type_id, element_dimension, length, &error);
+        SPVM_IMPLEMENT_NEW_MULDIM_ARRAY(env, stack, &object_vars[opcode->operand0], basic_type_id, type_dimension, length, &error);
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_MULNUM_ARRAY: {
@@ -1156,20 +1159,20 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, int32_t current_me
         void* string = object_vars[opcode->operand0];
         int32_t line = opcode->operand1;
         
-        const char* module_dir = NULL;
-        const char* module_dir_sep;
-        int32_t module_dir_id = current_class->module_dir_id;
-        if (module_dir_id >= 0) {
-          module_dir_sep = "/";
-          module_dir = SPVM_API_RUNTIME_get_constant_string_value(runtime, current_class->module_dir_id, NULL);
+        const char* class_path = NULL;
+        const char* class_path_sep;
+        int32_t class_path_id = current_class->class_path_id;
+        if (class_path_id >= 0) {
+          class_path_sep = "/";
+          class_path = SPVM_API_RUNTIME_get_constant_string_value(runtime, current_class->class_path_id, NULL);
         }
         else {
-          module_dir_sep = "";
-          module_dir = "";
+          class_path_sep = "";
+          class_path = "";
         }
-        const char* module_rel_file = SPVM_API_RUNTIME_get_constant_string_value(runtime, current_class->module_rel_file_id, NULL);
+        const char* class_rel_file = SPVM_API_RUNTIME_get_constant_string_value(runtime, current_class->class_rel_file_id, NULL);
 
-        SPVM_IMPLEMENT_WARN(env, stack, string, module_dir, module_dir_sep, module_rel_file, line);
+        SPVM_IMPLEMENT_WARN(env, stack, string, class_path, class_path_sep, class_rel_file, line);
         
         break;
       }

@@ -47,3 +47,10 @@ Get the group ID.
   method gr_mem : string[] ();
 
 Get the group member names.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

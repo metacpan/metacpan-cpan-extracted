@@ -1,3 +1,8 @@
+.timestamp {
+  font-size: 0.8em;
+  padding-left: 0.5in;
+  color: #aaa;
+}
 
 #new_person {
   width:35em;

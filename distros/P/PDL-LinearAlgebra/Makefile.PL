@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 use Config;
 use Devel::CheckLib qw(check_lib check_lib_or_exit);
 use ExtUtils::F77;
+use PDL::Core::Dev;
 
 our %ldloadlibs = ($^O =~ /MSWin/ && $Config{cc} eq 'cl')
   ? (LDLOADLIBS => 'oldnames.lib kernel32.lib user32.lib gdi32.lib winspool.lib  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib  netapi32.lib uuid.lib wsock32.lib mpr.lib winmm.lib  version.lib odbc32.lib odbccp32.lib msvcrt.lib  ../lapack/libacml.lib "C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\lib\msvcrt.lib" ')
@@ -98,4 +99,9 @@ sub find_libs {
   }
 
   return;
+}
+
+sub MY::postamble {
+  my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
+  qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
 }

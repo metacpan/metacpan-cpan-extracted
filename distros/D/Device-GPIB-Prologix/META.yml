@@ -1,5 +1,5 @@
 ---
-abstract: 'Interface to Prologix GPIB-USB Controller'
+abstract: 'Interface to Prologix GPIB-USB Controller This module is now obsoleted by and replaced by Device::GPIB::Controllers::Prologix,  part of the new Device::GPIB module.'
 author:
   - 'Mike McCauley <mikem@airspayce.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,4 +19,5 @@ no_index:
     - inc
 requires:
   Device::SerialPort: '0'
-version: '0.04'
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

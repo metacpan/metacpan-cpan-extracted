@@ -1,4 +1,7 @@
 $Log: Changes,v $
+Revision 1.7  Wed 12 Apr 2023 17:28:29 BST
+Added git info to metadata
+
 Revision 1.6  2003/08/27 16:48:51  wrigley
 moved $SIG{CHLD} = "IGNORE" after the fork to prevent the child from inheriting it
 

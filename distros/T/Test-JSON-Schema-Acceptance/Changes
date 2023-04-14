@@ -1,5 +1,9 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.019     2023-04-01 17:50:45Z
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/d21ed578aeb13b55dfe3604db53adb4750e1abc3...47958f82d0ca44b82f3fb32744a0fb5aead191a6
+
 1.018     2022-12-30 22:15:58Z
         - use two separate json encoders, to avoid inadvertently changing
           serialization results in the middle of testing

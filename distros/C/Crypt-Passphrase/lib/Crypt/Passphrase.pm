@@ -1,7 +1,9 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.012';
+$Crypt::Passphrase::VERSION = '0.015';
 use strict;
 use warnings;
+
+use mro ();
 
 use Carp ();
 use Scalar::Util ();
@@ -17,15 +19,15 @@ sub import {
 			require Crypt::Passphrase::Encoder;
 			no strict 'refs';
 			no warnings 'once';
-			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Encoder';
-			push @{"$caller\::CARP_NOT"}, __PACKAGE__;
+			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Encoder' unless $caller->isa('Crypt::Passphrase::Encoder');
+			push @{"$caller\::CARP_NOT"}, __PACKAGE__, mro::get_linear_isa($caller);
 		}
 		elsif ($arg eq '-validator') {
 			require Crypt::Passphrase::Validator;
 			no strict 'refs';
 			no warnings 'once';
-			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Validator';
-			push @{"$caller\::CARP_NOT"}, __PACKAGE__;
+			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Validator' unless $caller->isa('Crypt::Passphrase::Validator');
+			push @{"$caller\::CARP_NOT"}, __PACKAGE__, mro::get_linear_isa($caller);
 		}
 		elsif ($arg eq '-integration') {
 			push @CARP_NOT, $caller;
@@ -37,12 +39,11 @@ sub import {
 }
 
 sub _load_extension {
-	my $name = shift;
-	$name =~ s/^(?!\+)/Crypt::Passphrase::/;
-	$name =~ s/^\+//;
-	(my $filename = "$name.pm") =~ s{::}{/}g;
-	require $filename;
-	return $name;
+	my $short_name = shift;
+	my $module_name = $short_name =~ s/^(\+)?/$1 ? '' : 'Crypt::Passphrase::'/re;
+	my $file_name = "$module_name.pm" =~ s{::}{/}gr;
+	require $file_name;
+	return $module_name;
 }
 
 sub _load_encoder {
@@ -55,12 +56,8 @@ sub _load_encoder {
 		my $encoder_module = _load_extension(delete $encoder_conf{module});
 		return $encoder_module->new(%encoder_conf);
 	}
-	elsif ($encoder) {
-		my $encoder_module = _load_extension($encoder);
-		return $encoder_module->new;
-	}
 	else {
-		Carp::croak('No encoder given to Crypt::Passphrase->new');
+		return _load_extension($encoder)->new;
 	}
 }
 
@@ -86,6 +83,7 @@ sub _load_validator {
 my %valid = map { $_ => 1 } qw/C D KC KD/;
 sub new {
 	my ($class, %args) = @_;
+	Carp::croak('No encoder given to Crypt::Passphrase->new') if not $args{encoder};
 	my $encoder = _load_encoder($args{encoder});
 	my @validators = map { _load_validator($_) } @{ $args{validators} };
 	my $normalization = $args{normalization} || 'C';
@@ -158,13 +156,13 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.012
+version 0.015
 
 =head1 SYNOPSIS
 
  my $authenticator = Crypt::Passphrase->new(
      encoder    => 'Argon2',
-     validators => [ 'Bcrypt' ],
+     validators => [ 'Bcrypt', 'SHA1::Hex' ],
  );
 
  my ($hash) = $dbh->selectrow_array("SELECT password FROM users WHERE name = ?", {}, $user);
@@ -264,7 +262,7 @@ Hashing passwords is by its nature a heavy operations. It can be abused by malig
 
 In some situations, it may be appropriate to have different password settings for different users (e.g. set them more strict for administrators than for ordinary users).
 
-=head1 SEE ALSO
+=head1 BACKENDS
 
 The following encoders are currently available on CPAN:
 
@@ -294,7 +292,17 @@ An implementation of SHA-512, SHA256 and MD5 based C<crypt()>. Recommended if yo
 
 A first-generation memory-hard algorithm, Argon2 is recommended instead if you want a memory-hard algorithm.
 
+=item * L<Crypt::Passphrase::System|Crypt::Passphrase::System>
+
+Your system's C<crypt> implementation. Support for various algorithms varies between platforms and platform versions, and while on some platforms it's a good backend one should not rely on this for a portable result.
+
+=item * L<Crypt::Passphrase::Pepper::Simple|Crypt::Passphrase::Pepper::Simple>
+
+A meta-encoder that adds peppering to your passwords by pre-hashing the inputs.
+
 =back
+
+=head1 INTEGRATIONS
 
 A number of integrations of Crypt::Passphrase exist:
 

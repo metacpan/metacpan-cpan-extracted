@@ -6,250 +6,219 @@ SPVM::Document::NativeAPI - SPVM Native APIs
 
 The SPVM native APIs are public APIs that are used in native language sources such as C<C/C++>.
 
-The native APIs are writen in C<C language>, but the languages that have compatibility of C<C language> such as <C++>, C<CUDA/nvcc> can call the native APIs.
+The native APIs are writen in the C language, but the languages that have compatibility of the C language such as <C++>, C<CUDA/nvcc> can call the native APIs.
 
-The native APIs is used when L<native methods|SPVM::Document::NativeModule> are implemented.
+The native APIs is used when L<native methods|SPVM::Document::NativeClass> are implemented.
 
 =head1 Native APIs
 
 Native APIs have its IDs. These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
-  0 class_vars_heap
-  1 object_header_size
-  2 object_weaken_backref_head_offset
-  3 object_ref_count_offset
-  4 object_basic_type_id_offset
-  5 object_type_dimension_offset
-  6 object_type_category_offset
-  7 object_flag_offset
-  8 object_length_offset
-  9 api
-  10 allocator
-  11 new_env_raw
-  12 free_env_raw
-  13 isa
-  14 elem_isa
-  15 runtime
-  16 reserved16
-  17 reserved17
-  18 reserved18
-  19 reserved19
-  20 get_basic_type_id
-  21 get_field_id
-  22 get_field_offset
-  23 get_class_var_id
-  24 get_class_method_id
-  25 get_instance_method_id
-  26 new_object_raw
-  27 new_object
-  28 new_byte_array_raw
-  29 new_byte_array
-  30 new_short_array_raw
-  31 new_short_array
-  32 new_int_array_raw
-  33 new_int_array
-  34 new_long_array_raw
-  35 new_long_array
-  36 new_float_array_raw
-  37 new_float_array
-  38 new_double_array_raw
-  39 new_double_array
-  40 new_object_array_raw
-  41 new_object_array
-  42 new_muldim_array_raw
-  43 new_muldim_array
-  44 new_mulnum_array_raw
-  45 new_mulnum_array
-  46 new_string_nolen_raw
-  47 new_string_nolen
-  48 new_string_raw
-  49 new_string
-  50 new_pointer_raw
-  51 new_pointer
-  52 concat_raw
-  53 concat
-  54 new_stack_trace_raw
-  55 new_stack_trace
-  56 length
-  57 get_elems_byte
-  58 get_elems_short
-  59 get_elems_int
-  60 get_elems_long
-  61 get_elems_float
-  62 get_elems_double
-  63 get_elem_object
-  64 set_elem_object
-  65 get_field_byte
-  66 get_field_short
-  67 get_field_int
-  68 get_field_long
-  69 get_field_float
-  70 get_field_double
-  71 get_field_object
-  72 set_field_byte
-  73 set_field_short
-  74 set_field_int
-  75 set_field_long
-  76 set_field_float
-  77 set_field_double
-  78 set_field_object
-  79 get_class_var_byte
-  80 get_class_var_short
-  81 get_class_var_int
-  82 get_class_var_long
-  83 get_class_var_float
-  84 get_class_var_double
-  85 get_class_var_object
-  86 set_class_var_byte
-  87 set_class_var_short
-  88 set_class_var_int
-  89 set_class_var_long
-  90 set_class_var_float
-  91 set_class_var_double
-  92 set_class_var_object
-  93 get_pointer
-  94 set_pointer
-  95 call_method
-  96 get_exception
-  97 set_exception
-  98 get_ref_count
-  99 inc_ref_count
-  100 dec_ref_count
-  101 enter_scope
-  102 push_mortal
-  103 leave_scope
-  104 remove_mortal
-  105 is_type
-  106 is_object_array
-  107 get_object_basic_type_id
-  108 get_object_type_dimension
-  109 weaken
-  110 isweak
-  111 unweaken
-  112 alloc_memory_block_zero
-  113 free_memory_block
-  114 get_memory_blocks_count
-  115 get_type_name_raw
-  116 get_type_name
-  117 new_env
-  118 free_env
-  119 memory_blocks_count
-  120 get_chars
-  121 die
-  122 new_object_by_name
-  123 new_pointer_by_name
-  124 set_field_byte_by_name
-  125 set_field_short_by_name
-  126 set_field_int_by_name
-  127 set_field_long_by_name
-  128 set_field_float_by_name
-  129 set_field_double_by_name
-  130 set_field_object_by_name
-  131 get_field_byte_by_name
-  132 get_field_short_by_name
-  133 get_field_int_by_name
-  134 get_field_long_by_name
-  135 get_field_float_by_name
-  136 get_field_double_by_name
-  137 get_field_object_by_name
-  138 set_class_var_byte_by_name
-  139 set_class_var_short_by_name
-  140 set_class_var_int_by_name
-  141 set_class_var_long_by_name
-  142 set_class_var_float_by_name
-  143 set_class_var_double_by_name
-  144 set_class_var_object_by_name
-  145 get_class_var_byte_by_name
-  146 get_class_var_short_by_name
-  147 get_class_var_int_by_name
-  148 get_class_var_long_by_name
-  149 get_class_var_float_by_name
-  150 get_class_var_double_by_name
-  151 get_class_var_object_by_name
-  152 call_class_method_by_name
-  153 call_instance_method_by_name
-  154 get_field_string_chars_by_name
-  155 free_env_prepared
-  156 dump_raw
-  157 dump
-  158 reserved158
-  159 reserved159
-  160 get_instance_method_id_static
-  161 get_bool_object_value
-  162 cleanup_global_vars
-  163 make_read_only
-  164 is_read_only
-  165 is_array
-  166 is_string
-  167 is_numeric_array
-  168 is_mulnum_array
-  169 get_elem_size
-  170 new_array_proto_raw
-  171 new_array_proto
-  172 copy_raw
-  173 copy
-  174 shorten
-  175 has_interface
-  176 reserved176
-  177 reserved177
-  178 reserved178
-  179 print
-  180 print_stderr
-  181 init_env,
-  182 call_init_blocks
-  183 get_class_id
-  184 new_stack
-  185 free_stack
-  186 reserved186
-  187 new_memory_env
-  188 free_memory_env
-  189 get_memory_blocks_count_env
-  190 new_memory_stack
-  191 free_memory_stack
-  192 get_memory_blocks_count_stack
-  193 set_command_info_program_name
-  194 set_command_info_argv
-  195 get_class_id_by_name
-  196 strerror
-  197 new_string_array
-  198 get_args_stack_length
-  199 set_args_stack_length
-  200 dumpc
-  201 new_pointer_object_raw
-  202 new_pointer_object
-  203 new_pointer_object_by_name
-  204 reserved204
-  205 reserved205
-  206 reserved206
-  207 reserved207
-  208 is_class
-  209 is_pointer_class
-  210 reserved201
-  211 reserved211
-  212 reserved212
-  213 reserved213
-  214 reserved214
-  215 reserved215
-  216 reserved216
-  217 reserved217
-  218 reserved218
-  219 reserved219
-  220 reserved220
-  221 reserved221
-  222 reserved222
-  223 reserved223
-  224 reserved224
-  225 strerror_string
-  226 get_basic_type_id_by_name
-  227 get_field_id_static
-  228 get_args_stack_length
-  229 call_instance_method_static_by_name
-  230 get_method_id
-  231 strerror_nolen
-  232 strerror_string_nolen
-  233 get_compile_type_name_raw
-  234 get_compile_type_name
-  235 set_command_info_base_time
+    0 class_vars_heap
+    1 object_header_size
+    2 object_weaken_backref_head_offset
+    3 object_ref_count_offset
+    4 object_basic_type_id_offset
+    5 object_type_dimension_offset
+    6 object_flag_offset
+    7 object_length_offset
+    8 api
+    9 allocator
+   10 new_env_raw
+   11 free_env_raw
+   12 isa
+   13 elem_isa
+   14 runtime
+   15 get_basic_type_id
+   16 get_field_id
+   17 get_field_offset
+   18 get_class_var_id
+   19 get_class_method_id
+   20 get_instance_method_id
+   21 new_object_raw
+   22 new_object
+   23 new_byte_array_raw
+   24 new_byte_array
+   25 new_short_array_raw
+   26 new_short_array
+   27 new_int_array_raw
+   28 new_int_array
+   29 new_long_array_raw
+   30 new_long_array
+   31 new_float_array_raw
+   32 new_float_array
+   33 new_double_array_raw
+   34 new_double_array
+   35 new_object_array_raw
+   36 new_object_array
+   37 new_muldim_array_raw
+   38 new_muldim_array
+   39 new_mulnum_array_raw
+   40 new_mulnum_array
+   41 new_string_nolen_raw
+   42 new_string_nolen
+   43 new_string_raw
+   44 new_string
+   45 concat_raw
+   46 concat
+   47 new_stack_trace_raw
+   48 new_stack_trace
+   49 length
+   50 get_elems_byte
+   51 get_elems_short
+   52 get_elems_int
+   53 get_elems_long
+   54 get_elems_float
+   55 get_elems_double
+   56 get_elem_object
+   57 set_elem_object
+   58 get_field_byte
+   59 get_field_short
+   60 get_field_int
+   61 get_field_long
+   62 get_field_float
+   63 get_field_double
+   64 get_field_object
+   65 set_field_byte
+   66 set_field_short
+   67 set_field_int
+   68 set_field_long
+   69 set_field_float
+   70 set_field_double
+   71 set_field_object
+   72 get_class_var_byte
+   73 get_class_var_short
+   74 get_class_var_int
+   75 get_class_var_long
+   76 get_class_var_float
+   77 get_class_var_double
+   78 get_class_var_object
+   79 set_class_var_byte
+   80 set_class_var_short
+   81 set_class_var_int
+   82 set_class_var_long
+   83 set_class_var_float
+   84 set_class_var_double
+   85 set_class_var_object
+   86 get_pointer
+   87 set_pointer
+   88 call_method
+   89 get_exception
+   90 set_exception
+   91 get_ref_count
+   92 inc_ref_count
+   93 dec_ref_count
+   94 enter_scope
+   95 push_mortal
+   96 leave_scope
+   97 remove_mortal
+   98 is_type
+   99 is_object_array
+  100 get_object_basic_type_id
+  101 get_object_type_dimension
+  102 weaken
+  103 isweak
+  104 unweaken
+  105 alloc_memory_block_zero
+  106 free_memory_block
+  107 get_memory_blocks_count
+  108 get_type_name_raw
+  109 get_type_name
+  110 new_env
+  111 free_env
+  112 memory_blocks_count
+  113 get_chars
+  114 die
+  115 new_object_by_name
+  116 set_field_byte_by_name
+  117 set_field_short_by_name
+  118 set_field_int_by_name
+  119 set_field_long_by_name
+  120 set_field_float_by_name
+  121 set_field_double_by_name
+  122 set_field_object_by_name
+  123 get_field_byte_by_name
+  124 get_field_short_by_name
+  125 get_field_int_by_name
+  126 get_field_long_by_name
+  127 get_field_float_by_name
+  128 get_field_double_by_name
+  129 get_field_object_by_name
+  130 set_class_var_byte_by_name
+  131 set_class_var_short_by_name
+  132 set_class_var_int_by_name
+  133 set_class_var_long_by_name
+  134 set_class_var_float_by_name
+  135 set_class_var_double_by_name
+  136 set_class_var_object_by_name
+  137 get_class_var_byte_by_name
+  138 get_class_var_short_by_name
+  139 get_class_var_int_by_name
+  140 get_class_var_long_by_name
+  141 get_class_var_float_by_name
+  142 get_class_var_double_by_name
+  143 get_class_var_object_by_name
+  144 call_class_method_by_name
+  145 call_instance_method_by_name
+  146 get_field_string_chars_by_name
+  147 free_env_prepared
+  148 dump_raw
+  149 dump
+  150 get_instance_method_id_static
+  151 get_bool_object_value
+  152 cleanup_global_vars
+  153 make_read_only
+  154 is_read_only
+  155 is_array
+  156 is_string
+  157 is_numeric_array
+  158 is_mulnum_array
+  159 get_elem_size
+  160 new_array_proto_raw
+  161 new_array_proto
+  162 copy_raw
+  163 copy
+  164 shorten
+  165 has_interface
+  166 print
+  167 print_stderr
+  168 init_env
+  169 call_init_blocks
+  170 get_class_id
+  171 new_stack
+  172 free_stack
+  173 new_memory_env
+  174 free_memory_env
+  175 get_memory_blocks_count_env
+  176 new_memory_stack
+  177 free_memory_stack
+  178 get_memory_blocks_count_stack
+  179 set_command_info_program_name
+  180 set_command_info_argv
+  181 get_class_id_by_name
+  182 strerror
+  183 new_string_array
+  184 get_args_stack_length
+  185 set_args_stack_length
+  186 dumpc
+  187 new_pointer_object_raw
+  188 new_pointer_object
+  189 new_pointer_object_by_name
+  190 get_elem_string
+  191 set_elem_string
+  192 is_class
+  193 is_pointer_class
+  194 strerror_string
+  195 get_basic_type_id_by_name
+  196 get_field_id_static
+  197 items
+  198 call_instance_method_static_by_name
+  199 get_method_id
+  200 strerror_nolen
+  201 strerror_string_nolen
+  202 get_compile_type_name_raw
+  203 get_compile_type_name
+  204 set_command_info_base_time
 
 =head2 class_vars_heap
 
@@ -365,30 +334,6 @@ Checks the runtime type assignability of an array element.
   void* runtime;
 
 A pointer to the runtime information. This is used internally.
-
-=head2 reserved16
-
-  void* reserved16;
-
-Reserved.
-
-=head2 reserved17
-
-  void* reserved17;
-
-Reserved.
-
-=head2 reserved18
-
-  void* reserved18;
-
-Reserved.
-
-=head2 reserved19
-
-  void* reserved19;
-
-Reserved.
 
 =head2 get_basic_type_id
 
@@ -582,19 +527,19 @@ Examples:
 
 =head2 new_muldim_array_raw
 
-  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t element_dimension, int32_t length);
+  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t type_dimension, int32_t length);
 
-Creates a new multi dimension array by specifying the basic type ID, the type dimension of the element, and the array length. The basic type ID must be the correct basic type ID got bu C<get_basic_type_id> function. the type dimension of the element must be less than or equals to 255.
+Creates a new multi-dimensional array by specifying the basic type ID and the type dimension, and the array length. The basic type ID must be the correct basic type ID got bu C<get_basic_type_id> function. the type dimension of the element must be less than or equals to 255.
 
 =head2 new_muldim_array
 
-  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t element_dimension, int32_t length);
+  void* (*new_muldim_array_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, int32_t type_dimension, int32_t length);
 
 The same as C<new_muldim_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_muldim_array_raw>.
 
 Examples:
 
-  // new Int[][][100]
+  // Creates 2-dimensional array - The same as "new Int[][100]".
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* multi_array = env->new_muldim_array(env, stack, basic_type_id, 2, 100);
 
@@ -648,20 +593,6 @@ The same as C<new_string_raw>, and push the created object to the mortal stack. 
 Examples:
 
   void* str_obj = env->new_string(env, stack, "Hello \0World", 11);
-
-=head2 new_pointer_raw
-
-  void* (*new_pointer_raw)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
-
-Creates a pointer object by specifying a basic type ID and a C language pointer. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
-
-The same as the L</"new_pointer_raw">, but this is deprecagted and will be removed.
-
-=head2 new_pointer
-
-  void* (*new_pointer)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t basic_type_id, void* pointer);
-
-The same as the L</"new_pointer_object">, but this is deprecagted and will be removed.
 
 =head2 concat_raw
 
@@ -775,7 +706,7 @@ Examples:
 
 =head2 set_elem_object
 
-  void (*set_elem_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* array, int32_t index, void* value);
+  void (*set_elem_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* array, int32_t index, void* object);
 
 If you specify an array of object type and methodscript and element objects, the element object is assigned to the corresponding methodscript position. If the element's object has a weak reference, the weak reference is removed. The reference count of the originally assigned object is decremented by 1.
 
@@ -1201,9 +1132,9 @@ Given an object and a base type ID and a type dimension, returns a nonzero value
 
   int32_t (*is_object_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is a object array, returns C<1>, otherwise returns C<0>.
+If the object is a object array, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 get_object_basic_type_id
 
@@ -1255,7 +1186,7 @@ Specifying the address of the object releases the weak reference to the object.
 
 Creates a new memory block that is managed by the environment with the byte size and return the address. If it fails, return C<NULL>.
 
-The count of the memory block that is managed by the environment is incremented by C<1>.
+The count of the memory block that is managed by the environment is incremented by 1.
 
 =head2 free_memory_block
 
@@ -1263,7 +1194,7 @@ The count of the memory block that is managed by the environment is incremented 
 
 Frees the memory block that is managed by the environment.
 
-The count of the memory block that is managed by the environment is decremented by C<1>.
+The count of the memory block that is managed by the environment is decremented by 1.
 
 =head2 get_memory_blocks_count
 
@@ -1299,7 +1230,7 @@ Creates a new environment that is ready to call methods.
 
 The number of memory blocks is shared with the original execution environment.
 
-If this method can't allocate memory for the new environment, return NULL.
+If this method cannnot allocate memory for the new environment, return NULL.
 
 Note that L</"call_init_blocks"> need to be called before calling user methods by yourself.
 
@@ -1352,12 +1283,6 @@ Examples:
   int32_t e;
   void* minimal = env->new_object_by_name(env, stack, "TestCase::Minimal", &e, __func__, __FILE__, __LINE__);
   if (e) { return e; }
-
-=head2 new_pointer_by_name
-
-  void* (*new_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, void* pointer, int32_t* error, const char* func_name, const char* file, int32_t line);
-
-The same as the L</"new_pointer_object_by_name">, but this is deprecagted and will be removed.
 
 =head2 set_field_byte_by_name
 
@@ -1898,39 +1823,39 @@ Make the string read-only.
 
   void (*make_read_only)(SPVM_ENV* env, SPVM_VALUE* stack, void* string)
 
-If the string is read-only, returns C<1>, otherwise returns C<0>.
+If the string is read-only, returns 1, otherwise returns 0.
 
 =head2 is_array
 
   int32_t (*is_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is an array, returns C<1>, otherwise returns C<0>.
+If the object is an array, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 is_string
 
   int32_t (*is_string)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is a string, returns C<1>, otherwise returns C<0>.
+If the object is a string, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 is_numeric_array
 
   int32_t (*is_numeric_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is a numeric array, returns C<1>, otherwise returns C<0>.
+If the object is a numeric array, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 is_mulnum_array
 
   int32_t (*is_mulnum_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is a multi numeric array, returns C<1>, otherwise returns C<0>.
+If the object is a multi numeric array, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 get_elem_size
 
@@ -1948,7 +1873,7 @@ The given array must be the object that is an array type.
 
 If the given array is L<NULL>, returns C<NULL>.
 
-If the given length is lower than C<0>, returns C<NULL>.
+If the given length is lower than 0, returns C<NULL>.
 
 =head2 copy
 
@@ -1968,7 +1893,7 @@ If the string is null, does nothing.
 
 If the given length is greater than the length of the string, does nothing.
 
-If the given length is lower than C<0>, the given length become C<0>.
+If the given length is lower than 0, the given length become 0.
 
 The charaters of the after the given length are filled with C<\0>.
 
@@ -2024,7 +1949,7 @@ Call C<INIT> blocks.
 
 Creates a new memory block that is managed by the environment with the byte size and return the address. If it fails, return C<NULL>.
 
-The count of the memory block that is managed by the environment is incremented by C<1>.
+The count of the memory block that is managed by the environment is incremented by 1.
 
 This is the same as L</"alloc_memory_block_zero">. This is more understandable name that memories are managed by the environment.
 
@@ -2034,7 +1959,7 @@ This is the same as L</"alloc_memory_block_zero">. This is more understandable n
 
 Frees the memory block that is managed by the environment.
 
-The count of the memory block that is managed by the environment is decremented by C<1>.
+The count of the memory block that is managed by the environment is decremented by 1.
 
 This is the same as L</"free_memory_block">. This is more understandable name that memories are managed by the environment.
 
@@ -2052,9 +1977,9 @@ This is the same as L</"get_memory_blocks_count">. This is more understandable n
 
 Creates a new memory block that is managed by the stack of the environment with the byte size and return the address. If it fails, return C<NULL>.
 
-The count of the memory block that is managed by the stack is incremented by C<1>.
+The count of the memory block that is managed by the stack is incremented by 1.
 
-The count of the memory block that is managed by the environment is incremented by C<1>.
+The count of the memory block that is managed by the environment is incremented by 1.
 
 =head2 free_memory_stack
 
@@ -2062,9 +1987,9 @@ The count of the memory block that is managed by the environment is incremented 
 
 Frees the memory block that is managed by the environment.
 
-The count of the memory block that is managed by the stack is decremented by C<1>.
+The count of the memory block that is managed by the stack is decremented by 1.
 
-The count of the memory block that is managed by the environment is decremented by C<1>.
+The count of the memory block that is managed by the environment is decremented by 1.
 
 =head2 get_memory_blocks_count_stack
 
@@ -2078,7 +2003,7 @@ Returns the count of the memory blocks on the stack.
 
 Sets the program name. This value is got by L<CommandInfo->PROGRAM_NAME|SPVM::CommandInfo/"PROGRAM_NAME">.
 
-If it succeed, return C<0>.
+If it succeed, return 0.
 
 The program name must be a C<string> object. Otherwise return non-zero value.
 
@@ -2088,7 +2013,7 @@ The program name must be a C<string> object. Otherwise return non-zero value.
 
 Sets the argv. This value is got by L<CommandInfo->ARGV|SPVM::CommandInfo/"ARGV">.
 
-If it succeed, return C<0>.
+If it succeed, return 0.
 
 The argv must be a C<string[]> object. Otherwise return non-zero value.
 
@@ -2098,15 +2023,15 @@ The argv must be a C<string[]> object. Otherwise return non-zero value.
 
 Gets the class id by the class name.
 
-If the class is not loaded, The C<error> is set to C<1>. Otherwise set to C<0>.
+If the class is not loaded, The C<error> is set to 1. Otherwise set to 0.
 
 =head2 strerror
 
   const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
 
-Gets the value of C<strerror> of C<C language> on thread-safely.
+Gets the value of C<strerror> of the C language on thread-safely.
 
-If the length is C<0>, the length is set to C<64>.
+If the length is 0, the length is set to 64.
 
 =head2 new_string_array
 
@@ -2166,21 +2091,33 @@ If function is succeeded, C<error> is set to 0. If a exception occurs, C<error> 
   void* minimal = env->new_pointer_by_name(env, stack, "TestCase::Pointer", pointer, &e, __func__, __FILE__, __LINE__);
   if (e) { return e; }
 
+=head2 get_elem_string
+
+  void* (*get_elem_string)(SPVM_ENV* env, SPVM_VALUE* stack, void* array, int32_t index);
+
+The same as L</"get_elem_object">.
+
+=head2 set_elem_string
+
+  void (*set_elem_string)(SPVM_ENV* env, SPVM_VALUE* stack, void* array, int32_t index, void* string);
+
+The same as L</"set_elem_object">.
+
 =head2 is_class
 
   int32_t (*is_class)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is a instance of a class, returns C<1>, otherwise returns C<0>.
+If the object is a instance of a class, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 is_pointer_class
 
   int32_t (*is_pointer_class)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
 
-If the object is a instance of a pointer class, returns C<1>, otherwise returns C<0>.
+If the object is a instance of a pointer class, returns 1, otherwise returns 0.
 
-If the object is C<NULL>, returns C<0>.
+If the object is C<NULL>, returns 0.
 
 =head2 strerror_string
 
@@ -2194,7 +2131,7 @@ The same as the L</"strerror"> function, but return a C<string> object.
 
 Gets the basic_type id by the basic_type name.
 
-If the basic_type is not loaded, The C<error> is set to C<1>. Otherwise set to C<0>.
+If the basic_type is not loaded, The C<error> is set to 1. Otherwise set to 0.
 
 =head2 get_field_id_static
 
@@ -2253,13 +2190,13 @@ Examples:
 
   const char* (*strerror_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
 
-The same as L</"strerror"> given the length to C<0>.
+The same as L</"strerror"> given the length to 0.
 
 =head2 strerror_string_nolen
 
   void* (*strerror_string_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
 
-The same as L</"strerror_string"> given the length to C<0>.
+The same as L</"strerror_string"> given the length to 0.
 
 =head2 get_compile_type_name_raw
 
@@ -2281,7 +2218,7 @@ Gets a new C<string> object that is the compile-time type name with a basic type
 
 Sets the time when the program starts. This value is got by L<CommandInfo->BASE_TIME|SPVM::CommandInfo/"BASE_TIME">.
 
-If it succeed, return C<0>.
+If it succeed, return 0.
 
 The program name must be a C<string> object. Otherwise return non-zero value.
 
@@ -2341,7 +2278,7 @@ The basic type is unknown.
 
 =head3 SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF
 
-The basic type ID of C<undef> type.
+The basic type ID of undef type.
 
 =head3 SPVM_NATIVE_C_BASIC_TYPE_ID_VOID
 
@@ -2526,3 +2463,8 @@ Examples:
 
 =back
 
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

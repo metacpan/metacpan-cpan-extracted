@@ -353,3 +353,9 @@ Revision history for PPR
 
     * Improved error handling via PPR::ERROR mechanism
       (Thanks, Yves!)
+
+
+0.001008  Tue Apr 11 15:49:58 2023
+
+    * Added support for Perl 5.38 features:
+      classes, methods, fields, optimistic regex evals, //= and ||= in signatures

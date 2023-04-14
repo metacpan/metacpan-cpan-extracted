@@ -1,3 +1,7 @@
+0.012 2023-04-09 WENWU YAN <968826@gmail.com>
+   [FUNCTION]
+   - 优化网络设备健康检查逻辑
+
 0.011 2022-11-24 WENWU YAN <968826@gmail.com>
    [FUNCTION]
    - 优化批量端口开通处理逻辑

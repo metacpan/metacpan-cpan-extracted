@@ -1,3 +1,9 @@
+0.483   2023-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: get-value-with-sah, list-sah-value-rule-modules,
+          show-sah-value-rule-modules.
+
+
 0.482   2022-09-30  Released-By: PERLANCAR; Urgency: medium
 
         - [cli validate-with-sah] Add option --no-coerce.

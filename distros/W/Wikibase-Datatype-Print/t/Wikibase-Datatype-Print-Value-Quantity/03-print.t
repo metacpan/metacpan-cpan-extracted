@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Value::Quantity;
@@ -51,3 +51,29 @@ $ret = Wikibase::Datatype::Print::Value::Quantity::print($obj, {
 	'print_name' => 1,
 });
 is($ret, '10 (centimetre)', 'Get printed value. With explicit mapping.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Quantity->new(
+	'unit' => 'Q335320',
+	'value' => 10,
+);
+$cache = Wikibase::Cache::Backend::Basic->new;
+$ret = Wikibase::Datatype::Print::Value::Quantity::print($obj, {
+	'cb' => $cache,
+	'print_name' => 1,
+});
+is($ret, '10 (Q335320)', 'Get printed value. With explicit mapping without translation.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Quantity->new(
+	'unit' => 'Q174728',
+	'value' => 10,
+);
+eval {
+	Wikibase::Datatype::Print::Value::Quantity::print($obj, {
+		'cb' => 'bad_callback',
+	});
+};
+is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache::Backend.\n",
+	"Option 'cb' must be a instance of Wikibase::Cache::Backend.");
+clean();

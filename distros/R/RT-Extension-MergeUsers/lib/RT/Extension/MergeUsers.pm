@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 1996-2020 Best Practical Solutions, LLC
+# This software is Copyright (c) 1996-2023 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -55,7 +55,7 @@ use RT::Shredder;
 
 package RT::Extension::MergeUsers;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 NAME
 
@@ -429,10 +429,26 @@ sub AddRecord {
     return $self->SUPER::AddRecord($record);
 }
 
-sub _DoSearch {
-    my $self = shift;
-    delete $self->{seen_users};
-    return $self->SUPER::_DoSearch(@_);
+# DBIx::SearchBuilder 1.72 adds a new feature called CombineSearchAndCount,
+# when it's enabled _DoSearchAndCount will be called instead of _DoSearch. As
+# both methods call __DoSearch underneath, we can clear seen_users there
+# instead. In older versions, _we have only _DoSearch, so we need to clear
+# seen_users there for compatibility purposes.
+
+if ( DBIx::SearchBuilder->can('__DoSearch') ) {
+    no warnings 'redefine';
+    *__DoSearch = sub {
+        my $self = shift;
+        delete $self->{seen_users};
+        return $self->SUPER::__DoSearch(@_);
+    };
+} else {
+    no warnings 'redefine';
+    *_DoSearch = sub {
+        my $self = shift;
+        delete $self->{seen_users};
+        return $self->SUPER::_DoSearch(@_);
+    };
 }
 
 
@@ -655,9 +671,6 @@ sub TweakRoleLimitArgs {
                 $args{VALUE} = $o->id;
             }
         }
-        else {
-            $args{VALUE} = 0;
-        }
     }
     return %args;
 }
@@ -692,7 +705,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2020 by Best Practical Solutions
+This software is Copyright (c) 2014-2023 by Best Practical Solutions
 
 This is free software, licensed under:
 

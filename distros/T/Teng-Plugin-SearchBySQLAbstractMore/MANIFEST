@@ -10,6 +10,7 @@ lib/Teng/Plugin/SearchBySQLAbstractMore/Pager.pm
 lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/Count.pm
 lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/CountOrMySQLFoundRows.pm
 lib/Teng/Plugin/SearchBySQLAbstractMore/Pager/MySQLFoundRows.pm
+minil.toml
 t/00-load.t
 t/001_basic/025_pager.t
 t/001_basic/025_pager_count.t
@@ -30,17 +31,12 @@ t/lib/Mock/Inflate/Name.pm
 t/lib/Mock/Inflate/Schema.pm
 t/lib/MyGuard.pm
 t/lib/TengTest.pm
+t/manifest.t
 t/new_option.t
 t/pager_count_create_sqls.t
 t/pod-coverage.t
 t/pod.t
 t/search.t
 t/search_pager.t
-xt/001_basic/025_pager.t
-xt/001_basic/025_pager_count.t
-xt/Utils/mysql.pm
-xt/install_method-mysql.t
-xt/pager_count_create_sqls_mysql.t
-xt/search_pager_mysql_foundrows.t
 META.yml
 MANIFEST

@@ -9,19 +9,19 @@ use Carp qw(croak);
 use Fcntl qw(LOCK_EX LOCK_NB);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 sub new {
-    my ($class, %param) = @ARG;
+    my ( $class, %param ) = @ARG;
 
     # Mandatory options
-    if (!exists $param{'lock_file'}) {
+    if ( !exists $param{lock_file} ) {
         croak q{Mandatory argument "lock_file" is missing};
     }
 
     # Check "lock_file"
-    my $lock_file = $param{'lock_file'};
-    if (!length $lock_file) {
+    my $lock_file = $param{lock_file};
+    if ( !length $lock_file ) {
         croak q{Bad argument "lock_file"};
     }
 
@@ -35,24 +35,24 @@ sub new {
         },
         $class,
     );
-}
+} ## end sub new
 
 sub is_locked {
     my ($self) = @ARG;
 
-    return $self->{'is_locked'};
+    return $self->{is_locked};
 }
 
 sub lock_file {
     my ($self) = @ARG;
 
-    return $self->{'lock_file'};
+    return $self->{lock_file};
 }
 
 sub error {
     my ($self) = @ARG;
 
-    return $self->{'error'};
+    return $self->{error};
 }
 
 # Lock or raise an exception
@@ -66,7 +66,7 @@ sub lock {
 sub try_lock {
     my ($self) = @ARG;
 
-    return $self->_lock(try => 1);
+    return $self->_lock( try => 1 );
 }
 
 # You can manually unlock
@@ -74,15 +74,15 @@ sub unlock {
     my ($self) = @ARG;
 
     # Re-unlocking changes nothing
-    return $self if !$self->is_locked;
+    return $self if !$self->is_locked();
 
     # Close filehandle before file removing
     $self->_set_fh(undef);
 
-    if (!unlink $self->lock_file) {
+    if ( !unlink $self->lock_file() ) {
         $self->_set_error($OS_ERROR);
 
-        croak sprintf(q{Can't unlink "%s": %s}, $self->lock_file, $self->error);
+        croak sprintf( q{Can't unlink "%s": %s}, $self->lock_file(), $self->error() );
     }
 
     return $self->_set_is_locked(0);
@@ -94,13 +94,13 @@ sub get_lock_data {
     my $line;
     {
         my $fh
-            = $self->is_locked
-            ? $self->_fh
-            : $self->_init_file_handle;
+            = $self->is_locked()
+            ? $self->_fh()
+            : $self->_init_file_handle();
 
         return if !$fh;
 
-        $fh->seek(0, 0);
+        $fh->seek( 0, 0 );
 
         $line = $fh->getline();
     }
@@ -109,7 +109,7 @@ sub get_lock_data {
 
     chomp $line;
 
-    my ($pid, $executable_name) = $line =~ m{
+    my ( $pid, $executable_name ) = $line =~ m{
         ^
         {
             "pid":"(\d+)"
@@ -123,21 +123,21 @@ sub get_lock_data {
         pid             => $pid,
         executable_name => $executable_name,
     };
-}
+} ## end sub get_lock_data
 
 # unlocking on scope exit
 sub DESTROY {
     my ($self) = @ARG;
 
-    return $self->unlock;
+    return $self->unlock();
 }
 
 sub _init_file_handle {
     my ($self) = @ARG;
 
-    my $fh = IO::File->new($self->lock_file, O_RDWR | O_CREAT);
+    my $fh = IO::File->new( $self->lock_file(), O_RDWR | O_CREAT );
 
-    if (!$fh) {
+    if ( !$fh ) {
         $self->_set_error($OS_ERROR);
     }
 
@@ -145,41 +145,41 @@ sub _init_file_handle {
 }
 
 sub _lock {
-    my ($self, %param) = @_;
+    my ( $self, %param ) = @_;
 
     # Re-locking changes nothing
-    return $self if $self->is_locked;
+    return $self if $self->is_locked();
 
-    my $fh = $self->_init_file_handle;
+    my $fh = $self->_init_file_handle();
 
-    if (!$fh) {
-        croak sprintf(q{Can't open "%s": %s}, $self->lock_file, $self->error);
+    if ( !$fh ) {
+        croak sprintf( q{Can't open "%s": %s}, $self->lock_file(), $self->error() );
     }
 
-    if (!flock $fh, LOCK_EX | LOCK_NB) {
+    if ( !flock $fh, LOCK_EX | LOCK_NB ) {
         $self->_set_error($OS_ERROR);
 
-        return if $param{'try'};
+        return if $param{try};
 
-        croak sprintf(q{Can't lock "%s": %s}, $self->lock_file, $self->error);
+        croak sprintf( q{Can't lock "%s": %s}, $self->lock_file(), $self->error() );
     }
 
-    if (!truncate $fh, 0) {
+    if ( !truncate $fh, 0 ) {
         $self->_set_error($OS_ERROR);
 
-        croak sprintf(q{Can't truncate "%s": %s}, $self->lock_file, $self->error);
+        croak sprintf( q{Can't truncate "%s": %s}, $self->lock_file(), $self->error() );
     }
 
     autoflush $fh 1;
 
-    if (!$fh->print($self->_lock_message)) {
+    if ( !$fh->print( $self->_lock_message() ) ) {
         $self->_set_error($OS_ERROR);
 
-        croak sprintf(q{Can't write message to file: %s}, $self->error);
+        croak sprintf( q{Can't write message to file: %s}, $self->error() );
     }
 
     return $self->_set_fh($fh)->_set_is_locked(1);
-}
+} ## end sub _lock
 
 sub _lock_message {
     return sprintf(
@@ -190,9 +190,9 @@ sub _lock_message {
 }
 
 sub _set_is_locked {
-    my ($self, $is_locked) = @ARG;
+    my ( $self, $is_locked ) = @ARG;
 
-    $self->{'is_locked'} = $is_locked;
+    $self->{is_locked} = $is_locked;
 
     return $self;
 }
@@ -200,21 +200,21 @@ sub _set_is_locked {
 sub _fh {
     my ($self) = @ARG;
 
-    return $self->{'fh'};
+    return $self->{fh};
 }
 
 sub _set_fh {
-    my ($self, $fh) = @ARG;
+    my ( $self, $fh ) = @ARG;
 
-    $self->{'fh'} = $fh;
+    $self->{fh} = $fh;
 
     return $self;
 }
 
 sub _set_error {
-    my ($self, $error) = @ARG;
+    my ( $self, $error ) = @ARG;
 
-    $self->{'error'} = $error || '<unknown_error>';
+    $self->{error} = $error || '<unknown_error>';
 
     return $self;
 }
@@ -229,7 +229,7 @@ JIP::LockFile - application lock/mutex based on files
 
 =head1 VERSION
 
-This document describes C<JIP::LockFile> version C<0.062>.
+This document describes C<JIP::LockFile> version C<0.063>.
 
 =head1 SYNOPSIS
 
@@ -237,31 +237,31 @@ This document describes C<JIP::LockFile> version C<0.062>.
 
     my $lock_file = '/path/to/pid_file';
 
-    my $foo = JIP::LockFile->new(lock_file => $lock_file);
-    my $wtf = JIP::LockFile->new(lock_file => $foo->lock_file);
+    my $foo = JIP::LockFile->new( lock_file => $lock_file );
+    my $wtf = JIP::LockFile->new( lock_file => $foo->lock_file() );
 
-    $foo->lock;           # lock
-    eval { $wtf->lock; }; # or raise exception
+    $foo->lock();           # lock
+    eval { $wtf->lock(); }; # or raise exception
 
     # Can check its status in case you forgot
-    $foo->is_locked; # 1
-    $wtf->is_locked; # 0
+    $foo->is_locked();      # 1
+    $wtf->is_locked();      # 0
 
-    $foo->lock; # Re-locking changes nothing
+    $foo->lock();           # Re-locking changes nothing
 
     # But trying to get a lock is ok
-    $wtf->try_lock;  # 0
-    $wtf->is_locked; # 0
+    $wtf->try_lock();       # 0
+    $wtf->is_locked();      # 0
 
     # Data from lock-file
-    $foo->get_lock_data->{pid};             # $PROCESS_ID
-    $foo->get_lock_data->{executable_name}; # $EXECUTABLE_NAME
+    $foo->get_lock_data()->{pid};             # $PROCESS_ID
+    $foo->get_lock_data()->{executable_name}; # $EXECUTABLE_NAME
 
     # You can manually unlock
-    $foo->unlock;
+    $foo->unlock();
 
     # Re-unlocking changes nothing
-    $foo->unlock;
+    $foo->unlock();
 
     # ... or unlocking is automatic on scope exit
     undef $foo;
@@ -272,27 +272,27 @@ L<JIP::LockFile> implements the following attributes.
 
 =head2 lock_file
 
-    my $object = JIP::LockFile->new(lock_file => '/path/to/pid_file');
+    my $object = JIP::LockFile->new( lock_file => '/path/to/pid_file' );
 
-    $object->lock_file; # /path/to/pid_file
+    $object->lock_file(); # /path/to/pid_file
 
 =head2 is_locked
 
-    my $object = JIP::LockFile->new(lock_file => '/path/to/pid_file');
+    my $object = JIP::LockFile->new( lock_file => '/path/to/pid_file' );
 
-    $object->is_locked; # 0
+    $object->is_locked(); # 0
 
-    $object->lock->is_locked; # 1
+    $object->lock->is_locked(); # 1
 
 =head2 error
 
-    my $object = JIP::LockFile->new(lock_file => '/path/to/pid_file');
+    my $object = JIP::LockFile->new( lock_file => '/path/to/pid_file' );
 
-    $object->lock;
+    $object->lock();
 
-    my $concurrent = JIP::LockFile->new(lock_file => $object->lock_file);
+    my $concurrent = JIP::LockFile->new( lock_file => $object->lock_file() );
 
-    $concurrent->try_lock->error; # Resource temporarily unavailable
+    $concurrent->try_lock->error(); # Resource temporarily unavailable
 
 =head1 SEE ALSO
 
@@ -300,11 +300,11 @@ L<Lock::File>, L<Lock::Socket> and L<JIP::LockSocket>.
 
 =head1 AUTHOR
 
-Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
+Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2020 Vladimir Zhavoronkov.
+Copyright 2015-2023 Volodymyr Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

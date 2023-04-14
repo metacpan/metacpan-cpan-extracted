@@ -74,7 +74,7 @@
          "web" : "https://github.com/ology/Music-Duration-Partition"
       }
    },
-   "version" : "0.0805",
+   "version" : "0.0814",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -304,9 +304,14 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
+                     "Instantiation",
+                     "VLC",
+                     "Voss",
                      "durations",
                      "hn",
+                     "homebrew",
                      "qn",
+                     "th",
                      "wn"
                   ],
                   "wordlist" : "Pod::Wordlist"
@@ -343,7 +348,8 @@
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
                   "exclude_match" : [
-                     "\\.mid"
+                     "\\.mid",
+                     "site"
                   ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,

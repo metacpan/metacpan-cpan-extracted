@@ -2,7 +2,7 @@ package App::optex;
 use strict;
 use warnings;
 
-our $VERSION = "v0.5.4";
+our $VERSION = "v0.6";
 
 1;
 
@@ -12,7 +12,7 @@ __END__
 
 =head1 NAME
 
-optex - optex command module direcrtory
+optex - optex command module directory
 
 =head1 SYNOPSIS
 

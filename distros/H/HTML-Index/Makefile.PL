@@ -18,4 +18,17 @@ WriteMakefile(
         Lingua::Stem            => 0,
         HTML::TreeBuilder       => 0,
     }, # e.g., Module::Name => 1.1
+    'META_MERGE' => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/avewrigley/HTML-Index.git',
+                 web  => 'https://github.com/avewrigley/HTML-Index/',
+             },
+             bugtracker => {
+                 web => 'https://github.com/avewrigley/HTML-Index/issues',
+             },
+         },
+    },
 );

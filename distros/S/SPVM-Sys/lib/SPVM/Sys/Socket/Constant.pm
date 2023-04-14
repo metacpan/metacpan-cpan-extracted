@@ -1344,3 +1344,10 @@ Get the constant value of C<ICMP_TIMESTAMP>. If the system doesn't define this c
   static method ICMP_TIME_EXCEEDED : int ();
 
 Get the constant value of C<ICMP_TIME_EXCEEDED>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

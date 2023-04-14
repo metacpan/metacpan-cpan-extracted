@@ -6,7 +6,7 @@ use Test::More 0.96;
 use Test::Fatal;
 
 use File::Spec;
-use File::Temp qw( tempdir );
+use File::Temp      qw( tempdir );
 use Module::Runtime qw( use_module );
 use Try::Tiny;
 
@@ -234,7 +234,7 @@ subtest(
             );
 
             $dispatch->log(
-                level => 'emerg',
+                level   => 'emerg',
                 message =>
                     "Mail::Send test - If you can read this then the test succeeded (PID $$)"
             );
@@ -269,7 +269,7 @@ subtest(
             );
 
             $dispatch->log(
-                level => 'emerg',
+                level   => 'emerg',
                 message =>
                     "Mail::Sendmail test - If you can read this then the test succeeded (PID $$)"
             );
@@ -305,7 +305,7 @@ subtest(
             );
 
             $dispatch->log(
-                level => 'emerg',
+                level   => 'emerg',
                 message =>
                     "MIME::Lite - If you can read this then the test succeeded (PID $$)"
             );
@@ -341,7 +341,7 @@ subtest(
             );
 
             $dispatch->log(
-                level => 'emerg',
+                level   => 'emerg',
                 message =>
                     "Mail::Sender - If you can read this then the test succeeded (PID $$)"
             );

@@ -1,13 +1,9 @@
 package Valiant::HTML::FormBuilder;
 
 use Moo;
-use Valiant::HTML::FormTags ();
-use Valiant::HTML::Form ();
-use Valiant::HTML::TagBuilder ();
-use Valiant::HTML::Util::Collection;
-
-use Valiant::I18N;
 use Scalar::Util (); 
+use Module::Runtime ();
+use Valiant::I18N;
 
 with 'Valiant::Naming';
 
@@ -24,7 +20,23 @@ has name => ( is => 'ro', required => 1 );
 has options => ( is => 'ro', required => 1, default => sub { +{} } );  
 has index => ( is => 'ro', required => 0, predicate => 'has_index' );
 has namespace => ( is => 'ro', required => 0, predicate => 'has_namespace' );
-has view => ( is => 'ro', required => 0, predicate => 'has_view' );
+has tag_helpers => (
+  is => 'ro', 
+  required => 1,
+  handles => [qw/view/],
+  builder => '_build_tag_helpers',
+  lazy => 1,
+);
+
+  sub _build_tag_helpers {
+    my ($self) = @_;
+    my %args = ();
+    $args{view} = exists($self->options->{view}) ? 
+      $self->options->{view} :
+        Module::Runtime::use_module('Valiant::HTML::Util::View')->new;
+    return Module::Runtime::use_module('Valiant::HTML::Util::Form')->new(%args);
+  }
+
 has _theme => ( is => 'rw', required => 1, init_arg=>'theme', default => sub { +{} } );
 has _nested_child_index => (is=>'rw', init_arg=>undef, required=>1, default=>sub { +{} });
 
@@ -33,7 +45,8 @@ around BUILDARGS => sub {
   my $options = $class->$orig(@args);
 
   $options->{index} = $options->{child_index} if !exists($options->{index}) && exists($options->{child_index});
-  
+  $options->{options} = exists($options->{options}) ? +{%$options, %{$options->{options}}} : $options;
+
   return $options;
 };
 
@@ -41,6 +54,8 @@ sub DEFAULT_MODEL_ERROR_MSG_ON_FIELD_ERRORS { return 'Your form has errors' }
 sub DEFAULT_MODEL_ERROR_TAG_ON_FIELD_ERRORS { return 'invalid_form' }
 sub DEFAULT_COLLECTION_CHECKBOX_BUILDER { return 'Valiant::HTML::FormBuilder::Checkbox' }
 sub DEFAULT_COLLECTION_RADIO_BUTTON_BUILDER { return 'Valiant::HTML::FormBuilder::RadioButton' }
+
+sub id { return shift->options->{id} }
 
 sub theme {
   my ($self) = @_;
@@ -63,7 +78,7 @@ sub tag_id_for_attribute {
   $opts->{namespace} = $self->namespace if $self->has_namespace;
   $opts->{index} = $self->index if $self->has_index;
 
-  return Valiant::HTML::FormTags::field_id($self->name, $attribute, $opts, @extra);
+  return $self->tag_helpers->field_id($self->name, $attribute, $opts, @extra);
 }
 
 # $self->tag_name_for_attribute($attribute, +{ multiple=>1 });
@@ -73,19 +88,19 @@ sub tag_name_for_attribute {
   $opts->{namespace} = $self->namespace if $self->has_namespace;
   $opts->{index} = $self->index if $self->has_index;
 
-  return Valiant::HTML::FormTags::field_name($self->name, $attribute, $opts, @extra);
+  return $self->tag_helpers->field_name($self->name, $attribute, $opts, @extra);
 }
 
 sub tag_value_for_attribute {
   my ($self, $attribute) = @_;
-  return Valiant::HTML::FormTags::field_value($self->model, $attribute);
+  return $self->tag_helpers->field_value($self->model, $attribute);
 }
 
 sub human_name_for_attribute {
   my ($self, $attribute) = @_;
   return $self->model->can('human_attribute_name') ?
     $self->model->human_attribute_name($attribute) :
-      Valiant::HTML::FormTags::_humanize($attribute);
+      $self->tag_helpers->_humanize($attribute);
 }
 
 sub attribute_has_errors {
@@ -93,7 +108,41 @@ sub attribute_has_errors {
   return $self->model->can('errors') && $self->model->errors->where($attribute) ? 1:0;
 }
 
+# $fb->has_errors()
+# $fb->model_errors($content)
+# $fb->error_for_form(\&template)
+
+sub form_has_errors {
+  my ($self) = shift;
+  return '' unless $self->model->has_errors # There is at least one field with an error
+    || $self->_get_model_errors; # There is at least one error on the model itself
+
+  my $options = ref($_[0]) eq 'HASH' ? shift : +{};
+  my $content = @_ ? shift : _t('invalid_form'); 
+
+  return $content->($self->view, $self, $self->model) if ref($content) eq 'CODE';
+
+  $options = $self->merge_theme_field_opts('model_errors', undef, $options);
+  $content = $self->model->i18n->translate(
+    $content,
+    scope=>'valiant.html.errors.messages',
+    default=>[ _t("errors.messages.invalid_form"), _t("messages.invalid_form") ],
+  ) if $self->model->i18n->is_i18n_tag($content);
+
+  return $self->tag_helpers->tags->div($options, $content);
+}
+
+sub _default_form_has_errors_content {
+  my ($self) = shift;
+  my $message = $self->_generate_default_model_error; 
+  return sub {
+    my ($view, $self) = @_;
+    return $self->tag_helpers->div($message);
+  }
+}
+
 # Public methods for HTML generation
+
 # $fb->model_errors()
 # $fb->model_errors(\%options)
 # $fb->model_errors(\%options, \&template)
@@ -114,7 +163,7 @@ sub model_errors {
 
   if(
     $self->model->has_errors &&     # We have errors
-    # !scalar(@errors) &&             # but no model errors
+    # !scalar(@errors) &&             # but no model errorsS_VIEW
     ($show_message_on_field_errors)   # And a default model error
   ) {
     unshift @errors, $self->_generate_default_model_error($show_message_on_field_errors);
@@ -151,9 +200,10 @@ sub _default_model_errors_content {
   return sub {
     my (@errors) = @_;
     if( scalar(@errors) == 1 ) {
-       return Valiant::HTML::TagBuilder::content_tag 'div', $errors[0], $options;
+      return $self->tag_helpers->content_tag('div', $errors[0], $options);
+       return $self->tag_helpers->content_tag('div', $errors[0], $options);
     } else {
-       return Valiant::HTML::TagBuilder::content_tag 'ol', $options, sub { map { Valiant::HTML::TagBuilder::content_tag('li', $_) } @errors };
+       return $self->tag_helpers->content_tag('ol', $options, sub { map { $self->tag_helpers->content_tag('li', $_) } @errors });
     }
   }
 }
@@ -197,9 +247,9 @@ sub label {
   $options = $self->merge_theme_field_opts(label=>$attribute, $options);
 
   if((ref($content)||'') eq 'CODE') {
-    return Valiant::HTML::FormTags::label_tag($attribute, $options, sub { $content->($translated_attribute) } );
+    return $self->tag_helpers->label_tag($attribute, $self->process_options($attribute, $options), sub { $content->($translated_attribute) } );
   } else {
-    return Valiant::HTML::FormTags::label_tag($attribute, $content, $options);
+    return $self->tag_helpers->label_tag($attribute, $content, $self->process_options($attribute, $options));
   }
 }
 
@@ -224,7 +274,7 @@ sub errors_for {
   
   my $max_errors = exists($options->{max_errors}) ? delete($options->{max_errors}) : undef;
   @errors = @errors[0..($max_errors-1)] if($max_errors);
-  $content = $self->_default_errors_for_content($options) unless defined($content);
+  $content = $self->_default_errors_for_content($self->process_options($attribute, $options)) unless defined($content);
 
   return $content->(@errors);  
 }
@@ -234,15 +284,16 @@ sub _default_errors_for_content {
   return sub {
     my (@errors) = @_;
     if( scalar(@errors) == 1 ) {
-       return Valiant::HTML::TagBuilder::content_tag 'div', $errors[0], $options;
+       return $self->tag_helpers->content_tag('div', $errors[0], $options);
     } else {
-       return Valiant::HTML::TagBuilder::content_tag 'ol', $options, sub { map { Valiant::HTML::TagBuilder::content_tag('li', $_) } @errors };
+       return $self->tag_helpers->content_tag('ol', $options, sub { map { $self->tag_helpers->content_tag('li', $_) } @errors });
     }
   }
 }
 
 sub process_options {
   my ($self, $attribute, $options) = @_;
+
   if( ($self->attribute_has_errors($attribute)) && (my $errors_attrs = delete $options->{errors_attrs})) {
     foreach my $key(keys %$errors_attrs) {
       if(exists $options->{$key}) {
@@ -278,7 +329,9 @@ sub input {
   set_unless_defined(name => $options, $self->tag_name_for_attribute($attribute));
   $options->{value} = $self->tag_value_for_attribute($attribute) unless defined($options->{value});
 
-  return Valiant::HTML::FormTags::input_tag $attribute, $self->process_options($attribute, $options);
+  $options = $self->process_options($attribute, $options);
+
+  return $self->tag_helpers->input_tag($attribute, $options);
 }
 
 sub password {
@@ -303,7 +356,7 @@ sub text_area {
     if $errors_classes && $self->model->can('errors') && $self->model->errors->where($attribute);
 
   set_unless_defined(id => $options, $self->tag_id_for_attribute($attribute));
-  return Valiant::HTML::FormTags::text_area_tag(
+  return $self->tag_helpers->text_area_tag(
     $self->tag_name_for_attribute($attribute),
     $self->tag_value_for_attribute($attribute),
     $self->process_options($attribute, $options),
@@ -335,7 +388,7 @@ sub checkbox {
 
   set_unless_defined(id => $options, $self->tag_id_for_attribute($attribute));
 
-  my $checkbox = Valiant::HTML::FormTags::checkbox_tag(
+  my $checkbox = $self->tag_helpers->checkbox_tag(
     $name,
     $checked_value,
     $checked,
@@ -344,7 +397,8 @@ sub checkbox {
 
   if($show_hidden_unchecked) {
     my $hidden_name = exists($options->{name}) ? $options->{name} : $name;
-    $checkbox = Valiant::HTML::TagBuilder::tag('input', +{type=>'hidden', name=>$hidden_name, value=>$unchecked_value})->concat($checkbox);
+    my $hidden_checkbox = $self->tag_helpers->tag('input', +{type=>'hidden', name=>$hidden_name, value=>$unchecked_value});
+    $checkbox = $self->tag_helpers->join_tags($hidden_checkbox, $checkbox);
   }
 
   return $checkbox;
@@ -409,27 +463,20 @@ sub submit {
   my $value = @_ ? shift(@_) : $self->_submit_default_value;
   $options = $self->merge_theme_field_opts('submit', undef, $options);
 
-  return Valiant::HTML::FormTags::submit_tag($value, $options);
-}
-
-sub _humanize {
-  my $value = shift;
-  $value =~s/_id$//; # remove trailing _id
-  $value =~s/_/ /g;
-  return ucfirst($value);
+  return $self->tag_helpers->submit_tag($value, $options);
 }
 
 sub _submit_default_value {
   my $self = shift;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $key = $model->can('in_storage') ? ( $model->in_storage ? 'update':'create' ) : 'submit';
-  my $model_placeholder = $model->can('model_name') ? $model->model_name->human : _humanize($self->name);
+  my $model_placeholder = $model->can('model_name') ? $model->model_name->human : $self->tag_helpers->_humanize($self->name);
 
   my @defaults = ();
 
   push @defaults, _t "formbuilder.submit.@{[ $self->name ]}.${key}";
   push @defaults, _t "formbuilder.submit.${key}";
-  push @defaults, "@{[ _humanize($key) ]} ${model_placeholder}";
+  push @defaults, "@{[ $self->tag_helpers->_humanize($key) ]} ${model_placeholder}";
 
   return $self->model->i18n->translate(
       shift(@defaults),
@@ -456,8 +503,8 @@ sub button {
   $attrs = $self->merge_theme_field_opts('button', $attribute, $attrs);
 
   return ref($content) ?
-    Valiant::HTML::FormTags::button_tag($attrs, $content) :
-      Valiant::HTML::FormTags::button_tag($content, $self->process_options($attribute, $attrs));
+    $self->tag_helpers->button_tag($attrs, $content) :
+      $self->tag_helpers->button_tag($content, $self->process_options($attribute, $attrs));
 }
 
 sub legend {
@@ -470,7 +517,7 @@ sub legend {
   $value = shift(@_) if @_;
   $value = $value->($default_value) if ((ref($value)||'') eq 'CODE');
 
-  return Valiant::HTML::FormTags::legend_tag($value, $options);
+  return $self->tag_helpers->legend_tag($value, $options);
 }
 
 sub legend_for {
@@ -482,22 +529,22 @@ sub legend_for {
   $attrs->{id} = "@{[ $self->tag_id_for_attribute($attribute) ]}_legend" unless exists($attrs->{id});
   $attrs = $self->merge_theme_field_opts('legend_for', $attribute, $attrs);
 
-  return Valiant::HTML::FormTags::legend_tag($attrs, $content);
+  return $self->tag_helpers->legend_tag($attrs, $content);
 }
 
 sub _legend_default_value {
   my $self = shift;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $key = $model->can('in_storage') ? ( $model->in_storage ? 'update':'create' ) : 'new';
-  my $model_placeholder = $model->can('model_name') ? $model->model_name->human : _humanize($self->name);
+  my $model_placeholder = $model->can('model_name') ? $model->model_name->human : $self->tag_helpers->_humanize($self->name);
 
   my @defaults = ();
 
-  return "@{[ _humanize($key) ]} ${model_placeholder}" unless $self->model->can('i18n');
+  return "@{[ $self->tag_helpers->_humanize($key) ]} ${model_placeholder}" unless $self->model->can('i18n');
 
   push @defaults, _t "formbuilder.legend.@{[ $self->model_name->i18n_key ]}.${key}";
   push @defaults, _t "formbuilder.legend.${key}";
-  push @defaults, "@{[ _humanize($key) ]} ${model_placeholder}";
+  push @defaults, "@{[ $self->tag_helpers->_humanize($key) ]} ${model_placeholder}";
 
   return $self->model->i18n->translate(
       shift(@defaults),
@@ -517,7 +564,6 @@ sub fields_for {
   $options->{include_id} = $self->options->{include_id} if !exists($options->{include_id}) && !defined($options->{include_id}) && defined($self->options->{include_id});
   $options->{namespace} = $self->namespace if $self->has_namespace;
   $options->{parent_builder} = $self;
-  $options->{view} = $self->view if $self->has_view;
 
   my $related_record = $self->tag_value_for_attribute($related_attribute);
   my $name = "@{[ $self->name ]}.@{[ $related_attribute ]}";
@@ -525,12 +571,12 @@ sub fields_for {
   $related_record = $related_record->to_model if Scalar::Util::blessed($related_record) && $related_record->can('to_model');
 
   # Coerce an array into a collection.  Not sure if we want this here or not TBH...
-  $related_record = Valiant::HTML::Util::Collection->new(map { $_->can('to_model') ? $_->to_model : $_ } @$related_record)
+  $related_record = $self->tag_helpers->array_to_collection(map { $_->can('to_model') ? $_->to_model : $_ } @$related_record)
     if (ref($related_record)||'') eq 'ARRAY';
 
   # Ok is the related record a collection or something else.
   if($related_record->can('next')) {
-    my $output = undef;
+    my @output = ();
     my $explicit_child_index = exists($options->{child_index}) ? $options->{child_index} : undef;
 
     while(my $child_model = $related_record->next) {
@@ -540,12 +586,7 @@ sub fields_for {
         $options->{child_index} = $self->nested_child_index($related_attribute); 
       }
       my $nested = $self->fields_for_nested_model("${name}[@{[ $options->{child_index} ]}]", $child_model, $options, $codeblock);
-
-      if(defined $output) {
-        $output = $output->concat($nested);
-      } else {
-        $output = $nested;
-      }
+      push @output, $nested;
     }
     $related_record->reset if $related_record->can('reset');
     if($finally_block) {
@@ -556,14 +597,9 @@ sub fields_for {
         $options->{child_index} = $self->nested_child_index($related_attribute); 
       }
       my $finally_content = $self->fields_for_nested_model("${name}[@{[ $options->{child_index} ]}]", $finally_model, $options, $finally_block);
-      if(defined $output) {
-        $output = $output->concat($finally_content);
-      } else {
-        $output = $finally_content;
-      }
-
+      push @output, $finally_content;
     }
-    return defined($output) ? $output : '';
+    return $self->tag_helpers->join_tags(@output);
   } else {
     return $self->fields_for_nested_model($name, $related_record, $options, $codeblock);
   }
@@ -578,15 +614,16 @@ sub fields_for_nested_model {
     $emit_hidden_id = exists($options->{include_id}) ? $options->{include_id} : 1;
   }
 
-  return Valiant::HTML::Form::fields_for($name, $model, $options, sub {
+  return $self->tag_helpers->fields_for($name, $model, $options, sub {
+    my $view = shift;
     my $fb = shift;
-    my $output = Valiant::HTML::FormTags::capture($codeblock, $fb, $model);
-    if($output && $emit_hidden_id && $model->can('primary_columns')) {
+    my @output = $codeblock->($view, $fb, $model);
+    if(@output && $emit_hidden_id && $model->can('primary_columns')) {
       foreach my $id_field ($model->primary_columns) {
-        $output = $output->concat($fb->hidden($id_field)); #TODO this cant be right...
+        push @output, $fb->hidden($id_field); #TODO this cant be right...
       }
     }
-    return $output;
+    return $self->tag_helpers->join_tags(@output);
   });
 }
 
@@ -613,7 +650,7 @@ sub select {
     $options->{include_hidden} = 0; # Avoid adding two
     my ($bridge, $value_method) = %$attribute_proto;
     my $collection = $model->$bridge;
-    $collection = Valiant::HTML::Util::Collection->new(map { $_->can('to_model') ? $_->to_model : $_ } @$collection)
+    $collection = $self->tag_helpers->array_to_collection(map { $_->can('to_model') ? $_->to_model : $_ } @$collection)
       if (ref($collection)||'') eq 'ARRAY';
 
     while(my $item = $collection->next) {
@@ -639,23 +676,24 @@ sub select {
     my $option_tags_proto = @_ ? shift : ();
     my @disabled = ( @{delete($options->{disabled})||[]});
     @selected = @{ delete($options->{selected})||[]} if exists($options->{selected});
-
-    $options_tags = Valiant::HTML::FormTags::options_for_select($option_tags_proto, +{
+    $options_tags = $self->tag_helpers->options_for_select($option_tags_proto, +{
       selected => \@selected,
       disabled => \@disabled,
     });
   } else {
-    $options_tags = Valiant::HTML::FormTags::capture($block, $model, $attribute_proto, @selected);
+    $options_tags = $self->tag_helpers->join_tags($block->($model, $attribute_proto, @selected));
   }
 
   $options->{include_hidden} = 0 if $options->{multiple};
-  my $select_tag = Valiant::HTML::FormTags::select_tag($name, $options_tags, $options);
+  my $select_tag = $self->tag_helpers->select_tag($name, $options_tags, $options);
   if($include_hidden && $options->{multiple}) {
     if(ref($attribute_proto)) {
       my ($bridge, $value_method) = %$attribute_proto;
-      $select_tag = $self->hidden("${bridge}[0]._nop", +{value=>1, id=>$options->{id}.'_hidden'})->concat($select_tag);
+      my $hidden = $self->hidden("${bridge}[0]._nop", +{value=>1, id=>$options->{id}.'_hidden'});
+      $select_tag = $self->tag_helpers->join_tags($hidden, $select_tag);
     } elsif(defined $unselected_default) {
-      $select_tag = $self->hidden("${attribute_proto}[0]", +{value=>$unselected_default, id=>$options->{id}.'_hidden'})->concat($select_tag)
+      my $hidden = $self->hidden("${attribute_proto}[0]", +{value=>$unselected_default, id=>$options->{id}.'_hidden'});
+      $select_tag = $self->tag_helpers->join_tags($hidden, $select_tag);
     }
   }
   return $select_tag;
@@ -678,7 +716,7 @@ sub collection_select {
     $options->{include_hidden} = 0 unless exists($options->{include_hidden}); # Avoid adding two
     my ($bridge, $value_method) = %$method_proto;
     my $collection = $model->$bridge;
-    $collection = Valiant::HTML::Util::Collection->new(map { $_->can('to_model') ? $_->to_model : $_ } @$collection)
+    $collection = $self->tag_helpers->array_to_collection(map { $_->can('to_model') ? $_->to_model : $_ } @$collection)
       if (ref($collection)||'') eq 'ARRAY';
 
     while(my $item = $collection->next) {
@@ -707,9 +745,9 @@ sub collection_select {
   
   my @disabled = ( @{delete($options->{disabled})||[]});
   @selected = @{ delete($options->{selected})||[]} if exists($options->{selected});
-  my $select_tag = Valiant::HTML::FormTags::select_tag(
+  my $select_tag = $self->tag_helpers->select_tag(
     $name,
-    Valiant::HTML::FormTags::options_from_collection_for_select($collection, $value_method, $label_method, +{
+    $self->tag_helpers->options_from_collection_for_select($collection, $value_method, $label_method, +{
       selected => \@selected,
       disabled => \@disabled,
     }),
@@ -717,7 +755,8 @@ sub collection_select {
 
   if($include_hidden && ref($method_proto)) {
     my ($bridge, $value_method) = %$method_proto;
-    $select_tag = $self->hidden("${bridge}[0]._nop", +{value=>1, id=>$options->{id}.'_hidden'})->concat($select_tag);    
+    my $hidden = $self->hidden("${bridge}[0]._nop", +{value=>1, id=>$options->{id}.'_hidden'});
+    $select_tag = $self->tag_helpers->join_tags($hidden, $select_tag);    
   }
 
   return $select_tag;
@@ -739,7 +778,7 @@ sub collection_checkbox {
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_checkbox_include_hidden;
   my $container_tag = exists($options->{container_tag}) ? delete($options->{container_tag}) : 'div';
 
-  # It's either +{ person_roles => role_id } or roles 
+  # It's either +{ person_roles => role_id } or roles
   my ($attribute, $attribute_value_method) = ();
   if( (ref($attribute_spec)||'') eq 'HASH' ) {
     ($attribute, $attribute_value_method) = (%{ $attribute_spec });
@@ -752,7 +791,7 @@ sub collection_checkbox {
 
   my @checked_values = ();
   my $value_collection = $self->tag_value_for_attribute($attribute);
-  $value_collection = Valiant::HTML::Util::Collection->new(map { $_->can('to_model') ? $_->to_model : $_ } @$value_collection)
+  $value_collection = $self->tag_helpers->array_to_collection(map { $_->can('to_model') ? $_->to_model : $_ } @$value_collection)
     if (ref($value_collection)||'') eq 'ARRAY';
 
   while(my $value_model = $value_collection->next) {
@@ -767,10 +806,10 @@ sub collection_checkbox {
     attribute_value_method => $attribute_value_method,
     parent_builder => $self,
     attribute => $attribute,
+    tag_helpers => $self->tag_helpers,
     errors => [$model->errors->where($attribute)],
   };
   $checkbox_builder_options->{namespace} = $self->namespace if $self->has_namespace;
-  $checkbox_builder_options->{view} = $self->view if $self->has_view;
 
   $collection = $model->$collection unless Scalar::Util::blessed($collection);
 
@@ -778,12 +817,14 @@ sub collection_checkbox {
     my $index = $self->nested_child_index($attribute); 
     my $name = "@{[ $self->name ]}.${attribute}";
     my $checked = grep {
-      my $current_value = $checkbox_model->can('read_attribute_for_html') ? $checkbox_model->read_attribute_for_html($value_method) : $checkbox_model->$value_method;
+      my $current_value = $checkbox_model->can('read_attribute_for_html') ? 
+        $checkbox_model->read_attribute_for_html($value_method)
+          : $checkbox_model->$value_method;
       $_ eq $current_value;
     } @checked_values;
 
     if($include_hidden && !scalar(@checkboxes)) { # Add nop as first to handle empty list
-      my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $value_collection->build, {%$checkbox_builder_options, index=>$index});
+      my $hidden_fb = $self->tag_helpers->_instantiate_builder($name, $value_collection->build, {%$checkbox_builder_options, index=>$index});
       push @checkboxes, $hidden_fb->hidden('_nop', +{value=>'1'});
       $index = $self->nested_child_index($attribute);
     }
@@ -791,20 +832,20 @@ sub collection_checkbox {
     $checkbox_builder_options->{index} = $index;
     $checkbox_builder_options->{checked} = $checked;
     $checkbox_builder_options->{parent_builder} = $self;
-    my $checkbox_fb = Valiant::HTML::Form::_instantiate_builder($name, $checkbox_model, $checkbox_builder_options);
+    my $checkbox_fb = $self->tag_helpers->_instantiate_builder($name, $checkbox_model, $checkbox_builder_options);
     push @checkboxes, $codeblock->($checkbox_fb);
   }
   $collection->reset if $collection->can('reset');
-  my $checkbox_content = shift(@checkboxes)->concat(@checkboxes);
+  my $checkbox_content = $self->view->safe_concat(@checkboxes);
 
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
   $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
     if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
 
-  return Valiant::HTML::TagBuilder::content_tag $container_tag, $checkbox_content, +{
+  return $self->tag_helpers->content_tag($container_tag, $checkbox_content, +{
     id => $self->tag_id_for_attribute($attribute),
     %$options,
-  }; 
+  }); 
 }
 
 sub _default_collection_checkbox_content {
@@ -813,7 +854,7 @@ sub _default_collection_checkbox_content {
     my ($fb) = @_;
     my $label = $fb->label;
     my $checkbox = $fb->checkbox;
-    return $label->concat($checkbox);
+    return $self->tag_helpers->join_tags($label, $checkbox);
   };
 }
 
@@ -842,39 +883,41 @@ sub collection_radio_buttons {
     checked_value => $checked_value,
     parent_builder => $self,
     attribute => $attribute,
+    tag_helpers => $self->tag_helpers,
     errors => [$model->errors->where($attribute)],
   };
   $radio_buttons_builder_options->{namespace} = $self->namespace if $self->has_namespace;
-  $radio_buttons_builder_options->{view} = $self->view if $self->has_view;
 
   $collection = $model->$collection unless Scalar::Util::blessed($collection);
 
   while (my $radio_button_model = $collection->next) {
     my $name = "@{[ $self->name ]}.${attribute}";
-    my $current_value = $radio_button_model->can('read_attribute_for_html') ? $radio_button_model->read_attribute_for_html($value_method) : $radio_button_model->$value_method;
+    my $current_value = $radio_button_model->can('read_attribute_for_html') ?
+      $radio_button_model->read_attribute_for_html($value_method) :
+      $radio_button_model->$value_method;
     my $checked = $current_value eq ($checked_value||'') ? 1:0;
 
     if($include_hidden && !scalar(@radio_buttons) ) { # Add nop as first to handle empty list
-      my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $model, $radio_buttons_builder_options);
+      my $hidden_fb = $self->tag_helpers->_instantiate_builder($name, $model, $radio_buttons_builder_options);
       push @radio_buttons, $hidden_fb->hidden($name, +{name=>$name, id=>$self->tag_id_for_attribute($attribute).'_hidden', value=>''});
     }
 
     $radio_buttons_builder_options->{checked} = $checked;
 
-    my $radio_button_fb = Valiant::HTML::Form::_instantiate_builder($name, $radio_button_model, $radio_buttons_builder_options);
+    my $radio_button_fb = $self->tag_helpers->_instantiate_builder($name, $radio_button_model, $radio_buttons_builder_options);
     push @radio_buttons, $codeblock->($radio_button_fb);
   }
   $collection->reset if $collection->can('reset');
-  my $radios = shift(@radio_buttons)->concat(@radio_buttons);
+  my $radios = $self->view->safe_concat(@radio_buttons);
 
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
   $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
     if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
 
-  return Valiant::HTML::TagBuilder::content_tag $container_tag, $radios, +{
+  return $self->tag_helpers->content_tag($container_tag, $radios, +{
     id => $self->tag_id_for_attribute($attribute),
     %$options,
-  }; 
+  }); 
 }
 
 sub _default_collection_radio_buttons_content {
@@ -883,14 +926,14 @@ sub _default_collection_radio_buttons_content {
     my ($fb) = @_;
     my $label = $fb->label();
     my $checkbox = $fb->radio_button();
-    return $label->concat($checkbox);
+    return $self->tag_helpers->join_tags($label, $checkbox);
   };
 }
 
 sub radio_buttons {
   my ($self, $attribute, $collection_proto) = (shift, shift, shift);
   $collection_proto = $self->model->$collection_proto unless (ref($collection_proto)||'') eq 'ARRAY';
-  my $collection = Valiant::HTML::Util::Collection->new(@$collection_proto);
+  my $collection = $self->tag_helpers->array_to_collection(@$collection_proto);
   return $self->collection_radio_buttons($attribute, $collection, @_);
 }
 
@@ -902,7 +945,7 @@ sub radio_buttons {
 
 =head1 NAME
 
-Valiant::HTML::Formbuilder - General HTML Forms
+Valiant::HTML::FormBuilder - General HTML Forms
 
 =head1 SYNOPSIS
 
@@ -1027,14 +1070,116 @@ The current index of a collection for which the current formbuilder is one item 
 
 Used to add a prefix to the ID for your form elements.
 
+=head2 allow_method_names_outside_model
+
+Default is false.  Generally we expect C<method_name> to be an actual method on the
+C<model> and if its not we expect an exception.  This helps to prevent typos from
+leading to unexpected results.  However sometimes you may wish create a form field that
+has a name that isn't on the model but still respects the current namespace and index.
+These names would appear in the POST request body and could be used for things other than
+updating or creating a model.
+
+=head2 skip_default_ids
+
+Defaults to false.  Generally we create an html C<id> attribute for the field based
+on a convention which includes the model name, index and method name.  Setting this
+to true prevents that so you should set C<id> manually unless you don't want them.
+Please note that even if this is false, you can always override the C<id> on a per
+field basis by setting it manually.
+
 =head2 view
 
 Optional.  The view or template object that is using the formbuilder.  If available can be used to
 influence how the HTML for controls are created.
 
+Generally used to provide HTML escaping and safe string tagging methods that are compatible with
+your template system.  For example L<Mojo::Template> provides its own system for marking strings
+safe for template display.  I you don't provide a view then we will use L<Valiant::HTML::SafeString>
+for automatic HTML escaping.  If you are not using a view or template system (for example like
+L<Template::Toolkit> ) that does automatic escaping then the built in escaping features are probably
+fine.
+
+If you provide a view it should provide the following API methods:
+
+=over 4
+
+=item raw
+
+given a string return a single tagged object which is marked as safe for display.  Do not do any HTML 
+escaping on the string.  This is used when you want to pass strings straight to display and that you 
+know is safe.  Be careful with this to avoid HTML injection attacks.
+
+=item safe
+
+given a string return a single tagged object which is marked as safe for display.  First HTML escape the
+string as safe unless its already been done (no double escaping).
+
+=item safe_concat
+
+Same as C<safe> but instead works an an array of strings (or mix of strings and safe string objects) and
+concatenates them all into one big safe marked string.
+
+=item html_escape
+
+Given a string return string that has been HTML escaped.
+
+=item read_attribute_for_view
+
+Given an attribute name return the value that the view has defined for it.
+
+=item attribute_for_view_exists
+
+Given an attribute name return true if the view has defined a value for it.
+
+=back
+
+Both C<raw>, C<safe> and C<safe_concat> should return a 'tagged' object which is specific to your view or
+template system. However this object must 'stringify' to the safe version of the string to be displayed.  See
+L<Valiant::HTML::SafeString> for example API.  We use <Valiant::HTML::SafeString> internally to provide
+safe escaping if you're view doesn't do automatic escaping, as many older template systems like Template
+Toolkit.
+
+B<NOTE>: In the future the view API might change so keep an eye on this spot.
+
 =head1 METHODS
 
 This class defines the following public instance methods.
+
+=head2 form_has_errors
+
+Display a message if the form has errors.  This is a convenience method that you can use in your
+template to display a message if there are any errors in the form.  This is useful if you want to
+display a message at the top of the form.  You can also use this method to display a message at the
+top of a sub formbuilder if you are using sub formbuilders.
+
+A form has errors if any of the fields has an error or if the model has errors.
+
+    $fb->form_has_errors();
+    $fb->form_has_errors(\%attrs);
+    $fb->form_has_errors(\%attrs, $content);
+    $fb->form_has_errors(\$content);
+    $fb->form_has_errors(\&template);
+
+Examples:
+
+    # with default content
+    $fb->form_has_errors;
+
+    # with simple content
+    $fb->form_has_errors('There were errors in the form. Please correct them.');
+
+    # Simple content with attributes
+    $fb->form_has_errors({ class=>'alert alert-danger', role=>'alert' },
+      'There were errors in the form. Please correct them and try again.');
+
+    # with complex content
+    $fb->form_has_errors(sub ($self, $fb, $contact) {
+      div +{ class=>'alert alert-danger', role=>'alert' }, [
+        'There were errors in the form. Please correct them and try again.',
+      ]
+    });
+
+If you pass a scalar as content, the scalar can be a string or a translation tag.
 
 =head2 model_errors
 

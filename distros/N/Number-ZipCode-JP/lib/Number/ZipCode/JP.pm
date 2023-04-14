@@ -6,7 +6,7 @@ use 5.008_001;
 use Carp;
 use UNIVERSAL::require;
 
-our $VERSION = '0.20230131';
+our $VERSION = '0.20230331';
 our %ZIP_TABLE = ();
 
 sub import {

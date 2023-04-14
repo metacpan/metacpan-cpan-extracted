@@ -1,5 +1,7 @@
 Revision history for Book::Collate
 
+0.0.02    20230413
+          Removed references to cpanratings.
 0.0.01    20210703
           First version, released on an unsuspecting world.
 

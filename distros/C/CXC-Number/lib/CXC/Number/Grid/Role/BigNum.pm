@@ -2,11 +2,11 @@ package CXC::Number::Grid::Role::BigNum;
 
 # ABSTRACT: Role to return Math::BigFloats
 
-use feature ':5.24';
+use v5.28;
 
 use Moo::Role;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use experimental 'signatures';
 use namespace::clean;
@@ -43,7 +43,7 @@ CXC::Number::Grid::Role::BigNum - Role to return Math::BigFloats
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ passed L<Math::BigFloat> arrays and scalars.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

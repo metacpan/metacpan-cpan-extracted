@@ -9,6 +9,16 @@ use Venus::Class 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
+# BUILDERS
+
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    args => ref $data eq 'ARRAY' ? $data : [$data],
+  };
+}
+
 # METHODS
 
 sub all {
@@ -113,9 +123,9 @@ sub foreach {
 sub from {
   my ($self, $data) = @_;
 
-  $self = $self->class->new;
+  $self = $self->new if !ref $self;
 
-  $self->{from} = ref $data || $data;
+  $self->{from} = ref $data || $data if $data;
 
   return $self;
 }
@@ -177,6 +187,14 @@ sub move {
   return $self;
 }
 
+sub name {
+  my ($self, $data) = @_;
+
+  $self->{name} = $data if $data;
+
+  return $self;
+}
+
 sub one {
   my ($self, $code, @args) = @_;
 
@@ -203,15 +221,29 @@ sub set {
 }
 
 sub signature {
-  my ($self, $name, @args) = @_;
+  my ($self, @args) = @_;
 
   require Venus::Assert;
+
+  my ($from, $name) = ((caller(1))[0,3]);
+  my ($file, $line) = ((caller(0))[1,2]);
+
+  $from = $self->{from} if defined $self->{from};
+  $name = $self->{name} if defined $self->{name};
+
+  if (!$name) {
+    $from = "$file at line $line";
+    $name = "signature";
+  }
+  else {
+    $name = (split /::/, $name)[-1];
+    $name = "signature \"$name\"";
+  }
 
   my $code = sub {
     my ($self, $data, $expr, $index) = @_;
 
-    my $from = $self->{from} || ref $self;
-    my $name = qq(argument #@{[$index + 1]} for signature "$name" in $from);
+    my $name = qq(argument #@{[$index + 1]} for $name in $from);
     return scalar Venus::Assert->new($name)->expression($expr)->validate($data);
   };
 
@@ -281,7 +313,7 @@ Unpack Class for Perl 5
 
 =head1 DESCRIPTION
 
-This package provides methods for validating, coercing, and otherwise operting
+This package provides methods for validating, coercing, and otherwise operating
 on lists of arguments.
 
 =cut
@@ -646,6 +678,46 @@ I<Since C<2.01>>
 
 =cut
 
+=head2 from
+
+  from(Str $data) (Unpack)
+
+The from method names the source of the unpacking operation and is used in
+exception messages whenever the L<Venus::Unpack/signature> operation fails.
+This method returns the invocant.
+
+I<Since C<2.23>>
+
+=over 4
+
+=item from example 1
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->from;
+
+  # bless(..., 'Venus::Unpack')
+
+=back
+
+=over 4
+
+=item from example 2
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->from('Example');
+
+  # bless(..., 'Venus::Unpack')
+
+=back
+
+=cut
+
 =head2 get
 
   get(Str $index) (Any)
@@ -949,6 +1021,46 @@ I<Since C<2.01>>
 
 =cut
 
+=head2 name
+
+  name(Str $data) (Unpack)
+
+The name method names the unpacking operation and is used in exception messages
+whenever the L<Venus::Unpack/signature> operation fails. This method returns
+the invocant.
+
+I<Since C<2.23>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->name;
+
+  # bless(..., 'Venus::Unpack')
+
+=back
+
+=over 4
+
+=item name example 2
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->name('example');
+
+  # bless(..., 'Venus::Unpack')
+
+=back
+
+=cut
+
 =head2 one
 
   one(Str | CodeRef $code, Any @args) (Any)
@@ -1130,8 +1242,7 @@ I<Since C<2.01>>
 
   package main;
 
-  my ($string, $number, $float) = $unpack->all->signature(
-    'example-1',
+  my ($string, $number, $float) = $unpack->all->name('example-1')->signature(
     'string | number | float',
   );
 
@@ -1147,8 +1258,7 @@ I<Since C<2.01>>
 
   package main;
 
-  my ($string, $number, $float) = $unpack->all->signature(
-    'example-2',
+  my ($string, $number, $float) = $unpack->all->name('example-2')->signature(
     'string', 'number', 'float',
  );
 
@@ -1164,8 +1274,7 @@ I<Since C<2.01>>
 
   package main;
 
-  my $results = $unpack->all->signature(
-    'example-3',
+  my $results = $unpack->all->name('example-3')->signature(
     'string', 'number',
   );
 
@@ -1181,9 +1290,24 @@ I<Since C<2.01>>
 
   package main;
 
-  my $results = $unpack->all->signature(
-    'example-4',
+  my $results = $unpack->all->name('example-4')->signature(
     'string',
+  );
+
+  # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=over 4
+
+=item signature example 5
+
+  # given: synopsis
+
+  package main;
+
+  my $results = $unpack->all->name('example-5')->from('t/Venus_Unpack.t')->signature(
+    'object',
   );
 
   # Exception! (isa Venus::Assert::Error)

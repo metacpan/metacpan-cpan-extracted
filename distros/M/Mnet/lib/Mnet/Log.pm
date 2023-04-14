@@ -114,14 +114,17 @@ BEGIN {
     # declare sub used by SIG handlers to log error and stack trace info
     sub _sig_handler {
         my ($label, $caller, $error, $sev) = (shift, shift, shift, 7);
+        my $opts = Mnet::Opts::Cli::Cache::get({});
         $sev = 3 if not defined $Mnet::Log::error;
         output(undef, "ERR", 3, $caller, "$label, $error");
-        output(undef, "err", $sev, $caller, "$label, $_")
-            foreach split(/\n/, Carp::longmess());
-        output(undef, "err", $sev, $caller, "$label, \$! = $!") if $! ne "";
-        output(undef, "err", $sev, $caller, "$label, \$@ = $@") if $@ ne "";
-        output(undef, "err", $sev, $caller, "$label, \$? = $?") if $? ne "";
-        output(undef, "err", $sev, $caller, "$label, \$^E = $^E") if $^E ne "";
+        if (not $opts->{quiet} and not $label =~ /^perl (die|warn),\s(.*)/) {
+            output(undef, "err", $sev, $caller, "$label, $_")
+                foreach split(/\n/, Carp::longmess());
+            output(undef,"err",$sev,$caller,"$label, \$! = $!") if $! ne "";
+            output(undef,"err",$sev,$caller,"$label, \$@ = $@") if $@ ne "";
+            output(undef,"err",$sev,$caller,"$label, \$? = $?") if $? ne "";
+            output(undef,"err",$sev,$caller,"$label, \$^E = $^E") if $^E ne "";
+        }
     }
 
     # trap perl die signal, log as error and exit with a failed status
@@ -154,7 +157,7 @@ BEGIN {
     #   output a linefeed to stderr after ^C put there by shell
     $SIG{INT} = sub {
         syswrite STDERR, "\n";
-        output(undef, "ERR", 3, scalar(caller), "terminate signal received");
+        output(undef, "ERR", 3, scalar(caller), "interrupt signal received");
         exit 1;
     };
 
@@ -413,8 +416,10 @@ sub output {
 
         # stderr sev 4 warn, sev 3 error, and sev 2 fatal
         #   included in Mnet::Tee::test_outputs
+        #   if --quiet and perl die/warn error then output original error only
         #   if --silent set then output to --tee file only
         } elsif ($severity < 5) {
+            $line = $2 if $self->{quiet} and $text =~ /^perl (die|warn),\s(.*)/;
             if ($self->{silent} and not $self->{quiet}) {
                 Mnet::Tee::tee_no_term("$line\n") if $INC{"Mnet/Tee.pm"};
             } else {

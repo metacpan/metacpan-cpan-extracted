@@ -1,0 +1,57 @@
+NAME
+
+    Crypt::Passphrase::Argon2::AES - A peppered AES-encrypted Argon2
+    encoder for Crypt::Passphrase
+
+SYNOPSIS
+
+     my $passphrase = Crypt::Passphrase->new(
+         encoder => {
+             module  => 'Argon2::AES',
+             peppers => {
+                 1 => pack('H*', '0123456789ABCDEF...'),
+                 2 => pack('H*', 'FEDCBA9876543210...'),
+             },
+         },
+     );
+
+DESCRIPTION
+
+    This class implements peppering by encrypting the hash using AES
+    (unlike Crypt::Passphrase::Pepper::Simple which hashes the input
+    instead).
+
+METHODS
+
+ new
+
+    This constructor takes all arguments also taken by
+    Crypt::Passphrase::Argon2, with the following additions:
+
+      * peppers
+
+      This is a map of identifier to pepper value. The identifiers should
+      be (probably small) numbers, the values should be random binary
+      strings that must be either 16, 24 or 32 bytes long.
+
+      * active
+
+      This is the identifier of the active pepper. By default it will be
+      the identifier with the highest (numerical) value.
+
+      * mode
+
+      This is the mode that will be used with AES. Values values are 'ecb',
+      'cbc' (the default), 'cfb', 'ofb' and 'ctr'.
+
+AUTHOR
+
+    Leon Timmermans <leont@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2023 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

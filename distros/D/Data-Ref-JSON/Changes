@@ -1,0 +1,11 @@
+Revision history for Perl module Data::Ref::JSON
+
+0.01 Tue Oct 29 14:19:29 2019
+    - original version; created by ExtUtils::ModuleMaker 0.63
+
+0.02 Wed Apr 12 10:25:04 2023
+ - fixed a bug in JSON.pm - sometimes value is null, deal with it
+ - updated comments and documentation
+
+
+

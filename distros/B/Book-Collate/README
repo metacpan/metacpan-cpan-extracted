@@ -21,11 +21,8 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Book::Collate
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Book::Collate
+    GitHub (report bugs here)
+        https://github.com/LeamHall/book_collate
 
     Search CPAN
         https://metacpan.org/release/Book::Collate
@@ -33,7 +30,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by Leam Hall.
+This software is Copyright (c) 2023 by Leam Hall.
 
 This is free software, licensed under:
 

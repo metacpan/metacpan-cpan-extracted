@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Root;
 # ABSTRACT: Handle machine data for StorageDisplay
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -122,7 +122,7 @@ StorageDisplay::Data::Root - Handle machine data for StorageDisplay
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 AUTHOR
 

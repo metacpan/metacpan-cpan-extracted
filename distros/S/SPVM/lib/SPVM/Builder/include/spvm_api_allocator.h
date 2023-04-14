@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_API_ALLOCATOR_H
 #define SPVM_API_ALLOCATOR_H
 

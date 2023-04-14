@@ -1,5 +1,18 @@
 Revision history for App-VTide
 
+1.0.1   2023-04-01
+        Updating for release of version 1.0.1
+        Adding missing new files (Ivan Wills)
+        Switching to using opt rather than default (Ivan Wills)
+        Fixing list logic (Ivan Wills)
+        Fixing auto completion and making list clearer (Ivan Wills)
+        Fixing some ambiguities with auto completion (Ivan Wills)
+        Minor fixes (Ivan Wills)
+        New session management command (Ivan Wills)
+        Fixing up adding sessions (Ivan Wills)
+        Starting to add logic to save/restore sessions (Ivan Wills)
+        Allowing recurse to work when a helper is defined (Ivan Wills)
+
 0.1.21   2023-03-14
         Updating for release of version 0.1.21
         Updating documentation of commands (Ivan Wills)

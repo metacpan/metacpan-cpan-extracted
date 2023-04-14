@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_keep;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Moo;
 use Catmandu::Fix::Has;
@@ -10,9 +10,9 @@ use PICA::Data qw(pica_path pica_fields);
 use Scalar::Util 'reftype';
 
 has pathes => (
-    fix_arg => 1,
+    fix_arg => 'collect',
     coerce  => sub {
-        [ map { pica_path($_) } grep { $_ } split /[ \|]+/, $_[0] ]
+        [ map { pica_path($_) } map { split /\s*,\s*/ } @{ $_[0] } ]
     }
 );
 
@@ -34,14 +34,16 @@ Catmandu::Fix::pica_keep - reduce PICA record to selected fields
     pica_keep('0.../*')
 
     # keep two specific fields only
-    pica_keep('003@,021A')
+    pica_keep(003@,021A)    # pathes can passed as multiple arguments
+    pica_keep("003@,021A")  # equivalent: one argument with multiple pathes
 
 =head1 FUNCTIONS
 
-=head2 pica_keep(PATH)
+=head2 pica_keep(PATH,PATH...)
 
 Reduce PICA record to fields referenced by L<PICA Path expressions|https://format.gbv.de/query/picapath>.
-Multiple expressions can be separated by C<|> or space. Path expressions must not contain subfields.
+Multiple expressions can be separated by C<,> and optional space or given as multiple arguments.
+Path expressions should not contain subfields.
 
 =head2 SEE ALSO
 

@@ -26,14 +26,14 @@ pin( my $ver, 'libfoo', 'VERSION', Int );
 
 # DESCRIPTION
 
-Affix is a wrapper around [dyncall](https://dyncall.org/).
-
-Note: This is experimental software and is subject to change as long as this
-disclaimer is here.
+Affix is an [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) to
+wrap libraries developed in other languages (C, C++, Rust, etc.) with pure
+Perl; without XS!
 
 # Basic Usage
 
-The basic API here is rather simple but not lacking in power.
+The basic API is rather simple but not lacking in power. It's likely what
+you'll decide to use in your projects.
 
 ## `affix( ... )`
 
@@ -43,6 +43,9 @@ warn pow( 3, 5 );
 
 affix( 'foo', ['foo', 'foobar'] => [ Str ] );
 foobar( 'Hello' );
+
+affix( ['foo_dylib', RUST], ['foo', 'foobar'] => [ Str ] );
+foobar( 'Hello' );
 ```
 
 Attaches a given symbol in a named perl sub.
@@ -51,8 +54,11 @@ Parameters include:
 
 - `$lib`
 
-    path of the library as a string or pointer returned by [`dlLoadLibrary( ...
-    )`](https://metacpan.org/pod/Dyn%3A%3ALoad#dlLoadLibrary)
+    path or name of the library or an explicit `undef` to load functions from the
+    main executable
+
+    Optionally, you may provide an array reference with the library and an [ABI
+    hint](#abi-hints) if the library was built with mangled exports
 
 - `$symbol_name`
 
@@ -86,7 +92,11 @@ Parameters include:
 
 - `$lib`
 
-    pointer returned by [`dlLoadLibrary( ... )`](https://metacpan.org/pod/Dyn%3A%3ALoad#dlLoadLibrary) or the path of the library as a string
+    path or name of the library or an explicit `undef` to load functions from the
+    main executable
+
+    Optionally, you may provide an array reference with the library and an [ABI
+    hint](#abi-hints) if the library was built with mangled exports
 
 - `$symbol_name`
 
@@ -101,7 +111,41 @@ Parameters include:
     return type
 
 `wrap( ... )` behaves exactly like `affix( ... )` but returns an anonymous
-subroutine.
+subroutine and does not pollute the namespace.
+
+## `pin( ... )`
+
+```perl
+my $errno;
+pin( $errno, 'libc', 'errno', Int );
+print $errno;
+$errno = 0;
+```
+
+Variables exported by a library - also names "global" or "extern" variables -
+can be accessed using `pin( ... )`. The above example code applies magic to
+`$error` that binds it to the integer variable named "errno" as exported by
+the [libc](https://metacpan.org/pod/libc) library.
+
+Expected parameters include:
+
+- `$var`
+
+    Perl scalar that will be bound to the exported variable.
+
+- `$lib`
+
+    name or path of the symbol
+
+- `$symbol_name`
+
+    the name of the exported variable name
+
+- `$type`
+
+    type that data will be coerced in or out of as required
+
+This is likely broken on BSD but patches are welcome.
 
 # `:Native` CODE attribute
 
@@ -168,7 +212,7 @@ creating a module called `Foo` and we'd rather call the routine as
 the name of the symbol in `libfoo` and call the subroutine whatever we want
 (`init` in this case).
 
-## Passing and returning values
+## Signatures
 
 Normal Perl signatures do not convey the type of arguments a native function
 expects and what it returns so you must define them with our final attribute:
@@ -182,50 +226,6 @@ sub add :Native("calculator") :Signature([Int, Int] => Int);
 Here, we have declared that the function takes two 32-bit integers and returns
 a 32-bit integer. You can find the other types that you may pass [further down
 this page](#types).
-
-# Signatures
-
-Affix's advisory signatures are required to give us a little hint about what we
-should expect.
-
-```perl
-[ Int, ArrayRef[ Int, 100 ], Str ] => Int
-```
-
-Arguments are defined in a list: `[ Int, ArrayRef[ Char, 5 ], Str ]`
-
-The return value comes next: `Int`
-
-To call the function with such a signature, your Perl would look like this:
-
-```
-mh $int = func( 500, [ 'a', 'b', 'x', '4', 'H' ], 'Test');
-```
-
-See the aptly named sections entitled [Types](#types) for more on the possible
-types and ["Calling Conventions" in Calling Conventions](https://metacpan.org/pod/Calling%20Conventions#Calling-Conventions) for flags that may also be
-defined as part of your signature.
-
-# Library Paths and Names
-
-The `:Native` attribute, `affix( ... )`, and `wrap( ... )` all accept the
-library name, the full path, or a subroutine returning either of the two. When
-using the library name, the name is assumed to be prepended with lib and
-appended with `.so` (or just appended with `.dll` on Windows), and will be
-searched for in the paths in the `LD_LIBRARY_PATH` (`PATH` on Windows)
-environment variable.
-
-You can also put an incomplete path like `'./foo'` and Affix will
-automatically put the right extension according to the platform specification.
-If you wish to suppress this expansion, simply pass the string as the body of a
-block.
-
-```perl
-sub bar :Native({ './lib/Non Standard Naming Scheme' });
-```
-
-**BE CAREFUL**: the `:Native` attribute and constant might be evaluated at
-compile time.
 
 ## ABI/API version
 
@@ -247,6 +247,27 @@ sub foo2 :Native('foo', v1.2.3); # Will try to load libfoo.so.1.2.3
 
 sub pow : Native('m', v6) : Signature([Double, Double] => Double);
 ```
+
+## Library Paths and Names
+
+The `:Native` attribute, `affix( ... )`, and `wrap( ... )` all accept the
+library name, the full path, or a subroutine returning either of the two. When
+using the library name, the name is assumed to be prepended with lib and
+appended with `.so` (or just appended with `.dll` on Windows), and will be
+searched for in the paths in the `LD_LIBRARY_PATH` (`PATH` on Windows)
+environment variable.
+
+You can also put an incomplete path like `'./foo'` and Affix will
+automatically put the right extension according to the platform specification.
+If you wish to suppress this expansion, simply pass the string as the body of a
+block.
+
+```perl
+sub bar :Native({ './lib/Non Standard Naming Scheme' });
+```
+
+**BE CAREFUL**: the `:Native` attribute and constant might be evaluated at
+compile time.
 
 ## Calling into the standard library
 
@@ -274,42 +295,6 @@ sub getpwuid : Native : Signature([Int]=>Pointer[PwStruct]);
 my $data = main::getpwuid( getuid() );
 print Dumper( ptr2sv( $data, Pointer [ PwStruct() ] ) );
 ```
-
-# Exported Variables
-
-Variables exported by a library - also names "global" or "extern" variables -
-can be accessed using `pin( ... )`.
-
-## `pin( ... )`
-
-```
-pin( $errno, 'libc', 'errno', Int );
-print $errno;
-$errno = 0;
-```
-
-This code applies magic to `$error` that binds it to the integer variable
-named "errno" as exported by the [libc](https://metacpan.org/pod/libc) library.
-
-Expected parameters include:
-
-- `$var`
-
-    Perl scalar that will be bound to the exported variable.
-
-- `$lib`
-
-    pointer returned by [`dlLoadLibrary( ... )`](https://metacpan.org/pod/Dyn%3A%3ALoad#dlLoadLibrary) or the path of the library as a string
-
-- `$symbol_name`
-
-    the name of the exported variable
-
-- `$type`
-
-    type that data will be coerced in or out of as required
-
-This is likely broken on BSD. Patches welcome.
 
 # Memory Functions
 
@@ -713,6 +698,9 @@ A blessed object of a certain type. When used as an lvalue, the result is
 properly blessed. As an rvalue, the reference is checked to be a subclass of
 the given package.
 
+Note: This "type" is in a state of development flux and might be made complete
+with [issue #32](https://github.com/sanko/Affix.pm/issues/32)
+
 ## `Any`
 
 Anything you dump here will be passed along unmodified. We hand off a pointer
@@ -775,6 +763,29 @@ Same as `Enum`.
 
 `Enum` but with signed chars.
 
+# Signatures
+
+Affix's advisory signatures are required to give us a little hint about what we
+should expect.
+
+```perl
+[ Int, ArrayRef[ Int, 100 ], Str ] => Int
+```
+
+Arguments are defined in a list: `[ Int, ArrayRef[ Char, 5 ], Str ]`
+
+The return value comes next: `Int`
+
+To call the function with such a signature, your Perl would look like this:
+
+```
+mh $int = func( 500, [ 'a', 'b', 'x', '4', 'H' ], 'Test');
+```
+
+See the aptly named sections entitled [Types](#types) for more on the possible
+types and ["Calling Conventions" in Calling Conventions](https://metacpan.org/pod/Calling%20Conventions#Calling-Conventions) for flags that may also be
+defined as part of your signature.
+
 # Calling Conventions
 
 Handle with care! Using these without understanding them can break your code!
@@ -804,53 +815,22 @@ When used in ["Signatures" in signatures](https://metacpan.org/pod/signatures#Si
 argument stack to be reset. The exception is `CC_ELLIPSIS_VARARGS` which is
 used prior to binding varargs of variadic functions.
 
-# Examples
+# ABI Hints
 
-The best example of use might be [LibUI](https://metacpan.org/pod/LibUI). Brief examples will be found in
-`eg/`. Very short examples might find their way here.
+Advanced languages may [mangle the names of exported
+symbols](https://en.wikipedia.org/wiki/Name_mangling) according to their ABIs.
+Affix can handle wrap the correct symbol when provided with a language/platform
+hint.
 
-## Microsoft Windows
+Currently supported ABIs include:
 
-Here is an example of a Windows API call:
+- `ITANIUM` - basic C++ mangling (https://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling)
+- `RUST` - legacy rust mangling (current stable)
 
-```perl
-use Affix;
-sub MessageBoxA :Native('user32') :Signature([Int, Str, Str, Int] => Int);
-MessageBoxA(0, "We have NativeCall", "ohai", 64);
-```
+These may be imported by name or with the `:abi` tag and this list will grow
+as this project matures.
 
-## Short tutorial on calling a C function
-
-This is an example for calling a standard function and using the returned
-information.
-
-`getaddrinfo` is a POSIX standard function for obtaining network information
-about a network node, e.g., `google.com`. It is an interesting function to
-look at because it illustrates a number of the elements of Affix.
-
-The Linux manual provides the following information about the C callable
-function:
-
-```
-int getaddrinfo(const char *node, const char *service,
-   const struct addrinfo *hints,
-   struct addrinfo **res);
-```
-
-The function returns a response code 0 for success and 1 for error. The data
-are extracted from a linked list of `addrinfo` elements, with the first
-element pointed to by `res`.
-
-From the table of Affix types we know that an `int` is `Int`. We also know
-that a `char *` is best expressed with `Str`. But `addrinfo` is a structure,
-which means we will need to write our own type class. However, the function
-declaration is straightforward:
-
-```
-TODO
-```
-
-# Features
+# Platform Support
 
 Not all features of dyncall are supported on all platforms, for those, the
 underlying library defines macros you can use to detect support. These values
@@ -865,15 +845,32 @@ are exposed under the `Affix::Feature` package:
     If true, your platform supports passing around aggregates (struct, union) by
     value.
 
+# Stack Size
+
+You may control the max size of the internal stack that will be allocated and
+used to bind the arguments to by setting the `$VMSize` variable before using
+Affix.
+
+```
+BEGIN{ $Affix::VMSize = 2 ** 16; }
+```
+
+This value is `4096` by default.
+
+# Examples
+
+The best example of use might be [LibUI](https://metacpan.org/pod/LibUI). Brief examples will be found in
+`eg/`. Very short examples might find their way here.
+
 # See Also
+
+All the heavy lifting is done by [dyncall](https://dyncall.org/).
 
 Check out [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus) for a more robust and mature FFI
 
-Examples found in `eg/`.
-
 [LibUI](https://metacpan.org/pod/LibUI) for a larger demo project based on Affix
 
-[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard) for the inspiration of the advisory types system.
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard) for the inspiration of the advisory types system
 
 # LICENSE
 

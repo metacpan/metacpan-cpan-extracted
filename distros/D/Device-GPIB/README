@@ -1,0 +1,62 @@
+Device-GPIB version 0.01
+========================
+
+This module provides Perl Modules and command line programs to access
+a variety of generic and specific GPIB devices, via a number of
+supported GPIB interfaces.
+
+Generic command line programs can be used to scan the GPIB bus and to
+send arbitrary commands and queries to any device that supports GPIB.
+
+Perl Modules and command line programs to access specific
+features of a number of HP, Tektronix and Advantest devices are also
+provided.
+
+Supports a number of GPIB interfaces and controllers including:
+
+Prologix GPIB-USB Controller and compatibles, including:
+   AR488 for Arduino from Twilight-Logic: https://github.com/Twilight-Logic/AR488
+      (tested version 0.51.18 with Arduino Nano and custom wiring interface)
+   (requires Device::SerialPort)
+
+LinuxGpib compatible devices
+   (requires linux-gpib from https://sourceforge.net/projects/linux-gpib and its LinuxGpib perl module)
+   (Tested with linux-gpib-4.3.5 and Keysight 82357B on Ubuntu 22.10)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+You can test the library and specific programs without installation with commands like:
+
+perl -I lib bin/gpib.pl -address 11 'id?'
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+If you intend to use a Prologix USB-GPIB or conpatible controller, you
+must install Device::Serial
+
+If you intend to use a LinuxGpib device, you must first install linux-gpib and its LinuxGpib perl module
+from https://sourceforge.net/projects/linux-gpib
+Follow the instructions in lib/Device/GPIB/Controllers/README.
+  
+This module obsoletes and replaces the earlier Device::GPIB::Prologix
+module from the same author.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2023 by Mike McCauley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.34.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

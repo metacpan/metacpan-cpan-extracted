@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::Socket::AddrinfoLinkedList {
   use Sys::Socket::Addrinfo;
   native method DESTROY : void ();

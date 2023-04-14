@@ -1,3 +1,13 @@
+0.009   2023-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: ean{8,13}_unvalidated.
+
+
+0.008   2023-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: ean{8,13}_without_check_digit.
+
+
 0.007   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

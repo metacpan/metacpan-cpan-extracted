@@ -1,0 +1,30 @@
+---
+abstract: "Dropbox's password estimation logic, with French defaults"
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Password-zxcvbn-French
+no_index:
+  directory:
+    - t/lib
+requires:
+  Data::Password::zxcvbn: v1.1.2
+  Exporter: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://bitbucket.org/broadbean/p5-data-password-zxcvbn-french.git
+version: 1.0.2
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

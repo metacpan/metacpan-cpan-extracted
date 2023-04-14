@@ -2,10 +2,12 @@ use strict;
 use warnings;
 
 use App::Pod::Example;
-use English qw(-no_match_vars);
+use Capture::Tiny qw(capture);
+use English;
+use Error::Pure::Utils qw(clean);
 use File::Object;
-use IO::CaptureOutput qw(capture);
-use Test::More 'tests' => 18;
+use File::Spec::Functions qw(abs2rel);
+use Test::More 'tests' => 20;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn;
@@ -15,11 +17,53 @@ my $modules_dir = File::Object->new->up->dir('modules');
 
 # Test.
 @ARGV = (
+	'-h',
+);
+my $script = abs2rel(File::Object->new->file('04-run.t')->s);
+# XXX Hack for missing abs2rel on Windows.
+if ($OSNAME eq 'MSWin32') {
+	$script =~ s/\\/\//msg;
+}
+my $right_ret = <<"END";
+Usage: $script [-d flag] [-e] [-h] [-n number] [-p] [-r]
+	[-s section] [--version] pod_file_or_module [argument ..]
+
+	-d flag		Turn debug (0/1) (default is 1).
+	-e		Enumerate lines. Only for print mode.
+	-h		Help.
+	-n number	Number of example (default is nothing).
+	-p		Print example.
+	-r		Run example.
+	-s section	Use section (default EXAMPLE).
+	--version	Print version.
+END
+stderr_is(
+	sub {
+		App::Pod::Example->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help.',
+);
+
+# Test.
+@ARGV = (
+	'Foo',
+);
+eval {
+       App::Pod::Example->new->run;
+};
+is($EVAL_ERROR, "Cannot process any action (-p or -r options).\n",
+	'No action.');
+clean();
+
+# Test.
+@ARGV = (
 	'-d' => 0,
 	'-r',
 	$modules_dir->file('Ex1.pm')->s,
 );
-my $right_ret = <<'END';
+$right_ret = <<'END';
 Foo.
 END
 stdout_is(
@@ -63,11 +107,9 @@ $right_ret = <<'END';
 # Example output
 #-------------------------------------------------------------------------------
 END
-my ($stderr, $stdout);
-capture sub {
+my ($stdout, $stderr) = capture {
 	App::Pod::Example->new->run;
-	return;
-} => \$stdout, \$stderr;
+};
 is($stdout, $right_ret, 'Header on example with die().');
 like($stderr, qr{^Error\. at .* line 5\.$}, 'Example with die().');
 
@@ -77,11 +119,9 @@ like($stderr, qr{^Error\. at .* line 5\.$}, 'Example with die().');
 	'-r',
 	$modules_dir->file('Ex3.pm')->s,
 );
-($stderr, $stdout) = (undef, undef);
-capture sub {
+($stdout, $stderr) = capture {
 	App::Pod::Example->new->run;
-	return;
-} => \$stdout, \$stderr;
+};
 is($stdout, $right_ret, 'Header on example with Carp::croak().');
 like($stderr, qr{^Error\. at .* line 7\.$}, 'Example with Carp::croak().');
 
@@ -91,11 +131,9 @@ like($stderr, qr{^Error\. at .* line 7\.$}, 'Example with Carp::croak().');
 	'-r',
 	$modules_dir->file('Ex4.pm')->s,
 );
-($stderr, $stdout) = (undef, undef);
-capture sub {
+($stdout, $stderr) = capture {
 	App::Pod::Example->new->run;
-	return;
-} => \$stdout, \$stderr;
+};
 is($stdout, $right_ret, 'Header on example with Error::Pure::Die::err().');
 like($stderr, qr{^Error\. at .* line 7\.$},
 	'Example with Error::Pure::Die::err().');

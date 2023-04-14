@@ -463,6 +463,36 @@ sub rmfiles {
   return wantarray ? (@paths) : \@paths;
 }
 
+sub root {
+  my ($self, $spec, $base) = @_;
+
+  my @paths;
+
+  for my $path ($self->absolute->lineage) {
+    if ($path->child($base)->test($spec)) {
+      push @paths, $path;
+      last;
+    }
+  }
+
+  return @paths ? (-f $paths[0] ? $paths[0]->parent : $paths[0]) : undef;
+}
+
+sub seek {
+  my ($self, $spec, $base) = @_;
+
+  if ((my $path = $self->child($base))->test($spec)) {
+    return $path;
+  }
+  else {
+    for my $path ($self->directories) {
+      my $sought = $path->seek($spec, $base);
+      return $sought if $sought;
+    }
+    return undef;
+  }
+}
+
 sub sibling {
   my ($self, $path) = @_;
 
@@ -1712,6 +1742,84 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/stars/sirius" }, "Venus::Path"),
   #   bless({ value => "t/data/stars/vega" }, "Venus::Path"),
   # ]
+
+=back
+
+=cut
+
+=head2 root
+
+  root(Str $spec, Str $base) (Maybe[Path])
+
+The root method performs a search up the file system heirarchy returns the
+first path (i.e. absolute path) matching the file test specification and base
+path expression provided. The file test specification is the same passed to
+L</test>. If no path matches are found this method returns underfined.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item root example 1
+
+  # given: synopsis;
+
+  my $root = $path->root('d', 't');
+
+  # bless({ value => "/path/to/t/../" }, "Venus::Path")
+
+=back
+
+=over 4
+
+=item root example 2
+
+  # given: synopsis;
+
+  my $root = $path->root('f', 't');
+
+  # undef
+
+=back
+
+=cut
+
+=head2 seek
+
+  seek(Str $spec, Str $base) (Maybe[Path])
+
+The seek method performs a search down the file system heirarchy returns the
+first path (i.e. absolute path) matching the file test specification and base
+path expression provided. The file test specification is the same passed to
+L</test>. If no path matches are found this method returns underfined.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item seek example 1
+
+  # given: synopsis;
+
+  my $path = Venus::Path->new('t');
+
+  my $seek = $path->seek('f', 'earth');
+
+  # bless({ value => "/path/to/t/data/planets/earth" }, "Venus::Path")
+
+=back
+
+=over 4
+
+=item seek example 2
+
+  # given: synopsis;
+
+  my $path = Venus::Path->new('t');
+
+  my $seek = $path->seek('f', 'europa');
+
+  # undef
 
 =back
 

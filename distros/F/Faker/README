@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    1.17
+    1.19
 
 SYNOPSIS
 
@@ -2310,4 +2310,11 @@ FEATURES
 AUTHORS
 
     Awncorp, awncorp@cpan.org
+
+LICENSE
+
+    Copyright (C) 2000, Al Newkirk.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Apache license version 2.0.
 

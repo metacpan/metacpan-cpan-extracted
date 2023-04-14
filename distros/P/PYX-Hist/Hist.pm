@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use List::Util qw(reduce);
 use PYX::Parser;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -126,11 +126,11 @@ PYX::Hist - Processing PYX data or file and print histogram.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = PYX::Hist->new(%parameters);
 
- Constructor.
+Constructor.
 
 =over 8
 
@@ -141,25 +141,32 @@ PYX::Hist - Processing PYX data or file and print histogram.
 
 =back
 
-=item C<parse($pyx[, $out])>
+=head2 C<parse>
 
- Parse PYX text or array of PYX text and print histogram of PYX input.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse($pyx, $out);
 
-=item C<parse_file($input_file[, $out])>
+Parse PYX text or array of PYX text and print histogram of PYX input.
+If C<$out> not present, use 'output_handler'.
 
- Parse file with PYX data and print histogram of PYX input.
- If $out not present, use 'output_handler'.
- Returns undef.
+Returns undef.
 
-=item C<parse_handler($input_file_handler[, $out])>
+=head2 C<parse_file>
 
- Parse PYX handler and print histogram of PYX input.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse_file($input_file, $out);
 
-=back
+Parse file with PYX data and print histogram of PYX input.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<parse_handler>
+
+ $obj->parse_handle($input_file_handler, $out);
+
+Parse PYX handler and print histogram of PYX input.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -183,6 +190,8 @@ PYX::Hist - Processing PYX data or file and print histogram.
          Stack has some elements.
 
 =head1 EXAMPLE1
+
+=for comment filename=hist.pl
 
  use strict;
  use warnings;
@@ -216,6 +225,8 @@ PYX::Hist - Processing PYX data or file and print histogram.
 
 =head1 EXAMPLE2
 
+=for comment filename=hist_with_bad_end_element.pl
+
  use strict;
  use warnings;
 
@@ -246,6 +257,8 @@ PYX::Hist - Processing PYX data or file and print histogram.
  # Element: middle
 
 =head1 EXAMPLE3
+
+=for comment filename=hist_with_missing_element.pl
 
  use strict;
  use warnings;
@@ -304,12 +317,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2020 Michal Josef Špaček
+© 2014-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

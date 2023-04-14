@@ -1,5 +1,9 @@
 Revision history for Weather::Meteo
 
+0.05	Fri Apr 14 09:55:47 EDT 2023
+	Include the daily overview in the results
+	The database is from 1940
+
 0.04	Tue Mar 21 21:49:03 EDT 2023
 	Support Geo::Location::Point object to give a location
 

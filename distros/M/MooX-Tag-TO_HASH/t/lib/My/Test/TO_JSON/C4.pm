@@ -16,9 +16,8 @@ has secret_admirer => ( is => 'ro', );
 
 sub modify_jsonr {
     my ( $self, $jsonr ) = @_;
-    $jsonr->{$_} = uc $jsonr->{$_}
-      for grep defined $jsonr->{$_}, keys %$jsonr;
-};
+    $jsonr->{$_} = uc $jsonr->{$_} for grep defined $jsonr->{$_}, keys %$jsonr;
+}
 
 1;
 

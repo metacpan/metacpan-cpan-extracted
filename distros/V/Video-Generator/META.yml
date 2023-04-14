@@ -30,7 +30,6 @@ requires:
   File::Path: 0
   File::Spec::Functions: 0
   File::Temp: 0
-  IO::CaptureOutput: 0
   Image::Random: 0
   Readonly: 0
   Video::Delay::Const: 0
@@ -41,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Video-Generator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Video-Generator
-version: '0.09'
+version: '0.10'

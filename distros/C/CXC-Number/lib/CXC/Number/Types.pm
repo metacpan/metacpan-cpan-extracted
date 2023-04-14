@@ -2,15 +2,16 @@ package CXC::Number::Types;
 
 # ABSTRACT: Type::Tiny types for CXC::Number
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use Math::BigInt upgrade => 'Math::BigFloat';
 use Math::BigFloat;
 use Type::Utils;
-use Types::Standard qw[ Num Int InstanceOf  ];
+use Types::Standard        qw[ Num Int InstanceOf  ];
 use Types::Common::Numeric qw[ PositiveNum PositiveOrZeroNum PositiveInt ];
 
 use Type::Library -base, -declare => qw(
@@ -60,16 +61,13 @@ declare BigPositiveOrZeroNum, as BigNum, where { $_ >= 0 }, message {
 
 
 
-coerce BigPositiveOrZeroNum,
-  from PositiveOrZeroNum,
-  via { Math::BigFloat->new( $_ ) };
+coerce BigPositiveOrZeroNum, from PositiveOrZeroNum, via { Math::BigFloat->new( $_ ) };
 
 
 
 
 
-declare BigInt,
-  as( InstanceOf ['Math::BigInt'] | InstanceOf ['Math::BigFloat'] ),
+declare BigInt, as( InstanceOf ['Math::BigInt'] | InstanceOf ['Math::BigFloat'] ),
   where { $_->is_int() }, message {
     'Not an integer or a Math::BigInt'
   };
@@ -117,7 +115,7 @@ CXC::Number::Types - Type::Tiny types for CXC::Number
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 TYPES
 
@@ -141,7 +139,7 @@ A BigInt > 0.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

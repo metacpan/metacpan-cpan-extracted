@@ -31,3 +31,10 @@ Revision history for Perl extension HTML::Index.
           [david@blumenthal.com]
 0.15 Mon Jun 30 16:33:38 BST 2003
         - added Carp::Assert to PREREQ_PM in Makefile.PL
+0.16 Tue 28 Mar 2023 13:07:26 BST
+        - changed big.t to use done_testing for test count
+0.17 Tue  4 Apr 2023 18:35:40 BST
+0.18 Thu  6 Apr 2023 15:16:11 BST
+        - add github repo to metadata
+0.19 Mon 10 Apr 2023 17:58:29 BST
+        - fix compress bug

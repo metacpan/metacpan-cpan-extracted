@@ -1,12 +1,12 @@
 {
-   "abstract" : "zlib Resource",
+   "abstract" : "Resource of zlib Library",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,23 +27,26 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "SPVM" : "0.9701"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9500"
+            "SPVM" : "0.9701"
          }
+      },
+      "test" : {
+         "requires" : {}
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/yuki-kimoto/Perl-SPVM-Resource-Zlib.git",
-         "web" : "https://github.com/yuki-kimoto/Perl-SPVM-Resource-Zlib"
+         "url" : "https://github.com/yuki-kimoto/SPVM-Resource-Zlib.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Resource-Zlib"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -19,7 +19,26 @@ WriteMakefile(
     },
 
     BUILD_REQUIRES => {
-        'Test::More'      => 0.88, # done_testing()
-        'Test::Exception' => 0,
+        'Test::Simple'   => 0.88,    # done_testing()
+        'Test::Fatal'    => 0,
+        'Test::Warnings' => 0,
+    },
+
+    MIN_PERL_VERSION => 5.008,
+    META_ADD => {
+        'meta-spec' => {
+            version => 2,
+        },
+        license => [ 'perl_5' ],
+        'resources' => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com:abeltje/Business-IBAN-Validator.git',
+                web  => 'https://github.com/abeltje/Business-IBAN-Validator',
+            },
+        },
+        bugtracker => {
+            web => 'https://github.com/abeltje/Business-IBAN-Validator/issues',
+        },
     },
 );

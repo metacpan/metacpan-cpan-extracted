@@ -14,7 +14,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ name: DynaLoader-Functions
 provides:
   DynaLoader::Functions:
     file: lib/DynaLoader/Functions.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Config: '0'
@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DynaLoader-Functions
   license: http://dev.perl.org/licenses/
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

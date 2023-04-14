@@ -1,0 +1,59 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::TrailingSpace' => '0.0203'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Type::Tiny::XS' => '0'
+                                      },
+                      'requires' => {
+                                      'Fcntl' => '0',
+                                      'List::Util' => '0',
+                                      'Moo' => '0',
+                                      'Path::Tiny' => '0',
+                                      'PerlX::Maybe' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Types::Common::String' => '0',
+                                      'Types::Path::Tiny' => '0',
+                                      'Types::Standard' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.14.0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Test::Differences' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

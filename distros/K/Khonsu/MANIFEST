@@ -3,6 +3,7 @@ ignore.txt
 lib/Khonsu.pm
 lib/Khonsu/File.pm
 lib/Khonsu/Font.pm
+lib/Khonsu/Image.pm
 lib/Khonsu/Page.pm
 lib/Khonsu/Ra.pm
 lib/Khonsu/Shape.pm
@@ -26,6 +27,7 @@ t/01-file.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/test.png
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

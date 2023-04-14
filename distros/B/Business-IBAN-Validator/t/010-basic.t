@@ -1,8 +1,5 @@
-#! perl -w
-use strict;
-
-use Test::More;
-use Test::Exception;
+#! perl -I. -w
+use t::Test::abeltje;
 
 use Business::IBAN::Validator;
 
@@ -11,29 +8,33 @@ use Business::IBAN::Validator;
     isa_ok($v, 'Business::IBAN::Validator');
 
     my $iban = 'XX';
-    throws_ok(
-        sub { $v->validate($iban) },
+    my $e = exception { $v->validate($iban) };
+    like(
+        $e,
         qr/^'XX' is not an IBAN country code.\n\z/,
         "Not an IBAN country code"
     );
 
     $iban = 'NL00ABNA123456789';
-    throws_ok(
-        sub { $v->validate($iban) },
-        qr/^'$iban' has incorrect length 17 \(expected 18 for The Netherlands\).\n\z/,
+    $e = exception { $v->validate($iban) };
+    like(
+        $e,
+        qr/^'$iban' has incorrect length 17 \(expected 18 for Netherlands \(The\)\).\n\z/,
         "invalid length"
     );
 
     $iban = 'NL00ABNA123456789x';
-    throws_ok(
-        sub { $v->validate($iban) },
-        qr/^'NL00ABNA123456789x' does not match the pattern 'NL2!n4!a10!n'for The Netherlands./,
+    $e = exception { $v->validate($iban) };
+    like(
+        $e,
+        qr/^'NL00ABNA123456789x' does not match the pattern 'NL2!n4!a10!n'for Netherlands/,
         "Pattern check"
     );
 
     $iban = 'NL00ABNA0123456789';
-    throws_ok(
-        sub { $v->validate($iban) },
+    $e = exception { $v->validate($iban) };
+    like(
+        $e,
         qr/^'NL00ABNA0123456789' does not comply with the 97-check./,
         "97-check"
     );
@@ -43,15 +44,18 @@ use Business::IBAN::Validator;
         sub { $v->NL->{is_sepa} },
         "AUTOLOAD() works."
     );
-    throws_ok(
-        sub { $v->XX->{is_sepa} },
+
+    $e = exception { $v->XX->{is_sepa} };
+    like(
+        $e,
         qr/^'XX' is not a valid IBAN country code./,
         "(AUTOLOAD) Unknown country code."
     );
 
     # Restricted hash
-    throws_ok(
-        sub { $v->{XX} = {} },
+    $e = exception { $v->{XX} = {} };
+    like(
+        $e,
         qr/^Attempt to access disallowed key 'XX' in a restricted hash/,
         "Cannot modify the validator"
     );
@@ -59,4 +63,4 @@ use Business::IBAN::Validator;
     $v = undef;
 }
 
-done_testing();
+abeltje_done_testing();

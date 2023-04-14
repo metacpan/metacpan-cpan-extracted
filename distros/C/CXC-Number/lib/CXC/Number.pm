@@ -2,10 +2,11 @@ package CXC::Number;
 
 # ABSTRACT:  A namespace for modules which deal with numbers.
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 #
 # This file is part of CXC-Number
@@ -31,7 +32,7 @@ CXC::Number - A namespace for modules which deal with numbers.
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -57,7 +58,7 @@ constructed so that they are useful for binning data.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

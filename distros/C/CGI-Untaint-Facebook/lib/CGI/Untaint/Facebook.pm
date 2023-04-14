@@ -18,11 +18,11 @@ CGI::Untaint::Facebook - Validate a string is a valid Facebook URL or ID
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ sub is_valid {
 		$url = $value;
 	}
 
-	my $request = new HTTP::Request('HEAD' => $url);
+	my $request = HTTP::Request->new('HEAD' => $url);
 	$request->header('Accept' => 'text/html');
 	if($ENV{'HTTP_ACCEPT_LANGUAGE'}) {
 		$request->header('Accept-Language' => $ENV{'HTTP_ACCEPT_LANGUAGE'});
@@ -108,8 +108,8 @@ sub is_valid {
 	$browser->env_proxy(1);
 
 	my $webdoc = $browser->simple_request($request);
-	my $error_code = $webdoc->code;
-	unless($webdoc->is_success()) {
+	my $error_code = $webdoc->code();
+	if(!$webdoc->is_success()) {
 		if((($error_code == 301) || ($error_code == 302)) &&
 		   ($webdoc->as_string =~ /^location: (.+)$/im)) {
 		   	my $location = $1;
@@ -118,16 +118,24 @@ sub is_valid {
 				return 1;
 			} else {
 				my $e = uri_escape($url);
+				if($location =~ /^https?:\/\/(www|m).facebook.com\/login\/\?next=\Q$e\E/) {
+					return 1;
+				}
 				if($location =~ /^https?:\/\/(www|m).facebook.com\/login.php\?next=\Q$e\E/) {
 					return 1;
 				}
 			}
 			carp "redirect from $url to $location";
+			return 1;
 		} elsif($error_code != 404) {
 			# Probably the certs file is wrong, or there
 			# was a timeout
-			carp "$url: " . $webdoc->status_line;
+			carp "$url: ", $webdoc->status_line();
 		}
+		return 0;
+	}
+	my $response = $browser->decoded_content();
+	if($response =~ /This content isn't available at the moment/mis) {
 		return 0;
 	}
 	return 1;
@@ -143,18 +151,15 @@ Please report any bugs or feature requests to C<bug-cgi-untaint-url-facebook at 
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-Twitter>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
 =head1 SEE ALSO
 
 CGI::Untaint::url
-
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc CGI::Untaint::Facebook
-
 
 You can also look for information at:
 
@@ -164,10 +169,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-Facebook>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-Untaint-Facebook>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/CGI-Untaint-Facebook>
@@ -176,13 +177,11 @@ L<http://search.cpan.org/dist/CGI-Untaint-Facebook>
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2019 Nigel Horne.
+Copyright 2012-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
-
 
 =cut
 

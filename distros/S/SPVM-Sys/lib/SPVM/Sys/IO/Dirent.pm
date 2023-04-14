@@ -37,3 +37,10 @@ Gets C<d_reclen>.
   method d_name : string ();
 
 Gets C<d_name>. This value is copied.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

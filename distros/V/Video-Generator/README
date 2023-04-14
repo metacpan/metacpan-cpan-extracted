@@ -8,92 +8,99 @@ SYNOPSIS
      my $type = $obj->create($out_path);
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = Video::Generator->new(%parameters);
 
-            *       "delay_generator"
+    Constructor.
 
-                     Delay generator.
-                     Default value is object below:
-                       Video::Delay::Const->new(
-                               'const' => 1000,
-                       )
+    *       "delay_generator"
 
-            *       "duration"
+             Delay generator.
+             Default value is object below:
+               Video::Delay::Const->new(
+                       'const' => 1000,
+               )
 
-                     Video duration used for implicit 'video_pattern' parameter.
-                     Possible suffixes are:
-                     - ms for milisendons.
-                     - s for seconds.
-                     - min for minute.
-                     - h for hour.
-                     Default value is 10000 (10s).
+    *       "duration"
 
-            *       "ffmpeg_pixel_format"
+             Video duration used for implicit 'video_pattern' parameter.
+             Possible suffixes are:
+             - ms for milisendons.
+             - s for seconds.
+             - min for minute.
+             - h for hour.
+             Default value is 10000 (10s).
 
-                     FFmpeg pixel format.
-                     Default value is undef, use default ffmpeg.
+    *       "ffmpeg_pixel_format"
 
-            *       "ffmpeg_video_codec"
+             FFmpeg pixel format.
+             Default value is undef, use default ffmpeg.
 
-                     FFmpeg video codec.
-                     Default value is undef, use default ffmpeg.
+    *       "ffmpeg_video_codec"
 
-            *       "fps"
+             FFmpeg video codec.
+             Default value is undef, use default ffmpeg.
 
-                     Frames per second.
-                     Default value is 60.
+    *       "fps"
 
-            *       "height"
+             Frames per second.
+             Default value is 60.
 
-                     Height.
-                     Default value is 1080.
+    *       "height"
 
-            *       "image_generator"
+             Height.
+             Default value is 1080.
 
-                     Image generator.
-                     Default value is object below:
-                       Image::Random->new(
-                               'height' => $self->{'height'},
-                               'type' => $self->{'image_type'},
-                               'width' => $self->{'width'},
-                       )
+    *       "image_generator"
 
-            *       "image_type"
+             Image generator.
+             Default value is object below:
+               Image::Random->new(
+                       'height' => $self->{'height'},
+                       'type' => $self->{'image_type'},
+                       'width' => $self->{'width'},
+               )
 
-                     Image type used for implicit 'image_generator' parameter.
-                     List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff.
-                     Defult image type is 'bmp'.
+    *       "image_type"
 
-            *       "temp_dir"
+             Image type used for implicit 'image_generator' parameter.
+             List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff.
+             Defult image type is 'bmp'.
 
-                     Temporary dir.
-                     Default value is File::Temp::tempdir().
+    *       "temp_dir"
 
-            *       "verbose"
+             Temporary dir.
+             Default value is File::Temp::tempdir().
 
-                     Verbose mode.
-                     Default value is 0.
+    *       "verbose"
 
-            *       "video_pattern"
+             Verbose mode.
+             Default value is 0.
 
-                     Video pattern generator.
-                     Default value is object below:
-                       Video::Pattern->new(
-                               'delay_generator' => $self->{'delay_generator'},
-                               'duration' => $self->{'duration'},
-                               'fps' => $self->{'fps'},
-                               'image_generator' => $self->{'image_generator'},
-                       )
+    *       "video_pattern"
 
-            *       "width"
+             Video pattern generator.
+             Default value is object below:
+               Video::Pattern->new(
+                       'delay_generator' => $self->{'delay_generator'},
+                       'duration' => $self->{'duration'},
+                       'fps' => $self->{'fps'},
+                       'image_generator' => $self->{'image_generator'},
+               )
 
-                     Width.
-                     Default value is 1920.
+    *       "width"
 
-    "create($out_path)"
-             Create video.
-             Returns undef.
+             Width.
+             Default value is 1920.
+
+    Returns instance of object.
+
+  "create"
+     my $type = $obj->create($out_path);
+
+    Create video.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -171,8 +178,8 @@ EXAMPLE2
 
 DEPENDENCIES
     Class::Utils, Error::Pure, FFmpeg::Command, File::Path,
-    File::Spec::Functions, File::Temp, IO::CaptureOutput, Image::Random,
-    Readonly, Video::Delay::Const, Video::Pattern.
+    File::Spec::Functions, File::Temp, Image::Random, Readonly,
+    Video::Delay::Const, Video::Pattern.
 
 SEE ALSO
     Image::Random
@@ -202,10 +209,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2014-2020 Michal Josef Špaček
+    © 2014-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

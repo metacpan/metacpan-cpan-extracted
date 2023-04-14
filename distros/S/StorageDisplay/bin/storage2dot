@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # delay module loading so that local data collect can be done
 # without extra modules
@@ -31,6 +31,7 @@ sub collect_from_remote {
         Net::OpenSSH->import;
         require Term::ReadKey;
         Term::ReadKey->import;
+	1;
     } or die "Cannot load required modules (Net::OpenSSH and/or Term::ReadKey) for remote data collect: $!\n";
     END {
         if ($cleanup_readmode) {
@@ -280,7 +281,7 @@ storage2dot - analyse and generate a graphical view of a machine storage
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

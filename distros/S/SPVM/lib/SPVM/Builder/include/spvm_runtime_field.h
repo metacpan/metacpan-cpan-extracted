@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_RUNTIME_FIELD_H
 #define SPVM_RUNTIME_FIELD_H
 

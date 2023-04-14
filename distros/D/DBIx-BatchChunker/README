@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v1.0.0
+    version v1.0.1
 
 SYNOPSIS
 
@@ -178,6 +178,24 @@ ATTRIBUTES
 
     A DBIx::Class::ResultSetColumn. This is only used to override "rs" for
     min/max calculations. Optional.
+
+  count_rs
+
+    A DBIx::Class::ResultSet, only used to override "rs" for row counting
+    calculations. For 99.9% of cases, you do not need to set this. Though,
+    it could be used for the rare case where the original Resulset would
+    run into indexing problems with its row counting statement and needs
+    something broader to compensate.
+
+    WARNING: Do not set this unless you know what you're doing. Having a
+    different COUNT ResultSet from the base ResultSet means that the row
+    counts to size up the chunk workload will be different from the
+    workload itself. If the row counts are too high, you may end up with
+    workloads that are too quick and runtime targeting may compensate with
+    an overly large chunk size, anyway. If the row counts are too low, you
+    risk having a oversized chunk that gets processed and locks rows for
+    too long, and chunk resizing may even skip blocks that it thinks have
+    no rows to process.
 
   dbic_retry_opts
 
@@ -394,6 +412,19 @@ ATTRIBUTES
 
     (This was previously defaulted to 0 seconds, prior to v1.0.0.)
 
+  max_runtime
+
+    The number of seconds that the entire process is allowed to run. If you
+    have a long-running and idempotent operation that you don't want to run
+    for days, you can set this attribute, execute the operation, and run it
+    again at a later date. The "min_id" will be set to the last-used ID, so
+    the operation can be continued with another "execute" call. Or you can
+    use this to figure out if it finished or not.
+
+    Turned off by default. If you use this, you should add in extra
+    multipler operations to separate out the time math, like 6 * 60 * 60
+    for 6 hours.
+
   process_past_max
 
     Boolean that controls whether to check past the "max_id" during the
@@ -457,6 +488,11 @@ ATTRIBUTES
     and the information may have changed between the DB change development
     and deployment. Instead, use "calculate_ranges" to fill in these values
     right before running the loop.
+
+    When the operation is finished, min_id will be set to the last
+    processed ID, just in case it was stopped early and needs to be
+    restarted (eg: "max_runtime" is set). Alternately, you can run
+    "calculate_ranges" again to confirm from the database.
 
   loop_state
 
@@ -549,6 +585,7 @@ METHODS
             single_rows       => 1,    # does $coderef get a single $row or the whole $chunk_rs / $stmt
             min_chunk_percent => 0.25, # minimum row count of chunk size percentage; defaults to 0.5 (or 50%)
             target_time       => 5,    # target runtime for dynamic chunk size scaling; default is 5 seconds
+            max_runtime       => 12 * 60 * 60, # stop processing after 12 hours
     
             progress_name => 'Updating Accounts',  # easier than creating your own progress_bar
     
@@ -654,7 +691,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 - 2022 by Grant Street Group.
+    This software is Copyright (c) 2018 - 2023 by Grant Street Group.
 
     This is free software, licensed under:
 

@@ -1,7 +1,14 @@
 Revision history for CAPE-Utils
 
+1.0.1   2023-03-30/20:00
+		- Fix a typo in regards to regex loading for ignore hosts regex file
+
+1.0.0   2023-03-30/16:15
+		- Rework the auth system. Not backwards compatabile.
+		- Add ignoreHosts options for ignoring hosts via regexp for suricata_extract_submit
+
 0.1.0   2023-03-23/18:15
-        - Add json output to -a submit
+		- Add json output to -a submit
 		- submit now returns a hash of submitted files and task IDs
 		- add src_bin/mojo_cape_submit
 		- add src_bin/suricata_extract_submit

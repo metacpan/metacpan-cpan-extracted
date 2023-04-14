@@ -45,7 +45,7 @@ order.
     # Chunks will be set to the number of atomic chunks the message was split
     # into. It is fine to ignore the value returned, it will always be an
     # integer 1 or larger.
-    my $chunks = $w->send_message("Hello");
+    my $chunks = $w->write_message("Hello");
 
     # $msg now contains "Hello";
     my $msg = $r->read_message;
@@ -419,13 +419,20 @@ into readers and writers. These help you do that.
     Enable mixed-data mode. Also makes read-side non-blocking.
 
 - ($type, $data) = $r->get\_line\_burst\_or\_data()
+- ($type, $data) = $r->get\_line\_burst\_or\_data(peek\_line => 1)
 
     Get a line, a burst, or a message from the pipe. Always non-blocking, will
     return `(undef, undef)` if no complete line/burst/message is ready.
 
-    $type will be one of: `undef`, `'line'`, `'burst'`, or `'message'`.
+    $type will be one of: `undef`, `'line'`, `'burst'`, `'message'`, or `'peek'`.
 
-    $data will either be `undef`, or a complete line, burst, or message.
+    $data will either be `undef`, or a complete line, burst, message, or a buffered line that has no newline termination.
+
+    The `peek_line` option, when true, will cause this to return `'peek'` and a
+    buffered line not terminated by a newline, if such a line has been read and is
+    pending in the buffer. Calling this multiple times will return the same peek
+    line (and anything added to the buffer since the last read) until the buffer
+    reads a newline or hits EOF.
 
 # SOURCE
 

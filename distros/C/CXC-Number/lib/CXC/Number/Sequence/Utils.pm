@@ -4,17 +4,15 @@ package CXC::Number::Sequence::Utils;
 use strict;
 use warnings;
 
-use feature ':5.24';
+use v5.28;
 use experimental 'signatures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 # ABSTRACT: sequence utilities
 
-use feature 'state';
-
 use Exporter::Shiny qw( buildargs_factory load_class );
-use Type::Params qw( compile_named compile_named_oo );
+use Type::Params    qw( compile_named compile_named_oo );
 use Types::Standard -types;
 use Types::Common::Numeric qw( PositiveInt );
 
@@ -23,7 +21,7 @@ use CXC::Number::Sequence::Failure -all;
 use Hash::Wrap 0.11 {
     -as        => 'wrap_attrs_ro',
     -immutable => 1,
-    -exists    => 'has'
+    -exists    => 'has',
 };
 use Hash::Wrap { -as => 'wrap_attrs_rw' };
 
@@ -123,7 +121,7 @@ sub buildargs_factory {
             Dict [
                 flag => PositiveInt,
                 type => InstanceOf ['Type::Tiny'],
-            ]
+            ],
         ],
         build     => Map [ PositiveInt, CodeRef ],
         xvalidate => Optional [ ArrayRef [ Tuple [ PositiveInt, CodeRef ] ] ],
@@ -134,9 +132,11 @@ sub buildargs_factory {
 
     return sub {
 
+        ## no critic( Variables::ProhibitReusedNames )
+
         state $check = compile_named(
             map { $_ => $arg->map->{$_}{type} }
-              keys $arg->map->%*
+              keys $arg->map->%*,
         );
 
         my ( $class, undef ) = ( shift, shift );
@@ -145,8 +145,7 @@ sub buildargs_factory {
 
         # don't touch attributes we don't know about
         my %build_attrs;
-        $build_attrs{$_} = delete $attrs{$_}
-          foreach grep { exists $arg->map->{$_} } keys %attrs;
+        $build_attrs{$_} = delete $attrs{$_} foreach grep { exists $arg->map->{$_} } keys %attrs;
 
         if ( $arg->adjust ) {
             local $_ = \%build_attrs;
@@ -158,10 +157,8 @@ sub buildargs_factory {
         my $attrs_set = 0;
         $attrs_set |= $arg->map->{$_}{flag} for keys %build_attrs;
 
-        my $build = $arg->build->{$attrs_set}
-          // parameter_IllegalCombination->throw(
-            "illegal combination of parameters: "
-              . join( ', ', sort keys %build_attrs ) );
+        my $build = $arg->build->{$attrs_set} // parameter_IllegalCombination->throw(
+            'illegal combination of parameters: ' . join( ', ', sort keys %build_attrs ) );
 
         if ( $arg->has_xvalidate ) {
             local $_ = wrap_attrs_rw( $attrs );
@@ -188,16 +185,17 @@ sub buildargs_factory {
 # based on Mojo::Plugin::load_plugin, Mojo::Loader::load_class, Mojo::Util::camelize
 sub load_class ( $name ) {
 
-    $name = join '::', map {
-        join( '', map { ucfirst lc } split /_/ )
+    $name = join q{::}, map {
+        join( q{}, map { ucfirst lc } split /_/ )
     } split( /-/, $name )
-      unless $name =~ /^[A-Z]/;
+      unless $name =~ /^[[:upper:]]/;
 
     for my $class ( "CXC::Number::Sequence::${name}", $name ) {
         ## no critic (BuiltinFunctions::ProhibitStringyEval)
         eval "require $class; 1"
           && return $class;
 
+        ## no critic( RegularExpressions::ProhibitUnusualDelimiters )
         loadclass_CompileError->throw( "$class had a compile error: $@" )
           unless $@ =~ m|Can't locate \Q@{[ $class =~ s{::}{/}gr . '.pm' ]}|;
     }
@@ -230,7 +228,7 @@ CXC::Number::Sequence::Utils - Utilities for CXC::Number::Sequence generators
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -332,7 +330,7 @@ C<$class_or_submodule> is CamelCased.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

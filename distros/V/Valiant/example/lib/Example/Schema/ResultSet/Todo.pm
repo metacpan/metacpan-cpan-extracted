@@ -20,4 +20,8 @@ sub filter_by_request($self, $request) {
   return $todos;
 }
 
+sub new_todo($self) {
+  return $self->new_result(+{status=>'active'});
+}
+
 1;

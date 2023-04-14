@@ -10,11 +10,11 @@ Book
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 =head1 SYNOPSIS
@@ -41,17 +41,35 @@ Initializes with a data hash consisiting of title and author.
 sub new {
   my ( $class, %data ) = @_;
   bless {
-    _author     => $data{author},
-    _blurb_file => $data{blurb_file},
-    _book_dir   => $data{book_dir},
-    _file_name  => $data{file_name},
-    _image      => $data{image},
-    _output_dir => $data{output_dir},
-    _report_dir => $data{report_dir},
-    _sections   => [],  
-    _title      => $data{title},
-    _url        => $data{url},
+    _author           => $data{author},
+    _blurb_file       => $data{blurb_file},
+    _book_dir         => $data{book_dir},
+    _file_name        => $data{file_name},
+    _image            => $data{image},
+    _output_dir       => $data{output_dir},
+    _report_dir       => $data{report_dir},
+    _sections         => [],  
+    _title            => $data{title},
+    _url              => $data{url},
+    _words            => {},
+    _custom_word_file => $data{custom_word_file},
+    _weak_word_file   => $data{weak_word_file},
   }, $class;
+}
+
+=head2 add_words
+
+Adds words from each section to the $self->_words hash.
+
+=cut
+
+sub add_words {
+  my ( $self, $word_list ) = @_;
+  my @word_list = @$word_list;
+  foreach my $word ( @word_list ) {
+    $self->{_words}{$word} = 1;
+  } 
+  return;
 }
 
 =head2 add_section
@@ -100,6 +118,23 @@ Returns the directory for the book project.
 
 sub book_dir { $_[0]->{_book_dir} };
 
+
+=head2 custom_word_file
+
+Returns the file with custom words.
+
+=cut
+
+sub custom_word_file { $_[0]->{_custom_word_file} };
+
+
+=head2 weak_word_file 
+
+Returns the file of weak words.
+
+=cut
+
+sub weak_word_file { $_[0]->{_weak_word_file} };
 
 =head2 file_name
 
@@ -150,6 +185,31 @@ Returns the title.
 
 sub title     { $_[0]->{_title}     };
 
+=head2 title_as_filename
+
+Returns the book title as a lowercase string, with underscores replacing spaces and punctuation.
+
+=cut
+
+sub title_as_filename {
+  my $self = shift;
+  my $title_string;
+  my $title_orig = $self->title;
+  my $last_char = '_';
+  foreach my $char ( split( //, $title_orig ) ){
+    if ( $char =~ m/[A-Za-z]/ ){
+      $last_char = lc($char);
+      $title_string .= $last_char;
+    } elsif ( $last_char eq '_' ){
+      next;
+    } else {
+      $last_char = '_';
+      $title_string .= $last_char;
+    }
+  }
+  return $title_string;
+};
+
 =head2 url
 
 Return the URL of the book.
@@ -157,6 +217,7 @@ Return the URL of the book.
 =cut
 
 sub url       { $_[0]->{_url}       };
+
 
 =head2 write_report
 
@@ -168,7 +229,6 @@ sub write_report {
   my $self  = shift;
   my $num   = 1; 
   foreach my $section ( @{$self->sections} ){
-    #my $report_file = $self->book_dir . '/' . $self->report_dir . "/report_${num}.txt";
     my $report_file = $self->report_dir . "/report_${num}.txt";
     open( my $file, '>', $report_file ) or die "Can't open $report_file: $!";
     print $file $section->write_report;
@@ -187,7 +247,6 @@ Writes the text version of the file.
 sub write_text {
   my ($self)      = @_; 
   my $title = $self->title;
-  #my $text_file   = $self->book_dir . '/' . $self->output_dir . '/' . $self->file_name . '.txt';
   my $text_file   = $self->output_dir . '/' . $self->file_name . '.txt';
   my $section_break   = "\n__section_break__\n";
 
@@ -210,7 +269,7 @@ Leam Hall, C<< <leamhall at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to L<https://github.com/LeamHall/bookbot/issues>.
+Please report any bugs or feature requests to L<https://github.com/LeamHall/book_collate/issues>.
 
 
 
@@ -240,7 +299,7 @@ Besides Larry Wall, you can blame the folks on IRC Libera#perl for this stuff ex
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by Leam Hall.
+This software is Copyright (c) 2321 by Leam Hall.
 
 This is free software, licensed under:
 

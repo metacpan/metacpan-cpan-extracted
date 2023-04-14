@@ -6,17 +6,17 @@ use version 0.77;
 
 use English qw(-no_match_vars);
 
-our $VERSION = version->declare('v0.0.1');
+our $VERSION = version->declare('v0.0.2');
 
 sub new {
-    my ($class, %param) = @ARG;
+    my ( $class, %param ) = @ARG;
 
     return bless(
         {
-            method     => $param{'method'},
-            arguments  => $param{'arguments'},
-            want_array => $param{'want_array'},
-            times      => $param{'times'},
+            method     => $param{method},
+            arguments  => $param{arguments},
+            want_array => $param{want_array},
+            times      => $param{times},
         },
         $class,
     );
@@ -25,25 +25,25 @@ sub new {
 sub method {
     my ($self) = @ARG;
 
-    return $self->{'method'};
+    return $self->{method};
 }
 
 sub arguments {
     my ($self) = @ARG;
 
-    return $self->{'arguments'};
+    return $self->{arguments};
 }
 
 sub want_array {
     my ($self) = @ARG;
 
-    return $self->{'want_array'};
+    return $self->{want_array};
 }
 
 sub times {
     my ($self) = @ARG;
 
-    return $self->{'times'};
+    return $self->{times};
 }
 
 1;
@@ -56,7 +56,7 @@ JIP::Spy::Event
 
 =head1 VERSION
 
-This document describes L<JIP::Spy::Event> version C<v0.0.1>.
+This document describes L<JIP::Spy::Event> version C<v0.0.2>.
 
 =head1 SYNOPSIS
 
@@ -69,10 +69,10 @@ This document describes L<JIP::Spy::Event> version C<v0.0.1>.
         times      => { method_name => 1 },
     );
 
-    $spy_event->method;     # 'method_name'
-    $spy_event->arguments;  # []
-    $spy_event->want_array; # 1
-    $spy_event->times;      # { method_name => 1 }
+    $spy_event->method();     # 'method_name'
+    $spy_event->arguments();  # []
+    $spy_event->want_array(); # 1
+    $spy_event->times();      # { method_name => 1 }
 
 =head1 ATTRIBUTES
 
@@ -80,29 +80,29 @@ L<JIP::Spy::Event> implements the following attributes.
 
 =head2 method
 
-    my $method = $spy_event->method;
+    my $method = $spy_event->method();
 
 =head2 arguments
 
-    my $arguments = $spy_event->arguments;
+    my $arguments = $spy_event->arguments();
 
 Comment about arguments
 
 =head2 want_array
 
-    my $want_array = $spy_event->want_array;
+    my $want_array = $spy_event->want_array();
 
 Comment about arguments
 
 =head2 times
 
-    my $times = $spy_event->times;
+    my $times = $spy_event->times();
 
 Comment about times
 
 =head1 AUTHOR
 
-Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
+Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 

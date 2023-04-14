@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-DirectoryServer
 
+1.002 2023-04-03T08:26:18Z
+	* tobyink added the iniweb.pm so you can type perl -Miniweb to start
+	a server in the local directory.
+
 1.001 2023-03-06T10:48:05Z
 	* First release of a fork of Mojolicious::Plugin::Directory, which
 	has been abandoned. This is a static file server with auto_index

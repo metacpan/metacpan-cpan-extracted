@@ -1,5 +1,15 @@
 Revision history for File-Map
 
+0.71      2023-04-10 14:18:43+02:00 Europe/Amsterdam
+          - Check layers before statting
+          - Split out mmap-compat.c
+
+0.70      2023-04-02 22:27:45+02:00 Europe/Amsterdam
+          - Fix backwards compatability issue
+
+0.69      2023-04-02 22:07:56+02:00 Europe/Amsterdam
+          - Move almost all code from .pm file into .xs file
+
 0.68      2023-03-25 10:32:11+01:00 Europe/Amsterdam
           - Re-eliminate second magic vtable
           - Eliminate all CODE blocks in XS

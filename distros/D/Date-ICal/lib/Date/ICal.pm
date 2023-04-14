@@ -1,9 +1,9 @@
-# $Rev: 679 $
+# $Rev: 680 $
 package Date::ICal;
 use strict;
 
 use vars qw($VERSION $localzone $localoffset @months @leapmonths %add_units);
-$VERSION = '2.'.(qw'$Rev: 679 $')[1];
+$VERSION = '2.'.(qw'$Rev: 680 $')[1];
 use Carp;
 use Time::Local;
 use Date::Leapyear qw();
@@ -24,7 +24,7 @@ Date::ICal - Perl extension for ICalendar date objects.
 
 =head1 VERSION
 
-$Revision: 679 $
+$Revision: 680 $
 
 =head1 SYNOPSIS
 
@@ -60,9 +60,9 @@ other date/calendar modules that know about ICal time format also.
 =head1 AUTHOR
 
 Rich Bowen, and the Reefknot team. Alas, Reefknot is no more. See
-http://datetime.perl.org/ for more modern and accurate modules.
+L<https://github.com/houseabsolute/DateTime.pm/wiki> for more modern and accurate modules.
 
-Last touched by $Author: rbowen $
+Last touched by $Author: michal-josef-spacek $
 
 =head1 METHODS
 
@@ -1275,7 +1275,7 @@ list of patch contributors and version-by-version notes.
 
 datetime@perl.org mailing list
 
-http://datetime.perl.org/
+L<https://github.com/houseabsolute/DateTime.pm/wiki>
 
 Time::Local
 

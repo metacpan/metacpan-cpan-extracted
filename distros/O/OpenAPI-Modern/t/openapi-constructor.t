@@ -90,7 +90,6 @@ subtest 'missing arguments' => sub {
   );
 };
 
-
 subtest 'document errors' => sub {
   my $result;
   try {
@@ -110,13 +109,19 @@ subtest 'document errors' => sub {
       errors => [
         {
           instanceLocation => '',
-          keywordLocation => '',
-          absoluteKeywordLocation => '/api',
-          error => 'invalid document type: array',
+          keywordLocation => '/type',
+          absoluteKeywordLocation => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07#/type',
+          error => 'got array, not object',
         },
       ],
     },
     'bad document causes validation to immediately fail',
+  );
+
+  is(
+    "$result",
+    q!'': got array, not object!,
+    'exception during construction serializes the error correctly',
   );
 };
 

@@ -50,8 +50,21 @@ ALL := $(TARGET)
 
 ALL: $(ALL)
 
+TEXTCONV := optex -Mtc cat
+CONVERT += doc docx pptx xlsx
+CONVERT += pdf
+SRCEXT  = stxt
+$(foreach ext,$(CONVERT),$(eval \
+  %.$(SRCEXT): %.$(ext) ; $$(TEXTCONV) $$< > $$@ \
+))
+
+TMP = $(if $(findstring $(suffix $1),$(CONVERT:%=.%)),$(basename $1).$(SRCEXT))
+SRC = $(or $(call TMP,$1),$1)
+
+TEMPFILES += $(foreach file,$(XLATE_FILES),$(call TMP,$(file)))
+
 define DEFINE_RULE
-$(basename $3).$1.$2: $3
+$(basename $3).$1.$2: $(call SRC,$3)
 	$$(XLATE) -t $1 -o $2 $$< > $$@
 endef
 $(eval $(call FOREACH,DEFINE_RULE))
@@ -63,8 +76,4 @@ XLATE = xlate \
 
 .PHONY: clean
 clean:
-	rm -fr $(ALL)
-
-.PHONY: shell
-shell:
-	MAKELEVEL= /bin/bash
+	rm -fr $(ALL) $(TEMPFILES)

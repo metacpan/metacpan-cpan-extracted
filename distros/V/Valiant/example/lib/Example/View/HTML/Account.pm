@@ -1,25 +1,24 @@
 package Example::View::HTML::Account;
 
-use Moose;
+use Moo;
 use Example::Syntax;
-use Valiant::HTML::TagBuilder 'div', 'fieldset', 'legend', 'br', ':utils';
-use Valiant::HTML::Form 'form_for';
-
-extends 'Example::View::HTML';
-
-__PACKAGE__->views(
-  layout => 'HTML::Layout',
-  navbar => 'HTML::Navbar',
-  form_for => 'HTML::FormFor',
-);
+use Example::View::HTML
+  -tags => qw(div a fieldset legend br form_for),
+  -util => qw(path),
+  -views => 'HTML::Page', 'HTML::Navbar';
 
 has 'account' => ( is=>'ro', required=>1 );
+has 'states' => (is=>'ro', required=>1, lazy=>1, default=>sub ($self) { $self->ctx->model('Schema::State') } );
+has 'roles' => (is=>'ro', required=>1, lazy=>1, default=>sub ($self) { $self->ctx->model('Schema::Role') } );
+has 'status_list' => (is=>'ro', required=>1, lazy=>1, default=>sub ($self) { [map { [ucfirst($_) => $_] } $self->account->profile->status_list ] } );
+has 'employment_options' => (is=>'ro', required=>1, lazy=>1, default=>sub ($self) { $self->ctx->model('Schema::Employment') } );
 
 sub render($self, $c) {
-  $self->layout(page_title=>'Homepage', sub($layout) {
-    $self->navbar(active_link=>'/account'),
-    $self->form_for($self->account, +{style=>'width:35em; margin:auto'}, sub ($ff, $fb, $account) {
-      div +{ cond=>$fb->successfully_updated, class=>'alert alert-success', role=>'alert' }, 'Successfully Updated',
+  html_page page_title=>'Homepage', sub($page) {
+    html_navbar active_link=>'/account',
+    div {class=>"col-5 mx-auto"},
+    form_for $self->account, {action=>path('update')}, sub ($self, $fb, $account) {
+      div +{ if=>$fb->successfully_updated, class=>'alert alert-success', role=>'alert' }, 'Successfully Updated',
       fieldset [
         $fb->legend,
         div +{ class=>'form-group' },
@@ -43,7 +42,7 @@ sub render($self, $c) {
       fieldset [
         legend $self->account->human_attribute_name('profile'),
         $fb->errors_for('profile', +{ class=>'alert alert-danger', role=>'alert' }),
-        $fb->fields_for('profile', sub ($fb_profile, $profile) {
+        $fb->fields_for('profile', sub ($self, $fb_profile, $profile) {
           div +{ class=>'form-group' }, [
             $fb_profile->label('address'),
             $fb_profile->input('address'),
@@ -57,7 +56,7 @@ sub render($self, $c) {
           div +{ class=>'form-row' }, [
             div +{ class=>'col form-group' }, [
               $fb_profile->label('state_id'),
-              $fb_profile->collection_select(state_id => 'state_select_options', +{ include_blank=>1 }),
+              $fb_profile->collection_select(state_id => $self->states, id=>'name', +{ include_blank=>1 }),
               $fb_profile->errors_for('state_id'),
             ],
             div +{ class=>'col form-group' }, [
@@ -82,7 +81,7 @@ sub render($self, $c) {
             div +{ class=>'col form-group' }, [
               fieldset [
                 $fb->legend_for('person_roles'),
-                  $fb->collection_checkbox({person_roles => 'role_id'}, 'role_checkbox_options', sub ($fb_roles) {
+                  $fb->collection_checkbox({person_roles => 'role_id'}, $self->roles, id=>'label', sub ($fb_roles) {
                     div +{class=>'form-check'}, [
                       $fb_roles->checkbox(),
                       $fb_roles->label({class=>'form-check-label'}),
@@ -94,7 +93,7 @@ sub render($self, $c) {
             div +{ class=>'col form-group' }, [
               fieldset [
                 $fb_profile->legend_for('status'),
-                $fb_profile->radio_buttons(status => 'status_options', sub ($fb_status) {
+                $fb_profile->radio_buttons(status => $self->status_list, sub ($fb_status) {
                   div +{class=>'custom-control custom-radio'}, [
                     $fb_status->radio_button(),
                     $fb_status->label({class=>'custom-control-label'}),
@@ -106,7 +105,7 @@ sub render($self, $c) {
             div +{ class=>'col form-group' }, [
               fieldset [
                 $fb_profile->legend_for('employment_id'),
-                $fb_profile->collection_radio_buttons(employment_id => 'employment_radio_options', sub ($fb_emp) {
+                $fb_profile->collection_radio_buttons(employment_id => $self->employment_options, id=>'label', sub ($fb_emp) {
                   div +{class=>'custom-control custom-radio'}, [
                     $fb_emp->radio_button(),
                     $fb_emp->label({class=>'custom-control-label'}),
@@ -132,7 +131,7 @@ sub render($self, $c) {
         legend $self->account->human_attribute_name('credit_cards'),
         div +{ class=>'form-group' }, [
           $fb->errors_for('credit_cards', +{ class=>'alert alert-danger', role=>'alert' }),
-          $fb->fields_for('credit_cards', sub($fb_cc, $cc) {
+          $fb->fields_for('credit_cards', sub($self, $fb_cc, $cc) {
             div +{ class=>'form-row' }, [
               div +{ class=>'col form-group' }, [
                 $fb_cc->label('card_number'),
@@ -151,14 +150,14 @@ sub render($self, $c) {
                 ],
               ],
             ]
-          }, sub ($fb_final, $new_cc) {
+          }, sub ($self, $fb_final, $new_cc) {
             $fb_final->button( '_add', 'Add Credit Card')
           }),
         ],
       ],
       fieldset $fb->submit(),
-    }),
-  });
+    },
+  };
 }
 
-__PACKAGE__->meta->make_immutable();
+1;

@@ -13,5 +13,6 @@ META.yml
 README
 src/future.c
 t/00use.t
+t/50thread.t
 t/90leak.t
 t/99pod.t

@@ -80,6 +80,7 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "Devel::CheckBin" : "0",
             "Math::BigInt" : "0",
             "Test::More" : "0.98"
          }
@@ -88,7 +89,7 @@
    "provides" : {
       "Affix" : {
          "file" : "lib/Affix.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -103,7 +104,7 @@
          "web" : "https://github.com/sanko/Affix.pm"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0

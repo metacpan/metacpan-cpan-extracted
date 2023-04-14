@@ -8,6 +8,8 @@ pod_spelling_system:
   stopwords:
     - memcache
     - TLS
+    - DHARDISON
+    - Hardison
 
 pod_coverage:
   skip: 0

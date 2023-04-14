@@ -528,3 +528,5 @@ Revision history for StreamFinder
         to fetch with just a podcast-ID or podcast-ID/episode-ID (without a 
         full URL).  Also misc. tweaks to try to get all metadata, properly 
         handle sorting the playlist (getURL('playlist')), and doc. tweaks.
+2.13    2023/04/08
+        - StreamFinder::Apple - Fix sometimes failure to fetch proper title.

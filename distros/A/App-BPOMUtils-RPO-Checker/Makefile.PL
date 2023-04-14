@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-    "Data::Sah::Value::perl::Path::filenames" => 0,
+    "Data::Sah::Value::perl::Path::filenames" => "0.004",
     "Exporter" => "5.57",
     "File::Basename" => 0,
     "File::MimeInfo::Magic" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +57,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-  "Data::Sah::Value::perl::Path::filenames" => 0,
+  "Data::Sah::Value::perl::Path::filenames" => "0.004",
   "Exporter" => "5.57",
   "File::Basename" => 0,
   "File::MimeInfo::Magic" => 0,

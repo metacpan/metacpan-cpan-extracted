@@ -370,3 +370,10 @@ Portalbe C<strerror> related to the errors of the socket.
 =head2 sendto
 
   static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

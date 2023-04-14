@@ -3,30 +3,32 @@
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
+
 use Test::More;
 use Test::Exception;
 use Term::ANSIColor 3.00 ();
+use File::Temp qw(tempfile);
 use English qw(-no_match_vars);
 use Capture::Tiny qw(capture capture_stderr);
 
-plan tests => 12;
+plan tests => 13;
 
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::Debug', '0.021';
+    use_ok 'JIP::Debug', '0.031';
     require_ok 'JIP::Debug';
 
     diag(
         sprintf 'Testing JIP::Debug %s, Perl %s, %s',
-            $JIP::Debug::VERSION,
-            $PERL_VERSION,
-            $EXECUTABLE_NAME,
+        $JIP::Debug::VERSION,
+        $PERL_VERSION,
+        $EXECUTABLE_NAME,
     );
 };
 
 subtest 'Exportable functions' => sub {
-    plan tests => 6;
+    plan tests => 7;
 
     can_ok 'JIP::Debug', qw(to_debug to_debug_raw to_debug_empty);
 
@@ -49,24 +51,29 @@ subtest 'Exportable functions' => sub {
     throws_ok { to_debug_trace() } qr{
         Undefined \s subroutine \s &main::to_debug_trace \s called
     }x;
+
+    throws_ok { to_debug_truncate() } qr{
+        Undefined \s subroutine \s &main::to_debug_truncate \s called
+    }x;
 };
 
 subtest 'Exportable variables' => sub {
-    plan tests => 10;
+    plan tests => 11;
 
     no warnings qw(once);
 
-    ok $JIP::Debug::COLOR           eq 'bright_green';
-    ok $JIP::Debug::MSG_DELIMITER   eq q{-} x 80;
-    ok $JIP::Debug::DUMPER_INDENT   == 1;
+    ok $JIP::Debug::COLOR eq 'bright_green';
+    ok $JIP::Debug::MSG_DELIMITER eq q{-} x 80;
+    ok $JIP::Debug::DUMPER_INDENT == 1;
     ok $JIP::Debug::DUMPER_DEEPCOPY == 1;
     ok $JIP::Debug::DUMPER_SORTKEYS == 1;
+    ok $JIP::Debug::DUMPER_TRAILING_COMMA == 1;
 
-    ok ref($JIP::Debug::HANDLE)          eq 'GLOB';
-    ok ref($JIP::Debug::MAYBE_COLORED)   eq 'CODE';
+    ok ref($JIP::Debug::HANDLE) eq 'GLOB';
+    ok ref($JIP::Debug::MAYBE_COLORED) eq 'CODE';
     ok ref($JIP::Debug::MAKE_MSG_HEADER) eq 'CODE';
 
-    is_deeply \%JIP::Debug::TRACE_PARAMS, {skip_frames => 1};
+    is_deeply \%JIP::Debug::TRACE_PARAMS, { skip_frames => 1 };
 
     is_deeply \%JIP::Debug::TRACE_AS_STRING_PARAMS, {};
 };
@@ -88,14 +95,14 @@ subtest 'send_to_output()' => sub {
 
     no warnings qw(once);
 
-    my ($stdout, $stderr) = capture {
+    my ( $stdout, $stderr ) = capture {
         JIP::Debug::send_to_output(42);
     };
     is $stderr, 42;
     is $stdout, q{};
 
     local $JIP::Debug::HANDLE = \*STDOUT;
-    ($stdout, $stderr) = capture {
+    ( $stdout, $stderr ) = capture {
         JIP::Debug::send_to_output(42);
     };
     is $stderr, q{};
@@ -110,8 +117,8 @@ subtest 'MAYBE_COLORED()' => sub {
     # with color
     is $JIP::Debug::MAYBE_COLORED->(),      undef;
     is $JIP::Debug::MAYBE_COLORED->(undef), undef;
-    is $JIP::Debug::MAYBE_COLORED->(q{}),   Term::ANSIColor::colored(q{}, $JIP::Debug::COLOR);
-    is $JIP::Debug::MAYBE_COLORED->(42),    Term::ANSIColor::colored(42, $JIP::Debug::COLOR);
+    is $JIP::Debug::MAYBE_COLORED->(q{}),   Term::ANSIColor::colored( q{}, $JIP::Debug::COLOR );
+    is $JIP::Debug::MAYBE_COLORED->(42),    Term::ANSIColor::colored( 42,  $JIP::Debug::COLOR );
 
     # without color
     {
@@ -187,20 +194,20 @@ subtest 'to_debug_empty()' => sub {
 
 subtest 'to_debug_count()' => sub {
     my @tests = (
-        [q{<no \s label>}, 1],
-        [q{<no \s label>}, 2],
-        [q{<no \s label>}, 3, undef],
-        [q{<no \s label>}, 4, q{}],
-        [q{0}, 1, 0],
-        [q{0}, 2, q{0}],
-        [q{tratata}, 1, 'tratata'],
-        [q{tratata}, 2, 'tratata'],
+        [ q{<no \s label>}, 1 ],
+        [ q{<no \s label>}, 2 ],
+        [ q{<no \s label>}, 3, undef ],
+        [ q{<no \s label>}, 4, q{} ],
+        [ q{0},             1, 0 ],
+        [ q{0},             2, q{0} ],
+        [ q{tratata},       1, 'tratata' ],
+        [ q{tratata},       2, 'tratata' ],
     );
 
     plan tests => scalar @tests;
 
     foreach my $test (@tests) {
-        my ($label_regex, $count, @params) = @{ $test };
+        my ( $label_regex, $count, @params ) = @{$test};
 
         my $stderr_listing = capture_stderr {
             no warnings qw(once);
@@ -231,32 +238,32 @@ subtest 'to_debug_count() with callback' => sub {
     );
 
     my $sequence = [];
-    my $cb = sub {
-        my ($label, $count) = @ARG;
+    my $cb       = sub {
+        my ( $label, $count ) = @ARG;
 
-        push @{ $sequence }, [$label, $count];
+        push @{$sequence}, [ $label, $count ];
     };
 
     my @tests = (
         [],
         ['tratata'],
         [$cb],
-        ['tratata', $cb],
+        [ 'tratata', $cb ],
         [$cb],
-        ['tratata', $cb],
+        [ 'tratata', $cb ],
         [],
         ['tratata'],
     );
 
     foreach my $test (@tests) {
-        capture_stderr { JIP::Debug::to_debug_count(@{ $test }); };
+        capture_stderr { JIP::Debug::to_debug_count( @{$test} ); };
     }
 
     is_deeply $sequence, [
-        [q{<no label>}, 2],
-        [q{tratata},    2],
-        [q{<no label>}, 3],
-        [q{tratata},    3],
+        [ q{<no label>}, 2 ],
+        [ q{tratata},    2 ],
+        [ q{<no label>}, 3 ],
+        [ q{tratata},    3 ],
     ];
 };
 
@@ -278,5 +285,29 @@ subtest 'to_debug_trace()' => sub {
         \n\n
         $
     }sx;
+};
+
+subtest 'to_debug_truncate()' => sub {
+    plan tests => 2;
+
+    my $fh = File::Temp->new( UNLINK => 1, SUFFIX => '.log' );
+
+    local $JIP::Debug::HANDLE          = $fh;
+    local $JIP::Debug::MAKE_MSG_HEADER = sub { return 'header' };
+
+    JIP::Debug::to_debug_raw(42);
+
+    my $slurp = sub {
+        $fh->flush;
+        $fh->seek( 0, 0 );
+
+        return join q{}, $fh->getlines;
+    };
+
+    is $slurp->(), qq{header\n42\n\n};
+
+    JIP::Debug::to_debug_truncate();
+
+    is $slurp->(), q{};
 };
 

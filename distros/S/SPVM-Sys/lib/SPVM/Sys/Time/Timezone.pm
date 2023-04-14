@@ -67,3 +67,10 @@ Gets C<tz_dsttime>.
 Sets C<tz_dsttime>.
 
   $tz->set_tz_dsttime(34);
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

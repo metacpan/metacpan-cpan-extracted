@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Syntax;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001009';
+our $VERSION   = '0.001010';
 
 use Story::Interact::Page ();
 
@@ -26,6 +26,7 @@ our @EXPORT = qw(
 	npc
 	define_npc
 	visited
+	params
 	true
 	false
 	match
@@ -101,6 +102,10 @@ sub define_npc {
 sub visited {
 	my ( $code ) = @_ ? @_ : ( $page->id );
 	$state->visited->{$code} //= 0;
+}
+
+sub params () {
+	return $state->params;
 }
 
 sub FINISH {

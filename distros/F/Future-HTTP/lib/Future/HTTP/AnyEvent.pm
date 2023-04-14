@@ -2,17 +2,13 @@ package Future::HTTP::AnyEvent;
 use strict;
 use Future;
 use AnyEvent::HTTP ();
-use AnyEvent::Future 'as_future_cb';
-BEGIN {
-    # Versions before that didn't have as_future_cb
-    AnyEvent::Future->VERSION(0.02)
-}
+use AnyEvent::Future;
 use Moo 2; # or Moo::Lax if you can't have Moo v2
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 with 'Future::HTTP::Handler';
 
@@ -38,17 +34,18 @@ sub future_from_result {
 }
 
 sub http_request($self,$method,$url,%options) {
-    my $res = AnyEvent::Future->new()->then(sub ($body, $headers) {
-        return $self->future_from_result($body, $headers);
+    my $res1 = AnyEvent::Future->new();
+    my $res = $res1->then(sub ($body, $headers) {
+        $self->future_from_result($body, $headers);
     });
 
     my $r;
     $r = AnyEvent::HTTP::http_request($method => $url, %options, sub ($body, $headers) {
         undef $r;
-        $res->done( $body,$headers )
+        $res1->done( $body,$headers );
     });
 
-    $res
+    return $res
 }
 
 sub http_get($self,$url,%options) {
@@ -167,7 +164,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

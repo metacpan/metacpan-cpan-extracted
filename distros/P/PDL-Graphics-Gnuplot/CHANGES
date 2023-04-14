@@ -1,3 +1,6 @@
+2.024 2023-03-30
+- Add Alien::Gnuplot as a configure-time dependency. Fixes #92 - thanks @zmughal
+
 2.023 2023-01-29
 - Fix over-enthusiastic code tidying - thanks @zmughal
 

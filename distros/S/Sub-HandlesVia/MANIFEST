@@ -181,6 +181,7 @@ t/60detect.t
 t/61moosemetagubbins.t
 t/62mousemetagubbins.t
 t/80beam.t
+t/81mxpa.t
 t/94cmp.t
 t/95any.t
 t/96foreach.t

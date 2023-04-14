@@ -11,6 +11,7 @@ dist.ini
 examples/fastsearch.pl
 lib/File/Map.pm
 lib/File/Map.xs
+lib/File/mmap-compat.c
 lib/File/ppport.h
 metamerge.yml
 t/10-basics.t

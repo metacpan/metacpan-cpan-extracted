@@ -1,0 +1,33 @@
+---
+abstract: 'CLI-based client / toolbox for ActivityPub Client-to-Server'
+author:
+  - 'Haelwenn (lanodan) Monnier <contact+ap-client@hacktivis.me>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ActivityPubClient
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  Getopt::Std: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Scalar::Util: '0'
+resources:
+  repository: https://hacktivis.me/git/ap-client.git/
+version: v0.1.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

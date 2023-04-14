@@ -1,0 +1,85 @@
+NAME
+
+    Crypt::Passphrase::Pepper::HSM - A pepper-wrapper using hardware for
+    Crypt::Passphrase
+
+SYNOPSIS
+
+     my $passphrase = Crypt::Passphrase->new(
+         encoder => {
+             module   => 'Pepper::HSM',
+             provider => '/usr/lib/pkcs11/some-pkcs11.so',
+             active   => '3',
+             inner    => {
+                 module      => 'Argon2',
+                 output_size => 32,
+             },
+         },
+     );
+
+DESCRIPTION
+
+    This module wraps another encoder to pepper the input to the hash. By
+    using identifiers for the peppers, it allows for easy rotation of
+    peppers. Unlike Crypt::Passphrase::Pepper::Simple it stores the peppers
+    in a hardware security module (or some other PKCS11 implementation of
+    choice) to ensure their confidentiality.
+
+    It will be able to validate both peppered and unpeppered hashes.
+
+METHODS
+
+ new(%args)
+
+    This creates a new pepper encoder. It takes the following named
+    arguments:
+
+      * inner
+
+      This contains an encoder specification identical to the encoder field
+      of Crypt::Passphrase. It is mandatory.
+
+      * provider
+
+      The path to the PKCS11 provider. This is mandatory.
+
+      * active
+
+      This is the identifier of the active pepper. This is mandatory.
+
+      * prefix
+
+      The prefix that is used when looking up keys in the HSM. It defaults
+      to 'pepper-'.
+
+      * pin
+
+      The PIN that is used for logging in, if any.
+
+      * user_type
+
+      The type of user you're logging in with. This defaults to 'user', and
+      you're unlikely to want to change that.
+
+      * algorithm
+
+      This is the algorithm that's used for peppering. Supported values are
+      'sha1-hmac', 'sha224-hmac', 'sha256-hmac', 'sha384-hmac', and
+      'sha512-hmac' (the default).
+
+ prehash_password($password, $algorithm, $identifier)
+
+    This prehashes the $password using the given $algorithm and
+    $identifier.
+
+AUTHOR
+
+    Leon Timmermans <leont@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2023 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

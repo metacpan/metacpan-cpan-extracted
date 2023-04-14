@@ -1,6 +1,6 @@
 package App::optex::textconv::ooxml::regex;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use v5.14;
 use warnings;
@@ -57,11 +57,15 @@ sub _xml2text {
 	my $p = $+{para};
 	my @s;
 	while ($p =~ m{
+	       (?<br> <[aw]:br/> )
+	       |
 	       (?<tab> <w:tab/> | <w:tabs> )
 	       |
 	       <(?<tag>(?:[apw]:)?t)\b[^>]*> (?<text>[^<]*?) </\g{tag}>
 	       }xsg) {
-	    if ($+{tab}) {
+	    if ($+{br}) {
+		push @s, "\n";
+	    } elsif ($+{tab}) {
 		push @s, "  ";
 	    } else {
 		push @s, $+{text} if $+{text} ne '';

@@ -1,5 +1,8 @@
 Revision history for Crypt-ECDH_ES
 
+0.004     2023-04-14 12:58:26+02:00 Europe/Amsterdam
+          - Use Crypt::URandom for randomness.
+
 0.003     2017-04-13 13:53:00+02:00 Europe/Amsterdam
           - Don't use space padded strings in pack
 

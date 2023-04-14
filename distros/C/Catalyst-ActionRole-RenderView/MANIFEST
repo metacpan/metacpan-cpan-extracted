@@ -9,4 +9,5 @@ README
 README.mkdn
 dist.ini
 lib/Catalyst/ActionRole/RenderView.pm
+lib/Catalyst/ActionRole/RenderView/Utils/NoView.pm
 t/basic.t

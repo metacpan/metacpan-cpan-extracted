@@ -256,6 +256,11 @@ two arguments (path and value) to replace, add or remove a subfield value.
 Remove all fields matching given PICA Path expressions. Subfields and positions
 in the path are ignored.
 
+## pica\_split( $level )
+
+Reduce and split record to given level except for identifiers PPN/ILN. Returns
+a list of records.
+
 # ACCESSORS
 
 All accessors of `PICA::Data` are also available as ["FUNCTIONS"](#functions), prefixed
@@ -303,6 +308,12 @@ Returns the record id, if given.
 
 Tell whether the record is empty (no fields).
 
+## split($level)
+
+Reduce and split the record into title record (level=0), holding records
+(level=1) or copy/item records (level=2). PPN and ILN are included for level 1
+and 2 respectively.
+
 # METHODS
 
 ## write( \[ $type \[, @options\] \] | $writer )
@@ -333,7 +344,7 @@ instance of [PICA::Field](https://metacpan.org/pod/PICA%3A%3AField) but this fea
 ## remove( $path \[, $path..\] )
 
 Remove all fields matching given PICA Path expressions. Subfields and positions
-are ignored.
+are ignored so far.
 
 ## update( ... )
 

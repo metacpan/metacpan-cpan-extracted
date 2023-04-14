@@ -53,6 +53,7 @@ lib/Type/Parser.pm
 lib/Type/Registry.pm
 lib/Type/Tie.pm
 lib/Type/Tiny.pm
+lib/Type/Tiny/Bitfield.pm
 lib/Type/Tiny/Class.pm
 lib/Type/Tiny/ConstrainedObject.pm
 lib/Type/Tiny/Duck.pm
@@ -158,6 +159,7 @@ t/20-modules/Type-Params/hashorder.t
 t/20-modules/Type-Params/methods.t
 t/20-modules/Type-Params/mixednamed.t
 t/20-modules/Type-Params/multisig-custom-message.t
+t/20-modules/Type-Params/multisig-gotonext.t
 t/20-modules/Type-Params/multisig.t
 t/20-modules/Type-Params/named-to-list.t
 t/20-modules/Type-Params/named.t
@@ -199,6 +201,10 @@ t/20-modules/Type-Tie/06clone.t
 t/20-modules/Type-Tie/06storable.t
 t/20-modules/Type-Tie/basic.t
 t/20-modules/Type-Tie/very-minimal.t
+t/20-modules/Type-Tiny-Bitfield/basic.t
+t/20-modules/Type-Tiny-Bitfield/errors.t
+t/20-modules/Type-Tiny-Bitfield/import-options.t
+t/20-modules/Type-Tiny-Bitfield/plus.t
 t/20-modules/Type-Tiny-Class/basic.t
 t/20-modules/Type-Tiny-Class/errors.t
 t/20-modules/Type-Tiny-Class/exporter.t
@@ -235,6 +241,7 @@ t/20-modules/Type-Tiny/basic.t
 t/20-modules/Type-Tiny/cmp.t
 t/20-modules/Type-Tiny/coercion-modifiers.t
 t/20-modules/Type-Tiny/constraint-strings.t
+t/20-modules/Type-Tiny/custom-exception-classes.t
 t/20-modules/Type-Tiny/definition-context.t
 t/20-modules/Type-Tiny/deprecation.t
 t/20-modules/Type-Tiny/esoteric.t
@@ -294,6 +301,7 @@ t/21-types/Any.t
 t/21-types/ArrayLike.t
 t/21-types/ArrayRef.t
 t/21-types/Bool.t
+t/21-types/BoolLike.t
 t/21-types/ClassName.t
 t/21-types/CodeLike.t
 t/21-types/CodeRef.t
@@ -365,6 +373,7 @@ t/30-external/Exporter-Tiny/basic.t
 t/30-external/Exporter-Tiny/installer.t
 t/30-external/Exporter-Tiny/role-conflict.t
 t/30-external/Function-Parameters/basic.t
+t/30-external/JSON-PP/basic.t
 t/30-external/Kavorka/80returntype.t
 t/30-external/Kavorka/basic.t
 t/30-external/Moo/basic.t

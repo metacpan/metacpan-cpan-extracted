@@ -1,7 +1,7 @@
 # -*- mode: perl; -*-
 
-use strict;             # restrict unsafe constructs
-use warnings;           # enable optional warnings
+use strict;
+use warnings;
 
 use Test::More tests => 2;
 
@@ -10,9 +10,12 @@ BEGIN {
     use_ok('Math::BigInt');         # Math::BigInt is required for the tests
 };
 
-my @mods = ('Math::BigInt::Pari',
+my @mods = (
             'Math::BigInt',
-            'Math::Pari');
+            'Math::BigInt::Lib',
+            'Math::BigInt::Pari',
+            'Math::Pari',
+           );
 
 diag("");
 diag("Testing with Perl $], $^X");

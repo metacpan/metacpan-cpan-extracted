@@ -1,4 +1,6 @@
-#!perl -T
+#!/usr/bin/perl -T
+
+use lib 'lib';
 
 use Test::More tests => 1;
 

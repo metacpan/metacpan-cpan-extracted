@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Stringable : interface_t {
   required method to_string : string ();
 }

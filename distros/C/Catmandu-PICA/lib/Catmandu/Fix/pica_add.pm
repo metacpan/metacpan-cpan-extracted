@@ -2,7 +2,7 @@ package Catmandu::Fix::pica_add;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);
@@ -50,13 +50,17 @@ sub _build_fixer {
                   @$record ];
 
             if (@$fields) {
-                my @sf_codes = split '', $subfields;
+                my @sf_codes  = split '', $subfields;
                 my @sf_values = @values;
 
                 foreach my $f (@$fields) {
                     my $annotation = @$f % 2 ? pop @$f : undef;
 
-                    for ( my $i = 0 ; $i < @sf_codes && $i < @sf_values ; $i++ )
+                    for (
+                        my $i = 0 ;
+                        $i < @sf_codes && $i < @sf_values ;
+                        $i++
+                      )
                     {
                         push @$f, $sf_codes[$i], $sf_values[$i];
                     }
@@ -78,7 +82,7 @@ sub _build_fixer {
         }
 
         $data;
-      }
+    }
 }
 
 1;
@@ -91,17 +95,17 @@ Catmandu::Fix::pica_add - add new subfields to record
 =head1 SYNOPSIS
 
     # Copy value of dc.identifier to PICA field 003A as subfield 0
-    pica_add('dc.identifier', '003A0');
+    pica_add('dc.identifier', '003A$0');
     
     # Same as above, but use another record path ('pica')
-    pica_add('dc.identifier', '003A0', record:'pica');
+    pica_add('dc.identifier', '003A$0', record:'pica');
     
     # force the creation of a new field 003A
-    pica_add('dc.identifier', '003A0', force_new:1);
+    pica_add('dc.identifier', '003A$0', force_new:1);
     
     # Add multiple subfields
     # "dc": {"subjects": ["foo", "bar"]}
-    pica_add('dc.subjects', '004Faf')
+    pica_add('dc.subjects', '004F$af')
 
 =head1 DESCRIPTION
 

@@ -11,7 +11,7 @@ Readonly::Array our @EXPORT_OK => qw(print_aliases print_common print_descriptio
 	print_forms print_glosses print_labels print_references print_senses
 	print_sitelinks print_statements);
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 sub print_common {
 	my ($obj, $opts_hr, $list_method, $print_cb, $title, $input_cb,

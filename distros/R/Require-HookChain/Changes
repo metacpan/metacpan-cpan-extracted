@@ -1,3 +1,11 @@
+0.006   2023-02-07  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Note about Require::HookChain::log::stderr being able to log
+          loading of strict.pm and warnings.pm.
+
+
 0.005   2022-11-15  Released-By: PERLANCAR; Urgency: medium
 
         - Split Require::HookChain::source::metacpan to its own dist to

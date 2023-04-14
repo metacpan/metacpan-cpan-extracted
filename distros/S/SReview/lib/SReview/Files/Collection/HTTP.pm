@@ -42,6 +42,18 @@ sub _get_file {
 	}
 }
 
+sub _probe_basepath {
+	return shift->workdir;
+}
+
+sub DESTROY {
+	my $self = shift;
+	$self->SUPER::DESTROY();
+	if($self->has_download) {
+		unlink($self->filename);
+	}
+}
+
 package SReview::Files::Collection::HTTP;
 
 use Moose;

@@ -28,7 +28,6 @@ __PACKAGE__->belongs_to(
   state =>
   'Example::Schema::Result::State',
   { 'foreign.id' => 'self.state_id' },
-  { proxy_select_options => {value=>'id', label=>'name'} },
 );
 
 __PACKAGE__->belongs_to(
@@ -41,7 +40,6 @@ __PACKAGE__->belongs_to(
   employment =>
   'Example::Schema::Result::Employment',
   { 'foreign.id' => 'self.employment_id' },
-  { proxy_radio_options => {value=>'id', label=>'label'} },
 );
 
 __PACKAGE__->validates(address => (presence=>1, length=>[2,48]));
@@ -61,7 +59,7 @@ __PACKAGE__->validates(birthday => (
 
 __PACKAGE__->validates(status => (
     presence => 1,
-    inclusion => [qw/pending active inactive/],
+    inclusion => \&status_list,
     with => {
       method => 'valid_status',
       on => 'update',
@@ -73,10 +71,12 @@ __PACKAGE__->validates(status => (
 __PACKAGE__->validates_with(\&valid_employment_registration );
 __PACKAGE__->validates_with(\&valid_state_registration );
 
+sub status_list($self) { return qw( pending active inactive ) }
 
 sub valid_employment_registration($self, $opts) {
   if(
-    $self->employment->label eq 'unemployed'
+    $self->employment # because this is optional relationship
+    && $self->employment->label eq 'unemployed'
     && $self->registered
   ) {
     $self->errors->add('registered', "can't be selected if unemployed", $opts) if $self->is_column_changed('registered');
@@ -86,7 +86,8 @@ sub valid_employment_registration($self, $opts) {
 
 sub valid_state_registration($self, $opts) {
   if(
-    $self->state->abbreviation eq 'NY'
+    $self->state # because this is optional relationship
+    && $self->state->abbreviation eq 'NY'
     && $self->registered
   ) {
     $opts->{state} = 'New York';
@@ -103,10 +104,6 @@ sub valid_status($self, $attribute_name, $value, $opt) {
   if($old eq 'inactive') {
     $self->errors->add($attribute_name, "can't become pending once inactive", $opt) if $value eq 'pending';
   }
-}
-
-sub status_list($self) {
-  return qw( pending active inactive );
 }
 
 sub status_options($self) {

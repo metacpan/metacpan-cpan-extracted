@@ -51,7 +51,7 @@ my @test_cases = (
 for my $test (@test_cases) {
     my ( $method, $params, $expected_text_re ) = @{$test}{qw/method params expected_text_re/};
 
-    my $response = $openai->$method( %{$params} );
+    my $response = $openai->$method( $params );
 
     like( $response->{choices}[0]{text}, $expected_text_re );
 }

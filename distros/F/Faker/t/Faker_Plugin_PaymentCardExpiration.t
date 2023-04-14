@@ -127,11 +127,11 @@ $test->for('example', 1, 'execute', sub {
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
   ok $result->faker->random->pick; # reset randomizer
-  is $result->execute, "02/24";
+  is $result->execute, "02/25";
   ok $result->faker->random->pick; # reset randomizer
-  is $result->execute, "11/23";
+  is $result->execute, "11/24";
   ok $result->faker->random->pick; # reset randomizer
-  is $result->execute, "09/24";
+  is $result->execute, "09/25";
 
   $result
 });
@@ -170,6 +170,15 @@ $test->for('example', 1, 'new', sub {
 
   $result
 });
+
+=partials
+
+t/Faker.t: pdml: authors
+t/Faker.t: pdml: license
+
+=cut
+
+$test->for('partials');
 
 # END
 

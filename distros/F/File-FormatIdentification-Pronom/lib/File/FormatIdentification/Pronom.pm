@@ -9,10 +9,12 @@ use List::Util qw( none first );
 use Scalar::Util;
 use YAML::XS;
 use File::FormatIdentification::Regex;
-use v5.21; # special regex syntax introduced with 5.21 needed!
 use Moose;
+use v5.21; # special regex syntax introduced with 5.21 needed!
+use feature qw(signatures);
+no warnings qw( experimental::signatures);
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # ABSTRACT Perl extension for parsing PRONOM-Signatures using DROID-Signature file
 
@@ -22,12 +24,14 @@ our $VERSION = '0.06'; # VERSION
 #
 no warnings 'recursion';
 
-sub _flatten_rx_recursive ($$$@) {
-    my $regex         = shift;
-    my $lastpos       = shift;
-    my $open_brackets = shift;
-    my @rx_groups     = @_;
+sub _flatten_rx_recursive ($regex, $lastpos, $open_brackets, @rx_groups) {
     my $rx            = shift @rx_groups;
+    my $sub_close_open_brackets = sub {
+        while ( $open_brackets > 0 ) {
+            $regex .= ")";
+            $open_brackets--;
+        }
+    };
 
     #use Data::Printer;
     #say "_flatten_rx_recursive";
@@ -37,10 +41,7 @@ sub _flatten_rx_recursive ($$$@) {
     if ( !defined $regex ) { confess; }
 
     if ( !defined $rx ) {    # do nothing
-        while ( $open_brackets > 0 ) {
-            $regex .= ")";
-            $open_brackets--;
-        }
+        &$sub_close_open_brackets();
     }
     else {
         my $pos_diff    = $rx->{position} - $lastpos;
@@ -48,16 +49,7 @@ sub _flatten_rx_recursive ($$$@) {
         if ( !defined $local_regex ) {
             $local_regex = '';
         }
-        if ( 0 == $pos_diff ) {
-
-            # TODO:
-            File::FormatIdentification::Regex::simplify_two_or_combined_regex(
-                $regex, $local_regex );
-            $regex =
-              &_flatten_rx_recursive( "$regex|$local_regex", $lastpos,
-                $open_brackets, @rx_groups );
-        }
-        elsif ( $pos_diff > 0 ) {    # is deeper
+        if ( $pos_diff > 0 ) {    # is deeper
                # look a head, if same pos found, then use bracket, otherwise not
             if (
                 (
@@ -78,7 +70,14 @@ sub _flatten_rx_recursive ($$$@) {
                 );
             } ## end else [ if ( scalar @rx_groups...)]
         }
-        elsif ( $pos_diff < 0 ) {    # is higher
+        elsif ( 0 == $pos_diff ) {
+            File::FormatIdentification::Regex::simplify_two_or_combined_regex(
+                $regex, $local_regex );
+            $regex =
+                &_flatten_rx_recursive( "$regex|$local_regex", $lastpos,
+                    $open_brackets, @rx_groups );
+        }
+        else { #( $pos_diff < 0 )    # is higher
             $regex = &_flatten_rx_recursive(
                 "$regex)$local_regex",
                 $rx->{position},
@@ -86,167 +85,165 @@ sub _flatten_rx_recursive ($$$@) {
                 @rx_groups
             );
         }
-        else {
-            confess
-"FL: pos=$rx->{position} lastpos=$lastpos regex='$regex' open=$open_brackets\n";
-        }
     }
     return $regex;
 } ## end sub _flatten_rx_recursive ($$$@)
 use warnings 'recursion';
 
-sub _flatten_rx ($@) {
-    my $regex     = shift;
-    my @rx_groups = @_;
-
+sub _flatten_rx ($regex, @rx_groups) {
     #say "calling flatten_rx with regex=$regex quality=$quality";
     #use Data::Printer;
     #p( @rx_groups );
-    $regex = _flatten_rx_recursive( $regex, 0, 0, @rx_groups );
-    return $regex;
+    return _flatten_rx_recursive( $regex, 0, 0, @rx_groups );
 } ## end sub _flatten_rx ($@)
 
 # expands pattern of form "FFFB[10:EB]" to FFFB10, FFFB11, ... FFFBEB
-sub _expand_pattern ($) {
-    my $pattern = $_[0];
+sub _expand_pattern ($pattern) {
     $pattern =~ s/(?<=\[)!/^/g;
     $pattern =~ s/(?<=[0-9A-F]{2}):(?=[0-9A-F]{2})\]/-]/g;
     $pattern =~ s/([0-9A-F]{2})/\\x{$1}/g;
 
     # substitute hex with printable ASCII-Output
-    $pattern =~ s#\\x\{(3[0-9]|[46][1-9A-F]|[57][0-9A])\}#chr( hex($1) );#egs;
+    #$pattern =~ s#\\x\{(3[0-9]|[46][1-9A-F]|[57][0-9A])\}#chr( hex($1) );#egs;
+    $pattern =~ s#\\x\{([46][1-9A-F]|[57][0-9A]|3[0-9])\}#chr( hex($1) );#egs;
     return $pattern;
 } ## end sub _expand_pattern ($)
 
+sub _expand_offsets_residual_loop($maxoffset, $offset_expanded, $byte) {
+    my $maxloops    = int( $maxoffset / 32766 );
+    my $maxresidual = $maxoffset % 32766;
+    for ( my $i = 0 ; $i < $maxloops ; $i++ ) {
+        $offset_expanded .= $byte . "{32766}";
+    }
+    $offset_expanded .= $byte . "{$maxresidual}";
+    return $offset_expanded;
+}
+
+sub _expand_offsets_calc_repetitions( $minoffset, $maxoffset, $offset_expanded, $byte) {
+    # workaround, because perl quantifier limits,
+    #  calc How many repetitions we need! Both offsets should be less than 32766
+    #TODO: check if this comes from Droid or is calculated
+
+    my $mintmp = 0;
+    my $maxtmp = 0;
+    if ( defined $minoffset && ( length($minoffset) > 0 ) ) {
+        $mintmp = $minoffset;
+    }
+    if ( defined $maxoffset && ( length($maxoffset) > 0 ) ) {
+        $maxtmp = $maxoffset;
+    }
+
+    my $maxloops;
+    if ( $maxtmp >= $mintmp ) {
+        $maxloops = int( $maxtmp / 32766 );
+    }
+    else {
+        $maxloops = int( $mintmp / 32766 );
+    }
+    my $maxresidual = $maxtmp % 32766;
+    my $minresidual = $mintmp % 32766;
+
+    #say "\tMaxloops=$maxloops maxres = $maxresidual minres=$minresidual";
+    my @offsets;
+    my $minstr = 0;
+    my $maxstr = 0;
+    if ( defined $minoffset && length($minoffset) > 0 ) {
+        $minstr = $minresidual;
+        $mintmp = $mintmp - $minresidual;
+    }
+
+    for ( my $i = 0 ; $i <= $maxloops ; $i++ ) {
+
+        # loop, so we assure the special handling of residuals
+        if ( $maxtmp > $maxresidual ) {
+            $maxstr = 32766;
+        } elsif ( $maxtmp < 0 ) {
+            $maxstr = 0;
+        } else {
+            $maxstr = $maxresidual;
+        }
+        if ( $mintmp > $minresidual ) {
+            $minstr = 32766;
+        } elsif ( $mintmp < 0 ) {
+            $minstr = 0;
+        } else {
+            $minstr = $minresidual;
+        }
+        #### handle residuals
+        if ( $i == 0 ) {
+            $minstr = $minresidual;
+            $mintmp = $mintmp - $minresidual;
+        } elsif ( $i == $maxloops ) {
+            $maxstr = $maxresidual;
+            $maxtmp = $maxtmp - $maxresidual;
+        }
+        # mark offsets
+        my $tmp;
+        if (defined $maxstr and $maxstr > 0 and $minstr > $maxstr) {
+            $tmp->{minoffset} = $maxstr;
+            $tmp->{maxoffset} = $minstr;
+        } else {
+            $tmp->{minoffset} = $minstr;
+            $tmp->{maxoffset} = $maxstr;
+        }
+        push @offsets, $tmp;
+    } ## end for ( my $i = 0 ; $i <=...)
+
+    my @filtered = map {
+        if ( !defined $maxoffset || length($maxoffset) == 0 ) {
+            $_->{maxoffset} = "";
+        }
+        if ( !defined $minoffset || length($minoffset) == 0 ) {
+            $_->{minoffset} = "";
+        }
+        $_;
+    } @offsets;
+    foreach my $tmp (@filtered) {
+        # ? at the end - means non-greedy
+        #$offset_expanded .= $byte."{" . $tmp->{minoffset} . "," . $tmp->{maxoffset} . "}?";
+        $offset_expanded .=
+            $byte . "{" . $tmp->{minoffset} . "," . $tmp->{maxoffset} . "}";
+    } ## end foreach my $tmp (@filtered)
+    return $offset_expanded;
+}
+
 # expands offsets min,max to regex ".{$min,$max}" and uses workarounds if $min or $max exceeds 32766
-sub _expand_offsets($$) {
-    my $minoffset = shift;
-    my $maxoffset = shift;
+sub _expand_offsets($minoffset, $maxoffset) {
     my $byte =
       '.';    # HINT: needs the character set modifier "aa" in $foo=~m/$regex/aa
               #my $byte = '[\x00-\xff]';
     my $offset_expanded = "";
-    if (   ( ( not defined $minoffset ) || ( length($minoffset) == 0 ) )
-        && ( ( not defined $maxoffset ) || ( length($maxoffset) == 0 ) ) )
-    {
-        $offset_expanded = "";
-    }
-    elsif (( defined $minoffset )
+    if (( defined $minoffset )
         && ( length($minoffset) > 0 )
         && ( defined $maxoffset )
         && ( length($maxoffset) > 0 )
         && ( $minoffset == $maxoffset ) )
     {
         if ( $minoffset > 0 ) {
-            my $maxloops    = int( $maxoffset / 32766 );
-            my $maxresidual = $maxoffset % 32766;
-            for ( my $i = 0 ; $i < $maxloops ; $i++ ) {
-                $offset_expanded .= $byte . "{32766}";
-            }
-            $offset_expanded .= $byte . "{$maxresidual}";
+            $offset_expanded = _expand_offsets_residual_loop($maxoffset, $offset_expanded, $byte);
         } ## end if ( $minoffset > 0 )
     }
+    elsif (   ( ( not defined $minoffset ) || ( length($minoffset) == 0 ) )
+        && ( ( not defined $maxoffset ) || ( length($maxoffset) == 0 ) ) )
+    {
+        $offset_expanded = "";
+    }
     else {
+        $offset_expanded = _expand_offsets_calc_repetitions($minoffset, $maxoffset, $offset_expanded, $byte)
 
-    # workaround, because perl quantifier limits,
-    #  calc How many repetitions we need! Both offsets should be less than 32766
-    #TODO: check if this comes from Droid or is calculated
-
-        my $mintmp = 0;
-        my $maxtmp = 0;
-        if ( defined $minoffset && ( length($minoffset) > 0 ) ) {
-            $mintmp = $minoffset;
-        }
-        if ( defined $maxoffset && ( length($maxoffset) > 0 ) ) {
-            $maxtmp = $maxoffset;
-        }
-
-        my $maxloops;
-        if ( $maxtmp >= $mintmp ) {
-            $maxloops = int( $maxtmp / 32766 );
-        }
-        else {
-            $maxloops = int( $mintmp / 32766 );
-        }
-        my $maxresidual = $maxtmp % 32766;
-        my $minresidual = $mintmp % 32766;
-
-        #say "\tMaxloops=$maxloops maxres = $maxresidual minres=$minresidual";
-        my @offsets;
-        my $minstr = "";
-        my $maxstr = "";
-        if ( defined $minoffset && length($minoffset) > 0 ) {
-            $minstr = $minresidual;
-            $mintmp = $mintmp - $minresidual;
-        }
-
-        for ( my $i = 0 ; $i <= $maxloops ; $i++ ) {
-
-            # loop, so we assure the special handling of residuals
-            if ( $maxtmp > $maxresidual ) {
-                $maxstr = 32766;
-            }
-            elsif ( $maxtmp < 0 ) {
-                $maxstr = 0;
-            }
-            else {
-                $maxstr = $maxresidual;
-            }
-            if ( $mintmp > $minresidual ) {
-                $minstr = 32766;
-            }
-            elsif ( $mintmp < 0 ) {
-                $minstr = 0;
-            }
-            else {
-                $minstr = $minresidual;
-            }
-            #### handle residuals
-            if ( $i == 0 ) {
-                $minstr = $minresidual;
-                $mintmp = $mintmp - $minresidual;
-            }
-            elsif ( $i == $maxloops ) {
-                $maxstr = $maxresidual;
-                $maxtmp = $maxtmp - $maxresidual;
-            }
-
-            # mark offsets
-            my $tmp;
-            $tmp->{minoffset} = $minstr;
-            $tmp->{maxoffset} = $maxstr;
-            push @offsets, $tmp;
-        } ## end for ( my $i = 0 ; $i <=...)
-        my @filtered = map {
-            if ( !defined $maxoffset || length($maxoffset) == 0 ) {
-                $_->{maxoffset} = "";
-            }
-            if ( !defined $minoffset || length($minoffset) == 0 ) {
-                $_->{minoffset} = "";
-            }
-            $_;
-        } @offsets;
-        foreach my $tmp (@filtered) {
-
-# ? at the end - means non-greedy
-#$offset_expanded .= $byte."{" . $tmp->{minoffset} . "," . $tmp->{maxoffset} . "}?";
-            $offset_expanded .=
-              $byte . "{" . $tmp->{minoffset} . "," . $tmp->{maxoffset} . "}";
-        } ## end foreach my $tmp (@filtered)
     } ## end else [ if ( ( ( not defined $minoffset...)))]
 
 #say "DEBUG: minoffset='$minoffset' maxoffset='$maxoffset' --> offset_expanded='$offset_expanded'";
 
     # minimization steps
     $offset_expanded =~ s#{0,}#*#g;
-    $offset_expanded =~ s#{1,}#+#g;
     $offset_expanded =~ s#{0,1}#?#g;
+    $offset_expanded =~ s#{1,}#+#g;
     return $offset_expanded;
 } ## end sub _expand_offsets($$)
 
 # got XPath-object and returns a regex-structure as hashref
-sub _parse_fragments ($) {
-    my $fq        = shift;
+sub _parse_fragments ($fq) {
     my $position  = $fq->getAttribute('Position');
     my $minoffset = $fq->getAttribute('MinOffset');
     my $maxoffset = $fq->getAttribute('MaxOffset');
@@ -273,9 +270,7 @@ sub _parse_fragments ($) {
 } ## end sub _parse_fragments ($)
 
 # got XPath-object and search direction and returns a regex-structure as hashref
-sub _parse_subsequence ($$) {
-    my $ssq       = shift;
-    my $dir       = shift;
+sub _parse_subsequence ($ssq, $direction =  undef) {
     my $position  = $ssq->getAttribute('Position');
     my $minoffset = $ssq->getAttribute('SubSeqMinOffset');
     my $maxoffset = $ssq->getAttribute('SubSeqMaxOffset');
@@ -303,19 +298,19 @@ sub _parse_subsequence ($$) {
     my $suffix;
     my $ret;
     my $regex;
-    if ( !defined $dir || length($dir) == 0 ) {
+    if ( !defined $direction || length($direction) == 0 ) {
         $regex = join( "", $lregex, $expanded, $rregex );
     }
-    elsif ( $dir eq "BOFoffset" ) {
+    elsif ( $direction eq "BOFoffset" ) {
         $regex =
           join( "", $offset_expanded, "(", $lregex, $expanded, $rregex, ")" );
     }
-    elsif ( $dir eq "EOFoffset" ) {
+    elsif ( $direction eq "EOFoffset" ) {
         $regex =
           join( "", "(", $lregex, $expanded, $rregex, ")", $offset_expanded );
     }
     else {
-        warn "unknown reference '$dir' found\n";
+        warn "unknown reference '$direction' found\n";
         $regex = join( "", $lregex, $expanded, $rregex );
     }
     $ret->{regex} =
@@ -326,9 +321,7 @@ sub _parse_subsequence ($$) {
 } ## end sub _parse_subsequence ($$)
 
 # got XPath-object and returns regex-string
-sub _parse_bytesequence ($) {
-    my $bsq = shift;
-
+sub _parse_bytesequence ($bsq) {
     #say "rx_groups in parse_byte_sequence:";
     my $reference = $bsq->getAttribute('Reference');
     ;    # if BOFoffset -> anchored begin of file, EOFofset -> end of file
@@ -366,8 +359,7 @@ sub _parse_bytesequence ($) {
 } ## end sub _parse_bytesequence ($)
 
 # ($%signatures, $%internal) = parse_signaturefile( $file )
-sub _parse_signaturefile($) {
-    my $pronomfile = shift;
+sub _parse_signaturefile($pronomfile) {
     my %signatures;
 
     # hash{internalid}->{regex} = $regex
@@ -449,9 +441,7 @@ sub _parse_signaturefile($) {
     return ( \%signatures, \%internal_signatures );
 } ## end sub _parse_signaturefile($)
 
-sub uniq_signature_ids_by_priority {
-    my $self       = shift;
-    my @signatures = @_;
+sub uniq_signature_ids_by_priority ($self, @signatures){
     my %found_signature_ids;
 
     # which PUIDs are in list?
@@ -510,9 +500,7 @@ has 'droid_signature_filename' => (
     }
 );
 
-sub save_as_yamlfile {
-    my $self     = shift;
-    my $filename = shift;
+sub save_as_yamlfile ($self, $filename) {
     my @res;
     push @res, $self->{signatures};
     push @res, $self->{internal_signatures};
@@ -520,9 +508,7 @@ sub save_as_yamlfile {
     return;
 } ## end sub save_as_yamlfile
 
-sub load_from_yamlfile {
-    my $self     = shift;
-    my $filename = shift;
+sub load_from_yamlfile ($self, $filename) {
     my ( $sig, $int ) = YAML::XS::LoadFile($filename);
     $self->{signatures}          = $sig;
     $self->{internal_signatures} = $int;
@@ -539,22 +525,17 @@ has 'auto_load' => (
     default => 1,
 );
 
-sub get_all_signature_ids {
-    my $self = shift;
+sub get_all_signature_ids ($self) {
     my @sigs = sort { $a <=> $b } keys %{ $self->{signatures} };
     return @sigs;
 }
 
-sub get_signature_id_by_puid {
-    my $self = shift;
-    my $puid = shift;
+sub get_signature_id_by_puid ($self, $puid) {
     my $sig  = $self->{puids}->{$puid};
     return $sig;
 }
 
-sub get_internal_ids_by_puid {
-    my $self = shift;
-    my $puid = shift;
+sub get_internal_ids_by_puid ($self, $puid) {
     my $sig  = $self->get_signature_id_by_puid($puid);
     my @ids  = ();
     if ( defined $sig ) {
@@ -564,9 +545,7 @@ sub get_internal_ids_by_puid {
     return @ids;
 }
 
-sub get_file_endings_by_puid {
-    my $self    = shift;
-    my $puid    = shift;
+sub get_file_endings_by_puid ($self, $puid){
     my $sig     = $self->get_signature_id_by_puid($puid);
     my @endings = ();
     if ( defined $sig ) {
@@ -575,8 +554,7 @@ sub get_file_endings_by_puid {
     return @endings;
 }
 
-sub get_all_internal_ids {
-    my $self = shift;
+sub get_all_internal_ids ($self) {
     my @ids = sort { $a <=> $b } keys %{ $self->{internal_signatures} };
     foreach my $id (@ids) {
         if ( !defined $id ) { confess("$id not defined") }
@@ -584,8 +562,7 @@ sub get_all_internal_ids {
     return @ids;
 }
 
-sub get_all_puids {
-    my $self = shift;
+sub get_all_puids ($self){
     my @ids =
       sort grep { defined $_ }
       map       { $self->{signatures}->{$_}->{puid}; }
@@ -593,15 +570,12 @@ sub get_all_puids {
     return @ids;
 }
 
-sub get_regular_expressions_by_internal_id {
-    my $self       = shift;
-    my $internalid = shift;
+sub get_regular_expressions_by_internal_id ($self, $internalid){
     if ( !defined $internalid ) { confess("internalid must exists!"); }
     return @{ $self->{internal_signatures}->{$internalid}->{regex} };
 }
 
-sub get_all_regular_expressions {
-    my $self    = shift;
+sub get_all_regular_expressions ($self) {
     my @ids     = $self->get_all_internal_ids();
     my @regexes = ();
     foreach my $id (@ids) {
@@ -612,9 +586,7 @@ sub get_all_regular_expressions {
     return @ret;
 }
 
-sub get_qualities_by_internal_id {
-    my $self       = shift;
-    my $internalid = shift;
+sub get_qualities_by_internal_id ($self, $internalid) {
     if ( !defined $internalid ) { confess("internalid must exists!"); }
     my $value = $self->{internal_signatures}->{$internalid}->{quality};
     if ( defined $value ) {
@@ -623,37 +595,27 @@ sub get_qualities_by_internal_id {
     return;
 }
 
-sub get_signature_id_by_internal_id {
-    my $self       = shift;
-    my $internalid = shift;
+sub get_signature_id_by_internal_id ($self, $internalid) {
     if ( !defined $internalid ) { confess("internalid must exists!"); }
     return $self->{internal_signatures}->{$internalid}->{signature};
 }
 
-sub get_name_by_signature_id {
-    my $self      = shift;
-    my $signature = shift;
+sub get_name_by_signature_id ($self, $signature) {
     return $self->{signatures}->{$signature}->{name};
 }
 
-sub get_puid_by_signature_id {
-    my $self      = shift;
-    my $signature = shift;
+sub get_puid_by_signature_id ($self, $signature) {
     return $self->{signatures}->{$signature}->{puid};
 }
 
-sub get_puid_by_internal_id {
-    my $self       = shift;
-    my $internalid = shift;
+sub get_puid_by_internal_id ($self, $internalid) {
     if ( !defined $internalid ) { confess("internalid must exists!"); }
     my $signature = $self->get_signature_id_by_internal_id($internalid);
     return $self->get_puid_by_signature_id($signature);
 }
 
-sub get_quality_sorted_internal_ids {
-    my $self = shift;
+sub get_quality_sorted_internal_ids ($self){
     my @ids  = sort {
-
         # sort by regexes
         my @a_rxq = @{ $self->{internal_signatures}->{$a}->{quality} };
         my @b_rxq = @{ $self->{internal_signatures}->{$b}->{quality} };
@@ -670,11 +632,8 @@ sub get_quality_sorted_internal_ids {
     return @ids;
 }
 
-sub get_combined_regex_by_puid {
-    my $self      = shift;
-    my $puid      = shift;
+sub get_combined_regex_by_puid ($self, $puid) {
     my @internals = $self->get_internal_ids_by_puid($puid);
-
     #use Data::Printer;
     #p( $puid );
     #p( @internals );
@@ -688,15 +647,12 @@ sub get_combined_regex_by_puid {
         $combined;
     } @internals;
     my $result = File::FormatIdentification::Regex::or_combine(@regexes);
-
     #p( $result );
     return $result;
 }
 
-sub _prepare_statistics {
-    my $self = shift;
+sub _prepare_statistics ($self) {
     my $results;
-
     # count of PUIDs
     # count of internal ids (IDs per PUID)
     # count of regexes
@@ -825,9 +781,7 @@ sub _prepare_statistics {
     return $results;
 }
 
-sub print_csv_statistics {
-    my $self    = shift;
-    my $csv_file = shift;
+sub print_csv_statistics ($self, $csv_file) {
     my $results = $self->_prepare_statistics();
     my $version = $results->{filename};
     $version =~ s/DROID_SignatureFile_V(\d+)\.xml/$1/;
@@ -866,9 +820,7 @@ sub print_csv_statistics {
     return;
 }
 
-sub print_statistics {
-    my $self    = shift;
-    my $verbose = shift;
+sub print_statistics ($self, $verbose = undef){
     my $results = $self->_prepare_statistics();
 
     say "Statistics of file $results->{filename}";
@@ -962,7 +914,7 @@ File::FormatIdentification::Pronom
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

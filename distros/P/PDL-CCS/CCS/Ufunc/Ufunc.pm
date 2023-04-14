@@ -1,26 +1,28 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::CCS::Ufunc;
 
-@EXPORT_OK  = qw( PDL::PP ccs_accum_prod PDL::PP ccs_accum_dprod PDL::PP ccs_accum_sum PDL::PP ccs_accum_dsum PDL::PP ccs_accum_or PDL::PP ccs_accum_and PDL::PP ccs_accum_bor PDL::PP ccs_accum_band PDL::PP ccs_accum_maximum PDL::PP ccs_accum_minimum PDL::PP ccs_accum_maximum_nz_ind PDL::PP ccs_accum_minimum_nz_ind PDL::PP ccs_accum_nbad PDL::PP ccs_accum_ngood PDL::PP ccs_accum_nnz PDL::PP ccs_accum_average );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(ccs_accum_prod ccs_accum_dprod ccs_accum_sum ccs_accum_dsum ccs_accum_or ccs_accum_and ccs_accum_bor ccs_accum_band ccs_accum_maximum ccs_accum_minimum ccs_accum_maximum_nz_ind ccs_accum_minimum_nz_ind ccs_accum_nbad ccs_accum_ngood ccs_accum_nnz ccs_accum_average );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::CCS::Ufunc::VERSION = 1.23.20;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.23.22';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ufunc $VERSION;
 
 
 
 
+
+
+
+#line 13 "ccsufunc.pd"
 
 #use PDL::CCS::Version;
 use strict;
@@ -40,26 +42,20 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
  ## ... stuff happens
 
 =cut
-
-
-
-
-
-
+#line 46 "Ufunc.pm"
 
 =head1 FUNCTIONS
-
-
 
 =cut
 
 
 
 
+
+#line 58 "ccsufunc.pd"
+
 *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
-
-
-
+#line 59 "Ufunc.pm"
 
 =head2 ccs_accum_prod
 
@@ -75,14 +71,12 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
     indx [o]nOut();
     )
 
-
 Accumulated product over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
-
 
 If $N() is specified and greater than zero, then the quantity:
 
@@ -91,19 +85,14 @@ If $N() is specified and greater than zero, then the quantity:
 is multiplied into $nzvalsOut: this is probably What You Want if you are computing the product over a virtual
 dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_prod processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -142,7 +131,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_prod = \&PDL::ccs_accum_prod;
+
 
 
 
@@ -162,14 +153,12 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated double-precision product over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
-
 
 If $N() is specified and greater than zero, then the quantity:
 
@@ -178,19 +167,14 @@ If $N() is specified and greater than zero, then the quantity:
 is multiplied into $nzvalsOut: this is probably What You Want if you are computing the product over a virtual
 dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_dprod processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -229,7 +213,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_dprod = \&PDL::ccs_accum_dprod;
+
 
 
 
@@ -249,14 +235,12 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated sum over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
-
 
 If $N() is specified and greater than zero, then the quantity:
 
@@ -265,19 +249,14 @@ If $N() is specified and greater than zero, then the quantity:
 is added to $nzvalsOut: this is probably What You Want if you are summing over a virtual
 dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_sum processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -316,7 +295,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_sum = \&PDL::ccs_accum_sum;
+
 
 
 
@@ -336,14 +317,12 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated double-precision sum over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
-
 
 If $N() is specified and greater than zero, then the quantity:
 
@@ -352,19 +331,14 @@ If $N() is specified and greater than zero, then the quantity:
 is added to $nzvalsOut: this is probably What You Want if you are summing over a virtual
 dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_dsum processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -403,7 +377,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_dsum = \&PDL::ccs_accum_dsum;
+
 
 
 
@@ -423,7 +399,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated logical "or" over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -431,24 +406,18 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 If $N() is specified and greater than zero, $missing() is logically (or)ed
 into each result value at each output index with a run length of less than $N() in $ixIn().
 This is probably What You Want.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_or processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -487,7 +456,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_or = \&PDL::ccs_accum_or;
+
 
 
 
@@ -507,7 +478,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated logical "and" over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -515,24 +485,18 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 If $N() is specified and greater than zero, $missing() is logically (and)ed
 into each result value at each output index with a run length of less than $N() in $ixIn().
 This is probably What You Want.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_and processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -571,7 +535,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_and = \&PDL::ccs_accum_and;
+
 
 
 
@@ -591,7 +557,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated bitwise "or" over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -599,24 +564,18 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 If $N() is specified and greater than zero, $missing() is bitwise (or)ed
 into each result value at each output index with a run length of less than $N() in $ixIn().
 This is probably What You Want.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_bor processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -633,7 +592,7 @@ The state of the bad-value flag of the output piddles is unknown.
      shift(@nnzOut);
    }
 
-   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
+   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
    @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
    @nnzOut = @nnzIn           if (!@nnzOut);
    $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
@@ -656,7 +615,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_bor = \&PDL::ccs_accum_bor;
+
 
 
 
@@ -676,7 +637,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated bitwise "and" over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -684,24 +644,18 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 If $N() is specified and greater than zero, $missing() is bitwise (and)ed
 into each result value at each output index with a run length of less than $N() in $ixIn().
 This is probably What You Want.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_band processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -718,7 +672,7 @@ The state of the bad-value flag of the output piddles is unknown.
      shift(@nnzOut);
    }
 
-   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
+   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
    @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
    @nnzOut = @nnzIn           if (!@nnzOut);
    $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
@@ -741,7 +695,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_band = \&PDL::ccs_accum_band;
+
 
 
 
@@ -761,7 +717,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated maximum over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -769,25 +724,19 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 If $N() is specified and greater than zero,
 and if $missing() is greater than any listed value for a vector key with a run-length
 of less than $N(), then $missing() is used as the output value for that key.
 This is probably What You Want.
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_maximum processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -826,7 +775,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_maximum = \&PDL::ccs_accum_maximum;
+
 
 
 
@@ -846,7 +797,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated minimum over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -854,25 +804,19 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 If $N() is specified and greater than zero,
 and if $missing() is less than any listed value for a vector key with a run-length
 of less than $N(), then $missing() is used as the output value for that key.
 This is probably What You Want.
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_minimum processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -911,7 +855,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_minimum = \&PDL::ccs_accum_minimum;
+
 
 
 
@@ -931,7 +877,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated maximum_nz_ind over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -939,22 +884,16 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 Output indices index $nzvalsIn, -1 indicates that the missing value is maximal.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_maximum_nz_ind processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -993,7 +932,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_maximum_nz_ind = \&PDL::ccs_accum_maximum_nz_ind;
+
 
 
 
@@ -1013,7 +954,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated minimum_nz_ind over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -1021,22 +961,16 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 Output indices index $nzvalsIn, -1 indicates that the missing value is minimal.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_minimum_nz_ind processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -1075,7 +1009,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_minimum_nz_ind = \&PDL::ccs_accum_minimum_nz_ind;
+
 
 
 
@@ -1095,7 +1031,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated number of bad values over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -1103,22 +1038,16 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 Should handle missing values appropriately.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_nbad processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -1158,7 +1087,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_nbad = \&PDL::ccs_accum_nbad;
+
 
 
 
@@ -1178,7 +1109,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated number of good values over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -1186,22 +1116,16 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 Should handle missing values appropriately.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_ngood processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -1241,7 +1165,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_ngood = \&PDL::ccs_accum_ngood;
+
 
 
 
@@ -1261,7 +1187,6 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated number of non-zero values over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
@@ -1269,22 +1194,16 @@ $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
 
-
 Should handle missing values appropriately.
-
-
 
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_nnz processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -1301,7 +1220,7 @@ The state of the bad-value flag of the output piddles is unknown.
      shift(@nnzOut);
    }
 
-   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
+   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
    @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
    @nnzOut = @nnzIn           if (!@nnzOut);
    $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
@@ -1324,7 +1243,9 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_nnz = \&PDL::ccs_accum_nnz;
+
 
 
 
@@ -1344,14 +1265,12 @@ The state of the bad-value flag of the output piddles is unknown.
     indx [o]nOut();
     )
 
-
 Accumulated average over values $nzvalsIn() associated with vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
 and
 $nOut() stores the number of unique non-missing values computed.
-
 
 If $N() is specified and greater than zero, then the quantity:
 
@@ -1360,19 +1279,14 @@ If $N() is specified and greater than zero, then the quantity:
 is added to $nzvalsOut: this is probably What You Want if you are averaging over a virtual
 dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
 
-
-
 Returned PDLs are implicitly sliced such that NnzOut==$nOut().
 
 In scalar context, returns only $nzvalsOut().
 
-
-
 =for bad
 
 ccs_accum_average processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
-
+The state of the bad-value flag of the output ndarrays is unknown.
 
 =cut
 
@@ -1411,10 +1325,14 @@ The state of the bad-value flag of the output piddles is unknown.
  }
 
 
+
 *ccs_accum_average = \&PDL::ccs_accum_average;
 
 
 
+
+
+#line 615 "ccsufunc.pd"
 
 =pod
 
@@ -1442,9 +1360,7 @@ zcover, intover, minmaximum
 
 =cut
 
-
-
-
+#line 651 "ccsufunc.pd"
 ##---------------------------------------------------------------------
 =pod
 
@@ -1464,7 +1380,6 @@ PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
 Probably many.
 
 =cut
-
 
 ##---------------------------------------------------------------------
 =pod
@@ -1486,15 +1401,8 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-
-
-
-;
-
-
+#line 1405 "Ufunc.pm"
 
 # Exit with OK status
 
 1;
-
-		   

@@ -1,0 +1,18 @@
+- name: installation
+  title: Installation
+  source: _pages/installation.md
+- name: docs
+  title: Manual
+  children:
+    - pod: Scalar::Util
+    - pod: List::Util
+    - divider:
+    - pod: Carp
+- name: metacpan
+  title: CPAN
+  icon: '<i class="fa-solid fa-circle-dot"></i>'
+  target: '_blank'
+- name: github
+  title: GitHub
+  icon: '<i class="fa-brands fa-github"></i>'
+  target: '_blank'

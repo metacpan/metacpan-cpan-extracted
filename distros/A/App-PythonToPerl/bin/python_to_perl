@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+#
+# This file is part of App-PythonToPerl
+#
+# This software is Copyright (c) 2023 by Auto-Parallel Technologies, Inc.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+# Python to Perl Translator
+# Use OO component conversion & large language models to recursively translate Python source code into equivalent Perl
+
+# [[[ HEADER ]]]
+#use RPerl;
+use strict;
+use warnings;
+our $VERSION = 0.018_000;
+
+# [[[ INCLUDES ]]]
+# system includes
+use Perl::Types;
+use Time::HiRes qw(time);
+
+# internal includes
+use Python::File;
+use Python::Include;
+use Python::Function;
+use Python::Class;
+use App::PythonToPerl qw();
+
+# [[[ OPERATIONS ]]]
+
+# START TRANSLATION PERFORMANCE TIMING
+my number $time_start = time();
+ 
+# NEED UPGRADE: accept multiple file and/or directory names as input
+# NEED UPGRADE: accept multiple file and/or directory names as input
+# NEED UPGRADE: accept multiple file and/or directory names as input
+
+# INITIALIZE OBJECT-ORIENTED COMPONENT CONVERSION
+# receive path to Python input file
+my string $python_file_path = $ARGV[0];
+print 'have $python_file_path = \'', $python_file_path, '\'', "\n";
+
+# create object to handle Python input file
+my Python::File $python_file = Python::File->new({python_file_path => $python_file_path});
+
+# create and initialize pre-parsed Python data structures,
+# outer hashes are keyed on file paths, then inner structures are Python::File objects or hashes keyed on fully-scoped symbol names
+my Python::File::hashref                $python_files     = { $python_file_path => $python_file };
+my Python::Include::hashref::hashref    $python_includes_all  = { $python_file_path => {}, index_max => -1 };
+my Python::Function::hashref::hashref   $python_functions_all = { $python_file_path => {} };
+my Python::Class::hashref::hashref      $python_classes_all   = { $python_file_path => {} };
+
+# INITIALIZE ACCESS TO OPENAI CODEX
+# must have OPENAI_API_KEY env var to enable OpenAI::API access
+if ((not exists $ENV{OPENAI_API_KEY}) or (not defined $ENV{OPENAI_API_KEY}) or ($ENV{OPENAI_API_KEY} eq '')) {
+    croak 'ERROR EPYPL000: non-existent or undefined or empty OPENAI_API_KEY environmental variable, please create API key in your OpenAI account & set env var accordingly, croaking';
+}
+
+# create new OpenAI API object, used for all LLM translation calls
+my OpenAI::API $openai = OpenAI::API->new( 
+    api_key => $ENV{OPENAI_API_KEY},
+    timeout => 60,  # abandon request after so many seconds
+);
+
+# TRANSLATE PYTHON FILE INTO PERL FILE
+my string $perl_file_path = 
+    $python_file->python_file_to_perl_file(
+        $openai,
+        $python_includes_all->{$python_file_path},
+        $python_functions_all->{$python_file_path},
+        $python_classes_all->{$python_file_path}
+    );
+print 'received $perl_file_path = \'', $perl_file_path, '\'', "\n";
+
+# FINISH TRANSLATION PERFORMANCE TIMING
+my number $time_total = time() - $time_start;
+print 'time total:   ' . $time_total . ' seconds' . "\n";
+
+
+# START HERE: implement Perl-based recursive translation, or stick with bash?
+# START HERE: implement Perl-based recursive translation, or stick with bash?
+# START HERE: implement Perl-based recursive translation, or stick with bash?
+
+# RECURSIVE TRANSLATION
+# test recursive translation of Python files to Perl files
+#my string $perl_directory_name = $ARGV[1];
+#my string_arrayref $perl_file_paths = python_file_to_perl_files__follow_includes($openai, $python_file_path, $python_includes_all);
+#print 'received $perl_file_paths = ', Dumper($perl_file_paths), "\n";
+
+1;  # end of package main
+
+
+__END__
+=head1 NAME
+
+python_to_perl Front-End Program
+
+Python-to-Perl Translator
+
+EXPERIMENTAL ALPHA PROTOTYPE, USE AT YOUR OWN RISK!
+
+=head1 SYNOPSIS
+
+        export OPENAI_API_KEY=your_api_key
+        python_to_perl your_input_file.py
+
+        python_to_perl_directory_recurse.sh your_input_directory/
+
+=head1 DESCRIPTION
+
+B<App::PythonToPerl> is a translator.
+
+B<App::PythonToPerl> is a Perl distribution which includes the `bin/python_to_perl` application for converting Python source code into Perl source code.  Perl currently handles the translation of top-level file structure, comments, includes, function definitions, and class definitions.  Large language model (LLM) neural networks handle the translation of all remaining source code lines.  Currently, OpenAI LLMs are supported via OpenAI::API.
+
+For more info:
+
+L<https://gitlab.com/scienceperl/app-pythontoperl/-/blob/main/README.md>
+
+=head1 SEE ALSO
+
+L<App::PythonToPerl>
+
+=head1 AUTHOR
+
+B<William N. Braswell, Jr.>
+
+L<mailto:wbraswell@NOSPAM.cpan.org>
+
+=cut

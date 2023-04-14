@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "Alien::Gnuplot" : "0",
             "ExtUtils::MakeMaker" : "6.64"
          }
       },
@@ -63,6 +64,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git"
       }
    },
-   "version" : "2.023",
+   "version" : "2.024",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

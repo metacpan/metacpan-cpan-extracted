@@ -1,12 +1,14 @@
 Build.PL
 Changes
+LICENSE
 MANIFEST
+META.json
+META.yml
 README
+bin/gmitool
 lib/Net/Gemini.pm
 lib/Net/Gemini/Server.pm
-lib/Net/Gemini/URI.pm
 t/00-load.t
-t/10-uri.t
 t/20-server.t
 t/30-gemini.t
 t/host.cert
@@ -14,6 +16,4 @@ t/host.key
 t/mkcertificate
 t/pod-coverage.t
 t/pod.t
-META.yml
-META.json
 SIGNATURE    Added here by Module::Build

@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-OpenAI::API::Request::Moderation - moderations endpoint
+OpenAI::API::Request::Moderation - Request class for OpenAI API content moderation
 
 =head1 SYNOPSIS
 
@@ -42,32 +42,37 @@ OpenAI::API::Request::Moderation - moderations endpoint
 
 =head1 DESCRIPTION
 
-Given a input text, outputs if the model classifies it as violating
-OpenAI's content policy.
+This module provides a request class for interacting with the OpenAI API's
+content moderation endpoint. It inherits from L<OpenAI::API::Request>.
+
+=head1 ATTRIBUTES
+
+=head2 input
+
+The content to be moderated. Required.
+
+=head2 model
+
+The model to use for content moderation. Optional.
 
 =head1 METHODS
 
-=head2 new()
+=head2 endpoint
 
-=over 4
+This method returns the API endpoint for content moderation.
 
-=item * input
+=head2 method
 
-=item * model [optional]
+This method returns the HTTP method for content moderation.
 
-=back
+=head1 INHERITED METHODS
 
-=head2 send()
+This module inherits the following methods from L<OpenAI::API::Request>:
 
-Sends the request and returns a data structured similar to the one
-documented in the API reference.
+=head2 send(%args)
 
-=head2 send_async()
-
-Send a request asynchronously. Returns a L<Promises> promise that will
-be resolved with the decoded JSON response. See L<OpenAI::API::Request>
-for an example.
+=head2 send_async(%args)
 
 =head1 SEE ALSO
 
-OpenAI API Reference: L<Moderations|https://platform.openai.com/docs/api-reference/moderations>
+L<OpenAI::API::Request>, L<OpenAI::API::Config>

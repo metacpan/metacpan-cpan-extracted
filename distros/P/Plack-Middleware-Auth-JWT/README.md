@@ -4,7 +4,7 @@ Plack::Middleware::Auth::JWT - Token-based Auth (aka Bearer Token) using JSON We
 
 # VERSION
 
-version 0.906
+version 0.907
 
 # SYNOPSIS
 
@@ -136,6 +136,8 @@ Thanks to
 regression in the tests caused by an update in [Crypt::JWT](https://metacpan.org/pod/Crypt%3A%3AJWT) error
 messages. The same issue was also reported by SREZIC.
 - [Michael R. Davis](https://github.com/mrdvt92) for fixing a typo.
+
+    \+item \* [Balloon Metainfo XR GmbH](https://balloon-events.com/) for supporting Open Source and sponsoring some improvements.
 
 # AUTHOR
 

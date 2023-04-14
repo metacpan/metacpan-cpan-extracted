@@ -3,15 +3,29 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util::API;
+use Getopt::Long 'GetOptions';
 
+GetOptions(
+  'meta' => \my $meta,
+  'no-build-spvm-modules' => \my $no_build_spvm_modules,
+);
+
+if ($meta) {
+  $no_build_spvm_modules = 1;
+}
+
+unless ($meta) {
+
+}
+
+my %configure_and_runtime_requires = ('SPVM' => '0.9701');
 WriteMakefile(
   NAME              => 'SPVM::Resource::SocketUtil',
   VERSION_FROM      => 'lib/SPVM/Resource/SocketUtil.pm',
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Resource/SocketUtil.pm',
-     AUTHOR         => 'USER_NAME<USER_MAIL>') : ()),
+     AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
   test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
   clean => {FILES => ['.spvm_build', 't/.spvm_build']},
   META_MERGE => {
@@ -29,11 +43,10 @@ WriteMakefile(
   },
   NORECURS => 1,
   CONFIGURE_REQUIRES => {
-    # SPVM::Builder::Util::API is needed for Makefile.PL
-    'SPVM'              => '0.9662',
+    %configure_and_runtime_requires,
   },
-  PREREQ_PM => {
-    
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
   },
   TEST_REQUIRES => {
     
@@ -44,8 +57,9 @@ sub MY::postamble {
 
   my $make_rule = '';
   
-  
-  
+  unless ($no_build_spvm_modules) {
+    require SPVM::Builder::Util::API;
+  }
   
   return $make_rule;
 }

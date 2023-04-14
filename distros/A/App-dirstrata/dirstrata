@@ -1,0 +1,189 @@
+#!/usr/bin/perl 
+use 5.014 ; use strict ; use warnings  ;
+use feature qw [ say ] ;
+use Time::HiRes qw[gettimeofday tv_interval] ; 
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use File::Basename qw [ basename fileparse ] ;
+use File::Spec::Functions qw[ catfile splitdir rel2abs updir ] ; 
+use Getopt::Std ; 
+use Getopt::Long qw [ GetOptions :config bundling no_ignore_case pass_through ] ; # GetOptionsFromArray ] ;
+use List::Util qw [ max min sum sum0 reduce shuffle uniq ] ;
+use Cwd qw [ getcwd abs_path ] ;
+use App::dirdir ; 
+
+my $time_start = [ gettimeofday ] ; 
+GetOptions ( 'pattern=s' => \my$ptn ) ; #  ファイル名(末端)でパターンに当てはまる物だけを数える(例には影響しない)。
+GetOptions ( 'nodiff' => \my$nodiff ) ; # ディレクトリ深さの階層の、「差」を取らないようにする。
+GetOptions ( 'noshuffle' => \my$noshuffle ) ; # shuffle を無効化する。
+* shuffle = sub(@){@_} if $noshuffle ;
+getopts '.:fg:L:l:s:v:0:' , \my%o ; 
+$o{s} = exists $o{s} ? srand $o{s} : srand ; 
+$o{g} //= '' ; # どんなデータを出力させるか(get)
+$o{v} //= 2  ; # 具体例を何個表示するか
+$o{'.'} //= '' ; # ピリオドで始まる隠しファイルについての処理(0が指定されると、たどらない)
+$o{L} //= 1 ; # 最も長いディレクトリ名を何個保管するか
+push @ARGV , $o{x} if defined $o{x} ; # 引数がオプションで  与えられた場合の処理
+my $start_dir = $ARGV [0] // "." ; # 先頭のディレクトリ 
+my $I = catfile q[] , q[] ; # OS固有の、ディレクトリの区切り文字を取り出す。Unix系なら'/'。
+chdir $start_dir or do { say STDERR "Seems no such a directory ``$start_dir''" ; exit -1 }  ;
+
+# -- 関数 head_trim の定義 : state でさらに短くなるかも。-- 
+my $d0 = ( getcwd ) . $I ;
+$d0 = (getcwd ). $I unless exists $o{g} && $o{g} =~ m/a/ ; 
+$d0 = '' if $o{g} =~ m/A/ ;
+sub head_trim ( $ ) { return $_[0] =~ s/^\Q$d0\E//r =~ s/\ /\\ /gr }
+
+my @gg = ( map { [ split /-/, $_ ] } split /,/ , $o{g} =~ s/[Aadlx]//gr );   # コンマ区切り ハイフン結合ペアの取り出し
+our %g1 = map { $_ ->[0] , 1 } grep { @ { $_ } == 1 } @gg ; # ペアではないもの
+our %g2 = map { $_->[0] ."-" .$_->[1] , 1 } grep { @ { $_ } == 2 } @gg ; # ペアのもの
+our @S ; #　$S[depth][maxdepth]の集計表となる。
+our @Sq ;  # $S_ln [ depth ]  # 各リンクファイルの情報を取り出す。(確か)
+my @Ex ; # 例の保管 $Ex[$dep][$depM] が 具体的なディレクトリ名 (後で網羅的に格納するかも)
+my @Ex2 ; # 例の保管 $Ex[$dep][$depM] が 具体的なディレクトリ名 (後で網羅的に格納するかも)
+my @dnLong = '' ; # 最も文字数の多いディレクトリ名
+
+& main ; 
+exit 0 ;
+
+END{
+  print RESET "" ; 
+  my $s = tv_interval $time_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " --  " , "Proc. time: " , sprintf( "%.3f", $s ) , " sec." . ($s>1 ? 's' : '' ) 
+    . " ; Random seed to shuffle : " . $o{s} . " " 
+    . ". ($0 App::dirdir\@$App::dirdir::VERSION)"  ; 
+}
+
+sub open_dir_error_message ( $ ) { 
+  say STDERR FAINT BOLD YELLOW "Cannot open the directory `$_[0]' so skipped." ;
+}
+
+sub main () {
+  $SIG{INFO} = sub { say GREEN getcwd ; & output (\@S, \@Sq ) } ;
+  & node_proc ( 0 , '.' ) ; # <- 再帰的な関数呼び出しが中でされる。
+  & output ( \@S, \@Sq ) unless exists $o{g} && $o{g} =~ m/x/ ;
+}
+
+sub node_proc ( $ $ )  {  # 第１引数は、元の指定ディレクトリからの深さであり、# 返り値は、そこで ( 経験した最大の深さ , 最大深さを達成したディレクトリ名 ) 。
+  my $dep = $_[0] ; # 深さ
+  my $dn = $_[1] ; #head_trim(getcwd);  # dir name  ディレクトリのファイル名(ディレクトリ名)である。
+  @dnLong = splice @{[ sort {length($b) <=> length($a) } (uniq @dnLong , basename $dn) ]} , 0, $o{L} if $o{L} ;
+  my $dnM = $dn ; # 最も深いところにあるディレクトリ名が保管されることになる。
+  my $depM = $dep ; # 最大深さの記録用。
+  my @dirs ; 
+  opendir my $dh , '.' or do { open_dir_error_message ( abs_path "." ) ; return () } ; 
+  my @allfiles = readdir $dh ; 
+  my @dirs0 = shuffle sort grep { ! /^\.{1,2}$/o && -d $_ } @allfiles  ;  # <-- - sort は -g が無いときは不要である
+  my @plainfiles = grep { -f $_ } @allfiles if $o{f} ;
+  for ( @dirs0 ) { 
+    do { push @dirs , $_ ; next } if ! -l $_  ;
+    say join "\t" , $o{g} =~ m/d/ ? () : "link:", head_trim (getcwd).$I.$_ if $o{g} =~ m/l/;#exists $o{g} && $o{g} =~ m/l/;
+    ++ $Sq [ $dep + 1 ] ;   # シンボリックリンクファイルについて数える。
+  }
+  @dirs = grep { ! m/^\./ } @dirs if 0 eq $o{'.'} ; # 隠しファイルに関する処理 
+  @plainfiles = grep { ! m/^\./ } @plainfiles if 0 eq $o{'.'} ; # 隠しファイルに関する処理 
+  for ( @dirs ) { 
+    next unless chdir $_ ; 
+    my ($depM1,$dnM1) = & node_proc ( $dep + 1 , "$dn$I$_" ) ; # <-- - 再帰が発生  ; 1はここでは一時的を意味する。
+    ( $depM, $dnM ) = ($depM1, $dnM1) if ($depM1//'-Inf') > $depM ; 
+    chdir $dh or die ; # ここで戻れないのは、とてもおかしいはず。
+  }
+  $ptn = qr/$ptn/ if defined $ptn;
+  @plainfiles = grep { $_ =~ m/$ptn/ } @plainfiles if $o{f} && defined $ptn ; 
+  $S [ $dep ] [ $depM - $dep ] += $o{f} ? @plainfiles : defined $ptn ?  $dn =~ m/$ptn/o ? 1 : 0 : 1 ;
+  $Ex [ $dep ] [ $depM - $dep ] //= $dnM if ! defined $ptn || ! $o{f} && $dn =~ m/$ptn/ ;
+  $Ex2[ $dep ] [ $depM - $dep ] = $dnM if ! defined $ptn || ! $o{f} && $dn =~ m/$ptn/ ;;
+  say join "\t" , $o{g} =~ m/d/ ? () : $dep, head_trim getcwd , 2 if $g1{$dep}  ;  # head_trim getcwd から変更substr $dn
+  my $g2x = "$dep-" . ($depM -$dep) ; 
+  #say join "\t" , $o{g} =~ m/d/ ? () : "$dep-$depM", head_trim getcwd  if  $g2{"$dep-$depM"} ; 
+  say join "\t" , $o{g} =~ m/d/ ? () : $g2x , head_trim getcwd  if  $g2{$g2x} ; 
+  return $depM , $dnM  ; # <- - $dn であっているか
+}
+
+sub output ($$) {  # 引数 \@S と \@Sq が引数となる。
+  my $sumA = 0 ; # ファイル数の合計
+  my @out = ( '', '++', '+'  , ! $nodiff ?  0 .. $#{$_[0]} - 1  :  1 .. $#{$_[0]} ) ;  # 0を1に。
+  push @out , MAGENTA "Symbolic_link_dir" if sum0 map { $_ // 0 } @{$_[1]} && 0 ne ($o{l}//''); # f ;
+  push @out , UNDERLINE YELLOW "dir examples" if $o{v} >= 1 ;
+  say join "\t" , @out ;
+  for ( 1 .. $#{$_[0]} ) {  # 0を1に。
+    for my $i ( 0 .. $#{$_[0]} - $_ ) { $_[0]->[$_][$i] //= 0 } ; 
+    my @out ;
+    push @out , $_ ; # 階層の深さ
+    my $sumR = sum0 map { $_ || 0 } @{$_[0]->[$_]}   ; 
+    push @out , FAINT $sumA += $sumR ;
+    push @out , FAINT $sumR ;
+    my @t = @{$_[0]->[$_]} ; 
+    push @out , ('') x ( $_ - 1 ) if $nodiff ; 
+    push @out , YELLOW $t[0] ; 
+    push @out , map { ! defined $_ ? '' : $_ eq 0 ? FAINT 0 : $_ } @t [ 1 .. $#t ] ; # @{$_[0]->[$_]} ; #@t[0..@t] } ; 
+    push @out , MAGENTA "+$_[1]->[$_]" if $_[1]->[$_] && 0 ne ($o{l}//'') ;
+    # 先頭の2文字は 通常 './' (".$I") または '  ' になるはずなので、それを除去。
+    push @out , YELLOW (my $t1 = substr $Ex[$_][0]//$Ex[$_][1]//$Ex[$_][2]//'  ' , 2 ) if $o{v} >= 1 ; 
+    push @out , YELLOW do{ my $t2 = substr $Ex2[$_][0]//$Ex2[$_][1]//$Ex2[$_][2]//'  ' , 2 ; $t2 eq $t1 ? () : ($t2) } if $o{v} >= 2 ;
+    say join "\t" , @out ; 
+    print color('reset') ;
+  }
+  #for ( @dnLong ) { say $_ } ; # 最も文字数の多いディレクトリ名の表示
+  say "The longest direcotry name(s) : @dnLong" if 0 < ($o{L} // 0 ) ; 
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+　$0 [dirname]
+   
+   指定されたディレクトリから、i階層下にあるディレクトリで、さらにそこからj階層下まで
+  何かディレクトリを持つものが何個あるのかを、行列状に示す。縦方向がiで、横方向がjに対応。
+   シンボリックリンクのディレクトリは辿らない。存在する場合は、その数を出力する。
+   dirname が指定されない場合は、現行ディレクトリが指定されたものと見なされる。
+
+ 出力表の解説 :
+   1. 出力表において、「+」と表記された列は、i階層の合計値を示す。「++」は累積和。
+   2. 最も左の列は i = 1,2,3.. を示す。最初の列の内、数は j = 0,1,2,..,(i-1)を示す。
+   3. j=0 (対応する各ディレクトリは子ディレクトリを持たない)は黄色で示した。
+      その部分に対応するディレクトリの例が、最も右の列に黄色で示される。
+      (ディレクトリの例は、ランダムに抽出される。再現性の確保のため -s でシードが指定可能。)
+   4. マゼンタ(紫)色で、各i(基点からのディレクトリ深さ)に対応するシンボリックリンファイルの
+      ディレクトリの個数を示す。
+   5. オプションの-fの指定により、plainファイルの個数を数える。
+      出力表の最後の行の2列目が、指定ディレクトリ全体の plainファイルの総数と一致する。
+
+  オプション: 
+
+    -. 0 : 隠しファイルを辿らない。
+    -f   : ディレクトリの個数で無くて、普通の(plainな)ファイルの個数を数える。(出力表の行列の各要素に対応するディレクトリが持つ直接の子ファイルの個数を計数する。)
+    -g N1-N2 ; iがN1, jがN2に相当するディレクトリ名を出力する。N1-N2の書式は コンマ(,)で連結が可能
+    -g ...[dx] ; xを指定文字列に含むことで表の出力を抑制する。dがある場合は深さ情報を抑制する。
+    -g ...[Aa] : aの有無でディレクトリの表示が変わる。あれば、指定ディレクトリ名から表示する。Aを含めば、絶対パスとなる。
+    -g ...l  : シンボリックリンクのディレクトリを出力する。 
+    -l 0 : シンボリックリンファイルの情報は出力しない。
+    -s N  : シャッフルの時の、ランダムシード。
+    --nodiff : 出力表の要素をできるだけ右にずらす 「(i,j)要素は元の 基点から深さiにあるディレクトリから、下方向に潜ってたどる最も深いディレクトリが基点から深さjまで」に相当。
+    --noshuffle : シャッフルをしない。-v1で辞書順最初、-v2で加えて辞書順最後が出力される。
+    --pattern : (実験的)ディレクトリ名またはファイル名を正規表現で指定する。(末尾は$を指定するが、先頭文字へのマッチングは^ではなくて、/を指定すること。)
+
+    -v N : 該当するディレクトリ名を、具体的に何個取り出すか。N=0,1,2が指定できる。
+    -L N : 最も長い異なるディレクトリ名(のbasename)も N 個出力する。未指定ならN=1。出力しない場合は 0 を指定すること。
+
+  その他の注意: 
+    - Ctrl+C では途中結果を出すのみで，停止しない。Ctrl+\で停止する。
+
+  開発上の注意 : 
+    * chdir ".." が意図通りに動作しないことがあったので、opendirを使った動作とした。
+    * examples でパスの表示が長くなるので、うまく省略したい。たとえば、最後から3番目まで-にするか、途中を略称にするかしたい。
+    * パスの途中の空白文字をエスケープするオプションを作りたい。
+    * バターンは文字列で指定するが、他に、シンボリックリンクファイルだけをフィルタリングして数える機能もあれば良い。

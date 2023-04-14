@@ -2,12 +2,9 @@ package CXC::Number::Sequence;
 
 # ABSTRACT: Numerical Sequence Generation
 
-use feature ':5.24';
+use v5.28;
 
-use Carp;
-
-use POSIX ();
-
+use POSIX                        ();
 use CXC::Number::Sequence::Types qw( Sequence );
 use CXC::Number::Sequence::Failure -all;
 use CXC::Number::Sequence::Utils qw( load_class );
@@ -16,7 +13,7 @@ use Moo;
 
 use experimental 'signatures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use namespace::clean;
 
@@ -77,8 +74,7 @@ sub nelem ( $self ) {
 
 sub spacing ( $self ) {
     my $elements = $self->_raw_elements;
-    my @spacing  = map { $elements->[$_] - $elements->[ $_ - 1 ] }
-      1 .. ( $self->nelem - 1 );
+    my @spacing  = map { $elements->[$_] - $elements->[ $_ - 1 ] } 1 .. ( $self->nelem - 1 );
     return $self->_convert( \@spacing );
 }
 
@@ -195,7 +191,7 @@ CXC::Number::Sequence - Numerical Sequence Generation
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -296,7 +292,7 @@ Returns an object which returns piddles for the following methods
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

@@ -1,5 +1,19 @@
 Revision history for App-ModuleBuildTiny
 
+0.040     2023-04-13 23:40:33+0200
+          - Create .gitignore when minting
+          - Add -I option to test subcommand
+          - Run more release tests on upload
+          - Make upload prompt default to false
+
+0.039     2023-04-06 16:08:17+0200
+          - Don't autocommit/autobump on partial regenerate
+
+0.038     2023-03-30 17:07:59+0200
+          - Add --jobs argument to mbtiny test
+          - Also allow module name as mint argument
+          - mkdir 't' during mint
+
 0.037     2023-03-24 12:45:52+0100
           - Write metamerge.json when dirname doesn't match distname
           - Add default settings to mint

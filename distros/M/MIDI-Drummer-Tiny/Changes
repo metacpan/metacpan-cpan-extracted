@@ -1,5 +1,20 @@
 Revision history for MIDI-Drummer
 
+0.4206 2023-04-07 11:42:24
+    - Fix a dumb typo - ugh!
+
+0.4205 2023-04-07 00:29:20
+    - Flesh-out the Advanced tutorial.
+
+0.4204 2023-04-06 22:32:51
+    - Flesh-out the Basics tutorial.
+
+0.4203 2023-04-06 21:23:50
+    - Flesh-out the Quickstart tutorial.
+
+0.4202 2023-04-06 19:04:25
+    - Begin to add a WIP tutorial.
+
 0.4201 2023-03-27 15:35:48
     - Improve documentation.
 

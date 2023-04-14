@@ -1,7 +1,10 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Time::Local {
-  use Time::Info;
+  use Sys::Time::Tm;
   
-  native static method timelocal : long ($time_info : Time::Info);
+  native static method timelocal : long ($time_info : Sys::Time::Tm);
   
-  native static method timegm : long ($time_info : Time::Info);
+  native static method timegm : long ($time_info : Sys::Time::Tm);
 }

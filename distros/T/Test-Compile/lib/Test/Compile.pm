@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = version->declare("v3.1.0");
+use version; our $VERSION = version->declare("v3.2.2");
 use parent 'Exporter';
 use Test::Compile::Internal;
 
@@ -114,16 +114,16 @@ Skips the current test, reporting the C<$reason>.
 
 The use of the following functions is deprecated and strongly discouraged.
 
+Instead, you should use the object oriented interface described in the L</SYNOPSIS>
+and in L<Test::Compile::Internal>.
+
 They are automatically exported to your namespace,  which is
 no longer considered best practise.  At some stage in the future, this will
-stop and you'll have to import them explicitly.
+stop and you'll have to import them explicitly to keep using them.
 
-Even then, you really should use the object oriented methods as they provide
-a more consistent interface.  For example: C<all_pm_files_ok()> calls the
-C<plan()> function - so you can't call multiple test functions in the same test file.
-
-You should definitely use the object oriented interface described in the L</SYNOPSIS>
-and in L<Test::Compile::Internal> instead of calling these functions.
+The object oriented methods also provide a more consistent interface. 
+For example: C<all_pm_files_ok()> calls the C<plan()> function - so you can't call
+multiple test functions in the same test file.
 
 =over 4
 
@@ -182,8 +182,8 @@ sub all_pl_files_ok {
 
 B<This function is deprecated>.  Please use
 L<Test::Compile::Internal/all_pm_files_ok(@dirs)> instead.  It's pretty much the
-same, except you can't specify a test name, and it can handle more than one file at a
-time.
+same, except it won't allow you to specify a test name, and it can handle more than
+one file at a time.
 
 C<pm_file_ok()> will okay the test if $filename compiles as a perl module.
 
@@ -243,9 +243,6 @@ Returns a list of all the perl module files - that is, files ending in F<.pm>
 defaults to F<blib> if F<blib> exists, or else F<lib> if not. Skips any files
 in F<CVS>, F<.svn>, or F<.git> directories.
 
-The order of the files returned is machine-dependent. If you want them
-sorted, you'll have to sort them yourself.
-
 =cut
 
 sub all_pm_files {
@@ -264,9 +261,6 @@ If C<@dirs> is undefined, it searches F<script> if F<script> exists, or else
 F<bin> if F<bin> exists.
 
 Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
-
-The order of the files returned is machine-dependent. If you want them
-sorted, you'll have to sort them yourself.
 
 =cut
 
@@ -301,7 +295,7 @@ Evan Giles, C<< <egiles@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2021 by the authors.
+Copyright 2007-2023 by the authors.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -312,9 +306,9 @@ L<Test::Compile::Internal> provides the object oriented interface to (and the
 inner workings for) the Test::Compile functionality.
 
 L<Test::Strict> provides functions to ensure your perl files compile, with
-added bonus that it will check you have used strict in all your files.
+the added bonus that it will check you have used strict in all your files.
+
 L<Test::LoadAllModules> just handles modules, not script files, but has more
 fine-grained control.
-
 
 =cut

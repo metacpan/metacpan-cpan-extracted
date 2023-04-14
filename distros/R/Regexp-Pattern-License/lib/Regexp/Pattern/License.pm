@@ -19,11 +19,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.10.0
+Version v3.10.1
 
 =cut
 
-our $VERSION = version->declare("v3.10.0");
+our $VERSION = version->declare("v3.10.1");
 
 =head1 SYNOPSIS
 

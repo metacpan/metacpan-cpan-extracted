@@ -1,5 +1,13 @@
 Revision history for Perl extension LaTeX::TOM.
 
+1.06  2023-03-30  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.05_01  2023-03-18  <schubiger@cpan.org>
+
+ - Minor tweaks.
+
 1.05  2023-02-10  <schubiger@cpan.org>
 
  - Drop generating compat Makefile.PL.

@@ -2,7 +2,7 @@ use warnings;
 use 5.020;
 use experimental qw( postderef signatures );
 
-package Memcached::RateLimit 0.07 {
+package Memcached::RateLimit 0.08 {
 
   # ABSTRACT: Sliding window rate limiting with Memcached
 
@@ -129,7 +129,7 @@ Memcached::RateLimit - Sliding window rate limiting with Memcached
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -328,7 +328,11 @@ The last error message is passed in.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Dylan Hardison (DHARDISON)
 
 =head1 COPYRIGHT AND LICENSE
 

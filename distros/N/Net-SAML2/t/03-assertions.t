@@ -179,4 +179,11 @@ is(
     "... and the sub status yay"
 );
 
+
+{
+    my $xml = path('t/data/digid-live.xml')->slurp;
+    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+    isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
+}
+
 done_testing;

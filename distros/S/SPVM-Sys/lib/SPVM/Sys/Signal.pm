@@ -147,3 +147,10 @@ Gets a monitored signal by monitored L<Sys::Signal::Handler::Monitor|Sys::Signal
 If a signal is received, the monitored signal was set to C<1> by the L<Sys::Signal::Handler::Monitor|Sys::Signal::Handler::Monitor> specified in the L</"signal"> method.
 
 Constant values specified in C<$signum> is defined in L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

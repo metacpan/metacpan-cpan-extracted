@@ -72,7 +72,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'JSON::MaybeXS' => '0',
+                                      'JSON::MaybeXS' => '1.00400',
                                       'Moo::Role' => '0',
                                       'MooX::TaggedAttributes' => '0.18',
                                       'Ref::Util' => '0',

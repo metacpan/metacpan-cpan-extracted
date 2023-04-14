@@ -1,5 +1,9 @@
 Revision history for RT-Extension-MergeUsers
 
+1.07 2023-04-13
+ - Support the new CombineSearchAndCount feature in DBIx::SearchBuilder
+   (Fix the issue that the first page of user search results might be empty)
+
 1.06 2020-07-17
  - Add RT 5 support
 

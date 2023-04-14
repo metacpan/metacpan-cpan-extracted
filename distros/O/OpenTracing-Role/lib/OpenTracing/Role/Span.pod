@@ -320,6 +320,32 @@ I<none>
 
 
 
+=head2 C<is_root_span>
+
+Returns 'true' if this is the root span, that is, if there is no parent span id.
+
+=over
+
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item C<Boolean>, according to perl
+
+=back
+
+=back
+
+
+
 =head2 C<duration>
 
 The time (in seconds) between start and finish. This will C<croak> when either

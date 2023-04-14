@@ -120,7 +120,7 @@ Code Class for Perl 5
 
 =head1 DESCRIPTION
 
-This package provides methods for manipulating code data.
+This package provides methods for manipulating subroutines.
 
 =cut
 

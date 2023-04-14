@@ -3,35 +3,16 @@ Upstream-Name: Sub-HandlesVia
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-HandlesVia
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
+Files: dist.ini
  lib/Sub/HandlesVia/CodeGenerator.pm.mite.pm
  lib/Sub/HandlesVia/Handler.pm.mite.pm
- lib/Sub/HandlesVia/HandlerLibrary.pm
- lib/Sub/HandlesVia/HandlerLibrary/Array.pm
- lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
- lib/Sub/HandlesVia/HandlerLibrary/Code.pm
- lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
- lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
- lib/Sub/HandlesVia/HandlerLibrary/Number.pm
- lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
- lib/Sub/HandlesVia/HandlerLibrary/String.pm
  lib/Sub/HandlesVia/Mite.pm
  lib/Sub/HandlesVia/Toolkit.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Mite.pm
  lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Moo.pm
  lib/Sub/HandlesVia/Toolkit/Moo.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Moose.pm
  lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Mouse.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/ObjectPad.pm
  lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Plain.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
  t/00begin.t
  t/02moo.t
@@ -104,7 +85,6 @@ Files: Changes
  t/60detect.t
  t/61moosemetagubbins.t
  t/62mousemetagubbins.t
- t/80beam.t
  t/94cmp.t
  t/96foreach.t
  t/99headtail.t
@@ -160,6 +140,30 @@ Files: t/02moo/role.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Sub/HandlesVia/HandlerLibrary.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Array.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Code.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Number.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
+ lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm
+ lib/Sub/HandlesVia/Toolkit/Moo.pm
+ lib/Sub/HandlesVia/Toolkit/Moose.pm
+ lib/Sub/HandlesVia/Toolkit/Mouse.pm
+ lib/Sub/HandlesVia/Toolkit/ObjectPad.pm
+ lib/Sub/HandlesVia/Toolkit/Plain.pm
+ t/80beam.t
+ t/81mxpa.t
+Copyright: Copyright 2023 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: lib/Sub/HandlesVia/Declare.pm
  lib/Sub/HandlesVia/HandlerLibrary/Blessed.pm
  lib/Sub/HandlesVia/HandlerLibrary/Enum.pm
@@ -213,14 +217,14 @@ Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2023 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2023 by the copyright holder(s).
  
  This is free software, licensed under:
  

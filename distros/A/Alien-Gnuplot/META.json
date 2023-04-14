@@ -70,7 +70,7 @@
          "url" : "git://github.com/drzowie/Alien-Gnuplot.git"
       }
    },
-   "version" : "1.041",
+   "version" : "1.042",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.38",
       "requires" : {

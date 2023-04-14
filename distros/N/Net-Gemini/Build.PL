@@ -1,5 +1,5 @@
 #!perl
-use 5.10.0;
+use 5.8.0;
 use strict;
 use warnings;
 use Module::Build;
@@ -8,7 +8,7 @@ Module::Build->VERSION('0.4004');
 # there is also Devel::CheckOS but the use-devel-assertos script seems a
 # bit too complicated every time I look at it. so...
 if ( $^O =~ /MSWin32/ ) {
-    say "no automated install on Windows due to test failures.";
+    print "no automated install on Windows due to test failures.\n";
     exit 0;
 }
 
@@ -18,16 +18,27 @@ my $builder = Module::Build->new(
     dist_author        => q{Jeremy Mates <jeremy.mates@gmail.com>},
     dist_version_from  => 'lib/Net/Gemini.pm',
     release_status     => 'stable',
+    create_license     => 0,
+    create_readme      => 0,
+    dynamic_config     => 0,
     configure_requires => { 'Module::Build' => '0.4004', },
     test_requires      => {
-        'Test2::V0' => '0.000060',
-        'perl'      => '5.10.0',
+        'Test2::Tools::Command' => '0.11',
+        'Test2::V0'             => '0.000060',
+        'perl'                  => '5.8.0',
     },
+    # NOTE several of these are for gmitool so are not really required
     requires => {
-        'Carp'            => '0',
-        'Encode'          => '0',
-        'IO::Socket::SSL' => '1.985',    # can_ipv6
-        'perl'            => '5.10.0',
+        'Carp'             => '0',
+        'Cpanel::JSON::XS' => '0',
+        'File::Path'       => '0',
+        'File::Slurper'    => '0',
+        'File::Spec'       => '0',
+        'IO::Socket::SSL'  => '1.985',    # can_ipv6
+        'Net::SSLeay'      => '0',
+        'Parse::MIME'      => '0',
+        'URI'              => '0',
+        'perl'             => '5.8.0',
     },
     sign           => 1,
     add_to_cleanup => ['Net-Gemini-*'],

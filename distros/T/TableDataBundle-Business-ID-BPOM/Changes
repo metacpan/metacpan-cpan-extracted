@@ -1,3 +1,10 @@
+20230207.0.0  2023-02-07  Released-By: PERLANCAR; Urgency: high
+
+              - Update module names of the source data.
+
+              - Add TableData pod weaver plugin for nicer POD.
+
+
 20221027.0.0  2022-10-27  Released-By: PERLANCAR
 
               - First release.

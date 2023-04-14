@@ -13,6 +13,17 @@ lib/OpenAI/API/Request/Image/Generation.pm
 lib/OpenAI/API/Request/Model/List.pm
 lib/OpenAI/API/Request/Model/Retrieve.pm
 lib/OpenAI/API/Request/Moderation.pm
+lib/OpenAI/API/Response.pm
+lib/OpenAI/API/Response/Chat.pm
+lib/OpenAI/API/Response/Completion.pm
+lib/OpenAI/API/Response/Edit.pm
+lib/OpenAI/API/Response/Embedding.pm
+lib/OpenAI/API/Response/File/List.pm
+lib/OpenAI/API/Response/File/Retrieve.pm
+lib/OpenAI/API/Response/Image/Generation.pm
+lib/OpenAI/API/Response/Model/List.pm
+lib/OpenAI/API/Response/Model/Retrieve.pm
+lib/OpenAI/API/Response/Moderation.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
@@ -20,13 +31,16 @@ META.yml			Module YAML meta-data (added by MakeMaker)
 README.md
 t/00-load.t
 t/01-completions-raw.t
+t/01-completions-string-overload.t
 t/01-completions.t
 t/02-edits.t
 t/03-moderations.t
+t/04-chat-string-overload.t
 t/04-chat.t
 t/05-models.t
 t/06-images.t
 t/07-files.t
+t/08-embedding.t
 t/10-exceptions-validation.t
 t/11-exceptions-internet.t
 t/12-exceptions-timeout.t

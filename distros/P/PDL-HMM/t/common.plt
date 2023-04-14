@@ -5,6 +5,7 @@ BEGIN { $| = 1; }
 
 # isok($label,@_) -- prints helpful label
 sub isok {
+  local $Test::Builder::Level = $Test::Builder::Level + 2;
   my $label = shift;
   if (@_==1) {
     ok($_[0],$label);
@@ -98,7 +99,8 @@ sub pdlapprox {
   isok($label,
        defined($got) && defined($want)
        && cmp_dims($got,$want)
-       && all(matchpdla($want,$got,$eps)));
+       && all(matchpdla($want,$got,$eps)))
+    or diag "got=$got\nwant=$want";
 }
 
 # pdlapprox_nodims($label, $got, $want, $eps=1e-5)
@@ -113,8 +115,6 @@ sub pdlapprox_nodims {
        && all(matchpdla($want,$got,$eps)));
 }
 
-
 print "loaded ", __FILE__, "\n";
 
 1;
-

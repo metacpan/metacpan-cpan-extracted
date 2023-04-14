@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.017-8-g212c3e9
+package Test::JSON::Schema::Acceptance; # git description: v1.018-3-g10756e0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.018';
+our $VERSION = '1.019';
 
 use 5.020;
 use Moo;
@@ -513,7 +513,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.018
+version 1.019
 
 =head1 SYNOPSIS
 
@@ -721,7 +721,7 @@ A subroutine reference, which is passed two arguments: the JSON Schema, and the 
 structure to be validated. This is the main entry point to your JSON Schema library being tested.
 
 The subroutine should return truthy or falsey depending on if the schema was valid for the input or
-not.
+not (an object with a boolean overload is acceptable).
 
 Either C<validate_data> or C<validate_json_string> is required.
 
@@ -732,7 +732,7 @@ containing the data to be validated. This is an alternative to L</validate_data>
 library only accepts JSON strings.
 
 The subroutine should return truthy or falsey depending on if the schema was valid for the input or
-not.
+not (an object with a boolean overload is acceptable).
 
 Exactly one of C<validate_data> or C<validate_json_string> is required.
 

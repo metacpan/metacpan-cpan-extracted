@@ -7,7 +7,7 @@ use Getopt::Long ();
 use Pod::Usage   ();
 use App::Toot;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $opt = {
     config => 'default',

@@ -1,3 +1,47 @@
+version 0.002; 2023-04-07
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    more comprehensive coverage)
+
+  * port to pre-5.9.5 Perl on Windows, where the Perl core's qerror()
+    function isn't available to modules
+
+  * port to Perl 5.21.4, where a GV op doesn't necessarily reference a GV
+
+  * port to Perl 5.33.1, which defines a PERL_VERSION_GE() macro that
+    clashes with the one this module previously had
+
+  * skip thread tests on some old versions of Perl (around 5.10.0) where
+    a core bug makes thread creation violate an internal assertion and
+    causes crashes
+
+  * skip thread tests on pre-5.8.9 Perls where a core bug makes thread
+    creation corrupt memory
+
+  * skip thread tests on pre-5.8.3 Perls where a core bug makes thread
+    completion break the global PL_sv_placeholder
+
+  * put whitespace around C string literals being pasted, for C++11
+    compatibility
+
+  * explicitly document that the affected operations are those that use
+    the two mentioned hidden variables, and so that the list of affected
+    operations is exhaustive
+
+  * document that the module doesn't affect select(), ${^LAST_FH},
+    readline(), <>, eof() (with the parenthesised empty argument list),
+    or <<>>
+
+  * avoid a compiler warning that arises on Perl 5.20
+
+  * add an alarm to thread tests in case of infinite loop
+
+  * refactor thread tests
+
+  * in XS, refactor Perl version comparisons
+
+  * in XS, better argument parenthesisation in a macro
+
 version 0.001; 2017-07-30
 
   * bugfix: require bugfixed version of Lexical::SealRequireHints (for not

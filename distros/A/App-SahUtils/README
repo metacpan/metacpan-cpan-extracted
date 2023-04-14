@@ -2,8 +2,8 @@ NAME
     App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 VERSION
-    This document describes version 0.482 of App::SahUtils (from Perl
-    distribution App-SahUtils), released on 2022-09-30.
+    This document describes version 0.483 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2023-01-20.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -16,6 +16,8 @@ SYNOPSIS
     *   format-with-sah
 
     *   get-sah-type
+
+    *   get-value-with-sah
 
     *   is-sah-builtin-type
 
@@ -53,6 +55,8 @@ SYNOPSIS
 
     *   list-sah-type-modules
 
+    *   list-sah-value-rule-modules
+
     *   normalize-sah-schema
 
     *   resolve-sah-schema
@@ -64,6 +68,8 @@ SYNOPSIS
     *   show-sah-filter-rule-module
 
     *   show-sah-schema-module
+
+    *   show-sah-value-rule-modules
 
     *   validate-with-sah
 
@@ -83,6 +89,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   schema* => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -114,6 +122,8 @@ FUNCTIONS
 
     *   schema* => *any*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -143,6 +153,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   schema* => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -175,6 +187,8 @@ FUNCTIONS
 
     *   schema* => *any*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -204,6 +218,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   schema* => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -236,6 +252,8 @@ FUNCTIONS
 
     *   schema* => *any*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -265,6 +283,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   schema* => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -297,6 +317,8 @@ FUNCTIONS
 
     *   schema* => *any*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -326,6 +348,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   schema* => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -358,6 +382,8 @@ FUNCTIONS
 
     *   schema* => *any*
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -388,6 +414,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   schema* => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -434,8 +462,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016,
+    2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

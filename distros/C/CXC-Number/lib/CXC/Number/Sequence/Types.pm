@@ -2,15 +2,16 @@ package CXC::Number::Sequence::Types;
 
 # ABSTRACT: Type::Tiny types for CXC::Number::Sequence
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use Math::BigInt upgrade => 'Math::BigFloat';
 use Math::BigFloat;
 use Type::Utils -all;
-use Types::Standard qw[ Num Int Enum Tuple Any InstanceOf Dict ArrayRef Value ];
+use Types::Standard        qw[ Num Int Enum Tuple Any InstanceOf Dict ArrayRef Value ];
 use Types::Common::Numeric qw[ PositiveNum PositiveOrZeroNum PositiveInt ];
 
 use Type::Library -base, -declare => qw(
@@ -20,7 +21,7 @@ use Type::Library -base, -declare => qw(
   Ratio
 );
 
-BEGIN { extends( "CXC::Number::Types" ) }
+BEGIN { extends 'CXC::Number::Types' }
 
 
 
@@ -34,13 +35,9 @@ BEGIN { extends( "CXC::Number::Types" ) }
 
 
 
-declare Alignment, as Tuple [ BigNum, BigPositiveOrZeroNum ],
-  where { $_->[1] < 1 },
-  coercion => 1;
+declare Alignment, as Tuple [ BigNum, BigPositiveOrZeroNum ], where { $_->[1] < 1 }, coercion => 1;
 
-coerce Alignment,
-  from Num,
-  via { [ Math::BigFloat->new( $_ ), Math::BigFloat->new( 0.5 ) ] };
+coerce Alignment, from Num, via { [ Math::BigFloat->new( $_ ), Math::BigFloat->new( 0.5 ) ] };
 
 
 
@@ -55,8 +52,7 @@ declare Sequence, as ArrayRef [ BigNum, 2 ], where {
     1;
 }, message {
     ArrayRef( [ BigNum, 2 ] )->validate( $_ )
-      or
-      "Must be an array of monotonically increasing numbers with at lest two elements"
+      or 'Must be an array of monotonically increasing numbers with at lest two elements'
 }, coercion => 1;
 
 
@@ -68,7 +64,7 @@ declare Sequence, as ArrayRef [ BigNum, 2 ], where {
 
 declare Spacing, as BigNum,
   where { $_ != 0 },
-  message { BigNum->validate( $_ ) or "Must be a non-zero number" },
+  message { BigNum->validate( $_ ) or 'Must be a non-zero number' },
   coercion => 1;
 
 
@@ -80,7 +76,7 @@ declare Spacing, as BigNum,
 
 declare Ratio, as BigNum,
   where { $_ > 0 && $_ != 1 },
-  message { BigNum->validate( $_ ) or "$_ must be > 0 && != 1." },
+  message { BigNum->validate( $_ ) or 'Number must be > 0 && != 1' },
   coercion => 1;
 
 #
@@ -107,7 +103,7 @@ CXC::Number::Sequence::Types - Type::Tiny types for CXC::Number::Sequence
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 TYPES
 
@@ -134,7 +130,7 @@ A positive number greater than 1.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number
+Please report any bugs or feature requests to bug-cxc-number@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Number>
 
 =head2 Source
 

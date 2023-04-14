@@ -18,18 +18,20 @@ my @test_cases = (
     {
         method => 'image_create',
         params => {
-            prompt => 'A cute baby sea otter',
-            size   => '256x256',
+            prompt          => 'A cute baby sea otter',
+            size            => '256x256',
             response_format => 'b64_json',
         },
-        expected_response => {
-            created => ignore(),
-            data    => array_each(
-                {
-                    b64_json => ignore(),
-                }
-            ),
-        },
+        expected_response => noclass(
+            {
+                created => ignore(),
+                data    => array_each(
+                    {
+                        b64_json => ignore(),
+                    }
+                ),
+            }
+        ),
     },
 
 );

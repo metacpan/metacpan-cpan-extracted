@@ -1,0 +1,5 @@
+.my-style {
+  @extend .text-primary;
+  @extend .fw-bold;
+  font-size: 1.25rem;
+}

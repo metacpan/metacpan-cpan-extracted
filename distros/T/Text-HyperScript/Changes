@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-HyperScript
 
+0.06 2023-04-08T03:27:10Z
+
+    - Rename internal class (Text::HyperScript::Element to Text::HyperScript::NodeString)
+    - Fix wrong documentation
+
 0.05 2022-09-30T10:33:39Z
 
     - Fix conflict with builtin name of perl on Text::HyperScript::HTML5

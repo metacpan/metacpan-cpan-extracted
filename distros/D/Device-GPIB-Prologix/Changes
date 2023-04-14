@@ -1,5 +1,12 @@
 Revision history for Perl extension Device::GPIB::Prologix.
 
+0.06  2023-03-31
+      Updated README to reflect obsoletion.
+      
+0.05  2023-03-31
+      This module is now obsoleted by and replaced by Device::GPIB::Controllers::Prologix, part
+      of the new Device::GPIB module.
+      
 0.04  2015-06-04
       Examples in bin were missing from dist.
 

@@ -1,5 +1,4 @@
 # SPVM::Resource::Zlib
 
-SPVM::Resource::Zlib is <a href="https://zlib.net/">zlib</a> porting to Perl/SPVM.
+<a href="https://metacpan.org/pod/SPVM::Resource::Zlib">SPVM::Resource::Zlib</a>
 
-Current zlib version is 1.2.11.

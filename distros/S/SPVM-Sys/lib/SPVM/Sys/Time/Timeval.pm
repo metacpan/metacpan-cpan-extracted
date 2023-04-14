@@ -67,3 +67,10 @@ Gets C<tv_usec>.
 Sets C<tv_usec>.
 
   $tv->set_tv_usec(34);
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

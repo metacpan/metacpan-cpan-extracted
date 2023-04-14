@@ -221,3 +221,10 @@ Gabor Szabo(L<https://github.com/szabgab>)
 =head1 Repository
 
 L<SPVM::Sys::OS - Github|https://github.com/yuki-kimoto/SPVM-Sys::OS>
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

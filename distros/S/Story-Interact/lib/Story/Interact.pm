@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001009';
+our $VERSION   = '0.001010';
 
 use Story::Interact::Analyze ();
 use Story::Interact::Character ();
@@ -167,6 +167,8 @@ Please report any bugs to
 L<https://github.com/tobyink/p5-story-interact/issues>.
 
 =head1 SEE ALSO
+
+L<https://story-interact.xlc.pl/>: Story-Interact's website and tutorial.
 
 L<Pod::CYOA>, L<https://en.wikipedia.org/wiki/Choose_Your_Own_Adventure>.
 

@@ -32,19 +32,19 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 {
   my $link_info = $main::NATIVE_API2_LINK_INFO;
   
-  my $config = SPVM::Builder::Config->new_gnu99(file_optional => 1);
+  my $config = SPVM::Builder::Config->new_c99(file_optional => 1);
   
-  ok($link_info->class_name, 'TestCase::NativeAPI2');
-  ok($link_info->ld, $config->ld);
-  ok($link_info->ldflags, $config->ldflags);
+  ok($link_info->config->class_name, 'TestCase::NativeAPI2');
+  ok($link_info->config->ld, $config->ld);
+  ok($link_info->config->ldflags, $config->ldflags);
   like($link_info->output_file, qr|TestCase/NativeAPI2\.$Config{dlext}|);
-  my $is_object_file_infos = 1;
-  for my $object_file_info (@{$link_info->object_file_infos}) {
-    unless ($object_file_info->isa('SPVM::Builder::ObjectFileInfo')) {
-      $is_object_file_infos = 0;
+  my $is_object_files = 1;
+  for my $object_file (@{$link_info->object_files}) {
+    unless ($object_file->isa('SPVM::Builder::ObjectFileInfo')) {
+      $is_object_files = 0;
     }
   }
-  ok($is_object_file_infos);
+  ok($is_object_files);
 }
 
 # Clear exception

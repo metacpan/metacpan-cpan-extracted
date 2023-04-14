@@ -9,9 +9,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-28'; # DATE
+our $DATE = '2023-01-28'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.742'; # VERSION
+our $VERSION = '0.743'; # VERSION
 
 our %SPEC;
 $SPEC{pmcost} = {
@@ -99,7 +99,7 @@ pmcost - Load Perl module with Devel::EndStats
 
 =head1 VERSION
 
-This document describes version 0.742 of pmcost (from Perl distribution App-PMUtils), released on 2022-09-28.
+This document describes version 0.743 of pmcost (from Perl distribution App-PMUtils), released on 2023-01-28.
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,13 @@ C<*> marks required options.
 
 =item B<--hide-core>
 
+(No description)
+
+
 =item B<--hide-noncore>
+
+(No description)
+
 
 =item B<--module-json>=I<s>
 
@@ -147,6 +153,9 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--module>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--no-import>
@@ -154,6 +163,9 @@ Can also be specified as the 1st command-line argument and onwards.
 Load module without import(): use MOD ().
 
 =item B<--show-memsize>
+
+(No description)
+
 
 =item B<--sort>=I<s>
 
@@ -321,7 +333,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

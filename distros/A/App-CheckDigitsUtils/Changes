@@ -1,3 +1,8 @@
+0.002   2023-01-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to make 'method' argument required.
+
+
 0.001   2023-01-28  Released-By: PERLANCAR
 
         - First release.

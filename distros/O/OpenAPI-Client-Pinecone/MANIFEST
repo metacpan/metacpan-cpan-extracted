@@ -1,0 +1,15 @@
+Changes
+ignore.txt
+lib/OpenAPI/Client/Pinecone.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+share/pinecone.yaml
+t/00-load.t
+t/describe_index_stats.t
+t/list_collections.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

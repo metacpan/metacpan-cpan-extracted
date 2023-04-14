@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class MIME::QuotedPrint  {
   native static method encode_qp : string ($str : string, $eol = undef : string, $binmode = 0 : int);
   

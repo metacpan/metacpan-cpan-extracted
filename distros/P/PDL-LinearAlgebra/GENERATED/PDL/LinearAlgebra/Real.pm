@@ -21,10 +21,10 @@ use DynaLoader;
 
 
 
+
 #line 78 "real.pd"
 
 use strict;
-
 
 {
   package # hide from CPAN
@@ -82,8 +82,6 @@ These routines accept either float or double ndarrays.
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
 
 
 =head2 gtsv
@@ -91,8 +89,6 @@ These routines accept either float or double ndarrays.
 =for sig
 
   Signature: ([phys]DL(n); [phys]D(n); [phys]DU(n); [io,phys]B(n,nrhs); int [o,phys]info())
-
-
 
 =for ref
 
@@ -146,27 +142,20 @@ its second element.
  gtsv($dl, $d, $du, $b, ($info=null));
  print "X is:\n$b" unless $info;
 
-
-
 =for bad
 
 gtsv ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 159 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gtsv = \&PDL::gtsv;
-#line 166 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -175,8 +164,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info())
-
-
 
 =for ref
 
@@ -204,7 +191,6 @@ Note that the routine returns VT = V', not V.
                     vectors) are returned in the array U;
             = 3:  the first min(m,n) columns of U (the left singular
                     vectors) are overwritten on the array A;
-
 
     jobvt:  Specifies options for computing all or part of the matrix
             V':
@@ -259,27 +245,20 @@ Note that the routine returns VT = V', not V.
  $info = pdl(long, 0);
  gesvd($a, 2, 2, $s , $u, $vt, $info);
 
-
-
 =for bad
 
 gesvd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 272 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesvd = \&PDL::gesvd;
-#line 279 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -288,8 +267,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
-
-
 
 =for ref
 
@@ -356,27 +333,20 @@ It is much faster than the simple driver for large matrices, but uses more works
  $info = long (0);
  gesdd($a, 1, $s , $u, $vt, $info);
 
-
-
 =for bad
 
 gesdd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 369 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesdd = \&PDL::gesdd;
-#line 376 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -385,8 +355,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(m,n); int jobu(); int jobv(); int jobq(); [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(q,q); [o]V(r,r); [o]Q(s,s); int [o]iwork(n); int [o]info())
-
-
 
 =for ref
 
@@ -554,27 +522,20 @@ form by taking the nonsingular matrix X as
  $info = null;
  ggsvd($A,1,1,1,$B,$k,$l,$alpha, $beta,$U, $V, $Q, $iwork,$info);
 
-
-
 =for bad
 
 ggsvd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 567 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggsvd = \&PDL::ggsvd;
-#line 574 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -583,8 +544,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
-
-
 
 =for ref
 
@@ -647,7 +606,6 @@ equal to 1 and largest component real.
                   elements i+1:N of wr and wi contain eigenvalues which
                   have converged.
 
-
 =for example
 
  $a = random (5, 5);
@@ -658,27 +616,20 @@ equal to 1 and largest component real.
  $info = null;
  geev($a, 1, 1, $wr, $wi, $vl, $vr, $info);
 
-
-
 =for bad
 
 geev ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 671 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geev = \&PDL::geev;
-#line 678 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -687,8 +638,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn))
-
-
 
 =for ref
 
@@ -840,27 +789,20 @@ Users' Guide.
  $info = null;
  geevx($a, 1,1,3,3,$wr, $wi, $vl, $vr, $ilo, $ihi, $scale, $abnrm,$rconde, $rcondv, $info);
 
-
-
 =for bad
 
 geevx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 853 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geevx = \&PDL::geevx;
-#line 860 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -869,8 +811,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n); int [phys]jobvl();int [phys]jobvr();B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
-
-
 
 =for ref
 
@@ -895,7 +835,6 @@ of (A,B) satisfies
 	u(j)**H * A  = lambda(j) * u(j)**H * B .
 
 	where u(j)**H is the conjugate-transpose of u(j).
-
 
     Arguments
     =========
@@ -967,27 +906,20 @@ of (A,B) satisfies
  $vr = zeroes(5,5);
  ggev($a, 1, 1, $b, $alphar, $alphai, $beta, $vl, $vr, ($info=null));
 
-
-
 =for bad
 
 ggev ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 980 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggev = \&PDL::ggev;
-#line 987 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -996,7 +928,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
-
 
 =for ref
 
@@ -1053,7 +984,6 @@ eigenvector vl(i) or vr(i) is given by
 
 For further explanation of the reciprocal condition numbers rconde
 and rcondv, see section 4.11 of LAPACK User's Guide.
-
 
     Arguments
     =========
@@ -1181,7 +1111,6 @@ and rcondv, see section 4.11 of LAPACK User's Guide.
             > N:  =N+1: other than QZ iteration failed in hgeqz.
                   =N+2: error return from tgevc.
 
-
 =for example
 
  $a = random(5,5);
@@ -1202,27 +1131,20 @@ and rcondv, see section 4.11 of LAPACK User's Guide.
  ggevx($a, 3, 1, 1, 3, $b, $alphar, $alphai, $beta, $vl, $vr,
  $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde,$rcondv,($info=null));
 
-
-
 =for bad
 
 ggevx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1215 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggevx = \&PDL::ggevx;
-#line 1222 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1231,8 +1153,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
-
-
 
 =for ref
 
@@ -1331,27 +1251,20 @@ The eigenvalues of such a block are a +- sqrt(bc).
  $info = null;
  gees($A, 1,1, $wr, $wi, $vs, $sdim, $info,\&select_function);
 
-
-
 =for bad
 
 gees ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1344 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gees = \&PDL::gees;
-#line 1351 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1360,8 +1273,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
-
-
 
 =for ref
 
@@ -1479,27 +1390,20 @@ the form
  $info = null;
  geesx($A, 1,1, 3, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info, \&select_function);
 
-
-
 =for bad
 
 geesx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1492 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geesx = \&PDL::geesx;
-#line 1499 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1508,8 +1412,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn); SV* select_func)
-
-
 
 =for ref
 
@@ -1546,7 +1448,6 @@ form:
 
 and the pair of corresponding 2-by-2 blocks in S and T will have a
 complex conjugate pair of generalized eigenvalues.
-
 
     Arguments
     =========
@@ -1629,7 +1530,6 @@ complex conjugate pair of generalized eigenvalues.
                         be caused due to scaling.
                   =N+3: reordering failed in tgsen.
 
-
 =for example
 
  sub my_select{
@@ -1647,27 +1547,20 @@ complex conjugate pair of generalized eigenvalues.
  $vsr = zeroes(5,5);
  gges($a, 1, 1, 1, $b, $alphar, $alphai, $beta, $vsl, $vsr, $sdim,($info=null), \&my_select);
 
-
-
 =for bad
 
 gges ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1660 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gges = \&PDL::gges;
-#line 1667 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1676,8 +1569,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); SV* select_func)
-
-
 
 =for ref
 
@@ -1730,7 +1621,6 @@ the computed deflating subspaces is
 	EPS * norm((A, B)) / RCONDV( 2 ).
 
 See LAPACK User's Guide, section 4.11 for more information.
-
 
     Arguments
     =========
@@ -1830,7 +1720,6 @@ See LAPACK User's Guide, section 4.11 for more information.
                         be caused due to scaling.
                   =N+3: reordering failed in tgsen.
 
-
 =for example
 
  sub my_select{
@@ -1852,27 +1741,20 @@ See LAPACK User's Guide, section 4.11 for more information.
  $rcondv = zeroes(2);
  ggesx($a, 1, 1, 1, 3,$b, $alphar, $alphai, $beta, $vsl, $vsr, $sdim, $rconde, $rcondv, ($info=null), \&my_select);
 
-
-
 =for bad
 
 ggesx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1865 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggesx = \&PDL::ggesx;
-#line 1872 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1881,8 +1763,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -1923,27 +1803,20 @@ real symmetric matrix A.
  $a = random (5,5);
  syev($a, 1,1, (my $w = zeroes(5)), (my $info=null));
 
-
-
 =for bad
 
 syev ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1936 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syev = \&PDL::syev;
-#line 1943 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1952,8 +1825,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -2005,27 +1876,20 @@ workspace than syevx.
  $a = random (5,5);
  syevd($a, 1,1, (my $w = zeroes(5)), (my $info=null));
 
-
-
 =for bad
 
 syevd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2018 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevd = \&PDL::syevd;
-#line 2025 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2034,8 +1898,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn))
-
-
 
 =for ref
 
@@ -2049,7 +1911,6 @@ for the desired eigenvalues.
 
     jobz:   = 0:  Compute eigenvalues only;
             = 1:  Compute eigenvalues and eigenvectors.
-
 
     range:  = 0: all eigenvalues will be found.
             = 1: all eigenvalues in the half-open interval (vl,vu]
@@ -2144,27 +2005,20 @@ for the desired eigenvalues.
  $z = zeroes(5,5);
  syevx($a, 1,0,1,0,0,0,0,$abstol, $m, $w, $z ,$ifail, $info);
 
-
-
 =for bad
 
 syevx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2157 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevx = \&PDL::syevx;
-#line 2164 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2173,8 +2027,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]z(p,q);int [o,phys]isuppz(r); int [o,phys]info())
-
-
 
 =for ref
 
@@ -2209,7 +2061,6 @@ For more details, see "A new O(n^2) algorithm for the symmetric
 tridiagonal eigenvalue/eigenvector problem", by Inderjit Dhillon,
 Computer Science Division Technical Report No. UCB//CSD-97-971,
 UC Berkeley, May 1997.
-
 
 Note 1 : syevr calls stegr when the full spectrum is requested
 on machines which conform to the ieee-754 floating point standard.
@@ -2325,27 +2176,20 @@ manner.
  $z = zeroes(5,5);
  syevr($a, 1,0,1,0,0,0,0,$abstol, $m, $w, $z ,$isuppz, $info);
 
-
-
 =for bad
 
 syevr ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2338 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevr = \&PDL::syevr;
-#line 2345 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2354,8 +2198,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -2425,27 +2267,20 @@ positive definite.
  $b = random (5,5);
  sygv($a, 1,1, 0, $b, (my $w = zeroes(5)), (my $info=null));
 
-
-
 =for bad
 
 sygv ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2438 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygv = \&PDL::sygv;
-#line 2445 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2454,8 +2289,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -2532,27 +2365,20 @@ without guard digits, but we know of none.
  $b = random (5,5);
  sygvd($a, 1,1, 0, $b, (my $w = zeroes(5)), (my $info=null));
 
-
-
 =for bad
 
 sygvd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2545 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygvd = \&PDL::sygvd;
-#line 2552 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2565,8 +2391,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
 	  int [t]iwork(iworkn);
 	)
-
-
 
 =for ref
 
@@ -2699,27 +2523,20 @@ range of values or a range of indices for the desired eigenvalues.
  $ifail = zeroes(5);
  sygvx($a, 1,1, 0,0, $b, 0, 0, 0, 0, $abstol, $m, $w, $z,$ifail,(my $info=null));
 
-
-
 =for bad
 
 sygvx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2712 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygvx = \&PDL::sygvx;
-#line 2719 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2728,8 +2545,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -2776,27 +2591,20 @@ system of equations A * X = B.
  gesv($a,$b, (my $ipiv=zeroes(5)),(my $info=null));
  print "The solution matrix X is :". transpose($b)."\n" unless $info;
 
-
-
 =for bad
 
 gesv ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2789 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesv = \&PDL::gesv;
-#line 2796 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2805,7 +2613,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn); int [t]iwork(n))
-
 
 =for ref
 
@@ -2875,7 +2682,6 @@ that it solves the original system before equilibration.
 
 =back
 
-
     Arguments
     =========
 
@@ -2918,7 +2724,6 @@ that it solves the original system before equilibration.
             returns the factors L and U from the factorization A = P*L*U
             of the equilibrated matrix A (see the description of A for
             the form of the equilibrated matrix).
-
 
     ipiv:   If fact = 0, then ipiv is an input argument and on entry
             contains the pivot indices from the factorization A = P*L*U
@@ -3034,27 +2839,20 @@ that it solves the original system before equilibration.
  gesvx($a,0, 2, $b, $af, $ipiv, $equed, $r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info);
  print "The solution matrix X is :". transpose($X)."\n" unless $info;
 
-
-
 =for bad
 
 gesvx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3047 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesvx = \&PDL::gesvx;
-#line 3054 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3063,8 +2861,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o]ipiv(n); int [o]info())
-
-
 
 =for ref
 
@@ -3117,7 +2913,6 @@ used to solve the system of equations A * X = B.
     B:      On entry, the N-by-NRHS right hand side matrix B.
             On exit, if info = 0, the N-by-NRHS solution matrix X.
 
-
     info:   = 0: successful exit
             < 0: if info = -i, the i-th argument had an illegal value
             > 0: if info = i, D(i,i) is exactly zero.  The factorization
@@ -3134,27 +2929,20 @@ used to solve the system of equations A * X = B.
  sysv($a, 1, $b, (my $ipiv=zeroes(5)),(my $info=null));
  print "The solution matrix X is :". transpose($b)."\n" unless $info;
 
-
-
 =for bad
 
 sysv ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3147 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sysv = \&PDL::sysv;
-#line 3154 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3163,8 +2951,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n))
-
-
 
 =for ref
 
@@ -3191,7 +2977,6 @@ The form of the factorization is
 	triangular matrices, and D is symmetric and block diagonal with
 	1-by-1 and 2-by-2 diagonal blocks.
 
-
 =item 2
 
 If some D(i,i)=0, so that D is exactly singular, then the routine
@@ -3213,7 +2998,6 @@ matrix and calculate error bounds and backward error estimates
 for it.
 
 =back
-
 
     Arguments
     =========
@@ -3298,7 +3082,6 @@ for it.
                          computed solution can be more accurate than the
                          value of rcond would suggest.
 
-
 =for example
 
  $a= random(5,5);
@@ -3316,27 +3099,20 @@ for it.
  sysvx($a, 0, 0, $b,$af, $ipiv, $X, $rcond, $ferr, $berr,$info);
  print "The solution matrix X is :". transpose($X)."\n";
 
-
-
 =for bad
 
 sysvx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3329 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sysvx = \&PDL::sysvx;
-#line 3336 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3345,8 +3121,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o,phys]info())
-
-
 
 =for ref
 
@@ -3402,27 +3176,20 @@ equations A * X = B.
  posv($a, 1, $b, (my $info=null));
  print "The solution matrix X is :". transpose($b)."\n" unless $info;
 
-
-
 =for bad
 
 posv ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3415 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *posv = \&PDL::posv;
-#line 3422 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3431,8 +3198,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn))
-
-
 
 =for ref
 
@@ -3449,7 +3214,6 @@ provided.
 The following steps are performed:
 
 =over 3
-
 
 =item 1
 
@@ -3604,7 +3368,6 @@ equilibration.
                          computed solution can be more accurate than the
                          value of rcond would suggest.
 
-
 =for example
 
  $a= random(5,5);
@@ -3623,27 +3386,20 @@ equilibration.
  posvx($a,0,2,$b,$af, $equed, $s, $X, $rcond, $ferr, $berr,$info);
  print "The solution matrix X is :". transpose($X)."\n" unless $info;
 
-
-
 =for bad
 
 posvx ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3636 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *posvx = \&PDL::posvx;
-#line 3643 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3652,8 +3408,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); int trans(); [io,phys]B(p,q);int [o,phys]info())
-
-
 
 =for ref
 
@@ -3729,7 +3483,6 @@ matrix X.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a= random(7,5);
@@ -3738,27 +3491,20 @@ matrix X.
  $b = random(7,6);
  gels($a, 1, $b, ($info = null));
 
-
-
 =for bad
 
 gels ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3751 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gels = \&PDL::gels;
-#line 3758 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3767,8 +3513,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info())
-
-
 
 =for ref
 
@@ -3808,7 +3552,6 @@ The minimum-norm solution is then
 		   [	     0	    ]
 	where Q1 consists of the first rank columns of Q.
 
-
     Arguments
     =========
 
@@ -3834,10 +3577,8 @@ The minimum-norm solution is then
             R11.  This is the same as the order of the submatrix T11
             in the complete orthogonal factorization of A.
 
-
     info:   = 0: successful exit
             < 0: If info = -i, the i-th argument had an illegal value.
-
 
 =for example
 
@@ -3851,27 +3592,20 @@ The minimum-norm solution is then
  $rcond = sqrt($eps) - (sqrt($eps) - $eps) / 2;
  gelsy($a, $b, $rcond, $jpvt,($rank=null),($info = null));
 
-
-
 =for bad
 
 gelsy ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3864 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelsy = \&PDL::gelsy;
-#line 3871 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3880,8 +3614,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
-
-
 
 =for ref
 
@@ -3932,7 +3664,6 @@ value.
                   if info = i, i off-diagonal elements of an intermediate
                   bidiagonal form did not converge to zero.
 
-
 =for example
 
  $a= random(7,5);
@@ -3945,27 +3676,20 @@ value.
  $rcond = sqrt($eps) - (sqrt($eps) - $eps) / 2;
  gelss($a, $b, $rcond, $s, ($rank=null),($info = null));
 
-
-
 =for bad
 
 gelss ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 3958 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelss = \&PDL::gelss;
-#line 3965 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3974,8 +3698,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn))
-
-
 
 =for ref
 
@@ -4053,7 +3775,6 @@ without guard digits, but we know of none.
                   if info = i, i off-diagonal elements of an intermediate
                   bidiagonal form did not converge to zero.
 
-
 =for example
 
  $a= random(7,5);
@@ -4066,27 +3787,20 @@ without guard digits, but we know of none.
  $rcond = sqrt($eps) - (sqrt($eps) - $eps) / 2;
  gelsd($a, $b, $rcond, $s, ($rank=null),($info = null));
 
-
-
 =for bad
 
 gelsd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4079 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelsd = \&PDL::gelsd;
-#line 4086 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4095,8 +3809,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(m,n); [phys]B(p,n);[io,phys]c(m);[phys]d(p);[o,phys]x(n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -4136,10 +3848,8 @@ which is obtained using a GRQ factorization of the matrices B and A.
 
     x:      On exit, x is the solution of the LSE problem.
 
-
     info:   = 0:  successful exit.
             < 0:  if info = -i, the i-th argument had an illegal value.
-
 
 =for example
 
@@ -4150,28 +3860,20 @@ which is obtained using a GRQ factorization of the matrices B and A.
  $x = zeroes(5);
  gglse($a, $b, $c, $d, $x, ($info=null));
 
-
-
-
 =for bad
 
 gglse ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4164 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gglse = \&PDL::gglse;
-#line 4171 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4180,8 +3882,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,m); [phys]B(n,p);[phys]d(n);[o,phys]x(m);[o,phys]y(p);int [o,phys]info())
-
-
 
 =for ref
 
@@ -4227,7 +3927,6 @@ problem
     info:   = 0:  successful exit.
             < 0:  if info = -i, the i-th argument had an illegal value.
 
-
 =for example
 
  $a = random(7,5);
@@ -4237,27 +3936,20 @@ problem
  $y = zeroes(4);
  ggglm($a, $b, $d, $x, $y,($info=null));
 
-
-
 =for bad
 
 ggglm ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4250 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggglm = \&PDL::ggglm;
-#line 4257 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4266,8 +3958,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(m,n); int [o]ipiv(p); int [o]info())
-
-
 
 =for ref
 
@@ -4308,27 +3998,20 @@ This is the right-looking Level 3 BLAS version of the algorithm.
  $info = null;
  getrf($a, $ipiv, $info);
 
-
-
 =for bad
 
 getrf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4321 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getrf = \&PDL::getrf;
-#line 4328 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4337,8 +4020,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(m,n); int [o]ipiv(p); int [o]info())
-
-
 
 =for ref
 
@@ -4379,27 +4060,20 @@ This is the right-looking Level 2 BLAS version of the algorithm.
  $info = null;
  getf2($a, $ipiv, $info);
 
-
-
 =for bad
 
 getf2 ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4392 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getf2 = \&PDL::getf2;
-#line 4399 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4408,8 +4082,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -4502,27 +4174,20 @@ This is the blocked version of the algorithm, calling Level 3 BLAS.
  # Assume $a is symmetric
  sytrf($a, 0, $ipiv, $info);
 
-
-
 =for bad
 
 sytrf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4515 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytrf = \&PDL::sytrf;
-#line 4522 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4531,8 +4196,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -4590,27 +4253,20 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
  # Assume $a is symmetric
  sytf2($a, 0, $ipiv, $info);
 
-
-
 =for bad
 
 sytf2 ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4603 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytf2 = \&PDL::sytf2;
-#line 4610 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4619,8 +4275,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]info())
-
-
 
 =for ref
 
@@ -4664,27 +4318,20 @@ This is the block version of the algorithm, calling Level 3 BLAS.
  # Assume $a is symmetric positive definite
  potrf($a, 0, ($info = null));
 
-
-
 =for bad
 
 potrf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4677 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potrf = \&PDL::potrf;
-#line 4684 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4693,8 +4340,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]info())
-
-
 
 =for ref
 
@@ -4738,27 +4383,20 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
  # Assume $a is symmetric positive definite
  potf2($a, 0, ($info = null));
 
-
-
 =for bad
 
 potf2 ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4751 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potf2 = \&PDL::potf2;
-#line 4758 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4767,7 +4405,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int [phys]ipiv(n); int [o,phys]info())
-
 
 =for ref
 
@@ -4793,8 +4430,6 @@ This method inverts U and then computes inv(A) by solving the system
             > 0:  if info = i, U(i,i) is exactly zero; the matrix is
                   singular and its inverse could not be computed.
 
-
-
 =for example
 
  $a = random (float, 100, 100);
@@ -4806,27 +4441,20 @@ This method inverts U and then computes inv(A) by solving the system
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
-
-
 =for bad
 
 getri ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4819 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getri = \&PDL::getri;
-#line 4826 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4835,7 +4463,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(n))
-
 
 =for ref
 
@@ -4880,27 +4507,20 @@ C<sytrf>.
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
-
-
 =for bad
 
 sytri ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4893 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytri = \&PDL::sytri;
-#line 4900 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4909,8 +4529,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]info())
-
-
 
 =for ref
 
@@ -4935,8 +4553,6 @@ computed by C<potrf>.
             > 0:  if info = i, the (i,i) element of the factor U or L is
                   zero, and the inverse could not be computed.
 
-
-
 =for example
 
  $a = random (float, 100, 100);
@@ -4947,27 +4563,20 @@ computed by C<potrf>.
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
-
-
 =for bad
 
 potri ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 4960 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potri = \&PDL::potri;
-#line 4967 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4976,8 +4585,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5012,8 +4619,6 @@ This is the Level 3 BLAS version of the algorithm.
             > 0: if info = i, A(i,i) is exactly zero.  The triangular
                  matrix is singular and its inverse can not be computed.
 
-
-
 =for example
 
  $a = random (float, 100, 100);
@@ -5021,27 +4626,20 @@ This is the Level 3 BLAS version of the algorithm.
  trtri($a, 1, ($info=null));
  print "Inverse of \$a is :\n transpose($a)" unless $info;
 
-
-
 =for bad
 
 trtri ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5034 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trtri = \&PDL::trtri;
-#line 5041 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5050,8 +4648,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5091,27 +4687,20 @@ This is the Level 2 BLAS version of the algorithm.
  trtri2($a, 1, ($info=null));
  print "Inverse of \$a is :\n transpose($a)" unless $info;
 
-
-
 =for bad
 
 trti2 ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5104 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trti2 = \&PDL::trti2;
-#line 5111 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5120,8 +4709,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int trans(); [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5162,27 +4749,20 @@ by getrf.
  }
  print "X is :\n $b" unless $info;
 
-
-
 =for bad
 
 getrs ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5175 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getrs = \&PDL::getrs;
-#line 5182 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5191,8 +4771,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int uplo();[io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5233,27 +4811,20 @@ A = L*D*L' computed by C<sytrf>.
  }
  print("X is :\n".transpose($b))unless $info;
 
-
-
 =for bad
 
 sytrs ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5246 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytrs = \&PDL::sytrs;
-#line 5253 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5262,8 +4833,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int uplo(); [io,phys]B(n,m); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5299,27 +4868,20 @@ A = U'*U or A = L*L' computed by C<potrf>.
  }
  print("X is :\n".transpose($b))unless $info;
 
-
-
 =for bad
 
 potrs ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5312 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potrs = \&PDL::potrs;
-#line 5319 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5328,8 +4890,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int uplo(); int trans(); int diag();[io,phys]B(n,m); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5384,27 +4944,20 @@ A check is made to verify that A is nonsingular.
  trtrs($a, 0, 0, 0, $b, $info);
  print("X is :\n".transpose($b))unless $info;
 
-
-
 =for bad
 
 trtrs ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5397 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trtrs = \&PDL::trtrs;
-#line 5404 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5413,8 +4966,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -5551,11 +5102,8 @@ than max(underflow, 1/overflow).
             to the infinity-norm, and if trans = 1, cnorm(j)
             must be greater than or equal to the 1-norm.
 
-
-
     info:   = 0:  successful exit
             < 0:  if info = -k, the k-th argument had an illegal value
-
 
 =for example
 
@@ -5568,27 +5116,20 @@ than max(underflow, 1/overflow).
  $cnorm = zeroes(100);
  latrs($a, 0, 0, 0, 0,$b, $scale, $cnorm,$info);
 
-
-
 =for bad
 
 latrs ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5581 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *latrs = \&PDL::latrs;
-#line 5588 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5597,8 +5138,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
-
-
 
 =for ref
 
@@ -5625,13 +5164,11 @@ condition number is computed as
     anorm:  If norm = 0, the infinity-norm of the original matrix A.
             If norm = 1, the 1-norm of the original matrix A.
 
-
     rcond:  The reciprocal of the condition number of the matrix A,
             computed as rcond = 1/(norm(A) * norm(inv(A))).
 
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
-
 
 =for example
 
@@ -5642,26 +5179,20 @@ condition number is computed as
  getrf($a, $ipiv, $info);
  ($rcond, $info) = gecon($a, 1, $anorm) unless $info != 0;
 
-
 =for bad
 
 gecon ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5654 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gecon = \&PDL::gecon;
-#line 5661 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5670,7 +5201,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn))
-
 
 =for ref
 
@@ -5704,7 +5234,6 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value.
 
-
 =for example
 
  # Assume $a is symmetric
@@ -5715,26 +5244,20 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
  sytrf($a, 1,$ipiv, $info);
  ($rcond, $info) = sycon($a, 1, $anorm) unless $info != 0;
 
-
 =for bad
 
 sycon ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5727 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sycon = \&PDL::sycon;
-#line 5734 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5743,8 +5266,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
-
-
 
 =for ref
 
@@ -5773,7 +5294,6 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  # Assume $a is symmetric positive definite
@@ -5783,26 +5303,20 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
  potrf($a,  0, $info);
  ($rcond, $info) = pocon($a, 1, $anorm) unless $info != 0;
 
-
 =for bad
 
 pocon ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5795 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pocon = \&PDL::pocon;
-#line 5802 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5811,7 +5325,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
-
 
 =for ref
 
@@ -5831,7 +5344,6 @@ computed as
             infinity-norm condition number is required:
             = 0:	Infinity-norm.
             = 1:	1-norm;
-
 
     uplo:   = 0:  A is upper triangular;
             = 1:  A is lower triangular.
@@ -5861,26 +5373,20 @@ computed as
  $info = null;
  ($rcond, $info) = trcon($a, 1, 1, 0) unless $info != 0;
 
-
 =for bad
 
 trcon ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5873 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trcon = \&PDL::trcon;
-#line 5880 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5889,8 +5395,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); int [io,phys]jpvt(n); [o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5940,26 +5444,20 @@ Each H(i) has the form
  $jpvt = zeroes(long, 50);
  geqp3($a, $jpvt, $tau, $info);
 
-
 =for bad
 
 geqp3 ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 5952 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqp3 = \&PDL::geqp3;
-#line 5959 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5968,8 +5466,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -5999,7 +5495,6 @@ Each H(i) has the form
             with the array TAU, represent the orthogonal matrix Q as a
             product of min(m,n) elementary reflectors.
 
-
     tau:    The scalar factors of the elementary reflectors.
 
     info:   = 0: successful exit.
@@ -6012,26 +5507,20 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  geqrf($a, $tau, $info);
 
-
 =for bad
 
 geqrf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6024 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqrf = \&PDL::geqrf;
-#line 6031 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6040,8 +5529,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6068,7 +5555,6 @@ reflectors of order M
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
-
 =for example
 
  $a = random (float, 100, 50);
@@ -6077,26 +5563,20 @@ reflectors of order M
  geqrf($a, $tau, $info);
  orgqr($a, $tau, $info) unless $info != 0;
 
-
 =for bad
 
 orgqr ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6089 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgqr = \&PDL::orgqr;
-#line 6096 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6105,8 +5585,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(p,k); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -6149,7 +5627,6 @@ if C<side> = 1.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (float, 50, 100);
@@ -6163,26 +5640,20 @@ if C<side> = 1.
  $c = transpose($c);
  ormqr($a, $tau, $c, $info);
 
-
 =for bad
 
 ormqr ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6175 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormqr = \&PDL::ormqr;
-#line 6182 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6191,8 +5662,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6234,26 +5703,20 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  gelqf($a, $tau, $info);
 
-
 =for bad
 
 gelqf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6246 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelqf = \&PDL::gelqf;
-#line 6253 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6262,8 +5725,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6289,7 +5750,6 @@ reflectors of order N
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
-
 =for example
 
  $a = random (float, 100, 50);
@@ -6298,26 +5758,20 @@ reflectors of order N
  gelqf($a, $tau, $info);
  orglq($a, $tau, $info) unless $info != 0;
 
-
 =for bad
 
 orglq ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6310 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orglq = \&PDL::orglq;
-#line 6317 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6326,8 +5780,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -6370,7 +5822,6 @@ if C<side> = 1.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (float, 50, 100);
@@ -6384,26 +5835,20 @@ if C<side> = 1.
  $c = transpose($c);
  ormlq($a, $tau, $c, $info);
 
-
 =for bad
 
 ormlq ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6396 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormlq = \&PDL::ormlq;
-#line 6403 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6412,8 +5857,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6457,26 +5900,20 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  geqlf($a, $tau, $info);
 
-
 =for bad
 
 geqlf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6469 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqlf = \&PDL::geqlf;
-#line 6476 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6485,8 +5922,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6513,7 +5948,6 @@ reflectors of order M
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
-
 =for example
 
  $a = random (float, 100, 50);
@@ -6522,26 +5956,20 @@ reflectors of order M
  geqlf($a, $tau, $info);
  orgql($a, $tau, $info) unless $info != 0;
 
-
 =for bad
 
 orgql ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6534 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgql = \&PDL::orgql;
-#line 6541 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6550,8 +5978,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(p,k); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -6594,7 +6020,6 @@ if C<side> = 1.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (float, 50, 100);
@@ -6608,26 +6033,20 @@ if C<side> = 1.
  $c = transpose($c);
  ormql($a, $tau, $c, $info);
 
-
 =for bad
 
 ormql ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6620 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormql = \&PDL::ormql;
-#line 6627 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6636,8 +6055,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6682,26 +6099,20 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  gerqf($a, $tau, $info);
 
-
 =for bad
 
 gerqf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6694 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gerqf = \&PDL::gerqf;
-#line 6701 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6710,8 +6121,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6738,7 +6147,6 @@ reflectors of order N
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
-
 =for example
 
  $a = random (float, 100, 50);
@@ -6747,26 +6155,20 @@ reflectors of order N
  gerqf($a, $tau, $info);
  orgrq($a, $tau, $info) unless $info != 0;
 
-
 =for bad
 
 orgrq ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6759 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgrq = \&PDL::orgrq;
-#line 6766 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6775,8 +6177,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -6819,7 +6219,6 @@ if C<side> = 1.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (float, 50, 100);
@@ -6833,26 +6232,20 @@ if C<side> = 1.
  $c = transpose($c);
  ormrq($a, $tau, $c, $info);
 
-
 =for bad
 
 ormrq ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6845 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormrq = \&PDL::ormrq;
-#line 6852 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6861,8 +6254,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -6917,7 +6308,6 @@ Z is given by
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (float, 50, 100);
@@ -6925,26 +6315,20 @@ Z is given by
  $tau = zeroes(float, 50);
  tzrzf($a, $tau, $info);
 
-
 =for bad
 
 tzrzf ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 6937 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tzrzf = \&PDL::tzrzf;
-#line 6944 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6953,8 +6337,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
-
-
 
 =for ref
 
@@ -6997,7 +6379,6 @@ if C<side> = 1.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (float, 50, 100);
@@ -7011,26 +6392,20 @@ if C<side> = 1.
  $c = transpose($c);
  ormrz($a, $tau, $c, $info);
 
-
 =for bad
 
 ormrz ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7023 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormrz = \&PDL::ormrz;
-#line 7030 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7039,8 +6414,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(k); int [o,phys]info())
-
-
 
 =for ref
 
@@ -7079,7 +6452,6 @@ n = 7, ilo = 2 and ihi = 6:
 	modified element of the upper Hessenberg matrix H, and vi denotes an
 	element of the vector defining H(i).
 
-
     Arguments
     =========
 
@@ -7104,7 +6476,6 @@ n = 7, ilo = 2 and ihi = 6:
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value.
 
-
 =for example
 
  $a = random (50, 50);
@@ -7112,26 +6483,20 @@ n = 7, ilo = 2 and ihi = 6:
  $tau = zeroes(50);
  gehrd($a, 1, 50, $tau, $info);
 
-
 =for bad
 
 gehrd ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7124 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gehrd = \&PDL::gehrd;
-#line 7131 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7141,8 +6506,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: ([io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[phys]tau(k); int [o,phys]info())
 
-
-
 =for ref
 
 Generates a real orthogonal matrix Q which is defined as the
@@ -7150,7 +6513,6 @@ product of ihi-ilo elementary reflectors of order N, as returned by
 C<gehrd>:
 
 	Q = H(ilo) H(ilo+1) . . . H(ihi-1).
-
 
     Arguments
     =========
@@ -7171,7 +6533,6 @@ C<gehrd>:
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (50, 50);
@@ -7180,27 +6541,20 @@ C<gehrd>:
  gehrd($a, 1, 50, $tau, $info);
  orghr($a, 1, 50, $tau, $info);
 
-
-
 =for bad
 
 orghr ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7193 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orghr = \&PDL::orghr;
-#line 7200 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7209,8 +6563,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]H(n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]wr(n); [o,phys]wi(n);[o,phys]Z(m,m); int [o,phys]info())
-
-
 
 =for ref
 
@@ -7280,7 +6632,6 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
                   elements 1:ilo-1 and i+1:n of wr and wi contain those
                   eigenvalues which have been successfully computed.
 
-
 =for example
 
  $a = random (50, 50);
@@ -7290,27 +6641,20 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
 
-
-
 =for bad
 
 hseqr ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7303 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hseqr = \&PDL::hseqr;
-#line 7310 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7319,8 +6663,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
-
-
 
 =for ref
 
@@ -7359,10 +6701,8 @@ Each eigenvector is normalized so that the element of largest
 magnitude has magnitude 1; here the magnitude of a complex number
 (x,y) is taken to be |x| + |y|.
 
-
     Arguments
     =========
-
 
     side:   = 0 :  compute both right and left eigenvectors;
 	    = 1 :  compute right eigenvectors only;
@@ -7444,7 +6784,6 @@ magnitude has magnitude 1; here the magnitude of a complex number
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  $a = random (50, 50);
@@ -7454,27 +6793,20 @@ magnitude has magnitude 1; here the magnitude of a complex number
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
 
-
-
 =for bad
 
 trevc ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7467 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trevc = \&PDL::trevc;
-#line 7474 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7483,8 +6815,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
-
-
 
 =for ref
 
@@ -7520,7 +6850,6 @@ to the eigenvalue with positive imaginary part.
 
     Arguments
     =========
-
 
     side:   = 0 : compute both right and left eigenvectors;
 	    = 1 : compute right eigenvectors only;
@@ -7597,27 +6926,20 @@ to the eigenvalue with positive imaginary part.
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
 
-
-
 =for bad
 
 tgevc ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7610 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tgevc = \&PDL::tgevc;
-#line 7617 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7626,8 +6948,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -7663,10 +6983,8 @@ The output matrix is
        (  0  inv(D)*B*D  inv(D)*Z ).
        (  0      0           T2   )
 
-
 Information about the permutations P and the diagonal matrix D is
 returned in the vector C<scale>.
-
 
     Arguments
     =========
@@ -7701,9 +7019,6 @@ returned in the vector C<scale>.
     info:   = 0:  successful exit.
             < 0:  if info = -i, the i-th argument had an illegal value.
 
-
-
-
 =for example
 
  $a = random (50, 50);
@@ -7713,27 +7028,20 @@ returned in the vector C<scale>.
  $ihi = null;
  gebal($a, $ilo, $ihi, $scale, $info);
 
-
-
 =for bad
 
 gebal ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7726 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gebal = \&PDL::gebal;
-#line 7733 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7742,8 +7050,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,m); int job(); int side();int [phys]ilo();int [phys]ihi();[phys]scale(n); int [o,phys]info())
-
-
 
 =for ref
 
@@ -7780,9 +7086,6 @@ balanced matrix output by gebal.
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value.
 
-
-
-
 =for example
 
  $a = random (50, 50);
@@ -7794,27 +7097,20 @@ balanced matrix output by gebal.
  # Compute eigenvectors ($ev)
  gebak($ev, $ilo, $ihi, $scale, $info);
 
-
-
 =for bad
 
 gebak ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7807 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gebak = \&PDL::gebak;
-#line 7814 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7823,7 +7119,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(n,m); int norm(); [o]b(); [t]work(workn))
-
 
 =for ref
 
@@ -7862,26 +7157,20 @@ real matrix A.
  $a = random (float, 100, 100);
  $norm  = $a->lange(1);
 
-
 =for bad
 
 lange ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7874 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lange = \&PDL::lange;
-#line 7881 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7890,7 +7179,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
-
 
 =for ref
 
@@ -7938,26 +7226,20 @@ real symmetric matrix A.
  $a = random (float, 100, 100);
  $norm  = $a->lansy(1, 1);
 
-
 =for bad
 
 lansy ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 7950 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lansy = \&PDL::lansy;
-#line 7957 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7966,7 +7248,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (A(m,n);int uplo();int norm();int diag();[o]b(); [t]work(workn))
-
 
 =for ref
 
@@ -8020,26 +7301,20 @@ trapezoidal or triangular matrix A.
  $a = random (float, 100, 100);
  $norm  = $a->lantr(1, 1, 0);
 
-
 =for bad
 
 lantr ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8032 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lantr = \&PDL::lantr;
-#line 8039 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8048,7 +7323,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(m,n); int transa(); int transb(); [phys]B(p,q);[phys]alpha(); [phys]beta(); [io,phys]C(r,s))
-
 
 =for ref
 
@@ -8101,26 +7375,20 @@ Performs one of the matrix-matrix operations
  $c = zeroes(5,5);
  gemm($a, 0, 1,$b, $alpha, $beta, $c);
 
-
 =for bad
 
 gemm ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8113 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gemm = \&PDL::gemm;
-#line 8120 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8130,33 +7398,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: ([phys]A(m,n); [phys]B(p,m); [o,phys]C(p,n))
 
-
-
 =for ref
 
 Blas matrix multiplication based on gemm
-
-
 
 =for bad
 
 mmult ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8149 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mmult = \&PDL::mmult;
-#line 8156 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8166,33 +7425,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: ([phys]A(n,m); [phys]B(p,m); [o,phys]C(p,n))
 
-
-
 =for ref
 
 Blas matrix cross product based on gemm
-
-
 
 =for bad
 
 crossprod ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8185 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *crossprod = \&PDL::crossprod;
-#line 8192 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8201,8 +7451,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(m,n); int uplo(); int trans(); [phys]alpha(); [phys]beta(); [io,phys]C(p,p))
-
-
 
 =for ref
 
@@ -8265,27 +7513,20 @@ or
  $beta = 0;
  syrk ($a, 1,0,$alpha, $beta , $b);
 
-
-
 =for bad
 
 syrk ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8278 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syrk = \&PDL::syrk;
-#line 8285 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8294,8 +7535,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]a(n);[phys]b(n);[o,phys]c())
-
-
 
 =for ref
 
@@ -8307,27 +7546,20 @@ Dot product of two vectors using Blas.
  $b = random(5);
  $c = dot($a, $b)
 
-
-
 =for bad
 
 dot ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8320 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dot = \&PDL::dot;
-#line 8327 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8337,13 +7569,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: ([phys]a(n);[phys] alpha();[io,phys]b(m))
 
-
-
 =for ref
 
 Linear combination of vectors ax + b using Blas.
 Returns result in b.
-
 
 =for example
 
@@ -8351,27 +7580,20 @@ Returns result in b.
  $b = random(5);
  axpy($a, 12, $b)
 
-
-
 =for bad
 
 axpy ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8364 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *axpy = \&PDL::axpy;
-#line 8371 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8380,8 +7602,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]a(n);[o]b())
-
-
 
 =for ref
 
@@ -8392,27 +7612,20 @@ Euclidean norm of a vector using Blas.
  $a = random(5);
  $norm2 = norm2($a)
 
-
-
 =for bad
 
 nrm2 ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8405 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *nrm2 = \&PDL::nrm2;
-#line 8412 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8421,8 +7634,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]a(n);[o]b())
-
-
 
 =for ref
 
@@ -8433,27 +7644,20 @@ Sum of absolute values of a vector using Blas.
  $a = random(5);
  $absum = asum($a)
 
-
-
 =for bad
 
 asum ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8446 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *asum = \&PDL::asum;
-#line 8453 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8462,8 +7666,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]a(n);scale())
-
-
 
 =for ref
 
@@ -8474,27 +7676,20 @@ Scale a vector by a constant using Blas.
  $a = random(5);
  $a->scal(0.5)
 
-
-
 =for bad
 
 scal ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8487 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *scal = \&PDL::scal;
-#line 8494 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8503,8 +7698,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]a(n);[phys]c(); [phys]s();[io,phys]b(n))
-
-
 
 =for ref
 
@@ -8516,27 +7709,20 @@ Applies plane rotation using Blas.
  $b = random(5);
  rot($a, 0.5, 0.7, $b)
 
-
-
 =for bad
 
 rot ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8529 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rot = \&PDL::rot;
-#line 8536 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8545,8 +7731,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]a();[io,phys]b();[o,phys]c(); [o,phys]s())
-
-
 
 =for ref
 
@@ -8557,27 +7741,20 @@ Generates plane rotation using Blas.
  $a = sequence(4);
  rotg($a(0), $a(1),$a(2),$a(3))
 
-
-
 =for bad
 
 rotg ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8570 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rotg = \&PDL::rotg;
-#line 8577 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8586,8 +7763,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]d(n); int id();int [o,phys]info())
-
-
 
 =for ref
 
@@ -8616,26 +7791,20 @@ size <= 20. Dimension of stack limits N to about 2**32.
  $a = random(5);
  lasrt ($a, 0, ($info = null));
 
-
 =for bad
 
 lasrt ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8628 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lasrt = \&PDL::lasrt;
-#line 8635 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8644,8 +7813,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(m,n); int uplo(); [o,phys]B(p,n))
-
-
 
 =for ref
 
@@ -8672,26 +7839,20 @@ matrix B.
  $b = zeroes($a);
  lacpy ($a, 0, $b);
 
-
 =for bad
 
 lacpy ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8684 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lacpy = \&PDL::lacpy;
-#line 8691 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8700,8 +7861,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(m,n);int [phys]k1();int [phys] k2(); int [phys]ipiv(p);int [phys]inc())
-
-
 
 =for ref
 
@@ -8736,26 +7895,20 @@ Doesn't use PDL indices (start = 1).
  $b = pdl([5,4,3,2,1]);
  $a->laswp(1,2,$b,1);
 
-
 =for bad
 
 laswp ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8748 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *laswp = \&PDL::laswp;
-#line 8755 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8764,8 +7917,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (cmach(); [o]precision())
-
-
 
 =for ref
 
@@ -8805,26 +7956,20 @@ Works inplace.
  $a = lamch (0);
  print "EPS is $a for double\n";
 
-
 =for bad
 
 lamch ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8817 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lamch = \&PDL::lamch;
-#line 8824 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8833,8 +7978,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]small(); [io,phys]large())
-
-
 
 =for ref
 
@@ -8864,27 +8007,20 @@ the exponent range, as is found on a Cray.
  $overflow = lamch(9);
  labad ($underflow, $overflow);
 
-
-
 =for bad
 
 labad ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8877 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *labad = \&PDL::labad;
-#line 8884 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8898,27 +8034,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
 
-
-
 =for bad
 
 tricpy does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8911 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tricpy = \&PDL::tricpy;
-#line 8918 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8934,19 +8063,15 @@ Output complex eigen-values/vectors from eigen-values/vectors
 as computed by geev or geevx.
 'fortran' means fortran storage type.
 
-
 =for bad
 
 cplx_eigen does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8946 "Real.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::cplx_eigen {
   my ($eigre, $eigim, $eigvec, $fortran, @outs) = @_;
@@ -8959,18 +8084,13 @@ sub PDL::cplx_eigen {
   }
   ($outval, $outvec);
 }
-#line 8963 "Real.pm"
 
 
-
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cplx_eigen = \&PDL::cplx_eigen;
-#line 8970 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8985,27 +8105,20 @@ sub PDL::cplx_eigen {
 Combine two ndarrays into a single ndarray.
 This routine does backward and forward dataflow automatically.
 
-
-
 =for bad
 
 augment does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 8998 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *augment = \&PDL::augment;
-#line 9005 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -9020,27 +8133,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Combine two ndarrays into a single ndarray.
 This routine does backward and forward dataflow automatically.
 
-
-
 =for bad
 
 mstack does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 9033 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mstack = \&PDL::mstack;
-#line 9040 "Real.pm"
 
 
 
-#line 948 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -9054,30 +8160,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Compute adjoint matrix and characteristic polynomial.
 
-
-
 =for bad
 
 charpol does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 9067 "Real.pm"
 
 
 
-#line 950 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *charpol = \&PDL::charpol;
-#line 9074 "Real.pm"
+
+
 
 
 
 
 
 #line 10762 "real.pd"
-
 
 =head1 AUTHOR
 
@@ -9088,7 +8189,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 9092 "Real.pm"
+#line 8193 "Real.pm"
 
 
 

@@ -1,5 +1,29 @@
 Revision history for Astro-FITS-CFITSIO-FileName
 
+0.07      2023-04-13 12:11:26-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * constructor can now take a "filename" option, which will be parsed
+      and which provide the initial set of attributes.
+
+    * New Type::Tiny compatible type library, Astro::FITS::CFITSIO::FileName::Types
+
+0.06      2023-04-05 13:45:22-04:00 America/New_York
+
+  [API CHANGE]
+
+    * ->to_hash() is deprecated; use ->TO_HASH()
+
+  [ENHANCEMENT]
+
+    * add 'clone_with' method
+
+  [INTERNALS]
+
+    * uses MooX::Tag::TO_HASH for TO_HASH method
+
+
 0.05      2021-06-30 00:52:09-04:00 America/New_York
 
   [BUG FIX]

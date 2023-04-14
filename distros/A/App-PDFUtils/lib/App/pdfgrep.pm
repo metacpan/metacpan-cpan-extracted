@@ -3,9 +3,9 @@
 package App::pdfgrep;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-02-10'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -131,7 +131,7 @@ App::pdfgrep - Print lines matching text in PDF files
 
 =head1 VERSION
 
-This document describes version 0.014 of App::pdfgrep (from Perl distribution App-PDFUtils), released on 2022-10-07.
+This document describes version 0.015 of App::pdfgrep (from Perl distribution App-PDFUtils), released on 2023-02-10.
 
 =head1 FUNCTIONS
 
@@ -160,6 +160,8 @@ Require all patterns to match, instead of just one.
 
 =item * B<color> => I<str> (default: "auto")
 
+Specify when to show color (never, always, or autoE<sol>when interactive).
+
 =item * B<count> => I<true>
 
 Supress normal output, return a count of matching lines.
@@ -180,17 +182,27 @@ directory.
 
 =item * B<ignore_case> => I<bool>
 
+If set to true, will search case-insensitively.
+
 =item * B<invert_match> => I<bool>
 
 Invert the sense of matching.
 
 =item * B<line_number> => I<true>
 
+Show line number along with matches.
+
 =item * B<pattern> => I<str>
+
+Specify *string* to search for.
 
 =item * B<quiet> => I<true>
 
+Do not print matches, only return appropriate exit code.
+
 =item * B<regexps> => I<array[str]>
+
+Specify additional *regexp pattern* to search for.
 
 
 =back
@@ -238,7 +250,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

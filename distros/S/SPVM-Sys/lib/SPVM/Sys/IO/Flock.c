@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <assert.h>
@@ -15,7 +18,7 @@ int32_t SPVM__Sys__IO__Flock__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct flock* st_flock = env->new_memory_stack(env, stack, sizeof(struct flock));
 
-  void* obj_st_flock = env->new_pointer_by_name(env, stack, "Sys::IO::Flock", st_flock, &e, __func__, FILE_NAME, __LINE__);
+  void* obj_st_flock = env->new_pointer_object_by_name(env, stack, "Sys::IO::Flock", st_flock, &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_st_flock;

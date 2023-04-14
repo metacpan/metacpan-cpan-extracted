@@ -16,7 +16,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.68';
+our $VERSION = '0.70';
 our @CARP_NOT;
 
 =head1 NAME
@@ -243,9 +243,9 @@ sub connect( $self, %args ) {
         : $self->transport->connect();
 
     $done = $done->then(sub {
-        $self->{l} = $self->transport->add_listener('Target.receivedMessageFromTarget', sub {
+        $s->{l} = $s->transport->add_listener('Target.receivedMessageFromTarget', sub {
             if( $s ) {
-                $s->log( 'trace', '(target) receivedMessage', $_[0] );
+                #$s->log( 'trace', '(target) receivedMessage', $_[0] );
                 my $id = $s->targetId;
                 my $sid = $s->sessionId;
                 if( exists $_[0]->{params}->{sessionId}
@@ -271,7 +271,7 @@ sub connect( $self, %args ) {
             # Set up a new browser context
             $done = $done->then( sub { $s->transport->send_message('Target.createBrowserContext')})
             ->then( sub( $info ) {
-                $self->browserContextId( $info->{browserContextId} );
+                $s->browserContextId( $info->{browserContextId} );
                 Future->done();
             });
 
@@ -285,7 +285,7 @@ sub connect( $self, %args ) {
         }
 
         $done = $done->then(sub {
-            my $id = $self->browserContextId;
+            my $id = $s->browserContextId;
 
             $s->createTarget(
                 url => $args{ start_url } || 'about:blank',
@@ -347,8 +347,8 @@ sub connect( $self, %args ) {
         $done = $done->then(sub {
             $s->getTargetInfo( $args{tab})
         })->then(sub( $tab ) {
-            $self->tab($tab);
-            $self->attach( $tab->{targetId});
+            $s->tab($tab);
+            $s->attach( $tab->{targetId});
         });
 
     } else {
@@ -378,8 +378,9 @@ sub close( $self ) {
 }
 
 sub DESTROY( $self ) {
-    $self->close
-        if $self->autoclose;
+    if( $self->autoclose ) {
+        $self->close->catch(sub {})->retain;
+    }
 };
 
 =head2 C<< ->sleep >>
@@ -574,6 +575,7 @@ sub _send_packet( $self, $response, $method, %params ) {
     };
     if( my $err = $@ ) {
         $self->log('error', $@ );
+        $self->log('error', Dumper \%params );
     };
 
     $self->log( 'trace', "Sent message", $payload );
@@ -790,12 +792,15 @@ sub attach( $self, $targetId=$self->targetId ) {
     weaken $s;
     $self->targetId( $targetId );
 
-    $self->{have_target_info} = $self->transport->one_shot('Target.attachedToTarget', sub($r) {
-        $s->log('debug', "Attached to", $r );
-        #$s->sessionId( $target->{sessionId});
-        #$s->log('debug', "Attached to session $target->{sessionId}" );
-        #undef $s->{have_session};
-    });
+    $self->{have_target_info} = $self->transport->one_shot('Target.attachedToTarget')->then(sub($r) {
+    #    #$s->log('trace', "Attached to", $r );
+        #use Data::Dumper; warn Dumper $r;
+        #$s->browserContextId($r->{params}->{targetInfo}->{browserContextId});
+    #    #$s->sessionId( $target->{sessionId});
+    #    #$s->log('debug', "Attached to session $target->{sessionId}" );
+    #    #undef $s->{have_session};
+        return Future->done;
+    })->retain;
 
     $self->transport->attachToTarget( targetId => $targetId )
     ->on_done(sub( $sessionId ) {
@@ -833,7 +838,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2021 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

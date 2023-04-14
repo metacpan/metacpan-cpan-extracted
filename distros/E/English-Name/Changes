@@ -1,5 +1,8 @@
 Revision history for English-Name
 
+0.003     2023-03-31 20:18:32+02:00 Europe/Amsterdam
+          - Use gv_fetchpvn_flags for perl 5.10-5.12 compatibility
+
 0.002     2022-08-29 17:10:54+02:00 Europe/Amsterdam
           - Include ppport.h for backwards compatibility
           - Don't touch ${^MATCH} and friends

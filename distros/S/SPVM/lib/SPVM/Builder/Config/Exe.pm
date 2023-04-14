@@ -5,29 +5,19 @@ use warnings;
 use Carp 'confess';
 
 use SPVM::Builder::Util;
+use SPVM::Builder::Util::API;
 
 use base 'SPVM::Builder::Config';
 
-sub new {
-  my ($self, %options) = @_;
-  
-  unless (defined $options{output_type}) {
-    $options{output_type} = 'exe';
-  }
-  
-  $self = $self->SUPER::new(%options);
-
-  return $self;
-}
-
-sub global_before_compile {
+# Fields
+sub before_each_compile_cbs {
   my $self = shift;
   if (@_) {
-    $self->{global_before_compile} = $_[0];
+    $self->{before_each_compile_cbs} = $_[0];
     return $self;
   }
   else {
-    return $self->{global_before_compile};
+    return $self->{before_each_compile_cbs};
   }
 }
 
@@ -53,6 +43,60 @@ sub no_compiler_api {
   }
 }
 
+sub config_spvm_core {
+  my $self = shift;
+  if (@_) {
+    $self->{config_spvm_core} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{config_spvm_core};
+  }
+}
+
+sub config_bootstrap {
+  my $self = shift;
+  if (@_) {
+    $self->{config_bootstrap} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{config_bootstrap};
+  }
+}
+
+# Class Methods
+sub new {
+  my ($self, %options) = @_;
+  
+  unless (defined $options{output_type}) {
+    $options{output_type} = 'exe';
+  }
+  
+  $self = $self->SUPER::new(%options);
+  
+  unless (defined $self->{before_each_compile_cbs}) {
+    $self->before_each_compile_cbs([]);
+  }
+  
+  unless (defined $self->{config_spvm_core}) {
+    $self->{config_spvm_core} = SPVM::Builder::Util::API::create_default_config();
+  }
+  
+  unless (defined $self->{config_bootstrap}) {
+    $self->{config_bootstrap} = SPVM::Builder::Util::API::create_default_config();
+  }
+  
+  return $self;
+}
+
+# Instance Methods
+sub add_before_each_compile_cb {
+  my ($self, @before_each_compile_cbs) = @_;
+  
+  push @{$self->{before_each_compile_cbs}}, @before_each_compile_cbs;
+}
+
 1;
 
 =head1 Name
@@ -63,7 +107,7 @@ SPVM::Builder::Config::Exe - Configurations of creating excutable files.
 
   use SPVM::Builder::Config::Exe;
   
-  my $config = SPVM::Builder::Config::Exe->new_gnu99;
+  my $config_exe = SPVM::Builder::Config::Exe->new_c99;
 
 =head1 Description
 
@@ -89,6 +133,24 @@ If C<no_precompile> is a true value, precompiling is not performed.
 
 If C<no_compiler_api> is a true value, the source codes of the L<compiler native APIs|SPVM::Document::NativeAPI::Compiler> and the L<precompile native APIs|SPVM::Document::NativeAPI::Precompile> is not linked.
 
+=head2 config_spvm_core
+
+  my $config_spvm_core = $config->config_spvm_core;
+  $config->config_spvm_core($config_spvm_core);
+
+Gets and sets the config(a L<SPVM::Builder::Config> object) for SPVM core source files.
+
+The default is a config that is created by the L<create_default_config|SPVM::Builder::Util::API/"create_default_config"> function in the L<SPVM::Builder::Util::API> class.
+
+=head2 config_bootstrap
+
+  my $config_bootstrap = $config->config_bootstrap;
+  $config->config_bootstrap($config_bootstrap);
+
+Gets and sets the config(a L<SPVM::Builder::Config> object) for the bootstrap source file that contains C<main> function in the C language.
+
+The default is a config that is created by the L<create_default_config|SPVM::Builder::Util::API/"create_default_config"> function in the L<SPVM::Builder::Util::API> class.
+
 =head1 Methods
 
 Methods of B<SPVM::Builder::Config::Exe>.
@@ -102,3 +164,15 @@ Methods are inherited from L<SPVM::Builder::Config> and you can use the followin
 Create a new C<SPVM::Builder::Config::Exe> object.
 
 This is same as L<SPVM::Builder::Config/"new">, but set C<output_type> field to C<exe>.
+
+=head2 add_before_each_compile_cb
+
+  $config->add_before_compile_cb(@before_each_compile_cbs);
+
+Adds elements after the last element of L</"before_each_compile_cbs"> field.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

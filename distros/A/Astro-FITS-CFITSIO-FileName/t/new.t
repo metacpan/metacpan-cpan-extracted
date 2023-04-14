@@ -1,5 +1,6 @@
 #! perl
 
+use v5.26;
 use Test2::V0;
 use Astro::FITS::CFITSIO::FileName;
 
@@ -16,17 +17,9 @@ subtest api => sub {
 
     my $err;
     my %args;
-    like(
-        dies { FileName( \%args ) },
-        qr/missing required arguments/i,
-        'no arguments'
-    ) or note $err;
+    like( dies { FileName( \%args ) }, qr/missing required arguments/i, 'no arguments' ) or note $err;
 
-    like(
-        dies { FileName( undef ) },
-        qr/can't parse filename/i,
-        'undef filename',
-    ) or note $err;
+    like( dies { FileName( undef ) }, qr/can't parse filename/i, 'undef filename', ) or note $err;
 
 };
 
@@ -144,8 +137,7 @@ subtest 'new from string' => sub {
                 item 'rowfilter2';
                 end;
             };
-            call filename =>
-              'file://foo.tar.gz[events][rowfilter1][rowfilter2]';
+            call filename => 'file://foo.tar.gz[events][rowfilter1][rowfilter2]';
         },
 
         'file://foo.tar.gz[2]' => object {
@@ -177,14 +169,12 @@ subtest 'new from string' => sub {
             call filename => 'file://foo.tar.gz[2;image()][pixr1 expr(ffo)]';
         },
 
-        q|foo.fits.gz[EVENTS][col *; GTI=gtifilter('[GTI]')][#row < 10000]| =>
-          object {
+        q|foo.fits.gz[EVENTS][col *; GTI=gtifilter('[GTI]')][#row < 10000]| => object {
             call has_file_type => F;
             call base_filename => 'foo.fits.gz';
             call extname       => 'EVENTS';
-            call filename =>
-              q|foo.fits.gz[EVENTS][col *;GTI=gtifilter('[GTI]')][#row < 10000]|;
-            call row_filter => array {
+            call filename      => q|foo.fits.gz[EVENTS][col *;GTI=gtifilter('[GTI]')][#row < 10000]|;
+            call row_filter    => array {
                 item '#row < 10000';
                 end;
             };
@@ -193,7 +183,7 @@ subtest 'new from string' => sub {
                 item q|GTI=gtifilter('[GTI]')|;
                 end;
             };
-          },
+        },
     );
 
     for my $filename ( keys %Test ) {
@@ -206,7 +196,7 @@ subtest 'new from string' => sub {
                 lives {
                     $object = FileName( $filename )
                 },
-                'creation'
+                'creation',
             ) or diag $@;
 
             is( $object, $check, 'contents' )
@@ -214,7 +204,7 @@ subtest 'new from string' => sub {
         };
     }
 
-    todo "properly parse row filters. this isn't a row filter" => sub {
+    todo q{properly parse row filters. this isn't a row filter} => sub {
         my $object;
         like( dies { $object = FileName( 'foo.tar.gz[1:512]' ) }, qr/foo/ )
           or note _dumper( $object->to_hash );
@@ -222,23 +212,23 @@ subtest 'new from string' => sub {
 
 };
 
-subtest 'round trip' => sub {
-
-    my $filename = 'file://foo.tar.gz[2; image() ][pixr1 expr(ffo)]';
-    my $check    = object {
-        call file_type       => 'file://';
-        call base_filename   => 'foo.tar.gz';
-        call hdunum          => '2';
-        call image_cell_spec => 'image()';
-        call pix_filter      => hash {
-            field datatype     => 'r';
-            field discard_hdus => T();
-            field expr         => 'expr(ffo)';
-            end;
-        };
-        call filename => 'file://foo.tar.gz[2;image()][pixr1 expr(ffo)]';
+my $filename = 'file://foo.tar.gz[2; image() ][pixr1 expr(ffo)]';
+my $check    = object {
+    call file_type       => 'file://';
+    call base_filename   => 'foo.tar.gz';
+    call hdunum          => '2';
+    call image_cell_spec => 'image()';
+    call pix_filter      => hash {
+        field datatype     => 'r';
+        field discard_hdus => T();
+        field expr         => 'expr(ffo)';
+        end;
     };
+    call filename => 'file://foo.tar.gz[2;image()][pixr1 expr(ffo)]';
+};
 
+
+subtest 'round trip' => sub {
 
     my $obj1 = FileName( $filename );
     is( $obj1, $check, 'first object' );
@@ -246,15 +236,51 @@ subtest 'round trip' => sub {
     my $attr = $obj1->to_hash;
     my $obj2 = FileName( $attr );
     is( $obj2, $check, 'second object' );
+
 };
+
+subtest 'parse from filename constructor arg' => sub {
+
+    subtest 'no attrs' => sub {
+        my $obj = FileName( filename => $filename );
+        is( $obj, $check, 'object' );
+    };
+
+    subtest 'attrs' => sub {
+        my $mod_filename = $filename =~ s/\Q[2; image() ]\E//r;
+        my $obj = FileName( filename => $mod_filename, hdunum => 2, image_cell_spec => 'image()' );
+        is( $obj, $check, 'attrs' );
+    };
+
+};
+
+subtest 'clone_with' => sub {
+
+    is(
+        FileName( $filename )->clone_with( hdunum => 9 ),
+        object {
+            call file_type       => 'file://';
+            call base_filename   => 'foo.tar.gz';
+            call hdunum          => '9';
+            call image_cell_spec => 'image()';
+            call pix_filter      => hash {
+                field datatype     => 'r';
+                field discard_hdus => T();
+                field expr         => 'expr(ffo)';
+                end;
+            };
+            call filename => 'file://foo.tar.gz[9;image()][pixr1 expr(ffo)]';
+        },
+        'cloned object',
+    );
+};
+
 
 subtest 'overload' => sub {
-
     my $obj = FileName( 'file://foo.tar.gz[2; image() ][pixr1 expr(ffo)]' );
-
     is( "$obj", $obj->filename );
-
 };
+
 
 done_testing;
 

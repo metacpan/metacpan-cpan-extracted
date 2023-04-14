@@ -7,88 +7,102 @@ use Carp qw(croak);
 use Exporter qw(import);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 our @EXPORT_OK = qw(path);
 
 sub path {
     my ($document) = @ARG;
 
-    return __PACKAGE__->new(document => $document);
+    return __PACKAGE__->new( document => $document );
+}
+
+sub default_value {
+    return __PACKAGE__ . '::default_value';
+}
+
+sub is_default_value {
+    my ( $self, $value ) = @ARG;
+
+    return 0 if !defined $value;
+    return 0 if ref $value;
+    return 0 if $value ne $self->default_value();
+
+    return 1;
 }
 
 sub document {
     my ($self) = @ARG;
 
-    return $self->{'document'};
+    return $self->{document};
 }
 
 sub new {
-    my ($class, %param) = @ARG;
+    my ( $class, %param ) = @ARG;
 
     # Mandatory params
-    if (!exists $param{'document'}) {
+    if ( !exists $param{document} ) {
         croak 'Mandatory argument "document" is missing';
     }
 
     return bless(
         {
-            document => $param{'document'},
+            document => $param{document},
         },
         $class,
     );
 }
 
 sub get {
-    my ($self, $path_parts, $default_value) = @ARG;
+    my ( $self, $path_parts, $default_value ) = @ARG;
 
-    if (@{ $path_parts } == 0) {
-        return $self->document;
+    if ( @{$path_parts} == 0 ) {
+        return $self->document();
     }
 
-    my ($contains, $context) = $self->_accessor($path_parts);
+    my ( $contains, $context ) = $self->_accessor($path_parts);
 
     return $default_value if !$contains;
 
     my $last_part = $path_parts->[-1] // q{};
     my $type      = ref $context      // q{};
 
-    if ($type eq 'HASH' && length $last_part) {
+    if ( $type eq 'HASH' && length $last_part ) {
         return $context->{$last_part};
     }
-    elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
+    elsif ( $type eq 'ARRAY' && $last_part =~ m{^\d+$}x ) {
         return $context->[$last_part];
     }
 
     return $default_value;
-}
+} ## end sub get
 
 sub get_new {
-    my ($self, $path_parts, $default_value) = @ARG;
+    my ( $self, $path_parts, $default_value ) = @ARG;
 
-    if (@{ $path_parts } == 0) {
-        return __PACKAGE__->new(document => $self->document);
+    if ( @{$path_parts} == 0 ) {
+        return path( $self->document() );
     }
 
-    my ($contains, $context) = $self->_accessor($path_parts);
+    my ( $contains, $context ) = $self->_accessor($path_parts);
 
     return $default_value if !$contains;
 
     my $last_part = $path_parts->[-1] // q{};
     my $type      = ref $context      // q{};
 
-    if ($type eq 'HASH' && length $last_part) {
-        return __PACKAGE__->new(document => $context->{$last_part});
+    if ( $type eq 'HASH' && length $last_part ) {
+        return path( $context->{$last_part} );
     }
-    elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
-        return __PACKAGE__->new(document => $context->[$last_part]);
+    elsif ( $type eq 'ARRAY' && $last_part =~ m{^\d+$}x ) {
+        return path( $context->[$last_part] );
     }
 
     return $default_value;
-}
+} ## end sub get_new
 
 sub contains {
-    my ($self, @xargs) = @ARG;
+    my ( $self, @xargs ) = @ARG;
 
     my ($contains) = $self->_accessor(@xargs);
 
@@ -96,74 +110,74 @@ sub contains {
 }
 
 sub set {
-    my ($self, $path_parts, $value) = @ARG;
+    my ( $self, $path_parts, $value ) = @ARG;
 
-    if (@{ $path_parts } == 0) {
+    if ( @{$path_parts} == 0 ) {
         $self->_set_document($value);
         return 1;
     }
 
-    my ($contains, $context) = $self->_accessor($path_parts);
+    my ( $contains, $context ) = $self->_accessor($path_parts);
 
     return 0 if !$contains;
 
     my $last_part = $path_parts->[-1] // q{};
     my $type      = ref $context      // q{};
 
-    if ($type eq 'HASH' && length $last_part) {
+    if ( $type eq 'HASH' && length $last_part ) {
         $context->{$last_part} = $value;
         return 1;
     }
-    elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
+    elsif ( $type eq 'ARRAY' && $last_part =~ m{^\d+$}x ) {
         $context->[$last_part] = $value;
         return 1;
     }
 
     return 0;
-}
+} ## end sub set
 
 sub perform {
-    my ($self, $method, $path_parts, @xargs) = @ARG;
+    my ( $self, $method, $path_parts, @xargs ) = @ARG;
 
-    return $self->$method($path_parts, @xargs);
+    return $self->$method( $path_parts, @xargs );
 }
 
 sub _set_document {
-    my ($self, $document) = @ARG;
+    my ( $self, $document ) = @ARG;
 
-    $self->{'document'} = $document;
+    $self->{document} = $document;
 
-    return $self;
+    return;
 }
 
 sub _accessor {
-    my ($self, $path_parts) = @ARG;
+    my ( $self, $path_parts ) = @ARG;
 
-    my $context    = $self->document;
-    my $last_index = $#{ $path_parts };
+    my $context    = $self->document();
+    my $last_index = $#{$path_parts};
 
-    foreach my $part_index (0 .. $last_index) {
+    foreach my $part_index ( 0 .. $last_index ) {
         my $part = $path_parts->[$part_index];
         my $type = ref $context // q{};
         my $last = $part_index == $last_index;
 
-        if ($type eq 'HASH' && exists $context->{$part}) {
-            return 1, $context if $last;
+        if ( $type eq 'HASH' && exists $context->{$part} ) {
+            return ( 1, $context ) if $last;
 
             $context = $context->{$part};
         }
-        elsif ($type eq 'ARRAY' && $part =~ m{^\d+$}x && @{ $context } > $part) {
-            return 1, $context if $last;
+        elsif ( $type eq 'ARRAY' && $part =~ m{^\d+$}x && @{$context} > $part ) {
+            return ( 1, $context ) if $last;
 
             $context = $context->[$part];
         }
         else {
-            return 0, undef;
+            return ( 0, undef );
         }
     }
 
-    return 1, $context;
-}
+    return ( 1, $context );
+} ## end sub _accessor
 
 1;
 
@@ -175,19 +189,19 @@ JIP::DataPath - provides a way to access data elements in a deep, complex and ne
 
 =head1 VERSION
 
-This document describes L<JIP::DataPath> version C<0.042>.
+This document describes L<JIP::DataPath> version C<0.043>.
 
 =head1 SYNOPSIS
 
     use JIP::DataPath qw(path);
 
-    path({foo => 42})->get(['foo']); # 42
+    path( { foo => 42 } )->get( ['foo'] ); # 42
 
-    path({foo => 42})->contains(['foo']); # True
+    path( { foo => 42 } )->contains( ['foo'] ); # True
 
-    my $document = {foo => 42};
-    if (path($document)->set(['foo'], 100500)) {
-        path($document)->perform('get', ['foo']); # 100500
+    my $document = { foo => 42 };
+    if ( path($document)->set( ['foo'], 100500 ) ) {
+        path($document)->perform( 'get', ['foo'] ); # 100500
     }
 
 =head1 ATTRIBUTES
@@ -196,7 +210,7 @@ L<JIP::DataPath> implements the following attributes.
 
 =head2 document
 
-    my $document = $data_path->document;
+    my $document = $data_path->document();
 
 Data structure to be processed.
 
@@ -204,32 +218,35 @@ Data structure to be processed.
 
 =head2 new
 
-    my $data_path = JIP::DataPath->new(document => {foo => 'bar'});
+    my $data_path = JIP::DataPath->new( document => { foo => 'bar' } );
 
 Build new L<JIP::DataPath> object.
 
 =head2 get
 
     # undef
-    JIP::DataPath->new(document => undef)->get([]);
+    JIP::DataPath->new( document => undef )->get( [] );
 
     # 42
-    JIP::DataPath->new(document => 42)->get([]);
+    JIP::DataPath->new( document => 42 )->get( [] );
 
-    # {foo => 'bar'}
-    JIP::DataPath->new(document => {foo => 'bar'})->get([]);
-
-    # 'bar'
-    JIP::DataPath->new(document => {foo => 'bar'})->get(['foo']);
+    # { foo => 'bar' }
+    JIP::DataPath->new( document => { foo => 'bar' } )->get( [] );
 
     # 'bar'
-    JIP::DataPath->new(document => ['foo', 'bar'])->get([1]);
+    JIP::DataPath->new( document => { foo => 'bar' } )->get( ['foo'] );
+
+    # 'bar'
+    JIP::DataPath->new( document => [ 'foo', 'bar' ] )->get( [1] );
 
     # undef
-    JIP::DataPath->new(document => ['foo', 'bar'])->get([2]);
+    JIP::DataPath->new( document => [ 'foo', 'bar' ] )->get( [2] );
 
     # 'default value'
-    JIP::DataPath->new(document => ['foo', 'bar'])->get([2], 'default value');
+    JIP::DataPath->new( document => [ 'foo', 'bar' ] )->get( [2], 'default value' );
+
+    # JIP::DataPath->default_value()
+    JIP::DataPath->new( document => [ 'foo', 'bar' ] )->get( [2], JIP::DataPath->default_value() );
 
 Extract value from L</"document"> identified by the given path.
 
@@ -246,56 +263,76 @@ Extract value from L</"document"> identified by the given path.
     );
 
     # undef
-    $data_path->get_new(['not exists']);
+    $data_path->get_new( ['not exists'] );
 
-    # {wtf => 42}
-    $data_path->get_new(['foo bar'])->document;
+    # { wtf => 42 }
+    $data_path->get_new( [ 'foo', 'bar' ] )->document();
 
     # 'default value'
-    $data_path->get_new(['not exists'], 'default value');
+    $data_path->get_new( ['not exists'], 'default value' );
+
+    # $data_path->default_value()
+    $data_path->get_new( ['not exists'], $data_path->default_value() );
 
 Extract value from L</"document">, identified by the given path, and create an instance of the L<JIP::DataPath> with this value.
+
+=head2 default_value
+
+    my $data_path = JIP::DataPath->new( document => undef );
+
+    # 'JIP::DataPath::default_value'
+    $data_path->default_value();
+
+Constant with default value.
+
+=head2 is_default_value
+
+    # True
+    JIP::DataPath->is_default_value( JIP::DataPath->default_value() );
+
+    # False
+    JIP::DataPath->is_default_value(42);
 
 =head2 set
 
     # True
-    JIP::DataPath->new(document => undef)->set([], {foo => undef});
-    JIP::DataPath->new(document => {foo => undef})->set(['foo'], {bar => undef});
-    JIP::DataPath->new(document => {foo => {bar => undef}})->set(['foo', 'bar'], []);
-    JIP::DataPath->new(document => {foo => {bar => []}})->set(['foo', 'bar'], [undef]);
-    JIP::DataPath->new(document => {foo => {bar => [undef]}})->set(['foo', 'bar', 0], 42);
+    JIP::DataPath->new( document => undef )->set( [], { foo => undef } );
+    JIP::DataPath->new( document => { foo => undef } )->set( ['foo'], { bar => undef } );
+    JIP::DataPath->new( document => { foo => { bar => undef } } )->set( [ 'foo', 'bar' ], [] );
+    JIP::DataPath->new( document => { foo => { bar => [] } } )->set( [ 'foo', 'bar' ], [undef] );
+    JIP::DataPath->new( document => { foo => { bar => [undef] } } )->set( [ 'foo', 'bar', 0 ], 42 );
 
 Sets the value at the specified path.
 
 =head2 contains
 
     # True
-    JIP::DataPath->new(document => undef)->contains([]);
-    JIP::DataPath->new(document => 42)->contains([]);
-    JIP::DataPath->new(document => {foo => 'bar'})->contains([]);
-    JIP::DataPath->new(document => {foo => 'bar'})->contains(['foo']);
-    JIP::DataPath->new(document => ['foo', 'bar'])->contains([1]);
+    JIP::DataPath->new( document => undef )->contains( [] );
+    JIP::DataPath->new( document => 42 )->contains( [] );
+    JIP::DataPath->new( document => { foo => 'bar' } )->contains( [] );
+    JIP::DataPath->new( document => { foo => 'bar' } )->contains( ['foo'] );
+    JIP::DataPath->new( document => [ 'foo', 'bar' ] )->contains( [1] );
 
     # False
-    JIP::DataPath->new(document => {foo => 'bar'})->contains(['wtf']);
-    JIP::DataPath->new(document => ['foo', 'bar'])->contains([42]);
+    JIP::DataPath->new( document => { foo => 'bar' } )->contains( ['wtf'] );
+    JIP::DataPath->new( document => [ 'foo', 'bar' ] )->contains( [42] );
 
 Check if L</"document"> contains a value that can be identified with the given path.
 
 =head2 perform
 
     # 42
-    JIP::DataPath->new(document => 42)->perform('get', []);
+    JIP::DataPath->new( document => 42 )->perform( 'get', [] );
 
     # undef
-    JIP::DataPath->new(document => 42)->perform('get', ['foo']);
+    JIP::DataPath->new( document => 42 )->perform( 'get', ['foo'] );
 
     # 42
-    JIP::DataPath->new(document => 42)->perform('get', ['foo'], 42);
+    JIP::DataPath->new( document => 42 )->perform( 'get', ['foo'], 42 );
 
     # True
-    JIP::DataPath->new(document => 42)->perform('set', [], 100500);
-    JIP::DataPath->new(document => 42)->perform('contains', []);
+    JIP::DataPath->new( document => 42 )->perform( 'set', [], 100500 );
+    JIP::DataPath->new( document => 42 )->perform( 'contains', [] );
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -305,21 +342,21 @@ These functions are exported only by request.
 
     use JIP::DataPath;
 
-    JIP::DataPath::path({foo => 42})->get(['foo']);
-    JIP::DataPath::path({foo => 42})->set(['foo'], 100500);
-    JIP::DataPath::path({foo => 42})->contains(['foo']);
-    JIP::DataPath::path({foo => 42})->perform('contains', ['foo']);
+    JIP::DataPath::path( { foo => 42 } )->get( ['foo'] );
+    JIP::DataPath::path( { foo => 42 } )->set( ['foo'], 100500 );
+    JIP::DataPath::path( { foo => 42 } )->contains( ['foo'] );
+    JIP::DataPath::path( { foo => 42 } )->perform( 'contains', ['foo'] );
 
 or exported on demand via
 
     use JIP::DataPath qw(path);
 
-    path({foo => 42})->get(['foo']);
-    path({foo => 42})->set(['foo'], 100500);
-    path({foo => 42})->contains(['foo']);
-    path({foo => 42})->perform('contains', ['foo']);
+    path( { foo => 42 } )->get( ['foo'] );
+    path( { foo => 42 } )->set( ['foo'], 100500 );
+    path( { foo => 42 } )->contains( ['foo'] );
+    path( { foo => 42 } )->perform( 'contains', ['foo'] );
 
-Alias of C<< JIP::DataPath->new(document => {}) >>. It creates a L<JIP::DataPath> object.
+Alias of C<< JIP::DataPath->new( document => {} ) >>. It creates a L<JIP::DataPath> object.
 
 =head1 DIAGNOSTICS
 
@@ -339,11 +376,11 @@ L<Data::Focus>, L<Data::PathSimple>, L<Data::SimplePath>, L<JSON::Pointer>
 
 =head1 AUTHOR
 
-Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
+Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Vladimir Zhavoronkov.
+Copyright 2018 Volodymyr Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

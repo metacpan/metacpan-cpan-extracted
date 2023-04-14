@@ -1,5 +1,15 @@
 Revision history for Future-XS
 
+0.10    2023-03-28
+        [BUGFIXES]
+         * Remember to destroy the `catches` HV after immediate `->thencatch`
+           (RT145699)
+         * Many other small refcount-related bugfixes
+         * Provide MAGIC with an `svt_dup` function on threaded perls, so as
+           not to break objects on destruction of sidecar threads
+         * Don't SEGV when DESTROY is run during global destruction and some
+           SVs have already been reclaimed
+
 0.09    2023-03-17
         [CHANGES]
          * Improved rethrow of failures to set a more accurate thrower

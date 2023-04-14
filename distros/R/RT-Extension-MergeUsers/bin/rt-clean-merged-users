@@ -1,4 +1,4 @@
-#!/Users/sunnavy/perl5/perlbrew/perls/perl-5.24.4/bin/perl
+#!/Users/sunnavy/perl5/perlbrew/perls/perl-5.36.0/bin/perl
 ### before: #!@PERL@
 
 use strict;

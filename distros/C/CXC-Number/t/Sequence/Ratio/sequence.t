@@ -3,7 +3,8 @@
 use Test2::V0;
 
 use List::Util 1.54 qw{ reductions };
-use aliased 'CXC::Number::Sequence::Ratio' => 'Sequence';
+use CXC::Number::Sequence::Ratio;
+use constant Sequence => 'CXC::Number::Sequence::Ratio';
 use Hash::Wrap { -as => 'ro_hash', -immutable => 1 };
 use POSIX ();
 
@@ -33,9 +34,7 @@ sub test_sequence {
 
   SKIP: {
         my $sequence;
-        $bool
-          = ok( lives { $sequence = Sequence->new( %pars ) },
-            'create sequence' )
+        $bool = ok( lives { $sequence = Sequence->new( %pars ) }, 'create sequence' )
           or do { diag $@; skip 1 };
 
         $bool = is(
@@ -84,8 +83,8 @@ my %tests = (
         test_sequence(
             $exp,
             min => $exp->min,
-          # this creates a soft edge just larger than the second from last edge,
-          # which should drag in another bin
+            # this creates a soft edge just larger than the second from last edge,
+            # which should drag in another bin
             soft_max => ( $exp->elements->[-2] + $exp->elements->[-1] ) / 2,
             w0       => $exp->w0,
             ratio    => $exp->ratio,
@@ -118,36 +117,26 @@ my %tests = (
                 my ( $w0, $ratio ) = do {
 
                     if ( $idx == 0 ) {
-                        (
-                            $exp->elements->[1] - $exp->elements->[0],
-                            $exp->ratio
-                        )
+                        ( $exp->elements->[1] - $exp->elements->[0], $exp->ratio )
                     }
                     elsif ( $idx == -1 ) {
-   # need to generate the width of the bin whose minimum is the largest bin edge
-   # that depends upon whether the bins grew to the left or to the right
-                        (
-                            $exp->elements->[-2] - $exp->elements->[-1],
-                            1 / $exp->ratio
-                        );
+                        # need to generate the width of the bin whose minimum is the largest bin edge
+                        # that depends upon whether the bins grew to the left or to the right
+                        ( $exp->elements->[-2] - $exp->elements->[-1], 1 / $exp->ratio );
                     }
                     else {
-                        (
-                            $exp->elements->[ $idx + 1 ]
-                              - $exp->elements->[$idx],
-                            $exp->ratio
-                        )
+                        ( $exp->elements->[ $idx + 1 ] - $exp->elements->[$idx], $exp->ratio )
                     }
                 };
 
                 test_sequence(
                     $exp,
-     # this creates soft edges just outward of the second edges from the maxima,
-     # which should drag in another bin
-                    e0  => $E0,
-                    min => ( $exp->elements->[0] + $exp->elements->[1] ) / 2,
-                    max => ( $exp->elements->[-2] + $exp->elements->[-1] ) / 2,
-                    w0  => $w0,
+                    # this creates soft edges just outward of the second edges from the maxima,
+                    # which should drag in another bin
+                    e0    => $E0,
+                    min   => ( $exp->elements->[0] + $exp->elements->[1] ) / 2,
+                    max   => ( $exp->elements->[-2] + $exp->elements->[-1] ) / 2,
+                    w0    => $w0,
                     ratio => $ratio,
                 );
             };

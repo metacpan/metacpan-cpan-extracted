@@ -27,8 +27,6 @@ customizable yet.
 
 =over 4
 
-=item C<ttree> (from Template) is in C</usr/local/bin/ttree>
-
 =item Your distribution template directory is F<~/.templates/dist_cooker>
 
 =item Your module template name is F<lib/Foo.pm>
@@ -68,7 +66,7 @@ give you as much flexibility with your templates.
 
 This module is in Github:
 
-	http://github.com/briandfoy/distribution--cooker/
+	http://github.com/briandfoy/distribution-cooker/
 
 =head1 AUTHOR
 
@@ -76,7 +74,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

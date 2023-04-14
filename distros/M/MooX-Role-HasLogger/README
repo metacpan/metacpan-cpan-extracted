@@ -1,0 +1,46 @@
+NAME
+
+MooX::Role::HasLogger - Moo role that provides a logger attribute
+
+DESCRIPTION
+
+This "Moo::Role based" role provides a "logger" attribute to the consuming
+class.  The attribute is read-only and its value is grabbed lazily. The type
+library "MooX::Role::HasLogger::Types" exports the "Logger" type that defines
+the interface of the attribute. The "build_logger()" builder method returns a
+"Log::Any" logger object with the consuming class as its category.
+
+INSTALLATION
+
+To install this module manually, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DOCUMENTATION
+
+After the installation, you can find further documentation using the commands:
+
+  perldoc MooX::Role::HasLogger
+  perldoc MooX::Role::HasLogger::Types
+
+MAINTENANCE
+
+To maintain this module, run the following commands:
+
+  perl Makefile.PL
+  make PERL_CPANM_OPT=--notest installdeps 
+  make
+  make test
+
+The second command installs the module dependencies in a "local" directory
+using "cpanm".
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

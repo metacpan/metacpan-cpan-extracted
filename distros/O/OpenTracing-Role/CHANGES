@@ -1,6 +1,13 @@
 CHANGE LOG
 ==========
 
+2023-03-28 - v0.86.0
+--------------------
+
+### Added
+    - a method `is_root_span`, that returns 'true' if there is no parent_span_id
+
+
 2021-02-12 - v0.85.0
 --------------------
 
@@ -9,6 +16,7 @@ CHANGE LOG
 
 ### Fixed
     - use `carp` and don't `croack`; becasue `finish` or `close` are idempotent
+
 
 2020-07-08 - v0.84.0
 --------------------

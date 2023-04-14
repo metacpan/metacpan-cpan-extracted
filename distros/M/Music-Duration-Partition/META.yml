@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Duration-Partition
   repository: https://github.com/ology/Music-Duration-Partition.git
-version: '0.0805'
+version: '0.0814'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -214,9 +214,14 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - Instantiation
+            - VLC
+            - Voss
             - durations
             - hn
+            - homebrew
             - qn
+            - th
             - wn
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
@@ -244,6 +249,7 @@ x_Dist_Zilla:
           exclude_filename: []
           exclude_match:
             - \.mid
+            - site
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

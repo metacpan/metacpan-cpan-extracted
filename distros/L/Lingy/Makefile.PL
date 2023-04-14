@@ -21,12 +21,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Lingy",
   "PREREQ_PM" => {
+    "Capture::Tiny" => 0,
+    "Sub::Identify" => 0,
+    "Sub::Name" => 0,
+    "Term::ReadLine" => 0,
+    "Term::ReadLine::Gnu" => 0,
     "Tie::IxHash" => 0,
     "XXX" => 0,
     "YAML::PP" => 0,
     "YAMLTest" => 0
   },
-  "VERSION" => "0.1.0",
+  "VERSION" => "0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,6 +39,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => 0,
+  "Sub::Identify" => 0,
+  "Sub::Name" => 0,
+  "Term::ReadLine" => 0,
+  "Term::ReadLine::Gnu" => 0,
   "Tie::IxHash" => 0,
   "XXX" => 0,
   "YAML::PP" => 0,

@@ -8,7 +8,7 @@ use Test::Needs {
     'IPC::Run3' => 0,
 };
 
-use FindBin qw( $Bin );
+use FindBin   qw( $Bin );
 use IPC::Run3 qw( run3 );
 use Log::Dispatch::Screen;
 use Log::Dispatch;

@@ -41,13 +41,10 @@
             "perl" : "5.008008"
          },
          "requires" : {
-            "Carp" : "0",
-            "PerlIO::Layers" : "0",
             "Sub::Exporter::Progressive" : "0.001005",
             "XSLoader" : "0",
             "perl" : "5.008001",
             "strict" : "0",
-            "subs" : "0",
             "warnings" : "0"
          },
          "suggests" : {
@@ -72,7 +69,7 @@
    "provides" : {
       "File::Map" : {
          "file" : "lib/File/Map.pm",
-         "version" : "0.68"
+         "version" : "0.71"
       }
    },
    "release_status" : "stable",
@@ -87,7 +84,7 @@
          "web" : "https://github.com/Leont/file-map"
       }
    },
-   "version" : "0.68",
+   "version" : "0.71",
    "x_contributors" : [
       "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>",
       "Doug Hoyte <doug@hcsw.org>",

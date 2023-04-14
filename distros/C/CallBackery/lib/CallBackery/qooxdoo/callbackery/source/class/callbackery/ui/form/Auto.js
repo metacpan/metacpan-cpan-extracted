@@ -102,7 +102,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
 
             var cfg = s.cfg || {};
             var control;
-
+            var textWidget = false;
             switch(s.widget)
             {
                 case 'date':
@@ -121,6 +121,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     break;
 
                 case 'text':
+                    textWidget = true;
                 case 'time':
                     control = new qx.ui.form.TextField();
                     tm[s.key] = 'text';
@@ -130,6 +131,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     tm[s.key] = 'text';
                     break;
                 case 'textArea':
+                    textWidget = true;
                     control = new qx.ui.form.TextArea();
                     tm[s.key] = 'text';
                     break;
@@ -175,6 +177,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 default:
                     throw new Error("unknown widget type " + s.widget);
                     break;
+            }
+            if (textWidget && s.spellcheck){
+               control.getContentElement().setAttribute('spellcheck','true');
             }
             if (s.key) {
                 form.addOwnedQxObject(control, s.key);

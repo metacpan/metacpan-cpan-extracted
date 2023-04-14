@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Harness::Terminal;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001009';
+our $VERSION   = '0.001010';
 
 use Story::Interact::Harness ();
 use Term::Choose qw( choose );

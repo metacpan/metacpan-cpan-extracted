@@ -3,55 +3,74 @@ NAME
 
 SYNOPSIS
      use Memory::Process;
+
      my $m = Memory::Process->new(%params);
      $m->dump;
      $m->record($message, $pid);
-     $m->reset;
      my @report = $m->report;
      my $report = $m->report;
+     $m->reset;
      $m->state;
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+     my $m = Memory::Process->new(%params);
 
-    "dump()"
-             Print report to STDERR.
-             Returns return value of print().
+    Constructor.
 
-    "record([$message, $pid])"
-             Set record.
-             If message not set, use ''.
-             Returns undef.
+    Returns instance of object.
 
-    "report()"
-             Get report.
-             In scalar context returns string with report.
-             In array context returns array of report lines.
-             First line is title.
+  "dump"
+     $m->dump;
 
-    "reset()"
-             Reset records.
-             Returns undef.
+    Print report to STDERR.
 
-    "state()"
-             Get internal state.
-             Each state item consists from:
-             - timestamp (in seconds since epoch)
-             - message (from record())
-             - virtual memory size (in kB)
-             - resident set size (in kB)
-             - shared memory size (in kB)
-             - text size (in kB)
-             - data and stack size (in kB)
-             Returns reference to array with state items.
+    Returns return value of print().
+
+  "record"
+     $m->record($message, $pid);
+
+    Set record. If message not set, use ''.
+
+    Returns undef.
+
+  "report"
+     my @report = $m->report;
+     my $report = $m->report;
+
+    Get report.
+
+    In scalar context returns string with report. In array context returns
+    array of report lines. First line is title.
+
+  "reset"
+     $m->reset;
+
+    Reset records.
+
+    Returns undef.
+
+  "state"
+     $m->state;
+
+    Get internal state.
+
+    Each state item consists from:
+
+     - timestamp (in seconds since epoch)
+     - message (from record())
+     - virtual memory size (in kB)
+     - resident set size (in kB)
+     - shared memory size (in kB)
+     - text size (in kB)
+     - data and stack size (in kB)
+
+    Returns reference to array with state items.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Memory::Process;
 
      # Object.
@@ -74,11 +93,9 @@ EXAMPLE1
      #      2  19120 (     0)   2464 (     0)   1824 (     0)      8 (     0)   1056 (     0) End
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Data::Printer;
      use Memory::Process;
 
@@ -141,17 +158,18 @@ SEE ALSO
         Tools to determine actual memory usage
 
 REPOSITORY
-    <https://github.com/tupinek/Memory-Process>
+    <https://github.com/michal-josef-spacek/Memory-Process>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz/>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

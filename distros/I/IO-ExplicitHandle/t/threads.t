@@ -11,6 +11,21 @@ BEGIN {
 		require Test::More;
 		Test::More::plan(skip_all => "threads unavailable");
 	}
+	if("$]" < 5.008003) {
+		require Test::More;
+		Test::More::plan(skip_all =>
+			"threading breaks PL_sv_placeholder on this Perl");
+	}
+	if("$]" < 5.008009) {
+		require Test::More;
+		Test::More::plan(skip_all =>
+			"threading corrupts memory on this Perl");
+	}
+	if("$]" >= 5.009005 && "$]" < 5.010001) {
+		require Test::More;
+		Test::More::plan(skip_all =>
+			"threading breaks assertions on this Perl");
+	}
 	eval { require Thread::Semaphore; };
 	if($@ ne "") {
 		require Test::More;
@@ -29,98 +44,40 @@ use Test::More tests => 6;
 use Thread::Semaphore ();
 use threads::shared;
 
-my $done1 = Thread::Semaphore->new(0);
-my $exit1 = Thread::Semaphore->new(0);
-my $done2 = Thread::Semaphore->new(0);
-my $exit2 = Thread::Semaphore->new(0);
-my $done3 = Thread::Semaphore->new(0);
-my $exit3 = Thread::Semaphore->new(0);
-my $done4 = Thread::Semaphore->new(0);
-my $exit4 = Thread::Semaphore->new(0);
+alarm 10;   # failure mode may involve an infinite loop
 
-my $ok1 :shared;
-my $thread1 = threads->create(sub {
-	my $ok = 1;
+my(@exit_sems, @threads);
+
+sub test_in_thread($) {
+	my($test_code) = @_;
+	my $done_sem = Thread::Semaphore->new(0);
+	my $exit_sem = Thread::Semaphore->new(0);
+	push @exit_sems, $exit_sem;
+	my $ok :shared;
+	push @threads, threads->create(sub {
+		$ok = !!$test_code->();
+		$done_sem->up;
+		$exit_sem->down;
+	});
+	$done_sem->down;
+	ok $ok;
+}
+
+sub basic_test {
 	eval(q{
 		use IO::ExplicitHandle;
 		if(0) { print 123; }
 		1;
 	});
-	$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
-	$ok1 = $ok;
-	$done1->up;
-	$exit1->down;
-});
-$done1->down;
-ok $ok1;
+	return !!($@ =~ /\AUnspecified I\/O handle in print /);
+}
 
-my $ok2 :shared;
-my $thread2 = threads->create(sub {
-	my $ok = 1;
-	eval(q{
-		use IO::ExplicitHandle;
-		if(0) { print 123; }
-		1;
-	});
-	$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
-	$ok2 = $ok;
-	$done2->up;
-	$exit2->down;
-});
-$done2->down;
-ok $ok2;
+test_in_thread(\&basic_test) for 0..1;
+ok basic_test();
+test_in_thread(\&basic_test) for 0..1;
 
-eval(q{
-	use IO::ExplicitHandle;
-	if(0) { print 123; }
-	1;
-});
-like $@, qr/\AUnspecified I\/O handle in print /;
-
-my $ok3 :shared;
-my $thread3 = threads->create(sub {
-	my $ok = 1;
-	"$]" < 5.007002 or do {
-		eval(q{
-			use IO::ExplicitHandle;
-			if(0) { print 123; }
-			1;
-		});
-		$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
-	};
-	$ok3 = $ok;
-	$done3->up;
-	$exit3->down;
-});
-$done3->down;
-ok $ok3;
-
-my $ok4 :shared;
-my $thread4 = threads->create(sub {
-	my $ok = 1;
-	"$]" < 5.007002 or do {
-		eval(q{
-			use IO::ExplicitHandle;
-			if(0) { print 123; }
-			1;
-		});
-		$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
-	};
-	$ok4 = $ok;
-	$done4->up;
-	$exit4->down;
-});
-$done4->down;
-ok $ok4;
-
-$exit1->up;
-$exit2->up;
-$exit3->up;
-$exit4->up;
-$thread1->join;
-$thread2->join;
-$thread3->join;
-$thread4->join;
+$_->up foreach @exit_sems;
+$_->join foreach @threads;
 ok 1;
 
 1;

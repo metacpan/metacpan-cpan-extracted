@@ -28,7 +28,7 @@
       return $c->body('entities');
     }
 
-    sub not_found :Via(root) At({*}) {
+    sub not_found :Via('root') At({*}) {
       my ($self, $c, @args) = @_;
       $c->res->status(400);
       $c->res->body(join ',',@args);

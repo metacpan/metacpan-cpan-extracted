@@ -35,8 +35,8 @@ where <I<name>> is a human-readable name for the new media (e.g.
 "updates"). <I<name>> is optional if B<--distrib> is given in the options
 list. <I<host>>/<I<path>> is the location of the media directory on the
 net (e.g. C<media/main>). The location is given relative to
-<I<path>>. B<curl> is used by default to download files, B<wget> may be
-used if B<curl> is not installed or if or B<--wget> is given in
+<I<path>>. B<wget> is used by default to download files, B<curl> may be
+used if B<wget> is not installed or if or B<--curl> is given in
 I<options>. Example:
 
     urpmi.addmedia http http://jpackage.sf.net/rpm/free
@@ -191,13 +191,13 @@ Don't import pubkey of added media.
 
 =item B<--wget>
 
-Use wget only for downloading distant files. By default curl is used if
-available.
+Use wget only for downloading distant files. This is the default if wget
+is available.
 
 =item B<--curl>
 
-Use curl only for downloading distant files. This is the default if curl
-is available.
+Use curl only for downloading distant files. By default wget is used if
+available.
 
 =item B<--curl-options> I<'options'>
 

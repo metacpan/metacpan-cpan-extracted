@@ -1,5 +1,8 @@
 Revision history for Excel-Template-XLSX 
 
+v1.1.3  4/1/2023
+        Fixed t/06-cell.t to check _col_info instead of _col_sizes for column width changes
+
 v1.1.2  04-Dec-2021
         Added sub _parse_final_pass, ot process merge_ranges, that have blank cells.
         Fixed handling of styles to accept either 'True' or '1' as an XML attribute

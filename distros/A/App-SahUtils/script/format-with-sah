@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-01-20'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.482'; # VERSION
+our $VERSION = '0.483'; # VERSION
 
 our %SPEC;
 
@@ -251,11 +251,15 @@ format-with-sah - Format data
 
 =head1 VERSION
 
-This document describes version 0.482 of format-with-sah (from Perl distribution App-SahUtils), released on 2022-09-30.
+This document describes version 0.483 of format-with-sah (from Perl distribution App-SahUtils), released on 2023-01-20.
 
 =head1 SYNOPSIS
 
-B<format-with-sah> [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--data-as-json>=I<str>] [B<--data-as-perl>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--formatter-args>=I<s>|B<--formatter-args-json>=I<json>] [B<--linenum>|B<-l>] [B<--multiple-data-as-json>=I<str>] [B<--multiple-data-as-perl>=I<str>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--show-code>|B<-c>] -- E<lt>I<format>E<gt>
+B<format-with-sah> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<format-with-sah> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<format-with-sah> [B<L<--compiler|/"--compiler=s, -C">>=I<str>|B<L<-C|/"--compiler=s, -C">>=I<str>] [(B<L<--config-path|/"--config-path=s">>=I<path>)+|B<L<--no-config|/"--no-config">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--data-as-json|/"--data-as-json=s">>=I<str>] [B<L<--data-as-perl|/"--data-as-perl=s">>=I<str>] [B<L<--data-with-result|/"--data-with-result, -d">>|B<L<-d|/"--data-with-result, -d">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--formatter-args|/"--formatter-args=s">>=I<s>|B<L<--formatter-args-json|/"--formatter-args=s">>=I<json>] [B<L<--linenum|/"--linenum, -l">>|B<L<-l|/"--linenum, -l">>] [B<L<--multiple-data-as-json|/"--multiple-data-as-json=s">>=I<str>] [B<L<--multiple-data-as-perl|/"--multiple-data-as-perl=s">>=I<str>] [B<L<--(no)naked-res|/"--no-naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--show-code|/"--show-code, -c">>|B<L<-c|/"--show-code, -c">>] -- E<lt>I<L<format|/"--format-arg=s*">>E<gt>
 
 
 
@@ -373,6 +377,9 @@ Valid values:
 
 =item B<--format-arg>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--formatter-args-json>=I<s>
@@ -380,6 +387,9 @@ Can also be specified as the 1st command-line argument.
 See C<--formatter-args>.
 
 =item B<--formatter-args>=I<s>
+
+(No description)
+
 
 =back
 
@@ -605,7 +615,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

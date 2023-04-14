@@ -1,2 +1,31 @@
+0.04 2023-04-11T22:08:03+02:00
+ - Add doc for Wikibase::Datatype::Print::Value::Quantity.
+ - Add doc for Wikibase::Datatype::Print::Value::String.
+ - Add doc for Wikibase::Datatype::Print::Value::Time.
+ - Add test for Wikibase::Datatype::Print::Value::Quantity.
+ - Fix default options in Wikibase::Datatype::Print::Value::Quantity.
+ - Fix default options in Wikibase::Datatype::Print::Value::Time.
+
+0.03 2023-04-10T23:11:35+02:00
+ - Add doc for Wikibase::Datatype::Print::Value::Item.
+ - Add doc for Wikibase::Datatype::Print::Value::Monolingual.
+ - Add doc for Wikibase::Datatype::Print::Value::Property.
+ - Add test for Wikibase::Datatype::Print::Form.
+ - Add test for Wikibase::Datatype::Print::Value::Quantity.
+ - Add test for Wikibase::Datatype::Print::Value::Time.
+ - Add tests for Wikibase::Datatype::Print::Value::Item.
+ - Add tests for Wikibase::Datatype::Print::Value::Property.
+ - Fix doc description for
+   Wikibase::Datatype::Print::Value::Globecoordinate.
+ - Fix error check in Wikibase::Datatype::Print::Form.
+
+0.02 2023-04-10T11:37:10+02:00
+ - Add doc for Wikibase::Datatype::Print::Value::Globecoordinate.
+ - Fix dependency to
+   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.
+ - Remove List::MoreUtils from dependencies.
+ - Remove Wikibase::Cache from dependencies.
+ - Update copyright years.
+
 0.01 2022-10-19T11:10:23+02:00
  - First version.

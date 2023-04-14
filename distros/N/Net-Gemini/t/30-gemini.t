@@ -5,13 +5,14 @@
 # them have been wrapped in AUTHOR_TEST_JMATES which assumes one is
 # running on OpenBSD
 
+use strict;
+use warnings;
 use Test2::V0;
-plan 30;
+plan 28;
 
 use IO::Socket::SSL;
 use Net::Gemini;
 use Net::Gemini::Server;
-use Net::Gemini::URI 'parse_gemini_uri';
 
 # for the test servers. see also t/mkcertificate
 my $The_Host = exists $ENV{GEMINI_HOST} ? $ENV{GEMINI_HOST} : '127.0.0.1';
@@ -24,22 +25,10 @@ check_that(
     code => 0,
     err  => qr/^could not parse/
 );
-check_that(
-    req  => {},
-    code => 0,
-    err  => qr/^unknown type/
-);
-# TODO need a string that blows up when encoded to UTF-8 ...
-#check_that(
-#    req  => "gemini://127.0.0.1/\x80",
-#    code => 0,
-#    err  => qr/FIXME/
-#);
 
-my $long_uri =
-  ( Net::Gemini::URI->new( 'gemini://example.org/' . ( 'a' x 1005 ) ) )[0];
+my $long_uri = URI->new( 'gemini://example.org/' . ( 'a' x 1005 ) );
 check_that(
-    req  => [ $long_uri, '127.0.0.1', 0 ],
+    req  => $long_uri,
     code => 0,
     err  => qr/^URI is too long/
 );
@@ -146,9 +135,8 @@ SKIP: {
 {
     my ( $pid, $port ) = with_server(
         sub {
-            my ( $socket, $length, $buffer ) = @_;
-            # NOTE technically buffer needs a decode-to-UTF-8 here
-            $socket->print("22 text/plain\r\n$buffer");
+            my ( $socket, $length, $from_client ) = @_;
+            $socket->print("22 text/plain\r\n$from_client");
             $socket->flush;
             die "this is for better code coverage?\n";
         }
@@ -157,7 +145,7 @@ SKIP: {
     my $uri = "gemini://$The_Host:$port/test";
     my ( $gem, $code ) =
       Net::Gemini->get( $uri, ssl => { SSL_ca_file => $The_Cert } );
-    is( $gem->code,    2 );
+    is( $gem->code,    2 ) or diag $gem->error;
     is( $gem->content, "$uri\r\n" );
     is( $gem->error,   undef );
     is( $gem->host,    $The_Host );
@@ -170,8 +158,7 @@ SKIP: {
     my $body = '';
     $gem->getmore(
         sub {
-            my ( $status, $buffer ) = @_;
-            return 0 if !defined $status or $status == 0;
+            my ( $buffer, $length ) = @_;
             $body .= $buffer;
             return 1;
         }

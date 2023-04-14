@@ -9,6 +9,7 @@ lib/SReview/Config.pm
 lib/SReview/Config/Common.pm
 lib/SReview/Db.pm
 lib/SReview/Files/Collection/HTTP.pm
+lib/SReview/Files/Collection/HTTP/nginx/JSON.pm
 lib/SReview/Files/Collection/S3.pm
 lib/SReview/Files/Factory.pm
 lib/SReview/Job.pm
@@ -28,6 +29,7 @@ lib/SReview/Schedule/Wafer.pm
 lib/SReview/Schedule/WithShadow.pm
 lib/SReview/Schedule/Yaml.pm
 lib/SReview/Talk.pm
+lib/SReview/Talk/Progress.pm
 lib/SReview/Talk/State.pm
 lib/SReview/Template.pm
 lib/SReview/Template/SVG.pm

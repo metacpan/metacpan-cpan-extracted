@@ -61,7 +61,7 @@ es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 8.4
+version 8.5
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Brad Lhotsky.
+This software is Copyright (c) 2023 by Brad Lhotsky.
 
 This is free software, licensed under:
 

@@ -56,7 +56,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '4.42';
+$VERSION = '4.44';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -65,11 +65,13 @@ sub RebuildMakerNotes($$$);
 sub EncodeExifText($$);
 sub ValidateIFD($;$);
 sub ValidateImageData($$$;$);
+sub AddImageDataMD5($$$);
 sub ProcessTiffIFD($$$);
 sub PrintParameter($$$);
 sub GetOffList($$$$$);
 sub PrintOpcode($$$);
 sub PrintLensInfo($);
+sub InverseOffsetTime($$);
 sub ConvertLensInfo($);
 
 # size limit for loading binary data block into memory
@@ -572,10 +574,19 @@ my %opcodeInfo = (
             ],
             Name => 'StripOffsets',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x117,  # point to associated byte counts
             # A200 stores this information in the wrong byte order!!
             ValueConv => '$val=join(" ",unpack("N*",pack("V*",split(" ",$val))));\$val',
             ByteOrder => 'LittleEndian',
+        },
+        {
+            Condition => '$$self{Compression} and $$self{Compression} eq "34892"', # DNG Lossy JPEG
+            Name => 'OtherImageStart',
+            IsOffset => 1,
+            IsImageData => 1,
+            OffsetPair => 0x117,  # point to associated byte counts
+            DataTag => 'OtherImage',
         },
         {
             # (APP1 IFD2 is for Leica JPEG preview)
@@ -586,6 +597,7 @@ my %opcodeInfo = (
             ],
             Name => 'StripOffsets',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x117,  # point to associated byte counts
             ValueConv => 'length($val) > 32 ? \$val : $val',
         },
@@ -622,6 +634,7 @@ my %opcodeInfo = (
             # JpgFromRawStart in various IFD's of DNG images except SubIFD2
             Name => 'JpgFromRawStart',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x117,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
@@ -662,6 +675,12 @@ my %opcodeInfo = (
             # A200 stores this information in the wrong byte order!!
             ValueConv => '$val=join(" ",unpack("N*",pack("V*",split(" ",$val))));\$val',
             ByteOrder => 'LittleEndian',
+        },
+        {
+            Condition => '$$self{Compression} and $$self{Compression} eq "34892"', # DNG Lossy JPEG
+            Name => 'OtherImageLength',
+            OffsetPair => 0x111,   # point to associated offset
+            DataTag => 'OtherImage',
         },
         {
             # (APP1 IFD2 is for Leica JPEG preview)
@@ -919,6 +938,7 @@ my %opcodeInfo = (
     0x144 => {
         Name => 'TileOffsets',
         IsOffset => 1,
+        IsImageData => 1,
         OffsetPair => 0x145,
         ValueConv => 'length($val) > 32 ? \$val : $val',
     },
@@ -1173,6 +1193,7 @@ my %opcodeInfo = (
             Name => 'JpgFromRawStart',
             Condition => '$$self{DIR_NAME} eq "SubIFD"',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
@@ -1185,6 +1206,7 @@ my %opcodeInfo = (
             Name => 'JpgFromRawStart',
             Condition => '$$self{DIR_NAME} eq "IFD2"',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
@@ -1196,6 +1218,7 @@ my %opcodeInfo = (
         {
             Name => 'OtherImageStart',
             Condition => '$$self{DIR_NAME} eq "SubIFD1"',
+            IsImageData => 1,
             IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'OtherImage',
@@ -1208,6 +1231,7 @@ my %opcodeInfo = (
             Name => 'OtherImageStart',
             Condition => '$$self{DIR_NAME} eq "SubIFD2"',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x202,
             DataTag => 'OtherImage',
             Writable => 'int32u',
@@ -1218,6 +1242,7 @@ my %opcodeInfo = (
         {
             Name => 'OtherImageStart',
             IsOffset => 1,
+            IsImageData => 1,
             OffsetPair => 0x202,
         },
     ],
@@ -1486,9 +1511,10 @@ my %opcodeInfo = (
     0x7031 => {
         Name => 'VignettingCorrection',
         Notes => 'found in Sony ARW images',
-        Protected => 1,
         Writable => 'int16s',
         WriteGroup => 'SubIFD',
+        Permanent => 1,
+        Protected => 1,
         PrintConv => {
             256 => 'Off',
             257 => 'Auto',
@@ -1499,17 +1525,19 @@ my %opcodeInfo = (
     0x7032 => {
         Name => 'VignettingCorrParams', #forum7640
         Notes => 'found in Sony ARW images',
-        Protected => 1,
         Writable => 'int16s',
         WriteGroup => 'SubIFD',
         Count => 17,
+        Permanent => 1,
+        Protected => 1,
     },
     0x7034 => {
         Name => 'ChromaticAberrationCorrection',
         Notes => 'found in Sony ARW images',
-        Protected => 1,
         Writable => 'int16s',
         WriteGroup => 'SubIFD',
+        Permanent => 1,
+        Protected => 1,
         PrintConv => {
             0 => 'Off',
             1 => 'Auto',
@@ -1519,17 +1547,19 @@ my %opcodeInfo = (
     0x7035 => {
         Name => 'ChromaticAberrationCorrParams', #forum6509
         Notes => 'found in Sony ARW images',
-        Protected => 1,
         Writable => 'int16s',
         WriteGroup => 'SubIFD',
         Count => 33,
+        Permanent => 1,
+        Protected => 1,
     },
     0x7036 => {
         Name => 'DistortionCorrection',
         Notes => 'found in Sony ARW images',
-        Protected => 1,
         Writable => 'int16s',
         WriteGroup => 'SubIFD',
+        Permanent => 1,
+        Protected => 1,
         PrintConv => {
             0 => 'Off',
             1 => 'Auto',
@@ -1540,10 +1570,38 @@ my %opcodeInfo = (
     0x7037 => {
         Name => 'DistortionCorrParams', #forum6509
         Notes => 'found in Sony ARW images',
-        Protected => 1,
         Writable => 'int16s',
         WriteGroup => 'SubIFD',
         Count => 17,
+        Permanent => 1,
+        Protected => 1,
+    },
+    0x7038 => { #github#195 (Sony ARW)
+        Name => 'SonyRawImageSize',
+        Notes => 'size of actual image in Sony ARW files',
+        Writable => 'int32u',
+        WriteGroup => 'SubIFD',
+        Count => 2,
+        Permanent => 1,
+        Protected => 1,
+    },
+    0x7310 => { #github#195 (Sony ARW)
+        Name => 'BlackLevel',
+        Notes => 'found in Sony ARW images',
+        Writable => 'int16u',
+        WriteGroup => 'SubIFD',
+        Count => 4,
+        Permanent => 1,
+        Protected => 1,
+    },
+    0x7313 => { #github#195 (Sony ARW)
+        Name => 'WB_RGGBLevels',
+        Notes => 'found in Sony ARW images',
+        Writable => 'int16s',
+        WriteGroup => 'SubIFD',
+        Count => 4,
+        Permanent => 1,
+        Protected => 1,
     },
     0x74c7 => { #IB (in ARW images from some Sony cameras)
         Name => 'SonyCropTopLeft',
@@ -2082,11 +2140,7 @@ my %opcodeInfo = (
         Notes => 'time zone for ModifyDate',
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => q{
-            return "+00:00" if $val =~ /\d{2}Z$/;
-            return sprintf("%s%.2d:%.2d",$1,$2,$3) if $val =~ /([-+])(\d{1,2}):(\d{2})/;
-            return undef;
-        },
+        PrintConvInv => \&InverseOffsetTime,
     },
     0x9011 => {
         Name => 'OffsetTimeOriginal',
@@ -2094,11 +2148,7 @@ my %opcodeInfo = (
         Notes => 'time zone for DateTimeOriginal',
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => q{
-            return "+00:00" if $val =~ /\d{2}Z$/;
-            return sprintf("%s%.2d:%.2d",$1,$2,$3) if $val =~ /([-+])(\d{1,2}):(\d{2})/;
-            return undef;
-        },
+        PrintConvInv => \&InverseOffsetTime,
     },
     0x9012 => {
         Name => 'OffsetTimeDigitized',
@@ -2106,11 +2156,7 @@ my %opcodeInfo = (
         Notes => 'time zone for CreateDate',
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => q{
-            return "+00:00" if $val =~ /\d{2}Z$/;
-            return sprintf("%s%.2d:%.2d",$1,$2,$3) if $val =~ /([-+])(\d{1,2}):(\d{2})/;
-            return undef;
-        },
+        PrintConvInv => \&InverseOffsetTime,
     },
     0x9101 => {
         Name => 'ComponentsConfiguration',
@@ -2966,6 +3012,7 @@ my %opcodeInfo = (
     0xbcc0 => { #13
         Name => 'ImageOffset',
         IsOffset => 1,
+        IsImageData => 1,
         OffsetPair => 0xbcc1,  # point to associated byte count
     },
     0xbcc1 => { #13
@@ -2975,6 +3022,7 @@ my %opcodeInfo = (
     0xbcc2 => { #13
         Name => 'AlphaOffset',
         IsOffset => 1,
+        IsImageData => 1,
         OffsetPair => 0xbcc3,  # point to associated byte count
     },
     0xbcc3 => { #13
@@ -4717,12 +4765,28 @@ my %subSecConv = (
             0 => 'OtherImageStart',
             1 => 'OtherImageLength',
         },
+        Desire => {
+            2 => 'OtherImageStart (1)',
+            3 => 'OtherImageLength (1)',
+        },
         Notes => q{
             this tag is writable, and may be used to update existing embedded images,
             but not create or delete them
         },
-        # retrieve the thumbnail from our EXIF data
+        # retrieve all other images
         RawConv => q{
+            if ($val[2] and $val[3]) {
+                my $i = 1;
+                for (;;) {
+                    my %val = ( 0 => $$val{2}, 1 => $$val{3} );
+                    $self->FoundTag($tagInfo, \%val);
+                    ++$i;
+                    $$val{2} = "$$val{0} ($i)";
+                    last unless defined $$self{VALUE}{$$val{2}};
+                    $$val{3} = "$$val{1} ($i)";
+                    last unless defined $$self{VALUE}{$$val{3}};
+                }
+            }
             @grps = $self->GetGroup($$val{0});
             Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"OtherImage");
         },
@@ -5862,14 +5926,16 @@ sub ProcessExif($$$)
     my $base = $$dirInfo{Base} || 0;
     my $firstBase = $base;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $et->Options('Verbose');
-    my $validate = $et->Options('Validate');
-    my $saveFormat = $et->Options('SaveFormat');
+    my ($verbose,$validate,$saveFormat) = @{$$et{OPTIONS}}{qw(Verbose Validate SaveFormat)};
     my $htmlDump = $$et{HTML_DUMP};
     my $success = 1;
-    my ($tagKey, $dirSize, $makerAddr, $strEnc, %offsetInfo, $offName, $nextOffName);
+    my ($tagKey, $dirSize, $makerAddr, $strEnc, %offsetInfo, $offName, $nextOffName, $doMD5);
     my $inMakerNotes = $$tagTablePtr{GROUPS}{0} eq 'MakerNotes';
     my $isExif = ($tagTablePtr eq \%Image::ExifTool::Exif::Main);
+
+    # set flag to calculate image data MD5 if requested
+    $doMD5 = 1 if $$et{ImageDataMD5} and (($$et{FILE_TYPE} eq 'TIFF' and not $base and not $inMakerNotes) or
+        ($$et{FILE_TYPE} eq 'RAF' and $dirName eq 'FujiIFD'));
 
     # set encoding to assume for strings
     $strEnc = $et->Options('CharsetEXIF') if $$tagTablePtr{GROUPS}{0} eq 'EXIF';
@@ -5879,7 +5945,12 @@ sub ProcessExif($$$)
         $isExif and $$et{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/)
     {
         my $path = $et->MetadataPath();
-        unless ($path =~ /^(JPEG-APP1-IFD0|TIFF-IFD0|PSD-EXIFInfo-IFD0)$/) {
+        if ($path =~ /^(JPEG-APP1-IFD0|TIFF-IFD0|PSD-EXIFInfo-IFD0)$/) {
+            unless ($$et{DOC_NUM}) {
+                $et->Warn("Duplicate EXIF at $path") if $$et{HasExif};
+                $$et{HasExif} = 1;
+            }
+        } else {
             if ($Image::ExifTool::MWG::strict) {
                 $et->Warn("Ignored non-standard EXIF at $path");
                 return 0;
@@ -6343,10 +6414,10 @@ sub ProcessExif($$$)
             $tval .= " ($rational)" if defined $rational;
             if ($htmlDump) {
                 my ($tagName, $colName);
-                if ($tagID == 0x927c and $dirName eq 'ExifIFD') {
-                    $tagName = 'MakerNotes';
-                } elsif ($tagInfo) {
+                if ($tagInfo) {
                     $tagName = $$tagInfo{Name};
+                } elsif ($tagID == 0x927c and $dirName eq 'ExifIFD') {
+                    $tagName = 'MakerNotes';
                 } else {
                     $tagName = sprintf("Tag 0x%.4x",$tagID);
                 }
@@ -6421,6 +6492,9 @@ sub ProcessExif($$$)
                     }
                     # add value data block (underlining maker notes data)
                     $et->HDump($exifDumpPos,$size,"$tagName value",'SAME', $flag, $sid);
+                    if ($subdir and $$tagInfo{MakerNotes} and $$tagInfo{NotIFD}) {
+                        $et->HDump($exifDumpPos,$size,"$tagName value",undef,undef,$$dirInfo{OffsetName});
+                    }
                 }
             } else {
                 if ($tagID <= $lastID and not $inMakerNotes) {
@@ -6707,7 +6781,7 @@ sub ProcessExif($$$)
             }
             $val = join(' ', @vals);
         }
-        if ($validate) {
+        if ($validate or $doMD5) {
             if ($$tagInfo{OffsetPair}) {
                 $offsetInfo{$tagID} = [ $tagInfo, $val ];
             } elsif ($saveForValidate{$tagID} and $isExif) {
@@ -6725,9 +6799,11 @@ sub ProcessExif($$$)
         }
     }
 
-    # validate image data offsets for this IFD
-    if ($validate and %offsetInfo) {
-        Image::ExifTool::Validate::ValidateOffsetInfo($et, \%offsetInfo, $$dirInfo{DirName}, $inMakerNotes)
+    if (%offsetInfo) {
+        # calculate image data MD5 if requested
+        AddImageDataMD5($et, $dirInfo, \%offsetInfo) if $doMD5;
+        # validate image data offsets for this IFD (note: modifies %offsetInfo)
+        Image::ExifTool::Validate::ValidateOffsetInfo($et, \%offsetInfo, $dirName, $inMakerNotes) if $validate;
     }
 
     # scan for subsequent IFD's if specified
@@ -6789,7 +6865,7 @@ EXIF and TIFF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2022, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2023, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

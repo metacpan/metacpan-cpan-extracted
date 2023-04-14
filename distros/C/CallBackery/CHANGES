@@ -1,3 +1,8 @@
+0.45.0 2023-03-30 09:13:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - new widget attribute spellcheck which allows to enable
+   spellcheckers like languagetool in textareas or normal text widets
+
 0.44.3 2023-03-03 16:29:29 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - add timing for validators as well

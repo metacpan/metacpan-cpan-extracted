@@ -29,7 +29,9 @@ library L<MooX::Role::HasLogger::Types> exports the C<Logger> type that defines
 the interface of the attribute. The C<build_logger()> builder method returns a
 L<Log::Any> logger object with the consuming class as its category.
 
-This example
+=head1 EXAMPLE
+
+This extended example
 
   package Bar;
 

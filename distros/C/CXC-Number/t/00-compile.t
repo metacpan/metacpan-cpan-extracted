@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CXC/Number.pm',
     'CXC/Number/Grid.pm',
     'CXC/Number/Grid/Failure.pm',
+    'CXC/Number/Grid/Range.pm',
     'CXC/Number/Grid/Role/BigNum.pm',
+    'CXC/Number/Grid/Tree.pm',
     'CXC/Number/Grid/Types.pm',
     'CXC/Number/Sequence.pm',
     'CXC/Number/Sequence/Failure.pm',

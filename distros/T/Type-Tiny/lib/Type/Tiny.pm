@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '2.002001';
+	$Type::Tiny::VERSION    = '2.004000';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -534,6 +534,7 @@ sub mouse_type           { $_[0]{mouse_type} ||= $_[0]->_build_mouse_type }
 sub deep_explanation     { $_[0]{deep_explanation} }
 sub my_methods           { $_[0]{my_methods} ||= $_[0]->_build_my_methods }
 sub sorter               { $_[0]{sorter} }
+sub exception_class      { $_[0]{exception_class} ||= $_[0]->_build_exception_class }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -635,6 +636,13 @@ sub _build_compiled_check {
 		return !!1;
 	};
 } #/ sub _build_compiled_check
+
+sub _build_exception_class {
+	my $self = shift;
+	return $self->parent->exception_class if $self->has_parent;
+	require Error::TypeTiny::Assertion;
+	return 'Error::TypeTiny::Assertion';
+}
 
 sub definition_context {
 	my $self  = shift;
@@ -1002,6 +1010,8 @@ sub inline_assert {
 	my $self = shift;
 	my ( $varname, $typevarname, %extras ) = @_;
 	
+	$extras{exception_class} ||= $self->exception_class;
+	
 	my $inline_check;
 	if ( $self->can_be_inlined ) {
 		$inline_check = sprintf( '(%s)', $self->inline_check( $varname ) );
@@ -1047,13 +1057,11 @@ sub inline_assert {
 } #/ sub inline_assert
 
 sub _failed_check {
-	require Error::TypeTiny::Assertion;
-	
 	my ( $self, $name, $value, %attrs ) = @_;
 	$self = $ALL_TYPES{$self} if defined $self && !ref $self;
 	
-	my $exception_class =
-		delete( $attrs{exception_class} ) || "Error::TypeTiny::Assertion";
+	my $exception_class = delete( $attrs{exception_class} )
+		|| ( ref $self ? $self->exception_class : 'Error::TypeTiny::Assertion' );
 	my $callback = delete( $attrs{on_die} );
 
 	if ( $self ) {
@@ -1983,6 +1991,16 @@ for the reader.
 
 Experimental hashref of additional methods that can be called on the type
 constraint object.
+
+=item C<< exception_class >>
+
+The class used to throw an exception when a value fails its type check.
+Defaults to "Error::TypeTiny::Assertion", which is usually good. This class
+is expected to provide a C<throw_cb> method compatible with the method of
+that name in L<Error::TypeTiny>.
+
+If a parent type constraint has a custom C<exception_class>, then this
+will be "inherited" by its children.
 
 =back
 

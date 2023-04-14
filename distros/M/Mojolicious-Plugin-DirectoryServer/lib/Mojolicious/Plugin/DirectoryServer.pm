@@ -2,7 +2,7 @@ use v5.32;
 
 package Mojolicious::Plugin::DirectoryServer;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use Cwd ();
 use Encode ();
@@ -195,9 +195,13 @@ Mojolicious::Plugin::DirectoryServer - Serve static files from document root wit
       }
   })->start;
 
-  or
+or
 
   > perl -Mojo -E 'a->plugin("Directory", root => "/path/to/htdocs")->start' daemon
+
+or
+
+  > perl -Miniweb
 
 =head1 DESCRIPTION
 
@@ -295,7 +299,7 @@ Many thanks to the contributors for their work.
 
 =head1 SEE ALSO
 
-L<Plack::App::Directory>
+L<Plack::App::Directory>, L<iniweb>.
 
 =head1 LICENSE
 

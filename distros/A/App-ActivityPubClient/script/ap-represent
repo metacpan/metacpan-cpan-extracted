@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+# AP-Client: CLI-based client / toolbox for ActivityPub
+# Copyright © 2020-2023 AP-Client Authors <https://hacktivis.me/git/ap-client/>
+# SPDX-License-Identifier: BSD-3-Clause
+use strict;
+use utf8;
+use open ":std", ":encoding(UTF-8)";
+our $VERSION = 'v0.1.3';
+
+use JSON;
+use App::ActivityPubClient qw(print_object);
+
+=head1 NAME
+
+ap-represent - Pretty-print ActivityStreams data
+
+=head1 SYNOPSIS
+
+B<ap-represent>
+
+=head1 DESCRIPTION
+
+ap-represent takes JSON-formatted ActivityStreams data from standard input and
+pretty prints it to stdout.
+
+Said output isn't made to be readable by machines, only humans.
+
+=head1 LICENSE
+
+BSD-3-Clause
+
+=cut
+
+undef $/;
+# from_json because UTF-8 is already decoded
+my $blob = from_json(<STDIN>);
+print_object(1, $blob);
+print "\n";

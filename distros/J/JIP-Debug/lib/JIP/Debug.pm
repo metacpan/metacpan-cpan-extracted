@@ -1,18 +1,18 @@
 package JIP::Debug;
 
-use base qw(Exporter);
-
 use 5.006;
 use strict;
 use warnings;
+
 use Term::ANSIColor 3.00 ();
 use Devel::StackTrace;
 use Carp qw(croak);
+use Exporter qw(import);
 use Data::Dumper qw(Dumper);
 use Fcntl qw(LOCK_EX LOCK_UN);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.021';
+our $VERSION = '0.031';
 
 our @EXPORT_OK = qw(
     to_debug
@@ -20,6 +20,7 @@ our @EXPORT_OK = qw(
     to_debug_empty
     to_debug_count
     to_debug_trace
+    to_debug_truncate
 );
 
 our $HANDLE = \*STDERR;
@@ -28,9 +29,10 @@ our $MSG_FORMAT      = qq{%s\n%s\n\n};
 our $MSG_DELIMITER   = q{-} x 80;
 our $MSG_EMPTY_LINES = qq{\n} x 18;
 
-our $DUMPER_INDENT   = 1;
-our $DUMPER_DEEPCOPY = 1;
-our $DUMPER_SORTKEYS = 1;
+our $DUMPER_INDENT         = 1;
+our $DUMPER_DEEPCOPY       = 1;
+our $DUMPER_SORTKEYS       = 1;
+our $DUMPER_TRAILING_COMMA = 1;
 
 our %TRACE_PARAMS = (
     skip_frames => 1, # skip to_debug_trace
@@ -40,27 +42,26 @@ our %TRACE_AS_STRING_PARAMS;
 our $COLOR = 'bright_green';
 
 our $MAYBE_COLORED = sub {
-    my $text = shift;
+    my ($text) = @ARG;
 
-    return defined $text && defined $COLOR
-        ? Term::ANSIColor::colored($text, $COLOR) : $text;
+    return defined $text && defined $COLOR ? Term::ANSIColor::colored( $text, $COLOR ) : $text;
 };
 
 our $MAKE_MSG_HEADER = sub {
     # $MAKE_MSG_HEADER=0, to_debug=1
-    my ($package, undef, $line) = caller 1;
+    my ( $package, undef, $line ) = caller 1;
 
     # $MAKE_MSG_HEADER=0, to_debug=1, subroutine=2
-    my $subroutine = (caller 2)[3];
+    my $subroutine = ( caller 2 )[3];
 
     $subroutine = resolve_subroutine_name($subroutine);
 
     my $text = join q{, }, (
-        sprintf('package=%s', $package),
-        (defined $subroutine ? sprintf('subroutine=%s', $subroutine) : ()),
-        sprintf('line=%d', $line),
+        'package=' . $package,
+        ( defined $subroutine ? ( 'subroutine=' . $subroutine ) : () ),
+        'line=' . $line,
     );
-    $text = qq{[$text]:};
+    $text = sprintf '[%s]:', $text;
 
     {
         my $msg_delimiter = defined $MSG_DELIMITER ? $MSG_DELIMITER : q{};
@@ -71,26 +72,28 @@ our $MAKE_MSG_HEADER = sub {
 };
 
 our $NO_LABEL_KEY   = '<no label>';
-our %COUNT_OF_LABEL = ($NO_LABEL_KEY => 0);
+our %COUNT_OF_LABEL = ( $NO_LABEL_KEY => 0 );
 
 # Supported on Perl 5.22+
 eval {
     require Sub::Util;
 
-    if (my $set_subname = Sub::Util->can('set_subname')) {
-        $set_subname->('MAYBE_COLORED',   $MAYBE_COLORED);
-        $set_subname->('MAKE_MSG_HEADER', $MAKE_MSG_HEADER);
+    if ( my $set_subname = Sub::Util->can('set_subname') ) {
+        $set_subname->( 'MAYBE_COLORED',   $MAYBE_COLORED );
+        $set_subname->( 'MAKE_MSG_HEADER', $MAKE_MSG_HEADER );
     }
 };
 
 sub to_debug {
-    my $msg_body = do {
-        local $Data::Dumper::Indent   = $DUMPER_INDENT;
-        local $Data::Dumper::Deepcopy = $DUMPER_DEEPCOPY;
-        local $Data::Dumper::Sortkeys = $DUMPER_SORTKEYS;
+    my $msg_body;
+    {
+        local $Data::Dumper::Indent        = $DUMPER_INDENT;
+        local $Data::Dumper::Deepcopy      = $DUMPER_DEEPCOPY;
+        local $Data::Dumper::Sortkeys      = $DUMPER_SORTKEYS;
+        local $Data::Dumper::Trailingcomma = $DUMPER_TRAILING_COMMA;
 
-        Dumper(\@ARG);
-    };
+        $msg_body = Dumper( \@ARG );
+    }
 
     my $msg = sprintf $MSG_FORMAT, $MAKE_MSG_HEADER->(), $msg_body;
 
@@ -98,7 +101,7 @@ sub to_debug {
 }
 
 sub to_debug_raw {
-    my $msg_text = shift;
+    my ($msg_text) = @ARG;
 
     my $msg = sprintf $MSG_FORMAT, $MAKE_MSG_HEADER->(), $msg_text;
 
@@ -112,34 +115,34 @@ sub to_debug_empty {
 }
 
 sub to_debug_count {
-    my ($label, $cb);
-    if (@ARG == 2 && ref $ARG[1] eq 'CODE') {
-        ($label, $cb) = @ARG;
+    my ( $label, $cb );
+    if ( @ARG == 2 && ref $ARG[1] eq 'CODE' ) {
+        ( $label, $cb ) = @ARG;
     }
-    elsif (@ARG == 1 && ref $ARG[0] eq 'CODE') {
+    elsif ( @ARG == 1 && ref $ARG[0] eq 'CODE' ) {
         $cb = $ARG[0];
     }
-    elsif (@ARG == 1) {
+    elsif ( @ARG == 1 ) {
         $label = $ARG[0];
     }
 
     $label = defined $label && length $label ? $label : $NO_LABEL_KEY;
 
     my $count = $COUNT_OF_LABEL{$label} || 0;
-    $count++;
+    $count += 1;
     $COUNT_OF_LABEL{$label} = $count;
 
     my $msg_body = sprintf '%s: %d', $label, $count;
 
     my $msg = sprintf $MSG_FORMAT, $MAKE_MSG_HEADER->(), $msg_body;
 
-    $cb->($label, $count) if defined $cb;
+    $cb->( $label, $count ) if defined $cb;
 
     return send_to_output($msg);
-}
+} ## end sub to_debug_count
 
 sub to_debug_trace {
-    my $cb = shift;
+    my ($cb) = @ARG;
 
     my $trace = Devel::StackTrace->new(%TRACE_PARAMS);
 
@@ -153,22 +156,32 @@ sub to_debug_trace {
     return send_to_output($msg);
 }
 
-sub send_to_output {
-    my $msg = shift;
-
-    return unless $HANDLE;
+sub to_debug_truncate {
+    return if !$HANDLE;
 
     flock $HANDLE, LOCK_EX;
-    $HANDLE->print($msg) or croak(sprintf q{Can't write to output: %s}, $OS_ERROR);
+    truncate $HANDLE, 0;
+    flock $HANDLE, LOCK_UN;
+
+    return 1;
+}
+
+sub send_to_output {
+    my ($msg) = @ARG;
+
+    return if !$HANDLE;
+
+    flock $HANDLE, LOCK_EX;
+    $HANDLE->print($msg) || croak( q{Can't write to output: } . $OS_ERROR );
     flock $HANDLE, LOCK_UN;
 
     return 1;
 }
 
 sub resolve_subroutine_name {
-    my $subroutine = shift;
+    my ($subroutine) = @ARG;
 
-    return unless defined $subroutine;
+    return if !defined $subroutine;
 
     my ($subroutine_name) = $subroutine =~ m{::(\w+)$}x;
 
@@ -185,7 +198,7 @@ JIP::Debug - provides a convenient way to attach debug print statements anywhere
 
 =head1 VERSION
 
-This document describes C<JIP::Debug> version C<0.021>.
+This document describes C<JIP::Debug> version C<0.031>.
 
 =head1 SYNOPSIS
 
@@ -293,6 +306,12 @@ $JIP::Debug::DUMPER_SORTKEYS = 1 I<or> $Data::Dumper::Sortkeys = 1
 
 Hash keys are dumped in sorted order.
 
+=item *
+
+$JIP::Debug::DUMPER_TRAILING_COMMA = 1 I<or> $Data::Dumper::Trailingcomma = 1
+
+Controls whether a comma is added after the last element of an array or hash.
+
 =back
 
 =head2 to_debug_raw(I<[STRING]>)
@@ -322,15 +341,20 @@ called at this particular line.
 
 This function takes an optional argument C<callback>:
 
-    to_debug_count('label', sub {
-        my ($label, $count) = @_;
-    });
+    to_debug_count(
+        'label',
+        sub {
+            my ( $label, $count ) = @_;
+        },
+    );
 
 or
 
-    to_debug_count(sub {
-        my ($label, $count) = @_;
-    });
+    to_debug_count(
+        sub {
+            my ( $label, $count ) = @_;
+        },
+    );
 
 =head2 to_debug_trace(I<[CODE]>)
 
@@ -338,13 +362,26 @@ Logs a stack trace from the point where the method was called.
 
 This function takes an optional argument C<callback>:
 
-    to_debug_trace(sub {
-        my ($trace) = @_;
-    });
+    to_debug_trace(
+        sub {
+            my ($trace) = @_;
+        },
+    );
+
+=head2 to_debug_truncate()
+
+Truncates the file opened on C<$JIP::Debug::HANDLE>. In fact it's just a wrapper for the built-in function C<truncate>.
 
 =head1 CODE SNIPPET
 
-    use JIP::Debug qw(to_debug to_debug_raw to_debug_empty to_debug_count to_debug_trace);
+    use JIP::Debug qw(
+        to_debug
+        to_debug_raw
+        to_debug_empty
+        to_debug_count
+        to_debug_trace
+        to_debug_truncate
+    );
     BEGIN { $JIP::Debug::HANDLE = IO::File->new('/home/my_dir/debug.log', '>>'); }
 
 =head1 DIAGNOSTICS
@@ -361,11 +398,11 @@ L<Debuggit>, L<Debug::Simple>, L<Debug::Easy>
 
 =head1 AUTHOR
 
-Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
+Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Vladimir Zhavoronkov.
+Copyright 2018 Volodymyr Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use feature ':5.36';
 
-our $VERSION = '1.1.1'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 # ABSTRACT: pragma for Sietima modules
 
 
@@ -31,7 +31,7 @@ Sietima::Policy - pragma for Sietima modules
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 SYNOPSIS
 

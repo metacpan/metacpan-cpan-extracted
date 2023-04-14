@@ -1,0 +1,112 @@
+=head1 NAME
+
+Unicode and ODF::lpOD
+
+=head1 SYNOPSIS
+
+  use ODF::lpOD_Helper ':chars';  # or qw/:chars :DEFAULT/
+  use feature 'unicode_strings';
+
+=head1 DISCUSSION
+
+The usual Perl paradigm is to *decode* character data immediately upon
+receipt from an external source, process the data as Perl character
+strings without concern for encoding,
+and finally *encode* results just before sending them out.
+Often this can be done automatically by calling
+C<open> or C<binmode> with an ":encoding()" specification.
+
+For historical reasons
+ODF::lpOD is incompatible with the above paradigm by default
+because it's methods always encode result strings (e.g. into UTF-8)
+before returning them to you, and attempts to decode strings you pass in before
+using them.  Therefore, by default,
+you must work with binary rather than character strings;
+regex match, substr(), length(), etc. will not do what you want
+with non-ASCII characters
+(ASCII slides by because C<encode> and C<decode> are essentially no-ops
+for those characters).
+
+B<< use ODF::lpOD_Helper ':chars'; >>
+disables ODF::lpOD's internal encoding and decoding,
+so that methods speak and listen in characters, not octets.
+
+It is possible to toggle between the old behavior and character-string
+mode:
+I<< set_input/output_charset() >> (see C<ODF::lpOD::Common>)
+will re-enable implicit decoding/encoding of method arguments
+if the B<:chars> tag was imported.
+And I<< lpod->Huse_character_strings() >> will disable the old behavior
+and restore B<:chars> mode.
+
+Additionally, you should B<< use feature 'unicode_strings'; >> to
+disable legacy Perl behavior which might not treat character strings
+properly (see 'unicode_strings' in 'perldoc feature').
+
+=head1 WHAT DOES THIS MEAN?
+
+If the above discussion is bewildering, you are not alone;
+but understanding Perl character hadling
+is essential to making your programs work around the world.
+
+The official documentation is 'man perlunicode' and 'man perlunitut' and
+all their references.  Those docs include some Perl internals
+and compatibility with pre-Unicode scripts.
+They can be daunting on first read.
+
+So here is yet another overview of the subject:
+
+=over
+
+A I<character> is an abstract thing defined only by it's Unicode code point,
+which is a number between 0 and 1,114,112.
+Obviously Perl must represent characters somehow in memory, but you 
+do not care how because Perl *character* strings behave as a sequence
+of those abstract entities called characters, each of length 1, 
+regardless of their internal representation.  
+Internally, Perl represents some characters as a single byte (aka octet)
+and some as multiple bytes, 
+but this is invisible to Perl code.
+
+The ONLY time your program must know how characters are stored
+is when communicating with the world outside of Perl.
+When reading input, your program uses C<decode> to convert 
+from the external representation (which you specify) to Perl's internal
+representation (which you don't know); and you use C<encode> when
+writing to disk or network to convert from Perl's internal rep to
+the appropriate external representation (which you specify).  The
+C<encoding(...)> option to C<open> and C<binmode> make Perl's I/O system
+do the encode or decode for you. 
+
+Encoded data (the "external representation") is stored by Perl in "binary"
+strings, which behave as a sequence of octets instead of abstract characters.
+Operations like C<length()> and C<substr()> count octets individually.
+Internally, Perl keeps track of which strings hold binary data[*] and makes
+those strings behave this way.
+
+The difference is that with *character* strings, the octets actually stored 
+are determined by Perl using its internal system which you don't know; 
+the individual octets are not accessible except via back doors.
+
+Before Perl implemented Unicode all strings were "binary", which was okay
+because all characters were represented as single bytes using Latin-1 encoding.
+Nowadays there are two species of strings, and they must be kept separate.
+Inter-species marriage (for example concatenation) will yield wrong results.
+
+By the way, encode and decode are very fast when the UTF-8 encoding is used
+because Perl often (but not always) uses UTF-8 as it's internal representation 
+and in that case there's nothing to do.  
+However you still must perform the encode & decode operations so 
+that Perl will know which strings represent abstract characters
+and which represent binary octets.
+
+=back
+
+[*] Perl actually does the oppposite: It keeps track of which strings
+contain characters which might have multi-byte representations,
+and therefore operations like C<length()> etc. can not just count octets.
+All other strings use the "binary" behavior, which is correct for actual
+binary as well as characters which Perl represents as single octets.
+For detsils, see "UTF8 flag" in C<perlunifaq>.
+
+=cut

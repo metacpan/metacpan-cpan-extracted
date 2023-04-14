@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Mnet::T;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 # functions with quiet pragma option
 Mnet::T::test_perl({
@@ -111,15 +111,15 @@ Mnet::T::test_perl({
     perl-eof
     filter  => 'grep -v ^err',
     expect  => <<'    expect-eof',
-        ERR - main perl warn, warn eval
-        ERR - main perl warn, warn command
-        ERR - main perl die, die command
+        warn eval
+        warn command
+        die command
     expect-eof
 });
 
-# stdout/stederr with quiet pragma
+# stdout/stderr with quiet pragma
 Mnet::T::test_perl({
-    name    => 'stdout/stederr with quiet pragma',
+    name    => 'stdout/stderr with quiet pragma',
     perl    => <<'    perl-eof',
         use warnings;
         use strict;
@@ -132,6 +132,28 @@ Mnet::T::test_perl({
     expect  => <<'    expect-eof',
         stdout
         stderr
+    expect-eof
+});
+
+# --silent overriding quiet pragma
+Mnet::T::test_perl({
+    name    => '--silent overriding quiet pragma',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log qw( DEBUG INFO WARN FATAL );
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        use Mnet::Opts::Set::Debug;
+        use Mnet::Opts::Set::Quiet;
+        my $cli = Mnet::Opts::Cli->new;
+        DEBUG("debug");
+        INFO("info");
+        WARN("warn");
+        FATAL("fatal");
+    perl-eof
+    args    => '--silent',
+    expect  => <<'    expect-eof',
     expect-eof
 });
 

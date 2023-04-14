@@ -3027,11 +3027,11 @@ $test->for('example', 1, 'payment_card_expiration', sub {
   ok $result->isa('Faker');
   ok $result->random->reseed($seed);
   my $payment_card_expiration = $result->payment_card_expiration;
-  is $payment_card_expiration, "02/24";
+  is $payment_card_expiration, "02/25";
   ok $payment_card_expiration = $result->payment_card_expiration;
-  is $payment_card_expiration, "11/23";
+  is $payment_card_expiration, "11/24";
   ok $payment_card_expiration = $result->payment_card_expiration;
-  is $payment_card_expiration, "09/24";
+  is $payment_card_expiration, "09/25";
 
   $payment_card_expiration
 });
@@ -4194,6 +4194,19 @@ $test->for('example', 1, 'caching-feature', sub {
 Awncorp, C<awncorp@cpan.org>
 
 =cut
+
+$test->for('authors');
+
+=license
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut
+
+$test->for('license');
 
 # END
 

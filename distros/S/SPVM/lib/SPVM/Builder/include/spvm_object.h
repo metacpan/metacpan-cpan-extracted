@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #ifndef SPVM_OBJECT_H
 #define SPVM_OBJECT_H
 
@@ -16,9 +19,7 @@ struct spvm_object {
 };
 
 enum {
-  SPVM_OBJECT_C_FLAG_HAS_DESTRUCTOR = 1,
-  SPVM_OBJECT_C_FLAG_IS_READ_ONLY = 2,
-  SPVM_OBJECT_C_FLAG_POINTER_NO_NEED_FREE = 4,
+  SPVM_OBJECT_C_FLAG_IS_READ_ONLY = 1,
 };
 
 #endif

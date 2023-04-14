@@ -14,15 +14,16 @@ my %RE = %Regexp::Pattern::License::RE;
 
 my $any           = '[A-Za-z_][A-Za-z0-9_]*';
 my $str           = '[A-Za-z][A-Za-z0-9_]*';
+my $re_prop_begin = qr/\A(?'prop'$str)\.alt/x;
 my $re_prop_attrs = qr/
-	\A(?'prop'$str)\.alt(?:
+	\G(?:
 		\.org\.(?'org'$str)|
 		\.version\.(?'version'$str)|
 		\.since\.date_(?'since_date'\d{8})|
 		\.until\.date_(?'until_date'\d{8})|
 		\.synth\.$any|
 		(?'other'\.$any)
-	)*\z/x;
+	)/x;
 
 sub license_org_metadata
 {
@@ -68,28 +69,36 @@ sub get_org_props
 	my ( @main, @extra, $skipcount );
 
 	for ( keys %{ $RE{$key} } ) {
-		/$re_prop_attrs/;
-		next unless $+{prop} and $+{prop} eq $prop;
-		next unless $+{org}  and $+{org} eq $org;
-		next if $+{version};
-		if ( $+{since_date} ) {
-			if ( defined $date and 1 < $date and $date < $+{since_date} ) {
-				$skipcount++ unless $+{other};
+		my %props;
+		if (m/$re_prop_begin/g) {
+			%props = %+;
+			while (m/$re_prop_attrs/g) {
+				$props{$_} = $+{$_} for keys %+;
+			}
+		}
+
+		next unless $props{prop} and $props{prop} eq $prop;
+		next unless $props{org}  and $props{org} eq $org;
+		next if $props{version};
+		if ( $props{since_date} ) {
+			if ( defined $date and 1 < $date and $date < $props{since_date} )
+			{
+				$skipcount++ unless $props{other};
 				next;
 			}
 		}
-		if ( $+{until_date} ) {
-			if ( not defined $date or $+{until_date} <= $date ) {
-				$skipcount++ unless $+{other};
+		if ( $props{until_date} ) {
+			if ( not defined $date or $props{until_date} <= $date ) {
+				$skipcount++ unless $props{other};
 				next;
 			}
 		}
 		elsif ( defined $date and $date == 0 ) {
-			$skipcount++ unless $+{other};
+			$skipcount++ unless $props{other};
 			next;
 		}
 
-		if ( $+{other} ) {
+		if ( $props{other} ) {
 			push @extra, $RE{$key}{$_};
 		}
 		else {

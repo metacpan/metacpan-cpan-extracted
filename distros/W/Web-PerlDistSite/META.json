@@ -1,0 +1,147 @@
+{
+   "abstract" : "generate fairly flashy websites for CPAN distributions",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Web-PerlDistSite",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Colouring::In" : "0",
+            "Data::Section" : "0",
+            "Exporter::Almighty" : "0",
+            "HTML::HTML5::Entities" : "0",
+            "HTML::HTML5::Parser" : "0",
+            "HTML::HTML5::Sanity" : "0",
+            "HTML::HTML5::Writer" : "0",
+            "Lingua::EN::Titlecase" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Find" : "0",
+            "Pod::POM" : "0",
+            "TOBYINK::Pod::HTML" : "0",
+            "Text::Markdown" : "0",
+            "Type::Params" : "0",
+            "Types::Common" : "0",
+            "URI::Escape" : "0",
+            "XML::LibXML::PrettyPrint" : "0",
+            "YAML::PP" : "0",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Web::PerlDistSite" : {
+         "file" : "lib/Web/PerlDistSite.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::Common" : {
+         "file" : "lib/Web/PerlDistSite/Common.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::Compile" : {
+         "file" : "lib/Web/PerlDistSite/Compile.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::Component" : {
+         "file" : "lib/Web/PerlDistSite/Component.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::Component::LayoutScss" : {
+         "file" : "lib/Web/PerlDistSite/Component/LayoutScss.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::Component::MainScss" : {
+         "file" : "lib/Web/PerlDistSite/Component/MainScss.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem::Divider" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem/Divider.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem::File" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem/File.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem::Homepage" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem/Homepage.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem::MarkdownFile" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem/MarkdownFile.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem::Pod" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem/Pod.pm",
+         "version" : "0.001010"
+      },
+      "Web::PerlDistSite::MenuItem::PodFile" : {
+         "file" : "lib/Web/PerlDistSite/MenuItem/PodFile.pm",
+         "version" : "0.001010"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-web-perldistsite/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Web-PerlDistSite",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-web-perldistsite.git",
+         "web" : "https://github.com/tobyink/p5-web-perldistsite"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/project"
+   },
+   "version" : "0.001010",
+   "x_serialization_backend" : "JSON::PP version 4.09",
+   "x_static_install" : 1
+}

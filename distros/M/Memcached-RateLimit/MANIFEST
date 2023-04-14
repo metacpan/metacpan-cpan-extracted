@@ -9,7 +9,6 @@ Makefile.PL
 README
 author.yml
 dist.ini
-ffi/Cargo.lock
 ffi/Cargo.toml
 ffi/src/lib.rs
 lib/Memcached/RateLimit.pm

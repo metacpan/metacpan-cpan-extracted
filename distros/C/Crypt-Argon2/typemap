@@ -1,0 +1,5 @@
+enum Argon2_type T_ARGON2_TYPE
+
+INPUT
+T_ARGON2_TYPE
+	$var = get_argon2_type($arg);

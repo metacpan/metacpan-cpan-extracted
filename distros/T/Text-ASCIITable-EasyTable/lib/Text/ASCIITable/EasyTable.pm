@@ -11,18 +11,41 @@ use Text::ASCIITable;
 
 use parent qw(Exporter);
 
-our @EXPORT = qw(easy_table); ## no critic (ProhibitAutomaticExportation)
+our @EXPORT = qw(easy_table);  ## no critic (ProhibitAutomaticExportation)
 
-our $VERSION = '1.002';
-
-########################################################################
-sub is_array { push @_, 'ARRAY'; goto &_is_type; }
-sub is_hash  { push @_, 'HASH';  goto &_is_type; }
-########################################################################
+our $VERSION = '1.003';
 
 ########################################################################
-sub _is_type { return ref $_[0] && reftype( $_[0] ) eq $_[1]; }
+{
+  ## no critic (RequireArgUnpacking)
+
+  sub is_array { push @_, 'ARRAY'; goto &_is_type; }
+  sub is_hash  { push @_, 'HASH';  goto &_is_type; }
+  sub _is_type { return ref $_[0] && reftype( $_[0] ) eq $_[1]; }
+}
 ########################################################################
+
+########################################################################
+sub uncamel {
+########################################################################
+  my ($str) = @_;
+
+  while ( $str =~ s/^(.)(.*?)([[:upper:]])/\l$1$2_\l$3/xsmg ) { }
+
+  return $str;
+}
+
+########################################################################
+sub wordify {
+########################################################################
+  my ($str) = @_;
+
+  $str = uncamel($str);
+
+  $str =~ s/_(.)/ \u$1/xsmg;
+
+  return ucfirst $str;
+}
 
 ########################################################################
 sub easy_table {
@@ -87,7 +110,13 @@ sub _render_table {
 
   my $t = Text::ASCIITable->new($table_options);
 
-  $t->setCols( @{ $options{columns} } );
+  my @columns = @{ $options{columns} };
+
+  if ( $options{fix_headings} ) {
+    @columns = map { wordify $_ } @columns;
+  }
+
+  $t->setCols(@columns);
 
   for ( @{ $options{data} } ) {
     $t->addRow( @{$_} );
@@ -180,14 +209,14 @@ Text::ASCIITable::EasyTable - create ASCII tables from an array of hashes
  print easy_table(
    data          => $data,
    rows          => $rows,
-   table_options => { headerText => 'My Easy Table' },
+   table_options => { headingText => 'My Easy Table' },
  );
 
  # easier 
  print easy_table(
    data          => $data,
    columns       => [ sort keys %{ $data->[0] } ],
-   table_options => { headerText => 'My Easy Table' },
+   table_options => { headingText => 'My Easy Table' },
  );
  
  # easiest 
@@ -322,6 +351,20 @@ be efficient when larger data sets are used.>
 =item max_rows
 
 Maximum number of rows to render.
+
+=item fix_headings
+
+Many data sets will contain hash keys composed of lower case letters
+in what is termed I<snake case> (words separated by '_') or I<camel
+case> (first letter of words in upper case). Set this to true to turn
+snake and camel case into space separated 'ucfirst'ed words.
+
+Example:
+
+ creation_date => Creation Date
+ IsTruncated   => Is Truncated
+
+default: false
 
 =item sort_key
 

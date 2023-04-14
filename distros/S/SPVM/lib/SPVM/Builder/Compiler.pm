@@ -14,14 +14,14 @@ sub compiler {
   }
 }
 
-sub module_dirs {
+sub class_paths {
   my $self = shift;
   if (@_) {
-    $self->{module_dirs} = $_[0];
+    $self->{class_paths} = $_[0];
     return $self;
   }
   else {
-    return $self->{module_dirs};
+    return $self->{class_paths};
   }
 }
 
@@ -57,3 +57,13 @@ sub use {
 }
 
 1;
+
+=head1 Name
+
+SPVM::Builder::Compiler - SPVM Builder Compiler
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

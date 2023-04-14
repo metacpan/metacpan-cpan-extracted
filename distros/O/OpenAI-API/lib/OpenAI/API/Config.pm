@@ -15,6 +15,11 @@ has timeout => ( is => 'rw', isa => Num, default => sub { 60 } );
 has retry   => ( is => 'rw', isa => Int, default => sub { 3 } );
 has sleep   => ( is => 'rw', isa => Num, default => sub { 1 } );
 
+has 'event_loop_class' => (
+    is      => 'ro',
+    default => 'IO::Async::Loop',
+);
+
 1;
 
 __END__
@@ -85,6 +90,26 @@ The number of times to retry a failed API request. This defaults to
 
 The number of seconds to wait between retry attempts. This defaults to
 1 second.
+
+=item * event_loop_class
+
+IO::Async event loop class (if you are doing asynchronous programming).
+
+Default: L<IO::Async::Loop>.
+
+Possible values:
+
+=over
+
+=item * L<IO::Async::Loop::AnyEvent>
+
+=item * L<IO::Async::Loop::Mojo>
+
+=item * L<IO::Async::Loop::POE>
+
+=item * and L<many others|IO::Async#SEE-ALSO>
+
+=back
 
 =back
 

@@ -70,8 +70,7 @@ Set C<imr_sourceaddr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_ad
 
 =head1 Copyright & License
 
-Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+MIT License
 

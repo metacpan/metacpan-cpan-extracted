@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Sys::Socket::Ip_mreq : pointer {
   use Sys::Socket::In_addr;
 

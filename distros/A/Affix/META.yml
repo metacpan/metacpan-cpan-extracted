@@ -5,6 +5,7 @@ author:
   - 'Sanko Robinson <sanko@cpan.org>'
 build_requires:
   Data::Dumper: '0'
+  Devel::CheckBin: '0'
   Math::BigInt: '0'
   Test::More: '0.98'
 configure_requires:
@@ -44,7 +45,7 @@ no_index:
 provides:
   Affix:
     file: lib/Affix.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Attribute::Handlers: '0'
   Config: '0'
@@ -57,7 +58,7 @@ resources:
   bugtracker: https://github.com/sanko/Affix.pm/issues
   homepage: https://github.com/sanko/Affix.pm
   repository: https://github.com/sanko/Affix.pm.git
-version: '0.10'
+version: '0.11'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

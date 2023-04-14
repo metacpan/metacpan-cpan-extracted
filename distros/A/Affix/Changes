@@ -1,5 +1,13 @@
 Revision history for Perl extension Affix.pm
 
+0.11 2023-03-30T02:50:47Z
+
+    - Support for WChar
+    - Rough, basic support for mangled symbols:
+        - Itanium C++ ABI
+        - Rust (legacy)
+    - Expose dcNewCallVM( ... ) size variable
+
 0.10 2023-03-11T04:25:59Z
 
     - Support for ArrayRef[] with dynamic size

@@ -1,57 +1,70 @@
 package SPVM::Resource::SocketUtil;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
 =head1 Name
 
-SPVM::Resource::SocketUtil - The Resource for Socket Utilities
+SPVM::Resource::SocketUtil - Resource for Socket Utilities
 
 =head1 Description
 
-C<SPVM::Resource::SocketUtil> is the L<SPVM>'s C<Resource::SocketUtil> L<resource|SPVM::Document::Resource> for socket utilities.
+SPVM::Resource::SocketUtil is a L<resource|SPVM::Document::Resource> of L<SPVM> for socket utilities.
 
 =head1 Usage
 
-  # MyClass.config
+MyClass.config:
+  
+  my $config = SPVM::Builder::Config->new_c99(file => __FILE__);
+  
   $config->use_resource('Resource::SocketUtil');
+  
+  if ($^O eq 'MSWin32') {
+    $config->add_lib('wsock32', 'ws2_32');
+  }
+  
+  $config;
 
-=head1 Library Dependencies
+MyClass.c:
+  
+  # include "spvm_socket_util.h"
+  
+  int32_t socket_errno = spvm_socket_errno();
 
-On Windows, the C<wsock32> and C<ws2_32> libraries are needed.
+=head1 Language
 
-if ($^O eq 'MSWin32') {
-  $config->add_libs('wsock32', 'ws2_32');
-}
+The C language
 
-=head1 Headers
+=head1 Language Specification
 
-=head2 spvm_socket_util.h
+C99
 
-  #include "spvm_socket_util.h"
+=head1 Required Libraries
 
-=head1 Sources
+=over 2
 
-=head2 spvm_socket_util.c
+=item * C<wsock32> (Only on Windows)
 
-  cc spvm_socket_util.c
+=item * C<ws2_32> (Only on Windows)
 
-=head1 Functions
+=back
 
-=head2 spvm_socket_util.h
+=head1 Header Files
 
-=head3 spvm_socket_errno
+=over 2
 
-  int32_t spvm_socket_errno (void);
+=item * C<spvm_socket_util.h>
 
-=head3 spvm_socket_strerror_string
+=back
 
-  void* spvm_socket_strerror_string (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length);
+=head1 Source Files
 
-=head3 spvm_socket_strerror
+=over 2
 
-  const char* spvm_socket_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length);
+=item * C<spvm_socket_util.c>
+
+=back
 
 =head1 Author
 
@@ -59,8 +72,6 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+Copyright (c) 2023 Yuki Kimoto
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+MIT License

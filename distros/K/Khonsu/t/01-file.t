@@ -18,7 +18,6 @@ $khonsu->add_box(
 	h => 100 
 );
 
-
 $khonsu->add_line(
 	fill_colour => '#000',
 	x => 140, 
@@ -42,7 +41,6 @@ $khonsu->add_pie(
 	rx => 360,
 	ry => 40
 );
-
 
 $khonsu->add_pie(
 	fill_colour => '#fff',
@@ -76,7 +74,6 @@ $khonsu->add_text(
 	w => 100,
 	h => 100,
 );
-
 
 $khonsu->add_text( 
 	text => 'This is a test ' x 24,
@@ -166,6 +163,16 @@ $khonsu->add_page(
 		colour => '#fff'
 	},
 	overflow => 1,
+);
+
+$khonsu->add_page(
+	background => '#fff'
+)->add_image(
+	image => 't/test.png',
+	x => 20,
+	y => 20,
+	w => $khonsu->page->w - 40,
+	h => $khonsu->page->h - 40,
 );
 
 $khonsu->save();

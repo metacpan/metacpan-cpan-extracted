@@ -1,5 +1,15 @@
 Revision history for Crypt-Passphrase
 
+0.015     2023-04-04 15:54:56+02:00 Europe/Amsterdam
+          - Fix compilation issue on perls < 5.22.0
+
+0.014     2023-04-03 16:43:30+02:00 Europe/Amsterdam
+          - Add Crypt::Passphrase::Pepper::Simple
+          - Bump minimum perl to 5.14
+
+0.013     2023-03-29 14:53:58+02:00 Europe/Amsterdam
+          - Add SHA::Base64 and MD5::Base64 validators
+
 0.012     2023-03-22 12:32:01+01:00 Europe/Amsterdam
           - Allow descrypt to not need rehash
 

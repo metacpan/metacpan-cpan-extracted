@@ -47,3 +47,10 @@ The same as Perl L<readlink|https://perldoc.perl.org/functions/readlink> on Wind
   native static method get_readlink_buffer_size : int ($path : string);
 
 Gets the L</"readlink"> needed buffer size.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License
+

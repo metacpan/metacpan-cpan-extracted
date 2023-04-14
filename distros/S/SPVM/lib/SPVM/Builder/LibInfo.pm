@@ -42,36 +42,25 @@ sub static {
   }
 }
 
-sub file_flag {
+sub is_abs {
   my $self = shift;
   if (@_) {
-    $self->{file_flag} = $_[0];
+    $self->{is_abs} = $_[0];
     return $self;
   }
   else {
-    return $self->{file_flag};
+    return $self->{is_abs};
   }
 }
 
-sub config {
+sub static_option_cb {
   my $self = shift;
   if (@_) {
-    $self->{config} = $_[0];
+    $self->{static_option_cb} = $_[0];
     return $self;
   }
   else {
-    return $self->{config};
-  }
-}
-
-sub static_name_cb {
-  my $self = shift;
-  if (@_) {
-    $self->{static_name_cb} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{static_name_cb};
+    return $self->{static_option_cb};
   }
 }
 
@@ -83,55 +72,62 @@ sub new {
 
   bless $self, $class;
   
-  unless (defined $self->static_name_cb) {
-    my $default_static_name_cb = sub {
+  unless (defined $self->static_option_cb) {
+    my $default_static_option_cb = sub {
       my ($self, $name) = @_;
       
       $name = "-Wl,-Bstatic -l$name -Wl,-Bdynamic";
       
       return $name;
     };
-    $self->static_name_cb($default_static_name_cb);
+    $self->static_option_cb($default_static_option_cb);
   }
   
   return $self;
 }
 
 # Instance Methods
-sub to_string {
+sub to_arg {
   my ($self) = @_;
   
-  my $string;
-  if ($self->file_flag) {
+  my $link_command_arg;
+  
+  if ($self->is_abs) {
     if (defined $self->file) {
-      $string = $self->file;
+      $link_command_arg = $self->file;
     }
     else {
-      $string = "";
+      $link_command_arg = "";
     }
   }
   else {
     my $name = $self->name;
     if ($self->static) {
-      $string = $self->static_name_cb->($self, $name);
+      $link_command_arg = $self->static_option_cb->($self, $name);
     }
     else {
-      $string = "-l$name";
+      $link_command_arg = "-l$name";
     }
   }
   
-  return $string;
+  return $link_command_arg;
+}
+
+sub to_string { 
+  my ($self) = @_;
+  
+  return $self->name;
 }
 
 1;
 
-=head1 NAME
+=head1 Name
 
 SPVM::Builder::LibInfo - Library Information
 
-=head1 DESCRIPTION
+=head1 Description
 
-C<SPVM::Builder::LibInfo> is a library file information.
+The SPVM::Builder::LibInfo class has methods to manipulate library information.
 
 =head1 Fields
 
@@ -140,41 +136,51 @@ C<SPVM::Builder::LibInfo> is a library file information.
   my $name = $lib_info->name;
   $lib_info->name($name);
 
-Get and set the library name. C<z>, C<png>, etc.
+Gets and sets the library name.
+
+Examples:
+  
+  $lib_info->name('z');
+  
+  $lib_info->name('png');
 
 =head2 file
 
   my $file = $lib_info->file;
   $lib_info->file($file);
 
-Get and set the library file. C</path/libz.so>, C</path/libpng.a>, etc.
-
-This field has the meaning when L</"file_flag"> is set to a true value.
+Gets and sets the absolute path of the library file like C</path/libz.so>, C</path/libpng.a>.
 
 =head2 static
 
   my $static = $lib_info->static;
   $lib_info->static($static);
 
-Get and set the flag if the library is linked statically such as C<libfoo.a>.
+Gets and sets the flag whether a static library is linked.
 
-The default is a false value.
+Default:
 
-=head2 file_flag
+A false value.
 
-  my $file_flag = $lib_info->file_flag;
-  $lib_info->file_flag($file_flag);
+=head2 is_abs
 
-Get and set the flag if the library is linked by the file path such as C<path/libfoo.so>, not the name such as C<-lfoo>.
+  my $is_abs = $lib_info->is_abs;
+  $lib_info->is_abs($is_abs);
 
-The default is a false value.
+If the C<is_abs> is a true value, the library is linked by the library name like C<-lfoo>.
 
-=head2 static_name_cb
+If it is a false value, the library is linked by the absolute path of the library like C</path/libfoo.so>.
 
-  my $static_name_cb = $lib_info->static_name_cb;
-  $lib_info->static_name_cb($static_name_cb);
+Default:
 
-Get and set the callback for a static link name.
+A false value.
+
+=head2 static_option_cb
+
+  my $static_option_cb = $lib_info->static_option_cb;
+  $lib_info->static_option_cb($static_option_cb);
+
+Gets and sets the callback to create a linker option to link a static library.
 
 Default:
 
@@ -186,16 +192,7 @@ Default:
     return $name;
   };
 
-=head2 config
-
-  my $config = $lib_info->config;
-  $lib_info->config($config);
-
-Get and set the L<config|SPVM::Builder::Config> that is used to link this library.
-
 =head1 Class Methods
-
-The list of class methods.
 
 =head2 new
 
@@ -203,28 +200,43 @@ The list of class methods.
 
 =head1 Instance Methods
 
+=head2 to_arg
+
+  my $link_command_arg = $lib_info->to_arg;
+
+Creates an argument of the link command from the L</"is_abs"> field and L</"static"> field, and returns it.
+
+The following ones are examples of the return value.
+  
+  -lfoo
+  -Wl,-Bstatic -lfoo -Wl,-Bdynamic
+  /path/foo.so
+  /path/foo.a
+
 =head2 to_string
 
-  my $lib = $lib_info->to_string;
+  my $lib_name = $lib_info->to_string;
 
-If L</"file_flag"> is false value and L</"static"> is false value, get the library flag such as C<-lfoo> from L<"/name">.
-
-If L</"file_flag"> is false value and L</"static"> is true value, get the library flag that L<"/static_name_cb"> is performed to L<"/name"> such as C<-Wl,-Bstatic -lfoo -Wl,-Bdynamic>.
-
-If L</"file_flag"> is true value, get the library file path from L<"/file">.
+Returns the L</"name"> field.
 
 =head1 Operators
 
-L<SPVM::BlessedObject::String> overloads the following operators.
+Overloads the following operators.
 
 =head2 bool
 
   my $bool = !!$lib_info;
-  
+
 Always true.
 
 =head2 stringify
 
   my $lib_name = "$lib_info";
-  
-Alias for L</"to_string">.
+
+Alias for the L</"to_string"> method.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

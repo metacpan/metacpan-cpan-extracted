@@ -28,43 +28,43 @@ optional_features: {}
 provides:
   Story::Interact:
     file: lib/Story/Interact.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Analyze:
     file: lib/Story/Interact/Analyze.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Character:
     file: lib/Story/Interact/Character.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Harness:
     file: lib/Story/Interact/Harness.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Harness::Terminal:
     file: lib/Story/Interact/Harness/Terminal.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Harness::Test:
     file: lib/Story/Interact/Harness/Test.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Page:
     file: lib/Story/Interact/Page.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::PageSource:
     file: lib/Story/Interact/PageSource.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::PageSource::DBI:
     file: lib/Story/Interact/PageSource/DBI.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::PageSource::Dir:
     file: lib/Story/Interact/PageSource/Dir.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::PageSource::Waterfall:
     file: lib/Story/Interact/PageSource/Waterfall.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::State:
     file: lib/Story/Interact/State.pm
-    version: '0.001009'
+    version: '0.001010'
   Story::Interact::Syntax:
     file: lib/Story/Interact/Syntax.pm
-    version: '0.001009'
+    version: '0.001010'
 recommends:
   String::Tagged::Markdown: '0'
   String::Tagged::Terminal: '0'
@@ -74,21 +74,23 @@ requires:
   DBI: '0'
   Exporter::Shiny: '0'
   List::Util: '1.54'
+  Module::Runtime: '0'
   Moo: '0'
   Term::Choose: '0'
   Text::Wrap: '0'
   Types::Common: '0'
   Types::Path::Tiny: '0'
+  URI::Query: '0'
   match::simple: '0'
   namespace::clean: '0'
   perl: '5.010001'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Story-Interact/project
   bugtracker: https://github.com/tobyink/p5-story-interact/issues
-  homepage: https://metacpan.org/release/Story-Interact
+  homepage: https://story-interact.xlc.pl/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-story-interact.git
-version: '0.001009'
+version: '0.001010'
 x_provides_scripts:
   story-interact:
     file: bin/story-interact

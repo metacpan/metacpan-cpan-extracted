@@ -27,7 +27,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 our $DEFAULT_ENDPOINT_URL = 'https://arkady.deplide.org/rfidReading';
 
 sub new {
@@ -67,12 +67,13 @@ __END__
 
 =head1 NAME
 
-Deplide::RFID::EPCISSubmitter - Perl extension for blah blah blah
+Deplide::RFID::EPCISSubmitter - Perl extension for submission of EPCIS documents with RFID reading data to Deplide
 
 =head1 SYNOPSIS
 
   use Deplide::RFID::EPCISSubmitter;
-  blah blah blah
+  my $submitter = Deplide::RFID::EPCISSubmitter->new($user, $password, $endpointURL);
+  $submitter->submit($epcisMessage);
 
 =head1 DESCRIPTION
 

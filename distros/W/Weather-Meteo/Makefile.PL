@@ -51,6 +51,7 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
+		'constant' => 0,
 		'Encode' => 0,
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,

@@ -1,3 +1,10 @@
+0.484   2023-01-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli org-to-html-wordpress] Rebuild to tweak Abstract.
+
+
 0.483   2022-10-11  Released-By: PERLANCAR; Urgency: medium
 
         - Add utilities: org-to-ansi-text, org-to-text.

@@ -1,0 +1,1320 @@
+#!/usr/bin/env perl
+# License: Public Domain or CC0
+# See https://creativecommons.org/publicdomain/zero/1.0/
+# The author, Jim Avera (jim.avera at gmail) has waived all copyright and
+# related or neighboring rights.  Attribution is requested but is not required.
+use strict; use warnings FATAL => 'all'; use 5.010;
+
+our $VERSION = '1.004'; # VERSION
+our $DATE = '2023-04-07'; # DATE
+
+######################################################################
+# POD HAS BEEN MOVED TO THE STUB LIBRARY App::diff_spreadsheets.pm
+######################################################################
+
+use strict; use warnings; use feature qw(switch state say);
+use Carp; $Carp::MaxArgNums = 0;
+use Data::Dumper::Interp;
+use File::Basename qw(basename dirname fileparse);
+use File::Path qw(make_path remove_tree);
+use File::Temp qw(tempfile tempdir);
+use File::Copy ();
+use File::Spec::Functions qw(:DEFAULT catpath splitpath splitdir rootdir tmpdir);
+use FindBin qw/$Bin $Script/;
+use Getopt::Long qw/GetOptions/;
+use Guard qw(guard scope_guard);
+use List::Util qw/min max any first/;
+use List::MoreUtils qw/indexes/;
+use Pod::Find qw/pod_where/;
+use Pod::Usage qw/pod2usage/;
+use lib "$ENV{HOME}/lib/perl";
+use Spreadsheet::Edit qw(title2ident);
+use Spreadsheet::Edit::IO qw/convert_spreadsheet 
+             sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
+use Term::ReadKey ();
+sub oops(@) { unshift @_, "oops "; require Carp; goto &Carp::confess; }
+#$SIG{__WARN__} = sub{ Carp::cluck @_ };
+
+sub main::Differ::compile_if_regex(@); #forward
+
+# Replace invalid/undesirable filename characters with underscore
+sub sanitize_filename(_) { local $_ = shift; s/[^-._[:word:]]/_/g; s/_$//; $_ }
+
+use utf8;
+use open ':std', ':locale';
+select STDERR; $| = 1; select STDOUT; $| = 1;
+
+use Encode qw/decode/;
+require PerlIO;
+my ($stdout_encoding) = map{ /encoding\((.+)\)/ ? ($1) : () }
+                        PerlIO::get_layers(*STDOUT);
+sub decoded_readlink(_) {
+  my $r = readlink(shift);
+  defined($r) && defined($stdout_encoding)
+    ? decode($stdout_encoding, $r) : $r
+}
+
+#-------- Get Arguments ---------------
+sub call_pod2usage {
+  confess "bug" if (scalar(@_) % 2) != 0;
+  my %opts = @_;
+  if (! $opts{-msg}) {
+    if (my $podpath = pod_where({-inc => 1},"App::diff_spreadsheets")) {
+      $opts{-input} = $podpath;
+    } else {
+      warn "Could not find App::diff_spreadsheets in \@INC\n",
+           "\@INC:\n", join("\n   ",@INC), "\n";
+    }
+  }
+  pod2usage(\%opts);
+}
+
+=head1 SYNOPSYS
+
+*Could not locate documentation* 
+
+=cut
+
+sub badargs_exit(@) {
+  call_pod2usage(-output => \*STDERR, -exitval => 2, @_);
+}
+
+# We could use Term::Encoding to detect the terminal's encoding
+# but that would create a possibly-undesirable dependency.
+# We just assume UTF-8, which these days is probably correct.
+#my $rightarrow = '->';
+#my $rightarrow = "\N{RIGHTWARDS ARROW}\N{THIN SPACE}";
+#my $rightarrow = "\N{RIGHTWARDS ARROW}\N{NARROW NO-BREAK SPACE}";
+my $rightarrow = "\N{RIGHTWARDS ARROW}\N{HAIR SPACE}";
+
+# 0 or undef to not wrap long lines
+my $maxwidth = do{
+  my $wmsg = ""; # Suppress hard-coded "didn't work" warning from Term::ReadKey 
+  local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
+  my ($width, $height) = Term::ReadKey::GetTerminalSize(*STDOUT);
+  warn $wmsg if $wmsg && $wmsg !~ /did.*n.*work/i;
+  $width // 80
+};
+
+my %opts = (
+  quote_char      => '"',
+  sep_char        => ',',
+  encoding        => 'UTF-8',
+  trunc_title_width => $maxwidth > 60 ? int($maxwidth/3) : 20,
+);
+my $method = "native";
+my @diff_opts;
+my $help;
+
+badargs_exit(-msg => "Usage: $Script file1 file2\n   -h for help") if @ARGV==0;
+Getopt::Long::Configure ("default", "gnu_getopt", "auto_version");
+GetOptions(
+   "always-show-columns=s"     => sub{ push @{$opts{always_show_columns}}, $_[1] },
+   "a|text"                    => sub{ push @diff_opts, "-$_[0]"; },
+   "B|ignore-blank-lines"      => sub{ push @diff_opts, "-$_[0]"; },
+   "b|ignore-space-change"     => sub{ push @diff_opts, "-$_[0]"; },
+   "columns=s"                 => sub{ push @{$opts{columns}}, $_[1] },
+   "c|C|context=i"             => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "debug"                     => sub{ $opts{debug} = $_[1] },
+   "D|ifdef=s"                 => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "d|minimal"                 => sub{ push @diff_opts, "-$_[0]"; },
+   "encoding=s"                => sub{ $opts{encoding} = $_[1] },
+   "e|ed"                      => sub{ push @diff_opts, "-$_[0]"; },
+   "E|ignore-tab-expansion"    => sub{ push @diff_opts, "-$_[0]"; },
+   "F|show-function-line=s"    => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "GTYPE-group-format=s"      => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "hash-func=s"               => sub{ $opts{hash_func} = $_[1] },
+   "hashid-func=s"             => sub{ $opts{hashid_func} = $_[1] },
+   "horizon-lines=s"           => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "h|help"                    => \$help,
+   "id-columns=s"              => sub{ push @{$opts{id_columns}}, $_[1] },
+   "i|ignore-case"             => sub{ push @diff_opts, "-$_[0]"; },
+   "I|ignore-matching-lines=s" => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "keep-temps!"               => sub{ $opts{keep_temps} = $_[1] },
+   "label=s"                   => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "line-format=s"             => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "LTYPE-group-format=s"      => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "l|paginate"                => sub{ push @diff_opts, "-$_[0]"; },
+   "m|method=s"                => \$method,
+   "n|rcs"                     => sub{ push @diff_opts, "-$_[0]"; },
+   "p|show-c-function"         => sub{ push @diff_opts, "-$_[0]"; },
+   "quiet"                     => sub{ $opts{quiet} = $_[1] },
+   "quote-char=s"              => sub{ $opts{quote_char} = $_[1] },
+   "q|brief"                   => sub{ push @diff_opts, "-$_[0]"; },
+   "sep-char=s"                => sub{ $opts{sep_char} = $_[1] },
+   "setup-code=s"              => sub{ $opts{setup_code} = $_[1] },
+   "sheets=s"                  => sub{ push @{$opts{sheet_names}}, $_[1] },
+   "show-empties"              => sub{ $opts{show_empties} = $_[1] },
+   "speed-large-files"         => sub{ push @diff_opts, "-$_[0]"; },
+   "strip-trailing-cr"         => sub{ push @diff_opts, "-$_[0]"; },
+   "suppress-common-lines"     => sub{ $opts{suppress_common_lines} = 1;
+                                       push @diff_opts, "-$_[0]"; },
+   "s|report-identical-files"  => sub{ push @diff_opts, "-$_[0]"; },
+   "tabsize=i"                 => sub{ push @diff_opts, "-$_[0]", $_[1]; },
+   "title-row=i"               => sub{ $opts{title_row} = $_[1] },
+   "t|expand-tabs"             => sub{ push @diff_opts, "-$_[0]"; },
+   "T|initial-tab"             => sub{ push @diff_opts, "-$_[0]"; },
+   "u|U|unified:i"             => sub{ push @diff_opts, "-$_[0]", $_[1]?($_[1]):(); },
+   "v|verbose"                 => sub{ $opts{verbose} = $_[1] },
+   "w|ignore-all-space"        => sub{ push @diff_opts, "-$_[0]"; },
+   "W|width=i"                 => sub{ $maxwidth = $_[1];
+                                       push @diff_opts, "-$_[0]", $_[1]; },
+   "y|side-by-side"            => sub{ push @diff_opts, "-$_[0]"; },
+   "Z|ignore-trailing-space"   => sub{ $opts{ign_trailing_spaces} = 1;
+                                       push @diff_opts, "-$_[0]"; },
+
+   # Options valid only for 'git diff':
+   "color=s"                   => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
+   "word-diff=s"               => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
+   "word-diff-regex=s"         => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
+   "ws-error-highlight=s"      => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
+) or badargs_exit(-msg => "$Script -h for help");
+
+call_pod2usage(-verbose => 2, -output => \*STDOUT) if $help;
+
+foreach (@diff_opts) { s/^-(\w\w+)/--$1/ }  # change -longopt to --longopt
+
+foreach my $key (qw/columns id_columns always_show_columns sheet_names/) {
+  next unless $opts{$key};
+  @{$opts{$key}} = map{ split/(?<!\\),/ } @{$opts{$key}}
+}
+$opts{verbose} //= $opts{debug};
+
+our ($hash_func_code, $hashid_func_code, $setup_code_code);
+foreach my $argname (qw(hashid-func hash-func setup-code)) {
+  (my $optskey = $argname) =~ s/-/_/g;
+  next unless defined $opts{$optskey};
+  my $source = "package Usercode;" . $opts{$optskey};
+  no strict 'refs';
+  ${"${optskey}_code"} = eval $source;
+  die "Syntax error in Perl code for --$argname option:\n$@" if $@;
+  die "--$argname did not produce a sub ref (got ",u(${"${optskey}_code"}),"\n"
+    unless ref(${"${optskey}_code"}) eq "CODE";
+}
+$hashid_func_code //= sub{ Carp::cluck "bug" if grep{! defined} @{$_[0]}; join ",", @{$_[0]} };
+$hash_func_code   //= sub{ Carp::cluck "bug" if grep{! defined} @{$_[0]}; join ",", @{$_[0]} };
+$setup_code_code  //= sub{};
+
+badargs_exit(-msg => "Two files must be specified") if @ARGV != 2;
+$opts{origpath1} = $ARGV[0];
+$opts{origpath2} = $ARGV[1];
+
+if ($opts{keep_temps}) {
+  my $dir = File::Spec->catfile(tmpdir(), "dstmp");  # /tmp/dstmp
+  remove_tree($dir);
+  mkdir $dir or die "mkdir $dir : $!";
+  warn "> Created ",qsh($dir),"\n";
+  $opts{tempdir} = $dir;
+} else {
+  $opts{tempdir} = tempdir("diffspread_XXXXX", DIR=>tmpdir(), CLEANUP=>1);
+}
+
+# Extract the possibly-multiple "sheets" from each spreadsheet into
+# separate .csv files and process the corresponding pairs.
+# If a specific sheet was specified, then only that sheet will be extracted.
+foreach my $N (1,2) {
+  my $origpath = $opts{"origpath$N"};
+  if (defined(sheetname_from_spec($origpath))) {
+    die "--sheets argument not allowed because filename specifies a sheet:\n",
+        "  ", qsh($origpath), "\n"
+      if $opts{sheet_names};
+  }
+  #my $dir = File::Spec->catdir($opts{tempdir},title2ident($origpath));
+  my $dir = File::Spec->catdir($opts{tempdir},"«INFILE$N»");
+  remove_tree $dir; make_path $dir || die;
+  my $h = convert_spreadsheet($origpath, cvt_to=>"csv",
+                                         outpath => $dir, allsheets => 1);
+  $opts{cvt_from} = $h->{cvt_from};
+  if ($h->{cvt_from} =~ /csv/i) {
+    # Input was already a CSV (possibly detected by peeking at actual content).
+    # The "converted" file has a bogus name; use the original path instead.
+    $opts{"csvpaths$N"} = [ $origpath ];
+  } else {
+    opendir(my $dh,$dir) or die;
+    my @csvpaths = sort map{ File::Spec->catdir($dir,$_) }
+                        File::Spec->no_upwards(readdir $dh) ;
+    if (0 and @csvpaths == 1) { ### FIXME WHY IS THIS DISABLED ???
+      # Only one sheet in this file: Rename the csv to just show the
+      # spreadsheet file name without a redundant [sheetname] suffix
+      my $new_tmpfname = File::Spec->catdir($dir, basename($origpath)).".csv";
+      rename $csvpaths[0], $new_tmpfname or die;
+      $opts{"csvpaths$N"} = [ $new_tmpfname ];
+    } else {
+      $opts{"csvpaths$N"} = \@csvpaths;
+    }
+  }
+  my %sheet2csvpath;  # sheetname => csvpath
+  foreach (@{ $opts{"csvpaths$N"} }) {
+    my $sheetname = (fileparse($_, qr/\.csv/i))[0];
+    die if exists $sheet2csvpath{$sheetname};
+    $sheet2csvpath{$sheetname} = $_;
+  };
+  $opts{"sheet2csvpath$N"} = \%sheet2csvpath;
+}
+
+my $onlyone = @{ $opts{"csvpaths1"} } == 1 && @{ $opts{"csvpaths2"} } == 1;
+
+# If --sheets arg(s) were given, diff only pairs of so-named sheets.
+# Otherwise if each file contains only one sheet then diff them regardless
+# of their names, but with a multi-sheet file diff all (and only) pairs of
+# same-named sheets.
+
+my $status = 0;
+$opts{sheetname_header} = "";
+my @pairs;  # { n1 n2 label1 label2 sheetname_header }
+if (@{$opts{sheet_names}//[]}) {
+  # Sheet names were specified; corresponding sheets might have different
+  # names if the user specified a regex.
+  foreach (@{$opts{sheet_names}}) {
+    my $spec = main::Differ::compile_if_regex($_);
+    if (ref($spec)) {
+      my @names1 = grep{ /$spec/s } keys %{ $opts{sheet2csvpath1} };
+      die "$spec matches no sheet name in $opts{origpath1}\n"
+        unless @names1 > 0;
+      die "'$spec' matches multiple sheet names in $opts{origpath1}\n"
+        if @names1 > 1;
+      my @names2 = grep{ /$spec/s } keys %{ $opts{sheet2csvpath2} };
+      die "$spec matches no sheet name in $opts{origpath2}\n"
+        unless @names2 > 0;
+      die "'$spec' matches multiple sheet names in $opts{origpath2}\n"
+        if @names2 > 1;
+      push @pairs, { n1 => $names1[0], n2 => $names2[0],
+                     sheetname_header => $names1[0] eq $names2[0]
+                                 ? "*** sheet ".qsh($names1[0])." ***\n"
+                                 : "*** sheet ".qsh($names1[0])."/".qsh($names2[0])." ***\n"
+                   };
+    } else {
+      die "sheet '$spec' does not exist in $opts{origpath1}\n"
+        unless $opts{sheet2csvpath1}{$spec};
+      die "sheet '$spec' does not exist in $opts{origpath2}\n"
+        unless $opts{sheet2csvpath2}{$spec};
+      push @pairs, { n1 => $spec, n2 => $spec,
+                     sheetname_header => "*** sheet ".qsh($spec)." ***\n" };
+    }
+  }
+}
+elsif ($onlyone) {
+  # User did not specity a sheet name, but there is only one in each file.
+  # Compare them regardless of their names.
+  my ($name1, $bug1) = keys %{ $opts{sheet2csvpath1} }; die "bug1" if $bug1;
+  $opts{path1} = $opts{sheet2csvpath1}{$name1};
+  my ($name2, $bug2) = keys %{ $opts{sheet2csvpath2} }; die "bug2" if $bug2;
+  # set the displayed names to just the spreadsheet paths sans sheetnames.
+  push @pairs, { n1 => $name1, n2 => $name2,
+                 label1 => $opts{origpath1}, label2 => $opts{origpath2} };
+}
+else {
+  # User did not specity which sheets, but there are several
+  foreach my $name (sort keys %{ $opts{sheet2csvpath1} }) {
+    unless ($opts{sheet2csvpath2}{$name}) {
+      say "*** sheet '$name' exists ONLY in ",qsh($opts{origpath1}),"\n";
+      $status = max($status, 2);
+      next;
+    }
+    push @pairs, { n1 => $name, n2 => $name,
+                   sheetname_header => "*** ".qsh($name)." ***\n" };
+  }
+  foreach my $name (sort keys %{ $opts{sheet2csvpath2} }) {
+    unless ($opts{sheet2csvpath1}{$name}) {
+      say "*** sheet '$name' exists ONLY in ",qsh($opts{origpath2}),"\n";
+      $status = max($status, 2);
+      next;
+    }
+  }
+}
+
+foreach my $h (@pairs) {
+  my ($name1, $name2, $label1, $label2, $sheetname_header)
+              = @$h{qw/n1 n2 label1 label2 sheetname_header/};
+  # If no labels provided, default to "/path/to/file.xls[sheetname]"
+  $label1 //= form_spec_with_sheetname($opts{origpath1}, $name1);
+  $label2 //= form_spec_with_sheetname($opts{origpath2}, $name2);
+
+  $opts{path1} = $opts{sheet2csvpath1}{$name1} // die;
+  $opts{path2} = $opts{sheet2csvpath2}{$name2} // die;
+  $opts{label1} = $label1;
+  $opts{label2} = $label2;
+  $opts{sheetname_header} = $sheetname_header // "";
+  $status = max($status, &process_pair);
+}
+
+exit $status;
+
+sub process_pair {
+  # N.B. %opts includes "origpathN" and "pathN" (the latter refers to a csv),
+  # "sheetnameN", and "labelN".
+  # "sheetname_header" is "" or "title...\n" to print before the first diff.
+  # ---- Read data into memory, delete ignored columns, etc. ----
+  my $obj = main::Differ->new( %opts );
+
+  # Set data_source() to a unique human-readable representation of each
+  # sheet.   This is the caller-specified $opts{nameN}, typically
+  # "/path/to/file.xls[sheetname]" or just "/path/to/file",
+  # modified to omit the common ancestor directory parts.
+  my @splits;
+  for my $N (1, 2) {
+    push @splits, [ splitpath($obj->{"label$N"} // oops) ]; # [volume,dirs,fname]
+  }
+  if ($splits[0]->[0] eq $splits[1]->[0]) { # same volume
+    $splits[0]->[0] = $splits[1]->[0] = "";
+    my @dirs1 = File::Spec->splitdir($splits[0]->[1]);
+    my @dirs2 = File::Spec->splitdir($splits[1]->[1]);
+    while (@dirs1 && @dirs2 && $dirs1[0] eq $dirs2[0]) {
+      shift @dirs1; shift @dirs2;
+    }
+    $splits[0]->[1] = catdir(@dirs1);
+    $splits[1]->[1] = catdir(@dirs2);
+  }
+  for my $N (1, 2) {
+    my $i = $N - 1;
+    $obj->{"sheet$N"}->data_source(
+           catpath($splits[$i]->[0], $splits[$i]->[1], $splits[$i]->[2]) );
+  }
+
+  # Preliminary raw comparison
+  PRECHECK: {
+    my $rows1 = $obj->{sheet1}->rows();
+    my $rows2 = $obj->{sheet2}->rows();
+    my $num_cols = $obj->{sheet1}->num_cols();
+    last PRECHECK unless $obj->{sheet2}->num_cols() == $num_cols
+                      && @$rows1 == @$rows2;
+    for my $rx (0..$#$rows1) {
+      my $r1 = $rows1->[$rx];
+      my $r2 = $rows2->[$rx];
+      last PRECHECK if grep{ $r1->[$_] ne $r2->[$_] } 0..($num_cols-1)
+    }
+    warn "> Paired sheets contain identical data, skipping fancier algos\n"
+      if $opts{debug};
+    return 0
+  }
+
+  if ($method ne "native") {
+    foreach my $key (qw/id_columns always_show_columns hashid_func hash_func/) {
+      if ($opts{$key}) {
+        (my $optname = $key) =~ s/_/-/g;
+        die "--${optname} option applies only to the 'native' method\n"
+      }
+    }
+  }
+  if ($method eq "tkdiff" || $method eq "diff") {
+    $obj->compare_using_diff([$method, @diff_opts]);
+    return $obj->exit_status;
+  }
+  elsif ($method eq "git") {
+    $obj->compare_using_diff([qw/git diff --no-index --color-words/, @diff_opts]);
+    return $obj->exit_status;
+  }
+  elsif ($method eq "gitchars") {
+    $obj->compare_using_diff([qw/git diff --no-index --word-diff=color --word-diff-regex=./, @diff_opts]);
+    return $obj->exit_status;
+  }
+  elsif ($method eq "native") {
+    $obj->compare_native();
+    return $obj->exit_status;
+  }
+  else {
+    die "Don't know comparison method '$method'\n";
+  }
+}
+
+
+########################################
+#
+#
+#
+########################################
+package main::Differ;
+
+use Carp;
+use File::Temp qw(tempfile tempdir);
+use List::Util qw(first any min max any sum0);
+use File::Basename qw(basename dirname fileparse);
+use File::Path qw(make_path remove_tree);
+use File::Spec::Functions qw(catpath splitpath splitdir rootdir tmpdir);
+use List::Util qw(min max any first);
+use Spreadsheet::Edit qw(:DEFAULT logmsg cx2let let2cx);
+use Data::Dumper::Interp;
+sub oops(@) { unshift @_, "oops "; require Carp; goto &Carp::confess; }
+
+sub _visualize($);
+sub _title_or_origABC($$);
+
+my $seen = {};
+sub warnonce(@) {
+  my $msg = join "",@_;
+  return if $seen->{$msg}++;
+  warn $msg;
+}
+
+sub cx2origcx($$) {
+  my ($sheet, $currcx) = @_;
+  #  0 1 2 3 [4] [5] 6 7 [8] 9 10  original
+  #  0 1 2 3         4 5     6  7  after deletes
+  my $deleted_cxs = $sheet->attributes->{DELETED_CXS} // confess("bug");
+  my $nskipped = 0;
+  my $oldcx = $currcx;
+  for my $dcx (@$deleted_cxs) {
+    return($currcx + $nskipped) if $dcx >= $oldcx;
+    $oldcx = $dcx;
+    ++$nskipped;
+  }
+  return($currcx + $nskipped);
+}
+sub cx2origlet($$) { cx2let(&cx2origcx) }
+
+sub compile_if_regex(@) { # compile "/.../msix" strings to qr/.../msix
+  my @specs = @_;
+  foreach (@specs) {
+    if (m#^(/.*/[a-z]*)\z|^m([/\[\{\(\<].*)\z#s) {
+      my $regex = eval "qr${1}" // do{
+        $@ =~ s/ at \(eval.*//mg;
+        die "$@ in $_\n";
+      };
+      $_ = $regex
+    }
+  }
+  wantarray ? @specs :
+  @specs==1 ? confess("multiple results") :
+  $specs[0]
+}
+
+sub __truncate($$) {
+  my ($aref, $maxwid) = @_;
+  my $changed;
+  foreach (@$aref) {
+    if (length($_) > $maxwid) {
+      $changed++;
+      # cut before the first actual newline or after visualized newline
+      s/\A.+?(?:\\n|(?=\n))\K.*/.../s;  
+      if (length($_) > $maxwid) {
+        my $numdots = max(3, length($_)-$maxwid);
+        substr($_, $maxwid - $numdots) = ("." x $numdots);
+      }
+      #warn dvis '##TT __truncated $_ (len=',length($_),")\n";
+    }
+  }
+  $changed
+}
+
+sub __visualize($) {
+  local $_ = shift;
+  s/\n/\\n/sg;
+  s/\t/\\t/g;
+  s/([^[:print:]])/ sprintf "\\x{%02x}", ord($1) /eg;
+  if ($opts{ign_leading_spaces}) {
+    s/^( +)//;
+  } else {
+    # make leading spaces visible
+    s/^( +)/"\N{SYMBOL FOR SPACE}" x length($1)/e;
+  }
+  if ($opts{ign_trailing_spaces}) {
+    s/( +)$//;
+  } else {
+    # make trailing spaces visible
+    s/( +)$/"\N{SYMBOL FOR SPACE}" x length($1)/e;
+  }
+  $_
+}
+
+# Read the two files (only one sheet each) into memory and delete
+# columns to be ignored.  In each Spreadsheet::Edit sheet :
+#
+# To find corresponding columns after deleting ignored columns, even if
+# the user specified absolute column letters:
+#
+#  For each in {always_show_columns} and {id_columns} :
+#    alias <uniqueident> to the column and set
+#      $sheet->attributes->{TRACKING}{ spec => [list of <uniqueident>] }
+#      (each might be a regex matching multiple values).
+#
+#  Set attributes->{DELETED_CXS} => [ original cxs ]
+#
+sub new {
+  my $class = shift;
+  my %hash = @_;
+  warn __PACKAGE__,"->new",hvis(%hash),"\n" if $hash{debug};
+
+  #my @sheet_new_opts = ($hash{debug} ? (debug => 1) : (silent => 1)); # no alias warnings
+  my @sheet_new_opts = ($hash{debug} ? (verbose => 1) : (silent => 1)); # no alias warnings
+  my @columns = @{ $hash{columns} // [] }; # copy; will be mutated
+  my $id_columns = $hash{id_columns} // [];
+  my $always_show_columns = $hash{always_show_columns} // $id_columns;
+  my $negated;
+  if (@columns) {
+    $negated = $columns[0] =~ s/^-//;
+    foreach (@columns[1..$#columns]) {
+      die "You can not mix negated and non-negated --columns COLSPECS (",
+          vis("$columns[0]")," and ",vis($_),")\n"
+        unless s/^-// == $negated;
+    }
+  }
+  for my $N (1, 2) {
+    # Read into memory
+    my $path = $hash{"path$N"} // confess "'path$N' option is required";
+    my $sh = Spreadsheet::Edit->new(@sheet_new_opts);
+
+    my $title_row_spec = $hash{title_row}; # TODO: Allow separate specification
+
+    $sh->read_spreadsheet({
+                           use_gnumeric => 1,
+                           quote_char   => $hash{quote_char},
+                           sep_char     => $hash{sep_char},
+                           encoding     => $hash{encoding},
+                           (defined($title_row_spec)
+                             ? $title_row_spec == 0 
+                               ? (title_rx => undef)
+                               : (title_rx => ($title_row_spec-1),
+                                  required => [compile_if_regex
+                                   @$always_show_columns,@$id_columns,@columns],
+                                 )
+                             : () # allow auto-detect if not specified
+                           ),
+                          }, $path
+                         );
+
+    $hash{"sheet$N"} = $sh;
+    $sh->attributes->{ORIG_PATH} = $path;
+  }
+
+  my $ncols = 0;
+  for my $N (1,2) {
+    my $sh = $hash{"sheet$N"};
+
+    $ncols = max($ncols, $sh->num_cols);
+
+    # Create aliases for columns which might move when non-compared
+    # columns are deleted later.  The aliases will automatically track,
+    # relevant when the user specified absolute column letters.
+    # Each <spec> might be a regex which matches multiple columns!
+    my %cx2seq;
+    foreach my $spec (@$always_show_columns, @$id_columns,
+                      @columns ###unnecessary???
+                     ) {
+      my @cxlist = $sh->spectocx(compile_if_regex($spec));
+
+      if (defined(my $prev_aliases = $sh->attributes->{TRACKING}->{ $spec })) {
+        # This same spec was seen before (perhaps in both always-show & id),
+        # and we should have processed what is in @cxlist before.
+        
+        my %seen_cx = map{($_ => 1)} @cxlist; # Sanity check...
+        delete $seen_cx{ $sh->colx->{$_} } for @$prev_aliases;
+        oops if keys %seen_cx;
+      } else {
+        my @aliaslist = 
+                  map { "__origcx${_}_".$cx2seq{$_}++."_".title2ident($spec) } 
+                      @cxlist;
+        $sh->attributes->{TRACKING}->{ $spec } = \@aliaslist;
+        for (0..$#aliaslist) {
+          $sh->alias($aliaslist[$_] => $cxlist[$_]);
+          oops unless $sh->colx->{$aliaslist[$_]} == $cxlist[$_];
+        }
+      }
+    }
+
+    # Remove columns not being compared
+    if (@columns) {
+      my %delete_cxs;
+      if ($negated) {
+        %delete_cxs = map{ $_ => 1 }
+                         $sh->spectocx(compile_if_regex(@columns));
+      } else {
+        %delete_cxs = map{ $_ => 1 } 0..$sh->num_cols-1;
+        delete @delete_cxs{ $sh->spectocx(compile_if_regex(@columns)) };
+      }
+      my @deleted_cxs = sort {$a <=> $b} keys %delete_cxs;
+      warn "negated=",vis($negated),
+           " delete cxs:",avis(@deleted_cxs),
+           " abcs:",avis(map{cx2let} @deleted_cxs),"\n"
+         if $hash{debug};
+      $sh->delete_cols(@deleted_cxs);
+      $sh->attributes->{DELETED_CXS} = \@deleted_cxs;
+    } else {
+      $sh->attributes->{DELETED_CXS} = [];
+    }
+    
+    # Change newline etc. and non-printing to visible escapes
+    $sh->apply_all(sub{
+      foreach (@{ $sh->crow }) {
+        $_ = __visualize($_);
+      }
+    });
+
+    # Truncate overly-long titles
+    if (defined(my $title_row = $sh->title_row)) {
+      if (__truncate($title_row, $hash{trunc_title_width})) {
+        # Is this necessary (or wise) ???
+        $sh->title_rx($sh->title_rx); # re-compute %colx
+      }
+    }
+  }
+  
+  # Append empty columns if needed to make both sheets the same width
+  for my $N (1,2) {
+    my $sh = $hash{"sheet$N"};
+    while ($sh->num_cols < $ncols) { $sh->insert_col('>$', "") }
+  }
+  bless \%hash, $class;
+}
+
+sub _getncols($$) {
+  my ($sh, $rx) = @_;
+  $rx >= ($sh->title_rx//0) ? $sh->attributes->{NUM_DATA_COLS} : $sh->num_cols
+}
+
+sub _title_or_origABC($$) {
+  my ($sh, $cx) = @_;
+  my $titlerow = $sh->title_row;
+  (defined($titlerow) && $titlerow->[$cx] ne "")
+    ? $titlerow->[$cx]
+    : cx2origlet($sh,$cx)
+}
+
+sub _native_output {
+  my ($self, $cxlist1, $cxlist2, $diff, $dumbrun) = @_; oops unless @_==5;
+  my $restricted_keycols = @{$self->{id_columns}} > 0;
+  my $changed;
+  $diff->Reset();
+  while( $diff->Next() ) {
+    my @items1 = $diff->Items(1);
+    my @items2 = $diff->Items(2);
+    if ($diff->Same() && $restricted_keycols) {
+      # Diff looked only at @id_columns and found no changes; there
+      # may be other changes, which we manually detect here.
+      die "bug" unless @items1 == @items2;
+      for my $i (0 .. $#items1) {
+        # Each item is [sheet#, rowref, original_rx]
+        my ($N1, $row1, $rx1) = @{$items1[$i]};
+        my ($N2, $row2, $rx2) = @{$items2[$i]};
+        my $hash1 = $hash_func_code->([@{$row1}[ @$cxlist1 ]], $rx1)
+             // die "ERROR: hash-func returned undef for row ".($rx1+1)." in ".$self->{"sheet$N1"}->data_source()."\n";
+        my $hash2 = $hash_func_code->([@{$row2}[ @$cxlist2 ]], $rx2)
+             // die "ERROR: hash-func returned undef for row ".($rx2+1)." in ".$self->{"sheet$N2"}->data_source()."\n";
+        if ($hash1 ne $hash2) {
+          $self->diff_rows($rx1, $rx2, "--CHANGED", $dumbrun);
+          $changed = 1;
+        } else {
+          #print "NOT-CHANGED: ", fmt_rownum($rx1,$rx2), "\n"
+          #  if $debug && !$dumbrun;
+        }
+      }
+    }
+    next
+      if $diff->Same();
+    $changed = 1;
+
+    if (@items2 == 0) {
+      # A hunk of rows deleted from self->{sheet2}
+      for my $i (0 .. $#items1) {
+        my ($N, $row, $orig_rx) = @{ $items1[$i] };
+        $self->show_row($N, $row, $orig_rx, "--DELETED", $dumbrun);
+      }
+    }
+    elsif (@items1 == 0) {
+      # A hunk of rows added to self->{sheet2}
+      for my $i (0 .. $#items2) {
+        my ($N, $row, $orig_rx) = @{ $items2[$i] };
+        $self->show_row($N, $row, $orig_rx, "--ADDED  ", $dumbrun);
+      }
+    }
+    else {
+      # A range replaced
+      my $lim = min($#items1, $#items2);
+      for my $i (0 .. $lim) {
+        if ($restricted_keycols) {
+          # Did not match in ID columns, so they must be unrelated
+          # records; show as deletes and adds.
+          my ($N1, $row1, $rx1) = @{$items1[$i]};
+          my ($N2, $row2, $rx2) = @{$items2[$i]};
+          $self->show_row($N1, $row1, $rx1, "--Deleted", $dumbrun);
+          $self->show_row($N2, $row2, $rx2, "--Added  ", $dumbrun);
+        } else {
+          my (undef, undef, $rx1) = @{$items1[$i]};
+          my (undef, undef, $rx2) = @{$items2[$i]};
+          $self->diff_rows($rx1, $rx2, "--Changed", $dumbrun)
+        }
+      }
+      for my $i ($lim+1 .. $#items1) {
+        my ($N1, $row1, $rx1) = @{$items1[$i]};
+        oops unless $N1==1;
+        $self->show_row(1, $row1, $rx1, "--Deleted*", $dumbrun);
+      }
+      for my $i ($lim+1 .. $#items2) {
+        my ($N2, $row2, $rx2) = @{$items2[$i]};
+        oops unless $N2==2;
+        $self->show_row(2, $row2, $rx2, "--Added* ", $dumbrun);
+      }
+    }
+  }
+  return $changed
+}
+
+sub compare_native {
+  my $self = shift;
+  require Algorithm::Diff;
+
+  for my $N (1, 2) {
+    my $sh = $self->{"sheet$N"};
+    # Determine widest row in rows not preceeding title row (if any).
+    # Empty cells on the right end of a row are ignored for this purpose.
+    my $ndcols = 0;
+    my $title_rx = $sh->title_rx;
+    $sh->apply_all(sub{
+      return if defined($title_rx) && $sh->rx < $title_rx;
+      my $n = $sh->num_cols;
+      while ($n > 0 && $sh->crow->[$n-1] eq "") { --$n }
+      $ndcols = max($ndcols, $n);
+    });
+    $sh->attributes->{NUM_DATA_COLS} = $ndcols;
+
+    # Translate --always-show and --id columns to cx values for each sheet
+    foreach(['always_show_columns','ALWAYS_SHOW'],
+            ['id_columns','ID_CXS']) {
+      my ($option_key, $attr_key) = @$_;
+      foreach my $spec (@{$self->{$option_key}}) {
+        my $identlist = $sh->attributes->{TRACKING}->{ $spec } // confess;
+        foreach (@$identlist) {
+          my $cx = $sh->colx->{$_}
+            // die "Can not use ignored column '$_' ($spec) for $option_key",
+                   " (",$sh->data_source,")\n";
+
+          $sh->attributes->{$attr_key}->{$cx} = 1; # e.g. attributes->{ID_CXS}
+        }
+      }
+    }
+##    $self->preprocess_titles($sh);
+  }
+  local *_titlerow_msg = sub {
+    my $sh = shift;
+    my $rx = $sh->title_rx;
+    defined($rx) ? "--title-row ".($rx+1) : "NO --title-row"
+  };
+  if (!defined($self->{title_row})) {
+    if ($self->{verbose}) {
+      if (u($self->{sheet1}->title_rx) eq u($self->{sheet2}->title_rx)) {
+        warn "> Auto-detected ", _titlerow_msg($self->{sheet1}), " in both\n";
+      } else {
+        warn "> Auto-dtected DIFFERENT title rows:\n";
+        for my $N(1,2) {
+          my $sh = $self->{"sheet$N"};
+          warn ">   ",_titlerow_msg($sh), " in ", $sh->data_source, "\n";
+        }
+      }
+    }
+  } else {
+    confess "bug"
+      ,vis($self->{sheet1}->attributes())
+      if $self->{title_row}==0 && defined( $self->{sheet1}->title_rx );
+  }
+
+  # Find corresponding (possibly-rearranged) columns
+  {
+    my @corresp_titles;
+    my (@unpaired_cxlist1, @unpaired_cxlist2);
+    my (@corresp_cxlist1,   @corresp_cxlist2);
+    my $title_row1 = $self->{sheet1}->title_row;
+    my $title_row2 = $self->{sheet2}->title_row;
+    my $have_titles = defined($title_row1) && defined($title_row2);
+    if ($have_titles) {
+      # (N.B. As of 4/24/16 only both or neither can have titles)
+      for my $cx1 (0 .. ($self->{sheet1}->num_cols-1)) {
+        my $title = $title_row1->[$cx1];
+        if ($title ne "" && defined (my $cx2 = $self->{sheet2}->colx->{$title})) {
+          push @corresp_titles, $title;
+          push @corresp_cxlist1, $cx1;
+          push @corresp_cxlist2, $cx2;
+          say sprintf "%-12s moved from column %s to %s\n",
+                       qsh($title), cx2origlet($self->{sheet1},$cx1),
+                                    cx2origlet($self->{sheet2},$cx2)
+            if $cx1 != $cx2  && !$self->{quiet};
+        } else {
+          push @unpaired_cxlist1, $cx1;
+          say sprintf "Title %-12s in f1.%s has no counterpart in f2\n",
+                       qsh($title), cx2origlet($self->{sheet1},$cx1)
+            if $title ne "" && !$self->{quiet};
+        }
+      }
+      for my $cx2 (0 .. ($self->{sheet2}->num_cols-1)) {
+        my $title = $title_row2->[$cx2];
+        if ($title ne "" && defined (my $cx1 = $self->{sheet1}->colx->{$title})) {
+          if (! any{ $_ == $cx2 } @corresp_cxlist2) {
+            push @corresp_titles, $title;
+            push @corresp_cxlist1, $cx1;
+            push @corresp_cxlist2, $cx2;
+          }
+        } else {
+          push @unpaired_cxlist2, $cx2;
+          say sprintf "Title %-12s in f2.%s has no counterpart in f1\n",
+                       qsh($title), cx2origlet($self->{sheet2},$cx2)
+            if $title ne "" && !$self->{quiet};
+        }
+      }
+    } else {
+      @unpaired_cxlist1 = (0 .. $self->{sheet1}->num_cols-1);
+      @unpaired_cxlist2 = (0 .. $self->{sheet2}->num_cols-1);
+    }
+
+    # Assume un-matched titles *in the same column* correspond
+    # (if no titles, then all columns correspond).
+    # A collective title is synthesized for each pair.
+    my ($i,$j)=(0,0);
+    while ($i <= $#unpaired_cxlist1 && $j <= $#unpaired_cxlist2) {
+      my $cx1 = $unpaired_cxlist1[$i];
+      my $cx2 = $unpaired_cxlist2[$j];
+      if ($cx1 == $cx2) {
+        push @corresp_cxlist1, splice @unpaired_cxlist1, $i, 1;
+        push @corresp_cxlist2, splice @unpaired_cxlist2, $j, 1;
+        my $title = (
+              ($have_titles && ($title_row1->[$cx1] ne "" || $title_row2->[$cx2] ne ""))
+              ? $title_row1->[$cx1]."/".$title_row2->[$cx2]." "
+              : ""  #?? maybe should be A/B
+                    ) . "(".cx2origlet($self->{sheet1},$cx1).")";
+        push @corresp_titles, $title;
+        # redo with same i & j, since we deleted entries from @unpaired_cxlist*
+      } else {
+        if ($cx1 > $cx2) { $j++ } else { $i++ }
+      }
+    }
+###TEMP DEBUG
+{ #append [cx] to titles
+  if ($have_titles) {
+    for my $i (0..$#corresp_titles) {
+      my $cx1 = $corresp_cxlist1[$i];
+      my $cx2 = $corresp_cxlist2[$i];
+      if ($cx1==$cx2) {
+        $corresp_titles[$i] .= "[".cx2let($cx1)."=$cx1]";
+      } else {
+        $corresp_titles[$i] .= "[".cx2let($cx1)."=$cx1/".cx2let($cx2)."=$cx2]";
+      }
+    }
+  }
+}
+    die "bug" unless @corresp_cxlist1 == @corresp_cxlist2;
+    die "bug" unless @corresp_cxlist1 == @corresp_titles;
+#    for my $sh ($self->{sheet1}, $self->{sheet2}) {
+#      $sh->attributes->{CORRESP_TITLES  } = \@corresp_titles;
+#      $sh->attributes->{CORRESP_CXLIST  } = \@corresp_cxlist1;
+#      $sh->attributes->{UNPAIRED_CXLIST } = \@unpaired_cxlist1;
+#    }
+
+    { my $sh1 = $self->{"sheet1"};
+      $sh1->attributes->{CORRESP_TITLES  } = \@corresp_titles;
+      $sh1->attributes->{CORRESP_CXLIST  } = \@corresp_cxlist1;
+      $sh1->attributes->{UNPAIRED_CXLIST } = \@unpaired_cxlist1;
+      my $sh2 = $self->{"sheet2"};
+      $sh2->attributes->{CORRESP_TITLES  } = \@corresp_titles;
+      $sh2->attributes->{CORRESP_CXLIST  } = \@corresp_cxlist2;
+      $sh2->attributes->{UNPAIRED_CXLIST } = \@unpaired_cxlist2;
+    }
+    warn dvis '$have_titles @corresp_titles\n'
+             .'@corresp_cxlist1\n@corresp_cxlist2\n'
+             .'@unpaired_cxlist1\n@unpaired_cxlist2\n'
+      if $opts{debug};
+  }
+
+  my $restricted_keycols = @{$self->{id_columns}} > 0;
+
+  # Corresponding columns
+  my @cxlist1 = ( @{ $self->{sheet1}->attributes->{CORRESP_CXLIST} // [] },
+                  @{ $self->{sheet1}->attributes->{UNPAIRED_CXLIST}     } );
+  my @cxlist2 = ( @{ $self->{sheet2}->attributes->{CORRESP_CXLIST} // [] },
+                  @{ $self->{sheet2}->attributes->{UNPAIRED_CXLIST}     } );
+
+  # Corresponding columns, limited to --id-columns
+  my (@idcxlist1, @idcxlist2);
+  if ($restricted_keycols) {
+    @idcxlist1 = sort {$a <=> $b}
+                 keys %{ $self->{sheet1}->attributes->{ID_CXS} };
+    @idcxlist2 = sort {$a <=> $b}
+                 keys %{ $self->{sheet2}->attributes->{ID_CXS} };
+  } else {
+    @idcxlist1 = @cxlist1;
+    @idcxlist2 = @cxlist2;
+  }
+  my $max_idcxlist_max = max($#idcxlist1, $#idcxlist2);
+  my @idpadding1 = ("") x ($max_idcxlist_max - $#idcxlist1);
+  my @idpadding2 = ("") x ($max_idcxlist_max - $#idcxlist2);
+  if ($self->{debug}) {
+    warn '    titles1=',avis(@{$self->{sheet1}->title_row}),"\n" if $self->{sheet1}->title_row;
+    warn '    titles2=',avis(@{$self->{sheet2}->title_row}),"\n" if $self->{sheet2}->title_row;
+  }
+
+  # Call user-specified global setup code (defaults to nop).
+  # This could edit the Spreadsheet::Edit sheet contents and/or
+  # save information in globals (declared with "our") for later use
+  # by hashid-func or hash-func.  All these user-defined functions
+  # are compiled into package Usercode.
+  $setup_code_code->( $self->{"sheet1"},
+                      $self->{"sheet2"},
+                      \@idcxlist1,
+                      \@idcxlist2,
+                    );
+
+  my $keygen = sub{
+    # Form a hash of values to diff, first from columns we can identify
+    # as corresponding, and then any other columns.  If one file has fewer
+    # columns than the other, the narrower rows are padded with empty strings.
+    my ($N, $row, $orig_rx) = @{ $_[0] };
+    my $sh = $self->{"sheet$N"};
+    my $idcxlist  = ($N==1 ? \@idcxlist1  : \@idcxlist2);
+    my $idpadding = ($N==1 ? \@idpadding1 : \@idpadding2);
+
+    my $s = $hashid_func_code->([@{$row}[ @$idcxlist ], @$idpadding], $orig_rx);
+    $s;
+  };
+
+  # Pre-screen all records, ignoring any for which hashid-func returns
+  # undef, but remembering the original rx values for display to the user.
+  #
+  # Note: An alternate implementation would be to pass the hash strings
+  # directly to Algorithm::Diff with no keyGen for faster Diff operation
+  # (Diff is optimized for this case), remembering original rx values in
+  # a side hash.  However this would double memory usage and performance
+  # probably matters only with very large spreadsheets when conserving memory
+  # is arguably more important than conserving CPU.
+
+  # Two arrays of [sheet#, rowref, original_rx], one for each sheet:
+  my @diffargs = ([], []);
+  foreach my $N (1,2) {
+    my $sh = $self->{"sheet$N"};
+    my $rows = $sh->rows;
+    for (my $rx=0; $rx <= $#$rows; $rx++) {
+      my $row = $rows->[$rx];
+      my $diffitem = [$N, $row, $rx];   # [sheet#, rowref, original_rx]
+      push @{ $diffargs[$N-1] }, $diffitem if defined($keygen->($diffitem));
+    }
+  }
+
+  my $diff = Algorithm::Diff->new(
+    $diffargs[0],
+    $diffargs[1],
+    { keyGen => $keygen }
+  );
+
+  # dumbrun==true to determine the width of the widest displayed title
+  # without actually printing anything
+  $self->{widest_title_width} = 0;
+  my $changed = $self->_native_output(\@cxlist1, \@cxlist2, $diff, 1);
+
+  if ($changed) {
+    print $self->{sheetname_header};  # possibly ""
+    $diff->Reset;
+    my $changed2 = $self->_native_output(\@cxlist1, \@cxlist2, $diff, 0);
+    oops if $changed2 != $changed;
+  }
+  else {
+    if ($opts{debug}) {
+      ###TEMP FIXME remove this after verified
+      $diff->Reset;
+      my $changed2 = $self->_native_output(\@cxlist1, \@cxlist2, $diff, 0);
+      oops if $changed2;
+    }
+  }
+  $self->{exit_status} = ($changed ? 1 : 0);
+}
+
+##sub preprocess_titles {
+##  my ($self, $sh) = @_;
+##
+##  # OLD CRUFT: [Auto-detection is no longer lazy: It happens only when
+##  #   read_spreadsheet is called or (if read_spreadsheet was called with
+##  #   title_rx=>undef) when title_rx is called; so the following is BOGUS!]
+##  #
+##
+##}
+
+# Format a value for display as an indented block.
+# Newlines in the input are already converted to visible "\n".
+# Actual newlines are appended to these markers and indentation
+# inserted before second and subsequent lines.  Quotes are not
+# included in the result.
+# Usage:
+#   printf "%*s: '%s'\n", $twid, $title, fmt_value($valstr,$twid+3);
+sub fmt_value($$) {
+  my ($str, $indent_width) = @_;
+  oops if $str =~ /\n/s;
+  my $indent = " " x ($indent_width);
+  $str =~ s/\\n/\\n\n${indent}/gs;
+  if ($maxwidth) { # fold
+    my $first_mw = $maxwidth - $indent_width;
+    oops "maxwidth $maxwidth is too narrow\nfmw=$first_mw iw=$indent_width <<$str>>" 
+      if $first_mw < 20;  # sanity
+    $str =~ s/\A([^\n]\{$first_mw\})([^\n]+)/$1\n${indent}$2/m;
+    while ($str =~ s/^([^\n]{$maxwidth})([^\n]+)/$1\n${indent}$2/m) { }
+  }
+  $str
+}
+#BEGIN {
+#$maxwidth = 30; for my $w (0..$maxwidth*3) {
+#  my ($i, $NextL) = (0, "A");
+#  my $s = "";
+#  for (0..$w-1) {
+#    my $d = ($i++ % 10);
+#    if ($d==0 && $i > 1) { $d = $NextL++ }
+#    $s .= $d;
+#    if (($_ % 62)==9) { $s .= "\\n" }
+#  }
+#  print "Input : $s\n";
+#  print "Output: ", fmt_value($s,8), "\n";
+#}
+#die "Test exit";
+#}
+
+sub show_cell {
+  my ($self, $title, $v1, $v2, $dumbrun) = @_; oops unless @_ == 5;
+
+  my $widest_title_width = $self->{widest_title_width};
+  if ($dumbrun) {
+
+    # This was wrong bc \n was visualized to \\n and real line-breaks
+    # are not inserted when showing titles (should they be?)
+    #my $mw = max( map{length} ($title =~ /^(.*)/mg) );
+    
+    my $mw = length($title);
+
+    if ($mw > $widest_title_width) {
+      $self->{widest_title_width} = $mw;
+    }
+    return
+  }
+
+  my $twidth = (2+$widest_title_width);  # 2 for indent
+  my $v1str = fmt_value($v1, $twidth+3); # +3 for the ": '"
+  if (! defined $v2) {
+    printf "%*s: '%s'\n", $twidth, $title, $v1str;
+  }
+  elsif ($v1 eq $v2) {
+    printf "%*s: '%s' (unchanged)\n", $twidth, $title, $v1str;
+  }
+  else {
+    my $v2str = fmt_value($v2, $twidth+3);
+    my $v1_nl = 1 + @{[ $v1str =~ /\n/sg ]};
+    my $v2_nl = 1 + @{[ $v2str =~ /\n/sg ]};
+    if ($v2_nl <= 1) {
+      my $s = sprintf "%*s: '%s'", $twidth, $title, $v1str;
+      if ($v2_nl==1
+          && (!$maxwidth
+              || length($s)+4+length($rightarrow)+length($v2str) <= $maxwidth)
+         ) {
+        # COL TITLE: 'old text' -> 'new text' (on one line)
+        $s .= " $rightarrow '$v2str'";
+      }
+      else {
+        #  COL TITLE: 'old text'
+        #          -> 'new text'
+        $s .= sprintf "\n%*s $rightarrow '%s'",
+                      $twidth-length($rightarrow), "",
+                      $v2str;
+      }
+      print $s, "\n";
+    } else {
+      # Long multi-line blocks -- show ala 'diff -u infinity' :
+      #  COL TITLE:  unchanged line
+      #            + added line
+      #            - deleted line
+      #              unchanged line
+      my @lines1 = split /\\n/, $v1;
+      my @lines2 = split /\\n/, $v2;
+      my $diff = Algorithm::Diff->new(\@lines1, \@lines2);
+      my $title_str  = sprintf "%*s:", $twidth, $title;
+      my $indent_str = sprintf "%*s ", $twidth, "";
+      my $pfx = $title_str;
+      while(my $posn = $diff->Next()) {
+        my $d = $diff->Diff;
+        next if $d==0 && $opts{suppress_common_lines};
+        foreach ($diff->Items(1)) {
+          print $pfx, (($d&1) ? "- " : "  "), fmt_value($_, $twidth+3), "\n";
+          $pfx = $indent_str;
+        }
+        next if $d==0; # both lists are the same
+        foreach ($diff->Items(2)) {
+          print $pfx, (($d&2) ? "+ " : "  "), fmt_value($_, $twidth+3), "\n";
+          $pfx = $indent_str;
+        }
+      }
+    }
+  }
+} #show_cell
+sub fmt_rownum($;$) {
+  my ($rx1, $rx2) = @_;
+  my $s = "row ".($rx1+1);
+  $s .= " (row ".($rx2+1)." in 2nd file)" if defined($rx2) && $rx1 != $rx2;
+  $s;
+}
+sub show_row {
+  #my ($self, $N, $rx, $comment, $dumbrun) = @_; oops if @_ != 5;
+  my ($self, $N, $row, $orig_rx, $comment, $dumbrun) = @_; oops if @_ != 6;
+  my $sh = $self->{"sheet$N"};
+  print "$comment ", fmt_rownum($orig_rx), ":\n" unless $dumbrun;
+  local *ABC_label = sub {
+    my $cx = shift;
+    defined($sh->title_rx()) ? "(".cx2origlet($sh,$cx).")" : cx2let($cx);
+  };
+  my $title_rx = $sh->title_rx;
+  my $corresp_titles  = $sh->attributes->{CORRESP_TITLES};
+  my $always_show     = $sh->attributes->{ALWAYS_SHOW};
+  my %notseen = map{ ($_=>1) } (0.._getncols($sh,$orig_rx)-1);
+  my $all_empty = 1;
+
+  for my $show_always_shown (1, 0) { # Show --id-columns etc. first
+    if (defined $corresp_titles) {
+      my $corresp_cxlist = $sh->attributes->{CORRESP_CXLIST};
+      for my $i (0 .. $#$corresp_cxlist) {
+        my $cx = $corresp_cxlist->[$i];
+        next if ((!$always_show->{$cx}) ^ (!$show_always_shown));
+        my $value = $row->[$cx];
+        if ($value ne "" || $self->{show_empties} || $always_show->{ $cx }) {
+          my $label = $orig_rx <= ($title_rx//-1)
+               ? ABC_label($cx) : $corresp_titles->[$i];
+          $self->show_cell($label, $value, undef, $dumbrun);
+          $all_empty = 0;
+        }
+        delete $notseen{$cx};
+      }
+    }
+    for my $cx (@{ $sh->attributes->{UNPAIRED_CXLIST} }) {
+      next if (!!$always_show->{ $cx } ^ !!$show_always_shown);
+      my $value = $row->[$cx];
+      if ($value ne "" || $self->{show_empties} || $always_show->{ $cx }) {
+        $self->show_cell(ABC_label($cx), $value, undef, $dumbrun);
+        $all_empty = 0;
+      }
+      delete $notseen{$cx};
+    }
+  }
+  die dvis 'bug\n  %notseen\n  $sh->attributes()\n ' if %notseen;
+  print "    (empty row)\n" if $all_empty && !$dumbrun;
+}
+sub diff_rows {
+  my ($self, $rx1, $rx2, $comment, $dumbrun) = @_;
+  oops unless @_ == 5;
+  my ($sheet1, $sheet2) = @$self{qw/sheet1 sheet2/};
+  my $headerline = "$comment ".fmt_rownum($rx1,$rx2).":\n";
+  my $header_printed = $dumbrun; #suppress during dumb run
+  my $row1 = $sheet1->[$rx1] // die "BUG: Undef row in sheet1 at rx1=$rx1\n";
+  my $row2 = $sheet2->[$rx2] // die "BUG: Undef row in sheet2 at rx2=$rx2\n";
+  my $ncols1 = _getncols($sheet1, $rx1);
+  my $ncols2 = _getncols($sheet2, $rx2);
+  my %notseen1 = map{ ($_=>1) } (0..$ncols1-1);
+  my %notseen2 = map{ ($_=>1) } (0..$ncols2-1);
+
+  my $corresp_titles  = $sheet1->attributes->{CORRESP_TITLES};
+  if (defined $corresp_titles) {
+    my $corresp_cxlist1 = $sheet1->attributes->{CORRESP_CXLIST};
+    my $corresp_cxlist2 = $sheet2->attributes->{CORRESP_CXLIST};
+    for my $show_always_shown (1, 0) { # Show --id-columns etc. first
+      for my $i (0 .. $#$corresp_cxlist1) {
+        my $cx1 = $corresp_cxlist1->[$i];
+        next if ((!$sheet1->attributes->{ALWAYS_SHOW}->{$cx1}) ^ (!$show_always_shown));
+        my $cx2 = $corresp_cxlist2->[$i];
+        delete $notseen1{$cx1};
+        delete $notseen2{$cx2};
+        if (($row1->[$cx1] ne $row2->[$cx2])
+              || $sheet1->attributes->{ALWAYS_SHOW}->{ $cx1 }) {
+          print $headerline unless $header_printed++;
+          $self->show_cell($corresp_titles->[$i], $row1->[$cx1], $row2->[$cx2], $dumbrun);
+        }
+      }
+    }
+  }
+  # "Singleton" columns have no corresponding column in the other sheet.
+  # Show their cells only if not empty because they don't actually represent
+  # different content except where such columns contain something.
+  my $title1_row = $sheet1->title_row;
+  for my $cx1 (@{ $sheet1->attributes->{UNPAIRED_CXLIST} }) {
+    if ((my $content = $row1->[$cx1]) ne "") {
+      print $headerline unless $header_printed++;
+      $self->show_cell("f1."._title_or_origABC($sheet1,$cx1), $content, undef, $dumbrun);
+    }
+    delete $notseen1{$cx1};
+  }
+  my $title2_row = $sheet2->title_row;
+  for my $cx2 (@{ $sheet2->attributes->{UNPAIRED_CXLIST} }) {
+    if ((my $content = $row2->[$cx2]) ne "") {
+      print $headerline unless $header_printed++;
+      $self->show_cell("f2."._title_or_origABC($sheet2,$cx2), $content, undef, $dumbrun);
+    }
+    delete $notseen2{$cx2};
+  }
+  die dvis 'bug $rx1 $rx2 $comment %notseen1 %notseen2\n$sheet1->attributes()\n$sheet2->attributes()'
+    if keys(%notseen1) or keys(%notseen2);
+}
+
+sub compare_using_diff {
+  my ($self, $cmd) = @_;
+  confess "usage: obj->compare_using_diff([command, args...])"
+    unless ref($cmd) eq "ARRAY" && $cmd->[0] =~ /diff|git/i;
+
+#  # With standard diff, we have no way to suppress the header if there are
+#  # no diffs, so always print it (it will be "" if no header is ever
+#  # appropraite).
+#  confess "bug" unless defined $self->{sheetname_header};
+#  print $self->{sheetname_header};
+
+  # Write the possibly-edited-for-visibiliity data to temp .csv files,
+  # and create symlinks to these csv files for using human-friendly names
+  # "labelN" (optionally in subdirs if the labels include "directories").
+  # These are used when running [tk]diff for nice output.
+  # N.B. this is necessary because tkdiff does not support the --label option!
+  # 4/1/23: Ditto for git diff.
+  my $tdirdepth = 0;
+  foreach my $N (1,2) {
+    my $sh = $self->{"sheet$N"};
+    ($self->{"linkrpath$N"} = $sh->data_source()) =~ s/^${ \rootdir() }//;
+    my @dotdots = $self->{"linkrpath$N"} =~ /(?:^|\/)\.\.(?=$|\/)/g;
+    $tdirdepth = max($tdirdepth, $#dotdots+1);
+  }
+  my $tdir = $self->{tempdir} // tempdir(CLEANUP => 1);
+  # If linkrpaths contain .. put them in a sufficiently-deep subdir
+  # that they will still be within our temp directory structure
+  for (1..$tdirdepth) {
+    $tdir = catfile($tdir,"sub");
+    make_path($tdir);
+  }
+
+  foreach my $N (1,2) {
+    $self->{"tmpcsv$N"} = catfile($tdir, "«TEMPCSV$N».csv");
+    $self->{"sheet$N"}->write_csv( $self->{"tmpcsv$N"} );
+  }
+
+  foreach my $N (1,2) {
+    my $sh = $self->{"sheet$N"};
+    (my $rpath = $sh->data_source()) =~ s/^${ \rootdir() }//;
+    $self->{"linkrpath$N"} = $rpath;
+    $self->{"link$N"} = canonpath(
+            catfile(catdir($tdir,dirname($rpath)), basename($rpath)) );
+    warn "### link$N = ",qsh($self->{"link$N"}),
+         " rpath=",qsh($rpath),
+         " linkpath$N = ",qsh($self->{"linkrpath$N"}), "\n" if $self->{debug};
+    make_path( dirname($self->{"link$N"}) );
+    # Arrgh! git diff never follows symlinks
+    if ($cmd->[0] =~ /git/) {
+      File::Copy::copy($self->{"tmpcsv$N"}, $self->{"link$N"})
+        or die "copy ",$self->{"tmpcsv$N"}," ",$self->{"link$N"}," : $!";
+    } else {
+      symlink $self->{"tmpcsv$N"}, $self->{"link$N"}
+        or die "symlink ",$self->{"tmpcsv$N"}," ",$self->{"link$N"}," : $!";
+    }
+  }
+
+  my @cmd = (@$cmd, $self->{"linkrpath1"}, $self->{"linkrpath2"});
+  my $pid = fork;
+  if ($pid == 0) { #CHILD
+    warn "> cd ", qsh($tdir), "\n" if $self->{debug};
+    chdir $tdir or die "chdir $tdir : $!";
+    if ($self->{debug}) {
+      warn ">    : ",qsh($cmd[-2])," -> ",main::decoded_readlink($cmd[-2]),"\n"
+        if -l $cmd[-2];
+      warn ">    : ",qsh($cmd[-1])," -> ",main::decoded_readlink($cmd[-1]),"\n"
+        if -l $cmd[-1];
+      warn "> @cmd\n";
+    }
+    exec @cmd;
+    die "exec failed: $!";
+  }
+  waitpid($pid,0);
+  $self->{exit_status} = (($? >> 8) | ($? & 0xFF));
+}
+
+sub exit_status { $_[0]->{exit_status} }
+
+#(end)

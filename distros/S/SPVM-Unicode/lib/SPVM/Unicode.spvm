@@ -1,9 +1,12 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Unicode : precompile {
   use IntList;
   
-  native static method uchar : int ($str : string, $offset_ref : int*);
+  native static method uchar : int ($string : string, $offset_ref : int*);
   native static method uchar_to_utf8 : string ($uchar : int);
-
+  
   enum {
     ERROR_INVALID_UTF8 = -2,
   }
@@ -21,26 +24,26 @@ class Unicode : precompile {
     return $is_unicode_scalar_value;
   }
  
-  static method utf8_to_utf16 : short[] ($str : string) {
+  static method utf8_to_utf16 : short[] ($string : string) {
     my $pos = 0;
     my $uchars_list = IntList->new_len(0);
-    while ((my $uchar = &uchar($str, \$pos)) >= 0) {
+    while ((my $uchar = &uchar($string, \$pos)) >= 0) {
       $uchars_list->push($uchar);
     }
     
-    unless ($pos >= length $str) {
+    unless ($pos >= length $string) {
       die "Can't convert part of string to utf16";
     }
     
     my $uchars = $uchars_list->to_array;
     
-    my $utf16_chars = &utf32_to_utf16($uchars);
+    my $string_ret = &utf32_to_utf16($uchars);
     
-    return $utf16_chars;
+    return $string_ret;
   }
   
-  static method utf16_to_utf8 : string ($utf16_chars : short[]) {
-    my $uchars = &utf16_to_utf32($utf16_chars);
+  static method utf16_to_utf8 : string ($string : short[]) {
+    my $uchars = &utf16_to_utf32($string);
     
     my $buffer = StringBuffer->new;
     
@@ -50,17 +53,17 @@ class Unicode : precompile {
       $buffer->push($utf8_str);
     }
     
-    my $str = $buffer->to_string;
+    my $string_ret = $buffer->to_string;
     
-    return $str;
+    return $string_ret;
   }
   
-  static method utf32_to_utf16 : short[] ($code_point_string : int[]) {
+  static method utf32_to_utf16 : short[] ($string : int[]) {
     my $length = 0;
     
     # Culcurate length
-    for (my $i = 0; $i < @$code_point_string; $i++) {
-      my $code_point = $code_point_string->[$i];
+    for (my $i = 0; $i < @$string; $i++) {
+      my $code_point = $string->[$i];
 
       if ($code_point < 0 || $code_point > 0x10FFFF) {
         die "Invalid code point in code point string";
@@ -75,68 +78,68 @@ class Unicode : precompile {
     }
     
     # Convert code point to UTF-16
-    my $utf16_string = new short[$length];
+    my $string_ret = new short[$length];
     my $pos = 0;
     
-    for (my $i = 0; $i < @$code_point_string; $i++) {
-      my $code_point = $code_point_string->[$i];
+    for (my $i = 0; $i < @$string; $i++) {
+      my $code_point = $string->[$i];
 
       if ($code_point < 0x10000) {
-        $utf16_string->[$pos] = (short)$code_point;
+        $string_ret->[$pos] = (short)$code_point;
         $pos++;
       }
       else {
-        $utf16_string->[$pos] = (short)(($code_point - 0x10000) / 0x400 + 0xD800);
-        $utf16_string->[$pos + 1] = (short)(($code_point - 0x10000) % 0x400 + 0xDC00);
+        $string_ret->[$pos] = (short)(($code_point - 0x10000) / 0x400 + 0xD800);
+        $string_ret->[$pos + 1] = (short)(($code_point - 0x10000) % 0x400 + 0xDC00);
         $pos += 2;
       }
     }
     
-    return $utf16_string;
+    return $string_ret;
   }
 
-  static method utf16_to_utf32 : int[] ($utf16_string : short[]) {
+  static method utf16_to_utf32 : int[] ($string : short[]) {
 
     my $length = 0;
     
     # Culcurate length
-    for (my $i = 0; $i < @$utf16_string; $i++) {
-      if (&_is_utf16_high_surrogate($utf16_string->[$i] & 0xFFFF)) {
-        if ($i + 1 == @$utf16_string - 1) {
+    for (my $i = 0; $i < @$string; $i++) {
+      if (&_is_utf16_high_surrogate($string->[$i] & 0xFFFF)) {
+        if ($i + 1 == @$string - 1) {
           die "Invalid UTF-16 string";
         }
         else {
           $i++;
-          unless (&_is_utf16_low_surrogate($utf16_string->[$i] & 0xFFFF)) {
+          unless (&_is_utf16_low_surrogate($string->[$i] & 0xFFFF)) {
             die "Invalid UTF-16 string";
           }
         }
       }
-      elsif (&_is_utf16_low_surrogate($utf16_string->[$i] & 0xFFFF)) {
+      elsif (&_is_utf16_low_surrogate($string->[$i] & 0xFFFF)) {
         die "Invalid UTF-16 string";
       }
       $length++;
     }
     
     # Convert UTF-16 to code point
-    my $code_point_string = new int[$length];
+    my $string_ret = new int[$length];
     my $pos = 0;
-    for (my $i = 0; $i < @$utf16_string; $i++) {
-      if (&_is_utf16_high_surrogate($utf16_string->[$i] & 0xFFFF)) {
-        $code_point_string->[$pos] = 0x10000 + (($utf16_string->[$i] & 0xFFFF) - 0xD800) * 0x400 + (($utf16_string->[$i + 1] & 0xFFFF) - 0xDC00);
+    for (my $i = 0; $i < @$string; $i++) {
+      if (&_is_utf16_high_surrogate($string->[$i] & 0xFFFF)) {
+        $string_ret->[$pos] = 0x10000 + (($string->[$i] & 0xFFFF) - 0xD800) * 0x400 + (($string->[$i + 1] & 0xFFFF) - 0xDC00);
         $i++;
       }
       else {
-        $code_point_string->[$pos] = $utf16_string->[$i] & 0xFFFF;
+        $string_ret->[$pos] = $string->[$i] & 0xFFFF;
       }
       $pos++;
     }
     
-    return $code_point_string;
+    return $string_ret;
   }
 
-  private static method _is_utf16_high_surrogate : int ($ch : int) {
-    if ($ch >= 0xD800 && $ch < 0xDC00) {
+  private static method _is_utf16_high_surrogate : int ($char : int) {
+    if ($char >= 0xD800 && $char < 0xDC00) {
       return 1;
     }
     else {
@@ -144,8 +147,8 @@ class Unicode : precompile {
     }
   }
 
-  private static method _is_utf16_low_surrogate : int ($ch : int) {
-    if ($ch >= 0xDC00 && $ch < 0xE000) {
+  private static method _is_utf16_low_surrogate : int ($char : int) {
+    if ($char >= 0xDC00 && $char < 0xE000) {
       return 1;
     }
     else {

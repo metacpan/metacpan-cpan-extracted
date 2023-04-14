@@ -8,7 +8,9 @@ use strict; use warnings FATAL => 'all'; use feature qw/say state/;
 use utf8;
 
 package Spreadsheet::Edit::Preload;
-$Spreadsheet::Edit::Preload::VERSION = '3.003';
+our $VERSION = '3.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-04'; # DATE from Dist::Zilla::Plugin::OurDate
+
 use Carp;
 use Import::Into;
 require Spreadsheet::Edit;

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.68, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -37,6 +37,7 @@
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "URI" : "0",
+            "constant" : "0",
             "perl" : "5.006002"
          }
       },
@@ -67,6 +68,6 @@
          "x_repository" : "https://github.com/nigelhorne/Weather-Meto"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

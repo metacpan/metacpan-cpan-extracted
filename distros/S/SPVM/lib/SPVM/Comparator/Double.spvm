@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Comparator::Double : interface_t {
   required method : int ($a : double, $b : double);
 }

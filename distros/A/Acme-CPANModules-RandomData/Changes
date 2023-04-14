@@ -1,3 +1,18 @@
+0.004   2023-04-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: Text::Lorem.
+
+
+0.003   2023-04-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entries: Faker, Mock::Data, Mock::Populate, Data::Faker,
+          Data::Maker.
+
+        - [ux] Add alias modules for discoverability: AC:GeneratingFakeData,
+          AC:GeneratingMockData, AC:GeneratingRandomData, AC:FakeData,
+          AC:MockData.
+
+
 0.002   2021-06-09  Released-By: PERLANCAR; Urgency: low
 
 	- Fix Abstract.

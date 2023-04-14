@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.157';
+our $VERSION = '0.159';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -143,7 +143,6 @@ sub print_table {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
     }
-
     $self->{tab_w} = $self->{tab_width};
     if ( ! ( $self->{tab_width} % 2 ) ) {
         ++$self->{tab_w};
@@ -398,7 +397,13 @@ sub __copy_table {
                 $str =~ s/\e\[[\d;]*m/\x{feff}/g;
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-                $str = $self->{binary_filter} == 2 ? sprintf("%v02X", $str) =~ tr/./ /r : $self->{binary_string};
+                #$str = $self->{binary_filter} == 2 ? sprintf("%v02X", $str) =~ tr/./ /r : $self->{binary_string};  # perl 5.14
+                if ( $self->{binary_filter} == 2 ) {
+                    ( $str = sprintf("%v02X", $str) ) =~ tr/./ /;
+                }
+                else {
+                    $str = $self->{binary_string};
+                }
             }
             $str =~ s/\t/ /g;
             $str =~ s/\v+/\ \ /g;
@@ -460,9 +465,9 @@ sub __calc_col_width {
                 }
             }
             else {
-                my $width = print_columns( $tbl_copy->[$row][$col] );
-                if ( $width > $w_cols->[$col] ) {
-                    $w_cols->[$col] = $width;
+                my $str_w = print_columns( $tbl_copy->[$row][$col] );
+                if ( $str_w > $w_cols->[$col] ) {
+                    $w_cols->[$col] = $str_w;
                 }
             }
         }
@@ -669,12 +674,12 @@ sub __cols_to_string {
                 }
             }
             else {
-                my $width = print_columns( $tbl_copy->[$row][$col] );
-                if ( $width > $w_cols_calc->[$col] ) {
+                my $str_w = print_columns( $tbl_copy->[$row][$col] );
+                if ( $str_w > $w_cols_calc->[$col] ) {
                     $str = $str . cut_to_printwidth( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
                 }
-                elsif ( $width < $w_cols_calc->[$col] ) {
-                    $str =  $str . $tbl_copy->[$row][$col] . ' ' x ( $w_cols_calc->[$col] - $width );
+                elsif ( $str_w < $w_cols_calc->[$col] ) {
+                    $str =  $str . $tbl_copy->[$row][$col] . ' ' x ( $w_cols_calc->[$col] - $str_w );
                 }
                 else {
                     $str = $str . $tbl_copy->[$row][$col];
@@ -725,13 +730,19 @@ sub __print_single_row {
     for my $col ( 0 .. $#{$tbl_orig->[0]} ) {
         push @$row_data, $separator_row;
         my $key = $tbl_orig->[0][$col] // $self->{undef};
-        if ( $self->{binary_filter} && substr( $key, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-            $key = $self->{binary_filter} == 2 ? sprintf("%v02X", $key) =~ tr/./ /r : $self->{binary_string};
-        }
-        my @color;
+        my @key_color;
         if ( $self->{color} ) {
             $key =~ s/\x{feff}//g;
-            $key =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+            $key =~ s/(\e\[[\d;]*m)/push( @key_color, $1 ) && "\x{feff}"/ge;
+        }
+        if ( $self->{binary_filter} && substr( $key, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
+            #$key = $self->{binary_filter} == 2 ? sprintf("%v02X", $key) =~ tr/./ /r : $self->{binary_string};  # perl 5.14
+            if ( $self->{binary_filter} == 2 ) {
+                ( $key = sprintf("%v02X", $key) ) =~ tr/./ /;
+            }
+            else {
+                $key = $self->{binary_string};
+            }
         }
         $key =~ s/\t/ /g;
         $key =~ s/\v+/\ \ /g;
@@ -743,8 +754,8 @@ sub __print_single_row {
         elsif ( $key_w < $max_key_w ) {
             $key = ( ' ' x ( $max_key_w - $key_w ) ) . $key;
         }
-        if ( @color ) {
-            $key =~ s/\x{feff}/shift @color/ge;
+        if ( @key_color ) {
+            $key =~ s/\x{feff}/shift @key_color/ge;
             $key = $key . "\e[0m";
         }
         my $value = $tbl_orig->[$row][$col];
@@ -754,9 +765,6 @@ sub __print_single_row {
         }
         if ( ref $value ) {
             $value = _handle_reference( $value );
-        }
-        if ( $self->{binary_filter} && substr( $value, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-            $value = $self->{binary_filter} == 2 ? sprintf("%v02X", $value) =~ tr/./ /r : $self->{binary_string};
         }
         if ( $self->{color} ) {
             # color is reset only at the end of a table row
@@ -770,7 +778,7 @@ sub __print_single_row {
         my $subseq_tab = ' ' x ( $max_key_w + $sep_w );
         my $count;
 
-        for my $line ( line_fold( $value, $max_value_w, { join => 0, color => $self->{color} } ) ) {
+        for my $line ( line_fold( $value, $max_value_w, { join => 0, color => $self->{color}, binary_filter => $self->{binary_filter} } ) ) {
             if ( ! $count++ ) {
                 push @$row_data, $key . $separator . $line;
             }
@@ -923,7 +931,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.157
+Version 0.159
 
 =cut
 

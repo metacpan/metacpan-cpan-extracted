@@ -325,9 +325,11 @@ The perl ARGV array is not modified by this module.
 
     # enable silent pragma based on --silent, --help, and --version cli options
     #   this is done so Mnet::Test and Mnet::Log has access to this
+    #   remove quiet pragma if --silent option is set on command line
     #   remove silent pragma if --nosilent option was set on cli
     if ($cli_opts->{silent}
         or defined $cli_opts->{help} or $cli_opts->{version}) {
+        delete $INC{"Mnet/Opts/Set/Quiet.pm"};
         Mnet::Opts::Set::enable("silent");
     } elsif (defined $cli_opts->{silent} and not $cli_opts->{silent}) {
         delete $INC{"Mnet/Opts/Set/Silent.pm"};
@@ -335,8 +337,10 @@ The perl ARGV array is not modified by this module.
 
     # enable quiet pragma based on --quiet cli options
     #   this is done so Mnet::Test and Mnet::Log has access to this
+    #   remove silent pragma if --quiet option is set on command line
     #   remove quiet and silent pragmas if --noquiet option was set on cli
     if ($cli_opts->{quiet}) {
+        delete $INC{"Mnet/Opts/Set/Silent.pm"};
         Mnet::Opts::Set::enable("quiet");
     } elsif (defined $cli_opts->{quiet} and not $cli_opts->{quiet}) {
         delete $INC{"Mnet/Opts/Set/Quiet.pm"};

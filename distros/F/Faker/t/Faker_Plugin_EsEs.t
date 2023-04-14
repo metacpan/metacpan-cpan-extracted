@@ -206,6 +206,15 @@ $test->for('example', 1, 'subclass-feature', sub {
   $result
 });
 
+=partials
+
+t/Faker.t: pdml: authors
+t/Faker.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Faker/Plugin/EsEs.pod') if $ENV{RENDER};

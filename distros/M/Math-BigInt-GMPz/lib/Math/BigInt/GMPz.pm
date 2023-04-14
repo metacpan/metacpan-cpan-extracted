@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0010';
+our $VERSION = '0.0011';
 
 use Math::GMPz 0.36 qw< :mpz >;
 
@@ -177,7 +177,8 @@ sub _pow {
 
 sub _modinv {
     my $bool = Rmpz_invert($_[1], $_[1], $_[2]);
-    return $bool ? ($_[1], '+') : (undef, undef);
+    return $_[1], '+' if $bool;
+    return;
 }
 
 sub _modpow {

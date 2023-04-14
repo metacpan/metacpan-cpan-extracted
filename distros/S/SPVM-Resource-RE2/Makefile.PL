@@ -30,12 +30,12 @@ unless ($meta) {
   }
 }
 
-my %spvm_requires = ('SPVM' => '0.9692');
+my %spvm_requires = ('SPVM' => '0.9701');
 WriteMakefile(
   NAME              => 'SPVM::Resource::RE2',
   VERSION_FROM      => 'lib/SPVM/Resource/RE2.pm',
   PREREQ_PM         => {}, # e.g., Module::Name => 1.1
-  LICENSE           => 'perl_5',
+  LICENSE           => 'mit',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Resource/RE2.pm',
      AUTHOR         => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),

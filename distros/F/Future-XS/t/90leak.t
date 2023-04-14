@@ -49,12 +49,56 @@ no_growth {
 } 'Future::XS->then does not leak';
 
 no_growth {
+   my $fret = ( my $f1 = Future::XS->done )
+      ->then( sub { Future::XS->done } );
+
+   $fret->result;
+} 'Future::XS->then immediate does not leak';
+
+no_growth {
    my $fret = ( my $f1 = Future::XS->new )
       ->else( sub { Future::XS->done } );
 
    $f1->done;
    $fret->result;
 } 'Future::XS->else does not leak';
+
+no_growth {
+   my $fret = ( my $f1 = Future::XS->fail( "oopsie" ) )
+      ->else( sub { Future::XS->done } );
+
+   $fret->result;
+} 'Future::XS->else does not leak';
+
+no_growth {
+   my $fret = ( my $f1 = Future::XS->new )
+      ->followed_by( sub { Future::XS->done } );
+
+   $f1->done;
+   $fret->result;
+} 'Future::XS->followed_by does not leak';
+
+no_growth {
+   my $fret = ( my $f1 = Future::XS->done )
+      ->followed_by( sub { Future::XS->done } );
+
+   $fret->result;
+} 'Future::XS->followed_by immediate does not leak';
+
+no_growth {
+   my $fret = ( my $f1 = Future::XS->new )
+      ->catch( fail => sub { Future::XS->done } );
+
+   $f1->done;
+   $fret->result;
+} 'Future::XS->catch does not leak';
+
+no_growth {
+   my $fret = ( my $f1 = Future::XS->done )
+      ->catch( fail => sub { Future::XS->done } );
+
+   $fret->result;
+} 'Future::XS->catch immediate does not leak';
 
 no_growth {
    Future::XS->wait_all(

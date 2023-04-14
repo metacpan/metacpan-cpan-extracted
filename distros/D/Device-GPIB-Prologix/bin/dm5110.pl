@@ -6,6 +6,7 @@
 # Prints on stdout
 # Caution: for fast response to reads, expects the DM5110 to be configured for LF not EOI
 # Reads as fast as it can unless a -delay is specified.
+# UPDATE: there is a better version of this in Device-GPIB-Tektronix
 
 use Device::GPIB::Prologix;
 use Getopt::Long;
@@ -49,7 +50,7 @@ die "Not a Tek DM5110 at $address: $id"
 $d->send($measure);
 while (1)
 {
-    my $v = $d->read(1);
+    my $v = $d->read();
     print scalar localtime() . ': '
 	if $main::opt_timestamp;
 

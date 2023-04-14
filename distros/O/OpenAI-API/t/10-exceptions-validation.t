@@ -40,11 +40,6 @@ my @test_cases = (
         exception => qr/Missing required arguments: input/,
     },
     {
-        method    => 'chat',
-        params    => {},
-        exception => qr/Missing required arguments: messages/,
-    },
-    {
         method    => 'model_retrieve',
         params    => {},
         exception => qr/Missing required arguments: model/,

@@ -7,7 +7,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Safe::Isa;
 use Ref::Util qw( is_ref is_blessed_ref is_arrayref is_hashref );
@@ -15,7 +15,7 @@ use MooX::Tag::TO_HASH::Util ':all';
 
 sub _process_value {
 
-    return \$_[0] unless is_ref( $_[0] );    ## no critic
+    return \$_[0] unless is_ref( $_[0] );
 
     my $ref   = $_[0];
     my $value = $ref;
@@ -28,8 +28,8 @@ sub _process_value {
     elsif ( is_arrayref( $ref ) ) {
         my %new;
         for my $idx ( 0 .. @{$ref} - 1 ) {
-            my $ref = _process_value( $ref->[$idx] );
-            $new{$idx} = $$ref if defined $ref;
+            my $_ref = _process_value( $ref->[$idx] );
+            $new{$idx} = $$_ref if defined $ref;
         }
         if ( keys %new ) {
             my @replace = @$ref;
@@ -40,8 +40,8 @@ sub _process_value {
     elsif ( is_hashref( $ref ) ) {
         my %new;
         for my $key ( keys %$ref ) {
-            my $ref = _process_value( $ref->{$key} );
-            $new{$key} = $$ref if defined $ref;
+            my $_ref = _process_value( $ref->{$key} );
+            $new{$key} = $$_ref if defined $ref;
         }
         if ( keys %new ) {
             my %replace = %$ref;
@@ -123,7 +123,7 @@ sub TO_HASH {
         $hash{$name} = $value;
     }
 
-    if ( defined ( my $mth = $self->can( 'modify_hashr' ) ) ) {
+    if ( defined( my $mth = $self->can( '_modify_hashr' ) // $self->can( 'modify_hashr' ) ) ) {
         $self->$mth( \%hash );
     }
 
@@ -157,7 +157,7 @@ MooX::Tag::TO_HASH - Controlled translation of Moo objects into Hashes
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -186,9 +186,9 @@ version 0.03
 # resulting in
 
  $VAR1 = {
+           'goose' => 'Frank',
            'cow' => 'Daisy',
-           'hen' => undef,
-           'goose' => 'Frank'
+           'hen' => undef
          };
 
 =head1 DESCRIPTION
@@ -218,9 +218,10 @@ also prevent that).
 L<TO_HASH> method, this is no longer recommended. See discussion
 under L<DEPRECATED BEHAVIOR> below.].
 
-If the class provides a C<modify_hashr> method, it will be called as
+If the class provides a C<_modify_hashr> method (or for backwards
+compatibility, C<modify_hashr>), it will be called as
 
-    $self->modify_hashr( \%hash );
+    $self->_modify_hashr( \%hash );
 
 and should modify the passed hash in place.
 
@@ -315,10 +316,10 @@ This method is added to the consuming class or role.
 # resulting in
 
  $VAR1 = {
-           'HORSE' => 'Ed',
+           'HEN' => 'Ruby',
            'GOOSE' => 'Donald',
-           'COW' => 'Daisy',
-           'HEN' => 'Ruby'
+           'HORSE' => 'Ed',
+           'COW' => 'Daisy'
          };
 
 =head1 DEPRECATED BEHAVIOR
@@ -362,7 +363,7 @@ Note it does not output C<Parent>.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-moox-tag-to_hash@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH
+Please report any bugs or feature requests to bug-moox-tag-to_hash@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Tag-TO_HASH>
 
 =head2 Source
 

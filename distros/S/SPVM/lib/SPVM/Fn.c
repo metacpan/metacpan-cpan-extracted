@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include "spvm_native.h"
 
 #include <stdlib.h>
@@ -373,7 +376,7 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!(env->is_string(env, stack, obj_dest) || env->is_numeric_array(env, stack, obj_dest) || env->is_mulnum_array(env, stack, obj_dest))) {
-    return env->die(env, stack, "The $type of the $dest must be the $string type, the $numeric arrya type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $type of the $dest must be the $string type, the $numeric array type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_source) {
@@ -381,11 +384,11 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!(env->is_string(env, stack, obj_source) || env->is_numeric_array(env, stack, obj_source) || env->is_mulnum_array(env, stack, obj_source))) {
-    return env->die(env, stack, "The $type of the $source must be the $string type, the $numeric arrya type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $type of the $source must be the $string type, the $numeric array type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
   }
   
   if (env->is_read_only(env, stack, obj_dest)) {
-    return env->die(env, stack, "The $dest can't be be a read-only string", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $dest cannnot be be a read-only string", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(length >= 0)) {
@@ -432,7 +435,7 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   if (!(env->is_string(env, stack, obj_dest) || env->is_numeric_array(env, stack, obj_dest) || env->is_mulnum_array(env, stack, obj_dest))) {
-    return env->die(env, stack, "The $type of the $dest must be the $string type, the $numeric arrya type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $type of the $dest must be the $string type, the $numeric array type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_source) {
@@ -440,7 +443,7 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
 
   if (!(env->is_string(env, stack, obj_source) || env->is_numeric_array(env, stack, obj_source) || env->is_mulnum_array(env, stack, obj_source))) {
-    return env->die(env, stack, "The $type of the $source must be the $string type, the $numeric arrya type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $type of the $source must be the $string type, the $numeric array type, or the $multi numeric array type", __func__, FILE_NAME, __LINE__);
   }
 
   if (env->is_read_only(env, stack, obj_dest)) {
@@ -619,6 +622,26 @@ int32_t SPVM__Fn__to_long_with_base(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   stack[0].lval = (int64_t)num;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__object_to_int(SPVM_ENV* env, SPVM_VALUE* stack) {
+  void* object = stack[0].oval;
+  
+  int32_t int_value = (int32_t)(intptr_t)object;
+  
+  stack[0].ival = int_value;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__object_to_long(SPVM_ENV* env, SPVM_VALUE* stack) {
+  void* object = stack[0].oval;
+  
+  int64_t long_value = (int64_t)(intptr_t)object;
+  
+  stack[0].lval = long_value;
   
   return 0;
 }

@@ -7,8 +7,8 @@ use Test::More tests => 9;
 use Test::Exception;
 use Test::File;
 use Path::Tiny;
-my $sigfile = path("t/DROID_SignatureFile_V93.xml");
-my $ymlfile = path("t/DROID_SignatureFile_V93.xml.yaml");
+my $sigfile = path("t/DROID_SignatureFile_V111.xml");
+my $ymlfile = path("t/DROID_SignatureFile_V111.xml.yaml");
 
 ### tests
 BEGIN { use_ok("File::FormatIdentification::Pronom"); }

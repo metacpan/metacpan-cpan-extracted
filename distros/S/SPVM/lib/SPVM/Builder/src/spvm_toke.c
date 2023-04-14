@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Yuki Kimoto
+// MIT License
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -281,7 +284,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       ch = '"';
     }
 
-    // '\0' means end of file, so try to read next module source
+    // '\0' means end of file, so try to read next class source
     if (ch == '\0') {
       
       // End of file
@@ -299,7 +302,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       compiler->befbufptr = NULL;
       compiler->line_start_ptr = NULL;
       
-      // If there are more module, load it
+      // If there are more class, load it
       SPVM_LIST* op_use_stack = compiler->op_use_stack;
       
       while (1) {
@@ -334,33 +337,33 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
             }
 
-            // A class name can't conatain "__"
+            // A class name cannnot conatain "__"
             if (strstr(class_name, "__")) {
-              SPVM_COMPILER_error(compiler, "The class name \"%s\" can't constain \"__\" at %s line %d", class_name, op_use->file, op_use->line);
+              SPVM_COMPILER_error(compiler, "The class name \"%s\" cannnot constain \"__\" at %s line %d", class_name, op_use->file, op_use->line);
               return 0;
             }
             
-            // A class name can't end with "::"
+            // A class name cannnot end with "::"
             if (class_name_length >= 2 && class_name[class_name_length - 2] == ':' && class_name[class_name_length - 1] == ':' ) {
-              SPVM_COMPILER_error(compiler, "The class name \"%s\" can't end with \"::\" at %s line %d", class_name, op_use->file, op_use->line);
+              SPVM_COMPILER_error(compiler, "The class name \"%s\" cannnot end with \"::\" at %s line %d", class_name, op_use->file, op_use->line);
               return 0;
             }
 
-            // A class name can't contains "::::".
+            // A class name cannnot contains "::::".
             if (strstr(class_name, "::::")) {
-              SPVM_COMPILER_error(compiler, "The class name \"%s\" can't contains \"::::\" at %s line %d", class_name, op_use->file, op_use->line);
+              SPVM_COMPILER_error(compiler, "The class name \"%s\" cannnot contains \"::::\" at %s line %d", class_name, op_use->file, op_use->line);
               return 0;
             }
 
-            // A class name can't begin with \"$::\"
+            // A class name cannnot begin with \"$::\"
             if (class_name_length >= 2 && class_name[0] == ':' && class_name[1] == ':') {
-              SPVM_COMPILER_error(compiler, "The class name \"%s\" can't begin with \"::\" at %s line %d", class_name, op_use->file, op_use->line);
+              SPVM_COMPILER_error(compiler, "The class name \"%s\" cannnot begin with \"::\" at %s line %d", class_name, op_use->file, op_use->line);
               return 0;
             }
 
-            // A class name can't begin with a number
+            // A class name cannnot begin with a number
             if (class_name_length >= 1 && isdigit(class_name[0])) {
-              SPVM_COMPILER_error(compiler, "The class name \"%s\" can't begin with a number at %s line %d", class_name, op_use->file, op_use->line);
+              SPVM_COMPILER_error(compiler, "The class name \"%s\" cannnot begin with a number at %s line %d", class_name, op_use->file, op_use->line);
               return 0;
             }
           }
@@ -396,23 +399,23 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
             char* cur_file = NULL;
             
-            // Do directry module search
-            int32_t do_directry_module_search;
+            // Do directry class search
+            int32_t do_directry_class_search;
 
-            // Byte, Short, Int, Long, Float, Double, Bool is already existsregistered in module source symtable
-            const char* found_module_source = SPVM_HASH_get(compiler->module_source_symtable, class_name, strlen(class_name));
-            const char* module_dir = NULL;
-            if (!found_module_source) {
-              // Search module file
+            // Byte, Short, Int, Long, Float, Double, Bool is already existsregistered in class source symtable
+            const char* found_class_source = SPVM_HASH_get(compiler->class_source_symtable, class_name, strlen(class_name));
+            const char* class_path = NULL;
+            if (!found_class_source) {
+              // Search class file
               FILE* fh = NULL;
-              int32_t module_dirs_length = SPVM_COMPILER_get_module_dirs_length(compiler);
-              for (int32_t i = 0; i < module_dirs_length; i++) {
-                module_dir = SPVM_COMPILER_get_module_dir(compiler, i);
+              int32_t class_paths_length = SPVM_COMPILER_get_class_paths_length(compiler);
+              for (int32_t i = 0; i < class_paths_length; i++) {
+                class_path = SPVM_COMPILER_get_class_path(compiler, i);
                 
                 // File name
-                int32_t file_name_length = (int32_t)(strlen(module_dir) + 1 + strlen(cur_rel_file));
+                int32_t file_name_length = (int32_t)(strlen(class_path) + 1 + strlen(cur_rel_file));
                 cur_file = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, file_name_length + 1);
-                sprintf(cur_file, "%s/%s", module_dir, cur_rel_file);
+                sprintf(cur_file, "%s/%s", class_path, cur_rel_file);
                 cur_file[file_name_length] = '\0';
                 
                 // \ is replaced to /
@@ -430,68 +433,68 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 errno = 0;
               }
               
-              // Module not found
+              // Class not found
               if (!fh) {
                 if (!op_use->uv.use->is_require) {
-                  int32_t moduler_dirs_str_length = 0;
-                  for (int32_t i = 0; i < module_dirs_length; i++) {
-                    const char* module_dir = SPVM_COMPILER_get_module_dir(compiler, i);
-                    moduler_dirs_str_length += 1 + strlen(module_dir);
+                  int32_t classr_dirs_str_length = 0;
+                  for (int32_t i = 0; i < class_paths_length; i++) {
+                    const char* class_path = SPVM_COMPILER_get_class_path(compiler, i);
+                    classr_dirs_str_length += 1 + strlen(class_path);
                   }
-                  char* moduler_dirs_str = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, moduler_dirs_str_length + 1);
-                  int32_t moduler_dirs_str_offset = 0;
-                  for (int32_t i = 0; i < module_dirs_length; i++) {
-                    const char* module_dir = SPVM_COMPILER_get_module_dir(compiler, i);
-                    sprintf(moduler_dirs_str + moduler_dirs_str_offset, "%s", module_dir);
-                    moduler_dirs_str_offset += strlen(module_dir);
-                    if (i != module_dirs_length - 1) {
-                      moduler_dirs_str[moduler_dirs_str_offset] = ' ';
-                      moduler_dirs_str_offset++;
+                  char* classr_dirs_str = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, classr_dirs_str_length + 1);
+                  int32_t classr_dirs_str_offset = 0;
+                  for (int32_t i = 0; i < class_paths_length; i++) {
+                    const char* class_path = SPVM_COMPILER_get_class_path(compiler, i);
+                    sprintf(classr_dirs_str + classr_dirs_str_offset, "%s", class_path);
+                    classr_dirs_str_offset += strlen(class_path);
+                    if (i != class_paths_length - 1) {
+                      classr_dirs_str[classr_dirs_str_offset] = ' ';
+                      classr_dirs_str_offset++;
                     }
                   }
                   
-                  SPVM_COMPILER_error(compiler, "Failed to load the \"%s\" class. The module file \"%s\" is not found in (%s) at %s line %d", class_name, cur_rel_file, moduler_dirs_str, op_use->file, op_use->line);
+                  SPVM_COMPILER_error(compiler, "Failed to load the \"%s\" class. The class file \"%s\" is not found in (%s) at %s line %d", class_name, cur_rel_file, classr_dirs_str, op_use->file, op_use->line);
                   
                   return 0;
                 }
               }
-              // Module found
+              // Class found
               else {
                 // Read file content
                 fseek(fh, 0, SEEK_END);
                 int32_t file_size = (int32_t)ftell(fh);
                 if (file_size < 0) {
-                  SPVM_COMPILER_error(compiler, "[System Error]Failed to tell the module file \"%s\" at %s line %d", cur_file, op_use->file, op_use->line);
+                  SPVM_COMPILER_error(compiler, "[System Error]Failed to tell the class file \"%s\" at %s line %d", cur_file, op_use->file, op_use->line);
                   return 0;
                 }
                 fseek(fh, 0, SEEK_SET);
                 char* src = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, file_size + 1);
                 if ((int32_t)fread(src, 1, file_size, fh) < file_size) {
-                  SPVM_COMPILER_error(compiler, "[System Error]Failed to read the module file \"%s\" at %s line %d", cur_file, op_use->file, op_use->line);
+                  SPVM_COMPILER_error(compiler, "[System Error]Failed to read the class file \"%s\" at %s line %d", cur_file, op_use->file, op_use->line);
                   SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, src);
                   return 0;
                 }
                 fclose(fh);
                 src[file_size] = '\0';
                 
-                found_module_source = src;
-                SPVM_HASH_set(compiler->module_source_symtable, class_name, strlen(class_name), src);
+                found_class_source = src;
+                SPVM_HASH_set(compiler->class_source_symtable, class_name, strlen(class_name), src);
               }
             }
             
             const char* src = NULL;
             int32_t file_size = 0;
-            if (found_module_source) {
-              src = found_module_source;
+            if (found_class_source) {
+              src = found_class_source;
               file_size = strlen(src);
 
               // Copy original source to current source because original source is used at other places(for example, SPVM::Builder::Exe)
               compiler->cur_src = (char*)src;
-              compiler->cur_dir = module_dir;
+              compiler->cur_dir = class_path;
               compiler->cur_rel_file = cur_rel_file;
               compiler->cur_rel_file_class_name = class_name;
               
-              // If we get current module file path, set it, otherwise set module relative file path
+              // If we get current class file path, set it, otherwise set class relative file path
               if (cur_file) {
                 compiler->cur_file = cur_file;
               }
@@ -511,7 +514,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->cur_line = 1;
             }
             else {
-              // If module not found and the module is used in require syntax, compilation errors don't occur.
+              // If class not found and the class is used in require syntax, compilation errors don't occur.
               if (op_use->uv.use->is_require) {
                 SPVM_HASH_set(compiler->not_found_class_class_symtable, class_name, strlen(class_name), (void*)class_name);
                 continue;
@@ -1000,7 +1003,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         char ch = 0;
         
         if (*compiler->bufptr == '\'') {
-          SPVM_COMPILER_error(compiler, "The character literal can't be empty at %s line %d", compiler->cur_file, compiler->cur_line);
+          SPVM_COMPILER_error(compiler, "The character literal cannnot be empty at %s line %d", compiler->cur_file, compiler->cur_line);
           compiler->bufptr++;
         }
         else {
@@ -1590,29 +1593,29 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             
             // Check the variable name
             {
-              // A variable name can't conatain "__"
+              // A variable name cannnot conatain "__"
               if (strstr(var_name, "__")) {
-                SPVM_COMPILER_error(compiler, "The variable name \"%s\" can't contain \"__\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The variable name \"%s\" cannnot contain \"__\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
               }
 
-              // A variable name can't begin with \"$::\"
+              // A variable name cannnot begin with \"$::\"
               if (var_name_symbol_name_part_length >= 2 && var_name[1] == ':' && var_name[2] == ':') {
-                SPVM_COMPILER_error(compiler, "The variable name \"%s\" can't begin with \"$::\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The variable name \"%s\" cannnot begin with \"$::\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
               }
 
-              // A variable name can't end with \"::\"
+              // A variable name cannnot end with \"::\"
               if (var_name_symbol_name_part_length >= 2 && var_name[var_name_length - 1] == ':' && var_name[var_name_length - 2] == ':') {
-                SPVM_COMPILER_error(compiler, "The variable name \"%s\" can't end with \"::\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The variable name \"%s\" cannnot end with \"::\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
               }
               
-              // A variable name \"%s\" can't contain \"::::\"
+              // A variable name \"%s\" cannnot contain \"::::\"
               if (strstr(var_name, "::::")) {
-                SPVM_COMPILER_error(compiler, "The variable name \"%s\" can't contain \"::::\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The variable name \"%s\" cannnot contain \"::::\" at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
               }
 
-              // A variable name can't begin with a number
+              // A variable name cannnot begin with a number
               if (var_name_symbol_name_part_length >= 1 && isdigit(var_name[1])) {
-                SPVM_COMPILER_error(compiler, "The symbol name part of the variable name \"%s\" can't begin with a number at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The symbol name part of the variable name \"%s\" cannnot begin with a number at %s line %d", var_name, compiler->cur_file, compiler->cur_line);
               }
             }
             
@@ -2511,33 +2514,33 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           else {
             // Check the symbol name
             {
-              // A symbol name can't conatain "__"
+              // A symbol name cannnot conatain "__"
               if (strstr(symbol_name, "__")) {
-                SPVM_COMPILER_error(compiler, "The symbol name \"%s\" can't constain \"__\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The symbol name \"%s\" cannnot constain \"__\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
               }
               
-              // A symbol name can't end with "::"
+              // A symbol name cannnot end with "::"
               if (symbol_name_length >= 2 && symbol_name[symbol_name_length - 2] == ':' && symbol_name[symbol_name_length - 1] == ':' ) {
-                SPVM_COMPILER_error(compiler, "The symbol name \"%s\" can't end with \"::\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The symbol name \"%s\" cannnot end with \"::\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
               }
 
-              // A symbol name can't contains "::::".
+              // A symbol name cannnot contains "::::".
               if (strstr(symbol_name, "::::")) {
-                SPVM_COMPILER_error(compiler, "The symbol name \"%s\" can't contains \"::::\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The symbol name \"%s\" cannnot contains \"::::\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
               }
 
-              // A symbol name can't begin with "::"
+              // A symbol name cannnot begin with "::"
               assert(!(symbol_name[0] == ':' && symbol_name[1] == ':'));
 
-              // A symbol name can't begin with a number "0-9".
+              // A symbol name cannnot begin with a number "0-9".
               assert(!isdigit(symbol_name[0]));
             }
 
             // A string literal of the left operand of the fat camma
             if (next_is_fat_camma) {
-              // The string literal of the left operand of the fat camma can't contains "::".
+              // The string literal of the left operand of the fat camma cannnot contains "::".
               if (symbol_name_length >= 2 && strstr(symbol_name, "::")) {
-                SPVM_COMPILER_error(compiler, "The string literal \"%s\" of the left operand of the fat camma can't contains \"::\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "The string literal \"%s\" of the left operand of the fat camma cannnot contains \"::\" at %s line %d", symbol_name, compiler->cur_file, compiler->cur_line);
               }
 
               SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, symbol_name, symbol_name_length, compiler->cur_file, compiler->cur_line);

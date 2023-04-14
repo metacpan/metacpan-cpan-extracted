@@ -42,10 +42,7 @@ subtest 'interface' => sub {
 
         subtest 'grids overlap too much' => sub {
             my $err = dies {
-                join_n(
-                    Grid->new( edges => [ 0, 1, 2, 3.2, 4 ] ),
-                    Grid->new( edges => [ 3, 4, 5 ] ),
-                )
+                join_n( Grid->new( edges => [ 0, 1, 2, 3.2, 4 ] ), Grid->new( edges => [ 3, 4, 5 ] ), )
             };
             isa_ok( $err, [ Failure( 'parameter::constraint' ) ], );
             like( $err, qr/overlaps/ );
@@ -61,10 +58,7 @@ subtest 'gap' => sub {
 
     # default is include
     is(
-        join_n(
-            Grid->new( edges => [ 1, 2, 3 ] ),
-            Grid->new( edges => [ 4, 5, 6 ] ),
-        ),
+        join_n( Grid->new( edges => [ 1, 2, 3 ] ), Grid->new( edges => [ 4, 5, 6 ] ), ),
         object {
             prop blessed => Grid;
             call edges => [ 1, 2, 3, 4, 5, 6 ];

@@ -10,7 +10,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use PDF::Table;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 NAME
 
@@ -666,6 +666,10 @@ sub text
 
     my $page = $self->page; # Ensure that page is built and cursor adjusted for first use
 
+    # Add new page if already at the bottom from previous operation (e.g.
+    # rendering table)
+    $page = $self->add_page
+        if $self->_y - $self->_line_height($size) < $self->margin_bottom;
 
     my $text   = $page->text;
     my $grfx   = $page->gfx;

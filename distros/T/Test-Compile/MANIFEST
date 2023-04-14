@@ -12,7 +12,9 @@ t/000-compile.t
 t/100-internal--find-files-ignores-cvs.t
 t/100-internal--find-files-ignores-svn.t
 t/100-internal--find-files.t
-t/100-internal--is-in-taint-mode.t
+t/100-internal--taint-mode.t
+t/100-internal--perl-module.t
+t/100-internal--perl-script.t
 t/100-internal--read-shebang.t
 t/100-internal--skip.t
 t/100-internal--test-methods.t
@@ -37,13 +39,14 @@ t/999-pod.t
 t/999-portability.t
 t/999-synopsis.t
 t/999-version.t
+t/perlcriticrc
 t/scripts/.svn/Ignore.pm
 t/scripts/CVS/Ignore.pm
 t/scripts/CVS/taint2.pl
 t/scripts/datafile
 t/scripts/failure.pl
 t/scripts/LethalImport.pm
-t/scripts/lib.pl
+t/scripts/messWithLib.pl
 t/scripts/Module2.pm
 t/scripts/Module.pm
 t/scripts/perlscript

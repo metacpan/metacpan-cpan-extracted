@@ -32,7 +32,7 @@ use vars qw[$DEBUG $error $VERSION $WARN $FOLLOW_SYMLINK $CHOWN $CHMOD
 $DEBUG                  = 0;
 $WARN                   = 1;
 $FOLLOW_SYMLINK         = 0;
-$VERSION                = "3.00";
+$VERSION                = "3.02";
 $CHOWN                  = 1;
 $CHMOD                  = 1;
 $SAME_PERMISSIONS       = $> == 0 ? 1 : 0;
@@ -2153,25 +2153,31 @@ numbers. Added for compatibility with C<busybox> implementations.
 
 =head2 Tuning the way RESOLVE_SYMLINK will works
 
-	You can tune the behaviour by setting the $Archive::Tar::RESOLVE_SYMLINK variable,
-	or $ENV{PERL5_AT_RESOLVE_SYMLINK} before loading the module Archive::Tar.
+You can tune the behaviour by setting the $Archive::Tar::RESOLVE_SYMLINK variable,
+or $ENV{PERL5_AT_RESOLVE_SYMLINK} before loading the module Archive::Tar.
 
-  Values can be one of the following:
+Values can be one of the following:
 
-		none
-           Disable this mechanism and failed as it was in previous version (<1.88)
+=over 4
 
-		speed (default)
-           If you prefer speed
-           this will read again the whole archive using read() so all entries
-           will be available
+=item none
 
-    memory
-           If you prefer memory
+Disable this mechanism and failed as it was in previous version (<1.88)
 
-	Limitation
+=item speed (default)
 
-		It won't work for terminal, pipe or sockets or every non seekable source.
+If you prefer speed
+this will read again the whole archive using read() so all entries
+will be available
+
+=item memory
+
+If you prefer memory
+
+=back
+
+Limitation: It won't work for terminal, pipe or sockets or every non seekable
+source.
 
 =head2 $Archive::Tar::EXTRACT_BLOCK_SIZE
 

@@ -9,16 +9,18 @@ use FFmpeg::Command;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
-use IO::CaptureOutput qw(capture_exec);
 use Image::Random;
 use Readonly;
 use Video::Delay::Const;
 use Video::Pattern;
 
 # Constants.
+Readonly::Scalar our $DEFAULT_DURATION => 10000;
+Readonly::Scalar our $DEFAULT_VIDEO_HEIGHT => 1080;
+Readonly::Scalar our $DEFAULT_VIDEO_WIDTH => 1920;
 Readonly::Scalar our $SPACE => q{ };
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -31,7 +33,7 @@ sub new {
 	$self->{'delay_generator'} = undef;
 
 	# Duration.
-	$self->{'duration'} = 10000;
+	$self->{'duration'} = $DEFAULT_DURATION;
 
 	# Frames per second.
 	$self->{'fps'} = 60;
@@ -58,8 +60,8 @@ sub new {
 	$self->{'video_pattern'} = undef;
 
 	# Sizes.
-	$self->{'height'} = 1080;
-	$self->{'width'} = 1920;
+	$self->{'height'} = $DEFAULT_VIDEO_HEIGHT;
+	$self->{'width'} = $DEFAULT_VIDEO_WIDTH;
 
 	# Process params.
 	set_params($self, @params);
@@ -166,11 +168,11 @@ Video::Generator - Perl class for video generation.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Video::Generator->new(%parameters);
 
- Constructor.
+Constructor.
 
 =over 8
 
@@ -256,12 +258,15 @@ Video::Generator - Perl class for video generation.
 
 =back
 
-=item C<create($out_path)>
+Returns instance of object.
 
- Create video.
- Returns undef.
+=head2 C<create>
 
-=back
+ my $type = $obj->create($out_path);
+
+Create video.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -280,6 +285,8 @@ Video::Generator - Perl class for video generation.
                  ..
 
 =head1 EXAMPLE1
+
+=for comment filename=random_video_in_temp_and_ffprobe.pl
 
  use strict;
  use warnings;
@@ -311,6 +318,8 @@ Video::Generator - Perl class for video generation.
  #     Stream #0:0[0x1e0]: Video: mpeg1video, yuv420p(tv), 1920x1080 [SAR 1:1 DAR 16:9], 104857 kb/s, 60 fps, 60 tbr, 90k tbn, 60 tbc
 
 =head1 EXAMPLE2
+
+=for comment filename=random_video_in_temp_verbose.pl
 
  use strict;
  use warnings;
@@ -348,7 +357,6 @@ L<FFmpeg::Command>,
 L<File::Path>,
 L<File::Spec::Functions>,
 L<File::Temp>,
-L<IO::CaptureOutput>,
 L<Image::Random>,
 L<Readonly>,
 L<Video::Delay::Const>,
@@ -396,12 +404,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2020 Michal Josef Špaček
+© 2014-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

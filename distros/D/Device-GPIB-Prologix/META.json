@@ -1,16 +1,16 @@
 {
-   "abstract" : "Interface to Prologix GPIB-USB Controller",
+   "abstract" : "Interface to Prologix GPIB-USB Controller This module is now obsoleted by and replaced by Device::GPIB::Controllers::Prologix,  part of the new Device::GPIB module.",
    "author" : [
       "Mike McCauley <mikem@airspayce.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-GPIB-Prologix",
    "no_index" : {
@@ -37,5 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

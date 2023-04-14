@@ -1,7 +1,7 @@
 package Net::SAML2::Protocol::Assertion;
 use Moose;
 
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
 use MooseX::Types::DateTime qw/ DateTime /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
@@ -14,6 +14,7 @@ use XML::Enc;
 use XML::LibXML;
 use List::Util qw(first);
 use URN::OASIS::SAML2 qw(STATUS_SUCCESS);
+use Carp qw(croak);
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
@@ -131,8 +132,9 @@ sub new_from_xml {
         $nameid = $global->get_node(1);
     }
 
-    my $nodeset = $xpath->findnodes('/samlp:Response/samlp:Status/samlp:StatusCode');
-    croak("Unable to parse status from assertion") unless ($nodeset->size);
+    my $nodeset = $xpath->findnodes('/samlp:Response/samlp:Status/samlp:StatusCode|/samlp:ArtifactResponse/samlp:Status/samlp:StatusCode');
+
+    croak("Unable to parse status from assertion") unless $nodeset->size;
 
     my $status_node = $nodeset->get_node(1);
     my $status = $status_node->getAttribute('Value');
@@ -243,7 +245,7 @@ Net::SAML2::Protocol::Assertion - Net::SAML2::Protocol::Assertion - SAML2 assert
 
 =head1 VERSION
 
-version 0.67
+version 0.69
 
 =head1 SYNOPSIS
 

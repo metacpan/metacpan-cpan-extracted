@@ -123,15 +123,15 @@ C<Array> provides array utilities.
 
 Create a new C<byte> array with the $length, and copy the elements from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_double
 
@@ -139,17 +139,17 @@ The $offset + the $length must be less than or equal to the length of the $array
 
 Create a new C<double> array with the $length, and copy the elements from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
+
+If the array is not defined, return undef.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
-
-If the array is not defined, return C<undef>.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_float
 
@@ -157,15 +157,15 @@ If the array is not defined, return C<undef>.
 
 Create a new C<float> array with the $length, and copy the elements from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_int
 
@@ -173,15 +173,15 @@ The $offset + the $length must be less than or equal to the length of the $array
 
 Create a new C<int> array with the $length, and copy the elements from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
   
 =head2 copy_long
 
@@ -189,15 +189,15 @@ The $offset + the $length must be less than or equal to the length of the $array
 
 Create a new C<long> array with the $length, and copy the elements from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_object
 
@@ -209,15 +209,15 @@ Each element is cloned by the L<Cloner|SPVM::Cloner>.
 
 If the cloner is not defined, the address of each element is copied.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_object_address
 
@@ -233,15 +233,15 @@ The alias for the following code using L</"copy_object">.
 
 Create a new C<short> array with the $length, and copy the elements from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_string
 
@@ -249,15 +249,15 @@ The $offset + the $length must be less than or equal to the length of the $array
 
 Create a new C<string> array with the $length, and copy the elements of the C<string> array using C<copy> operator from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 copy_string_address
 
@@ -265,15 +265,15 @@ The $offset + the $length must be less than or equal to the length of the $array
 
 Create a new C<string> array with the $length, and copy the addresses of the elements of the C<string> array from the $offset to the position proceeded by the $length to the created array.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 dump_unsigned_byte
 
@@ -311,87 +311,87 @@ Same as the following code using the L<dump operator|SPVM::Document::Language/"d
 
   static method equals_byte : int ($array1 : byte[], $array2 : byte[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_double
 
   static method equals_double : int ($array1 : double[], $array2 : double[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_float
 
   static method equals_float : int ($array1 : float[], $array2 : float[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_int
 
   static method equals_int : int ($array1 : int[], $array2 : int[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_long
 
   static method equals_long : int ($array1 : long[], $array2 : long[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_object
 
   static method static method equals_object : int ($array1 : object[], $array2 : object[], $equality_checker : EqualityChecker);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the equality checker, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the equality checker, return 1.
 
 The equality checker is not defined, the address is used to check the equality.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_object_address
 
@@ -405,29 +405,29 @@ The alias for the following code using L</"equals_object">.
 
   static method equals_short : int ($array1 : short[], $array2 : short[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_string
 
   static method equals_string : int ($array1 : string[], $array2 : string[]);
 
-If the $array1 is not defined and the $array2 is not defined, return C<1>.
+If the $array1 is not defined and the $array2 is not defined, return 1.
 
-If the $array1 is defined and the $array2 is not defined, return C<0>.
+If the $array1 is defined and the $array2 is not defined, return 0.
 
-If the $array1 is not defined, the $array2 is defined, return C<0>.
+If the $array1 is not defined, the $array2 is defined, return 0.
 
-If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the C<eq> operator, return C<1>.
+If the $array1 is defined and the $array2 is defined and the all elements of $array1 are equal to all elements of $array2 using the C<eq> operator, return 1.
 
-Otherwise return C<0>.
+Otherwise return 0.
 
 =head2 equals_string_address
 
@@ -451,19 +451,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_double
   
@@ -479,19 +479,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_float
   
@@ -507,19 +507,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_int
   
@@ -535,19 +535,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_long
   
@@ -563,19 +563,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_object_address
 
@@ -593,19 +593,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_short
 
@@ -621,19 +621,19 @@ If the range of the elements of the $source array and the range of the elements 
 
 Exceptions:
 
-The $dest must be defined.
+The $dest must be defined. Otherwize an exception is thrown.
 
-The $source must be defined.
+The $source must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset must be greater than or equal to C<0>.
+The $dest_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $source_offset must be greater than or equal to C<0>.
+The $source_offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $dest_offset + the $length must be less than or equal to the length of the $dest.
+The $dest_offset + the $length must be less than or equal to the length of the $dest. Otherwize an exception is thrown.
 
-The $source_offset + the $length must be less than or equal to the length of the $source.
+The $source_offset + the $length must be less than or equal to the length of the $source. Otherwize an exception is thrown.
 
 =head2 memcpy_string_address
 
@@ -699,15 +699,15 @@ Set the range of the elements of the C<byte> array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
 The $array must be defined.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_double
 
@@ -717,15 +717,15 @@ Set the range of the elements of the C<double> array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_float
 
@@ -735,15 +735,15 @@ Set the range of the elements of the C<float> array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_int
 
@@ -753,15 +753,15 @@ Set the range of the elements of the C<int> array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_long
 
@@ -771,15 +771,15 @@ Set the range of the elements of the C<long> array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_object
 
@@ -789,15 +789,15 @@ Set the range of the elements of the object $array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_short
 
@@ -807,15 +807,15 @@ Set the range of the elements of the C<short> $array to the $element.
 
 The range of the elements of the $array is from the $offset to the position proceeded by the $length.
 
-If the length is less than C<0>, the length to the end of the string is calculated from the length of the array and the offset.
+If the length is less than 0, the length to the end of the string is calculated from the length of the array and the offset.
 
 Exceptions:
 
-The $array must be defined.
+The $array must be defined. Otherwize an exception is thrown.
 
-The $offset must be greater than or equal to C<0>.
+The $offset must be greater than or equal to 0. Otherwize an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the $array.
+The $offset + the $length must be less than or equal to the length of the $array. Otherwize an exception is thrown.
 
 =head2 memset_string
 
@@ -833,6 +833,12 @@ Create a new object array as the same type as the $proto_array with the $length.
 
 Exceptions:
 
-The $prototype array must be defined.
+The $prototype array must be defined. Otherwize an exception is thrown.
 
-The $length must be greater than or equal to C<0>.
+The $length must be greater than or equal to 0. Otherwize an exception is thrown.
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

@@ -1,11 +1,35 @@
-use 5.006001;
+use strict;
+use warnings;
+
+use 5.006002;
+
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
 WriteMakefile(
+    DISTNAME          => 'POE-Filter-PPPHDLC',
     NAME              => 'POE::Filter::PPPHDLC',
-    VERSION_FROM      => 'lib/POE/Filter/PPPHDLC.pm', # finds $VERSION
-    PREREQ_PM         => {'Test::More'  =>  0}, # e.g., Module::Name => 1.1
-    ABSTRACT_FROM     => 'lib/POE/Filter/PPPHDLC.pm', # retrieve abstract from module
-    AUTHOR            => 'Benjamin Smith <bsmith@cpan.org>',
+    VERSION_FROM      => 'lib/POE/Filter/PPPHDLC.pm',
+    CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 0 },
+    PREREQ_PM         => {
+        strict => 0,
+	warnings => 0,
+    },
+    TEST_REQUIRES     => {
+        'Test::More'  => 0.47,
+    },
+    ABSTRACT_FROM     => 'lib/POE/Filter/PPPHDLC.pm',
+    AUTHOR            => 'Benjamin Smith <bsmith@cabbage.org.uk>',
+    MIN_PERL_VERSION  => '5.006002',
+    LICENSE           => 'perl',
+    META_ADD        => {
+	dynamic_config => 0,
+        resources => {
+            homepage => "https://github.com/bsmith/POE-Filter-PPPHDLC",
+            repository => {
+                type => "git",
+                url => "https://github.com/bsmith/POE-Filter-PPPHDLC.git",
+                web => "https://github.com/bsmith/POE-Filter-PPPHDLC",
+            },
+	},
+    },
 );

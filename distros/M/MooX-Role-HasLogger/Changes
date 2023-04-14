@@ -1,5 +1,12 @@
 Release history for MooX-Role-HasLogger
 
+0.001002  2023-04-04
+          - set minimum perl version  
+          - update prerequisites
+          - add author extensions
+          - configure "provides" META.yml field
+          - rename and update readme
+
 0.001001  2023-01-26
           - fix needed version of some prerequisites (CPAN Testers feedback)
 

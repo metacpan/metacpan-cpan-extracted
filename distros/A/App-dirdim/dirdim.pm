@@ -1,12 +1,12 @@
 package App::dirdim ;  
-our $VERSION = '0.031' ; 
-our $DATE = '2022-04-25T22:34+09:00' ; 
+our $VERSION = '0.046' ; 
+our $DATE = '2023-04-06T15:23+09:00' ; 
 
 =encoding utf8
 
 =head1 NAME
 
-App::dirdim
+App::dirdim -- Counts file numbers just below given director(y/ies) also with the height of the directory strata.
 
 =head1 SYNOPSIS
 
@@ -16,32 +16,35 @@ This module provides a Unix-like command `F<dirdim>'.
 
  dirdim DIR [DIR] [DIR] ..
 
-  指定されたディレクトリの直下にある、非ディリクトリファイルの数とディレトリの数を出力する。
-  シンボリックファイルの個数は括弧内に示す。 (何も引数が無い場合は、カレントディレクトリに対して動作。)
+  This commnd counts the numbers of files just under the specified director(y/ies).
+  The numbers are each of both for non-directories and directories. 
+  (Symblic files are also counted and the numbers appear in the round parenthesis.)
+  The current directory is regarded to be specified if any argument DIR is not specified.
 
- オプション: 
+  `perldoc App::dirdim' shows English help. 
+  `perldoc dirdim' and `dirdim --help' shows Japanese help. 
 
-  -.  : ファイル名がピリオドで始まるファイル(隠しファイルと言われる)について調べる。(dot file)
-  -j  : 出力の表頭の表記を、英語から日本語に変更。
-  -n  : ファイル名がピリオドで始まるファイル(隠しファイルと言われる)は対象外とする。(Nomal)
-  -r  ; 最も深い所にあるファイルの名前とその深さを示す。さらに、findで見つかるファイルの個数も出力。(Recursive)
-  -v  : ファイル名の(文字列としての)最小値と最大値も出力する。(verbose)
-  -y  : 引数 arg でディレクトリ以外のものがあった場合は、処理を飛ばす。(出力が簡潔になる。)
+ Options : 
 
-  --help : このヘルプを表示。
+  -d  ; The "maximum depth" and the number of all files (equivalently via `find' command) are shown. 
+  -v  : Verbosely shows the names of files names as examples. The first and the last are shown.
+  -. 0    : Suppresses counting the files having the name beginning from "." (period).
+  -. only : Counting only the files having the name beginning from "." (period).
 
- 開発上のメモ: 
-   * glob の */../*のような探索と File::Find による探索の違いを発見した。dirdimとdirdigで共通化の検討が必要。
-   * Ctrl-Cを押下した時の挙動を決めたい。
-   * 色を消すオプションを実装した方が良いだろうか? 他のコマンドの colorplus -0 に任せるべきか?
+=head1 SEE ALSO
+
+  App::colorplus -- `colorplus -0' deletes the colros given by ANSI escape code. 
+  App::dirstrata -- gives minute hierarchial information about a directory using a triangular matrix.
+  App::diroctopus -- shows the longest directory branch paths (most apart each other) of a given directory.
+  App::expandtab -- output vertically-aligned table using space characters from a TSV file.
 
 =head1 AUTHOR
 
-下野寿之 Toshiyuki SHIMONO <bin4tsv@gmail.com> 統計数理研究所 外来研究員
+下野寿之 Toshiyuki SHIMONO <bin4tsv@gmail.com> The Institute of Statistical Mathematics, a visiting researcher. 
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022 Toshiyuki SHIMONO. All rights reserved.
+Copyright (c) 2022-2023 Toshiyuki SHIMONO. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

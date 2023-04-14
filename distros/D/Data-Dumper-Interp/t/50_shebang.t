@@ -3,19 +3,21 @@
 # Compile this before anything is modified by t_Setup
 our $test_sub;
 BEGIN {
+  # WHY???  It must be something in Perl which otherwise
+  # is not suppressed, triggering out warning trap error.
   local ${^WARNING_BITS} = 0; # undo -w flag
   $test_sub = sub{ my $x = 42; };
 }
 
 use FindBin qw($Bin);
 use lib $Bin;
-#use t_Setup qw/bug :silent/; # strict, warnings, Test::More, Carp etc.
-use t_Setup qw/bug /; # strict, warnings, Test::More, Carp etc.
-
-use Scalar::Util qw(blessed reftype looks_like_number);
+use t_Common qw/oops/; # strict, warnings, Carp
+use t_TestCommon ':silent', # Test::More etc.
+                 qw/bug displaystr fmt_codestring timed_run 
+                    checkeq_literal check @quotes/;
 
 $SIG{__WARN__} = sub { confess "warning trapped; @_" };
-use English qw( -no_match_vars );;
+
 use Data::Compare qw(Compare);
 
 confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
@@ -23,180 +25,11 @@ confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 # This script was written before the author knew anything about standard
 # Perl test-harness tools.  Perhaps someday it will be wholely rewritten.
 # Meanwhile, some baby steps...
-use Test::More;
+#use Test::More; (imported via t_Setup)
 
 use Data::Dumper::Interp;
 
 confess "Non-zero initial CHILD_ERROR ($?)" if $? != 0;
-
-# Format a Unicode string in «french quotes» and also with hex escapes
-# (so we can still see something useful on non-Unicode platforms).
-#my @quotes = ("«", "»");
-my @quotes = ("<<", ">>");
-sub displaystr($) {
-  my ($input) = @_;
-  return "undef" if ! defined($input);
-  chomp( my $dd = Data::Dumper->new([$input])->Useqq(1)->Terse(1)->Indent(0)->Dump );
-  $quotes[0].$input.$quotes[1]."($dd)"
-}
-
-# Do an initial read of $[ so arybase will be autoloaded
-# (prevents corrupting $!/ERRNO in subsequent tests)
-eval '$[' // die;
-
-#$Data::Dumper::Interp::Debug = 1;
-
-#sub _dbvis(_) { goto &Data::Dumper::Interp::_dbvis }
-#sub _dbvisq(_) { goto &Data::Dumper::Interp::_dbvisq }
-#sub _dbavis(_) { goto &Data::Dumper::Interp::_dbavis }
-
-sub fmt_codestring($;$) { # returns list of lines
-  my ($str, $prefix) = @_;
-  $prefix //= "line ";
-  my $i=1; map{ sprintf "%s%2d: %s\n", $prefix,$i++,$_ } (split /\n/,$_[0]);
-}
-
-sub timed_run(&$@) {
-  my ($code, $maxcpusecs, @codeargs) = @_;
-
-  eval { require Time::HiRes };
-  my $getcpu = defined(eval{ &Time::HiRes::clock() })
-    ? \&Time::HiRes::clock : sub{ my @t = times; $t[0]+$t[1] };
-
-  my $startclock = &$getcpu();
-  my (@result, $result);
-  if (wantarray) {@result = &$code(@codeargs)} else {$result = &$code(@codeargs)};
-  my $cpusecs = &$getcpu() - $startclock;
-  confess "TOOK TOO LONG ($cpusecs CPU seconds vs. limit of $maxcpusecs)\n"
-    if $cpusecs > $maxcpusecs;
-  if (wantarray) {return @result} else {return $result};
-}
-
-sub visFoldwidth() {
-  "Data::Dumper::Interp::Foldwidth=".u($Data::Dumper::Interp::Foldwidth)
- ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
- .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
-}
-
-# Nicer alternative to check() when 'expected' is a literal string, not regex
-sub checkeq_literal($$$) {
-  my ($desc, $exp, $act) = @_;
-  #confess "'exp' is not plain string in checkeq_literal" if ref($exp); #not re!
-  $exp = show_white($exp); # stringifies undef
-  $act = show_white($act);
-  return unless $exp ne $act;
-  my $posn = 0;
-  for (0..length($exp)) {
-    my $c = substr($exp,$_,1);
-    last if $c ne substr($act,$_,1);
-    $posn = $c eq "\n" ? 0 : ($posn + 1);
-  }
-  @_ = ( "\n**************************************\n"
-        ."${desc}\n"
-        ."Expected:\n".displaystr($exp)."\n"
-        ."Actual:\n".displaystr($act)."\n"
-        # + for opening « or << in the displayed str
-        .(" " x ($posn+length($quotes[0])))."^\n"
-        .visFoldwidth()."\n" ) ;
-  #goto &Carp::confess;
-  Carp::confess(@_);
-}
-
-# Convert a literal "expected" string which contains things which are
-# represented differently among versions of Perl and/or Data::Dumper
-# into a regex which works with all versions.
-# As of 1/1/23 the input string is expected to be what Perl v5.34 produces.
-our $bs = '\\';  # a single backslash
-sub expstr2re($) {
-  local $_ = shift;
-  confess "bug" if ref($_);
-  unless (m#qr/|"::#) {
-    return $_; # doesn't contain variable-representation items
-  }
-  # In \Q *string* \E the *string* may not end in a backslash because
-  # it would be parsed as (\\)(E) instead of (\)(\E).
-  # So change them to a unique token and later replace problematic
-  # instances with ${bs} variable references.
-  s/\\/<BS>/g;
-  $_ = '\Q' . $_ . '\E';
-  s#([\$\@\%])#\\E\\$1\\Q#g;
-
-  if (m#qr/#) {
-    # Canonical: qr/STUFF/MODIFIERS
-    # Alternate: qr/STUFF/uMODIFIERS
-    # Alternate: qr/(?^MODIFIERS:STUFF)/
-    # Alternate: qr/(?^uMODIFIERS:STUFF)/
-#say "#XX qr BEFORE: $_"; 
-    s#qr/([^\/]+)/([msixpodualngcer]*)
-     #\\E\(\\Qqr/$1/\\Eu?\\Q$2\\E|\\Qqr/(?^\\Eu?\\Q$2:$1)/\\E\)\\Q#xg
-      or confess "Problem with qr/.../ in input string: $_";
-#say "#XX qr AFTER : $_"; 
-  }
-  if (m#\{"([\w:]+).*"\}#) {
-    # Canonical: fh=\*{"::\$fh"}  or  fh=\*{"Some::Pkg::\$fh"}
-    #   which will be encoded above like ...\Qfh=<BS>*{"::<BS>\E\$\Qfh"}
-    # Alt1     : fh=\*{"main::\$fh"}
-    # Alt2     : fh=\*{'main::$fh'}  or  fh=\*{'main::$fh'} etc.
-#say "#XX fh BEFORE: $_"; 
-    s{(\w+)=<BS>\*\{"(::)<BS>([^"]+)"\}}
-     {$1=<BS>*{\\E(?x: "(?:main::|::) \\Q<BS>$3"\\E | '(?:main::|::) \\Q$3'\\E )\\Q}}xg
-    |
-    s{(\w+)=<BS>\*\{"(\w[\w:]*::)<BS>([^"]+)"\}}
-     {$1=<BS>*{\\E(?x: "\\Q$2<BS>$3"\\E | '\\Q$2$3'\\E )\\Q}}xg
-    or
-      confess "Problem with filehandle in input string <<$_>>";
-#say "#XX fh AFTER : $_"; 
-  }
-  s/<BS>\\/\${bs}\\/g;
-  s/<BS>/\\/g;
-#say "#XX    FINAL : $_"; 
-
-  my $saved_dollarat = $@;
-  my $re = eval "qr{${_}}"; die "$@ " if $@;
-  $@ = $saved_dollarat;
-  $re
-}
-
-# check $test_desc, string_or_regex, result
-sub check($$@) {
-  my ($desc, $expected_arg, @actual) = @_;
-  local $_;  # preserve $1 etc. for caller
-  my @expected = ref($expected_arg) eq "ARRAY" ? @$expected_arg : ($expected_arg);
-  confess "zero 'actual' results" if @actual==0;
-  confess "ARE WE USING THIS FEATURE? (@actual)" if @actual != 1;
-  confess "ARE WE USING THIS FEATURE? (@expected)" if @expected != 1;
-  confess "\nTESTa FAILED: $desc\n"
-         ."Expected ".scalar(@expected)." results, but got ".scalar(@actual).":\n"
-         ."expected=(@expected)\n"
-         ."actual=(@actual)\n"
-         ."\$@=$@\n"
-    if @expected != @actual;
-  foreach my $i (0..$#actual) {
-    my $actual = $actual[$i];
-    my $expected = $expected[$i];
-    if (!ref($expected)) {
-      # Work around different Perl versions stringifying regexes differently
-      $expected = expstr2re($expected);
-    }
-    if (ref($expected) eq "Regexp") {
-      unless ($actual =~ $expected) {
-        @_ = ( "\n**************************************\n"
-              ."TESTb FAILED: ".$desc."\n"
-              ."Expected (Regexp):\n".${expected}."<<end>>\n"
-              ."Got:\n".displaystr($actual)."<<end>>\n"
-              .visFoldwidth()."\n" ) ;
-        Carp::confess(@_); #goto &Carp::confess;
-      }
-#say "###ACT $actual";
-#say "###EXP $expected";
-    } else {
-      unless ($expected eq $actual) {
-        @_ = ("TESTc FAILED: $desc", $expected, $actual);
-        goto &checkeq_literal
-      }
-    }
-  }
-}
 
 # Run a variety of tests on an item which is a string or strigified object
 # which is not presented as a bare number (i.e. it is shown in quotes).
@@ -749,6 +582,8 @@ sub get_closure(;$) {
   local $local_obj = $toplex_obj;
   local $local_regexp = $toplex_regexp;
 
+  use constant CPICS_DEFAULT => 0; # is Useqq('controlpics') the default?
+
   my @dvis_tests = (
     [ __LINE__, q(hexesc:\x{263a}), qq(hexesc:\N{U+263A}) ],   # \x{...} in dvis input
     [ __LINE__, q(NUesc:\N{U+263a}), qq(NUesc:\N{U+263A}) ], # \N{U+...} in dvis input
@@ -760,9 +595,12 @@ sub get_closure(;$) {
 
     [__LINE__, q(unicodehex_str=\"\\x{263a}\\x{263b}\\x{263c}\\x{263d}\\x{263e}\\x{263f}\\x{2640}\\x{2641}\\x{2642}\\x{2643}\\x{2644}\\x{2645}\\x{2646}\\x{2647}\\x{2648}\\x{2649}\\x{264a}\\x{264b}\\x{264c}\\x{264d}\\x{264e}\\x{264f}\\x{2650}\"\n), qq(unicodehex_str="${unicode_str}"\n) ],
 
-    [__LINE__, q($byte_str\n), qq(byte_str=\"\N{SYMBOL FOR NEWLINE}\\13\N{SYMBOL FOR FORM FEED}\N{SYMBOL FOR CARRIAGE RETURN}\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\N{SYMBOL FOR ESCAPE}\\34\\35\\36\"\n) ],
-    #[__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\13\\f\\r\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\\e\\34\\35\\36\"\n) ],
-    #[__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\x{B}\\f\\r\\x{E}\\x{F}\\x{10}\\x{11}\\x{12}\\x{13}\\x{14}\\x{15}\\x{16}\\x{17}\\x{18}\\x{19}\\x{1A}\\e\\x{1C}\\x{1D}\\x{1E}\"\n) ],
+    (CPICS_DEFAULT ? (
+     [__LINE__, q($byte_str\n), qq(byte_str=\"\N{SYMBOL FOR NEWLINE}\\13\N{SYMBOL FOR FORM FEED}\N{SYMBOL FOR CARRIAGE RETURN}\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\N{SYMBOL FOR ESCAPE}\\34\\35\\36\"\n) ]
+    ):(
+     [__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\13\\f\\r\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\\e\\34\\35\\36\"\n) ],
+     #[__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\x{B}\\f\\r\\x{E}\\x{F}\\x{10}\\x{11}\\x{12}\\x{13}\\x{14}\\x{15}\\x{16}\\x{17}\\x{18}\\x{19}\\x{1A}\\e\\x{1C}\\x{1D}\\x{1E}\"\n) ],
+    )),
 
     [__LINE__, q($flex\n), qq(flex=\"Lexical in sub f\"\n) ],
     [__LINE__, q($$flex_ref\n), qq(\$\$flex_ref=\"Lexical in sub f\"\n) ],
@@ -777,16 +615,22 @@ sub get_closure(;$) {
     [__LINE__, q(${^MATCH}\n), qq(\${^MATCH}=\"GroupA.GroupB\"\n) ],
     [__LINE__, q($.\n), qq(\$.=1234\n) ],
     [__LINE__, q($NR\n), qq(NR=1234\n) ],
-    [__LINE__, q($/\n), qq(\$/=\"\N{SYMBOL FOR NEWLINE}\"\n) ],
-    #[__LINE__, q($/\n), qq(\$/=\"\\n\"\n) ],
+    (CPICS_DEFAULT ? (
+     [__LINE__, q($/\n), qq(\$/=\"\N{SYMBOL FOR NEWLINE}\"\n) ],
+    ):(
+     [__LINE__, q($/\n), qq(\$/=\"\\n\"\n) ],
+    )),
     [__LINE__, q($\\\n), qq(\$\\=undef\n) ],
     [__LINE__, q($"\n), qq(\$\"=\" \"\n) ],
     [__LINE__, q($~\n), qq(\$~=\"STDOUT\"\n) ],
     #20 :
     [__LINE__, q($^\n), qq(\$^=\"STDOUT_TOP\"\n) ],
-    [__LINE__, q($:\n), qq(\$:=\" \N{SYMBOL FOR NEWLINE}-\"\n) ],
-    #[__LINE__, q($:\n), qq(\$:=\" \\n-\"\n) ],
-    [__LINE__, q($^L\n), qq(\$^L=\"\N{SYMBOL FOR FORM FEED}\"\n) ],
+    (CPICS_DEFAULT ? (
+     [__LINE__, q($:\n), qq(\$:=\" \N{SYMBOL FOR NEWLINE}-\"\n) ],
+     [__LINE__, q($^L\n), qq(\$^L=\"\N{SYMBOL FOR FORM FEED}\"\n) ],
+    ):(
+     [__LINE__, q($:\n), qq(\$:=\" \\n-\"\n) ],
+    )),
     [__LINE__, q($?\n), qq(\$?=0\n) ],
     [__LINE__, q($[\n), qq(\$[=0\n) ],
     [__LINE__, q($$\n), qq(\$\$=$$\n) ],
@@ -812,7 +656,11 @@ sub get_closure(;$) {
 )
 EOF
     [__LINE__, q($#_\n), qq(\$#_=1\n) ],
-    [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\N{SYMBOL FOR NEWLINE}\"\n) ],
+    (CPICS_DEFAULT ? (
+     [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\N{SYMBOL FOR NEWLINE}\"\n) ],
+    ):(
+     [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\\n\"\n) ],
+    )),
     #37 :
     map({
       my ($LQ,$RQ) = (/^(.)(.)$/) or die "bug";

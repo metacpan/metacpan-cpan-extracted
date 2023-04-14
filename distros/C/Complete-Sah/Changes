@@ -1,7 +1,14 @@
+0.011   2023-01-28  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention x.in.summaries.
+
+
 0.010   2023-01-19  Released-By: PERLANCAR; Urgency: medium
 
         - [func complete_from_schema] Fix Rinci metadata: add
-          result_is_naked=1.
+          result_naked=1.
 
 
 0.009   2023-01-19  Released-By: PERLANCAR; Urgency: medium

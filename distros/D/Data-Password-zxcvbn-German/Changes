@@ -1,0 +1,11 @@
+1.0.2     2023-04-04 15:54:47+01:00 Europe/London
+ - *actually* re-generate dictionaries with the new serialisation;
+    perl 5.18 couldn't parse the previous one
+
+1.0.1     2023-04-04 10:45:51+01:00 Europe/London
+ - change serialisation of dictionaries, some cpantesters had problems
+   parsing them
+ - fix dependency versions
+
+1.0.0     2023-04-03 15:41:06+01:00 Europe/London
+ - initial release

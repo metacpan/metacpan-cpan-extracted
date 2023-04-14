@@ -5,7 +5,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 use 5.020;
 use Moo;
@@ -15,7 +15,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities 0.525 qw(assert_keyword_exists assert_keyword_type E canonical_uri get_type jsonp);
+use JSON::Schema::Modern::Utilities 0.525 qw(E canonical_uri jsonp);
 use Safe::Isa;
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
@@ -40,14 +40,15 @@ use constant DEFAULT_SCHEMAS => {
   'strict-dialect.json' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-dialect.json',
 };
 
-use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/latest';
+use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2022-10-07';
+use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
 
 has '+evaluator' => (
   required => 1,
 );
 
 has '+metaschema_uri' => (
-  default => DEFAULT_METASCHEMA,
+  default => DEFAULT_BASE_METASCHEMA,
 );
 
 has json_schema_dialect => (
@@ -86,26 +87,43 @@ sub traverse ($self, $evaluator) {
     vocabularies => [],
   };
 
-  if ((my $type = get_type($schema)) ne 'object') {
-    ()= E($state, 'invalid document type: %s', $type);
+  # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/latest
+  # just to validate the parts of the document we need to verify before parsing jsonSchemaDialect
+  # and switching to the real metaschema for this document
+  state $top_schema = {
+    '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+    type => 'object',
+    required => ['openapi'],
+    properties => {
+      openapi => {
+        type => 'string',
+        pattern => '',  # just here for the callback so we can customize the error
+      },
+      jsonSchemaDialect => {
+        type => 'string',
+        format => 'uri',
+      },
+    },
+  };
+  my $top_result = $self->evaluator->evaluate(
+    $schema, $top_schema,
+    {
+      effective_base_uri => DEFAULT_METASCHEMA,
+      callbacks => {
+        pattern => sub ($data, $schema, $state) {
+          return $data =~ /^3\.1\.[0-9]+(-.+)?$/ ? 1 : E($state, 'unrecognized openapi version %s', $data);
+        },
+      },
+    },
+  );
+  if (not $top_result) {
+    $_->mode('evaluate') foreach $top_result->errors;
+    push $state->{errors}->@*, $top_result->errors;
     return $state;
   }
-
-  # /openapi: https://spec.openapis.org/oas/v3.1.0#openapi-object
-  return $state if not assert_keyword_exists({ %$state, keyword => 'openapi' }, $schema)
-    or not assert_keyword_type({ %$state, keyword => 'openapi' }, $schema, 'string');
-
-  if ($schema->{openapi} !~ /^3\.1\.[0-9]+(-.+)?$/) {
-    ()= E({ %$state, keyword => 'openapi' }, 'unrecognized openapi version %s', $schema->{openapi});
-    return $state;
-  }
-
 
   # /jsonSchemaDialect: https://spec.openapis.org/oas/v3.1.0#specifying-schema-dialects
   {
-    return $state if exists $schema->{jsonSchemaDialect}
-      and not assert_keyword_type({ %$state, keyword => 'jsonSchemaDialect' }, $schema, 'string');
-
     my $json_schema_dialect = $self->json_schema_dialect // $schema->{jsonSchemaDialect};
 
     # "If [jsonSchemaDialect] is not set, then the OAS dialect schema id MUST be used for these Schema Objects."
@@ -119,6 +137,7 @@ sub traverse ($self, $evaluator) {
 
     # we cannot continue if the metaschema is invalid
     if ($check_metaschema_state->{errors}->@*) {
+      # these errors should be mode=traverse
       push $state->{errors}->@*, $check_metaschema_state->{errors}->@*;
       return $state;
     }
@@ -131,8 +150,7 @@ sub traverse ($self, $evaluator) {
   # resources within to add to the global resource index, and to extract all operationIds
   my (@json_schema_paths, @operation_paths);
   my $result = $self->evaluator->evaluate(
-    $self->schema,
-    $self->metaschema_uri,
+    $schema, $self->metaschema_uri,
     {
       callbacks => {
         '$dynamicRef' => sub ($, $schema, $state) {
@@ -159,9 +177,16 @@ sub traverse ($self, $evaluator) {
   my %seen_path;
   foreach my $path (sort keys $schema->{paths}->%*) {
     my $normalized = $path =~ s/\{[^}]+\}/\x00/r;
-    ()= E({ %$state, data_path => jsonp('/paths', $path) },
-      'duplicate templated path %s', $path) if ++$seen_path{$normalized} > 1;
+    if (my $first_path = $seen_path{$normalized}) {
+      ()= E({ %$state, data_path => jsonp('/paths', $path),
+        initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+        'duplicate of templated path %s', $first_path);
+      $state->{errors}[-1]->mode('evaluate');
+      next;
+    }
+    $seen_path{$normalized} = $path;
   }
+
   return $state if $state->{errors}->@*;
 
   my @real_json_schema_paths;
@@ -176,7 +201,8 @@ sub traverse ($self, $evaluator) {
   foreach my $pair (@operation_paths) {
     my ($operation_id, $path) = @$pair;
     if (my $existing = $self->get_operationId_path($operation_id)) {
-      ()= E({ %$state, keyword => 'operationId', schema_path => $path },
+      ()= E({ %$state, data_path => $path .'/operationId',
+          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
         'duplicate of operationId at %s', $existing);
     }
     else {
@@ -184,6 +210,7 @@ sub traverse ($self, $evaluator) {
     }
   }
 
+  $_->mode('evaluate') foreach $state->{errors}->@*;
   return $state;
 }
 
@@ -250,7 +277,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

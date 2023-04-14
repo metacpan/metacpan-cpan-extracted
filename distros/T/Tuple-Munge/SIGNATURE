@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 d5f856b935922d1ba4f81053aa9032b4705aca83cef500344112302284a018be .gitignore
+SHA256 ede73547b0574bba8a3a56ea7d636309e53e03f226e5104b867407ba56621b91 Build.PL
+SHA256 a0bd20455861ac3b4c86d2b494ea0990a5b35b593d5cee257b566eecc42fc06c Changes
+SHA256 18d8ddffaefb00271ffd18fd61a620ec31c462bf3813843aa96a5c500d19912b MANIFEST
+SHA256 aa90ac623ae8096f608d0d007ddac9673d2a8929cd55ad9d3c09168cb4914681 META.json
+SHA256 3e466db6bc906890f53340c0ae268f6ae42a52d5d19c92ba2a313258739ad95e META.yml
+SHA256 9988da40f433779a090f9ae021c74fb35557099249d1ff27ff0bf23752c08036 README
+SHA256 e4f5ffc476f1468fcc0c0fe27c4ee5aaba470627e8a8754c47de549ed878c164 lib/Tuple/Munge.pm
+SHA256 f62ecff414acf447a98e4c8ac5f5a6dffe21d85000207ef966236178c7e7cd79 lib/Tuple/Munge.xs
+SHA256 26444c4bcdb6d0057238bda24ebe83345b54aac03f2e690c923d82be91f8f5a4 t/basic.t
+SHA256 26188f4933c788a342c6dfa9fb1e7a43f93789d2aec4759bfccc670892467423 t/context.t
+SHA256 0513cd312c8408a296912bb3d1c57565d2e95144186bfcbe1b96c85c1861325d t/magic.t
+SHA256 5bd78efd8ffdcd5cec38f05a0741237a96e3b62f2d36ba2718abfb9d59688aff t/ops.t
+SHA256 3679257bdfb4a07658e98a41325f82c1744f7dae6d1d0151f1b216af0c1df5c9 t/pod_cvg.t
+SHA256 e16860066c4ca9b2ee9e7d4604297def8a58b53bf0ca03eed863b5d9c5a2ac91 t/pod_syn.t
+SHA256 c35004969d6569367fff5fe183682b4a1d5f220ebe3cd1dd41a09af61aade954 t/prototype.t
+SHA256 130f6a98342b45efe8f390321c5a83a0d310e3b308855d5ca2237b4759e59744 t/return_ro.t
+SHA256 5bac78107ad731801315810d92d658ff39a0a8cd17b0b69773da98d1c6cc510c t/slot_value.t
+SHA256 5b1985e81b3f074a3eb194275fbdbb6f6b947a9780afc1d080431e58f25daa68 t/threads.t
+SHA256 085397fc352f7ff796c92887b71e4a2364eb7158a560fd1fd549b0f20640343e t/tuple_ref.t
+SHA256 e9f66c48644d1e39d57f38f700e416c5935938de3854fa7ecb844e0b0cbedffe t/usage.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEAREDAAYFAmQ2Ka4ACgkQOV9mt2VyAVEOfQCfTbQU5+1WbV3GoheBVT/NZus7
+sWkAniWDfW3j21dsbiJo4O6P02yh6j1K
+=jwOf
+-----END PGP SIGNATURE-----

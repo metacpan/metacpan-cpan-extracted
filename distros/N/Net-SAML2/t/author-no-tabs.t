@@ -70,6 +70,7 @@ my @files = (
     't/data/cacert-azure.pem',
     't/data/cacert-google.pem',
     't/data/cacert-samlid.pem',
+    't/data/digid-live.xml',
     't/data/eherkenning-assertion.xml',
     't/data/failed-assertion.xml',
     't/data/idp-metadata-multiple-invalid-use.xml',

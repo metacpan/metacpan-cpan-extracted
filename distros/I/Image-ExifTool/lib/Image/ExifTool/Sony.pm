@@ -34,7 +34,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '3.55';
+$VERSION = '3.59';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -160,6 +160,7 @@ sub PrintInvLensSpec($;$$);
     32875 => 'Sony FE 24-70mm F2.8 GM II', #JR
     32876 => 'Sony E 11mm F1.8', #JR
     32877 => 'Sony E 15mm F1.4 G', #JR
+    32878 => 'Sony FE 20-70mm F4 G', #JR
 
   # (comment this out so LensID will report the LensModel, which is more useful)
   # 32952 => 'Metabones Canon EF Speed Booster Ultra', #JR (corresponds to 184, but 'Advanced' mode, LensMount reported as E-mount)
@@ -191,6 +192,7 @@ sub PrintInvLensSpec($;$$);
     49235 => 'Zeiss Loxia 85mm F2.4', #JR
     49236 => 'Zeiss Loxia 25mm F2.4', #JR
 
+    49456 => 'Tamron E 18-200mm F3.5-6.3 Di III VC', #FrancoisPiette
     49457 => 'Tamron 28-75mm F2.8 Di III RXD', #JR (Model A036)
     49458 => 'Tamron 17-28mm F2.8 Di III RXD', #JR (Model A046)
     49459 => 'Tamron 35mm F2.8 Di III OSD M1:2', #IB (Model F053)
@@ -256,6 +258,8 @@ sub PrintInvLensSpec($;$$);
     50533 => 'Sigma 16-28mm F2.8 DG DN | C', #JR (022)
     50534 => 'Sigma 20mm F1.4 DG DN | A', #JR (022)
     50535 => 'Sigma 24mm F1.4 DG DN | A', #JR (022)
+    50536 => 'Sigma 60-600mm F4.5-6.3 DG DN OS | S', #JR (023)
+    50539 => 'Sigma 50mm F1.4 DG DN | A', #JR (023)
 
     50992 => 'Voigtlander SUPER WIDE-HELIAR 15mm F4.5 III', #JR
     50993 => 'Voigtlander HELIAR-HYPER WIDE 10mm F5.6', #IB
@@ -1953,6 +1957,7 @@ my %hidUnk = ( Hidden => 1, Unknown => 1 );
             '3 3 3 0' => 'ARW 2.3.3', #JR (ILCE-9)
             '3 3 5 0' => 'ARW 2.3.5', #JR (DSC-HX99)
             '4 0 0 0' => 'ARW 4.0', # (ILCE-7SM3)
+            '4 0 1 0' => 'ARW 4.0.1', #github#195 (ZV-E1)
             # what about cRAW images?
         },
     },
@@ -2041,6 +2046,7 @@ my %hidUnk = ( Hidden => 1, Unknown => 1 );
             369 => 'DSC-RX100M5A', #JR
             371 => 'ILCE-6400', #IB
             372 => 'DSC-RX0M2', #JR
+            373 => 'DSC-HX95', #github191
             374 => 'DSC-RX100M7', #IB
             375 => 'ILCE-7RM4', #IB
             376 => 'ILCE-9M2', #JR
@@ -2157,6 +2163,7 @@ my %hidUnk = ( Hidden => 1, Unknown => 1 );
         # set to 65535 for E-mount lenses (values 0x80xx)
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 65535 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0xb028 => { #2
         # (used by the DSLR-A100)
@@ -5566,6 +5573,7 @@ my %faceInfo = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x400 => { #JR
         Name => 'ImageNumber',
@@ -6599,6 +6607,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x1896 => {
         Name => 'LensType',
@@ -6608,6 +6617,7 @@ my %isoSetting2010 = (
         SeparateTable => 1,
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x1898 => {
         Name => 'DistortionCorrParamsPresent',
@@ -6805,6 +6815,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x18c2 => {
         Name => 'LensType',
@@ -6814,6 +6825,7 @@ my %isoSetting2010 = (
         SeparateTable => 1,
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x18c4 => {
         Name => 'DistortionCorrParamsPresent',
@@ -6942,6 +6954,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x18f2 => {
         Name => 'LensType',
@@ -6951,6 +6964,7 @@ my %isoSetting2010 = (
         SeparateTable => 1,
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x18f4 => {
         Name => 'DistortionCorrParamsPresent',
@@ -7071,6 +7085,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x17f6 => {
         Name => 'LensType',
@@ -7080,6 +7095,7 @@ my %isoSetting2010 = (
         SeparateTable => 1,
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x17f8 => {
         Name => 'DistortionCorrParamsPresent',
@@ -7435,6 +7451,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x0109 => {
         Name => 'LensType',
@@ -7446,6 +7463,7 @@ my %isoSetting2010 = (
         # has a value of 0 for E-mount lenses (values 0x80xx)
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x010b => {
         Name => 'DistortionCorrParamsPresent',
@@ -7722,6 +7740,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x0109 => {
         Name => 'LensType',
@@ -7733,6 +7752,7 @@ my %isoSetting2010 = (
         # has a value of 0 for E-mount lenses (values 0x80xx)
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x010b => {
         Name => 'DistortionCorrParamsPresent',
@@ -8531,6 +8551,7 @@ my %isoSetting2010 = (
         Notes => 'E-mount lenses',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x0608 => {
         Name => 'LensType',
@@ -8539,6 +8560,7 @@ my %isoSetting2010 = (
         Notes => 'A-mount lenses on SLT and NEX',
         SeparateTable => 1,
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x064a => {
         Name => 'VignettingCorrParams',
@@ -8709,6 +8731,7 @@ my %isoSetting2010 = (
         Notes => 'E-mount lenses',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x0062 => {
         Name => 'LensType',
@@ -8717,6 +8740,7 @@ my %isoSetting2010 = (
         Notes => 'A-mount lenses on SLT and NEX',
         SeparateTable => 1,
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x0064 => {
         Name => 'DistortionCorrParams',
@@ -8933,6 +8957,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x000b => {
         Name => 'CameraE-mountVersion',
@@ -9618,6 +9643,7 @@ my %isoSetting2010 = (
         Format => 'int16u',
         SeparateTable => 'LensType2',
         PrintConv => \%sonyLensTypes2,
+        PrintInt => 1,
     },
     0x004d => {
         Name => 'LensType',
@@ -9627,6 +9653,7 @@ my %isoSetting2010 = (
         SeparateTable => 1,
         ValueConvInv => '($val & 0xff00) == 0x8000 ? 0 : int($val)',
         PrintConv => \%sonyLensTypes,
+        PrintInt => 1,
     },
     0x004f => {
         Name => 'DistortionCorrParams',
@@ -10191,10 +10218,10 @@ my %isoSetting2010 = (
         PrintConv => 'Image::ExifTool::Exif::PrintFNumber($val)',
     },
     0x8001 => { Name => 'Sony_rtmd_0x8001', Format => 'int16u', %hidUnk },
-    0x8004 => { Name => 'Sony_rtmd_0x8004', Format => 'int16u', %hidUnk },
-    0x8005 => { Name => 'Sony_rtmd_0x8005', Format => 'int16u', %hidUnk },
-    0x800a => { Name => 'Sony_rtmd_0x800a', Format => 'int16u', %hidUnk },
-    0x800b => { Name => 'Sony_rtmd_0x800b', Format => 'int16u', %hidUnk },
+    0x8004 => { Name => 'Sony_rtmd_0x8004', Format => 'int16u', %hidUnk }, # (FocalLength35efl?, forum14315)
+    0x8005 => { Name => 'Sony_rtmd_0x8005', Format => 'int16u', %hidUnk }, # (FocalLength?, forum14315)
+    0x800a => { Name => 'Sony_rtmd_0x800a', Format => 'int16u', %hidUnk }, # (FocusRingPosition?, forum14315)
+    0x800b => { Name => 'Sony_rtmd_0x800b', Format => 'int16u', %hidUnk }, # (ZoomRingPosition?, forum14315)
   # 0x8100 - 16 bytes starting with 0x060e2b340401
     0x8100 => { Name => 'Sony_rtmd_0x8100', Format => 'int8u',  %hidUnk },
     0x8101 => { Name => 'Sony_rtmd_0x8101', Format => 'int8u',  %hidUnk }, # seen: 0,1
@@ -10364,7 +10391,7 @@ my %isoSetting2010 = (
             return 'inf' if $val >= 255;
             return (2**($val/16-5) + 1) * $val[1] / 1000;
         },
-        PrintConv => '$val eq "inf" ? $val : sprintf("%.2f m",$val)',
+        PrintConv => '$val eq "inf" ? $val : sprintf("%.4g m", $val)',
     },
     GPSDateTime => {
         Description => 'GPS Date/Time',
@@ -11317,7 +11344,7 @@ Minolta.
 
 =head1 AUTHOR
 
-Copyright 2003-2022, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2023, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

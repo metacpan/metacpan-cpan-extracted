@@ -2,16 +2,14 @@
 .github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
-.github/workflows/windows-2019.yml
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
 lib/SPVM/Time/Local.c
 lib/SPVM/Time/Local.config
-lib/SPVM/Time/Local.native/include/.gitkeep
-lib/SPVM/Time/Local.native/src/.gitkeep
 lib/SPVM/Time/Local.pm
 lib/SPVM/Time/Local.spvm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

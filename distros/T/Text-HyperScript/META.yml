@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,13 +26,13 @@ no_index:
 provides:
   Text::HyperScript:
     file: lib/Text/HyperScript.pm
-    version: '0.05'
+    version: '0.06'
   Text::HyperScript::Boolean:
-    file: lib/Text/HyperScript.pm
-  Text::HyperScript::Element:
     file: lib/Text/HyperScript.pm
   Text::HyperScript::HTML5:
     file: lib/Text/HyperScript/HTML5.pm
+  Text::HyperScript::NodeString:
+    file: lib/Text/HyperScript.pm
 requires:
   Exporter::Lite: '0.09'
   perl: '5.008001'
@@ -40,6 +40,6 @@ resources:
   bugtracker: https://github.com/nyarla/p5-Text-HyperScript/issues
   homepage: https://github.com/nyarla/p5-Text-HyperScript
   repository: https://github.com/nyarla/p5-Text-HyperScript.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

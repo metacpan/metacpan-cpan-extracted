@@ -1,20 +1,20 @@
 #!/usr/bin/env perl
-use FindBin qw($Bin);
-use lib $Bin;
-use t_Setup qw/bug silent/; # strict, warnings, Test::More, Carp etc.
-
-unless (($ENV{PERL_PERTURB_KEYS}//"") eq "2") {
-  $ENV{PERL_PERTURB_KEYS} = "2"; # deterministic
-  $ENV{PERL_HASH_SEED} = "0xDEADBEEF";
-  $ENV{PERL_HASH_SEED_DEBUG} = "1";
-  exec $^X, $0, @ARGV; # for reproducible results
+BEGIN {
+  unless (($ENV{PERL_PERTURB_KEYS}//"") eq "2") {
+    $ENV{PERL_PERTURB_KEYS} = "2"; # deterministic
+    $ENV{PERL_HASH_SEED} = "0xDEADBEEF";
+    #$ENV{PERL_HASH_SEED_DEBUG} = "1";
+    exec $^X, $0, @ARGV; # for reproducible results
+  }
 }
 
-use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
-#use open IO => ':locale';
-use open ':std', ':encoding(UTF-8)';
-select STDERR; $|=1; select STDOUT; $|=1;
-use Carp;
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Common qw/oops/; # strict, warnings, Carp, etc.
+use t_TestCommon ':silent', qw/bug/; # Test::More etc.
+
+use strict; use warnings  FATAL => 'all'; 
+
 use POSIX qw(INT_MAX);
 use Math::BigRat ();
 use Math::BigInt ();

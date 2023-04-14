@@ -16,9 +16,9 @@ App::Greple::subst::desumasu - Japanese DESU/MASU dictionary for App::Greple::su
 greple -Msubst module based on
 [desumasu-converter](https://github.com/kssfilo/desumasu-converter).
 
-This is a simple checker/converter module for Japanese writing style
-so called DUSU/MASU (ですます調: 敬体) and DEARU (である調: 常体).
-This is not my own idea and the dictionary is based on
+This is a simple checker/converter module for the Japanese writing
+styles so called DESU/MASU (ですます調: 敬体) and DEARU (である調: 常
+体).  This is not my own idea and the dictionary is based on
 [https://github.com/kssfilo/desumasu-converter](https://github.com/kssfilo/desumasu-converter).
 
 See article [https://kanasys.com/tech/722](https://kanasys.com/tech/722) for detail.
@@ -31,10 +31,10 @@ See article [https://kanasys.com/tech/722](https://kanasys.com/tech/722) for det
 
     Convert DESU/MASU to DEARU style.
 
-    DESU (です) and MASU (ます) sometimes followed by NE (ね) in frank
-    situation, and that NE (ね) is removed from converted result by
-    default.  Option with **-n** keep that NE (ね), and option with **-N**
-    igonore them.
+    DESU (です) and MASU (ます) are sometimes followed by NE (ね) in an
+    open situation, and that NE (ね) is removed from the converted result
+    by default.  Option with **-n** keeps the NE (ね), and option with
+    **-N** igonores it.
 
 - **--desumasu**
 - **--desumasu-n**
@@ -58,8 +58,8 @@ Use them with **greple** **-Msubst** options.
 - **--overwrite**
 
     To update the file, use these options.  Option **--create** make new
-    file with `.new` suffix.  Option **--replace** update the target file
-    with backup, while option **--overwrite** does without backup.
+    file with extention `.new`.  Option **--replace** updates the target
+    file with backup, while option **--overwrite** does it without backup.
 
 See [App::Greple::subst](https://metacpan.org/pod/App%3A%3AGreple%3A%3Asubst) for other options.
 

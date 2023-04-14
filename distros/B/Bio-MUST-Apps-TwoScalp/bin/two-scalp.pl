@@ -68,6 +68,7 @@ if ($ARGV_p_ref) {
     $master_profile = $ref_prefix;
 }
 
+my $basename = $ARGV_in_seqs[0];
 my $len = @ARGV_in_seqs;
 #### number of specified files: $len
 
@@ -203,7 +204,7 @@ if ($ARGV_p_ref) {
 }
 
 # add suffix
-my $outfile = secure_outfile($ARGV_in_seqs[0], $ARGV_out_suffix);
+my $outfile = secure_outfile($basename, $ARGV_out_suffix);
 ### Store fasta outfile: $outfile
 $master_profile->store($outfile);
 
@@ -255,7 +256,7 @@ sub align_on_profile {
     }
 
     elsif ($type eq 'seqs') {
-        delete %reduced_opt{ qw( --maxiterate --localpair ) }
+        delete @reduced_opt{ qw( --maxiterate --localpair ) }
             if $ARGV_keep_length;
         $new_profile =    Seqs2Profile->new( file1   => $toalign_file,
                                              file2   => $profile_file,
@@ -351,7 +352,7 @@ two-scalp.pl - Align or re-align sequences using various strategies
 
 =head1 VERSION
 
-version 0.211710
+version 0.231010
 
 =head1 USAGE
 

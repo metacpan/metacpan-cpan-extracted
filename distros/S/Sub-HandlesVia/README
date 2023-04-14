@@ -84,6 +84,7 @@ SEE ALSO
     Sub::HandlesVia::HandlerLibrary::Bool,
     Sub::HandlesVia::HandlerLibrary::Code,
     Sub::HandlesVia::HandlerLibrary::Counter,
+    Sub::HandlesVia::HandlerLibrary::Enum,
     Sub::HandlesVia::HandlerLibrary::Hash,
     Sub::HandlesVia::HandlerLibrary::Number,
     Sub::HandlesVia::HandlerLibrary::Scalar, and

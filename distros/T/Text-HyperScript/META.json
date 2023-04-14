@@ -4,7 +4,7 @@
       "OKAMURA Naoki a.k.a nyarla: <nyarla@kalaclista.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
@@ -55,16 +55,16 @@
    "provides" : {
       "Text::HyperScript" : {
          "file" : "lib/Text/HyperScript.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Text::HyperScript::Boolean" : {
          "file" : "lib/Text/HyperScript.pm"
       },
-      "Text::HyperScript::Element" : {
-         "file" : "lib/Text/HyperScript.pm"
-      },
       "Text::HyperScript::HTML5" : {
          "file" : "lib/Text/HyperScript/HTML5.pm"
+      },
+      "Text::HyperScript::NodeString" : {
+         "file" : "lib/Text/HyperScript.pm"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/nyarla/p5-Text-HyperScript"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

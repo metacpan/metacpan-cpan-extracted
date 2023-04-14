@@ -54,6 +54,13 @@ has 'baseurl' => (
 	required => 1,
 );
 
+has 'basepath' => (
+	isa => 'Str',
+	is => 'ro',
+	lazy => 1,
+	builder => '_probe_basepath',
+);
+
 has 'create' => (
 	is => 'rw',
 	traits => ['Bool'],
@@ -81,6 +88,10 @@ sub _probe_url {
 	my $self = shift;
 
 	return join('/', $self->baseurl, $self->relname);
+}
+
+sub _probe_basepath {
+	return shift->baseurl;
 }
 
 sub DESTROY {
@@ -292,7 +303,7 @@ sub delete_files {
 			push @to_delete, shift @ownfiles;
 		} elsif($names[0] eq substr($ownfiles[0]->url, 0, length($names[0]))) {
 			push @to_delete, shift @ownfiles;
-			if((!scalar(@ownfiles)) || $names[0] lt $ownfiles[0]->url) {
+			if((!scalar(@ownfiles)) || $names[0] ne substr($ownfiles[0]->url, 0, length($names[0]))) {
 				shift @names;
 			}
 		} elsif ($names[0] gt $ownfiles[0]->url) {

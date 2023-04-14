@@ -3,23 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker 6.48;
 
 # make sure we can run gnuplot before continuing
-{
-    unless(`gnuplot -V`)
-    {
-        print STDERR <<EOM;
-
-Error: "$!"
-
-I tried to execute 'gnuplot' and it didn't work. Since this module is an is an
-interface to Gnuplot, it must be installed for the module to be useful. Install
-Gnuplot to continue. Use your package manager, or download the source from
-http://www.gnuplot.info
-EOM
-
-        exit 0;
-    }
-}
-
+use Alien::Gnuplot;
 
 sub MY::libscan {
     package MY;
@@ -56,6 +40,7 @@ WriteMakefile(
     MIN_PERL_VERSION          => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.64', # TEST_REQUIRES
+        'Alien::Gnuplot'      => 0,
     },
     PREREQ_PM => { 
             'Alien::Gnuplot'      => 0,

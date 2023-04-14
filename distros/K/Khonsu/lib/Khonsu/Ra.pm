@@ -19,6 +19,8 @@ use Khonsu::Text::H4;
 use Khonsu::Text::H5;
 use Khonsu::Text::H6;
 
+use Khonsu::Image;
+
 use Types::Standard qw/Str Object ArrayRef HashRef Num Bool/;
 
 use constant RW => (is => 'rw');
@@ -76,7 +78,9 @@ use constant H5 => (
 use constant H6 => (
 	h6 => {is => 'rw', isa => Object, default => sub { Khonsu::Text::H6->new() }}
 );
-
+use constant IMAGE => (
+	image => {is => 'rw', isa => Object, default => sub { Khonsu::Image->new() }}
+);
 sub new {
 	my ($pkg, %params) = @_;
 

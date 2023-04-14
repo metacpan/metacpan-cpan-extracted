@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.20'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.22'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -322,16 +322,14 @@ sub recode  :lvalue {
   my $z  = $ccs->[$VALS]->slice("-1");
 
   ##-- get mask of "real" non-zero values
-  my $nzmask = PDL->zeroes($P_BYTE,$nz->nelem);
-  my ($nzmask1);
+  my ($nzmask, $nzmask1);
   if ($z->isbad) {
-    $nz->isgood($nzmask);
+    $nzmask = $nz->isgood;
   }
   else {
-    $nz->ne($z, $nzmask, 0);
+    $nzmask = $nz != $z;
     if ($ccs->[$FLAGS] & $CCSND_BAD_IS_MISSING) {
-      $nzmask1 = $nzmask->pdl;
-      $nz->isgood($nzmask1);
+      $nzmask1 = $nz->isgood;
       $nzmask &= $nzmask1;
     }
   }
@@ -1070,6 +1068,8 @@ sub _ufuncsub {
       $which1   = $which1->dice_axis(1,$sorti);
       $vals1    = $vals->index($sorti);
     }
+    confess "\$vals1 is empty: \$which=".$which->info.", \$vals1=".$vals1->info.", \$vals=".$vals->info
+      if $vals1->isempty;
     ##
     ##-- guts
     my ($which2,$nzvals2) = $accumsub->($which1,$vals1,

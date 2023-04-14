@@ -1,5 +1,5 @@
 use v5.12.0;
-package Test::Routine::Test::Role 0.030;
+package Test::Routine::Test::Role 0.031;
 # ABSTRACT: role providing test attributes
 
 use Moose::Role;
@@ -35,7 +35,7 @@ Test::Routine::Test::Role - role providing test attributes
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 PERL VERSION
 

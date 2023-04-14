@@ -7,7 +7,7 @@ use warnings;
 use constant ntests => 100;
 use constant nwords => 10;
 
-use Test::More tests => ntests * nwords;
+use Test::More;
 use lib 'blib/lib';
 use HTML::Index::Store::BerkeleyDB;
 use HTML::Index::Document;
@@ -20,6 +20,7 @@ my @dict = map { "word$_" } ( 1 .. ntests );
 my %index;
 my %words;
 my %files;
+my $tested = 0;
 if ( my $fh = IO::File->new( '/usr/dict/words' ) )
 {
     @dict = <$fh>;
@@ -58,6 +59,8 @@ for my $w ( keys %words )
     {
         is( $r1[$_], $r2[$_] ); 
         $failed++ if not defined $r2[$_] or $r1[$_] ne $r2[$_];
+        $tested++;
     }
     warn "$w : @r1 : @r2\n" if $failed;
 }
+done_testing( $tested );

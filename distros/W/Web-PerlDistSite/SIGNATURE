@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 90909e835ba4dd448ee7d39ed196abaee9cb60568f114416220ec04195b7d6bd COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 19517e0b0c241e58f157e2287d24a40976e789248ad4135c10111cbf84500951 Changes
+SHA256 84f46a6a6f0c053555af0bd6eba5b37d0b8390c6b0e13ea35fcdd3480aa0ae2e INSTALL
+SHA256 1a2929dacaef239beca27a85f7f97b793628dfb22f07fdfb406cb6f3f0d22a6b LICENSE
+SHA256 3a577d6b8378ed5a9dcf515e7631a5b5d2bbdbb024eceb7c0532b0cfa9cdd7f7 MANIFEST
+SHA256 4f398bd805c36f86bc2eadf41d27c023139965c44082b3a03e96e6f4c81778dc META.json
+SHA256 d407b944a12b1b2f74c509d1fceae03488dc04f81eb8b70786b0ccf921c34425 META.yml
+SHA256 ac9d5b9cd7e82f29dc9b0ce918e4b35e578b218c10750f666dc23decc5559562 Makefile.PL
+SHA256 0ca5b05b1eb84316af9a85553aa6cdb95dc231247b2d937d4c355bce7bc23f2f README
+SHA256 0c6a3ccb97d3e8f763de932fb4d7fdca835551d3753bd93333d6f8d420629b98 dist.ini
+SHA256 5c5755f956dd1c6e37bd3a3a2409d6cf86c2093cc71dbb3407dc2cfe09ddd2f3 doap.ttl
+SHA256 7f87797abf8a26421dd7fe232dbf4cb57363e6f57460614ae71a123242376cd0 examples/site1/Makefile
+SHA256 8817e9ab31e574124acce935a3c4216f9a181876027acd696c8cfadcda73f945 examples/site1/_pages/index.md
+SHA256 ee096ebcb2726d9d85b65095f2b85ed4ee087fe8c825d8af50b9dc68107e9e05 examples/site1/_pages/installation.md
+SHA256 9952f49b32b381191aeaaf43ba179758083531af1a6b56744bc981810dafaadf examples/site1/config.yaml
+SHA256 25f04427d189a012acafe390b3fbd84e3e7d26d05c258b074fec93eed802d767 examples/site1/custom.scss
+SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 examples/site1/images/.exists
+SHA256 99321b4a0a979ec89a607a3fd80bc6e2effe37508badb6f670fe40c874b00860 examples/site1/menu.yaml
+SHA256 64366f6f6f3c178c84e26d40cc37ff1417a71ec903b061152c6d66690a45277c examples/site1/package.json
+SHA256 4a19c6871a056546fa1a0745aba7bcc97c30b68c001f0938dd6a7ee2b3e23b70 lib/Web/PerlDistSite.pm
+SHA256 c0f3e8fa987e915ca7e1afde96dbfe623ffb8a0e0cc1ffb153c728b5007c193d lib/Web/PerlDistSite/Common.pm
+SHA256 58bf7f4a79e821a55c842bc9491ead488055e519b75873a06b4f9d29edf799bc lib/Web/PerlDistSite/Compile.pm
+SHA256 6de54803e1e10b6117ef43a5e58e11338dd157d1e7522a3ad51f63e1bd627292 lib/Web/PerlDistSite/Component.pm
+SHA256 fc39e0777bb382e635e5baa7fa9f08a3671553eac342769c2f348a7ad5dbd2dd lib/Web/PerlDistSite/Component/LayoutScss.pm
+SHA256 a3b2594329f8836309136d27d295b251eb0ad1eb6b612ebe69a80dc7d2ad1521 lib/Web/PerlDistSite/Component/MainScss.pm
+SHA256 443d97288779a7b17f935c1eae637389b87161c3eeb6aeab57b1e22bd5a0b8ff lib/Web/PerlDistSite/MenuItem.pm
+SHA256 a1572725f0f3b03122878572a6484d487a9bf547d44f49d2ee070feb46625f36 lib/Web/PerlDistSite/MenuItem/Divider.pm
+SHA256 bbfa7e59d9d1e909fb6ea72e9cc37add2bde1ce5d696ae447a16fffa0d878507 lib/Web/PerlDistSite/MenuItem/File.pm
+SHA256 34d9727a2446834b4b989a56532cab1c8fc967106e5a4b75f8bed4110eb2daab lib/Web/PerlDistSite/MenuItem/Homepage.pm
+SHA256 a9acda851e5911c72a9446b5e2afb754a62c10ef05c9ed1d5e4ac4e15b79c504 lib/Web/PerlDistSite/MenuItem/MarkdownFile.pm
+SHA256 f398a3335b82c24226789d53d8656e9ff315225cff41abfd52b9c054455c9857 lib/Web/PerlDistSite/MenuItem/Pod.pm
+SHA256 4882b5ab3673bbb608fc6ed3e0243b094a34a251bc97df29dd255e955e7e3f62 lib/Web/PerlDistSite/MenuItem/PodFile.pm
+SHA256 bd71694180e714097451336e1dac9591d559f6d83d168f22c43ad1ca11d4740a lib/Web/PerlDistSite/MenuItem/_PodCommon.pm
+SHA256 2649b1551941c87af1ad8b64701cb99f3ed684fceb6f5a4a1c83d80007f4ba09 t/00start.t
+SHA256 77cc42d4bf91b2a98d981667e4a1ba31b24ffbf72fc9836b7144c96c403271a8 t/01basic.t
+SHA256 b8979b8e3233fcc59e77fea35854589cbe56f28dd272ff47c311ddcff943ae55 t/unit/Web/PerlDistSite.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCZDWFRwAKCRDOv4Eoaip9
+OcdNAJ4/l/gUbAaQ22DxbRS91toBKnmu/gCfVNDGa2jyFSJ/EzM+Fr8cUlefS00=
+=jzl8
+-----END PGP SIGNATURE-----
