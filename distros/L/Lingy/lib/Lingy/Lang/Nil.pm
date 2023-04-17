@@ -1,8 +1,7 @@
+use strict; use warnings;
 package Lingy::Lang::Nil;
 
-use Lingy::Base 'Scalar';
-
-use constant lingy_class => 'host.lang.Nil';
+use base 'Lingy::Lang::ScalarClass';
 
 {
     package Lingy::Common;

@@ -24,7 +24,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,22 +36,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.37'
+    version: '1.38'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.37'
+    version: '1.38'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.37'
+    version: '1.38'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.37'
+    version: '1.38'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.37'
+    version: '1.38'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.37'
+    version: '1.38'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.37'
+version: '1.38'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -106,23 +106,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::License
       name: '@DROLSKY/License'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@DROLSKY/ExecDir'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DROLSKY/ShareDir'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@DROLSKY/Manifest'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@DROLSKY/CheckVersionIncrement'
@@ -130,15 +130,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@DROLSKY/TestRelease'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DROLSKY/ConfirmRelease'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@DROLSKY/UploadToCPAN'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
@@ -154,7 +154,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@DROLSKY/AutoPrereqs'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@DROLSKY/CopyFilesFromBuild'
@@ -173,7 +173,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -182,7 +182,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.025'
+              version: '6.030'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -201,19 +201,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@DROLSKY/MetaConfig'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@DROLSKY/MetaJSON'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@DROLSKY/MetaYAML'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@DROLSKY/NextRelease'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -221,7 +221,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@DROLSKY/Test::More with Test2'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -229,7 +229,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Tools for use with precious'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -237,7 +237,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -283,15 +283,20 @@ x_Dist_Zilla:
           spell_cmd: ''
           stopwords:
             - AO
+            - Abkhazian
             - Adlam
             - Adlm
             - Aghem
             - Ahad
             - Ajé
             - Akan
+            - Akoose
             - Alatsinainy
             - Altine
             - Aneg
+            - Aragonese
+            - Arak
+            - Arateĩ
             - Asiḍyas
             - Asturian
             - Asu
@@ -311,10 +316,13 @@ x_Dist_Zilla:
             - BZ
             - Bafia
             - Balaza
+            - Balochi
+            - Baluchi
             - Bambara
             - Bangla
             - Barthélemy
             - Basaa
+            - Bashkir
             - Belarusian
             - Bemba
             - Bena
@@ -331,7 +339,9 @@ x_Dist_Zilla:
             - CLDR
             - CN
             - CX
+            - Caddo
             - Caicos
+            - Cako
             - Cawe
             - Ceuta
             - Chakma
@@ -361,6 +371,7 @@ x_Dist_Zilla:
             - Divehi
             - Dogri
             - Domhnaigh
+            - Dsrt
             - Duala
             - Duşenbe
             - Dwowda
@@ -382,6 +393,8 @@ x_Dist_Zilla:
             - Ehm
             - Ehms
             - Embu
+            - Enhvteceskv
+            - Erzya
             - Eswatini
             - Etleeni
             - Ewondo
@@ -431,22 +444,27 @@ x_Dist_Zilla:
             - HHmmss
             - HK
             - HN
+            - Hanifi
             - Hant
             - Haryanvi
             - Hm
             - Hmm
+            - Hmnp
             - Hms
             - Hmsv
             - Hmsvvvv
             - Hmv
+            - Hollo
             - Hong
             - IC
             - IM
             - ISonto
+            - Ido
             - Igbo
             - Ijumatatu
             - Il
             - Inari
+            - Iniku
             - Interlingua
             - Isniin
             - Isnin
@@ -482,6 +500,7 @@ x_Dist_Zilla:
             - Kamba
             - Kashmiri
             - Katanga
+            - Kenyang
             - Kinyarwanda
             - Kitts
             - Kiumia
@@ -506,21 +525,25 @@ x_Dist_Zilla:
             - LLLLL
             - LY
             - Lakota
+            - Lamorena
             - Langi
             - Lanka
             - Latn
             - Leone
             - Leste
             - Liduva
+            - Ligurian
             - Lingala
             - Linggo
             - Lintani
             - Litini
             - Litinin
             - Llun
+            - Lojban
             - Lolemba
             - Luain
             - Luba
+            - Lule
             - Lun
             - Lunes
             - Luns
@@ -565,13 +588,17 @@ x_Dist_Zilla:
             - Mande
             - Manipuri
             - Mantaxtsees
+            - Manti
+            - Mapuche
             - Marino
+            - Mayek
             - Mayen
             - Mayotte
             - Mazanderani
             - Mdd
             - Mderot
             - Meetto
+            - Meitei
             - Melilla
             - Meru
             - Minggu
@@ -579,14 +606,18 @@ x_Dist_Zilla:
             - Mmantaha
             - Mohndaach
             - Moksha
+            - Mong
             - Montag
             - Moondaach
             - Morisyen
             - Mosopulogo
             - Mosupalogo
             - Msombuluko
+            - Mtei
             - Mundang
             - Muramuko
+            - Muscogee
+            - Musopologo
             - Musumbhunuku
             - Musumbuluwo
             - Muvhuro
@@ -601,17 +632,23 @@ x_Dist_Zilla:
             - Nakaejuma
             - Nama
             - Ndebele
+            - Nettv
             - Ngiemboon
             - Ngomba
             - Nheengatu
+            - Nittak
             - Niue
+            - Njua
             - Njumatatu
             - Njumatatũ
             - Nkodya
+            - Nkoo
             - Nuer
             - Nyanja
             - Nyankole
+            - Nyiakeng
             - Nynorsk
+            - N’Ko
             - Obolo
             - Occitan
             - Odia
@@ -625,15 +662,18 @@ x_Dist_Zilla:
             - PY
             - Palau
             - Palichimo
+            - Papiamento
             - Papua
             - Pashto
             - PayPal
             - PayPal
             - Pazartesi
             - Pijin
+            - Pisin
             - Pona
             - Ponedjeljak
             - Príncipe
+            - Puachue
             - Puerto
             - QA
             - QQQ
@@ -645,6 +685,9 @@ x_Dist_Zilla:
             - Raviwaar
             - Rica
             - Ridas
+            - Riffian
+            - Rohg
+            - Rohingya
             - Rolsky
             - "Rolsky's"
             - Rombo
@@ -676,15 +719,19 @@ x_Dist_Zilla:
             - Senén
             - Serbo
             - Shambala
+            - Shan
             - Shona
             - Sichuan
             - Sidamo
+            - Silesian
             - Sinhala
             - Sint
             - Skolt
             - Soga
             - Somwaar
             - Sondag
+            - Sonta
+            - Sontaha
             - Sonto
             - Sorbian
             - Sotho
@@ -701,6 +748,7 @@ x_Dist_Zilla:
             - TW
             - TZ
             - Tachelhit
+            - Tai
             - Taita
             - Tajik
             - Tamazight
@@ -720,6 +768,8 @@ x_Dist_Zilla:
             - Tokelau
             - Toki
             - Tomé
+            - Torwali
+            - Tshipi
             - Tsonga
             - Tunga
             - Turkmen
@@ -745,12 +795,15 @@ x_Dist_Zilla:
             - Wai
             - Walamo
             - Walser
+            - Warlpiri
             - Wiik
             - Wiixata
             - Wik
             - Woche
+            - Wolaytta
             - Wolof
             - Wuok
+            - Wísts’i
             - XK
             - Yangben
             - Yi
@@ -762,6 +815,7 @@ x_Dist_Zilla:
             - aa
             - aba
             - akahi
+            - apc
             - asiḍyas
             - astea
             - astelehena
@@ -770,6 +824,7 @@ x_Dist_Zilla:
             - ay
             - aynas
             - bazar
+            - beke
             - ccc
             - cccc
             - chida
@@ -784,6 +839,7 @@ x_Dist_Zilla:
             - dilluns
             - diluns
             - dimanche
+            - djaluna
             - domingo
             - drolsky
             - dushanba
@@ -807,6 +863,7 @@ x_Dist_Zilla:
             - hafta
             - haftas
             - hai
+            - hayashuh
             - hepde
             - hete
             - hh
@@ -822,6 +879,7 @@ x_Dist_Zilla:
             - há
             - hétfő
             - hënë
+            - iche
             - ika
             - il
             - im
@@ -893,6 +951,7 @@ x_Dist_Zilla:
             - pir
             - pirmadienis
             - pirmdiena
+            - polyton
             - pondelok
             - pondělí
             - ponedeljak
@@ -905,6 +964,7 @@ x_Dist_Zilla:
             - pónjeźele
             - ranar
             - ravivaar
+            - rkiye
             - roka
             - roku
             - sa
@@ -1028,7 +1088,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@DROLSKY/PodSyntaxTests'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -1107,7 +1167,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@DROLSKY/Test::Version'
@@ -1124,7 +1184,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.38.1
+          git_version: 2.40.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -1305,7 +1365,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
@@ -1328,12 +1388,12 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@DROLSKY/CheckPrereqsIndexed'
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.22'
@@ -1345,7 +1405,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -1379,7 +1439,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.048'
@@ -1403,7 +1463,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -1416,11 +1476,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.37
+          tag: v1.38
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -1434,7 +1494,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.048'
@@ -1464,7 +1524,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -1478,7 +1538,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.40.0
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.048'
@@ -1487,22 +1547,22 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.025'
+          version: '6.030'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
           version: '0.49'
         Dist::Zilla::Role::TestRunner:
           default_jobs: '12'
-          version: '6.025'
+          version: '6.030'
       name: '@DROLSKY/DROLSKY::MakeMaker'
       version: '1.22'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Conflicts
       name: Conflicts
@@ -1526,56 +1586,56 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.025'
+      version: '6.030'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.025'
+    version: '6.030'
 x_authority: cpan:DROLSKY
 x_breaks:
   DateTime::Format::Strptime: '<= 1.1000'

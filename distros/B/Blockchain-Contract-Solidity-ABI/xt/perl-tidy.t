@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Code::TidyAll qw(tidyall_ok);
 
-subtest "tidy" => sub {
-    tidyall_ok();
-};
+## no critic
+eval 'use Test::Code::TidyAll';
+plan skip_all => "Test::Code::TidyAll required to check files." if $@;
+tidyall_ok();
 
 done_testing;
 

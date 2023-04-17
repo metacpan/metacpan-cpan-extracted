@@ -168,6 +168,20 @@ DESCRIPTION
     used, these pages will still be built. (You'll just need to link to them
     manually somehow.)
 
+    A `meta` key allows you to provide metadata for a page. It's an array of
+    hashrefs. Each item in the array will result in a `<meta content="">` or
+    `<link href="">` tag added to the document's `<head>`. For example:
+
+          - name: installation
+            title: How to install
+            source: _pages/installation.html
+            meta:
+              - name: description
+                content: "How to install my module."
+              - rel: related
+                href: "https://videotube.example/1234"
+                title: "Watch a screen recording of module installation"
+
     A list item like this can be used to add dividers:
 
           - divider: true

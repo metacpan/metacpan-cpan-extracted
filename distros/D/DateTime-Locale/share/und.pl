@@ -219,8 +219,8 @@
     "M12",
   ],
   name => "Unknown language",
-  native_language => "und",
-  native_name => "und",
+  native_language => undef,
+  native_name => "",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

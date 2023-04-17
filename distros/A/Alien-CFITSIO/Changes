@@ -1,5 +1,12 @@
 Revision history for Alien-CFITSIO
 
+v4.2.0.0  2023-04-14 22:11:49-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * build CFITSIO v4.2.0
+
+
 v4.1.0.5  2022-06-27 17:33:54-04:00 America/New_York
 
   [BUG FIX]

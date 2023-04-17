@@ -1,3 +1,13 @@
+1.0.2   2023-04-14
+
+- Be more careful about the order in which we kill processes
+  for greater reliability. If the watchdog killed itself too
+  early it might miss other child processes.
+
+1.0.1   2021-12-18
+
+- Make tests more reliable under heavy load
+
 1.0.0  2021-12-09
 
 - Initial release

@@ -23,7 +23,13 @@ my $obj = Wikibase::Datatype::Reference->new(
 	],
 );
 my $ret = Wikibase::Datatype::Print::Reference::print($obj);
-is($ret, 'P11: text', 'Get printed value.');
+my $right_ret = <<'END';
+{
+  P11: text
+}
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Get printed value.');
 
 # Test.
 eval {

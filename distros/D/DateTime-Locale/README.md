@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.37
+version 1.38
 
 # SYNOPSIS
 
@@ -231,7 +231,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2022 by Dave Rolsky.
+This software is copyright (c) 2003 - 2023 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

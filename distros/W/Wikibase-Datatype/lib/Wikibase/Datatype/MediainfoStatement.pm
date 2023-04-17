@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @RANKS => qw(normal preferred deprecated);
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 has id => (
 	is => 'ro',
@@ -25,6 +25,11 @@ has property_snaks => (
 has rank => (
 	is => 'ro',
 	default => 'normal',
+);
+
+has references => (
+	default => [],
+	is => 'ro',
 );
 
 has snak => (
@@ -50,6 +55,10 @@ sub BUILD {
 	check_array_object($self, 'property_snaks', 'Wikibase::Datatype::MediainfoSnak',
 		'Property mediainfo snak');
 
+	# Check references.
+	check_array_object($self, 'references', 'Wikibase::Datatype::Reference',
+		'Reference');
+
 	return;
 }
 
@@ -73,6 +82,7 @@ Wikibase::Datatype::MediainfoStatement - Wikibase mediainfo statement datatype.
  my $id = $obj->id;
  my $property_snaks_ar = $obj->property_snaks;
  my $rank = $obj->rank;
+ my $referenes_ar = $obj->references;
  my $snak = $obj->snak;
 
 =head1 DESCRIPTION
@@ -109,6 +119,13 @@ Rank value.
 Parameter is string with these possible values: normal, preferred and deprecated
 Default value is 'normal'.
 
+=item * C<references>
+
+List of references.
+Parameter is reference to hash with Wikibase::Datatype::Reference instances.
+Parameter is optional.
+Default value is [].
+
 =item * C<snak>
 
 Main snak.
@@ -139,6 +156,14 @@ Returns reference to array with Wikibase::Datatype::MediainfoSnak instances.
 
 Get rank value.
 
+=head2 C<references>
+
+ my $referenes_ar = $obj->references;
+
+Get references.
+
+Returns reference to array with Wikibase::Datatype::Reference instance.
+
 =head2 C<snak>
 
  my $snak = $obj->snak;
@@ -152,7 +177,9 @@ Returns Wikibase::Datatype::MediainfoSnak instance.
  new():
          From Mo::utils::check_array_object():
                  Parameter 'property_snaks' must be a array.
+                 Parameter 'references' must be a array.
                  Property mediainfo snak isn't 'Wikibase::Datatype::MediainfoSnak' object.
+                 Reference isn't 'Wikibase::Datatype::Reference' object.
          From Mo::utils::check_isa():
                  Parameter 'snak' must be a 'Wikibase::Datatype::MediainfoSnak' object.
          From Mo::utils::check_required():
@@ -282,6 +309,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

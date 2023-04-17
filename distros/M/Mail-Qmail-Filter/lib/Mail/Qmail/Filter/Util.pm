@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::Util;
 
-our $VERSION = '1.1';
+our $VERSION = '1.11';
 
 use base 'Exporter';
 
@@ -11,7 +11,6 @@ our @EXPORT_OK = qw(addresses_to_hash match_address split_address);
 
 sub addresses_to_hash {
     my $addrs = shift;
-    $addrs = [$addrs] unless ref $addrs;
     my %struct;
     for ( ref $addrs ? @$addrs : $addrs ) {
         my ( $localpart, $domain ) = split_address($_);

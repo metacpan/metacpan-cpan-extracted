@@ -5,7 +5,7 @@ package Astro::FITS::CFITSIO::FileName::Types;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Type::Library -base;
 use Types::Standard 'Str', 'HashRef';
@@ -52,7 +52,7 @@ Astro::FITS::CFITSIO::FileName::Types - Types for Astro::FITS::CFITSIO::FileName
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

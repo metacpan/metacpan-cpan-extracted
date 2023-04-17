@@ -38,7 +38,7 @@ requires:
   File::Which: '0'
   Path::Tiny: '0'
 resources: {}
-version: '0.51'
+version: '0.52'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.37'
   requires:

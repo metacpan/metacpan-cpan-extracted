@@ -1,0 +1,38 @@
+---
+abstract: 'Pure-perl API-driven assembler for x86-64'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Digest::MD5: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPU-x86_64-InstructionWriter
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Moo: '2'
+  Scalar::Util: '0'
+  integer: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-CPU-x86_64-InstructionWriter/issues
+  homepage: https://github.com/nrdvana/perl-CPU-x86_64-InstructionWriter
+  repository: https://github.com/nrdvana/perl-CPU-x86_64-InstructionWriter.git
+version: '0.001'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

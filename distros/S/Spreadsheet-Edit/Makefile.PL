@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.009005;
+use 5.018;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Spreadsheet-Edit",
   "LICENSE" => "unrestricted",
-  "MIN_PERL_VERSION" => "5.009005",
+  "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Spreadsheet::Edit",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Clone" => 0,
-    "Data::Dumper::Interp" => 0,
+    "Data::Dumper::Interp" => "5.015",
     "Encode" => 0,
     "Exporter" => 0,
     "Exporter::Tiny" => "1.001_000",
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "File::Copy" => 0,
     "File::Path" => 0,
     "File::Spec::Functions" => 0,
-    "File::Temp" => 0,
+    "File::Temp" => "0.23",
     "Guard" => 0,
     "Import::Into" => 0,
     "List::Util" => 0,
@@ -50,16 +50,24 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
+    "Cwd" => 0,
+    "Data::Dumper" => 0,
+    "English" => 0,
+    "Env::Path" => "0.18",
+    "File::Spec" => 0,
+    "File::Temp" => "0.23",
     "FindBin" => 0,
     "Getopt::Long" => 0,
     "Test::More" => "0.98",
+    "Test::Most" => 0,
+    "Time::HiRes" => 0,
     "autovivification" => 0,
     "indirect" => 0,
     "lib" => 0,
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "3.005",
+  "VERSION" => "3.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,16 +78,21 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Carp" => 0,
   "Clone" => 0,
-  "Data::Dumper::Interp" => 0,
+  "Cwd" => 0,
+  "Data::Dumper" => 0,
+  "Data::Dumper::Interp" => "5.015",
   "Encode" => 0,
+  "English" => 0,
+  "Env::Path" => "0.18",
   "Exporter" => 0,
   "Exporter::Tiny" => "1.001_000",
   "Fcntl" => 0,
   "File::Basename" => 0,
   "File::Copy" => 0,
   "File::Path" => 0,
+  "File::Spec" => 0,
   "File::Spec::Functions" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.23",
   "FindBin" => 0,
   "Getopt::Long" => 0,
   "Guard" => 0,
@@ -89,9 +102,11 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Symbol" => 0,
   "Test::More" => "0.98",
+  "Test::Most" => 0,
   "Text::CSV" => "1.90_01",
   "Tie::Array" => 0,
   "Tie::Indirect" => 0,
+  "Time::HiRes" => 0,
   "autovivification" => 0,
   "bytes" => 0,
   "constant" => 0,

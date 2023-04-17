@@ -219,10 +219,10 @@
     "M12",
   ],
   name => "Skolt Sami Finland",
-  native_language => "sms",
-  native_name => "sms FI",
+  native_language => "s\N{U+00e4}\N{U+00e4}\N{U+02b9}m\N{U+01e9}i\N{U+00f5}ll",
+  native_name => "s\N{U+00e4}\N{U+00e4}\N{U+02b9}m\N{U+01e9}i\N{U+00f5}ll",
   native_script => undef,
-  native_territory => "FI",
+  native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

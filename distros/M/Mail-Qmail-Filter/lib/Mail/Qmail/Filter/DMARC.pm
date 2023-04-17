@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::DMARC;
 
-our $VERSION = '1.2';
+our $VERSION = '1.21';
 
 sub domain {
     shift =~ s/.*\@//r;
@@ -111,7 +111,8 @@ __END__
 
 =head1 NAME
 
-Mail::Qmail::Filter::DMARC - verify DMARC policy of mail message
+Mail::Qmail::Filter::DMARC -
+verify DMARC policy of mail message
 
 =head1 SYNOPSIS
 

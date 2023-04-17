@@ -10,6 +10,62 @@ my $khonsu = Khonsu->new(
 	}
 )->add_page;
 
+$khonsu->add_image(
+	image => 't/test.png',
+	x => 20,
+	y => 20,
+	w => $khonsu->page->w - 40,
+	h => $khonsu->page->h - 40,
+)->add_page;
+
+$khonsu->add_page_header(
+	padding => 20,
+	show_page_num => 'right',
+	page_num_text => 'page {num}',
+	h => 20,
+	cb => sub {
+		my ($self, $file, %atts) = @_;
+		$self->add(
+			$file,
+			text => 'Khonsu',
+			align => 'center',
+			%attrs,
+		);
+	}
+);
+
+$khonsu->add_page_footer(
+	padding => 20,
+	show_page_num => 'left',
+	page_num_text => 'page {num}',
+	h => 20,
+	cb => sub {
+		my ($self, $file, %atts) = @_;
+		$self->add(
+			$file,
+			text => 'Khonsu',
+			align => 'center',
+			%attrs,
+		);
+	}
+);
+
+$khonsu->add_toc(
+	title => 'Table of contents',
+	title_font_args => {
+		size => 50,
+	},
+	title_padding => 10,
+	font_args => {
+		size => 20,
+	},
+	padding => 5,
+	x => 20,
+	y => 20,
+	w => $khonsu->page->w - 40,
+	h => $khonsu->page->h - 40
+);
+
 $khonsu->add_box(
 	fill_colour => '#000',
 	x => 20, 
@@ -91,49 +147,57 @@ $khonsu->add_text(
 	h => 100,
 );
 
-$khonsu->add_h1(
-	text => 'This is a test',
-	x => 20,
-	y => 240,
-	w => 500,
-);
+for (0..50) {
+	$khonsu->add_page();
+	$khonsu->add_h1(
+		text => 'This is a test',
+		x => 20,
+		y => 240,
+		w => 500,
+		toc => 1,
+	);
 
-$khonsu->add_h2(
-	text => 'This is a test',
-	x => 20,
-	y => 270,
-	w => 500,
-);
+	$khonsu->add_h2(
+		text => 'This is a test',
+		x => 20,
+		y => 270,
+		w => 500,
+		toc => 1,
+	);
 
-$khonsu->add_h3(
-	text => 'This is a test',
-	x => 20,
-	y => 300,
-	w => 500,
-);
+	$khonsu->add_h3(
+		text => 'This is a test',
+		x => 20,
+		y => 300,
+		w => 500,
+		toc => 1,
+	);
 
-$khonsu->add_h4(
-	text => 'This is a test',
-	x => 20,
-	y => 325,
-	w => 500,
-);
+	$khonsu->add_h4(
+		text => 'This is a test',
+		x => 20,
+		y => 325,
+		w => 500,
+		toc => 1
+	);
 
-$khonsu->add_h5(
-	text => 'This is a test',
-	x => 20,
-	y => 342,
-	w => 500,
-);
+	$khonsu->add_h5(
+		text => 'This is a test',
+		x => 20,
+		y => 342,
+		w => 500,
+		toc => 1,
+	);
 
-$khonsu->add_h6(
-	text => 'This is a test',
-	x => 20,
-	y => 358,
-	w => 500,
-	h => 20,
-);
-
+	$khonsu->add_h6(
+		text => 'This is a test',
+		x => 20,
+		y => 358,
+		w => 500,
+		h => 20,
+		toc => 1,
+	);
+}
 
 my @words = ('Aker', 'Anubis', 'Hapi', 'Khepri', 'Maahes', 'Thoth', 'Bastet', 'Hatmehit', 'Tefnut', 'Menhit', 'Imentet');
 

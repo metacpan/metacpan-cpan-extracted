@@ -8,4 +8,3 @@ testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA4
 testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA3
 testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA4
 testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA3
-

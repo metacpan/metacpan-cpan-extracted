@@ -12,7 +12,7 @@ use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-13'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_ingredients
@@ -20983,7 +20983,7 @@ App::BPOMUtils::Table::FoodIngredient - List ingredients in BPOM processed food 
 
 =head1 VERSION
 
-This document describes version 0.018 of App::BPOMUtils::Table::FoodIngredient (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
+This document describes version 0.019 of App::BPOMUtils::Table::FoodIngredient (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
 
 =head1 DESCRIPTION
 

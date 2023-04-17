@@ -20,8 +20,8 @@ sub make_smtp_server {
 	my $class;
 	if ($tls) {
 		$class = 'IO::Socket::SSL';
-		push @opts, SSL_cert_file => 't/cert/server-cert.pem',
-		            SSL_key_file  => 't/cert/server-key.pem';
+		push @opts, SSL_cert_file => 't/cert/server.crt',
+		            SSL_key_file  => 't/cert/server.key';
 	}
 	else {
 		$class = 'IO::Socket::INET';
@@ -52,8 +52,8 @@ sub make_smtp_server {
 					warn "[$clt] !starttls\n" if DEBUG;
 					IO::Socket::SSL->start_SSL($clt,
 						SSL_server      => 1,
-						SSL_cert_file   => 't/cert/server-cert.pem',
-						SSL_key_file    => 't/cert/server-key.pem'
+						SSL_cert_file   => 't/cert/server.crt',
+						SSL_key_file    => 't/cert/server.key'
 					) or die $IO::Socket::SSL::SSL_ERROR;
 				}
 				

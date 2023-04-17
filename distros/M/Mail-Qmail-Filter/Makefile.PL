@@ -18,6 +18,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Capture::Tiny'               => 0,
         'Email::Valid'                => 0,
+        'File::Scan::ClamAV'          => 0,
         'Mail::Address'               => 0,
         'Mail::DKIM::Verifier'        => 0,
         'Mail::DMARC::PurePerl'       => 0,

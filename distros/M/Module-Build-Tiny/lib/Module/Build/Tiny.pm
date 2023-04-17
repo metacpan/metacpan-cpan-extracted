@@ -1,5 +1,5 @@
 package Module::Build::Tiny;
-$Module::Build::Tiny::VERSION = '0.039';
+$Module::Build::Tiny::VERSION = '0.041';
 use strict;
 use warnings;
 use Exporter 5.57 'import';
@@ -23,7 +23,7 @@ sub write_file {
 	print $fh $content;
 }
 sub read_file {
-	my ($filename, $mode) = @_;
+	my ($filename) = @_;
 	open my $fh, '<', $filename or die "Could not open $filename: $!\n";
 	return do { local $/; <$fh> };
 }
@@ -78,27 +78,46 @@ sub find {
 	return @ret;
 }
 
+sub contains_pod {
+	my ($file) = @_;
+	return unless -T $file;
+	return read_file($file) =~ /^\=(?:head|pod|item)/;
+}
+
 my %actions = (
 	build => sub {
 		my %opt = @_;
 		for my $pl_file (find(qr/\.PL$/, 'lib')) {
-                       (my $pm = $pl_file) =~ s/\.PL$//;
+			(my $pm = $pl_file) =~ s/\.PL$//;
 			system $^X, $pl_file, $pm and die "$pl_file returned $?\n";
 		}
-		my %modules = map { $_ => catfile('blib', $_) } find(qr/\.p(?:m|od)$/, 'lib');
+		my %modules = map { $_ => catfile('blib', $_) } find(qr/\.pm$/, 'lib');
+		my %docs    = map { $_ => catfile('blib', $_) } find(qr/\.pod$/, 'lib');
 		my %scripts = map { $_ => catfile('blib', $_) } find(qr//, 'script');
+		my %sdocs   = map { $_ => delete $scripts{$_} } grep { /.pod$/ } keys %scripts;
 		my %shared  = map { $_ => catfile(qw/blib lib auto share dist/, $opt{meta}->name, abs2rel($_, 'share')) } find(qr//, 'share');
-		pm_to_blib({ %modules, %scripts, %shared }, catdir(qw/blib lib auto/));
+		pm_to_blib({ %modules, %docs, %scripts, %shared }, catdir(qw/blib lib auto/));
 		make_executable($_) for values %scripts;
 		mkpath(catdir(qw/blib arch/), $opt{verbose});
 		process_xs($_, \%opt) for find(qr/.xs$/, 'lib');
 
 		if ($opt{install_paths}->install_destination('bindoc') && $opt{install_paths}->is_default_installable('bindoc')) {
-			manify($_, catfile('blib', 'bindoc', man1_pagename($_)), $opt{config}->get('man1ext'), \%opt) for keys %scripts;
+			my $section = $opt{config}->get('man1ext');
+			for my $input (keys %scripts, keys %sdocs) {
+				next unless contains_pod($input);
+				my $output = catfile('blib', 'bindoc', man1_pagename($input));
+				manify($input, $output, $section, \%opt);
+			}
 		}
 		if ($opt{install_paths}->install_destination('libdoc') && $opt{install_paths}->is_default_installable('libdoc')) {
-			manify($_, catfile('blib', 'libdoc', man3_pagename($_)), $opt{config}->get('man3ext'), \%opt) for keys %modules;
+			my $section = $opt{config}->get('man3ext');
+			for my $input (keys %modules, keys %docs) {
+				next unless contains_pod($input);
+				my $output = catfile('blib', 'libdoc', man3_pagename($input));
+				manify($input, $output, $section, \%opt);
+			}
 		}
+		return 0;
 	},
 	test => sub {
 		my %opt = @_;
@@ -111,20 +130,23 @@ my %actions = (
 			lib => [ map { rel2abs(catdir(qw/blib/, $_)) } qw/arch lib/ ],
 		);
 		my $tester = TAP::Harness::Env->create(\%test_args);
-		$tester->runtests(sort +find(qr/\.t$/, 't'))->has_errors and exit 1;
+		return $tester->runtests(sort +find(qr/\.t$/, 't'))->has_errors;
 	},
 	install => sub {
 		my %opt = @_;
 		die "Must run `./Build build` first\n" if not -d 'blib';
 		install($opt{install_paths}->install_map, @opt{qw/verbose dry_run uninst/});
+		return 0;
 	},
 	clean => sub {
 		my %opt = @_;
 		rmtree($_, $opt{verbose}) for qw/blib temp/;
+		return 0;
 	},
 	realclean => sub {
 		my %opt = @_;
 		rmtree($_, $opt{verbose}) for qw/blib temp Build _build_params MYMETA.yml MYMETA.json/;
+		return 0;
 	},
 );
 
@@ -136,7 +158,7 @@ sub Build {
 	GetOptionsFromArray($_, \%opt, qw/install_base=s install_path=s% installdirs=s destdir=s prefix=s config=s% uninst:1 verbose:1 dry_run:1 pureperl-only:1 create_packlist=i jobs=i/) for ($env, $bargv, \@ARGV);
 	$_ = detildefy($_) for grep { defined } @opt{qw/install_base destdir prefix/}, values %{ $opt{install_path} };
 	@opt{ 'config', 'meta' } = (ExtUtils::Config->new($opt{config}), get_meta());
-	$actions{$action}->(%opt, install_paths => ExtUtils::InstallPaths->new(%opt, dist_name => $opt{meta}->name));
+	exit $actions{$action}->(%opt, install_paths => ExtUtils::InstallPaths->new(%opt, dist_name => $opt{meta}->name));
 }
 
 sub Build_PL {
@@ -155,7 +177,7 @@ sub Build_PL {
 #ABSTRACT: A tiny replacement for Module::Build
 
 
-# vi:et:sts=2:sw=2:ts=2
+# vi:noet:sts=4:sw=4:ts=4
 
 __END__
 
@@ -169,7 +191,7 @@ Module::Build::Tiny - A tiny replacement for Module::Build
 
 =head1 VERSION
 
-version 0.039
+version 0.041
 
 =head1 SYNOPSIS
 
@@ -184,7 +206,7 @@ Traditionally, Build.PL uses Module::Build as the underlying build system.
 This module provides a simple, lightweight, drop-in replacement.
 
 Whereas Module::Build has over 6,700 lines of code; this module has less
-than 120, yet supports the features needed by most distributions.
+than 200, yet supports the features needed by most distributions.
 
 =head2 Supported
 
@@ -220,7 +242,7 @@ than 120, yet supports the features needed by most distributions.
 
 =head2 Directory structure
 
-Your .pm and .pod files must be in F<lib/>.  Any executables must be in
+Your .pm, .xs and .pod files must be in F<lib/>.  Any executables must be in
 F<script/>.  Test files must be in F<t/>. Dist sharedirs must be in F<share/>.
 
 =head1 USAGE

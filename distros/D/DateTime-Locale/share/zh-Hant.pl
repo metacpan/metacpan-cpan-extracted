@@ -270,5 +270,5 @@
   time_format_medium => "Bh:mm:ss",
   time_format_short => "Bh:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

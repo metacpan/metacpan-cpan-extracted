@@ -1,4 +1,8 @@
 Revision history for Blockchain-Contract-Solidity-ABI
+0.007
+    - remove required test dependencies
+0.006
+    - change license
 0.005
     - remove organization name from root
 0.004

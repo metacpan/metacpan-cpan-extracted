@@ -110,11 +110,11 @@ Norwegian locale.
 
   jan.
   feb.
-  mar.
+  mars
   apr.
   mai
-  jun.
-  jul.
+  juni
+  juli
   aug.
   sep.
   okt.

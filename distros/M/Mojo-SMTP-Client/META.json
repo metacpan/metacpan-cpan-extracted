@@ -4,7 +4,7 @@
       "Oleg G <oleg@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,6 @@
          "url" : "https://github.com/olegwtf/p5-Mojo-SMTP-Client"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

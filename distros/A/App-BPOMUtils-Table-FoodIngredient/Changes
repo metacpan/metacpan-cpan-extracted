@@ -1,3 +1,8 @@
+0.019   2023-02-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix export for RBA.
+
+
 0.018   2023-02-13  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLI: bpom-list-food-ingredients-rba.

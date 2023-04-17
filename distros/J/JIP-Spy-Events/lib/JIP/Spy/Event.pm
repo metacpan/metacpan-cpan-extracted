@@ -6,7 +6,7 @@ use version 0.77;
 
 use English qw(-no_match_vars);
 
-our $VERSION = version->declare('v0.0.2');
+our $VERSION = version->declare('v0.0.3');
 
 sub new {
     my ( $class, %param ) = @ARG;
@@ -52,11 +52,11 @@ __END__
 
 =head1 NAME
 
-JIP::Spy::Event
+JIP::Spy::Event - Object representation of an individual call to a spied method
 
 =head1 VERSION
 
-This document describes L<JIP::Spy::Event> version C<v0.0.2>.
+This document describes L<JIP::Spy::Event> version C<v0.0.3>.
 
 =head1 SYNOPSIS
 
@@ -66,13 +66,13 @@ This document describes L<JIP::Spy::Event> version C<v0.0.2>.
         method     => 'method_name',
         arguments  => [],
         want_array => 1,
-        times      => { method_name => 1 },
+        times      => 42,
     );
 
     $spy_event->method();     # 'method_name'
     $spy_event->arguments();  # []
     $spy_event->want_array(); # 1
-    $spy_event->times();      # { method_name => 1 }
+    $spy_event->times();      # 42
 
 =head1 ATTRIBUTES
 
@@ -80,25 +80,39 @@ L<JIP::Spy::Event> implements the following attributes.
 
 =head2 method
 
-    my $method = $spy_event->method();
+    $string = $spy_event->method();
+
+Method name.
 
 =head2 arguments
 
-    my $arguments = $spy_event->arguments();
+    $arrayref = $spy_event->arguments();
 
-Comment about arguments
+Returns a list of the arguments passed to method.
 
 =head2 want_array
 
-    my $want_array = $spy_event->want_array();
+    $want_array = $spy_event->want_array(); # 1/q{}/undef
 
-Comment about arguments
+Returns result of built in function C<wantarray>.
 
 =head2 times
 
-    my $times = $spy_event->times();
+    $count = $spy_event->times();
 
-Comment about times
+The number of times the C<method> was called.
+
+=head1 DIAGNOSTICS
+
+None.
+
+=head1 DEPENDENCIES
+
+Perl 5.10.1 or later.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+L<JIP::Spy::Event> requires no configuration files or environment variables.
 
 =head1 AUTHOR
 
@@ -106,7 +120,7 @@ Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Vladimir Zhavoronkov.
+Copyright (c) 2019-2023 Volodymyr Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

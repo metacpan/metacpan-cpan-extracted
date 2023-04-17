@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::Libvirt;
 # ABSTRACT: Handle Libvirt data for StorageDisplay
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -227,14 +227,15 @@ around BUILDARGS => sub {
     my $consumename=$bname;
     my $size = 0;
     if ($binfo->{'type'} eq 'file') {
-        my $mountpoint = $binfo->{'mount-point'};
+	my $fileinfo = $st->get_info('files')->{$bname};
+	my $mountpoint = $fileinfo->{'mountpoint'};
         if (defined($mountpoint)) {
             push @optional_infos, 'mountpoint' => $mountpoint;
 	    $consumename = $st->fs_mountpoint_blockname($mountpoint);
         } else {
 	    $consumename=undef;
 	}
-	$size = $binfo->{'size'} // $size;
+	$size = $fileinfo->{'size'} // $size;
     } elsif ($binfo->{'type'} eq 'block') {
 	eval {
 	    # unknown (deleted?) blocks are NoSystem block with no size method
@@ -244,6 +245,7 @@ around BUILDARGS => sub {
     if (defined($consumename)) {
 	my $consumeblock = $st->block($consumename);
 	push @optional_infos, 'consume' => [$consumeblock];
+	#print STDERR$binfo->{'target'}, " consomme ", $consumename, "\n";
     }
     if (defined($size)) {
 	$block->size($size);
@@ -351,7 +353,7 @@ StorageDisplay::Data::Libvirt - Handle Libvirt data for StorageDisplay
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

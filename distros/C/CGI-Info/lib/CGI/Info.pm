@@ -26,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 =cut
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 =head1 SYNOPSIS
 
@@ -150,9 +150,9 @@ sub _find_paths {
 		$self->{script_path} = $ENV{'SCRIPT_FILENAME'};
 	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
 		my $script_name = $ENV{'SCRIPT_NAME'};
-		if(substr($script_name, 0, 1) eq '/') {
+		if($script_name =~ /^\/(.+)/) {
 			# It's usually the case, e.g. /cgi-bin/foo.pl
-			$script_name = substr($script_name, 1);
+			$script_name = $1;
 		}
 		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
 	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
@@ -165,9 +165,9 @@ sub _find_paths {
 			Cwd->import;
 
 			my $script_name = $ENV{'SCRIPT_NAME'};
-			if(substr($script_name, 0, 1) eq '/') {
+			if($script_name =~ /^\/(.+)/) {
 				# It's usually the case, e.g. /cgi-bin/foo.pl
-				$script_name = substr($script_name, 1);
+				$script_name = $1;
 			}
 
 			$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
@@ -305,6 +305,10 @@ sub _find_site_details {
 	} else {
 		require Sys::Hostname;
 		Sys::Hostname->import;
+
+		if($self->{logger}) {
+			$self->{logger}->debug('Falling back to using hostname');
+		}
 
 		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
@@ -743,6 +747,7 @@ sub params {
 			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
+			   ($value =~ /\sAND\s1=1/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				if($self->{logger}) {
 					if($ENV{'REMOTE_ADDR'}) {
@@ -751,6 +756,7 @@ sub params {
 						$self->{logger}->warn("SQL injection attempt blocked for '$value'");
 					}
 				}
+				$self->status(403);
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
@@ -758,6 +764,14 @@ sub params {
 				if($self->{logger}) {
 					$self->{logger}->warn("XSS injection attempt blocked for '$value'");
 				}
+				$self->status(403);
+				return;
+			}
+			if($value eq '../') {
+				if($self->{logger}) {
+					$self->{logger}->warn("Blocked directory traversal attack for $key");
+				}
+				$self->status(403);
 				return;
 			}
 		}
@@ -1335,7 +1349,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests/i) {
+	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1504,7 +1518,7 @@ sub is_search_engine {
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
-	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
+	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 1, '1 day');
 		}
@@ -1660,8 +1674,7 @@ sub status {
 
 	if(my $status = shift) {
 		$self->{status} = $status;
-	}
-	if(!defined($self->{status})) {
+	} elsif(!defined($self->{status})) {
 		if(defined(my $method = $ENV{'REQUEST_METHOD'})) {
 			if(($method eq 'OPTIONS') || ($method eq 'DELETE')) {
 				return 405;
@@ -1781,10 +1794,6 @@ L<http://cpants.cpanauthors.org/dist/CGI-Info>
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=CGI-Info>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-Info>
 
 =item * CPAN Testers Dependencies
 

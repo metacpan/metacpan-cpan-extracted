@@ -8,21 +8,34 @@ build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular: 0
   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog: 0.24
   Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun: 0.17
   Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman: 0.15
   Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human: 0.15
   Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human: 0.15
   Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf: 0.17
+  Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog: 0
+  Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human: 0
   Unicode::UTF8: 0
-  Wikibase::Cache::Backend::Basic: 0
-  Wikibase::Datatype: 0.12
+  Wikibase::Cache: 0
+  Wikibase::Cache::Backend::Basic: 0.03
   Wikibase::Datatype::Form: 0
+  Wikibase::Datatype::Item: 0
+  Wikibase::Datatype::Lexeme: 0
+  Wikibase::Datatype::MediainfoSnak: 0
+  Wikibase::Datatype::Reference: 0
+  Wikibase::Datatype::Sense: 0
+  Wikibase::Datatype::Sitelink: 0
   Wikibase::Datatype::Snak: 0
   Wikibase::Datatype::Statement: 0
+  Wikibase::Datatype::Value::Globecoordinate: 0
   Wikibase::Datatype::Value::Item: 0
   Wikibase::Datatype::Value::Monolingual: 0
+  Wikibase::Datatype::Value::Property: 0
+  Wikibase::Datatype::Value::Quantity: 0
   Wikibase::Datatype::Value::String: 0
+  Wikibase::Datatype::Value::Time: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -40,14 +53,14 @@ no_index:
     - t
     - xt
 requires:
-  Class::Utils: 0.03
   DateTime::Format::ISO8601: 0
   Error::Pure: 0.15
-  Unicode::UTF8: 0
+  Exporter: 0
+  Readonly: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print/issues
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
-version: '0.04'
+version: '0.07'

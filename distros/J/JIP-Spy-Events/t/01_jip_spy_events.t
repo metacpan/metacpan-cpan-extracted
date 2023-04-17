@@ -7,15 +7,11 @@ use warnings FATAL => 'all';
 use Test::More;
 use English qw(-no_match_vars);
 
-plan tests => 10;
-
 BEGIN {
-    use_ok 'JIP::Spy::Events', 'v0.0.2';
+    use_ok 'JIP::Spy::Events', 'v0.0.3';
 }
 
 subtest 'Require some module' => sub {
-    plan tests => 1;
-
     require_ok 'JIP::Spy::Events';
 
     diag(
@@ -29,8 +25,6 @@ subtest 'Require some module' => sub {
 };
 
 subtest 'new()' => sub {
-    plan tests => 7;
-
     my $sut = JIP::Spy::Events->new();
     ok $sut, 'got instance of JIP::Spy::Events';
 
@@ -55,8 +49,6 @@ subtest 'new()' => sub {
 };
 
 subtest '_handle_event' => sub {
-    plan tests => 3;
-
     my $sut = JIP::Spy::Events->new();
 
     my $result = $sut->_handle_event(
@@ -78,8 +70,6 @@ subtest '_handle_event' => sub {
 };
 
 subtest 'AUTOLOAD() as class method' => sub {
-    plan tests => 1;
-
     eval { JIP::Spy::Events->AUTOLOAD } or do {
         like $EVAL_ERROR, qr{
             ^
@@ -89,8 +79,6 @@ subtest 'AUTOLOAD() as class method' => sub {
 };
 
 subtest 'AUTOLOAD()' => sub {
-    plan tests => 8;
-
     my $sut = JIP::Spy::Events->new();
 
     {
@@ -150,8 +138,6 @@ subtest 'AUTOLOAD()' => sub {
 };
 
 subtest 'AUTOLOAD() with want_array' => sub {
-    plan tests => 9;
-
     my $sut = JIP::Spy::Events->new( want_array => 1 );
 
     is $sut->want_array(), 1;
@@ -219,8 +205,6 @@ subtest 'AUTOLOAD() with want_array' => sub {
 };
 
 subtest 'AUTOLOAD() with skip_methods' => sub {
-    plan tests => 5;
-
     my $sut = JIP::Spy::Events->new(
         skip_methods => [qw(tratata)],
     );
@@ -241,8 +225,6 @@ subtest 'AUTOLOAD() with skip_methods' => sub {
 };
 
 subtest 'clear()' => sub {
-    plan tests => 2;
-
     my $sut = JIP::Spy::Events->new();
 
     $sut->tratata->clear();
@@ -252,8 +234,6 @@ subtest 'clear()' => sub {
 };
 
 subtest 'on_spy_event' => sub {
-    plan tests => 11;
-
     my $sut = JIP::Spy::Events->new();
 
     $sut->on_spy_event(
@@ -307,3 +287,5 @@ subtest 'on_spy_event' => sub {
 
     is $result, '100500';
 };
+
+done_testing();

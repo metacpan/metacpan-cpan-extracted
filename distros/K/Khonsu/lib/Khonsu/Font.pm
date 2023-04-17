@@ -16,6 +16,9 @@ sub attributes {
 sub load {
 	my ($self, $file, %attributes) = @_;
 	$self->set_attributes(%attributes);
+	if (!$attributes{line_height} && $self->size > $self->line_height) {
+		$self->line_height($self->size);
+	}
 	return $self->find($file, $self->family);
 }
 

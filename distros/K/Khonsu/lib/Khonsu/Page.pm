@@ -5,6 +5,8 @@ use parent 'Khonsu::Ra';
 sub attributes {
 	my $a = shift;
 	return (
+		header => {$a->RW, $a->OBJ},
+		footer => {$a->RW, $a->OBJ},
 		page_size => {$a->RW, $a->REQ, $a->STR},
 		background => {$a->RW, $a->STR},
 		num => {$a->RW, $a->REQ, $a->NUM},
@@ -14,8 +16,9 @@ sub attributes {
 		rows => {$a->RW, $a->NUM, default => sub { 1 }},
 		row => {$a->RW, $a->NUM, default => sub { 1 }},
 		is_rotated => {$a->RW, $a->NUM},
-		header => {$a->RW, $a->Object},
-		footer => {$a->RW, $a->Object},
+		header => {$a->RW, $a->OBJ},
+		footer => {$a->RW, $a->OBJ},
+		toc => {$a->RW, $a->BOOL},
 		$a->POINTS,
 		$a->BOX,
 	);
@@ -23,7 +26,8 @@ sub attributes {
 
 sub add {
 	my ($self, $file, %args) = @_;
-	my $page = $args{open} ? $file->pdf->openpage($args{num}) : $file->pdf->page($args{num} || 0);
+	
+	my $page = $args{open} ? $file->pdf->openpage($args{num} || $self->num) : $file->pdf->page($args{num} || $self->num || 0);
 	$page->mediabox($self->page_size);
 	$self->set_points($page->get_mediabox);
 
@@ -50,6 +54,13 @@ sub rotate {
 	);
 	$self->is_rotated(!$self->is_rotated);
 	return $self;
+}
+
+sub render {
+	my ($self, $file) = @_;
+	$self->header->render($file) if $self->header;
+	$self->footer->render($file) if $self->footer;
+
 }
 
 1;

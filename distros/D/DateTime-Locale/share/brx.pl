@@ -38,7 +38,7 @@
     d => "d",
     h => "a \N{U+0928}\N{U+093f} h",
     hm => "h:mm a",
-    hms => "h:mm:ss\N{U+202f}a",
+    hms => "h:mm:ss a",
     hmsv => "a \N{U+0928}\N{U+093f} h:mm:ss v",
     hmv => "a h:mm v",
     ms => "mm:ss",
@@ -270,5 +270,5 @@
   time_format_medium => "a h:mm:ss",
   time_format_short => "a \N{U+0928}\N{U+093f} h:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

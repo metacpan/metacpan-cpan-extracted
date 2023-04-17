@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-our $VERSION = '0.1912';
+our $VERSION = '0.1913';
 
 1;
 
@@ -25,7 +25,7 @@ Task::MusicBundle - MIDI and music creation modules
 
 =head1 VERSION
 
-version 0.1912
+version 0.1913
 
 =head1 SYNOPSIS
 

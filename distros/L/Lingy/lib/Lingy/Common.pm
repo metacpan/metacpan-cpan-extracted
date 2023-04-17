@@ -7,6 +7,8 @@ BEGIN {
     our @EXPORT = qw<
         atom
         boolean
+        char
+        class
         false
         function
         hash_map
@@ -18,7 +20,6 @@ BEGIN {
         string
         symbol
         true
-        type
         var
         vector
 
@@ -32,35 +33,20 @@ BEGIN {
     >;
 }
 
-use Lingy::Types;
-
-use Lingy::Lang::Atom;
-use Lingy::Lang::Boolean;
-use Lingy::Lang::Function;
-use Lingy::Lang::HashMap;
-use Lingy::Lang::Keyword;
-use Lingy::Lang::List;
-use Lingy::Lang::Nil;
-use Lingy::Lang::Number;
-use Lingy::Lang::String;
-use Lingy::Lang::Symbol;
-use Lingy::Lang::Type;
-use Lingy::Lang::Var;
-use Lingy::Lang::Vector;
-
 use Lingy::Printer;
 
 sub atom     { Lingy::Lang::Atom->new(@_) }
 sub boolean  { Lingy::Lang::Boolean->new(@_) }
+sub char     { Lingy::Lang::Character->read(@_) }
+sub class    { Lingy::Lang::Class->_new(@_) }
 sub function { Lingy::Lang::Function->new(@_) }
 sub keyword  { Lingy::Lang::Keyword->new(@_) }
 sub hash_map { Lingy::Lang::HashMap->new(@_) }
 sub list     { Lingy::Lang::List->new(@_) }
-sub macro    { 'macro'   ->new(@_) }
+sub macro    { Lingy::Lang::Macro->new(@_) }
 sub number   { Lingy::Lang::Number->new(@_) }
 sub string   { Lingy::Lang::String->new(@_) }
 sub symbol   { Lingy::Lang::Symbol->new(@_) }
-sub type     { Lingy::Lang::Type->new(@_) }
 sub var      { Lingy::Lang::Var->new(@_) }
 sub vector   { Lingy::Lang::Vector->new(@_) }
 

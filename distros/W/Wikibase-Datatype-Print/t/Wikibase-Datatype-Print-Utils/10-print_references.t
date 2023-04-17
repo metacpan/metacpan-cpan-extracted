@@ -16,9 +16,11 @@ is_deeply(
 	\@ret,
 	[
 		'References:',
-		'  P248: Q53919',
-		'  P214: 113230702',
-		'  P813: 07 December 2013 (Q1985727)',
+                '  {',
+		'    P248: Q53919',
+		'    P214: 113230702',
+		'    P813: 07 December 2013 (Q1985727)',
+                '  }',
 	],
 	'Print referneces test.',
 );

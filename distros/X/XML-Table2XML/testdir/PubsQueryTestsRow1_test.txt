@@ -21,4 +21,3 @@ data
 1389	Algodata Infosystems	Berkeley	CA	USA	BU1032	The Busy Executive's Database Guide	business	8042	423LL930	14.Sep.94	10	ON invoice
 1389	Algodata Infosystems	Berkeley	CA	USA	BU1111	Cooking with Computers: Surreptitious Balance Sheets	business	8042	P723	11.Mar.93	25	Net 30
 1389	Algodata Infosystems	Berkeley	CA	USA	PC1035	But Is It User Friendly?	popular_comp	8042	QA879.1	22.Mai.93	30	Net 30
-

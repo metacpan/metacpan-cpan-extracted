@@ -7,6 +7,7 @@ sub add {
 	$attributes{font}->{size} ||= 25;
 	$attributes{font}->{line_height} ||= 17;
 	$attributes{h} ||= $attributes{font}->{line_height};
+	$file->toc->outline($file, 'h4', %attributes) if $attributes{toc};
 	return $self->SUPER::add($file, %attributes);
 }
 

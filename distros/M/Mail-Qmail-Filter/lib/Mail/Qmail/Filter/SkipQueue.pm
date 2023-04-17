@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::SkipQueue;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Mo qw(coerce);
 extends 'Mail::Qmail::Filter';
@@ -70,7 +70,7 @@ __END__
 
 =head1 NAME
 
-Mail::Qmail::Filter::SkipQueue - 
+Mail::Qmail::Filter::SkipQueue -
 deliver message using external commands
 
 =head1 SYNOPSIS

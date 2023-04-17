@@ -66,11 +66,12 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 	Version 0.6.5 - Package architecture modification (PeakForest Part), POD improvement, Annotation results filtering based on scores
 	Version 0.6.6 - Fix cpan bugs (#24) and fix several templates and properties issues (rel int, peakforest compliance, ...)
 	Version 0.6.7 - Fix tests issues + pod alignment
-	Version 0.6.8 - Version in progress (Plan is PeakForest LCMS + GCMS full compliance)
+	Version 0.6.8 - Buggy version 
+	Version 0.6.9 - Fix GCMS tests issue, fix intensity value missing in banks module + PeakForest REST API Client Update
 
 =cut
 
-our $VERSION = '0.6.8';
+our $VERSION = '0.6.9';
 
 
 =head1 SYNOPSIS

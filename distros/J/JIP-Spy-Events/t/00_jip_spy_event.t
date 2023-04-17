@@ -7,15 +7,11 @@ use warnings FATAL => 'all';
 use Test::More;
 use English qw(-no_match_vars);
 
-plan tests => 4;
-
 BEGIN {
-    use_ok 'JIP::Spy::Event', 'v0.0.2';
+    use_ok 'JIP::Spy::Event', 'v0.0.3';
 }
 
 subtest 'Require some module' => sub {
-    plan tests => 1;
-
     require_ok 'JIP::Spy::Event';
 
     diag(
@@ -29,8 +25,6 @@ subtest 'Require some module' => sub {
 };
 
 subtest 'new()' => sub {
-    plan tests => 7;
-
     my $sut = JIP::Spy::Event->new();
     ok $sut, 'got instance of JIP::Spy::Event';
 
@@ -45,8 +39,6 @@ subtest 'new()' => sub {
 };
 
 subtest 'new() with arguments' => sub {
-    plan tests => 4;
-
     my $sut = JIP::Spy::Event->new(
         method     => 'tratata',
         arguments  => [],
@@ -60,3 +52,5 @@ subtest 'new() with arguments' => sub {
 
     is_deeply $sut->arguments(), [];
 };
+
+done_testing();

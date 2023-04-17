@@ -294,7 +294,7 @@ sub get_required_resources {
           confess "\"$class_file\" class is not loaded";
         }
       }
-      my $config_exe = $builder_cc->create_native_config_from_class_file($class_file);
+      my $config_exe = $builder->create_native_config_from_class_file($class_file);
       
       my $resource_names = $config_exe->get_resource_names;
       for my $resource_name (@$resource_names) {
@@ -445,17 +445,19 @@ sub compile_source_file {
   my $before_each_compile_cbs = $config_exe->before_each_compile_cbs;
   $config->add_before_compile_cb(@$before_each_compile_cbs);
   
-  my $compile_info = $builder_cc->create_compile_command_info({
-    config => $config,
+  my $compile_info = SPVM::Builder::CompileInfo->new(
     output_file => $output_file,
-    source_file => $source_file
-  });
+    source_file => $source_file,
+    config => $config,
+  );
   
   if ($need_generate) {
     $builder_cc->compile_source_file($compile_info);
   }
   
+  my $object_file_name = $compile_info->output_file;
   my $object_file = SPVM::Builder::ObjectFileInfo->new(
+    file => $object_file_name,
     compile_info => $compile_info,
   );
   
@@ -1072,7 +1074,7 @@ sub compile_class_native_source_files {
         confess "\"$class_file\" class is not loaded";
       }
     }
-    my $config = $builder_cc->create_native_config_from_class_file($class_file);
+    my $config = $builder->create_native_config_from_class_file($class_file);
     my $before_each_compile_cbs = $config_exe->before_each_compile_cbs;
     $config->add_before_compile_cb(@$before_each_compile_cbs);
     
@@ -1086,6 +1088,7 @@ sub compile_class_native_source_files {
     }
     $config->add_include_dir(@$resource_include_dirs);
     
+    $config->disable_resource(1);
     my $object_files = $builder_cc->compile_source_files(
       $class_name,
       {
@@ -1093,7 +1096,6 @@ sub compile_class_native_source_files {
         output_dir => $build_object_dir,
         config => $config,
         category => 'native',
-        no_use_resource => 1,
       }
     );
     push @$all_object_files, @$object_files;

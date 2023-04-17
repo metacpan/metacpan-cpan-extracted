@@ -219,8 +219,8 @@
     "kr\N{U+00ed}simin",
   ],
   name => "Kwasio Cameroon",
-  native_language => "nmg",
-  native_name => "nmg Kamerun",
+  native_language => undef,
+  native_name => "Kamerun",
   native_script => undef,
   native_territory => "Kamerun",
   native_variant => undef,
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

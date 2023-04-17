@@ -141,11 +141,11 @@
   month_format_abbreviated => [
     "jan.",
     "feb.",
-    "mar.",
+    "mars",
     "apr.",
     "mai",
-    "jun.",
-    "jul.",
+    "juni",
+    "juli",
     "aug.",
     "sep.",
     "okt.",
@@ -271,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

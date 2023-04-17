@@ -22,8 +22,8 @@ use feature 'lexical_subs';
 no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
-our $VERSION = '5.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-12'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '5.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -138,7 +138,7 @@ our @EXPORT    = qw(visnew
                     vis  avis  alvis  ivis  dvis  hvis  hlvis
                     visq avisq alvisq ivisq dvisq hvisq hlvisq
                     addrvis refvis
-                    u quotekey qsh __forceqsh qshpath);
+                    u quotekey qsh qshlist __forceqsh qshpath);
 
 our @EXPORT_OK = qw($Debug $MaxStringwidth $Truncsuffix $Objects $Foldwidth
                     $Useqq $Quotekeys $Sortkeys $Sparseseen
@@ -182,6 +182,9 @@ sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
   my ($tilde_prefix, $rest) = /^( (?:\~[^\/\\]*[\/\\]?+)? )(.*)/xs or die;
   $rest eq "" ? $tilde_prefix : $tilde_prefix.qsh($rest)
 }
+
+# Should this have been called 'aqsh' ?
+sub qshlist(@) { join " ", map{qsh} @_ }
 
 my $sane_cW = $^W;
 my $sane_cH = $^H;
@@ -1512,6 +1515,7 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say quotekey($string);   # quote hash key if not a valid bareword
   say qsh($string);        # quote if needed for /bin/sh
   say qshpath($pathname);  # shell quote excepting ~ or ~username prefix
+  say "Runing this: ", qshlist(@command_and_args);
 
     system "ls -ld ".join(" ",map{ qshpath }
                               ("/tmp", "~sally/My Documents", "~"));
@@ -1813,6 +1817,12 @@ as a special case to avoid ambiguity the string 'undef' is always "quoted".
 
 Similar to C<qsh> except that an initial ~ or ~username is left
 unquoted.  Useful for paths given to bash or csh.
+
+=head2 qshlist @items
+
+Format e.g. a shell command and arguments, quoting as necessary ala C<qsh>.
+
+Returns a string with the items separated by spaces.
 
 =head1 LIMITATIONS
 

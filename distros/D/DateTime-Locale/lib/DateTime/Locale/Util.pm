@@ -6,7 +6,7 @@ use namespace::autoclean 0.19 -except => ['import'];
 
 use Exporter qw( import );
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 our @EXPORT_OK = 'parse_locale_code';
 
@@ -76,7 +76,7 @@ DateTime::Locale::Util - Utility code for DateTime::Locale
 
 =head1 VERSION
 
-version 1.37
+version 1.38
 
 =head1 DESCRIPTION
 
@@ -99,7 +99,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2022 by Dave Rolsky.
+This software is copyright (c) 2003 - 2023 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

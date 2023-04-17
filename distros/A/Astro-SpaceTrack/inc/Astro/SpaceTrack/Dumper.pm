@@ -19,7 +19,7 @@ eval {
     1;
 } or croak 'Can not load Mock::LWP::UserAgent. Code must be run from the base directory of the Astro-SpaceTrack distribution';
 
-our $VERSION = '0.160';
+our $VERSION = '0.161';
 
 {
     my $json;

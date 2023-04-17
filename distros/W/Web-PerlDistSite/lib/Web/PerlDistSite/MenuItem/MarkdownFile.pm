@@ -1,6 +1,6 @@
 package Web::PerlDistSite::MenuItem::MarkdownFile;
 
-our $VERSION = '0.001010';
+our $VERSION = '0.001011';
 
 use Moo;
 use Web::PerlDistSite::Common -lexical, -all;
@@ -68,5 +68,7 @@ sub compile_page ( $self ) {
 	
 	return $self->_compile_dom( $dom );
 }
+
+# TODO: wrap `_build_meta` to parse frontmatter from the markdown file.
 
 1;

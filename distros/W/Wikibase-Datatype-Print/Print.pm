@@ -3,7 +3,7 @@ package Wikibase::Datatype::Print;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = 0.07;
 
 1;
 
@@ -43,7 +43,7 @@ TODO
 
 =item L<Wikibase::Datatype::Print::MediainfoSnak>
 
-TODO
+Wikibase mediainfo snak pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Property>
 
@@ -59,23 +59,23 @@ TODO
 
 =item L<Wikibase::Datatype::Print::Sitelink>
 
-TODO
+Wikibase sitelink pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Snak>
 
-TODO
+Wikibase snak pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Statement>
 
-TODO
+Wikibase statement pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Utils>
 
-TODO
+Wikibase pretty print helper utils.
 
 =item L<Wikibase::Datatype::Print::Value>
 
-TODO
+Wikibase value pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Value::Globecoordinate>
 
@@ -143,6 +143,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.07
 
 =cut

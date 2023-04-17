@@ -3,15 +3,19 @@ package Khonsu::File;
 use parent 'Khonsu::Ra';
 
 use Khonsu::Page;
+use Khonsu::Page::Header;
+use Khonsu::Page::Footer;
+
 
 sub attributes {
 	my $a = shift;
 	return (
 		file_name => {$a->RW, $a->REQ, $a->STR},
 		pdf => {$a->RW, $a->REQ, $a->OBJ},
-		pages => {$a->RW, $a->REQ, $a->AR},
+		pages => {$a->RW, $a->REQ, $a->DAR},
 		page => {$a->RW, $a->OBJ},
 		page_args => {$a->RW, $a->DHR},
+		page_offset => {$a->RW, $a->NUM, default => sub { 0 }},
 		onsave_cbs => {$a->RW, $a->DAR},
 		page_offset => {$a->RW, $a->NUM},
 		$a->LINE,
@@ -27,22 +31,58 @@ sub attributes {
 		$a->H4,
 		$a->H5,
 		$a->H6,
-		$a->IMAGE
+		$a->IMAGE,
+		$a->TOC
 	);
+}
+
+sub open_page {
+	my ($self, $page) = @_;
+	if ($self->pages) {
+		$self->page($self->pages->[$page - 1]);
+	}
+	return $self;
 }
 
 sub add_page {
 	my ($self, %args) = @_;
 
 	my $page = $self->page(Khonsu::Page->new(
+		header => $self->page ? $self->page->header : undef,
+		footer => $self->page ? $self->page->footer : undef,
 		page_size =>'A4',
-		num => scalar @{$self->pages},
+		num => scalar @{$self->pages} + 1,
 		%{ $self->page_args },
 		%args
 	))->add($self);
+	
+	splice @{$self->pages}, $page->num - 1, 0, $page;
 
-	push @{$self->pages}, $page;
+	return $self;
+}
 
+sub add_page_header {
+	my ($self, %args) = @_;
+	$self->page->header(Khonsu::Page::Header->new(
+		%args
+	));
+
+	return $self;
+}
+
+sub add_page_footer {
+	my ($self, %args) = @_;
+
+	$self->page->footer(Khonsu::Page::Footer->new(
+		%args
+	));
+
+	return $self;
+}
+
+sub add_toc {
+	my ($self, %args) = @_;
+	$self->toc->add($self, %args);
 	return $self;
 }
 
@@ -130,8 +170,33 @@ sub add_image {
 	return $self;
 }
 
+sub onsave {
+	my ($self, $plug, $meth, %args) = @_;
+	my $cbs = $self->onsave_cbs || [];
+	push @{$cbs}, [$plug, $meth, \%args];
+	$self->onsave_cbs($cbs);
+	return $self;
+}
+
+sub handle_onsave {
+	my ($self) = shift;
+	if ($self->onsave_cbs) {
+		for my $cb (@{$self->onsave_cbs}) {
+			my ($plug, $meth, $args) = @{$cb};
+			$self->$plug->$meth($self, %{$args});
+		}
+	}
+	
+	for my $page (@{$self->pages}) {
+		$self->page($page);
+		$page->num($page->num + ($self->page_offset || 0)) if !$page->toc;
+		$page->render($self);
+	}
+}
+
 sub save {
 	my ($self) = shift;
+	$self->handle_onsave();
 	$self->pdf->saveas();
 	$self->pdf->end();
 }

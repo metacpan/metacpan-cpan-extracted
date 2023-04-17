@@ -1,10 +1,7 @@
+use strict; use warnings;
 package Lingy::Lang::Function;
 
-use Lingy::Common();
-
-use Lingy::Base;
-
-use constant lingy_class => 'host.lang.Function';
+use base 'Lingy::Lang::Class';
 
 *list = \&Lingy::Common::list;
 *symbol = \&Lingy::Common::symbol;

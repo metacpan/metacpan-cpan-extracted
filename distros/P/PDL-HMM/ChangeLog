@@ -1,5 +1,20 @@
+v0.06008 Fri, 14 Apr 2023 23:09:19 +0200 moocow
+	* restrict GenericTypes to floating-point (F D E)
+	  - E in lieu of LD (long double)
+	* require PDL v2.082
+	* use indx instead of int for state-IDs
+	* DRY for GenericTypes floating-point restrictions
+	* merge PR #3 from mohawk2/tweaks: output-only operation cannot be Inplace
+	* ignore some stuff
+
+v0.06007 Fri Apr 7 18:11:23 2023 +0100 mohawk2
+	* merge pull request #2 from mohawk2/test-tweaks
+	* gitignore generated pp-*.c
+	* make pdlapprox show got vs want
+	* make isok report where test actually run
+
 v0.06006 Tue, 22 Feb 2022 19:33:06 +0100 moocow
-	* fixes for PDL 2.058+, from mowhawk2
+	* fixes for PDL 2.058+, from mohawk2
 
 v0.06005 Tue, 06 Jun 2017 10:57:05 +0200 moocow
 	* added 'use lib "."' to Makefile.PL (RT bug #121661)

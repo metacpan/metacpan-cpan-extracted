@@ -19,7 +19,7 @@ SEE ALSO
         TODO
 
     Wikibase::Datatype::Print::MediainfoSnak
-        TODO
+        Wikibase mediainfo snak pretty print helpers.
 
     Wikibase::Datatype::Print::Property
         TODO
@@ -31,19 +31,19 @@ SEE ALSO
         TODO
 
     Wikibase::Datatype::Print::Sitelink
-        TODO
+        Wikibase sitelink pretty print helpers.
 
     Wikibase::Datatype::Print::Snak
-        TODO
+        Wikibase snak pretty print helpers.
 
     Wikibase::Datatype::Print::Statement
-        TODO
+        Wikibase statement pretty print helpers.
 
     Wikibase::Datatype::Print::Utils
-        TODO
+        Wikibase pretty print helper utils.
 
     Wikibase::Datatype::Print::Value
-        TODO
+        Wikibase value pretty print helpers.
 
     Wikibase::Datatype::Print::Value::Globecoordinate
         Wikibase globe coordinate item pretty print helpers.
@@ -90,5 +90,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.07
 

@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Role;
 # ABSTRACT: Load all roles used in StorageDisplay
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 1;
 
@@ -637,7 +637,7 @@ sub dotFormatedFullLabel {
     my $t = shift;
 
     return join($self->_dotLabelNL,
-                $self->dotFullLabel);
+                grep {defined($_)} $self->dotFullLabel);
 }
 
 # default implementations
@@ -952,8 +952,7 @@ has 'free' => (
     required => 1,
     );
 
-around _dotDefaultStyleNode => sub {
-    my $orig  = shift;
+sub fillcolor {
     my $self = shift;
 
     my $fillcolor='"green"';
@@ -963,12 +962,18 @@ around _dotDefaultStyleNode => sub {
                        sprintf("%f.2", ($self->size - $self->free) / $self->size).
                        ':green"';
     }
+    return $fillcolor;
+}
+
+around _dotDefaultStyleNode => sub {
+    my $orig  = shift;
+    my $self = shift;
 
     return $self->dotJoinStyle(
         $self->$orig(@_),
         'shape=rectangle',
         'style=striped',
-        'fillcolor='.$fillcolor,
+        'fillcolor='.$self->fillcolor,
         );
 };
 
@@ -976,10 +981,11 @@ around '_dotDefaultFullLabel' => sub {
     my $orig  = shift;
     my $self = shift;
 
-    return (
-        $self->$orig(@_),
-        "Free: ".$self->disp_size($self->free),
-        );
+    my @labels = $self->$orig(@_);
+    if ($self->size !=0 || $self->free != 0) {
+	push @labels, "Free: ".$self->disp_size($self->free);
+    }
+    return @labels;
 };
 
 1;
@@ -997,6 +1003,65 @@ has 'used' => (
     required => 1,
     );
 
+has 'reserved' => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+    lazy     => 1,
+    default  => sub {
+	my $self = shift;
+	my $reserved = $self->size - $self->used - $self->free;
+	if ($reserved < 0) {
+	    print STDERR "Reserved: $reserved\n";
+	    $reserved = 0;
+	}
+	return $reserved;
+    },
+    );
+
+around _dotDefaultStyleNode => sub {
+    my $orig  = shift;
+    my $self = shift;
+    my $fillcolor;
+    my $part='@@@@@@@';
+
+    if ($self->used > 0) {
+	if (defined($fillcolor)) {
+	    $fillcolor .= $part;
+	}
+	$fillcolor.='pink';
+	$part=';'.sprintf("%f.2", $self->used / $self->size).':';
+    }
+    if ($self->free > 0) {
+	if (defined($fillcolor)) {
+	    $fillcolor .= $part;
+	}
+	$fillcolor.='green';
+	$part=';'.sprintf("%f.2", $self->free / $self->size).':';
+    }
+    if ($self->reserved > 0) {
+	if (defined($fillcolor)) {
+	    $fillcolor .= $part;
+	}
+	$fillcolor.='orange';
+	$part=';'.sprintf("%f.2", $self->reserved / $self->size).':';
+    }
+    if (not defined($fillcolor)) {
+	if ($self->size == 0) {
+	    $fillcolor='yellow';
+	} else {
+	    $fillcolor='red';
+	}
+    }
+
+    return $self->dotJoinStyle(
+        $self->$orig(@_),
+        'shape=rectangle',
+        'style=striped',
+        'fillcolor="'.$fillcolor.'"',
+        );
+};
+
 sub dotStyle {
     my $orig  = shift;
     my $self = shift;
@@ -1013,11 +1078,11 @@ around '_dotDefaultFullLabel' => sub {
     my $orig  = shift;
     my $self = shift;
 
-    my $label = $self->$orig(@_);
-    return (
-        $self->$orig(@_),
-        "Used: ".$self->disp_size($self->used),
-        );
+    my @labels = $self->$orig(@_);
+    if ($self->size !=0 || $self->used != 0) {
+	push @labels, "Used: ".$self->disp_size($self->used);
+    }
+    return @labels;
 };
 
 1;
@@ -1121,7 +1186,7 @@ StorageDisplay::Role - Load all roles used in StorageDisplay
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

@@ -68,8 +68,13 @@ sub import {
   multidimensional->unimport::out_of($target);
 
   require autovivification;
-  autovivification->unimport::out_of($target,
-                warn => qw/fetch store exists delete/);
+  # A bug makes
+  #   "no autovivification warn anything..." wrongly flag
+  #   "my %hash; delete $hash{nonexistentkey}"
+  # This happens with Perl 5.24.0 and autovivification v0.18
+  # but not with Perl5.34.0 and same autovivification.
+  # So just disable autoviv but don't enable warnings...
+  autovivification->unimport::out_of($target, qw/fetch store exists delete/);
 
   # Avoid regex performance penalty in Perl <= 5.18 if
   # $PREMATCH $MATCH or $POSTMATCH are imported (fixed in perl 5.20).

@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male::VERSION, 0.24, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male::VERSION, 0.25, 'Version.');

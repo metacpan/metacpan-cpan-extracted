@@ -227,10 +227,10 @@
   ],
   name => "Belarusian Taraskievica orthography",
   native_language => "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f}",
-  native_name => "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f} TARASK",
+  native_name => "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f}",
   native_script => undef,
   native_territory => undef,
-  native_variant => "TARASK",
+  native_variant => undef,
   quarter_format_abbreviated => [
     "1-\N{U+0448}\N{U+044b} \N{U+043a}\N{U+0432}.",
     "2-\N{U+0433}\N{U+0456} \N{U+043a}\N{U+0432}.",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => "Taraskievica orthography",
-  version => 42,
+  version => 43,
 }

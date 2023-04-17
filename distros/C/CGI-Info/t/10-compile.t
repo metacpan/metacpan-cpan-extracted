@@ -3,9 +3,12 @@
 use strict;
 use warnings;
 
-use lib 'lib';
+eval 'use Test::Compile';
 
-use Test::Compile;
-my $test = Test::Compile->new();
-$test->all_files_ok();
-$test->done_testing();
+if($@) {
+	plan(skip_all => 'Test::Compile needed to verify module compiles');
+} else {
+	my $test = Test::Compile->new();
+	$test->all_files_ok();
+	$test->done_testing();
+}

@@ -1,3 +1,11 @@
+##############################################################################
+#
+#  Time::Progress
+#  2013-2023 (c) Vladi Belperchinov-Shabanski "Cade" <cade@bis.bg>
+#
+#  DISTRIBUTED UNDER GPLv2
+#
+##############################################################################
 package Time::Progress;
 
 use 5.006;
@@ -5,7 +13,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '2.12';
+our $VERSION = '2.14';
 
 our $SMOOTHING_DELTA_DEFAULT = '0.1';
 our %ATTRS =  (
@@ -47,6 +55,8 @@ sub restart
   my @ret = $self->attr( @_ );
   $self->{ 'start' } = time();
   $self->{ 'stop'  } = undef;
+  $self->{ 'min_speed' } = 'n';
+  $self->{ 'max_speed' } = 'a';
   return @ret;
 }
 
@@ -96,10 +106,12 @@ sub report
     $bl = 79 if $bl eq '' or $bl < 1;
     }
 
-  my $e = "n/a";
-  my $E = "n/a";
-  my $f = "n/a";
-  my $p = "n/a";
+  my $e  = "n/a";
+  my $E  = "n/a";
+  my $f  = "n/a";
+  my $p  = 0;
+  my $ps = "n/a";
+  my $s  = "n/a";
 
   if ( (($min <= $cur and $cur <= $max) or ($min >= $cur and $cur >= $max)) )
     {
@@ -128,17 +140,22 @@ sub report
       $p = 100 * ( $cur - $min ) / ( $max - $min );
       $b = '#' x int( $bl * $p / 100 ) . '.' x $bl;
       $b = substr $b, 0, $bl;
-      $p = sprintf "%5.1f%%", $p;
+      $ps = sprintf "%5.1f%%", $p;
       }
+    $s = int( ( $cur - $min ) / ( time() - $self->{ 'start' } ) ) if time() - $self->{ 'start' } > 0;
+    $self->{ 'min_speed' } = $s if $p > 1 and $s > 0 and ( $self->{ 'min_speed' } eq 'n' or $self->{ 'min_speed' } > $s );
+    $self->{ 'max_speed' } = $s if $p > 1 and $s > 0 and ( $self->{ 'max_speed' } eq 'a' or $self->{ 'max_speed' } < $s );
     }
 
   $format =~ s/%(\d*)l/$self->sp_format( $l, $1 )/ge;
   $format =~ s/%(\d*)L/$self->sp_format( $L, $1 )/ge;
   $format =~ s/%(\d*)e/$self->sp_format( $e, $1 )/ge;
   $format =~ s/%(\d*)E/$self->sp_format( $E, $1 )/ge;
-  $format =~ s/%p/$p/g;
+  $format =~ s/%p/$ps/g;
   $format =~ s/%f/$f/g;
   $format =~ s/%\d*[bB]/$b/g;
+  $format =~ s/%s/$s/g;
+  $format =~ s/%S/$self->{ 'min_speed' } . "\/" . $self->{ 'max_speed' }/ge;
 
   return $format;
 }
@@ -388,9 +405,17 @@ progress bar which looks like:
   %9b  --  9-chars wide bar
   %b   -- 79-chars wide bar (default)
 
+=item %s
+
+current speed in items per second
+
+=item %S
+
+current min/max speeds (calculated after first 1% of the progress)
+
 =back
 
-Parameters can be ommited and then default format set with B<attr> will
+Parameters can be omitted and then default format set with B<attr> will
 be used.
 
 Sequences 'L', 'l', 'E' and 'e' can have width also:
@@ -454,6 +479,8 @@ Returns estimated remaining time, as a formatted string:
  # prints:
  # done  33.3% ETA Sun Oct 21 16:50:57 2001
 
+ print $p->report( "%30b %p %s/sec (%S) %L ETA: %E" );
+ # ..............................   0.7% 924/sec (938/951)   1:13 ETA: 173:35
 
 =head1 SEE ALSO
 
@@ -509,21 +536,23 @@ seen a release in the last 12 years.
 
 =head1 GITHUB REPOSITORY
 
-L<https://github.com/cade-vs/perl-time-progress>
+
+  https://github.com/cade-vs/perl-time-progress
+  
+  git clone https://github.com/cade-vs/perl-time-progress
 
 
 =head1 AUTHOR
 
-Vladi Belperchinov-Shabanski "Cade"
+  Vladi Belperchinov-Shabanski "Cade"
 
-E<lt>cade@biscom.netE<gt> E<lt>cade@datamax.bgE<gt> E<lt>cade@cpan.orgE<gt>
+  <cade@bis.bg> <cade@cpan.org>
 
-L<http://cade.datamax.bg>
+  http://cade.datamax.bg
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2001-2015 by Vladi Belperchinov-Shabanski
-E<lt>cade@cpan.orgE<gt>.
+This software is (c) 2001-2019 by Vladi Belperchinov-Shabanski E<lt>cade@bis.bgE<gt> E<lt>cade@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

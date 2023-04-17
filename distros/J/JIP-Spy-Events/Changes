@@ -1,8 +1,13 @@
 Revision history for JIP-Spy-Events
 
-v0.0.2         2023-03-02
-        Added Perl 5.36 into ".travis.yml".
-        Small changes in distro.
+v0.0.3    2023-04-16
+  - Improved portability of some tests.
+  - More documentation.
+  - Small changes in distro.
 
-v0.0.1         2019-09-15
-        First version, released on an unsuspecting world.
+v0.0.2    2023-03-02
+  - Added Perl 5.36 into ".travis.yml".
+  - Small changes in distro.
+
+v0.0.1    2019-09-15
+  - First version, released on an unsuspecting world.

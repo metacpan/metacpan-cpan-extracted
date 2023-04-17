@@ -9,8 +9,6 @@ use Carp;
 use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 
 use Spreadsheet::Edit qw/:all logmsg/;
-diag "Loaded ",$INC{"Spreadsheet/Edit.pm"};
-
 
 die "oops" unless ! %Spreadsheet::Edit::pkg2currsheet;
 die "oops" unless ! defined $Spreadsheet::Edit::_inner_apply_sheet;

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 no warnings 'numeric';
 
-use Proc::Killfam;
+use Proc::ProcessTable;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.2';
 
 sub _run {
     my($timeout, @argv) = @_;
@@ -27,8 +27,32 @@ sub _run {
     } else { # watchdog child process
         sleep $timeout;
         warn "timed out\n";
-        killfam SIGTERM => getppid;
+        # We can't just `Proc::Killfam::killfam TERM => getppid` because that
+        # will put the watchdog process somewhere in the list of victims, and
+        # thus anything after it in the list won't get killed. Filter this
+        # process out of the list of victims and kill everything else. The
+        # watchdog will then exit normally.
+        my $process_table = Proc::ProcessTable->new->table;
+        my @victims = grep { $_ != $$ } _get_pids($process_table, getppid);
+        kill SIGTERM => @victims, getppid;
     }
+}
+
+# Copied from Proc::Killfam::get_pids in Proc-ProcessTable-0.634 which is
+# GPL/Artistic licenced. It's undocumented there so should be considered
+# unstable, hence why copied.
+sub _get_pids {
+    my($procs, @kids) = @_;
+    my @pids;
+    foreach my $kid (@kids) {
+        foreach my $proc (@$procs) {
+            if ($proc->ppid == $kid) {
+                my $pid = $proc->pid;
+                push @pids, $pid, _get_pids($procs, $pid);
+            }
+        }
+    }
+    @pids;
 }
 
 =head1 NAME
@@ -37,7 +61,7 @@ App::ptimeout - module implementing L<ptimeout>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2021 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

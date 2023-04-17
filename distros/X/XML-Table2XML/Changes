@@ -14,3 +14,6 @@ Revision history for Perl extension Table2XML.
 
 1.4.1  Thu Apr 06 21:00:00 2023
 	- corrected files in test suite
+	
+1.4.2  Thu Apr 15 21:00:00 2023
+	- after installing linux, finally corrected files in test suite (CR/LF problem)

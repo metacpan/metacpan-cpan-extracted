@@ -1,13 +1,13 @@
-digraph "yeti-3.example.com"{ // HEADER: MACHINE
+digraph "yeti-2.example.com"{ // HEADER: MACHINE
 	rankdir=LR; // HEADER: MACHINE
-	subgraph "cluster_machine@yeti-3.example.com" {
+	subgraph "cluster_machine@yeti-2.example.com" {
 		style=filled;
 		color=lightgrey;
 		fillcolor=white;
 		node [style=filled,color=white,fillcolor=white,shape=rectangle];
-			{ "machine@yeti-3.example.com|Partition::GPT@sda" [
+			{ "machine@yeti-2.example.com|Partition::GPT@sda" [
 				label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-						<TR> <TD COLSPAN="2">ATA SSDSC2KG480G8R</TD> </TR><TR><TD >/dev/sda<BR/>Model: SSDSC2KG480G8R<BR/>Serial: BTYG918106V4480BGN<BR/>Label: gpt<BR/>Size: 447 GiB</TD>    <TD BGCOLOR="lightgrey">
+						<TR> <TD COLSPAN="2">ATA SSDSC2KG480G7R</TD> </TR><TR><TD >/dev/sda<BR/>Model: SSDSC2KG480G7R<BR/>Serial: BTYM7295013Y480BGN<BR/>Label: gpt<BR/>Size: 447 GiB</TD>    <TD BGCOLOR="lightgrey">
 						<TABLE >
 							<TR>
 								<TD bgcolor="green">
@@ -55,46 +55,438 @@ digraph "yeti-3.example.com"{ // HEADER: MACHINE
 				style=striped;
 				fillcolor="green;0.000002:pink;0.008330:pink;0.064570:pink;0.070818:pink;0.002081:pink;0.854197:green;0.000002";
 			]; }
-			subgraph "cluster_machine@yeti-3.example.com|FS" {
+			subgraph "cluster_machine@yeti-2.example.com|FS" {
 				style=filled;
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				{ "machine@yeti-3.example.com|FS|::FS@/" [
-					label="/\nDevice: /dev/sda2\next4\nSize: 28.2 GiB\nFree: 10.7 GiB\nUsed: 16.0 GiB";
-					style=striped;fillcolor="pink;0.619758.2:green"
-				]; }
-				{ "machine@yeti-3.example.com|FS|::FS@/tmp" [
-					label="/tmp\nDevice: /dev/sda5\next4\nSize: 375 GiB\nFree: 356 GiB\nUsed: 76.0 kiB";
-					style=striped;fillcolor="pink;0.050984.2:green"
-				]; }
-				{ "machine@yeti-3.example.com|FS|::SWAP::Partition@sda1" [
+				{ "machine@yeti-2.example.com|FS|::SWAP::Partition@sda1" [
 					label="SWAP\nDevice: /dev/sda1\nSize: 3.72 GiB\nFree: 3.72 GiB\nUsed: 0 B";
-					style=striped;fillcolor="green"
+					shape=rectangle;style=striped;fillcolor="green"
 				]; }
+				subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/" {
+					style=filled;
+					color=lightgrey;
+					fillcolor=lightgrey;
+					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+					{ "machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" [
+						label="/\nDevice: /dev/sda2\next4\nSize: 28.2 GiB\nFree: 10.7 GiB\nUsed: 16.0 GiB";
+						shape=rectangle;style=striped;fillcolor="pink;0.568108.2:green;0.380240.2:orange"
+					]; }
+					subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/" {
+						color=white;
+						fillcolor=white;
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" [
+								label="/sys (sysfs)";
+								shape=rectangle;style=striped;fillcolor="yellow"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@28@/sys/kernel/security" [
+									label="/sys/kernel/security (securityfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup" {
+									style=filled;
+									color=lightgrey;
+									fillcolor=lightgrey;
+									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+									{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" [
+										label="/sys/fs/cgroup\ntmpfs\nSize: 4.00 MiB\nFree: 4.00 MiB\nUsed: 0 B";
+										shape=rectangle;style=striped;fillcolor="green"
+									]; }
+									subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup" {
+										color=white;
+										fillcolor=white;
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@32@/sys/fs/cgroup/systemd" [
+											label="/sys/fs/cgroup/systemd (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@35@/sys/fs/cgroup/net_cls,net_prio" [
+											label="/sys/fs/cgroup/net_cls,net_prio (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@36@/sys/fs/cgroup/perf_event" [
+											label="/sys/fs/cgroup/perf_event (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@37@/sys/fs/cgroup/devices" [
+											label="/sys/fs/cgroup/devices (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@38@/sys/fs/cgroup/rdma" [
+											label="/sys/fs/cgroup/rdma (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@39@/sys/fs/cgroup/freezer" [
+											label="/sys/fs/cgroup/freezer (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@40@/sys/fs/cgroup/hugetlb" [
+											label="/sys/fs/cgroup/hugetlb (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@41@/sys/fs/cgroup/memory" [
+											label="/sys/fs/cgroup/memory (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@42@/sys/fs/cgroup/cpu,cpuacct" [
+											label="/sys/fs/cgroup/cpu,cpuacct (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@43@/sys/fs/cgroup/cpuset" [
+											label="/sys/fs/cgroup/cpuset (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@44@/sys/fs/cgroup/pids" [
+											label="/sys/fs/cgroup/pids (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@45@/sys/fs/cgroup/blkio" [
+											label="/sys/fs/cgroup/blkio (cgroup)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										label="";
+									}
+									label="";
+								}
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@33@/sys/fs/pstore" [
+									label="/sys/fs/pstore (pstore)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@34@/sys/fs/bpf" [
+									label="/sys/fs/bpf\nSource: none\nbpf";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@49@/sys/kernel/debug" [
+									label="/sys/kernel/debug (debugfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@50@/sys/kernel/tracing" [
+									label="/sys/kernel/tracing (tracefs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@52@/sys/fs/fuse/connections" [
+									label="/sys/fs/fuse/connections (fusectl)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@53@/sys/kernel/config" [
+									label="/sys/kernel/config (configfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::FS@FS@23@/proc" [
+								label="/proc (proc)";
+								shape=rectangle;style=striped;fillcolor="yellow"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc" {
+								color=white;
+								fillcolor=white;
+								subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc" {
+									style=filled;
+									color=lightgrey;
+									fillcolor=lightgrey;
+									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+									{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc|::FS@FS@46@/proc/sys/fs/binfmt_misc" [
+										label="/proc/sys/fs/binfmt_misc\nSource: systemd-1\nautofs";
+										shape=rectangle;style=striped;fillcolor="yellow"
+									]; }
+									subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc|::C@46@/proc/sys/fs/binfmt_misc" {
+										color=white;
+										fillcolor=white;
+										{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc|::C@46@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@127@/proc/sys/fs/binfmt_misc" [
+											label="/proc/sys/fs/binfmt_misc (binfmt_misc)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										label="";
+									}
+									label="";
+								}
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::FS@FS@24@/dev" [
+								label="/dev\nSource: udev\ndevtmpfs\nSize: 377 GiB\nFree: 377 GiB\nUsed: 0 B";
+								shape=rectangle;style=striped;fillcolor="green"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@25@/dev/pts" [
+									label="/dev/pts (devpts)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@29@/dev/shm" [
+									label="/dev/shm\ntmpfs\nSize: 377 GiB\nFree: 377 GiB\nUsed: 4.00 kiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.000000.2:green"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@47@/dev/hugepages" [
+									label="/dev/hugepages (hugetlbfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@48@/dev/mqueue" [
+									label="/dev/mqueue (mqueue)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::FS@FS@26@/run" [
+								label="/run\ntmpfs\nSize: 75.4 GiB\nFree: 75.4 GiB\nUsed: 4.25 MiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.000055.2:green"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@30@/run/lock" [
+									label="/run/lock\ntmpfs\nSize: 5.00 MiB\nFree: 5.00 MiB\nUsed: 0 B";
+									shape=rectangle;style=striped;fillcolor="green"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@51@/run/rpc_pipefs" [
+									label="/run/rpc_pipefs\nSource: sunrpc\nrpc_pipefs";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@436@/run/user/118" [
+									label="/run/user/118\ntmpfs\nSize: 75.4 GiB\nFree: 75.4 GiB\nUsed: 4.00 kiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.000000.2:green"
+								]; }
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@480@/run/user/15069" [
+									label="/run/user/15069\ntmpfs\nSize: 75.4 GiB\nFree: 75.4 GiB\nUsed: 4.00 kiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.000000.2:green"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@124@/tmp" [
+							label="/tmp\nDevice: /dev/sda5\next4\nSize: 375 GiB\nFree: 356 GiB\nUsed: 76.0 kiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.000000.2:green;0.949016.2:orange"
+						]; }
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000|::FS@FS@370@/grid5000" [
+								label="/grid5000\nSource: nfs:/export/grid5000\nnfs\nSize: 1.97 TiB\nFree: 595 GiB\nUsed: 1.39 TiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.704732.2:green;0.295260.2:orange"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000|::C@370@/grid5000" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000|::C@370@/grid5000|FS::MP::FS@FS@403@/grid5000/spack" [
+									label="/grid5000/spack\nSource: /etc/auto.spack\nautofs\nSize: 1007 GiB\nFree: 595 GiB\nUsed: 411 GiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.408572.2:green;0.591412.2:orange"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix|::FS@FS@381@/var/guix" [
+								label="/var/guix\nSource: /etc/auto.guix\nautofs\nSize: 29.4 GiB\nFree: 14.5 GiB\nUsed: 13.5 GiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.457697.2:green;0.493482.2:orange"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix|::C@381@/var/guix" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix|::C@381@/var/guix|FS::MP::FS@FS@458@/var/guix" [
+									label="/var/guix\nSource: guix:/var/guix\nnfs\nSize: 29.4 GiB\nFree: 14.5 GiB\nUsed: 13.5 GiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.457697.2:green;0.493482.2:orange"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store|::FS@FS@392@/gnu/store" [
+								label="/gnu/store\nSource: /etc/auto.guix\nautofs\nSize: 29.4 GiB\nFree: 14.5 GiB\nUsed: 13.5 GiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.457697.2:green;0.493482.2:orange"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store|::C@392@/gnu/store" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store|::C@392@/gnu/store|FS::MP::FS@FS@469@/gnu/store" [
+									label="/gnu/store\nSource: guix:/gnu/store\nnfs\nSize: 29.4 GiB\nFree: 14.5 GiB\nUsed: 13.5 GiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.457697.2:green;0.493482.2:orange"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home|::FS@FS@414@/home" [
+								label="/home\nSource: /etc/auto.home\nautofs";
+								shape=rectangle;style=striped;fillcolor="yellow"
+							]; }
+							subgraph "cluster_machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home|::C@414@/home" {
+								color=white;
+								fillcolor=white;
+								{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home|::C@414@/home|FS::MP::FS@FS@447@/home/user" [
+									label="/home/user\nSource: nfs:/export/home/user\nnfs\nSize: 12.9 TiB\nFree: 6.95 TiB\nUsed: 5.94 TiB";
+									shape=rectangle;style=striped;fillcolor="pink;0.460718.2:green;0.539281.2:orange"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						{ "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@425@/srv/storage" [
+							label="/srv/storage\nSource: /etc/auto.storage\nautofs";
+							shape=rectangle;style=striped;fillcolor="yellow"
+						]; }
+						label="";
+					}
+					label="";
+				}
 				label="Mounted FS and swap";
 			}
-			subgraph "cluster_machine@yeti-3.example.com|Libvirt" {
+			subgraph "cluster_machine@yeti-2.example.com|Libvirt" {
 				style=filled;
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 				label="Libvirt Virtual Machines";
 			}
-			{ "machine@yeti-3.example.com|Partition::None@nvme0n1" [
-				label="/dev/nvme0n1\nModel: Dell Express Flash NVMe PM1725 1.6TB AIC\nSerial:       S2MBNA0J600524\nSize: 1.46 TiB";
+			{ "machine@yeti-2.example.com|Partition::None@nvme0n1" [
+				label="/dev/nvme0n1\nModel: Dell Express Flash NVMe PM1725 1.6TB AIC\nSerial:       S2MBNA0J600517\nSize: 1.46 TiB";
 				fillcolor="lightgrey"
 				style=filled
 				shape=rectangle
 			]; }
-			{ "machine@yeti-3.example.com|Partition::None@nvme1n1" [
-				label="/dev/nvme1n1\nModel: Dell Express Flash NVMe PM1725 1.6TB AIC\nSerial:       S2MBNA0J501703\nSize: 1.46 TiB";
+			{ "machine@yeti-2.example.com|Partition::None@nvme1n1" [
+				label="/dev/nvme1n1\nModel: Dell Express Flash NVMe PM1725 1.6TB AIC\nSerial:       S2MBNA0J501704\nSize: 1.46 TiB";
 				fillcolor="lightgrey"
 				style=filled
 				shape=rectangle
 			]; }
+			// Links from FS::MP::FS@FS@22@/sys
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" [style=invis]
+			// Links from FS::MP::FS@FS@28@/sys/kernel/security
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@28@/sys/kernel/security" [style=invis]
+			// Links from FS::MP::FS@FS@31@/sys/fs/cgroup
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" [style=invis]
+			// Links from FS::MP::FS@FS@32@/sys/fs/cgroup/systemd
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@32@/sys/fs/cgroup/systemd" [style=invis]
+			// Links from FS::MP::FS@FS@35@/sys/fs/cgroup/net_cls,net_prio
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@35@/sys/fs/cgroup/net_cls,net_prio" [style=invis]
+			// Links from FS::MP::FS@FS@36@/sys/fs/cgroup/perf_event
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@36@/sys/fs/cgroup/perf_event" [style=invis]
+			// Links from FS::MP::FS@FS@37@/sys/fs/cgroup/devices
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@37@/sys/fs/cgroup/devices" [style=invis]
+			// Links from FS::MP::FS@FS@38@/sys/fs/cgroup/rdma
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@38@/sys/fs/cgroup/rdma" [style=invis]
+			// Links from FS::MP::FS@FS@39@/sys/fs/cgroup/freezer
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@39@/sys/fs/cgroup/freezer" [style=invis]
+			// Links from FS::MP::FS@FS@40@/sys/fs/cgroup/hugetlb
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@40@/sys/fs/cgroup/hugetlb" [style=invis]
+			// Links from FS::MP::FS@FS@41@/sys/fs/cgroup/memory
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@41@/sys/fs/cgroup/memory" [style=invis]
+			// Links from FS::MP::FS@FS@42@/sys/fs/cgroup/cpu,cpuacct
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@42@/sys/fs/cgroup/cpu,cpuacct" [style=invis]
+			// Links from FS::MP::FS@FS@43@/sys/fs/cgroup/cpuset
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@43@/sys/fs/cgroup/cpuset" [style=invis]
+			// Links from FS::MP::FS@FS@44@/sys/fs/cgroup/pids
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@44@/sys/fs/cgroup/pids" [style=invis]
+			// Links from FS::MP::FS@FS@45@/sys/fs/cgroup/blkio
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::FS@FS@31@/sys/fs/cgroup" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP@31@/sys/fs/cgroup|::C@31@/sys/fs/cgroup|FS::MP::FS@FS@45@/sys/fs/cgroup/blkio" [style=invis]
+			// Links from FS::MP::FS@FS@33@/sys/fs/pstore
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@33@/sys/fs/pstore" [style=invis]
+			// Links from FS::MP::FS@FS@34@/sys/fs/bpf
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@34@/sys/fs/bpf" [style=invis]
+			// Links from FS::MP::FS@FS@49@/sys/kernel/debug
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@49@/sys/kernel/debug" [style=invis]
+			// Links from FS::MP::FS@FS@50@/sys/kernel/tracing
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@50@/sys/kernel/tracing" [style=invis]
+			// Links from FS::MP::FS@FS@52@/sys/fs/fuse/connections
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@52@/sys/fs/fuse/connections" [style=invis]
+			// Links from FS::MP::FS@FS@53@/sys/kernel/config
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::FS@FS@22@/sys" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@22@/sys|::C@22@/sys|FS::MP::FS@FS@53@/sys/kernel/config" [style=invis]
+			// Links from FS::MP::FS@FS@23@/proc
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::FS@FS@23@/proc" [style=invis]
+			// Links from FS::MP::FS@FS@46@/proc/sys/fs/binfmt_misc
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::FS@FS@23@/proc" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc|::FS@FS@46@/proc/sys/fs/binfmt_misc" [style=invis]
+			// Links from FS::MP::FS@FS@127@/proc/sys/fs/binfmt_misc
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc|::FS@FS@46@/proc/sys/fs/binfmt_misc" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@23@/proc|::C@23@/proc|FS::MP@46@/proc/sys/fs/binfmt_misc|::C@46@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@127@/proc/sys/fs/binfmt_misc" [style=invis]
+			// Links from FS::MP::FS@FS@24@/dev
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::FS@FS@24@/dev" [style=invis]
+			// Links from FS::MP::FS@FS@25@/dev/pts
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::FS@FS@24@/dev" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@25@/dev/pts" [style=invis]
+			// Links from FS::MP::FS@FS@29@/dev/shm
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::FS@FS@24@/dev" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@29@/dev/shm" [style=invis]
+			// Links from FS::MP::FS@FS@47@/dev/hugepages
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::FS@FS@24@/dev" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@47@/dev/hugepages" [style=invis]
+			// Links from FS::MP::FS@FS@48@/dev/mqueue
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::FS@FS@24@/dev" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@24@/dev|::C@24@/dev|FS::MP::FS@FS@48@/dev/mqueue" [style=invis]
+			// Links from FS::MP::FS@FS@26@/run
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::FS@FS@26@/run" [style=invis]
+			// Links from FS::MP::FS@FS@30@/run/lock
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::FS@FS@26@/run" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@30@/run/lock" [style=invis]
+			// Links from FS::MP::FS@FS@51@/run/rpc_pipefs
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::FS@FS@26@/run" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@51@/run/rpc_pipefs" [style=invis]
+			// Links from FS::MP::FS@FS@436@/run/user/118
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::FS@FS@26@/run" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@436@/run/user/118" [style=invis]
+			// Links from FS::MP::FS@FS@480@/run/user/15069
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::FS@FS@26@/run" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@26@/run|::C@26@/run|FS::MP::FS@FS@480@/run/user/15069" [style=invis]
+			// Links from FS::MP::FS@FS@124@/tmp
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@124@/tmp" [style=invis]
+			// Links from FS::MP::FS@FS@370@/grid5000
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000|::FS@FS@370@/grid5000" [style=invis]
+			// Links from FS::MP::FS@FS@403@/grid5000/spack
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000|::FS@FS@370@/grid5000" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@370@/grid5000|::C@370@/grid5000|FS::MP::FS@FS@403@/grid5000/spack" [style=invis]
+			// Links from FS::MP::FS@FS@381@/var/guix
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix|::FS@FS@381@/var/guix" [style=invis]
+			// Links from FS::MP::FS@FS@458@/var/guix
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix|::FS@FS@381@/var/guix" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@381@/var/guix|::C@381@/var/guix|FS::MP::FS@FS@458@/var/guix" [style=invis]
+			// Links from FS::MP::FS@FS@392@/gnu/store
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store|::FS@FS@392@/gnu/store" [style=invis]
+			// Links from FS::MP::FS@FS@469@/gnu/store
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store|::FS@FS@392@/gnu/store" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@392@/gnu/store|::C@392@/gnu/store|FS::MP::FS@FS@469@/gnu/store" [style=invis]
+			// Links from FS::MP::FS@FS@414@/home
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home|::FS@FS@414@/home" [style=invis]
+			// Links from FS::MP::FS@FS@447@/home/user
+			"machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home|::FS@FS@414@/home" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP@414@/home|::C@414@/home|FS::MP::FS@FS@447@/home/user" [style=invis]
+			// Links from FS::MP::FS@FS@425@/srv/storage
+			"machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@425@/srv/storage" [style=invis]
 			// Links for Partition::GPT@sda
-			// TARGET LINK: yeti-3.example.com 480103981056 sda "machine@yeti-3.example.com|Partition::GPT@sda"
+			// TARGET LINK: yeti-2.example.com 480103981056 sda "machine@yeti-2.example.com|Partition::GPT@sda"
 			// Links for Partition::Table
 			// Links for Partition::Table::Part::Free@_1
 			// Links for Partition::Table::Part::Data@sda1
@@ -104,20 +496,85 @@ digraph "yeti-3.example.com"{ // HEADER: MACHINE
 			// Links for Partition::Table::Part::Data@sda5
 			// Links for Partition::Table::Part::Free@_2
 			// Links for FS
-			// Links for FS::FS@/
-			"machine@yeti-3.example.com|Partition::GPT@sda":"2" -> "machine@yeti-3.example.com|FS|::FS@/"
-			// Links for FS::FS@/
-			// Links for FS::FS@/tmp
-			"machine@yeti-3.example.com|Partition::GPT@sda":"5" -> "machine@yeti-3.example.com|FS|::FS@/tmp"
-			// Links for FS::FS@/tmp
 			// Links for FS::SWAP::Partition@sda1
-			"machine@yeti-3.example.com|Partition::GPT@sda":"1" -> "machine@yeti-3.example.com|FS|::SWAP::Partition@sda1"
+			"machine@yeti-2.example.com|Partition::GPT@sda":"1" -> "machine@yeti-2.example.com|FS|::SWAP::Partition@sda1"
 			// Links for FS::SWAP::Partition@sda1
+			// Links for FS::MP@27@/
+			// Links for FS::MP::FS@FS@27@/
+			"machine@yeti-2.example.com|Partition::GPT@sda":"2" -> "machine@yeti-2.example.com|FS|::MP@27@/|::FS@FS@27@/"
+			// Links for FS::MP::FS@FS@27@/
+			// Links for FS::MP::C@27@/
+			// Links for FS::MP@22@/sys
+			// Links for FS::MP::FS@FS@22@/sys
+			// Links for FS::MP::C@22@/sys
+			// Links for FS::MP::FS@FS@28@/sys/kernel/security
+			// Links for FS::MP@31@/sys/fs/cgroup
+			// Links for FS::MP::FS@FS@31@/sys/fs/cgroup
+			// Links for FS::MP::C@31@/sys/fs/cgroup
+			// Links for FS::MP::FS@FS@32@/sys/fs/cgroup/systemd
+			// Links for FS::MP::FS@FS@35@/sys/fs/cgroup/net_cls,net_prio
+			// Links for FS::MP::FS@FS@36@/sys/fs/cgroup/perf_event
+			// Links for FS::MP::FS@FS@37@/sys/fs/cgroup/devices
+			// Links for FS::MP::FS@FS@38@/sys/fs/cgroup/rdma
+			// Links for FS::MP::FS@FS@39@/sys/fs/cgroup/freezer
+			// Links for FS::MP::FS@FS@40@/sys/fs/cgroup/hugetlb
+			// Links for FS::MP::FS@FS@41@/sys/fs/cgroup/memory
+			// Links for FS::MP::FS@FS@42@/sys/fs/cgroup/cpu,cpuacct
+			// Links for FS::MP::FS@FS@43@/sys/fs/cgroup/cpuset
+			// Links for FS::MP::FS@FS@44@/sys/fs/cgroup/pids
+			// Links for FS::MP::FS@FS@45@/sys/fs/cgroup/blkio
+			// Links for FS::MP::FS@FS@33@/sys/fs/pstore
+			// Links for FS::MP::FS@FS@34@/sys/fs/bpf
+			// Links for FS::MP::FS@FS@49@/sys/kernel/debug
+			// Links for FS::MP::FS@FS@50@/sys/kernel/tracing
+			// Links for FS::MP::FS@FS@52@/sys/fs/fuse/connections
+			// Links for FS::MP::FS@FS@53@/sys/kernel/config
+			// Links for FS::MP@23@/proc
+			// Links for FS::MP::FS@FS@23@/proc
+			// Links for FS::MP::C@23@/proc
+			// Links for FS::MP@46@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::FS@FS@46@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::C@46@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::FS@FS@127@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP@24@/dev
+			// Links for FS::MP::FS@FS@24@/dev
+			// Links for FS::MP::C@24@/dev
+			// Links for FS::MP::FS@FS@25@/dev/pts
+			// Links for FS::MP::FS@FS@29@/dev/shm
+			// Links for FS::MP::FS@FS@47@/dev/hugepages
+			// Links for FS::MP::FS@FS@48@/dev/mqueue
+			// Links for FS::MP@26@/run
+			// Links for FS::MP::FS@FS@26@/run
+			// Links for FS::MP::C@26@/run
+			// Links for FS::MP::FS@FS@30@/run/lock
+			// Links for FS::MP::FS@FS@51@/run/rpc_pipefs
+			// Links for FS::MP::FS@FS@436@/run/user/118
+			// Links for FS::MP::FS@FS@480@/run/user/15069
+			// Links for FS::MP::FS@FS@124@/tmp
+			"machine@yeti-2.example.com|Partition::GPT@sda":"5" -> "machine@yeti-2.example.com|FS|::MP@27@/|::C@27@/|FS::MP::FS@FS@124@/tmp"
+			// Links for FS::MP::FS@FS@124@/tmp
+			// Links for FS::MP@370@/grid5000
+			// Links for FS::MP::FS@FS@370@/grid5000
+			// Links for FS::MP::C@370@/grid5000
+			// Links for FS::MP::FS@FS@403@/grid5000/spack
+			// Links for FS::MP@381@/var/guix
+			// Links for FS::MP::FS@FS@381@/var/guix
+			// Links for FS::MP::C@381@/var/guix
+			// Links for FS::MP::FS@FS@458@/var/guix
+			// Links for FS::MP@392@/gnu/store
+			// Links for FS::MP::FS@FS@392@/gnu/store
+			// Links for FS::MP::C@392@/gnu/store
+			// Links for FS::MP::FS@FS@469@/gnu/store
+			// Links for FS::MP@414@/home
+			// Links for FS::MP::FS@FS@414@/home
+			// Links for FS::MP::C@414@/home
+			// Links for FS::MP::FS@FS@447@/home/user
+			// Links for FS::MP::FS@FS@425@/srv/storage
 			// Links for Libvirt Virtual Machines
 			// Links for Partition::None@nvme0n1
-			// TARGET LINK: yeti-3.example.com 1600321314816 nvme0n1 "machine@yeti-3.example.com|Partition::None@nvme0n1"
+			// TARGET LINK: yeti-2.example.com 1600321314816 nvme0n1 "machine@yeti-2.example.com|Partition::None@nvme0n1"
 			// Links for Partition::None@nvme1n1
-			// TARGET LINK: yeti-3.example.com 1600321314816 nvme1n1 "machine@yeti-3.example.com|Partition::None@nvme1n1"
-		label="yeti-3.example.com";
+			// TARGET LINK: yeti-2.example.com 1600321314816 nvme1n1 "machine@yeti-2.example.com|Partition::None@nvme1n1"
+		label="yeti-2.example.com";
 	}
 } // FOOTER: MACHINE

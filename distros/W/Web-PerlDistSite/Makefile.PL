@@ -56,42 +56,39 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Web::PerlDistSite"                         => { file => "lib/Web/PerlDistSite.pm", version => "0.001010" },
-                          "Web::PerlDistSite::Common"                 => { file => "lib/Web/PerlDistSite/Common.pm", version => "0.001010" },
-                          "Web::PerlDistSite::Compile"                => { file => "lib/Web/PerlDistSite/Compile.pm", version => "0.001010" },
-                          "Web::PerlDistSite::Component"              => { file => "lib/Web/PerlDistSite/Component.pm", version => "0.001010" },
+                          "Web::PerlDistSite"                         => { file => "lib/Web/PerlDistSite.pm", version => 0.001011 },
+                          "Web::PerlDistSite::Common"                 => { file => "lib/Web/PerlDistSite/Common.pm", version => 0.001011 },
+                          "Web::PerlDistSite::Compile"                => { file => "lib/Web/PerlDistSite/Compile.pm", version => 0.001011 },
+                          "Web::PerlDistSite::Component"              => { file => "lib/Web/PerlDistSite/Component.pm", version => 0.001011 },
                           "Web::PerlDistSite::Component::LayoutScss"  => {
                                                                            file => "lib/Web/PerlDistSite/Component/LayoutScss.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
                           "Web::PerlDistSite::Component::MainScss"    => {
                                                                            file => "lib/Web/PerlDistSite/Component/MainScss.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
-                          "Web::PerlDistSite::MenuItem"               => { file => "lib/Web/PerlDistSite/MenuItem.pm", version => "0.001010" },
+                          "Web::PerlDistSite::MenuItem"               => { file => "lib/Web/PerlDistSite/MenuItem.pm", version => 0.001011 },
                           "Web::PerlDistSite::MenuItem::Divider"      => {
                                                                            file => "lib/Web/PerlDistSite/MenuItem/Divider.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
                           "Web::PerlDistSite::MenuItem::File"         => {
                                                                            file => "lib/Web/PerlDistSite/MenuItem/File.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
                           "Web::PerlDistSite::MenuItem::Homepage"     => {
                                                                            file => "lib/Web/PerlDistSite/MenuItem/Homepage.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
                           "Web::PerlDistSite::MenuItem::MarkdownFile" => {
                                                                            file => "lib/Web/PerlDistSite/MenuItem/MarkdownFile.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
-                          "Web::PerlDistSite::MenuItem::Pod"          => {
-                                                                           file => "lib/Web/PerlDistSite/MenuItem/Pod.pm",
-                                                                           version => "0.001010",
-                                                                         },
+                          "Web::PerlDistSite::MenuItem::Pod"          => { file => "lib/Web/PerlDistSite/MenuItem/Pod.pm", version => 0.001011 },
                           "Web::PerlDistSite::MenuItem::PodFile"      => {
                                                                            file => "lib/Web/PerlDistSite/MenuItem/PodFile.pm",
-                                                                           version => "0.001010",
+                                                                           version => 0.001011,
                                                                          },
                         },
   "release_status"   => "stable",
@@ -106,7 +103,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/project",
                         },
-  "version"          => "0.001010",
+  "version"          => 0.001011,
   "x_static_install" => 1,
 };
 

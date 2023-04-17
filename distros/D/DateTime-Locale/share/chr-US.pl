@@ -29,8 +29,8 @@
     MEd => "E, M/d",
     MMM => "LLL",
     MMMEd => "E, MMM d",
-    "MMMMW-count-one" => "\N{U+2019}\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7}\N{U+2019} W \N{U+2019}\N{U+13be}\N{U+13bf}\N{U+2019} MMMM",
-    "MMMMW-count-other" => "\N{U+2019}\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7}\N{U+2019} W \N{U+2019}\N{U+13be}\N{U+13bf}\N{U+2019} MMMM",
+    "MMMMW-count-one" => "\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7} W \N{U+13be}\N{U+13bf} MMMM",
+    "MMMMW-count-other" => "\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7} W \N{U+13be}\N{U+13bf} MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 42,
+  version => 43,
 }

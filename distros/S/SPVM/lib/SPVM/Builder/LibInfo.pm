@@ -31,14 +31,14 @@ sub file {
   }
 }
 
-sub static {
+sub is_static {
   my $self = shift;
   if (@_) {
-    $self->{static} = $_[0];
+    $self->{is_static} = $_[0];
     return $self;
   }
   else {
-    return $self->{static};
+    return $self->{is_static};
   }
 }
 
@@ -71,6 +71,14 @@ sub new {
   my $self = {@_};
 
   bless $self, $class;
+
+  unless (defined $self->is_static) {
+    $self->is_static(0);
+  }
+  
+  unless (defined $self->is_abs) {
+    $self->is_abs(0);
+  }
   
   unless (defined $self->static_option_cb) {
     my $default_static_option_cb = sub {
@@ -102,7 +110,7 @@ sub to_arg {
   }
   else {
     my $name = $self->name;
-    if ($self->static) {
+    if ($self->is_static) {
       $link_command_arg = $self->static_option_cb->($self, $name);
     }
     else {
@@ -129,6 +137,11 @@ SPVM::Builder::LibInfo - Library Information
 
 The SPVM::Builder::LibInfo class has methods to manipulate library information.
 
+=head1 Usage
+
+  my $lib_info = SPVM::Builder::LibInfo->new(%fields);
+  my $lib_arg = $lib_info->to_arg;
+
 =head1 Fields
 
 =head2 name
@@ -136,7 +149,9 @@ The SPVM::Builder::LibInfo class has methods to manipulate library information.
   my $name = $lib_info->name;
   $lib_info->name($name);
 
-Gets and sets the library name.
+Gets and sets the C<name> field.
+
+This field is a library name.
 
 Examples:
   
@@ -149,40 +164,70 @@ Examples:
   my $file = $lib_info->file;
   $lib_info->file($file);
 
-Gets and sets the absolute path of the library file like C</path/libz.so>, C</path/libpng.a>.
+Gets and sets the C<file> field.
 
-=head2 static
+This field is the absolute path of the library file like C</path/libz.so>, C</path/libpng.a>.
 
-  my $static = $lib_info->static;
-  $lib_info->static($static);
+=head2 is_static
 
-Gets and sets the flag whether a static library is linked.
+  my $is_static = $lib_info->is_static;
+  $lib_info->is_static($is_static);
 
-Default:
+Gets and sets the C<is_static> field.
 
-A false value.
+If this field is a true value, a static library is linked.
 
 =head2 is_abs
 
   my $is_abs = $lib_info->is_abs;
   $lib_info->is_abs($is_abs);
 
-If the C<is_abs> is a true value, the library is linked by the library name like C<-lfoo>.
+Gets and sets the C<is_abs> field.
 
-If it is a false value, the library is linked by the absolute path of the library like C</path/libfoo.so>.
+If this field is a true value, the library is linked by the library name like C<-lfoo>.
 
-Default:
-
-A false value.
+Otherwise the library is linked by the absolute path of the library like C</path/libfoo.so>.
 
 =head2 static_option_cb
 
   my $static_option_cb = $lib_info->static_option_cb;
   $lib_info->static_option_cb($static_option_cb);
 
-Gets and sets the callback to create a linker option to link a static library.
+Gets and sets the C<static_option_cb> field.
 
-Default:
+This field is the callback to create a linker option to link a static library.
+
+=head1 Class Methods
+
+=head2 new
+
+  my $lib_info = SPVM::Builder::LibInfo->new(%fields);
+
+Creates a L<SPVM::Builder::LibInfo> object with L</"Fields">.
+
+Default Field Values:
+
+If a field is not defined, the field is set to the following default value.
+
+=over 2
+
+=item * L</"name">
+
+undef
+
+=item * L</"file">
+
+undef
+
+=item * L</"is_static">
+
+0
+
+=item * L</"is_abs">
+
+0
+
+=item * L</"static_option_cb">
 
   sub {
     my ($self, $name) = @_;
@@ -192,11 +237,7 @@ Default:
     return $name;
   };
 
-=head1 Class Methods
-
-=head2 new
-
-  my $lib_info = SPVM::Builder::LibInfo->new;
+=back
 
 =head1 Instance Methods
 
@@ -204,7 +245,7 @@ Default:
 
   my $link_command_arg = $lib_info->to_arg;
 
-Creates an argument of the link command from the L</"is_abs"> field and L</"static"> field, and returns it.
+Creates an argument of the link command from the L</"is_abs"> field and L</"is_static"> field, and returns it.
 
 The following ones are examples of the return value.
   

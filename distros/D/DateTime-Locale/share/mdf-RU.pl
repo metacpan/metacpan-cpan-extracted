@@ -220,9 +220,9 @@
   ],
   name => "Moksha Russia",
   native_language => "\N{U+043c}\N{U+043e}\N{U+043a}\N{U+0448}\N{U+0435}\N{U+043d}\N{U+044c} \N{U+043a}\N{U+044f}\N{U+043b}\N{U+044c}",
-  native_name => "\N{U+043c}\N{U+043e}\N{U+043a}\N{U+0448}\N{U+0435}\N{U+043d}\N{U+044c} \N{U+043a}\N{U+044f}\N{U+043b}\N{U+044c} RU",
+  native_name => "\N{U+043c}\N{U+043e}\N{U+043a}\N{U+0448}\N{U+0435}\N{U+043d}\N{U+044c} \N{U+043a}\N{U+044f}\N{U+043b}\N{U+044c}",
   native_script => undef,
-  native_territory => "RU",
+  native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

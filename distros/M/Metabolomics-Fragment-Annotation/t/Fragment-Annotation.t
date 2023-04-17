@@ -20,7 +20,7 @@ use Metabolomics::Banks::Knapsack qw( :all ) ;
 use Metabolomics::Banks::PhytoHub qw( :all ) ;
 use Metabolomics::Banks::PeakForest qw( :all ) ;
 
-use Test::More tests => 35 ;
+use Test::More tests => 33 ;
 use Data::Dumper ;
 
 
@@ -1429,57 +1429,57 @@ BEGIN {
 
 #########################	
 
-	print "\n** Test $current_test fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2 **\n" ; $current_test++;
-	is_deeply( fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2_TEST(
-		# $expFile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds, $delta, $url, $token, $polarity, $resolution, $column_code, $template, $tabular
-		$modulePath.'/input_gcms_fake_clusters.tabular',
-		'TRUE',
-		2, 
-		21,
-		13,
-		0.05, ##PPM
-		'MMU',
-		'https://metabohub.peakforest.org/rest/v2/',
-		undef, # url card
-		'2big17k7a871tfatk1b4cm8pr7',
-		'POSITIVE',
-		'high',
-		undef,
-		$modulePath.'/_template-peakforest.tabular',
-		$modulePath.'/in_testGCMS_pos__PEAKFOREST_ANNOTATED__.TSV',
-		$modulePath.'/_template_db_spectra.tmpl',
-		$modulePath.'/in_testGCMS_pos__PEAKFOREST_ANNOTATED__.HTML',
-		),
-		## Expected
-		$modulePath.'/in_testGCMS_pos__PEAKFOREST_ANNOTATED__.TSV',
-		## Answer
-		'Method \'fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2\' works with a bank and tabular template');
+#	print "\n** Test $current_test fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2 **\n" ; $current_test++;
+#	is_deeply( fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2_TEST(
+#		# $expFile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds, $delta, $url, $token, $polarity, $resolution, $column_code, $template, $tabular
+#		$modulePath.'/input_gcms_fake_clusters.tabular',
+#		'TRUE',
+#		2, 
+#		21,
+#		13,
+#		0.05, ##PPM
+#		'MMU',
+#		'https://metabohub.peakforest.org/rest/v2/',
+#		undef, # url card
+#		'2big17k7a871tfatk1b4cm8pr7',
+#		'POSITIVE',
+#		'high',
+#		undef,
+#		$modulePath.'/_template-peakforest.tabular',
+#		$modulePath.'/in_testGCMS_pos__PEAKFOREST_ANNOTATED__.TSV',
+#		$modulePath.'/_template_db_spectra.tmpl',
+#		$modulePath.'/in_testGCMS_pos__PEAKFOREST_ANNOTATED__.HTML',
+#		),
+#		## Expected
+#		$modulePath.'/in_testGCMS_pos__PEAKFOREST_ANNOTATED__.TSV',
+#		## Answer
+#		'Method \'fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2\' works with a bank and tabular template');
 
-	print "\n** Test $current_test fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2 with Lab data **\n" ; $current_test++;
-	is_deeply( fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2_TEST(
-		# $expFile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds, $delta, $url, $token, $polarity, $resolution, $column_code, $template, $tabular
-		$modulePath.'/ASM0683_VariableMetaData.TSV',
-		'TRUE',
-		3, 
-		22,
-		14,
-		0.05, ## DA
-		'MMU',
-		'https://pfem.peakforest.org/rest/v2/',
-		'https://pfem.peakforest.org/webapp/home?PFc=',
-		'ta8j54uq85k00hi9qrnrrghgei',
-		'POSITIVE',
-		'high',
-		undef,
-		$modulePath.'/_template-peakforest.tabular',
-		$modulePath.'/ASM0683_VariableMetaData__PEAKFOREST_ANNOTATED__.TSV',
-		$modulePath.'/_template_db_spectra.tmpl',
-		$modulePath.'/ASM0683_VariableMetaData__PEAKFOREST_ANNOTATED__.HTML',
-		),
-		## Expected
-		$modulePath.'/ASM0683_VariableMetaData__PEAKFOREST_ANNOTATED__.TSV',
-		## Answer
-		'Method \'fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2\' works with a bank and tabular template');
+#	print "\n** Test $current_test fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2 with Lab data **\n" ; $current_test++;
+#	is_deeply( fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2_TEST(
+#		# $expFile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds, $delta, $url, $token, $polarity, $resolution, $column_code, $template, $tabular
+#		$modulePath.'/ASM0683_VariableMetaData.TSV',
+#		'TRUE',
+#		3, 
+#		22,
+#		14,
+#		0.05, ## DA
+#		'MMU',
+#		'https://pfem.peakforest.org/rest/v2/',
+#		'https://pfem.peakforest.org/webapp/home?PFc=',
+#		'ta8j54uq85k00hi9qrnrrghgei',
+#		'POSITIVE',
+#		'high',
+#		undef,
+#		$modulePath.'/_template-peakforest.tabular',
+#		$modulePath.'/ASM0683_VariableMetaData__PEAKFOREST_ANNOTATED__.TSV',
+#		$modulePath.'/_template_db_spectra.tmpl',
+#		$modulePath.'/ASM0683_VariableMetaData__PEAKFOREST_ANNOTATED__.HTML',
+#		),
+#		## Expected
+#		$modulePath.'/ASM0683_VariableMetaData__PEAKFOREST_ANNOTATED__.TSV',
+#		## Answer
+#		'Method \'fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2\' works with a bank and tabular template');
 
 #########################	
 

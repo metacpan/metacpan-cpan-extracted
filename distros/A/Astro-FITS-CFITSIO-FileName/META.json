@@ -138,15 +138,15 @@
    "provides" : {
       "Astro::FITS::CFITSIO::FileName" : {
          "file" : "lib/Astro/FITS/CFITSIO/FileName.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Astro::FITS::CFITSIO::FileName::Regexp" : {
          "file" : "lib/Astro/FITS/CFITSIO/FileName/Regexp.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Astro::FITS::CFITSIO::FileName::Types" : {
          "file" : "lib/Astro/FITS/CFITSIO/FileName/Types.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -161,7 +161,7 @@
          "web" : "https://gitlab.com/djerius/astro-fits-cfitsio-filename"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_generated_by_perl" : "v5.28.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"

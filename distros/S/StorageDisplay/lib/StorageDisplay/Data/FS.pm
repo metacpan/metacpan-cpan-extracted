@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::FS;
 # ABSTRACT: Handle filesystem data for StorageDisplay
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -57,34 +57,68 @@ sub BUILD {
     my $args=shift;
 
     my $st = $args->{'st'};
+    # in case FS hierachy is not initialized
+    # and 'parent' not present (old versions of findmnt)
+    my $rootid = $st->fs_mountpoint_id('/');
     my $allfs = $st->get_info('fs')//{};
 
-    foreach my $dev (sort keys %{$allfs}) {
-        my $fs = $allfs->{$dev};
-        if (($fs->{'mountpoint'}//'') eq 'SWAP') {
-            if ($fs->{'fstype'} eq 'partition') {
-                $self->_add_swap(
-                    $self->newElem('FS::SWAP::Partition',
-				   $dev, $st, $fs),
-                    );
-            } elsif ($fs->{'fstype'} eq 'file') {
-                $self->_add_swap(
-                    $self->newElem('FS::SWAP::File',
-				   $dev, $st, $fs),
-                    );
-            } else {
-                $self->error("Unknown swap type ".$fs->{'fstype'}." for ".$dev);
-            }
-        } else {
-            $self->newChild('FS::FS', $dev, $st, $fs);
-        }
+    foreach my $mp (sort keys %{$allfs->{swap}}) {
+        my $fs = $allfs->{swap}->{$mp};
+	if ($fs->{'fstype'} eq 'partition') {
+	    $self->_add_swap(
+		$self->newElem('FS::SWAP::Partition',
+			       $fs->{filesystem}, $st, $fs),
+		);
+	} elsif ($fs->{'fstype'} eq 'file') {
+	    $self->_add_swap(
+		$self->newElem('FS::SWAP::File',
+			       $fs->{filesystem}, $st, $fs),
+		);
+	} else {
+	    $self->error("Unknown swap type ".$fs->{'fstype'}." for ".$fs->{filesystem});
+	}
     }
     if ($self->nb_swap == 1) {
         my $s = ($self->all_swap)[0];
         $s->onlyoneswap;
         $self->addChild($s);
     } else {
-        $self->newChild('FS::AllSWAP', $st, [$self->all_swap()]);
+        $self->newChild('FS::SWAP', $st, [$self->all_swap()]);
+    }
+    #foreach my $mp (sort keys %{$allfs->{df}}) {
+    #    my $fs = $allfs->{df}->{$mp};
+    #	$self->newChild('FS::FS', $fs->{filesystem}, $st, $fs);
+    #}
+    my $fullfs = $allfs->{flatfull};
+    if (0) {
+	foreach my $id (keys %{$fullfs}) {
+	    my $fs = $fullfs->{$id};
+	    $self->newChild('FS::FS', $st, $fs);
+	}
+    } else {
+	while ($fullfs->{$rootid}->{parent} != 1) {
+	    $rootid = $fullfs->{$rootid}->{parent};
+	}
+	$self->createFS($self, $st, $fullfs, $rootid);
+    }
+}
+
+sub createFS {
+    my $self = shift;
+    my $container = shift;
+    my $st = shift;
+    my $fullfs = shift;
+    my $id = shift;
+
+    my $fs = $fullfs->{$id};
+    if (exists($fs->{children})) {
+	$container->newChild('FS::MP',
+			     'fs' => $fs,
+			     'st' => $st,
+			     'SDFS' => $self,
+			     'fullfs' => $fullfs);
+    } else {
+	$container->newChild('FS::MP::FS', $st, $fs);
     }
 }
 
@@ -96,7 +130,7 @@ sub dotLabel {
 1;
 
 ##################################################################
-package StorageDisplay::Data::FS::FS;
+package StorageDisplay::Data::FS::MP::FS;
 
 use Moose;
 use namespace::sweep;
@@ -110,32 +144,122 @@ with (
 has 'mountpoint' => (
     is => 'ro',
     isa => 'Str',
+    required => 1,
     );
 
 has 'fstype' => (
     is => 'ro',
     isa => 'Str',
+    required => 1,
+    );
+
+has 'sourcenames' => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+    );
+
+has 'special' => (
+    is => 'ro',
+    isa => 'Bool',
+    required => 1,
+    default => 0,
+    );
+
+has 'fsroot' => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+    );
+
+has 'parentfsid' => (
+    is => 'ro',
+    isa => 'Num',
+    required => 1,
+    );
+
+has 'sd' => (
+    is => 'ro',
+    isa => 'StorageDisplay',
+    required => 1,
     );
 
 around 'BUILDARGS' => sub {
     my $orig  = shift;
     my $class = shift;
-    my $dev = shift;
     my $st = shift;
     my $fs = shift;
 
-    my $block = $st->block($dev);
-    $st->log({level=>1}, ($fs->{mountpoint}//$dev));
+    my @consume = ();
+    my $has_sources = exists($fs->{'sources'});
+    my @sources;
+    if ($has_sources) {
+	@sources = @{$fs->{'sources'}};
+    } else {
+	@sources = ($fs->{'source'});
+    }
+    my @sourcenames;
+    if (! defined($fs->{'fsroot'})) {
+	use Data::Dumper;
+	use Carp;
+	print STDERR Dumper($fs), "\n";
+	confess "coucou\n";
+    }
+    for my $source (@sources) {
+	if (! $has_sources
+	    && $fs->{'fsroot'} ne '/'
+	    && $source =~ m,^(.*)\[$fs->{'fsroot'}\]$,) {
+	    $source = $1;
+	}
+	my $block;
+	if ($source =~ m,^/dev/,) {
+	    $block = $st->block($source);
+	    push @sourcenames, 'Device: '.$block->dname;
+	} elsif ($source =~ m,^/,) {
+	    # TODO : wrong if $target is not a mountpoint
+	    $block = $st->block($source);
+	    push @sourcenames, 'Source: '.$source;
+	    #$block = $st->block($st->fs_mountpoint_blockname($source));
+	} else {
+	    push @sourcenames, 'Source: '.$source;
+	    $block = $st->block($source);
+	    $fs->{special} = 1;
+	}
+	push @consume, $block;
+    }
+    if ($fs->{fsroot} ne '/') {
+	push @sourcenames, "Subdir: ".$fs->{fsroot};
+    }
 
-    my $name = $fs->{mountpoint}//$block->name;
+    $st->log({level=>1}, $fs->{target});
 
+    my $name = $st->fs_mountpoint_blockname_by_id($fs->{id}, $fs->{target});
+    if (not exists($fs->{free})) {
+	$fs->{free} = $fs->{avail};
+    }
+    if (exists($fs->{label})) {
+	delete $fs->{label};
+    }
+
+    #if ($fs->{parent} != 1) {
+    #	push @consume, $st->block($st->fs_mountpoint_blockname_by_id($fs->{parent}));
+    #}
+    my $block = $st->block($name);
     return $class->$orig(
         'name' => $name,
-        'consume' => [$block],
-        'provide' => $st->block($st->fs_mountpoint_blockname($name)),
-        'st' => $st,
+        'consume' => \@consume,
+        'provide' => $block,
+        'sd' => $st,
         'block' => $block,
-        %{$fs},
+	'free' => $fs->{free},
+	'used' => $fs->{used},
+	'size' => $fs->{size},
+	'sourcenames' => join("\n", @sourcenames),
+	'fsroot' => $fs->{fsroot},
+	'fstype' => $fs->{fstype},
+	'mountpoint' => $fs->{target},
+	'parentfsid' => $fs->{parent},
+        #%{$fs},
         @_
         );
 };
@@ -148,17 +272,137 @@ sub BUILD {
 
 sub dotLabel {
     my $self = shift;
+    #if ($self->size == 0 && $self->special) {
+    if ($self->sourcenames eq 'Source: '.$self->{fstype}) {
+	if ($self->size == 0) {
+	    return ($self->mountpoint.' ('.$self->fstype.')');
+	} else {
+	    return (
+		$self->mountpoint,
+		$self->fstype,
+        );
+	}
+    }
     return (
         $self->mountpoint,
-        "Device: ".$self->block->dname,
+        $self->sourcenames,
         $self->fstype,
         );
+}
+
+around 'sizeLabel' => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    if ($self->size == 0) {
+	return;
+    }
+    return $self->$orig(@_);
+};
+
+around dotLinks => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my @links = $self->$orig(@_);
+    if ($self->parentfsid != 1) {
+	push @links, $self->sd->block($self->sd->fs_mountpoint_blockname_by_id($self->parentfsid))->elem->linkname.' -> '.$self->linkname.' [style=invis]';
+    }
+    #if ($fs->{parent} != 1) {
+    #	push @consume, $st->block($st->fs_mountpoint_blockname_by_id($fs->{parent}));
+    #}
+    return @links;
+};
+
+1;
+
+##################################################################
+package StorageDisplay::Data::FS::MP;
+
+use Moose;
+use namespace::sweep;
+
+extends 'StorageDisplay::Data::Elem';
+
+with (
+    'StorageDisplay::Role::Style::IsSubGraph',
+    'StorageDisplay::Role::Style::Grey',
+    #'StorageDisplay::Role::Style::SubInternal',
+    );
+
+around 'BUILDARGS' => sub {
+    my $orig  = shift;
+    my $class = shift;
+    #my $args = shift;
+    #for my $i (@_) {
+#	print STDERR "args=$i\n";
+    #}
+    my %args=(@_);
+    my $fs = $args{fs};
+
+    return $class->$orig(
+        'name' => $fs->{id}.'@'.$fs->{target},
+        %args,
+        );
+};
+
+sub BUILD {
+    my $self=shift;
+    my $args=shift;
+
+    my $st = $args->{st};
+    my $SDFS = $args->{SDFS};
+    my $fullfs = $args->{fullfs};
+    my $fs = $args->{fs};
+
+    $self->newChild('FS::MP::FS', $st, $fs);
+    $self->newChild('FS::MP::C', $args);
+}
+
+sub dotLabel {
+    return ();
 }
 
 1;
 
 ##################################################################
-package StorageDisplay::Data::FS::AllSWAP;
+package StorageDisplay::Data::FS::MP::C;
+
+use Moose;
+use namespace::sweep;
+
+extends 'StorageDisplay::Data::Elem';
+
+with (
+    'StorageDisplay::Role::Style::IsSubGraph',
+    #'StorageDisplay::Role::Style::Grey',
+    'StorageDisplay::Role::Style::SubInternal',
+    #'StorageDisplay::Role::HasBlock',
+    #'StorageDisplay::Role::Style::WithUsed',
+    );
+
+sub BUILD {
+    my $self=shift;
+    my $args=shift;
+
+    my $st = $args->{st};
+    my $SDFS = $args->{SDFS};
+    my $fullfs = $args->{fullfs};
+    my $fs = $args->{fs};
+
+    for my $child (@{$fs->{children}}) {
+	$SDFS->createFS($self, $st, $fullfs, $child);
+    }
+}
+
+sub dotLabel {
+    return ();
+}
+
+1;
+
+##################################################################
+package StorageDisplay::Data::FS::SWAP;
 
 use Moose;
 use namespace::sweep;
@@ -384,7 +628,7 @@ StorageDisplay::Data::FS - Handle filesystem data for StorageDisplay
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

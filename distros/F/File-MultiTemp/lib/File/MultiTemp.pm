@@ -7,7 +7,7 @@ use v5.14;
 use Moo;
 
 use Fcntl qw/ LOCK_EX /;
-use List::Util qw/ pairs /;
+use List::Util 1.29 qw/ pairs /;
 use Path::Tiny qw/ path /;
 use PerlX::Maybe qw/ maybe /;
 use Scalar::Util qw/ openhandle /;
@@ -19,7 +19,7 @@ use Types::Path::Tiny     qw/ Dir File /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.5';
 
 
 has template => (
@@ -178,7 +178,7 @@ File::MultiTemp - manage a hash of temporary files
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.5
 
 =head1 SYNOPSIS
 

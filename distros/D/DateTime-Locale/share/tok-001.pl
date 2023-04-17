@@ -220,9 +220,9 @@
   ],
   name => "Toki Pona world",
   native_language => "Toki Pona",
-  native_name => "Toki Pona 001",
+  native_name => "Toki Pona",
   native_script => undef,
-  native_territory => "001",
+  native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

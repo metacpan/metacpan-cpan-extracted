@@ -15,6 +15,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/bin_spec.t',
     't/leaves.t',
+    't/misc.t',
     't/new.t',
     't/types.t'
 );

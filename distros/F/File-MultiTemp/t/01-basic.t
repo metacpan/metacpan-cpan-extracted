@@ -1,6 +1,7 @@
 use v5.14;
 use Test::Most;
 
+use Path::Tiny 0.101;
 use Scalar::Util qw/ openhandle refaddr /;
 
 use File::MultiTemp;

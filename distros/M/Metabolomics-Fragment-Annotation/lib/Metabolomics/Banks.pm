@@ -50,10 +50,11 @@ Metabolomics::Banks - Perl extension to build metabolite banks for metabolomics
 Version 0.3 - Object integration for multi-annotation
 Version 0.4 - Completing object properties and add cluster support
 Version 0.5 - parsingFeaturesFragments method to manage complexe fragments (multiple features)
+Version 0.6 - Fix intensity parsing reference issue in Banks::parsingFeaturesFragments method + computing relative_100+relative_900/absolute intensities
 
 =cut
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 
 =head1 SYNOPSIS
@@ -169,6 +170,44 @@ sub computeNeutralCpdMz_To_NegativeIonMz {
     $negativeMz = sprintf("%.$decimalLength"."f", $negativeMz );
     
     return ($negativeMz) ;
+}
+### END of SUB
+
+=item computeRelativeIntensity
+	## Description : relative intensity computed based on 100 or 999...
+	## Input : $mzs_intensities, $intensityHeader, $base, 
+	## Output : $mzs_intensities_relIntensities
+	## Usage : my ( $mzs_intensities_relIntensities ) = computeRelativeIntensity ( $mzs_intensities, intensityHeader, base ) ;
+	
+=cut
+## START of SUB
+sub computeRelativeIntensity {
+    ## Retrieve Values
+#    my $self = shift ;
+    my ( $absIntensity, $maxIntensity, $baseIntensity ) = @_;
+    
+    my $relIntensity = undef ;
+    my $oUtils = Metabolomics::Utils->new() ;
+    	
+    $relIntensity = $oUtils->roundFloat( ($absIntensity / $maxIntensity ), 4) ;
+    	
+   	if ($relIntensity == 0) {
+   		$relIntensity = 1 ;
+   	}
+   	else {
+   		## based on 100 (hmdb)
+   		if ($baseIntensity == 100 ) {
+   			$relIntensity = $oUtils->roundFloat( ( ( $relIntensity * $baseIntensity ) ), 4) ;
+   		}
+   		## based on 999 (massbank format)
+   		elsif ($baseIntensity == 1000 ) {
+   			$relIntensity = $oUtils->roundFloat( ( ( $relIntensity * $baseIntensity - 1 ) ), 4) ;
+   		}
+   		else {
+   			croak ("[ERROR] The given base intensity is not supported (100 or 1000") ;
+   		}
+    }
+    return($relIntensity) ;
 }
 ### END of SUB
 
@@ -400,6 +439,7 @@ sub parsingMsFragmentsByCluster {
 sub parsingFeaturesFragments {
     ## Retrieve Values
     my ( $oBank, $Xfile, $is_header, $columns ) = @_;
+    ## $columns = [$MZ, $AB_INTENSITY, $REL100_INTENSITY, $REL999_INTENSITY] # 4 values
     my @fragmentsList = () ;
     my @headers = () ;
 
@@ -435,7 +475,9 @@ sub parsingFeaturesFragments {
 	
 	## Clean headers: (can contains space before or after value/key)
 	my @cleanHeaders = () ;
+	
 	foreach my $header (@headers) {
+		
 		my $headerToclean = $header ;
 		$headerToclean =~ s/^\s+//;
 		$headerToclean =~ s/\s+$//;
@@ -448,33 +490,63 @@ sub parsingFeaturesFragments {
 		
 		foreach my $col ( @{$columns} ) {
 			
-			my $fieldName = $cleanHeaders[$col -1] ;
-			$fieldName =~ s/^\s+//;
-			$fieldName =~ s/\s+$//;
-			
-			my $fieldValue = $row->{$headers[$col -1]} ;
-			$fieldValue =~ s/^\s+//;
-			$fieldValue =~ s/\s+$//;
-			
-        	$fragment->{ $fieldName } = $fieldValue ;
+			if (defined $col) {
+				
+				my $fieldName = $cleanHeaders[$col -1] ;
+				$fieldName =~ s/^\s+//;
+				$fieldName =~ s/\s+$//;
+				
+				my $fieldValue = $row->{$headers[$col -1]} ;
+				$fieldValue =~ s/^\s+//;
+				$fieldValue =~ s/\s+$//;
+				
+	        	$fragment->{ $fieldName } = $fieldValue ;
+				
+			}
+			else {
+				next ;
+			}
         }
         my $tmp = $fragment ;
         push ( @fragmentsList, $tmp ) ;
 	}
+    
+    #print Dumper @fragmentsList ;
+    
+    my $currentMzHeader = $cleanHeaders[ $columns->[0] - 1 ] if ( $columns->[0] ) ;
+    my $currentAbIntHeader = $cleanHeaders[ $columns->[1] - 1 ] if ( $columns->[1] ) ;
+    my $currentRel100IntHeader = $cleanHeaders[ $columns->[2] - 1 ] if ( $columns->[2] ) ;
+    my $currentRel999IntHeader = undef ; ## corresponding to $columns->[3]
+    
+    my @sortedRelInt =  sort { $a->{$currentAbIntHeader} <=> $b->{$currentAbIntHeader} } @fragmentsList ;
+    
+    #print Dumper @sortedRelInt ;
+    my $maxAbsoluteIntensity = $sortedRelInt[-1]->{$currentAbIntHeader} ;
+    
+    #print "MAX IS : $maxAbsoluteIntensity\n" ;
     
     ## Create a PeakList (Mapping on )
     foreach my $features (@fragmentsList) {
     
     	my $oPeak = Metabolomics::Banks->__refPeak__() ;
     	## TODO... make it generic ! (NOT ONLY FOR BRUKER output format)
-    	my $currentMzHeader = $cleanHeaders[ $columns->[0] - 1 ] ;
-    	my $currentIntHeader = $cleanHeaders[ $columns->[0] - 1 ] ;
-
-	    $oPeak->_setPeak_MESURED_MONOISOTOPIC_MASS (  $features->{$currentMzHeader} );
-	    $oPeak->_setPeak_INTENSITY ( $features->{$currentIntHeader} );
-	    #$oPeak->_setPeak_RELATIVE_INTENSITY_100 ( ) ;
-	    #$oPeak->_setPeak_RELATIVE_INTENSITY_999 ( ) ;
+    	## Issue '_INTENSITY_' => '195.07577', (this is MZ and NOT intensity)
+    	#my $currentMzHeader = $cleanHeaders[ $columns->[0] - 1 ] if ( $columns->[0] ) ;
+    	#my $currentAbIntHeader = $cleanHeaders[ $columns->[1] - 1 ] if ( $columns->[1] ) ;
+    	#my $currentRel100IntHeader = $cleanHeaders[ $columns->[2] - 1 ] if ( $columns->[2] ) ;
+    	#my $currentRel999IntHeader = undef ; ## corresponding to $columns->[3]
     	
+    	$oPeak->_setPeak_MESURED_MONOISOTOPIC_MASS (  $features->{$currentMzHeader} ) ;
+	    $oPeak->_setPeak_INTENSITY ( $features->{$currentAbIntHeader} ) ;
+	    
+    	if ( ( defined $currentAbIntHeader ) and ( ( !defined $currentRel100IntHeader ) or ( !defined $currentRel999IntHeader ) ) ) {
+    		## compute Rel100 + Rel999
+    		my $currentRelIntValue100 = computeRelativeIntensity($features->{$currentAbIntHeader}, $maxAbsoluteIntensity, 100) ;
+    		my $currentRelIntValue999 = computeRelativeIntensity($features->{$currentAbIntHeader}, $maxAbsoluteIntensity, 1000) ;
+    		$oPeak->_setPeak_RELATIVE_INTENSITY_100 ( $currentRelIntValue100 ) ;
+	   		$oPeak->_setPeak_RELATIVE_INTENSITY_999 ( $currentRelIntValue999 ) ;
+    	}
+	    
     	$oBank->_addPeakList('_EXP_PEAK_LIST_', $oPeak) ;
     	
     }

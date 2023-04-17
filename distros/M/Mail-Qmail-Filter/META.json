@@ -34,6 +34,7 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Email::Valid" : "0",
+            "File::Scan::ClamAV" : "0",
             "Mail::Address" : "0",
             "Mail::DKIM::Verifier" : "0",
             "Mail::DMARC::PurePerl" : "0",
@@ -56,6 +57,6 @@
          "url" : "https://github.com/fany/Mail-Qmail-Filter.git"
       }
    },
-   "version" : "1.21",
+   "version" : "1.31",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

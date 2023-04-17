@@ -29,43 +29,43 @@ optional_features: {}
 provides:
   Web::PerlDistSite:
     file: lib/Web/PerlDistSite.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::Common:
     file: lib/Web/PerlDistSite/Common.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::Compile:
     file: lib/Web/PerlDistSite/Compile.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::Component:
     file: lib/Web/PerlDistSite/Component.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::Component::LayoutScss:
     file: lib/Web/PerlDistSite/Component/LayoutScss.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::Component::MainScss:
     file: lib/Web/PerlDistSite/Component/MainScss.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem:
     file: lib/Web/PerlDistSite/MenuItem.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem::Divider:
     file: lib/Web/PerlDistSite/MenuItem/Divider.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem::File:
     file: lib/Web/PerlDistSite/MenuItem/File.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem::Homepage:
     file: lib/Web/PerlDistSite/MenuItem/Homepage.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem::MarkdownFile:
     file: lib/Web/PerlDistSite/MenuItem/MarkdownFile.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem::Pod:
     file: lib/Web/PerlDistSite/MenuItem/Pod.pm
-    version: '0.001010'
+    version: '0.001011'
   Web::PerlDistSite::MenuItem::PodFile:
     file: lib/Web/PerlDistSite/MenuItem/PodFile.pm
-    version: '0.001010'
+    version: '0.001011'
 requires:
   Colouring::In: '0'
   Data::Section: '0'
@@ -95,6 +95,6 @@ resources:
   homepage: https://metacpan.org/release/Web-PerlDistSite
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-web-perldistsite.git
-version: '0.001010'
+version: '0.001011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -220,9 +220,9 @@
   ],
   name => "Nuer South Sudan",
   native_language => "Thok Nath",
-  native_name => "Thok Nath SS",
+  native_name => "Thok Nath",
   native_script => undef,
-  native_territory => "SS",
+  native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
     "P1",
@@ -267,5 +267,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 42,
+  version => 43,
 }

@@ -44,6 +44,7 @@ lib/StorageDisplay/Data/FS.pm
 lib/StorageDisplay/Data/LUKS.pm
 lib/StorageDisplay/Data/LVM.pm
 lib/StorageDisplay/Data/Libvirt.pm
+lib/StorageDisplay/Data/Loop.pm
 lib/StorageDisplay/Data/Partition.pm
 lib/StorageDisplay/Data/RAID.pm
 lib/StorageDisplay/Data/Root.pm

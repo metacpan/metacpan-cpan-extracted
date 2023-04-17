@@ -36,9 +36,9 @@ sub tokenize {
                 ~@ |                    # Unquote-splice token
                 [\[\]{}()'`~^@] |       # Single character tokens
                 "(?:                    # Quoted string
-                    \\. |                 # Escaped char
-                    [^\\"]                # Any other char
-                )*"? |                    # Match if missing ending quote
+                    \\. |                   # Escaped char
+                    [^\\"]                  # Any other char
+                )*"? |                      # Match if missing ending quote
                                         # Other tokens
                 [^\s\[\]\{\}\(\)\'\"\`\,\;]*
             )
@@ -113,6 +113,7 @@ sub read_scalar {
     return nil if $_ eq 'nil';
     return number($_) if /^-?\d+$/;
     return keyword($_) if /^:/;
+    return char($_) if /^\\/;
     return $self->read_symbol($_);
 }
 

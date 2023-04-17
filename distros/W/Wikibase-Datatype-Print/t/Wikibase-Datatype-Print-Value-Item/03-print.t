@@ -5,6 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Test::More 'tests' => 6;
 use Test::NoWarnings;
+use Wikibase::Cache;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Print::Value::Item;
@@ -25,7 +26,9 @@ is($EVAL_ERROR, "Object isn't 'Wikibase::Datatype::Value::Item'.\n",
 clean();
 
 # Test.
-my $cache = Wikibase::Cache::Backend::Basic->new;
+my $cache = Wikibase::Cache->new(
+	'backend' => 'Basic',
+);
 $obj = Wikibase::Datatype::Value::Item->new(
 	'value' => 'Q11573',
 );
@@ -35,7 +38,9 @@ $ret = Wikibase::Datatype::Print::Value::Item::print($obj, {
 is($ret, 'metre', 'Get printed value (translated).');
 
 # Test.
-$cache = Wikibase::Cache::Backend::Basic->new;
+$cache = Wikibase::Cache->new(
+	'backend' => 'Basic',
+);
 $obj = Wikibase::Datatype::Value::Item->new(
 	'value' => 'Q42',
 );
@@ -53,6 +58,6 @@ eval {
 		'cb' => 'bad_callback',
 	});
 };
-is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache::Backend.\n",
-	"Option 'cb' must be a instance of Wikibase::Cache::Backend.");
+is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache.\n",
+	"Option 'cb' must be a instance of Wikibase::Cache.");
 clean();

@@ -1,0 +1,15 @@
+JSON *		T_JSON
+
+INPUT
+
+T_JSON
+	if (!(
+           SvROK ($arg)
+           && SvOBJECT (SvRV ($arg))
+           && (SvSTASH (SvRV ($arg)) == JSON_STASH || sv_derived_from ($arg, \"JSON::SIMD\"))
+        ))
+          croak (\"object is not of type JSON::SIMD\");
+        /**/
+        $var = (JSON *)SvPVX (SvRV ($arg));
+
+

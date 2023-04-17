@@ -2,6 +2,7 @@ use strict;
 use Test::More;
 use Mojo::SMTP::Client;
 use Mojo::Exception;
+use Mojo::IOLoop::TLS;
 use Socket 'CRLF';
 use lib 't/lib';
 use Utils;
@@ -10,7 +11,7 @@ if ($^O eq 'MSWin32') {
 	plan skip_all => 'fork() support required';
 }
 
-my $tls = (exists &Mojo::IOLoop::Client::TLS ? &Mojo::IOLoop::Client::TLS : &Mojo::IOLoop::TLS::TLS) || 0;
+my $tls = &Mojo::IOLoop::TLS::TLS;
 
 # 1
 my ($pid, $sock, $host, $port) = Utils::make_smtp_server($tls);

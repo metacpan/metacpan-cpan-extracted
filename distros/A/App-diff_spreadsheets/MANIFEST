@@ -8,11 +8,14 @@ bin/diff_spreadsheets
 dist.ini
 lib/App/diff_spreadsheets.pm
 t/00_prelim.t
-t/20_basics.t
+t/20_diff.t
+t/30_git.t
+t/60_native.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/t_Common.pm
 t/t_TestCommon.pm
+t/t_dsUtils.pm
 tlib/Addrlist.xlsx
 tlib/Addrlist_mod1.xlsx
 tlib/Multisheet.xlsx

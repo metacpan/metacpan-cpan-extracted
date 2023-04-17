@@ -11,6 +11,13 @@ use File::Temp 'tempfile';
 use Storable 'dclone';
 use LWP::UserAgent;
 
+my $have_mojolicious;
+BEGIN {
+    if( eval { require Mojo::UserAgent; 1 }) {
+        $have_mojolicious = 1;
+    }
+}
+
 use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -164,11 +171,16 @@ sub identical_headers_ok( $code, $expected_request, $name,
 
     if( my $boundary = $options{ boundary }) {
         (my $old_boundary) = ($log =~ m!Content-Type: multipart/form-data; boundary=(.*?)$!ms);
+        if( ! $old_boundary ) {
+            diag "Old request didn't have a boundary?!";
+            diag $log;
+            return;
+        };
 
         $log =~ s!\bboundary=\Q$old_boundary!boundary=$boundary!ms
-            or die "Didn't replace $old_boundary in [[$log]]?!";
+            or die "Didn't replace $old_boundary to '$boundary' in [[$log]]?!";
         $log =~ s!^\Q--$old_boundary!--$boundary!msg
-            or die "Didn't replace '--$old_boundary' in [[$log]]?!";
+            or die "Didn't replace '--$old_boundary' to '$boundary' in [[$log]]?!";
 
         push @ignore_headers, 'Content-Length';
     };
@@ -555,9 +567,34 @@ sub request_identical_ok( $test ) {
                 boundary       => $boundary,
             ) or diag $code;
 
+            if( $have_mojolicious ) {
+                my $code = $r->as_snippet(type => 'Mojolicious',
+                    preamble => ['use strict;','use Mojo::UserAgent;']
+                );
+                compiles_ok( $code, "$name as Mojolicious snippet compiles OK")
+                    or diag $code;
+
+                my @mojolicious_ignore;
+
+                my $h = $test->{ignore_headers} || [];
+                $h = [$h]
+                    unless ref $h;
+
+                identical_headers_ok( $code, $curl_log,
+                    "We create (almost) the same headers with Mojolicious",
+                    ignore_headers => ['Host', 'Content-Length', 'Accept-Encoding', 'Connection', @mojolicious_ignore, @$h],
+                    boundary       => $boundary,
+                ) or diag $code;
+            } else {
+                SKIP: {
+                    skip "Mojolicious not installed", 2;
+                }
+            }
+
+
         } else {
             SKIP: {
-                skip "Did not generate a request", 4;
+                skip "Did not generate a request", 6;
             };
         };
     };
@@ -583,7 +620,7 @@ sub run_curl_tests( @tests ) {
     for( @tests ) {
         my $request_count = $_->{request_count} || 1;
         $testcount +=   2
-                      + ($request_count * 6);
+                      + ($request_count * 8);
     };
     plan tests => $testcount;
 

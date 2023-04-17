@@ -17,6 +17,8 @@ my @tests = (
       # we check we don't crash. Available compressions might differ between
       # Curl and Compress::Zlib, so ...
     },
+    { cmd => [ '--verbose', '-Z', '-s', '$url', '-S' ] },
+    { cmd => [ '--verbose', '--parallel', '-s', '$url', '-S' ] },
 );
 
 run_curl_tests( @tests );

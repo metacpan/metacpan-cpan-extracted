@@ -12,7 +12,7 @@ use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.04;
+our $VERSION = 0.07;
 
 sub print {
 	my ($obj, $opts_hr) = @_;

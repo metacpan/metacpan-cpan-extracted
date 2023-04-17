@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.04;
+our $VERSION = 0.07;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -26,8 +26,8 @@ sub print {
 		err "Object isn't 'Wikibase::Datatype::Value::Quantity'.";
 	}
 
-	if (exists $opts_hr->{'cb'} && ! $opts_hr->{'cb'}->isa('Wikibase::Cache::Backend')) {
-		err "Option 'cb' must be a instance of Wikibase::Cache::Backend.";
+	if (exists $opts_hr->{'cb'} && ! $opts_hr->{'cb'}->isa('Wikibase::Cache')) {
+		err "Option 'cb' must be a instance of Wikibase::Cache.";
 	}
 
 	# Unit.
@@ -82,7 +82,7 @@ Returns string.
 
  print():
          Object isn't 'Wikibase::Datatype::Value::Quantity'.
-         Option 'cb' must be a instance of Wikibase::Cache::Backend.
+         Option 'cb' must be a instance of Wikibase::Cache.
 
 =head1 EXAMPLE1
 
@@ -113,6 +113,7 @@ Returns string.
  use strict;
  use warnings;
 
+ use Wikibase::Cache;
  use Wikibase::Cache::Backend::Basic;
  use Wikibase::Datatype::Print::Value::Quantity;
  use Wikibase::Datatype::Value::Quantity;
@@ -124,7 +125,9 @@ Returns string.
  );
 
  # Cache object.
- my $cache = Wikibase::Cache::Backend::Basic->new;
+ my $cache = Wikibase::Cache->new(
+         'backend' => 'Basic',
+ );
 
  # Print.
  print Wikibase::Datatype::Print::Value::Quantity::print($obj, {
@@ -168,6 +171,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.07
 
 =cut

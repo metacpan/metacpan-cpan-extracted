@@ -241,8 +241,8 @@ Occitan Spain locale.
 
 =head3 Narrow (format)
 
-  BCE
-  CE
+  a. C.
+  d. C.
 
 =head2 Date Formats
 
@@ -419,9 +419,9 @@ Occitan Spain locale.
 
 =head3 GyMd (GGGGG y-MM-dd)
 
-   2008-02-05T18:30:30 = CE 2008-02-05
-   1995-12-22T09:05:02 = CE 1995-12-22
-  -0010-09-15T04:44:23 = BCE -10-09-15
+   2008-02-05T18:30:30 = d. C. 2008-02-05
+   1995-12-22T09:05:02 = d. C. 1995-12-22
+  -0010-09-15T04:44:23 = a. C. -10-09-15
 
 =head3 H (HH)
 

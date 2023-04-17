@@ -42,7 +42,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Web-PerlDistSite";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001006>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001007>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001008>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001009>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001010>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001006>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001007>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001008>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001009>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001010>, <http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001011>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-web-perldistsite>;
@@ -137,6 +137,14 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Web-PerlDistSite-0.001010.tar.gz>;
 	doap:revision        "0.001010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Web-PerlDistSite/v_0-001011>
+	a                    doap:Version;
+	dc:identifier        "Web-PerlDistSite-0.001011"^^xsd:string;
+	dc:issued            "2023-04-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Web-PerlDistSite-0.001011.tar.gz>;
+	doap:revision        "0.001011"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

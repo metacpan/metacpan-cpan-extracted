@@ -223,8 +223,8 @@
   ],
   name => "Tachelhit Latin",
   native_language => "Tashel\N{U+1e25}iyt",
-  native_name => "Tashel\N{U+1e25}iyt Latn",
-  native_script => "Latn",
+  native_name => "Tashel\N{U+1e25}iyt",
+  native_script => undef,
   native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

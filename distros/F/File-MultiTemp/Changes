@@ -1,5 +1,13 @@
 Revision history for File-MultiTemp
 
+v0.1.5    2023-04-17 15:16:55+01:00 Europe/London
+  [Bug Fixes]
+  - Specified a minimum version of List::Util with the pairs function.
+
+v0.1.4    2023-04-17 15:12:32+01:00 Europe/London
+  [Bug Fixes]
+  - Specified a minimum version of Path::Tiny with the cached_temp method.
+
 v0.1.3    2023-04-09 14:42:44+01:00 Europe/London
   [Bug Fixes]
   - Removed postderef syntax, which is only usable in more recent Perl versions than the declared minimum.

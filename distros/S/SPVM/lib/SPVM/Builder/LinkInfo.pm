@@ -136,6 +136,11 @@ SPVM::Builder::LinkInfo - Link Information
 
 The SPVM::Builder::LinkInfo class has methods to manipulate link information.
 
+=head1 Usage
+
+  my $link_info = SPVM::Builder::LinkInfo->new(%fields);
+  my $link_command_string = $link_info->to_cmd;
+
 =head1 Fields
 
 =head2 config
@@ -143,21 +148,25 @@ The SPVM::Builder::LinkInfo class has methods to manipulate link information.
   my $config = $link_info->config;
   $link_info->config($config);
 
-Gets and sets a L<SPVM::Builder::Config> object used to link the object files.
+Gets and sets the C<config> field.
+
+This field is a L<SPVM::Builder::Config> object used to link the object files.
 
 =head2 output_file
 
   my $output_file = $link_info->output_file;
   $link_info->output_file($output_file);
 
-Gets and sets the output file.
+Gets and sets the C<output_file> field.
+
+This field is an output file.
 
 =head2 object_files
 
   my $object_files = $link_info->object_files;
   $link_info->object_files($object_files);
 
-Gets and sets the object files.
+Gets and sets the C<object_files> field.
 
 This field is an array reference of L<SPVM::Builder::ObjectFileInfo> objects.
 
@@ -165,9 +174,29 @@ This field is an array reference of L<SPVM::Builder::ObjectFileInfo> objects.
 
 =head2 new
 
-  my $link_info = SPVM::Builder::LinkInfo->new;
+  my $link_info = SPVM::Builder::LinkInfo->new(%fields);
 
-Creates a new C<SPVM::Builder::LinkInfo> object.
+Creates a new C<SPVM::Builder::LinkInfo> object with L</"Fields">.
+
+Default Field Values:
+
+If a field is not defined, the field is set to the following default value.
+
+=over 2
+
+=item * L</"config">
+
+undef
+
+=item * L</"output_file">
+
+undef
+
+=item * L</"object_files">
+
+[]
+
+=back
 
 =head1 Instance Methods
 

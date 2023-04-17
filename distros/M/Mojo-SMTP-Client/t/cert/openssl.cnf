@@ -1,0 +1,15 @@
+[ req ]
+distinguished_name	= req_distinguished_name
+attributes		= req_attributes
+
+# Stop confirmation prompts. All information is contained below.
+prompt			= no
+
+[ req_distinguished_name ]
+countryName=		DE
+stateOrProvinceName=	Bayern
+localityName=		Muenchen
+organizationName=	Whatever it is
+commonName=		server.local
+
+[ req_attributes ]

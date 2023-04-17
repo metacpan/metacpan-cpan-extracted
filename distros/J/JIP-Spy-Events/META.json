@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "the most basic function spy ability",
    "author" : [
       "Volodymyr Zhavoronkov <flyweight@yandex.ru>"
    ],
@@ -57,6 +57,6 @@
          "web" : "https://github.com/outtaspace/jip_spy_events"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

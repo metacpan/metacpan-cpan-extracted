@@ -1,4 +1,4 @@
-# Copyrights 2003-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2003-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package User::Identity::Collection;
 use vars '$VERSION';
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 use base 'User::Identity::Item';
 
@@ -17,7 +17,9 @@ use warnings;
 
 use User::Identity;
 use Carp;
-use List::Util   qw/first/;
+
+use List::Util    qw/first/;
+use Hash::Ordered ();
 
 
 use overload '""' => sub {
@@ -40,7 +42,7 @@ sub init($)
     defined($self->SUPER::init($args)) or return;
     
     $self->{UIC_itype} = delete $args->{item_type} or die;
-    $self->{UIC_roles} = { };
+    tie %{$self->{UIC_roles}}, 'Hash::Ordered';
     my $roles = $args->{roles};
  
     my @roles

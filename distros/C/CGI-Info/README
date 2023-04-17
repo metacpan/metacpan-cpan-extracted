@@ -1,4 +1,4 @@
-CGI-Info Version 0.74
+CGI-Info Version 0.75
 
 INSTALLATION
 
@@ -24,12 +24,8 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/CGI-Info
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/CGI-Info
-
     Search CPAN
         http://search.cpan.org/dist/CGI-Info/
-
 
 LICENSE AND COPYRIGHT
 

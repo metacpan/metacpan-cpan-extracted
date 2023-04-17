@@ -10,7 +10,7 @@ use Wikibase::Datatype::Print::Snak;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.04;
+our $VERSION = 0.07;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -19,10 +19,11 @@ sub print {
 		err "Object isn't 'Wikibase::Datatype::Reference'.";
 	}
 
-	my @ret;
+	my @ret = '{';
 	foreach my $snak (@{$obj->snaks}) {
-		push @ret, Wikibase::Datatype::Print::Snak::print($snak, $opts_hr);
+		push @ret, map { '  '.$_ } Wikibase::Datatype::Print::Snak::print($snak, $opts_hr);
 	}
+	push @ret, '}';
 
 	return wantarray ? @ret : (join "\n", @ret);
 }

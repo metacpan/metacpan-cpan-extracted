@@ -219,10 +219,10 @@
     "M12",
   ],
   name => "Occitan France",
-  native_language => "oc",
-  native_name => "oc FR",
+  native_language => undef,
+  native_name => "",
   native_script => undef,
-  native_territory => "FR",
+  native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

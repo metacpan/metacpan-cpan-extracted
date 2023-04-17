@@ -220,9 +220,9 @@
   ],
   name => "Obolo Nigeria",
   native_language => "Obolo",
-  native_name => "Obolo NG",
+  native_name => "Obolo",
   native_script => undef,
-  native_territory => "NG",
+  native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

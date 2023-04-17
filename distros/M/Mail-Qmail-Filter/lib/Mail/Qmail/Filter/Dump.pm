@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::Dump;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Mo qw(coerce required);
 extends 'Mail::Qmail::Filter';
@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-Mail::Qmail::Filter::Dump - 
+Mail::Qmail::Filter::Dump -
 dump message to file
 
 =head1 SYNOPSIS

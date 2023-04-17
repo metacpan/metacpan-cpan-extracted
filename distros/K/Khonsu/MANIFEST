@@ -5,6 +5,8 @@ lib/Khonsu/File.pm
 lib/Khonsu/Font.pm
 lib/Khonsu/Image.pm
 lib/Khonsu/Page.pm
+lib/Khonsu/Page/Footer.pm
+lib/Khonsu/Page/Header.pm
 lib/Khonsu/Ra.pm
 lib/Khonsu/Shape.pm
 lib/Khonsu/Shape/Box.pm
@@ -19,8 +21,12 @@ lib/Khonsu/Text/H3.pm
 lib/Khonsu/Text/H4.pm
 lib/Khonsu/Text/H5.pm
 lib/Khonsu/Text/H6.pm
+lib/Khonsu/TOC.pm
+lib/Khonsu/TOC/Outline.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-file.t
@@ -29,5 +35,3 @@ t/pod-coverage.t
 t/pod.t
 t/test.png
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@
       "Dave Rolsky <autarch@urth.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -108,27 +108,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       }
    },
    "release_status" : "stable",
@@ -144,7 +144,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.37",
+   "version" : "1.38",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -186,27 +186,27 @@
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@DROLSKY/ManifestSkip",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@DROLSKY/License",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@DROLSKY/ExecDir",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@DROLSKY/ShareDir",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@DROLSKY/Manifest",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckVersionIncrement",
@@ -216,17 +216,17 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@DROLSKY/TestRelease",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@DROLSKY/ConfirmRelease",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@DROLSKY/UploadToCPAN",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
@@ -247,7 +247,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@DROLSKY/AutoPrereqs",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -272,7 +272,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@DROLSKY/MetaResources",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -282,7 +282,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.025"
+                        "version" : "6.030"
                      }
                   ],
                   "include_underscores" : 0
@@ -309,22 +309,22 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@DROLSKY/MetaConfig",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@DROLSKY/MetaJSON",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@DROLSKY/MetaYAML",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@DROLSKY/NextRelease",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -335,7 +335,7 @@
                }
             },
             "name" : "@DROLSKY/Test::More with Test2",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -346,7 +346,7 @@
                }
             },
             "name" : "@DROLSKY/Tools for use with precious",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -357,7 +357,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -413,15 +413,20 @@
                   "spell_cmd" : "",
                   "stopwords" : [
                      "AO",
+                     "Abkhazian",
                      "Adlam",
                      "Adlm",
                      "Aghem",
                      "Ahad",
                      "Aj\u00e9",
                      "Akan",
+                     "Akoose",
                      "Alatsinainy",
                      "Altine",
                      "Aneg",
+                     "Aragonese",
+                     "Arak",
+                     "Arate\u0129",
                      "Asi\u1e0dyas",
                      "Asturian",
                      "Asu",
@@ -441,10 +446,13 @@
                      "BZ",
                      "Bafia",
                      "Balaza",
+                     "Balochi",
+                     "Baluchi",
                      "Bambara",
                      "Bangla",
                      "Barth\u00e9lemy",
                      "Basaa",
+                     "Bashkir",
                      "Belarusian",
                      "Bemba",
                      "Bena",
@@ -461,7 +469,9 @@
                      "CLDR",
                      "CN",
                      "CX",
+                     "Caddo",
                      "Caicos",
+                     "Cako",
                      "Cawe",
                      "Ceuta",
                      "Chakma",
@@ -491,6 +501,7 @@
                      "Divehi",
                      "Dogri",
                      "Domhnaigh",
+                     "Dsrt",
                      "Duala",
                      "Du\u015fenbe",
                      "Dwowda",
@@ -512,6 +523,8 @@
                      "Ehm",
                      "Ehms",
                      "Embu",
+                     "Enhvteceskv",
+                     "Erzya",
                      "Eswatini",
                      "Etleeni",
                      "Ewondo",
@@ -561,22 +574,27 @@
                      "HHmmss",
                      "HK",
                      "HN",
+                     "Hanifi",
                      "Hant",
                      "Haryanvi",
                      "Hm",
                      "Hmm",
+                     "Hmnp",
                      "Hms",
                      "Hmsv",
                      "Hmsvvvv",
                      "Hmv",
+                     "Hollo",
                      "Hong",
                      "IC",
                      "IM",
                      "ISonto",
+                     "Ido",
                      "Igbo",
                      "Ijumatatu",
                      "Il",
                      "Inari",
+                     "Iniku",
                      "Interlingua",
                      "Isniin",
                      "Isnin",
@@ -612,6 +630,7 @@
                      "Kamba",
                      "Kashmiri",
                      "Katanga",
+                     "Kenyang",
                      "Kinyarwanda",
                      "Kitts",
                      "Kiumia",
@@ -636,21 +655,25 @@
                      "LLLLL",
                      "LY",
                      "Lakota",
+                     "Lamorena",
                      "Langi",
                      "Lanka",
                      "Latn",
                      "Leone",
                      "Leste",
                      "Liduva",
+                     "Ligurian",
                      "Lingala",
                      "Linggo",
                      "Lintani",
                      "Litini",
                      "Litinin",
                      "Llun",
+                     "Lojban",
                      "Lolemba",
                      "Luain",
                      "Luba",
+                     "Lule",
                      "Lun",
                      "Lunes",
                      "Luns",
@@ -695,13 +718,17 @@
                      "Mande",
                      "Manipuri",
                      "Mantaxtsees",
+                     "Manti",
+                     "Mapuche",
                      "Marino",
+                     "Mayek",
                      "Mayen",
                      "Mayotte",
                      "Mazanderani",
                      "Mdd",
                      "Mderot",
                      "Meetto",
+                     "Meitei",
                      "Melilla",
                      "Meru",
                      "Minggu",
@@ -709,14 +736,18 @@
                      "Mmantaha",
                      "Mohndaach",
                      "Moksha",
+                     "Mong",
                      "Montag",
                      "Moondaach",
                      "Morisyen",
                      "Mosopulogo",
                      "Mosupalogo",
                      "Msombuluko",
+                     "Mtei",
                      "Mundang",
                      "Muramuko",
+                     "Muscogee",
+                     "Musopologo",
                      "Musumbhunuku",
                      "Musumbuluwo",
                      "Muvhuro",
@@ -731,17 +762,23 @@
                      "Nakaejuma",
                      "Nama",
                      "Ndebele",
+                     "Nettv",
                      "Ngiemboon",
                      "Ngomba",
                      "Nheengatu",
+                     "Nittak",
                      "Niue",
+                     "Njua",
                      "Njumatatu",
                      "Njumatat\u0169",
                      "Nkodya",
+                     "Nkoo",
                      "Nuer",
                      "Nyanja",
                      "Nyankole",
+                     "Nyiakeng",
                      "Nynorsk",
+                     "N\u2019Ko",
                      "Obolo",
                      "Occitan",
                      "Odia",
@@ -755,15 +792,18 @@
                      "PY",
                      "Palau",
                      "Palichimo",
+                     "Papiamento",
                      "Papua",
                      "Pashto",
                      "PayPal",
                      "PayPal",
                      "Pazartesi",
                      "Pijin",
+                     "Pisin",
                      "Pona",
                      "Ponedjeljak",
                      "Pr\u00edncipe",
+                     "Puachue",
                      "Puerto",
                      "QA",
                      "QQQ",
@@ -775,6 +815,9 @@
                      "Raviwaar",
                      "Rica",
                      "Ridas",
+                     "Riffian",
+                     "Rohg",
+                     "Rohingya",
                      "Rolsky",
                      "Rolsky's",
                      "Rombo",
@@ -806,15 +849,19 @@
                      "Sen\u00e9n",
                      "Serbo",
                      "Shambala",
+                     "Shan",
                      "Shona",
                      "Sichuan",
                      "Sidamo",
+                     "Silesian",
                      "Sinhala",
                      "Sint",
                      "Skolt",
                      "Soga",
                      "Somwaar",
                      "Sondag",
+                     "Sonta",
+                     "Sontaha",
                      "Sonto",
                      "Sorbian",
                      "Sotho",
@@ -831,6 +878,7 @@
                      "TW",
                      "TZ",
                      "Tachelhit",
+                     "Tai",
                      "Taita",
                      "Tajik",
                      "Tamazight",
@@ -850,6 +898,8 @@
                      "Tokelau",
                      "Toki",
                      "Tom\u00e9",
+                     "Torwali",
+                     "Tshipi",
                      "Tsonga",
                      "Tunga",
                      "Turkmen",
@@ -875,12 +925,15 @@
                      "Wai",
                      "Walamo",
                      "Walser",
+                     "Warlpiri",
                      "Wiik",
                      "Wiixata",
                      "Wik",
                      "Woche",
+                     "Wolaytta",
                      "Wolof",
                      "Wuok",
+                     "W\u00edsts\u2019i",
                      "XK",
                      "Yangben",
                      "Yi",
@@ -892,6 +945,7 @@
                      "aa",
                      "aba",
                      "akahi",
+                     "apc",
                      "asi\u1e0dyas",
                      "astea",
                      "astelehena",
@@ -900,6 +954,7 @@
                      "ay",
                      "aynas",
                      "bazar",
+                     "beke",
                      "ccc",
                      "cccc",
                      "chida",
@@ -914,6 +969,7 @@
                      "dilluns",
                      "diluns",
                      "dimanche",
+                     "djaluna",
                      "domingo",
                      "drolsky",
                      "dushanba",
@@ -937,6 +993,7 @@
                      "hafta",
                      "haftas",
                      "hai",
+                     "hayashuh",
                      "hepde",
                      "hete",
                      "hh",
@@ -952,6 +1009,7 @@
                      "h\u00e1",
                      "h\u00e9tf\u0151",
                      "h\u00ebn\u00eb",
+                     "iche",
                      "ika",
                      "il",
                      "im",
@@ -1023,6 +1081,7 @@
                      "pir",
                      "pirmadienis",
                      "pirmdiena",
+                     "polyton",
                      "pondelok",
                      "pond\u011bl\u00ed",
                      "ponedeljak",
@@ -1035,6 +1094,7 @@
                      "p\u00f3nje\u017aele",
                      "ranar",
                      "ravivaar",
+                     "rkiye",
                      "roka",
                      "roku",
                      "sa",
@@ -1162,7 +1222,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@DROLSKY/PodSyntaxTests",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -1269,7 +1329,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@DROLSKY/Test::ReportPrereqs",
-            "version" : "0.028"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Version",
@@ -1290,7 +1350,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -1522,7 +1582,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "@DROLSKY/CPANFile",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
@@ -1553,13 +1613,13 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
             "name" : "@DROLSKY/CheckPrereqsIndexed",
-            "version" : "0.021"
+            "version" : "0.022"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -1575,7 +1635,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -1618,7 +1678,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -1648,7 +1708,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1665,12 +1725,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.37",
+                  "tag" : "v1.38",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1690,7 +1750,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -1731,7 +1791,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1751,7 +1811,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.1",
+                  "git_version" : "2.40.0",
                   "repo_root" : "."
                }
             },
@@ -1763,14 +1823,14 @@
             "config" : {
                "Dist::Zilla::Plugin::MakeMaker" : {
                   "make_path" : "make",
-                  "version" : "6.025"
+                  "version" : "6.030"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.49"
                },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : "12",
-                  "version" : "6.025"
+                  "version" : "6.030"
                }
             },
             "name" : "@DROLSKY/DROLSKY::MakeMaker",
@@ -1779,12 +1839,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "MetaResources",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
             "name" : "MetaNoIndex",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Conflicts",
@@ -1817,62 +1877,62 @@
                }
             },
             "name" : "DevelopRequires",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.025"
+            "version" : "6.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.025"
+            "version" : "6.030"
          }
       ],
       "zilla" : {
@@ -1880,7 +1940,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.025"
+         "version" : "6.030"
       }
    },
    "x_authority" : "cpan:DROLSKY",

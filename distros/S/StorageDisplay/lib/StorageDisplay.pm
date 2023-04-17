@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 ## Main object
 
@@ -28,6 +28,7 @@ use StorageDisplay::Data::RAID;
 use StorageDisplay::Data::LUKS;
 use StorageDisplay::Data::FS;
 use StorageDisplay::Data::Libvirt;
+use StorageDisplay::Data::Loop;
 
 has 'blocks' => (
     is       => 'ro',
@@ -304,6 +305,7 @@ sub createElems {
     $self->createLSISASIrcus($root);
     $self->createFSs($root);
     $self->createVMs($root);
+    $self->createLoops($root);
     # Must be last, to avoid to create already existing disks
     $self->createEmptyDisks($root);
     $self->computeUsedBlocks;
@@ -509,6 +511,20 @@ sub createVMs {
     return $elem;
 }
 
+sub createLoops {
+    my $self = shift;
+    my $root = shift;
+
+    $self->log("Creating Loop devices");
+    for my $loop (sort keys %{$self->get_info('loops') // {}}) {
+        my $elem = $root->newChild('Loop', $loop, $self);
+        if (!$self->_registerElement($elem)) {
+            $self->error("Cannot register loop device ".$loop);
+            return;
+        }
+    }
+}
+
 sub computeUsedBlocks {
     my $self = shift;
 
@@ -538,13 +554,82 @@ sub display {
     print join("\n", $self->dotNode), "\n";
 }
 
-sub fs_mountpoint_blockname {
-    # must return an unique (per machine) fake blockname
-    # for the provided mount point
+has '_mountpoints' => (
+    is       => 'ro',
+    isa      => 'HashRef[Num]',
+    traits   => [ 'Hash' ],
+    required => 1,
+    lazy     => 1,
+    builder  => '_compute_mp',
+    handles  => {
+	'has_mp' => 'exists',
+	    'fs_mountpoint_blockname'     => 'get',
+	    'fs_mountpoint_id'     => 'get',
+    },
+    );
+
+sub _compute_mp {
+    my $self = shift;
+
+    my $st = $self;
+    my $allfs = $st->get_info('fs', 'hierarchy');
+    my $flatfs = $st->get_info('fs', 'flatfull');
+    my $mp = {};
+    my $comp_rec;
+    $comp_rec = sub {
+	my $node = shift;
+	my $parent = shift;
+	if (not defined($flatfs->{$node->{id}})) {
+	    $self->warn($node->{id}.' not defined');
+	} elsif (not defined($flatfs->{$node->{id}}->{parent})) {
+	    $flatfs->{$node->{id}}->{parent} = $parent;
+	} elsif ($flatfs->{$node->{id}}->{parent} != $parent) {
+	    $self->warn('FS: wrong parent for '.$node->{target}
+			.' got: '.$flatfs->{$node->{id}}->{parent}
+			.' expects: '.$parent);
+	}
+	if ($parent != 1) {
+	    push @{$flatfs->{$parent}->{children}}, $node->{id};
+	}
+	$mp->{$node->{target}} = $node->{id};
+	if (exists($node->{children})) {
+	    for my $child (@{$node->{children}}) {
+		$comp_rec->($child, $node->{id});
+	    }
+	}
+    };
+    $comp_rec->($allfs, 1);
+    return $mp;
+}
+
+around 'fs_mountpoint_blockname' => sub {
+    my $orig = shift;
     my $self = shift;
     my $mountpoint = shift;
 
-    return 'FS@'.$mountpoint;
+    # must return an unique (per machine) fake blockname
+    # for the provided mount point
+    if (not $self->has_mp($mountpoint)) {
+	$self->warn("No mountpoint for $mountpoint");
+	return 'FS@-1@'.$mountpoint;
+    }
+    my $id = $self->$orig($mountpoint, @_);
+
+    return $self->fs_mountpoint_blockname_by_id($id, $mountpoint);
+};
+
+sub fs_mountpoint_blockname_by_id {
+    my $self = shift;
+    my $id = shift;
+    my $mp = shift;
+
+    my $target = $self->get_info('fs', 'flatfull', $id)->{target};
+
+    if (defined($mp) and not ($target eq $mp)) {
+	$self->warn("Bad mountpoint: got $mp, expects $target");
+    }
+
+    return 'FS@'.$id.'@'.$target;
 }
 
 sub fs_swap_blockname {
@@ -593,7 +678,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

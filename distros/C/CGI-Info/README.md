@@ -12,7 +12,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.74
+Version 0.75
 
 # SYNOPSIS
 
@@ -436,10 +436,6 @@ You can also look for information at:
 - CPAN Testers' Matrix
 
     [http://matrix.cpantesters.org/?dist=CGI-Info](http://matrix.cpantesters.org/?dist=CGI-Info)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/CGI-Info](http://cpanratings.perl.org/d/CGI-Info)
 
 - CPAN Testers Dependencies
 

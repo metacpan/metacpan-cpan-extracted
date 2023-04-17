@@ -1,15 +1,24 @@
 #!/usr/bin/perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Setup;  # parses @ARGV and sets $debug, $verbose and $silent
-use t_Utils;
+use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
+use t_TestCommon  # Test::More etc.
+         qw/$verbose $silent $debug dprint dprintf
+            bug checkeq_literal expect1 check 
+            verif_no_internals_mentioned
+            insert_loc_in_evalstr verif_eval_err
+            arrays_eq hash_subset
+            string_to_tempfile
+            @quotes/;
+use t_SSUtils;
 
-use Spreadsheet::Edit qw/fmt_sheet/;
+use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
 
 ##########################################################################
 package Other {
-  use t_Setup;
-  use t_Utils;
+  use t_Common;
+  use t_TestCommon qw/:DEFAULT $silent $debug $verbose dprint dprintf/;
+  
   use Spreadsheet::Edit ':FUNCS', # don't import stdvars
                         '@rows' => { -as, '@myrows' },
                         qw(%colx @crow %crow $num_cols @linenums),
@@ -840,7 +849,7 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
     my $sheet2 = $Spreadsheet::Edit::pkg2currsheet{"".__PACKAGE__};
 
 #-----------------------------------
-    my $inpath2 = write_string_to_tmpf("in2", <<'EOF');
+    my $inpath2 = string_to_tempfile(<<'EOF', "in2_XXXXX.csv");
 TitleP,TitleQ,,TitleS,TitleT
 P1,Q1,R1,S1,T1,U1
 P2,Q2,R2,S2,T2,U2
@@ -931,9 +940,7 @@ EOF
 
     # Create a sheet from existing data
     #new_sheet(rows => $old_rows, silent => $silent);
-    new_sheet(rows => $old_rows, linenums => $old_linenums);
-    title_rx 1;
-    check_both('ABCDEFGHIJKLMNO');
+    new_sheet(rows => $old_rows, linenums => $old_linenums, silent => $silent);
 
     # Put back sheet1
     sheet($sheet1);

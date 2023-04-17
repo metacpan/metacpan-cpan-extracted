@@ -248,7 +248,7 @@ subtest 'parse from filename constructor arg' => sub {
 
     subtest 'attrs' => sub {
         my $mod_filename = $filename =~ s/\Q[2; image() ]\E//r;
-        my $obj = FileName( filename => $mod_filename, hdunum => 2, image_cell_spec => 'image()' );
+        my $obj          = FileName( filename => $mod_filename, hdunum => 2, image_cell_spec => 'image()' );
         is( $obj, $check, 'attrs' );
     };
 

@@ -1,3 +1,9 @@
+Mon Apr 17 08:07:13 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.63 - pass -key to Crypt::CBC]:
+	* src/mai/perl/lib/Amazon/S3.pm.in
+	(_decrypt): pass encryption key as -key and -pass
+
 Fri Apr 14 08:29:32 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.62 - list_bucket, buckets]:

@@ -224,8 +224,8 @@
   ],
   name => "Fula Gambia Latin",
   native_language => "Pulaar",
-  native_name => "Pulaar Gammbi Latn",
-  native_script => "Latn",
+  native_name => "Pulaar Gammbi",
+  native_script => undef,
   native_territory => "Gammbi",
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 42,
+  version => 43,
 }

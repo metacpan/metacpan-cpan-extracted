@@ -1,0 +1,62 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Martin Sluka <fany@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-Qmail-Filter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Email::Valid" : "0",
+            "File::Scan::ClamAV" : "0",
+            "Mail::Address" : "0",
+            "Mail::DKIM::Verifier" : "0",
+            "Mail::DMARC::PurePerl" : "0",
+            "Mail::Header" : "0",
+            "Mail::Qmail::Queue::Message" : "0",
+            "Mail::SPF" : "0",
+            "Mail::SpamAssassin" : "0",
+            "Mo" : "0",
+            "Path::Tiny" : "0",
+            "Qmail::Deliverable" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/fany/Mail-Qmail-Filter",
+      "repository" : {
+         "url" : "https://github.com/fany/Mail-Qmail-Filter.git"
+      }
+   },
+   "version" : "1.31",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

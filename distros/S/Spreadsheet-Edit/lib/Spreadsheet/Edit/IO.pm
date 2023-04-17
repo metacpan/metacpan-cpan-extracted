@@ -8,8 +8,8 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit::IO;
-our $VERSION = '3.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-04'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -32,7 +32,8 @@ use Scalar::Util qw(openhandle);
 use Guard qw(guard scope_guard);
 use Fcntl qw(:flock :seek);
 use Encode qw(decode);
-use Data::Dumper::Interp qw(vis visq dvis ivis qsh u);
+# DDI 5.015 is needed for 'qshlist'
+use Data::Dumper::Interp qw/vis visq dvis ivis qsh qshlist u/;
 
 # Libre Office text converter "charset" numbers
 my %LO_charsets = (
@@ -244,6 +245,9 @@ sub _runcmd($@) {
     if ($opts->{suppress_stderr}) {
       open(STDERR, ">", devnull()) or croak $!;
     }
+    if ($opts->{suppress_stdout}) {
+      open(STDOUT, ">", devnull()) or croak $!;
+    }
     exec(@cmd) or print "### exec failed: $!\n";
     die;
   }
@@ -318,7 +322,7 @@ sub _convert_using_openlibre($) {
       xlsx => "Calc MS Excel 2007 XML",
     };
     my $ofilter = $suf2ofilter->{$outsuf}
-      // confess "I don't know how to convert to '$opts->{cvt_to}'\n";
+      // croak "I don't know how to convert to '$opts->{cvt_to}'\n";
     $lo_cvtto = $outsuf . ":" . $ofilter;
   }
 
@@ -368,29 +372,29 @@ sub _convert_using_openlibre($) {
 
   my ($ifbase, $idir, $isuffix) = fileparse($opts->{inpath}, qr/\.[^.]+/);
   my ($ofbase, $odir, $osuffix) = fileparse($opts->{outpath}, qr/\.[^.]+/);
-
-  # 2/10/21: This is ridiculous.  An undiagnosed problem causes an exception
-  #  in unoconv when an output file given with -o has a certain name.
-  #  Which particular file name results in an abort seems to depend on the
-  #  directory.  Names like "out.xlsx" or "xout.xlsx" have been problematic
-  #  (and yes, the files did not exist beforehand).  Hard to believe.
-  #
-  #  Anyway, I'm trying to substitute a file name which empirically is
-  #  "safe" from this problem, and renaming the result afterwards
-  #
-  my $tmp_outpath = $opts->{tempdir}."/SAFENAME".$osuffix;
-  my @postcmd = ("mv", "-f", "$tmp_outpath", $opts->{outpath});
+  my @postcmd;
 
   my ($prog, @cmd);
   if (0) {
   }
-  # unoconv is deprecated now and spews warnings about and ol Python library
-  # So use libreoffice directly...
+#  # unoconv is deprecated now and spews warnings about and ol Python library
+#  # So use libreoffice directly...
 #  elsif ($prog =
 #          _find_prog("unoconv", $ENV{PATH}) //
 #          _find_prog("unoconv", [reverse glob "/opt/libreoffice*/program"]) //
 #          _find_prog("unoconv", [reverse glob "/opt/openoffice*/program"])
 #     ) {
+#  # 2/10/21: This is ridiculous.  An undiagnosed problem causes an exception
+#  #  in unoconv when an output file given with -o has a certain name.
+#  #  Which particular file name results in an abort seems to depend on the
+#  #  directory.  Names like "out.xlsx" or "xout.xlsx" have been problematic
+#  #  (and yes, the files did not exist beforehand).  Hard to believe.
+#  #
+#  #  Anyway, I'm trying to substitute a file name which empirically is
+#  #  "safe" from this problem, and renaming the result afterwards
+#  #
+#  my $tmp_outpath = $opts->{tempdir}."/SAFENAME".$osuffix;
+#  @postcmd = ("mv", "-f", "$tmp_outpath", $opts->{outpath});
 #    @cmd = ($prog,
 #                   ($opts->{debug} ? ("-vvv") :
 #                    $opts->{debug} ? ("-v") :
@@ -420,15 +424,16 @@ sub _convert_using_openlibre($) {
        ) {
 
     # TODO: If necessary, create in a temp --outdir then rename
-    confess "Can not specify an arbitrary output file name when using ",
+    croak "Can not specify an arbitrary output file name when using ",
         basename($prog), " to do conversion\n"
       unless $ifbase eq $ofbase;
 
     @cmd = ($prog, "--headless", "--invisible",
                    "--convert-to", $lo_cvtto,
                    "--outdir", $odir, $opts->{inpath});
-    #
-    # NOW TO SET OUTPUT ENCODING? libreoffice --help hints that
+    $opts->{suppress_stdout} = 1; # avoid "convert ..." message
+    
+    # HOW TO SET OUTPUT ENCODING? libreoffice --help hints that
     #   output filters take humanized options.  For example,
     #     --convert-to "txt:Text (encoded):UTF8" for .doc files.
     #   but it does not mention createing csv files.
@@ -452,16 +457,22 @@ sub _convert_using_openlibre($) {
     if ("@cmd" =~ / -o \/tmp\/out\./ || ($ENV{PWD}//"") eq "/tmp" && "@cmd" =~ / -o (?:\.\/)?out\./) {
       _warn "**KNOWN unoconv bug causes abort if output file is /tmp/out.* (yes, strange)\n";
     }
-    die "($$) Conversion of '$opts->{inpath}' to $outsuf failed\n(make sure libre/open office is not running)\n"
+    croak "($$) Conversion of '$opts->{inpath}' to $outsuf failed\n",
+          "(make sure libre/open office is not running)\n"
   }
-  elsif (! -f $tmp_outpath) {
-    die "($$) Conversion of $opts->{inpath} to $tmp_outpath SILENTLY failed\n(make sure libre/open office is not running)\n"
+  elsif (! -f $opts->{outpath}) {
+    #system "set -x; ls -la '$odir' >&2"; ###TEMP DEBUG
+    #system "set -x; ls -la '$opts->{outpath}' >&2"; ###TEMP DEBUG
+    croak "($$) Conversion of ",qsh($opts->{inpath})," to ",
+            qsh($opts->{outpath})," SILENTLY failed\n",
+          "  cmd: ",qshlist(@cmd),"\n",
+          "(Make sure libre/open office is not running)\n"
   }
 
   if (@postcmd) {
     $cmdstatus = _runcmd($opts, @postcmd);
     if ($cmdstatus != 0) {
-      die "($$) postcmd (@postcmd) failed stat=$cmdstatus";
+      croak "($$) postcmd (@postcmd) failed stat=$cmdstatus";
     }
   }
 
@@ -471,7 +482,7 @@ sub _convert_using_openlibre($) {
 sub _convert_using_gnumeric($) {  # use ssconvert
   my $opts = shift;
   foreach (qw/inpath cvt_to/)
-    { confess "bug: missing opts->{$_}" unless exists $opts->{$_} }
+    { croak "bug: missing opts->{$_}" unless exists $opts->{$_} }
 
   my $eff_outpath = $opts->{outpath};
   if (my $prog=_find_prog("ssconvert", $ENV{PATH})) {
@@ -488,7 +499,7 @@ sub _convert_using_gnumeric($) {  # use ssconvert
       if ($opts->{allsheets}) {
         #If both {allsheets} and {sheetname} are specified, only a single
         # .csv file will be in the output directory
-        confess "'allsheets' option: 'outpath' must specify an existing directory"
+        croak "'allsheets' option: 'outpath' must specify an existing directory"
           unless -d $eff_outpath;
         $eff_outpath = catfile($eff_outpath, "%s.csv");
         push @options, "--export-file-per-sheet";
@@ -525,7 +536,7 @@ sub _convert_using_gnumeric($) {  # use ssconvert
       # let ssconvert choose based on the output file suffix
     }
     else {
-      confess "unrecognized cvt_to='".u($opts->{cvt_to})."' and no outfile suffix";
+      croak "unrecognized cvt_to='".u($opts->{cvt_to})."' and no outfile suffix";
     }
 
     my $eff_inpath = $opts->{inpath};
@@ -544,21 +555,23 @@ sub _convert_using_gnumeric($) {  # use ssconvert
       # Before showing a complicated ssconvert failure with backtrace,
       # check to see if the problem is just a non-existent input file
       { open my $dummy_fh, "<", $eff_inpath or croak "$eff_inpath : $!"; }
-      my $failmsg = "($$) Conversion of '$opts->{inpath}' to $eff_outpath failed\n"."cmd: ".(join " ", map{qsh} @cmd)."\n";
+      my $failmsg = "($$) Conversion of '$opts->{inpath}' to $eff_outpath failed\n"."cmd: ".qshlist(@cmd)."\n";
       if ($suppress_stderr) {  # repeat showing all output
         if (0 == _runcmd({%$opts, suppress_stderr => 0}, @cmd)) {
           _warn "Surprise!  Command failed the first time but succeeded on 2nd try!\n";
         }
-        confess $failmsg;
+        croak $failmsg;
       }
     }
     elsif (! -e $opts->{outpath}) {
-      confess "($$) Conversion SILENTLY failed\n(using $prog)\n";
+      croak "($$) Conversion SILENTLY failed\n(using $prog)\n",
+            "  cmd: ",qshlist(@cmd),"\n"
+            ;
     }
     return ($enc)
   }
   else {
-    die "Can not find ssconvert to convert '$opts->{inpath}' to $opts->{cvt_to}\n",
+    croak "Can not find ssconvert to convert '$opts->{inpath}' to $opts->{cvt_to}\n",
         "To install ssconvert: sudo apt-get install gnumeric\n";
   }
 }
@@ -600,11 +613,16 @@ sub filepath_from_spec($) {
 #die "TEX";
 
 # Construct a file + sheetname spec in the preferred form for humans to read
+# If sheetname is undef, just return the file path
 sub form_spec_with_sheetname($$) {
-  my ($filepath, $sheetname) = @_;
-  confess "bug" if defined sheetname_from_spec($filepath);
-   "${filepath}[${sheetname}]"
-  #"${filepath}|||${sheetname}"
+  my ($filespec, $sheetname) = @_;
+  my $embedded_sheetname = sheetname_from_spec($filespec);
+  croak "both embedded and separate sheetnames given"
+    if $embedded_sheetname && $sheetname && $embedded_sheetname ne $sheetname;
+  $sheetname //= $embedded_sheetname;
+  my $filepath = filepath_from_spec($filespec);
+  $sheetname ? "${filepath}[${sheetname}]" : $filepath
+  #$sheetname ? "${filepath}|||${sheetname}" : $filepath
 }
 
 # Convert between spreadsheet and CSV file (either direction),
@@ -696,7 +714,7 @@ sub _process_args($;@) { # returns (key => value, ...)
   }
   if (exists($opts{sheet})) {
     carp "WARNING: Deprecated 'sheet' option key found (use 'sheetname' instead)\n";
-    confess "Both {sheet} and {sheetname} specified"
+    croak "Both {sheet} and {sheetname} specified"
       if exists $opts{sheetname};
     $opts{sheetname} = delete $opts{sheet};
   }
@@ -780,7 +798,7 @@ sub _detect_to_from($) { # updates %$opts and returns the effective inpath
            };
       if (! $@) {
         # No decode errors occurred in check above, so assume it is a text file
-        my $enc = _get_encodings_from_opts($opts) // confess dvis '%$opts';
+        my $enc = _get_encodings_from_opts($opts) // croak dvis '%$opts';
         my $chars = decode($enc, $octets, Encode::FB_CROAK|Encode::LEAVE_SRC);
         # Does the data look like a csv file?
         my $min_cols_minus1 = 3 - 1;
@@ -857,7 +875,7 @@ sub convert_spreadsheet($;@) {
         _warn "  No conversion needed, leaving symlink to input at ", qsh($linkpath),"\n"
           if $opts{verbose};
       } else {
-        confess "{allsheets} not supported with cvt_to=",vis($opts{cvt_to});
+        croak "{allsheets} not supported with cvt_to=",vis($opts{cvt_to});
       }
     }
     else {
@@ -907,7 +925,7 @@ sub convert_spreadsheet($;@) {
   return {
     map{ ($_ => $opts{$_}) }
     grep{ defined $opts{$_} }
-    qw(inpath sheet outpath iolayers cvt_from cvt_to verbose debug)
+    qw(inpath sheetname outpath iolayers cvt_from cvt_to verbose debug)
   }
 }
 
@@ -923,7 +941,7 @@ sub _get_encodings_from_opts($) {
     return wantarray ? () : undef
   }
   if ($opts->{encoding} && $opts->{encoding} ne $enclist) {
-    confess "BUG: Incompatible opts{encoding}='$opts->{encoding}' and {iolayers}='$opts->{iolayers}'"
+    croak "BUG: Incompatible opts{encoding}='$opts->{encoding}' and {iolayers}='$opts->{iolayers}'"
   }
   my @enclist = split /,/, $enclist;
   wantarray ? @enclist : $enclist[0];
@@ -948,7 +966,7 @@ sub _detect_encoding($$) {
     _warn "Encoding '$enc' seems to work.\n" if $opts->{debug};
     return $enc;
   }
-  confess "None of the encodings \"",join(",",@enclist),"\" are correct!\ninpath: ",u($opts->{inpath}),"\n"
+  croak "None of the encodings \"",join(",",@enclist),"\" are correct!\ninpath: ",u($opts->{inpath}),"\n"
 }
 
 sub _update_iolayers($$) {
@@ -970,7 +988,7 @@ sub _update_iolayers($$) {
     $lineend_layer = ":perlio";  # Doesn't really matter for an empty file
   }
   else {
-    confess u($opts->{inpath})," : Could not detect line ending convention. File ends with: ",
+    croak u($opts->{inpath})," : Could not detect line ending convention. File ends with: ",
             join( "", map{ sprintf " 0x%02X", ord($_) }
                       split //,substr($octets,-40) ),
             "\n";
@@ -1003,11 +1021,11 @@ sub OpenAsCsv {
   #   (massive changes required; in some contexts it must be a path...)
 
   my $inpath = delete $opts{inpath};
-  confess "OpenAsCsv: missing 'inpath' option\n" unless $inpath;
-  confess "OpenAsCsv: outpath may not be specified\n" if $opts{outpath};
+  croak "OpenAsCsv: missing 'inpath' option\n" unless $inpath;
+  croak "OpenAsCsv: outpath may not be specified\n" if $opts{outpath};
 
   my $h = convert_spreadsheet($inpath, %opts);
-  confess "sheetname key bug" if exists $h->{sheet};
+  croak "sheetname key bug" if exists $h->{sheet};
   my $csvpath = $h->{outpath}; # may be same as {inpath} if already a CSV
   my $iolayers = $h->{iolayers};
 

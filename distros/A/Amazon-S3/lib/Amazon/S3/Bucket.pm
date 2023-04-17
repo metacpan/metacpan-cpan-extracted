@@ -19,7 +19,7 @@ use XML::Simple; ## no critic (DiscouragedModules)
 
 use parent qw(Class::Accessor::Fast);
 
-our $VERSION = '0.62'; ## no critic (RequireInterpolation)
+our $VERSION = '0.63'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
   qw(

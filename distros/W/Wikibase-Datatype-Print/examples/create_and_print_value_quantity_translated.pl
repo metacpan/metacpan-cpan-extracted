@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Wikibase::Cache;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Print::Value::Quantity;
 use Wikibase::Datatype::Value::Quantity;
@@ -14,7 +15,9 @@ my $obj = Wikibase::Datatype::Value::Quantity->new(
 );
 
 # Cache object.
-my $cache = Wikibase::Cache::Backend::Basic->new;
+my $cache = Wikibase::Cache->new(
+        'backend' => 'Basic',
+);
 
 # Print.
 print Wikibase::Datatype::Print::Value::Quantity::print($obj, {

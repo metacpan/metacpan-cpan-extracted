@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman::VERSION, 0.24, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman::VERSION, 0.25, 'Version.');

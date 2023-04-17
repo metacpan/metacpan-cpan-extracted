@@ -224,8 +224,8 @@
   ],
   name => "Fula Cameroon Latin",
   native_language => "Pulaar",
-  native_name => "Pulaar Kameruun Latn",
-  native_script => "Latn",
+  native_name => "Pulaar Kameruun",
+  native_script => undef,
   native_territory => "Kameruun",
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -271,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

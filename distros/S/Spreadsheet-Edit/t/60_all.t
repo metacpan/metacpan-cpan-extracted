@@ -1,7 +1,9 @@
 #!/usr/bin/perl
-use strict; use warnings; use feature qw(say state);
-use feature qw(say state lexical_subs);
-no warnings qw(experimental::lexical_subs);
+use FindBin qw($Bin);
+use lib $Bin;
+use t_Common qw/oops/; # strict, warnings, Carp
+use t_TestCommon # Test::More etc.
+  qw/$silent $verbose $debug run_perlscript verif_no_internals_mentioned/;
 
 # Run all "subtests" twice:
 #
@@ -13,26 +15,12 @@ no warnings qw(experimental::lexical_subs);
 #
 # "Subtests" are all the scripts called t/*.pl 
 
-use Test::More;
-
-use FindBin qw($Bin);
-use lib $Bin;
-
-# N.B. t_Setup parses and removes -d/--debug etc. from @ARGV
-# and sets $debug, etc. but this wrapper ignores them.
-use t_Setup;
-
-use t_Utils;
-
-use Getopt::Long qw(GetOptions);
 use Capture::Tiny qw/capture_merged tee_merged/;
-use File::Basename qw(dirname basename);
 
 sub run_subtest($@) {
   my ($subtest, @args) = @_;
-  my @cmd = ($^X, $Carp::Verbose ? ("-MCarp=verbose"):(), $subtest, @args);
-  my $wstat = system @cmd;
-  say "ERROR: Command  @cmd\n",
+  my $wstat = run_perlscript($subtest, @args);
+  say "ERROR: $subtest @args\n",
       sprintf("  exited with WAIT STATUS 0x%04X\n", $wstat)
     if $wstat != 0;
   $wstat;
@@ -52,12 +40,14 @@ plan tests => scalar(@subtests) * 2;
 
 #--------------------------------------------------------------------------
 for my $st (@subtests) {
+  # The --silent argument is parsed in t_TestCommon.pm and sets the global $silent
   my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
   if ($swstat != 0) {
     # Diagnostic has already been displayed
     die "$soutput\nNon-zero exit status from subtest '$st' --silent"; 
   }
-  ok ($soutput eq "", basename($st)." --silent is really silent") or die;
+  ok ($soutput eq "", basename($st)." --silent is really silent") 
+    or die; # stop immediately
 }
 #--------------------------------------------------------------------------
 for my $st (@subtests) {

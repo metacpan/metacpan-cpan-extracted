@@ -17,10 +17,11 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  Hash::Ordered: '0.014'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-User-Identity.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -1,8 +1,8 @@
+use strict; use warnings;
 package Lingy::Lang::Number;
 
-use Lingy::Base 'Scalar';
-
-use constant lingy_class => 'host.lang.Number';
+use base 'Lingy::Lang::ScalarClass';
+use Lingy::Common;
 
 use overload
     '""' => sub { ${$_[0]} },
@@ -10,7 +10,7 @@ use overload
     '-' => \&subtract,
     '*' => \&multiply,
     '/' => \&divide,
-    '=' => \&equal_to,
+    '==' => \&equal_to,
     '>' => \&greater_than,
     '>=' => \&greater_equal,
     '<' => \&less_than,

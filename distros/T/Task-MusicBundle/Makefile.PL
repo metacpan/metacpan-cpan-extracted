@@ -64,7 +64,6 @@ my %WriteMakefileArgs = (
     "Music::ToRoman" => 0,
     "Music::VoiceGen" => 0,
     "Music::Voss" => 0,
-    "String::Approx" => 0,
     "Text::Chord::Piano" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -75,7 +74,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1912",
+  "VERSION" => "0.1913",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -133,7 +132,6 @@ my %FallbackPrereqs = (
   "Music::ToRoman" => 0,
   "Music::VoiceGen" => 0,
   "Music::Voss" => 0,
-  "String::Approx" => 0,
   "Test::More" => 0,
   "Text::Chord::Piano" => 0,
   "strict" => 0,

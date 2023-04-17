@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all'; use 5.010;
 
-our $VERSION = '1.004'; # VERSION
-our $DATE = '2023-04-07'; # DATE
+our $VERSION = '1.005'; # VERSION
+our $DATE = '2023-04-14'; # DATE
 
 ######################################################################
 # POD HAS BEEN MOVED TO THE STUB LIBRARY App::diff_spreadsheets.pm
@@ -19,7 +19,7 @@ use File::Basename qw(basename dirname fileparse);
 use File::Path qw(make_path remove_tree);
 use File::Temp qw(tempfile tempdir);
 use File::Copy ();
-use File::Spec::Functions qw(:DEFAULT catpath splitpath splitdir rootdir tmpdir);
+use File::Spec::Functions qw(canonpath catfile catdir splitpath splitdir rootdir tmpdir);
 use FindBin qw/$Bin $Script/;
 use Getopt::Long qw/GetOptions/;
 use Guard qw(guard scope_guard);
@@ -179,6 +179,7 @@ foreach my $key (qw/columns id_columns always_show_columns sheet_names/) {
   @{$opts{$key}} = map{ split/(?<!\\),/ } @{$opts{$key}}
 }
 $opts{verbose} //= $opts{debug};
+
 
 our ($hash_func_code, $hashid_func_code, $setup_code_code);
 foreach my $argname (qw(hashid-func hash-func setup-code)) {
@@ -368,7 +369,7 @@ sub process_pair {
   for my $N (1, 2) {
     my $i = $N - 1;
     $obj->{"sheet$N"}->data_source(
-           catpath($splits[$i]->[0], $splits[$i]->[1], $splits[$i]->[2]) );
+           catdir($splits[$i]->[0], $splits[$i]->[1], $splits[$i]->[2]) );
   }
 
   # Preliminary raw comparison
@@ -396,7 +397,11 @@ sub process_pair {
       }
     }
   }
-  if ($method eq "tkdiff" || $method eq "diff") {
+  if ($method eq "diff") {
+    $obj->compare_using_diff(['diff', '-u', @diff_opts]);
+    return $obj->exit_status;
+  }
+  if ($method eq "tkdiff") {
     $obj->compare_using_diff([$method, @diff_opts]);
     return $obj->exit_status;
   }
@@ -430,7 +435,7 @@ use File::Temp qw(tempfile tempdir);
 use List::Util qw(first any min max any sum0);
 use File::Basename qw(basename dirname fileparse);
 use File::Path qw(make_path remove_tree);
-use File::Spec::Functions qw(catpath splitpath splitdir rootdir tmpdir);
+use File::Spec::Functions qw(canonpath catfile catdir splitpath splitdir rootdir tmpdir);
 use List::Util qw(min max any first);
 use Spreadsheet::Edit qw(:DEFAULT logmsg cx2let let2cx);
 use Data::Dumper::Interp;
@@ -1262,14 +1267,13 @@ sub compare_using_diff {
     ($self->{"linkrpath$N"} = $sh->data_source()) =~ s/^${ \rootdir() }//;
     my @dotdots = $self->{"linkrpath$N"} =~ /(?:^|\/)\.\.(?=$|\/)/g;
     $tdirdepth = max($tdirdepth, $#dotdots+1);
+    #FIXME: Is the +1 needed?   Verify with actual cases!
   }
   my $tdir = $self->{tempdir} // tempdir(CLEANUP => 1);
   # If linkrpaths contain .. put them in a sufficiently-deep subdir
   # that they will still be within our temp directory structure
-  for (1..$tdirdepth) {
-    $tdir = catfile($tdir,"sub");
-    make_path($tdir);
-  }
+  $tdir = catdir($tdir, ("sub" x $tdirdepth));
+  make_path($tdir);
 
   foreach my $N (1,2) {
     $self->{"tmpcsv$N"} = catfile($tdir, "«TEMPCSV$N».csv");
@@ -1299,8 +1303,9 @@ sub compare_using_diff {
   my @cmd = (@$cmd, $self->{"linkrpath1"}, $self->{"linkrpath2"});
   my $pid = fork;
   if ($pid == 0) { #CHILD
-    warn "> cd ", qsh($tdir), "\n" if $self->{debug};
+    warn "> cd ", qsh($tdir), "\n" if $self->{verbose};
     chdir $tdir or die "chdir $tdir : $!";
+    warn "> ",join(" ",map{qsh} @cmd),"\n" if $self->{verbose};
     if ($self->{debug}) {
       warn ">    : ",qsh($cmd[-2])," -> ",main::decoded_readlink($cmd[-2]),"\n"
         if -l $cmd[-2];

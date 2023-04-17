@@ -1,5 +1,18 @@
 Revision history for CGI-Info
 
+0.75	Sat Apr 15 14:44:30 EDT 2023
+	Remove most calls to substr
+	Added Mediatoolkitbot as a robot
+	Added NetcraftSurveyAgent as a robot
+	Added Expanse as a robot
+	Added t/pod-synopsis.t
+	Refactored t/unused.t and t/10-compile.t
+	Fixed Github Actions on Alpine Linux, FreeBSD and OpenBSD
+	Label AmazonBot as a search engine
+	Block directory traversal attacks
+	Set HTTP status to 403 on blocked attacks
+	Catch another SQL injection attempt
+
 0.74	Wed Jan  4 22:16:12 EST 2023
 	Added python-requests/2.27.1 as a robot
 	Use latest Github Actions environment

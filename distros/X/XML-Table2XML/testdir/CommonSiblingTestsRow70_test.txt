@@ -4,4 +4,3 @@ testX	testAttX	testY	TestA1
 testX	testAttX	testY	TestA2
 testX	testAttX	testY	TestA3
 testX	testAttX	testY	TestA4
-

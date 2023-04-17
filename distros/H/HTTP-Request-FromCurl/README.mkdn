@@ -219,7 +219,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2018-2022 by Max Maischein `corion@cpan.org`.
+Copyright 2018-2023 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

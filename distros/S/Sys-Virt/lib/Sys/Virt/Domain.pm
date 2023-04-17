@@ -408,6 +408,11 @@ The guest is paused as post-copy migration is taking place
 
 The guest is paused as post-copy migration failed
 
+=item Sys::Virt::Domain::STATE_PAUSED_API_ERROR
+
+The guest is paused as a result of failed resume operation at the end of some
+APIs which internally suspend guests.
+
 =item Sys::Virt::Domain::STATE_RUNNING_BOOTED
 
 The guest is running after being booted

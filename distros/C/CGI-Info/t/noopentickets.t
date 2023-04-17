@@ -38,10 +38,10 @@ GITHUB: {
 	# https://docs.github.com/en/rest/reference/issues#list-repository-issues
 	SKIP: {
 		if($ENV{'AUTHOR_TESTING'}) {
-			eval 'use JSON';
+			eval 'use JSON::MaybeXS';
 			if($@) {
-				diag('JSON required to check for open tickets');
-				skip('JSON required to check for open tickets', 1);
+				diag('JSON::MaybeXS required to check for open tickets');
+				skip('JSON::MaybeXS required to check for open tickets', 1);
 			} else {
 				eval 'use IO::Socket::INET';
 				if($@) {
@@ -59,7 +59,7 @@ GITHUB: {
 							diag('LWP::Simple required to check for open tickets');
 							skip('LWP::Simple required to check for open tickets', 1);
 						} elsif(my $data = LWP::Simple::get(URL)) {
-							my $json = JSON->new()->utf8();
+							my $json = JSON::MaybeXS->new()->utf8();
 							my @issues = @{$json->decode($data)};
 							# diag(Data::Dumper->new([\@issues])->Dump());
 							if($ENV{'TEST_VERBOSE'}) {

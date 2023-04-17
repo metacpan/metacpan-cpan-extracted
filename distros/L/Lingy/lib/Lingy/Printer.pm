@@ -27,11 +27,13 @@ sub pr_str {
     $type eq 'Lingy::Lang::Boolean' ? $$o ? 'true' : 'false' :
     $type eq 'Lingy::Lang::Nil' ? 'nil' :
     $type eq 'Lingy::Lang::Var' ? ("#'" . $$o) :
+    $type eq 'Lingy::Lang::Class' ? $o->_name :
+    $type eq 'Lingy::Lang::Character' ? $o->print :
     $type eq 'Lingy::Lang::Type' ? $$o :
     $type eq 'CODE' ? "#<function ${\ sub_name($o)}>" :
-    $o->isa('Lingy::NS') ? qq(#<Namespace ${\ $o->{' NAME'}}>) :
+    $o->isa('Lingy::Namespace') ? qq(#<Namespace ${\ $o->NAME}>) :
     $type eq 'Lingy::Lang::Function' ? '#<Function>' :
-    $type eq 'macro' ? '#<Macro>' :
+    $type eq 'Lingy::Lang::Macro' ? '#<Macro>' :
     $type eq 'Lingy::Lang::List' ?
         "(${\ join(' ', map pr_str($_, $raw), @$o)})" :
     $type eq 'Lingy::Lang::Vector' ?

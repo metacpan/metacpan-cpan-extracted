@@ -240,6 +240,7 @@ $_ = "GroupA.GroupB";
 { my $code = 'qshpath($_)';          check $code, "${_}",   eval $code; }
 { my $code = 'qshpath()';            check $code, "${_}",   eval $code; }
 { my $code = 'qshpath';              check $code, "${_}",   eval $code; }
+{ my $code = q(qshlist("a b","c",'$d')); check $code, q("a b" c '$d'),  eval $code; }
 
 # Basic checks
 { my $code = 'vis($_)'; check $code, "\"${_}\"", eval $code; }

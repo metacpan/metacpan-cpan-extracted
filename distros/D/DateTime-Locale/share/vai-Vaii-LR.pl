@@ -221,8 +221,8 @@
   ],
   name => "Vai Liberia Vai",
   native_language => "\N{U+a559}\N{U+a524}",
-  native_name => "\N{U+a559}\N{U+a524} \N{U+a55e}\N{U+a524}\N{U+a52b}\N{U+a569} Vaii",
-  native_script => "Vaii",
+  native_name => "\N{U+a559}\N{U+a524} \N{U+a55e}\N{U+a524}\N{U+a52b}\N{U+a569}",
+  native_script => undef,
   native_territory => "\N{U+a55e}\N{U+a524}\N{U+a52b}\N{U+a569}",
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 42,
+  version => 43,
 }

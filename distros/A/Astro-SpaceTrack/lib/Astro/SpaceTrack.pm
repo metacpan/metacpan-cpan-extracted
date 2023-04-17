@@ -128,7 +128,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.160';
+our $VERSION = '0.161';
 our @EXPORT_OK = qw{
     shell
 
@@ -1180,11 +1180,10 @@ These can be accessed by C<< $st->content_type( $resp ) >> and
 C<< $st->content_source( $resp ) >> respectively.
 
 You can specify the C<retrieve()> options on this method as well, but
-they will have no effect, and are deprecated. Six months after the
-release of version 0.158 these will warn on the first use. Six months
-after that, they will warn on every use, and six months after that they
-will be fatal. After a further six months all related code will be
-removed.
+they will have no effect, are deprecated, and warn on the first use. Six
+months after the release of version 0.161 these will warn on every use.
+Six months after that they will be fatal. After a further six months all
+related code will be removed.
 
 =cut
 
@@ -5078,11 +5077,11 @@ sub _check_cookie_generic {
     my %deprecate = (
 	celestrak => {
 #	    sts	=> 3,
-	    '--descending'	=> 0,
-	    '--end_epoch'	=> 0,
-	    '--last5'		=> 0,
-	    '--sort'		=> 0,
-	    '--start_epoch'	=> 0,
+	    '--descending'	=> 1,
+	    '--end_epoch'	=> 1,
+	    '--last5'		=> 1,
+	    '--sort'		=> 1,
+	    '--start_epoch'	=> 1,
 	},
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,

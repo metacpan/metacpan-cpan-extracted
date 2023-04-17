@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::VersionEditionOrTranslation;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::VersionEditionOrTranslation::VERSION, 0.24, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::VersionEditionOrTranslation::VERSION, 0.25, 'Version.');

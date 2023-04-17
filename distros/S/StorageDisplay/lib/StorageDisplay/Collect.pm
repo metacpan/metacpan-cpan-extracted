@@ -18,7 +18,7 @@ package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data.
 # No dependencies (but perl itself and its basic modules)
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 sub collectors {
@@ -314,6 +314,17 @@ sub decode_json {
 
 sub pp_parser_has_boolean_values {
     return $has_boolean_values;
+}
+
+sub jsonarray2perlhash {
+    my $json = shift;
+    my $root = shift;
+    my $key = shift;
+    my $info = {
+        map { $_->{$key} => $_ }
+	(@{decode_json($json)->{$root}})
+    };
+    return $info;
 }
 
 1;
@@ -702,12 +713,7 @@ use StorageDisplay::Collect::JSON;
 sub lsblkjson2perl {
     my $self = shift;
     my $json = shift;
-    my $info = {
-        map { $_->{kname} => $_ }
-	(@{StorageDisplay::Collect::JSON::decode_json($json)
-	       ->{"blockdevices"}})
-    };
-    return $info;
+    return StorageDisplay::Collect::JSON::jsonarray2perlhash($json, 'blockdevices', 'kname');
 }
 
 sub collect {
@@ -1102,9 +1108,11 @@ use is_collector
     provides => 'fs',
     no_names => 1,
     depends => {
-        progs => [ '/sbin/swapon', 'df', 'findmnt', 'stat' ],
+        progs => [ '/sbin/swapon', 'findmnt', 'stat' ],
 	root => 1,
 };
+
+use StorageDisplay::Collect::JSON;
 
 sub collect {
     my $self = shift;
@@ -1118,11 +1126,12 @@ sub collect {
         chomp($line);
         if ($line =~ m,([^ ]+) (partition|file) ([0-9]+) ([0-9]+)$,) {
             my $info={
+		filesystem => $1,
                 size => $3,
                 used => $4,
                 free => ''.($3-$4),
                 fstype => $2,
-                mountpoint => 'SWAP',
+		mountpoint => 'SWAP',
             };
             my $dev = $1;
             if ($2 eq 'file') {
@@ -1137,7 +1146,7 @@ sub collect {
                 close $dh2;
                 $info->{'file-size'}=$size;
             }
-            $fs->{$dev} = $info;
+            $fs->{swap}->{$dev} = $info;
         } elsif ($line =~ m,([^ ]+) ([^ ]+) ([0-9]+) ([0-9]+)$,) {
             # skipping other kind of swap
         } else {
@@ -1146,21 +1155,41 @@ sub collect {
     }
     close $dh;
 
-    $dh=$self->open_cmd_pipe_root(qw(df -B1 --local),
-                             '--output=source,fstype,size,used,avail,target');
-    while(defined(my $line=<$dh>)) {
-        chomp($line);
-        next if $line !~ m,^/,;
-        my @i=split(/\s+/, $line);
-        $fs->{$i[0]} = {
-            fstype => $i[1],
-            size => $i[2],
-            used => $i[3],
-            free => $i[4],
-            mountpoint => $i[5],
-        };
-    }
+    #$dh=$self->open_cmd_pipe_root(qw(findmnt --all --output-all --json --bytes --list));
+    #my @json=<$dh>;
+    #close $dh;
+    #$fs->{flatfull} = StorageDisplay::Collect::JSON::jsonarray2perlhash(join("",@json), 'filesystems', 'id');
+
+    $dh=$self->open_cmd_pipe_root(qw(findmnt --all --output-all --json --bytes));
+    my @json=<$dh>;
     close $dh;
+    my $data = StorageDisplay::Collect::JSON::decode_json(join("",@json))->{"filesystems"}->[0];
+    my $rec;
+    $rec = sub {
+	my $node = shift;
+	my $res = {
+	    id => $node->{id},
+	    target => $node->{target},
+	};
+	if (exists($node->{children})) {
+	    $res->{children} = [ map { $rec->($_) } @{$node->{children}} ];
+	}
+	return $res;
+    };
+    $fs->{hierarchy} = $rec->($data);
+
+    $rec = sub {
+	my $node = shift;
+	my $id = $node->{id};
+	$fs->{flatfull}->{$id} = $node;
+	if (exists($node->{children})) {
+	    for my $child (@{$node->{children}}) {
+		$rec->($child);
+	    }
+	    delete $node->{children};
+	}
+    };
+    $rec->($data);
 
     return { 'fs' => $fs };
 }
@@ -1795,18 +1824,7 @@ sub collect {
                 source => $info[3],
             };
             if ($info[0] eq 'file') {
-                my $dh2=$self->open_cmd_pipe_root(qw(findmnt -n -o TARGET --target), $info[3]);
-                my $mountpoint = <$dh2>;
-                chomp($mountpoint) if defined($mountpoint);
-                close $dh2;
-                $v->{'blocks'}->{$info[3]}->{'mount-point'}=$mountpoint;
-		if (defined($mountpoint)) {
-		    $dh2=$self->open_cmd_pipe_root(qw(stat -c %s), $info[3]);
-		    my $size = <$dh2>;
-		    chomp($size);
-		    close $dh2;
-		    $v->{'blocks'}->{$info[3]}->{'size'}=$size;
-		}
+		StorageDisplay::Collect::File::select_file($info[3]);
             } elsif ($info[0] eq 'block') {
 	    } else {
 		print STDERR "W: unknown VM device type: $info[0]\n";
@@ -1860,6 +1878,153 @@ sub collect {
 1;
 
 ###########################################################################
+package StorageDisplay::Collect::Loops;
+
+use is_collector
+    provides => 'loops',
+    depends => {
+        progs => [ 'losetup' ],
+        root => 1,
+};
+
+use StorageDisplay::Collect::JSON;
+sub losetupjson2perl {
+    my $self = shift;
+    my $json = shift;
+    return StorageDisplay::Collect::JSON::jsonarray2perlhash($json, 'loopdevices', 'name');
+}
+
+sub select {
+    my $self = shift;
+    my $infos = shift;
+    my $request = shift // {};
+    my @loops;
+
+    my $dh=$self->open_cmd_pipe_root(qw(losetup --output NAME));
+    while(defined(my $line=<$dh>)) {
+        chomp($line);
+        next if $line =~ /^NAME$/;
+        push @loops, $line;
+    }
+    close $dh;
+    @loops = sort @loops;
+    return @loops;
+}
+
+sub collect {
+    my $self = shift;
+    my $infos = shift;
+    my $files={};
+
+    my @loops=$self->select($infos);
+
+    my $dh=$self->open_cmd_pipe_root(qw(losetup --output-all --list --json));
+    my $all_loops = $self->losetupjson2perl(join(' ', <$dh>));
+    close $dh;
+
+    my $loops={};
+    foreach my $loop (@loops) {
+	$loops->{$loop} = $all_loops->{$loop};
+	my $filename = $loops->{$loop}->{'back-file'};
+	StorageDisplay::Collect::File::select_file($filename);
+	if ($filename =~ /(.*) \(deleted\)/) {
+	    StorageDisplay::Collect::File::select_file($1);
+	}
+    }
+    return { 'loops' => $loops };
+}
+
+1;
+
+###########################################################################
+package StorageDisplay::Collect::File;
+
+# This collector must be the last one as it collects info on requested
+# files by other collectors.
+
+use is_collector
+    provides => 'files',
+    depends => {
+        progs => [ 'findmnt' ],
+        root => 1,
+};
+
+use StorageDisplay::Collect::JSON;
+use Data::Dumper;
+sub statjson2perl {
+    my $self = shift;
+    my $json = shift;
+    return StorageDisplay::Collect::JSON::jsonarray2perlhash($json, 'stats', 'name');
+}
+
+my $files = {};
+
+sub select_file {
+    my $filename = shift;
+    $files->{$filename} = 1;
+}
+
+sub select {
+    my $self = shift;
+    my $infos = shift;
+    my $request = shift // {};
+    my @files = sort keys %{$files};
+    return @files;
+}
+
+sub collect {
+    my $self = shift;
+    my $infos = shift;
+    my $files={};
+
+    my @files=$self->select($infos);
+    my @json;
+    my @present;
+
+    if (scalar(@files) == 0) {
+	return { 'files' => [] };
+    }
+    my $dh0=$self->open_cmd_pipe_root(
+	qw(perl -e),
+	'my '.Dumper(\@files).
+	'grep { if (-e $_) { print "OK\n" } else { print "NACK\n" }; 1 } @{$VAR1};');
+    my @res = <$dh0>;
+    close $dh0;
+    if (scalar(@files) != scalar(@res)) {
+	print STDERR "WARNING: Something goes wrong with stat files\n";
+    } else {
+	for(my $i=0; $i<scalar(@res); $i++) {
+	    if ($res[$i] =~ /^OK/) {
+		push @present, $files[$i];
+	    } else {
+		push @json, '{ "name":"'.$files[$i].'", "deleted":true },'."\n";
+	    }
+	}
+    }
+    if (scalar(@present) > 0) {
+	my $dh=$self->open_cmd_pipe_root(
+	    # '%[LH][rd]' do not exist on old stat tool
+	    qw(stat -c),
+	    '{ "name":"%n", "deleted":false, "size":%s, "inode":%i,'.
+	    ' "permission":"0%a", "mode":"0x%f", "blocks":%b,'.
+	    ' "blocksize":%B, "st_dev":%d, "hardlinks":%h,'.
+	    ' "mountpoint":"%m", "st_rdev":"%r", "st_special":"%t:%T" },',
+	    @present);
+	push @json, <$dh>;
+    }
+    my $json=join("", @json);
+    chomp($json);
+    $json =~ s/,$//;
+    #print STDERR "json=$json\n";
+    return { 'files' => $self->statjson2perl('{ "stats": [  '.$json."\n] }") };
+}
+
+# This collector must be the last one as it collects info on requested
+# files by other collectors.
+
+1;
+
+###########################################################################
 ###########################################################################
 ###########################################################################
 ###########################################################################
@@ -1894,7 +2059,7 @@ StorageDisplay::Collect - modules required to collect data.
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 Main class, allows one to register collectors and run them
 (through the collect method)

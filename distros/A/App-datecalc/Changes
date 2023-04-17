@@ -1,37 +1,44 @@
-0.08    2018-02-21 (PERLANCAR)
+0.090   2023-02-18  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [ux][doc] Show days() and totdays() in Synopsis.
+
+
+0.08    2018-02-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace SHARYANTO::List::Util with List::Util::Uniq.
 
 
-0.07    2016-08-15 (PERLANCAR)
+0.07    2016-08-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add FAQ entry about gotcha with fractional duration.
 
 
-0.06    2015-01-03 (PERLANCAR)
+0.06    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (generate TODO.md).
 
 
-0.05    2014-12-01 (PERLANCAR)
+0.05    2014-12-01  Released-By: PERLANCAR
 
 	- [ux] Change DateTime rendering to include day of week.
 
 
-0.04    2014-06-26 (SHARYANTO)
+0.04    2014-06-26  Released-By: SHARYANTO
 
         - Adjust to SHARYANTO::List::Util's 0.75 (uniq renamed to uniq_adj).
 
         - [ux] Add commands help/? and exit/quit.
 
 
-0.03    2014-05-28 (SHARYANTO)
+0.03    2014-05-28  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -51,7 +58,7 @@
         - Add more examples in Synopsis.
 
 
-0.02    2014-05-21 (SHARYANTO)
+0.02    2014-05-21  Released-By: SHARYANTO
 
         - Numeric arithmetics.
 
@@ -60,6 +67,6 @@
         - Save and load history (~/.datecalc_history).
 
 
-0.01    2014-05-20 (SHARYANTO)
+0.01    2014-05-20  Released-By: SHARYANTO
 
         - First release.

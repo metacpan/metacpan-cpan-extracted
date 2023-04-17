@@ -10,8 +10,8 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit;
-our $VERSION = '3.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-04'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # TODO FIXME: Integrate with Spreadsheet::Read and provide a formatting API
 #
@@ -203,6 +203,7 @@ use Data::Dumper::Interp;
 
 use Carp;
 our @CARP_NOT = qw(Spreadsheet::Edit
+                   Spreadsheet::Edit::IO
                    Tie::Indirect::Array Tie::Indirect::Hash
                    Tie::Indirect::Scalar
                   );
@@ -220,7 +221,8 @@ require Tie::Indirect; # OUR CUSTOM STUFF: stop using it?
 use Text::CSV 1.90_01; # 1st version with known_attributes()
 use Spreadsheet::Edit::IO qw(
    OpenAsCsv @sane_CSV_read_options @sane_CSV_write_options
-   convert_spreadsheet);
+   convert_spreadsheet
+   sheetname_from_spec filepath_from_spec form_spec_with_sheetname);
 
 sub oops(@) { unshift @_, "oops - "; goto &Carp::confess; }
 
@@ -2696,8 +2698,8 @@ sub read_spreadsheet($;@) {
   }
   close $fh || croak "Error reading $hash->{csvpath}: $!\n";
 
-  $$self->{data_source} = $hash->{inpath}
-    .($hash->{sheetname} ? "!".$hash->{sheetname} : "");
+  $$self->{data_source} = 
+    form_spec_with_sheetname($hash->{inpath}, $hash->{sheetname});
   $$self->{sheetname} = $hash->{sheetname}; # possibly undef
 
   $self->_rows_replaced;
@@ -3358,9 +3360,9 @@ to import functions and helper variables (see STANDARD SHEET VARIABLES
 and VARIABLES USED DURING APPLY).
 
 You can rename imported items using the '-as' notation shown in
-C<Exporter::Tiny::Manual::QuickStart>.
+L<Exporter::Tiny::Manual::QuickStart>.
 
-Purely-OO applications can C<use Spreadsheet::Edit ();>.
+Purely-OO applications can L<use Spreadsheet::Edit ();>.
 
 =head1 THE 'CURRENT SHEET'
 
@@ -3472,7 +3474,7 @@ workbook was saved will be retrieved.
 
 =item Other C<< key => value >> pairs override details of CSV parsing.
 
-See Text::CSV.  UTF-8 encoding is assumed by default.
+See L<Text::CSV>.  UTF-8 encoding is assumed by default.
 
 =back
 
@@ -3600,7 +3602,7 @@ occurs before code is compiled which references the variables.  This can
 be the case if C<tie_column_vars> is called in a BEGIN{} block or in the
 C<import> method of a module loaded with C<use>.
 
-C<Spreadsheet::Edit::Preload> makes use of this.
+L<Spreadsheet::Edit::Preload> makes use of this.
 
 =head2 $rowindex = title_rx ;
 
@@ -3618,7 +3620,7 @@ C<read_spreadsheet> automatically sets the title row.
 =head2 title_rx undef ;
 
 Titles are disabled and any existing COLSPECs derived from
-titles are invalidated.  Auto-detection is I<disabled>.
+titles are invalidated.
 
 =head2 title_rx {AUTODETECT_OPTIONS} 'auto';
 
@@ -3643,7 +3645,7 @@ While executing your code, tied column variables and
 the sheet variables C<@crow>, C<%crow>, C<$rx> and C<$linenum>
 and corresponding OO methods will refer to the row being visited.
 
-If a list COLSPECs is specified, then
+If a list of COLSPECs is specified, then
 
 =over 2
 
@@ -3670,7 +3672,7 @@ An 'apply' sub may change the 'current sheet', after which
 tied column variables will refer to the other sheet and
 any C<apply> active for that sheet.  It should take care to restore
 the original sheet before returning
-(perhaps using Guard::scope_guard).
+(perhaps using C<Guard::scope_guard>).
 Nested and recursive C<apply>s are allowed.
 
 B<MAGIC VARIABLES USED DURING APPLY>
@@ -4207,7 +4209,7 @@ instead of (or in addition to) an {OPTIONS} hashref.
 
 =head1 SEE ALSO
 
-Spreadsheet::Edit::Preload
+L<Spreadsheet::Edit::Preload>
 
 =head1 BUGS
 

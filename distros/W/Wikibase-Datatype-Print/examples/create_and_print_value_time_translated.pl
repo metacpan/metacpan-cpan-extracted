@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Wikibase::Cache;
 use Wikibase::Cache::Backend::Basic;
 use Wikibase::Datatype::Print::Value::Time;
 use Wikibase::Datatype::Value::Time;
@@ -14,7 +15,9 @@ my $obj = Wikibase::Datatype::Value::Time->new(
 );
 
 # Cache object.
-my $cache = Wikibase::Cache::Backend::Basic->new;
+my $cache = Wikibase::Cache->new(
+        'backend' => 'Basic',
+);
 
 # Print.
 print Wikibase::Datatype::Print::Value::Time::print($obj, {

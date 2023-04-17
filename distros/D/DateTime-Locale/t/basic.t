@@ -13,7 +13,68 @@ my %locale_codes = map { $_ => 1 } DateTime::Locale->codes;
 
 # These are locales that are missing native name data in the JSON source
 # files.
-my %is_locale_without_native_data = map { $_ => 1 } qw( nds nds-DE nds-NL );
+my %is_locale_without_native_data = map { $_ => 1 } qw(
+    aa
+    aa-DJ
+    aa-ER
+    aa-ET
+    apc
+    bm-Nkoo
+    bm-Nkoo-ML
+    byn
+    byn-ER
+    cad
+    cad-US
+    cu
+    cu-RU
+    dv
+    dv-MV
+    en-Shaw
+    en-Shaw-GB
+    gez
+    gez-ER
+    gez-ET
+    ha-Arab
+    ha-Arab-NG
+    ha-Arab-SD
+    iu
+    iu-CA
+    iu-Latn
+    iu-Latn-CA
+    la
+    la-VA
+    lmo
+    lmo-IT
+    mn-Mong
+    mn-Mong-CN
+    ms-Arab
+    ms-Arab-BN
+    ms-Arab-MY
+    nds
+    nds-DE
+    nds-NL
+    nmg
+    nr
+    nr-ZA
+    nso
+    oc
+    oc-ES
+    oc-FR
+    sid
+    sid-ET
+    tig
+    tig-ER
+    tn
+    tn-BW
+    ts
+    ts-ZA
+    ve
+    ve-ZA
+    vo
+    vo-001
+    wal
+    wal-ET
+);
 
 subtest( 'basic overall tests', \&basic_tests );
 for my $code (@locale_codes) {

@@ -3,19 +3,49 @@ Devel::CheckOS;
 
 use strict;
 use warnings;
+
 use Exporter;
+# if we're loading this from Makefile.PL, FFR might not yet be installed
+eval 'use File::Find::Rule';
+use File::Spec;
 
-use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
+use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '1.87';
+our $VERSION = '1.96';
 
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(os_is os_isnt die_if_os_is die_if_os_isnt die_unsupported list_platforms list_family_members);
+@EXPORT_OK = qw(
+    os_is os_isnt die_if_os_is die_if_os_isnt die_unsupported
+    list_platforms list_family_members register_alias
+);
 %EXPORT_TAGS = (
     all      => \@EXPORT_OK,
     booleans => [qw(os_is os_isnt die_unsupported)],
     fatal    => [qw(die_if_os_is die_if_os_isnt)]
 );
+
+# get a list of the .pm files under a list of dirs, or the empty list
+# in taint mode
+sub _find_pm_files_in_dirs {
+    my @files;
+    eval { @files = File::Find::Rule->file()->name('*.pm')->in(@_) };
+    return @files;
+}
+
+if(exists($INC{'File/Find/Rule.pm'})) {
+    foreach my $alias_module (
+        _find_pm_files_in_dirs(
+            grep { -d }
+            map { File::Spec->catdir($_, qw(Devel AssertOS Alias)) }
+            @INC
+        )
+    ) {
+        my(undef, undef, $file_part) = File::Spec->splitpath($alias_module);
+        $file_part =~ s/\.pm$//;
+        eval "use Devel::AssertOS::Alias::$file_part";
+        warn("Bad alias module 'Devel::AssertOS::Alias::$file_part' ignored\n") if($@);
+    }
+}
 
 =head1 NAME
 
@@ -51,8 +81,8 @@ the use-devel-assertos script.
 =head1 FUNCTIONS
 
 Devel::CheckOS implements the following functions, which load subsidiary
-OS-specific modules on demand to do the real work.  They can be exported
-by listing their names after C<use Devel::CheckOS>.  You can also export
+OS-specific modules on demand to do the real work. They can all be exported
+by listing their names after C<use Devel::CheckOS>. You can also export
 groups of functions thus:
 
     use Devel::CheckOS qw(:booleans); # export the boolean functions
@@ -60,7 +90,7 @@ groups of functions thus:
     
     use Devel::CheckOS qw(:fatal);    # export those that die on no match
 
-    use Devel::CheckOS qw(:all);      # export everything
+    use Devel::CheckOS qw(:all);      # export everything exportable
 
 =head2 Boolean functions
 
@@ -72,12 +102,36 @@ of OSes and OS families, eg ...
 
     os_is(qw(Unix VMS)); # Unix is a family, VMS is an OS
 
+Matching is case-insensitive provided that Taint-mode is not enabled, so the
+above could also be written:
+
+    os_is(qw(unix vms));
+
 =cut
 
 sub os_is {
     my @targets = @_;
     my $rval = 0;
-    foreach my $target (@targets) {
+
+    TARGET: foreach my $target (@targets) {
+        # resolve aliases
+        ALIAS: foreach my $alias (keys %OS_ALIASES) {
+            if($target =~ /^$alias$/i) {
+                $target = $OS_ALIASES{$alias};
+                last ALIAS;
+            }
+        }
+
+        # resolve case-insensitive names (no-op in taint-mode as list_platforms
+        # won't work)
+        my @available_platforms = list_platforms();
+        CANDIDATE: foreach my $candidate (@available_platforms) {
+            if($target =~ /^\Q$candidate\E$/i) {
+                $target = $candidate;
+                last CANDIDATE;
+            }
+        }
+
         die("Devel::CheckOS: $target isn't a legal OS name\n")
             unless($target =~ /^\w+(::\w+)*$/);
         eval "use Devel::AssertOS::$target";
@@ -91,8 +145,8 @@ sub os_is {
 
 =head3 os_isnt
 
-If the current platform matches any of the parameters it returns false,
-otherwise it returns true.
+If the current platform matches (case-insensitively) any of the parameters it
+returns false, otherwise it returns true.
 
 =cut
 
@@ -151,47 +205,39 @@ add-ons you have installed.
 
 In scalar context, returns a hashref keyed by platform with the filename
 of the most recent version of the supporting module that is available to you.
-This is to make sure that the use-devel-assertos script Does The Right Thing
-in the case where you have installed the module in one version of perl, then
-upgraded perl, and installed it again in the new version.  Sometimes the old
-version of perl and all its modules will still be hanging around and perl
-"helpfully" includes the old perl's search path in its own.
+This behaviour is deprecated.
 
 Unfortunately, on some platforms this list may have file case
 broken.  eg, some platforms might return 'freebsd' instead of 'FreeBSD'.
 This is because they have case-insensitive filesystems so things
 should Just Work anyway.
 
+This function does not work in taint-mode.
+
 =cut
 
-my ($re_Devel, $re_AssertOS);
+my $case_flag = File::Spec->case_tolerant ? '(?i)' : '';
+my $re_Devel    = qr/$case_flag ^Devel$/x;
+my $re_AssertOS = qr/$case_flag ^AssertOS$/x;
+my $re_Alias    = qr/$case_flag ^Alias\b/x;
 
 sub list_platforms {
-    # need to lazily load these cos the module gets use()d in Makefile.PL,
-    # at which point pre-reqs might not be installed. This function isn't
-    # used in Makefile.PL so we can live without 'em.
-    eval " # only load these if needed
-        use File::Find::Rule;
-        use File::Spec;
-    ";
-    die($@) if($@);
-    
-    if (!$re_Devel) {
-        my $case_flag = File::Spec->case_tolerant ? '(?i)' : '';
-        $re_Devel    = qr/$case_flag ^Devel$/x;
-        $re_AssertOS = qr/$case_flag ^AssertOS$/x;
-    }
-
-    # sort by mtime, so oldest last
+    # sort by mtime, so oldest last. This was necessary so that if a module
+    # appears twice in @INC we pick the newer one but that functionality is
+    # no longer needed. We do need to de-dupe the list though
     my @modules = sort {
         (stat($a->{file}))[9] <=> (stat($b->{file}))[9]
+    } grep {
+        $_->{module} !~ $re_Alias
     } map {
         my (undef, $dir_part, $file_part) = File::Spec->splitpath($_);
         $file_part =~ s/\.pm$//;
         my (@dirs) = grep {+length} File::Spec->splitdir($dir_part);
         foreach my $i (reverse 1..$#dirs) {
-            next unless $dirs[$i] =~ $re_AssertOS
-                && $dirs[$i - 1] =~ $re_Devel;
+            next unless(
+                $dirs[$i] =~ $re_AssertOS &&
+                $dirs[$i - 1] =~ $re_Devel
+            );;
             splice @dirs, 0, $i + 1;
             last;
         }
@@ -199,7 +245,7 @@ sub list_platforms {
             module => join('::', @dirs, $file_part),
             file   => File::Spec->canonpath($_)
         }
-    } File::Find::Rule->file()->name('*.pm')->in(
+    } _find_pm_files_in_dirs(
         grep { -d }
         map { File::Spec->catdir($_, qw(Devel AssertOS)) }
         @INC
@@ -212,6 +258,7 @@ sub list_platforms {
     if(wantarray()) {
         return sort keys %modules;
     } else {
+        warn("Calling list_platforms in scalar context and getting back a reference is deprecated and will go away some time after April 2024. To disable this warning set \$Devel::CheckOS::NoDeprecationWarnings::Context to a true value.\n") unless($Devel::CheckOS::NoDeprecationWarnings::Context);
         return \%modules;
     }
 }
@@ -235,9 +282,39 @@ sub list_family_members {
     # ... so we can now query it
     my @members = eval qq{
         no strict 'refs';
-	&{"Devel::AssertOS::${family}::matches"}()
+        &{"Devel::AssertOS::${family}::matches"}()
     };
-    return wantarray() ? @members : \@members;
+    if(wantarray()) {
+        return @members;
+    } else {
+        warn("Calling list_family_members in scalar context and getting back a reference is deprecated and will go away some time after April 2024. To disable this warning set \$Devel::CheckOS::NoDeprecationWarnings::Context to a true value.\n") unless($Devel::CheckOS::NoDeprecationWarnings::Context);
+        return \@members;
+    }
+}
+
+=head3 register_alias
+
+It takes two arguments, the first being an alias name, the second being the
+name of an OS. After the alias has been registered, any queries about the
+alias will return the appropriate result for the named OS.
+
+It returns true unless you invoke it incorrectly or you attempt to change
+an existing alias.
+
+Aliases don't work under taint-mode.
+
+See L<Devel::AssertOS::Extending>.
+
+=cut
+
+sub register_alias {
+    my($alias, $os) = @_;
+    ($alias && $os) || return 0;
+    if(!exists($OS_ALIASES{$alias}) || $OS_ALIASES{$alias} eq $os) {
+        return $OS_ALIASES{$alias} = $os;
+    } else {
+        return 0
+    }
 }
 
 =head1 PLATFORMS SUPPORTED
@@ -246,8 +323,7 @@ To see the list of platforms for which information is available, run this:
 
     perl -MDevel::CheckOS -e 'print join(", ", Devel::CheckOS::list_platforms())'
 
-Note that capitalisation is important.  These are the names of the
-underlying Devel::AssertOS::* modules
+These are the names of the underlying Devel::AssertOS::* modules
 which do the actual platform detection, so they have to
 be 'legal' filenames and module names, which unfortunately precludes
 funny characters, so platforms like OS/2 are mis-spelt deliberately.
@@ -273,6 +349,19 @@ if relevant, what "OS family" it should be in and who wrote it.
 If you are feeling particularly generous you can encourage me in my
 open source endeavours by buying me something from my wishlist:
   L<http://www.cantrell.org.uk/david/wishlist/>
+
+=head1 COMPATIBILITY
+
+Version 1.90 made all matches case-insensitive. This is a change in behaviour, but
+if it breaks your code then your code was already broken, you just didn't know it.
+
+=head1 DEPRECATIONS
+
+At some point after April 2024 the C<list_family_members> and C<list_platforms>
+functions will stop being sensitive to whether they are called in list context or
+not, and will always return a list. From now until then calling them in non-list
+context will emit a warning. You can turn that off by setting
+C<$Devel::CheckOS::NoDeprecationWarnings::Context> to a true value.
 
 =head1 SEE ALSO
 
@@ -326,7 +415,7 @@ L<git://github.com/DrHyde/perl-modules-Devel-CheckOS.git>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2007-2020 David Cantrell
+Copyright 2023 David Cantrell
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

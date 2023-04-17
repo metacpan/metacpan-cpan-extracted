@@ -30,9 +30,11 @@ Lexical category: Q1084
 Statements:
   P5185: Q499327 (normal)
   References:
-    P248: Q53919
-    P214: 113230702
-    P813: 07 December 2013 (Q1985727)
+    {
+      P248: Q53919
+      P214: 113230702
+      P813: 07 December 2013 (Q1985727)
+    }
 Senses:
   Id: L469-S1
   Glosses:

@@ -11,7 +11,7 @@ use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 sub new {
 	my $class = shift;
@@ -292,6 +292,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

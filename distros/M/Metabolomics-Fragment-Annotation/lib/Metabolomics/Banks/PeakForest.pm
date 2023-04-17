@@ -530,7 +530,7 @@ sub _getGcmsSpectraByMatchingPeaks {
     my $oSpectra = [] ;
     my @spectraIds = () ; ## aggregate all matched spectra ids
     
-    my $api_client = PeakForest::REST_Client::ChromatographyApi->new(api_key => {'token' => $self->{_DATABASE_TOKEN_}}, 'base_url' => $self->{_DATABASE_URL_}) ;
+    my $api_client = PeakForest::REST_Client::SpectraApi->new(api_key => {'token' => $self->{_DATABASE_TOKEN_}}, 'base_url' => $self->{_DATABASE_URL_}) ;
 #    my $mzs_string = join(',', @{$list_mzs}) ;
     if ( ( defined $list_mzs ) and $list_mzs > 0  ) {
     	print "\tImported peak list is not null \n" ;

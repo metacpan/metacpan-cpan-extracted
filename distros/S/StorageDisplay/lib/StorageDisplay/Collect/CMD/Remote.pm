@@ -14,7 +14,7 @@ use 5.14.0;
 
 package StorageDisplay::Collect::CMD::Remote;
 # ABSTRACT: Collect data on remote machine with SSH
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 use StorageDisplay::Collect;
@@ -83,7 +83,7 @@ StorageDisplay::Collect::CMD::Remote - Collect data on remote machine with SSH
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 Commands to collect data for StorageDisplay are run through SSH
 

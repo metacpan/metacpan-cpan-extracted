@@ -1,3 +1,9 @@
+0.03 2023-04-15T18:41:40+02:00
+ - Add P180.
+ - Add tests for get().
+ - Add tests for save().
+ - Update copyright years.
+
 0.02 2023-04-13T09:26:32+02:00
  - Fix dependency to Wikibase::Cache::Backend.
  - Fix error message.

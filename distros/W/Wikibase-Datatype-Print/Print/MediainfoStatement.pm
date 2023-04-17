@@ -6,11 +6,13 @@ use warnings;
 
 use Error::Pure qw(err);
 use Readonly;
+use Wikibase::Datatype::Print::Reference;
 use Wikibase::Datatype::Print::MediainfoSnak;
+use Wikibase::Datatype::Print::Utils qw(print_references);
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.04;
+our $VERSION = 0.07;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -25,6 +27,10 @@ sub print {
 	foreach my $property_snak (@{$obj->property_snaks}) {
 		push @ret, ' '.Wikibase::Datatype::Print::MediainfoSnak::print($property_snak, $opts_hr);
 	}
+
+	# References.
+	push @ret, print_references($obj, $opts_hr,
+		\&Wikibase::Datatype::Print::Reference::print);
 
 	return wantarray ? @ret : (join "\n", @ret);
 }

@@ -10,7 +10,7 @@ use English qw(-no_match_vars);
 
 use JIP::Spy::Event;
 
-our $VERSION = version->declare('v0.0.2');
+our $VERSION = version->declare('v0.0.3');
 our $AUTOLOAD;
 
 sub new {
@@ -180,11 +180,11 @@ __END__
 
 =head1 NAME
 
-JIP::Spy::Events
+JIP::Spy::Events - the most basic function spy ability
 
 =head1 VERSION
 
-This document describes L<JIP::Spy::Events> version C<v0.0.2>.
+This document describes L<JIP::Spy::Events> version C<v0.0.3>.
 
 =head1 SYNOPSIS
 
@@ -276,19 +276,27 @@ L<JIP::Spy::Events> implements the following attributes.
 
 =head2 events
 
-    $spy_events->events();
+    $arrayref = $spy_events->events();
+
+Returns an array of all the calls to the spied module.
 
 =head2 times
 
-    $spy_events->times();
+    $hashref = $spy_events->times();
+
+Returns a hash where keys are method names, and values are the number of times the method has been called.
 
 =head2 want_array
 
-    $spy_events->want_array(); # undef/1/q{}
+    $bool = $spy_events->want_array(); # undef/1/q{}
+
+Track (or not track) invocation context. Disabled by default.
 
 =head2 on_spy_event
 
-    $spy_events->on_spy_event();
+    $spy_events->on_spy_event( name => sub {...} );
+
+Declare one or more subroutines in the spied module.
 
 =head1 SUBROUTINES/METHODS
 
@@ -306,6 +314,10 @@ Build new L<JIP::Spy::Events> object.
 
 None.
 
+=head1 DEPENDENCIES
+
+Perl 5.10.1 or later.
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 L<JIP::Spy::Events> requires no configuration files or environment variables.
@@ -320,7 +332,7 @@ Volodymyr Zhavoronkov, C<< <flyweight at yandex dot ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Vladimir Zhavoronkov.
+Copyright (c) 2019-2023 Volodymyr Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

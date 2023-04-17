@@ -33,7 +33,7 @@ sub set {
     $space->{$symbol} = $value;
     return ref($space) eq 'HASH'
         ? $symbol
-        : symbol($space->name . "/$symbol");
+        : symbol($space->NAME . "/$symbol");
 }
 
 sub get {
@@ -48,7 +48,7 @@ sub get {
             return $value;
         }
         if (ref($ns) ne 'HASH') {
-            if (my $refer_ns_map = $Lingy::RT::refer{$ns->name}) {
+            if (my $refer_ns_map = $Lingy::RT::refer{$ns->NAME}) {
                 if (my $refer_ns_name = $refer_ns_map->{$symbol}) {
                     if (my $refer_ns = $Lingy::RT::ns{$refer_ns_name}) {
                         if (defined(my $value = $refer_ns->{$symbol})) {
@@ -61,6 +61,10 @@ sub get {
         $self = $self->{outer};
     }
 
+    if (my $class = $Lingy::RT::class{"$symbol"}) {
+        return $class;
+    }
+
     return if $optional;
 
     err "Unable to resolve symbol: '$symbol' in this context";
@@ -71,15 +75,20 @@ sub get_qualified {
 
     $symbol =~ m{^(.*)/(.*)$} or die;
     my $space_name = $1;
+    my $symbol_name = $2;
+
+    if (my $class = $Lingy::RT::class{$space_name}) {
+        return \&{"${class}::$symbol_name"};
+    }
+
     my $ns = $Lingy::RT::ns{$space_name}
         or err "No such namespace: '$space_name'";
-    my $symbol_name = $2;
 
     if (defined(my $value = $ns->{$symbol_name})) {
         return $value;
     }
     if (ref($ns) ne 'HASH') {
-        if (my $refer_ns_map = $Lingy::RT::refer{$ns->name}) {
+        if (my $refer_ns_map = $Lingy::RT::refer{$ns->NAME}) {
             if (my $refer_ns_name = $refer_ns_map->{$symbol_name}) {
                 if (my $refer_ns = $Lingy::RT::ns{$refer_ns_name}) {
                     if (defined(my $value = $refer_ns->{$symbol_name})) {

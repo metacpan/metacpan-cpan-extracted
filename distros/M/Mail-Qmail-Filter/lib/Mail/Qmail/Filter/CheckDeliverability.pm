@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::CheckDeliverability;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Mo qw(coerce default);
 extends 'Mail::Qmail::Filter';
@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-Mail::Qmail::Filter::CheckDeliverabilty - 
+Mail::Qmail::Filter::CheckDeliverabilty -
 check deliverability according to .qmail files
 
 =head1 SYNOPSIS

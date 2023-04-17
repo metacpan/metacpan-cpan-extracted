@@ -1,0 +1,68 @@
+
+[![Windows](https://github.com/Corion/MooX-Role-EventEmitter/workflows/windows/badge.svg)](https://github.com/Corion/MooX-Role-EventEmitter/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/MooX-Role-EventEmitter/workflows/macos/badge.svg)](https://github.com/Corion/MooX-Role-EventEmitter/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/MooX-Role-EventEmitter/workflows/linux/badge.svg)](https://github.com/Corion/MooX-Role-EventEmitter/actions?query=workflow%3Alinux)
+
+# NAME
+
+MooX::Role::EventEmitter - Event emitter role
+
+# SYNOPSIS
+
+    package My::Thing;
+    use 5.020;
+    use feature 'signatures';
+    no warnings 'experimental::signatures';
+    use Moo 2;
+    with 'MooX::Role::EventEmitter';
+
+    sub event_received( $self, $ev ) {
+        $self->emit( myevent => $ev );
+    }
+
+    # ... later, in your client
+
+    package main;
+    my $foo = My::Thing->new();
+    $foo->on( myevent => sub( $ev ) {
+        say "I receivend an event";
+    });
+
+# METHODS
+
+## `$obj->emit $name, @args`
+
+Emit an event
+
+## `$obj->has_subscribers $name`
+
+Check if an event has subscribers.
+
+## `$obj->on $name, @args`
+
+    my $cb = $obj->on( myevent => sub { ... });
+
+Subscribe to an event.
+
+## `$obj->once $name, @args`
+
+    my $cb = $obj->once( myevent => sub { ... });
+
+Subscribe to an event for just one event.
+
+## `$obj->subscribers( $name )`
+
+    my $s = $obj->subscribers( 'myevent' );
+
+Return an arrayref of the subscribers for an event.
+
+## `$obj->unsubscribe( $name => $cb )`
+
+    $obj->unsubscribe('myevent', $cb); # a specific callback
+    $obj->unsubscribe('myevent');      # all callbacks
+
+Unsubscribe from event.
+
+# SEE ALSO
+
+[Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter) - the module this API is based on

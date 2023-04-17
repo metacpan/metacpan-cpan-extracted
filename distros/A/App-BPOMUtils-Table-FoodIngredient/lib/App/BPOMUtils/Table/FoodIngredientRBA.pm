@@ -12,10 +12,10 @@ use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-02-13'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our @EXPORT_OK = qw(
-                       bpom_list_food_ingredients
+                       bpom_list_food_ingredients_rba
                );
 
 our %SPEC;
@@ -7878,7 +7878,7 @@ App::BPOMUtils::Table::FoodIngredientRBA - List ingredients in BPOM processed fo
 
 =head1 VERSION
 
-This document describes version 0.018 of App::BPOMUtils::Table::FoodIngredientRBA (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
+This document describes version 0.019 of App::BPOMUtils::Table::FoodIngredientRBA (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
 
 =head1 FUNCTIONS
 
@@ -7891,7 +7891,7 @@ Usage:
 
 List ingredients in BPOM processed food division (RBA version).
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 

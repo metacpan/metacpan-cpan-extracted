@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Pod;
 
+## no critic
+eval 'use Test::Pod';
+plan skip_all => "Test::Pod required to check files." if $@;
 all_pod_files_ok();
 
 done_testing;
-

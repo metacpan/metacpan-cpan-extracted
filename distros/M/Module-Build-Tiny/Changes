@@ -1,5 +1,13 @@
 Revision history for Module::Build::Tiny
 
+0.041     2023-04-17 16:03:06+02:00 Europe/Amsterdam
+          - Released without changes from 0.040
+
+0.040     2023-02-05 23:06:28+01:00 Europe/Amsterdam (TRIAL RELEASE)
+          - Manify .pod after .pm
+          - Filter out script documentation from scripts
+          - Don't manify podless modules/scripts
+
 0.039     2014-10-12 10:38:39+02:00 Europe/Amsterdam
           Supply basename to *.PL files as its args
 

@@ -1,14 +1,13 @@
-Table2XML version 1.41
+Table2XML version 1.42
 ======================
 
 table2xml is an algorithm having two functions that allow the conversion of tabular data to XML
 without using XSLT. This is achieved by reverting the "Flattener" methodology used by Microsoft Excel
-to convert the XML tree format to a two-dimensional table
-(see Opening XML Files in Excel and INFO: Microsoft Excel 2002 and XML).
+to convert the XML tree format to a two-dimensional table (for more details on this see the REFERENCE section).
 
 This reversion is achieved by:
 
-1. (possibly) modifying the flattened table a bit to enable a simpler processing of the data,
+1. (if needed) modifying the flattened table a bit to enable a simpler processing of the data,
 
 2. sequentially processing the data column- and row wise. 
 

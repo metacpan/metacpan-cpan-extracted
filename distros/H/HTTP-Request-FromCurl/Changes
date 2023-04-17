@@ -1,3 +1,10 @@
+0.48 2023-04-16
+    * Add the missing SKIP: label needed when Mojolicious is missing for the test
+    * No code changes, no need to upgrade
+
+0.47 2023-04-14
+    * Support Mojolicious as output type
+
 0.46 2022-08-18
     * Fix the test suite for machines where 'localhost' does not find our
       local testing webserver

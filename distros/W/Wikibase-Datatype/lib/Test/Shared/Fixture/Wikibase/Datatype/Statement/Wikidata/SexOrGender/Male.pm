@@ -4,10 +4,11 @@ use base qw(Wikibase::Datatype::Statement);
 use strict;
 use warnings;
 
+use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL;
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::SexOrGender::Male;
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 sub new {
 	my $class = shift;
@@ -15,6 +16,7 @@ sub new {
 	my @params = (
 		'snak' => Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::SexOrGender::Male->new,
 		'references' => [
+			Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL->new,
 			Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF->new,
 		],
 	);

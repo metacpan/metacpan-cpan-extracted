@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Hash::Ordered" : "0.014"
+         }
       }
    },
    "release_status" : "stable",
@@ -46,6 +48,6 @@
          "web" : "https://github.com/markov2/perl5-User-Identity"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

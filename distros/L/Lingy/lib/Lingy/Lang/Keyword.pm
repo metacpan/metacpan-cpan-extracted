@@ -1,8 +1,7 @@
+use strict; use warnings;
 package Lingy::Lang::Keyword;
 
-use Lingy::Base 'Scalar';
-
-use constant lingy_class => 'host.lang.Keyword';
+use base 'Lingy::Lang::ScalarClass';
 
 sub new {
     my ($class, $scalar) = @_;

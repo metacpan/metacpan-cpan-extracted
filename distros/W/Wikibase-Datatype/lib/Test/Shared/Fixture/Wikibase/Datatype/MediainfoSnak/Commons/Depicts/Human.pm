@@ -6,13 +6,12 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::DouglasAdams;
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 sub new {
 	my $class = shift;
 
 	my @params = (
-		'datatype' => 'wikibase-item',
 		'datavalue' => Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::DouglasAdams->new,
 		'property' => 'P180',
 	);

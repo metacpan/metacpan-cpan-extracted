@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.04;
+our $VERSION = 0.07;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -18,8 +18,8 @@ sub print {
 		err "Object isn't 'Wikibase::Datatype::Value::Item'.";
 	}
 
-	if (exists $opts_hr->{'cb'} && ! $opts_hr->{'cb'}->isa('Wikibase::Cache::Backend')) {
-		err "Option 'cb' must be a instance of Wikibase::Cache::Backend.";
+	if (exists $opts_hr->{'cb'} && ! $opts_hr->{'cb'}->isa('Wikibase::Cache')) {
+		err "Option 'cb' must be a instance of Wikibase::Cache.";
 	}
 
 	my $item;
@@ -65,7 +65,7 @@ Returns string.
 
  print():
          Object isn't 'Wikibase::Datatype::Value::Item'.
-         Option 'cb' must be a instance of Wikibase::Cache::Backend.
+         Option 'cb' must be a instance of Wikibase::Cache.
 
 =head1 EXAMPLE
 
@@ -122,6 +122,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.07
 
 =cut

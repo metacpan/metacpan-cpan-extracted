@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.46';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -409,6 +409,24 @@ sub _init_cookie_jar_tiny( $self ) {
     }
 }
 
+sub _init_cookie_jar_mojolicious( $self ) {
+    if( my $fn = $self->cookie_jar ) {
+        my $save = $self->cookie_jar_options->{'write'};
+        return {
+            preamble => [
+            #    "use Path::Tiny;",
+                "use Mojo::UserAgent::CookieJar;",
+            ],
+            code => \"Mojo::UserAgent::CookieJar->new,",
+            postamble => [
+            #$save ?
+            #      ("path('$fn')->spew(\$ua->cookie_jar->dump_cookies())")
+            #    : (),
+            ],
+        };
+    }
+}
+
 sub _pairlist( $self, $l, $prefix = "    " ) {
     return join ",\n",
         pairmap { my $v = ! ref $b ? qq{'$b'}
@@ -443,6 +461,40 @@ sub _build_tiny_headers( $self, $prefix = "    ", %options ) {
     $self->_pairlist( \@result, $prefix );
 }
 
+sub _build_mojolicious_headers( $self, $prefix = "    ", %options ) {
+    # This is so we create the standard header order in our output
+    my @h = $self->_explode_headers;
+    my $h = HTTP::Headers->new( @h );
+    $h->remove_header( @{$options{implicit_headers}} );
+
+    # also skip the Host: header if it derives from $uri
+    my $val = $h->header('Host');
+    if( $val and ($val eq $self->uri->host_port
+                  or $val eq $self->uri->host   )) {
+                        # trivial host header
+        $h->remove_header('Host');
+    };
+
+    @h = $h->flatten;
+    my %h;
+    my @order;
+    while( @h ) {
+        my ($k,$v) = splice(@h,0,2);
+        if( ! exists $h{ $k }) {
+            # Fresh value
+            $h{ $k } = $v;
+            push @order, $k;
+        } elsif( ! ref $h{$k}) {
+            # Second value
+            $h{ $k } = [$h{$k}, $v];
+        } else {
+            # Multiple values
+            push @{$h{ $k }}, $v;
+        }
+    };
+
+    $self->_pairlist([ map { $_ => $h{ $_ } } @order ], $prefix);
+}
 
 =head2 C<< $r->as_snippet( %options ) >>
 
@@ -468,7 +520,8 @@ Convenient values are ['Content-Length']
 
     type => 'Tiny',
 
-Type of snippet. Valid values are C<LWP> for L<LWP::UserAgent>
+Type of snippet. Valid values are C<LWP> for L<LWP::UserAgent>,
+C<Mojolicious> for L<Mojolicious::UserAgent>
 and C<Tiny> for L<HTTP::Tiny>.
 
 =back
@@ -481,6 +534,8 @@ sub as_snippet( $self, %options ) {
         $self->as_lwp_snippet( %options )
     } elsif( 'Tiny' eq $type ) {
         $self->as_http_tiny_snippet( %options )
+    } elsif( 'Mojolicious' eq $type ) {
+        $self->as_mojolicious_snippet( %options )
     } else {
         croak "Unknown type '$type'.";
     }
@@ -650,6 +705,91 @@ sub as_http_tiny_snippet( $self, %options ) {
           @content
         },
     );
+@postamble
+SNIPPET
+};
+
+sub as_mojolicious_snippet( $self, %options ) {
+    $options{ prefix } ||= '';
+    $options{ implicit_headers } ||= [];
+
+    my @preamble;
+    my @postamble;
+    my %ssl_options;
+    push @preamble, @{ $options{ preamble } } if $options{ preamble };
+    push @postamble, @{ $options{ postamble } } if $options{ postamble };
+    my @setup_ua = ('');
+
+    my $request_args = join ", ",
+                                 '$r',
+                           $self->_pairlist([
+                               maybe ':content_file', $self->output
+                           ], '')
+                       ;
+    my $init_cookie_jar = $self->_init_cookie_jar_mojolicious();
+    if( my $p = $init_cookie_jar->{preamble}) {
+        push @preamble, @{$p}
+    };
+
+    my @ssl;
+    if( $self->insecure ) {
+        push @ssl, insecure => 1,
+    };
+    if( $self->cert ) {
+        push @ssl, cert => $self->cert,
+    };
+    if( $self->show_error ) {
+        push @postamble,
+            '    die $res->message if $res->is_error;',
+    } elsif( $self->fail ) {
+        push @postamble,
+            '    exit 1 if !$res->is_error;',
+    };
+    my $socket_options = {};
+    if( my $host = $self->local_address ) {
+        $socket_options->{ LocalAddr } = $host;
+    }
+    my $constructor_args = join ",",
+                           $self->_pairlist([
+                                     @ssl,
+                                     keys %$socket_options ? $socket_options : (),
+                               maybe request_timeout    => $self->timeout,
+                               maybe local_address => $self->local_address,
+                               maybe cookie_jar    => $init_cookie_jar->{code},
+                               maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
+                           ], '')
+                           ;
+    if( defined( my $credentials = $self->credentials )) {
+        my( $user, $pass ) = split /:/, $credentials, 2;
+        my $setup_credentials = sprintf qq{\$ua->userinfo("%s","%s");},
+            quotemeta $user,
+            quotemeta $pass;
+        push @setup_ua, $setup_credentials;
+    };
+
+    @setup_ua = ()
+        if @setup_ua == 1;
+
+    @preamble = map { "$options{prefix}    $_\n" } @preamble;
+    @postamble = map { "$options{prefix}    $_\n" } @postamble;
+    @setup_ua = map { "$options{prefix}    $_\n" } @setup_ua;
+
+    my $content = $self->_build_quoted_body();
+    #if( $content ) {
+    #    $content = qq{"} . quotemeta($content) . qq{"};
+    #};
+
+    return <<SNIPPET;
+@preamble
+    my \$ua = Mojo::UserAgent->new($constructor_args);@setup_ua
+    my \$tx = \$ua->build_tx(
+        '@{[$self->method]}' => '@{[$self->uri]}',
+        {
+@{[$self->_build_mojolicious_headers('            ', %options)]}
+        },
+        $content
+    );
+    my \$res = \$ua->start(\$tx)->result;
 @postamble
 SNIPPET
 };
@@ -868,7 +1008,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2023 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -1,5 +1,9 @@
 Revision history for Perl module Time::Progress
 
+2.14 2023-04-14 CADE
+  - added %s for calculating total speed (items per second)
+  - added %S for reporting min/max speed (after first 1%)
+
 2.12 2017-03-27 NIGELM
   - fixed div-by-zero when smoothing
 

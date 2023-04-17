@@ -1,3 +1,31 @@
+0.07 2023-04-17T11:50:54+02:00
+ - Add doc for Wikibase::Datatype::Print::MediainfoSnak.
+ - Add doc for Wikibase::Datatype::Print::Snak.
+ - Add doc for Wikibase::Datatype::Print::Statement.
+ - Add references to MediainfoStatement.
+ - Fix dependencies.
+ - Fix printing of multiple references. Each reference is in '{' and '}'
+   block.
+ - Fix test dependencies.
+ - Remove non-sense test dependency to Wikibase::Datatype.
+ - Remove obsolete dependencies in Wikibase::Datatype::Print::Sitelink.
+
+0.06 2023-04-15T18:46:48+02:00
+ - Add doc for Wikibase::Datatype::Print::Sitelink.
+ - Add tests for Wikibase::Datatype::Print::MediainfoSnak.
+ - Fix bad object creating in Wikibase::Datatype::MediainfoSnak tests.
+ - Remove two doc TODOs in Wikibase::Datatype::Print.
+
+0.05 2023-04-15T00:49:16+02:00
+ - Add doc for Wikibase::Datatype::Print::Utils.
+ - Add doc for Wikibase::Datatype::Print::Value.
+ - Add error for bad snaktype to Snak and MediainfoSnak classes.
+ - Add tests for MediainfoSnak.
+ - Fix test requirements.
+ - Fix usage of Wikibase::Cache. Not use backend directly.
+ - Improve variables names in Wikibase::Datatype::Print::Utils.
+ - Sort subroutines in Wikibase::Datatype::Print::Utils.
+
 0.04 2023-04-11T22:08:03+02:00
  - Add doc for Wikibase::Datatype::Print::Value::Quantity.
  - Add doc for Wikibase::Datatype::Print::Value::String.

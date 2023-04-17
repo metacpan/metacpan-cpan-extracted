@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Data::LVM;
 # ABSTRACT: Handle LVM data for StorageDisplay
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 1;
 
@@ -130,6 +130,11 @@ sub BUILD {
 				$self, $st, $args->{'lvm-info'}));
     return $self;
 };
+
+sub dotLabel {
+    my $self = shift;
+    return ('LVM: unassigned PVs');
+}
 
 1;
 
@@ -385,7 +390,7 @@ sub BUILD {
     my $self=shift;
     my $args=shift;
     foreach my $pv_name (sort map { $_->{'pv_name'} } @{$args->{'lvm-info'}->{'pvs'}}) {
-        $self->newChild('LVM::UnassignedPVs::PV', $pv_name, $self->vg,
+        $self->newChild('LVM::VG::PVs::PV', $pv_name, $self->vg,
 			$args->{st}, $args->{'lvm-info'});
     }
     return $self;
@@ -580,7 +585,7 @@ StorageDisplay::Data::LVM - Handle LVM data for StorageDisplay
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 AUTHOR
 

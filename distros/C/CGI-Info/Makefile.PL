@@ -13,12 +13,12 @@ WriteMakefile(
 	NAME		=> 'CGI::Info',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/CGI/Info.pm',
-	ABSTRACT_FROM	   => 'lib/CGI/Info.pm',
+	ABSTRACT_FROM	=> 'lib/CGI/Info.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
-	'LIBS' => [''],   # e.g., '-lm'
+	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
@@ -27,7 +27,6 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::Exception' => 0.42,
-		'Test::Requires' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Script' => 1.12,

@@ -21,7 +21,9 @@ use Khonsu::Text::H6;
 
 use Khonsu::Image;
 
-use Types::Standard qw/Str Object ArrayRef HashRef Num Bool/;
+use Khonsu::TOC;
+
+use Types::Standard qw/Str Object ArrayRef HashRef Num Bool CodeRef/;
 
 use constant RW => (is => 'rw');
 use constant REQ => (required => 1);
@@ -33,6 +35,7 @@ use constant HR => (isa => HashRef);
 use constant DAR => (isa => ArrayRef, default => sub { [ ] });
 use constant DHR => (isa => HashRef, default => sub { { } });
 use constant NUM => (isa => Num);
+use constant CODE => (isa => CodeRef);
 use constant POINTS => (
 	x => {is => 'rw', isa => Num},
 	y => {is => 'rw', isa => Num},
@@ -81,15 +84,16 @@ use constant H6 => (
 use constant IMAGE => (
 	image => {is => 'rw', isa => Object, default => sub { Khonsu::Image->new() }}
 );
+use constant TOC => (
+	toc => {is => 'rw', isa => Object, default => sub { Khonsu::TOC->new() }}
+);
 sub new {
 	my ($pkg, %params) = @_;
 
 	my $self = bless {
 		attributes => {}
 	}, $pkg;
-
 	my @attributes = $self->attributes();
-
 	for (my $i = 0; $i < $#attributes; $i += 2) {
 		my ($key, $value) = ($attributes[$i], $attributes[$i + 1]);
 		$self->{attributes}->{$key} = $value->{is} eq 'ro' ? sub { $_[0]->{$key}; } : sub {
@@ -111,7 +115,7 @@ sub new {
 			$params{$key} = $value->{default}->($self);
 		}
 
-		if ($params{$key}) {
+		if (defined $params{$key}) {
 			if ($value->{isa}) {
 				$params{$key} = $value->{isa}->($params{$key});
 			}

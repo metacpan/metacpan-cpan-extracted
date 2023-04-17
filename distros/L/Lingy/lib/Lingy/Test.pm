@@ -8,10 +8,10 @@ use Test::More;
 use Lingy::RT;
 use Lingy::Common;
 
-use Capture::Tiny 'capture';
+use Capture::Tiny qw'capture capture_merged';
 use File::Temp 'tempfile';
 
-use lib './test/lib', './t/lib';
+use lib 'lib', './test/lib', './t/lib';
 
 symlink 't', 'test' if -d 't' and not -e 'test';
 
@@ -24,6 +24,11 @@ our $lingy =
     -f './bin/lingy' ? './bin/lingy' :
     die "Can't find 'lingy' bin script to test";
 
+our $eg =
+    -d 'eg' ? 'eg' :
+    -d 'example' ? 'example' :
+    die "Can't find eg/example directory";
+
 our @EXPORT = qw<
     done_testing
     is
@@ -32,12 +37,15 @@ our @EXPORT = qw<
     pass
     plan
     subtest
+    use_ok
 
     capture
+    capture_merged
     tempfile
 
     $lingy
     $rt
+    $eg
 
     rep
     run_is

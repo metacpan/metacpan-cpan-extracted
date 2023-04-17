@@ -65,7 +65,7 @@ May be a string or a subroutine which returns the text.
 The subroutine may access the problematic address as its first argument.
 
 Default:
-  
+
     sub { "Invalid e-mail address <$_[0]> in From header line" };
 
 =head1 SEE ALSO

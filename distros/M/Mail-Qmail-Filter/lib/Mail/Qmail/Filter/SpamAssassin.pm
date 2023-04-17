@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter::SpamAssassin;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use Mo qw(coerce default);
 extends 'Mail::Qmail::Filter';
@@ -33,7 +33,7 @@ sub filter {
             $self->debug( 'dumped message to' => $file );
             path( $dir, $file . '_report' )->spew( $status->get_report );
         }
-        $self->reject( $self->reject_text =~ y/\n/ /r )
+        $self->reject( $self->reject_text )
           if $self->reject_score && $score >= $self->reject_score;
         $$body_ref = $status->rewrite_mail if $self->mark;
     }
@@ -73,10 +73,10 @@ is probably spam.
 
 If the message is spam, copy it into a file in the given directory.
 The file will be named 
-C<E<lt>epoch_time_when_script_startedE<gt>_E<lt>pidE<gt>_E<lt>spam_score<gt>>
+C<E<lt>epoch_time_when_script_startedE<gt>_E<lt>pidE<gt>_E<lt>spam_scoreE<gt>>
 
 A spam report will be written to another file named
-C<E<lt>epoch_time_when_script_startedE<gt>_E<lt>pidE<gt>_E<lt>spam_score<gt>_report>
+C<E<lt>epoch_time_when_script_startedE<gt>_E<lt>pidE<gt>_E<lt>spam_scoreE<gt>_report>
 
 =head2 mark
 

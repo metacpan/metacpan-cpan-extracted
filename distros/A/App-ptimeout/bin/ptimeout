@@ -46,6 +46,8 @@ This does not reliably kill child processes in all circumstances.
 
 =head1 BUGS
 
+Doesn't work properly on OpenBSD and I have no idea why.
+
 Please report any bugs you find on Github:
 
 L<https://github.com/DrHyde/perl-modules-App-ptimeout/issues>
@@ -56,7 +58,7 @@ L<git://github.com/DrHyde/perl-modules-App-ptimeout.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2021 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

@@ -426,6 +426,9 @@ sub _build_source_data_root ($self) {
     return $self->_generator_script->parent->parent->child(qw( source-data ));
 }
 
+# apc has no English name.
+my %IncompleteLocales = map { $_ => 1 } qw( apc );
+
 sub _build_locale_codes ($self) {
 
     # We need to have en-US available so we can build a DateTime.pm object.
@@ -443,7 +446,7 @@ sub _build_locale_codes ($self) {
             ->slurp_raw );
 
     return [
-        $avail->{availableLocales}{full}->@*,
+        grep { !$IncompleteLocales{$_} } $avail->{availableLocales}{full}->@*,
         $default->{defaultContent}->@*
     ];
 }

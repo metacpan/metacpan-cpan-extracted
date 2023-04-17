@@ -223,8 +223,8 @@
   ],
   name => "Tachelhit Tifinagh",
   native_language => "\N{U+2d5c}\N{U+2d30}\N{U+2d5b}\N{U+2d4d}\N{U+2d43}\N{U+2d49}\N{U+2d5c}",
-  native_name => "\N{U+2d5c}\N{U+2d30}\N{U+2d5b}\N{U+2d4d}\N{U+2d43}\N{U+2d49}\N{U+2d5c} Tfng",
-  native_script => "Tfng",
+  native_name => "\N{U+2d5c}\N{U+2d30}\N{U+2d5b}\N{U+2d4d}\N{U+2d43}\N{U+2d49}\N{U+2d5c}",
+  native_script => undef,
   native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

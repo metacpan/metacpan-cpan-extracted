@@ -6,6 +6,7 @@
 \.o$
 \.old$
 \.cvsignore$
+\bMYMETA\.
 \bCVS\b
 ^pm_to_blib$
 ^blib

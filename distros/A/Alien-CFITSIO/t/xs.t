@@ -10,10 +10,11 @@ my $xs = do { local $/; <DATA> };
 xs_ok { xs => $xs, verbose => 1 }, with_subtest {
     my ( $module ) = @_;
     my $stash      = Package::Stash->new( $module );
-    my $version    = $stash->get_symbol( '&fits_get_version' )->();
-    $version = int( $version * 10000 ) / 10000;
-    my $expected = Alien::CFITSIO::CFITSIO_VERSION;
 
+    # MAJOR + .01 * MINOR + 0.0001 * MICRO
+    # where MINOR < 100, MAJOR < 100
+    my $version = sprintf( "%-8.4f", $stash->get_symbol( '&fits_get_version' )->() );
+    my $expected = Alien::CFITSIO::CFITSIO_VERSION;
     ok( $version >= $expected, "Version >= $expected" )
       or note( "Got Version = $version" );
 };

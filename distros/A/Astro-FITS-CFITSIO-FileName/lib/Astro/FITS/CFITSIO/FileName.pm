@@ -7,7 +7,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Types::Standard        qw[ Str ArrayRef StrMatch Enum Bool Optional Dict ];
 use Types::Common::Numeric qw[ PositiveOrZeroInt PositiveInt ];
@@ -808,6 +808,18 @@ sub _build_filename ( $self ) {
 
 
 
+sub is_compressed ( $self ) {
+    return $self->base_filename =~ /[.]gz$/i;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -854,7 +866,7 @@ Astro::FITS::CFITSIO::FileName - parse and generate CFITSIO extended file names.
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -1269,6 +1281,12 @@ to construct an extended syntax CFITSIO filename.  For example,
 might return
 
   [extname, 2]
+
+=head2 is_compressed
+
+  $bool = $file->is_compressed.
+
+Returns true if the filename ends in C<.gz>.
 
 =head2 to_hash (deprecated)
 

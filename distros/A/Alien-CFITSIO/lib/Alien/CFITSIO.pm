@@ -7,9 +7,9 @@ use warnings;
 
 use base qw( Alien::Base );
 
-our $VERSION = 'v4.1.0.5';
+our $VERSION = 'v4.2.0.0';
 use constant
-  CFITSIO_VERSION => 4.01;
+  CFITSIO_VERSION => 4.02;
 
   1;
 
@@ -35,7 +35,7 @@ Alien::CFITSIO - Build and Install the CFITSIO library
 
 =head1 VERSION
 
-version v4.1.0.5
+version v4.2.0.0
 
 =head1 SYNOPSIS
 

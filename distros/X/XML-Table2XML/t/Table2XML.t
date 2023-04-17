@@ -75,19 +75,19 @@ for my $testfilename (@xmltests) {
 	for my $lineData (@datarows) {
 		$testXML.=addXMLLine($lineData);
 	}
-	#finally finish the XML and reset the static vars
+	# finally finish the XML and reset the static vars
 	$testXML.=addXMLLine(undef);
-	is_xml($expectedXML,$testXML, "XML comparison:".$testfilename);
+	is_xml($expectedXML, $testXML, "XML comparison:".$testfilename);
 }
 
 
 sub readTxtFile {
 	my ($testfilename, $rootNodeName, $headerLine, $datarows) = @_;
 
-  open (TXTIN, "<$testfilename");
+	open (TXTIN, "<$testfilename");
 	$_ = <TXTIN>; chomp;
 	$$rootNodeName = $_;
-	$_ = <TXTIN>;chomp;
+	$_ = <TXTIN>; chomp;
 	@$headerLine = split "\t";
 	while (<TXTIN>) {
 		chomp;

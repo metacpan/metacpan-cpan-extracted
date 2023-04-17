@@ -1,8 +1,16 @@
 #!/usr/bin/perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Setup;  # parses @ARGV and sets $debug, $verbose and $silent
-use t_Utils;
+use t_Common qw/oops mytempfile mytempdir/; # strict, warnings, Carp etc.
+use t_TestCommon  # Test::More etc.
+         qw/$verbose $silent $debug dprint dprintf
+            bug checkeq_literal expect1 check 
+            verif_no_internals_mentioned
+            insert_loc_in_evalstr verif_eval_err
+            arrays_eq hash_subset
+            string_to_tempfile
+            @quotes/;
+use t_SSUtils;
 
 use Spreadsheet::Edit qw(:all);
 
@@ -38,13 +46,20 @@ BEGIN {
 
 # BUT outside BEGIN{} we just get a warning and the variable is not
 # tied, although the COLSPEC is otherwise usable.
-our $Myvar2;
-insert_cols '>$', "Myvar2";
-die unless $rows[$title_rx]{Myvar2} eq "Myvar2";
-die if defined($Myvar2);
-$Myvar2 = "random"; # would croak outside of apply if this was tied
-die unless $Myvar2 eq "random";
-delete_cols "Myvar2";
+{ our $Myvar2;
+  my @caught; 
+  { local $SIG{__WARN__} = sub{ push @caught, join("",@_); };
+    insert_cols '>$', "Myvar2";
+  }
+  die "Did not get expected not-tied warning (got:@caught)"
+    unless grep /Not tieing new variable.*because.*:safe/i, @caught;
+  die unless $rows[$title_rx]{Myvar2} eq "Myvar2";
+  die if defined($Myvar2);
+  $Myvar2 = "random"; # would croak outside of apply if this was tied
+  die unless $Myvar2 eq "random";
+  die unless $rows[$title_rx]{Myvar2} eq "Myvar2";
+  delete_cols "Myvar2";
+}
 
 our $Atitle;
 

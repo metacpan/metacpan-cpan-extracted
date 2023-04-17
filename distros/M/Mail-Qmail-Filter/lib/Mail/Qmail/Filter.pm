@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter;
 
-our $VERSION = '1.21';
+our $VERSION = '1.31';
 
 use Carp qw(confess);
 use FindBin    ();
@@ -28,6 +28,7 @@ has 'defer_only';
 has 'feedback_fh'     => $feedback_fh;
 has 'filters'         => [];
 has 'reject_text'     => 'Rejected.';
+has 'skip_if';
 has 'skip_for_from'   => coerce => \&addresses_to_hash;
 has 'skip_for_rcpt'   => coerce => \&addresses_to_hash;
 has 'skip_for_sender' => coerce => \&addresses_to_hash;
@@ -41,7 +42,8 @@ sub debug {
 }
 
 $SIG{__DIE__} //= sub {
-    __PACKAGE__->debug( died => "@_" ) unless $^S;
+    return if $^S || !defined $^S;
+    __PACKAGE__->debug( died => "@_" );
     die @_;
 };
 
@@ -60,6 +62,12 @@ sub add_filters {
     $self;
 }
 
+sub defer {
+    my $self = shift;
+    $self->debug( action => 'defer' );
+    $self->_exit( Z => @_ );
+}
+
 sub filter {
     my $self = shift;
 
@@ -72,19 +80,17 @@ sub message {
 }
 
 sub reject {
-    my $self        = shift;
-    my $reject_text = shift // $self->reject_text;
-    $reject_text = $reject_text->(@_)
-      if ref $reject_text && 'CODE' eq ref $reject_text;
-    $self->feedback_fh->print( $self->defer_only ? 'Z' : 'D', $reject_text );
+    my $self = shift;
     $self->debug( action => 'reject' );
-    exit 88;
+    $self->_exit( $self->defer_only ? 'Z' : 'D', @_ );
 }
 
 sub run {
     my $self = shift;
 
     my $package = ref $self;
+
+    return if $self->skip_if && $self->skip_if->($self);
 
     if ( exists $ENV{RELAYCLIENT} && $self->skip_if_relayclient ) {
         $self->debug("$package skipped");
@@ -122,6 +128,16 @@ sub run {
 
     $self->debug("$package started");
     $self->filter;
+}
+
+sub _exit {
+    my $self        = shift;
+    my $status      = shift;
+    my $reject_text = shift // $self->reject_text;
+    $reject_text = $reject_text->(@_)
+      if ref $reject_text && 'CODE' eq ref $reject_text;
+    $self->feedback_fh->print( $status, $reject_text =~ y/\n/ /r );
+    exit 88;
 }
 
 END {
@@ -201,6 +217,12 @@ L</reject> e-mails (or L<defer|/defer_only> them)
 
 This distribution ships with the following predefined filters:
 
+=head2 Queueing the message
+
+Usually you want to use L<Mail::Qmail::Filter::Queue> as the last
+filter in your chain to pass the message on to C<qmail-queue>,
+because if you don't, the message will be discarded.
+
 =head2 Rejecting filters
 
 =over 4
@@ -220,6 +242,10 @@ only allow certain RFC322.From addresses
 =item L<Mail::Qmail::Filter::SpamAssassin>
 
 spam-check message
+
+=item L<Mail::Qmail::Filter::ClamAV>
+
+scan message for viruses
 
 =item L<Mail::Qmail::Filter::ValidateFrom>
 
@@ -267,9 +293,15 @@ validate RFC5321.MailFrom
 
 =head1 COMMON PARAMETERS FOR ALL FILTERS
 
+=head2 skip_if
+
+When given a sub routine as an argument, executes this sub routine,
+passing the filter as only parameter.
+If the sub routine returns a true value, the rest of the filter is skipped.
+
 =head2 skip_if_relayclient
 
-When set to a true calue, the L</run> method will skip the filter when
+When set to a true value, the L</run> method will skip the filter when
 the environment variable C<RELAYCLIENT> exists.
 
 =head2 skip_for_sender
@@ -353,6 +385,12 @@ caused the rejection.
 
 Please note that you should only use ASCII characters for the reply text and
 that C<qmail-smtpd> usually limits its length to 254 characters.
+
+=head2 defer
+
+defers the message with status C<451>,
+just like L</reject> would when L</defer_only> is set.
+Everything else that is said above about L</reject> also applies to L</defer>.
 
 =head2 debug
 

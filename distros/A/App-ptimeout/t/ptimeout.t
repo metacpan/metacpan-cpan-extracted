@@ -17,11 +17,11 @@ my @perl = (
 my($stdout, $stderr, $status) = capture(sub {
     system(
         @perl,
-        10,
+        20,
         q{
             sh -c "
-                sh -c 'echo starting; sleep 2; echo slept'&
-                sleep 4
+                sh -c 'echo starting; sleep 1; echo slept'&
+                wait
             "
         }
     ) >> 8;
@@ -33,16 +33,20 @@ eq_or_diff(
 );
 
 ($stdout, $stderr, $status) = capture(sub {
-    system(
+    my $status = system(
         @perl,
         1,
         q{
             sh -c "
-                sh -c 'echo starting; sleep 2; echo slept'&
-                sleep 4
+                sh -c 'echo starting; sleep 10; echo slept'&
+                wait
             "
         }
     ) >> 8;
+    # keep capturing output until the sub-process would have finished
+    # were it not killed
+    sleep 15;
+    $status;
 });
 eq_or_diff(
     [$status, $stderr,       $stdout],
@@ -53,7 +57,7 @@ eq_or_diff(
 ($stdout, $stderr, $status) = capture(sub {
     system(
         @perl,
-        1,
+        20,
         q{
             sh -c "echo starting;exit 3"
         }

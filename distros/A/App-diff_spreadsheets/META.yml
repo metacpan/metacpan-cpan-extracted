@@ -9,6 +9,7 @@ build_requires:
   English: '0'
   Exporter: '0'
   File::Spec: '0'
+  File::Temp: '0.23'
   Import::Into: '0'
   Scalar::Util: '0'
   Test::More: '0.98'
@@ -36,7 +37,7 @@ requires:
   File::Copy: '0'
   File::Path: '0'
   File::Spec::Functions: '0'
-  File::Temp: '0'
+  File::Temp: '0.23'
   FindBin: '0'
   Getopt::Long: '0'
   Guard: '0'
@@ -59,7 +60,7 @@ resources:
   bugtracker: https://github.com/jimav/App-diff_spreadsheets/issues
   homepage: https://github.com/jimav/App-diff_spreadsheets
   repository: https://github.com/jimav/App-diff_spreadsheets.git
-version: '1.004'
+version: '1.005'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

@@ -1,3 +1,6 @@
+0.161		2023-04-16	T. R. Wyant
+    Space Track options to celestrak() warn on first use.
+
 0.160		2023-03-09	T. R. Wyant
     Remove spaceflight() and all supporting code.
 

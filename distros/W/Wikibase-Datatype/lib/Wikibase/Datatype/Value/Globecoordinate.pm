@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build is);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -266,6 +266,10 @@ L<Wikibase::Datatype::Value>.
 
 Wikibase datatypes.
 
+=item L<Wikibase::Datatype::Print::Value::Globecoordinate>
+
+Wikibase globe coordinate value pretty print helpers.
+
 =back
 
 =head1 REPOSITORY
@@ -286,6 +290,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

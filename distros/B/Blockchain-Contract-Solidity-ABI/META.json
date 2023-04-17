@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -42,11 +42,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::Code::TidyAll" : "0.82",
             "Test::Fatal" : "0.016",
-            "Test::More" : "0.98",
-            "Test::Perl::Critic" : "1.04",
-            "Test::Pod" : "1.52"
+            "Test::More" : "0.98"
          }
       }
    },
@@ -58,6 +55,6 @@
          "web" : "https://github.com/refeco/perl-ABI"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

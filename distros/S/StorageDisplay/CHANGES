@@ -1,9 +1,48 @@
 ==================================================
-Changes from 2022-04-03 00:00:00 +0000 to present.
+Changes from 2022-04-14 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 2.03 at 2023-04-03 12:21:51 +0000
+version 2.04 at 2023-04-14 17:25:36 +0000
+-----------------------------------------
+
+  Change: 262e765ab3c875d3d3b01c7a2da05655c638c5cc
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-14 19:25:28 +0000
+
+    new release 
+
+  Change: 5e2f13921e27387eb111e93e3074c779b7bf1ef9
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-14 19:25:28 +0000
+
+    disable a test not up-to-date
+
+    The machine is currently HS, the reference files cannot be updated 
+
+  Change: 98fd04e9962c7bf6dab5f025ec12aa3f12dd7617
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-14 19:25:28 +0000
+
+    Update references 
+
+  Change: 7992bee79b567b99405241003b20c23680a77c88
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-14 19:25:28 +0000
+
+    Improvement for FS and loop devices
+
+    - loop devices are now managed - mounted FS are now represented as a
+    hierarchy - reserved space in FS are in orange 
+
+  Change: 969b6cf51e79eedb5e454508a76a957e8e03599f
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2023-04-06 11:30:10 +0000
+
+    Fix bug with unassigned PVs 
+
+-----------------------------------------
+version 2.03 at 2023-04-03 12:21:42 +0000
 -----------------------------------------
 
   Change: 7cb5d3601cdf54946b55a52baca86c8d618a4a5d

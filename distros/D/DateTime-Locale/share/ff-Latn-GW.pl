@@ -224,8 +224,8 @@
   ],
   name => "Fula Guinea-Bissau Latin",
   native_language => "Pulaar",
-  native_name => "Pulaar Gine-Bisaawo Latn",
-  native_script => "Latn",
+  native_name => "Pulaar Gine-Bisaawo",
+  native_script => undef,
   native_territory => "Gine-Bisaawo",
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -271,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

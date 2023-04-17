@@ -1,3 +1,20 @@
+0.25 2023-04-17T11:28:59+02:00
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF.
+ - Add item to doc SEE ALSO section in
+   Wikibase::Datatype::Value::Globecoordinate.
+ - Add reference to
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male
+   as example of statement with multiple references.
+ - Add references parameter and method to MediainfoStatement.
+ - Fix
+   Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human
+   object.
+ - Sort usage modules in
+   Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF.
+
 0.24 2023-01-06T12:57:15+01:00
  - Add Czech description to
    Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog.

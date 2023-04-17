@@ -15,9 +15,9 @@ WriteMakefile(
         bin/ptimeout
     )],
     PREREQ_PM    => {
-        Capture::Tiny     => 0,
-        Proc::Killfam     => '1.0',
-        Test::Differences => 0,
-        Test::More        => '0.88', # done_testing
+        Capture::Tiny      => 0,
+        Proc::ProcessTable => '0.634',
+        Test::Differences  => 0,
+        Test::More         => '0.88', # done_testing
     },
 );

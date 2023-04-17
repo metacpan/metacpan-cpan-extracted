@@ -110,15 +110,15 @@ digraph "ge95142"{ // HEADER: MACHINE
 					fillcolor=white;
 					{ "machine@ge95142|LVM::VG@vgdata|::PVs|::PV@sda1" [
 						label="PV: /dev/sda1\nSize: 5.46 TiB\nFree: 2.46 TiB\nUsed: 3.00 TiB";
-						style=striped;fillcolor="pink;0.549750.2:green"
+						shape=rectangle;style=striped;fillcolor="pink;0.549750.2:green"
 					]; }
 					{ "machine@ge95142|LVM::VG@vgdata|::PVs|::PV@sdb2" [
 						label="PV: /dev/sdb2\nSize: 931 GiB\nFree: 771 GiB\nUsed: 160 GiB";
-						style=striped;fillcolor="pink;0.171799.2:green"
+						shape=rectangle;style=striped;fillcolor="pink;0.171799.2:green"
 					]; }
 					{ "machine@ge95142|LVM::VG@vgdata|::PVs|::PV@sdc1" [
 						label="PV: /dev/sdc1\nSize: 5.46 TiB\nFree: 467 GiB\nUsed: 5.00 TiB";
-						style=striped;fillcolor="pink;0.916414.2:green"
+						shape=rectangle;style=striped;fillcolor="pink;0.916414.2:green"
 					]; }
 					label="vgdata's PVs";
 				}
@@ -230,25 +230,221 @@ digraph "ge95142"{ // HEADER: MACHINE
 				color=lightgrey;
 				fillcolor=lightgrey;
 				node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-				{ "machine@ge95142|FS|::FS@/srv/glusterfs/ge" [
-					label="/srv/glusterfs/ge\nDevice: /dev/vgdata/gfs-ge-b1\nxfs\nSize: 3.00 TiB\nFree: 2.98 TiB\nUsed: 21.3 GiB";
-					style=striped;fillcolor="pink;0.006951.2:green"
-				]; }
-				{ "machine@ge95142|FS|::FS@/" [
-					label="/\nDevice: /dev/vgdata/root\next4\nSize: 9.68 GiB\nFree: 1.08 GiB\nUsed: 8.09 GiB";
-					style=striped;fillcolor="pink;0.888388.2:green"
-				]; }
-				{ "machine@ge95142|FS|::FS@/boot/efi" [
-					label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 6.03 MiB";
-					style=striped;fillcolor="pink;0.000012.2:green"
-				]; }
-				subgraph "cluster_machine@ge95142|FS|::AllSWAP@@FS@SWAP" {
+				subgraph "cluster_machine@ge95142|FS|::SWAP@@FS@SWAP" {
 					style=filled;
 					color=white
 					fillcolor=lightgrey;
 					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
-					label="SWAP\nSize: 0 B\nFree: 0 B\nUsed: 0 B";
-					style=striped;fillcolor="green"
+					label="SWAP\nSize: 0 B";
+					shape=rectangle;style=striped;fillcolor="yellow"
+				}
+				subgraph "cluster_machine@ge95142|FS|::MP@26@/" {
+					style=filled;
+					color=lightgrey;
+					fillcolor=lightgrey;
+					node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+					{ "machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" [
+						label="/\nDevice: /dev/vgdata/root\next4\nSize: 9.68 GiB\nFree: 1.01 GiB\nUsed: 8.16 GiB";
+						shape=rectangle;style=striped;fillcolor="pink;0.842524.2:green;0.104225.2:orange"
+					]; }
+					subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/" {
+						color=white;
+						fillcolor=white;
+						subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" [
+								label="/sys (sysfs)";
+								shape=rectangle;style=striped;fillcolor="yellow"
+							]; }
+							subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys" {
+								color=white;
+								fillcolor=white;
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@27@/sys/kernel/security" [
+									label="/sys/kernel/security (securityfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@29@/sys/fs/selinux" [
+									label="/sys/fs/selinux (selinuxfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@31@/sys/fs/cgroup" [
+									label="/sys/fs/cgroup (cgroup2)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@32@/sys/fs/pstore" [
+									label="/sys/fs/pstore (pstore)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@33@/sys/firmware/efi/efivars" [
+									label="/sys/firmware/efi/efivars (efivarfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@34@/sys/fs/bpf" [
+									label="/sys/fs/bpf (bpf)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@37@/sys/kernel/tracing" [
+									label="/sys/kernel/tracing (tracefs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug" {
+									style=filled;
+									color=lightgrey;
+									fillcolor=lightgrey;
+									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+									{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug|::FS@FS@39@/sys/kernel/debug" [
+										label="/sys/kernel/debug (debugfs)";
+										shape=rectangle;style=striped;fillcolor="yellow"
+									]; }
+									subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug|::C@39@/sys/kernel/debug" {
+										color=white;
+										fillcolor=white;
+										{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug|::C@39@/sys/kernel/debug|FS::MP::FS@FS@219@/sys/kernel/debug/tracing" [
+											label="/sys/kernel/debug/tracing (tracefs)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										label="";
+									}
+									label="";
+								}
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@40@/sys/fs/fuse/connections" [
+									label="/sys/fs/fuse/connections (fusectl)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@41@/sys/kernel/config" [
+									label="/sys/kernel/config (configfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::FS@FS@22@/proc" [
+								label="/proc (proc)";
+								shape=rectangle;style=striped;fillcolor="yellow"
+							]; }
+							subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc" {
+								color=white;
+								fillcolor=white;
+								subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc" {
+									style=filled;
+									color=lightgrey;
+									fillcolor=lightgrey;
+									node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+									{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::FS@FS@35@/proc/sys/fs/binfmt_misc" [
+										label="/proc/sys/fs/binfmt_misc\nSource: systemd-1\nautofs";
+										shape=rectangle;style=striped;fillcolor="yellow"
+									]; }
+									subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::C@35@/proc/sys/fs/binfmt_misc" {
+										color=white;
+										fillcolor=white;
+										{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::C@35@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@343@/proc/sys/fs/binfmt_misc" [
+											label="/proc/sys/fs/binfmt_misc (binfmt_misc)";
+											shape=rectangle;style=striped;fillcolor="yellow"
+										]; }
+										label="";
+									}
+									label="";
+								}
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP::FS@FS@43@/proc/fs/nfsd" [
+									label="/proc/fs/nfsd (nfsd)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::FS@FS@23@/dev" [
+								label="/dev\nSource: udev\ndevtmpfs\nSize: 62.9 GiB\nFree: 62.9 GiB\nUsed: 0 B";
+								shape=rectangle;style=striped;fillcolor="green"
+							]; }
+							subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev" {
+								color=white;
+								fillcolor=white;
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@24@/dev/pts" [
+									label="/dev/pts (devpts)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@28@/dev/shm" [
+									label="/dev/shm\ntmpfs\nSize: 62.9 GiB\nFree: 62.9 GiB\nUsed: 0 B";
+									shape=rectangle;style=striped;fillcolor="green"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@36@/dev/hugepages" [
+									label="/dev/hugepages (hugetlbfs)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@38@/dev/mqueue" [
+									label="/dev/mqueue (mqueue)";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run" {
+							style=filled;
+							color=lightgrey;
+							fillcolor=lightgrey;
+							node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+							{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::FS@FS@25@/run" [
+								label="/run\ntmpfs\nSize: 12.6 GiB\nFree: 12.6 GiB\nUsed: 3.18 MiB";
+								shape=rectangle;style=striped;fillcolor="pink;0.000247.2:green"
+							]; }
+							subgraph "cluster_machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run" {
+								color=white;
+								fillcolor=white;
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@30@/run/lock" [
+									label="/run/lock\ntmpfs\nSize: 5.00 MiB\nFree: 5.00 MiB\nUsed: 0 B";
+									shape=rectangle;style=striped;fillcolor="green"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@42@/run/rpc_pipefs" [
+									label="/run/rpc_pipefs\nSource: sunrpc\nrpc_pipefs";
+									shape=rectangle;style=striped;fillcolor="yellow"
+								]; }
+								{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@352@/run/user/5000" [
+									label="/run/user/5000\ntmpfs\nSize: 12.6 GiB\nFree: 12.6 GiB\nUsed: 0 B";
+									shape=rectangle;style=striped;fillcolor="green"
+								]; }
+								label="";
+							}
+							label="";
+						}
+						{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@95@/srv/glusterfs/ge" [
+							label="/srv/glusterfs/ge\nDevice: /dev/vgdata/gfs-ge-b1\nxfs\nSize: 3.00 TiB\nFree: 2.98 TiB\nUsed: 21.3 GiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.006951.2:green"
+						]; }
+						{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@98@/boot/efi" [
+							label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 6.03 MiB";
+							shape=rectangle;style=striped;fillcolor="pink;0.000012.2:green"
+						]; }
+						{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@157@/srv/cifs" [
+							label="/srv/cifs\nSource: /etc/auto.smbkrb\nautofs";
+							shape=rectangle;style=striped;fillcolor="yellow"
+						]; }
+						{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@223@/srv/net" [
+							label="/srv/net\nSource: /etc/auto.nfs4\nautofs";
+							shape=rectangle;style=striped;fillcolor="yellow"
+						]; }
+						{ "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@303@/srv/shared-gfs" [
+							label="/srv/shared-gfs\nSource: /etc/auto.ngs-glfs\nautofs";
+							shape=rectangle;style=striped;fillcolor="yellow"
+						]; }
+						label="";
+					}
+					label="";
 				}
 				label="Mounted FS and swap";
 			}
@@ -295,6 +491,66 @@ digraph "ge95142"{ // HEADER: MACHINE
 			"machine@ge95142|RAID::LSI::Megacli@0|::RawDevice@LSI@c0u0pY" -> "machine@ge95142|RAID::LSI::Megacli@0|::State@sdb|::RaidDevice@sdb"
 			"machine@ge95142|RAID::LSI::Megacli@0|::RawDevice@LSI@c0u1p2" -> "machine@ge95142|RAID::LSI::Megacli@0|::State@sda|::RaidDevice@sda"
 			
+			// Links from FS::MP::FS@FS@21@/sys
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" [style=invis]
+			// Links from FS::MP::FS@FS@27@/sys/kernel/security
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@27@/sys/kernel/security" [style=invis]
+			// Links from FS::MP::FS@FS@29@/sys/fs/selinux
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@29@/sys/fs/selinux" [style=invis]
+			// Links from FS::MP::FS@FS@31@/sys/fs/cgroup
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@31@/sys/fs/cgroup" [style=invis]
+			// Links from FS::MP::FS@FS@32@/sys/fs/pstore
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@32@/sys/fs/pstore" [style=invis]
+			// Links from FS::MP::FS@FS@33@/sys/firmware/efi/efivars
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@33@/sys/firmware/efi/efivars" [style=invis]
+			// Links from FS::MP::FS@FS@34@/sys/fs/bpf
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@34@/sys/fs/bpf" [style=invis]
+			// Links from FS::MP::FS@FS@37@/sys/kernel/tracing
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@37@/sys/kernel/tracing" [style=invis]
+			// Links from FS::MP::FS@FS@39@/sys/kernel/debug
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug|::FS@FS@39@/sys/kernel/debug" [style=invis]
+			// Links from FS::MP::FS@FS@219@/sys/kernel/debug/tracing
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug|::FS@FS@39@/sys/kernel/debug" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP@39@/sys/kernel/debug|::C@39@/sys/kernel/debug|FS::MP::FS@FS@219@/sys/kernel/debug/tracing" [style=invis]
+			// Links from FS::MP::FS@FS@40@/sys/fs/fuse/connections
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@40@/sys/fs/fuse/connections" [style=invis]
+			// Links from FS::MP::FS@FS@41@/sys/kernel/config
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::FS@FS@21@/sys" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@21@/sys|::C@21@/sys|FS::MP::FS@FS@41@/sys/kernel/config" [style=invis]
+			// Links from FS::MP::FS@FS@22@/proc
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::FS@FS@22@/proc" [style=invis]
+			// Links from FS::MP::FS@FS@35@/proc/sys/fs/binfmt_misc
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::FS@FS@22@/proc" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::FS@FS@35@/proc/sys/fs/binfmt_misc" [style=invis]
+			// Links from FS::MP::FS@FS@343@/proc/sys/fs/binfmt_misc
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::FS@FS@35@/proc/sys/fs/binfmt_misc" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP@35@/proc/sys/fs/binfmt_misc|::C@35@/proc/sys/fs/binfmt_misc|FS::MP::FS@FS@343@/proc/sys/fs/binfmt_misc" [style=invis]
+			// Links from FS::MP::FS@FS@43@/proc/fs/nfsd
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::FS@FS@22@/proc" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@22@/proc|::C@22@/proc|FS::MP::FS@FS@43@/proc/fs/nfsd" [style=invis]
+			// Links from FS::MP::FS@FS@23@/dev
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::FS@FS@23@/dev" [style=invis]
+			// Links from FS::MP::FS@FS@24@/dev/pts
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@24@/dev/pts" [style=invis]
+			// Links from FS::MP::FS@FS@28@/dev/shm
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@28@/dev/shm" [style=invis]
+			// Links from FS::MP::FS@FS@36@/dev/hugepages
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@36@/dev/hugepages" [style=invis]
+			// Links from FS::MP::FS@FS@38@/dev/mqueue
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::FS@FS@23@/dev" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@23@/dev|::C@23@/dev|FS::MP::FS@FS@38@/dev/mqueue" [style=invis]
+			// Links from FS::MP::FS@FS@25@/run
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::FS@FS@25@/run" [style=invis]
+			// Links from FS::MP::FS@FS@30@/run/lock
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@30@/run/lock" [style=invis]
+			// Links from FS::MP::FS@FS@42@/run/rpc_pipefs
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@42@/run/rpc_pipefs" [style=invis]
+			// Links from FS::MP::FS@FS@352@/run/user/5000
+			"machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::FS@FS@25@/run" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP@25@/run|::C@25@/run|FS::MP::FS@FS@352@/run/user/5000" [style=invis]
+			// Links from FS::MP::FS@FS@95@/srv/glusterfs/ge
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@95@/srv/glusterfs/ge" [style=invis]
+			// Links from FS::MP::FS@FS@98@/boot/efi
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@98@/boot/efi" [style=invis]
+			// Links from FS::MP::FS@FS@157@/srv/cifs
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@157@/srv/cifs" [style=invis]
+			// Links from FS::MP::FS@FS@223@/srv/net
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@223@/srv/net" [style=invis]
+			// Links from FS::MP::FS@FS@303@/srv/shared-gfs
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@303@/srv/shared-gfs" [style=invis]
 			// Links from Libvirt::VM::Block@hda
 			// SOURCE LINK: memtest86+ 1839104 (hda) "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda"
 			// Links from Libvirt::VM::Block@sda
@@ -358,20 +614,62 @@ digraph "ge95142"{ // HEADER: MACHINE
 			// Links for RAID::LSI::Megacli::State@sdc
 			// Links for RAID::LSI::Megacli::State::RaidDevice@sdc
 			// Links for FS
-			// Links for FS::FS@/srv/glusterfs/ge
-			"machine@ge95142|LVM::VG@vgdata|::LVs|::LV@gfs-ge-b1" -> "machine@ge95142|FS|::FS@/srv/glusterfs/ge"
-			// Links for FS::FS@/srv/glusterfs/ge
-			// Links for FS::FS@/
-			"machine@ge95142|LVM::VG@vgdata|::LVs|::LV@root" -> "machine@ge95142|FS|::FS@/"
-			// Links for FS::FS@/
-			// Links for FS::FS@/boot/efi
-			"machine@ge95142|Partition::GPT@sdb":"1" -> "machine@ge95142|FS|::FS@/boot/efi"
-			// Links for FS::FS@/boot/efi
-			// Links for FS::AllSWAP@@FS@SWAP
+			// Links for FS::SWAP@@FS@SWAP
+			// Links for FS::MP@26@/
+			// Links for FS::MP::FS@FS@26@/
+			"machine@ge95142|LVM::VG@vgdata|::LVs|::LV@root" -> "machine@ge95142|FS|::MP@26@/|::FS@FS@26@/"
+			// Links for FS::MP::FS@FS@26@/
+			// Links for FS::MP::C@26@/
+			// Links for FS::MP@21@/sys
+			// Links for FS::MP::FS@FS@21@/sys
+			// Links for FS::MP::C@21@/sys
+			// Links for FS::MP::FS@FS@27@/sys/kernel/security
+			// Links for FS::MP::FS@FS@29@/sys/fs/selinux
+			// Links for FS::MP::FS@FS@31@/sys/fs/cgroup
+			// Links for FS::MP::FS@FS@32@/sys/fs/pstore
+			// Links for FS::MP::FS@FS@33@/sys/firmware/efi/efivars
+			// Links for FS::MP::FS@FS@34@/sys/fs/bpf
+			// Links for FS::MP::FS@FS@37@/sys/kernel/tracing
+			// Links for FS::MP@39@/sys/kernel/debug
+			// Links for FS::MP::FS@FS@39@/sys/kernel/debug
+			// Links for FS::MP::C@39@/sys/kernel/debug
+			// Links for FS::MP::FS@FS@219@/sys/kernel/debug/tracing
+			// Links for FS::MP::FS@FS@40@/sys/fs/fuse/connections
+			// Links for FS::MP::FS@FS@41@/sys/kernel/config
+			// Links for FS::MP@22@/proc
+			// Links for FS::MP::FS@FS@22@/proc
+			// Links for FS::MP::C@22@/proc
+			// Links for FS::MP@35@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::FS@FS@35@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::C@35@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::FS@FS@343@/proc/sys/fs/binfmt_misc
+			// Links for FS::MP::FS@FS@43@/proc/fs/nfsd
+			// Links for FS::MP@23@/dev
+			// Links for FS::MP::FS@FS@23@/dev
+			// Links for FS::MP::C@23@/dev
+			// Links for FS::MP::FS@FS@24@/dev/pts
+			// Links for FS::MP::FS@FS@28@/dev/shm
+			// Links for FS::MP::FS@FS@36@/dev/hugepages
+			// Links for FS::MP::FS@FS@38@/dev/mqueue
+			// Links for FS::MP@25@/run
+			// Links for FS::MP::FS@FS@25@/run
+			// Links for FS::MP::C@25@/run
+			// Links for FS::MP::FS@FS@30@/run/lock
+			// Links for FS::MP::FS@FS@42@/run/rpc_pipefs
+			// Links for FS::MP::FS@FS@352@/run/user/5000
+			// Links for FS::MP::FS@FS@95@/srv/glusterfs/ge
+			"machine@ge95142|LVM::VG@vgdata|::LVs|::LV@gfs-ge-b1" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@95@/srv/glusterfs/ge"
+			// Links for FS::MP::FS@FS@95@/srv/glusterfs/ge
+			// Links for FS::MP::FS@FS@98@/boot/efi
+			"machine@ge95142|Partition::GPT@sdb":"1" -> "machine@ge95142|FS|::MP@26@/|::C@26@/|FS::MP::FS@FS@98@/boot/efi"
+			// Links for FS::MP::FS@FS@98@/boot/efi
+			// Links for FS::MP::FS@FS@157@/srv/cifs
+			// Links for FS::MP::FS@FS@223@/srv/net
+			// Links for FS::MP::FS@FS@303@/srv/shared-gfs
 			// Links for Libvirt Virtual Machines
 			// Links for Libvirt::VM@memtest86+
 			// Links for Libvirt::VM::Block@hda
-			"machine@ge95142|FS|::FS@/" -> "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda"
+			"machine@ge95142|FS|::MP@26@/|::FS@FS@26@/" -> "machine@ge95142|Libvirt|::VM@memtest86+|::Block@hda"
 			// Links for Libvirt::VM::Block@hda
 			// Links for Libvirt::VM@1-hera
 			// Links for Libvirt::VM::Block@sda

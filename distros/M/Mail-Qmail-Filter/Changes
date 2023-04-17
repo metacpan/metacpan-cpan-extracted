@@ -1,5 +1,14 @@
 Revision history for Mail-Qmail-Filter
 
+1.31    2022-04-18 16:49
+        * implemented ->skip_if
+        * removed unnecessary code
+        * fixed typo in POD
+
+1.3     2022-03-08 07:24
+        * added Mail::Qmail::Filter::ClamAV
+        * do not die() for exceptions which occured in an eval
+
 1.21    2020-01-08 08:45
         bugfix for default reject text in Mail::Qmail::Filter::ValidateFrom
 

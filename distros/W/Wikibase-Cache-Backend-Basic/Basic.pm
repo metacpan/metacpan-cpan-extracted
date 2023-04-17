@@ -8,7 +8,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Text::DSV;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ($class, @params) = @_;
@@ -72,6 +72,7 @@ P106:occupation:occupation of a person; see also "field of work" (Property:P101)
 P110:illustrator:person drawing the pictures or taking the photographs in a book
 P123:publisher:organization or person responsible for publishing books, periodicals, printed music, podcasts, games or software
 P179:part of the series:series which contains the subject
+P180:depicts:entity visually depicted in an image, literarily described in a work, or otherwise incorporated into an audiovisual or other medium; see also P921, 'main subject'
 P212:ISBN-13:identifier for a book (edition), thirteen digit
 P214:VIAF ID:identifier for the Virtual International Authority File database [format: up to 22 digits]
 P243:OCLC control number:identifier for a unique bibliographic record in OCLC WorldCat

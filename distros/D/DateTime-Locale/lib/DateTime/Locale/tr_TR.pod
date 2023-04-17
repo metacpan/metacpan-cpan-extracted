@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::tr_TR - Locale data examples for the Turkish Turkey (tr-TR) locale
+DateTime::Locale::tr_TR - Locale data examples for the Turkish Türkiye (tr-TR) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Turkish Turkey locale.
+Turkish Türkiye locale.
 
 =head2 Days
 

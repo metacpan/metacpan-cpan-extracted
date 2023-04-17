@@ -224,8 +224,8 @@
   ],
   name => "Fula Nigeria Latin",
   native_language => "Pulaar",
-  native_name => "Pulaar Nijeriyaa Latn",
-  native_script => "Latn",
+  native_name => "Pulaar Nijeriyaa",
+  native_script => undef,
   native_territory => "Nijeriyaa",
   native_variant => undef,
   quarter_format_abbreviated => [
@@ -271,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 42,
+  version => 43,
 }

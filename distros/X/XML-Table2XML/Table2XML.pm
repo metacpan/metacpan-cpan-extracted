@@ -6,7 +6,7 @@ use Carp;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(parseHeaderForXML addXMLLine commonParent offsetNodesXML);
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 my $LINEFEED = "";
 my $XMLDIRECTIVE = '<?xml version="1.0"?>';
 my $ENCODING = 'iso-8859-1';
@@ -336,7 +336,7 @@ which means there is no way to exactly reproduce (C<< <a><b>test1</b></a><a><b>t
 
 =head1 REFERENCE
 
-for a detailed discussion of the flattening algorithmm in Excel see L<http://support.microsoft.com/kb/282161/EN-US> and L<http://support.microsoft.com/kb/288215/EN-US>
+for a detailed discussion of the flattening algorithmm in Excel see L<https://web.archive.org/web/20041124175116/http://support.microsoft.com/kb/282161/EN-US/> and L<https://web.archive.org/web/20050210015617/http://support.microsoft.com/kb/288215/EN-US/>
 
 =head1 AUTHOR
 

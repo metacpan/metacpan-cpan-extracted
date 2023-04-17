@@ -2,14 +2,16 @@ use 5.010;
 
 use ExtUtils::MakeMaker;
 
-my $version = '1.01';
+my $version = '1.02';
 
 #
 # The following is needed, because User::Identity does gracefully handle
 # a missing Geography::Countries, but is incompatible with older releases.
 #
 
-my %prereq;
+my %prereq =
+(   'Hash::Ordered' => 0.014,
+);
 
 my ($gc, $gc_version) = (Geography::Countries => 1.4);
 eval "require $gc";

@@ -75,19 +75,53 @@ sub create_compile_command_args {
   
   my @compile_command_args;
   
-  if (defined $config->optimize) {
-    push @compile_command_args, split(/ +/, $config->optimize);
+  my $std = $config->std;
+  if (defined $std) {
+    push @compile_command_args, "-std=$std";
+  }
+  
+  my $optimize = $config->optimize;
+  if (defined $optimize) {
+    push @compile_command_args, split(/ +/, $optimize);
   }
   
   push @compile_command_args, @{$config->ccflags};
+  
+  my $output_type = $config->output_type;
+  
+  if ($output_type eq 'dynamic_lib') {
+    push @compile_command_args, @{$config->dynamic_lib_ccflags};
+  }
   
   # include directories
   {
     my @all_include_dirs;
     
+    # SPVM core native directory
     my $spvm_core_include_dir = $config->spvm_core_include_dir;
     push @all_include_dirs, $spvm_core_include_dir;
     
+    # Native include directory
+    my $native_include_dir = $config->native_include_dir;
+    if (defined $native_include_dir) {
+      push @all_include_dirs, $native_include_dir;
+    }
+    
+    # Resource include directories
+    my $disable_resource = $config->disable_resource;
+    unless ($disable_resource) {
+      my $resource_names = $config->get_resource_names;
+      for my $resource_name (@$resource_names) {
+        my $resource = $config->get_resource($resource_name);
+        my $config = $resource->config;
+        my $resource_include_dir = $config->native_include_dir;
+        if (defined $resource_include_dir) {
+          push @all_include_dirs, $resource_include_dir;
+        }
+      }
+    }
+    
+    # include directories
     my $include_dirs = $config->include_dirs;
     push @all_include_dirs, @$include_dirs;
     
@@ -99,8 +133,7 @@ sub create_compile_command_args {
   return \@compile_command_args;
 }
 
-# Instance methods
-sub to_string {
+sub to_cmd {
   my ($self) = @_;
 
   my $compile_command = $self->create_compile_command;
@@ -126,29 +159,55 @@ The SPVM::Builder::CompileInfo class has methods to manipulate compilation infor
   my $config = $compile_info->config;
   $compile_info->config($config);
 
-Gets and sets a L<SPVM::Builder::Config> object used to compile the source file.
+Gets and sets the C<config> field.
+
+This is a L<SPVM::Builder::Config> object used to compile the source file.
 
 =head2 source_file
 
   my $source_file = $compile_info->source_file;
   $compile_info->source_file($source_file);
 
-Gets and sets the source file.
+Gets and sets the C<source_file> field.
+
+This field is a source file.
 
 =head2 output_file
 
   my $output_file = $compile_info->output_file;
   $compile_info->output_file($output_file);
 
-Gets and sets the output file.
+Gets and sets the C<output_file> field.
+
+This field is an output file.
 
 =head1 Class Methods
 
 =head2 new
 
-  my $compile_info = SPVM::Builder::CompileInfo->new;
+  my $compile_info = SPVM::Builder::CompileInfo->new(%fields);
 
-Creates a new L<SPVM::Builder::CompileInfo> object.
+Creates a new L<SPVM::Builder::CompileInfo> object with L</"Fields">.
+
+Default Field Values:
+
+If a field is not defined, the field is set to the following default value.
+
+=over 2
+
+=item * L</"source_file">
+
+undef
+
+=item * L</"output_file">
+
+undef
+
+=item * L</"config">
+
+undef
+
+=back
 
 =head1 Instance Methods
 
@@ -156,7 +215,9 @@ Creates a new L<SPVM::Builder::CompileInfo> object.
 
   my $compile_command = $compile_info->create_compile_command;
 
-Creates the compilation command, and returns it. The return value is an array reference.
+Creates the compilation command, and returns it.
+
+The return value is an array reference.
 
 The following one is an example of the return value.
 
