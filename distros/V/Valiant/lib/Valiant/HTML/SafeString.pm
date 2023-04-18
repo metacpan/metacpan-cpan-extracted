@@ -12,7 +12,7 @@ use overload
   '""' => sub { shift->to_string },
   '+' => sub {
     my ($self, $other, $reverse) = @_;
-    carp "Can only join two safe string objects" unless (ref($other) eq ref($self));
+    croak "Can only join two safe string objects" unless (ref($other) eq ref($self));
   
     return $reverse
         ? raw("${other}${self}")

@@ -1,5 +1,22 @@
 Changes for Perl::Tidy::Sweetend
 
+1.20 - Tue Apr 18 09:38:58 EDT 2023
+    Adds support for Object::Pad
+    Thanks for @jonassmedegaard for the issue and patch.
+    Upgrades Perl::Tidy dependency to v20230309.
+    [Upgrade recommended for imporovement in Perl::Tidy and particularly if you
+    use Object::Pad]
+
+1.19 - Mon Feb 20 21:26:40 EST 2023
+    Updates Perl::Tidy dependency (GH#23)
+    Thanks to @shancock9 this release of Perl::Tidy resolves @dboehmer's
+    issues where 'Use of uninitialized value $body' error messages are
+    printed.
+
+    Updates the repo and bugtracker urls to use https (PR #22)
+    Thanks @szabgab for the PR.
+    [Upgrade recommended.]
+
 1.18 - Sun Jan 31 12:24:35 EST 2021
     Fixes tests to handle more changes in spacing in Perl::Tidy versions
     [Only changes tests. No need to upgrade.]

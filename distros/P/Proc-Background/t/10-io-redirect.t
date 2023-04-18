@@ -19,12 +19,12 @@ sub open_or_die {
   $fh;
 }
 sub readfile {
-  my $fh= open_or_die('<:raw', $_[0]);
+  my $fh= open_or_die('<', $_[0]);
   local $/= undef;
   scalar <$fh>;
 }
 sub writefile {
-  my $fh= open_or_die('>:raw', $_[0]);
+  my $fh= open_or_die('>', $_[0]);
   print $fh $_[1] or die "print: $!";
   close $fh or die "close: $!";
 }
@@ -38,7 +38,7 @@ my $stderr_fname= catfile(tmpdir, "$tmp_prefix-stderr-$$.txt");
 
 # Write something to the stdin file.  Then run the script which reads it and echoes to both stdout and stderr.
 my ($stdin, $stdout, $stderr);
-my $content= "Time = ".time."\r\n";
+my $content= "Time = ".time."\n";
 writefile($stdin_fname, $content);
 
 my $proc= Proc::Background->new({
@@ -47,9 +47,6 @@ my $proc= Proc::Background->new({
   stderr => open_or_die('>', $stderr_fname),
   command => [ $^X, '-we', <<'END' ],
 use strict;
-binmode STDIN;
-binmode STDOUT;
-binmode STDERR;
 $/= undef;
 my $content= <STDIN>;
 print STDOUT $content;
@@ -87,9 +84,8 @@ $proc= Proc::Background->new({
   stderr => $stderr_fname,
   command => [ $^X, '-we', <<'END' ],
 use strict;
-binmode STDERR;
 print STDERR "appended a line\n";
-print "ok 7\r\n";
+print "ok 7\n";
 END
 });
 $proc->wait;

@@ -34,7 +34,7 @@ test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog' =
 test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun' => 0.17;
 test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman' => 0.15;
 test_requires 'Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human' => 0.15;
-test_requires 'Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human' => 0.15;
+test_requires 'Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human' => 0.25;
 test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf' => 0.17;
 test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog' => 0;
 test_requires 'Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human' => 0;
@@ -58,7 +58,7 @@ test_requires 'Wikibase::Datatype::Value::Quantity' => 0;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

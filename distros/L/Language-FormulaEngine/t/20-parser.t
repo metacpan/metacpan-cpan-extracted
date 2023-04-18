@@ -34,7 +34,7 @@ sub test_parser {
 			undef, qr/unexpected.*\(/i
 		],
 		[ '',
-			undef, qr/expected.*near.*end of/i
+			undef, qr/expected.*end of/i
 		],
 		[ '3foo',
 			undef, qr/unknown.*syntax/i

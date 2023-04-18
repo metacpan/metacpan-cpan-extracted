@@ -10,7 +10,7 @@ use Wikibase::Datatype::Print::Value;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -177,7 +177,7 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut
 

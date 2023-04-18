@@ -17,7 +17,7 @@ App::Greple::git is a greple module to handle git output.
 - **--color-blame-label**
 
     Read [git-blame(1)](http://man.he.net/man1/git-blame) output and apply unique color for each commit
-    ids.  Option **--color-blame** and **--color-blame-line** colorize whole
+    id.  Option **--color-blame** and **--color-blame-line** colorize whole
     line, while **--color-blame-label** does only labels.
 
     Set `$HOME/.gitconfig` like this:
@@ -32,6 +32,18 @@ App::Greple::git is a greple module to handle git output.
     <div>
             <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-git/main/images/git-blame-label-small.jpg">
     </div>
+
+- **--color-header-by-author**
+
+    Colorize the commit header in a different color based on the author field.
+
+- **--color-header-by-field** _field_
+
+    Generic version of log header colorization.  Take a case-insensitive
+    field name as a parameter.  **--color-header-by-author** is defined as
+    follows:
+
+        option --color-header-by-author --color-header-by-field Author
 
 # ENVIRONMENT
 
@@ -62,7 +74,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro.
+Copyright 2021-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

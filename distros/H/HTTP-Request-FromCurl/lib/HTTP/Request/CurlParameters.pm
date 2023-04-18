@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 NAME
 
@@ -314,8 +314,8 @@ has fail => (
     is => 'ro',
 );
 
-sub _build_quoted_body( $self ) {
-    if( my $body = $self->body ) {
+sub _build_quoted_body( $self, $body=$self->body ) {
+    if( defined $body ) {
         $body =~ s!([\x00-\x1f'"\$\@\%\\])!sprintf '\\x%02x', ord $1!ge;
         return sprintf qq{"%s"}, $body
 
@@ -456,9 +456,32 @@ sub _build_lwp_headers( $self, $prefix = "    ", %options ) {
 }
 
 sub _build_tiny_headers( $self, $prefix = "    ", %options ) {
-    delete $self->{headers}->{Host};
-    my @result = (%{ $self->headers});
-    $self->_pairlist( \@result, $prefix );
+    my @h = $self->_explode_headers;
+    my $h = HTTP::Headers->new( @h );
+    $h->remove_header( @{$options{implicit_headers}} );
+
+    # HTTP::Tiny does not like overriding the Host: header :-/
+    $h->remove_header('Host');
+
+    @h = $h->flatten;
+    my %h;
+    my @order;
+    while( @h ) {
+        my ($k,$v) = splice(@h,0,2);
+        if( ! exists $h{ $k }) {
+            # Fresh value
+            $h{ $k } = $v;
+            push @order, $k;
+        } elsif( ! ref $h{$k}) {
+            # Second value
+            $h{ $k } = [$h{$k}, $v];
+        } else {
+            # Multiple values
+            push @{$h{ $k }}, $v;
+        }
+    };
+
+    $self->_pairlist([ map { $_ => $h{ $_ } } @order ], $prefix);
 }
 
 sub _build_mojolicious_headers( $self, $prefix = "    ", %options ) {
@@ -605,13 +628,22 @@ sub as_lwp_snippet( $self, %options ) {
     @setup_ua = ()
         if @setup_ua == 1;
 
-    @preamble = map { "$options{prefix}    $_\n" } @preamble;
-    @postamble = map { "$options{prefix}    $_\n" } @postamble;
-    @setup_ua = map { "$options{prefix}    $_\n" } @setup_ua;
+    my $request_constructor;
 
-    return <<SNIPPET;
-@preamble
-    my \$ua = LWP::UserAgent->new($constructor_args);@setup_ua
+    if( $self->method ne 'GET' and @{ $self->form_args }) {
+        push @preamble, 'use HTTP::Request::Common;';
+        $request_constructor = <<SNIPPET;
+    my \$r = HTTP::Request::Common::@{[$self->method]}(
+        '@{[$self->uri]}',
+        Content_Type => 'form-data',
+        Content => [
+            @{[$self->_pairlist($self->form_args, '            ')]}
+        ],
+@{[$self->_build_lwp_headers('            ', %options)]}
+    );
+SNIPPET
+    } else {
+        $request_constructor = <<SNIPPET;
     my \$r = HTTP::Request->new(
         '@{[$self->method]}' => '@{[$self->uri]}',
         [
@@ -619,6 +651,17 @@ sub as_lwp_snippet( $self, %options ) {
         ],
         @{[$self->_build_quoted_body()]}
     );
+SNIPPET
+    }
+
+    @preamble = map { "$options{prefix}    $_\n" } @preamble;
+    @postamble = map { "$options{prefix}    $_\n" } @postamble;
+    @setup_ua = map { "$options{prefix}    $_\n" } @setup_ua;
+
+    return <<SNIPPET;
+@preamble
+    my \$ua = LWP::UserAgent->new($constructor_args);@setup_ua
+    $request_constructor
     my \$res = \$ua->request( $request_args );
 @postamble
 SNIPPET
@@ -691,7 +734,15 @@ sub as_http_tiny_snippet( $self, %options ) {
     my @content = $self->_build_quoted_body();
     if( grep {/\S/} @content ) {
         unshift @content, 'content => ',
-    };
+    } elsif( @{ $self->form_args }) {
+        my $req = HTTP::Request::Common::POST(
+            'https://example.com',
+            Content_Type => 'form-data',
+            Content => $self->form_args,
+        );
+        @content = ('content => ', $self->_build_quoted_body( $req->content ));
+        $self->headers->{ 'Content-Type' } = join "; ", $req->headers->content_type;
+    }
 
     return <<SNIPPET;
 @preamble
@@ -775,9 +826,15 @@ sub as_mojolicious_snippet( $self, %options ) {
     @setup_ua = map { "$options{prefix}    $_\n" } @setup_ua;
 
     my $content = $self->_build_quoted_body();
-    #if( $content ) {
-    #    $content = qq{"} . quotemeta($content) . qq{"};
-    #};
+    if( @{ $self->form_args }) {
+        my $req = HTTP::Request::Common::POST(
+            'https://example.com',
+            Content_Type => 'form-data',
+            Content => $self->form_args,
+        );
+        $content ||= $self->_build_quoted_body( $req->content );
+        $self->headers->{ 'Content-Type' } = join "; ", $req->headers->content_type;
+    }
 
     return <<SNIPPET;
 @preamble

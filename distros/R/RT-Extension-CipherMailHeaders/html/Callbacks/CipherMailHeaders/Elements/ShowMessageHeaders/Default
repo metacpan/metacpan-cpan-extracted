@@ -1,0 +1,121 @@
+%#
+%# Part of RT::Extension::CipherMail 
+%#
+%# See module for Copyright Information
+%#
+%# Otmar Lendl <lendl@cert.at> 2023-04-17
+%#
+<%ARGS>
+$headers => []
+$display_headers => {}
+$message => undef
+</%ARGS>
+<%INIT>
+use Data::Dumper;
+
+# $RT::Logger->info("CallBack -- otmar");
+
+my %mc_header = ();
+my $is_internal = 1;
+my $seen_from = 0;
+my @smime_keys = ();
+
+foreach ( $message->SplitHeaders ) {
+    if ( /^X-Djigzo-Info-([^:]+):\s*(.*)/i ) {
+        $mc_header{$1} = $2;
+        $RT::Logger->info("RT::Extension::CipherMailHeaders: found header: $1 - $2");
+    }
+    if ( /^X-Djigzo-Info-Signer-ID-(\d+-\d+):/ ) {
+		push @smime_keys, $1;
+    }
+}
+
+
+# Incoming PGP signed message
+if (defined($mc_header{'PGP-Signed'}) and defined($mc_header{'PGP-Signature-Valid'})) {
+	my @css_class;
+	my $text;
+	if ($mc_header{'PGP-Signature-Valid'} eq 'True') {
+		@css_class = ("done", "trust-FULL");
+		$text = "Good PGP Signature";
+	} else {
+		@css_class = ("bad");
+		$text = "Bad PGP Signature";
+		$text .= (defined($mc_header{'PGP-Signature-Failure'})) ? " (" . $mc_header{'PGP-Signature-Failure'}. ")" : ".";
+	}
+	$text .= (defined($mc_header{'PGP-Signer-Keyid'})) ? " from KeyID " . $mc_header{'PGP-Signer-Keyid'}. "." : ".";
+	$text .= (defined($mc_header{'PGP-Encoding'})) ? " Encoding " . $mc_header{'PGP-Encoding'}. "." : "";
+	unshift @$headers, { Tag => "Signing", Classes => ['verify', @css_class], 
+			Value => $m->interp->apply_escapes($text)};
+	$display_headers->{"signing"} = 1;
+#        $RT::Logger->info("RT::Extension::CipherMailHeaders: Adding Signing header: $text");
+} 
+
+
+# Incoming PGP encrypted message
+if (defined($mc_header{'PGP-Encrypted'})) {
+	my @css_class;
+	my $text;
+	if ($mc_header{'PGP-Encrypted'} eq 'True') {
+		@css_class = ("done", "trust-FULL");
+		$text = "Good PGP Encryption";
+	} else {
+		@css_class = ("bad");
+		$text = "Bad PGP Encryption";
+	}
+
+# Elements/CryptStatus uses class 'decrypt', but I don't see that in any css file
+# thus we go for "verify" here
+	unshift @$headers, { Tag => "Encryption", Classes => ['verify', @css_class], 
+			Value => $m->interp->apply_escapes($text)};
+	$display_headers->{"encryption"} = 1;
+} 
+
+# Incoming MIME signed message
+if (defined($mc_header{'Smime-Signed'})) {
+	foreach my $skey (@smime_keys) {
+		$RT::Logger->info("RT::Extension::CipherMailHeaders: Dealing with $skey");
+		next unless (defined($mc_header{"Signer-Verified-" . $skey}) and
+				defined($mc_header{"Signer-Email-" . $skey}) and
+				defined($mc_header{"Signer-Trusted-" . $skey}) and
+				defined($mc_header{"Signer-ID-" . $skey})); 
+		$RT::Logger->info("RT::Extension::CipherMailHeaders: got all headers for $skey");
+
+		my @css_class;
+		my $text;
+		my $errortext = "";
+		if ($mc_header{'Signer-Verified-' . $skey} eq 'True') {
+			@css_class = ("done");
+			$text = "Good S/MIME Signature";
+		} else {
+			@css_class = ("bad");
+			$text = "Bad S/MIME Signature";
+
+			if (defined($mc_header{'Signer-Verification-Info-'. $skey})) {
+				$errortext = $mc_header{'Signer-Verification-Info-'. $skey};
+# in my tests this was .e.g "Signature could not be verified. Message: org.bouncycastle.cms.CMSSignerDigestMismatchException: message-digest attribute value does not match calculated value" which is two layers too deep.
+				$errortext =~ s/.*Message: //;			
+				$errortext =~ s/^org.bouncycastle.cms\S+: //;			
+				$text .= " ($errortext)";
+			}
+		}
+
+		$text .= " from " . $mc_header{"Signer-Email-" . $skey} .  ".";
+		if ($mc_header{'Signer-Trusted-' . $skey} eq 'True') {
+			push @css_class,  "trust-FULL";
+			$text .= " (Trusted)";
+		} else {
+			push @css_class,  "trust-NONE";
+			$text .= " (Untrusted)";
+		}
+		
+
+		my $hname = ($skey eq '0-0') ? "Signing" : "Signing-$skey";
+		unshift @$headers, { Tag => $hname, Classes => ['verify', @css_class], 
+				Value => $m->interp->apply_escapes($text)};
+		$display_headers->{lc $hname} = 1;
+	        $RT::Logger->info("RT::Extension::CipherMailHeaders: Adding Signing header $hname: $text");
+	}
+} 
+
+</%INIT>

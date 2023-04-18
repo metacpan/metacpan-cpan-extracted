@@ -1,3 +1,8 @@
+1.000012                2023-04-18 01:11:58+00:00 UTC TABULO
+
+    [REVISION]
+    - Remove plugin "PrereqsClean" which appears to be unmaintained since 2014 and fails tests for perl v5.23+
+
 1.000011                2022-03-05 05:17:26+00:00 UTC TABULO
 
     [REVISION]

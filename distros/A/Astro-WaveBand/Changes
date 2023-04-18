@@ -1,0 +1,87 @@
+Revision history for Astro::WaveBand
+
+0.10 2023-04-17
+
+  - Add Namakanui receivers for JCMT.
+
+0.09 2014-02-13
+
+  - Add 1.69CH4_l filter for UFTI.
+
+  - Add RxA3M for JCMT.
+
+0.08 2012-06-19
+
+  - Include Sloan, PanSTARRS w & Y and solar filters.
+
+  - Add 1.644FeII filter for WFCAM.
+
+0.07 2010-12-30
+
+  - Use Module::Build.
+
+  - Add 2.122MK filter for UFTI.
+
+  - Add UIST Y_MK filter.
+
+  - Add 1.619nBH filter for WFCAM.
+
+  - Add Y+MK filter for UFTI.
+
+  - Add WB, WD.
+
+  - Add HARP support.
+
+  - When converting from wavelength to filter in the
+    _convert_to() function and using lookup table to do so, round the
+    value obtained from the lookup table in the same fashion as the
+    rounding of the given wavelength in order to avoid rounding issues
+    when trying to compare floating-point numbers.
+
+  - t/waveband.t: Test fix of above bug.
+
+  - Add comparison operators and overloaded comparison operators.
+
+  - t/waveband.t: Test comparison operators.
+
+  - t/waveband.t: Use Test::More.
+
+  - Add WFCAM.
+
+  - Added three static methods has_instrument(),
+    has_filter() and is_observable() which pretty much do exactly
+    what it says on the box. Check the inline POD for details.
+    Added a %TELESCOPE lookup hash to go along with the existing
+    %FILTERS lookup hash.
+
+  - Update UIST filters.
+
+0.06 2003-01-31
+
+  - Add support for JCMT heterodyne instruments.
+
+  - Add UIST support.
+
+0.05 2002-06-04
+
+  - Add Blank for UFTI and add SCUBA filters. Still a
+    problem with multiple wavelengths associated with a single filter.
+
+0.04 2002-05-28
+
+  - Included README in release.
+
+  - Add licence statement.
+
+0.03 2002-05-16
+
+  - CPAN release 0.03
+
+0.02 2001-12-05
+
+  - Make sure that we do not require full
+    precision when matching wavelength against filter.
+
+0.01 2001-11-27
+
+  - First version.

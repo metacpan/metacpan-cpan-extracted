@@ -88,7 +88,7 @@ package JSON::SIMD;
 
 use common::sense;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our $JSON_XS_VERSION = '4.03';
 our @ISA = qw(Exporter);
 

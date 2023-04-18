@@ -8,6 +8,13 @@ use View::Example::View
 
 has name => (is=>'ro', required=>1);
 
+sub form :Renders {
+  my $self = shift;
+  return $self->form_for($self, +{a=>1}, sub {
+    my ($self, $fb) = @_;
+    $fb->input('name'),
+  }); 
+}
 sub simple :Renders {
   my $self = shift;
   return div "Hey";
@@ -72,11 +79,11 @@ sub render {
         },
       },
       div form_for 'fff', sub {
-        my ($fb) = @_;
+        my ($self, $fb) = @_;
         $fb->input('foo'),
         $fb->input('bar'),
       },
-      form_for $self, +{}, sub {
+      form_for [$self], +{a=>2}, sub {
         my ($fb) = @_;
         $fb->input('name'),
       },
@@ -85,18 +92,18 @@ sub render {
       a {href=>path('test', +{foo=>'bar'})},
       a {href=>path('test', +{foo=>'bar'}, \'fragment')},
 
-      div form_for $self, +{}, sub {
-        my ($fb) = @_;
+      div form_for [$self], +{b=>1}, sub {
+        my ($self, $fb) = @_;
         $fb->input('name'),
       },
 
       link_to 'test', {class=>'linky'}, 'Link to Test item.',
       link_to 'test', 'Link to Test item.',
       link_to path('test', +{page=>1}), {class=>'linky'}, 'Link to Test item.',
-      div form_for $self, +{}, sub {
-        my ($fb) = @_;
+      div $self->form_for($self, +{a=>1}, sub {
+        my ($self, $fb) = @_;
         $fb->input('name'),
-      }, 
+      }), 
     };
 }
 

@@ -43,7 +43,7 @@ use overload
 # Package Global variables
 use vars qw/ $VERSION /;
 
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 =head1 METHODS
 
@@ -235,7 +235,8 @@ setting of C<str_ndp>, but is constrained by an optional argument:
 
   @comp = $ang->components( $ndp );
 
-Default resolution is 5 decimal places.
+Default resolution is 5 decimal places.  The limit is 9 to avoid
+overflowing the results from palDr2af or palDr2tf.
 
 In scalar context, returns a reference to an array.
 
@@ -251,6 +252,13 @@ sub components {
   # Convert to components using PAL. COCO uses 4 dp for high
   # resolution.
   $res = 5 unless defined $res;
+
+  # Limit $res to avoid overflowing results from palDr2af or palDr2tf.
+  if ($res > 9) {
+    warnings::warnif("Excess dp ($res) requested, limiting to 9");
+    $res = 9;
+  }
+
   my @dmsf = $self->_r2f( $res );
 
   # Combine the fraction with the seconds unless no decimal places
@@ -455,7 +463,7 @@ sub in_format {
   } elsif ($format =~ /^arcs/ || $format eq 'as') {
     return $self->arcsec;
   } elsif ($format =~ /^a/) {
-    return $self->components( 2 );
+    return $self->components($self->str_ndp);
   } else {
     warnings::warnif("Unsupported format '$format'. Returning radians.");
     return $self->radians;
@@ -774,6 +782,9 @@ Note that the number of decimal places is an argument.
 sub _r2f {
   my $self = shift;
   my $res = shift;
+
+  warnings::warnif("More than 9 dp requested ($res), result from palDr2af likely to overflow in fractional part") if $res > 9;
+
   my ($sign, @dmsf) = Astro::PAL::palDr2af($res, $self->radians);
   return ($sign, @dmsf);
 }

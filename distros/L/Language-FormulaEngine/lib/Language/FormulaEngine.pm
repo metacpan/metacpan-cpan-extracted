@@ -5,7 +5,7 @@ use Try::Tiny;
 use Module::Runtime 'require_module';
 
 # ABSTRACT: Parser/Interpreter/Compiler for simple spreadsheet formula language
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 has parser => (
@@ -49,6 +49,23 @@ sub _coerce_instance {
 }
 
 
+sub parse {
+	my ($self, $text, $error_ref)= @_;
+	unless ($self->parser->parse($text)) {
+		die $self->parser->error unless $error_ref;
+		$$error_ref= $self->parser->error;
+		return undef;
+	}
+	return Language::FormulaEngine::Formula->new(
+		engine     => $self,
+		orig_text  => $text,
+		parse_tree => $self->parser->parse_tree,
+		functions  => $self->parser->functions,
+		symbols    => $self->parser->symbols,
+	);
+}
+
+
 sub evaluate {
 	my ($self, $text, $vars)= @_;
 	$self->parser->parse($text)
@@ -69,6 +86,7 @@ sub compile {
 }
 
 
+require Language::FormulaEngine::Formula;
 1;
 
 __END__
@@ -83,7 +101,7 @@ Language::FormulaEngine - Parser/Interpreter/Compiler for simple spreadsheet for
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -203,6 +221,14 @@ default compiler.
 
 =head1 METHODS
 
+=head2 parse
+
+  my $formula= $fe->parse( $formula_text, \$error );
+
+Return a L<Language::FormulaEngine::Formula|Formula object> representing the expression.
+Dies if it can't parse the expression, unless you supply C<$error> then the error is
+stores in that scalarref and the methods returns C<undef>.
+
 =head2 evaluate
 
   my $value= $fe->evaluate( $formula_text, \%variables );
@@ -294,7 +320,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2023 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

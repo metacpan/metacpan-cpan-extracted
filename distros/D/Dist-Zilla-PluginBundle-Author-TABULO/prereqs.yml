@@ -5,6 +5,7 @@ runtime:
     Dist::Zilla::Plugin::ArchiveRelease: 0
     Dist::Zilla::Plugin::Authority: 0
     Dist::Zilla::Plugin::AutoPrereqs: 0
+    Dist::Zilla::Plugin::Bugtracker: 0
     Dist::Zilla::Plugin::BumpVersionAfterRelease: 0
     Dist::Zilla::Plugin::CheckChangesHasContent: 0
     Dist::Zilla::Plugin::CheckMetaResources: 0
@@ -45,7 +46,6 @@ runtime:
     Dist::Zilla::Plugin::Pod2Readme: 0
     Dist::Zilla::Plugin::PodSyntaxTests: 0
     Dist::Zilla::Plugin::Prereqs::AuthorDeps: 0
-    Dist::Zilla::Plugin::PrereqsClean: 0
     Dist::Zilla::Plugin::PrereqsFile: 0
     Dist::Zilla::Plugin::PromptIfStale: 0
     Dist::Zilla::Plugin::PruneCruft: 0
@@ -75,6 +75,7 @@ runtime:
 test:
   requires:
     Path::Tiny: '0.079' # relative method algorithm
+    Test::CPAN::Meta: 0
     Test::DZil: 0
     Test::More: '0.88' # done_testing
     Test::File::ShareDir::Module: 0
@@ -88,4 +89,3 @@ develop:
     Perl::Critic::Community: '1.000'
     Perl::Critic::TooMuchCode: '0.13'
     Perl::Critic::Policy::Lax::ProhibitStringyEval::ExceptForRequire: 0
-

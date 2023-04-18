@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,42 +16,42 @@ name: XML-Generator
 provides:
   XML::Generator:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::DOM:
     file: lib/XML/Generator/DOM.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::DOM::util:
     file: lib/XML/Generator/DOM.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::cdata:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::comment:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::final:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::overload:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::pi:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::pretty:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
   XML::Generator::util:
     file: lib/XML/Generator.pm
-    version: '1.09'
+    version: '1.11'
 recommends:
   XML::DOM: '1.46'
 requires:
   perl: '5.008'
 resources:
-  repository: git://github.com/perl-net-saml2/perl-XML-Generator.git
-version: '1.09'
-x_generated_by_perl: v5.32.1
+  repository: git://github.com/timlegge/perl-XML-Generator.git
+version: '1.11'
+x_generated_by_perl: v5.34.0
 x_maintainers:
   - 'Timothy Legge <timlegge@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.73'

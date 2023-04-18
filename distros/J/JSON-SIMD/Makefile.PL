@@ -21,5 +21,15 @@ WriteMakefile(
     LD => 'g++',
     OPTIMIZE => '-O3',
     CCFLAGS => "$Config::Config{ccflags} -DSIMDJSON_EXCEPTIONS=0 -DNDEBUG",
+    META_MERGE => {
+        resources => {
+            bugtracker => { web => "https://github.com/pjuhasz/JSON-SIMD/issues" },
+            license => [ "http://dev.perl.org/licenses/" ],
+            repository => {
+                type => "git",
+                url => "https://github.com/pjuhasz/JSON-SIMD"
+            }
+        }
+    },
 );
 

@@ -1,5 +1,9 @@
 Revision history for Astro::FITS::Header
 
+3.09 2023-04-17
+
+  - Minor updates to documentation.
+
 3.08 2021-02-22
 
   - Starlink::AST recommends prereq changed to suggests.

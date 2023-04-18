@@ -17,7 +17,6 @@ t/autodetect.pl
 t/basic.pl
 t/datasource.pl
 t/optional_alias.pl
-t/requires_external.t
 t/t_Common.pm
 t/t_SSUtils.pm
 t/t_TestCommon.pm

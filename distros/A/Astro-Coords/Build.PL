@@ -35,10 +35,10 @@ my $build = Module::Build->new
    author => [
               'Tim Jenness <t.jenness@jach.hawaii.edu>',
              ],
-   dist_version => '0.20',
+   dist_version => '0.21',
    meta_merge => {
                resources =>  {
-                              repository => "git://github.com/timj/perl-Astro-Coords.git",
+                              repository => "https://github.com/timj/perl-Astro-Coords.git",
                               homepage => "http://github.com/timj/perl-Astro-Coords/tree/master",
                              },
                 },

@@ -5,12 +5,13 @@ use strict;
 use warnings;
 
 use DateTime::Format::ISO8601;
+use English;
 use Error::Pure qw(err);
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -39,13 +40,35 @@ sub print {
 		$calendar = $obj->calendarmodel;
 	}
 
-	my $dt = DateTime::Format::ISO8601->parse_datetime((substr $obj->value, 1));
+	# Convert to DateTime.
+	my $dt = _parse_date((substr $obj->value, 1));
 
 	# TODO Precision
+	# 0 - billion years, 1 - hundred million years, ..., 6 - millenia, 7 - century, 8 - decade,
+	# 9 - year, 10 - month, 11 - day
 	# TODO other?
 
 	# TODO %d 01 -> 1
+	# TODO Based on precision.
 	return $dt->strftime("%d %B %Y").' ('.$calendar.')';
+}
+
+sub _parse_date {
+	my $date = shift;
+
+	my $dt = eval {
+		DateTime::Format::ISO8601->parse_datetime($date, 1);
+	};
+	if ($EVAL_ERROR) {
+		err 'Cannot parse datetime value.',
+			'Input string', $date,
+			# XXX Long error message, we don't need. Probably issue
+			# in DateTime::Format::ISO8601
+			# 'Error', $EVAL_ERROR,
+		;
+	}
+
+	return $dt;
 }
 
 1;
@@ -80,6 +103,8 @@ Returns string.
 =head1 ERRORS
 
  print():
+         Cannot parse datetime value.
+                 Input string: %s
          Object isn't 'Wikibase::Datatype::Value::Time'.
          Option 'cb' must be a instance of Wikibase::Cache.
 
@@ -139,6 +164,7 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<DateTime::Format::ISO8601>,
+L<English>,
 L<Error::Pure>,
 L<Exporter>,
 L<Readonly>.
@@ -171,6 +197,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

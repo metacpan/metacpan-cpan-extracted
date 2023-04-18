@@ -1,3 +1,9 @@
+0.07 - 2023-04-17
+  - New Formula object for tracking a parse tree along with its
+    original formula text and associated engine.
+  - New 'simplify' method for removing constant terms from formula
+  - New compiler output_api 'function_of_vars_no_default'
+
 0.06 - 2021-01-26
   - Compiled formulas now access vars via Namespace->get_value
     the same as uncompiled evaluated formulas, though this may be

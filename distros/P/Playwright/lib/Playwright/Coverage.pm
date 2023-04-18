@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Coverage;
-$Playwright::Coverage::VERSION = '1.291';
+$Playwright::Coverage::VERSION = '1.323';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'Coverage'}{members};
 }
 
-sub startCSSCoverage {
+sub stopJSCoverage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'startCSSCoverage',
+        command => 'stopJSCoverage',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -42,11 +42,11 @@ sub startJSCoverage {
     );
 }
 
-sub stopJSCoverage {
+sub startCSSCoverage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'stopJSCoverage',
+        command => 'startCSSCoverage',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Coverage - Automatically generated class for Playwright::Coverage
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 CONSTRUCTOR
 
@@ -117,11 +117,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 startCSSCoverage(@args)
+=head2 stopJSCoverage(@args)
 
-Execute the Coverage::startCSSCoverage playwright routine.
+Execute the Coverage::stopJSCoverage playwright routine.
 
-See L<https://playwright.dev/api/class-Coverage#Coverage-startCSSCoverage> for more information.
+See L<https://playwright.dev/api/class-Coverage#Coverage-stopJSCoverage> for more information.
 
 =head2 startJSCoverage(@args)
 
@@ -129,11 +129,11 @@ Execute the Coverage::startJSCoverage playwright routine.
 
 See L<https://playwright.dev/api/class-Coverage#Coverage-startJSCoverage> for more information.
 
-=head2 stopJSCoverage(@args)
+=head2 startCSSCoverage(@args)
 
-Execute the Coverage::stopJSCoverage playwright routine.
+Execute the Coverage::startCSSCoverage playwright routine.
 
-See L<https://playwright.dev/api/class-Coverage#Coverage-stopJSCoverage> for more information.
+See L<https://playwright.dev/api/class-Coverage#Coverage-startCSSCoverage> for more information.
 
 =head2 stopCSSCoverage(@args)
 

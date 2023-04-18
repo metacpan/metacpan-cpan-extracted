@@ -7,13 +7,11 @@ build_requires:
   Cwd: '0'
   Data::Dumper: '0'
   English: '0'
-  Env::Path: '0.18'
   File::Spec: '0'
   File::Temp: '0.23'
   FindBin: '0'
   Getopt::Long: '0'
   Test::More: '0.98'
-  Test::Most: '0'
   Time::HiRes: '0'
   autovivification: '0'
   indirect: '0'
@@ -65,7 +63,7 @@ resources:
   bugtracker: https://github.com/jimav/Spreadsheet-Edit/issues
   homepage: https://github.com/jimav/Spreadsheet-Edit
   repository: https://github.com/jimav/Spreadsheet-Edit.git
-version: '3.006'
+version: '3.007'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

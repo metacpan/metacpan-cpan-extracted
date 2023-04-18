@@ -1,5 +1,12 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001022 2023 April 18
+          - Improved some error reporting and messaging
+          - Catalyst View can now import methods from the controller and context
+          - fixes to bugs in the view imported tags
+          - mostly invisible changes to the way we create form builders to set the
+            groundwork for bigger changes in the future
+            
 0.001021 2023 April 10
           - Added missing distribution dependencies
           - minor tweaks to some naming and formating in the example application

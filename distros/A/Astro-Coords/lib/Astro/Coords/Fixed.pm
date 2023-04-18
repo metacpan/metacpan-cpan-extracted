@@ -36,7 +36,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Astro::PAL ();
 use Astro::Coords::Angle;

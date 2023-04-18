@@ -2,7 +2,7 @@
 #
 ## LICENSE AND COPYRIGHT
 # 
-## Copyright (C) 2022 Carlos Celso
+## Copyright (C) Carlos Celso
 # 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -34,13 +34,13 @@
 
 ################################################################################
 
-	$ENV{SQL_SIMPLE_DB_CREATE_ALLOWED} = "" if (!defined$ENV{SQL_SIMPLE_DB_CREATE_ALLOWED});
-	$ENV{SQL_SIMPLE_DB_SKIP_CREATE} = "" if (!defined$ENV{SQL_SIMPLE_DB_SKIP_CREATE});
+	$ENV{SQL_SIMPLE_DB_TEST_CREATE_ALLOWED} = "" if (!defined$ENV{SQL_SIMPLE_DB_TEST_CREATE_ALLOWED});
+	$ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE} = "" if (!defined$ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE});
 	$ENV{SQL_SIMPLE_DB_SHOW_CREATE} = "" if (!defined$ENV{SQL_SIMPLE_DB_SHOW_CREATE});
 
 	my $test=0;
-	$test++ if ($ENV{SQL_SIMPLE_DB_CREATE_ALLOWED} eq "1");
-	$test++ if ($ENV{SQL_SIMPLE_DB_SKIP_CREATE} eq "1");
+	$test++ if ($ENV{SQL_SIMPLE_DB_TEST_CREATE_ALLOWED} eq "1");
+	$test++ if ($ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE} eq "1");
 	$test++ if ($ENV{SQL_SIMPLE_DB_SHOW_CREATE} eq "1");
 	if ($test == 0)
 	{
@@ -59,18 +59,47 @@
 
 ################################################################################
 
-	require "$dir/testDB_sqlite.pm";
-	require "$dir/testDB_mysql.pm";
-	require "$dir/testDB_postgres.pm";
-
-	diag("");
-
-	&SQLite_do($dir);
-
-	&MySQL_do($dir);
-
-	&PG_do($dir);
-
+	## test sqlite if avail
+	
+	eval { require DBD::SQLite; };
+	if (!$@)
+	{
+		require "$dir/testDB_sqlite.pm";
+		&SQLite_do($dir);
+	}
+	else
+	{
+		diag($@);
+		diag("DBD::SQLite not found, SQLite test skipped");
+	}
+	
+	# test mysql/mariadb if avail
+	
+	eval { require DBD::mysql; };
+	if (!$@)
+	{
+		require "$dir/testDB_mysql.pm";
+		&MySQL_do($dir);
+	}
+	else
+	{
+		diag($@);
+		diag("DBD::mysql not found, MySQL/MariaDB test skipped");
+	}
+	
+	# test postgresql if avail
+	
+	eval { require DBD::Pg; };
+	if (!$@)
+	{
+		require "$dir/testDB_postgres.pm";
+		&PG_do($dir);
+	}
+	else
+	{
+		diag($@);
+		diag("DBD::Pg not found, Postegres test skipped");
+	}
 	done_testing();
 	exit;
 

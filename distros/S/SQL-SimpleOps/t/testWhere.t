@@ -2,7 +2,7 @@
 #
 ## LICENSE AND COPYRIGHT
 # 
-## Copyright (C) 2022 Carlos Celso
+## Copyright (C) Carlos Celso
 # 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -47,73 +47,74 @@
 	my $er;
 	my $ok;
 
-	&my_where ( f=>"001", t=> "t1", w=> [ "id"=> "info" ], r=> "id = 'info'" );
-	&my_where ( f=>"002", t=> "t1", w=> [ "id"=> [ "=", "info" ] ], r=> "id = 'info'" );
-	&my_where ( f=>"003", t=> "t1", w=> [ "id"=> [ "!", "info" ] ], r=> "id != 'info'" );
-	&my_where ( f=>"004", t=> "t1", w=> [ "id"=> [ "<", "info" ] ], r=> "id < 'info'" );
-	&my_where ( f=>"005", t=> "t1", w=> [ "id"=> [ ">", "info" ] ], r=> "id > 'info'" );
-	&my_where ( f=>"006", t=> "t1", w=> [ "id"=> [ "^%", "info" ] ], r=> "id LIKE 'info%'" );
-	&my_where ( f=>"007", t=> "t1", w=> [ "id"=> [ "%%", "info" ] ], r=> "id LIKE '%info%'" );
-	&my_where ( f=>"008", t=> "t1", w=> [ "id"=> [ "%^", "info" ] ], r=> "id LIKE '%info'" );
-	&my_where ( f=>"009", t=> "t1", w=> [ "id"=> [ "^^", "info" ] ], r=> "id LIKE 'info'" );
-	&my_where ( f=>"010", t=> "t1", w=> [ "id"=> undef ], r=> "id IS NULL" );
-	&my_where ( f=>"011", t=> "t1", w=> [ "id"=> [ "!", undef ] ], r=> "id NOT NULL" );
-	&my_where ( f=>"012", t=> "t1", w=> [ "id"=> [ "info1", "info2" ] ], r=> "id IN ('info1','info2')" );
-	&my_where ( f=>"013", t=> "t1", w=> [ "id"=> [ "!", "info1", "info2" ] ], r=> "id NOT IN ('info1','info2')" );
-	&my_where ( f=>"014", t=> "t1", w=> [ "id"=> [ "info1", "..", "info2" ] ], r=> "id BETWEEN ('info1','info2')" );
-	&my_where ( f=>"015", t=> "t1", w=> [ "id"=> [ "!", "info1", "..", "info2" ] ], r=> "id NOT BETWEEN ('info1','info2')" );
+	&my_where ( f=>"101", t=> "t1", w=> [ "id"=> "info" ], r=> "id = 'info'" );
+	&my_where ( f=>"102", t=> "t1", w=> [ "id"=> [ "=", "info" ] ], r=> "id = 'info'" );
+	&my_where ( f=>"103", t=> "t1", w=> [ "id"=> [ "!", "info" ] ], r=> "id != 'info'" );
+	&my_where ( f=>"104", t=> "t1", w=> [ "id"=> [ "<", "info" ] ], r=> "id < 'info'" );
+	&my_where ( f=>"105", t=> "t1", w=> [ "id"=> [ ">", "info" ] ], r=> "id > 'info'" );
+	&my_where ( f=>"106", t=> "t1", w=> [ "id"=> [ "^%", "info" ] ], r=> "id LIKE 'info%'" );
+	&my_where ( f=>"107", t=> "t1", w=> [ "id"=> [ "%%", "info" ] ], r=> "id LIKE '%info%'" );
+	&my_where ( f=>"108", t=> "t1", w=> [ "id"=> [ "%^", "info" ] ], r=> "id LIKE '%info'" );
+	&my_where ( f=>"109", t=> "t1", w=> [ "id"=> [ "^^", "info" ] ], r=> "id LIKE 'info'" );
+	&my_where ( f=>"110", t=> "t1", w=> [ "id"=> undef ], r=> "id IS NULL" );
+	&my_where ( f=>"111", t=> "t1", w=> [ "id"=> [ "!", undef ] ], r=> "id NOT NULL" );
+	&my_where ( f=>"112", t=> "t1", w=> [ "id"=> [ "info1", "info2" ] ], r=> "id IN ('info1','info2')" );
+	&my_where ( f=>"113", t=> "t1", w=> [ "id"=> [ "!", "info1", "info2" ] ], r=> "id NOT IN ('info1','info2')" );
+	&my_where ( f=>"114", t=> "t1", w=> [ "id"=> [ "info1", "..", "info2" ] ], r=> "id BETWEEN ('info1','info2')" );
+	&my_where ( f=>"115", t=> "t1", w=> [ "id"=> [ "!", "info1", "..", "info2" ] ], r=> "id NOT BETWEEN ('info1','info2')" );
 
-	&my_where ( f=>"020", t=> "t1", w=> [ "id"=> "info", "id" => "info2",       "no" => "no1", no => "no2" ], r=> "id = 'info' AND id = 'info2' AND no = 'no1' AND no = 'no2'" );
-	&my_where ( f=>"021", t=> "t1", w=> [ "id"=> "info", "id" => "info2", "or", "no" => "no1", no => "no2" ], r=> "id = 'info' AND id = 'info2' OR no = 'no1' AND no = 'no2'" );
+	&my_where ( f=>"120", t=> "t1", w=> [ "id"=> "info", "id" => "info2",       "no" => "no1", no => "no2" ], r=> "id = 'info' AND id = 'info2' AND no = 'no1' AND no = 'no2'" );
+	&my_where ( f=>"121", t=> "t1", w=> [ "id"=> "info", "id" => "info2", "or", "no" => "no1", no => "no2" ], r=> "id = 'info' AND id = 'info2' OR no = 'no1' AND no = 'no2'" );
 
-	&my_where ( f=>"100", t=> ["t1","t2"], w=> [ "t1.id" => "t2.id" ], r=> "t1.id = t2.id" );
-	&my_where ( f=>"101", t=> ["t1","t2"], w=> [ "t1.id" => [ "=", "t2.id" ] ], r=> "t1.id = t2.id" );
-	&my_where ( f=>"102", t=> ["t1","t2"], w=> [ "t1.id" => [ "!", "t2.id" ] ], r=> "t1.id != t2.id" );
+	&my_where ( f=>"200", t=> ["t1","t2"], w=> [ "t1.id" => "t2.id" ], r=> "t1.id = t2.id" );
+	&my_where ( f=>"201", t=> ["t1","t2"], w=> [ "t1.id" => [ "=", "t2.id" ] ], r=> "t1.id = t2.id" );
+	&my_where ( f=>"202", t=> ["t1","t2"], w=> [ "t1.id" => [ "!", "t2.id" ] ], r=> "t1.id != t2.id" );
 
-	&my_where ( f=>"110", t=> ["t1","t2","t3"], w=> [ "t1.id" => "t2.id", "t1.id" => "t3.id" ], r=> "t1.id = t2.id AND t1.id = t3.id" );
-	&my_where ( f=>"111", t=> ["t1","t2","t3"], w=> [ "t1.id" => [ "=", "t2.id" ], "t1.id" => [ "=", "t3.id" ] ], r=> "t1.id = t2.id AND t1.id = t3.id" );
-	&my_where ( f=>"112", t=> ["t1","t2","t3"], w=> [ "t1.id" => [ "!", "t2.id" ], "t1.id" => [ "!", "t3.id" ] ], r=> "t1.id != t2.id AND t1.id != t3.id" );
-	&my_where ( f=>"113", t=> ["t1","t2","t3"], w=> [ "t1.id" => "t2.id", "or", "t1.id" => "t3.id" ], r=> "t1.id = t2.id OR t1.id = t3.id");
+	&my_where ( f=>"210", t=> ["t1","t2","t3"], w=> [ "t1.id" => "t2.id", "t1.id" => "t3.id" ], r=> "t1.id = t2.id AND t1.id = t3.id" );
+	&my_where ( f=>"211", t=> ["t1","t2","t3"], w=> [ "t1.id" => [ "=", "t2.id" ], "t1.id" => [ "=", "t3.id" ] ], r=> "t1.id = t2.id AND t1.id = t3.id" );
+	&my_where ( f=>"212", t=> ["t1","t2","t3"], w=> [ "t1.id" => [ "!", "t2.id" ], "t1.id" => [ "!", "t3.id" ] ], r=> "t1.id != t2.id AND t1.id != t3.id" );
+	&my_where ( f=>"213", t=> ["t1","t2","t3"], w=> [ "t1.id" => "t2.id", "or", "t1.id" => "t3.id" ], r=> "t1.id = t2.id OR t1.id = t3.id");
+	&my_where ( f=>"214", t=> ["t1","t2"], w=> [ 't1.id' => 't2.id', 't1.id' => [ '1234','..','5678' ], [ 't1.id' => [ '!', 0 ], 'or', 't2.id' => [ '!', 0 ] ] ], r=> "t1.id = t2.id AND t1.id BETWEEN ('1234','5678') AND (t1.id != '0' OR t2.id != '0')");
 
 	&my_where
 	(
-		f=> "200",
+		f=> "220",
 		w=> [ [ "id" => 1, id => 2 ], [ no => 3, no => 4 ] ],
 		t=> "t1",
 		r=> "(id = '1' AND id = '2') AND (no = '3' AND no = '4')",
 	);
 	&my_where
 	(
-		f=> "201",
+		f=> "221",
 		w=> [ "id" => [ "^%", 1, 2 ], no => [ "%^", 3, 4 ] ],
 		t=> "t1",
 		r=> "(id LIKE '1%' OR id LIKE '2%') AND (no LIKE '%3' OR no LIKE '%4')",
 	);
 	&my_where
 	(
-		f=> "202",
+		f=> "222",
 		w=> [ "id" => [ "!^%", 1, 2 ], no => [ "!%^", 3, 4 ] ],
 		t=> "t1",
 		r=> "(id NOT LIKE '1%' AND id NOT LIKE '2%') AND (no NOT LIKE '%3' AND no NOT LIKE '%4')",
 	);
 	&my_where
 	(
-		f=> "203",
+		f=> "223",
 		w=> [ "id" => [ "!^%", 1, 2 ], "or", no => [ "!%^", 3, 4 ] ],
 		t=> "t1",
 		r=> "(id NOT LIKE '1%' AND id NOT LIKE '2%') OR (no NOT LIKE '%3' AND no NOT LIKE '%4')",
 	);
 	&my_where
 	(
-		f=> "204",
+		f=> "224",
 		w=> [ "id" => [ "!", undef ], "or", no => undef ],
 		t=> "t1",
 		r=> "id NOT NULL OR no IS NULL",
 	);
-	&my_where ( f=>"205", t=> "t1", w=> [ [ [ a=>1, b=>2 ], "or", [ c=>3, d=>4 ] ], e=>5 ], r=>"((a = '1' AND b = '2') OR (c = '3' AND d = '4')) AND e = '5'" );
+	&my_where ( f=>"225", t=> "t1", w=> [ [ [ a=>1, b=>2 ], "or", [ c=>3, d=>4 ] ], e=>5 ], r=>"((a = '1' AND b = '2') OR (c = '3' AND d = '4')) AND e = '5'" );
 
-	&my_where ( f=>"300", t=> "t1", w=> [ a => "\\concat(a,'abc')" ], r=>"a = concat(a,'abc')" );
-	&my_where ( f=>"301", t=> "t1", w=> [ a => [ "!", "\\concat(a,'abc')" ] ], r=>"a != concat(a,'abc')" );
+	&my_where ( f=>"230", t=> "t1", w=> [ a => "\\concat(a,'abc')" ], r=>"a = concat(a,'abc')" );
+	&my_where ( f=>"231", t=> "t1", w=> [ a => [ "!", "\\concat(a,'abc')" ] ], r=>"a != concat(a,'abc')" );
 
 	fail($er." error") if ($er);
 	pass($ok." successful") if ($ok);

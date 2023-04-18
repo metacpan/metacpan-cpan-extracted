@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::TABULO;
 ### ex: set ft=perl noai ts=4 sw=4:
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000012';
 
 use 5.026; # Indented HEREDOC.
 use Data::Printer qw(p np);
@@ -95,7 +95,7 @@ has archive_dir => (
         * The 'directory' [name] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
         * If the directory doesn't exist, it will be created during the BeforeRelease phase.
         * All files inside this directory will be pruned from the distribution.
-__EOT__
+        __EOT__
     );
 
 has authority => (
@@ -153,7 +153,7 @@ has dist_genre => (
 
         Currently, the only distinction made is for the 'task' genre, which will result in [TaskWeaver] being used
         instead of [SurgicalPodWeaver].
-__EOT__
+        __EOT__
     );
 
 has exclude_filenames => (
@@ -223,7 +223,7 @@ has is_task => ( #DEPRECATED
         Identifies this distro as a 'task'.
 
         Currently, the only distinction is that, for a task, we use [TaskWeaver] instead of [SurgicalPodWeaver].
-__EOT__
+        __EOT__
     );
 
 has manage_versions => (
@@ -286,9 +286,9 @@ has no_git_impact => (
     isa     => 'Bool',
     default => 0,
     -doc    => <<~"_EOT_"
-Omit any [Git:*] plugins that may modify the vcs repository state, such as : [Git::Commit], [Git::CommitBuild], [Git::Tag], [Git::Push] and the like.
-Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option.
-_EOT_
+        Omit any [Git:*] plugins that may modify the vcs repository state, such as : [Git::Commit], [Git::CommitBuild], [Git::Tag], [Git::Push] and the like.
+        Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option.
+        _EOT_
     );
 
 has no_github => (
@@ -358,20 +358,20 @@ has tag_format => (
     isa     => 'Str',
     default => 'repo-release-v%V%t',
     -doc    => <<~"__EOT__"
-The tag format passed to [Git::Tag] after committing sources.
-The default is 'repo-release-v%V%t', which may be prefixed by some other string.
-The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
-__EOT__
+        The tag format passed to [Git::Tag] after committing sources.
+        The default is 'repo-release-v%V%t', which may be prefixed by some other string.
+        The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+        __EOT__
     );
 
 has tag_format_dist => (
     isa     => 'Str',
     default => 'dist-release-v%V%t',
     -doc    => <<~"__EOT__"
-The tag format passed to [Git::Tag] after committing the build.
-The default is 'dist-release-v%V%t', which may be prefixed by some other string.
-The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
-__EOT__
+        The tag format passed to [Git::Tag] after committing the build.
+        The default is 'dist-release-v%V%t', which may be prefixed by some other string.
+        The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+        __EOT__
     );
 
 has stopwords => ( ## ALIAS: stopword
@@ -392,10 +392,10 @@ has stopwords_providers => ( ## ALIAS: wordlist
     isa     => 'ArrayRef',
     default => sub { [q/Pod::Wordlist::Author::TABULO/] },
     -doc    => <<~"__EOT__"
-Perl module(s) for contributing additional stopword(s) for spelling tests. [May be repeated].
-Note that given module(s) would need to expose the same API as L<Pod::Wordlist>.
-See also: 'stopwords' and 'stopword_files' for alternative mechanisms of adding stopwords.
-__EOT__
+        Perl module(s) for contributing additional stopword(s) for spelling tests. [May be repeated].
+        Note that given module(s) would need to expose the same API as L<Pod::Wordlist>.
+        See also: 'stopwords' and 'stopword_files' for alternative mechanisms of adding stopwords.
+        __EOT__
     );
 
 has version_regexp => (
@@ -871,7 +871,7 @@ sub _prepare_plugins {
     plugin 'Git::Contributors' unless $no_git;
     plugin 'Prereqs::AuthorDeps' if $self->auto_prereqs;
     plugin 'RemovePrereqs::Provided';   # Must come after MetaProvides
-    plugin 'PrereqsClean';
+    # plugin 'PrereqsClean';  # XXX: It looks like this plugin is no longer maintained... [PluginBundle::Prereqs](https://metacpan.org/dist/Dist-Zilla-PluginBundle-Prereqs)
     plugin 'MetaYAML' and harvest 'Meta.yml';
     plugin 'MetaJSON' and harvest 'Meta.json';
     plugin 'CPANFile' and harvest 'cpanfile';
@@ -952,7 +952,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 =head1 VERSION
 
-version 1.000011
+version 1.000012
 
 =head1 SYNOPSIS
 
@@ -1133,8 +1133,6 @@ Using this plugin bundle (with its default options) is roughly equivalent to the
     [Prereqs::AuthorDeps]
 
     [RemovePrereqs::Provided]
-
-    [PrereqsClean]
 
     [MetaYAML]
 
@@ -1698,7 +1696,7 @@ Tabulo <dev-git.perl@tabulo.net>
 
 =head1 LEGAL
 
-This software is copyright (c) 2022 by Tabulo[n].
+This software is copyright (c) 2023 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

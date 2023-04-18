@@ -4,15 +4,14 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset link_to legend br form_for),
-  -util => qw(path content),
-  -links => qw(create_or_update_contact_path),
+  -util => qw(path list_entities_path create_entity_path update_entity_path content);
 
 has 'contact' => (is=>'ro', required=>1);
 
 sub create_or_update_contact_path  :Renders ($self, $contact)  {
   return $contact->in_storage ?
-   path('update', [$contact->id]) :
-    path('create');  
+   update_entity_path($contact) :
+    create_entity_path; 
 }
 
 sub render($self, $c) {
@@ -86,7 +85,7 @@ sub render($self, $c) {
     ],
 
     $fb->submit(),
-    link_to path('list'), {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Contact List',
+    link_to list_entities_path, {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Contact List',
     content('form_footer'),
   };
 }

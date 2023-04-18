@@ -4,7 +4,7 @@
 use strict;
 use vars qw($loaded);
 
-BEGIN { $| = 1; print "1..50\n"; }
+BEGIN { $| = 1; print "1..41\n"; }
 END   {print "not ok 1\n" unless $loaded; }
 
 my $ok_count = 1;
@@ -27,35 +27,19 @@ package main;
 $loaded = 1;
 ok(1);								# 1
 
-# Find the lib directory.
-my $lib;
-foreach my $l (qw(lib ../lib)) {
-  if (-d $l) {
-    $lib = $l;
-    last;
-  }
-}
-$lib or die "Cannot find lib directory.\n";
-
 # Find the sleep_exit.pl and timed-process scripts.  The sleep_exit.pl
 # script takes a sleep time and an exit value.  timed-process takes a
 # sleep time and a command to run.
 my $sleep_exit;
-my $timed_process;
 foreach my $dir (qw(. ./bin ./t ../bin ../t Proc-Background/t)) {
   unless ($sleep_exit) {
     my $s = "$dir/sleep_exit.pl";
     $sleep_exit = $s if -r $s;
   }
-  unless ($timed_process) {
-    my $t = "$dir/timed-process";
-    $timed_process = $t if -r $t;
-  }
 }
 $sleep_exit or die "Cannot find sleep_exit.pl.\n";
-$timed_process or die "Cannot find timed-process.\n";
 my @sleep_exit    = ($^X, '-w', $sleep_exit);
-my @timed_process = ($^X, '-w', "-I$lib", $timed_process);
+my $sleep_exit_cmdline= join ' ', map { $_ =~ /\S/? qq{"$_"} : $_ } @sleep_exit;
 
 # Test the alive and wait returns.
 my $p1 = EmptySubclass->new(@sleep_exit, 2, 26);
@@ -146,7 +130,7 @@ if ($p4) {
 }
 
 # Test a command line entered as a single string.
-my $p5 = EmptySubclass->new("@sleep_exit 2 26");
+my $p5 = EmptySubclass->new("$sleep_exit_cmdline 2 26");
 ok($p5);							# 29
 if ($p5) {
   ok($p5->alive);						# 30
@@ -159,36 +143,14 @@ if ($p5) {
   ok(0);							# 32
 }
 
-sub System {
-  my $result = system(@_);
-  return ($? >> 8, $? & 127, $? & 128);
-}
-
-# Test the timed-process script.  First test a normal exit.
-my @t_args = ($^X, '-w', "-I$lib", $timed_process);
-my @result = System(@t_args, '-e', 153, 3, "@sleep_exit 0 237");
-ok($result[0] == 237);						# 33
-ok($result[1] ==   0);						# 34
-ok($result[2] ==   0);						# 35
-
-@result = System(@t_args, 1, "@sleep_exit 10 27");
-ok($result[0] == 255);						# 36
-ok($result[1] ==   0);						# 37
-ok($result[2] ==   0);						# 38
-
-@result = System(@t_args, '-e', 153, 1, "@sleep_exit 10 27");
-ok($result[0] == 153);						# 39
-ok($result[1] ==   0);						# 40
-ok($result[2] ==   0);						# 41
-
 # Test the ability to pass options to Proc::Background::new.
 my %options;
 my $p6 = EmptySubclass->new(\%options, @sleep_exit, 0, 43);
-ok($p6);							# 42
+ok($p6);							# 33
 if ($p6) {
-  ok(($p6->wait >> 8) == 43);					# 43
+  ok(($p6->wait >> 8) == 43);					# 34
 } else {
-  ok(0);							# 43
+  ok(0);							# 34
 }
 
 # Test to make sure that the process is killed when the
@@ -196,28 +158,28 @@ if ($p6) {
 $options{die_upon_destroy} = 1;
 {
   my $p7 = EmptySubclass->new(\%options, @sleep_exit, 99999, 98);
-  ok($p7);							# 44
+  ok($p7);							# 35
   if ($p7) {
     my $pid = $p7->pid;
-    ok(defined $pid);						# 45
+    ok(defined $pid);						# 36
     sleep 1;
-    ok(kill(0, $pid) == 1);					# 46
+    ok(kill(0, $pid) == 1);					# 37
     $p7 = undef;
     # sleep up to 10 seconds waiting for the process id to stop being valid
     my $kill= 1;
     for (1..10) { sleep 1; last if !($kill=kill(0, $pid)); }
-    ok($kill == 0);					# 47
+    ok($kill == 0);					# 38
   } else {
-    ok(0);							# 45
-    ok(0);							# 46
-    ok(0);							# 47
+    ok(0);							# 36
+    ok(0);							# 37
+    ok(0);							# 38
   }
 }
 
 # Test wait with a timeout on a process that doesn't exit.
 my $p8 = EmptySubclass->new(@sleep_exit, 10, 0);
-ok($p8);                             # 48
-ok($p8 && $p8->alive);               # 49
-ok($p8 && !defined $p8->wait(1.5));  # 50
+ok($p8);                             # 39
+ok($p8 && $p8->alive);               # 40
+ok($p8 && !defined $p8->wait(1.5));  # 41
 $p8->die;
 

@@ -1,159 +1,192 @@
-SQL-SimpleOps version 2022.301.1
+SQL-SimpleOps version 2023.106.1
 ================================
 
-  The README is used to introduce the module and provide instructions on
-  how to install the module, any machine dependencies it may have (for
-  example C compilers and installed libraries) and any other information
-  that should be provided before the module is installed.
+ The README is used to introduce the module and provide instructions on
+ how to install the module, any machine dependencies it may have (for
+ example C compilers and installed libraries) and any other information
+ that should be provided before the module is installed.
 
-  A README file is required for CPAN modules since CPAN extracts the
-  README file from a module distribution so that people browsing the
-  archive can use it get an idea of the modules uses. It is usually a
-  good idea to provide version information here so that people can
-  decide whether fixes for the module are worth downloading.
+ A README file is required for CPAN modules since CPAN extracts the
+ README file from a module distribution so that people browsing the
+ archive can use it get an idea of the modules uses. It is usually a
+ good idea to provide version information here so that people can
+ decide whether fixes for the module are worth downloading.
 
 INSTALLATION
 
-  To install this module type the following:
+ To install this module type the following:
 
-    perl Makefile.PL
-    make
-    make test		# see: TESTS, considerations and retrictions
-    make install
+  perl Makefile.PL
+  make
+  make test		# see: TESTS, considerations and retrictions
+  make install
 
 TESTS
 
-  The installation have three differents tests:
+ The installation have three differents tests:
 
-  * TEST SQL COMMAND (no additional settings required):
+ * TEST SQL COMMAND (no additional settings required):
 
-    The test routine for the 'sql' command simulates some models of calls to
-    demonstrate the correct formating of SQL Command.
+   The test routine for the 'sql' command simulates some models of calls to
+   demonstrate the correct formating of SQL Command.
 
-    This test will automatic doing in the 'make test' process.
+   This test will automatic doing in the 'make test' process.
 
-    You can run in iteractive tests, use:
+   You can run in iteractive tests, use:
 
-    # perl t/testSQL.t
+   # perl t/testSQL.t
 
-  * TEST WHERE CLAUSE (no additional settings required):
+ * TEST WHERE CLAUSE (no additional settings required):
 
-    The test routine for the 'where' clause simulates some models to
-    demonstrate the correct formating of the selection conditions.
+   The test routine for the 'where' clause simulates some models to
+   demonstrate the correct formating of the selection conditions.
 
-    This test will automatic doing in the 'make test' process.
+   This test will automatic doing in the 'make test' process.
 
-    Only failed tests will be shown, however, the following command can
-    be used to show details for success results:
+   Only failed tests will be shown, however, the following command can
+   be used to show details for success results:
 
-    # export SQL_SIMPLE_WHERE_SHOW_OK=1
+   # export SQL_SIMPLE_WHERE_SHOW_OK=1
 
-    You can run in iteractive tests, use:
+   You can run in iteractive tests, use:
 
-    # perl t/testWhere.t
+   # perl t/testWhere.t
 
-  * TEST DATABASE COMMANDS (additional settings required):
+ * TEST DATABASE COMMANDS (additional settings required):
 
-    CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION
-    CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION
-    CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION
+   CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION
+   CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION
+   CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION -- CAUTION
 
-    The test will execute actions inside the database
-    (create, insert, select, updates, delete and drop).
+   The test will execute actions inside the database
+   (create, insert, select, updates, delete and drop).
 
-    The process have two levels of tests:
+   The process have two levels of tests:
 
-    1) Create and Drop Database/Schema/Tables and;
+   1) Create and Drop Database/Schema/Tables and;
 
-    2) Insert/Select/Update/Delete rows in the tables.
+   2) Insert/Select/Update/Delete rows in the tables.
 
-    BEWARE: For security reasons we recommends only empty database/schema 
-    in the tests, remember, the tests doing changes and drop all the data,
-    tables, schema and database. See: "Making the Tests inside Databases".
+   BEWARE: For security reasons we recommends only empty database/schema 
+   in the tests, remember, the tests doing changes and drop all the data,
+   tables, schema and database. See: "Making the Tests inside Databases".
 
-MAKING THE TESTS INSIDE DATABASES
+   see: "PREPARATION - MAKING THE TESTS INSIDE DATABASES" how to execute database tests.
 
-  The execution of the "TEST DATABASE COMMANDS" depends on the creation of
-  system environments. These environments must be pre-defined before the
-  process.
+PREPARATION
+
+ * MAKING THE TESTS INSIDE DATABASES
+
+   This section explain about the level of tests and restrictions.
+
+   The execution of the "TEST DATABASE COMMANDS" depends on the creation of
+   system environments.
+
+   These environments must be pre-defined before the process.
+
+   Their consist of database parameters for: identifying, authentication,
+   connecting, and execution SQL commands.
+
+   There are specific environments for each type of database.
+
+   The omission of a set of specific database environments does not
+   compromise the validation of the others databases.
+
+   You can define only the variables of the databases that you really
+   want to test.
+
+   The tests will:
+
+   a) Create a temporary database (if requested);
+   b) Create a temporary tables (if requested);
+   c) Execute the main commands on the tables and;
+   d) Drop tables and databases at end of the tests (if requested).
+
+   The 'a,b and d' can be ignored if you for pre-created database to test.
+
+   To make tests you must sets system exported environment, where you can
+   run with or withou database/schema/tables/roles creation.
+
+   - To test without the Create and Drop you must define the environment:
+
+     # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
+     # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
+
+   - To test with the Create and Drop you must define the environment:
+
+     # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=1
+     # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=
+
+     BEWARE: Do not use pre-existing databases users data to run the Create
+     and Drop test, remember, at end all tables and data will be DESTROYED.
+
+     NOTE: The exported sets must be done to grant the access to tests.
+
+   - The procedure for creating database, schema, tables and roles,
+     see 'HOW TO PRE-CREATE'.
+
+ * HOW TO PRE-CREATE THE DATABASES/SCHEMA/TABLES/ROLES?
+
+   This section explain how to get the command to pre-create process.
+
+   # export SQL_SIMPLE_DB_SHOW_CREATE=1
+   # export SQL_SIMPLE_MYSQL=1
+   # export SQL_SIMPLE_MYSQL_DB=test_db
+   # export SQL_SIMPLE_PG=1
+   # export SQL_SIMPLE_PG_DB=test_db
+   # export SQL_SIMPLE_PG_SCHEMA=test_db
+   # export SQL_SIMPLE_SQLITE=1
+   # perl t/testDB.t
+
+   IMPORTANT:
+
+   a) This example show the 'test_db' as 'database name' and 'schema name'.
+   b) You may use differents name of database or schema for your tests.
+   c) Copy/Paste the STDOUT database section to pre-create.
+
+ * GETTING ADDITIONAL INFORMATION IN THE TESTS.
+
+   a) Show the SQL command after execution.
+
+      # export SQL_SIMPLE_DB_SHOW_SQL=1
+
+   b) Show table of contents load in database (long list) before the tests.
+
+      # export SQL_SIMPLE_DB_SHOW_CONTENTS=1
+  
+   c) Run the interactive creation database in verbose mode
+
+      # export SQL_SIMPLE_MYSQL_DEBUG=1
+      # export SQL_SIMPLE_PG_DEBUG=1
+      # export SQL_SIMPLE_SQLITE_DEBUG=1
+
+   d) Get where details for t/testWhere.t
+
+      # export SQL_SIMPLE_WHERE_SHOW=1
+
+   e) Redefining database CLI:
+
+      # export SQL_SIMPLE_MYSQL_CLI=[fullpath]
+
+	*defaults:
+         - /usr/bin/mysql
+         - /usr/bin/mariadb
+         - /usr/local/bin/mysql
+         - /usr/local/bin/mariadb
  
-  Their consist of database parameters for: identifying, authentication,
-  connecting, and execution SQL commands.
+      # export SQL_SIMPLE_PG_CLI=[fullpath]
+
+        *defaults:
+         - /usr/bin/psql
+         - /usr/local/bin/psql
+
+      # export SQL_SIMPLE_SQLITE_CLI=[fullpath]
+
+        *defaults:
+         - /usr/bin/sqlite3
+         - /usr/local/bin/sqlite3
  
-  There are specific environments for each type of database.
- 
-  The omission of a set of specific database environments does not
-  compromise the validation of the others databases.
- 
-  You can define only the variables of the databases that you really
-  want to test.
-
-  The test will:
-
-  a) Create a temporary database (if requested);
-  b) Create a temporary tables (if requested);
-  c) Execute the main commands on the tables and;
-  d) Drop tables and databases at end of the tests (if requested).
-
-  The 'a,b and d' can be ignored if you for pre-created database to test.
-
-  To make tests you must sets system exported environment, where you can
-  run with or withou database/schema/tables/roles creation.
-
-  * To test without the Create and Drop you must define the environment:
-
-    # export SQL_SIMPLE_DB_CREATE_ALLOWED=
-    # export SQL_SIMPLE_DB_SKIP_CREATE=1
-
-    NOTE: We recommend this test.
-
-  * To test with the Create and Drop you must define the environment:
-
-    # export SQL_SIMPLE_DB_CREATE_ALLOWED=1
-    # export SQL_SIMPLE_DB_SKIP_CREATE=
-
-    BEWARE: Do not use pre-existing databases users data to run the Create
-    and Drop test, remember, at end all tables and data will be DESTROYED.
-
-    NOTE: The exported sets must be done to grant the access to tests.
-
-  * The procedure for creating database, schema, tables and roles,
-    see 'how to' below.
-
-HOW TO SHOW THE SQL COMMANDS TO CREATE THE DATABASES/SCHEMA/TABLES/ROLES?
-
-  NOTE: Using 'test_db' as 'database name' and 'schema name'.
-
-    # export SQL_SIMPLE_DB_SHOW_CREATE=1
-    # export SQL_SIMPLE_MYSQL=1
-    # export SQL_SIMPLE_MYSQL_DB=test_db
-    # export SQL_SIMPLE_PG=1
-    # export SQL_SIMPLE_PG_DB=test_db
-    # export SQL_SIMPLE_PG_SCHEMA=test_db
-    # export SQL_SIMPLE_SQLITE=1
-    # perl t/testDB.t
-
-  The list of commands will be written on STDOUT for each database engine.
-
-  You may specify differents name of database or schema for your tests.
-
-ADDITIONAL SYSTEM ENVIRONMENTS
-
-  # export SQL_SIMPLE_DB_SHOW_SQL=1
-
-    Show the SQL command after execution.
-
-  # export SQL_SIMPLE_DB_SHOW_CONTENTS=1
-
-    Show table of contents load in database (long list) before the tests.
-
-  # export SQL_SIMPLE_MYSQL_DEBUG=1
-  # export SQL_SIMPLE_PG_DEBUG=1
-  # export SQL_SIMPLE_SQLITE_DEBUG=1
-
-    Run the interactive creation database in verbose mode
-
-MAKING TESTS
+MAKING STANDARD TESTS
 
  A) If the system environment was defined before the test will be done:
 
@@ -166,181 +199,209 @@ MAKING TESTS
  B) Can i execute all database tests in same time?
     Answer: YES. Create all database environments and run the test.
 
-MAKING ITERACTIVE TEST UNDER SQLITE3
- 
-  NOTE: SQLite2 is not supported;
-  NOTE: No database is required;
-  NOTE: A temporary file database will be used and destroyed at end.
+MAKING ITERACTIVE TEST UNDER SQLITE
 
-  (mandatory)
+ IMPORTANT: 
 
+  a) Iteractive configurations is required;
+  a) SQLite2 is not supported;
+  b) SQLite3 database must be installed;
+  c) A temporary file database will be used and destroyed at end.
+
+ (optional)
+
+  # export SQL_SIMPLE_MYSQL=		# disable MySQL tests
+  # export SQL_SIMPLE_PG=		# disable Postgres tests
+
+ (mandatory)
+
+  # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
+  # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
   # export SQL_SIMPLE_SQLITE=1
   # perl t/testDB.t
 
-MAKING ITERACTIVE TEST UNDER MYSQL/MARIADB (BASED PRECREATED DATABASE)
+MAKING ITERACTIVE TEST UNDER MYSQL/MARIADB (BASED PRE-CREATED DATABASE)
 
-  (mandatory)
+ IMPORTANT:
 
-  # export SQL_SIMPLE_DB_CREATE_ALLOWED=
-  # export SQL_SIMPLE_DB_SKIP_CREATE=1
-  # export SQL_SIMPLE_MYSQL=1
-  # export SQL_SIMPLE_MYSQL_DB=[dsname]
-  # perl t/testDB.t
- 
-  (optional)
+  a) MySQL/MariaDB must be installed and started.
+
+ (optional)
+
+  # export SQL_SIMPLE_SQLITE=		# disable SQLite tests
+  # export SQL_SIMPLE_PG=		# disable Postgres tests
+
+ (optional)
 
   # export SQL_SIMPLE_MYSQL_SERVER=[server|localhost]
   # export SQL_SIMPLE_MYSQL_PORT=[port]
   # export SQL_SIMPLE_MYSQL_USER=[user-or-role-with-updates]
   # export SQL_SIMPLE_MYSQL_PASSWORD=[password]
 
-  SQL_SIMPLE_MYSQL_DB: Set the database name.
-  Default: no defaults, is required;
+ (mandatory)
 
-  SQL_SIMPLE_MYSQL_SERVER: Set the server name address.
-  Default: localhost.
-
-  SQL_SIMPLE_MYSQL_PORT: Set the server tcp port.
-  Default: Depends of database configuration.
-
-  SQL_SIMPLE_MYSQL_USER: Set the user authentication with udpates
-  granted. Default: current login session.
-
-  SQL_SIMPLE_MYSQL_PASSWORD: Set the password for user authentication.
-  Default: Depends of database configuration.
-
-  NOTE: We indentify a mismatch situation for MariaDB 10.5.16.
-  The 'float' format disallow the quote usage.
-  You must specify numbers without quote to search the rows.
-
-     # mariadb
-     Welcome to the MariaDB monitor.  Commands end with ; or \g.
-     Your MariaDB connection id is 29
-     Server version: 10.5.16-MariaDB MariaDB package
- 
-     Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
- 
-     MariaDB [TEST_DB]> desc standard_null;
-     +--------------------+---------------+------+-----+---------+-------+
-     | Field              | Type          | Null | Key | Default | Extra |
-     +--------------------+---------------+------+-----+---------+-------+
-     ...
-     | f_float            | float         | YES  |     | NULL    |       |
-     | f_double           | double        | YES  |     | NULL    |       |
-     ...
-     +--------------------+---------------+------+-----+---------+-------+
-     29 rows in set (0.002 sec)
-
-  ## Testing using float fields
-
-     MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_float='2.1';
-     Empty set (0.001 sec)
-    
-     NOTE: No match rows found.
- 
-     MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_float=2.1;
-     +---------+
-     | f_float |
-     +---------+
-     |     2.1 |
-     +---------+
-     1 row in set (0.001 sec)
-     
-     NOTE: Match rows found if no quotes in use.
- 
-  ## Testing same test with double field
-     
-     MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_double='1.1';
-     +---------+
-     | f_float |
-     +---------+
-     |     2.1 |
-     +---------+
-     1 row in set (0.001 sec)
-     
-     MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_double=1.1;
-     +---------+
-     | f_float |
-     +---------+
-     |     2.1 |
-     +---------+
-     1 row in set (0.001 sec)
-
-MAKING ITERACTIVE TEST UNDER POSTGRESQL (BASED PRECREATED DATABASE)
-
-  (mandatory)
-
-  # export SQL_SIMPLE_DB_CREATE_ALLOWED=
-  # export SQL_SIMPLE_DB_SKIP_CREATE=1
-  # export SQL_SIMPLE_PG=1
-  # export SQL_SIMPLE_PG_DB=[dsname]
-  # export SQL_SIMPLE_PG_SCHEMA=[schema-name]
+  # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
+  # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
+  # export SQL_SIMPLE_MYSQL=1
+  # export SQL_SIMPLE_MYSQL_DB=[dsname]
   # perl t/testDB.t
- 
-  (optional)
+
+ SQL_SIMPLE_MYSQL_DB: Set the database name.
+ Default: no defaults, is required;
+
+ SQL_SIMPLE_MYSQL_SERVER: Set the server name address.
+ Default: localhost.
+
+ SQL_SIMPLE_MYSQL_PORT: Set the server tcp port.
+ Default: Depends of database configuration.
+
+ SQL_SIMPLE_MYSQL_USER: Set the user authentication with udpates
+ granted. Default: current login session.
+
+ SQL_SIMPLE_MYSQL_PASSWORD: Set the password for user authentication.
+ Default: Depends of database configuration.
+
+ NOTE: We indentify a mismatch situation for MariaDB 10.5.16.
+ The 'float' format disallow the quote usage.
+ You must specify numbers without quote to search the rows.
+
+    # mariadb
+    Welcome to the MariaDB monitor.  Commands end with ; or \g.
+    Your MariaDB connection id is 29
+    Server version: 10.5.16-MariaDB MariaDB package
+
+    Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+    MariaDB [TEST_DB]> desc standard_null;
+    +--------------------+---------------+------+-----+---------+-------+
+    | Field              | Type          | Null | Key | Default | Extra |
+    +--------------------+---------------+------+-----+---------+-------+
+    ...
+    | f_float            | float         | YES  |     | NULL    |       |
+    | f_double           | double        | YES  |     | NULL    |       |
+    ...
+    +--------------------+---------------+------+-----+---------+-------+
+    29 rows in set (0.002 sec)
+
+ ## Testing using float fields
+
+    MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_float='2.1';
+    Empty set (0.001 sec)
+   
+    NOTE: No match rows found.
+
+    MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_float=2.1;
+    +---------+
+    | f_float |
+    +---------+
+    |     2.1 |
+    +---------+
+    1 row in set (0.001 sec)
+    
+    NOTE: Match rows found if no quotes in use.
+
+ ## Testing same test with double field
+    
+    MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_double='1.1';
+    +---------+
+    | f_float |
+    +---------+
+    |     2.1 |
+    +---------+
+    1 row in set (0.001 sec)
+    
+    MariaDB [TEST_DB]> SELECT f_float FROM standard_null WHERE f_double=1.1;
+    +---------+
+    | f_float |
+    +---------+
+    |     2.1 |
+    +---------+
+    1 row in set (0.001 sec)
+
+MAKING ITERACTIVE TEST UNDER POSTGRESQL (BASED PRE-CREATED DATABASE)
+
+ IMPORTANT:
+
+  a) Postgress must be installed and started.
+
+ (optional)
+
+  # export SQL_SIMPLE_SQLITE=		# disable SQLite tests
+  # export SQL_SIMPLE_MYSQL=		# disable MySQL tests
+
+ (optional)
 
   # export SQL_SIMPLE_PG_SERVER=[server|localhost]
   # export SQL_SIMPLE_PG_PORT=[port]
   # export SQL_SIMPLE_PG_USER=[user-or-role-with-updates]
   # export SQL_SIMPLE_PG_PASSWORD=[password]
 
-  SQL_SIMPLE_PG_DB: Set the database name.
-  Default: no defaults, is required;
+ (mandatory)
 
-  SQL_SIMPLE_PG_SCHEMA: Set the database name.
-  Default: no defaults, is required;
+  # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
+  # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=1
+  # export SQL_SIMPLE_PG=1
+  # export SQL_SIMPLE_PG_DB=[dsname]
+  # export SQL_SIMPLE_PG_SCHEMA=[schema-name]
+  # perl t/testDB.t
+ 
+ SQL_SIMPLE_PG_DB: Set the database name.
+ Default: no defaults, is required;
 
-  SQL_SIMPLE_PG_SERVER: Set the server name address.
-  Default: localhost.
+ SQL_SIMPLE_PG_SCHEMA: Set the database name.
+ Default: no defaults, is required;
 
-  SQL_SIMPLE_PG_PORT: Set the server tcp port.
-  Default: Depends of database configuration.
+ SQL_SIMPLE_PG_SERVER: Set the server name address.
+ Default: localhost.
 
-  SQL_SIMPLE_PG_USER: Set the user authentication with udpates
-  granted. Default: current login session.
+ SQL_SIMPLE_PG_PORT: Set the server tcp port.
+ Default: Depends of database configuration.
 
-  Recommended for tests: postgres
+ SQL_SIMPLE_PG_USER: Set the user authentication with udpates
+ granted. Default: current login session.
 
-  SQL_SIMPLE_PG_PASSWORD: Set the password for user authentication.
-  Default: Depends of database configuration.
+ Recommended for tests: postgres
 
-  Recommended for tests: postgres passord or null
+ SQL_SIMPLE_PG_PASSWORD: Set the password for user authentication.
+ Default: Depends of database configuration.
+
+ Recommended for tests: postgres passord or null
 
 DEPENDENCIES
 
-  The current version support only DBI driver connector.
+ The current version support only DBI driver connector.
 
-  This module requires these other modules and libraries:
+ This module requires these other modules and libraries:
 
-  Depencencies (mandatory)
+ Depencencies (mandatory)
 
-    DBI
-    DBD
+   DBI
+   DBD
 
-  Dependencies for Databases (not checked in the installation)
+ Dependencies for Databases (not checked in the installation)
 
-    DBD::mysql
-    DBD::SQLite
-    DBD::Pg
+   DBD::mysql
+   DBD::SQLite
+   DBD::Pg
 
-  Dependencies (optional) for SaveFiles Option
+ Dependencies (optional) for SaveFiles Option
 
-    Date::Calc
-    File::Path
-    File::Spec
-    IO::File
+   Date::Calc
+   File::Path
+   File::Spec
+   IO::File
 
-  Dependencies (optional) for Syslog Option
+ Dependencies (optional) for Syslog Option
 
-    Sys::Syslog
+   Sys::Syslog
 
-  Dependencies (optional) for Config File Option
+ Dependencies (optional) for Config File Option
 
-    JSON
+   JSON
 
 COPYRIGHT
 
-  Copyright (c) 2008-2022 - by Carlos Celso.
+  Copyright (C) 2008-2023 Carlos Celso.
 
 LICENCE
 

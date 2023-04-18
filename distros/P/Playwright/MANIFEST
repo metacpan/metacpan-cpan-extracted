@@ -26,6 +26,7 @@ lib/Playwright/BrowserContext.pm
 lib/Playwright/BrowserServer.pm
 lib/Playwright/BrowserType.pm
 lib/Playwright/CDPSession.pm
+lib/Playwright/CDPSessionEvent.pm
 lib/Playwright/ConsoleMessage.pm
 lib/Playwright/Coverage.pm
 lib/Playwright/Dialog.pm
@@ -38,6 +39,7 @@ lib/Playwright/FileChooser.pm
 lib/Playwright/FormData.pm
 lib/Playwright/Frame.pm
 lib/Playwright/FrameLocator.pm
+lib/Playwright/GenericAssertions.pm
 lib/Playwright/JSHandle.pm
 lib/Playwright/Keyboard.pm
 lib/Playwright/Locator.pm

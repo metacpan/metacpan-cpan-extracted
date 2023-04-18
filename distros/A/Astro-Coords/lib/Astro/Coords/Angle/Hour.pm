@@ -40,7 +40,7 @@ use base qw/ Astro::Coords::Angle /;
 # Package Global variables
 use vars qw/ $VERSION /;
 
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 =head1 METHODS
 
@@ -225,6 +225,9 @@ Note that the number of decimal places is an argument.
 sub _r2f {
   my $self = shift;
   my $res = shift;
+
+  warnings::warnif("More than 9 dp requested ($res), result from palDr2tf likely to overflow in fractional part") if $res > 9;
+
   my ($sign, @dmsf) = Astro::PAL::palDr2tf($res, $self->radians);
   return ($sign, @dmsf);
 }

@@ -23,8 +23,8 @@ my $build = Module::Build->new
                   ],
    meta_merge => {
                resources =>  {
-                              repository => "git://github.com/timj/perl-Astro-WaveBand.git",
-                              homepage => "http://github.com/timj/perl-Astro-WaveBand/tree/master",
+                              repository => "https://github.com/timj/perl-Astro-WaveBand.git",
+                              homepage => "https://github.com/timj/perl-Astro-WaveBand/tree/master",
                              },
                 },
    build_requires => {

@@ -31,6 +31,21 @@ __PACKAGE__->config(
   },
 );
 
+after 'setup_components' => sub ($class) {
+  use Devel::Dwarn;
+  my @controllers = $class->controllers;
+  foreach my $controller (@controllers) {
+    #warn "Controller: $controller";
+    my @methods_with_attributes = "${class}::Controller::${controller}"->meta->get_all_methods_with_attributes;
+    foreach my $method (@methods_with_attributes) {
+      #warn "  Method: @{[ $method->name ]}";
+      my @attributes = $method->attributes;
+      #Dwarn \@attributes; 
+    }
+    #Dwarn \@methods_with_attributes;
+  }
+};
+
 __PACKAGE__->setup();
   
 has user => (
@@ -60,6 +75,25 @@ sub authenticate($self, @args) {
 sub logout($self) {
   $self->model('Session')->logout;
   $self->clear_user;
+}
+
+# Path Helpers
+
+## Contacts
+
+sub edit_contact_path($self, $c, $contact, $attrs=+{}) {
+  return $self->ctx->uri('edit', [$contact->id], $attrs);
+}
+
+sub contacts_path($c, @args) {
+  return $c->uri('/contacts', @args);
+}
+
+
+## Register
+
+sub register_init_path($c, @args) {
+  return $c->uri('/register/init', @args);
 }
 
 __PACKAGE__->meta->make_immutable();

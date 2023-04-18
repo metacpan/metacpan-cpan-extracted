@@ -44,7 +44,7 @@ my %trustme = (
                                                    qr/^BUILD/
                                                  ],
              'Language::FormulaEngine::Namespace::Default' => [
-                                                                qr/^(fn_|perlgen_|nodeval_)/
+                                                                qr/^(fn_|perlgen_|simplify_|nodeval_)/
                                                               ]
            );
 

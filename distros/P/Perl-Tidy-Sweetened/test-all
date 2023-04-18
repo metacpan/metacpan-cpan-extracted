@@ -1,6 +1,6 @@
 #!/bin/bash
 
-releases="$( cat versions )"
+releases="$( grep --invert-match -P '^#' versions )"
 [ -d local/cache/SHANCOCK ] || mkdir -p local/cache/SHANCOCK
 for rel in $releases ; do
     if [ ! -e local/cache/${rel}.tar.gz ] ; then

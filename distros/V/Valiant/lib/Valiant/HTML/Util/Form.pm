@@ -60,6 +60,8 @@ sub _model_id_for_dom_id {
 
 sub _to_model {
   my ($self, $model) = @_;
+  croak "No model provided" unless $model;
+  confess "Model is not an object: $model" unless Scalar::Util::blessed($model);
   return $model->to_model if $model->can('to_model');
   return $model;
 }
@@ -72,30 +74,11 @@ sub _model_name_from_object_or_class {
   return Valiant::Name->new(Valiant::Naming::prepare_model_name_args($model));
 }
 
-sub _apply_form_options {
-  my ($self, $model, $options) = @_;
-  $model = $self->_to_model($model);
-
-  my $as = exists $options->{as} ? $options->{as} : undef;
-  my $namespace = exists $options->{namespace} ? $options->{namespace} : undef;
-  my ($action, $method) = @{ $self->model_persisted($model) ? ['edit', 'patch']:['new', 'post'] };
-
-  $options->{html} = $self->_merge_attrs(
-    ($options->{html} || +{}),
-    +{
-      class => $as ? "${action}_${as}" : $self->_dom_class($model, $action),
-      id => join(_DEFAULT_ID_DELIM, ( $as ? (grep { defined $_ } $namespace, $action, $as)  :  (grep { defined $_ } ($namespace, $self->_dom_id($model, $action))) )),
-      method => $method,
-    },
-  );
-
-  return $options;
-}
-
 # public methods
 
 sub model_persisted {
   my ($self, $model) = @_;
+  croak "No model provided" unless $model;
   return $model->persisted if $model->can('persisted');
   return $model->in_storage if $model->can('in_storage');
   return 0;
@@ -116,22 +99,30 @@ sub form_for {
   my $content_block_coderef = pop; # required; at the end
   my $options = ref($_[-1]||'') eq 'HASH' ? pop : +{};
 
-  carp "You must provide a content block to form_for" unless ref($content_block_coderef) eq 'CODE';
+  croak "You must provide a content block to form_for" unless ref($content_block_coderef) eq 'CODE';
 
   my ($model, $object_name);
   if( ref(\$proto) eq 'SCALAR') {
-    $object_name = $proto;
+    $object_name = $proto;  # form_for 'name', $model, \%options, \&block
     if(@_) {
       $model = shift;
     } else {
-    $model = $self->view->read_attribute_for_html($object_name)
-      if $self->view->attribute_exists_for_html($object_name);
+      # Support form_for 'attribute_name', ... 
+      $model = $self->view->read_attribute_for_html($object_name)
+        if $self->view->attribute_exists_for_html($object_name);
     }
-  } elsif(Scalar::Util::blessed($proto)) {
-    $model = $proto;
+    if(defined $model) {
+      $options->{as} ||= $object_name;
+      $self->_apply_form_for_options($model, $options);
+    }
+  } else {
+    my $object = $self->_object_from_record_proto($proto); # Is either arrayref or object
+
+    croak "First argument can't be undef or empty string" unless defined($object) && length($object);
+    $model = $proto; # Is either arrayref or object
     $object_name = exists $options->{as} ?
-      $options->{as} :
-        $self->_model_name_from_object_or_class($model)->param_key;
+      $options->{as} : $self->_model_name_from_object_or_class($object)->param_key;
+    $self->_apply_form_for_options($object, $options);
   }
 
   $options->{model} = $model;
@@ -141,6 +132,33 @@ sub form_for {
     $options->{allow_method_names_outside_object} : 0;
 
   return $self->form_with($options, $content_block_coderef);
+}
+
+sub _object_from_record_proto {
+  my ($self, $proto) = @_;
+  croak "First argument can't be undef or empty string" unless defined($proto) && length($proto);
+  return $proto->[-1] if ((ref($proto)||'') eq 'ARRAY');
+  return $proto;
+}
+
+sub _apply_form_for_options {
+  my ($self, $model, $options) = @_;
+  $model = $self->_to_model($model);
+
+  my $as = exists $options->{as} ? $options->{as} : undef;
+  my $namespace = exists $options->{namespace} ? $options->{namespace} : undef;
+  my ($action, $method) = @{ $self->model_persisted($model) ? ['edit', 'patch']:['new', 'post'] };
+
+  $options->{html} = $self->_merge_attrs(
+    ($options->{html} || +{}),
+    +{
+      class => $as ? "${action}_${as}" : $self->_dom_class($model, $action),
+      id => join(_DEFAULT_ID_DELIM, ( $as ? (grep { defined $_ } $namespace, $action, $as)  :  (grep { defined $_ } ($namespace, $self->_dom_id($model, $action))) )),
+      method => $method,
+    },
+  );
+
+  return $options;
 }
 
 sub form_with {
@@ -154,20 +172,11 @@ sub form_with {
 
   my ($model, $url);
   if($options->{model}) {
-    $model = $self->_to_model(delete $options->{model});
+    $url = $self->_polymorphic_path_for_model($model, $scope);
+    $model = $self->_to_model($self->_object_from_record_proto(delete $options->{model}));
     $scope = exists $options->{scope} ?
       delete $options->{scope} :
         $self->_model_name_from_object_or_class($model)->param_key;
-
-    $options->{as} = $scope unless exists $options->{as};
-
-    $self->_apply_form_options($model, $options);
-  
-    # TODO: This it where we need to be able to get a url from the model
-    # for the builder.  Either the model itself should have a way to do
-    # this or possible the controller ($url = $self->controller->url_for_model($model))
-    # this method should DTRT in generating a url for a new or existing model and
-    # should be able to be overridden by args passed.
   }
 
   $url ||= delete $options->{url} if exists $options->{url};
@@ -183,6 +192,32 @@ sub form_with {
 
   return $output;
 }
+
+sub _polymorphic_path_for_model {
+  my ($self, $model, $scope) = @_;
+  return undef;
+  # $model can be an object, string or array of objects strings
+  if($self->model_persisted($model)) {
+    return $self->_edit_action_for_model($model, $scope);
+  } else {
+    return $self->_new_action_for_model($model, $scope);
+  }
+}
+
+sub _edit_action_for_model {
+  my ($self, $model, $scope) = @_;
+  my $method = "edit_${scope}_url";
+  return $self->context->$method() if $self->has_context && $self->context->can($method);
+  return undef;
+}
+
+sub _new_action_for_model {
+  my ($self, $model, $scope) = @_;
+  my $method = "new_${scope}_url";
+  return $self->context->$method() if $self->has_context && $self->context->can($method);
+  return undef;
+}
+
 
 # _instantiate_builder($object)
 # _instantiate_builder($object, \%options)
@@ -221,11 +256,11 @@ sub _html_options_for_form_with {
 
   $self->_merge_attrs($html_options, $options, qw(action method data id csrf_token class style));
 
-  $html_options->{action} = $url if $url;
+  $html_options->{action} ||= $url if $url;
   $html_options->{csrf_token} ||= $self->view->csrf_token if $self->view->can('csrf_token');
   $html_options->{csrf_token} ||= $self->context->csrf_token if $self->has_context && $self->context->can('csrf_token');
   $html_options->{tunneled_method} = 1 unless exists $html_options->{tunneled_method};
-  $html_options->{method} = lc($html_options->{method}||'post'); # most common standards specify lowercase
+  $html_options->{method} ||= $model && $self->model_persisted($model) ? 'patch' : 'post';
 
   # This is what Rails does but not sure I want to force that.  It might break a
   # lot of existing code people try to shoehorn this stuff into.  

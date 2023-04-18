@@ -1,3 +1,11 @@
+0.08 2023-04-18T01:48:41+02:00
+ - Add doc for Wikibase::Datatype::Print::MediainfoStatement.
+ - Add error check to Wikibase::Datatype::Print::Value::Time.
+ - Add test for Utils::print_common().
+ - Add tests for Wikibase::Datatype::Print::Value.
+ - Fix minimal dependency for
+   Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human.
+
 0.07 2023-04-17T11:50:54+02:00
  - Add doc for Wikibase::Datatype::Print::MediainfoSnak.
  - Add doc for Wikibase::Datatype::Print::Snak.

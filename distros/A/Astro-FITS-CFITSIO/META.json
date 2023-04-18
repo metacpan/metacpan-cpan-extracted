@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,12 +28,17 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "1.97",
-            "Alien::CFITSIO" : "v4.1.0",
+            "Alien::CFITSIO" : "v4.2.0",
             "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.16",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.17",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

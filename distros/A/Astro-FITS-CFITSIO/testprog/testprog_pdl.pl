@@ -271,26 +271,31 @@ print "The 1st, and every 4th pixel should be undefined:\n";
 $anynull = 0;
 $binarray = zeroes($types{TBYTE()}, $npixels);
 $fptr->read_img_byt(1,1,$npixels,99,${$binarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
 map printf(" %2d",$binarray->at($_)),(0..$npixels-1);
 print "  $anynull (ffgpvb)\n";
 
 $iinarray = zeroes($types{TSHORT()}, $npixels);
 $fptr->read_img_sht(1,1,$npixels,99,${$iinarray->get_dataref},$anynull,$status);
+$iinarray->upd_data;
 map printf(" %2d",$iinarray->at($_)),(0..$npixels-1);
 print "  $anynull (ffgpvi)\n";
 
 $jinarray = zeroes($types{TLONG()}, $npixels);
 $fptr->read_img_lng(1,1,$npixels,99,${$jinarray->get_dataref},$anynull,$status);
+$jinarray->upd_data;
 map printf(" %2d",$jinarray->at($_)),(0..$npixels-1);
 print "  $anynull (ffgpvj)\n";
 
 $einarray = zeroes(float, $npixels);
 $fptr->read_img_flt(1,1,$npixels,99,${$einarray->get_dataref},$anynull,$status);
+$einarray->upd_data;
 map printf(" %2.0f",$einarray->at($_)),(0..$npixels-1);
 print "  $anynull (ffgpve)\n";
 
 $dinarray = zeroes(double, $npixels);
 $fptr->read_img_dbl(1,1,$npixels,99,${$dinarray->get_dataref},$anynull,$status);
+$dinarray->upd_data;
 map printf(" %2.0d",$dinarray->at($_)),(0..$npixels-1);
 print "  $anynull (ffgpvd)\n";
 
@@ -334,6 +339,8 @@ $dinarray = zeroes(double, $npixels);
 $anynull = 0;
 
 $fptr->read_imgnull_byt(1,1,$npixels,${$binarray->get_dataref},${$larray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$larray->upd_data;
 for ($ii=0;$ii<$npixels;$ii++) {
 	if ($larray->at($ii)) { print "  *" }
 	else { printf " %2d",$binarray->at($ii) }
@@ -341,6 +348,8 @@ for ($ii=0;$ii<$npixels;$ii++) {
 print "  $anynull (ffgpfb)\n";
 
 $fptr->read_imgnull_sht(1,1,$npixels,${$iinarray->get_dataref},${$larray->get_dataref},$anynull,$status);
+$iinarray->upd_data;
+$larray->upd_data;
 for ($ii=0;$ii<$npixels;$ii++) {
 	if ($larray->at($ii)) { print "  *" }
 	else { printf " %2d",$iinarray->at($ii) }
@@ -348,6 +357,8 @@ for ($ii=0;$ii<$npixels;$ii++) {
 print "  $anynull (ffgpfi)\n";
 
 $fptr->read_imgnull_lng(1,1,$npixels,${$jinarray->get_dataref},${$larray->get_dataref},$anynull,$status);
+$jinarray->upd_data;
+$larray->upd_data;
 for ($ii=0;$ii<$npixels;$ii++) {
 	if ($larray->at($ii)) { print "  *" }
 	else { printf " %2d",$jinarray->at($ii) }
@@ -355,6 +366,8 @@ for ($ii=0;$ii<$npixels;$ii++) {
 print "  $anynull (ffgpfj)\n";
 
 $fptr->read_imgnull_flt(1,1,$npixels,${$einarray->get_dataref},${$larray->get_dataref},$anynull,$status);
+$einarray->upd_data;
+$larray->upd_data;
 for ($ii=0;$ii<$npixels;$ii++) {
 	if ($larray->at($ii)) { print "  *" }
 	else { printf " %2.0f",$einarray->at($ii) }
@@ -362,6 +375,8 @@ for ($ii=0;$ii<$npixels;$ii++) {
 print "  $anynull (ffgpfe)\n";
 
 $fptr->read_imgnull_dbl(1,1,$npixels,${$dinarray->get_dataref},${$larray->get_dataref},$anynull,$status);
+$dinarray->upd_data;
+$larray->upd_data;
 for ($ii=0;$ii<$npixels;$ii++) {
 	if ($larray->at($ii)) { print "  *" }
 	else { printf " %2.0f",$dinarray->at($ii) }
@@ -875,6 +890,7 @@ print "ffpcl_ status = $status\n";
 ################################
 
 $fptr->read_atblhdr($rowlen,$nrows,$tfields,$ttype,${$tbcol->get_dataref},$tform,$tunit,$tblname,$status);
+$tbcol->upd_data;
 
 print "\nASCII table: rowlen, nrows, tfields, extname: $rowlen $nrows $tfields $tblname\n";
 for ($ii=0;$ii<$tfields;$ii++) {
@@ -889,6 +905,11 @@ $fptr->read_col_sht(2,1,1,$nrows,99,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(3,1,1,$nrows,99,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(4,1,1,$nrows,99,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(5,1,1,$nrows,99,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values read from ASCII table:\n";
 for ($ii=0;$ii<$nrows;$ii++) {
@@ -900,6 +921,7 @@ for ($ii=0;$ii<$nrows;$ii++) {
 
 $uchars = zeroes(78)->byte;
 $fptr->read_tblbytes(1,20,78,${$uchars->get_dataref},$status);
+$uchars->upd_data;
 print "\n";
 foreach (0..77) { print pack "C", $uchars->at($_) }
 print "\n";
@@ -942,6 +964,11 @@ $fptr->read_col_sht(2,1,1,$nrows,99,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(3,1,1,$nrows,99,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(4,1,1,$nrows,99,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(5,1,1,$nrows,99,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after inserting 3 rows after row 2:\n";
 for ($ii=0;$ii<$nrows;$ii++) {
@@ -961,6 +988,11 @@ $fptr->read_col_sht(2,1,1,$nrows,99,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(3,1,1,$nrows,99,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(4,1,1,$nrows,99,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(5,1,1,$nrows,99,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after deleting 2 rows at row 10:\n";
 for ($ii=0;$ii<$nrows;$ii++) {
@@ -977,6 +1009,10 @@ $fptr->read_col_byt(2,1,1,$nrows,99,${$binarray->get_dataref},$anynull,$status);
 $fptr->read_col_sht(2,1,1,$nrows,99,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(3,1,1,$nrows,99,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(4,1,1,$nrows,99,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after deleting column 3:\n";
 for ($ii=0;$ii<$nrows;$ii++) {
@@ -994,6 +1030,11 @@ $fptr->read_col_sht(2,1,1,$nrows,99,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(3,1,1,$nrows,99,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(4,1,1,$nrows,99,${$dinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(5,1,1,$nrows,99,${$jinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
+$jinarray->upd_data;
 
 print "\nData values after inserting column 5:\n";
 for ($ii=0;$ii<$nrows;$ii++) {
@@ -1072,6 +1113,7 @@ print "\nData values read from binary table:\n";
 printf "  Bit column (X) data values: \n\n";
 
 $fptr->read_col_bit(3,1,1,36,${$larray->get_dataref},$status);
+$larray->upd_data;
 for ($jj=0;$jj<5;$jj++) {
 	foreach ($jj*8..$jj*8+7) {
 		print $larray->at($_);
@@ -1105,6 +1147,15 @@ $fptr->read_col_flt(7,1,1,$nrows,98.,${$einarray->get_dataref},$anynull,$status)
 $fptr->read_col_dbl(8,1,1,$nrows,98.,${$dinarray->get_dataref},$anynull,$status);
 $fptr->read_col_cmp(9,1,1,$nrows,98.,${$cinarray->get_dataref},$anynull,$status);
 $fptr->read_col_dblcmp(10,1,1,$nrows,98.,${$minarray->get_dataref},$anynull,$status);
+$larray->upd_data;
+$xinarray->upd_data;
+$binarray->upd_data;
+$iinarray->upd_data;
+$kinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
+$cinarray->upd_data;
+$minarray->upd_data;
 
 print "\nRead columns with ffgcv_:\n";
 for ($ii=0;$ii<$nrows;$ii++) {
@@ -1140,6 +1191,16 @@ $fptr->read_colnull_flt(7,1,1,$nrows,${$einarray->get_dataref},${$larray2->get_d
 $fptr->read_colnull_dbl(8,1,1,$nrows,${$dinarray->get_dataref},${$larray2->get_dataref},$anynull,$status);
 $fptr->read_colnull_cmp(9,1,1,$nrows,${$cinarray->get_dataref},${$larray2->get_dataref},$anynull,$status);
 $fptr->read_colnull_dblcmp(10,1,1,$nrows,${$minarray->get_dataref},${$larray2->get_dataref},$anynull,$status);
+$larray->upd_data;
+$larray2->upd_data;
+$xinarray->upd_data;
+$binarray->upd_data;
+$iinarray->upd_data;
+$kinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
+$cinarray->upd_data;
+$minarray->upd_data;
 
 print "\nRead columns with ffgcf_:\n";
 for ($ii=0;$ii<10;$ii++) {
@@ -1171,6 +1232,11 @@ $fptr->read_col_sht(5,1,1,$nrows,98,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(6,1,1,$nrows,98,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(7,1,1,$nrows,98.,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(8,1,1,$nrows,98.,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after inserting 3 rows after row 2:\n";
 for ($ii = 0; $ii < $nrows; $ii++) {
@@ -1188,6 +1254,11 @@ $fptr->read_col_sht(5,1,1,$nrows,98,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(6,1,1,$nrows,98,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(7,1,1,$nrows,98.,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(8,1,1,$nrows,98.,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after deleting 2 rows at row 10:\n";
 for ($ii = 0; $ii < $nrows; $ii++) {
@@ -1202,6 +1273,11 @@ $fptr->read_col_byt(4,1,1,$nrows,98,${$binarray->get_dataref},$anynull,$status);
 $fptr->read_col_sht(5,1,1,$nrows,98,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(6,1,1,$nrows,98.,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(7,1,1,$nrows,98.,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after deleting column 6:\n";
 for ($ii = 0; $ii < $nrows; $ii++) {
@@ -1217,6 +1293,11 @@ $fptr->read_col_sht(5,1,1,$nrows,98,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(8,1,1,$nrows,98,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(6,1,1,$nrows,98.,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(7,1,1,$nrows,98.,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nData values after inserting column 8:\n";
 for ($ii = 0; $ii < $nrows; $ii++) {
@@ -1233,6 +1314,11 @@ $fptr->read_col_sht(5,1,1,$nrows,98,${$iinarray->get_dataref},$anynull,$status);
 $fptr->read_col_flt(6,1,1,$nrows,98.,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col_dbl(7,1,1,$nrows,98.,${$dinarray->get_dataref},$anynull,$status);
 $fptr->read_col_lng(8,1,1,$nrows,98,${$jinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
+$jinarray->upd_data;
 
 print "\nValues after setting 1st 10 elements in column 8 = null:\n";
 for ($ii = 0; $ii < $nrows; $ii++) {
@@ -1335,6 +1421,7 @@ for ($ii=4;$ii<7;$ii++) {
 
 for ($jj=4;$jj<7;$jj++) {
 	$fptr->read_col_lng($jj,1,1,6,-999,${$jinarray->get_dataref},$anynull,$status);
+	$jinarray->upd_data;
 	for ($ii=0;$ii<6;$ii++) {
 		printf " %6d",$jinarray->at($ii);
 	}
@@ -1348,6 +1435,7 @@ $fptr->set_tscale(6,1.,0.,$status);
 
 for ($jj=4;$jj<7;$jj++) {
 	$fptr->read_col_lng($jj,1,1,6,-999,${$jinarray->get_dataref},$anynull,$status);
+	$jinarray->upd_data;
 	for ($ii=0;$ii<6;$ii++) {
 		printf " %6d",$jinarray->at($ii);
 	}
@@ -1377,6 +1465,7 @@ print "\nWrote whole 2D array: ffp2di status = $status\n";
 
 $imgarray = zeroes($types{TSHORT()}, 19,30);
 $fptr->read_2d_sht(1,0,19,$naxes->[0],$naxes->[1],${$imgarray->get_dataref},$anynull,$status);
+$imgarray->upd_data;
 print "\nRead whole 2D array: ffg2di status = $status\n";
 
 for ($jj=0;$jj<30;$jj++) {
@@ -1401,6 +1490,7 @@ print "\nWrote subset 2D array: ffpssi status = $status\n";
 
 $imgarray = zeroes($types{TSHORT()}, 19,30);
 $fptr->read_2d_sht(1,0,19,$naxes->[0],$naxes->[1],${$imgarray->get_dataref},$anynull,$status);
+$imgarray->upd_data;
 print "\nRead whole 2D array: ffg2di status = $status\n";
 
 for ($jj=0;$jj<30;$jj++) {
@@ -1418,6 +1508,7 @@ $inc = [2,3];
 $imgarray = zeroes($types{TSHORT()}, 19,30);
 
 $fptr->read_subset_sht(1,$naxis,$naxes,$fpixels,$lpixels,$inc,0,${$imgarray->get_dataref},$anynull,$status);
+$imgarray->upd_data;
 print "\nRead subset of 2D array: ffgsvi status = $status\n";
 
 for ($ii=0;$ii<10;$ii++) {
@@ -1572,12 +1663,14 @@ for ($ii=1;$ii<=20;$ii++) {
 	print "A $inskey->[0] $status\nL";
 
 	$fptr->read_col_log(2,$ii,1,$ii,0,${$larray->get_dataref},$anynull,$status);
+	$larray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2d", $larray->at($_);
 	}
 	print " $status\nX";
 
 	$fptr->read_col_bit(3,$ii,1,$ii,${$larray->get_dataref},$status);
+	$larray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2d", $larray->at($_);
 	}
@@ -1585,12 +1678,14 @@ for ($ii=1;$ii<=20;$ii++) {
 
 
 	$fptr->read_col_byt(4,$ii,1,$ii,99,${$boutarray->get_dataref},$anynull,$status);
+	$boutarray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2d", $boutarray->at($_);
 	}
 	print " $status\nI";
 
 	$fptr->read_col_sht(5,$ii,1,$ii,99,${$ioutarray->get_dataref},$anynull,$status);
+	$ioutarray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2d", $ioutarray->at($_);
 	}
@@ -1598,18 +1693,21 @@ for ($ii=1;$ii<=20;$ii++) {
 
 
 	$fptr->read_col_lng(6,$ii,1,$ii,99,${$joutarray->get_dataref},$anynull,$status);
+	$joutarray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2d", $joutarray->at($_);
 	}
 	print " $status\nE";
 
 	$fptr->read_col_flt(7,$ii,1,$ii,99,${$eoutarray->get_dataref},$anynull,$status);
+	$eoutarray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2.0f", $eoutarray->at($_);
 	}
 	print " $status\nD";
 
 	$fptr->read_col_dbl(8,$ii,1,$ii,99,${$doutarray->get_dataref},$anynull,$status);
+	$doutarray->upd_data;
 	foreach (0..$ii-1) {
 		printf " %2.0f", $doutarray->at($_);
 	}
@@ -1661,6 +1759,12 @@ $fptr->read_img(TINT,1,14,$knul,${$kinarray->get_dataref},$anynull,$status);
 $fptr->read_img(TLONG,1,14,$jnul,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_img(TFLOAT,1,14,$enul,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_img(TDOUBLE,1,14,$dnul,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$kinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nImage values written with ffppr and read with ffgpv:\n";
 
@@ -1763,6 +1867,12 @@ $fptr->read_col(TINT,3,1,1,10,$knul,${$kinarray->get_dataref},$anynull,$status);
 $fptr->read_col(TLONG,3,1,1,10,$jnul,${$jinarray->get_dataref},$anynull,$status);
 $fptr->read_col(TFLOAT,4,1,1,10,$enul,${$einarray->get_dataref},$anynull,$status);
 $fptr->read_col(TDOUBLE,5,1,1,10,$dnul,${$dinarray->get_dataref},$anynull,$status);
+$binarray->upd_data;
+$iinarray->upd_data;
+$kinarray->upd_data;
+$jinarray->upd_data;
+$einarray->upd_data;
+$dinarray->upd_data;
 
 print "\nColumn values written with ffpcl and read with ffgcl:\n";
 $npixels = 10;

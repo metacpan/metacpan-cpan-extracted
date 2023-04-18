@@ -1,2 +1,3 @@
+From cfitsio 4.2.0, add fits_{read,write}_cols
 fits_calc_rows: should be calling fits_test_expr
 fits_read_keys_TYP: do we want to automagically return all keys?

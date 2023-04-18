@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Android;
-$Playwright::Android::VERSION = '1.291';
+$Playwright::Android::VERSION = '1.323';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,16 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Android'}{members};
-}
-
-sub setDefaultTimeout {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setDefaultTimeout',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub connect {
@@ -47,6 +37,16 @@ sub devices {
     return $self->_api_request(
         args    => [@_],
         command => 'devices',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setDefaultTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultTimeout',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Android - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 CONSTRUCTOR
 
@@ -116,12 +116,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 setDefaultTimeout(@args)
-
-Execute the Android::setDefaultTimeout playwright routine.
-
-See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
 
 =head2 connect(@args)
 
@@ -134,6 +128,12 @@ See L<https://playwright.dev/api/class-Android#Android-connect> for more informa
 Execute the Android::devices playwright routine.
 
 See L<https://playwright.dev/api/class-Android#Android-devices> for more information.
+
+=head2 setDefaultTimeout(@args)
+
+Execute the Android::setDefaultTimeout playwright routine.
+
+See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
 
 =head2 launchServer(@args)
 

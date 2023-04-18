@@ -36,7 +36,7 @@ use Carp;
 
 require Starlink::AST;
 
-$VERSION = 3.08;
+$VERSION = '3.09';
 
 # C O N S T R U C T O R ----------------------------------------------------
 

@@ -117,7 +117,7 @@ The package is currently maintained by Tim Jenness <tjenness@cpan.org>.
 Please use CPAN RT for bug reports and github pull requests for patches.
 The source code repository is at
 
-  git://github.com/timj/perl-Astro-FITS-Header.git
+  https://github.com/timj/perl-Astro-FITS-Header.git
 
 License
 -------

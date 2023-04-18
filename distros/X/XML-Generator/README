@@ -412,6 +412,11 @@ CONSTRUCTOR
     Specify the dtd. The value should be an array reference with three
     values; the type, the name and the uri.
 
+  xml
+    This is an hash ref value that should contain the version, encoding and
+    dtd values (same as above). This is used in case "conformance" is set to
+    "loose", but you still want to use the xml declaration or prolog.
+
 IMPORT ARGUMENTS
     use XML::Generator ':option';
 

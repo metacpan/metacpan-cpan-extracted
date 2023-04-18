@@ -2,7 +2,7 @@
 #
 ## LICENSE AND COPYRIGHT
 # 
-## Copyright (C) 2022 Carlos Celso
+## Copyright (C) Carlos Celso
 # 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 	use 5.006001;
 	use strict;
+	use warnings;
 	use Exporter;
 
 	use DBI;
@@ -84,7 +85,7 @@
 		$err
 	);
 
-	our $VERSION = "2022.301.1";
+	our $VERSION = "2023.106.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -470,8 +471,8 @@ sub _SelectCursor()
 				$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"013");
 				return SQL_SIMPLE_RC_SYNTAX;
 			}
-			if	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_NEXT) { $argv->{cursor} = $last; $argv->{cursor_command} = SQL_SIMPLE_CURSOR_TOP if ($last == undef);}
-			elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_BACK) { $argv->{cursor} = $first; $argv->{cursor_command} = SQL_SIMPLE_CURSOR_LAST if ($first == undef);}
+			if	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_NEXT) { $argv->{cursor} = $last; $argv->{cursor_command} = SQL_SIMPLE_CURSOR_TOP if (!defined($last));}
+			elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_BACK) { $argv->{cursor} = $first; $argv->{cursor_command} = SQL_SIMPLE_CURSOR_LAST if (!defined($first));}
 			elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_RELOAD) { $argv->{cursor} = $first; }
 		}
 	}
@@ -764,6 +765,11 @@ sub _Select()
 				$field = $2;
 				$field_b = ")";
 			}
+			else
+			{
+				$field_a = "";
+				$field_b = "";
+			}
 			## translate field
 			if ($field =~ /^(.*)\.(.*)$/)
 			{
@@ -901,7 +907,7 @@ sub _Delete()
 	## make where
 	my $where;
 	return SQL_SIMPLE_RC_SYNTAX if ($self->_getWhere("delete",[$argv->{table}],$argv->{where},\$where));
-	if ($where eq "" && !$argv->{force})
+	if ((!defined($where) || $where eq "") && !$argv->{force})
 	{
 		$self->setMessage("delete",SQL_SIMPLE_RC_SYNTAX,"016");
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1155,7 +1161,7 @@ sub _Update()
 	my $where;
 	return SQL_SIMPLE_RC_SYNTAX if ($self->_getWhere("update",[$argv->{table}],$argv->{where},\$where));
 
-	if ($where eq "" && !$argv->{force})
+	if ((!defined($where) || $where eq "") && !$argv->{force})
 	{
 		$self->setMessage("update",SQL_SIMPLE_RC_SYNTAX,"016");
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1602,7 +1608,7 @@ sub _getWhereRecursive()
 			my @where_aux;
 			foreach my $value(@_value2)
 			{
-				if	(defined($value) || $value ne "")
+				if	(defined($value) && $value ne "")
 				{
 					if ($value =~ /^\\(.*)/)
 					{
@@ -1640,9 +1646,14 @@ sub _getWhereRecursive()
 			next;
 		}
 		## value2 is single value
+		if (!defined($value2))
+		{
+			push(@where_tmp,$value1." IS NULL");
+			next;
+		}
 		if (ref($value2) eq "")
 		{
-			if (defined($value2) || $value2 ne "")
+			if ($value2 ne "")
 			{
 				if ($value2 =~ /^\\(.*)/)
 				{

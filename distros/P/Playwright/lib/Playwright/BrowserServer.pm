@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '1.291';
+$Playwright::BrowserServer::VERSION = '1.323';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'BrowserServer'}{members};
 }
 
-sub close {
+sub wsEndpoint {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'close',
+        command => 'wsEndpoint',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,11 +52,11 @@ sub kill {
     );
 }
 
-sub wsEndpoint {
+sub close {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'wsEndpoint',
+        command => 'close',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 CONSTRUCTOR
 
@@ -117,11 +117,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 close(@args)
+=head2 wsEndpoint(@args)
 
-Execute the BrowserServer::close playwright routine.
+Execute the BrowserServer::wsEndpoint playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for more information.
+See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
 
 =head2 process(@args)
 
@@ -135,11 +135,11 @@ Execute the BrowserServer::kill playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-kill> for more information.
 
-=head2 wsEndpoint(@args)
+=head2 close(@args)
 
-Execute the BrowserServer::wsEndpoint playwright routine.
+Execute the BrowserServer::close playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
+See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for more information.
 
 =head2 on(@args)
 

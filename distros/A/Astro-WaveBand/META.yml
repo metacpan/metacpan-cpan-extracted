@@ -6,22 +6,22 @@ author:
   - 'Alasdair Allan <aa@astro.ex.ac.uk>'
   - 'Tim Lister <tlister@lcogt.net>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.3
+  Module::Build: '0.3'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Astro-WaveBand
 provides:
   Astro::WaveBand:
     file: lib/Astro/WaveBand.pm
-    version: 0.09
+    version: '0.10'
 resources:
-  homepage: http://github.com/timj/perl-Astro-WaveBand/tree/master
+  homepage: https://github.com/timj/perl-Astro-WaveBand/tree/master
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/timj/perl-Astro-WaveBand.git
-version: 0.09
+  repository: https://github.com/timj/perl-Astro-WaveBand.git
+version: '0.10'

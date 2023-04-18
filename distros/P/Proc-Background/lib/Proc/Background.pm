@@ -1,5 +1,5 @@
 package Proc::Background;
-$Proc::Background::VERSION = '1.30';
+$Proc::Background::VERSION = '1.31';
 # ABSTRACT: Generic interface to Unix and Win32 background process management
 require 5.004_04;
 
@@ -396,7 +396,7 @@ Proc::Background - Generic interface to Unix and Win32 background process manage
 
 =head1 SYNOPSIS
 
-  use Proc::Background;
+  use Proc::Background 'timeout_system';
   timeout_system($seconds, $command, $arg1, $arg2);
   timeout_system($seconds, "$command $arg1 $arg2");
   
@@ -469,7 +469,8 @@ If you supply a single-string command line, it derives the executable by
 parsing the command line and looking for the first element in the C<PATH>,
 appending C<".exe"> if needed.  If you supply multiple arguments, the
 first is used as the C<exe> and the command line is built using
-L<Win32::ShellQuote>.
+L<Win32::ShellQuote>.  To let Windows search for the executable, pass option
+C<< { exe => undef } >>.
 
 =back
 
@@ -483,19 +484,21 @@ This module traditionally has returned C<undef> if the child could not
 be started.  Modern Perl recommends the use of exceptions for things
 like this.  This option, like Perl's L<autodie> pragma, causes all
 fatal errors in starting the process to die with exceptions instead of
-returning undef.
+returning undef.  (module-usage errors or other problems prior to
+launching the process may still 'croak' regardless of this setting)
 
 =item C<command>
 
 You may specify the command as an option instead of passing the command
 as a list.  A string value is considered a command line, and an arrayref
-value is considered an argument list.  This can resolve the ambiguity
-between a command line vs. single-element argument list.
+value is considered an argument list.  Using this option resolves the
+ambiguity in the plain-list constructor between a command line vs.
+a single-element argument list.
 
 =item C<exe>
 
 Specify the executable.  This can serve two purposes:
-on Win32 it avoids the parsing of the commandline, and on Unix it can be
+on Win32 it avoids the need to parse the commandline, and on Unix it can be
 used to run an executable while passing a different value for C<$ARGV[0]>.
 
 =item C<stdin>, C<stdout>, C<stderr>
@@ -510,7 +513,7 @@ name which this module will attmept to open for reading or appending.
 
 Note that on Win32, none of the parent's handles are inherited by default,
 which is the opposite on Unix.  When you specify any of these handles on
-Win32 the default will change to inherit them from the parent.
+Win32 the default will change to inherit the rest from the parent.
 
 =item C<cwd>
 
@@ -681,6 +684,41 @@ scalar context, or nothing in a void context.
 
 =back
 
+=head1 BUGS
+
+The following behaviors aren't ideal, but are preserved for backward-compatibility.
+
+=over
+
+=item Commandline vs. Single Argv[]
+
+C<< ->new($x) >> is treated as a command line.  In C<< ->new({ exe => $y }, $x) >>,
+$x is treated as C<$ARGV[0]>.  Use C<< ->new({ command => ... }) >>
+(scalar vs. arrayref) to dis-ambiguate.
+
+=item Win32 Argv Quoting
+
+This is a bug in Windows, not this module.  It is not possible to universally
+convert an @ARGV into a commandline, because each Win32 program performs its
+own command line parsing, and cmd.exe and find.exe deviate from the majority
+of other executables.  Those things could be improved with hieuristics, which
+this module doesn't have.
+
+=item Win32 exe determination
+
+If you don't specify an absolute path for option C<exe>, this module manually
+searches the %PATH% looking for the executable, and is less thorough than the
+native Windows shell behavior.  Use C<< { exe => undef } >> to get the naive
+Windows exe search.  (but you need Win32::Process version 0.17 or newer)
+
+=item Win32 SIGTERM
+
+This module only supports TerminateProcess, which is equivalent to SIGKILL, not
+SIGTERM.  SIGTERM could be emulated by calling taskkill.exe, or using windows
+messages.  Patches welcome.
+
+=back
+
 =head1 SEE ALSO
 
 =over
@@ -723,7 +761,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Schlichting Kevin Ryde Salvador Fandiño
+=for stopwords Florian Schlichting Kevin Ryde Salvador Fandiño Sven Kirmess
 
 =over 4
 
@@ -739,15 +777,19 @@ Kevin Ryde <user42@zip.com.au>
 
 Salvador Fandiño <sfandino@yahoo.com>
 
+=item *
+
+Sven Kirmess <sven.kirmess@kzone.ch>
+
 =back
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
+This software is copyright (c) 2023 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

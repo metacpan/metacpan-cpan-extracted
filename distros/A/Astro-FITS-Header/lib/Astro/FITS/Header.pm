@@ -26,7 +26,7 @@ use Carp;
 
 use Astro::FITS::Header::Item;
 
-$VERSION = 3.08;
+$VERSION = '3.09';
 
 # Operator overloads
 use overload '""' => "stringify",
@@ -703,7 +703,7 @@ In scalar context, just returns the merged header.
 The options hash is itself optional. It contains the following keys:
 
  merge_unique - if an item is identical across multiple headers and only
-                exists in those headers, propogate to the merged header rather
+                exists in those headers, propagate to the merged header rather
                 than storing it in the difference headers.
 
  force_return_diffs - return an empty difference object per input header
@@ -933,7 +933,7 @@ These methods are for internal use only.
 
 Private function used to rebuild the lookup table after modifying the
 header block, its easier to do it this way than go through and add one
-to the indices of all header cards following the modifed card.
+to the indices of all header cards following the modified card.
 
 =cut
 
@@ -1604,7 +1604,7 @@ use strict;
 use Carp;
 
 our $VERSION;
-$VERSION = '3.08';
+$VERSION = '3.09';
 
 # Class wrapper for subhdrs tie. Not (yet) a public interface
 # we simply need a class that we can tie the subhdrs array to.

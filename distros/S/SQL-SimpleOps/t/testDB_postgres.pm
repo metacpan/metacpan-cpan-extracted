@@ -2,7 +2,7 @@
 #
 ## LICENSE AND COPYRIGHT
 # 
-## Copyright (C) 2022 Carlos Celso
+## Copyright (C) Carlos Celso
 # 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ sub PG_do()
 
 	if (&PG_Load($dir))
 	{
-		if ($ENV{SQL_SIMPLE_DB_SKIP_CREATE} eq "1" || &PG_Call("Creating database, schema, tables and rules",\@pg_commands))
+		if ($ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE} eq "1" || &PG_Call("Creating database, schema, tables and rules",\@pg_commands))
 		{
 			&PG_Test($dir);
 			&PG_Drop($dir);
@@ -260,7 +260,7 @@ sub PG_Test()
 
 sub PG_Drop()
 {
-	return 1 if ($ENV{SQL_SIMPLE_DB_SKIP_CREATE} eq "1");
+	return 1 if ($ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE} eq "1");
 	my @drop;
 	foreach my $cmd(@pg_commands)
 	{

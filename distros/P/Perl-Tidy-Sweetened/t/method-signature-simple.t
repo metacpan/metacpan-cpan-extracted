@@ -91,7 +91,7 @@ method name1 :Attrib(Arg) {# comment
 sub name2 :Attrib(Arg) {  # comment
 }
 RAW
-method name1 : Attrib(Arg) {    # comment
+method name1 :Attrib(Arg) {    # comment
 }
 
 sub name2 : Attrib(Arg) {$indent_tc# comment

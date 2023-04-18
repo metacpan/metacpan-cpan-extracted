@@ -4,16 +4,16 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(fieldset form_for input legend div a link_to),
-  -util => qw($sf content_for path ),
+  -helpers => qw(create_path register_init_path),
   -views => 'HTML::Page';
 
 has 'user' => (is=>'ro', required=>1);
 has 'post_login_redirect' => (is=>'rw', predicate=>'has_post_login_redirect');
 
 sub action_link :Renders ($self) {
-  return $self->has_post_login_redirect ?
-    path('create', +{post_login_redirect=>$self->post_login_redirect}) :
-    path('create');
+  return create_path( $self->has_post_login_redirect ?
+    +{post_login_redirect=>$self->post_login_redirect} : 
+    +{} );
 }
 
 sub render($self, $c) {
@@ -36,7 +36,7 @@ sub render($self, $c) {
         ],
         input {if=>$self->has_post_login_redirect, type=>'hidden', name=>'post_login_redirect', value=>$self->post_login_redirect},
         div +{ class=>'text-center' },
-          link_to path('/register/init'), 'Register', 
+          link_to register_init_path(), 'Register', 
       };
     };
 }

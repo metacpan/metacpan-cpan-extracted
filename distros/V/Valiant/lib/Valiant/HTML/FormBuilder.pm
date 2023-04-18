@@ -320,7 +320,7 @@ sub input {
   $options = $self->merge_theme_field_opts($options->{type} || 'input', $attribute, $options);
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
- 
+
   $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
     if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
 

@@ -1,0 +1,147 @@
+Revision history for Astro::Coords
+
+0.21 2023-04-17
+
+  - Check for requests for more than 9 decimal places, which can cause an
+    overflow from PAL functions.
+
+  - Use str_ndp for Angle in_format('array').
+
+0.20 2019-09-11
+
+  - Units can now be given as a 2-element array such as ['hours', 'degrees'].
+
+0.19 2018-02-07
+
+  - Astro::Coords::Fixed::array now returns the azimuth and elevation
+    in radians.
+
+  - Changed the default number of decimal places for
+    Astro::Coords::Angle::Hour to 3.
+
+  - Updated the format specification used to parse epoch strings in
+    Astro::Coords::Elements (for recent versions of Time::Piece).
+
+  - Fixed the Astro::Coords::Angle::negate method.
+
+  - Added warnings about the use of proper motion without parallax.
+    (With Astro::PAL, significant proper motions are not applied
+    unless the parallax is also given.)
+
+0.18 2012-11-09
+
+  - Fix inconsistency in parsing of hours vs degrees (Eric Jensen).
+
+0.17 2012-07-16
+
+  - Require DateTime version 0.76 to avoid problems with rise/set test scripts.
+
+0.16 2012-07-13
+
+  - Massive speed up in rise/set time calculation.
+
+0.15 2012-07-05
+
+  - Add planets() method to retrieve planet names and remove Pluto.
+
+0.14 2012-06-04
+
+  - Fix tests for long double Perl. Build now requires Test::Number::Delta.
+
+0.13 2012-05-25
+
+  - Use Astro::PAL instead of Astro::SLA. The main driver being that
+    Astro::PAL can be installed from CPAN without any additional dependencies.
+
+  - Significant speed improvements.
+
+  - New apply_offset() method to add an Offset onto an existing coordinate
+    object and return a new coordinate object.
+
+0.12 2010-12-30
+
+  - Update Elements interface.
+
+  - Improve performance of DateTime usage (caching TimeZone object).
+
+  - Support barycentric velocities.
+
+  - Astro::Coords::Offset now has invert(), clone() and posang() methods.
+
+  - Astro::Coords::Angle now has clone() and negate() methods.
+
+  - Astro::Coords::Offset now allows more systems.
+
+  - Fix problem with fractions seconds in LST calculation.
+
+  - Fix problem with calculate() method trashing the cached DateTime.
+
+  - Uses Module::Build.
+
+0.10 2005-02-21
+
+  - Major reorganization internally to use (the new) Astro::Coords::Angle
+    objects for all angles. Should simplify formatting of return values.
+
+  - datetime() method now supports DateTime objects for time
+    specification. Time::Piece is now deprecated.
+
+  - Add radial velocity support.
+
+  - Add Doppler correction (experimental).
+
+  - New method to obtain the native Equatorial encoding that was used.
+
+  - set_time and rise_time now works properly for the Moon (and Sun).
+
+  - rise_time can now be configured to return the nearest rise time
+    not just the next rise_time.
+
+  - Planet diameter is now available.
+
+  - Galactic and ecliptic conversions now in base class (moved from Equatorial)
+
+  - radec1950 method available.
+
+  - Switch to GPL license.
+
+0.07 2004-02-26
+
+  - Add support for parallax and proper motion, epoch and equinox.
+
+  - ra2000 and dec2000 methods always return RA/Dec J2000 for epoch 2000.0
+    (equatorial only).
+
+0.05 2003-11-17
+
+  - Check format of input arguments (for sexagesimal parsing).
+
+  - Add rise, set and transit time calculation.
+
+  - Add Interpolated RA/Dec (Astro::Coords::Interpolated).
+
+  - Add calculate method.
+
+  - Fix orbital elements (requires recent slalib).
+
+  - Can now ask for J2000 for all coordinate types.
+
+  - Add name and comment method for tagging a coordinate object.
+
+0.04 2002-08-03
+
+  - Internal release.
+
+0.03 2002-05-24
+
+  - Add isObservable method.
+
+  - Spun off Astro::Telescope into its own CPAN distribution.
+
+0.02 2001-12-05
+
+  - Add Astro::Coords::Calibration and Astro::Coords::Fixed.
+
+0.01 2001-11-01
+
+  - Initial test release to CPAN.

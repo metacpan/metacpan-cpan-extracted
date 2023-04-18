@@ -7,13 +7,13 @@
       "Tim Lister <tlister@lcogt.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-WaveBand",
    "prereqs" : {
@@ -31,18 +31,18 @@
    "provides" : {
       "Astro::WaveBand" : {
          "file" : "lib/Astro/WaveBand.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/timj/perl-Astro-WaveBand/tree/master",
+      "homepage" : "https://github.com/timj/perl-Astro-WaveBand/tree/master",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "git://github.com/timj/perl-Astro-WaveBand.git"
+         "url" : "https://github.com/timj/perl-Astro-WaveBand.git"
       }
    },
-   "version" : "0.09"
+   "version" : "0.10"
 }

@@ -371,15 +371,17 @@ where it proposes the most common and basic operations with low parameter comple
 
 The module allow switch between database engine without recoding.
 It makes the necessary adjusments in SQL statement according the database engine in use,
-reducing the complexity in the applications's code,
-where the current version has built-in support for the databases: I<MySQL>, I<MariaDB>, I<Postgres> and I<SQLite3>.
+reducing the complexity in the applications's code.
+
+The current version has built-in support for the databases: I<MySQL>, I<MariaDB>, I<Postgres> and I<SQLite3>.
 
 However, the module does not convert the fields format in the databases,
 where each one has its restrictions and rules.
-We understand that the table in use have same format and data type and supported by all engines.
 
-By default, evey command invoked will be effectively executed in database,
-however this process can be suppressed if requested and the SQL command can retrieve (if neeeded, see: C<make_only> option).
+By definition, we assume that switching databases will use supported fields between the engines.
+
+By default, evey invoked command will be effectively executed in database.
+To disable the execution use C<make_only> option.
 
 All parameters set in the Constructor (method new) are defined as Global Parameters, and some options can be enable/disable by the Methods, for more information see L<Global Options>.
 
@@ -439,7 +441,7 @@ You must load the constructor and use the object address created by it to run th
 However, in this document have references and examples using the format "SQL::SimpleOps->[method]" just for simple illustration,
 but this format is not supported in encoding. (see B<EXAMPLES>)
 
-The controls can initialized by the Options Arguments and/or L<Configuration File>.
+The controls can be initialized by the Options Arguments and/or L<Configuration File>.
 The module will load the arguments and at end will apply the L<Configuration File> changes,
 where the L<Configuration File> is the highest priority value over the arguments.
 
@@ -500,7 +502,7 @@ B<REMEMBER:> The JSON format does not allow comma at the end of last field in br
 X<Loading Data into Applicatons>
 
 Exists two different process to manipulate the application data with the module.
-The first put data into the database (C<Insert> and C<Update>) and the second get data from the database (C<Select> and C<SelectCursor>).
+The first update data into the database (C<Insert>, C<Delete> and C<Update>) and the second get data from the database (C<Select> and C<SelectCursor>).
 
 The first process the data will be sent by arguments, where the module will convert to SQL command and run it.
 
@@ -590,6 +592,8 @@ B<Example5:>
 
   print "id=".$my_scalar."\n":
 
+B<BEWARE:> Only the last value will be returned for queries with multiple rows.
+
 =item B<Complex Extractions>
 
 The most case you need provide a lot number of process before select the rows.
@@ -613,7 +617,7 @@ B<Example6:>
      my $ref = shift;			# my hash of extracted row from table1
      my $any = shift;			# my 'buffer_options' option.
      ...
-     return SQL::SimpleOps->Select		# returing the code of call
+     return SQL::SimpleOps->Select	# returing the code of call
      (
         table => table2,
         where => [ id => $ref->{register} ],
@@ -642,11 +646,11 @@ X<Aliases Table>
 
 The can be used to abstract the real names on the tables and the columns, reducing the recoding.
 
-The Aliases Table is not mandatory, use it you necessary. See B<EXAMPLES>
+The Aliases Table is not mandatory. See B<EXAMPLES>
 
 When mapped the B<Aliases Column> these aliases will be the keys in the C<hashref buffers>
 
-B<Why should I?> Some companies disallow tables using generic names (out of the norms), in this case, you can use aliases to abstract the real name in your the databases.
+B<Why should I?> Some places disallow tables using generic names (out of the norms), in this case, you can use aliases to abstract the real name in your the databases.
 
 B<REMEMBER:> Do not use I<reserved words>, like function names (etc), as aliases. This keywords are reserved and is not allowed to assign as aliases (SQL will be fail).
 
@@ -697,11 +701,11 @@ Results:
   or
   SELECT * FROM table_for_users;
 
-B<NOTE:> This last will not assign the alias names in the SQL Command.
+B<NOTE:> The '*' option will not assign alias names in the SQL Command.
 
 =head2 Escape or Backslash
 
-The C<escape> operand (or C<backslash>) is the format used to force the methods to ignore the translating data as arguments.
+The C<escape> operand (or C<backslash>) is the format to force the methods to ignore the translating data as arguments.
 The data with escape information will passed to SQL command without check or decode.
 
 To escape the data, you must use as prefix the backslash caracter ('\').
@@ -718,7 +722,7 @@ You can C<escape> the following options:
 
  SQL::SimpleOps->getWhere ( ... , where => [ '\\my_bypass_as_col_name' => '\\my_bypass_as_value', ... ], ... );
 
-B<NOTE:> The escape is valid in the 'where' clause of C<Select>, C<SelectCursor>, C<Delete> and C<Update> command.
+B<NOTE:> The escape is valid in the 'where' clause for C<Select>, C<SelectCursor>, C<Delete> and C<Update> command.
 
 B<Example1:> C<Select> or C<SelectCursor>
 
@@ -735,8 +739,11 @@ B<Example2:> C<Insert>
 Result:
 
  INSERT INTO tb1 ... ON DUPLICATE last_update = concat(substr(col1_date,1,4),"-01-01") ... ;
+ (mySQL / MariaDB engine)
 
-B<NOTE:> The C<on duplicate> is I<MySQL/MariaDB> database engine, for I<SQLite> and I<Postgres> will be C<on conflict>.
+ or
+ INSERT INTO tb1 ... ON CONFLICT last_update = concat(substr(col1_date,1,4),"-01-01") ... ;
+ (SQLite / Postgres engine)
 
 B<Example3:> C<Update>
 
@@ -752,21 +759,20 @@ B<Example4:> C<getWhere>
 
 Result:
 
- ... WHERE col1 = my_expression AND my_col_expression = 'my_value' ...
+ ... col1 = my_expression AND my_col_expression = 'my_value' ...
 
 B<NOTE:> The 'my_value' will have quote as applied and 'no quotes' will be in escaped expressions.
 
 =head2 Where Clause
 X<Where Clause>
 
-We belive that the most important situations will was created,
-however we understand that some format will not be supported.
+We belive that the most basic situations is supported.
 
-The Where Clause was be create based C<array_ref>, no others options exists.
+The Where Clause is be defined by C<array_ref> values, no others options exists.
 We must remember that some engines explore the sequence in the I<Where Clause> to establish de best way to extract data (index and match condition),
-using this point of view the best way is this type of struct.
+basd on this definition, the best choice is the C<array_ref> format.
 
-If you any item (or sub-item) specifies C<hash_ref>, the process is aborted with C<SQL_SIMPLE_RC_SYNTAX> as the return code.
+If any item (or sub-item) specifies C<hash_ref>, the process is aborted with C<SQL_SIMPLE_RC_SYNTAX> as the return code.
  
 B<Operators:> The follow operators was been builtin:
 
@@ -830,7 +836,7 @@ B<Example1:>
 
        fld120 => [ '%^', 'abc' ],			# ... fld120 LIKE '%abc'
 
-       fld121 => [ '^^', 'ab%de' ],			# ... fld121 LIKE 'ab%de'  	# you can use '%' if required
+       fld121 => [ '^^', 'ab%de' ],			# ... fld121 LIKE 'ab%de'  		# use '%' if required
 
        fld130 => '\\concat(fld130,"xxxx")',		# ... fld130 = concat(fld130,"xxxx")  	# without quote
      ],
@@ -1004,11 +1010,11 @@ Sets the folder for writes log file process.
 
 Defaults: (unix/linux) F</var/spool/sql/> or (windows) F<c:\windows\temp>
 
-B<NOTE:> You must create the F</var/spool/sql/> as I<mode drwxrwxrwt>.
+B<NOTE:> The folder must be previously created.
 
 =item B<sql_save_name:>
 
-Sets the filename string  for writes log file process.
+Sets the filename string on writes log file process. The string will prefix the name in the logfile.
 
 Defaults: The default value is C<sql>.
 
@@ -1028,27 +1034,27 @@ Defaults: no defaults.
 
 The follow options can be temporarily modified by the methods:
 
-=over
-
-=item B<commit:>
-
-Enable/Disable the commit after a specific update command.
-
-=item B<message_log:>
-
-Enable/Disable the written on System Syslog Services.
-
-=item B<quote:>
-
-Change the quote character.
-
-=item B<sql_save:>
-
-Enable/Disable the written for SQL Log Files.
-
-This Options can be modified with each SQL Command execution.
+B<NOTE>: This Options can be modified with each SQL Command execution.
 These changes will be valid only in this process,
 where the global values will be restored after each execution.
+
+=over
+
+=item *
+
+B<commit:> Enable/Disable the commit after a specific update command.
+
+=item *
+
+B<message_log:> Enable/Disable the written on System Syslog Services.
+
+=item *
+
+B<quote:> Change the quote character.
+
+=item *
+
+B<sql_save:> Enable/Disable the written for SQL Log Files.
 
 =back
 
@@ -1150,7 +1156,7 @@ The SQL Command will be written as flat file separeted into distinct folders by 
 
 The folder will be create as:
 
-F</var/tmp/sql/YYYY/YYYYmm/YYYYmmdd/[sql_save_name].[database_name].[today].[pid].[counter]>
+F<B</var/tmp/sql>/[YYYY]/[YYYYmm]/[YYYYmmdd]/B<my_cmds>.B<my_db>.[today].[pid].[counter]>
 
 B<Example5:> The database "my_db" forcing commit for each update command.
 
@@ -1167,7 +1173,7 @@ The C<commit> option for each update command can cause degradation in the proces
 Use this option wisely.
 
 B<When can i use it?>
-The C<commit> option can be used at the end of a long process of updates,
+The C<commit> option can be used at the end of a large number of updates,
 and that at a certain point you need to create relational consistency to reduce I<rollback> process.
 
 In this case, you can either execute the Commit SQL Command or execute the last update command of the cycle using C<commit> option.
@@ -1181,7 +1187,7 @@ In this case, you can either execute the Commit SQL Command or execute the last 
      commit => 1,				# (default is OFF)
   );
 
-=head3 Openning Interface MySQL/MariaDB
+=head3 Openning MySQL/MariaDB Engine
 X<Interface MySQL/MariaDB>
 
 B<Format:> see L<DBI>
@@ -1208,7 +1214,7 @@ B<Example1:> The database as "my_info", loging "my_user", password "my_auth":
      interface_options => { mysql_auto_reconnect => 0 },
   );
 
-=head3 Openning Interface SQLite
+=head3 Openning SQLite Engine
 X<Interface SQLite>
 
 B<Format:> see L<DBI>
@@ -1216,12 +1222,16 @@ B<Format:> see L<DBI>
   my $mymod = SQL::SimpleOps->new
   (
      driver => "sqlite",
+     db => "my_info",
+     dbfile => "my_file",
      interface_options =>
      {
         # no special options 
      },
      ...
   );
+
+B<NOTE:> The default valor for C<dbfile> is "[db].db".
 
 B<Example1:> The database as "my_info" and fileset as "my_info.db":
 
@@ -1237,7 +1247,7 @@ B<Example2:> The database as "my_db" and fileset as "my_file.db":
   (
      driver => "sqlite",
      db => "my_db"
-     dbfile => "my_file.db"		# (or: dbfile => "my_file")
+     dbfile => "/var/tmp/my_file.db"	# (or: dbfile => "my_file")
      interface_options =>
      {
         RaiseError => 1,		# (the default is 0)
@@ -1245,7 +1255,9 @@ B<Example2:> The database as "my_db" and fileset as "my_file.db":
      },
   );
 
-=head3 Openning Interface Postgres
+B<NOTE:> The default location is the current folder in use. The Fullpath on C<dbfile> is mandatory for specific location.
+
+=head3 Openning Postgres Engine
 X<Interface Postgres>
 
 B<Format:> see L<DBI>
@@ -1649,7 +1661,7 @@ Defaults: no defaults
 Sets the return buffer to getting the page controls.
 This informantion should be used in the paging process.
 
-We highly recommend using this option to help the pagination process.
+We highly recommend using this option in the pagination process.
 At the end of each retrieve, the cursor of page will be saved in C<cursor_info> option.
 
 Defaults: no defaults, if omitted this information must be obtained by the C<getLastCursor> method.
@@ -1713,9 +1725,9 @@ The 4th read the penultimate page.
 B<NOTE:> The number of page is limited by C<limit> option.
 
   # at end of each retrieve the 'cursor_info' option is up to date.
-
   my %cursor_info;
 
+  # the scan will retrieve 'no_lines' lines into the 'buffer' options,
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1727,10 +1739,9 @@ B<NOTE:> The number of page is limited by C<limit> option.
      ...
      limit => no_lines,
   );
-  # the scan will retrieve 'no_lines' lines into the 'buffer' options,
-
   ...
 
+  # the scan will retrieve the next 'no_lines' lines based in saved
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1742,10 +1753,9 @@ B<NOTE:> The number of page is limited by C<limit> option.
      ...
      limit => no_lines,
   );
-  # the scan will retrieve the next 'no_lines' lines based in saved
-
   ...
 
+  # the scan jump at end of table and retrieve the next 'no_lines'
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1757,9 +1767,9 @@ B<NOTE:> The number of page is limited by C<limit> option.
      buffer => array_ref,
      limit => no_lines,
   );
-
   ...
 
+  # the scan back page based the current cursor
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1771,7 +1781,6 @@ B<NOTE:> The number of page is limited by C<limit> option.
      buffer => array_ref,
      limit => no_lines,
   );
-  # the scan jump at end of table and retrieve the next 'no_lines'
 
 =head2 Update
 X<Update>
@@ -1827,7 +1836,10 @@ Consists of the Return Buffer Area, where the method will written the columns an
   scalar_ref	Address of SCALAR;
   callback_ref	Address of Your Subroutine.
 
-B<flush:> Force the clean up in the return buffer area. The default value is enabled, all buffer area will be initialized.
+=item B<flush:>
+
+Force the clean up in the return buffer area.
+The default value is enabled, all buffer area will be initialized.
 
 =back
 
@@ -1838,7 +1850,7 @@ Consists of the method to get the realname for columns mapped on L<Aliases Table
 
 The method return the Column Arguments Value if the table or column argument does not exists.
 
-B<NOTE:> This method can be used on B<PLUGINS> to help to translate the aliases names.
+B<NOTE:> This method can be used on B<PLUGINS> to translate the aliases names.
 
 =head2 getAliasTable
 
@@ -1846,7 +1858,7 @@ Consists of the method to get the realname for table mapped on L<Aliases Table>.
 
 The method return the Table Arguments Value if the table argument does not exists.
 
-B<NOTE:> This method can be used on B<PLUGINS> to help to translate the aliases names.
+B<NOTE:> This method can be used on B<PLUGINS> to translate the aliases names.
 
 =head2 getDBH
 X<getDBH>
@@ -2042,6 +2054,7 @@ The parameters can be used to establish the operations on extract list.
   SQL_SIMPLE_CURSOR_BACK	# Cursor Command Backward (descending order)
   SQL_SIMPLE_CURSOR_NEXT	# Cursor Command Forward (ascending order)
   SQL_SIMPLE_CURSOR_LAST	# Cursor Command Bottom of List (descending order)
+  SQL_SIMPLE_CURSOR_RELOAD	# Cursor Command Reload the Current Page (ascending order)
 
 Default: no defaults
 
@@ -3682,7 +3695,7 @@ Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
 =head1 COPYRIGHT
 X<COPYRIGHT>
 
-Copyright (C) 2008-2022 by Carlos Celso
+Copyright (C) 2008-2023 by Carlos Celso
 
 =head1 LICENSE
 X<LICENSE>
@@ -3701,4 +3714,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
-

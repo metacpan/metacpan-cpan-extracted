@@ -40,7 +40,7 @@ use base qw/ Astro::FITS::Header /;
 use Astro::FITS::CFITSIO qw / :longnames :constants /;
 use Carp;
 
-$VERSION = 3.08;
+$VERSION = '3.09';
 
 # C O N S T R U C T O R ----------------------------------------------------
 
@@ -172,7 +172,7 @@ Write a FITS header to a FITS file
 Its accepts a FITS identifier or a filename. If both fitsID and File keys
 exist, fitsID key takes priority.
 
-Returns undef on error, true if the header was written successfully.
+Throws an exception (croaks) on error.
 
 =cut
 

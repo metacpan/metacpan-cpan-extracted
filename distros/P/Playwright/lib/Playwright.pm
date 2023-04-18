@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.291';
+$Playwright::VERSION = '1.323';
 use strict;
 use warnings;
 
@@ -308,7 +308,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 SYNOPSIS
 
@@ -330,6 +330,13 @@ version 1.291
     $body->screenshot();
 
     my $kids = $body->selectMulti('*');
+
+    #Alternatively, use the new locator API instead of select/selectMulti:
+    my $loc = $page->locator('body');
+    my $innerTubes = $loc->allInnerTexts();
+    print Dumper($innerTubes);
+
+    # See a more full exploration of the API in example.pl on github.
 
 =head1 DESCRIPTION
 
@@ -733,6 +740,12 @@ Current Maintainers:
 George S. Baugh <teodesian@gmail.com>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Yanick Champoux
+
+Yanick Champoux <yanick.champoux@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -12,7 +12,7 @@ use Wikibase::Datatype::Print::Utils qw(print_references);
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -38,3 +38,218 @@ sub print {
 1;
 
 __END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Wikibase::Datatype::Print::MediainfoStatement - Wikibase mediainfo statement pretty print helpers.
+
+=head1 SYNOPSIS
+
+ use Wikibase::Datatype::Print::MediainfoStatement qw(print);
+
+ my $pretty_print_string = print($obj, $opts_hr);
+
+=head1 SUBROUTINES
+
+=head2 C<print>
+
+ my $pretty_print_string = print($obj, $opts_hr);
+
+Construct pretty print output for L<Wikibase::Datatype::MediainfoStatement>
+object.
+
+Returns string.
+
+=head1 ERRORS
+
+ print():
+         Object isn't 'Wikibase::Datatype::MediainfoStatement'.
+
+=head1 EXAMPLE1
+
+=for comment filename=create_and_print_mediainfo_statement.pl
+
+ use strict;
+ use warnings;
+
+ use Wikibase::Datatype::MediainfoSnak;
+ use Wikibase::Datatype::MediainfoStatement;
+ use Wikibase::Datatype::Print::MediainfoStatement;
+ use Wikibase::Datatype::Value::Item;
+ use Wikibase::Datatype::Value::String;
+
+ # Object.
+ my $obj = Wikibase::Datatype::MediainfoStatement->new(
+         'id' => 'M123$00C04D2A-49AF-40C2-9930-C551916887E8',
+
+         # creator (P170)
+         'snak' => Wikibase::Datatype::MediainfoSnak->new(
+                  'property' => 'P170',
+                  'snaktype' => 'novalue',
+         ),
+         'property_snaks' => [
+                 # Wikimedia username (P4174): Lviatour
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::String->new(
+                                  'value' => 'Lviatour',
+                          ),
+                          'property' => 'P4174',
+                 ),
+
+                 # URL (P2699): https://commons.wikimedia.org/wiki/user:Lviatour
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::String->new(
+                                  'value' => 'https://commons.wikimedia.org/wiki/user:Lviatour',
+                          ),
+                          'property' => 'P2699',
+                 ),
+
+                 # author name string (P2093): Lviatour
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::String->new(
+                                  'value' => 'Lviatour',
+                          ),
+                          'property' => 'P2093',
+                 ),
+
+                 # object has role (P3831): photographer (Q33231)
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::Item->new(
+                                  'value' => 'Q33231',
+                          ),
+                          'property' => 'P3831',
+                 ),
+         ],
+ );
+
+ # Print.
+ print Wikibase::Datatype::Print::MediainfoStatement::print($obj)."\n";
+
+ # Output:
+ # P170: no value (normal)
+ #  P4174: Lviatour
+ #  P2699: https://commons.wikimedia.org/wiki/user:Lviatour
+ #  P2093: Lviatour
+ #  P3831: Q33231
+
+=head1 EXAMPLE2
+
+=for comment filename=create_and_print_mediainfo_statement_translated.pl
+
+ use strict;
+ use warnings;
+
+ use Wikibase::Cache;
+ use Wikibase::Cache::Backend::Basic;
+ use Wikibase::Datatype::MediainfoSnak;
+ use Wikibase::Datatype::MediainfoStatement;
+ use Wikibase::Datatype::Print::MediainfoStatement;
+ use Wikibase::Datatype::Value::Item;
+ use Wikibase::Datatype::Value::String;
+
+ # Object.
+ my $obj = Wikibase::Datatype::MediainfoStatement->new(
+         'id' => 'M123$00C04D2A-49AF-40C2-9930-C551916887E8',
+
+         # creator (P170)
+         'snak' => Wikibase::Datatype::MediainfoSnak->new(
+                  'property' => 'P170',
+                  'snaktype' => 'novalue',
+         ),
+         'property_snaks' => [
+                 # Wikimedia username (P4174): Lviatour
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::String->new(
+                                  'value' => 'Lviatour',
+                          ),
+                          'property' => 'P4174',
+                 ),
+
+                 # URL (P2699): https://commons.wikimedia.org/wiki/user:Lviatour
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::String->new(
+                                  'value' => 'https://commons.wikimedia.org/wiki/user:Lviatour',
+                          ),
+                          'property' => 'P2699',
+                 ),
+
+                 # author name string (P2093): Lviatour
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::String->new(
+                                  'value' => 'Lviatour',
+                          ),
+                          'property' => 'P2093',
+                 ),
+
+                 # object has role (P3831): photographer (Q33231)
+                 Wikibase::Datatype::MediainfoSnak->new(
+                          'datavalue' => Wikibase::Datatype::Value::Item->new(
+                                  'value' => 'Q33231',
+                          ),
+                          'property' => 'P3831',
+                 ),
+         ],
+ );
+
+ # Cache.
+ my $cache = Wikibase::Cache->new(
+         'backend' => 'Basic',
+ );
+
+ # Print.
+ print Wikibase::Datatype::Print::MediainfoStatement::print($obj, {
+         'cache' => $cache,
+ })."\n";
+
+ # Output:
+ # P170: no value (normal)
+ #  P4174: Lviatour
+ #  P2699: https://commons.wikimedia.org/wiki/user:Lviatour
+ #  P2093: Lviatour
+ #  P3831: Q33231
+
+=head1 DEPENDENCIES
+
+L<Error::Pure>,
+L<Exporter>,
+L<Readonly>,
+L<Wikibase::Datatype::Print::Reference>,
+L<Wikibase::Datatype::Print::MediainfoSnak>,
+L<Wikibase::Datatype::Print::Utils>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Wikibase::Datatype::MediainfoStatement>
+
+Wikibase statement datatype.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Wikibase-Datatype-Print>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2020-2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.08
+
+=cut
+

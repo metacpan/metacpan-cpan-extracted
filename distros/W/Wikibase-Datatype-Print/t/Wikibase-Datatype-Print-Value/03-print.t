@@ -3,11 +3,14 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
+use Wikibase::Datatype::Value::Globecoordinate;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Value::Property;
+use Wikibase::Datatype::Value::Quantity;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 use Wikibase::Datatype::Print::Value;
@@ -42,6 +45,28 @@ $ret = Wikibase::Datatype::Print::Value::print($obj);
 is($ret, '01 September 2020 (Q1985727)', 'Get printed value for time.');
 
 # Test.
+$obj = Wikibase::Datatype::Value::Globecoordinate->new(
+	'value' => [49.6398383, 18.1484031],
+);
+$ret = Wikibase::Datatype::Print::Value::print($obj);
+is($ret, '(49.6398383, 18.1484031)', 'Get printed value for globecoordinate.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Property->new(
+	'value' => 'P123',
+);
+$ret = Wikibase::Datatype::Print::Value::print($obj);
+is($ret, 'P123', 'Get printed value pro property.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Quantity->new(
+	'unit' => 'Q174728',
+	'value' => 10,
+);
+$ret = Wikibase::Datatype::Print::Value::print($obj);
+is($ret, '10 (Q174728)', 'Get printed value for quantity.');
+
+# Test.
 $obj = Wikibase::Datatype::Value->new(
 	'value' => 'text',
 	'type' => 'bad',
@@ -60,3 +85,4 @@ eval {
 is($EVAL_ERROR, "Object isn't 'Wikibase::Datatype::Value'.\n",
 	"Object isn't 'Wikibase::Datatype::Value'.");
 clean();
+

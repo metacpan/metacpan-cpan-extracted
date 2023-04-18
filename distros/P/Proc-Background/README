@@ -26,7 +26,7 @@ AVAILABILITY
 The latest released version of this package is available for download
 from a CPAN (Comprehensive Perl Archive Network) archive near you in
 
-    https://metacpan.org/pod/proc::Background
+    https://metacpan.org/pod/Proc::Background
 
 The package's source code is hosted in a Git repository at
 
@@ -56,7 +56,7 @@ which includes Win32::Process.  If you want to use your current Perl
 installation, then download the latest version of the libwin32 package
 by Gurusamy Sarathy available at:
 
-    http://www.perl.com/CPAN/authors/id/GSAR/
+    http://www.perl.com/CPAN/authors/id/G/GS/GSAR/
 
 Once that is completed, you install Proc::Background as you would
 install any perl module library, by running these commands:

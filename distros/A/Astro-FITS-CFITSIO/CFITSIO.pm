@@ -1,5 +1,5 @@
 package Astro::FITS::CFITSIO;
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 use strict;
 use Carp;
@@ -539,6 +539,7 @@ my %__names = (
 	       ffcpcl => 'fits_copy_col',
 	       ffccls => 'fits_copy_cols',
 	       ffcprw => 'fits_copy_rows',
+	       ffcpsr => 'fits_copy_selrows',
 	       ffmvec => 'fits_modify_vector_len',
 	       ffgics => 'fits_read_img_coord',
 	       ffgtcs => 'fits_read_tbl_coord',
@@ -1224,7 +1225,7 @@ function implementations, bug fixes
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2002,2004,2006,2011 by the Smithsonian Astrophysical
+Copyright (C) 2002,2004,2006,2011,2023 by the Smithsonian Astrophysical
 Observatory.
 
 This software is released under the same terms as Perl. A copy of the

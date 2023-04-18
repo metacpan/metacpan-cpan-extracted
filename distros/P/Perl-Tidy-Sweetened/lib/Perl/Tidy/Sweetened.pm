@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Perl::Tidy qw();
 
-our $VERSION = '1.18';
+our $VERSION = '1.20';
 
 use Perl::Tidy::Sweetened::Pluggable;
 use Perl::Tidy::Sweetened::Keyword::Block;
@@ -49,14 +49,19 @@ $plugins->add_filter(
 
 # Create a subroutine filter for:
 #    method foo (Int $i) returns (Bool) {}
-# where both the parameter list and the returns type are optional
+#    method foo(@\@) :prototype(@\@) :Bar (Baz) ($i %args) {}
+# where all of the parameter list, returns type, signature, and colon-prefixed parameters are optional
 $plugins->add_filter(
     Perl::Tidy::Sweetened::Keyword::Block->new(
         keyword     => 'method',
         marker      => 'METHOD',
         replacement => 'sub',
-        clauses =>
-          [ 'PAREN?', '(returns \s* PAREN)?', '(\b(?:is|but|does) \s+ \w+)?' ],
+        clauses     => [
+            'PAREN?',
+            '(:\w+ PAREN?)*',
+            '(returns \s* PAREN)?',
+            '(\b(?:is|but|does) \s+ \w+)?'
+        ],
     ) );
 
 # Create a subroutine filter for:
@@ -97,14 +102,51 @@ $plugins->add_filter(
 # Create a subroutine filter for:
 #    class Foo extends Bar {
 #    class Foo with Bar, Baz {
-# where both the extends and with are optional
+#    class Foo using Baz {
+#    class Foo :Bar :Baz {
+#    class Foo :does(ROLE) {
+# where all of the extends, with, using and colon-prefixed parameters are optional
 $plugins->add_filter(
     Perl::Tidy::Sweetened::Keyword::Block->new(
         keyword     => 'class',
         marker      => 'CLASS',
         replacement => 'package',
-        clauses =>
-          [ '(with(\s+\w+)*)?', '(extends \s+ [\w|:]+)?', '(is(\s+\w+)*)?', ],
+        clauses     => [
+            '(: \w+ (?=\s) )?',
+            '(:does PAREN)?',
+            '(:repr PAREN)?',
+            '(:strict PAREN)?',
+            '(:isa PAREN)?',
+            '(extends \s+ [\w|:]+ )?',
+            '(does \s+ (\w+,?\s*)+ )?',
+            '(isa \s+ (\w+\s*)+ )?',
+            '(with (\s+\w+)* )?',
+            '(is (\s+\w+)* )?',
+            '(using \s+\w+ )?',
+            'PAREN?',
+        ],
+    ) );
+
+# Create a subroutine filter for:
+#    role Foo :Bar :Baz {
+# where the colon-prefixed parameters is optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'role',
+        marker      => 'ROLE',
+        replacement => 'sub',
+        clauses     => [ '( : \w+ )?', ],
+    ) );
+
+# Create a subroutine filter for:
+#    field $slot_name :Bar //= 'foo' {
+# where the colon-prefixed parameters are optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'field',
+        marker      => 'FIELD',
+        replacement => 'my',
+        clauses     => [ '( : \w+ )?', ],
     ) );
 
 # Create a twigil filter for:
@@ -138,7 +180,7 @@ Perl::Tidy::Sweetened - Tweaks to Perl::Tidy to support some syntactic sugar
 
 =head1 VERSION
 
-version 1.18
+version 1.20
 
 =head1 STATUS
 
@@ -193,7 +235,7 @@ L<Perl::Tidy>
 
 =head1 AUTHOR
 
-Mark Grimes E<lt>mgrimes@cpan.orgE<gt>
+Mark Grimes <mgrimes@cpan.org>
 
 =head1 SOURCE
 
@@ -201,7 +243,7 @@ Source repository is at L<https://github.com/mvgrimes/Perl-Tidy-Sweetened>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<http://github.com/mvgrimes/Perl-Tidy-Sweetened/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/mvgrimes/Perl-Tidy-Sweetened/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -209,7 +251,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2023 by Mark Grimes <mgrimes@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

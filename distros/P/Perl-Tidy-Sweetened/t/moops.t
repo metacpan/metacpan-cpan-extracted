@@ -12,8 +12,8 @@ class Person {
 }
 TIDIED
 
-run_test( <<'RAW', <<'TIDIED', 'Class defn with Moose', '1',  );
-class Person using Moose {
+run_test( <<'RAW', <<'TIDIED', 'Class defn with Moose', '',  );
+class Person  using Moose  {
   has 'name' => ( is => 'rw' );
 }
 RAW
@@ -68,8 +68,8 @@ class Employee extends Person::Object {
 }
 TIDIED
 
-run_test( <<'RAW', <<'TIDIED', 'Class that extends and role', '1',  );
-class Employee extends Person with Employment {
+run_test( <<'RAW', <<'TIDIED', 'Class that extends and role', '',  );
+class Employee  extends Person  with Employment {
    has job_title => (is=>'ro');
 }
 RAW
@@ -105,12 +105,12 @@ class BankAccount {
 }
 TIDIED
 
-run_test( <<'RAW', <<'TIDIED', 'Class with attribute', '1',  );
+run_test( <<'RAW', <<'TIDIED', 'Class with attribute', '',  );
 class Person :mutable {
    lexical_has job_title => (is=>'ro');
 }
 RAW
-class Person : mutable {
+class Person :mutable {
     lexical_has job_title => ( is => 'ro' );
 }
 TIDIED

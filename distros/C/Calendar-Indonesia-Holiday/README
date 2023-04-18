@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.348 of Calendar::Indonesia::Holiday
+    This document describes version 0.349 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2022-11-28.
+    2023-04-18.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -560,6 +560,86 @@ FUNCTIONS
         Only return records where the 'dow' field is greater than specified
         value.
 
+    *   eng_aliases => *array*
+
+        Only return records where the 'eng_aliases' field equals specified
+        value.
+
+    *   eng_aliases.has => *array[str]*
+
+        Only return records where the 'eng_aliases' field is an array/list
+        which contains specified value.
+
+    *   eng_aliases.is => *array*
+
+        Only return records where the 'eng_aliases' field equals specified
+        value.
+
+    *   eng_aliases.isnt => *array*
+
+        Only return records where the 'eng_aliases' field does not equal
+        specified value.
+
+    *   eng_aliases.lacks => *array[str]*
+
+        Only return records where the 'eng_aliases' field is an array/list
+        which does not contain specified value.
+
+    *   eng_name => *str*
+
+        Only return records where the 'eng_name' field equals specified
+        value.
+
+    *   eng_name.contains => *str*
+
+        Only return records where the 'eng_name' field contains specified
+        text.
+
+    *   eng_name.in => *array[str]*
+
+        Only return records where the 'eng_name' field is in the specified
+        values.
+
+    *   eng_name.is => *str*
+
+        Only return records where the 'eng_name' field equals specified
+        value.
+
+    *   eng_name.isnt => *str*
+
+        Only return records where the 'eng_name' field does not equal
+        specified value.
+
+    *   eng_name.max => *str*
+
+        Only return records where the 'eng_name' field is less than or equal
+        to specified value.
+
+    *   eng_name.min => *str*
+
+        Only return records where the 'eng_name' field is greater than or
+        equal to specified value.
+
+    *   eng_name.not_contains => *str*
+
+        Only return records where the 'eng_name' field does not contain
+        specified text.
+
+    *   eng_name.not_in => *array[str]*
+
+        Only return records where the 'eng_name' field is not in the
+        specified values.
+
+    *   eng_name.xmax => *str*
+
+        Only return records where the 'eng_name' field is less than
+        specified value.
+
+    *   eng_name.xmin => *str*
+
+        Only return records where the 'eng_name' field is greater than
+        specified value.
+
     *   exclude_fields => *array[str]*
 
         Select fields to return.
@@ -567,6 +647,86 @@ FUNCTIONS
     *   fields => *array[str]*
 
         Select fields to return.
+
+    *   ind_aliases => *array*
+
+        Only return records where the 'ind_aliases' field equals specified
+        value.
+
+    *   ind_aliases.has => *array[str]*
+
+        Only return records where the 'ind_aliases' field is an array/list
+        which contains specified value.
+
+    *   ind_aliases.is => *array*
+
+        Only return records where the 'ind_aliases' field equals specified
+        value.
+
+    *   ind_aliases.isnt => *array*
+
+        Only return records where the 'ind_aliases' field does not equal
+        specified value.
+
+    *   ind_aliases.lacks => *array[str]*
+
+        Only return records where the 'ind_aliases' field is an array/list
+        which does not contain specified value.
+
+    *   ind_name => *str*
+
+        Only return records where the 'ind_name' field equals specified
+        value.
+
+    *   ind_name.contains => *str*
+
+        Only return records where the 'ind_name' field contains specified
+        text.
+
+    *   ind_name.in => *array[str]*
+
+        Only return records where the 'ind_name' field is in the specified
+        values.
+
+    *   ind_name.is => *str*
+
+        Only return records where the 'ind_name' field equals specified
+        value.
+
+    *   ind_name.isnt => *str*
+
+        Only return records where the 'ind_name' field does not equal
+        specified value.
+
+    *   ind_name.max => *str*
+
+        Only return records where the 'ind_name' field is less than or equal
+        to specified value.
+
+    *   ind_name.min => *str*
+
+        Only return records where the 'ind_name' field is greater than or
+        equal to specified value.
+
+    *   ind_name.not_contains => *str*
+
+        Only return records where the 'ind_name' field does not contain
+        specified text.
+
+    *   ind_name.not_in => *array[str]*
+
+        Only return records where the 'ind_name' field is not in the
+        specified values.
+
+    *   ind_name.xmax => *str*
+
+        Only return records where the 'ind_name' field is less than
+        specified value.
+
+    *   ind_name.xmin => *str*
+
+        Only return records where the 'ind_name' field is greater than
+        specified value.
 
     *   is_holiday => *bool*
 
@@ -703,10 +863,6 @@ FUNCTIONS
         string, or "/FOO/" to use regular expression. All queries must match
         if the "query_boolean" option is set to "and"; only one query should
         match if the "query_boolean" option is set to "or".
-
-    *   query => *any*
-
-        (No description)
 
     *   query_boolean => *str* (default: "and")
 
@@ -977,8 +1133,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,
-    2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017,
+    2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

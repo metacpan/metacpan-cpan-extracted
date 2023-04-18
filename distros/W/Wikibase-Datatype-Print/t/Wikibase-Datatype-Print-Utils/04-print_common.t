@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 7;
+use English;
+use Error::Pure::Utils qw(clean);
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular;
 use Unicode::UTF8 qw(decode_utf8);
@@ -147,3 +149,25 @@ is_deeply(
 	],
 	'Print commons test (labels - multiple lines).',
 );
+
+# Test.
+$obj = Wikibase::Datatype::Item->new(
+	'aliases' => [
+		Wikibase::Datatype::Value::Monolingual->new(
+			'language' => 'en',
+			'value' => 'dog',
+		),
+		Wikibase::Datatype::Value::Monolingual->new(
+			'language' => 'cs',
+			'value' => 'pes',
+		),
+	],
+);
+eval {
+	print_common($obj, {}, 'aliases',
+	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	'Aliases', undef, 1);
+};
+is($EVAL_ERROR, "Multiple values are printed to one line.\n",
+	"Multiple values are printed to one line.");
+clean();

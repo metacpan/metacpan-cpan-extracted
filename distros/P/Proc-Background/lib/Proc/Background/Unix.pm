@@ -1,5 +1,5 @@
 package Proc::Background::Unix;
-$Proc::Background::Unix::VERSION = '1.30';
+$Proc::Background::Unix::VERSION = '1.31';
 # ABSTRACT: Unix-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -104,17 +104,18 @@ sub _start {
       # child
       # Make absolutely sure nothing in this block interacts with the rest of the
       # process state, and that flow control never skips the _exit().
+      $SIG{$_}= sub{die;} for qw( INT HUP QUIT TERM ); # clear custom signal handlers
+      $SIG{$_}= 'DEFAULT' for qw( __WARN__ __DIE__ );
       eval {
-        local $SIG{__DIE__}= undef;
         eval {
           chdir($options->{cwd}) or die "chdir($options->{cwd}): $!\n"
             if defined $options->{cwd};
 
-          open STDIN, '<&', $new_stdin or die "Can't redirect STDIN: $!\n"
+          open STDIN, '<&'.fileno($new_stdin) or die "Can't redirect STDIN: $!\n"
             if defined $new_stdin;
-          open STDOUT, '>&', $new_stdout or die "Can't redirect STDOUT: $!\n"
+          open STDOUT, '>&'.fileno($new_stdout) or die "Can't redirect STDOUT: $!\n"
             if defined $new_stdout;
-          open STDERR, '>&', $new_stderr or die "Can't redirect STDERR: $!\n"
+          open STDERR, '>&'.fileno($new_stderr) or die "Can't redirect STDERR: $!\n"
             if defined $new_stderr;
 
           if (defined $exe) {
@@ -234,10 +235,6 @@ Proc::Background::Unix - Unix-specific implementation of process create/wait/kil
 
 This module does not have a public interface.  Use L<Proc::Background>.
 
-=head1 NAME
-
-Proc::Background::Unix - Implementation of process management for Unix systems
-
 =head1 IMPLEMENTATION
 
 =head2 Command vs. Exec
@@ -288,11 +285,11 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
+This software is copyright (c) 2023 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

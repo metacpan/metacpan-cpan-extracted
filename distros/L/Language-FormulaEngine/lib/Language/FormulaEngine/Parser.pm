@@ -8,7 +8,7 @@ use Language::FormulaEngine::Parser::ContextUtil
 use namespace::clean;
 
 # ABSTRACT: Create parse tree from an input string
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 has parse_tree   => ( is => 'rw' );
@@ -234,7 +234,7 @@ sub parse_unit_expr {
 	}
 	
 	if ($self->{token_type} eq '0') {
-		die "Expected expression component near (end of input)";
+		die "Expected expression, but reached end of input\n";
 	}
 	
 	die "Unexpected token $self->{token_type} '$self->{token_value}' near ".$self->token_context."\n";
@@ -322,11 +322,20 @@ sub _build_scan_token_method {
 sub scan_token { my $m= $_[0]->_build_scan_token_method; goto $m; };
 
 
+sub Language::FormulaEngine::Parser::Node::Call::new {
+	my ($class, $name, $params)= @_;
+	bless [ $name, $params ], $class;
+}
+sub Language::FormulaEngine::Parser::Node::Call::is_constant { 0 }
 sub Language::FormulaEngine::Parser::Node::Call::function_name { $_[0][0] }
 sub Language::FormulaEngine::Parser::Node::Call::parameters { $_[0][1] }
 sub Language::FormulaEngine::Parser::Node::Call::evaluate {
 	my ($self, $namespace)= @_;
 	$namespace->evaluate_call($self);
+}
+sub Language::FormulaEngine::Parser::Node::Call::simplify {
+	my ($node, $namespace)= @_;
+	$namespace->simplify_call($node)
 }
 sub Language::FormulaEngine::Parser::Node::Call::deparse {
 	my ($node, $parser)= @_;
@@ -343,10 +352,20 @@ sub new_call {
 }
 
 
+sub Language::FormulaEngine::Parser::Node::symbol::new {
+	my ($class, $name)= @_;
+	bless \$name, $class;
+}
+
+sub Language::FormulaEngine::Parser::Node::Symbol::is_constant { 0 }
 sub Language::FormulaEngine::Parser::Node::Symbol::symbol_name { ${$_[0]} }
 sub Language::FormulaEngine::Parser::Node::Symbol::evaluate {
 	my ($self, $namespace)= @_;
 	$namespace->get_value($$self);
+}
+sub Language::FormulaEngine::Parser::Node::Symbol::simplify {
+	my ($self, $namespace)= @_;
+	return $namespace->simplify_symref($self);
 }
 sub Language::FormulaEngine::Parser::Node::Symbol::deparse {
 	shift->symbol_name;
@@ -359,8 +378,15 @@ sub new_symbol  {
 }
 
 
+sub Language::FormulaEngine::Parser::Node::String::new {
+	my ($class, $value)= @_;
+	bless \$value, $class;
+}
+
+sub Language::FormulaEngine::Parser::Node::String::is_constant { 1 }
 sub Language::FormulaEngine::Parser::Node::String::string_value { ${$_[0]} }
 sub Language::FormulaEngine::Parser::Node::String::evaluate { ${$_[0]} }
+sub Language::FormulaEngine::Parser::Node::String::simplify { $_[0] }
 sub _str_escape {
 	my $str= shift;
 	$str =~ s/'/''/g;
@@ -376,8 +402,16 @@ sub new_string {
 }
 
 
+sub Language::FormulaEngine::Parser::Node::Number::new {
+	my ($class, $value)= @_;
+	$value= 0+$value;
+	bless \$value, $class;
+}
+	
+sub Language::FormulaEngine::Parser::Node::Number::is_constant { 1 }
 sub Language::FormulaEngine::Parser::Node::Number::number_value { ${$_[0]} }
 sub Language::FormulaEngine::Parser::Node::Number::evaluate { ${$_[0]} }
+sub Language::FormulaEngine::Parser::Node::Number::simplify { $_[0] }
 sub Language::FormulaEngine::Parser::Node::Number::deparse { shift->number_value }
 
 sub new_number {
@@ -407,7 +441,7 @@ Language::FormulaEngine::Parser - Create parse tree from an input string
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -725,7 +759,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2023 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

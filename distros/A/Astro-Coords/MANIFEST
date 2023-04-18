@@ -1,5 +1,5 @@
 Build.PL
-ChangeLog
+Changes
 lib/Astro/Coords.pm
 lib/Astro/Coords/Angle.pm
 lib/Astro/Coords/Angle/Hour.pm

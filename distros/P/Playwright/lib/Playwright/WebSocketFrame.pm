@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::WebSocketFrame;
-$Playwright::WebSocketFrame::VERSION = '1.291';
+$Playwright::WebSocketFrame::VERSION = '1.323';
 use parent 'Playwright::Base';
 
 sub new {
@@ -86,7 +86,7 @@ Playwright::WebSocketFrame - Automatically generated class for Playwright::WebSo
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 CONSTRUCTOR
 

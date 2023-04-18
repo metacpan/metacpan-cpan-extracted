@@ -1,5 +1,30 @@
 Revision history for Perl extension XML::Generator.
 
+1.11 -- Mon Apr 17 17:17:55 ADT 2023
+
+    [Significant Updates since 1.09]
+
+    Allow the xml tag attributes to be specified during construction
+    when conformance is not 'strict' by Wesley Schwengle (waterkip)
+
+    Release 1.10 for production
+
+    - 0ff9e8b Update for production release
+    - 85396bc Update Copyright year
+    - 30c95bf v1.10
+
+1.10 -- Sun Apr 16 20:10:11 ADT 2023
+
+    [Significant Updates since 1.09]
+
+    Allow the xml tag attributes to be specified during construction
+    when conformance is not 'strict'
+
+    - efc7d9d Update for release
+    - 83b1699 Remove VERSION number from git repo
+    - a49e891 Add new xml option to constructor
+    - 4171530 v1.09
+
 1.09 -- Fri Feb 18 23:06:27 AST 2022
 
     - b31c19f Increment version

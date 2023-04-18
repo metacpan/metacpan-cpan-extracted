@@ -2,7 +2,7 @@
 #
 ## LICENSE AND COPYRIGHT
 # 
-## Copyright (C) 2022 Carlos Celso
+## Copyright (C) Carlos Celso
 # 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ sub MySQL_do()
 
 	if (&MySQL_Load($dir))
 	{
-		if ($ENV{SQL_SIMPLE_DB_SKIP_CREATE} eq "1" || &MySQL_Call("Creating database, tables and rules",\@mysql_commands))
+		if ($ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE} eq "1" || &MySQL_Call("Creating database, tables and rules",\@mysql_commands))
 		{
 			&MySQL_Test($dir);
 			&MySQL_Drop($dir);
@@ -121,7 +121,7 @@ sub MySQL_Load()
 	if	(defined($ENV{SQL_SIMPLE_MYSQL_CLI}) && stat($ENV{SQL_SIMPLE_MYSQL_CLI})) { $mysql_module = $ENV{SQL_SIMPLE_MYSQL_CLI}; }
 	if	(stat("/usr/bin/mysql")) { $mysql_module = "/usr/bin/mysql"; }
 	elsif	(stat("/usr/bin/mariadb")) { $mysql_module = "/usr/bin/mariadb"; }
-	elsif	(stat("/usr/local/bin/mariadb")) { $mysql_module = "/usr/local/bin/mariadb"; }
+	elsif	(stat("/usr/local/bin/mysql")) { $mysql_module = "/usr/local/bin/mysql"; }
 	elsif	(stat("/usr/local/bin/mariadb")) { $mysql_module = "/usr/local/bin/mariadb"; }
 	else
 	{
@@ -214,7 +214,7 @@ sub MySQL_Test()
 
 sub MySQL_Drop()
 {
-	return 1 if ($ENV{SQL_SIMPLE_DB_SKIP_CREATE} eq "1");
+	return 1 if ($ENV{SQL_SIMPLE_DB_TEST_SKIP_CREATE} eq "1");
 	my @drop;
 	diag("cleanup");
 	foreach my $cmd(@mysql_commands)

@@ -81,8 +81,30 @@ sub collection :Via('*Private') At('contacts/...') ($self, $c, $user) {
       }
 
 
-  sub contacts_path($self, $c, $attrs=+{}) {
-    return $self->ctx->uri('list', $attrs);
-  }
+sub edit_entity_path($self, $c, $contact, $attrs=+{}) {
+  return $self->ctx->uri('edit', [$contact->id], $attrs);
+}
+
+sub create_entity_path($self, $c, $attrs=+{}) {
+  return $self->ctx->uri('create', $attrs);
+}
+
+sub update_entity_path($self, $c, $contact, $attrs=+{}) {
+  return $self->ctx->uri('update', [$contact->id], $attrs);
+}
+
+sub init_entity_path ($self, $c, $attrs=+{}) {
+  return $self->ctx->uri('init', $attrs);
+}
+
+sub delete_entity_path ($self, $c, $contact, $attrs=+{}) {
+  return $self->ctx->uri('delete', [$contact->id], $attrs);
+}
+
+sub list_entities_path ($self, $c, $attrs=+{}) {
+  return $self->ctx->uri('list', $attrs);
+}
+
+
 
 __PACKAGE__->meta->make_immutable;

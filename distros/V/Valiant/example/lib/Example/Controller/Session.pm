@@ -26,4 +26,15 @@ sub logout :GET Via('*Private') At('logout') ($self, $c, $user) {
   return $c->logout && $c->redirect_to_action('init');
 }
 
+sub create_path ($self, $c, @args) {
+  return $c->uri('create', @args);
+}
+
+sub get_collection  {}
+sub find_entity_from_resource {}
+sub validate_entity {}
+sub build_entity_from_colection {}
+sub search_collection {}
+
+
 __PACKAGE__->meta->make_immutable;

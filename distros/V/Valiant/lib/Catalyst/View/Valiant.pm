@@ -32,7 +32,7 @@ sub Renders :ATTR(CODE) {
   unless($package->can("__attr_${name}")) {
     my $wrapper = sub {
       my ($self, @args) = @_;
-      carp "View method called without correct self" unless $self->isa($package);
+      croak "View method called without correct self" unless $self->isa($package);
       local $form->{view} = $self; # Evil Hack lol
       local $form->{context} = $self->ctx;
       local $form->{controller} = $self->ctx->controller;
@@ -58,7 +58,7 @@ sub import {
     } elsif($next eq '-views') {
       $which = 'views';
       next;
-    } elsif(($next eq '-util') || ($next eq '-utils')) {
+    } elsif(($next eq '-helpers') || ($next eq '-util') || ($next eq '-utils')) {
       $which = 'util';
       next;
     }
@@ -126,6 +126,18 @@ sub _install_utils {
         }
       };
       Moo::_Utils::_install_tracked($target, 'path', $sub);
+    } else {
+      ## could be from controller or context
+      my $sub = sub {
+        if($form->controller->can($util)) {
+          return $form->controller->$util($form->context, @_);
+        } elsif($form->context->can($util)) {
+          return $form->context->$util(@_);
+        } else {
+          croak "Can't find method $util in controller or context";
+        }
+      };
+      Moo::_Utils::_install_tracked($target, $util, $sub);
     }
 
   }
@@ -158,7 +170,8 @@ sub _install_tags {
               $content = shift;
             }
           }
-          return $form->tags->$tag($args, $content), @_;
+          return $form->tags->$tag($args, $content), @_ if @_;
+          return $form->tags->$tag($args, $content);
         };
       #  use Devel::Dwarn;
       #  Dwarn [2, $method] if $tag eq 'blockquote';
@@ -170,7 +183,8 @@ sub _install_tags {
         $method = Sub::Util::set_subname "${target}::${tag}" => sub {
           my $args = +{};
           $args = shift if ref $_[0] eq 'HASH';
-          return $form->tags->$tag($args), @_;
+          return $form->tags->$tag($args), @_ if @_;
+          return $form->tags->$tag($args);
         };
       #}
     } elsif($tag eq 'trow') {
@@ -204,6 +218,14 @@ sub _install_tags {
           ## return $form->safe_concat($form->$tag(@_));
           ## Will ponder this, it seems to be a performance hit
           my @args = ();
+          if($tag eq 'link_to') {
+            push @args, shift(); # required uri
+            if( (ref($_[0])||'') eq 'HASH' ) {
+              push @args, shift(), shift(); # if arg2 is a hash, then two more args required
+            } else {
+              push @args, shift(); # if arg2 is not a hash, then one more arg required
+            }
+          }
           while(@_) {
             last if
               !defined($_[0])
@@ -313,21 +335,21 @@ sub path {
       
   my $action;
   if($action_proto =~/^\/?\*/) {
-    carp "$action_proto is not a named action"
+    croak "$action_proto is not a named action"
       unless $action = $c->dispatcher->get_action_by_path($action_proto);
   } elsif($action_proto=~m/^(.*)\:(.+)$/) {
-    carp "$1 is not a controller"
+    croak "$1 is not a controller"
       unless my $controller = $c->controller($1||'');
-    carp "$2 is not an action for controller ${\$controller->component_name}"
+    croak "$2 is not an action for controller ${\$controller->component_name}"
       unless $action = $controller->action_for($2);
   } elsif($action_proto =~/\//) {
     my $path = eval {
       $action_proto=~m/^\// ?
       $action_proto : 
       $c->controller->action_for($action_proto)->private_path;
-    } || carp "Error: $@ while trying to get private path for $action_proto";
-    carp "$action_proto is not a full or relative private action path" unless $path;
-    carp "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+    } || croak "Error: $@ while trying to get private path for $action_proto";
+    croak "$action_proto is not a full or relative private action path" unless $path;
+    croak "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
   } elsif($action = $c->controller->action_for($action_proto)) {
     # Noop
   } else {
@@ -335,7 +357,7 @@ sub path {
     $action = $action_proto;
   }
 
-  carp "We can't create a URI from $action with the given arguments: @{[ join ', ', @args ]}]}"
+  croak "We can't create a URI from $action with the given arguments: @{[ join ', ', @args ]}]}"
     unless my $uri = $c->uri_for($action, @args);
 
   return $uri  
@@ -372,7 +394,7 @@ Catalyst::View::Valiant - Per Request, strongly typed Views in code
     use Moo;
     use Catalyst::View::Valiant
       -tags => qw(div blockquote form_for fieldset),
-      -utils => qw($sf),
+      -helpers => qw($sf),
       -views => 'HTML::Layout', 'HTML::Navbar';
 
     has info => (is=>'rw', predicate=>'has_info');
@@ -525,9 +547,10 @@ Export any HTML tag supported in L<Valiant::HTML::TagBuilder> as well as tag hel
 L<Valiant::HTML::Util::FormTags> and L<Valiant::HTML::Util::Form>.  Please note the C<tr> tag
 must be imported by the C<trow> name since C<tr> is a reserved word in Perl.
 
-=head2 -utils
+=head2 -helpers
 
-Export the following functions:
+Export the following functions as well as any named method from the current controller 
+and application context:
 
 =over 4
 

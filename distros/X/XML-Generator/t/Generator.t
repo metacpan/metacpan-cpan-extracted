@@ -3,7 +3,7 @@
 use Test;
 use utf8;
 
-BEGIN { $| = 1; plan tests => 105; }
+BEGIN { $| = 1; plan tests => 108; }
 
 use XML::Generator ();
 ok(1);
@@ -90,6 +90,7 @@ ok($xml, '<!-- test -->');
 $x = new XML::Generator 'conformance' => 'strict',
 			'version' => '1.1',
 			'encoding' => 'iso-8859-2';
+
 $xml = $x->xmldecl();
 ok($xml, qq(<?xml version="1.1" encoding="iso-8859-2" standalone="yes"?>\n));
 
@@ -136,6 +137,41 @@ ok($xml eq '<foo xmlns="bar" baz:foo="qux" fob="gux" />' ||
 $xml = $x->foo(['bar' => 'bam'], {'baz:foo' => 'qux', 'fob' => 'gux'});
 ok($xml eq '<bar:foo xmlns:bar="bam" baz:foo="qux" fob="gux" />' ||
    $xml eq '<bar:foo xmlns:bar="bam" fob="gux" baz:foo="qux" />', 1, $xml);
+
+$x = XML::Generator->new(
+    conformance => 'loose',
+    xml         => { version => "1.0", encoding => 'UTF-8' },
+);
+
+ok(
+    $x->xml($x->foo),
+    join("\n",
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+        '<foo />'),
+    "Correct XML tag"
+);
+
+$x = XML::Generator->new(
+    conformance => 'loose',
+    xml         => { version => "1.0", encoding => 'UTF-8', dtd => [ 'foo' ] },
+);
+
+ok(
+    $x->xml($x->foo),
+    join("\n",
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+        '<!DOCTYPE foo>',
+        '<foo />'),
+    "Correct XML tag with doctype"
+);
+
+eval {
+        XML::Generator->new(
+            conformance => 'loose',
+            xml         => [],
+        );
+};
+ok $@ =~ qr/XML arguments must be a hash/;
 
 $x = new XML::Generator;
 $xml = $x->xml();

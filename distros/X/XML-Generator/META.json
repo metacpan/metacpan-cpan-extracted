@@ -4,7 +4,7 @@
       "Benjamin Holzman <bholzman@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,55 +48,55 @@
    "provides" : {
       "XML::Generator" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::DOM" : {
          "file" : "lib/XML/Generator/DOM.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::DOM::util" : {
          "file" : "lib/XML/Generator/DOM.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::cdata" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::comment" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::final" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::overload" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::pi" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::pretty" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       },
       "XML::Generator::util" : {
          "file" : "lib/XML/Generator.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/perl-net-saml2/perl-XML-Generator.git",
-         "web" : "https://github.com/perl-net-saml2/perl-XML-Generator"
+         "url" : "git://github.com/timlegge/perl-XML-Generator.git",
+         "web" : "https://github.com/timlegge/perl-XML-Generator"
       }
    },
-   "version" : "1.09",
-   "x_generated_by_perl" : "v5.32.1",
+   "version" : "1.11",
+   "x_generated_by_perl" : "v5.34.0",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],

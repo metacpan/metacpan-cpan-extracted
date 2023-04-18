@@ -227,7 +227,7 @@ ok !$person->valid;
   });
 
   is $result,
-    '<form accept-charset="UTF-8" action="posts" class="new_local_person" enctype="application/x-www-form-urlencoded" id="new_local_person" method="post">'.
+    '<form accept-charset="UTF-8" action="posts" enctype="application/x-www-form-urlencoded" method="post">'.
       '<input id="local_person_first_name" name="local_person.first_name" type="text" value="aa"/>'.
     '</form>'
 }
@@ -242,7 +242,7 @@ ok !$person->valid;
   $person->persisted(0);
 
   is $result,
-    '<form accept-charset="UTF-8" action="posts?x-tunneled-method=patch" class="edit_local_person" enctype="application/x-www-form-urlencoded" id="edit_local_person" method="post">'.
+    '<form accept-charset="UTF-8" action="posts?x-tunneled-method=patch" enctype="application/x-www-form-urlencoded" method="post">'.
       '<input id="local_person_first_name" name="local_person.first_name" type="text" value="aa"/>'.
     '</form>'
 }
@@ -261,7 +261,7 @@ ok !$person->valid;
   });
 
   is $result,
-    '<form accept-charset="UTF-8" action="posts" class="aaa new_local_person bbb ccc" enctype="application/x-www-form-urlencoded" id="new_local_person" method="post">'.
+    '<form accept-charset="UTF-8" action="posts" class="aaa bbb ccc" enctype="application/x-www-form-urlencoded" method="post">'.
       '<input id="csrf_token" name="csrf_token" type="hidden" value="toke"/>'.
       '<input id="local_person_fake" name="local_person.fake" type="text" value=""/>'.
     '</form>'

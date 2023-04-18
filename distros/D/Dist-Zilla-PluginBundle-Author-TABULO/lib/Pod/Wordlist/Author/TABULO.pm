@@ -5,7 +5,7 @@ use utf8;
 
 package Pod::Wordlist::Author::TABULO;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000012';
 our $DEBUG   = 0;
 
 use Lingua::EN::Inflect 'PL';
@@ -183,7 +183,7 @@ Pod::Wordlist::Author::TABULO - Add words for spell checking POD à la TABULO
 
 =head1 VERSION
 
-version 1.000011
+version 1.000012
 
 =head1 SYNOPSIS
 
@@ -287,7 +287,7 @@ Tabulo[n] <dev@tabulo.net>
 
 =head1 LEGAL
 
-This software is copyright (c) 2022 by Tabulo[n].
+This software is copyright (c) 2023 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

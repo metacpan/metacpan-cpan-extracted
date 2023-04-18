@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Keyboard;
-$Playwright::Keyboard::VERSION = '1.291';
+$Playwright::Keyboard::VERSION = '1.323';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,16 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Keyboard'}{members};
-}
-
-sub type {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'type',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub press {
@@ -47,6 +37,16 @@ sub down {
     return $self->_api_request(
         args    => [@_],
         command => 'down',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub type {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'type',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::Keyboard - Automatically generated class for Playwright::Keyboard
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 CONSTRUCTOR
 
@@ -126,12 +126,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 type(@args)
-
-Execute the Keyboard::type playwright routine.
-
-See L<https://playwright.dev/api/class-Keyboard#Keyboard-type> for more information.
 
 =head2 press(@args)
 
@@ -144,6 +138,12 @@ See L<https://playwright.dev/api/class-Keyboard#Keyboard-press> for more informa
 Execute the Keyboard::down playwright routine.
 
 See L<https://playwright.dev/api/class-Keyboard#Keyboard-down> for more information.
+
+=head2 type(@args)
+
+Execute the Keyboard::type playwright routine.
+
+See L<https://playwright.dev/api/class-Keyboard#Keyboard-type> for more information.
 
 =head2 up(@args)
 

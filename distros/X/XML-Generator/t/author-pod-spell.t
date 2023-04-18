@@ -41,6 +41,7 @@ dtd
 eg
 filterInvalidChars
 lib
+prolog
 qualifiedAttributes
 xml
 xmlcdata

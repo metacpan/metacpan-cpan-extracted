@@ -14,9 +14,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-28'; # DATE
+our $DATE = '2023-04-18'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.348'; # VERSION
+our $VERSION = '0.349'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -1220,6 +1220,10 @@ our %year_holidays;
 #
 # ref:
 # - https://www.kemenkopmk.go.id/pemerintah-terapkan-hari-libur-nasional-dan-cuti-bersama-tahun-2023
+#
+# superseded mar 29, 2023 (SKB No 327/2023, 1/2023, 1/2023)
+# ref:
+# - https://setkab.go.id/pemerintah-terbitkan-skb-perubahan-libur-nasional-dan-cuti-bersama-2023/
 {
     # 2023 holidays
     my ($chnewyear2023, $nyepi2023, $eidulf2023, $vesakha2023, $christmas);
@@ -1245,10 +1249,11 @@ our %year_holidays;
     push @{ $year_holidays{2023} }, (
         _jointlv     ({_expand_dm("23-01")}, {holiday=>$chnewyear2023}),
         _jointlv     ({_expand_dm("23-03")}, {holiday=>$nyepi2023}),
+        _jointlv     ({_expand_dm("19-04")}, {holiday=>$eidulf2023}),
+        _jointlv     ({_expand_dm("20-04")}, {holiday=>$eidulf2023}),
         _jointlv     ({_expand_dm("21-04")}, {holiday=>$eidulf2023}),
         _jointlv     ({_expand_dm("24-04")}, {holiday=>$eidulf2023}),
         _jointlv     ({_expand_dm("25-04")}, {holiday=>$eidulf2023}),
-        _jointlv     ({_expand_dm("26-04")}, {holiday=>$eidulf2023}),
         _jointlv     ({_expand_dm("02-06")}, {holiday=>$vesakha2023}),
         _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
     );
@@ -1323,7 +1328,6 @@ my $res = gen_read_table_func(
             date => {
                 schema     => 'date*',
                 pos        => 0,
-                searchable => 0,
             },
             day => {
                 schema     => 'int*',
@@ -1346,29 +1350,21 @@ my $res = gen_read_table_func(
                 schema     => 'str*',
                 summary    => 'English name',
                 pos        => 5,
-                filterable => 0,
-                sortable   => 0,
             },
             ind_name => {
                 schema     => 'str*',
                 summary    => 'Indonesian name',
                 pos        => 6,
-                filterable => 0,
-                sortable   => 0,
             },
             eng_aliases => {
                 schema     => ['array*'=>{of=>'str*'}],
                 summary    => 'English other names, if any',
                 pos        => 7,
-                filterable => 0,
-                sortable   => 0,
             },
             ind_aliases => {
                 schema     => ['array*'=>{of=>'str*'}],
                 summary    => 'Indonesian other names, if any',
                 pos        => 8,
-                filterable => 0,
-                sortable   => 0,
             },
             is_holiday => {
                 schema     => 'bool*',
@@ -1383,22 +1379,18 @@ my $res = gen_read_table_func(
             decree_date => {
                 schema     => 'str',
                 pos        => 11,
-                sortable   => 1,
             },
             decree_note => {
                 schema     => 'str',
                 pos        => 12,
-                sortable   => 0,
             },
             note => {
                 schema     => 'str',
                 pos        => 13,
-                sortable   => 0,
             },
             tags => {
                 schema     => 'array*',
                 pos        => 14,
-                sortable   => 0,
             },
         },
         pk => 'date',
@@ -1409,7 +1401,8 @@ my $res = gen_read_table_func(
 die "BUG: Can't generate func: $res->[0] - $res->[1]"
     unless $res->[0] == 200;
 
-delete $SPEC{list_idn_holidays}{args}{query}{pos};
+delete $SPEC{list_idn_holidays}{args}{queries}{pos};
+delete $SPEC{list_idn_holidays}{args}{queries}{slurpy};
 $SPEC{list_idn_holidays}{args}{year}{pos}  = 0;
 $SPEC{list_idn_holidays}{args}{month}{pos} = 1;
 
@@ -1664,7 +1657,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.348 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2022-11-28.
+This document describes version 0.349 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-04-18.
 
 =head1 SYNOPSIS
 
@@ -2197,6 +2190,70 @@ Only return records where the 'dow' field is less than specified value.
 
 Only return records where the 'dow' field is greater than specified value.
 
+=item * B<eng_aliases> => I<array>
+
+Only return records where the 'eng_aliases' field equals specified value.
+
+=item * B<eng_aliases.has> => I<array[str]>
+
+Only return records where the 'eng_aliases' field is an arrayE<sol>list which contains specified value.
+
+=item * B<eng_aliases.is> => I<array>
+
+Only return records where the 'eng_aliases' field equals specified value.
+
+=item * B<eng_aliases.isnt> => I<array>
+
+Only return records where the 'eng_aliases' field does not equal specified value.
+
+=item * B<eng_aliases.lacks> => I<array[str]>
+
+Only return records where the 'eng_aliases' field is an arrayE<sol>list which does not contain specified value.
+
+=item * B<eng_name> => I<str>
+
+Only return records where the 'eng_name' field equals specified value.
+
+=item * B<eng_name.contains> => I<str>
+
+Only return records where the 'eng_name' field contains specified text.
+
+=item * B<eng_name.in> => I<array[str]>
+
+Only return records where the 'eng_name' field is in the specified values.
+
+=item * B<eng_name.is> => I<str>
+
+Only return records where the 'eng_name' field equals specified value.
+
+=item * B<eng_name.isnt> => I<str>
+
+Only return records where the 'eng_name' field does not equal specified value.
+
+=item * B<eng_name.max> => I<str>
+
+Only return records where the 'eng_name' field is less than or equal to specified value.
+
+=item * B<eng_name.min> => I<str>
+
+Only return records where the 'eng_name' field is greater than or equal to specified value.
+
+=item * B<eng_name.not_contains> => I<str>
+
+Only return records where the 'eng_name' field does not contain specified text.
+
+=item * B<eng_name.not_in> => I<array[str]>
+
+Only return records where the 'eng_name' field is not in the specified values.
+
+=item * B<eng_name.xmax> => I<str>
+
+Only return records where the 'eng_name' field is less than specified value.
+
+=item * B<eng_name.xmin> => I<str>
+
+Only return records where the 'eng_name' field is greater than specified value.
+
 =item * B<exclude_fields> => I<array[str]>
 
 Select fields to return.
@@ -2204,6 +2261,70 @@ Select fields to return.
 =item * B<fields> => I<array[str]>
 
 Select fields to return.
+
+=item * B<ind_aliases> => I<array>
+
+Only return records where the 'ind_aliases' field equals specified value.
+
+=item * B<ind_aliases.has> => I<array[str]>
+
+Only return records where the 'ind_aliases' field is an arrayE<sol>list which contains specified value.
+
+=item * B<ind_aliases.is> => I<array>
+
+Only return records where the 'ind_aliases' field equals specified value.
+
+=item * B<ind_aliases.isnt> => I<array>
+
+Only return records where the 'ind_aliases' field does not equal specified value.
+
+=item * B<ind_aliases.lacks> => I<array[str]>
+
+Only return records where the 'ind_aliases' field is an arrayE<sol>list which does not contain specified value.
+
+=item * B<ind_name> => I<str>
+
+Only return records where the 'ind_name' field equals specified value.
+
+=item * B<ind_name.contains> => I<str>
+
+Only return records where the 'ind_name' field contains specified text.
+
+=item * B<ind_name.in> => I<array[str]>
+
+Only return records where the 'ind_name' field is in the specified values.
+
+=item * B<ind_name.is> => I<str>
+
+Only return records where the 'ind_name' field equals specified value.
+
+=item * B<ind_name.isnt> => I<str>
+
+Only return records where the 'ind_name' field does not equal specified value.
+
+=item * B<ind_name.max> => I<str>
+
+Only return records where the 'ind_name' field is less than or equal to specified value.
+
+=item * B<ind_name.min> => I<str>
+
+Only return records where the 'ind_name' field is greater than or equal to specified value.
+
+=item * B<ind_name.not_contains> => I<str>
+
+Only return records where the 'ind_name' field does not contain specified text.
+
+=item * B<ind_name.not_in> => I<array[str]>
+
+Only return records where the 'ind_name' field is not in the specified values.
+
+=item * B<ind_name.xmax> => I<str>
+
+Only return records where the 'ind_name' field is less than specified value.
+
+=item * B<ind_name.xmin> => I<str>
+
+Only return records where the 'ind_name' field is greater than specified value.
 
 =item * B<is_holiday> => I<bool>
 
@@ -2318,10 +2439,6 @@ query can be in the form of C<-FOO> (dash prefix notation) to require that the
 fields do not contain specified string, or C</FOO/> to use regular expression.
 All queries must match if the C<query_boolean> option is set to C<and>; only one
 query should match if the C<query_boolean> option is set to C<or>.
-
-=item * B<query> => I<any>
-
-(No description)
 
 =item * B<query_boolean> => I<str> (default: "and")
 
@@ -2598,7 +2715,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

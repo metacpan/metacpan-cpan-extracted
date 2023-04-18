@@ -1662,6 +1662,20 @@ ffcprw(infptr,outfptr,firstrow,nrows,status)
 		status
 
 int
+ffcpsr(infptr,outfptr,firstrow,nrows,row_status,status)
+	fitsfile * infptr
+	fitsfile * outfptr
+	LONGLONG firstrow
+	LONGLONG nrows
+	logical * row_status
+	int &status
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_copy_select_rows = 1
+		fitsfilePtr::copy_select_rows = 2
+	OUTPUT:
+		status
+
+int
 ffcpdt(infptr,outfptr,status)
 	fitsfile * infptr
 	fitsfile * outfptr
@@ -3639,13 +3653,19 @@ open_file(filename,iomode,status)
 	char * filename
 	int iomode
 	int status
+	ALIAS:
+		Astro::FITS::CFITSIO::open_diskfile = 1
+		Astro::FITS::CFITSIO::open_data     = 2
+		Astro::FITS::CFITSIO::open_image    = 3
+		Astro::FITS::CFITSIO::open_table    = 4
 	PREINIT:
 		FitsFile * fptr;
+		static int (*fits_open[5])(fitsfile **, const char *, int , int *) = { ffopen, ffdkopn, ffdopn, ffiopn, fftopn };
 	CODE:
 		if (!filename) /* undef passed */
 			filename = "";
 		NewFitsFile(fptr);
-		if (ffopen(&(fptr->fptr),filename,iomode,&status))
+		if (fits_open[ix](&(fptr->fptr),filename,iomode,&status))
 		   AbortFitsFile(fptr);
 		RETVAL = fptr;
 	OUTPUT:

@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 use Wikibase::Cache;
 use Wikibase::Cache::Backend::Basic;
@@ -57,3 +57,39 @@ eval {
 is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache.\n",
 	"Option 'cb' must be a instance of Wikibase::Cache.");
 clean();
+
+# Test.
+SKIP: {
+skip "Format YYYY-00-00 isn't supported.", 1;
+$obj = Wikibase::Datatype::Value::Time->new(
+	'precision' => 9, # year
+	'value' => '+1940-00-00T00:00:00Z',
+);
+$ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
+is($ret, '1940 (Q1985727)', 'Get printed value. Only QID.');
+};
+
+# Test.
+SKIP: {
+skip "Format with before and after is unsupported.", 1;
+# https://www.mediawiki.org/w/index.php?title=Wikibase/DataModel#Examples
+$obj = Wikibase::Datatype::Value::Time->new(
+	'after' => 5,
+	'before' => 4,
+	'precision' => 9, # year
+	'value' => '+00000001850-00-00T00:00:00Z',
+);
+$ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
+is($ret, '1846-1855 (Q1985727)', 'Get printed value. Only QID.');
+};
+
+# Test.
+SKIP: {
+skip "BCE implementation", 1;
+$obj = Wikibase::Datatype::Value::Time->new(
+	'precision' => 11,
+	'value' => '-0001-01-01T00:00:00Z',
+);
+$ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
+is($ret, '01 January 1 BCE (Q1985727)', 'Get printed value. Only QID.');
+};

@@ -563,7 +563,6 @@ Dist::Zilla::Plugin::Prereqs::SetMinimumVersion::FromPmVersions
 Dist::Zilla::Plugin::Prereqs::Soften
 Dist::Zilla::Plugin::Prereqs::SyncVersions
 Dist::Zilla::Plugin::Prereqs::Upgrade
-Dist::Zilla::Plugin::PrereqsClean
 Dist::Zilla::Plugin::PrereqsFile
 Dist::Zilla::Plugin::PreviousVersion
 Dist::Zilla::Plugin::PreviousVersion::Changelog

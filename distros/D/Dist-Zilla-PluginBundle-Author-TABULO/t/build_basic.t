@@ -21,7 +21,7 @@ done_testing;
 #
 # This file is part of Dist-Zilla-PluginBundle-Author-TABULO
 #
-# This software is copyright (c) 2022 by Tabulo[n].
+# This software is copyright (c) 2023 by Tabulo[n].
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.

@@ -115,7 +115,7 @@ sub _process_cb_attr {
 
 sub tag {
   my ($self, $name, $attrs) = (@_, +{});
-  carp "'$name' is not a valid VOID HTML element" unless $HTML_VOID_ELEMENTS{$name};
+  croak "'$name' is not a valid VOID HTML element" unless $HTML_VOID_ELEMENTS{$name};
 
   # Handle given / when / when_default
   if(exists $attrs->{when}) {
@@ -157,7 +157,7 @@ sub tag {
 sub content_tag {
   my $self = shift;
   my $name = shift;
-  carp "'$name' is not a valid HTML content element" unless $HTML_CONTENT_ELEMENTS{$name};
+  croak "'$name' is not a valid HTML content element" unless $HTML_CONTENT_ELEMENTS{$name};
 
   my ($code, $block);
   if(ref($_[-1]) eq 'CODE') {
@@ -262,12 +262,12 @@ sub sf {
   my $self = shift;
   if(Scalar::Util::blessed $_[0]) {
     my ($src_object, $format) = @_;
-    $format =~ s/\{(.*?)\:([^}]+)\}/ $src_object->can($2) ? ($1 ? sprintf($1,$src_object->$2) : $src_object->$2) : carp("Source object '@{[ ref $src_object ]}' has no method '$2'") /gex;
+    $format =~ s/\{(.*?)\:([^}]+)\}/ $src_object->can($2) ? ($1 ? sprintf($1,$src_object->$2) : $src_object->$2) : croak("Source object '@{[ ref $src_object ]}' has no method '$2'") /gex;
     return $self->safe($format);
   } else {
     my ($format, %args) = @_;
     my $collapse = delete $args{collapse};
-    $format =~ s/\{(.*?)\:([^}]+)\}/ exists($args{$2})? ($1 ? sprintf($1,$args{$2}) : $args{$2}) : carp("Source data has no value '$2'") /gex;
+    $format =~ s/\{(.*?)\:([^}]+)\}/ exists($args{$2})? ($1 ? sprintf($1,$args{$2}) : $args{$2}) : croak("Source data has no value '$2'") /gex;
     if($collapse) {
       $format =~s/\s+/ /gsm;
     }
@@ -288,7 +288,7 @@ sub text { return shift->safe_concat(@_) }
 
 sub link_to {
   my $self = shift;
-  my $url = shift || carp 'link_to requires a url';
+  my $url = shift || croak 'link_to requires a url';
   my $attrs = (ref($_[0]) eq 'HASH') ? shift : {};
   my $content = @_ ? shift : $url;
   $attrs->{href} = $url;

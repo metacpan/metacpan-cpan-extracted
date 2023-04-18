@@ -1,3 +1,16 @@
+2023-04-17  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '1.17';
+
+	* CFITSIO.xs, t/: constructors open_{diskfile,data,image,table}
+	added, beginninng of test suite update, courtesy of Diab Jerius
+	(djerius@cfa.harvard.edu).
+
+	* testprog/testprog_pdl.pl: added upd_data methods where
+	appropriate
+
+	* CFITSIO.xs: added fits_copy_selrows/ffcpsr
+
 2022-08-17  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
 
 	* CFITSIO.pm: $VERSION = '1.16';

@@ -4,12 +4,13 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
 configure_requires:
   Alien::Base::Wrapper: '1.97'
-  Alien::CFITSIO: v4.1.0
+  Alien::CFITSIO: v4.2.0
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +20,5 @@ no_index:
   directory:
     - t
     - inc
-version: '1.16'
+version: '1.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

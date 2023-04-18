@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FileChooser;
-$Playwright::FileChooser::VERSION = '1.291';
+$Playwright::FileChooser::VERSION = '1.323';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,6 +32,16 @@ sub page {
     );
 }
 
+sub isMultiple {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'isMultiple',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub setFiles {
     my $self = shift;
     return $self->_api_request(
@@ -47,16 +57,6 @@ sub element {
     return $self->_api_request(
         args    => [@_],
         command => 'element',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub isMultiple {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'isMultiple',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::FileChooser - Automatically generated class for Playwright::FileChoo
 
 =head1 VERSION
 
-version 1.291
+version 1.323
 
 =head1 CONSTRUCTOR
 
@@ -123,6 +123,12 @@ Execute the FileChooser::page playwright routine.
 
 See L<https://playwright.dev/api/class-FileChooser#FileChooser-page> for more information.
 
+=head2 isMultiple(@args)
+
+Execute the FileChooser::isMultiple playwright routine.
+
+See L<https://playwright.dev/api/class-FileChooser#FileChooser-isMultiple> for more information.
+
 =head2 setFiles(@args)
 
 Execute the FileChooser::setFiles playwright routine.
@@ -134,12 +140,6 @@ See L<https://playwright.dev/api/class-FileChooser#FileChooser-setFiles> for mor
 Execute the FileChooser::element playwright routine.
 
 See L<https://playwright.dev/api/class-FileChooser#FileChooser-element> for more information.
-
-=head2 isMultiple(@args)
-
-Execute the FileChooser::isMultiple playwright routine.
-
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-isMultiple> for more information.
 
 =head2 on(@args)
 

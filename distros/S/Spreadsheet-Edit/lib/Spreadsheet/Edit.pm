@@ -10,8 +10,8 @@ use feature qw(say state lexical_subs);
 no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit;
-our $VERSION = '3.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-04-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '3.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-04-17'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # TODO FIXME: Integrate with Spreadsheet::Read and provide a formatting API
 #

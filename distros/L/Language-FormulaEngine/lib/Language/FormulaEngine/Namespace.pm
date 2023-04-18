@@ -7,7 +7,7 @@ use Language::FormulaEngine::Error ':all';
 use namespace::clean;
 
 # ABSTRACT: Object holding function and variable names
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 has variables            => ( is => 'rw', default => sub { +{} } );
@@ -51,6 +51,19 @@ sub get_value {
 	return undef;
 }
 
+our %is_pure_function;
+sub FETCH_CODE_ATTRIBUTES {
+	my ($class, $ref)= @_;
+	return $class->maybe::mext::method($ref), ($is_pure_function{$ref}? ('Pure') : ());
+}
+sub MODIFY_CODE_ATTRIBUTES {
+	my ($class, $ref, @attr)= @_;
+	my $n= @attr;
+	@attr= grep $_ ne 'Pure', @attr;
+	$is_pure_function{$ref}= 1 if $n > @attr;
+	$class->maybe::next::method($ref, @attr);
+}
+
 sub get_function {
 	my ($self, $name)= @_;
 	$name= lc $name;
@@ -65,10 +78,16 @@ sub get_function {
 sub _collect_function_info {
 	my ($self, $name)= @_;
 	my $fn= $self->can("fn_$name");
+	my $sm= $self->can("simplify_$name");
 	my $ev= $self->can("nodeval_$name");
+	my $pure= $fn? $is_pure_function{$fn}
+		: $ev? $is_pure_function{$ev}
+		: 0;
 	my $pl= $self->can("perlgen_$name");
 	return
+		($pure? ( is_pure_function => $pure ) : ()),
 		($fn? ( native => $fn ) : ()),
+		($sm? ( simplify => $sm ) : ()),
 		($ev? ( evaluator => $ev ) : ()),
 		($pl? ( perl_generator => $pl ) : ()),
 		$self->maybe::next::method($name);
@@ -95,6 +114,48 @@ sub evaluate_call {
 	}
 	# Else the definition of the function is incomplete.
 	die ErrNAME("Incomplete function '$name' cannot be evaluated");
+}
+
+
+sub simplify_call {
+	my ($self, $call)= @_;
+	my ($same, $const)= (1,1);
+	my @s_params= @{ $call->parameters };
+	for (@s_params) {
+		my $s= $_->simplify($self);
+		$same &&= ($s == $_);
+		$const &&= $s->is_constant;
+		$_= $s;
+	}
+	$call= Language::FormulaEngine::Parser::Node::Call->new($call->function_name, \@s_params)
+		unless $same;
+	if (my $info= $self->get_function($call->function_name)) {
+		if (my $method= $info->{simplify}) {
+			return $self->$method($call);
+		}
+		# Are they all constants being passed to a pure function?
+		elsif ($const && $info->{is_pure_function}) {
+			my $val= $self->evaluate_call($call);
+			return !defined $val? $call : $self->_parse_node_for_value($val);
+		}
+	}
+	return $call;
+}
+
+sub simplify_symref {
+	my ($self, $symref)= @_;
+	local $self->{die_on_unknown_value}= 0;
+	my $val= $self->get_value($symref->symbol_name);
+	return !defined $val? $symref : $self->_parse_node_for_value($val);
+}
+sub _parse_node_for_value {
+	my ($self, $val)= @_;
+	# Take a guess at whether this should be a number or string...
+	if (Scalar::Util::looks_like_number($val) && 0+$val eq $val) {
+		return Language::FormulaEngine::Parser::Node::Number->new($val);
+	} else {
+		return Language::FormulaEngine::Parser::Node::String->new($val);
+	}
 }
 
 
@@ -125,7 +186,7 @@ Language::FormulaEngine::Namespace - Object holding function and variable names
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -242,6 +303,24 @@ C<< $self->can("perlgen_$name") >>.
 Evaluate a function call, passing it either to a specialized evaluator or performing a more
 generic evaluation of the arguments followed by calling a native perl function.
 
+=head2 simplify_call
+
+  $new_tree= $namespace->simplify_call( $parse_tree );
+
+Create a simplified formula by reducing variables and evaluating
+functions down to constants.  If all variables required by the
+formula are defined, and true functions without side effects, this
+will return a single parse node which is a constant the same as
+evaluate() would return.
+
+=head2 simplify_symref
+
+  $parse_node= $namespace->simplify_symref( $parse_node );
+
+This is a helper for the "simplify" mechanism that returns a parse
+node holding the constant value of C<< $self->get_value($name) >>
+if the value is defined, else passes-through the same parse node.
+
 =head2 find_methods
 
 Find methods on this object that match a regex.
@@ -259,7 +338,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2023 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

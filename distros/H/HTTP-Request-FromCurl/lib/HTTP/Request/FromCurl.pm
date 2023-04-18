@@ -18,7 +18,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 NAME
 
@@ -435,13 +435,13 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         if( @form_args) {
             $method //= 'POST';
 
-            my $req = HTTP::Request::Common::POST(
-                'https://example.com',
-                Content_Type => 'form-data',
-                Content => \@form_args,
-            );
-            $body = $req->content;
-            $request_default_headers{ 'Content-Type' } = join "; ", $req->headers->content_type;
+            #my $req = HTTP::Request::Common::POST(
+            #    'https://example.com',
+            #    Content_Type => 'form-data',
+            #    Content => \@form_args,
+            #);
+            #$body = $req->content;
+            #$request_default_headers{ 'Content-Type' } = join "; ", $req->headers->content_type;
 
         } elsif( $options->{ get }) {
             $method = 'GET';
@@ -573,6 +573,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             maybe show_error => $options->{'show-error'},
             maybe fail => $options->{'fail'},
             maybe unix_socket => $options->{'unix-socket'},
+            maybe form_args => scalar @form_args ? \@form_args : undef,
         });
     }
 

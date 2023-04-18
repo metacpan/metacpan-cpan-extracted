@@ -2,7 +2,7 @@
 #
 ## LICENSE AND COPYRIGHT
 # 
-## Copyright (C) 2022 Carlos Celso
+## Copyright (C) Carlos Celso
 # 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -21,13 +21,14 @@
 
 	use 5.006001;
 	use strict;
+	use warnings;
 	use Exporter;
 
 	our @ISA = qw ( Exporter );
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2022.301.1";
+	our $VERSION = "2023.106.1";
 
 	our @EXPORT_OK = @EXPORT;
 

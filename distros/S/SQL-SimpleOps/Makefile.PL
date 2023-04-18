@@ -1,42 +1,76 @@
 #
-## LICENSE AND COPYRIGHT
+## Copyright (C) Carlos Celso
+## All rights reserved.
 # 
-## Copyright (C) 2022 Carlos Celso
-# 
-## This program is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-# 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-#
-## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see L<http://www.gnu.org/licenses/>.
-#
 	use 5.006001;
-
 	use ExtUtils::MakeMaker;
 
-	WriteMakefile(
-		NAME		=> 'SQL::SimpleOps',
-		VERSION_FROM	=> 'lib/SQL/SimpleOps.pm',
-		PREREQ_PM	=>
+	my %makefile_param =
+	(
+		NAME => 'SQL::SimpleOps',
+		VERSION_FROM => 'lib/SQL/SimpleOps.pm',
+		ABSTRACT_FROM => 'lib/SQL/SimpleOps.pod',
+		AUTHOR => 'Carlos Celso <ccelso@cpan.org>',
+		LICENSE => 'GPL_3',
+		META_MERGE =>
 		{
-			Date::Calc => 0,
-			DBI => 0,
-			File::Path => 0,
-			File::Spec => 0,
-			IO::File => 0,
-			JSON => 0,
-			Sys::Syslog => 0,
+			'meta-spec' => { version => 2 },
+			resources =>
+			{
+				license => 'http://www.gnu.org/licenses/gpl-3.0.html',
+				bugtracker => { web => 'https://sourceforge.net/p/csi-sql-simpleops/tickets/' },
+				repository =>
+				{
+					type => 'git',
+					url => 'https://sourceforge.net/projects/csi-sql-simpleops/files',
+					web => 'https://sourceforge.net/projects/csi-sql-simpleops/',
+				},
+			},
 		},
-		ABSTRACT_FROM	=> 'lib/SQL/SimpleOps.pod',
-		AUTHOR		=> 'Carlos Celso <ccelso@cpan.org>',
-    		LICENSE		=> 'GPL_3',
-		dist		=> { COMPRESS => "gzip -9", SUFFIX => "gz"},
+		CONFIGURE_REQUIRES =>
+		{
+			'ExtUtils::MakeMaker' => 0,
+		},
+		BUILD_REQUIRES => {},
+		PREREQ_PM =>
+		{
+			'Date::Calc' => 0,
+			'DBI' => 0,
+			'File::Path' => 0,
+			'File::Spec' => 0,
+			'IO::File' => 0,
+			'JSON' => 0,
+			'Sys::Syslog' => 0,
+		},
+		TEST_REQUIRES =>
+		{
+			'Test::More' => 0,
+			'DBD::SQLite' => 0,
+		},
+		dist => { COMPRESS => "gzip -9", SUFFIX => "gz" },
 	);
+	#
+	## test makemaker version and supported options
+	#
+	if ( !eval { ExtUtils::MakeMaker->VERSION(6.63_03); } )
+	{
+		$makefile_param{PREREQ_PM} = 
+		{
+			%{ delete $makefile_param{TEST_REQUIRES} },
+			%{ delete $makefile_param{BUILD_REQUIRES} },
+		};
+	}
+	if ( !eval { ExtUtils::MakeMaker->VERSION(6.52) } )
+	{
+		delete $makefile_param{CONFIGURE_REQUIRES};
+	}
+	if ( !eval { ExtUtils::MakeMaker->VERSION(6.48) } )
+	{
+		delete $makefile_param{MIN_PERL_VERSION};
+	}
+	#
+	## write my makefile
+	#
+	WriteMakefile(%makefile_param);
 
 ##ENDED
