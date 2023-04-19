@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidInput;
-$Playwright::AndroidInput::VERSION = '1.323';
+$Playwright::AndroidInput::VERSION = '1.324';
 use parent 'Playwright::Base';
 
 sub new {
@@ -42,11 +42,11 @@ sub drag {
     );
 }
 
-sub swipe {
+sub type {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'swipe',
+        command => 'type',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,11 +62,11 @@ sub press {
     );
 }
 
-sub type {
+sub swipe {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'type',
+        command => 'swipe',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::AndroidInput - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 1.323
+version 1.324
 
 =head1 CONSTRUCTOR
 
@@ -139,11 +139,11 @@ Execute the AndroidInput::drag playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-drag> for more information.
 
-=head2 swipe(@args)
+=head2 type(@args)
 
-Execute the AndroidInput::swipe playwright routine.
+Execute the AndroidInput::type playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-swipe> for more information.
+See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-type> for more information.
 
 =head2 press(@args)
 
@@ -151,11 +151,11 @@ Execute the AndroidInput::press playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-press> for more information.
 
-=head2 type(@args)
+=head2 swipe(@args)
 
-Execute the AndroidInput::type playwright routine.
+Execute the AndroidInput::swipe playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-type> for more information.
+See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-swipe> for more information.
 
 =head2 on(@args)
 

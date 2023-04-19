@@ -2,7 +2,7 @@ package Astro::Catalog::IO::Binary;
 
 =head1 NAME
 
-Astro::Catalog::IO::Binary - base class for binary catalogues
+Astro::Catalog::IO::Binary - base class for binary catalogs
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ Astro::Catalog::IO::Binary - base class for binary catalogues
 
 =head1 DESCRIPTION
 
-This class provides a wrapper for reading binary catalogues
+This class provides a wrapper for reading binary catalogs
 into C<Astro::Catalog> objects. The method should, in general, only
 be called from the C<Astro::Catalog> C<configure> method.
 
@@ -21,7 +21,7 @@ use warnings::register;
 use Carp;
 use strict;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -37,12 +37,12 @@ Read the catalog.
 Takes a hash as argument with the list of keywords. Supported options
 are:
 
-    Data => Contents of catalogue, as a reference to glob (file handle)
+    Data => Contents of catalog, as a reference to glob (file handle)
             or a scalar containing data to be turned into a catalog.
             This key is used in preference to 'File' if both are present.
     File => File name for catalog on disk. Not used if 'Data' supplied.
     ReadOpt => Reference to hash of options to be forwarded onto the
-               format specific catalogue reader. See the IO documentation
+               format specific catalog reader. See the IO documentation
                for details.
 
 The options are case-insensitive.
@@ -124,7 +124,7 @@ sub read_catalog {
         else {
             # Need to ask for the default file
             $file = $class->_default_file() if $class->can('_default_file');
-            croak "Unable to read catalogue since no file specified and no default known."
+            croak "Unable to read catalog since no file specified and no default known."
                 unless defined $file;
         }
 
@@ -146,6 +146,35 @@ sub read_catalog {
     }
 
     return $catalog;
+}
+
+=item B<write_catalog>
+
+Write the catalog.
+
+    $ioclass->write_catalog($catalog, %args);
+
+Takes a hash as argument with the list of keywords. Supported options
+are:
+
+    File => File name for catalog on disk.
+
+The options are case-insensitive.  Other options are forwarded
+to the format-specific catalog writer.
+
+=cut
+
+sub write_catalog {
+    my $class = shift;
+    my $catalog = shift;
+
+    my %args = @_;
+    %args = Astro::Catalog::_normalize_hash(%args);
+
+    my $file = $args{file};
+    delete $args{file};
+
+    croak "Not yet implemented.";
 }
 
 1;

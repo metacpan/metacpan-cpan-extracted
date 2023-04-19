@@ -40,7 +40,7 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Item;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 

@@ -98,4 +98,16 @@ note 'exponent: ', unpack('H*', $attributes->{'public-exponent'});
 $session->destroy_object($public_key);
 $session->destroy_object($private_key);
 
+my $aes_key = $session->generate_key('aes-key-gen', { 'value-len' => 32, token => 0 });
+
+ok $aes_key;
+
+my $iv = "\0" x 16;
+my $encoder = $session->open_encrypt('aes-cbc-pad', $aes_key, $iv);
+
+my $ciphertext = $encoder->add_data($plain_text x 3);
+$ciphertext .= $encoder->finalize;
+
+is $session->decrypt('aes-cbc-pad', $aes_key, $ciphertext, $iv), $plain_text x 3;
+
 done_testing;

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::WebSocketFrame;
-$Playwright::WebSocketFrame::VERSION = '1.323';
+$Playwright::WebSocketFrame::VERSION = '1.324';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'WebSocketFrame'}{members};
 }
 
-sub binary {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'binary',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub text {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'text',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub binary {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'binary',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +86,7 @@ Playwright::WebSocketFrame - Automatically generated class for Playwright::WebSo
 
 =head1 VERSION
 
-version 1.323
+version 1.324
 
 =head1 CONSTRUCTOR
 
@@ -97,17 +97,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 binary(@args)
-
-Execute the WebSocketFrame::binary playwright routine.
-
-See L<https://playwright.dev/api/class-WebSocketFrame#WebSocketFrame-binary> for more information.
-
 =head2 text(@args)
 
 Execute the WebSocketFrame::text playwright routine.
 
 See L<https://playwright.dev/api/class-WebSocketFrame#WebSocketFrame-text> for more information.
+
+=head2 binary(@args)
+
+Execute the WebSocketFrame::binary playwright routine.
+
+See L<https://playwright.dev/api/class-WebSocketFrame#WebSocketFrame-binary> for more information.
 
 =head2 on(@args)
 

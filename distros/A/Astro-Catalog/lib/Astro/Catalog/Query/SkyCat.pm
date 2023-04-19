@@ -2,7 +2,7 @@ package Astro::Catalog::Query::SkyCat;
 
 =head1 NAME
 
-Astro::Catalog::Query::SkyCat - Generate SkyCat catalogue query clients
+Astro::Catalog::Query::SkyCat - Generate SkyCat catalog query clients
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ use File::Spec;
 
 use base qw/Astro::Catalog::Transport::REST/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively
@@ -244,7 +244,7 @@ sub _parse_query {
         }
     }
 
-    # If this catalogue is a GSC, pass in a GSC parameter
+    # If this catalog is a GSC, pass in a GSC parameter
     $params{gsc} = 1 if $cat =~ /^gsc/i;
 
     print $self->{BUFFER} ."\n" if $DEBUG;
@@ -644,7 +644,7 @@ If the supplied hash reference has content, look at the content
 and decide whether you simply want to keep that content or
 follow up directory specifications by doing a remote URL call
 and expanding that directory specification to many more remote
-catalogue server configs.
+catalog server configs.
 
     @configs = $q->_dir_check(\%current);
 
@@ -869,7 +869,7 @@ as opposed to
             target => 'HL Tau',
             radius => 5 );
 
-What to do with catalogue mirrors is an open question. Of course,
+What to do with catalog mirrors is an open question. Of course,
 convenience wrapper classes could be made available that simply delegate
 the calls to the SkyCat class.
 

@@ -4,6 +4,11 @@ This distribution installs the XPA library if its not available. It
 provides a uniform interface via Alien::Base to configuration
 information useful to link against it.
 
+This module finds or builds version 2.1.20 of the "XPA" library, which
+is bundled.
+
+"XPA" is distributed under the MIT License.
+
 For more information, please see Alien::Build::Manual::AlienUser
 
 INSTALLATION

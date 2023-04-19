@@ -9,14 +9,14 @@ RUN	apt-get update &&                       \
             cpanminus                           \
             gcc                                 \
             tar                                 \
-            curl
+            curl				\
+	    libwww-perl
 
 RUN 	apt-get install -y make
+# required for podman, but not for docker(?)
+ENV	TAR_OPTIONS=--no-same-owner
 WORKDIR /tmp
-
-COPY    Alien-XPA-0.08.tar.gz .
-RUN	cpanm install Alien-XPA-0.08.tar.gz ; true
-
-
-
-
+ARG     DIST=DIST_NOT_SPECIFIED
+COPY	${DIST} .
+RUN     cpanm -n --installdeps ${DIST}
+RUN     cpanm ${DIST}

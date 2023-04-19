@@ -1,7 +1,7 @@
 #!perl
 
-# Test that we can read a JCMT catalogue that is not rigid about its
-# columns. Test simply creates a catalogue with random junk attached
+# Test that we can read a JCMT catalog that is not rigid about its
+# columns. Test simply creates a catalog with random junk attached
 # and then reads it in and compares target values.
 
 use strict;
@@ -45,7 +45,7 @@ for (@ref) {
     isa_ok($_, "Astro::Coords::Equatorial");
 }
 
-# Generate a catalogue manually
+# Generate a catalog manually
 my @lines = ("* a comment\n");
 for my $c (@ref) {
     my $line = $c->name;

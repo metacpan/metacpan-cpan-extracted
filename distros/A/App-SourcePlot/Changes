@@ -1,5 +1,9 @@
 Revision history for Perl application App::SourcePlot
 
+1.31 2023-04-18
+
+    - Updated the included JCMT pointing catalog.
+
 1.30 2021-06-03
 
     - Updated the included JCMT pointing catalog.

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Video;
-$Playwright::Video::VERSION = '1.323';
+$Playwright::Video::VERSION = '1.324';
 use parent 'Playwright::Base';
 
 sub new {
@@ -96,7 +96,7 @@ Playwright::Video - Automatically generated class for Playwright::Video
 
 =head1 VERSION
 
-version 1.323
+version 1.324
 
 =head1 CONSTRUCTOR
 

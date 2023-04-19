@@ -43,7 +43,7 @@ is($mag_isocor->error('MAG_ISOCOR'), 0.0073, "SExtractor Star magnitude error");
 my $fh = new File::Temp;
 my $tempfile = $fh->filename;
 ok($cat->write_catalog(Format => 'SExtractor', File => $tempfile),
-    "Writing catalogue to disk");
+    "Writing catalog to disk");
 
 my $newcat = new Astro::Catalog(Format => 'SExtractor', File => $tempfile);
 
@@ -57,9 +57,9 @@ my $newid = $newstar->id;
 my $newra = $newstar->ra;
 my $newdec = $newstar->dec;
 
-is($newid,  $id,  "SExtractor written catalogue ID");
-is($newra,  $ra,  "SExtractor written catalogue RA");
-is($newdec, $dec, "SExtractor written catalogue Dec");
+is($newid,  $id,  "SExtractor written catalog ID");
+is($newra,  $ra,  "SExtractor written catalog RA");
+is($newdec, $dec, "SExtractor written catalog Dec");
 
 exit;
 

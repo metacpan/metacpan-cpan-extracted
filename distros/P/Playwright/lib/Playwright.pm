@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.323';
+$Playwright::VERSION = '1.324';
 use strict;
 use warnings;
 
@@ -308,7 +308,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.323
+version 1.324
 
 =head1 SYNOPSIS
 

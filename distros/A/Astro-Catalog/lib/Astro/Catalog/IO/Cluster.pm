@@ -37,7 +37,7 @@ use base qw/Astro::Catalog::IO::ASCII/;
 
 use Data::Dumper;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 
@@ -178,7 +178,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Will write the catalogue object to an standard ARK Cluster format file
+Will write the catalog object to an standard ARK Cluster format file
 
     $lines = Astro::Catalog::IO::Cluster->_write_catalog($catalog, %opts);
 
@@ -196,7 +196,7 @@ despite the presence of other
     \@lines = Astro::Catalog::IO::Cluster->write_catalog(
         $catalog, Magnitudes => \@mags, Colours => \@colours);
 
-will write a catalogue with R, B-R and B-V.
+will write a catalog with R, B-R and B-V.
 
 =cut
 
@@ -205,11 +205,11 @@ sub _write_catalog {
     my $class = shift;
     my $catalog = shift;
 
-    # real list of filters and colours in the catalogue
+    # real list of filters and colours in the catalog
     my @filters = $catalog->starbyindex(0)->what_filters();
     my @colours = $catalog->starbyindex(0)->what_colours();
 
-    # number of stars in catalogue
+    # number of stars in catalog
     my $number = $catalog->sizeof();
 
     # number of filters & colours
@@ -295,7 +295,7 @@ sub _write_catalog {
 
     # write body
 
-    # loop through all the stars in the catalogue
+    # loop through all the stars in the catalog
     foreach my $star (0 .. $#$stars) {
         $output_line = undef;
 

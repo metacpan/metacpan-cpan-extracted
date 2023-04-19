@@ -23,16 +23,16 @@ $dist->add_file('share/file.txt', 'FooBarBaz');
 $dist->add_file('script/simple', undent(<<'    ---'));
     #!perl
     use Foo::Bar;
-    print Simple->VERSION . "\n";
+    print Foo::Bar->VERSION . "\n";
     ---
 my $has_compiler = ExtUtils::CBuilder->new->have_compiler();
-$dist->add_file('lib/Simple.xs', undent(<<'    ---')) if $has_compiler;
+$dist->add_file('lib/Foo/Bar.xs', undent(<<'    ---')) if $has_compiler;
     #define PERL_NO_GET_CONTEXT
     #include "EXTERN.h"
     #include "perl.h"
     #include "XSUB.h"
 
-    MODULE = Simple                PACKAGE = Simple
+    MODULE = Foo::Bar                PACKAGE = Foo::Bar
 
     const char*
     foo()
@@ -119,8 +119,16 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
   ok( -f catfile(qw/blib lib auto share dist Foo-Bar file.txt/), 'sharedir file has been made');
 
   if ($has_compiler) {
-    XSLoader::load('Simple');
-    is(Simple::foo(), "Hello World!\n", 'Can run XSub Simple::foo');
+    XSLoader::load('Foo::Bar');
+    is(Foo::Bar::foo(), "Hello World!\n", 'Can run XSub Foo::Bar::foo');
+  }
+
+  SKIP: {
+    require ExtUtils::InstallPaths;
+    skip 1, 'No manification supported' if not ExtUtils::InstallPaths->new->is_default_installable('libdoc');
+    require ExtUtils::Helpers;
+    my $file = "blib/libdoc/" . ExtUtils::Helpers::man3_pagename($pmfile, '.');
+    ok( -e $file, 'Module gets manified properly');
   }
 }
 

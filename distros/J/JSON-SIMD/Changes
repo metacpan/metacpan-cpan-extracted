@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON::SIMD
 
+1.03 Apr 18 20:11:05 CEST 2023
+	- fix hardcoded g++ in Makefile
+	- document requirements and incompatibilites
+
 1.02 Mon Apr 17 20:00:08  CEST 2023
 	- update repository and issue tracker?
 	- split old changes into separate file

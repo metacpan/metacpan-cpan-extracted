@@ -10,7 +10,7 @@ Astro::Catalog::IO::Astrom - Starlink Astrom catalog I/O for Astro::Catalog
 
 =head1 DESCRIPTION
 
-This class provides a write method for catalogues to be used as
+This class provides a write method for catalogs to be used as
 import to Starlink Astrom. The method is not public and should,
 in general, only be called from the C<Astro::Catalog> C<write_catalog>
 method.
@@ -28,7 +28,7 @@ use Astro::Coords;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -52,7 +52,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Writes the catalogue object to a file in a format that Starlink ASTROM
+Writes the catalog object to a file in a format that Starlink ASTROM
 can understand.
 
     $lines = Astro::Catalog::IO::Astrom->_write_catalog($catalog);
@@ -71,7 +71,7 @@ sub _write_catalog {
     my $nstars = $catalog->sizeof();
 
     unless (defined $catalog->get_coords) {
-        croak "Need catalogue field centre to do astrometry correction";
+        croak "Need catalog field centre to do astrometry correction";
     }
 
     # Set up some variables for output.

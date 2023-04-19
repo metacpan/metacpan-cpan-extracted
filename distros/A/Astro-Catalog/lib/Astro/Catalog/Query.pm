@@ -26,7 +26,7 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Item;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =head1 METHODS
 
@@ -81,7 +81,7 @@ sub new {
 
 Hash representing the query options to be used to query the catalog
 server. This keys in this hash are restricted by the subclass. Some
-keys are not usable by all catalogues.
+keys are not usable by all catalogs.
 
 Returns a copy of the options hash when.
 
@@ -262,7 +262,7 @@ sub bright {
 
 =item B<Sort>
 
-Set or query the order in which the stars are listed in the catalogue
+Set or query the order in which the stars are listed in the catalog
 
     $sort = $query->sort();
     $query->sort('RA');
@@ -478,7 +478,7 @@ sub _get_default_options {
 
 =item B<_set_default_options>
 
-Each catalogue requires different default settings for the
+Each catalog requires different default settings for the
 URL parameters. They should be specified in a subclass.
 
 =cut

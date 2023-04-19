@@ -19,7 +19,7 @@ Astro::Catalog::Query::USNOA2 - A query request to the USNO-A2.0 Catalog
 =head1 DESCRIPTION
 
 The module is an object orientated interface to the online USNO-A2.0
-catalogue at the ESO/ST-ECF archive site.
+catalog at the ESO/ST-ECF archive site.
 
 Stores information about an prospective USNO-A2.0 query and allows the query to
 be made, returning an Astro::Catalog::USNOA2::Catalog object.
@@ -48,7 +48,7 @@ use Astro::Fluxes;
 use Astro::FluxColor;
 use Number::Uncertainty;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 
@@ -294,7 +294,7 @@ sub _parse_query {
 
                 # only push the star if the Astro::Coords object is
                 # correctly defined. The Dec might be bogus since the
-                # USNO-A2 catalogue has its seconds field out of
+                # USNO-A2 catalog has its seconds field out of
                 # normal range (0-59.9) in some cases.
                 if ($star->coords()) {
                     $catalog->pushstar($star);

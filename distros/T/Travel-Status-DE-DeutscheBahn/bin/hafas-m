@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 use utf8;
 use DateTime;
@@ -64,6 +64,10 @@ if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
 		lat => $+{lat},
 		lon => $+{lon},
 	};
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{ ^ [?] (?<query> .*) $ }x ) {
+	$opt{locationSearch} = $+{query};
 	delete $opt{station};
 }
 elsif ( $opt{station} =~ m{[|]} ) {
@@ -251,6 +255,12 @@ if ( $opt{geoSearch} ) {
 	}
 	exit 0;
 }
+elsif ( $opt{locationSearch} ) {
+	for my $result ( $status->results ) {
+		printf( "%8d  %s\n", $result->eva, $result->name );
+	}
+	exit 0;
+}
 elsif ( $opt{journey} ) {
 	my $result = $status->result;
 
@@ -350,7 +360,7 @@ B<hafas-m> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 4.09
+version 4.10
 
 =head1 DESCRIPTION
 

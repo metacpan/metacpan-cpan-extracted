@@ -4,7 +4,7 @@ Configuration Files
 This directory contains the SkyCat configuration files. Current files are:
 
  sss.cfg - SuperCOSMOS configuration for Astro::Catalog::Query::SuperCOSMOS,
-           the returned SuperCOSMOS catalogue is in TST format with the columns
+           the returned SuperCOSMOS catalog is in TST format with the columns
            returned being as follows,
 
                  Column  Content        Unit                   Type
@@ -32,8 +32,8 @@ This directory contains the SkyCat configuration files. Current files are:
                 20       FLDNO                                 INTEGER
 
            the Astro::Catalog::Query::SuperCOSMOS module is used to query the
-           catalogue servers at ROE for this catalogue. The generic SkyCat
+           catalog servers at ROE for this catalog. The generic SkyCat
            module is unable to do so due to the rather odd URL's for the
-           catalogue servers.
+           catalog servers.
 
  skycat.cfg - Generic config file for Astronomical Catalogs

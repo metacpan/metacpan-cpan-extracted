@@ -20,7 +20,7 @@ Astro::Catalog::Query::Vizier - A query request to the Vizier catalogs
 =head1 DESCRIPTION
 
 The module is an object orientated interface to the online
-Vizier catalogs. Multiple catalogues can be specified using a
+Vizier catalogs. Multiple catalogs can be specified using a
 comma-separated list.
 
 Stores information about an prospective query and allows the query to
@@ -44,7 +44,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Item;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -67,7 +67,7 @@ sub _default_remote_host {
 
 =item B<_default_url_path>
 
-asu-acl will generate TST format catalogues. asu-xml will generate
+asu-acl will generate TST format catalogs. asu-xml will generate
 AstroRes format XML. We assume TST for the moment.
 
 =cut

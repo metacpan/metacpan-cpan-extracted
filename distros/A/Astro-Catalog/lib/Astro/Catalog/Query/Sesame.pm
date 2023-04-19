@@ -28,7 +28,7 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Item;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -156,7 +156,7 @@ sub _set_default_options {
 
 =item B<_get_supported_init>
 
-Return the list of initialization methods supported by this catalogue.
+Return the list of initialization methods supported by this catalog.
 This is not the same as the allowed options since some methods are
 not related to options and other methods that are related to options
 use different names.

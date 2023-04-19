@@ -11,9 +11,9 @@ Astro::Catalog::IO::TST - Standard Tab Separated Table format I/O
 
 =head1 DESCRIPTION
 
-Performs IO for catalogues that use the standard Tab Separated Table
-(TST) format. The TST format is commonly returned by astronomical catalogue
-servers that use the Astronomical Catalogue Library (ACL) format, although
+Performs IO for catalogs that use the standard Tab Separated Table
+(TST) format. The TST format is commonly returned by astronomical catalog
+servers that use the Astronomical Catalog Library (ACL) format, although
 it is also perfectly reasonable to read and write this format to disk.
 
 =cut
@@ -31,7 +31,7 @@ use Astro::Coords;
 use base qw/Astro::Catalog::IO::ASCII/;
 
 our $DEBUG = 0;
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 
@@ -44,7 +44,7 @@ constructor.
 
 =item B<_read_catalog>
 
-Read contents of a TST catalogue (supplied as an array of lines) and
+Read contents of a TST catalog (supplied as an array of lines) and
 return a corresponding C<Astro::Catalog> object.
 
     $cat = Astro::Catalog::IO::TST->_read_catalog(\@lines, %opts);
@@ -284,7 +284,7 @@ sub _read_catalog {
     # Now convert the information into a star object
 
     # This is a back-of-the-envelope data dictionary from looking at
-    # USNO-A2, 2MASS, Bright Star Catalogues and SuperCOSMOS. Maps the
+    # USNO-A2, 2MASS, Bright Star Catalogs and SuperCOSMOS. Maps the
     # Astro::Catalog::Item methods to different columns names
     my %datadict = (
         field => [ qw/ field /, qw/ fldno / ],
@@ -379,7 +379,7 @@ sub _read_catalog {
         for my $key (keys %$star) {
             print "LOOPING KEY = $key\n" if $DEBUG;
 
-            # Un-Goldy hack number #5 for the SuperCOSMOS catalogue, for some
+            # Un-Goldy hack number #5 for the SuperCOSMOS catalog, for some
             # bloody stupid reason they've decided to label their magntitudes
             # B_J, R_1, R_2 and I. God help me, if I ever find the guy responsible
             # for this stupid idea. For now lets munge these here and cross our
@@ -491,7 +491,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Create an output catalogue in the TST format and return the lines
+Create an output catalog in the TST format and return the lines
 in an array.
 
     $ref = Astro::Catalog::IO::TST->_write_catalog($catalog);

@@ -2,7 +2,7 @@ package Astro::Catalog::Item;
 
 =head1 NAME
 
-Astro::Catalog::Item - A generic star object in a stellar catalogue.
+Astro::Catalog::Item - A generic star object in a stellar catalog
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,11 @@ Astro::Catalog::Item - A generic star object in a stellar catalogue.
 
 =head1 DESCRIPTION
 
-Stores generic meta-data about an individual stellar object from a catalogue.
+Stores generic meta-data about an individual stellar object from a catalog.
 
-If the catalogue has a field center the Distance and Position Angle properties
+If the catalog has a field center the Distance and Position Angle properties
 should be used to store the direction to the field center, e.g. a star from the
-USNO-A2 catalogue retrieived from the ESO/ST-ECF Archive will have these
+USNO-A2 catalog retrieived from the ESO/ST-ECF Archive will have these
 properties.
 
 =cut
@@ -52,7 +52,7 @@ use Astro::FluxColor;
 # Register an Astro::Catalog::Item warning category
 use warnings::register;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -535,7 +535,7 @@ also changed.
 
 If an optional flag is passed as set to the routine it will replace
 instead of appending (default action) to an existing fluxes object
-in the catalogue.
+in the catalog.
 
 Returns undef if the fluxes have never been specified.
 
@@ -870,11 +870,11 @@ Return (or set) the quality flag of the star
     $quality = $star->quailty();
     $star->quality(0);
 
-for example for the USNO-A2 catalogue, 0 denotes good quality, and 1
+for example for the USNO-A2 catalog, 0 denotes good quality, and 1
 denotes a possible problem object. In the generic case any flag value,
 including a boolean, could be used.
 
-These quality flags are standardised sybolically across catalogues and
+These quality flags are standardised sybolically across catalogs and
 have the following definitions:
 
     STARGOOD
@@ -962,7 +962,7 @@ Return (or set) the GSC flag for the object
     $gsc = $star->gsc();
     $star->gsc( 'TRUE' );
 
-the flag is TRUE if the object is known to be in the Guide Star Catalogue,
+the flag is TRUE if the object is known to be in the Guide Star Catalog,
 and FALSE otherwise.
 
 =cut
@@ -982,7 +982,7 @@ Return (or set) the distance from the field centre
     $distance = $star->distance();
     $star->distance('0.009');
 
-e.g. for the USNO-A2 catalogue.
+e.g. for the USNO-A2 catalog.
 
 =cut
 
@@ -1001,7 +1001,7 @@ Return (or set) the position angle from the field centre
     $position_angle = $star->posangle();
     $star->posangle('50.761');
 
-e.g. for the USNO-A2 catalogue.
+e.g. for the USNO-A2 catalog.
 
 =cut
 

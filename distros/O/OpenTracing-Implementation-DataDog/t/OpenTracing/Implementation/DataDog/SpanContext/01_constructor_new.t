@@ -3,7 +3,7 @@ use Test::Most;
 
 use aliased 'OpenTracing::Implementation::DataDog::SpanContext';
 
-use Types::Standard qw/is_Int/;
+use Types::Standard qw/InstanceOf/;
 
 
 
@@ -42,8 +42,11 @@ subtest 'new SpanContext with minimal parameters' => sub {
         )
     } "Created a SpanContext" ;
     
-    ok ( is_Int( $test_span_context->trace_id ),
-        "... and default 'trace_id' has been set to an 'Int'"
+    ok ( is_BigInt( $test_span_context->trace_id ),
+        "... and default 'trace_id' has been set to a 'BigInt'"
+    );
+    ok ( is_BigInt( $test_span_context->span_id ),
+        "... and default 'span_id' has been set to a 'BigInt'"
     );
     is ( $test_span_context->get_service_type, 'custom',
         "... and default 'service_type' has been set to 'custom'"
@@ -61,5 +64,7 @@ subtest 'new SpanContext with minimal parameters' => sub {
 };
 
 
+
+sub is_BigInt { ( InstanceOf['Math::BigInt'] )->assert_valid( shift ) }
 
 done_testing;

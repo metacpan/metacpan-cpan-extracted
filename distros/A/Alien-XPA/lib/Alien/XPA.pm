@@ -2,10 +2,11 @@ package Alien::XPA;
 
 # ABSTRACT: Find or Build libxpa
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = 'v2.1.20.0';
 
 use base qw( Alien::Base );
 
@@ -21,7 +22,11 @@ use base qw( Alien::Base );
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory metacpan
 
 =head1 NAME
 
@@ -29,7 +34,7 @@ Alien::XPA - Find or Build libxpa
 
 =head1 VERSION
 
-version 0.09
+version v2.1.20.0
 
 =head1 DESCRIPTION
 
@@ -37,12 +42,35 @@ This distribution installs the XPA library if its not available. It
 provides a uniform interface via L<Alien::Base> to configuration
 information useful to link against it.
 
+This module finds or builds version 2.1.20 of the C<XPA> library,
+which is bundled.
+
+C<XPA> is distributed under the MIT License.
+
 For more information, please see L<Alien::Build::Manual::AlienUser>
 
-=head1 BUGS AND LIMITATIONS
+=head1 USAGE
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA>.
+Please see L<Alien::Build::Manual::AlienUser> (or equivalently on
+metacpan
+L<https://metacpan.org/pod/distribution/Alien-Build/lib/Alien/Build/Manua
+l/AlienUser.pod>).
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-alien-xpa@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/alien-xpa
+
+and may be cloned from
+
+  https://gitlab.com/djerius/alien-xpa.git
 
 =head1 AUTHOR
 
@@ -57,14 +85,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 DESCRIPTION
-#pod
-#pod This distribution installs the XPA library if its not available. It
-#pod provides a uniform interface via L<Alien::Base> to configuration
-#pod information useful to link against it.
-#pod
-#pod For more information, please see L<Alien::Build::Manual::AlienUser>
-#pod

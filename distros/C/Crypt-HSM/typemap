@@ -1,6 +1,12 @@
 TYPEMAP
 	Crypt::HSM              T_PROVIDER
 	Crypt::HSM::Session     T_PTROBJ
+	Crypt::HSM::Stream      T_PTROBJ
+	Crypt::HSM::Encrypt     T_PTROBJ
+	Crypt::HSM::Decrypt     T_PTROBJ
+	Crypt::HSM::Digest      T_PTROBJ
+	Crypt::HSM::Sign        T_PTROBJ
+	Crypt::HSM::Verify      T_PTROBJ
 	CK_BBOOL                T_BOOL
 	CK_ULONG                T_U_LONG
 	CK_OBJECT_HANDLE        T_U_LONG

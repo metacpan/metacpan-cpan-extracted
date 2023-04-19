@@ -68,12 +68,12 @@ $catalog->fieldcentre(
 
 isa_ok($catalog, "Astro::Catalog");
 
-# Create a temporary file to hold the written catalogue.
+# Create a temporary file to hold the written catalog.
 my $tempfile = File::Temp->new();
 ok($catalog->write_catalog(Format => 'Astrom', File => $tempfile),
     "Check catalog write" );
 
-# Now we need to read in the catalogue into an array.
+# Now we need to read in the catalog into an array.
 my $fh;
 open $fh, $tempfile;
 my @written_cat = <$fh>;

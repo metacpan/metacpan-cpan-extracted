@@ -25,13 +25,13 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Data::Validate::URI: '0'
   Exporter: '0'
   HTTP::Request: '0'
   HTTP::Response::Maker: '0'
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
   LWP::UserAgent: '0'
+  Math::BigInt::Random::OO: '0'
   Moo: '0'
   Moo::Role: '0'
   MooX::Attribute::ENV: '0.04'
@@ -42,6 +42,8 @@ requires:
   OpenTracing::Role: v0.86.0
   PerlX::Maybe: '0'
   Ref::Util: '0'
+  Regexp::Common: '0'
+  Regexp::Common::URI::http: '0'
   Sub::HandlesVia: '0'
   Sub::Trigger::Lock: '0'
   Syntax::Feature::Maybe: '0'
@@ -56,5 +58,5 @@ requires:
 resources:
   bugtracker: https://github.com/Perceptyx/perl-opentracing-implementation-datadog/issues
   repository: https://github.com/Perceptyx/perl-opentracing-implementation-datadog.git
-version: v0.45.0
+version: v0.46.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

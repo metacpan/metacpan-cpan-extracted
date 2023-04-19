@@ -128,7 +128,7 @@ SKIP: {
     print "# DAT has " . $catalog_data->sizeof() . " stars\n";
     print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-    # Compare catalogues
+    # Compare catalogs
     compare_catalog( $catalog_byname, $catalog_data);
 }
 

@@ -4,7 +4,7 @@ Astro::Catalog module
 What is it?
 -----------
 
-The module is a generic object orientated astronomical catalogue object.
+The module is a generic object orientated astronomical catalog object.
 
 Requirements
 ------------
@@ -37,10 +37,10 @@ Provides
 The package provides the following user level classes
 
   Astro::Catalog
-    A generic catalogue object, includes pluggable I/O support.
+    A generic catalog object, includes pluggable I/O support.
 
   Astro::Catalog::Item
-    A generic catalogue item.
+    A generic catalog item.
 
 NB: Astro::Catalog::Star is maintained for backwards compatibility.
 
@@ -49,7 +49,7 @@ for astronomical objects. They all return an Astro::Catalog object
 populated with matching Astro::Catalog::Item objects.
 
   Astro::Catalog::Query::2MASS
-    Queries the Two Micron All Sky Survey (2MASS) catalogue.
+    Queries the Two Micron All Sky Survey (2MASS) catalog.
 
   Astro::Catalog::Query::CMC
     Queries the Carlsberg Meridian Catalogue (CMC/12).
@@ -68,19 +68,19 @@ populated with matching Astro::Catalog::Item objects.
     of the Astro::SIMBAD module.
 
   Astro::Catalog::Query::SkyCat
-    Queries SkyCat catalogues. For some catalogue queries, parsing of the
-    returned catalogue will not work. In some cases the URLs of the
+    Queries SkyCat catalogs. For some catalog queries, parsing of the
+    returned catalog will not work. In some cases the URLs of the
     resources may break this module's parsing code.
 
   Astro::Catalog::Query::SuperCOSMOS
     Queries the SuperCOSMOS catalogue.
 
   Astro::Catalog::Query::USNOA2
-    Queries the USNO-A2.0 catalogue.
+    Queries the USNO-A2.0 catalog.
 
   Astro::Catalog::Query::Vizier
-    Queries Vizier catalogues. For some catalogue queries, parsing of the
-    returned catalogue will not work.
+    Queries Vizier catalogs. For some catalog queries, parsing of the
+    returned catalog will not work.
 
 Additional classes provided by the package handle things that you don't
 need to concern yourself with, unless you want to write your own I/O or

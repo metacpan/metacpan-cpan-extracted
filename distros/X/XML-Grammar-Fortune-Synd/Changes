@@ -1,5 +1,9 @@
 Revision history for XML-Grammar-Fortune-Synd
 
+0.0400  2023-04-19
+    - Write the YAML only on change.
+    - Explicit imports.
+
 0.0215  2020-10-22
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

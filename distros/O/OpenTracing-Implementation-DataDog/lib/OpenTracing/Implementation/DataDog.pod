@@ -27,7 +27,7 @@ This version is for
 
 =head1 SYNOPSIS
 
-    use alias "OpenTracing::Implementation::DataDog", 'Implementation';
+    use aliased "OpenTracing::Implementation::DataDog", 'Implementation';
     
     my $tracer = Implementation->bootstrap_tracer(
         agent => {
@@ -35,11 +35,11 @@ This version is for
             port            => '8126',
             path            => 'v0.3/traces',
         },
-        default_context => {
-            service_name    => 'MyService',
-            service_type    => 'web',
-            resource_name   => 'my_cgi_endpoint',
-        },
+        default_service_name    => 'MyService',
+        default_service_type    => 'web',
+        default_resource_name   => 'my_cgi_endpoint',
+        default_hostname        => 'my.host.123',
+        default_environment     => 'staging',
     );
 
 

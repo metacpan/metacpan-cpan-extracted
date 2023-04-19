@@ -2,7 +2,7 @@ package Astro::Catalog::IO::UKIRTBS;
 
 =head1 NAME
 
-Astro::Catalog::IO::UKIRTBS - Old format used by UKIRT Bright Star catalogues
+Astro::Catalog::IO::UKIRTBS - Old format used by UKIRT Bright Star catalogs
 
 =head1 SYNOPSIS
 
@@ -12,9 +12,9 @@ Astro::Catalog::IO::UKIRTBS - Old format used by UKIRT Bright Star catalogues
 
 This class provides a read method for catalogs written in a format
 used by the old C<ukstar> web interface to the SAO and Bright Star
-catalogues. It is probable that this format has a real name and is a
+catalogs. It is probable that this format has a real name and is a
 historical format rather than a UKIRT-specific format but the history
-of C<ukstar> and the associated catalogue files is not known to the
+of C<ukstar> and the associated catalog files is not known to the
 author of this module.
 
 =cut
@@ -29,13 +29,13 @@ use Astro::Catalog::Item;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =over 4
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog>
+Parses the catalog lines and returns a new C<Astro::Catalog>
 object containing the catalog entries.
 
     $cat = Astro::Catalog::IO::JCMT->_read_catalog(\@lines);
@@ -48,7 +48,7 @@ sub _read_catalog {
     my $class = shift;
     my $lines = shift;
 
-    croak "Must supply catalogue contents as a reference to an array"
+    croak "Must supply catalog contents as a reference to an array"
         unless ref($lines) eq 'ARRAY';
 
     # Go through each line and parse it

@@ -6,11 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Crypt/HSM.pm',
-    'Crypt/HSM/Session.pm'
+    'Crypt/HSM/Decrypt.pm',
+    'Crypt/HSM/Digest.pm',
+    'Crypt/HSM/Encrypt.pm',
+    'Crypt/HSM/Session.pm',
+    'Crypt/HSM/Sign.pm',
+    'Crypt/HSM/Stream.pm',
+    'Crypt/HSM/Verify.pm'
 );
 
 

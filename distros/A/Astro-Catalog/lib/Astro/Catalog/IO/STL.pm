@@ -2,7 +2,7 @@ package Astro::Catalog::IO::STL;
 
 =head1 NAME
 
-Astro::Catalog::IO::STL - STL catalogue I/O for Astro::Catalog
+Astro::Catalog::IO::STL - STL catalog I/O for Astro::Catalog
 
 =head1 SYNOPSIS
 
@@ -10,8 +10,8 @@ Astro::Catalog::IO::STL - STL catalogue I/O for Astro::Catalog
 
 =head1 DESCRIPTION
 
-This class provides read and write methods for catalogues in the CURSA
-small text list (STL) catalogue format. The methods are not public and
+This class provides read and write methods for catalogs in the CURSA
+small text list (STL) catalog format. The methods are not public and
 should, in general, only be called from the C<Astro::Catalog>
 C<write_catalog> method.
 
@@ -28,7 +28,7 @@ use Astro::Coords;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -42,12 +42,12 @@ constructor.
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog>
-object containing the catalogue entries.
+Parses the catalog lines and returns a new C<Astro::Catalog>
+object containing the catalog entries.
 
     $cat = Astro::Catalog::IO::STL->_read_catalog(\@lines);
 
-The catalogue lines must include column definitions (lines starting
+The catalog lines must include column definitions (lines starting
 with a C) so that the parser knows in which column values lie.
 
 =cut
@@ -57,7 +57,7 @@ sub _read_catalog {
     my $lines = shift;
 
     if (ref( $lines) ne 'ARRAY') {
-        croak "Must supply catalogue contents as a reference to an array";
+        croak "Must supply catalog contents as a reference to an array";
     }
 
     my @lines = @$lines; # Dereference, make own copy.
@@ -199,7 +199,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Create an output catalogue in the STL format and return the lines
+Create an output catalog in the STL format and return the lines
 in an array.
 
     $ref = Astro::Catalog::IO::STL->_write_catalog($catalog);
@@ -217,7 +217,7 @@ sub _write_catalog {
 
     # First, the preamble.
     push @return, "!+";
-    push @return, "!  This catalogue is formatted as a CURSA small text list (STL).";
+    push @return, "!  This catalog is formatted as a CURSA small text list (STL).";
     push @return, "!  For a description of this format see Starlink User Note 190.";
     push @return, "!-";
     push @return, "";
@@ -236,7 +236,7 @@ sub _write_catalog {
     # Begin the table.
     push @return, "BEGINTABLE";
 
-    # And now the actual data. Loop through the stars in the catalogue.
+    # And now the actual data. Loop through the stars in the catalog.
     my $stars = $catalog->stars();
 
     foreach my $star (@$stars) {

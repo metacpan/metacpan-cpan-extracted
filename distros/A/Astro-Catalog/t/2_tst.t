@@ -29,7 +29,7 @@ is($star->dec, "-06 50 40.00", "TST Star Dec");
 my $fh = new File::Temp;
 my $tempfile = $fh->filename;
 ok($cat->write_catalog(Format => 'TST', File => $tempfile),
-    "Writing catalogue to disk" );
+    "Writing catalog to disk" );
 
 my $newcat = new Astro::Catalog(Format => 'TST', File => $tempfile);
 
@@ -41,18 +41,18 @@ my $newid = $newstar->id;
 my $newra = $newstar->ra;
 my $newdec = $newstar->dec;
 
-is($newid,  $star->id,  "TST written catalogue ID");
-is($newra,  $star->ra,  "TST written catalogue RA");
-is($newdec, $star->dec, "TST written catalogue Dec");
+is($newid,  $star->id,  "TST written catalog ID");
+is($newra,  $star->ra,  "TST written catalog RA");
+is($newdec, $star->dec, "TST written catalog Dec");
 
 exit;
 
 __DATA__
-Simple TST example; stellar photometry catalogue.
+Simple TST example; stellar photometry catalog.
 
 A.C. Davenhall (Edinburgh) 26/7/00.
 
-Catalogue of U,B,V colours.
+Catalog of U,B,V colours.
 UBV photometry from Mount Pumpkin Observatory,
 see Sage, Rosemary and Thyme (1988).
 

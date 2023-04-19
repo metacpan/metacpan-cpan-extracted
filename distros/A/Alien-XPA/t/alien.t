@@ -17,8 +17,8 @@ plan( 5 );
 alien_ok 'Alien::XPA';
 
 
-diag(  which($_) or bail_out( "can't find $_" ) )
-  for qw( xpaaccess xpamb xpaset );
+diag "PATH = $ENV{PATH}";
+diag( which( $_ ) or bail_out( "can't find $_" ) ) for qw( xpaaccess xpamb xpaset );
 
 my $run = run_ok( [ 'xpaaccess', '--version' ] );
 $run->exit_is( 0 )
@@ -32,19 +32,13 @@ our $child;
 
 if ( $^O eq 'MSWin32' ) {
     require Win32::Process;
-    use subs
-      qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
-    Win32::Process::Create(
-        $child,
-        which( 'xpamb' ),
-        "xpamb",
-        0,
-        Win32::Process::NORMAL_PRIORITY_CLASS | Win32::Process::CREATE_NO_WINDOW,
-        "."
-    ) || die $^E;
+    use subs qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
+    Win32::Process::Create( $child, which( 'xpamb' ),
+        "xpamb", 0, Win32::Process::NORMAL_PRIORITY_CLASS | Win32::Process::CREATE_NO_WINDOW, "." )
+      || die $^E;
 }
 else {
-    $child = child { exec { 'xpamb' } 'xpamb' };
+    $child = child { exec {'xpamb'} 'xpamb' };
 }
 
 my $xpamb_is_running;
@@ -66,8 +60,7 @@ xs_ok { xs => $xs, verbose => 1 }, with_subtest {
     my ( $module ) = @_;
     ok $module->connected, "connected to xpamb";
     $version = $module->version;
-    is( $module->version, $version,
-        "library version same as command line version" );
+    is( $module->version, $version, "library version same as command line version" );
 };
 
 sub remove_xpamb {
@@ -76,12 +69,12 @@ sub remove_xpamb {
     retry {
         my $run;
 
-        $run = run( 'xpaaccess', 'XPAMB:*' );
+        $run              = run( 'xpaaccess', 'XPAMB:*' );
         $xpamb_is_running = $run->out =~ 'yes';
 
         return unless $xpamb_is_running;
 
-        $run = run( 'xpaset', qw [ -p xpamb -exit ] );
+        $run              = run( 'xpaset', qw [ -p xpamb -exit ] );
         $xpamb_is_running = $run->err =~ qr[XPA\$ERROR no 'xpaset' access points];
 
         die if $xpamb_is_running;
@@ -139,12 +132,12 @@ sub remove_xpamb {
         }, $class;
     }
 
-    sub out  { $_[0]->{out} }
-    sub err  { $_[0]->{err} }
-    sub exit { $_[0]->{exit} }
-    sub core { $_[0]->{core} }
+    sub out    { $_[0]->{out} }
+    sub err    { $_[0]->{err} }
+    sub exit   { $_[0]->{exit} }
+    sub core   { $_[0]->{core} }
     sub signal { $_[0]->{signal} }
-    sub cmd { join ' ', @{ $_[0]->{cmd} } }
+    sub cmd    { join ' ', @{ $_[0]->{cmd} } }
 
     sub dump {
         sprintf "cmd: %s\nexit: %d\ncore; %s\nsignal: %s\nstdout: %s\nstderr: %s\n",
@@ -153,8 +146,8 @@ sub remove_xpamb {
           $_[0]->core,
           $_[0]->signal,
           $_[0]->out,
-          $_[0]->err
-      }
+          $_[0]->err;
+    }
 }
 
 END {

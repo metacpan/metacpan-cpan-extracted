@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::RequestOptions;
-$Playwright::RequestOptions::VERSION = '1.323';
+$Playwright::RequestOptions::VERSION = '1.324';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,41 +22,41 @@ sub spec {
     return $Playwright::spec->{'RequestOptions'}{members};
 }
 
+sub setQueryParam {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setQueryParam',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setIgnoreHTTPSErrors {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setIgnoreHTTPSErrors',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub setMaxRedirects {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'setMaxRedirects',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setForm {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setForm',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setMultipart {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setMultipart',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setMethod {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setMethod',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -72,11 +72,11 @@ sub setHeader {
     );
 }
 
-sub setQueryParam {
+sub setForm {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setQueryParam',
+        command => 'setForm',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -92,11 +92,11 @@ sub setData {
     );
 }
 
-sub setIgnoreHTTPSErrors {
+sub setMultipart {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setIgnoreHTTPSErrors',
+        command => 'setMultipart',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -122,11 +122,11 @@ sub create {
     );
 }
 
-sub setTimeout {
+sub setMethod {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setTimeout',
+        command => 'setMethod',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -176,7 +176,7 @@ Playwright::RequestOptions - Automatically generated class for Playwright::Reque
 
 =head1 VERSION
 
-version 1.323
+version 1.324
 
 =head1 CONSTRUCTOR
 
@@ -187,29 +187,29 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 setQueryParam(@args)
+
+Execute the RequestOptions::setQueryParam playwright routine.
+
+See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setQueryParam> for more information.
+
+=head2 setTimeout(@args)
+
+Execute the RequestOptions::setTimeout playwright routine.
+
+See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setTimeout> for more information.
+
+=head2 setIgnoreHTTPSErrors(@args)
+
+Execute the RequestOptions::setIgnoreHTTPSErrors playwright routine.
+
+See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setIgnoreHTTPSErrors> for more information.
+
 =head2 setMaxRedirects(@args)
 
 Execute the RequestOptions::setMaxRedirects playwright routine.
 
 See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setMaxRedirects> for more information.
-
-=head2 setForm(@args)
-
-Execute the RequestOptions::setForm playwright routine.
-
-See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setForm> for more information.
-
-=head2 setMultipart(@args)
-
-Execute the RequestOptions::setMultipart playwright routine.
-
-See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setMultipart> for more information.
-
-=head2 setMethod(@args)
-
-Execute the RequestOptions::setMethod playwright routine.
-
-See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setMethod> for more information.
 
 =head2 setHeader(@args)
 
@@ -217,11 +217,11 @@ Execute the RequestOptions::setHeader playwright routine.
 
 See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setHeader> for more information.
 
-=head2 setQueryParam(@args)
+=head2 setForm(@args)
 
-Execute the RequestOptions::setQueryParam playwright routine.
+Execute the RequestOptions::setForm playwright routine.
 
-See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setQueryParam> for more information.
+See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setForm> for more information.
 
 =head2 setData(@args)
 
@@ -229,11 +229,11 @@ Execute the RequestOptions::setData playwright routine.
 
 See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setData> for more information.
 
-=head2 setIgnoreHTTPSErrors(@args)
+=head2 setMultipart(@args)
 
-Execute the RequestOptions::setIgnoreHTTPSErrors playwright routine.
+Execute the RequestOptions::setMultipart playwright routine.
 
-See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setIgnoreHTTPSErrors> for more information.
+See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setMultipart> for more information.
 
 =head2 setFailOnStatusCode(@args)
 
@@ -247,11 +247,11 @@ Execute the RequestOptions::create playwright routine.
 
 See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-create> for more information.
 
-=head2 setTimeout(@args)
+=head2 setMethod(@args)
 
-Execute the RequestOptions::setTimeout playwright routine.
+Execute the RequestOptions::setMethod playwright routine.
 
-See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setTimeout> for more information.
+See L<https://playwright.dev/api/class-RequestOptions#RequestOptions-setMethod> for more information.
 
 =head2 on(@args)
 

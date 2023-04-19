@@ -44,7 +44,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Item;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 
@@ -124,7 +124,7 @@ sub _parse_query {
     my $query = new Astro::Catalog(
             Format  => 'TST',
             Data => $self->{BUFFER},
-            Origin  => '2MASS Catalogue',
+            Origin  => '2MASS Catalog',
             ReadOpt => {ra_col => 1, dec_col => 2, id_col => 0});
 
     # Grab each star in the catalog and add some value to it
@@ -170,7 +170,7 @@ sub _parse_query {
         my $delta_jmk = (($delta_j ** 2.0) + ($delta_k ** 2.0)) ** (1.0 / 2.0);
         my $delta_hmk = (($delta_h ** 2.0) + ($delta_k ** 2.0)) ** (1.0 / 2.0);
 
-        # fudge accuracy for readable catalogues
+        # fudge accuracy for readable catalogs
         $j_minus_h = sprintf("%.4f", $j_minus_h) if defined $star;
         $j_minus_k = sprintf("%.4f", $j_minus_k) if defined $star;
         $h_minus_k = sprintf("%.4f", $h_minus_k) if defined $star;
@@ -198,7 +198,7 @@ sub _parse_query {
     }
     $catalog->pushstar( @newstars );
 
-    # return the modified catalogue
+    # return the modified catalog
     return $catalog;
 }
 

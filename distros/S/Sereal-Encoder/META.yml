@@ -10,7 +10,7 @@ build_requires:
   File::Spec: '0'
   Hash::Util: '0'
   Scalar::Util: '0'
-  Sereal::Decoder: '5.003'
+  Sereal::Decoder: '5.004'
   Test::Deep: '0'
   Test::Differences: '0'
   Test::LongString: '0'
@@ -20,7 +20,7 @@ configure_requires:
   Devel::CheckLib: '1.16'
   ExtUtils::MakeMaker: '7.0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,11 +31,11 @@ no_index:
     - t
     - inc
 requires:
-  Sereal::Decoder: '5.003'
+  Sereal::Decoder: '5.004'
   XSLoader: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '5.003'
+version: '5.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

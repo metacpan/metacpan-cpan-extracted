@@ -2,6 +2,27 @@ CHANGE LOG
 ==========
 
 
+2023-04-18 - v0.46.0
+--------------------
+
+### Added
+  - now supports non 64bit architectures, using BigInt internally
+
+### Changed
+  - removing non-transportable (indirect) dependencies
+
+### Minor updates
+  - typos
+  - MANIFEST, includes newer tests
+
+
+2023-04-12 - v0.45.1
+--------------------
+
+### Changed
+  - remove (TODO) for the error attribute
+
+
 2023-04-12 - v0.45.0
 --------------------
 

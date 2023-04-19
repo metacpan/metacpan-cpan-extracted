@@ -35,7 +35,7 @@ is($stars[4]->y, 52, "star 4 y position is 52");
 my $fh = new File::Temp;
 my $tempfile = $fh->filename;
 ok($cat->write_catalog(Format => 'XY', File => $tempfile),
-    "Writing catalogue to disk");
+    "Writing catalog to disk");
 
 my $newcat = new Astro::Catalog(Format => 'XY', File => $tempfile);
 isa_ok($newcat, "Astro::Catalog");

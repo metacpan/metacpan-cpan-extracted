@@ -46,7 +46,7 @@ my $file = File::Spec->catfile( "data", "m31.fit" );
 # Get FITS Header
 # ---------------
 
-my $header = new Astro::FITS::Header::CFITSIO( File => $file );
+my $header = new Astro::FITS::Header::CFITSIO( File => $file, ReadOnly => 1 );
 my @cards = $header->cards();
 
 # Make FitsChan

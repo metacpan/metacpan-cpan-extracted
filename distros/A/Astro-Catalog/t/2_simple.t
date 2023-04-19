@@ -54,7 +54,7 @@ exit;
 __DATA__
 # Catalog written automatically by class Astro::Catalog::IO::Simple
 # on date Sun Jul 27 03:37:59 2003UT
-# Origin of catalogue: <UNKNOWN>
+# Origin of catalog: <UNKNOWN>
 A  09 55 39.00  +60 07 23.60 B1950 # This is a comment
 B  10 44 57.00  +12 34 53.50 J2000 # This is another comment
 C  12:33:52    + 12:28:30

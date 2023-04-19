@@ -32,7 +32,7 @@ use DateTime::Format::ISO8601;
 use POSIX qw/log10/;
 use base qw/Astro::Catalog::IO::Binary/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =begin __PUBLIC_METHODS__
@@ -70,7 +70,7 @@ constructor.
 =item B<_read_catalog>
 
 Parses the binary FITS table and returns a new C<Astro::Catalog> object
-containing the catalogue entries.
+containing the catalog entries.
 
     $cat = Astro::Catalog::IO::LCOGTFITSTable->_read_catalog($whatever);
 
@@ -110,7 +110,7 @@ date and time will be used for the flux timestamps.
 There are optional named parameters. These are case-sensitive, and are:
 
 =item Filter - An Astro::WaveBand object denoting the waveband that
-the catalogue values were measured in.
+the catalog values were measured in.
 
 =cut
 

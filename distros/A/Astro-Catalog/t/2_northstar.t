@@ -1,7 +1,7 @@
 #!perl
 
-# Make sure we can read a NorthStar format catalogue. In this case
-# it is the pointing catalogue.
+# Make sure we can read a NorthStar format catalog. In this case
+# it is the pointing catalog.
 
 # Author: Tim Jenness (tjenness@cpan.org)
 # Copyright (C) 2007 Particle Physics and Astronomy Research Council
@@ -12,7 +12,7 @@ use Test::More tests => 4;
 
 require_ok('Astro::Catalog');
 
-# Create a new catalogue from the DATA handle
+# Create a new catalog from the DATA handle
 my $cat = new Astro::Catalog(Format => 'Northstar', Data => \*DATA);
 
 isa_ok($cat, "Astro::Catalog");

@@ -2,7 +2,7 @@ package Astro::Catalog::IO::SExtractor;
 
 =head1 NAME
 
-Astro::Catalog::IO::SExtractor - SExtractor output catalogue I/O for
+Astro::Catalog::IO::SExtractor - SExtractor output catalog I/O for
 Astro::Catalog
 
 =head1 SYNOPSIS
@@ -11,7 +11,7 @@ Astro::Catalog
 
 =head1 DESCRIPTION
 
-This class provides read and write methods for catalogues written by
+This class provides read and write methods for catalogs written by
 SExtractor, as long as they were written in ASCII_HEAD format. The
 methods are not public and should, in general, only be called from the
 C<Astro::Catalog> C<read_catalog> and C<write_catalog> methods.
@@ -35,7 +35,7 @@ use Astro::Fluxes;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -49,13 +49,13 @@ constructor.
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog> object
-containing the catalogue entries.
+Parses the catalog lines and returns a new C<Astro::Catalog> object
+containing the catalog entries.
 
     $cat = Astro::Catalog::IO::SExtractor->_read_catalog(\@lines);
 
-The catalogue lines must include column definitions as written using
-the 'ASCII_HEAD' catalogue type from SExtractor. This implementation
+The catalog lines must include column definitions as written using
+the 'ASCII_HEAD' catalog type from SExtractor. This implementation
 currently only supports reading information from the following output
 parameters:
 
@@ -121,18 +121,18 @@ standard coordinates.
 
 For the flux and magnitude values, a separate C<Astro::Flux> object is
 set up for each type with the flux type() equal to the SExtractor
-keyword. For example, if the MAG_AUTO keyword exists in the catalogue,
+keyword. For example, if the MAG_AUTO keyword exists in the catalog,
 then the output C<Astro::Catalog::Item> objects will have an
 C<Astro::Flux> object of the type 'MAG_AUTO' in it.
 
 There are optional named parameters. These are case-sensitive, and are:
 
 =item Filter - An Astro::WaveBand object denoting the waveband that
-the catalogue values were measured in.
+the catalog values were measured in.
 
 =item Quality - If set, then only objects that have an extraction flag
 in the FLAGS column equal to this value will be used to generate the
-output catalogue. Otherwise, all objects will be used.
+output catalog. Otherwise, all objects will be used.
 
 =cut
 
@@ -142,7 +142,7 @@ sub _read_catalog {
     my %args = @_;
 
     if (ref( $lines ) ne 'ARRAY') {
-        croak "Must supply catalogue contents as a reference to an array";
+        croak "Must supply catalog contents as a reference to an array";
     }
 
     if ((defined $args{'Filter'}) &&
@@ -442,7 +442,7 @@ sub _read_catalog {
         $line =~ s/^\s+//;
         next if length($line) == 0;
 
-        # Form an array of the fields in the catalogue.
+        # Form an array of the fields in the catalog.
         my @fields = split /\s+/, $line;
 
         # Don't deal with this object if our requested quality is not -1
@@ -731,7 +731,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Create an output catalogue in the SExtractor ASCII_HEAD format and
+Create an output catalog in the SExtractor ASCII_HEAD format and
 return the lines in an array.
 
     $ref = Astro::Catalog::IO::SExtractor->_write_catalog($catalog);

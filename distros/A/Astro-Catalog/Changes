@@ -1,99 +1,103 @@
+Revision history for Astro::Catalog
 
-Release Notes
-=============
+4.37 2023-04-18
 
-For more detail please see the commit log at
+  - Tk::AstroCatalog window now resizable.
+  - JCMT format updated with addition of proper motion and parallax.
+  - More consistent spelling of catalog.
 
-  https://github.com/timj/perl-Astro-Catalog
+4.36 2021-10-11
 
-v4.36
+  - Added IO modules for VEX, Hedwig and JCMT_OT_SC formats.
+  - For Vizier query, generate combined c.rm parameter.
+  - Use Astro::Catalog::Item internally instead of Astro::Catalog::Star.
+  - Added catalog_convert script to convert catalogs between formats.
 
-  + Added IO modules for VEX, Hedwig and JCMT_OT_SC formats.
-  + For Vizier query, generate combined c.rm parameter.
-  + Use Astro::Catalog::Item internally instead of Astro::Catalog::Star.
-  + Added catalog_convert script to convert catalogs between formats.
+4.35 2020-04-28
 
-v4.35
-
-  + Changed the Astro::Catalog::IO::TST pattern match used to identify
+  - Changed the Astro::Catalog::IO::TST pattern match used to identify
     magnitude error columns to allow multiple characters in the filter name
     (with thanks to Paul Leyland - CPAN bug #132433).
-  + Suppressed some debugging output (unless $DEBUG is set).
+  - Suppressed some debugging output (unless $DEBUG is set).
 
-v4.34
+4.34 2018-07-05
 
-  + Updated reference coordinates for 4_sesame.t test.
+  - Updated reference coordinates for 4_sesame.t test.
 
-v4.33
+4.33 2018-02-07
 
-  + Updated the test scripts to work with the latest release
+  - Updated the test scripts to work with the latest release
     of Astro::Coords (0.19).
 
-v4.32
+4.32 2018-01-31
 
-  + Updated skycat.cfg file.
-  + Updated RITMatch for the case of multiple filters and renamed
+  - Updated skycat.cfg file.
+  - Updated RITMatch for the case of multiple filters and renamed
     the write_catalog "waveband" option to "filter".
-  + Adjusted JCMT catalog formatting to match the current catalog.
-  + Skipped 2_jcmt.t's test of the HOLO source in the JCMT catalog.
-  + Now skip test 4_skycat_gsc.t as service has been decommissioned.
-  + Updated reference coordinates for 4_sesame.t test.
+  - Adjusted JCMT catalog formatting to match the current catalog.
+  - Skipped 2_jcmt.t's test of the HOLO source in the JCMT catalog.
+  - Now skip test 4_skycat_gsc.t as service has been decommissioned.
+  - Updated reference coordinates for 4_sesame.t test.
 
-v4.31
+4.31 2014-04-01
 
-  + Fix test 4_skycat_gsc.t for users who have a SkyCat configuration
+  - Fix test 4_skycat_gsc.t for users who have a SkyCat configuration
     file which does not include "gsc@eso".
 
-v4.30
+4.30 2014-01-31
 
-  + Catalogs can now be sorted by distance in azimuth.
+  - Catalogs can now be sorted by distance in azimuth.
 
-v4.28
+4.29 2013-11-27
 
-  + Mercury has been added to the list of planets to be included
+  - JCMT test script updated for the addition of Mercury.
+
+4.28 2013-11-27
+
+  - Mercury has been added to the list of planets to be included
     in the JCMT catalog.
 
-v4.27
+4.27 2013-06-05
 
-  + Test scripts skip query tests in the event of network problems.
+  - Test scripts skip query tests in the event of network problems.
 
-v4.26
+4.26 2013-06-04
 
-  + The search button in Tk::AstroCatalog is now operational.
-  + Minor updates to documentation.
-  + Fixes for SkyCat GSC test due to hash key randomization.
+  - The search button in Tk::AstroCatalog is now operational.
+  - Minor updates to documentation.
+  - Fixes for SkyCat GSC test due to hash key randomization.
 
-v4.25
+4.25 2012-10-12
 
-  + Tk::AstroCatalog can now be told to display additional columns
+  - Tk::AstroCatalog can now be told to display additional columns
     in the widget.
 
-v4.24
+4.24 2012-07-06
 
-  + recommend that Astro::FITS::CFITSIO is installed rather than
+  - recommend that Astro::FITS::CFITSIO is installed rather than
     requiring it. We can't guarantee that people have the CFITSIO
     library installed.
 
-v4.23
+4.23 2012-07-05
 
-  + Tk::AstroCatalog now calls the onDestroy method correctly
+  - Tk::AstroCatalog now calls the onDestroy method correctly
     when the widget is closed from the window manager (Graham Bell)
 
-v4.22
+4.22 2012-06-20
 
-  + Use File::Temp for temporary files in tests.
-  + Can now take IO::Handle objects for read_catalog and
+  - Use File::Temp for temporary files in tests.
+  - Can now take IO::Handle objects for read_catalog and
     write_catalog.
 
-v4.21
+4.21 2012-06-18
 
-  + Remove code that relies on CVS $Revision$ tags. Those
+  - Remove code that relies on CVS $Revision$ tags. Those
     modules have now been updated to v2.00 to ensure that they
     are seen as new.
 
-v4.2
+4.2 2012-06-18
 
-  + The MPC web service seems to have changed so MPC is not functioning
+  - The MPC web service seems to have changed so MPC is not functioning
     in this release.
 
   - Added FITSTable, ASSM, NorthStar, Binary, RITMatch, XY

@@ -1,6 +1,6 @@
 #!perl
 
-# Test UKIRT Bright Standards catalogue format read
+# Test UKIRT Bright Standards catalog format read
 
 # Astro::Catalog test harness
 use Test::More tests => 5;

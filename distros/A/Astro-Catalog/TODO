@@ -24,4 +24,4 @@ To Do (16th June 2004)
 
  * Change Astro::Catalog::Query::Vizier to use VOTables for easier parsing?
 
- * Add further catalogue query classes?
+ * Add further catalog query classes?

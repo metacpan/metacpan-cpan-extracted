@@ -2,7 +2,7 @@ package Astro::Catalog::IO::RITMatch;
 
 =head1 NAME
 
-Astro::Catalog::IO::RITMatch - Catalogue I/O for Astro::Catalog for
+Astro::Catalog::IO::RITMatch - Catalog I/O for Astro::Catalog for
 Michael Richmond's 'match' program
 
 =head1 SYNOPSIS
@@ -12,7 +12,7 @@ Michael Richmond's 'match' program
 
 =head1 DESCRIPTION
 
-This class provides read and write methods for catalogues in Michael
+This class provides read and write methods for catalogs in Michael
 Richmond's 'match' application's input and output file format. The
 methods are not public and should, in general only be called from the
 C<Astro::Catalog> C<write_catalog> and C<read_catalog> methods.
@@ -34,7 +34,7 @@ use Number::Uncertainty;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -45,8 +45,8 @@ our $DEBUG = 0;
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog> object
-containing the catalogue entries.
+Parses the catalog lines and returns a new C<Astro::Catalog> object
+containing the catalog entries.
 
     $cat = Astro::Catalog::IO::RITMatch->_read_catalog(\@lines, %options);
 
@@ -59,7 +59,7 @@ Currently supported options are:
 Either an Astro::WaveBand object or a string that can
 be used by the Filter method of the Astro::WaveBand module when
 constructing a new object. This option describes the waveband for the
-magnitudes in the catalogue. If this is not defined, then the waveband
+magnitudes in the catalog. If this is not defined, then the waveband
 will default to the near infrared 'J' band.
 
 =back
@@ -71,7 +71,7 @@ sub _read_catalog {
     my $lines = shift;
 
     if (ref($lines) ne 'ARRAY') {
-        croak "Must supply catalogue contents as a reference to an array";
+        croak "Must supply catalog contents as a reference to an array";
     }
 
     # Retrieve options.
@@ -123,7 +123,7 @@ sub _read_catalog {
             Fluxes  => $fluxes,
         );
 
-        # Push it into the catalogue.
+        # Push it into the catalog.
         $catalog->pushstar($item);
     }
 
@@ -135,7 +135,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Create an output catalogue in the 'match' format and return the lines
+Create an output catalog in the 'match' format and return the lines
 in an array.
 
     $ref = Astro::Catalog::IO::RITMatch->_write_catalog($catalog, %options);
@@ -153,7 +153,7 @@ to 'mag'.
 
 =item filter
 
-reference filter to select from catalogue. See flux()
+reference filter to select from catalog. See flux()
 method in Astro::Flux. This allows a specific filter to be selected
 for output. Argument can be a string or Astro::Waveband object.
 
@@ -170,7 +170,7 @@ sub _write_catalog {
     my $catalog = shift;
 
     if (! UNIVERSAL::isa($catalog, "Astro::Catalog")) {
-        croak "Must supply catalogue as an Astro::Catalog object";
+        croak "Must supply catalog as an Astro::Catalog object";
     }
 
     # Get options.
@@ -195,7 +195,7 @@ sub _write_catalog {
     # grab the first one. We might get a "J" this time but previously
     # got "R".
 
-    # Loop through the items in the catalogue.
+    # Loop through the items in the catalog.
     foreach my $item ($catalog->stars) {
         my $x = $item->x;
         my $y = $item->y;

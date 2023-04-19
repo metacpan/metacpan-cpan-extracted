@@ -2,7 +2,7 @@ package Astro::Catalog::Item::Morphology;
 
 =head1 NAME
 
-Astro::Catalog::Item::Morphology - Information about a star's morphology.
+Astro::Catalog::Item::Morphology - Information about a star's morphology
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ use Number::Uncertainty;
 
 use warnings::register;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =head1 METHODS
 

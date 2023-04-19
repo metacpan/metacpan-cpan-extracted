@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::Synd::App;
-$XML::Grammar::Fortune::Synd::App::VERSION = '0.0215';
+$XML::Grammar::Fortune::Synd::App::VERSION = '0.0400';
 use strict;
 use warnings;
 
@@ -117,7 +117,7 @@ application to syndicate FortuneXML as Atom/RSS.
 
 =head1 VERSION
 
-version 0.0215
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2023 by Shlomi Fish.
 
 This is free software, licensed under:
 

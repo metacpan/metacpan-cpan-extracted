@@ -1,5 +1,13 @@
 Revision history for Module::Build::Tiny
 
+0.043     2023-04-19 02:05:14+02:00 Europe/Amsterdam
+          - Fix manification test for perls without man paths
+
+0.042     2023-04-18 23:32:40+02:00 Europe/Amsterdam
+          - Restore manpage generation
+          - Add include/ to include paths
+          - Compile all .c files in src/
+
 0.041     2023-04-17 16:03:06+02:00 Europe/Amsterdam
           - Released without changes from 0.040
 

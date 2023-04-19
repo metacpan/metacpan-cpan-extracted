@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::Synd;
-$XML::Grammar::Fortune::Synd::VERSION = '0.0215';
+$XML::Grammar::Fortune::Synd::VERSION = '0.0400';
 use warnings;
 use strict;
 
@@ -8,15 +8,18 @@ use 5.008;
 
 use parent 'Class::Accessor';
 
-use YAML::XS        (qw( DumpFile LoadFile ));
-use Heap::Elem::Ref (qw(RefElem));
-use Heap::Binary;
-use XML::Feed;
-use XML::Grammar::Fortune;
-use DateTime::Format::W3CDTF;
-use XML::Grammar::Fortune::Synd::Heap::Elem;
+use Path::Tiny qw/ path tempdir tempfile cwd /;
 
-use File::Spec;
+use File::Update  qw( write_on_change_no_utf8 );
+use YAML::XS        (qw( Dump DumpFile LoadFile ));
+use Heap::Elem::Ref (qw(RefElem));
+use Heap::Binary ();
+use XML::Feed ();
+use XML::Grammar::Fortune ();
+use DateTime::Format::W3CDTF ();
+use XML::Grammar::Fortune::Synd::Heap::Elem ();
+
+use File::Spec ();
 
 __PACKAGE__->mk_accessors(
     qw(
@@ -152,7 +155,10 @@ sub calc_feeds
     {
         push @recent_ids, $id_obj;
     }
-    DumpFile( $scripts_hash_fn_out, $persistent_data );
+    write_on_change_no_utf8(
+        path( $scripts_hash_fn_out),
+        \(Dump($persistent_data) ),
+    );
 
     my @feed_formats = (qw(Atom RSS));
 
@@ -314,7 +320,7 @@ XML-Grammar-Fortune files.
 
 =head1 VERSION
 
-version 0.0215
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -465,7 +471,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2023 by Shlomi Fish.
 
 This is free software, licensed under:
 

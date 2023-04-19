@@ -21,7 +21,7 @@ use vars qw/$VERSION/;
 # Load Tk module
 use Tk;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 =head1 EXTERNAL MODULES
 

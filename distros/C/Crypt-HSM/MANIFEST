@@ -15,7 +15,13 @@ include/pkcs11t.h
 include/refcount.h
 lib/Crypt/HSM.pm
 lib/Crypt/HSM.xs
+lib/Crypt/HSM/Decrypt.pm
+lib/Crypt/HSM/Digest.pm
+lib/Crypt/HSM/Encrypt.pm
 lib/Crypt/HSM/Session.pm
+lib/Crypt/HSM/Sign.pm
+lib/Crypt/HSM/Stream.pm
+lib/Crypt/HSM/Verify.pm
 lib/Crypt/ppport.h
 t/00-compile.t
 t/softhsm.t

@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "ExtUtils::CppGuess" : "0.15",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -39,6 +40,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

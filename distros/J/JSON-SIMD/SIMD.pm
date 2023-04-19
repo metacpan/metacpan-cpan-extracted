@@ -88,7 +88,7 @@ package JSON::SIMD;
 
 use common::sense;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our $JSON_XS_VERSION = '4.03';
 our @ISA = qw(Exporter);
 
@@ -145,6 +145,29 @@ wrapper or compatibity modules, you have C<use> it explicitly.
 It is the intent of JSON::SIMD's author to keep it compatible with JSON::XS
 to the extent possible. Future bugfixes to JSON::XS will likely be applied
 here, too.
+
+=head3 REQUIREMENTS
+
+Due to having simdjson as a dependency, a recent, C++11-capable compiler 
+is required to compile and install this module, and a 64-bit CPU is required
+to run it. The following implementations are available (taken from simdjson's
+documentation):
+
+=over
+
+=item    icelake: AVX-512F, AVX-512VBMI, etc.
+
+=item    haswell: AVX2 (2013 Intel Haswell or later)
+
+=item    westmere: SSE4.2 (2010 Westmere or later).
+
+=item    arm64: 64-bit ARMv8-A NEON
+
+=item    ppc64: 64-bit POWER8 and POWER9 with VSX and ALTIVEC extensions.
+
+=item    fallback: A generic implementation that runs on any 64-bit processor.
+
+=back
 
 =head1 FUNCTIONAL INTERFACE
 
@@ -1139,6 +1162,10 @@ Note that precision is not accuracy - binary floating point values cannot
 represent most decimal fractions exactly, and when converting from and to
 floating point, JSON::SIMD only guarantees precision up to but not including
 the least significant bit.
+
+The simdjson decoder always decodes floating point numbers as IEEE-754 doubles,
+which may lead to a perceived loss of precision if Perl was built to use
+long doubles.
 
 =item true, false
 

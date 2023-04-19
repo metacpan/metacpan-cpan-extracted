@@ -1,5 +1,8 @@
 Revision history for Crypt-HSM
 
+0.007     2023-04-19 16:32:09+02:00 Europe/Amsterdam
+          - Add streaming interfaces
+
 0.006     2023-04-09 12:16:50+02:00 Europe/Amsterdam
           - Further improve refcounting on compilers without atomics
           - Stricten up pointer usage

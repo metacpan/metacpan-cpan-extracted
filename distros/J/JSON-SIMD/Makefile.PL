@@ -1,5 +1,9 @@
 use 5.008003;
 use ExtUtils::MakeMaker;
+use ExtUtils::CppGuess;
+ 
+my $guess = ExtUtils::CppGuess->new;
+my %cxx_options = $guess->makemaker_options;
 
 #use Canary::Stability JSON::SIMD => 1, 5.008003;
 
@@ -16,9 +20,9 @@ WriteMakefile(
        common::sense     => 0,
        Types::Serialiser => 0,
     },
-    CONFIGURE_REQUIRES => { ExtUtils::MakeMaker => 6.52 },
+    CONFIGURE_REQUIRES => { ExtUtils::MakeMaker => 6.52, ExtUtils::CppGuess => 0.15 },
     OBJECT => '$(O_FILES)',
-    LD => 'g++',
+    LD => $cxx_options{CC},
     OPTIMIZE => '-O3',
     CCFLAGS => "$Config::Config{ccflags} -DSIMDJSON_EXCEPTIONS=0 -DNDEBUG",
     META_MERGE => {

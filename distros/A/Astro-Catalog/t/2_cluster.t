@@ -12,19 +12,19 @@ BEGIN {
 my $p = (-d "t" ? "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
 
-# Read in the catalogue from the DATA block
+# Read in the catalog from the DATA block
 my $cat = new Astro::Catalog(Format => 'Cluster', Data => \*DATA);
 
 # Is it an Astro::Catalog object?
 isa_ok($cat, "Astro::Catalog");
 
-# Write the catalogue out to disk.
+# Write the catalog out to disk.
 my $tempfile = File::Temp->new();
 ok($cat->write_catalog(
             Format => 'Cluster',
             File   => $tempfile,
             ),
-        "Writing catalogue to disk" );
+        "Writing catalog to disk" );
 
 # Read it back in...
 my $newcat = new Astro::Catalog(
@@ -35,7 +35,7 @@ my $newcat = new Astro::Catalog(
 # ...check to make sure it's an Astro::Catalog object...
 isa_ok($newcat, "Astro::Catalog");
 
-# ...and that it's the same as the old catalogue.
+# ...and that it's the same as the old catalog.
 compare_catalog($cat, $newcat);
 
 # Pop off the first item.

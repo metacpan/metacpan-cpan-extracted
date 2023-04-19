@@ -2,7 +2,7 @@ package Astro::Catalog::IO::ASCII;
 
 =head1 NAME
 
-Astro::Catalog::IO::ASCII - base class for ASCII-based catalogues.
+Astro::Catalog::IO::ASCII - base class for ASCII-based catalogs
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ Astro::Catalog::IO::ASCII - base class for ASCII-based catalogues.
 
 =head1 DESCRIPTION
 
-This class provides a wrapper for reading ASCII-based catalogues
+This class provides a wrapper for reading ASCII-based catalogs
 into C<Astro::Catalog> objects. The method should, in general, only
 be called from the C<Astro::Catalog> C<configure> method.
 
@@ -21,7 +21,7 @@ use warnings::register;
 use Carp;
 use strict;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -37,7 +37,7 @@ Read the catalog.
 Takes a hash as argument with the list of keywords. Supported options
 are:
 
-    Data => Contents of catalogue, either as a scalar variable,
+    Data => Contents of catalog, either as a scalar variable,
             reference to array of lines or reference to glob (file handle).
             This key is used in preference to 'File' if both are present.
 
@@ -46,7 +46,7 @@ are:
             for the class is used.
 
     ReadOpt => Reference to hash of options to be forwarded onto the
-               format specific catalogue reader. See the IO documentation
+               format specific catalog reader. See the IO documentation
                for details.
 
 The options are case-insensitive.
@@ -96,13 +96,13 @@ sub read_catalog {
         else {
             # Need to ask for the default file
             $file = $class->_default_file() if $class->can('_default_file');
-            croak "Unable to read catalogue since no file specified and no default known."
+            croak "Unable to read catalog since no file specified and no default known."
                 unless defined $file;
         }
 
         # Open the file
         my $CAT;
-        croak("Astro::Catalog - Cannot open catalogue file $file: $!")
+        croak("Astro::Catalog - Cannot open catalog file $file: $!")
             unless open($CAT, "< $file");
 
         # read from file
@@ -120,6 +120,88 @@ sub read_catalog {
     my $catalog = $class->_read_catalog(\@lines, %$readopt);
 
     return $catalog;
+}
+
+=item B<write_catalog>
+
+Write the catalog.
+
+    $ioclass->write_catalog($catalog, %args);
+
+Takes a hash as argument with the list of keywords. Supported options
+are:
+
+    File => File name for catalog on disk.
+
+The options are case-insensitive.  Other options are forwarded
+to the format-specific catalog writer.
+
+=cut
+
+sub write_catalog {
+    my $class = shift;
+    my $catalog = shift;
+
+    my %args = @_;
+    %args = Astro::Catalog::_normalize_hash(%args);
+
+    my $file = $args{file};
+    delete $args{file};
+
+    my $lines = $class->_write_catalog($catalog, %args);
+
+    # Play it defensively - make sure we add the newlines
+    chomp @$lines;
+
+    # If we have a reference then we do not need to open or close
+    # files - simpler to deal with each case in turn. This has the
+    # side effect of repeating the join() in 3 separate places.
+    # Probably better than creating a large scalar for the one time
+    # when we do not need it.
+
+    my $retval = 1;
+    if (ref($file)) {
+        # If we are storing in a reference to a scalar or reference
+        # to an array, just do the copy and return early. We do not
+        if (ref($file) eq 'SCALAR') {
+            # Copy single string to scalar
+            $$file = join("\n", @$lines) ."\n";
+        }
+        elsif (ref($file) eq 'ARRAY') {
+            # Just copy the lines into the output array
+            @$file = @$lines;
+        }
+        elsif (ref($file) eq 'GLOB' || $file->can("print") ) {
+            # GLOB - so print the full string to the file handle and flush
+            $retval = print $file join("\n", @$lines) ."\n";
+            autoflush $file 1; # We need to make sure we write the lines
+        }
+        else {
+            croak "Can not write catalog to reference of type ".
+                ref($file)."\n";
+        }
+    }
+    else {
+        # A file name
+        my $status = open my $fh, ">$file";
+        unless ($status) {
+            $catalog->errstr(__PACKAGE__ .": Error creating catalog file $file: $!" );
+            return;
+        }
+
+        # write to file
+        $retval = print $fh join("\n", @$lines) ."\n";
+
+        # close file
+        $status = close($fh);
+        unless ($status) {
+            $catalog->errstr(__PACKAGE__.": Error closing catalog file $file: $!");
+            return;
+        }
+    }
+
+    # everything okay
+    return $retval;
 }
 
 1;

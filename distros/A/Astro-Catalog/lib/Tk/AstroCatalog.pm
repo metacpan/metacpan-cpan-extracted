@@ -33,7 +33,7 @@ my @COLOR_LIST = (
     '#ff00ff', '#ffffff', '#ff5555', '#55ff55', '#55ffff', '#ffff55');
 my $COLOR_INDEX = 0;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 # Kluge - this is the format of the catalog to be read
 # Needs to be given as an option on the FileSelect widget.
@@ -418,7 +418,7 @@ sub makeCatalog {
     my $Top = $self->Toplevel;
     $Top->geometry('+600+437');
     $Top->title('Source Plot: Catalog Window');
-    $Top->resizable(0, 0);
+    $Top->resizable(1, 1);
 
     print "made the catalog window\n" if $locateBug;
 
@@ -427,13 +427,13 @@ sub makeCatalog {
         -relief => 'groove',
         -borderwidth => 2,
         -width => 50
-    )->pack(-padx => 10, -fill => 'x', -ipady => 3, -pady => 10);
+    )->grid(-column => 0, -row => 0, -padx => 3, -pady => 3, -sticky => 'nsew');
 
     # create the header
     my $headFrame = $topFrame->Frame(
         -relief => 'flat',
         -borderwidth => 2
-    )->grid(-row => 0, -sticky => 'nsew', -ipadx => 3);
+    )->grid(-row => 0, -sticky => 'nsew');
     my $head = $topFrame->Text(
         -wrap       => 'none',
         -relief     => 'flat',
@@ -442,7 +442,7 @@ sub makeCatalog {
         -height     => 1,
         -font       => '-*-Courier-Medium-R-Normal--*-120-*-*-*-*-*-*',
         -takefocus  => 0
-    )->grid(-sticky => 'ew', -row => 0);
+    )->grid(-sticky => 'nsew', -row => 0);
     my $title = sprintf "%5s  %-16s  %-12s  %-13s  %-4s %-3s %-3s %-5s %s%s",
        'Index', 'Name', 'Ra', 'Dec', 'Epoc', 'Az', 'El', 'Dist',
        $self->{'CustomHeadings'}, "Comment";
@@ -469,9 +469,12 @@ sub makeCatalog {
         -textvariable => $self->RefLabel, -width => 64,
     )->grid(-sticky=>'nsew',-row=>2);
 
+    $topFrame->gridRowconfigure(1, -weight => 1);
+    $topFrame->gridColumnconfigure(0, -weight => 1);
+
     # Create button frame
-    my $buttonF2 = $Top->Frame->pack(-padx => 10, -fill => 'x');
-    my $buttonF = $Top->Frame->pack(-padx => 10, -pady => 10);
+    my $buttonF2 = $Top->Frame->grid(-column => 0, -row => 1, -pady => 3);
+    my $buttonF = $Top->Frame->grid(-column => 0, -row => 2, -pady => 3);
 
     # create the Done button if we are not transient
     unless ($self->Transient) {
@@ -589,7 +592,7 @@ sub makeCatalog {
             $catEnt->delete('0', 'end');
             $catEnt->insert('0', $file);
 
-            # Get the current catalogue properties [should be a sub]
+            # Get the current catalog properties [should be a sub]
             my $oldcat = $self->Catalog;
             my ($refc, $canobs);
             if (defined $oldcat) {
@@ -622,7 +625,7 @@ sub makeCatalog {
         -width => 37
     )->pack(-side => 'left', -padx => 10);
     $catEnt->bind('<KeyPress-Return>' => sub {
-        # Get the current catalogue properties [should be a sub]
+        # Get the current catalog properties [should be a sub]
         my $oldcat = $self->Catalog;
         my ($refc, $canobs);
         if (defined $oldcat) {
@@ -650,6 +653,9 @@ sub makeCatalog {
         $self->fillWithSourceList('full');
     });
     $catEnt->insert(0, $self->file);
+
+    $Top->gridRowconfigure(0, -weight => 1);
+    $Top->gridColumnconfigure(0, -weight => 1);
 
     print "made it past all the buttons and just about to fill...\n" if $locateBug;
     # if we do not have a catalog yet create one

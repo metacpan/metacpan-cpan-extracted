@@ -1,27 +1,32 @@
 #! perl
 
+use v5.10;
 use strict;
 use warnings;
 
 use alienfile;
 use Path::Tiny;
 
-plugin PkgConfig => 'xpa';
+our $VERSION = 'v2.1.20.0';
 
-probe [ 'pkg-config --exists xpa' ];
+use constant PACKAGE_VERSION => '2.1.20';
+use constant PACKAGE_NAME => 'xpa';
+
+plugin 'Gather::IsolateDynamic';
+
+plugin PkgConfig => ( pkg_name => PACKAGE_NAME, );
 
 share {
-    start_url 'https://github.com/ericmandel/xpa/releases/latest';
+    start_url 'src/xpa-2.1.20.tar.gz';
 
     plugin Download => (
-       filter  => qr/(?:\d+\.\d+\.\d+).tar.gz$/,
-       version => qr/(\d+\.\d+\.\d+).tar.gz$/,
+       filter  => qr/(?:\d+[.]\d+[.]\d+)[.]tar[.]gz$/,
+        version => qr/(\d+[.]\d+[.]\d+)[.]tar[.]gz$/,
     );
 
     plugin Extract => 'tar.gz';
 
     patch sub {
-        my ( $build ) = @_;
 
         # Makefile.in uses INSTALL_ROOT instead of DESTDIR
         path( 'Makefile.in' )->edit_lines(
@@ -32,15 +37,11 @@ share {
     };
 
     plugin 'Build::Autoconf';
-    build [
-           '%{configure}',
-           '%{make} CFLAGS=-fPIC',
-           '%{make} install',
-    ];
+    build [ '%{configure}', '%{make} CFLAGS=-fPIC', '%{make} install' ];
 };
 
 gather [
-  [ 'pkg-config --modversion libcxcregion', \'%{.runtime.version}' ],
-  [ 'pkg-config --cflags     libcxcregion', \'%{.runtime.cflags}'  ],
-  [ 'pkg-config --libs       libcxcregion', \'%{.runtime.libs}'    ],
+    [ 'pkg-config --modversion xpa', \'%{.runtime.version}' ],
+    [ 'pkg-config --cflags     xpa', \'%{.runtime.cflags}' ],
+    [ 'pkg-config --libs       xpa', \'%{.runtime.libs}' ],
 ];

@@ -250,7 +250,7 @@ my $catalog2 = new Astro::Catalog(Stars  => \@star2);
 
 isa_ok($catalog2, "Astro::Catalog");
 
-# Compare catalogues
+# Compare catalogs
 
 compare_catalog($read_catalog, $catalog2);
 

@@ -28,7 +28,7 @@ use Astro::Fluxes;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -43,7 +43,7 @@ call them from outside that module.
 
 =item B<_read_catalog>
 
-Parses a reference to an array containing a simply formatted catalogue
+Parses a reference to an array containing a simply formatted catalog
 
     $catalog = Astro::Catalog::IO::ASSM->_read_catalog(\@lines);
 

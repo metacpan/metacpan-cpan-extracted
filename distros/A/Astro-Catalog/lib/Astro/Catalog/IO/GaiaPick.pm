@@ -2,7 +2,7 @@ package Astro::Catalog::IO::GaiaPick;
 
 =head1 NAME
 
-Astro::Catalog::IO::GaiaPick - Catalogue reader for GAIA Pick Object files
+Astro::Catalog::IO::GaiaPick - Catalog reader for GAIA Pick Object files
 
 =head1 SYNOPSIS
 
@@ -10,8 +10,8 @@ Astro::Catalog::IO::GaiaPick - Catalogue reader for GAIA Pick Object files
 
 =head1 DESCRIPTION
 
-This class provides a read method for catalogues in the GAIA Pick
-Object catalogue format. This format is written by the Starlink GAIA
+This class provides a read method for catalogs in the GAIA Pick
+Object catalog format. This format is written by the Starlink GAIA
 application when a user requests the result of a "Pick Object" are to
 be saved. The method is not public and should, in general, only be
 called from the C<Astro::Catalog> C<read_catalog> method.
@@ -31,7 +31,7 @@ use Astro::Coords;
 use base qw/Astro::Catalog::IO::ASCII/;
 
 our $DEBUG = 0;
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 # Named Constants for column positions
 use constant NAME => 0;
@@ -67,7 +67,7 @@ sub _read_catalog {
     my $class = shift;
     my $lines = shift;
 
-    # Local copy of array [may be a problem for very large catalogues]
+    # Local copy of array [may be a problem for very large catalogs]
     my @lines = @$lines;
 
     # Remove the first line from the array

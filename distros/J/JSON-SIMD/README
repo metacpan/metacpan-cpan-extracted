@@ -122,6 +122,19 @@ SIMDJSON
     JSON::XS to the extent possible. Future bugfixes to JSON::XS will likely
     be applied here, too.
 
+   REQUIREMENTS
+    Due to having simdjson as a dependency, a recent, C++11-capable compiler
+    is required to compile and install this module, and a 64-bit CPU is
+    required to run it. The following implementations are available (taken
+    from simdjson's documentation):
+
+    icelake: AVX-512F, AVX-512VBMI, etc.
+    haswell: AVX2 (2013 Intel Haswell or later)
+    westmere: SSE4.2 (2010 Westmere or later).
+    arm64: 64-bit ARMv8-A NEON
+    ppc64: 64-bit POWER8 and POWER9 with VSX and ALTIVEC extensions.
+    fallback: A generic implementation that runs on any 64-bit processor.
+
 FUNCTIONAL INTERFACE
     The following convenience methods are provided by this module. They are
     exported by default:
@@ -1051,6 +1064,10 @@ MAPPING
         cannot represent most decimal fractions exactly, and when converting
         from and to floating point, JSON::SIMD only guarantees precision up
         to but not including the least significant bit.
+
+        The simdjson decoder always decodes floating point numbers as
+        IEEE-754 doubles, which may lead to a perceived loss of precision if
+        Perl was built to use long doubles.
 
     true, false
         These JSON atoms become "Types::Serialiser::true" and

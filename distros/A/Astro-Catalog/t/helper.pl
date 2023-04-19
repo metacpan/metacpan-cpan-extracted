@@ -25,8 +25,8 @@ Compare 2 catalogs.
 
     compare_catalog($cat1, $cat2);
 
-where $cat1 is the catalogue to be tested, and $cat2 is the
-reference catalogue.
+where $cat1 is the catalog to be tested, and $cat2 is the
+reference catalog.
 
 Catalogs must be C<Astro::Catalog> objects. Currently simply compares
 each star in teh catalog, without forcing a new sort (so order is
@@ -50,21 +50,21 @@ sub main::compare_catalog {
 
 =item B<compare_mpc_catalog>
 
-Compare two MPC catalogues.
+Compare two MPC catalogs.
 
     compare_mpc_catalog($cat1, $cat2);
 
-where $cat1 is the catalogue to be tested, and $cat2 is the
-reference catalogue.
+where $cat1 is the catalog to be tested, and $cat2 is the
+reference catalog.
 
 Catalogs must be C<Astro::Catalog> objects. Currently simply compares
 each star in teh catalog, without forcing a new sort (so order is
 important).
 
 This method differs from compare_catalog() in that this one does not
-do direct comparisons between RA and Dec for the two catalogues; it
+do direct comparisons between RA and Dec for the two catalogs; it
 only checks to make sure that the tested star is within one arcminute
-of the reference star. It also sorts both catalogues by RA. This helps
+of the reference star. It also sorts both catalogs by RA. This helps
 compensate for the changing coordinates of minor planets as returned
 from the MPC.
 

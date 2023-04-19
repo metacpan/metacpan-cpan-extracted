@@ -25,7 +25,7 @@ Astro::Catalog::Query::SuperCOSMOS - A query request to the SuperCOSMOS catalogu
 =head1 WARNING
 
 This code totally ignores the epoch of the observations and the associated
-proper motions, this pretty much means that for astrometric work the catalogues
+proper motions, this pretty much means that for astrometric work the catalogs
 you get back from the query are pretty much bogus. This should be sorted in
 the next distribution.
 
@@ -64,7 +64,7 @@ use Astro::FluxColor;
 use Astro::Fluxes;
 use Number::Uncertainty;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively
@@ -263,7 +263,7 @@ sub _parse_query {
 
     # Time to pad the params with known values, this is yet another un-Godly
     # hack for which I'm duely ashamed. God help us if they ever change the
-    # catalogues. Why is SuperCOSMOS so much bloody trouble?
+    # catalogs. Why is SuperCOSMOS so much bloody trouble?
 
     # Make sure we set origin and field centre if we know it
     my $query = new Astro::Catalog(
@@ -776,7 +776,7 @@ If the supplied hash reference has content, look at the content
 and decide whether you simply want to keep that content or
 follow up directory specifications by doing a remote URL call
 and expanding that directory specification to many more remote
-catalogue server configs.
+catalog server configs.
 
     @configs = $q->_dir_check(\%current);
 

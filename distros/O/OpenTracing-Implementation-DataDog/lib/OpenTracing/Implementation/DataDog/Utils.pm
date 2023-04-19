@@ -6,29 +6,19 @@ OpenTracing::Implementation::DataDog::Utils - DataDog Utilities
 
 =cut
 
-our $VERSION = 'v0.45.0';
+our $VERSION = 'v0.46.0';
 
 ;
 
 use Exporter qw/import/;
 
-our @EXPORT_OK = qw/random_64bit_int nano_seconds/;
+our @EXPORT_OK = qw/nano_seconds/;
 
 =head1 EXPORTS OK
 
 The following subroutines can be imported into your namespance:
 
 =cut
-
-
-
-=head2 random_64bit_int
-
-Generates a 64bit integers (or actually a 63bit, or signed 64bit)
-
-=cut
-
-sub random_64bit_int { int(rand( 2**63 )) }
 
 
 

@@ -1,5 +1,8 @@
 Revision history for Starlink::AST
 
+3.03 2023-04-18
+    - Update to AST version 9.2.10
+
 3.02 2022-06-08
     - Update to AST version 9.2.9
     - Adjusted option passing to allow building with -Werror=format-security

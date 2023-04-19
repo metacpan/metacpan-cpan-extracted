@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 # {{{ Endpoint Definition
 
@@ -193,8 +193,15 @@ sub new {
 		$ua->env_proxy;
 	}
 
-	if ( not( $conf{station} or $conf{journey} or $conf{geoSearch} ) ) {
-		confess('station / journey / geoSearch must be specified');
+	if (
+		not(   $conf{station}
+			or $conf{journey}
+			or $conf{geoSearch}
+			or $conf{locationSearch} )
+	  )
+	{
+		confess(
+			'station / journey / geoSearch / locationSearch must be specified');
 	}
 
 	if ( not defined $service ) {
@@ -263,7 +270,28 @@ sub new {
 						],
 						getPOIs  => \0,
 						getStops => \1,
-						maxLoc   => 10,
+						maxLoc   => $conf{results} // 30,
+					}
+				}
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
+	}
+	elsif ( $conf{locationSearch} ) {
+		$req = {
+			svcReqL => [
+				{
+					cfg  => { polyEnc => 'GPA' },
+					meth => 'LocMatch',
+					req  => {
+						input => {
+							loc => {
+								type => 'S',
+								name => $conf{locationSearch},
+							},
+							maxLoc => $conf{results} // 30,
+							field  => 'S',
+						},
 					}
 				}
 			],
@@ -372,8 +400,8 @@ sub new {
 	if ( $conf{journey} ) {
 		$self->parse_journey;
 	}
-	elsif ( $conf{geoSearch} ) {
-		$self->parse_geosearch;
+	elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
+		$self->parse_search;
 	}
 	else {
 		$self->parse_board;
@@ -386,7 +414,13 @@ sub new_p {
 	my ( $obj, %conf ) = @_;
 	my $promise = $conf{promise}->new;
 
-	if ( not $conf{station} and not $conf{journey} ) {
+	if (
+		not(   $conf{station}
+			or $conf{journey}
+			or $conf{geoSearch}
+			or $conf{locationSearch} )
+	  )
+	{
 		return $promise->reject('station or journey flag must be passed');
 	}
 
@@ -401,8 +435,8 @@ sub new_p {
 			if ( $conf{journey} ) {
 				$self->parse_journey;
 			}
-			elsif ( $conf{geoSearch} ) {
-				$self->parse_geosearch;
+			elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
+				$self->parse_search;
 			}
 			else {
 				$self->parse_board;
@@ -613,7 +647,7 @@ sub add_message {
 	return $message;
 }
 
-sub parse_geosearch {
+sub parse_search {
 	my ($self) = @_;
 
 	$self->{results} = [];
@@ -624,6 +658,10 @@ sub parse_geosearch {
 
 	my @refLocL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{locL}         // [] };
+
+	if ( $self->{raw_json}{svcResL}[0]{res}{match} ) {
+		@locL = @{ $self->{raw_json}{svcResL}[0]{res}{match}{locL} // [] };
+	}
 
 	for my $loc (@locL) {
 		push(
@@ -865,7 +903,7 @@ monitors
 
 =head1 VERSION
 
-version 4.09
+version 4.10
 
 =head1 DESCRIPTION
 
@@ -886,7 +924,7 @@ Requests item(s) as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
 I<opt> were passed.
 
-I<opt> must contain either a B<station>, a B<geoSearch>, or a B<journey> flag:
+I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, or B<journey> flag:
 
 =over
 
@@ -900,6 +938,11 @@ Results are available via C<< $status->results >>.
 =item B<geoSearch> => B<{> B<lat> => I<latitude>, B<lon> => I<longitude> B<}>
 
 Search for stations near I<latitude>, I<longitude>.
+Results are available via C<< $status->results >>.
+
+=item B<locationSearch> => I<query>
+
+Search for stations whose name is similar to I<query>.
 Results are available via C<< $status->results >>.
 
 =item B<journey> => B<{> B<id> => I<tripid> [, B<name> => I<line> ] B<}>
@@ -953,7 +996,7 @@ Default: -1 (do not limit results by time).
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 
-=item B<results> => I<count> (geoSearch, station)
+=item B<results> => I<count> (geoSearch, locationSearch, station)
 
 Request up to I<count> results.
 Default: 30.
@@ -1001,7 +1044,7 @@ as string. If no backend error occurred, returns undef.
 In case of an error in the HTTP request or HAFAS backend, returns a string
 describing it.  If no error occurred, returns undef.
 
-=item $status->results (geoSearch)
+=item $status->results (geoSearch, locationSearch)
 
 Returns a list of stations. Each list element is a
 Travel::Status::DE::HAFAS::Stop(3pm) object.

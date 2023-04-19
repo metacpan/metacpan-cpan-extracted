@@ -32,7 +32,7 @@ is($flux->quantity('mag'), "-9.3", "RIT Star magnitude");
 my $fh = new File::Temp;
 my $tempfile = $fh->filename;
 ok($cat->write_catalog(Format => 'RITMatch', File => $tempfile),
-    "Writing catalogue to disk" );
+    "Writing catalog to disk" );
 
 my $newcat = new Astro::Catalog(Format => 'RITMatch', File => $tempfile);
 
@@ -40,9 +40,9 @@ isa_ok($newcat, "Astro::Catalog");
 
 my @newstars = $newcat->stars;
 my $newstar = $newstars[2];
-is($newstar->id, $star->id, "RITMatch written catalogue ID");
-is($newstar->x, $star->x, "RITMatch written catalogue X");
-is($newstar->y, $star->y, "RITMatch written catalogue Y");
+is($newstar->id, $star->id, "RITMatch written catalog ID");
+is($newstar->x, $star->x, "RITMatch written catalog X");
+is($newstar->y, $star->y, "RITMatch written catalog Y");
 
 __DATA__
 1 20 20 -5.6

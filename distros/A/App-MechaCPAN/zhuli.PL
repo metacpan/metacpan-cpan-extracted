@@ -18,7 +18,7 @@ find(
     wanted => sub
     {
       my $file = $_;
-      if ( -f $file && $file =~ m/^[^.] .* [.]pm/xms )
+      if ( -f $file && $file =~ m/^[^.] .* [.]pm$/xms )
       {
         warn "Will include '$file' in '$ARGV[0]'\n";
         my $filename = $File::Find::name;
@@ -31,7 +31,7 @@ find(
   $prefix
 );
 
-foreach my $file (@files)
+foreach my $file (sort @files)
 {
   my $parser = Pod::Simple->new;
 

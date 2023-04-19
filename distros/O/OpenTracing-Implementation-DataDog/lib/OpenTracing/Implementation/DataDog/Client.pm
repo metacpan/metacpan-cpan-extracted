@@ -39,7 +39,7 @@ agent.
 
 
 
-our $VERSION = 'v0.45.0';
+our $VERSION = 'v0.46.0';
 
 use English;
 
@@ -51,11 +51,11 @@ use MooX::ProtectedAttributes;
 use MooX::Should;
 
 use Carp;
-use Data::Validate::URI qw/is_uri/;
 use HTTP::Request ();
 use JSON::MaybeXS qw(JSON);
 use LWP::UserAgent;
 use PerlX::Maybe qw/maybe provided/;
+use Regexp::Common qw/URI/;
 use Types::Standard qw/ArrayRef Bool Enum HasMethods Maybe Str/;
 use Types::Common::Numeric qw/IntRange/;
 
@@ -170,8 +170,17 @@ precedence over any of the other settings.
 has agent_url => (
     is => 'ro',
     env_key => 'DD_TRACE_AGENT_URL',
-    should  => Maybe[Str->where( sub { is_uri($_) } )],
+    should  => Maybe[Str->where( sub { _is_uri($_) } )],
 );
+
+=pod
+
+NOTE: DataDog Agents can also listen to a UNiX socket, and one is suggested that
+there is a C<unix:> URL. Fist of all, that is false, the C<unix:> scheme is just
+non existent. It should be C<file:> instead. Secondly, this L<Client> just does
+not support it, only C<http:> or C<https:>
+
+=cut
 
 
 
@@ -222,7 +231,7 @@ has _json_encoder => (
 );
 
 sub _build__json_encoder {
-    JSON()->new->utf8->canonical->pretty
+    JSON()->new->utf8->canonical->pretty->convert_blessed()
 }
 #
 # I just love readable and consistant JSONs
@@ -408,7 +417,7 @@ a hashreference with the following keys:
 
 =item C<parent_id> (optional)
 
-=item C<error> (TODO)
+=item C<error>
 
 =item C<meta> (optional)
 
@@ -582,6 +591,17 @@ sub _flush_span_buffer {
 sub _is_with_errors {
     my $span = shift;
     return exists { $span->get_tags() }->{ error }
+}
+
+
+
+# _is_uri
+#
+# Returns true if the given string matches an http(s) url
+#
+sub _is_uri {
+    return $RE{URI}{HTTP}{-scheme => 'https?'}->matches(shift)
+    # scheme must be specified, defaults to 'http:'
 }
 
 

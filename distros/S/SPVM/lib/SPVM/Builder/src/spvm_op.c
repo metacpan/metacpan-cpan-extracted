@@ -252,6 +252,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "set_error_code",
     "error",
     "items",
+    "version",
   };
   
   return id_names;
@@ -2020,8 +2021,92 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     SPVM_OP* op_decls = op_block->first;
     SPVM_OP* op_decl = op_decls->first;
     while ((op_decl = SPVM_OP_sibling(compiler, op_decl))) {
-      // use declarations
-      if (op_decl->id == SPVM_OP_C_ID_USE) {
+      // version declaration
+      if (op_decl->id == SPVM_OP_C_ID_VERSION_DECL) {
+        if (class->version) {
+          SPVM_COMPILER_error(compiler, "The version has already been declared at %s line %d", op_decl->file, op_decl->line);
+          break;
+        }
+        
+        SPVM_OP* op_version_string = op_decl->first;
+        SPVM_CONSTANT* version_string_constant = op_version_string->uv.constant;
+        const char* version_string = version_string_constant->value.oval;
+        int32_t version_string_length = version_string_constant->string_length;
+        
+        // Version string normalization - Remove "_"
+        int32_t version_string_normalized_length = 0;
+        char* version_string_normalized = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, version_string_length + 1);
+        {
+          for (int32_t version_string_index = 0; version_string_index < version_string_length; version_string_index++) {
+            char ch = version_string[version_string_index];
+            if (!(ch == '_')) {
+              version_string_normalized[version_string_normalized_length++] = ch;
+            }
+          }
+        }
+        
+        // Version string validation
+        int32_t is_invalid_version_string = 0;
+        {
+          int32_t dot_count = 0;
+          int32_t digits_after_dot = 0;
+          for (int32_t version_string_normalized_index = 0; version_string_normalized_index < version_string_normalized_length; version_string_normalized_index++) {
+            char ch = version_string_normalized[version_string_normalized_index];
+            
+            if (!(ch == '.' || isdigit(ch))) {
+              SPVM_COMPILER_error(compiler, "A character in a version number must be a number or \".\" at %s line %d", op_decl->file, op_decl->line);
+              is_invalid_version_string = 1;
+              break;
+            }
+            
+            if (ch == '.') {
+              dot_count++;
+              if (!(dot_count <= 1)) {
+                SPVM_COMPILER_error(compiler, "The number of \".\" in a version number must be less than or equal to 1 at %s line %d", op_decl->file, op_decl->line);
+                is_invalid_version_string = 1;
+                break;
+              }
+            }
+            
+            if (dot_count > 0 && isdigit(ch)) {
+              digits_after_dot++;
+            }
+          }
+
+          if (!isdigit(version_string_normalized[0])) {
+            SPVM_COMPILER_error(compiler, "A version number must begin with a number at %s line %d", op_decl->file, op_decl->line);
+            is_invalid_version_string = 1;
+            break;
+          }
+          
+          if (!isdigit(version_string_normalized[version_string_normalized_length - 1])) {
+            SPVM_COMPILER_error(compiler, "A version number must end with a number at %s line %d", op_decl->file, op_decl->line);
+            is_invalid_version_string = 1;
+            break;
+          }
+          
+          if (is_invalid_version_string) {
+            break;
+          }
+          
+          if (!(digits_after_dot % 3 == 0)) {
+            SPVM_COMPILER_error(compiler, "The length of characters after \".\" in a version number must be divisible by 3 at %s line %d", op_decl->file, op_decl->line);
+            is_invalid_version_string = 1;
+          }
+        }
+        
+        if (!is_invalid_version_string) {
+          // Assertion: Check the version string is parsed as a double value
+          char* end;
+          strtod(version_string_normalized, &end);
+          assert(*end == '\0');
+          
+          SPVM_CONSTANT_STRING_new(compiler, version_string_normalized, version_string_normalized_length);
+          class->version = version_string_normalized;
+        }
+      }
+      // use statement
+      else if (op_decl->id == SPVM_OP_C_ID_USE) {
         SPVM_OP* op_use = op_decl;
         
         // Class alias
@@ -2541,6 +2626,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   }
 
   return op_class;
+}
+
+SPVM_OP* SPVM_OP_build_version_decl(SPVM_COMPILER* compiler, SPVM_OP* op_version_decl, SPVM_OP* op_version_number_string) {
+  
+  SPVM_OP_insert_child(compiler, op_version_decl, op_version_decl->last, op_version_number_string);
+  
+  return op_version_decl;
 }
 
 SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_class, SPVM_OP* op_name_class_alias, int32_t is_require) {

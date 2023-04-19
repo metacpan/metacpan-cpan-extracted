@@ -45,7 +45,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     8-JUN-2022 (makeh):
+*     18-APR-2023 (makeh):
 *        Original version, generated automatically from the internal header
 *        files by the "makeh" script.
 *     {enter_changes_here}
@@ -556,11 +556,11 @@ void astFandl_( const char *, size_t, size_t, size_t *, size_t *, int * );
 /* ===== */
 #define AST__VMAJOR 9
 #define AST__VMINOR 2
-#define AST__RELEASE 9
+#define AST__RELEASE 10
 
 #define AST_MAJOR_VERS 9
 #define AST_MINOR_VERS 2
-#define AST_RELEASE 9
+#define AST_RELEASE 10
 
 #include <stdarg.h>
 #include <float.h>

@@ -1,5 +1,13 @@
 Revision history for App-MechaCPAN
 
+0.29  2023-04-18 23:32:58 EDT
+  - Add support to install from a cpanfile without using Deploy
+  - Add feature to download prebuilt binries for popular linux distros
+  - Improve SSL handling
+  - Fix bug where install couldn't handle modules with names starting with git
+  - Fix bug where install couldn't handle modules starting with git
+  - Fix bug that prevented reusable perls from being threaded
+
 0.28  2021-08-12 23:26:06 EDT
   - Include core dependencies, because RedHat. Fixes GH#20
   - Be more forgiving of the limitations of the underlying OS

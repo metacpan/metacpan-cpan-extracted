@@ -137,11 +137,8 @@ sub go
   my @states     = grep { ref $_ eq 'CODE' } @full_states;
   my @state_desc = grep { ref $_ ne 'CODE' } @full_states;
 
-  foreach my $target (@targets)
-  {
-    $target = _create_target( $target, $cache );
-    $target->{update} = $opts->{update} // 1;
-  }
+  @targets
+    = map { _create_inital_target( $_, $cache, $opts->{update} ) } @targets;
 
 TARGET:
   while ( my $target = shift @targets )
@@ -603,6 +600,65 @@ sub _alias_target
   return;
 }
 
+sub _targets_from_cpanfile
+{
+  my $cpanfile = shift;
+  my $cache    = shift;
+  my $update   = shift;
+
+  my $iname
+    = $cpanfile =~ m{^(.[/\\])?cpanfile$}
+    ? 'cpanfile'
+    : "cpanfile $cpanfile";
+  info "Reading $iname";
+
+  my $prereq = parse_cpanfile($cpanfile);
+  my @phases = qw/configure build test runtime/;
+
+  my @acc = map {%$_} map { values %{ $prereq->{$_} } } @phases;
+  my @reqs;
+  while (@acc)
+  {
+    my $req    = [ splice( @acc, 0, 2 ) ];
+    my $target = _create_target( $req, $cache );
+    $target->{update} = $update // 1;
+    push @reqs, $target;
+  }
+
+  return @reqs;
+}
+
+sub _create_inital_target
+{
+  my $src_name = shift;
+  my $cache    = shift;
+  my $update   = shift;
+
+  # Check to see if the source is a cpanfile
+  if ( ref $src_name eq '' || ref $src_name eq 'GLOB' )
+  {
+    if ( -d $src_name )
+    {
+      $src_name = File::Spec->catfile( $src_name, 'cpanfile' );
+    }
+
+    if ( -e -f $src_name )
+    {
+      # If the filename includes the work cpanfile or looks like a text file,
+      # assume it's a cpanfile because a module archive must be binary
+      if ( $src_name =~ m/cpanfile/ || -T $src_name )
+      {
+        return _targets_from_cpanfile( $src_name, $cache, $update );
+      }
+    }
+  }
+
+  my $target = _create_target( $src_name, $cache );
+  $target->{update} = $update // 1;
+
+  return $target;
+}
+
 sub _create_target
 {
   my $target = shift;
@@ -896,10 +952,10 @@ sub _should_install
   my $module = $target->{module};
   my $ver    = _get_mod_ver($module);
 
-  $target->{installed_version} = $ver;
-
   return 1
     if !defined $ver;
+
+  $target->{installed_version} = $ver;
 
   my $msg = 'Up to date';
 

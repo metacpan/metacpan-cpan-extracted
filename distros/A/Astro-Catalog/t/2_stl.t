@@ -34,7 +34,7 @@ exit;
 
 __DATA__
 !+
-! Simple STL example; stellar photometry catalogue.
+! Simple STL example; stellar photometry catalog.
 !
 ! A.C. Davenhall (Edinburgh) 24/1/97.
 !-

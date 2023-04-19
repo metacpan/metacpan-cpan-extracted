@@ -11,7 +11,7 @@ use Term::ANSIColor qw//;
 use IPC::Open3;
 use IO::Select;
 use List::Util qw/first/;
-use Scalar::Util qw/blessed/;
+use Scalar::Util qw/blessed openhandle/;
 use File::Temp qw/tempfile tempdir/;
 use File::Fetch;
 use File::Spec qw//;
@@ -29,13 +29,14 @@ BEGIN
     dest_dir get_project_dir
     fetch_file inflate_archive
     humane_tmpname humane_tmpfile humane_tmpdir
+    parse_cpanfile
     run restart_script
     rel_start_to_abs
     /;
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -169,6 +170,7 @@ sub main
   _setup_log($dest_dir)
     unless $options->{'no-log'};
 
+  local $@;
   my $ret = eval { $pkg->$action( $options, @argv ) || 0; };
   chdir $orig_dir;
 
@@ -223,6 +225,22 @@ sub has_git
   return _git_str && has_updated_git;
 }
 
+# Give a list of https-incapable File::Fetch methods when https is unavailable
+sub _https_blacklist
+{
+  require Module::Load::Conditional;
+
+  state $can_https
+    = Module::Load::Conditional::can_load( modules => 'IO::Socket::SSL' );
+
+  if ( !$can_https )
+  {
+    return qw/lwp httptiny httplite/;
+  }
+
+  return ();
+}
+
 sub can_https
 {
   state $can_https;
@@ -234,7 +252,7 @@ sub can_https
 
   if ( !defined $can_https )
   {
-    my $test_url = 'https://www.cpan.org/';
+    my $test_url = 'https://get.mechacpan.us/latest';
     my $test_str = '';
 
     local $File::Fetch::WARN;
@@ -244,9 +262,12 @@ sub can_https
     return 0
       if !defined $ff;
 
+    $ff_blacklist = $File::Fetch::BLACKLIST;
+
+    # Make sure not to use methods that can't handle https
+    local $File::Fetch::BLACKLIST = [ @$ff_blacklist, _https_blacklist ];
     $ff->scheme('http');
     $can_https = defined $ff->fetch( to => \$test_str );
-    $ff_blacklist = $File::Fetch::BLACKLIST;
   }
 
   return $can_https;
@@ -265,7 +286,7 @@ sub url_re
 sub git_re
 {
   state $git_re = qr[
-    ^ (?: git | ssh ) :
+    ^ (?: git | ssh ) : [^:]
     |
     [.]git (?: @|$ )
   ]xmsi;
@@ -289,6 +310,99 @@ sub git_extract_re
   ]xmsi;
 
   return $re;
+}
+
+sub parse_cpanfile
+{
+  my $file = shift;
+
+  state $sandbox_num = 1;
+
+  my $result = { runtime => {} };
+
+  $result->{current} = $result->{runtime};
+
+  my $methods = {
+    on => sub
+    {
+      my ( $phase, $code ) = @_;
+      local $result->{current} = $result->{$phase} //= {};
+      $code->();
+    },
+    feature => sub {...},
+  };
+
+  foreach my $type (qw/requires recommends suggests conflicts/)
+  {
+    $methods->{$type} = sub
+    {
+      my ( $module, $ver ) = @_;
+      if ( $module eq 'perl' )
+      {
+        $result->{perl} = $ver;
+        return;
+      }
+      $result->{current}->{$type}->{$module} = $ver;
+    };
+  }
+
+  foreach my $phase (qw/configure build test author/)
+  {
+    $methods->{ $phase . '_requires' } = sub
+    {
+      my ( $module, $ver ) = @_;
+      $result->{$phase}->{requires}->{$module} = $ver;
+    };
+  }
+
+  my $code_fh;
+  if ( !($code_fh = openhandle($file) ) )
+  {
+    open $code_fh, '<', $file;
+  }
+  my $code = do { local $/; <$code_fh> };
+
+  my $pkg = __PACKAGE__ . "::Sandbox$sandbox_num";
+  $sandbox_num++;
+
+  foreach my $method ( keys %$methods )
+  {
+    no strict 'refs';
+    *{"${pkg}::${method}"} = $methods->{$method};
+  }
+
+  local $@;
+  my $sandbox = join(
+    "\n",
+    qq[package $pkg;],
+    qq[no warnings;],
+    qq[# line 1 "$file"],
+    qq[$code],
+    qq[return 1;],
+  );
+
+  my $no_error = eval $sandbox;
+
+  croak $@
+    unless $no_error;
+
+  delete $result->{current};
+
+  return $result;
+}
+
+sub humane_qr
+{
+  state $humane_re = qr[
+    [.]
+    \d{4} \d{2} \d{2}
+    _
+    \d{2} \d{2} \d{2}
+    [.]
+    \w{4}
+  ]xmsi;
+
+  return $humane_re;
 }
 
 sub humane_tmpname
@@ -662,8 +776,9 @@ my @inflate = (
   {
     my $src = shift;
 
+    my $humane_qr = humane_qr;
     return
-      unless $src =~ m{ [.]tar[.] (?: gz | bz2 | xz ) $}xms;
+      unless $src =~ m{ [.]tar[.] (?: gz | bz2 | xz ) $humane_qr? $}xms;
 
     state $tar;
     if ( !defined $tar )
@@ -676,13 +791,13 @@ my @inflate = (
       unless $tar;
 
     my $unzip
-      = $src =~ m/gz$/          ? 'gzip'
-      : $src =~ m/(bz2|bzip2)$/ ? 'bzip2'
-      :                           'xz';
+      = $src =~ m/gz $humane_qr? $/xms          ? 'gzip'
+      : $src =~ m/(bz2|bzip2) $humane_qr? $/xms ? 'bzip2'
+      :                                           'xz';
 
     run("$unzip -dc $src | tar xf -");
     return 1;
-  },
+    },
 
   # Archive::Tar
   sub

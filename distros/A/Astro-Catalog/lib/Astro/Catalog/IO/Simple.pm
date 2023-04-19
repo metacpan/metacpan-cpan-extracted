@@ -30,7 +30,7 @@ use base qw/Astro::Catalog::IO::ASCII/;
 
 use Data::Dumper;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 
@@ -44,7 +44,7 @@ call them from outside that module.
 
 =item B<_read_catalog>
 
-Parses a reference to an array containing a simply formatted catalogue
+Parses a reference to an array containing a simply formatted catalog
 
     $catalog = Astro::Catalog::IO::Simple->_read_catalog(\@lines);
 
@@ -176,7 +176,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Will write the catalogue object to an simple output format
+Will write the catalog object to an simple output format
 
     $lines = Astro::Catalog::IO::Simple->_write_catalog($catalog);
 
@@ -195,14 +195,14 @@ sub _write_catalog {
 
     push (@output, "# Catalog written automatically by class ". __PACKAGE__ ."\n");
     push (@output, "# on date " . gmtime . "UT\n" );
-    push (@output, "# Origin of catalogue: ". $catalog->origin ."\n");
+    push (@output, "# Origin of catalog: ". $catalog->origin ."\n");
 
     # write body
 
     # Keep track of star count for unnamed stars
     my $starcnt = 0;
 
-    # loop through all the stars in the catalogue
+    # loop through all the stars in the catalog
     foreach my $star ($catalog->stars) {
         # Extract the information into an array for later formatting
         my @chunks;
@@ -225,7 +225,7 @@ sub _write_catalog {
                 push(@chunks, $c->az(format => 's'), $c->el(format => 's'), "AZEL");
             }
             else {
-                $comment = "Can not represent star $chunks[0] in catalogue since it is of type $type";
+                $comment = "Can not represent star $chunks[0] in catalog since it is of type $type";
             }
 
         }

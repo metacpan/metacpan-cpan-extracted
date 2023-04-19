@@ -21,7 +21,7 @@ typedef struct { const char* key; size_t length; CK_ULONG value; } entry;
 typedef entry map[];
 
 static const entry* S_map_find(pTHX_ const map table, size_t table_size, const char* name, size_t name_length) {
-	int i;
+	size_t i;
 	for (i = 0; i < table_size; ++i) {
 		if (table[i].length == name_length && strEQ(name, table[i].key))
 			return &table[i];
@@ -41,7 +41,7 @@ static CK_ULONG S_map_get(pTHX_ const map table, size_t table_size, SV* input, c
 #define map_get(table, name, type) S_map_get(aTHX_ table, sizeof table / sizeof *table, name, type)
 
 static const entry* S_map_reverse_find(pTHX_ const map table, size_t table_size, UV value) {
-	int i;
+	size_t i;
 	for (i = 0; i < table_size; ++i) {
 		if (table[i].value == value)
 			return &table[i];
@@ -238,7 +238,7 @@ static UV S_get_flags(pTHX_ const map table, size_t table_size, SV* input) {
 	if (SvROK(input) && SvTYPE(SvRV(input)) == SVt_PVAV) {
 		UV result = 0, i;
 		AV* array = (AV*)SvRV(input);
-		for (i = 0; i < av_len(array) + 1; ++i) {
+		for (i = 0; i < av_count(array); ++i) {
 			SV** svp = av_fetch(array, i, FALSE);
 			result |= S_map_get(aTHX_ table, table_size, *svp, "flag");
 		}
@@ -252,7 +252,8 @@ static UV S_get_flags(pTHX_ const map table, size_t table_size, SV* input) {
 
 static AV* S_reverse_flags(pTHX_ const map table, size_t table_size, CK_ULONG input) {
 	AV* result = newAV();
-	for (CK_ULONG i = 0; i < CHAR_BIT * sizeof(CK_ULONG); ++i) {
+	CK_ULONG i;
+	for (i = 0; i < CHAR_BIT * sizeof(CK_ULONG); ++i) {
 		CK_ULONG right = 1ul << i;
 		if (input & right) {
 			const entry* item = S_map_reverse_find(aTHX_ table, table_size, right);
@@ -767,7 +768,7 @@ static const map kdfs = {
 	params->hashAlg = hash;\
 	params->mgf = generator;\
 	if (array_len >= 1)\
-		params->sLen = SvUV((array)[1]);\
+		params->sLen = SvUV((array)[0]);\
 }
 
 #ifndef MIN
@@ -851,7 +852,7 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 
 		case CKM_RSA_PKCS_PSS: {
 			if (array_len < 1)
-				Perl_croak(aTHX_ "No hash given for RSA_PKCS_PSS");
+				Perl_croak(aTHX_ "No hash given for rsa-pkcs-pss");
 			CK_MECHANISM_TYPE hash = get_mechanism_type(array[0]);
 			CK_RSA_PKCS_MGF_TYPE generator = map_get(generators, array[0], "generator");
 			specialize_pss(&result, hash, generator, array + 1, array_len - 1);
@@ -953,7 +954,7 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 
 		case CKM_RSA_PKCS_OAEP: {
 			if (array_len < 2)
-				Perl_croak(aTHX_ "Insufficient parameters for derivation");
+				Perl_croak(aTHX_ "Insufficient parameters for rsa-pkcs-oaep");
 
 			INIT_PARAMS(CK_RSA_PKCS_OAEP_PARAMS);
 
@@ -1237,7 +1238,7 @@ static const attribute_map attributes = {
 };
 
 static const attribute_entry* S_get_attribute_entry(pTHX_ const char* name, size_t name_length) {
-	int i;
+	size_t i;
 	for (i = 0; i < sizeof attributes / sizeof *attributes; ++i) {
 		if (attributes[i].length == name_length && strEQ(name, attributes[i].key))
 			return &attributes[i];
@@ -1269,7 +1270,7 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 	HE* item;
 	hv_iterinit(attributes);
 
-	while(item = hv_iternext(attributes)) {
+	while((item = hv_iternext(attributes))) {
 		I32 name_length;
 		const char* name = hv_iterkey(item, &name_length);
 		const attribute_entry* entry = get_attribute_entry(name, name_length);
@@ -1305,7 +1306,8 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 						char* array;
 						Newxz(array, av_len(input) + 1, char);
 						SAVEFREEPV(array);
-						for (int i = 0; i < av_len(input) + 1; ++i)
+						size_t i;
+						for (i = 0; i < av_count(input); ++i)
 							array[i] = (char)SvUV(*av_fetch(input, i, FALSE));
 						current->pValue = array;
 						current->ulValueLen = av_len(input) + 1;
@@ -1341,10 +1343,10 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVAV)
 						Perl_croak(aTHX_ "Invalid IntArray attribute value");
 					AV* array = (AV*) SvRV(value);
-					CK_ULONG* values;
+					CK_ULONG* values, i;
 					Newxz(values, av_len(array) + 1, CK_ULONG);
 					SAVEFREEPV(values);
-					for (int i = 0; i <= av_len(array); ++i)
+					for (i = 0; i < av_count(array); ++i)
 						values[i] = SvUV(*av_fetch(array, i, FALSE));
 					current->pValue = value;
 					current->ulValueLen = av_len(array) + 1;
@@ -1368,7 +1370,7 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 
 
 static const attribute_entry* S_attribute_reverse_find(pTHX_ CK_ULONG value) {
-	int i;
+	size_t i;
 	for (i = 0; i < sizeof attributes / sizeof *attributes; ++i) {
 		if (attributes[i].value == value)
 			return &attributes[i];
@@ -1432,22 +1434,24 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 		case IntArrayAttr: {
 			AV* result = newAV();
 			CK_ULONG* values = (CK_ULONG*) pointer;
-			size_t elems = length / sizeof(CK_ULONG);
-			for (int i = 0; i < elems; ++i)
+			size_t elems = length / sizeof(CK_ULONG), i;
+			for (i = 0; i < elems; ++i)
 				av_push(result, newSVuv(values[i]));
 			return newRV_noinc((SV*)result);
 		}
 		case AttrAttr: {
 			HV* result = newHV();
 			CK_ATTRIBUTE* values = (CK_ATTRIBUTE*) pointer;
-			size_t elems = length / sizeof(CK_ATTRIBUTE);
-			for (int i = 0; i < elems; ++i) {
+			size_t elems = length / sizeof(CK_ATTRIBUTE), i;
+			for (i = 0; i < elems; ++i) {
 				const attribute_entry* reversed2 = attribute_reverse_find(attribute->type);
 				if (reversed2)
 					hv_store(result, reversed2->key, reversed2->length, reverse_attribute(&values[i]), 0);
 			}
 			return newRV_noinc((SV*)result);
 		}
+		default:
+			Perl_croak(aTHX_ "Unknown type");
 	}
 }
 
@@ -1473,8 +1477,9 @@ struct Provider {
 };
 typedef struct Provider* Crypt__HSM;
 
-static void S_provider_refcount_increment(pTHX_ struct Provider* provider) {
+static struct Provider* S_provider_refcount_increment(pTHX_ struct Provider* provider) {
 	refcount_inc(&provider->refcount);
+	return provider;
 }
 #define provider_refcount_increment(provider) S_provider_refcount_increment(aTHX_ provider)
 
@@ -1488,17 +1493,17 @@ static void S_provider_refcount_decrement(pTHX_ struct Provider* provider) {
 }
 #define provider_refcount_decrement(provider) S_provider_refcount_decrement(aTHX_ provider)
 
-static int provider_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+static int provider_dup(pTHX_ MAGIC* magic, CLONE_PARAMS*) {
 	provider_refcount_increment((struct Provider*)magic->mg_ptr);
 	return 0;
 }
 
-static int provider_free(pTHX_ SV* sv, MAGIC* magic) {
+static int provider_free(pTHX_ SV*, MAGIC* magic) {
 	provider_refcount_decrement((struct Provider*)magic->mg_ptr);
 	return 0;
 }
 
-const static MGVTBL Crypt__HSM_magic = { NULL, NULL, NULL, NULL, provider_free, NULL, provider_dup, NULL };
+static const MGVTBL Crypt__HSM_magic = { NULL, NULL, NULL, NULL, provider_free, NULL, provider_dup, NULL };
 
 struct Session {
 	Refcount refcount;
@@ -1507,8 +1512,9 @@ struct Session {
 };
 typedef struct Session* Crypt__HSM__Session;
 
-static void S_session_refcount_increment(pTHX_ struct Session* session) {
+static struct Session* S_session_refcount_increment(pTHX_ struct Session* session) {
 	refcount_inc(&session->refcount);
+	return session;
 }
 #define session_refcount_increment(session) S_session_refcount_increment(aTHX_ session)
 
@@ -1522,14 +1528,38 @@ static void S_session_refcount_decrement(pTHX_ struct Session* session) {
 }
 #define session_refcount_decrement(session) S_session_refcount_decrement(aTHX_ session)
 
+struct Stream {
+	struct Session* session;
+	CK_OBJECT_HANDLE encrypt_key;
+	CK_OBJECT_HANDLE sign_key;
+};
+
+typedef struct Stream* Crypt__HSM__Stream;
+typedef struct Stream* Crypt__HSM__Encrypt;
+typedef struct Stream* Crypt__HSM__Decrypt;
+typedef struct Stream* Crypt__HSM__Digest;
+typedef struct Stream* Crypt__HSM__Sign;
+typedef struct Stream* Crypt__HSM__Verify;
+
 #define CLONE_SKIP() 1
 
 MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM		PREFIX = provider_
 
 PROTOTYPES: DISABLED
 
+BOOT:
+	SV* stream = newSVpvs("Crypt::HSM::Stream");
+	av_push(get_av("Crypt::HSM::Encrypt::ISA", GV_ADD), SvREFCNT_inc(stream));
+	av_push(get_av("Crypt::HSM::Decrypt::ISA", GV_ADD), SvREFCNT_inc(stream));
+	av_push(get_av("Crypt::HSM::Digest::ISA", GV_ADD), SvREFCNT_inc(stream));
+	av_push(get_av("Crypt::HSM::Sign::ISA", GV_ADD), SvREFCNT_inc(stream));
+	av_push(get_av("Crypt::HSM::Verify::ISA", GV_ADD), SvREFCNT_inc(stream));
+	SvREFCNT_dec(stream);
+
+
 Crypt::HSM load(SV* class, const char* path)
 CODE:
+	PERL_UNUSED_VAR(class);
 	RETVAL = (struct Provider*) PerlMemShared_calloc(1, sizeof(struct Provider));
 	refcount_init(&RETVAL->refcount, 1);
 
@@ -1581,7 +1611,7 @@ PPCODE:
 	if ( result != CKR_OK )
 		croak_with("Couldn't get slots", result);
 
-	EXTEND(SP, count);
+	EXTEND(SP, (int)count);
 
 	CK_SLOT_ID_PTR slotList;
 	Newxz(slotList, count, CK_SLOT_ID);
@@ -1646,8 +1676,7 @@ CODE:
 	Newxz(RETVAL, 1, struct Session);
 	refcount_init(&RETVAL->refcount, 1);
 
-	RETVAL->provider = self;
-	provider_refcount_increment(self);
+	RETVAL->provider = provider_refcount_increment(self);
 
 	CK_RV result = self->funcs->C_OpenSession(slot, flags | CKF_SERIAL_SESSION, NULL, Notify, &RETVAL->handle);
 	if (result != CKR_OK)
@@ -1655,10 +1684,10 @@ CODE:
 OUTPUT:
 	RETVAL
 
-AV* mechanisms(Crypt::HSM self, CK_SLOT_ID slot)
+void mechanisms(Crypt::HSM self, CK_SLOT_ID slot)
 PPCODE:
 	CK_MECHANISM_TYPE* types;
-	CK_ULONG length;
+	CK_ULONG length, i;
 	CK_RV result = self->funcs->C_GetMechanismList(slot, NULL, &length);
 	if (result != CKR_OK)
 		croak_with("Couldn't get mechanisms length", result);
@@ -1669,8 +1698,7 @@ PPCODE:
 	if (result != CKR_OK)
 		croak_with("Couldn't get mechanisms", result);
 
-	RETVAL = newAV();
-	for (int i = 0; i < length; ++i) {
+	for (i = 0; i < length; ++i) {
 		const entry* item = map_reverse_find(mechanisms, types[i]);
 		mXPUSHs(item ? newSVpvn(item->key, item->length) : &PL_sv_undef);
 	}
@@ -1691,7 +1719,7 @@ OUTPUT:
 	RETVAL
 
 
-AV* close_all_sessions(Crypt::HSM self, CK_SLOT_ID slot)
+void close_all_sessions(Crypt::HSM self, CK_SLOT_ID slot)
 CODE:
 	CK_RV result = self->funcs->C_CloseAllSessions(slot);
 	if (result != CKR_OK)
@@ -1713,6 +1741,7 @@ CODE:
 
 
 MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Session PREFIX = session_
+
 
 void DESTROY(Crypt::HSM::Session self)
 CODE:
@@ -1789,13 +1818,11 @@ OUTPUT:
 	RETVAL
 
 
-CK_OBJECT_HANDLE destroy_object(Crypt::HSM::Session self, CK_OBJECT_HANDLE source)
+void destroy_object(Crypt::HSM::Session self, CK_OBJECT_HANDLE source)
 CODE:
 	CK_RV result = self->provider->funcs->C_DestroyObject(self->handle, source);
 	if (result != CKR_OK)
 		croak_with("Could not destroy object", result);
-OUTPUT:
-	RETVAL
 
 CK_ULONG object_size(Crypt::HSM::Session self, CK_OBJECT_HANDLE source)
 CODE:
@@ -1812,7 +1839,8 @@ CODE:
 	Newxz(attributes.member, attributes.length, CK_ATTRIBUTE);
 	SAVEFREEPV(attributes.member);
 
-	for (int i = 0; i < attributes.length; ++i) {
+	size_t i;
+	for (i = 0; i < attributes.length; ++i) {
 		STRLEN name_length;
 		const char* name = SvPVutf8(*av_fetch(attributes_av, i, FALSE), name_length);
 		const attribute_entry* item = get_attribute_entry(name, name_length);
@@ -1825,9 +1853,7 @@ CODE:
 	if (result != CKR_OK && result != CKR_ATTRIBUTE_SENSITIVE && result != CKR_ATTRIBUTE_TYPE_INVALID && result !=CKR_BUFFER_TOO_SMALL)
 		croak_with("Could not get attributes", result);
 
-	for (int i = 0; i < attributes.length; ++i) {
-		SV* key = *av_fetch(attributes_av, i, FALSE);
-
+	for (i = 0; i < attributes.length; ++i) {
 		if (attributes.member[i].ulValueLen != CK_UNAVAILABLE_INFORMATION) {
 			Newxz(attributes.member[i].pValue, attributes.member[i].ulValueLen, char);
 			SAVEFREEPV(attributes.member[i].pValue);
@@ -1839,7 +1865,7 @@ CODE:
 		croak_with("Could not get attributes", result);
 
 	RETVAL = newHV();
-	for (int i = 0; i < attributes.length; ++i) {
+	for (i = 0; i < attributes.length; ++i) {
 		SV* key = *av_fetch(attributes_av, i, FALSE);
 		SV* value = reverse_attribute(&attributes.member[i]);
 		hv_store_ent(RETVAL, key, value, 0);
@@ -1922,6 +1948,20 @@ OUTPUT:
 	RETVAL
 
 
+Crypt::HSM::Encrypt open_encrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
+	CK_RV result = self->provider->funcs->C_EncryptInit(self->handle, &mechanism, key);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize encryption", result);
+
+	Newxz(RETVAL, 1, struct Stream);
+	RETVAL->session = session_refcount_increment(self);
+	RETVAL->encrypt_key = key;
+OUTPUT:
+	RETVAL
+
+
 SV* decrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
@@ -1941,6 +1981,20 @@ CODE:
 	SvCUR(RETVAL) = decryptedDataLen;
 	if (result != CKR_OK)
 		croak_with("Couldn't decrypt", result);
+OUTPUT:
+	RETVAL
+
+
+Crypt::HSM::Encrypt open_decrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
+	CK_RV result = self->provider->funcs->C_DecryptInit(self->handle, &mechanism, key);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize decryption", result);
+
+	Newxz(RETVAL, 1, struct Stream);
+	RETVAL->session = session_refcount_increment(self);
+	RETVAL->encrypt_key = key;
 OUTPUT:
 	RETVAL
 
@@ -1968,6 +2022,20 @@ OUTPUT:
 	RETVAL
 
 
+Crypt::HSM::Encrypt open_sign(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
+	CK_RV result = self->provider->funcs->C_SignInit(self->handle, &mechanism, key);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize signing", result);
+
+	Newxz(RETVAL, 1, struct Stream);
+	RETVAL->session = session_refcount_increment(self);
+	RETVAL->sign_key = key;
+OUTPUT:
+	RETVAL
+
+
 bool verify(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, SV* data, SV* signature, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 5);
@@ -1991,6 +2059,20 @@ OUTPUT:
 	RETVAL
 
 
+Crypt::HSM::Encrypt open_verify(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
+	CK_RV result = self->provider->funcs->C_VerifyInit(self->handle, &mechanism, key);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize verifying", result);
+
+	Newxz(RETVAL, 1, struct Stream);
+	RETVAL->session = session_refcount_increment(self);
+	RETVAL->sign_key = key;
+OUTPUT:
+	RETVAL
+
+
 SV* digest(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
@@ -2010,6 +2092,19 @@ CODE:
 	SvCUR(RETVAL) = digestedDataLen;
 	if (result != CKR_OK)
 		croak_with("Couldn't digest", result);
+OUTPUT:
+	RETVAL
+
+
+Crypt::HSM::Encrypt open_digest(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, CK_OBJECT_HANDLE key, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
+	CK_RV result = self->provider->funcs->C_DigestInit(self->handle, &mechanism);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize digesting", result);
+
+	Newxz(RETVAL, 1, struct Stream);
+	RETVAL->session = session_refcount_increment(self);
 OUTPUT:
 	RETVAL
 
@@ -2074,3 +2169,218 @@ OUTPUT:
 
 
 int CLONE_SKIP();
+
+
+MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Stream
+
+
+SV* get_state(Crypt::HSM::Stream self)
+CODE:
+	CK_ULONG length;
+	CK_RV result = self->session->provider->funcs->C_GetOperationState(self->session->handle, NULL, &length);
+	if (result != CKR_OK)
+		croak_with("Couldn't get operation state", result);
+	RETVAL = newSV(length);
+	SvPOK_only(RETVAL);
+	if (length) {
+		result = self->session->provider->funcs->C_GetOperationState(self->session->handle, SvPVbyte_nolen(RETVAL), &length);
+		SvCUR(RETVAL) = length;
+		if (result != CKR_OK)
+			croak_with("Couldn't get operation state", result);
+	}
+OUTPUT:
+	RETVAL
+
+void set_state(Crypt::HSM::Stream self, SV* state)
+CODE:
+	STRLEN stateLen;
+	char* statePV = SvPVbyte(state, stateLen);
+	CK_RV result = self->session->provider->funcs->C_SetOperationState(self->session->handle, statePV, stateLen, self->encrypt_key, self->sign_key);
+	if (result != CKR_OK)
+		croak_with("Couldn't set operation state", result);
+
+
+void DESTROY(Crypt::HSM::Stream self)
+CODE:
+	session_refcount_decrement(self->session);
+	Safefree(self);
+
+
+int CLONE_SKIP()
+
+
+MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Encrypt
+
+
+SV* add_data(Crypt::HSM::Encrypt self, SV* data)
+CODE:
+	CK_ULONG dataLen, encryptedDataLen;
+	CK_BYTE* dataPV = get_buffer(data, &dataLen);
+	CK_RV result = self->session->provider->funcs->C_EncryptUpdate(self->session->handle, dataPV, dataLen, NULL, &encryptedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute encrypted length", result);
+
+	RETVAL = newSV(encryptedDataLen);
+	SvPOK_only(RETVAL);
+	if (encryptedDataLen) {
+		result = self->session->provider->funcs->C_EncryptUpdate(self->session->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
+		SvCUR(RETVAL) = encryptedDataLen;
+		if (result != CKR_OK)
+			croak_with("Couldn't encrypt", result);
+	}
+OUTPUT:
+	RETVAL
+
+
+SV* finalize(Crypt::HSM::Encrypt self)
+CODE:
+	CK_ULONG encryptedDataLen;
+	CK_RV result = self->session->provider->funcs->C_EncryptFinal(self->session->handle, NULL, &encryptedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute encrypted length", result);
+
+	RETVAL = newSV(encryptedDataLen + 1);
+	SvPOK_only(RETVAL);
+	result = self->session->provider->funcs->C_EncryptFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
+	SvCUR(RETVAL) = encryptedDataLen;
+	if (result != CKR_OK)
+		croak_with("Couldn't encrypt", result);
+OUTPUT:
+	RETVAL
+
+
+MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Decrypt
+
+
+SV* add_data(Crypt::HSM::Decrypt self, SV* data)
+CODE:
+	CK_ULONG dataLen, decryptedDataLen;
+	CK_BYTE* dataPV = get_buffer(data, &dataLen);
+	CK_RV result = self->session->provider->funcs->C_DecryptUpdate(self->session->handle, dataPV, dataLen, NULL, &decryptedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute decrypted length", result);
+
+	RETVAL = newSV(decryptedDataLen);
+	SvPOK_only(RETVAL);
+	if (decryptedDataLen) {
+		result = self->session->provider->funcs->C_DecryptUpdate(self->session->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
+		SvCUR(RETVAL) = decryptedDataLen;
+		if (result != CKR_OK)
+			croak_with("Couldn't decrypt", result);
+	}
+OUTPUT:
+	RETVAL
+
+
+SV* finalize(Crypt::HSM::Decrypt self)
+CODE:
+	CK_ULONG decryptedDataLen;
+	CK_RV result = self->session->provider->funcs->C_DecryptFinal(self->session->handle, NULL, &decryptedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute decrypted length", result);
+
+	RETVAL = newSV(decryptedDataLen + 1);
+	SvPOK_only(RETVAL);
+	result = self->session->provider->funcs->C_DecryptFinal(self->session->handle, SvPVbyte_nolen(RETVAL), &decryptedDataLen);
+	SvCUR(RETVAL) = decryptedDataLen;
+	if (result != CKR_OK)
+		croak_with("Couldn't decrypt", result);
+OUTPUT:
+	RETVAL
+
+
+MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Digest
+
+
+
+void add_data(Crypt::HSM::Digest self, SV* data)
+CODE:
+	CK_ULONG dataLen;
+	CK_BYTE* dataPV = get_buffer(data, &dataLen);
+	CK_RV result = self->session->provider->funcs->C_DigestUpdate(self->session->handle, dataPV, dataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute digested length", result);
+
+
+SV* add_key(Crypt::HSM::Digest self, CK_OBJECT_HANDLE key)
+CODE:
+	CK_RV result = self->session->provider->funcs->C_DigestKey(self->session->handle, key);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute digested length", result);
+OUTPUT:
+	RETVAL
+
+
+SV* finalize(Crypt::HSM::Digest self)
+CODE:
+	CK_ULONG digestedDataLen;
+	CK_RV result = self->session->provider->funcs->C_DigestFinal(self->session->handle, NULL, &digestedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute digested length", result);
+
+	RETVAL = newSV(digestedDataLen + 1);
+	SvPOK_only(RETVAL);
+	result = self->session->provider->funcs->C_DigestFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &digestedDataLen);
+	SvCUR(RETVAL) = digestedDataLen;
+	if (result != CKR_OK)
+		croak_with("Couldn't digest", result);
+OUTPUT:
+	RETVAL
+
+
+MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Sign
+
+
+void add_data(Crypt::HSM::Sign self, SV* data)
+CODE:
+	CK_ULONG dataLen;
+	CK_BYTE* dataPV = get_buffer(data, &dataLen);
+	CK_RV result = self->session->provider->funcs->C_SignUpdate(self->session->handle, dataPV, dataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't add date to sign", result);
+
+
+SV* finalize(Crypt::HSM::Sign self)
+CODE:
+	CK_ULONG signedDataLen;
+	CK_RV result = self->session->provider->funcs->C_SignFinal(self->session->handle, NULL, &signedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute signed length", result);
+
+	RETVAL = newSV(signedDataLen + 1);
+	SvPOK_only(RETVAL);
+	result = self->session->provider->funcs->C_SignFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
+	SvCUR(RETVAL) = signedDataLen;
+	if (result != CKR_OK)
+		croak_with("Couldn't sign", result);
+OUTPUT:
+	RETVAL
+
+
+MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Verify
+
+
+void add_data(Crypt::HSM::Verify self, SV* data)
+CODE:
+	CK_ULONG dataLen;
+	CK_BYTE* dataPV = get_buffer(data, &dataLen);
+	CK_RV result = self->session->provider->funcs->C_VerifyUpdate(self->session->handle, dataPV, dataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't add data to verify", result);
+
+
+bool finalize(Crypt::HSM::Verify self, SV* signature)
+CODE:
+	CK_ULONG signatureLen;
+	CK_BYTE* signaturePV = get_buffer(signature, &signatureLen);
+
+	CK_RV result = self->session->provider->funcs->C_VerifyFinal(self->session->handle, signaturePV, signatureLen);
+
+	if (result == CKR_OK)
+		RETVAL = TRUE;
+	else if (result == CKR_SIGNATURE_INVALID)
+		RETVAL = FALSE;
+	else
+		croak_with("Couldn't verify", result);
+OUTPUT:
+	RETVAL

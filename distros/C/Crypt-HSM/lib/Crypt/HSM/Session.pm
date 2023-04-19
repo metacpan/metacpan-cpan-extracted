@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.006';
+$Crypt::HSM::Session::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,26 @@ Log the current session out.
 =head2 object_size($object)
 
 This returns the size of C<$object>
+
+=head2 open_decrypt($mechanism, $key, ...)
+
+Start a decryption with C<$mechanism> and C<$key>. This returns a L<Crypt::HSM::Decrypt|Crypt::HSM::Decrypt> object.
+
+=head2 open_digest($mechanism, ...)
+
+Start a digest with C<$mechanism>. This returns a L<Crypt::HSM::Digest|Crypt::HSM::Digest> object.
+
+=head2 open_encrypt($mechanism, $key, ...)
+
+Start an encryption with C<$mechanism> and C<$key>. This returns a L<Crypt::HSM::Encrypt|Crypt::HSM::Encrypt> object.
+
+=head2 open_sign($mechanism, $key, ...)
+
+Start an signing with C<$mechanism> and C<$key>. This returns a L<Crypt::HSM::Sign|Crypt::HSM::Sign> object.
+
+=head2 open_verify($mechanism, $key, ...)
+
+Start an verification with C<$mechanism> and C<$key>. This returns a L<Crypt::HSM::Verify|Crypt::HSM::Verify> object.
 
 =head2 seed_random($seed)
 

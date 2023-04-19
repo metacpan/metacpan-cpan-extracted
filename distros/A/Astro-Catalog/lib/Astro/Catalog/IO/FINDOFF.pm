@@ -2,7 +2,7 @@ package Astro::Catalog::IO::FINDOFF;
 
 =head1 NAME
 
-Astro::Catalog::IO::FINDOFF - Catalogue I/O for Astro::Catalog for Starlink FINDOFF
+Astro::Catalog::IO::FINDOFF - Catalog I/O for Astro::Catalog for Starlink FINDOFF
 
 =head1 SYNOPSIS
 
@@ -11,7 +11,7 @@ Astro::Catalog::IO::FINDOFF - Catalogue I/O for Astro::Catalog for Starlink FIND
 
 =head1 DESCRIPTION
 
-This class provides read and write methods for catalogues in the Starlink
+This class provides read and write methods for catalogs in the Starlink
 FINDOFF input and output file format. The methods are not public and should,
 in general only be called from the C<Astro::Catalog> C<write_catalog> and
 C<read_catalog> methods.
@@ -28,7 +28,7 @@ use Astro::Catalog::Item;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -39,7 +39,7 @@ our $DEBUG = 0;
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog>
+Parses the catalog lines and returns a new C<Astro::Catalog>
 object containing the catalog entries.
 
     $cat = Astro::Catalog::IO::FINDOFF->_read_catalog(\@lines, %options);
@@ -52,7 +52,7 @@ sub _read_catalog {
     my $class = shift;
     my $lines = shift;
 
-    croak "Must supply catalogue contents as a reference to an array"
+    croak "Must supply catalog contents as a reference to an array"
         unless ref($lines) eq 'ARRAY';
 
     # Create the Astro::Catalog object.
@@ -77,11 +77,11 @@ sub _read_catalog {
             Y => $y,
             Comment => $comment);
 
-        # And push the star onto the catalogue.
+        # And push the star onto the catalog.
         $catalog->pushstar($star);
     }
 
-    # Set the catalogue's origin.
+    # Set the catalog's origin.
     $catalog->origin('IO::FINDOFF');
 
     # And return;
@@ -90,7 +90,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Create an output catalogue in the Starlink FINDOFF format and return
+Create an output catalog in the Starlink FINDOFF format and return
 the lines in an array.
 
     $ref = Astro::Catalog::IO::FINDOFF->_write_catalog($catalog);
@@ -113,7 +113,7 @@ sub _write_catalog {
     my $class = shift;
     my $catalog = shift;
 
-    croak "Must supply catalogue contents as a reference to an array"
+    croak "Must supply catalog contents as a reference to an array"
         unless UNIVERSAL::isa($catalog, "Astro::Catalog");
 
     # Set up variables for output.

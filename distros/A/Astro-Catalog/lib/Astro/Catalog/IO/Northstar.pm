@@ -2,7 +2,7 @@ package Astro::Catalog::IO::Northstar;
 
 =head1 NAME
 
-Astro::Catalog::IO::Northstar - NorthStar format catalogue parser
+Astro::Catalog::IO::Northstar - NorthStar format catalog parser
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ Astro::Catalog::IO::Northstar - NorthStar format catalogue parser
 
 =head1 DESCRIPTION
 
-This class provides read and write methods for catalogues in the
+This class provides read and write methods for catalogs in the
 format used by the NorthStar proposal submission system.  The methods
 are not public and should, in general, only be called from the
 C<Astro::Catalog> C<write_catalog> and C<read_catalog> methods.
@@ -31,7 +31,7 @@ use Astro::Catalog::Item;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =head1 METHODS
@@ -40,7 +40,7 @@ our $DEBUG = 0;
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog>
+Parses the catalog lines and returns a new C<Astro::Catalog>
 object containing the catalog entries.
 
     $cat = Astro::Catalog::IO::Northstar->_read_catalog(\@lines, %options);
@@ -64,7 +64,7 @@ sub _read_catalog {
 
     my %options = (%defaults, @_);
 
-    croak "Must supply catalogue contents as a reference to an array"
+    croak "Must supply catalog contents as a reference to an array"
         unless ref($lines) eq 'ARRAY';
 
     # Create a new telescope to associate with this
@@ -126,7 +126,7 @@ __END__
 
 =head1 NOTES
 
-The NorthStar (http://proposal.astron.nl) catalogue format is:
+The NorthStar (http://proposal.astron.nl) catalog format is:
 
   TargetName  hh:mm:ss  dd:mm:ss system  misc
 

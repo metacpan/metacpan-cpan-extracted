@@ -9,7 +9,7 @@ require q[./t/helper.pm];
 my $pwd = cwd;
 
 my $cpanfile      = "$FindBin::Bin/../test_dists/DeployCpanfile/cpanfile";
-my $cpanfile_info = App::MechaCPAN::Deploy::parse_cpanfile($cpanfile);
+my $cpanfile_info = App::MechaCPAN::parse_cpanfile($cpanfile);
 
 my $output = {
   'runtime' => {

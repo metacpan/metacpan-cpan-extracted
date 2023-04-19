@@ -34,7 +34,7 @@ use base qw/Astro::Catalog::IO::ASCII/;
 
 use Data::Dumper;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 
 =begin __PRIVATE_METHODS__
 
@@ -48,7 +48,7 @@ call them from outside that module.
 
 =item B<_read_catalog>
 
-Parses a reference to an array containing a simply formatted catalogue
+Parses a reference to an array containing a simply formatted catalog
 
     $catalog = Astro::Catalog::IO::VOTable->_read_catalog(\@lines);
 
@@ -215,7 +215,7 @@ sub _read_catalog {
         $catalog->pushstar( $star );
     }
 
-    # return the catalogue
+    # return the catalog
     $catalog->origin( 'IO::VOTable' );
     return $catalog;
 
@@ -223,7 +223,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Will write the catalogue object to an simple output format
+Will write the catalog object to an simple output format
 
     $lines = Astro::Catalog::IO::VOTable->_write_catalog($catalog);
 
@@ -236,11 +236,11 @@ sub _write_catalog {
     my $class = shift;
     my $catalog = shift;
 
-    # real list of filters and colours in the catalogue
+    # real list of filters and colours in the catalog
     my @mags = $catalog->starbyindex(0)->what_filters();
     my @cols = $catalog->starbyindex(0)->what_colours();
 
-    # number of stars in catalogue
+    # number of stars in catalog
     my $number = $catalog->sizeof();
 
     # number of filters & colours

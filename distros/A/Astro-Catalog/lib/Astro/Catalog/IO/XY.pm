@@ -11,7 +11,7 @@ Astro::Catalog::IO::XY - X & Y position I/O for Astro::Catalog
 =head1 DESCRIPTION
 
 Performs simple IO, writing "x y" formatted strings for each
-Astro::Catalog::Item object in the catalogue.
+Astro::Catalog::Item object in the catalog.
 
 =cut
 
@@ -27,7 +27,7 @@ use Astro::Catalog::Item;
 
 use base qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.36';
+our $VERSION = '4.37';
 our $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -42,12 +42,12 @@ call them from outside that module.
 
 =item B<_read_catalog>
 
-Parses the catalogue lines and returns a new C<Astro::Catalog> object
-containing the catalogue entries.
+Parses the catalog lines and returns a new C<Astro::Catalog> object
+containing the catalog entries.
 
     $cat = Astro::Catalog::IO::XY->_read_catalog(\@lines);
 
-The catalogue lines must be as described in the FORMAT section, below.
+The catalog lines must be as described in the FORMAT section, below.
 
 =cut
 
@@ -87,16 +87,16 @@ sub _read_catalog {
         $catalog->pushstar($item);
     }
 
-    # Set the catalogue origin and return.
+    # Set the catalog origin and return.
     $catalog->origin('IO::XY');
     return $catalog;
 }
 
 =item B<_write_catalog>
 
-Will write the catalogue object to a simple output format of the form
+Will write the catalog object to a simple output format of the form
 "x y", where x is the x-position and y is the y-position of each
-object in the catalogue.
+object in the catalog.
 
     $lines = Astro::Catalog::IO::XY->_write_catalog($catalog);
 
