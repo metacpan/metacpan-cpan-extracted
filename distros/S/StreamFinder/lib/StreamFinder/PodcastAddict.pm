@@ -360,7 +360,7 @@ sub new
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 	$self->{'id'} = '';
 	$self->{'_podcast_id'} = '';
-	(my $url2fetch = $url);
+	my $url2fetch = $url;
 	my $tried = 0;
 	my @epiTitles = ();
 	my @epiStreams = ();
@@ -372,20 +372,35 @@ sub new
 	my $response;
 	my $isEpisode;
 
+#NOTE:  THE ONLY "EPISODE" URLS NOW USED BY PODCASTADDICT ARE THE URI-ESCAPED ONES CONTAINING
+#THE STREAM URL EMBEDDED IN THEIR PODCAST PAGES (WITH NO EPISODE-ID#) AND HAVE THE FORMAT (EXAMPLE):
+#"https://podcastaddict.com/episode/https%3A%2F%2Fpscrb.fm%2Frss%2Fp%2Fpdst.fm%2Fe%2Farttrk.com%2Fp%2FABMA5%2Faudioboom.com%2Fposts%2F8280770.mp3%3Fmodified%3D1681401989%26sid%3D2399216%26source%3Drss&podcastId=1719501"
+#TO PREVENT USING THE FULL STREAM-URL FOR THE UNIQUE EPISODE-ID#, WE JUST USE THE PODCAST-ID#.
+#NO KNOWN WAY EXISTS FOR FETCHING EPISODES VIA JUST A PODCAST AND EPISODE-ID, THEREFORE WE CAN'T
+#DETERMINE WHAT THE REAL EPISODE-ID IS, EXCEPT ON PODCAST PAGES STILL USING THE CLASSIC, UNESCAPED
+#EPISODE-URLS (format:  "https://podcastaddict.com/episode/<episode-ID-number>")!
+#(NOTE ALSO THAT THE "&podcastId=#####" PART OF THE URL IS *NOT* THE SEARCHABLE PODCAST-ID EITHER,
+#BUT RATHER THE PODCAST ARTIST'S/CHANNEL ID#)!
+
 TRYIT:
-	if ($url2fetch =~ m#^([0-9]+)$#) {  #ASSUME EPISODE-ID, AS BOTH PODCAST & EPISODE IDs ARE ALL NUMERIC!:
+	if ($url2fetch =~ m#^([0-9]+)$#) {  #ASSUME PODCAST-ID, AS EPISODES NO LONGER HAVE DESCERNABLE IDs:
 		$self->{'id'} = $1;
-		$url2fetch = 'https://podcastaddict.com/episode/'.$self->{'id'};
-		$isEpisode = 1;
-	} elsif ($url2fetch =~ m#\/episode\/(\d+)\/?$#) {  #SHORT EPISODE URL (ACTUAL ONE LOADED BY BROWSER)
-		$self->{'id'} = $1;
-		$isEpisode = 1;
-	} elsif ($url2fetch =~ m#\/episode\/https?#) {     #LONG EPISODE URL (ON PODCAST PAGES)
-		$self->{'id'} = '';
-		$isEpisode = 1;
-	} elsif ($url2fetch =~ m#\/podcast\/(\d+)\/?$#) {  #PODCAST URL
-		$self->{'id'} = $1;
+		$url2fetch = 'https://podcastaddict.com/podcast/'.$self->{'id'};
 		$isEpisode = 0;
+		print STDERR "-1- PODCAST ID, ID=".$self->{'id'}."= found ($url2fetch)\n"  if ($DEBUG);
+	} elsif ($url2fetch =~ m#\/episode\/https?#) { #(LONG) EPISODE URL (ON PODCAST PAGES, ESCAPED):
+		$url2fetch = uri_escape($url2fetch)  unless($url2fetch =~ m#\%3A#);  #PODCASTADDICT EPISODE URLS NOW MUST BE URI-ESCAPED!
+		#$self->{'id'} IS NOT EMBEDDED OR DETERMINABLE, WILL SET TO PODCAST-ID LATER!
+		$isEpisode = 1;
+		print STDERR "-2- EPISODE URL, ID=UNKNOWN= found ($url2fetch)\n"  if ($DEBUG);
+	} elsif ($url2fetch =~ m#\/episode\/(\d+)\/?$#) {  #CLASSIC (SHORT) EPISODE URL WITH ID. (DEPRECIATED)
+		$self->{'id'} = $1;  #CLASSIC EPISODE URLS HAVE A PROPER EPISODE-ID EMBEDDED!
+		$isEpisode = 1;
+		print STDERR "-3- CLASSIC EPISODE URL, ID=".$self->{'id'}."= found ($url2fetch)\n"  if ($DEBUG);
+	} elsif ($url2fetch =~ m#\/podcast\/#) {  #PODCAST URL
+		$self->{'id'} = $1;  #USE UNIQUE NUMBER AS A MADE-UP "EPISODE-ID"
+		$isEpisode = 0;
+		print STDERR "-4- PODCAST URL, ID=".$self->{'id'}."= found ($url2fetch)\n"  if ($DEBUG);
 	} else {
 		return undef;  #INVALID ID/URL!
 	}
@@ -408,6 +423,8 @@ TRYIT:
 
 		#FETCH PODCAST-WIDE METADATA HERE!:
 		$self->{'albumartist'} = $url2fetch;
+		$self->{'albumartist'} = $1  if ($html =~ m#\<meta\s+property\=\"(?:og|twitter)\:url\"\s+content\=\"([^\"]+)\"\>#s);
+		$self->{'id'} = $1  if ($self->{'albumartist'} =~ m#(\d+)\/?$#);
 		if ($html =~ m#\<div\s+class\=\"headerThumbnail\"\>(.+?)\<\/div\>#s) {
 			my $thumbnaildata = $1;
 			$self->{'articonurl'} = $1  if ($thumbnaildata =~ m#\<img\s+src\=\"([^\"]+)#s);
@@ -448,24 +465,20 @@ TRYIT:
 		print STDERR "-----WE'RE AN EPISODE PAGE: ID=".$self->{'id'}."!\n"  if ($DEBUG);
 		if ($html =~ m#\<h1\>(.+?)\<\/h1\>#s) {
 			my $h1data = $1;
-			my $channelID = $1  if ($h1data =~ m#\<a\s+href\=\"\/podcast\/(\d+)#s);  #USE PODCAST'S ID FOR DEFAULT.
-			$self->{'id'} ||= $channelID;
-			$self->{'articonurl'} ||= 'https://podcastaddict.com/cache/artwork/thumb/'.$channelID;
-			$self->{'albumartist'} = 'https://podcastaddict.com/podcast/'.$channelID;
-			#NOTE:  podcastaddict DOES NOT INCLUDE THE PODCAST ARTIST'S NAME IN EPISODE PAGES, SO WE 
-			#PUT THE PODCAST NAME IN THE ARTIST FIELD (WHICH WOULD NORMALLY GO IN THE ALBUM FIELD)!
-			#IF WE ALREADY HAVE (THE CORRECT) ARTIST & ALBUM FIELDS, IT MEANS WE FETCHED A PODCAST 
+			if ($h1data =~ m#\<a\s+href\=\"([^\"]+)#s) {
+				$self->{'albumartist'} = $1;
+				my $channelID = $1  if ($self->{'albumartist'} =~ m#\/(\d+)$#);  #USE PODCAST'S ID FOR ARTIST ICON.
+				$self->{'id'} ||= $channelID;  #USE PODCAST'S ID SINCE NEWER (LONG) EPISODES DON'T HAVE ONE.
+				$self->{'articonurl'} ||= 'https://podcastaddict.com/cache/artwork/thumb/'.$channelID;
+			}
+			#NOTE:  podcastaddict DOES NOT INCLUDE THE PODCAST ALBUM'S NAME IN EPISODE PAGES.
+			#IF WE ALREADY HAVE (THE CORRECT) ALBUM FIELD, IT MEANS WE FETCHED A PODCAST 
 			#PAGE FIRST AND HERE WE'RE FETCHING THE 1ST EPISODE, SO LEAVE 'EM ALONE (THEY'RE CORRECT)!:
 			#(FOR REFERENCE, NORMALLY THE "ARTIST" IS THE PODCAST'S ARTIST'S NAME, AND ALBUM IS THE 
 			#PODCAST'S NAME (AN ARTIST CAN HAVE MULTIPLE PODCASTS & A PODCAST CAN HAVE MULT. EPISODES)!)
 			$self->{'artist'} ||= $1  if ($h1data =~ m#\>(.+?)\<\/a\>#s);
 		}
 		$self->{'title'} = $1  if ($html =~ m#\<h4\>(.+?)\<\/h4\>#s);
-		if ($html =~ m#\<meta\s+property\=\"og\:url\"\s+content\=\"(http[^\"]+)#s) {
-		    my $epiShortURL = $1;
-			$self->{'album'} ||= $epiShortURL;  #SET ALBUM TO THE "SHORT EPISODE URL" B/C THE LONG ONE IS HIDIOUSLY LONG!
-			$self->{'id'} = $1  if ($epiShortURL =~ m#\/(\d+)\/?$#);  #WE FOUND THE PROPER EPISODE ID, SO USE THAT!
-		}
 		$self->{'imageurl'} = $1  if ($html =~ m#Artwork\"\s+src\=\"([^\"]+)#s);
 		$self->{'imageurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)#);
 		$self->{'iconurl'} = $self->{'imageurl'};
@@ -507,9 +520,15 @@ TRYIT:
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 
-	print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."= iconurl="
-			.$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}
-			."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."=\n";
+		foreach my $f (sort keys %{$self}) {
+			print STDERR "--field($f)=".$self->{$f}."=\n";
+		}
+		foreach my $s (@{$self->{'streams'}}) {
+			print STDERR "-----stream=$s=\n";
+		}
+	}
 	return undef  unless ($self->{'cnt'} > 0);
 
 	#GENERATE EXTENDED-M3U PLAYLIST (NOTE: MAY NOT BE ABLE TO UNTIL USER CALLS $podcast->get('playlist')!):

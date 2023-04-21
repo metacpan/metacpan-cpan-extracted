@@ -4,14 +4,14 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
-use DateTime::Format::ISO8601;
+use DateTime;
 use English;
 use Error::Pure qw(err);
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -41,32 +41,34 @@ sub print {
 	}
 
 	# Convert to DateTime.
-	my $dt = _parse_date((substr $obj->value, 1));
+	my $dt = _parse_date($obj->value);
 
-	# TODO Precision
-	# 0 - billion years, 1 - hundred million years, ..., 6 - millenia, 7 - century, 8 - decade,
-	# 9 - year, 10 - month, 11 - day
-	# TODO other?
+	my $printed_date;
+	if ($obj->precision == 11) {
+		$printed_date = $dt->strftime("%e %B %Y");
+		$printed_date =~ s/^\s+//ms;
+	} elsif ($obj->precision == 10) {
+		$printed_date = $dt->strftime("%B %Y");
+	} elsif ($obj->precision == 9) {
+		$printed_date = $dt->strftime("%Y");
+	} else {
+		# TODO Precision
+		# 0 - billion years, 1 - hundred million years, ..., 6 - millenia, 7 - century, 8 - decade,
+		err "Unsupported precision '".$obj->precision."'.";
+	}
 
-	# TODO %d 01 -> 1
-	# TODO Based on precision.
-	return $dt->strftime("%d %B %Y").' ('.$calendar.')';
+	return $printed_date.' ('.$calendar.')';
 }
 
 sub _parse_date {
 	my $date = shift;
 
-	my $dt = eval {
-		DateTime::Format::ISO8601->parse_datetime($date, 1);
-	};
-	if ($EVAL_ERROR) {
-		err 'Cannot parse datetime value.',
-			'Input string', $date,
-			# XXX Long error message, we don't need. Probably issue
-			# in DateTime::Format::ISO8601
-			# 'Error', $EVAL_ERROR,
-		;
-	}
+	my ($year, $month, $day) = ($date =~ m/^([\+\-]\d{4})\-(\d{2})\-(\d{2})T\d{2}:\d{2}:\d{2}Z$/ms);
+	my $dt = DateTime->new(
+		'year' => int($year),
+		$month != 0 ? ('month' => $month) : (),
+		$day != 0 ? ('day' => $day) : (),
+	);
 
 	return $dt;
 }
@@ -107,6 +109,7 @@ Returns string.
                  Input string: %s
          Object isn't 'Wikibase::Datatype::Value::Time'.
          Option 'cb' must be a instance of Wikibase::Cache.
+         Unsupported precision '%s'.
 
 =head1 EXAMPLE1
 
@@ -120,7 +123,7 @@ Returns string.
 
  # Object.
  my $obj = Wikibase::Datatype::Value::Time->new(
-         'precision' => 10,
+         'precision' => 11,
          'value' => '+2020-09-01T00:00:00Z',
  );
 
@@ -128,7 +131,7 @@ Returns string.
  print Wikibase::Datatype::Print::Value::Time::print($obj)."\n";
 
  # Output:
- # 01 September 2020 (Q1985727)
+ # 1 September 2020 (Q1985727)
 
 =head1 EXAMPLE2
 
@@ -144,7 +147,7 @@ Returns string.
 
  # Object.
  my $obj = Wikibase::Datatype::Value::Time->new(
-         'precision' => 10,
+         'precision' => 11,
          'value' => '+2020-09-01T00:00:00Z',
  );
 
@@ -159,11 +162,11 @@ Returns string.
  })."\n";
 
  # Output:
- # 01 September 2020 (proleptic Gregorian calendar)
+ # 1 September 2020 (proleptic Gregorian calendar)
 
 =head1 DEPENDENCIES
 
-L<DateTime::Format::ISO8601>,
+L<DateTime>,
 L<English>,
 L<Error::Pure>,
 L<Exporter>,
@@ -197,6 +200,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

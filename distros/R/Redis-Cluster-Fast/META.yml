@@ -3,16 +3,9 @@ abstract: 'A fast perl binding for Redis Cluster'
 author:
   - 'plainbanana <plainbanana@mustardon.tokyo>'
 build_requires:
-  IO::CaptureOutput: '0'
-  Scope::Guard: '0'
-  Sub::Retry: '0'
-  Test::LeakTrace: '0'
   Test::More: '0.98'
-  Test::SharedFork: '0'
-  Test::Valgrind: '0'
 configure_requires:
   Devel::CheckBin: '0'
-  File::Spec: '0'
   File::Which: '0'
   File::chdir: '0'
   Module::Build: '0.4005'
@@ -38,13 +31,13 @@ no_index:
 provides:
   Redis::Cluster::Fast:
     file: lib/Redis/Cluster/Fast.pm
-    version: '0.087'
+    version: '0.088'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plainbanana/Redis-Cluster-Fast/issues
   homepage: https://github.com/plainbanana/Redis-Cluster-Fast
   repository: https://github.com/plainbanana/Redis-Cluster-Fast.git
-version: '0.087'
+version: '0.088'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

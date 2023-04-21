@@ -4,14 +4,66 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
+use DateTime;
 use Error::Pure qw(err);
 use List::Util qw(none);
 use Wikibase::Datatype::Languages qw(all_language_codes);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_entity check_language check_lexeme check_property);
+Readonly::Array our @EXPORT_OK => qw(check_datetime check_entity check_language check_lexeme check_property);
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
+
+sub check_datetime {
+	my ($self, $key) = @_;
+
+	if ($self->{$key} !~ m/^([\+\-]\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/ms) {
+		err "Parameter '$key' has bad date time.",
+			'Value', $self->{$key},
+		;
+	}
+	my ($year, $month, $day, $hour, $min, $sec) = ($1, $2, $3, $4, $5, $6);
+	if ($month > 12) {
+		err "Parameter '$key' has bad date time month value.",
+			'value' => $self->{$key},
+		;
+	}
+	if ($month > 0) {
+		my $dt = DateTime->new(
+			'day' => 1,
+			'month' => $month,
+			'year' => int($year),
+		)->add(months => 1)->subtract(days => 1);;
+		if ($day > $dt->day) {
+			err "Parameter '$key' has bad date time day value.",
+				'value' => $self->{$key},
+			;
+		}
+	} else {
+		if ($day != 0) {
+			err "Parameter '$key' has bad date time day value.",
+				'value' => $self->{$key},
+			;
+		}
+	}
+	if ($hour != 0) {
+		err "Parameter '$key' has bad date time hour value.",
+			'value' => $self->{$key},
+		;
+	}
+	if ($min != 0) {
+		err "Parameter '$key' has bad date time minute value.",
+			'value' => $self->{$key},
+		;
+	}
+	if ($sec != 0) {
+		err "Parameter '$key' has bad date time second value.",
+			'value' => $self->{$key},
+		;
+	}
+
+	return;
+}
 
 sub check_entity {
 	my ($self, $key) = @_;
@@ -75,8 +127,9 @@ Wikibase::Datatype::Utils - Wikibase datatype utilities.
 
 =head1 SYNOPSIS
 
- use Wikibase::Datatype::Utils qw(check_entity check_language check_lexeme check_property);
+ use Wikibase::Datatype::Utils qw(check_datetime check_entity check_language check_lexeme check_property);
 
+ check_datetime($self, $key);
  check_entity($self, $key);
  check_language($self, $key);
  check_lexeme($self, $key);
@@ -87,6 +140,15 @@ Wikibase::Datatype::Utils - Wikibase datatype utilities.
 Datatype utilities for checking of data objects.
 
 =head1 SUBROUTINES
+
+=head2 C<check_datetime>
+
+ check_datetime($self, $key);
+
+Check parameter defined by C<$key> if it's datetime for Wikibase.
+Format of value is variation of ISO 8601 with some changes (like 00 as valid month).
+
+Returns undef.
 
 =head2 C<check_entity>
 
@@ -122,6 +184,20 @@ Returns undef.
 
 =head1 ERRORS
 
+ check_datetime():
+         Parameter '%s' has bad date time.
+                 Value: %s
+         Parameter '%s' has bad date time day value.
+                 Value: %s
+         Parameter '%s' has bad date time hour value.
+                 Value: %s
+         Parameter '%s' has bad date time minute value.
+                 Value: %s
+         Parameter '%s' has bad date time month value.
+                 Value: %s
+         Parameter '%s' has bad date time second value.
+                 Value: %s
+
  check_entity():
          Parameter '%s' must begin with 'Q' and number after it.";
 
@@ -136,6 +212,49 @@ Returns undef.
          Parameter '%s' must begin with 'P' and number after it.";
 
 =head1 EXAMPLE1
+
+=for comment filename=check_datetime_success.pl
+
+ use strict;
+ use warnings;
+
+ use Wikibase::Datatype::Utils qw(check_datetime);
+
+ my $self = {
+         'key' => '+0134-11-00T00:00:00Z',
+         'precision' => 10
+ };
+ check_datetime($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE2
+
+=for comment filename=check_datetime_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Wikibase::Datatype::Utils qw(check_datetime);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => '+0134-34-00T00:01:00Z',
+ };
+ check_datetime($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' has bad date time month value.
+
+=head1 EXAMPLE3
 
 =for comment filename=check_entity_success.pl
 
@@ -155,7 +274,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE2
+=head1 EXAMPLE4
 
 =for comment filename=check_entity_fail.pl
 
@@ -178,7 +297,7 @@ Returns undef.
  # Output like:
  # #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'Q' and number after it.
 
-=head1 EXAMPLE3
+=head1 EXAMPLE5
 
 =for comment filename=check_lexeme_success.pl
 
@@ -198,7 +317,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head1 EXAMPLE6
 
 =for comment filename=check_lexeme_fail.pl
 
@@ -221,7 +340,7 @@ Returns undef.
  # Output like:
  # #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'L' and number after it.
 
-=head1 EXAMPLE5
+=head1 EXAMPLE7
 
 =for comment filename=check_property_success.pl
 
@@ -241,7 +360,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE8
 
 =for comment filename=check_property_fail.pl
 
@@ -266,6 +385,7 @@ Returns undef.
 
 =head1 DEPENDENCIES
 
+L<DateTime>,
 L<Exporter>,
 L<Error::Pure>,
 L<List::Util>,
@@ -299,6 +419,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

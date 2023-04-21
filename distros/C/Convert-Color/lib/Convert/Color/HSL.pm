@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::HSL 0.16;
+package Convert::Color::HSL 0.17;
 
 use v5.14;
 use warnings;

@@ -1,5 +1,7 @@
 Changes
 examples/all_language_codes.pl
+examples/check_datetime_fail.pl
+examples/check_datetime_success.pl
 examples/check_entity_fail.pl
 examples/check_entity_success.pl
 examples/check_lexeme_fail.pl
@@ -33,7 +35,9 @@ examples/fixture_create_and_print_mediainfo_commons_imageofhuman.pl
 examples/fixture_create_and_print_reference_wd_url.pl
 examples/fixture_create_and_print_reference_wd_viaf.pl
 examples/fixture_create_and_print_snak_wd_givenname_douglas.pl
+examples/fixture_create_and_print_snak_wd_gramatical_gender_masculine.pl
 examples/fixture_create_and_print_snak_wd_image_dog.pl
+examples/fixture_create_and_print_snak_wd_instance_of_human.pl
 examples/fixture_create_and_print_value_item_wd_dog.pl
 examples/fixture_create_and_print_value_item_wd_douglas.pl
 examples/fixture_create_and_print_value_item_wd_douglasadams.pl
@@ -362,10 +366,11 @@ t/Wikibase-Datatype-Statement/07-references.t
 t/Wikibase-Datatype-Statement/08-snak.t
 t/Wikibase-Datatype-Utils/01-use.t
 t/Wikibase-Datatype-Utils/02-version.t
-t/Wikibase-Datatype-Utils/03-check_entity.t
-t/Wikibase-Datatype-Utils/04-check_language.t
-t/Wikibase-Datatype-Utils/05-check_lexeme.t
-t/Wikibase-Datatype-Utils/06-check_property.t
+t/Wikibase-Datatype-Utils/03-check_datetime.t
+t/Wikibase-Datatype-Utils/04-check_entity.t
+t/Wikibase-Datatype-Utils/05-check_language.t
+t/Wikibase-Datatype-Utils/06-check_lexeme.t
+t/Wikibase-Datatype-Utils/07-check_property.t
 t/Wikibase-Datatype-Value-Globecoordinate/01-use.t
 t/Wikibase-Datatype-Value-Globecoordinate/02-version.t
 t/Wikibase-Datatype-Value-Globecoordinate/03-new.t

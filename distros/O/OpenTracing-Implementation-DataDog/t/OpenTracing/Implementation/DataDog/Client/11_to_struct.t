@@ -12,6 +12,7 @@ my $some_span_context = SpanContext->new(
     resource_name   => 'rsrc name',
     environment     => 'test envr',
     hostname        => 'test host',
+    version         => 'test vers',
     baggage_items   => { foo => 1, bar => 2 },
 )->with_span_id(54365)->with_trace_id(87359);
 
@@ -39,6 +40,7 @@ cmp_deeply(
         resource   => "rsrc name",
         env        => "test envr",
         hostname   => 'test host',
+        version    => 'test vers',
         parent_id  => 54365,
         name       => "oprt name",
         start      => 52750000000, # nano seconds

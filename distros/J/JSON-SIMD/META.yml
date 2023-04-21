@@ -20,7 +20,9 @@ no_index:
     - inc
 requires:
   Types::Serialiser: '0'
-  common::sense: '0'
-resources: {}
-version: '1.03'
+resources:
+  bugtracker: https://github.com/pjuhasz/JSON-SIMD/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/pjuhasz/JSON-SIMD
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

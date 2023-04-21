@@ -86,15 +86,3 @@ sub Encoding {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-Autrijus Tang
-
-=head1 SEE ALSO
-
-DBIx::SearchBuilder, DBIx::SearchBuilder::Handle
-
-=cut

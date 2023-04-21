@@ -55,35 +55,35 @@
    "provides" : {
       "Crypt::HSM" : {
          "file" : "lib/Crypt/HSM.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Decrypt" : {
          "file" : "lib/Crypt/HSM/Decrypt.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Digest" : {
          "file" : "lib/Crypt/HSM/Digest.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Encrypt" : {
          "file" : "lib/Crypt/HSM/Encrypt.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Session" : {
          "file" : "lib/Crypt/HSM/Session.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Sign" : {
          "file" : "lib/Crypt/HSM/Sign.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Stream" : {
          "file" : "lib/Crypt/HSM/Stream.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Crypt::HSM::Verify" : {
          "file" : "lib/Crypt/HSM/Verify.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -97,7 +97,7 @@
          "web" : "https://github.com/Leont/crypt-hsm"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

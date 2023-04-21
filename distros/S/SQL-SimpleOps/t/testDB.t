@@ -26,6 +26,8 @@
 	use IO::File;
 	use Test::More;
 
+	our $VERSION = "2023.106.1";
+
 	BEGIN{ use_ok('SQL::SimpleOps'); };
 
 	my $dir = ($0 =~ /^(.*)\/(.*)/) ? $1 : "";

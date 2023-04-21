@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.74";
+our $VERSION = "1.76";
 
 use Clone qw();
 use Encode qw();
@@ -806,6 +806,7 @@ in a single query.
 
 =cut
 
+my $unsupported_combine_search_and_count_logged;
 sub CombineSearchAndCount {
     my $self = shift;
     if ( @_ ) {
@@ -813,7 +814,8 @@ sub CombineSearchAndCount {
             $self->{'_combine_search_and_count'} = shift;
         }
         else {
-            warn "Current database version " . $self->_Handle->DatabaseVersion . " does not support CombineSearchAndCount. Consider upgrading to a newer version with support for windowing functions.";
+            warn "Current database version " . $self->_Handle->DatabaseVersion . " does not support CombineSearchAndCount. Consider upgrading to a newer version with support for windowing functions." unless $unsupported_combine_search_and_count_logged;
+            $unsupported_combine_search_and_count_logged ||= 1;
             return undef;
         }
     }
@@ -2060,6 +2062,32 @@ is installed, using a temporary file as the database.  For example:
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item Ansgar Burchardt <ANSGAR@cpan.org>
+
+=item Audrey Tang <audreyt@audreyt.org>
+
+=item Ivan Kohler <ivan-rt@420.am>
+
+=item Martin King <Martin.King@arm.com>
+
+=item Mathieu Arnold <mat@mat.cc>
+
+=item Matt Knopp <mhat@netlag.com>
+
+=item Matthew Simon Cavalletto <simonm@cavalletto.org>
+
+=item Nick Morrott <knowledgejunkie@gmail.com>
+
+=item Oliver Tappe <oliver@akso.de>
+
+=item Simon Cozens <simon@cpan.org>
+
+=back
+
 =head1 BUGS
 
 All bugs should be reported via email to
@@ -2072,7 +2100,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2001-2022, Best Practical Solutions LLC.
+Copyright (C) 2001-2023, Best Practical Solutions LLC.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

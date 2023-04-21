@@ -67,7 +67,7 @@
    "provides" : {
       "App::RouterColorizer" : {
          "file" : "lib/App/RouterColorizer.pm",
-         "version" : "1.230830"
+         "version" : "1.231100"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/jmaslak/App-RouterColorizer"
       }
    },
-   "version" : "1.230830",
+   "version" : "1.231100",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

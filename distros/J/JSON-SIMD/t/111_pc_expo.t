@@ -32,5 +32,6 @@ $js  = q|[1.01e+30]|;
 $obj = $pc->decode($js);
 is($obj->[0], 1.01e+30, 'digit 1.01e+30');
 $js = $pc->encode($obj);
-like($js,qr/\[1.01[Ee]\+0?30\]/, 'digit 1.01e+30');
+# -Dusequadmath may produce the integer form
+like($js,qr/\[(?:1.01[Ee]\+0?30|1010000000000000000000000000000)\]/, 'digit 1.01e+30');
 

@@ -27,6 +27,7 @@ no_index:
     - xt
 requires:
   Class::Utils: 0.03
+  DateTime: 0
   Error::Pure: 0.15
   Exporter: 0
   List::MoreUtils: 0
@@ -41,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype
-version: '0.25'
+version: '0.26'

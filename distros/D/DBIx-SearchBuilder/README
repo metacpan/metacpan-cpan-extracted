@@ -2,15 +2,575 @@ NAME
     DBIx::SearchBuilder - Encapsulate SQL queries and rows in simple perl
     objects
 
+SYNOPSIS
+      use DBIx::SearchBuilder;
+
+      package My::Things;
+      use base qw/DBIx::SearchBuilder/;
+
+      sub _Init {
+          my $self = shift;
+          $self->Table('Things');
+          return $self->SUPER::_Init(@_);
+      }
+
+      sub NewItem {
+          my $self = shift;
+          # MyThing is a subclass of DBIx::SearchBuilder::Record
+          return(MyThing->new);
+      }
+
+      package main;
+
+      use DBIx::SearchBuilder::Handle;
+      my $handle = DBIx::SearchBuilder::Handle->new();
+      $handle->Connect( Driver => 'SQLite', Database => "my_test_db" );
+
+      my $sb = My::Things->new( Handle => $handle );
+
+      $sb->Limit( FIELD => "column_1", VALUE => "matchstring" );
+
+      while ( my $record = $sb->Next ) {
+          print $record->my_column_name();
+      }
+
 DESCRIPTION
     This module provides an object-oriented mechanism for retrieving and
     updating data in a DBI-accesible database.
 
-INSTALLATION
-    $ perl Makefile.PL
-    $ make
-    $ make test   # but see below for how to actually test against a test database
-    # make install
+    In order to use this module, you should create a subclass of
+    "DBIx::SearchBuilder" and a subclass of "DBIx::SearchBuilder::Record"
+    for each table that you wish to access. (See the documentation of
+    "DBIx::SearchBuilder::Record" for more information on subclassing it.)
+
+    Your "DBIx::SearchBuilder" subclass must override "NewItem", and
+    probably should override at least "_Init" also; at the very least,
+    "_Init" should probably call "_Handle" and "_Table" to set the database
+    handle (a "DBIx::SearchBuilder::Handle" object) and table name for the
+    class. You can try to override just about every other method here, as
+    long as you think you know what you are doing.
+
+METHOD NAMING
+    Each method has a lower case alias; '_' is used to separate words. For
+    example, the method "RedoSearch" has the alias "redo_search".
+
+METHODS
+  new
+    Creates a new SearchBuilder object and immediately calls "_Init" with
+    the same parameters that were passed to "new". If you haven't overridden
+    "_Init" in your subclass, this means that you should pass in a
+    "DBIx::SearchBuilder::Handle" (or one of its subclasses) like this:
+
+       my $sb = My::DBIx::SearchBuilder::Subclass->new( Handle => $handle );
+
+    However, if your subclass overrides _Init you do not need to take a
+    Handle argument, as long as your subclass returns an appropriate handle
+    object from the "_Handle" method. This is useful if you want all of your
+    SearchBuilder objects to use a shared global handle and don't want to
+    have to explicitly pass it in each time, for example.
+
+  _Init
+    This method is called by "new" with whatever arguments were passed to
+    "new". By default, it takes a "DBIx::SearchBuilder::Handle" object as a
+    "Handle" argument, although this is not necessary if your subclass
+    overrides "_Handle".
+
+  CleanSlate
+    This completely erases all the data in the SearchBuilder object. It's
+    useful if a subclass is doing funky stuff to keep track of a search and
+    wants to reset the SearchBuilder data without losing its own data; it's
+    probably cleaner to accomplish that in a different way, though.
+
+  Clone
+    Returns copy of the current object with all search restrictions.
+
+  _ClonedAttributes
+    Returns list of the object's fields that should be copied.
+
+    If your subclass store references in the object that should be copied
+    while clonning then you probably want override this method and add own
+    values to the list.
+
+  _Handle  [DBH]
+    Get or set this object's DBIx::SearchBuilder::Handle object.
+
+  _DoSearch
+    This internal private method actually executes the search on the
+    database; it is called automatically the first time that you actually
+    need results (such as a call to "Next").
+
+  AddRecord RECORD
+    Adds a record object to this collection.
+
+  _RecordCount
+    This private internal method returns the number of Record objects saved
+    as a result of the last query.
+
+  _DoCount
+    This internal private method actually executes a counting operation on
+    the database; it is used by "Count" and "CountAll".
+
+  _DoSearchAndCount
+    This internal private method actually executes the search and also
+    counting on the database;
+
+  _ApplyLimits STATEMENTREF
+    This routine takes a reference to a scalar containing an SQL statement.
+    It massages the statement to limit the returned rows to only
+    "$self->RowsPerPage" rows, skipping "$self->FirstRow" rows. (That is, if
+    rows are numbered starting from 0, row number "$self->FirstRow" will be
+    the first row returned.) Note that it probably makes no sense to set
+    these variables unless you are also enforcing an ordering on the rows
+    (with "OrderByCols", say).
+
+  _DistinctQuery STATEMENTREF
+    This routine takes a reference to a scalar containing an SQL statement.
+    It massages the statement to ensure a distinct result set is returned.
+
+  _DistinctQueryAndCount STATEMENTREF
+    This routine takes a reference to a scalar containing an SQL statement.
+    It massages the statement to ensure a distinct result set and total
+    number of potential records are returned.
+
+  _BuildJoins
+    Build up all of the joins we need to perform this query.
+
+  _isJoined
+    Returns true if this SearchBuilder will be joining multiple tables
+    together.
+
+  _isLimited
+    If we've limited down this search, return true. Otherwise, return false.
+
+  BuildSelectQuery PreferBind => 1|0
+    Builds a query string for a "SELECT rows from Tables" statement for this
+    SearchBuilder object
+
+    If "PreferBind" is true, the generated query will use bind variables
+    where possible. If "PreferBind" is not passed, it defaults to package
+    variable $DBIx::SearchBuilder::PREFER_BIND, which defaults to
+    $ENV{SB_PREFER_BIND}.
+
+    To override global $DBIx::SearchBuilder::PREFER_BIND for current object
+    only, you can also set "_prefer_bind" accordingly, e.g.
+
+        $sb->{_prefer_bind} = 1;
+
+  BuildSelectCountQuery PreferBind => 1|0
+    Builds a SELECT statement to find the number of rows this SearchBuilder
+    object would find.
+
+  BuildSelectAndCountQuery PreferBind => 1|0
+    Builds a query string that is a combination of BuildSelectQuery and
+    BuildSelectCountQuery.
+
+  Next
+    Returns the next row from the set as an object of the type defined by
+    sub NewItem. When the complete set has been iterated through, returns
+    undef and resets the search such that the following call to Next will
+    start over with the first item retrieved from the database.
+
+  GotoFirstItem
+    Starts the recordset counter over from the first item. The next time you
+    call Next, you'll get the first item returned by the database, as if
+    you'd just started iterating through the result set.
+
+  GotoItem
+    Takes an integer N and sets the record iterator to N. The first time
+    "Next" is called afterwards, it will return the Nth item found by the
+    search.
+
+    You should only call GotoItem after you've already fetched at least one
+    result or otherwise forced the search query to run (such as via
+    "ItemsArrayRef"). If GotoItem is called before the search query is ever
+    run, it will reset the item iterator and "Next" will return the "First"
+    item.
+
+  First
+    Returns the first item
+
+  Last
+    Returns the last item
+
+  DistinctFieldValues
+    Returns list with distinct values of field. Limits on collection are
+    accounted, so collection should be "UnLimit"ed to get values from the
+    whole table.
+
+    Takes paramhash with the following keys:
+
+    Field
+        Field name. Can be first argument without key.
+
+    Order
+        'ASC', 'DESC' or undef. Defines whether results should be sorted or
+        not. By default results are not sorted.
+
+    Max Maximum number of elements to fetch.
+
+  ItemsArrayRef
+    Return a reference to an array containing all objects found by this
+    search.
+
+  NewItem
+    NewItem must be subclassed. It is used by DBIx::SearchBuilder to create
+    record objects for each row returned from the database.
+
+  RedoSearch
+    Takes no arguments. Tells DBIx::SearchBuilder that the next time it's
+    asked for a record, it should requery the database
+
+  CombineSearchAndCount 1|0
+    Tells DBIx::SearchBuilder if it shall search both records and the total
+    count in a single query.
+
+  UnLimit
+    UnLimit clears all restrictions and causes this object to return all
+    rows in the primary table.
+
+  Limit
+    Limit takes a hash of parameters with the following keys:
+
+    TABLE
+        Can be set to something different than this table if a join is
+        wanted (that means we can't do recursive joins as for now).
+
+    ALIAS
+        Unless ALIAS is set, the join criterias will be taken from
+        EXT_LINKFIELD and INT_LINKFIELD and added to the criterias. If ALIAS
+        is set, new criterias about the foreign table will be added.
+
+    LEFTJOIN
+        To apply the Limit inside the ON clause of a previously created left
+        join, pass this option along with the alias returned from creating
+        the left join. ( This is similar to using the EXPRESSION option when
+        creating a left join but this allows you to refer to the join alias
+        in the expression. )
+
+    FIELD
+        Column to be checked against.
+
+    FUNCTION
+        Function that should be checked against or applied to the FIELD
+        before check. See "CombineFunctionWithField" for rules.
+
+    VALUE
+        Should always be set and will always be quoted.
+
+    OPERATOR
+        OPERATOR is the SQL operator to use for this phrase. Possible
+        choices include:
+
+        "="
+        "!="
+        "LIKE"
+            In the case of LIKE, the string is surrounded in % signs. Yes.
+            this is a bug.
+
+        "NOT LIKE"
+        "STARTSWITH"
+            STARTSWITH is like LIKE, except it only appends a % at the end
+            of the string
+
+        "ENDSWITH"
+            ENDSWITH is like LIKE, except it prepends a % to the beginning
+            of the string
+
+        "MATCHES"
+            MATCHES is equivalent to the database's LIKE -- that is, it's
+            actually LIKE, but doesn't surround the string in % signs as
+            LIKE does.
+
+        "IN" and "NOT IN"
+            VALUE can be an array reference or an object inherited from this
+            class. If it's not then it's treated as any other operator and
+            in most cases SQL would be wrong. Values in array are considered
+            as constants and quoted according to QUOTEVALUE.
+
+            If object is passed as VALUE then its select statement is used.
+            If no "Column" is selected then "id" is used, if more than one
+            selected then warning is issued and first column is used.
+
+    ENTRYAGGREGATOR
+        Can be "AND" or "OR" (or anything else valid to aggregate two
+        clauses in SQL). Special value is "none" which means that no entry
+        aggregator should be used. The default value is "OR".
+
+    CASESENSITIVE
+        on some databases, such as postgres, setting CASESENSITIVE to 1 will
+        make this search case sensitive
+
+    SUBCLAUSE
+        Subclause allows you to assign tags to Limit statements. Statements
+        with matching SUBCLAUSE tags will be grouped together in the final
+        SQL statement.
+
+        Example:
+
+        Suppose you want to create Limit statements which would produce
+        results the same as the following SQL:
+
+           SELECT * FROM Users WHERE EmailAddress OR Name OR RealName OR Email LIKE $query;
+
+        You would use the following Limit statements:
+
+            $folks->Limit( FIELD => 'EmailAddress', OPERATOR => 'LIKE', VALUE => "$query", SUBCLAUSE => 'groupsearch');
+            $folks->Limit( FIELD => 'Name', OPERATOR => 'LIKE', VALUE => "$query", SUBCLAUSE => 'groupsearch');
+            $folks->Limit( FIELD => 'RealName', OPERATOR => 'LIKE', VALUE => "$query", SUBCLAUSE => 'groupsearch');
+
+  OrderBy PARAMHASH
+    Orders the returned results by ALIAS.FIELD ORDER.
+
+    Takes a paramhash of ALIAS, FIELD and ORDER. ALIAS defaults to "main".
+    FIELD has no default value. ORDER defaults to ASC(ending). DESC(ending)
+    is also a valid value for OrderBy.
+
+    FIELD also accepts "FUNCTION(FIELD)" format.
+
+  OrderByCols ARRAY
+    OrderByCols takes an array of paramhashes of the form passed to OrderBy.
+    The result set is ordered by the items in the array.
+
+  _OrderClause
+    returns the ORDER BY clause for the search.
+
+  GroupByCols ARRAY_OF_HASHES
+    Each hash contains the keys FIELD, FUNCTION and ALIAS. Hash combined
+    into SQL with "CombineFunctionWithField".
+
+  _GroupClause
+    Private function to return the "GROUP BY" clause for this query.
+
+  NewAlias
+    Takes the name of a table and paramhash with TYPE and DISTINCT.
+
+    Use TYPE equal to "LEFT" to indicate that it's LEFT JOIN. Old style way
+    to call (see below) is also supported, but should be avoided:
+
+        $records->NewAlias('aTable', 'left');
+
+    True DISTINCT value indicates that this join keeps result set distinct
+    and DB side distinct is not required. See also "Join".
+
+    Returns the string of a new Alias for that table, which can be used to
+    Join tables or to Limit what gets found by a search.
+
+  Join
+    Join instructs DBIx::SearchBuilder to join two tables.
+
+    The standard form takes a param hash with keys ALIAS1, FIELD1, ALIAS2
+    and FIELD2. ALIAS1 and ALIAS2 are column aliases obtained from
+    $self->NewAlias or a $self->Limit. FIELD1 and FIELD2 are the fields in
+    ALIAS1 and ALIAS2 that should be linked, respectively. For this type of
+    join, this method has no return value.
+
+    Supplying the parameter TYPE => 'left' causes Join to preform a left
+    join. in this case, it takes ALIAS1, FIELD1, TABLE2 and FIELD2. Because
+    of the way that left joins work, this method needs a TABLE for the
+    second field rather than merely an alias. For this type of join, it will
+    return the alias generated by the join.
+
+    Instead of ALIAS1/FIELD1, it's possible to specify EXPRESSION, to join
+    ALIAS2/TABLE2 on an arbitrary expression.
+
+    It is also possible to join to a pre-existing, already-limited
+    DBIx::SearchBuilder object, by passing it as COLLECTION2, instead of
+    providing an ALIAS2 or TABLE2.
+
+    By passing true value as DISTINCT argument join can be marked distinct.
+    If all joins are distinct then whole query is distinct and SearchBuilder
+    can avoid "_DistinctQuery" call that can hurt performance of the query.
+    See also "NewAlias".
+
+  Pages: size and changing
+    Use "RowsPerPage" to set size of pages. "NextPage", "PrevPage",
+    "FirstPage" or "GotoPage" to change pages. "FirstRow" to do tricky
+    stuff.
+
+   RowsPerPage
+    Get or set the number of rows returned by the database.
+
+    Takes an optional integer which restricts the # of rows returned in a
+    result. Zero or undef argument flush back to "return all records
+    matching current conditions".
+
+    Returns the current page size.
+
+   NextPage
+    Turns one page forward.
+
+   PrevPage
+    Turns one page backwards.
+
+   FirstPage
+    Jumps to the first page.
+
+   GotoPage
+    Takes an integer number and jumps to that page or first page if number
+    omitted. Numbering starts from zero.
+
+   FirstRow
+    Get or set the first row of the result set the database should return.
+    Takes an optional single integer argrument. Returns the currently set
+    integer minus one (this is historical issue).
+
+    Usually you don't need this method. Use "RowsPerPage", "NextPage" and
+    other methods to walk pages. It only may be helpful to get 10 records
+    starting from 5th.
+
+  _ItemsCounter
+    Returns the current position in the record set.
+
+  Count
+    Returns the number of records in the set. When "RowsPerPage" is set,
+    returns number of records in the page only, otherwise the same as
+    "CountAll".
+
+  CountAll
+    Returns the total number of potential records in the set, ignoring any
+    "RowsPerPage" settings.
+
+  IsLast
+    Returns true if the current row is the last record in the set.
+
+  Column
+    Call to specify which columns should be loaded from the table. Each
+    calls adds one column to the set. Takes a hash with the following named
+    arguments:
+
+    FIELD
+        Column name to fetch or apply function to.
+
+    ALIAS
+        Alias of a table the field is in; defaults to "main"
+
+    FUNCTION
+        A SQL function that should be selected instead of FIELD or applied
+        to it.
+
+    AS  The column alias to use instead of the default. The default column
+        alias is either the column's name (i.e. what is passed to FIELD) if
+        it is in this table (ALIAS is 'main') or an autogenerated alias.
+        Pass "undef" to skip column aliasing entirely.
+
+    "FIELD", "ALIAS" and "FUNCTION" are combined according to
+    "CombineFunctionWithField".
+
+    If a FIELD is provided and it is in this table (ALIAS is 'main'), then
+    the column named FIELD and can be accessed as usual by accessors:
+
+        $articles->Column(FIELD => 'id');
+        $articles->Column(FIELD => 'Subject', FUNCTION => 'SUBSTR(?, 1, 20)');
+        my $article = $articles->First;
+        my $aid = $article->id;
+        my $subject_prefix = $article->Subject;
+
+    Returns the alias used for the column. If FIELD was not provided, or was
+    from another table, then the returned column alias should be passed to
+    the "_Value" in DBIx::SearchBuilder::Record method to retrieve the
+    column's result:
+
+        my $time_alias = $articles->Column(FUNCTION => 'NOW()');
+        my $article = $articles->First;
+        my $now = $article->_Value( $time_alias );
+
+    To choose the column's alias yourself, pass a value for the AS parameter
+    (see above). Be careful not to conflict with existing column aliases.
+
+  CombineFunctionWithField
+    Takes a hash with three optional arguments: FUNCTION, FIELD and ALIAS.
+
+    Returns SQL with all three arguments combined according to the following
+    rules.
+
+    *   FUNCTION or undef returned when FIELD is not provided
+
+    *   'main' ALIAS is used if not provided
+
+    *   ALIAS.FIELD returned when FUNCTION is not provided
+
+    *   NULL returned if FUNCTION is 'NULL'
+
+    *   If FUNCTION contains '?' (question marks) then they are replaced
+        with ALIAS.FIELD and result returned.
+
+    *   If FUNCTION has no '(' (opening parenthesis) then ALIAS.FIELD is
+        appended in parentheses and returned.
+
+    Examples:
+
+        $obj->CombineFunctionWithField()
+         => undef
+
+        $obj->CombineFunctionWithField(FUNCTION => 'FOO')
+         => 'FOO'
+
+        $obj->CombineFunctionWithField(FIELD => 'foo')
+         => 'main.foo'
+
+        $obj->CombineFunctionWithField(ALIAS => 'bar', FIELD => 'foo')
+         => 'bar.foo'
+
+        $obj->CombineFunctionWithField(FUNCTION => 'FOO(?, ?)', FIELD => 'bar')
+         => 'FOO(main.bar, main.bar)'
+
+        $obj->CombineFunctionWithField(FUNCTION => 'FOO', ALIAS => 'bar', FIELD => 'baz')
+         => 'FOO(bar.baz)'
+
+        $obj->CombineFunctionWithField(FUNCTION => 'NULL', FIELD => 'bar')
+         => 'NULL'
+
+  Columns LIST
+    Specify that we want to load only the columns in LIST
+
+  AdditionalColumn
+    Calls "Column", but first ensures that this table's standard columns are
+    selected as well. Thus, each call to this method results in an
+    additional column selected instead of replacing the default columns.
+
+    Takes a hash of parameters which is the same as "Column". Returns the
+    result of calling "Column".
+
+  Fields TABLE
+    Return a list of fields in TABLE. These fields are in the case presented
+    by the database, which may be case-sensitive.
+
+  HasField  { TABLE => undef, FIELD => undef }
+    Returns true if TABLE has field FIELD. Return false otherwise
+
+    Note: Both TABLE and FIELD are case-sensitive (See: "Fields")
+
+  Table [TABLE]
+    If called with an argument, sets this collection's table.
+
+    Always returns this collection's table.
+
+  QueryHint [Hint]
+    If called with an argument, sets a query hint for this collection.
+
+    Always returns the query hint.
+
+    When the query hint is included in the SQL query, the "/* ... */" will
+    be included for you. Here's an example query hint for Oracle:
+
+        $sb->QueryHint("+CURSOR_SHARING_EXACT");
+
+  QueryHintFormatted
+    Returns the query hint formatted appropriately for inclusion in SQL
+    queries.
+
+DEPRECATED METHODS
+  GroupBy
+    DEPRECATED. Alias for the "GroupByCols" method.
+
+  SetTable
+    DEPRECATED. Alias for the "Table" method.
+
+  ShowRestrictions
+    DEPRECATED AND DOES NOTHING.
+
+  ImportRestrictions
+    DEPRECATED AND DOES NOTHING.
 
 TESTING
     In order to test most of the features of "DBIx::SearchBuilder", you need
@@ -28,10 +588,35 @@ TESTING
         SB_TEST_PG=test SB_TEST_PG_USER=postgres  make test
 
 AUTHOR
-    Copyright (c) 2001-2005 Jesse Vincent, jesse@fsck.com.
+    Best Practical Solutions, LLC <modules@bestpractical.com>
 
-    All rights reserved.
+CONTRIBUTORS
+    Ansgar Burchardt <ANSGAR@cpan.org>
+    Audrey Tang <audreyt@audreyt.org>
+    Ivan Kohler <ivan-rt@420.am>
+    Martin King <Martin.King@arm.com>
+    Mathieu Arnold <mat@mat.cc>
+    Matt Knopp <mhat@netlag.com>
+    Matthew Simon Cavalletto <simonm@cavalletto.org>
+    Nick Morrott <knowledgejunkie@gmail.com>
+    Oliver Tappe <oliver@akso.de>
+    Simon Cozens <simon@cpan.org>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-DBIx-SearchBuilder@rt.cpan.org|mailto:bug-DBIx-SearchBuilder@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-SearchBuilder>.
+
+LICENSE AND COPYRIGHT
+    Copyright (C) 2001-2023, Best Practical Solutions LLC.
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
+SEE ALSO
+    DBIx::SearchBuilder::Handle, DBIx::SearchBuilder::Record.
 

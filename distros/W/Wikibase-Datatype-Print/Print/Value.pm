@@ -16,7 +16,7 @@ use Wikibase::Datatype::Print::Value::Time;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -145,6 +145,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

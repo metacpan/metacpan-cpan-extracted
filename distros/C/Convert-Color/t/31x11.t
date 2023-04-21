@@ -9,7 +9,7 @@ use Convert::Color::X11;
 use Convert::Color::RGB8;
 
 unless( eval { Convert::Color::X11->colors; 1 } ) {
-   import Test::More skip_all => "Cannot load X11 rgb.txt database";
+   plan skip_all => "Cannot load X11 rgb.txt database";
 }
 
 ok( Convert::Color::X11->colors > 0, 'colors is > 0' );

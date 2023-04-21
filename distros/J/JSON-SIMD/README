@@ -1066,8 +1066,9 @@ MAPPING
         to but not including the least significant bit.
 
         The simdjson decoder always decodes floating point numbers as
-        IEEE-754 doubles, which may lead to a perceived loss of precision if
-        Perl was built to use long doubles.
+        IEEE-754 doubles, so if Perl was built to use long doubles or
+        quadmath, we fall back to the slower but more precise legacy number
+        parser in order to avoid the loss of precision.
 
     true, false
         These JSON atoms become "Types::Serialiser::true" and
@@ -1846,5 +1847,5 @@ AUTHORS
      https://simdjson.org/
 
      JSON::SIMD
-     Pe'ter Juha'sz <peter.juhasz83@gmail.com>
+     Pe'ter Juha'sz <pjuhasz@cpan.org>
 

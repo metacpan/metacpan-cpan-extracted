@@ -49,17 +49,3 @@ that you can get the same row twice, which you might not want. If that's
 the case, use this module as a mix-in, and it will provide you with an
 C<AddRecord> method which ensures that a record will not appear twice in
 the same search.
-
-=head1 AUTHOR
-
-Simon Cozens.
-
-=head1 COPYRIGHT
-
-Copyright 2005 Best Practical Solutions, LLC
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=cut
-

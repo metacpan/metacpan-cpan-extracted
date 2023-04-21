@@ -1,0 +1,33 @@
+---
+abstract: 'HSM encrypted Argon2 hashes for Crypt::Passphrase'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.040, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Passphrase-Argon2-HSM
+provides:
+  Crypt::Passphrase::Argon2::HSM:
+    file: lib/Crypt/Passphrase/Argon2/HSM.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Crypt::HSM: '0'
+  Crypt::Passphrase: '0.010'
+  Crypt::Passphrase::Argon2::Encrypted: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/crypt-passphrase-argon2-hsm/issues
+  repository: git://github.com/Leont/crypt-passphrase-argon2-hsm.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

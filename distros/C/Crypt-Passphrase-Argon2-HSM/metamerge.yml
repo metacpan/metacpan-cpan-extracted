@@ -1,0 +1,12 @@
+name: Crypt-Passphrase-Argon2-HSM
+resources:
+   bugtracker:
+      web: https://github.com/Leont/crypt-passphrase-argon2-hsm/issues
+   repository:
+      type: git,
+      url: git://github.com/Leont/crypt-passphrase-argon2-hsm.git
+      web: https://github.com/Leont/crypt-passphrase-argon2-hsm
+prereqs:
+  runtime:
+    requires:
+      Crypt-Passphrase-Argon2: 0.008

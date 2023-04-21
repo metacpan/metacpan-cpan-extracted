@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Lexeme;
 
 # Test.
-is($Wikibase::Datatype::Lexeme::VERSION, 0.25, 'Version.');
+is($Wikibase::Datatype::Lexeme::VERSION, 0.26, 'Version.');

@@ -8,7 +8,7 @@ use Wikibase::Datatype::Value::Time;
 
 # Object.
 my $obj = Wikibase::Datatype::Value::Time->new(
-        'precision' => 10,
+        'precision' => 11,
         'value' => '+2020-09-01T00:00:00Z',
 );
 
@@ -16,4 +16,4 @@ my $obj = Wikibase::Datatype::Value::Time->new(
 print Wikibase::Datatype::Print::Value::Time::print($obj)."\n";
 
 # Output:
-# 01 September 2020 (Q1985727)
+# 1 September 2020 (Q1985727)

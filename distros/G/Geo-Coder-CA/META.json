@@ -1,10 +1,10 @@
 {
-   "abstract" : "Provides a Geo-Coding functionality using http:://geocoder.ca for both Canada and the US.",
+   "abstract" : "Provides a Geo-Coding functionality using L<https://geocoder.ca> for both Canada and the US.",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Encode" : "0",
-            "HTTP::Request" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
@@ -68,6 +67,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Coder-CA"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

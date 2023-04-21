@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.46.0';
+our $VERSION = 'v0.46.1';
 
 =head1 NAME
 
@@ -149,6 +149,14 @@ has default_hostname => (
 
 
 
+has default_version => (
+    is          => 'ro',
+    should      => Str,
+    predicate   => 1,
+);
+
+
+
 sub build_span {
     my $self = shift;
     my %opts = @_;
@@ -199,6 +207,9 @@ sub build_context {
     my $hostname   = delete $opts{ hostname }
         || $self->default_hostname;
     
+    my $version   = delete $opts{ version }
+        || $self->default_version;
+    
     my $span_context = SpanContext->new(
         
         %opts,
@@ -216,6 +227,9 @@ sub build_context {
         
         maybe
         hostname        => $hostname,
+        
+        maybe
+        version         => $version,
         
     );
     

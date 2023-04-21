@@ -145,15 +145,3 @@ sub DistinctQuery {
 
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-Oliver Tappe, oliver@akso.de
-
-=head1 SEE ALSO
-
-perl(1), DBIx::SearchBuilder
-
-=cut

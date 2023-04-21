@@ -1,5 +1,11 @@
 Revision history for Crypt-Passphrase-Argon2
 
+0.008     2023-04-20 17:04:51+02:00 Europe/Amsterdam
+          - Reorder recrypt_hash arguments
+          - Make recrypt_hash return $input as fallback
+          - Allow verification of unencrypted hashes in
+            Crypt::Passphrase::Argon2::Encrypted
+
 0.007     2023-04-07 16:30:06+02:00 Europe/Amsterdam
           - Add Crypt::Passphrase::Argon2::Encrypted
           - Move more implementation details down into Crypt::Argon2

@@ -1,0 +1,89 @@
+NAME
+
+    Crypt::Passphrase::HSM - A hasher using hardware for Crypt::Passphrase
+
+SYNOPSIS
+
+     my $passphrase = Crypt::Passphrase->new(
+         encoder => {
+             module   => 'HSM',
+             provider => '/usr/lib/pkcs11/some-pkcs11.so',
+             active   => '3',
+         },
+     );
+
+DESCRIPTION
+
+    This module wraps hashes the password using an hmac. By using
+    identifiers for the peppers, it allows for easy rotation of peppers.
+    Unlike traditional mechanisms it relies fully depends on the secrecy of
+    the peppers in the HSM instead of computational difficulty, as such the
+    key size should probably equal the output size.
+
+METHODS
+
+ new(%args)
+
+    This creates a new encoder. It takes the following named arguments:
+
+      * provider
+
+      The path to the PKCS11 provider. This is mandatory.
+
+      * slot
+
+      The slot used on the provider, this defaults to the first listed
+      slot.
+
+      * active
+
+      This is the identifier of the active pepper. This is mandatory.
+
+      * prefix
+
+      The prefix that is used when looking up keys in the HSM. It defaults
+      to 'pepper-'.
+
+      * pin
+
+      The PIN that is used for logging in, if any.
+
+      * user_type
+
+      The type of user you're logging in with. This defaults to 'user', and
+      you're unlikely to want to change that.
+
+      * algorithm
+
+      This is the algorithm that's used for hashing. It supports any
+      mechanism on your HSM that can sign and verify, common values are
+      'sha1-hmac', 'sha224-hmac', 'sha256-hmac', 'sha384-hmac', and
+      'sha512-hmac' (the default).
+
+ hash_password($password)
+
+    This hashes the $password in the HSM using the given algorithm.
+
+ verify_password($password, $hash)
+
+    Verify a password with the HSM.
+
+ needs_rehash($hash)
+
+    This will check if the hash needs a rehash.
+
+ crypt_subtypes
+
+    This returns the chosen algorithm.
+
+AUTHOR
+
+    Leon Timmermans <leont@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2023 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

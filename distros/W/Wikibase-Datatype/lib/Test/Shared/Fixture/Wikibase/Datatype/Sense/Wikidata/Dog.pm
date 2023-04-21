@@ -9,7 +9,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::ItemForThisS
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 sub new {
 	my $class = shift;

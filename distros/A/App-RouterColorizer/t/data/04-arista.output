@@ -2032,3 +2032,24 @@ Interface        Role       State      Cost      Prio.Nbr Type
 [32mPo6              designated forwarding [4m1[24m999      128.130  P2p Edge[0m
 [32mPo8              designated forwarding [4m19[24m999     128.133  P2p Edge[0m
 
+[37m[44m1.2.3.4[0m:
+Host: [37m[44m1.2.3.4[0m port [4m1[24m000
+VRF: default
+Refresh interval: [4m3[24m600 seconds
+Retry interval: 600 seconds
+Expire interval: [4m7[24m200 seconds
+Preference: 5
+Protocol version: 1
+[32mState: synced[0m
+[1;31mState: idle[0m
+Session ID: [4m45[24m070
+Serial number: [4m26[24m493
+Last update sync: 0:02:46 ago
+Last full sync: 34 days, 4:15:05 ago
+Last serial query: 0:02:46 ago
+Last reset query: 34 days, 4:15:50 ago
+Entries: [4m424[24m637
+[32mConnection: Active (11 days, 18:39:28)[0m
+Transport information:
+  Protocol: TCP
+

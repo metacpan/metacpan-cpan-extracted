@@ -9,8 +9,9 @@ use File::Temp;
 use File::Spec::Functions 'splitpath', 'splitdir', 'catdir', 'catpath';
 use Digest::MD5 'md5_hex';
 use CPU::x86_64::InstructionWriter ':unknown';
+use CPU::x86_64::InstructionWriter::_int32 qw/ int64 pack /;
 
-our @EXPORT_OK= qw( reference_assemble iterate_mem_addr_combos
+our @EXPORT_OK= qw( int64 pack reference_assemble iterate_mem_addr_combos
 	hex_diff have_nasm asm_ok new_writer
 	@r64 @r32 @r16 @r8 @r8h @immed64 @immed32 @immed16 @immed8
 	unknown unknown8 unknown16 unknown32 unknown64 unknown7 unknown15 unknown31 unknown63
@@ -32,7 +33,7 @@ our @r8h= qw( ah ch dh bh );
 our @scale= (1, 2, 4, 8);
 
 our @immed64= $do_all? (0, map { (1 << $_, -1 << $_) } 0..62)
-	: (0, 1, -1, 0x7F, -0x80, 0x7FFFFFFF, -0x80000000, 0x7FFFFFFFFFFFFFFF, -0x8000000000000000);
+	: (0, 1, -1, 0x7F, -0x80, 0x7FFFFFFF, -0x80000000, int64('0x7FFFFFFFFFFFFFFF'), int64('-0x8000000000000000'));
 our @immed32= $do_all? (0, map { (1 << $_, -1 << $_) } 0..30)
 	: (0, 1, -1, 0x7F, -0x80, 0x7FFFFFFF, -0x80000000, -1);
 our @immed16= $do_all? (0, map { (1 << $_, -1 << $_) } 0..14)

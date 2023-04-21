@@ -1,8 +1,12 @@
 Changes
+examples/create_and_print_form.pl
 examples/create_and_print_mediainfo_snak.pl
 examples/create_and_print_mediainfo_snak_translated.pl
 examples/create_and_print_mediainfo_statement.pl
 examples/create_and_print_mediainfo_statement_translated.pl
+examples/create_and_print_reference.pl
+examples/create_and_print_reference_translated.pl
+examples/create_and_print_sense.pl
 examples/create_and_print_sitelink.pl
 examples/create_and_print_snak.pl
 examples/create_and_print_snak_translated.pl

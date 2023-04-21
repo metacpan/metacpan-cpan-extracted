@@ -7,7 +7,7 @@ DESCRIPTION
 
 SEE ALSO
     Wikibase::Datatype::Print::Form
-        TODO
+        Wikibase form pretty print helpers.
 
     Wikibase::Datatype::Print::Item
         TODO
@@ -28,10 +28,10 @@ SEE ALSO
         TODO
 
     Wikibase::Datatype::Print::Reference
-        TODO
+        Wikibase reference pretty print helpers.
 
     Wikibase::Datatype::Print::Sense
-        TODO
+        Wikibase sense pretty print helpers.
 
     Wikibase::Datatype::Print::Sitelink
         Wikibase sitelink pretty print helpers.
@@ -93,5 +93,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

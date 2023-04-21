@@ -87,6 +87,6 @@
          "web" : "https://github.com/Perceptyx/perl-opentracing-implementation-datadog"
       }
    },
-   "version" : "v0.46.0",
+   "version" : "v0.46.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

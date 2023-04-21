@@ -216,22 +216,4 @@ sub ItemsArrayRef {
     return \@ret;
 }
 
-=head1 AUTHOR
-
-Copyright (c) 2004 Robert Spier
-
-All rights reserved.
-
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
-
-=head1 SEE ALSO
-
-DBIx::SearchBuilder
-
-=cut
-
 1;
-
-__END__
-

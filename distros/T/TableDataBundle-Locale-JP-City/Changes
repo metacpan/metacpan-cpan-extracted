@@ -1,3 +1,10 @@
+0.002   2023-02-07  Released-By: PERLANCAR; Urgency: low
+
+        - No data changes.
+
+        - [build] Use TableData dzil & pod weaver plugin for nicer POD.
+
+
 0.001   2022-08-25  Released-By: PERLANCAR
 
         - First release.

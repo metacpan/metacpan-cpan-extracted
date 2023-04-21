@@ -20,7 +20,6 @@ if($ENV{AUTHOR_TESTING}) {
 	}
 }
 
-
 my $test_requires = {
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,	# http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
@@ -54,7 +53,6 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Encode' => 0,
 		'JSON::MaybeXS' => 0,
-		'HTTP::Request' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
 		'URI' => 0,
@@ -92,7 +90,7 @@ sub are_online
 	if($s) {
 		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
 			close($s);
-			return 1;
+			return 0;	# Don't overload the server by default
 		}
 
 		print <<EOF;

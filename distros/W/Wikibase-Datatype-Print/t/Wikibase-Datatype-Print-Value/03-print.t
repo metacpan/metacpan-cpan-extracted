@@ -42,7 +42,7 @@ $obj = Wikibase::Datatype::Value::Time->new(
 	'value' => '+2020-09-01T00:00:00Z',
 );
 $ret = Wikibase::Datatype::Print::Value::print($obj);
-is($ret, '01 September 2020 (Q1985727)', 'Get printed value for time.');
+is($ret, '1 September 2020 (Q1985727)', 'Get printed value for time.');
 
 # Test.
 $obj = Wikibase::Datatype::Value::Globecoordinate->new(

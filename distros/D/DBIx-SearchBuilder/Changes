@@ -1,5 +1,13 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.76 2023-04-20
+ - Call DatabaseVersion instead to make sure we already retrieved the version
+   (this is to fix a possible uninitialized warning on disconnect)
+
+1.75 2023-04-19
+ - Log unsupported CombineSearchAndCount warning only once
+ - Fix version comparison for MariaDB 10.10+
+
 1.74 2022-12-12
  - Explicitly require version to make cpantesters happy
  - Require perl 5.10.1+ to not support derelict versions

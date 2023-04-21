@@ -1,3 +1,9 @@
+0.09 2023-04-21T21:13:56+02:00
+ - Add doc for Wikibase::Datatype::Print::Form.
+ - Add doc for Wikibase::Datatype::Print::Reference.
+ - Add doc for Wikibase::Datatype::Print::Sense.
+ - Improve printing of time.
+
 0.08 2023-04-18T01:48:41+02:00
  - Add doc for Wikibase::Datatype::Print::MediainfoStatement.
  - Add error check to Wikibase::Datatype::Print::Value::Time.

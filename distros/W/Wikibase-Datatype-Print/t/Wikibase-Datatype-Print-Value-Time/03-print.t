@@ -15,7 +15,7 @@ my $obj = Wikibase::Datatype::Value::Time->new(
 	'value' => '+2020-09-01T00:00:00Z',
 );
 my $ret = Wikibase::Datatype::Print::Value::Time::print($obj);
-is($ret, '01 September 2020 (Q1985727)', 'Get printed value. Default printing.');
+is($ret, '1 September 2020 (Q1985727)', 'Get printed value. Default printing.');
 
 # Test.
 eval {
@@ -30,7 +30,7 @@ $obj = Wikibase::Datatype::Value::Time->new(
 	'value' => '+2020-09-01T00:00:00Z',
 );
 $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
-is($ret, '01 September 2020 (Q1985727)', 'Get printed value. Only QID.');
+is($ret, '1 September 2020 (Q1985727)', 'Get printed value. Only QID.');
 
 # Test.
 $obj = Wikibase::Datatype::Value::Time->new(
@@ -43,7 +43,7 @@ $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {
 	'cb' => $cache,
 	'print_name' => 1,
 });
-is($ret, '01 September 2020 (proleptic Gregorian calendar)', 'Get printed value. Explicit mapping.');
+is($ret, '1 September 2020 (proleptic Gregorian calendar)', 'Get printed value. Explicit mapping.');
 
 # Test.
 $obj = Wikibase::Datatype::Value::Time->new(
@@ -59,15 +59,12 @@ is($EVAL_ERROR, "Option 'cb' must be a instance of Wikibase::Cache.\n",
 clean();
 
 # Test.
-SKIP: {
-skip "Format YYYY-00-00 isn't supported.", 1;
 $obj = Wikibase::Datatype::Value::Time->new(
 	'precision' => 9, # year
 	'value' => '+1940-00-00T00:00:00Z',
 );
 $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
 is($ret, '1940 (Q1985727)', 'Get printed value. Only QID.');
-};
 
 # Test.
 SKIP: {
@@ -84,12 +81,9 @@ is($ret, '1846-1855 (Q1985727)', 'Get printed value. Only QID.');
 };
 
 # Test.
-SKIP: {
-skip "BCE implementation", 1;
 $obj = Wikibase::Datatype::Value::Time->new(
 	'precision' => 11,
 	'value' => '-0001-01-01T00:00:00Z',
 );
 $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
-is($ret, '01 January 1 BCE (Q1985727)', 'Get printed value. Only QID.');
-};
+is($ret, '1 January -1 (Q1985727)', 'Get printed value. Only QID.');

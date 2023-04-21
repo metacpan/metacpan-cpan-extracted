@@ -53,7 +53,7 @@ no_index:
     - t
     - xt
 requires:
-  DateTime::Format::ISO8601: 0
+  DateTime: 0
   Error::Pure: 0.15
   Exporter: 0
   Readonly: 0
@@ -63,4 +63,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
-version: '0.08'
+version: '0.09'

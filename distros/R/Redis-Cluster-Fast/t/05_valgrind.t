@@ -5,7 +5,7 @@ use lib './t/lib';
 BEGIN {
     use Test::More;
     plan skip_all =>
-        'Skip tests using local Docker / Redis Cluster / Valgrind because AUTOMATED_TESTING is not set' unless $ENV{AUTOMATED_TESTING};
+        'Skip tests using local Docker / Redis Cluster / Valgrind because AUTHOR_TESTING is not set' unless $ENV{AUTHOR_TESTING};
 };
 
 eval {

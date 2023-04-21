@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+dist.json
+lib/Crypt/Passphrase/HSM.pm
+lib/Crypt/Passphrase/Pepper/HSM.pm
+metamerge.yml
+t/hash.t
+t/lib/Crypt/Passphrase/Reversed.pm
+t/peppered.t

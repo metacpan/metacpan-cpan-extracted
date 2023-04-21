@@ -48,6 +48,7 @@ typedef struct
 
 // needed by both decoders
 SV * filter_object (dec_t *dec, SV *sv, HV* hv);
+NV json_atof (const char *s);
 
 // actual interface to simdjson decoder
 void simdjson_global_init();

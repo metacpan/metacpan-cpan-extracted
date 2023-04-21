@@ -530,3 +530,6 @@ Revision history for StreamFinder
         handle sorting the playlist (getURL('playlist')), and doc. tweaks.
 2.13    2023/04/08
         - StreamFinder::Apple - Fix sometimes failure to fetch proper title.
+2.14    2023/04/20
+        - StreamFinder::PodcastAddict - Fix failure to fetch podcasts and
+        episodes due to slight changes in their site.

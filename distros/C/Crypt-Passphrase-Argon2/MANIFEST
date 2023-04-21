@@ -12,4 +12,6 @@ lib/Crypt/Passphrase/Argon2.pm
 lib/Crypt/Passphrase/Argon2/Encrypted.pm
 t/00-compile.t
 t/basic.t
+t/encrypted.t
+t/lib/Crypt/Passphrase/Argon2/Rot.pm
 xt/author/pod-syntax.t

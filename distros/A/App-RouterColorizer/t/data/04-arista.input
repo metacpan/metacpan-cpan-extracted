@@ -2032,3 +2032,24 @@ Po5              designated forwarding 1999      128.132  P2p
 Po6              designated forwarding 1999      128.130  P2p Edge
 Po8              designated forwarding 19999     128.133  P2p Edge
 
+1.2.3.4:
+Host: 1.2.3.4 port 1000
+VRF: default
+Refresh interval: 3600 seconds
+Retry interval: 600 seconds
+Expire interval: 7200 seconds
+Preference: 5
+Protocol version: 1
+State: synced
+State: idle
+Session ID: 45070
+Serial number: 26493
+Last update sync: 0:02:46 ago
+Last full sync: 34 days, 4:15:05 ago
+Last serial query: 0:02:46 ago
+Last reset query: 34 days, 4:15:50 ago
+Entries: 424637
+Connection: Active (11 days, 18:39:28)
+Transport information:
+  Protocol: TCP
+

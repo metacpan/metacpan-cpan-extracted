@@ -6,7 +6,7 @@ OpenTracing::Implementation::DataDog::SpanContext - A DataDog Implementation
 
 =cut
 
-our $VERSION = 'v0.46.0';
+our $VERSION = 'v0.46.1';
 
 
 =head1 SYNOPSIS
@@ -38,7 +38,7 @@ use OpenTracing::Implementation::DataDog::ID qw/random_datadog_id/;
 
 use Sub::Trigger::Lock;
 use Types::Common::String qw/NonEmptyStr/;
-use Types::Standard qw/InstanceOf/; # by lack of Types::BigNum
+use Types::Standard qw/InstanceOf Maybe/;
 
 
 
@@ -104,7 +104,7 @@ be set by a intergration solution.
 
 has service_name => (
     is              => 'ro',
-    env_key         => 'DD_SERVICE_NAME',
+    env_key         => [ 'DD_SERVICE', 'DD_SERVICE_NAME' ], # only DD_SERVICE!!
     required        => 1,
     should          => NonEmptyStr->where( 'length($_) <= 100' ),
     reader          => 'get_service_name',
@@ -160,7 +160,7 @@ An optional C<NonEmptyString> where C<length <= 5000>.
 
 has environment => (
     is              => 'ro',
-    should          => NonEmptyStr->where( 'length($_) <= 5000' ),
+    should          => Maybe[NonEmptyStr->where( 'length($_) <= 5000' )],
     required        => 0,
     env_key         => 'DD_ENV',
     reader          => 'get_environment',
@@ -177,10 +177,27 @@ An optional C<NonEmptyString> where C<length <= 5000>.
 
 has hostname => (
     is              => 'ro',
-    should          => NonEmptyStr->where( 'length($_) <= 5000' ),
+    should          => Maybe[NonEmptyStr->where( 'length($_) <= 5000' )],
     required        => 0,
     env_key         => 'DD_HOSTNAME',
     reader          => 'get_hostname',
+    trigger         => Lock,
+);
+
+
+
+=head2 C<version>
+
+An optional C<NonEmptyString> where C<length <= 5000>.
+
+=cut
+
+has version => (
+    is              => 'ro',
+    should          => Maybe[NonEmptyStr->where( 'length($_) <= 5000' )],
+    required        => 0,
+    env_key         => 'DD_VERSION',
+    reader          => 'get_version',
     trigger         => Lock,
 );
 
@@ -373,6 +390,71 @@ A cloned C<DataDog::SpanContext>
 =cut
 
 sub with_hostname { $_[0]->clone_with( hostname => $_[1] ) }
+
+
+
+=head2 C<with_version>
+
+Creates a cloned object, with a new value for C<hostname>.
+
+    $span_context_new = $root_span->with_version( 'v0.123.456' );
+
+=head3 Required Positional Parameter(s)
+
+=over
+
+=item C<version>
+
+A C<NonEmptyString> where C<length <= 5000>.
+
+=back
+
+=head3 Returns
+
+A cloned C<DataDog::SpanContext>
+
+=cut
+
+sub with_version { $_[0]->clone_with( version => $_[1] ) }
+
+
+
+=head1 ENVIRONMENT VARIABLES
+
+For configuring DataDog Tracing there is support for the folllowing environment
+variables:
+
+
+
+=head2 C<DD_SERVICE_NAME>
+
+The name of a set of processes that do the same job. Used for grouping stats for
+your application.
+
+B<default:> I<none>
+
+
+
+=head2 C<DD_ENV>
+
+Your application environment (for example, production, staging).
+
+B<default:> I<none>
+
+
+
+=head2 C<DD_HOSTNAME>
+
+Manually set the hostname to use for metrics if autodetection fails, or when
+running the Datadog Cluster Agent.
+
+
+
+=head2 C<DD_VERSION>
+
+Your application version (for example, 2.5, 202003181415, 1.3-alpha).
+
+B<default:> I<none>
 
 
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Douglas;
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 sub new {
 	my $class = shift;
@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::GivenName::Douglas - Test instance for Wikidata item value.
+Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::GivenName::Douglas - Test instance for Wikidata snak.
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

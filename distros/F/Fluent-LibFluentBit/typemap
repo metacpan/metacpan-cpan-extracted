@@ -1,0 +1,11 @@
+TYPEMAP
+flb_ctx_t *      O_FLUENTBIT_CONTEXT
+
+INPUT
+O_FLUENTBIT_CONTEXT
+	$var= PerlFluentBit_get_ctx_mg($arg);
+   if (!$var) croak(\"argument is not a LibFluentBit instance\");
+
+OUTPUT
+O_FLUENTBIT_CONTEXT
+   $arg = $var? PerlFluentBit_wrap_ctx($var) : &PL_sv_undef;

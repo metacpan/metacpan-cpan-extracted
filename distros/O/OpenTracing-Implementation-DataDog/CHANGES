@@ -2,6 +2,15 @@ CHANGE LOG
 ==========
 
 
+2023-04-19 - v0.46.1
+--------------------
+
+### Added
+  - now adds support for the correct `DD_SERVICE` environment variable
+  - Proper documentation in POD about commonly used environment variables
+  - support for setting a application version, using `DD_VERSION`
+
+
 2023-04-18 - v0.46.0
 --------------------
 

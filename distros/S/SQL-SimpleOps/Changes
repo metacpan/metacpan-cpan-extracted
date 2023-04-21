@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2023.111.1 Fri Apr 21 09:39:34 2023
+	- fix: mkdir permission denied, logfile creation folder for non-root user; by CCELSO
+	- fix: getLastSQL mismatch on syntax error condition; by CCELSO
+
 2023.106.1 Sun Apr 16 10:18:13 2023
 	- added: use warnings added; by CCELSO
 	- added: license file created; by CCELSO

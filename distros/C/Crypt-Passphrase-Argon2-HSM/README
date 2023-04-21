@@ -1,0 +1,70 @@
+NAME
+
+    Crypt::Passphrase::Argon2::HSM - HSM encrypted Argon2 hashes for
+    Crypt::Passphrase
+
+SYNOPSIS
+
+     my $passphrase = Crypt::Passphrase->new(
+         encoder => {
+             module   => 'Argon2::HSM',
+             provider => '/usr/lib/pkcs11/some-pkcs11.so',
+             active   => '3',
+         },
+     );
+
+DESCRIPTION
+
+    This class implements peppering by encrypting the hash using HSM. Note
+    that it does not do the argon2 computation in the HSM.
+
+METHODS
+
+ new
+
+    This constructor takes all arguments also taken by
+    Crypt::Passphrase::Argon2, with the following additions:
+
+      * provider
+
+      The path to the PKCS11 provider. This is mandatory.
+
+      * slot
+
+      The slot used on the provider, this defaults to the first listed
+      slot.
+
+      * active
+
+      This is the identifier of the active pepper. This is mandatory.
+
+      * prefix
+
+      The prefix that is used when looking up keys in the HSM. It defaults
+      to 'pepper-'.
+
+      * pin
+
+      The PIN that is used for logging in, if any.
+
+      * user_type
+
+      The type of user you're logging in with. This defaults to 'user', and
+      you're unlikely to want to change that.
+
+      * cipher
+
+      This is the cipher that's used for peppering. This can be any
+      mechanism supporting encrypt/decrypt. The default is 'aes-cbc'.
+
+AUTHOR
+
+    Leon Timmermans <leont@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2023 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

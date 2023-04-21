@@ -43,6 +43,7 @@ t/OpenTracing/Implementation/DataDog/SpanContext/11_with_hostname.t
 t/OpenTracing/Implementation/DataDog/SpanContext/11_with_resource_name.t
 t/OpenTracing/Implementation/DataDog/SpanContext/11_with_service_name.t
 t/OpenTracing/Implementation/DataDog/SpanContext/11_with_service_type.t
+t/OpenTracing/Implementation/DataDog/SpanContext/11_with_version.t
 t/OpenTracing/Implementation/DataDog/Tracer/00_use_ok.t
 t/OpenTracing/Implementation/DataDog/Tracer/01_can_all_ok.t
 t/OpenTracing/Implementation/DataDog/Tracer/09_build_context.t

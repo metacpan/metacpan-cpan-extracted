@@ -1,9 +1,9 @@
-#!perl -w
+#!perl -wT
 
 use warnings;
 use strict;
 use Test::Number::Delta within => 1e-2;
-use Test::Most tests => 19;
+use Test::Most tests => 16;
 use Test::Carp;
 
 BEGIN {
@@ -16,7 +16,7 @@ US: {
 			use_ok('Test::LWP::UserAgent');
 		} else {
 			diag('On-line tests have been disabled');
-			skip('On-line tests have been disabled', 18);
+			skip('On-line tests have been disabled', 15);
 		}
 
 		my $geocoder = new_ok('Geo::Coder::CA');
@@ -59,29 +59,29 @@ US: {
 			}
 		}
 
-		$location = $geocoder->geocode('');
-		ok(!defined($location));
-
-		$location = $geocoder->geocode(location => '');
-		ok(!defined($location));
-
-		$location = $geocoder->geocode({ location => '' });
-		ok(!defined($location));
-
 		$location = $geocoder->geocode(location => 'XYZZY');
 		ok(!defined($location));
 
 		my $address = $geocoder->reverse_geocode('38.9,-77.04');
 		is($address->{'prov'}, 'DC', 'test reverse');
+		diag(Data::Dumper->new([$address])->Dump()) if($ENV{'TEST_VERBOSE'});
 
+		# Check API errors are correctly handled
 		my $ua = new_ok('Test::LWP::UserAgent');
 		$ua->map_response('geocoder.ca', new_ok('HTTP::Response' => [ '500' ]));
 
 		$geocoder->ua($ua);
 
-		sub f {
-			$location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
-		}
-		does_croak_that_matches(\&f, qr/ API returned error: 500/);
+		# See https://github.com/nigelhorne/Geo-Coder-CA/issues/61
+		# Can't debug until https://rt.cpan.org/Ticket/Display.html?id=146779 is fixed
+		# does_carp_that_matches(sub {
+			# $location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA')
+		# }, qr/ API returned error: 500/);
+
+		does_carp(sub {
+			$location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA')
+		});
+
+		# diag(Data::Dumper->new([$location])->Dump());
 	}
 }

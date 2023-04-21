@@ -1,0 +1,9 @@
+0.02 - 2023-04-20
+  - Use Alien::FluentBit to get an actually-working .so
+    (no more need for LD_PRELOAD)
+  - Documentation fixes
+
+0.01 - 2023-04-19
+  - Initial usable version
+  - BUG: Requires LD_PRELOAD in order to work, see README
+

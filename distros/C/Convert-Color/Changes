@@ -1,5 +1,10 @@
 Revision history for Convert-Color
 
+0.17    2023-04-21
+        [BUGFIXES]
+         * Call `plan()` to skip tests in t/31x11.t if no rgb.txt is found
+           (RT147340)
+
 0.16    2023-03-22
         [BUGFIXES]
          * Convert remaining tests to `float()` comparisons that were missed

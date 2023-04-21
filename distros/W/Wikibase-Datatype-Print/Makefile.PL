@@ -18,7 +18,7 @@ name 'Wikibase-Datatype-Print';
 perl_version 5.006002;
 readme_from 'Print.pm';
 recursive_author_tests('xt');
-requires 'DateTime::Format::ISO8601' => 0;
+requires 'DateTime' => 0;
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
@@ -58,7 +58,7 @@ test_requires 'Wikibase::Datatype::Value::Quantity' => 0;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

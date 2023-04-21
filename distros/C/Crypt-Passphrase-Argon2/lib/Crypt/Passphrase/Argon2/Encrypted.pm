@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Argon2::Encrypted;
-$Crypt::Passphrase::Argon2::Encrypted::VERSION = '0.007';
+$Crypt::Passphrase::Argon2::Encrypted::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Crypt::Passphrase 0.010 -encoder;
 use Crypt::Passphrase::Argon2;
 
 use Carp 'croak';
-use Crypt::Argon2 0.017 qw/argon2_raw argon2_needs_rehash argon2_types/;
+use Crypt::Argon2 0.017 qw/argon2_raw argon2_verify argon2_types/;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 
 my %multiplier = (
@@ -47,18 +47,22 @@ sub _unpack_hash {
 
 my $unencrypted_regex = qr/ ^ \$ ($Crypt::Argon2::type_regex) \$ v=(\d+) \$ m=(\d+), t=(\d+), p=(\d+) \$ ([^\$]+) \$ (.*) $ /x;
 sub recrypt_hash {
-	my ($self, $to, $input) = @_;
+	my ($self, $input, $to) = @_;
+	$to //= $self->{active};
 	if (my ($subtype, $alg, $id, $version, $m_cost, $t_cost, $parallel, $salt, $hash) = _unpack_hash($input)) {
-		return $input if $id eq $to;
+		return $input if $id eq $to and $alg eq $self->{cipher};
 		my $decrypted = $self->decrypt_hash($alg, $id, $salt, $hash);
-		my $encrypted = $self->encrypt_hash($alg, $to, $salt, $decrypted);
-		return _pack_hash($subtype, $self->{cipher}, $to, $version, $m_cost, $t_cost, $parallel, $salt, $encrypted);
+		my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $decrypted);
+		return _pack_hash($subtype, $self->{cipher}, $to, $m_cost, $t_cost, $parallel, $salt, $encrypted);
 	}
 	elsif (($subtype, $version, $m_cost, $t_cost, $parallel, my $encoded_salt, my $encoded_hash) = $input =~ $unencrypted_regex) {
 		my $salt = decode_base64($encoded_salt);
 		my $hash = decode_base64($encoded_hash);
-		my $encrypted = $self->encrypt_hash($alg, $to, $salt, $hash);
-		return _pack_hash($subtype, $self->{cipher}, $to, $version, $m_cost, $t_cost, $parallel, $salt, $encrypted);
+		my $encrypted = $self->encrypt_hash($self->{cipher}, $to, $salt, $hash);
+		return _pack_hash($subtype, $self->{cipher}, $to, $m_cost * 1024, $t_cost, $parallel, $salt, $encrypted);
+	}
+	else {
+		return $input;
 	}
 }
 
@@ -81,17 +85,20 @@ sub needs_rehash {
 
 sub crypt_subtypes {
 	my $self = shift;
-	return map { "$_-encrypted" } argon2_types;
+	return map { ("$_-encrypted", $_) } argon2_types;
 }
 
 sub verify_password {
 	my ($self, $password, $pwhash) = @_;
-	my ($subtype, $alg, $id, $version, $m_got, $t_got, $parallel_got, $salt, $hash) = _unpack_hash($pwhash) or return 0;
+	if (my ($subtype, $alg, $id, $version, $m_got, $t_got, $parallel_got, $salt, $hash) = _unpack_hash($pwhash)) {
+		my $raw = eval { argon2_raw($subtype, $password, $salt, $t_got, $m_got, $parallel_got, length $hash) } or return !!0;
+		my $decrypted = eval { $self->decrypt_hash($alg, $id, $salt, $hash) } or return !!0;
 
-	my $raw = argon2_raw($subtype, $password, $salt, $t_got, $m_got, $parallel_got, length $hash);
-	my $encrypted = $self->encrypt_hash($alg, $id, $salt, $raw);
-
-	return $self->secure_compare($encrypted, $hash);
+		return $self->secure_compare($decrypted, $raw);
+	}
+	elsif ($pwhash =~ $unencrypted_regex) {
+		return argon2_verify($pwhash, $password);
+	}
 }
 
 #ABSTRACT: A base-class for encrypting/peppered Argon2 encoders for Crypt::Passphrase
@@ -108,7 +115,7 @@ Crypt::Passphrase::Argon2::Encrypted - A base-class for encrypting/peppered Argo
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 
@@ -120,25 +127,25 @@ This is a base-class for pre-peppering implementations. You probably want to use
 
 This constructor takes all arguments also taken by L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2>, with the following additions: C<cipher> and C<active>.
 
-=head2 recrypt_hash($to, $input)
-
-This recrypts the hash int C<$input> to the key identified by C<$to>, if it's not already.
-
 =head2 hash_password($password)
 
 This hashes the passwords with argon2 according to the specified settings and a random salt (and will thus return a different result each time).
+
+=head2 verify_password($password, $hash)
+
+This will check if a password matches an encrypted or unencrypted argon2 hash.
 
 =head2 needs_rehash($hash)
 
 This returns true if the hash uses a different cipher or subtype, or if any of the parameters is lower that desired by the encoder.
 
-=head2 crypt_types()
+=head2 recrypt_hash($input, $to = $active)
 
-This class supports at least the following crypt types: C<argon2id>, C<argon2i> and C<argon2d>.
+This recrypts the hash in C<$input> to the key identified by C<$to>, if it's not already.
 
-=head2 verify_password($password, $hash)
+=head2 crypt_subtypes()
 
-This will check if a password matches an argon2 hash.
+This class supports at all types supported by L<Crypt::Argon2>, with and without a C<'-encrypted'> postfix.
 
 =head1 AUTHOR
 

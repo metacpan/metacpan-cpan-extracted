@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.230830';
+$App::RouterColorizer::VERSION = '1.231100';
 use Moose;
 
 use feature 'signatures';
@@ -307,6 +307,14 @@ s/^ ( $INTSHORT \s+ $STP_TYPES\s+ $STP_GOOD \s+ [0-9]+ \s+ [0-9]+\.[0-9]+ \s+ P2
 s/^ ( $INTSHORT \s+ $STP_TYPES\s+ $STP_WARN \s+ [0-9]+ \s+ [0-9]+\.[0-9]+ \s+ P2p .* ) $/$self->_colorize($1, $ORANGE)/exx;
     $line =~
 s/^ ( $INTSHORT \s+ $STP_TYPES\s+ $STP_BAD  \s+ [0-9]+ \s+ [0-9]+\.[0-9]+ \s+ P2p .* ) $/$self->_colorize($1, $RED)/exx;
+
+
+    # show bgp rpki cache (Arista)
+    $line =~ s/^ (State: \s synced) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~ s/^ (State: \s .*    ) $/$self->_colorize($1, $RED)/exx;
+
+    $line =~ s/^ (Connection: \s Active \s .*) $/$self->_colorize($1, $GREEN)/exx;
+    $line =~ s/^ (Connection: \s .*          ) $/$self->_colorize($1, $RED)/exx;
 
     return $line;
 }
@@ -763,7 +771,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.230830
+version 1.231100
 
 =head1 DESCRIPTION
 

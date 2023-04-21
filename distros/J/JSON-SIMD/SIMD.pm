@@ -86,9 +86,7 @@ stuff). Or you can combine those features in whatever way you like.
 
 package JSON::SIMD;
 
-use common::sense;
-
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 our $JSON_XS_VERSION = '4.03';
 our @ISA = qw(Exporter);
 
@@ -1164,8 +1162,9 @@ floating point, JSON::SIMD only guarantees precision up to but not including
 the least significant bit.
 
 The simdjson decoder always decodes floating point numbers as IEEE-754 doubles,
-which may lead to a perceived loss of precision if Perl was built to use
-long doubles.
+so if Perl was built to use long doubles or quadmath,
+we fall back to the slower but more precise legacy number parser
+in order to avoid the loss of precision.
 
 =item true, false
 
@@ -2008,7 +2007,7 @@ The F<json_simd> command line utility for quick experiments.
  https://simdjson.org/
 
  JSON::SIMD
- Pe'ter Juha'sz <peter.juhasz83@gmail.com>
+ Pe'ter Juha'sz <pjuhasz@cpan.org>
 
 =cut
 

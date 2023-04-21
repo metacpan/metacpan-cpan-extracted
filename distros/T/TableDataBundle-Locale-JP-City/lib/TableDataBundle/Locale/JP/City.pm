@@ -3,9 +3,9 @@ package TableDataBundle::Locale::JP::City;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-25'; # DATE
+our $DATE = '2023-02-07'; # DATE
 our $DIST = 'TableDataBundle-Locale-JP-City'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules that contain list of cities in Japan
@@ -22,7 +22,7 @@ TableDataBundle::Locale::JP::City - Collection of TableData:: modules that conta
 
 =head1 VERSION
 
-This document describes version 0.001 of TableDataBundle::Locale::JP::City (from Perl distribution TableDataBundle-Locale-JP-City), released on 2022-08-25.
+This document describes version 0.002 of TableDataBundle::Locale::JP::City (from Perl distribution TableDataBundle-Locale-JP-City), released on 2023-02-07.
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

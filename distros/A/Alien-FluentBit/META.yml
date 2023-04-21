@@ -1,0 +1,44 @@
+---
+abstract: 'libfluent-bit.so and fluent-bit commandline tool'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+configure_requires:
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::CMake: '0.99'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-FluentBit
+resources:
+  bugtracker: https://github.com/nrdvana/perl-Alien-FluentBit/issues
+  repository: https://github.com/nrdvana/perl-Alien-FluentBit.git
+version: '0.01'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Alien::bison: '0'
+      Alien::cmake3: '0.02'
+      Alien::flex: '0'
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

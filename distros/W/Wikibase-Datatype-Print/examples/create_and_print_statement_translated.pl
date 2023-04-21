@@ -86,5 +86,5 @@ print Wikibase::Datatype::Print::Statement::print($obj, {
 #   {
 #     P248 (stated in): Q53919
 #     P214 (VIAF ID): 113230702
-#     P813 (retrieved): 07 December 2013 (Q1985727)
+#     P813 (retrieved): 7 December 2013 (Q1985727)
 #   }

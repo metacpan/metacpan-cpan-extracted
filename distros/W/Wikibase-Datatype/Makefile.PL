@@ -19,6 +19,7 @@ perl_version 5.006002;
 readme_from 'lib/Wikibase/Datatype.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
+requires 'DateTime' => 0;
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Mo' => 0;
@@ -36,7 +37,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.25';
+version '0.26';
 
 # Run.
 WriteAll();

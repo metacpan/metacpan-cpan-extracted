@@ -1,3 +1,7 @@
+1.29    2023-04-21
+
+- Skip taint-mode tests if perl was built without taint support
+
 1.28    2023-03-14
 
 - Bug fix: DCANTRELL: undef values in hashes were treated incorrectly,

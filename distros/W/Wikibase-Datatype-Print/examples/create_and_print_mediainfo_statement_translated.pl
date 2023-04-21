@@ -66,4 +66,8 @@ print Wikibase::Datatype::Print::MediainfoStatement::print($obj, {
 })."\n";
 
 # Output:
-# TODO
+# P170: no value (normal)
+#  P4174: Lviatour
+#  P2699: https://commons.wikimedia.org/wiki/user:Lviatour
+#  P2093: Lviatour
+#  P3831: Q33231

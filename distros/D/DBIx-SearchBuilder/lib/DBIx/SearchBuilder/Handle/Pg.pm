@@ -361,16 +361,3 @@ sub HasSupportForNullsOrder {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-Jesse Vincent, jesse@fsck.com
-
-=head1 SEE ALSO
-
-DBIx::SearchBuilder, DBIx::SearchBuilder::Handle
-
-=cut
-

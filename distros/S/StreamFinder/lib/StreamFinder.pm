@@ -527,7 +527,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.13';
+our $VERSION = '2.14';
 our $DEBUG = 0;
 
 require Exporter;

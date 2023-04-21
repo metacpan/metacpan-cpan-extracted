@@ -1,5 +1,12 @@
 Revision history for Perl extension JSON::SIMD
 
+1.04 Thu Apr 20 19:48:29 CEST 2023
+	- fix floating point precision issues with -Duselongdouble and -Dusequadmath
+	- fix intermittent garbage in floating point numbers from encode with -Dusequadmath (fix taken from Cpanel::JSON::XS ad072b4)
+	- fix build issue with "invalid register for .seh_savexmm"
+	- drop common::sense as a direct dependency (it's still used via Types::Serialiser, though)
+	- fix repository and issue tracker for CPAN (thanks to Gabor Szabo)
+
 1.03 Apr 18 20:11:05 CEST 2023
 	- fix hardcoded g++ in Makefile
 	- document requirements and incompatibilites

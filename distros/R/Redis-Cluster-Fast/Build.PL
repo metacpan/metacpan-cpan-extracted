@@ -36,13 +36,7 @@ my %args = (
     },
 
     test_requires => {
-        'IO::CaptureOutput' => '0',
-        'Scope::Guard' => '0',
-        'Sub::Retry' => '0',
-        'Test::LeakTrace' => '0',
         'Test::More' => '0.98',
-        'Test::SharedFork' => '0',
-        'Test::Valgrind' => '0',
     },
 
     name            => 'Redis-Cluster-Fast',

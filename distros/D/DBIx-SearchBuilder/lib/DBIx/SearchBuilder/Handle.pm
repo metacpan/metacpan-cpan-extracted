@@ -7,6 +7,7 @@ use Carp qw(croak cluck);
 use DBI;
 use Class::ReturnValue;
 use Encode qw();
+use version;
 
 use DBIx::SearchBuilder::Util qw/ sorted_values /;
 
@@ -332,10 +333,10 @@ sub Disconnect  {
     # interacting with a disconnected handle, here we unset
     # dbh to inform other code that there is no connection any more.
     # See also https://github.com/perl5-dbi/DBD-mysql/issues/306
-
+    my ($version) = ( $self->DatabaseVersion // '' ) =~ /^(\d+\.\d+)/;
     if (   $self->isa('DBIx::SearchBuilder::Handle::mysql')
         && $self->{'database_version'} =~ /mariadb/i
-        && $self->{'database_version'} ge '10.2' )
+        && version->parse('v'.$version) > version->parse('v10.2') )
     {
         $self->dbh(undef);
     }
@@ -1939,16 +1940,3 @@ sub DESTROY {
 
 
 1;
-__END__
-
-
-=head1 AUTHOR
-
-Jesse Vincent, jesse@fsck.com
-
-=head1 SEE ALSO
-
-perl(1), L<DBIx::SearchBuilder>
-
-=cut
-

@@ -283,16 +283,3 @@ sub _CacheConfig {
 }
 
 1;
-
-__END__
-
-
-=head1 AUTHOR
-
-Matt Knopp <mhat@netlag.com>
-
-=head1 SEE ALSO
-
-L<DBIx::SearchBuilder>, L<DBIx::SearchBuilder::Record>
-
-=cut

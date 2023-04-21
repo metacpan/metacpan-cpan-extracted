@@ -1,3 +1,16 @@
+0.26 2023-04-21T20:18:03+02:00
+ - Add check_datetime() utility.
+ - Add date time check to Wikibase::Datatype::Value::Time.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::GrammaticalGender::Masculine.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::Human.
+ - Fix example in
+   Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::WikidataEntity.
+ - Fix module doc description in
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::GivenName::Douglas.
+ - Improve doc EXAMPLE in Wikibase::Datatype::Reference to something real.
+
 0.25 2023-04-17T11:28:59+02:00
  - Add doc for
    Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL.

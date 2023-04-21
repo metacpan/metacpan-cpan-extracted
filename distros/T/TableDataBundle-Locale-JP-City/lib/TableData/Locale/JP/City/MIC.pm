@@ -4,13 +4,15 @@ use strict;
 use utf8;
 use warnings;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-25'; # DATE
-our $DIST = 'TableDataBundle-Locale-JP-City'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use Role::Tiny::With;
 with 'TableDataRole::Source::CSVInDATA';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-02-07'; # DATE
+our $DIST = 'TableDataBundle-Locale-JP-City'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+our %STATS = ("num_columns",5,"num_rows",1916); # STATS
 
 1;
 # ABSTRACT: List of cities in Japan (from website of Ministry of Internal Affairs and Communications, https://www.soumu.go.jp/)
@@ -25,7 +27,37 @@ TableData::Locale::JP::City::MIC - List of cities in Japan (from website of Mini
 
 =head1 VERSION
 
-This document describes version 0.001 of TableData::Locale::JP::City::MIC (from Perl distribution TableDataBundle-Locale-JP-City), released on 2022-08-25.
+This document describes version 0.002 of TableData::Locale::JP::City::MIC (from Perl distribution TableDataBundle-Locale-JP-City), released on 2023-02-07.
+
+=head1 SYNOPSIS
+
+To use from Perl code:
+
+ use TableData::Locale::JP::City::MIC;
+
+ my $td = TableData::Locale::JP::City::MIC->new;
+
+ # Iterate rows of the table
+ $td->each_row_arrayref(sub { my $row = shift; ... });
+ $td->each_row_hashref (sub { my $row = shift; ... });
+
+ # Get the list of column names
+ my @columns = $td->get_column_names;
+
+ # Get the number of rows
+ my $row_count = $td->get_row_count;
+
+See also L<TableDataRole::Spec::Basic> for other methods.
+
+To use from command-line (using L<tabledata> CLI):
+
+ # Display as ASCII table and view with pager
+ % tabledata Locale::JP::City::MIC --page
+
+ # Get number of rows
+ % tabledata --action count_rows Locale::JP::City::MIC
+
+See the L<tabledata> CLI's documentation for other available actions and options.
 
 =head1 DESCRIPTION
 
@@ -37,6 +69,17 @@ L<https://www.soumu.go.jp/>.
 This version reflects the data retrieved on 2019-05-01.
 
 =head2 About the data
+
+=head1 TABLEDATA STATISTICS
+
+ +-------------+-------+
+ | key         | value |
+ +-------------+-------+
+ | num_columns | 5     |
+ | num_rows    | 1916  |
+ +-------------+-------+
+
+The statistics is available in the C<%STATS> package variable.
 
 =head1 HOMEPAGE
 
@@ -72,7 +115,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

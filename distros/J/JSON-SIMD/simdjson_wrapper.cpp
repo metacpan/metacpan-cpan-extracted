@@ -275,11 +275,24 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
       switch (nt) {
       case ondemand::number_type::floating_point_number:
         {
+#if defined(USE_LONG_DOUBLE) || defined(USE_QUADMATH)
+          // simdjson only gets us IEEE-754 doubles, which is fine if Perl's
+          // NV happens to be a double (which is the most common case),
+          // but we'd lose precision if Perl was compiled with a larger numeric type.
+          // So in this case we fall back to the slower but tried and true
+          // legacy number parser.
+          auto str = get_raw_json_token_from(element);
+          const char *s = str.data();
+          NV nv = json_atof(s);
+          res = newSVnv(nv);
+#else
           double d = 0.0;
           auto err = element.get_double().get(d);
           ERROR_RETURN;
 
-          res = newSVnv(d);
+          res = newSVnv((NV) d);
+#endif
+
           break;
         }
       case ondemand::number_type::signed_integer:

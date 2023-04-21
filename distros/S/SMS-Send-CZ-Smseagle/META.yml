@@ -1,0 +1,35 @@
+---
+abstract: 'SMS::Send driver for SMSEagle - Czech Republic '
+author:
+  - 'Radek Šiman <rbit@rbit.cz>'
+build_requires:
+  Module::Build: '0.28'
+  SMS::Send: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-CZ-Smseagle
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  LWP::UserAgent: '0'
+  Log::LogLite: '0'
+  SMS::Send::Driver: '0'
+  Text::Unidecode: '0'
+  URI::Escape: '0'
+  XML::Simple: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+version: '1.001'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

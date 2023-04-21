@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog;
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 sub new {
 	my $class = shift;

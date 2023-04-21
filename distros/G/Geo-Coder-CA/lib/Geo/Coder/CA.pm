@@ -8,22 +8,20 @@ use warnings;
 use Carp;
 use Encode;
 use JSON::MaybeXS;
-use HTTP::Request;
 use LWP::UserAgent;
-use LWP::Protocol::https;
 use URI;
 
 =head1 NAME
 
-Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca for both Canada and the US.
+Geo::Coder::CA - Provides a Geo-Coding functionality using L<https://geocoder.ca> for both Canada and the US.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -34,7 +32,8 @@ our $VERSION = '0.13';
 
 =head1 DESCRIPTION
 
-Geo::Coder::CA provides an interface to geocoder.ca.  Geo::Coder::Canada no longer seems to work.
+Geo::Coder::CA provides an interface to geocoder.ca.
+L<Geo::Coder::Canada> no longer seems to work.
 
 =head1 METHODS
 
@@ -48,19 +47,22 @@ Geo::Coder::CA provides an interface to geocoder.ca.  Geo::Coder::Canada no long
 =cut
 
 sub new {
-	my($class, %param) = @_;
+	my($class, %args) = @_;
 
 	if(!defined($class)) {
 		# Geo::Coder::CA::new() used rather than Geo::Coder::CA->new()
 		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
 
-	my $ua = $param{ua};
+	my $ua = $args{ua};
 	if(!defined($ua)) {
 		$ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 		$ua->default_header(accept_encoding => 'gzip,deflate');
 	}
-	my $host = $param{host} || 'geocoder.ca';
+	my $host = $args{host} || 'geocoder.ca';
 
 	return bless { ua => $ua, host => $host }, $class;
 }
@@ -91,7 +93,7 @@ sub geocode {
 	}
 
 	my $location = $param{location};
-	if(!defined($location)) {
+	if((!defined($location)) || (length($location) == 0)) {
 		Carp::croak('Usage: geocode(location => $location)');
 		return;
 	}
@@ -109,7 +111,7 @@ sub geocode {
 	my $res = $self->{ua}->get($url);
 
 	if($res->is_error()) {
-		Carp::croak("$url API returned error: ", $res->status_line());
+		Carp::carp("$url API returned error: ", $res->status_line());
 		return;
 	}
 	# $res->content_type('text/plain');	# May be needed to decode correctly
@@ -220,7 +222,7 @@ sub run {
 
 =head1 AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne, C<< <njh@bandsman.co.uk> >>
 
 Based on L<Geo::Coder::Googleplaces>.
 
@@ -239,7 +241,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

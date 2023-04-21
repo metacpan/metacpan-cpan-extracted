@@ -1,0 +1,4 @@
+0.01 - 2023-04-20
+  * Initial release, with working from-source build and
+    almost-working system-install detection, and custom
+    fluent-bit.h

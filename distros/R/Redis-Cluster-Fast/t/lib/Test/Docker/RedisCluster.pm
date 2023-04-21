@@ -19,7 +19,7 @@ use constant {
 
 require Test::More;
 Test::More::plan skip_all =>
-    'Skip tests using local Docker / Redis Cluster because AUTOMATED_TESTING is not set' unless $ENV{AUTOMATED_TESTING};
+    'Skip tests using local Docker / Redis Cluster because AUTHOR_TESTING is not set' unless $ENV{AUTHOR_TESTING};
 
 my $pid = $$;
 

@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 5;
 use Test::NoWarnings;
 use Wikibase::Datatype::Value::Time;
 
@@ -30,4 +30,14 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'calendarmodel' must begin with 'Q' and number after it.\n",
 	"Parameter 'calendarmodel' must begin with 'Q' and number after it.");
+clean();
+
+# Test.
+eval {
+	Wikibase::Datatype::Value::Time->new(
+		'value' => '+2020-09-01T01:00:00Z',
+	);
+};
+is($EVAL_ERROR, "Parameter 'value' has bad date time hour value.\n",
+	"Parameter 'value' has bad date time hour value.");
 clean();

@@ -3,7 +3,7 @@ package Wikibase::Datatype::Print;
 use strict;
 use warnings;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 1;
 
@@ -27,7 +27,7 @@ This distributions is set of print helpers for Wikibase::Datatype objects.
 
 =item L<Wikibase::Datatype::Print::Form>
 
-TODO
+Wikibase form pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Item>
 
@@ -55,11 +55,11 @@ TODO
 
 =item L<Wikibase::Datatype::Print::Reference>
 
-TODO
+Wikibase reference pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Sense>
 
-TODO
+Wikibase sense pretty print helpers.
 
 =item L<Wikibase::Datatype::Print::Sitelink>
 
@@ -147,6 +147,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

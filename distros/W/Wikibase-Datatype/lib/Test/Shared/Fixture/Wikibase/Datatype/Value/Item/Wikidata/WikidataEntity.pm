@@ -4,7 +4,7 @@ use base qw(Wikibase::Datatype::Value::Item);
 use strict;
 use warnings;
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 sub new {
 	my $class = shift;
@@ -71,11 +71,11 @@ Returns string.
  use strict;
  use warnings;
 
- use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::WikidataEntity;
+ use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::WikidataEntity;
  use Wikibase::Datatype::Print::Value::Item;
 
  # Object.
- my $obj = Test::Shared::Fixture::Wikibase::Datatype::Value::Item::WikidataEntity->new;
+ my $obj = Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::WikidataEntity->new;
 
  # Print out.
  print scalar Wikibase::Datatype::Print::Value::Item::print($obj);
@@ -119,6 +119,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

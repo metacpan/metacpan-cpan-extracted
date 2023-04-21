@@ -30,7 +30,6 @@
       "configure" : {
          "requires" : {
             "Devel::CheckBin" : "0",
-            "File::Spec" : "0",
             "File::Which" : "0",
             "File::chdir" : "0",
             "Module::Build" : "0.4005",
@@ -39,11 +38,17 @@
       },
       "develop" : {
          "requires" : {
+            "IO::CaptureOutput" : "0",
+            "Scope::Guard" : "0",
+            "Sub::Retry" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::LeakTrace" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Test::SharedFork" : "0",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::Valgrind" : "0"
          }
       },
       "runtime" : {
@@ -53,20 +58,14 @@
       },
       "test" : {
          "requires" : {
-            "IO::CaptureOutput" : "0",
-            "Scope::Guard" : "0",
-            "Sub::Retry" : "0",
-            "Test::LeakTrace" : "0",
-            "Test::More" : "0.98",
-            "Test::SharedFork" : "0",
-            "Test::Valgrind" : "0"
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "Redis::Cluster::Fast" : {
          "file" : "lib/Redis/Cluster/Fast.pm",
-         "version" : "0.087"
+         "version" : "0.088"
       }
    },
    "release_status" : "stable",
@@ -81,7 +80,7 @@
          "web" : "https://github.com/plainbanana/Redis-Cluster-Fast"
       }
    },
-   "version" : "0.087",
+   "version" : "0.088",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 0
 }

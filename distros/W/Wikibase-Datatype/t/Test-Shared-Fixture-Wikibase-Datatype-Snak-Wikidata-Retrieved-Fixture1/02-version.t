@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Retrieved::Fixture1;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Retrieved::Fixture1::VERSION, 0.25, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Retrieved::Fixture1::VERSION, 0.26, 'Version.');

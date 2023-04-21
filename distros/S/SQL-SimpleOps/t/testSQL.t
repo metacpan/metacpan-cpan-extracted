@@ -27,11 +27,13 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
+	our $VERSION = "2023.111.1";
+
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
 	## create dbh entry point (is required)
 
-	my $savedir = "/tmp" if (!($^O =~ /win/i));
+	my $savedir = "/tmp" if (($^O =~ /win/i) || stat("/tmp"));
 	our $mymod = new SQL::SimpleOps
 	(
 		db => "teste",			# you can use any database name
@@ -39,6 +41,7 @@
 		dbfile => ":memory:",		# use ram memory
 		connect => 0,			# do not open database
 		sql_save_dir => $savedir,	# savedir test
+		sql_save_bydate => 1,		# split logfile by date folders
 	);
 
 	diag("");
@@ -306,10 +309,14 @@ sub my_cmd()
 	my $argv = {@_};
 
 	diag("################################################################");
+	diag("test: ".$argv->{f});
 
 	&{$argv->{s}};
 	my $buffer = $mymod->getLastSQL();
+	my $myrc = $mymod->getRC();
 
+	diag("rc: ".$myrc);
+	diag("msg: ".$mymod->getMessage()) if ($myrc);
 	diag("format: ".$argv->{t});
 	diag("note: ".$argv->{n}) if (defined($argv->{n}));
 
@@ -317,7 +324,7 @@ sub my_cmd()
 	{
 		my $savefile = $mymod->getLastSave();
 		diag("result: ".$buffer);
-		diag("savefile: ".$savefile." (removed at end)");
+		diag("savefile: ".$savefile);
 		my $fh = new IO::File($savefile);
 		if (defined($fh))
 		{
@@ -325,28 +332,29 @@ sub my_cmd()
 			foreach my $buf(<$fh>) { $st .= $buf; }
 			close($fh);
 			undef($fh);
+
+			(unlink($savefile)) ? diag("savefile: removed") : diag("savefile: not removed, $!");
+
 			$st =~ s/[\n\r]//g;
 			if ($st eq $buffer)
 			{
-				diag("test: ".$argv->{f}.", SUCCESSFUL");
+				diag("status: SUCCESSFUL");
 				$ok++;
 			}
 			else
 			{
 				diag("savelog: ".$st);
-				diag("test: ".$argv->{f}.", ERROR, mismatch");
+				diag("status: ERROR, mismatch");
 				$er++;
 			}
-			unlink($savefile);
 		}
 		else
 		{
-			diag("test: ".$argv->{f}.", ERROR, ".$!);
+			diag("status: ERROR, ".$!);
 			$er++;
 		}
 		return;
 	}
-
 	if ($buffer eq $argv->{r} || (defined($argv->{r2}) && $buffer eq $argv->{r2}))
 	{
 		if ($show_ok)
@@ -355,7 +363,7 @@ sub my_cmd()
 			diag("        ".$argv->{r2}) if (defined($argv->{r2}));
 		}
 		diag("result: ".$buffer);
-		diag("test: ".$argv->{f}.", SUCCESSFUL");
+		diag("status: SUCCESSFUL");
 		$ok++;
 	}
 	else
@@ -363,12 +371,7 @@ sub my_cmd()
 		diag("tester: ".$argv->{r});
 		diag("tester: ".$argv->{r2}) if (defined($argv->{r2}));
 		diag("result: ".$buffer);
-		if ($mymod->getRC())
-		{
-			diag("msg: ".$mymod->getMessage());
-			diag("rc: ".$mymod->getRC());
-		}
-		diag("test: ".$argv->{f}.", ERROR");
+		diag("status: ERROR");
 		$er++;
 	}
 }

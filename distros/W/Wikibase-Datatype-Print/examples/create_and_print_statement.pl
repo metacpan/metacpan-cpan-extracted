@@ -77,5 +77,5 @@ print Wikibase::Datatype::Print::Statement::print($obj)."\n";
 #   {
 #     P248: Q53919
 #     P214: 113230702
-#     P813: 07 December 2013 (Q1985727)
+#     P813: 7 December 2013 (Q1985727)
 #   }

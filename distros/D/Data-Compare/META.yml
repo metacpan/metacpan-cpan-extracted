@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Data-Compare/issues
   repository: https://github.com/DrHyde/perl-modules-Data-Compare
-version: 1.28
+version: 1.29
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

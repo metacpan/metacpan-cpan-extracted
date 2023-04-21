@@ -12,7 +12,7 @@ use Wikibase::Datatype::Print::Utils qw(print_references);
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -150,7 +150,7 @@ Returns string.
  #   {
  #     P248: Q53919
  #     P214: 113230702
- #     P813: 07 December 2013 (Q1985727)
+ #     P813: 7 December 2013 (Q1985727)
  #   }
 
 =head1 EXAMPLE2
@@ -243,7 +243,7 @@ Returns string.
  #   {
  #     P248 (stated in): Q53919
  #     P214 (VIAF ID): 113230702
- #     P813 (retrieved): 07 December 2013 (Q1985727)
+ #     P813 (retrieved): 7 December 2013 (Q1985727)
  #   }
 
 =head1 DEPENDENCIES
@@ -283,7 +283,7 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut
 

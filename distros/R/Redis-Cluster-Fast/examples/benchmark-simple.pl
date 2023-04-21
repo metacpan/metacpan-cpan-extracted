@@ -80,7 +80,7 @@ Benchmark::cmpthese(-2, {
 is 1, 1;
 done_testing;
 __END__
-% AUTOMATED_TESTING=1 perl ./examples/benchmark-simple.pl
+% AUTHOR_TESTING=1 perl ./examples/benchmark-simple.pl
 Redis::Cluster::Fast is 0.084
 Redis::ClusterRider is 0.26
 ### mset ###

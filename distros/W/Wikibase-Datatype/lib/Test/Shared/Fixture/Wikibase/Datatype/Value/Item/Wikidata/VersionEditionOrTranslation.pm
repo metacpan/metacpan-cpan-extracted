@@ -4,7 +4,7 @@ use base qw(Wikibase::Datatype::Value::Item);
 use strict;
 use warnings;
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 sub new {
 	my $class = shift;
@@ -119,6 +119,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

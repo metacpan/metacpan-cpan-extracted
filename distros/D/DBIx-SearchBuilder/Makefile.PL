@@ -3,6 +3,7 @@ use inc::Module::Install;
 
 name ('DBIx-SearchBuilder');
 all_from('lib/DBIx/SearchBuilder.pm');
+readme_from('lib/DBIx/SearchBuilder.pm');
 perl_version('5.10.1');
 requires('DBI');
 requires('Want');

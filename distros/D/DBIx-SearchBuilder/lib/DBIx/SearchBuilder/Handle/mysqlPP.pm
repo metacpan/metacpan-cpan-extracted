@@ -18,14 +18,3 @@ DBIx::SearchBuilder::Handle::mysqlPP - A mysql specific Handle object
 A Handle subclass for the "pure perl" mysql database driver.
 
 This is currently identical to the DBIx::SearchBuilder::Handle::mysql class.
-
-=head1 AUTHOR
-
-
-
-=head1 SEE ALSO
-
-DBIx::SearchBuilder::Handle::mysql
-
-=cut
-

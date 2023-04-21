@@ -85,7 +85,7 @@
 		$err
 	);
 
-	our $VERSION = "2023.106.1";
+	our $VERSION = "2023.111.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -423,6 +423,7 @@ sub SelectCursor()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
 	## define the command in load
@@ -583,6 +584,7 @@ sub Select()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
 	## define the command in load
@@ -867,6 +869,7 @@ sub Delete()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
 	## define the command in load
@@ -947,10 +950,11 @@ sub Insert()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->setLastSQL("");
+	$self->Open() if (!defined($self->{init}{dbh}));
+
 	## define the command in load
 	$self->{init}{command} = "insert";
-
-	$self->Open() if (!defined($self->{init}{dbh}));
 
 	if ($self->{init}{plugin_fh}->can('Insert') && $self->{init}{plugin_fh}->Insert($argv))
 	{
@@ -1102,6 +1106,7 @@ sub Update()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
 	## define the command in load
@@ -1237,6 +1242,7 @@ sub Call()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
 	## define the command in load
@@ -1247,7 +1253,6 @@ sub Call()
 		$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
 	}
-
 	if ($argv->{command} eq "")
 	{
 		$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"023");
@@ -1274,7 +1279,7 @@ sub _Call()
 	my $self = shift;
 	my $argv = {@_};
 
-	$self->{init}{sql_command} = $argv->{command};
+	$self->setLastSQL($argv->{command});
 
 	## save command (call-sql_save is prior that new-sql_save
 	if ((defined($argv->{sql_save}) && $argv->{sql_save}) || (defined($self->{argv}{sql_save}) && $self->{argv}{sql_save} && $argv->{command_type}))
@@ -1353,8 +1358,9 @@ sub Commit()
 	my $self = shift;
 	my $argv = {@_};
 
-	return SQL_SIMPLE_RC_OK if (!defined($self->{init}{dbh}));
+	$self->setLastSQL("");
 
+	return SQL_SIMPLE_RC_OK if (!defined($self->{init}{dbh}));
 	return $self->_Call(
 		command => "commit",
 	       	command_type => 0,		# (ZERO to eliminate the LOOP)
@@ -1408,14 +1414,18 @@ sub Save()
 	require IO::File;
 
 	my $today = sprintf("%04s%02s%02s",Date::Calc::Today());
-	my $path = ($self->{init}{sql_save_bydate}) ?
+	my $path = ($self->{argv}{sql_save_bydate}) ?
 		File::Spec->catdir($self->{init}{sql_save_dir},substr($today,0,4),substr($today,0,6),$today) :
 		$self->{init}{sql_save_dir};
 
-	if (!stat($path) && !&File::Path::mkpath($path))
-	{
-		$self->setMessage("save",SQL_SIMPLE_RC_ERROR,"025",$!);
-		return ($self->{argv}{sql_save_ignore}) ? SQL_SIMPLE_RC_OK : SQL_SIMPLE_RC_ERROR;
+	if (!stat($path))
+       	{
+		eval { &File::Path::mkpath($path); };
+		if ($@)
+		{
+			$self->setMessage("save",SQL_SIMPLE_RC_ERROR,"025",$@);
+			return ($self->{argv}{sql_save_ignore}) ? SQL_SIMPLE_RC_OK : SQL_SIMPLE_RC_ERROR;
+		}
 	}
 
 	$self->{init}{sql_save_logfile} = File::Spec->catpath("", $path,$self->{init}{sql_save_name}.".".($self->{argv}{db}||"public").".".$today.".".$$.".".(++$self->{init}{sql_save_ix}));
@@ -1791,6 +1801,15 @@ sub getAliasCols()
 		!defined($self->{argv}{tables}{$table}{cols}{$field})) ?
 			(($notab) ? $table.".".$field : $field) :
 			(($notab) ? $table.".".$self->{argv}{tables}{$table}{cols}{$field} : $self->{argv}{tables}{$table}{cols}{$field});
+}
+
+################################################################################
+## action: set last command sql
+## return: none
+
+sub setLastSQL()
+{
+	$_[0]->{init}{sql_command} = $_[1];
 }
 
 ################################################################################

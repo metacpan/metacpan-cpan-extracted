@@ -1410,23 +1410,3 @@ if( eval { require capitalization } ) {
 }
 
 1;
-
-__END__
-
-
-
-=head1 AUTHOR
-
-Jesse Vincent, <jesse@fsck.com>
-
-Enhancements by Ivan Kohler, <ivan-rt@420.am>
-
-Docs by Matt Knopp <mhat@netlag.com>
-
-=head1 SEE ALSO
-
-L<DBIx::SearchBuilder>
-
-=cut
-
-

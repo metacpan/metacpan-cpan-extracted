@@ -1,5 +1,5 @@
 package CPU::x86_64::InstructionWriter;
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 use v5.10;
 use Moo 2;
 use Carp;
@@ -7,13 +7,10 @@ use Scalar::Util 'looks_like_number';
 use Exporter 'import';
 use CPU::x86_64::InstructionWriter::Unknown;
 use CPU::x86_64::InstructionWriter::Label;
+use if !eval{ pack('Q<',1) }, 'CPU::x86_64::InstructionWriter::_int32', qw/pack/;
 
 # ABSTRACT: Assemble x86-64 instructions using a pure-perl API
 
-
-(0x7FFFFFFE << 31) > 0 && (0x7FFFFFFE << 63) == 0
-	or die "Author is lazy and requires 64-bit perl integers\n";
-no warnings 'portable';
 
 my @byte_registers= qw( AH AL BH BL CH CL DH DL SPL BPL SIL DIL R8B R9B R10B R11B R12B R13B R14B R15B );
 my %byte_register_alias= ( map {; "R${_}L" => "R${_}B" } 8..15 );
@@ -150,7 +147,7 @@ sub data     { $_[0]{_buf} .= $_[1] }
 sub data_i8  { $_[0]{_buf} .= chr($_[1]) }
 sub data_i16 { $_[0]{_buf} .= pack('v', $_[1]) }
 sub data_i32 { $_[0]{_buf} .= pack('V', $_[1]) }
-sub data_i64 { $_[0]{_buf} .= pack('<Q', $_[1]) }
+sub data_i64 { $_[0]{_buf} .= pack('Q<', $_[1]) }
 
 
 sub data_f32 { $_[0]{_buf} .= pack('f', $_[1]) }
@@ -241,7 +238,7 @@ sub call_label {
 			my ($self, $params)= @_;
 			defined $label->{offset} or croak "Label $label is not marked";
 			my $ofs= $label->{offset} - ($params->{offset}+$params->{len});
-			($ofs >> 31) == ($ofs >> 32) or croak "Offset must be within 31 bits";
+			($ofs >> 31) == ($ofs >> 31 >> 1) or croak "Offset must be within 31 bits";
 			return pack('CV', 0xE8, $ofs);
 		}
 	);
@@ -417,7 +414,7 @@ sub _append_mov_reg_mem {
 			$opstr= "\x48".$opstr if $bits == 64;
 			$opstr= "\x66".$opstr if $bits == 16;
 			# Do the dance for values which haven't been resolved yet
-			my $val= ref $disp? $disp->value : $disp;
+			my $val= looks_like_number($disp)? $disp : $disp->value;
 			if (!defined $val) {
 				$self->_mark_unresolved(
 					10, # longest instruction possible, not the greatest guess.
@@ -453,18 +450,18 @@ sub _encode_mov64_imm {
 	my ($self, $reg, $immed)= @_;
 	use integer;
 	# If the number fits in 32-bits, encode as the classic instruction
-	if (!($immed >> 32)) {
+	if (($immed >> 31 >> 1) == 0) { # ">> 32" is a no-op on 32-bit perl
 		return $reg > 7? # need REX byte if extended register
-			pack('CCL<', 0x41, 0xB8 + ($reg&7), $immed)
-			: pack('CL<', 0xB8 + $reg, $immed);
+			pack('C C L<', 0x41, 0xB8 + ($reg&7), $immed)
+			: pack('C L<', 0xB8 + $reg, $immed);
 	}
 	# If the number can sign-extend from 32-bits, encode as 32-bit sign-extend
 	elsif (($immed >> 31) == -1) {
-		return pack('CCCl<', 0x48 | (($reg & 8) >> 3), 0xC7, 0xC0 + ($reg & 7), $immed);
+		return pack('C C C l<', 0x48 | (($reg & 8) >> 3), 0xC7, 0xC0 + ($reg & 7), $immed);
 	}
 	# else encode as new 64-bit immediate
 	else {
-		return pack('CCQ<', 0x48 | (($reg & 8) >> 3), 0xB8 + ($reg & 7), $immed);
+		return pack('C C Q<', 0x48 | (($reg & 8) >> 3), 0xB8 + ($reg & 7), $immed);
 	}
 }
 sub mov32_reg_imm {
@@ -1313,7 +1310,7 @@ sub _encode_op_reg_mem {
 		# RBP,R13 always gets mod_rm displacement to differentiate from Null base register
 		my ($mod_rm, $suffix)= !$disp? ( ($base_reg&7) == 5? (0x40, "\0") : (0x00, '') )
 			: (($disp >>  7) == ($disp >>  8))? (0x40, pack('c', $disp))
-			: (($disp >> 31) == ($disp >> 32))? (0x80, pack('V', $disp))
+			: (($disp >> 31) == ($disp >> 31 >> 1))? (0x80, pack('V', $disp))
 			: croak "address displacement out of range: $disp";
 		
 		if (defined $index_reg) {
@@ -1333,7 +1330,7 @@ sub _encode_op_reg_mem {
 	} else {
 		# Null base register is encoded as RBP + 32bit displacement
 		
-		(($disp >> 31) == ($disp >> 32))
+		(($disp >> 31) == ($disp >> 31 >> 1))
 			or croak "address displacement out of range: $disp";
 		
 		if (defined $index_reg) {
@@ -1388,7 +1385,7 @@ sub _encode_mathop64_imm {
 	my $rex= 0x48 | (($reg & 8)>>3);
 	defined $opcode8 && (($value >> 7) == ($value >> 8))?
 		pack('CCCc', $rex, $opcode8, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
-	: (($value >> 31) == ($value >> 32))? (
+	: (($value >> 31) == ($value >> 31 >> 1))? (
 		# Ops on AX get encoded as a special instruction
 		$reg? pack('CCCV', $rex, $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
 			: pack('CCV', $rex, $opcodeAX32, $value)
@@ -1414,7 +1411,7 @@ sub _encode_mathop32_imm {
 		(	$rex? pack('CCCC', 0x40|$rex, $opcode8, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFF)
 				: pack('CCC', $opcode8, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value&0xFF)
 		)
-		: (($value >> 32) == ($value >> 33))? (
+		: (($value >> 31 >> 1) == ($value >> 31 >> 2))? (
 			# Ops on AX get encoded as a special instruction
 			$rex? pack('CCCV', 0x40|$rex, $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
 			: $reg? pack('CCV', $opcode32, 0xC0 | ($opcode_reg << 3) | ($reg & 7), $value)
@@ -1496,7 +1493,7 @@ sub _encode_mathop64_mem_immed {
 	use integer;
 	defined $opcode8 && (($value >> 7) == ($value >> 8))?
 		$self->_encode_op_reg_mem(8, $opcode8, $opcode_reg, $base_reg, $disp, $index_reg, $scale, 'C', $value&0xFF)
-	: (($value >> 31) == ($value >> 32))?
+	: (($value >> 31) == ($value >> 31 >> 1))?
 		$self->_encode_op_reg_mem(8, $opcode32, $opcode_reg, $base_reg, $disp, $index_reg, $scale, 'V', $value&0xFFFFFFFF)
 	: croak "$value is wider than 31-bit";
 }
@@ -1515,7 +1512,7 @@ sub _encode_mathop32_mem_immed {
 	use integer;
 	defined $opcode8 && (($value >> 7) == ($value >> 8) or ($value >> 8 == 0xFFFFFF))?
 		$self->_encode_op_reg_mem(0, $opcode8, $opcode_reg, $base_reg, $disp, $index_reg, $scale).pack('C',$value&0xFF)
-	: (($value >> 32) == ($value >> 33))?
+	: (($value >> 30 >> 2) == ($value >> 30 >> 3))?
 		$self->_encode_op_reg_mem(0, $opcode32, $opcode_reg, $base_reg, $disp, $index_reg, $scale).pack('V', $value&0xFFFFFFFF)
 	: croak "$value is wider than 32-bit";
 }
@@ -1675,7 +1672,7 @@ sub _append_jmp_cx {
 sub _append_possible_unknown {
 	my ($self, $encoder, $encoder_args, $unknown_pos, $estimated_length)= @_;
 	my $u= $encoder_args->[$unknown_pos];
-	if (ref $u && ref $u ne 'SCALAR') {
+	if (ref $u && ref $u ne 'SCALAR' && !looks_like_number($u)) {
 		ref($u)->can('value')
 			or croak "Expected object with '->value' method";
 		$self->_mark_unresolved(
@@ -1816,7 +1813,7 @@ CPU::x86_64::InstructionWriter - Assemble x86-64 instructions using a pure-perl 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

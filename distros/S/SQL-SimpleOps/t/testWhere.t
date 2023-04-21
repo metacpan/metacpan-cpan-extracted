@@ -27,6 +27,8 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
+	our $VERSION = "2023.106.1";
+
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
 	## create dbh entry point (is required)

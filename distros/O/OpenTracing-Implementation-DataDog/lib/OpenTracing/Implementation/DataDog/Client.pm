@@ -39,7 +39,7 @@ agent.
 
 
 
-our $VERSION = 'v0.46.0';
+our $VERSION = 'v0.46.1';
 
 use English;
 
@@ -463,6 +463,9 @@ sub to_struct {
         maybe
         hostname  => $context->get_hostname,
         
+        maybe
+        version   => $context->get_version,
+        
         name      => $span->get_operation_name,
         start     => nano_seconds( $span->start_time() ),
         duration  => nano_seconds( $span->duration() ),
@@ -485,6 +488,56 @@ sub to_struct {
     
     return $data
 }
+
+
+
+=head1 ENVIRONMENT VARIABLES
+
+For configuring DataDog Tracing there is support for the folllowing environment
+variables:
+
+
+
+=head2 C<DD_AGENT_HOST>
+
+Hostname for where to send traces to. If using a containerized environment,
+configure this to be the host IP.
+
+B<default:> C<localhost>
+
+
+
+=head2 C<DD_TRACE_AGENT_PORT>
+
+The port number the Agent is listening on for configured host. If the Agent
+configuration sets receiver_port or C<DD_APM_RECEIVER_PORT> to something other
+than the default B<8126>, then C<DD_TRACE_AGENT_PORT> or C<DD_TRACE_AGENT_URL>
+must match it.
+
+B<default:> C<8126>
+
+
+=head2 C<DD_TRACE_AGENT_URL>
+
+The URL to send traces to. If the Agent configuration sets receiver_port or
+C<DD_APM_RECEIVER_PORT> to something other than the default B<8126>, then
+C<DD_TRACE_AGENT_PORT> or C<DD_TRACE_AGENT_URL> must match it. The URL value can
+start with C<http://> to connect B<using HTTP> or with C<unix://> to use a
+B<Unix Domain Socket>.
+
+When set this takes precedence over C<DD_AGENT_HOST> and C<DD_TRACE_AGENT_PORT>.
+
+B<CAVEATE: > the C<unix:> scheme is non-exisitent, and is not supported with the
+L<DataDog::Client|OpenTracing::Implementation::DataDog::Client>.
+
+
+
+=head2 C<DD_TRACE_PARTIAL_FLUSH_MIN_SPANS>
+
+Set a number of partial spans to flush on. Useful to reduce memory overhead when
+dealing with heavy traffic or long running traces.
+
+B<default:> 100
 
 
 

@@ -13,6 +13,7 @@ SIMD.xs
 SIMD/Boolean.pm
 bin/json_simd
 eg/bench
+eg/bench_simdjson.pl
 t/00_load.t
 t/01_utf8.t
 t/02_error.t

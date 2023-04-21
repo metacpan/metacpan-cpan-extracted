@@ -16,7 +16,7 @@ use File::Find::Rule;
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(Compare);
-$VERSION = 1.28;
+$VERSION = 1.29;
 $DEBUG   = $ENV{PERL_DATA_COMPARE_DEBUG} || 0;
 
 my %handler;

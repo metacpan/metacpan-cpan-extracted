@@ -1293,7 +1293,7 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					break;
 				}
 				case StrAttr: {
-					CK_ULONG len;
+					STRLEN len;
 					current->pValue = (void*)SvPVutf8(value, len);
 					current->ulValueLen = len;
 					break;
@@ -1493,12 +1493,14 @@ static void S_provider_refcount_decrement(pTHX_ struct Provider* provider) {
 }
 #define provider_refcount_decrement(provider) S_provider_refcount_decrement(aTHX_ provider)
 
-static int provider_dup(pTHX_ MAGIC* magic, CLONE_PARAMS*) {
+static int provider_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
 	provider_refcount_increment((struct Provider*)magic->mg_ptr);
 	return 0;
 }
 
-static int provider_free(pTHX_ SV*, MAGIC* magic) {
+static int provider_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
 	provider_refcount_decrement((struct Provider*)magic->mg_ptr);
 	return 0;
 }

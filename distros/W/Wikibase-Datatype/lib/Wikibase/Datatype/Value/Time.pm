@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Wikibase::Datatype::Utils qw(check_entity);
+use Wikibase::Datatype::Utils qw(check_datetime check_entity);
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -46,6 +46,8 @@ sub BUILD {
 	}
 
 	check_entity($self, 'calendarmodel');
+
+	check_datetime($self, 'value');
 
 	return;
 }
@@ -183,6 +185,19 @@ Returns string.
 =head1 ERRORS
 
  new():
+         From Wikibase::Datatype::Utils::check_datetime():
+                 Parameter '%s' has bad date time.
+                         Value: %s
+                 Parameter '%s' has bad date time day value.
+                         Value: %s
+                 Parameter '%s' has bad date time hour value.
+                         Value: %s
+                 Parameter '%s' has bad date time minute value.
+                         Value: %s
+                 Parameter '%s' has bad date time month value.
+                         Value: %s
+                 Parameter '%s' has bad date time second value.
+                         Value: %s
          From Wikibase::Datatype::Utils::check_entity():
                  Parameter 'calendarmodel' must begin with 'Q' and number after it.
          From Wikibase::Datatype::Value::new():
@@ -262,6 +277,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

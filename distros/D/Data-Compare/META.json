@@ -51,6 +51,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Data-Compare"
       }
    },
-   "version" : 1.28,
+   "version" : 1.29,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -7,11 +7,11 @@
 
 # NAME
 
-Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca for both Canada and the US.
+Geo::Coder::CA - Provides a Geo-Coding functionality using [https://geocoder.ca](https://geocoder.ca) for both Canada and the US.
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
@@ -22,7 +22,8 @@ Version 0.13
 
 # DESCRIPTION
 
-Geo::Coder::CA provides an interface to geocoder.ca.  Geo::Coder::Canada no longer seems to work.
+Geo::Coder::CA provides an interface to geocoder.ca.
+[Geo::Coder::Canada](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3ACanada) no longer seems to work.
 
 # METHODS
 
@@ -69,7 +70,7 @@ You can also run this module from the command line:
 
 # AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne, `<njh@bandsman.co.uk>`
 
 Based on [Geo::Coder::Googleplaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGoogleplaces).
 
@@ -88,6 +89,6 @@ Should be called Geo::Coder::NA for North America.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
