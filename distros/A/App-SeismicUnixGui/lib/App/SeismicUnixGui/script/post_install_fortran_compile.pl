@@ -2,7 +2,6 @@
 
 =head1 DOCUMENTATION
 
-
 =head2 SYNOPSIS 
 
  PERL SCRIPT NAME: post_install_fortran_compile.pl 
@@ -55,8 +54,9 @@ my $pgplot_path;
 
 # Searching
 print(" Examining the system ... for pgplot directory\n");
-
-my @pgplot_list   = `(find $starting_point -path $pgplot_pathNfile2find -print 2>/dev/null)`;
+my $instruction = ("find $starting_point -path $pgplot_pathNfile2find -print 2>/dev/null");
+#print "\t".$instruction."\n";
+my @pgplot_list   = `$instruction`;
 my $lengthB = scalar @pgplot_list;
 
 print("\n Found $lengthB locations for the pgplot libraries:\n");
@@ -123,7 +123,8 @@ print("\n Examining the system ... for fortran files\n");
 my @fortran_list   = `(find $starting_point -path $fortran_pathNfile2find -print 2>/dev/null)`;
 my $lengthA= scalar @fortran_list;
 
-print("\n Found $lengthA versions of the script. \(Hint: use one with the \"perl\" in path\)\n");
+print("\n Found $lengthA versions of the script.\n");
+print(" Hint: use one with the \"perl\" in its path\)\n");
 
 for ( my $i = 0 ; $i < $lengthA ; $i++ ) {
 
@@ -168,7 +169,7 @@ chomp $path;
 
 print "Proceeding to compile\n";
 
-system("cd $path; bash run_me_only.sh $PGPLOT_DIR ");
+system("cd $path; sudo bash run_me_only.sh $PGPLOT_DIR ");
 # my $me = system("whoami");
 # print("post_install_fortran_compile.pl,me=$me\n");
 

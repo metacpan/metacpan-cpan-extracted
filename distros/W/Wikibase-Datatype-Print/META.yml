@@ -34,6 +34,7 @@ build_requires:
   Wikibase::Datatype::Value::Monolingual: 0
   Wikibase::Datatype::Value::Property: 0
   Wikibase::Datatype::Value::Quantity: 0
+  Wikibase::Datatype::Value::Sense: 0.29
   Wikibase::Datatype::Value::String: 0
   Wikibase::Datatype::Value::Time: 0
 configure_requires:
@@ -63,4 +64,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
-version: '0.09'
+version: '0.12'

@@ -4,13 +4,13 @@
       "Matthias Bethke <matthias@towiski.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Levenshtein-Flexible",
    "no_index" : {
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Exception" : "0",
-            "Test::LeakTrace" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -36,8 +34,15 @@
          "requires" : {
             "perl" : "5.008008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::LeakTrace" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

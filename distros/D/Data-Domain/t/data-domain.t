@@ -3,9 +3,11 @@ use strict;
 use warnings;
 use Test::More tests => 20;
 use Test::NoWarnings;
+use Clone qw/clone/;
+
 
 BEGIN { use_ok( 'Data::Domain', qw/:all/ );}
-diag( "Testing Data::Domain $Data::Domain::VERSION, Perl $], $^X" );
+diag( "Testing Data::Domain $Data::Domain::VERSION, Perl $], Test::More $Test::More::VERSION, $^X" );
 
 my $dom;
 my $msg;
@@ -433,7 +435,6 @@ subtest "All_of" => sub {
 
 subtest "Overloads" => sub {
   plan tests => 4;
-  use experimental 'smartmatch';
 
   $dom = Unblessed;
   my $string = "$dom";
@@ -441,9 +442,17 @@ subtest "Overloads" => sub {
 
   SKIP: {
     skip "no smartmatch operator", 3 if $] >= 5.037;
-    ok(1 ~~ $dom,       "Smart match OK");
-    ok(!($dom ~~ $dom), "Smart match KO");
-    like($Data::Domain::MESSAGE, qr/blessed/, "Smart match message");
+
+    # This is in an eval to hide the ~~ from the compiler. Even with the skip,
+    # without the eval the compiler sees the ~~ and in 5.37.12 will emit
+    # deprecation warnings.
+    eval q{
+      no if ($] >= 5.018), 'warnings' => 'experimental';
+      use experimental 'smartmatch';
+      ok(1 ~~ $dom,       "Smart match OK");
+      ok(!($dom ~~ $dom), "Smart match KO");
+      like($Data::Domain::MESSAGE, qr/blessed/, "Smart match message");
+    } or die $@;
   }
 };
 
@@ -467,19 +476,6 @@ subtest "Lazy" => sub {
 
   ok(!$dom->inspect({d_begin => '03.03.2003', 
                      d_end   => '02.02.2002'}), "Dates order fail");
-
-
-  sub clone { # can't remember which CPAN module implements cloning
-    my $node = shift;
-    for (ref $node) {
-      /ARRAY/ and return [map {clone($_)} @$node];
-      /HASH/  and do { my $r = {};
-                       $r->{$_} = clone($node->{$_}) foreach keys %$node;
-                       return $r; };
-      /^$/    and return $node;
-      die "cloning incorrect data";
-    }
-  }
 
   my $context;
   $dom = Struct(
@@ -559,7 +555,7 @@ subtest "Lazy" => sub {
 #----------------------------------------------------------------------
 
 subtest "messages" => sub {
-  plan tests => 6;
+  plan tests => 7;
 
   Data::Domain->messages("français");
 
@@ -596,7 +592,15 @@ subtest "messages" => sub {
   is($msg, "validation error (TOO_SMALL)", "msg global sub");
 
   Data::Domain->messages("english");
+
+  # with this test, sprintf will get a redundant arg. Needs "no warnings 'redundant'" to become silent
+  $dom = String(-regex    => qr/^\+?[0-9() ]+$/,
+                -messages => {SHOULD_MATCH => "illegal char"});
+  $msg = $dom->inspect("foobar");
+  is $msg, "String: illegal char", "message with redundant arg";
 };
+
+
 
 
 #----------------------------------------------------------------------
@@ -630,6 +634,11 @@ subtest "doc" => sub {
   ok($msg, "constant subdomains ERR2");
   note(explain($msg));
 };
+
+
+
+
+
 
 
 #----------------------------------------------------------------------

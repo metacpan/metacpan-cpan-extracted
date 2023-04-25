@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 has forms => (
 	default => [],
@@ -334,7 +334,7 @@ Returns string.
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
- # Object.
+ # Statements.
  my $statement1 = Wikibase::Datatype::Statement->new(
          # instance of (P31) human (Q5)
          'snak' => Wikibase::Datatype::Snak->new(
@@ -430,7 +430,7 @@ Returns string.
          ],
  );
 
- # Main item.
+ # Object.
  my $obj = Wikibase::Datatype::Lexeme->new(
          'id' => 'L469',
          'lemmas' => [
@@ -525,6 +525,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut

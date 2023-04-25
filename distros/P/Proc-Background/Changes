@@ -1,3 +1,9 @@
+Sat Apr 22 17:27:59 EDT 2023
+
+  Version 1.32
+
+  * Fix fatal bug in Win32 constructor from changes in 1.31
+
 Mon Apr 17 14:33:00 EDT 2023
 
   Version 1.31

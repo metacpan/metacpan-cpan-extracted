@@ -38,7 +38,7 @@
 120         read (unit=21) Amp(k,i)
 
  !            print*,'k, i,ntr, ns,Amp(k-1,i-1)',k,i,ntr,ns,Amp(k-1,i-1)
-             i = i+1
+ !            i = i+1
              if(i.GE.ns) goto 50
            enddo
           

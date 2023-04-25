@@ -1801,7 +1801,7 @@ I<Since C<2.32>>
 
   # given: synopsis;
 
-  my $path = Venus::Path->new('t');
+  $path = Venus::Path->new('t');
 
   my $seek = $path->seek('f', 'earth');
 
@@ -1815,7 +1815,7 @@ I<Since C<2.32>>
 
   # given: synopsis;
 
-  my $path = Venus::Path->new('t');
+  $path = Venus::Path->new('t');
 
   my $seek = $path->seek('f', 'europa');
 

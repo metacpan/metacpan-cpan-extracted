@@ -76,6 +76,7 @@
             "JSON::MaybeXS" : "1.004001",
             "JSON::PP" : "0",
             "List::Util" : "1.50",
+            "Math::BigFloat" : "0",
             "Mojo::JSON::Pointer" : "0",
             "Mojo::URL" : "0",
             "Mojolicious" : "7.23",
@@ -101,7 +102,6 @@
             "Data::Dumper" : "0",
             "File::Spec" : "0",
             "List::Util" : "1.50",
-            "Math::BigFloat" : "0",
             "Math::BigInt" : "0",
             "Module::Metadata" : "0",
             "Path::Tiny" : "0",
@@ -200,7 +200,7 @@
    "provides" : {
       "JSON::Schema::Tiny" : {
          "file" : "lib/JSON/Schema/Tiny.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -215,7 +215,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Tiny"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037010"
@@ -1115,7 +1115,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.020",
+                  "tag" : "v0.021",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

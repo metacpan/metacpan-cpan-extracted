@@ -1,6 +1,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 #include "simdjson_wrapper.h"
 
@@ -36,22 +37,24 @@
 // three extra for rounding, sign, and end of string
 #define IVUV_MAXCHARS (sizeof (UV) * CHAR_BIT * 28 / 93 + 3)
 
-#define F_ASCII          0x00000001UL
-#define F_LATIN1         0x00000002UL
-#define F_UTF8           0x00000004UL
-#define F_INDENT         0x00000008UL
-#define F_CANONICAL      0x00000010UL
-#define F_SPACE_BEFORE   0x00000020UL
-#define F_SPACE_AFTER    0x00000040UL
-#define F_ALLOW_NONREF   0x00000100UL
-#define F_SHRINK         0x00000200UL
-#define F_ALLOW_BLESSED  0x00000400UL
-#define F_CONV_BLESSED   0x00000800UL
-#define F_RELAXED        0x00001000UL
-#define F_ALLOW_UNKNOWN  0x00002000UL
-#define F_ALLOW_TAGS     0x00004000UL
-#define F_HOOK           0x00080000UL // some hooks exist, so slow-path processing
-#define F_USE_SIMDJSON   0x00100000UL
+#define F_ASCII             0x00000001UL
+#define F_LATIN1            0x00000002UL
+#define F_UTF8              0x00000004UL
+#define F_INDENT            0x00000008UL
+#define F_CANONICAL         0x00000010UL
+#define F_SPACE_BEFORE      0x00000020UL
+#define F_SPACE_AFTER       0x00000040UL
+#define F_ALLOW_NONREF      0x00000100UL
+#define F_SHRINK            0x00000200UL
+#define F_ALLOW_BLESSED     0x00000400UL
+#define F_CONV_BLESSED      0x00000800UL
+#define F_RELAXED           0x00001000UL
+#define F_ALLOW_UNKNOWN     0x00002000UL
+#define F_ALLOW_TAGS        0x00004000UL
+#define F_HOOK              0x00008000UL // some hooks exist, so slow-path processing
+#define F_USE_SIMDJSON      0x00010000UL
+#define F_CORE_BOOLS        0x00020000UL
+#define F_ENCODE_CORE_BOOLS 0x00040000UL
 
 #define F_PRETTY    F_INDENT | F_SPACE_BEFORE | F_SPACE_AFTER
 
@@ -66,15 +69,15 @@
 #define SE } while (0)
 
 #if __GNUC__ >= 3
-# define expect(expr,value)         __builtin_expect ((expr), (value))
+# define my_expect(expr,value)      __builtin_expect ((expr), (value))
 # define INLINE                     static inline
 #else
-# define expect(expr,value)         (expr)
+# define my_expect(expr,value)      (expr)
 # define INLINE                     static
 #endif
 
-#define expect_false(expr) expect ((expr) != 0, 0)
-#define expect_true(expr)  expect ((expr) != 0, 1)
+#define expect_false(expr) my_expect ((expr) != 0, 0)
+#define expect_true(expr)  my_expect ((expr) != 0, 1)
 
 #define IN_RANGE_INC(type,val,beg,end) \
   ((unsigned type)((unsigned type)(val) - (unsigned type)(beg)) \
@@ -790,7 +793,7 @@ encode_rv (enc_t *enc, SV *sv)
           PUSHs (sv_json);
 
           PUTBACK;
-          count = call_sv ((SV *)GvCV (method), G_ARRAY);
+          count = call_sv ((SV *)GvCV (method), G_LIST);
           SPAGAIN;
 
           // catch this surprisingly common error
@@ -885,6 +888,16 @@ encode_sv (enc_t *enc, SV *sv)
 {
   SvGETMAGIC (sv);
 
+#if PERL_VERSION_GE(5,36,0)
+  if (enc->json.flags & F_ENCODE_CORE_BOOLS && SvIsBOOL (sv))
+    {
+      if (SvTRUE_nomg_NN (sv))
+        encode_str (enc, "true", 4, 0);
+      else
+        encode_str (enc, "false", 5, 0);
+    }
+  else /* continues after the endif! */
+#endif
   if (SvPOKp (sv))
     {
       STRLEN len;
@@ -1544,7 +1557,7 @@ filter_object (dec_t *dec, SV *sv, HV* hv)
           XPUSHs (HeVAL (he));
           sv_2mortal (sv);
 
-          PUTBACK; count = call_sv (HeVAL (cb), G_ARRAY); SPAGAIN;
+          PUTBACK; count = call_sv (HeVAL (cb), G_LIST); SPAGAIN;
 
           if (count == 1)
             {
@@ -1573,7 +1586,7 @@ filter_object (dec_t *dec, SV *sv, HV* hv)
       PUSHMARK (SP);
       XPUSHs (sv_2mortal (sv));
 
-      PUTBACK; count = call_sv (dec->json.cb_object, G_ARRAY); SPAGAIN;
+      PUTBACK; count = call_sv (dec->json.cb_object, G_LIST); SPAGAIN;
 
       if (count == 1)
         sv = newSVsv (POPs);
@@ -2252,37 +2265,59 @@ void new (char *klass)
 
 void boolean_values (JSON *self, SV *v_false = 0, SV *v_true = 0)
 	PPCODE:
-	self->v_false = newSVsv (v_false);
-	self->v_true  = newSVsv (v_true);
+        self->flags   &= ~F_CORE_BOOLS;
+        self->v_false = newSVsv (v_false);
+        self->v_true  = newSVsv (v_true);
         XPUSHs (ST (0));
 
 void get_boolean_values (JSON *self)
 	PPCODE:
         if (self->v_false && self->v_true)
-	  {
+          {
             EXTEND (SP, 2);
             PUSHs (self->v_false);
             PUSHs (self->v_true);
           }
 
+void core_bools (JSON *self, int enable = 1)
+	PPCODE:
+        self->flags   |= F_CORE_BOOLS;
+        self->v_false = newSVsv (&PL_sv_no);
+        self->v_true  = newSVsv (&PL_sv_yes);
+        XPUSHs (ST (0));
+
+void get_core_bools (JSON *self)
+	PPCODE:
+{
+        int result = self->flags & F_CORE_BOOLS;
+#if PERL_VERSION_GE(5,36,0)
+        if (self->v_false && self->v_true && SvIsBOOL(self->v_false) && SvIsBOOL(self->v_true))
+          {
+            result = F_CORE_BOOLS;
+          }
+#endif
+        XPUSHs (boolSV (result));
+}
+
 void ascii (JSON *self, int enable = 1)
 	ALIAS:
-        ascii           = F_ASCII
-        latin1          = F_LATIN1
-        utf8            = F_UTF8
-        indent          = F_INDENT
-        canonical       = F_CANONICAL
-        space_before    = F_SPACE_BEFORE
-        space_after     = F_SPACE_AFTER
-        pretty          = F_PRETTY
-        allow_nonref    = F_ALLOW_NONREF
-        shrink          = F_SHRINK
-        allow_blessed   = F_ALLOW_BLESSED
-        convert_blessed = F_CONV_BLESSED
-        relaxed         = F_RELAXED
-        allow_unknown   = F_ALLOW_UNKNOWN
-        allow_tags      = F_ALLOW_TAGS
-        use_simdjson    = F_USE_SIMDJSON
+        ascii             = F_ASCII
+        latin1            = F_LATIN1
+        utf8              = F_UTF8
+        indent            = F_INDENT
+        canonical         = F_CANONICAL
+        space_before      = F_SPACE_BEFORE
+        space_after       = F_SPACE_AFTER
+        pretty            = F_PRETTY
+        allow_nonref      = F_ALLOW_NONREF
+        shrink            = F_SHRINK
+        allow_blessed     = F_ALLOW_BLESSED
+        convert_blessed   = F_CONV_BLESSED
+        relaxed           = F_RELAXED
+        allow_unknown     = F_ALLOW_UNKNOWN
+        allow_tags        = F_ALLOW_TAGS
+        use_simdjson      = F_USE_SIMDJSON
+        encode_core_bools = F_ENCODE_CORE_BOOLS
 	PPCODE:
 {
         if (enable)
@@ -2300,21 +2335,22 @@ void ascii (JSON *self, int enable = 1)
 
 void get_ascii (JSON *self)
 	ALIAS:
-        get_ascii           = F_ASCII
-        get_latin1          = F_LATIN1
-        get_utf8            = F_UTF8
-        get_indent          = F_INDENT
-        get_canonical       = F_CANONICAL
-        get_space_before    = F_SPACE_BEFORE
-        get_space_after     = F_SPACE_AFTER
-        get_allow_nonref    = F_ALLOW_NONREF
-        get_shrink          = F_SHRINK
-        get_allow_blessed   = F_ALLOW_BLESSED
-        get_convert_blessed = F_CONV_BLESSED
-        get_relaxed         = F_RELAXED
-        get_allow_unknown   = F_ALLOW_UNKNOWN
-        get_allow_tags      = F_ALLOW_TAGS
-        get_use_simdjson    = F_USE_SIMDJSON
+        get_ascii             = F_ASCII
+        get_latin1            = F_LATIN1
+        get_utf8              = F_UTF8
+        get_indent            = F_INDENT
+        get_canonical         = F_CANONICAL
+        get_space_before      = F_SPACE_BEFORE
+        get_space_after       = F_SPACE_AFTER
+        get_allow_nonref      = F_ALLOW_NONREF
+        get_shrink            = F_SHRINK
+        get_allow_blessed     = F_ALLOW_BLESSED
+        get_convert_blessed   = F_CONV_BLESSED
+        get_relaxed           = F_RELAXED
+        get_allow_unknown     = F_ALLOW_UNKNOWN
+        get_allow_tags        = F_ALLOW_TAGS
+        get_use_simdjson      = F_USE_SIMDJSON
+        get_encode_core_bools = F_ENCODE_CORE_BOOLS
 	PPCODE:
         XPUSHs (boolSV (self->flags & ix));
 
@@ -2494,7 +2530,7 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
 
               sv_chop (self->incr_text, SvPVX (self->incr_text) + offset);
             }
-          while (GIMME_V == G_ARRAY);
+          while (GIMME_V == G_LIST);
 }
 
 SV *incr_text (JSON *self)

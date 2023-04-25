@@ -8,7 +8,7 @@ use Language::FormulaEngine::Parser::ContextUtil
 use namespace::clean;
 
 # ABSTRACT: Create parse tree from an input string
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 has parse_tree   => ( is => 'rw' );
@@ -441,7 +441,7 @@ Language::FormulaEngine::Parser - Create parse tree from an input string
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

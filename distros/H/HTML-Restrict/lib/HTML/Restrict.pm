@@ -4,7 +4,7 @@ use 5.006;
 package HTML::Restrict;
 
 use version;
-our $VERSION = 'v3.0.1';
+our $VERSION = 'v3.0.2';
 
 use Carp                     qw( croak );
 use Data::Dump               qw( dump );
@@ -26,6 +26,12 @@ has allow_comments => (
 );
 
 has allow_declaration => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
+has create_newlines => (
     is      => 'rw',
     isa     => Bool,
     default => 0,
@@ -245,6 +251,13 @@ sub _build_parser {
                     }
                     $self->_processed( ( $self->_processed || q{} ) . $alt );
                 }
+                elsif ( $tagname eq 'br' && $self->create_newlines ) {
+                    $self->_processed( ( $self->_processed || q{} ) . "\n" );
+                }
+                elsif ( $tagname eq 'p' && $self->create_newlines ) {
+                    $self->_processed(
+                        ( $self->_processed || q{} ) . "\n\n" );
+                }
                 elsif ( any { $_ eq $tagname }
                     @{ $self->strip_enclosed_content } ) {
                     print "adding $tagname to strippers" if $self->debug;
@@ -414,7 +427,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 =head1 VERSION
 
-version v3.0.1
+version v3.0.2
 
 =head1 SYNOPSIS
 
@@ -644,6 +657,12 @@ feature is off by default.
     my $hr = HTML::Restrict->new( allow_comments => 1 );
     $html = $hr->process( $html );
     # $html is now: "<!-- comments! -->foo"
+
+=item * create_newlines => [0|1]
+
+Set the value to true if you'd like to have each br tag replaced by a
+newline and every p tag replaced by two newlines. If a tag is
+specified in the allowed HTML, it won't be replaced.
 
 =item * replace_img => [0|1|CodeRef]
 

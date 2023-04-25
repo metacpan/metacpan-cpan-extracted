@@ -14,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( WebSocket::HeaderValue );
+    use vars qw( $VERSION );
     use Nice::Try;
     our $VERSION = 'v0.1.0';
 };
@@ -21,7 +22,7 @@ BEGIN
 sub extension { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -70,7 +71,7 @@ L<rfc7692 for WebSocket compression|https://datatracker.ietf.org/doc/html/rfc769
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

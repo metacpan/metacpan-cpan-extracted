@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
         'overload'      => 0,
         'parent'        => 0,
         'strict'        => '0.238',
+        'vars'          => 0,
         'warnings'      => '1.44',
         'Config'        => 0,
         'Digest::MD5'   => '2.58',
@@ -34,6 +35,8 @@ my %WriteMakefileArgs = (
         'Module::Generic'=> 'v0.16.4',
         'Nice::Try'     => 'v1.1.2',
         'POSIX'         => '1.53_01',
+        # Just to ensure URI::_generic does not die when requiring it
+        'Regexp::IPv6'  => 0,
         'Scalar::Util'  => '1.56',
         'Socket'        => '2.031',
         'URI'           => '5.09',
@@ -46,11 +49,14 @@ my %WriteMakefileArgs = (
         'version'       => 0,
         'Test::More'    => '1.302182',
         'Test::Pod'     => '1.52',
+        'Test2::IPC'    => '1.302190',
+        'Test2::V0'     => '0.000145',
     },
     EXE_FILES           => [],
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.14.0',
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'WebSocket-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -58,12 +64,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/WebSocket.git',
-                web         => 'https://git.deguest.jp/jack/WebSocket',
+                url         => 'git@gitlab.com:jackdeguest/WebSocket.git',
+                web         => 'https://gitlab.com/jackdeguest/WebSocket',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/WebSocket/issues',
+                web         => 'https://gitlab.com/jackdeguest/WebSocket/issues',
             },
         },
     }) : ()),

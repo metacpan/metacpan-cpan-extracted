@@ -16,7 +16,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Clone" : "0",
+            "Test::More" : "1.30219",
+            "Test::NoWarnings" : "0"
          }
       },
       "configure" : {
@@ -25,6 +27,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "match::simple::XS" : "0"
+         },
          "requires" : {
             "Date::Calc" : "0",
             "List::MoreUtils" : "0",
@@ -35,7 +40,6 @@
             "autouse" : "0",
             "experimental" : "0",
             "match::simple" : "0",
-            "match::simple::XS" : "0",
             "perl" : "5.010001"
          }
       }
@@ -43,7 +47,7 @@
    "provides" : {
       "Data::Domain" : {
          "file" : "lib/Data/Domain.pm",
-         "version" : "1.08"
+         "version" : "1.11"
       },
       "Data::Domain::All_of" : {
          "file" : "lib/Data/Domain.pm"
@@ -97,6 +101,6 @@
          "url" : "https://github.com/damil/Data-Domain"
       }
    },
-   "version" : "1.08",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

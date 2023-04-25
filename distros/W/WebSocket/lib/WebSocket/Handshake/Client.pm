@@ -14,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( WebSocket::Handshake );
+    use vars qw( $VERSION );
     use Nice::Try;
     use WebSocket::Frame;
     use WebSocket::Request;
@@ -27,7 +28,6 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->{_init_params_order}   = [qw( request response )];
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    $self->message( 3, "WebSocket::Request object set ? ", defined( $self->{request} ) ? 'yes' : 'no', " (", overload::StrVal( $self->{request} ), ")." );
     $self->{request}  ||= WebSocket::Request->new;
     $self->{response} ||= WebSocket::Response->new;
     if( my $version = $self->version )
@@ -64,9 +64,7 @@ sub parse
     unless( $res->is_done )
     {
         $res->debug( $self->debug );
-        $self->message( 3, "Parsing data received from server: '$data'" );
         $res->parse( $data ) || return( $self->pass_error( $res->error ) );
-        $self->message( 3, "Done parsing." );
         if( $res->is_done )
         {
             my $v = $req->version;
@@ -105,7 +103,7 @@ sub uri
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -117,7 +115,8 @@ WebSocket::Handshake::Client - WebSocket Client Handshake
 =head1 SYNOPSIS
 
     use WebSocket::Handshake::Client;
-    my $this = WebSocket::Handshake::Client->new || die( WebSocket::Handshake::Client->error, "\n" );
+    my $this = WebSocket::Handshake::Client->new( uri => "ws://localhost:8181/some/where" ) || 
+        die( WebSocket::Handshake::Client->error, "\n" );
 
 =head1 VERSION
 
@@ -159,11 +158,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Client>, L<WebSocket::Handshake>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

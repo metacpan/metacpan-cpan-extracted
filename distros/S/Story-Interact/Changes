@@ -7,6 +7,12 @@ Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001011	2023-04-24
+
+ - Added: An `INTERNAL_PAGE` keyword has been added to access the page's
+   internals at runtime.
+ - Added: Story::Interact::Page now has a reset_next_pages method.
+
 0.001010	2023-04-10
 
  [ Documentation ]

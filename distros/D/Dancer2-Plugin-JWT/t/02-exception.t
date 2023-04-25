@@ -15,11 +15,12 @@ use Data::Dumper;
 	BEGIN {
 		set plugins => { JWT => { secret => 'secret'}};
 	}
+
 	use Dancer2::Plugin::JWT;
 
 	set log => 'debug';
 
-	hook 'jwt_exception' => sub { 
+	hook 'jwt_exception' => sub {
 		halt(Dumper($_[0]));
 	};
 
@@ -38,6 +39,7 @@ my $authorization = 'FDAHFKDAHFKDFKAGFKAHKJAHFKgdhfdhfajkdgdsad';
 $mech->add_header("Authorization" => $authorization);
 $mech->get_ok("/");
 my $exception = $mech->content();
+
 $exception = eval "my $exception";
 like $exception, '/^JWT: invalid token format/', "Exception includes a message";
 done_testing();

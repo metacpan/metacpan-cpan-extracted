@@ -1,3 +1,10 @@
+0.50 2023-04-22
+    * Don't accept "--form" for wget - it doesn't exist there
+    * Fix test count when skipping tests
+    * Skip --parallel curl tests on versions before 7.68
+    * Documentation of ->as_wget, cosmetic documentation changes
+    * Run Mojolicious tests also for wget
+
 0.49 2023-04-17
     * Better generation of -F foo=bar code for Curl -> LWP
     * Preserve consistent header order in HTTP::Tiny output

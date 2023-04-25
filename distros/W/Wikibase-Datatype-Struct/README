@@ -6,6 +6,15 @@ DESCRIPTION
     structures serialized via JSON to MediaWiki.
 
 SEE ALSO
+    Wikibase::Datatype::Struct::Form
+        Wikibase form structure serialization.
+
+    Wikibase::Datatype::Struct::Item
+        Wikibase item structure serialization.
+
+    Wikibase::Datatype::Struct::Lexeme
+        Wikibase lexeme structure serialization.
+
     Wikibase::Datatype::Struct::Mediainfo
         Wikibase mediainfo structure serialization.
 
@@ -15,8 +24,14 @@ SEE ALSO
     Wikibase::Datatype::Struct::MediainfoStatement
         Wikibase mediainfo statement structure serialization.
 
+    Wikibase::Datatype::Struct::Property
+        Wikibase property structure serialization.
+
     Wikibase::Datatype::Struct::Reference
         Wikibase reference structure serialization.
+
+    Wikibase::Datatype::Struct::Sense
+        Wikibase sense structure serialization.
 
     Wikibase::Datatype::Struct::Sitelink
         Wikibase sitelink structure serialization.
@@ -34,25 +49,28 @@ SEE ALSO
         Wikibase value structure serialization.
 
     Wikibase::Datatype::Struct::Value::Globecoordinate
-        Wikibase globe coordinate structure serialization.
+        Wikibase globe coordinate value structure serialization.
 
     Wikibase::Datatype::Struct::Value::Item
-        Wikibase item structure serialization.
+        Wikibase item value structure serialization.
 
     Wikibase::Datatype::Struct::Value::Monolingual
-        Wikibase monolingual structure serialization.
+        Wikibase monolingual value structure serialization.
 
     Wikibase::Datatype::Struct::Value::Property
-        Wikibase property structure serialization.
+        Wikibase property value structure serialization.
 
     Wikibase::Datatype::Struct::Value::Quantity
-        Wikibase quantity structure serialization.
+        Wikibase quantity value structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Sense
+        Wikibase sense value structure serialization.
 
     Wikibase::Datatype::Struct::Value::String
-        Wikibase string structure serialization.
+        Wikibase string value structure serialization.
 
     Wikibase::Datatype::Struct::Value::Time
-        Wikibase time structure serialization.
+        Wikibase time value structure serialization.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct>
@@ -63,10 +81,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2022 Michal Josef Špaček
+    © 2020-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.11
 

@@ -90,6 +90,7 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => "1.004001",
     "JSON::PP" => 0,
     "List::Util" => "1.50",
+    "Math::BigFloat" => 0,
     "Mojo::JSON::Pointer" => 0,
     "Mojo::URL" => 0,
     "Mojolicious" => "7.23",
@@ -105,7 +106,6 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "File::Spec" => 0,
     "List::Util" => "1.50",
-    "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
     "Module::Metadata" => 0,
     "Path::Tiny" => 0,
@@ -121,7 +121,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }

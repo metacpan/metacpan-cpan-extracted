@@ -1,5 +1,9 @@
 Revision history for HTML-Restrict
 
+v3.0.2    2023-04-23 17:06:28Z
+        - Add create_newlines to replace BR and P by 1, resp. 2 newlines
+          (GH#46) (E. Choroba)
+
 v3.0.1    2022-09-22 22:27:40Z
         - Add a filter_text attribute. This can be used to disable text
           encoding. (GH#44) (ccottingham-presinet)

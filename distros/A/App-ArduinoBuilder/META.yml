@@ -1,0 +1,39 @@
+---
+abstract: 'Build system for Arduino programs'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - arduino
+  - embedded
+  - arm
+  - avr
+  - build
+  - make
+  - compiler
+  - source
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ArduinoBuilder
+no_index:
+  directory:
+    - t
+    - inc
+optional_features:
+  test_coverage:
+    description: 'Run `make cover` to compute test coverage'
+requires:
+  perl: '5.022'
+resources:
+  bugtracker: https://github.com/mkende/arduino_builder/issues
+  repository: https://github.com/mkende/arduino_builder
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

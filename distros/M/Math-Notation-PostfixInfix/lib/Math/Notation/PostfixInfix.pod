@@ -1,10 +1,8 @@
 
 =head1 NAME
+X<NAME>
 
 Math::Notation::PostfixInfix - Math Notation for Postfix and Infix Expressions
-
-=head1 CONTENTS
-X<CONTENTS>
 
 =head1 SYNOPSIS
 X<SYNOPSIS>
@@ -12,14 +10,14 @@ X<SYNOPSIS>
  use Math::Notation::PostfixInfix;
 
  Infix_to_Postfix
-    @array = Infix_to_Postfix ( "math infix expression" );
+    I<@array_of_rule = Infix_to_Postfix ( I<"infix string"> );
 
  Postfix_to_Infix
-    $string = Postfix_to_Infix ( @postfix_array_expression );
+    I<$infix_notation> = Postfix_to_Infix ( I<@array_of_rule> );
 
  Postfix_Test
-    $bolean = Postfix_Test ( \@postfix_array_expression,
-                             [ \&external_subrot, [ \@subrot_options ]]
+    I<$bolean> = Postfix_Test ( I<arrayref_of_rule>,
+                             [ I<\&external_subrot>, [ I<\@subrot_options> ]]
                            );
 
 =head1 DESCRIPTION
@@ -43,12 +41,10 @@ X<EXAMPLES>
 
 The examples below were created in the hope that it will be useful.
 
-=over
-
 =head2 Infix_to_Postfix
 X<Infix_to_Postfix>
 
-This exempla demonstrates how to convert an INFIX notaton to POSTFIX.
+This example demonstrates how to convert an INFIX notaton to POSTFIX.
 
 =over
 
@@ -56,8 +52,7 @@ code:
 
   use Math::Notation::PostfixInfix;
 
-  my @array = Math::Notation::PostfixInfix->Infix_to_Postfix
-                    ("a && b || c && d");
+  my @array = Math::Notation::PostfixInfix->Infix_to_Postfix ( "a && b || c && d" );
 
 results:
 
@@ -68,7 +63,7 @@ results:
 =head2 Postfix_to_Infix
 X<Postfix_to_Infix>
 
-This exempla demonstrates how to convert an POSTFIX notaton to INFIX.
+This example demonstrates how to convert an POSTFIX notaton to INFIX.
 
 =over
 
@@ -88,8 +83,8 @@ results:
 
 =back
 
-=head2 Postfix_Test Bolean_value
-X<Postfix_Test Bolean_value>
+=head2 Postfix_Test Bolean_Value
+X<Postfix_Test Bolean_Value>
 
 The script below is a simple example of logical comparation using constant data.
 
@@ -150,8 +145,8 @@ results:
 
 =back
 
-=head2 Postfix_Test Hash_table
-X<Postfix_Test Hash_table>
+=head2 Postfix_Test Hash_Table
+X<Postfix_Test Hash_Table>
 
 The script below was create to establish the concepts of context selection and exclusion rules based on data in HASH tables.
 
@@ -259,8 +254,6 @@ results:
 
 =back
 
-=back
-
 =head1 DEPENDENCIES
 X<DEPENDENCIES>
 
@@ -274,7 +267,7 @@ Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
 =head1 COPYRIGHT
 X<COPYRIGHT>
 
-Copyright (C) 2022 by Carlos Celso
+Copyright (C) 2022-2023 Carlos Celso
 
 =head1 LICENSE
 X<LICENSE>

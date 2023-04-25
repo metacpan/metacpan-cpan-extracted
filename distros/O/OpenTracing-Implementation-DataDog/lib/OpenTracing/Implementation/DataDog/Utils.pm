@@ -6,13 +6,13 @@ OpenTracing::Implementation::DataDog::Utils - DataDog Utilities
 
 =cut
 
-our $VERSION = 'v0.46.1';
+our $VERSION = 'v0.46.2';
 
 ;
 
 use Exporter qw/import/;
 
-our @EXPORT_OK = qw/nano_seconds/;
+our @EXPORT_OK = qw/nano_seconds random_bigint/;
 
 =head1 EXPORTS OK
 
@@ -29,6 +29,29 @@ To turn floatingpoint times into number of nano seconds
 =cut
 
 sub nano_seconds { int( $_[0] * 1_000_000_000 ) }
+
+
+
+=head2 random_bigint
+
+Returns a random 63 bits L<Math::BigInt>. Some architectures do not support
+native 64 bit integers, but that is what DataDog expects.
+
+NOTE: special care needs to be taken when rendering to JSON, as the GO language
+is not forgiving for double qouted values when using big numbers.
+Use C<<JSON->allow_bignum>>.
+
+=cut
+
+use Math::BigInt::Random::OO;
+#
+# $random
+#
+# our internal BigInt::Random generator, we only instantiate once
+#
+my $RANDOM = Math::BigInt::Random::OO->new( length_bin => 63 );
+
+sub random_bigint { $RANDOM->generate() }
 
 
 

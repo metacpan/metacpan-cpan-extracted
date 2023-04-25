@@ -7,7 +7,7 @@ use warnings;
 use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 sub new {
 	my $class = shift;

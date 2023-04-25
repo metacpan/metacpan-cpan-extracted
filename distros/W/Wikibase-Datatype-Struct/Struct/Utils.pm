@@ -10,7 +10,7 @@ use List::MoreUtils qw(none);
 
 Readonly::Array our @EXPORT_OK => qw(obj_array_ref2struct struct2snaks_array_ref);
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 sub obj_array_ref2struct {
 	my ($snaks_ar, $key, $base_uri, $snak_obj, $struct_snak_obj) = @_;
@@ -146,6 +146,8 @@ Returns reference to array with snaks objects.
 
 =head1 EXAMPLE1
 
+=for comment filename=utils_obj_array_ref2struct.pl
+
  use strict;
  use warnings;
 
@@ -214,6 +216,8 @@ Returns reference to array with snaks objects.
  # }
 
 =head1 EXAMPLE2
+
+=for comment filename=utils_struct2snaks_array_ref.pl
 
  use strict;
  use warnings;
@@ -301,12 +305,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

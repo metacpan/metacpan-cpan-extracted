@@ -7,9 +7,9 @@ package Require::HookChain::log::stderr;
 # END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-07'; # DATE
+our $DATE = '2023-02-08'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -23,7 +23,8 @@ sub Require::HookChain::log::stderr::INC {
     return () unless ref $r;
 
     my @caller = caller(1);
-    warn "Require::HookChain::log::stderr: Require-ing ".$r->filename." (called from package $caller[0] file $caller[1]:$caller[2]) ...\n";
+    my $elapsed = time() - $^T;
+    warn "[time +${elapsed}s] Require::HookChain::log::stderr: Require-ing ".$r->filename." (called from package $caller[0] file $caller[1]:$caller[2]) ...\n";
 }
 
 1;
@@ -41,7 +42,7 @@ Require::HookChain::log::stderr - Log a message to STDERR
 
 =head1 VERSION
 
-This document describes version 0.006 of Require::HookChain::log::stderr (from Perl distribution Require-HookChain), released on 2023-02-07.
+This document describes version 0.008 of Require::HookChain::log::stderr (from Perl distribution Require-HookChain), released on 2023-02-08.
 
 =head1 SYNOPSIS
 

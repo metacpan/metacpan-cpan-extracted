@@ -49,4 +49,30 @@ $tests->($letter, 'upgraded');
 utf8::downgrade($letter);
 $tests->($letter, 'downgraded');
 
+subtest 'empty pattern' => sub {
+  # create a "last successful match" in a containing scope
+  my $str = "furble" =~ s/fur/meow/r;
+
+  cmp_deeply(
+    evaluate('hello', { pattern => '' }),
+    { valid => true },
+    'empty pattern in "pattern" will correctly match',
+  );
+
+  # create a new "last successful match"
+  $str = "furble" =~ s/fur/meow/r;
+
+  cmp_deeply(
+    evaluate(
+      { alpha => 'hello' },
+      {
+        patternProperties => { '' => true },
+        additionalProperties => false,
+      },
+    ),
+    { valid => true },
+    'empty pattern in "patternProperties" will correctly match',
+  );
+};
+
 done_testing;

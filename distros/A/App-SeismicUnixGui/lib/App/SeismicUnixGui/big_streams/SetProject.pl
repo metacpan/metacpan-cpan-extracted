@@ -35,9 +35,11 @@ my ($PROJECT_HOME)                 = $Project->PROJECT_HOME();
 my ($DATA_GAMMA_WELL_TXT)          = $Project->DATA_GAMMA_WELL_TXT();
 my ($DATA_GEOMAPS)                 = $Project->DATA_GEOMAPS();
 my ($DATA_GEOMAPS_BIN)             = $Project->DATA_GEOMAPS_BIN();
+my ($DATA_GEOTECH_WELL_TXT)        = $Project->DATA_GEOTECH_WELL_TXT();
+#my ($GEOTECH)                      = $Project->GEOTECH();
 my ($GEOMAPS_IMAGES)               = $Project->GEOMAPS_IMAGES();
 my ($GEOMAPS_IMAGES_JPEG)          = $Project->GEOMAPS_IMAGES_JPEG();
-my ($GEOMAPS_IMAGES_PNG)          = $Project->GEOMAPS_IMAGES_PNG();
+my ($GEOMAPS_IMAGES_PNG)           = $Project->GEOMAPS_IMAGES_PNG();
 my ($GEOMAPS_IMAGES_TIF)           = $Project->GEOMAPS_IMAGES_TIF();
 my ($GEOMAPS_IMAGES_PS)            = $Project->GEOMAPS_IMAGES_PS();
 my ($DATA_GEOMAPS_TEXT)            = $Project->DATA_GEOMAPS_TEXT();
@@ -122,6 +124,8 @@ manage_dirs_by->make_dir($GEOMAPS_IMAGES_PS);
 
 # manage_dirs_by->make_dir($DATA_GEOMAPS_TEXT);
 manage_dirs_by->make_dir($DATA_GEOMAPS_TOPO);
+
+manage_dirs_by->make_dir($DATA_GEOTECH_WELL_TXT);
 
 manage_dirs_by->make_dir($DATA_RESISTIVITY_SURFACE);
 manage_dirs_by->make_dir($PL_RESISTIVITY_SURFACE);

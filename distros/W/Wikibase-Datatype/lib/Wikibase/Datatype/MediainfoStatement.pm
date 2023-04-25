@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @RANKS => qw(normal preferred deprecated);
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 has id => (
 	is => 'ro',
@@ -309,6 +309,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut

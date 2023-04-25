@@ -18,13 +18,15 @@ Readonly::Hash our %LANGUAGES => (
 	'zxx' => 'no linguistic content', # Q22282939
 
 	# Codes in https://doc.wikimedia.org/mediawiki-core/master/php/Names_8php_source.html
+	# Updated 2023-04-22 in https://github.com/wikimedia/mediawiki/blob/dc1465a85944dfd7b98333d9061e0ba61e4af2da/includes/languages/data/Names.php
 	'aa' => 'Qafár af', # Afar
 	'ab' => 'аԥсшәа', # Abkhaz
 	'abs' => 'bahasa ambon', # Ambonese Malay, T193566
 	'ace' => 'Acèh', # Aceh
+	'acm' => 'عراقي', # Iraqi (Mesopotamian) Arabic
 	'ady' => 'адыгабзэ', # Adyghe
 	'ady-cyrl' => 'адыгабзэ', # Adyghe
-	'aeb' => 'تونسي/Tûnsî', # Tunisian Arabic (multiple scripts - defaults to Arabic)
+	'aeb' => 'تونسي / Tûnsî', # Tunisian Arabic (multiple scripts - defaults to Arabic)
 	'aeb-arab' => 'تونسي', # Tunisian Arabic (Arabic Script)
 	'aeb-latn' => 'Tûnsî', # Tunisian Arabic (Latin Script)
 	'af' => 'Afrikaans', # Afrikaans
@@ -36,6 +38,7 @@ Readonly::Hash our %LANGUAGES => (
 	'ami' => 'Pangcah', # Amis
 	'an' => 'aragonés', # Aragonese
 	'ang' => 'Ænglisc', # Old English, T25283
+	'ann' => 'Obolo', # Obolo
 	'anp' => 'अंगिका', # Angika
 	'ar' => 'العربية', # Arabic
 	'arc' => 'ܐܪܡܝܐ', # Aramaic
@@ -86,8 +89,8 @@ Readonly::Hash our %LANGUAGES => (
 	'bug' => 'ᨅᨔ ᨕᨘᨁᨗ', # Buginese
 	'bxr' => 'буряад', # Buryat (Russia)
 	'ca' => 'català', # Catalan
-	'cbk-zam' => 'Chavacano de Zamboanga', # Zamboanga Chavacano
-	'cdo' => 'Mìng-dĕ̤ng-ngṳ̄', # Min Dong
+	'cbk-zam' => 'Chavacano de Zamboanga', # Zamboanga Chavacano, T124657
+	'cdo' => '閩東語 / Mìng-dĕ̤ng-ngṳ̄', # Min-dong (multiple scripts - defaults to Latin)
 	'ce' => 'нохчийн', # Chechen
 	'ceb' => 'Cebuano', # Cebuano
 	'ch' => 'Chamoru', # Chamorro
@@ -112,6 +115,7 @@ Readonly::Hash our %LANGUAGES => (
 	'de-at' => 'Österreichisches Deutsch', # Austrian German
 	'de-ch' => 'Schweizer Hochdeutsch', # Swiss Standard German
 	'de-formal' => 'Deutsch (Sie-Form)', # German - formal address ("Sie")
+	'dga' => 'Dagaare', # Southern Dagaare
 	'din' => 'Thuɔŋjäŋ', # Dinka
 	'diq' => 'Zazaki', # Zazaki
 	'dsb' => 'dolnoserbski', # Lower Sorbian
@@ -126,6 +130,7 @@ Readonly::Hash our %LANGUAGES => (
 	'en' => 'English', # English
 	'en-ca' => 'Canadian English', # Canadian English
 	'en-gb' => 'British English', # British English
+	'en-x-piglatin' => 'Igpay Atinlay', # Pig Latin, for variant development
 	'eo' => 'Esperanto', # Esperanto
 	'es' => 'español', # Spanish
 	'es-419' => 'español de América Latina', # Spanish for the Latin America and Caribbean region
@@ -151,7 +156,7 @@ Readonly::Hash our %LANGUAGES => (
 	'ga' => 'Gaeilge', # Irish
 	'gaa' => 'Ga', # Ga
 	'gag' => 'Gagauz', # Gagauz
-	'gan' => '贛語', # Gan (multiple scripts - defaults to Traditional)
+	'gan' => '贛語', # Gan (multiple scripts - defaults to Traditional Han)
 	'gan-hans' => '赣语（简体）', # Gan (Simplified Han)
 	'gan-hant' => '贛語（繁體）', # Gan (Traditional Han)
 	'gcr' => 'kriyòl gwiyannen', # Guianan Creole
@@ -181,6 +186,7 @@ Readonly::Hash our %LANGUAGES => (
 	'hif' => 'Fiji Hindi', # Fijian Hindi (multiple scripts - defaults to Latin)
 	'hif-latn' => 'Fiji Hindi', # Fiji Hindi (Latin script)
 	'hil' => 'Ilonggo', # Hiligaynon
+	'hno' => 'ہندکو', # Hindko
 	'ho' => 'Hiri Motu', # Hiri Motu
 	'hr' => 'hrvatski', # Croatian
 	'hrx' => 'Hunsrik', # Riograndenser Hunsrückisch
@@ -196,6 +202,7 @@ Readonly::Hash our %LANGUAGES => (
 	'id' => 'Bahasa Indonesia', # Indonesian
 	'ie' => 'Interlingue', # Interlingue (Occidental)
 	'ig' => 'Igbo', # Igbo
+	'igl' => 'Igala', # Igala
 	'ii' => 'ꆇꉙ', # Sichuan Yi
 	'ik' => 'Iñupiatun', # Inupiaq
 	'ike-cans' => 'ᐃᓄᒃᑎᑐᑦ', # Inuktitut, Eastern Canadian (Unified Canadian Aboriginal Syllabics)
@@ -205,7 +212,7 @@ Readonly::Hash our %LANGUAGES => (
 	'io' => 'Ido', # Ido
 	'is' => 'íslenska', # Icelandic
 	'it' => 'italiano', # Italian
-	'iu' => 'ᐃᓄᒃᑎᑐᑦ/inuktitut', # Inuktitut (macro language, see ike/ikt, falls back to ike-cans)
+	'iu' => 'ᐃᓄᒃᑎᑐᑦ / inuktitut', # Inuktitut (macro language, see ike/ikt, falls back to ike-cans)
 	'ja' => '日本語', # Japanese
 	'jam' => 'Patois', # Jamaican Creole English
 	'jbo' => 'la .lojban.', # Lojban
@@ -224,6 +231,7 @@ Readonly::Hash our %LANGUAGES => (
 	'ki' => 'Gĩkũyũ', # Gikuyu
 	'kiu' => 'Kırmancki', # Kirmanjki
 	'kj' => 'Kwanyama', # Kwanyama
+	'kjh' => 'хакас', # Khakas
 	'kjp' => 'ဖၠုံလိက်', # Eastern Pwo (multiple scripts - defaults to Burmese script)
 	'kk' => 'қазақша', # Kazakh (multiple scripts - defaults to Cyrillic)
 	'kk-arab' => 'قازاقشا (تٴوتە)', # Kazakh Arabic
@@ -252,6 +260,7 @@ Readonly::Hash our %LANGUAGES => (
 	'ku-arab' => 'كوردي (عەرەبی)', # Northern Kurdish (Arabic script) (falls back to ckb)
 	'ku-latn' => 'kurdî (latînî)', # Northern Kurdish (Latin script)
 	'kum' => 'къумукъ', # Kumyk (Cyrillic, 'kum-latn' for Latin script)
+	'kus' => 'Kʋsaal', # Kusaal
 	'kv' => 'коми', # Komi-Zyrian (Cyrillic is common script but also written in Latin script)
 	'kw' => 'kernowek', # Cornish
 	'ky' => 'кыргызча', # Kirghiz
@@ -325,6 +334,7 @@ Readonly::Hash our %LANGUAGES => (
 	'nn' => 'norsk nynorsk', # Norwegian (Nynorsk)
 	'no' => 'norsk', # Norwegian macro language (falls back to nb).
 	'nod' => 'ᨣᩤᩴᨾᩮᩬᩥᨦ', # Northern Thai
+	'nog' => 'ногайша', # Nogai
 	'nov' => 'Novial', # Novial
 	'nqo' => 'ߒߞߏ', # N'Ko
 	'nrm' => 'Nouormand', # Norman (invalid code; 'nrf' in ISO 639 since 2014)
@@ -363,6 +373,7 @@ Readonly::Hash our %LANGUAGES => (
 	'qug' => 'Runa shimi', # Kichwa/Northern Quechua (temporarily used until Kichwa has its own)
 	'rgn' => 'Rumagnôl', # Romagnol
 	'rif' => 'Tarifit', # Tarifit
+	'rki' => 'ရခိုင်', # Arakanese
 	'rm' => 'rumantsch', # Raeto-Romance
 	'rmc' => 'romaňi čhib', # Carpathian Romany
 	'rmy' => 'romani čhib', # Vlax Romany
@@ -397,7 +408,9 @@ Readonly::Hash our %LANGUAGES => (
 	'ses' => 'Koyraboro Senni', # Koyraboro Senni
 	'sg' => 'Sängö', # Sango/Sangho
 	'sgs' => 'žemaitėška', # Samogitian
-	'sh' => 'srpskohrvatski / српскохрватски', # Serbocroatian
+	'sh' => 'srpskohrvatski / српскохрватски', # Serbo-Croatian (multiple scripts - defaults to Latin)
+	'sh-cyrl' => 'српскохрватски (ћирилица)', # Serbo-Croatian (Cyrillic script)
+	'sh-latn' => 'srpskohrvatski (latinica)', # Serbo-Croatian (Latin script) (default)
 	'shi' => 'Taclḥit', # Tachelhit, Shilha (multiple scripts - defaults to Latin)
 	'shi-latn' => 'Taclḥit', # Tachelhit (Latin script)
 	'shi-tfng' => 'ⵜⴰⵛⵍⵃⵉⵜ', # Tachelhit (Tifinagh script)
@@ -452,12 +465,13 @@ Readonly::Hash our %LANGUAGES => (
 	'tly-cyrl' => 'толыши', # Talysh (Cyrillic)
 	'tn' => 'Setswana', # Setswana
 	'to' => 'lea faka-Tonga', # Tonga (Tonga Islands)
+	'tok' => 'toki pona', # Toki Pona
 	'tpi' => 'Tok Pisin', # Tok Pisin
 	'tr' => 'Türkçe', # Turkish
 	'tru' => 'Ṫuroyo', # Turoyo
 	'trv' => 'Seediq', # Taroko
 	'ts' => 'Xitsonga', # Tsonga
-	'tt' => 'татарча/tatarça', # Tatar (multiple scripts - defaults to Cyrillic)
+	'tt' => 'татарча / tatarça', # Tatar (multiple scripts - defaults to Cyrillic)
 	'tt-cyrl' => 'татарча', # Tatar (Cyrillic script) (default)
 	'tt-latn' => 'tatarça', # Tatar (Latin script)
 	'tum' => 'chiTumbuka', # Tumbuka
@@ -471,7 +485,7 @@ Readonly::Hash our %LANGUAGES => (
 	'ug-latn' => 'Uyghurche', # Uyghur (Latin script)
 	'uk' => 'українська', # Ukrainian
 	'ur' => 'اردو', # Urdu
-	'uz' => 'oʻzbekcha/ўзбекча', # Uzbek (multiple scripts - defaults to Latin)
+	'uz' => 'oʻzbekcha / ўзбекча', # Uzbek (multiple scripts - defaults to Latin)
 	'uz-cyrl' => 'ўзбекча', # Uzbek Cyrillic
 	'uz-latn' => 'oʻzbekcha', # Uzbek Latin (default)
 	've' => 'Tshivenda', # Venda
@@ -485,6 +499,7 @@ Readonly::Hash our %LANGUAGES => (
 	'vot' => 'Vaďďa', # Vod/Votian
 	'vro' => 'võro', # Võro
 	'wa' => 'walon', # Walloon
+	'wal' => 'wolaytta', # Wolaytta
 	'war' => 'Winaray', # Waray-Waray
 	'wls' => 'Fakaʻuvea', # Wallisian
 	'wo' => 'Wolof', # Wolof
@@ -496,9 +511,9 @@ Readonly::Hash our %LANGUAGES => (
 	'yi' => 'ייִדיש', # Yiddish
 	'yo' => 'Yorùbá', # Yoruba
 	'yrl' => 'Nhẽẽgatú', # Nheengatu
-	'yue' => '粵語', # Cantonese
+	'yue' => '粵語', # Cantonese (multiple scripts - defaults to Traditional Han)
 	'za' => 'Vahcuengh', # Zhuang
-	'zea' => 'Zeêuws', # Zeeuws/Zeaws
+	'zea' => 'Zeêuws', # Zeeuws / Zeaws
 	'zgh' => 'ⵜⴰⵎⴰⵣⵉⵖⵜ ⵜⴰⵏⴰⵡⴰⵢⵜ', # Moroccan Amazigh (multiple scripts - defaults to Neo-Tifinagh)
 	'zh' => '中文', # (Zhōng Wén) - Chinese
 	'zh-classical' => '文言', # Classical Chinese/Literary Chinese -- (see T10217)
@@ -512,10 +527,72 @@ Readonly::Hash our %LANGUAGES => (
 	'zh-sg' => '中文（新加坡）', # Chinese (Singapore)
 	'zh-tw' => '中文（臺灣）', # Chinese (Taiwan)
 	'zh-yue' => '粵語', # Cantonese -- (see T10217)
-	'zu' => 'isiZulu' # Zulu
+	'zu' => 'isiZulu', # Zulu
+
+	# Codes from https://github.com/wikimedia/mediawiki-extensions-Wikibase/blob/master/lib/includes/WikibaseContentLanguages.php
+	# TODO Native names.
+	# Updated 2023-04-22 from https://github.com/wikimedia/mediawiki-extensions-Wikibase/blob/master/lib/includes/WikibaseContentLanguages.php
+	'agq' => 'Aghem', # Aghem - T288335
+	'bag' => 'Tuki', # Tuki - T263946
+	'bas' => 'Basaa', # Basaa - T263946
+	'bax' => 'Bamum', # Bamum - T263946
+	'bbj' => "Ghomála'", # Ghomála' - T263946
+	'bfd' => 'Bafut', # Bafut - T263946
+	'bkc' => 'Baka', # Baka - T263946
+	'bkh' => 'Bakoko', # Bakoko - T263946
+	'bkm' => 'Kom', # Kom - T263946
+	'bqz' => "Mka'a", # Mka'a - T263946
+	'byv' => 'Medumba', # Medumba - T263946
+	'cak' => 'Cakchiquel', # Cakchiquel - T278854
+	'cnh' => 'Chin', # Chin - T263946
+	'dua' => 'Duala', # Duala - T263946
+	'en-us' => 'American English', # American English - T154589
+	'eto' => 'Eton', # Eton - T263946
+	'etu' => 'Ejagham', # Ejagham - T263946
+	'ewo' => 'Ewondo', # Ewondo - T263946
+	'fkv' => 'Finnish (Kven)', # Finnish (Kven) - T167259
+	'fmp' => "Fe'fe'", # Fe'fe' - T263946
+	'gya' => 'Gbaya', # Gbaya - T263946
+	'isu' => 'Isu', # Isu - T263946
+	'kea' => 'Kabuverdianu', # Kabuverdianu - T127435
+	'ker' => 'Kera', # Kera - T263946
+	'ksf' => 'Bafia', # Bafia - T263946
+	'lem' => 'Nomaande', # Nomaande - T263946
+	'lns' => "Lamnso'", # Lamnso' - T263946
+	'mcn' => 'Masana', # Masana - T293884
+	'mcp' => 'Maka', # Maka - T263946
+	'mua' => 'Mundang', # Mundang - T263946
+	'nan-hani' => 'Min Nan Chinese', # Min Nan Chinese - T180771
+	'nge' => 'Ngémba', # Ngémba - T263946
+	'nla' => 'Ngombala', # Ngombala - T263946
+	'nmg' => 'Kwasio', # Kwasio - T263946
+	'nnh' => 'Ngiemboon', # Ngiemboon - T263946
+	'nnz' => "Nda'nda'", # Nda'nda' - T263946
+	'nod' => 'Thai (Northern)', # Thai (Northern) - T93880
+	'osa-latn' => 'Osage', # Osage - T265297
+	'ota' => 'Turkish, Ottoman (1500–1928)', # Turkish, Ottoman (1500–1928) - T59342
+	'pap-aw' => 'Papiamento', # Papiamento - T275682
+	'quc' => 'K’iche’', # K’iche’ - T278851
+	'rmf' => 'Romani, Kalo Finnish', # Romani, Kalo Finnish - T226701
+	'rwr' => 'Marwari', # Marwari - T61905
+	'ryu' => 'Okinawan, Central', # Okinawan, Central - T271215
+	'sjd' => 'Sami, Kildin', # Sami, Kildin - T226701
+	'sje' => 'Sami, Pite', # Sami, Pite - T146707
+	'sju' => 'Sami, Ume', # Sami, Ume - T226701
+	'smj' => 'Lule Sámi', # Lule Sámi - T146707
+	'sms' => 'Skolt Sami', # Skolt Sami - T220118, T223544
+	'srq' => 'Sirionó', # Sirionó - T113408
+	'tvu' => 'Tunen', # Tunen - T263946
+	'vut' => 'Vute', # Vute - T263946
+	'wes' => 'Pidgin (Cameroon)', # Pidgin (Cameroon) - T263946
+	'wya' => 'Wyandot', # Wyandot - T283364
+	'yas' => 'Nugunu', # Nugunu - T263946
+	'yat' => 'Yambeta', # Yambeta - T263946
+	'yav' => 'Yangben', # Yangben - T263946
+	'ybb' => 'Yemba', # Yemba - T263946
 );
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 sub all_language_codes {
 	return keys %LANGUAGES;
@@ -541,7 +618,8 @@ Wikibase::Datatype::Languages - Wikibase datatype languages.
 
 Language codes used for multilingual information in Wikibase::Datatype objects.
 
-It's imported from L<https://doc.wikimedia.org/mediawiki-core/master/php/Names_8php_source.html> (2022-10-17).
+It's imported from L<https://doc.wikimedia.org/mediawiki-core/master/php/Names_8php_source.html>
+and from L<https://github.com/wikimedia/mediawiki-extensions-Wikibase/blob/master/lib/includes/WikibaseContentLanguages.php> (2023-04-22).
 
 =head1 SUBROUTINES
 
@@ -1091,6 +1169,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut

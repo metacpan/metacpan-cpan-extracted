@@ -6,7 +6,7 @@ use warnings;
 
 use Wikibase::Datatype::Value::Time;
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 sub new {
 	my $class = shift;

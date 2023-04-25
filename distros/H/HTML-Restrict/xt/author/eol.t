@@ -14,6 +14,7 @@ my @files = (
     't/attribute_constraints.t',
     't/comments.t',
     't/control-characters.t',
+    't/create-newlines.t',
     't/declaration.t',
     't/empty-element-tags.t',
     't/filter_text.t',

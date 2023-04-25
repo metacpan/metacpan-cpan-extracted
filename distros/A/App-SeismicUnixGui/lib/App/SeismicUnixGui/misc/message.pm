@@ -43,7 +43,6 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 my $Project     = Project_config->new();
 my $get         = L_SU_global_constants->new();
 
-
 =head2 Declare
 local variables
 
@@ -53,19 +52,6 @@ my $var                 = $get->var();
 my $log_file_txt        = $var->{_log_file_txt};
 my $test_dir_name 		= $var->{_test_dir_name};
 my $PL_SEISMIC          = $Project->PL_SEISMIC();
-
-my $L_SU = $ENV{'SeismicUnixGui'};
-
-if ( not length($L_SU) ) {
-	
-    print "message.pm, L60\n";
-	print "global variable SeismicUnixGui must be set\n";
-	print "e.g., in .bashrc: ";
-	print "SeismicUnixGui_script=/usr/local/pl/App-SeismicUnixGui/lib/App/SeismicUnixGui/script";
-
-} else {
-	#	print("test.pl: \$L_SU = $L_SU; NADA \n");
-}
 
 =head2 Defaults
 

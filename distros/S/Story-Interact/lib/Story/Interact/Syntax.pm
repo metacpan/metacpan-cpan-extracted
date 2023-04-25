@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Syntax;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001010';
+our $VERSION   = '0.001011';
 
 use Story::Interact::Page ();
 
@@ -32,6 +32,7 @@ our @EXPORT = qw(
 	match
 	random
 	INTERNAL_STATE
+	INTERNAL_PAGE
 );
 
 my ( $page, $state );
@@ -139,6 +140,10 @@ sub false () {
 
 sub INTERNAL_STATE () {
 	return $state;
+}
+
+sub INTERNAL_PAGE () {
+	return $page;
 }
 
 sub random ($) {

@@ -13,7 +13,7 @@ use Wikibase::API;
 
 Readonly::Array our @EXPORT_OK => qw(resolve);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ($class, @params) = @_;

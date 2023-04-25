@@ -20,7 +20,7 @@ my $flow_type        = $get->flow_type_href();
 my $DATA_SEISMIC_SU = $Project->DATA_SEISMIC_SU();    # output data directory
 my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT(); 
 my $PL_SEISMIC       = $Project->PL_SEISMIC();
-my $max_index       = 12;                             # Insert a number here
+my $max_index         = 12;                             # Insert a number here
 
 my $suxcor_spec = {
 	_CONFIG                => $PL_SEISMIC,
@@ -364,13 +364,13 @@ sub suffix_aref {
 	my @index      = @$index_aref;
 
 	# label 1 in GUI is input file1 and needs a home directory
-	$suffix[ $index[0] ] = "." . '$suffix_txt';
+	$suffix[ $index[0] ] = "" . '$suffix_txt';
 
 	# label 10 in GUI is input file2 and needs a home directory
-	$suffix[ $index[1] ] = "." . '$suffix_su';	
+	$suffix[ $index[1] ] = "" . '$suffix_su';	
 
 	# label 11 in GUI is input file2 and needs a home directory
-	$suffix[ $index[2] ] = "." . '$suffix_su';		
+	$suffix[ $index[2] ] = "" . '$suffix_su';		
 	
 	$suxcor_spec->{_suffix_aref} = \@suffix;
 	return ();

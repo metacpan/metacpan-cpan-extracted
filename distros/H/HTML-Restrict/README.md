@@ -4,7 +4,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 # VERSION
 
-version v3.0.1
+version v3.0.2
 
 # SYNOPSIS
 
@@ -232,6 +232,12 @@ HTML::Restrict recognizes:
         my $hr = HTML::Restrict->new( allow_comments => 1 );
         $html = $hr->process( $html );
         # $html is now: "<!-- comments! -->foo"
+
+- create\_newlines => \[0|1\]
+
+    Set the value to true if you'd like to have each br tag replaced by a
+    newline and every p tag replaced by two newlines. If a tag is
+    specified in the allowed HTML, it won't be replaced.
 
 - replace\_img => \[0|1|CodeRef\]
 

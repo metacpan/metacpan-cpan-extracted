@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::API::Resolve;
 
 # Test.
-is($Wikibase::API::Resolve::VERSION, 0.03, 'Version.');
+is($Wikibase::API::Resolve::VERSION, 0.04, 'Version.');

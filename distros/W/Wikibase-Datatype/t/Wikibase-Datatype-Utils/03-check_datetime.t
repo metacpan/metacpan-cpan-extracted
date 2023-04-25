@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 15;
 use Test::NoWarnings;
 use Wikibase::Datatype::Utils qw(check_datetime);
 
@@ -125,3 +125,10 @@ $self = {
 };
 $ret = check_datetime($self, 'key');
 is($ret, undef, 'Right object is present (+1979-00-00T00:00:00Z).');
+
+# Test.
+$self = {
+	'key' => '-34000-00-00T00:00:00Z',
+};
+$ret = check_datetime($self, 'key');
+is($ret, undef, 'Right object is present (-34000-00-00T00:00:00Z).');

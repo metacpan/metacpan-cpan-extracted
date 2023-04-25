@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## WebSocket Client & Server - ~/lib/WebSocket.pm
-## Version v0.1.5
+## Version v0.1.6
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/09/13
-## Modified 2021/10/23
+## Modified 2023/04/17
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ BEGIN
     our %EXPORT_TAGS = ( all => [qw( WS_OK WS_GONE WS_PROTOCOL_ERROR WS_NOT_ACCEPTABLE WS_NO_STATUS WS_CLOSED_ABNORMALLY WS_BAD_MESSAGE WS_FORBIDDEN WS_MESSAGE_TOO_LARGE WS_EXTENSIONS_NOT_AVAILABLE WS_INTERNAL_SERVER_ERROR WS_TLS_HANDSHAKE_FAIL WEBSOCKET_DRAFT_VERSION_DEFAULT )] );
     $EXPORT_TAGS{ws} = $EXPORT_TAGS{all};
     our @EXPORT_OK = qw( WS_OK WS_GONE WS_PROTOCOL_ERROR WS_NOT_ACCEPTABLE WS_NO_STATUS WS_CLOSED_ABNORMALLY WS_BAD_MESSAGE WS_FORBIDDEN WS_MESSAGE_TOO_LARGE WS_EXTENSIONS_NOT_AVAILABLE WS_INTERNAL_SERVER_ERROR WS_TLS_HANDSHAKE_FAIL WEBSOCKET_DRAFT_VERSION_DEFAULT );
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
 };
 
 sub init
@@ -46,7 +46,7 @@ sub init
     my $self = shift( @_ );
     $self->{compression_threshold}  = WEBSOCKET_COMPRESSION_THRESHOLD unless( defined( $self->{compression_threshold} ) && length( $self->{compression_threshold} ) );
     $self->{_init_strict_use_sub} = 1;
-    $this->{_exception_class} = 'WebSocket::Exception';
+    $self->{_exception_class} = 'WebSocket::Exception';
     $self->SUPER::init( @_ );
     return( $self );
 }
@@ -79,8 +79,7 @@ sub server
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =head1 NAME
@@ -93,7 +92,7 @@ WebSocket - WebSocket Client & Server
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -249,7 +248,7 @@ L<WebSocket::Client>, L<WebSocket::Common>, L<WebSocket::Connection>, L<WebSocke
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

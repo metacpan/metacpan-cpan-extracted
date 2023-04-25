@@ -39,13 +39,10 @@ WriteMakefile(
 	},
 
 	# only needed during build but not later
-	BUILD_REQUIRES => {
-				'File::Tail' => '0'
-	},
+#	BUILD_REQUIRES => {
+#				'File::Tail' => '0'
+#	},
 
-	# required scripts
-	PL_FILES => {'./lib/App/SeismicUnixGui/script/post_install_env.pl' => 'null'},
-		
 	# Documentation accessible within the GUI with Mouse-button-3 click
 	# So man files are not used currently
 	MAN3PODS => {},
@@ -58,6 +55,17 @@ WriteMakefile(
 
 	test => { TESTS => 't/*.t',
 
-	},
+	}
+	
+	);
 
-);
+# post-installation required scripts
+	
+sub MY::postamble {
+	return <<'END';
+install ::
+	perl ./lib/App/SeismicUnixGui/script/post_install_env.pl
+END
+}
+
+

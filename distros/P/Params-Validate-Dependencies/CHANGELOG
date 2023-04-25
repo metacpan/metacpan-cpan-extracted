@@ -1,3 +1,11 @@
+1.41    2023-04-23
+
+- Add test to prove that literal back-slashes aren't a problem in auto-doco
+  (see https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues/6)
+- Bump dependency on Data::Domain to 1.10 so it will work on perls where
+  smartmatch is deprecated
+- Data::Domain support is now only for perl 5.18 and higher
+
 2018-07-12      1.40    Add support for validate_with
                           (see https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/pull/8)
                         Accept a hashref as first arg to validate

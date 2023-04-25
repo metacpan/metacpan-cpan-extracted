@@ -14,7 +14,7 @@ package Pod::Find;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '1.65';   ## Current version of this package
+$VERSION = '1.66';   ## Current version of this package
 require  5.005;   ## requires this Perl version or later
 use Carp;
 
@@ -212,7 +212,7 @@ sub pod_find
             $try = VMS::Filespec::unixify($try);
         }
         else {
-            $try = File::Spec->canonpath($try);
+            $try = _unixify(File::Spec->canonpath($try));
         }
         my $name;
         if(-f $try) {
@@ -253,6 +253,12 @@ sub pod_find
     }
     chdir $pwd;
     return %pods;
+}
+
+sub _unixify {
+    my $this = shift;
+    $this =~ s/\\/\//g;
+    return $this;
 }
 
 sub _check_for_duplicates {
@@ -458,7 +464,7 @@ sub pod_where {
 
       # Now concatenate this directory with the pod we are searching for
       my $fullname = File::Spec->catfile($dir, @parts);
-      $fullname = VMS::Filespec::unixify($fullname) if $^O eq 'VMS';
+      $fullname = $^O eq 'VMS' ? VMS::Filespec::unixify($fullname) : _unixify($fullname);
       warn "Filename is now $fullname\n"
         if $options{'-verbose'};
 

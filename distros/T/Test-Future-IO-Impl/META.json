@@ -1,0 +1,47 @@
+{
+   "abstract" : "acceptance tests for C<Future::IO> implementations",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Future-IO-Impl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Errno" : "0",
+            "IO::Handle" : "0",
+            "Socket" : "0",
+            "Test2::V0" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Future::IO::Impl" : {
+         "file" : "lib/Test/Future/IO/Impl.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

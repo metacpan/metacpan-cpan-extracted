@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Levenshtein::Flexible.
 
+0.10  2023-04-24
+    * Fixed parameter list documentation for distance_lc
+
 0.09  2014-06-07
     * print "I will not make any last-minute changes to tests\n" x 100;
 

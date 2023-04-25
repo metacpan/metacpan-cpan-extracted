@@ -1,5 +1,5 @@
 package Proc::Background::Unix;
-$Proc::Background::Unix::VERSION = '1.31';
+$Proc::Background::Unix::VERSION = '1.32';
 # ABSTRACT: Unix-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -40,8 +40,7 @@ sub _start {
   # like splitting the command string.
 
   my @argv;
-  my $cmd= $self->{_command};
-  my $exe= $self->{_exe};
+  my ($cmd, $exe)= @{$self}{'_command','_exe'};
 
   if (ref $cmd eq 'ARRAY') {
     @argv= @$cmd;
@@ -285,7 +284,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 COPYRIGHT AND LICENSE
 

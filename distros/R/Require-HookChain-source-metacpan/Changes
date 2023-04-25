@@ -1,3 +1,12 @@
+0.007   2023-02-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix Abstract.
+
+        - [doc] Mention Require::HookChain::source::lcpan.
+
+
 0.006   2023-02-07  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

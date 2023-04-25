@@ -1,8 +1,13 @@
 Revision history for Math::Notation::PostfixInfix.
 
-2022.035.1 Fri Feb 4 00:00:00 2022
-	- initial version; created by CCELSO
+2023.111.1 Fri Apr 21 19:07:02 2023
+	- added: use warning added; by CCELSO
+	- added: license file created; by CCELSO
+	- Fix: POD context; by CCELSO
 
 2022.218.2 Sat Aug 6 06:39:03 2022
 	- readme fix; changed by CCELSO
+
+2022.035.1 Fri Feb 4 00:00:00 2022
+	- initial version; created by CCELSO
 

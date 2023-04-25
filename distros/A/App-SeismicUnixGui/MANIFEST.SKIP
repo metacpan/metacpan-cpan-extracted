@@ -7,13 +7,15 @@
 \tbd.pl
 \cpan-upload.sh
 
-# Skip temporary and backup files.
+# Skip temporary, backup files,
+# and directories
 \.itemp_
 \.tbd
 \.num_samples
 \/archive
 \/tbd
 \/bck
+\/temp
 
 # Skip git-related files
 \.git

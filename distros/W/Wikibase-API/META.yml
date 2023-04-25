@@ -3,7 +3,6 @@ abstract: 'Wikibase API class.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
-  English: 0
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
@@ -43,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-API
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-API
-version: '0.03'
+version: '0.04'

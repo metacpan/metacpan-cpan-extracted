@@ -1,3 +1,6 @@
+0.08 - 2023-04-25
+  - Fix perl < 5.16 compatibility.
+
 0.07 - 2023-04-17
   - New Formula object for tracking a parse tree along with its
     original formula text and associated engine.

@@ -11,7 +11,7 @@ my $builder = Module::Build->new(
       'perl'            => "5.010001",
       'autouse'         => 0,
       'experimental'    => 0,
-      'match::simple'   => 0, 'match::simple::XS' => 0,
+      'match::simple'   => 0,
       'Date::Calc'      => 0,
       'List::MoreUtils' => 0,
       'Scalar::Does'    => 0.007,
@@ -19,8 +19,13 @@ my $builder = Module::Build->new(
       'Sub::Exporter'   => 0,
       'Try::Tiny'       => 0,
      },
+    recommends => {
+      'match::simple::XS' => 0,
+    },
     build_requires => {
-      'Test::More'   => 0,
+      'Test::More'       => 1.302190,
+      'Test::NoWarnings' => 0,
+      'Clone'            => 0,
     },
     add_to_cleanup      => [ 'Data-Domain-*' ],
     meta_merge => {

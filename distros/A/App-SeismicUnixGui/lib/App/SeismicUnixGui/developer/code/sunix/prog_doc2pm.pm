@@ -29,6 +29,7 @@ my $selected_program_name = 'sugetgthr';
 use Moose;
 our $VERSION = '0.0.1';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
+use Cwd;
 
 my $get = L_SU_global_constants->new();
 
@@ -124,11 +125,9 @@ sub _get_path_in {
 
 	if ( $prog_doc2pm->{_group_directory} ne $empty_string ) {
 
-		# my $path 	= '/usr/local/cwp_su_all_48/src/doc/Stripped';
-		my $L_SU_env = $ENV{$SeismicUnixGui};
-
-#		print "prog_doc2pm, _get_path_in, $L_SU_env\n";
-		my $path_in = $L_SU_env.'/developer';
+		my $local_dir= getcwd();
+        my $up3dir = '/../../../';
+		my $path_in = $local_dir.$up3dir.'developer';
 
 #		print("prog_doc2pm,_get_path_in = $path_in\n");
 		return ($path_in);
@@ -244,13 +243,11 @@ sub get_path_in {
 
 	if ( $prog_doc2pm->{_group_directory} ne $empty_string ) {
 
-		# my $path 	= '/usr/local/cwp_su_all_48/src/doc/Stripped';
 		my $dir = $prog_doc2pm->{_group_directory};
 
-		my $L_SU_env = $ENV{'SeismicUnixGui'};
-
-#		print "prog_doc2pm,get_path_in, $L_SU_env\n";
-		my $path_in = $L_SU_env . '/developer/Stripped' . '/' . $dir;
+		my $local_dir= getcwd();
+        my $up3dir = '/../../../';
+		my $path_in = $local_dir.$up3dir.'developer/Stripped'. '/' . $dir;
 
 #		print("prog_doc2pm,get_path_in = $path_in\n");
 		return ($path_in);
@@ -372,12 +369,11 @@ sub get_path_out4sunix {
 
 	if ( $prog_doc2pm->{_group_directory} ne $empty_string ) {
 
-		# my $path 	= '/usr/local/pl/L_SU/sunix';
 		my $dir = $prog_doc2pm->{_group_directory};
 
 		my $PATH_OUT = $global_libs->{_sunix} . '/' . $dir;
 
-		# print("prog_doc2pm,get_path_out4sunix = $PATH_OUT\n");
+		print("prog_doc2pm,get_path_out4sunix = $PATH_OUT\n");
 		return ($PATH_OUT);
 
 	} else {

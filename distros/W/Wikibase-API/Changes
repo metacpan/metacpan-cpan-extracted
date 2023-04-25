@@ -1,3 +1,10 @@
+0.04 2023-04-23T18:38:49+02:00
+ - Add support for property.
+ - Document get_item_raw() and add example to doc.
+ - Fix base uri for test.wikidata.org. It's same as for www.wikidata.org.
+ - Fix test requirements.
+ - Update copyright years.
+
 0.03 2022-11-03T02:04:46+01:00
  - Fix abstract in doc.
  - Rewrite to better initialization. Constructor not connect to network.

@@ -1,14 +1,12 @@
 ##----------------------------------------------------------------------------
 ## WebSocket Client & Server - ~/lib/WebSocket/Server.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/09/13
-## Modified 2021/09/13
-## All rights reserved
-## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
+## Modified 2023/04/18
+## You can use, copy, modify and  redistribute  this  package  and  associated
+## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package WebSocket::Server;
 BEGIN
@@ -16,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
+    use vars qw( $VERSION );
     # Import constants
     use WebSocket qw( :ws );
     use parent qw( WebSocket );
@@ -26,7 +25,7 @@ BEGIN
     use Want;
     use WebSocket::Connection;
     use WebSocket::Version;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
     $SIG{PIPE} = 'IGNORE';
 };
 
@@ -34,6 +33,8 @@ sub init
 {
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
+    # If true, connections will return a list, otherwise it will return an array object
+    $self->{legacy}         = 0;
     $self->{listen}         = undef();
     $self->{on_connect}     = sub{},
     $self->{on_shutdown}    = sub{},
@@ -51,7 +52,6 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{silence_checkinterval} = $self->{silence_max} / 2;
-    $self->message( 3, "Initiating watch_readable and watch_writable." );
     foreach my $watchtype ( qw( readable writable ) )
     {
         # Already setup because watch_readable or watch_writable was already passed as init parameters
@@ -74,14 +74,11 @@ sub connections
 {
     my $self = shift( @_ );
     my @conns = grep{ $_->is_ready } map{ $_->{conn} } values( %{$self->{conns}} );
-    if( Want::want( 'OBJECT' ) )
-    {
-        return( $self->new_array( \@conns ) );
-    }
-    else
+    if( want( 'LIST' ) || $self->legacy )
     {
         return( @conns );
     }
+    return( $self->new_array( \@conns ) );
 }
 
 sub disconnect
@@ -92,11 +89,13 @@ sub disconnect
     CORE::delete( $self->{conns}->{ $fh } );
 }
 
-sub extensions { return( $self->_set_get_object_array_object( 'extensions', 'WebSocket::Extension', @_ ) ); }
+sub extensions { return( shift->_set_get_object_array_object( 'extensions', 'WebSocket::Extension', @_ ) ); }
 
 sub ip { return( shift->_set_get_scalar_as_object( 'ip', @_ ) ); }
 
 sub is_ssl { return( shift->_set_get_boolean( 'is_ssl', @_ ) ); }
+
+sub legacy { return( shift->_set_get_boolean( 'legacy', @_ ) ); }
 
 sub listen { return( shift->_set_get_object_without_init( 'listen', 'IO::Socket', @_ ) ); }
  
@@ -124,9 +123,18 @@ sub port { return( shift->_set_get_number( 'port', @_ ) ); }
 sub shutdown
 {
     my $self = shift( @_ );
-    $self->message( 3, "Server shutdown called. Terminating ", $self->connections->length, " active connections." );
     my $shutdown_cb = $self->on_shutdown || sub{};
-    $shutdown_cb->( $self );
+    
+    try
+    {
+        $shutdown_cb->( $self );
+    }
+    catch( $e )
+    {
+        warnings::warn( "Error calling the shutdown callback: $e" ) if( warnings::enabled() );
+        return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
+    }
+    
     my $socket = $self->listen || return( $self->error( "Cannot find the socket object!" ) );
     $self->connections->for(sub
     {
@@ -153,14 +161,12 @@ sub start
     {
         # if we got a server, make sure it's valid by clearing errors and checking errors anyway; if there's still an error, it's closed
         $sock = $self->listen;
-        $self->message( 3, "Starting WebSocket server using socket '$self->{listen}' provided with port '", $sock->sockport, "'." );
         $sock->clearerr;
         return( $self->error( "Failed to start websocket server; the TCP server provided via 'listen' is invalid. (is the listening socket is closed? are you trying to reuse a server that has already shut down?)" ) ) if( $sock->error );
         $use_ssl = ( $sock->isa( 'IO::Socket::SSL' ) || $sock->can( 'accept_SSL' ) ) ? 1 : 0;
     }
     else
     {
-        $self->message( 3, "Starting WebSocket server by initiating our own IO::Socket::INET object on port '$self->{port}'." );
         # if we merely got a port, set up a reasonable default tcp server
         my $params =
         {
@@ -174,7 +180,6 @@ sub start
         $self->listen( $sock );
         if( !$self->port )
         {
-            $self->message( 3, "Using auto allocated port '", $sock->sockport, "'." );
             $self->port( $sock->sockport );
         }
     }
@@ -189,7 +194,6 @@ sub start
 
     my $connect_cb = $self->on_connect || sub{};
     my $tick_cb    = $self->on_tick || sub{};
-    $self->message( 3, "Starting the loop until the socket is not opened anymore." );
     while( $sock->opened )
     {
         my $silence_checktimeout = $self->silence_max ? ( $silence_nextcheck - time() ) : undef();
@@ -208,8 +212,7 @@ sub start
             {
                 my $client = $sock->accept;
                 next unless $client;
-                # XXX Connection
-                $self->message( 3, "Handling client connection from host '", $client->peerhost, "' on port '", $client->peerport, "'." );
+                # NOTE: Connection
                 my $conn = WebSocket::Connection->new(
                     socket      => $client,
                     server      => $self,
@@ -218,7 +221,16 @@ sub start
                 );
                 $self->{conns}->{ $client } = { conn => $conn, lastrecv => time() };
                 $self->{select_readable}->add( $client );
-                $connect_cb->( $self, $conn );
+                
+                try
+                {
+                    $connect_cb->( $self, $conn );
+                }
+                catch( $e )
+                {
+                    warnings::warn( "Error calling the connect callback: $e" ) if( warnings::enabled() );
+                    return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
+                }
             }
             elsif( $self->{watch_readable}->{ $fh } )
             {
@@ -231,12 +243,11 @@ sub start
                 my $rv = $def->{conn}->recv();
                 if( !defined( $rv ) )
                 {
-                    $self->message( 3, "Connection ended with an error code '", $def->{conn}->error->code, "' and message '", $def->{conn}->error->message, "'." );
+                    $self->{select_readable}->remove( $fh );
                 }
             }
             else
             {
-                $self->message( 3, "*** Filehandle $fh became readable, but no handler took responsibility for it; removing it." );
                 warning::warn( "Filehandle $fh became readable, but no handler took responsibility for it; removing it\n" ) if( warnings::enabled() );
                 $self->{select_readable}->remove( $fh );
             }
@@ -250,7 +261,6 @@ sub start
             }
             else
             {
-                $self->message( 3, "Filehandle $fh became writable, but no handler took responsibility for it; removing it." );
                 warnings::warn( "Filehandle $fh became writable, but no handler took responsibility for it; removing it\n" ) if( warnings::enabled() );
                 $self->{select_writable}->remove( $fh );
             }
@@ -269,11 +279,19 @@ sub start
 
         if( $self->tick_period && $tick_next < time() )
         {
-            $tick_cb->( $self );
+            try
+            {
+                $tick_cb->( $self );
+            }
+            catch( $e )
+            {
+                warnings::warn( "Error calling the tick callback: $e" ) if( warnings::enabled() );
+                return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
+            }
+            
             $tick_next += $self->tick_period;
         }
     }
-    $self->message( 3, "Server done, connections closed." );
     return( $self );
 }
 
@@ -291,7 +309,6 @@ sub subprotocol
                         ? shift( @_ )
                         : [CORE::split( /[[:blank:]\h]+/, $_[0] )]
                 : [@_];
-        $self->message( 3, "Called with -> ", sub{ $self->dump( $ref ) } );
         $self->_set_get_array_as_object( 'subprotocol', $ref ) || return( $self->pass_error );
     }
     return( $self->_set_get_array_as_object( 'subprotocol' ) );
@@ -386,10 +403,11 @@ sub _watch
 {
     my $self = shift( @_ );
     my $type = shift( @_ );
-    return( $self->error( "watch_${type} expects an even number of arguments after the type" ) ) if( @_ % 2 );
-    for( my $i = 0; $i < @_; $i += 2 )
+    my $args = $self->_get_args_as_array( @_ );
+    return( $self->error( "watch_${type} expects an even number of arguments after the type" ) ) if( @$args % 2 );
+    for( my $i = 0; $i < @$args; $i += 2 )
     {
-        my( $fh, $cb ) = ( $_[ $i ], $_[ $i + 1 ] );
+        my( $fh, $cb ) = ( $args->[ $i ], $args->[ $i + 1 ] );
         return( $self->error( "watch_${type} expects the second value of each pair to be a code reference, but element $i was not" ) ) if( ref( $cb ) ne 'CODE' );
         if( $self->{ "watch_${type}" }->{ $fh } )
         {
@@ -404,7 +422,7 @@ sub _watch
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -425,6 +443,16 @@ WebSocket::Server - WebSocket Server
         on_connect => sub
         {
             my( $serv, $conn ) = @_;
+            # Set the code that will issue pong reply to ping queries from the client
+            $conn->do_pong(sub
+            {
+                # WebSocket::Connection and a scalar of bytes received
+                my( $c, $bytes ) = @_;
+                # This is the default behaviour
+                return( $c->pong( $bytes ) );
+            });
+            
+            # See WebSocket::Connection for more information on the followings:
             $conn->on(
                 handshake => sub
                 {
@@ -434,6 +462,8 @@ WebSocket::Server - WebSocket Server
                     print( "Origin is: '", $handshake->request->origin, "', ", ( $handshake->request->origin eq $origin ? '' : 'not ' ), "ok\n" );
                     # $conn->disconnect() unless( $handshake->request->origin eq $origin );
                 },
+                ping => \&on_ping,
+                pong => \&on_pong,
                 ready => sub
                 {
                     my $conn = shift( @_ );
@@ -459,7 +489,7 @@ WebSocket::Server - WebSocket Server
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -473,7 +503,7 @@ Instantiate a new L<WebSocket> server object. This takes the following options:
 
 =over 4
 
-=item I<extensions>
+=item C<extensions>
 
 Optional. One or more extension enabled for this server. For example C<permessage-deflate> to enable message compression.
 
@@ -483,7 +513,7 @@ See L<rfc6455 section 9.1|https://datatracker.ietf.org/doc/html/rfc6455#section-
 
 Seel also L</compression_threshold>.
 
-=item I<listen>
+=item C<listen>
 
 Optional. A L<IO::Socket> object, or one of its inheriting packages. This enables you to instantiate your own L<IO::Socket> object and pass it here to be used. For example:
 
@@ -497,39 +527,55 @@ Optional. A L<IO::Socket> object, or one of its inheriting packages. This enable
     ) or die "failed to listen: $!";
     my $server = WebSocket::Server->new( listen => $ssl_server ) || die( WebSocket::Server->error );
 
-=item I<on_connect>
+=item C<on_connect>
 
 A code reference that will be triggered upon connection from client.
 
 It will be passed the the server object and the connection object (L<WebSocket::Connection>).
 
-=item I<on_shutdown>
+See L</on_connect> for more information.
+
+=item C<on_shutdown>
 
 A code reference that will be triggered upon termination of the connection.
 
-=item I<on_tick>
+See L</on_shutdown> for more information.
+
+=item C<on_tick>
 
 A code reference that will be triggered for every tick.
 
-=item I<port>
+See L</on_tick> for more information.
+
+=item C<port>
 
 The port number on which to connect.
 
-=item I<silence_max>
+=item C<silence_max>
 
-=item I<tick_period>
+The maximum value for ping frequency.
+
+=item C<tick_period>
 
 Frequency for the tick.
 
-=item I<version>
+=item C<version>
 
 The version supported. Defaults to C<draft-ietf-hybi-17> which means version C<13> (the latest as of 2021-09-24)
 
 See also L</version> to change this afterward.
 
-=item I<watch_readable>
+=item C<watch_readable>
 
-=item I<watch_writable>
+An array reference of filehandle and subroutine callback as code reference. Each callback will be passed the L<WebSocket::Server> object and the socket filehandle.
+
+The callback is called when the filehandle provided becomes readable.
+
+=item C<watch_writable>
+
+An array reference of filehandle and subroutine callback as code reference. Each callback will be passed the L<WebSocket::Server> object and the socket filehandle.
+
+The callback is called when the filehandle provided becomes writable.
 
 =back
 
@@ -547,20 +593,20 @@ Set or get the threshold in bytes above which the ut8 or binary messages will be
 
 Returns the client connections currently active.
 
-In object context, this returns a L<Module::Generic::Array>, such as:
+In list context, or if the C<legacy> is turned on, this returns a regular array:
+
+    for( $server->connections )
+    {
+        print( "Connection from ip '", $_->ip, "' on port '", $_->port, "'\n" );
+    }
+
+In any other context, including object context, this returns a L<Module::Generic::Array>, such as:
 
     $server->connections->for(sub
     {
         my $conn = shift( @_ );
         print( "Connection from ip '", $conn->ip, "' on port '", $conn->port, "'\n" );
     });
-
-In other context, this returns a regular array:
-
-    for( $server->connections )
-    {
-        print( "Connection from ip '", $_->ip, "' on port '", $_->port, "'\n" );
-    }
 
 =head2 disconnect
 
@@ -584,6 +630,10 @@ Returns true if the server is using a ssl connection, false otherwise.
 
 This value is set automatically upon calling L</start>.
 
+=head2 legacy
+
+Set or get the boolean value whether the method L</connections> use the legacy pattern and returns a list of current connection objects, or if false, it returns an L<array object|Module::Generic::Array> instead. This defaults to false.
+
 =head2 listen
 
 Get the L<IO::Socket> (or any of its inheriting classes such as L<IO::Socket::INET> or L<IO::Socket::SSL>) server socket object.
@@ -592,13 +642,19 @@ This value is set automatically upon calling L</start>, or it can also be provid
 
 =head2 on
 
-Provided with an array or array reference of event name and core reference pairs and this will set those event handlers.
+Provided with an hash or hash reference of event name and code reference pairs and this will set those event handlers.
+
+Possible event names are: C<connect>, C<shutdown>, C<tick>.
+
+See below their corresponding method for more details.
+
+See also L<WebSocket::Connection> for event handlers that can be set when a connection has been established.
 
 It returns the current object.
 
 =head2 on_connect
 
-Set or get the code reference for the event handler that is triggered when there is a new client connection.
+Set or get the code reference for the event handler that is triggered when there is a new client connection, and after the connection has been established.
 
 The handler is passed the server object and the connection object.
 
@@ -606,21 +662,40 @@ The handler is passed the server object and the connection object.
     {
         my( $s, $conn ) = @_;
         print( "Connection received from ip '", $conn->ip, "'\n" );
+        # set handler for each event
+        # See WebSocket::Connection for details on the arguments provided
+        # You can also check out the example given in the symopsis
+        $conn->on(
+            handshake   => $self->curry::onconnect,
+            ready       => $self->curry::onready,
+            utf8        => $self->curry::onmessage,
+            binary      => $self->curry::onbinary,
+            pong        => $self->curry::onpong,
+            disconnect  => $self->curry::onclose,
+        );
     });
+
+Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 on_shutdown
 
-Set or get the code reference for the event handler that is triggered when the server is shutting down and before calling L</disconnect> on every connected client.
+Set or get the code reference for the event handler that is triggered B<before> calling L</disconnect> on every connected client and before the server is shutting down.
+
+The callback is provided this server object as its sole argument.
+
+Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 on_tick
 
-Set or get the code reference for the event handler that is triggered for every tick, if enabled.
+Set or get the code reference for the event handler that is triggered for every tick, if enabled by setting L</tick_period> to a true value.
 
-The handler is passed the server object.
+The handler is passed this server object.
+
+Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 port
 
-Returns the port to which this server is listening to.
+Sets or gets the port on which this server is listening to.
 
 =head2 shutdown
 
@@ -630,11 +705,13 @@ It returns the current server object.
 
 =head2 silence_checkinterval
 
+Sets or gets the interval in seconds. This is used to set the frequency of pings and also contribute to set the timeout.
+
 =head2 silence_max
 
 =head2 socket
 
-This is an alias for L</listen>. It returns the server socket object.
+This is an alias for L</listen>. It returns the L<server socket|IO::Socket> object.
 
 =head2 start
 
@@ -660,7 +737,15 @@ Set or get the tick interval period.
 
 =head2 unwatch_readable
 
+This takes one or more filehandle, and removes them from being watched.
+
+It returns the current server object.
+
 =head2 unwatch_writable
+
+This takes one or more filehandle, and removes them from being watched.
+
+It returns the current server object.
 
 =head2 version
 
@@ -678,11 +763,39 @@ It can take inteer sucha s C<13>, which is the latest WebSocket rfc6455 protocol
 
 =head2 watch_readable
 
+This takes a list or an array reference of filehandle and subroutine callback as code reference. Each callback will be passed the L<WebSocket::Server> object and the socket filehandle.
+
+The callback is called when the filehandle provided becomes readable.
+
+It returns the current server object.
+
 =head2 watch_writable
+
+This takes a list or an array reference of filehandle and subroutine callback as code reference. Each callback will be passed the L<WebSocket::Server> object and the socket filehandle.
+
+The callback is called when the filehandle provided becomes writable.
+
+It returns the current server object.
 
 =head2 watched_readable
 
+    my $code = $ws->watched_readable( $fh );
+    my( $fh1, $code1, $fh2, $code2 ) = $ws->watched_readable;
+    my @all = $ws->watched_readable;
+
+If a file handle is provided as a unique argument, it returns the corresponding callback, if any.
+
+Otherwise, if no argument is provided, it returns a list of file handle and their calback.
+
 =head2 watched_writable
+
+    my $code = $ws->watched_writable( $fh );
+    my( $fh1, $code1, $fh2, $code2 ) = $ws->watched_writable;
+    my @all = $ws->watched_writable;
+
+If a file handle is provided as a unique argument, it returns the corresponding callback, if any.
+
+Otherwise, if no argument is provided, it returns a list of file handle and their calback.
 
 =head1 CREDITS
 
@@ -698,9 +811,8 @@ L<WebSocket::Client>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut
-

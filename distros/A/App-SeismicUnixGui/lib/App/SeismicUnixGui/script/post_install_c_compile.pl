@@ -55,7 +55,8 @@ print(" Looking for script on the system...\n");
 my @list   = `(find $starting_point -path $pathNfile2find -print 2>/dev/null)`;
 my $length = scalar @list;
 
-print(" Found $length versions of the script: \(Hint: use one with the \"perl\" in path\)\n");
+print(" Found $length versions of the script:\n");
+print \(" Hint: use one with the \"perl\" in the path name\)\n");
 
 for ( my $i = 0 ; $i < $length ; $i++ ) {
 
@@ -97,7 +98,7 @@ print("\nC_PATH=$C_pathNfile\n");
 
 print "Proceeding to compile\n";
 chdir "$path";
-system("bash $file");
+system("sudo bash $file");
 
 print("Hit Enter to leave\n");
 <STDIN>

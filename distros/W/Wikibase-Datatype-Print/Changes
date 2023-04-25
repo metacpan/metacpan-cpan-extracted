@@ -1,3 +1,22 @@
+0.12 2023-04-24T18:40:57+02:00
+ - Add doc for Wikibase::Datatype::Print::Item.
+ - Fix dependency to Wikidata::Datatype::Value::Sense.
+
+0.11 2023-04-23T18:41:18+02:00
+ - Add doc example in Utils.
+ - Add comments.
+ - Add support for before/after in year precision in Time.
+ - Add support for decade precision in Time.
+ - Fix MANIFEST file for sense value test.
+ - Fix support of bigger year than with 4 characters.
+ - Improve datetime precision print.
+
+0.10 2023-04-23T10:57:02+02:00
+ - Add doc for Wikibase::Datatype::Print::Lexeme.
+ - Add support of sense to Value.
+ - Add Wikibase::Datatype::Print::Value::Sense.
+ - Fix test message.
+
 0.09 2023-04-21T21:13:56+02:00
  - Add doc for Wikibase::Datatype::Print::Form.
  - Add doc for Wikibase::Datatype::Print::Reference.

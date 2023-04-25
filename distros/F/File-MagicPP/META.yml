@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - 'Lee S. Katz <gzu2@cdc.gov>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-MagicPP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  perl: '5.012000'
+  version: '0.77'
+resources:
+  repository: git://github.com/lskatz/pp-file-magic.git
+version: v0.2.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,9 @@ abstract: 'Data description and validation'
 author:
   - 'Laurent Dami <dami@cpan.org>'
 build_requires:
-  Test::More: '0'
+  Clone: '0'
+  Test::More: '1.30219'
+  Test::NoWarnings: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
@@ -16,7 +18,7 @@ name: Data-Domain
 provides:
   Data::Domain:
     file: lib/Data/Domain.pm
-    version: '1.08'
+    version: '1.11'
   Data::Domain::All_of:
     file: lib/Data/Domain.pm
   Data::Domain::Date:
@@ -45,6 +47,8 @@ provides:
     file: lib/Data/Domain.pm
   Data::Domain::Whatever:
     file: lib/Data/Domain.pm
+recommends:
+  match::simple::XS: '0'
 requires:
   Date::Calc: '0'
   List::MoreUtils: '0'
@@ -55,10 +59,9 @@ requires:
   autouse: '0'
   experimental: '0'
   match::simple: '0'
-  match::simple::XS: '0'
   perl: '5.010001'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Data-Domain
-version: '1.08'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

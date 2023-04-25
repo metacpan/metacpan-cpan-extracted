@@ -16,7 +16,7 @@ use Wikibase::Datatype::Value::Item;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -215,6 +215,8 @@ Returns Wikibase::Datatype::Lexeme instance.
 
 =head1 EXAMPLE1
 
+=for comment filename=obj2struct_lexeme.pl
+
  use strict;
  use warnings;
 
@@ -403,6 +405,8 @@ Returns Wikibase::Datatype::Lexeme instance.
  # }
 
 =head1 EXAMPLE2
+
+=for comment filename=struct2obj_lexeme.pl
 
  use strict;
  use warnings;
@@ -654,12 +658,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

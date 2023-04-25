@@ -87,6 +87,7 @@ my $Project = {
 	_PROJECT_HOME                 => '',
 	_DATA_GAMMA_WELL              => '',
 	_DATA_GAMMA_WELL_TXT          => '',
+	_DATA_GEOTECH_WELL_TXT         => '',	
 	_DATA_RESISTIVITY_SURFACE     => '',
 	_DATA_RESISTIVITY_SURFACE_TXT => '',
 	_DATA_RESISTIVITY_WELL        => '',
@@ -100,6 +101,7 @@ my $Project = {
 #	_DATA_GPR_SU                  => '',
 #	_DATA_GPR_SU_RAW              => '',
 #	_DATA_GPR_TXT                 => '',
+    _DATA_GEOTECH_WELL_TXT        => '',
 	_DATA_SEISMIC                 => '',
 	_DATA_SEISMIC_BIN             => '',
 	_DATA_SEISMIC_DAT             => '',
@@ -588,10 +590,12 @@ sub _system_dirs {
 
 	# BASE DATA TYPES : default is SURFACE
 	my $GEOMAPS             = $PROJECT_HOME . '/geomaps';
+#	my $GEOTECH             = $PROJECT_HOME . '/geotech';
 #	my $GPR                 = $PROJECT_HOME . '/gpr';
 	my $WELL                = $PROJECT_HOME . '/well';
 	my $SEISMIC             = $PROJECT_HOME . '/seismics';
 	my $GAMMA_WELL          = $WELL . '/gamma';
+	my $GEOTECH_WELL        = $WELL . '/geotech';	
 	my $RESISTIVITY_SURFACE = $PROJECT_HOME . '/' . 'resistivity_surface';
 	my $RESISTIVITY_WELL    = $WELL . '/resistivity';
 	my $SEISMIC_WELL        = $WELL . '/seismics';
@@ -606,6 +610,7 @@ sub _system_dirs {
 
 	# TOOL DATA TYPES
 	my $DATA_GAMMA_WELL       = $GAMMA_WELL . '/data';
+	my $DATA_GEOTECH_WELL     = $GEOTECH_WELL.'/data';	
 	my $DATA_RESISTIVITY_WELL = $RESISTIVITY_WELL . '/data';
 	my $DATA_SEISMIC_WELL     = $SEISMIC_WELL . '/data';
 
@@ -856,6 +861,13 @@ sub _system_dirs {
 		$DATA_GAMMA_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
 	  . $subUser;
+	  
+	# GEOTECH WELL DATA in TXT format
+	my $DATA_GEOTECH_WELL_TXT =
+		$DATA_GEOTECH_WELL . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
+	  . $subUser;	  
+	  
 
 #	# GPR DIRECTORY
 #	my $DATA_GPR_SEGY =
@@ -1097,6 +1109,9 @@ sub _system_dirs {
 	$Project->{_DATA_GAMMA_WELL}     = $DATA_GAMMA_WELL;
 	$Project->{_DATA_GAMMA_WELL_TXT} = $DATA_GAMMA_WELL_TXT;
 
+	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;
+	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;
+	
 	# $Project->{_DATA_RESISTIVITY_}		= $DATA_RESISTIVITY;
 	# $Project->{_DATA_RESISTIVITY_TXT}		= $DATA_RESISTIVITY_TXT;
 	$Project->{_DATA_RESISTIVITY_SURFACE}     = $DATA_RESISTIVITY_SURFACE;
@@ -1244,10 +1259,12 @@ sub system_dirs {
 	my $WELL             = $PROJECT_HOME . '/well';
 	my $DATA_WELL        = $WELL . '/data';
 	my $GAMMA_WELL       = $WELL . '/gamma';
+	my $GEOTECH_WELL     = $WELL . '/geotech';
 	my $SEISMIC_WELL     = $WELL . '/seismics';
 	my $RESISTIVITY_WELL = $WELL . '/resistivity';
 
 	my $DATA_GAMMA_WELL       = $GAMMA_WELL . '/data';
+	my $DATA_GEOTECH_WELL     = $GEOTECH_WELL . '/data';	
 	my $DATA_RESISTIVITY_WELL = $RESISTIVITY_WELL . '/data';
 	my $DATA_SEISMIC_WELL     = $SEISMIC_WELL . '/data';
 
@@ -1544,6 +1561,12 @@ sub system_dirs {
 		$DATA_GAMMA_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
 	  . $subUser;
+	  
+	# WELL GEOTECH DATA in TXT format
+	my $DATA_GEOTECH_WELL_TXT =
+		$DATA_GEOTECH_WELL . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
+	  . $subUser;	  
 
 	# SEISMIC BIN  and DAT DIRECTORY
 	my $DATA_SEISMIC_BIN =
@@ -1782,16 +1805,20 @@ sub system_dirs {
 	$Project->{_PROJECT_HOME}        = $PROJECT_HOME;
 	$Project->{_DATA_GAMMA_WELL}     = $DATA_GAMMA_WELL;
 	$Project->{_DATA_GAMMA_WELL_TXT} = $DATA_GAMMA_WELL_TXT;
+		
+	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;	
+	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;	
 
 	$Project->{_DATA_GEOMAPS}        = $DATA_GEOMAPS;
 	$Project->{_DATA_GEOMAPS_BIN}    = $DATA_GEOMAPS_BIN;
 	$Project->{_DATA_GEOMAPS_TOPO}   = $DATA_GEOMAPS_TOPO;
+	
 	$Project->{_GEOMAPS_IMAGES}      = $GEOMAPS_IMAGES;
 	$Project->{_GEOMAPS_IMAGES_JPEG} = $GEOMAPS_IMAGES_JPEG;
 	$Project->{_GEOMAPS_IMAGES_PNG}  = $GEOMAPS_IMAGES_PNG;
 	$Project->{_GEOMAPS_IMAGES_TIF}  = $GEOMAPS_IMAGES_TIF;
 	$Project->{_GEOMAPS_IMAGES_PS}   = $GEOMAPS_IMAGES_PS;
-
+	
 #	$Project->{_DATA_GPR}          = $DATA_GPR;
 #	$Project->{_DATA_GPR_SEGY}     = $DATA_GPR_SEGY;
 #	$Project->{_DATA_GPR_SEGY_RAW} = $DATA_GPR_SEGY_RAW;
@@ -1952,6 +1979,14 @@ sub DATA_GEOMAPS_TOPO {
 
 	my $DATA_GEOMAPS_TOPO = $Project->{_DATA_GEOMAPS_TOPO};
 	return ($DATA_GEOMAPS_TOPO);
+}
+
+sub DATA_GEOTECH_WELL_TXT {
+	_basic_dirs();
+	_system_dirs();
+
+	my $DATA_GEOTECH_WELL_TXT = $Project->{_DATA_GEOTECH_WELL_TXT};
+	return ($DATA_GEOTECH_WELL_TXT);
 }
 
 sub DATA_GPR {
@@ -2863,13 +2898,12 @@ sub make_local_dirs {
 	my $WELL    = $Project->{_WELL};
 	my $PL_WELL = $Project->{_PL_WELL};
 
-	# my $MATLAB_WELL       			= $Project->{_MATLAB_WELL};
 	# $manage_dirs_by->make_dir($R_WELL)
-	# $manage_dirs_by->make_dir($WELL);
+	$manage_dirs_by->make_dir($WELL);
 	# pl programs and wells
 	# $manage_dirs_by->make_dir($PL_WELL);
 	# matlab programs and wells
-	# $manage_dirs_by->make_dir($MATLAB_WELL);
+	$manage_dirs_by->make_dir($MATLAB_WELL);
 
 	# CATEGORY well and images
 	my $PS_WELL = $Project->{_PS_WELL};
@@ -3060,6 +3094,11 @@ sub make_local_dirs {
 	# location surface
 	# and program PL
 	$manage_dirs_by->make_dir($PL_RESISTIVITY_SURFACE);
+
+	# CATEGORY GEOTECH well data
+	# location well
+	my $DATA_GEOTECH_WELL_TXT  = $Project->{_DATA_GEOTECH_WELL_TXT};
+	$manage_dirs_by->make_dir($DATA_GEOTECH_WELL_TXT);
 
 	#CATEGORY GAMMA data
 	# location well

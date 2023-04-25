@@ -12,6 +12,13 @@ use Storable 'dclone';
 use LWP::UserAgent;
 use HTTP::Request;
 
+my $have_mojolicious;
+BEGIN {
+    if( eval { require Mojo::UserAgent; 1 }) {
+        $have_mojolicious = 1;
+    }
+}
+
 use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -310,8 +317,8 @@ sub request_identical_ok( $test ) {
     # For consistency checking the skip counts
     #$res[0]->{error} = "Dummy error";
     if( $res[0]->{error} ) {
-        # We run 2 tests for the setup and then 6 tests per request
-        my $skipcount = 6;
+        # We run 2 tests for the setup and then 8 tests per request
+        my $skipcount = 8;
         my $skipreason = $res[0]->{error};
         if(     $res[0]->{error_output}
             and $res[0]->{error_output} =~ /\b(option .*?: the installed libwget version doesn't support this\b)/) {
@@ -514,9 +521,33 @@ sub request_identical_ok( $test ) {
                 boundary       => $boundary,
             ) or diag $code;
 
+            if( $have_mojolicious ) {
+                my $code = $r->as_snippet(type => 'Mojolicious',
+                    preamble => ['use strict;','use Mojo::UserAgent;']
+                );
+                compiles_ok( $code, "$name as Mojolicious snippet compiles OK")
+                    or diag $code;
+
+                my @mojolicious_ignore;
+
+                my $h = $test->{ignore_headers} || [];
+                $h = [$h]
+                    unless ref $h;
+
+                identical_headers_ok( $code, $wget_log,
+                    "We create (almost) the same headers with Mojolicious",
+                    ignore_headers => ['Host', 'Content-Length', 'Accept-Encoding', 'Connection', @mojolicious_ignore, @$h],
+                    boundary       => $boundary,
+                ) or diag $code;
+            } else {
+                SKIP: {
+                    skip "Mojolicious not installed", 2;
+                }
+            }
+
         } else {
             SKIP: {
-                skip "Did not generate a request", 4;
+                skip "Did not generate a request", 6;
             };
         };
     };
@@ -542,7 +573,7 @@ sub run_wget_tests( @tests ) {
     for( @tests ) {
         my $request_count = $_->{request_count} || 1;
         $testcount +=   2
-                      + ($request_count * 6);
+                      + ($request_count * 8);
     };
     plan tests => $testcount;
 

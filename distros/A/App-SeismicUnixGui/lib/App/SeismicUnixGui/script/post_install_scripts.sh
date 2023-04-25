@@ -36,8 +36,8 @@ hint_ans=''
 Afile2find="post_install_fortran_compile.pl"
 # read the list of files and their paths
 
-echo "Looking for scripts to compile fortran and C code  ..."
-echo -e "Hint: Use case with the \"bin\" in its path.\n"
+echo -e " Looking for scripts to compile fortran and C code  ...\n"
+echo -e " Hint: Use case with the \"bin\" in its path.\n"
 readarray -d '' -t list < <(find $starting_point -type $file -name $Afile2find -print0 )
 
 length=${#list[@]}
@@ -88,15 +88,16 @@ while [ $choice == $repeat ]; do
 	fi
 
  done
-echo -e "\n sudo perl $script_name\n"
-sudo perl $script_name
+echo -e "\n perl $script_name\n"
+perl $script_name
 
 # read the list of files and their paths
 c_script_name=$(echo $script_name | sed -e 's/fortran/c/')
 
+echo -e "\nNow, looking for scripts to compile C code  ..."
 echo -e "\nNext script name=$c_script_name"
 echo "Looking for $c_script_name to compile  C code  ..."
-sudo perl $c_script_name
+perl $c_script_name
 
 # env_script_name=$(echo $script_name | sed -e 's/fortran_compile/env/')
 # echo -e "environment script=$env_script_name"

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More (
-    $] <= 5.010 ? (skip_all => 'only on perl 5.10 and higher') : ()
+    $] <= 5.018 ? (skip_all => 'only on perl 5.18 and higher') : ()
 );
 END { done_testing(); }
 

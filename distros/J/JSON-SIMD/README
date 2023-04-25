@@ -568,6 +568,29 @@ OBJECT-ORIENTED INTERFACE
         "get_boolean_values" will return both $false and $true values, or
         the empty list when they are set to the default.
 
+    $json->core_bools([$enable])
+    $enabled = $json->get_core_bools
+        If $enable is true (or missing), then subsequent "decode"s will
+        produce standard perl boolean values. Equivalent to calling:
+
+            $json->boolean_values(!!0, !!1)
+
+        "get_core_bools" will return true if this has been set. On perl 5.36
+        or newer, it will also return true if the boolean values have been
+        set to perl's core booleans using the boolean_values method.
+
+        (See also "encode_core_bools" for the encode counterpart of this.)
+
+    $json = $json->encode_core_bools ([$enable])
+    $enabled = $json->get_encode_core_bools
+        If $enable is true (or missing), then subsequent "encode" operations
+        will recognize Perl's special boolean values !!0 and !!1 (or
+        "builtin::false" and "builtin::true") and encode them as JSON
+        "false" and "true", respectively.
+
+        Be warned though, this only works on perl 5.36 or newer. With older
+        perls this option does nothing.
+
     $json = $json->filter_json_object ([$coderef->($hashref)])
         When $coderef is specified, it will be called from "decode" each
         time it decodes a JSON object. The only argument is a reference to
@@ -1071,11 +1094,17 @@ MAPPING
         parser in order to avoid the loss of precision.
 
     true, false
-        These JSON atoms become "Types::Serialiser::true" and
+        By default, these JSON atoms become "Types::Serialiser::true" and
         "Types::Serialiser::false", respectively. They are overloaded to act
         almost exactly like the numbers 1 and 0. You can check whether a
         scalar is a JSON boolean by using the "Types::Serialiser::is_bool"
         function (after "use Types::Serialier", of course).
+
+        You can also use the "boolean_values" method to supply your own true
+        and false values for decoding, or the "core_bools" method to decode
+        to Perl's standard booleans (the special values !!0 or !!1, also
+        available as the aliases "false" and "true" from the (experimental)
+        "builtin" module since perl 5.36).
 
     null
         A JSON null atom becomes "undef" in Perl.
@@ -1128,12 +1157,25 @@ MAPPING
     Types::Serialiser::true, Types::Serialiser::false
         These special values from the Types::Serialiser module become JSON
         true and JSON false values, respectively. You can also use "\1" and
-        "\0" directly if you want.
+        "\0" directly if you want. Also see the "builtin booleans" section
+        below.
 
     blessed objects
         Blessed objects are not directly representable in JSON, but
         "JSON::SIMD" allows various ways of handling objects. See "OBJECT
         SERIALISATION", below, for details.
+
+    builtin booleans
+        Since perl 5.36 it is possible to have "stable boolean tracking",
+        that is, the special !!0 and !!1 boolean-ish values can retain their
+        boolean-ish nature even after assignment into a variable. There are
+        also (experimental) "true" and "false" aliases available from the
+        "builtin" module.
+
+        If the "encode_core_bools" option is enabled, these special values
+        will be encoded to the JSON atoms "true" and "false".
+
+        This option only works in perl 5.36 or newer.
 
     simple scalars
         Simple Perl scalars (any scalar that is not a reference) are the
@@ -1668,7 +1710,8 @@ RELATIONSHIP WITH I-JSON
 
     *   objects must not have duplicate keys
 
-        This is trivially done, as "JSON::XS" does not allow duplicate keys.
+        This is trivially done, as "JSON::SIMD" does not generate objects
+        with duplicate keys.
 
     *   do not generate scalar JSON texts, use "->allow_nonref (0)"
 
@@ -1693,7 +1736,7 @@ INTEROPERABILITY WITH OTHER MODULES
     "JSON::SIMD" uses the Types::Serialiser module to provide boolean
     constants. That means that the JSON true and false values will be
     comaptible to true and false values of other modules that do the same,
-    such as JSON::XS, JSON::PP and CBOR::XS.
+    such as JSON::XS and CBOR::XS.
 
 INTEROPERABILITY WITH OTHER JSON DECODERS
     As long as you only serialise data that can be directly expressed in

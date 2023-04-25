@@ -3,6 +3,7 @@ API/Resolve.pm
 Changes
 examples/create_item_in_test_wikidata.pl
 examples/get_item_from_test_wikidata.pl
+examples/get_item_raw_from_test_wikidata.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

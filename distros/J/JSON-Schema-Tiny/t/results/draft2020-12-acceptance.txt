@@ -46,7 +46,7 @@ patternProperties.json                      23          0     0
 prefixItems.json                            11          0     0
 properties.json                             28          0     0
 propertyNames.json                          10          0     0
-ref.json                                    59          9     4
+ref.json                                    59         13     0
 refRemote.json                              14         15     0
 required.json                               16          0     0
 type.json                                   80          0     0
@@ -65,4 +65,4 @@ optional/no-schema.json                      3          0     0
 optional/non-bmp-regex.json                 12          0     0
 optional/refOfUnknownKeyword.json            4          0     0
 ---------------------------------------------------------------
-TOTAL                                     1130        187     4
+TOTAL                                     1130        191     0

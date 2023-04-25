@@ -1,0 +1,6 @@
+test.value = this is a value
+  test.other = {test.value} and more
+test.last = {not.yet.here} and {test.other}!
+
+# And finally:
+not.yet.here = tada {undef.value}

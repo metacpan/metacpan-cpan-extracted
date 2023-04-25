@@ -14,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( WebSocket::Handshake );
+    use vars qw( $VERSION );
     use Nice::Try;
     use WebSocket::Frame;
     use WebSocket::Request;
@@ -84,7 +85,7 @@ sub parse
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -96,7 +97,8 @@ WebSocket::Handshake::Server - WebSocket Server Handshake
 =head1 SYNOPSIS
 
     use WebSocket::Handshake::Server;
-    my $this = WebSocket::Handshake::Server->new || die( WebSocket::Handshake::Server->error, "\n" );
+    my $this = WebSocket::Handshake::Server->new || 
+        die( WebSocket::Handshake::Server->error, "\n" );
 
 =head1 VERSION
 
@@ -134,11 +136,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Server>, L<WebSocket::Handshake>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

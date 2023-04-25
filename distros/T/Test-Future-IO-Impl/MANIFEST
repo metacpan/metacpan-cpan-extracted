@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Test/Future/IO/Impl.pm
+MANIFEST			This list of files
+README
+t/00use.t
+t/99pod.t
+LICENSE
+META.yml
+META.json

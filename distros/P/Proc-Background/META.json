@@ -32,7 +32,7 @@
          "web" : "https://github.com/nrdvana/perl-proc-background"
       }
    },
-   "version" : "1.31",
+   "version" : "1.32",
    "x_contributors" : [
       "Florian Schlichting <fsfs@debian.org>",
       "Kevin Ryde <user42@zip.com.au>",

@@ -3,11 +3,11 @@ abstract: 'Math Notation for Postfix and Infix Expressions'
 author:
   - 'Carlos Celso <CCELSO@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,5 +18,9 @@ no_index:
     - t
     - inc
 requires: {}
-version: v2022.218.2
+resources:
+  bugtracker: https://sourceforge.net/p/csi-math-notation-postfixinfix/tickets/
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://sourceforge.net/projects/csi-math-notation-postfixinfix/files
+version: v2023.111.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

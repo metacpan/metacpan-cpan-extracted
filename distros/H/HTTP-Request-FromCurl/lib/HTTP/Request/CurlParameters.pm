@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 NAME
 
@@ -941,6 +941,24 @@ sub as_curl($self,%options) {
         @request_commands;
 }
 
+=head2 C<< $r->as_wget >>
+
+    print $r->as_wget;
+
+Returns a curl command line representing the request
+
+This is convenient if you started out from something else or want a canonical
+representation of a curl command line.
+
+=over 4
+
+=item B<wget>
+
+The curl command to be used. Default is C<wget>.
+
+=back
+
+=cut
 # These are what wget uses as defaults, not what Perl should use as default!
 our %wget_header_defaults = (
     'Accept'          => '*/*',

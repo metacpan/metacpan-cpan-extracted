@@ -24,6 +24,8 @@ my $spvmdist_path = File::Spec->rel2abs('blib/script/spvmdist');
 my $blib_lib = File::Spec->rel2abs('blib/lib');
 my $blib_arch = File::Spec->rel2abs('blib/arch');
 my $include_blib = "-I$blib_arch -I$blib_lib";
+my $path_sep = $Config{path_sep};
+my $perl5lib = "$ENV{PERL5LIB}$path_sep$blib_arch$path_sep$blib_lib";
 
 # -h, --help
 {
@@ -80,8 +82,10 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   ok(SPVM::Builder::Util::file_contains($makefile_pl_file, q|mit|));
   ok(SPVM::Builder::Util::file_contains($makefile_pl_file, '[--user-name]'));
   ok(SPVM::Builder::Util::file_contains($makefile_pl_file, '[--user-email]'));
-  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, 'get_version_string'));
-  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, 'VERSION => $version_string'));
+  
+  # VERSION_FROM must be included in Makefile.PL to resolve CPAN module dependencies.
+  # VERSION is not sufficient.
+  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, 'VERSION_FROM'));
   
   my $readme_markdown_file = "$tmp_dir/SPVM-Foo/README.md";
   ok(-f $readme_markdown_file);
@@ -535,6 +539,18 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   system($spvmdist_cmd) == 0
     or die "Can't execute spvmdist command $spvmdist_cmd:$!";
   
+  chdir('SPVM-Foo')
+    or die "Can't chdir";
+  
+  local $ENV{PERL5LIB} = $perl5lib;
+  my $make = $Config{make};
+  my $ret = system("$^X Makefile.PL && $make && $make test");
+  ok($ret == 0);
+  
+  my $mymeta_json = 'MYMETA.json';
+  ok(-f $mymeta_json);
+  ok(SPVM::Builder::Util::file_contains($mymeta_json, "0.001_001"));
+  
   chdir($save_cur_dir) or die;
 }
 
@@ -550,16 +566,13 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   chdir('SPVM-Foo')
     or die "Can't chdir";
   
+  local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
   my $ret = system("$^X Makefile.PL && $make && $make test");
   ok($ret == 0);
   
   ok(SPVM::Builder::Util::file_contains('Makefile', 'build_dynamic_lib_dist_native'));
   ok(SPVM::Builder::Util::file_contains('Makefile', 'build_dynamic_lib_dist_precompile'));
-  
-  my $mymeta_json = 'MYMETA.json';
-  ok(-f $mymeta_json);
-  ok(SPVM::Builder::Util::file_contains($mymeta_json, "0.001_001"));
   
   chdir($save_cur_dir) or die;
 }
@@ -576,6 +589,7 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   chdir('SPVM-Foo')
     or die "Can't chdir";
   
+  local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
   my $ret = system("$^X Makefile.PL && $make && $make test");
   ok($ret == 0);
@@ -597,6 +611,7 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   chdir('SPVM-Foo')
     or die "Can't chdir";
   
+  local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
   my $ret = system("$^X Makefile.PL --meta");
   ok($ret == 0);
@@ -619,6 +634,7 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   chdir('SPVM-Foo')
     or die "Can't chdir";
   
+  local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
   my $ret = system("$^X Makefile.PL --no-build-spvm-classes");
   ok($ret == 0);
@@ -776,6 +792,7 @@ for my $test_index (0 .. 1) {
   chdir('SPVM-Foo')
     or die "Can't chdir";
   
+  local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
   my $ret = system("$^X Makefile.PL && $make && $make test");
   ok($ret == 0);
@@ -795,6 +812,7 @@ for my $test_index (0 .. 1) {
   chdir('SPVM-Foo')
     or die "Can't chdir";
   
+  local $ENV{PERL5LIB} = $perl5lib;
   my $make = $Config{make};
   my $ret = system("$^X Makefile.PL && $make && $make test");
   ok($ret == 0);

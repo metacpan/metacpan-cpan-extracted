@@ -34,11 +34,10 @@ requires 'Wikibase::Datatype::Struct::Mediainfo' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Wikibase-API/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Wikibase-API';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Wikibase-API';
-test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

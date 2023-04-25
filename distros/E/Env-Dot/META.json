@@ -1,7 +1,7 @@
 {
    "abstract" : "Read environment variables from .env file",
    "author" : [
-      "'Mikko Koivunalho <mikkoi@cpan.org>'"
+      "Mikko Koivunalho <mikkoi@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -22,7 +22,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.009005"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -63,6 +63,7 @@
       },
       "test" : {
          "requires" : {
+            "Cwd" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "Test2::V0" : "0",
@@ -73,11 +74,15 @@
    "provides" : {
       "Env::Dot" : {
          "file" : "lib/Env/Dot.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "Env::Dot::Functions" : {
          "file" : "lib/Env/Dot/Functions.pm",
-         "version" : "0.004"
+         "version" : "0.006"
+      },
+      "Env::Dot::ScriptFunctions" : {
+         "file" : "lib/Env/Dot/ScriptFunctions.pm",
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -92,7 +97,7 @@
          "web" : "https://github.com/mikkoi/env-dot.git"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

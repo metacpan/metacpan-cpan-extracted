@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "spvm_native.h"
 
@@ -302,7 +303,10 @@ SPVM_ENV* SPVM_API_new_env_raw() {
     SPVM_API_get_compile_type_name_raw,
     SPVM_API_get_compile_type_name,
     SPVM_API_set_command_info_base_time,
-    SPVM_API_get_spvm_version,
+    SPVM_API_get_spvm_version_string,
+    SPVM_API_get_spvm_version_number,
+    SPVM_API_get_version_string,
+    SPVM_API_get_version_number,
   };
   SPVM_ENV* env = calloc(1, sizeof(env_init));
   if (env == NULL) {
@@ -4129,9 +4133,77 @@ int32_t SPVM_API_call_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method
   return SPVM_VM_call_method(env, stack, method_id, args_stack_length);
 }
 
-const char* SPVM_API_get_spvm_version(SPVM_ENV* env, SPVM_VALUE* stack) {
+const char* SPVM_API_get_spvm_version_string(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   const char* spvm_version = SPVM_VERSION;
   
   return spvm_version;
+}
+
+double SPVM_API_get_spvm_version_number(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  const char* spvm_version_string = env->get_spvm_version_string(env, stack);
+  
+  assert(spvm_version_string);
+  
+  int32_t spvm_version_string_length = strlen(spvm_version_string);
+  
+  char spvm_version_string_without_hyphen[20] = {0};
+  int32_t spvm_version_string_without_hyphen_length = 0;
+  for (int32_t i = 0; i < spvm_version_string_length; i++) {
+    char ch = spvm_version_string[i];
+    if (!(ch == '_')) {
+      spvm_version_string_without_hyphen[spvm_version_string_without_hyphen_length] = ch;
+      spvm_version_string_without_hyphen_length++;
+    }
+  }
+  
+  char *end;
+  errno = 0;
+  double version_number = strtod(spvm_version_string_without_hyphen, &end);
+  assert(*end == '\0');
+  assert(errno == 0);
+  
+  return version_number;
+}
+
+const char* SPVM_API_get_version_string(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_id){
+  
+  int32_t version_string_id = env->api->runtime->get_class_version_string_id(env->runtime, class_id);
+  
+  const char* version_string = NULL;
+  if (version_string_id >= 0) {
+    version_string = env->api->runtime->get_name(env->runtime, version_string_id);
+  }
+  
+  return version_string;
+}
+
+double SPVM_API_get_version_number(SPVM_ENV* env, SPVM_VALUE* stack, int32_t class_id) {
+  
+  const char* version_string = env->get_version_string(env, stack, class_id);
+  
+  if (!version_string) {
+    return -1;
+  }
+  
+  int32_t version_string_length = strlen(version_string);
+  
+  char version_string_without_hyphen[20] = {0};
+  int32_t version_string_without_hyphen_length = 0;
+  for (int32_t i = 0; i < version_string_length; i++) {
+    char ch = version_string[i];
+    if (!(ch == '_')) {
+      version_string_without_hyphen[version_string_without_hyphen_length] = ch;
+      version_string_without_hyphen_length++;
+    }
+  }
+  
+  char *end;
+  errno = 0;
+  double version_number = strtod(version_string_without_hyphen, &end);
+  assert(*end == '\0');
+  assert(errno == 0);
+  
+  return version_number;
 }

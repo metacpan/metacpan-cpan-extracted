@@ -1,30 +1,36 @@
 Revision history for JSON-Schema-Tiny
 
+0.021     2023-04-22 17:25:12Z
+          - fix bad handling of empty patterns in "pattern",
+            "patternProperties" keywords
+          - use bignum calculations for any non-integer in "multipleOf", to
+            better handle overflows on older architectures
+
 0.020     2023-04-12 03:28:28Z
-         - update test results and exemptions for TJSA 1.019
+          - update test results and exemptions for TJSA 1.019
 
 0.019     2023-01-08 19:54:14Z
-         - fix warning when using a $ref to a URI with no fragment
-         - update test skip list for latest release of the test suite
+          - fix warning when using a $ref to a URI with no fragment
+          - update test skip list for latest release of the test suite
 
 0.018     2022-08-06 22:02:20Z
-         - update test skip list for latest release of the test suite
+          - update test skip list for latest release of the test suite
 
 0.017     2022-07-10 04:09:23Z
-         - fix 'experimental' prereq for older perls
+          - fix 'experimental' prereq for older perls
 
 0.016     2022-07-09 18:29:49Z
-         - avoid new experimental warning on 5.35.9
-         - the "specification_version" configuration option now accepts
-           values without "draft" in the name, to facilitate a new naming
-           convention used for future specification versions
+          - avoid new experimental warning on 5.35.9
+          - the "specification_version" configuration option now accepts
+            values without "draft" in the name, to facilitate a new naming
+            convention used for future specification versions
 
 0.015     2022-01-29 17:52:15Z
-         - pod fixes
+          - pod fixes
 
 0.014     2022-01-06 04:05:12Z
-         - updated error message for the "type" keyword to include the actual
-           type, as well as the expected type(s)
+          - updated error message for the "type" keyword to include the actual
+            type, as well as the expected type(s)
 
 0.013     2021-12-31 21:20:46Z
           - enable bignum mode when deserializing test data

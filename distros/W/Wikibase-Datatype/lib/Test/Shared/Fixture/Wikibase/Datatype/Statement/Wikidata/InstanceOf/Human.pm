@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::Human;
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 sub new {
 	my $class = shift;

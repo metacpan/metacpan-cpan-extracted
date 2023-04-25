@@ -1,9 +1,20 @@
 use 5.008003;
 use ExtUtils::MakeMaker;
 use ExtUtils::CppGuess;
- 
+
 my $guess = ExtUtils::CppGuess->new;
 my %cxx_options = $guess->makemaker_options;
+
+my $ccflags = "$Config::Config{ccflags} -DSIMDJSON_EXCEPTIONS=0 -DNDEBUG";
+
+# work around compilation issue on windows (invalid register for .seh_savexmm)
+# (https://stackoverflow.com/questions/43152633/invalid-register-for-seh-savexmm-in-cygwin)
+# (-fno-asynchronous-unwind-tables caused other problems)
+if ($^O eq 'MSWin32' and $guess->is_gcc() and $Config::Config{gccversion} =~ /^(\d+)\.(\d+)\./) {
+	if (($1 == 8 and $2 < 4) or ($1 < 8)) {
+		$ccflags .= " -ffixed-xmm$_" for 16..31;
+	}
+}
 
 WriteMakefile(
     dist	 => {
@@ -21,7 +32,7 @@ WriteMakefile(
     OBJECT => '$(O_FILES)',
     LD => $cxx_options{CC},
     OPTIMIZE => '-O3',
-    CCFLAGS => "$Config::Config{ccflags} -DSIMDJSON_EXCEPTIONS=0 -DNDEBUG -fno-asynchronous-unwind-tables",
+    CCFLAGS => $ccflags,
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {

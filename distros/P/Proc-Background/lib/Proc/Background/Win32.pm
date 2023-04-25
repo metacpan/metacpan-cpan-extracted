@@ -1,5 +1,5 @@
 package Proc::Background::Win32;
-$Proc::Background::Win32::VERSION = '1.31';
+$Proc::Background::Win32::VERSION = '1.32';
 # ABSTRACT: Windows-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -14,7 +14,7 @@ use Win32::ShellQuote ();
 
 sub _start {
   my ($self, $options)= @_;
-  my ($exe, $cmd, $cmdline, $err)= @{$options}{'exe','command'};
+  my ($cmd, $exe, $cmdline, $err)= @{$self}{'_command','_exe'};
 
   # If 'command' is a single string, treat it as system() would and assume
   # it should be split into arguments.  The first argument is then the
@@ -296,7 +296,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 COPYRIGHT AND LICENSE
 

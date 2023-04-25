@@ -26,7 +26,6 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "Pod::Usage" => 0,
     "constant" => 0,
-    "feature" => 0,
     "open" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +48,6 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Test2::V0" => 0,
   "constant" => 0,
-  "feature" => 0,
   "open" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## WebSocket Client & Server - ~/lib/WebSocket/Connection.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/09/13
-## Modified 2021/10/23
+## Modified 2023/04/21
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -13,6 +13,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    use vars qw( $VERSION );
     # Import constants
     use WebSocket qw( :ws );
     use parent qw( WebSocket );
@@ -25,12 +26,13 @@ BEGIN
     use URI;
     use WebSocket::Handshake::Server;
     use WebSocket::Frame;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 sub init
 {
     my $self = shift( @_ );
+    $self->{do_pong}       = \&pong,
     # Need to have this setup before, because calls to subprotocol depend on it
     $self->{handshake}     = WebSocket::Handshake::Server->new;
     $self->{max_recv_size} = eval{ WebSocket::Frame->new->max_payload_size } || 65536,
@@ -40,6 +42,7 @@ sub init
     $self->{on_disconnect} = sub{},
     $self->{on_handshake}  = sub{},
     $self->{on_origin}     = sub{1},
+    $self->{on_ping}       = sub{},
     $self->{on_pong}       = sub{},
     $self->{on_ready}      = sub{},
     $self->{on_utf8}       = sub{},
@@ -64,9 +67,6 @@ sub init
 sub disconnect
 {
     my( $self, $code, $reason ) = @_;
-    # XXX Remove once debugged
-    my $trace = $self->_get_stack_trace;
-    $self->message( 3, "Disconnecting remote client connection. Stack trace -> $trace" );
     return( $self ) if( $self->disconnecting || $self->disconnected );
     $self->disconnecting(1);
     
@@ -96,6 +96,8 @@ sub disconnected { return( shift->_set_get_boolean( 'disconnected', @_ ) ); }
 
 sub disconnecting { return( shift->_set_get_boolean( 'disconnecting', @_ ) ); }
 
+sub do_pong { return( shift->_set_get_code( 'do_pong', @_ ) ); }
+
 sub frame { return( shift->_set_get_object_without_init( 'frame', 'WebSocket::Frame', @_ ) ); }
 
 sub handshake { return( shift->_set_get_object_without_init( 'handshake', 'WebSocket::Handshake::Server', @_ ) ); }
@@ -110,7 +112,7 @@ sub http_error
     my( $code, $msg );
     if( ( @_ == 1 && ref( $_[0] ) ne 'HASH' ) || 
         # e.g.: 500 => { status => 'Oh my', message => 'Something went wrong' }
-        ( @__ == 2 && ref( $_[1] ) eq 'HASH' ) ||
+        ( @_ == 2 && ref( $_[1] ) eq 'HASH' ) ||
         # e.g. 500 => 'Internal error'
         ( @_ == 2 && !ref( $_[1] ) ) ||
         # e.g.: 500, status => 'Oh my!', message => 'Something went wrong'
@@ -216,6 +218,8 @@ sub on_handshake { return( shift->_set_get_code( 'on_handshake', @_ ) ); }
 
 sub on_origin { return( shift->_set_get_code( 'on_origin', @_ ) ); }
 
+sub on_ping { return( shift->_set_get_code( 'on_ping', @_ ) ); }
+
 sub on_pong { return( shift->_set_get_code( 'on_pong', @_ ) ); }
 
 sub on_ready { return( shift->_set_get_code( 'on_ready', @_ ) ); }
@@ -223,6 +227,10 @@ sub on_ready { return( shift->_set_get_code( 'on_ready', @_ ) ); }
 sub on_utf8 { return( shift->_set_get_code( 'on_utf8', @_ ) ); }
 
 sub origin { return( shift->_set_get_uri( 'origin', @_ ) ); }
+
+sub ping { return( shift->send( 'ping', @_ ) ); }
+
+sub pong { return( shift->send( 'pong', @_ ) ); }
 
 sub port { return( shift->_set_get_number( 'port', @_ ) ); }
 
@@ -238,7 +246,6 @@ sub recv
         my $ssl_done = $socket->accept_SSL;
         if( $socket->errstr )
         {
-            $self->message( 3, "SSL socket error: ", $socket->errstr );
             warnings::warn( "SSL socket error: ", $socket->errstr ) if( warnings::enabled( $self->server ) );
             if( $hs )
             {
@@ -261,7 +268,6 @@ sub recv
     my( $len, $data ) = ( 0, '' );
     if( !( $len = sysread( $socket, $data, 8192 ) ) )
     {
-        $self->message( 3, "Unable to read from socket, disconnecting: $!" );
         warnings::warn( "Unable to read from socket, disconnecting: $!") if( warnings::enabled( $self->server ) );
         if( $hs )
         {
@@ -277,7 +283,6 @@ sub recv
     # read remaining data
     $len = sysread( $socket, $data, 8192, length( $data ) ) while( $len >= 8192 );
 
-    $self->message( 3, "Received ", length( $data ), " bytes of data. Handshake done? ", ( $hs->is_done ? 'yes' : 'no' ) );
     
     if( $hs && !$hs->is_done )
     {
@@ -285,7 +290,6 @@ sub recv
         my $rv = $hs->parse( $data );
         if( !defined( $rv ) )
         {
-            $self->message( 3, "Handshake error occurred, disconnecting with code '", WS_PROTOCOL_ERROR, "': '", $hs->error->message, "'" );
             # $self->disconnect( WS_PROTOCOL_ERROR ); # 1002, protocol error
             $self->http_error({ code => 400, message => 'Handshake error' });
             return( $self->pass_error( $hs->error ) );
@@ -295,7 +299,6 @@ sub recv
         {
             my $req_path = $hs->request->uri->path;
             my $req_host = $hs->request->host;
-            $self->message( 3, "Parsing request is done with path '$req_path' and host '$req_host'" );
             my $uri = URI->new( ( $self->needs_ssl ? 'wss' : 'ws' ) . '://' . ( $req_host || $self->server->ip ) );
             # rfc6455 says those are the standard ports
             if( ( $self->needs_ssl && $self->server->port != 443 ) ||
@@ -308,7 +311,6 @@ sub recv
             
             my $orig = URI->new( $hs->request->origin );
             $self->origin( $orig );
-            $self->message( 3, "Origin is '$orig'" );
             my $origin_cb = $self->on_origin || sub{1};
             # Callback as the user may reject connection with 403 Forbidden if origin is not satisfactory
             # rfc6455, section 4.2.2 <https://datatracker.ietf.org/doc/html/rfc6455#section-4.2.2>
@@ -317,10 +319,8 @@ sub recv
                 local $SIG{ALRM} = sub{ die( "timeout\n" ); };
                 alarm(2);
                 my $orig_rv = $origin_cb->( $self, $orig, $hs );
-                $self->message( 3, "origin callback returned '$orig_rv'" );
                 unless( $orig_rv )
                 {
-                    $self->message( 3, "origin callback did not return a true value." );
                     $self->http_error({
                         code => 403,
                         message => "Unacceptable origin \"$orig\""
@@ -331,7 +331,6 @@ sub recv
             }
             catch( $e )
             {
-                $self->message( 3, "Error trying to execute the origin callback: $e" );
                 if( $e =~ /timeout/ )
                 {
                     $self->http_error({
@@ -350,14 +349,12 @@ sub recv
                 }
             }
             
-            $self->message( 3, "Checking version negotiation. Server version is '", $self->server->versions->join( ',' )->scalar, "'" );
             if( $self->server->versions->length )
             {
                 # Servers can have multiple supported versions
                 # but client has only one
                 my $ok_versions = $self->server->versions;
                 my $client_version = $hs->request->version;
-                $self->message( 3, "Checking server supported versions '", $ok_versions->join( ',' )->scalar, "' vs the client requested one -> '", $client_version->version, "'." );
                 if( !defined( $client_version ) || !length( "$client_version" ) )
                 {
                     $self->http_error({
@@ -406,14 +403,13 @@ sub recv
                 }
             }
             
-            $self->message( 3, "Version is all good. Checking extensions." );
             # Client has provided extension and we have some that we support.
             # Let's check
             my $client_ext = $hs->request->extensions;
             if( $client_ext->length &&
                 $self->server->extensions->length )
             {
-                my $server_ext = $self->server-extensions;
+                my $server_ext = $self->server->extensions;
                 my $ok_extensions = $self->new_array;
                 $client_ext->foreach(sub
                 {
@@ -435,12 +431,10 @@ sub recv
             }
             
             my $client_proto = $hs->request->subprotocol;
-            $self->message( 3, "Checking on client subprotocol -> '", $client_proto->join( "', '" ), "' against server supported ons -> '", $self->server->subprotocol->join( "', '" ), "'." );
             if( $client_proto->length && 
                 $self->server->subprotocol->length )
             {
                 my $ok_proto = $client_proto->intersection( $self->server->subprotocol );
-                $self->message( 3, "Resulting common subprotocols found -> '", $ok_proto->join( "', '" ), "'." );
                 $self->subprotocol( $ok_proto );
             }
             
@@ -462,18 +456,13 @@ sub recv
                 return( $self->error( "Socket is not connected." ) );
             }
             
-            $self->message( 3, "Sending out server handshake response: ", $hs->as_string );
             my $len = syswrite( $socket, $hs->as_string );
             if( !defined( $len ) )
             {
                 return( $self->error({ code => 500, message => "Unable to write handshake response to socket: $!" }) );
             }
-            # CORE::delete( $self->{handshake} );
-            # XXX We use is_done to check
-            # $self->handshake( undef() );
 
-            # $self->{frame} = WebSocket::Frame->new( max_payload_size => $self->max_recv_size );
-            # XXX Set frame object for this connection
+            # Set frame object for this connection
             my $frame = WebSocket::Frame->new( max_payload_size => $self->max_recv_size, debug => $self->debug ) || do
             {
                 $self->disconnect( WS_INTERNAL_SERVER_ERROR => 'Internal error' );
@@ -488,7 +477,6 @@ sub recv
             }
             catch( $e )
             {
-                $self->message( 3, "Error while trying to execute the 'ready' callback: $e" );
                 warnings::warn( "An error occurred while trying to call the ready callback: $e" ) if( warnings::enabled( $self->server ) );
             }
         }
@@ -498,65 +486,79 @@ sub recv
     # End of handshake
 
     my $frame = $self->frame;
-    $self->message( 3, "Processing ", length( $data ), " bytes of data -> '$data'" );
     $frame->append( $data );
-    $self->message( 3, "Frame debug value is '", $frame->debug, "'" );
 
     my $bytes;
     my $binary_cb = $self->on_binary || sub{};
     my $msg_cb = $self->on_utf8 || sub{};
+    my $ping_cb = $self->on_pong || sub{};
     my $pong_cb = $self->on_pong || sub{};
+    my $do_pong = $self->do_pong || sub{};
     while( defined( $bytes = $frame->next_bytes ) )
     {
-        $self->message( 3, "Server connection received ", length( $bytes ), " bytes of data -> '$bytes'" );
         if( $frame->is_binary )
         {
-            $self->message( 3, "Frame is of type binary" );
             try
             {
                 $binary_cb->( $self, $bytes );
             }
             catch( $e )
             {
-                $self->message( 3, "Error with callback to process binary message: $e" );
                 warnings::warn( "Error with callback to process binary message: $e" ) if( warnings::enabled( $self->server ) );
             }
         }
         elsif( $frame->is_text )
         {
-            $self->message( 3, "Frame is of type text" );
             try
             {
                 $msg_cb->( $self, Encode::decode( 'UTF-8', $bytes ) );
             }
             catch( $e )
             {
-                $self->message( 3, "Error with callback to process text message: $e" );
                 warnings::warn( "Error with callback to process text message: $e" ) if( warnings::enabled( $self->server ) );
+            }
+        }
+        elsif( $frame->is_ping )
+        {
+            try
+            {
+                $ping_cb->( $self, $bytes );
+            }
+            catch( $e )
+            {
+                warnings::warn( "Error with callback to process ping received from server: $e" ) if( warnings::enabled( $self->server ) );
+                return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
+            }
+
+            # RFC says we should perform a pong as soon as possible and return whatever they were sent
+            try
+            {
+                $do_pong->( $self, $bytes );
+            }
+            catch( $e )
+            {
+                warnings::warn( "Error with callback to execute a pong to the client in response to ping received: $e" ) if( warnings::enabled( $self->server ) );
+                return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
             }
         }
         elsif( $frame->is_pong )
         {
-            $self->message( 3, "Frame is of type pong" );
             try
             {
                 $pong_cb->( $self, $bytes );
             }
             catch( $e )
             {
-                $self->message( 3, "Error with callback to process pong: $e" );
-                warnings::warn( "Error with callback to process pong: $e" ) if( warnings::enabled( $self->server ) );
+                warnings::warn( "Error with callback to process pong received from client: $e" ) if( warnings::enabled( $self->server ) );
             }
         }
         # rfc6455, section 5.5.1:
         # "If an endpoint receives a Close frame and did not previously send a Close frame, the endpoint MUST send a Close frame in response. (When sending a Close frame in response, the endpoint typically echos the status code it received.)"
         elsif( $frame->is_close )
         {
-            $self->message( 3, "Received disconnection notice from client." );
             # A reply to our own disconnection
             if( $self->disconnecting )
             {
-                $self->message( 3, "Receiving client reply to our disconnection." );
                 $self->shutdown;
             }
             # We receive a disconnect notification. We reply back and shutdown
@@ -566,12 +568,10 @@ sub recv
                 if( length( "$bytes" ) )
                 {
                     my( $code, $reason ) = ( unpack( 'n', substr( $bytes, 0, 2, '' ) ), Encode::decode( 'UTF-8', $bytes ) );
-                    $self->message( 3, "Frame is of type close with code '$code' and reason '$reason'" );
                     $self->disconnect( $code );
                 }
                 else
                 {
-                    $self->message( 3, "Frame is of type close" );
                     $self->disconnect( WS_OK );
                 }
                 # And we disconnect
@@ -581,20 +581,17 @@ sub recv
         }
         else
         {
-            $self->message( 3, "Frame is of unknown type." );
         }
     }
-    $self->message( 3, "Done receiving data." );
 
     if( !$bytes && $frame->error )
     {
-        $self->message( 3, "Error occurred, disconnecting with code '", WS_PROTOCOL_ERROR, "': ", $frame->error );
         my $code = $frame->error->code || WS_PROTOCOL_ERROR;
         my $msg  = $frame->error->message || 'Protocol error';
         $self->disconnect( $code => $msg ); # 1002, protocol error
         return( $self );
     }
-    # XXX Returning number of bytes received or our object?
+    # Should we rather return the number of bytes received or our object?
     return( $self );
 }
 
@@ -610,12 +607,11 @@ sub send
         return(0);
     }
 
-    my $trace = $self->_get_stack_trace;
-    $self->message( 3, "Sending message of type '$type' -> '$data' with trace: $trace" );
     my $frame = WebSocket::Frame->new(
         type             => $type,
         max_payload_size => $self->max_send_size,
         debug            => $self->debug,
+        version          => $self->handshake->request->version,
     );
     $frame->append( $data ) if( defined( $data ) );
     
@@ -641,7 +637,6 @@ sub server { return( shift->_set_get_object_without_init( 'server', 'WebSocket::
 sub shutdown
 {
     my $self = shift( @_ );
-    $self->message( 3, "Shutting down this connection with remote client." );
     return( $self ) if( $self->disconnected );
     $self->server->disconnect( $self->{socket} );
     $self->disconnected(1);
@@ -666,7 +661,6 @@ sub subprotocol
                         ? shift( @_ )
                         : [CORE::split( /[[:blank:]\h]+/, $_[0] )]
                 : [@_];
-        $self->message( 3, "Called with -> ", sub{ $self->dump( $ref ) } );
         my $v = $self->_set_get_array_as_object( 'subprotocol', $ref ) || return( $self->pass_error );
         $self->handshake->response->subprotocol( $v ) if( !$self->handshake->is_done );
     }
@@ -675,7 +669,7 @@ sub subprotocol
 
 1;
 
-# XXX POD
+# NOTE POD
 __END__
 
 =encoding utf-8
@@ -689,6 +683,7 @@ WebSocket::Connection - WebSocket Server Connection
     use WebSocket qw( :ws );
     use WebSocket::Connection;
     my $conn = WebSocket::Connection->new(
+        do_pong         => \&pong,
         max_recv_size   => 65536,
         max_send_size   => 65536,
         nodelay         => 1,
@@ -696,6 +691,7 @@ WebSocket::Connection - WebSocket Server Connection
         on_disconnect   => \&on_close,
         on_handshake    => \&on_handshake,
         on_origin       => \&on_origin,
+        on_ping     	=> \&on_ping,
         on_pong     	=> \&on_pong,
         on_ready        => \&on_ready,
         on_utf8         => \&on_utf8_message,
@@ -709,11 +705,17 @@ WebSocket::Connection - WebSocket Server Connection
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
 Class initiated by L<WebSocket::Server> for each connection received.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Instantiate a new L<WebSocket::Connection> object. It takes an hash or hash reference of options. Each option matches their corresponding method described below. See each of their documentation for more information.
 
 =head1 METHODS
 
@@ -734,6 +736,10 @@ There are 2 status: C<disconnecting> and C<disconnected>. The former is set when
 =head2 disconnecting
 
 Set or get the boolean value indicating the connection is disconnecting.
+
+=head2 do_pong
+
+Set or get the code reference used to issue a C<pong>. By default this is set to L</pong>
 
 =head2 frame
 
@@ -792,7 +798,9 @@ Returns the currently set boolean value.
 
 =head2 on
 
-Provided with an array or array reference of event name and core reference pairs and this will set those event handlers.
+Provided with an hash or hash reference of event name and core reference pairs and this will set those event handlers.
+
+For acceptable event name, check out the supported methods starting with C<on_>. For example: C<binary>, C<disconnect>, C<handshake>, C<origin>, C<pong>, C<ready>, C<utf8>
 
 It returns the current object.
 
@@ -800,7 +808,9 @@ It returns the current object.
 
 Set or get the code reference that is triggered when a binary message is received from the client.
 
-The event handler is then passed the current connection object and the message itself.
+The event handler is then passed the current connection object and the binary message itself.
+
+Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 on_disconnect
 
@@ -812,7 +822,7 @@ The event handler is then passed the current connection object.
 
 Event handler called after the handshake between the client and the server has been performed.
 
-The handler is passed this connection object (L<WebSocket::Connection> and the handshake object (L<WebSocket::Handshake>)
+The handler is passed this connection object (L<WebSocket::Connection>) and the handshake object (L<WebSocket::Handshake>)
 
 You can get the requested uri using L</request_uri>, which will return a L<URI> object.
 
@@ -820,11 +830,23 @@ You can get the requested uri using L</request_uri>, which will return a L<URI> 
 
 Event handler called during the handshake between the client and the server. This is a convenient handler so that the caller can be called with the client submitted origin and decide to accept it by returning true, or reject it by return false.
 
+The callback is provided with this connection object, the origine value and the handshake object (L<WebSocket::Handshake>)
+
+=head2 on_ping
+
+A code reference that will be triggered when a C<ping> is received from the WebSocket client.
+
+See L</on_ping> and L<Mozilla documentation on ping and pong|https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#Pings_and_Pongs_The_Heartbeat_of_WebSockets>
+
+See also L</do_pong> to set the code reference to perform a C<pong>
+
 =head2 on_pong
 
-Event handler called when a ping is received from the client.
+A code reference that will be triggered when a C<pong> is received from the WebSocket client, most likely as a reply to our initial C<ping>.
 
 The event handler is then passed the current connection object.
+
+See L</on_ping> and L<Mozilla documentation on ping and pong|https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#Pings_and_Pongs_The_Heartbeat_of_WebSockets>
 
 See L<rfc6455 for more on this|https://datatracker.ietf.org/doc/html/rfc6455#section-5.5.2>
 
@@ -840,9 +862,19 @@ Event handler called when a text message is received from the client.
 
 The event handler is then passed the current connection object and the message itself, after having been utf8 decoded.
 
+Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
+
 =head2 origin
 
 Set or get the L<origin|https://datatracker.ietf.org/doc/html/rfc6455#page-50> of the client as set in the request header.
+
+=head2 ping
+
+Send a ping to the WebSocket server and returns the value returned by L</send>. It passes L</send> whatever extra argument was provided.
+
+=head2 pong
+
+Send a pong to the WebSocket server and returns the value returned by L</send>. It passes L</send> whatever extra argument was provided.
 
 =head2 port
 
@@ -920,11 +952,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Server>, L<WebSocket::Client>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

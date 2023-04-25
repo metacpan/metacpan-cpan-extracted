@@ -4,6 +4,7 @@ Changes.old
 MANIFEST
 COPYING
 Makefile.PL
+ppport.h
 simdjson_wrapper.h
 simdjson_wrapper.cpp
 simdjson.h

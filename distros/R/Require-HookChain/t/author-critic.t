@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/RHC.pm','lib/Require/HookChain.pm','lib/Require/HookChain/log/logger.pm','lib/Require/HookChain/log/stderr.pm','lib/Require/HookChain/munge/prepend.pm'];
+my $filenames = ['lib/RHC.pm','lib/Require/HookChain.pm','lib/Require/HookChain/log/logger.pm','lib/Require/HookChain/log/stderr.pm','lib/Require/HookChain/munge/prepend.pm','lib/Require/HookChain/timestamp/hires.pm','lib/Require/HookChain/timestamp/std.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

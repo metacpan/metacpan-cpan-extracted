@@ -131,7 +131,7 @@ Valid codes for the regions that make up ISO-3166-1 "GB" are:
 
 The source for this package is generated via a script, included with the
 distribution (`share/generate_date_holidays_gb.pl`). This downloads the
-latest JSON files from [http://www.gov.uk/](http://www.gov.uk/), and could be used to
+latest JSON files from [https://www.gov.uk/](https://www.gov.uk/), and could be used to
 update/alter the package if necessary.
 
 # SEE ALSO

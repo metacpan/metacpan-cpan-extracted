@@ -19,6 +19,7 @@ examples/error.pl
 examples/json.pl
 examples/mappable.pl
 examples/ones.pl
+examples/processes.pl
 examples/random.pl
 examples/yaml.pl
 examples/zeros.pl

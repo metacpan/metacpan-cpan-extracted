@@ -9,8 +9,13 @@
 		for ( var link of page.next_pages ) {
 			let link_id = link[0];
 			let link_desc = link[1];
+			let link_classes = 'list-group-item-primary';
+			if ( link[2].css_class == 'success' ) { link_classes = 'list-group-item-success'; }
+			if ( link[2].css_class == 'danger' )  { link_classes = 'list-group-item-danger';  }
+			if ( link[2].css_class == 'warning' ) { link_classes = 'list-group-item-warning'; }
+			if ( link[2].css_class == 'info' )    { link_classes = 'list-group-item-info';    }
 			$( "#next_pages" ).append(
-				'<button class="list-group-item list-group-item-action list-group-item-primary" x-data-page-id="' +
+				'<button class="list-group-item list-group-item-action ' + link_classes + '" x-data-page-id="' +
 				link_id +
 				'">' +
 				link_desc +
@@ -23,7 +28,7 @@
 	}
 
 	function get_page ( page_id ) {
-		$.ajax( API + '/story/' + STORY_ID + '/page/' + page_id, {
+		$.ajax( API + '/story/' + encodeURIComponent(STORY_ID) + '/page/' + encodeURIComponent(page_id), {
 			method: 'POST',
 			data: JSON.stringify( { "state": state } ),
 			contentType: 'application/json',

@@ -3,9 +3,9 @@ package App::SeismicUnixGui::misc::L_SU_global_constants;
 use Moose;
 our $VERSION = '0.0.1';
 use Carp;
+use Cwd;
 
 my $path4SeismicUnixGui;
-$path4SeismicUnixGui = $ENV{'SeismicUnixGui'};
 
 BEGIN {
 
@@ -15,81 +15,29 @@ BEGIN {
 
 	}
 	else {
-		my $dir = 'App-SeismicUnixGui/lib/App/SeismicUnixGui';
-		my $pathNfile =
-		  'App-SeismicUnixGui/lib/App/SeismicUnixGui/sunix/data/data_in.pm';
-		my $look  = `locate $pathNfile`;
-		my @field = split( $dir, $look );
+		# When environment variables can not be found in Perl
+		my $dir       = 'App/SeismicUnixGui';
+		my $pathNfile = $dir . '/sunix/data/data_in.pm';
+		my $look      = `locate $pathNfile`;
+		my @field     = split( $dir, $look );
 		$path4SeismicUnixGui = $field[0] . $dir;
-#		print(
-#"\nL22. Using default L_SU_global_constants, L_SU = $path4SeismicUnixGui\n"
-#		);
+
+		print(
+"\nL22. Warning: Using default L_SU_global_constants, L_SU = $path4SeismicUnixGui\n"
+		);
 	}
+
 }
-
-#BEGIN {
-#	# searching for directory: SeismicUnixGui
-#	my $count=1;
-#	foreach my $dir (@INC) {
-#
-#		if (   $dir =~ 'share'
-#			&& $dir =~ 'perl' )
-#		{
-#
-##			print $dir."\n";
-#
-#			my @look = `ls $dir`;
-#
-#			foreach my $test (@look) {
-#
-##				print $test;
-#
-#				if ($test =~/App/) {
-#
-#					if ($count >1) {
-##					  print("L_SU_global_constants, has $count App directories\n");
-#					}
-#
-#
-#					my @look2 = `ls $dir'/'$test`;
-#
-#					foreach my $test (@look2) {
-#
-#						if( $test =~ /SeismicUnixGui$/) {
-#
-#							$path4SeismicUnixGui = $dir.'/App/SeismicUnixGui';
-##         					print $path4SeismicUnixGui."\n";
-#							$count++;
-#
-#						}
-#					}
-#					last; # allow only first directory found
-#				}
-#			}
-#
-#		}
-#		else {
-#			# NADA
-#		}
-#
-#	}
-#}
-
-#my $path4SeismicUnixGui_lib = $L_SU;
-
-#   print ("L_SU_global_constants,SeismicUnixGui_lib = $path4SeismicUnixGui_lib\n");
-#	print("L_SU_global_constants,SeismicUnixGui = $path4SeismicUnixGui\n");
 
 =head2 private hash
 
 =cut
 
 my $L_SU_global_constants = {
-	_file_name          => '',
-	_program_name       => '',
+	_file_name    => '',
+	_program_name => '',
 
 };
-
 
 =head2 Default Tk settings
 
@@ -284,15 +232,15 @@ my @file_dialog_type;
 my @alias_help_menubutton_label;
 $alias_help_menubutton_label[0] = 'About',
 
-my $alias_help_menubutton_label_h = { _About => 'About', };
+  my $alias_help_menubutton_label_h = { _About => 'About', };
 
 # in spec files for when Data_PL_SEISMIC, may
 # not necessarily informed by DATA_DIR_IN and DATA_DIR_OUT
 $file_dialog_type[0] = 'Data_PL_SEISMIC',
 
-# in spec files, for when Data is informed 
-# by DATA_DIR_IN and DATA_DIR_OUT
-$file_dialog_type[1] = 'Data';
+  # in spec files, for when Data is informed
+  # by DATA_DIR_IN and DATA_DIR_OUT
+  $file_dialog_type[1] = 'Data';
 $file_dialog_type[2] = 'Path';
 $file_dialog_type[3] = 'Open';
 $file_dialog_type[4] = 'SaveAs';
@@ -390,8 +338,8 @@ my $var = {
 	_main_window_geometry          => '1100x750+12+5',
 	_medium_width                  => '100',
 	_message_box_geometry          => '400x250+400+400',
-	_min_clicks4save_button        => 19,  # fixing leaky param_widget memory
-	_min_clicks4flow_select        => 8,  # fixing leaky param_widget memory
+	_min_clicks4save_button        => 19,     # fixing leaky param_widget memory
+	_min_clicks4flow_select        => 8,      # fixing leaky param_widget memory
 	_ms2s                          => 0.001,
 	_my_arial                      => "-*-arial-normal-r-*-*-*-120-*-*-*-*-*-*",
 	_my_purple                     => 'MediumPurple1',
@@ -415,7 +363,7 @@ my $var = {
 	_one_character                 => '1',
 	_one_pixel                     => '1',
 	_one_pixel_borderwidth         => '1',
-	_program_title                 => 'SeismicUnixGui V0.82.0',
+	_program_title                 => 'SeismicUnixGui V0.82.3',
 	_project_selector_title        => 'Project Selector',
 	_l_suplot_title                => 'L_suplot',
 	_project_selector_title        => 'Project Selector',
@@ -816,12 +764,11 @@ my @sunix_datum_programs =
   ( "sudatumk2dr", "sudatumk2ds", "sukdmdcr", "sukdmdcs", );
 
 my @sunix_filter_programs = (
-	"subfilt", "succfilt", "sucddecon", "sudipfilt",
-	"sueipofi", "sufilter", "sufrac", "sufxdecon",
-	"sugroll",
-	"suk1k2filter", "sukfilter", "sulfaf", "sumedian",
-	"supef", "suphase", "suphidecon", "supofilt",
-	"supolar", "susmgauss2", "sutvband",
+	"subfilt",  "succfilt",     "sucddecon",  "sudipfilt",
+	"sueipofi", "sufilter",     "sufrac",     "sufxdecon",
+	"sugroll",  "suk1k2filter", "sukfilter",  "sulfaf",
+	"sumedian", "supef",        "suphase",    "suphidecon",
+	"supofilt", "supolar",      "susmgauss2", "sutvband",
 );
 
 my @sunix_header_programs = (
@@ -902,18 +849,16 @@ my @sunix_plot_programs = (
 );
 
 my @sunix_shapeNcut_programs = (
-	"suflip", "sugain", "sugprfb", "sukill", "sumute", "susort",
-	"susort",
-	"susplit", "suwind", "supad", "suvcat",
+	"suflip",  "sugain", "sugprfb", "sukill", "sumute", "susort",
+	"susplit", "suwind", "supad",   "suvcat",
 );
 
 my @sunix_statsMath_programs = (
-	"cpftrend", "entropy", "farith", "suacor",
-	"suacorfrac", "sualford", "suattributes", 
-	"suconv",
-	"sufwmix", "suhistogram", "suhrot", "suinterp",
-	"sumax", "sumean", "sumix", "suop",
-	"suop2", "suxcor", "suxmax",
+	"cpftrend",   "entropy",     "farith",       "suacor",
+	"suacorfrac", "sualford",    "suattributes", "suconv",
+	"sufwmix",    "suhistogram", "suhrot",       "suinterp",
+	"sumax",      "sumean",      "sumix",        "suop",
+	"suop2",      "suxcor",      "suxmax",
 );
 
 my @sunix_transform_programs = (
@@ -949,7 +894,9 @@ sub _get_global_libs {
 	# empty string is predefined herein
 	if ( length $path4SeismicUnixGui ) {
 
-		#			print("L_SU_global_constants my L_SU = $L_SU\n");
+		print(
+"L_SU_global_constants _get_global_libs L_SU = $path4SeismicUnixGui\n"
+		);
 
 		my $global_libs = {
 			_configs             => $path4SeismicUnixGui . '/configs',
@@ -972,10 +919,10 @@ sub _get_global_libs {
 	else {
 		my $path4SeismicUnixGui = _default_path();
 
-#		print("L1042, L_SU_global_constants, global_libs, L_SU was missing\n");
-#		print(
-#"\nL1044. L_SU_global_constants, Using default  L_SU = $path4SeismicUnixGui\n"
-#		);
+ #		print("L1042, L_SU_global_constants, global_libs, L_SU was missing\n");
+ #		print(
+ #"\nL1044. L_SU_global_constants, Using default  L_SU = $path4SeismicUnixGui\n"
+ #		);
 
 		my $global_libs = {
 			_configs             => $path4SeismicUnixGui . '/configs',
@@ -1008,14 +955,26 @@ sub _default_path {
 
 	my ($self) = @_;
 
-	my $dir = 'App-SeismicUnixGui/lib/App/SeismicUnixGui';
-	my $pathNfile =
-	  'App-SeismicUnixGui/lib/App/SeismicUnixGui/sunix/data/data_in.pm';
-	my $look  = `locate $pathNfile`;
-	my @field = split( $dir, $look );
+#	my $dir = 'App-SeismicUnixGui/lib/App/SeismicUnixGui';
+#	my $pathNfile =
+#	  'App-SeismicUnixGui/lib/App/SeismicUnixGui/sunix/data/data_in.pm';
+#	my $look  = `locate $pathNfile`;
+#	my @field = split( $dir, $look );
+#	$path4SeismicUnixGui = $field[0] . $dir;
+
+	my $dir       = 'App/SeismicUnixGui';
+	my $pathNfile = $dir . '/sunix/data/data_in.pm';
+	my $look      = `locate $pathNfile`;
+	my @field     = split( $dir, $look );
 	$path4SeismicUnixGui = $field[0] . $dir;
 
 	my $result = $path4SeismicUnixGui;
+
+	#	my $local_dir= getcwd();
+	#    my $up2dir = '/../../';
+	#	$path4SeismicUnixGui = $local_dir.$up2dir;
+	#	my $result = $path4SeismicUnixGui;
+	#	print("L_SU_global_constants,_default_path=$result\n");
 
 	return ($result);
 }
@@ -2198,7 +2157,9 @@ sub global_libs {
 	# empty string is predefined herein
 	if ( length $path4SeismicUnixGui ) {
 
-		#		print("L_SU_global_constants my L_SU = $path4SeismicUnixGui\n");
+#		print(
+#"1. L_SU_global_constants, global_libs,my L_SU = $path4SeismicUnixGui\n"
+#		);
 
 		my $global_libs = {
 			_configs             => $path4SeismicUnixGui . '/configs',
@@ -2217,13 +2178,11 @@ sub global_libs {
 
 		return ($global_libs);
 
-	}else {
+	}
+	else {
 		my $path4SeismicUnixGui = _default_path();
 
-#		print("L2526, L_SU_global_constants, global_libs, L_SU was missing\n");
-#		print(
-#"\nL22. Using default L_SU_global_constants, L_SU = $path4SeismicUnixGui\n"
-#		);
+#		print("2. L_SU_global_constants, global_libs,my L_SU = $path4SeismicUnixGui\n");
 
 		my $global_libs = {
 			_configs             => $path4SeismicUnixGui . '/configs',

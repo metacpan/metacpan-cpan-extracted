@@ -1,4 +1,0 @@
-3 su
-2 bin
-4 su
-7 bin

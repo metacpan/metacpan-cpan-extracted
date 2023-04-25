@@ -1,5 +1,10 @@
 Revision history for Future-IO
 
+0.14    2023-04-25
+        [CHANGES]
+         * Moved `Test::Future::IO::Impl` into its own distribution, so that
+           downstream packages don't have to runtime-depend on `Test2`
+
 0.13    2023-02-19
         [CHANGES]
          * Swap all unit tests from `Test::More` to `Test2::V0`

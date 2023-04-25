@@ -8,6 +8,10 @@ App::Greple::type - file type filter module for greple
 
     greple -Mdig -Mtype --type-xxxx ... --dig .
 
+=head1 VERSION
+
+Version 1.01
+
 =head1 DESCRIPTION
 
 This module filters search target files by given rule.  It is
@@ -27,27 +31,12 @@ line will be searched.
 Option B<--suffix> and B<--shebang> are defined in
 L<App::Greple::select> module.
 
-=head1 CONFIGURATION
+=head1 SHORT NAME
 
-=over 7
-
-=item B<-Mtype::config>(I<key>[=I<value>])
-
-B<-Mtype> module can be called with B<config> function to control
-module behavior.
-
-=over 4
-
-=item B<short>
-
-Calling as B<-Mtype::config(short)> or B<-Mtype::config=short>
+Calling module as B<-Mtype::config(short)> or B<-Mtype::config=short>
 introduce short name for rule options.  When short name mode is
 activated, all B<--type-xxxx> options can be used as B<--xxxx> as
 well.
-
-=back
-
-=back
 
 =head1 OPTIONS
 
@@ -139,7 +128,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro.
+Copyright 2021-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -147,7 +136,7 @@ it under the same terms as Perl itself.
 =cut
 
 package App::Greple::type;
-our $VERSION = "0.01";
+our $VERSION = "1.01";
 
 use v5.14;
 use warnings;

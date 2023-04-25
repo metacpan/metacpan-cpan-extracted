@@ -8,6 +8,8 @@ examples/check_lexeme_fail.pl
 examples/check_lexeme_success.pl
 examples/check_property_fail.pl
 examples/check_property_success.pl
+examples/check_sense_fail.pl
+examples/check_sense_success.pl
 examples/create_and_print_form.pl
 examples/create_and_print_item.pl
 examples/create_and_print_lexeme.pl
@@ -27,6 +29,7 @@ examples/create_and_print_value_monolingual.pl
 examples/create_and_print_value_property.pl
 examples/create_and_print_value_quantity1.pl
 examples/create_and_print_value_quantity2.pl
+examples/create_and_print_value_sense.pl
 examples/create_and_print_value_string.pl
 examples/create_and_print_value_time.pl
 examples/fixture_create_and_print_form_wd_dogczechsingular.pl
@@ -38,6 +41,13 @@ examples/fixture_create_and_print_snak_wd_givenname_douglas.pl
 examples/fixture_create_and_print_snak_wd_gramatical_gender_masculine.pl
 examples/fixture_create_and_print_snak_wd_image_dog.pl
 examples/fixture_create_and_print_snak_wd_instance_of_human.pl
+examples/fixture_create_and_print_snak_wd_instance_of_version_edition_or_translation.pl
+examples/fixture_create_and_print_snak_wd_instance_of_wikidata_entity.pl
+examples/fixture_create_and_print_snak_wd_item_for_this_sense_dog.pl
+examples/fixture_create_and_print_snak_wd_of_poem.pl
+examples/fixture_create_and_print_snak_wd_reference_url_fixture1.pl
+examples/fixture_create_and_print_snak_wd_sex_or_gender_male.pl
+examples/fixture_create_and_print_snak_wd_stated_in_viaf.pl
 examples/fixture_create_and_print_value_item_wd_dog.pl
 examples/fixture_create_and_print_value_item_wd_douglas.pl
 examples/fixture_create_and_print_value_item_wd_douglasadams.pl
@@ -122,6 +132,7 @@ lib/Wikibase/Datatype/Value/Item.pm
 lib/Wikibase/Datatype/Value/Monolingual.pm
 lib/Wikibase/Datatype/Value/Property.pm
 lib/Wikibase/Datatype/Value/Quantity.pm
+lib/Wikibase/Datatype/Value/Sense.pm
 lib/Wikibase/Datatype/Value/String.pm
 lib/Wikibase/Datatype/Value/Time.pm
 LICENSE
@@ -371,6 +382,7 @@ t/Wikibase-Datatype-Utils/04-check_entity.t
 t/Wikibase-Datatype-Utils/05-check_language.t
 t/Wikibase-Datatype-Utils/06-check_lexeme.t
 t/Wikibase-Datatype-Utils/07-check_property.t
+t/Wikibase-Datatype-Utils/08-check_sense.t
 t/Wikibase-Datatype-Value-Globecoordinate/01-use.t
 t/Wikibase-Datatype-Value-Globecoordinate/02-version.t
 t/Wikibase-Datatype-Value-Globecoordinate/03-new.t
@@ -405,6 +417,11 @@ t/Wikibase-Datatype-Value-Quantity/05-type.t
 t/Wikibase-Datatype-Value-Quantity/06-unit.t
 t/Wikibase-Datatype-Value-Quantity/07-upper_bound.t
 t/Wikibase-Datatype-Value-Quantity/08-value.t
+t/Wikibase-Datatype-Value-Sense/01-use.t
+t/Wikibase-Datatype-Value-Sense/02-version.t
+t/Wikibase-Datatype-Value-Sense/03-new.t
+t/Wikibase-Datatype-Value-Sense/04-type.t
+t/Wikibase-Datatype-Value-Sense/05-value.t
 t/Wikibase-Datatype-Value-String/01-use.t
 t/Wikibase-Datatype-Value-String/02-version.t
 t/Wikibase-Datatype-Value-String/03-new.t
@@ -549,6 +566,8 @@ xt/Wikibase-Datatype-Value-Property/01-pod_coverage.t
 xt/Wikibase-Datatype-Value-Property/02-pod.t
 xt/Wikibase-Datatype-Value-Quantity/01-pod_coverage.t
 xt/Wikibase-Datatype-Value-Quantity/02-pod.t
+xt/Wikibase-Datatype-Value-Sense/01-pod_coverage.t
+xt/Wikibase-Datatype-Value-Sense/02-pod.t
 xt/Wikibase-Datatype-Value-String/01-pod_coverage.t
 xt/Wikibase-Datatype-Value-String/02-pod.t
 xt/Wikibase-Datatype-Value-Time/01-pod_coverage.t

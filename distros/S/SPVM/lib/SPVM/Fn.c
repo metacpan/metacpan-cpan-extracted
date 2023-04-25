@@ -660,22 +660,51 @@ int32_t SPVM__Fn__get_version_string(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The class specified by the $class_name must be loaded", __func__, FILE_NAME, __LINE__);
   }
   
-  int32_t version_id = env->api->runtime->get_class_version_id(env->runtime, class_id);
+  const char* version_string = env->get_version_string(env, stack, class_id);
   
-  void* obj_version = NULL;
-  if (version_id >= 0) {
-    const char* version = env->api->runtime->get_name(env->runtime, version_id);
-    obj_version = env->new_string(env, stack, version, strlen(version));
+  void* obj_version_string = NULL;
+  if (version_string) {
+    obj_version_string = env->new_string(env, stack, version_string, strlen(version_string));
   }
   
-  stack[0].oval = obj_version;
+  stack[0].oval = obj_version_string;
   
   return 0;
 }
 
-int32_t SPVM__Fn__get_spvm_version(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Fn__get_spvm_version_number(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  const char* spvm_version = env->get_spvm_version(env, stack);
+  double spvm_version_number = env->get_spvm_version_number(env, stack);
+  
+  stack[0].dval = spvm_version_number;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__get_version_number(SPVM_ENV* env, SPVM_VALUE* stack) {
+  void* obj_class_name = stack[0].oval;
+  
+  if (!obj_class_name) {
+    return env->die(env, stack, "The $class_name must be defined", __func__, FILE_NAME, __LINE__);
+  }
+  
+  const char* class_name = env->get_chars(env, stack, obj_class_name);
+  
+  int32_t class_id = env->get_class_id(env, stack, class_name);
+  if (class_id < 0) {
+    return env->die(env, stack, "The class specified by the $class_name must be loaded", __func__, FILE_NAME, __LINE__);
+  }
+  
+  double version_number = env->get_version_number(env, stack, class_id);
+  
+  stack[0].dval = version_number;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__get_spvm_version_string(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  const char* spvm_version = env->get_spvm_version_string(env, stack);
   
   void* obj_spvm_version = env->new_string(env, stack, spvm_version, strlen(spvm_version));
   

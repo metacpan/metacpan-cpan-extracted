@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.09;
+our $VERSION = 0.12;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -44,16 +44,34 @@ sub print {
 	my $dt = _parse_date($obj->value);
 
 	my $printed_date;
+
+	# Day.
 	if ($obj->precision == 11) {
 		$printed_date = $dt->strftime("%e %B %Y");
 		$printed_date =~ s/^\s+//ms;
+
+	# Month.
 	} elsif ($obj->precision == 10) {
 		$printed_date = $dt->strftime("%B %Y");
+
+	# Year.
 	} elsif ($obj->precision == 9) {
 		$printed_date = $dt->strftime("%Y");
+		if ($obj->before || $obj->after) {
+			my $before = $obj->before ? $dt->year - $obj->before : $dt->year;
+			my $after = $obj->after ? $dt->year + $obj->after : $dt->year;
+			$printed_date .= " ($before-$after)";
+		}
+
+	# Decade.
+	} elsif ($obj->precision == 8) {
+		$printed_date = (int($dt->strftime('%Y') / 10) * 10).'s';
+
+	# TODO Better precision print?
+	# 0 - billion years, 1 - hundred million years, ..., 6 - millenia, 7 - century
+	} elsif ($obj->precision <= 7 && $obj->precision >= 0) {
+		$printed_date = $dt->strftime("%Y");
 	} else {
-		# TODO Precision
-		# 0 - billion years, 1 - hundred million years, ..., 6 - millenia, 7 - century, 8 - decade,
 		err "Unsupported precision '".$obj->precision."'.";
 	}
 
@@ -63,7 +81,7 @@ sub print {
 sub _parse_date {
 	my $date = shift;
 
-	my ($year, $month, $day) = ($date =~ m/^([\+\-]\d{4})\-(\d{2})\-(\d{2})T\d{2}:\d{2}:\d{2}Z$/ms);
+	my ($year, $month, $day) = ($date =~ m/^([\+\-]\d+)\-(\d{2})\-(\d{2})T\d{2}:\d{2}:\d{2}Z$/ms);
 	my $dt = DateTime->new(
 		'year' => int($year),
 		$month != 0 ? ('month' => $month) : (),
@@ -200,6 +218,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.12
 
 =cut

@@ -15,7 +15,7 @@ use DateTime::Format::Flexible;
 use namespace::clean;
 
 # ABSTRACT: Default spreadsheet-like set of functions and behavior
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 # No official versioned namespace yet, but this code is for when I publish one.
 
@@ -48,8 +48,9 @@ our $VERSION = '0.07'; # VERSION
 #@Language::FormulaEngine::Namespace::Default::V0::ISA= ( __PACKAGE__ );
 
 
+my @mark_pure;
 *fn_sum= *List::Util::sum0;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES(\&fn_sum, 'Pure');
+push @mark_pure, qw( fn_sum );
 sub simplify_sum {
 	my ($self, $node)= @_;
 	my ($const, @unknown)= (0);
@@ -83,7 +84,7 @@ sub perlgen_negative {
 }
 
 *fn_mul= *List::Util::product;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES(\&fn_mul, 'Pure');
+push @mark_pure, qw( fn_mul );
 sub simplify_mul {
 	my ($self, $node)= @_;
 	my ($const, @unknown)= (1);
@@ -276,7 +277,7 @@ sub fn_na :Pure {
 *fn_acot= *Math::Trig::acot;
 *fn_asin= *Math::Trig::asin;
 *fn_atan= *Math::Trig::atan;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_abs, \&fn_acos, \&fn_acot, \&fn_asin, \&fn_atan;
+push @mark_pure, qw( fn_abs fn_acos fn_acot fn_asin fn_atan );
 
 sub fn_atan2 :Pure {
 	# Perl differs in argument order from popular spreadsheet programs
@@ -302,7 +303,7 @@ sub fn_base :Pure {
 *fn_cos= *CORE::cos;
 *fn_degrees= *Math::Trig::rad2deg;
 *fn_exp= *CORE::exp;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_cos, \&fn_degrees, \&fn_exp;
+push @mark_pure, qw( fn_cos fn_degrees fn_exp );
 
 sub fn_fact :Pure {
 	my $n= int($_[0]);
@@ -313,7 +314,7 @@ sub fn_fact :Pure {
 
 *fn_min= *List::Util::min;
 *fn_max= *List::Util::max;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_min, \&fn_max;
+push @mark_pure, qw( fn_min fn_max );
 sub fn_mod :Pure {
 	my ($num, $modulo)= @_;
 	$modulo+0 or die ErrNUM("MOD($num, $modulo): can't claculate modulus-0");
@@ -321,7 +322,7 @@ sub fn_mod :Pure {
 }
 
 *fn_pi= *Math::Trig::pi;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_pi;
+push @mark_pure, qw( fn_pi );
 
 sub fn_round :Pure {
 	my ($num, $digits)= @_;
@@ -356,7 +357,7 @@ sub fn_power :Pure {
 *fn_sin= *CORE::sin;
 *fn_sqrt= *CORE::sqrt;
 *fn_tan= *Math::Trig::tan;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_sin, \&fn_sqrt, \&fn_tan;
+push @mark_pure, qw( fn_sin fn_sqrt fn_tan );
 
 
 *fn_char= *CORE::chr;
@@ -368,7 +369,7 @@ sub fn_clean {
 *fn_code= *CORE::ord;
 *fn_upper= *CORE::uc;
 *fn_lower= *CORE::lc;
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_char, \&fn_code, \&fn_upper, \&fn_lower;
+push @mark_pure, qw( fn_char fn_code fn_upper fn_lower );
 
 sub fn_replace :Pure {
 	@_ == 4 or die ErrInval("REPLACE() takes 4 arguments");
@@ -386,7 +387,7 @@ sub fn_concatenate :Pure {
 *fn_concat= *fn_concatenate;
 *fn_join= *CORE::join;
 
-__PACKAGE__->MODIFY_CODE_ATTRIBUTES($_, 'Pure') for \&fn_substr, \&fn_len, \&fn_join;
+push @mark_pure, qw( fn_substr fn_len fn_join );
 
 sub fn_find :Pure {
 	my ($needle, $haystack, $ofs)= @_;
@@ -507,6 +508,8 @@ if ($] < 5.016) {
 	}
 }
 
+__PACKAGE__->MODIFY_CODE_ATTRIBUTES(__PACKAGE__->can($_), 'Pure')
+	for @mark_pure;
 
 1;
 
@@ -522,7 +525,7 @@ Language::FormulaEngine::Namespace::Default - Default spreadsheet-like set of fu
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

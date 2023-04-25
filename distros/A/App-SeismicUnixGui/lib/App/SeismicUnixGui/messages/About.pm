@@ -1,14 +1,14 @@
 package App::SeismicUnixGui;
 
-$VERSION = '0.82.0';
+$VERSION = '0.82.3';
 use strict;
 use warnings;
 
-=head2 NAME
+=head1 NAME
 
 App::SeismicUnixGui - A graphical user interface for Seismic Unix
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 SeismicUnixGui (alpha) is a graphical user interface (GUI) 
 to select parameters for Seismic Unix (SU) modules. 
@@ -18,12 +18,28 @@ and signal processing.
 Perl/Tk is a mature, well-documented and free, 
 object-oriented graphical user interface for Perl. 
 
-=head2 EXTRA PACKAGES
+=head1 ENVIRONMENTAL VARIABLES
+
+It is advisable to already have you environment variables
+properly defined. That is you should already have active the
+following definitions in your ".bashrc" file. For example:
+
+#for using a SeismicUnixGui installed via cpan  
+
+export SeismicUnixGui=/usr/local/share/perl/5.34.0/App/SeismicUnixGui 
+ 
+export SeismicUnixGui_script=$SeismicUnixGui/script  
+
+export PATH=$PATH::$SeismicUnixGui_script  
+
+export PERL5LIB=$PERL5LIB:$SeismicUnixGui  
+
+=head1 EXTRA PACKAGES
 
 If you want to additional fortran and c packages
 run the following instruction post-installation:
 
-sudo bash post_install_scripts.sh
+bash post_install_scripts.sh
 
 If you can not find this file, then look for it with any of the
 these instructions:
@@ -33,3 +49,5 @@ A.
 
 B.
   locate post_install_scripts.sh
+
+=head2 SeismicUnixGui Project Examples

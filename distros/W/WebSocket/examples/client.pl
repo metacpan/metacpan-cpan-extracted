@@ -4,10 +4,16 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use open ':std' => ':utf8';
     use WebSocket::Client;
+    use AnyEvent::Handle;
+    
     our $DEBUG = 3;
 };
+
+use strict;
+use warnings;
 
 {
     # ws://localhost:8080?csrf=token
@@ -21,7 +27,8 @@ BEGIN
         on_utf8         => \&on_message,
         on_send         => \&on_send,
         origin          => 'http://localhost',
-        debug       =   > $DEBUG,
+        debug           => $DEBUG,
+        version         => 13,
     }) || die( WebSocket::Client->error );
     print( "Client object initiated. Now trying to start connecting.\n" );
     $ws->connect() || die( $ws->error );

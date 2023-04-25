@@ -3,7 +3,7 @@ package Wikibase::Datatype::Struct;
 use strict;
 use warnings;
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 1;
 
@@ -26,6 +26,18 @@ serialized via JSON to MediaWiki.
 
 =over
 
+=item L<Wikibase::Datatype::Struct::Form>
+
+Wikibase form structure serialization.
+
+=item L<Wikibase::Datatype::Struct::Item>
+
+Wikibase item structure serialization.
+
+=item L<Wikibase::Datatype::Struct::Lexeme>
+
+Wikibase lexeme structure serialization.
+
 =item L<Wikibase::Datatype::Struct::Mediainfo>
 
 Wikibase mediainfo structure serialization.
@@ -38,9 +50,17 @@ Wikibase mediainfo snak structure serialization.
 
 Wikibase mediainfo statement structure serialization.
 
+=item L<Wikibase::Datatype::Struct::Property>
+
+Wikibase property structure serialization.
+
 =item L<Wikibase::Datatype::Struct::Reference>
 
 Wikibase reference structure serialization.
+
+=item L<Wikibase::Datatype::Struct::Sense>
+
+Wikibase sense structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Sitelink>
 
@@ -64,31 +84,35 @@ Wikibase value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::Globecoordinate>
 
-Wikibase globe coordinate structure serialization.
+Wikibase globe coordinate value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::Item>
 
-Wikibase item structure serialization.
+Wikibase item value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::Monolingual>
 
-Wikibase monolingual structure serialization.
+Wikibase monolingual value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::Property>
 
-Wikibase property structure serialization.
+Wikibase property value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::Quantity>
 
-Wikibase quantity structure serialization.
+Wikibase quantity value structure serialization.
+
+=item L<Wikibase::Datatype::Struct::Value::Sense>
+
+Wikibase sense value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::String>
 
-Wikibase string structure serialization.
+Wikibase string value structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Value::Time>
 
-Wikibase time structure serialization.
+Wikibase time value structure serialization.
 
 =back
 
@@ -104,12 +128,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

@@ -2,9 +2,9 @@
 package Require::HookChain;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-07'; # DATE
+our $DATE = '2023-02-08'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -127,7 +127,7 @@ Require::HookChain - Chainable require hook
 
 =head1 VERSION
 
-This document describes version 0.006 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-07.
+This document describes version 0.008 of Require::HookChain (from Perl distribution Require-HookChain), released on 2023-02-08.
 
 =head1 SYNOPSIS
 
@@ -224,6 +224,18 @@ Usage:
 
 Get or set source code content. Will return undef if source code has not been
 found or set.
+
+=head1 FAQ
+
+=head2 Loading a hook does nothing!
+
+Make sure you use a hook this way:
+
+ use Require::HookChain 'hookname'; # correct
+
+instead of:
+
+ use Require::HookChain::hookname; # INCORRECT
 
 =head1 HOMEPAGE
 

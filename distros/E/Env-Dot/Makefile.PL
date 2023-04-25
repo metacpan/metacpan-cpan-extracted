@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Read environment variables from .env file",
-  "AUTHOR" => "'Mikko Koivunalho <mikkoi\@cpan.org>'",
+  "AUTHOR" => "Mikko Koivunalho <mikkoi\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -32,11 +32,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Cwd" => 0,
     "File::Basename" => 0,
     "File::Spec" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t t/env-dot-public/*.t"
   }
@@ -45,6 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Cwd" => 0,
   "Data::Dumper" => 0,
   "English" => 0,
   "Exporter" => 0,

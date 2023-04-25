@@ -147,7 +147,7 @@ NIR - Northern Ireland
 
 The source for this package is generated via a script, included with the
 distribution (C<share/generate_date_holidays_gb.pl>). This downloads the
-latest JSON files from L<http://www.gov.uk/>, and could be used to
+latest JSON files from L<https://www.gov.uk/>, and could be used to
 update/alter the package if necessary.
 
 =head1 SEE ALSO

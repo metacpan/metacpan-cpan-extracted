@@ -1,11 +1,10 @@
 NAME
-    Require::HookChain::source::metacpan - Prepend a piece of code to module
-    source
+    Require::HookChain::source::metacpan - Load module source from MetaCPAN
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Require::HookChain::source::metacpan (from Perl distribution
-    Require-HookChain-source-metacpan), released on 2023-02-07.
+    Require-HookChain-source-metacpan), released on 2023-02-08.
 
 SYNOPSIS
     In Perl code:
@@ -31,6 +30,8 @@ SEE ALSO
     Require::HookChain
 
     Require::Hook::Source::MetaCPAN
+
+    Require::HookChain::source::lcpan
 
 AUTHOR
     perlancar <perlancar@cpan.org>

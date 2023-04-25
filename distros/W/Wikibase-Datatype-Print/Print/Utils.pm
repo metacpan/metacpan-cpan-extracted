@@ -11,7 +11,7 @@ Readonly::Array our @EXPORT_OK => qw(print_aliases print_common print_descriptio
 	print_forms print_glosses print_labels print_references print_senses
 	print_sitelinks print_statements);
 
-our $VERSION = 0.09;
+our $VERSION = 0.12;
 
 sub print_aliases {
 	my ($obj, $opts_hr, $alias_cb) = @_;
@@ -246,7 +246,7 @@ Returns array with pretty print strings.
          From print_common():
                  Multiple values are printed to one line.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=utils_print_aliases.pl
 
@@ -269,6 +269,29 @@ Returns array with pretty print strings.
  # Output:
  # Aliases:
  #   pes domácí (cs)
+
+=head1 EXAMPLE2
+
+=for comment filename=utils_print_descriptions.pl
+
+ use strict;
+ use warnings;
+
+ use Unicode::UTF8 qw(encode_utf8);
+ use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog;
+ use Wikibase::Datatype::Print::Utils qw(print_descriptions);
+ use Wikibase::Datatype::Print::Value::Monolingual;
+
+ my $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
+ my @ret = print_descriptions($obj, {'lang' => 'cs'},
+         \&Wikibase::Datatype::Print::Value::Monolingual::print);
+
+ # Print.
+ print encode_utf8(join "\n", @ret);
+ print "\n";
+
+ # Output:
+ # Description: domácí zvíře (cs)
 
 =head1 DEPENDENCIES
 
@@ -294,6 +317,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.12
 
 =cut

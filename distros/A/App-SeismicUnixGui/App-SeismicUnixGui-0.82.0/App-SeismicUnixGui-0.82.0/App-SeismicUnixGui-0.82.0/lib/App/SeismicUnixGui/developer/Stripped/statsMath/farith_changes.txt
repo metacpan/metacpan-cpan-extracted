@@ -1,3 +1,0 @@
-2 bin
-6 bin
-7 bin

@@ -14,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTTP::Headers Module::Generic );
+    use vars qw( $VERSION );
     use Nice::Try;
     use Want;
     our $VERSION = 'v0.1.0';
@@ -31,7 +32,6 @@ sub header
 {
     my $self = shift( @_ );
     my @args = @_;
-    # $self->message( 3, "Arguments received are: ", sub{ $self->dump( \@args ) });
     # Set mode
     if( scalar( @args ) > 1 )
     {
@@ -56,9 +56,7 @@ sub header
     
     try
     {
-        # $self->message( 3, "Calling HTTP::Headers->header with args ", sub{ $self->dump( \@args ) });
         my @rv = $self->SUPER::header( @args );
-        # $self->message( 3, "\@rv contains: ", sub{ $self->dump( \@rv ) }, " for initial arguments: ", sub{ $self->dump( \@args )});
         # Convert
         for( my $i = 0; $i < scalar( @rv ); $i++ )
         {
@@ -73,10 +71,8 @@ sub header
         }
         if( !scalar( @rv ) )
         {
-            # $self->message( 3, "HTTP::Headers->header returned empty/null" );
             @rv = ( $self->new_scalar( undef ) );
         }
-        # $self->message( 3, "Returning -> ", sub{ $self->dump( \@rv ) });
         return( @rv ) if( wantarray() );
         return( $rv[0] ) if( @rv <= 1 );
         return( join( ", ", @rv ) );
@@ -88,7 +84,7 @@ sub header
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -245,11 +241,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Request>, L<WebSocket::Response>, L<HTTP::Headers>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

@@ -11,13 +11,14 @@ use Wikibase::Datatype::Struct::Value::Item;
 use Wikibase::Datatype::Struct::Value::Monolingual;
 use Wikibase::Datatype::Struct::Value::Property;
 use Wikibase::Datatype::Struct::Value::Quantity;
+use Wikibase::Datatype::Struct::Value::Sense;
 use Wikibase::Datatype::Struct::Value::String;
 use Wikibase::Datatype::Struct::Value::Time;
 use Wikibase::Datatype::Value;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -41,6 +42,8 @@ sub obj2struct {
 		$struct_hr = Wikibase::Datatype::Struct::Value::Property::obj2struct($obj);
 	} elsif ($type eq 'quantity') {
 		$struct_hr = Wikibase::Datatype::Struct::Value::Quantity::obj2struct($obj, $base_uri);
+	} elsif ($type eq 'sense') {
+		$struct_hr = Wikibase::Datatype::Struct::Value::Sense::obj2struct($obj, $base_uri);
 	} elsif ($type eq 'string') {
 		$struct_hr = Wikibase::Datatype::Struct::Value::String::obj2struct($obj);
 	} elsif ($type eq 'time') {
@@ -75,6 +78,8 @@ sub struct2obj {
 			$obj = Wikibase::Datatype::Struct::Value::Item::struct2obj($struct_hr);
 		} elsif ($struct_hr->{'value'}->{'entity-type'} eq 'property') {
 			$obj = Wikibase::Datatype::Struct::Value::Property::struct2obj($struct_hr);
+		} elsif ($struct_hr->{'value'}->{'entity-type'} eq 'sense') {
+			$obj = Wikibase::Datatype::Struct::Value::Sense::struct2obj($struct_hr);
 		} else {
 			err "Entity type '$struct_hr->{'value'}->{'entity-type'}' is unsupported.";
 		}
@@ -142,6 +147,8 @@ Returns Wikibase::Datatype::Value instance.
 
 =head1 EXAMPLE1
 
+=for comment filename=obj2struct_value.pl
+
  use strict;
  use warnings;
 
@@ -175,6 +182,8 @@ Returns Wikibase::Datatype::Value instance.
  # }
 
 =head1 EXAMPLE2
+
+=for comment filename=struct2obj_value.pl
 
  use strict;
  use warnings;
@@ -285,12 +294,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

@@ -8,7 +8,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::SexOrGender::Male;
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 sub new {
 	my $class = shift;

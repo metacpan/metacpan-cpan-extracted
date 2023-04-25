@@ -86,7 +86,7 @@ stuff). Or you can combine those features in whatever way you like.
 
 package JSON::SIMD;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 our $JSON_XS_VERSION = '4.03';
 our @ISA = qw(Exporter);
 
@@ -640,6 +640,32 @@ to their default values.
 C<get_boolean_values> will return both C<$false> and C<$true> values, or
 the empty list when they are set to the default.
 
+=item $json->core_bools([$enable])
+
+=item $enabled = $json->get_core_bools
+
+If C<$enable> is true (or missing), then subsequent C<decode>s will produce
+standard perl boolean values. Equivalent to calling:
+
+    $json->boolean_values(!!0, !!1)
+
+C<get_core_bools> will return true if this has been set. On perl 5.36 or newer,
+it will also return true if the boolean values have been set to perl's core
+booleans using the boolean_values method.
+
+(See also C<encode_core_bools> for the encode counterpart of this.)
+
+=item $json = $json->encode_core_bools ([$enable])
+
+=item $enabled = $json->get_encode_core_bools
+
+If C<$enable> is true (or missing), then subsequent C<encode> operations
+will recognize Perl's special boolean values !!0 and !!1 (or C<builtin::false>
+and C<builtin::true>) and encode them as JSON C<false> and C<true>, respectively.
+
+Be warned though, this only works on perl 5.36 or newer. With older perls
+this option does nothing.
+
 =item $json = $json->filter_json_object ([$coderef->($hashref)])
 
 When C<$coderef> is specified, it will be called from C<decode> each
@@ -1168,11 +1194,17 @@ in order to avoid the loss of precision.
 
 =item true, false
 
-These JSON atoms become C<Types::Serialiser::true> and
+By default, these JSON atoms become C<Types::Serialiser::true> and
 C<Types::Serialiser::false>, respectively. They are overloaded to act
 almost exactly like the numbers C<1> and C<0>. You can check whether
 a scalar is a JSON boolean by using the C<Types::Serialiser::is_bool>
 function (after C<use Types::Serialier>, of course).
+
+You can also use the C<boolean_values> method to supply your own true
+and false values for decoding, or the C<core_bools> method to decode to
+Perl's standard booleans (the special values !!0 or !!1, also available
+as the aliases C<false> and C<true> from the (experimental) C<builtin>
+module since perl 5.36).
 
 =item null
 
@@ -1235,13 +1267,25 @@ and C<Types::Serialiser::true> to improve readability.
 
 These special values from the L<Types::Serialiser> module become JSON true
 and JSON false values, respectively. You can also use C<\1> and C<\0>
-directly if you want.
+directly if you want. Also see the C<builtin booleans> section below.
 
 =item blessed objects
 
 Blessed objects are not directly representable in JSON, but C<JSON::SIMD>
 allows various ways of handling objects. See L<OBJECT SERIALISATION>,
 below, for details.
+
+=item builtin booleans
+
+Since perl 5.36 it is possible to have "stable boolean tracking", that is,
+the special !!0 and !!1 boolean-ish values can retain their boolean-ish
+nature even after assignment into a variable. There are also (experimental)
+C<true> and C<false> aliases available from the C<builtin> module.
+
+If the C<encode_core_bools> option is enabled, these special values
+will be encoded to the JSON atoms C<true> and C<false>.
+
+This option only works in perl 5.36 or newer.
 
 =item simple scalars
 
@@ -1803,7 +1847,8 @@ floating point numbers, so all you need to do is to avoid large integers.
 
 =item * objects must not have duplicate keys
 
-This is trivially done, as C<JSON::XS> does not allow duplicate keys.
+This is trivially done, as C<JSON::SIMD> does not generate objects with
+duplicate keys.
 
 =item * do not generate scalar JSON texts, use C<< ->allow_nonref (0) >>
 
@@ -1831,7 +1876,7 @@ interested.
 C<JSON::SIMD> uses the L<Types::Serialiser> module to provide boolean
 constants. That means that the JSON true and false values will be
 comaptible to true and false values of other modules that do the same,
-such as L<JSON::XS>, L<JSON::PP> and L<CBOR::XS>.
+such as L<JSON::XS> and L<CBOR::XS>.
 
 
 =head1 INTEROPERABILITY WITH OTHER JSON DECODERS

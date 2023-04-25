@@ -81,7 +81,7 @@ subtest holidays => sub {
     is_deeply holidays(2030), {}, "No data for year 2030 - outside range";
 
 #like exception { holidays(2000) }, qr/No holiday data for year 2000/, "dies ok outside date range";
-#like exception { holidays(2020) }, qr/No holiday data for year 2020/, "dies ok outside date range";
+#like exception { holidays(2030) }, qr/No holiday data for year 2030/, "dies ok outside date range";
 
     is_deeply holidays(2013),
         {

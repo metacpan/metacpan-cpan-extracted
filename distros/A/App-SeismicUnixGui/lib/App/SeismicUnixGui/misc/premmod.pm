@@ -19,9 +19,9 @@ This program module is used to read a SU file,
 creates the file: 
 datammod
 which is a binary fortran file containing the SU file with no headers, and that
-can be read by program mmodpg.  It also create the ascii file: 
+can be read by program mmodpg.  It also creates the ascii file: 
 parmmod  
-containi ng
+containing
 basic parameters of the SU file (ntr,ns,dt) also used by mmodpg.
 
 =head4
@@ -164,7 +164,7 @@ sub out_header_values {
 		  qx(sugethw key=dt output=geom <  $premmod->{_inbound_su} | sed 1q);
 		my $ntr = $size / ( $ns * 4 + 240 );
 
-#		can not print the output to ticks. DO not know why
+#		can not print the output to ticks. Do not know why
 # print("premmod,out_header_values, size=$size number of samples=$ns SI=$dt Traces=$ntr \n\n");
 # 		print("premmod,out_header_values, size=$size \n\n");
 
@@ -199,7 +199,7 @@ sustrip parameter values
 =cut
 
 		$sustrip->clear();
-		$sustrip->ftn( quotemeta(0) );
+		$sustrip->ftn( quotemeta(1) ); # fortran binary output
 		$sustrip->head( quotemeta('/dev/null') );
 		$sustrip->outpar( quotemeta('/dev/null') );
 		$sustrip[1] = $sustrip->Step();
@@ -239,6 +239,7 @@ and release lock file after writing
 				$run->flow( \$flow[1] );
 
 =head2 LOG FLOW(s)
+
 to screen and FILE
 
 =cut

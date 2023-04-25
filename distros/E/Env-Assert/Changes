@@ -1,5 +1,9 @@
 Revision history for Env-Assert
 
+0.007     2023-04-23 22:45:02+02:00 Europe/Stockholm
+          * Replace say with print
+          * Add envassert.self-contained to MANIFEST.SKIP.
+
 0.006     2023-02-27 22:15:15+01:00 Europe/Stockholm
           * Clean up documentation.
           * Clean up dist.ini a little.

@@ -1,5 +1,15 @@
 Revision history for Data-Domain
 
+1.11 24.04.2023
+  - "no warnings 'experimental'" only for perl >= 5.018
+
+1.10 23.04.2023
+  - no longer use smartmatch for perl >= 5.37.10
+  - removed 'node_from_path'; backwards compat through Data::Reach
+
+1.09 21.04.2023
+  - fix one special case of warning 'redundant' that was omitted in the 1.07 fix
+
 1.08 10.03.2023
   - remove internal uses of smartmatch and 'when'
   - drop support for "~~" overloading if perl version >= 5.037

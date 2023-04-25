@@ -6,14 +6,15 @@ META.json
 META.yml
 Makefile.PL
 README
-envdot.self-contained
 lib/Env/Dot.pm
 lib/Env/Dot/Functions.pm
+lib/Env/Dot/ScriptFunctions.pm
 script/envdot
 t/env-dot-functions-private.t
 t/env-dot-private.t
 t/env-dot-public/dotenv
 t/env-dot-public/env-dot-public.t
+t/env-dot-scriptfunctions.t
 xt/author/distmeta.t
 xt/author/eol.t
 xt/author/pod-coverage.t

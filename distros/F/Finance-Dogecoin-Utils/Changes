@@ -1,2 +1,6 @@
+1.20230424.0253 2023-04-23 19:53:28-07:00 America/Los_Angeles
+    - add exportaddresses proxy command
+    - minor internal configuration and re-use improvements
+
 1.20221211.2353 2022-12-11 15:53:18-08:00 America/Los_Angeles
     - first version released upon an unsuspecting world

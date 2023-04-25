@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 11;
+use Test::More 'tests' => 12;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Value::Globecoordinate;
@@ -11,6 +11,7 @@ use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 use Wikibase::Datatype::Value::Property;
 use Wikibase::Datatype::Value::Quantity;
+use Wikibase::Datatype::Value::Sense;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 use Wikibase::Datatype::Struct::Value;
@@ -106,6 +107,23 @@ is_deeply(
 		'type' => 'quantity',
 	},
 	'Quantity: Output of obj2struct() subroutine.',
+);
+
+# Test.
+$obj = Wikibase::Datatype::Value::Sense->new(
+	'value' => 'L34727-S1',
+);
+$ret_hr = Wikibase::Datatype::Struct::Value::obj2struct($obj);
+is_deeply(
+	$ret_hr,
+	{
+		'value' => {
+			'entity-type' => 'sense',
+			'id' => 'L34727-S1',
+		},
+		'type' => 'wikibase-entityid',
+	},
+	'Sense: Output of obj2struct() subroutine.',
 );
 
 # Test.

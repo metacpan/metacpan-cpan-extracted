@@ -1,0 +1,83 @@
+{
+   "abstract" : "Build system for Arduino programs",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "arduino",
+      "embedded",
+      "arm",
+      "avr",
+      "build",
+      "make",
+      "compiler",
+      "source"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-ArduinoBuilder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "test_coverage" : {
+         "description" : "Run `make cover` to compute test coverage",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Devel::Cover" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         },
+         "suggests" : {
+            "Perl::Tidy" : "20220613",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test::Pod" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/arduino_builder/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/arduino_builder"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

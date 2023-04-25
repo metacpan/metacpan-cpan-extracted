@@ -14,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $QUOTE_REGEXP $TYPE_REGEXP $TOKEN_REGEXP $TEXT_REGEXP );
     our $VERSION = 'v0.1.0';
     use overload (
         '""' => 'as_string',
@@ -49,7 +50,6 @@ sub new_from_multi
     my $self = shift( @_ );
     my $s    = shift( @_ );
     return( $self->error( 'Header value is required' ) ) if( !defined( $s ) || !length( $s ) );
-    my $sep  = @_ ? shift( @_ ) : ';';
     my @parts = ();
     my $i = 0;
     foreach( split( /(\\.)|\,/, $s ) ) 
@@ -78,7 +78,6 @@ sub new_from_header
     {
         defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
     }
-    # $self->message( 3, "Field parts are: ", sub{ $self->dumper( \@parts ) } );
     my $header_val = shift( @parts );
     my $obj = WebSocket::HeaderValue->new( $header_val );
 
@@ -86,7 +85,6 @@ sub new_from_header
     {
         $frag =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//g;
         my( $attribute, $value ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $frag, 2 );
-        # $self->message( 3, "\tAttribute is '$attribute' and value '$value'. Fragment processed was '$frag'" );
         $value =~ s/^\"|\"$//g;
         # Check character string and length. Should not be more than 255 characters
         # http://tools.ietf.org/html/rfc1341
@@ -175,7 +173,7 @@ sub reset
 sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -252,11 +250,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Request>, L<WebSocket::Response>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

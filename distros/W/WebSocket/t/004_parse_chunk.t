@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     # use Test::More tests => 22;
     use Test::More;
     use WebSocket::Common;

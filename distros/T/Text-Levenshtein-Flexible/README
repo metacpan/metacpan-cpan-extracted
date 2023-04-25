@@ -1,4 +1,4 @@
-Text-Levenshtein-Flexible version 0.05
+Text-Levenshtein-Flexible version 0.10
 ======================================
 
 Yet another Levenshtein module written in C, but a tad more flexible than the rest.
@@ -28,7 +28,7 @@ None
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014 by Matthias Bethke
+Copyright (C) 2014-2023 by Matthias Bethke
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.14.2 or, at your option,

@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::WWW;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001003';
+our $VERSION   = '0.001004';
 
 use constant DISTRIBUTION => 'Story-Interact-WWW';
 
@@ -16,6 +16,8 @@ use Story::Interact::State ();
 use Text::Markdown::Hoedown;
 
 sub startup ( $self ) {
+
+	$self->log->info( 'Story::Interact::State->VERSION = ' . Story::Interact::State->VERSION );
 
 	$self->secrets( [ __PACKAGE__ . '/' . $VERSION ] );
 
@@ -90,13 +92,26 @@ sub startup ( $self ) {
 		$self->routes->post( '/api/story/:story/page/:page' )->to(
 			cb => sub ($c) {
 				my $story_id     = $c->stash( 'story' );
+				my $page_id      = $c->stash( 'page' );
+				$c->log->info("Request for page `$page_id` from story `$story_id`");
 				my $story_config = $self->config( 'story' )->{$story_id};
 				my $page_source  = $story_config->{page_source};
 				my $munge_state  = $story_config->{state_munge} // sub {};
 				my $munge        = $story_config->{data_munge}  // sub {};
 				my $state = Story::Interact::State->load( $c->req->json( '/state' ) );
 				$munge_state->( $c, $state );
-				my $page = $page_source->get_page( $state, $c->stash( 'page' ) );
+				
+				if ( $page_id =~ /\A(.+)\?(.+)\z/ms ) {
+					$page_id = $1;
+					require URI::Query;
+					my $params = URI::Query->new( $2 )->hash;
+					$state->params( $params );
+				}
+				else {
+					$state->params( {} );
+				}
+				
+				my $page = $page_source->get_page( $state, $page_id );
 				my %data = (
 					%$page,
 					state => $state->dump,

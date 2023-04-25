@@ -10,8 +10,8 @@ use Test::More import => ['!pass'];
 		set plugins => { JWT => { secret => undef }};
 	}
 
-        eval "use Dancer2::Plugin::JWT";
-        like $@, qr/JWT cannot be used without a secret/;
+    eval "use Dancer2::Plugin::JWT";
+    like $@, qr/JWT cannot be used without a secret/;
 
 }
 

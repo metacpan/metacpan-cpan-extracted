@@ -10,7 +10,7 @@ use Exporter qw(import);
 use base qw(Data::Domain);
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
-$VERSION = '1.30';
+$VERSION = '1.41';
 
 @EXPORT = ();
 @EXPORT_OK = (
@@ -29,8 +29,8 @@ A sub-class of Data::Domain which provides functions and objects
 to let Data::Domain use the same
 functions as Params::Validate::Dependencies.
 
-NB now this only works on perl 5.10 and higher as Data::Domain started
-using some features of more modern perls.
+NB now this only works on perl 5.18 and higher as Data::Domain uses
+some features of more modern perls.
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2011 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

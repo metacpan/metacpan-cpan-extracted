@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,6 +49,7 @@
             "Module::Generic" : "v0.16.4",
             "Nice::Try" : "v1.1.2",
             "POSIX" : "1.53_01",
+            "Regexp::IPv6" : "0",
             "Scalar::Util" : "1.56",
             "Socket" : "2.031",
             "URI" : "5.09",
@@ -59,11 +60,14 @@
             "parent" : "0",
             "perl" : "5.014000",
             "strict" : "0.238",
+            "vars" : "0",
             "warnings" : "1.44"
          }
       },
       "test" : {
          "requires" : {
+            "Test2::IPC" : "1.302190",
+            "Test2::V0" : "0.000145",
             "Test::More" : "1.302182",
             "Test::Pod" : "1.52",
             "utf8" : "0",
@@ -74,13 +78,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://git.deguest.jp/jack/WebSocket/issues"
+         "web" : "https://gitlab.com/jackdeguest/WebSocket/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://git.deguest.jp/jack/WebSocket"
+         "web" : "https://gitlab.com/jackdeguest/WebSocket"
       }
    },
-   "version" : "v0.1.5",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.1.6",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

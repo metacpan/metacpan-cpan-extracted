@@ -2,8 +2,8 @@ NAME
     Data::Sah::Filter - Filtering for Data::Sah
 
 VERSION
-    This document describes version 0.015 of Data::Sah::Filter (from Perl
-    distribution Data-Sah-Filter), released on 2022-10-18.
+    This document describes version 0.016 of Data::Sah::Filter (from Perl
+    distribution Data-Sah-Filter), released on 2023-04-25.
 
 SYNOPSIS
      use Data::Sah::Filter qw(gen_filter);
@@ -96,6 +96,31 @@ VARIABLES
      % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
          -MData::Sah::Filter=gen_filter -E'my $c = gen_filter(...)'
 
+FUNCTIONS
+  gen_filter
+    Usage:
+
+     gen_filter(%args) -> any
+
+    Generate filter code.
+
+    This is mostly for testing. Normally the filter rules will be used from
+    Data::Sah.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filter_names* => *array[str]*
+
+        (No description)
+
+    *   return_type => *str* (default: "val")
+
+        (No description)
+
+    Return value: (any)
+
 ENVIRONMENT
   LOG_SAH_FILTER_CODE => bool
     Set default for $Log_Filter_Code.
@@ -141,7 +166,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,3 +1,33 @@
+0.29 2023-04-24T18:31:06+02:00
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::ReferenceURL::Fixture1.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::SexOrGender::Male.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::StatedIn::VIAF.
+ - Add Wikibase::Datatype::Languages to Wikibase::Datatype doc.
+ - Fix datetime check.
+ - Fix MANIFEST file for sense value.
+ - Improve Wikibase::Datatype doc links.
+
+0.28 2023-04-23T10:34:23+02:00
+ - Add check_sense() to Utils.
+ - Add support of wikibase-sense to Snak.
+ - Add Wikibase::Datatype::Value::Sense class.
+ - Fix doc in Wikibase::Datatype::Value::Property.
+
+0.27 2023-04-22T19:14:08+02:00
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::VersionEditionOrTranslation.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::WikidataProperty.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::ItemForThisSense::Dog.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem.
+ - Improve example comments.
+ - Update language codes.
+
 0.26 2023-04-21T20:18:03+02:00
  - Add check_datetime() utility.
  - Add date time check to Wikibase::Datatype::Value::Time.

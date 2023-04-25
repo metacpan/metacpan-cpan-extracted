@@ -246,7 +246,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "is_read_only",
     "make_read_only",
     "copy",
-    "has_impl",
+    "can",
     "class_id",
     "error_code",
     "set_error_code",
@@ -1449,7 +1449,7 @@ int32_t SPVM_OP_get_mem_id(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_ISA:
     case SPVM_OP_C_ID_IS_TYPE:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
-    case SPVM_OP_C_ID_HAS_IMPL:
+    case SPVM_OP_C_ID_CAN:
     {
       return 0;
     }
@@ -1520,7 +1520,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_IF:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
     case SPVM_OP_C_ID_IS_READ_ONLY:
-    case SPVM_OP_C_ID_HAS_IMPL:
+    case SPVM_OP_C_ID_CAN:
     case SPVM_OP_C_ID_CLASS_ID:
     case SPVM_OP_C_ID_ERROR_CODE:
     case SPVM_OP_C_ID_SET_ERROR_CODE:
@@ -1786,19 +1786,34 @@ SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_field_a
   return op_field_access;
 }
 
-SPVM_OP* SPVM_OP_build_field_impl(SPVM_COMPILER* compiler, SPVM_OP* op_has_impl, SPVM_OP* op_var, SPVM_OP* op_name) {
+SPVM_OP* SPVM_OP_build_can(SPVM_COMPILER* compiler, SPVM_OP* op_can, SPVM_OP* op_var, SPVM_OP* op_name) {
   
-  if (!op_name) {
-    op_name = SPVM_OP_new_op_name(compiler, "", op_var->file, op_var->line);
+  if (op_name->id == SPVM_OP_C_ID_CONSTANT) {
+    SPVM_OP* op_constant = op_name;
+    SPVM_CONSTANT* constant = op_constant->uv.constant;
+    SPVM_TYPE* constant_type = constant->type;
+    const char* constant_chars = (const char*)constant->value.oval;
+    int32_t is_empty_string = 0;
+    if (SPVM_TYPE_is_string_type(compiler, constant_type->basic_type->id, constant_type->dimension, constant_type->flag)) {
+      if (strcmp(constant_chars, "") == 0) {
+        is_empty_string = 1;
+      }
+    }
+    
+    if (!is_empty_string) {
+      SPVM_COMPILER_error(compiler, "If the right operand of the can operator is a constant value, it must be an empty string \"\" at %s line %d", op_name->file, op_name->line);
+    }
+    
+    op_name = SPVM_OP_new_op_name(compiler, "", op_name->file, op_name->line);
   }
   
-  SPVM_OP_insert_child(compiler, op_has_impl, op_has_impl->last, op_var);
-  SPVM_OP_insert_child(compiler, op_has_impl, op_has_impl->last, op_name);
+  SPVM_OP_insert_child(compiler, op_can, op_can->last, op_var);
+  SPVM_OP_insert_child(compiler, op_can, op_can->last, op_name);
 
   SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_var->file, op_var->line);
   SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_var->file, op_var->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_has_impl);
+  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_can);
 
   return op_assign;
 }
@@ -2023,7 +2038,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     while ((op_decl = SPVM_OP_sibling(compiler, op_decl))) {
       // version declaration
       if (op_decl->id == SPVM_OP_C_ID_VERSION_DECL) {
-        if (class->version) {
+        if (class->version_string) {
           SPVM_COMPILER_error(compiler, "The version has already been declared at %s line %d", op_decl->file, op_decl->line);
           break;
         }
@@ -2033,77 +2048,56 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         const char* version_string = version_string_constant->value.oval;
         int32_t version_string_length = version_string_constant->string_length;
         
-        // Version string normalization - Remove "_"
-        int32_t version_string_normalized_length = 0;
-        char* version_string_normalized = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, version_string_length + 1);
-        {
-          for (int32_t version_string_index = 0; version_string_index < version_string_length; version_string_index++) {
-            char ch = version_string[version_string_index];
-            if (!(ch == '_')) {
-              version_string_normalized[version_string_normalized_length++] = ch;
-            }
-          }
-        }
-        
         // Version string validation
-        int32_t is_invalid_version_string = 0;
         {
           int32_t dot_count = 0;
           int32_t digits_after_dot = 0;
-          for (int32_t version_string_normalized_index = 0; version_string_normalized_index < version_string_normalized_length; version_string_normalized_index++) {
-            char ch = version_string_normalized[version_string_normalized_index];
+          int32_t invalid_char = 0;
+          for (int32_t version_string_index = 0; version_string_index < version_string_length; version_string_index++) {
+            char ch = version_string[version_string_index];
             
-            if (!(ch == '.' || isdigit(ch))) {
-              SPVM_COMPILER_error(compiler, "A character in a version number must be a number or \".\" at %s line %d", op_decl->file, op_decl->line);
-              is_invalid_version_string = 1;
+            if (!(ch == '.' || isdigit(ch) || ch == '_')) {
+              invalid_char = 1;
               break;
             }
             
             if (ch == '.') {
               dot_count++;
-              if (!(dot_count <= 1)) {
-                SPVM_COMPILER_error(compiler, "The number of \".\" in a version number must be less than or equal to 1 at %s line %d", op_decl->file, op_decl->line);
-                is_invalid_version_string = 1;
-                break;
-              }
             }
             
             if (dot_count > 0 && isdigit(ch)) {
               digits_after_dot++;
             }
           }
-
-          if (!isdigit(version_string_normalized[0])) {
-            SPVM_COMPILER_error(compiler, "A version number must begin with a number at %s line %d", op_decl->file, op_decl->line);
-            is_invalid_version_string = 1;
+          
+          if (invalid_char) {
+            SPVM_COMPILER_error(compiler, "A character in a version string must be a number or \".\" or \"_\" at %s line %d", op_decl->file, op_decl->line);
             break;
           }
           
-          if (!isdigit(version_string_normalized[version_string_normalized_length - 1])) {
-            SPVM_COMPILER_error(compiler, "A version number must end with a number at %s line %d", op_decl->file, op_decl->line);
-            is_invalid_version_string = 1;
+          if (!isdigit(version_string[0])) {
+            SPVM_COMPILER_error(compiler, "A version string must begin with a number at %s line %d", op_decl->file, op_decl->line);
             break;
           }
           
-          if (is_invalid_version_string) {
+          if (!isdigit(version_string[version_string_length - 1])) {
+            SPVM_COMPILER_error(compiler, "A version string must end with a number at %s line %d", op_decl->file, op_decl->line);
+            break;
+          }
+          
+          if (!(dot_count <= 1)) {
+            SPVM_COMPILER_error(compiler, "The number of \".\" in a version string must be less than or equal to 1 at %s line %d", op_decl->file, op_decl->line);
             break;
           }
           
           if (!(digits_after_dot % 3 == 0)) {
-            SPVM_COMPILER_error(compiler, "The length of characters after \".\" in a version number must be divisible by 3 at %s line %d", op_decl->file, op_decl->line);
-            is_invalid_version_string = 1;
+            SPVM_COMPILER_error(compiler, "The length of characters after \".\" in a version string must be divisible by 3 at %s line %d", op_decl->file, op_decl->line);
+            break;
           }
         }
         
-        if (!is_invalid_version_string) {
-          // Assertion: Check the version string is parsed as a double value
-          char* end;
-          strtod(version_string_normalized, &end);
-          assert(*end == '\0');
-          
-          SPVM_CONSTANT_STRING_new(compiler, version_string_normalized, version_string_normalized_length);
-          class->version = version_string_normalized;
-        }
+        SPVM_CONSTANT_STRING_new(compiler, version_string, version_string_length);
+        class->version_string = version_string;
       }
       // use statement
       else if (op_decl->id == SPVM_OP_C_ID_USE) {
@@ -2494,6 +2488,30 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       }
     }
     
+    // Add an default INIT block
+    int32_t has_init_block = 0;
+    for (int32_t i = 0; i < class->methods->length; i++) {
+      SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
+      if (strcmp(method->name, "INIT") == 0) {
+        has_init_block = 1;
+        break;
+      }
+    }
+    if (class->category == SPVM_CLASS_C_CATEGORY_CLASS && !has_init_block) {
+      SPVM_OP* op_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_INIT, op_class->file, op_class->line);
+      
+      // Statements
+      SPVM_OP* op_list_statements = SPVM_OP_new_op_list(compiler, op_class->file, op_class->line);
+      
+      // Block
+      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, op_class->file, op_class->line);
+      SPVM_OP_insert_child(compiler, op_block, op_block->last, op_list_statements);
+      
+      SPVM_OP* op_method = SPVM_OP_build_init_block(compiler, op_init, op_block);
+      
+      SPVM_LIST_push(class->methods, op_method->uv.method);
+    }
+    
     // Method declarations
     for (int32_t i = 0; i < class->methods->length; i++) {
       SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
@@ -2622,9 +2640,9 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   return op_class;
 }
 
-SPVM_OP* SPVM_OP_build_version_decl(SPVM_COMPILER* compiler, SPVM_OP* op_version_decl, SPVM_OP* op_version_number_string) {
+SPVM_OP* SPVM_OP_build_version_decl(SPVM_COMPILER* compiler, SPVM_OP* op_version_decl, SPVM_OP* op_version_string) {
   
-  SPVM_OP_insert_child(compiler, op_version_decl, op_version_decl->last, op_version_number_string);
+  SPVM_OP_insert_child(compiler, op_version_decl, op_version_decl->last, op_version_string);
   
   return op_version_decl;
 }
@@ -3076,6 +3094,24 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   method->op_method = op_method;
   
   op_method->uv.method = method;
+  
+  return op_method;
+}
+
+SPVM_OP* SPVM_OP_build_init_block(SPVM_COMPILER* compiler, SPVM_OP* op_init, SPVM_OP* op_block) {
+    
+  SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_init->file, op_init->line);
+  SPVM_CONSTANT_STRING* method_name_string = SPVM_CONSTANT_STRING_new(compiler, "INIT", strlen("INIT"));
+  const char* method_name = method_name_string->value;
+  SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "INIT", op_init->file, op_init->line);
+  SPVM_OP* op_void_type = SPVM_OP_new_op_void_type(compiler, op_init->file, op_init->line);
+  
+  SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, op_init->file, op_init->line);
+  SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, op_init->file, op_init->line);
+  SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
+  
+  int32_t is_init = 1;
+  SPVM_OP_build_method(compiler, op_method, op_method_name, op_void_type, NULL, op_list_attributes, op_block, NULL, NULL, is_init, 0);
   
   return op_method;
 }

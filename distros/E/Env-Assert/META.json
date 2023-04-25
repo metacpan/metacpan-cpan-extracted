@@ -54,7 +54,6 @@
             "Getopt::Long" : "0",
             "Pod::Usage" : "0",
             "constant" : "0",
-            "feature" : "0",
             "open" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -71,7 +70,7 @@
    "provides" : {
       "Env::Assert" : {
          "file" : "lib/Env/Assert.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -86,7 +85,7 @@
          "web" : "https://github.com/mikkoi/env-assert.git"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Ivan Bessarabov <ivan@bessarabov.ru>"
    ],

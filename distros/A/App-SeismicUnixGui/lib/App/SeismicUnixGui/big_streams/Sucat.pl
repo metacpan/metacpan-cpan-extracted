@@ -95,7 +95,7 @@ output file will automatically be reformatted for input into
 GUI EXAMPLE:    
     
 Note that a list can only be used when the values of the prior
-7 parameters are blank.
+6 parameters are blank.
 
 An output name is also required.
 --Exclude values for first 7 parameters in GUI. 
@@ -103,8 +103,7 @@ An output name is also required.
 
     first_file_number_in               =               
     last_file_number_in                =                
-    number_of_files_in                 =                  
-    output_file_name                   =           
+    number_of_files_in                 =                            
     input_suffix                       =               
     input_name_prefix                  =                  
     input_name_extension               =              
@@ -112,7 +111,13 @@ An output name is also required.
     output_file_name                   =    
     alternative_inbound_directory      =  [$PL_SEISMIC]             
     alternative_outbound_directory     =  [$PL_SEISMIC]  
-         
+  
+  
+  and exmample list
+  
+  25.su
+  26.su
+  27.su       
 
 ---------------------------------------------------------------------------
 
@@ -189,7 +194,7 @@ CASE 3
 
 =head2 NOTES 
 
-   The input and output default directories is $PL_SEISMIC
+   The input and output default directories are $PL_SEISMIC
    but these can be overridden by the values of the 
    alternative directories
     

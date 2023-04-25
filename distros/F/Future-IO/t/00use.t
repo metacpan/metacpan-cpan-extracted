@@ -8,7 +8,5 @@ use Test2::V0;
 require Future::IO;
 require Future::IO::ImplBase;
 
-require Test::Future::IO::Impl;;
-
 pass "Modules loaded";
 done_testing;

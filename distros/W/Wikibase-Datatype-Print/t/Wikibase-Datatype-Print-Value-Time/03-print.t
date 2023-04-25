@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 use Wikibase::Cache;
 use Wikibase::Cache::Backend::Basic;
@@ -67,8 +67,6 @@ $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
 is($ret, '1940 (Q1985727)', 'Get printed value. Only QID.');
 
 # Test.
-SKIP: {
-skip "Format with before and after is unsupported.", 1;
 # https://www.mediawiki.org/w/index.php?title=Wikibase/DataModel#Examples
 $obj = Wikibase::Datatype::Value::Time->new(
 	'after' => 5,
@@ -77,8 +75,7 @@ $obj = Wikibase::Datatype::Value::Time->new(
 	'value' => '+00000001850-00-00T00:00:00Z',
 );
 $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
-is($ret, '1846-1855 (Q1985727)', 'Get printed value. Only QID.');
-};
+is($ret, '1850 (1846-1855) (Q1985727)', 'Get printed value. Only QID.');
 
 # Test.
 $obj = Wikibase::Datatype::Value::Time->new(
@@ -87,3 +84,19 @@ $obj = Wikibase::Datatype::Value::Time->new(
 );
 $ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
 is($ret, '1 January -1 (Q1985727)', 'Get printed value. Only QID.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Time->new(
+	'precision' => 8,
+	'value' => '+1851-00-00T00:00:00Z',
+);
+$ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
+is($ret, '1850s (Q1985727)', 'Get printed value. Only QID.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Time->new(
+	'precision' => 8,
+	'value' => '-1851-00-00T00:00:00Z',
+);
+$ret = Wikibase::Datatype::Print::Value::Time::print($obj, {});
+is($ret, '-1850s (Q1985727)', 'Get printed value. Only QID.');

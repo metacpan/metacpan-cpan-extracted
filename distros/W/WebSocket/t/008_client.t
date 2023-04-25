@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use open ':std' => ':utf8';
     use IO::Socket::INET;
     use POSIX qw( WNOHANG WIFEXITED WEXITSTATUS WIFSIGNALED );
@@ -115,8 +116,8 @@ subtest 'callback on new data received' => sub
             skip( 'mmap not available on this machine', 1 );
         }
         
-        # XXX
-        my $file = tempfile({ unlink => 0, debug => $DEBUG + 2, use_file_map => 1 });
+        # my $file = tempfile({ unlink => 0, debug => $DEBUG + 2, use_file_map => 1 });
+        my $file = tempfile({ unlink => 0, use_file_map => 1 });
         $file->mmap( my $read, 2048, '+<' ) || do
         {
             diag( "Error trying to create a mmap: ", $file->error );
@@ -244,11 +245,16 @@ sub init_server
                     diag( "SERVER: Binary message received -> $msg" ) if( $DEBUG );
                     $conn->send_binary( $msg );
                 },
-                pong => sub
+                ping => sub
                 {
                     my( $conn, $msg ) = @_;
                     diag( "Ping received -> $msg" ) if( $DEBUG );
                     $conn->send_binary( 'pong' );
+                },
+                pong => sub
+                {
+                    my( $conn, $msg ) = @_;
+                    diag( "Pong received -> $msg" ) if( $DEBUG );
                 },
                 disconnect => sub
                 {

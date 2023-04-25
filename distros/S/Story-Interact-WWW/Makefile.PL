@@ -40,7 +40,7 @@ my $meta = {
                                          },
                           },
   "provides"           => {
-                            "Story::Interact::WWW" => { file => "lib/Story/Interact/WWW.pm", version => 0.001003 },
+                            "Story::Interact::WWW" => { file => "lib/Story/Interact/WWW.pm", version => 0.001004 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -56,7 +56,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Story-Interact-WWW/project",
                           },
-  "version"            => 0.001003,
+  "version"            => 0.001004,
   "x_provides_scripts" => { si_www => { file => "bin/si_www" } },
 };
 

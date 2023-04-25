@@ -38,6 +38,7 @@ use Moose;
 our $VERSION = '0.0.2';
 use Cwd;
 use Carp;
+use File::Spec;
 
 # important variables defined
 my $null = 'null';
@@ -46,6 +47,7 @@ my $starting_point          = '/';
 my $script_file             = 'post_install_env.pl';
 my $script_path;
 my $path2find               = "*/App/SeismicUnixGui/script";
+my $SeismicUnixGui;
 my $default_answer          = 'y';
 
 $ARGV[0] = $null;
@@ -58,7 +60,7 @@ print("\n\tHOW TO SET UP YOUR WORKING ENVIRONMENT\n");
 # Searching
 print(" Please be patient.\n");
 print(" Examining the system ... for $path2find\n");
-print(" Hint: use the one with \"perl\". \n");
+print(" Hint: use the one with \"perl\". in its path.\n");
 
 # remove pre-exisiting files
 unlink($fifo);
@@ -123,7 +125,13 @@ my $SCRIPT_PATH= $script_path;
 
 if ( length $SCRIPT_PATH ) {
 	print "From: $SCRIPT_PATH\n";
-		
+	my @folders = File::Spec->splitdir($SCRIPT_PATH);
+	print("post_install_env.pl, @folders\n");
+	my $number_of_folders = scalar @folders;
+	my $all_but_last      = $number_of_folders -2;
+	$SeismicUnixGui = join('/',@folders[0..$all_but_last]);
+	print("post_install_env.pl, $SeismicUnixGui\n");
+			
 	my $outbound = ".temp";
 	my $bash_file2run = 'set_env_variables.sh';
 	print ("Writing to: $outbound;\n\n");
@@ -131,22 +139,24 @@ if ( length $SCRIPT_PATH ) {
 	  or die("File $outbound error");
 
 	printf OUT ("#!/bin/bash\n");
+	printf OUT ("export SeismicUnixGui=$SeismicUnixGui\n");	
 	printf OUT ("export SeismicUnixGui_script=$SCRIPT_PATH\n");
 	printf OUT ("export PATH=\$PATH::\$SeismicUnixGui_script\n\n");
-	printf OUT ("export PERL5LIB=\$SeismicUnixGui_script/../lib\n");
+	printf OUT ("export PERL5LIB=\$PERL5LIB::\$SeismicUnixGui\n");
 	close(OUT);
 	system("chmod 755 $outbound");
 
 	print(
-"\n\nThe system path to \"SeismicUnixGui\" appears to be:\n $SCRIPT_PATH\n");
+"\n\nThe system path to \"SeismicUnixGui_script\" appears to be:\n $SCRIPT_PATH\n");
 	print("Before running SeismicUnixGui, be sure to add the\n");
-	print("following 3 lines to the end of your \".bashrc\" file\n\n");
+	print("following 4 lines to the end of your \".bashrc\" file\n\n");
+	print("export SeismicUnixGui=$SeismicUnixGui\n");	
 	print("export SeismicUnixGui_script=$SCRIPT_PATH\n");
 	print("export PATH=\$PATH::\$SeismicUnixGui_script\n");
-	print("export PERL5LIB=\$SeismicUnixGui_script/SeismicUnixGui\n");
+	print("export PERL5LIB=\$PERL5LIB::\$SeismicUnixGui\n");
 	print(
 		"\nHowever, for a quick BUT temporary fix, you have 2 options:\n");
-	print("   A. Cut-and-paste the 3 instructions above, one at a time \n");
+	print("   A. Cut-and-paste the 4 instructions above, one at a time \n");
 	print("into your command line and execute them one at a time.\n"
 	);
 	print("\nIn case you are unsure, this last instruction also means: \n");

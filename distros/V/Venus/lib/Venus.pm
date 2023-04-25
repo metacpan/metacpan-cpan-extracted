@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.40';
+our $VERSION = '2.50';
 
 # AUTHORITY
 
@@ -24,25 +24,34 @@ sub import {
 
   my %exports = (
     args => 1,
+    assert => 1,
     box => 1,
     call => 1,
     cast => 1,
     catch => 1,
     caught => 1,
     chain => 1,
+    check => 1,
     cop => 1,
     error => 1,
     false => 1,
     fault => 1,
+    json => 1,
     load => 1,
+    log => 1,
     make => 1,
     merge => 1,
+    perl => 1,
     raise => 1,
     roll => 1,
     space => 1,
     then => 1,
     true => 1,
+    unpack => 1,
+    venus => 1,
+    work => 1,
     wrap => 1,
+    yaml => 1,
   );
 
   @args = grep defined && !ref && /^[A-Za-z]/ && $exports{$_}, @args;
@@ -65,6 +74,16 @@ sub args (@) {
     : ((@args == 1 && ref($args[0]) eq 'HASH')
     ? (!%{$args[0]} ? {} : {%{$args[0]}})
     : (@args % 2 ? {@args, undef} : {@args}));
+}
+
+sub assert ($$) {
+  my ($data, $expr) = @_;
+
+  require Venus::Assert;
+
+  my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
+
+  return $assert->validate($data);
 }
 
 sub box ($) {
@@ -90,7 +109,7 @@ sub call (@) {
     $next = 0;
   }
   if ($next && ref($data) eq 'SCALAR') {
-    return $$data->$code(@args) if UNIVERSAL::can($$data, $code);
+    return $$data->$code(@args) if UNIVERSAL::can(load($$data)->package, $code);
     $next = 0;
   }
   if ($next && UNIVERSAL::can(load($data)->package, $code)) {
@@ -163,6 +182,14 @@ sub chain {
   return $data;
 }
 
+sub check ($$) {
+  my ($data, $expr) = @_;
+
+  require Venus::Assert;
+
+  return Venus::Assert->new->expression($expr)->check($data);
+}
+
 sub cop (@) {
   my ($data, @args) = @_;
 
@@ -201,10 +228,34 @@ sub fault (;$) {
   return Venus::Fault->new($data)->throw;
 }
 
+sub json ($;$) {
+  my ($code, $data) = @_;
+
+  require Venus::Json;
+
+  if (lc($code) eq 'decode') {
+    return Venus::Json->new->decode($data);
+  }
+
+  if (lc($code) eq 'encode') {
+    return Venus::Json->new($data)->encode;
+  }
+
+  return undef;
+}
+
 sub load ($) {
   my ($data) = @_;
 
   return space($data)->do('load');
+}
+
+sub log (@) {
+  my (@args) = @_;
+
+  require Venus::Log;
+
+  return Venus::Log->new->debug(@args);
 }
 
 sub make (@) {
@@ -220,6 +271,22 @@ sub merge (@) {
   require Venus::Hash;
 
   return Venus::Hash->new({})->merge(@args);
+}
+
+sub perl ($;$) {
+  my ($code, $data) = @_;
+
+  require Venus::Dump;
+
+  if (lc($code) eq 'decode') {
+    return Venus::Dump->new->decode($data);
+  }
+
+  if (lc($code) eq 'encode') {
+    return Venus::Dump->new($data)->encode;
+  }
+
+  return undef;
 }
 
 sub raise ($;$) {
@@ -262,6 +329,30 @@ sub true () {
   return Venus::True->value;
 }
 
+sub unpack (@) {
+  my (@args) = @_;
+
+  require Venus::Unpack;
+
+  return Venus::Unpack->new->do('args', @args)->all;
+}
+
+sub venus ($;@) {
+  my ($name, @args) = @_;
+
+  @args = ('new') if !@args;
+
+  return chain(\space(join('/', 'Venus', $name))->package, @args);
+}
+
+sub work ($) {
+  my ($data) = @_;
+
+  require Venus::Process;
+
+  return Venus::Process->new->do('work', $data);
+}
+
 sub wrap ($;$) {
   my ($data, $name) = @_;
 
@@ -274,6 +365,22 @@ sub wrap ($;$) {
   no warnings 'redefine';
 
   return *{"${caller}::${moniker}"} = sub {@_ ? make($data, @_) : $data};
+}
+
+sub yaml ($;$) {
+  my ($code, $data) = @_;
+
+  require Venus::Yaml;
+
+  if (lc($code) eq 'decode') {
+    return Venus::Yaml->new->decode($data);
+  }
+
+  if (lc($code) eq 'encode') {
+    return Venus::Yaml->new($data)->encode;
+  }
+
+  return undef;
 }
 
 1;
@@ -293,7 +400,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-2.40
+2.50
 
 =cut
 
@@ -488,6 +595,45 @@ I<Since C<2.32>>
   my $args = args('content', 'example', 'algorithm');
 
   # {content => "example", algorithm => undef}
+
+=back
+
+=cut
+
+=head2 assert
+
+  assert(Any $data, Str $expr) (Any)
+
+The assert function builds a L<Venus::Assert> object and returns the result of
+a L<Venus::Assert/validate> operation.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item assert example 1
+
+  package main;
+
+  use Venus 'assert';
+
+  my $assert = assert(1234567890, 'number');
+
+  # 1234567890
+
+=back
+
+=over 4
+
+=item assert example 2
+
+  package main;
+
+  use Venus 'assert';
+
+  my $assert = assert(1234567890, 'float');
+
+  # Exception! (isa Venus::Assert::Error)
 
 =back
 
@@ -949,6 +1095,45 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 check
+
+  check(Any $data, Str $expr) (Bool)
+
+The check function builds a L<Venus::Assert> object and returns the result of
+a L<Venus::Assert/check> operation.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item check example 1
+
+  package main;
+
+  use Venus 'check';
+
+  my $check = check(rand, 'float');
+
+  # true
+
+=back
+
+=over 4
+
+=item check example 2
+
+  package main;
+
+  use Venus 'check';
+
+  my $check = check(rand, 'string');
+
+  # false
+
+=back
+
+=cut
+
 =head2 cop
 
   cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
@@ -1109,6 +1294,46 @@ I<Since C<1.80>>
 
 =cut
 
+=head2 json
+
+  json(Str $call, Any $data) (Any)
+
+The json function builds a L<Venus::Json> object and will either
+L<Venus::Json/decode> or L<Venus::Json/encode> based on the argument provided
+and returns the result.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item json example 1
+
+  package main;
+
+  use Venus 'json';
+
+  my $decode = json 'decode', '{"codename":["Ready","Robot"],"stable":true}';
+
+  # { codename => ["Ready", "Robot"], stable => 1 }
+
+=back
+
+=over 4
+
+=item json example 2
+
+  package main;
+
+  use Venus 'json';
+
+  my $encode = json 'encode', { codename => ["Ready", "Robot"], stable => true };
+
+  # '{"codename":["Ready","Robot"],"stable":true}'
+
+=back
+
+=cut
+
 =head2 load
 
   load(Any $name) (Space)
@@ -1128,6 +1353,35 @@ I<Since C<2.32>>
   my $space = load 'Venus::Scalar';
 
   # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+=back
+
+=cut
+
+=head2 log
+
+  log(Any @args) (Log)
+
+The log function prints the arguments provided to STDOUT, stringifying complex
+values, and returns a L<Venus::Log> object.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item log example 1
+
+  package main;
+
+  use Venus 'log';
+
+  my $log = log;
+
+  # bless({...}, 'Venus::Log')
+
+  # log time, rand, 1..9;
+
+  # 00000000 0.000000, 1..9
 
 =back
 
@@ -1206,6 +1460,46 @@ I<Since C<2.32>>
   my $merged = merge({1..4}, {5, 6}, {7, 8, 9, 0});
 
   # {1..9, 0}
+
+=back
+
+=cut
+
+=head2 perl
+
+  perl(Str $call, Any $data) (Any)
+
+The perl function builds a L<Venus::Dump> object and will either
+L<Venus::Dump/decode> or L<Venus::Dump/encode> based on the argument provided
+and returns the result.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item perl example 1
+
+  package main;
+
+  use Venus 'perl';
+
+  my $decode = perl 'decode', '{stable=>bless({},\'Venus::True\')}';
+
+  # { stable => 1 }
+
+=back
+
+=over 4
+
+=item perl example 2
+
+  package main;
+
+  use Venus 'perl';
+
+  my $encode = perl 'encode', { stable => true };
+
+  # '{stable=>bless({},\'Venus::True\')}'
 
 =back
 
@@ -1396,6 +1690,143 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 unpack
+
+  unpack(Any @args) (Unpack)
+
+The unpack function builds and returns a L<Venus::Unpack> object.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item unpack example 1
+
+  package main;
+
+  use Venus 'unpack';
+
+  my $unpack = unpack;
+
+  # bless({...}, 'Venus::Unpack')
+
+  # $unpack->checks('string');
+
+  # false
+
+  # $unpack->checks('undef');
+
+  # false
+
+=back
+
+=over 4
+
+=item unpack example 2
+
+  package main;
+
+  use Venus 'unpack';
+
+  my $unpack = unpack rand;
+
+  # bless({...}, 'Venus::Unpack')
+
+  # $unpack->check('number');
+
+  # false
+
+  # $unpack->check('float');
+
+  # true
+
+=back
+
+=cut
+
+=head2 venus
+
+  venus(Str $name, Any @args) (Any)
+
+The venus function build a L<Venus> package via the L</chain> function based on
+the name provided and returns an instance of that package.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item venus example 1
+
+  package main;
+
+  use Venus 'venus';
+
+  my $space = venus 'space';
+
+  # bless({value => 'Venus'}, 'Venus::Space')
+
+=back
+
+=over 4
+
+=item venus example 2
+
+  package main;
+
+  use Venus 'venus';
+
+  my $space = venus 'space', ['new', 'venus/string'];
+
+  # bless({value => 'Venus::String'}, 'Venus::Space')
+
+=back
+
+=over 4
+
+=item venus example 3
+
+  package main;
+
+  use Venus 'venus';
+
+  my $space = venus 'code';
+
+  # bless({value => sub{...}}, 'Venus::Code')
+
+=back
+
+=cut
+
+=head2 work
+
+  work(CodeRef $callback) (Process)
+
+The work function builds a L<Venus::Process> object, forks the current process
+using the callback provided via the L<Venus::Process/work> operation, and
+returns an instance of L<Venus::Process> representing the current process.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item work example 1
+
+  package main;
+
+  use Venus 'work';
+
+  my $parent = work sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  };
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
 =head2 wrap
 
   wrap(Str $data, Str $name) (CodeRef)
@@ -1449,6 +1880,46 @@ I<Since C<2.32>>
   # my $digest = SHA(1);
 
   # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=back
+
+=cut
+
+=head2 yaml
+
+  yaml(Str $call, Any $data) (Any)
+
+The yaml function builds a L<Venus::Yaml> object and will either
+L<Venus::Yaml/decode> or L<Venus::Yaml/encode> based on the argument provided
+and returns the result.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item yaml example 1
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $decode = yaml 'decode', "---\nname:\n- Ready\n- Robot\nstable: true\n";
+
+  # { name => ["Ready", "Robot"], stable => 1 }
+
+=back
+
+=over 4
+
+=item yaml example 2
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $encode = yaml 'encode', { name => ["Ready", "Robot"], stable => true };
+
+  # '---\nname:\n- Ready\n- Robot\nstable: true\n'
 
 =back
 

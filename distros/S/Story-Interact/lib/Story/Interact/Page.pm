@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Page;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001010';
+our $VERSION   = '0.001011';
 
 use Moo;
 use Types::Common -types;
@@ -72,6 +72,13 @@ sub add_next_page {
 	my ( $self, $page_id, $desc, %extra ) = @_;
 	push @{ $self->next_pages }, [ $page_id, $desc, \%extra ];
 	return;
+}
+
+sub reset_next_pages {
+	my $self = shift;
+	my @r = @{ $self->next_pages };
+	@{ $self->next_pages } = ();
+	return \@r;
 }
 
 1;

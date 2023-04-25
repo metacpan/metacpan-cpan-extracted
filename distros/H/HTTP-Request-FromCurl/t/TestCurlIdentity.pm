@@ -34,7 +34,7 @@ our $server = Test::HTTP::LocalServer->spawn(
 #debug => 1,
 );
 END { undef $server }
-my $curl = 'curl';
+my $curl = $ENV{TEST_CURL_BIN} // 'curl';
 
 my @erase;
 
@@ -359,7 +359,7 @@ sub request_identical_ok( $test ) {
     #$res[0]->{error} = "Dummy error";
     if( $res[0]->{error} ) {
         # We run 2 tests for the setup and then 6 tests per request
-        my $skipcount = 6;
+        my $skipcount = 8;
         my $skipreason = $res[0]->{error};
         if(     $res[0]->{error_output}
             and $res[0]->{error_output} =~ /\b(option .*?: the installed libcurl version doesn't support this\b)/) {

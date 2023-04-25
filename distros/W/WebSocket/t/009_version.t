@@ -4,6 +4,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use WebSocket::Request;
     # use Devel::Confess;
@@ -69,7 +70,7 @@ subtest 'operations' => sub
     TRY:
     {
         # Returns draft version 12, because it is the latest version using the protocol version 8
-        my $draft12 = WebSocket::Version->new(8, debug => $DEBUG) || 
+        my $draft12 = WebSocket::Version->new(8, debug => $DEBUG);
         diag( "Cannot find data for draft version 12: ", WebSocket::Version->error ) if( !defined( $draft12 ) || $DEBUG );
     
         my $d16 = $v - 1;

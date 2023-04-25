@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use WebSocket qw( :all );
     use parent qw( WebSocket );
+    use vars qw( $VERSION $MAX_PAYLOAD_SIZE $MAX_FRAGMENTS_AMOUNT $TYPES );
     use Config;
     use Encode ();
     use Scalar::Util qw( readonly );
@@ -70,7 +71,6 @@ sub init
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->version( WEBSOCKET_DRAFT_VERSION_DEFAULT ) unless( $self->version );
     $self->{buffer} //= '';
-    # $self->message( 3, "Buffer is '$self->{buffer}' -> ", sub{ $self->dump( $self->{buffer} ) });
     if( Encode::is_utf8( $self->{buffer} ) )
     {
         $self->{buffer} = Encode::encode( 'UTF-8', $self->{buffer} );
@@ -87,9 +87,7 @@ sub append
     my $self = shift( @_ );
     return unless( defined( $_[0] ) );
 
-    $self->message( 3, "Appending '$_[0]' to buffer." );
     $self->buffer->append( $_[0] );
-    $self->message( 3, "Buffer is now: '", $self->buffer->scalar, "'" );
     $_[0] = '' unless( readonly( $_[0] ) );
     return( $self );
 }
@@ -137,13 +135,11 @@ sub next_bytes
     my $self = shift( @_ );
 
     my $v = $self->version;
-    $self->message( 3, "Version object is '$v' (", overload::StrVal( $v ), ") and buffer is ", $self->buffer->length, " bytes -> '", $self->buffer->scalar, "'" );
     if( ( $v->type eq 'hixie' && $v->revision == 75 ) ||
         ( $v->type eq 'hybi'  && $v->revision <= 3 ) )
     {
         if( $self->buffer->replace( qr/^\xff\x00/ => '' ) )
         {
-            $self->message( 3, "Closing frame, returning empty string" );
             $self->opcode(8);
             return( '' );
         }
@@ -151,16 +147,13 @@ sub next_bytes
         my $rv = $self->buffer->replace( qr/^[^\x00]*\x00(.*?)\xff/s, '' );
         return unless( $rv );
         # return( $1 );
-        $self->message( 3, "Returning regexp capture '", $rv->capture->first, "'." );
         return( $rv->capture->first );
     }
-    $self->message( 3, "Returning, because buffer is smaller than 2 bytes (", $self->buffer->length, ") -> (", $self->buffer->scalar, ")." ) unless( $self->buffer->length >= 2 );
     return unless( $self->buffer->length >= 2 );
 
     while( $self->buffer->length )
     {
         my( $first, $second ) = $self->buffer->unpack( 'C2' );
-        $self->message( 3, "First segment is '$first' and second is '$second'" );
 
         my $fin  = ( $first & 0b10000000 ) == 0b10000000 ? 1 : 0;
 
@@ -173,21 +166,16 @@ sub next_bytes
         # Opcode
         my $opcode = $first & 0b00001111;
         my $masked = ( $second & 0b10000000 ) >> 7;
-        $self->message( 3, "Is frame masked ? '$masked'" );
         $self->masked( $masked );
         my( $offset, $payload_len ) = ( 2, $second & 0b01111111 );
-        # $self->message( 3, "offset now '$offset', payload length '$payload_len' -> '", $self->buffer->scalar, "'" );
-        $self->message( 3, "offset now '$offset', payload length '$payload_len' and opcode is '$opcode'" );
         if( $payload_len == 126 )
         {
-            $self->message( 3, "Returning, because buffer is smaller than ", ( $offset + 2 ), " bytes." ) unless( $self->buffer->length >= $offset + 2 );
             return unless( $self->buffer->length >= $offset + 2 );
             $payload_len = $self->buffer->substr( $offset, 2 )->unpack( 'n' );
             $offset += 2;
         }
         elsif( $payload_len > 126 )
         {
-            $self->message( 3, "Returning, because buffer is smaller than ", ( $offset + 4 ), " bytes." ) unless( $self->buffer->length >= $offset + 4 );
             return unless( $self->buffer->length >= $offset + 4 );
 
             my $bits = $self->buffer->substr( $offset, 8 )->split( '' )->map(sub{ CORE::unpack( 'B*', $_ ) })->join( '' );
@@ -209,19 +197,15 @@ sub next_bytes
             $offset += 8;
         }
         
-        $self->message( 3, "Max payload size is '",  $self->max_payload_size, "' and this payload size is '$payload_len'" );
         if( $self->max_payload_size && $payload_len > $self->max_payload_size )
         {
             $self->buffer->empty;
-            $self->message( 3, "Payload is too big. Deny big message ($payload_len) or increase max_payload_size ($self->{max_payload_size})" );
             return( $self->error({ code => WS_MESSAGE_TOO_LARGE, message => "Payload is too big. Deny big message ($payload_len) or increase max_payload_size ($self->{max_payload_size})" }) );
         }
 
         my $mask;
         if( $self->masked )
         {
-            $self->message( 3, "Frame is masked." );
-            $self->message( 3, "Returning, because buffer is smaller than ", ( $offset + 4 ), " bytes." ) unless( $self->buffer->length >= $offset + 4 );
             return unless( $self->buffer->length >= $offset + 4 );
 
             $mask = $self->buffer->substr( $offset, 4 );
@@ -229,10 +213,8 @@ sub next_bytes
         }
         else
         {
-            $self->message( 3, "Frame is not masked." );
         }
 
-        $self->message( 3, "Returning, because buffer is smaller than ", ( $offset + $payload_len ), " bytes." ) if( $self->buffer->length < $offset + $payload_len );
         return if( $self->buffer->length < $offset + $payload_len );
 
         my $payload = $self->buffer->substr( $offset, $payload_len );
@@ -241,16 +223,13 @@ sub next_bytes
         {
             $payload = $self->_mask( $payload, $mask );
         }
-        $self->message( 3, "Opcode is '$opcode' and payload is '$payload'" );
 
-        # $self->message( 3, "Removing data from offset 0 to ", ( $offset + $payload_len ), " which is: '", $self->buffer->substr( 0, $offset + $payload_len )->scalar, "'" );
         $self->buffer->substr( 0, $offset + $payload_len, '' );
 
         # Injected control frame
         if( $self->fragments->length && $opcode & 0b1000 )
         {
             $self->opcode( $opcode );
-            $self->message( 3, "Opcode set to '$opcode', returning payload of '$payload'" );
             return( $payload );
         }
 
@@ -268,7 +247,6 @@ sub next_bytes
             $payload = $self->fragments->join( '', $payload );
             # $self->{fragments} = [];
             $self->fragments->empty;
-            $self->message( 3, "Returning payload '$payload'" );
             return( $payload );
         }
         else
@@ -283,12 +261,10 @@ sub next_bytes
 
             if( $self->fragments->length > $self->max_fragments_amount )
             {
-                $self->message( 3, "Too many fragments (", $self->fragments->length, ")" );
                 return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Too many fragments" }) );
             }
         }
     }
-    $self->message( "Returning undef because no data in buffer." );
     return;
 }
 
@@ -333,13 +309,11 @@ sub to_bytes
     }
 
     my $opcode = $self->opcode;
-    $self->message( 3, "opcode='$opcode', fin='", $self->fin, "' and type is '", $self->type, "'" );
     my $head = $opcode + ( $self->fin ? 128 : 0 );
     $head |= 0b01000000 if( $self->rsv->first );
     $head |= 0b00100000 if( $self->rsv->second );
     $head |= 0b00010000 if( $self->rsv->third );
     my $string = pack( 'C', $head );
-    # $self->message( 3, "string so far is -> '", sub{ $self->dump_hex( $string ) }, "'");
 
     my $payload_len = $self->buffer->length;
     if( $payload_len <= 125 )
@@ -369,11 +343,9 @@ sub to_bytes
         #    ? pack( 'Q>', $payload_len )
         #    : pack( 'NN', ( $Config{ivsize} <= 4 ? 0 : $payload_len >> 32 ), $payload_len & 0xffffffff );
     }
-    $self->message( 3, "Resulting string is now '$string'" );
 
     if( $self->masked )
     {
-        $self->message( 3, "Masking frame." );
         my $mask = $self->{mask} || (
             MATH_RANDOM_SECURE
                 ? Math::Random::Secure::irand( MAX_RAND_INT )
@@ -385,11 +357,8 @@ sub to_bytes
     }
     else
     {
-        $self->message( 3, "Not masking frame." );
         $string .= $self->buffer->scalar;
-        # $self->message( 3, "string so far is -> '", sub{ $self->dump_hex( $string ) }, "'");
     }
-    $self->message( 3, "Returning encoded payload -> '$string'" );
     return( $string );
 }
 
@@ -408,7 +377,7 @@ sub _mask
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -452,39 +421,39 @@ When called with more than one arguments, it takes the following named arguments
 
 =over 4
 
-=item I<buffer>
+=item C<buffer>
 
 The payload of the frame. It can also be provided as the first argument of the L</new> method.
 
-=item I<fin>
+=item C<fin>
 
 Boolean default to 1. Indicate whether this frame is the last frame of the entire message body
 
 C<fin> flag of the frame. C<fin> flag must be 1 in the ending frame of fragments.
 
-=item I<masked>
+=item C<masked>
 
 Boolean default to 0.
 
 If set to true, the frame will be masked.
 
-=item I<opcode>
+=item C<opcode>
 
 Default to 1. Operation bit, which defines the type of this frame
 
 The opcode of the frame. If I<type> field is set to a valid string, this field is ignored.
 
-=item I<rsv>
+=item C<rsv>
 
 Reserved bit, must be 0, if it is not 0, it is marked as connection failure
 
-=item I<type>
+=item C<type>
 
 Default to C<text>
 
 The type of the frame. Accepted values are: C<continuation>, C<text>, C<binary>, C<ping>, C<pong>, C<close>
 
-=item I<version>
+=item C<version>
 
 String. Default to C<draft-ietf-hybi-17>
 
@@ -507,6 +476,8 @@ Beware that this method is B<destructive>. It makes C<$chunk> empty unless C<$ch
 Indicate whether this frame is the last frame of the entire message body
 
 =head2 fragments
+
+Sets or gets the L<array object|Module::Generic::Array> of payload fragments
 
 =head2 is_binary
 
@@ -594,11 +565,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Client>, L<WebSocket::Connection>, L<WebSocket::Server>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

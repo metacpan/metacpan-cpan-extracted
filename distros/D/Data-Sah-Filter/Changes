@@ -1,3 +1,8 @@
+0.016   2023-04-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Add perl filters: Array::check_uniq{,num,str}.
+
+
 0.015   2022-10-18  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Fix broken filter.

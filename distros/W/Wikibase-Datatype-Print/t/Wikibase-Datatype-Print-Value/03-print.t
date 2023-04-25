@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Value::Globecoordinate;
@@ -11,6 +11,7 @@ use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 use Wikibase::Datatype::Value::Property;
 use Wikibase::Datatype::Value::Quantity;
+use Wikibase::Datatype::Value::Sense;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 use Wikibase::Datatype::Print::Value;
@@ -56,7 +57,14 @@ $obj = Wikibase::Datatype::Value::Property->new(
 	'value' => 'P123',
 );
 $ret = Wikibase::Datatype::Print::Value::print($obj);
-is($ret, 'P123', 'Get printed value pro property.');
+is($ret, 'P123', 'Get printed value for property.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Sense->new(
+	'value' => 'L34727-S1',
+);
+$ret = Wikibase::Datatype::Print::Value::print($obj);
+is($ret, 'L34727-S1', 'Get printed value for sense.');
 
 # Test.
 $obj = Wikibase::Datatype::Value::Quantity->new(

@@ -61,7 +61,7 @@ Finance::Dogecoin::Utils::NodeRPC - make authenticated RPC to a Dogecoin Core no
 
 =head1 VERSION
 
-version 1.20221211.2353
+version 1.20230424.0253
 
 =head1 SYNOPSIS
 

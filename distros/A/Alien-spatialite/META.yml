@@ -17,8 +17,11 @@ build_requires:
   FFI::CheckLib: '0.23'
   File::Find::Rule: '0'
   HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
   Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
   Path::Tiny: '0'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
@@ -57,9 +60,9 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-spatialite/issues/
   repository: https://github.com/shawnlaffan/perl-alien-spatialite
-version: '1.08'
+version: '1.09'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.48'
+  generated_by: 'Alien::Build::MM version 2.74'
   requires:
     share:
       Alien::MSYS: '0.07'
@@ -70,8 +73,11 @@ x_alienfile:
       Archive::Tar: '0'
       Env::ShellWords: '0.01'
       HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'

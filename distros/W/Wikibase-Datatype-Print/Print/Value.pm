@@ -11,12 +11,13 @@ use Wikibase::Datatype::Print::Value::Item;
 use Wikibase::Datatype::Print::Value::Monolingual;
 use Wikibase::Datatype::Print::Value::Property;
 use Wikibase::Datatype::Print::Value::Quantity;
+use Wikibase::Datatype::Print::Value::Sense;
 use Wikibase::Datatype::Print::Value::String;
 use Wikibase::Datatype::Print::Value::Time;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.09;
+our $VERSION = 0.12;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -37,6 +38,8 @@ sub print {
 		$ret = Wikibase::Datatype::Print::Value::Property::print($obj, $opts_hr);
 	} elsif ($type eq 'quantity') {
 		$ret = Wikibase::Datatype::Print::Value::Quantity::print($obj, $opts_hr);
+	} elsif ($type eq 'sense') {
+		$ret = Wikibase::Datatype::Print::Value::Sense::print($obj, $opts_hr);
 	} elsif ($type eq 'string') {
 		$ret = Wikibase::Datatype::Print::Value::String::print($obj, $opts_hr);
 	} elsif ($type eq 'time') {
@@ -114,6 +117,7 @@ L<Wikibase::Datatype::Print::Value::Item>,
 L<Wikibase::Datatype::Print::Value::Monolingual>,
 L<Wikibase::Datatype::Print::Value::Property>,
 L<Wikibase::Datatype::Print::Value::Quantity>,
+L<Wikibase::Datatype::Print::Value::Sense>,
 L<Wikibase::Datatype::Print::Value::String>,
 L<Wikibase::Datatype::Print::Value::Time>.
 
@@ -145,6 +149,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.12
 
 =cut

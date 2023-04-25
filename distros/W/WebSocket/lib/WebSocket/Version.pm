@@ -15,6 +15,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $IETF_VERSIONS );
     use Module::Generic::Number ();
     use Nice::Try;
     use overload (
@@ -254,20 +255,17 @@ sub new_from_request
         if( $h->header( 'Sec-WebSocket-Version' )->length &&
             $h->header( 'Sec-WebSocket-Version' )->match( qr/^\d{1,2}$/ ) )
         {
-            $self->message( 3, "Creating new object based on 'Sec-WebSocket-Version' (", $h->header( 'Sec-WebSocket-Version' )->scalar, ")" );
             $new = $self->new( $h->header( 'Sec-WebSocket-Version' )->scalar, debug => $self->debug ) || return( $self->pass_error );
         }
         # Version 10 or lower; From version 11, it uses 'Origin' only; but from version 0 to 3, it uses also Origin
         elsif( $h->header( 'Sec-WebSocket-Origin' )->length )
         {
-            $self->message( 3, "Creating new object based on 'Sec-WebSocket-Origin' (", $h->header( 'Sec-WebSocket-Origin' )->scalar, ")" );
             $new = $self->new( 'draft-ietf-hybi-10', debug => $self->debug ) || return( $self->pass_error );
         }
         # Sec-WebSocket-Key has started to be used since version 4
         # We default to the latest version 17
         else
         {
-            $self->message( 3, "Creating new object based on 'draft-ietf-hybi-17'" );
             $new = $self->new( 'draft-ietf-hybi-17', debug => $self->debug ) || return( $self->pass_error );
         }
     }
@@ -288,17 +286,14 @@ sub new_from_request
     # No Sec-WebSocket-Key1? then it is Hixie75
     else
     {
-        $self->message( 3, "Checking for old protocol version traits" );
         if( $h->header( 'Sec-WebSocket-Protocol' )->length )
         {
-            $self->message( 3, "Found a Sec-WebSocket-Protocol header, so protocol version 76 it seems." );
             # $new would stringify to undef since there is no version in the WebSocket protocol for those early drafts
             $new = $self->new( 'draft-hixie-76', debug => $self->debug );
             return( $self->pass_error ) if( !defined( $new ) );
         }
         elsif( $h->header( 'WebSocket-Protocol' )->length )
         {
-            $self->message( 3, "Found a WebSocket-Protocol header, so protocol version 75 it seems." );
             $new = $self->new( 'draft-hixie-75', debug => $self->debug );
             return( $self->pass_error ) if( !defined( $new ) );
         }
@@ -306,7 +301,6 @@ sub new_from_request
         # Connect, Upgrade, Host and Origin
         else
         {
-            $self->message( 3, "Did not find anything meaningful, falling back to old draft revision 7" );
             $new = $self->new( 'draft-hixie-07', debug => $self->debug );
             return( $self->pass_error ) if( !defined( $new ) );
         }
@@ -347,11 +341,10 @@ sub previous
     my $self = shift( @_ );
     return( $self->error( "Somehow this version lost its offset number !" ) ) if( !defined( $self->{offset} ) || !length( $self->{offset} ) );
     my $offset = $self->{offset};
-    $self->message( 3, "Version serial is '$serial' and thus offset is '$offset'" );
+    my $serial = $self->{serial};
     # Reached the end
     return if( $offset == int( $#$IETF_VERSIONS / 2 ) );
     my $prev_def = $IETF_VERSIONS->[ $offset + 3 ];
-    $self->message( 3, "Previous draft dictionary is -> ", sub{ $self->dump( $prev_def ) });
     return( $self->error( "No data found in data at offset ", $offset + 3 ) ) if( !ref( $prev_def ) || !scalar( keys( %$prev_def ) ) );
     my $new = $self->new( $prev_def ) || return( $self->pass_error );
     return( $new );
@@ -383,7 +376,6 @@ sub _compare
 sub _compute
 {
     my( $self, $other, $swap, $opts ) = @_;
-    $self->message( 3, "Computing serial $self->{serial} with other '$other', swap '$swap' and operator '$opts->{op}'" );
     my $other_val = $self->_is_a( $other => ( ref( $self ) || $self ) ) 
         ? $other->{serial} 
         : ( defined( $other ) && "$other" =~ /^\d+$/ )
@@ -391,11 +383,9 @@ sub _compute
             : "\"$other\"";
     my $serial = "$self->{serial}";
     my $operation = $swap ? "${other_val} $opts->{op} \$serial" : "\$serial $opts->{op} ${other_val}";
-    $self->message( 3, "Evaluating operation '$operation'" );
     if( $opts->{return_object} )
     {
         my $new_serial = eval( $operation );
-        $self->message( 3, "New resulting serial is '$new_serial'" );
         no overloading;
         warn( "Error with return formula \"$operation\" using object $self having serial '$self->{serial}' and version '$self->{version}': $@" ) if( $@ && $self->_warnings_is_enabled );
         return if( $@ );
@@ -421,7 +411,6 @@ sub _compute
             warn( "Unable to get dictionary for resulting serial '$new_serial': ", $self->error ) if( $self->_warnings_is_enabled );
             return;
         };
-        $self->message( 3, "Dictionary found for serial '", sub{ $self->dump( $dict )} );
         if( !scalar( keys( %$dict ) ) )
         {
             return;
@@ -431,7 +420,6 @@ sub _compute
             warn( $self->error ) if( $self->_warnings_is_enabled );
             return;
         };
-        $self->message( 3, "Returning new object '$new'" );
         return( $new );
     }
     elsif( $opts->{boolean} )
@@ -451,8 +439,7 @@ sub _compute
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -513,23 +500,23 @@ Current supported options are:
 
 =over 4
 
-=item I<draft>
+=item C<draft>
 
 The draft version, such as C<draft-ietf-hybi-17>
 
-=item I<revision>
+=item C<revision>
 
 The draft revision number such as C<17>. This is used in conjunction with the I<type> option
 
-=item I<serial>
+=item C<serial>
 
 The serial number to search for. This is an internal number not part of the L<rfc6455|>https://datatracker.ietf.org/doc/html/rfc6455.
 
-=item I<type>
+=item C<type>
 
 The draft type, which is either C<hiby> or C<hixie>. This is used in conjunction with the I<revision> option
 
-=item I<version>
+=item C<version>
 
 Its value is an integer representing the WebSocket protocol version. For example C<13>, the latest version.
 
@@ -1493,7 +1480,7 @@ L<perl>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

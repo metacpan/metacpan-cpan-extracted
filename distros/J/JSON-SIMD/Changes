@@ -1,5 +1,12 @@
 Revision history for Perl extension JSON::SIMD
 
+1.05 Sat Apr 22 21:55:43 CEST 2023
+	- fix build issue with "invalid register for .seh_savexmm" (prev fix caused other problems, was reverted)
+	- add ppport.h
+	- add core_bools and encode_core_bools methods to support builtin::true and false on perl >= 5.36
+		core_bools also works towards compatibility with JSON::XS, and with both of these options
+		it is possible to have correct, full round-trip encode/decode between Perl and JSON booleans.
+
 1.04 Thu Apr 20 19:48:29 CEST 2023
 	- fix floating point precision issues with -Duselongdouble and -Dusequadmath
 	- fix intermittent garbage in floating point numbers from encode with -Dusequadmath (fix taken from Cpanel::JSON::XS ad072b4)

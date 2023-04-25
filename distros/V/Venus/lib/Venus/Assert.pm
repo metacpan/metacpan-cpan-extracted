@@ -263,6 +263,9 @@ sub expression {
 
   return $self if !$data;
 
+  $data =
+  $data =~ s/\s*\n+\s*/ /gr =~ s/^\s+|\s+$//gr =~ s/\[\s+/[/gr =~ s/\s+\]/]/gr;
+
   $self->expects([$data]);
 
   my @parsed = $self->parse($data);
@@ -432,6 +435,9 @@ sub parse {
   my ($self, $expr) = @_;
 
   $expr ||= '';
+
+  $expr =
+  $expr =~ s/\s*\n+\s*/ /gr =~ s/^\s+|\s+$//gr =~ s/\[\s+/[/gr =~ s/\s+\]/]/gr;
 
   return _type_parse($expr);
 }
@@ -686,7 +692,7 @@ sub _type_parse_nested {
 
   my @items = ($expr);
 
-  @items = ($expr =~ /^(\w+)\s*\[(.*)\]+$/g);
+  @items = ($expr =~ /^(\w+)\s*\[\s*(.*)\s*\]+$/g);
 
   @items = map _type_parse_lists($_), @items;
 
@@ -1972,6 +1978,49 @@ I<Since C<1.71>>
   # false
 
   # $assert->check([$assert]);
+
+  # true
+
+=back
+
+=over 4
+
+=item expression example 5
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('
+    string
+    | within[
+        arrayref, within[
+          hashref, string
+        ]
+      ]
+  ');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # false
+
+  # $assert->check($assert);
+
+  # false
+
+  # $assert->check([]);
+
+  # false
+
+  # $assert->check([{'test' => ['okay']}]);
+
+  # false
+
+  # $assert->check([{'test' => 'okay'}]);
 
   # true
 

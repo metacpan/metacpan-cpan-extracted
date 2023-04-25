@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,12 +29,13 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ambs/Dancer2-Plugin-JWT
-version: '0.020'
+version: '0.021'
 x_contributors:
   - 'Alberto Simões <hashashin@gmail.com>'
-  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Peter Mottram <peter@sysnix.com>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  - 'Stephen Thirlwall <sdt@dr.com>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -7,7 +7,7 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -178,7 +178,7 @@ Returns undef.
          From Tags::HTML::process_css():
                  Parameter 'css' isn't defined.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=button_html_css.pl
 
@@ -244,6 +244,43 @@ Returns undef.
  #   </div>
  # </body>
 
+=head1 EXAMPLE2
+
+=for comment filename=plack_app_login.pl
+
+ use strict;
+ use warnings;
+ 
+ use CSS::Struct::Output::Indent;
+ use Plack::App::Tags::HTML;
+ use Plack::Runner;
+ use Tags::Output::Indent;
+ use Unicode::UTF8 qw(decode_utf8);
+ 
+ my $app = Plack::App::Tags::HTML->new(
+         'component' => 'Tags::HTML::Login::Button',
+         'constructor_args' => {
+                 'title' => decode_utf8('Přihlašovací tlačítko'),
+         },
+         'css' => CSS::Struct::Output::Indent->new,
+         'tags' => Tags::Output::Indent->new(
+                 'xml' => 1,
+                 'preserved' => ['style'],
+         ),
+         'title' => decode_utf8('Přihlašovací tlačítko'),
+ )->to_app;
+ Plack::Runner->new->run($app);
+
+ # Output screenshot is in images/ directory.
+
+=begin html
+
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-Login-Button/master/images/plack_app_login.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-Login-Button/master/images/plack_app_login.png" alt="Web app example" width="300px" height="300px" />
+</a>
+
+=end html
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -262,12 +299,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

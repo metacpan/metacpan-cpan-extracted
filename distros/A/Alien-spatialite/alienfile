@@ -56,7 +56,7 @@ share {
   my $with_local = '';
   my $with_cpp11 = '';
 
-  start_url 'http://www.gaia-gis.it/gaia-sins/libspatialite-sources/';
+  start_url 'https://www.gaia-gis.it/gaia-sins/libspatialite-sources/';
   #start_url "file://$base_dir";  #  debug
   plugin Download => (
     filter  => qr/^libspatialite-([0-9\.]+[a-z]?)\.tar\.gz$/,
@@ -143,6 +143,8 @@ share {
     }
   );
 
+  meta->before_hook( build => \&update_configure_freebsd );
+
   build [
     "%{configure} $with_local $with_cpp11 $build_static $extra_build_args",
     \&pause,
@@ -155,6 +157,37 @@ share {
 
 };
 
+
+sub update_configure_freebsd {
+  my ($build) = @_;
+
+  return if not $^O =~ /bsd/;
+
+  $build->log ('Updating configure for FreeBSD');
+
+  use File::Find::Rule;
+  my @configures
+    = File::Find::Rule->file()
+                        ->name( 'configure' )
+                        ->in( '.' );
+  
+  foreach my $fname (@configures) {
+    $build->log ($fname);
+    my $permissions = (stat ($fname))[2];
+    open my $fh, $fname or die $!;
+    my $text = do {local $/ = undef; <$fh>};
+    $fh->close;
+    $text =~ s/(freebsd[12])\*/$1.*/gms;
+    $text =~ s/(freebsd\[123?\])\*/$1.*/gms;
+    rename $fname, "$fname.bak";
+    open my $ofh, '>', $fname or die $!;
+    print {$ofh} $text;
+    $ofh->close;
+    chmod $permissions, $fname;
+  }
+  
+  return;
+}
 
 sub rename_la_files {
     #  need to return if not share

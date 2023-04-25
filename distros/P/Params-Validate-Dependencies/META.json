@@ -4,14 +4,14 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Params-Validate-Dependencies",
    "no_index" : {
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0.38",
-            "Data::Domain" : "1.02",
+            "Data::Domain" : "1.1",
             "PadWalker" : "1.96",
             "Params::Validate" : "1.07",
             "Scalar::Util" : "1.25",
@@ -55,5 +55,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies"
       }
    },
-   "version" : "1.40"
+   "version" : "1.41",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

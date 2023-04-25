@@ -70,7 +70,7 @@ ERRORS
              From Tags::HTML::process_css():
                      Parameter 'css' isn't defined.
 
-EXAMPLE
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -108,13 +108,20 @@ EXAMPLE
      # }
      # .login {
      #         text-align: center;
-     #         background-color: blue;
-     #         padding: 1em;
      # }
      # .login a {
      #         text-decoration: none;
-     #         color: white;
-     #         font-size: 3em;
+     #         background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
+     #         background-repeat: repeat-x;
+     #         border: 1px solid #adadad;
+     #         border-radius: 4px;
+     #         color: black;
+     #         font-family: sans-serif!important;
+     #         padding: 15px 40px;
+     # }
+     # .login a:hover {
+     #         background-color: #e0e0e0;
+     #         background-image: none;
      # }
      #
      # HTML
@@ -125,6 +132,32 @@ EXAMPLE
      #     </a>
      #   </div>
      # </body>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+ 
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Tags::HTML;
+     use Plack::Runner;
+     use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8);
+ 
+     my $app = Plack::App::Tags::HTML->new(
+             'component' => 'Tags::HTML::Login::Button',
+             'constructor_args' => {
+                     'title' => decode_utf8('Přihlašovací tlačítko'),
+             },
+             'css' => CSS::Struct::Output::Indent->new,
+             'tags' => Tags::Output::Indent->new(
+                     'xml' => 1,
+                     'preserved' => ['style'],
+             ),
+             'title' => decode_utf8('Přihlašovací tlačítko'),
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output screenshot is in images/ directory.
 
 DEPENDENCIES
     Class::Utils, Error::Pure, Tags::HTML.
@@ -138,10 +171,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2022 Michal Josef Špaček
+    © 2021-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

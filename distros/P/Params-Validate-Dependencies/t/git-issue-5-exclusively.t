@@ -41,7 +41,7 @@ is(
 );
 
 SKIP: {
-  skip "Data::Domain requires perl 5.10 or higher" if($] <= 5.010);
+  skip "Data::Domain requires perl 5.18 or higher" if($] <= 5.018);
   note("Now let's try with Data::Domain::Dependencies");
 
   eval 'use Data::Domain::Dependencies qw(:all)';

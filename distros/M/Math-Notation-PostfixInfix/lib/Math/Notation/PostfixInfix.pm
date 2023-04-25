@@ -1,18 +1,16 @@
 # ABSTRACT Math Notation for Postfix and Infix Expressions
-###############################################################################
-##                                                                           ##
-##  Copyright (c) 2022 - by Carlos Celso.                                    ##
-##  All rights reserved.                                                     ##
-##                                                                           ##
-##  This package is free software; can, at your discretion, also be used,    ##
-##  modified and redistributed under the terms of the "GPLv3 - GNU Library   ##
-##  General Public License".                                                 ##
-##                                                                           ##
-###############################################################################
-
+#
+##  Copyright (C) Carlos Celso
+#
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+# 
 	package Math::Notation::PostfixInfix;
 
 	use strict;
+	use warnings;
 	use Exporter;
 
 	use vars qw( @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
@@ -25,7 +23,7 @@
 
 	our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
-	our $VERSION = "2022.218.2";
+	our $VERSION = "2023.111.1";
 
 	1;
 

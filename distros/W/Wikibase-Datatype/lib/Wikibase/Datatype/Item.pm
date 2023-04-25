@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number check_number_of_items);
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 has aliases => (
 	default => [],
@@ -345,7 +345,7 @@ Returns string.
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
- # Object.
+ # Statements.
  my $statement1 = Wikibase::Datatype::Statement->new(
          # instance of (P31) human (Q5)
          'snak' => Wikibase::Datatype::Snak->new(
@@ -620,6 +620,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut

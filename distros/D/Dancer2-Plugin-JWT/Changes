@@ -1,3 +1,7 @@
+0.021  2023-04-21
+   - Only check the cookie when set_cookie_header set
+     (Stephen Thirlwall)
+
 0.020  2021-07-18
    - Further changes on header/cookie being optional
      (Mikko Koivunalho)

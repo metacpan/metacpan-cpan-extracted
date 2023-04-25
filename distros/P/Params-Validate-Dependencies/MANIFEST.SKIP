@@ -1,2 +1,4 @@
 .travis.yml
 ^\.git
+.appveyor.yml
+.cirrus.yml

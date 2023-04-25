@@ -21,5 +21,5 @@ requires:
   Cwd: '0'
   File::Basename: '0'
   Test::More: '0.6'
-version: '1.65'
+version: '1.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

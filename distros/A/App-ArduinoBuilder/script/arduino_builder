@@ -1,0 +1,145 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use utf8;
+
+use open ':std', ':encoding(UTF-8)';
+
+use App::ArduinoBuilder;
+
+our $VERSION = $App::ArduinoBuilder::VERSION;
+
+App::ArduinoBuilder::Run();
+exit 0;
+
+# PODNAME: arduino_builder
+# ABSTRACT: Build system for Arduino programs
+
+__DATA__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+arduino_builder - Build system for Arduino programs
+
+=head1 SYNOPSIS
+
+  arduino_builder ...
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=head1 CONFIGURATION FILE SYNTAX
+
+The syntax of the configuration file used by this tool is the same as those used
+to describe Arduino I<platforms>. You can read about it
+L<here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#configuration-files-format>.
+
+Informally, the format is a UTF-8 text file, where empty lines and lines
+starting with C<#> are ignored (but note that you can’t have end-of-line
+comments on non-comment lines). Other lines have an C<key=value> syntax where
+keys can contain letters, numbers and C<.>, C<_>, and C<-> characters and values
+can contain anything. Values can be expressed with other values by putting their
+key in brackets. For examples:
+
+    value.name=text with {other.value}
+
+=head1 CONFIGURATION FILES
+
+When you start `arduino_builder` it will read a set of configuration files. Once
+a key is defined by a given file it will not be overriden by other files
+defining the same key. So the most specific configuration should be loaded
+first.
+
+The following files are read in that order when they exist (any of these files
+is allowed to be missing):
+
+=over 4
+
+=item - F<arduino_builder.local> file in the project directory.
+
+=item - F<arduino_builder.config> file in the project directory.
+
+=item - F<boards.local.txt> file in the platform package directory, like all
+other files below.
+
+=item - F<boards.txt>
+
+=item - F<platform.local.txt>
+
+=item - F<platform.txt>
+
+=item - F<programmers.local.txt>
+
+=item - F<programmers.txt.txt>
+
+=back
+
+=head1 CAVEATS
+
+Not all features of the Arduino GUI are currently implemented. The main missing
+features are the following ones:
+
+=over 4
+
+=item Library auto-discovery
+
+For now, you have to specify explicitly all the libraries that are used by your
+program as well as where these libraries are installed.
+
+=item Pre-compiled libraries
+
+The Arduino GUI can use pre-compiled libraries for closed source code. This is
+not supported yet by this tool.
+
+=item Program size calculation
+
+The Arduino GUI displays the program size compared to your micro-controller
+flash size.
+
+=item Program upload to micro-controller
+
+The Arduino GUI can upload (flash) your program on your micro-controller.
+
+=back
+
+=head1 AUTHOR
+
+This program has been written by L<Mathias Kende|mailto:mathias@cpan.org>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2022 Mathias Kende
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Arduino CLI|https://arduino.github.io/arduino-cli>
+
+=back
+
+=cut

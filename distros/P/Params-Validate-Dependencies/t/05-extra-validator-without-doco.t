@@ -30,7 +30,7 @@ is(
 );
 
 SKIP: {
-    skip "only on perl 5.10 and higher" if($] <= 5.010);
+    skip "only on perl 5.18 and higher" if($] <= 5.018);
     eval 'use Data::Domain::Dependencies qw(Dependencies)';
 
     my $domain = Dependencies(@pvd);

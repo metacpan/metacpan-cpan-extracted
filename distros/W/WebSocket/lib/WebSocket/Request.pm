@@ -1,14 +1,12 @@
 ##----------------------------------------------------------------------------
 ## WebSocket Client & Server - ~/lib/WebSocket/Request.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/09/16
-## Modified 2021/09/16
-## All rights reserved
-## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
+## Modified 2023/04/21
+## You can use, copy, modify and  redistribute  this  package  and  associated
+## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package WebSocket::Request;
 BEGIN
@@ -17,6 +15,7 @@ BEGIN
     use warnings;
     use WebSocket::Common qw( :all );
     use parent qw( WebSocket::Common );
+    use vars qw( $VERSION );
     use Digest::MD5 ();
     use HTTP::Request ();
     use MIME::Base64 ();
@@ -25,7 +24,7 @@ BEGIN
     use WebSocket::Extension;
     use WebSocket::Headers;
     use WebSocket::Version;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub init
@@ -72,10 +71,9 @@ sub as_string
     my $version = $self->version || WebSocket::Version->new( WEBSOCKET_DRAFT_VERSION_DEFAULT );
     return( $self->error( "uri is required" ) ) unless( defined( $self->uri ) );
     return( $self->error( "Host is required" ) ) unless( $self->host->defined && $self->host->length );
-    $self->message( 3, "Version is '$version', revision '", $version->revision, "' and subprotocol is '", $self->subprotocol->join( ',' )->scalar, "'." );
     my $req_line = "GET " . ( $self->uri->path_query || '/' ) . " HTTP/1.1";
     my $h = $self->headers;
-    $h->header( Upgrade => 'WebSocket', Connection => Upgrade );
+    $h->header( Upgrade => 'WebSocket', Connection => 'Upgrade' );
     if( $self->cookies->length )
     {
         $h->header( Cookie => $self->cookies->scalar );
@@ -151,6 +149,8 @@ sub connection { return( shift->headers->header( 'Connection', @_ ) ); }
 
 sub cookies { return( shift->_set_get_scalar_as_object( 'cookies', @_ ) ); }
 
+sub header { return( shift->headers->header( @_ ) ); }
+
 sub key  { return( shift->_key( key  => @_ ) ); }
 
 sub key1 { return( shift->_key( key1 => @_ ) ); }
@@ -163,8 +163,6 @@ sub number1 { return( shift->_number( 'number1', 'key1', @_ ) ); }
 
 sub number2 { return( shift->_number( 'number2', 'key2', @_ ) ); }
 
-# XXX Need to improve this and set the right header based on the version set
-# sub origin { return( shift->headers->header( 'Origin', @_ ) ); }
 sub origin
 {
     my $self = shift( @_ );
@@ -173,7 +171,6 @@ sub origin
     {
         # Based on our version, we set the right header
         my $v = $self->version;
-        # $self->message( 3, "Setting origin '$_[0]' for client version $v" );
         if( $v && $v->type eq 'hybi' && $v->revision >= 4 && $v->revision <= 10 )
         {
             $h->header( 'Sec-WebSocket-Origin' => shift( @_ ) );
@@ -185,7 +182,6 @@ sub origin
                    ( $v->revision >= 11 && $v->revision <= 17 )
                ) )
         {
-            # $self->message( 3, "Setting origin for client with header 'Origin' and value '$_[0]'" );
             $h->header( 'Origin' => shift( @_ ) );
         }
     }
@@ -240,7 +236,6 @@ sub parse_body
     return( $self->error( "Excessive unknown data found in request body: ", $self->buffer->scalar ) ) if( $self->buffer->length );
     $self->is_done(1);
     
-    $self->message( 3, "Key is '", $self->key, "', key1 is '", $self->key1, "' and key2 is '", $self->key2, "'." );
     if( !$self->{_parse_postprocessed} && $self->is_done )
     {
         $self->{_parse_postprocessed} = 1;
@@ -256,7 +251,7 @@ sub parse_body
             {
                 $self->version( $self->headers->header( 'Sec-WebSocket-Version' )->scalar );
             }
-            # XXX Since there is no Sec-WebSocket-Version in request, maybe we should set
+            # Since there is no Sec-WebSocket-Version in request, maybe we should set
             # the version to draft protocol revision 3 or earlier when there was no 
             # Sec-WebSocket-Version header?
             else
@@ -275,7 +270,6 @@ sub parse_body
             return( $self->error( 'Not a valid request: ', $self->error ) );
         }
     }
-    $self->message( 3, "Version set to '", $self->version, "' (", $self->version->draft, ")." );
     return( $self );
 }
 
@@ -417,17 +411,14 @@ sub _parse_body_chunk
 sub _parse_postprocess
 {
     my $self = shift( @_ );
-    $self->message( 3, "Upgrade header is '", $self->upgrade->lc, "'" );
     return( $self->error( "No upgrade header or its value is not \"WebSocket\"." ) ) unless( $self->upgrade->lc eq 'websocket' );
 
     my $connection = $self->connection;
-    $self->message( 3, "Connection header is '", $self->connection, "' (", overload::StrVal( $connection ), ")." );
     return( $self->error( "No \"Connection\" header" ) ) unless( $connection->length );
     
     my $connections = $connection->split( qr/[[:blank:]\h]*\,[[:blank:]\h]*/ );
     return( $self->error( "Connection header has no \"Upgrade\" value." ) ) unless( $connections->grep(sub{ lc( $_ ) eq 'upgrade' })->length );
     my $origin = $self->headers->header( 'Sec-WebSocket-Origin' ) || $self->headers->header( 'Origin' );
-    $self->message( 3, "Client origin provided is '$origin'" );
     $self->origin( $origin );
     if( $origin->length )
     {
@@ -439,10 +430,9 @@ sub _parse_postprocess
 
     my $subprotocol = $self->headers->header( 'Sec-WebSocket-Protocol' ) || 
                       $self->headers->header( 'WebSocket-Protocol' );
-    $self->message( 3, "Subprotocol value found from header is '$subprotocol'" );
     my $v = $self->version;
     # rfc6455, section 4.1: multiple values are comma separated
-    # XXX Careful. If version is < HyBi 04 subprotocol are separated by a space, not by a comma
+    # Careful. If version is < HyBi 04 subprotocol are separated by a space, not by a comma
     if( $subprotocol->length )
     {
         if( $subprotocol->index( ',' ) != -1 )
@@ -477,8 +467,7 @@ sub _parse_postprocess
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -529,7 +518,7 @@ WebSocket::Request - WebSocket Request
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -560,11 +549,11 @@ Provided with an optional set of headers, as either an array reference or a L<HT
 
 =over 4
 
-=item I<buffer>
+=item C<buffer>
 
 Content buffer
 
-=item I<cookies>
+=item C<cookies>
 
 A C<Cookie> request header string. The string provided must be already properly formatted and encoded and will be added as is. For example:
 
@@ -573,39 +562,43 @@ A C<Cookie> request header string. The string provided must be already properly 
         host    => 'example.com'
     );
 
-=item I<headers>
+=item C<headers>
 
 Either an array reference of header-value pairs, or an L<HTTP::Headers> object.
 
 If an array reference is provided, an L<HTTP::Headers> object will be instantiated with it.
 
-=item I<host>
+=item C<host>
 
 The C<Host> header value.
 
-=item I<max_message_size>
+=item C<max_message_size>
 
 Integer. Defaults to 20Kb. This is the maximum payload size.
 
-=item I<number1>
+=item C<number1>
 
-=item I<number2>
+Value for key1 as used in protocol version 0 to 3 of WebSocket requests.
 
-=item I<origin>
+=item C<number2>
+
+Value for key2 as used in protocol version 0 to 3 of WebSocket requests.
+
+=item C<origin>
 
 The C<Origin> header value.
 
 See L<rfc6454|https://datatracker.ietf.org/doc/html/rfc6454>
 
-=item I<protocol>
+=item C<protocol>
 
 HTTP/1.1. This is the only version supported by L<rfc6455|https://datatracker.ietf.org/doc/html/rfc6455>
 
-=item I<secure>
+=item C<secure>
 
 Boolean. This is set to true when the connection is using ssl (i.e. C<wss>), false otherwise.
 
-=item I<subprotocol>
+=item C<subprotocol>
 
 The optional subprotocol which consists of multiple arbitrary identifiers that need to be recognised and supported by the server.
 
@@ -619,11 +612,11 @@ The optional subprotocol which consists of multiple arbitrary identifiers that n
 
 See L<rfc6455|https://datatracker.ietf.org/doc/html/rfc6455#page-12>
 
-=item I<uri>
+=item C<uri>
 
 The request uri, such as C</chat> or it could also be a fully qualified uri such as C<wss://example.com/chat?csrf_token=7a292e44341dc0a052d717980563fa4528dc254bc80f3e735303ed710b764143.1631279571>
 
-=item I<version>
+=item C<version>
 
 The WebSocket protocol version. Defaults to C<draft-ietf-hybi-17>
 
@@ -643,7 +636,13 @@ Set or get the content buffer.
 
 =head2 challenge
 
+Sets or gets the challenge returned to the client. 
+
 =head2 checksum
+
+Sets or gets the checksum. If a checksum is provided, it returns the current object.
+
+If no checksum is provided, it will compute one based on the value of L</number1>, L</number2> and L</challenge>. It returns the checksum as a regular string.
 
 =head2 connection
 
@@ -652,6 +651,10 @@ Set or get the C<Connection> header value, which should typically be C<Upgrade>.
 =head2 cookies
 
 Set or get the cookies string to be used in the C<Cookie> request header.
+
+=head2 header
+
+This is a short-cut for L<WebSocket::Headers/header>
 
 =head2 headers
 
@@ -671,9 +674,15 @@ Set or get the boolean value. This is set to signal the parsing is complete.
 
 =head2 key
 
+Value of header C<Sec-WebSocket-Key> available in protocol version 4 to 17.
+
 =head2 key1
 
+Value of header C<Sec-WebSocket-Key1> available in protocol version 0 to 3.
+
 =head2 key2
+
+Value of header C<Sec-WebSocket-Key2> available in protocol version 0 to 3.
 
 =head2 method
 
@@ -681,7 +690,11 @@ The http method used, such as C<GET>
 
 =head2 number1
 
+This is a default method to store a number used for the checksum challenge sent to the client.
+
 =head2 number2
+
+This is a default method to store a number used for the checksum challenge sent to the client.
 
 =head2 origin
 
@@ -740,13 +753,12 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Response>, L<WebSocket::Headers>, L<WebSocket::Common>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
-
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut
-

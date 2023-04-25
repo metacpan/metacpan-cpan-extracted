@@ -1,10 +1,10 @@
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.019-2-gecd0a20
+package JSON::Schema::Tiny; # git description: v0.020-6-g695f073
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use experimental 0.026 qw(signatures postderef args_array_with_signatures);
@@ -23,6 +23,7 @@ use JSON::PP ();
 use List::Util 1.33 qw(any none);
 use Scalar::Util 'blessed';
 use if "$]" >= 5.022, POSIX => 'isinf';
+use Math::BigFloat;
 use namespace::clean;
 use Exporter 5.57 'import';
 
@@ -431,7 +432,6 @@ sub _eval_keyword_type ($data, $schema, $state) {
 
 sub _eval_keyword_enum ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'array');
-  abort($state, '"enum" values are not unique') if not is_elements_unique($schema->{enum});
 
   my @s; my $idx = 0;
   return 1 if any { is_equal($data, $_, $s[$idx++] = {}) } $schema->{enum}->@*;
@@ -454,7 +454,9 @@ sub _eval_keyword_multipleOf ($data, $schema, $state) {
   return 1 if not is_type('number', $data);
 
   # if either value is a float, use the bignum library for the calculation
-  if (ref($data) =~ /^Math::Big(?:Int|Float)$/ or ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/) {
+  if (ref($data) =~ /^Math::Big(?:Int|Float)$/
+      or ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/
+      or get_type($data) eq 'number' or get_type($schema->{multipleOf}) eq 'number') {
     $data = ref($data) =~ /^Math::Big(?:Int|Float)$/ ? $data->copy : Math::BigFloat->new($data);
     my $divisor = ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/ ? $schema->{multipleOf} : Math::BigFloat->new($schema->{multipleOf});
     my ($quotient, $remainder) = $data->bdiv($divisor);
@@ -520,7 +522,7 @@ sub _eval_keyword_pattern ($data, $schema, $state) {
   assert_pattern($state, $schema->{pattern});
 
   return 1 if not is_type('string', $data);
-  return 1 if $data =~ m/$schema->{pattern}/;
+  return 1 if $data =~ m/(?:$schema->{pattern})/;
   return E($state, 'pattern does not match');
 }
 
@@ -950,7 +952,7 @@ sub _eval_keyword_patternProperties ($data, $schema, $state) {
 
   my $valid = 1;
   foreach my $property_pattern (sort keys $schema->{patternProperties}->%*) {
-    foreach my $property (sort grep m/$property_pattern/, keys %$data) {
+    foreach my $property (sort grep m/(?:$property_pattern)/, keys %$data) {
       if (is_type('boolean', $schema->{patternProperties}{$property_pattern})) {
         next if $schema->{patternProperties}{$property_pattern};
         $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property),
@@ -979,7 +981,7 @@ sub _eval_keyword_additionalProperties ($data, $schema, $state) {
   foreach my $property (sort keys %$data) {
     next if exists $schema->{properties} and exists $schema->{properties}{$property};
     next if exists $schema->{patternProperties}
-      and any { $property =~ /$_/ } keys $schema->{patternProperties}->%*;
+      and any { $property =~ /(?:$_)/ } keys $schema->{patternProperties}->%*;
 
     if (is_type('boolean', $schema->{additionalProperties})) {
       next if $schema->{additionalProperties};
@@ -1273,7 +1275,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,8 @@
+0.03 2023-04-23T20:53:28+02:00
+ - Add example web app and screenshot.
+ - Regen README file from doc.
+ - Update copyright years.
+
 0.02 2022-09-12T23:51:29+02:00
  - Fix minimal dependency of Tags::HTML.
  - Improve CSS for button.

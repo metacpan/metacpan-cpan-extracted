@@ -6,7 +6,7 @@ OpenTracing::Implementation::DataDog::SpanContext - A DataDog Implementation
 
 =cut
 
-our $VERSION = 'v0.46.1';
+our $VERSION = 'v0.46.2';
 
 
 =head1 SYNOPSIS
@@ -34,7 +34,7 @@ use MooX::Should;
 
 with 'OpenTracing::Role::SpanContext';
 
-use OpenTracing::Implementation::DataDog::ID qw/random_datadog_id/;
+use OpenTracing::Implementation::DataDog::Utils qw/random_bigint/;
 
 use Sub::Trigger::Lock;
 use Types::Common::String qw/NonEmptyStr/;
@@ -65,8 +65,8 @@ DataDog requires this to be a unsigned 64-bit integer
 
 has '+trace_id' => (
     is =>'ro',
-    should => InstanceOf['OpenTracing::Implementation::DataDog::ID'],
-    default => sub{ random_datadog_id() }
+    should => InstanceOf['Math::BigInt'],
+    default => sub{ random_bigint() }
 );
 
 
@@ -79,8 +79,8 @@ DataDog requires this to be a unsigned 64-bit integer
 
 has '+span_id' => (
     is =>'ro',
-    should => InstanceOf['OpenTracing::Implementation::DataDog::ID'],
-    default => sub{ random_datadog_id() }
+    should => InstanceOf['Math::BigInt'],
+    default => sub{ random_bigint() }
 );
 
 

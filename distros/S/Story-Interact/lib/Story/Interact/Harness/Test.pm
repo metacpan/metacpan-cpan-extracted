@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Harness::Test;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001010';
+our $VERSION   = '0.001011';
 
 use Moo;
 use Types::Common -types;

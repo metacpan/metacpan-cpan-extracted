@@ -4,6 +4,7 @@ BEGIN
     use FindBin qw($Bin);
     use lib "$Bin/../lib";
     use lib "$Bin/../t";
+    use vars qw( $DEBUG );
     use strict;
     use warnings;
     use utf8;

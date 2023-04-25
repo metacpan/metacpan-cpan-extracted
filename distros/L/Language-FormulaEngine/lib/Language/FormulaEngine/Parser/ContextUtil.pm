@@ -5,7 +5,7 @@ use Exporter 'import';
 our @EXPORT_OK= qw( calc_text_coordinates format_context_string format_context_multiline );
 
 # ABSTRACT: utility methods for parsers
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub calc_text_coordinates {
@@ -99,7 +99,7 @@ Language::FormulaEngine::Parser::ContextUtil - utility methods for parsers
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 EXPORTED FUNCTIONS
 

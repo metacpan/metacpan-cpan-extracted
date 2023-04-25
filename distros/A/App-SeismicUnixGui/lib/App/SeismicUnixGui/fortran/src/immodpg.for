@@ -391,7 +391,7 @@
       thickness_increment_km =result(19)
 
 !      print*, 'immodpg.for,read pre_digitized_XT_pairs (y/n)=',idrxy
-!      print*, 'immodpg.for,reading data_traces(y/n)=',idrdtr
+!       print*, 'immodpg.for,reading data_traces(y/n)=',idrdtr
 !      print*, 'immodpg.for,datat1 (S)=',datat1
 !      print*, 'immodpg.for,datax1 (KM)=',datax1
 !      print*, 'immodpg.for,datadx (X)=',datadx
@@ -436,7 +436,7 @@
 
        call rdata(Amp,ntrmax,nsmax,ntr,ns,Amp_min,Amp_max)
              
-!       print*,'immodpg.for,rdata:ns,ntr',ns,'--',ntr
+       print*,'immodpg.for,rdata:ns,ntr',ns,'--',ntr
        
 ! Clips for gray scale (pggray)
          current_clip   = Amp_max/100
@@ -470,6 +470,8 @@
         rvinvd = 0.0
 ! if no velocity reduction (idred=0)
         if(idred.eq.0) rvinvd = rvinv
+        print*, '473 immodpg.for,rvinvd=',rvinvd
+        
 ! *******************
 	tr(1)  =  datax1 - datadx
 	tr(2)  =  datadx

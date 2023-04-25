@@ -241,6 +241,7 @@ The list of keywords:
   as
   break
   byte
+  can
   case
   cmp
   class
@@ -266,15 +267,16 @@ The list of keywords:
   gt
   ge
   has
-  has_impl
   if
-  isa
-  isweak
-  is_type
-  is_read_only
   interface
   int
   interface_t
+  isa
+  isweak
+  is_compile_type
+  is_type
+  is_read_only
+  items
   last
   length
   lt
@@ -320,6 +322,7 @@ The list of keywords:
   unless
   unweaken
   use
+  version
   void
   warn
   while
@@ -1229,14 +1232,14 @@ The SPVM language is assumed to be parsed by yacc/bison.
 The definition of syntax parsing of SPVM language. This is written by yacc/bison syntax.
 
   %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
-  %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE ERROR_CODE ERROR
+  %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE ERROR_CODE ERROR ITEMS VERSION_DECL
   %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
   %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
   %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
   %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID EXTENDS SUPER
   %token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
-  %type <opval> opt_classes classes class class_block
+  %type <opval> opt_classes classes class class_block version_decl
   %type <opval> opt_declarations declarations declaration
   %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
   %type <opval> method anon_method opt_args args arg has use require alias our
@@ -1245,10 +1248,10 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %type <opval> for_statement while_statement foreach_statement
   %type <opval> switch_statement case_statement case_statements opt_case_statements default_statement
   %type <opval> block eval_block init_block switch_block if_require_statement
-  %type <opval> unary_operator binary_operator comparison_operator isa is_type
+  %type <opval> unary_operator binary_operator comparison_operator isa is_type is_compile_type
   %type <opval> call_method opt_vaarg
   %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
-  %type <opval> assign inc dec allow has_impl
+  %type <opval> assign inc dec allow can
   %type <opval> new array_init die opt_extends
   %type <opval> var_decl var interface union_type
   %type <opval> operator opt_operators operators opt_operator logical_operator void_return_operator
@@ -1261,11 +1264,11 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %left <opval> BIT_OR BIT_XOR
   %left <opval> BIT_AND
   %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
-  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE NUMERIC_CMP STRING_CMP
+  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
   %left <opval> SHIFT
   %left <opval> '+' '-' '.'
   %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY HAS_IMPL SET_ERROR_CODE
+  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY SET_ERROR_CODE
   %nonassoc <opval> INC DEC
   %left <opval> ARROW
 
@@ -1302,7 +1305,8 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | declaration
 
   declaration
-    : has
+    : version_decl
+    | has
     | method
     | enumeration
     | our
@@ -1314,6 +1318,9 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
 
   init_block
     : INIT block
+
+  version_decl
+    : VERSION_DECL CONSTANT ';'
 
   use
     : USE class_name ';'
@@ -1516,15 +1523,17 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | comparison_operator
     | isa
     | is_type
+    | is_compile_type
     | TRUE
     | FALSE
     | is_read_only
-    | has_impl
+    | can
     | logical_operator
     | CLASS_ID class_name
     | ERROR_CODE
     | SET_ERROR_CODE operator
     | ERROR
+    | ITEMS
 
   operators
     : operators ',' operator
@@ -1593,6 +1602,9 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   is_type
     : operator IS_TYPE type
 
+  is_compile_type
+    : operator IS_COMPILE_TYPE type
+
   logical_operator
     : operator LOGICAL_OR operator
     | operator LOGICAL_AND operator
@@ -1644,9 +1656,9 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   isweak_field
     : ISWEAK var ARROW '{' field_name '}'
 
-  has_impl
-    : HAS_IMPL var ARROW method_name
-    | HAS_IMPL var
+  can
+    : operator CAN method_name
+    | operator CAN CONSTANT
 
   array_length
     : '@' operator
@@ -1865,7 +1877,7 @@ The list of syntax parsing tokens:
     <td>HAS</td><td>has</td>
   </tr>
   <tr>
-    <td>HAS_IMPL</td><td>has_impl</td>
+    <td>CAN</td><td>can</td>
   </tr>
   <tr>
     <td>IF</td><td>if</td>
@@ -2066,6 +2078,9 @@ The list of syntax parsing tokens:
     <td>VAR</td><td>var</td>
   </tr>
   <tr>
+    <td>VERSION</td><td>version</td>
+  </tr>
+  <tr>
     <td>VOID</td><td>void</td>
   </tr>
   <tr>
@@ -2108,11 +2123,11 @@ The bottom is the highest precidence and the top is the lowest precidence.
   %left <opval> BIT_OR BIT_XOR
   %left <opval> BIT_AND
   %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
-  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA NUMERIC_CMP STRING_CMP
+  %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
   %left <opval> SHIFT
   %left <opval> '+' '-' '.'
   %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY HAS_IMPL SET_ERROR_CODE
+  %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY SET_ERROR_CODE
   %nonassoc <opval> INC DEC
   %left <opval> ARROW
 
@@ -2219,37 +2234,25 @@ The operand VERSION_STRING is a version string.
 
 The version string is a version of a class such as C<"1.001003">.
 
-This is the string type.
-
-This is composed of numbers C<0-9> and C<.>. 
-
-This can contain C<_>.
-
 If the version has already been declared, a compilation error occurs.
 
-This is normalized by the following way.
+A version string is the string type.
 
-=over 2
+This is composed of numbers C<0-9>, C<.> and C<_>. 
 
-=item * All C<_> is removed.
+The following checks are performed.
 
-=back
+A character in a version string must be a number or C<.>. Otherwise a compilation error occurs.
 
-The normalized version string can be parsed as a floating point number.
+The number of C<.> in a version string must be less than or equal to 1. Otherwise a compilation error occurs.
 
-After the nomalization, the following checks are performed.
+A version string must begin with a number. Otherwise a compilation error occurs.
 
-A character in a version number must be a number or C<.>. Otherwise a compilation error occurs.
+A version string must end with a number. Otherwise a compilation error occurs.
 
-The number of C<.> in a version number must be less than or equal to 1. Otherwise a compilation error occurs.
+The length of characters after C<.> in a version string must be divisible by 3. Otherwise a compilation error occurs.
 
-A version number must begin with a number. Otherwise a compilation error occurs.
-
-A version number must end with a number. Otherwise a compilation error occurs.
-
-The length of characters after C<.> in a version number must be divisible by 3. Otherwise a compilation error occurs.
-
-The normalized version string is saved to the version information of the class.
+The version string is saved to the version information of the class.
 
 Examples:
   
@@ -2270,8 +2273,22 @@ Examples:
   }
   
   class Foo {
-    version "1.001003_001"; # Normalized to "1.001003001"
+    version "1.001003_001";
   }
+
+=head3 Version String
+
+The version string is a string that is parsed by the L<version declaration|/"Version Declaration">.
+
+This is used as the version string of the SPVM language.
+
+=head2 Version Number
+
+The version number is a floating point number created by the following steps.
+
+1. C<_> is removed from a L<version string/"Version Declaration">.
+
+2. The string is converted to a floating point number by the C<strtod> C function.
 
 =head2 Class Attribute
 
@@ -2833,8 +2850,6 @@ It is defined by the C<ro> or C<rw> L<class variable attributes|/"Class Variable
 
 It is a L<method|/"Method"> that name is the same as the class variable name removing C<$>. For example, if the class variable name is $FOO, its getter method name is C<FOO>.
 
-Inline expantion to the L<getting class variable|/"Getting Class Variable"> is performed on each class variable getter method.
-
 Examples:
 
   # Class variable getter method
@@ -2859,8 +2874,6 @@ If the type of the class variable is the L<byte type|/"byte Type"> or the L<shor
 It is defined by the C<wo>  or C<rw> L<class variable attributes|/"Class Variable Attributes">.
 
 It is a L<method|/"Method"> that name is the same as the class variable name removing C<$> and adding C<SET_> to the beginning. For example, if the class variable name is $FOO, its setter method name is C<SET_FOO>.
-
-Inline expantion to the L<setting class variable|/"Setting Class Variable"> is performed on each class variable setter method.
 
 Examples:
 
@@ -3002,8 +3015,6 @@ If the type of the field is the C<byte> or C<short> type, The return type of a f
 A field setter method is an L<instance method|/"Instance Method">. It has an argument. The type of the argument is the same as the field type. The return type is the L<void type|/"void Type">.
 
 If the type of the field is the C<byte> or C<short> type, The argument type of a field setter method is the C<int> type.
-
-Inline expansion to the field access except that the field type is the C<byte> or C<short> is performed on field getter method and setter method.
 
 Examples:
 
@@ -3309,29 +3320,13 @@ And each function in the shared library is bind to the SPVM method.
 
 Precompiled methods need the L<build directory|SPVM/"SPVM_BUILD_DIR"> such as C<~/.spvm_build> to compile and link them.
 
-=head2 Constant Method
-
-Constant Method is a Method that the return type is a L<numeric type|/"Numeric Type"> and returns Constant Value.
-
-  static method foo : int () { return 5; }
-  static method foo : long () { return 5L; }
-  static method foo : float () { return 5.0f; }
-  static method foo : double () { return 5.0; }
-
-Inline Expansion optimization is performed on Constant Method.
-
-Note that SPVM does not perform constant convolution optimization, so if a constant is calculated, it will not performe Inline Expansion.
-
-  # This is not Constant Method.  Inline Expansion is not performed
-  static method foo : int () { return 5 + 3; }
-
 =head1 Enumeration
 
-The enumeration is the syntax to define constant values of the L<int type|/"int Type">.
+The enumeration is the syntx to defines constant values of the L<int type|/"int Type">.
 
 =head2 Enumeration Definition
 
-The C<enum> keyword defines an enumeration. An enumeration defines constant values.
+The C<enum> keyword defines an enumeration. An enumeration has definitions of constant values.
 
   # Enumeration Definition
   enum {
@@ -3342,11 +3337,23 @@ The C<enum> keyword defines an enumeration. An enumeration defines constant valu
 
 An enumeration must be defined directly under the L<class definition|/"Class Definition">.
 
-The first value of an enumeration begins with 0. The next value is incremented by 1, and this is continued in the same way. In this example, C<FLAG1> is 0, C<FALG2> is 1, and C<FLAG3> is 2.
+  class Foo {
+    enum {
+      FLAG1,
+      FLAG2,
+      FLAG3
+    }
+  }
 
-The type of a value of an enumeration is the L<int type|/"int Type">.
+The name given to an enumeration value must be a L<method name|/"Method Name">.
 
-C<,> after the last value can be allowed.
+The first enumeration value is 0. The next enumeration value is incremented by 1, and this is continued in the same way.
+
+In the above example, C<FLAG1> is 0, C<FALG2> is 1, and C<FLAG3> is 2.
+
+The type of an enumeration value is the L<int type|/"int Type">.
+
+C<,> after the last enumeration value can be allowed.
 
   enum {
     FLAG1,
@@ -3354,13 +3361,7 @@ C<,> after the last value can be allowed.
     FLAG3,
   }
 
-A value of an enumeration is implemented as a L<constant method|/"Constant Method">.
-
-  static method FLAG1 : int () { return 0; }
-  static method FLAG2 : int () { return 1; }
-  static method FLAG3 : int () { return 2; }
-
-The value can be set explicitly.
+An enumeration value can be set by C<=> explicitly.
 
   enum {
     FLAG1,
@@ -3371,6 +3372,8 @@ The value can be set explicitly.
 In the above example, C<FLAG1> is 0, C<FALG2> is 4, and C<FLAG3> is 5.
 
 If an enumeration definition is invalid, a compilation error occurs.
+
+An enumeration value is got by the L<getting enumeration value|/"Getting Enumeration Value">.
 
 Examples:
 
@@ -3437,13 +3440,17 @@ Only one of enumeration attributes C<private>, C<protected> or C<public> can be 
 
 =head2 Getting Enumeration Value
 
-The value of the enumeration can be got using the L<class method call|/"Class Method Call">.
+A value of the enumeration can be got using the L<class method call|/"Class Method Call">.
 
   my $flag1 = Foo->FLAG1;
   my $flag2 = Foo->FLAG2;
   my $flag3 = Foo->FLAG3;
 
-As special cases, the value of the enumeration can be used as the C<OPERAND> of the L<case statement|/"case Statement">.
+A getting enumeration value is replaced to an L<interger literal|/"Integer Literal"> at compilation time.
+
+For this, if an enumeration value is changed after first publication to users, the binary compatibility is not kept.
+
+An enumeration value can be used as an operand of the L<case statement|/"case Statement">.
 
   switch ($num) {
     case Foo->FLAG1: {
@@ -3601,7 +3608,7 @@ A class block is a L<block|/"Block">.
 
 =head3 Enumeration Block
 
-A enumeration block is a L<block|/"Block">.
+An enumeration block is a L<block|/"Block">.
 
   # Enumeration block
   enum {
@@ -3745,10 +3752,16 @@ Zero or more L<statements|/"Statement"> can be written in a C<INIT> block.
 
 The L<return statement|/"return Statement"> cannot be written in C<INIT> block.
 
-Each class can have a C<INIT> block.
+If a C<INIT> block is not defined in a class, a default empty C<INIT> block is defined.
 
-The execution order of C<INIT> blocks is not guaranteed.
-Using fields, class variables, methods of other classes is dangerous because INIT blocks may not have been executed yet.
+The execution order of C<INIT> blocks is not guaranteed, so before using a class in a C<INIT> block, the C<INIT> block of a using class should be called.
+
+  INIT {
+    Point->INIT;
+    $POINT = Point->new(1, 2);
+  }
+
+For this reason, The C<INIT> block should be implemented so that it may be called multiple times.
 
 Examples:
 
@@ -3764,7 +3777,7 @@ Examples:
       $NUM = 3;
       $STRING = "abc";
       
-      # This is dangerous because the INIT block of the Point class may not have been executed.
+      Point->INIT;
       $POINT = Point->new(1, 2);
     }
   }
@@ -6182,13 +6195,13 @@ The boxing conversion is a L<type coversion|/"Type Conversion"> to convert the v
 
 The unboxing conversion is a L<type coversion|/"Type Conversion"> to convert the value of the L<numeric object type|/"Numeric Object Type"> to the value of the corresponding L<numeric type|/"Numeric Type">.
 
-=head2 Bool Conversion
+=head2 Boolean Conversion
 
-The bool conversion is a L<type conversion|/"Type Conversion"> that is performed on the L<conditional operand|/"Conditional Operand">.
+The boolean conversion is a L<type conversion|/"Type Conversion"> that is performed on the L<conditional operand|/"Conditional Operand">.
 
-The type of the C<OPERAND> of the bool conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error occurs.
+The type of the C<OPERAND> of the boolean conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error occurs.
 
-The bool conversion returns the following value corresponding to the type of the condional operand.
+The boolean conversion returns the following value corresponding to the type of the condional operand.
 
 If the type is the L<int type|/"int Type">, return the value.
 
@@ -6397,7 +6410,7 @@ The C<if> statement is a L<statement|/"Statement"> for conditional branch.
   
   }
 
-First, The L<bool conversion|/"Bool Conversion"> is performed on the condition.
+First, The L<boolean conversion|/"Boolean Conversion"> is performed on the condition.
 
 Next, if the condition is not 0, the execution position jumps to the beginning of the L<if block|/"if Block">. Otherwise jumps to the end of the L<if block|/"if Block">.
 
@@ -6438,7 +6451,7 @@ The C<elsif> statement is a L<statement|/"Statement"> for conditional branch use
 
 If the C<condition 1> doesn't match, the execution position jumps to the end of the L<if block|/"if Block">.
 
-Next, The L<bool conversion|/"Bool Conversion"> is performed on the C<condition 2>.
+Next, The L<boolean conversion|/"Boolean Conversion"> is performed on the C<condition 2>.
 
 Next, if the C<condition 2> is not 0, the execution position jumps to the beginning of the L<elsif block|/"elsif Block">. Otherwise jumps to the end of the L<elsif block|/"elsif Block">
 
@@ -6743,7 +6756,7 @@ The C<while> statement is a L<statement|/"Statement"> for loop.
   
   }
 
-First, The L<bool conversion|/"Bool Conversion"> is performed on the condition.
+First, The L<boolean conversion|/"Boolean Conversion"> is performed on the condition.
 
 Next, If the condition is 0, the program jumps to the end of the L<while block|/"while Block">. Otherwise the program goes to the beginning of the L<while block|/"while Block">.
 
@@ -7774,9 +7787,9 @@ The left operand and the right operand must be an L<operator|/"Operator">.
 
 The return type of the logical AND operator is the L<int type|/"int Type">.
 
-Thg logical AND operator performs the L<bool conversion|/"Bool Conversion"> to the left operand. If the evaluated value is 0, return 0. Otherwise proceed to the evaluation of the right operand.
+Thg logical AND operator performs the L<boolean conversion|/"Boolean Conversion"> to the left operand. If the evaluated value is 0, return 0. Otherwise proceed to the evaluation of the right operand.
 
-It performs the L<bool conversion|/"Bool Conversion"> to the right operand. If the evaluated value is 0, return 0. Otherwise return the evaluated value.
+It performs the L<boolean conversion|/"Boolean Conversion"> to the right operand. If the evaluated value is 0, return 0. Otherwise return the evaluated value.
 
 =head3 Logical OR Operator
 
@@ -7786,9 +7799,9 @@ The logical OR operator C<||> is a L<logical operator|/"Logical Operator"> to pe
 
 The return type of the logical OR operator is the L<int type|/"int Type">.
 
-Thg logical OR operator performs the L<bool conversion|/"Bool Conversion"> to the left operand. If the evaluated value is not 0, return the evaluated value. Otherwise proceed to the evaluation of the right operand.
+Thg logical OR operator performs the L<boolean conversion|/"Boolean Conversion"> to the left operand. If the evaluated value is not 0, return the evaluated value. Otherwise proceed to the evaluation of the right operand.
 
-It performs the L<bool conversion|/"Bool Conversion"> to the right operand. If the evaluated value is not 0, return the evaluated value. Otherwise return 0.
+It performs the L<boolean conversion|/"Boolean Conversion"> to the right operand. If the evaluated value is not 0, return the evaluated value. Otherwise return 0.
 
 =head3 Logical NOT Operator
 
@@ -7798,7 +7811,7 @@ The logical NOT operator C<!> is a L<logical operator|/"Logical Operator"> to pe
 
 The return type of the logical NOT operator is the L<int type|/"int Type">.
 
-Thg logical NOT operator performs the L<bool conversion|/"Bool Conversion"> to the C<OPERAND>. If the evaluated value is 0, returns 1. Otherwise return 0.
+Thg logical NOT operator performs the L<boolean conversion|/"Boolean Conversion"> to the C<OPERAND>. If the evaluated value is 0, returns 1. Otherwise return 0.
 
 =head2 String Concatenation Operator
 
@@ -8087,31 +8100,31 @@ Examples:
   # isweak
   my $isweak = isweak $object->{point};
 
-=head2 has_impl Operator
+=head2 can Operator
 
-The C<has_impl> operator checks the existence of the method implementation.
+The C<can> operator checks if a method can be called. 
 
-  has_impl OPERAND->METHOD_NAME
+  OPERAND can METHOD_NAME
 
-  has_impl OPERAND
+The type of the OPERAND must be the L<class type|/"Class Type"> or the L<interface type|/"Interface Type">. Otherwise a compilation error occurs.
 
-The operand must the object that has a L<class type|/"Class Type"> or an L<interface type|/"Interface Type">. Otherwise a compilation error occurs.
+The METHOD_NAME must be a L<method name|/"Method Name"> or an empty string C<"">. Otherwise a compilation error occurs.
 
-If the class or the interface doesn't have the method declaration, a compilation error occurs.
+An empty string C<""> means an L<anon method|/"Anon Method">.
 
-The method name must be a L<method name|/"Method Name">. Otherwise a compilation error occurs.
-
-If method name is not specified, the method name become C<"">.
+If the OPERAND can call the method given by METHOD_NAME, returns 1. Otherwise returns 0.
 
 The return type is L<int type|/"int Type">.
-
-If the class or the interface has the method implementation, returns 1, otherwise returns 0.
 
 Examples:
 
   my $stringable = (Stringable)Point->new(1, 2);
   
-  if (has_impl $stringable->to_string) {
+  if ($stringable can to_string) {
+    # ...
+  }
+  
+  if ($stringable can "") {
     # ...
   }
 

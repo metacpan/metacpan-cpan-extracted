@@ -11,7 +11,7 @@ use overload (
   fallback => 1,
 );
 
-use Venus::Class 'base', 'with';
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -28,7 +28,15 @@ require POSIX;
 state $GETCWD = Cwd->getcwd;
 state $MAPSIG = {%SIG};
 
+# ATTRIBUTES
+
+attr 'alarm';
+
 # HOOKS
+
+sub _alarm {
+  CORE::alarm(shift);
+}
 
 sub _chdir {
   CORE::chdir(shift);
@@ -39,7 +47,7 @@ sub _exit {
 }
 
 sub _exitcode {
-  $?;
+  $? >> 8;
 }
 
 sub _fork {
@@ -109,6 +117,18 @@ sub check {
   return wantarray ? ($result, _exitcode) : $result;
 }
 
+sub count {
+  my ($self, $code, @args) = @_;
+
+  $code ||= 'watchlist';
+
+  my @result = $self->$code(@args);
+
+  my $count = (@result == 1 && ref $result[0] eq 'ARRAY') ? @{$result[0]} : @result;
+
+  return $count;
+}
+
 sub daemon {
   my ($self) = @_;
 
@@ -172,6 +192,7 @@ sub fork {
     my $process;
 
     if ($pid) {
+      $self->watch($pid);
       return wantarray ? (undef, $pid) : undef;
     }
 
@@ -180,6 +201,8 @@ sub fork {
     my $orig_seed = srand;
     my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
     srand $self_seed;
+
+    _alarm($self->alarm) if defined $self->alarm;
 
     if ($code) {
       local $_ = $process;
@@ -225,10 +248,54 @@ sub kill {
   return _kill(uc($name), @pids);
 }
 
+sub killall {
+  my ($self, $name, @pids) = @_;
+
+  $name ||= 'INT';
+
+  my $result = [map $self->kill($name, $_), (@pids ? @pids : $self->watchlist)];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub pid {
+  my ($self) = @_;
+
+  return $self->value;
+}
+
+sub pids {
+  my ($self) = @_;
+
+  my $result = [$self->pid, $self->watchlist];
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub ping {
   my ($self, @pids) = @_;
 
   return $self->kill(0, @pids);
+}
+
+sub prune {
+  my ($self) = @_;
+
+  $self->unwatch($self->stopped);
+
+  return $self;
+}
+
+sub restart {
+  my ($self, $code) = @_;
+
+  my $result = [];
+
+  $self->status(sub {
+    push @{$result}, $code->(@_) if ($_[1] == -1) || ($_[1] == $_[0])
+  });
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub setsid {
@@ -243,6 +310,32 @@ sub setsid {
     $throw->stash(pid => _pid());
     $throw->error;
   };
+}
+
+sub started {
+  my ($self) = @_;
+
+  my $result = [];
+
+  $self->status(sub {
+    push @{$result}, $_[0] if $_[1] > -1 && $_[1] != $_[0]
+  });
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub status {
+  my ($self, $code) = @_;
+
+  my $result = [];
+  my $watchlist = $self->watchlist;
+
+  for my $pid (@{$watchlist}) {
+    local $_ = $pid;
+    push @{$result}, $code->($pid, $self->check($pid));
+  }
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub stderr {
@@ -326,6 +419,18 @@ sub stdout {
   return $self;
 }
 
+sub stopped {
+  my ($self) = @_;
+
+  my $result = [];
+
+  $self->status(sub {
+    push @{$result}, $_[0] if ($_[1] == -1) || ($_[1] == $_[0])
+  });
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub trap {
   my ($self, $name, $expr) = @_;
 
@@ -345,6 +450,32 @@ sub wait {
   return wantarray ? ($result, _exitcode) : $result;
 }
 
+sub waitall {
+  my ($self, @pids) = @_;
+
+  my $result = [map [$self->wait($_)], @pids ? @pids : $self->watchlist];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub watch {
+  my ($self, @args) = @_;
+
+  my $watchlist = $self->watchlist;
+
+  my %seen; @{$watchlist} = grep !$seen{$_}++, @{$watchlist}, @args;
+
+  return wantarray ? @{$watchlist} : $watchlist;
+}
+
+sub watchlist {
+  my ($self) = @_;
+
+  my $watchlist = $self->{watchlist} ||= [];
+
+  return wantarray ? @{$watchlist} : $watchlist;
+}
+
 sub work {
   my ($self, $code, @args) = @_;
 
@@ -358,6 +489,18 @@ sub work {
   return $returned[-1];
 }
 
+sub works {
+  my ($self, $count, $code, @args) = @_;
+
+  my $result = [];
+
+  for (my $i = 1; $i <= ($count || 0); $i++) {
+    push @{$result}, scalar($self->work($code, @args));
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub untrap {
   my ($self, $name) = @_;
 
@@ -369,6 +512,18 @@ sub untrap {
   }
 
   return $self;
+}
+
+sub unwatch {
+  my ($self, @args) = @_;
+
+  my $watchlist = $self->watchlist;
+
+  my %seen = map +($_, 1), @args;
+
+  @{$watchlist} = grep !$seen{$_}++, @{$watchlist}, @args;
+
+  return wantarray ? @{$watchlist} : $watchlist;
 }
 
 1;
@@ -413,6 +568,51 @@ Process Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for handling and forking processes.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 alarm
+
+  alarm(Int $seconds) (Int)
+
+The alarm attribute is used in calls to L<alarm> when the process is forked,
+installing an alarm in the forked process if set.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item alarm example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $alarm = $parent->alarm;
+
+  # undef
+
+=back
+
+=over 4
+
+=item alarm example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $alarm = $parent->alarm(10);
+
+  # 10
+
+=back
 
 =cut
 
@@ -567,6 +767,70 @@ I<Since C<0.06>>
   my ($check, $status) = $parent->check($pid);
 
   # ($pid, 1)
+
+=back
+
+=cut
+
+=head2 count
+
+  count(Str | CodeRef $code, Any @args) (Int)
+
+The count method dispatches to the method specified (or the L</watchlist> if
+not specified) and returns a count of the items returned from the dispatched
+call.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item count example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $count = $parent->count;
+
+  # 0
+
+=back
+
+=over 4
+
+=item count example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my ($pid) = $parent->watch(1001);
+
+  my $count = $parent->count;
+
+  # 1
+
+=back
+
+=over 4
+
+=item count example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my ($pid) = $parent->watch(1001);
+
+  my $count = $parent->count('watchlist');
+
+  # 1
 
 =back
 
@@ -787,6 +1051,29 @@ I<Since C<0.06>>
 
 =back
 
+=over 4
+
+=item fork example 5
+
+  # given: synopsis
+
+  $process = $parent->do('alarm', 10)->fork;
+
+  # if ($process) {
+  #   # in forked process with alarm installed ...
+  #   $process->exit;
+  # }
+  # else {
+  #   # in parent process ...
+  #   $parent->wait(-1);
+  # }
+
+  # in child process
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
 =cut
 
 =head2 forks
@@ -902,9 +1189,130 @@ I<Since C<0.06>>
     $process->exit;
   }
 
-  my $kill = $parent->kill('term', int$process);
+  my $kill = $parent->kill('term', int $process);
 
   # 1
+
+=back
+
+=cut
+
+=head2 killall
+
+  killall(Str $name, Int @pids) (ArrayRef)
+
+The killall method accepts a list of PIDs (or uses the L</watchlist> if not
+provided) and returns the result of calling the L</kill> method for each PID.
+Returns a list in list context.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item killall example 1
+
+  # given: synopsis
+
+  package main;
+
+  if ($process = $parent->fork) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $killall = $parent->killall('term');
+
+  # [1]
+
+=back
+
+=over 4
+
+=item killall example 2
+
+  # given: synopsis
+
+  package main;
+
+  if ($process = $parent->fork) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $killall = $parent->killall('term', 1001..1004);
+
+  # [1, 1, 1, 1]
+
+=back
+
+=cut
+
+=head2 pid
+
+  pid() (Int)
+
+The pid method returns the PID of the current process.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item pid example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $pid = $parent->pid;
+
+  # 00000
+
+=back
+
+=cut
+
+=head2 pids
+
+  pids() (ArrayRef)
+
+The pids method returns the PID of the current process, and the PIDs of any
+child processes.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item pids example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $pids = $parent->pids;
+
+  # [00000]
+
+=back
+
+=over 4
+
+=item pids example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $pids = $parent->pids;
+
+  # [00000, 1001..1004]
 
 =back
 
@@ -930,9 +1338,117 @@ I<Since C<2.01>>
     $process->exit;
   }
 
-  my $ping = $parent->ping(int$process);
+  my $ping = $parent->ping(int $process);
 
   # 1
+
+=back
+
+=cut
+
+=head2 prune
+
+  prune() (Process)
+
+The prune method removes all stopped processes and returns the invocant.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item prune example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001);
+
+  $parent = $parent->prune;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item prune example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $process = $parent->fork;
+
+  if ($process) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  $parent = $parent->prune;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item prune example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->work(sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  $parent = $parent->prune;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 restart
+
+  restart(CodeRef $callback) (ArrayRef)
+
+The restart method executes the callback provided for each PID returned by the
+L</stopped> method, passing the pid and the results of L</check> to the
+callback as arguments, and returns the result of each call as an arrayref. In
+list context, this method returns a list.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item restart example 1
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my $restart = $parent->restart(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # redeploy stopped process
+
+    return [$pid, $check, $exit];
+  });
+
+  # [[1001, 1001, 255]]
 
 =back
 
@@ -968,6 +1484,128 @@ I<Since C<0.06>>
   my $setsid = $parent->setsid;
 
   # Exception! Venus::Process::Error (isa Venus::Error)
+
+=back
+
+=cut
+
+=head2 started
+
+  started() (ArrayRef)
+
+The started method returns a list of PIDs whose processes have been started and
+which have not terminated. Returns a list in list context.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item started example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $started = $parent->started;
+
+  # child not terminated
+
+  # [...]
+
+=back
+
+=over 4
+
+=item started example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $started = $parent->started;
+
+  # child terminated
+
+  # []
+
+=back
+
+=cut
+
+=head2 status
+
+  status(CodeRef $callback) (ArrayRef)
+
+The status method executes the callback provided for each PID in the
+L</watchlist>, passing the pid and the results of L</check> to the callback as
+arguments, and returns the result of each call as an arrayref. In list context,
+this method returns a list.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item status example 1
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my $status = $parent->status(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # assuming process 1001 is still running (not terminated)
+
+    return [$pid, $check, $exit];
+  });
+
+  # [[1001, 0, -1]]
+
+=back
+
+=over 4
+
+=item status example 2
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my $status = $parent->status(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # assuming process 1001 terminated with exit code 255
+
+    return [$pid, $check, $exit];
+  });
+
+  # [[1001, 1001, 255]]
+
+=back
+
+=over 4
+
+=item status example 3
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my @status = $parent->status(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # assuming process 1001 terminated with exit code 255
+
+    return [$pid, $check, $exit];
+  });
+
+  # ([1001, 1001, 255])
 
 =back
 
@@ -1081,6 +1719,49 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 stopped
+
+  stopped() (ArrayRef)
+
+The stopped method returns a list of PIDs whose processes have terminated.
+Returns a list in list context.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item stopped example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $stopped = $parent->stopped;
+
+  # child terminated
+
+  # [...]
+
+=back
+
+=over 4
+
+=item stopped example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $stopped = $parent->stopped;
+
+  # child not terminated
+
+  # []
+
+=back
+
+=cut
+
 =head2 trap
 
   trap(Str $name, Str | CodeRef $expr) (Process)
@@ -1149,6 +1830,69 @@ I<Since C<0.06>>
   $parent = $parent->untrap;
 
   # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 unwatch
+
+  unwatch(Int @pids) (ArrayRef)
+
+The unwatch method removes the PIDs provided from the watchlist and returns the
+list of PIDs remaining to be watched. In list context returns a list.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item unwatch example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $unwatch = $parent->unwatch;
+
+  # []
+
+=back
+
+=over 4
+
+=item unwatch example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $unwatch = $parent->unwatch(1001);
+
+  # [1002..1004]
+
+=back
+
+=over 4
+
+=item unwatch example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $unwatch = $parent->unwatch(1002, 1004);
+
+  # [1001, 1003]
 
 =back
 
@@ -1235,6 +1979,211 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 waitall
+
+  waitall(Int @pids) (ArrayRef)
+
+The waitall method does a blocking L</wait> call for all processes based on the
+PIDs provided (or the PIDs returned by L</watchlist> if not provided) and
+returns an arrayref of results from calling L</wait> on each PID. Returns a
+list in list context.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item waitall example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $waitall = $parent->waitall;
+
+  # []
+
+=back
+
+=over 4
+
+=item waitall example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $waitall = $parent->waitall(1001);
+
+  # [[1001, 0]]
+
+=back
+
+=over 4
+
+=item waitall example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my ($process, $pid) = $parent->fork;
+
+  if ($process) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $waitall = $parent->waitall;
+
+  # [[$pid, 0]]
+
+=back
+
+=cut
+
+=head2 watch
+
+  watch(Int @pids) (ArrayRef)
+
+The watch method records PIDs to be watched, e.g. using the L</status> method
+and returns all PIDs being watched. Returns a list in list context.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item watch example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watch = $parent->watch;
+
+  # []
+
+=back
+
+=over 4
+
+=item watch example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watch = $parent->watch(1001..1004);
+
+  # [1001..1004]
+
+=back
+
+=over 4
+
+=item watch example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watch = $parent->watch(1001..1004, 1001..1004);
+
+  # [1001..1004]
+
+=back
+
+=over 4
+
+=item watch example 4
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $watch = $parent->watch;
+
+  # [1001..1004]
+
+=back
+
+=over 4
+
+=item watch example 5
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my @watch = $parent->watch(1001..1004);
+
+  # (1001..1004)
+
+=back
+
+=cut
+
+=head2 watchlist
+
+  watchlist() (ArrayRef)
+
+The watchlist method returns the recorded PIDs. Returns a list in list context.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item watchlist example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watchlist = $parent->watchlist;
+
+  # []
+
+=back
+
+=over 4
+
+=item watchlist example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $watchlist = $parent->watchlist;
+
+  # [1001..1004]
+
+=back
+
+=cut
+
 =head2 work
 
   work(Str | CodeRef $code, Any @args) (Int)
@@ -1260,6 +2209,38 @@ I<Since C<0.06>>
   });
 
   # $pid
+
+=back
+
+=cut
+
+=head2 works
+
+  works(Int $count, CodeRef $callback, Any @args) (ArrayRef)
+
+The works method creates multiple forks by calling the L</work> method C<n>
+times, based on the count specified. The works method runs the callback
+provided in the child process, and immediately exits after with an exit code of
+C<0> by default. This method returns the I<PIDs> of the child processes. It is
+recommended to install an L<perlfunc/alarm> in the child process (i.e.
+callback) to avoid creating zombie processes in situations where the parent
+process might exit before the child process is done working.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item works example 1
+
+  # given: synopsis;
+
+  my $pids = $parent->works(5, sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # $pids
 
 =back
 

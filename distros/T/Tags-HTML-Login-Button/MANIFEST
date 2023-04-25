@@ -1,6 +1,8 @@
 Button.pm
 Changes
 examples/button_html_css.pl
+examples/plack_app_login.pl
+images/plack_app_login.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

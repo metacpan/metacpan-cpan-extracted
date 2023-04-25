@@ -1,5 +1,5 @@
 package Proc::Background;
-$Proc::Background::VERSION = '1.31';
+$Proc::Background::VERSION = '1.32';
 # ABSTRACT: Generic interface to Unix and Win32 background process management
 require 5.004_04;
 
@@ -785,7 +785,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 COPYRIGHT AND LICENSE
 

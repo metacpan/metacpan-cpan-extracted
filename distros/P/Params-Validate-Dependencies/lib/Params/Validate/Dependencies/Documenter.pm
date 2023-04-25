@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.41';
 
 use Scalar::Util qw(blessed);
 

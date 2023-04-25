@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-envassert.self-contained
 lib/Env/Assert.pm
 script/envassert
 t/env-assert-private.t

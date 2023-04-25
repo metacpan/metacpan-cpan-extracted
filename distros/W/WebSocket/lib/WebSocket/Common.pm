@@ -15,6 +15,10 @@ BEGIN
 {
     use strict;
     use warnings;
+    use vars qw(
+        $MAX_MESSAGE_SIZE
+        %EXPORT_TAGS @EXPORT_OK $VERSION
+    );
     use WebSocket qw( WEBSOCKET_DRAFT_VERSION_DEFAULT );
     use parent qw( WebSocket );
     use Digest::MD5 ();
@@ -64,27 +68,27 @@ sub init
     $self->{version}        = '' unless( length( $self->{version} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    $headers = $self->headers;
+    my $headers = $self->headers;
     unless( $self->version )
     {
         if( $headers->header( 'Sec-WebSocket-Version' )->length &&
             $headers->header( 'Sec-WebSocket-Version' )->match( qr/^\d{1,2}$/ ) )
         {
             my $v = WebSocket::Version->new( $headers->header( 'Sec-WebSocket-Version' )->scalar ) ||
-                return( $self->pass_error( $v->error ) );
+                return( $self->pass_error( WebSocket::Version->error ) );
             $self->version( $v );
         }
         elsif( $headers->header( 'WebSocket-Version' )->length &&
                $headers->header( 'WebSocket-Version' )->match( qr/^\d{1,2}$/ ) )
         {
             my $v = WebSocket::Version->new( $headers->header( 'WebSocket-Version' )->scalar ) ||
-                return( $self->pass_error( $v->error ) );
+                return( $self->pass_error( WebSocket::Version->error ) );
             $self->version( $v );
         }
         else
         {
             my $v = WebSocket::Version->new( WEBSOCKET_DRAFT_VERSION_DEFAULT ) ||
-                return( $self->pass_error( $v->error ) );
+                return( $self->pass_error( WebSocket::Version->error ) );
             $self->version( $v );
         }
     }
@@ -131,7 +135,7 @@ sub headers
         if( $self->_is_a( $v, 'HTTP::Headers' ) )
         {
             my $h = $v->clone;
-            $self->{headers} = bless( $h => WebSocket::Headers );
+            $self->{headers} = bless( $h => 'WebSocket::Headers' );
         }
         elsif( $self->_is_array( $v ) )
         {
@@ -139,7 +143,7 @@ sub headers
         }
         else
         {
-            return( $self->error( "Bad value for headers. I was expecting either an array reference or a HTTP::Headers object and I got instead '", overload::StrVal( $v ), "'." ) );
+            return( $self->error( "Bad value for headers. I was expecting either an array reference or a HTTP::Headers object (including WebSocket::Headers) and I got instead '", overload::StrVal( $v ), "'." ) );
         }
     }
     elsif( !$self->{headers} )
@@ -247,7 +251,6 @@ sub subprotocol
                         ? shift( @_ )
                         : [CORE::split( /[[:blank:]\h]+/, $_[0] )]
                 : [@_];
-        $self->message( 3, "Called with -> ", sub{ $self->dump( $ref ) } );
         my $v = $self->_set_get_array_as_object( 'subprotocol', $ref ) || return( $self->pass_error );
     }
     return( $self->_set_get_array_as_object( 'subprotocol' ) );
@@ -270,9 +273,8 @@ sub _append
     }
     else
     {
-        # $self->message( 3, "Appending data -> '$_[0]'" );
         $self->buffer->append( $_[0] );
-        # XXX Emptying implicitly the caller's variable passed is very bad design
+        # NOTE: Emptying implicitly the caller's variable passed is very bad design
         # It is up to the caller to decide of the content of its variable, not us.
         # This makes for head-scratching troubles and is a way of doing never used in perl
         # The only time when the caller's variable content is modified is with perl's read() or sysread()
@@ -280,7 +282,6 @@ sub _append
         # $_[0] = '' unless( readonly( $_[0] ) );
     }
 
-    # $self->message( 3, "Is buffer size (", $self->buffer->length, ") bigger than limit (", $self->max_message_size, ")." );
     if( $self->buffer->length > $self->max_message_size )
     {
         return( $self->error( "Message is too long" ) );
@@ -337,7 +338,6 @@ sub _parse_header_chunk
 
     # parse into lines
     my $headers = $header->split( qr/\x0d?\x0a/ );
-    # $self->message( 3, "Headers found are: ", sub{ $self->dump( $headers ) });
     my $request = $headers->shift unless( $trailer );
 
     # join folded lines
@@ -412,7 +412,7 @@ sub _parse_header_chunk
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -424,7 +424,11 @@ WebSocket::Message - Common Class for Request and Response
 =head1 SYNOPSIS
 
     use WebSocket::Request;
-    my $req = WebSocket::Request->new || die( WebSocket::Request->error, "\n" );
+    my $req = WebSocket::Request->new(
+        host        => 'example.com',
+        uri         => '/demo'
+        protocol    => 'com.example.chat',
+    ) || die( WebSocket::Request->error, "\n" );
 
 =head1 VERSION
 
@@ -438,9 +442,17 @@ This is a common class for L<WebSocket::Request> and L<WebSocket::Response>
 
 =head2 buffer
 
+Sets or gets the buffer. It returns a L<scalar object|Module::Generic::Scalar>
+
 =head2 challenge
 
+Sets or gets the challenge returned to the client. 
+
 =head2 checksum
+
+Sets or gets the checksum. If a checksum is provided, it returns the current object.
+
+If no checksum is provided, it will compute one based on the value of L</number1>, L</number2> and L</challenge>. It returns the checksum as a regular string.
 
 =head2 content
 
@@ -456,9 +468,17 @@ See L<rfc6455 section 9.1|https://datatracker.ietf.org/doc/html/rfc6455#section-
 
 =head2 headers
 
+If an argument is provided, it takes either an L<WebSocket::Headers> object, or an object that inherits from L<HTTP::Headers>, or an array reference.
+
+It returns a L<WebSocket::Headers> and will instantiate a L<WebSocket::Headers> object if one is not already set.
+
 =head2 headers_as_string
 
+Returns the L<WebSocket::Headers> as a string by calling L<WebSocket::Headers/as_string>
+
 =head2 host
+
+Sets or gets the header value for C<Host>
 
 =head2 is_client_error
 
@@ -486,9 +506,19 @@ Returns true when the provided code is a success
 
 =head2 max_message_size
 
+Sets or gets the maximum message size as an integer.
+
 =head2 number1
 
+This is a default method to store a number used for the checksum challenge sent to the client.
+
+This method is overriden by L<WebSocket::Request> or L<WebSocket::Response>
+
 =head2 number2
+
+This is a default method to store a number used for the checksum challenge sent to the client.
+
+This method is overriden by L<WebSocket::Request> or L<WebSocket::Response>
 
 =head2 parse_chunk
 
@@ -582,13 +612,13 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Request>, L<WebSocket::Response>, L<HTTP::Headers>, L<HTTP::Parser>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
-
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut
 

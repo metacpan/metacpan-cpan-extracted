@@ -13,7 +13,7 @@ SEE ALSO
         TODO
 
     Wikibase::Datatype::Print::Lexeme
-        TODO
+        Wikibase lexeme pretty print helpers.
 
     Wikibase::Datatype::Print::Mediainfo
         TODO
@@ -93,5 +93,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.12
 

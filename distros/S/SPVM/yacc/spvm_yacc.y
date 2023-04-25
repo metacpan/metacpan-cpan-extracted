@@ -43,7 +43,7 @@
 %type <opval> unary_operator binary_operator comparison_operator isa is_type is_compile_type
 %type <opval> call_method opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
-%type <opval> assign inc dec allow has_impl
+%type <opval> assign inc dec allow can
 %type <opval> new array_init die opt_extends
 %type <opval> var_decl var interface union_type
 %type <opval> operator opt_operators operators opt_operator logical_operator void_return_operator
@@ -57,11 +57,11 @@
 %left <opval> BIT_OR BIT_XOR
 %left <opval> BIT_AND
 %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
-%nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP
+%nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA IS_TYPE IS_COMPILE_TYPE NUMERIC_CMP STRING_CMP CAN
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY HAS_IMPL SET_ERROR_CODE
+%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY SET_ERROR_CODE
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -188,17 +188,7 @@ declaration
 init_block
   : INIT block
     { 
-      SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, compiler->cur_file, compiler->cur_line);
-      SPVM_CONSTANT_STRING* method_name_string = SPVM_CONSTANT_STRING_new(compiler, "INIT", strlen("INIT"));
-      const char* method_name = method_name_string->value;
-      SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "INIT", compiler->cur_file, compiler->cur_line);
-      SPVM_OP* op_void_type = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
-
-      SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
-      SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
-
-      $$ = SPVM_OP_build_method(compiler, op_method, op_method_name, op_void_type, NULL, op_list_attributes, $2, NULL, NULL, 1, 0);
+      $$ = SPVM_OP_build_init_block(compiler, $1, $2);
     }
 
 version_decl
@@ -779,7 +769,7 @@ operator
       $$ = SPVM_OP_new_op_false(compiler, $1);
     }
   | is_read_only
-  | has_impl
+  | can
   | logical_operator
   | CLASS_ID class_name
     {
@@ -1219,14 +1209,14 @@ isweak_field
       $$ = SPVM_OP_build_isweak_field(compiler, $1, op_field_access);
     }
 
-has_impl
-  : HAS_IMPL var ARROW method_name
+can
+  : operator CAN method_name
     {
-      $$ = SPVM_OP_build_field_impl(compiler, $1, $2, $4);
+      $$ = SPVM_OP_build_can(compiler, $2, $1, $3);
     }
-  | HAS_IMPL var
+  | operator CAN CONSTANT
     {
-      $$ = SPVM_OP_build_field_impl(compiler, $1, $2, NULL);
+      $$ = SPVM_OP_build_can(compiler, $2, $1, $3);
     }
 
 array_length

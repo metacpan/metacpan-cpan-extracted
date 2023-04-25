@@ -14,6 +14,7 @@ my $build = Module::Build->new(
       'perl' => '5.014',
    },
    test_requires => {
+      'Test::Future::IO::Impl' => 0,
       'Test2::V0' => 0,
    },
    configure_requires => {

@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 34;
+use Test::More 'tests' => 37;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Struct::Value;
@@ -83,6 +83,19 @@ isa_ok($ret, 'Wikibase::Datatype::Value::Quantity');
 is($ret->value, 10, 'Quantity: Method value().');
 is($ret->unit, 'Q123', 'Quantity: Method unit().');
 is($ret->type, 'quantity', 'Quantity: Method type().');
+
+# Test.
+$struct_hr = {
+	'value' => {
+		'entity-type' => 'sense',
+		'id' => 'L34727-S1',
+	},
+	'type' => 'wikibase-entityid',
+};
+$ret = Wikibase::Datatype::Struct::Value::struct2obj($struct_hr);
+isa_ok($ret, 'Wikibase::Datatype::Value::Sense');
+is($ret->value, 'L34727-S1', 'Sense: Method value().');
+is($ret->type, 'sense', 'Sense: Method type().');
 
 # Test.
 $struct_hr = {

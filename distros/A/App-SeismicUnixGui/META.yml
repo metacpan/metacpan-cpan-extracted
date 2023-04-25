@@ -3,7 +3,7 @@ abstract: 'A graphical user interface for Seismic Unix'
 author:
   - 'Juan Lorenzo <gllore@lsu.edu>'
 build_requires:
-  File::Tail: '0'
+  ExtUtils::MakeMaker: '0'
   Test::Compile::Internal: '1.3'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -31,5 +31,5 @@ requires:
   Tk: '804.036'
   aliased: '0.34'
   namespace::autoclean: '0.29'
-version: v0.82.0
+version: v0.82.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

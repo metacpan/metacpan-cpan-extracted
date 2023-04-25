@@ -7,7 +7,7 @@ use Language::FormulaEngine::Error ':all';
 use namespace::clean;
 
 # ABSTRACT: Object holding function and variable names
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 has variables            => ( is => 'rw', default => sub { +{} } );
@@ -54,13 +54,13 @@ sub get_value {
 our %is_pure_function;
 sub FETCH_CODE_ATTRIBUTES {
 	my ($class, $ref)= @_;
-	return $class->maybe::mext::method($ref), ($is_pure_function{$ref}? ('Pure') : ());
+	return $class->maybe::mext::method($ref), ($is_pure_function{0+$ref}? ('Pure') : ());
 }
 sub MODIFY_CODE_ATTRIBUTES {
 	my ($class, $ref, @attr)= @_;
 	my $n= @attr;
 	@attr= grep $_ ne 'Pure', @attr;
-	$is_pure_function{$ref}= 1 if $n > @attr;
+	$is_pure_function{0+$ref}= 1 if $n > @attr;
 	$class->maybe::next::method($ref, @attr);
 }
 
@@ -80,8 +80,8 @@ sub _collect_function_info {
 	my $fn= $self->can("fn_$name");
 	my $sm= $self->can("simplify_$name");
 	my $ev= $self->can("nodeval_$name");
-	my $pure= $fn? $is_pure_function{$fn}
-		: $ev? $is_pure_function{$ev}
+	my $pure= $fn? $is_pure_function{0+$fn}
+		: $ev? $is_pure_function{0+$ev}
 		: 0;
 	my $pl= $self->can("perlgen_$name");
 	return
@@ -186,7 +186,7 @@ Language::FormulaEngine::Namespace - Object holding function and variable names
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

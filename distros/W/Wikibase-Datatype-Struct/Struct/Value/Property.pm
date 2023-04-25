@@ -10,7 +10,7 @@ use Wikibase::Datatype::Value::Property;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 sub obj2struct {
 	my $obj = shift;
@@ -67,7 +67,7 @@ __END__
 
 =head1 NAME
 
-Wikibase::Datatype::Struct::Value::Property - Wikibase property structure serialization.
+Wikibase::Datatype::Struct::Value::Property - Wikibase property value structure serialization.
 
 =head1 SYNOPSIS
 
@@ -110,6 +110,8 @@ Returns Wikibase::Datatype::Value::Property instance.
 
 =head1 EXAMPLE1
 
+=for comment filename=obj2struct_value_property.pl
+
  use strict;
  use warnings;
 
@@ -139,6 +141,8 @@ Returns Wikibase::Datatype::Value::Property instance.
  # }
 
 =head1 EXAMPLE2
+
+=for comment filename=struct2obj_value_property.pl
 
  use strict;
  use warnings;
@@ -205,12 +209,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

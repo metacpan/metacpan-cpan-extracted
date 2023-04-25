@@ -15,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 NAME
 
@@ -23,26 +23,26 @@ HTTP::Request::FromWget - create a HTTP::Request from a wget command line
 
 =head1 SYNOPSIS
 
-    my $req = HTTP::Request::FromWget->new(
-        # Note - wget itself may not appear
-        argv => ['https://example.com'],
-    );
+  my $req = HTTP::Request::FromWget->new(
+      # Note - wget itself may not appear
+      argv => ['https://example.com'],
+  );
 
-    my $req = HTTP::Request::FromWget->new(
-        command => 'https://example.com',
-    );
+  my $req = HTTP::Request::FromWget->new(
+      command => 'https://example.com',
+  );
 
-    my $req = HTTP::Request::FromWget->new(
-        command_wget => 'wget -A mywget/1.0 https://example.com',
-    );
+  my $req = HTTP::Request::FromWget->new(
+      command_wget => 'wget -A mywget/1.0 https://example.com',
+  );
 
-    my @requests = HTTP::Request::FromWget->new(
-        command_wget => 'wget -A mywget/1.0 https://example.com https://www.example.com',
-    );
-    # Send the requests
-    for my $r (@requests) {
-        $ua->request( $r->as_request )
-    }
+  my @requests = HTTP::Request::FromWget->new(
+      command_wget => 'wget -A mywget/1.0 https://example.com https://www.example.com',
+  );
+  # Send the requests
+  for my $r (@requests) {
+      $ua->request( $r->as_request )
+  }
 
 =head1 RATIONALE
 
@@ -54,25 +54,25 @@ the network panel. This module enables converting these to Perl code.
 
 =head2 C<< ->new >>
 
-    my $req = HTTP::Request::FromWget->new(
-        # Note - wget itself may not appear
-        argv => ['--user-agent', 'myscript/1.0', 'https://example.com'],
-    );
+  my $req = HTTP::Request::FromWget->new(
+      # Note - wget itself may not appear
+      argv => ['--user-agent', 'myscript/1.0', 'https://example.com'],
+  );
 
-    my $req = HTTP::Request::FromWget->new(
-        # Note - wget itself may not appear
-        command => '--user-agent myscript/1.0 https://example.com',
-    );
+  my $req = HTTP::Request::FromWget->new(
+      # Note - wget itself may not appear
+      command => '--user-agent myscript/1.0 https://example.com',
+  );
 
 The constructor returns one or more L<HTTP::Request::CurlParameters> objects
 that encapsulate the parameters. If the command generates multiple requests,
 they will be returned in list context. In scalar context, only the first request
 will be returned.
 
-    my $req = HTTP::Request::FromWget->new(
-        command => '--post-file /etc/passwd https://example.com',
-        read_files => 1,
-    );
+  my $req = HTTP::Request::FromWget->new(
+      command => '--post-file /etc/passwd https://example.com',
+      read_files => 1,
+  );
 
 =head3 Options
 
@@ -154,7 +154,6 @@ our @option_spec = (
     'cookie|b=s@',
     'cookies!',              # ignored
     'debug',                 # ignored
-    'form|F=s@',
     'header|H=s@',
     'http-keep-alive!',
     'http-password=s',
@@ -206,10 +205,10 @@ sub new( $class, %options ) {
 
 =head2 C<< ->squash_uri( $uri ) >>
 
-    my $uri = HTTP::Request::FromWget->squash_uri(
-        URI->new( 'https://example.com/foo/bar/..' )
-    );
-    # https://example.com/foo/
+  my $uri = HTTP::Request::FromWget->squash_uri(
+      URI->new( 'https://example.com/foo/bar/..' )
+  );
+  # https://example.com/foo/
 
 Helper method to clean up relative path elements from the URI the same way
 that wget does.
@@ -456,7 +455,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
 
 =head1 LIVE DEMO
 
-L<https://corion.net/curl2lwp.psgi>
+L<https://corion.net/wget2lwp.psgi>
 
 =head1 KNOWN DIFFERENCES
 
@@ -470,14 +469,14 @@ save files in the format that wget uses.
 
 You're expected to instruct your UA to load/save cookie jars:
 
-    use Path::Tiny;
-    use HTTP::CookieJar::LWP;
+  use Path::Tiny;
+  use HTTP::CookieJar::LWP;
 
-    if( my $cookies = $r->cookie_jar ) {
-        $ua->cookie_jar( HTTP::CookieJar::LWP->new()->load_cookies(
-            path($cookies)->lines
-        ));
-    };
+  if( my $cookies = $r->cookie_jar ) {
+      $ua->cookie_jar( HTTP::CookieJar::LWP->new()->load_cookies(
+          path($cookies)->lines
+      ));
+  };
 
 =head2 Different Content-Length for POST requests
 
@@ -512,7 +511,7 @@ of C<< ->as_curl >> than this module.
 =head1 REPOSITORY
 
 The public repository of this module is
-L<http://github.com/Corion/HTTP-Request-FromWget>.
+L<http://github.com/Corion/HTTP-Request-FromCurl>.
 
 =head1 SUPPORT
 
@@ -522,7 +521,7 @@ L<https://perlmonks.org/>.
 =head1 BUG TRACKER
 
 Please report bugs in this module via the Github bug queue at
-L<https://github.com/Corion/HTTP-Request-FromWget/issues>
+L<https://github.com/Corion/HTTP-Request-FromCurl/issues>
 
 =head1 AUTHOR
 

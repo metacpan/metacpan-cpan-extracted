@@ -14,6 +14,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( WebSocket );
+    use vars qw( $VERSION );
     use Nice::Try;
     our $VERSION = 'v0.1.0';
 };
@@ -39,7 +40,7 @@ sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
 sub version { return( shift->_set_get_object_without_init( 'version', 'WebSocket::Version', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -51,7 +52,8 @@ WebSocket::Handshake - WebSocket Client & Server
 =head1 SYNOPSIS
 
     use WebSocket::Handshake;
-    my $this = WebSocket::Handshake->new || die( WebSocket::Handshake->error, "\n" );
+    my $this = WebSocket::Handshake->new || 
+        die( WebSocket::Handshake->error, "\n" );
 
 =head1 VERSION
 
@@ -83,11 +85,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Handshake::Client>, L<WebSocket::Handshake::Server>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

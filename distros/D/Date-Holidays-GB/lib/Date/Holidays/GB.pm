@@ -1,6 +1,6 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 # ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2023
 
@@ -22,8 +22,8 @@ our @EXPORT_OK = qw(
 );
 
 # See
-# http://en.wikipedia.org/wiki/ISO_3166-2
-# http://en.wikipedia.org/wiki/ISO_3166-2:GB
+# https://en.wikipedia.org/wiki/ISO_3166-2
+# https://en.wikipedia.org/wiki/ISO_3166-2:GB
 
 use constant REGION_NAMES => {
     EAW => 'England & Wales',

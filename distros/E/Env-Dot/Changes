@@ -1,5 +1,26 @@
 Revision history for Env-Dot
 
+0.006     2023-04-23 22:10:09+02:00 Europe/Stockholm
+          * Add envdot.self-container to MANIFEST.SKIP. We don't need it in CPAN.
+          * Fix dist.ini Run::AfterRelease action.
+
+0.005     2023-04-23 20:04:35+02:00 Europe/Stockholm
+          * Remove var:export option.
+          * Add and document more envdot meta commands.
+          * Isolate functions from script/envdot.
+          * Rework internals in script/envdot.
+          * Rework documentation in script/envdot.
+          * Add test for interpret_dotenv_filepath_var.
+          * Expand regexp.
+          * Fix bug not output in vars in read order.
+          * Fix bug not recognise prefix 'export'.
+          * Add lonesome dash to parameters; not implemented.
+          * Add shdotenv project to SEE ALSO section.
+          * Clean up dist.ini a little.
+          * Use option auto_help in executable.
+          * Use option auto_version in executable.
+
+
 0.004     2023-02-26 21:07:39+01:00 Europe/Stockholm
           * Add CLI argument --version to envdot.
 

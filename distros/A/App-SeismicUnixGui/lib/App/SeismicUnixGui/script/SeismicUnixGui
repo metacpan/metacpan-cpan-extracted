@@ -11,5 +11,5 @@
  	
  else
 	perl $SeismicUnixGui_script/L_SU_project_selector.pl
-	perl $SeismicUnixGui_script/L_SUV0.82.0.pl
+	perl $SeismicUnixGui_script/L_SUV0.82.3.pl
  fi

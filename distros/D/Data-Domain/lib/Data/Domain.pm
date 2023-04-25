@@ -10,11 +10,12 @@ use Scalar::Does 0.007;
 use Scalar::Util ();
 use Try::Tiny;
 use List::MoreUtils qw/part natatime any/;
-use if $] < 5.037, experimental => 'smartmatch';
-use overload '""' => \&_stringify, $] < 5.037 ? ('~~' => \&_matches) : ();
+use if $] < 5.037, experimental => 'smartmatch';      # smartmatch no longer experimental after 5.037
+use overload '""' => \&_stringify,
+             $] < 5.037 ? ('~~' => \&_matches) : ();  # fully deprecated, so cannot be overloaded
 use match::simple ();
 
-our $VERSION = "1.08";
+our $VERSION = "1.11";
 
 our $MESSAGE;        # global var for last message from _matches()
 our $MAX_DEEP = 100; # limit for recursive calls to inspect()
@@ -48,7 +49,7 @@ BEGIN {
 
 # setup exports through Sub::Exporter API
 use Sub::Exporter -setup => {
-  exports    => [ 'node_from_path', 
+  exports    => [ 'node_from_path',                                          # no longer documented, but still present for backwards compat
                   (map {$_ => \&_wrap_domain          } @CONSTRUCTORS  ),
                   (map {$_ => \&_wrap_shortcut_options} keys %SHORTCUTS) ],
   groups     => { constructors => \@CONSTRUCTORS,
@@ -356,6 +357,10 @@ sub msg {
   my $name     = $self->{-name} || $subclass;
   my $msg;
 
+  # perl v5.22 and above warns if there are too many @args for sprintf.
+  # The line below prevents that warning
+  no if $] ge '5.022000', warnings => 'redundant';
+
   # if there is a user_defined message, return it
   if (defined $msgs) { 
     for (ref $msgs) {
@@ -374,10 +379,6 @@ sub msg {
   $msg = $global_msgs->{$subclass}{$msg_id}  # otherwise
       || $global_msgs->{Generic}{$msg_id}
      or croak "no error string for message $msg_id";
-
-  # perl v5.22 and above warns if there are too many @args for sprintf.
-  # The line below prevents that warning
-  no if $] ge '5.022000', warnings => 'redundant';
 
   return sprintf "$name: $msg", @args;
 }
@@ -504,7 +505,7 @@ sub _parse_args {
 }
 
 
-sub node_from_path {
+sub node_from_path { # no longer documented, but still present for backwards compat
   my ($root, $path0, @path) = @_;
   return $root if not defined $path0;
   return undef if not defined $root;
@@ -516,7 +517,6 @@ sub node_from_path {
   # otherwise
   croak "node_from_path: incorrect root/path";
 }
-
 
 #----------------------------------------------------------------------
 # implementation for overloaded operators
@@ -1155,7 +1155,6 @@ package Data::Domain::Struct;
 #======================================================================
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Carp;
 use Scalar::Does qw/does/;
 our @ISA = 'Data::Domain';
@@ -1426,9 +1425,10 @@ dependencies within the structure, and with several options to
 finely tune the error messages returned to the user.
 
 The main usage for C<Data::Domain> is to check input from forms in
-interactive applications : the structured error messages make it easy
-to display a form again, highlighting which fields were rejected and
-why. Another usage is for writing automatic tests, with the help of
+interactive applications : structured error messages give detailed
+information about which fields were rejected and why; this can be
+used to display a form again, highlighting the wrong fields.
+Another usage is for writing automatic tests, with the help of
 the companion module L<Test::InDomain>.
 
 There are several other packages in CPAN doing data validation; these
@@ -1466,7 +1466,7 @@ C<:constructors>, and allow us to write more compact code :
     ...
   );
 
-The list of available domain constructors will be expanded below
+The list of available domain constructors is expanded below
 in L</"BUILTIN DOMAIN CONSTRUCTORS">.
 
 =head2 Shortcuts (domains with predefined options)
@@ -1640,16 +1640,12 @@ through L<Scalar::Does>.
 
 =item C<-matches>
 
-Deprecated. Was used to check if the data smart matches the supplied right operand
-(i.e. C<< $data ~~ $domain->{-matches} >>).
+Was originally designed for the smart match operator in perl 5.10.
+Is now implemented through L<match::simple>.
 
 =back
 
-=head3 EXPERIMENTAL: options for checking return values
-
-B<Disclaimer>: options in this section are still experimental; the call 
-API or structure of returned values might change in future
-versions of C<Data::Domain>.
+=head3 Options for checking return values
 
 These options call methods or coderefs within the data, and
 then check the results against the supplied domains. This is
@@ -2301,8 +2297,9 @@ the overall root of the inspected data
 
 the sequence of keys or array indices that led to the current
 data node. With that information, the subdomain is able to jump
-to other ancestor or sibling data nodes within the tree (see also
-the L</node_from_path> helper function).
+to other ancestor or sibling data nodes within the tree
+(L<Data::Reach> is your friend for doing that).
+
 
 =item flat
 
@@ -2647,7 +2644,7 @@ The default limit is 100, but it can be changed like this :
 
 =head2 Methods
 
-=head3 node_from_path
+=head3 node_from_path (DEPRECATED)
 
   my $node = node_from_path($root, @path);
 
@@ -2655,6 +2652,8 @@ Convenience function to find a given node in a data tree, starting
 from the root and following a I<path> (a sequence of hash keys or
 array indices). Returns C<undef> if no such path exists in the tree.
 Mainly useful for contextual constraints in lazy constructors.
+Now superseded by L<Data::Reach>.
+
 
 =head3 msg
 
@@ -2703,13 +2702,17 @@ the idea of passing a context where individual rules can grab
 information about neighbour nodes. Ideas for some features were
 borrowed from L<Test::Deep> and from L<Moose::Manual::Types>.
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to David Cantrell and Gabor Szabo for their help on issues related to smartmatch deprecation.
+
 =head1 AUTHOR
 
 Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006, 2007, 2012 by Laurent Dami.
+Copyright 2006, 2007, 2012, 2023 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.

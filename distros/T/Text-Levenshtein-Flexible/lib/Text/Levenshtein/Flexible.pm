@@ -24,7 +24,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Text::Levenshtein::Flexible', $VERSION);
@@ -177,7 +177,7 @@ Just like C<levenshtein_c()> but using the previously specified costs.
 
 C<levenshtein_l()>'s modern brother.
 
-=head3 distance_lc($src, $dst, $max_distance, $cost_ins, $cost_del, $cost_sub)
+=head3 distance_lc($src, $dst)
 
 The nicer variant of C<levenshtein_lc()>.
 
@@ -195,14 +195,18 @@ Of course there's no C<distance_all()> method either.
 
 According to a few completely made-up benchmarks,
 L<Text::Levenshtein::Flexible> is at least as fast as either
-L<Text::Levenshtein::XS>, L<Text::LevenshteinXS> or L<Text::Fuzzy> (Core i7
-920) and between 25% and 48% faster on some systems (Phenom II X6 1090T). A
-small benchmark script is included to test on your system, I'd be interested to
-hear about any unexpectedly good or bad performance.
+L<Text::Levenshtein::XS> or L<Text::Fuzzy> (Core i5 920) and between 25% and
+48% faster on some systems (Phenom II X6 1090T). For pure 8-bit character sets,
+L<Text::LevenshteinXS> is usually a tad faster, but it can't deal with
+multibyte characters at all. A small benchmark script is included to test on
+your system, I'd be interested to hear about any unexpectedly good or bad
+performance.
 
 =head1 SEE ALSO
 
 L<Text::Levenshtein::XS>
+L<Text::LevenshteinXS>
+L<Text::Fuzzy>
 
 Dont even bother with anything else unless you're more interested in the
 algorithm than in practical applications as the algorithm is one of the better
@@ -223,7 +227,7 @@ Matthias Bethke, E<lt>matthias@towiski.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014 by Matthias Bethke
+Copyright (C) 2014-2018 by Matthias Bethke
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.14.2 or, at your option,

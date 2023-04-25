@@ -1,17 +1,14 @@
-###############################################################################
-##                                                                           ##
-##      Copyright (c) 2022 - by Carlos Celso.                                ##
-##      All rights reserved.                                                 ##
-##                                                                           ##
-##  This pachage is free software; you can redistribuite it                  ##
-##  and/or modify it under the same terms as Perl itself.                    ##
-##                                                                           ##
-###############################################################################
+#!/usr/bin/perl
+#
+## Copyright (c) 2022 - by Carlos Celso
+#
 
 use strict;
 use warnings;
 
 use Test::More tests => 21;
+
+our $VERSION = "2023.111.1";
 
 BEGIN { use_ok('Math::Notation::PostfixInfix') };
 
@@ -21,10 +18,11 @@ while (my $data = <DATA>)
 	$data =~ s/[\n\r]//g;
 	&test($1,$2,$3) if ($data =~ /^<(.*)><(.*)><(.*)>/);
 }
+close(DATA);
 done_testing();
-exit;
+exit(0);
 
-sub test
+sub test()
 {
 	$ix++;
 	my $s = shift;
@@ -51,3 +49,4 @@ __DATA__
 <aaaa and (bbbb or cccc) and dddd><aaaa,bbbb,cccc,|,&,dddd,&><>
 <aaaa bbbb and cccc dddd><aaaa bbbb,cccc dddd,&><>
 <aaaa bbbb or cccc dddd><aaaa bbbb,cccc dddd,|><>
+<aaaa and (bbbb or cccc or (dddd and eeee or ffff and gggg))><>

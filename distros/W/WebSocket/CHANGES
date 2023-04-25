@@ -1,5 +1,13 @@
 Revision history for Perl module WebSocket
 
+v0.1.6 2023-04-17T12:07:12+0900
+    - Minor corrections and improvements in both code and documentation
+    - Corrected error in _watch method
+    - Corrected some typos in WebSocket::Connection and added methods 'do_pong', 'ping', 'pong' and 'on_ping'
+    - Added methods 'connected', 'do_pong', 'on_pong', 'ping' and 'pong' in WebSocket::Client
+    - Minor correction in method as_string in WebSocket::Request
+    - Minor correction in method extensions in WebSocket::Server
+
 v0.1.5 2021-10-23T19:39:35+0900
     - Corrected client test unit
 

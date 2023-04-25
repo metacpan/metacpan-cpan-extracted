@@ -2,8 +2,8 @@ NAME
     Require::HookChain - Chainable require hook
 
 VERSION
-    This document describes version 0.006 of Require::HookChain (from Perl
-    distribution Require-HookChain), released on 2023-02-07.
+    This document describes version 0.008 of Require::HookChain (from Perl
+    distribution Require-HookChain), released on 2023-02-08.
 
 SYNOPSIS
     Say you want to create a require hook to prepend some code to the module
@@ -94,6 +94,16 @@ Require::HookChain::r OBJECT
 
     Get or set source code content. Will return undef if source code has not
     been found or set.
+
+FAQ
+  Loading a hook does nothing!
+    Make sure you use a hook this way:
+
+     use Require::HookChain 'hookname'; # correct
+
+    instead of:
+
+     use Require::HookChain::hookname; # INCORRECT
 
 HOMEPAGE
     Please visit the project's homepage at

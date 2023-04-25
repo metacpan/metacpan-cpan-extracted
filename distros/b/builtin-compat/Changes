@@ -1,5 +1,9 @@
 Revision history for builtin-compat
 
+0.002000 - 2023-04-22
+  - add is_tainted function
+  - ensure the expermental::builtin warnings category always exists
+
 0.001002 - 2022-07-18
   - add prereq on Scalar::Util 1.36 for unweaken function
 

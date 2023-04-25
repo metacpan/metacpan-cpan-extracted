@@ -8,9 +8,9 @@ package Require::HookChain::source::metacpan;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-07'; # DATE
+our $DATE = '2023-02-08'; # DATE
 our $DIST = 'Require-HookChain-source-metacpan'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Require::Hook::Source::MetaCPAN;
 
@@ -40,7 +40,7 @@ sub Require::HookChain::source::metacpan::INC {
 }
 
 1;
-# ABSTRACT: Prepend a piece of code to module source
+# ABSTRACT: Load module source from MetaCPAN
 
 __END__
 
@@ -50,11 +50,11 @@ __END__
 
 =head1 NAME
 
-Require::HookChain::source::metacpan - Prepend a piece of code to module source
+Require::HookChain::source::metacpan - Load module source from MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.006 of Require::HookChain::source::metacpan (from Perl distribution Require-HookChain-source-metacpan), released on 2023-02-07.
+This document describes version 0.007 of Require::HookChain::source::metacpan (from Perl distribution Require-HookChain-source-metacpan), released on 2023-02-08.
 
 =head1 SYNOPSIS
 
@@ -85,6 +85,8 @@ Source repository is at L<https://github.com/perlancar/perl-Require-HookChain-so
 L<Require::HookChain>
 
 L<Require::Hook::Source::MetaCPAN>
+
+L<Require::HookChain::source::lcpan>
 
 =head1 AUTHOR
 

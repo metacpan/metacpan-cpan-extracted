@@ -10,14 +10,15 @@ use List::Util qw(none);
 use Wikibase::Datatype::Languages qw(all_language_codes);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_datetime check_entity check_language check_lexeme check_property);
+Readonly::Array our @EXPORT_OK => qw(check_datetime check_entity check_language
+	check_lexeme check_property check_sense);
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 sub check_datetime {
 	my ($self, $key) = @_;
 
-	if ($self->{$key} !~ m/^([\+\-]\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/ms) {
+	if ($self->{$key} !~ m/^([\+\-]\d+)\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/ms) {
 		err "Parameter '$key' has bad date time.",
 			'Value', $self->{$key},
 		;
@@ -99,6 +100,20 @@ sub check_property {
 	return;
 }
 
+sub check_sense {
+	my ($self, $key) = @_;
+
+	if (! defined $self->{$key}) {
+		return;
+	}
+
+	if ($self->{$key} !~ m/^L\d+\-S\d+$/ms) {
+		err "Parameter '$key' must begin with 'L' and number, dash, S and number after it.";
+	}
+
+	return;
+}
+
 sub _check_item_with_char {
 	my ($self, $key, $char) = @_;
 
@@ -127,13 +142,14 @@ Wikibase::Datatype::Utils - Wikibase datatype utilities.
 
 =head1 SYNOPSIS
 
- use Wikibase::Datatype::Utils qw(check_datetime check_entity check_language check_lexeme check_property);
+ use Wikibase::Datatype::Utils qw(check_datetime check_entity check_language check_lexeme check_property check_sense);
 
  check_datetime($self, $key);
  check_entity($self, $key);
  check_language($self, $key);
  check_lexeme($self, $key);
  check_property($self, $key);
+ check_sense($self, $key);
 
 =head1 DESCRIPTION
 
@@ -182,6 +198,14 @@ Check parameter defined by C<$key> if it's property (/^P\d+/).
 
 Returns undef.
 
+=head2 C<check_sense>
+
+ check_sense($self, $key);
+
+Check parameter defined by C<$key> if it's property (/^L\d+\-S\d+$/).
+
+Returns undef.
+
 =head1 ERRORS
 
  check_datetime():
@@ -210,6 +234,9 @@ Returns undef.
 
  check_property():
          Parameter '%s' must begin with 'P' and number after it.";
+
+ check_sense():
+         Parameter '%s' must begin with 'L' and number, dash, S and number after it.
 
 =head1 EXAMPLE1
 
@@ -383,6 +410,49 @@ Returns undef.
  # Output like:
  # #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'P' and number after it.
 
+=head1 EXAMPLE9
+
+=for comment filename=check_sense_success.pl
+
+ use strict;
+ use warnings;
+
+ use Wikibase::Datatype::Utils qw(check_sense);
+
+ my $self = {
+         'key' => 'L34727-S1',
+ };
+ check_sense($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE10
+
+=for comment filename=check_sense_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Wikibase::Datatype::Utils qw(check_sense);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'bad_sense',
+ };
+ check_sense($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'L' and number, dash, S and number after it.
+
 =head1 DEPENDENCIES
 
 L<DateTime>,
@@ -419,6 +489,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut

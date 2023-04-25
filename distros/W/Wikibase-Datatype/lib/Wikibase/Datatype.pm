@@ -3,7 +3,7 @@ package Wikibase::Datatype;
 use strict;
 use warnings;
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 1;
 
@@ -33,6 +33,10 @@ Wikibase form datatype.
 
 Wikibase item datatype.
 
+=item L<Wikibase::Datatype::Languages>
+
+Wikibase datatype languages.
+
 =item L<Wikibase::Datatype::Lexeme>
 
 Wikibase lexeme datatype.
@@ -44,6 +48,10 @@ Wikibase mediainfo datatype.
 =item L<Wikibase::Datatype::MediainfoSnak>
 
 Wikibase mediainfo snak datatype.
+
+=item L<Wikibase::Datatype::MediainfoStatement>
+
+Wikibase mediainfo statement datatype.
 
 =item L<Wikibase::Datatype::Property>
 
@@ -97,6 +105,10 @@ Wikibase property value datatype.
 
 Wikibase quantity value datatype.
 
+=item L<Wikibase::Datatype::Value::Sense>
+
+Wikibase sense value datatype.
+
 =item L<Wikibase::Datatype::Value::String>
 
 Wikibase string value datatype.
@@ -110,6 +122,10 @@ Wikibase time value datatype.
 Another projects:
 
 =over
+
+=item L<Wikibase::Datatype::Print>
+
+Wikibase datatype print helpers.
 
 =item L<Wikibase::Datatype::Struct>
 
@@ -135,6 +151,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut

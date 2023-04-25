@@ -13,7 +13,7 @@ use base qw(Exporter);
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS $DOC);
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 $DOC = 0;
 
 # copy and update P::V's EXPORT* constants
@@ -383,7 +383,7 @@ L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2016 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

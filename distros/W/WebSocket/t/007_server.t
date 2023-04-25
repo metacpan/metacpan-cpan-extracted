@@ -4,17 +4,28 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
-    use Test::More;
-    use WebSocket::Handshake::Client;
-    use WebSocket::Frame;
-    use IO::Socket::INET;
-    use WebSocket::Server;
+    use vars qw( $DEBUG );
+    use Test2::IPC;
+    use Test2::V0;
+    # use Test::More;
+    use ok( 'WebSocket::Handshake::Client' ) || bail_out( "Unable to load WebSocket::Handshake::Client" );
+    use ok( 'WebSocket::Frame' ) || bail_out( "Unable to load WebSocket::Frame" );
+    use ok( 'IO::Socket::INET' ) || bail_out( "Unable to load IO::Socket::INET" );
+    use ok( 'WebSocket::Server' ) || bail_out( "Unable to load WebSocket::Server" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 my $child;
-sub cleanup { kill( 9 => $child ) if( $child && $child > 0 ) }
-$SIG{ALRM} = sub{ cleanup; die( "test timed out\n" ); };
+sub cleanup
+{
+    kill( 9 => $child ) if( $child && $child > 0 );
+}
+
+$SIG{ALRM} = sub
+{
+    cleanup();
+    die( "test timed out\n" );
+};
 alarm(10);
 # Supported WebSocket protocols
 my $proto = 'test protocol';
@@ -23,7 +34,7 @@ my $listen = IO::Socket::INET->new(
     Listen => 2,
     Proto => 'tcp',
     Timeout => 5,
-) or die( "$!" );
+) or bail_out( "Unable to create tcp socket: $!" );
 
 sub accursed_win32_pipe_simulation
 {
@@ -71,10 +82,13 @@ while(1)
 }
 $write_test_in->blocking(1);
 
+my( $port, $sock );
+$port = $listen->sockport;
+my $origin = "http://localhost:${port}";
+
 unless( $child = fork )
 {
     delete( $SIG{ALRM} );
-    require WebSocket::Server;
 
     my $ws = WebSocket::Server->new(
         debug  => $DEBUG,
@@ -106,8 +120,8 @@ unless( $child = fork )
                 handshake => sub
                 {
                     my( $conn, $hs ) = @_;
-                    diag( "SERVER: Received handshake from client on ip '", $conn->ip, "' and port '", $conn->port, "'." ) if( $DEBUG );
-                    die( "Bad handshake origin: " . $hs->request->origin ) unless( $hs->request->origin eq 'http://localhost' );
+                    diag( "SERVER: Received handshake from client on ip '", $conn->ip, "' and port '", $conn->port, "': ", $hs->as_string ) if( $DEBUG );
+                    die( "Bad handshake origin: " . $hs->request->origin ) unless( $hs->request->origin eq $origin );
                     die( "Bad subprotocol: " . $hs->request->subprotocol->join( ',' )->scalar ) unless( $hs->request->subprotocol->join( ' ' )->scalar eq 'test subprotocol' );
                 },
                 ready => sub
@@ -155,11 +169,8 @@ unless( $child = fork )
     exit;
 }
 
-my( $port, $sock );
-
 subtest "initialize client socket" => sub
 {
-    $port = $listen->sockport;
     $sock = IO::Socket::INET->new(
         PeerPort => $port,
         Proto    => 'tcp',
@@ -173,25 +184,34 @@ my $hs;
 
 subtest "handshake send" => sub
 {
-    $hs = WebSocket::Handshake::Client->new( debug => $DEBUG, uri => 'ws://localhost/testserver' );
-    $hs->request->subprotocol( "test subprotocol" );
-    my $handshake = $hs->as_string;
-    diag( "Error getting the handshake data: ", $hs->error ) if( !defined( $handshake ) && $DEBUG );
-    diag( "Sending handshake to server:\n", $hs->as_string ) if( $DEBUG );
-    ok( print( $sock $hs->as_string ), 'sending handshake on socket' );
+    SKIP:
+    {
+        skip( "No client socket could be created.", 1 ) if( !$sock );
+        $hs = WebSocket::Handshake::Client->new( debug => $DEBUG, uri => "ws://localhost:${port}/testserver" );
+        $hs->request->subprotocol( "test subprotocol" );
+        my $handshake = $hs->as_string;
+        diag( "Error getting the handshake data: ", $hs->error ) if( !defined( $handshake ) && $DEBUG );
+        diag( "Sending handshake to server:\n", $hs->as_string ) if( $DEBUG );
+        # ok( print( $sock $hs->as_string ), 'sending handshake on socket' );
+        ok( $sock->syswrite( $hs->as_string ), 'sending handshake on socket' );
+    };
 };
 
 subtest "handshake recv" => sub
 {
-    diag( "Reading 8192 bytes from socket." ) if( $DEBUG );
-    while( sysread( $sock, $buf, 8192, length( $buf ) ) )
+    SKIP:
     {
-        diag( "Parsing data received from server -> '$buf'" ) if( $DEBUG );
-        $hs->parse( $buf );
-        last if( $hs->is_done );
-    }
-    diag( "Handshake error occurred: ", $hs->error ) if( $hs->error && $DEBUG );
-    ok( !$hs->error, "completed handshake with server without error" );
+        skip( "No client socket could be created.", 1 ) if( !$sock );
+        diag( "Reading 8192 bytes from socket." ) if( $DEBUG );
+        while( $sock->sysread( $buf, 8192, length( $buf ) ) )
+        {
+            diag( "Parsing data received from server -> '$buf'" ) if( $DEBUG );
+            $hs->parse( $buf );
+            last if( $hs->is_done );
+        }
+        diag( "Handshake error occurred: ", $hs->error ) if( $hs->error && $DEBUG );
+        ok( !$hs->error, "completed handshake with server without error" );
+    };
 };
 
 my $frame;
@@ -206,10 +226,12 @@ subtest "initialize frame" => sub
 
 subtest "ready message" => sub
 {
-    my $bytes = _recv( $sock => $frame );
-    ok( defined( $bytes ), 'socket read' );
     SKIP:
     {
+        skip( "No client socket could be created.", 1 ) if( !$sock );
+        my $bytes = _recv( $sock => $frame );
+        
+        ok( defined( $bytes ), 'socket read' );
         skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
         ok( $frame->is_binary, "expected binary message" );
         is( $bytes, "ready", "expected welcome 'ready' message" );
@@ -218,59 +240,72 @@ subtest "ready message" => sub
 
 subtest "echo utf8" => sub
 {
-    foreach my $msg ( "simple", "", ( "a" x 32768 ), "unicode \u2603 snowman", "hiragana \u3072\u3089\u304c\u306a null \x00 ctrls \cA \cF \n \e del \x7f end" )
+    SKIP:
     {
-        print( $sock WebSocket::Frame->new( debug => $DEBUG, type => 'text', buffer => $msg )->to_bytes );
-        my $bytes = _recv( $sock => $frame );
-        ok( defined( $bytes ), 'socket read' );
-        SKIP:
+        skip( "No client socket could be created.", 15 ) if( !$sock );
+        foreach my $msg ( "simple", "", ( "a" x 32768 ), "unicode \u2603 snowman", "hiragana \u3072\u3089\u304c\u306a null \x00 ctrls \cA \cF \n \e del \x7f end" )
         {
-            skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
-            ok( $frame->is_text, "expected text message" );
-            is( $bytes, "utf8(" . length( $msg ) . ") = $msg" );
-        };
-    }
+            $sock->syswrite( WebSocket::Frame->new( debug => $DEBUG, type => 'text', buffer => $msg )->to_bytes );
+            my $bytes = _recv( $sock => $frame );
+            ok( defined( $bytes ), 'socket read' );
+            SKIP:
+            {
+                skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
+                ok( $frame->is_text, "expected text message" );
+                is( $bytes, "utf8(" . length( $msg ) . ") = $msg" );
+            };
+        }
+    };
 };
 
 subtest "echo binary" => sub
 {
-    foreach my $msg ( "simple", "", ( "a" x 32768 ), "unicode \u2603 snowman", "hiragana \u3072\u3089\u304c\u306a null \x00 ctrls \cA \cF \n \e del \x7f end", join( "", map{ chr( $_ ) } 0..255 ) )
+    SKIP:
     {
-        print( $sock WebSocket::Frame->new( debug => $DEBUG, type => 'binary', buffer => $msg )->to_bytes );
-        my $bytes = _recv( $sock => $frame );
-        ok( defined( $bytes ), 'socket read' );
-        SKIP:
+        skip( "No client socket could be created.", 15 ) if( !$sock );
+        foreach my $msg ( "simple", "", ( "a" x 32768 ), "unicode \u2603 snowman", "hiragana \u3072\u3089\u304c\u306a null \x00 ctrls \cA \cF \n \e del \x7f end", join( "", map{ chr( $_ ) } 0..255 ) )
         {
-            skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
-            ok( $frame->is_binary, "expected binary message" );
-            is( $bytes, "binary(" . length( $msg ) . ") = $msg" );
-        };
-    }
+            $sock->syswrite( WebSocket::Frame->new( debug => $DEBUG, type => 'binary', buffer => $msg )->to_bytes );
+            my $bytes = _recv( $sock => $frame );
+            ok( defined( $bytes ), 'socket read' );
+            SKIP:
+            {
+                skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
+                ok( $frame->is_binary, "expected binary message" );
+                is( $bytes, "binary(" . length( $msg ) . ") = $msg" );
+            };
+        }
+    };
 };
 
 subtest "echo pong" => sub
 {
-    foreach my $msg ( "simple", "", ( "a" x 32768 ), "unicode \u2603 snowman", "hiragana \u3072\u3089\u304c\u306a null \x00 ctrls \cA \cF \n \e del \x7f end", join( "", map{ chr( $_ ) } 0..255 ) )
+    SKIP:
     {
-        print( $sock WebSocket::Frame->new( debug => $DEBUG, type => 'pong', buffer => $msg )->to_bytes );
-        my $bytes = _recv( $sock => $frame );
-        ok( defined( $bytes ), 'socket read' );
-        SKIP:
+        skip( "No client socket could be created.", 15 ) if( !$sock );
+        foreach my $msg ( "simple", "", ( "a" x 32768 ), "unicode \u2603 snowman", "hiragana \u3072\u3089\u304c\u306a null \x00 ctrls \cA \cF \n \e del \x7f end", join( "", map{ chr( $_ ) } 0..255 ) )
         {
-            skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
-            ok( $frame->is_binary, "expected binary message" );
-            is( $bytes, "pong(" . length( $msg ) . ") = $msg" );
-        };
-    }
+            $sock->syswrite( WebSocket::Frame->new( debug => $DEBUG, type => 'pong', buffer => $msg )->to_bytes );
+            my $bytes = _recv( $sock => $frame );
+            ok( defined( $bytes ), 'socket read' );
+            SKIP:
+            {
+                skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
+                ok( $frame->is_binary, "expected binary message" );
+                is( $bytes, "pong(" . length( $msg ) . ") = $msg" );
+            };
+        }
+    };
 };
 
 subtest "watch_readable" => sub
 {
-    syswrite( $read_test_in, "R" );
-    my $bytes = _recv( $sock => $frame );
-    ok( defined( $bytes ), 'socket read' );
     SKIP:
     {
+        skip( "No client socket could be created.", 3 ) if( !$sock || !$read_test_in );
+        $read_test_in->syswrite( "R" );
+        my $bytes = _recv( $sock => $frame );
+        ok( defined( $bytes ), 'socket read' );
         skip( 'failed to read from socket', 2 ) if( !defined( $bytes ) );
         ok( $frame->is_binary, "expected binary message" );
         is( $bytes, "read_test_out(1) = R" );
@@ -279,35 +314,43 @@ subtest "watch_readable" => sub
 
 subtest "watch_writable" => sub
 {
-    my( $bytes_read, $scratch, $value );
-    local $timeout = 0;
-    local $SIG{ALRM} = sub{ $timeout++ };
-    alarm(1);
-    while( !$timeout && $write_pipe_size )
+    SKIP:
     {
-        $bytes_read = sysread( $write_test_out, $scratch, $write_pipe_size > 8192 ? 8192 : $write_pipe_size );
-        die( "watch_writable sysread: $!" ) unless( defined( $bytes_read ) );
-        $write_pipe_size -= $bytes_read;
-    }
-    if( $timeout )
-    {
-        warn( "Timeout trying to read from socket!\n" );
-        fail( 'Timeout trying to read from socket' );
-    }
-    else
-    {
-        alarm(0);
-        sysread( $write_test_out, $value, 1 );
-        is( $value, "W" );
-    }
+        skip( "No client socket could be created.", 1 ) if( !$sock || !$write_test_out );
+        my( $bytes_read, $scratch, $value );
+        my $timeout = 0;
+        local $SIG{ALRM} = sub{ $timeout++ };
+        alarm(1);
+        while( !$timeout && $write_pipe_size )
+        {
+            $bytes_read = $write_test_out->sysread( $scratch, $write_pipe_size > 8192 ? 8192 : $write_pipe_size );
+            bail_out( "watch_writable sysread: $!" ) unless( defined( $bytes_read ) );
+            $write_pipe_size -= $bytes_read;
+        }
+        if( $timeout )
+        {
+            warn( "Timeout trying to read from socket!\n" );
+            fail( 'Timeout trying to read from socket' );
+        }
+        else
+        {
+            alarm(0);
+            $write_test_out->sysread( $value, 1 );
+            is( $value, "W" );
+        }
+    };
 };
 
 subtest "server shutdown" => sub
 {
-    ok( kill( 0 => $child ), "child should still be alive" );
-    print( $sock WebSocket::Frame->new( debug => $DEBUG, type => 'close', buffer => pack( "n", 4242 ) . "test server shutdown cleanly" )->to_bytes );
-    waitpid( $child, 0 );
-    ok( !kill( 0 => $child ), "child should have shut down cleanly" );
+    SKIP:
+    {
+        skip( "No client socket could be created.", 1 ) if( !$sock );
+        ok( kill( 0 => $child ), "child should still be alive" );
+        $sock->syswrite( WebSocket::Frame->new( debug => $DEBUG, type => 'close', buffer => pack( "n", 4242 ) . "test server shutdown cleanly" )->to_bytes );
+        waitpid( $child, 0 );
+        ok( !kill( 0 => $child ), "child should have shut down cleanly" );
+    };
 };
 
 done_testing();
@@ -318,7 +361,8 @@ sub _recv
 {
     my( $sock, $frame ) = @_;
     diag( "CLIENT: Trying to get next bytes." ) if( $DEBUG );
-    local $timeout = 0;
+    diag( "CLIENT: is connected? ", $sock->connected ? 'yes' : 'no' ) if( $DEBUG );
+    my $timeout = 0;
     local $SIG{ALRM} = sub{ $timeout++ };
     alarm(2);
     my $message;
@@ -326,7 +370,10 @@ sub _recv
     {
         my $data;
         die( $frame->error ) if( $frame->error );
-        die( "CLIENT: expected read but socket seems to be disconnected" ) unless( defined( sysread( $sock, $data, 8192 ) ) );
+        unless( defined( $sock->sysread( $data, 8192 ) ) )
+        {
+            die( "CLIENT: expected read but socket seems to be disconnected" );
+        }
         # diag( "Appending data to frame: '$data'" ) if( $DEBUG );
         $frame->append( $data );
     }
@@ -339,3 +386,4 @@ sub _recv
     # diag( "next_bytes returned message '$message'" ) if( $DEBUG );
     return( $message );
 }
+

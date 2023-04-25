@@ -3,12 +3,13 @@ BEGIN
 {
     use strict;
     use lib './lib';
+    use vars qw( $DEBUG @modules );
     use Test::More qw( no_plan );
     use File::Find;
     our @modules;
     File::Find::find(sub
     {
-        next unless( /\.pm$/ );
+        return unless( /\.pm$/ );
         # print( "Checking file '$_' ($File::Find::name)\n" );
         $_ = $File::Find::name;
         s,^./lib/,,;

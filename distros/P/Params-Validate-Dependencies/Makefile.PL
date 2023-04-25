@@ -18,8 +18,8 @@ WriteMakefile(
     'Test::More'        => 0.88, # done_testing
     'Test::Warnings'    => 0.026,
     'Test::Exception'   => 0,
-    # Modern Data::Domain only works on 5.10 and higher
-    (($] > 5.010) ? ('Data::Domain' => 1.02) : ()),
+    # Modern Data::Domain only works on 5.18 and higher
+    (($] > 5.018) ? ('Data::Domain' => 1.10) : ()),
     # dep of D::D, earlier versions broken on 5.24
     'lexical::underscore' => 0.004,
   },

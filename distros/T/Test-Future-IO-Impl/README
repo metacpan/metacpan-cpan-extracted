@@ -1,0 +1,65 @@
+NAME
+
+    Test::Future::IO::Impl - acceptance tests for Future::IO
+    implementations
+
+SYNOPSIS
+
+       use Test::More;
+       use Test::Future::IO::Impl;
+    
+       use Future::IO;
+       use Future::IO::Impl::MyNewImpl;
+    
+       run_tests 'sleep';
+    
+       done_testing;
+
+DESCRIPTION
+
+    This module contains a collection of acceptance tests for
+    implementations of Future::IO.
+
+FUNCTIONS
+
+ run_tests
+
+       run_tests @suitenames
+
+    Runs a collection of tests against Future::IO. It is expected that the
+    caller has already loaded the specific implementation module to be
+    tested against before this function is called.
+
+TEST SUITES
+
+    The following test suite names may be passed to the "run_tests"
+    function:
+
+ accept
+
+    Tests the Future::IO->accept method.
+
+ connect
+
+    Tests the Future::IO->connect method.
+
+ sleep
+
+    Tests the Future::IO->sleep method.
+
+ sysread
+
+    Tests the Future::IO->sysread method.
+
+ syswrite
+
+    Tests the Future::IO->syswrite method.
+
+ waitpid
+
+    Tests the Future::IO->waitpid method.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

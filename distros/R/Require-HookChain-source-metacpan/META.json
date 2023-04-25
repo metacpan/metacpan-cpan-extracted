@@ -1,5 +1,5 @@
 {
-   "abstract" : "Prepend a piece of code to module source",
+   "abstract" : "Load module source from MetaCPAN",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -47,7 +47,7 @@
    "provides" : {
       "Require::HookChain::source::metacpan" : {
          "file" : "lib/Require/HookChain/source/metacpan.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Require-HookChain-source-metacpan"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

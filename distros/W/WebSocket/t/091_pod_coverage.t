@@ -9,7 +9,10 @@ BEGIN
 	}
 };
 
-eval "use Test::Pod::Coverage 1.04";
+eval "use Test::Pod::Coverage 1.04; use Pod::Coverage::TrustPod;";
 plan( skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage" ) if( $@ );
-my $trustme = { trustme => [qr/^(init|_unwatch|_watch|_compare|_compute)$/] };
-all_pod_coverage_ok( $trustme );
+my $params = 
+{
+    coverage_class => 'Pod::Coverage::TrustPod',
+    trustme => [qr/^(init|_unwatch|_watch|_compare|_compute)$/] };
+all_pod_coverage_ok( $params );

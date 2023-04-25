@@ -52,3 +52,14 @@ is(
   "any of ('alpha', 'beta', all of ('foo', 'bar' and none of ('barf')) or one of ('quux' or 'garbleflux'))",
   "crazy stuff doco also works"
 );
+
+is(
+  doc(
+    exclusively(any_of(
+      qw( \foo foo\ ),
+      all_of(qw( fo\o f\oo \ \\\\ \\\\\\ ))
+    ))
+  ),
+  "exclusively (any of ('\\foo', 'foo\\' or all of ('fo\\o', 'f\\oo', '\\', '\\\\' and '\\\\\\')))",
+  "autodoco copes with literal backslashes"
+);

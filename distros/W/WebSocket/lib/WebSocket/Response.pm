@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use WebSocket::Common qw( :all );
     use parent qw( WebSocket::Common );
+    use vars qw( $VERSION );
     use Digest::SHA ();
     use HTTP::Response ();
     use MIME::Base64 ();
@@ -119,6 +120,8 @@ sub code { return( shift->_set_get_number( 'code', @_ ) ); }
 
 sub cookies { return( shift->_set_get_array_as_object( 'cookies', @_ ) ); }
 
+sub header { return( shift->headers->header( @_ ) ); }
+
 sub headers_as_string
 {
     my $self = shift( @_ );
@@ -141,7 +144,6 @@ sub headers_as_string
     $location->path( $self->uri->path ) if( $self->uri->path ne '/' );
     my $origin = URI->new( $self->origin ? $self->origin : 'http://' . $location->host );
     $origin->scheme( 'https' ) if( !$self->origin && $self->secure );
-    $self->message( 3, "Setting origin to '$origin' and location to '$location'" );
 
     # rfc6455 section 4.2.2 on server handshake response
     # For draft revision 4 to 17 (latest)
@@ -277,7 +279,6 @@ sub parse
         # Add data to buffer
         # return( $self->pass_error ) unless( $self->_append( @_ ) );
         $self->_append( @_ ) || return( $self->pass_error );
-        $self->message( 3, "Parsing buffer appended from server: '", $self->buffer, "'" );
         unless( $self->buffer->match( qr{^HTTP/1\.1[[:blank:]\h]+101 } ) )
         {
             my $bad_line = ( $self->buffer->length > 80 ? $self->buffer->substr( 0, 77 )->append( '...' ) : $self->buffer );
@@ -337,9 +338,7 @@ sub parse_body
     if( $v->type eq 'hixie' && $v->revision == 75 )
     {
         my $location = $h->header( 'WebSocket-Location' );
-        $self->message( 3, "WebSocket-Location found is '$location' -> ", $h->as_string );
         return( $self->error( "No \"WebSocket-Location\" header found." ) ) unless( $location->defined );
-        $self->message( 3, "Using location '$location' (", overload::StrVal( $location ), ")" );
         $self->location( $location );
         my $uri = URI->new( $location );
         $self->secure(1) if( $uri->scheme eq 'wss' );
@@ -417,7 +416,6 @@ sub _parse_body_chunk
     my $resp = $self->SUPER::_parse_body_chunk;
     $self->protocol( $resp->protocol );
     $self->code( $resp->code );
-    $self->message( $resp->message );
     $self->headers( $resp->headers );
     # The rest is the body
     $self->buffer( $resp->content );
@@ -426,7 +424,7 @@ sub _parse_body_chunk
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -508,15 +506,15 @@ Provided with an http code, http status, an optional set of headers, as either a
 
 =over 4
 
-=item I<buffer>
+=item C<buffer>
 
 Content buffer
 
-=item I<code>
+=item C<code>
 
 An integer representing the status code, such as C<101> (switching protocol).
 
-=item I<cookies>
+=item C<cookies>
 
 A C<Set-Cookie> response header string. The string provided must be already properly formatted and encoded and will be added as is. For example:
 
@@ -525,39 +523,43 @@ A C<Set-Cookie> response header string. The string provided must be already prop
         host    => 'example.com'
     );
 
-=item I<headers>
+=item C<headers>
 
 Either an array reference of header-value pairs, or an L<HTTP::Headers> object.
 
 If an array reference is provided, an L<HTTP::Headers> object will be instantiated with it.
 
-=item I<max_message_size>
+=item C<max_message_size>
 
 Integer. Defaults to 20Kb. This is the maximum payload size.
 
-=item I<number1>
+=item C<number1>
 
-=item I<number2>
+Value for key1 as used in protocol version 0 to 3 of WebSocket requests.
 
-=item I<origin>
+=item C<number2>
+
+Value for key2 as used in protocol version 0 to 3 of WebSocket requests.
+
+=item C<origin>
 
 The C<Origin> header value.
 
 See L<rfc6454|https://datatracker.ietf.org/doc/html/rfc6454>
 
-=item I<protocol>
+=item C<protocol>
 
 HTTP/1.1. This is the only version supported by L<rfc6455|https://datatracker.ietf.org/doc/html/rfc6455>
 
-=item I<secure>
+=item C<secure>
 
 Boolean. This is set to true when the connection is using ssl (i.e. C<wss>), false otherwise.
 
-=item I<status>
+=item C<status>
 
 The status line, such as C<Switching Protocol>. This is set upon parsing. There should be no need to set this by yourself.
 
-=item I<subprotocol>
+=item C<subprotocol>
 
 The optional subprotocol which consists of multiple arbitrary identifiers that need to be recognised and supported by the server.
 
@@ -571,17 +573,17 @@ The optional subprotocol which consists of multiple arbitrary identifiers that n
 
 See L<rfc6455|https://datatracker.ietf.org/doc/html/rfc6455#page-12>
 
-=item I<uri>
+=item C<uri>
 
 The request uri, such as C</chat> or it could also be a fully qualified uri such as C<wss://example.com/chat>
 
-=item I<version>
+=item C<version>
 
 The WebSocket protocol version. Defaults to C<draft-ietf-hybi-17>
 
 See L<rfc6455|https://datatracker.ietf.org/doc/html/rfc6455#page-26>
 
-=item I<versions>
+=item C<versions>
 
 Same as I<version>, but pass an array of L<WebSocket::Version> objects or version number, or draft identifier such as <draft-ietf-hybi-17>
 
@@ -591,11 +593,23 @@ Same as I<version>, but pass an array of L<WebSocket::Version> objects or versio
 
 =head2 as_string
 
+The response returned as a string.
+
 =head2 body_as_string
+
+The response body returned as a string.
 
 =head2 code
 
+The response code returned as a 3 or 4-digits integer.
+
 =head2 cookies
+
+L<Array object|Module::Generic::Array> of cookies.
+
+=head2 header
+
+This is a short-cut for L<WebSocket::Headers/header>
 
 =head2 headers
 
@@ -615,15 +629,27 @@ Set or get the boolean value. This is set to signal the parsing is complete.
 
 =head2 key
 
+Value of header C<Sec-WebSocket-Key> available in protocol version 4 to 17.
+
 =head2 key1
+
+Value of header C<Sec-WebSocket-Key1> available in protocol version 0 to 3.
 
 =head2 key2
 
+Value of header C<Sec-WebSocket-Key2> available in protocol version 0 to 3.
+
 =head2 location
+
+Value of header C<Sec-WebSocket-Location> available in protocol version 76, and 0 to 3.
 
 =head2 number1
 
+This is a default method to store a number used for the checksum challenge sent to the client.
+
 =head2 number2
+
+This is a default method to store a number used for the checksum challenge sent to the client.
 
 =head2 parse
 
@@ -682,13 +708,13 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<WebSocket::Request>, L<WebSocket::Headers>, L<WebSocket::Common>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 
-
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut
 

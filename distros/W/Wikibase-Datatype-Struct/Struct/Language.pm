@@ -10,7 +10,7 @@ use Wikibase::Datatype::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 sub obj2struct {
 	my $obj = shift;
@@ -91,6 +91,8 @@ Returns Wikibase::Datatype::Value::Monolingual instance.
 
 =head1 EXAMPLE1
 
+=for comment filename=obj2struct_language.pl
+
  use strict;
  use warnings;
 
@@ -118,6 +120,8 @@ Returns Wikibase::Datatype::Value::Monolingual instance.
 
 =head1 EXAMPLE2
 
+=for comment filename=struct2obj_language.pl
+
  use strict;
  use warnings;
 
@@ -126,7 +130,7 @@ Returns Wikibase::Datatype::Value::Monolingual instance.
  # Monolingualtext structure.
  my $struct_hr = {
          'language' => 'en',
-         'text' => 'English text',
+         'value' => 'English text',
  };
 
  # Get object.
@@ -188,12 +192,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2022 Michal Josef Špaček
+© 2020-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

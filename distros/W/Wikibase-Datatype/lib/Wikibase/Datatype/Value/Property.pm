@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build);
 use Wikibase::Datatype::Utils qw(check_property);
 
-our $VERSION = 0.26;
+our $VERSION = 0.29;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -44,7 +44,7 @@ Wikibase::Datatype::Value::Property - Wikibase property value datatype.
 
 =head1 DESCRIPTION
 
-This datatype is item class for representation of wikibase item (e.g. Q123).
+This datatype is property class for representation of wikibase item (e.g. P31).
 
 =head1 METHODS
 
@@ -153,6 +153,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.29
 
 =cut
