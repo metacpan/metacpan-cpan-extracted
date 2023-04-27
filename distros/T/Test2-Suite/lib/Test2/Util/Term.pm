@@ -4,9 +4,9 @@ use warnings;
 
 use Term::Table::Util qw/term_size USE_GCS USE_TERM_READKEY uni_length/;
 
-our $VERSION = '0.000150';
+our $VERSION = '0.000152';
 
-use Importer Importer => 'import';
+use Test2::Util::Importer 'Test2::Util::Importer' => 'import';
 our @EXPORT_OK = qw/term_size USE_GCS USE_TERM_READKEY uni_length/;
 
 1;

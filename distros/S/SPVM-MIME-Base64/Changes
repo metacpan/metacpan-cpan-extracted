@@ -1,3 +1,12 @@
+1.001 2023-04-26
+  [New Features]
+    * The version string of the MIME::Base64 can be got.
+  [Prequirement Changes]
+    * SPVM 0.971006+ is required.
+  [Exception Messages Improvement]
+    * Exception messages are improved.
+  [Document Imrpovement]
+    * Added "Exceptions:" section to the doc of each method.
 0.07 2023-04-06
   [Document Improvement]
     * The document is imporved.

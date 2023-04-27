@@ -1,0 +1,53 @@
+NAME
+    test-dwg-libredwg-dwgread - Script to test DWG files by LibreDWG dwgread
+    command.
+
+SYNOPSIS
+     test-dwg-libredwg-dwgread [-d test_dir] [-h] [-v level] [--version] directory
+
+ARGUMENTS
+    *       "-d test_dir"
+
+            Test directory. If doesn't exist, create dir in system tmp.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-v level"
+
+            Verbosity level.
+
+            Default value is 1, min is 0, max is 9.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "directory"
+
+            Directory with DWG files to test.
+
+EXAMPLE
+     test-dwg-libredwg-dwgread __DIR__
+
+SEE ALSO
+    test-dwg-libredwg-json
+        Script to test DWG file by LibreDWG conversions via JSON.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-DwgRead>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

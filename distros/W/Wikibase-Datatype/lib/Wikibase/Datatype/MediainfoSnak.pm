@@ -16,7 +16,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.29;
+our $VERSION = 0.31;
 
 has datavalue => (
 	is => 'ro',
@@ -94,7 +94,7 @@ datatype.
 
 Constructor.
 
-Retruns instance of object.
+Returns instance of object.
 
 =over 8
 
@@ -231,6 +231,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.31
 
 =cut

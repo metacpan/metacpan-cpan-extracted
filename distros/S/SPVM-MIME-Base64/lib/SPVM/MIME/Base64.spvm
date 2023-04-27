@@ -2,11 +2,13 @@
 # MIT License
 
 class MIME::Base64 {
-  native static method encode_base64 : string ($str : string, $eol = undef : string);
+  version "1.001";
   
-  native static method decode_base64 : string ($str : string);
+  native static method encode_base64 : string ($string : string, $eol = undef : string);
   
-  native static method encoded_base64_length : int ($str : string, $eol = undef : string);
+  native static method decode_base64 : string ($string : string);
   
-  native static method decoded_base64_length : int ($str : string);
+  native static method encoded_base64_length : int ($string : string, $eol = undef : string);
+  
+  native static method decoded_base64_length : int ($string : string);
 }

@@ -7,7 +7,7 @@ BEGIN {
 }
 
 
-our $VERSION =  '0.05';
+our $VERSION =  '0.07';
 
 =head1 NAME
 
@@ -1541,16 +1541,16 @@ __END__
 
 =head1 SUPPORT
 
-Bugs may be reported via RT at
+Bugs may be reported via GitHub at
 
- https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-DebugHooks
+    https://github.com/KES777/Devel-DebugHooks/issues
 
 Support by IRC may also be found on F<irc.perl.org> in the F<#debughooks>
 channel.
 
 =head1 AUTHOR
 
-Eugen Konkov <kes-kes@yandex.ru>
+Eugen Konkov <cpan@konkov.top>
 
 =head1 COPYRIGHT
 
@@ -1558,7 +1558,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2016 Eugen Konkov
+Copyright 2023 Eugen Konkov
 
 =head1 LICENSE
 

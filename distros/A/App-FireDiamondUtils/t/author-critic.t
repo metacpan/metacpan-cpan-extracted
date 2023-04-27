@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FireDiamondUtils.pm','script/parse-fire-diamond-text-notation','script/show-fire-diamond-legends'];
+my $filenames = ['lib/App/FireDiamondUtils.pm','script/explain-fire-diamond-text-notation','script/parse-fire-diamond-text-notation','script/show-fire-diamond-legends'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

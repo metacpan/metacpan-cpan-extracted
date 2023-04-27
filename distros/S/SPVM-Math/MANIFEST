@@ -9,7 +9,7 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
-t/lib/SPVM/TestCase/Lib/Math.spvm
-t/SPVM_Math.t
+t/basic.t
+t/lib/SPVM/TestCase/Math.spvm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

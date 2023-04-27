@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::Aliased 1.025;
+package Perl::PrereqScanner::Scanner::Aliased 1.100;
 # ABSTRACT: scan for OO module aliases via aliased.pm
 
-use Moose;
+use Moo;
 with 'Perl::PrereqScanner::Scanner';
 
 #pod =head1 DESCRIPTION
@@ -53,7 +53,7 @@ Perl::PrereqScanner::Scanner::Aliased - scan for OO module aliases via aliased.p
 
 =head1 VERSION
 
-version 1.025
+version 1.100
 
 =head1 DESCRIPTION
 

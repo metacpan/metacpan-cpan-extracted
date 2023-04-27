@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FireDiamondUtils.pm'
 );
 
 my @scripts = (
+    'script/explain-fire-diamond-text-notation',
     'script/parse-fire-diamond-text-notation',
     'script/show-fire-diamond-legends'
 );

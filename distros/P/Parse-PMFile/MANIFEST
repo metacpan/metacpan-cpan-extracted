@@ -14,6 +14,9 @@ t/34_math_version.t
 t/35_scoped_our_version.t
 t/36_long_version.t
 t/40_package_versions.t
+t/41_multiple_packages.t
+t/42_class_versions.t
+t/43_role_versions.t
 t/50_no_index.t
 t/60_permissions.t
 t/70_vpp.t

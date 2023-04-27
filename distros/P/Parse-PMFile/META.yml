@@ -7,9 +7,9 @@ build_requires:
   File::Temp: '0.19'
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker::CPANfile: '0.08'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,5 +27,5 @@ requires:
   version: '0.83'
 resources:
   repository: https://github.com/charsbar/Parse-PMFile
-version: '0.43'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.44'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

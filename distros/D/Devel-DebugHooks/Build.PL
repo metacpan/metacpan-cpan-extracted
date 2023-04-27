@@ -5,7 +5,7 @@ use Module::Build;
 
 my $build = Module::Build->new(
 	module_name => 'Devel::DebugHooks',
-	dist_author => 'Eugen Konkov <kes-kes@yandex.ru>',
+	dist_author => 'Eugen Konkov <cpan@konkov.top>',
 	requires => {
 		'Scope::Cleanup' =>  0,
 		'Sub::Metadata'  =>  0,
@@ -37,6 +37,7 @@ my $build = Module::Build->new(
 			# Need help? Feel free to ask questions on:
 			x_IRC      =>  "irc://irc.perl.org/#debughooks",
 			repository =>  'https://github.com/KES777/Devel-DebugHooks',
+			bugtracker =>  'https://github.com/KES777/Devel-DebugHooks/issues',
 		},
 	},
 );

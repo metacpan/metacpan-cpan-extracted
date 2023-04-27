@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::TestMore 1.025;
+package Perl::PrereqScanner::Scanner::TestMore 1.100;
 # ABSTRACT: scanner to find recent Test::More usage
 
-use Moose;
+use Moo;
 use List::Util 1.33 'none';
 with 'Perl::PrereqScanner::Scanner';
 
@@ -33,7 +33,7 @@ Perl::PrereqScanner::Scanner::TestMore - scanner to find recent Test::More usage
 
 =head1 VERSION
 
-version 1.025
+version 1.100
 
 =head1 DESCRIPTION
 

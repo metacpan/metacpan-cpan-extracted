@@ -17,9 +17,11 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
+        'Moo'           => '2.005004',
         'LWP'           => '6.61',
         'JSON::MaybeXS' => '1.004003',
         'strictures'    => 2,
+        'URI'           => '5.10',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Museum-MetropolitanMuseumArt-*' },

@@ -4,7 +4,7 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -14,6 +14,14 @@
    },
    "name" : "Excel-ValueWriter-XLSX",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::More" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -31,20 +39,12 @@
             "perl" : "5.014001",
             "utf8" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "DBD::SQLite" : "0",
-            "DBI" : "0",
-            "LWP::UserAgent" : "0",
-            "Test::More" : "0"
-         }
       }
    },
    "provides" : {
       "Excel::ValueWriter::XLSX" : {
          "file" : "lib/Excel/ValueWriter/XLSX.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/damil/Excel-ValueWriter-XLSX"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -10,7 +10,7 @@ use Dumpvalue;
 use version ();
 use File::Spec ();
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 our $VERBOSE = 0;
 our $ALLOW_DEV_VERSION = 0;
 our $FORK = 0;
@@ -382,7 +382,7 @@ sub _packages_per_pmfile {
                       # (.*) # takes too much time if $pline is long
                       #(?<![*\$\\@%&]) # no sigils
                       ^[\s\{;]*
-                      \bpackage\s+
+                      \b(?:package|class|role)\s+
                       ([\w\:\']+)
                       \s*
                       (?: $ | [\}\;] | \{ | \s+($version::STRICT) )

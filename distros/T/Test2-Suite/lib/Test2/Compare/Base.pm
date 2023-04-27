@@ -2,12 +2,12 @@ package Test2::Compare::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.000150';
+our $VERSION = '0.000152';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/blessed/;
 
-use Sub::Info qw/sub_info/;
+use Test2::Util::Sub qw/sub_info/;
 use Test2::Compare::Delta();
 
 sub MAX_CYCLES() { 75 }

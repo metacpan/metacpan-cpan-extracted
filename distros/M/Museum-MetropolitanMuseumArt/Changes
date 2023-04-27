@@ -1,5 +1,7 @@
 Revision history for Museum-MetropolitanMuseumArt
 
+0.02    2023-04-26
+        Added missing dependencies to Makefile.PL
 0.01    2023-04-24
         First version, released on an unsuspecting world.
 

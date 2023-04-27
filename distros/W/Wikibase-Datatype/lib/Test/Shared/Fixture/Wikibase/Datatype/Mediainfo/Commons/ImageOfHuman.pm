@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.29;
+our $VERSION = 0.31;
 
 sub new {
 	my $class = shift;
@@ -47,7 +47,7 @@ __END__
 
 =head1 NAME
 
-Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman - Test instance for Wikidata mediainfo.
+Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman - Test instance for Wikimedia Commons mediainfo.
 
 =head1 SYNOPSIS
 
@@ -211,6 +211,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.31
 
 =cut

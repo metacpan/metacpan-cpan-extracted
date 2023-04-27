@@ -2,7 +2,23 @@ use strict;
 use warnings;
 package RT::Extension::DynamicWebPath;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+use RT::Config;
+$RT::Config::META{DynamicWebPath} = {
+    Immutable     => 1,
+    Type          => 'HASH',
+    PostLoadCheck => sub {
+        my $config = shift;
+        my $paths  = $config->Get('DynamicWebPath') || {};
+
+        if ( my $default = $paths->{''} ) {
+            for my $name ( keys %$default ) {
+                RT->Config->Set( $name => $default->{$name} );
+            }
+        }
+    }
+};
 
 =head1 NAME
 

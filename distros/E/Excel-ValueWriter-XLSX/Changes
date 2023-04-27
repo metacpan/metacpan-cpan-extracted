@@ -1,6 +1,10 @@
 Revision history for Excel-ValueWriter-XLSX
 
 
+1.04     25.04.2023
+  - perl treats strings "infinity" or "NaN" as numbers ... but Excel does not
+  - escape control chars in the form _x...._ (borrowed from Excel::Writer::XLSX::Package::SharedStrings)
+
 1.03     28.01.2023
   - fixed bug : sheet content was not properly UTF8-encoded
 

@@ -1,3 +1,43 @@
+0.31 2023-04-27T15:00:16+02:00
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::DouglasAdams.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog.
+ - Add SEE ALSO link to Wikibase::Datatype::Snak.
+ - Fix output of example in Wikibase::Datatype::Languages doc.
+ - Fix typos in doc.
+
+0.30 2023-04-26T10:57:20+02:00
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Retrieved::Fixture1.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GivenName::Douglas.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GrammaticalGender::Masculine.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::Image::Dog.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::CommonLivingOrganism.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::VersionEditionOrTranslation.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::WikidataProperty.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::ItemForThisSense::Dog.
+ - Add doc for
+   Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male.
+ - Fix author tests for Wikibase::Datatype::Value::Sense.
+
 0.29 2023-04-24T18:31:06+02:00
  - Add doc for
    Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::ReferenceURL::Fixture1.

@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/FireDiamondUtils.pm
+script/explain-fire-diamond-text-notation
 script/parse-fire-diamond-text-notation
 script/show-fire-diamond-legends
 t/00-compile.t

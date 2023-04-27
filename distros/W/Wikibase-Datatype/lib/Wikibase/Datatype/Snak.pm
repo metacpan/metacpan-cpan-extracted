@@ -34,7 +34,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.29;
+our $VERSION = 0.31;
 
 has datatype => (
 	is => 'ro',
@@ -121,7 +121,7 @@ This datatype is snak class for representing relation between property and value
 
 Constructor.
 
-Retruns instance of object.
+Returns instance of object.
 
 =over 8
 
@@ -272,6 +272,10 @@ L<Wikibase::Datatype::Utils>.
 
 Wikibase datatypes.
 
+=item L<Wikibase::Datatype::MediainfoSnak>
+
+Wikibase mediainfo snak datatype.
+
 =back
 
 =head1 REPOSITORY
@@ -292,6 +296,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.31
 
 =cut

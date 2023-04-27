@@ -1,22 +1,27 @@
-Revision history for App-jpath
+0.050   2023-02-14  Released-By: PERLANCAR; Urgency: low
 
-0.04    2016-03-11 (PERLANCAR)
+        - No functional changes.
+
+        - [doc] Mention jsonsel and jq.
+
+
+0.04    2016-03-11  Released-By: PERLANCAR
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.03    2014-02-14 (SHARYANTO)
+0.03    2014-02-14  Released-By: SHARYANTO
 
         - Use Data::Format::Pretty::* modules for all output.
 
 
-0.02    2014-02-14 (SHARYANTO)
+0.02    2014-02-14  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Mention more related modules in See Also.
 
 
-0.01    2014-02-14 (SHARYANTO)
+0.01    2014-02-14  Released-By: SHARYANTO
 
         - First release.

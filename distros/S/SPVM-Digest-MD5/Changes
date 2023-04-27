@@ -1,3 +1,14 @@
+1.001 2023-04-27
+  [Prerequirement Change]
+    * SPVM 0.971006 is required.
+  [License Change]
+    * The license is changed to MIT License.
+  [Exception Message Changes]
+    * Exception messages are improved.
+  [Document Improvement]
+    * Added the doc of exceptions.
+  [Incompatible Changes]
+    * Removed the md5_base64 and b64digest methods. Use the encode_base64 method in the MIEE::Base64 class to produce md5_base64 result instead.
 0.13  2023-03-20
   [Internal Compatible Changes]
     * Use SPVM::ExchangeAPI method instead of SPVM functions.

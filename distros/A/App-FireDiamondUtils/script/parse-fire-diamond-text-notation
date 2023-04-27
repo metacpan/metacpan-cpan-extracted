@@ -6,20 +6,17 @@
 use 5.010001;
 use strict;
 use warnings;
-use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-03-29'; # DATE
 our $DIST = 'App-FireDiamondUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Parse/FireDiamond/parse_fire_diamond_text_notation",
     program_name => "parse-fire-diamond-text-notation",
-    log => 1,
-    pass_cmdline_object => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -41,7 +38,7 @@ parse-fire-diamond-text-notation - Parse Fire Diamond (NFPA 704) text notation
 
 =head1 VERSION
 
-This document describes version 0.002 of parse-fire-diamond-text-notation (from Perl distribution App-FireDiamondUtils), released on 2023-03-29.
+This document describes version 0.003 of parse-fire-diamond-text-notation (from Perl distribution App-FireDiamondUtils), released on 2023-03-29.
 
 =head1 SYNOPSIS
 
@@ -49,7 +46,7 @@ B<parse-fire-diamond-text-notation> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"
 
 B<parse-fire-diamond-text-notation> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<parse-fire-diamond-text-notation> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<notation|/"--notation=s*">>E<gt>
+B<parse-fire-diamond-text-notation> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<notation|/"--notation=s*">>E<gt>
 
 
 
@@ -69,43 +66,6 @@ C<*> marks required options.
 
 
 Can also be specified as the 1st command-line argument.
-
-=back
-
-=head2 Logging options
-
-=over
-
-=item B<--debug>
-
-Shortcut for --log-level=debug.
-
-=item B<--log-level>=I<s>
-
-Set log level.
-
-By default, these log levels are available (in order of increasing level of
-importance, from least important to most): C<trace>, C<debug>, C<info>,
-C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
-C<warn>, which means that log statements with level C<info> and less important
-levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
-C<trace>.
-
-For more details on log level and logging, as well as how new logging levels can
-be defined or existing ones modified, see L<Log::ger>.
-
-
-=item B<--quiet>
-
-Shortcut for --log-level=error.
-
-=item B<--trace>
-
-Shortcut for --log-level=trace.
-
-=item B<--verbose>
-
-Shortcut for --log-level=info.
 
 =back
 

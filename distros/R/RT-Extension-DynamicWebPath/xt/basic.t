@@ -6,11 +6,8 @@ use RT::Extension::DynamicWebPath::Test tests => undef;
 plan skip_all => 'This test only works for RT_TEST_WEB_HANDLER=apache+fcgid'
   unless ( $ENV{RT_TEST_WEB_HANDLER} // '' ) eq 'apache+fcgid';
 
-RT->Config->Set( WebRemoteUserAuth => 1 );
-RT->Config->Set( WebFallbackToRTLogin => 0 );
-
 RT->Config->Set(
-    'DynamicWebPath' => {
+    'DynamicWebPath' => (
         '' => {
             WebRemoteUserAuth    => 1,
             WebFallbackToRTLogin => 0,
@@ -18,8 +15,8 @@ RT->Config->Set(
         '/rt' => {
             WebRemoteUserAuth    => 0,
             WebFallbackToRTLogin => 1,
-        },
-    },
+        }
+    ),
 );
 
 my $autoreply = RT::Template->new( RT->SystemUser );

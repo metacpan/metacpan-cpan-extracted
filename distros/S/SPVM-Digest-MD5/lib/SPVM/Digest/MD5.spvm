@@ -1,17 +1,27 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class Digest::MD5 {
+  version "1.001";
+  
   use Digest::MD5::Context;
+  
+  # Fields
   has context : Digest::MD5::Context;
   
+  # Class Methods
   native static method md5 : string ($data : string);
+  
   native static method md5_hex : string ($data : string);
-  native static method md5_base64 : string ($data : string);
   
   native static method new : Digest::MD5 ();
-
-  native method add : Digest::MD5 ($data : string);
-  native method digest : string ();
-  native method hexdigest : string ();
-  native method b64digest : string ();
   
+  # Instance Methods
   native method DESTROY : void ();
+  
+  native method add : Digest::MD5 ($data : string);
+  
+  native method digest : string ();
+  
+  native method hexdigest : string ();
 }

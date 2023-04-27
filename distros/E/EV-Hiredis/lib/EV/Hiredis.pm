@@ -6,7 +6,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.05';
+    our $VERSION = '0.06';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -18,6 +18,8 @@ sub new {
 
     $self->on_error($args{on_error} || sub { die @_ });
     $self->on_connect($args{on_connect}) if $args{on_connect};
+    $self->connect_timeout($args{connect_timeout}) if $args{connect_timeout};
+    $self->command_timeout($args{command_timeout}) if $args{command_timeout};
 
     if (exists $args{host}) {
         $self->connect($args{host}, defined $args{port} ? $args{port} : 6379);
@@ -135,6 +137,14 @@ This callback can be set by C<< $obj->on_error($cb) >> method any time.
 Connection callback will be called when connection successful and completed to redis server.
 
 This callback can be set by C<< $obj->on_connect($cb) >> method any time.
+
+=item * connect_timeout => $num_of_milliseconds
+
+Connection timeout.
+
+=item * command_timeout => $num_of_milliseconds
+
+Command timeout.
 
 =item * loop => 'EV::loop',
 

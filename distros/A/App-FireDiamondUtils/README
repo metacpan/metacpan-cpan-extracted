@@ -3,17 +3,62 @@ NAME
     standard)
 
 VERSION
-    This document describes version 0.002 of App::FireDiamondUtils (from
+    This document describes version 0.003 of App::FireDiamondUtils (from
     Perl distribution App-FireDiamondUtils), released on 2023-03-29.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
+
+    *   explain-fire-diamond-text-notation
 
     *   parse-fire-diamond-text-notation
 
     *   show-fire-diamond-legends
 
 FUNCTIONS
+  explain_fire_diamond_text_notation
+    Usage:
+
+     explain_fire_diamond_text_notation(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Explain fire diamond text notation in several ways.
+
+    Examples:
+
+    *   Show fire diamond for sulfuric acid in highlighted table style:
+
+         explain_fire_diamond_text_notation(notation => "H3/F0/R2/W+OX"); # -> [200, undef, undef, {}]
+
+    *   Show fire diamond for sulfuric acid in table style:
+
+         explain_fire_diamond_text_notation(notation => "H3/F0/R2/W+OX", style => "table"); # -> [200, undef, undef, {}]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   notation* => *str*
+
+        (No description)
+
+    *   style => *str* (default: "highlighted-table")
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   show_fire_diamond_legends
     Usage:
 
@@ -21,6 +66,16 @@ FUNCTIONS
 
     Show a table that explains the meaning of each number and symbol in the
     Fire Diamond notation.
+
+    Examples:
+
+    *   Show the short table:
+
+         show_fire_diamond_legends(); # -> [200, undef, undef, {}]
+
+    *   Show the long/verbose table:
+
+         show_fire_diamond_legends(detail => 1); # -> [200, undef, undef, {}]
 
     This function is not exported.
 

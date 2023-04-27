@@ -151,7 +151,7 @@ TUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=
     # Exception
     {
       eval { MIME::QuotedPrint->encode_qp(undef); };
-      unless (Fn->contains($@, "The input must be defined")) {
+      unless (Fn->contains($@, "The \$string must be defined")) {
         return 0;
       }
     }
@@ -288,7 +288,7 @@ y. -- H. L. Mencken=\n",
     # Exception
     {
       eval { MIME::QuotedPrint->decode_qp(undef); };
-      unless (Fn->contains($@, "The input must be defined")) {
+      unless (Fn->contains($@, "The \$string must be defined")) {
         return 0;
       }
     }

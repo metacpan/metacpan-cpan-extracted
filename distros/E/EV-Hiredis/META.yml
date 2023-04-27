@@ -14,7 +14,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,18 +34,19 @@ no_index:
 provides:
   EV::Hiredis:
     file: lib/EV/Hiredis.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   EV: '4.11'
   XSLoader: '0.02'
-  perl: '5.008001'
+  perl: '5.012000'
 resources:
   bugtracker: https://github.com/typester/EV-Hiredis/issues
   homepage: https://github.com/typester/EV-Hiredis
   repository: https://github.com/typester/EV-Hiredis.git
-version: '0.05'
+version: '0.06'
 x_contributors:
-  - 'Ichinose Shogo <shogo82148@gmail.com>'
+  - 'ICHINOSE Shogo <shogo82148@gmail.com>'
   - 'taniwaki-makoto <taniwaki-makoto@kayac.com>'
+  - 'vividsnow <vividsnow@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

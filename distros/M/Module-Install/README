@@ -493,7 +493,7 @@ EXTENSIONS
     via their own POD documentation.
 
   Module::Install::AutoInstall
-    Provides "auto_install()" to automatically fetch and install
+    Provides auto_install() to automatically fetch and install
     prerequisites.
 
   Module::Install::Base

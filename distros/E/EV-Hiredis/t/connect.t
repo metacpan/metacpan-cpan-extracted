@@ -38,6 +38,30 @@ EV::run;
 is $connected, 1;
 is $error, 0;
 
+
+$r = EV::Hiredis->new(connect_timeout => 1000, command_timeout => 1000);
+
+$connected = 0;
+$error = 0;
+
+$r->on_error(sub { $error++ });
+$r->on_connect(sub {
+    $connected++;
+
+    my $t; $t = EV::timer .1, 0, sub {
+        $r->disconnect;
+        undef $t;
+    };
+});
+
+$r->connect('127.0.0.1', $port);
+
+EV::run;
+
+is $connected, 1;
+is $error, 0;
+
+
 $redis_server->stop;
 
 $r = EV::Hiredis->new;

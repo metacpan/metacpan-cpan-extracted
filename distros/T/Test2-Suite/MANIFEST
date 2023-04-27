@@ -111,6 +111,8 @@ lib/Test2/Tools/Target.pm
 lib/Test2/Tools/Tester.pm
 lib/Test2/Tools/Warnings.pm
 lib/Test2/Util/Grabber.pm
+lib/Test2/Util/Guard.pm
+lib/Test2/Util/Importer.pm
 lib/Test2/Util/Ref.pm
 lib/Test2/Util/Stash.pm
 lib/Test2/Util/Sub.pm

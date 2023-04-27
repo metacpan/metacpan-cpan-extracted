@@ -85,6 +85,14 @@ Available `%options` are:
 
     This callback can be set by `$obj->on_connect($cb)` method any time.
 
+- connect\_timeout => $num\_of\_milliseconds
+
+    Connection timeout.
+
+- command\_timeout => $num\_of\_milliseconds
+
+    Command timeout.
+
 - loop => 'EV::loop',
 
     EV loop for running this instance. Default is `EV::default_loop`.

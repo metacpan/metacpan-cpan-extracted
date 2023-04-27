@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::POE 1.025;
+package Perl::PrereqScanner::Scanner::POE 1.100;
 # ABSTRACT: scan for POE components
 
-use Moose;
+use Moo;
 with 'Perl::PrereqScanner::Scanner';
 
 #pod =head1 DESCRIPTION
@@ -47,7 +47,7 @@ Perl::PrereqScanner::Scanner::POE - scan for POE components
 
 =head1 VERSION
 
-version 1.025
+version 1.100
 
 =head1 DESCRIPTION
 

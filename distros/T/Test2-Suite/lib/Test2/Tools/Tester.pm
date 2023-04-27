@@ -2,13 +2,18 @@ package Test2::Tools::Tester;
 use strict;
 use warnings;
 
-our $VERSION = '0.000150';
+our $VERSION = '0.000152';
 
 use Carp qw/croak/;
-use Module::Pluggable search_path => ['Test2::EventFacet'], require => 1;
 use Test2::Util::Ref qw/rtype/;
 
-use Importer Importer => 'import';
+BEGIN {
+    if (eval { require Module::Pluggable; 1 }) {
+        Module::Pluggable->import(search_path => ['Test2::EventFacet'], require => 1);
+    }
+}
+
+use Test2::Util::Importer 'Test2::Util::Importer' => 'import';
 
 our @EXPORT_OK = qw{
     facets

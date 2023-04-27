@@ -1,5 +1,9 @@
 Revision history for Perl extension EV::Hiredis
 
+0.06 2023-04-25T22:39:28Z
+     - support of hiredis connect/command timeouts (#13)
+     - drop support of Perl 5.10 (#14)
+
 0.05 2022-09-11T04:27:59Z
      - bump ppport.h Version 3.68
      - bump hiredis v1.0.2

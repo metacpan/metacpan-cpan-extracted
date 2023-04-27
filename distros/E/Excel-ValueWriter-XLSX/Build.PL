@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
       'Date::Calc'                => 0,
       'Carp'                      => 0,
      },
-    test_requires => {
+    build_requires => {
       'Test::More'                => 0,
       'LWP::UserAgent'            => 0,
       'DBI'                       => 0,

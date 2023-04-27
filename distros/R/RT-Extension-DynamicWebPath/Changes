@@ -1,4 +1,7 @@
 Revision history for RT-Extension-DynamicWebPath
 
+0.02 2023-04-27
+ - Automatically set configs defined for default WebPath ""
+
 0.01 2023-03-01
  - Initial version

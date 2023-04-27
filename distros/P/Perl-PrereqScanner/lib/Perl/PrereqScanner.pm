@@ -2,11 +2,12 @@ use 5.008;
 use strict;
 use warnings;
 
-package Perl::PrereqScanner 1.025;
+package Perl::PrereqScanner 1.100;
 # ABSTRACT: a tool to scan your Perl code for its prerequisites
 
-use Moose;
+use Moo 2.000000;
 
+use Carp qw(confess);
 use List::Util qw(max);
 use Params::Util qw(_CLASS);
 use Perl::PrereqScanner::Scanner;
@@ -15,16 +16,16 @@ use String::RewritePrefix 0.005 rewrite => {
   -as => '__rewrite_scanner',
   prefixes => { '' => 'Perl::PrereqScanner::Scanner::', '=' => '' },
 };
+use Types::Standard qw(ArrayRef ConsumerOf);
 
 use CPAN::Meta::Requirements 2.124; # normalized v-strings
 
 use namespace::autoclean;
 
 has scanners => (
-  is  => 'ro',
-  isa => 'ArrayRef[Perl::PrereqScanner::Scanner]',
+  is  => 'rwp',
+  isa => ArrayRef[ConsumerOf['Perl::PrereqScanner::Scanner']],
   init_arg => undef,
-  writer   => '_set_scanners',
 );
 
 sub __scanner_from_str {
@@ -150,7 +151,7 @@ Perl::PrereqScanner - a tool to scan your Perl code for its prerequisites
 
 =head1 VERSION
 
-version 1.025
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -277,7 +278,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords bowtie celogeek Christopher J. Madsen David Golden Steinbrunner Ed J Florian Ragwitz Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Mark Gardner Neil Bowers Randy Stauner Ricardo Signes Tina Mueller Vyacheslav Matjukhin
+=for stopwords bowtie celogeek Christopher J. Madsen Dan Book David Golden Steinbrunner Ed J Florian Ragwitz Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Mark Gardner Neil Bowers Randy Stauner Ricardo Signes Tina Mueller Vyacheslav Matjukhin
 
 =over 4
 
@@ -292,6 +293,10 @@ celogeek <me@celogeek.com>
 =item *
 
 Christopher J. Madsen <perl@cjmweb.net>
+
+=item *
+
+Dan Book <grinnz@grinnz.com>
 
 =item *
 

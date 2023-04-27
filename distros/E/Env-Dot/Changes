@@ -1,8 +1,11 @@
 Revision history for Env-Dot
 
+0.007     2023-04-26 21:56:58+02:00 Europe/Stockholm
+
 0.006     2023-04-23 22:10:09+02:00 Europe/Stockholm
           * Add envdot.self-container to MANIFEST.SKIP. We don't need it in CPAN.
           * Fix dist.ini Run::AfterRelease action.
+          * Use var $SHELL as default shell value, instead of sh.
 
 0.005     2023-04-23 20:04:35+02:00 Europe/Stockholm
           * Remove var:export option.

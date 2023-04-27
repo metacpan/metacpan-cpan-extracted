@@ -19,11 +19,10 @@ name: App-FireDiamondUtils
 provides:
   App::FireDiamondUtils:
     file: lib/App/FireDiamondUtils.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Data::Sah::Compiler::perl::TH::bool: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
-  Log::ger: '0.038'
   Parse::FireDiamond: '0.004'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
@@ -35,11 +34,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FireDiamondUtils
   homepage: https://metacpan.org/release/App-FireDiamondUtils
   repository: git://github.com/perlancar/perl-App-FireDiamondUtils.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript explain-fire-diamond-text-notation'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript parse-fire-diamond-text-notation'

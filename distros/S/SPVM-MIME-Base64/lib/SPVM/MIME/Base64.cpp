@@ -68,7 +68,7 @@ int32_t SPVM__MIME__Base64__encode_base64(SPVM_ENV* env, SPVM_VALUE* stack) {
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-                return env->die(env, stack, "The input must be defined", __func__, FILE_NAME, __LINE__);
+                return env->die(env, stack, "The $string must be defined", __func__, FILE_NAME, __LINE__);
         }
 
         rlen = env->length(env, stack, obj_str);
@@ -155,7 +155,7 @@ int32_t SPVM__MIME__Base64__decode_base64(SPVM_ENV* env, SPVM_VALUE* stack) {
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-                return env->die(env, stack, "The input must be defined", __func__, FILE_NAME, __LINE__);
+                return env->die(env, stack, "The $string must be defined", __func__, FILE_NAME, __LINE__);
         }
         
         len = env->length(env, stack, obj_str);
@@ -222,7 +222,7 @@ int32_t SPVM__MIME__Base64__encoded_base64_length(SPVM_ENV* env, SPVM_VALUE* sta
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-          return env->die(env, stack, "The input must be defined", __func__, FILE_NAME, __LINE__);
+          return env->die(env, stack, "The $string must be defined", __func__, FILE_NAME, __LINE__);
         }
 
         void* obj_eol = NULL;
@@ -257,7 +257,7 @@ int32_t SPVM__MIME__Base64__decoded_base64_length(SPVM_ENV* env, SPVM_VALUE* sta
         void* obj_str = stack[0].oval;
         
         if (!obj_str) {
-                return env->die(env, stack, "The input must be defined", __func__, FILE_NAME, __LINE__);
+                return env->die(env, stack, "The $string must be defined", __func__, FILE_NAME, __LINE__);
         }
         
         len = env->length(env, stack, obj_str);

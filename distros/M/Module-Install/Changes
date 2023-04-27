@@ -1,5 +1,8 @@
 Changes for Perl programming language extension Module-Install
 
+1.19  2023-04-27
+  - Module::Install::DSL has been removed, as its use is highly discouraged.
+
 1.19  2017-12-19
   - remove use of INIT phase in Module::Install::DSL, to fix issues on perl
     5.27.7 (see cpan RT#123867 and perl RT#132577)

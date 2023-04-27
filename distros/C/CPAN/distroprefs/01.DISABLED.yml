@@ -87,6 +87,7 @@ match:
     |BTROTT/WWW-Blog-Metadata-0.02           # ExtUtils::AutoInstall 0.56 http://rt.cpan.org/Ticket/Display.html?id=40601
     |BULKDD/Acme-Shining-0.01                # spits out too much output
     |BWILLIAM/AltaVista-SDKLinguistics-3.02.tar.gz # looks like abandoned since 2001
+    |CAC/Tcl-pTk-1.09                        # tests hanging on some smokers
     |CAFFIEND/font_ft2_0.1.0.tgz             # only fails on cpantesters
     |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
     |CAPOEIRAB/WWW-Salesforce-               # demands username and passwd
@@ -146,6 +147,7 @@ match:
     |FIBO/PNI-Node-Tk-                       # hangs after t/PNI-Node-Tk.t
     |FCO/treadsemulate/threads-emulate-0     # hangs in 00-load.t on 32642
     |FDULAU/Graph-Chart-0.65                 # looks like abandonded since 2012
+    |FRIFFIN/Geo-Coder-Cloudmade-0\.7\.t     # only red since 201606; 
     |FROGGS/Alien-SDL-1.418                  # questions
     |FreeHAL                                 # David Cantrell warns that it is a 137 MB thingy
     |GAFFER/Relations-Abstract-0.94.tar.gz   # seems abandoned sincce 2001
@@ -155,6 +157,8 @@ match:
     |GEOTIGER/Oracle-Trigger-\d              # may call both CPANPLUS::install and CPAN::install
     |GGARAND/PerlQt-3.008.tar.gz             # disk scans taking forever
     |GKNAUSS/WebService-Upcoming             # for members only
+    |GLLORE/App-SeismicUnixGui-0.81.4.tar.gz # runs a find on / during setup
+    |GLLORE/App-SeismicUnixGui-0.82.0.tar.gz # runs a find on / during setup
     |GOLOGO/Podcast-ESLPodcast-Splitter-v0.0.1 # only fails on cpantesters
     |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
     |GONERI/Ocsinventory-Agent-\d            # hanger
@@ -245,7 +249,7 @@ match:
     |LARRYL/WebService-ScormCloud-\d         # asks for an ID
     |LBAXTER/Openview-Message-0.03.tar.gz
     |LBROCARD/Devel-ebug-HTTP-0.32           # http://rt.cpan.org/Ticket/Display.html?id=40599
-    |LDACHARY/Catalog-0.5                    # asks questions
+    |LDACHARY/Catalog-\d                     # asks questions (and may deny answers)
     |LDS/Bio-SamTools-\d                     # requires non-CPAN prereq
     |LEIFHED/perldap-1.4.tar.gz              # looks like abandoned since 1999
     |LEOCHARRE/WWW-Autosite-                 # asks question, does not use prompt RT 35081
@@ -306,6 +310,7 @@ match:
     |NXADM/App-Unix-RPasswd-\d               # takes too much time, no idea what it does
     |OALDERS/URI-ParseSearchString-More-0.04
     |OESTERHOL/Aut-0.11.tar.gz               # looks like abandoned since 2004
+    |OKHARCH/Parallel-DataPipe-0.11.tar.gz   # https://rt.cpan.org/Ticket/Display.html?id=132464
     |PATL/autorequire-0.08.tar.gz
     |PERFSONAR/perfSONAR_PS-DB-RRD-0.09.tar.gz # looks like abandoned since 2008
     |PERIGRIN/Git-Wrapper-\d                 # some huge kill triggered?

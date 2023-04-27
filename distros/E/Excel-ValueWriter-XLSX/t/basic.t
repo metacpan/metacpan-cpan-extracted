@@ -22,7 +22,9 @@ $writer->add_sheet(s1 => à_table => [[qw/foo bar barbar gig/],
 $writer->add_sheet(table_oubliée => (undef) => [[qw/aa bb cc dd/],
                                                 [45, 56],
                                                 [qw/il était une bergère/],
-                                                [99, 33, 33]]);
+                                                [99, 33, 33, 'INFINITY'],
+                                                ["ctrl\cA\cB\cC", " space "],
+                                               ]);
 
 # sheet with a large number of random values
 my @headers_for_rand = map {"h$_"} 1 .. 300;
@@ -63,8 +65,12 @@ my $table1 = $zip->contents('xl/tables/table1.xml');
 like $table1, qr[<tableColumn id="1"], 'table1';
 
 my $strings = $zip->contents('xl/sharedStrings.xml');
-like $strings, qr[<si><t>foo</t></si><si><t>bar</t></si>],     'shared strings';
-like $strings, qr[<si><t>\Q=[foo]+[bar]&amp;[bar]\E</t></si>], 'escaped formula';
+like $strings, qr[<si><t>foo</t></si><si><t>bar</t></si>],       'shared strings';
+like $strings, qr[<si><t>\Q=[foo]+[bar]&amp;[bar]\E</t></si>],   'escaped formula';
+like $strings, qr[<si><t>INFINITY</t></si>],                     'INFINITY treated as a string';
+like $strings, qr[<si><t>ctrl_x0001__x0002__x0003_</t></si>],    'control chars';
+like $strings, qr[<si><t xml:space="preserve"> space </t></si>], 'preserve space';
+
 
 # end of tests
 done_testing;

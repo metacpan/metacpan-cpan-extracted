@@ -592,7 +592,7 @@ Readonly::Hash our %LANGUAGES => (
 	'ybb' => 'Yemba', # Yemba - T263946
 );
 
-our $VERSION = 0.29;
+our $VERSION = 0.31;
 
 sub all_language_codes {
 	return keys %LANGUAGES;
@@ -651,12 +651,14 @@ Returns array with codes.
  # ab
  # abs
  # ace
+ # acm
  # ady
  # ady-cyrl
  # aeb
  # aeb-arab
  # aeb-latn
  # af
+ # agq
  # ak
  # aln
  # als
@@ -665,6 +667,7 @@ Returns array with codes.
  # ami
  # an
  # ang
+ # ann
  # anp
  # ar
  # arc
@@ -683,30 +686,39 @@ Returns array with codes.
  # az
  # azb
  # ba
+ # bag
  # ban
  # ban-bali
  # bar
+ # bas
  # bat-smg
+ # bax
  # bbc
  # bbc-latn
+ # bbj
  # bcc
  # bci
  # bcl
  # be
  # be-tarask
  # be-x-old
+ # bfd
  # bg
  # bgn
  # bh
  # bho
  # bi
  # bjn
+ # bkc
+ # bkh
+ # bkm
  # blk
  # bm
  # bn
  # bo
  # bpy
  # bqi
+ # bqz
  # br
  # brh
  # bs
@@ -714,7 +726,9 @@ Returns array with codes.
  # bto
  # bug
  # bxr
+ # byv
  # ca
+ # cak
  # cbk-zam
  # cdo
  # ce
@@ -724,6 +738,7 @@ Returns array with codes.
  # chr
  # chy
  # ckb
+ # cnh
  # co
  # cps
  # cr
@@ -741,11 +756,13 @@ Returns array with codes.
  # de-at
  # de-ch
  # de-formal
+ # dga
  # din
  # diq
  # dsb
  # dtp
  # dty
+ # dua
  # dv
  # dz
  # ee
@@ -755,12 +772,17 @@ Returns array with codes.
  # en
  # en-ca
  # en-gb
+ # en-us
+ # en-x-piglatin
  # eo
  # es
  # es-419
  # es-formal
  # et
+ # eto
+ # etu
  # eu
+ # ewo
  # ext
  # fa
  # fat
@@ -769,6 +791,8 @@ Returns array with codes.
  # fit
  # fiu-vro
  # fj
+ # fkv
+ # fmp
  # fo
  # fon
  # fr
@@ -802,6 +826,7 @@ Returns array with codes.
  # gur
  # guw
  # gv
+ # gya
  # ha
  # hak
  # haw
@@ -810,6 +835,7 @@ Returns array with codes.
  # hif
  # hif-latn
  # hil
+ # hno
  # ho
  # hr
  # hrx
@@ -825,6 +851,7 @@ Returns array with codes.
  # id
  # ie
  # ig
+ # igl
  # ii
  # ik
  # ike-cans
@@ -833,6 +860,7 @@ Returns array with codes.
  # inh
  # io
  # is
+ # isu
  # it
  # iu
  # ja
@@ -848,11 +876,13 @@ Returns array with codes.
  # kbp
  # kcg
  # kea
+ # ker
  # kg
  # khw
  # ki
  # kiu
  # kj
+ # kjh
  # kjp
  # kk
  # kk-arab
@@ -875,12 +905,14 @@ Returns array with codes.
  # ks
  # ks-arab
  # ks-deva
+ # ksf
  # ksh
  # ksw
  # ku
  # ku-arab
  # ku-latn
  # kum
+ # kus
  # kv
  # kw
  # ky
@@ -888,6 +920,7 @@ Returns array with codes.
  # lad
  # lb
  # lbe
+ # lem
  # lez
  # lfn
  # lg
@@ -898,6 +931,7 @@ Returns array with codes.
  # lld
  # lmo
  # ln
+ # lns
  # lo
  # loz
  # lrc
@@ -912,6 +946,8 @@ Returns array with codes.
  # mag
  # mai
  # map-bms
+ # mcn
+ # mcp
  # mdf
  # mg
  # mh
@@ -932,6 +968,7 @@ Returns array with codes.
  # ms
  # ms-arab
  # mt
+ # mua
  # mul
  # mus
  # mwl
@@ -941,6 +978,7 @@ Returns array with codes.
  # na
  # nah
  # nan
+ # nan-hani
  # nap
  # nb
  # nds
@@ -948,14 +986,20 @@ Returns array with codes.
  # ne
  # new
  # ng
+ # nge
  # nia
  # niu
  # nl
  # nl-informal
+ # nla
+ # nmg
  # nmz
  # nn
+ # nnh
+ # nnz
  # no
  # nod
+ # nog
  # nov
  # nqo
  # nrm
@@ -970,10 +1014,13 @@ Returns array with codes.
  # om
  # or
  # os
+ # osa-latn
+ # ota
  # pa
  # pag
  # pam
  # pap
+ # pap-aw
  # pcd
  # pcm
  # pdc
@@ -991,11 +1038,14 @@ Returns array with codes.
  # pt-br
  # pwn
  # qu
+ # quc
  # qug
  # rgn
  # rif
+ # rki
  # rm
  # rmc
+ # rmf
  # rmy
  # rn
  # ro
@@ -1009,6 +1059,7 @@ Returns array with codes.
  # ruq-cyrl
  # ruq-latn
  # rw
+ # rwr
  # ryu
  # sa
  # sah
@@ -1028,6 +1079,8 @@ Returns array with codes.
  # sg
  # sgs
  # sh
+ # sh-cyrl
+ # sh-latn
  # shi
  # shi-latn
  # shi-tfng
@@ -1038,6 +1091,7 @@ Returns array with codes.
  # simple
  # sjd
  # sje
+ # sju
  # sk
  # skr
  # skr-arab
@@ -1045,6 +1099,7 @@ Returns array with codes.
  # sli
  # sm
  # sma
+ # smj
  # smn
  # sms
  # sn
@@ -1055,6 +1110,7 @@ Returns array with codes.
  # sr-el
  # srn
  # sro
+ # srq
  # ss
  # st
  # stq
@@ -1082,6 +1138,7 @@ Returns array with codes.
  # tly-cyrl
  # tn
  # to
+ # tok
  # tpi
  # tr
  # tru
@@ -1091,6 +1148,7 @@ Returns array with codes.
  # tt-cyrl
  # tt-latn
  # tum
+ # tvu
  # tw
  # ty
  # tyv
@@ -1115,15 +1173,23 @@ Returns array with codes.
  # vo
  # vot
  # vro
+ # vut
  # wa
+ # wal
  # war
+ # wes
  # wls
  # wo
  # wuu
+ # wya
  # xal
  # xh
  # xmf
  # xsy
+ # yas
+ # yat
+ # yav
+ # ybb
  # yi
  # yo
  # yrl
@@ -1169,6 +1235,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.31
 
 =cut

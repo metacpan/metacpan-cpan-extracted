@@ -1,5 +1,8 @@
 Revision history for Parse-PMFile
 
+0.44 2023/04/27
+  - Allow to parse class|role NAME VERSION
+
 0.43 2020/12/12
   - Avoid instantiating `Safe` compartment if operating in "unsafe" mode.
     (GH#12; bleargh45++)

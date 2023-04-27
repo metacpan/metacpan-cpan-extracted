@@ -56,7 +56,7 @@ is
 	,$files->{ 'last eval' }
 	,'Eval last expression if none supplied';
 
-$cmd =  's;$x;e $x;$x++;e $x;s;e $x;s;e $x;s;@x;scalar @x;e \@x;s;%x;scalar %x;e \%x;';
+$cmd =  's;$x;e $x;$x++;e $x;s;e $x;s;e $x;s;@x;scalar @x;e \@x;s;%x;0+keys(%x);e \%x;';
 is
 	n( `$^X $lib -d:DbInteract='$cmd' -e '$script'` )
 	,$files->{ 'eval' }
@@ -137,7 +137,7 @@ a 1
 ["a", 1]
 -e:0006  2;
 a 1
-1/8
+1
 { a => 1 }
 @@ @_ not clash
 -e:0004  t( 1, [], {} );

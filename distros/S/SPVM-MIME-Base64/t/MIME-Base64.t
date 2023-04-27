@@ -8,6 +8,10 @@ use Test::More;
 use MIME::Base64;
 use SPVM 'TestCase::MIME::Base64';
 
+use SPVM 'Fn';
+use SPVM::MIME::Base64;
+use SPVM 'MIME::Base64';
+
 my $api = SPVM::api();
 
 # Start objects count
@@ -37,6 +41,11 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
 # decoded_base64_lengt
 {
   ok(SPVM::TestCase::MIME::Base64->decoded_base64_length());
+}
+
+# Version
+{
+  is($SPVM::MIME::Base64::VERSION, SPVM::Fn->get_version_string('MIME::Base64'));
 }
 
 # All object is freed

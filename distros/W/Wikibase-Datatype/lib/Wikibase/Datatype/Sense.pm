@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number_of_items);
 
-our $VERSION = 0.29;
+our $VERSION = 0.31;
 
 has glosses => (
 	default => [],
@@ -70,7 +70,7 @@ This datatype is snak class for representing relation between property and value
 
 Constructor.
 
-Retruns instance of object.
+Returns instance of object.
 
 =over 8
 
@@ -242,6 +242,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.31
 
 =cut

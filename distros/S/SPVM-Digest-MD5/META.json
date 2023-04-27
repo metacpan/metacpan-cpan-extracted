@@ -1,10 +1,10 @@
 {
-   "abstract" : "SPVM interface to the MD5 Algorithm",
+   "abstract" : "MD5",
    "author" : [
-      "USER_NAME<USER_MAIL>"
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,12 +28,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9691"
+            "SPVM" : "0.971006"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9691"
+            "SPVM" : "0.971006"
          }
       }
    },
@@ -45,6 +45,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Digest-MD5"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

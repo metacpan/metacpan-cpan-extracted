@@ -1,6 +1,6 @@
 package SPVM::MIME::Base64;
 
-our $VERSION = '0.07';
+our $VERSION = "1.001";
 
 1;
 
@@ -23,9 +23,9 @@ The MIME::Base64 class of L<SPVM> has methods for L<Base64|https://en.wikipedia.
 
 =head2 encode_base64
 
-  static method encode_base64 : string ($str : string, $eol = undef : string);
+  static method encode_base64 : string ($string : string, $eol = undef : string);
 
-Encodes the string $str to a Base64 string, and returns it.
+Encodes the string $string to a Base64 string, and returns it.
 
 The argument $eol is the line-ending sequence to use. It is optional and defaults to C<\n>.
 
@@ -35,19 +35,27 @@ characters each and it will end with $eol unless it is empty.
 Pass an empty string as the $eol if you do not want the encoded string
 to be broken into lines.
 
+Exceptions:
+
+The $string must be defined. Otherwise an exception is thrown.
+
 =head2 decode_base64
 
-  static method decode_base64 : string ($str : string);
+  static method decode_base64 : string ($string : string);
 
-Decodes a Base64 string $str to a string, and returns it.
+Decodes a Base64 string $string to a string, and returns it.
 
 Any character not part of the 65-character base64 subset is
 silently ignored.  Characters occurring after a C<=> padding character
 are never decoded.
 
+Exceptions:
+
+The $string must be defined. Otherwise an exception is thrown.
+
 =head2 encoded_base64_length
 
-  static method encoded_base64_length : int ($str : string, $eol = undef : string);
+  static method encoded_base64_length : int ($string : string, $eol = undef : string);
 
 Returns the length that the encoded string would have without actually
 encoding it.
@@ -55,15 +63,23 @@ encoding it.
 This will return the same value as the length of the returned value of the L</"encode_base64"> method,
 but should be more efficient.
 
+Exceptions:
+
+The $string must be defined. Otherwise an exception is thrown.
+
 =head2 decoded_base64_length
 
-  static method decoded_base64_length : int ($str : string);
+  static method decoded_base64_length : int ($string : string);
 
 Returns the length that the decoded string would have without actually
 decoding it.
 
 This will return the same value as the length of the returned value of the L</"decode_base64"> method,
 but should be more efficient.
+
+Exceptions:
+
+The $string must be defined. Otherwise an exception is thrown.
 
 =head1 Other Modules in This Distribution
 

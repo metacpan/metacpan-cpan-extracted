@@ -1,0 +1,3 @@
+CONCEPT
+=======
+Find all DWG files in directory and run dwgread to them. Detect ERRORs.

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::Perl5 1.025;
+package Perl::PrereqScanner::Scanner::Perl5 1.100;
 # ABSTRACT: scan for core Perl 5 language indicators of required modules
 
-use Moose;
+use Moo;
 with 'Perl::PrereqScanner::Scanner';
 
 #pod =head1 DESCRIPTION
@@ -127,7 +127,7 @@ Perl::PrereqScanner::Scanner::Perl5 - scan for core Perl 5 language indicators o
 
 =head1 VERSION
 
-version 1.025
+version 1.100
 
 =head1 DESCRIPTION
 

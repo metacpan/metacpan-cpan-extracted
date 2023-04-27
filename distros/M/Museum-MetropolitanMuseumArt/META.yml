@@ -21,7 +21,9 @@ no_index:
 requires:
   JSON::MaybeXS: '1.004003'
   LWP: '6.61'
+  Moo: '2.005004'
+  URI: '5.10'
   perl: '5.034000'
   strictures: '2'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ BEGIN {
 	$^W      = 1;
 }
 
-use Test::More tests => 68;
+use Test::More tests => 66;
 
 # Check their perl version
 ok( $] >= 5.005, "Your perl is new enough" );
@@ -23,7 +23,6 @@ my @classes = qw{
 	Module::Install::Can
 	Module::Install::Compiler
 	Module::Install::Deprecated
-	Module::Install::DSL
 	Module::Install::External
 	Module::Install::Fetch
 	Module::Install::Include

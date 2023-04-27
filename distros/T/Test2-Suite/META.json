@@ -31,11 +31,7 @@
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "0",
-            "Importer" : "0.024",
-            "Module::Pluggable" : "2.7",
             "Scalar::Util" : "0",
-            "Scope::Guard" : "0",
-            "Sub::Info" : "0.002",
             "Term::Table" : "0.013",
             "Test2::API" : "1.302176",
             "Time::HiRes" : "0",
@@ -44,7 +40,7 @@
             "utf8" : "0"
          },
          "suggests" : {
-            "Sub::Name" : "0.11",
+            "Module::Pluggable" : "2.7",
             "Term::ReadKey" : "0",
             "Term::Size::Any" : "0",
             "Unicode::GCString" : "0",
@@ -62,7 +58,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000150",
+   "version" : "0.000152",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

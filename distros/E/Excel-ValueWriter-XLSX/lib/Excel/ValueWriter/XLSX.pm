@@ -12,7 +12,7 @@ use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 #======================================================================
 # GLOBALS
@@ -141,12 +141,13 @@ sub add_sheet {
       defined $val and length $val or next COLUMN;
 
       # choose XML attributes and inner value
+      # NOTE : for perl, looks_like_number( "INFINITY") is TRUE! Hence the test $val !~ /^\pL/
       (my $tag, my $attrs, $val)
-        = looks_like_number $val             ? (v => ""                  , $val                          )
-        : $date_regex && $val =~ $date_regex ? (v => qq{ s="$DATE_STYLE"}, n_days($+{y}, $+{m}, $+{d})   )
-        : $bool_regex && $val =~ $bool_regex ? (v => qq{ t="b"}          , $1 ? 1 : 0                    )
-        : $val =~ /^=/                       ? (f => "",                   escape_formula($val)          )
-        :                                      (v => qq{ t="s"}          , $self->add_shared_string($val));
+        = looks_like_number($val) && $val !~ /^\pL/ ? (v => ""                  , $val                          )
+        : $date_regex && $val =~ $date_regex        ? (v => qq{ s="$DATE_STYLE"}, n_days($+{y}, $+{m}, $+{d})   )
+        : $bool_regex && $val =~ $bool_regex        ? (v => qq{ t="b"}          , $1 ? 1 : 0                    )
+        : $val =~ /^=/                              ? (f => "",                   escape_formula($val)          )
+        :                                             (v => qq{ t="s"}          , $self->add_shared_string($val));
 
       # add the new XML cell
       my $cell = sprintf qq{<c r="%s%d"%s><%s>%s</%s></c>}, $col_letter, $row_num, $attrs, $tag, $val, $tag;
@@ -519,11 +520,25 @@ sub n_tables {
 #======================================================================
 
 
-sub si_node {
+sub si_node { # build XML node for a single shared string
   my ($string) = @_;
 
-  # build XML node for a single shared string
+  # escape XML entities
   $string =~ s/($entity_regex)/$entity{$1}/g;
+
+
+  # Excel escapes control characters with _xHHHH_ and also escapes any
+  # literal strings of that type by encoding the leading underscore. So
+  # "\0" -> _x0000_ and "_x0000_" -> _x005F_x0000_.
+  # The following substitutions deal with those cases.
+  # This code is borrowed from Excel::Writer::XLSX::Package::SharedStrings -- thank you, John McNamara
+
+  # Escape the escape.
+  $string =~ s/(_x[0-9a-fA-F]{4}_)/_x005F$1/g;
+
+  # Convert control character to the _xHHHH_ escape.
+  $string =~ s/([\x00-\x08\x0B-\x1F])/sprintf "_x%04X_", ord($1)/eg;
+
   my $maybe_preserve_space = $string =~ /^\s|\s$/ ? ' xml:space="preserve"' : '';
   my $node = qq{<si><t$maybe_preserve_space>$string</t></si>};
 

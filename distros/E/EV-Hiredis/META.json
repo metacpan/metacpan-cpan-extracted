@@ -4,7 +4,7 @@
       "Daisuke Murase <typester@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.18",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
@@ -58,14 +58,14 @@
          "requires" : {
             "EV" : "4.11",
             "XSLoader" : "0.02",
-            "perl" : "5.008001"
+            "perl" : "5.012000"
          }
       }
    },
    "provides" : {
       "EV::Hiredis" : {
          "file" : "lib/EV/Hiredis.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -80,10 +80,11 @@
          "web" : "https://github.com/typester/EV-Hiredis"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
-      "Ichinose Shogo <shogo82148@gmail.com>",
-      "taniwaki-makoto <taniwaki-makoto@kayac.com>"
+      "ICHINOSE Shogo <shogo82148@gmail.com>",
+      "taniwaki-makoto <taniwaki-makoto@kayac.com>",
+      "vividsnow <vividsnow@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0

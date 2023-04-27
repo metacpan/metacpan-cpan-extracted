@@ -1,4 +1,4 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.012000';
 requires 'EV', '4.11';
 requires 'XSLoader', '0.02';
 

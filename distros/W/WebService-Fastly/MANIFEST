@@ -107,8 +107,6 @@ docs/EnabledProductResponseLinks.md
 docs/EnabledProductResponseProduct.md
 docs/EnabledProductResponseService.md
 docs/EnabledProductsApi.md
-docs/ErrorResponse.md
-docs/ErrorResponseData.md
 docs/Event.md
 docs/EventAttributes.md
 docs/EventResponse.md
@@ -427,7 +425,6 @@ docs/RelationshipsForStar.md
 docs/RelationshipsForTlsActivation.md
 docs/RelationshipsForTlsBulkCertificate.md
 docs/RelationshipsForTlsConfiguration.md
-docs/RelationshipsForTlsCsr.md
 docs/RelationshipsForTlsDomain.md
 docs/RelationshipsForTlsPrivateKey.md
 docs/RelationshipsForTlsSubscription.md
@@ -551,13 +548,6 @@ docs/TlsConfigurationResponseDataAllOf.md
 docs/TlsConfigurationsApi.md
 docs/TlsConfigurationsResponse.md
 docs/TlsConfigurationsResponseAllOf.md
-docs/TlsCsr.md
-docs/TlsCsrData.md
-docs/TlsCsrDataAttributes.md
-docs/TlsCsrResponse.md
-docs/TlsCsrResponseAttributes.md
-docs/TlsCsrResponseData.md
-docs/TlsCsrsApi.md
 docs/TlsDnsRecord.md
 docs/TlsDomainData.md
 docs/TlsDomainsApi.md
@@ -605,7 +595,6 @@ docs/TypeTlsActivation.md
 docs/TypeTlsBulkCertificate.md
 docs/TypeTlsCertificate.md
 docs/TypeTlsConfiguration.md
-docs/TypeTlsCsr.md
 docs/TypeTlsDnsRecord.md
 docs/TypeTlsDomain.md
 docs/TypeTlsPrivateKey.md

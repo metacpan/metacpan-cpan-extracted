@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-03-29'; # DATE
 our $DIST = 'App-FireDiamondUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FireDiamondUtils/show_fire_diamond_legends",
@@ -38,7 +38,7 @@ show-fire-diamond-legends - Show a table that explains the meaning of each numbe
 
 =head1 VERSION
 
-This document describes version 0.002 of show-fire-diamond-legends (from Perl distribution App-FireDiamondUtils), released on 2023-03-29.
+This document describes version 0.003 of show-fire-diamond-legends (from Perl distribution App-FireDiamondUtils), released on 2023-03-29.
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,10 @@ B<show-fire-diamond-legends> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help,
 B<show-fire-diamond-legends> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
 B<show-fire-diamond-legends> [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -172,6 +176,16 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+=head2 Show the short table
+
+ % show-fire-diamond-legends
+ 
+=head2 Show the long/verbose table
+
+ % show-fire-diamond-legends -l
+ 
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-FireDiamondUtils>.

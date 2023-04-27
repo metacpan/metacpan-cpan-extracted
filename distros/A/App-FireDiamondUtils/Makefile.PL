@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FireDiamondUtils",
   "EXE_FILES" => [
+    "script/explain-fire-diamond-text-notation",
     "script/parse-fire-diamond-text-notation",
     "script/show-fire-diamond-legends"
   ],
@@ -23,7 +24,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
-    "Log::ger" => "0.038",
     "Parse::FireDiamond" => "0.004",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.038",
   "Parse::FireDiamond" => "0.004",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",

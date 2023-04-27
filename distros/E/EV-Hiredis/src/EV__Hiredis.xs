@@ -21,6 +21,8 @@ struct ev_hiredis_s {
     redisAsyncContext* ac;
     SV* error_handler;
     SV* connect_handler;
+    struct timeval* connect_timeout;
+    struct timeval* command_timeout;
     ngx_queue_t cb_queue; /* for long term callbacks such as subscribe */
 };
 
@@ -106,6 +108,15 @@ static void EV__hiredis_disconnect_cb(redisAsyncContext* c, int status) {
     }
 
     remove_cb_queue(self);
+}
+
+static void pre_connect_common(EV__Hiredis self, redisOptions* opts) {
+    if (NULL != self->connect_timeout) {
+        opts->connect_timeout = self->connect_timeout;
+    }
+    if (NULL != self->command_timeout) {
+        opts->command_timeout = self->command_timeout;
+    }
 }
 
 static void connect_common(EV__Hiredis self) {
@@ -237,7 +248,7 @@ _new(char* class, EV::Loop loop);
 CODE:
 {
     PERL_UNUSED_VAR(class);
-    Newxz(RETVAL, sizeof(ev_hiredis_t), ev_hiredis_t);
+    Newxz(RETVAL, 1, ev_hiredis_t);
     ngx_queue_init(&RETVAL->cb_queue);
     RETVAL->loop = loop;
 }
@@ -261,6 +272,14 @@ CODE:
         SvREFCNT_dec(self->connect_handler);
         self->connect_handler = NULL;
     }
+    if (NULL != self->connect_timeout) {
+        Safefree(self->connect_timeout);
+        self->connect_timeout = NULL;
+    }
+    if (NULL != self->command_timeout) {
+        Safefree(self->command_timeout);
+        self->command_timeout = NULL;
+    }
 
     remove_cb_queue(self);
 
@@ -276,7 +295,10 @@ CODE:
         return;
     }
 
-    self->ac = redisAsyncConnect(hostname, port);
+    redisOptions opts = {0};
+    pre_connect_common(self, &opts);
+    REDIS_OPTIONS_SET_TCP(&opts, hostname, port);
+    self->ac = redisAsyncConnectWithOptions(&opts);
     if (NULL == self->ac) {
         croak("cannot allocate memory");
         return;
@@ -286,7 +308,7 @@ CODE:
 }
 
 void
-connect_unix(EV::Hiredis self, char* path);
+connect_unix(EV::Hiredis self, const char* path);
 CODE:
 {
     if (NULL != self->ac) {
@@ -294,7 +316,10 @@ CODE:
         return;
     }
 
-    self->ac = redisAsyncConnectUnix(path);
+    redisOptions opts = {0};
+    pre_connect_common(self, &opts);
+    REDIS_OPTIONS_SET_UNIX(&opts, path);
+    self->ac = redisAsyncConnectWithOptions(&opts);
     if (NULL == self->ac) {
         croak("cannot allocate memory");
         return;
@@ -313,6 +338,28 @@ CODE:
     }
 
     redisAsyncDisconnect(self->ac);
+}
+
+void
+connect_timeout(EV::Hiredis self, int timeout_ms);
+CODE:
+{
+    if (NULL == self->connect_timeout) {
+        Newx(self->connect_timeout, 1, struct timeval);
+    }
+    self->connect_timeout->tv_sec = timeout_ms / 1000;
+    self->connect_timeout->tv_usec = (timeout_ms % 1000) * 1000;
+}
+
+void
+command_timeout(EV::Hiredis self, int timeout_ms);
+CODE:
+{
+    if (NULL == self->command_timeout) {
+        Newx(self->command_timeout, 1, struct timeval);
+    }
+    self->command_timeout->tv_sec = timeout_ms / 1000;
+    self->command_timeout->tv_usec = (timeout_ms % 1000) * 1000;
 }
 
 CV*
@@ -380,15 +427,15 @@ CODE:
     }
 
     argc = items - 2;
-    Newx(argv, sizeof(char*) * argc, char*);
-    Newx(argvlen, sizeof(size_t) * argc, size_t);
+    Newx(argv, argc, char*);
+    Newx(argvlen, argc, size_t);
 
     for (i = 0; i < argc; i++) {
         argv[i] = SvPV(ST(i + 1), len);
         argvlen[i] = len;
     }
 
-    Newx(cbt, sizeof(ev_hiredis_cb_t), ev_hiredis_cb_t);
+    Newx(cbt, 1, ev_hiredis_cb_t);
     cbt->cb = SvREFCNT_inc(cb);
     ngx_queue_init(&cbt->queue);
     ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
@@ -413,4 +460,3 @@ CODE:
 }
 OUTPUT:
     RETVAL
-
