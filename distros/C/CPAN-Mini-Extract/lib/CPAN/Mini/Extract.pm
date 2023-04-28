@@ -1,4 +1,4 @@
-package CPAN::Mini::Extract;
+package CPAN::Mini::Extract; # git description: 6eeec63
 
 =pod
 
@@ -70,13 +70,8 @@ use LWP::Online             0.03 ();
 use File::Find::Rule        0.30 ();
 use CPAN::Mini          1.111004 ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.23';
-	@ISA     = 'CPAN::Mini';
-}
-
-
+our $VERSION = '1.24';
+our @ISA     = 'CPAN::Mini';
 
 
 

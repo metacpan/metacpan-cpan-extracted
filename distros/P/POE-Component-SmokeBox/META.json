@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,7 @@
             "Object::Accessor" : "0",
             "POE" : "1.367",
             "Params::Check" : "0",
+            "Regexp::Assemble" : "0.34",
             "SDBM_File" : "0",
             "String::Perl::Warnings" : "0.04",
             "perl" : "5.006"
@@ -61,8 +62,9 @@
          "web" : "https://github.com/bingos/poe-component-smokebox"
       }
    },
-   "version" : "0.54",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "0.56",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

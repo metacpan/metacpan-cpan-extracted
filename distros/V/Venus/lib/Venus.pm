@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.50';
+our $VERSION = '2.55';
 
 # AUTHORITY
 
@@ -33,13 +33,16 @@ sub import {
     chain => 1,
     check => 1,
     cop => 1,
+    date => 1,
     error => 1,
     false => 1,
     fault => 1,
+    gather => 1,
     json => 1,
     load => 1,
     log => 1,
     make => 1,
+    match => 1,
     merge => 1,
     perl => 1,
     raise => 1,
@@ -202,6 +205,18 @@ sub cop (@) {
   return space("$data")->cop(@args);
 }
 
+sub date (;$@) {
+  my ($code, @args) = @_;
+
+  require Venus::Date;
+
+  if (!$code) {
+    return Venus::Date->new;
+  }
+
+  return Venus::Date->new->$code(@args);
+}
+
 sub error (;$) {
   my ($data) = @_;
 
@@ -228,20 +243,42 @@ sub fault (;$) {
   return Venus::Fault->new($data)->throw;
 }
 
-sub json ($;$) {
+sub gather ($;&) {
+  my ($data, $code) = @_;
+
+  require Venus::Gather;
+
+  my $match = Venus::Gather->new($data);
+
+  return $match if !$code;
+
+  local $_ = $match;
+
+  my $returned = $code->($match, $data);
+
+  $match->data($returned) if ref $returned eq 'HASH';
+
+  return $match->result;
+}
+
+sub json (;$$) {
   my ($code, $data) = @_;
 
   require Venus::Json;
+
+  if (!$code) {
+    return Venus::Json->new;
+  }
 
   if (lc($code) eq 'decode') {
     return Venus::Json->new->decode($data);
   }
 
   if (lc($code) eq 'encode') {
-    return Venus::Json->new($data)->encode;
+    return Venus::Json->new(value => $data)->encode;
   }
 
-  return undef;
+  return fault(qq(Invalid "json" action "$code"));
 }
 
 sub load ($) {
@@ -265,6 +302,24 @@ sub make (@) {
   return call($_[0], 'new', @_);
 }
 
+sub match ($;&) {
+  my ($data, $code) = @_;
+
+  require Venus::Match;
+
+  my $match = Venus::Match->new($data);
+
+  return $match if !$code;
+
+  local $_ = $match;
+
+  my $returned = $code->($match, $data);
+
+  $match->data($returned) if ref $returned eq 'HASH';
+
+  return $match->result;
+}
+
 sub merge (@) {
   my (@args) = @_;
 
@@ -273,20 +328,24 @@ sub merge (@) {
   return Venus::Hash->new({})->merge(@args);
 }
 
-sub perl ($;$) {
+sub perl (;$$) {
   my ($code, $data) = @_;
 
   require Venus::Dump;
+
+  if (!$code) {
+    return Venus::Dump->new;
+  }
 
   if (lc($code) eq 'decode') {
     return Venus::Dump->new->decode($data);
   }
 
   if (lc($code) eq 'encode') {
-    return Venus::Dump->new($data)->encode;
+    return Venus::Dump->new(value => $data)->encode;
   }
 
-  return undef;
+  return fault(qq(Invalid "perl" action "$code"));
 }
 
 sub raise ($;$) {
@@ -367,20 +426,24 @@ sub wrap ($;$) {
   return *{"${caller}::${moniker}"} = sub {@_ ? make($data, @_) : $data};
 }
 
-sub yaml ($;$) {
+sub yaml (;$$) {
   my ($code, $data) = @_;
 
   require Venus::Yaml;
+
+  if (!$code) {
+    return Venus::Yaml->new;
+  }
 
   if (lc($code) eq 'decode') {
     return Venus::Yaml->new->decode($data);
   }
 
   if (lc($code) eq 'encode') {
-    return Venus::Yaml->new($data)->encode;
+    return Venus::Yaml->new(value => $data)->encode;
   }
 
-  return undef;
+  return fault(qq(Invalid "yaml" action "$code"));
 }
 
 1;
@@ -400,7 +463,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-2.50
+2.55
 
 =cut
 
@@ -1175,6 +1238,63 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 date
+
+  date(Str | CodeRef $code, Any @args) (Date)
+
+The date function builds and returns a L<Venus::Date> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<2.40>>
+
+=over 4
+
+=item date example 1
+
+  package main;
+
+  use Venus 'date';
+
+  my $date = date 'string';
+
+  # '0000-00-00T00:00:00Z'
+
+=back
+
+=over 4
+
+=item date example 2
+
+  package main;
+
+  use Venus 'date';
+
+  my $date = date 'reset', 570672000;
+
+  # bless({...}, 'Venus::Date')
+
+  # $date->string;
+
+  # '1988-02-01T00:00:00Z'
+
+=back
+
+=over 4
+
+=item date example 3
+
+  package main;
+
+  use Venus 'date';
+
+  my $date = date;
+
+  # bless({...}, 'Venus::Date')
+
+=back
+
+=cut
+
 =head2 error
 
   error(Maybe[HashRef] $args) (Error)
@@ -1294,6 +1414,109 @@ I<Since C<1.80>>
 
 =cut
 
+=head2 gather
+
+  gather(Any $value, CodeRef $callback) (Any)
+
+The gather function builds a L<Venus::Gather> object, passing it and the value
+provided to the callback provided, and returns the return value from
+L<Venus::Gather/result>.
+
+I<Since C<2.50>>
+
+=over 4
+
+=item gather example 1
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'];
+
+  # bless({...}, 'Venus::Gather')
+
+  # $gather->result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item gather example 2
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'], sub {{
+    a => 1,
+    b => 2,
+    c => 3,
+  }};
+
+  # [1..3]
+
+=back
+
+=over 4
+
+=item gather example 3
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['e'..'h'], sub {{
+    a => 1,
+    b => 2,
+    c => 3,
+  }};
+
+  # []
+
+=back
+
+=over 4
+
+=item gather example 4
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'], sub {
+    my ($case) = @_;
+
+    $case->when(sub{lc($_) eq 'a'})->then('a -> A');
+    $case->when(sub{lc($_) eq 'b'})->then('b -> B');
+  };
+
+  # ['a -> A', 'b -> B']
+
+=back
+
+=over 4
+
+=item gather example 5
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'], sub {
+
+    $_->when(sub{lc($_) eq 'a'})->then('a -> A');
+    $_->when(sub{lc($_) eq 'b'})->then('b -> B');
+  };
+
+  # ['a -> A', 'b -> B']
+
+=back
+
+=cut
+
 =head2 json
 
   json(Str $call, Any $data) (Any)
@@ -1329,6 +1552,34 @@ I<Since C<2.40>>
   my $encode = json 'encode', { codename => ["Ready", "Robot"], stable => true };
 
   # '{"codename":["Ready","Robot"],"stable":true}'
+
+=back
+
+=over 4
+
+=item json example 3
+
+  package main;
+
+  use Venus 'json';
+
+  my $json = json;
+
+  # bless({...}, 'Venus::Json')
+
+=back
+
+=over 4
+
+=item json example 4
+
+  package main;
+
+  use Venus 'json';
+
+  my $json = json 'class', {data => "..."};
+
+  # Exception! (isa Venus::Fault)
 
 =back
 
@@ -1426,6 +1677,128 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 match
+
+  match(Any $value, CodeRef $callback) (Any)
+
+The match function builds a L<Venus::Match> object, passing it and the value
+provided to the callback provided, and returns the return value from
+L<Venus::Match/result>.
+
+I<Since C<2.50>>
+
+=over 4
+
+=item match example 1
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5;
+
+  # bless({...}, 'Venus::Match')
+
+  # $match->result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item match example 2
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5, sub {{
+    1 => 'one',
+    2 => 'two',
+    5 => 'five',
+  }};
+
+  # 'five'
+
+=back
+
+=over 4
+
+=item match example 3
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5, sub {{
+    1 => 'one',
+    2 => 'two',
+    3 => 'three',
+  }};
+
+  # undef
+
+=back
+
+=over 4
+
+=item match example 4
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5, sub {
+    my ($case) = @_;
+
+    $case->when(sub{$_ < 5})->then('< 5');
+    $case->when(sub{$_ > 5})->then('> 5');
+  };
+
+  # undef
+
+=back
+
+=over 4
+
+=item match example 5
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 6, sub {
+    my ($case, $data) = @_;
+
+    $case->when(sub{$_ < 5})->then("$data < 5");
+    $case->when(sub{$_ > 5})->then("$data > 5");
+  };
+
+  # '6 > 5'
+
+=back
+
+=over 4
+
+=item match example 6
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 4, sub {
+
+    $_->when(sub{$_ < 5})->then("$_[1] < 5");
+    $_->when(sub{$_ > 5})->then("$_[1] > 5");
+  };
+
+  # '4 < 5'
+
+=back
+
+=cut
+
 =head2 merge
 
   merge(HashRef @args) (HashRef)
@@ -1500,6 +1873,34 @@ I<Since C<2.40>>
   my $encode = perl 'encode', { stable => true };
 
   # '{stable=>bless({},\'Venus::True\')}'
+
+=back
+
+=over 4
+
+=item perl example 3
+
+  package main;
+
+  use Venus 'perl';
+
+  my $perl = perl;
+
+  # bless({...}, 'Venus::Dump')
+
+=back
+
+=over 4
+
+=item perl example 4
+
+  package main;
+
+  use Venus 'perl';
+
+  my $perl = perl 'class', {data => "..."};
+
+  # Exception! (isa Venus::Fault)
 
 =back
 
@@ -1920,6 +2321,34 @@ I<Since C<2.40>>
   my $encode = yaml 'encode', { name => ["Ready", "Robot"], stable => true };
 
   # '---\nname:\n- Ready\n- Robot\nstable: true\n'
+
+=back
+
+=over 4
+
+=item yaml example 3
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $yaml = yaml;
+
+  # bless({...}, 'Venus::Yaml')
+
+=back
+
+=over 4
+
+=item yaml example 4
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $yaml = yaml 'class', {data => "..."};
+
+  # Exception! (isa Venus::Fault)
 
 =back
 

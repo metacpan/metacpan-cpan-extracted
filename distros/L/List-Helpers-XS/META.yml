@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ requires:
   Test::More: '1.302183'
   XSLoader: '0'
 resources:
-  bugtracker: https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues
-  repository: https://github.com/KalessinD/perl_linux_sys_cpu_affinity
-version: '0.19'
+  bugtracker: https://github.com/KalessinD/perl_list_helpers_xs/issues
+  repository: https://github.com/KalessinD/perl_list_helpers_xs
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

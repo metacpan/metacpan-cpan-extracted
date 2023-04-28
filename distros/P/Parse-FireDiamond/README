@@ -2,15 +2,15 @@ NAME
     Parse::FireDiamond - Parse Fire Diamond (NFPA 704) notation
 
 VERSION
-    This document describes version 0.004 of Parse::FireDiamond (from Perl
+    This document describes version 0.005 of Parse::FireDiamond (from Perl
     distribution Parse-FireDiamond), released on 2023-03-29.
 
 SYNOPSIS
      use Parse::FireDiamond qw(
-         parse_fire_diamond_text
+         parse_fire_diamond_text_notation
      );
 
-     my $res = parse_fire_diamond_text(notation => 'H3/F2/R1/');
+     my $res = parse_fire_diamond_text_notation(notation => 'H3/F2/R1/');
 
 DESCRIPTION
     Keywords: chemicals, materials, hazardous, safety.
@@ -111,7 +111,7 @@ FUNCTIONS
            },
          ]
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 

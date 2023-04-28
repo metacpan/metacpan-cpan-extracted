@@ -20,27 +20,40 @@ local $ENV{PERL_MB_OPT};
 my $dist = DistGen->new(name => 'Foo::Bar');
 $dist->chdir_in;
 $dist->add_file('share/file.txt', 'FooBarBaz');
+$dist->add_file('module-share/Foo-Bar/file.txt', 'BazBarFoo');
 $dist->add_file('script/simple', undent(<<'    ---'));
     #!perl
     use Foo::Bar;
     print Foo::Bar->VERSION . "\n";
     ---
 my $has_compiler = ExtUtils::CBuilder->new->have_compiler();
-$dist->add_file('lib/Foo/Bar.xs', undent(<<'    ---')) if $has_compiler;
-    #define PERL_NO_GET_CONTEXT
-    #include "EXTERN.h"
-    #include "perl.h"
-    #include "XSUB.h"
 
-    MODULE = Foo::Bar                PACKAGE = Foo::Bar
+if ($has_compiler) {
+	$dist->add_file('lib/Foo/Bar.xs', undent(<<'		---'));
+		#define PERL_NO_GET_CONTEXT
+		#include "EXTERN.h"
+		#include "perl.h"
+		#include "XSUB.h"
+		#include "foo.h"
 
-    const char*
-    foo()
-        CODE:
-        RETVAL = "Hello World!\n";
-        OUTPUT:
-        RETVAL
-    ---
+		MODULE = Foo::Bar                PACKAGE = Foo::Bar
+
+		const char*
+		foo()
+			CODE:
+			RETVAL = foo();
+			OUTPUT:
+			RETVAL
+		---
+	$dist->add_file('include/foo.h', undent(<<'		---'));
+		char* foo();
+		---
+	$dist->add_file('src/foo.c', undent(<<'		---'));
+		char* foo() {
+			return "Hello World!\n";
+		}
+		---
+}
 
 $dist->regen;
 
@@ -114,9 +127,14 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
   if (eval { require File::ShareDir }) {
     ok( -d File::ShareDir::dist_dir('Foo-Bar'), 'sharedir has been made');
     ok( -f File::ShareDir::dist_file('Foo-Bar', 'file.txt'), 'sharedir file has been made');
+    require Foo::Bar;
+    ok( -d File::ShareDir::module_dir('Foo::Bar'), 'sharedir has been made');
+    ok( -f File::ShareDir::module_file('Foo::Bar', 'file.txt'), 'sharedir file has been made');
   }
-  ok( -d catdir(qw/blib lib auto share dist Foo-Bar/), 'sharedir has been made');
-  ok( -f catfile(qw/blib lib auto share dist Foo-Bar file.txt/), 'sharedir file has been made');
+  ok( -d catdir(qw/blib lib auto share dist Foo-Bar/), 'dist sharedir has been made');
+  ok( -f catfile(qw/blib lib auto share dist Foo-Bar file.txt/), 'dist sharedir file has been made');
+  ok( -d catdir(qw/blib lib auto share module Foo-Bar/), 'moduole sharedir has been made');
+  ok( -f catfile(qw/blib lib auto share module Foo-Bar file.txt/), 'module sharedir file has been made');
 
   if ($has_compiler) {
     XSLoader::load('Foo::Bar');
@@ -125,7 +143,7 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
 
   SKIP: {
     require ExtUtils::InstallPaths;
-    skip 1, 'No manification supported' if not ExtUtils::InstallPaths->new->is_default_installable('libdoc');
+    skip 'No manification supported', 1 if not ExtUtils::InstallPaths->new->is_default_installable('libdoc');
     require ExtUtils::Helpers;
     my $file = "blib/libdoc/" . ExtUtils::Helpers::man3_pagename($pmfile, '.');
     ok( -e $file, 'Module gets manified properly');

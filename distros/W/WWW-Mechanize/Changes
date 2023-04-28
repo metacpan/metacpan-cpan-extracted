@@ -1,5 +1,9 @@
 Revision history for WWW::Mechanize
 
+2.17      2023-04-27 15:45:01Z
+    [ENHANCEMENTS]
+    - Perltidied the entire dist, and enabled tests for it (Julien Fiegehenn)
+
 2.16      2023-02-11 12:09:16Z
     [FIXED]
     - Raise minimum Perl to 5.8 to match what we test, what dependencies

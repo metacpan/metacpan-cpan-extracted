@@ -1,4 +1,4 @@
-package File::Find::Rule::PPI;
+package File::Find::Rule::PPI; # git description: 9eae512
 
 =pod
 
@@ -30,18 +30,17 @@ and checks each file as a perl document to see if matches the query.
 
 =cut
 
-use 5.005;
 use strict;
+use warnings;
 use Params::Util      0.10 '_INSTANCE';
 use File::Find::Rule  0.20 ();
 use PPI              1.000 ();
 
-use vars qw{$VERSION @ISA @EXPORT};
-BEGIN {
-	$VERSION = '1.06';
-	@ISA     = 'File::Find::Rule';
-	@EXPORT  = @File::Find::Rule::EXPORT;
+our $VERSION = '1.07';
+our @ISA     = 'File::Find::Rule';
+our @EXPORT  = @File::Find::Rule::EXPORT;
 
+BEGIN {
 	# Preload PPI::Find module if needed and possible
 	eval "use prefork => 'PPI::Find';";
 }

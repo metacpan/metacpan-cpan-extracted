@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,18 +17,13 @@
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.034",
-            "perl" : "5.004"
+            "perl" : "v5.4.5"
          }
       },
       "develop" : {
          "requires" : {
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "blib" : "1.01",
-            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -47,6 +42,7 @@
             "Module::Metadata" : "0",
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types::Moose" : "0",
             "MooseX::Types::Perl" : "0",
             "perl" : "5.006"
          }
@@ -54,6 +50,9 @@
       "test" : {
          "requires" : {
             "CPAN::Meta" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Path::Tiny" : "0",
             "Test::DZil" : "0",
             "Test::Deep" : "0",
@@ -68,14 +67,13 @@
    "provides" : {
       "Dist::Zilla::Plugin::ModuleBuildTiny" : {
          "file" : "lib/Dist/Zilla/Plugin/ModuleBuildTiny.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dist-zilla-plugin-modulebuildtiny at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ModuleBuildTiny"
+         "web" : "https://github.com/Leont/dist-zilla-plugin-modulebuildtiny/issues"
       },
       "repository" : {
          "type" : "git",
@@ -83,10 +81,10 @@
          "web" : "https://github.com/Leont/dist-zilla-plugin-modulebuildtiny"
       }
    },
-   "version" : "0.015",
-   "x_contributors" : [
-      "Karen Etheridge <ether@cpan.org>"
-   ],
+   "version" : "0.016",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }
 

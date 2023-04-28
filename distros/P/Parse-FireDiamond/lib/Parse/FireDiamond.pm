@@ -7,11 +7,11 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-03-29'; # DATE
 our $DIST = 'Parse-FireDiamond'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
-                       parse_fire_diamond_notation
+                       parse_fire_diamond_text_notation
                );
 
 our %SPEC;
@@ -247,15 +247,15 @@ Parse::FireDiamond - Parse Fire Diamond (NFPA 704) notation
 
 =head1 VERSION
 
-This document describes version 0.004 of Parse::FireDiamond (from Perl distribution Parse-FireDiamond), released on 2023-03-29.
+This document describes version 0.005 of Parse::FireDiamond (from Perl distribution Parse-FireDiamond), released on 2023-03-29.
 
 =head1 SYNOPSIS
 
  use Parse::FireDiamond qw(
-     parse_fire_diamond_text
+     parse_fire_diamond_text_notation
  );
 
- my $res = parse_fire_diamond_text(notation => 'H3/F2/R1/');
+ my $res = parse_fire_diamond_text_notation(notation => 'H3/F2/R1/');
 
 =head1 DESCRIPTION
 
@@ -364,7 +364,7 @@ Result:
 
 =back
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 

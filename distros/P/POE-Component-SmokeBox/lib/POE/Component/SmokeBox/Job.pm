@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Job;
-$POE::Component::SmokeBox::Job::VERSION = '0.54';
+$POE::Component::SmokeBox::Job::VERSION = '0.56';
 #ABSTRACT: Object defining a SmokeBox job.
 
 use strict;
@@ -65,7 +65,7 @@ POE::Component::SmokeBox::Job - Object defining a SmokeBox job.
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

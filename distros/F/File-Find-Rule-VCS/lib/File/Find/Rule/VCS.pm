@@ -1,4 +1,4 @@
-package File::Find::Rule::VCS;
+package File::Find::Rule::VCS; # git description: b034768
 
 =pod
 
@@ -10,7 +10,7 @@ File::Find::Rule::VCS - Exclude files/directories for Version Control Systems
 
   use File::Find::Rule      ();
   use File::Find::Rule::VCS ();
-  
+
   # Find all files smaller than 10k, ignoring version control files
   my @files = File::Find::Rule->ignore_vcs
                               ->file
@@ -60,12 +60,9 @@ use Carp                  ();
 use Text::Glob       0.08 ();
 use File::Find::Rule 0.20 ();
 
-use vars qw{$VERSION @ISA @EXPORT};
-BEGIN {
-	$VERSION = '1.08';
-	@ISA     = 'File::Find::Rule';
-	@EXPORT  = @File::Find::Rule::EXPORT;
-}
+our $VERSION = '1.09';
+our @ISA     = 'File::Find::Rule';
+our @EXPORT  = @File::Find::Rule::EXPORT;
 
 use constant FFR => 'File::Find::Rule';
 
@@ -86,10 +83,10 @@ my @svn = ($^O eq 'MSWin32') ? ('.svn', '_svn') : ('.svn');
 
   # Ignore all common version control systems
   $find->ignore_vcs;
-  
+
   # Ignore a specific named version control systems
   $find->ignore_vcs($name);
-  
+
   # Ignore nothing (silent pass-through)
   $find->ignore_vcs('');
 

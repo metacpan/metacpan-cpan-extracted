@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Manifest
 
+1.74  2023-04-28
+  - Add some MANIFEST.SKIP patterns for bzr/brz
+
 1.73  2021-01-16
   - Calculate absolute path to MANIFEST.SKIP (in $DEFAULT_MSKIP) at module
     load time, where __FILE__ is guaranteed to valid.

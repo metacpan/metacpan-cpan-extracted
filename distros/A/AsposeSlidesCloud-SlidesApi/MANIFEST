@@ -222,6 +222,8 @@ lib/AsposeSlidesCloud/Object/SvgExportOptions.pm
 lib/AsposeSlidesCloud/Object/SwfExportOptions.pm
 lib/AsposeSlidesCloud/Object/Table.pm
 lib/AsposeSlidesCloud/Object/TableCell.pm
+lib/AsposeSlidesCloud/Object/TableCellMergeOptions.pm
+lib/AsposeSlidesCloud/Object/TableCellSplitType.pm
 lib/AsposeSlidesCloud/Object/TableColumn.pm
 lib/AsposeSlidesCloud/Object/TableRow.pm
 lib/AsposeSlidesCloud/Object/Task.pm

@@ -31,5 +31,5 @@ requires:
   Tk: '804.036'
   aliased: '0.34'
   namespace::autoclean: '0.29'
-version: v0.82.3
+version: v0.82.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

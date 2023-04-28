@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.760';
+our $VERSION = '1.761';
 
 use Exporter qw( import );
 
@@ -119,9 +119,9 @@ sub line_fold {
         $str =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
     }
     if ( $opt->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
-        #$value = $self->{binary_filter} == 2 ? sprintf("%v02X", $value) =~ tr/./ /r : 'BNRY';  # perl 5.14
+        #$str = $self->{binary_filter} == 2 ? sprintf("%v02X", $_[0]) =~ tr/./ /r : 'BNRY';  # perl 5.14
         if ( $opt->{binary_filter} == 2 ) {
-            ( $str = sprintf("%v02X", $str) ) =~ tr/./ /;
+            ( $str = sprintf( "%v02X", $_[0] ) ) =~ tr/./ /; # use unmodified string
         }
         else {
             $str = 'BNRY';

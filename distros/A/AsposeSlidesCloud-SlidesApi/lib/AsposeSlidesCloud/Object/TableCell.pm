@@ -39,6 +39,8 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::ResourceUri;
+use AsposeSlidesCloud::Object::TextFrameFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -303,6 +305,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'text_frame_format' => {
+    	datatype => 'TextFrameFormat',
+    	base_name => 'TextFrameFormat',
+    	description => 'Returns TextFrame&#39;s formatting properties.',
+    	format => '',
+    	read_only => '',
+    		},
+    'paragraphs' => {
+    	datatype => 'ResourceUri',
+    	base_name => 'Paragraphs',
+    	description => 'Get or sets list to paragraphs list',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -323,7 +339,9 @@ __PACKAGE__->swagger_types( {
     'border_diagonal_up' => 'LineFormat',
     'border_diagonal_down' => 'LineFormat',
     'column_index' => 'int',
-    'row_index' => 'int'
+    'row_index' => 'int',
+    'text_frame_format' => 'TextFrameFormat',
+    'paragraphs' => 'ResourceUri'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -344,7 +362,9 @@ __PACKAGE__->attribute_map( {
     'border_diagonal_up' => 'BorderDiagonalUp',
     'border_diagonal_down' => 'BorderDiagonalDown',
     'column_index' => 'ColumnIndex',
-    'row_index' => 'RowIndex'
+    'row_index' => 'RowIndex',
+    'text_frame_format' => 'TextFrameFormat',
+    'paragraphs' => 'Paragraphs'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,4 +1,4 @@
-package Module::Faker::Appendix 0.023;
+package Module::Faker::Appendix 0.024;
 # ABSTRACT: a thing that appends
 
 use Moose::Role;
@@ -29,7 +29,7 @@ Module::Faker::Appendix - a thing that appends
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 PERL VERSION
 

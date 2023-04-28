@@ -1,5 +1,9 @@
 Revision history for Algorithm-Graphs-Reachable-Tiny
 
+0.04    2023/04/28
+        Rudimentary argument check added
+        Graph can be specified as an array
+
 0.03    2022/08/12
         Renamed test file.
 

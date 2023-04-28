@@ -50,6 +50,6 @@
          "url" : "https://github.com/pjuhasz/JSON-SIMD"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

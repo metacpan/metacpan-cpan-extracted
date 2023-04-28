@@ -120,7 +120,7 @@ sub _gen_default_filedata {
       package $module_name;
 
       use vars qw( \$VERSION );
-      \$VERSION = '0.01';
+      \$VERSION = '0.001';
 
       use strict;
 

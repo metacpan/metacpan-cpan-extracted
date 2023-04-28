@@ -2281,9 +2281,18 @@ void get_boolean_values (JSON *self)
 
 void core_bools (JSON *self, int enable = 1)
 	PPCODE:
-        self->flags   |= F_CORE_BOOLS;
-        self->v_false = newSVsv (&PL_sv_no);
-        self->v_true  = newSVsv (&PL_sv_yes);
+        if (enable)
+          {
+            self->flags   |= F_CORE_BOOLS;
+            self->v_false = newSVsv (&PL_sv_no);
+            self->v_true  = newSVsv (&PL_sv_yes);
+          }
+        else
+          {
+            self->flags   &= ~F_CORE_BOOLS;
+            self->v_false = 0;
+            self->v_true  = 0;
+          }
         XPUSHs (ST (0));
 
 void get_core_bools (JSON *self)
@@ -2603,4 +2612,14 @@ void simdjson_version ()
         SV *version_info;
         PUTBACK; version_info = simdjson_get_version(); SPAGAIN;
         XPUSHs (version_info);
+}
+
+void is_core_bool (SV *scalar)
+	PPCODE:
+{
+#if PERL_VERSION_GE(5,36,0)
+        XPUSHs( boolSV( SvIsBOOL( scalar )));
+#else
+        XPUSHs( boolSV( 0 ));
+#endif
 }

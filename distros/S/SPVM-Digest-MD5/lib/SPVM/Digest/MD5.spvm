@@ -2,7 +2,7 @@
 # MIT License
 
 class Digest::MD5 {
-  version "1.001";
+  version "1.001001";
   
   use Digest::MD5::Context;
   

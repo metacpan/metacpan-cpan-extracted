@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::CPAN::YACSmoke;
-$POE::Component::SmokeBox::Backend::CPAN::YACSmoke::VERSION = '0.54';
+$POE::Component::SmokeBox::Backend::CPAN::YACSmoke::VERSION = '0.56';
 #ABSTRACT: a backend for CPAN::YACSmoke smokers.
 
 use strict;
@@ -31,7 +31,7 @@ POE::Component::SmokeBox::Backend::CPAN::YACSmoke - a backend for CPAN::YACSmoke
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

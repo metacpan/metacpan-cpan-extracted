@@ -90,6 +90,7 @@ t/moose/todo.t
 t/moose/with_variable.t
 t/moosex_declare.t
 t/object_pad.t
+t/object_pad_attr.t
 t/only.t
 t/package_variant.t
 t/plack.t

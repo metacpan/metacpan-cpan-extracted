@@ -13,7 +13,6 @@ control.pm
 count.pm
 decisions.pm
 developer.pm
-dirs.pm
 error.pm
 file_dialog.pm
 files_LSU.pm
@@ -28,7 +27,6 @@ help.pm
 iFile.pm
 label_boxes.pm
 L_SU_local_user_constants.pm
-L_SU_path.pm
 L_SU.pm
 manage_dirs_by.pm
 manage_files_by2.pm

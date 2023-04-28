@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Stylish
+abstract: look at all these styles
+provides:
+  Stylish::Legacy:
+    version: 0.001
+    style: legacy
+  Stylish::Statement:
+    version: 0.001
+    style: statement
+  Stylish::Block:
+    version: 0.001
+    style: block
+  Stylish::Class:
+    version: 0.001
+    style: class

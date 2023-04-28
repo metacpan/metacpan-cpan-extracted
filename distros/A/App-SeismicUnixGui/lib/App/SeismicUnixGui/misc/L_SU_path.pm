@@ -19,6 +19,12 @@ package App::SeismicUnixGui::misc::L_SU_path;
 
 =head3 NOTES
 
+Sets the environment variables on
+first pass using BEGIN
+
+getcwd points to the "local" directory from
+which SeismicUnixGui is commanded
+
 =head4 Examples
 
 
@@ -30,40 +36,45 @@ use Moose;
 our $VERSION = '0.0.1';
 use Carp;
 use Shell qw(echo);
+use Cwd;
 
 my $path4SeismicUnixGui_slash;
 my $path4SeismicUnixGui_colon;
 my $SeismicUnixGui;
-my $path;
-
+#		my $local = getcwd();
+#		print("L_SU_path, local=$local\n");
+		
 BEGIN {
 
-    $SeismicUnixGui = ` echo \$SeismicUnixGui`;
-    chomp $SeismicUnixGui;
-	$path = $SeismicUnixGui;
-	
-#	print ("L_SU_global_constants, path=$path\n");
-	
-	if (length $SeismicUnixGui ) {
+	if ( length $ENV{'SeismicUnixGui'} ) {
+
+		$path4SeismicUnixGui_slash = $ENV{'SeismicUnixGui'};
 		
-			$path4SeismicUnixGui_slash = $path;
-			$path4SeismicUnixGui_colon = $path4SeismicUnixGui_slash;
-			
-	} else {
-		my $dir       = 'App-SeismicUnixGui/lib/App/SeismicUnixGui';
-	    my $pathNfile = 'App-SeismicUnixGui/lib/App/SeismicUnixGui/sunix/data/data_in.pm';
-	    my $look = `locate $pathNfile`;
-	    my @field= split($dir, $look);
-		$path4SeismicUnixGui_slash    = $field[0].$dir;
-#		print("\nL_SU_path, Using default: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+		my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
+		$path4SeismicUnixGui_colon = 'App/' . $pieces[1];
+		$path4SeismicUnixGui_colon =~ s/\//::/g;
+		# print("\n1.L_SU_path: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+		# print("\n1.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");
+	}
+	else {
+		my $dir       = 'App/SeismicUnixGui';
+		my $pathNfile = $dir . '/sunix/data/data_in.pm';
+		my $look  = `locate $pathNfile`;
+		my @field = split( $dir, $look );
+		$path4SeismicUnixGui_slash = $field[0] . $dir;
+		
+		my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
+        $path4SeismicUnixGui_colon    = 'App/' . $pieces[1];
+        $path4SeismicUnixGui_colon    =~ s/\//::/g;
+		print("\nWarning: L_SU_path uses default: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+		#print("\n2.L_SU_path: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+		#print("\n2.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");		
+		
 	}
 }
 
-my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
-$path4SeismicUnixGui_colon    = 'App/' . $pieces[1];
-$path4SeismicUnixGui_colon    =~ s/\//::/g;
-
 =head2 private hash
+
 L_SU_path
 
 =cut
@@ -225,7 +236,7 @@ my $specifications_path_w_colon = {
 	_sufxdecon => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[3],
 	_sugroll => $global_libs_w_colon->{_specs} . '::'
-	  . $developer_sunix_categories[3],	  
+	  . $developer_sunix_categories[3],
 	_suk1k2filter => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[3],
 	_sukfilter => $global_libs_w_colon->{_specs} . '::'
@@ -1383,7 +1394,7 @@ sub get_pathNmodule_spec_w_colon {
 
 sub get_pathNmodule_spec_w_slash_pm {
 	my ($self) = @_;
-	
+
 	if ( length $L_SU_path->{_program_name} ) {
 
 		my $key            = '_' . $L_SU_path->{_program_name};

@@ -5527,6 +5527,557 @@ sub create_special_slide_shape {
 }
 
 #
+# create_table_cell_paragraph
+#
+# Creates table cell paragraph.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_table_cell_paragraph' } = { 
+    	summary => 'Creates table cell paragraph.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub create_table_cell_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling create_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling create_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling create_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling create_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling create_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling create_table_cell_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraph', $response);
+    return $_response_object;
+}
+
+#
+# create_table_cell_portion
+#
+# Creates table cell portion.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_table_cell_portion' } = { 
+    	summary => 'Creates table cell portion.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub create_table_cell_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling create_table_cell_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling create_table_cell_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling create_table_cell_portion");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling create_table_cell_portion");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling create_table_cell_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling create_table_cell_portion");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling create_table_cell_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}/portions';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portion', $response);
+    return $_response_object;
+}
+
+#
+# create_table_row
+#
+# Inserts the table row in the specified position. If position is not specified, the row add to the end of the table.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param TableRow $dto Table row data. (required)
+# @param int $position Position. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'TableRow',
+        description => 'Table row data.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_table_row' } = { 
+    	summary => 'Inserts the table row in the specified position. If position is not specified, the row add to the end of the table.',
+        params => $params,
+        returns => 'TableRow',
+        };
+}
+# @return TableRow
+#
+sub create_table_row {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling create_table_row");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling create_table_row");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling create_table_row");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling create_table_row");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TableRow', $response);
+    return $_response_object;
+}
+
+#
 # create_watermark
 #
 # Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
@@ -12043,6 +12594,563 @@ sub delete_special_slide_shapes {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
+# delete_table_cell_paragraph
+#
+# Delete cell paragraph.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_table_cell_paragraph' } = { 
+    	summary => 'Delete cell paragraph.',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub delete_table_cell_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling delete_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling delete_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling delete_table_cell_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraphs', $response);
+    return $_response_object;
+}
+
+#
+# delete_table_cell_portion
+#
+# Delete table ell portion.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_table_cell_portion' } = { 
+    	summary => 'Delete table ell portion.',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub delete_table_cell_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_table_cell_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_table_cell_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_table_cell_portion");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling delete_table_cell_portion");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling delete_table_cell_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling delete_table_cell_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling delete_table_cell_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portions', $response);
+    return $_response_object;
+}
+
+#
+# delete_table_row
+#
+# Deletes the table row.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param boolean $with_attached_rows Also delete all attached rows. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'with_attached_rows' => {
+        data_type => 'boolean',
+        description => 'Also delete all attached rows.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_table_row' } = { 
+    	summary => 'Deletes the table row.',
+        params => $params,
+        returns => 'Table',
+        };
+}
+# @return Table
+#
+sub delete_table_row {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_table_row");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_table_row");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_table_row");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling delete_table_row");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'with_attached_rows'} && defined $args{'with_attached_rows'}) {
+        $query_params->{'withAttachedRows'} = $self->{api_client}->to_boolean_query_value($args{'with_attached_rows'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Table', $response);
     return $_response_object;
 }
 
@@ -21880,6 +22988,758 @@ sub get_special_slide_shapes {
 }
 
 #
+# get_table_cell_paragraph
+#
+# Returns paragraph info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_table_cell_paragraph' } = { 
+    	summary => 'Returns paragraph info.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub get_table_cell_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling get_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling get_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling get_table_cell_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraph', $response);
+    return $_response_object;
+}
+
+#
+# get_table_cell_paragraphs
+#
+# Returns table cell paragraphs.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_table_cell_paragraphs' } = { 
+    	summary => 'Returns table cell paragraphs.',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub get_table_cell_paragraphs {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_table_cell_paragraphs");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_table_cell_paragraphs");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_table_cell_paragraphs");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling get_table_cell_paragraphs");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling get_table_cell_paragraphs");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraphs', $response);
+    return $_response_object;
+}
+
+#
+# get_table_cell_portion
+#
+# Returns table cell portion.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_table_cell_portion' } = { 
+    	summary => 'Returns table cell portion.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub get_table_cell_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_table_cell_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_table_cell_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_table_cell_portion");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling get_table_cell_portion");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling get_table_cell_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling get_table_cell_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling get_table_cell_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portion', $response);
+    return $_response_object;
+}
+
+#
+# get_table_cell_portions
+#
+# Returns table cell portions.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_table_cell_portions' } = { 
+    	summary => 'Returns table cell portions.',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub get_table_cell_portions {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_table_cell_portions");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_table_cell_portions");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_table_cell_portions");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling get_table_cell_portions");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling get_table_cell_portions");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling get_table_cell_portions");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}/portions';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portions', $response);
+    return $_response_object;
+}
+
+#
 # get_theme
 #
 # Read slide theme info.
@@ -23162,6 +25022,156 @@ sub merge_online {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# merge_table_cells
+#
+# Merge table cells.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param TableCellMergeOptions $table_cell_merge_options Merge settings. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'table_cell_merge_options' => {
+        data_type => 'TableCellMergeOptions',
+        description => 'Merge settings.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'merge_table_cells' } = { 
+    	summary => 'Merge table cells.',
+        params => $params,
+        returns => 'Table',
+        };
+}
+# @return Table
+#
+sub merge_table_cells {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling merge_table_cells");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling merge_table_cells");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling merge_table_cells");
+    }
+
+    # verify the required parameter 'table_cell_merge_options' is set
+    unless (exists $args{'table_cell_merge_options'} && $args{'table_cell_merge_options'}) {
+      croak("Missing the required parameter 'table_cell_merge_options' when calling merge_table_cells");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/mergeCells';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'table_cell_merge_options'} && $args{'table_cell_merge_options'}) {
+        $_body_data = $args{'table_cell_merge_options'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Table', $response);
     return $_response_object;
 }
 
@@ -30176,6 +32186,217 @@ sub split_online {
 }
 
 #
+# split_table_cell
+#
+# Split table cell.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param string $split_type Table cell split type (SplitByWidth, SplitByHeight,SplitByColSpan or SplitByRowSpan). (required)
+# @param double $value Split value. In case of splitting by column or row span, the value must be an integer number. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'split_type' => {
+        data_type => 'string',
+        description => 'Table cell split type (SplitByWidth, SplitByHeight,SplitByColSpan or SplitByRowSpan).',
+        required => '1',
+    },
+    'value' => {
+        data_type => 'double',
+        description => 'Split value. In case of splitting by column or row span, the value must be an integer number.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'split_table_cell' } = { 
+    	summary => 'Split table cell.',
+        params => $params,
+        returns => 'Table',
+        };
+}
+# @return Table
+#
+sub split_table_cell {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling split_table_cell");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling split_table_cell");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling split_table_cell");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling split_table_cell");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling split_table_cell");
+    }
+
+    # verify the required parameter 'split_type' is set
+    unless (exists $args{'split_type'} && $args{'split_type'}) {
+      croak("Missing the required parameter 'split_type' when calling split_table_cell");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'split_type'}$/i, ( 'SplitByWidth', 'SplitByHeight', 'SplitByColSpan', 'SplitByRowSpan' ))) {
+      croak("Invalid value for 'split_type': " . $args{'split_type'});
+    }
+
+    # verify the required parameter 'value' is set
+    unless (exists $args{'value'} && $args{'value'}) {
+      croak("Missing the required parameter 'value' when calling split_table_cell");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/{splitType}/{value}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'split_type'}) {
+        my $_base_variable = "{" . "splitType" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'split_type'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'value'}) {
+        my $_base_variable = "{" . "value" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'value'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Table', $response);
+    return $_response_object;
+}
+
+#
 # storage_exists
 #
 # Check if storage exists
@@ -33112,6 +35333,786 @@ sub update_special_slide_shape {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
+    return $_response_object;
+}
+
+#
+# update_table_cell
+#
+# Update the table cell.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param TableCell $dto Table cell data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'TableCell',
+        description => 'Table cell data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_table_cell' } = { 
+    	summary => 'Update the table cell.',
+        params => $params,
+        returns => 'TableCell',
+        };
+}
+# @return TableCell
+#
+sub update_table_cell {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling update_table_cell");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling update_table_cell");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling update_table_cell");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling update_table_cell");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling update_table_cell");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling update_table_cell");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TableCell', $response);
+    return $_response_object;
+}
+
+#
+# update_table_cell_paragraph
+#
+# Updates table cell paragraph.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_table_cell_paragraph' } = { 
+    	summary => 'Updates table cell paragraph.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub update_table_cell_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling update_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling update_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling update_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling update_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling update_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling update_table_cell_paragraph");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling update_table_cell_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraph', $response);
+    return $_response_object;
+}
+
+#
+# update_table_cell_portion
+#
+# Updates table cell portion.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param int $cell_index Table cell index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'cell_index' => {
+        data_type => 'int',
+        description => 'Table cell index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_table_cell_portion' } = { 
+    	summary => 'Updates table cell portion.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub update_table_cell_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'cell_index' is set
+    unless (exists $args{'cell_index'}) {
+      croak("Missing the required parameter 'cell_index' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling update_table_cell_portion");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling update_table_cell_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}/cells/{cellIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'cell_index'}) {
+        my $_base_variable = "{" . "cellIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'cell_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portion', $response);
+    return $_response_object;
+}
+
+#
+# update_table_row
+#
+# Update the table row.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $row_index Row index. (required)
+# @param TableRow $dto Table cell data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'row_index' => {
+        data_type => 'int',
+        description => 'Row index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'TableRow',
+        description => 'Table cell data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'update_table_row' } = { 
+    	summary => 'Update the table row.',
+        params => $params,
+        returns => 'TableRow',
+        };
+}
+# @return TableRow
+#
+sub update_table_row {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling update_table_row");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling update_table_row");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling update_table_row");
+    }
+
+    # verify the required parameter 'row_index' is set
+    unless (exists $args{'row_index'}) {
+      croak("Missing the required parameter 'row_index' when calling update_table_row");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling update_table_row");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/rows/{rowIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'row_index'}) {
+        my $_base_variable = "{" . "rowIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'row_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('TableRow', $response);
     return $_response_object;
 }
 

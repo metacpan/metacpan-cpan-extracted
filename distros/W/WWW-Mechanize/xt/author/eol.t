@@ -18,7 +18,6 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/TestServer.pm',
-    't/Tools.pm',
     't/add_header.t',
     't/aliases.t',
     't/area_link.html',

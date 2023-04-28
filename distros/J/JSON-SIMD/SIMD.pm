@@ -86,7 +86,7 @@ stuff). Or you can combine those features in whatever way you like.
 
 package JSON::SIMD;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 our $JSON_XS_VERSION = '4.03';
 our @ISA = qw(Exporter);
 
@@ -652,6 +652,8 @@ standard perl boolean values. Equivalent to calling:
 C<get_core_bools> will return true if this has been set. On perl 5.36 or newer,
 it will also return true if the boolean values have been set to perl's core
 booleans using the boolean_values method.
+
+If C<$enable> is false, the booleans are reset to their default values.
 
 (See also C<encode_core_bools> for the encode counterpart of this.)
 
@@ -2028,7 +2030,7 @@ BEGIN {
    *true    = \&Types::Serialiser::true;
    *false   = \$Types::Serialiser::false;
    *false   = \&Types::Serialiser::false;
-   *is_bool = \&Types::Serialiser::is_bool;
+   *is_bool = sub { JSON::SIMD::is_core_bool($_[0]) or Types::Serialiser::is_bool($_[0]); };
 
    *JSON::SIMD::Boolean:: = *Types::Serialiser::Boolean::;
 }

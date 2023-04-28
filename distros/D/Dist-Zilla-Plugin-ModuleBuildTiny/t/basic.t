@@ -33,6 +33,7 @@ use warnings;
 use $];
 use Module::Build::Tiny 0.034;
 Build_PL();
+
 END
 
 my $base = path($tzil->built_in);

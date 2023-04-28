@@ -1,4 +1,4 @@
-package Module::Faker::Dist 0.023;
+package Module::Faker::Dist 0.024;
 # ABSTRACT: a fake CPAN distribution
 
 use Moose;
@@ -284,12 +284,12 @@ has packages => (
 sub _build_packages {
   my ($self) = @_;
 
-  my $href = $self->provides;
+  my $provides = $self->provides;
 
   # do this dance so we don't autovivify X_Module_Faker in provides
   my %package_order = map {;
-    $_ => (exists $href->{$_}{X_Module_Faker} ? $href->{$_}{X_Module_Faker}{order} : 0 )
-  } keys %$href;
+    $_ => (exists $provides->{$_}{X_Module_Faker} ? $provides->{$_}{X_Module_Faker}{order} : 0 )
+  } keys %$provides;
 
   my @pkg_names = do {
     no warnings 'uninitialized';
@@ -300,8 +300,9 @@ sub _build_packages {
   for my $name (@pkg_names) {
     push @packages, Module::Faker::Package->new({
       name    => $name,
-      version => $href->{$name}{version},
-      in_file => $href->{$name}{file},
+      version => $provides->{$name}{version},
+      in_file => $provides->{$name}{file},
+      ($provides->{$name}{style} ? (style => $provides->{$name}{style}) : ()),
     });
   }
 
@@ -802,7 +803,7 @@ Module::Faker::Dist - a fake CPAN distribution
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

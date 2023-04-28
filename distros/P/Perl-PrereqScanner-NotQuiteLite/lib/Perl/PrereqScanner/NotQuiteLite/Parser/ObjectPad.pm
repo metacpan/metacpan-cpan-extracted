@@ -70,6 +70,15 @@ sub parse_class_args {
         }
       }
     }
+    if (ref $token && $token->[1] && $token->[1] eq 'ATTRIBUTE') {
+      while($token->[0] =~ s/:(?:isa|does)\(([^)]+)\)//) {
+        my ($name, $version) = split /\s+/, $1;
+        $version ||= 0;
+        if (is_module_name($name) && is_version($version)) {
+          $c->add($name => $version);
+        }
+      }
+    }
   }
 }
 

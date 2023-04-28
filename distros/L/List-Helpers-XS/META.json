@@ -4,7 +4,7 @@
       "Chernenko Dmitriy <cnd@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,12 +42,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues"
+         "web" : "https://github.com/KalessinD/perl_list_helpers_xs/issues"
       },
       "repository" : {
-         "url" : "https://github.com/KalessinD/perl_linux_sys_cpu_affinity"
+         "url" : "https://github.com/KalessinD/perl_list_helpers_xs"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

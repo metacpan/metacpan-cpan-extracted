@@ -1,7 +1,7 @@
 # This Makefile is for the List::Helpers::XS extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.24 (Revision: 72400) from the contents of
+# 7.62 (Revision: 76200) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -23,7 +23,7 @@
 #     LDDLFLAGS => q[-O3 -std=c++17 -msse2 -msse4.2 -shared -L/usr/local/lib -fstack-protector-strong]
 #     LIBS => [q[]]
 #     LICENSE => q[perl]
-#     META_MERGE => { resources=>{ bugtracker=>q[https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues], repository=>q[https://github.com/KalessinD/perl_linux_sys_cpu_affinity] } }
+#     META_MERGE => { resources=>{ bugtracker=>q[https://github.com/KalessinD/perl_list_helpers_xs/issues], repository=>q[https://github.com/KalessinD/perl_list_helpers_xs] } }
 #     NAME => q[List::Helpers::XS]
 #     PREREQ_PM => { Config=>q[0], Test::LeakTrace=>q[0.14], Test::More=>q[1.302183], XSLoader=>q[0] }
 #     TEST_REQUIRES => {  }
@@ -34,7 +34,7 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/lib/x86_64-linux-gnu/perl/5.26/Config.pm).
+# These definitions are from config.sh (via /usr/lib/x86_64-linux-gnu/perl-base/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
 CC = c++
@@ -47,16 +47,16 @@ FULL_AR = /usr/bin/ar
 LD = c++
 LDDLFLAGS = -O3 -std=c++17 -msse2 -msse4.2 -shared -L/usr/local/lib -fstack-protector-strong
 LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
-LIBC = libc-2.27.so
+LIBC = /lib/x86_64-linux-gnu/libc.so.6
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 4.9.0
+OSVERS = 4.19.0
 RANLIB = :
-SITELIBEXP = /usr/local/share/perl/5.26.1
-SITEARCHEXP = /usr/local/lib/x86_64-linux-gnu/perl/5.26.1
+SITELIBEXP = /usr/local/share/perl/5.34.0
+SITEARCHEXP = /usr/local/lib/x86_64-linux-gnu/perl/5.34.0
 SO = so
-VENDORARCHEXP = /usr/lib/x86_64-linux-gnu/perl5/5.26
+VENDORARCHEXP = /usr/lib/x86_64-linux-gnu/perl5/5.34
 VENDORLIBEXP = /usr/share/perl5
 
 
@@ -66,11 +66,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = List::Helpers::XS
 NAME_SYM = List_Helpers_XS
-VERSION = 0.19
+VERSION = 0.20
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_19
+VERSION_SYM = 0_20
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.19
+XS_VERSION = 0.20
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -81,23 +81,25 @@ INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
 MAN1EXT = 1p
 MAN3EXT = 3pm
+MAN1SECTION = 1
+MAN3SECTION = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
 PERLPREFIX = /usr
 SITEPREFIX = /usr/local
 VENDORPREFIX = /usr
-INSTALLPRIVLIB = /usr/share/perl/5.26
+INSTALLPRIVLIB = /usr/share/perl/5.34
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /usr/local/share/perl/5.26.1
+INSTALLSITELIB = /usr/local/share/perl/5.34.0
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
 INSTALLVENDORLIB = /usr/share/perl5
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.26
+INSTALLARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.34
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /usr/local/lib/x86_64-linux-gnu/perl/5.26.1
+INSTALLSITEARCH = /usr/local/lib/x86_64-linux-gnu/perl/5.34.0
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = /usr/lib/x86_64-linux-gnu/perl5/5.26
+INSTALLVENDORARCH = /usr/lib/x86_64-linux-gnu/perl5/5.34
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
 INSTALLBIN = /usr/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
@@ -123,16 +125,16 @@ INSTALLSITEMAN3DIR = /usr/local/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = /usr/share/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /usr/share/perl/5.26
-PERL_ARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.26
-PERL_ARCHLIBDEP = /usr/lib/x86_64-linux-gnu/perl/5.26
+PERL_LIB = /usr/share/perl/5.34
+PERL_ARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.34
+PERL_ARCHLIBDEP = /usr/lib/x86_64-linux-gnu/perl/5.34
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/lib/x86_64-linux-gnu/perl/5.26/CORE
-PERL_INCDEP = /usr/lib/x86_64-linux-gnu/perl/5.26/CORE
+PERL_INC = /usr/lib/x86_64-linux-gnu/perl/5.34/CORE
+PERL_INCDEP = /usr/lib/x86_64-linux-gnu/perl/5.34/CORE
 PERL = "/usr/bin/perl"
 FULLPERL = "/usr/bin/perl"
 ABSPERL = $(PERL)
@@ -147,9 +149,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/share/perl/5.26/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.24
-MM_REVISION = 72400
+MAKEMAKER   = /usr/share/perl/5.34/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.62
+MM_REVISION = 76200
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -201,7 +203,7 @@ TO_INST_PM = lib/List/Helpers/XS.pm
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.24
+MM_Unix_VERSION = 7.62
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -213,12 +215,12 @@ AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$AR
 
 # --- MakeMaker tool_xsubpp section:
 
-XSUBPPDIR = /usr/share/perl/5.26/ExtUtils
+XSUBPPDIR = /usr/share/perl/5.34/ExtUtils
 XSUBPP = "$(XSUBPPDIR)$(DFSEP)xsubpp"
 XSUBPPRUN = $(PERLRUN) $(XSUBPP)
 XSPROTOARG = 
-XSUBPPDEPS = /usr/share/perl/5.26/ExtUtils/typemap /usr/share/perl/5.26/ExtUtils$(DFSEP)xsubpp
-XSUBPPARGS = -typemap '/usr/share/perl/5.26/ExtUtils/typemap'
+XSUBPPDEPS = /usr/share/perl/5.34/ExtUtils/typemap /usr/share/perl/5.34/ExtUtils$(DFSEP)xsubpp
+XSUBPPARGS = -typemap '/usr/share/perl/5.34/ExtUtils/typemap'
 XSUBPP_EXTRA_ARGS =
 
 
@@ -275,7 +277,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = List-Helpers-XS
-DISTVNAME = List-Helpers-XS-0.19
+DISTVNAME = List-Helpers-XS-0.20
 
 
 # --- MakeMaker macro section:
@@ -372,8 +374,6 @@ all :: pure_all manifypods
 	$(NOECHO) $(NOOP)
 
 pure_all :: config pm_to_blib subdirs linkext
-	$(NOECHO) $(NOOP)
-
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
@@ -478,9 +478,9 @@ OTHERLDFLAGS =
 INST_DYNAMIC_DEP = 
 INST_DYNAMIC_FIX = 
 
-$(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) 
 	$(RM_F) $@
-	$(LD)  $(LDDLFLAGS) $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
+	$(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
 	  $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) \
 	  $(INST_DYNAMIC_FIX)
 	$(CHMOD) $(PERM_RWX) $@
@@ -593,7 +593,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: perl' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
@@ -609,9 +609,9 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Test::More: '\''1.302183'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XSLoader: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues' >> META_new.yml
-	$(NOECHO) $(ECHO) '  repository: https://github.com/KalessinD/perl_linux_sys_cpu_affinity' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.19'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/KalessinD/perl_list_helpers_xs/issues' >> META_new.yml
+	$(NOECHO) $(ECHO) '  repository: https://github.com/KalessinD/perl_list_helpers_xs' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.20'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -621,7 +621,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "Chernenko Dmitriy <cnd@cpan.org>"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "perl_5"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
@@ -659,14 +659,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "resources" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "bugtracker" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '         "web" : "https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues"' >> META_new.json
+	$(NOECHO) $(ECHO) '         "web" : "https://github.com/KalessinD/perl_list_helpers_xs/issues"' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "repository" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '         "url" : "https://github.com/KalessinD/perl_linux_sys_cpu_affinity"' >> META_new.json
+	$(NOECHO) $(ECHO) '         "url" : "https://github.com/KalessinD/perl_list_helpers_xs"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.19",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.05"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.20",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.06"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -888,7 +888,6 @@ PERL_HDRS = \
         $(PERL_INCDEP)/cop.h            \
         $(PERL_INCDEP)/cv.h            \
         $(PERL_INCDEP)/dosish.h            \
-        $(PERL_INCDEP)/dquote_inline.h            \
         $(PERL_INCDEP)/ebcdic_tables.h            \
         $(PERL_INCDEP)/embed.h            \
         $(PERL_INCDEP)/embedvar.h            \
@@ -900,6 +899,7 @@ PERL_HDRS = \
         $(PERL_INCDEP)/handy.h            \
         $(PERL_INCDEP)/hv.h            \
         $(PERL_INCDEP)/hv_func.h            \
+        $(PERL_INCDEP)/hv_macro.h            \
         $(PERL_INCDEP)/inline.h            \
         $(PERL_INCDEP)/intrpvar.h            \
         $(PERL_INCDEP)/invlist_inline.h            \
@@ -924,6 +924,9 @@ PERL_HDRS = \
         $(PERL_INCDEP)/patchlevel-debian.h            \
         $(PERL_INCDEP)/patchlevel.h            \
         $(PERL_INCDEP)/perl.h            \
+        $(PERL_INCDEP)/perl_inc_macro.h            \
+        $(PERL_INCDEP)/perl_langinfo.h            \
+        $(PERL_INCDEP)/perl_siphash.h            \
         $(PERL_INCDEP)/perlapi.h            \
         $(PERL_INCDEP)/perlio.h            \
         $(PERL_INCDEP)/perliol.h            \
@@ -938,12 +941,14 @@ PERL_HDRS = \
         $(PERL_INCDEP)/regcomp.h            \
         $(PERL_INCDEP)/regexp.h            \
         $(PERL_INCDEP)/regnodes.h            \
+        $(PERL_INCDEP)/sbox32_hash.h            \
         $(PERL_INCDEP)/scope.h            \
         $(PERL_INCDEP)/sv.h            \
         $(PERL_INCDEP)/thread.h            \
         $(PERL_INCDEP)/time64.h            \
         $(PERL_INCDEP)/time64_config.h            \
         $(PERL_INCDEP)/uconfig.h            \
+        $(PERL_INCDEP)/uni_keywords.h            \
         $(PERL_INCDEP)/unicode_constants.h            \
         $(PERL_INCDEP)/unixish.h            \
         $(PERL_INCDEP)/utf8.h            \
@@ -951,7 +956,8 @@ PERL_HDRS = \
         $(PERL_INCDEP)/util.h            \
         $(PERL_INCDEP)/uudmap.h            \
         $(PERL_INCDEP)/vutil.h            \
-        $(PERL_INCDEP)/warnings.h            
+        $(PERL_INCDEP)/warnings.h            \
+        $(PERL_INCDEP)/zaphod32_hash.h            
 
 $(OBJECT) : $(PERL_HDRS)
 
@@ -982,7 +988,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
 FULLPERL      = "/usr/bin/perl"
-MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/usr/lib/x86_64-linux-gnu/perl/5.26" "-I/usr/share/perl/5.26"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/usr/lib/x86_64-linux-gnu/perl/5.34" "-I/usr/share/perl/5.34"
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -1023,17 +1029,17 @@ testdb_dynamic :: dynamic pure_all
 subdirs-test_static :: static pure_all
 
 test_static :: subdirs-test_static $(MAP_TARGET)
-	PERL_DL_NONLAZY=1 "/home/trojn/github/perl_list_helpers_xs/$(MAP_TARGET)" $(MAP_PERLINC) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
+	PERL_DL_NONLAZY=1 "/home/dchernenko/github/perl_list_helpers_xs/$(MAP_TARGET)" $(MAP_PERLINC) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
 
 testdb_static :: static pure_all $(MAP_TARGET)
-	PERL_DL_NONLAZY=1 "/home/trojn/github/perl_list_helpers_xs/$(MAP_TARGET)" $(MAP_PERLINC) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
+	PERL_DL_NONLAZY=1 "/home/dchernenko/github/perl_list_helpers_xs/$(MAP_TARGET)" $(MAP_PERLINC) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
 
 
 
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="List-Helpers-XS" VERSION="0.19">' > List-Helpers-XS.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="List-Helpers-XS" VERSION="0.20">' > List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Perl extension to provide some usefull functions with arrays</ABSTRACT>' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Chernenko Dmitriy &lt;cnd@cpan.org&gt;</AUTHOR>' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> List-Helpers-XS.ppd
@@ -1041,7 +1047,7 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::LeakTrace" VERSION="0.14" />' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::More" VERSION="1.302183" />' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XSLoader::" />' >> List-Helpers-XS.ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.26" />' >> List-Helpers-XS.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.34" />' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> List-Helpers-XS.ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> List-Helpers-XS.ppd

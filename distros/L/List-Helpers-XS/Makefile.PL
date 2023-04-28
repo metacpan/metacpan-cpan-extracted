@@ -17,8 +17,8 @@ WriteMakefile(
     },
     'META_MERGE'    => {
         'resources' => {
-            'bugtracker' => 'https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues',
-            'repository' => 'https://github.com/KalessinD/perl_linux_sys_cpu_affinity',
+            'bugtracker' => 'https://github.com/KalessinD/perl_list_helpers_xs/issues',
+            'repository' => 'https://github.com/KalessinD/perl_list_helpers_xs',
         },
     },
     CC => 'c++',

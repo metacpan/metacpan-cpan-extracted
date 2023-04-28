@@ -11,7 +11,6 @@ WriteMakefile(
 	ABSTRACT_FROM => 'lib/App/SeismicUnixGui.pm',
 	LICENSE       => 'perl',
         EXE_FILES     => [qw(
-        ./lib/App/SeismicUnixGui/script/set_env_variables.sh
 		./lib/App/SeismicUnixGui/script/post_install_scripts.sh
 		./lib/App/SeismicUnixGui/script/post_install_env.pl
 		./lib/App/SeismicUnixGui/script/post_install_c_compile.pl

@@ -2622,6 +2622,7 @@ App-SeismicUnixGui-0.82.0/t/misc.t
 App-SeismicUnixGui-0.82.0/t/script.t
 App-SeismicUnixGui-0.82.0/t/specs.t
 App-SeismicUnixGui-0.82.0/t/sunix.t
+App-SeismicUnixGui-0.82.3.tar.gz
 archive/big_streams_param.pm
 archive/color_listbox_tbd.pm
 archive/config_superflows_fix.pm
@@ -3859,6 +3860,7 @@ lib/App/SeismicUnixGui/script/iSpectralAnalysis
 lib/App/SeismicUnixGui/script/iTopMute
 lib/App/SeismicUnixGui/script/iVA
 lib/App/SeismicUnixGui/script/junk
+lib/App/SeismicUnixGui/script/L_SU.pl
 lib/App/SeismicUnixGui/script/L_SU_project_selector.pl
 lib/App/SeismicUnixGui/script/L_SUV0.80.6.pl
 lib/App/SeismicUnixGui/script/L_SUV0.80.7.pl
@@ -4511,7 +4513,9 @@ t/developer.t
 t/geopsy.t
 t/messages.t
 t/misc.t
+t/misc2.t
 t/misc_files.txt
+t/misc_files2.txt
 t/script.t
 t/specs.t
 t/sunix.t

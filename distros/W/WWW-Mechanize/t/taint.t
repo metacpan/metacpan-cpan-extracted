@@ -2,22 +2,17 @@
 
 use warnings;
 use strict;
-use Test::More;
+use Test::More tests => 6;
+use Test::Taint 1.08;
 
 BEGIN {
-    eval 'use Test::Taint';
-    plan skip_all => 'Test::Taint required for checking taintedness' if $@;
-    plan tests=>6;
-}
-
-BEGIN {
-    use_ok( 'WWW::Mechanize' );
+    use_ok('WWW::Mechanize');
 }
 
 my $mech = WWW::Mechanize->new( autocheck => 1 );
 isa_ok( $mech, 'WWW::Mechanize', 'Created object' );
 
-$mech->get( 'file:t/google.html' );
+$mech->get('file:t/google.html');
 
 # Make sure taint checking is on correctly
 tainted_ok( $^X, 'Interpreter Variable taints OK' );

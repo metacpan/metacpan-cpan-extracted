@@ -9,7 +9,7 @@ use Config;
 
 use vars qw{$VERSION @ISA @EXPORT $DIST};
 BEGIN {
-	$VERSION = '1.20';
+	$VERSION = '1.21';
 	@ISA     = 'Exporter';
 	@EXPORT  = qw{
 		create_dist

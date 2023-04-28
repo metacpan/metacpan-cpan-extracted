@@ -1,49 +1,52 @@
 Revision history for Perl extension File::Find::Rule::VCS
 
-1.08 Wed  6 Oct 2010
+1.09      2023-04-28 12:43:47Z
+        - tooling updates
+
+1.08    2010-10-06
 	- Upgrading to Module::Install::DSL 1.00
 	- Removing use UNIVERSAL, it does some evil stuff
 
-1.07 Mon 31 May 2010
+1.07    2010-05-31
 	- Added git support to resolve #43558: .git missing
 	- Extend test for bzr, git and default invocation
 	  (Jens Rehsack)
 	- Added support for RCS (RT#43559) and Mercurial/hg
 	  (Jens Rehsack)
 
-1.06 Wed  8 Jul 2009
+1.06    2009-07-08
 	- Updated to Module::Install::DSL 0.91
 	- Added explicit dependency on Text::Glob.
 	  Some CPAN Testers machines seem to blow up without it.
 
-1.05 Mon 29 Sep 2008
+1.05    2008-09-29
 	- Updated to Module::Install 0.77
 	- Updated tests to new style
 	- Adding support for _svn (closes bug #32030)
 
-1.04 Sat 10 May 2008
+1.04    2008-05-10
 	- Support ->ignore_vcs() for ignoring all supported VCS
 	- Change all methods to check file name before checking
 	  it is a directory or file.
 	  This should provide a *massive* reduction in the number
 	  of filesystem -f or -d calls that get made.
 
-1.03 Sat 22 Mar 2008
+1.03    2008-03-22
 	- Adding support for Bazaar
 
-1.02 Fri 22 Sep 2006
+1.02    2006-09-22
         - Making ->ignore_vcs('') a nullop, as a convenience
 
-1.01 Mon  4 Sep 2006
+1.01    2006-09-04
 	- Upgrading to Module::Install 0.64
 
-1.00 Sat  8 Apr 2006
+1.00    2006-04-08
 	- Moved from old CVS to new SVN repository
 	- Upgraded to Module::Install 0.61
 
-0.02 Sat 12 Feb 2005
+0.02    2005-02-12
 	- Decided that ignore_ was better than discard_
 	- When filtering CVS, remove those post-merge dot-hash files
 
-0.01 Fri 11 Feb 2005
+0.01    2005-02-11
 	- Created the initial version of the module

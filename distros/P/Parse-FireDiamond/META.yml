@@ -19,7 +19,7 @@ name: Parse-FireDiamond
 provides:
   Parse::FireDiamond:
     file: lib/Parse/FireDiamond.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-FireDiamond
   homepage: https://metacpan.org/release/Parse-FireDiamond
   repository: git://github.com/perlancar/perl-Parse-FireDiamond.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

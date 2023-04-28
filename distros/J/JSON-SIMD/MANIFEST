@@ -15,6 +15,10 @@ SIMD/Boolean.pm
 bin/json_simd
 eg/bench
 eg/bench_simdjson.pl
+eg/bench_at_path.pl
+eg/bench_functional.pl
+eg/bench_simdjson.pl
+eg/generate_longkeys.pl
 t/00_load.t
 t/01_utf8.t
 t/02_error.t
@@ -54,8 +58,10 @@ t/19_incr.t
 t/20_faihu.t
 t/21_evans.t
 t/22_comment_at_eof.t
+t/23_boolean.t
 t/52_object.t
 t/99_binary.t
+xt/02_leak_memory.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

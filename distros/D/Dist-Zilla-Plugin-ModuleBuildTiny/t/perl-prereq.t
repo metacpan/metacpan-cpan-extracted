@@ -31,6 +31,7 @@ use warnings;
 use 5.010;
 use Module::Build::Tiny 0.034;
 Build_PL();
+
 END
 
 is(path($tzil->built_in)->child('Build.PL')->slurp, $expected, 'Build.PL declares the correct minimum perl version');

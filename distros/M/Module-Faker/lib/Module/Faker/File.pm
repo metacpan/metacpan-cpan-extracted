@@ -1,4 +1,4 @@
-package Module::Faker::File 0.023;
+package Module::Faker::File 0.024;
 # ABSTRACT: a fake file in a fake dist
 
 use Moose;
@@ -24,7 +24,7 @@ Module::Faker::File - a fake file in a fake dist
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 PERL VERSION
 

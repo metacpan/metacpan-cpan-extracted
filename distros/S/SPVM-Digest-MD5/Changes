@@ -1,3 +1,6 @@
+1.001001 2023-04-28
+  [Meta Information Fix]
+    * Fixed the license in Makefile.PL
 1.001 2023-04-27
   [Prerequirement Change]
     * SPVM 0.971006 is required.

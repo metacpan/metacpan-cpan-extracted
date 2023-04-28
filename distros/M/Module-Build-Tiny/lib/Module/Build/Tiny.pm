@@ -1,5 +1,5 @@
 package Module::Build::Tiny;
-$Module::Build::Tiny::VERSION = '0.043';
+$Module::Build::Tiny::VERSION = '0.044';
 use strict;
 use warnings;
 use Exporter 5.57 'import';
@@ -45,7 +45,7 @@ sub manify {
 }
 
 sub process_xs {
-	my ($source, $options) = @_;
+	my ($source, $options, $c_files) = @_;
 
 	die "Can't build xs files under --pureperl-only\n" if $options->{'pureperl-only'};
 	my (undef, @parts) = splitdir(dirname($source));
@@ -64,9 +64,9 @@ sub process_xs {
 	my @objects = $builder->compile(source => $c_file, defines => { VERSION => qq/"$version"/, XS_VERSION => qq/"$version"/ }, include_dirs => [ curdir, 'include', dirname($source) ]);
 
 	my $o = $options->{config}->get('_o');
-	for my $c_source (find(qr/\.c$/, 'src')) {
+	for my $c_source (@{ $c_files }) {
 		my $o_file = catfile($tempdir, basename($c_source, '.c') . $o);
-		push @objects, $builder->compile(source => $c_file, include_dirs => [ curdir, 'include', dirname($source) ])
+		push @objects, $builder->compile(source => $c_source, include_dirs => [ curdir, 'include', dirname($source) ])
 	}
 
 	require DynaLoader;
@@ -101,11 +101,16 @@ my %actions = (
 		my %docs    = map { $_ => catfile('blib', $_) } find(qr/\.pod$/, 'lib');
 		my %scripts = map { $_ => catfile('blib', $_) } find(qr//, 'script');
 		my %sdocs   = map { $_ => delete $scripts{$_} } grep { /.pod$/ } keys %scripts;
-		my %shared  = map { $_ => catfile(qw/blib lib auto share dist/, $opt{meta}->name, abs2rel($_, 'share')) } find(qr//, 'share');
-		pm_to_blib({ %modules, %docs, %scripts, %shared }, catdir(qw/blib lib auto/));
+		my %dist_shared  = map { $_ => catfile(qw/blib lib auto share dist/, $opt{meta}->name, abs2rel($_, 'share')) } find(qr//, 'share');
+		my %module_shared  = map { $_ => catfile(qw/blib lib auto share module/, abs2rel($_, 'module-share')) } find(qr//, 'module-share');
+		pm_to_blib({ %modules, %docs, %scripts, %dist_shared, %module_shared }, catdir(qw/blib lib auto/));
 		make_executable($_) for values %scripts;
 		mkpath(catdir(qw/blib arch/), $opt{verbose});
-		process_xs($_, \%opt) for find(qr/.xs$/, 'lib');
+		my $main_xs = catfile('lib', split /-/, $opt{meta}->name) . '.xs';
+		for my $xs (find(qr/.xs$/, 'lib')) {
+			my @c_files = $xs eq $main_xs ? find(qr/\.c$/, 'src') : ();
+			process_xs($xs, \%opt, \@c_files);
+		}
 
 		if ($opt{install_paths}->install_destination('bindoc') && $opt{install_paths}->is_default_installable('bindoc')) {
 			my $section = $opt{config}->get('man1ext');
@@ -197,7 +202,7 @@ Module::Build::Tiny - A tiny replacement for Module::Build
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 
@@ -230,6 +235,8 @@ than 200, yet supports the features needed by most distributions.
 
 =item * Generated code from PL files
 
+=item * Module sharedirs
+
 =back
 
 =head2 Not Supported
@@ -242,14 +249,17 @@ than 200, yet supports the features needed by most distributions.
 
 =item * Extending Module::Build::Tiny
 
-=item * Module sharedirs
-
 =back
 
 =head2 Directory structure
 
 Your .pm, .xs and .pod files must be in F<lib/>.  Any executables must be in
-F<script/>.  Test files must be in F<t/>. Dist sharedirs must be in F<share/>.
+F<script/>.  Test files must be in F<t/>. Dist sharedirs must be in F<share/>,
+module sharedirs are under F<module-share> (e.g. F<module-share/Foo-Bar> for
+module C<Foo::Bar>).
+
+C<.c> files in the F<src/> are compiled together with the .xs file matching the
+distribution name.
 
 =head1 USAGE
 

@@ -1,4 +1,4 @@
-package ExtUtils::Manifest; # git description: 1.72-7-g54209ce
+package ExtUtils::Manifest; # git description: 1.73-6-gddfed15
 
 require Exporter;
 use Config;
@@ -10,7 +10,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 our @ISA = ('Exporter');
 our @EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
@@ -65,7 +65,7 @@ ExtUtils::Manifest - Utilities to write and check a MANIFEST file
 
 =head1 VERSION
 
-version 1.73
+version 1.74
 
 =head1 SYNOPSIS
 
@@ -134,25 +134,25 @@ sub mkmanifest {
                      'This list of files'
         if $manimiss; # add new MANIFEST to known file list
     foreach $file (_sort keys %all) {
-	if ($skip->($file)) {
-	    # Policy: only remove files if they're listed in MANIFEST.SKIP.
-	    # Don't remove files just because they don't exist.
-	    warn "Removed from $MANIFEST: $file\n" if $Verbose and exists $read->{$file};
-	    next;
-	}
-	if ($Verbose){
-	    warn "Added to $MANIFEST: $file\n" unless exists $read->{$file};
-	}
-	my $text = $all{$file};
-	$file = _unmacify($file);
-	my $tabs = (5 - (length($file)+1)/8);
-	$tabs = 1 if $tabs < 1;
-	$tabs = 0 unless $text;
+        if ($skip->($file)) {
+            # Policy: only remove files if they're listed in MANIFEST.SKIP.
+            # Don't remove files just because they don't exist.
+            warn "Removed from $MANIFEST: $file\n" if $Verbose and exists $read->{$file};
+            next;
+        }
+        if ($Verbose){
+            warn "Added to $MANIFEST: $file\n" unless exists $read->{$file};
+        }
+        my $text = $all{$file};
+        $file = _unmacify($file);
+        my $tabs = (5 - (length($file)+1)/8);
+        $tabs = 1 if $tabs < 1;
+        $tabs = 0 unless $text;
         if ($file =~ /\s/) {
             $file =~ s/([\\'])/\\$1/g;
             $file = "'$file'";
         }
-	print M $file, "\t" x $tabs, $text, "\n";
+        print M $file, "\t" x $tabs, $text, "\n";
     }
     close M;
 }
@@ -189,10 +189,10 @@ sub manifind {
     my $found = {};
 
     my $wanted = sub {
-	my $name = clean_up_filename($File::Find::name);
-	warn "Debug: diskfile $name\n" if $Debug;
-	return if -d $_;
-	$found->{$name} = "";
+        my $name = clean_up_filename($File::Find::name);
+        warn "Debug: diskfile $name\n" if $Debug;
+        return if -d $_;
+        $found->{$name} = "";
     };
 
     # We have to use "$File::Find::dir/$_" in preprocess, because
@@ -200,7 +200,7 @@ sub manifind {
     # Also, it's okay to use / here, because MANIFEST files use Unix-style
     # paths.
     find({wanted => $wanted, follow_fast => 1},
-	 $Is_MacOS ? ":" : ".");
+        $Is_MacOS ? ":" : ".");
 
     return $found;
 }
@@ -416,17 +416,17 @@ sub maniskip {
     local(*M, $_);
     open M, "< $mfile" or open M, "< $DEFAULT_MSKIP" or return sub {0};
     while (<M>){
-      chomp;
-      s/\r//;
-      $_ =~ qr{^\s*(?:(?:'([^\\']*(?:\\.[^\\']*)*)')|([^#\s]\S*))?(?:(?:\s*)|(?:\s+(.*?)\s*))$};
-      #my $comment = $3;
-      my $filename = $2;
-      if ( defined($1) ) {
-        $filename = $1;
-        $filename =~ s/\\(['\\])/$1/g;
-      }
-      next if (not defined($filename) or not $filename);
-      push @skip, _macify($filename);
+        chomp;
+        s/\r//;
+        $_ =~ qr{^\s*(?:(?:'([^\\']*(?:\\.[^\\']*)*)')|([^#\s]\S*))?(?:(?:\s*)|(?:\s+(.*?)\s*))$};
+        #my $comment = $3;
+        my $filename = $2;
+        if ( defined($1) ) {
+          $filename = $1;
+          $filename =~ s/\\(['\\])/$1/g;
+        }
+        next if (not defined($filename) or not $filename);
+        push @skip, _macify($filename);
     }
     close M;
     return sub {0} unless (scalar @skip > 0);
@@ -457,20 +457,20 @@ sub _check_mskip_directives {
     }
     while (<M>) {
         if (/^#!include_default\s*$/) {
-	    if (my @default = _include_mskip_file()) {
-	        push @lines, @default;
-		warn "Debug: Including default MANIFEST.SKIP\n" if $Debug;
-		$flag++;
-	    }
-	    next;
+            if (my @default = _include_mskip_file()) {
+                push @lines, @default;
+                warn "Debug: Including default MANIFEST.SKIP\n" if $Debug;
+                $flag++;
+            }
+            next;
         }
-	if (/^#!include\s+(.*)\s*$/) {
-	    my $external_file = $1;
-	    if (my @external = _include_mskip_file($external_file)) {
-	        push @lines, @external;
-		warn "Debug: Including external $external_file\n" if $Debug;
-		$flag++;
-	    }
+        if (/^#!include\s+(.*)\s*$/) {
+            my $external_file = $1;
+            if (my @external = _include_mskip_file($external_file)) {
+                push @lines, @external;
+                warn "Debug: Including external $external_file\n" if $Debug;
+                $flag++;
+            }
             next;
         }
         push @lines, $_;
@@ -543,22 +543,22 @@ sub manicopy {
     $target = VMS::Filespec::unixify($target) if $Is_VMS_mode;
     File::Path::mkpath([ $target ],! $Quiet,$Is_VMS ? undef : 0755);
     foreach my $file (keys %$read){
-	if ($Is_MacOS) {
-	    if ($file =~ m!:!) {
-		my $dir = _maccat($target, $file);
-		$dir =~ s/[^:]+$//;
-		File::Path::mkpath($dir,1,0755);
-	    }
-	    cp_if_diff($file, _maccat($target, $file), $how);
-	} else {
-	    $file = VMS::Filespec::unixify($file) if $Is_VMS_mode;
-	    if ($file =~ m!/!) { # Ilya, that hurts, I fear, or maybe not?
-		my $dir = File::Basename::dirname($file);
-		$dir = VMS::Filespec::unixify($dir) if $Is_VMS_mode;
-		File::Path::mkpath(["$target/$dir"],! $Quiet,$Is_VMS ? undef : 0755);
-	    }
-	    cp_if_diff($file, "$target/$file", $how);
-	}
+        if ($Is_MacOS) {
+            if ($file =~ m!:!) {
+                my $dir = _maccat($target, $file);
+                $dir =~ s/[^:]+$//;
+                File::Path::mkpath($dir,1,0755);
+            }
+            cp_if_diff($file, _maccat($target, $file), $how);
+        } else {
+            $file = VMS::Filespec::unixify($file) if $Is_VMS_mode;
+            if ($file =~ m!/!) { # Ilya, that hurts, I fear, or maybe not?
+                my $dir = File::Basename::dirname($file);
+                $dir = VMS::Filespec::unixify($dir) if $Is_VMS_mode;
+                File::Path::mkpath(["$target/$dir"],! $Quiet,$Is_VMS ? undef : 0755);
+            }
+            cp_if_diff($file, "$target/$file", $how);
+        }
     }
 }
 
@@ -573,24 +573,24 @@ sub cp_if_diff {
     open(F,"< $from\0") or die "Can't read $from: $!\n";
     if (open(T,"< $to\0")) {
         local $_;
-	while (<F>) { $diff++,last if $_ ne <T>; }
-	$diff++ unless eof(T);
-	close T;
+        while (<F>) { $diff++,last if $_ ne <T>; }
+        $diff++ unless eof(T);
+        close T;
     }
     else { $diff++; }
     close F;
     if ($diff) {
-	if (-e $to) {
-	    unlink($to) or confess "unlink $to: $!";
-	}
+        if (-e $to) {
+            unlink($to) or confess "unlink $to: $!";
+        }
         STRICT_SWITCH: {
-	    best($from,$to), last STRICT_SWITCH if $how eq 'best';
-	    cp($from,$to), last STRICT_SWITCH if $how eq 'cp';
-	    ln($from,$to), last STRICT_SWITCH if $how eq 'ln';
-	    croak("ExtUtils::Manifest::cp_if_diff " .
-		  "called with illegal how argument [$how]. " .
-		  "Legal values are 'best', 'cp', and 'ln'.");
-	}
+            best($from,$to), last STRICT_SWITCH if $how eq 'best';
+            cp($from,$to), last STRICT_SWITCH if $how eq 'cp';
+            ln($from,$to), last STRICT_SWITCH if $how eq 'ln';
+            croak("ExtUtils::Manifest::cp_if_diff " .
+              "called with illegal how argument [$how]. " .
+              "Legal values are 'best', 'cp', and 'ln'.");
+        }
     }
 }
 
@@ -634,9 +634,9 @@ sub best {
 
     my $is_exception = grep $srcFile =~ /$_/, @Exceptions;
     if ($is_exception or !$Config{d_link} or -l $srcFile) {
-	cp($srcFile, $dstFile);
+        cp($srcFile, $dstFile);
     } else {
-	ln($srcFile, $dstFile) or cp($srcFile, $dstFile);
+        ln($srcFile, $dstFile) or cp($srcFile, $dstFile);
     }
 }
 
@@ -647,8 +647,8 @@ sub _macify {
 
     $file =~ s|^\./||;
     if ($file =~ m|/|) {
-	$file =~ s|/+|:|g;
-	$file = ":$file";
+        $file =~ s|/+|:|g;
+        $file = ":$file";
     }
 
     $file;
@@ -741,7 +741,7 @@ sub _fix_manifest {
     if ( $must_rewrite ) {
         1 while unlink $MANIFEST; # avoid multiple versions on VMS
         open MANIFEST, ">", $MANIFEST or die "(must_rewrite=$must_rewrite) Could not open >$MANIFEST: $!";
-	binmode MANIFEST, ':raw';
+        binmode MANIFEST, ':raw';
         for (my $i=0; $i<=$#manifest; $i+=2) {
             print MANIFEST "$manifest[$i]\n";
         }

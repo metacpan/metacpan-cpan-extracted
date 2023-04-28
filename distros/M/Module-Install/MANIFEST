@@ -1,9 +1,7 @@
 .ackrc
 .mailmap
-.travis.yml
 Changes
 lib/inc/Module/Install.pm
-lib/inc/Module/Install/DSL.pm
 lib/Module/AutoInstall.pm
 lib/Module/Install.pm
 lib/Module/Install.pod
@@ -24,7 +22,6 @@ lib/Module/Install/Bundle.pm
 lib/Module/Install/Can.pm
 lib/Module/Install/Compiler.pm
 lib/Module/Install/Deprecated.pm
-lib/Module/Install/DSL.pm
 lib/Module/Install/External.pm
 lib/Module/Install/FAQ.pod
 lib/Module/Install/Fetch.pm
@@ -53,7 +50,6 @@ t/04_version.t
 t/05_share.t
 t/06_ppport.t
 t/07_perl_version.t
-t/08_dsl.t
 t/09_read.t
 t/10_test.t
 t/11_extraction.t

@@ -1,5 +1,9 @@
 Revision history for Module-Faker
 
+0.024     2023-04-28 11:48:37+02:00 Europe/Paris
+        - add "class" and "role" style packages
+        - allow "style" to be present in "provides"
+
 0.023     2022-11-30 07:52:25-05:00 America/New_York
         - add some more Pod (thanks gregor herrmann and Debian!)
         - update dist metadata

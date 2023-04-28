@@ -27,6 +27,14 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 23.4
+
+* Added **CreateTableRow**, **UpdateTableRow** and **DeleteTableRow** methods to add, update and delete table rows.
+* Added **UpdateTableCell** method to update table cells.
+* Added  **MergeTableCells** and **SplitTableCell** methods to merge &amp; split table cells.
+* Added methods to get, add, modify and delete paragraphs & portions within table cells: **GetTableCellParagraph**, **GetTableCellParagraphs**, **GetTableCellPortion**, **GetTableCellPortions**, **CreateTableCellParagraph**, **CreateTableCellPortion**, **UpdateTableCellPortion**, **UpdateTableCellParagraph**, **DeleteTableCellParagraph**,  **DeleteTableCellPortion**.
+* New **TextFrameFormat** property in **TableCell** class allows to specify text format for table cells.
+
 ## Enhancements in Version 23.3
 
 * Added **options** parameter to **SplitOnline** and **SplitAndSaveOnline** methods. Those options are the same as for other split & convert methods.

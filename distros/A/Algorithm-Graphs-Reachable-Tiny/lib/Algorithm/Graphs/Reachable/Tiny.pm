@@ -4,28 +4,47 @@ use 5.008;
 use strict;
 use warnings;
 
+use Carp;
 use Exporter 'import';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(all_reachable);
 
 
 sub all_reachable {
+  @_ == 2 or croak("Need exactly two arguments!");
   my ($graph, $nodes) = @_;
   my %visited = ref($nodes) eq "ARRAY" ? map {$_ => undef} @{$nodes} : %{$nodes};
   return {} unless %visited;
-  return \%visited unless %{$graph};
   my @queue = keys(%visited);
-  while (defined(my $v = shift(@queue))) {
-    if (exists($graph->{$v})) {              ## we need this if() to avoid autovivification!
-      foreach my $s (keys(%{$graph->{$v}})) {
-        if (!exists($visited{$s})) {
-          $visited{$s} = undef;
-          push(@queue, $s);
+  if (ref($graph) eq 'HASH') {
+  return \%visited unless %{$graph};
+    while (defined(my $v = shift(@queue))) {
+      if (exists($graph->{$v})) { ## we need this if() to avoid autovivification!
+        foreach my $s (keys(%{$graph->{$v}})) {
+          if (!exists($visited{$s})) {
+            $visited{$s} = undef;
+            push(@queue, $s);
+          }
         }
       }
     }
+  }
+  elsif (ref($graph) eq 'ARRAY') {
+  return \%visited unless @{$graph};
+    while (defined(my $v = shift(@queue))) {
+      if (defined($graph->[$v])) {
+        foreach my $s (keys(%{$graph->[$v]})) {
+          if (!exists($visited{$s})) {
+            $visited{$s} = undef;
+            push(@queue, $s);
+          }
+        }
+      }
+    }
+  } else {
+    croak("Arg 1 must be an ARRAY or HASH reference");
   }
   return \%visited;
 }
@@ -48,7 +67,7 @@ Algorithm::Graphs::Reachable::Tiny - Compute rechable nodes in a graph.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 
 =head1 SYNOPSIS
@@ -72,6 +91,23 @@ or
 
    my $reachable = all_reachable(\%g, {4 => undef, 7 => undef});
 
+or
+
+  my @g = (
+           {1 => undef},
+           {2 => undef, 4 => undef},
+           {3 => undef},
+           {},
+           {5 => undef},
+           undef,
+           {7 => undef},
+           {8 => undef},
+           {9 => undef},
+           {7 => undef, 10 => undef}
+          );
+
+   my $reachable = all_reachable(\@g, [4, 7]);
+
 
 =head1 DESCRIPTION
 
@@ -91,13 +127,16 @@ A graph must be represented like this:
 In this example, there is an edge from 'this' to 'that'. Note that you are not
 forced to use C<undef> as hash value.
 
+If your vertices are integers, you can also specify the graph as an array of
+hashes. Non-existent or unconnected vertices can be specified by an empty hash
+or by C<undef>.
 
 =head2 FUNCTIONS
 
 =head3 all_reachable(GRAPH, NODES)
 
-I<C<GRAPH>> must be a reference to a hash. It represents the graph as described above.
-I<C<NODES>> must be a reference to a hash or an array.
+I<C<GRAPH>> must be a reference to a hash or a hash. It represents the graph
+as described above.  I<C<NODES>> must be a reference to a hash or an array.
 
 The function determines the set of all nodes in I<C<GRAPH>> that are reachable
 from one of the nodes in I<C<NODES>>. It returns a reference to a hash
@@ -118,6 +157,9 @@ I<C<NODES>>.
 
 If I<C<NODES>> contains elements that are not in I<C<GRAPH>>, then those
 elements are still in the result set.
+
+Note: If I<C<GRAPH>> is an array reference, then I<C<NODES>> must contain
+integers only.
 
 =back
 
